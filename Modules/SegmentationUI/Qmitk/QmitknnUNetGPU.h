@@ -6,12 +6,12 @@ Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
 Use of this source code is governed by a 3-clause BSD license that can be
-found in the LICENSE file.s
+found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitknnUNetToolGPU_h_Included
-#define QmitknnUNetToolGPU_h_Included
+#ifndef QmitknnUNetGPU_h
+#define QmitknnUNetGPU_h
 
 #include <vector>
 #include <QString>
@@ -50,7 +50,7 @@ public:
    *
    * @return int
    */
-  int GetGPUCount();
+  int GetGPUCount() const;
 
   /**
    * @brief Returns all the parsed GPU  information

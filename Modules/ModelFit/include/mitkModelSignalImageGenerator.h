@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MODELSIGNALIMAGEGENERATOR_H
-#define MODELSIGNALIMAGEGENERATOR_H
+#ifndef mitkModelSignalImageGenerator_h
+#define mitkModelSignalImageGenerator_h
 
 
 #include "mitkModelParameterizerBase.h"
@@ -81,4 +81,4 @@ namespace mitk
 }
 
 
-#endif // MODELSIGNALIMAGEGENERATOR_H
+#endif

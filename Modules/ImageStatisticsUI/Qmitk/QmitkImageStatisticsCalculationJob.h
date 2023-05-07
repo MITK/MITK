@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMITKIMAGESTATISTICSCALCULATIONTHREAD_H_INCLUDED
-#define QMITKIMAGESTATISTICSCALCULATIONTHREAD_H_INCLUDED
+#ifndef QmitkImageStatisticsCalculationJob_h
+#define QmitkImageStatisticsCalculationJob_h
 
 //QT headers
 #include <QThread>
@@ -95,4 +95,4 @@ private:
   std::vector<HistogramType::ConstPointer> m_HistogramVector;          ///< member holds the histograms of all time steps.
   std::string m_message;
 };
-#endif // QMITKIMAGESTATISTICSCALCULATIONTHREAD_H_INCLUDED
+#endif

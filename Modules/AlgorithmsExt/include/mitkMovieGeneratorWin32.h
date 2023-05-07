@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MovieGeneratorWin32WIN32_H_HEADER_INCLUDED
-#define MovieGeneratorWin32WIN32_H_HEADER_INCLUDED
+#ifndef mitkMovieGeneratorWin32_h
+#define mitkMovieGeneratorWin32_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include "mitkMovieGenerator.h"
@@ -75,4 +75,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MovieGeneratorWin32WIN32_H_HEADER_INCLUDED */
+#endif

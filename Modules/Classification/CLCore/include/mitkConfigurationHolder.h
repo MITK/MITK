@@ -79,4 +79,4 @@ namespace mitk
   };
 }
 
-#endif //mitkConfigurationHolder_h
+#endif

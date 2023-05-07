@@ -13,28 +13,53 @@ found in the LICENSE file.
 #include "QmitkAboutDialog.h"
 #include "QmitkModulesDialog.h"
 #include <QPushButton>
+#include <QRegularExpression>
 #include <itkConfigure.h>
 #include <mitkVersion.h>
 #include <vtkVersionMacros.h>
+
+namespace
+{
+  QString CreateRevisionLabelText()
+  {
+    auto revisionText = QString("<html><head/><body><p>Revision: <a href=\"https://phabricator.mitk.org/rMITK%1\"><span style=\"text-decoration: underline; color:#5555ff;\">%1</span></a>").arg(MITK_REVISION);
+    QString mitkRevisionDescription(MITK_REVISION_DESC);
+
+    if (!mitkRevisionDescription.isEmpty())
+      revisionText += QString("<br>Description: %1").arg(mitkRevisionDescription);
+
+    revisionText += "</p></body></html>";
+
+    return revisionText;
+  }
+
+  QString CreateToolkitVersionsLabelText()
+  {
+    auto itkVersion = QString("%1.%2.%3").arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH);
+    return QString("ITK %1, VTK %2, Qt %3").arg(itkVersion, VTK_VERSION, QT_VERSION_STR);
+  }
+
+  QString MatchDocumentationToReleaseVersion(QString nightly)
+  {
+    QRegularExpression regEx("^v(\\d\\d\\d\\d\\.\\d\\d)$"); // "v", 4 digits, dot, 2 digits
+    auto match = regEx.match(MITK_REVISION_DESC);
+
+    if (match.hasMatch())
+      nightly.replace("nightly", match.captured(1)); // Replace with captured 4 digits, dot, 2 digits
+
+    return nightly;
+  }
+}
 
 QmitkAboutDialog::QmitkAboutDialog(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
   m_GUI.setupUi(this);
 
-  QString mitkRevision(MITK_REVISION);
-  QString mitkRevisionDescription(MITK_REVISION_DESC);
-  QString itkVersion = QString("%1.%2.%3").arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH);
-  QString vtkVersion = QString("%1.%2.%3").arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION);
+  m_GUI.m_RevisionLabel->setText(CreateRevisionLabelText());
+  m_GUI.m_ToolkitVersionsLabel->setText(CreateToolkitVersionsLabelText());
+  m_GUI.m_AboutLabel->setText(MatchDocumentationToReleaseVersion(m_GUI.m_AboutLabel->text()));
 
-  QString revisionText = QString("Revision: %1").arg(MITK_REVISION);
-
-  if (!QString(MITK_REVISION_DESC).isEmpty())
-    revisionText += QString("\nDescription: %1").arg(MITK_REVISION_DESC);
-
-  m_GUI.m_RevisionLabel->setText(revisionText);
-  m_GUI.m_ToolkitVersionsLabel->setText(QString("ITK %1, VTK %2, Qt %3").arg(itkVersion, vtkVersion, QT_VERSION_STR));
-
-  QPushButton *btnModules = new QPushButton(QIcon(":/QtWidgetsExt/ModuleView.png"), "Modules");
+  auto* btnModules = new QPushButton(QIcon(":/QtWidgetsExt/ModuleView.png"), "Modules");
   m_GUI.m_ButtonBox->addButton(btnModules, QDialogButtonBox::ActionRole);
 
   connect(btnModules, SIGNAL(clicked()), this, SLOT(ShowModules()));

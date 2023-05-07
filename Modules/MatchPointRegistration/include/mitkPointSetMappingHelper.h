@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITK_POINTSET_MAPPING_HELPER_H
-#define MITK_POINTSET_MAPPING_HELPER_H
+#ifndef mitkPointSetMappingHelper_h
+#define mitkPointSetMappingHelper_h
 
 #include "mapRegistrationBase.h"
 #include <mitkPointSet.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkLiveWireTool2DGUI_h_Included
-#define QmitkLiveWireTool2DGUI_h_Included
+#ifndef QmitkLiveWireTool2DGUI_h
+#define QmitkLiveWireTool2DGUI_h
 
 #include "QmitkEditableContourToolGUIBase.h"
 #include <MitkSegmentationUIExports.h>

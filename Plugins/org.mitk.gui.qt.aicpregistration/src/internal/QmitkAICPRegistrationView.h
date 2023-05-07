@@ -114,4 +114,4 @@ class QmitkAICPRegistrationView : public QmitkAbstractView
 
 };
 
-#endif // QmitkAICPRegistrationView_h
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLEVELWINDOWRANGECHANGEDIALOG_H_
-#define QMITKLEVELWINDOWRANGECHANGEDIALOG_H_
+#ifndef QmitkLevelWindowRangeChangeDialog_h
+#define QmitkLevelWindowRangeChangeDialog_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -40,4 +40,4 @@ protected slots:
   void inputValidator();
 };
 
-#endif /*QMITKLEVELWINDOWRANGECHANGEDIALOG_H_*/
+#endif

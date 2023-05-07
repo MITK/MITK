@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKIGTLMESSAGECOMMONH_HEADER_INCLUDED_
-#define MITKIGTLMESSAGECOMMONH_HEADER_INCLUDED_
+#ifndef mitkIGTLMessageCommon_h
+#define mitkIGTLMessageCommon_h
 
 #include <itkDataObject.h>
 #include "MitkOpenIGTLinkExports.h"
@@ -66,4 +66,4 @@ namespace mitk {
 
 
 } // namespace mitk
-#endif /* MITKIGTLMESSAGECOMMONH_HEADER_INCLUDED_ */
+#endif

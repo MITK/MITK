@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKVECTORDEPRECATED_H_
-#define MITKVECTORDEPRECATED_H_
+#ifndef mitkVectorDeprecated_h
+#define mitkVectorDeprecated_h
 
 #include <itkIndex.h>
 #include <vnl/vnl_quaternion.h>
@@ -273,4 +273,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKVECTORDEPRECATED_H_ */
+#endif

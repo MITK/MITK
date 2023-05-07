@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkEditbaleContourTool_h_Included
-#define mitkEditbaleContourTool_h_Included
+#ifndef mitkEditableContourTool_h
+#define mitkEditableContourTool_h
 
 #include <mitkFeedbackContourTool.h>
 

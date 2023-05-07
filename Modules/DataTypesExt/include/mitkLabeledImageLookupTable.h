@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMITKLABELEDIMAGELOOKUPTABLE_H
-#define MITKMITKLABELEDIMAGELOOKUPTABLE_H
+#ifndef mitkLabeledImageLookupTable_h
+#define mitkLabeledImageLookupTable_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkLevelWindow.h"

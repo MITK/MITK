@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkIGTConnectionWidget_H
-#define QmitkIGTConnectionWidget_H
+#ifndef QmitkIGTConnectionWidget_h
+#define QmitkIGTConnectionWidget_h
 
 #include <QWidget>
 #include "MitkIGTUIExports.h"

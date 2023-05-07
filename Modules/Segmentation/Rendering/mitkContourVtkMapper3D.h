@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_CONTOUR_VTK_MAPPER_3D_H
-#define MITK_CONTOUR_VTK_MAPPER_3D_H
+#ifndef mitkContourVtkMapper3D_h
+#define mitkContourVtkMapper3D_h
 
 #include "mitkVtkMapper.h"
 #include <MitkSegmentationExports.h>
@@ -62,4 +62,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITK_CONTOUR_VTK_MAPPER_3D_H
+#endif

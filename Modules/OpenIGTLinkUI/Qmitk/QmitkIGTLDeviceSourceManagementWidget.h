@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKIGTLDeviceSourceMANAGEMENTWIDGET_H
-#define QMITKIGTLDeviceSourceMANAGEMENTWIDGET_H
+#ifndef QmitkIGTLDeviceSourceManagementWidget_h
+#define QmitkIGTLDeviceSourceManagementWidget_h
 
 //QT headers
 #include <QWidget>

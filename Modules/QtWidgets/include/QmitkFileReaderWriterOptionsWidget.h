@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKFILEREADERWRITEROPTIONSWIDGET_H
-#define QMITKFILEREADERWRITEROPTIONSWIDGET_H
+#ifndef QmitkFileReaderWriterOptionsWidget_h
+#define QmitkFileReaderWriterOptionsWidget_h
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -141,4 +141,4 @@ private:
   Q_DISABLE_COPY(QmitkFileReaderWriterOptionsWidget)
 };
 
-#endif // QMITKFILEREADERWRITEROPTIONSWIDGET_H
+#endif

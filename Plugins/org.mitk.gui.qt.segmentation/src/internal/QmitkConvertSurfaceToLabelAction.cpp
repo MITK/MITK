@@ -56,7 +56,6 @@ void QmitkConvertSurfaceToLabelAction::Run( const QList<mitk::DataNode::Pointer>
       if (colorProp.IsNull()) continue;
       color = colorProp->GetValue();
       workingImage->GetLabelSet()->AddLabel(name,color);
-      //workingImage->AddLabelEvent.Send();
 
       try
       {

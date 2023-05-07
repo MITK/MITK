@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __QMITK_FRAMES_REGISTRATION_JOB_H
-#define __QMITK_FRAMES_REGISTRATION_JOB_H
+#ifndef QmitkFramesRegistrationJob_h
+#define QmitkFramesRegistrationJob_h
 
 // QT
 #include <QObject>

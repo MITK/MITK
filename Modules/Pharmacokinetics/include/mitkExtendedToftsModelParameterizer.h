@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKEXTENDEDTOFTSMODELPARAMETRIZER_H
-#define MITKEXTENDEDTOFTSMODELPARAMETRIZER_H
+#ifndef mitkExtendedToftsModelParameterizer_h
+#define mitkExtendedToftsModelParameterizer_h
 
 #include "mitkAIFBasedModelParameterizerBase.h"
 #include "mitkExtendedToftsModel.h"

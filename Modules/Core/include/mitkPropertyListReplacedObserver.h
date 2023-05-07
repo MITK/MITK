@@ -42,4 +42,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // mitkPropertyListReplacedObserver_h
+#endif

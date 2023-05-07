@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IndexedValueFunctorBase_H
-#define IndexedValueFunctorBase_H
+#ifndef mitkIndexedValueFunctorBase_h
+#define mitkIndexedValueFunctorBase_h
 
 #include <itkObject.h>
 #include <itkIndex.h>
@@ -62,4 +62,4 @@ namespace mitk
 }
 
 
-#endif // IndexedValueFunctorBase_H
+#endif

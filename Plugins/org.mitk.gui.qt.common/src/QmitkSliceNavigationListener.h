@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __Q_MITK_SLICE_NAVIGATION_LISTENER_H
-#define __Q_MITK_SLICE_NAVIGATION_LISTENER_H
+#ifndef QmitkSliceNavigationListener_h
+#define QmitkSliceNavigationListener_h
 
 #include <mitkTimeGeometry.h>
 #include <mitkPoint.h>
@@ -133,4 +133,3 @@ class MITK_QT_COMMON QmitkSliceNavigationListener : public QObject
   };
 
 #endif
-

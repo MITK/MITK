@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_PLANAR_FIGURE_MAPPER_2D_H_
-#define MITK_PLANAR_FIGURE_MAPPER_2D_H_
+#ifndef mitkPlanarFigureMapper2D_h
+#define mitkPlanarFigureMapper2D_h
 
 #include "mitkCommon.h"
 #include "mitkMapper.h"
@@ -315,4 +315,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITK_PLANAR_FIGURE_MAPPER_2D_H_ */
+#endif

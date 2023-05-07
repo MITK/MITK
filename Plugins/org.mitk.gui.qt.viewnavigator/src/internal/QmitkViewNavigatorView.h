@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKVIEWNAVIGATORVIEW_H
-#define QMITKVIEWNAVIGATORVIEW_H
+#ifndef QmitkViewNavigatorView_h
+#define QmitkViewNavigatorView_h
 
 #include <QmitkAbstractView.h>
 
@@ -41,4 +41,4 @@ private:
 
 };
 
-#endif // QMITKVIEWNAVIGATORVIEW_H
+#endif

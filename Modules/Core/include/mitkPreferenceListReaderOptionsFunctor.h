@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPREFERENCELISTREADEROPTIONSFUNCTOR_H
-#define MITKPREFERENCELISTREADEROPTIONSFUNCTOR_H
+#ifndef mitkPreferenceListReaderOptionsFunctor_h
+#define mitkPreferenceListReaderOptionsFunctor_h
 
 #include <MitkCoreExports.h>
 #include <mitkIOUtil.h>
@@ -59,4 +59,4 @@ namespace mitk
   };
 }
 
-#endif // MITKWHITELISTREADEROPTIONSFUNCTOR_H
+#endif

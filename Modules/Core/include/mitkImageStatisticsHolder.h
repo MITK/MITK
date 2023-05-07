@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKIMAGESTATISTICSHOLDER_H
-#define MITKIMAGESTATISTICSHOLDER_H
+#ifndef mitkImageStatisticsHolder_h
+#define mitkImageStatisticsHolder_h
 
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
@@ -173,4 +173,4 @@ namespace mitk
   };
 
 } // end namespace
-#endif // MITKIMAGESTATISTICSHOLDER_H
+#endif

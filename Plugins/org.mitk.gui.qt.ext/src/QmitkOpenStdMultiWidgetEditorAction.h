@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKOPENSTDMULTIWIDGETEDITORACTION_H
-#define QMITKOPENSTDMULTIWIDGETEDITORACTION_H
+#ifndef QmitkOpenStdMultiWidgetEditorAction_h
+#define QmitkOpenStdMultiWidgetEditorAction_h
 
 #ifdef __MINGW32__
 // We need to inlclude winbase.h here in order to declare
@@ -47,4 +47,4 @@ private:
 
 };
 
-#endif // QMITKOPENSTDMULTIWIDGETEDITORACTION_H
+#endif

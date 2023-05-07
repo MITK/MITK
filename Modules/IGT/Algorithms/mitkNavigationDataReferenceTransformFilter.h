@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNavigationDataReferenceTransformFilter_H_HEADER_INCLUDED_
-#define MITKNavigationDataReferenceTransformFilter_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataReferenceTransformFilter_h
+#define mitkNavigationDataReferenceTransformFilter_h
 
 #include <mitkNavigationDataLandmarkTransformFilter.h>
 
@@ -104,4 +104,4 @@ namespace mitk {
 
   };
 } // namespace mitk
-#endif /* MITKNavigationDataReferenceTransformFilter_H_HEADER_INCLUDED_ */
+#endif

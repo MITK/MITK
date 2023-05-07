@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKPRIMITIVEMOVIENAVIGATORWIDGET_H_
-#define QMITKPRIMITIVEMOVIENAVIGATORWIDGET_H_
+#ifndef QmitkPrimitiveMovieNavigatorWidget_h
+#define QmitkPrimitiveMovieNavigatorWidget_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include <QTimer>

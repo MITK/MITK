@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkCopyToClipBoardDialog_h_Included
-#define QmitkCopyToClipBoardDialog_h_Included
+#ifndef QmitkCopyToClipBoardDialog_h
+#define QmitkCopyToClipBoardDialog_h
 
 #include <MitkSegmentationUIExports.h>
 #include <mitkCommon.h>

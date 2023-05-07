@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSegmentationInterpolationController_h_Included
-#define mitkSegmentationInterpolationController_h_Included
+#ifndef mitkSegmentationInterpolationController_h
+#define mitkSegmentationInterpolationController_h
 
 #include "mitkCommon.h"
 #include "mitkImage.h"

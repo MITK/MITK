@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef BOUNDINGOBJECTGROUP_H_HEADER_INCLUDED
-#define BOUNDINGOBJECTGROUP_H_HEADER_INCLUDED
+#ifndef mitkBoundingObjectGroup_h
+#define mitkBoundingObjectGroup_h
 
 #include "MitkDataTypesExtExports.h"
 #include <deque>
@@ -63,4 +63,4 @@ namespace mitk
     CSGMode m_CSGMode;
   };
 }
-#endif /* BOUNDINGOBJECTGROUP_H_HEADER_INCLUDED */
+#endif

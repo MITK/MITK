@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKFLOWSEGMENTATIONPERSPECTIVE_H_
-#define QMITKFLOWSEGMENTATIONPERSPECTIVE_H_
+#ifndef QmitkFlowSegmentationPerspective_h
+#define QmitkFlowSegmentationPerspective_h
 
 #include <berryIPerspectiveFactory.h>
 
@@ -29,4 +29,4 @@ public:
 
 };
 
-#endif /* QMITKFLOWSEGMENTATIONPERSPECTIVE_H_ */
+#endif

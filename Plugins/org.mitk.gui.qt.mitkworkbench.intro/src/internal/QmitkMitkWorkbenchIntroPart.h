@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKWORKBENCHINTROPART_H_
-#define QMITKWORKBENCHINTROPART_H_
+#ifndef QmitkMitkWorkbenchIntroPart_h
+#define QmitkMitkWorkbenchIntroPart_h
 
 #include <QtCore/qconfig.h>
 
@@ -72,4 +72,4 @@ private:
   Impl* m_Impl;
 };
 
-#endif /* QMITKWORKBENCHINTROPART_H_ */
+#endif

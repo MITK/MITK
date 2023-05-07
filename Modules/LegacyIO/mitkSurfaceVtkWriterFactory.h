@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SURFACEWRITERFACTORY_H_HEADER_INCLUDED
-#define SURFACEWRITERFACTORY_H_HEADER_INCLUDED
+#ifndef mitkSurfaceVtkWriterFactory_h
+#define mitkSurfaceVtkWriterFactory_h
 
 #include <MitkLegacyIOExports.h>
 

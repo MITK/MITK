@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSControlInterfaceDoppler_H_HEADER_INCLUDED_
-#define MITKUSControlInterfaceDoppler_H_HEADER_INCLUDED_
+#ifndef mitkUSControlInterfaceDoppler_h
+#define mitkUSControlInterfaceDoppler_h
 
 #include "mitkUSAbstractControlInterface.h"
 
@@ -32,4 +32,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKUSControlInterfaceDoppler_H_HEADER_INCLUDED_
+#endif

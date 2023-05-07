@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKVIEWINITIALIZATIONVIEW_H_INCLUDED
-#define _QMITKVIEWINITIALIZATIONVIEW_H_INCLUDED
+#ifndef QmitkViewInitializationView_h
+#define QmitkViewInitializationView_h
 
 #include <QmitkAbstractView.h>
 #include <mitkILifecycleAwarePart.h>
@@ -63,4 +63,4 @@ private:
   unsigned long m_CommandTag;
 };
 
-#endif // _QMITKVIEWINITIALIZATIONVIEW_H_INCLUDED
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#if !defined(QMITK_SurfaceUtilities_H__INCLUDED)
-#define QMITK_SurfaceUtilities_H__INCLUDED
+#ifndef QmitkSurfaceUtilities_h
+#define QmitkSurfaceUtilities_h
 
 #include <berryISelectionListener.h>
 
@@ -60,4 +60,4 @@ protected:
 
   Ui::QmitkSurfaceUtilitiesControls m_Controls;
 };
-#endif // !defined(QMITK_ISOSURFACE_H__INCLUDED)
+#endif

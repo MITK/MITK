@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTHREESTEPLINEARMODEL_H
-#define MITKTHREESTEPLINEARMODEL_H
+#ifndef mitkThreeStepLinearModel_h
+#define mitkThreeStepLinearModel_h
 
 #include "mitkModelBase.h"
 
@@ -120,4 +120,4 @@ namespace mitk
 }
 
 
-#endif // MITKTHREESTEPLINEARMODEL_H
+#endif

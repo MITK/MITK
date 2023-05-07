@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MODEL_FIT_FUNCTOR_BASE_H
-#define MODEL_FIT_FUNCTOR_BASE_H
+#ifndef mitkModelFitFunctorBase_h
+#define mitkModelFitFunctorBase_h
 
 #include <itkObject.h>
 
@@ -136,4 +136,4 @@ namespace mitk
 }
 
 
-#endif // MODEL_FIT_FUNCTOR_BASE_H
+#endif

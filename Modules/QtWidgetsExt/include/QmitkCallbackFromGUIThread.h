@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_CALLBACK_WITHIN_GUI_TREAD_H_INCLUDGEWQ
-#define QMITK_CALLBACK_WITHIN_GUI_TREAD_H_INCLUDGEWQ
+#ifndef QmitkCallbackFromGUIThread_h
+#define QmitkCallbackFromGUIThread_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include "mitkCallbackFromGUIThread.h"

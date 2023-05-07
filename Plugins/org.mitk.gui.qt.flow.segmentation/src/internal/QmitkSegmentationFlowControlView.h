@@ -11,16 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __Q_MITK_MATCHPOINT_MAPPER_H
-#define __Q_MITK_MATCHPOINT_MAPPER_H
+#ifndef QmitkSegmentationFlowControlView_h
+#define QmitkSegmentationFlowControlView_h
 
 #include <berryISelectionListener.h>
 #include <berryIWorkbenchListener.h>
 #include <QmitkAbstractView.h>
 
 #include "mitkNodePredicateBase.h"
-
-#include <optional>
 
 namespace Ui
 {
@@ -57,12 +55,8 @@ public:
 
 protected slots:
 
-    void OnStoreButtonClicked();
     void OnAcceptButtonClicked();
-    void OnActiveTaskChanged(const std::optional<size_t>& index);
-    void OnCurrentTaskChanged(const std::optional<size_t>& index);
-    void OnStoreInterimResultShortcutActivated();
-    void OnAcceptSegmentationShortcutActivated();
+
 
 protected:
     void SetFocus() override;
@@ -78,12 +72,10 @@ protected:
     Ui::SegmentationFlowControlView* m_Controls;
 
 private:
-    QWidget *m_Parent;
     mitk::NodePredicateBase::Pointer m_SegmentationPredicate;
     mitk::NodePredicateBase::Pointer m_SegmentationTaskListPredicate;
     QString m_OutputDir;
     QString m_FileExtension;
 };
 
-#endif // MatchPoint_h
-
+#endif

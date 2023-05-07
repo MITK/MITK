@@ -1,34 +1,23 @@
 <RCC>
   <qresource prefix="/Qmitk" >
-    <file>AcceptCurrentInterpolation.png</file>
-    <file>AcceptAllInterpolations.png</file>
-    <file>AcceptSurfaceInterpolation.png</file>
     <file>BooleanDifference_48x48.png</file>
     <file>BooleanIntersection_48x48.png</file>
     <file>BooleanUnion_48x48.png</file>
-    <file>Accept_48x48.png</file>
-    <file>Cancel_48x48.png</file>
-    <file>Run_48x48.png</file>
-    <file>ImportLabelSet_48x48.png</file>
-    <file>ImportLabeledImage_48x48.png</file>
+    <file>BooleanLabelA_32x32.png</file>
+    <file>BooleanLabelB_32x32.png</file>
+    <file>Dilate_48x48.png</file>
+    <file>Erode_48x48.png</file>
+    <file>Closing_48x48.png</file>
+    <file>Opening_48x48.png</file>
+    <file>FillHoles_48x48.png</file>
     <file>DeleteLayer_48x48.png</file>
     <file>PreviousLayer_48x48.png</file>
     <file>NextLayer_48x48.png</file>
     <file>AddLayer_48x48.png</file>
-    <file>SegmentationInteractor_48x48.png</file>
     <file>LockExterior_48x48.png</file>
     <file>UnlockExterior_48x48.png</file>
     <file>NewLabel_48x48.png</file>
     <file>NewSegmentation_48x48.png</file>
-    <file>ClearSeeds_48x48.png</file>
-    <file>Start.png</file>
-    <file>Stop.png</file>
-    <file>Help_48x48.png</file>
-    <file>AdvancedTools.png</file>
-    <file>visible.svg</file>
-    <file>invisible.svg</file>
-    <file>lock.svg</file>
-    <file>unlock.svg</file>
     <file>MergeLabels.png</file>
     <file>RemoveLabel.png</file>
     <file>EraseLabel.png</file>
@@ -36,5 +25,11 @@
     <file>CreateMask.png</file>
     <file>RandomColor.png</file>
     <file>RenameLabel.png</file>
+    <file>icon_label_add.svg</file>
+    <file>icon_label_add_instance.svg</file>
+    <file>icon_label_delete.svg</file>
+    <file>icon_label_delete_instance.svg</file>
+    <file>icon_group_add.svg</file>
+    <file>icon_group_delete.svg</file>
   </qresource>
 </RCC>

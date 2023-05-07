@@ -28,23 +28,7 @@
        </widget>
       </item>
       <item row="2" column="0" colspan="2">
-       <widget class="QComboBox" name="m_DirectionBox">
-        <item>
-         <property name="text">
-          <string>axial</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>coronal</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>sagittal</string>
-         </property>
-        </item>
-       </widget>
+       <widget class="QComboBox" name="m_DirectionBox"/>
       </item>
       <item row="1" column="0">
        <widget class="QPushButton" name="btnScreenshot">

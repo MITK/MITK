@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSAFEAPPLICATION_H
-#define QMITKSAFEAPPLICATION_H
+#ifndef QmitkSafeApplication_h
+#define QmitkSafeApplication_h
 
 #include <MitkAppUtilExports.h>
 
@@ -40,4 +40,4 @@ private:
   bool m_SafeMode;
 };
 
-#endif // QMITKSAFEAPPLICATION_H
+#endif

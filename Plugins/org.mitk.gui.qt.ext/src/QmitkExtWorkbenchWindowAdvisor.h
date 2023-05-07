@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKEXTWORKBENCHWINDOWADVISOR_H_
-#define QMITKEXTWORKBENCHWINDOWADVISOR_H_
+#ifndef QmitkExtWorkbenchWindowAdvisor_h
+#define QmitkExtWorkbenchWindowAdvisor_h
 
 #include <berryWorkbenchWindowAdvisor.h>
 
@@ -174,4 +174,4 @@ private:
   QAction* openMxNMultiWidgetEditorAction;
 };
 
-#endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/
+#endif

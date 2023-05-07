@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKDATANODEITEMMODEL_H
-#define QMITKDATANODEITEMMODEL_H
+#ifndef QmitkDataNodeItemModel_h
+#define QmitkDataNodeItemModel_h
 
 #include <QStandardItemModel>
 
@@ -29,4 +29,4 @@ public:
   void AddDataNodes(const QList<mitk::DataNode::Pointer>& nodes);
 };
 
-#endif // QMITKDATANODEITEMMODEL_H
+#endif

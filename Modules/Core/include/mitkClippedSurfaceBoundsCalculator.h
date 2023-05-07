@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ClippedSurfaceBoundsCalculator_h_included
-#define ClippedSurfaceBoundsCalculator_h_included
+#ifndef mitkClippedSurfaceBoundsCalculator_h
+#define mitkClippedSurfaceBoundsCalculator_h
 
 #include "mitkImage.h"
 #include "mitkPlaneGeometry.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkStateMachineConfig_h
-#define mitkStateMachineConfig_h
+#ifndef mitkEventConfig_h
+#define mitkEventConfig_h
 
 #include <MitkCoreExports.h>
 
@@ -186,4 +186,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* mitkStateMachineConfig_h */
+#endif

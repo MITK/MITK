@@ -1,162 +1,150 @@
 /**
 \page org_mitk_views_segmentation The Segmentation View
 
-\imageMacro{segmentation-dox.svg,"Icon of the segmentation view",2.00}
-
-<i>Some of the features described below are closed source additions to the open source toolkit MITK and are not  available in every application.</i>
+\imageMacro{segmentation-dox.svg,"Icon of the Segmentation View",2.00}
 
 \tableofcontents
 
 \section org_mitk_views_segmentationoverview Overview
 
-Segmentation is the act of partitioning an image into subsets by either manual or automated delineation to create i.e. a distinction between foreground and background.
-A multilabel segmentation can contain more than one label and more than one layer.
-This allows you to create different labels for different regions of interest encapsulated in one single image.
-The difference between labels and layers is that labels on one layer cannot overlap but labels on different layers can.
+Segmentation is the act of separating an image into foreground and background subsets by manual or automated delineation, while the foreground is defined to be part of the segmentation.
+Such a segmented image subset is also called a label as it typically labels a specific region of interest.
+A multilabel segmentation may contain multiple labels organized in distinct groups.
+You can create multiple labels for different regions of interest contained within a single segmentation image.
+Labels in the same group cannot overlap each other but labels from different groups may overlap.
 
-The MITK <b>segmentation plugin</b> allows you to create multilabel segmentations of anatomical and pathological structures in medical images.
+The MITK <b>Segmentation Plugin</b> allows you to create multilabel segmentations of anatomical and pathological structures in medical images.
 The plugin consists of two views:
 <ul>
   <li> <b>Segmentation View</b>: Manual and (semi-)automatic segmentation
-  <li> \subpage org_mitk_views_segmentationutilities : Segmentation post-processing
+  <li> \subpage org_mitk_views_segmentationutilities : Post-processing of segmentations
 </ul>
-In this documentation, the features and usage of the segmentation view will be described.
-For an introduction to the segmentation utilities please be referred to the respective documentation pages.
+In this user guide, the features of the <b>Segmentation View</b> are described.
+For an introduction to the Segmentation Utilities, refer to the respective user guide.
 
-\imageMacro{QmitkSegmentationPlugin_Overview.png,"Segmentation plugin overview", 16.00}
+\imageMacro{QmitkSegmentationPlugin_Overview.png,"Segmentation View", 16.00}
 
-\section org_mitk_views_segmentationpreferences Preferences
-The segmentation plugin offers a number of preferences which can be set via the MITK Workbench application preferences:
+\section org_mitk_views_segmentationtechnicalissues Image and segmentation prerequisites
 
-\imageMacro{QmitkSegmentationPreferences.png,"Segmentation preferences", 10.00}
-
+The Segmentation View has a few prerequisites regarding the segmentations and their reference image:
 <ul>
-  <li> <b>Slim view:</b> Allows to show or hide the tool button description of the segmentation view
-  <li> <b>2D display:</b> Specify whether the segmentation is drawn as outline or as a transparent overlay
-  <li> <b>Show only selected nodes:</b> Enable if only the selected segmentation and the reference image should be visible
-  <li> <b>Smoothed surface creation:</b> Set certain smoothing parameters for surface creation
-  <li> <b>Default label set preset:</b> Start a new segmentation with this preset instead of a default label
-  <li> <b>Label creation:</b> Assign default names and colors to new labels or ask users for them
-  <li> <b>Label suggestions:</b> Specify custom suggestions for label names and colors
+  <li> Images must be two or three-dimensional and may be either static or dynamic, e.g., are time-resolved resp. have different pixel values for different time steps.
+  <li> Images must be single-valued, i.e. CT, MRI or ultrasound. Images from color doppler or photographic (RGB) images are only partially supported (please be aware that some tools might not be compatible with this image type).
+  <li> Segmentations must be congruent to their reference images.
 </ul>
 
-\section org_mitk_views_segmentationtechnicalissues Technical issues
+\section org_mitk_views_segmentationdataselection Image selection and creating new segmentations
 
-The segmentation plugin makes a number of assumptions:
-<ul>
-  <li> Images must be 2D, 3D, or 3D+t.
-  <li> Images must be single-values, i.e. CT, MRI or "normal" ultrasound. Images from color doppler or photographic (RGB) images are only partially supported (please be aware that some tools might not be compatible with this image type).
-  <li> Segmentations are handled as multilabel images of the same extent as the original image.
-</ul>
+To select a reference image for a new segmentation, click on the <i>Image</i> widget in the Data selection section at the very top of the Segmentation View.
+Choose an image from the displayed list of Data Manager images.
+Once an image is selected, a new segmentation for this reference image can be created by clicking the button right next to the <i>Segmentation</i> widget in the Data selection section.
+A new multilabel segmentation with an initial, empty label is automatically generated if not set otherwise in the preferences.
+The new segmentation will be added to the Data Manager as child node of its reference image node.
+It is automatically selected edit can be edited in the Segmentation View right away.
+Instead of creating a new segmentation, an existing segmentation can be selected and edited as well.
+The selection list of existing segmentations for a certain reference image consists of matching/congruent segmentations only.
 
-\section org_mitk_views_segmentationdataselection Data selection & creating new segmentations
+\imageMacro{"QmitkSegmentation_DataSelection.png","Data selection and creating new segmentations",12}
 
-To select a reference image for the segmentation, click on the <i>Selected image</i> selection widget and choose a suitable image from the selection available in the data manager.
-Once an image is selected, a new segmentation can be created on this reference image by clicking the button to the right of the <i>Selected segmentation</i> selection widget.
-A new multilabel segmentation with an initial label is automatically generated.
-The new segmentation will be added to the data manager as sub-node of the reference image.
-This item is then automatically selected in the data selection, which allows to start editing the new segmentation right away.
+\section org_mitk_views_segmentationgroups Groups
 
-\imageMacro{"QmitkSegmentation_DataSelection.png","Data selection",12}
+Segmentation images consist of at least a single group called "Group 0" in which the first default label is created.
+More groups can be added and removed but there will always be at least a single group.
+Labels of the same group cannot overlap each other.
+Labels of different groups may overlap each other.
 
-Alternatively to creating a new segmentation, an existing one can be edited as well.
-If a reference image is selected for which a segmentation already exists in the data manager, the auto selection mode will automatically
-select a fitting segmentation.
-Clicking on the segmentation selection widget a drop down list will open, containing all suitable segmentations for the selected reference dataset available in the data manager.
+For example, you could segment the whole heart as "Heart" label in "Group 0", add "Group 1" and create multiple labels of the anatomical details of the heart in that group.
+Naturally, all these labels lie within the extents of the "Heart" label of "Group 0" but in principle they are completely independent of "Group 0".
+Some pixels are now labelled twice, e.g., as "Heart" and "Left ventricle".
+Since the labels of "Group 1" cannot overlap each other, it is impossible to accidentally label a pixel as both "Left ventricle" and "Right ventricle".
 
-\section org_mitk_views_segmentationlayers Segmentation layers
+If you would like to segment even more details you could create "Group 2" to have up to three labels per pixel.
+Nevertheless, groups are technically a flat data structure and cannot contain nested groups.
+It is all about possibly overlapping labels from distinct groups and spatially exclusive, non-overlapping labels within the same group.
 
-For each multilabel segmentation different layers can be added or deleted. The layers can be used independently and layers can be switched using the left and right arrows.
-A layer is a set of labels that occupy a non-overlapping anatomical space. The best way to describe them is by a real use case:
-Imagine you are working on a radiotherapy planning application. In the first layer of your segmentation session, you would like to trace the contours of the liver and neighboring organs.
-You can accommodate all these segmentations in separate labels because they all occupy different anatomical regions and do not overlap.
-Now say you would like to segment the arteries and veins inside the liver. If you don't trace them in a different layer, you will overwrite the previous ones.
-You may also need a third layer for segmenting the different irrigation territories in the liver and a fourth layer to contain the lesion you would like to treat.
+\imageMacro{"QmitkSegmentation_Groups.png","Groups",10}
 
-\imageMacro{"QmitkSegmentation_LayerSelection.png","Layer selection",12}
+\section org_mitk_views_segmentationlabelinstances Label instances
 
-\section org_mitk_views_segmentationlabels Segmentation labels
+The Segmentation View also supports label instances.
+That is, segmenting multiple distributed entities of the same thing like metastases for example.
+A label is already a single instance of itself but for the sake of clearness it is only shown explicitly as such as soon as there are multiple instances of the same label (also refered to as label class).
 
-For each layer, one or more labels can be added. Pressing the double arrow on the right, all created labels are shown in the 'Label Table'.
-The following label properties are available:
+Technically all label instances have their own distinct label/pixel value that is explicitly shown in square brackets as a clue for distinction and identification.
+It is important to understand that this number is not a classic index starting at zero for each label class. It is just the plain label/pixel value of the label instance, which is unique across all labels of the whole segmentation.
 
-<ul>
-  <li><b>Name:</b></li> the name of the label. Can be a predefined one or any other.
-  <li><b>Locked:</b></li> whether the label is locked or editable. A locked label cannot be overwritten by another.
-  <li><b>Color:</b></li> the color of the label.
-  <li><b>Visible:</b></li> whether the label is currently visible or hidden.
-</ul>
+\imageMacro{"QmitkSegmentation_LabelInstances.png","Label instances",10}
 
-\imageMacro{"QmitkSegmentation_LabelTable.png","The 'Label Table' shows all labels in the current segmentation session",12}
+\section org_mitk_views_segmentationlock_color_visibility Unlocking, changing color of, and hiding labels
 
-The 'New Label' button can be used to add a new label. This will automatically add a new label with a distinct name and color to the list of available labels.\n
-In the current implementation of the plugin, the maximum number of labels is restricted to 255. If you need more, you will have to create a new segmentation session.
+Labels (and label instances) are locked by default: labels from the same group cannot accidentally override pixels from other labels.
+Locked labels behave like cookie cutters for other labels of the same group.
+You can unlock labels to remove that protection from other labels of the same group.
+Their pixel contents can then be overridden by other labels of the same group.
 
-\subsection org_mitk_views_segmentationlabelsuggestions Label name and color suggestions
+Remember that labels from distinct groups do not interact with each other.
+They can always overlap (not override) each other.
+
+You can also change the color of labels and label instances as well as show (default) or hide their pixel contents.
+The icons at the right side of the rows of the groups and labels widget reflect their state in all these regards.
+
+Renaming of labels can be found in their content menu as shown further below.
+
+\imageMacro{"QmitkSegmentation_LockColorVisibility.png","Unlocking\, changing color of\, and hiding labels",10}
+
+\section org_mitk_views_segmentationcontextmenus Context menus
+
+Actions for organization of groups, labels, and label instances (as well as other operations) can be also found in their right-click context menus.
+
+\imageMacro{"QmitkSegmentation_ContextMenus.png","Context menus of groups\, labels\, and label instances",12}
+
+Most actions available in these context menus are self-explanatory or were already described above by other means of access like the tool button bar for adding and removing groups, labels, and label instances.
+
+Labels and label instances can be <b>renamed</b>, while groups have fixed names.
+This may change in future releases of MITK.
+
+<b>Clear content</b> only clears the pixels of a label or label instance but won't delete the actual label or label instance.
+
+Groups can be <b>locked</b> and <b>unlocked</b> as a whole from their context menu, while labels and label instances can be directly locked and unlocked outside the context menu as decribed further below.
+
+\section org_mitk_views_segmentationlabelsuggestions Label name and color suggestions
 
 When renaming labels or creating new labels with enforced manual naming in the Segmentation preferences, entering names is supported by auto-completion for common label names.
 The list of predefined label names and colors for the auto-completion feature can be either extented or replaced by a custom list of label name and color suggestions.
 This custom list must be specified as a JSON file, just containing an array of objects, each with a mandatory "name" string and an optional "color" string.
 The JSON file can be set in the Segmentation preferences as well as a few options on how to apply these suggestions.
 
-\subsection org_mitk_views_segmentationlabelpresets Saving and loading label set presets
+\section org_mitk_views_segmentationlabelpresets Saving and loading label set presets
 
 Label set presets are useful to share a certain style or scheme between different segmentation sessions or to provide templates for new segmentation sessions.
 
-The properties of all labels in all layers like their names, colors, and visibilities are saved as a label set preset by clicking on the 'Save label set preset' button.
+The properties of all labels in all groups like their names, colors, and visibilities are saved as a label set preset by clicking on the 'Save label set preset' button.
 Label set presets are applied to any segmentation session by clicking on the 'Load label set preset' button.
 If a label for a certain value already exists, its properties are overridden by the preset.
 If a label for a certain value does not yet exist, an empty label with the label properties of the preset is created.
 The actual segmentations of labels are unaffected as label set presets only store label properties.
 
-\subsubsection org_mitk_views_segmentationdefaultlabelpresets Applying label set presets by default
+\imageMacro{QmitkSegmentation_Preset.png,"Saving and loading label set presets", 10.00}
+
+\subsection org_mitk_views_segmentationdefaultlabelpresets Applying label set presets by default
 
 If you work on a repetetive segmentation task, manually loading the same label set preset for each and every new segmentation can be tedious.
-To streamline your workflow, you can set a default label set preset in the Segmentation preferences (Ctrl+P). When set, this label set preset will be applied to all new segmentations instead of creating the default red "New label 1" label.
+To streamline your workflow, you can set a default label set preset in the Segmentation preferences (Ctrl+P). When set, this label set preset will be applied to all new segmentations instead of creating the default red "Label 1" label.
 
-\subsection org_mitk_views_segmentationlabelsearch Searching for a label
+\section org_mitk_views_segmentationpreferences Preferences
 
-It may happen that many labels (e.g. > 200) are present in a segmentation session and therefore manual searching can be time-consuming.
-The 'Label Search' edit box allows for quickly finding a label by providing assistance for label name completion.
-If the label is found, it will become the active one after pressing 'enter'.
+The Segmentation Plugin offers a number of preferences which can be set via the MITK Workbench application preferences (Ctrl+P):
 
-To start editing a label needs to be activated by clicking on the corresponding row in the 'Label Table'.
-Only one label can be active at the time. Then the segmentation tools in the toolbox can be used for mask generation.
-
-\subsection org_mitk_views_multilabelsegmentationoperationsonlabels Operations on labels
-Depending on the selection in the 'Label Table', several actions are offered:
-
-\subsubsection org_mitk_views_segmentationoperationssingleselection Operations with single label selection
-
-Right-clicking on any label opens a pop-up menu that offers the following actions to be performed on the selected label:
+\imageMacro{QmitkSegmentationPreferences.png,"Segmentation preferences", 10.00}
 
 <ul>
-  <li><b>Rename...</b></li> : change the name and / or color of the selected label.
-  <li><b>Remove...</b></li> : delete the selected label.
-  <li><b>Erase...</b></li> : only clear the contents of the selected label.
-  <li><b>Merge...</b></li> : merge two labels by selecting a second label.
-  <li><b>Random color </b></li> : assign a random color to the label.
-  <li><b>View only </b></li> : make all labels except the current selected label invisible.
-  <li><b>View/Hide all </b></li> : make all labels visible / invisible
-  <li><b>Lock/Unlock all </b></li> : lock or unlock all labels.
-  <li><b>Create surface </b></li> : generate a surface out of the selected label.
-    <li><b>Create mask </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
-	<li><b>Create cropped mask </b></li> : generate a binary mask out of the selected label. Crop changes the extent of the resulting image to the extent of the label.
+  <li> <b>Compact view:</b> Hide the tool button texts to save some space on screen (6 instead of 4 buttons per row)
+  <li> <b>2D display:</b> Draw segmentations as as outlines or transparent overlays
+  <li> <b>Data node selection mode:</b> Hide everything but the selected segmentation and its reference image
+  <li> <b>Default label set preset:</b> Start a new segmentation with this preset instead of a default label
+  <li> <b>Label creation:</b> Assign default names and colors to new labels or ask users for name and color
+  <li> <b>Label suggestions:</b> Specify custom suggestions for label names and colors
 </ul>
-
-\imageMacro{"QmitkSegmentation_OperationsSingleSelection.png","Context menu for single label selection",12}
-
-\subsubsection org_mitk_views_segmentationoperationsmultiselection Operations with multiple label selection
-
-Shift-clickink on multiple labels allows to select more than one label. If more than one label is selected, different options will appear in the menu:
-
-<ul>
-  <li><b>Merge selection on current label</b></li> : transfer the contents of the selected labels in the 'Label Table' into the current one.
-  <li><b>Remove selected labels</b></li> : delete the selected labels.
-  <li><b>Erase selected labels</b></li> : only clear the contents of the selected labels.
-</ul>
-
-\imageMacro{"QmitkSegmentation_OperationsMultiSelection.png","Context menu for multiple label selection",12}
 
 \section org_mitk_views_segmentationtooloverview Segmentation tool overview
 
@@ -401,6 +389,28 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
     will be downloaded and placed to the <b>RESULTS_FOLDER</b> directory automatically.
     -# In the <b>RESULTS_FOLDER</b> directory, inside the trainer-planner folder of every task, MITK keeps a "mitk_export.json" file for fast loading for multi-modal information. It is recommended not to delete this file(s) for a fast responsive UI.
     Tip: If multi-modal information shown on MITK is not correct for a given task, you may modify this JSON file and try again.
+  
+\subsection org_mitk_views_segmentationTotalSegmentator TotalSegmentator Tool
+
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"TotalSegmentator tool",10.00}
+
+This tool provides a GUI to the deep learning-based segmentation algorithm called the TotalSegmentator. With this tool, you can get a segmentation mask predicted for 104 classes in CT images, loaded in MITK. 
+For a detailed explanation on tasks and supported classes etc., please refer to https://github.com/wasserth/TotalSegmentator <br>
+The tool assumes that you have Python 3 installed and available on your machine. We recommend to install TotalSegmentator via MITK. The "Install TotalSegmentator" action implicitly creates a python virtual environment in an MITK mainitained
+directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv package using the following command:  `apt install python3-venv`. For best results, your machine should be ideally equipped with a CUDA-enabled GPU. 
+\imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator Settings",5}
+
+\subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow:
+    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 1.5.5) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    Once installed, the "Install TotalSegmentator" button is grayed out.
+    -# If Python is not found by MITK goto "Install Options" & select the "System Python Path" drop-down to see if MITK has automatically detected other Python environments.
+    Click on a fitting Python installation for TotalSegmentator to use or click "Select" in the dropdown to choose an unlisted installation of Python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".
+    No need to navigate all the way into "../usr/bin/python3", for example.
+    -# Select a specific subtask in the "Tasks" drop-downs. The default is "total" for non-specific total segmentation.
+    -# Click on "Run TotalSegmentator" for a preview.
+    -# In the "Advanced" section, you can also activate other options like "Fast" for faster runtime and less memory requirements. Use "Fast" if you only have a CPU for inferencing.
+    -# Use "Advanced" > "GPU Id" combobox to change the preferred GPU for inferencing. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
+    -# In case you want to use your own virtual environment containing TotalSegmentator, goto "Install Options" & check "Use Custom Installation" checkbox. Then, select the environment of your choice by using "Custom Env. Path".
 
 \section org_mitk_views_segmentationpostprocessing Additional things you can do with segmentations
 

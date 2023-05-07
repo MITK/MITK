@@ -10,10 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-// Class is adapted from MatchPoint ProcessExecutor
-
-#ifndef __MITK_PROCESS_EXECUTOR_H
-#define __MITK_PROCESS_EXECUTOR_H
+#ifndef mitkProcessExecutor_h
+#define mitkProcessExecutor_h
 
 #include <MitkSegmentationExports.h>
 #include <itkObject.h>
@@ -22,6 +20,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  // Class is adapted from MatchPoint ProcessExecutor
+
   class ExternalProcessOutputEvent : public itk::AnyEvent
   {
   public:

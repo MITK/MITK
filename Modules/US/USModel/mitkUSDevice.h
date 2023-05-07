@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSDevice_H_HEADER_INCLUDED_
-#define MITKUSDevice_H_HEADER_INCLUDED_
+#ifndef mitkUSDevice_h
+#define mitkUSDevice_h
 
 // STL
 #include <condition_variable>
@@ -529,4 +529,4 @@ namespace mitk {
 // This is the microservice declaration. Do not meddle!
 MITK_DECLARE_SERVICE_INTERFACE(mitk::USDevice, "org.mitk.services.UltrasoundDevice")
 
-#endif // MITKUSDevice_H_HEADER_INCLUDED_
+#endif

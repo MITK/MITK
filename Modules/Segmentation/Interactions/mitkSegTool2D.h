@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSegTool2D_h_Included
-#define mitkSegTool2D_h_Included
+#ifndef mitkSegTool2D_h
+#define mitkSegTool2D_h
 
-#include "mitkCommon.h"
-#include "mitkImage.h"
-#include "mitkTool.h"
+#include <mitkCommon.h>
+#include <mitkImage.h>
+#include <mitkTool.h>
 #include <MitkSegmentationExports.h>
 
-#include "mitkInteractionPositionEvent.h"
+#include <mitkInteractionPositionEvent.h>
 
-#include "mitkInteractionConst.h"
-#include "mitkPlanePositionManager.h"
-#include "mitkRestorePlanePositionOperation.h"
+#include <mitkInteractionConst.h>
+#include <mitkPlanePositionManager.h>
+#include <mitkRestorePlanePositionOperation.h>
 
 #include <mitkDiffSliceOperation.h>
 
@@ -164,6 +164,7 @@ namespace mitk
       mitk::Image::ConstPointer slice;
       const mitk::PlaneGeometry *plane = nullptr;
       mitk::TimeStepType timestep = 0;
+      unsigned int slicePosition;
 
       SliceInformation() = default;
       SliceInformation(const mitk::Image* aSlice, const mitk::PlaneGeometry* aPlane, mitk::TimeStepType aTimestep);
@@ -174,12 +175,16 @@ namespace mitk
      * @param sliceInfos vector of slice information instances from which the contours should be extracted
      * @param workingImage the segmentation image
      * @param detectIntersection if true the slice is eroded before contour extraction. If the slice is empty after the
+     * @param activeLayerID The layer ID of the active label.
+     * @param activeLabelValue The label value of the active label.
      * erosion it is most
      *        likely an intersecting contour an will not be added to the SurfaceInterpolationController
      */
     static void UpdateSurfaceInterpolation(const std::vector<SliceInformation>& sliceInfos,
       const Image* workingImage,
-      bool detectIntersection);
+      bool detectIntersection,
+      unsigned int activeLayerID,
+      mitk::Label::PixelType activeLabelValue);
 
 
     /**

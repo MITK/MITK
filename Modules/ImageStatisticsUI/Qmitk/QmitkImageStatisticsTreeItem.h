@@ -56,4 +56,4 @@ private:
   bool m_IsWIP;
 };
 
-#endif // QmitkImageStatisticsTreeItem_h
+#endif

@@ -9,12 +9,13 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
+
+#ifndef mitkDataCollection_h
+#define mitkDataCollection_h
+
 #ifdef _MSC_VER
 #  pragma warning (disable : 4996)
 #endif
-
-#ifndef mitkDataCollection_H_
-#define mitkDataCollection_H_
 
 //#include <itkLightObject.h>
 //#include <itkDataObject.h>

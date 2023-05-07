@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIGTLDEVICE_H
-#define MITKIGTLDEVICE_H
+#ifndef mitkIGTLDevice_h
+#define mitkIGTLDevice_h
 
 #include <mutex>
 #include <thread>
@@ -409,4 +409,4 @@ namespace mitk {
   itkEventMacroDeclaration(LostConnectionEvent, itk::AnyEvent);
 } // namespace mitk
 
-#endif /* MITKIGTLDEVICE_H */
+#endif

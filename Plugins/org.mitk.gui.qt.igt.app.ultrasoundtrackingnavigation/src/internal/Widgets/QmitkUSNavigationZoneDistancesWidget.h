@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSNAVIGATIONZONEDISTANCESWIDGET_H
-#define QMITKUSNAVIGATIONZONEDISTANCESWIDGET_H
+#ifndef QmitkUSNavigationZoneDistancesWidget_h
+#define QmitkUSNavigationZoneDistancesWidget_h
 
 #include <QWidget>
 
@@ -70,4 +70,4 @@ protected:
   QVector<QmitkZoneProgressBar*>                  m_ZoneProgressBars;
 };
 
-#endif // QMITKUSNAVIGATIONZONEDISTANCESWIDGET_H
+#endif

@@ -38,4 +38,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif //mitkMicronTrackerTypeInformation_h
+#endif

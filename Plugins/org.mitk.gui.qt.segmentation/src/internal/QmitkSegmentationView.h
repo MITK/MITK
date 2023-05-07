@@ -10,15 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSEGMENTATIONVIEW_H
-#define QMITKSEGMENTATIONVIEW_H
+#ifndef QmitkSegmentationView_h
+#define QmitkSegmentationView_h
 
 #include "ui_QmitkSegmentationViewControls.h"
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
-
-#include <mitkSegmentationInteractor.h>
 
 /**
 * @brief The segmentation view provides a set of tool to use different segmentation algorithms.
@@ -74,13 +72,10 @@ private Q_SLOTS:
 
   void OnShowMarkerNodes(bool);
 
-  void OnLayersChanged();
+  void OnCurrentLabelSelectionChanged(QmitkMultiLabelManager::LabelValueVectorType labels);
 
-  void OnShowLabelTable(bool);
-
-  void OnGoToLabel(const mitk::Point3D &pos);
-
-  void OnLabelSetWidgetReset();
+  void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&);
+  void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
 
 private:
 
@@ -114,31 +109,16 @@ private:
   * @param event   The observed mitk::SegmentationInteractionEvent.
   */
   void ValidateRendererGeometry(const itk::EventObject& event);
-  /**
-  * @brief Show a warning on the given base renderer.
-  *
-  * This function will show the overlay on the QmitkRenderWindow
-  * corresponding to the given base renderer to indicate that the
-  * renderer should not be used for interactive image segmentation.
-  *
-  * @param baseRenderer   The base renderer to "block"
-  * @param show           If true, the overlay widget will be shown.
-  *                       If false, the overlay widget will be hid.
-  */
-  void ShowRenderWindowWarning(mitk::BaseRenderer* baseRenderer, bool show);
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
   void OnPreferencesChanged(const mitk::IPreferences* prefs) override;
 
   void NodeAdded(const mitk::DataNode* node) override;
 
   void NodeRemoved(const mitk::DataNode* node) override;
-
-  void EstablishLabelSetConnection();
-
-  void LooseLabelSetConnection();
 
   void OnAnySelectionChanged();
 
@@ -170,6 +150,8 @@ private:
 
   std::string GetDefaultLabelSetPreset() const;
 
+  mitk::LabelSetImage* GetCurrentSegmentation() const;
+
   QWidget* m_Parent;
 
   Ui::QmitkSegmentationViewControls* m_Controls;
@@ -180,8 +162,6 @@ private:
 
   mitk::DataNode::Pointer m_ReferenceNode;
   mitk::DataNode::Pointer m_WorkingNode;
-
-  mitk::SegmentationInteractor::Pointer m_SegmentationInteractor;
 
   typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
   NodeTagMapType m_WorkingDataObserverTags;
@@ -201,4 +181,4 @@ private:
   bool m_SelectionChangeIsAlreadyBeingHandled;
 };
 
-#endif // QMITKSEGMENTATIONVIEW_H
+#endif

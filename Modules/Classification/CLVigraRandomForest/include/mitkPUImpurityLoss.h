@@ -81,4 +81,4 @@ namespace mitk
 
 #include <../src/Splitter/mitkPUImpurityLoss.cpp>
 
-#endif //mitkImpurityLoss_h
+#endif

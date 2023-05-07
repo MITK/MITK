@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKFILEOPENACTION_H_
-#define QMITKFILEOPENACTION_H_
+#ifndef QmitkFileOpenAction_h
+#define QmitkFileOpenAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -46,4 +46,4 @@ private:
 };
 
 
-#endif /*QMITKFILEOPENACTION_H_*/
+#endif

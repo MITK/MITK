@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASETOPENINACTION_H
-#define QMITKDATASETOPENINACTION_H
+#ifndef QmitkDataSetOpenInAction_h
+#define QmitkDataSetOpenInAction_h
 
 #include "QmitkDataNodeOpenInAction.h"
 
@@ -41,4 +41,4 @@ protected:
   void InitializeAction() override;
 };
 
-#endif // QMITKDATASETOPENINACTION_H
+#endif

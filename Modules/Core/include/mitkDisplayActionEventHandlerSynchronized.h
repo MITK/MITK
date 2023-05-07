@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDISPLAYACTIONEVENTHANDLERSYNCHRONIZED_H
-#define MITKDISPLAYACTIONEVENTHANDLERSYNCHRONIZED_H
+#ifndef mitkDisplayActionEventHandlerSynchronized_h
+#define mitkDisplayActionEventHandlerSynchronized_h
 
 #include <MitkCoreExports.h>
 
@@ -34,4 +34,4 @@ namespace mitk
   };
 } // end namespace mitk
 
-#endif // MITKDISPLAYACTIONEVENTHANDLERSYNCHRONIZED_H
+#endif

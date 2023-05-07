@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _Vtk_VOLUME_TIME_SERIES_READER__H_
-#define _Vtk_VOLUME_TIME_SERIES_READER__H_
+#ifndef mitkVtkVolumeTimeSeriesReader_h
+#define mitkVtkVolumeTimeSeriesReader_h
 
 #include "mitkCommon.h"
 #include "mitkFileSeriesReader.h"

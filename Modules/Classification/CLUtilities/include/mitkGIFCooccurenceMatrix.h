@@ -60,4 +60,4 @@ namespace mitk
   };
 
 }
-#endif //mitkGIFCooccurenceMatrix_h
+#endif

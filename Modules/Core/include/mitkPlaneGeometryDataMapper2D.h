@@ -20,7 +20,6 @@ found in the LICENSE file.
 
 class vtkActor2D;
 class vtkPropAssembly;
-class vtkFloatArray;
 class vtkCellArray;
 class vtkPolyDataMapper2D;
 
@@ -59,8 +58,6 @@ namespace mitk
 
     /** Applies properties specific to this mapper */
     virtual void ApplyAllProperties(BaseRenderer *renderer);
-
-    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
     /** \brief set the default properties for this mapper */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
@@ -106,19 +103,6 @@ namespace mitk
     static bool CutCrossLineWithPlaneGeometry(const PlaneGeometry *planeGeometry, Line3D &crossLine);
     static bool CutCrossLineWithReferenceGeometry(const BaseGeometry *referenceGeometry, Line3D &crossLine);
 
-    /**
-      * \brief Returns the thick slice mode for the given datanode.
-      *
-      * This method returns the value of the 'reslice.thickslices' property for
-      * the given datanode.
-      *   '0': thick slice mode disabled
-      *   '1': thick slice mode enabled
-      *
-      * The variable 'thickSlicesNum' contains the value of the 'reslice.thickslices.num'
-      * property that defines how many slices are shown at once.
-      */
-    int DetermineThickSliceMode(DataNode *dn, int &thickSlicesNum);
-
     void DrawLine(Point3D p0, Point3D p1, vtkCellArray *lines, vtkPoints *points);
 
     // member variables holding the current value of the properties used in this mapper
@@ -130,7 +114,6 @@ namespace mitk
 
     bool m_RenderOrientationArrows;
     bool m_ArrowOrientationPositive;
-    mitk::ScalarType m_DepthValue;
 
     void ApplyColorAndOpacityProperties2D(BaseRenderer *renderer, vtkActor2D *actor);
     void DrawOrientationArrow(vtkSmartPointer<vtkCellArray> triangles,
@@ -141,4 +124,4 @@ namespace mitk
                               Point3D &point2);
   };
 } // namespace mitk
-#endif /* mitkPlaneGeometryDataMapper2D_h */
+#endif

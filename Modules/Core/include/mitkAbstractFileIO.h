@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKABSTRACTFILEIO_H
-#define MITKABSTRACTFILEIO_H
+#ifndef mitkAbstractFileIO_h
+#define mitkAbstractFileIO_h
 
 #include "mitkAbstractFileReader.h"
 #include "mitkAbstractFileWriter.h"
@@ -156,4 +156,4 @@ namespace mitk
   };
 }
 
-#endif // MITKABSTRACTFILEIO_H
+#endif

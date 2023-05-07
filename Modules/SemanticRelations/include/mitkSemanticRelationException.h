@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSEMANTICRELATIONEXCEPTION_H
-#define MITKSEMANTICRELATIONEXCEPTION_H
+#ifndef mitkSemanticRelationException_h
+#define mitkSemanticRelationException_h
 
 // mitk core
 #include <mitkExceptionMacro.h>
@@ -28,4 +28,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKSEMANTICRELATIONEXCEPTION_H
+#endif

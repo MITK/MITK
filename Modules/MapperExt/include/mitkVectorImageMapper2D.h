@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_VECTOR_IMAGE_MAPPER_2D__H_
-#define _MITK_VECTOR_IMAGE_MAPPER_2D__H_
+#ifndef mitkVectorImageMapper2D_h
+#define mitkVectorImageMapper2D_h
 
 #include "MitkMapperExtExports.h"
 

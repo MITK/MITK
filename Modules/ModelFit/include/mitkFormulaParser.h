@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITKFORMULAPARSER_H__
-#define __MITKFORMULAPARSER_H__
+#ifndef mitkFormulaParser_h
+#define mitkFormulaParser_h
 
 #include <string>
 #include <map>

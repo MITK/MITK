@@ -6,12 +6,12 @@ Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
 Use of this source code is governed by a 3-clause BSD license that can be
-found in the LICENSE file.s
+found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitknnUNetFolderParser_h_Included
-#define QmitknnUNetFolderParser_h_Included
+#ifndef QmitknnUNetFolderParser_h
+#define QmitknnUNetFolderParser_h
 
 #include <QDirIterator>
 #include <memory>
@@ -115,8 +115,7 @@ public:
    * @brief Returns all the task names present in the root node with possible duplicates.
    * Template function, type can be any of stl or Qt containers which supports push_back call.
    *
-   * @param T
-   * @param taskName
+   * @tparam T
    * @return T (any of stl or Qt containers which supports push_back call)
    */
   template <typename T>

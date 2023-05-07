@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSIMPELEMEASUREMENT_H
-#define MITKSIMPELEMEASUREMENT_H
+#ifndef QmitkSimpleMeasurement_h
+#define QmitkSimpleMeasurement_h
 
 #include <QmitkAbstractView.h>
 #include <mitkIZombieViewPart.h>
@@ -92,4 +92,4 @@ private:
   void UpdateMeasurementList();
 };
 
-#endif // QMITK_MEASUREMENT_H__INCLUDED
+#endif

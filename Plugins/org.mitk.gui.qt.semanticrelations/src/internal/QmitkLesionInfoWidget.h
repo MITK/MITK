@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLESIONINFOWIDGET_H
-#define QMITKLESIONINFOWIDGET_H
+#ifndef QmitkLesionInfoWidget_h
+#define QmitkLesionInfoWidget_h
 
 // semantic relations plugin
 #include <ui_QmitkLesionInfoWidgetControls.h>
@@ -100,4 +100,4 @@ private:
 
 };
 
-#endif // QMITKLESIONINFOWIDGET_H
+#endif

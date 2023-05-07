@@ -20,6 +20,15 @@
       <description>Edit segmentations using standard operations. </description>
       <keywordReference id="org.mitk.views.segmentationutilities.ViewKeyword"/>
     </view>
+    <view
+      id="org.mitk.views.segmentationtasklist"
+      name="Segmentation Task List"
+      category="Segmentation"
+      class="QmitkSegmentationTaskListView"
+      icon="resources/SegmentationTaskListIcon.svg" >
+      <description>Create or edit a batch of segmentations according to a task list in a streamlined workflow.</description>
+      <keywordReference id="org.mitk.views.segmentationtasklist.ViewKeyword"/>
+    </view>
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">
@@ -80,5 +89,14 @@
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Surface to Image" />
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Surface creation" />
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Surface operations" />
+
+    <keyword id="org.mitk.views.segmentationtasklist.ViewKeyword"  label="Segmentation" />
+    <keyword id="org.mitk.views.segmentationtasklist.ViewKeyword"  label="Task" />
+    <keyword id="org.mitk.views.segmentationtasklist.ViewKeyword"  label="Task List" />
+    <keyword id="org.mitk.views.segmentationtasklist.ViewKeyword"  label="Work List" />
+    <keyword id="org.mitk.views.segmentationtasklist.ViewKeyword"  label="To-do List" />
+    <keyword id="org.mitk.views.segmentationtasklist.ViewKeyword"  label="Workflow" />
+    <keyword id="org.mitk.views.segmentationtasklist.ViewKeyword"  label="Preset" />
+    <keyword id="org.mitk.views.segmentationtasklist.ViewKeyword"  label="JSON" />
   </extension>
 </plugin>

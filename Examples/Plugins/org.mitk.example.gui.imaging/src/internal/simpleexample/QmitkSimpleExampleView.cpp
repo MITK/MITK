@@ -11,29 +11,23 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkSimpleExampleView.h"
+#include <ui_QmitkSimpleExampleViewControls.h>
 
 #include <vtkImageWriter.h>
 #include <vtkJPEGWriter.h>
 #include <vtkPNGWriter.h>
 #include <vtkRenderLargeImage.h>
-#include <vtkRenderWindow.h>
-#include <vtk_glew.h>
 
 #include "QmitkRenderWindow.h"
 #include "QmitkStepperAdapter.h"
 
-#include "QmitkFFmpegWriter.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkProperties.h"
-#include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
 
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QMessageBox>
 
 const std::string QmitkSimpleExampleView::VIEW_ID = "org.mitk.views.simpleexample";
 
@@ -109,7 +103,6 @@ void QmitkSimpleExampleView::CreateConnections()
             SLOT(RenderWindowSelected(QString)));
     connect(m_Controls->stereoSelect, SIGNAL(activated(int)), this, SLOT(StereoSelectionChanged(int)));
     connect(m_Controls->reInitializeNavigatorsButton, SIGNAL(clicked()), this, SLOT(InitNavigators()));
-    connect(m_Controls->genMovieButton, SIGNAL(clicked()), this, SLOT(GenerateMovie()));
     connect(m_Controls->m_TakeScreenshotBtn, SIGNAL(clicked()), this, SLOT(OnTakeScreenshot()));
     connect(m_Controls->m_TakeHighResScreenShotBtn, SIGNAL(clicked()), this, SLOT(OnTakeHighResolutionScreenshot()));
   }
@@ -125,141 +118,6 @@ void QmitkSimpleExampleView::InitNavigators()
   auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
   /* initialize the views to the bounding geometry */
   m_NavigatorsInitialized = mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-}
-
-/**
- * Returns path to the ffmpeg lib if configured in preferences.
- *
- * This implementation has been reused from MovieMaker view.
- *
- * @return The path to ffmpeg lib or empty string if not configured.
- */
-QString QmitkSimpleExampleView::GetFFmpegPath() const
-{
-  auto* preferences =
-    mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
-
-  return preferences != nullptr
-    ? QString::fromStdString(preferences->Get("ffmpeg", ""))
-    : QString("");
-}
-
-/**
- * Reads pixels from specified render window.
- *
- * This implementation has been reused from MovieMaker view.
- *
- * @param renderWindow
- * @param x
- * @param y
- * @param width
- * @param height
- * @return
- */
-static unsigned char *ReadPixels(vtkRenderWindow *renderWindow, int x, int y, int width, int height)
-{
-  if (renderWindow == nullptr)
-    return nullptr;
-
-  unsigned char *frame = new unsigned char[width * height * 3];
-
-  renderWindow->MakeCurrent();
-  glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, frame);
-
-  return frame;
-}
-
-/**
- * Records a movie from the selected render window with a default frame rate of 30 Hz.
- *
- * Parts of this implementation have been reused from MovieMaker view.
- */
-void QmitkSimpleExampleView::GenerateMovie()
-{
-  QmitkRenderWindow *movieRenderWindow = GetSelectedRenderWindow();
-
-  mitk::Stepper::Pointer stepper = movieRenderWindow->GetSliceNavigationController()->GetSlice();
-
-  QmitkFFmpegWriter *movieWriter = new QmitkFFmpegWriter(m_Parent);
-
-  const QString ffmpegPath = GetFFmpegPath();
-
-  if (ffmpegPath.isEmpty())
-  {
-    QMessageBox::information(
-      nullptr,
-      "Movie Maker",
-      "<p>Set path to FFmpeg<sup>1</sup> in preferences (Window -> Preferences... "
-      "(Ctrl+P) -> External Programs) to be able to record your movies to video files.</p>"
-      "<p>If you are using Linux, chances are good that FFmpeg is included in the official package "
-      "repositories.</p>"
-      "<p>[1] <a href=\"https://www.ffmpeg.org/download.html\">Download FFmpeg from ffmpeg.org</a></p>");
-    return;
-  }
-
-  movieWriter->SetFFmpegPath(GetFFmpegPath());
-
-  vtkRenderWindow *renderWindow = movieRenderWindow->renderWindow();
-
-  if (renderWindow == nullptr)
-    return;
-
-  const int border = 3;
-  const int x = border;
-  const int y = border;
-  int width = renderWindow->GetSize()[0] - border * 2;
-  int height = renderWindow->GetSize()[1] - border * 2;
-
-  if (width & 1)
-    --width;
-
-  if (height & 1)
-    --height;
-
-  if (width < 16 || height < 16)
-    return;
-
-  movieWriter->SetSize(width, height);
-  movieWriter->SetFramerate(30);
-
-  QString saveFileName = QFileDialog::getSaveFileName(nullptr, "Specify a filename", "", "Movie (*.mp4)");
-
-  if (saveFileName.isEmpty())
-    return;
-
-  if (!saveFileName.endsWith(".mp4"))
-    saveFileName += ".mp4";
-
-  movieWriter->SetOutputPath(saveFileName);
-
-  const unsigned int numberOfFrames = stepper->GetSteps() - stepper->GetPos();
-
-  try
-  {
-    movieWriter->Start();
-
-    for (unsigned int currentFrame = 0; currentFrame < numberOfFrames; ++currentFrame)
-    {
-      mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-
-      renderWindow->MakeCurrent();
-      unsigned char *frame = ReadPixels(renderWindow, x, y, width, height);
-      movieWriter->WriteFrame(frame);
-      delete[] frame;
-
-      stepper->Next();
-    }
-
-    movieWriter->Stop();
-
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-  }
-  catch (const mitk::Exception &exception)
-  {
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-
-    QMessageBox::critical(nullptr, "Generate Movie", exception.GetDescription());
-  }
 }
 
 void QmitkSimpleExampleView::StereoSelectionChanged(int id)

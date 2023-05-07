@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGECAST_H_HEADER_INCLUDED
-#define MITKIMAGECAST_H_HEADER_INCLUDED
+#ifndef mitkImageCast_h
+#define mitkImageCast_h
 
 #include <MitkCoreExports.h>
 #include <mitkImage.h>
@@ -96,4 +96,4 @@ namespace mitk
   }
 }
 
-#endif // of MITKIMAGECAST_H_HEADER_INCLUDED
+#endif

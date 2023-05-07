@@ -19,8 +19,9 @@ found in the LICENSE file.
 #include <mitkNodePredicateDataType.h>
 #include <mitkSegmentationTaskList.h>
 
-#include <QmitkNodeDescriptorManager.h>
-#include <QmitkStyleManager.h>
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 ctkPluginContext* org_mitk_gui_qt_flow_segmentation_Activator::m_Context = nullptr;
 
@@ -28,17 +29,6 @@ void org_mitk_gui_qt_flow_segmentation_Activator::start(ctkPluginContext* contex
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationFlowControlView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFlowSegmentationPerspective, context);
-
-  auto* descriptorManager = QmitkNodeDescriptorManager::GetInstance();
-
-  if (descriptorManager != nullptr)
-  {
-    auto icon = QmitkStyleManager::ThemeIcon(QStringLiteral(":/SegmentationTaskList/Icon.svg"));
-    auto predicate = mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New();
-    auto* descriptor = new QmitkNodeDescriptor("SegmentationTaskList", icon, predicate, descriptorManager);
-
-    descriptorManager->AddDescriptor(descriptor);
-  }
 
   m_Context = context;
 }

@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKEDITORPERSPECTIVE_H_
-#define QMITKEDITORPERSPECTIVE_H_
+#ifndef QmitkEditorPerspective_h
+#define QmitkEditorPerspective_h
 
 #include <berryIPerspectiveFactory.h>
 
@@ -29,4 +29,4 @@ public:
   void CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/) override;
 };
 
-#endif /* QMITKEDITORPERSPECTIVE_H_ */
+#endif

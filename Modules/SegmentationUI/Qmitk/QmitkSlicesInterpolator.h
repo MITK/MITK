@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkSlicesInterpolator_h_Included
-#define QmitkSlicesInterpolator_h_Included
+#ifndef QmitkSlicesInterpolator_h
+#define QmitkSlicesInterpolator_h
 
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
@@ -49,6 +49,14 @@ namespace mitk
 }
 
 class QPushButton;
+class QmitkRenderWindow;
+
+enum ModifyLabelActionTrigerred
+{
+  Null,
+  Erase,
+  Merge
+};
 
 /**
   \brief GUI for slices interpolation.
@@ -79,14 +87,30 @@ public:
   /**
     To be called once before real use.
     */
-  void Initialize(mitk::ToolManager *toolManager, const QList<mitk::SliceNavigationController *> &controllers);
+  void Initialize(mitk::ToolManager *toolManager, const QList<QmitkRenderWindow*>& windows);
 
+  /**
+   * @brief
+   *
+   */
   void Uninitialize();
 
   ~QmitkSlicesInterpolator() override;
 
+  /**
+   * @brief Set the Data Storage object
+   *
+   * @param storage
+   */
   void SetDataStorage(mitk::DataStorage::Pointer storage);
+
+  /**
+   * @brief Get the Data Storage object
+   *
+   * @return mitk::DataStorage*
+   */
   mitk::DataStorage *GetDataStorage();
+
 
   /**
     Just public because it is called by itk::Commands. You should not need to call this.
@@ -98,9 +122,20 @@ public:
   */
   void OnToolManagerReferenceDataModified();
 
+  /**
+   * @brief Reacts to the time changed event.
+   *
+   * @param sender
+   */
   void OnTimeChanged(itk::Object *sender, const itk::EventObject &);
 
+  /**
+   * @brief Reacts to the slice changed event
+   *
+   * @param sender
+   */
   void OnSliceChanged(itk::Object *sender, const itk::EventObject &);
+
 
   void OnSliceNavigationControllerDeleted(const itk::Object *sender, const itk::EventObject &);
 
@@ -119,10 +154,73 @@ public:
   */
   void OnSurfaceInterpolationInfoChanged(const itk::EventObject &);
 
+
+private:
   /**
    * @brief Set the visibility of the 3d interpolation
    */
   void Show3DInterpolationResult(bool);
+
+  /**
+   * @brief Function that reacts to a change in the activeLabel of the working segmentation image.
+   *
+   */
+  void OnActiveLabelChanged(mitk::Label::PixelType);
+
+  /**
+   * @brief Function that reacts to a change in the layer.
+   *
+   */
+  void OnLayerChanged();
+
+  /**
+   * @brief Function that handles label removal from the segmentation image.
+   *
+   */
+  void OnRemoveLabel(mitk::Label::PixelType removedLabelValue);
+
+  /**
+   * @brief Function that to changes in the segmentation image. It handles the layer removal, addition, label erasure,
+   *
+   */
+  void OnModifyLabelChanged(const itk::Object *caller,
+                              const itk::EventObject & /*event*/);
+
+  /**
+   * @brief Add the necessary subscribers to the label set image, for UI responsiveness.
+   *        It deals with remove label, change active label, layer changes and change in the label.
+   *
+   */
+  void OnAddLabelSetConnection();
+
+  /**
+   * @brief Add the necessary subscribers to the current LabelSetImage at the layer input, for UI responsiveness.
+   *        It deals with remove label, change active label, layer changes and change in the label.
+   *
+   * @param layerID
+   */
+  void OnAddLabelSetConnection(unsigned int layerID);
+
+  /**
+   * @brief Remove the subscribers for the different events to the segmentation image.
+   *
+   */
+  void OnRemoveLabelSetConnection();
+
+  /**
+   * @brief Merge contours for the current layerID and current timeStep.
+   *
+   * @param timeStep
+   * @param layerID
+   */
+  void MergeContours(unsigned int timeStep, unsigned int layerID);
+
+
+  /**
+   * @brief Prepare Inputs for 3D Interpolation.
+   *
+   */
+  void PrepareInputsFor3DInterpolation();
 
 signals:
 
@@ -161,9 +259,12 @@ protected slots:
   */
   void OnAccept3DInterpolationClicked();
 
+  /**
+   * @brief Reaction to reinit 3D Interpolation. Re-reads the plane geometries of the image
+   *         that should have generated the
+   *
+   */
   void OnReinit3DInterpolation();
-
-  void OnSuggestPlaneClicked();
 
   /*
    * Will trigger interpolation for all slices in given orientation (called from popup menu of
@@ -188,8 +289,12 @@ protected slots:
 
   void Run3DInterpolation();
 
-  void RunPlaneSuggestion();
-
+  /**
+   * @brief Function triggers when the surface interpolation thread completes running.
+   *        It is responsible for retrieving the data, rendering it in the active color label,
+   *        storing the surface information in the feedback node.
+   *
+   */
   void OnSurfaceInterpolationFinished();
 
   void StartUpdateInterpolationTimer();
@@ -198,9 +303,18 @@ protected slots:
 
   void ChangeSurfaceColor();
 
+  /**
+   * @brief Removes all observers to the labelSetImage at the layerID specified.
+   *        Is used when changing the segmentation image.
+   *
+   * @param labelSetImage
+   * @param layerID
+   */
+  void OnRemoveLabelSetConnection(mitk::LabelSetImage* labelSetImage, unsigned int layerID);
+
 protected:
-  const std::map<QAction *, mitk::SliceNavigationController *> createActionToSliceDimension();
-  std::map<QAction *, mitk::SliceNavigationController *> ACTION_TO_SLICEDIMENSION;
+  const std::map<QAction *, mitk::SliceNavigationController *> createActionToSlicer(const QList<QmitkRenderWindow*>& windows);
+  std::map<QAction *, mitk::SliceNavigationController *> m_ActionToSlicer;
 
   void AcceptAllInterpolations(mitk::SliceNavigationController *slicer);
 
@@ -232,12 +346,14 @@ protected:
   void SetCurrentContourListID();
 
 private:
+  void InitializeWindow(QmitkRenderWindow* window);
   void HideAllInterpolationControls();
   void Show2DInterpolationControls(bool show);
   void Show3DInterpolationControls(bool show);
   void CheckSupportedImageDimension();
   void WaitForFutures();
   void NodeRemoved(const mitk::DataNode* node);
+  void ClearSegmentationObservers();
 
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
@@ -251,6 +367,8 @@ private:
   QHash<mitk::SliceNavigationController *, int> m_ControllerToTimeObserverTag;
   QHash<mitk::SliceNavigationController *, int> m_ControllerToSliceObserverTag;
   QHash<mitk::SliceNavigationController *, int> m_ControllerToDeleteObserverTag;
+
+  std::map<mitk::LabelSetImage *, unsigned long> m_SegmentationObserverTags;
 
   unsigned int InterpolationInfoChangedObserverTag;
   unsigned int SurfaceInterpolationInfoChangedObserverTag;
@@ -281,17 +399,27 @@ private:
 
   bool m_2DInterpolationEnabled;
   bool m_3DInterpolationEnabled;
-  // unsigned int m_CurrentListID;
+
+  unsigned int m_numTimesLabelSetConnectionAdded;
 
   mitk::DataStorage::Pointer m_DataStorage;
 
   QFuture<void> m_Future;
   QFutureWatcher<void> m_Watcher;
+
+  QFuture<void> m_ModifyFuture;
+  QFutureWatcher<void> m_ModifyWatcher;
+
   QTimer *m_Timer;
 
   QFuture<void> m_PlaneFuture;
   QFutureWatcher<void> m_PlaneWatcher;
 
+  mitk::Label::PixelType m_PreviousActiveLabelValue;
+  mitk::Label::PixelType m_CurrentActiveLabelValue;
+
+  unsigned int m_PreviousLayerIndex;
+  unsigned int m_CurrentLayerIndex;
   bool m_FirstRun;
 };
 

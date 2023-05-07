@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMULTICOMPONENTIMAGEDATACOMPARISONFILTER_H
-#define MITKMULTICOMPONENTIMAGEDATACOMPARISONFILTER_H
+#ifndef mitkMultiComponentImageDataComparisonFilter_h
+#define mitkMultiComponentImageDataComparisonFilter_h
 
 // mitk includes
 #include "mitkCompareImageDataFilter.h"
@@ -82,4 +82,4 @@ namespace mitk
   };
 } // end namespace mitk
 
-#endif // MITKMULTICOMPONENTIMAGEDATACOMPARISONFILTER_H
+#endif

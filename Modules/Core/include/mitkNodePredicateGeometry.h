@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNODEPREDICATEGEOMETRY_H_HEADER_INCLUDED_
-#define MITKNODEPREDICATEGEOMETRY_H_HEADER_INCLUDED_
+#ifndef mitkNodePredicateGeometry_h
+#define mitkNodePredicateGeometry_h
 
 #include "mitkNodePredicateBase.h"
 #include "mitkBaseGeometry.h"
@@ -104,4 +104,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKNodePredicateGeometry_H_HEADER_INCLUDED_ */
+#endif

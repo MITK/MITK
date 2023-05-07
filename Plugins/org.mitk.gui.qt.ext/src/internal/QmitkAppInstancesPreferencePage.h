@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKAPPINSTANCESPREFERENCEPAGE_H_
-#define QMITKAPPINSTANCESPREFERENCEPAGE_H_
+#ifndef QmitkAppInstancesPreferencePage_h
+#define QmitkAppInstancesPreferencePage_h
 
 #include <berryIQtPreferencePage.h>
 
@@ -44,4 +44,4 @@ private:
   QWidget* mainWidget;
 };
 
-#endif /* QMITKAPPINSTANCESPREFERENCEPAGE_H_ */
+#endif

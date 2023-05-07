@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef UNSTRUCTURED_GRID_WRITERFACTORY_H_HEADER_INCLUDED
-#define UNSTRUCTURED_GRID_WRITERFACTORY_H_HEADER_INCLUDED
+#ifndef mitkUnstructuredGridVtkWriterFactory_h
+#define mitkUnstructuredGridVtkWriterFactory_h
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
@@ -56,4 +56,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#endif // UNSTRUCTURED_GRID_WRITERFACTORY_H_HEADER_INCLUDED
+#endif

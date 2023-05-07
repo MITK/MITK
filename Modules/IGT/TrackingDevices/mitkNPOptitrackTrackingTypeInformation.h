@@ -39,4 +39,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif //mitkNPOptitrackTrackingTypeInformation_h
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDICOMRTMimeTypes_H
-#define MITKDICOMRTMimeTypes_H
+#ifndef mitkDICOMRTMimeTypes_h
+#define mitkDICOMRTMimeTypes_h
 
 #include <mitkCustomMimeType.h>
 #include <MitkRTExports.h>
@@ -74,4 +74,4 @@ public:
 
 }
 
-#endif // MITKDICOMRTMimeTypes_H
+#endif

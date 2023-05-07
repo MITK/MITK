@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkOtsuSegmentationFilter_h_Included
-#define mitkOtsuSegmentationFilter_h_Included
+#ifndef mitkOtsuSegmentationFilter_h
+#define mitkOtsuSegmentationFilter_h
 
 //#include "MitkSBExports.h"
 #include "mitkITKImageImport.h"
@@ -31,12 +31,14 @@ namespace mitk
     image histogram.
     Internally, the itk::OtsuMultipleThresholdsImageFilter is used.
 
-    $Author: somebody$
+    @remark In contrast to the itk filter. The MITK version generates classes starting with the pixel value 1
+    (and not 0 like the itk version). MITK uses 0 in Segmentation to indicate unlabeled pixel, but after otsu
+    every pixel has a proposed class.
   */
   class MITKSEGMENTATION_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
   {
   public:
-    typedef unsigned char OutputPixelType;
+    typedef unsigned short OutputPixelType;
     typedef itk::Image<OutputPixelType, 3> itkOutputImageType;
     typedef mitk::ITKImageImport<itkOutputImageType> ImageConverterType;
 

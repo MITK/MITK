@@ -145,4 +145,4 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBoxWithSelectNone : public Qmitk
     QString m_CurrentPath;
 };
 
-#endif // QmitkDataStorageComboBoxWithSelectNone_h
+#endif

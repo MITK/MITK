@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGERENDERWINDOWTREEMODEL_H
-#define QMITKDATASTORAGERENDERWINDOWTREEMODEL_H
+#ifndef QmitkRenderWindowDataStorageTreeModel_h
+#define QmitkRenderWindowDataStorageTreeModel_h
 
 // render window manager UI model
 #include "MitkQtWidgetsExports.h"
@@ -123,10 +123,9 @@ private:
   QModelIndex GetIndexByItem(QmitkDataStorageTreeModelInternalItem* item) const;
 
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
-  mitk::RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
   QmitkDataStorageTreeModelInternalItem* m_Root;
   mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
 
 };
 
-#endif // QMITKDATASTORAGERENDERWINDOWTREEMODEL_H
+#endif

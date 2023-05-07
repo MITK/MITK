@@ -27,6 +27,7 @@ found in the LICENSE file.
 namespace mitk
 {
   class LabelSetImage;
+  class Label;
 }
 
 namespace Ui
@@ -34,9 +35,8 @@ namespace Ui
   class QmitkNewSegmentationDialog;
 }
 
-/**
-  \brief Dialog for naming labels.
-*/
+/** \brief Dialog for naming labels.
+ */
 class MITK_QT_SEGMENTATION QmitkNewSegmentationDialog : public QDialog
 {
   Q_OBJECT
@@ -49,6 +49,13 @@ public:
     NewLabel,
     RenameLabel
   };
+
+  /** \brief Static helper function to (re)name a label.
+   *
+   * In NewLabel mode it is assumed that the label has not yet been added, hence for example a look-up table update is not done.
+   * In RenameLabel mode the segmentation (if provided) is updated.
+   */
+  static bool DoRenameLabel(mitk::Label* label, mitk::LabelSetImage* segmentation, QWidget* parent = nullptr, Mode mode = NewLabel);
 
   explicit QmitkNewSegmentationDialog(QWidget *parent = nullptr, mitk::LabelSetImage* labelSetImage = nullptr, Mode mode = NewLabel);
   ~QmitkNewSegmentationDialog() override;

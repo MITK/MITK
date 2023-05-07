@@ -31,9 +31,12 @@ found in the LICENSE file.
 #include <QTimer>
 #include <QWheelEvent>
 #include <QWindow>
+#include <QApplication>
+#include <QDesktopWidget>
 
-#include "QmitkMimeTypes.h"
-#include "QmitkRenderWindowMenu.h"
+#include <QmitkMimeTypes.h>
+#include <QmitkRenderWindowMenu.h>
+#include <QmitkStyleManager.h>
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *)
   : QVTKOpenGLNativeWidget(parent)
@@ -56,12 +59,17 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
   QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setSizePolicy(sizePolicy);
 
-  // setup overlay widget to show a warning message
-  m_GeometryViolationWarningOverlay = new QmitkSimpleTextOverlayWidget(this);
+  // setup overlay widget to show a warning message with a button
+  m_GeometryViolationWarningOverlay = new QmitkButtonOverlayWidget(this);
   m_GeometryViolationWarningOverlay->setVisible(false);
   m_GeometryViolationWarningOverlay->SetOverlayText(
-    QStringLiteral("<font class=\"warning\"><p style=\"text-align:center\">Interaction is not possible because the "
-                   "render window is not aligned.</p></center></font>"));
+    QStringLiteral("<font color=\"red\"><p style=\"text-align:center\">Interaction is not possible because the "
+                   "render window geometry<br>does not match the interaction reference geometry.</p></center></font>"));
+  m_GeometryViolationWarningOverlay->SetButtonText("Reset geometry");
+  m_GeometryViolationWarningOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/reset.svg")));
+
+  connect(m_GeometryViolationWarningOverlay, &QmitkButtonOverlayWidget::Clicked,
+          this, &QmitkRenderWindow::ResetGeometry);
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()
@@ -119,6 +127,12 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
   {
     m_MenuWidget = new QmitkRenderWindowMenu(this, nullptr, m_Renderer);
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
+  }
+
+  if (m_MenuWidgetActivated == state)
+  {
+    // no new state; nothing to do
+    return;
   }
 
   m_MenuWidgetActivated = state;
@@ -238,9 +252,8 @@ bool QmitkRenderWindow::event(QEvent* e)
 
 void QmitkRenderWindow::enterEvent(QEvent *e)
 {
-  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(m_Renderer, nullptr, "EnterRenderWindow");
-
-  this->HandleEvent(internalEvent.GetPointer());
+  auto* baseRenderer = mitk::BaseRenderer::GetInstance(this->GetRenderWindow());
+  this->ShowOverlayMessage(!baseRenderer->GetReferenceGeometryAligned());
 
   if (nullptr != m_MenuWidget)
     m_MenuWidget->ShowMenu();
@@ -252,10 +265,7 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
 {
   auto statusBar = mitk::StatusBar::GetInstance();
   statusBar->DisplayGreyValueText("");
-
-  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(m_Renderer, nullptr, "LeaveRenderWindow");
-
-  this->HandleEvent(internalEvent.GetPointer());
+  this->ShowOverlayMessage(false);
 
   if (nullptr != m_MenuWidget)
     m_MenuWidget->HideMenu();
@@ -299,18 +309,20 @@ void QmitkRenderWindow::DeferredHideMenu()
 mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent *me) const
 {
   mitk::Point2D point;
-  point[0] = me->x();
+  const auto scale = QApplication::desktop()->devicePixelRatio();
+  point[0] = me->x()*scale;
   // We need to convert the y component, as the display and vtk have other definitions for the y direction
-  point[1] = m_Renderer->GetSizeY() - me->y();
+  point[1] = m_Renderer->GetSizeY() - me->y()*scale;
   return point;
 }
 
 mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent *we) const
 {
   mitk::Point2D point;
-  point[0] = we->x();
+  const auto scale = QApplication::desktop()->devicePixelRatio();
+  point[0] = we->x()*scale;
   // We need to convert the y component, as the display and vtk have other definitions for the y direction
-  point[1] = m_Renderer->GetSizeY() - we->y();
+  point[1] = m_Renderer->GetSizeY() - we->y()*scale;
   return point;
 }
 

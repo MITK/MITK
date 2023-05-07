@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkLabelSet_H_
-#define __mitkLabelSet_H_
+#ifndef mitkLabelSet_h
+#define mitkLabelSet_h
 
 #include "MitkMultilabelExports.h"
 #include <mitkLookupTable.h>
@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
+#include <itkEventObject.h>
 
 #include <mitkLabel.h>
 
@@ -38,13 +39,15 @@ namespace mitk
 
     typedef mitk::Label::PixelType PixelType;
 
-    typedef std::map<PixelType, Label::Pointer> LabelContainerType;
+    using LabelValueType = mitk::Label::PixelType;
+    typedef std::map<LabelValueType, Label::Pointer> LabelContainerType;
     typedef LabelContainerType::const_iterator LabelContainerConstIteratorType;
     typedef LabelContainerType::iterator LabelContainerIteratorType;
 
     /**
     * \brief AddLabelEvent is emitted whenever a new label has been added to the LabelSet.
     *
+    * The registered method will be called with the label value of the added label.
     * Observers should register to this event by calling myLabelSet->AddLabelEvent.AddListener(myObject,
     * MyObject::MyMethod).
     * After registering, myObject->MyMethod() will be called every time a new label has been added to the LabelSet.
@@ -53,11 +56,12 @@ namespace mitk
     * member variable is not needed to be locked in multi-threaded scenarios since the LabelSetEvent is a typedef for
     * a Message1 object which is thread safe
     */
-    Message<> AddLabelEvent;
+    Message1<LabelValueType> AddLabelEvent;
 
     /**
     * \brief RemoveLabelEvent is emitted whenever a new label has been removed from the LabelSet.
     *
+    * The registered method will be called with the label value of the removed label.
     * Observers should register to this event by calling myLabelSet->RemoveLabelEvent.AddListener(myObject,
     * MyObject::MyMethod).
     * After registering, myObject->MyMethod() will be called every time a new label has been removed from the LabelSet.
@@ -66,11 +70,12 @@ namespace mitk
     * member variable is not needed to be locked in multi-threaded scenarios since the LabelSetEvent is a typedef for
     * a Message object which is thread safe
     */
-    Message<> RemoveLabelEvent;
+    Message1<LabelValueType> RemoveLabelEvent;
 
     /**
     * \brief ModifyLabelEvent is emitted whenever a label has been modified from the LabelSet.
     *
+    * The registered method will be called with the label value of the modified label.
     * Observers should register to this event by calling myLabelSet->ModifyLabelEvent.AddListener(myObject,
     * MyObject::MyMethod).
     * After registering, myObject->MyMethod() will be called every time a new label has been removed from the LabelSet.
@@ -79,7 +84,7 @@ namespace mitk
     * member variable is not needed to be locked in multi-threaded scenarios since the LabelSetEvent is a typedef for
     * a Message object which is thread safe
     */
-    Message<> ModifyLabelEvent;
+    Message1<LabelValueType> ModifyLabelEvent;
 
     /**
     * \brief ActiveLabelEvent is emitted whenever a label has been set as active in the LabelSet.
@@ -119,7 +124,7 @@ namespace mitk
     /** \brief
      * Recall itk::Object::Modified event from a label and send a ModifyLabelEvent
     */
-    void OnLabelModified();
+    void OnLabelModified(const Object*, const itk::EventObject&);
 
     /** \brief
     */
@@ -137,13 +142,19 @@ namespace mitk
     */
     bool ExistLabel(PixelType);
 
-    /** \brief
+    /** \brief Adds a label to the label set.
+    * @remark If the pixel value of the label is already used in the label set, the label
+    * will get a new none conflicting value assigned.
+    * @param label Instance of an label that should be added or used as template
+    * @param addAsClone flag that control if the passed instance should be added or
+    * a clone of the instance.
+    * @return Instance of the label as it was added to the label set.
     */
-    void AddLabel(mitk::Label *label);
+    mitk::Label* AddLabel(mitk::Label *label, bool addAsClone = true);
 
     /** \brief
     */
-    void AddLabel(const std::string &name, const Color &color);
+    mitk::Label* AddLabel(const std::string &name, const Color &color);
 
     /** \brief
     */
@@ -195,13 +206,18 @@ namespace mitk
     */
     void UpdateLookupTable(PixelType pixelValue);
 
+    using ReservedLabelValuesFunctor = std::function<std::vector<LabelValueType>()>;
+    ReservedLabelValuesFunctor m_ReservedLabelValuesFunctor;
+
+    std::vector<LabelValueType> GetUsedLabelValues() const;
+
   protected:
     LabelSet();
     LabelSet(const LabelSet &);
 
     mitkCloneMacro(Self);
 
-      ~LabelSet() override;
+    ~LabelSet() override;
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
@@ -234,6 +250,14 @@ namespace mitk
                                    ScalarType eps,
                                    bool verbose);
 
+  /**
+  * Method takes a label set and generates a new label set with the same labels but updated labels values according to
+  * the passed labelMapping.
+  * @pre sourceLabelSet is valid
+  */
+  MITKMULTILABEL_EXPORT LabelSet::Pointer GenerateLabelSetWithMappedValues(const LabelSet* sourceLabelSet,
+    std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} });
+
 } // namespace mitk
 
-#endif // __mitkLabelSet_H_
+#endif

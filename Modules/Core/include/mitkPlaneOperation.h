@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPlaneOperation_H
-#define MITKPlaneOperation_H
+#ifndef mitkPlaneOperation_h
+#define mitkPlaneOperation_h
 
 #include "mitkNumericTypes.h"
 #include "mitkPointOperation.h"
@@ -46,4 +46,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKPlaneOperation_H */
+#endif

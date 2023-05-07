@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSTRINGPROPERTY_H_HEADER_INCLUDED_C1C02491
-#define MITKSTRINGPROPERTY_H_HEADER_INCLUDED_C1C02491
+#ifndef mitkStringProperty_h
+#define mitkStringProperty_h
 
 #include <itkConfigure.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkToolSelectionBox_h_Included
-#define QmitkToolSelectionBox_h_Included
+#ifndef QmitkToolSelectionBox_h
+#define QmitkToolSelectionBox_h
 
 #include "QmitkToolGUIArea.h"
 #include <MitkSegmentationUIExports.h>

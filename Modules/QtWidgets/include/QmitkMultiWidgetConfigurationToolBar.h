@@ -10,12 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMULTIWIDGETCONFIGURATIONTOOLBAR_H
-#define QMITKMULTIWIDGETCONFIGURATIONTOOLBAR_H
+#ifndef QmitkMultiWidgetConfigurationToolBar_h
+#define QmitkMultiWidgetConfigurationToolBar_h
 
 #include "MitkQtWidgetsExports.h"
 
 #include <mitkInteractionSchemeSwitcher.h>
+
+#include <nlohmann/json.hpp>
 
 // qt
 #include <QToolBar>
@@ -40,6 +42,8 @@ public:
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);
+  void SaveLayout(std::ostream* outStream);
+  void LoadLayout(const nlohmann::json* jsonData);
   void Synchronized(bool synchronized);
   void InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
@@ -63,4 +67,4 @@ private:
 
 };
 
-#endif // QMITKMULTIWIDGETCONFIGURATIONTOOLBAR_H
+#endif

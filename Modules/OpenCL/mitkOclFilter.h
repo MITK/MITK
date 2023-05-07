@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __mitkOclFilter_h
-#define __mitkOclFilter_h
+#ifndef mitkOclFilter_h
+#define mitkOclFilter_h
 
 #include "mitkOclUtils.h"
 #include "mitkCommon.h"
@@ -154,4 +154,4 @@ protected:
   void LoadSourceFiles(CStringList &SourceCodeList, ClSizeList &SourceCodeSizeList);
 };
 }
-#endif // __mitkOclFilter_h
+#endif

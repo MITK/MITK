@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDICOMSEGMENTATIONCONSTANTS_H_
-#define MITKDICOMSEGMENTATIONCONSTANTS_H_
+#ifndef mitkDICOMSegmentationConstants_h
+#define mitkDICOMSegmentationConstants_h
 
 #include <mitkDICOMTagPath.h>
 
@@ -51,4 +51,4 @@ namespace mitk
   };
 }
 
-#endif // MITKDICOMSEGMENTATIONCONSTANTS_H_
+#endif

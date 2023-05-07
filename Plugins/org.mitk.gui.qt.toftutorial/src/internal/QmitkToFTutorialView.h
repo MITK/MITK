@@ -63,5 +63,4 @@ class QmitkToFTutorialView : public QmitkAbstractView
 
 
 
-#endif // _QMITKTOFTUTORIALVIEW_H_INCLUDED
-
+#endif

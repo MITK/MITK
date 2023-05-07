@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKTRACKINGDEVICESOURCECONFIGURATOR_H_HEADER_INCLUDED_
-#define MITKTRACKINGDEVICESOURCECONFIGURATOR_H_HEADER_INCLUDED_
+#ifndef mitkTrackingDeviceSourceConfigurator_h
+#define mitkTrackingDeviceSourceConfigurator_h
 
 #include <MitkIGTExports.h>
 
@@ -95,4 +95,4 @@ namespace mitk {
 
   };
 } // namespace mitk
-#endif /* MITKTrackingDeviceSource_H_HEADER_INCLUDED_ */
+#endif

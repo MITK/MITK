@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitk_labeled_image_to_surface_filter__h_
-#define _mitk_labeled_image_to_surface_filter__h_
+#ifndef mitkLabeledImageToSurfaceFilter_h
+#define mitkLabeledImageToSurfaceFilter_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include <map>

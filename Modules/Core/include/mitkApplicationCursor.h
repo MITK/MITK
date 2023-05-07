@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_APPLICATION_CURSOR_H_DEFINED_AND_ALL_IS_GOOD
-#define MITK_APPLICATION_CURSOR_H_DEFINED_AND_ALL_IS_GOOD
+#ifndef mitkApplicationCursor_h
+#define mitkApplicationCursor_h
 
 #include "mitkNumericTypes.h"
 #include <MitkCoreExports.h>

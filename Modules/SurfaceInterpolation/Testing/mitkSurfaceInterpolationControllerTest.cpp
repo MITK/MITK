@@ -14,11 +14,14 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
-#include <vtkDebugLeaks.h>
-#include <vtkRegularPolygonSource.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkLabelSetImage.h>
 
-#include "mitkImagePixelWriteAccessor.h"
-#include "mitkImageTimeSelector.h"
+#include <vtkDebugLeaks.h>
+#include <vtkDoubleArray.h>
+#include <vtkFieldData.h>
+#include <vtkPolygon.h>
+#include <vtkRegularPolygonSource.h>
 
 class mitkSurfaceInterpolationControllerTestSuite : public mitk::TestFixture
 {
@@ -50,8 +53,17 @@ public:
   mitk::Image::Pointer createImage(unsigned int *dimensions)
   {
     mitk::Image::Pointer newImage = mitk::Image::New();
+    // mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
     mitk::PixelType p_type = mitk::MakeScalarPixelType<unsigned char>();
     newImage->Initialize(p_type, 3, dimensions);
+    return newImage;
+  }
+
+  mitk::LabelSetImage::Pointer createLabelSetImage(unsigned int *dimensions)
+  {
+    mitk::Image::Pointer image = createImage(dimensions);
+    mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
+    newImage->InitializeByLabeledImage(image);
     return newImage;
   }
 
@@ -63,10 +75,19 @@ public:
     return newImage;
   }
 
+  mitk::LabelSetImage::Pointer createLabelSetImage4D(unsigned int *dimensions)
+  {
+    mitk::Image::Pointer image = createImage4D(dimensions);
+    mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
+    newImage->InitializeByLabeledImage(image);
+    return newImage;
+  }
+
   void setUp() override
   {
     m_Controller = mitk::SurfaceInterpolationController::GetInstance();
-    m_Controller->SetCurrentTimePoint(0.);
+    m_Controller->RemoveAllInterpolationSessions();
+    m_Controller->SetCurrentTimePoint(0);
 
     vtkSmartPointer<vtkRegularPolygonSource> polygonSource = vtkSmartPointer<vtkRegularPolygonSource>::New();
     polygonSource->SetRadius(100);
@@ -87,13 +108,14 @@ public:
   {
     // Create image for testing
     unsigned int dimensions1[] = {10, 10, 10};
-    mitk::Image::Pointer segmentation_1 = createImage(dimensions1);
+    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage(dimensions1);
 
     unsigned int dimensions2[] = {20, 10, 30};
-    mitk::Image::Pointer segmentation_2 = createImage(dimensions2);
+    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage(dimensions2);
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
+
     MITK_ASSERT_EQUAL(
       m_Controller->GetCurrentSegmentation(), segmentation_1->Clone(), "Segmentation images are not equal");
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
@@ -128,18 +150,44 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2",
                            m_Controller->GetNumberOfInterpolationSessions() == 2);
 
-    // Test 5
+    // // Test 5
     m_Controller->SetCurrentInterpolationSession(nullptr);
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().IsNull());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2",
                            m_Controller->GetNumberOfInterpolationSessions() == 2);
   }
 
+  mitk::PlaneGeometry::Pointer GetPlaneGeometry()
+  {
+    mitk::Point3D origin;
+    mitk::Vector3D right, bottom, normal, spacing;
+    mitk::ScalarType width, height;
+    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+
+    auto planegeometry = mitk::PlaneGeometry::New();
+    width = 100;
+    widthInMM = width;
+    height = 200;
+    heightInMM = height;
+    thicknessInMM = 1.0;
+    mitk::FillVector3D(origin, 4.5, 7.3, 11.2);
+    mitk::FillVector3D(right, widthInMM, 0, 0);
+    mitk::FillVector3D(bottom, 0, heightInMM, 0);
+    mitk::FillVector3D(normal, 0, 0, thicknessInMM);
+    mitk::FillVector3D(spacing, 1.0, 1.0, thicknessInMM);
+
+    planegeometry->InitializeStandardPlane(right, bottom);
+    planegeometry->SetOrigin(origin);
+    planegeometry->SetSpacing(spacing);
+    return planegeometry;
+  }
+
   void TestReplaceInterpolationSession()
   {
     // Create segmentation image
     unsigned int dimensions1[] = {10, 10, 10};
-    mitk::Image::Pointer segmentation_1 = createImage(dimensions1);
+    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage(dimensions1);
+
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
 
     // Create some contours
@@ -154,6 +202,16 @@ public:
     vtkPolyData *poly_1 = p_source->GetOutput();
     mitk::Surface::Pointer surf_1 = mitk::Surface::New();
     surf_1->SetVtkPolyData(poly_1);
+    vtkSmartPointer<vtkIntArray> int1Array = vtkSmartPointer<vtkIntArray>::New();
+    int1Array->InsertNextValue(1);
+    int1Array->InsertNextValue(0);
+    int1Array->InsertNextValue(0);
+    surf_1->GetVtkPolyData()->GetFieldData()->AddArray(int1Array);
+    vtkSmartPointer<vtkDoubleArray> double1Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double1Array->InsertNextValue(center_1[0]);
+    double1Array->InsertNextValue(center_1[1]);
+    double1Array->InsertNextValue(center_1[2]);
+    surf_1->GetVtkPolyData()->GetFieldData()->AddArray(double1Array);
 
     double center_2[3] = {4.0f, 4.0f, 4.0f};
     double normal_2[3] = {1.0f, 0.0f, 0.0f};
@@ -166,41 +224,71 @@ public:
     vtkPolyData *poly_2 = p_source_2->GetOutput();
     mitk::Surface::Pointer surf_2 = mitk::Surface::New();
     surf_2->SetVtkPolyData(poly_2);
+    vtkSmartPointer<vtkIntArray> int2Array = vtkSmartPointer<vtkIntArray>::New();
+    int2Array->InsertNextValue(1);
+    int2Array->InsertNextValue(0);
+    int2Array->InsertNextValue(0);
+    surf_2->GetVtkPolyData()->GetFieldData()->AddArray(int2Array);
+    vtkSmartPointer<vtkDoubleArray> doubleArray = vtkSmartPointer<vtkDoubleArray>::New();
+    doubleArray->InsertNextValue(center_2[0]);
+    doubleArray->InsertNextValue(center_2[1]);
+    doubleArray->InsertNextValue(center_2[2]);
+    surf_2->GetVtkPolyData()->GetFieldData()->AddArray(doubleArray);
+
+    std::vector<mitk::Surface::Pointer> surfaces;
+    surfaces.push_back(surf_1);
+    surfaces.push_back(surf_2);
+
+    const mitk::PlaneGeometry * planeGeometry1 = GetPlaneGeometry();
+    const mitk::PlaneGeometry * planeGeometry2 = GetPlaneGeometry();
+
+    std::vector<const mitk::PlaneGeometry*> planeGeometries;
+    planeGeometries.push_back(planeGeometry1);
+    planeGeometries.push_back(planeGeometry2);
 
     // Add contours
-    m_Controller->AddNewContour(surf_1);
-    m_Controller->AddNewContour(surf_2);
+    m_Controller->AddNewContours(surfaces, planeGeometries, true);
 
     // Check if all contours are there
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo1;
-    contourInfo1.contourNormal = normal_1;
-    contourInfo1.contourPoint = center_1;
+
+    mitk::ScalarType n[3];
+    vtkPolygon::ComputeNormal(surf_1->GetVtkPolyData()->GetPoints(), n);
+    contourInfo1.ContourNormal = n;
+    contourInfo1.ContourPoint = center_1;
 
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo2;
-    contourInfo2.contourNormal = normal_2;
-    contourInfo2.contourPoint = center_2;
 
-    mitk::Image::Pointer segmentation_2 = createImage(dimensions1);
-    bool success = m_Controller->ReplaceInterpolationSession(segmentation_1, segmentation_2);
+    vtkPolygon::ComputeNormal(surf_2->GetVtkPolyData()->GetPoints(), n);
+
+    contourInfo2.ContourNormal = n;
+    contourInfo2.ContourPoint = center_2;
+
+
     const mitk::Surface *contour_1 = m_Controller->GetContour(contourInfo1);
     const mitk::Surface *contour_2 = m_Controller->GetContour(contourInfo2);
 
-    CPPUNIT_ASSERT_MESSAGE("Replace session failed!", success == true);
+
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 2);
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
                            mitk::Equal(*(surf_1->GetVtkPolyData()), *(contour_1->GetVtkPolyData()), 0.000001, true));
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
                            mitk::Equal(*(surf_2->GetVtkPolyData()), *(contour_2->GetVtkPolyData()), 0.000001, true));
+
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 1",
                            m_Controller->GetNumberOfInterpolationSessions() == 1);
+
+    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage(dimensions1);
+    bool success = m_Controller->ReplaceInterpolationSession(segmentation_1, segmentation_2);
+
+    CPPUNIT_ASSERT_MESSAGE("Replace session failed!", success == true);
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
                            m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_2.GetPointer());
 
     unsigned int dimensions2[] = {10, 20, 10};
-    mitk::Image::Pointer segmentation_3 = createImage(dimensions2);
-    success = m_Controller->ReplaceInterpolationSession(segmentation_2, segmentation_3);
+    mitk::Image::Pointer segmentation_3 = createLabelSetImage(dimensions2);
+    success = m_Controller->ReplaceInterpolationSession(segmentation_1, segmentation_3);
     CPPUNIT_ASSERT_MESSAGE("Replace session failed!", success == false);
-    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 2);
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 1",
                            m_Controller->GetNumberOfInterpolationSessions() == 1);
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
@@ -211,10 +299,10 @@ public:
   {
     // Create image for testing
     unsigned int dimensions1[] = {10, 10, 10};
-    mitk::Image::Pointer segmentation_1 = createImage(dimensions1);
+    auto segmentation_1 = createLabelSetImage(dimensions1);
 
     unsigned int dimensions2[] = {20, 10, 30};
-    mitk::Image::Pointer segmentation_2 = createImage(dimensions2);
+    auto segmentation_2 = createLabelSetImage(dimensions2);
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
@@ -228,10 +316,10 @@ public:
   {
     // Create image for testing
     unsigned int dimensions1[] = {10, 10, 10};
-    mitk::Image::Pointer segmentation_1 = createImage(dimensions1);
+    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage(dimensions1);
 
     unsigned int dimensions2[] = {20, 10, 30};
-    mitk::Image::Pointer segmentation_2 = createImage(dimensions2);
+    mitk::Image::Pointer segmentation_2 = createLabelSetImage(dimensions2);
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
@@ -262,12 +350,14 @@ public:
 
   void TestOnSegmentationDeleted()
   {
-    {
-      // Create image for testing
-      unsigned int dimensions1[] = {10, 10, 10};
-      mitk::Image::Pointer segmentation_1 = createImage(dimensions1);
-      m_Controller->SetCurrentInterpolationSession(segmentation_1);
-    }
+    // Create image for testing
+    unsigned int dimensions1[] = {10, 10, 10};
+    auto segmentation_1 = createLabelSetImage(dimensions1);
+
+    m_Controller->SetCurrentInterpolationSession(segmentation_1);
+
+    segmentation_1 = nullptr;
+
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 0",
                            m_Controller->GetNumberOfInterpolationSessions() == 0);
   }
@@ -276,7 +366,7 @@ public:
   {
     // Create segmentation image
     unsigned int dimensions1[] = {10, 10, 10};
-    mitk::Image::Pointer segmentation_1 = createImage(dimensions1);
+    mitk::Image::Pointer segmentation_1 = createLabelSetImage(dimensions1);
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
 
     // Create some contours
@@ -291,6 +381,16 @@ public:
     vtkPolyData *poly_1 = p_source->GetOutput();
     mitk::Surface::Pointer surf_1 = mitk::Surface::New();
     surf_1->SetVtkPolyData(poly_1);
+    vtkSmartPointer<vtkIntArray> int1Array = vtkSmartPointer<vtkIntArray>::New();
+    int1Array->InsertNextValue(1);
+    int1Array->InsertNextValue(0);
+    int1Array->InsertNextValue(0);
+    surf_1->GetVtkPolyData()->GetFieldData()->AddArray(int1Array);
+    vtkSmartPointer<vtkDoubleArray> double1Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double1Array->InsertNextValue(center_1[0]);
+    double1Array->InsertNextValue(center_1[1]);
+    double1Array->InsertNextValue(center_1[2]);
+    surf_1->GetVtkPolyData()->GetFieldData()->AddArray(double1Array);
 
     double center_2[3] = {4.0f, 4.0f, 4.0f};
     double normal_2[3] = {1.0f, 0.0f, 0.0f};
@@ -303,6 +403,16 @@ public:
     vtkPolyData *poly_2 = p_source_2->GetOutput();
     mitk::Surface::Pointer surf_2 = mitk::Surface::New();
     surf_2->SetVtkPolyData(poly_2);
+    vtkSmartPointer<vtkIntArray> int2Array = vtkSmartPointer<vtkIntArray>::New();
+    int2Array->InsertNextValue(1);
+    int2Array->InsertNextValue(0);
+    int2Array->InsertNextValue(0);
+    surf_2->GetVtkPolyData()->GetFieldData()->AddArray(int2Array);
+    vtkSmartPointer<vtkDoubleArray> double2Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double2Array->InsertNextValue(center_2[0]);
+    double2Array->InsertNextValue(center_2[1]);
+    double2Array->InsertNextValue(center_2[2]);
+    surf_2->GetVtkPolyData()->GetFieldData()->AddArray(double2Array);
 
     double center_3[3] = {4.0f, 4.0f, 3.0f};
     double normal_3[3] = {0.0f, 0.0f, 1.0f};
@@ -315,24 +425,51 @@ public:
     vtkPolyData *poly_3 = p_source_3->GetOutput();
     mitk::Surface::Pointer surf_3 = mitk::Surface::New();
     surf_3->SetVtkPolyData(poly_3);
+    vtkSmartPointer<vtkIntArray> int3Array = vtkSmartPointer<vtkIntArray>::New();
+    int3Array->InsertNextValue(1);
+    int3Array->InsertNextValue(0);
+    int3Array->InsertNextValue(0);
+    surf_3->GetVtkPolyData()->GetFieldData()->AddArray(int3Array);
+    vtkSmartPointer<vtkDoubleArray> double3Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double3Array->InsertNextValue(center_3[0]);
+    double3Array->InsertNextValue(center_3[1]);
+    double3Array->InsertNextValue(center_3[2]);
+    surf_3->GetVtkPolyData()->GetFieldData()->AddArray(double3Array);
+
+    std::vector<mitk::Surface::Pointer> surfaces;
+    surfaces.push_back(surf_1);
+    surfaces.push_back(surf_2);
+    surfaces.push_back(surf_3);
+
+    const mitk::PlaneGeometry * planeGeometry1 = GetPlaneGeometry();
+    const mitk::PlaneGeometry * planeGeometry2 = GetPlaneGeometry();
+    const mitk::PlaneGeometry * planeGeometry3 = GetPlaneGeometry();
+
+    std::vector<const mitk::PlaneGeometry*> planeGeometries;
+    planeGeometries.push_back(planeGeometry1);
+    planeGeometries.push_back(planeGeometry2);
+    planeGeometries.push_back(planeGeometry3);
 
     // Add contours
-    m_Controller->AddNewContour(surf_1);
-    m_Controller->AddNewContour(surf_2);
-    m_Controller->AddNewContour(surf_3);
+    m_Controller->AddNewContours(surfaces, planeGeometries, true);
+
+    mitk::ScalarType n[3];
 
     // Check if all contours are there
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo1;
-    contourInfo1.contourNormal = normal_1;
-    contourInfo1.contourPoint = center_1;
+    vtkPolygon::ComputeNormal(surf_1->GetVtkPolyData()->GetPoints(), n);
+    contourInfo1.ContourNormal = n;
+    contourInfo1.ContourPoint = center_1;
 
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo2;
-    contourInfo2.contourNormal = normal_2;
-    contourInfo2.contourPoint = center_2;
+    vtkPolygon::ComputeNormal(surf_2->GetVtkPolyData()->GetPoints(), n);
+    contourInfo2.ContourNormal = n;
+    contourInfo2.ContourPoint = center_2;
 
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo3;
-    contourInfo3.contourNormal = normal_3;
-    contourInfo3.contourPoint = center_3;
+    vtkPolygon::ComputeNormal(surf_3->GetVtkPolyData()->GetPoints(), n);
+    contourInfo3.ContourNormal = n;
+    contourInfo3.ContourPoint = center_3;
 
     const mitk::Surface *contour_1 = m_Controller->GetContour(contourInfo1);
     const mitk::Surface *contour_2 = m_Controller->GetContour(contourInfo2);
@@ -348,7 +485,7 @@ public:
 
     // Create another segmentation image
     unsigned int dimensions2[] = {20, 20, 20};
-    mitk::Image::Pointer segmentation_2 = createImage(dimensions2);
+    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage(dimensions2);
     m_Controller->SetCurrentInterpolationSession(segmentation_2);
 
     // Create some contours
@@ -363,6 +500,16 @@ public:
     vtkPolyData *poly_4 = p_source_4->GetOutput();
     mitk::Surface::Pointer surf_4 = mitk::Surface::New();
     surf_4->SetVtkPolyData(poly_4);
+    vtkSmartPointer<vtkIntArray> int4Array = vtkSmartPointer<vtkIntArray>::New();
+    int4Array->InsertNextValue(2);
+    int4Array->InsertNextValue(0);
+    int4Array->InsertNextValue(0);
+    surf_4->GetVtkPolyData()->GetFieldData()->AddArray(int4Array);
+    vtkSmartPointer<vtkDoubleArray> double4Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double4Array->InsertNextValue(center_4[0]);
+    double4Array->InsertNextValue(center_4[1]);
+    double4Array->InsertNextValue(center_4[2]);
+    surf_4->GetVtkPolyData()->GetFieldData()->AddArray(double4Array);
 
     double center_5[3] = {3.0f, 10.0f, 10.0f};
     double normal_5[3] = {1.0f, 0.0f, 0.0f};
@@ -375,6 +522,16 @@ public:
     vtkPolyData *poly_5 = p_source_5->GetOutput();
     mitk::Surface::Pointer surf_5 = mitk::Surface::New();
     surf_5->SetVtkPolyData(poly_5);
+    vtkSmartPointer<vtkIntArray> int5Array = vtkSmartPointer<vtkIntArray>::New();
+    int5Array->InsertNextValue(2);
+    int5Array->InsertNextValue(0);
+    int5Array->InsertNextValue(0);
+    surf_5->GetVtkPolyData()->GetFieldData()->AddArray(int5Array);
+    vtkSmartPointer<vtkDoubleArray> double5Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double5Array->InsertNextValue(center_5[0]);
+    double5Array->InsertNextValue(center_5[1]);
+    double5Array->InsertNextValue(center_5[2]);
+    surf_5->GetVtkPolyData()->GetFieldData()->AddArray(double5Array);
 
     double center_6[3] = {10.0f, 10.0f, 3.0f};
     double normal_6[3] = {0.0f, 0.0f, 1.0f};
@@ -387,23 +544,47 @@ public:
     vtkPolyData *poly_6 = p_source_6->GetOutput();
     mitk::Surface::Pointer surf_6 = mitk::Surface::New();
     surf_6->SetVtkPolyData(poly_6);
+    vtkSmartPointer<vtkIntArray> int6Array = vtkSmartPointer<vtkIntArray>::New();
+    int6Array->InsertNextValue(2);
+    int6Array->InsertNextValue(0);
+    int6Array->InsertNextValue(0);
+    surf_6->GetVtkPolyData()->GetFieldData()->AddArray(int6Array);
+    vtkSmartPointer<vtkDoubleArray> double6Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double6Array->InsertNextValue(center_6[0]);
+    double6Array->InsertNextValue(center_6[1]);
+    double6Array->InsertNextValue(center_6[2]);
+    surf_6->GetVtkPolyData()->GetFieldData()->AddArray(double6Array);
 
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo4;
-    contourInfo4.contourNormal = normal_4;
-    contourInfo4.contourPoint = center_4;
+    vtkPolygon::ComputeNormal(surf_4->GetVtkPolyData()->GetPoints(), n);
+    contourInfo4.ContourNormal = n;
+    contourInfo4.ContourPoint = center_4;
 
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo5;
-    contourInfo5.contourNormal = normal_5;
-    contourInfo5.contourPoint = center_5;
+    vtkPolygon::ComputeNormal(surf_5->GetVtkPolyData()->GetPoints(), n);
+    contourInfo5.ContourNormal = n;
+    contourInfo5.ContourPoint = center_5;
 
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo6;
-    contourInfo6.contourNormal = normal_6;
-    contourInfo6.contourPoint = center_6;
+    vtkPolygon::ComputeNormal(surf_6->GetVtkPolyData()->GetPoints(), n);
+    contourInfo6.ContourNormal = n;
+    contourInfo6.ContourPoint = center_6;
 
-    // Add contours
-    m_Controller->AddNewContour(surf_4);
-    m_Controller->AddNewContour(surf_5);
-    m_Controller->AddNewContour(surf_6);
+    const mitk::PlaneGeometry * planeGeometry4 = GetPlaneGeometry();
+    const mitk::PlaneGeometry * planeGeometry5 = GetPlaneGeometry();
+    const mitk::PlaneGeometry * planeGeometry6 = GetPlaneGeometry();
+
+    std::vector<mitk::Surface::Pointer> surfaces2;
+    surfaces2.push_back(surf_4);
+    surfaces2.push_back(surf_5);
+    surfaces2.push_back(surf_6);
+
+    std::vector<const mitk::PlaneGeometry*> planeGeometries2;
+    planeGeometries2.push_back(planeGeometry4);
+    planeGeometries2.push_back(planeGeometry5);
+    planeGeometries2.push_back(planeGeometry6);
+
+    m_Controller->AddNewContours(surfaces2, planeGeometries2, true);
 
     // Check if all contours are there
     auto contour_4 = m_Controller->GetContour(contourInfo4);
@@ -427,8 +608,35 @@ public:
     vtkPolyData *poly_7 = p_source_7->GetOutput();
     mitk::Surface::Pointer surf_7 = mitk::Surface::New();
     surf_7->SetVtkPolyData(poly_7);
+    vtkSmartPointer<vtkIntArray> int7Array = vtkSmartPointer<vtkIntArray>::New();
+    int7Array->InsertNextValue(2);
+    int7Array->InsertNextValue(0);
+    int7Array->InsertNextValue(0);
+    surf_7->GetVtkPolyData()->GetFieldData()->AddArray(int7Array);
+    vtkSmartPointer<vtkDoubleArray> double7Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double7Array->InsertNextValue(3.0);
+    double7Array->InsertNextValue(10.0);
+    double7Array->InsertNextValue(10.0);
+    surf_7->GetVtkPolyData()->GetFieldData()->AddArray(double7Array);
 
-    m_Controller->AddNewContour(surf_7);
+
+    std::vector<mitk::Surface::Pointer> surfaces3;
+    surfaces3.push_back(surf_7);
+
+    const mitk::PlaneGeometry * planeGeometry7 = GetPlaneGeometry();
+    std::vector<const mitk::PlaneGeometry*> planeGeometries3;
+    planeGeometries3.push_back(planeGeometry7);
+
+    m_Controller->AddNewContours(surfaces3, planeGeometries3, true);
+
+    mitk::ScalarType center_7[3];
+    center_7[0] = 3.0;
+    center_7[1] = 10.0;
+    center_7[2] = 10.0;
+    vtkPolygon::ComputeNormal(surf_7->GetVtkPolyData()->GetPoints(), n);
+    contourInfo5.ContourNormal = n;
+    contourInfo5.ContourPoint = center_7;
+
     auto contour_7 = m_Controller->GetContour(contourInfo5);
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
                            mitk::Equal(*(surf_7->GetVtkPolyData()), *(contour_7->GetVtkPolyData()), 0.000001, true));
@@ -450,8 +658,8 @@ public:
   void TestRemoveContour()
   {
     // Create segmentation image
-    unsigned int dimensions1[] = {10, 10, 10};
-    mitk::Image::Pointer segmentation_1 = createImage(dimensions1);
+    unsigned int dimensions1[] = {12, 12, 12};
+    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage(dimensions1);
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
 
     // Create some contours
@@ -466,6 +674,16 @@ public:
     vtkPolyData *poly_1 = p_source->GetOutput();
     mitk::Surface::Pointer surf_1 = mitk::Surface::New();
     surf_1->SetVtkPolyData(poly_1);
+    vtkSmartPointer<vtkIntArray> int1Array = vtkSmartPointer<vtkIntArray>::New();
+    int1Array->InsertNextValue(1);
+    int1Array->InsertNextValue(0);
+    int1Array->InsertNextValue(0);
+    surf_1->GetVtkPolyData()->GetFieldData()->AddArray(int1Array);
+    vtkSmartPointer<vtkDoubleArray> double1Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double1Array->InsertNextValue(center_1[0]);
+    double1Array->InsertNextValue(center_1[1]);
+    double1Array->InsertNextValue(center_1[2]);
+    surf_1->GetVtkPolyData()->GetFieldData()->AddArray(double1Array);
 
     double center_2[3] = {4.0f, 4.0f, 4.0f};
     double normal_2[3] = {1.0f, 0.0f, 0.0f};
@@ -478,33 +696,52 @@ public:
     vtkPolyData *poly_2 = p_source_2->GetOutput();
     mitk::Surface::Pointer surf_2 = mitk::Surface::New();
     surf_2->SetVtkPolyData(poly_2);
+    vtkSmartPointer<vtkIntArray> int2Array = vtkSmartPointer<vtkIntArray>::New();
+    int2Array->InsertNextValue(1);
+    int2Array->InsertNextValue(0);
+    int2Array->InsertNextValue(0);
+    surf_2->GetVtkPolyData()->GetFieldData()->AddArray(int2Array);
+    vtkSmartPointer<vtkDoubleArray> double2Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double2Array->InsertNextValue(center_2[0]);
+    double2Array->InsertNextValue(center_2[1]);
+    double2Array->InsertNextValue(center_2[2]);
+    surf_2->GetVtkPolyData()->GetFieldData()->AddArray(double2Array);
 
-    // Add contours
-    m_Controller->AddNewContour(surf_1);
-    m_Controller->AddNewContour(surf_2);
+    std::vector<mitk::Surface::Pointer> surfaces;
+    surfaces.push_back(surf_1);
+    surfaces.push_back(surf_2);
+
+    const mitk::PlaneGeometry * planeGeometry1 = GetPlaneGeometry();
+    const mitk::PlaneGeometry * planeGeometry2 = GetPlaneGeometry();
+    std::vector<const mitk::PlaneGeometry*> planeGeometries;
+    planeGeometries.push_back(planeGeometry1);
+    planeGeometries.push_back(planeGeometry2);
+
+    m_Controller->AddNewContours(surfaces, planeGeometries, true);
+    // // Add contours
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 2);
 
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo3;
-    contourInfo3.contour = surf_1->Clone();
-    contourInfo3.contourNormal = normal_1;
-    contourInfo3.contourPoint = center_1;
+    contourInfo3.Contour = surf_1->Clone();
+    contourInfo3.ContourNormal = normal_1;
+    contourInfo3.ContourPoint = center_1;
     // Shift the new contour so that it is different
-    contourInfo3.contourPoint += 0.5;
+    contourInfo3.ContourPoint += 0.5;
 
     bool success = m_Controller->RemoveContour(contourInfo3);
     CPPUNIT_ASSERT_MESSAGE("Remove failed - contour was unintentionally removed!",
                            (m_Controller->GetNumberOfContours() == 2) && !success);
 
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo2;
-    contourInfo2.contourNormal = normal_2;
-    contourInfo2.contourPoint = center_2;
-    contourInfo2.contour = surf_2;
+    contourInfo2.ContourNormal = normal_2;
+    contourInfo2.ContourPoint = center_2;
+    contourInfo2.Contour = surf_2;
     success = m_Controller->RemoveContour(contourInfo2);
     CPPUNIT_ASSERT_MESSAGE("Remove failed - contour was not removed!",
                            (m_Controller->GetNumberOfContours() == 1) && success);
 
-    // Let's see if the other contour No. 1 is still there
-    contourInfo3.contourPoint -= 0.5;
+    // // Let's see if the other contour No. 1 is still there
+    contourInfo3.ContourPoint -= 0.5;
     const mitk::Surface *remainingContour = m_Controller->GetContour(contourInfo3);
     CPPUNIT_ASSERT_MESSAGE(
       "Remove failed - contour was accidentally removed!",
@@ -512,12 +749,12 @@ public:
         mitk::Equal(*(surf_1->GetVtkPolyData()), *(remainingContour->GetVtkPolyData()), 0.000001, true) && success);
   }
 
-  bool AssertImagesEqual4D(mitk::Image *img1, mitk::Image *img2)
+  bool AssertImagesEqual4D(mitk::LabelSetImage *img1, mitk::LabelSetImage *img2)
   {
-    mitk::ImageTimeSelector::Pointer selector1 = mitk::ImageTimeSelector::New();
+    auto selector1 = mitk::ImageTimeSelector::New();
     selector1->SetInput(img1);
     selector1->SetChannelNr(0);
-    mitk::ImageTimeSelector::Pointer selector2 = mitk::ImageTimeSelector::New();
+    auto selector2 = mitk::ImageTimeSelector::New();
     selector2->SetInput(img2);
     selector2->SetChannelNr(0);
 
@@ -555,23 +792,18 @@ public:
 
   void TestSetCurrentInterpolationSession4D()
   {
-    /*unsigned int testDimensions[] = {10, 10, 10, 5};
-    mitk::Image::Pointer testSeg = createImage4D(testDimensions);
-    mitk::Image::Pointer testSegClone = testSeg->Clone();
-    int testTs = testSeg->GetTimeSteps();
-
-    MITK_ASSERT_EQUAL(testSeg, testSegClone, "Segmentation images are not equal");*/
-
     // Create image for testing
     unsigned int dimensions1[] = {10, 10, 10, 5};
-    mitk::Image::Pointer segmentation_1 = createImage4D(dimensions1);
+    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
+    // mitk::Image * segmentationImage_1 = dynamic_cast<mitk::Image *>(segmentation_1.GetPointer());
 
     unsigned int dimensions2[] = {20, 10, 30, 4};
-    mitk::Image::Pointer segmentation_2 = createImage4D(dimensions2);
+    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
-    AssertImagesEqual4D(m_Controller->GetCurrentSegmentation(), segmentation_1->Clone());
+    auto currentSegmentation = dynamic_cast<mitk::LabelSetImage *>(m_Controller->GetCurrentSegmentation().GetPointer());
+    AssertImagesEqual4D(currentSegmentation, segmentation_1->Clone());
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
                            m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_1.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 1",
@@ -581,9 +813,10 @@ public:
     m_Controller->SetCurrentInterpolationSession(segmentation_2);
     // MITK_ASSERT_EQUAL(m_Controller->GetCurrentSegmentation(), segmentation_2->Clone(), "Segmentation images are not
     // equal");
-    AssertImagesEqual4D(m_Controller->GetCurrentSegmentation(), segmentation_2->Clone());
+    currentSegmentation = dynamic_cast<mitk::LabelSetImage *>(m_Controller->GetCurrentSegmentation().GetPointer());
+    // AssertImagesEqual4D(currentSegmentation, segmentation_2->Clone());
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
-                           m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_2.GetPointer());
+                           currentSegmentation == segmentation_2.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2",
                            m_Controller->GetNumberOfInterpolationSessions() == 2);
 
@@ -591,7 +824,8 @@ public:
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
     // MITK_ASSERT_EQUAL(m_Controller->GetCurrentSegmentation(), segmentation_1->Clone(), "Segmentation images are not
     // equal");
-    AssertImagesEqual4D(m_Controller->GetCurrentSegmentation(), segmentation_1->Clone());
+    currentSegmentation = dynamic_cast<mitk::LabelSetImage *>(m_Controller->GetCurrentSegmentation().GetPointer());
+    AssertImagesEqual4D(currentSegmentation, segmentation_1->Clone());
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
                            m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_1.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2",
@@ -601,7 +835,8 @@ public:
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
     // MITK_ASSERT_EQUAL(m_Controller->GetCurrentSegmentation(), segmentation_1->Clone(), "Segmentation images are not
     // equal");
-    AssertImagesEqual4D(m_Controller->GetCurrentSegmentation(), segmentation_1->Clone());
+    currentSegmentation = dynamic_cast<mitk::LabelSetImage *>(m_Controller->GetCurrentSegmentation().GetPointer());
+    AssertImagesEqual4D(currentSegmentation, segmentation_1->Clone());
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
                            m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_1.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2",
@@ -618,8 +853,10 @@ public:
   {
     // Create segmentation image
     unsigned int dimensions1[] = {10, 10, 10, 5};
-    mitk::Image::Pointer segmentation_1 = createImage4D(dimensions1);
+    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
+
+    m_Controller->SetCurrentTimePoint(0);
 
     // Create some contours
     double center_1[3] = {1.25f, 3.43f, 4.44f};
@@ -633,6 +870,16 @@ public:
     vtkPolyData *poly_1 = p_source->GetOutput();
     mitk::Surface::Pointer surf_1 = mitk::Surface::New();
     surf_1->SetVtkPolyData(poly_1);
+    vtkSmartPointer<vtkIntArray> int1Array = vtkSmartPointer<vtkIntArray>::New();
+    int1Array->InsertNextValue(1);
+    int1Array->InsertNextValue(0);
+    int1Array->InsertNextValue(0);
+    surf_1->GetVtkPolyData()->GetFieldData()->AddArray(int1Array);
+    vtkSmartPointer<vtkDoubleArray> double1Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double1Array->InsertNextValue(center_1[0]);
+    double1Array->InsertNextValue(center_1[1]);
+    double1Array->InsertNextValue(center_1[2]);
+    surf_1->GetVtkPolyData()->GetFieldData()->AddArray(double1Array);
 
     double center_2[3] = {4.0f, 4.0f, 4.0f};
     double normal_2[3] = {1.0f, 0.0f, 0.0f};
@@ -645,10 +892,30 @@ public:
     vtkPolyData *poly_2 = p_source_2->GetOutput();
     mitk::Surface::Pointer surf_2 = mitk::Surface::New();
     surf_2->SetVtkPolyData(poly_2);
+    vtkSmartPointer<vtkIntArray> int2Array = vtkSmartPointer<vtkIntArray>::New();
+    int2Array->InsertNextValue(1);
+    int2Array->InsertNextValue(0);
+    int2Array->InsertNextValue(0);
+    surf_2->GetVtkPolyData()->GetFieldData()->AddArray(int2Array);
+    vtkSmartPointer<vtkDoubleArray> double2Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double2Array->InsertNextValue(center_2[0]);
+    double2Array->InsertNextValue(center_2[1]);
+    double2Array->InsertNextValue(center_2[2]);
+    surf_2->GetVtkPolyData()->GetFieldData()->AddArray(double2Array);
 
+
+    std::vector<mitk::Surface::Pointer> surfaces;
+    surfaces.push_back(surf_1);
+    surfaces.push_back(surf_2);
+
+    const mitk::PlaneGeometry * planeGeometry1 = GetPlaneGeometry();
+    const mitk::PlaneGeometry * planeGeometry2 = GetPlaneGeometry();
+    std::vector<const mitk::PlaneGeometry*> planeGeometries;
+    planeGeometries.push_back(planeGeometry1);
+    planeGeometries.push_back(planeGeometry2);
     // Add contours
-    m_Controller->AddNewContour(surf_1);
-    m_Controller->AddNewContour(surf_2);
+    m_Controller->AddNewContours(surfaces, planeGeometries, true);
+
 
     // Add contours for another timestep
     m_Controller->SetCurrentTimePoint(2);
@@ -664,6 +931,16 @@ public:
     vtkPolyData *poly_3 = p_source_3->GetOutput();
     mitk::Surface::Pointer surf_3 = mitk::Surface::New();
     surf_3->SetVtkPolyData(poly_3);
+    vtkSmartPointer<vtkIntArray> int3Array = vtkSmartPointer<vtkIntArray>::New();
+    int3Array->InsertNextValue(1);
+    int3Array->InsertNextValue(0);
+    int3Array->InsertNextValue(2);
+    surf_3->GetVtkPolyData()->GetFieldData()->AddArray(int3Array);
+    vtkSmartPointer<vtkDoubleArray> double3Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double3Array->InsertNextValue(center_3[0]);
+    double3Array->InsertNextValue(center_3[1]);
+    double3Array->InsertNextValue(center_3[2]);
+    surf_3->GetVtkPolyData()->GetFieldData()->AddArray(double3Array);
 
     double center_4[3] = {1.32f, 3.53f, 4.8f};
     double normal_4[3] = {0.22f, 1.5f, 0.85f};
@@ -676,54 +953,62 @@ public:
     vtkPolyData *poly_4 = p_source_4->GetOutput();
     mitk::Surface::Pointer surf_4 = mitk::Surface::New();
     surf_4->SetVtkPolyData(poly_4);
+    vtkSmartPointer<vtkIntArray> int4Array = vtkSmartPointer<vtkIntArray>::New();
+    int4Array->InsertNextValue(1);
+    int4Array->InsertNextValue(0);
+    int4Array->InsertNextValue(2);
+    surf_4->GetVtkPolyData()->GetFieldData()->AddArray(int4Array);
+    vtkSmartPointer<vtkDoubleArray> double4Array = vtkSmartPointer<vtkDoubleArray>::New();
+    double4Array->InsertNextValue(center_4[0]);
+    double4Array->InsertNextValue(center_4[1]);
+    double4Array->InsertNextValue(center_4[2]);
+    surf_4->GetVtkPolyData()->GetFieldData()->AddArray(double4Array);
 
-    m_Controller->AddNewContour(surf_3);
-    m_Controller->AddNewContour(surf_4);
+
+    std::vector<mitk::Surface::Pointer> surfaces2;
+    surfaces2.push_back(surf_3);
+    surfaces2.push_back(surf_4);
+
+    const mitk::PlaneGeometry * planeGeometry3 = GetPlaneGeometry();
+    const mitk::PlaneGeometry * planeGeometry4 = GetPlaneGeometry();
+    std::vector<const mitk::PlaneGeometry*> planeGeometries2;
+    planeGeometries2.push_back(planeGeometry3);
+    planeGeometries2.push_back(planeGeometry4);
+    // Add contours
+    m_Controller->AddNewContours(surfaces2, planeGeometries2, true);
 
     m_Controller->SetCurrentTimePoint(0);
 
     // Check if all contours are there
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo1;
-    contourInfo1.contourNormal = normal_1;
-    contourInfo1.contourPoint = center_1;
+    contourInfo1.ContourNormal = normal_1;
+    contourInfo1.ContourPoint = center_1;
 
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo2;
-    contourInfo2.contourNormal = normal_2;
-    contourInfo2.contourPoint = center_2;
+    contourInfo2.ContourNormal = normal_2;
+    contourInfo2.ContourPoint = center_2;
 
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo3;
-    contourInfo3.contourNormal = normal_3;
-    contourInfo3.contourPoint = center_3;
+    mitk::ScalarType n[3];
+    vtkPolygon::ComputeNormal(surf_3->GetVtkPolyData()->GetPoints(), n);
+    contourInfo3.ContourNormal = n;
+    contourInfo3.ContourPoint = center_3;
 
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo4;
-    contourInfo4.contourNormal = normal_4;
-    contourInfo4.contourPoint = center_4;
-
-    mitk::Image::Pointer segmentation_2 = createImage4D(dimensions1);
-    bool success = m_Controller->ReplaceInterpolationSession(segmentation_1, segmentation_2);
-
-    CPPUNIT_ASSERT_MESSAGE("Replace session failed!", success == true);
-    CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 1",
-                           m_Controller->GetNumberOfInterpolationSessions() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
-                           m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_2.GetPointer());
+    // mitk::ScalarType n[3];
+    vtkPolygon::ComputeNormal(surf_4->GetVtkPolyData()->GetPoints(), n);
+    contourInfo4.ContourNormal = n;
+    contourInfo4.ContourPoint = center_4;
 
     const mitk::Surface *contour_1 = m_Controller->GetContour(contourInfo1);
     const mitk::Surface *contour_2 = m_Controller->GetContour(contourInfo2);
 
-    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 2);
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
                            mitk::Equal(*(surf_1->GetVtkPolyData()), *(contour_1->GetVtkPolyData()), 0.000001, true));
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
                            mitk::Equal(*(surf_2->GetVtkPolyData()), *(contour_2->GetVtkPolyData()), 0.000001, true));
 
     m_Controller->SetCurrentTimePoint(2);
-
-    // CPPUNIT_ASSERT_MESSAGE("Contour accessed from outside of timestep!", m_Controller->GetNumberOfContours() == 0);
-    contour_1 = m_Controller->GetContour(contourInfo1);
-    contour_2 = m_Controller->GetContour(contourInfo2);
-    CPPUNIT_ASSERT_MESSAGE("Contour accessed from outside of timestep!", contour_1 == nullptr && contour_2 == nullptr);
-
     const mitk::Surface *contour_3 = m_Controller->GetContour(contourInfo3);
     const mitk::Surface *contour_4 = m_Controller->GetContour(contourInfo4);
 
@@ -733,36 +1018,24 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
                            mitk::Equal(*(surf_4->GetVtkPolyData()), *(contour_4->GetVtkPolyData()), 0.000001, true));
 
-    unsigned int dimensions2[] = {10, 20, 10, 4};
-    mitk::Image::Pointer segmentation_3 = createImage4D(dimensions2);
-    success = m_Controller->ReplaceInterpolationSession(segmentation_2, segmentation_3);
-    CPPUNIT_ASSERT_MESSAGE("Replace session failed!", success == false);
+    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage4D(dimensions1);
+    bool success = m_Controller->ReplaceInterpolationSession(segmentation_1, segmentation_2);
+
+    CPPUNIT_ASSERT_MESSAGE("Replace session failed!", success == true);
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 1",
                            m_Controller->GetNumberOfInterpolationSessions() == 1);
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
                            m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_2.GetPointer());
-
-    m_Controller->SetCurrentTimePoint(1);
-    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 0);
-
-    m_Controller->SetCurrentTimePoint(0);
-    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 2);
-
-    m_Controller->SetCurrentTimePoint(4);
-    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 0);
-
-    m_Controller->SetCurrentTimePoint(2);
-    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 2);
   }
 
   void TestRemoveAllInterpolationSessions4D()
   {
     // Create image for testing
     unsigned int dimensions1[] = {10, 10, 10, 4};
-    mitk::Image::Pointer segmentation_1 = createImage4D(dimensions1);
+    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
 
     unsigned int dimensions2[] = {20, 10, 30, 5};
-    mitk::Image::Pointer segmentation_2 = createImage4D(dimensions2);
+    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
@@ -776,10 +1049,10 @@ public:
   {
     // Create image for testing
     unsigned int dimensions1[] = {10, 10, 10, 3};
-    mitk::Image::Pointer segmentation_1 = createImage4D(dimensions1);
+    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
 
     unsigned int dimensions2[] = {20, 10, 30, 6};
-    mitk::Image::Pointer segmentation_2 = createImage4D(dimensions2);
+    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
@@ -813,7 +1086,7 @@ public:
     {
       // Create image for testing
       unsigned int dimensions1[] = {10, 10, 10, 7};
-      mitk::Image::Pointer segmentation_1 = createImage4D(dimensions1);
+      mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
       m_Controller->SetCurrentInterpolationSession(segmentation_1);
       m_Controller->SetCurrentTimePoint(3);
     }

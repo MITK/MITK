@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkTool_h_Included
-#define mitkTool_h_Included
+#ifndef mitkTool_h
+#define mitkTool_h
 
 #include "itkObjectFactoryBase.h"
 #include "itkVersion.h"
@@ -117,8 +117,8 @@ namespace mitk
     XPM is e.g. supported by The Gimp. But if you open any XPM file in your text editor, you will see that you could
     also "draw" it with an editor.
     */
-    [[deprecated]]
-    virtual const char **GetXPM() const = 0;
+    //[[deprecated]]
+    DEPRECATED(virtual const char **GetXPM() const) = 0;
 
     /**
      * \brief Returns the path of an icon.

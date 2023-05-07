@@ -109,4 +109,3 @@ namespace mitk
 }
 
 #endif
-

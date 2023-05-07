@@ -55,8 +55,6 @@ namespace mitk
       // Iterate over all labels
       const LabelSet *labelSet = dicomSegImage->GetLabelSet(layer);
       auto labelIter = labelSet->IteratorConstBegin();
-      // Ignore background label
-      ++labelIter;
 
       for (; labelIter != labelSet->IteratorConstEnd(); ++labelIter)
       {

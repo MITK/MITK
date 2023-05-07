@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSNAVIGATIONEXPERIMENTLOGGING_H
-#define MITKUSNAVIGATIONEXPERIMENTLOGGING_H
+#ifndef mitkUSNavigationExperimentLogging_h
+#define mitkUSNavigationExperimentLogging_h
 
 #include <mitkCommon.h>
 #include <itkObjectFactory.h>
@@ -105,4 +105,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSNAVIGATIONEXPERIMENTLOGGING_H
+#endif

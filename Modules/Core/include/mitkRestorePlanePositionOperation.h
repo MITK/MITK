@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkRestorePlanePositionOperation_h_Included
-#define mitkRestorePlanePositionOperation_h_Included
+#ifndef mitkRestorePlanePositionOperation_h
+#define mitkRestorePlanePositionOperation_h
 
 #include "mitkCommon.h"
 #include "mitkNumericTypes.h"

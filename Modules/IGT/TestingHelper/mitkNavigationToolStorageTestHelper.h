@@ -9,16 +9,23 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
+
+#ifndef mitkNavigationToolStorageTestHelper_h
+#define mitkNavigationToolStorageTestHelper_h
+
 #include <mitkNavigationToolStorage.h>
-namespace mitk {
-  class MITKIGT_EXPORT NavigationToolStorageTestHelper
+
+namespace mitk
+{
+  namespace NavigationToolStorageTestHelper
   {
-  public:
-  //help methods for test tool storages
-  static mitk::NavigationToolStorage::Pointer CreateTestData_SimpleStorage();
+    //help methods for test tool storages
+    MITKIGT_EXPORT mitk::NavigationToolStorage::Pointer CreateTestData_SimpleStorage();
 
-  static mitk::NavigationToolStorage::Pointer CreateTestData_StorageWithOneTool();
+    MITKIGT_EXPORT mitk::NavigationToolStorage::Pointer CreateTestData_StorageWithOneTool();
 
-  static mitk::NavigationToolStorage::Pointer CreateTestData_ComplexStorage(std::string toolFilePath, std::string toolSurfacePath1, std::string toolSurfacePath2);
-  };
+    MITKIGT_EXPORT mitk::NavigationToolStorage::Pointer CreateTestData_ComplexStorage(std::string toolFilePath, std::string toolSurfacePath1, std::string toolSurfacePath2);
+  }
 }
+
+#endif

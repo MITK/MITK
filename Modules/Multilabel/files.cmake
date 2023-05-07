@@ -10,7 +10,7 @@ set(CPP_FILES
   mitkLabelSetImageToSurfaceThreadedFilter.cpp
   mitkLabelSetImageVtkMapper2D.cpp
   mitkMultilabelObjectFactory.cpp
-  mitkLabelSetIOHelper.cpp
+  mitkMultiLabelIOHelper.cpp
   mitkDICOMSegmentationPropertyHelper.cpp
   mitkDICOMSegmentationConstants.cpp
   mitkSegmentationTaskList.cpp

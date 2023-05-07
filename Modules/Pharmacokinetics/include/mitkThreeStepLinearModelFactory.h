@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTHREESTEPLINEARMODELFACTORY_H
-#define MITKTHREESTEPLINEARMODELFACTORY_H
+#ifndef mitkThreeStepLinearModelFactory_h
+#define mitkThreeStepLinearModelFactory_h
 
 #include <mitkCommon.h>
 
@@ -52,4 +52,4 @@ namespace mitk
 
 }
 
-#endif // MITKTHREESTEPLINEARMODELFACTORY_H
+#endif

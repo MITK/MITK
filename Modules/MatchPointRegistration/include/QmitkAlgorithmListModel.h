@@ -48,5 +48,4 @@ private:
   ::map::deployment::DLLDirectoryBrowser::DLLInfoListType m_AlgList;
 };
 
-#endif // mitkQmitkAlgorithmListModel_h
-
+#endif

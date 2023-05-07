@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkStlVolumeTimeSeriesIOFactory_h
-#define __mitkStlVolumeTimeSeriesIOFactory_h
+#ifndef mitkStlVolumeTimeSeriesIOFactory_h
+#define mitkStlVolumeTimeSeriesIOFactory_h
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4786)

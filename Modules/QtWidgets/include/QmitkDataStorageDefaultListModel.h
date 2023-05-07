@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGEDEFAULTLISTMODEL_H
-#define QMITKDATASTORAGEDEFAULTLISTMODEL_H
+#ifndef QmitkDataStorageDefaultListModel_h
+#define QmitkDataStorageDefaultListModel_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -75,4 +75,4 @@ protected:
 
 };
 
-#endif // QMITKDATASTORAGEDEFAULTLISTMODEL_H
+#endif

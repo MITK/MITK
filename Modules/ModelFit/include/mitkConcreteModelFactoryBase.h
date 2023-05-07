@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __CONCRETE_MODEL_FACTORY_BASE_H
-#define __CONCRETE_MODEL_FACTORY_BASE_H
+#ifndef mitkConcreteModelFactoryBase_h
+#define mitkConcreteModelFactoryBase_h
 
 #include "mitkModelFactoryBase.h"
 
@@ -169,4 +169,4 @@ namespace mitk
   };
 }
 
-#endif // __CONCRETE_MODEL_FACTORY_BASE_H
+#endif

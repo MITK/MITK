@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKQTWIDGETSACTIVATOR_H_
-#define MITKQTWIDGETSACTIVATOR_H_
+#ifndef mitkQtWidgetsActivator_h
+#define mitkQtWidgetsActivator_h
 
 // Micro Services
 #include <usModuleActivator.h>
@@ -39,4 +39,4 @@ private:
   std::unique_ptr<mitk::IDataStorageInspectorProvider> m_FavoriteNodesInspector;
 };
 
-#endif // MITKCOREACTIVATOR_H_
+#endif

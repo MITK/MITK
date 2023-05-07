@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkOtsuTool3DGUI_h_Included
-#define QmitkOtsuTool3DGUI_h_Included
+#ifndef QmitkOtsuTool3DGUI_h
+#define QmitkOtsuTool3DGUI_h
 
 #include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
 

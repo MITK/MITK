@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef PlyFileWriterService_h
-#define PlyFileWriterService_h
+#ifndef mitkPlyFileWriterService_h
+#define mitkPlyFileWriterService_h
 
 #include <mitkAbstractFileWriter.h>
 

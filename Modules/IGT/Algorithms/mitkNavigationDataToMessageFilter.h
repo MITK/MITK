@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNAVIGATIONDATATOMESSAGEFILTER_H_HEADER_INCLUDED_
-#define MITKNAVIGATIONDATATOMESSAGEFILTER_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataToMessageFilter_h
+#define mitkNavigationDataToMessageFilter_h
 
 #include <mitkNavigationDataToNavigationDataFilter.h>
 #include "mitkMessage.h"
@@ -87,4 +87,4 @@ namespace mitk
     void GenerateData() override;
   };
 } // namespace mitk
-#endif /* MITKNAVIGATIONDATATOMESSAGEFILTER_H_HEADER_INCLUDED_ */
+#endif

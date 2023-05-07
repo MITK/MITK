@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_POINTLIST_MODEL_H_INCLUDED
-#define QMITK_POINTLIST_MODEL_H_INCLUDED
+#ifndef QmitkPointListModel_h
+#define QmitkPointListModel_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include <QAbstractListModel>

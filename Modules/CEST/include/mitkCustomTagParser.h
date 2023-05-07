@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCUSTOMTAGPARSER_H
-#define MITKCUSTOMTAGPARSER_H
+#ifndef mitkCustomTagParser_h
+#define mitkCustomTagParser_h
 
 #include<mitkPropertyList.h>
 #include<mitkTemporoSpatialStringProperty.h>
@@ -136,4 +136,4 @@ namespace mitk
 
 }
 
-#endif // MITKCUSTOMTAGPARSER_H
+#endif

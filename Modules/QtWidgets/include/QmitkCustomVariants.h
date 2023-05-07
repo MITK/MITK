@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKCUSTOMVARIANTS_H_
-#define QMITKCUSTOMVARIANTS_H_
+#ifndef QmitkCustomVariants_h
+#define QmitkCustomVariants_h
 
 #include <mitkDataNode.h>
 
@@ -20,4 +20,4 @@ typedef mitk::DataNode::Pointer mitkDataNodePtr;
 Q_DECLARE_METATYPE(mitkDataNodePtr)
 Q_DECLARE_METATYPE(mitk::DataNode *)
 
-#endif /* QMITKCUSTOMVARIANTS_H_ */
+#endif

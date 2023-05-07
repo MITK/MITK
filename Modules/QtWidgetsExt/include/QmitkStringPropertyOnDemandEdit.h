@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMITK_STRINGPROPERTYONDEMANDDEDITOR_H_INCLUDED
-#define QMITK_STRINGPROPERTYONDEMANDDEDITOR_H_INCLUDED
+#ifndef QmitkStringPropertyOnDemandEdit_h
+#define QmitkStringPropertyOnDemandEdit_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include <QLabel>

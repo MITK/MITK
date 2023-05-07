@@ -22,7 +22,6 @@ found in the LICENSE file.
 #include <mitkShowSegmentationAsSurface.h>
 #include <mitkSliceBasedInterpolationController.h>
 #include <mitkStatusBar.h>
-#include <mitkSurfaceBasedInterpolationController.h>
 #include <mitkToolManagerProvider.h>
 
 // Qmitk
@@ -290,7 +289,7 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
-    GetWorkingImage()->RemoveLabel(pixelValue, GetWorkingImage()->GetActiveLayer());
+    GetWorkingImage()->RemoveLabel(pixelValue);
     this->WaitCursorOff();
   }
 
@@ -393,7 +392,7 @@ void QmitkLabelSetWidget::OnRemoveLabels(bool /*value*/)
     }
 
     this->WaitCursorOn();
-    GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues, GetWorkingImage()->GetActiveLayer());
+    GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues);
     this->WaitCursorOff();
   }
 
@@ -547,12 +546,6 @@ void QmitkLabelSetWidget::OnActiveLabelChanged(int pixelValue)
   workingImage->GetActiveLabelSet()->SetActiveLabel(pixelValue);
   // MITK_INFO << "Active Label set to << " << pixelValue;
 
-  mitk::SurfaceBasedInterpolationController *interpolator = mitk::SurfaceBasedInterpolationController::GetInstance();
-  if (interpolator)
-  {
-    interpolator->SetActiveLabel(pixelValue);
-  }
-
   workingImage->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -704,6 +697,11 @@ void QmitkLabelSetWidget::InsertTableWidgetItem(mitk::Label *label)
   }
 }
 
+void QmitkLabelSetWidget::UpdateAllTableWidgetItems(mitk::Label::PixelType /*lv*/)
+{
+  this->UpdateAllTableWidgetItems();
+}
+
 void QmitkLabelSetWidget::UpdateAllTableWidgetItems()
 {
   mitk::LabelSetImage *workingImage = GetWorkingImage();
@@ -757,6 +755,11 @@ void QmitkLabelSetWidget::UpdateTableWidgetItem(QTableWidgetItem *item)
   {
     tableWidget->hideRow(item->row()); // hide exterior label
   }
+}
+
+void QmitkLabelSetWidget::ResetAllTableWidgetItems(mitk::Label::PixelType /*lv*/)
+{
+  this->ResetAllTableWidgetItems();
 }
 
 void QmitkLabelSetWidget::ResetAllTableWidgetItems()
@@ -820,7 +823,7 @@ QStringList &QmitkLabelSetWidget::GetLabelStringList()
 
 void QmitkLabelSetWidget::InitializeTableWidget()
 {
-  QTableWidget *tableWidget = m_Controls.m_LabelSetTableWidget;
+  auto* tableWidget = m_Controls.m_LabelSetTableWidget;
 
   tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
   tableWidget->setTabKeyNavigation(false);
@@ -838,13 +841,38 @@ void QmitkLabelSetWidget::InitializeTableWidget()
   tableWidget->verticalHeader()->hide();
   tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-  connect(tableWidget, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(OnItemClicked(QTableWidgetItem *)));
-  connect(
-    tableWidget, SIGNAL(itemDoubleClicked(QTableWidgetItem *)), this, SLOT(OnItemDoubleClicked(QTableWidgetItem *)));
-  connect(tableWidget,
-          SIGNAL(customContextMenuRequested(const QPoint &)),
-          this,
-          SLOT(OnTableViewContextMenuRequested(const QPoint &)));
+  using Self = QmitkLabelSetWidget;
+
+  connect(tableWidget, &QTableWidget::itemClicked, this, &Self::OnItemClicked);
+  connect(tableWidget, &QTableWidget::itemDoubleClicked, this, &Self::OnItemDoubleClicked);
+  connect(tableWidget, &QTableWidget::customContextMenuRequested, this, &Self::OnTableViewContextMenuRequested);
+
+  auto* model = tableWidget->model();
+
+  connect(model, &QAbstractItemModel::rowsInserted, this, &Self::OnRowsInserted);
+  connect(model, &QAbstractItemModel::rowsRemoved, this, &Self::OnRowsRemoved);
+}
+
+void QmitkLabelSetWidget::OnRowsInserted(const QModelIndex&, int, int)
+{
+  auto* tableWidget = m_Controls.m_LabelSetTableWidget;
+
+  if (tableWidget->rowCount() > 4)
+  {
+    tableWidget->setMinimumHeight(160);
+    tableWidget->setMaximumHeight(tableWidget->minimumHeight());
+  }
+}
+
+void QmitkLabelSetWidget::OnRowsRemoved(const QModelIndex&, int, int)
+{
+  auto* tableWidget = m_Controls.m_LabelSetTableWidget;
+
+  if (tableWidget->rowCount() <= 4)
+  {
+    tableWidget->setMinimumHeight(80);
+    tableWidget->setMaximumHeight(tableWidget->minimumHeight());
+  }
 }
 
 void QmitkLabelSetWidget::OnOpacityChanged(int value)

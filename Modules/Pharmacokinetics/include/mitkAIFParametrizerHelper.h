@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_AIF_PARAMETERIZER_HELPER_H_
-#define __MITK_AIF_PARAMETERIZER_HELPER_H_
+#ifndef mitkAIFParametrizerHelper_h
+#define mitkAIFParametrizerHelper_h
 
 #include "mitkModelBase.h"
 

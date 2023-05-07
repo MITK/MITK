@@ -77,6 +77,9 @@ namespace mitk
   {
     std::string tagString = GeneratePropertyNameForDICOMTag(tag.GetGroup(), tag.GetElement());
 
+    if (auto* property = propertyList->GetProperty(tagString); property != nullptr)
+      return; // Do not override existing DICOM information (T29431)
+
     // Get DICOM property from referenced image
     BaseProperty::Pointer originalProperty = referencedPropertyList->GetProperty(tagString.c_str());
 

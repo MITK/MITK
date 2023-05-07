@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMATRIXCONVERT_H_HEADER_INCLUDED_C1EBD0AD
-#define MITKMATRIXCONVERT_H_HEADER_INCLUDED_C1EBD0AD
+#ifndef mitkMatrixConvert_h
+#define mitkMatrixConvert_h
 
 #include "mitkBaseGeometry.h"
 #include "mitkItkMatrixHack.h"
@@ -124,4 +124,4 @@ namespace mitk
   }
 }
 
-#endif /* MITKMATRIXCONVERT_H_HEADER_INCLUDED_C1EBD0AD */
+#endif

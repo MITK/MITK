@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkAffineImageCropperInteractor_h_
-#define mitkAffineImageCropperInteractor_h_
+#ifndef mitkAffineImageCropperInteractor_h
+#define mitkAffineImageCropperInteractor_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkBaseRenderer.h"

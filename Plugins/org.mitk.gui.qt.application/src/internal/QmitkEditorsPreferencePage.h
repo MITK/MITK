@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKEDITORSPREFERENCEPAGE_H_
-#define QMITKEDITORSPREFERENCEPAGE_H_
+#ifndef QmitkEditorsPreferencePage_h
+#define QmitkEditorsPreferencePage_h
 
 #include "berryIQtPreferencePage.h"
 
@@ -66,4 +66,4 @@ protected:
 
 };
 
-#endif /* QMITKEDITORSPREFERENCEPAGE_H_ */
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPROPERTIES_H_HEADER_INCLUDED
-#define MITKPROPERTIES_H_HEADER_INCLUDED
+#ifndef mitkProperties_h
+#define mitkProperties_h
 
 #include "mitkGenericProperty.h"
 #include "mitkLookupTables.h"
@@ -50,4 +50,4 @@ namespace mitk
   * templated GetPropertyValue() method in mitkPropertyList.cpp!
   */
 } // namespace mitk
-#endif /* MITKPROPERTIES_H_HEADER_INCLUDED */
+#endif

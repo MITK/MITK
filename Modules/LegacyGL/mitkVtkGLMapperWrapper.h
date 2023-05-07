@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKVtkGLMapperWrapper_H_HEADER
-#define MITKVtkGLMapperWrapper_H_HEADER
+#ifndef mitkVtkGLMapperWrapper_h
+#define mitkVtkGLMapperWrapper_h
 
 #include "mitkBaseRenderer.h"
 #include "mitkGLMapper.h"
@@ -79,4 +79,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKVtkGLMapperWrapper_H_HEADER_INCLUDED_C1902626 */
+#endif

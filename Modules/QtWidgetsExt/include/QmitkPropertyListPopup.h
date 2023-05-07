@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkPropertyListPopuph_included_dingeling
-#define QmitkPropertyListPopuph_included_dingeling
+#ifndef QmitkPropertyListPopup_h
+#define QmitkPropertyListPopup_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include <QMenu>

@@ -10,12 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMULTIWIDGETLAYOUTSELECTIONWIDGET_H
-#define QMITKMULTIWIDGETLAYOUTSELECTIONWIDGET_H
+#ifndef QmitkMultiWidgetLayoutSelectionWidget_h
+#define QmitkMultiWidgetLayoutSelectionWidget_h
 
 #include "MitkQtWidgetsExports.h"
 
 #include "ui_QmitkMultiWidgetLayoutSelectionWidget.h"
+
+#include <nlohmann/json.hpp>
 
 // qt
 #include "QWidget"
@@ -37,10 +39,18 @@ Q_SIGNALS:
 
   void LayoutSet(int row, int column);
 
+  // needs to be connected via Qt::DirectConnection (usually default), to ensure the stream pointers validity
+  void SaveLayout(std::ostream* outStream);
+
+  void LoadLayout(const nlohmann::json* jsonData);
+
 private Q_SLOTS:
 
   void OnTableItemSelectionChanged();
   void OnSetLayoutButtonClicked();
+  void OnSaveLayoutButtonClicked();
+  void OnLoadLayoutButtonClicked();
+  void OnLayoutPresetSelected(int index);
 
 private:
 
@@ -48,7 +58,8 @@ private:
 
 
   Ui::QmitkMultiWidgetLayoutSelectionWidget ui;
+  std::map<int, nlohmann::json> m_PresetMap;
 
 };
 
-#endif // QMITKMULTIWIDGETLAYOUTSELECTIONWIDGET_H
+#endif

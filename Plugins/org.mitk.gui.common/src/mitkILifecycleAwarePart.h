@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKILIFECYCLEAWAREPART_H
-#define MITKILIFECYCLEAWAREPART_H
+#ifndef mitkILifecycleAwarePart_h
+#define mitkILifecycleAwarePart_h
 
 #include <org_mitk_gui_common_Export.h>
 
@@ -53,4 +53,4 @@ struct MITK_GUI_COMMON_PLUGIN ILifecycleAwarePart
 
 }
 
-#endif // MITKILIFECYCLEAWAREPART_H
+#endif

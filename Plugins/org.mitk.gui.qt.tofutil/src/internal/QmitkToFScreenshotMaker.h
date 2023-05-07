@@ -93,4 +93,4 @@ private:
   int m_SavingCounter;
 };
 
-#endif // QmitkToFScreenshotMaker_h
+#endif

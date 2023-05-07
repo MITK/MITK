@@ -81,9 +81,9 @@ void mitk::LabelSetImageSurfaceStampFilter::ItkImageProcessing(itk::Image<TPixel
       auto sourceValue = static_cast<int>(sourceIter.Get());
       auto targetValue = static_cast<int>(targetIter.Get());
 
-      if ((sourceValue != 0) &&
+      if ((sourceValue != LabelSetImage::UnlabeledValue) &&
           (m_ForceOverwrite ||
-           !LabelSetInputImage->GetLabel(targetValue)->GetLocked())) // skip exterior and locked labels
+           !LabelSetInputImage->GetLabel(targetValue)->GetLocked())) // skip unlabled pixels and locked labels
       {
         targetIter.Set(activeLabel);
       }

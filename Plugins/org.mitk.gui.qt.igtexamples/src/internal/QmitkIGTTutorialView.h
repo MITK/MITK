@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKIGTTUTORIALVIEW_H_INCLUDED
-#define _QMITKIGTTUTORIALVIEW_H_INCLUDED
+#ifndef QmitkIGTTutorialView_h
+#define QmitkIGTTutorialView_h
 
 #include <QmitkAbstractView.h>
 
@@ -82,4 +82,4 @@ protected:
 
 
 
-#endif // _QMITKIGTTUTORIALVIEW_H_INCLUDED
+#endif

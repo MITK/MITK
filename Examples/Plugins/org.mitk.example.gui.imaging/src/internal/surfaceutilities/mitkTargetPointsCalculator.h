@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTARGETPOINTSCALCULATOR_H_HEADER_INCLUDED_
-#define MITKTARGETPOINTSCALCULATOR_H_HEADER_INCLUDED_
+#ifndef mitkTargetPointsCalculator_h
+#define mitkTargetPointsCalculator_h
 
 // mitk headers
 #include "mitkCommon.h"

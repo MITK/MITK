@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkApplyTransformMatrixOperation_h_Included
-#define mitkApplyTransformMatrixOperation_h_Included
+#ifndef mitkApplyTransformMatrixOperation_h
+#define mitkApplyTransformMatrixOperation_h
 
 #include "mitkCommon.h"
 #include "mitkPointOperation.h"

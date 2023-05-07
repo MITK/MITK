@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKVOLUMETRYVIEW_H_INCLUDED
-#define _QMITKVOLUMETRYVIEW_H_INCLUDED
+#ifndef QmitkVolumetryView_h
+#define QmitkVolumetryView_h
 
 #include <QmitkAbstractView.h>
 
@@ -82,4 +82,4 @@ private:
   QWidget *m_ParentWidget;
 };
 
-#endif // _QMITKVOLUMETRYVIEW_H_INCLUDED
+#endif

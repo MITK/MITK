@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKFILELISTWIDGET_H
-#define QMITKFILELISTWIDGET_H
+#ifndef QmitkFileListWidget_h
+#define QmitkFileListWidget_h
 
 #include "ui_QmitkPathListWidget.h"
 #include <QWidget>
@@ -52,4 +52,4 @@ private Q_SLOTS:
   void OnPathsChanged(const QStringList&, const QStringList&);
 };
 
-#endif // QMITKDIRECTORYLISTWIDGET_H
+#endif

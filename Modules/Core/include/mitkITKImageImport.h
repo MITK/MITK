@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D
-#define MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D
+#ifndef mitkITKImageImport_h
+#define mitkITKImageImport_h
 
 #include "itkImageToImageFilterDetail.h"
 #include "mitkImageSource.h"
@@ -208,10 +208,36 @@ namespace mitk
                                     const BaseGeometry *geometry = nullptr,
                                     bool update = true);
 
+  /**
+  * @brief Grabs the memory of an itk::Image (with a specific type)
+  * and puts it into an mitk::Image.
+  * @ingroup Adaptor
+  *
+  * The memory is managed by the mitk::Image after calling this
+  * function. The itk::Image remains valid until the mitk::Image
+  * decides to free the memory.
+  *
+  * \param itkimage
+  * \param mitkImage
+  * \param geometry
+  *
+  * \param update if \a true, fill mitk::Image, which will execute the
+  * up-stream pipeline connected to the input itk::Image. Otherwise you
+  * need to make sure that Update() is called on the mitk::Image before
+  * its data is being used, e.g., by connecting it to an mitk-pipeline
+  * and call Update of a downstream filter at some time.
+  * \sa ImportItkImage
+  */
+  template <typename ItkOutputImageType>
+  Image::Pointer GrabItkImageMemoryChannel(ItkOutputImageType* itkimage,
+    const TimeGeometry* geometry = nullptr,
+    mitk::Image* mitkImage = nullptr,
+    bool update = true);
+
 } // namespace mitk
 
 #ifndef MITK_MANUAL_INSTANTIATION
 #include "mitkITKImageImport.txx"
 #endif
 
-#endif /* MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D */
+#endif

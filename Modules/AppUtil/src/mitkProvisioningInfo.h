@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPROVISIONINGINFO_H
-#define MITKPROVISIONINGINFO_H
+#ifndef mitkProvisioningInfo_h
+#define mitkProvisioningInfo_h
 
 #include <QSet>
 #include <QString>
@@ -53,4 +53,4 @@ namespace mitk
   };
 }
 
-#endif // MITKPROVISIONINGINFO_H
+#endif

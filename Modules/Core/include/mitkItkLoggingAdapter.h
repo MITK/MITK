@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ItkLoggingAdapter_H_HEADER_INCLUDED
-#define ItkLoggingAdapter_H_HEADER_INCLUDED
+#ifndef mitkItkLoggingAdapter_h
+#define mitkItkLoggingAdapter_h
 
 #include <MitkCoreExports.h>
 #include <itkObjectFactory.h>
@@ -56,4 +56,4 @@ namespace mitk
   };
 }
 
-#endif /* mitkItkLoggingAdapter_H_HEADER_INCLUDED */
+#endif

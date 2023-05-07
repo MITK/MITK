@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <berryPlatformUI.h>
 
 #include <mitkWorkbenchUtil.h>
+#include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
@@ -32,7 +33,7 @@ public:
 
   mitk::IPreferences* GetPreferences() const
   {
-    auto* prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
+    auto* prefService = mitk::CoreServices::GetPreferencesService();
 
     return prefService != nullptr
       ? prefService->GetSystemPreferences()->Node("/General")

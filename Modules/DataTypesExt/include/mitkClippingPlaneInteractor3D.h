@@ -67,4 +67,4 @@ namespace mitk
     Vector3D m_ObjectNormal;
   };
 }
-#endif // mitkClippingPlaneInteractor3D_h
+#endif

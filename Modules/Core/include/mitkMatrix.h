@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMATRIX_H_
-#define MITKMATRIX_H_
+#ifndef mitkMatrix_h
+#define mitkMatrix_h
 
 #include <itkMatrix.h>
 
@@ -177,4 +177,4 @@ namespace mitk
   }
 }
 
-#endif /* MITKMATRIX_H_ */
+#endif

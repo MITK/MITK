@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKXMLSerializable_H
-#define MITKXMLSerializable_H
+#ifndef mitkXMLSerializable_h
+#define mitkXMLSerializable_h
 
 #include <string>
 #include <itkObject.h>

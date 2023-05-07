@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKXNATEXPERIMENTWIDGET_H
-#define QMITKXNATEXPERIMENTWIDGET_H
+#ifndef QmitkXnatExperimentWidget_h
+#define QmitkXnatExperimentWidget_h
 
 // XNATUI
 #include <MitkXNATExports.h>
@@ -50,4 +50,4 @@ private:
   ctkXnatExperiment *m_Experiment;
 };
 
-#endif // QMITKXNATEXPERIMENTWIDGET_H
+#endif

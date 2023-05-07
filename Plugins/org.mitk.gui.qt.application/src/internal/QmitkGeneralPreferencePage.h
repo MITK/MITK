@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKGENERALPREFERENCEPAGE_H
-#define QMITKGENERALPREFERENCEPAGE_H
+#ifndef QmitkGeneralPreferencePage_h
+#define QmitkGeneralPreferencePage_h
 
 #include "berryIQtPreferencePage.h"
 
@@ -65,4 +65,4 @@ protected:
     QCheckBox* m_GlobalReinitOnNodeVisibilityChanged;
 };
 
-#endif // QMITKGENERALPREFERENCEPAGE_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkPolhemusTrackerWidget_H
-#define QmitkPolhemusTrackerWidget_H
+#ifndef QmitkPolhemusTrackerWidget_h
+#define QmitkPolhemusTrackerWidget_h
 
 #include "ui_QmitkPolhemusTrackerWidget.h"
 

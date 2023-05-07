@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMIRCOBIRDTRACKINGDEVICE_H_HEADER_INCLUDED
-#define MITKMIRCOBIRDTRACKINGDEVICE_H_HEADER_INCLUDED
+#ifndef mitkMicroBirdTrackingDevice_h
+#define mitkMicroBirdTrackingDevice_h
 
 #include "mitkTrackingDevice.h"
 
@@ -134,4 +134,4 @@ namespace mitk {
     AGC_MODE_TYPE m_agc;
   };
 } // namespace mitk
-#endif /* MITKMIRCOBIRDTRACKINGDEVICE_H_HEADER_INCLUDED*/
+#endif

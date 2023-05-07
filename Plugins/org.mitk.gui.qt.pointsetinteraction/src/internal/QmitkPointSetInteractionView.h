@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKPOINTSETINTERACTIONVIEW_H
-#define QMITKPOINTSETINTERACTIONVIEW_H
+#ifndef QmitkPointSetInteractionView_h
+#define QmitkPointSetInteractionView_h
 
 #include "ui_QmitkPointSetInteractionViewControls.h"
 

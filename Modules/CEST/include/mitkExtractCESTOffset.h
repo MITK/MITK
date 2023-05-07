@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_EXTRACT_CEST_OFFSET_H_
-#define __MITK_EXTRACT_CEST_OFFSET_H_
+#ifndef mitkExtractCESTOffset_h
+#define mitkExtractCESTOffset_h
 
 #include <mitkBaseData.h>
 

@@ -15,14 +15,14 @@
   </property>
   <layout class="QFormLayout" name="formLayout">
    <item row="0" column="0">
-    <widget class="QLabel" name="slimViewLabel">
+    <widget class="QLabel" name="compactViewLabel">
      <property name="text">
-      <string>Slim view</string>
+      <string>Compact view</string>
      </property>
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QCheckBox" name="slimViewCheckBox">
+    <widget class="QCheckBox" name="compactViewCheckBox">
      <property name="text">
       <string>Hide tool button texts and increase icon size</string>
      </property>

@@ -21,17 +21,12 @@ found in the LICENSE file.
 #include "QmitkTimeSliceAnimationItem.h"
 #include "QmitkTimeSliceAnimationWidget.h"
 
-#include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
-
-#include <mitkGL.h>
-
-#include <QmitkFFmpegWriter.h>
+#include <mitkVideoRecorder.h>
 
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
+#include <QThread>
 #include <QTimer>
 
 #include <array>
@@ -52,29 +47,31 @@ namespace
     return nullptr;
   }
 
-  QString GetFFmpegPath()
+  class EncodingThread : public QThread
   {
-    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
+  public:
+    EncodingThread(mitk::VideoRecorder* videoRecorder, QObject* parent = nullptr)
+      : QThread(parent),
+        m_VideoRecorder(videoRecorder)
+    {
+    }
 
-    return preferences != nullptr
-      ? QString::fromStdString(preferences->Get("ffmpeg", ""))
-      : QString();
-  }
+    ~EncodingThread() override = default;
 
-  void ReadPixels(std::unique_ptr<unsigned char[]>& frame, vtkRenderWindow* renderWindow, int x, int y, int width, int height)
-  {
-    if (nullptr == renderWindow)
-      return;
+  private:
+    void run() override
+    {
+      m_VideoRecorder->StopRecording();
+    }
 
-    renderWindow->MakeCurrent();
-    glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, frame.get());
-  }
+    mitk::VideoRecorder* m_VideoRecorder;
+  };
 }
 
 const std::string QmitkMovieMakerView::VIEW_ID = "org.mitk.views.moviemaker";
 
 QmitkMovieMakerView::QmitkMovieMakerView()
-  : m_FFmpegWriter(nullptr),
+  : m_Parent(nullptr),
     m_Ui(new Ui::QmitkMovieMakerView),
     m_AnimationModel(nullptr),
     m_AddAnimationMenu(nullptr),
@@ -92,7 +89,7 @@ QmitkMovieMakerView::~QmitkMovieMakerView()
 
 void QmitkMovieMakerView::CreateQtPartControl(QWidget* parent)
 {
-  m_FFmpegWriter = new QmitkFFmpegWriter(parent);
+  m_Parent = parent;
 
   m_Ui->setupUi(parent);
 
@@ -133,6 +130,7 @@ void QmitkMovieMakerView::InitializePlaybackAndRecordWidgets()
 {
   this->InitializeRecordMenu();
   this->ConnectPlaybackAndRecordWidgets();
+  this->InitializeRecordingProgress();
 }
 
 void QmitkMovieMakerView::InitializeAnimationModel()
@@ -171,6 +169,23 @@ void QmitkMovieMakerView::InitializeRecordMenu()
 
     m_RecordMenu->addAction(action);
   }
+}
+
+void QmitkMovieMakerView::InitializeRecordingProgress()
+{
+  m_Ui->recordingLabel->setEnabled(true);
+  m_Ui->recordingLabel->setVisible(false);
+
+  m_Ui->recordingProgressBar->setEnabled(true);
+  m_Ui->recordingProgressBar->setValue(0);
+  m_Ui->recordingProgressBar->setVisible(false);
+
+  m_Ui->encodingLabel->setEnabled(false);
+  m_Ui->encodingLabel->setVisible(false);
+
+  m_Ui->encodingProgressBar->setEnabled(false);
+  m_Ui->encodingProgressBar->setMaximum(1);
+  m_Ui->encodingProgressBar->setVisible(false);
 }
 
 void QmitkMovieMakerView::InitializeTimer(QWidget* parent)
@@ -215,6 +230,21 @@ void QmitkMovieMakerView::ConnectTimer()
 void QmitkMovieMakerView::SetFocus()
 {
   m_Ui->addAnimationButton->setFocus();
+}
+
+void QmitkMovieMakerView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  auto multiWidgetEditor = dynamic_cast<berry::Object*>(renderWindowPart);
+  bool isMxN = nullptr != multiWidgetEditor && multiWidgetEditor->GetClassName() == "QmitkMxNMultiWidgetEditor";
+  m_Parent->setDisabled(isMxN);
+}
+
+void QmitkMovieMakerView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
+{
+}
+
+void QmitkMovieMakerView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* /*renderWindowPart*/)
+{
 }
 
 void QmitkMovieMakerView::OnMoveAnimationUpButtonClicked()
@@ -296,81 +326,90 @@ void QmitkMovieMakerView::OnRecordButtonClicked()
   if (0 == m_NumFrames || 0.0 == m_TotalDuration)
     return;
 
-  const QString ffmpegPath = GetFFmpegPath();
+  m_VideoRecorder = std::make_unique<mitk::VideoRecorder>();
 
-  if (ffmpegPath.isEmpty())
+  if (m_VideoRecorder->GetFFmpegPath().empty())
   {
     QMessageBox::information(nullptr, "Movie Maker",
       "<p>Set path to FFmpeg (<a href=\"https://ffmpeg.org\">ffmpeg.org</a>) in preferences "
-      "(Window -> Preferences... (Ctrl+P) -> External Programs) "
-      "to be able to record your movies to video files.</p>");
+      "(Window -> Preferences... (Ctrl+P) -> Movie Maker) to be able to record your "
+      "movies to video files.</p>");
     return;
   }
-
-  m_FFmpegWriter->SetFFmpegPath(GetFFmpegPath());
 
   auto action = m_RecordMenu->exec(QCursor::pos());
 
   if (nullptr == action)
     return;
 
-  auto renderWindow = mitk::BaseRenderer::GetRenderWindowByName(action->data().toString().toStdString());
+  m_VideoRecorder->SetRenderWindowName(action->data().toString().toStdString());
+  m_VideoRecorder->SetFrameRate(static_cast<unsigned int>(m_Ui->fpsSpinBox->value()));
 
-  if (nullptr == renderWindow)
+  auto fileExt = QString::fromStdString(mitk::VideoRecorder::GetFileExtension(m_VideoRecorder->GetOutputFormat()));
+  QString outputPath = QFileDialog::getSaveFileName(nullptr, "Specify a filename", "", "Movie (*" + fileExt + ")");
+
+  if (outputPath.isEmpty())
     return;
 
-  const int border = 3;
-  const int x = border;
-  const int y = border;
-  int width = renderWindow->GetSize()[0] - border * 2;
-  int height = renderWindow->GetSize()[1] - border * 2;
+  if(!outputPath.endsWith(fileExt))
+    outputPath += fileExt;
 
-  if (width & 1)
-    --width;
+  m_VideoRecorder->SetOutputPath(outputPath.toStdString());
 
-  if (height & 1)
-    --height;
+  m_Ui->recordButton->setEnabled(false);
 
-  if (width < 16 || height < 16)
-    return;
+  m_Ui->recordingProgressBar->setMaximum(m_NumFrames);
 
-  m_FFmpegWriter->SetSize(width, height);
-  m_FFmpegWriter->SetFramerate(m_Ui->fpsSpinBox->value());
+  m_Ui->recordingLabel->setVisible(true);
+  m_Ui->recordingProgressBar->setVisible(true);
 
-  QString saveFileName = QFileDialog::getSaveFileName(nullptr, "Specify a filename", "", "Movie (*.mp4)");
+  m_Ui->encodingLabel->setVisible(true);
+  m_Ui->encodingProgressBar->setVisible(true);
 
-  if (saveFileName.isEmpty())
-    return;
-
-  if(!saveFileName.endsWith(".mp4"))
-    saveFileName += ".mp4";
-
-  m_FFmpegWriter->SetOutputPath(saveFileName);
+  EncodingThread* encodingThread = new EncodingThread(m_VideoRecorder.get(), m_Parent);
+  connect(encodingThread, &EncodingThread::finished, this, &QmitkMovieMakerView::OnEncodingFinished);
 
   try
   {
-    auto frame = std::make_unique<unsigned char[]>(width * height * 3);
-    m_FFmpegWriter->Start();
+    m_VideoRecorder->StartRecording();
 
     for (m_CurrentFrame = 0; m_CurrentFrame < m_NumFrames; ++m_CurrentFrame)
     {
+      m_Ui->recordingProgressBar->setValue(m_CurrentFrame + 1);
+
       this->RenderCurrentFrame();
-      ReadPixels(frame, renderWindow, x, y, width, height);
-      m_FFmpegWriter->WriteFrame(frame.get());
+      m_VideoRecorder->RecordFrame();
     }
 
-    m_FFmpegWriter->Stop();
+    m_Ui->encodingProgressBar->setMaximum(0);
 
-    m_CurrentFrame = 0;
-    this->RenderCurrentFrame();
+    m_Ui->encodingLabel->setEnabled(true);
+    m_Ui->encodingProgressBar->setEnabled(true);
+
+    encodingThread->start();
   }
   catch (const mitk::Exception& exception)
   {
-    m_CurrentFrame = 0;
-    this->RenderCurrentFrame();
+    if (encodingThread->isRunning())
+      encodingThread->terminate();
 
     QMessageBox::critical(nullptr, "Movie Maker", exception.GetDescription());
+
+    m_VideoRecorder = nullptr;
+    this->OnEncodingFinished();
   }
+}
+
+void QmitkMovieMakerView::OnEncodingFinished()
+{
+  m_VideoRecorder = nullptr;
+
+  this->InitializeRecordingProgress();
+
+  m_CurrentFrame = 0;
+  this->RenderCurrentFrame();
+
+  m_Ui->recordButton->setEnabled(true);
 }
 
 void QmitkMovieMakerView::OnRemoveAnimationButtonClicked()

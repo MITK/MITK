@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMXNMULTIWIDGETEDITOR_H
-#define QMITKMXNMULTIWIDGETEDITOR_H
+#ifndef QmitkMxNMultiWidgetEditor_h
+#define QmitkMxNMultiWidgetEditor_h
 
 #include <org_mitk_gui_qt_mxnmultiwidgeteditor_Export.h>
 
@@ -59,6 +59,10 @@ public:
   void OnLayoutSet(int row, int column) override;
   void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme) override;
 
+private Q_SLOTS:
+
+  void OnLayoutChanged();
+
 private:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor
@@ -78,4 +82,4 @@ private:
 
 };
 
-#endif // QMITKMXNMULTIWIDGETEDITOR_H
+#endif

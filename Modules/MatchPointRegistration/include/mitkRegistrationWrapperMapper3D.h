@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_MITK_REGISTRATION_WRAPPER_MAPPER_3D_H
-#define _MITK_MITK_REGISTRATION_WRAPPER_MAPPER_3D_H
+#ifndef mitkRegistrationWrapperMapper3D_h
+#define mitkRegistrationWrapperMapper3D_h
 
 
 #include "mitkRegistrationWrapperMapperBase.h"
@@ -50,5 +50,4 @@ private:
 
 
 
-#endif /* MITKRegistrationWrapperMapper3D_H_HEADER_INCLUDED */
-
+#endif

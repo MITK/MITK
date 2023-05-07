@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMAXIMUMCURVEDESCRIPTIONPARAMETER_H
-#define MITKMAXIMUMCURVEDESCRIPTIONPARAMETER_H
+#ifndef mitkMaximumCurveDescriptionParameter_h
+#define mitkMaximumCurveDescriptionParameter_h
 
 #include "mitkCurveDescriptionParameterBase.h"
 
@@ -42,4 +42,4 @@ protected:
 
 
 }
-#endif // MITKMAXIMUMCONCENTRATIONCURVEDESCRIPTIONPARAMETER_H
+#endif

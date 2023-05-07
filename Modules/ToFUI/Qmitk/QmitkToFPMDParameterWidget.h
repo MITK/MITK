@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKTOFPMDPARAMETERWIDGET_H_INCLUDED
-#define _QMITKTOFPMDPARAMETERWIDGET_H_INCLUDED
+#ifndef QmitkToFPMDParameterWidget_h
+#define QmitkToFPMDParameterWidget_h
 
 #include <MitkToFUIExports.h>
 #include "ui_QmitkToFPMDParameterWidgetControls.h"
@@ -111,4 +111,4 @@ class MITKTOFUI_EXPORT QmitkToFPMDParameterWidget :public QWidget
 
 };
 
-#endif // _QMITKTOFCONNECTIONWIDGET_H_INCLUDED
+#endif

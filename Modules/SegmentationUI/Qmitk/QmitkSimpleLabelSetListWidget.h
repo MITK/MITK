@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkSimpleLabelSetListWidget_h_Included
-#define QmitkSimpleLabelSetListWidget_h_Included
+#ifndef QmitkSimpleLabelSetListWidget_h
+#define QmitkSimpleLabelSetListWidget_h
 
 #include "mitkLabel.h"
 #include "mitkLabelSetImage.h"
@@ -49,7 +49,7 @@ protected slots:
 
 protected:
   void OnLayerChanged();
-  void OnLabelChanged();
+  void OnLabelChanged(mitk::LabelSetImage::LabelValueType lv);
 
   void OnLooseLabelSetConnection();
   void OnEstablishLabelSetConnection();

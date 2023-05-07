@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIGTLMESSAGECLONE_H_
-#define MITKIGTLMESSAGECLONE_H_
+#ifndef mitkIGTLMessageCloneHandler_h
+#define mitkIGTLMessageCloneHandler_h
 
 #include "itkObject.h"
 #include "mitkCommon.h"
@@ -80,4 +80,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKIGTLMESSAGECLONE_H_
+#endif

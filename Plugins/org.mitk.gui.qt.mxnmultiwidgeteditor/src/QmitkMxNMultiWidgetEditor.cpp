@@ -76,7 +76,6 @@ void QmitkMxNMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference:
     const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
     if (nullptr != multiWidget)
     {
-      multiWidget->RemovePlanesFromDataStorage();
       multiWidget->ActivateMenuWidget(false);
     }
   }
@@ -89,7 +88,7 @@ void QmitkMxNMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference:
     const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
     if (nullptr != multiWidget)
     {
-      multiWidget->AddPlanesToDataStorage();
+      multiWidget->EnableCrosshair();
       multiWidget->ActivateMenuWidget(true);
     }
   }
@@ -125,7 +124,7 @@ void QmitkMxNMultiWidgetEditor::OnLayoutSet(int row, int column)
   if (nullptr != multiWidget)
   {
     QmitkAbstractMultiWidgetEditor::OnLayoutSet(row, column);
-    multiWidget->AddPlanesToDataStorage();
+    multiWidget->EnableCrosshair();
   }
 }
 
@@ -171,7 +170,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   auto multiWidget = GetMultiWidget();
   if (nullptr == multiWidget)
   {
-    multiWidget = new QmitkMxNMultiWidget(parent, 0, nullptr);
+    multiWidget = new QmitkMxNMultiWidget(parent);
 
     // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves in PACS mode
     if (nullptr == m_Impl->m_InteractionSchemeToolBar)
@@ -184,6 +183,8 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     multiWidget->SetDataStorage(GetDataStorage());
     multiWidget->InitializeMultiWidget();
     SetMultiWidget(multiWidget);
+    connect(static_cast<QmitkMxNMultiWidget*>(multiWidget), &QmitkMxNMultiWidget::LayoutChanged,
+      this, &QmitkMxNMultiWidgetEditor::OnLayoutChanged);
   }
 
   layout->addWidget(multiWidget);
@@ -201,6 +202,10 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
           this, &QmitkMxNMultiWidgetEditor::OnSynchronize);
   connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::InteractionSchemeChanged,
           this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
+  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::SaveLayout,
+    static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::SaveLayout, Qt::DirectConnection);
+  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::LoadLayout,
+    static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::LoadLayout);
 
   GetSite()->GetPage()->AddPartListener(this);
 
@@ -231,4 +236,9 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
     mitk::InteractionSchemeSwitcher::MITKStandard);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkMxNMultiWidgetEditor::OnLayoutChanged()
+{
+  FirePropertyChange(berry::IWorkbenchPartConstants::PROP_INPUT);
 }

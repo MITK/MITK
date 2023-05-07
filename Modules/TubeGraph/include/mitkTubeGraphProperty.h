@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitk_TubeGraphProperty_h
-#define _mitk_TubeGraphProperty_h
+#ifndef mitkTubeGraphProperty_h
+#define mitkTubeGraphProperty_h
 
 #include <MitkTubeGraphExports.h>
 
@@ -143,4 +143,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* _mitk_TubeGraphProperty_h */
+#endif

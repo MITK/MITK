@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __CEST_PROERTY_HELPER_H
-#define __CEST_PROERTY_HELPER_H
+#ifndef mitkCESTPropertyHelper_h
+#define mitkCESTPropertyHelper_h
 
 #include "mitkIPropertyProvider.h"
 #include "mitkIPropertyOwner.h"
@@ -57,4 +57,4 @@ namespace mitk
   double MITKCEST_EXPORT GetCESTDutyCycle(const IPropertyProvider* provider);
 }
 
-#endif // __CEST_PROERTY_HELPER_H
+#endif

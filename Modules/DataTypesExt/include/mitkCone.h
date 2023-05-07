@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCONE_H_HEADER_INCLUDED
-#define MITKCONE_H_HEADER_INCLUDED
+#ifndef mitkCone_h
+#define mitkCone_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkBoundingObject.h"
@@ -36,4 +36,4 @@ namespace mitk
     ~Cone() override;
   };
 }
-#endif /* MITKCONE_H_HEADER_INCLUDED */
+#endif

@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITK_IMAGE_MAPPING_HELPER_H
-#define MITK_IMAGE_MAPPING_HELPER_H
+#ifndef mitkImageMappingHelper_h
+#define mitkImageMappingHelper_h
 
 #include "mapImageMappingTask.h"
 #include "mapRegistrationBase.h"

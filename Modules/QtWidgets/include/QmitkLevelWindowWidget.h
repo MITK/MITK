@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLEVELWINDOWWIDGET_H_
-#define QMITKLEVELWINDOWWIDGET_H_
+#ifndef QmitkLevelWindowWidget_h
+#define QmitkLevelWindowWidget_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -34,4 +34,4 @@ protected:
   // unsigned long m_ObserverTag;
   mitk::LevelWindowManager::Pointer m_Manager;
 };
-#endif /*QMITKLEVELWINDOWWIDGET_H_*/
+#endif

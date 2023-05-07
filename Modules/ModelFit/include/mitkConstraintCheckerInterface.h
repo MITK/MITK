@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef CONSTRAINTCHECKER_INTERFACE_H
-#define CONSTRAINTCHECKER_INTERFACE_H
+#ifndef mitkConstraintCheckerInterface_h
+#define mitkConstraintCheckerInterface_h
 
 #include "mitkModelBase.h"
 
@@ -66,4 +66,4 @@ namespace mitk
 
 }
 
-#endif // MODELFITCOSTFUNCTION_H
+#endif

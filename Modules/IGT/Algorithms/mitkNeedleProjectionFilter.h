@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef NEEDLEPROJECTIONFILTER_H_INCLUDED
-#define NEEDLEPROJECTIONFILTER_H_INCLUDED
+#ifndef mitkNeedleProjectionFilter_h
+#define mitkNeedleProjectionFilter_h
 
 #include "MitkIGTExports.h"
 

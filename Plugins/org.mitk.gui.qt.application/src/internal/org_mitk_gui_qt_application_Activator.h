@@ -18,8 +18,6 @@ found in the LICENSE file.
 
 namespace mitk {
 
-class IPreferencesService;
-
 class org_mitk_gui_qt_application_Activator :
   public QObject, public ctkPluginActivator
 {
@@ -33,15 +31,12 @@ public:
   void stop(ctkPluginContext* context) override;
 
   static ctkPluginContext* GetContext();
-  static org_mitk_gui_qt_application_Activator* GetInstance();
-
-  mitk::IPreferencesService* GetPreferencesService();
 
 private:
 
-  static org_mitk_gui_qt_application_Activator* m_Instance;
   static ctkPluginContext* m_Context;
-}; // org_mitk_gui_common_Activator
+
+}; // org_mitk_gui_qt_application_Activator
 
 typedef org_mitk_gui_qt_application_Activator PluginActivator;
 

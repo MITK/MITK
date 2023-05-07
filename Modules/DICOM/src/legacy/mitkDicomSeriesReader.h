@@ -1030,4 +1030,4 @@ namespace mitk
   };
 }
 
-#endif /* mitkDicomSeriesReader_h */
+#endif

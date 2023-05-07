@@ -111,4 +111,4 @@ private:
 
 }; // end class
 
-#endif // QmitkCmdLineModuleGui_h
+#endif

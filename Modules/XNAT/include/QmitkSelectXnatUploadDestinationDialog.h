@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSELECTXNATUPLOADDESTINATIONDIALOG_H
-#define QMITKSELECTXNATUPLOADDESTINATIONDIALOG_H
+#ifndef QmitkSelectXnatUploadDestinationDialog_h
+#define QmitkSelectXnatUploadDestinationDialog_h
 
 #include <MitkXNATExports.h>
 
@@ -56,4 +56,4 @@ private:
   Ui::QmitkSelectXnatUploadDestinationDialog *ui;
 };
 
-#endif // QMITKSELECTXNATUPLOADDESTINATIONDIALOG_H
+#endif

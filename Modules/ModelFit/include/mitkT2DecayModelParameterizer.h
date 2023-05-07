@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __T2_DECAY_MODEL_PARAMETERIZER_H
-#define __T2_DECAY_MODEL_PARAMETERIZER_H
+#ifndef mitkT2DecayModelParameterizer_h
+#define mitkT2DecayModelParameterizer_h
 
 #include "mitkConcreteModelParameterizerBase.h"
 #include "mitkT2DecayModel.h"
@@ -60,4 +60,4 @@ namespace mitk
   };
 }
 
-#endif // __LINEAR_MODEL_PARAMETERIZER_H
+#endif

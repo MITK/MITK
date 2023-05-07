@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkNavigationToolCreationWidget_H
-#define QmitkNavigationToolCreationWidget_H
+#ifndef QmitkNavigationToolCreationWidget_h
+#define QmitkNavigationToolCreationWidget_h
 
 //QT headers
 #include <QWidget>

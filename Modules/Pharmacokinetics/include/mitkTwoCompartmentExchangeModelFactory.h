@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKTWOCOMPARTMENTEXCHANGEMODELFACTORY_H
-#define MITKTWOCOMPARTMENTEXCHANGEMODELFACTORY_H
+#ifndef mitkTwoCompartmentExchangeModelFactory_h
+#define mitkTwoCompartmentExchangeModelFactory_h
 
 #include "mitkTwoCompartmentExchangeModelFactoryBase.h"
 #include "mitkTwoCompartmentExchangeModelParameterizer.h"
@@ -40,4 +40,4 @@ namespace mitk
 
 
 }
-#endif // MITKTWOCOMPARTMENTEXCHANGEMODELFACTORY_H
+#endif

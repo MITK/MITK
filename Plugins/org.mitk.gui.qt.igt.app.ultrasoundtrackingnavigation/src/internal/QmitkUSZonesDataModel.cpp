@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include "mitkMessage.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
-#include "mitkNodePredicateSource.h"
 #include "Interactors/mitkUSZonesInteractor.h"
 
 QmitkUSZonesDataModel::QmitkUSZonesDataModel(QObject *parent) :

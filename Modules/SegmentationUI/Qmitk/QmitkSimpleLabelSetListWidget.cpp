@@ -102,11 +102,11 @@ void QmitkSimpleLabelSetListWidget::OnLooseLabelSetConnection()
   auto labelSet = m_LabelSetImage->GetLabelSet(activeLayerID);
 
   // Reset LabelSetWidget Events
-  labelSet->AddLabelEvent -= mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
+  labelSet->AddLabelEvent -= mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
     this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
-  labelSet->RemoveLabelEvent -= mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
+  labelSet->RemoveLabelEvent -= mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
     this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
-  labelSet->ModifyLabelEvent -= mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
+  labelSet->ModifyLabelEvent -= mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
     this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
 }
 
@@ -119,11 +119,11 @@ void QmitkSimpleLabelSetListWidget::OnEstablishLabelSetConnection()
   auto labelSet = m_LabelSetImage->GetLabelSet(activeLayerID);
 
   // Reset LabelSetWidget Events
-  labelSet->AddLabelEvent += mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
+  labelSet->AddLabelEvent += mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
     this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
-  labelSet->RemoveLabelEvent += mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
+  labelSet->RemoveLabelEvent += mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
     this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
-  labelSet->ModifyLabelEvent += mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
+  labelSet->ModifyLabelEvent += mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
     this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
 }
 
@@ -141,7 +141,7 @@ void QmitkSimpleLabelSetListWidget::OnLayerChanged()
   }
 }
 
-void QmitkSimpleLabelSetListWidget::OnLabelChanged()
+void QmitkSimpleLabelSetListWidget::OnLabelChanged(mitk::LabelSetImage::LabelValueType /*lv*/)
 {
   if (!this->m_Emmiting)
   {

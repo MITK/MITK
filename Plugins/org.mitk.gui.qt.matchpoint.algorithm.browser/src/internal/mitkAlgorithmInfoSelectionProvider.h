@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_ALGORITHM_SELECTION_PROVIDER_H
-#define _MITK_ALGORITHM_SELECTION_PROVIDER_H
+#ifndef mitkAlgorithmInfoSelectionProvider_h
+#define mitkAlgorithmInfoSelectionProvider_h
 
 #include <org_mitk_gui_qt_matchpoint_algorithm_browser_Export.h>
 
@@ -52,4 +52,4 @@ protected:
 
 }
 
-#endif /* BERRYQTSELECTIONPROVIDER_H_ */
+#endif

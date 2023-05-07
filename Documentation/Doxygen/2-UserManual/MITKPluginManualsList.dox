@@ -10,6 +10,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \subpage org_mitk_views_dicominspector </li>
   <li> \subpage org_mitk_views_imagecropper </li>
   <li> \subpage org_mitk_views_imagenavigator </li>
+  <li> \subpage org_mitk_views_pixelvalue </li>
   <li> \subpage org_blueberry_views_logview </li>
   <li> \subpage org_mitk_views_matchpoint_algorithm_browser </li>
   <li> \subpage org_mitk_views_matchpoint_algorithm_control </li>
@@ -18,8 +19,12 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \subpage org_mitk_views_matchpoint_manipulator </li>
   <li> \subpage org_mitk_views_matchpoint_mapper </li>
   <li> \subpage org_mitk_views_matchpoint_visualizer </li>
-  <li> \subpage org_mitk_views_measurement </li>
-  <li> \subpage org_mitk_views_imagestatistics </li>
+  <li> \subpage org_mitk_gui_qt_measurementtoolbox
+    <ul>
+      <li> \subpage org_mitk_views_measurement </li>
+      <li> \subpage org_mitk_views_imagestatistics </li>
+    </ul>
+  </li>
   <li> \subpage org_mitk_views_moviemaker </li>
   <li> \subpage org_mitk_views_pointsetinteraction </li>
   <li> \subpage org_mitk_views_python </li>
@@ -27,11 +32,13 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \subpage org_mitk_views_screenshotmaker </li>
   <li> \subpage org_mitk_views_segmentation </li>
   <li> \subpage org_mitk_editors_stdmultiwidget </li>
+  <li> \subpage org_mitk_editors_mxnmultiwidget </li>
   <li> \subpage org_mitk_views_deformableclippingplane </li>
   <li> \subpage org_mitk_views_viewnavigator </li>
   <li> \subpage org_mitk_views_volumevisualization </li>
   <li> \subpage org_mitk_views_properties </li>
   <li> \subpage org_mitk_gui_qt_flowapplication </li>
+  <li> \subpage org_mitk_gui_qt_flow_segmentation </li>
   <li> \subpage org_mitk_gui_qt_aicpregistration </li>
   <li> \subpage org_mitk_gui_qt_cest </li>
   <li> \subpage org_mitk_gui_qt_classificationsegmentation </li>
@@ -52,7 +59,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \subpage org_mitk_gui_qt_mitkphenotyping </li>
   <li> \subpage org_mitk_gui_qt_preprocessing_resampling </li>
   <li> \subpage org_mitk_views_pharmacokinetics_curvedescriptor </li>
-  <li> \subpage org_mitk_gui_qt_pharmacokinetics_simulation </li>
+  <li> \subpage org_mitk_views_pharmacokinetics_simulation </li>
   <li> \subpage org_surfacematerialeditor </li>
   <li> \subpage org_toftutorial </li>
   <li> \subpage org_blueberry_ui_qt_objectinspector </li>

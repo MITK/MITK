@@ -37,4 +37,4 @@ public:
 
 } // namespace mitk
 
-#endif // mitkConvertGrayscaleOpenCVImageFilter_h
+#endif

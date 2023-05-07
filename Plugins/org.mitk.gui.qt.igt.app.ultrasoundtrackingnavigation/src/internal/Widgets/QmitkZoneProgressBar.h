@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKZONEPROGRESSBAR_H
-#define QMITKZONEPROGRESSBAR_H
+#ifndef QmitkZoneProgressBar_h
+#define QmitkZoneProgressBar_h
 
 #include <QProgressBar>
 
@@ -95,4 +95,4 @@ protected:
   QString m_StyleSheet;
 };
 
-#endif // QMITKZONEPROGRESSBAR_H
+#endif

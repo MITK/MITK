@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __DOSE_NODE_HELPER_H
-#define __DOSE_NODE_HELPER_H
+#ifndef mitkDoseNodeHelper_h
+#define mitkDoseNodeHelper_h
 
 #include "mitkIsoDoseLevelCollections.h"
 #include "mitkDataNode.h"

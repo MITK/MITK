@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef UNDOCONTROLLER_H_HEADER_INCLUDED_C16EFF79
-#define UNDOCONTROLLER_H_HEADER_INCLUDED_C16EFF79
+#ifndef mitkUndoController_h
+#define mitkUndoController_h
 
 #include "mitkOperationEvent.h"
 #include "mitkUndoModel.h"
@@ -129,4 +129,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* UNDOCONTROLLER_H_HEADER_INCLUDED_C16EFF79 */
+#endif

@@ -108,4 +108,3 @@ class MITKDICOMTESTING_EXPORT TestDICOMLoading
 }
 
 #endif
-

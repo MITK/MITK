@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSinglePointDataInteractor_h_
-#define mitkSinglePointDataInteractor_h_
+#ifndef mitkSinglePointDataInteractor_h
+#define mitkSinglePointDataInteractor_h
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"

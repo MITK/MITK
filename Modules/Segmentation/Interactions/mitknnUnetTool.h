@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitknnUnetTool_h_Included
-#define mitknnUnetTool_h_Included
+#ifndef mitknnUnetTool_h
+#define mitknnUnetTool_h
 
 #include "mitkSegWithPreviewTool.h"
 #include "mitkCommon.h"
@@ -164,10 +164,10 @@ namespace mitk
 
   protected:
     /**
-     * @brief Construct a new nnUNet Tool object and temp directory.
+     * @brief Construct a new nnUNet Tool object.
      *
      */
-    nnUNetTool();
+    nnUNetTool() = default;
 
     /**
      * @brief Destroy the nnUNet Tool object and deletes the temp directory.

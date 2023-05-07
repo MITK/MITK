@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IMAGETIMESELECTOR_H_HEADER_INCLUDED_C1E4861D
-#define IMAGETIMESELECTOR_H_HEADER_INCLUDED_C1E4861D
+#ifndef mitkImageTimeSelector_h
+#define mitkImageTimeSelector_h
 
 #include "mitkSubImageSelector.h"
 #include <MitkCoreExports.h>
@@ -75,4 +75,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* IMAGETIMESELECTOR_H_HEADER_INCLUDED_C1E4861D */
+#endif

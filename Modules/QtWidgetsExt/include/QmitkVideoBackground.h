@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _Qmitk_Video_Background_h_
-#define _Qmitk_Video_Background_h_
+#ifndef QmitkVideoBackground_h
+#define QmitkVideoBackground_h
 
 // MITK
 #include "MitkQtWidgetsExtExports.h"

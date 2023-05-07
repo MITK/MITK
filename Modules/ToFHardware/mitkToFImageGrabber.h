@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkToFImageGrabber_h
-#define __mitkToFImageGrabber_h
+#ifndef mitkToFImageGrabber_h
+#define mitkToFImageGrabber_h
 
 #include <MitkToFHardwareExports.h>
 #include <mitkCommon.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef TEMPORALJOINIMAGESFILTER_H
-#define TEMPORALJOINIMAGESFILTER_H
+#ifndef mitkTemporalJoinImagesFilter_h
+#define mitkTemporalJoinImagesFilter_h
 
 
 #include "mitkImageToImageFilter.h"
@@ -59,4 +59,4 @@ namespace mitk
 }
 
 
-#endif // MODELSIGNALIMAGEGENERATOR_H
+#endif

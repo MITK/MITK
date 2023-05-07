@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#if !defined(QMITK_ScreenshotMaker_H__INCLUDED)
-#define QMITK_ScreenshotMaker_H__INCLUDED
+#ifndef QmitkScreenshotMaker_h
+#define QmitkScreenshotMaker_h
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
@@ -77,6 +77,10 @@ public:
   /// Called when a RenderWindowPart becomes unavailable.
   ///
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  ///
+  /// Called when a RenderWindowPart changes.
+  ///
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
   signals:
 
@@ -101,6 +105,7 @@ protected:
 private:
 
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void UpdateDirectionBox(mitk::IRenderWindowPart* renderWindowPart);
 
   vtkCamera* GetCam();
   void GenerateHR3DAtlasScreenshots(QString fileName, QString filter = "");
@@ -124,5 +129,5 @@ private:
   QString           m_PNGExtension = "PNG File (*.png)";
   QString           m_JPGExtension = "JPEG File (*.jpg)";
 };
-#endif // !defined(QMITK_ScreenshotMaker_H__INCLUDED)
 
+#endif

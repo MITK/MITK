@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSIMPLEVOLUMEDICOMSERIESREADERSERVICE_H
-#define MITKSIMPLEVOLUMEDICOMSERIESREADERSERVICE_H
+#ifndef mitkSimpleVolumeDICOMSeriesReaderService_h
+#define mitkSimpleVolumeDICOMSeriesReaderService_h
 
 #include <mitkBaseDICOMReaderService.h>
 
@@ -37,4 +37,4 @@ private:
 
 }
 
-#endif // MITKSIMPLEVOLUMEDICOMSERIESREADERSERVICE_H
+#endif

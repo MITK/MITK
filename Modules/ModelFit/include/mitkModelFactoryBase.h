@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MODEL_FACTORY_BASE_H
-#define __MODEL_FACTORY_BASE_H
+#ifndef mitkModelFactoryBase_h
+#define mitkModelFactoryBase_h
 
 #include <itkObject.h>
 
@@ -87,4 +87,4 @@ namespace mitk
   };
 }
 
-#endif // __MODEL_FACTORY_BASE_H
+#endif

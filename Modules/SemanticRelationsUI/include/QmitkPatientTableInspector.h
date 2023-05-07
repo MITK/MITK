@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKPATIENTTABLEINSPECTOR_H
-#define QMITKPATIENTTABLEINSPECTOR_H
+#ifndef QmitkPatientTableInspector_h
+#define QmitkPatientTableInspector_h
 
 // semantic relations UI module
 #include "MitkSemanticRelationsUIExports.h"
@@ -82,4 +82,4 @@ private:
 
 };
 
-#endif // QMITKPATIENTTABLEINSPECTOR_H
+#endif

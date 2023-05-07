@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __TEST_ARTIFACT_GENERATOR_H
-#define __TEST_ARTIFACT_GENERATOR_H
+#ifndef mitkTestDynamicImageGenerator_h
+#define mitkTestDynamicImageGenerator_h
 
 #include "itkImage.h"
 #include "itkImageRegionIterator.h"

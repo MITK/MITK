@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_POINT_LOCATOR__H__
-#define _MITK_POINT_LOCATOR__H__
+#ifndef mitkPointLocator_h
+#define mitkPointLocator_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include <itkObject.h>

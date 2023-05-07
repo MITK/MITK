@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOWWIDGET_H
-#define QMITKRENDERWINDOWWIDGET_H
+#ifndef QmitkRenderWindowWidget_h
+#define QmitkRenderWindowWidget_h
+
+#include "MitkQtWidgetsExports.h"
 
 // qt widgets module
-#include "MitkQtWidgetsExports.h"
-#include "QmitkRenderWindow.h"
-#include "QmitkRenderWindowUtilityWidget.h"
+#include <QmitkRenderWindow.h>
 
 // mitk core
 #include <mitkCrosshairManager.h>
@@ -26,6 +26,7 @@ found in the LICENSE file.
 // qt
 #include <QFrame>
 #include <QMouseEvent>
+#include <QVBoxLayout>
 
 class vtkCornerAnnotation;
 
@@ -47,8 +48,7 @@ public:
   QmitkRenderWindowWidget(
     QWidget* parent = nullptr,
     const QString& widgetName = "",
-    mitk::DataStorage* dataStorage = nullptr,
-    bool windowControls = false);
+    mitk::DataStorage* dataStorage = nullptr);
 
   ~QmitkRenderWindowWidget() override;
 
@@ -61,6 +61,8 @@ public:
 
   void RequestUpdate();
   void ForceImmediateUpdate();
+
+  void AddUtilityWidget(QWidget* utilityWidget);
 
   void SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower);
   void ShowGradientBackground(bool enable);
@@ -84,8 +86,8 @@ public:
   bool GetCrosshairVisibility();
   void SetCrosshairGap(unsigned int gapSize);
 
-  void AddPlanesToDataStorage();
-  void RemovePlanesFromDataStorage();
+  void EnableCrosshair();
+  void DisableCrosshair();
 
   void SetCrosshairPosition(const mitk::Point3D& newPosition);
   mitk::Point3D GetCrosshairPosition() const;
@@ -93,16 +95,15 @@ public:
   void SetGeometry(const itk::EventObject& event);
   void SetGeometrySlice(const itk::EventObject& event);
 
-private Q_SLOTS:
+public Q_SLOTS:
 
-  void OnReinitAction(QList<mitk::DataNode::Pointer> selectedNodes);
-  void OnResetAction(QList<mitk::DataNode::Pointer> selectedNodes);
+  void OnResetGeometry();
 
 private:
 
   void InitializeGUI();
   void InitializeDecorations();
-  void ComputeInvertedSliceNavigation();
+  void ResetGeometry(const mitk::TimeGeometry* referenceGeometry);
 
   QString m_WidgetName;
   QVBoxLayout* m_Layout;
@@ -117,10 +118,6 @@ private:
   mitk::Color m_DecorationColor;
   vtkSmartPointer<vtkCornerAnnotation> m_CornerAnnotation;
 
-  QmitkRenderWindowUtilityWidget* m_UtilityWidget;
-
-  bool m_WindowControls;
-
 };
 
-#endif // QMITKRENDERWINDOWWIDGET_H
+#endif

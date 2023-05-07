@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKABSTRACTRENDEREDITOR_H
-#define QMITKABSTRACTRENDEREDITOR_H
+#ifndef QmitkAbstractRenderEditor_h
+#define QmitkAbstractRenderEditor_h
 
 #include <berryQtEditorPart.h>
 
@@ -163,4 +163,4 @@ private:
 
 };
 
-#endif // QMITKABSTRACTRENDEREDITOR_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef FILEWRITERWITHINFORMATION_H_INCLUDED
-#define FILEWRITERWITHINFORMATION_H_INCLUDED
+#ifndef mitkFileWriterWithInformation_h
+#define mitkFileWriterWithInformation_h
 
 #include "mitkBaseData.h"
 #include "mitkFileWriter.h"

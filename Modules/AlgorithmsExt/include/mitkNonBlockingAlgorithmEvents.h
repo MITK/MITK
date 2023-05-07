@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_NON_BLOCKING_ALGORHITHMS_ENVETS_H_INCLDUED
-#define MITK_NON_BLOCKING_ALGORHITHMS_ENVETS_H_INCLDUED
+#ifndef mitkNonBlockingAlgorithmEvents_h
+#define mitkNonBlockingAlgorithmEvents_h
 
 #include <itkEventObject.h>
 

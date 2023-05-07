@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSCONTROLSDOPPLERWIDGET_H
-#define QMITKUSCONTROLSDOPPLERWIDGET_H
+#ifndef QmitkUSControlsDopplerWidget_h
+#define QmitkUSControlsDopplerWidget_h
 
 #include <QWidget>
 
@@ -51,4 +51,4 @@ private:
   mitk::USControlInterfaceDoppler::Pointer  m_ControlInterface;
 };
 
-#endif // QMITKUSCONTROLSDOPPLERWIDGET_H
+#endif

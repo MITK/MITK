@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPOINT_H_
-#define MITKPOINT_H_
+#ifndef mitkPoint_h
+#define mitkPoint_h
 
 #include <itkPoint.h>
 
@@ -132,4 +132,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKPOINT_H_ */
+#endif

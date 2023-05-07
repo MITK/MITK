@@ -88,6 +88,8 @@ namespace mitk
      */
     static void onPythonProcessEvent(itk::Object *, const itk::EventObject &e, void *);
 
+    bool run_download_model(std::string);
+
   protected:
     SegmentAnythingTool();
     ~SegmentAnythingTool() override;
@@ -105,20 +107,28 @@ namespace mitk
 
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 
-private:
+    std::vector<std::pair<mitk::Point2D, std::string>> GetPointsAsCSVString(const mitk::BaseGeometry*);
+
+  private:
     /**
      * @brief Runs SAM python process with desired arguments to generate embeddings for the input image
      *
      */
   void run_generate_embeddings(ProcessExecutor*, const std::string&, const std::string&, const std::string&, const std::string&, const unsigned int);
     
-  void run_segmentation_from_points(ProcessExecutor *, const std::string &, const std::string &, const std::string &, const std::string &, const unsigned int);
+  void run_segmentation_from_points(ProcessExecutor *, const std::string &, const std::string &, const std::string &,
+                                    const std::string &,
+                                    const std::string &,
+                                    const std::string &,
+                                    const unsigned int);
 
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_ModelType;
     std::string m_CheckpointPath;
+    std::string m_InDir, m_OutDir, inputImagePath, pickleFilePath, outputImagePath, token; //rename as per standards
+
 
     unsigned int m_GpuId = 0;
 

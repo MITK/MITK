@@ -99,10 +99,15 @@ void mitk::SegmentAnythingTool::ConnectActionsAndFunctions()
 
 void mitk::SegmentAnythingTool::OnAddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
+  if (!this->GetIsReady())
+  {
+    return;
+  }
   m_IsGenerateEmbeddings = false; 
   if ((nullptr == this->GetWorkingPlaneGeometry()) || !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()), *(this->GetWorkingPlaneGeometry())))
   {
     m_IsGenerateEmbeddings = true;
+    this->ClearSeeds();
     this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
   }
   if (!this->IsUpdating() && m_PointSet.IsNotNull())
@@ -132,7 +137,7 @@ void mitk::SegmentAnythingTool::OnDelete(StateMachineAction*, InteractionEvent* 
 void mitk::SegmentAnythingTool::ClearPicks()
 {
   this->ClearSeeds();
-  this->UpdatePreview();
+  //this->UpdatePreview();
 }
 
 bool mitk::SegmentAnythingTool::HasPicks() const
@@ -180,6 +185,16 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
     if (this->m_MitkTempDir.empty())
     {
       this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
+      
+      m_InDir = IOUtil::CreateTemporaryDirectory("sam-in-XXXXXX", this->GetMitkTempDir());
+      std::ofstream tmpStream;
+      inputImagePath =
+        IOUtil::CreateTemporaryFile(tmpStream, TEMPLATE_FILENAME, m_InDir + IOUtil::GetDirectorySeparator());
+      tmpStream.close();
+      std::size_t found = inputImagePath.find_last_of(IOUtil::GetDirectorySeparator());
+      std::string fileName = inputImagePath.substr(found + 1);
+      token = fileName.substr(0, fileName.find("_"));
+      m_OutDir = IOUtil::CreateTemporaryDirectory("sam-out-XXXXXX", this->GetMitkTempDir());
     }
     if (this->HasPicks())
     {
@@ -188,44 +203,55 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
       spCommand->SetCallback(&onPythonProcessEvent);
       spExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
 
-      std::string inDir, outDir, inputImagePath, pickleFilePath, outputImagePath, scriptPath;
-      inDir = IOUtil::CreateTemporaryDirectory("sam-in-XXXXXX", this->GetMitkTempDir());
-      std::ofstream tmpStream;
-      inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, TEMPLATE_FILENAME, inDir + IOUtil::GetDirectorySeparator());
-      tmpStream.close();
-      std::size_t found = inputImagePath.find_last_of(IOUtil::GetDirectorySeparator());
-      std::string fileName = inputImagePath.substr(found + 1);
-      std::string token = fileName.substr(0, fileName.find("_"));
-      outDir = IOUtil::CreateTemporaryDirectory("sam-out-XXXXXX", this->GetMitkTempDir());
-      pickleFilePath = outDir + IOUtil::GetDirectorySeparator() + "dump.pkl";
-      outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
+      pickleFilePath = m_OutDir + IOUtil::GetDirectorySeparator() + "dump.pkl";
+      outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
 
       LabelSetImage::Pointer outputBuffer;
 
-      //IOUtil::Save(inputAtTimeStep, inputImagePath);
-      MITK_INFO << "No.of points: " << m_PointSet->GetSize();
-      auto point = m_PointSet->GetPoint(0);
-      MITK_INFO << point[0] << " " << point[1] << " " << point[2];
-      Point2D p2D;
-      p2D.SetElement(0, point[0]);
-      p2D.SetElement(1, point[1]);
-      
+      IOUtil::Save(inputAtTimeStep, inputImagePath);
 
-      this->GetWorkingPlaneGeometry()->WorldToIndex(p2D, p2D);
       this->SetPythonPath("C:\\DKFZ\\SAM_work\\sam_env\\Scripts");
       this->SetModelType("vit_b");
       this->SetCheckpointPath("C:\\DKFZ\\SAM_work\\sam_vit_b_01ec64.pth");
 
-      if (false)//m_IsGenerateEmbeddings)
+      if (m_IsGenerateEmbeddings)
       {
         this->run_generate_embeddings(
-          spExec, inputImagePath, outDir, this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId());
+          spExec, inputImagePath, m_OutDir, this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId());
       }
 
-      //run_segmentation_from_points(
-      //  spExec, pickleFilePath, outputImagePath, this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId());
+      auto pointsVec = GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
+      std::string pointsCSV;
+      std::string labelsCSV;
+      pointsCSV.reserve(64);
+      labelsCSV.reserve(m_PointSet->GetSize() * 2);
+      for (const std::pair<mitk::Point2D, std::string>& pointPair : pointsVec)
+      {
+        auto& p2D = pointPair.first;
+        pointsCSV.append(std::to_string(static_cast<int>(p2D[0])));
+        pointsCSV.append(",");
+        pointsCSV.append(std::to_string(static_cast<int>(p2D[1])));
+        pointsCSV.append(";");
 
-      outputImagePath = "C:\\DKFZ\\SAM_work\\test_seg_3d.nii.gz";
+        auto &label = pointPair.second;
+        labelsCSV.append(label);
+        labelsCSV.append(",");
+      }
+      pointsCSV.pop_back();
+      labelsCSV.pop_back();
+      MITK_INFO << " pointsCSV " << pointsCSV;
+      MITK_INFO << " labelsCSV " << labelsCSV;
+
+      run_segmentation_from_points(spExec,
+                                   pickleFilePath,
+                                   outputImagePath,
+                                   this->GetModelType(),
+                                   this->GetCheckpointPath(),
+                                   pointsCSV,
+                                   labelsCSV,
+                                   this->GetGpuId());
+
+      //outputImagePath = "C:\\DKFZ\\SAM_work\\test_seg_3d.nii.gz";
       Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
       previewImage->InitializeByLabeledImage(outputImage);
       previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
@@ -283,6 +309,8 @@ void mitk::SegmentAnythingTool::run_segmentation_from_points(ProcessExecutor *sp
                                                              const std::string &outputImagePath,
                                                              const std::string &modelType,
                                                              const std::string &checkpointPath,
+                                                             const std::string &points,
+                                                             const std::string &labels,
                                                              const unsigned int gpuId)
 {
   ProcessExecutor::ArgumentListType args;
@@ -301,6 +329,12 @@ void mitk::SegmentAnythingTool::run_segmentation_from_points(ProcessExecutor *sp
 
   args.push_back("--checkpoint");
   args.push_back(checkpointPath);
+  
+  args.push_back("--input-points");
+  args.push_back(points);
+
+  args.push_back("--input-labels");
+  args.push_back(labels);
 
   // TODO: add more arguments here-- ashis
 
@@ -322,4 +356,29 @@ void mitk::SegmentAnythingTool::run_segmentation_from_points(ProcessExecutor *sp
     MITK_ERROR << e.GetDescription();
     return;
   }
+}
+
+bool mitk::SegmentAnythingTool::run_download_model(std::string targetDir)
+{
+  MITK_INFO << "model will be downloading to " << targetDir;
+  return true;
+}
+
+std::vector<std::pair<mitk::Point2D, std::string>> mitk::SegmentAnythingTool::GetPointsAsCSVString(
+  const mitk::BaseGeometry *baseGeometry)
+{
+  MITK_INFO << "No.of points: " << m_PointSet->GetSize();
+  std::vector<std::pair<mitk::Point2D, std::string>> clickVec;
+  clickVec.reserve(m_PointSet->GetSize());
+  for (int i = 0; i < m_PointSet->GetSize(); ++i)
+  {
+    auto point = m_PointSet->GetPoint(i);
+    baseGeometry->WorldToIndex(point, point);
+    MITK_INFO << point[0] << " " << point[1] << " " << point[2]; // remove
+    Point2D p2D;
+    p2D.SetElement(0, point[0]);
+    p2D.SetElement(1, point[1]);
+    clickVec.push_back(std::pair(p2D, "1"));
+  }  
+  return clickVec;
 }

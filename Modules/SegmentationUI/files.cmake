@@ -37,6 +37,7 @@ set(CPP_FILES
   Qmitk/QmitkMultiLabelPresetHelper.cpp
   Qmitk/QmitkLabelColorItemDelegate.cpp
   Qmitk/QmitkLabelToggleItemDelegate.cpp
+  Qmitk/QmitkMonaiLabelToolGUI.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/QmitkContourModelToImageWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
@@ -88,6 +89,7 @@ set(MOC_H_FILES
   Qmitk/QmitkMultiLabelTreeView.h
   Qmitk/QmitkLabelColorItemDelegate.h
   Qmitk/QmitkLabelToggleItemDelegate.h
+  Qmitk/QmitkMonaiLabelToolGUI.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkContourModelToImageWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h

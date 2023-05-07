@@ -44,7 +44,8 @@ mitk::MonaiLabelTool::~MonaiLabelTool()
 void mitk::MonaiLabelTool::Activated()
 {
   Superclass::Activated();
-  this->SetLabelTransferMode(LabelTransferMode::AllLabels);
+  this->SetLabelTransferScope(LabelTransferScope::AllLabels);
+  this->SetLabelTransferMode(LabelTransferMode::AddLabel);
 }
 
 const char **mitk::MonaiLabelTool::GetXPM() const

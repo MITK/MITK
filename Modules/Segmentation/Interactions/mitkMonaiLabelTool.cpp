@@ -154,13 +154,14 @@ void mitk::MonaiLabelTool::MapLabelsToSegmentation(const mitk::LabelSetImage *so
   auto labelset = dest->GetLabelSet();
   auto lookupTable = mitk::LookupTable::New();
   lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
+  mitk::Label::PixelType labelId = 0;
   for (auto const &[key, val] : flippedLabelMap)
   {
-    if (source->ExistLabel(key, source->GetActiveLayer()))
+    if (source->ExistLabel(labelId, source->GetActiveLayer()))
     {
-      Label::Pointer label = Label::New(key, val);
+      Label::Pointer label = Label::New(labelId, val);
       std::array<double, 3> lookupTableColor;
-      lookupTable->GetColor(key, lookupTableColor.data());
+      lookupTable->GetColor(labelId, lookupTableColor.data());
       Color color;
       color.SetRed(lookupTableColor[0]);
       color.SetGreen(lookupTableColor[1]);
@@ -172,6 +173,7 @@ void mitk::MonaiLabelTool::MapLabelsToSegmentation(const mitk::LabelSetImage *so
     {
       MITK_INFO << "Label not found for " << val;
     }
+    labelId++;
   }
 }
 

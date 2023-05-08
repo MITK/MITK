@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <usModuleResource.h>
 #include <usServiceReference.h>
 #include <vector>
+#include <mitkImageReadAccessor.h>
 
 namespace mitk
 {
@@ -127,9 +128,10 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
     outputBuffer->InitializeByLabeledImage(outputImage);
     outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
 
-    std::map<std::string, int> labelMap = m_ResultMetadata["label_names"];
-    MapLabelsToSegmentation(outputBuffer, labelMap);
-    TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
+    std::map<std::string, mitk::Label::PixelType> labelMap = m_ResultMetadata["label_names"];
+    MapLabelsToSegmentation(outputBuffer, previewImage, labelMap);
+    mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
+    previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
     this->SetIsLastSuccess(true);
   }
   catch (const mitk::Exception &e)
@@ -140,28 +142,36 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
   }
 }
 
-void mitk::MonaiLabelTool::MapLabelsToSegmentation(mitk::LabelSetImage::Pointer outputBuffer,
-                                                   std::map<std::string, int> &labelMap)
+void mitk::MonaiLabelTool::MapLabelsToSegmentation(const mitk::LabelSetImage *source,
+                                                         mitk::LabelSetImage *dest,
+                                                         std::map<std::string, mitk::Label::PixelType> &labelMap)
 {
-  std::map<int, std::string> flippedLabelMap;
+  std::map<mitk::Label::PixelType, std::string> flippedLabelMap;
   for (auto const &[key, val] : labelMap)
   {
     flippedLabelMap[val] = key;
   }
-  int labelId = 0;
+  auto labelset = dest->GetLabelSet();
+  auto lookupTable = mitk::LookupTable::New();
+  lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
   for (auto const &[key, val] : flippedLabelMap)
   {
-    mitk::Label *labelptr = outputBuffer->GetLabel(labelId, 0);
-    if (nullptr != labelptr)
+    if (source->ExistLabel(key, source->GetActiveLayer()))
     {
-      MITK_INFO << "Replacing label with name: " << labelptr->GetName() << " as " << val;
-      labelptr->SetName(val);
+      Label::Pointer label = Label::New(key, val);
+      std::array<double, 3> lookupTableColor;
+      lookupTable->GetColor(key, lookupTableColor.data());
+      Color color;
+      color.SetRed(lookupTableColor[0]);
+      color.SetGreen(lookupTableColor[1]);
+      color.SetBlue(lookupTableColor[2]);
+      label->SetColor(color);
+      labelset->AddLabel(label, false);
     }
     else
     {
-      MITK_INFO << "nullptr found for " << val;
+      MITK_INFO << "Label not found for " << val;
     }
-    labelId++;
   }
 }
 

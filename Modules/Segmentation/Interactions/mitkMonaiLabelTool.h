@@ -118,7 +118,7 @@ namespace mitk
     std::string m_MitkTempDir;
     std::vector<std::string> getPartsBetweenBoundary(const std::string &, const std::string &);
     std::unique_ptr<MonaiAppMetadata> mitk::MonaiLabelTool::DataMapper(nlohmann::json&);
-    void MapLabelsToSegmentation(mitk::LabelSetImage::Pointer, std::map<std::string, int> &);
+    void MapLabelsToSegmentation(const mitk::LabelSetImage*, mitk::LabelSetImage*, std::map<std::string, mitk::Label::PixelType>&);
     bool IsMonaiServerOn(std::string &, int &);
     bool m_IsLastSuccess = false;
     std::string m_ModelName;

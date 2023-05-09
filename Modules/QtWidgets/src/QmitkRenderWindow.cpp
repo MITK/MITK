@@ -31,8 +31,6 @@ found in the LICENSE file.
 #include <QTimer>
 #include <QWheelEvent>
 #include <QWindow>
-#include <QApplication>
-#include <QDesktopWidget>
 
 #include <QmitkMimeTypes.h>
 #include <QmitkRenderWindowMenu.h>
@@ -309,7 +307,7 @@ void QmitkRenderWindow::DeferredHideMenu()
 mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent *me) const
 {
   mitk::Point2D point;
-  const auto scale = QApplication::desktop()->devicePixelRatio();
+  const auto scale = this->devicePixelRatioF();
   point[0] = me->x()*scale;
   // We need to convert the y component, as the display and vtk have other definitions for the y direction
   point[1] = m_Renderer->GetSizeY() - me->y()*scale;
@@ -319,7 +317,7 @@ mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent *me) const
 mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent *we) const
 {
   mitk::Point2D point;
-  const auto scale = QApplication::desktop()->devicePixelRatio();
+  const auto scale = this->devicePixelRatioF();
   point[0] = we->x()*scale;
   // We need to convert the y component, as the display and vtk have other definitions for the y direction
   point[1] = m_Renderer->GetSizeY() - we->y()*scale;

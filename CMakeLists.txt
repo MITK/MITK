@@ -599,12 +599,6 @@ mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
 option(MITK_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting MITK GUI Applications" ON)
 mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
 
-# As of Windows 10 Version 1903 (May 2019 Update), applications can use the UTF-8 code page
-if(WIN32)
-  option(MITK_UTF8 "Use UTF-8 code page in MITK applications on Windows" ON)
-  mark_as_advanced(MITK_UTF8)
-endif()
-
 if(NOT MITK_FAST_TESTING)
   if(MITK_CTEST_SCRIPT_MODE STREQUAL "Continuous" OR MITK_CTEST_SCRIPT_MODE STREQUAL "Experimental")
     set(MITK_FAST_TESTING ON)

@@ -105,7 +105,7 @@ This may change in future releases of MITK.
 
 <b>Clear content</b> only clears the pixels of a label or label instance but won't delete the actual label or label instance.
 
-Groups can be <b>locked</b> and <b>unlocked</b> as a whole from their context menu, while labels and label instances can be directly locked and unlocked outside the context menu as decribed further below.
+Groups can be <b>locked</b> and <b>unlocked</b> as a whole from their context menu, while label instances can be directly locked and unlocked outside the context menu as decribed further below.
 
 \section org_mitk_views_segmentationlabelsuggestions Label name and color suggestions
 

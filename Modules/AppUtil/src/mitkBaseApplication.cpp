@@ -673,19 +673,6 @@ namespace mitk
       QCoreApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
-#ifdef _WIN32
-      {
-        typedef BOOL (*SetProcessDpiAwarenessContextT)(DPI_AWARENESS_CONTEXT);
-        QLibrary user32("user32.dll");
-        SetProcessDpiAwarenessContextT SetProcessDpiAwarenessContextD =
-          (SetProcessDpiAwarenessContextT)user32.resolve("SetProcessDpiAwarenessContext");
-        if (SetProcessDpiAwarenessContextD)
-        {
-          SetProcessDpiAwarenessContextD(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-        }
-      }
-#endif
-
       QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)

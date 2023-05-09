@@ -233,8 +233,11 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Press SHIFT and click to pick region(s).
-Press DEL to remove last pick.</string>
+        <string>
+Press SHIFT+Left-click for positive seeds.
+Press SHIFT+Right-click for negative seeds.
+Press DEL to remove last seed.
+        </string>
        </property>
       </widget>
      </item>

@@ -27,11 +27,7 @@ namespace us
 namespace mitk
 {
   /** CHANGE THIS --ashis
-  \brief Extracts a single region from a segmentation image and creates a new image with same geometry of the input
-  image.
-
-  The region is extracted in 3D space. This is done by performing region growing within the desired region.
-  Use shift click to add the seed point.
+  \brief Segment Anything Model interactive 2D tool.
 
   \ingroup ToolManagerEtAl
   \sa mitk::Tool
@@ -96,13 +92,20 @@ namespace mitk
 
     void ConnectActionsAndFunctions() override;
 
-    /// \brief Add point action of StateMachine pattern
+    /*
+     * @brief Add point action of StateMachine pattern
+     */
     virtual void OnAddPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+    virtual void OnAddNegativePoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
-    /// \brief Delete action of StateMachine pattern
+    /*
+     * @brief Delete action of StateMachine pattern
+     */
     virtual void OnDelete(StateMachineAction*, InteractionEvent* interactionEvent);
 
-    /// \brief Clear all seed points.
+    /*
+     * @brief Clear all seed points and call UpdatePreview to reset the segmentation Preview
+     */
     void ClearSeeds();
 
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
@@ -132,12 +135,15 @@ namespace mitk
 
     unsigned int m_GpuId = 0;
 
-    PointSet::Pointer m_PointSet;
+    PointSet::Pointer m_PointSetPositive;
+    PointSet::Pointer m_PointSetNegative;
     DataNode::Pointer m_PointSetNode;
+    DataNode::Pointer m_PointSetNodeNegative;
     bool m_IsGenerateEmbeddings = true;
     bool m_IsAuto = false;
     bool m_IsReady = false;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
+    int m_PointSetCount = 0;
 
   };
 

@@ -332,13 +332,6 @@ After the segmentation process, the user can decide which newly generated labels
 
 \imageMacro{QmitkSegmentation_3DGrowCutTool.png,"3D GrowCut tool",16.00}
 
-\subsection org_mitk_views_segmentation3drgtool 3D Region growing tool
-
-The 3D Region Growing tool works similar to the 2D pendant. At the beginning you have to place a seedpoint and define a threshold interval. If you press
-<i>Run Segmentation</i> a preview is calculated. By moving the <i>Adapt region growing</i> slider you can interactively adapt the segmentation result.
-
-\imageMacro{QmitkSegmentation_3DRGTool.png,"3D Region growing tool",10.00}
-
 \subsection org_mitk_views_segmentationpickingtool Picking Tool
 
 The Picking tool offers two modes that allow you to manipulate "islands" within your segmentation. This is especially useful if e.g. a thresholding provided you with several areas within

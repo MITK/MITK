@@ -117,14 +117,14 @@ namespace mitk
      * @brief Runs SAM python process with desired arguments to generate embeddings for the input image
      *
      */
-  void run_generate_embeddings(ProcessExecutor*, const std::string&, const std::string&, const std::string&, const std::string&, const unsigned int);
+    void run_generate_embeddings(ProcessExecutor*, const std::string&, const std::string&, const std::string&, const std::string&, const unsigned int);
     
-  void run_segmentation_from_points(ProcessExecutor *, const std::string &, const std::string &, const std::string &,
-                                    const std::string &,
-                                    const std::string &,
-                                    const std::string &,
+    void run_segmentation_from_points(ProcessExecutor*, const std::string&, const std::string&, const std::string&,
+                                    const std::string&,
+                                    const std::string&,
+                                    const std::string&,
                                     const unsigned int);
-
+    static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, mitk::Point3D&);
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;

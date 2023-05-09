@@ -155,7 +155,7 @@ void mitk::SegmentAnythingTool::OnDelete(StateMachineAction*, InteractionEvent* 
   if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
   {
     PointSet::Pointer removeSet = m_PointSetPositive;
-    int maxId = 0;
+    decltype(m_PointSetPositive->GetMaxId().Index()) maxId = 0;
     if (m_PointSetPositive->GetSize() > 0)
     {
       maxId = m_PointSetPositive->GetMaxId().Index();
@@ -259,7 +259,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
       auto pointsVec = GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
       std::string pointsCSV;
       std::string labelsCSV;
-      pointsCSV.reserve((m_PointSetPositive->GetSize() + m_PointSetNegative->GetSize()) * 4);
+      pointsCSV.reserve((m_PointSetPositive->GetSize() + m_PointSetNegative->GetSize()) * 6);
       labelsCSV.reserve((m_PointSetPositive->GetSize() + m_PointSetNegative->GetSize()) * 2);
       for (const std::pair<mitk::Point2D, std::string>& pointPair : pointsVec)
       {
@@ -395,8 +395,7 @@ bool mitk::SegmentAnythingTool::run_download_model(std::string targetDir)
   return true;
 }
 
-std::vector<std::pair<mitk::Point2D, std::string>> mitk::SegmentAnythingTool::GetPointsAsCSVString(
-  const mitk::BaseGeometry *baseGeometry)
+std::vector<std::pair<mitk::Point2D, std::string>> mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry)
 {
   MITK_INFO << "No.of points: " << m_PointSetPositive->GetSize();
   std::vector<std::pair<mitk::Point2D, std::string>> clickVec;
@@ -408,25 +407,33 @@ std::vector<std::pair<mitk::Point2D, std::string>> mitk::SegmentAnythingTool::Ge
     if (pointSetItPos != m_PointSetPositive->End())
     {
       mitk::Point3D point = pointSetItPos.Value();
-      baseGeometry->WorldToIndex(point, point);
-      MITK_INFO << point[0] << " " << point[1] << " " << point[2]; // remove
-      Point2D p2D;
-      p2D.SetElement(0, point[0]);
-      p2D.SetElement(1, point[1]);
-      clickVec.push_back(std::pair(p2D, "1"));
+      if (baseGeometry->IsInside(point))
+      {
+        Point2D p2D = Get2DIndicesfrom3DWorld(baseGeometry, point);
+        clickVec.push_back(std::pair(p2D, "1"));
+      }
       ++pointSetItPos;
     }
     if (pointSetItNeg != m_PointSetNegative->End())
     {
       mitk::Point3D point = pointSetItNeg.Value();
-      baseGeometry->WorldToIndex(point, point);
-      MITK_INFO << point[0] << " " << point[1] << " " << point[2]; // remove
-      Point2D p2D;
-      p2D.SetElement(0, point[0]);
-      p2D.SetElement(1, point[1]);
-      clickVec.push_back(std::pair(p2D, "0"));
+      if (baseGeometry->IsInside(point))
+      {
+        Point2D p2D = Get2DIndicesfrom3DWorld(baseGeometry, point);
+        clickVec.push_back(std::pair(p2D, "0"));
+      }
       ++pointSetItNeg;
     }
   }
   return clickVec;
+}
+
+mitk::Point2D mitk::SegmentAnythingTool::Get2DIndicesfrom3DWorld(const mitk::BaseGeometry* baseGeometry, mitk::Point3D& point3d)
+{
+  baseGeometry->WorldToIndex(point3d, point3d);
+  MITK_INFO << point3d[0] << " " << point3d[1] << " " << point3d[2]; // remove
+  Point2D point2D;
+  point2D.SetElement(0, point3d[0]);
+  point2D.SetElement(1, point3d[1]);
+  return point2D;
 }

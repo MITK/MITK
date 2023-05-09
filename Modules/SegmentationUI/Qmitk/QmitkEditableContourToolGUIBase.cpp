@@ -13,28 +13,33 @@ found in the LICENSE file.
 #include <QmitkEditableContourToolGUIBase.h>
 #include <ui_QmitkEditableContourToolGUIControls.h>
 
+#include <QButtonGroup>
+
 #include <mitkEditableContourTool.h>
 
 QmitkEditableContourToolGUIBase::QmitkEditableContourToolGUIBase()
   : QmitkToolGUI(),
-    m_Controls(new Ui::QmitkEditableContourToolGUIControls)
+    m_Controls(new Ui::QmitkEditableContourToolGUIControls),
+    m_ModeButtonGroup(new QButtonGroup(this))
 {
   m_Controls->setupUi(this);
 
-  m_Controls->m_Information->hide();
-  m_Controls->m_AutoCheck->setChecked(true);
   m_Controls->m_ConfirmButton->hide();
-  m_Controls->m_AddMode->setChecked(true);
-  m_Controls->m_SubtractMode->hide();
   m_Controls->m_AddMode->hide();
+  m_Controls->m_SubtractMode->hide();
   m_Controls->m_ClearButton->hide();
+  m_Controls->m_Information->hide();
 
+  m_ModeButtonGroup->addButton(m_Controls->m_AddMode, static_cast<int>(Mode::Add));
+  m_ModeButtonGroup->addButton(m_Controls->m_SubtractMode, static_cast<int>(Mode::Subtract));
+
+  connect(this, &Self::NewToolAssociated, this, &Self::OnNewToolAssociated);
+
+  connect(m_Controls->m_AutoCheck, &QCheckBox::toggled, this, &Self::OnAutoConfirm);
+  connect(m_ModeButtonGroup, &QButtonGroup::idClicked, [this](int id) { this->OnModeToggled(static_cast<Mode>(id)); });
   connect(m_Controls->m_ConfirmButton, &QPushButton::clicked, this, &Self::OnConfirmSegmentation);
   connect(m_Controls->m_ClearButton, &QPushButton::clicked, this, &Self::OnClearContour);
-  connect(this, &Self::NewToolAssociated, this, &Self::OnNewToolAssociated);
   connect(m_Controls->m_InformationCheckBox, &QCheckBox::toggled, this, &Self::OnShowInformation);
-  connect(m_Controls->m_AutoCheck, &QCheckBox::toggled, this, &Self::OnAutoConfirm);
-  connect(m_Controls->m_AddMode, &QRadioButton::toggled, this, &Self::OnAddModeToogled);
 }
 
 QmitkEditableContourToolGUIBase::~QmitkEditableContourToolGUIBase()
@@ -51,10 +56,40 @@ void QmitkEditableContourToolGUIBase::OnNewToolAssociated(mitk::Tool* tool)
   const auto autoConfirm = m_NewTool->GetAutoConfirm();
   m_Controls->m_AutoCheck->setChecked(autoConfirm);
 
-  const auto addMode = m_NewTool->GetAddMode();
-  m_Controls->m_AddMode->setChecked(addMode);
+  const auto mode = m_NewTool->GetAddMode()
+    ? Mode::Add
+    : Mode::Subtract;
+
+  m_ModeButtonGroup->button(static_cast<int>(mode))->setChecked(true);
 
   this->OnAutoConfirm(autoConfirm);
+  this->OnModeToggled(mode);
+}
+
+void QmitkEditableContourToolGUIBase::OnAutoConfirm(bool on)
+{
+  m_Controls->m_ConfirmButton->setVisible(!on);
+  m_Controls->m_ClearButton->setVisible(!on);
+  m_Controls->m_AddMode->setVisible(!on);
+  m_Controls->m_SubtractMode->setVisible(!on);
+
+  if (on)
+    m_Controls->m_AddMode->setChecked(true);
+
+  if (m_NewTool.IsNotNull())
+  {
+    if (on && m_NewTool->IsEditingContour())
+      this->OnConfirmSegmentation();
+
+    m_NewTool->SetAutoConfirm(on);
+    m_NewTool->SetAddMode(m_Controls->m_AddMode->isChecked());
+  }
+}
+
+void QmitkEditableContourToolGUIBase::OnModeToggled(Mode mode)
+{
+  if (m_NewTool.IsNotNull())
+    m_NewTool->SetAddMode(Mode::Add == mode);
 }
 
 void QmitkEditableContourToolGUIBase::OnConfirmSegmentation()
@@ -72,30 +107,4 @@ void QmitkEditableContourToolGUIBase::OnClearContour()
 void QmitkEditableContourToolGUIBase::OnShowInformation(bool on)
 {
   m_Controls->m_Information->setVisible(on);
-}
-
-void QmitkEditableContourToolGUIBase::OnAutoConfirm(bool on)
-{
-  m_Controls->m_ConfirmButton->setVisible(!on);
-  m_Controls->m_ClearButton->setVisible(!on);
-  m_Controls->m_AddMode->setVisible(!on);
-
-  if (on)
-    m_Controls->m_AddMode->setChecked(true);
-
-  m_Controls->m_SubtractMode->setVisible(!on);
-
-  if (m_NewTool.IsNotNull())
-  {
-    if (on && m_NewTool->IsEditingContour())
-      this->OnConfirmSegmentation();
-
-    m_NewTool->SetAutoConfirm(on);
-  }
-}
-
-void QmitkEditableContourToolGUIBase::OnAddModeToogled(bool on)
-{
-  if (m_NewTool.IsNotNull())
-    m_NewTool->SetAddMode(on);
 }

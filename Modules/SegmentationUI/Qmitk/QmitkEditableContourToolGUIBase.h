@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include <QmitkToolGUI.h>
 #include <MitkSegmentationUIExports.h>
 
+class QButtonGroup;
+
 namespace mitk
 {
   class EditableContourTool;
@@ -36,6 +38,12 @@ class MITKSEGMENTATIONUI_EXPORT QmitkEditableContourToolGUIBase : public QmitkTo
   Q_OBJECT
 
 public:
+  enum class MITKSEGMENTATIONUI_EXPORT Mode
+  {
+    Add,
+    Subtract
+  };
+
   mitkClassMacro(QmitkEditableContourToolGUIBase, QmitkToolGUI);
   itkFactorylessNewMacro(Self);
 
@@ -45,7 +53,7 @@ protected slots:
   void OnConfirmSegmentation();
   void OnClearContour();
   void OnAutoConfirm(bool on);
-  void OnAddModeToogled(bool on);
+  void OnModeToggled(Mode mode);
   void OnShowInformation(bool on);
 
 protected:
@@ -53,6 +61,7 @@ protected:
   ~QmitkEditableContourToolGUIBase() override;
 
   Ui::QmitkEditableContourToolGUIControls* m_Controls;
+  QButtonGroup* m_ModeButtonGroup;
   itk::SmartPointer<mitk::EditableContourTool> m_NewTool;
 };
 

@@ -268,7 +268,7 @@ namespace mitk
      * @param layerID Layer from which to get the contours.
      * @return std::vector<ContourPositionInformation> Returns contours.
      */
-    ContourPositionInformationList& GetContours(unsigned int timeStep, unsigned int layerID);
+    ContourPositionInformationList* GetContours(unsigned int timeStep, unsigned int layerID);
 
     /**
      * @brief Trigerred with the "Reinit Interpolation" action. The contours are used to repopulate the

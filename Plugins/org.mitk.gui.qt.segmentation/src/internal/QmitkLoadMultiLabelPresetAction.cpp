@@ -13,18 +13,12 @@ found in the LICENSE file.
 #include "QmitkLoadMultiLabelPresetAction.h"
 
 #include <mitkLabelSetImage.h>
-#include <mitkMultiLabelIOHelper.h>
+#include <QmitkMultiLabelPresetHelper.h>
 
-#include <QFileDialog>
 
 void QmitkLoadMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
-  const auto filename = QFileDialog::getOpenFileName(nullptr, QStringLiteral("Load Label Set Preset"),
-    QString(), QStringLiteral("Label set preset (*.lsetp)")).toStdString();
-
-  if (filename.empty())
-    return;
-
+  std::vector<mitk::LabelSetImage::Pointer> images;
   for (const auto &node : selectedNodes)
   {
     if (node.IsNull())
@@ -35,8 +29,9 @@ void QmitkLoadMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &
     if (image.IsNull())
       continue;
 
-    mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(filename, image);
+    images.emplace_back(image);
   }
+  QmitkLoadMultiLabelPreset(images);
 }
 
 void QmitkLoadMultiLabelPresetAction::SetDataStorage(mitk::DataStorage*)

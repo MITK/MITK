@@ -132,6 +132,7 @@ private Q_SLOTS:
 
   void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position) const;
   void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
+  void OnModelUpdated();
 
 private:
   enum TableColumns
@@ -149,6 +150,12 @@ private:
   void RestoreOverrideCursor();
 
   void OnThreadedCalculationDone();
+
+  void AddSegmentationObserver();
+  void RemoveSegmentationObserver();
+
+  void OnLabelEvent(mitk::LabelSetImage::LabelValueType labelValue);
+  void OnGroupEvent(mitk::LabelSetImage::GroupIndexType groupIndex);
 
   Ui::QmitkMultiLabelManagerControls* m_Controls;
 

@@ -86,7 +86,7 @@ bool mitk::GrowCutTool::SeedImageIsValid()
 
   auto numberOfLabels = workingDataLabelSetImage->GetNumberOfLabels(workingDataLabelSetImage->GetActiveLayer());
 
-  if (numberOfLabels >= 3)
+  if (numberOfLabels >= 2)
   {
     return true;
   }
@@ -126,9 +126,9 @@ void mitk::GrowCutTool::DoUpdatePreview(const Image *inputAtTimeStep,
         mitkThrow() << "itkGrowCutFilter error";
       }
 
-      auto growCutResultImage = mitk::LabelSetImage::New();
-      growCutResultImage->InitializeByLabeledImage(growCutFilter->GetOutput());
+      auto growCutResultImage = growCutFilter->GetOutput();
 
-      TransferLabelSetImageContent(growCutResultImage, previewImage, timeStep);
+      mitk::ImageReadAccessor newMitkImgAcc(growCutResultImage);
+      previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
   }
 }

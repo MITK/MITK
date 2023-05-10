@@ -486,7 +486,8 @@ QModelIndex QmitkMultiLabelTreeModel::indexOfLabel(mitk::Label::PixelType labelV
   if (labelValue == mitk::LabelSetImage::UnlabeledValue) return QModelIndex();
   auto relevantItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
-  if (nullptr == relevantItem) QModelIndex();
+  if (nullptr == relevantItem)
+    return QModelIndex();
 
   auto labelItem = relevantItem->ParentItem();
 
@@ -597,6 +598,27 @@ std::vector <QmitkMultiLabelTreeModel::LabelValueType> QmitkMultiLabelTreeModel:
   }
 
   if (!currentItem) return {};
+
+  return currentItem->GetLabelsInSubTree();
+}
+
+std::vector <QmitkMultiLabelTreeModel::LabelValueType> QmitkMultiLabelTreeModel::GetLabelInstancesOfSameLabelClass(const QModelIndex& currentIndex) const
+{
+  const QmitkMultiLabelSegTreeItem* currentItem = nullptr;
+
+  if (currentIndex.isValid())
+  {
+    currentItem = static_cast<const QmitkMultiLabelSegTreeItem*>(currentIndex.internalPointer());
+  }
+
+  if (!currentItem)
+    return {};
+
+  if (QmitkMultiLabelSegTreeItem::ItemType::Group == currentItem->m_ItemType)
+    return {};
+
+  if (QmitkMultiLabelSegTreeItem::ItemType::Instance == currentItem->m_ItemType)
+    currentItem = currentItem->ParentItem();
 
   return currentItem->GetLabelsInSubTree();
 }
@@ -831,6 +853,8 @@ void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
       { //first label added
         auto groupIndex = GetIndexByItem(groupItem, this);
         emit dataChanged(groupIndex, groupIndex);
+        this->beginInsertRows(groupIndex, instanceItem->ParentItem()->Row(), instanceItem->ParentItem()->Row());
+        this->endInsertRows();
       }
       else
       { //whole new label level added to group item

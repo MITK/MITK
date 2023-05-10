@@ -86,12 +86,12 @@ mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateNewSegmentationNode(con
   return newSegmentationNode;
 }
 
-mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const LabelSetImage* labelSetImage)
+mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const LabelSetImage* labelSetImage, const std::string& namePrefix)
 {
   if (nullptr == labelSetImage)
     return nullptr;
 
-  const std::regex genericLabelNameRegEx("Label ([1-9][0-9]*)");
+  const std::regex genericLabelNameRegEx(namePrefix + " ([1-9][0-9]*)");
   int maxGenericLabelNumber = 0;
 
   std::vector<std::array<int, 3>> colorsInUse = { {0,0,0} }; //black is always in use.
@@ -111,7 +111,7 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const LabelSetIma
   }
 
   auto newLabel = mitk::Label::New();
-  newLabel->SetName("Label " + std::to_string(maxGenericLabelNumber + 1));
+  newLabel->SetName(namePrefix + " " + std::to_string(maxGenericLabelNumber + 1));
 
   auto lookupTable = mitk::LookupTable::New();
   lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);

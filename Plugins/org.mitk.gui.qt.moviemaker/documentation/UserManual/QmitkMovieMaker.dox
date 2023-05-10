@@ -8,31 +8,34 @@
 \section org_mitk_views_moviemakerOverview Overview
 
 The Movie Maker View allows you to create basic animations of your scene and to record them to video files.
-Individual animations are arranged in a timeline and can be played back sequential or in parallel.
+Individual animations are arranged in a timeline and can be played back sequentially or in parallel.
 
-The Movie Maker View uses the external FFmpeg command line utility to write compressed video files.
+The Movie Maker View uses the external FFmpeg command-line application to write compressed video files.
 
-<b>You have to manually install FFmpeg and set the corresponding path in "External Programs" in the MITK Workbench Preferences (Ctrl+P) in order to record your movies to video files.</b>
+<b>You must install FFmpeg and set its corresponding path in the "Movie Maker" preferences (Ctrl+P) to be able to record your movies to video files.</b>
 
-\imageMacro{QmitkMovieMaker_Preferences.png,"The External Programs preferences page.",12.00}
+\imageMacro{QmitkMovieMaker_Preferences.png,"The Movie Maker preferences page.",12.00}
 
 \section org_mitk_views_moviemakerUsage Usage
 
 \imageMacro{QmitkMovieMaker_MovieMakerView.png,"The Movie Maker View.",16.00}
 
-To create a movie you have to add an animation to the timeline by clicking the "Add animation" button.
+To create a movie, add an animation to the timeline by clicking the "Add animation" button.
 You can choose between the available types of animations, e.g., Orbit or Slice.
 
-The timeline surrounding bottons allow you to arrange, remove, or add further animations to your movie.
+The bottons sourroundng the timeline allow you to arrange, remove, or add further animations to your movie.
 
-Each animation can be set to either begin with the previous animation, i.e., run in parallel, or to start after the previous animation, i.e., run sequential.
+Each animation can be set to either begin with the previous animation, i.e., run in parallel, or to start after the previous animation, i.e., run sequentially.
 In combination with delays, rather complex animation arrangements are possible.
 
 To set animation specific parameters, select the corresponding animation in the timeline first.
 
-You can play back, pause and stop your movie with the according controls at the bottom of the Movie Maker View.
-Click the "Record" button to finally record your movie to a video file with the specified number of frames per second.
-You have to choose the render window which you want to record.
+You can play back, pause and stop your movie with the controls at the bottom of the Movie Maker View.
+Click the "Record" button to finally record your movie to a video file with the specified frame rate resp. number of frames per second.
+Choose the render window that you want to record.
+
+By default, movies are recorded into *.webm files using the open and royalty-free VP9 video codec.
+You can switch to the widespread *.mp4 file format using the non-free H.264 video codec in the Movie Maker preferences.
 
 \subsection org_mitk_views_moviemakerOrbitUsage Orbit Animation
 
@@ -47,8 +50,8 @@ Adjust the camera in the 3D window and restart the animation.
 
 The Slice animation slices through an image.
 You can choose the image plane (axial, sagittal, or coronal), as well as the start and end points of the slicing.
-Use the image navigator in the bottom left of the Workbench to get an idea of the desired values.
-Check "Reverse" in order to slice from the higher slice number to the lower slice number.
+Look at the Image Navigator View to get an idea of the desired values.
+Toggle "Reverse" to slice from the higher slice number to the lower slice number.
 
 \imageMacro{QmitkMovieMaker_Slice.png,"The Slice animation.",12.00}
 
@@ -56,8 +59,8 @@ Check "Reverse" in order to slice from the higher slice number to the lower slic
 
 The Time animation steps through the individual time steps of the current scene.
 You can specify the range of the animated time steps.
-Use the image navigator in the bottom left of the Workbench to get an idea of the desired values.
-Check "Reverse" in order to step from later time steps to previous time steps.
+Look at the Image Navigator View to get an idea of the desired values.
+Toggle "Reverse" to step from later time steps to previous time steps.
 
 \imageMacro{QmitkMovieMaker_Time.gif,"The Time animation.",12.00}
 

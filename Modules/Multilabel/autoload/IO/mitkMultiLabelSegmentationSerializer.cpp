@@ -17,17 +17,17 @@ found in the LICENSE file.
 
 #include <mitkIOUtil.h>
 
-MITK_REGISTER_SERIALIZER(MultiLabelSegmentationSerializer)
+MITK_REGISTER_SERIALIZER(LabelSetImageSerializer)
 
-mitk::MultiLabelSegmentationSerializer::MultiLabelSegmentationSerializer()
+mitk::LabelSetImageSerializer::LabelSetImageSerializer()
 {
 }
 
-mitk::MultiLabelSegmentationSerializer::~MultiLabelSegmentationSerializer()
+mitk::LabelSetImageSerializer::~LabelSetImageSerializer()
 {
 }
 
-std::string mitk::MultiLabelSegmentationSerializer::Serialize()
+std::string mitk::LabelSetImageSerializer::Serialize()
 {
   const auto *image = dynamic_cast<const LabelSetImage *>(m_Data.GetPointer());
   if (image == nullptr)

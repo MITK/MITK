@@ -1154,16 +1154,21 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabels()
 const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabelsInGroup(GroupIndexType index) const
 {
   if (!this->ExistGroup(index))
-  {
     mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
-  }
 
   mitk::LabelSetImage::ConstLabelVectorType result;
 
-  const auto labellist = m_GroupToLabelMap.find(index)->second;
-  for (const auto& labelvalue : labellist)
+  auto iter = m_GroupToLabelMap.find(index);
+
+  if (iter != m_GroupToLabelMap.end())
   {
-    result.emplace_back(this->GetLabel(labelvalue));
+    for (const auto& labelValue : iter->second)
+    {
+      const auto* label = this->GetLabel(labelValue);
+
+      if (label != nullptr)
+        result.emplace_back(label);
+    }
   }
 
   return result;
@@ -1172,16 +1177,21 @@ const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabelsIn
 const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabelsInGroup(GroupIndexType index)
 {
   if (!this->ExistGroup(index))
-  {
     mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
-  }
 
   mitk::LabelSetImage::LabelVectorType result;
 
-  const auto labellist = m_GroupToLabelMap[index];
-  for (const auto& labelvalue : labellist)
+  auto iter = m_GroupToLabelMap.find(index);
+
+  if (iter != m_GroupToLabelMap.end())
   {
-    result.emplace_back(this->GetLabel(labelvalue));
+    for (const auto& labelValue : iter->second)
+    {
+      auto* label = this->GetLabel(labelValue);
+
+      if (label != nullptr)
+        result.emplace_back(label);
+    }
   }
 
   return result;

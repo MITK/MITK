@@ -427,10 +427,10 @@ void mitk::SegWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage,
       TransferLabelContentAtTimeStep(sourceLSImage, destLSImage, timeStep, labelMapping, m_MergeStyle, m_OverwriteStyle);
     }
   }
-  catch (...)
+  catch (mitk::Exception& e)
   {
-    Tool::ErrorMessage("Error accessing single time steps of the original image. Cannot create segmentation.");
-    throw;
+    Tool::ErrorMessage(e.GetDescription());
+    mitkReThrow(e);
   }
 }
 

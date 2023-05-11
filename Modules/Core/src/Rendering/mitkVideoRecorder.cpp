@@ -246,7 +246,7 @@ namespace mitk
       bool vp9 = OutputFormat::WebM_VP9 == this->GetOutputFormat();
 
       std::stringstream stream;
-      stream << this->GetFFmpegPath()
+      stream << this->GetFFmpegPath() << ' '
         << "-y" << ' '
         << "-r " << std::to_string(this->GetFrameRate()) << ' '
         << "-i %6d.png" << ' '

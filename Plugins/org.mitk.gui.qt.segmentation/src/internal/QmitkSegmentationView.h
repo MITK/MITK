@@ -94,25 +94,6 @@ private:
   * to listen to 'SegmentationInteractionEvent's.
   */
   void ActiveToolChanged();
-  /**
-  * @brief Test whether the geometry of the reference image
-  *        fits the world geometry of the respective renderer.
-  *
-  * The respective renderer is retrieved from the given event, which
-  * needs to be a 'SegmentationInteractionEvent'.
-  * This event provides not only the sending base renderer but also a
-  * bool that indicates whether the mouse cursor entered or left the
-  * base renderer.
-  * This information is used to compare the renderer's world geometry
-  * with the oriented time geometry of the current reference image.
-  * If the geometries align, the renderer is not blocked anymore and the
-  * view's warning message is removed.
-  * If the geometries do not align, 'ShowRenderWindowWarning' is called
-  * and a warning message is added to the top of this plugin view.
-  *
-  * @param event   The observed mitk::SegmentationInteractionEvent.
-  */
-  void ValidateRendererGeometry(const itk::EventObject& event);
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;

@@ -98,36 +98,26 @@ void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep
   if (nullptr != inputAtTimeStep && nullptr != previewImage)
   {
     AccessByItk_n(inputAtTimeStep, ITKThresholding, (previewImage, timeStep));
-
-    auto* labelSet = previewImage->GetActiveLabelSet();
-    auto labelValue = this->GetUserDefinedActiveLabel();
-
-    if (!labelSet->ExistLabel(labelValue))
-    {
-      auto label = mitk::Label::New();
-      label->SetValue(labelValue);
-      labelSet->AddLabel(label);
-    }
-
-    labelSet->GetLabel(labelValue)->SetColor(this->GetTargetSegmentation()->GetActiveLabelSet()->GetLabel(labelValue)->GetColor());
-    labelSet->UpdateLookupTable(labelValue);
   }
 }
 
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::BinaryThresholdBaseTool::ITKThresholding(const itk::Image<TPixel, VImageDimension>* inputImage,
-                                                    Image* segmentation,
+                                                    LabelSetImage *segmentation,
                                                     unsigned int timeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
   typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
 
+  const auto activeValue = this->GetActiveLabelValueOfPreview();
+  this->SetSelectedLabels({activeValue});
+
   typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
   filter->SetInput(inputImage);
   filter->SetLowerThreshold(m_LowerThreshold);
   filter->SetUpperThreshold(m_UpperThreshold);
-  filter->SetInsideValue(this->GetUserDefinedActiveLabel());
+  filter->SetInsideValue(activeValue);
   filter->SetOutsideValue(0);
   filter->Update();
 

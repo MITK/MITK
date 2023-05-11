@@ -228,21 +228,7 @@ void QmitkSegmentationView::OnAnySelectionChanged()
   {
     workingNodeChanged = true;
 
-    // T29602: We need to check if the last label has been removed in which case we must disable the tools.
-    //         Likewise, if the first label is added to a previously empty segmentation, enable the tools.
-    auto onLabelAdded = mitk::MessageDelegate1<QmitkSegmentationView, mitk::LabelSetImage::LabelValueType>(this, &QmitkSegmentationView::OnLabelAdded);
-    auto onLabelRemoved = mitk::MessageDelegate1<QmitkSegmentationView, mitk::LabelSetImage::LabelValueType>(this, &QmitkSegmentationView::OnLabelRemoved);
-    auto onGroupRemoved = mitk::MessageDelegate1<QmitkSegmentationView, mitk::LabelSetImage::GroupIndexType>(this, &QmitkSegmentationView::OnGroupRemoved);
-
-    if (m_WorkingNode.IsNotNull())
-    {
-      if (auto* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData()); workingImage != nullptr)
-      {
-        workingImage->RemoveLabelAddedListener(onLabelAdded);
-        workingImage->RemoveLabelRemovedListener(onLabelRemoved);
-        workingImage->RemoveGroupRemovedListener(onGroupRemoved);
-      }
-    }
+    this->RemoveObserversFromWorkingImage();
 
     // Remove visibility observer for the current working node
     if (m_WorkingDataObserverTags.find(m_WorkingNode) != m_WorkingDataObserverTags.end())
@@ -266,12 +252,7 @@ void QmitkSegmentationView::OnAnySelectionChanged()
       m_WorkingDataObserverTags[m_WorkingNode] =
         m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
 
-      if (auto* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData()); workingImage != nullptr)
-      {
-        workingImage->AddLabelAddedListener(onLabelAdded);
-        workingImage->AddLabelRemovedListener(onLabelRemoved);
-        workingImage->AddGroupRemovedListener(onGroupRemoved);
-      }
+      this->AddObserversToWorkingImage();
     }
   }
 
@@ -300,6 +281,38 @@ void QmitkSegmentationView::OnLabelRemoved(mitk::LabelSetImage::LabelValueType)
 void QmitkSegmentationView::OnGroupRemoved(mitk::LabelSetImage::GroupIndexType)
 {
   this->ValidateSelectionInput();
+}
+
+mitk::LabelSetImage* QmitkSegmentationView::GetWorkingImage()
+{
+  if (m_WorkingNode.IsNull())
+    return nullptr;
+
+  return dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+}
+
+void QmitkSegmentationView::AddObserversToWorkingImage()
+{
+  auto* workingImage = this->GetWorkingImage();
+
+  if (workingImage != nullptr)
+  {
+    workingImage->AddLabelAddedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelAdded));
+    workingImage->AddLabelRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelRemoved));
+    workingImage->AddGroupRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::GroupIndexType>(this, &Self::OnGroupRemoved));
+  }
+}
+
+void QmitkSegmentationView::RemoveObserversFromWorkingImage()
+{
+  auto* workingImage = this->GetWorkingImage();
+
+  if (workingImage != nullptr)
+  {
+    workingImage->RemoveLabelAddedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelAdded));
+    workingImage->RemoveLabelRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelRemoved));
+    workingImage->RemoveGroupRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::GroupIndexType>(this, &Self::OnGroupRemoved));
+  }
 }
 
 void QmitkSegmentationView::OnVisibilityShortcutActivated()

@@ -85,6 +85,10 @@ private:
 
   using Self = QmitkSegmentationView;
 
+  mitk::LabelSetImage* GetWorkingImage();
+  void AddObserversToWorkingImage();
+  void RemoveObserversFromWorkingImage();
+
   void CreateQtPartControl(QWidget* parent) override;
 
   void SetFocus() override {}

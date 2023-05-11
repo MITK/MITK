@@ -433,6 +433,7 @@ void QmitkTotalSegmentatorToolGUI::OnClearInstall()
   if (folderPath.removeRecursively())
   {
     m_Controls.installButton->setEnabled(true);
+    m_IsInstalled = false;
     if (!m_Controls.overrideBox->isChecked())
     {
       m_Controls.previewButton->setEnabled(false);

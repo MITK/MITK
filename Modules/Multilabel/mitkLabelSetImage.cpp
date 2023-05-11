@@ -91,6 +91,8 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
     m_LayerContainer.push_back(liClone);
   }
 
+  this->ReinitMaps();
+
   // Add some DICOM Tags as properties to segmentation image
   DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
 }

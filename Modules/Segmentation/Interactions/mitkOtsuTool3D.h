@@ -51,7 +51,7 @@ namespace mitk
     unsigned int GetMaxNumberOfBins() const;
 
   protected:
-    OtsuTool3D() = default;
+    OtsuTool3D();
     ~OtsuTool3D() = default;
 
     void UpdatePrepare() override;

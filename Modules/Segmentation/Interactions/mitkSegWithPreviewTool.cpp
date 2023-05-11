@@ -297,13 +297,25 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
 
       m_PreviewSegmentationNode->SetData(newPreviewImage);
 
-      auto* activeLayer = newPreviewImage->GetActiveLabelSet();
-      auto* activeLabel = activeLayer->GetActiveLabel();
-      if (m_UseSpecialPreviewColor)
+      auto* activeLabelSet = newPreviewImage->GetActiveLabelSet();
+      if (nullptr == activeLabelSet)
+      {
+        newPreviewImage->AddLayer();
+        activeLabelSet = newPreviewImage->GetActiveLabelSet();
+      }
+
+      auto* activeLabel = activeLabelSet->GetActiveLabel();
+      if (nullptr == activeLabel)
+      {
+        activeLabel = activeLabelSet->AddLabel("toolresult", previewColor);
+        activeLabelSet = newPreviewImage->GetActiveLabelSet();
+        activeLabelSet->UpdateLookupTable(activeLabel->GetValue());
+      }
+      else if (m_UseSpecialPreviewColor)
       {
         // Let's paint the feedback node green...
         activeLabel->SetColor(previewColor);
-        activeLayer->UpdateLookupTable(activeLabel->GetValue());
+        activeLabelSet->UpdateLookupTable(activeLabel->GetValue());
       }
       activeLabel->SetVisible(true);
     }
@@ -373,24 +385,40 @@ mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMap
     }
   }
 
-  LabelMappingType labelMapping = { { this->GetUserDefinedActiveLabel(),this->GetUserDefinedActiveLabel() } };
+  LabelMappingType labelMapping = {};
 
-  if (LabelTransferScope::SelectedLabels == this->m_LabelTransferScope)
+  switch (this->m_LabelTransferScope)
   {
-    labelMapping.clear();
-    for (auto label : this->m_SelectedLabels)
-    {
-      labelMapping.push_back({ label, label+offset });
-    }
-  }
-  else if (LabelTransferScope::AllLabels == this->m_LabelTransferScope)
-  {
-    labelMapping.clear();
-    const auto labelSet = this->GetPreviewSegmentation()->GetActiveLabelSet();
-    for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
-    {
-      labelMapping.push_back({ labelIter->second->GetValue(),labelIter->second->GetValue()+offset });
-    }
+    case LabelTransferScope::SelectedLabels:
+      {
+        for (auto label : this->m_SelectedLabels)
+        {
+          labelMapping.push_back({label, label + offset});
+        }
+      }
+      break;
+    case LabelTransferScope::AllLabels:
+      {
+        const auto labelSet = this->GetPreviewSegmentation()->GetActiveLabelSet();
+        for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
+        {
+        labelMapping.push_back({labelIter->second->GetValue(), labelIter->second->GetValue() + offset});
+        }
+      }
+      break;
+    default:
+      {
+        if (m_SelectedLabels.empty())
+          mitkThrow() << "Failed to generate label transfer mapping. Tool is in an invalid state, as "
+                         "LabelTransferScope==ActiveLabel but no label is indicated as selected label. Check "
+                         "implementation of derived tool class.";
+        if (m_SelectedLabels.size() > 1)
+        mitkThrow() << "Failed to generate label transfer mapping. Tool is in an invalid state, as "
+                       "LabelTransferScope==ActiveLabel but more then one selected label is indicated."
+                       "Should be only one. Check implementation of derived tool class.";
+        labelMapping.push_back({m_SelectedLabels.front(), this->GetUserDefinedActiveLabel()});
+      }
+      break;
   }
 
   return labelMapping;
@@ -427,10 +455,10 @@ void mitk::SegWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage,
       TransferLabelContentAtTimeStep(sourceLSImage, destLSImage, timeStep, labelMapping, m_MergeStyle, m_OverwriteStyle);
     }
   }
-  catch (...)
+  catch (mitk::Exception& e)
   {
-    Tool::ErrorMessage("Error accessing single time steps of the original image. Cannot create segmentation.");
-    throw;
+    Tool::ErrorMessage(e.GetDescription());
+    mitkReThrow(e);
   }
 }
 
@@ -706,6 +734,18 @@ void mitk::SegWithPreviewTool::PreparePreviewToResultTransfer(const LabelMapping
 mitk::TimePointType mitk::SegWithPreviewTool::GetLastTimePointOfUpdate() const
 {
   return m_LastTimePointOfUpdate;
+}
+
+mitk::LabelSetImage::LabelValueType mitk::SegWithPreviewTool::GetActiveLabelValueOfPreview() const
+{
+  const auto previewImage = this->GetPreviewSegmentation();
+  const auto activeLabel = previewImage->GetActiveLabel(previewImage->GetActiveLayer());
+  if (nullptr == activeLabel)
+    mitkThrow() << this->GetNameOfClass() <<" is in an invalid state, as "
+                   "preview has no active label indicated. Check "
+                   "implementation of the class.";
+
+  return activeLabel->GetValue();
 }
 
 const char* mitk::SegWithPreviewTool::GetGroup() const

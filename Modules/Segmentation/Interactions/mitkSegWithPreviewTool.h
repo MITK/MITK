@@ -76,7 +76,10 @@ namespace mitk
 
     enum class LabelTransferScope
     {
-      ActiveLabel, //Only the active label will be transfered from preview to segmentation.
+      ActiveLabel, //Only the selected label will be transfered from the preview segmentation
+                   //to the result segmentation.
+                   //If this mode is selected the class expects that GetSelectedLabels indicate
+                   //the label in the preview.
       SelectedLabels, //The labels defined as selected labels will be transfered.
       AllLabels //Transfer all labels of the preview
     };
@@ -86,8 +89,10 @@ namespace mitk
 
     using SelectedLabelVectorType = std::vector<Label::PixelType>;
     /** Specifies the labels that should be transfered form preview to the working image,
-      if the segmentation is confirmed. The setting will be used, if LabelTransferScope is set to "SelectedLabels".
-      The selected label IDs corespond to the labels of the preview image.*/
+      if the segmentation is confirmed. The setting will be used, if LabelTransferScope is set to "ActiveLabel"
+      or "SelectedLabels".
+      @remark If the LabelTransferScope=="ActiveLabel", the class expects only one label to be selected.
+      @remark The selected label IDs corespond to the labels of the preview image.*/
     void SetSelectedLabels(const SelectedLabelVectorType& labelsToTransfer);
     itkGetMacro(SelectedLabels, SelectedLabelVectorType);
 
@@ -223,6 +228,8 @@ namespace mitk
     void ResetPreviewContentAtTimeStep(unsigned int timeStep);
 
     TimePointType GetLastTimePointOfUpdate() const;
+
+    LabelSetImage::LabelValueType GetActiveLabelValueOfPreview() const;
 
     itkGetConstMacro(UserDefinedActiveLabel, Label::PixelType);
 

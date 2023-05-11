@@ -228,6 +228,22 @@ void QmitkSegmentationView::OnAnySelectionChanged()
   {
     workingNodeChanged = true;
 
+    // T29602: We need to check if the last label has been removed in which case we must disable the tools.
+    //         Likewise, if the first label is added to a previously empty segmentation, enable the tools.
+    auto onLabelAdded = mitk::MessageDelegate1<QmitkSegmentationView, mitk::LabelSetImage::LabelValueType>(this, &QmitkSegmentationView::OnLabelAdded);
+    auto onLabelRemoved = mitk::MessageDelegate1<QmitkSegmentationView, mitk::LabelSetImage::LabelValueType>(this, &QmitkSegmentationView::OnLabelRemoved);
+    auto onGroupRemoved = mitk::MessageDelegate1<QmitkSegmentationView, mitk::LabelSetImage::GroupIndexType>(this, &QmitkSegmentationView::OnGroupRemoved);
+
+    if (m_WorkingNode.IsNotNull())
+    {
+      if (auto* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData()); workingImage != nullptr)
+      {
+        workingImage->RemoveLabelAddedListener(onLabelAdded);
+        workingImage->RemoveLabelRemovedListener(onLabelRemoved);
+        workingImage->RemoveGroupRemovedListener(onGroupRemoved);
+      }
+    }
+
     // Remove visibility observer for the current working node
     if (m_WorkingDataObserverTags.find(m_WorkingNode) != m_WorkingDataObserverTags.end())
     {
@@ -249,6 +265,13 @@ void QmitkSegmentationView::OnAnySelectionChanged()
 
       m_WorkingDataObserverTags[m_WorkingNode] =
         m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
+
+      if (auto* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData()); workingImage != nullptr)
+      {
+        workingImage->AddLabelAddedListener(onLabelAdded);
+        workingImage->AddLabelRemovedListener(onLabelRemoved);
+        workingImage->AddGroupRemovedListener(onGroupRemoved);
+      }
     }
   }
 
@@ -262,6 +285,21 @@ void QmitkSegmentationView::OnAnySelectionChanged()
   }
 
   this->UpdateGUI();
+}
+
+void QmitkSegmentationView::OnLabelAdded(mitk::LabelSetImage::LabelValueType)
+{
+  this->ValidateSelectionInput();
+}
+
+void QmitkSegmentationView::OnLabelRemoved(mitk::LabelSetImage::LabelValueType)
+{
+  this->ValidateSelectionInput();
+}
+
+void QmitkSegmentationView::OnGroupRemoved(mitk::LabelSetImage::GroupIndexType)
+{
+  this->ValidateSelectionInput();
 }
 
 void QmitkSegmentationView::OnVisibilityShortcutActivated()
@@ -971,8 +1009,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     m_Controls->toolSelectionBox3D->setEnabled(true);
 
     auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
-    auto activeLayer = labelSetImage->GetActiveLayer();
-    numberOfLabels = labelSetImage->GetNumberOfLabels(activeLayer);
+    numberOfLabels = labelSetImage->GetTotalNumberOfLabels();
 
     if (numberOfLabels > 0)
       m_Controls->slicesInterpolator->setEnabled(true);

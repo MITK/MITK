@@ -83,6 +83,8 @@ private Q_SLOTS:
 
 private:
 
+  using Self = QmitkSegmentationView;
+
   void CreateQtPartControl(QWidget* parent) override;
 
   void SetFocus() override {}

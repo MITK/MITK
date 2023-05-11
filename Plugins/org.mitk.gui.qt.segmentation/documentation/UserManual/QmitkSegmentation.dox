@@ -26,7 +26,7 @@ For an introduction to the Segmentation Utilities, refer to the respective user 
 
 \section org_mitk_views_segmentationtechnicalissues Image and segmentation prerequisites
 
-The Segmentation View has a few prerequisites regarding the segmentations and their reference image:
+The Segmentation View has a few prerequisites regarding segmentations and their reference image:
 <ul>
   <li> Images must be two or three-dimensional and may be either static or dynamic, e.g., are time-resolved resp. have different pixel values for different time steps.
   <li> Images must be single-valued, i.e. CT, MRI or ultrasound. Images from color doppler or photographic (RGB) images are only partially supported (please be aware that some tools might not be compatible with this image type).
@@ -39,8 +39,9 @@ To select a reference image for a new segmentation, click on the <i>Image</i> wi
 Choose an image from the displayed list of Data Manager images.
 Once an image is selected, a new segmentation for this reference image can be created by clicking the button right next to the <i>Segmentation</i> widget in the Data selection section.
 A new multilabel segmentation with an initial, empty label is automatically generated if not set otherwise in the preferences.
-The new segmentation will be added to the Data Manager as child node of its reference image node.
-It is automatically selected edit can be edited in the Segmentation View right away.
+The new segmentation will be added to the Data Manager as a child node of its reference image node.
+It is automatically selected and can be edited in the Segmentation View right away.
+
 Instead of creating a new segmentation, an existing segmentation can be selected and edited as well.
 The selection list of existing segmentations for a certain reference image consists of matching/congruent segmentations only.
 
@@ -64,52 +65,57 @@ It is all about possibly overlapping labels from distinct groups and spatially e
 
 \imageMacro{"QmitkSegmentation_Groups.png","Groups",10}
 
-\section org_mitk_views_segmentationlabelinstances Label instances
+\section org_mitk_views_segmentationlabelinstances Labels vs. label instances vs. label classes
 
-The Segmentation View also supports label instances.
+The Segmentation View supports label instances.
 That is, segmenting multiple distributed entities of the same thing like metastases for example.
-A label is already a single instance of itself but for the sake of clearness it is only shown explicitly as such as soon as there are multiple instances of the same label (also refered to as label class).
 
-Technically all label instances have their own distinct label/pixel value that is explicitly shown in square brackets as a clue for distinction and identification.
-It is important to understand that this number is not a classic index starting at zero for each label class. It is just the plain label/pixel value of the label instance, which is unique across all labels of the whole segmentation.
+A label, as we used the term before, is already a single instance of itself when seen as a label class, hence, a label class may consist of multiple label instances.
+For the sake of clearness, a label instance is only shown explicitly as a label instance as soon as there are multiple instances of the same label class.
+
+All label instances have their own distinct pixel value that is explicitly shown in square brackets as a clue for distinction and identification.
+It is important to understand that this number is not a separate, consequtive index for each label class.
+It is just the plain pixel value of the label instance, which is unique across all label instances of the whole segmentation.
+
+Hereafter we use the distinct terms <b>label instance</b> and <b>label class</b> instead of the contextual and ambiguous term <b>label</b>.
 
 \imageMacro{"QmitkSegmentation_LabelInstances.png","Label instances",10}
 
-\section org_mitk_views_segmentationlock_color_visibility Unlocking, changing color of, and hiding labels
+\section org_mitk_views_segmentationlock_color_visibility Unlocking, changing color of, and hiding label instances
 
-Labels (and label instances) are locked by default: labels from the same group cannot accidentally override pixels from other labels.
-Locked labels behave like cookie cutters for other labels of the same group.
-You can unlock labels to remove that protection from other labels of the same group.
-Their pixel contents can then be overridden by other labels of the same group.
+Label instances are locked by default: label instances from the same group cannot accidentally override pixels from other label instances.
+Locked label instances behave like cookie cutters for other label instances of the same group.
+You can unlock label instances to remove that protection from other label instances of the same group.
+Their pixel contents can then be overridden by other label instances of the same group.
 
-Remember that labels from distinct groups do not interact with each other.
+Remember that label instances from distinct groups do not interact with each other.
 They can always overlap (not override) each other.
 
-You can also change the color of labels and label instances as well as show (default) or hide their pixel contents.
+You can also change the color of label instances as well as show (default) or hide their pixel contents.
 The icons at the right side of the rows of the groups and labels widget reflect their state in all these regards.
 
-Renaming of labels can be found in their content menu as shown further below.
+Renaming of label instances and label classes can be found in their content menu as shown further below.
 
-\imageMacro{"QmitkSegmentation_LockColorVisibility.png","Unlocking\, changing color of\, and hiding labels",10}
+\imageMacro{"QmitkSegmentation_LockColorVisibility.png","Unlocking\, changing color of\, and hiding label instances",10}
 
 \section org_mitk_views_segmentationcontextmenus Context menus
 
-Actions for organization of groups, labels, and label instances (as well as other operations) can be also found in their right-click context menus.
+Actions for organization of groups, label classes, and label instances (as well as other operations) can be also found in their right-click context menus.
 
-\imageMacro{"QmitkSegmentation_ContextMenus.png","Context menus of groups\, labels\, and label instances",12}
+\imageMacro{"QmitkSegmentation_ContextMenus.png","Context menus of groups\, label classes\, and label instances",12}
 
-Most actions available in these context menus are self-explanatory or were already described above by other means of access like the tool button bar for adding and removing groups, labels, and label instances.
+Most actions available in these context menus are self-explanatory or were already described above by other means of access like the tool button bar for adding and removing groups, label classes, and label instances.
 
-Labels and label instances can be <b>renamed</b>, while groups have fixed names.
+Label classes and label instances can be <b>renamed</b>, while groups have fixed names.
 This may change in future releases of MITK.
 
-<b>Clear content</b> only clears the pixels of a label or label instance but won't delete the actual label or label instance.
+<b>Clear content</b> only clears the pixels of a label instance but won't delete the actual label instance.
 
 Groups can be <b>locked</b> and <b>unlocked</b> as a whole from their context menu, while label instances can be directly locked and unlocked outside the context menu as decribed further below.
 
 \section org_mitk_views_segmentationlabelsuggestions Label name and color suggestions
 
-When renaming labels or creating new labels with enforced manual naming in the Segmentation preferences, entering names is supported by auto-completion for common label names.
+When renaming label instances or creating new label instances with enforced manual naming in the Segmentation preferences, entering names is supported by auto-completion for common label names.
 The list of predefined label names and colors for the auto-completion feature can be either extented or replaced by a custom list of label name and color suggestions.
 This custom list must be specified as a JSON file, just containing an array of objects, each with a mandatory "name" string and an optional "color" string.
 The JSON file can be set in the Segmentation preferences as well as a few options on how to apply these suggestions.
@@ -118,18 +124,18 @@ The JSON file can be set in the Segmentation preferences as well as a few option
 
 Label set presets are useful to share a certain style or scheme between different segmentation sessions or to provide templates for new segmentation sessions.
 
-The properties of all labels in all groups like their names, colors, and visibilities are saved as a label set preset by clicking on the 'Save label set preset' button.
+The properties of all label instances in all groups like their names, colors, and visibilities are saved as a label set preset by clicking on the 'Save label set preset' button.
 Label set presets are applied to any segmentation session by clicking on the 'Load label set preset' button.
-If a label for a certain value already exists, its properties are overridden by the preset.
-If a label for a certain value does not yet exist, an empty label with the label properties of the preset is created.
-The actual segmentations of labels are unaffected as label set presets only store label properties.
+If a label instance for a certain value already exists, its properties are overridden by the preset.
+If a label instance for a certain value does not yet exist, an empty label instance with the label properties of the preset is created.
+The actual pixel contents of label instances are unaffected as label set presets only store label properties.
 
 \imageMacro{QmitkSegmentation_Preset.png,"Saving and loading label set presets", 10.00}
 
 \subsection org_mitk_views_segmentationdefaultlabelpresets Applying label set presets by default
 
 If you work on a repetetive segmentation task, manually loading the same label set preset for each and every new segmentation can be tedious.
-To streamline your workflow, you can set a default label set preset in the Segmentation preferences (Ctrl+P). When set, this label set preset will be applied to all new segmentations instead of creating the default red "Label 1" label.
+To streamline your workflow, you can set a default label set preset in the Segmentation preferences (Ctrl+P). When set, this label set preset will be applied to all new segmentations instead of creating the default red "Label 1" label instance.
 
 \section org_mitk_views_segmentationpreferences Preferences
 
@@ -142,7 +148,7 @@ The Segmentation Plugin offers a number of preferences which can be set via the 
   <li> <b>2D display:</b> Draw segmentations as as outlines or transparent overlays
   <li> <b>Data node selection mode:</b> Hide everything but the selected segmentation and its reference image
   <li> <b>Default label set preset:</b> Start a new segmentation with this preset instead of a default label
-  <li> <b>Label creation:</b> Assign default names and colors to new labels or ask users for name and color
+  <li> <b>Label creation:</b> Assign default names and colors to new label instances or ask users for name and color
   <li> <b>Label suggestions:</b> Specify custom suggestions for label names and colors
 </ul>
 

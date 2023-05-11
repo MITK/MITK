@@ -152,7 +152,6 @@ void mitk::TotalSegmentatorTool::UpdatePrepare()
 {
   Superclass::UpdatePrepare();
   auto preview = this->GetPreviewSegmentation();
-  auto labelset = preview->GetLabelSet(preview->GetActiveLayer());
   for (LabelSetImage::GroupIndexType i = 0; i < preview->GetNumberOfLayers(); ++i)
   {
     preview->GetLabelSet(i)->RemoveAllLabels();

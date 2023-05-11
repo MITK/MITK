@@ -275,10 +275,28 @@ namespace mitk
       itksysProcess_Execute(ffmpeg);
       itksysProcess_WaitForExit(ffmpeg, nullptr);
 
-      if (itksysProcess_State_Exited != itksysProcess_GetState(ffmpeg))
+      auto state = itksysProcess_GetState(ffmpeg);
+
+      if (itksysProcess_State_Exited != state)
       {
+        std::stringstream message;
+        message << "FFmpeg process did not exit as expected: ";
+
+        if (itksysProcess_State_Error == state)
+        {
+          message << itksysProcess_GetErrorString(ffmpeg);
+        }
+        else if (itksysProcess_State_Exception == state)
+        {
+          message << itksysProcess_GetExceptionString(ffmpeg);
+        }
+
+        message << "\n  Command: " << commandLineCStr;
+        message << "\n  Working directory: " << workingDirectory.c_str();
+
         itksysProcess_Delete(ffmpeg);
-        mitkThrow() << "FFmpeg process did not exit as expected.";
+
+        mitkThrow() << message.str();
       }
 
       auto exitCode = itksysProcess_GetExitValue(ffmpeg);

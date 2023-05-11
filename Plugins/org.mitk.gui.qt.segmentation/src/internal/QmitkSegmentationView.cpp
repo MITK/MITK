@@ -123,6 +123,8 @@ QmitkSegmentationView::~QmitkSegmentationView()
     }
     m_WorkingDataObserverTags.clear();
 
+    this->RemoveObserversFromWorkingImage();
+
     // removing all observers from reference data
     for (NodeTagMapType::iterator dataIter = m_ReferenceDataObserverTags.begin(); dataIter != m_ReferenceDataObserverTags.end(); ++dataIter)
     {

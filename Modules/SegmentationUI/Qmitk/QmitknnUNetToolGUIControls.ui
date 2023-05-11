@@ -139,7 +139,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to nnUNet in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to nnUNet. MITK does not ship with nnUNet. Make sure to have a working Python environment with nnUNet set up beforehand. Choose that environment in the Python Path before inferencing. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/MIC-DKFZ/nnUNet&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/MIC-DKFZ/nnUNet&lt;/span&gt;&lt;/a&gt; to learn everything about the nnUNet.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to nnUNet in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to nnUNet(v1). MITK does not ship with nnUNet(v1). Make sure to have a working Python environment with nnUNet(v1) set up beforehand. Choose that environment in the Python Path before inferencing. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/MIC-DKFZ/nnUNet&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/MIC-DKFZ/nnUNet&lt;/span&gt;&lt;/a&gt; to learn everything about the nnUNet.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>

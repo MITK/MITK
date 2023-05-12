@@ -345,9 +345,9 @@ your image but you are just interested in one special region.
 
 \imageMacro{QmitkSegmentation_nnUnetTool.png,"nnUNet tool",10.00}
 
-This tool provides a GUI to the deep learning-based segmentation algorithm called the nnUNet(v1). With this tool, you can get a segmentation mask predicted for the loaded image in MITK. Be ready with the pre-trained weights (a.k.a <b>RESULTS_FOLDER</b>)
+This tool provides a GUI to the deep learning-based segmentation algorithm called the nnU-Net v1. With this tool, you can get a segmentation mask predicted for the loaded image in MITK. Be ready with the pre-trained weights (a.k.a <b>RESULTS_FOLDER</b>)
 for your organ or task concerned, before using the tool. For a detailed explanation of the parameters and pre-trained weights folder structure etc., please refer to https://github.com/MIC-DKFZ/nnUNet. <br>
-Remark: The tool assumes that you have a Python3 environment with nnUNet(v1) (pip) installed. Your machine should be also equipped with a CUDA enabled GPU.
+Remark: The tool assumes that you have a Python3 environment with nnU-Net v1 (pip) installed. Your machine should be also equipped with a CUDA enabled GPU.
 
 \subsubsection org_mitk_views_segmentationnnUNetToolWorkflow Workflow:
     -# Select the "Python Path" drop-down to see if MITK has automatically detected other Python environments.

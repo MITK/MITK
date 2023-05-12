@@ -14,7 +14,6 @@ set(MITK_PLUGINS
   org.mitk.core.services:ON
   org.mitk.gui.common:ON
   org.mitk.planarfigure:ON
-  org.mitk.core.ext:OFF
   org.mitk.core.jobs:OFF
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.ext:OFF

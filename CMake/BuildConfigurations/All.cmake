@@ -25,7 +25,6 @@ set(_package_excludes
   TOF_PMDO3
   US_TELEMED_SDK
   videoInput
-  WIIMOTE
 )
 
 get_cmake_property(_cache_vars CACHE_VARIABLES)

@@ -2,9 +2,6 @@
 <plugin>
 
   <extension point="org.blueberry.ui.preferencePages">
-    <page id="org.mitk.InputDevicesPreferencePage" name="Input Devices" class="QmitkInputDevicesPrefPage">
-      <keywordreference id="org.mitk.InputDevicesPreferencePageKeywords"/>
-    </page>
     <page id="org.mitk.AppInstancesPreferencePage" name="Application Instances"
           class="QmitkAppInstancesPreferencePage" category="org.mitk.GeneralPreferencePage">
       <keywordreference id="org.mitk.AppInstancesPreferencePageKeywords"/>
@@ -17,9 +14,6 @@
 
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.ExternalProgramsPreferencePageKeywords" label="External program gnuplot ffmpeg libav"/>
-    <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="3D mouse"/>
-    <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="WiiMote"/>
-    <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="Input Devices"/>
     <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="application instances running multiple behavior repeated invocations mitk"/>
     <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="scene file .mitk"/>
   </extension>

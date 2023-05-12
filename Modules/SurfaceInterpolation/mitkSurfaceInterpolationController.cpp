@@ -990,6 +990,10 @@ void mitk::SurfaceInterpolationController::AddLabelSetConnection(unsigned int la
       auto previousLayerID = workingImage->GetActiveLayer();
       workingImage->SetActiveLayer(layerID);
       auto activeLabelSet = workingImage->GetLabelSet(layerID);
+
+      if (activeLabelSet == nullptr)
+        return;
+
       activeLabelSet->RemoveLabelEvent += mitk::MessageDelegate1<mitk::SurfaceInterpolationController, mitk::Label::PixelType>(
         this, &mitk::SurfaceInterpolationController::OnRemoveLabel);
       activeLabelSet->ActiveLabelEvent += mitk::MessageDelegate1<mitk::SurfaceInterpolationController, mitk::Label::PixelType>(
@@ -1014,6 +1018,10 @@ void mitk::SurfaceInterpolationController::AddLabelSetConnection()
     {
       auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_SelectedSegmentation);
       auto activeLabelSet = workingImage->GetActiveLabelSet();
+
+      if (activeLabelSet == nullptr)
+        return;
+
       activeLabelSet->RemoveLabelEvent += mitk::MessageDelegate1<mitk::SurfaceInterpolationController, mitk::Label::PixelType>(
         this, &mitk::SurfaceInterpolationController::OnRemoveLabel);
       workingImage->GetActiveLabelSet()->ActiveLabelEvent += mitk::MessageDelegate1<mitk::SurfaceInterpolationController, mitk::Label::PixelType>(
@@ -1138,7 +1146,6 @@ void mitk::SurfaceInterpolationController::OnRemoveLayer()
     assert (m_CurrentLayerIndex < contoursForSegmentation.at(t).size());
     contoursForSegmentation.at(t).erase(contoursForSegmentation.at(t).begin() + m_PreviousLayerIndex);
   }
-
   this->Modified();
 }
 

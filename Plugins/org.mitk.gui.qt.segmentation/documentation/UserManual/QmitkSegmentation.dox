@@ -65,19 +65,17 @@ It is all about possibly overlapping labels from distinct groups and spatially e
 
 \imageMacro{"QmitkSegmentation_Groups.png","Groups",10}
 
-\section org_mitk_views_segmentationlabelinstances Labels vs. label instances vs. label classes
+\section org_mitk_views_segmentationlabelinstances Labels vs. label instances
 
 The Segmentation View supports label instances.
 That is, segmenting multiple distributed entities of the same thing like metastases for example.
 
-A label, as we used the term before, is already a single instance of itself when seen as a label class, hence, a label class may consist of multiple label instances.
-For the sake of clearness, a label instance is only shown explicitly as a label instance as soon as there are multiple instances of the same label class.
+A label, as we used the term before, is already a single instance of itself but it may consist of multiple label instances.
 
-All label instances have their own distinct pixel value that is explicitly shown in square brackets as a clue for distinction and identification.
-It is important to understand that this number is not a separate, consequtive index for each label class.
+If a label consists of multiple label instances, they each show their own distinct pixel value in square brackets as a clue for distinction and identification.
+
+It is important to understand that this number is not a separate, consequtive index for each label.
 It is just the plain pixel value of the label instance, which is unique across all label instances of the whole segmentation.
-
-Hereafter we use the distinct terms <b>label instance</b> and <b>label class</b> instead of the contextual and ambiguous term <b>label</b>.
 
 \imageMacro{"QmitkSegmentation_LabelInstances.png","Label instances",10}
 
@@ -94,20 +92,20 @@ They can always overlap (not override) each other.
 You can also change the color of label instances as well as show (default) or hide their pixel contents.
 The icons at the right side of the rows of the groups and labels widget reflect their state in all these regards.
 
-Renaming of label instances and label classes can be found in their content menu as shown further below.
+Renaming of labels and label instances can be found in their content menu as shown further below.
 
 \imageMacro{"QmitkSegmentation_LockColorVisibility.png","Unlocking\, changing color of\, and hiding label instances",10}
 
 \section org_mitk_views_segmentationcontextmenus Context menus
 
-Actions for organization of groups, label classes, and label instances (as well as other operations) can be also found in their right-click context menus.
+Actions for organization of groups, labels, and label instances (as well as other operations) can be also found in their right-click context menus.
 
-\imageMacro{"QmitkSegmentation_ContextMenus.png","Context menus of groups\, label classes\, and label instances",12}
+\imageMacro{"QmitkSegmentation_ContextMenus.png","Context menus of groups\, labels\, and label instances",12}
 
-Most actions available in these context menus are self-explanatory or were already described above by other means of access like the tool button bar for adding and removing groups, label classes, and label instances.
+Most actions available in these context menus are self-explanatory or were already described above by other means of access like the tool button bar for adding and removing groups, labels, and label instances.
 
-Label classes and label instances can be <b>renamed</b>, while groups have fixed names.
-This may change in future releases of MITK.
+Labels and label instances can be <b>renamed</b>, while groups have fixed names.
+Note that renaming a label instance will make a separate label out of it, since all instances of the same label share a single common name.
 
 <b>Clear content</b> only clears the pixels of a label instance but won't delete the actual label instance.
 

@@ -781,17 +781,23 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
         QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
         menu->addAction(addInstanceAction);
 
-        QAction* renameAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "&Rename label instance", this);
-        QObject::connect(renameAction, SIGNAL(triggered(bool)), this, SLOT(OnRenameLabel(bool)));
-        menu->addAction(renameAction);
-
         const auto selectedLabelIndex = m_Model->indexOfLabel(selectedLabelValues.front());
 
         if (m_Model->GetLabelInstancesOfSameLabelClass(selectedLabelIndex).size() > 1) // Only labels that actually appear as instance (having additional instances)
         {
+          QAction* renameAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "&Rename label instance", this);
+          QObject::connect(renameAction, SIGNAL(triggered(bool)), this, SLOT(OnRenameLabel(bool)));
+          menu->addAction(renameAction);
+
           QAction* removeInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")), "&Delete label instance", this);
           QObject::connect(removeInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::DeleteLabelInstance);
           menu->addAction(removeInstanceAction);
+        }
+        else
+        {
+          QAction* renameAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "&Rename label", this);
+          QObject::connect(renameAction, SIGNAL(triggered(bool)), this, SLOT(OnRenameLabel(bool)));
+          menu->addAction(renameAction);
         }
 
         QAction* removeLabelAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")), "Delete &label", this);

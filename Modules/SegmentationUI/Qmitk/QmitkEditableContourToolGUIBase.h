@@ -38,11 +38,13 @@ class MITKSEGMENTATIONUI_EXPORT QmitkEditableContourToolGUIBase : public QmitkTo
   Q_OBJECT
 
 public:
+  /// \cond
   enum class MITKSEGMENTATIONUI_EXPORT Mode
   {
     Add,
     Subtract
   };
+  /// \endcond
 
   mitkClassMacro(QmitkEditableContourToolGUIBase, QmitkToolGUI);
   itkFactorylessNewMacro(Self);

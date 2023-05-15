@@ -12,7 +12,6 @@ set(INTERNAL_CPP_FILES
   QmitkAppInstancesPreferencePage.cpp
   QmitkExternalProgramsPreferencePage.cpp
   QmitkCommonExtPlugin.cpp
-  QmitkInputDevicesPrefPage.cpp
   QmitkModuleView.cpp
 )
 
@@ -30,7 +29,6 @@ set(MOC_H_FILES
   src/internal/QmitkExternalProgramsPreferencePage.h
   src/internal/QmitkCommonExtPlugin.h
   src/internal/QmitkExtWorkbenchWindowAdvisorHack.h
-  src/internal/QmitkInputDevicesPrefPage.h
   src/internal/QmitkModuleView.h
   src/QmitkOpenDicomEditorAction.h
   src/QmitkOpenMxNMultiWidgetEditorAction.h

@@ -27,6 +27,13 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, OtsuTool3D, "Otsu Segmentation");
 }
 
+mitk::OtsuTool3D::OtsuTool3D()
+  : SegWithPreviewTool()
+{
+  this->ResetsToEmptyPreviewOn();
+  this->UseSpecialPreviewColorOff();
+}
+
 void mitk::OtsuTool3D::Activated()
 {
   Superclass::Activated();
@@ -86,7 +93,11 @@ void mitk::OtsuTool3D::UpdatePrepare()
   Superclass::UpdatePrepare();
   auto preview = this->GetPreviewSegmentation();
   auto labelset = preview->GetLabelSet(preview->GetActiveLayer());
-  labelset->RemoveAllLabels();
+  for (LabelSetImage::GroupIndexType i = 0; i<preview->GetNumberOfLayers(); ++i)
+  {
+    preview->GetLabelSet(i)->RemoveAllLabels();
+  }
+
   for (unsigned int i = 0; i < m_NumberOfRegions; ++i)
   {
     auto label = LabelSetImageHelper::CreateNewLabel(preview, "Otsu");

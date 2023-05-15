@@ -194,7 +194,7 @@ ModifyLabelActionTrigerred ModifyLabelProcessing(mitk::LabelSetImage* labelSetIm
   ModifyLabelActionTrigerred actionTriggered = ModifyLabelActionTrigerred::Null;
   auto* currentContourList = surfaceInterpolator->GetContours(timePoint, currentLayerID);
 
-  if (nullptr == currentContourList)
+  while (nullptr == currentContourList)
   {
     surfaceInterpolator->OnAddLayer();
     currentContourList = surfaceInterpolator->GetContours(timePoint, currentLayerID);

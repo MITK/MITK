@@ -23,8 +23,10 @@ found in the LICENSE file.
 #include <usModuleResource.h>
 
 #include "mitkIOUtil.h"
+#include "mitkSegTool2D.h"
 #include <filesystem>
 #include <itksys/SystemTools.hxx>
+#include <chrono>
 
 
 namespace mitk
@@ -83,7 +85,8 @@ void mitk::SegmentAnythingTool::Activated()
   m_PointSetNodeNegative->SetVisibility(true);
   this->GetDataStorage()->Add(m_PointSetNodeNegative, this->GetToolManager()->GetWorkingData(0));
 
-  this->SetLabelTransferMode(LabelTransferMode::AllLabels);
+  this->SetLabelTransferScope(LabelTransferScope::AllLabels);
+  this->SetLabelTransferMode(LabelTransferMode::AddLabel);
 }
 
 void mitk::SegmentAnythingTool::Deactivated()
@@ -245,14 +248,16 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
       pickleFilePath = m_OutDir + IOUtil::GetDirectorySeparator() + "dump.pkl";
       outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
 
-      IOUtil::Save(inputAtTimeStep, inputImagePath);
-
       this->SetPythonPath("C:\\DKFZ\\SAM_work\\sam_env\\Scripts");
       this->SetModelType("vit_b");
       this->SetCheckpointPath("C:\\DKFZ\\SAM_work\\sam_vit_b_01ec64.pth");
 
       if (m_IsGenerateEmbeddings)
-      {
+      {auto startWrite = std::chrono::system_clock::now();
+        IOUtil::Save(inputAtTimeStep, inputImagePath);
+      auto endWrite = std::chrono::system_clock::now();
+      MITK_INFO << "UnLoaded image from MITK. Elapsed: "
+                  << std::chrono::duration_cast<std::chrono::milliseconds>(endWrite - startWrite).count();
         this->run_generate_embeddings(
           spExec, inputImagePath, m_OutDir, this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId());
       }
@@ -276,11 +281,18 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
       pointsCSV.pop_back(); labelsCSV.pop_back();
       MITK_INFO << " pointsCSV " << pointsCSV;
       MITK_INFO << " labelsCSV " << labelsCSV;
-
+      auto start = std::chrono::system_clock::now();
       run_segmentation_from_points(
         spExec, pickleFilePath, outputImagePath, this->GetModelType(), this->GetCheckpointPath(), pointsCSV, labelsCSV, this->GetGpuId());
+    auto endPython = std::chrono::system_clock::now();
+      MITK_INFO << "Back in MITK. Elapsed: "
+                << std::chrono::duration_cast<std::chrono::milliseconds>(endPython - start).count();
       //outputImagePath = "C:\\DKFZ\\SAM_work\\test_seg_3d.nii.gz";
       Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
+      auto endloading = std::chrono::system_clock::now();
+      MITK_INFO << "Loaded image in MITK. Elapsed: "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(endloading- endPython).count();
+      //mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputImage, timeStep, true);
       previewImage->InitializeByLabeledImage(outputImage);
       previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
     }

@@ -14,13 +14,14 @@ You can create multiple labels for different regions of interest contained withi
 Labels in the same group cannot overlap each other but labels from different groups may overlap.
 
 The MITK <b>Segmentation Plugin</b> allows you to create multilabel segmentations of anatomical and pathological structures in medical images.
-The plugin consists of two views:
+The plugin consists of three views:
 <ul>
   <li> <b>Segmentation View</b>: Manual and (semi-)automatic segmentation
   <li> \subpage org_mitk_views_segmentationutilities : Post-processing of segmentations
+  <li> \subpage org_mitk_views_segmentationtasklist : Optimized workflow for batches of segmentation tasks based on a user-defined task list
 </ul>
 In this user guide, the features of the <b>Segmentation View</b> are described.
-For an introduction to the Segmentation Utilities, refer to the respective user guide.
+For an introduction to the Segmentation Utilities or Segmentation Task List, refer to the respective user guides.
 
 \imageMacro{QmitkSegmentationPlugin_Overview.png,"Segmentation View", 16.00}
 

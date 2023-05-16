@@ -82,11 +82,6 @@ namespace mitk
     EIDSHIFTANDMIDDLEMOUSEPRESS = 2003,
     EIDSHIFTANDMIDDLEMOUSEMOVE = 2004,
     EIDSHIFTANDMIDDLEMOUSERELEASE = 2005,
-    EIDSPACENAVIGATORINPUT = 4001,   // 3d Mouse, SpaceNavigator input
-    EIDSPACENAVIGATORKEYDOWN = 4002, // 3d Mouse, KeyDown
-    EIDWIIMOTEINPUT = 4003,          // WiiMote input
-    EIDWIIMOTEBUTTON = 4004,         // WiiMote home button
-    EIDWIIMOTEBUTTONB = 4005,        // WiiMote b button
     EIDSTRGANDN = 10,
     EIDSTRGANDE = 11,
     EIDDELETE = 12,
@@ -182,7 +177,7 @@ namespace mitk
   };
 
   //##Constants for Operations
-  //## xomments are always examples of the usage
+  //## comments are always examples of the usage
   enum EOperations
   {
     OpNOTHING = 0,
@@ -404,11 +399,6 @@ namespace mitk
     AcDISPLAYOPTIONS = 49009,
     AcCYCLE = 49010,
     AcACCEPT = 49011,
-    AcONSPACENAVIGATORMOUSEINPUT = 4001, // On input of 3D Mouse
-    AcONPACENAVIGATORKEYDOWN = 4002,     // On input of 3D Mouse
-    AcONWIIMOTEINPUT = 4003,             // used for wiimote to signal IR input
-    AcRESETVIEW = 4004,                  // used for wiimote to reset view
-    AcONWIIMOTEBUTTONRELEASED = 4005,    // stops the surface interaction
     AcCHECKPOSITION = 5000,
     AcINITIALIZECONTOUR = 5001,
     AcCALCULATENEWSEGMENTATION_SP = 5002,
@@ -498,10 +488,6 @@ namespace mitk
     Type_TabletPress = 92,              // tablet press
     Type_TabletRelease = 93,            // tablet release
     Type_User = 1000,                   // first user event id
-    Type_SpaceNavigatorInput = 1094,    // 3D mouse input occurred
-    Type_SpaceNavigatorKeyDown = 1095,  // 3D mouse input occurred
-    Type_WiiMoteInput = 1096,           // WiiMote input occurred
-    Type_WiiMoteButton = 1097,          // WiiMote button pressed
     Type_MaxUser = 65535
   };
 

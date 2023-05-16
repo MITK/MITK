@@ -103,6 +103,10 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked()
   if (filename.isEmpty())
     return;
 
+  QString fileExt(".json");
+  if (!filename.endsWith(fileExt))
+    filename += fileExt;
+
   auto outStream = std::ofstream(filename.toStdString());
   emit SaveLayout(&outStream);
 }

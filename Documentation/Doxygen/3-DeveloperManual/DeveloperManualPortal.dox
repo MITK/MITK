@@ -22,9 +22,6 @@ Once you start consuming more specific functionality, the \link MITKModuleManual
   <li> \subpage Concepts </li>
   <li> \subpage MITKModuleManualsListPage </li>
   <li> \subpage DevelopmentApplication </li>
-  <ul>
-    <li> \ref mitkExtPointsIndex </li>
-  </ul>
   <li> \subpage DeploymentPage </li>
 </ul>
 

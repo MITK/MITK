@@ -673,8 +673,12 @@ namespace mitk
       QCoreApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
-      QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
       QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+      QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+#endif
+      QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
       d->m_QApp = this->getSingleMode()
         ? static_cast<QCoreApplication*>(new QmitkSingleApplication(d->m_Argc, d->m_Argv, this->getSafeMode()))

@@ -684,7 +684,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     {
       menu->addSeparator();
 
-      QAction* viewAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "View group", this);
+      QAction* viewAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "Show group", this);
       QObject::connect(viewAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSetAffectedLabelsVisible);
       menu->addAction(viewAllAction);
 
@@ -710,11 +710,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
       menu->addAction(addInstanceAction);
 
-      QAction* renameAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "&Rename label class", this);
+      QAction* renameAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "&Rename label", this);
       QObject::connect(renameAction, SIGNAL(triggered(bool)), this, SLOT(OnRenameLabel(bool)));
       menu->addAction(renameAction);
 
-      QAction* removeAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")), "&Delete label class", this);
+      QAction* removeAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")), "&Delete label", this);
       QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnDeleteAffectedLabel);
       menu->addAction(removeAction);
     }
@@ -735,17 +735,13 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     {
       menu->addSeparator();
 
-      QAction* viewAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "View label instances", this);
+      QAction* viewAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "Show label instances", this);
       QObject::connect(viewAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSetAffectedLabelsVisible);
       menu->addAction(viewAllAction);
 
       QAction* hideAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/invisible.svg")), "Hide label instances", this);
       QObject::connect(hideAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSetAffectedLabelsInvisible);
       menu->addAction(hideAllAction);
-
-      QAction* viewOnlyAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "View only", this);
-      QObject::connect(viewOnlyAction, SIGNAL(triggered(bool)), this, SLOT(OnSetOnlyActiveLabelVisible(bool)));
-      menu->addAction(viewOnlyAction);
 
       menu->addSeparator();
 
@@ -781,24 +777,30 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     {
       if (m_AllowLabelModification)
       {
-        QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "&Add label instance...", this);
+        QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "&Add label instance", this);
         QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
         menu->addAction(addInstanceAction);
-
-        QAction* renameAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "&Rename", this);
-        QObject::connect(renameAction, SIGNAL(triggered(bool)), this, SLOT(OnRenameLabel(bool)));
-        menu->addAction(renameAction);
 
         const auto selectedLabelIndex = m_Model->indexOfLabel(selectedLabelValues.front());
 
         if (m_Model->GetLabelInstancesOfSameLabelClass(selectedLabelIndex).size() > 1) // Only labels that actually appear as instance (having additional instances)
         {
+          QAction* renameAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "&Rename label instance", this);
+          QObject::connect(renameAction, SIGNAL(triggered(bool)), this, SLOT(OnRenameLabel(bool)));
+          menu->addAction(renameAction);
+
           QAction* removeInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")), "&Delete label instance", this);
           QObject::connect(removeInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::DeleteLabelInstance);
           menu->addAction(removeInstanceAction);
         }
+        else
+        {
+          QAction* renameAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "&Rename label", this);
+          QObject::connect(renameAction, SIGNAL(triggered(bool)), this, SLOT(OnRenameLabel(bool)));
+          menu->addAction(renameAction);
+        }
 
-        QAction* removeLabelAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")), "Delete &label class", this);
+        QAction* removeLabelAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")), "Delete &label", this);
         QObject::connect(removeLabelAction, &QAction::triggered, this, &QmitkMultiLabelInspector::DeleteLabel);
         menu->addAction(removeLabelAction);
 
@@ -810,7 +812,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       if (m_AllowVisibilityModification)
       {
         menu->addSeparator();
-        QAction* viewOnlyAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "Hide everything but this", this);
+        QAction* viewOnlyAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "Hide everything in group but this", this);
         QObject::connect(viewOnlyAction, SIGNAL(triggered(bool)), this, SLOT(OnSetOnlyActiveLabelVisible(bool)));
         menu->addAction(viewOnlyAction);
 
@@ -909,10 +911,10 @@ void QmitkMultiLabelInspector::OnDeleteAffectedLabel()
 
   auto affectedLabels = GetCurrentlyAffactedLabelInstances();
   auto currentLabel = m_Segmentation->GetLabel(affectedLabels.front());
-  QString question = "Do you really want to delete all label instances of class \"" + QString::fromStdString(currentLabel->GetName()) + "\"?";
+  QString question = "Do you really want to delete all instances of label \"" + QString::fromStdString(currentLabel->GetName()) + "\"?";
 
   QMessageBox::StandardButton answerButton =
-    QMessageBox::question(this, "Delete label class", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+    QMessageBox::question(this, "Delete label", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
   if (answerButton == QMessageBox::Yes)
   {

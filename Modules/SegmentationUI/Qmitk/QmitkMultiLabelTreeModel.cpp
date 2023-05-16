@@ -853,6 +853,8 @@ void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
       { //first label added
         auto groupIndex = GetIndexByItem(groupItem, this);
         emit dataChanged(groupIndex, groupIndex);
+        this->beginInsertRows(groupIndex, instanceItem->ParentItem()->Row(), instanceItem->ParentItem()->Row());
+        this->endInsertRows();
       }
       else
       { //whole new label level added to group item

@@ -192,14 +192,19 @@ ModifyLabelActionTrigerred ModifyLabelProcessing(mitk::LabelSetImage* labelSetIm
   auto numTimeSteps = labelSetImage->GetTimeSteps();
 
   ModifyLabelActionTrigerred actionTriggered = ModifyLabelActionTrigerred::Null;
-  mitk::SurfaceInterpolationController::ContourPositionInformationList &currentContourList =
-    surfaceInterpolator->GetContours(timePoint, currentLayerID);
+  auto* currentContourList = surfaceInterpolator->GetContours(timePoint, currentLayerID);
+
+  while (nullptr == currentContourList)
+  {
+    surfaceInterpolator->OnAddLayer();
+    currentContourList = surfaceInterpolator->GetContours(timePoint, currentLayerID);
+  }
 
   mitk::LabelSetImage::Pointer labelSetImage2 = labelSetImage->Clone();
 
   mitk::ImagePixelReadAccessor<mitk::LabelSet::PixelType, VImageDimension> readAccessor(labelSetImage2.GetPointer());
 
-  for (auto& contour : currentContourList)
+  for (auto& contour : *currentContourList)
   {
     mitk::Label::PixelType contourPixelValue;
 
@@ -1928,34 +1933,37 @@ void QmitkSlicesInterpolator::OnModifyLabelChanged(const itk::Object *caller,
 void QmitkSlicesInterpolator::MergeContours(unsigned int timeStep,
                                             unsigned int layerID)
 {
-  std::vector<mitk::SurfaceInterpolationController::ContourPositionInformation>& contours =
-                                            m_SurfaceInterpolator->GetContours(timeStep,layerID);
+  auto* contours = m_SurfaceInterpolator->GetContours(timeStep, layerID);
+
+  if (nullptr == contours)
+    return;
+
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-  for (size_t i = 0; i < contours.size(); ++i)
+  for (size_t i = 0; i < contours->size(); ++i)
   {
-    for (size_t j = i+1; j < contours.size(); ++j)
+    for (size_t j = i+1; j < contours->size(); ++j)
     {
       //  And Labels are the same and Layers are the same.
-      bool areContoursCoplanar = AreContoursCoplanar(contours[i],contours[j]);
+      bool areContoursCoplanar = AreContoursCoplanar((*contours)[i], (*contours)[j]);
 
-      if ( areContoursCoplanar  && (contours[i].LabelValue == contours[j].LabelValue) )
+      if ( areContoursCoplanar  && ((*contours)[i].LabelValue == (*contours)[j].LabelValue) )
       {
         //  Update the contour by re-extracting the slice from the corresponding plane.
-        mitk::Image::Pointer slice = ExtractSliceFromImage(m_Segmentation, contours[i].Plane, timeStep);
+        mitk::Image::Pointer slice = ExtractSliceFromImage(m_Segmentation, (*contours)[i].Plane, timeStep);
         mitk::ImageToContourFilter::Pointer contourExtractor = mitk::ImageToContourFilter::New();
         contourExtractor->SetInput(slice);
-        contourExtractor->SetContourValue(contours[i].LabelValue);
+        contourExtractor->SetContourValue((*contours)[i].LabelValue);
         contourExtractor->Update();
         mitk::Surface::Pointer contour = contourExtractor->GetOutput();
-        contours[i].Contour = contour;
+        (*contours)[i].Contour = contour;
 
         //  Update the interior point of the contour
-        contours[i].ContourPoint = m_SurfaceInterpolator->ComputeInteriorPointOfContour(contours[i],dynamic_cast<mitk::LabelSetImage *>(m_Segmentation));
+        (*contours)[i].ContourPoint = m_SurfaceInterpolator->ComputeInteriorPointOfContour((*contours)[i],dynamic_cast<mitk::LabelSetImage *>(m_Segmentation));
 
         //  Setting the contour polygon data to an empty vtkPolyData,
         //  as source label is empty after merge operation.
-        contours[j].Contour->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New());
+        (*contours)[j].Contour->SetVtkPolyData(vtkSmartPointer<vtkPolyData>::New());
       }
     }
   }
@@ -1978,8 +1986,8 @@ void QmitkSlicesInterpolator::MergeContours(unsigned int timeStep,
     return (contour.Contour->GetVtkPolyData()->GetNumberOfPoints() == 0);
   };
 
-  auto it = std::remove_if(contours.begin(), contours.end(), isContourEmpty);
-  contours.erase(it, contours.end());
+  auto it = std::remove_if((*contours).begin(), (*contours).end(), isContourEmpty);
+  (*contours).erase(it, (*contours).end());
 }
 
 void QmitkSlicesInterpolator::ClearSegmentationObservers()

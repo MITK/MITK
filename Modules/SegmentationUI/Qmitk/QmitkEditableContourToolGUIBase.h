@@ -13,12 +13,20 @@ found in the LICENSE file.
 #ifndef QmitkEditableContourToolGUIBase_h
 #define QmitkEditableContourToolGUIBase_h
 
-#include "QmitkToolGUI.h"
-#include "mitkEditableContourTool.h"
-#include "ui_QmitkEditableContourToolGUIControls.h"
+#include <QmitkToolGUI.h>
 #include <MitkSegmentationUIExports.h>
 
-class QmitkEditableContourToolGUIBaseControls;
+class QButtonGroup;
+
+namespace mitk
+{
+  class EditableContourTool;
+}
+
+namespace Ui
+{
+  class QmitkEditableContourToolGUIControls;
+}
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -30,30 +38,33 @@ class MITKSEGMENTATIONUI_EXPORT QmitkEditableContourToolGUIBase : public QmitkTo
   Q_OBJECT
 
 public:
+  /// \cond
+  enum class MITKSEGMENTATIONUI_EXPORT Mode
+  {
+    Add,
+    Subtract
+  };
+  /// \endcond
+
   mitkClassMacro(QmitkEditableContourToolGUIBase, QmitkToolGUI);
   itkFactorylessNewMacro(Self);
-  itkCloneMacro(Self);
 
-protected slots :
+protected slots:
 
-  void OnNewToolAssociated(mitk::Tool *);
-
+  void OnNewToolAssociated(mitk::Tool*);
   void OnConfirmSegmentation();
-
   void OnClearContour();
-
   void OnAutoConfirm(bool on);
-  void OnAddModeToogled(bool on);
-
+  void OnModeToggled(Mode mode);
   void OnShowInformation(bool on);
 
 protected:
   QmitkEditableContourToolGUIBase();
   ~QmitkEditableContourToolGUIBase() override;
 
-  Ui::QmitkEditableContourToolGUIControls m_Controls;
-
-  mitk::EditableContourTool::Pointer m_NewTool;
+  Ui::QmitkEditableContourToolGUIControls* m_Controls;
+  QButtonGroup* m_ModeButtonGroup;
+  itk::SmartPointer<mitk::EditableContourTool> m_NewTool;
 };
 
 #endif

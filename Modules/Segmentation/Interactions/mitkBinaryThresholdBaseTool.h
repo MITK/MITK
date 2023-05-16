@@ -58,7 +58,8 @@ namespace mitk
 
     template <typename TPixel, unsigned int VImageDimension>
     void ITKThresholding(const itk::Image<TPixel, VImageDimension>* inputImage,
-      Image* segmentation, unsigned int timeStep);
+                         LabelSetImage *segmentation,
+                         unsigned int timeStep);
 
   private:
     ScalarType m_SensibleMinimumThreshold;

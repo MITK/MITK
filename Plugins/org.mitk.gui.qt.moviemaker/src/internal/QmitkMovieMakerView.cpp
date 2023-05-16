@@ -61,7 +61,14 @@ namespace
   private:
     void run() override
     {
-      m_VideoRecorder->StopRecording();
+      try
+      {
+        m_VideoRecorder->StopRecording();
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_ERROR << e.GetDescription();
+      }
     }
 
     mitk::VideoRecorder* m_VideoRecorder;

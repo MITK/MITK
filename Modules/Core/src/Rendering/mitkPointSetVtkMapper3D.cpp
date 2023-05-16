@@ -100,15 +100,6 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   if (m_PointsAssembly->GetParts()->IsItemPresent(m_ContourActor))
     m_PointsAssembly->RemovePart(m_ContourActor);
 
-  // exceptional displaying for PositionTracker -> MouseOrientationTool
-  int mapperID;
-  bool isInputDevice = false;
-  if (this->GetDataNode()->GetBoolProperty("inputdevice", isInputDevice) && isInputDevice)
-  {
-    if (this->GetDataNode()->GetIntProperty("BaseRendererMapperID", mapperID) && mapperID == BaseRenderer::Standard3D)
-      return; // The event for the PositionTracker came from the 3d widget and  not needs to be displayed
-  }
-
   // get and update the PointSet
   mitk::PointSet::Pointer input = const_cast<mitk::PointSet *>(this->GetInput());
 
@@ -223,19 +214,8 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
         vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
         sphere->SetRadius(m_PointSize / 2.0f);
         sphere->SetCenter(currentPoint);
-        // sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
-
-        // MouseOrientation Tool (PositionTracker)
-        if (isInputDevice)
-        {
-          sphere->SetThetaResolution(10);
-          sphere->SetPhiResolution(10);
-        }
-        else
-        {
-          sphere->SetThetaResolution(20);
-          sphere->SetPhiResolution(20);
-        }
+        sphere->SetThetaResolution(20);
+        sphere->SetPhiResolution(20);
         source = sphere;
       }
       break;

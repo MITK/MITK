@@ -85,11 +85,11 @@ Useful links
 [mitk]: https://www.mitk.org
 [itk]: https://itk.org
 [vtk]: https://vtk.org
-[mitk-overview]: https://docs.mitk.org/2023.04/
-[mitk-usermanual]: https://docs.mitk.org/2023.04/UserManualPortal.html
-[mitk-devmanual]: https://docs.mitk.org/2023.04/DeveloperManualPortal.html
-[mitk-apiref]: https://docs.mitk.org/2023.04/usergroup0.html
-[platforms]: https://docs.mitk.org/2023.04/SupportedPlatformsPage.html
+[mitk-overview]: https://docs.mitk.org/nightly/
+[mitk-usermanual]: https://docs.mitk.org/nightly/UserManualPortal.html
+[mitk-devmanual]: https://docs.mitk.org/nightly/DeveloperManualPortal.html
+[mitk-apiref]: https://docs.mitk.org/nightly/usergroup0.html
+[platforms]: https://docs.mitk.org/nightly/SupportedPlatformsPage.html
 [dkfz]: https://www.dkfz.de
 [license]: https://github.com/MITK/MITK/blob/master/LICENSE
 [release-cycle]: https://www.mitk.org/MitkReleaseCycle
@@ -97,7 +97,7 @@ Useful links
 [phab_repo]: https://phabricator.mitk.org/source/mitk/
 [contribute]: https://www.mitk.org/How_to_contribute
 [cmake]: https://www.cmake.org
-[build]: https://docs.mitk.org/2023.04/BuildInstructionsPage.html
+[build]: https://docs.mitk.org/nightly/BuildInstructionsPage.html
 [mailinglist]: https://www.mitk.org/Mailinglist
 [bugs]: https://phabricator.mitk.org/maniphest/
 [cdash]: https://cdash.mitk.org/index.php?project=MITK

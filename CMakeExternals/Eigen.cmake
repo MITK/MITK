@@ -15,6 +15,15 @@ if(MITK_USE_Eigen)
 
   if(NOT DEFINED Eigen_DIR)
 
+
+    set(eigen_optional_cache_args )
+    if(NOT MITK_USE_CUDA)
+      list(APPEND eigen_optional_cache_args
+           -DCUDA_USE_STATIC_CUDA_RUNTIME:BOOL=OFF
+           -DCUDA_TOOLKIT_ROOT_DIR:PATH=""
+      )
+    endif()
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
@@ -23,6 +32,7 @@ if(MITK_USE_Eigen)
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS
         ${ep_common_args}
+        ${eigen_optional_cache_args}
         -DBUILD_TESTING:BOOL=ON
         -DEIGEN_BUILD_PKGCONFIG:BOOL=OFF
       CMAKE_CACHE_ARGS

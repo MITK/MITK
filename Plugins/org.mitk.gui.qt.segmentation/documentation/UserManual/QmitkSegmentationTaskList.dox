@@ -1,0 +1,177 @@
+/**
+\page org_mitk_views_segmentationtasklist The Segmentation Task List View
+
+\imageMacro{segmentation_task_list-dox.svg,"Icon of the Segmentation Task List View",2.00}
+
+\tableofcontents
+
+\section org_mitk_views_segmentationtasklist_disclaimer Disclaimer
+
+- The Segmentation Task List View and MITK Segmentation Task Lists in general are still in an <b>experimental</b> stage.
+- While we try to minimize breaking changes in the future, we cannot give any guarantees at the moment.
+- We strongly advise to ignore the Data Manager regarding loading and unloading of data while using the Segmentation Task List View, as it will completely take over these operations and may run into invalid states otherwise.
+
+\section org_mitk_views_segmentationtasklist_overview Overview
+
+\imageMacro{QmitkSegmentationTaskList.png,"Segmentation Task List View", 12.00}
+
+As the Segmentation Task List View is typically used in combination with the Segmentation View, we suggest to move the Segmentatiom View to the other side of the application (e.g. on top of the Data Manager), to see both views at the same time.
+
+To unlock the Segmentation Task List View, unload everything but a single MITK Segmentation Task List.
+The remaining Segmentation Task List will be automatically selected.
+
+The Segmentation Task List View shows the progress of the whole Segmentation Task List, e.g., the number of the tasks marked as <em>done</em> vs. the total number of available tasks.
+
+Below the progress indictator you can navigate between tasks, read their descriptions and related information, as well as load/activate the currently shown task.
+This will unload all data from a previously active task, if any, and load all data of the current task.
+To prevent any accidental data loss, unsaved task data will interfer task switches and you can decide on how to proceed.
+
+Above the task description, the status of tasks is displayed as a pair of colored labels, indicating if a task is either active or inactive and if it is considered not to be done, having unsaved changes, or to be done.
+
+With the bottom two buttons you can either save an interim result (the task is considered not to be done), or accept and save the task result.
+You can still edit accepted tasks but in contrast to interim results, the task is considered to be done.
+
+\section org_mitk_views_segmentationtasklist_shortcuts Keyboard shortcuts
+
+The Segmentation Task List View can be used even more efficiently with the following set of keyboard shortcuts:
+
+- <tt>Ctrl</tt> + <tt>Alt</tt> + <tt>P</tt>: Navigate to <b>p</b>revious task
+- <tt>Ctrl</tt> + <tt>Shift</tt> + <tt>P</tt>: Navigate to <b>p</b>revious undone task (or <tt>Shift</tt> + click on resp. button)
+- <tt>Ctrl</tt> + <tt>Alt</tt> + <tt>N</tt>: Navigate to <b>n</b>ext task
+- <tt>Ctrl</tt> + <tt>Shift</tt> + <tt>N</tt>: Navigate to <b>n</b>ext undone task (or <tt>Shift</tt> + click on resp. button)
+- <tt>Ctrl</tt> + <tt>Alt</tt> + <tt>L</tt>: <b>L</b>oad currently shown task
+- <tt>Ctrl</tt> + <tt>Alt</tt> + <tt>S</tt>: <b>S</b>tore interim result
+- <tt>Ctrl</tt> + <tt>Alt</tt> + <tt>A</tt>: <b>A</b>ccept task and store result
+
+\section org_mitk_views_segmentationtasklist_fileformat MITK Segmentation Task List file format
+
+MITK Segmentation Task List files are JSON files containing a JSON object as root.
+It must contain the two mandatory properties <tt>FileFormat</tt> and <tt>Version</tt>:
+
+\code{.json}
+{
+  "FileFormat": "MITK Segmentation Task List",
+  "Version": 1
+}
+\endcode
+
+We also recommend to specify an optional <tt>Name</tt> that is used in the application if present instead of the plain filename of the JSON file:
+
+\code{.json}
+{
+  "FileFormat": "MITK Segmentation Task List",
+  "Version": 1,
+  "Name": "My First Task List"
+}
+\endcode
+
+\subsection org_mitk_views_segmentationtasklist_fileformat_tasks Tasks
+
+The root object must also contain a mandatory <tt>Tasks</tt> array, containing JSON objects that specify the individual tasks of the task list.
+A minimum task object must contain <tt>Image</tt> and <tt>Result</tt> file paths.
+<tt>Image</tt> refers to the patient image and <tt>Result</tt> refers to the path were the resulting segmentation is expected to be stored.
+Paths can be absolute or relative to the JSON file.
+
+\code{.json}
+{
+  "FileFormat": "MITK Segmentation Task List",
+  "Version": 1,
+  "Tasks": [
+    {
+      "Image": "images/Pic3D.nrrd",
+      "Result": "results/liver.nrrd"
+    }
+  ]
+}
+\endcode
+
+In addition, tasks can contain a bunch of optional properties that mainly specify a segmentation a user starts with:
+
+- <tt>Name</tt> (<em>string</em>): A name for the task.
+- <tt>Description</tt> (<em>string</em>): A short description/definition of the task.
+- <tt>LabelName</tt> (<em>string</em>): The name of the first label in a new segmentation that is created for the task on the fly.
+- <tt>LabelNameSuggestions</tt> (<em>file path</em>): A Label Suggestions JSON file (example in next comment) specifying names and optional colors, that are suggested to the user for new labels in the segmentation.
+- <tt>Preset</tt> (<em>file path</em>): A Label Set Preset XML file in MITK's .lsetp file format. The preset is applied to a new segmentation that is created for the task on the fly. We recommend to use the Segmentation plugin of the MITK Workbench to create such label set preset files as described in its {key F1} user guide.
+- <tt>Segmentation</tt> (<em>file path</em>): A pre-segmentation that a user can start with or has to refine for example.
+- <tt>Dynamic</tt> (<em>boolean</em>): In case <tt>Image</tt> refers to a dynamic (3d+t) image, specifies whether the segmentation should be static (<em>false</em>), i.e. equal for all time steps, or dynamic (<em>true</em>), i.e. individual for each time step.
+
+\subsection org_mitk_views_segmentationtasklist_fileformat_taskdefaults Task defaults / common properties
+
+If a task list contains multiple tasks with common properties, they do not have to be specified for each and every task again and again.
+Instead, the root object can contain an optional <tt>Defaults</tt> object that is identical in format to the tasks specified above.
+As the name indicates, default properties can still be overridden by individual tasks if they are specified explicitly.
+
+There is a single exception, though: A <tt>Defaults</tt> object must not contain a <tt>Result</tt> file path, since result files of tasks must be distinct by definition.
+
+\subsection org_mitk_views_segmentationtasklist_fileformat_example Example
+
+The following example is a complete showcase of the properties and features listed above.
+It specifies 4 tasks.
+3 tasks refer to the same patient image so it is specified as default.
+
+Remember that the only task property required to be distinct is <tt>Result</tt> so you are pretty free in your task design.
+For simplicity, we chose to define tasks around organs for this example and named the tasks accordingly:
+
+\code{.json}
+{
+  "FileFormat": "MITK Segmentation Task List",
+  "Version": 1,
+  "Name": "Example Segmentation Task List",
+  "Defaults": {
+    "Image": "images/Pic3D.nrrd"
+  },
+  "Tasks": [
+    {
+      "Name": "Liver",
+      "LabelName": "Liver",
+      "LabelNameSuggestions": "suggestions/label_suggestions.json",
+      "Description": "This task provides an image and label name suggestions for new labels. The segmentation will start with an empty label named Liver.",
+      "Result": "results/liver.nrrd"
+    },
+    {
+      "Name": "Kidneys",
+      "Description": "This task provides an image and a label set preset that is applied to the new segmentation.",
+      "Preset": "presets/kidneys.lsetp",
+      "Result": "results/kidneys.nrrd"
+    },
+    {
+      "Name": "Spleen",
+      "Description": "This task provides an image and an initial (pre-)segmentation.",
+      "Segmentation": "segmentations/spleen.nrrd",
+      "Result": "results/spleen.nrrd"
+    },
+    {
+      "Name": "Surprise",
+      "Description": "And now for something completely different. This task overrides the default Image and starts with an empty static segmentation for a dynamic image.",
+      "Image": "images/US4DCyl.nrrd",
+      "Result": "results/US4DCyl.nrrd",
+      "Dynamic": false
+    }
+  ]
+}
+\endcode
+
+\section org_mitk_views_segmentationtasklist_labelsuggestions MITK Label Suggestions file format
+
+The Label Suggestions JSON file format mentioned above to specify a list of suggested names and optional colors for new labels is as follows:
+
+\code{.json}
+[
+  {
+    "name": "Abdomen",
+    "color": "red"
+  },
+  {
+    "name": "Lung",
+    "color": "#00ff00"
+  },
+  {
+    "name": "Heart"
+  },
+  {
+    "name": "Aortic Valve",
+    "color": "CornflowerBlue"
+  }
+]
+\endcode
+*/

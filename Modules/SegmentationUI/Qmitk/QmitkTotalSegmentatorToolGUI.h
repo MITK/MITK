@@ -22,7 +22,8 @@ public:
   const QString VENV_NAME = ".totalsegmentator";
   const QString TOTALSEGMENTATOR_VERSION = "1.5.5";
   const std::vector<QString> PACKAGES = {QString("Totalsegmentator==") + TOTALSEGMENTATOR_VERSION,
-                                           QString("scipy==1.9.1")};
+                                         QString("scipy==1.9.1"),
+                                         QString("urllib3==1.26.15")};
   const QString STORAGE_DIR;
   inline QmitkTotalSegmentatorToolInstaller(
     const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() 

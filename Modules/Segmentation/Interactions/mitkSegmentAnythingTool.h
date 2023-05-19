@@ -18,6 +18,9 @@ found in the LICENSE file.
 #include "mitkProcessExecutor.h"
 
 #include <MitkSegmentationExports.h>
+#include <thread>
+#include <future>
+
 
 namespace us
 {
@@ -110,7 +113,12 @@ namespace mitk
 
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 
-    std::vector<std::pair<mitk::Point2D, std::string>> GetPointsAsCSVString(const mitk::BaseGeometry*);
+    std::vector<std::pair<mitk::Point2D, std::string>> GetPointsAsVector(const mitk::BaseGeometry*);
+    std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry);
+    std::string GetHashForCurrentPlane();
+
+    void start_async_process();
+
 
   private:
     /**
@@ -126,11 +134,13 @@ namespace mitk
                                     const unsigned int);
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, mitk::Point3D&);
 
+    void start_python_daemon();
+
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_ModelType;
     std::string m_CheckpointPath;
-    std::string m_InDir, m_OutDir, inputImagePath, pickleFilePath, outputImagePath, token; //rename as per standards
+    std::string m_InDir, m_OutDir, outputImagePath, token; // rename as per standards
 
 
     unsigned int m_GpuId = 0;
@@ -143,7 +153,9 @@ namespace mitk
     bool m_IsAuto = false;
     bool m_IsReady = false;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
+    const std::string m_TRIGGER_FILENAME = "trigger.csv";
     int m_PointSetCount = 0;
+    std::future<void> m_Future;
 
   };
 

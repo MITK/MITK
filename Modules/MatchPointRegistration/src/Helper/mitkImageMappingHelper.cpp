@@ -348,11 +348,47 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
   return result;
 }
 
+mitk::ImageMappingHelper::ResultImageGeometryType::Pointer
+mitk::ImageMappingHelper::GenerateSuperSampledGeometry(const ResultImageGeometryType* inputGeometry, double xScaling, double yScaling, double zScaling)
+{
+  auto resultGeometry = inputGeometry->Clone();
+
+  //change the pixel count and  spacing of the geometry
+  mitk::BaseGeometry::BoundsArrayType geoBounds = inputGeometry->GetBounds();
+  auto oldSpacing = inputGeometry->GetSpacing();
+  mitk::Vector3D geoSpacing;
+
+  geoSpacing[0] = oldSpacing[0] / xScaling;
+  geoSpacing[1] = oldSpacing[1] / yScaling;
+  geoSpacing[2] = oldSpacing[2] / zScaling;
+
+  geoBounds[1] = geoBounds[1] * xScaling;
+  geoBounds[3] = geoBounds[3] * yScaling;
+  geoBounds[5] = geoBounds[5] * zScaling;
+
+  resultGeometry->SetBounds(geoBounds);
+  resultGeometry->SetSpacing(geoSpacing);
+
+  auto oldOrigin = inputGeometry->GetOrigin();
+
+  //if we change the spacing we must also correct the origin to ensure
+  //that the voxel matrix still covers the same space. This is due the fact
+  //that the origin is not in the corner of the voxel matrix, but in the center
+  // of the voxel that is in the corner.
+  mitk::Point3D newOrigin;
+  for (mitk::Point3D::SizeType i = 0; i < 3; ++i)
+  {
+    newOrigin[i] = 0.5 * (geoSpacing[i] - oldSpacing[i]) + oldOrigin[i];
+  }
+
+  return resultGeometry;
+}
+
 
 mitk::ImageMappingHelper::ResultImageType::Pointer
   mitk::ImageMappingHelper::
-  refineGeometry(const InputImageType* input, const RegistrationType* registration,
-  bool throwOnError)
+  refineGeometry(const InputImageType * input, const RegistrationType * registration,
+    bool throwOnError)
 {
   mitk::ImageMappingHelper::ResultImageType::Pointer result = nullptr;
 
@@ -365,19 +401,19 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
     mitkThrow() << "Cannot refine image geometry. Passed image pointer is nullptr.";
   }
 
-  mitk::MITKRegistrationHelper::Affine3DTransformType::Pointer spTransform = mitk::MITKRegistrationHelper::getAffineMatrix(registration,false);
-  if(spTransform.IsNull() && throwOnError)
+  mitk::MITKRegistrationHelper::Affine3DTransformType::Pointer spTransform = mitk::MITKRegistrationHelper::getAffineMatrix(registration, false);
+  if (spTransform.IsNull() && throwOnError)
   {
     mitkThrow() << "Cannot refine image geometry. Registration does not contain a suitable direct mapping kernel (3D affine transformation or compatible required).";
   }
 
-  if(spTransform.IsNotNull())
+  if (spTransform.IsNotNull())
   {
     //copy input image
     result = input->Clone();
 
     //refine geometries
-    for(unsigned int i = 0; i < result->GetTimeSteps(); ++i)
+    for (unsigned int i = 0; i < result->GetTimeSteps(); ++i)
     { //refine every time step
       result->GetGeometry(i)->Compose(spTransform);
     }
@@ -386,6 +422,8 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 
   return result;
 }
+
+
 
 mitk::ImageMappingHelper::ResultImageType::Pointer
   mitk::ImageMappingHelper::

@@ -37,7 +37,7 @@ mitk::MAPRegistrationWrapper::ConstPointer registration;
 mitk::BaseGeometry::Pointer refGeometry;
 mitk::ImageMappingInterpolator::Type interpolatorType = mitk::ImageMappingInterpolator::Linear;
 double paddingValue = 0;
-unsigned int superSamplingFactor = 1;
+std::vector<unsigned int> superSamplingFactors;
 
 void setupParser(mitkCommandLineParser& parser)
 {
@@ -79,7 +79,7 @@ void setupParser(mitkCommandLineParser& parser)
     "registrations", "r", mitkCommandLineParser::StringList, "Registration files", "Pathes to the registrations that should be used to map the input images. If this parameter is not set, identity transforms are assumed. If this parameter is set, it must have the same number of entries then the parameter inputs. If you want to use and identity transform for a specific input, specify an empty string. The application assumes that inputs and registrations have the same order, so the n-th input should use thr n-th registration.", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("interpolator", "n", mitkCommandLineParser::Int, "Interpolator type", "Interpolator used for mapping the images. Default: 2; allowed values: 1: Nearest Neighbour, 2: Linear, 3: BSpline 3, 4: WSinc Hamming, 5: WSinc Welch", us::Any(2), true);
   parser.addArgument("padding", "p", mitkCommandLineParser::Float, "Padding value", "Value used for output voxels that are not covered by any input image.", us::Any(0.), true);
-  parser.addArgument("super-sampling", "s", mitkCommandLineParser::Int, "Super sampling factor", "Value used for super sampling of the result. E.g. factor 2 will lead to a doubled resolution compared to the used template. If not specified, no super sampling will be done.", us::Any(1.), true);
+  parser.addArgument("super-sampling", "s", mitkCommandLineParser::StringList, "Super sampling factor", "Value used for super sampling of the result. E.g. factor 2 will lead to a doubled resolution compared to the used template. If not specified, no super sampling will be done.", us::Any(), true);
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.endGroup();
   //! [add arguments]
@@ -116,10 +116,33 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
       paddingValue = us::any_cast<float>(parsedArgs["padding"]);
     }
 
+    superSamplingFactors.clear();
     if (parsedArgs.count("super-sampling"))
     {
-      auto temp = us::any_cast<int>(parsedArgs["super-sampling"]);
-      superSamplingFactor = static_cast<unsigned int>(temp);
+      try
+      {
+        auto samplingStrings = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["super-sampling"]);
+        if (samplingStrings.size() != 1 && samplingStrings.size() != 3)
+        {
+          std::cerr << "Error. Invalid number of super sampling parameters provided. Either give one (for isometric super sampling) or 3.";
+          return false;
+        }
+
+        for (const auto& samplingstr : samplingStrings)
+        {
+          superSamplingFactors.push_back(std::stoul(samplingstr));
+        }
+        if (superSamplingFactors.size() == 1)
+        {
+          superSamplingFactors.push_back(superSamplingFactors[0]);
+          superSamplingFactors.push_back(superSamplingFactors[0]);
+        }
+      }
+      catch (...)
+      {
+        std::cerr << "Error. Invalid super sampling parameter provided.";
+        throw;
+      }
     }
   }
   catch (...)
@@ -166,7 +189,16 @@ int main(int argc, char* argv[])
     std::cout << refGeometryFileName << std::endl;
   std::cout << "Padding value: " << paddingValue << std::endl;
   std::cout << "Interpolation type: " << interpolatorType << std::endl;
-
+  //check for super/sub sampling
+  if (!superSamplingFactors.empty() && (superSamplingFactors.size() != 1 || superSamplingFactors[0] != 1))
+  {
+    std::cout << "Super sampling:";
+    for (auto value : superSamplingFactors)
+    {
+      std::cout << " " << value;
+    }
+    std::cout << std::endl;
+  }
   //! [do processing]
   try
   {
@@ -216,12 +248,12 @@ int main(int argc, char* argv[])
     }
 
     //check for super/sub sampling
-    if (superSamplingFactor!=1)
+    if (!superSamplingFactors.empty() && (superSamplingFactors.size()!=1 || superSamplingFactors[0]!=1))
     {
       refGeometry = mitk::ImageMappingHelper::GenerateSuperSampledGeometry(refGeometry,
-        superSamplingFactor,
-        superSamplingFactor,
-        superSamplingFactor);
+        superSamplingFactors[0],
+        superSamplingFactors[1],
+        superSamplingFactors[2]);
     }
 
     std::cout << "Map the images ..." << std::endl;

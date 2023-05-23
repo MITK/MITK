@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
 
     auto command = ::itk::CStyleCommand::New();
     command->SetCallback(OnMapAlgorithmEvent);
-    auto observerID = algorithm->AddObserver(::map::events::AlgorithmEvent(), command);
+    algorithm->AddObserver(::map::events::AlgorithmEvent(), command);
 
     std::cout << "Load moving data..." << std::endl;
     auto movingImage = mitk::IOUtil::Load<mitk::Image>(movingFileName);

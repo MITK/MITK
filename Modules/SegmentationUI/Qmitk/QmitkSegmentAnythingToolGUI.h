@@ -17,7 +17,35 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 #include "ui_QmitkSegmentAnythingGUIControls.h"
 #include "QmitknnUNetGPU.h"
+#include "QmitkSetupVirtualEnvUtil.h"
 #include <QMessageBox>
+#include <QStandardPaths>
+
+
+/**
+ * @brief Installer class for SegmentAnythingModel Tool.
+ * Class specifies the virtual environment name, install version, packages required to pip install
+ * and implements SetupVirtualEnv method.
+ *
+ */
+class QmitkSegmentAnythingToolInstaller : public QmitkSetupVirtualEnvUtil
+{
+public:
+  const QString VENV_NAME = ".sam";
+  const QString SAM_VERSION = "1.0"; //currently, unused
+  const std::vector<QString> PACKAGES = {QString("numpy"),
+                                         QString("opencv-python"),
+                                         QString("git+https://github.com/facebookresearch/segment-anything.git"),
+                                         QString("SimpleITK")};
+  const QString STORAGE_DIR;
+  inline QmitkSegmentAnythingToolInstaller(
+    const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
+                            qApp->organizationName() + QDir::separator())
+    : QmitkSetupVirtualEnvUtil(baseDir), STORAGE_DIR(baseDir){};
+  bool SetupVirtualEnv(const QString &) override;
+  QString GetVirtualEnvPath() override;
+};
+
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -43,6 +71,21 @@ protected slots:
    * @brief Qt Slot
    */
   void OnActivateBtnClicked();
+
+  /**
+   * @brief Qt Slot
+   */
+  void OnInstallBtnClicked();
+
+  /**
+   * @brief Qt Slot
+   */
+  QString OnSystemPythonChanged(const QString&);
+
+  /**
+   * @brief Qt Slot
+   */
+  void OnClearInstall();
 
 protected:
   QmitkSegmentAnythingToolGUI();
@@ -90,7 +133,28 @@ protected:
    */
   bool IsSAMInstalled(const QString &);
 
+  /**
+   * @brief Get the Exact Python Path for any OS
+   * from the virtual environment path.
+   * @return QString
+   */
+  QString GetExactPythonPath(const QString &) const;
+
+  /**
+   * @brief Enable (or Disable) GUI elements.
+   */
+  void EnableAll(bool);
+
+  /**
+   * @brief Get the virtual env path from UI combobox removing any
+   * extra special characters.
+   *
+   * @return QString
+   */
+  QString GetPythonPathFromUI(const QString &) const;
+
 private:
+  QmitkSegmentAnythingToolInstaller m_Installer;
   Ui_QmitkSegmentAnythingGUIControls m_Controls;
   QString m_PythonPath;
   QmitkGPULoader m_GpuLoader;

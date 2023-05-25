@@ -27,6 +27,8 @@ found in the LICENSE file.
 #include <filesystem>
 #include <itksys/SystemTools.hxx>
 #include <chrono>
+#include <thread>
+
 using namespace std::chrono_literals;
 
 namespace mitk
@@ -229,7 +231,8 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
     if (this->m_MitkTempDir.empty())
     {
       //this->SetPythonPath("C:\\DKFZ\\SAM_work\\sam_env\\Scripts");
-      this->SetPythonPath("C:\\DKFZ\\SAM_work\\sam-embed");
+      //this->SetPythonPath("C:\\DKFZ\\SAM_work\\sam-embed");
+      MITK_INFO << "Python Path: " << this->GetPythonPath();
       this->SetModelType("vit_b");
       this->SetCheckpointPath("C:\\DKFZ\\SAM_work\\sam_vit_b_01ec64.pth");
 
@@ -262,6 +265,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
         m_Future = std::async(std::launch::async, &mitk::SegmentAnythingTool::start_python_daemon, this);
       }
       //outputImagePath = "C:\\DKFZ\\SAM_work\\test_seg_3d.nii.gz";
+      std::this_thread::sleep_for(10ms);
       while (!std::filesystem::exists(outputImagePath));
       Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
       //auto endloading = std::chrono::system_clock::now();

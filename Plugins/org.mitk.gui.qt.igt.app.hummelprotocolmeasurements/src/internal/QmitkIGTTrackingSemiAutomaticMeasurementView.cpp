@@ -26,7 +26,7 @@ found in the LICENSE file.
 // MITK
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkTrackingDeviceSourceConfigurator.h>
-#include <mitkLog.h>
+#include <mitkLogBackend.h>
 #include "mitkHummelProtocolEvaluation.h"
 
 // POCO
@@ -54,9 +54,9 @@ QmitkIGTTrackingSemiAutomaticMeasurementView::~QmitkIGTTrackingSemiAutomaticMeas
 void QmitkIGTTrackingSemiAutomaticMeasurementView::CreateResults()
 {
   QString LogFileName = m_Controls->m_OutputPath->text() + "_results.log";
-  mitk::LoggingBackend::Unregister();
-  mitk::LoggingBackend::SetLogFile(LogFileName.toStdString().c_str());
-  mitk::LoggingBackend::Register();
+  mitk::LogBackend::Unregister();
+  mitk::LogBackend::SetLogFile(LogFileName.toStdString());
+  mitk::LogBackend::Register();
 
   double RMSmean = 0;
   for (std::size_t i = 0; i < m_RMSValues.size(); ++i)
@@ -425,9 +425,9 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::StartNextMeasurement()
   if (!myPath.exists()) myPath.createDirectory();
 
   QString LogFileName = m_Controls->m_OutputPath->text() + QString(m_FilenameVector.at(m_NextFile).c_str()) + ".log";
-  mitk::LoggingBackend::Unregister();
-  mitk::LoggingBackend::SetLogFile(LogFileName.toStdString().c_str());
-  mitk::LoggingBackend::Register();
+  mitk::LogBackend::Unregister();
+  mitk::LogBackend::SetLogFile(LogFileName.toStdString());
+  mitk::LogBackend::Register();
 
   //initialize logging filters
   m_MeasurementLoggingFilterXML = mitk::NavigationDataRecorderDeprecated::New();

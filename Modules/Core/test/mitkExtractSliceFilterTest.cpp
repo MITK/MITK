@@ -58,7 +58,7 @@ found in the LICENSE file.
 // use this to render an oblique slice through a specified image
 //#define SHOW_SLICE_IN_RENDER_WINDOW
 
-// use this to have infos printed in mbilog
+// use this to have infos printed in mitkLog
 //#define EXTRACTOR_DEBUG
 
 /*these are the deviations calculated by the function CalcTestFailureDeviation (see for details)*/
@@ -565,7 +565,7 @@ public:
     MITK_TEST_CONDITION(PixelvalueByMitkOutput == PixelvalueByVtkOutput,
                         "testing conversion of image output vtk->mitk by reslicer");
 
-/*================ mbilog outputs ===========================*/
+/*================ log outputs ===========================*/
 #ifdef EXTRACTOR_DEBUG
     MITK_INFO << "\n"
               << "TESTINFO index: " << sliceindex << " orientation: " << orientation << " frontside: " << isFrontside

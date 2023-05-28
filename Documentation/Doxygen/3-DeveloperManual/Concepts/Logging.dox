@@ -33,7 +33,7 @@ MITK offers different logging levels. You may mostly want to use MITK_INFO, but 
 MITK_DEBUG << "Result of method LoadPicture(): true."
 \endcode
 
-These messages are only displayed if you turn the CMake-Variable MBILOG_ENABLE_DEBUG_MESSAGES on. You can also use the debug message in release mode, output only depends on the CMake-Variable. If you want to enable the debug messages only for a single class / module / plugin you can also simply define the variable in your source code for the time you want to see the messages. Therefore you add a line "#define MBILOG_ENABLE_DEBUG" in the beginning of your cpp file. But don't forget to remove the definition before commiting the source code.
+These messages are only displayed if you turn the CMake-Variable MITK_ENABLE_DEBUG_MESSAGES on. You can also use the debug message in release mode, output only depends on the CMake-Variable.
 
 <b>Info (MITK_INFO)</b>: For standard information messages that inform about expected changes/results in the program flow. Info messages should be important and understandable for the users of the program.
 

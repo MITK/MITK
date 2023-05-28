@@ -18,8 +18,6 @@ found in the LICENSE file.
 #include "mitkCommandLineParser.h"
 #include <mitkSplitParameterToVector.h>
 #include <mitkLog.h>
-#include <mitkLogMacros.h>
-
 
 //#include <mitkLRDensityEstimation.h>
 #include <mitkGeneralizedLinearModel.h>

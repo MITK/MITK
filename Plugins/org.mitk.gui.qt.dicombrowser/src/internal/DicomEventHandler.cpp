@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include "DicomEventHandler.h"
 #include <service/event/ctkEventConstants.h>
 #include <ctkDictionary.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <mitkDataNode.h>
 #include <mitkIDataStorageService.h>
 #include <service/event/ctkEventAdmin.h>

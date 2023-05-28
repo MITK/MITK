@@ -10,19 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MBILOG_LOGGINGTYPES_H_
-#define _MBILOG_LOGGINGTYPES_H_
+#ifndef mitkLogLevel_h
+#define mitkLogLevel_h
 
-namespace mbilog
+namespace mitk
 {
-  /** \brief This enum defines the message/event levels of the mbi logging mechanism.
-   *       Info: TODO
-   *         Warn: TODO
-   *         Error: TODO
-   *         Fatal: TODO
-   *         Debug: TODO
+  /** \brief Message/event levels of the MITK log mechanism.
    */
-  enum
+  enum class LogLevel
   {
     Info,
     Warn,

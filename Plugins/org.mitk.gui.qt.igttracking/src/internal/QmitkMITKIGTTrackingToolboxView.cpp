@@ -20,7 +20,7 @@ found in the LICENSE file.
 // Qt
 #include <QMessageBox>
 #include <QSettings>
-#include <qfiledialog.h>
+#include <QFileDialog>
 
 // MITK
 #include <mitkNavigationToolStorageDeserializer.h>
@@ -29,7 +29,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkIOUtil.h>
-#include <mitkLog.h>
+#include <mitkLogBackend.h>
 #include <mitkTrackingDeviceTypeCollection.h>
 #include <mitkUnspecifiedTrackingTypeInformation.h>
 #include <mitkNeedleProjectionFilter.h>
@@ -60,11 +60,11 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_NeedleProjectionFilter = mitk::NeedleProjectionFilter::New();
 
   //create filename for autosaving of tool storage
-  QString loggingPathWithoutFilename = QString(mitk::LoggingBackend::GetLogFile().c_str());
+  auto loggingPathWithoutFilename = QString::fromStdString(mitk::LogBackend::GetLogFile());
   if (!loggingPathWithoutFilename.isEmpty()) //if there already is a path for the MITK logging file use this one
   {
     //extract path from path+filename (if someone knows a better way to do this feel free to change it)
-    int lengthOfFilename = QFileInfo(QString::fromStdString(mitk::LoggingBackend::GetLogFile())).fileName().size();
+    int lengthOfFilename = QFileInfo(QString::fromStdString(mitk::LogBackend::GetLogFile())).fileName().size();
     loggingPathWithoutFilename.resize(loggingPathWithoutFilename.size() - lengthOfFilename);
     m_AutoSaveFilename = loggingPathWithoutFilename + "TrackingToolboxAutoSave.IGTToolStorage";
   }

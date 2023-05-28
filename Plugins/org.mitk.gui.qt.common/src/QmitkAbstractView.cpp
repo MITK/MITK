@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "internal/QmitkDataNodeItemModel.h"
 
 // mitk Includes
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>

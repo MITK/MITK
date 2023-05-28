@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "QmitkMitkWorkbenchIntroPreferencePage.h"
 
 #include <mitkVersion.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <service/cm/ctkConfigurationAdmin.h>
 #include <service/cm/ctkConfiguration.h>

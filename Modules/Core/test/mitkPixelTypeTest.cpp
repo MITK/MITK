@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <string>
 // MITK includes
 #include "mitkPixelType.h"
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 // ITK includes
 #include "itkImage.h"
 #include <itkVectorImage.h>

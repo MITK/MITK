@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkOclImage.h"
 #include "mitkImageDataItem.h"
 #include "mitkCommon.h"
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 
 #include "mitkOclUtils.h"
 

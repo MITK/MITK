@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkApplicationCursor.h"
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <iostream>
 

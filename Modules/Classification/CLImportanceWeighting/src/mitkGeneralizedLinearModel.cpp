@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <v3p_netlib.h>
 #include <vnl/algo/vnl_qr.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <algorithm>
 #include <limits>
 

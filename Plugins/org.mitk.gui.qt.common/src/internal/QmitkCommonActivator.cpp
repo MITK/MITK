@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "QmitkCommonActivator.h"
 
 #include <berryPlatformUI.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <mitkCoreServices.h>
 #include "QmitkNodeSelectionPreferencePage.h"
 

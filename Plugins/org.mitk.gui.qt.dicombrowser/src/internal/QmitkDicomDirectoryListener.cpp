@@ -13,7 +13,7 @@ found in the LICENSE file.
 
 #include <QString>
 #include <QFile>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <QFileInfoList>
 #include <QDirIterator>
 

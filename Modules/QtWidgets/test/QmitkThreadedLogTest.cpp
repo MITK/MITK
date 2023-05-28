@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkCommon.h"
 #include "mitkTestingMacros.h"
 #include <itksys/SystemTools.hxx>
-#include <mitkLog.h>
+#include <mitkLogBackend.h>
 #include <mitkStandardFileLocations.h>
 
 #include <string>
@@ -52,7 +52,7 @@ static void TestThreadSaveLog(bool toFile)
     {
       std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/qtestthreadlog.log";
       itksys::SystemTools::RemoveFile(filename.c_str()); // remove old file, we do not want to append to large files
-      mitk::LoggingBackend::SetLogFile(filename.c_str());
+      mitk::LogBackend::SetLogFile(filename);
     }
 
     unsigned int numberOfThreads = 10;

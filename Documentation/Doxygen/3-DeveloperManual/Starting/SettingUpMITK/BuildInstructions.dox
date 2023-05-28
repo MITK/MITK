@@ -178,10 +178,10 @@ add_executable(MyApp main.cpp)
 target_link_libraries(MyApp MitkCore)
 \endcode
 
-with the main.ccp being
+with the main.cpp being
 \code
 #include <iostream>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 int main()
 {

@@ -11,8 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkExceptionMacro.h>
-#include <mitkLog.h>
-#include <mitkLogMacros.h>
+#include <mitkLogBackend.h>
 
 #include <itkOutputWindow.h>
 
@@ -22,32 +21,32 @@ found in the LICENSE file.
 #include <mutex>
 
 static std::mutex logMutex;
-static mitk::LoggingBackend *mitkLogBackend = nullptr;
+static mitk::LogBackend *mitkLogBackend = nullptr;
 static std::ofstream *logFile = nullptr;
 static std::string logFileName = "";
 static std::stringstream *outputWindow = nullptr;
 static bool logOutputWindow = false;
 
-void mitk::LoggingBackend::EnableAdditionalConsoleWindow(bool enable)
+void mitk::LogBackend::EnableAdditionalConsoleWindow(bool enable)
 {
   logOutputWindow = enable;
 }
 
-void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage &l)
+void mitk::LogBackend::ProcessMessage(const LogMessage& message)
 {
   logMutex.lock();
 #ifdef _WIN32
-  FormatSmart(l, (int)GetCurrentThreadId());
+  FormatSmart(message, (int)GetCurrentThreadId());
 #else
-  FormatSmart(l);
+  FormatSmart(message);
 #endif
 
   if (logFile)
   {
 #ifdef _WIN32
-    FormatFull(*logFile, l, (int)GetCurrentThreadId());
+    FormatFull(*logFile, message, (int)GetCurrentThreadId());
 #else
-    FormatFull(*logFile, l);
+    FormatFull(*logFile, message);
 #endif
   }
   if (logOutputWindow)
@@ -59,35 +58,35 @@ void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage &l)
     outputWindow->str("");
     outputWindow->clear();
 #ifdef _WIN32
-    FormatFull(*outputWindow, l, (int)GetCurrentThreadId());
+    FormatFull(*outputWindow, message, (int)GetCurrentThreadId());
 #else
-    FormatFull(*outputWindow, l);
+    FormatFull(*outputWindow, message);
 #endif
     itk::OutputWindow::GetInstance()->DisplayText(outputWindow->str().c_str());
   }
   logMutex.unlock();
 }
 
-void mitk::LoggingBackend::Register()
+void mitk::LogBackend::Register()
 {
   if (mitkLogBackend)
     return;
-  mitkLogBackend = new mitk::LoggingBackend();
-  mbilog::RegisterBackend(mitkLogBackend);
+  mitkLogBackend = new LogBackend;
+  RegisterBackend(mitkLogBackend);
 }
 
-void mitk::LoggingBackend::Unregister()
+void mitk::LogBackend::Unregister()
 {
   if (mitkLogBackend)
   {
-    SetLogFile(nullptr);
-    mbilog::UnregisterBackend(mitkLogBackend);
+    SetLogFile("");
+    UnregisterBackend(mitkLogBackend);
     delete mitkLogBackend;
     mitkLogBackend = nullptr;
   }
 }
 
-void mitk::LoggingBackend::SetLogFile(const char *file)
+void mitk::LogBackend::SetLogFile(const std::string& file)
 {
   // closing old logfile
   {
@@ -112,7 +111,7 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
   }
 
   // opening new logfile
-  if (file)
+  if (!file.empty())
   {
     logMutex.lock();
 
@@ -138,12 +137,12 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
   }
 }
 
-std::string mitk::LoggingBackend::GetLogFile()
+std::string mitk::LogBackend::GetLogFile()
 {
   return logFileName;
 }
 
-void mitk::LoggingBackend::CatchLogFileCommandLineParameter(int &argc, char **argv)
+void mitk::LogBackend::CatchLogFileCommandLineParameter(int &argc, char **argv)
 {
   int r;
 
@@ -158,7 +157,7 @@ void mitk::LoggingBackend::CatchLogFileCommandLineParameter(int &argc, char **ar
         return;
       }
 
-      mitk::LoggingBackend::SetLogFile(argv[r + 1]);
+      SetLogFile(argv[r + 1]);
 
       for (r += 2; r < argc; r++)
         argv[r - 2] = argv[r];
@@ -169,7 +168,7 @@ void mitk::LoggingBackend::CatchLogFileCommandLineParameter(int &argc, char **ar
   }
 }
 
-void mitk::LoggingBackend::RotateLogFiles(const std::string &prefixPath)
+void mitk::LogBackend::RotateLogFiles(const std::string &prefixPath)
 {
   static const int numLogFiles = 10;
   std::string newEmptyLogFileName;
@@ -178,10 +177,10 @@ void mitk::LoggingBackend::RotateLogFiles(const std::string &prefixPath)
   newEmptyLogFileName = IncrementLogFileNames(prefixPath, numLogFiles);
 
   // now: use the new empty logfile name as name for this run
-  mitk::LoggingBackend::SetLogFile(newEmptyLogFileName.c_str());
+  SetLogFile(newEmptyLogFileName.c_str());
 }
 
-std::string mitk::LoggingBackend::IncrementLogFileNames(const std::string &prefixPath, int numLogFiles)
+std::string mitk::LogBackend::IncrementLogFileNames(const std::string &prefixPath, int numLogFiles)
 {
   // delete last one
   {
@@ -227,7 +226,7 @@ std::string mitk::LoggingBackend::IncrementLogFileNames(const std::string &prefi
   }
 }
 
-bool mitk::LoggingBackend::CheckIfFileExists(const std::string &filename)
+bool mitk::LogBackend::CheckIfFileExists(const std::string &filename)
 {
   bool returnValue = false;
   std::ifstream File(filename.c_str());
@@ -243,7 +242,7 @@ bool mitk::LoggingBackend::CheckIfFileExists(const std::string &filename)
   return returnValue;
 }
 
-mbilog::OutputType mitk::LoggingBackend::GetOutputType() const
+mitk::LogBackendBase::OutputType mitk::LogBackend::GetOutputType() const
 {
-  return mbilog::Console;
+  return OutputType::Console;
 }

@@ -30,7 +30,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>

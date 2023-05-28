@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <boost/algorithm/string.hpp>
 
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 #include "dcmtk/ofstd/ofstd.h"
 
 mitk::DICOMTag

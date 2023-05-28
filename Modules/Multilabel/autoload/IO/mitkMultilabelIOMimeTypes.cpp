@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkMultilabelIOMimeTypes.h"
 #include <mitkIOMimeTypes.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <filesystem>
 #include <fstream>
 

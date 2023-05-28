@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "usModuleContext.h"
 #include "usGetModuleContext.h"
 
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 #include "mitkDataStorageInspectorGenerator.h"
 
 mitk::IDataStorageInspectorProvider* mitk::DataStorageInspectorGenerator::GetProvider(const IDType& id)

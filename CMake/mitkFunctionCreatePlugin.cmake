@@ -261,8 +261,8 @@ function(mitk_create_plugin)
     target_link_libraries(${PLUGIN_TARGET} PRIVATE ${CppUnit_LIBRARIES})
   endif()
 
-  if(mbilog_FOUND)
-    target_link_libraries(${PLUGIN_TARGET} PRIVATE mbilog)
+  if(TARGET MitkLog)
+    target_link_libraries(${PLUGIN_TARGET} PRIVATE MitkLog)
   endif()
 
   set(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")

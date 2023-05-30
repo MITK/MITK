@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <mitkTestingMacros.h>
 #include <mitkToFProcessingCommon.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 /**Documentation
  *  test for the class "ToFProcessingCommon".
  */

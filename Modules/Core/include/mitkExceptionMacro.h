@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "mitkException.h"
 #include <itkMacro.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <sstream>
 
 /** The exception macro is used to throw an exception

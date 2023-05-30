@@ -10,20 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MBILOG_CONFIG_H_
-#define _MBILOG_CONFIG_H_
+#include <mitkLogBackendBase.h>
 
-@_define_enable_debug@
-
-#define _MBILOG_STR_(x) #x
-#define _MBILOG_STR(x) _MBILOG_STR_(x)
-
-#ifndef MBILOG_MODULENAME
-  #if defined(US_MODULE_NAME)
-    #define MBILOG_MODULENAME _MBILOG_STR(US_MODULE_NAME)
-  #else
-    #define MBILOG_MODULENAME "n/a"
-  #endif
-#endif
-
-#endif /* _MBILOG_CONFIG_H_ */
+mitk::LogBackendBase::~LogBackendBase()
+{
+}

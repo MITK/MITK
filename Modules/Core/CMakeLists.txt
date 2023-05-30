@@ -17,7 +17,7 @@ mitk_create_module(
       src/Rendering
   DEPENDS
     PUBLIC
-      mbilog
+      MitkLog
       CppMicroServices
   PACKAGE_DEPENDS
     PUBLIC

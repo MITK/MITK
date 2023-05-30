@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <string>
 // MITK includes
 #include "mitkUIDGenerator.h"
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 

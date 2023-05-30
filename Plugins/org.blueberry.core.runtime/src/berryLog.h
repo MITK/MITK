@@ -13,16 +13,16 @@ found in the LICENSE file.
 #ifndef __BERRY_LOG_H__
 #define __BERRY_LOG_H__
 
-#include <mbilog.h>
+#include <mitkLog.h>
 
 #include <org_blueberry_core_runtime_Export.h>
 
-#define BERRY_INFO MBI_INFO("BlueBerry")
-#define BERRY_WARN MBI_WARN("BlueBerry")
-#define BERRY_ERROR MBI_ERROR("BlueBerry")
-#define BERRY_FATAL MBI_FATAL("BlueBerry")
+#define BERRY_INFO MITK_INFO("BlueBerry")
+#define BERRY_WARN MITK_WARN("BlueBerry")
+#define BERRY_ERROR MITK_ERROR("BlueBerry")
+#define BERRY_FATAL MITK_FATAL("BlueBerry")
 
-#define BERRY_DEBUG MBI_DEBUG("BlueBerry")
+#define BERRY_DEBUG MITK_DEBUG("BlueBerry")
 
 org_blueberry_core_runtime_EXPORT std::ostream& operator<<(std::ostream& os, const QString& str);
 

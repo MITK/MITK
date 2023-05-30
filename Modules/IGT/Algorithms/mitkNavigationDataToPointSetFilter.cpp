@@ -214,7 +214,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
     for (unsigned int index = 0; index < oPoint.Size(); index++)
       oPoint[index] = oPoint[index] / counterVec[i];
     output->SetPoint(newPointId, oPoint);
-    MBI_INFO << "For output # " << i << ", " << counterVec[i] << " tracked positions used for averaging";
+    MITK_INFO << "For output # " << i << ", " << counterVec[i] << " tracked positions used for averaging";
   }
 }
 

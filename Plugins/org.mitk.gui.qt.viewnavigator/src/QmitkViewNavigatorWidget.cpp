@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include <berryUIElement.h>
 
 // MITK
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 // Qt
 #include <QHash>

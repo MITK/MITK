@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 // Qmitk
 #include "QmitkDicomExternalDataWidget.h"
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 // CTK
 #include <ctkDICOMIndexer.h>

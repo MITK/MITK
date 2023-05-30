@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkOclUtils.h"
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 #include <cstdio>
 #include <cstring>
 

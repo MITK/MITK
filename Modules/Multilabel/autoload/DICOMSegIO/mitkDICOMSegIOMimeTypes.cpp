@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <array>
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <itkGDCMImageIO.h>
 #include <itksys/SystemTools.hxx>

@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 
 //Mitk
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <mitkConfig.h>
 
 //usService

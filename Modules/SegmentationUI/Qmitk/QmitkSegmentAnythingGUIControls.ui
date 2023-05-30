@@ -166,23 +166,6 @@
       </widget>
      </item>
 
-     <item row="3" column="0">
-      <widget class="QLabel" name="modelTypeLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Model Type</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1" colspan="3">
-        <widget class="ctkComboBox" name="modelTypeComboBox"/>
-     </item>
-
      <item row="4" column="0">
       <widget class="QLabel" name="interactiveLabel">
        <property name="sizePolicy">
@@ -253,7 +236,7 @@ Press DEL to remove last seed.
       </size>
      </property>
      <property name="title" stdset="0">
-      <string>Advanced</string>
+      <string>Preferences</string>
      </property>
      <property name="flat" stdset="0">
       <bool>true</bool>
@@ -298,6 +281,23 @@ Press DEL to remove last seed.
         <item row="0" column="1" colspan="3">
          <widget class="ctkComboBox" name="gpuComboBox"/>
         </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="modelTypeLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Model Type:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" colspan="3">
+         <widget class="ctkComboBox" name="modelTypeComboBox"/>
+        </item>   
+		
        </layout>
       </item>
      </layout>
@@ -354,6 +354,19 @@ Press DEL to remove last seed.
      </property>
     </widget>
    </item>
+	  <item>
+		  <widget class="QProgressBar" name="samProgressBar">
+			  <property name="maximum">
+				  <number>1</number>
+			  </property>
+			  <property name="value">
+				  <number>0</number>
+			  </property>
+			  <property name="textVisible">
+				  <bool>false</bool>
+			  </property>
+		  </widget>
+	  </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

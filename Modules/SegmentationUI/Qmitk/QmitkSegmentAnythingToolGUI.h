@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include "QmitkSetupVirtualEnvUtil.h"
 #include <QMessageBox>
 #include <QStandardPaths>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 
 /**
@@ -87,6 +89,16 @@ protected slots:
    */
   void OnClearInstall();
 
+  /**
+   * @brief Qt Slot
+   */
+  void FileDownloaded(QNetworkReply *); 
+
+  /**
+  * @brief Qt Slot
+  */
+  void OnParametersChanged(const QString &); 
+
 protected:
   QmitkSegmentAnythingToolGUI();
   ~QmitkSegmentAnythingToolGUI() = default;
@@ -152,9 +164,23 @@ protected:
    * @return QString
    */
   QString GetPythonPathFromUI(const QString &) const;
+  
+  /**
+  * 
+  */
+  bool DownloadModel(const QString &);
+
+  /**
+  * 
+  */
+  void ShowProgressBar(bool);
+
+  void ActivateSAMDaemon();
+
 
 private:
   QmitkSegmentAnythingToolInstaller m_Installer;
+  QNetworkAccessManager m_Manager;
   Ui_QmitkSegmentAnythingGUIControls m_Controls;
   QString m_PythonPath;
   QmitkGPULoader m_GpuLoader;
@@ -162,6 +188,10 @@ private:
   bool m_IsInstalled = false;
   const std::string WARNING_SAM_NOT_FOUND =
     "SAM is not detected in the selected python environment.Please reinstall SAM.";
-  const QStringList VALID_MODELS = {"vit_h (default)", "vit_l", "vit_b"};
+  const QMap<QString, QUrl> VALID_MODELS_URL_MAP = {
+    {"vit_b", QUrl("https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth")},
+    //{"vit_b", QUrl("http://www.google.ru/images/srpr/logo3w.png")},
+    {"vit_l", QUrl("https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth")},
+    {"vit_h", QUrl("https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth")}};
 };
 #endif

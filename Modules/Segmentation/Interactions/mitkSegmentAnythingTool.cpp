@@ -34,6 +34,9 @@ using namespace std::chrono_literals;
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, SegmentAnythingTool, "SegmentAnythingTool");
+  const std::string SIGNALCONSTANTS::READY = "READY";
+  const std::string SIGNALCONSTANTS::KILL = "KILL";
+  bool mitk::SegmentAnythingTool::IsPythonReady = false;
 }
 
 mitk::SegmentAnythingTool::SegmentAnythingTool() : SegWithPreviewTool(false, "PressMoveReleaseAndPointSetting")
@@ -44,6 +47,7 @@ mitk::SegmentAnythingTool::SegmentAnythingTool() : SegWithPreviewTool(false, "Pr
 
 mitk::SegmentAnythingTool::~SegmentAnythingTool()
 {
+  this->StopAsyncProcess();
   std::filesystem::remove_all(this->GetMitkTempDir());
 }
 
@@ -101,7 +105,6 @@ void mitk::SegmentAnythingTool::Deactivated()
   m_PointSetNodeNegative = nullptr;
   m_PointSetPositive = nullptr;
   m_PointSetNegative = nullptr;
-
   Superclass::Deactivated();
 }
 
@@ -214,6 +217,14 @@ void mitk::SegmentAnythingTool::onPythonProcessEvent(itk::Object * /*pCaller*/, 
   if (pEvent)
   {
     testCOUT = testCOUT + pEvent->GetOutput();
+    if (SIGNALCONSTANTS::READY == testCOUT)
+    {
+      mitk::SegmentAnythingTool::IsPythonReady = true;
+    }
+    if (SIGNALCONSTANTS::KILL == testCOUT)
+    {
+      mitk::SegmentAnythingTool::IsPythonReady = false;
+    }
     MITK_INFO << testCOUT;
   }
   const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
@@ -230,41 +241,28 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
   {
     if (this->m_MitkTempDir.empty())
     {
-      //this->SetPythonPath("C:\\DKFZ\\SAM_work\\sam_env\\Scripts");
-      //this->SetPythonPath("C:\\DKFZ\\SAM_work\\sam-embed");
       MITK_INFO << "Python Path: " << this->GetPythonPath();
-      this->SetModelType("vit_b");
-      this->SetCheckpointPath("C:\\DKFZ\\SAM_work\\sam_vit_b_01ec64.pth");
-
-      this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
-      m_InDir = IOUtil::CreateTemporaryDirectory("sam-in-XXXXXX", this->GetMitkTempDir());
-      m_OutDir = IOUtil::CreateTemporaryDirectory("sam-out-XXXXXX", this->GetMitkTempDir());
-      m_Future = std::async(std::launch::async, &mitk::SegmentAnythingTool::start_python_daemon, this);
+      MITK_INFO << "Checkpoint Path: " << this->GetCheckpointPath();
+      MITK_INFO << "Model type: " << this->GetModelType();
+      this->CreateTempDirs(m_PARENT_TEMP_DIR_PATTERN);
     }
     if (this->HasPicks())
     {
       std::string uniquePlaneID = GetHashForCurrentPlane();
       std::string inputImagePath = m_InDir + IOUtil::GetDirectorySeparator() + uniquePlaneID + ".nii.gz";
-      std::size_t found = inputImagePath.find_last_of(IOUtil::GetDirectorySeparator());
-      std::string fileName = inputImagePath.substr(found + 1);
-      token = fileName.substr(0, fileName.find("_"));
-
       outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + uniquePlaneID + ".nii.gz";
       IOUtil::Save(inputAtTimeStep, inputImagePath);
       auto csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
-      std::string triggerFilePath = m_InDir + IOUtil::GetDirectorySeparator() + m_TRIGGER_FILENAME;
-      std::ofstream csvfile;
-      csvfile.open(triggerFilePath, std::ofstream::out | std::ofstream::trunc);
-      csvfile << csvStream.rdbuf();
-      csvfile.close();
+      this->WriteCSVFile(csvStream);
 
       auto status = m_Future.wait_for(0ms); // check if python daemon has stopped for some reason
       if (status == std::future_status::ready)
       {
         MITK_INFO << "Thread finished... restarting..";
         m_Future = std::async(std::launch::async, &mitk::SegmentAnythingTool::start_python_daemon, this);
+        //StartAsyncProcess();
       }
-      //outputImagePath = "C:\\DKFZ\\SAM_work\\test_seg_3d.nii.gz";
+      //outputImagePath = "C:\\DKFZ\\SAM_work\\test_seg_3d.nii.gz"; 
       std::this_thread::sleep_for(10ms);
       while (!std::filesystem::exists(outputImagePath));
       Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
@@ -276,7 +274,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
       previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
       std::filesystem::remove(outputImagePath);
     }
-    else
+    else if (nullptr != this->GetWorkingPlaneGeometry())
     {
       previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
       this->ResetPreviewContentAtTimeStep(timeStep);
@@ -301,6 +299,59 @@ std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()
   return std::to_string(hashVal);
 }
 
+void mitk::SegmentAnythingTool::StopAsyncProcess()
+{
+  std::stringstream controlStream;
+  controlStream << SIGNALCONSTANTS::KILL;
+  this->WriteControlFile(controlStream);
+}
+
+void mitk::SegmentAnythingTool::CreateTempDirs(const std::string &dirPattern)
+{
+  this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory(dirPattern));
+  m_InDir = IOUtil::CreateTemporaryDirectory("sam-in-XXXXXX", this->GetMitkTempDir());
+  m_OutDir = IOUtil::CreateTemporaryDirectory("sam-out-XXXXXX", this->GetMitkTempDir());
+}
+
+void mitk::SegmentAnythingTool::StartAsyncProcess()
+{
+  if (nullptr != m_DaemonExec)
+  {
+    this->StopAsyncProcess();
+  }
+  if (this->m_MitkTempDir.empty())
+  {
+    this->CreateTempDirs(m_PARENT_TEMP_DIR_PATTERN);
+  }
+  std::stringstream controlStream;
+  controlStream << SIGNALCONSTANTS::READY;
+  this->WriteControlFile(controlStream);
+
+  m_DaemonExec = ProcessExecutor::New();
+  itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
+  spCommand->SetCallback(&mitk::SegmentAnythingTool::onPythonProcessEvent);
+  m_DaemonExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
+  m_Future = std::async(std::launch::async, &mitk::SegmentAnythingTool::start_python_daemon, this);
+}
+
+void mitk::SegmentAnythingTool::WriteCSVFile(std::stringstream &csvStream)
+{
+  std::string triggerFilePath = m_InDir + IOUtil::GetDirectorySeparator() + m_TRIGGER_FILENAME;
+  std::ofstream csvfile;
+  csvfile.open(triggerFilePath, std::ofstream::out | std::ofstream::trunc);
+  csvfile << csvStream.rdbuf();
+  csvfile.close();
+}
+
+void mitk::SegmentAnythingTool::WriteControlFile(std::stringstream &statusStream)
+{
+  std::string controlFilePath = m_InDir + IOUtil::GetDirectorySeparator() + "control.txt";
+  std::ofstream controlFile;
+  controlFile.open(controlFilePath, std::ofstream::out | std::ofstream::trunc);
+  controlFile << statusStream.rdbuf();
+  controlFile.close();
+}
+
 void mitk::SegmentAnythingTool::start_python_daemon()
 {
   ProcessExecutor::ArgumentListType args;
@@ -309,7 +360,6 @@ void mitk::SegmentAnythingTool::start_python_daemon()
 
   args.push_back("C:\\DKFZ\\SAM_work\\sam-playground\\endpoints\\run_inference_daemon.py");
   
-
   args.push_back("--input-folder");
   args.push_back(m_InDir);
 
@@ -325,11 +375,6 @@ void mitk::SegmentAnythingTool::start_python_daemon()
   args.push_back("--checkpoint");
   args.push_back(this->GetCheckpointPath());
 
-  ProcessExecutor::Pointer spExec = ProcessExecutor::New();
-  itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
-  spCommand->SetCallback(&onPythonProcessEvent);
-  spExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
-
   try
   {
     std::string cudaEnv = "CUDA_VISIBLE_DEVICES=" + std::to_string(this->GetGpuId());
@@ -341,7 +386,7 @@ void mitk::SegmentAnythingTool::start_python_daemon()
     logStream << this->GetPythonPath();
     MITK_INFO << logStream.str();
 
-    spExec->Execute(this->GetPythonPath(), command, args);
+    m_DaemonExec->Execute(this->GetPythonPath(), command, args);
   }
   catch (const mitk::Exception &e)
   {
@@ -349,12 +394,6 @@ void mitk::SegmentAnythingTool::start_python_daemon()
     return;
   }
   MITK_INFO << "ending python process.....";
-}
-
-bool mitk::SegmentAnythingTool::run_download_model(std::string targetDir)
-{
-  MITK_INFO << "model will be downloading to " << targetDir;
-  return true;
 }
 
 std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::BaseGeometry* baseGeometry)

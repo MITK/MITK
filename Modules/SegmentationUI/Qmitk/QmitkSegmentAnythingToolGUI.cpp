@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include <QmitkStyleManager.h>
 #include <QDirIterator>
 #include <QFileDialog>
+#include <QNetworkRequest>
+#include <QtConcurrentRun>
 
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkSegmentAnythingToolGUI, "")
@@ -54,7 +56,7 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.sysPythonComboBox->addItem("Select");
   m_Controls.sysPythonComboBox->setCurrentIndex(0);
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
-  m_Controls.modelTypeComboBox->addItems(VALID_MODELS);
+  m_Controls.modelTypeComboBox->addItems(VALID_MODELS_URL_MAP.keys());
 
   QString welcomeText;
   this->SetGPUInfo();
@@ -72,9 +74,13 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls.resetButton, SIGNAL(clicked()), this, SLOT(OnResetPicksClicked()));
   connect(m_Controls.installButton, SIGNAL(clicked()), this, SLOT(OnInstallBtnClicked()));
   connect(m_Controls.clearButton, SIGNAL(clicked()), this, SLOT(OnClearInstall()));
-  /*connect(m_Controls.sysPythonComboBox,
+  connect(m_Controls.sysPythonComboBox,
           QOverload<int>::of(&QComboBox::activated),
-          [=](int index) { OnSystemPythonChanged(m_Controls.sysPythonComboBox->itemText(index)); }); */
+          [=](int index) { OnSystemPythonChanged(m_Controls.sysPythonComboBox->itemText(index)); });
+  connect(m_Controls.gpuComboBox, SIGNAL(currentTextChanged(const QString &)), this,
+          SLOT(OnParametersChanged(const QString &)));
+  connect(m_Controls.modelTypeComboBox, SIGNAL(currentTextChanged(const QString &)), this,
+          SLOT(OnParametersChanged(const QString &)));
 
   QIcon deleteIcon =
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/edit-delete.svg"));
@@ -89,13 +95,16 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   {
     m_PythonPath = GetExactPythonPath(storageDir);
     m_Installer.SetVirtualEnvPath(m_PythonPath);
-    this->EnableAll(m_IsInstalled);
     welcomeText += " SAM is already found installed.";
   }
   else
   {
     welcomeText += " SAM is not installed. Please click on \"Install SAM\" above.";
   }
+  this->EnableAll(m_IsInstalled);
+  this->WriteStatusMessage(welcomeText);
+  this->ShowProgressBar(false);
+  m_Controls.samProgressBar->setMaximum(0);
 
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
@@ -231,34 +240,31 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
   {
     return;
   }
-
   try
   {
     m_Controls.activateButton->setEnabled(false);
     qApp->processEvents();
-    /* if (!this->IsSAMInstalled(m_PythonPath))
+    if (!this->IsSAMInstalled(m_PythonPath))
     {
       throw std::runtime_error(WARNING_SAM_NOT_FOUND);
-    }*/
+    }
     tool->SetIsAuto(m_Controls.autoRButton->isChecked());
     tool->SetPythonPath(m_PythonPath.toStdString());
     tool->SetGpuId(FetchSelectedGPUFromUI());
-    QString modelType = m_Controls.modelTypeComboBox->currentText();
-    std::string path = "c:\\Data";
+    QString modelType = m_Controls.modelTypeComboBox->currentText();    
     tool->SetModelType(modelType.toStdString());
     this->WriteStatusMessage(
       QString("<b>STATUS: </b><i>Checking if model is already downloaded... This might take a while.</i>"));
-    if (tool->run_download_model(path))
+    if (this->DownloadModel(modelType))
     {
-      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model is sucessfully found.</i>"));
-      tool->IsReadyOn();
+      this->ActivateSAMDaemon();
+      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. SAM Activated.</i>"));
     }
     else
     {
       tool->IsReadyOff();
-      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model couldn't be downloaded. Please try again.</i>"));
+      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model not found. Starting download...</i>"));
     }
-    m_Controls.activateButton->setEnabled(true);
   }
   catch (const std::exception &e)
   {
@@ -278,6 +284,24 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
   }
 }
 
+void QmitkSegmentAnythingToolGUI::ActivateSAMDaemon()
+{
+  auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
+  if (nullptr == tool)
+  {
+    return;
+  }
+  this->ShowProgressBar(true);
+  tool->StartAsyncProcess();
+  while (!tool->IsPythonReady)
+  {
+    qApp->processEvents();
+  }
+  tool->IsReadyOn();
+  m_Controls.activateButton->setEnabled(true);
+  this->ShowProgressBar(false);
+}
+
 QString QmitkSegmentAnythingToolGUI::GetPythonPathFromUI(const QString &pyUI) const
 {
   QString fullPath = pyUI;
@@ -286,6 +310,54 @@ QString QmitkSegmentAnythingToolGUI::GetPythonPathFromUI(const QString &pyUI) co
     fullPath = fullPath.mid(fullPath.indexOf(")") + 2);
   }
   return fullPath.simplified();
+}
+
+bool QmitkSegmentAnythingToolGUI::DownloadModel(const QString &modelType)
+{
+  QUrl url = VALID_MODELS_URL_MAP[modelType];
+  QString modelFileName = url.fileName();
+  const QString& storageDir = m_Installer.STORAGE_DIR;
+  QString checkPointPath = storageDir + QDir::separator() + modelFileName;
+  if (QFile::exists(checkPointPath))
+  {
+    auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
+    if (nullptr != tool)
+    {
+      tool->SetCheckpointPath(checkPointPath.toStdString());
+    }
+    return true;
+  }
+  connect(&m_Manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(FileDownloaded(QNetworkReply*)));
+  QNetworkRequest request(url);
+  m_Manager.get(request);
+  this->ShowProgressBar(true);
+  return false;
+}
+
+void QmitkSegmentAnythingToolGUI::FileDownloaded(QNetworkReply *reply)
+{
+  const QString &storageDir = m_Installer.STORAGE_DIR;
+  const QString &modelFileName = reply->url().fileName();
+  QFile file(storageDir + QDir::separator() + modelFileName);
+  if (file.open(QIODevice::WriteOnly))
+  {
+    file.write(reply->readAll());
+    file.close();
+    disconnect(&m_Manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(FileDownloaded(QNetworkReply *)));
+    auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
+    if (nullptr != tool)
+    {
+      tool->SetCheckpointPath(file.fileName().toStdString());
+      this->ActivateSAMDaemon();
+      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. SAM Activated.</i>"));
+    }
+  }
+  else
+  {
+    this->WriteErrorMessage("<b>STATUS: </b><i>Model couldn't be downloaded. SAM not activated.</i>");
+  }
+  this->EnableAll(true);
+  this->ShowProgressBar(false);
 }
 
 QString QmitkSegmentAnythingToolGUI::OnSystemPythonChanged(const QString &pyEnv)
@@ -314,6 +386,12 @@ QString QmitkSegmentAnythingToolGUI::OnSystemPythonChanged(const QString &pyEnv)
   return pyPath;
 }
 
+void QmitkSegmentAnythingToolGUI::ShowProgressBar(bool enabled)
+{
+  m_Controls.samProgressBar->setEnabled(enabled);
+  m_Controls.samProgressBar->setVisible(enabled);
+}
+
 bool QmitkSegmentAnythingToolGUI::IsSAMInstalled(const QString &pythonPath)
 {
   QString fullPath = pythonPath;
@@ -339,20 +417,27 @@ bool QmitkSegmentAnythingToolGUI::IsSAMInstalled(const QString &pythonPath)
   return isExists;
 }
 
+void QmitkSegmentAnythingToolGUI::OnParametersChanged(const QString &)
+{
+  if (m_Controls.activateButton->isEnabled())
+  {
+    this->WriteStatusMessage("<b>STATUS: </b><i>Please Reactivate SAM.</i>");
+  }
+}
+
 void QmitkSegmentAnythingToolGUI::OnResetPicksClicked()
 {
   auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
   if (nullptr != tool)
   {
     tool->ClearPicks();
+    tool->StopAsyncProcess();
   }
 }
 
 void QmitkSegmentAnythingToolGUI::OnInstallBtnClicked()
 {
   bool isInstalled = false;
-  //QNetworkRequest request(url);
-  //QNetworkReply *reply = manager.get(request);
   QString systemPython = OnSystemPythonChanged(m_Controls.sysPythonComboBox->currentText());
   if (systemPython.isEmpty())
   {
@@ -370,7 +455,7 @@ void QmitkSegmentAnythingToolGUI::OnInstallBtnClicked()
     }
     else
     {
-      this->WriteErrorMessage("<b>ERROR: </b>Couldn't install TotalSegmentator.");
+      this->WriteErrorMessage("<b>ERROR: </b>Couldn't install SAM.");
     }
   }
   this->EnableAll(isInstalled);
@@ -389,6 +474,7 @@ void QmitkSegmentAnythingToolGUI::OnClearInstall()
     MITK_ERROR << "The virtual environment couldn't be removed. Please check if you have the required access "
                   "privileges or, some other process is accessing the folders.";
   }
+  this->EnableAll(m_IsInstalled);
 }
 
 bool QmitkSegmentAnythingToolInstaller::SetupVirtualEnv(const QString &venvName)

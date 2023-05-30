@@ -86,8 +86,9 @@ namespace mitk
      *
      */
     static void onPythonProcessEvent(itk::Object *, const itk::EventObject &e, void *);
-
-    bool run_download_model(std::string);
+    static bool IsPythonReady;
+    void StartAsyncProcess();
+    void StopAsyncProcess();
 
   protected:
     SegmentAnythingTool();
@@ -117,8 +118,6 @@ namespace mitk
     std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry);
     std::string GetHashForCurrentPlane();
 
-    void start_async_process();
-
 
   private:
     /**
@@ -133,18 +132,17 @@ namespace mitk
                                     const std::string&,
                                     const unsigned int);
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, mitk::Point3D&);
-
     void start_python_daemon();
+    void WriteCSVFile(std::stringstream&);
+    void WriteControlFile(std::stringstream&);
+    void CreateTempDirs(const std::string& dirPattern);
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_ModelType;
     std::string m_CheckpointPath;
     std::string m_InDir, m_OutDir, outputImagePath, token; // rename as per standards
-
-
     unsigned int m_GpuId = 0;
-
     PointSet::Pointer m_PointSetPositive;
     PointSet::Pointer m_PointSetNegative;
     DataNode::Pointer m_PointSetNode;
@@ -153,10 +151,18 @@ namespace mitk
     bool m_IsAuto = false;
     bool m_IsReady = false;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
+    const std::string m_PARENT_TEMP_DIR_PATTERN = "mitk-sam-XXXXXX";
     const std::string m_TRIGGER_FILENAME = "trigger.csv";
     int m_PointSetCount = 0;
     std::future<void> m_Future;
+    ProcessExecutor::Pointer m_DaemonExec;
+  };
 
+
+  struct SIGNALCONSTANTS
+  {
+    static const std::string READY;
+    static const std::string KILL;
   };
 
 } // namespace

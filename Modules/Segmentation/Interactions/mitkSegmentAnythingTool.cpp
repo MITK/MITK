@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include "mitkProperties.h"
 #include "mitkToolManager.h"
+#include "mitkPointSetShapeProperty.h"
 
 #include "mitkInteractionPositionEvent.h"
 // us
@@ -80,6 +81,8 @@ void mitk::SegmentAnythingTool::Activated()
   m_PointSetNode->SetBoolProperty("helper object", true);
   m_PointSetNode->SetColor(0.0, 1.0, 0.0);
   m_PointSetNode->SetVisibility(true);
+  m_PointSetNode->SetProperty("Pointset.2D.shape", mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
+  m_PointSetNode->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
   this->GetDataStorage()->Add(m_PointSetNode, this->GetToolManager()->GetWorkingData(0));
 
   m_PointSetNegative = mitk::PointSet::New();
@@ -89,6 +92,8 @@ void mitk::SegmentAnythingTool::Activated()
   m_PointSetNodeNegative->SetBoolProperty("helper object", true);
   m_PointSetNodeNegative->SetColor(1.0, 0.0, 0.0);
   m_PointSetNodeNegative->SetVisibility(true);
+  m_PointSetNodeNegative->SetProperty("Pointset.2D.shape", mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
+  m_PointSetNodeNegative->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
   this->GetDataStorage()->Add(m_PointSetNodeNegative, this->GetToolManager()->GetWorkingData(0));
 
   this->SetLabelTransferScope(LabelTransferScope::AllLabels);
@@ -105,6 +110,7 @@ void mitk::SegmentAnythingTool::Deactivated()
   m_PointSetNodeNegative = nullptr;
   m_PointSetPositive = nullptr;
   m_PointSetNegative = nullptr;
+  this->StopAsyncProcess();
   Superclass::Deactivated();
 }
 

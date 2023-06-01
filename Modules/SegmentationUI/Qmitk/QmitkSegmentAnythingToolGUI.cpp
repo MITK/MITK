@@ -53,7 +53,7 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.sysPythonComboBox->addItem("/usr/bin");
 #endif
   this->AutoParsePythonPaths();
-  m_Controls.sysPythonComboBox->addItem("Select");
+  m_Controls.sysPythonComboBox->addItem("Select...");
   m_Controls.sysPythonComboBox->setCurrentIndex(0);
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   m_Controls.modelTypeComboBox->addItems(VALID_MODELS_URL_MAP.keys());
@@ -363,7 +363,7 @@ void QmitkSegmentAnythingToolGUI::FileDownloaded(QNetworkReply *reply)
 QString QmitkSegmentAnythingToolGUI::OnSystemPythonChanged(const QString &pyEnv)
 {
   QString pyPath;
-  if (pyEnv == QString("Select"))
+  if (pyEnv == QString("Select..."))
   {
     m_Controls.activateButton->setDisabled(true);
     QString path =

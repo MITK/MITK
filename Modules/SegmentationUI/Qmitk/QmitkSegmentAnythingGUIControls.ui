@@ -167,47 +167,6 @@
      </item>
 
      <item row="4" column="0">
-      <widget class="QLabel" name="interactiveLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Interactive</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QRadioButton" name="interactiveRButton">
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="2">
-      <widget class="QLabel" name="autoLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Auto</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="3">
-      <widget class="QRadioButton" name="autoRButton">
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-
-     <item row="5" column="0">
       <widget class="QLabel" name="instructLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -354,19 +313,19 @@ Press DEL to remove last seed.
      </property>
     </widget>
    </item>
-	  <item>
-		  <widget class="QProgressBar" name="samProgressBar">
-			  <property name="maximum">
-				  <number>1</number>
-			  </property>
-			  <property name="value">
-				  <number>0</number>
-			  </property>
-			  <property name="textVisible">
-				  <bool>false</bool>
-			  </property>
-		  </widget>
-	  </item>
+   <item>
+    <widget class="QProgressBar" name="samProgressBar">
+     <property name="maximum">
+       <number>1</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+     </property>
+     <property name="textVisible">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

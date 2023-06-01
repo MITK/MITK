@@ -248,7 +248,7 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     {
       throw std::runtime_error(WARNING_SAM_NOT_FOUND);
     }
-    tool->SetIsAuto(m_Controls.autoRButton->isChecked());
+    tool->SetIsAuto(false);
     tool->SetPythonPath(m_PythonPath.toStdString());
     tool->SetGpuId(FetchSelectedGPUFromUI());
     QString modelType = m_Controls.modelTypeComboBox->currentText();    

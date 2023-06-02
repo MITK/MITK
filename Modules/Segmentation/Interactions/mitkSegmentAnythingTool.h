@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "mitkSegWithPreviewTool.h"
 #include "mitkPointSet.h"
 #include "mitkProcessExecutor.h"
-
+#include "mitkSegmentAnythingPythonService.h"
 #include <MitkSegmentationExports.h>
 #include <thread>
 #include <future>
@@ -80,15 +80,8 @@ namespace mitk
     itkGetConstMacro(IsReady, bool);
     itkBooleanMacro(IsReady);
 
-    /**
-     * @brief Static function to print out everything from itk::EventObject.
-     * Used as callback in mitk::ProcessExecutor object.
-     *
-     */
-    static void onPythonProcessEvent(itk::Object *, const itk::EventObject &e, void *);
-    static bool IsPythonReady;
-    void StartAsyncProcess();
-    void StopAsyncProcess();
+    void InitSAMPythonProcess();
+    bool IsPythonReady() const;
 
   protected:
     SegmentAnythingTool();
@@ -120,28 +113,15 @@ namespace mitk
 
 
   private:
-    /**
-     * @brief Runs SAM python process with desired arguments to generate embeddings for the input image
-     *
-     */
-    void run_generate_embeddings(ProcessExecutor*, const std::string&, const std::string&, const std::string&, const std::string&, const unsigned int);
-    
-    void run_segmentation_from_points(ProcessExecutor*, const std::string&, const std::string&, const std::string&,
-                                    const std::string&,
-                                    const std::string&,
-                                    const std::string&,
-                                    const unsigned int);
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, mitk::Point3D&);
-    void start_python_daemon();
-    void WriteCSVFile(std::stringstream&);
-    void WriteControlFile(std::stringstream&);
+    void WriteCSVFile(std::stringstream&); // move to python service
     void CreateTempDirs(const std::string& dirPattern);
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_ModelType;
     std::string m_CheckpointPath;
-    std::string m_InDir, m_OutDir, outputImagePath, token; // rename as per standards
+    std::string m_InDir, m_OutDir, outputImagePath, m_TriggerCSVPath; // rename as per standards
     unsigned int m_GpuId = 0;
     PointSet::Pointer m_PointSetPositive;
     PointSet::Pointer m_PointSetNegative;
@@ -154,16 +134,9 @@ namespace mitk
     const std::string m_PARENT_TEMP_DIR_PATTERN = "mitk-sam-XXXXXX";
     const std::string m_TRIGGER_FILENAME = "trigger.csv";
     int m_PointSetCount = 0;
-    std::future<void> m_Future;
-    ProcessExecutor::Pointer m_DaemonExec;
+    std::unique_ptr<SegmentAnythingPythonService> m_PythonService;
   };
 
-
-  struct SIGNALCONSTANTS
-  {
-    static const std::string READY;
-    static const std::string KILL;
-  };
 
 } // namespace
 

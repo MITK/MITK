@@ -12,32 +12,27 @@ found in the LICENSE file.
 
 #include "mitkSegmentAnythingTool.h"
 
+#include "mitkInteractionPositionEvent.h"
+#include "mitkPointSetShapeProperty.h"
 #include "mitkProperties.h"
 #include "mitkToolManager.h"
-#include "mitkPointSetShapeProperty.h"
-
-#include "mitkInteractionPositionEvent.h"
 // us
+#include "mitkIOUtil.h"
+#include "mitkSegTool2D.h"
+#include <chrono>
+#include <filesystem>
+#include <itksys/SystemTools.hxx>
+#include <thread>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleResource.h>
-
-#include "mitkIOUtil.h"
-#include "mitkSegTool2D.h"
-#include <filesystem>
-#include <itksys/SystemTools.hxx>
-#include <chrono>
-#include <thread>
 
 using namespace std::chrono_literals;
 
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, SegmentAnythingTool, "SegmentAnythingTool");
-  const std::string SIGNALCONSTANTS::READY = "READY";
-  const std::string SIGNALCONSTANTS::KILL = "KILL";
-  bool mitk::SegmentAnythingTool::IsPythonReady = false;
 }
 
 mitk::SegmentAnythingTool::SegmentAnythingTool() : SegWithPreviewTool(false, "PressMoveReleaseAndPointSetting")
@@ -48,7 +43,6 @@ mitk::SegmentAnythingTool::SegmentAnythingTool() : SegWithPreviewTool(false, "Pr
 
 mitk::SegmentAnythingTool::~SegmentAnythingTool()
 {
-  this->StopAsyncProcess();
   std::filesystem::remove_all(this->GetMitkTempDir());
 }
 
@@ -73,8 +67,8 @@ void mitk::SegmentAnythingTool::Activated()
 {
   Superclass::Activated();
   m_PointSetPositive = mitk::PointSet::New();
-  //ensure that the seed points are visible for all timepoints.
-  //dynamic_cast<ProportionalTimeGeometry*>(m_PointSet->GetTimeGeometry())->SetStepDuration(std::numeric_limits<TimePointType>::max());
+  // ensure that the seed points are visible for all timepoints.
+  // dynamic_cast<ProportionalTimeGeometry*>(m_PointSet->GetTimeGeometry())->SetStepDuration(std::numeric_limits<TimePointType>::max());
   m_PointSetNode = mitk::DataNode::New();
   m_PointSetNode->SetData(m_PointSetPositive);
   m_PointSetNode->SetName(std::string(this->GetName()) + "_PointSetPositive");
@@ -103,14 +97,13 @@ void mitk::SegmentAnythingTool::Activated()
 void mitk::SegmentAnythingTool::Deactivated()
 {
   this->ClearSeeds();
-  // remove from data storage and disable interaction
   GetDataStorage()->Remove(m_PointSetNode);
   GetDataStorage()->Remove(m_PointSetNodeNegative);
   m_PointSetNode = nullptr;
   m_PointSetNodeNegative = nullptr;
   m_PointSetPositive = nullptr;
   m_PointSetNegative = nullptr;
-  this->StopAsyncProcess();
+  m_PythonService.reset();
   Superclass::Deactivated();
 }
 
@@ -119,6 +112,26 @@ void mitk::SegmentAnythingTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("ShiftSecondaryButtonPressed", OnAddNegativePoint);
   CONNECT_FUNCTION("ShiftPrimaryButtonPressed", OnAddPoint);
   CONNECT_FUNCTION("DeletePoint", OnDelete);
+}
+
+void mitk::SegmentAnythingTool::InitSAMPythonProcess()
+{
+  if (nullptr != m_PythonService)
+  {
+    m_PythonService.reset();
+  }
+  if (this->m_MitkTempDir.empty())
+  {
+    this->CreateTempDirs(m_PARENT_TEMP_DIR_PATTERN);
+  }
+  m_PythonService = std::make_unique<mitk::SegmentAnythingPythonService>(
+    this->GetPythonPath(), m_InDir, m_OutDir, this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId());
+  m_PythonService->StartAsyncProcess();
+}
+
+bool mitk::SegmentAnythingTool::IsPythonReady() const
+{
+  return mitk::SegmentAnythingPythonService::IsPythonReady;
 }
 
 void mitk::SegmentAnythingTool::OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -145,7 +158,7 @@ void mitk::SegmentAnythingTool::OnAddPoint(StateMachineAction*, InteractionEvent
   {
     return;
   }
-  m_IsGenerateEmbeddings = false; 
+  m_IsGenerateEmbeddings = false;
   if ((nullptr == this->GetWorkingPlaneGeometry()) || !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()), *(this->GetWorkingPlaneGeometry())))
   {
     m_IsGenerateEmbeddings = true;
@@ -192,7 +205,7 @@ void mitk::SegmentAnythingTool::ClearPicks()
 
 bool mitk::SegmentAnythingTool::HasPicks() const
 {
-  return this->m_PointSetPositive.IsNotNull() && this->m_PointSetPositive->GetSize()>0;
+  return this->m_PointSetPositive.IsNotNull() && this->m_PointSetPositive->GetSize() > 0;
 }
 
 void mitk::SegmentAnythingTool::ClearSeeds()
@@ -212,32 +225,6 @@ void mitk::SegmentAnythingTool::ClearSeeds()
     // ensure that the seed points are visible for all timepoints.
     dynamic_cast<ProportionalTimeGeometry *>(m_PointSetNegative->GetTimeGeometry())->SetStepDuration(std::numeric_limits<TimePointType>::max());
     this->m_PointSetNodeNegative->SetData(this->m_PointSetNegative);
-  }
-}
-
-void mitk::SegmentAnythingTool::onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
-{
-  std::string testCOUT;
-  std::string testCERR;
-  const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
-  if (pEvent)
-  {
-    testCOUT = testCOUT + pEvent->GetOutput();
-    if (SIGNALCONSTANTS::READY == testCOUT)
-    {
-      mitk::SegmentAnythingTool::IsPythonReady = true;
-    }
-    if (SIGNALCONSTANTS::KILL == testCOUT)
-    {
-      mitk::SegmentAnythingTool::IsPythonReady = false;
-    }
-    MITK_INFO << testCOUT;
-  }
-  const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
-  if (pErrEvent)
-  {
-    testCERR = testCERR + pErrEvent->GetOutput();
-    MITK_ERROR << testCERR;
   }
 }
 
@@ -261,21 +248,14 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
       auto csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
       this->WriteCSVFile(csvStream);
 
-      auto status = m_Future.wait_for(0ms); // check if python daemon has stopped for some reason
-      if (status == std::future_status::ready)
-      {
-        MITK_INFO << "Thread finished... restarting..";
-        m_Future = std::async(std::launch::async, &mitk::SegmentAnythingTool::start_python_daemon, this);
-        //StartAsyncProcess();
-      }
-      //outputImagePath = "C:\\DKFZ\\SAM_work\\test_seg_3d.nii.gz"; 
+      //outputImagePath = "C:\\DKFZ\\SAM_work\\test_seg_3d.nii.gz";
       std::this_thread::sleep_for(10ms);
       while (!std::filesystem::exists(outputImagePath));
       Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
-      //auto endloading = std::chrono::system_clock::now();
-      //MITK_INFO << "Loaded image in MITK. Elapsed: "
-      //        << std::chrono::duration_cast<std::chrono::milliseconds>(endloading- endPython).count();
-      //mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputImage, timeStep, true);
+      // auto endloading = std::chrono::system_clock::now();
+      // MITK_INFO << "Loaded image in MITK. Elapsed: "
+      //         << std::chrono::duration_cast<std::chrono::milliseconds>(endloading- endPython).count();
+      // mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputImage, timeStep, true);
       previewImage->InitializeByLabeledImage(outputImage);
       previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
       std::filesystem::remove(outputImagePath);
@@ -288,7 +268,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
   }
 }
 
-std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane() 
+std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()
 {
   mitk::Vector3D normal = this->GetWorkingPlaneGeometry()->GetNormal();
   std::stringstream hashstream;
@@ -296,7 +276,7 @@ std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()
   mitk::Point3D point = m_PointSetPositive->GetPoint(0);
   for (int i = 0; i < 3; ++i)
   {
-    if (normal[i]!=0)
+    if (normal[i] != 0)
     {
       hashstream << point[i];
     }
@@ -305,39 +285,11 @@ std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()
   return std::to_string(hashVal);
 }
 
-void mitk::SegmentAnythingTool::StopAsyncProcess()
-{
-  std::stringstream controlStream;
-  controlStream << SIGNALCONSTANTS::KILL;
-  this->WriteControlFile(controlStream);
-}
-
 void mitk::SegmentAnythingTool::CreateTempDirs(const std::string &dirPattern)
 {
   this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory(dirPattern));
   m_InDir = IOUtil::CreateTemporaryDirectory("sam-in-XXXXXX", this->GetMitkTempDir());
   m_OutDir = IOUtil::CreateTemporaryDirectory("sam-out-XXXXXX", this->GetMitkTempDir());
-}
-
-void mitk::SegmentAnythingTool::StartAsyncProcess()
-{
-  if (nullptr != m_DaemonExec)
-  {
-    this->StopAsyncProcess();
-  }
-  if (this->m_MitkTempDir.empty())
-  {
-    this->CreateTempDirs(m_PARENT_TEMP_DIR_PATTERN);
-  }
-  std::stringstream controlStream;
-  controlStream << SIGNALCONSTANTS::READY;
-  this->WriteControlFile(controlStream);
-
-  m_DaemonExec = ProcessExecutor::New();
-  itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
-  spCommand->SetCallback(&mitk::SegmentAnythingTool::onPythonProcessEvent);
-  m_DaemonExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
-  m_Future = std::async(std::launch::async, &mitk::SegmentAnythingTool::start_python_daemon, this);
 }
 
 void mitk::SegmentAnythingTool::WriteCSVFile(std::stringstream &csvStream)
@@ -349,60 +301,7 @@ void mitk::SegmentAnythingTool::WriteCSVFile(std::stringstream &csvStream)
   csvfile.close();
 }
 
-void mitk::SegmentAnythingTool::WriteControlFile(std::stringstream &statusStream)
-{
-  std::string controlFilePath = m_InDir + IOUtil::GetDirectorySeparator() + "control.txt";
-  std::ofstream controlFile;
-  controlFile.open(controlFilePath, std::ofstream::out | std::ofstream::trunc);
-  controlFile << statusStream.rdbuf();
-  controlFile.close();
-}
-
-void mitk::SegmentAnythingTool::start_python_daemon()
-{
-  ProcessExecutor::ArgumentListType args;
-  std::string command = "python";
-  args.push_back("-u");
-
-  args.push_back("C:\\DKFZ\\SAM_work\\sam-playground\\endpoints\\run_inference_daemon.py");
-  
-  args.push_back("--input-folder");
-  args.push_back(m_InDir);
-
-  args.push_back("--output-folder");
-  args.push_back(m_OutDir);
-
-  args.push_back("--trigger-file");
-  args.push_back(m_TRIGGER_FILENAME);
-
-  args.push_back("--model-type");
-  args.push_back(this->GetModelType());
-
-  args.push_back("--checkpoint");
-  args.push_back(this->GetCheckpointPath());
-
-  try
-  {
-    std::string cudaEnv = "CUDA_VISIBLE_DEVICES=" + std::to_string(this->GetGpuId());
-    itksys::SystemTools::PutEnv(cudaEnv.c_str());
-
-    std::stringstream logStream;
-    for (const auto &arg : args)
-      logStream << arg << " ";
-    logStream << this->GetPythonPath();
-    MITK_INFO << logStream.str();
-
-    m_DaemonExec->Execute(this->GetPythonPath(), command, args);
-  }
-  catch (const mitk::Exception &e)
-  {
-    MITK_ERROR << e.GetDescription();
-    return;
-  }
-  MITK_INFO << "ending python process.....";
-}
-
-std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::BaseGeometry* baseGeometry)
+std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry)
 {
   MITK_INFO << "No.of points: " << m_PointSetPositive->GetSize();
   std::stringstream pointsAndLabels;
@@ -440,7 +339,7 @@ std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::Ba
 std::vector<std::pair<mitk::Point2D, std::string>> mitk::SegmentAnythingTool::GetPointsAsVector(const mitk::BaseGeometry *baseGeometry)
 {
   std::vector<std::pair<mitk::Point2D, std::string>> clickVec;
-  clickVec.reserve(m_PointSetPositive->GetSize()+m_PointSetNegative->GetSize());
+  clickVec.reserve(m_PointSetPositive->GetSize() + m_PointSetNegative->GetSize());
   mitk::PointSet::PointsIterator pointSetItPos = m_PointSetPositive->Begin();
   mitk::PointSet::PointsIterator pointSetItNeg = m_PointSetNegative->Begin();
   while (pointSetItPos != m_PointSetPositive->End() || pointSetItNeg != m_PointSetNegative->End())

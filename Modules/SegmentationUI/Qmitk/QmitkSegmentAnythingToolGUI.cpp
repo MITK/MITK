@@ -292,8 +292,8 @@ void QmitkSegmentAnythingToolGUI::ActivateSAMDaemon()
     return;
   }
   this->ShowProgressBar(true);
-  tool->StartAsyncProcess();
-  while (!tool->IsPythonReady)
+  tool->InitSAMPythonProcess();
+  while (!tool->IsPythonReady())
   {
     qApp->processEvents();
   }
@@ -431,7 +431,6 @@ void QmitkSegmentAnythingToolGUI::OnResetPicksClicked()
   if (nullptr != tool)
   {
     tool->ClearPicks();
-    tool->StopAsyncProcess();
   }
 }
 

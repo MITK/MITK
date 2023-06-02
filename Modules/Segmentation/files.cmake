@@ -61,6 +61,7 @@ set(CPP_FILES
   Interactions/mitkProcessExecutor.cpp
   Interactions/mitkTotalSegmentatorTool.cpp
   Interactions/mitkSegmentAnythingTool.cpp
+  Interactions/mitkSegmentAnythingPythonService.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp

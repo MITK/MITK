@@ -209,7 +209,56 @@
      </property>
     </widget>
    </item>
-   <item row="8" column="1">
+
+	  <item row="8" column="0">
+		  <widget class="QLabel" name="SAMLabel">
+			  <property name="text">
+				  <string>SAM Tool</string>
+			  </property>
+		  </widget>
+	  </item>
+	  <item row="8" column="1">
+		  <layout class="QGridLayout" name="gridLayout_2">
+			  <item row="0" column="0" colspan="2">
+				  <widget class="QPushButton" name="installSAMButton">
+					  <property name="sizePolicy">
+						  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+							  <horstretch>0</horstretch>
+							  <verstretch>0</verstretch>
+						  </sizepolicy>
+					  </property>
+					  <property name="text">
+						  <string>Install SAM</string>
+					  </property>
+				  </widget>
+			  </item>
+			  <item row="0" column="2" colspan="2">
+				  <widget class="QPushButton" name="clearSAMButton">
+					  <property name="sizePolicy">
+						  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+							  <horstretch>0</horstretch>
+							  <verstretch>0</verstretch>
+						  </sizepolicy>
+					  </property>
+					  <property name="text">
+						  <string>Clear Install</string>
+					  </property>
+				  </widget>
+			  </item>
+			  <item row="1" column="0">
+				  <widget class="QLabel" name="pythonLabel">
+					  <property name="text">
+						  <string>System Python</string>
+					  </property>
+				  </widget>
+			  </item>
+				  <item row="1" column="1" colspan="3">
+					  <widget class="ctkComboBox" name="sysPythonComboBox"/>
+				  </item>
+		  </layout>
+	  </item>
+	  
+   <item row="9" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

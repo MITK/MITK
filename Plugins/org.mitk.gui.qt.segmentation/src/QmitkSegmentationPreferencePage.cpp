@@ -54,6 +54,8 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
 
   connect(m_Ui->labelSetPresetToolButton, SIGNAL(clicked()), this, SLOT(OnLabelSetPresetButtonClicked()));
   connect(m_Ui->suggestionsToolButton, SIGNAL(clicked()), this, SLOT(OnSuggestionsButtonClicked()));
+  connect(m_Ui->installSAMButton, SIGNAL(clicked()), this, SLOT(OnInstallBtnClicked()));
+  connect(m_Ui->clearSAMButton, SIGNAL(clicked()), this, SLOT(OnClearInstall()));
 
   this->Update();
   m_Initializing = false;
@@ -153,4 +155,25 @@ void QmitkSegmentationPreferencePage::OnSuggestionsButtonClicked()
 
   if (!filename.isEmpty())
     m_Ui->suggestionsLineEdit->setText(filename);
+}
+
+
+void QmitkSegmentationPreferencePage::OnInstallBtnClicked()
+{
+  MITK_INFO << "Install clicked";
+}
+
+void QmitkSegmentationPreferencePage::OnClearInstall() 
+{
+  MITK_INFO << "OnClearInstall clicked";
+}
+
+QString QmitkSAMInstaller::GetVirtualEnvPath()
+{
+  return QString("help");
+}
+
+bool QmitkSAMInstaller::SetupVirtualEnv(const QString &)
+{
+  return true;
 }

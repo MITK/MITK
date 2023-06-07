@@ -41,11 +41,6 @@ mitk::SegmentAnythingTool::SegmentAnythingTool() : SegWithPreviewTool(false, "Pr
   this->IsTimePointChangeAwareOff();
 }
 
-mitk::SegmentAnythingTool::~SegmentAnythingTool()
-{
-  std::filesystem::remove_all(this->GetMitkTempDir());
-}
-
 const char **mitk::SegmentAnythingTool::GetXPM() const
 {
   return nullptr;
@@ -120,12 +115,8 @@ void mitk::SegmentAnythingTool::InitSAMPythonProcess()
   {
     m_PythonService.reset();
   }
-  if (this->m_MitkTempDir.empty())
-  {
-    this->CreateTempDirs(m_PARENT_TEMP_DIR_PATTERN);
-  }
   m_PythonService = std::make_unique<mitk::SegmentAnythingPythonService>(
-    this->GetPythonPath(), m_InDir, m_OutDir, this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId());
+    this->GetPythonPath(), this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId());
   m_PythonService->StartAsyncProcess();
 }
 
@@ -228,34 +219,27 @@ void mitk::SegmentAnythingTool::ClearSeeds()
   }
 }
 
-void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
+                                                const Image *oldSegAtTimeStep,
+                                                LabelSetImage *previewImage,
+                                                TimeStepType timeStep)
 {
   if (nullptr != oldSegAtTimeStep && nullptr != previewImage && m_PointSetPositive.IsNotNull())
   {
-    if (this->m_MitkTempDir.empty())
-    {
-      MITK_INFO << "Python Path: " << this->GetPythonPath();
-      MITK_INFO << "Checkpoint Path: " << this->GetCheckpointPath();
-      MITK_INFO << "Model type: " << this->GetModelType();
-      this->CreateTempDirs(m_PARENT_TEMP_DIR_PATTERN);
-    }
-    if (this->HasPicks())
+    if (this->HasPicks() && nullptr != m_PythonService)
     {
       std::string uniquePlaneID = GetHashForCurrentPlane();
-      std::string inputImagePath = m_InDir + IOUtil::GetDirectorySeparator() + uniquePlaneID + ".nii.gz";
-      outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + uniquePlaneID + ".nii.gz";
-      IOUtil::Save(inputAtTimeStep, inputImagePath);
+      m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID);
       auto csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
-      this->WriteCSVFile(csvStream);
+      m_PythonService->TransferPointsToProcess(csvStream);
 
-      //outputImagePath = "C:\\DKFZ\\SAM_work\\test_seg_3d.nii.gz";
-      std::this_thread::sleep_for(10ms);
-      while (!std::filesystem::exists(outputImagePath));
-      Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
+      std::this_thread::sleep_for(100ms);
+      Image::Pointer outputImage = m_PythonService->RetrieveImageFromProcess();
       // auto endloading = std::chrono::system_clock::now();
       // MITK_INFO << "Loaded image in MITK. Elapsed: "
       //         << std::chrono::duration_cast<std::chrono::milliseconds>(endloading- endPython).count();
-      // mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputImage, timeStep, true);
+      // mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputImage, timeStep,
+      // true);
       previewImage->InitializeByLabeledImage(outputImage);
       previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
       std::filesystem::remove(outputImagePath);
@@ -267,6 +251,8 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image* inputAtTimeStep, co
     }
   }
 }
+
+
 
 std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()
 {
@@ -283,22 +269,6 @@ std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()
   }
   size_t hashVal = std::hash<std::string>{}(hashstream.str());
   return std::to_string(hashVal);
-}
-
-void mitk::SegmentAnythingTool::CreateTempDirs(const std::string &dirPattern)
-{
-  this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory(dirPattern));
-  m_InDir = IOUtil::CreateTemporaryDirectory("sam-in-XXXXXX", this->GetMitkTempDir());
-  m_OutDir = IOUtil::CreateTemporaryDirectory("sam-out-XXXXXX", this->GetMitkTempDir());
-}
-
-void mitk::SegmentAnythingTool::WriteCSVFile(std::stringstream &csvStream)
-{
-  std::string triggerFilePath = m_InDir + IOUtil::GetDirectorySeparator() + m_TRIGGER_FILENAME;
-  std::ofstream csvfile;
-  csvfile.open(triggerFilePath, std::ofstream::out | std::ofstream::trunc);
-  csvfile << csvStream.rdbuf();
-  csvfile.close();
 }
 
 std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry)

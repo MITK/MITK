@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 #include <chrono>
 #include <thread>
+#include <filesystem>
 
 using namespace std::chrono_literals;
 
@@ -27,13 +28,14 @@ namespace mitk
 }
 
 mitk::SegmentAnythingPythonService::SegmentAnythingPythonService(
-  std::string workingDir, std::string inDir, std::string outDir, std::string modelType, std::string checkPointPath, unsigned int gpuId)
+  std::string workingDir, std::string modelType, std::string checkPointPath, unsigned int gpuId)
   : m_PythonPath(workingDir),
-    m_InDir(inDir),
-    m_OutDir(outDir),
     m_ModelType(modelType),
     m_CheckpointPath(checkPointPath),
-    m_GpuId(gpuId) {}
+    m_GpuId(gpuId)
+{
+  this->CreateTempDirs(m_PARENT_TEMP_DIR_PATTERN);
+}
 
 mitk::SegmentAnythingPythonService::~SegmentAnythingPythonService()
 {
@@ -42,6 +44,7 @@ mitk::SegmentAnythingPythonService::~SegmentAnythingPythonService()
     this->StopAsyncProcess();
   }
   mitk::SegmentAnythingPythonService::IsPythonReady = false;
+  std::filesystem::remove_all(this->GetMitkTempDir());
 }
 
 void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object * /*pCaller*/,
@@ -85,6 +88,10 @@ void mitk::SegmentAnythingPythonService::StartAsyncProcess()
   {
     this->StopAsyncProcess();
   }
+  if (this->GetMitkTempDir().empty())
+  {
+    this->CreateTempDirs(m_PARENT_TEMP_DIR_PATTERN);
+  }
   std::stringstream controlStream;
   controlStream << SIGNALCONSTANTS::READY;
   this->WriteControlFile(controlStream);
@@ -96,6 +103,14 @@ void mitk::SegmentAnythingPythonService::StartAsyncProcess()
   m_Future = std::async(std::launch::async, &mitk::SegmentAnythingPythonService::start_python_daemon, this);
 }
 
+void mitk::SegmentAnythingPythonService::TransferPointsToProcess(std::stringstream &triggerCSV)
+{
+  std::string triggerFilePath = m_InDir + IOUtil::GetDirectorySeparator() + m_TRIGGER_FILENAME;
+  std::ofstream csvfile;
+  csvfile.open(triggerFilePath, std::ofstream::out | std::ofstream::trunc);
+  csvfile << triggerCSV.rdbuf();
+  csvfile.close();
+}
 
 void mitk::SegmentAnythingPythonService::WriteControlFile(std::stringstream &statusStream)
 {
@@ -148,4 +163,30 @@ void mitk::SegmentAnythingPythonService::start_python_daemon()
     return;
   }
   MITK_INFO << "ending python process.....";
+}
+
+void mitk::SegmentAnythingPythonService::CreateTempDirs(const std::string &dirPattern)
+{
+  this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory(dirPattern));
+  m_InDir = IOUtil::CreateTemporaryDirectory("sam-in-XXXXXX", m_MitkTempDir);
+  m_OutDir = IOUtil::CreateTemporaryDirectory("sam-out-XXXXXX", m_MitkTempDir);
+}
+
+mitk::Image::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProcess()
+{
+  //auto outputImagePath = "C:\\DKFZ\\SAM_work\\test_seg_3d.nii.gz";
+  auto outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + m_CurrentUId + ".nii.gz";
+  while (!std::filesystem::exists(outputImagePath))
+  {
+    std::this_thread::sleep_for(100ms);
+  }
+  Image::Pointer outputImage = mitk::IOUtil::Load<Image>(outputImagePath);
+  return outputImage;
+}
+
+void mitk::SegmentAnythingPythonService::TransferImageToProcess(const Image *inputAtTimeStep, std::string &UId)
+{
+  std::string inputImagePath = m_InDir + IOUtil::GetDirectorySeparator() + UId + ".nii.gz";
+  IOUtil::Save(inputAtTimeStep, inputImagePath);
+  m_CurrentUId = UId;
 }

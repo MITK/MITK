@@ -85,7 +85,7 @@ namespace mitk
 
   protected:
     SegmentAnythingTool();
-    ~SegmentAnythingTool() override;
+    ~SegmentAnythingTool() = default;
 
     void ConnectActionsAndFunctions() override;
 
@@ -114,8 +114,8 @@ namespace mitk
 
   private:
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, mitk::Point3D&);
-    void WriteCSVFile(std::stringstream&); // move to python service
-    void CreateTempDirs(const std::string& dirPattern);
+    //void WriteCSVFile(std::stringstream&); // move to python service
+    //void CreateTempDirs(const std::string& dirPattern);
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;

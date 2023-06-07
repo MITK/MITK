@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <thread>
 #include <future>
+#include "mitkImage.h"
 
 
 namespace mitk
@@ -29,29 +30,40 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
 
   */
-  class MITKSEGMENTATION_EXPORT SegmentAnythingPythonService 
+  class MITKSEGMENTATION_EXPORT SegmentAnythingPythonService : public itk::Object
   {
   public: 
-    SegmentAnythingPythonService(std::string, std::string, std::string, std::string, std::string, unsigned int);
+    SegmentAnythingPythonService(std::string, std::string, std::string, unsigned int);
     ~SegmentAnythingPythonService();
+    
+    itkSetMacro(MitkTempDir, std::string);
+    itkGetConstMacro(MitkTempDir, std::string);
+
     /**
      * @brief Static function to print out everything from itk::EventObject.
      * Used as callback in mitk::ProcessExecutor object.
      *
      */
-    static void onPythonProcessEvent(itk::Object *, const itk::EventObject &e, void *);
+    static void onPythonProcessEvent(itk::Object*, const itk::EventObject&, void*);
     bool static IsPythonReady;
     void StartAsyncProcess();
     void StopAsyncProcess();
+    void TransferImageToProcess(const Image*, std::string &UId);
+    //void TransferPointsToProcess(std::vector<std::pair<mitk::Point2D, std::string>>&);
+    void TransferPointsToProcess(std::stringstream&);
+    Image::Pointer RetrieveImageFromProcess();
 
   private:
     void start_python_daemon();
     void WriteControlFile(std::stringstream&);
+    void CreateTempDirs(const std::string&);
 
+    std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_ModelType;
     std::string m_CheckpointPath;
     std::string m_InDir, m_OutDir;
+    std::string m_CurrentUId;
     unsigned int m_GpuId = 0;
     bool m_IsAuto = false;
     bool m_IsReady = false;
@@ -67,6 +79,8 @@ namespace mitk
   {
     static const std::string READY;
     static const std::string KILL;
+    static const std::string SUCCESS;
+    static const std::string PROCESSING;
   };
 
 } // namespace

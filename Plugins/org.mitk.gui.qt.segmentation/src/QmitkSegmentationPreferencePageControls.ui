@@ -255,6 +255,26 @@
 				  <item row="1" column="1" colspan="3">
 					  <widget class="ctkComboBox" name="sysPythonComboBox"/>
 				  </item>
+			  <item row="2" column="0">
+				  <widget class="QLabel" name="samModelTypeLabel">
+					  <property name="text">
+						  <string>Model Type:</string>
+					  </property>
+				  </widget>
+			  </item>
+			  <item row="2" column="1" colspan="3">
+				  <widget class="ctkComboBox" name="samModelTypeComboBox"/>
+			  </item>
+			  <item row="3" column="0" colspan="4">
+				  <widget class="QLabel" name="samInstallStatusLabel">
+					  <property name="textFormat">
+						  <enum>Qt::RichText</enum>
+					  </property>
+					  <property name="wordWrap">
+						  <bool>true</bool>
+					  </property>
+				  </widget>
+			  </item>
 		  </layout>
 	  </item>
 	  

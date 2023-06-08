@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <berryIQtPreferencePage.h>
 #include <QmitkSetupVirtualEnvUtil.h>
 #include <QStandardPaths>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 class QWidget;
 
@@ -74,13 +76,38 @@ protected Q_SLOTS:
   void OnSuggestionsButtonClicked();
   void OnInstallBtnClicked();
   void OnClearInstall();
+  QString OnSystemPythonChanged(const QString&);
 
 protected:
+  /**
+   * @brief Searches and parses paths of python virtual enviroments
+   * from predefined lookout locations
+   */
+  void AutoParsePythonPaths();
+  
+  /**
+   * @brief Get the virtual env path from UI combobox removing any
+   * extra special characters.
+   *
+   * @return QString
+   */
+  QString GetPythonPathFromUI(const QString&) const;
 
+  /**
+   * @brief Get the Exact Python Path for any OS
+   * from the virtual environment path.
+   * @return QString
+   */
+  QString GetExactPythonPath(const QString&) const;
+  void WriteStatusMessage(const QString&);
+  void WriteErrorMessage(const QString&);
+  
+  QNetworkAccessManager m_Manager;
   Ui::QmitkSegmentationPreferencePageControls* m_Ui;
   QmitkSAMInstaller m_Installer;
   QWidget* m_Control;
-
+  QString m_PythonPath;
+  bool m_IsInstalled = false;
   bool m_Initializing;
 };
 

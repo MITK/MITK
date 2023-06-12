@@ -33,6 +33,14 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT SegmentAnythingPythonService : public itk::Object
   {
   public: 
+    enum Status
+    {
+      READY,
+      PROCESSING,
+      KILLED,
+      CUDAError
+    };
+
     SegmentAnythingPythonService(std::string, std::string, std::string, unsigned int);
     ~SegmentAnythingPythonService();
     
@@ -46,6 +54,8 @@ namespace mitk
      */
     static void onPythonProcessEvent(itk::Object*, const itk::EventObject&, void*);
     bool static IsPythonReady;
+    static Status CurrentStatus;
+    static void CheckStatus();
     void StartAsyncProcess();
     void StopAsyncProcess();
     void TransferImageToProcess(const Image*, std::string &UId);
@@ -81,6 +91,7 @@ namespace mitk
     static const std::string KILL;
     static const std::string SUCCESS;
     static const std::string PROCESSING;
+    static const std::string CUDA_OUT_OF_MEMORY_ERROR;
   };
 
 } // namespace

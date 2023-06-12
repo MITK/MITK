@@ -229,20 +229,26 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
     if (this->HasPicks() && nullptr != m_PythonService)
     {
       std::string uniquePlaneID = GetHashForCurrentPlane();
-      m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID);
-      auto csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
-      m_PythonService->TransferPointsToProcess(csvStream);
-
-      std::this_thread::sleep_for(100ms);
-      Image::Pointer outputImage = m_PythonService->RetrieveImageFromProcess();
-      // auto endloading = std::chrono::system_clock::now();
-      // MITK_INFO << "Loaded image in MITK. Elapsed: "
-      //         << std::chrono::duration_cast<std::chrono::milliseconds>(endloading- endPython).count();
-      // mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputImage, timeStep,
-      // true);
-      previewImage->InitializeByLabeledImage(outputImage);
-      previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
-      std::filesystem::remove(outputImagePath);
+      try
+      {
+        m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID);
+        auto csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
+        m_PythonService->TransferPointsToProcess(csvStream);
+        std::this_thread::sleep_for(100ms);
+        Image::Pointer outputImage = m_PythonService->RetrieveImageFromProcess();
+        // auto endloading = std::chrono::system_clock::now();
+        // MITK_INFO << "Loaded image in MITK. Elapsed: "
+        //         << std::chrono::duration_cast<std::chrono::milliseconds>(endloading- endPython).count();
+        // mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputImage, timeStep,
+        // true);
+        previewImage->InitializeByLabeledImage(outputImage);
+        previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
+        std::filesystem::remove(outputImagePath);
+      }
+      catch (const mitk::Exception &e)
+      {
+        mitkThrow() << e.GetDescription();
+      }
     }
     else if (nullptr != this->GetWorkingPlaneGeometry())
     {
@@ -251,8 +257,6 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
     }
   }
 }
-
-
 
 std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()
 {

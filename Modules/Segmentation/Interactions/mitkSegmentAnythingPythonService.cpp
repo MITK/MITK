@@ -24,7 +24,10 @@ namespace mitk
 {
   const std::string SIGNALCONSTANTS::READY = "READY";
   const std::string SIGNALCONSTANTS::KILL = "KILL";
+  const std::string SIGNALCONSTANTS::CUDA_OUT_OF_MEMORY_ERROR = "CudaOutOfMemoryError";
   bool mitk::SegmentAnythingPythonService::IsPythonReady = false;
+  mitk::SegmentAnythingPythonService::Status mitk::SegmentAnythingPythonService::CurrentStatus =
+    mitk::SegmentAnythingPythonService::Status::READY;
 }
 
 mitk::SegmentAnythingPythonService::SegmentAnythingPythonService(
@@ -62,6 +65,12 @@ void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object * /*pC
     }
     if (SIGNALCONSTANTS::KILL == testCOUT)
     {
+      mitk::SegmentAnythingPythonService::CurrentStatus = mitk::SegmentAnythingPythonService::Status::KILLED;
+      mitk::SegmentAnythingPythonService::IsPythonReady = false;
+    }
+    if (SIGNALCONSTANTS::CUDA_OUT_OF_MEMORY_ERROR == testCOUT)
+    {
+      mitk::SegmentAnythingPythonService::CurrentStatus = mitk::SegmentAnythingPythonService::Status::CUDAError;
       mitk::SegmentAnythingPythonService::IsPythonReady = false;
     }
     MITK_INFO << testCOUT;
@@ -105,6 +114,7 @@ void mitk::SegmentAnythingPythonService::StartAsyncProcess()
 
 void mitk::SegmentAnythingPythonService::TransferPointsToProcess(std::stringstream &triggerCSV)
 {
+  CheckStatus();
   std::string triggerFilePath = m_InDir + IOUtil::GetDirectorySeparator() + m_TRIGGER_FILENAME;
   std::ofstream csvfile;
   csvfile.open(triggerFilePath, std::ofstream::out | std::ofstream::trunc);
@@ -165,6 +175,17 @@ void mitk::SegmentAnythingPythonService::start_python_daemon()
   MITK_INFO << "ending python process.....";
 }
 
+void mitk::SegmentAnythingPythonService::CheckStatus()
+{
+  switch (CurrentStatus)
+  {
+    case mitk::SegmentAnythingPythonService::Status::CUDAError:
+      mitkThrow() << "Error: Cuda Out of Memory. Change your model type in Preferences and Activate SAM again.";
+    case mitk::SegmentAnythingPythonService::Status::KILLED:
+      mitkThrow() << "Error: Python process is already terminated. Cannot load requested segmentation.";
+  }
+}
+
 void mitk::SegmentAnythingPythonService::CreateTempDirs(const std::string &dirPattern)
 {
   this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory(dirPattern));
@@ -178,6 +199,7 @@ mitk::Image::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProces
   auto outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + m_CurrentUId + ".nii.gz";
   while (!std::filesystem::exists(outputImagePath))
   {
+    this->CheckStatus();
     std::this_thread::sleep_for(100ms);
   }
   Image::Pointer outputImage = mitk::IOUtil::Load<Image>(outputImagePath);

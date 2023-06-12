@@ -224,11 +224,11 @@ namespace mitk {
     ///
     vnl_matrix_fixed<mitk::ScalarType, 4, 4> GetMatrix() const;
     ///
-    /// \return the homogeneous vtk matrix representing this transform
+    /// returns the homogeneous vtk matrix representing this transform
     ///
     void GetMatrix(vtkMatrix4x4* matrix) const;
     ///
-    /// \return the homogeneous vtk matrix representing this transform
+    /// returns the homogeneous vtk matrix representing this transform
     /// in !OpenGL! left handed coordinate system
     ///
     void GetVtkOpenGlMatrix(vtkMatrix4x4* matrix) const;

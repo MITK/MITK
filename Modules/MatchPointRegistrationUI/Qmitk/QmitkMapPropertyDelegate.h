@@ -27,7 +27,7 @@ found in the LICENSE file.
 /// \brief An item delegate for rendering and editing mitk::Properties in a QTableView.
 ///
 /// \see QmitkPropertiesTableModel
-class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMapPropertyDelegate : public QStyledItemDelegate
+class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMapPropertyDelegate /** \cond */ : public QStyledItemDelegate /** \endcond */
 {
   Q_OBJECT
 

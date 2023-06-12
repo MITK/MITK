@@ -34,17 +34,17 @@ In this tab, you can configure the \ref MAP_FRAME_Mapper_Settings which are used
 
 \subsubsection  MAP_FRAME_Mapper_Settings Mapping settings
 For the mapping of corrected images, you have several settings available:\n
-\li <b>Allow undefined pixels</b> Activate to handle pixels of the result image that are not in the field of view of the input image. These pixels will get the <i>padding value</i>.
-\li <b>Allow error pixels</b> Activate to handle pixels of the result image that can not be mapped because the registration does not support this part of the output image. These pixels will get the <i>error value</i>.
-\li <b>Interpolator</b> Set to choose the interpolation strategy that should be used for mapping. See details at \ref MAP_FRAME_Interpolation .
+\li Allow undefined pixels: Activate to handle pixels of the result image that are not in the field of view of the input image. These pixels will get the <i>padding value</i>.
+\li Allow error pixels: Activate to handle pixels of the result image that can not be mapped because the registration does not support this part of the output image. These pixels will get the <i>error value</i>.
+\li Interpolator: Set to choose the interpolation strategy that should be used for mapping. See details at \ref MAP_FRAME_Interpolation .
 
 \subsubsection  MAP_FRAME_Interpolation Interpolation
 You can choose from the following interpolation strategies:\n
-\li <b>Nearest Neighbour</b> Use the value of the nearest pixel. Fastest, but high interpolation errors for gray value images. Right choice for label images or masks.
-\li <b>Linear"</b> Fast linear interpolation with often sufficient quality. Tends to blur edges.
-\li <b>BSpline (3rd order)</b> Good trade off between time and quality.
-\li <b>Windowed Sinc (Hamming)</b> Good interpolation quality but very time consuming.
-\li <b>Windowed Sinc (Welch)</b> Good interpolation quality but very time consuming.
+\li Nearest Neighbour: Use the value of the nearest pixel. Fastest, but high interpolation errors for gray value images. Right choice for label images or masks.
+\li Linear: Fast linear interpolation with often sufficient quality. Tends to blur edges.
+\li BSpline (3rd order): Good trade off between time and quality.
+\li Windowed Sinc (Hamming): Good interpolation quality but very time consuming.
+\li Windowed Sinc (Welch): Good interpolation quality but very time consuming.
 
 \subsection MAP_FRAME_Usage_frame_selection Frame selection tab
 \imageMacro{map_step4_frameselection.png, "Details of the frame selection tab.", 6}

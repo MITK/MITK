@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <QStandardPaths>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QmitknnUNetGPU.h>
 
 class QWidget;
 
@@ -99,10 +100,25 @@ protected:
    * @return QString
    */
   QString GetExactPythonPath(const QString&) const;
+
+  /**
+   * @brief Adds GPU information to the gpu combo box.
+   * In case, there aren't any GPUs avaialble, the combo box will be
+   * rendered editable.
+   */
+  void SetGPUInfo();
+
+  /**
+   * @brief Returns GPU id of the selected GPU from the Combo box.
+   * @return unsigned int
+   */
+  unsigned int FetchSelectedGPUFromUI() const;
+
   void WriteStatusMessage(const QString&);
   void WriteErrorMessage(const QString&);
   
   QNetworkAccessManager m_Manager;
+  QmitkGPULoader m_GpuLoader;
   Ui::QmitkSegmentationPreferencePageControls* m_Ui;
   QmitkSAMInstaller m_Installer;
   QWidget* m_Control;

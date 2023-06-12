@@ -64,7 +64,6 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
 
   QString welcomeText;
-  this->SetGPUInfo();
   if (m_GpuLoader.GetGPUCount() != 0)
   {
     welcomeText = "<b>STATUS: </b><i>Welcome to Segment Anything tool. You're in luck: " +
@@ -86,11 +85,12 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   if (isInstalled)
   {
     m_PythonPath = QString::fromStdString(m_Prefences->Get("sam python path", ""));
-    welcomeText += " SAM is already found installed.";
+    QString modelType = QString::fromStdString(m_Prefences->Get("sam modeltype", ""));
+    welcomeText += " SAM is already found installed. Model type '" + modelType + "' selected in Preferences.";
   }
   else
   {
-    welcomeText += " SAM is not configured correctly. Please go to Prefences (Cntl+P) to configure and/or install SAM.";
+    welcomeText += " SAM is not configured correctly. Please go to Preferences (Cntl+P) to configure and/or install SAM.";
   }
   this->EnableAll(isInstalled);
   this->WriteStatusMessage(welcomeText);
@@ -105,29 +105,14 @@ bool QmitkSegmentAnythingToolGUI::ValidatePrefences()
 {
   const QString storageDir = QString::fromStdString(m_Prefences->Get("sam python path", ""));
   bool isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(storageDir);
-  std::string modelType = m_Prefences->Get("sam modeltype", "");
-  std::string path = m_Prefences->Get("sam parent path", "");
+  std::string &modelType = m_Prefences->Get("sam modeltype", "");
+  std::string &path = m_Prefences->Get("sam parent path", "");
   return (isInstalled && !modelType.empty() && !path.empty());
 }
 
 void QmitkSegmentAnythingToolGUI::EnableAll(bool isEnable)
 {
   m_Controls.activateButton->setEnabled(isEnable);
-}
-
-void QmitkSegmentAnythingToolGUI::SetGPUInfo()
-{
-  std::vector<QmitkGPUSpec> specs = m_GpuLoader.GetAllGPUSpecs();
-  for (const QmitkGPUSpec &gpuSpec : specs)
-  {
-    m_Controls.gpuComboBox->addItem(QString::number(gpuSpec.id) + ": " + gpuSpec.name + " (" + gpuSpec.memory + ")");
-  }
-  if (specs.empty())
-  {
-    m_Controls.gpuComboBox->setEditable(true);
-    m_Controls.gpuComboBox->addItem(QString::number(0));
-    m_Controls.gpuComboBox->setValidator(new QIntValidator(0, 999, this));
-  }
 }
 
 void QmitkSegmentAnythingToolGUI::WriteStatusMessage(const QString &message)
@@ -153,20 +138,6 @@ void QmitkSegmentAnythingToolGUI::ShowErrorMessage(const std::string &message, Q
   MITK_WARN << message;
 }
 
-unsigned int QmitkSegmentAnythingToolGUI::FetchSelectedGPUFromUI() const
-{
-  QString gpuInfo = m_Controls.gpuComboBox->currentText();
-  if (m_GpuLoader.GetGPUCount() == 0)
-  {
-    return static_cast<unsigned int>(gpuInfo.toInt());
-  }
-  else
-  {
-    QString gpuId = gpuInfo.split(":", QString::SplitBehavior::SkipEmptyParts).first();
-    return static_cast<unsigned int>(gpuId.toInt());
-  }
-}
-
 void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
 {
   auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
@@ -184,7 +155,7 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     }
     tool->SetIsAuto(false);
     tool->SetPythonPath(m_PythonPath.toStdString());
-    tool->SetGpuId(FetchSelectedGPUFromUI());
+    tool->SetGpuId(m_Prefences->GetInt("sam gpuid", 0));
     const QString modelType = QString::fromStdString(m_Prefences->Get("sam modeltype", ""));  
     tool->SetModelType(modelType.toStdString());
     this->WriteStatusMessage(

@@ -93,19 +93,6 @@ protected:
   void ShowErrorMessage(const std::string &, QMessageBox::Icon = QMessageBox::Critical);
 
   /**
-   * @brief Adds GPU information to the gpu combo box.
-   * In case, there aren't any GPUs avaialble, the combo box will be
-   * rendered editable.
-   */
-  void SetGPUInfo();
-
-  /**
-   * @brief Returns GPU id of the selected GPU from the Combo box.
-   * @return unsigned int
-   */
-  unsigned int FetchSelectedGPUFromUI() const;
-
-  /**
    * @brief Enable (or Disable) GUI elements.
    */
   void EnableAll(bool);

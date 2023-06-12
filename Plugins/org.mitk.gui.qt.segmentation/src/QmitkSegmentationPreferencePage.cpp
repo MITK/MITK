@@ -89,7 +89,7 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   this->WriteStatusMessage(welcomeText);
 
   m_Ui->samModelTypeComboBox->addItems(QmitkSegmentAnythingToolGUI::VALID_MODELS_URL_MAP.keys());
-
+  this->SetGPUInfo();
   this->Update();
   m_Initializing = false;
 }
@@ -115,6 +115,8 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   prefs->Put("sam parent path", m_Installer.STORAGE_DIR.toStdString());
   prefs->Put("sam python path", m_PythonPath.toStdString());
   prefs->Put("sam modeltype", m_Ui->samModelTypeComboBox->currentText().toStdString());
+  prefs->PutInt("sam gpuid", FetchSelectedGPUFromUI());
+
   return true;
 }
 
@@ -176,6 +178,8 @@ void QmitkSegmentationPreferencePage::Update()
 
   m_Ui->replaceStandardSuggestionsCheckBox->setChecked(prefs->GetBool("replace standard suggestions", true));
   m_Ui->suggestOnceCheckBox->setChecked(prefs->GetBool("suggest once", true));
+
+  m_Ui->samModelTypeComboBox->setCurrentText(QString::fromStdString(prefs->Get("sam modeltype", "vit_b")));
 }
 
 void QmitkSegmentationPreferencePage::OnLabelSetPresetButtonClicked()
@@ -291,30 +295,34 @@ void QmitkSegmentationPreferencePage::AutoParsePythonPaths()
   }
 }
 
-/* bool QmitkSegmentationPreferencePage::IsSAMInstalled(const QString &pythonPath)
+void QmitkSegmentationPreferencePage::SetGPUInfo()
 {
-  QString fullPath = pythonPath;
-  bool isPythonExists = false;
-#ifdef _WIN32
-  isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
-  if (!(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
+  std::vector<QmitkGPUSpec> specs = m_GpuLoader.GetAllGPUSpecs();
+  for (const QmitkGPUSpec &gpuSpec : specs)
   {
-    fullPath += QDir::separator() + QString("Scripts");
-    isPythonExists =
-      (!isPythonExists) ? QFile::exists(fullPath + QDir::separator() + QString("python.exe")) : isPythonExists;
+    m_Ui->gpuComboBox->addItem(QString::number(gpuSpec.id) + ": " + gpuSpec.name + " (" + gpuSpec.memory + ")");
   }
-#else
-  isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python3"));
-  if (!(fullPath.endsWith("bin", Qt::CaseInsensitive) || fullPath.endsWith("bin/", Qt::CaseInsensitive)))
+  if (specs.empty())
   {
-    fullPath += QDir::separator() + QString("bin");
-    isPythonExists =
-      (!isPythonExists) ? QFile::exists(fullPath + QDir::separator() + QString("python3")) : isPythonExists;
+    m_Ui->gpuComboBox->setEditable(true);
+    m_Ui->gpuComboBox->addItem(QString::number(0));
+    m_Ui->gpuComboBox->setValidator(new QIntValidator(0, 999, this));
   }
-#endif*/
-//  bool isExists = /*QFile::exists(fullPath + QDir::separator() + QString("MITK_SAM"))*/ true && isPythonExists;
-//  return isExists;
-//}
+}
+
+unsigned int QmitkSegmentationPreferencePage::FetchSelectedGPUFromUI() const
+{
+  QString gpuInfo = m_Ui->gpuComboBox->currentText();
+  if (m_GpuLoader.GetGPUCount() == 0)
+  {
+    return static_cast<unsigned int>(gpuInfo.toInt());
+  }
+  else
+  {
+    QString gpuId = gpuInfo.split(":", QString::SplitBehavior::SkipEmptyParts).first();
+    return static_cast<unsigned int>(gpuId.toInt());
+  }
+}
 
 void QmitkSegmentationPreferencePage::OnInstallBtnClicked()
 {

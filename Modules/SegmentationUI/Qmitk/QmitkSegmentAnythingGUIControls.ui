@@ -55,8 +55,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to Segment Anything Model (SAM) tool in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to SAM. MITK does not ship with SAM. Make sure to have a working internet connection to install SAM via MITK.
-		   &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://segment-anything.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://segment-anything.com&lt;/span&gt;&lt;/a&gt; to learn everything about the SAM.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to Segment Anything Model (SAM) tool in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to SAM. MITK does not ship with SAM. Make sure to have a working internet connection to install SAM via MITK. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://segment-anything.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://segment-anything.com&lt;/span&gt;&lt;/a&gt; to learn everything about the SAM.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
@@ -83,68 +82,7 @@ Press DEL to remove last seed.
        </property>
       </widget>
      </item>
-
     </layout>
-   </item>
-   <item>
-    <widget class="ctkCollapsibleGroupBox" name="advancedGroupBox" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="title" stdset="0">
-      <string>Preferences</string>
-     </property>
-     <property name="flat" stdset="0">
-      <bool>true</bool>
-     </property>
-     <property name="collapsedHeight" stdset="0">
-      <number>5</number>
-     </property>
-     <property name="collapsed" stdset="0">
-      <bool>true</bool>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item>
-       <layout class="QGridLayout" name="_2">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <property name="spacing">
-         <number>6</number>
-        </property>
-        <item row="0" column="0">
-         <widget class="QLabel" name="gpuSpinLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>GPU Id:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="3">
-         <widget class="ctkComboBox" name="gpuComboBox"/>
-        </item>
-		
-       </layout>
-      </item>
-     </layout>
-    </widget>
    </item>
    <item>
     <widget class="QPushButton" name="resetButton">
@@ -200,10 +138,10 @@ Press DEL to remove last seed.
    <item>
     <widget class="QProgressBar" name="samProgressBar">
      <property name="maximum">
-       <number>1</number>
-      </property>
-      <property name="value">
-       <number>0</number>
+      <number>1</number>
+     </property>
+     <property name="value">
+      <number>0</number>
      </property>
      <property name="textVisible">
       <bool>false</bool>

@@ -83,6 +83,8 @@ namespace mitk
     void InitSAMPythonProcess();
     bool IsPythonReady() const;
 
+    Message1<const std::string&> SAMStatusMessageEvent;
+
   protected:
     SegmentAnythingTool();
     ~SegmentAnythingTool() = default;
@@ -110,6 +112,7 @@ namespace mitk
     std::vector<std::pair<mitk::Point2D, std::string>> GetPointsAsVector(const mitk::BaseGeometry*);
     std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry);
     std::string GetHashForCurrentPlane();
+    void EmitSAMStatusMessageEvent(const std::string);
 
 
   private:

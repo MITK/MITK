@@ -231,11 +231,15 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
       std::string uniquePlaneID = GetHashForCurrentPlane();
       try
       {
+        EmitSAMStatusMessageEvent("Prompting SAM...");
         m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID);
         auto csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
+        m_ProgressCommand->SetProgress(100);
         m_PythonService->TransferPointsToProcess(csvStream);
+        m_ProgressCommand->SetProgress(150);
         std::this_thread::sleep_for(100ms);
         Image::Pointer outputImage = m_PythonService->RetrieveImageFromProcess();
+        m_ProgressCommand->SetProgress(180);
         // auto endloading = std::chrono::system_clock::now();
         // MITK_INFO << "Loaded image in MITK. Elapsed: "
         //         << std::chrono::duration_cast<std::chrono::milliseconds>(endloading- endPython).count();
@@ -244,9 +248,11 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
         previewImage->InitializeByLabeledImage(outputImage);
         previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
         std::filesystem::remove(outputImagePath);
+        this->EmitSAMStatusMessageEvent("Successfully generated segmentation.");
       }
       catch (const mitk::Exception &e)
       {
+        this->EmitSAMStatusMessageEvent(e.GetDescription());
         mitkThrow() << e.GetDescription();
       }
     }
@@ -350,4 +356,9 @@ mitk::Point2D mitk::SegmentAnythingTool::Get2DIndicesfrom3DWorld(const mitk::Bas
   point2D.SetElement(0, point3d[0]);
   point2D.SetElement(1, point3d[1]);
   return point2D;
+}
+
+void mitk::SegmentAnythingTool::EmitSAMStatusMessageEvent(const std::string status)
+{
+  SAMStatusMessageEvent.Send(status);
 }

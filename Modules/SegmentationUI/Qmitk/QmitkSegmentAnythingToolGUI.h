@@ -73,7 +73,7 @@ protected slots:
 
 protected:
   QmitkSegmentAnythingToolGUI();
-  ~QmitkSegmentAnythingToolGUI() = default;
+  ~QmitkSegmentAnythingToolGUI();
 
   void InitializeUI(QBoxLayout *mainLayout) override;
   
@@ -86,6 +86,8 @@ protected:
    * @brief Writes any message in red on the tool pane.
    */
   void WriteErrorMessage(const QString &);
+
+  void StatusMessageListener(const std::string&);
 
   /**
    * @brief Creates a QMessage object and shows on screen.

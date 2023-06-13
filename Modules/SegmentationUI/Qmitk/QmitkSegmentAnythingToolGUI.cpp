@@ -58,6 +58,16 @@ QmitkSegmentAnythingToolGUI::QmitkSegmentAnythingToolGUI() : QmitkSegWithPreview
   m_Prefences = GetPreferences();
 }
 
+QmitkSegmentAnythingToolGUI::~QmitkSegmentAnythingToolGUI() 
+{
+  auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
+  if (nullptr != tool)
+  {
+    tool->SAMStatusMessageEvent -= mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI, const std::string&>(
+      this, &QmitkSegmentAnythingToolGUI::StatusMessageListener);
+  }
+}
+
 void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
@@ -129,6 +139,11 @@ void QmitkSegmentAnythingToolGUI::WriteErrorMessage(const QString &message)
   qApp->processEvents();
 }
 
+void QmitkSegmentAnythingToolGUI::StatusMessageListener(const std::string &message)
+{
+  this->WriteStatusMessage(QString::fromStdString(message));
+}
+
 void QmitkSegmentAnythingToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)
 {
   this->setCursor(Qt::ArrowCursor);
@@ -160,6 +175,8 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     tool->SetModelType(modelType.toStdString());
     this->WriteStatusMessage(
       QString("<b>STATUS: </b><i>Checking if model is already downloaded... This might take a while.</i>"));
+    tool->SAMStatusMessageEvent += mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI,const std::string&>(
+      this, &QmitkSegmentAnythingToolGUI::StatusMessageListener);
     if (this->DownloadModel(modelType))
     {
       this->ActivateSAMDaemon();

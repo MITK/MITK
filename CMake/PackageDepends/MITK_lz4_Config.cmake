@@ -1,1 +1,0 @@
-list(APPEND ALL_LIBRARIES LZ4::lz4_shared)

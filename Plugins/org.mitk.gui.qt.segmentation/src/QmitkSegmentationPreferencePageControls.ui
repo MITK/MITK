@@ -209,90 +209,102 @@
      </property>
     </widget>
    </item>
-	<item row="8" column="0">
-     <widget class="QLabel" name="SAMLabel">
-      <property name="text">
-       <string>SAM Tool</string>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="1">
-        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0" colspan="2">
-            <widget class="QPushButton" name="installSAMButton">
-                <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>Install SAM</string>
-                </property>
-            </widget>
-        </item>
-            <item row="0" column="2" colspan="2">
-                <widget class="QPushButton" name="clearSAMButton">
-                    <property name="sizePolicy">
-                        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>Clear Install</string>
-                    </property>
-                </widget>
-            </item>
-            <item row="1" column="0">
-                <widget class="QLabel" name="pythonLabel">
-                    <property name="text">
-                        <string>System Python</string>
-                    </property>
-                </widget>
-            </item>
-            <item row="1" column="1" colspan="3">
-                <widget class="ctkComboBox" name="sysPythonComboBox"/>
-            </item>
-            <item row="2" column="0">
-                <widget class="QLabel" name="samModelTypeLabel">
-                    <property name="text">
-                        <string>Model Type:</string>
-                    </property>
-                </widget>
-            </item>
-            <item row="2" column="1" colspan="3">
-                <widget class="ctkComboBox" name="samModelTypeComboBox"/>
-            </item>
-            <item row="3" column="1" colspan="3">
-                <widget class="ctkComboBox" name="gpuComboBox"/>
-            </item>
-            <item row="3" column="0">
-                <widget class="QLabel" name="gpuSpinLabel">
-                    <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>GPU Id:</string>
-                    </property>
-                </widget>
-            </item>
-            <item row="4" column="0" colspan="4">
-                <widget class="QLabel" name="samInstallStatusLabel">
-                    <property name="textFormat">
-                        <enum>Qt::RichText</enum>
-                    </property>
-                    <property name="wordWrap">
-                        <bool>true</bool>
-                    </property>
-                </widget>
-            </item>
-        </layout>
-    </item>
-	  
+   <item row="8" column="0">
+    <widget class="QLabel" name="SAMLabel">
+     <property name="text">
+      <string>SAM Tool</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0" colspan="2">
+      <widget class="QPushButton" name="installSAMButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Install SAM</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2" colspan="2">
+      <widget class="QPushButton" name="clearSAMButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Clear Install</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="pythonLabel">
+       <property name="text">
+        <string>System Python</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" colspan="3">
+      <widget class="ctkComboBox" name="sysPythonComboBox" native="true"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="samModelTypeLabel">
+       <property name="text">
+        <string>Model Type:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1" colspan="3">
+      <widget class="ctkComboBox" name="samModelTypeComboBox" native="true"/>
+     </item>
+     <item row="3" column="1" colspan="3">
+      <widget class="QLabel" name="samModelTipLabel">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic; color:#808080;&quot;&gt;Tip: Select vit_b for VRAM &amp;lt; 4GB, vit_l for VRAM &amp;lt; 6GB or vit_h for VRAM &amp;gt; 6GB.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1" colspan="3">
+      <widget class="ctkComboBox" name="gpuComboBox" native="true"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="gpuSpinLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>GPU Id:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="4">
+      <widget class="QLabel" name="samInstallStatusLabel">
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item row="9" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -308,10 +320,17 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ctkComboBox</class>
+   <extends>QWidget</extends>
+   <header>ctkcombobox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="labelCreationButtonGroup"/>
   <buttongroup name="displayButtonGroup"/>
+  <buttongroup name="labelCreationButtonGroup"/>
  </buttongroups>
 </ui>

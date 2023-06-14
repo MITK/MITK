@@ -64,12 +64,7 @@ protected slots:
   /**
    * @brief Qt Slot
    */
-  void FileDownloaded(QNetworkReply *); 
-
-  /**
-  * @brief Qt Slot
-  */
-  void OnParametersChanged(const QString&); 
+  void FileDownloaded(QNetworkReply *);
 
 protected:
   QmitkSegmentAnythingToolGUI();

@@ -87,8 +87,8 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls.activateButton, SIGNAL(clicked()), this, SLOT(OnActivateBtnClicked()));
   connect(m_Controls.resetButton, SIGNAL(clicked()), this, SLOT(OnResetPicksClicked()));
 
-  QIcon arrowIcon =
-    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/go-next.svg"));
+  QIcon arrowIcon = QmitkStyleManager::ThemeIcon(
+    QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg"));
   m_Controls.activateButton->setIcon(arrowIcon);
 
   bool isInstalled = this->ValidatePrefences();
@@ -139,11 +139,6 @@ void QmitkSegmentAnythingToolGUI::WriteErrorMessage(const QString &message)
   qApp->processEvents();
 }
 
-void QmitkSegmentAnythingToolGUI::StatusMessageListener(const std::string &message)
-{
-  this->WriteStatusMessage(QString::fromStdString(message));
-}
-
 void QmitkSegmentAnythingToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)
 {
   this->setCursor(Qt::ArrowCursor);
@@ -151,6 +146,15 @@ void QmitkSegmentAnythingToolGUI::ShowErrorMessage(const std::string &message, Q
   messageBox->exec();
   delete messageBox;
   MITK_WARN << message;
+}
+
+void QmitkSegmentAnythingToolGUI::StatusMessageListener(const std::string &message)
+{
+  this->WriteStatusMessage(QString::fromStdString(message));
+  if (message.rfind("Error", 0) == 0)
+  {
+    this->EnableAll(true);
+  }
 }
 
 void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
@@ -162,7 +166,7 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
   }
   try
   {
-    m_Controls.activateButton->setEnabled(false);
+    this->EnableAll(false);
     qApp->processEvents();
     if (!QmitkSegmentAnythingToolGUI::IsSAMInstalled(m_PythonPath))
     {
@@ -220,7 +224,6 @@ void QmitkSegmentAnythingToolGUI::ActivateSAMDaemon()
     qApp->processEvents();
   }
   tool->IsReadyOn();
-  m_Controls.activateButton->setEnabled(true);
   this->ShowProgressBar(false);
 }
 
@@ -303,20 +306,14 @@ bool QmitkSegmentAnythingToolGUI::IsSAMInstalled(const QString &pythonPath)
 #endif
   QDir folderPath(fullPath);
   folderPath.cdUp();
-  if (folderPath.cd("Lib/site-packages/segment_anything"))
+  QString segmentAnythingDirPath = QString("Lib") + QDir::separator() + QString("site-packages")
+                                   + QDir::separator() + QString("segment_anything");
+  if (folderPath.cd(segmentAnythingDirPath))
   {
     samExists = true;
   }
   bool isExists = samExists && isPythonExists;
   return isExists;
-}
-
-void QmitkSegmentAnythingToolGUI::OnParametersChanged(const QString &)
-{
-  if (m_Controls.activateButton->isEnabled())
-  {
-    this->WriteStatusMessage("<b>STATUS: </b><i>Please Reactivate SAM.</i>");
-  }
 }
 
 void QmitkSegmentAnythingToolGUI::OnResetPicksClicked()

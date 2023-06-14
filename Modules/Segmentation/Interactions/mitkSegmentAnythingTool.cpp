@@ -168,7 +168,7 @@ void mitk::SegmentAnythingTool::OnAddPoint(StateMachineAction*, InteractionEvent
   }
 }
 
-void mitk::SegmentAnythingTool::OnDelete(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
+void mitk::SegmentAnythingTool::OnDelete(StateMachineAction*, InteractionEvent*)
 {
   if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
   {
@@ -231,7 +231,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
       std::string uniquePlaneID = GetHashForCurrentPlane();
       try
       {
-        EmitSAMStatusMessageEvent("Prompting SAM...");
+        this->EmitSAMStatusMessageEvent("Prompting SAM...");
         m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID);
         auto csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
         m_ProgressCommand->SetProgress(100);
@@ -289,7 +289,6 @@ std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::Ba
   mitk::PointSet::PointsIterator pointSetItPos = m_PointSetPositive->Begin();
   mitk::PointSet::PointsIterator pointSetItNeg = m_PointSetNegative->Begin();
   const char SPACE = ' ';
-  const char newLine = ' ';
   while (pointSetItPos != m_PointSetPositive->End() || pointSetItNeg != m_PointSetNegative->End())
   {
     if (pointSetItPos != m_PointSetPositive->End())

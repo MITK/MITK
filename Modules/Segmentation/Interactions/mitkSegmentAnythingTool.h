@@ -100,7 +100,7 @@ namespace mitk
     /*
      * @brief Delete action of StateMachine pattern
      */
-    virtual void OnDelete(StateMachineAction*, InteractionEvent* interactionEvent);
+    virtual void OnDelete(StateMachineAction*, InteractionEvent*);
 
     /*
      * @brief Clear all seed points and call UpdatePreview to reset the segmentation Preview

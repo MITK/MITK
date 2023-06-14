@@ -62,6 +62,7 @@ void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object * /*pC
     if (SIGNALCONSTANTS::READY == testCOUT)
     {
       mitk::SegmentAnythingPythonService::IsPythonReady = true;
+      mitk::SegmentAnythingPythonService::CurrentStatus = mitk::SegmentAnythingPythonService::Status::READY;
     }
     if (SIGNALCONSTANTS::KILL == testCOUT)
     {
@@ -79,6 +80,7 @@ void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object * /*pC
   if (pErrEvent)
   {
     testCERR = testCERR + pErrEvent->GetOutput();
+    mitk::SegmentAnythingPythonService::IsPythonReady = false;
     MITK_ERROR << testCERR;
   }
 }
@@ -172,7 +174,7 @@ void mitk::SegmentAnythingPythonService::start_python_daemon()
     MITK_ERROR << e.GetDescription();
     return;
   }
-  MITK_INFO << "ending python process.....";
+  MITK_INFO << "Python process ended.";
 }
 
 void mitk::SegmentAnythingPythonService::CheckStatus()

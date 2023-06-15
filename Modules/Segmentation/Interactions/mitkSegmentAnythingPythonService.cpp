@@ -139,7 +139,7 @@ void mitk::SegmentAnythingPythonService::start_python_daemon()
   std::string command = "python";
   args.push_back("-u");
 
-  args.push_back("C:\\DKFZ\\SAM_work\\sam-playground\\endpoints\\run_inference_daemon.py");
+  args.push_back("run_inference_daemon.py");
   
   args.push_back("--input-folder");
   args.push_back(m_InDir);
@@ -197,7 +197,6 @@ void mitk::SegmentAnythingPythonService::CreateTempDirs(const std::string &dirPa
 
 mitk::Image::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProcess()
 {
-  //auto outputImagePath = "C:\\DKFZ\\SAM_work\\test_seg_3d.nii.gz";
   auto outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + m_CurrentUId + ".nii.gz";
   while (!std::filesystem::exists(outputImagePath))
   {

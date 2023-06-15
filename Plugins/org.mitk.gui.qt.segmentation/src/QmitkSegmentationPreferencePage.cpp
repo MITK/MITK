@@ -349,13 +349,16 @@ void QmitkSegmentationPreferencePage::OnInstallBtnClicked()
 
 void QmitkSegmentationPreferencePage::OnClearInstall()
 {
-  MITK_INFO << "OnClearInstall clicked";
   QDir folderPath(m_Installer.GetVirtualEnvPath());
   m_IsInstalled = folderPath.removeRecursively();
   if (!m_IsInstalled)
   {
     MITK_ERROR << "The virtual environment couldn't be removed. Please check if you have the required access "
                   "privileges or, some other process is accessing the folders.";
+  }
+  else
+  {
+    this->WriteStatusMessage("Deleted SAM installation.");
   }
 }
 

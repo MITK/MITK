@@ -35,10 +35,7 @@ class QmitkSAMInstaller : public QmitkSetupVirtualEnvUtil
 public:
   const QString VENV_NAME = ".sam";
   const QString SAM_VERSION = "1.0"; // currently, unused
-  const std::vector<QString> PACKAGES = {QString("numpy"),
-                                         QString("opencv-python"),
-                                         QString("git+https://github.com/facebookresearch/segment-anything.git"),
-                                         QString("SimpleITK")};
+  const std::vector<QString> PACKAGES = {QString("git+https://github.com/ASHISRAVINDRAN/sam-mitk.git")};
   const QString STORAGE_DIR;
   inline QmitkSAMInstaller(
     const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +

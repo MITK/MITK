@@ -100,7 +100,7 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   }
   else
   {
-    welcomeText += " SAM is not configured correctly. Please go to Preferences (Cntl+P) to configure and/or install SAM.";
+    welcomeText += " SAM tool is not configured correctly. Please go to Preferences (Cntl+P) > Segment Anything to configure and/or install SAM.";
   }
   this->EnableAll(isInstalled);
   this->WriteStatusMessage(welcomeText);

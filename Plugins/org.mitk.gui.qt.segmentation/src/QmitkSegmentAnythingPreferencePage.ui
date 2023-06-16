@@ -125,7 +125,7 @@
   <customwidget>
    <class>ctkComboBox</class>
    <extends>QWidget</extends>
-   <header>ctkcombobox.h</header>
+   <header>ctkComboBox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

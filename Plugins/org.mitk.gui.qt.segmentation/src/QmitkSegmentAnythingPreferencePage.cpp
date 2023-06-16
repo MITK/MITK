@@ -50,8 +50,6 @@ void QmitkSegmentAnythingPreferencePage::Init(berry::IWorkbench::Pointer)
 
 void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
 {
-  using Self = QmitkSegmentAnythingPreferencePage;
-
   m_Control = new QWidget(parent);
   m_Ui->setupUi(m_Control);
 #ifndef _WIN32

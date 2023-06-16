@@ -115,8 +115,8 @@ bool QmitkSegmentAnythingToolGUI::ValidatePrefences()
 {
   const QString storageDir = QString::fromStdString(m_Prefences->Get("sam python path", ""));
   bool isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(storageDir);
-  std::string &modelType = m_Prefences->Get("sam modeltype", "");
-  std::string &path = m_Prefences->Get("sam parent path", "");
+  std::string modelType = m_Prefences->Get("sam modeltype", "");
+  std::string path = m_Prefences->Get("sam parent path", "");
   return (isInstalled && !modelType.empty() && !path.empty());
 }
 
@@ -286,7 +286,7 @@ bool QmitkSegmentAnythingToolGUI::IsSAMInstalled(const QString &pythonPath)
 {
   QString fullPath = pythonPath;
   bool isPythonExists = false;
-  bool samExists = false;
+  bool isSamExists = false;
 #ifdef _WIN32
   isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
   if (!(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
@@ -304,15 +304,8 @@ bool QmitkSegmentAnythingToolGUI::IsSAMInstalled(const QString &pythonPath)
       (!isPythonExists) ? QFile::exists(fullPath + QDir::separator() + QString("python3")) : isPythonExists;
   }
 #endif
-  QDir folderPath(fullPath);
-  folderPath.cdUp();
-  QString segmentAnythingDirPath = QString("Lib") + QDir::separator() + QString("site-packages")
-                                   + QDir::separator() + QString("segment_anything");
-  if (folderPath.cd(segmentAnythingDirPath))
-  {
-    samExists = true;
-  }
-  bool isExists = samExists && isPythonExists;
+  isSamExists = QFile::exists(fullPath + QDir::separator() + QString("run_inference_daemon.py"));
+  bool isExists = isSamExists && isPythonExists;
   return isExists;
 }
 

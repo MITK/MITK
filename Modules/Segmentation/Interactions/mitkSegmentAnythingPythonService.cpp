@@ -59,6 +59,8 @@ void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object * /*pC
   if (pEvent)
   {
     testCOUT = testCOUT + pEvent->GetOutput();
+    testCOUT.erase(std::find_if(testCOUT.rbegin(), testCOUT.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);}).base(), testCOUT.end()); // remove trailing whitespaces, if any
     if (SIGNALCONSTANTS::READY == testCOUT)
     {
       mitk::SegmentAnythingPythonService::IsPythonReady = true;
@@ -185,6 +187,8 @@ void mitk::SegmentAnythingPythonService::CheckStatus()
       mitkThrow() << "Error: Cuda Out of Memory. Change your model type in Preferences and Activate SAM again.";
     case mitk::SegmentAnythingPythonService::Status::KILLED:
       mitkThrow() << "Error: Python process is already terminated. Cannot load requested segmentation.";
+    default:
+      MITK_INFO << "READY";
   }
 }
 

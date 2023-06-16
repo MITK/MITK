@@ -33,18 +33,26 @@ class mitkConvertSignalToConcentrationTestSuite : public mitk::TestFixture
 
 private:
   mitk::Image::Pointer m_dynamicImage;
-
-  itk::Index<4> m_idx_0 = { { 0, 0, 0, 0 } };
-  itk::Index<4> m_idx_1 = { { 0, 2, 2, 3 } };
-  itk::Index<4> m_idx_2 = { { 2, 2, 1, 9 } };
-  itk::Index<4> m_idx_3 = { { 0, 3, 2, 1 } };
-  itk::Index<4> m_idx_4 = { { 2, 2, 2, 4 } };
-
+  mitk::Image::Pointer m_convertedImage;
+  mitk::ConcentrationCurveGenerator::Pointer m_concentrationGen;
+  std::vector <itk::Index<4>> m_testIndices;
 
 public:
   void setUp() override
   {
     m_dynamicImage = mitk::GenerateDynamicTestImageMITK();
+    m_concentrationGen = mitk::ConcentrationCurveGenerator::New();
+    m_concentrationGen->SetDynamicImage(m_dynamicImage);
+    itk::Index<4> testIndex0 = { { 0, 0, 0, 0 } };
+    itk::Index<4> testIndex1 = { { 0, 2, 2, 3 } };
+    itk::Index<4> testIndex2 = { { 2, 2, 1, 9 } };
+    itk::Index<4> testIndex3 = { { 0, 3, 2, 1 } };
+    itk::Index<4> testIndex4 = { { 2, 2, 2, 4 } };
+    m_testIndices.push_back(testIndex0);
+    m_testIndices.push_back(testIndex1);
+    m_testIndices.push_back(testIndex2);
+    m_testIndices.push_back(testIndex3);
+    m_testIndices.push_back(testIndex4);
   }
 
   void tearDown() override
@@ -53,128 +61,155 @@ public:
 
   void GetConvertedImageAbsoluteEnhancementTest()
   {
-    mitk::Image::Pointer m_convertedImage;
-    mitk::ConcentrationCurveGenerator::Pointer concentrationGen = mitk::ConcentrationCurveGenerator::New();
-    concentrationGen->SetDynamicImage(m_dynamicImage);
-    concentrationGen->SetAbsoluteSignalEnhancement(true);
-    concentrationGen->SetFactor(1.0);
-    concentrationGen->SetBaselineStartTimeStep(0);
-    concentrationGen->SetBaselineEndTimeStep(0);
-    m_convertedImage = concentrationGen->GetConvertedImage();
+    m_concentrationGen->SetAbsoluteSignalEnhancement(true);
+    m_concentrationGen->SetFactor(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(0);
+    m_concentrationGen->SetBaselineEndTimeStep(0);
+    m_convertedImage = m_concentrationGen->GetConvertedImage();
     mitk::ImagePixelReadAccessor<double, 4> readAccess(m_convertedImage, m_convertedImage->GetSliceData(4));
+    std::vector <double> refValues;
+    refValues.push_back(0.0);
+    refValues.push_back(90.0);
+    refValues.push_back(360.0);
+    refValues.push_back(0.0);
+    refValues.push_back(160.0);
 
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 0 at pixel m_idx_0.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_0), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 0 at pixel m_idx_1.", mitk::Equal(90.0, readAccess.GetPixelByIndex(m_idx_1), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 0 at pixel m_idx_2.", mitk::Equal(360.0, readAccess.GetPixelByIndex(m_idx_2), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 0 at pixel m_idx_3.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_3), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 0 at pixel m_idx_4.", mitk::Equal(160.0, readAccess.GetPixelByIndex(m_idx_4), 1e-6, true) == true);
+    std::stringstream ss;
+    for (int i = 0; i < m_testIndices.size(); i++)
+    {
+      ss << "Checking value of image converted using absolute enhancement at test index " << i << ".";
+      std::string message = ss.str();
+      CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
+    }
   }
 
   void GetConvertedImageAbsoluteEnhancementAveragedBaselineTest()
   {
-    mitk::Image::Pointer convertedImage;
-    mitk::ConcentrationCurveGenerator::Pointer concentrationGen = mitk::ConcentrationCurveGenerator::New();
-    concentrationGen->SetDynamicImage(m_dynamicImage);
-    concentrationGen->SetAbsoluteSignalEnhancement(true);
-    concentrationGen->SetFactor(1.0);
-    concentrationGen->SetBaselineStartTimeStep(1);
-    concentrationGen->SetBaselineEndTimeStep(3);
-    convertedImage = concentrationGen->GetConvertedImage();
-    mitk::ImagePixelReadAccessor<double, 4> readAccess(convertedImage, convertedImage->GetSliceData(4));
+    m_concentrationGen->SetAbsoluteSignalEnhancement(true);
+    m_concentrationGen->SetFactor(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(1);
+    m_concentrationGen->SetBaselineEndTimeStep(3);
+    m_convertedImage = m_concentrationGen->GetConvertedImage();
+    mitk::ImagePixelReadAccessor<double, 4> readAccess(m_convertedImage, m_convertedImage->GetSliceData(4));
+    std::vector <double> refValues;
+    refValues.push_back(0.0);
+    refValues.push_back(30.0);
+    refValues.push_back(280.0);
+    refValues.push_back(0.0);
+    refValues.push_back(80.0);
 
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 1 at pixel m_idx_0.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_0), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 1 at pixel m_idx_1.", mitk::Equal(30.0, readAccess.GetPixelByIndex(m_idx_1), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 1 at pixel m_idx_2.", mitk::Equal(280.0, readAccess.GetPixelByIndex(m_idx_2), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 1 at pixel m_idx_3.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_3), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 1 at pixel m_idx_4.", mitk::Equal(80.0, readAccess.GetPixelByIndex(m_idx_4), 1e-6, true) == true);
-  }
+    std::stringstream ss;
+    for (int i = 0; i < m_testIndices.size(); i++)
+    {
+      ss << "Checking value of image converted using absolute enhancement with averaged baseline at test index " << i << ".";
+      std::string message = ss.str();
+      CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
+    }
+ }
 
   void GetConvertedImageRelativeEnhancementTest()
   {
-    mitk::Image::Pointer convertedImage;
-    mitk::ConcentrationCurveGenerator::Pointer concentrationGen = mitk::ConcentrationCurveGenerator::New();
-    concentrationGen->SetDynamicImage(m_dynamicImage);
-    concentrationGen->SetRelativeSignalEnhancement(true);
-    concentrationGen->SetFactor(1.0);
-    concentrationGen->SetBaselineStartTimeStep(0);
-    concentrationGen->SetBaselineEndTimeStep(0);
-    convertedImage = concentrationGen->GetConvertedImage();
+    m_concentrationGen->SetRelativeSignalEnhancement(true);
+    m_concentrationGen->SetFactor(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(0);
+    m_concentrationGen->SetBaselineEndTimeStep(0);
+    m_convertedImage = m_concentrationGen->GetConvertedImage();
+    mitk::ImagePixelReadAccessor<double, 4> readAccess(m_convertedImage, m_convertedImage->GetSliceData(4));
+    std::vector <double> refValues;
+    refValues.push_back(0.0);
+    refValues.push_back(3.461538);
+    refValues.push_back(20.0);
+    refValues.push_back(0.0);
+    refValues.push_back(5.714286);
 
-    mitk::ImagePixelReadAccessor<double, 4> readAccess(convertedImage, convertedImage->GetSliceData(4));
-
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 2 at pixel m_idx_0.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_0), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 2 at pixel m_idx_1.", mitk::Equal(3.461538, readAccess.GetPixelByIndex(m_idx_1), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 2 at pixel m_idx_2.", mitk::Equal(20.0, readAccess.GetPixelByIndex(m_idx_2), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 2 at pixel m_idx_3.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_3), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 2 at pixel m_idx_4.", mitk::Equal(5.714286, readAccess.GetPixelByIndex(m_idx_4), 1e-6, true) == true);
-  }
+    std::stringstream ss;
+    for (int i = 0; i < m_testIndices.size(); i++)
+    {
+      ss << "Checking value of image converted using relative enhancement at test index " << i << ".";
+      std::string message = ss.str();
+      CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
+    }
+ }
 
   void GetConvertedImageturboFLASHTest()
   {
-    mitk::Image::Pointer convertedImage;
-    mitk::ConcentrationCurveGenerator::Pointer concentrationGen = mitk::ConcentrationCurveGenerator::New();
-    concentrationGen->SetDynamicImage(m_dynamicImage);
-    concentrationGen->SetisTurboFlashSequence(true);
-    concentrationGen->SetRecoveryTime(1.0);
-    concentrationGen->SetRelaxationTime(1.0);
-    concentrationGen->SetRelaxivity(1.0);
-    concentrationGen->SetBaselineStartTimeStep(0);
-    concentrationGen->SetBaselineEndTimeStep(0);
-    convertedImage = concentrationGen->GetConvertedImage();
+    m_concentrationGen->SetisTurboFlashSequence(true);
+    m_concentrationGen->SetRecoveryTime(1.0);
+    m_concentrationGen->SetRelaxationTime(1.0);
+    m_concentrationGen->SetRelaxivity(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(0);
+    m_concentrationGen->SetBaselineEndTimeStep(0);
+    m_convertedImage = m_concentrationGen->GetConvertedImage();
+    mitk::ImagePixelReadAccessor<double, 4> readAccess(m_convertedImage, m_convertedImage->GetSliceData(4));
+    std::vector <double> refValues;
+    refValues.push_back(0.0);
+    refValues.push_back(0.0);
+    refValues.push_back(0.0);
+    refValues.push_back(0.0);
+    refValues.push_back(0.0);
 
-    mitk::ImagePixelReadAccessor<double, 4> readAccess(convertedImage, convertedImage->GetSliceData(4));
-
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 3 at pixel m_idx_0.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_0), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 3 at pixel m_idx_1.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_1), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 3 at pixel m_idx_2.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_2), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 3 at pixel m_idx_3.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_3), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 3 at pixel m_idx_4.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_4), 1e-6, true) == true);
+    std::stringstream ss;
+    for (int i = 0; i < m_testIndices.size(); i++)
+    {
+      ss << "Checking value of image converted using the turboFLASH model at test index " << i << ".";
+      std::string message = ss.str();
+      CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
+    }
   }
 
   void GetConvertedImageVFATest()
   {
     mitk::Image::Pointer PDWImage;
-    mitk::Image::Pointer convertedImage;
-    mitk::ConcentrationCurveGenerator::Pointer concentrationGen = mitk::ConcentrationCurveGenerator::New();
     PDWImage = mitk::GenerateTestFrame(1.0);
-    concentrationGen->SetDynamicImage(m_dynamicImage);
-    concentrationGen->SetUsingT1Map(true);
-    concentrationGen->SetRecoveryTime(1.0);
-    concentrationGen->SetRelaxivity(1.0);
-    concentrationGen->SetT10Image(PDWImage);
-    concentrationGen->SetFlipAngle(1.0);
-    concentrationGen->SetBaselineStartTimeStep(0);
-    concentrationGen->SetBaselineEndTimeStep(0);
-    convertedImage = concentrationGen->GetConvertedImage();
+    m_concentrationGen->SetUsingT1Map(true);
+    m_concentrationGen->SetRecoveryTime(1.0);
+    m_concentrationGen->SetRelaxivity(1.0);
+    m_concentrationGen->SetT10Image(PDWImage);
+    m_concentrationGen->SetFlipAngle(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(0);
+    m_concentrationGen->SetBaselineEndTimeStep(0);
+    m_convertedImage = m_concentrationGen->GetConvertedImage();
+    mitk::ImagePixelReadAccessor<double, 4> readAccess(m_convertedImage, m_convertedImage->GetSliceData(4));
+    std::vector <double> refValues;
+    refValues.push_back(0.0);
+    refValues.push_back(2.956868);
+    refValues.push_back(0.0);
+    refValues.push_back(0.0);
+    refValues.push_back(3.989374);
 
-    mitk::ImagePixelReadAccessor<double, 4> readAccess(convertedImage, convertedImage->GetSliceData(4));
-
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 4 at pixel m_idx_0.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_0), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 4 at pixel m_idx_1.", mitk::Equal(2.956868, readAccess.GetPixelByIndex(m_idx_1), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 4 at pixel m_idx_2.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_2), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 4 at pixel m_idx_3.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_3), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 4 at pixel m_idx_4.", mitk::Equal(3.989374, readAccess.GetPixelByIndex(m_idx_4), 1e-6, true) == true);
-  }
+    std::stringstream ss;
+    for (int i = 0; i < m_testIndices.size(); i++)
+    {
+      ss << "Checking value of image converted using the VFA method at test index " << i << ".";
+      std::string message = ss.str();
+      CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
+    }
+ }
 
   void GetConvertedImageT2Test()
   {
-    mitk::Image::Pointer convertedImage;
-    mitk::ConcentrationCurveGenerator::Pointer concentrationGen = mitk::ConcentrationCurveGenerator::New();
-    concentrationGen->SetDynamicImage(m_dynamicImage);
-    concentrationGen->SetisT2weightedImage(true);
-    concentrationGen->SetT2Factor(1.0);
-    concentrationGen->SetT2EchoTime(1.0);
-    concentrationGen->SetBaselineStartTimeStep(0);
-    concentrationGen->SetBaselineEndTimeStep(0);
-    convertedImage = concentrationGen->GetConvertedImage();
-    mitk::ImagePixelReadAccessor<double, 4> readAccess(convertedImage, convertedImage->GetSliceData(4));
+    m_concentrationGen->SetisT2weightedImage(true);
+    m_concentrationGen->SetT2Factor(1.0);
+    m_concentrationGen->SetT2EchoTime(1.0);
+    m_concentrationGen->SetBaselineStartTimeStep(0);
+    m_concentrationGen->SetBaselineEndTimeStep(0);
+    m_convertedImage = m_concentrationGen->GetConvertedImage();
+    mitk::ImagePixelReadAccessor<double, 4> readAccess(m_convertedImage, m_convertedImage->GetSliceData(4));
+    std::vector <double> refValues;
+    refValues.push_back(0.0);
+    refValues.push_back(-1.495494);
+    refValues.push_back(-3.044522);
+    refValues.push_back(0.0);
+    refValues.push_back(-1.904237);
 
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 5 at pixel m_idx_0.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_0), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 5 at pixel m_idx_1.", mitk::Equal(-1.495494, readAccess.GetPixelByIndex(m_idx_1), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 5 at pixel m_idx_2.", mitk::Equal(-3.044522, readAccess.GetPixelByIndex(m_idx_2), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 5 at pixel m_idx_3.", mitk::Equal(0.0, readAccess.GetPixelByIndex(m_idx_3), 1e-6, true) == true);
-    CPPUNIT_ASSERT_MESSAGE("Checking value of converted image 5 at pixel m_idx_4.", mitk::Equal(-1.904237, readAccess.GetPixelByIndex(m_idx_4), 1e-6, true) == true);
-  }
+    std::stringstream ss;
+    for (int i = 0; i < m_testIndices.size(); i++)
+    {
+      ss << "Checking value of converted T2 image at test index " << i << ".";
+      std::string message = ss.str();
+      CPPUNIT_ASSERT_MESSAGE(message, mitk::Equal(refValues.at(i), readAccess.GetPixelByIndex(m_testIndices.at(i)), 1e-6, true) == true);
+    }
+ }
 
 };
 MITK_TEST_SUITE_REGISTRATION(mitkConvertSignalToConcentration)

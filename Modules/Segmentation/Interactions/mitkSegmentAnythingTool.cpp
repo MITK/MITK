@@ -122,7 +122,7 @@ void mitk::SegmentAnythingTool::InitSAMPythonProcess()
 
 bool mitk::SegmentAnythingTool::IsPythonReady() const
 {
-  return mitk::SegmentAnythingPythonService::IsPythonReady;
+  return m_PythonService->CheckStatus();
 }
 
 void mitk::SegmentAnythingTool::OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent)

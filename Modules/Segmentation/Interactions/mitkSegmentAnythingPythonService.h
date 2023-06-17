@@ -36,7 +36,7 @@ namespace mitk
     enum Status
     {
       READY,
-      PROCESSING,
+      OFF,
       KILLED,
       CUDAError
     };
@@ -55,7 +55,7 @@ namespace mitk
     static void onPythonProcessEvent(itk::Object*, const itk::EventObject&, void*);
     bool static IsPythonReady;
     static Status CurrentStatus;
-    static void CheckStatus();
+    static bool CheckStatus();
     void StartAsyncProcess();
     void StopAsyncProcess();
     void TransferImageToProcess(const Image*, std::string &UId);
@@ -89,8 +89,7 @@ namespace mitk
   {
     static const std::string READY;
     static const std::string KILL;
-    static const std::string SUCCESS;
-    static const std::string PROCESSING;
+    static const std::string OFF;
     static const std::string CUDA_OUT_OF_MEMORY_ERROR;
   };
 

@@ -104,7 +104,7 @@ protected:
   */
   void ShowProgressBar(bool);
 
-  void ActivateSAMDaemon();
+  bool ActivateSAMDaemon();
 
   bool ValidatePrefences();
 

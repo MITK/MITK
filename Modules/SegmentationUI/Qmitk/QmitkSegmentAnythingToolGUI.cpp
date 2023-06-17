@@ -183,8 +183,16 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
       this, &QmitkSegmentAnythingToolGUI::StatusMessageListener);
     if (this->DownloadModel(modelType))
     {
-      this->ActivateSAMDaemon();
-      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. SAM Activated.</i>"));
+      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. Activating Segment Anything tool...</i>"));
+      if (this->ActivateSAMDaemon())
+      {
+        this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. SAM Activated.</i>"));
+      }
+      else
+      {
+        this->WriteErrorMessage(QString("<b>STATUS: </b><i>Model found. Couldn't init tool backend.</i>"));
+        this->EnableAll(true);
+      }
     }
     else
     {
@@ -210,21 +218,30 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
   }
 }
 
-void QmitkSegmentAnythingToolGUI::ActivateSAMDaemon()
+bool QmitkSegmentAnythingToolGUI::ActivateSAMDaemon()
 {
   auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
   if (nullptr == tool)
   {
-    return;
+    return false;
   }
   this->ShowProgressBar(true);
-  tool->InitSAMPythonProcess();
-  while (!tool->IsPythonReady())
+  qApp->processEvents();
+  try
   {
-    qApp->processEvents();
+    tool->InitSAMPythonProcess();
+    while (!tool->IsPythonReady())
+    {
+      qApp->processEvents();
+    }
+    tool->IsReadyOn();
   }
-  tool->IsReadyOn();
+  catch (...)
+  {
+    tool->IsReadyOff();
+  }
   this->ShowProgressBar(false);
+  return tool->GetIsReady();
 }
 
 bool QmitkSegmentAnythingToolGUI::DownloadModel(const QString &modelType)
@@ -264,8 +281,15 @@ void QmitkSegmentAnythingToolGUI::FileDownloaded(QNetworkReply *reply)
     if (nullptr != tool)
     {
       tool->SetCheckpointPath(file.fileName().toStdString());
-      this->ActivateSAMDaemon();
-      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. SAM Activated.</i>"));
+      if (this->ActivateSAMDaemon())
+      {
+        this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. Segment Anything activated.</i>"));
+      }
+      else
+      {
+        this->WriteErrorMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. But couldn't init tool backend.</i>"));
+        this->EnableAll(true);
+      }
     }
   }
   else

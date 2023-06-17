@@ -114,7 +114,6 @@ namespace mitk
     std::string GetHashForCurrentPlane();
     void EmitSAMStatusMessageEvent(const std::string);
 
-
   private:
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, mitk::Point3D&);
     //void WriteCSVFile(std::stringstream&); // move to python service

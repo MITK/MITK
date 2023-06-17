@@ -27,7 +27,7 @@ namespace mitk
   const std::string SIGNALCONSTANTS::CUDA_OUT_OF_MEMORY_ERROR = "CudaOutOfMemoryError";
   bool mitk::SegmentAnythingPythonService::IsPythonReady = false;
   mitk::SegmentAnythingPythonService::Status mitk::SegmentAnythingPythonService::CurrentStatus =
-    mitk::SegmentAnythingPythonService::Status::READY;
+    mitk::SegmentAnythingPythonService::Status::OFF;
 }
 
 mitk::SegmentAnythingPythonService::SegmentAnythingPythonService(
@@ -47,12 +47,11 @@ mitk::SegmentAnythingPythonService::~SegmentAnythingPythonService()
     this->StopAsyncProcess();
   }
   mitk::SegmentAnythingPythonService::IsPythonReady = false;
+  mitk::SegmentAnythingPythonService::CurrentStatus = mitk::SegmentAnythingPythonService::Status::OFF;
   std::filesystem::remove_all(this->GetMitkTempDir());
 }
 
-void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object * /*pCaller*/,
-                                                              const itk::EventObject &e,
-                                                              void *)
+void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object*, const itk::EventObject &e, void*)
 {
   std::string testCOUT,testCERR;
   const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
@@ -179,16 +178,18 @@ void mitk::SegmentAnythingPythonService::start_python_daemon()
   MITK_INFO << "Python process ended.";
 }
 
-void mitk::SegmentAnythingPythonService::CheckStatus()
+bool mitk::SegmentAnythingPythonService::CheckStatus()
 {
   switch (CurrentStatus)
   {
+    case mitk::SegmentAnythingPythonService::Status::READY:
+      return true;
     case mitk::SegmentAnythingPythonService::Status::CUDAError:
       mitkThrow() << "Error: Cuda Out of Memory. Change your model type in Preferences and Activate SAM again.";
     case mitk::SegmentAnythingPythonService::Status::KILLED:
       mitkThrow() << "Error: Python process is already terminated. Cannot load requested segmentation.";
     default:
-      MITK_INFO << "READY";
+      return false;
   }
 }
 

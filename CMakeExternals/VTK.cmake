@@ -51,7 +51,7 @@ if(NOT DEFINED VTK_DIR)
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
     GIT_REPOSITORY https://github.com/Kitware/VTK.git
-    GIT_TAG v9.1.0
+    GIT_TAG v9.2.6
     GIT_SUBMODULES ""
     CMAKE_GENERATOR ${gen}
     CMAKE_GENERATOR_PLATFORM ${gen_platform}
@@ -64,6 +64,9 @@ if(NOT DEFINED VTK_DIR)
       -DVTK_MODULE_ENABLE_VTK_RenderingContextOpenGL2:STRING=YES
       -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2:STRING=YES
       -DVTK_MODULE_ENABLE_VTK_GUISupportQtQuick:STRING=NO
+      -DVTK_MODULE_ENABLE_VTK_IOIOSS:STRING=NO # See T29633
+      -DVTK_MODULE_ENABLE_VTK_ioss:STRING=NO   # See T29633
+      -DVTK_QT_VERSION:STRING=5
       ${additional_cmake_args}
       ${${proj}_CUSTOM_CMAKE_ARGS}
     CMAKE_CACHE_ARGS

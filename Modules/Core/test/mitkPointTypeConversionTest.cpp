@@ -130,7 +130,7 @@ public:
   {
     itk::Vector<double, 3> vector3D = originalValues;
 
-    itk::Point<double, 3> point3D = vector3D;
+    itk::Point<double, 3> point3D(vector3D.GetDataPointer());
 
     TestForEquality(point3D, vector3D, "mitk::Point", "mitk::Vector");
   }

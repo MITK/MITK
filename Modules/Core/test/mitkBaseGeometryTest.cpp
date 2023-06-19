@@ -758,7 +758,7 @@ public:
 
     // Testing WorldToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)
     originOffCenter = origin + halfSpacingStep;
-    originOffCenter -= 0.0001;
+    originOffCenter -= mitk::Vector(0.0001);
     dummyGeometry->WorldToIndex(originOffCenter, itkindex);
     CPPUNIT_ASSERT(mitk::EqualArray(itkindex, globalOriginIndex, 3, mitk::eps, true));
 

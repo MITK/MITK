@@ -317,8 +317,8 @@ int main(int argc, char* argv[])
       mitk::CastToItkImage(class_mask, itk_class_mask);
 
       itk::LabelOverlapMeasuresImageFilter<itk::Image<short,3> >::Pointer overlap_filter = itk::LabelOverlapMeasuresImageFilter<itk::Image<short,3> >::New();
-      overlap_filter->SetInput(0,itk_result_mask);
-      overlap_filter->SetInput(1,itk_class_mask);
+      overlap_filter->SetSourceImage(itk_result_mask);
+      overlap_filter->SetTargetImage(itk_class_mask);
       overlap_filter->Update();
 
       MITK_INFO << "DICE (" << num_points - (CSF_vec.size() + LES_vec.size() + BRA_vec.size()) << "): " << overlap_filter->GetDiceCoefficient();

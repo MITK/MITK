@@ -287,7 +287,7 @@ void QmitkRenderWindowWidget::SetGeometrySlice(const itk::EventObject& event)
 
 void QmitkRenderWindowWidget::OnResetGeometry()
 {
-  const auto* baseRenderer = mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow());
+  const auto* baseRenderer = mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow());
   const auto* interactionReferenceGeometry = baseRenderer->GetInteractionReferenceGeometry();
   this->ResetGeometry(interactionReferenceGeometry);
   m_RenderWindow->ShowOverlayMessage(false);

@@ -55,7 +55,7 @@ namespace mitk
     static void onPythonProcessEvent(itk::Object*, const itk::EventObject&, void*);
     bool static IsPythonReady;
     static Status CurrentStatus;
-    static bool CheckStatus();
+    static bool CheckStatus() throw(mitk::Exception);
     void StartAsyncProcess();
     void StopAsyncProcess();
     void TransferImageToProcess(const Image*, std::string &UId);
@@ -75,9 +75,6 @@ namespace mitk
     std::string m_InDir, m_OutDir;
     std::string m_CurrentUId;
     unsigned int m_GpuId = 0;
-    bool m_IsAuto = false;
-    bool m_IsReady = false;
-    const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
     const std::string m_PARENT_TEMP_DIR_PATTERN = "mitk-sam-XXXXXX";
     const std::string m_TRIGGER_FILENAME = "trigger.csv";
     std::future<void> m_Future;

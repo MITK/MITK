@@ -150,10 +150,14 @@ void QmitkSegmentAnythingToolGUI::ShowErrorMessage(const std::string &message, Q
 
 void QmitkSegmentAnythingToolGUI::StatusMessageListener(const std::string &message)
 {
-  this->WriteStatusMessage(QString::fromStdString(message));
   if (message.rfind("Error", 0) == 0)
   {
     this->EnableAll(true);
+    this->WriteErrorMessage(QString::fromStdString(message));
+  }
+  else
+  {
+    this->WriteStatusMessage(QString::fromStdString(message));
   }
 }
 
@@ -172,7 +176,6 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     {
       throw std::runtime_error(WARNING_SAM_NOT_FOUND);
     }
-    tool->SetIsAuto(false);
     tool->SetPythonPath(m_PythonPath.toStdString());
     tool->SetGpuId(m_Prefences->GetInt("sam gpuid", 0));
     const QString modelType = QString::fromStdString(m_Prefences->Get("sam modeltype", ""));  
@@ -206,14 +209,14 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     errorMsg << "<b>STATUS: </b>Error while processing parameters for SAM segmentation. Reason: " << e.what();
     this->ShowErrorMessage(errorMsg.str());
     this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
-    m_Controls.activateButton->setEnabled(true);
+    this->EnableAll(true);
     return;
   }
   catch (...)
   {
     std::string errorMsg = "Unkown error occured while generation SAM segmentation.";
     this->ShowErrorMessage(errorMsg);
-    m_Controls.activateButton->setEnabled(true);
+    this->EnableAll(true);
     return;
   }
 }

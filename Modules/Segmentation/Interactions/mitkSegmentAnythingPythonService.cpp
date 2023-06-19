@@ -24,6 +24,7 @@ namespace mitk
 {
   const std::string SIGNALCONSTANTS::READY = "READY";
   const std::string SIGNALCONSTANTS::KILL = "KILL";
+  const std::string SIGNALCONSTANTS::OFF = "OFF";
   const std::string SIGNALCONSTANTS::CUDA_OUT_OF_MEMORY_ERROR = "CudaOutOfMemoryError";
   bool mitk::SegmentAnythingPythonService::IsPythonReady = false;
   mitk::SegmentAnythingPythonService::Status mitk::SegmentAnythingPythonService::CurrentStatus =
@@ -63,16 +64,16 @@ void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object*, cons
     if (SIGNALCONSTANTS::READY == testCOUT)
     {
       mitk::SegmentAnythingPythonService::IsPythonReady = true;
-      mitk::SegmentAnythingPythonService::CurrentStatus = mitk::SegmentAnythingPythonService::Status::READY;
+      CurrentStatus = Status::READY;
     }
     if (SIGNALCONSTANTS::KILL == testCOUT)
     {
-      mitk::SegmentAnythingPythonService::CurrentStatus = mitk::SegmentAnythingPythonService::Status::KILLED;
+      CurrentStatus = Status::KILLED;
       mitk::SegmentAnythingPythonService::IsPythonReady = false;
     }
     if (SIGNALCONSTANTS::CUDA_OUT_OF_MEMORY_ERROR == testCOUT)
     {
-      mitk::SegmentAnythingPythonService::CurrentStatus = mitk::SegmentAnythingPythonService::Status::CUDAError;
+      CurrentStatus = Status::CUDAError;
       mitk::SegmentAnythingPythonService::IsPythonReady = false;
     }
     MITK_INFO << testCOUT;

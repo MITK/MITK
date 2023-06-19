@@ -240,11 +240,15 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
         std::this_thread::sleep_for(100ms);
         Image::Pointer outputImage = m_PythonService->RetrieveImageFromProcess();
         m_ProgressCommand->SetProgress(180);
+        //for (unsigned int i = 0; i < outputImage->GetDimension(); ++i)
+        //  MITK_INFO << "Dim output: " << outputImage->GetDimension(i);
         // auto endloading = std::chrono::system_clock::now();
         // MITK_INFO << "Loaded image in MITK. Elapsed: "
         //         << std::chrono::duration_cast<std::chrono::milliseconds>(endloading- endPython).count();
-        // mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputImage, timeStep,
-        // true);
+        //mitk::SegTool2D::WriteSliceToVolume(
+        //  previewImage, this->GetWorkingPlaneGeometry(), outputImage.GetPointer(), timeStep, false);
+        //for (unsigned int i = 0; i < previewImage->GetDimension(); ++i)
+        //  MITK_INFO << "Dim previewImage: " << previewImage->GetDimension(i);
         previewImage->InitializeByLabeledImage(outputImage);
         previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
         std::filesystem::remove(outputImagePath);

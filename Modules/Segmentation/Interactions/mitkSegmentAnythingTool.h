@@ -72,10 +72,6 @@ namespace mitk
     itkSetMacro(GpuId, unsigned int);
     itkGetConstMacro(GpuId, unsigned int);
 
-    itkSetMacro(IsAuto, bool);
-    itkGetConstMacro(IsAuto, bool);
-    itkBooleanMacro(IsAuto);
-
     itkSetMacro(IsReady, bool);
     itkGetConstMacro(IsReady, bool);
     itkBooleanMacro(IsReady);
@@ -116,8 +112,6 @@ namespace mitk
 
   private:
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, mitk::Point3D&);
-    //void WriteCSVFile(std::stringstream&); // move to python service
-    //void CreateTempDirs(const std::string& dirPattern);
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;
@@ -130,7 +124,7 @@ namespace mitk
     DataNode::Pointer m_PointSetNode;
     DataNode::Pointer m_PointSetNodeNegative;
     bool m_IsGenerateEmbeddings = true;
-    bool m_IsAuto = false;
+    //bool m_IsAuto = false;
     bool m_IsReady = false;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
     const std::string m_PARENT_TEMP_DIR_PATTERN = "mitk-sam-XXXXXX";

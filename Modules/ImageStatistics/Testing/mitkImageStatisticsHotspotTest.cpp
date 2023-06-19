@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkImageStatisticsCalculator.h"
 #include "itkMultiGaussianImageSource.h"
 #include "mitkTestingMacros.h"
-#include "mitkImageCast.h"
+#include <mitkITKImageImport.h>
 
 #include <itkImageRegionIterator.h>
 
@@ -394,12 +394,9 @@ struct mitkImageStatisticsHotspotTestClass
 
   static mitk::Image::Pointer BuildTestImage(const Parameters& testParameters)
   {
-    mitk::Image::Pointer result;
-
     typedef double PixelType;
     const int Dimension = 3;
     typedef itk::Image<PixelType, Dimension> ImageType;
-    ImageType::Pointer image = ImageType::New();
     typedef itk::MultiGaussianImageSource< ImageType > MultiGaussianImageSource;
     MultiGaussianImageSource::Pointer gaussianGenerator = MultiGaussianImageSource::New();
     ImageType::SizeValueType size[3];
@@ -437,11 +434,7 @@ struct mitkImageStatisticsHotspotTestClass
 
     gaussianGenerator->Update();
 
-    image = gaussianGenerator->GetOutput();
-
-    mitk::CastToMitkImage(image, result);
-
-    return result;
+    return mitk::GrabItkImageMemory(gaussianGenerator->GetOutput(), nullptr, nullptr, false);
   }
 
   /**
@@ -461,7 +454,6 @@ struct mitkImageStatisticsHotspotTestClass
 
     mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
     statisticsCalculator->SetInputImage(image);
-    mitk::Image::Pointer mitkMaskImage;
 
     if((testParameters.m_MaxIndexX[label] > testParameters.m_MinIndexX[label] && testParameters.m_MinIndexX[label] >= 0) &&
       (testParameters.m_MaxIndexY[label] > testParameters.m_MinIndexY[label] && testParameters.m_MinIndexY[label] >= 0) &&
@@ -509,7 +501,8 @@ struct mitkImageStatisticsHotspotTestClass
         }
       }
 
-      mitk::CastToMitkImage(mask, mitkMaskImage);
+      auto mitkMaskImage = mitk::GrabItkImageMemory(mask, nullptr, nullptr, false);
+
       mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
       imgMaskGen->SetInputImage(image);
       imgMaskGen->SetImageMask(mitkMaskImage);

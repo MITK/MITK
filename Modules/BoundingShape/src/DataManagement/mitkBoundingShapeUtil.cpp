@@ -87,8 +87,8 @@ std::vector<mitk::Point3D> mitk::GetCornerPoints(mitk::BaseGeometry::Pointer geo
   // use 0.5 offset because the vtkCubeSource is not center pixel based (only for visualization purpose)
   if (visualizationOffset)
   {
-    BBmin -= 0.5;
-    BBmax -= 0.5;
+    BBmin -= mitk::Vector(0.5);
+    BBmax -= mitk::Vector(0.5);
   }
   mitk::Point3D p0;
   p0[0] = BBmin[0];

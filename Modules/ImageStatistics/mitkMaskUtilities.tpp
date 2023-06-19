@@ -76,8 +76,8 @@ namespace mitk
             }
 
             // check spacing
-            PointType imageSpacing = m_Image->GetSpacing();
-            PointType maskSpacing = m_Mask->GetSpacing();
+            PointType imageSpacing(m_Image->GetSpacing().GetDataPointer());
+            PointType maskSpacing(m_Mask->GetSpacing().GetDataPointer());
             for (unsigned int i = 0; i < VImageDimension; i++)
             {
                 if ( fabs( maskSpacing[i] - imageSpacing[i] ) > MASK_SUITABILITY_TOLERANCE_COORDINATE )

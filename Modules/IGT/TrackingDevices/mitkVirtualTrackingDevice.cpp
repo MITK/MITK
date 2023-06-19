@@ -234,7 +234,7 @@ void mitk::VirtualTrackingDevice::TrackTools()
         std::mt19937 generator(rd());
         std::normal_distribution<double> dist(this->m_MeanDistributionParam, this->m_DeviationDistributionParam);
         double noise = dist(generator);
-        mp = mp + noise;
+        mp = mp + mitk::Vector(noise);
       }
 
       currentTool->SetPosition(mp);

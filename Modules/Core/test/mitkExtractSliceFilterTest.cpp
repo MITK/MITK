@@ -397,7 +397,7 @@ public:
     imgRegion.SetIndex(start);
 
     image->SetRegions(imgRegion);
-    image->SetSpacing(1.0);
+    image->SetSpacing(mitk::Vector(1.0));
     image->Allocate();
 
     ImageIterator imageIterator(image, image->GetLargestPossibleRegion());
@@ -723,7 +723,7 @@ private:
     imgRegion.SetIndex(start);
 
     sphereImage->SetRegions(imgRegion);
-    sphereImage->SetSpacing(1.0);
+    sphereImage->SetSpacing(mitk::Vector(1.0));
     sphereImage->Allocate();
 
     sphereImage->FillBuffer(0);

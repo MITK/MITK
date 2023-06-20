@@ -232,7 +232,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
       try
       {
         this->EmitSAMStatusMessageEvent("Prompting SAM...");
-        m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID);
+        m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID, m_IsGenerateEmbeddings);
         auto csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
         m_ProgressCommand->SetProgress(100);
         m_PythonService->TransferPointsToProcess(csvStream);
@@ -240,18 +240,18 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
         std::this_thread::sleep_for(100ms);
         Image::Pointer outputImage = m_PythonService->RetrieveImageFromProcess();
         m_ProgressCommand->SetProgress(180);
-        //for (unsigned int i = 0; i < outputImage->GetDimension(); ++i)
-        //  MITK_INFO << "Dim output: " << outputImage->GetDimension(i);
+        for (unsigned int i = 0; i < outputImage->GetDimension(); ++i)
+          MITK_INFO << "Dim output: " << outputImage->GetDimension(i);
         // auto endloading = std::chrono::system_clock::now();
         // MITK_INFO << "Loaded image in MITK. Elapsed: "
         //         << std::chrono::duration_cast<std::chrono::milliseconds>(endloading- endPython).count();
-        //mitk::SegTool2D::WriteSliceToVolume(
+        //mitk::SegTool2D::WriteBackSegmentationResult(
         //  previewImage, this->GetWorkingPlaneGeometry(), outputImage.GetPointer(), timeStep, false);
-        //for (unsigned int i = 0; i < previewImage->GetDimension(); ++i)
-        //  MITK_INFO << "Dim previewImage: " << previewImage->GetDimension(i);
+        for (unsigned int i = 0; i < previewImage->GetDimension(); ++i)
+          MITK_INFO << "Dim previewImage: " << previewImage->GetDimension(i);
         previewImage->InitializeByLabeledImage(outputImage);
         previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
-        std::filesystem::remove(outputImagePath);
+        //std::filesystem::remove(outputImagePath);
         this->EmitSAMStatusMessageEvent("Successfully generated segmentation.");
       }
       catch (const mitk::Exception &e)

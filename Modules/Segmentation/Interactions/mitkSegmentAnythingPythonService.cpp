@@ -26,7 +26,6 @@ namespace mitk
   const std::string SIGNALCONSTANTS::KILL = "KILL";
   const std::string SIGNALCONSTANTS::OFF = "OFF";
   const std::string SIGNALCONSTANTS::CUDA_OUT_OF_MEMORY_ERROR = "CudaOutOfMemoryError";
-  bool mitk::SegmentAnythingPythonService::IsPythonReady = false;
   mitk::SegmentAnythingPythonService::Status mitk::SegmentAnythingPythonService::CurrentStatus =
     mitk::SegmentAnythingPythonService::Status::OFF;
 }
@@ -43,12 +42,11 @@ mitk::SegmentAnythingPythonService::SegmentAnythingPythonService(
 
 mitk::SegmentAnythingPythonService::~SegmentAnythingPythonService()
 {
-  if (mitk::SegmentAnythingPythonService::IsPythonReady)
+  if (CurrentStatus == Status::READY)
   {
     this->StopAsyncProcess();
   }
-  mitk::SegmentAnythingPythonService::IsPythonReady = false;
-  mitk::SegmentAnythingPythonService::CurrentStatus = mitk::SegmentAnythingPythonService::Status::OFF;
+  CurrentStatus = Status::OFF;
   std::filesystem::remove_all(this->GetMitkTempDir());
 }
 
@@ -63,18 +61,15 @@ void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object*, cons
         return !std::isspace(ch);}).base(), testCOUT.end()); // remove trailing whitespaces, if any
     if (SIGNALCONSTANTS::READY == testCOUT)
     {
-      mitk::SegmentAnythingPythonService::IsPythonReady = true;
       CurrentStatus = Status::READY;
     }
     if (SIGNALCONSTANTS::KILL == testCOUT)
     {
       CurrentStatus = Status::KILLED;
-      mitk::SegmentAnythingPythonService::IsPythonReady = false;
     }
     if (SIGNALCONSTANTS::CUDA_OUT_OF_MEMORY_ERROR == testCOUT)
     {
       CurrentStatus = Status::CUDAError;
-      mitk::SegmentAnythingPythonService::IsPythonReady = false;
     }
     MITK_INFO << testCOUT;
   }
@@ -82,7 +77,6 @@ void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object*, cons
   if (pErrEvent)
   {
     testCERR = testCERR + pErrEvent->GetOutput();
-    mitk::SegmentAnythingPythonService::IsPythonReady = false;
     MITK_ERROR << testCERR;
   }
 }
@@ -210,12 +204,16 @@ mitk::Image::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProces
     std::this_thread::sleep_for(100ms);
   }
   Image::Pointer outputImage = mitk::IOUtil::Load<Image>(outputImagePath);
+  std::filesystem::remove(outputImagePath);
   return outputImage;
 }
 
-void mitk::SegmentAnythingPythonService::TransferImageToProcess(const Image *inputAtTimeStep, std::string &UId)
+void mitk::SegmentAnythingPythonService::TransferImageToProcess(const Image *inputAtTimeStep, std::string &UId, bool writeContent)
 {
   std::string inputImagePath = m_InDir + IOUtil::GetDirectorySeparator() + UId + ".nii.gz";
-  IOUtil::Save(inputAtTimeStep, inputImagePath);
+  if (writeContent)
+    IOUtil::Save(inputAtTimeStep, inputImagePath);
+  else
+    std::ofstream output(inputImagePath); //No need to write full content if embeddings are already generated.
   m_CurrentUId = UId;
 }

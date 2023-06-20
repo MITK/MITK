@@ -22,13 +22,10 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** CHANGE THIS --ashis
-  \brief Segment Anything Model interactive 2D tool.
 
-  \ingroup ToolManagerEtAl
-  \sa mitk::Tool
-  \sa QmitkInteractiveSegmentation
-
+  /**
+   * @brief Segment Anything Model Python process handler class.
+   * 
   */
   class MITKSEGMENTATION_EXPORT SegmentAnythingPythonService : public itk::Object
   {
@@ -53,19 +50,69 @@ namespace mitk
      *
      */
     static void onPythonProcessEvent(itk::Object*, const itk::EventObject&, void*);
-    bool static IsPythonReady;
-    static Status CurrentStatus;
+
+    /**
+     * @brief Checks CurrentStatus enum variable and returns 
+     * true if daemon is READY state, false is OFF state or
+     * throws exception if daemon is found KILL or Cuda error state.
+     * 
+     * @return bool 
+     */
     static bool CheckStatus() throw(mitk::Exception);
+
+    /**
+     * @brief Creates temp directories and calls start_python_daemon
+     * function async.
+     * 
+     */
     void StartAsyncProcess();
+
+    /**
+     * @brief Writes KILL to the control file to stop the daemon process.
+     * 
+     */
     void StopAsyncProcess();
-    void TransferImageToProcess(const Image*, std::string &UId);
-    //void TransferPointsToProcess(std::vector<std::pair<mitk::Point2D, std::string>>&);
+
+    /**
+     * @brief Writes image as nifity file with unique id (UId) as file name. 
+     * 
+     */
+    void TransferImageToProcess(const Image*, std::string &UId, bool);
+
+    /**
+     * @brief Writes csv stringstream of points to a csv file for 
+     * python daemon to read.
+     * 
+     */
     void TransferPointsToProcess(std::stringstream&);
+
+    /**
+     * @brief Waits for output nifity file from the daemon to appear and 
+     * reads it as a mitk::Image
+     * 
+     * @return Image::Pointer 
+     */
     Image::Pointer RetrieveImageFromProcess();
 
+    static Status CurrentStatus;
+
   private:
+    /**
+     * @brief Runs SAM python daemon using mitk::ProcessExecutor
+     * 
+     */
     void start_python_daemon();
+
+    /**
+     * @brief Writes stringstream content into control file.
+     * 
+     */
     void WriteControlFile(std::stringstream&);
+
+    /**
+     * @brief Create a Temp Dirs
+     * 
+     */
     void CreateTempDirs(const std::string&);
 
     std::string m_MitkTempDir;

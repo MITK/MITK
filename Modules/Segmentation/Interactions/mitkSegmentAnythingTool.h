@@ -29,8 +29,8 @@ namespace us
 
 namespace mitk
 {
-  /** CHANGE THIS --ashis
-  \brief Segment Anything Model interactive 2D tool.
+  /**
+  \brief Segment Anything Model interactive 2D tool class.
 
   \ingroup ToolManagerEtAl
   \sa mitk::Tool
@@ -52,9 +52,16 @@ namespace mitk
     void Deactivated() override;
 
     /**
-     * Clears all picks and updates the preview.
+     * @brief  Clears all picks and updates the preview.
      */
     void ClearPicks();
+
+    /**
+     * @brief Checks if any point exists in the either
+     * of the pointsets
+     * 
+     * @return bool 
+     */
     bool HasPicks() const;
 
     itkSetMacro(MitkTempDir, std::string);
@@ -76,7 +83,18 @@ namespace mitk
     itkGetConstMacro(IsReady, bool);
     itkBooleanMacro(IsReady);
 
+    /**
+     * @brief Initializes python service and
+     * starts async python daemon of SegmentAnything model.
+     * 
+     */
     void InitSAMPythonProcess();
+
+    /**
+     * @brief Checks if Python daemon is ready to accept inputs.
+     * 
+     * @return bool 
+     */
     bool IsPythonReady() const;
 
     Message1<const std::string&> SAMStatusMessageEvent;
@@ -88,9 +106,13 @@ namespace mitk
     void ConnectActionsAndFunctions() override;
 
     /*
-     * @brief Add point action of StateMachine pattern
+     * @brief Add positive seed point action of StateMachine pattern
      */
     virtual void OnAddPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+    
+    /*
+     * @brief Add negative seed point action of StateMachine pattern
+     */
     virtual void OnAddNegativePoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
     /*
@@ -103,32 +125,71 @@ namespace mitk
      */
     void ClearSeeds();
 
+    /**
+     * @brief Overriden method from the tool manager to execute the segmentation
+     * Implementation:
+     * 1. Creates Hash for input image from current plane geometry.
+     * 2. Transfers image pointer to python service along with the hash code.
+     * 3. Creates seed points as CSV string & transfers to python service
+     * 3. Retrieves resulting segmentation Image pointer from python service and sets to previewImage.
+     *
+     * @param inputAtTimeStep
+     * @param oldSegAtTimeStep
+     * @param previewImage
+     * @param timeStep
+     */
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 
+    /**
+     * @brief Get the Points from positive and negative pointsets as std::vector.
+     * 
+     * @param baseGeometry of Image
+     * @return std::vector<std::pair<mitk::Point2D, std::string>> 
+     */
     std::vector<std::pair<mitk::Point2D, std::string>> GetPointsAsVector(const mitk::BaseGeometry*);
+
+    /**
+     * @brief Get the Points from positive and negative pointsets as csv string.
+     * 
+     * @param baseGeometry 
+     * @return std::stringstream 
+     */
     std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry);
+
+    /**
+     * @brief Get the Hash For Current Plane from current working plane geometry.
+     * 
+     * @return std::string 
+     */
     std::string GetHashForCurrentPlane();
+
+    /**
+     * @brief Emits message to connected Listnerers.
+     * 
+     */
     void EmitSAMStatusMessageEvent(const std::string);
 
   private:
+    /**
+     * @brief Convert 3D world coordinates to 2D indices.
+     * 
+     * @param baseGeometry 
+     * @param mitk::Point3D
+     * @return mitk::Point2D 
+     */
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, mitk::Point3D&);
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_ModelType;
     std::string m_CheckpointPath;
-    std::string m_InDir, m_OutDir, outputImagePath, m_TriggerCSVPath; // rename as per standards
     unsigned int m_GpuId = 0;
     PointSet::Pointer m_PointSetPositive;
     PointSet::Pointer m_PointSetNegative;
     DataNode::Pointer m_PointSetNode;
     DataNode::Pointer m_PointSetNodeNegative;
     bool m_IsGenerateEmbeddings = true;
-    //bool m_IsAuto = false;
     bool m_IsReady = false;
-    const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
-    const std::string m_PARENT_TEMP_DIR_PATTERN = "mitk-sam-XXXXXX";
-    const std::string m_TRIGGER_FILENAME = "trigger.csv";
     int m_PointSetCount = 0;
     std::unique_ptr<SegmentAnythingPythonService> m_PythonService;
   };

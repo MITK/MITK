@@ -40,7 +40,6 @@ public:
 
   inline static const QMap<QString, QUrl> VALID_MODELS_URL_MAP = {
     {"vit_b", QUrl("https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth")},
-    //{"vit_b", QUrl("http://www.google.ru/images/srpr/logo3w.png")},
     {"vit_l", QUrl("https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth")},
     {"vit_h", QUrl("https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth")}};
 
@@ -64,53 +63,69 @@ protected slots:
   /**
    * @brief Qt Slot
    */
-  void FileDownloaded(QNetworkReply *);
+  void FileDownloaded(QNetworkReply*);
 
 protected:
   QmitkSegmentAnythingToolGUI();
   ~QmitkSegmentAnythingToolGUI();
 
-  void InitializeUI(QBoxLayout *mainLayout) override;
+  void InitializeUI(QBoxLayout* mainLayout) override;
   
   /**
    * @brief Writes any message in white on the tool pane.
    */
-  void WriteStatusMessage(const QString &);
+  void WriteStatusMessage(const QString&);
 
   /**
    * @brief Writes any message in red on the tool pane.
    */
-  void WriteErrorMessage(const QString &);
+  void WriteErrorMessage(const QString&);
 
   void StatusMessageListener(const std::string&);
 
   /**
    * @brief Creates a QMessage object and shows on screen.
    */
-  void ShowErrorMessage(const std::string &, QMessageBox::Icon = QMessageBox::Critical);
+  void ShowErrorMessage(const std::string&, QMessageBox::Icon = QMessageBox::Critical);
 
   /**
-   * @brief Enable (or Disable) GUI elements.
+   * @brief Enable (or Disable) GUI elements. Currently, on the activate button 
+   * is affected.
    */
   void EnableAll(bool);
   
   /**
-  * 
-  */
-  bool DownloadModel(const QString &);
+   * @brief Start download process for the given model type.
+   * Download URL is looked from the VALID_MODELS_URL_MAP.
+   * 
+   * @return bool 
+   */
+  bool DownloadModel(const QString&);
 
   /**
-  * 
-  */
+   * @brief Enable (or Disable) progressbar on GUI
+   * 
+   */
   void ShowProgressBar(bool);
 
+  /**
+   * @brief Requests the tool class to spawn the SAM python daemon 
+   * process. Waits until the daemon is started.
+   * 
+   * @return bool 
+   */
   bool ActivateSAMDaemon();
 
+  /**
+   * @brief Checks if the preferences are correctly set by the user.
+   * 
+   * @return bool 
+   */
   bool ValidatePrefences();
 
 
 private:
-  mitk::IPreferences *m_Prefences;
+  mitk::IPreferences* m_Prefences;
   QNetworkAccessManager m_Manager;
   Ui_QmitkSegmentAnythingGUIControls m_Controls;
   QString m_PythonPath;

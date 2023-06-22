@@ -17,11 +17,8 @@ found in the LICENSE file.
 #include "mitkProperties.h"
 #include "mitkToolManager.h"
 // us
-#include "mitkIOUtil.h"
 #include "mitkSegTool2D.h"
 #include <chrono>
-#include <filesystem>
-#include <itksys/SystemTools.hxx>
 #include <thread>
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -35,10 +32,11 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, SegmentAnythingTool, "SegmentAnythingTool");
 }
 
-mitk::SegmentAnythingTool::SegmentAnythingTool() : SegWithPreviewTool(false, "PressMoveReleaseAndPointSetting")
+mitk::SegmentAnythingTool::SegmentAnythingTool() : SegWithPreviewTool(true, "PressMoveReleaseAndPointSetting")
 {
   this->ResetsToEmptyPreviewOn();
   this->IsTimePointChangeAwareOff();
+  this->KeepActiveAfterAcceptOn();
 }
 
 const char **mitk::SegmentAnythingTool::GetXPM() const
@@ -48,7 +46,7 @@ const char **mitk::SegmentAnythingTool::GetXPM() const
 
 const char *mitk::SegmentAnythingTool::GetName() const
 {
-  return "SAM";
+  return "Segment Anything";
 }
 
 us::ModuleResource mitk::SegmentAnythingTool::GetIconResource() const
@@ -62,17 +60,16 @@ void mitk::SegmentAnythingTool::Activated()
 {
   Superclass::Activated();
   m_PointSetPositive = mitk::PointSet::New();
-  // ensure that the seed points are visible for all timepoints.
-  // dynamic_cast<ProportionalTimeGeometry*>(m_PointSet->GetTimeGeometry())->SetStepDuration(std::numeric_limits<TimePointType>::max());
-  m_PointSetNode = mitk::DataNode::New();
-  m_PointSetNode->SetData(m_PointSetPositive);
-  m_PointSetNode->SetName(std::string(this->GetName()) + "_PointSetPositive");
-  m_PointSetNode->SetBoolProperty("helper object", true);
-  m_PointSetNode->SetColor(0.0, 1.0, 0.0);
-  m_PointSetNode->SetVisibility(true);
-  m_PointSetNode->SetProperty("Pointset.2D.shape", mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
-  m_PointSetNode->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
-  this->GetDataStorage()->Add(m_PointSetNode, this->GetToolManager()->GetWorkingData(0));
+  m_PointSetNodePositive = mitk::DataNode::New();
+  m_PointSetNodePositive->SetData(m_PointSetPositive);
+  m_PointSetNodePositive->SetName(std::string(this->GetName()) + "_PointSetPositive");
+  m_PointSetNodePositive->SetBoolProperty("helper object", true);
+  m_PointSetNodePositive->SetColor(0.0, 1.0, 0.0);
+  m_PointSetNodePositive->SetVisibility(true);
+  m_PointSetNodePositive->SetProperty("Pointset.2D.shape",
+                              mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
+  m_PointSetNodePositive->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
+  this->GetDataStorage()->Add(m_PointSetNodePositive, this->GetToolManager()->GetWorkingData(0));
 
   m_PointSetNegative = mitk::PointSet::New();
   m_PointSetNodeNegative = mitk::DataNode::New();
@@ -81,20 +78,21 @@ void mitk::SegmentAnythingTool::Activated()
   m_PointSetNodeNegative->SetBoolProperty("helper object", true);
   m_PointSetNodeNegative->SetColor(1.0, 0.0, 0.0);
   m_PointSetNodeNegative->SetVisibility(true);
-  m_PointSetNodeNegative->SetProperty("Pointset.2D.shape", mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
+  m_PointSetNodeNegative->SetProperty("Pointset.2D.shape",
+                                      mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
   m_PointSetNodeNegative->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
   this->GetDataStorage()->Add(m_PointSetNodeNegative, this->GetToolManager()->GetWorkingData(0));
 
-  this->SetLabelTransferScope(LabelTransferScope::AllLabels);
-  this->SetLabelTransferMode(LabelTransferMode::AddLabel);
+  this->SetLabelTransferScope(LabelTransferScope::ActiveLabel);
+  this->SetLabelTransferMode(LabelTransferMode::MapLabel);
 }
 
 void mitk::SegmentAnythingTool::Deactivated()
 {
   this->ClearSeeds();
-  GetDataStorage()->Remove(m_PointSetNode);
+  GetDataStorage()->Remove(m_PointSetNodePositive);
   GetDataStorage()->Remove(m_PointSetNodeNegative);
-  m_PointSetNode = nullptr;
+  m_PointSetNodePositive = nullptr;
   m_PointSetNodeNegative = nullptr;
   m_PointSetPositive = nullptr;
   m_PointSetNegative = nullptr;
@@ -143,14 +141,16 @@ void mitk::SegmentAnythingTool::OnAddNegativePoint(StateMachineAction *, Interac
   }
 }
 
-void mitk::SegmentAnythingTool::OnAddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::SegmentAnythingTool::OnAddPoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   if (!this->GetIsReady())
   {
     return;
   }
   m_IsGenerateEmbeddings = false;
-  if ((nullptr == this->GetWorkingPlaneGeometry()) || !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()), *(this->GetWorkingPlaneGeometry())))
+  if ((nullptr == this->GetWorkingPlaneGeometry()) ||
+      !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
+                   *(this->GetWorkingPlaneGeometry())))
   {
     m_IsGenerateEmbeddings = true;
     this->ClearSeeds();
@@ -158,7 +158,7 @@ void mitk::SegmentAnythingTool::OnAddPoint(StateMachineAction*, InteractionEvent
   }
   if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
   {
-    const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+    const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
     if (positionEvent != nullptr)
     {
       m_PointSetPositive->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
@@ -168,7 +168,7 @@ void mitk::SegmentAnythingTool::OnAddPoint(StateMachineAction*, InteractionEvent
   }
 }
 
-void mitk::SegmentAnythingTool::OnDelete(StateMachineAction*, InteractionEvent*)
+void mitk::SegmentAnythingTool::OnDelete(StateMachineAction *, InteractionEvent *)
 {
   if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
   {
@@ -204,54 +204,53 @@ void mitk::SegmentAnythingTool::ClearSeeds()
   if (this->m_PointSetPositive.IsNotNull())
   {
     m_PointSetCount -= m_PointSetPositive->GetSize();
-    this->m_PointSetPositive = mitk::PointSet::New();  // renew pointset
-    //ensure that the seed points are visible for all timepoints.
-    dynamic_cast<ProportionalTimeGeometry*>(m_PointSetPositive->GetTimeGeometry())->SetStepDuration(std::numeric_limits<TimePointType>::max());
-    this->m_PointSetNode->SetData(this->m_PointSetPositive);
+    this->m_PointSetPositive = mitk::PointSet::New(); // renew pointset
+    this->m_PointSetNodePositive->SetData(this->m_PointSetPositive);
   }
   if (this->m_PointSetNegative.IsNotNull())
   {
     m_PointSetCount -= m_PointSetNegative->GetSize();
     this->m_PointSetNegative = mitk::PointSet::New(); // renew pointset
-    // ensure that the seed points are visible for all timepoints.
-    dynamic_cast<ProportionalTimeGeometry *>(m_PointSetNegative->GetTimeGeometry())->SetStepDuration(std::numeric_limits<TimePointType>::max());
     this->m_PointSetNodeNegative->SetData(this->m_PointSetNegative);
   }
 }
 
+void mitk::SegmentAnythingTool::ConfirmCleanUp() 
+{
+  auto previewImage = this->GetPreviewSegmentation();
+  for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
+  {
+    this->ResetPreviewContentAtTimeStep(timeStep);
+  }
+  this->ClearSeeds();
+  RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
-                                                const Image *oldSegAtTimeStep,
+                                                const Image * /*oldSegAtTimeStep*/,
                                                 LabelSetImage *previewImage,
                                                 TimeStepType timeStep)
 {
-  if (nullptr != oldSegAtTimeStep && nullptr != previewImage && m_PointSetPositive.IsNotNull())
+  if (nullptr != previewImage && m_PointSetPositive.IsNotNull())
   {
     if (this->HasPicks() && nullptr != m_PythonService)
     {
       std::string uniquePlaneID = GetHashForCurrentPlane();
       try
       {
-        this->EmitSAMStatusMessageEvent("Prompting SAM...");
-        m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID, m_IsGenerateEmbeddings);
+        this->EmitSAMStatusMessageEvent("Prompting Segment Anything Model...");
+        m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID);
         auto csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
         m_ProgressCommand->SetProgress(100);
         m_PythonService->TransferPointsToProcess(csvStream);
         m_ProgressCommand->SetProgress(150);
         std::this_thread::sleep_for(100ms);
         Image::Pointer outputImage = m_PythonService->RetrieveImageFromProcess();
+        auto outputBuffer = mitk::LabelSetImage::New();
+        outputBuffer->InitializeByLabeledImage(outputImage);
         m_ProgressCommand->SetProgress(180);
-        for (unsigned int i = 0; i < outputImage->GetDimension(); ++i)
-          MITK_INFO << "Dim output: " << outputImage->GetDimension(i);
-        // auto endloading = std::chrono::system_clock::now();
-        // MITK_INFO << "Loaded image in MITK. Elapsed: "
-        //         << std::chrono::duration_cast<std::chrono::milliseconds>(endloading- endPython).count();
-        //mitk::SegTool2D::WriteBackSegmentationResult(
-        //  previewImage, this->GetWorkingPlaneGeometry(), outputImage.GetPointer(), timeStep, false);
-        for (unsigned int i = 0; i < previewImage->GetDimension(); ++i)
-          MITK_INFO << "Dim previewImage: " << previewImage->GetDimension(i);
-        previewImage->InitializeByLabeledImage(outputImage);
-        previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
-        //std::filesystem::remove(outputImagePath);
+        mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputBuffer.GetPointer(), timeStep, false);
+        this->SetSelectedLabels({MASK_VALUE});
         this->EmitSAMStatusMessageEvent("Successfully generated segmentation.");
       }
       catch (const mitk::Exception &e)
@@ -262,7 +261,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
     }
     else if (nullptr != this->GetWorkingPlaneGeometry())
     {
-      previewImage->SetGeometry(this->GetWorkingPlaneGeometry()->Clone());
+      MITK_INFO << "ResetPreviewContentAtTimeStep";
       this->ResetPreviewContentAtTimeStep(timeStep);
     }
   }
@@ -319,7 +318,8 @@ std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::Ba
   return pointsAndLabels;
 }
 
-std::vector<std::pair<mitk::Point2D, std::string>> mitk::SegmentAnythingTool::GetPointsAsVector(const mitk::BaseGeometry *baseGeometry)
+std::vector<std::pair<mitk::Point2D, std::string>> mitk::SegmentAnythingTool::GetPointsAsVector(
+  const mitk::BaseGeometry *baseGeometry)
 {
   std::vector<std::pair<mitk::Point2D, std::string>> clickVec;
   clickVec.reserve(m_PointSetPositive->GetSize() + m_PointSetNegative->GetSize());
@@ -351,7 +351,8 @@ std::vector<std::pair<mitk::Point2D, std::string>> mitk::SegmentAnythingTool::Ge
   return clickVec;
 }
 
-mitk::Point2D mitk::SegmentAnythingTool::Get2DIndicesfrom3DWorld(const mitk::BaseGeometry* baseGeometry, mitk::Point3D& point3d)
+mitk::Point2D mitk::SegmentAnythingTool::Get2DIndicesfrom3DWorld(const mitk::BaseGeometry *baseGeometry,
+                                                                 mitk::Point3D &point3d)
 {
   baseGeometry->WorldToIndex(point3d, point3d);
   MITK_INFO << point3d[0] << " " << point3d[1] << " " << point3d[2]; // remove
@@ -361,7 +362,7 @@ mitk::Point2D mitk::SegmentAnythingTool::Get2DIndicesfrom3DWorld(const mitk::Bas
   return point2D;
 }
 
-void mitk::SegmentAnythingTool::EmitSAMStatusMessageEvent(const std::string status)
+void mitk::SegmentAnythingTool::EmitSAMStatusMessageEvent(const std::string& status)
 {
   SAMStatusMessageEvent.Send(status);
 }

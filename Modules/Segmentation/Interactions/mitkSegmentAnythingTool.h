@@ -108,12 +108,12 @@ namespace mitk
     /*
      * @brief Add positive seed point action of StateMachine pattern
      */
-    virtual void OnAddPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+    virtual void OnAddPoint(StateMachineAction*, InteractionEvent *interactionEvent);
     
     /*
      * @brief Add negative seed point action of StateMachine pattern
      */
-    virtual void OnAddNegativePoint(StateMachineAction*, InteractionEvent* interactionEvent);
+    virtual void OnAddNegativePoint(StateMachineAction*, InteractionEvent *interactionEvent);
 
     /*
      * @brief Delete action of StateMachine pattern
@@ -138,7 +138,7 @@ namespace mitk
      * @param previewImage
      * @param timeStep
      */
-    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image *inputAtTimeStep, const Image *oldSegAtTimeStep, LabelSetImage *previewImage, TimeStepType timeStep) override;
 
     /**
      * @brief Get the Points from positive and negative pointsets as std::vector.
@@ -167,7 +167,9 @@ namespace mitk
      * @brief Emits message to connected Listnerers.
      * 
      */
-    void EmitSAMStatusMessageEvent(const std::string);
+    void EmitSAMStatusMessageEvent(const std::string&);
+
+    void ConfirmCleanUp() override;
 
   private:
     /**
@@ -186,15 +188,14 @@ namespace mitk
     unsigned int m_GpuId = 0;
     PointSet::Pointer m_PointSetPositive;
     PointSet::Pointer m_PointSetNegative;
-    DataNode::Pointer m_PointSetNode;
+    DataNode::Pointer m_PointSetNodePositive;
     DataNode::Pointer m_PointSetNodeNegative;
     bool m_IsGenerateEmbeddings = true;
     bool m_IsReady = false;
     int m_PointSetCount = 0;
     std::unique_ptr<SegmentAnythingPythonService> m_PythonService;
+    const Label::PixelType MASK_VALUE = 1;
   };
-
-
 } // namespace
 
 #endif

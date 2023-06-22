@@ -55,7 +55,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to Segment Anything Model (SAM) tool in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to SAM. MITK does not ship with SAM. Make sure to have a working internet connection to install SAM via MITK. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://segment-anything.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://segment-anything.com&lt;/span&gt;&lt;/a&gt; to learn everything about the SAM.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to Segment Anything Model (SAM) tool in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to SAM. MITK does not ship with SAM. Make sure to have a working internet connection to install Segment Anything Model via MITK. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://segment-anything.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://segment-anything.com&lt;/span&gt;&lt;/a&gt; to learn everything about the Segment Anything Model.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>

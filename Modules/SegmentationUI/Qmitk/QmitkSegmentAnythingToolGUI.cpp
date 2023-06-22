@@ -189,7 +189,7 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
       this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. Activating Segment Anything tool...</i>"));
       if (this->ActivateSAMDaemon())
       {
-        this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. SAM Activated.</i>"));
+        this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. Segment Anything tool Activated.</i>"));
       }
       else
       {
@@ -200,13 +200,13 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     else
     {
       tool->IsReadyOff();
-      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model not found. Starting download...</i>"));
+      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model type not found. Starting download...</i>"));
     }
   }
   catch (const std::exception &e)
   {
     std::stringstream errorMsg;
-    errorMsg << "<b>STATUS: </b>Error while processing parameters for SAM segmentation. Reason: " << e.what();
+    errorMsg << "<b>STATUS: </b>Error while processing parameters for Segment Anything segmentation. Reason: " << e.what();
     this->ShowErrorMessage(errorMsg.str());
     this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
     this->EnableAll(true);
@@ -214,7 +214,7 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
   }
   catch (...)
   {
-    std::string errorMsg = "Unkown error occured while generation SAM segmentation.";
+    std::string errorMsg = "Unkown error occured while generation Segment Anything segmentation.";
     this->ShowErrorMessage(errorMsg);
     this->EnableAll(true);
     return;
@@ -279,7 +279,7 @@ void QmitkSegmentAnythingToolGUI::FileDownloaded(QNetworkReply *reply)
     file.write(reply->readAll());
     file.close();
     disconnect(&m_Manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(FileDownloaded(QNetworkReply *)));
-    this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. Activating SAM...."));
+    this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. Activating Segment Anything...."));
     auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
     if (nullptr != tool)
     {
@@ -297,7 +297,7 @@ void QmitkSegmentAnythingToolGUI::FileDownloaded(QNetworkReply *reply)
   }
   else
   {
-    this->WriteErrorMessage("<b>STATUS: </b><i>Model couldn't be downloaded. SAM not activated.</i>");
+    this->WriteErrorMessage("<b>STATUS: </b><i>Model couldn't be downloaded. Segment Anything not activated.</i>");
   }
   this->EnableAll(true);
   this->ShowProgressBar(false);

@@ -28,7 +28,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Install SAM</string>
+        <string>Install Segment Anything</string>
        </property>
       </widget>
      </item>

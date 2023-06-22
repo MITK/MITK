@@ -74,12 +74,12 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
   {
     m_PythonPath = GetExactPythonPath(storageDir);
     m_Installer.SetVirtualEnvPath(m_PythonPath);
-    welcomeText += " SAM is already found installed.";
+    welcomeText += " Segment Anything tool is already found installed.";
     m_Ui->installSAMButton->setEnabled(false);
   }
   else
   {
-    welcomeText += " SAM is not installed. Please click on \"Install SAM\" above.";
+    welcomeText += " Segment Anything tool not installed. Please click on \"Install SAM\" above.";
     m_Ui->installSAMButton->setEnabled(true);
   }
   this->WriteStatusMessage(welcomeText);

@@ -26,8 +26,8 @@ namespace mitk
   const std::string SIGNALCONSTANTS::KILL = "KILL";
   const std::string SIGNALCONSTANTS::OFF = "OFF";
   const std::string SIGNALCONSTANTS::CUDA_OUT_OF_MEMORY_ERROR = "CudaOutOfMemoryError";
-  mitk::SegmentAnythingPythonService::Status mitk::SegmentAnythingPythonService::CurrentStatus =
-    mitk::SegmentAnythingPythonService::Status::OFF;
+  SegmentAnythingPythonService::Status SegmentAnythingPythonService::CurrentStatus =
+    SegmentAnythingPythonService::Status::OFF;
 }
 
 mitk::SegmentAnythingPythonService::SegmentAnythingPythonService(
@@ -180,9 +180,9 @@ bool mitk::SegmentAnythingPythonService::CheckStatus()
     case mitk::SegmentAnythingPythonService::Status::READY:
       return true;
     case mitk::SegmentAnythingPythonService::Status::CUDAError:
-      mitkThrow() << "Error: Cuda Out of Memory. Change your model type in Preferences and Activate SAM again.";
+      mitkThrow() << "Error: Cuda Out of Memory. Change your model type in Preferences and Activate Segment Anything tool again.";
     case mitk::SegmentAnythingPythonService::Status::KILLED:
-      mitkThrow() << "Error: Python process is already terminated. Cannot load requested segmentation.";
+      mitkThrow() << "Error: Python process is already terminated. Cannot load requested segmentation. Activate Segment Anything tool again.";
     default:
       return false;
   }
@@ -208,12 +208,9 @@ mitk::Image::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProces
   return outputImage;
 }
 
-void mitk::SegmentAnythingPythonService::TransferImageToProcess(const Image *inputAtTimeStep, std::string &UId, bool writeContent)
+void mitk::SegmentAnythingPythonService::TransferImageToProcess(const Image *inputAtTimeStep, std::string &UId)
 {
   std::string inputImagePath = m_InDir + IOUtil::GetDirectorySeparator() + UId + ".nii.gz";
-  if (writeContent)
-    IOUtil::Save(inputAtTimeStep, inputImagePath);
-  else
-    std::ofstream output(inputImagePath); //No need to write full content if embeddings are already generated.
+  IOUtil::Save(inputAtTimeStep, inputImagePath);
   m_CurrentUId = UId;
 }

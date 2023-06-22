@@ -77,7 +77,7 @@ namespace mitk
      * @brief Writes image as nifity file with unique id (UId) as file name. 
      * 
      */
-    void TransferImageToProcess(const Image*, std::string &UId, bool);
+    void TransferImageToProcess(const Image*, std::string &UId);
 
     /**
      * @brief Writes csv stringstream of points to a csv file for 

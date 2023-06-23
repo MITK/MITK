@@ -245,9 +245,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
         m_PythonService->TransferPointsToProcess(csvStream);
         m_ProgressCommand->SetProgress(150);
         std::this_thread::sleep_for(100ms);
-        Image::Pointer outputImage = m_PythonService->RetrieveImageFromProcess();
-        auto outputBuffer = mitk::LabelSetImage::New();
-        outputBuffer->InitializeByLabeledImage(outputImage);
+        mitk::LabelSetImage::Pointer outputBuffer = m_PythonService->RetrieveImageFromProcess();
         m_ProgressCommand->SetProgress(180);
         mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputBuffer.GetPointer(), timeStep, false);
         this->SetSelectedLabels({MASK_VALUE});
@@ -261,7 +259,6 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
     }
     else if (nullptr != this->GetWorkingPlaneGeometry())
     {
-      MITK_INFO << "ResetPreviewContentAtTimeStep";
       this->ResetPreviewContentAtTimeStep(timeStep);
     }
   }

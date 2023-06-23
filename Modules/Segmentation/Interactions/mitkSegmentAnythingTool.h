@@ -21,7 +21,6 @@ found in the LICENSE file.
 #include <thread>
 #include <future>
 
-
 namespace us
 {
   class ModuleResource;
@@ -169,6 +168,10 @@ namespace mitk
      */
     void EmitSAMStatusMessageEvent(const std::string&);
 
+    /**
+     * @brief Cleans up segmentation preview and clears all seeds.
+     * 
+     */
     void ConfirmCleanUp() override;
 
   private:

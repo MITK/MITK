@@ -195,22 +195,21 @@ void mitk::SegmentAnythingPythonService::CreateTempDirs(const std::string &dirPa
   m_OutDir = IOUtil::CreateTemporaryDirectory("sam-out-XXXXXX", m_MitkTempDir);
 }
 
-mitk::Image::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProcess()
+mitk::LabelSetImage::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProcess()
 {
-  auto outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + m_CurrentUId + ".nii.gz";
+  std::string outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + m_CurrentUId + ".nrrd";
   while (!std::filesystem::exists(outputImagePath))
   {
     this->CheckStatus();
     std::this_thread::sleep_for(100ms);
   }
-  Image::Pointer outputImage = mitk::IOUtil::Load<Image>(outputImagePath);
-  std::filesystem::remove(outputImagePath);
-  return outputImage;
+  LabelSetImage::Pointer outputBuffer = mitk::IOUtil::Load<LabelSetImage>(outputImagePath);
+  return outputBuffer;
 }
 
 void mitk::SegmentAnythingPythonService::TransferImageToProcess(const Image *inputAtTimeStep, std::string &UId)
 {
-  std::string inputImagePath = m_InDir + IOUtil::GetDirectorySeparator() + UId + ".nii.gz";
+  std::string inputImagePath = m_InDir + IOUtil::GetDirectorySeparator() + UId + ".nrrd";
   IOUtil::Save(inputAtTimeStep, inputImagePath);
   m_CurrentUId = UId;
 }

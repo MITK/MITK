@@ -17,8 +17,8 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <thread>
 #include <future>
-#include "mitkImage.h"
-
+#include <mitkImage.h>
+#include <mitkLabelSetImage.h>
 
 namespace mitk
 {
@@ -92,7 +92,7 @@ namespace mitk
      * 
      * @return Image::Pointer 
      */
-    Image::Pointer RetrieveImageFromProcess();
+    LabelSetImage::Pointer RetrieveImageFromProcess();
 
     static Status CurrentStatus;
 

@@ -75,7 +75,7 @@ public:
     refValues.push_back(160.0);
 
     std::stringstream ss;
-    for (int i = 0; i < m_testIndices.size(); i++)
+    for (long unsigned int i = 0; i < m_testIndices.size(); i++)
     {
       ss << "Checking value of image converted using absolute enhancement at test index " << i << ".";
       std::string message = ss.str();
@@ -99,7 +99,7 @@ public:
     refValues.push_back(80.0);
 
     std::stringstream ss;
-    for (int i = 0; i < m_testIndices.size(); i++)
+    for (long unsigned int i = 0; i < m_testIndices.size(); i++)
     {
       ss << "Checking value of image converted using absolute enhancement with averaged baseline at test index " << i << ".";
       std::string message = ss.str();
@@ -123,7 +123,7 @@ public:
     refValues.push_back(5.714286);
 
     std::stringstream ss;
-    for (int i = 0; i < m_testIndices.size(); i++)
+    for (long unsigned int i = 0; i < m_testIndices.size(); i++)
     {
       ss << "Checking value of image converted using relative enhancement at test index " << i << ".";
       std::string message = ss.str();
@@ -149,7 +149,7 @@ public:
     refValues.push_back(0.0);
 
     std::stringstream ss;
-    for (int i = 0; i < m_testIndices.size(); i++)
+    for (long unsigned int i = 0; i < m_testIndices.size(); i++)
     {
       ss << "Checking value of image converted using the turboFLASH model at test index " << i << ".";
       std::string message = ss.str();
@@ -178,7 +178,7 @@ public:
     refValues.push_back(3.989374);
 
     std::stringstream ss;
-    for (int i = 0; i < m_testIndices.size(); i++)
+    for (long unsigned int i = 0; i < m_testIndices.size(); i++)
     {
       ss << "Checking value of image converted using the VFA method at test index " << i << ".";
       std::string message = ss.str();
@@ -203,7 +203,7 @@ public:
     refValues.push_back(-1.904237);
 
     std::stringstream ss;
-    for (int i = 0; i < m_testIndices.size(); i++)
+    for (long unsigned int i = 0; i < m_testIndices.size(); i++)
     {
       ss << "Checking value of converted T2 image at test index " << i << ".";
       std::string message = ss.str();

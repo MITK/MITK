@@ -88,6 +88,9 @@ namespace mitk
       const ResultImageGeometryType* resultGeometry = nullptr,
       bool throwOnMappingError = true, const double& errorValue = 0, mitk::ImageMappingInterpolator::Type interpolatorType = mitk::ImageMappingInterpolator::Linear);
 
+    MITKMATCHPOINTREGISTRATION_EXPORT ResultImageGeometryType::Pointer GenerateSuperSampledGeometry(const ResultImageGeometryType* inputGeometry,
+      double xScaling, double yScaling, double zScaling);
+
     /**Method clones the input image and applies the registration by applying it to the Geometry3D of the image.
     Thus this method only produces a result if the passed registration has an direct mapping kernel that
     can be converted into an affine matrix transformation.

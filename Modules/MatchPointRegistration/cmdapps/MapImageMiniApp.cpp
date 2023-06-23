@@ -15,10 +15,10 @@ found in the LICENSE file.
 #include <numeric>
 
 // itk includes
-#include "itksys/SystemTools.hxx"
+//#include <itksys/SystemTools.hxx>
 
 // CTK includes
-#include "mitkCommandLineParser.h"
+#include <mitkCommandLineParser.h>
 
 // MITK includes
 #include <mitkIOUtil.h>
@@ -27,17 +27,17 @@ found in the LICENSE file.
 #include <mitkMAPAlgorithmHelper.h>
 #include <mitkImageStitchingHelper.h>
 
-std::string inFileName = "";
-std::string regFileName = "";
-std::string outFileName = "";
-std::string refGeometryFileName = "";
+struct Settings
+{
+  std::string inFileName = "";
+  std::string regFileName = "";
+  std::string outFileName = "";
+  std::string refGeometryFileName = "";
 
-mitk::Image::ConstPointer inputImage;
-mitk::MAPRegistrationWrapper::ConstPointer registration;
-mitk::BaseGeometry::Pointer refGeometry;
-mitk::ImageMappingInterpolator::Type interpolatorType = mitk::ImageMappingInterpolator::Linear;
-double paddingValue = 0;
-std::vector<unsigned int> superSamplingFactors;
+  mitk::ImageMappingInterpolator::Type interpolatorType = mitk::ImageMappingInterpolator::Linear;
+  double paddingValue = 0;
+  std::vector<unsigned int> superSamplingFactors;
+};
 
 void setupParser(mitkCommandLineParser& parser)
 {
@@ -85,38 +85,38 @@ void setupParser(mitkCommandLineParser& parser)
   //! [add arguments]
 }
 
-bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
+bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs, Settings& settings)
 {
   try
   {
     if (parsedArgs.size() == 0)
       return false;
 
-    inFileName = us::any_cast<std::string>(parsedArgs["input"]);
-    outFileName = us::any_cast<std::string>(parsedArgs["output"]);
+    settings.inFileName = us::any_cast<std::string>(parsedArgs["input"]);
+    settings.outFileName = us::any_cast<std::string>(parsedArgs["output"]);
 
     if (parsedArgs.count("template"))
     {
-      refGeometryFileName = us::any_cast<std::string>(parsedArgs["template"]);
+      settings.refGeometryFileName = us::any_cast<std::string>(parsedArgs["template"]);
     }
 
     if (parsedArgs.count("registration"))
     {
-      regFileName = us::any_cast<std::string>(parsedArgs["registration"]);
+      settings.regFileName = us::any_cast<std::string>(parsedArgs["registration"]);
     }
 
     if (parsedArgs.count("interpolator"))
     {
       auto interpolator = us::any_cast<int>(parsedArgs["interpolator"]);
-      interpolatorType = static_cast<mitk::ImageMappingInterpolator::Type>(interpolator);
+      settings.interpolatorType = static_cast<mitk::ImageMappingInterpolator::Type>(interpolator);
     }
 
     if (parsedArgs.count("padding"))
     {
-      paddingValue = us::any_cast<float>(parsedArgs["padding"]);
+      settings.paddingValue = us::any_cast<float>(parsedArgs["padding"]);
     }
 
-    superSamplingFactors.clear();
+    settings.superSamplingFactors.clear();
     if (parsedArgs.count("super-sampling"))
     {
       try
@@ -130,12 +130,12 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
 
         for (const auto& samplingstr : samplingStrings)
         {
-          superSamplingFactors.push_back(std::stoul(samplingstr));
+          settings.superSamplingFactors.push_back(std::stoul(samplingstr));
         }
-        if (superSamplingFactors.size() == 1)
+        if (settings.superSamplingFactors.size() == 1)
         {
-          superSamplingFactors.push_back(superSamplingFactors[0]);
-          superSamplingFactors.push_back(superSamplingFactors[0]);
+          settings.superSamplingFactors.push_back(settings.superSamplingFactors[0]);
+          settings.superSamplingFactors.push_back(settings.superSamplingFactors[0]);
         }
       }
       catch (...)
@@ -155,13 +155,18 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
 
 int main(int argc, char* argv[])
 {
+  mitk::Image::ConstPointer inputImage;
+  mitk::MAPRegistrationWrapper::ConstPointer registration;
+  mitk::BaseGeometry::Pointer refGeometry;
+
+  Settings settings;
   mitkCommandLineParser parser;
   setupParser(parser);
 
   mitk::PreferenceListReaderOptionsFunctor readerFilterFunctor = mitk::PreferenceListReaderOptionsFunctor({ "MITK DICOM Reader v2 (autoselect)" }, { "" });
 
   const std::map<std::string, us::Any>& parsedArgs = parser.parseArguments(argc, argv);
-  if (!configureApplicationSettings(parsedArgs))
+  if (!configureApplicationSettings(parsedArgs, settings))
   {
     MITK_ERROR << "Command line arguments are invalid. To see the correct usage please call with -h or --help to show the help information.";
     return EXIT_FAILURE;
@@ -175,25 +180,25 @@ int main(int argc, char* argv[])
   }
 
   std::cout << std::endl << "*******************************************" << std::endl;
-  std::cout << "Input file:        " << inFileName << std::endl;
-  std::cout << "Output file:        " << outFileName << std::endl;
+  std::cout << "Input file:        " << settings.inFileName << std::endl;
+  std::cout << "Output file:        " << settings.outFileName << std::endl;
   std::cout << "Registration: ";
-  if (regFileName.empty())
+  if (settings.regFileName.empty())
     std::cout << "None (Identity)" << std::endl;
   else
-    std::cout << regFileName << std::endl;
+    std::cout << settings.regFileName << std::endl;
   std::cout << "Template: ";
-  if (refGeometryFileName.empty())
+  if (settings.refGeometryFileName.empty())
     std::cout << "None (is input geometry)" << std::endl;
   else
-    std::cout << refGeometryFileName << std::endl;
-  std::cout << "Padding value: " << paddingValue << std::endl;
-  std::cout << "Interpolation type: " << interpolatorType << std::endl;
+    std::cout << settings.refGeometryFileName << std::endl;
+  std::cout << "Padding value: " << settings.paddingValue << std::endl;
+  std::cout << "Interpolation type: " << settings.interpolatorType << std::endl;
   //check for super/sub sampling
-  if (!superSamplingFactors.empty() && (superSamplingFactors.size() != 1 || superSamplingFactors[0] != 1))
+  if (!settings.superSamplingFactors.empty() && (settings.superSamplingFactors.size() != 1 || settings.superSamplingFactors[0] != 1))
   {
     std::cout << "Super sampling:";
-    for (auto value : superSamplingFactors)
+    for (auto value : settings.superSamplingFactors)
     {
       std::cout << " " << value;
     }
@@ -203,7 +208,7 @@ int main(int argc, char* argv[])
   try
   {
     std::cout << "Load input data..." << std::endl;
-    inputImage = mitk::IOUtil::Load<mitk::Image>(inFileName);
+    inputImage = mitk::IOUtil::Load<mitk::Image>(settings.inFileName);
 
     if (inputImage.IsNull())
     {
@@ -212,14 +217,14 @@ int main(int argc, char* argv[])
     }
 
     std::cout << "Load registration..." << std::endl;
-    if (regFileName.empty())
+    if (settings.regFileName.empty())
     {
       std::cout << "  associated registration: identity" << std::endl;
       registration = mitk::GenerateIdentityRegistration3D().GetPointer();
     }
     else
     {
-      registration = mitk::IOUtil::Load<mitk::MAPRegistrationWrapper>(regFileName);
+      registration = mitk::IOUtil::Load<mitk::MAPRegistrationWrapper>(settings.regFileName);
     }
 
     if (registration.IsNull())
@@ -228,10 +233,10 @@ int main(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
-    if (refGeometryFileName != "")
+    if (settings.refGeometryFileName != "")
     {
       std::cout << "Load reference image..." << std::endl;
-      auto refImage = mitk::IOUtil::Load<mitk::Image>(refGeometryFileName, &readerFilterFunctor);
+      auto refImage = mitk::IOUtil::Load<mitk::Image>(settings.refGeometryFileName, &readerFilterFunctor);
       if (refImage.IsNotNull())
       {
         refGeometry = refImage->GetGeometry();
@@ -248,21 +253,21 @@ int main(int argc, char* argv[])
     }
 
     //check for super/sub sampling
-    if (!superSamplingFactors.empty() && (superSamplingFactors.size()!=1 || superSamplingFactors[0]!=1))
+    if (!settings.superSamplingFactors.empty() && (settings.superSamplingFactors.size()!=1 || settings.superSamplingFactors[0]!=1))
     {
       refGeometry = mitk::ImageMappingHelper::GenerateSuperSampledGeometry(refGeometry,
-        superSamplingFactors[0],
-        superSamplingFactors[1],
-        superSamplingFactors[2]);
+        settings.superSamplingFactors[0],
+        settings.superSamplingFactors[1],
+        settings.superSamplingFactors[2]);
     }
 
     std::cout << "Map the images ..." << std::endl;
 
-    auto output = mitk::ImageMappingHelper::map(inputImage, registration, false, paddingValue, refGeometry, true, 0, interpolatorType);
+    auto output = mitk::ImageMappingHelper::map(inputImage, registration, false, settings.paddingValue, refGeometry, true, 0, settings.interpolatorType);
 
-    std::cout << "Save output image: " << outFileName << std::endl;
+    std::cout << "Save output image: " << settings.outFileName << std::endl;
 
-    mitk::IOUtil::Save(output, outFileName);
+    mitk::IOUtil::Save(output, settings.outFileName);
 
     std::cout << "Processing finished." << std::endl;
 

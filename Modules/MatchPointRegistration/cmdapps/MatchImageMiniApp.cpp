@@ -33,10 +33,13 @@ found in the LICENSE file.
 #include <mapDeploymentDLLHandle.h>
 #include <mapRegistrationBase.h>
 
-std::string movingFileName;
-std::string targetFileName;
-std::string outFileName;
-std::string algFileName;
+struct Settings
+{
+  std::string movingFileName = "";
+  std::string targetFileName = "";
+  std::string outFileName = "";
+  std::string algFileName = "";
+};
 
 void SetupParser(mitkCommandLineParser& parser)
 {
@@ -88,17 +91,17 @@ void SetupParser(mitkCommandLineParser& parser)
   parser.endGroup();
 }
 
-bool ConfigureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
+bool ConfigureApplicationSettings(std::map<std::string, us::Any> parsedArgs, Settings& settings)
 {
   try
   {
     if (parsedArgs.size() == 0)
       return false;
 
-    movingFileName = us::any_cast<std::string>(parsedArgs["moving"]);
-    targetFileName = us::any_cast<std::string>(parsedArgs["target"]);
-    outFileName = us::any_cast<std::string>(parsedArgs["output"]);
-    algFileName = us::any_cast<std::string>(parsedArgs["algorithm"]);
+    settings.movingFileName = us::any_cast<std::string>(parsedArgs["moving"]);
+    settings.targetFileName = us::any_cast<std::string>(parsedArgs["target"]);
+    settings.outFileName = us::any_cast<std::string>(parsedArgs["output"]);
+    settings.algFileName = us::any_cast<std::string>(parsedArgs["algorithm"]);
   }
   catch (...)
   {
@@ -108,7 +111,7 @@ bool ConfigureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
   return true;
 }
 
-map::deployment::RegistrationAlgorithmBasePointer loadAlgorithm()
+map::deployment::RegistrationAlgorithmBasePointer loadAlgorithm(const Settings& settings)
 {
   map::deployment::RegistrationAlgorithmBasePointer spAlgorithmBase = nullptr;
 
@@ -116,7 +119,7 @@ map::deployment::RegistrationAlgorithmBasePointer loadAlgorithm()
 
   map::deployment::DLLHandle::Pointer spHandle = nullptr;
 
-  spHandle = map::deployment::openDeploymentDLL(algFileName);
+  spHandle = map::deployment::openDeploymentDLL(settings.algFileName);
 
   if (spHandle.IsNull())
   {
@@ -212,11 +215,12 @@ int main(int argc, char* argv[])
 {
   std::cout << "MitkRegistrationMiniApp - Generic light weight image registration tool based on MatchPoint." << std::endl;
 
+  Settings settings;
   mitkCommandLineParser parser;
   SetupParser(parser);
 
   const std::map<std::string, us::Any>& parsedArgs = parser.parseArguments(argc, argv);
-  if (!ConfigureApplicationSettings(parsedArgs))
+  if (!ConfigureApplicationSettings(parsedArgs, settings))
   {
     MITK_ERROR << "Command line arguments are invalid. To see the correct usage please call with -h or --help to show the help information.";
     return EXIT_FAILURE;
@@ -230,22 +234,22 @@ int main(int argc, char* argv[])
   }
 
   std::cout << std::endl << "*******************************************" << std::endl;
-  std::cout << "Moving file:        " << movingFileName << std::endl;
-  std::cout << "Target file:        " << targetFileName << std::endl;
-  std::cout << "Output file:        " << outFileName << std::endl;
-  std::cout << "Algorithm location: " << algFileName << std::endl;
+  std::cout << "Moving file:        " << settings.movingFileName << std::endl;
+  std::cout << "Target file:        " << settings.targetFileName << std::endl;
+  std::cout << "Output file:        " << settings.outFileName << std::endl;
+  std::cout << "Algorithm location: " << settings.algFileName << std::endl;
 
   //load algorithm
   try
   {
-    auto algorithm = loadAlgorithm();
+    auto algorithm = loadAlgorithm(settings);
 
     auto command = ::itk::CStyleCommand::New();
     command->SetCallback(OnMapAlgorithmEvent);
     algorithm->AddObserver(::map::events::AlgorithmEvent(), command);
 
     std::cout << "Load moving data..." << std::endl;
-    auto movingImage = mitk::IOUtil::Load<mitk::Image>(movingFileName);
+    auto movingImage = mitk::IOUtil::Load<mitk::Image>(settings.movingFileName);
 
     if (movingImage.IsNull())
     {
@@ -262,7 +266,7 @@ int main(int argc, char* argv[])
     }
 
     std::cout << "Load target data..." << std::endl;
-    auto targetImage = mitk::IOUtil::Load<mitk::Image>(targetFileName);
+    auto targetImage = mitk::IOUtil::Load<mitk::Image>(settings.targetFileName);
 
     if (targetImage.IsNull())
     {
@@ -297,7 +301,7 @@ int main(int argc, char* argv[])
 
     auto regWrapper = mitk::MAPRegistrationWrapper::New(registration);
     std::cout << "Store registration...." << std::endl;
-    mitk::IOUtil::Save(regWrapper, outFileName);
+    mitk::IOUtil::Save(regWrapper, settings.outFileName);
   }
   catch (const std::exception& e)
   {

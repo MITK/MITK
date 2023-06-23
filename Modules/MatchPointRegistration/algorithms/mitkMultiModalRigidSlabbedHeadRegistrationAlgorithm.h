@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkMultiModalRigidSlabbedHeadRegistrationAlgorithm_h
 #define mitkMultiModalRigidSlabbedHeadRegistrationAlgorithm_h
 
-#include "mapDiscreteElements.h"
-#include "mapITKRigid3DMattesMISlabbedHeadRegistrationAlgorithmTemplate.h"
-#include "mapConfigure.h"
+#include <mapDiscreteElements.h>
+#include <mapITKRigid3DMattesMISlabbedHeadRegistrationAlgorithmTemplate.h>
+#include <mapConfigure.h>
 
-#include "mitkMultiModalRigidSlabbedHeadRegistrationAlgorithm_ProfileResource.h"
+#include <mitkMultiModalRigidSlabbedHeadRegistrationAlgorithm_ProfileResource.h>
 
 namespace mitk
 {

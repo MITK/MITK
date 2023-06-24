@@ -56,6 +56,9 @@ QmitkSegmentAnythingToolGUI::QmitkSegmentAnythingToolGUI() : QmitkSegWithPreview
     return result;
   };
   m_Prefences = GetPreferences();
+  m_Prefences->OnPropertyChanged +=
+    mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI, const mitk::IPreferences::ChangeEvent &>(
+      this, &QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent);
 }
 
 QmitkSegmentAnythingToolGUI::~QmitkSegmentAnythingToolGUI() 
@@ -342,5 +345,16 @@ void QmitkSegmentAnythingToolGUI::OnResetPicksClicked()
   if (nullptr != tool)
   {
     tool->ClearPicks();
+  }
+}
+
+void QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &e)
+{
+  this->EnableAll(true);
+  this->WriteStatusMessage("A Preference change was detected. Please activate the tool again.");
+  auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
+  if (nullptr != tool)
+  {
+    tool->IsReadyOff();
   }
 }

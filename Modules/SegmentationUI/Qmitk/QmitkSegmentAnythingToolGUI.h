@@ -82,6 +82,7 @@ protected:
   void WriteErrorMessage(const QString&);
 
   void StatusMessageListener(const std::string&);
+  void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent&);
 
   /**
    * @brief Creates a QMessage object and shows on screen.

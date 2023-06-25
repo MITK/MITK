@@ -55,8 +55,8 @@ QmitkSegmentAnythingToolGUI::QmitkSegmentAnythingToolGUI() : QmitkSegWithPreview
     }
     return result;
   };
-  m_Prefences = GetPreferences();
-  m_Prefences->OnPropertyChanged +=
+  m_Preferences = GetPreferences();
+  m_Preferences->OnPropertyChanged +=
     mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI, const mitk::IPreferences::ChangeEvent &>(
       this, &QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent);
 }
@@ -97,8 +97,8 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   bool isInstalled = this->ValidatePrefences();
   if (isInstalled)
   {
-    m_PythonPath = QString::fromStdString(m_Prefences->Get("sam python path", ""));
-    QString modelType = QString::fromStdString(m_Prefences->Get("sam modeltype", ""));
+    m_PythonPath = QString::fromStdString(m_Preferences->Get("sam python path", ""));
+    QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));
     welcomeText += " SAM is already found installed. Model type '" + modelType + "' selected in Preferences.";
   }
   else
@@ -116,10 +116,10 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
 bool QmitkSegmentAnythingToolGUI::ValidatePrefences()
 {
-  const QString storageDir = QString::fromStdString(m_Prefences->Get("sam python path", ""));
+  const QString storageDir = QString::fromStdString(m_Preferences->Get("sam python path", ""));
   bool isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(storageDir);
-  std::string modelType = m_Prefences->Get("sam modeltype", "");
-  std::string path = m_Prefences->Get("sam parent path", "");
+  std::string modelType = m_Preferences->Get("sam modeltype", "");
+  std::string path = m_Preferences->Get("sam parent path", "");
   return (isInstalled && !modelType.empty() && !path.empty());
 }
 
@@ -180,8 +180,8 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
       throw std::runtime_error(WARNING_SAM_NOT_FOUND);
     }
     tool->SetPythonPath(m_PythonPath.toStdString());
-    tool->SetGpuId(m_Prefences->GetInt("sam gpuid", 0));
-    const QString modelType = QString::fromStdString(m_Prefences->Get("sam modeltype", ""));  
+    tool->SetGpuId(m_Preferences->GetInt("sam gpuid", -1));
+    const QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));  
     tool->SetModelType(modelType.toStdString());
     this->WriteStatusMessage(
       QString("<b>STATUS: </b><i>Checking if model is already downloaded... This might take a while.</i>"));
@@ -254,7 +254,7 @@ bool QmitkSegmentAnythingToolGUI::DownloadModel(const QString &modelType)
 {
   QUrl url = QmitkSegmentAnythingToolGUI::VALID_MODELS_URL_MAP[modelType];
   QString modelFileName = url.fileName();
-  const QString storageDir = QString::fromStdString(m_Prefences->Get("sam parent path", ""));
+  const QString storageDir = QString::fromStdString(m_Preferences->Get("sam parent path", ""));
   QString checkPointPath = storageDir + QDir::separator() + modelFileName;
   if (QFile::exists(checkPointPath))
   {
@@ -274,7 +274,7 @@ bool QmitkSegmentAnythingToolGUI::DownloadModel(const QString &modelType)
 
 void QmitkSegmentAnythingToolGUI::FileDownloaded(QNetworkReply *reply)
 {
-  const QString storageDir = QString::fromStdString(m_Prefences->Get("sam parent path", ""));
+  const QString storageDir = QString::fromStdString(m_Preferences->Get("sam parent path", ""));
   const QString &modelFileName = reply->url().fileName();
   QFile file(storageDir + QDir::separator() + modelFileName);
   if (file.open(QIODevice::WriteOnly))

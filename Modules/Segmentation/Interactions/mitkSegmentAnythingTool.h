@@ -75,8 +75,8 @@ namespace mitk
     itkSetMacro(CheckpointPath, std::string);
     itkGetConstMacro(CheckpointPath, std::string);
 
-    itkSetMacro(GpuId, unsigned int);
-    itkGetConstMacro(GpuId, unsigned int);
+    itkSetMacro(GpuId, int);
+    itkGetConstMacro(GpuId, int);
 
     itkSetMacro(IsReady, bool);
     itkGetConstMacro(IsReady, bool);
@@ -188,7 +188,7 @@ namespace mitk
     std::string m_PythonPath;
     std::string m_ModelType;
     std::string m_CheckpointPath;
-    unsigned int m_GpuId = 0;
+    int m_GpuId = 0;
     PointSet::Pointer m_PointSetPositive;
     PointSet::Pointer m_PointSetNegative;
     DataNode::Pointer m_PointSetNodePositive;

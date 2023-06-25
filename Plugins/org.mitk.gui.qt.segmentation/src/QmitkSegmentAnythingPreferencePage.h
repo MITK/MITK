@@ -94,9 +94,9 @@ protected:
 
   /**
    * @brief Returns GPU id of the selected GPU from the Combo box.
-   * @return unsigned int
+   * @return int
    */
-  unsigned int FetchSelectedGPUFromUI() const;
+  int FetchSelectedGPUFromUI() const;
 
   void WriteStatusMessage(const QString &);
   void WriteErrorMessage(const QString &);

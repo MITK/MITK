@@ -66,7 +66,6 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
   QIcon deleteIcon =
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/edit-delete.svg"));
   m_Ui->clearSAMButton->setIcon(deleteIcon);
-
   const QString storageDir = m_Installer.GetVirtualEnvPath();
   m_IsInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(storageDir);
   QString welcomeText;
@@ -85,6 +84,7 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
   this->WriteStatusMessage(welcomeText);
   m_Ui->samModelTypeComboBox->addItems(QmitkSegmentAnythingToolGUI::VALID_MODELS_URL_MAP.keys());
   this->SetGPUInfo();
+  m_Ui->gpuComboBox->addItem("cpu");
   this->Update();
   this->Update();
 }
@@ -228,17 +228,21 @@ void QmitkSegmentAnythingPreferencePage::SetGPUInfo()
   }
 }
 
-unsigned int QmitkSegmentAnythingPreferencePage::FetchSelectedGPUFromUI() const
+int QmitkSegmentAnythingPreferencePage::FetchSelectedGPUFromUI() const
 {
   QString gpuInfo = m_Ui->gpuComboBox->currentText();
   if (m_GpuLoader.GetGPUCount() == 0)
   {
-    return static_cast<unsigned int>(gpuInfo.toInt());
+    return static_cast<int>(gpuInfo.toInt());
+  }
+  else if ("cpu" == gpuInfo)
+  {
+    return -1;
   }
   else
   {
     QString gpuId = gpuInfo.split(":", QString::SplitBehavior::SkipEmptyParts).first();
-    return static_cast<unsigned int>(gpuId.toInt());
+    return static_cast<int>(gpuId.toInt());
   }
 }
 

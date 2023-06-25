@@ -121,7 +121,7 @@ namespace mitk
     std::string m_CheckpointPath;
     std::string m_InDir, m_OutDir;
     std::string m_CurrentUId;
-    unsigned int m_GpuId = 0;
+    int m_GpuId = 0;
     const std::string m_PARENT_TEMP_DIR_PATTERN = "mitk-sam-XXXXXX";
     const std::string m_TRIGGER_FILENAME = "trigger.csv";
     std::future<void> m_Future;

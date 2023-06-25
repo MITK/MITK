@@ -152,17 +152,25 @@ void mitk::SegmentAnythingPythonService::start_python_daemon()
   args.push_back("--checkpoint");
   args.push_back(m_CheckpointPath);
 
-  try
+  args.push_back("--device");
+  if (m_GpuId == -1)
   {
+    args.push_back("cpu");
+  }
+  else
+  {
+    args.push_back("cuda");
     std::string cudaEnv = "CUDA_VISIBLE_DEVICES=" + std::to_string(m_GpuId);
     itksys::SystemTools::PutEnv(cudaEnv.c_str());
+  }
 
+  try
+  {
     std::stringstream logStream;
     for (const auto &arg : args)
       logStream << arg << " ";
     logStream << m_PythonPath;
     MITK_INFO << logStream.str();
-
     m_DaemonExec->Execute(m_PythonPath, command, args);
   }
   catch (const mitk::Exception &e)

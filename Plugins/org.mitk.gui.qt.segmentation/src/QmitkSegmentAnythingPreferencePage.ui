@@ -90,7 +90,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>GPU Id:</string>
+        <string>Device Id:</string>
        </property>
       </widget>
      </item>

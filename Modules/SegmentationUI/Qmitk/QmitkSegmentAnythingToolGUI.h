@@ -126,7 +126,7 @@ protected:
 
 
 private:
-  mitk::IPreferences* m_Prefences;
+  mitk::IPreferences* m_Preferences;
   QNetworkAccessManager m_Manager;
   Ui_QmitkSegmentAnythingGUIControls m_Controls;
   QString m_PythonPath;

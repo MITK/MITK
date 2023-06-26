@@ -348,7 +348,7 @@ void QmitkSegmentAnythingToolGUI::OnResetPicksClicked()
   }
 }
 
-void QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &e)
+void QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent&)
 {
   this->EnableAll(true);
   this->WriteStatusMessage("A Preference change was detected. Please activate the tool again.");

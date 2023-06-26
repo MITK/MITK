@@ -53,12 +53,12 @@ namespace mitk
 
     /**
      * @brief Checks CurrentStatus enum variable and returns 
-     * true if daemon is READY state, false is OFF state or
+     * true if daemon is READY (to read files) state, false is OFF state or
      * throws exception if daemon is found KILL or Cuda error state.
      * 
      * @return bool 
      */
-    static bool CheckStatus() throw(mitk::Exception);
+    static bool CheckStatus() /*throw(mitk::Exception)*/;
 
     /**
      * @brief Creates temp directories and calls start_python_daemon

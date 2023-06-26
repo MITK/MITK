@@ -108,6 +108,7 @@ private:
   QmitkGPULoader m_GpuLoader;
   QString m_PythonPath;
   bool m_IsInstalled = false;
+  const QString CPU_ID = "cpu";
 };
 
 #endif

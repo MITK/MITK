@@ -36,17 +36,11 @@ namespace
 
 QmitkSegmentAnythingPreferencePage::QmitkSegmentAnythingPreferencePage()
   : m_Ui(new Ui::QmitkSegmentAnythingPreferencePage),
-    m_Control(nullptr)
-{
-}
+    m_Control(nullptr){}
 
-QmitkSegmentAnythingPreferencePage::~QmitkSegmentAnythingPreferencePage()
-{
-}
+QmitkSegmentAnythingPreferencePage::~QmitkSegmentAnythingPreferencePage(){}
 
-void QmitkSegmentAnythingPreferencePage::Init(berry::IWorkbench::Pointer)
-{
-}
+void QmitkSegmentAnythingPreferencePage::Init(berry::IWorkbench::Pointer){}
 
 void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
 {
@@ -83,8 +77,8 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
   }
   this->WriteStatusMessage(welcomeText);
   m_Ui->samModelTypeComboBox->addItems(QmitkSegmentAnythingToolGUI::VALID_MODELS_URL_MAP.keys());
+  m_Ui->gpuComboBox->addItem(CPU_ID);
   this->SetGPUInfo();
-  m_Ui->gpuComboBox->addItem("cpu");
   this->Update();
   this->Update();
 }
@@ -97,7 +91,6 @@ QWidget* QmitkSegmentAnythingPreferencePage::GetQtControl() const
 bool QmitkSegmentAnythingPreferencePage::PerformOk()
 {
   auto* prefs = GetPreferences();
-
   prefs->Put("sam parent path", m_Installer.STORAGE_DIR.toStdString());
   prefs->Put("sam python path", m_PythonPath.toStdString());
   prefs->Put("sam modeltype", m_Ui->samModelTypeComboBox->currentText().toStdString());
@@ -105,14 +98,27 @@ bool QmitkSegmentAnythingPreferencePage::PerformOk()
   return true;
 }
 
-void QmitkSegmentAnythingPreferencePage::PerformCancel()
-{
-}
+void QmitkSegmentAnythingPreferencePage::PerformCancel(){}
 
 void QmitkSegmentAnythingPreferencePage::Update()
 {
   auto* prefs = GetPreferences();
   m_Ui->samModelTypeComboBox->setCurrentText(QString::fromStdString(prefs->Get("sam modeltype", "vit_b")));
+  int gpuId = prefs->GetInt("sam gpuid", -1);
+  if (gpuId == -1)
+  {
+    m_Ui->gpuComboBox->setCurrentText(CPU_ID);
+  }
+  else if (m_GpuLoader.GetGPUCount() == 0)
+  {
+    m_Ui->gpuComboBox->setCurrentText(QString::number(gpuId));
+  }
+  else
+  {
+    std::vector<QmitkGPUSpec> specs = m_GpuLoader.GetAllGPUSpecs();
+    QmitkGPUSpec gpuSpec = specs[gpuId];
+    m_Ui->gpuComboBox->setCurrentText(QString::number(gpuSpec.id) + ": " + gpuSpec.name + " (" + gpuSpec.memory + ")");
+  }
 }
 
 QString QmitkSegmentAnythingPreferencePage::OnSystemPythonChanged(const QString &pyEnv)
@@ -127,8 +133,7 @@ QString QmitkSegmentAnythingPreferencePage::OnSystemPythonChanged(const QString 
       bool oldState = m_Ui->sysPythonComboBox->blockSignals(true); // block signal firing while inserting item
       m_Ui->sysPythonComboBox->insertItem(0, path);
       m_Ui->sysPythonComboBox->setCurrentIndex(0);
-      m_Ui->sysPythonComboBox->blockSignals(
-        oldState); // unblock signal firing after inserting item. Remove this after Qt6 migration
+      m_Ui->sysPythonComboBox->blockSignals(oldState); // unblock signal firing after inserting item. Remove this after Qt6 migration
     }
   }
   else
@@ -225,19 +230,24 @@ void QmitkSegmentAnythingPreferencePage::SetGPUInfo()
     m_Ui->gpuComboBox->setEditable(true);
     m_Ui->gpuComboBox->addItem(QString::number(0));
     m_Ui->gpuComboBox->setValidator(new QIntValidator(0, 999, this));
+    m_Ui->gpuComboBox->setCurrentIndex(m_Ui->gpuComboBox->findText("cpu"));
+  }
+  else
+  {
+    m_Ui->gpuComboBox->setCurrentIndex(m_Ui->gpuComboBox->count()-1);
   }
 }
 
 int QmitkSegmentAnythingPreferencePage::FetchSelectedGPUFromUI() const
 {
   QString gpuInfo = m_Ui->gpuComboBox->currentText();
-  if (m_GpuLoader.GetGPUCount() == 0)
-  {
-    return static_cast<int>(gpuInfo.toInt());
-  }
-  else if ("cpu" == gpuInfo)
+  if ("cpu" == gpuInfo)
   {
     return -1;
+  }
+  else if(m_GpuLoader.GetGPUCount() == 0)
+  {
+    return static_cast<int>(gpuInfo.toInt());
   }
   else
   {

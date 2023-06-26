@@ -38,13 +38,6 @@ namespace
 
 QmitkSegmentAnythingToolGUI::QmitkSegmentAnythingToolGUI() : QmitkSegWithPreviewToolGUIBase(true)
 {
-  // Nvidia-smi command returning zero doesn't always imply lack of GPUs.
-  // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
-  if (m_GpuLoader.GetGPUCount() == 0)
-  {
-    std::string warning = "WARNING: No GPUs were detected on your machine. The SegmentAnything tool can be very slow.";
-    this->ShowErrorMessage(warning);
-  }
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   {
     bool result = false;
@@ -282,7 +275,7 @@ void QmitkSegmentAnythingToolGUI::FileDownloaded(QNetworkReply *reply)
     file.write(reply->readAll());
     file.close();
     disconnect(&m_Manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(FileDownloaded(QNetworkReply *)));
-    this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. Activating Segment Anything...."));
+    this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. Initializing Segment Anything...."));
     auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
     if (nullptr != tool)
     {

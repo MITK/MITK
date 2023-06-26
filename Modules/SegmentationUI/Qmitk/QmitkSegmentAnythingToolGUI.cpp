@@ -189,10 +189,10 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
       this, &QmitkSegmentAnythingToolGUI::StatusMessageListener);
     if (this->DownloadModel(modelType))
     {
-      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. Activating Segment Anything tool...</i>"));
+      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. Initializing Segment Anything tool...</i>"));
       if (this->ActivateSAMDaemon())
       {
-        this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. Segment Anything tool Activated.</i>"));
+        this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. Segment Anything tool initialized.</i>"));
       }
       else
       {
@@ -289,18 +289,18 @@ void QmitkSegmentAnythingToolGUI::FileDownloaded(QNetworkReply *reply)
       tool->SetCheckpointPath(file.fileName().toStdString());
       if (this->ActivateSAMDaemon())
       {
-        this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. Segment Anything activated.</i>"));
+        this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. Segment Anything initialized.</i>"));
       }
       else
       {
-        this->WriteErrorMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. But couldn't init tool backend.</i>"));
+        this->WriteErrorMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. But, couldn't initialize tool backend.</i>"));
         this->EnableAll(true);
       }
     }
   }
   else
   {
-    this->WriteErrorMessage("<b>STATUS: </b><i>Model couldn't be downloaded. Segment Anything not activated.</i>");
+    this->WriteErrorMessage("<b>STATUS: </b><i>Model couldn't be downloaded. Segment Anything not initialized.</i>");
   }
   this->EnableAll(true);
   this->ShowProgressBar(false);
@@ -351,7 +351,7 @@ void QmitkSegmentAnythingToolGUI::OnResetPicksClicked()
 void QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent&)
 {
   this->EnableAll(true);
-  this->WriteStatusMessage("A Preference change was detected. Please activate the tool again.");
+  this->WriteStatusMessage("A Preference change was detected. Please initialize the tool again.");
   auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
   if (nullptr != tool)
   {

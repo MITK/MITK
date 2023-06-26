@@ -118,7 +118,7 @@ Press DEL to remove last seed.
       </size>
      </property>
      <property name="text">
-      <string>Activate SAM</string>
+      <string>Initialize Segment Anything</string>
      </property>
     </widget>
    </item>

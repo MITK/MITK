@@ -117,8 +117,8 @@ void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir,
   args.push_back("install");
   args.push_back("light-the-torch");
   spExec->Execute(workingDir, "python", args);
-  PipInstall("torch", workingDir, callback, "ltt");
-  PipInstall("torchvision", workingDir, callback, "ltt");
+  PipInstall("torch==2.0.0", workingDir, callback, "ltt");
+  PipInstall("torchvision==0.15.0", workingDir, callback, "ltt");
 }
 
 void QmitkSetupVirtualEnvUtil::InstallPytorch()

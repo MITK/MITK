@@ -260,6 +260,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
     else if (nullptr != this->GetWorkingPlaneGeometry())
     {
       this->ResetPreviewContentAtTimeStep(timeStep);
+      RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     }
   }
 }

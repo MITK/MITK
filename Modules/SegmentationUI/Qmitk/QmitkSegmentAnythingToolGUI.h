@@ -129,7 +129,6 @@ private:
   mitk::IPreferences* m_Preferences;
   QNetworkAccessManager m_Manager;
   Ui_QmitkSegmentAnythingGUIControls m_Controls;
-  QString m_PythonPath;
   QmitkGPULoader m_GpuLoader;
   bool m_FirstPreviewComputation = true;
   const std::string WARNING_SAM_NOT_FOUND =

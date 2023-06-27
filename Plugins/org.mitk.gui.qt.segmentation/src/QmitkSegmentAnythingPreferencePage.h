@@ -107,7 +107,6 @@ private:
   QWidget* m_Control;
   QmitkGPULoader m_GpuLoader;
   QString m_PythonPath;
-  bool m_IsInstalled = false;
   const QString CPU_ID = "cpu";
 };
 

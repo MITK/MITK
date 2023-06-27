@@ -90,7 +90,6 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   bool isInstalled = this->ValidatePrefences();
   if (isInstalled)
   {
-    m_PythonPath = QString::fromStdString(m_Preferences->Get("sam python path", ""));
     QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));
     welcomeText += " SAM is already found installed. Model type '" + modelType + "' selected in Preferences.";
   }
@@ -168,11 +167,12 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
   {
     this->EnableAll(false);
     qApp->processEvents();
-    if (!QmitkSegmentAnythingToolGUI::IsSAMInstalled(m_PythonPath))
+    QString pythonPath = QString::fromStdString(m_Preferences->Get("sam python path", ""));
+    if (!QmitkSegmentAnythingToolGUI::IsSAMInstalled(pythonPath))
     {
       throw std::runtime_error(WARNING_SAM_NOT_FOUND);
     }
-    tool->SetPythonPath(m_PythonPath.toStdString());
+    tool->SetPythonPath(pythonPath.toStdString());
     tool->SetGpuId(m_Preferences->GetInt("sam gpuid", -1));
     const QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));  
     tool->SetModelType(modelType.toStdString());

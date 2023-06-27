@@ -61,9 +61,9 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/edit-delete.svg"));
   m_Ui->clearSAMButton->setIcon(deleteIcon);
   const QString storageDir = m_Installer.GetVirtualEnvPath();
-  m_IsInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(storageDir);
+  bool isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(storageDir);
   QString welcomeText;
-  if (m_IsInstalled)
+  if (isInstalled)
   {
     m_PythonPath = GetExactPythonPath(storageDir);
     m_Installer.SetVirtualEnvPath(m_PythonPath);
@@ -72,7 +72,8 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
   }
   else
   {
-    welcomeText += " Segment Anything tool not installed. Please click on \"Install SAM\" above.";
+    welcomeText += " Segment Anything tool not installed. Please click on \"Install SAM\" above. \
+      The installation will create a new virtual environment using the System Python selected above.";
     m_Ui->installSAMButton->setEnabled(true);
   }
   this->WriteStatusMessage(welcomeText);
@@ -264,13 +265,16 @@ void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
     this->WriteStatusMessage("<b>STATUS: </b>Installing SAM...");
     m_Ui->installSAMButton->setEnabled(false);
     m_Installer.SetSystemPythonPath(systemPython);
-    m_IsInstalled = m_Installer.SetupVirtualEnv(m_Installer.VENV_NAME);
-    if (m_IsInstalled)
+    bool isInstalled = false;
+    bool isFinished = m_Installer.SetupVirtualEnv(m_Installer.VENV_NAME);
+    if (isFinished)
+    {
+      isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(m_Installer.GetVirtualEnvPath());
+    }
+    if (isInstalled)
     {
       m_PythonPath = this->GetExactPythonPath(m_Installer.GetVirtualEnvPath());
       this->WriteStatusMessage("<b>STATUS: </b>Successfully installed SAM.");
-      auto *prefs = GetPreferences();
-      prefs->Put("sam python path", m_PythonPath.toStdString());
     }
     else
     {
@@ -283,11 +287,12 @@ void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
 void QmitkSegmentAnythingPreferencePage::OnClearInstall()
 {
   QDir folderPath(m_Installer.GetVirtualEnvPath());
-  m_IsInstalled = folderPath.removeRecursively();
-  if (m_IsInstalled)
+  bool isDeleted = folderPath.removeRecursively();
+  if (isDeleted)
   {
     this->WriteStatusMessage("Deleted SAM installation.");
     m_Ui->installSAMButton->setEnabled(true);
+    m_PythonPath.clear();
   }
   else
   {

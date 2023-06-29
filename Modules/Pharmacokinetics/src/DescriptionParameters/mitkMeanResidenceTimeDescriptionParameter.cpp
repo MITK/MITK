@@ -43,13 +43,13 @@ mitk::CurveDescriptionParameterBase::DescriptionParameterResultsType mitk::MeanR
 
     double deltaY1 = curve(i + 1)*grid(i + 1) - curve(i)*grid(i);
     double Y1 = curve(i)*grid(i);
-    double intI1 = 1 / 2 * deltaX * deltaY1 + Y1 * deltaX;
+    double intI1 = 0.5 * deltaX * deltaY1 + Y1 * deltaX;
     aumc += std::abs(intI1);
 
 
     double deltaY2 = curve(i + 1) - curve(i);
     double Y2 = curve(i);
-    double intI2 = 1 / 2 * deltaX * deltaY2 + Y2 * deltaX;
+    double intI2 = 0.5 * deltaX * deltaY2 + Y2 * deltaX;
     auc += std::abs(intI2);
 
 

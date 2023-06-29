@@ -233,7 +233,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
 {
   if (nullptr != previewImage && m_PointSetPositive.IsNotNull())
   {
-    if (this->HasPicks() && nullptr != m_PythonService)
+    if (this->HasPicks() && nullptr != m_PythonService && this->IsImageAtTimeStepValid(inputAtTimeStep))
     {
       std::string uniquePlaneID = GetHashForCurrentPlane();
       try
@@ -263,6 +263,14 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
       RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     }
   }
+}
+
+bool mitk::SegmentAnythingTool::IsImageAtTimeStepValid(const Image *inputAtTimeStep)
+{
+  bool isValidDim0 = (inputAtTimeStep->GetDimension(0) > 1);
+  bool isValidDim1 = (inputAtTimeStep->GetDimension(1) > 1);
+  bool isValidDim2 = (inputAtTimeStep->GetDimension(2) > 1);
+  return (isValidDim0 || isValidDim1) && (isValidDim1 || isValidDim2) && (isValidDim0 || isValidDim2);
 }
 
 std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()

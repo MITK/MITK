@@ -184,6 +184,14 @@ namespace mitk
      */
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, mitk::Point3D&);
 
+    /**
+     * @brief Checks if the image has valid size across each dimension.
+     * 
+     * @param inputAtTimeStep 
+     * @return bool 
+     */
+    bool mitk::SegmentAnythingTool::IsImageAtTimeStepValid(const Image *inputAtTimeStep);
+
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_ModelType;

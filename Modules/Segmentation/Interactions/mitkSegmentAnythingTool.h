@@ -185,12 +185,13 @@ namespace mitk
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, mitk::Point3D&);
 
     /**
-     * @brief Checks if the image has valid size across each dimension.
+     * @brief Checks if the image has valid size across each dimension. This function is 
+     * critical for 2D images since 2D image are not valid in Saggital and Coronal views.
      * 
      * @param inputAtTimeStep 
      * @return bool 
      */
-    bool mitk::SegmentAnythingTool::IsImageAtTimeStepValid(const Image *inputAtTimeStep);
+    bool IsImageAtTimeStepValid(const Image *inputAtTimeStep);
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;

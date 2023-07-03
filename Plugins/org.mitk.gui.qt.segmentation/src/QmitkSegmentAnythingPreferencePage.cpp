@@ -81,7 +81,6 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
   m_Ui->gpuComboBox->addItem(CPU_ID);
   this->SetGPUInfo();
   this->Update();
-  this->Update();
 }
 
 QWidget* QmitkSegmentAnythingPreferencePage::GetQtControl() const
@@ -228,9 +227,6 @@ void QmitkSegmentAnythingPreferencePage::SetGPUInfo()
   }
   if (specs.empty())
   {
-    m_Ui->gpuComboBox->setEditable(true);
-    m_Ui->gpuComboBox->addItem(QString::number(0));
-    m_Ui->gpuComboBox->setValidator(new QIntValidator(0, 999, this));
     m_Ui->gpuComboBox->setCurrentIndex(m_Ui->gpuComboBox->findText("cpu"));
   }
   else

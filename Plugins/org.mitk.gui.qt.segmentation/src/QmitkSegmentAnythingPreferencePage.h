@@ -108,6 +108,7 @@ private:
   QmitkGPULoader m_GpuLoader;
   QString m_PythonPath;
   const QString CPU_ID = "cpu";
+  const QStringList VALID_MODELS = {"vit_b", "vit_l", "vit_h"};
 };
 
 #endif

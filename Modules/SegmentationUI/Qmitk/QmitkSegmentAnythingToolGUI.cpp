@@ -12,15 +12,13 @@ found in the LICENSE file.
 
 #include "QmitkSegmentAnythingToolGUI.h"
 
-#include "mitkSegmentAnythingTool.h"
-#include "mitkProcessExecutor.h"
+#include <mitkSegmentAnythingTool.h>
+#include <mitkProcessExecutor.h>
 #include <QApplication>
 #include <QDir>
 #include <QmitkStyleManager.h>
 #include <QDirIterator>
 #include <QFileDialog>
-#include <QNetworkRequest>
-#include <QtConcurrentRun>
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
@@ -176,27 +174,19 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     tool->SetGpuId(m_Preferences->GetInt("sam gpuid", -1));
     const QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));  
     tool->SetModelType(modelType.toStdString());
+    tool->SetCheckpointPath(m_Preferences->Get("sam parent path", ""));
     this->WriteStatusMessage(
-      QString("<b>STATUS: </b><i>Checking if model is already downloaded... This might take a while.</i>"));
+      QString("<b>STATUS: </b><i>Activating Segment Anything Model... The selected model type will be downloaded. This might take a while.</i>"));
     tool->SAMStatusMessageEvent += mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI,const std::string&>(
       this, &QmitkSegmentAnythingToolGUI::StatusMessageListener);
-    if (this->DownloadModel(modelType))
+    if (this->ActivateSAMDaemon())
     {
-      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. Initializing Segment Anything tool...</i>"));
-      if (this->ActivateSAMDaemon())
-      {
-        this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model found. Segment Anything tool initialized.</i>"));
-      }
-      else
-      {
-        this->WriteErrorMessage(QString("<b>STATUS: </b><i>Model found. Couldn't init tool backend.</i>"));
-        this->EnableAll(true);
-      }
+      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Segment Anything tool initialized.</i>"));
     }
     else
     {
-      tool->IsReadyOff();
-      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model type not found. Starting download...</i>"));
+      this->WriteErrorMessage(QString("<b>STATUS: </b><i>Couldn't init tool backend.</i>"));
+      this->EnableAll(true);
     }
   }
   catch (const std::exception &e)
@@ -241,62 +231,6 @@ bool QmitkSegmentAnythingToolGUI::ActivateSAMDaemon()
   }
   this->ShowProgressBar(false);
   return tool->GetIsReady();
-}
-
-bool QmitkSegmentAnythingToolGUI::DownloadModel(const QString &modelType)
-{
-  QUrl url = QmitkSegmentAnythingToolGUI::VALID_MODELS_URL_MAP[modelType];
-  QString modelFileName = url.fileName();
-  const QString storageDir = QString::fromStdString(m_Preferences->Get("sam parent path", ""));
-  QString checkPointPath = storageDir + QDir::separator() + modelFileName;
-  if (QFile::exists(checkPointPath))
-  {
-    auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
-    if (nullptr != tool)
-    {
-      tool->SetCheckpointPath(checkPointPath.toStdString());
-    }
-    return true;
-  }
-  connect(&m_Manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(FileDownloaded(QNetworkReply*)));
-  QNetworkRequest request(url);
-  m_Manager.get(request);
-  this->ShowProgressBar(true);
-  return false;
-}
-
-void QmitkSegmentAnythingToolGUI::FileDownloaded(QNetworkReply *reply)
-{
-  const QString storageDir = QString::fromStdString(m_Preferences->Get("sam parent path", ""));
-  const QString &modelFileName = reply->url().fileName();
-  QFile file(storageDir + QDir::separator() + modelFileName);
-  if (file.open(QIODevice::WriteOnly))
-  {
-    file.write(reply->readAll());
-    file.close();
-    disconnect(&m_Manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(FileDownloaded(QNetworkReply *)));
-    this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. Initializing Segment Anything...."));
-    auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
-    if (nullptr != tool)
-    {
-      tool->SetCheckpointPath(file.fileName().toStdString());
-      if (this->ActivateSAMDaemon())
-      {
-        this->WriteStatusMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. Segment Anything initialized.</i>"));
-      }
-      else
-      {
-        this->WriteErrorMessage(QString("<b>STATUS: </b><i>Model successfully downloaded. But, couldn't initialize tool backend.</i>"));
-        this->EnableAll(true);
-      }
-    }
-  }
-  else
-  {
-    this->WriteErrorMessage("<b>STATUS: </b><i>Model couldn't be downloaded. Segment Anything not initialized.</i>");
-  }
-  this->EnableAll(true);
-  this->ShowProgressBar(false);
 }
 
 void QmitkSegmentAnythingToolGUI::ShowProgressBar(bool enabled)

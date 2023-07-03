@@ -1,7 +1,7 @@
 MITK_CREATE_MODULE (
   INCLUDE_DIRS Qmitk SegmentationUtilities
   DEPENDS MitkSegmentation MitkQtWidgetsExt
-  PACKAGE_DEPENDS PRIVATE CTK|CTKWidgets nlohmann_json Qt5|Network
+  PACKAGE_DEPENDS PRIVATE CTK|CTKWidgets nlohmann_json
 )
 
 if(BUILD_TESTING)

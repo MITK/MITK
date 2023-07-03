@@ -77,7 +77,7 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
     m_Ui->installSAMButton->setEnabled(true);
   }
   this->WriteStatusMessage(welcomeText);
-  m_Ui->samModelTypeComboBox->addItems(QmitkSegmentAnythingToolGUI::VALID_MODELS_URL_MAP.keys());
+  m_Ui->samModelTypeComboBox->addItems(VALID_MODELS);
   m_Ui->gpuComboBox->addItem(CPU_ID);
   this->SetGPUInfo();
   this->Update();

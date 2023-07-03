@@ -20,14 +20,11 @@ found in the LICENSE file.
 #include "QmitkSetupVirtualEnvUtil.h"
 #include <QMessageBox>
 #include <QStandardPaths>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 #include <mitkIPreferences.h>
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
 \brief GUI for mitk::SegmentAnythingTool.
-\sa mitk::PickingTool
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkSegmentAnythingToolGUI : public QmitkSegWithPreviewToolGUIBase
 {
@@ -37,11 +34,6 @@ public:
   mitkClassMacro(QmitkSegmentAnythingToolGUI, QmitkSegWithPreviewToolGUIBase);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
-
-  inline static const QMap<QString, QUrl> VALID_MODELS_URL_MAP = {
-    {"vit_b", QUrl("https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth")},
-    {"vit_l", QUrl("https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth")},
-    {"vit_h", QUrl("https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth")}};
 
   /**
    * @brief Checks if SegmentAnything is found inside the selected python virtual environment.
@@ -60,16 +52,11 @@ protected slots:
    */
   void OnActivateBtnClicked();
 
-  /**
-   * @brief Qt Slot
-   */
-  void FileDownloaded(QNetworkReply*);
-
 protected:
   QmitkSegmentAnythingToolGUI();
   ~QmitkSegmentAnythingToolGUI();
 
-  void InitializeUI(QBoxLayout* mainLayout) override;
+  void InitializeUI(QBoxLayout *mainLayout) override;
   
   /**
    * @brief Writes any message in white on the tool pane.
@@ -94,14 +81,6 @@ protected:
    * is affected.
    */
   void EnableAll(bool);
-  
-  /**
-   * @brief Start download process for the given model type.
-   * Download URL is looked from the VALID_MODELS_URL_MAP.
-   * 
-   * @return bool 
-   */
-  bool DownloadModel(const QString&);
 
   /**
    * @brief Enable (or Disable) progressbar on GUI
@@ -124,10 +103,8 @@ protected:
    */
   bool ValidatePrefences();
 
-
 private:
   mitk::IPreferences* m_Preferences;
-  QNetworkAccessManager m_Manager;
   Ui_QmitkSegmentAnythingGUIControls m_Controls;
   QmitkGPULoader m_GpuLoader;
   bool m_FirstPreviewComputation = true;

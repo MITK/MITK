@@ -5,4 +5,6 @@ SET(MODULE_TESTS
   mitkExtendedToftsModelTest.cpp
   mitkConvertSignalToConcentrationTest.cpp
   mitkCurveDescriptiveParametersTest.cpp
+  mitkTwoStepLinearModelTest.cpp
+  mitkThreeStepLinearModelTest.cpp
 )

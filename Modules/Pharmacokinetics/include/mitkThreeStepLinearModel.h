@@ -40,7 +40,7 @@ namespace mitk
     itkTypeMacro(ThreeStepLinearModel, ModelBase);
 
     static const std::string MODEL_DISPLAY_NAME;
-    static const std::string NAME_PARAMETER_S0;
+    static const std::string NAME_PARAMETER_s0;
     static const std::string NAME_PARAMETER_t1;
     static const std::string NAME_PARAMETER_t2;
     static const std::string NAME_PARAMETER_a1;
@@ -48,7 +48,7 @@ namespace mitk
     static const std::string NAME_PARAMETER_b1;
     static const std::string NAME_PARAMETER_b2;
 
-    static const std::string UNIT_PARAMETER_S0;
+    static const std::string UNIT_PARAMETER_s0;
     static const std::string UNIT_PARAMETER_t1;
     static const std::string UNIT_PARAMETER_t2;
     static const std::string UNIT_PARAMETER_a1;
@@ -56,7 +56,7 @@ namespace mitk
     static const std::string UNIT_PARAMETER_b1;
     static const std::string UNIT_PARAMETER_b2;
 
-    static const unsigned int POSITION_PARAMETER_S0;
+    static const unsigned int POSITION_PARAMETER_s0;
     static const unsigned int POSITION_PARAMETER_t1;
     static const unsigned int POSITION_PARAMETER_t2;
     static const unsigned int POSITION_PARAMETER_a1;
@@ -109,6 +109,8 @@ namespace mitk
     void SetStaticParameter(const ParameterNameType& name,
                                     const StaticParameterValuesType& values) override;
     StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const override;
+
+    static double ComputeSignalFromParameters(double x, double s0, double t1, double t2, double a1, double a2, double b1, double b2);
 
   private:
 

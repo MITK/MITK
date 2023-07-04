@@ -14,19 +14,19 @@ found in the LICENSE file.
 #include "mitkModelTestFixture.h"
 
 //MITK includes
-#include "mitkDescriptivePharmacokineticBrixModel.h"
+#include "mitkTwoStepLinearModel.h"
 
 
-  class mitkDescriptivePharmacokineticBrixModelTestSuite : public mitk::mitkModelTestFixture
+  class mitkTwoStepLinearModelTestSuite : public mitk::mitkModelTestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkDescriptivePharmacokineticBrixModelTestSuite);
+  CPPUNIT_TEST_SUITE(mitkTwoStepLinearModelTestSuite);
   MITK_TEST(GetModelInfoTest);
   MITK_TEST(ComputeModelfunctionTest);
   MITK_TEST(ComputeDerivedParametersTest);
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  mitk::DescriptivePharmacokineticBrixModel::Pointer m_testmodel;
+  mitk::TwoStepLinearModel::Pointer m_testmodel;
 
   json m_profile_json_obj;
   json m_modelValues_json_obj;
@@ -35,11 +35,11 @@ public:
   void setUp() override
   {
     // Parse JSON files
-    m_profile_json_obj = ParseJSONFile("Pharmacokinetics/mitkDescriptivePharmacokineticBrixModelTest_profile.json");
-    m_modelValues_json_obj = ParseJSONFile("Pharmacokinetics/mitkDescriptivePharmacokineticBrixModelTest_modelValues.json");
+    m_profile_json_obj = ParseJSONFile("Pharmacokinetics/mitkTwoStepLinearModelTest_profile.json");
+    m_modelValues_json_obj = ParseJSONFile("Pharmacokinetics/mitkTwoStepLinearModelTest_modelValues.json");
 
     // Generate test model
-    m_testmodel = mitk::DescriptivePharmacokineticBrixModel::New();
+    m_testmodel = mitk::TwoStepLinearModel::New();
  }
 
   void tearDown() override
@@ -63,4 +63,4 @@ public:
   }
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkDescriptivePharmacokineticBrixModel)
+MITK_TEST_SUITE_REGISTRATION(mitkTwoStepLinearModel)

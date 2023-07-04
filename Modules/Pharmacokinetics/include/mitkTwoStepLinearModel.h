@@ -92,12 +92,13 @@ namespace mitk
                                     const StaticParameterValuesType& values);
     virtual StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const;
 
+    static double ComputeSignalFromParameters(double x, double t, double a1, double a2, double b1, double b2);
+
   private:
 
     //No copy constructor allowed
     TwoStepLinearModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
-
   };
 }
 

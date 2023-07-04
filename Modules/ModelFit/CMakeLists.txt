@@ -3,7 +3,7 @@ mitk_create_module(ModelFit
     PUBLIC ${MITK_BINARY_DIR}
     PRIVATE src/Common src/Functors src/Models src/TestingHelper
   DEPENDS
-    PUBLIC MitkCore MitkSceneSerializationBase
+    PUBLIC MitkCore MitkSceneSerializationBase MitkTestingHelper
     PRIVATE	MitkMultilabel
   PACKAGE_DEPENDS
     PUBLIC ITK|Optimizers

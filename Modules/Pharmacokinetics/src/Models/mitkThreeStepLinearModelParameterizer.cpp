@@ -17,9 +17,9 @@ mitk::ThreeStepLinearModelParameterizer::GetDefaultInitialParameterization() con
 {
   ParametersType initialParameters;
   initialParameters.SetSize(5);
-  initialParameters[mitk:: ThreeStepLinearModel::POSITION_PARAMETER_S0] = 0.0;
-  initialParameters[mitk:: ThreeStepLinearModel::POSITION_PARAMETER_t1] = 50;
-  initialParameters[mitk:: ThreeStepLinearModel::POSITION_PARAMETER_t2] = 100;
+  initialParameters[mitk:: ThreeStepLinearModel::POSITION_PARAMETER_s0] = 0.0;
+  initialParameters[mitk:: ThreeStepLinearModel::POSITION_PARAMETER_t1] = 50.0;
+  initialParameters[mitk:: ThreeStepLinearModel::POSITION_PARAMETER_t2] = 100.0;
   initialParameters[mitk:: ThreeStepLinearModel::POSITION_PARAMETER_a1] = 1.0;
   initialParameters[mitk:: ThreeStepLinearModel::POSITION_PARAMETER_a2] = -1.0;
 

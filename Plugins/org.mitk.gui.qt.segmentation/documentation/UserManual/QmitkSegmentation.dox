@@ -258,6 +258,29 @@ The Live Wire Tool acts as a magnetic lasso with a contour snapping to edges of 
 
 The tool handling is the same like the Lasso tool (see for more info), except it generates live wire contours instead of straight lines.
 
+\subsection org_mitk_views_segmentationSegmentAnything Segment Anything Tool
+
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"Segment Anything tool",10.00}
+
+The Segment Anything Tool is an deep learning-based interactive segmentation tool. Originally created by MetaAI, MITK presents this model for medical image segmentation tasks.
+The tool assumes that you have Python 3 installed and available on your machine. Goto Preferences (Cntl+P)>Segment Anything to install Segment Anything model via MITK. The installation action implicitly creates a python virtual environment in an MITK mainitained
+directory. Note: on Debian/Ubuntu systems, you need to install the python3-pip python3-venv package using the following command:  `apt install python3-pip python3-venv`. For best results, your machine should be ideally equipped with a CUDA-enabled GPU. 
+For a detailed explanation to what this algorithm entails, please refer to https://ai.facebook.com/research/publications/segment-anything/ <br>
+
+\subsubsection org_mitk_views_segmentationSegmentAnythingWorkflow Workflow:
+    -# Install Segment Anything: Goto Preferences (Cntl+P)>Segment Anything and click "Install Segment Anything" to install Segment Anything (version: 1.0) in a virtual environment using the Python located in "System Python". Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    Once installed, the "Install Segment Anything" button is grayed out.
+    -# Note: If Python is not found by MITK goto "Install Options" & select the "System Python Path" drop-down to see if MITK has automatically detected other Python environments.
+    Click on a fitting Python (>=v3.8, <= 3.10) to use or click "Select" in the dropdown to choose an unlisted installation of Python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".
+    No need to navigate all the way into "../usr/bin/python3", for example.
+    -# Select a specific model type in the "Model Type" drop-downs. The default is "vit_b" for low memory footprint. 
+    -# Select inference hardware, i.e. any GPU or CPU.
+    -# Click "Ok" to save the Preferences.
+    -# Goto Segmentation View > 2D tools > Segment Anything.
+    -# Click "Initialize Segment Anything" to start the tool backend. This will invoke downloading of the select model type from the internet. This might take a while. It is a one time job, though.
+    -# Once the tool is initialized, Press SHIFT+Left Click on any of the 3 render windows to start click guided segmentation.
+    -# Press SHIFT+Right Click for negative clicks.
+
 \subsection org_mitk_views_segmentationinterpolation 2D and 3D Interpolation
 
 Creating segmentations using 2D manual contouring for large image volumes may be very time-consuming, because structures of interest may cover a large range of slices.

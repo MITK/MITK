@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkOclDataSet.h"
 #include "mitkCommon.h"
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 
 #include "mitkOclUtils.h"
 

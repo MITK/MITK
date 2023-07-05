@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkVtkEventProvider.h"
 #include "mitkVtkEventAdapter.h"
-#include <mbilog.h>
+#include <mitkLog.h>
 
 #include <vtkCallbackCommand.h>
 #include <vtkInteractorStyle.h>
@@ -21,10 +21,10 @@ found in the LICENSE file.
 
 #include "mitkInteractionEvent.h"
 
-#define VTKEVENTPROVIDER_INFO MBI_INFO("mitk.core.vtkeventprovider")
-#define VTKEVENTPROVIDER_WARN MBI_WARN("mitk.core.vtkeventprovider")
-#define VTKEVENTPROVIDER_ERROR MBI_ERROR("mitk.core.vtkeventprovider")
-#define VTKEVENTPROVIDER_DEBUG MBI_DEBUG("mitk.core.vtkeventprovider")
+#define VTKEVENTPROVIDER_INFO MITK_INFO("mitk.core.vtkeventprovider")
+#define VTKEVENTPROVIDER_WARN MITK_WARN("mitk.core.vtkeventprovider")
+#define VTKEVENTPROVIDER_ERROR MITK_ERROR("mitk.core.vtkeventprovider")
+#define VTKEVENTPROVIDER_DEBUG MITK_DEBUG("mitk.core.vtkeventprovider")
 
 namespace mitk
 {

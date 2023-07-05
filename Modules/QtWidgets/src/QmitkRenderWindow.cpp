@@ -250,7 +250,7 @@ bool QmitkRenderWindow::event(QEvent* e)
 
 void QmitkRenderWindow::enterEvent(QEvent *e)
 {
-  auto* baseRenderer = mitk::BaseRenderer::GetInstance(this->GetRenderWindow());
+  auto* baseRenderer = mitk::BaseRenderer::GetInstance(this->GetVtkRenderWindow());
   this->ShowOverlayMessage(!baseRenderer->GetReferenceGeometryAligned());
 
   if (nullptr != m_MenuWidget)

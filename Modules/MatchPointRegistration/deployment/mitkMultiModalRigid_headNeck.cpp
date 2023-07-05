@@ -10,20 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MBILOG_CONFIG_H_
-#define _MBILOG_CONFIG_H_
+#include "mapDeploymentDLLHelper.h"
+#include "mapDiscreteElements.h"
+#include "mapConfigure.h"
 
-@_define_enable_debug@
+#include "mitkMultiModalRigidHeadNeckRegistrationAlgorithm.h"
 
-#define _MBILOG_STR_(x) #x
-#define _MBILOG_STR(x) _MBILOG_STR_(x)
+typedef map::core::discrete::Elements<3>::InternalImageType ImageType;
 
-#ifndef MBILOG_MODULENAME
-  #if defined(US_MODULE_NAME)
-    #define MBILOG_MODULENAME _MBILOG_STR(US_MODULE_NAME)
-  #else
-    #define MBILOG_MODULENAME "n/a"
-  #endif
-#endif
-
-#endif /* _MBILOG_CONFIG_H_ */
+mapDeployAlgorithmMacro(mitk::MultiModalRigidHeadNeckRegistrationAlgorithm<ImageType>);

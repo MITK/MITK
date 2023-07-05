@@ -3,7 +3,7 @@
 #!
 #! params:
 #!  swig_module : Name of the SWIG module, for example pyMITK
-#!  library_names : Semicolon separated list of the libraries that are included, for example "MitkCore;mbilog"
+#!  library_names : Semicolon separated list of the libraries that are included, for example "MitkCore;MitkLog"
 #!
 
 

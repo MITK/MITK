@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <QmitkStyleManager.h>
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <QApplication>
 #include <QFile>

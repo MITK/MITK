@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkRESTServer.h>
 
 #include <mitkExceptionMacro.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 mitk::RESTManager::RESTManager() {}
 

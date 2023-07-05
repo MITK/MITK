@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "QmitkSafeNotify.h"
 
 #include <mitkException.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 QmitkSafeApplication::QmitkSafeApplication(int &argc, char **argv, bool safeMode)
   : QApplication(argc, argv),

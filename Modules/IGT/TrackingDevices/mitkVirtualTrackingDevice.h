@@ -44,7 +44,6 @@ namespace mitk
     * \brief Sets the refresh rate of the virtual tracking device in ms
     * \warning This refresh rate is not guaranteed. A thread is used to refresh the positions
     * of the virtual tools. However, this thread may not run at all during this refresh time period.
-    * \return Sets the refresh rate of the virtual tracking device in ms
     */
     itkSetMacro(RefreshRate, unsigned int);
 

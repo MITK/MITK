@@ -10,26 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MBILOG_LOGGINGTYPES_H_
-#define _MBILOG_LOGGINGTYPES_H_
+#include <mitkLogBackendBase.h>
 
-namespace mbilog
+mitk::LogBackendBase::~LogBackendBase()
 {
-  /** \brief This enum defines the message/event levels of the mbi logging mechanism.
-   *       Info: TODO
-   *         Warn: TODO
-   *         Error: TODO
-   *         Fatal: TODO
-   *         Debug: TODO
-   */
-  enum
-  {
-    Info,
-    Warn,
-    Error,
-    Fatal,
-    Debug
-  };
 }
-
-#endif

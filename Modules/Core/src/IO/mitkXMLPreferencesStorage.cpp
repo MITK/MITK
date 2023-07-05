@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkXMLPreferencesStorage.h"
 #include "mitkPreferences.h"
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <tinyxml2.h>
 

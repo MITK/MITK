@@ -160,7 +160,7 @@ void QmitkMxNMultiWidget::SetInteractionReferenceGeometry(const mitk::TimeGeomet
   auto allRenderWindows = this->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    auto* baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow->GetRenderWindow());
+    auto* baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow());
     baseRenderer->SetInteractionReferenceGeometry(referenceGeometry);
   }
 }
@@ -262,7 +262,7 @@ void QmitkMxNMultiWidget::ResetCrosshair()
     return;
   }
 
-  mitk::RenderingManager::GetInstance()->InitializeViewByBoundingObjects(renderWindow->GetRenderWindow(), dataStorage);
+  mitk::RenderingManager::GetInstance()->InitializeViewByBoundingObjects(renderWindow->GetVtkRenderWindow(), dataStorage);
 
   SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
 }

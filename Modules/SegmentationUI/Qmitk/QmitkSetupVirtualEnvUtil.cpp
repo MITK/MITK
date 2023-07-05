@@ -12,7 +12,7 @@ found in the LICENSE file.s
 
 #include "QmitkSetupVirtualEnvUtil.h"
 
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 #include <QStandardPaths>
 #include <itkCommand.h>
 

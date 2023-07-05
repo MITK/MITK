@@ -10,8 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mbilogBackendBase.h"
+#include <mitkLogMessage.h>
 
-mbilog::BackendBase::~BackendBase()
+mitk::LogMessage::LogMessage(const LogLevel level, const std::string& filePath, const int lineNumber,
+                             const std::string& functionName)
+  : Level(level),
+    FilePath(filePath),
+    LineNumber(lineNumber),
+    FunctionName(functionName)
 {
 }

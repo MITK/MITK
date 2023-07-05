@@ -27,7 +27,7 @@ found in the LICENSE file.
 #include <mitkStringProperty.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkWeakPointerProperty.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 // ITK includes
 #include <itkCommand.h>
 // VTK includes

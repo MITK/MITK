@@ -28,7 +28,7 @@ found in the LICENSE file.
   view-model-concept.
   \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 */
-class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmListModel : public QAbstractTableModel
+class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmListModel /** \cond */ : public QAbstractTableModel /** \endcond */
 {
   Q_OBJECT
 

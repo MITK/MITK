@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 
 #include <QApplication>
 #include <QMessageBox>

@@ -197,17 +197,7 @@ namespace mitk
     */
     bool AddToolByDefinitionFile(std::string fileName); // ^????? We should give an example of defined tool
 
-    /**
-    * \brief This function load a file with Tools definitions provided for the software
-    * \return Returns true if file is correctly loaded with all the tools
-    * @throw mitk::IGTException Throws an exception if there is an error during the Initialization
-    */
-//    bool AddToolByConfigurationFil(std::string fileName); // For next release....
-
   protected:
-    /**
-    * \brief Constructor & Destructor of the class
-    */
     OptitrackTrackingDevice();
     ~OptitrackTrackingDevice() override;
 

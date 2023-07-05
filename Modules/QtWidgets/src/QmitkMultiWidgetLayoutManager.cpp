@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkMultiWidgetLayoutManager.h"
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <QmitkAbstractMultiWidget.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>

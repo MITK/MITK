@@ -104,7 +104,7 @@ int testIndexAndWorldConsistency(mitk::Geometry3D *geometry3d)
 
   MITK_TEST_OUTPUT(<< " Testing WorldToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)");
   originOffCenter = origin + halfSpacingStep;
-  originOffCenter -= 0.0001;
+  originOffCenter -= mitk::Vector(0.0001);
   geometry3d->WorldToIndex(originOffCenter, itkindex);
   MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
 
@@ -274,7 +274,7 @@ int testItkImageIsCenterBased()
   MITK_TEST_OUTPUT(
     << " Testing itk::Image::TransformPhysicalPointToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)");
   originOffCenter = origin + halfSpacingStep;
-  originOffCenter -= 0.0001;
+  originOffCenter -= mitk::Vector(0.0001);
   itkintimage->TransformPhysicalPointToIndex(originOffCenter, itkindex);
   MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
 

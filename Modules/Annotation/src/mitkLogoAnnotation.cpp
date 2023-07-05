@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "mitkLogoAnnotation.h"
 #include <mitkIOUtil.h>
-#include "vtkUnicodeString.h"
 #include <vtkImageData.h>
 #include <vtkImageData.h>
 #include <vtkImageMapper.h>

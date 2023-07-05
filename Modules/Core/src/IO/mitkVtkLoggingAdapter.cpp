@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkVtkLoggingAdapter.h"
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 #include <vtkObjectFactory.h>
 
 namespace mitk

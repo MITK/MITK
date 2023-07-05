@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MBILOG_TEXTDICTIONARY_H_
-#define _MBILOG_TEXTDICTIONARY_H_
+#ifndef mitkLogDictionary_h
+#define mitkLogDictionary_h
 
-namespace mbilog
+namespace mitk
 {
   /** \brief This is a dictionary to replace long names of classes,
     *        modules, etc. to shorter versions in the console output. */

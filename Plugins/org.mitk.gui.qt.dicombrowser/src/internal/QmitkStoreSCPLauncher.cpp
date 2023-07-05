@@ -12,7 +12,7 @@ found in the LICENSE file.
 #include "QmitkStoreSCPLauncher.h"
 #include <QMessageBox>
 #include <QProcessEnvironment>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <fstream>
 #include <iostream>

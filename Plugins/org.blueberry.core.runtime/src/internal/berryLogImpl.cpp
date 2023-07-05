@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "berryIStatus.h"
 
 #include <ctkPlugin.h>
-#include <mbilog.h>
+#include <mitkLog.h>
 
 namespace berry {
 
@@ -42,21 +42,21 @@ void LogImpl::Log(const SmartPointer<IStatus>& status)
   switch (status->GetSeverity())
   {
   case IStatus::WARNING_TYPE:
-    mbilog::PseudoStream(mbilog::Warn,
+    mitk::PseudoLogStream(mitk::LogLevel::Warn,
                          qPrintable(status->GetFileName()),
                          status->GetLineNumber(),
                          qPrintable(status->GetMethodName()))(qPrintable(plugin->getSymbolicName()))
         << status->ToString().toStdString();
     break;
   case IStatus::ERROR_TYPE:
-    mbilog::PseudoStream(mbilog::Error,
+    mitk::PseudoLogStream(mitk::LogLevel::Error,
                          qPrintable(status->GetFileName()),
                          status->GetLineNumber(),
                          qPrintable(status->GetMethodName()))(qPrintable(plugin->getSymbolicName()))
         << status->ToString().toStdString();
     break;
   default:
-    mbilog::PseudoStream(mbilog::Info,
+    mitk::PseudoLogStream(mitk::LogLevel::Info,
                          qPrintable(status->GetFileName()),
                          status->GetLineNumber(),
                          qPrintable(status->GetMethodName()))(qPrintable(plugin->getSymbolicName()))

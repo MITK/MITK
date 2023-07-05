@@ -10,26 +10,27 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mbilogTextBackendBase.h"
-#include "mbilogLoggingTypes.h"
+#include <mitkLogBackendText.h>
+#include <mitkLogLevel.h>
+
 #include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <vector>
 
 #ifdef _WIN32
-#define USE_WIN32COLOREDCONSOLE
-#include <windows.h>
-#include "mbilogTextDictionary.h"
+#define MITK_WIN32_CONSOLE_COLOR
+#include <Windows.h>
+#include "mitkLogDictionary.h"
 #endif
 
 static bool g_init = false;
 
-mbilog::TextBackendBase::~TextBackendBase()
+mitk::LogBackendText::~LogBackendText()
 {
 }
 
-#ifdef USE_WIN32COLOREDCONSOLE
+#ifdef MITK_WIN32_CONSOLE_COLOR
 
 static HANDLE g_hConsole;
 
@@ -69,31 +70,31 @@ protected:
     {
       redo = false;
 
-      for (int r = 0; r < sizeof(mbilog::replace) / sizeof(char *); r += 2)
+      for (int r = 0; r < sizeof(mitk::replace) / sizeof(char *); r += 2)
       {
-        int s = static_cast<int>(strlen(mbilog::replace[r]));
+        int s = static_cast<int>(strlen(mitk::replace[r]));
         int xs = static_cast<int>(x.size());
 
         if (xs == s)
         {
-          if (mbilog::replace[r + 1][0] || !lft.empty() || !rgt.empty())
-            if (x.compare(mbilog::replace[r]) == 0)
-              x = mbilog::replace[r + 1];
+          if (mitk::replace[r + 1][0] || !lft.empty() || !rgt.empty())
+            if (x.compare(mitk::replace[r]) == 0)
+              x = mitk::replace[r + 1];
         }
         else if (xs > s)
         {
-          if (strncmp(mbilog::replace[r], &x.c_str()[xs - s], s) == 0)
+          if (strncmp(mitk::replace[r], &x.c_str()[xs - s], s) == 0)
           {
-            std::string rp = mbilog::replace[r + 1];
+            std::string rp = mitk::replace[r + 1];
             if (!rp.empty())
               rp[0] = toupper(rp[0]);
             x = x.substr(0, xs - s);
             rgt = rp + rgt;
             redo = true;
           }
-          else if (strncmp(mbilog::replace[r], x.c_str(), s) == 0)
+          else if (strncmp(mitk::replace[r], x.c_str(), s) == 0)
           {
-            std::string rp = mbilog::replace[r + 1];
+            std::string rp = mitk::replace[r + 1];
             if (!rp.empty())
               rp[0] = toupper(rp[0]);
             x = x.substr(s, xs - s);
@@ -172,15 +173,15 @@ protected:
   }
 
 public:
-  AutoCategorize(const mbilog::LogMessage &l)
+  AutoCategorize(const mitk::LogMessage &message)
   {
-    int size = static_cast<int>(strlen(l.filePath));
+    int size = static_cast<int>(message.FilePath.length());
 
     current = "";
 
     for (int r = 0; r < size; r++)
     {
-      char c = l.filePath[r];
+      char c = message.FilePath[r];
       if (c == '\\' || c == '/')
         flush();
       else
@@ -248,32 +249,32 @@ public:
 
 #endif
 
-void mbilog::TextBackendBase::FormatSmart(std::ostream &out, const LogMessage &l, int /*threadID*/)
+void mitk::LogBackendText::FormatSmart(std::ostream &out, const LogMessage &message, int /*threadID*/)
 {
   char c_open = '[';
   char c_close = ']';
 
-  switch (l.level)
+  switch (message.Level)
   {
-    case mbilog::Info:
+    case mitk::LogLevel::Info:
       break;
 
-    case mbilog::Warn:
+    case mitk::LogLevel::Warn:
       c_open = '!';
       c_close = '!';
       break;
 
-    case mbilog::Error:
+    case mitk::LogLevel::Error:
       c_open = '#';
       c_close = '#';
       break;
 
-    case mbilog::Fatal:
+    case mitk::LogLevel::Fatal:
       c_open = '*';
       c_close = '*';
       break;
 
-    case mbilog::Debug:
+    case mitk::LogLevel::Debug:
       c_open = '{';
       c_close = '}';
       break;
@@ -298,57 +299,57 @@ void mbilog::TextBackendBase::FormatSmart(std::ostream &out, const LogMessage &l
 
   out << c_close << " ";
 
-  if (!l.category.empty())
+  if (!message.Category.empty())
   {
-    out << "[" << l.category << "] ";
+    out << "[" << message.Category << "] ";
   }
 
-  switch (l.level)
+  switch (message.Level)
   {
-    case mbilog::Info:
+    case mitk::LogLevel::Info:
       break;
 
-    case mbilog::Warn:
+    case mitk::LogLevel::Warn:
       out << "WARNING: ";
       break;
 
-    case mbilog::Error:
+    case mitk::LogLevel::Error:
       out << "ERROR: ";
       break;
 
-    case mbilog::Fatal:
+    case mitk::LogLevel::Fatal:
       out << "FATAL: ";
       break;
 
-    case mbilog::Debug:
+    case mitk::LogLevel::Debug:
       out << "DEBUG: ";
       break;
   }
 
-  out << l.message << std::endl;
+  out << message.Message << std::endl;
 }
 
-void mbilog::TextBackendBase::FormatFull(std::ostream &out, const LogMessage &l, int threadID)
+void mitk::LogBackendText::FormatFull(std::ostream &out, const LogMessage &message, int threadID)
 {
-  switch (l.level)
+  switch (message.Level)
   {
-    case mbilog::Info:
+    case mitk::LogLevel::Info:
       out << "INFO";
       break;
 
-    case mbilog::Warn:
+    case mitk::LogLevel::Warn:
       out << "WARN";
       break;
 
-    case mbilog::Error:
+    case mitk::LogLevel::Error:
       out << "ERROR";
       break;
 
-    case mbilog::Fatal:
+    case mitk::LogLevel::Fatal:
       out << "FATAL";
       break;
 
-    case mbilog::Debug:
+    case mitk::LogLevel::Debug:
       out << "DEBUG";
       break;
   }
@@ -358,44 +359,30 @@ void mbilog::TextBackendBase::FormatFull(std::ostream &out, const LogMessage &l,
   AppendTimeStamp(out);
 
   out << "|";
+  out << "|" << message.FilePath << "(" << message.LineNumber << ")";
+  out << "|" << message.FunctionName;
+  out << "|" << std::hex << threadID;
+  out << "|" << message.ModuleName;
+  out << "|" << message.Category;
 
-  out << "|" << std::string(l.filePath) << "(" << l.lineNumber << ")";
-
-  out << "|" << std::string(l.functionName);
-
-  // if(threadID)
-  {
-    out << "|" << std::hex << threadID;
-  }
-
-  // if(NA_STRING != l.moduleName)
-  {
-    out << "|" << std::string(l.moduleName);
-  }
-
-  // if(!l.category.empty())
-  {
-    out << "|" << l.category;
-  }
-
-  out << l.message << std::endl;
+  out << message.Message << std::endl;
 }
 
-void mbilog::TextBackendBase::FormatSmart(const LogMessage &l, int threadID)
+void mitk::LogBackendText::FormatSmart(const LogMessage &l, int threadID)
 {
-#ifdef USE_WIN32COLOREDCONSOLE
+#ifdef MITK_WIN32_CONSOLE_COLOR
   FormatSmartWindows(l, threadID);
 #else
   FormatSmart(std::cout, l, threadID);
 #endif
 }
 
-void mbilog::TextBackendBase::FormatFull(const LogMessage &l, int threadID)
+void mitk::LogBackendText::FormatFull(const LogMessage &l, int threadID)
 {
   FormatFull(std::cout, l, threadID);
 }
 
-void mbilog::TextBackendBase::AppendTimeStamp(std::ostream &out)
+void mitk::LogBackendText::AppendTimeStamp(std::ostream &out)
 {
   time_t rawtime = time(nullptr);
   std::string timestring(ctime(&rawtime));
@@ -412,7 +399,7 @@ void mbilog::TextBackendBase::AppendTimeStamp(std::ostream &out)
   out.imbue(originalLocale);
 }
 
-#ifdef USE_WIN32COLOREDCONSOLE
+#ifdef MITK_WIN32_CONSOLE_COLOR
 
 // Get the horizontal and vertical screen sizes in pixel
 void GetDesktopResolution(int& horizontal, int& vertical)
@@ -444,7 +431,7 @@ int GetMonitorCount()
   return -1;//signals an error
 }
 
-void mbilog::TextBackendBase::FormatSmartWindows(const mbilog::LogMessage &l, int /*threadID*/)
+void mitk::LogBackendText::FormatSmartWindows(const LogMessage &message, int /*threadID*/)
 {
   int colorNormal = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
 
@@ -470,7 +457,7 @@ void mbilog::TextBackendBase::FormatSmartWindows(const mbilog::LogMessage &l, in
     g_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     g_init = true;
 
-    std::string title = "mbilog";
+    std::string title = "MITK Log";
 
     SetConsoleTitle(title.c_str());
 
@@ -491,12 +478,12 @@ void mbilog::TextBackendBase::FormatSmartWindows(const mbilog::LogMessage &l, in
     std::cout << std::endl;
   }
 
-  switch (l.level)
+  switch (message.Level)
   {
-    case mbilog::Info:
+    case mitk::LogLevel::Info:
       break;
 
-    case mbilog::Warn:
+    case mitk::LogLevel::Warn:
       colorTime = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
       // colorText = FOREGROUND_RED|FOREGROUND_GREEN;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
@@ -504,7 +491,7 @@ void mbilog::TextBackendBase::FormatSmartWindows(const mbilog::LogMessage &l, in
       forceCat = true;
       break;
 
-    case mbilog::Error:
+    case mitk::LogLevel::Error:
       colorTime = FOREGROUND_RED | FOREGROUND_INTENSITY;
       // colorText = FOREGROUND_RED;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
@@ -512,7 +499,7 @@ void mbilog::TextBackendBase::FormatSmartWindows(const mbilog::LogMessage &l, in
       forceCat = true;
       break;
 
-    case mbilog::Fatal:
+    case mitk::LogLevel::Fatal:
       colorTime = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
       // colorText = FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_INTENSITY;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
@@ -520,7 +507,7 @@ void mbilog::TextBackendBase::FormatSmartWindows(const mbilog::LogMessage &l, in
       forceCat = true;
       break;
 
-    case mbilog::Debug:
+    case mitk::LogLevel::Debug:
       colorTime = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
       // colorText |= FOREGROUND_INTENSITY;
       showColon = false;
@@ -539,14 +526,14 @@ void mbilog::TextBackendBase::FormatSmartWindows(const mbilog::LogMessage &l, in
 
   // category
   {
-    AutoCategorize ac(l);
+    AutoCategorize ac(message);
     std::string pre = ac.GetPrefix();
     std::string cat = ac.GetCategory();
 
     cat = pre + cat;
 
     if (cat.empty())
-      cat = l.category;
+      cat = message.Category;
 
     if (!cat.empty())
     {
@@ -570,33 +557,33 @@ void mbilog::TextBackendBase::FormatSmartWindows(const mbilog::LogMessage &l, in
     }
   }
 
-  switch (l.level)
+  switch (message.Level)
   {
-    case mbilog::Info:
+    case mitk::LogLevel::Info:
       break;
 
-    case mbilog::Warn:
+    case mitk::LogLevel::Warn:
       ChangeColor(colorTime);
       std::cout << "WARNING" << std::flush;
       ChangeColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
       std::cout << ": " << std::flush;
       break;
 
-    case mbilog::Error:
+    case mitk::LogLevel::Error:
       ChangeColor(colorTime);
       std::cout << "ERROR" << std::flush;
       ChangeColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
       std::cout << ": " << std::flush;
       break;
 
-    case mbilog::Fatal:
+    case mitk::LogLevel::Fatal:
       ChangeColor(colorTime);
       std::cout << "FATAL" << std::flush;
       ChangeColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
       std::cout << ": " << std::flush;
       break;
 
-    case mbilog::Debug:
+    case mitk::LogLevel::Debug:
       ChangeColor(colorTime);
       std::cout << "DBG" << std::flush;
       ChangeColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
@@ -605,7 +592,7 @@ void mbilog::TextBackendBase::FormatSmartWindows(const mbilog::LogMessage &l, in
   }
 
   ChangeColor(colorText);
-  std::cout << l.message << std::endl;
+  std::cout << message.Message << std::endl;
 
   ChangeColor(colorNormal);
 

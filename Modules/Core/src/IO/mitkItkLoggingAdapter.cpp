@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkItkLoggingAdapter.h"
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 
 void mitk::ItkLoggingAdapter::Initialize()
 {

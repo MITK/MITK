@@ -9,11 +9,22 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include <mitkLogMacros.h>
-#include <stdlib.h>
 
-int main(int /*argc*/, char ** /*argv*/)
+#ifndef mitkLogLevel_h
+#define mitkLogLevel_h
+
+namespace mitk
 {
-  MITK_INFO << "Test log ...";
-  return EXIT_SUCCESS;
+  /** \brief Message/event levels of the MITK log mechanism.
+   */
+  enum class LogLevel
+  {
+    Info,
+    Warn,
+    Error,
+    Fatal,
+    Debug
+  };
 }
+
+#endif

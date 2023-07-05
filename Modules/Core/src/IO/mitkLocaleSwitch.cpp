@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkLocaleSwitch.h"
 
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 
 #include <clocale>
 #include <string>

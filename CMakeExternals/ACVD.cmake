@@ -24,7 +24,7 @@ if(MITK_USE_ACVD)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/valette/ACVD.git
-      GIT_TAG e583e278
+      GIT_TAG 18209c90
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS

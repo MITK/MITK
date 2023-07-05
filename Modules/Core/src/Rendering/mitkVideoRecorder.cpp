@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <vtkImageResize.h>
 #include <vtkNew.h>

@@ -103,7 +103,7 @@ void mitk::SegmentAnythingTool::Deactivated()
 void mitk::SegmentAnythingTool::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION("ShiftSecondaryButtonPressed", OnAddNegativePoint);
-  CONNECT_FUNCTION("ShiftPrimaryButtonPressed", OnAddPoint);
+  CONNECT_FUNCTION("ShiftPrimaryButtonPressed", OnAddPositivePoint);
   CONNECT_FUNCTION("DeletePoint", OnDelete);
 }
 
@@ -141,7 +141,7 @@ void mitk::SegmentAnythingTool::OnAddNegativePoint(StateMachineAction *, Interac
   }
 }
 
-void mitk::SegmentAnythingTool::OnAddPoint(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::SegmentAnythingTool::OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   if (!this->GetIsReady())
   {
@@ -162,7 +162,7 @@ void mitk::SegmentAnythingTool::OnAddPoint(StateMachineAction *, InteractionEven
     if (positionEvent != nullptr)
     {
       m_PointSetPositive->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
-      m_PointSetCount++;
+      ++m_PointSetCount;
       this->UpdatePreview();
     }
   }

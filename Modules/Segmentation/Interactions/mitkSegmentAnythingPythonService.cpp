@@ -37,7 +37,7 @@ mitk::SegmentAnythingPythonService::SegmentAnythingPythonService(
     m_CheckpointPath(checkPointPath),
     m_GpuId(gpuId)
 {
-  this->CreateTempDirs(m_PARENT_TEMP_DIR_PATTERN);
+  this->CreateTempDirs(PARENT_TEMP_DIR_PATTERN);
 }
 
 mitk::SegmentAnythingPythonService::~SegmentAnythingPythonService()
@@ -97,7 +97,7 @@ void mitk::SegmentAnythingPythonService::StartAsyncProcess()
   }
   if (this->GetMitkTempDir().empty())
   {
-    this->CreateTempDirs(m_PARENT_TEMP_DIR_PATTERN);
+    this->CreateTempDirs(PARENT_TEMP_DIR_PATTERN);
   }
   std::stringstream controlStream;
   controlStream << SIGNALCONSTANTS::READY;
@@ -112,8 +112,8 @@ void mitk::SegmentAnythingPythonService::StartAsyncProcess()
 
 void mitk::SegmentAnythingPythonService::TransferPointsToProcess(std::stringstream &triggerCSV)
 {
-  CheckStatus();
-  std::string triggerFilePath = m_InDir + IOUtil::GetDirectorySeparator() + m_TRIGGER_FILENAME;
+  this->CheckStatus();
+  std::string triggerFilePath = m_InDir + IOUtil::GetDirectorySeparator() + TRIGGER_FILENAME;
   std::ofstream csvfile;
   csvfile.open(triggerFilePath, std::ofstream::out | std::ofstream::trunc);
   csvfile << triggerCSV.rdbuf();
@@ -135,7 +135,7 @@ void mitk::SegmentAnythingPythonService::start_python_daemon()
   std::string command = "python";
   args.push_back("-u");
 
-  args.push_back("run_inference_daemon.py");
+  args.push_back(SAM_PYTHON_FILE_NAME);
   
   args.push_back("--input-folder");
   args.push_back(m_InDir);
@@ -144,7 +144,7 @@ void mitk::SegmentAnythingPythonService::start_python_daemon()
   args.push_back(m_OutDir);
 
   args.push_back("--trigger-file");
-  args.push_back(m_TRIGGER_FILENAME);
+  args.push_back(TRIGGER_FILENAME);
 
   args.push_back("--model-type");
   args.push_back(m_ModelType);

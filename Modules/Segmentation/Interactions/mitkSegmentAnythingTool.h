@@ -18,8 +18,6 @@ found in the LICENSE file.
 #include "mitkProcessExecutor.h"
 #include "mitkSegmentAnythingPythonService.h"
 #include <MitkSegmentationExports.h>
-#include <thread>
-#include <future>
 
 namespace us
 {
@@ -107,7 +105,7 @@ namespace mitk
     /*
      * @brief Add positive seed point action of StateMachine pattern
      */
-    virtual void OnAddPoint(StateMachineAction*, InteractionEvent *interactionEvent);
+    virtual void OnAddPositivePoint(StateMachineAction*, InteractionEvent *interactionEvent);
     
     /*
      * @brief Add negative seed point action of StateMachine pattern

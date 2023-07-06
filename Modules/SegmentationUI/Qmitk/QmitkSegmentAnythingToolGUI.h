@@ -68,7 +68,14 @@ protected:
    */
   void WriteErrorMessage(const QString&);
 
+  /**
+   * @brief Function to listen to tool class status emitters.
+   */
   void StatusMessageListener(const std::string&);
+
+  /**
+   * @brief Function to listen to preference emitters.
+   */
   void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent&);
 
   /**

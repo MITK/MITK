@@ -22,7 +22,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-
   /**
    * @brief Segment Anything Model Python process handler class.
    * 
@@ -122,12 +121,12 @@ namespace mitk
     std::string m_InDir, m_OutDir;
     std::string m_CurrentUId;
     int m_GpuId = 0;
-    const std::string m_PARENT_TEMP_DIR_PATTERN = "mitk-sam-XXXXXX";
-    const std::string m_TRIGGER_FILENAME = "trigger.csv";
+    const std::string PARENT_TEMP_DIR_PATTERN = "mitk-sam-XXXXXX";
+    const std::string TRIGGER_FILENAME = "trigger.csv";
+    const std::string SAM_PYTHON_FILE_NAME = "run_inference_daemon.py";
     std::future<void> m_Future;
     ProcessExecutor::Pointer m_DaemonExec;
   };
-
 
   struct SIGNALCONSTANTS
   {

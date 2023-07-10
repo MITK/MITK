@@ -438,7 +438,6 @@ void GenericDataFittingView::ConfigureInitialParametersOfParameterizer(mitk::Mod
   }
 }
 
-
 template <typename TParameterizer>
 void GenericDataFittingView::GenerateModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
     modelFitInfo, mitk::ParameterFitImageGeneratorBase::Pointer& generator)

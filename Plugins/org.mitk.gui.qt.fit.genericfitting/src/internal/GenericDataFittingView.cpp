@@ -90,14 +90,15 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
   m_Controls.initialValuesManager->setEnabled(false);
   m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
 
-  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)), this,
-          SLOT(UpdateGUIControls()));
+  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls.initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
+
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), this,
           SLOT(UpdateGUIControls()));
-
   connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)),
           m_Controls.initialValuesManager,
           SLOT(setEnabled(bool)));
+
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager,
           SLOT(setEnabled(bool)));
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager,
@@ -193,11 +194,6 @@ void GenericDataFittingView::OnModellSet(int index)
 
     m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
       m_selectedModelFactory->GetDefaultInitialParameterization());
-
-    if (this->m_modelConstraints.IsNull())
-    {
-      this->m_modelConstraints = mitk::SimpleBarrierConstraintChecker::New();
-    }
 
     m_Controls.constraintManager->setChecker(this->m_modelConstraints,
       this->m_selectedModelFactory->GetParameterNames());

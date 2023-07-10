@@ -20,6 +20,9 @@ found in the LICENSE file.
 #include <mitkGenericParamModelParameterizer.h>
 #include <mitkT2DecayModelFactory.h>
 #include <mitkT2DecayModelParameterizer.h>
+#include <mitkExponentialSaturationModel.h>
+#include <mitkExponentialSaturationModelFactory.h>
+#include <mitkExponentialSaturationModelParameterizer.h>
 
 #include <mitkValueBasedParameterizationDelegate.h>
 
@@ -260,6 +263,9 @@ void GenericDataFittingView::OnModellingButtonClicked()
     bool isT2DecayFactory = dynamic_cast<mitk::T2DecayModelFactory*>
       (m_selectedModelFactory.GetPointer()) != nullptr;
 
+    bool isExponentialSaturationFactory = dynamic_cast<mitk::ExponentialSaturationModelFactory*>
+      (m_selectedModelFactory.GetPointer()) != nullptr;
+
     if (isLinearFactory)
     {
       if (this->m_Controls.radioPixelBased->isChecked())
@@ -291,6 +297,17 @@ void GenericDataFittingView::OnModellingButtonClicked()
       else
       {
         GenerateModelFit_ROIBased<mitk::T2DecayModelParameterizer>(fitSession, generator);
+      }
+    }
+    else if (isExponentialSaturationFactory)
+    {
+      if (this->m_Controls.radioPixelBased->isChecked())
+      {
+        GenerateModelFit_PixelBased<mitk::ExponentialSaturationModelParameterizer>(fitSession, generator);
+      }
+      else
+      {
+        GenerateModelFit_ROIBased<mitk::ExponentialSaturationModelParameterizer>(fitSession, generator);
       }
     }
     //add other models with else if
@@ -570,6 +587,8 @@ GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
   factory = mitk::GenericParamModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
   factory = mitk::T2DecayModelFactory::New().GetPointer();
+  m_FactoryStack.push_back(factory);
+  factory = mitk::ExponentialSaturationModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
 
   this->m_IsNotABinaryImagePredicate = mitk::NodePredicateAnd::New(

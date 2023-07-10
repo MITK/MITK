@@ -20,10 +20,6 @@ found in the LICENSE file.
 #include <mitkGenericParamModelParameterizer.h>
 #include <mitkT2DecayModelFactory.h>
 #include <mitkT2DecayModelParameterizer.h>
-#include <mitkExponentialSaturationModel.h>
-#include <mitkExponentialSaturationModelFactory.h>
-#include <mitkExponentialSaturationModelParameterizer.h>
-
 
 #include <mitkValueBasedParameterizationDelegate.h>
 
@@ -92,6 +88,7 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
   m_Controls.checkBox_Constraints->setEnabled(false);
   m_Controls.constraintManager->setEnabled(false);
   m_Controls.initialValuesManager->setEnabled(false);
+  m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
 
   connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)), this,
           SLOT(UpdateGUIControls()));
@@ -189,6 +186,24 @@ void GenericDataFittingView::OnModellSet(int index)
     }
   }
 
+  if (m_selectedModelFactory)
+  {
+    this->m_modelConstraints = dynamic_cast<mitk::SimpleBarrierConstraintChecker*>
+      (m_selectedModelFactory->CreateDefaultConstraints().GetPointer());
+
+    m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
+      m_selectedModelFactory->GetDefaultInitialParameterization());
+
+    if (this->m_modelConstraints.IsNull())
+    {
+      this->m_modelConstraints = mitk::SimpleBarrierConstraintChecker::New();
+    }
+
+    m_Controls.constraintManager->setChecker(this->m_modelConstraints,
+      this->m_selectedModelFactory->GetParameterNames());
+
+  }
+
   UpdateGUIControls();
 }
 
@@ -249,9 +264,6 @@ void GenericDataFittingView::OnModellingButtonClicked()
     bool isT2DecayFactory = dynamic_cast<mitk::T2DecayModelFactory*>
       (m_selectedModelFactory.GetPointer()) != nullptr;
 
-    bool isExponentialSaturationFactory = dynamic_cast<mitk::ExponentialSaturationModelFactory*>
-                                          (m_selectedModelFactory.GetPointer()) != nullptr;
-
     if (isLinearFactory)
     {
       if (this->m_Controls.radioPixelBased->isChecked())
@@ -283,18 +295,6 @@ void GenericDataFittingView::OnModellingButtonClicked()
       else
       {
         GenerateModelFit_ROIBased<mitk::T2DecayModelParameterizer>(fitSession, generator);
-      }
-    }
-
-    else if (isExponentialSaturationFactory)
-    {
-      if (this->m_Controls.radioPixelBased->isChecked())
-      {
-        GenerateModelFit_PixelBased<mitk::ExponentialSaturationModelParameterizer>(fitSession, generator);
-      }
-      else
-      {
-        GenerateModelFit_ROIBased<mitk::ExponentialSaturationModelParameterizer>(fitSession, generator);
       }
     }
     //add other models with else if
@@ -404,6 +404,14 @@ bool GenericDataFittingView::CheckModelSettings() const
   {
     ok = false;
   }
+  if (this->m_Controls.radioButton_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
+  {
+    std::string warning = "Warning. Invalid start parameters. At least one parameter has an invalid image setting as source.";
+    MITK_ERROR << warning;
+    m_Controls.infoBox->append(QString("<font color='red'><b>") + QString::fromStdString(warning) + QString("</b></font>"));
+
+    ok = false;
+  };
 
   return ok;
 }
@@ -429,6 +437,7 @@ void GenericDataFittingView::ConfigureInitialParametersOfParameterizer(mitk::Mod
     genericParameterizer->SetFunctionString(m_Controls.editFormula->text().toStdString());
   }
 }
+
 
 template <typename TParameterizer>
 void GenericDataFittingView::GenerateModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
@@ -566,8 +575,6 @@ GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
   factory = mitk::GenericParamModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
   factory = mitk::T2DecayModelFactory::New().GetPointer();
-  m_FactoryStack.push_back(factory);
-  factory = mitk::ExponentialSaturationModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
 
   this->m_IsNotABinaryImagePredicate = mitk::NodePredicateAnd::New(

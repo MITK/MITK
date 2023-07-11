@@ -7,4 +7,5 @@ SET(MODULE_TESTS
   mitkCurveDescriptiveParametersTest.cpp
   mitkTwoStepLinearModelTest.cpp
   mitkThreeStepLinearModelTest.cpp
+  mitkOneTissueCompartmentModelTest.cpp
 )

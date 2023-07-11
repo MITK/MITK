@@ -8,4 +8,5 @@ SET(MODULE_TESTS
   mitkTwoStepLinearModelTest.cpp
   mitkThreeStepLinearModelTest.cpp
   mitkOneTissueCompartmentModelTest.cpp
+  mitkExtendedOneTissueCompartmentModelTest.cpp
 )

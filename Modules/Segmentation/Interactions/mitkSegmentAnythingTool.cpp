@@ -276,16 +276,9 @@ bool mitk::SegmentAnythingTool::IsImageAtTimeStepValid(const Image *inputAtTimeS
 std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()
 {
   mitk::Vector3D normal = this->GetWorkingPlaneGeometry()->GetNormal();
+  mitk::Point3D center = this->GetWorkingPlaneGeometry()->GetCenter();
   std::stringstream hashstream;
-  hashstream << normal[0] << normal[1] << normal[2];
-  mitk::Point3D point = m_PointSetPositive->GetPoint(0);
-  for (int i = 0; i < 3; ++i)
-  {
-    if (normal[i] != 0)
-    {
-      hashstream << point[i];
-    }
-  }
+  hashstream << normal[0] << normal[1] << normal[2] << center[0] << center[1] << center[2];
   size_t hashVal = std::hash<std::string>{}(hashstream.str());
   return std::to_string(hashVal);
 }

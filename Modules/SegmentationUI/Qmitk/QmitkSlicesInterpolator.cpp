@@ -428,11 +428,6 @@ void QmitkSlicesInterpolator::InitializeWindow(QmitkRenderWindow* window)
   deleteCommand->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnSliceNavigationControllerDeleted);
   m_ControllerToDeleteObserverTag[slicer] = slicer->AddObserver(itk::DeleteEvent(), deleteCommand);
 
-  itk::MemberCommand<QmitkSlicesInterpolator>::Pointer timeChangedCommand =
-    itk::MemberCommand<QmitkSlicesInterpolator>::New();
-  timeChangedCommand->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnTimeChanged);
-  m_ControllerToTimeObserverTag[slicer] = slicer->AddObserver(mitk::SliceNavigationController::TimeGeometryEvent(nullptr, 0), timeChangedCommand);
-
   itk::MemberCommand<QmitkSlicesInterpolator>::Pointer sliceChangedCommand =
     itk::MemberCommand<QmitkSlicesInterpolator>::New();
   sliceChangedCommand->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnSliceChanged);
@@ -634,6 +629,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       this->Show2DInterpolationControls(true);
       this->OnInterpolationActivated(true);
       this->On3DInterpolationActivated(false);
+      this->Show3DInterpolationResult(false);
       m_Interpolator->Activate2DInterpolation(true);
       break;
 
@@ -730,8 +726,6 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object *sender, const itk::Even
 
   m_TimePoint = timeNavigationController->GetSelectedTimePoint();
 
-  m_SurfaceInterpolator->SetCurrentTimePoint(m_TimePoint);
-
   if (m_Watcher.isRunning())
     m_Watcher.waitForFinished();
 
@@ -818,7 +812,7 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const mitk::Ti
   }
 
   mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetPlaneGeometry(m_LastSNC->GetStepper()->GetPos()));
-  if (nullptr != plane)
+  if (nullptr == plane)
   {
     return false;
   }
@@ -1290,7 +1284,6 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   m_DataStorage->Add(interpolatedSurfaceDataNode, segmentationDataNode);
 }
 
-
 void QmitkSlicesInterpolator::OnReinit3DInterpolation()
 {
   //  Step 1. Load from the isContourPlaneGeometry nodes the contourNodes.
@@ -1309,8 +1302,7 @@ void QmitkSlicesInterpolator::OnReinit3DInterpolation()
       {
         auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
         auto activeLayerID = labelSetImage->GetActiveLayer();
-        const auto timePoint = m_LastSNC->GetSelectedTimePoint();
-        if (!labelSetImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
+        if (!labelSetImage->GetTimeGeometry()->IsValidTimePoint(m_TimePoint))
         {
           MITK_ERROR << "Invalid time point requested for interpolation pipeline.";
           return;
@@ -1915,13 +1907,12 @@ void QmitkSlicesInterpolator::OnModifyLabelChanged(const itk::Object *caller,
     auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
     if (labelSetImage == tempImage)
     {
-      const auto timePoint = m_LastSNC->GetSelectedTimePoint();
-      if (!labelSetImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
+      if (!labelSetImage->GetTimeGeometry()->IsValidTimePoint(m_TimePoint))
       {
         MITK_ERROR << "Invalid time point requested for interpolation pipeline.";
         return;
       }
-      auto timeStep = labelSetImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+      auto timeStep = labelSetImage->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
 
       auto numLayersInCurrentSegmentation = m_SurfaceInterpolator->GetNumberOfLayersInCurrentSegmentation();
       //  This handles the add layer or remove layer operation.

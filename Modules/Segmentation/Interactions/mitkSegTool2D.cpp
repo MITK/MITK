@@ -487,7 +487,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const PlaneGeometry *planeGeom
   {
     return;
   }
-  unsigned int currentSlicePosition = m_LastEventSender->GetSliceNavigationController()->GetSlice()->GetPos();
+  unsigned int currentSlicePosition = m_LastEventSender->GetSliceNavigationController()->GetStepper()->GetPos();
   SliceInformation sliceInfo(segmentationResult, const_cast<mitk::PlaneGeometry *>(planeGeometry), timeStep);
   sliceInfo.slicePosition = currentSlicePosition;
   WriteBackSegmentationResults({ sliceInfo }, true);

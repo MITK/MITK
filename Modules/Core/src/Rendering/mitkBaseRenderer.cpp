@@ -242,6 +242,9 @@ mitk::BaseRenderer::~BaseRenderer()
     m_RenderWindow->Delete();
     m_RenderWindow = nullptr;
   }
+
+  auto* timeNavigationController = RenderingManager::GetInstance()->GetTimeNavigationController();
+  timeNavigationController->Disconnect(this);
 }
 
 void mitk::BaseRenderer::RemoveAllLocalStorages()

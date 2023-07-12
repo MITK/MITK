@@ -63,6 +63,7 @@ if(NOT DEFINED ITK_DIR)
      CMAKE_ARGS
        ${ep_common_args}
        ${additional_cmake_args}
+       -DITK_SKIP_PATH_LENGTH_CHECKS:BOOL=ON
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
        -DGDCM_DIR:PATH=${GDCM_DIR}

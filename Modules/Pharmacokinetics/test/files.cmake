@@ -9,4 +9,5 @@ SET(MODULE_TESTS
   mitkThreeStepLinearModelTest.cpp
   mitkOneTissueCompartmentModelTest.cpp
   mitkExtendedOneTissueCompartmentModelTest.cpp
+  mitkTwoTissueCompartmentModelTest.cpp
 )

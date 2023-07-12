@@ -278,7 +278,12 @@ std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()
   mitk::Vector3D normal = this->GetWorkingPlaneGeometry()->GetNormal();
   mitk::Point3D center = this->GetWorkingPlaneGeometry()->GetCenter();
   std::stringstream hashstream;
-  hashstream << normal[0] << normal[1] << normal[2] << center[0] << center[1] << center[2];
+  hashstream << std::setprecision(3) << std::fixed << normal[0]; //Consider only 3 digits after decimal 
+  hashstream << std::setprecision(3) << std::fixed << normal[1];
+  hashstream << std::setprecision(3) << std::fixed << normal[2];
+  hashstream << std::setprecision(3) << std::fixed << center[0];
+  hashstream << std::setprecision(3) << std::fixed << center[1];
+  hashstream << std::setprecision(3) << std::fixed << center[2];
   size_t hashVal = std::hash<std::string>{}(hashstream.str());
   return std::to_string(hashVal);
 }

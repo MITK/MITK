@@ -541,6 +541,7 @@ namespace mitk
         }
         if (segmentAttribute != nullptr)
         {
+          segmentAttribute->setSegmentLabel(segmentLabelProp->GetValueAsString());
           segmentAttribute->setSegmentDescription(segmentLabelProp->GetValueAsString());
           segmentAttribute->setSegmentAlgorithmType(algorithmTypeProp->GetValueAsString());
           segmentAttribute->setSegmentAlgorithmName("MITK Segmentation");

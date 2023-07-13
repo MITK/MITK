@@ -181,11 +181,8 @@ namespace mitk
 
         // Iterate over all labels. For each label a segmentation image will be created
         const LabelSet *labelSet = input->GetLabelSet(layer);
-        auto labelIter = labelSet->IteratorConstBegin();
-        // Ignore background label
-        ++labelIter;
 
-        for (; labelIter != labelSet->IteratorConstEnd(); ++labelIter)
+        for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
         {
           // Thresold over the image with the given label value
           itk::ThresholdImageFilter<itkInternalImageType>::Pointer thresholdFilter =
@@ -488,11 +485,8 @@ namespace mitk
     handler.setBodyPartExamined("");
 
     const LabelSet *labelSet = image->GetLabelSet(layer);
-    auto labelIter = labelSet->IteratorConstBegin();
-    // Ignore background label
-    ++labelIter;
 
-    for (; labelIter != labelSet->IteratorConstEnd(); ++labelIter)
+    for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
     {
       const Label *label = labelIter->second;
 

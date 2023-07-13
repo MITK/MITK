@@ -20,7 +20,6 @@ found in the LICENSE file.
 
 #include <QmitkRenderWindow.h>
 #include <QmitkStepperAdapter.h>
-#include <QmitkFFmpegWriter.h>
 
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"

@@ -50,6 +50,7 @@ set(CPP_FILES
   Controllers/mitkStatusBar.cpp
   Controllers/mitkStepper.cpp
   Controllers/mitkTestManager.cpp
+  Controllers/mitkTimeNavigationController.cpp
   Controllers/mitkUndoController.cpp
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkLayerController.cpp

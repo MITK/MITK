@@ -16,7 +16,9 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 
 #include <mitkMorphologicalOperations.h>
-#include <QmitkSegmentationUtilityWidget.h>
+#include <mitkRenderingManager.h>
+
+#include <QWidget>
 
 namespace Ui
 {
@@ -31,14 +33,12 @@ namespace mitk
 
 /** \brief GUI class for morphological segmentation tools.
  */
-class MITKSEGMENTATIONUI_EXPORT QmitkMorphologicalOperationsWidget : public QmitkSegmentationUtilityWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkMorphologicalOperationsWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage,
-                                              mitk::SliceNavigationController* timeNavigationController,
-                                              QWidget* parent = nullptr);
+  explicit QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
   ~QmitkMorphologicalOperationsWidget() override;
 
 public slots:

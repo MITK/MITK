@@ -18,8 +18,8 @@ found in the LICENSE file.
 #include <vtkPNGWriter.h>
 #include <vtkRenderLargeImage.h>
 
-#include "QmitkRenderWindow.h"
-#include "QmitkStepperAdapter.h"
+#include <QmitkRenderWindow.h>
+#include <QmitkStepperAdapter.h>
 
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
@@ -75,10 +75,9 @@ void QmitkSimpleExampleView::RenderWindowPartActivated(mitk::IRenderWindowPart *
   }
 
   RenderWindowSelected(m_Controls->renderWindowComboBox->currentText());
-  m_TimeStepper.reset(new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget,
-                                              renderWindowPart->GetTimeNavigationController()->GetTime()));
-  m_MovieStepper.reset(new QmitkStepperAdapter(m_Controls->movieNavigatorTime,
-                                               renderWindowPart->GetTimeNavigationController()->GetTime()));
+  auto* timeController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+  m_TimeStepper.reset(new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget, timeController->GetStepper()));
+  m_MovieStepper.reset(new QmitkStepperAdapter(m_Controls->movieNavigatorTime, timeController->GetStepper()));
 
   m_Parent->setEnabled(true);
 }
@@ -271,6 +270,6 @@ void QmitkSimpleExampleView::RenderWindowSelected(const QString &id)
   if (!id.isEmpty())
   {
     m_SliceStepper.reset(new QmitkStepperAdapter(m_Controls->sliceNavigationWidget,
-      this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow(id)->GetSliceNavigationController()->GetSlice()));
+      this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow(id)->GetSliceNavigationController()->GetStepper()));
   }
 }

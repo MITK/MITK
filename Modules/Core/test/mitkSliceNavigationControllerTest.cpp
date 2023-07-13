@@ -27,7 +27,6 @@ class mitkSliceNavigationControllerTestSuite : public mitk::TestFixture
   CPPUNIT_TEST(validateAxialViewDirection);
   CPPUNIT_TEST(validateCoronalViewDirection);
   CPPUNIT_TEST(validateSagittalViewDirection);
-  CPPUNIT_TEST(GetSelectedTimePoint);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::Geometry3D::Pointer m_Geometry3D;
@@ -143,24 +142,6 @@ public:
 
     std::cout << "Sagittal view direction" << std::endl;
     CPPUNIT_ASSERT(this->validateGeometry(sliceNavigationController->GetCurrentGeometry3D(), origin, firstAxisVector, secondAxisVector, thirdAxisVector));
-  }
-
-  void GetSelectedTimePoint()
-  {
-    auto sliceNavigationController = mitk::SliceNavigationController::New();
-
-    CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimePoint() == 0.);
-
-    sliceNavigationController->SetInputWorldTimeGeometry(m_TimeGeometry);
-    sliceNavigationController->SetViewDirection(mitk::AnatomicalPlane::Sagittal);
-    sliceNavigationController->Update();
-
-    CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimeStep() == 0);
-    CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimePoint() == 0.5);
-
-    sliceNavigationController->GetTime()->SetPos(2);
-    CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimeStep() == 2);
-    CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimePoint() == 30.0);
   }
 
 private:

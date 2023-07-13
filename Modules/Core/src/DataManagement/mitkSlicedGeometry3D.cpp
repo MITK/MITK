@@ -375,7 +375,7 @@ void mitk::SlicedGeometry3D::ReinitializePlanes(const Point3D &center, const Poi
   }
 
   // Reinitialize SNC with new number of slices
-  m_SliceNavigationController->GetSlice()->SetSteps(m_Slices);
+  m_SliceNavigationController->GetStepper()->SetSteps(m_Slices);
 
   this->Modified();
 }
@@ -904,7 +904,7 @@ void mitk::SlicedGeometry3D::ExecuteOperation(Operation *operation)
             m_PlaneGeometries[0] = planeGeometry;
           }
 
-          m_SliceNavigationController->GetSlice()->SetSteps(m_Slices);
+          m_SliceNavigationController->GetStepper()->SetSteps(m_Slices);
 
           this->Modified();
 
@@ -912,7 +912,7 @@ void mitk::SlicedGeometry3D::ExecuteOperation(Operation *operation)
 
           if (m_SliceNavigationController)
           {
-            m_SliceNavigationController->GetSlice()->SetPos(restorePlaneOp->GetPos());
+            m_SliceNavigationController->GetStepper()->SetPos(restorePlaneOp->GetPos());
             m_SliceNavigationController->AdjustSliceStepperRange();
           }
           BaseGeometry::ExecuteOperation(restorePlaneOp);

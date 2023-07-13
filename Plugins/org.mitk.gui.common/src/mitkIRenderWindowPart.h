@@ -29,7 +29,7 @@ class QmitkRenderWindow;
 namespace mitk {
 
 struct IRenderingManager;
-class SliceNavigationController;
+class TimeNavigationController;
 
 /**
  * \ingroup org_mitk_gui_common
@@ -149,12 +149,12 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
   virtual bool HasCoupledRenderWindows() const = 0;
 
   /**
-   * Get the SliceNavigationController for controlling time positions.
+   * Get the TimeNavigationController for controlling time positions.
    *
-   * \return A SliceNavigationController if the render window supports this
+   * \return A TimeNavigationController if the render window supports this
    *         operation; otherwise returns <code>nullptr</code>.
    */
-  virtual mitk::SliceNavigationController* GetTimeNavigationController() const = 0;
+  virtual mitk::TimeNavigationController* GetTimeNavigationController() const = 0;
 
   /**
    * Get the selected position in the render window with id <code>id</code>

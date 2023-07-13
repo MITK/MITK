@@ -17,7 +17,8 @@ found in the LICENSE file.
 
 #include <mitkDataStorage.h>
 #include <mitkSurface.h>
-#include <QmitkSegmentationUtilityWidget.h>
+
+#include <QWidget>
 
 namespace Ui
 {
@@ -26,7 +27,6 @@ namespace Ui
 
 namespace mitk
 {
-  class DataStorage;
   class Image;
 }
 
@@ -38,16 +38,14 @@ namespace mitk
   image mask must be of the same size. Masking with a surface creates first a
   binary image of the surface and then use this for the masking of the input image.
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkImageMaskingWidget : public QmitkSegmentationUtilityWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkImageMaskingWidget : public QWidget
 {
   Q_OBJECT
 
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkImageMaskingWidget(mitk::DataStorage* dataStorage,
-                                   mitk::SliceNavigationController* timeNavigationController,
-                                   QWidget* parent = nullptr);
+  explicit QmitkImageMaskingWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
   ~QmitkImageMaskingWidget() override;

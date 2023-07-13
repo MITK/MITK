@@ -96,6 +96,7 @@ class MITK_QT_COMMON QmitkSliceNavigationListener : public QObject
 
     /**	@brief Calls OnSliceChangedDelayed so the event isn't triggered multiple times. */
     void OnSliceChangedInternal(const itk::EventObject& e);
+    void OnTimeChangedInternal(itk::Object* sender, const itk::EventObject& e);
 
     void OnSliceNavigationControllerDeleted(const itk::Object* sender, const itk::EventObject& /*e*/);
 
@@ -127,6 +128,7 @@ class MITK_QT_COMMON QmitkSliceNavigationListener : public QObject
 
     typedef std::multimap<const mitk::SliceNavigationController*, ObserverInfo> ObserverMapType;
     ObserverMapType m_ObserverMap;
+    unsigned int m_ControllerToTimeObserverTag;
 
     mitk::Point3D m_CurrentSelectedPosition;
     mitk::TimePointType m_CurrentSelectedTimePoint;

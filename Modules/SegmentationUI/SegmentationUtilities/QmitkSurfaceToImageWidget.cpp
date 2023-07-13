@@ -27,10 +27,8 @@ found in the LICENSE file.
 
 static const char* const HelpText = "Select an image and a surface above";
 
-QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::DataStorage* dataStorage,
-                                                     mitk::SliceNavigationController* timeNavigationController,
-                                                     QWidget* parent)
-  : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
+QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::DataStorage* dataStorage, QWidget* parent)
+  : QWidget(parent)
 {
   m_Controls = new Ui::QmitkSurfaceToImageWidgetControls;
   m_Controls->setupUi(this);

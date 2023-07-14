@@ -261,7 +261,6 @@ The tool handling is the same like the Lasso tool (see for more info), except it
 \subsection org_mitk_views_segmentationinterpolation 2D and 3D Interpolation
 
 Creating segmentations using 2D manual contouring for large image volumes may be very time-consuming, because structures of interest may cover a large range of slices.
-Note: Interpolation is currently disabled for segmentations containing more than one label.
 The segmentation view offers two helpful features to mitigate this drawback:
 
 <ul>

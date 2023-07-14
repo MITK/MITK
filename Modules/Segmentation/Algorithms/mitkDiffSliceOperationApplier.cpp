@@ -37,7 +37,7 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation(Operation *operation)
   if (!imageOperation)
     return;
 
-  // chak if the operation is valid
+  // check if the operation is valid
   if (imageOperation->IsValid())
   {
     // the actual overwrite filter (vtk)

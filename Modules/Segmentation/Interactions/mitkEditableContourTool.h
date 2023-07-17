@@ -82,6 +82,9 @@ namespace mitk
     /// \brief Finish EditableContour tool.
     virtual void OnFinish(StateMachineAction *, InteractionEvent *interactionEvent);
 
+    /// \brief Check if the event happened on the current plane.
+    virtual bool OnCheckPlane(const InteractionEvent* interactionEvent);
+
     /// \brief Finish contour interaction.
     virtual void FinishTool() = 0;
 

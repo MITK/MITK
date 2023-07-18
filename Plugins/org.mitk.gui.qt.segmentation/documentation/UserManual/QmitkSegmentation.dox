@@ -264,24 +264,24 @@ The tool handling is the same like the Lasso tool (see for more info), except it
 
 \imageMacro{QmitkSegmentation_SAMTool.png,"Segment Anything tool",10.00}
 
-The Segment Anything Tool is an deep learning-based interactive segmentation tool. Originally created by MetaAI, MITK presents this model for medical image segmentation tasks.
-The tool assumes that you have Python 3 installed and available on your machine. Goto Preferences (Cntl+P)>Segment Anything to install Segment Anything model via MITK. The installation action implicitly creates a python virtual environment in an MITK mainitained
-directory. Note: on Debian/Ubuntu systems, you need to install git, python3-pip, python3-venv package using the following command: `apt install git python3-pip python3-venv`. For best experience, your machine should be ideally equipped with a CUDA-enabled GPU. 
-For a detailed explanation to what this algorithm entails, please refer to https://ai.facebook.com/research/publications/segment-anything/ <br>
+The Segment Anything Tool is a deep learning-based interactive segmentation tool. Originally created by MetaAI, MITK presents this model for medical image segmentation tasks.
+The tool requires that you have Python 3 installed and available on your machine. Note: On Debian/Ubuntu systems, you need to install git, python3-pip, python3-venv package using the following command: `apt install git python3-pip python3-venv`. For best experience, your machine should be ideally equipped with a CUDA-enabled GPU. 
+For a detailed explanation of what this algorithm is able to, please refer to https://ai.facebook.com/research/publications/segment-anything/ <br>
 
 \subsubsection org_mitk_views_segmentationSegmentAnythingWorkflow Workflow:
-    -# Install Segment Anything: Goto Preferences (Cntl+P)>Segment Anything and click "Install Segment Anything" to install Segment Anything (version: 1.0) in a virtual environment using the Python located in "System Python". Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    -# Install Segment Anything: Goto Preferences (Cntl+P) > Segment Anything and click "Install Segment Anything" to install Segment Anything (version: 1.0). 
+    The installation process implicitly creates a python virtual environment using the Python located in "System Python" in an MITK mainitained directory. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
     Once installed, the "Install Segment Anything" button is grayed out.
     \imageMacro{QmitkSegmentation_SAMTool_Preferences.png,"Segment Anything Preferences",10.00}
 
     -# Note: If Python is not listed by MITK in "System Python", click "Select..." in the dropdown to choose an unlisted installation of Python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".
     No need to navigate all the way into "../usr/bin/python3", for example.
-    -# Select a specific model type in the "Model Type" dropdown. The default is "vit_b" for low memory footprint. 
+    -# Select a specific model type in the "Model Type" dropdown. The default is "vit_b" for low memory footprint. However, more larger models "vit_l" and "vit_h" are also available for selection.
     -# Select inference hardware, i.e. any GPU or CPU.
-    -# Click "Ok" to save the Preferences.
+    -# Click "Ok" to save the preference settings.
     -# Goto Segmentation View > 2D tools > Segment Anything.
-    -# Click "Initialize Segment Anything" to start the tool backend. This will invoke downloading of the select model type from the internet. This might take a while. It is a one time job, though.
-    -# Once the tool is initialized, Press SHIFT+Left Click on any of the 3 render windows to start click guided segmentation.
+    -# Click "Initialize Segment Anything" to start the tool backend. This will invoke downloading of the selected model type from the internet. This might take a while. It is a one time job, though.
+    -# Once the tool is initialized, Press SHIFT+Left Click on any of the 3 render windows to start click guided segmentation on that slice.
     -# Press SHIFT+Right Click for negative clicks to adjust the preview mask on the render window.
 
 \subsection org_mitk_views_segmentationinterpolation 2D and 3D Interpolation

@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <chrono>
 #include <thread>
 #include <filesystem>
+#include <itkImageFileWriter.h>
+#include "mitkImageAccessByItk.h"
 
 using namespace std::chrono_literals;
 
@@ -218,6 +220,25 @@ mitk::LabelSetImage::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFr
 void mitk::SegmentAnythingPythonService::TransferImageToProcess(const Image *inputAtTimeStep, std::string &UId)
 {
   std::string inputImagePath = m_InDir + IOUtil::GetDirectorySeparator() + UId + ".nrrd";
-  IOUtil::Save(inputAtTimeStep, inputImagePath);
+  AccessByItk_n(inputAtTimeStep, ITKWriter, (inputImagePath));
   m_CurrentUId = UId;
+}
+
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::SegmentAnythingPythonService::ITKWriter(const itk::Image<TPixel, VImageDimension> *image, std::string outputFilename)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::ImageFileWriter<ImageType> WriterType;
+  typename auto writer = WriterType::New();
+  writer->SetFileName(outputFilename);
+  writer->SetInput(image);
+  try
+  {
+    writer->Update();
+  }
+  catch (const itk::ExceptionObject &error)
+  {
+    MITK_ERROR << "Error: " << error << std::endl;
+    mitkThrow() << "Error: " << error;
+  }
 }

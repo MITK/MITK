@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <future>
 #include <mitkImage.h>
 #include <mitkLabelSetImage.h>
+#include <itkImage.h>
 
 namespace mitk
 {
@@ -113,6 +114,14 @@ namespace mitk
      * 
      */
     void CreateTempDirs(const std::string&);
+
+    /**
+     * @brief ITK-based file writer for dumping inputs into python daemon
+     *
+     */
+    template <typename TPixel, unsigned int VImageDimension>
+    void ITKWriter(const itk::Image<TPixel, VImageDimension> *inputImage, std::string filePath);
+
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;

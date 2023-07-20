@@ -120,7 +120,7 @@ namespace mitk
      *
      */
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKWriter(const itk::Image<TPixel, VImageDimension> *inputImage, std::string filePath);
+    void ITKWriter(const itk::Image<TPixel, VImageDimension> *image, std::string& outputFilename);
 
 
     std::string m_MitkTempDir;

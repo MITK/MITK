@@ -179,7 +179,7 @@ namespace mitk
      *
      */
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKWindowing(const itk::Image<TPixel, VImageDimension>*, Image*, ScalarType, ScalarType);
+    void ITKWindowing(const itk::Image<TPixel, VImageDimension>*, mitk::Image*, ScalarType, ScalarType);
 
   private:
     /**

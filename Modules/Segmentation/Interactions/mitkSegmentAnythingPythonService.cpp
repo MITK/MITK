@@ -225,11 +225,11 @@ void mitk::SegmentAnythingPythonService::TransferImageToProcess(const Image *inp
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::SegmentAnythingPythonService::ITKWriter(const itk::Image<TPixel, VImageDimension> *image, std::string outputFilename)
+void mitk::SegmentAnythingPythonService::ITKWriter(const itk::Image<TPixel, VImageDimension> *image, std::string& outputFilename)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::ImageFileWriter<ImageType> WriterType;
-  typename auto writer = WriterType::New();
+  typename WriterType::Pointer writer = WriterType::New();
   writer->SetFileName(outputFilename);
   writer->SetInput(image);
   try

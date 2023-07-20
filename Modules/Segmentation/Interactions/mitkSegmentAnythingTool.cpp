@@ -12,18 +12,22 @@ found in the LICENSE file.
 
 #include "mitkSegmentAnythingTool.h"
 
+#include <chrono>
+#include <thread>
+#include <iomanip>
 #include "mitkInteractionPositionEvent.h"
 #include "mitkPointSetShapeProperty.h"
 #include "mitkProperties.h"
 #include "mitkToolManager.h"
+#include <mitkSegTool2D.h>
 // us
-#include "mitkSegTool2D.h"
-#include <chrono>
-#include <thread>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleResource.h>
+
+#include <itkIntensityWindowingImageFilter.h>
+#include "mitkImageAccessByItk.h"
 
 using namespace std::chrono_literals;
 
@@ -226,21 +230,47 @@ void mitk::SegmentAnythingTool::ConfirmCleanUp()
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::SegmentAnythingTool::ITKWindowing(const itk::Image<TPixel, VImageDimension> *inputImage,
+                                             Image *mitkImage,
+                                             ScalarType min,
+                                             ScalarType max)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::IntensityWindowingImageFilter<ImageType, ImageType> IntensityFilterType;
+  typename IntensityFilterType::Pointer filter = IntensityFilterType::New();
+  filter->SetInput(inputImage);
+  filter->SetWindowMinimum(min);
+  filter->SetWindowMaximum(max);
+  filter->SetOutputMinimum(min);
+  filter->SetOutputMaximum(max);
+  filter->Update();
+  mitkImage->SetVolume((void *)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()));
+}
+
 void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                 const Image * /*oldSegAtTimeStep*/,
                                                 LabelSetImage *previewImage,
                                                 TimeStepType timeStep)
-{
+{ 
   if (nullptr != previewImage && m_PointSetPositive.IsNotNull())
   {
     if (this->HasPicks() && nullptr != m_PythonService && this->IsImageAtTimeStepValid(inputAtTimeStep))
     {
-      std::string uniquePlaneID = GetHashForCurrentPlane();
+      mitk::LevelWindow levelWindow;
+      this->GetToolManager()->GetReferenceData(0)->GetLevelWindow(levelWindow);
+      std::string uniquePlaneID = GetHashForCurrentPlane(levelWindow);
+      m_ProgressCommand->SetProgress(20);
       try
       {
+        auto filteredImage = mitk::Image::New();
+        filteredImage->Initialize(inputAtTimeStep);
+        AccessByItk_n(inputAtTimeStep, ITKWindowing, // apply level window filter
+                      (filteredImage, levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound()));
+        m_ProgressCommand->SetProgress(50);
         this->EmitSAMStatusMessageEvent("Prompting Segment Anything Model...");
-        m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID);
-        auto csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
+        m_PythonService->TransferImageToProcess(filteredImage, uniquePlaneID);
+        auto csvStream = this->GetPointsAsCSVString(filteredImage->GetGeometry());
         m_ProgressCommand->SetProgress(100);
         m_PythonService->TransferPointsToProcess(csvStream);
         m_ProgressCommand->SetProgress(150);
@@ -273,7 +303,7 @@ bool mitk::SegmentAnythingTool::IsImageAtTimeStepValid(const Image *inputAtTimeS
   return (isValidDim0 || isValidDim1) && (isValidDim1 || isValidDim2) && (isValidDim0 || isValidDim2);
 }
 
-std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()
+std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane(mitk::LevelWindow &levelWindow)
 {
   mitk::Vector3D normal = this->GetWorkingPlaneGeometry()->GetNormal();
   mitk::Point3D center = this->GetWorkingPlaneGeometry()->GetCenter();
@@ -284,6 +314,8 @@ std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane()
   hashstream << std::setprecision(3) << std::fixed << center[0];
   hashstream << std::setprecision(3) << std::fixed << center[1];
   hashstream << std::setprecision(3) << std::fixed << center[2];
+  hashstream << levelWindow.GetLowerWindowBound();
+  hashstream << levelWindow.GetUpperWindowBound();
   size_t hashVal = std::hash<std::string>{}(hashstream.str());
   return std::to_string(hashVal);
 }

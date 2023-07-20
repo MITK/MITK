@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include "mitkProcessExecutor.h"
 #include "mitkSegmentAnythingPythonService.h"
 #include <MitkSegmentationExports.h>
+#include <itkImage.h>
+#include <mitkLevelWindow.h>
 
 namespace us
 {
@@ -158,7 +160,7 @@ namespace mitk
      * 
      * @return std::string 
      */
-    std::string GetHashForCurrentPlane();
+    std::string GetHashForCurrentPlane(mitk::LevelWindow&);
 
     /**
      * @brief Emits message to connected Listnerers.
@@ -171,6 +173,13 @@ namespace mitk
      * 
      */
     void ConfirmCleanUp() override;
+
+    /**
+     * @brief Applies ITK IntensityWindowing Filter to input image;
+     *
+     */
+    template <typename TPixel, unsigned int VImageDimension>
+    void ITKWindowing(const itk::Image<TPixel, VImageDimension>*, Image*, ScalarType, ScalarType);
 
   private:
     /**

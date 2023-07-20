@@ -176,7 +176,7 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     tool->SetModelType(modelType.toStdString());
     tool->SetCheckpointPath(m_Preferences->Get("sam parent path", ""));
     this->WriteStatusMessage(
-      QString("<b>STATUS: </b><i>Activating Segment Anything Model... The selected model type will be downloaded. This might take a while.</i>"));
+      QString("<b>STATUS: </b><i>Initializing Segment Anything Model...</i>"));
     tool->SAMStatusMessageEvent += mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI,const std::string&>(
       this, &QmitkSegmentAnythingToolGUI::StatusMessageListener);
     if (this->ActivateSAMDaemon())

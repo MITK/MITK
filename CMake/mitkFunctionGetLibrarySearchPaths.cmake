@@ -84,18 +84,6 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     # to be included several times via find_pakcage calls.
     set(HDF5_LIBRARIES ${HDF5_LIBRARIES} PARENT_SCOPE)
   endif()
-  if(MITK_USE_Vigra)
-    # we cannot use _find_package(Vigra) here because the vigra-config.cmake file
-    # always includes the target-exports files without using an include guard. This
-    # would lead to errors when another find_package(Vigra) call is processed. The
-    # (bad) assumption here is that for the time being, only the Classification module
-    # is using Vigra.
-    if(UNIX)
-      list(APPEND _additional_paths ${Vigra_DIR}/lib)
-    else()
-      list(APPEND _additional_paths ${Vigra_DIR}/bin)
-    endif()
-  endif()
 
   if(_additional_paths)
     list(APPEND _dir_candidates ${_additional_paths})

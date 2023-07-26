@@ -8,7 +8,6 @@ mitkFunctionAddExternalProject(NAME ANN ON ADVANCED DOC "Use Approximate Nearest
 mitkFunctionAddExternalProject(NAME CppUnit ON ADVANCED DOC "Use CppUnit for unit tests")
 mitkFunctionAddExternalProject(NAME HDF5 ON ADVANCED)
 mitkFunctionAddExternalProject(NAME OpenCV OFF)
-mitkFunctionAddExternalProject(NAME Vigra OFF DEPENDS HDF5)
 mitkFunctionAddExternalProject(NAME ITK ON NO_CACHE DEPENDS HDF5)
 mitkFunctionAddExternalProject(NAME VTK ON NO_CACHE)
 mitkFunctionAddExternalProject(NAME Boost ON NO_CACHE)

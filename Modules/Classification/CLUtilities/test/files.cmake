@@ -13,6 +13,4 @@ set(MODULE_TESTS
   mitkGIFNeighbouringGreyLevelDependenceFeatureTest.cpp
   mitkGIFVolumetricDensityStatisticsTest.cpp
   mitkGIFVolumetricStatisticsTest.cpp
-  #mitkSmoothedClassProbabilitesTest.cpp
-  #mitkGlobalFeaturesTest.cpp
 )

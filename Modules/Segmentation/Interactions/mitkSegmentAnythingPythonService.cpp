@@ -220,7 +220,14 @@ mitk::LabelSetImage::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFr
 void mitk::SegmentAnythingPythonService::TransferImageToProcess(const Image *inputAtTimeStep, std::string &UId)
 {
   std::string inputImagePath = m_InDir + IOUtil::GetDirectorySeparator() + UId + ".nrrd";
-  AccessByItk_n(inputAtTimeStep, ITKWriter, (inputImagePath));
+  if (inputAtTimeStep->GetPixelType().GetNumberOfComponents() < 2)
+  {
+    AccessByItk_n(inputAtTimeStep, ITKWriter, (inputImagePath));
+  }
+  else
+  {
+    mitk::IOUtil::Save(inputAtTimeStep, inputImagePath);
+  }
   m_CurrentUId = UId;
 }
 

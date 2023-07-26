@@ -252,10 +252,10 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                 const Image * /*oldSegAtTimeStep*/,
                                                 LabelSetImage *previewImage,
                                                 TimeStepType timeStep)
-{ 
+{
   if (nullptr != previewImage && m_PointSetPositive.IsNotNull())
   {
-    if (this->HasPicks() && nullptr != m_PythonService && this->IsImageAtTimeStepValid(inputAtTimeStep))
+    if (this->HasPicks() && nullptr != m_PythonService)
     {
       mitk::LevelWindow levelWindow;
       this->GetToolManager()->GetReferenceData(0)->GetLevelWindow(levelWindow);
@@ -264,9 +264,16 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
       try
       {
         auto filteredImage = mitk::Image::New();
-        filteredImage->Initialize(inputAtTimeStep);
-        AccessByItk_n(inputAtTimeStep, ITKWindowing, // apply level window filter
-                      (filteredImage, levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound()));
+        if (inputAtTimeStep->GetPixelType().GetNumberOfComponents() < 2)
+        {
+          filteredImage->Initialize(inputAtTimeStep);
+          AccessByItk_n(inputAtTimeStep, ITKWindowing, // apply level window filter
+                        (filteredImage, levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound()));
+        }
+        else
+        {
+          filteredImage = const_cast<Image*>(inputAtTimeStep);
+        }
         m_ProgressCommand->SetProgress(50);
         this->EmitSAMStatusMessageEvent("Prompting Segment Anything Model...");
         m_PythonService->TransferImageToProcess(filteredImage, uniquePlaneID);
@@ -293,14 +300,6 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
       RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     }
   }
-}
-
-bool mitk::SegmentAnythingTool::IsImageAtTimeStepValid(const Image *inputAtTimeStep)
-{
-  bool isValidDim0 = (inputAtTimeStep->GetDimension(0) > 1);
-  bool isValidDim1 = (inputAtTimeStep->GetDimension(1) > 1);
-  bool isValidDim2 = (inputAtTimeStep->GetDimension(2) > 1);
-  return (isValidDim0 || isValidDim1) && (isValidDim1 || isValidDim2) && (isValidDim0 || isValidDim2);
 }
 
 std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane(mitk::LevelWindow &levelWindow)

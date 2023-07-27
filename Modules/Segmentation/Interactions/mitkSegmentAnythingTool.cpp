@@ -263,21 +263,23 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
       m_ProgressCommand->SetProgress(20);
       try
       {
-        auto filteredImage = mitk::Image::New();
+        std::stringstream csvStream;
+        this->EmitSAMStatusMessageEvent("Prompting Segment Anything Model...");
+        m_ProgressCommand->SetProgress(50);
         if (inputAtTimeStep->GetPixelType().GetNumberOfComponents() < 2)
         {
+          auto filteredImage = mitk::Image::New();
           filteredImage->Initialize(inputAtTimeStep);
           AccessByItk_n(inputAtTimeStep, ITKWindowing, // apply level window filter
                         (filteredImage, levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound()));
+          m_PythonService->TransferImageToProcess(filteredImage, uniquePlaneID);
+          csvStream = this->GetPointsAsCSVString(filteredImage->GetGeometry());
         }
         else
         {
-          filteredImage = const_cast<Image*>(inputAtTimeStep);
+          m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID);
+          csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
         }
-        m_ProgressCommand->SetProgress(50);
-        this->EmitSAMStatusMessageEvent("Prompting Segment Anything Model...");
-        m_PythonService->TransferImageToProcess(filteredImage, uniquePlaneID);
-        auto csvStream = this->GetPointsAsCSVString(filteredImage->GetGeometry());
         m_ProgressCommand->SetProgress(100);
         m_PythonService->TransferPointsToProcess(csvStream);
         m_ProgressCommand->SetProgress(150);

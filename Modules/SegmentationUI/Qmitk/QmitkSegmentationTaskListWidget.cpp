@@ -29,8 +29,6 @@ found in the LICENSE file.
 #include <QmitkStaticDynamicSegmentationDialog.h>
 #include <QmitkStyleManager.h>
 
-#include <QmitkStyleManager.h>
-
 #include <ui_QmitkSegmentationTaskListWidget.h>
 
 #include <QFileSystemWatcher>

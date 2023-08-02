@@ -7,4 +7,5 @@ mitk_create_module(
   TARGET_DEPENDS PRIVATE GrowCut
 )
 
+add_subdirectory(cmdapps)
 add_subdirectory(Testing)

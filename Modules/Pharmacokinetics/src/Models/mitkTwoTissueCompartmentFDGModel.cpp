@@ -108,11 +108,10 @@ mitk::TwoTissueCompartmentFDGModel::ComputeModelfunction(const ParametersType& p
 
 
   double lambda = k2+k3;
-  //double lambda2 = -alpha2;
+
   mitk::ModelBase::ModelResultType exp = mitk::convoluteAIFWithExponential(this->m_TimeGrid,
                                           aterialInputFunction, lambda);
   mitk::ModelBase::ModelResultType CA = mitk::convoluteAIFWithConstant(this->m_TimeGrid, aterialInputFunction, k3);
-
 
   //Signal that will be returned by ComputeModelFunction
   mitk::ModelBase::ModelResultType signal(timeSteps);

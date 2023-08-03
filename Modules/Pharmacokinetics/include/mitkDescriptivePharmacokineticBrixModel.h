@@ -104,10 +104,10 @@ namespace mitk
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
     void SetStaticParameter(const ParameterNameType& name,
-                                    const StaticParameterValuesType& values) override;
+      const StaticParameterValuesType& values) override;
+
     StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const
     override;
-
 
     void PrintSelf(std::ostream& os, ::itk::Indent indent) const override;
 

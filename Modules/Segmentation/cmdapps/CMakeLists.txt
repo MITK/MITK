@@ -2,7 +2,7 @@ option(BUILD_SegmentationCmdApps "Build command-line apps of the MitkSegmentatio
 
 if(BUILD_SegmentationCmdApps OR MITK_BUILD_ALL_APPS)
   mitkFunctionCreateCommandLineApp(
-    NAME ContourModelSetToImage
+    NAME ContoursToImage
     DEPENDS MitkSegmentation
   )
 endif()

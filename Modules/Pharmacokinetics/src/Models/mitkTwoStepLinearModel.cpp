@@ -86,9 +86,7 @@ mitk::TwoStepLinearModel::GetNumberOfDerivedParameters() const
 
 double mitk::TwoStepLinearModel::ComputeSignalFromParameters(double x, double t, double a1, double a2, double b1, double b2)
 {
-  double signal = 0.0;
-  (x < t) ? signal = a1 * x + b1 : signal = a2 * x + b2;
-  return signal;
+  return (x < t) ? (a1 * x + b1) : (a2 * x + b2);
 };
 
 

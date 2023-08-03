@@ -78,7 +78,7 @@ void CreateParentDirectories(const std::filesystem::path& path)
   }
 }
 
-bool TransferName(const mitk::IPropertyProvider* propertyProvider, mitk::Label* label)
+bool SetLabelName(const mitk::IPropertyProvider* propertyProvider, mitk::Label* label)
 {
   if (propertyProvider != nullptr)
   {
@@ -98,7 +98,7 @@ bool TransferName(const mitk::IPropertyProvider* propertyProvider, mitk::Label* 
   return false;
 }
 
-bool TransferColor(const mitk::IPropertyProvider* propertyProvider, mitk::Label* label)
+bool SetLabelColor(const mitk::IPropertyProvider* propertyProvider, mitk::Label* label)
 {
   if (propertyProvider != nullptr)
   {
@@ -267,8 +267,8 @@ int main(int argc, char* argv[])
         auto label = mitk::LabelSetImageHelper::CreateNewLabel(labelSetImage);
         label->SetValue(labelValue);
 
-        if (TransferName(input, label))
-          TransferColor(input, label);
+        SetLabelName(input, label);
+        SetLabelColor(input, label);
 
         if (format == OutputFormat::Multilabel)
           MITK_INFO << "Creating label: " << label->GetName() << " [" << labelValue << ']';

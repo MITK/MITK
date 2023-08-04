@@ -256,13 +256,13 @@ int main(int argc, char* argv[])
         {
           labelSetImage = mitk::LabelSetImage::New();
           labelSetImage->Initialize(image);
+
+          CopyImageToActiveLayerImage(image, labelSetImage);
         }
         else
         {
-          labelSetImage->AddLayer();
+          labelSetImage->AddLayer(image);
         }
-
-        CopyImageToActiveLayerImage(image, labelSetImage);
 
         auto label = mitk::LabelSetImageHelper::CreateNewLabel(labelSetImage);
         label->SetValue(labelValue);

@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkSegmentationHelper.h>
 #include <mitkToolManagerProvider.h>
 
+#include <QmitkFindSegmentationTaskDialog.h>
 #include <QmitkStaticDynamicSegmentationDialog.h>
 #include <QmitkStyleManager.h>
 
@@ -442,7 +443,19 @@ void QmitkSegmentationTaskListWidget::OnNextButtonClicked()
 
 void QmitkSegmentationTaskListWidget::OnFindButtonClicked()
 {
-  MITK_INFO << "[TODO] Find task...";
+  if (m_TaskList.IsNull())
+    return;
+
+  QmitkFindSegmentationTaskDialog dialog;
+  dialog.SetTaskList(m_TaskList);
+
+  if (dialog.exec() != QDialog::Accepted || !dialog.GetSelectedTask().has_value())
+    return;
+
+  this->SetCurrentTaskIndex(dialog.GetSelectedTask());
+
+  if (dialog.LoadSelectedTask())
+    this->OnLoadButtonClicked();
 }
 
 void QmitkSegmentationTaskListWidget::UpdateNavigationButtons()
@@ -861,7 +874,6 @@ void QmitkSegmentationTaskListWidget::SetCurrentTaskIndex(const std::optional<si
   {
     m_CurrentTaskIndex = index;
     this->OnCurrentTaskChanged();
-
   }
 }
 

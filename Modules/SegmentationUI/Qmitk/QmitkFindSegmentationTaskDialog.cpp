@@ -33,7 +33,7 @@ namespace
 
     prefs.geometry = node->GetByteArray("QmitkFindSegmentationTaskDialog geometry", nullptr, 0);
 
-    for (int column = 0; column < prefs.columnWidths.size(); ++column)
+    for (size_t column = 0; column < prefs.columnWidths.size(); ++column)
       prefs.columnWidths[column] = node->GetInt("QmitkFindSegmentationTaskDialog column width " + std::to_string(column), 125);
 
     return prefs;
@@ -80,7 +80,7 @@ QmitkFindSegmentationTaskDialog::QmitkFindSegmentationTaskDialog(QWidget* parent
   if (!prefs.geometry.empty())
     this->restoreGeometry(QByteArray(reinterpret_cast<const char*>(prefs.geometry.data()), prefs.geometry.size()));
 
-  for (int column = 0; column < prefs.columnWidths.size(); ++column)
+  for (int column = 0; column < static_cast<int>(prefs.columnWidths.size()); ++column)
     m_Ui->tableWidget->setColumnWidth(column, prefs.columnWidths[column]);
 }
 

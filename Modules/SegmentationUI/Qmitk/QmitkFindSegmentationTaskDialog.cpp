@@ -22,8 +22,15 @@ QmitkFindSegmentationTaskDialog::QmitkFindSegmentationTaskDialog(QWidget* parent
   m_Ui->setupUi(this);
 
   using Self = QmitkFindSegmentationTaskDialog;
+
   connect(m_Ui->tableWidget, &QTableWidget::itemSelectionChanged, this, &Self::OnItemSelectionChanged);
   connect(m_Ui->tableWidget, &QTableWidget::itemDoubleClicked, this, &Self::OnItemDoubleClicked);
+
+  auto applyFilter = [this](const QString&) { this->ApplyFilter(); };
+
+  connect(m_Ui->noLineEdit, &QLineEdit::textChanged, this, applyFilter);
+  connect(m_Ui->nameLineEdit, &QLineEdit::textChanged, this, applyFilter);
+  connect(m_Ui->statusComboBox, &QComboBox::currentTextChanged, applyFilter);
 }
 
 QmitkFindSegmentationTaskDialog::~QmitkFindSegmentationTaskDialog()
@@ -38,7 +45,7 @@ void QmitkFindSegmentationTaskDialog::SetTaskList(const mitk::SegmentationTaskLi
     m_TaskList = taskList;
 
     auto* table = m_Ui->tableWidget;
-    table->setSortingEnabled(false);
+    table->setSortingEnabled(false); // Do not sort while populating the table
     table->reset();
 
     if (m_TaskList.IsNotNull())
@@ -100,7 +107,7 @@ void QmitkFindSegmentationTaskDialog::SetTaskList(const mitk::SegmentationTaskLi
         }
       }
 
-      table->setSortingEnabled(true);
+      table->setSortingEnabled(true); // Sort fully populated table
     }
   }
 }
@@ -132,4 +139,52 @@ void QmitkFindSegmentationTaskDialog::OnItemSelectionChanged()
 void QmitkFindSegmentationTaskDialog::OnItemDoubleClicked(QTableWidgetItem*)
 {
   this->done(m_SelectedTask.has_value() ? QDialog::Accepted : QDialog::Rejected);
+}
+
+void QmitkFindSegmentationTaskDialog::ApplyFilter()
+{
+  auto* table = m_Ui->tableWidget;
+  const int numberOfRows = table->rowCount();
+  bool foundSomething = false;
+
+  for (int row = 0; row < numberOfRows; ++row)
+  {
+    if (!this->ContainsNumber(row) || !this->ContainsName(row) || !this->HasStatus(row))
+    {
+      table->hideRow(row);
+      continue;
+    }
+
+    table->showRow(row);
+
+    if (!foundSomething)
+    {
+      // Select the *first* finding to accelerate user interaction. For example, in a fresh dialog, typing
+      // '4', '2', '<Return>' will close the dialog and load task 42. In combination with the Ctrl+F shortcut
+      // for this dialog, no mouse interaction is necessary at all to jump to specific tasks.
+      table->selectRow(row);
+      foundSomething = true;
+    }
+  }
+
+  if (!foundSomething)
+    table->clearSelection(); // Hidden rows do not automatically lose selection
+}
+
+bool QmitkFindSegmentationTaskDialog::ContainsNumber(int row) const
+{
+  auto numberText = m_Ui->noLineEdit->text().trimmed();
+  return numberText.isEmpty() || m_Ui->tableWidget->item(row, Column::Number)->text().contains(numberText);
+}
+
+bool QmitkFindSegmentationTaskDialog::ContainsName(int row) const
+{
+  auto name = m_Ui->nameLineEdit->text().trimmed();
+  return name.isEmpty() || m_Ui->tableWidget->item(row, Column::Name)->text().contains(name, Qt::CaseInsensitive);
+}
+
+bool QmitkFindSegmentationTaskDialog::HasStatus(int row) const
+{
+  auto status = m_Ui->statusComboBox->currentText();
+  return status.isEmpty() || status == QStringLiteral("All") || m_Ui->tableWidget->item(row, Column::Status)->text() == status;
 }

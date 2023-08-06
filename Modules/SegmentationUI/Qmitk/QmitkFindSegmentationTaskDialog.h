@@ -46,8 +46,14 @@ private:
     Result,
     Description
   };
+
   void OnItemSelectionChanged();
   void OnItemDoubleClicked(QTableWidgetItem* item);
+
+  void ApplyFilter();
+  bool ContainsNumber(int row) const;
+  bool ContainsName(int row) const;
+  bool HasStatus(int row) const;
 
   Ui::QmitkFindSegmentationTaskDialog* m_Ui;
   mitk::SegmentationTaskList::ConstPointer m_TaskList;

@@ -449,13 +449,19 @@ void QmitkSegmentationTaskListWidget::OnFindButtonClicked()
   QmitkFindSegmentationTaskDialog dialog;
   dialog.SetTaskList(m_TaskList);
 
-  if (dialog.exec() != QDialog::Accepted || !dialog.GetSelectedTask().has_value())
+  if (dialog.exec() != QDialog::Accepted)
+    return;
+
+  if (!dialog.GetSelectedTask().has_value())
     return;
 
   this->SetCurrentTaskIndex(dialog.GetSelectedTask());
 
   if (dialog.LoadSelectedTask())
-    this->OnLoadButtonClicked();
+  {
+    if (!m_ActiveTaskIndex.has_value() || m_ActiveTaskIndex.value() != dialog.GetSelectedTask().value())
+      this->OnLoadButtonClicked();
+  }
 }
 
 void QmitkSegmentationTaskListWidget::UpdateNavigationButtons()

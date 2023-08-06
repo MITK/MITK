@@ -245,7 +245,9 @@ void mitk::SegmentAnythingTool::ITKWindowing(const itk::Image<TPixel, VImageDime
   filter->SetOutputMinimum(min);
   filter->SetOutputMaximum(max);
   filter->Update();
-  mitkImage->SetVolume((void *)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()));
+
+  mitkImage->SetImportVolume((void *)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), 0, 0, Image::ManageMemory);
+  filter->GetOutput()->GetPixelContainer()->ContainerManageMemoryOff();
 }
 
 void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,

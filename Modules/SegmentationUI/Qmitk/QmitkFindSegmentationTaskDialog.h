@@ -36,6 +36,16 @@ public:
   bool LoadSelectedTask() const;
 
 private:
+  enum Column
+  {
+    Number,
+    Name,
+    Status,
+    Image,
+    Segmentation,
+    Result,
+    Description
+  };
   void OnItemSelectionChanged();
   void OnItemDoubleClicked(QTableWidgetItem* item);
 

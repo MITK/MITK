@@ -55,39 +55,39 @@ void QmitkFindSegmentationTaskDialog::SetTaskList(const mitk::SegmentationTaskLi
 
           switch (column)
           {
-          case 0:
-            item->setText(QString::number(row));
+          case Column::Number:
+            item->setText(QString::number(row + 1));
             break;
 
-          case 1:
+          case Column::Name:
             if (m_TaskList->HasName(row))
               item->setText(QString::fromStdString(m_TaskList->GetName(row)));
 
             break;
 
-          case 2:
+          case Column::Status:
             item->setText(m_TaskList->IsDone(row) ? "Done" : "Not done");
             break;
 
-          case 3:
+          case Column::Image:
             if (m_TaskList->HasImage(row))
               item->setText(QString::fromStdString(m_TaskList->GetImage(row).string()));
 
             break;
 
-          case 4:
+          case Column::Segmentation:
             if (m_TaskList->HasSegmentation(row))
               item->setText(QString::fromStdString(m_TaskList->GetSegmentation(row).string()));
 
             break;
 
-          case 5:
+          case Column::Result:
             if (m_TaskList->HasResult(row))
               item->setText(QString::fromStdString(m_TaskList->GetResult(row).string()));
 
             break;
 
-          case 6:
+          case Column::Description:
             if (m_TaskList->HasDescription(row))
               item->setText(QString::fromStdString(m_TaskList->GetDescription(row)));
 

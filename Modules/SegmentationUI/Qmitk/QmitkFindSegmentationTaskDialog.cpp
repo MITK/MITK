@@ -13,6 +13,48 @@ found in the LICENSE file.
 #include <QmitkFindSegmentationTaskDialog.h>
 #include <ui_QmitkFindSegmentationTaskDialog.h>
 
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
+namespace
+{
+  struct Preferences
+  {
+    std::vector<std::byte> geometry;
+    std::array<int, 7> columnWidths;
+  };
+
+  Preferences GetPreferences()
+  {
+    auto* node = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentationtasklist");
+
+    Preferences prefs;
+
+    prefs.geometry = node->GetByteArray("QmitkFindSegmentationTaskDialog geometry", nullptr, 0);
+
+    for (int column = 0; column < prefs.columnWidths.size(); ++column)
+      prefs.columnWidths[column] = node->GetInt("QmitkFindSegmentationTaskDialog column width " + std::to_string(column), 125);
+
+    return prefs;
+  }
+
+  void SaveGeometry(const QByteArray& geometry)
+  {
+    auto* node = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentationtasklist");
+    node->PutByteArray("QmitkFindSegmentationTaskDialog geometry", reinterpret_cast<const std::byte*>(geometry.data()), geometry.size());
+  }
+
+  void SaveColumnWidths(const QTableWidget* table)
+  {
+    auto* node = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentationtasklist");
+    const int numberOfColumns = table->columnCount();
+
+    for (int column = 0; column < numberOfColumns; ++column)
+      node->PutInt("QmitkFindSegmentationTaskDialog column width " + std::to_string(column), table->columnWidth(column));
+  }
+}
+
 QmitkFindSegmentationTaskDialog::QmitkFindSegmentationTaskDialog(QWidget* parent)
   : QDialog(parent),
     m_Ui(new Ui::QmitkFindSegmentationTaskDialog)
@@ -25,12 +67,21 @@ QmitkFindSegmentationTaskDialog::QmitkFindSegmentationTaskDialog(QWidget* parent
 
   connect(m_Ui->tableWidget, &QTableWidget::itemSelectionChanged, this, &Self::OnItemSelectionChanged);
   connect(m_Ui->tableWidget, &QTableWidget::itemDoubleClicked, this, &Self::OnItemDoubleClicked);
+  connect(this, &Self::finished, this, &Self::OnFinished);
 
   auto applyFilter = [this](const QString&) { this->ApplyFilter(); };
 
   connect(m_Ui->noLineEdit, &QLineEdit::textChanged, this, applyFilter);
   connect(m_Ui->nameLineEdit, &QLineEdit::textChanged, this, applyFilter);
   connect(m_Ui->statusComboBox, &QComboBox::currentTextChanged, applyFilter);
+
+  auto prefs = GetPreferences();
+
+  if (!prefs.geometry.empty())
+    this->restoreGeometry(QByteArray(reinterpret_cast<const char*>(prefs.geometry.data()), prefs.geometry.size()));
+
+  for (int column = 0; column < prefs.columnWidths.size(); ++column)
+    m_Ui->tableWidget->setColumnWidth(column, prefs.columnWidths[column]);
 }
 
 QmitkFindSegmentationTaskDialog::~QmitkFindSegmentationTaskDialog()
@@ -139,6 +190,12 @@ void QmitkFindSegmentationTaskDialog::OnItemSelectionChanged()
 void QmitkFindSegmentationTaskDialog::OnItemDoubleClicked(QTableWidgetItem*)
 {
   this->done(m_SelectedTask.has_value() ? QDialog::Accepted : QDialog::Rejected);
+}
+
+void QmitkFindSegmentationTaskDialog::OnFinished(int)
+{
+  SaveGeometry(this->saveGeometry());
+  SaveColumnWidths(m_Ui->tableWidget);
 }
 
 void QmitkFindSegmentationTaskDialog::ApplyFilter()

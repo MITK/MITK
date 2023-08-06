@@ -49,6 +49,7 @@ private:
 
   void OnItemSelectionChanged();
   void OnItemDoubleClicked(QTableWidgetItem* item);
+  void OnFinished(int result);
 
   void ApplyFilter();
   bool ContainsNumber(int row) const;

@@ -17,6 +17,8 @@ QmitkFindSegmentationTaskDialog::QmitkFindSegmentationTaskDialog(QWidget* parent
   : QDialog(parent),
     m_Ui(new Ui::QmitkFindSegmentationTaskDialog)
 {
+  this->setWindowFlag(Qt::WindowContextHelpButtonHint, false);
+
   m_Ui->setupUi(this);
 
   using Self = QmitkFindSegmentationTaskDialog;

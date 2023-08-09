@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include "mitkLinearModelFactory.h"
 #include "mitkT2DecayModelFactory.h"
 #include "mitkExpDecayOffsetModelFactory.h"
+#include "mitkExponentialSaturationModelFactory.h"
 
 namespace mitk
 {
@@ -47,6 +48,7 @@ public:
     RegisterProvider<mitk::ModelFitProviderBase<mitk::LinearModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::T2DecayModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::ExpDecayOffsetModelFactory> >(context);
+    RegisterProvider<mitk::ModelFitProviderBase<mitk::ExponentialSaturationModelFactory> >(context);
   }
 
   void Unload(us::ModuleContext* ) override

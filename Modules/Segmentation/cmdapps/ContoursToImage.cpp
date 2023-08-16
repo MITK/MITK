@@ -141,6 +141,9 @@ OutputFormat ParseOutputFormat(const mitk::IFileIO::Options& args)
 
     if (format == "label")
       return OutputFormat::Label;
+
+    if (format != "binary")
+      mitkThrow() << "Unknown output format \"" << format << "\" (must be \"binary\", \"label\" or \"multilabel\").";
   }
 
   return OutputFormat::Binary;

@@ -117,6 +117,7 @@ void mitk::SegmentAnythingTool::InitSAMPythonProcess()
   {
     m_PythonService.reset();
   }
+  this->ClearPicks();
   m_PythonService = std::make_unique<mitk::SegmentAnythingPythonService>(
     this->GetPythonPath(), this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId());
   m_PythonService->StartAsyncProcess();
@@ -129,7 +130,8 @@ bool mitk::SegmentAnythingTool::IsPythonReady() const
 
 void mitk::SegmentAnythingTool::OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  if (!this->GetIsReady() || m_PointSetPositive->GetSize() == 0)
+  if (!this->GetIsReady() || m_PointSetPositive->GetSize() == 0 || nullptr == this->GetWorkingPlaneGeometry() ||
+      !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()), *(this->GetWorkingPlaneGeometry())))
   {
     return;
   }
@@ -286,7 +288,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
         m_PythonService->TransferPointsToProcess(csvStream);
         m_ProgressCommand->SetProgress(150);
         std::this_thread::sleep_for(100ms);
-        mitk::LabelSetImage::Pointer outputBuffer = m_PythonService->RetrieveImageFromProcess();
+        mitk::LabelSetImage::Pointer outputBuffer = m_PythonService->RetrieveImageFromProcess(this->GetTimeOutLimit());
         m_ProgressCommand->SetProgress(180);
         mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputBuffer.GetPointer(), timeStep, false);
         this->SetSelectedLabels({MASK_VALUE});
@@ -294,6 +296,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
       }
       catch (const mitk::Exception &e)
       {
+        this->ClearPicks();
         this->EmitSAMStatusMessageEvent(e.GetDescription());
         mitkThrow() << e.GetDescription();
       }
@@ -306,7 +309,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
   }
 }
 
-std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane(mitk::LevelWindow &levelWindow)
+std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane(const mitk::LevelWindow &levelWindow)
 {
   mitk::Vector3D normal = this->GetWorkingPlaneGeometry()->GetNormal();
   mitk::Point3D center = this->GetWorkingPlaneGeometry()->GetCenter();
@@ -328,8 +331,8 @@ std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::Ba
   MITK_INFO << "No.of points: " << m_PointSetPositive->GetSize();
   std::stringstream pointsAndLabels;
   pointsAndLabels << "Point,Label\n";
-  mitk::PointSet::PointsIterator pointSetItPos = m_PointSetPositive->Begin();
-  mitk::PointSet::PointsIterator pointSetItNeg = m_PointSetNegative->Begin();
+  mitk::PointSet::PointsConstIterator pointSetItPos = m_PointSetPositive->Begin();
+  mitk::PointSet::PointsConstIterator pointSetItNeg = m_PointSetNegative->Begin();
   const char SPACE = ' ';
   while (pointSetItPos != m_PointSetPositive->End() || pointSetItNeg != m_PointSetNegative->End())
   {
@@ -339,7 +342,7 @@ std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::Ba
       if (baseGeometry->IsInside(point))
       {
         Point2D p2D = Get2DIndicesfrom3DWorld(baseGeometry, point);
-        pointsAndLabels << (int)p2D[0] << SPACE << (int)p2D[1] << ",1" << std::endl;
+        pointsAndLabels << static_cast<int>(p2D[0]) << SPACE << static_cast<int>(p2D[1]) << ",1" << std::endl;
       }
       ++pointSetItPos;
     }
@@ -349,7 +352,7 @@ std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::Ba
       if (baseGeometry->IsInside(point))
       {
         Point2D p2D = Get2DIndicesfrom3DWorld(baseGeometry, point);
-        pointsAndLabels << (int)p2D[0] << SPACE << (int)p2D[1] << ",0" << std::endl;
+        pointsAndLabels << static_cast<int>(p2D[0]) << SPACE << static_cast<int>(p2D[1]) << ",0" << std::endl;
       }
       ++pointSetItNeg;
     }
@@ -362,8 +365,8 @@ std::vector<std::pair<mitk::Point2D, std::string>> mitk::SegmentAnythingTool::Ge
 {
   std::vector<std::pair<mitk::Point2D, std::string>> clickVec;
   clickVec.reserve(m_PointSetPositive->GetSize() + m_PointSetNegative->GetSize());
-  mitk::PointSet::PointsIterator pointSetItPos = m_PointSetPositive->Begin();
-  mitk::PointSet::PointsIterator pointSetItNeg = m_PointSetNegative->Begin();
+  mitk::PointSet::PointsConstIterator pointSetItPos = m_PointSetPositive->Begin();
+  mitk::PointSet::PointsConstIterator pointSetItNeg = m_PointSetNegative->Begin();
   while (pointSetItPos != m_PointSetPositive->End() || pointSetItNeg != m_PointSetNegative->End())
   {
     if (pointSetItPos != m_PointSetPositive->End())
@@ -391,13 +394,14 @@ std::vector<std::pair<mitk::Point2D, std::string>> mitk::SegmentAnythingTool::Ge
 }
 
 mitk::Point2D mitk::SegmentAnythingTool::Get2DIndicesfrom3DWorld(const mitk::BaseGeometry *baseGeometry,
-                                                                 mitk::Point3D &point3d)
+                                                                 const mitk::Point3D &point3d)
 {
-  baseGeometry->WorldToIndex(point3d, point3d);
-  MITK_INFO << point3d[0] << " " << point3d[1] << " " << point3d[2]; // remove
+  mitk::Point3D index3D;
+  baseGeometry->WorldToIndex(point3d, index3D);
+  MITK_INFO << index3D[0] << " " << index3D[1] << " " << index3D[2]; // remove
   Point2D point2D;
-  point2D.SetElement(0, point3d[0]);
-  point2D.SetElement(1, point3d[1]);
+  point2D.SetElement(0, index3D[0]);
+  point2D.SetElement(1, index3D[1]);
   return point2D;
 }
 

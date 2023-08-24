@@ -77,6 +77,9 @@ namespace mitk
 
     itkSetMacro(GpuId, int);
     itkGetConstMacro(GpuId, int);
+    
+    itkSetMacro(TimeOutLimit, long);
+    itkGetConstMacro(TimeOutLimit, long);
 
     itkSetMacro(IsReady, bool);
     itkGetConstMacro(IsReady, bool);
@@ -160,7 +163,7 @@ namespace mitk
      * 
      * @return std::string 
      */
-    std::string GetHashForCurrentPlane(mitk::LevelWindow&);
+    std::string GetHashForCurrentPlane(const mitk::LevelWindow&);
 
     /**
      * @brief Emits message to connected Listnerers.
@@ -189,7 +192,7 @@ namespace mitk
      * @param mitk::Point3D
      * @return mitk::Point2D 
      */
-    static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, mitk::Point3D&);
+    static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, const mitk::Point3D&);
 
     /**
      * @brief Checks if the image has valid size across each dimension. This function is 
@@ -212,6 +215,7 @@ namespace mitk
     bool m_IsGenerateEmbeddings = true;
     bool m_IsReady = false;
     int m_PointSetCount = 0;
+    long m_TimeOutLimit = -1;
     std::unique_ptr<SegmentAnythingPythonService> m_PythonService;
     const Label::PixelType MASK_VALUE = 1;
   };

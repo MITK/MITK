@@ -99,7 +99,6 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   this->WriteStatusMessage(welcomeText);
   this->ShowProgressBar(false);
   m_Controls.samProgressBar->setMaximum(0);
-
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
 }
@@ -143,7 +142,7 @@ void QmitkSegmentAnythingToolGUI::ShowErrorMessage(const std::string &message, Q
 
 void QmitkSegmentAnythingToolGUI::StatusMessageListener(const std::string &message)
 {
-  if (message.rfind("Error", 0) == 0)
+    if (message.rfind("Error", 0) == 0)
   {
     this->EnableAll(true);
     this->WriteErrorMessage(QString::fromStdString(message));
@@ -174,6 +173,7 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     tool->SetGpuId(m_Preferences->GetInt("sam gpuid", -1));
     const QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));  
     tool->SetModelType(modelType.toStdString());
+    tool->SetTimeOutLimit(m_Preferences->GetInt("sam timeout", 300));
     tool->SetCheckpointPath(m_Preferences->Get("sam parent path", ""));
     this->WriteStatusMessage(
       QString("<b>STATUS: </b><i>Initializing Segment Anything Model...</i>"));

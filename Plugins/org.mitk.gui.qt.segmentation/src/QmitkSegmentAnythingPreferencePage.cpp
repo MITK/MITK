@@ -50,6 +50,7 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
   m_Ui->sysPythonComboBox->addItem("/usr/bin");
 #endif
   this->AutoParsePythonPaths();
+  m_Ui->timeoutEdit->setValidator(new QIntValidator(0, 1000, this));
   m_Ui->sysPythonComboBox->addItem("Select...");
   m_Ui->sysPythonComboBox->setCurrentIndex(0);
   connect(m_Ui->installSAMButton, SIGNAL(clicked()), this, SLOT(OnInstallBtnClicked()));
@@ -95,6 +96,7 @@ bool QmitkSegmentAnythingPreferencePage::PerformOk()
   prefs->Put("sam python path", m_PythonPath.toStdString());
   prefs->Put("sam modeltype", m_Ui->samModelTypeComboBox->currentText().toStdString());
   prefs->PutInt("sam gpuid", FetchSelectedGPUFromUI());
+  prefs->PutInt("sam timeout", std::stoi(m_Ui->timeoutEdit->text().toStdString()));
   return true;
 }
 

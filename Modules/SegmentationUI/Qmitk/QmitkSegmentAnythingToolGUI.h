@@ -115,7 +115,7 @@ private:
   Ui_QmitkSegmentAnythingGUIControls m_Controls;
   QmitkGPULoader m_GpuLoader;
   bool m_FirstPreviewComputation = true;
-  const std::string WARNING_SAM_NOT_FOUND =
+    const std::string WARNING_SAM_NOT_FOUND =
     "SAM is not detected in the selected python environment. Please reinstall SAM.";
 };
 #endif

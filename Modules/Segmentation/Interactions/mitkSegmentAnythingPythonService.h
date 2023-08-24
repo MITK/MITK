@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSegmentAnythingPythonService_h
 #define mitkSegmentAnythingPythonService_h
 
-#include <mitkProcessExecutor.h>
+#include <mitkSegmentAnythingProcessExecutor.h>
 #include <MitkSegmentationExports.h>
 #include <thread>
 #include <future>
@@ -92,7 +92,7 @@ namespace mitk
      * 
      * @return Image::Pointer 
      */
-    LabelSetImage::Pointer RetrieveImageFromProcess();
+    LabelSetImage::Pointer RetrieveImageFromProcess(long timeOut= -1);
 
     static Status CurrentStatus;
 
@@ -134,7 +134,8 @@ namespace mitk
     const std::string TRIGGER_FILENAME = "trigger.csv";
     const std::string SAM_PYTHON_FILE_NAME = "run_inference_daemon.py";
     std::future<void> m_Future;
-    ProcessExecutor::Pointer m_DaemonExec;
+    //ProcessExecutor::Pointer m_DaemonExec;
+    SegmentAnythingProcessExecutor::Pointer m_DaemonExec;
   };
 
   struct SIGNALCONSTANTS

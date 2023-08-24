@@ -59,6 +59,7 @@ set(CPP_FILES
   Interactions/mitkPickingTool.cpp
   Interactions/mitknnUnetTool.cpp
   Interactions/mitkProcessExecutor.cpp
+  Interactions/mitkSegmentAnythingProcessExecutor.cpp
   Interactions/mitkTotalSegmentatorTool.cpp
   Interactions/mitkSegmentAnythingTool.cpp
   Interactions/mitkSegmentAnythingPythonService.cpp

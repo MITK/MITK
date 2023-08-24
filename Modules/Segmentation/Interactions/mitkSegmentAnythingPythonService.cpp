@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitkSegmentAnythingPythonService.h"
 
 #include "mitkIOUtil.h"
+#include <mitkSegmentAnythingProcessExecutor.h>
 #include <itksys/SystemTools.hxx>
 #include <chrono>
 #include <thread>
@@ -21,6 +22,7 @@ found in the LICENSE file.
 #include "mitkImageAccessByItk.h"
 
 using namespace std::chrono_literals;
+using sys_clock = std::chrono::system_clock;
 
 namespace mitk
 {
@@ -50,7 +52,7 @@ mitk::SegmentAnythingPythonService::~SegmentAnythingPythonService()
   }
   CurrentStatus = Status::OFF;
   std::filesystem::remove_all(this->GetMitkTempDir());
-}
+ }
 
 void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object*, const itk::EventObject &e, void*)
 {
@@ -88,6 +90,7 @@ void mitk::SegmentAnythingPythonService::StopAsyncProcess()
   std::stringstream controlStream;
   controlStream << SIGNALCONSTANTS::KILL;
   this->WriteControlFile(controlStream);
+  m_DaemonExec->SetStop(true);
   m_Future.get();
 }
 
@@ -104,13 +107,13 @@ void mitk::SegmentAnythingPythonService::StartAsyncProcess()
   std::stringstream controlStream;
   controlStream << SIGNALCONSTANTS::READY;
   this->WriteControlFile(controlStream);
-
-  m_DaemonExec = ProcessExecutor::New();
+  double timeout = 1;
+  m_DaemonExec = SegmentAnythingProcessExecutor::New(timeout);
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&mitk::SegmentAnythingPythonService::onPythonProcessEvent);
   m_DaemonExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
   m_Future = std::async(std::launch::async, &mitk::SegmentAnythingPythonService::start_python_daemon, this);
-}
+  }
 
 void mitk::SegmentAnythingPythonService::TransferPointsToProcess(std::stringstream &triggerCSV)
 {
@@ -205,13 +208,20 @@ void mitk::SegmentAnythingPythonService::CreateTempDirs(const std::string &dirPa
   m_OutDir = IOUtil::CreateTemporaryDirectory("sam-out-XXXXXX", m_MitkTempDir);
 }
 
-mitk::LabelSetImage::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProcess()
+mitk::LabelSetImage::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProcess(long timeOut)
 {
   std::string outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + m_CurrentUId + ".nrrd";
+  auto start = sys_clock::now();
   while (!std::filesystem::exists(outputImagePath))
   {
     this->CheckStatus();
     std::this_thread::sleep_for(100ms);
+    if (timeOut != -1 && std::chrono::duration_cast<std::chrono::seconds>(sys_clock::now() - start).count() > timeOut) 
+    {
+      CurrentStatus = Status::OFF;
+      m_DaemonExec->SetStop(true);
+      mitkThrow() << "Error: Operation Timed Out!";
+    }
   }
   LabelSetImage::Pointer outputBuffer = mitk::IOUtil::Load<LabelSetImage>(outputImagePath);
   return outputBuffer;

@@ -94,7 +94,27 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="0" colspan="4">
+     <item row="5" column="1" colspan="3">
+      <widget class="QLineEdit" name="timeoutEdit">
+       <property name="text">
+        <string>300</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="timeoutLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Time Out (s):</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0" colspan="4">
       <widget class="QLabel" name="samInstallStatusLabel">
        <property name="textFormat">
         <enum>Qt::RichText</enum>

@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include <berryUIElement.h>
 
 // MITK
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 // Qt
 #include <QHash>
@@ -34,6 +34,16 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QStandardItem>
 #include <QSortFilterProxyModel>
+
+namespace
+{
+  QFont getLargeFont()
+  {
+    QFont font = qApp->font();
+    font.setPointSizeF(font.pointSizeF() * 1.25f);
+    return font;
+  }
+}
 
 class KeywordRegistry
 {
@@ -332,7 +342,7 @@ void QmitkViewNavigatorWidget::UpdateTreeList(berry::IWorkbenchPart* workbenchPa
   // iterate over all tree items
   for (const auto& item : m_TreeModel->findItems("*", Qt::MatchWildcard | Qt::MatchRecursive))
   {
-    QFont font;
+    QFont font = qApp->font();
     // check if the item is a view item and if it is equal to any opened view
     QmitkViewItem* viewItem = dynamic_cast<QmitkViewItem *>(item);
     if (nullptr != viewItem)
@@ -604,7 +614,7 @@ void QmitkViewNavigatorWidget::AddPerspectivesToTree()
   qSort(perspectiveDescriptors.begin(), perspectiveDescriptors.end(), comparePerspectives);
 
   QStandardItem* perspectiveRootItem = new QStandardItem("Perspectives");
-  perspectiveRootItem->setFont(QFont("", 12, QFont::Normal));
+  perspectiveRootItem->setFont(getLargeFont());
   perspectiveRootItem->setEditable(false);
   QStandardItem* treeRootItem = m_TreeModel->invisibleRootItem();
   treeRootItem->appendRow(perspectiveRootItem);
@@ -619,14 +629,16 @@ void QmitkViewNavigatorWidget::AddViewsToTree()
   QList<berry::IViewDescriptor::Pointer> viewDescriptors(viewRegistry->GetViews());
   qSort(viewDescriptors.begin(), viewDescriptors.end(), compareViews);
 
+  auto largeFont = getLargeFont();
+
   QStandardItem* viewRootItem = new QStandardItem("Views");
-  viewRootItem->setFont(QFont("", 12, QFont::Normal));
+  viewRootItem->setFont(largeFont);
   viewRootItem->setEditable(false);
   QStandardItem* treeRootItem = m_TreeModel->invisibleRootItem();
   treeRootItem->appendRow(viewRootItem);
 
   QStandardItem* miscellaneousCategoryItem = new QStandardItem("Miscellaneous");
-  miscellaneousCategoryItem->setFont(QFont("", 12, QFont::Normal));
+  miscellaneousCategoryItem->setFont(largeFont);
   miscellaneousCategoryItem->setEditable(false);
 
   QStringList viewExcludeList;
@@ -697,7 +709,9 @@ void QmitkViewNavigatorWidget::AddItemsToTree(D itemDescriptors, QStandardItem* 
         categoryItems.push_back(categoryItem);
       }
 
-      categoryItem->setFont(QFont("", 12, QFont::Normal));
+      auto font = getLargeFont();
+
+      categoryItem->setFont(font);
       categoryItem->setEditable(false);
       categoryItem->appendRow(item);
     }

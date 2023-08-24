@@ -22,7 +22,7 @@ volume.
 nearest
   neighbor and uses the non optimized execute function of vtkImageReslice. Note that any interpolation doesn't make
 sense
-for round trip use extract->edit->overwrite, because it is nearly impossible to invert the interolation.
+for round trip use extract->edit->overwrite, because it is nearly impossible to invert the interpolation.
   There are two use cases for the Filter which are specified by the overwritemode property:
 
   1)Extract slices from a 3D volume.

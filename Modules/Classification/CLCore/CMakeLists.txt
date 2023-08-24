@@ -3,5 +3,3 @@ MITK_CREATE_MODULE(
   PACKAGE_DEPENDS
   PUBLIC Eigen
 )
-
-#add_subdirectory(test)

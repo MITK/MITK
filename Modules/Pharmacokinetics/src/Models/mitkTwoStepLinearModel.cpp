@@ -84,6 +84,14 @@ mitk::TwoStepLinearModel::GetNumberOfDerivedParameters() const
   return 4;
 };
 
+double mitk::TwoStepLinearModel::ComputeSignalFromParameters(double x, double t, double a1, double a2, double b1, double b2)
+{
+  return (x < t) ? (a1 * x + b1) : (a2 * x + b2);
+};
+
+
+
+
 mitk::TwoStepLinearModel::ModelResultType
 mitk::TwoStepLinearModel::ComputeModelfunction(const ParametersType& parameters) const
 {
@@ -93,23 +101,18 @@ mitk::TwoStepLinearModel::ComputeModelfunction(const ParametersType& parameters)
   const auto a1 = parameters[POSITION_PARAMETER_a1] ;
   const auto a2 = parameters[POSITION_PARAMETER_a2] ;
   const auto b1 = parameters[POSITION_PARAMETER_y1] ;
-  const auto b2 = (a1 - a2)*t + b1;
+
+  double b2 = (a1 - a2) * t + b1;
 
   ModelResultType signal(m_TimeGrid.GetSize());
 
   TimeGridType::const_iterator timeGridEnd = m_TimeGrid.end();
+
   ModelResultType::iterator signalPos = signal.begin();
 
   for (TimeGridType::const_iterator gridPos = m_TimeGrid.begin(); gridPos != timeGridEnd; ++gridPos, ++signalPos)
   {
-      if((*gridPos) < t)
-      {
-          *signalPos = a1*(*gridPos)+b1;
-      }
-      else
-      {
-          *signalPos = a2*(*gridPos)+b2;
-      }
+    *signalPos = ComputeSignalFromParameters(*gridPos, t, a1, a2, b1, b2);
   }
 
   return signal;
@@ -154,15 +157,37 @@ mitk::ModelBase::DerivedParameterMapType mitk::TwoStepLinearModel::ComputeDerive
 
     unsigned int timeSteps = m_TimeGrid.GetSize();
 
-
     const double taq = (m_TimeGrid.empty() == false) ? (m_TimeGrid.GetElement(timeSteps - 1)) : (mitkThrow() << "An exception occured because time grid is empty, method can't continue.");
 
     const double sfin = a2 * taq + b2;
 
-    const double smax = (a2 <= 0) ? (a1 * t + b1) : (sfin);
+    double smax = sfin;
+    if ((a1 >= 0) && (a2 >= 0))
+      smax = sfin;
+    else if ((a1 < 0) && (a2 < 0))
+      smax = b1;
+    else if ((a1 > 0) && (a2 < 0))
+      smax = (a1 * t + b1);
+    else
+    {
+      if (abs(a1 * t) >= abs(a2 * (taq - t)))
+        smax = b1;
+      else smax = sfin;
+    }
 
-    const double auc = a1/2*(t*t)+b1*t
-                 +a2/2*(taq*taq-t*t)+b2*(taq-t);
+    double auc = 0.0;
+    TimeGridType::const_iterator timeGridEnd = m_TimeGrid.end();
+    for (TimeGridType::const_iterator gridPos = m_TimeGrid.begin(); gridPos != timeGridEnd -1; ++gridPos)
+    {
+      double currentGridPos = *gridPos;
+      double nextGridPos = *(++gridPos);
+      double deltaX = nextGridPos - currentGridPos;
+      double deltaY = ComputeSignalFromParameters(nextGridPos, t, a1, a2, b1, b2) - ComputeSignalFromParameters(currentGridPos, t, a1, a2, b1, b2);
+      double Yi = ComputeSignalFromParameters(currentGridPos, t, a1, a2, b1, b2);
+      double intI = 0.5 * deltaX * deltaY + Yi * deltaX;
+      auc += std::abs(intI);
+      --gridPos;
+    }
 
     DerivedParameterMapType result;
 

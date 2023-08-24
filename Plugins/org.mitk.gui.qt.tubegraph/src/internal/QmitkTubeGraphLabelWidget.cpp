@@ -77,8 +77,8 @@ mitk::Color* QmitkTubeGraphLabelWidget::GetLabelColor()
 {
   //return the background color of the button
   const QColor color = m_ColoringPushButton->palette().color(QPalette::Button);
-  auto   rgb = new mitk::Color();
-  rgb[0] = color.red(); rgb[1] = color.green(); rgb[2] = color.blue();
+  auto rgb = new mitk::Color();
+  rgb->Set(color.red(), color.green(), color.blue());
   return rgb;
 }
 

@@ -44,6 +44,16 @@ bool mitk::MAPRegistrationWrapper::VerifyRequestedRegion()
     return true;
 }
 
+bool mitk::MAPRegistrationWrapper::IsEmptyTimeStep(unsigned int /*t*/) const
+{
+  return m_spRegistration.IsNull();
+}
+
+bool mitk::MAPRegistrationWrapper::IsEmpty() const
+{
+  return m_spRegistration.IsNull();
+}
+
 void mitk::MAPRegistrationWrapper::SetRequestedRegion(const itk::DataObject*)
 {
     //nothing to do

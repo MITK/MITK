@@ -13,12 +13,6 @@ found in the LICENSE file.
 #ifndef mitkLogMacros_h
 #define mitkLogMacros_h
 
-#include <mbilog.h>
-
-#define MITK_INFO MBI_INFO
-#define MITK_WARN MBI_WARN
-#define MITK_ERROR MBI_ERROR
-#define MITK_FATAL MBI_FATAL
-#define MITK_DEBUG MBI_DEBUG
+#include <mitkLog.h>
 
 #endif

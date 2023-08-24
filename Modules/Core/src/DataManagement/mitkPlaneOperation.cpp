@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkPlaneOperation.h"
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 
 namespace mitk
 {

@@ -24,6 +24,7 @@
     <state name="PressedState" ID="3">
       <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" target="Drawing" >
         <action name="Drawing"/>
+        <condition name="InsideCorrectPlane"/>
       </transition>
       <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="Active" >
         <action name="MovePoint" ID="92" />
@@ -34,6 +35,7 @@
     <state name="Drawing" ID="4">
       <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" target="Drawing" >
         <action name="Drawing"/>
+        <condition name="InsideCorrectPlane"/>
       </transition>
       <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="Active" >
         <action name="EndDrawing"/>

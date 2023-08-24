@@ -16,16 +16,15 @@ found in the LICENSE file.
 #include <fstream>
 #include <vector>
 
-#include "mbilogExports.h"
-#include "mbilogTextBackendBase.h"
-#include "mbilogLogMessage.h"
-#include "mbilogLoggingTypes.h"
+#include <mitkLogBackendText.h>
+#include <mitkLogMessage.h>
+#include <mitkLogLevel.h>
 
 namespace mitk {
   /**
-   *  \brief Backend for the mbi logging mechanism. This backend writes all messages to the given file.
+   *  \brief Backend for the MITK log mechanism. This backend writes all messages to the given file.
    */
-  class USNavigationLoggingBackend : public mbilog::TextBackendBase
+  class USNavigationLoggingBackend : public LogBackendText
   {
     public:
 
@@ -45,7 +44,7 @@ namespace mitk {
        *
        *  \param logMessage Logging message.
        */
-      void ProcessMessage(const mbilog::LogMessage &logMessage ) override;
+      void ProcessMessage(const LogMessage &logMessage ) override;
 
       /** @return Returns all messages of the category "USNavigationLogging" since the last call of ClearNavigationMessages(). */
       std::vector<std::string> GetNavigationMessages();
@@ -57,7 +56,7 @@ namespace mitk {
       /** Clears the internally stored navigation messages of the category "USNavigationLogging". */
       void ClearNavigationMessages();
 
-      mbilog::OutputType GetOutputType(void) const override;
+      OutputType GetOutputType() const override;
 
     private:
       std::ofstream m_OutputStream;

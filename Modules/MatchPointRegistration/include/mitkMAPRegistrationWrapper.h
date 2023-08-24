@@ -43,6 +43,10 @@ public:
 
   Identifiable::UIDType GetUID() const override;
 
+  bool IsEmptyTimeStep(unsigned int t) const override;
+
+  bool IsEmpty() const override;
+
   /**
    * Empty implementation, since the MAPRegistrationWrapper doesn't
    * support the requested region concept

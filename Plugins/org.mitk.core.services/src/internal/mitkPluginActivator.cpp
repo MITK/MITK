@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkPluginActivator.h"
 
-#include "mitkLog.h"
+#include <mitkLogBackend.h>
 
 #include <QString>
 #include <QFileInfo>
@@ -70,14 +70,14 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   pluginContext = context;
 
   //initialize logging
-  mitk::LoggingBackend::Register();
+  mitk::LogBackend::Register();
   QString logFilenamePrefix = "mitk";
   QFileInfo path = context->getDataFile(logFilenamePrefix);
   try
   {
     // using local8bit, because ofstream is not unicode aware (at least on windows)
     // to use utf-8 with ofstream it's possible to use "nowide.boots" lib
-    mitk::LoggingBackend::RotateLogFiles(path.absoluteFilePath().toLocal8Bit().constData());
+    mitk::LogBackend::RotateLogFiles(path.absoluteFilePath().toLocal8Bit().constData());
   }
   catch(mitk::Exception& e)
   {
@@ -118,7 +118,7 @@ void org_mitk_core_services_Activator::stop(ctkPluginContext* /*context*/)
   mapMitkIdToAdapter.clear();
 
   //clean up logging
-  mitk::LoggingBackend::Unregister();
+  mitk::LogBackend::Unregister();
 
   dataStorageService.reset();
   mitkContext = nullptr;

@@ -23,15 +23,15 @@ found in the LICENSE file.
 mitk::CameraRotationController::CameraRotationController()
   : BaseController(), m_LastStepperValue(180), m_Camera(nullptr), m_RenderWindow(nullptr)
 {
-  m_Slice->SetAutoRepeat(true);
-  m_Slice->SetSteps(360);
-  m_Slice->SetPos(180);
+  m_Stepper->SetAutoRepeat(true);
+  m_Stepper->SetSteps(360);
+  m_Stepper->SetPos(180);
 
   itk::SimpleMemberCommand<CameraRotationController>::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
   sliceStepperChangedCommand = itk::SimpleMemberCommand<CameraRotationController>::New();
   sliceStepperChangedCommand->SetCallbackFunction(this, &CameraRotationController::RotateCamera);
 
-  m_Slice->AddObserver(itk::ModifiedEvent(), sliceStepperChangedCommand);
+  m_Stepper->AddObserver(itk::ModifiedEvent(), sliceStepperChangedCommand);
 }
 
 mitk::CameraRotationController::~CameraRotationController()
@@ -47,7 +47,7 @@ void mitk::CameraRotationController::RotateCamera()
 
   if (m_Camera)
   {
-    int newStepperValue = m_Slice->GetPos();
+    int newStepperValue = m_Stepper->GetPos();
     m_Camera->Azimuth(m_LastStepperValue - newStepperValue);
     m_LastStepperValue = newStepperValue;
     // const_cast< RenderWindow* >(m_RenderWindow)->RequestUpdate(); // TODO does not work with movie generator!

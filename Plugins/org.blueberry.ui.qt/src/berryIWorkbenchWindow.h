@@ -59,7 +59,7 @@ struct IWorkbench;
  * @see IWorkbenchPage
  *
  */
-struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocator, public virtual Object
+struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocator /** \cond */, public virtual Object /** \endcond */
 {
 
   berryObjectMacro(berry::IWorkbenchWindow, IPageService, IServiceLocator, Object);

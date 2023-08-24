@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include "mitkDICOMTag.h"
 
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 
 mitk::GantryTiltInformation::GantryTiltInformation()
 : m_ShiftUp(0.0)

@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <vtkImageResize.h>
 #include <vtkNew.h>
@@ -246,7 +246,7 @@ namespace mitk
       bool vp9 = OutputFormat::WebM_VP9 == this->GetOutputFormat();
 
       std::stringstream stream;
-      stream << this->GetFFmpegPath()
+      stream << this->GetFFmpegPath() << ' '
         << "-y" << ' '
         << "-r " << std::to_string(this->GetFrameRate()) << ' '
         << "-i %6d.png" << ' '
@@ -275,10 +275,28 @@ namespace mitk
       itksysProcess_Execute(ffmpeg);
       itksysProcess_WaitForExit(ffmpeg, nullptr);
 
-      if (itksysProcess_State_Exited != itksysProcess_GetState(ffmpeg))
+      auto state = itksysProcess_GetState(ffmpeg);
+
+      if (itksysProcess_State_Exited != state)
       {
+        std::stringstream message;
+        message << "FFmpeg process did not exit as expected: ";
+
+        if (itksysProcess_State_Error == state)
+        {
+          message << itksysProcess_GetErrorString(ffmpeg);
+        }
+        else if (itksysProcess_State_Exception == state)
+        {
+          message << itksysProcess_GetExceptionString(ffmpeg);
+        }
+
+        message << "\n  Command: " << commandLineCStr;
+        message << "\n  Working directory: " << workingDirectory.c_str();
+
         itksysProcess_Delete(ffmpeg);
-        mitkThrow() << "FFmpeg process did not exit as expected.";
+
+        mitkThrow() << message.str();
       }
 
       auto exitCode = itksysProcess_GetExitValue(ffmpeg);

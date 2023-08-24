@@ -231,7 +231,7 @@ std::string mitk::StandardFileLocations::GetOptionDirectory()
     delete[] unquoted;
   }
 
-  if (itksys::SystemTools::MakeDirectory(optionsDirectory.c_str()) == false)
+  if (!itksys::SystemTools::MakeDirectory(optionsDirectory.c_str()).IsSuccess())
   {
     itkGenericExceptionMacro(<< "Could not create .mitk directory at " << Utf8Util::Utf8ToLocal8Bit(optionsDirectory));
   }

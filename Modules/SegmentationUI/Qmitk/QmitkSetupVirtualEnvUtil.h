@@ -13,7 +13,7 @@ found in the LICENSE file.s
 #ifndef QmitkSetupVirtualEnvUtil_h_Included
 #define QmitkSetupVirtualEnvUtil_h_Included
 
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 #include "mitkProcessExecutor.h"
 #include <MitkSegmentationUIExports.h>
 #include <QString>

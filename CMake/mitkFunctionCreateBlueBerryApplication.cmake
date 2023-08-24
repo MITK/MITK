@@ -110,7 +110,7 @@ if(WIN32)
   target_link_libraries(${_APP_NAME} PRIVATE ${QT_QTMAIN_LIBRARY})
 endif()
 
-if(WIN32 AND MITK_UTF8)
+if(WIN32)
   mitk_add_manifest(${_APP_NAME})
 endif()
 

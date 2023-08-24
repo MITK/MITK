@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitkInteractionPositionEvent.h>
 #include <mitkLine.h>
 #include <mitkRotationOperation.h>
+#include <mitkTimeNavigationController.h>
 
 #include <rotate_cursor.xpm>
 
@@ -772,16 +773,16 @@ void mitk::DisplayActionEventBroadcast::Swivel(StateMachineAction* /*stateMachin
 
 void mitk::DisplayActionEventBroadcast::IncreaseTimeStep(StateMachineAction*, InteractionEvent*)
 {
-  auto sliceNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
-  auto stepper = sliceNaviController->GetTime();
+  auto* timeNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
+  auto* stepper = timeNaviController->GetStepper();
   stepper->SetAutoRepeat(true);
   stepper->Next();
 }
 
 void mitk::DisplayActionEventBroadcast::DecreaseTimeStep(StateMachineAction*, InteractionEvent*)
 {
-  auto sliceNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
-  auto stepper = sliceNaviController->GetTime();
+  auto* timeNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
+  auto* stepper = timeNaviController->GetStepper();
   stepper->SetAutoRepeat(true);
   stepper->Previous();
 }

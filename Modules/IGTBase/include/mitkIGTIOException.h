@@ -21,7 +21,7 @@ namespace mitk {
   * \brief An object of this class represents an exception of the MITK-IGT module which are releated to the input/output problems (e.g. reading writing files, etc.).
   *
   * \ingroup IGT
-  */  class MITKIGTBASE_EXPORT IGTIOException : public mitk::IGTException
+  */  class MITKIGTBASE_EXPORT IGTIOException /** \cond */ : public mitk::IGTException /** \endcond */
   {
   public:
     mitkExceptionClassMacro(IGTIOException,mitk::IGTException);

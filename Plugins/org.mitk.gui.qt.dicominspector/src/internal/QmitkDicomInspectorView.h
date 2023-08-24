@@ -68,6 +68,7 @@ protected:
 
   /**	@brief Calls OnSliceChangedDelayed so the event isn't triggered multiple times.*/
   void OnSliceChanged();
+  void OnTimeChanged();
 
   void OnSliceNavigationControllerDeleted(const itk::Object* sender, const itk::EventObject& /*e*/);
 
@@ -104,15 +105,14 @@ private:
   {
     mitk::SliceNavigationController* controller;
     int observerTag;
-    std::string renderWindowName;
     mitk::IRenderWindowPart* renderWindowPart;
 
-    ObserverInfo(mitk::SliceNavigationController* controller, int observerTag,
-      const std::string& renderWindowName, mitk::IRenderWindowPart* part);
+    ObserverInfo(mitk::SliceNavigationController* controller, int observerTag, mitk::IRenderWindowPart* part);
   };
 
   typedef std::multimap<const mitk::SliceNavigationController*, ObserverInfo> ObserverMapType;
   ObserverMapType m_ObserverMap;
+  unsigned int m_ControllerToTimeObserverTag;
 
   /** @brief Currently selected node for the DICOM information.*/
   mitk::DataNode::ConstPointer m_SelectedNode;

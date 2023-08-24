@@ -26,9 +26,8 @@ found in the LICENSE file.
 #include <mitkSegmentationHelper.h>
 #include <mitkToolManagerProvider.h>
 
+#include <QmitkFindSegmentationTaskDialog.h>
 #include <QmitkStaticDynamicSegmentationDialog.h>
-#include <QmitkStyleManager.h>
-
 #include <QmitkStyleManager.h>
 
 #include <ui_QmitkSegmentationTaskListWidget.h>
@@ -114,6 +113,7 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
 
   m_Ui->progressBar->setStyleSheet(QString("QProgressBar::chunk { background-color: %1; }").arg(QmitkStyleManager::GetIconAccentColor()));
 
+  m_Ui->findButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_find.svg")));
   m_Ui->storeButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
 
   using Self = QmitkSegmentationTaskListWidget;
@@ -121,6 +121,7 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
   connect(m_Ui->selectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged, this, &Self::OnSelectionChanged);
   connect(m_Ui->previousButton, &QToolButton::clicked, this, &Self::OnPreviousButtonClicked);
   connect(m_Ui->nextButton, &QToolButton::clicked, this, &Self::OnNextButtonClicked);
+  connect(m_Ui->findButton, &QToolButton::clicked, this, &Self::OnFindButtonClicked);
   connect(m_Ui->loadButton, &QPushButton::clicked, this, &Self::OnLoadButtonClicked);
   connect(m_Ui->storeButton, &QPushButton::clicked, this, &Self::OnStoreButtonClicked);
   connect(m_Ui->acceptButton, &QPushButton::clicked, this, &Self::OnAcceptButtonClicked);
@@ -138,6 +139,9 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
 
   auto* nextUndoneShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key::Key_N), this);
   connect(nextUndoneShortcut, &QShortcut::activated, this, &Self::OnNextTaskShortcutActivated);
+
+  auto *findTaskShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_F), this);
+  connect(findTaskShortcut, &QShortcut::activated, this, &Self::OnFindTaskShortcutActivated);
 
   auto* loadShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_L), this);
   connect(loadShortcut, &QShortcut::activated, this, &Self::OnLoadTaskShortcutActivated);
@@ -435,6 +439,29 @@ void QmitkSegmentationTaskListWidget::OnNextButtonClicked()
   }
 
   this->UpdateNavigationButtons();
+}
+
+void QmitkSegmentationTaskListWidget::OnFindButtonClicked()
+{
+  if (m_TaskList.IsNull())
+    return;
+
+  QmitkFindSegmentationTaskDialog dialog;
+  dialog.SetTaskList(m_TaskList);
+
+  if (dialog.exec() != QDialog::Accepted)
+    return;
+
+  if (!dialog.GetSelectedTask().has_value())
+    return;
+
+  this->SetCurrentTaskIndex(dialog.GetSelectedTask());
+
+  if (dialog.LoadSelectedTask())
+  {
+    if (!m_ActiveTaskIndex.has_value() || m_ActiveTaskIndex.value() != dialog.GetSelectedTask().value())
+      this->OnLoadButtonClicked();
+  }
 }
 
 void QmitkSegmentationTaskListWidget::UpdateNavigationButtons()
@@ -853,7 +880,6 @@ void QmitkSegmentationTaskListWidget::SetCurrentTaskIndex(const std::optional<si
   {
     m_CurrentTaskIndex = index;
     this->OnCurrentTaskChanged();
-
   }
 }
 
@@ -943,6 +969,11 @@ void QmitkSegmentationTaskListWidget::OnPreviousTaskShortcutActivated()
 void QmitkSegmentationTaskListWidget::OnNextTaskShortcutActivated()
 {
   m_Ui->nextButton->click();
+}
+
+void QmitkSegmentationTaskListWidget::OnFindTaskShortcutActivated()
+{
+  m_Ui->findButton->click();
 }
 
 void QmitkSegmentationTaskListWidget::OnLoadTaskShortcutActivated()

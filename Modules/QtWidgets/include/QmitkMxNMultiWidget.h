@@ -110,10 +110,6 @@ Q_SIGNALS:
   void UpdateUtilityWidgetViewPlanes();
   void LayoutChanged();
 
-protected:
-
-  void RemoveRenderWindowWidget() override;
-
 private:
 
   void SetLayoutImpl() override;
@@ -126,7 +122,6 @@ private:
   static nlohmann::json BuildJSONFromLayout(const QSplitter* splitter);
   QSplitter* BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);
 
-  mitk::SliceNavigationController* m_TimeNavigationController;
   std::unique_ptr<QmitkSynchronizedWidgetConnector> m_SynchronizedWidgetConnector;
 
   bool m_CrosshairVisibility;

@@ -30,11 +30,18 @@ namespace mitk
     mitkClassMacro(ContourModelSetToImageFilter, ImageSource);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
-    itkSetMacro(MakeOutputBinary, bool);
-    itkGetMacro(MakeOutputBinary, bool);
-    itkBooleanMacro(MakeOutputBinary);
 
+    virtual void SetMakeOutputBinary(bool makeOutputBinary);
+    virtual void SetMakeOutputLabelPixelType(bool makeOutputLabelPixelType);
+    itkSetMacro(PaintingPixelValue, int);
     itkSetMacro(TimeStep, unsigned int);
+
+    itkGetMacro(MakeOutputBinary, bool);
+    itkGetMacro(MakeOutputLabelPixelType, bool);
+    itkGetMacro(PaintingPixelValue, int);
+
+    itkBooleanMacro(MakeOutputBinary);
+    itkBooleanMacro(MakeOutputLabelPixelType);
 
     /**
        * Allocates a new output object and returns it. Currently the
@@ -82,6 +89,8 @@ namespace mitk
     void InitializeOutputEmpty();
 
     bool m_MakeOutputBinary;
+    bool m_MakeOutputLabelPixelType;
+    int m_PaintingPixelValue;
 
     unsigned int m_TimeStep;
 

@@ -51,7 +51,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
   m_Renderer = m_RenderWindow->GetRenderer();
   hlayout->addWidget(m_RenderWindow);
 
-  new QmitkStepperAdapter(sliceNavigationWidget, m_RenderWindow->GetSliceNavigationController()->GetSlice());
+  new QmitkStepperAdapter(sliceNavigationWidget, m_RenderWindow->GetSliceNavigationController()->GetStepper());
 
   SetLevelWindowEnabled(true);
 }

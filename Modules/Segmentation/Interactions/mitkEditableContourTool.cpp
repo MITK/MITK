@@ -33,6 +33,7 @@ void mitk::EditableContourTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("EndDrawing", OnEndDrawing);
   CONNECT_FUNCTION("FinishContour", OnFinish);
   CONNECT_FUNCTION("CtrlMovePoint", OnMouseMoved);
+  CONNECT_CONDITION("InsideCorrectPlane", OnCheckPlane);
 }
 
 void mitk::EditableContourTool::Activated()
@@ -341,6 +342,23 @@ void mitk::EditableContourTool::OnFinish(StateMachineAction *, InteractionEvent 
   {
     this->ConfirmSegmentation();
   }
+}
+
+bool mitk::EditableContourTool::OnCheckPlane(const InteractionEvent* interactionEvent)
+{
+  auto positionEvent = dynamic_cast<const mitk::InteractionPositionEvent*>(interactionEvent);
+
+  if (nullptr == positionEvent)
+    return false;
+
+  if (m_PlaneGeometry.IsNotNull())
+  {
+    // Check if the point is in the correct slice
+    if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::sqrteps)
+      return false;
+  }
+
+  return true;
 }
 
 void mitk::EditableContourTool::ReleaseHelperObjects(bool includeWorkingContour)

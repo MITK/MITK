@@ -11,23 +11,25 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkThreeStepLinearModel.h"
+#include <mitkIOUtil.h>
+
 
 const std::string mitk::ThreeStepLinearModel::MODEL_DISPLAY_NAME = "Three Step Linear Model";
 
-const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_S0 = "Baseline";
+const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_s0 = "Baseline";
 const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_t1 = "Time_point_1";
 const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_t2 = "Time_point_2";
 const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_a1 = "Slope_1";
 const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_a2 = "Slope_2";
 
 // Assuming that Model is calculated on Signal intensities I
-const std::string mitk::ThreeStepLinearModel::UNIT_PARAMETER_S0 = "I";
+const std::string mitk::ThreeStepLinearModel::UNIT_PARAMETER_s0 = "I";
 const std::string mitk::ThreeStepLinearModel::UNIT_PARAMETER_t1 = "s";
 const std::string mitk::ThreeStepLinearModel::UNIT_PARAMETER_t2 = "s";
 const std::string mitk::ThreeStepLinearModel::UNIT_PARAMETER_a1 = "I/s";
 const std::string mitk::ThreeStepLinearModel::UNIT_PARAMETER_a2 = "I/s";
 
-const unsigned int mitk::ThreeStepLinearModel::POSITION_PARAMETER_S0 = 0;
+const unsigned int mitk::ThreeStepLinearModel::POSITION_PARAMETER_s0 = 0;
 const unsigned int mitk::ThreeStepLinearModel::POSITION_PARAMETER_t1 = 1;
 const unsigned int mitk::ThreeStepLinearModel::POSITION_PARAMETER_t2 = 2;
 const unsigned int mitk::ThreeStepLinearModel::POSITION_PARAMETER_a1 = 3;
@@ -59,7 +61,7 @@ mitk::ThreeStepLinearModel::ParameterNamesType
 mitk::ThreeStepLinearModel::GetParameterNames() const
 {
   ParameterNamesType result;
-  result.push_back(NAME_PARAMETER_S0);
+  result.push_back(NAME_PARAMETER_s0);
   result.push_back(NAME_PARAMETER_t1);
   result.push_back(NAME_PARAMETER_t2);
   result.push_back(NAME_PARAMETER_a1);
@@ -80,7 +82,7 @@ mitk::ThreeStepLinearModel::GetParameterUnits() const
 {
   ParamterUnitMapType result;
 
-  result.insert(std::make_pair(NAME_PARAMETER_S0, UNIT_PARAMETER_S0));
+  result.insert(std::make_pair(NAME_PARAMETER_s0, UNIT_PARAMETER_s0));
   result.insert(std::make_pair(NAME_PARAMETER_t1, UNIT_PARAMETER_t1));
   result.insert(std::make_pair(NAME_PARAMETER_t2, UNIT_PARAMETER_t2));
   result.insert(std::make_pair(NAME_PARAMETER_a1, UNIT_PARAMETER_a1));
@@ -97,8 +99,8 @@ mitk::ThreeStepLinearModel::GetDerivedParameterNames() const
   result.push_back("FinalTimePoint");
   result.push_back("FinalUptake");
   result.push_back("Smax");
-  result.push_back("y-intercept2");
   result.push_back("y-intercept1");
+  result.push_back("y-intercept2");
 
   return result;
 };
@@ -107,6 +109,27 @@ mitk::ThreeStepLinearModel::ParametersSizeType
 mitk::ThreeStepLinearModel::GetNumberOfDerivedParameters() const
 {
   return 6;
+};
+
+double mitk::ThreeStepLinearModel::ComputeSignalFromParameters(double x, double s0, double t1, double t2, double a1, double a2, double b1, double b2)
+{
+  double signal = 0.0;
+
+  if (x < t1)
+  {
+    signal = s0;
+  }
+  else if (x >= t1 && x <= t2)
+  {
+    signal = a1 * x + b1;
+  }
+  else
+  {
+    signal = a2 * x + b2;
+  }
+
+
+  return signal;
 };
 
 mitk::ThreeStepLinearModel::ParamterUnitMapType mitk::ThreeStepLinearModel::GetDerivedParameterUnits() const
@@ -130,35 +153,24 @@ mitk::ThreeStepLinearModel::ModelResultType
 mitk::ThreeStepLinearModel::ComputeModelfunction(const ParametersType& parameters) const
 {
   //Model Parameters
-  double     S0 = (double) parameters[POSITION_PARAMETER_S0];
-  double     t1 = (double) parameters[POSITION_PARAMETER_t1] ;
-  double     t2 = (double) parameters[POSITION_PARAMETER_t2] ;
-  double     a1 = (double) parameters[POSITION_PARAMETER_a1] ;
-  double     a2 = (double) parameters[POSITION_PARAMETER_a2] ;
+  const double     s0 = (double) parameters[POSITION_PARAMETER_s0];
+  const double     t1 = (double) parameters[POSITION_PARAMETER_t1] ;
+  const double     t2 = (double) parameters[POSITION_PARAMETER_t2] ;
+  const double     a1 = (double) parameters[POSITION_PARAMETER_a1] ;
+  const double     a2 = (double) parameters[POSITION_PARAMETER_a2] ;
 
-
-  double     b1 = S0-a1*t1 ;
-  double     b2 = (a1*t2+ b1) - (a2*t2);
+  double     b1 = s0 - a1 * t1;
+  double     b2 = (a1 * t2 + b1) - (a2 * t2);
 
   ModelResultType signal(m_TimeGrid.GetSize());
 
   TimeGridType::const_iterator timeGridEnd = m_TimeGrid.end();
+
   ModelResultType::iterator signalPos = signal.begin();
 
   for (TimeGridType::const_iterator gridPos = m_TimeGrid.begin(); gridPos != timeGridEnd; ++gridPos, ++signalPos)
   {
-      if((*gridPos) < t1)
-      {
-          *signalPos = S0;
-      }
-      else if ((*gridPos) >= t1 && (*gridPos) <= t2)
-      {
-          *signalPos = a1*(*gridPos)+b1;
-      }
-      else
-      {
-          *signalPos = a2*(*gridPos)+b2;
-      }
+    *signalPos = ComputeSignalFromParameters(*gridPos, s0, t1, t2, a1, a2, b1, b2);
   }
 
   return signal;
@@ -195,34 +207,60 @@ mitk::ThreeStepLinearModel::StaticParameterValuesType mitk::ThreeStepLinearModel
 mitk::ModelBase::DerivedParameterMapType mitk::ThreeStepLinearModel::ComputeDerivedParameters(
   const mitk::ModelBase::ParametersType& parameters) const
 {
-    double     S0 = (double) parameters[POSITION_PARAMETER_S0];
-    double     tau = (double) parameters[POSITION_PARAMETER_t1] ;
-    double     tmax = (double) parameters[POSITION_PARAMETER_t2] ;
-    double     s1 = (double) parameters[POSITION_PARAMETER_a1] ;
-    double     s2 = (double) parameters[POSITION_PARAMETER_a2] ;
+    const double     s0 = (double) parameters[POSITION_PARAMETER_s0];
+    const double     t1 = (double) parameters[POSITION_PARAMETER_t1] ;
+    const double     t2 = (double) parameters[POSITION_PARAMETER_t2] ;
+    const double     a1 = (double) parameters[POSITION_PARAMETER_a1] ;
+    const double     a2 = (double) parameters[POSITION_PARAMETER_a2] ;
+
+    const double     b1 = s0 - a1 * t1;
+    const double     b2 = (a1 * t2 + b1) - (a2 * t2);
 
     unsigned int timeSteps = m_TimeGrid.GetSize();
 
-    double Taq = 0;
-    Taq = m_TimeGrid.GetElement(timeSteps-1);
+    const double taq = (m_TimeGrid.empty() == false) ? (m_TimeGrid.GetElement(timeSteps - 1)) : ( mitkThrow() << "An exception occured because time grid is empty, method can't continue.");
 
-    double b1 = S0-s1*tau;
-    double Smax = s1*tmax+b1;
-    double b2 = Smax-s2*tmax;
-    double AUC = s1/2*(tmax*tmax-tau*tau)
-                 +(b1-S0)*(tmax-tau)
-                 +s2/2*(Taq*Taq-tmax*tmax)
-                 +(b2-S0)*(Taq-tmax);
-    double Sfin = s2*Taq+b2;
+    const double sfin = a2 * taq + b2;
+
+    double smax = sfin;
+    if ((a1 >= 0) && (a2 >= 0))
+      smax = sfin;
+    else if ((a1 < 0) && (a2 < 0))
+      smax = s0;
+    else if ((a1 > 0) && (a2 < 0))
+      smax = (a1 * t2 + b1);
+    else
+    {
+      if (abs(a1 * (t2 - t1)) >= abs(a2 * (taq - t2)))
+        smax = s0;
+      else smax = sfin;
+    }
+
+    double auc = 0.0;
+    TimeGridType::const_iterator timeGridEnd = m_TimeGrid.end();
+
+    for (TimeGridType::const_iterator gridPos = m_TimeGrid.begin(); gridPos != timeGridEnd - 1; ++gridPos)
+    {
+      double currentGridPos = *gridPos;
+      double nextGridPos = *(++gridPos);
+      double deltaX = nextGridPos - currentGridPos;
+      double deltaY = ComputeSignalFromParameters(nextGridPos, s0, t1, t2, a1, a2, b1, b2) - ComputeSignalFromParameters(currentGridPos, s0, t1, t2, a1, a2, b1, b2);
+      double Yi = ComputeSignalFromParameters(currentGridPos, s0, t1, t2, a1, a2, b1, b2 );
+      double intI = 0.5 * deltaX * deltaY + Yi * deltaX;
+      auc += std::abs(intI);
+      --gridPos;
+    }
+
 
     DerivedParameterMapType result;
 
-    result.insert(std::make_pair("AUC", AUC));
-    result.insert(std::make_pair("FinalTimePoint", Taq));
-    result.insert(std::make_pair("FinalUptake", Sfin));
-    result.insert(std::make_pair("Smax", Smax));
+    result.insert(std::make_pair("AUC", auc));
+    result.insert(std::make_pair("FinalTimePoint", taq));
+    result.insert(std::make_pair("FinalUptake", sfin));
+    result.insert(std::make_pair("Smax", smax));
     result.insert(std::make_pair("y-intercept1", b1));
     result.insert(std::make_pair("y-intercept2", b2));
+
 
     return result;
 };

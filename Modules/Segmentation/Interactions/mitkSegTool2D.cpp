@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "mitkBaseRenderer.h"
 #include "mitkDataStorage.h"
 #include "mitkPlaneGeometry.h"
+#include <mitkTimeNavigationController.h>
 
 // Include of the new ImageExtractor
 #include "mitkMorphologicalOperations.h"
@@ -395,8 +396,7 @@ void mitk::SegTool2D::OnTimePointChangedInternal()
 {
   if (m_IsTimePointChangeAware && nullptr != this->GetWorkingDataNode())
   {
-    const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-
+    const TimePointType timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
     if (timePoint != m_LastTimePointTriggered)
     {
       m_LastTimePointTriggered = timePoint;
@@ -487,7 +487,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const PlaneGeometry *planeGeom
   {
     return;
   }
-  unsigned int currentSlicePosition = m_LastEventSender->GetSliceNavigationController()->GetSlice()->GetPos();
+  unsigned int currentSlicePosition = m_LastEventSender->GetSliceNavigationController()->GetStepper()->GetPos();
   SliceInformation sliceInfo(segmentationResult, const_cast<mitk::PlaneGeometry *>(planeGeometry), timeStep);
   sliceInfo.slicePosition = currentSlicePosition;
   WriteBackSegmentationResults({ sliceInfo }, true);
@@ -514,7 +514,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
     dynamic_cast<const PlaneGeometry*>(dynamic_cast<const mitk::SlicedGeometry3D*>(
       m_LastEventSender->GetSliceNavigationController()->GetCurrentGeometry3D())
       ->GetPlaneGeometry(0));
-  unsigned int slicePosition = m_LastEventSender->GetSliceNavigationController()->GetSlice()->GetPos();
+  const unsigned int slicePosition = m_LastEventSender->GetSliceNavigationController()->GetStepper()->GetPos();
 
   mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume);
 

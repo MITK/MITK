@@ -91,6 +91,8 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
     m_LayerContainer.push_back(liClone);
   }
 
+  this->ReinitMaps();
+
   // Add some DICOM Tags as properties to segmentation image
   DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
 }
@@ -1154,16 +1156,17 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabels()
 const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabelsInGroup(GroupIndexType index) const
 {
   if (!this->ExistGroup(index))
-  {
     mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
-  }
 
   mitk::LabelSetImage::ConstLabelVectorType result;
+  const auto labelValues = m_GroupToLabelMap.find(index)->second;
 
-  const auto labellist = m_GroupToLabelMap.find(index)->second;
-  for (const auto& labelvalue : labellist)
+  for (const auto& labelValue : labelValues)
   {
-    result.emplace_back(this->GetLabel(labelvalue));
+    const auto* label = this->GetLabel(labelValue);
+
+    if (label != nullptr)
+      result.emplace_back(label);
   }
 
   return result;
@@ -1172,16 +1175,17 @@ const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabelsIn
 const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabelsInGroup(GroupIndexType index)
 {
   if (!this->ExistGroup(index))
-  {
     mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
-  }
 
   mitk::LabelSetImage::LabelVectorType result;
+  const auto labelValues = m_GroupToLabelMap[index];
 
-  const auto labellist = m_GroupToLabelMap[index];
-  for (const auto& labelvalue : labellist)
+  for (const auto& labelValue : labelValues)
   {
-    result.emplace_back(this->GetLabel(labelvalue));
+    auto* label = this->GetLabel(labelValue);
+
+    if (label != nullptr)
+      result.emplace_back(label);
   }
 
   return result;
@@ -1196,16 +1200,21 @@ void mitk::LabelSetImage::ReinitMaps()
   for (GroupIndexType layerID = 0; layerID < this->GetNumberOfLayers(); ++layerID)
   {
     auto labelSet = this->GetLabelSet(layerID);
-    for (auto iter = labelSet->IteratorBegin(); iter != labelSet->IteratorEnd(); ++iter)
+
+    if (labelSet->GetNumberOfLabels() != 0)
     {
-      if (iter->first != UnlabeledValue)
+      for (auto iter = labelSet->IteratorBegin(); iter != labelSet->IteratorEnd(); ++iter)
       {
-        this->AddLabelToMap(iter->first, iter->second, layerID);
+        if (iter->first != UnlabeledValue)
+          this->AddLabelToMap(iter->first, iter->second, layerID);
       }
+    }
+    else
+    {
+      m_GroupToLabelMap[layerID] = {};
     }
   }
 }
-
 
 bool mitk::Equal(const mitk::LabelSetImage &leftHandSide,
                  const mitk::LabelSetImage &rightHandSide,

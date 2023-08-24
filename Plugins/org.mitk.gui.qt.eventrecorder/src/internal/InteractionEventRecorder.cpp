@@ -114,7 +114,7 @@ void InteractionEventRecorder::RotateView()
     if (renderWindow == nullptr)
       continue;
 
-    mitk::Stepper* stepper = mapit->second->GetCameraRotationController()->GetSlice();
+    mitk::Stepper* stepper = mapit->second->GetCameraRotationController()->GetStepper();
     if (stepper == nullptr)
       return;
 

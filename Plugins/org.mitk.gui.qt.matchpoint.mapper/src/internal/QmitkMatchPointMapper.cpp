@@ -467,35 +467,10 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
         //check for super/sub sampling
         if (m_Controls.m_groupActivateSampling->isChecked())
         {
-            //change the pixel count and  spacing of the geometry
-            mitk::BaseGeometry::BoundsArrayType geoBounds = pJob->m_spRefGeometry->GetBounds();
-            auto oldSpacing = pJob->m_spRefGeometry->GetSpacing();
-            mitk::Vector3D geoSpacing;
-
-            geoSpacing[0] = oldSpacing[0] / m_Controls.m_sbXFactor->value();
-            geoSpacing[1] = oldSpacing[1] / m_Controls.m_sbYFactor->value();
-            geoSpacing[2] = oldSpacing[2] / m_Controls.m_sbZFactor->value();
-
-            geoBounds[1] = geoBounds[1] * m_Controls.m_sbXFactor->value();
-            geoBounds[3] = geoBounds[3] * m_Controls.m_sbYFactor->value();
-            geoBounds[5] = geoBounds[5] * m_Controls.m_sbZFactor->value();
-
-            pJob->m_spRefGeometry->SetBounds(geoBounds);
-            pJob->m_spRefGeometry->SetSpacing(geoSpacing);
-
-            auto oldOrigin = pJob->m_spRefGeometry->GetOrigin();
-
-            //if we change the spacing we must also correct the origin to ensure
-            //that the voxel matrix still covers the same space. This is due the fact
-            //that the origin is not in the corner of the voxel matrix, but in the center
-            // of the voxel that is in the corner.
-            mitk::Point3D newOrigin;
-            for (mitk::Point3D::SizeType i = 0; i < 3; ++i)
-            {
-              newOrigin[i] = 0.5* (geoSpacing[i] - oldSpacing[i]) + oldOrigin[i];
-            }
-
-            pJob->m_spRefGeometry->SetOrigin(newOrigin);
+          pJob->m_spRefGeometry = mitk::ImageMappingHelper::GenerateSuperSampledGeometry(pJob->m_spRefGeometry,
+            m_Controls.m_sbXFactor->value(),
+            m_Controls.m_sbYFactor->value(),
+            m_Controls.m_sbZFactor->value());
         }
     }
 

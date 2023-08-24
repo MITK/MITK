@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include "mitkImageAccessByItk.h"
 #include <itkImageDuplicator.h>
 #include <itkFFTConvolutionImageFilter.h>
+#include <itkVnlFFTImageFilterInitFactory.h>
 #include <mitkITKImageImport.h>
 
 namespace mitk
@@ -452,6 +453,8 @@ namespace mitk
       typedef itk::FFTConvolutionImageFilter<InputImageType,
         KernelImageType,
         ConvolutionImageType> ConvolutionFilterType;
+
+      itk::VnlFFTImageFilterInitFactory::RegisterFactories();
 
       typename ConvolutionFilterType::Pointer convolutionFilter = ConvolutionFilterType::New();
       typedef itk::ConstantBoundaryCondition<InputImageType, InputImageType> BoundaryConditionType;

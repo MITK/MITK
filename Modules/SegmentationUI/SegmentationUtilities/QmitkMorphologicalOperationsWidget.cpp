@@ -14,16 +14,12 @@ found in the LICENSE file.
 #include <ui_QmitkMorphologicalOperationsWidgetControls.h>
 
 #include <mitkProgressBar.h>
-#include <mitkSliceNavigationController.h>
-
 #include <QCheckBox>
 
 static const char* const HelpText = "Select a segmentation above";
 
-QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage,
-                                                                       mitk::SliceNavigationController* timeNavigationController,
-                                                                       QWidget* parent)
-  : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
+QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
+  : QWidget(parent)
 {
   m_Controls = new Ui::QmitkMorphologicalOperationsWidgetControls;
   m_Controls->setupUi(this);

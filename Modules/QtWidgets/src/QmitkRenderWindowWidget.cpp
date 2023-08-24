@@ -287,7 +287,7 @@ void QmitkRenderWindowWidget::SetGeometrySlice(const itk::EventObject& event)
 
 void QmitkRenderWindowWidget::OnResetGeometry()
 {
-  const auto* baseRenderer = mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow());
+  const auto* baseRenderer = mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow());
   const auto* interactionReferenceGeometry = baseRenderer->GetInteractionReferenceGeometry();
   this->ResetGeometry(interactionReferenceGeometry);
   m_RenderWindow->ShowOverlayMessage(false);
@@ -307,7 +307,7 @@ void QmitkRenderWindowWidget::ResetGeometry(const mitk::TimeGeometry* referenceG
 
   // store the current time step to set it again later, if the camera should not be reset
   auto* renderingManager = mitk::RenderingManager::GetInstance();
-  const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+  const mitk::TimePointType currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
   if (referenceGeometry->IsValidTimePoint(currentTimePoint))
   {
     imageTimeStep = referenceGeometry->TimePointToTimeStep(currentTimePoint);
@@ -318,5 +318,5 @@ void QmitkRenderWindowWidget::ResetGeometry(const mitk::TimeGeometry* referenceG
 
   // reset position and time step
   this->GetSliceNavigationController()->SelectSliceByPoint(currentPosition);
-  renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
+  renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(imageTimeStep);
 }

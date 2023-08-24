@@ -567,7 +567,7 @@ namespace mitk
   {
     enum class MergeStyle
     {
-      Replace, //The old label content of a lable value will be replaced by its new label content.
+      Replace, //The old label content of a label value will be replaced by its new label content.
                //Therefore pixels that are labeled might become unlabeled again.
                //(This means that a lock of the value is also ignored).
       Merge //The union of old and new label content will be generated.

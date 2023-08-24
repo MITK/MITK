@@ -74,12 +74,10 @@ public:
    * object may be used to match a <code>ServiceReference</code> object or a
    * <code>ServiceProperties</code> object.
    *
-   * <p>
    * If the filter cannot be parsed, an std::invalid_argument will be
    * thrown with a human readable message where the filter became unparsable.
    *
    * @param filter The filter string.
-   * @return A <code>LDAPFilter</code> object encapsulating the filter string.
    * @throws std::invalid_argument If <code>filter</code> contains an invalid
    *         filter string that cannot be parsed.
    * @see "Framework specification for a description of the filter string syntax." TODO!

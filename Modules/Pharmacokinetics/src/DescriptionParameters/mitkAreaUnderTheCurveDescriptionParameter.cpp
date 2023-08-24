@@ -40,11 +40,8 @@ mitk::CurveDescriptionParameterBase::DescriptionParameterResultsType mitk::AreaU
     double deltaX = grid(i + 1) - grid(i);
     double deltaY = curve(i + 1) - curve(i);
     double Yi = curve(i);
-
-    double intI = 1 / 2 * deltaX * deltaY + Yi * deltaX;
-
+    double intI = 0.5 * deltaX * deltaY + Yi * deltaX;
     auc += std::abs(intI);
-
   }
   results.push_back(auc);
   return results;

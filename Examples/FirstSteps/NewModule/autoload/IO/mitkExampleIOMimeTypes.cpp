@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkExampleIOMimeTypes.h"
 #include "mitkIOMimeTypes.h"
 #include <itksys/SystemTools.hxx>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 namespace mitk
 {

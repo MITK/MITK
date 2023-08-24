@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <cmath>
 #include <iomanip>
 
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 #include "mitkNumericConstants.h"
 
 namespace mitk

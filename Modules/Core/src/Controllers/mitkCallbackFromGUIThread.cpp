@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkCallbackFromGUIThread.h"
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 mitk::CallbackFromGUIThread *mitk::CallbackFromGUIThread::m_Instance = nullptr;
 mitk::CallbackFromGUIThreadImplementation *mitk::CallbackFromGUIThread::m_Implementation = nullptr;

@@ -35,7 +35,7 @@ namespace mitk
   *       methods.
   *   \ingroup IGT
   */
-  class MITKIGT_EXPORT ClaronInterface : public itk::Object
+  class MITKIGT_EXPORT ClaronInterface /** \cond */ : public itk::Object /** \endcond */
   {
   public:
 

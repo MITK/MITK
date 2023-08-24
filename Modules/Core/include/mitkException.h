@@ -59,7 +59,7 @@ namespace mitk
     /** \return Returns how often the exception was rethrown. */
     int GetNumberOfRethrows();
 
-    /** @return Returns the rethrow data of the specified rethrow number. Returns empty data, if the rethrowNumber
+    /** Returns the rethrow data of the specified rethrow number. Returns empty data, if the rethrowNumber
      * doesn't
      * exist.
       * @param rethrowNumber The internal number of the rethrow.

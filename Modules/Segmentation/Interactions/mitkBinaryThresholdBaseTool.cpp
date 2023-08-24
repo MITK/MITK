@@ -103,18 +103,21 @@ void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep
 
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::BinaryThresholdBaseTool::ITKThresholding(const itk::Image<TPixel, VImageDimension>* inputImage,
-                                                    Image* segmentation,
+                                                    LabelSetImage *segmentation,
                                                     unsigned int timeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
   typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
 
+  const auto activeValue = this->GetActiveLabelValueOfPreview();
+  this->SetSelectedLabels({activeValue});
+
   typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
   filter->SetInput(inputImage);
   filter->SetLowerThreshold(m_LowerThreshold);
   filter->SetUpperThreshold(m_UpperThreshold);
-  filter->SetInsideValue(this->GetUserDefinedActiveLabel());
+  filter->SetInsideValue(activeValue);
   filter->SetOutsideValue(0);
   filter->Update();
 

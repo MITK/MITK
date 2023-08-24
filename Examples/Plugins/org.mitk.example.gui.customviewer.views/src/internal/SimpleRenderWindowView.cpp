@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkIRenderingManager.h>
 #include <mitkInteractionConst.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkTimeNavigationController.h>
 
 #include <QVBoxLayout>
 #include <mitkPlaneGeometry.h>
@@ -152,7 +153,7 @@ bool SimpleRenderWindowView::HasCoupledRenderWindows() const
   return false;
 }
 
-mitk::SliceNavigationController *SimpleRenderWindowView::GetTimeNavigationController() const
+mitk::TimeNavigationController *SimpleRenderWindowView::GetTimeNavigationController() const
 {
   if (GetRenderingManager())
     return GetRenderingManager()->GetTimeNavigationController();

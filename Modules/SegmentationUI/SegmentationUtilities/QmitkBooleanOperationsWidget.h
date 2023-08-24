@@ -16,7 +16,8 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 
 #include <mitkBooleanOperation.h>
-#include <QmitkSegmentationUtilityWidget.h>
+
+#include <QWidget>
 
 namespace Ui
 {
@@ -29,14 +30,12 @@ namespace mitk
   class DataStorage;
 }
 
-class MITKSEGMENTATIONUI_EXPORT QmitkBooleanOperationsWidget : public QmitkSegmentationUtilityWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkBooleanOperationsWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage,
-                                        mitk::SliceNavigationController* timeNavigationController,
-                                        QWidget* parent = nullptr);
+  explicit QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
   ~QmitkBooleanOperationsWidget() override;
 
 private slots:

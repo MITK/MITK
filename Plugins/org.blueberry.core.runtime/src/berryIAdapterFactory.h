@@ -77,7 +77,7 @@ struct org_blueberry_core_runtime_EXPORT IAdapterFactory {
    * of dispatching any actual <code>getAdapter</code> requests.
    * </p>
    *
-   * @return the collection of adapter types
+   * @param[out] adapters the collection of adapter types
    */
   virtual void GetAdapterList(std::vector<const std::type_info&>& adapters) = 0;
 };

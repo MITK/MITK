@@ -123,6 +123,8 @@ QmitkSegmentationView::~QmitkSegmentationView()
     }
     m_WorkingDataObserverTags.clear();
 
+    this->RemoveObserversFromWorkingImage();
+
     // removing all observers from reference data
     for (NodeTagMapType::iterator dataIter = m_ReferenceDataObserverTags.begin(); dataIter != m_ReferenceDataObserverTags.end(); ++dataIter)
     {
@@ -143,7 +145,7 @@ QmitkSegmentationView::~QmitkSegmentationView()
   }
 
   m_ToolManager->ActiveToolChanged -=
-    mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
+    mitk::MessageDelegate<Self>(this, &Self::ActiveToolChanged);
 
   delete m_Controls;
 }
@@ -213,8 +215,8 @@ void QmitkSegmentationView::OnAnySelectionChanged()
       this->ApplySelectionModeOnReferenceNode();
 
       // Add visibility observer for the new reference node
-      auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-      command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
+      auto command = itk::SimpleMemberCommand<Self>::New();
+      command->SetCallbackFunction(this, &Self::ValidateSelectionInput);
 
       m_ReferenceDataObserverTags[m_ReferenceNode] =
         m_ReferenceNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
@@ -227,6 +229,8 @@ void QmitkSegmentationView::OnAnySelectionChanged()
   if (m_WorkingNode != selectedWorkingNode)
   {
     workingNodeChanged = true;
+
+    this->RemoveObserversFromWorkingImage();
 
     // Remove visibility observer for the current working node
     if (m_WorkingDataObserverTags.find(m_WorkingNode) != m_WorkingDataObserverTags.end())
@@ -244,11 +248,13 @@ void QmitkSegmentationView::OnAnySelectionChanged()
       this->ApplySelectionModeOnWorkingNode();
 
       // Add visibility observer for the new segmentation node
-      auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-      command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
+      auto command = itk::SimpleMemberCommand<Self>::New();
+      command->SetCallbackFunction(this, &Self::ValidateSelectionInput);
 
       m_WorkingDataObserverTags[m_WorkingNode] =
         m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
+
+      this->AddObserversToWorkingImage();
     }
   }
 
@@ -262,6 +268,53 @@ void QmitkSegmentationView::OnAnySelectionChanged()
   }
 
   this->UpdateGUI();
+}
+
+void QmitkSegmentationView::OnLabelAdded(mitk::LabelSetImage::LabelValueType)
+{
+  this->ValidateSelectionInput();
+}
+
+void QmitkSegmentationView::OnLabelRemoved(mitk::LabelSetImage::LabelValueType)
+{
+  this->ValidateSelectionInput();
+}
+
+void QmitkSegmentationView::OnGroupRemoved(mitk::LabelSetImage::GroupIndexType)
+{
+  this->ValidateSelectionInput();
+}
+
+mitk::LabelSetImage* QmitkSegmentationView::GetWorkingImage()
+{
+  if (m_WorkingNode.IsNull())
+    return nullptr;
+
+  return dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+}
+
+void QmitkSegmentationView::AddObserversToWorkingImage()
+{
+  auto* workingImage = this->GetWorkingImage();
+
+  if (workingImage != nullptr)
+  {
+    workingImage->AddLabelAddedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelAdded));
+    workingImage->AddLabelRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelRemoved));
+    workingImage->AddGroupRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::GroupIndexType>(this, &Self::OnGroupRemoved));
+  }
+}
+
+void QmitkSegmentationView::RemoveObserversFromWorkingImage()
+{
+  auto* workingImage = this->GetWorkingImage();
+
+  if (workingImage != nullptr)
+  {
+    workingImage->RemoveLabelAddedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelAdded));
+    workingImage->RemoveLabelRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelRemoved));
+    workingImage->RemoveGroupRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::GroupIndexType>(this, &Self::OnGroupRemoved));
+  }
 }
 
 void QmitkSegmentationView::OnVisibilityShortcutActivated()
@@ -485,9 +538,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // * SHORTCUTS
    // *------------------------
    QShortcut* visibilityShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_H), parent);
-   connect(visibilityShortcut, &QShortcut::activated, this, &QmitkSegmentationView::OnVisibilityShortcutActivated);
+   connect(visibilityShortcut, &QShortcut::activated, this, &Self::OnVisibilityShortcutActivated);
    QShortcut* labelToggleShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), parent);
-   connect(labelToggleShortcut, &QShortcut::activated, this, &QmitkSegmentationView::OnLabelToggleShortcutActivated);
+   connect(labelToggleShortcut, &QShortcut::activated, this, &Self::OnLabelToggleShortcutActivated);
 
    // *------------------------
    // * DATA SELECTION WIDGETS
@@ -505,9 +558,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->workingNodeSelector->SetPopUpHint("Select a segmentation that should be modified. Only segmentation with the same geometry and within the bounds of the reference image are selected.");
 
    connect(m_Controls->referenceNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
-           this, &QmitkSegmentationView::OnReferenceSelectionChanged);
+           this, &Self::OnReferenceSelectionChanged);
    connect(m_Controls->workingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
-           this, &QmitkSegmentationView::OnSegmentationSelectionChanged);
+           this, &Self::OnSegmentationSelectionChanged);
 
    // *------------------------
    // * TOOLMANAGER
@@ -544,7 +597,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox2D->SetToolGUIArea(m_Controls->toolGUIArea2D);
    m_Controls->toolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString());
    connect(m_Controls->toolSelectionBox2D, &QmitkToolSelectionBox::ToolSelected,
-           this, &QmitkSegmentationView::OnManualTool2DSelected);
+           this, &Self::OnManualTool2DSelected);
 
    // setup 3D Tools
    m_Controls->toolSelectionBox3D->SetToolManager(*m_ToolManager);
@@ -555,16 +608,16 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
 
    // create general signal / slot connections
-   connect(m_Controls->newSegmentationButton, &QToolButton::clicked, this, &QmitkSegmentationView::OnNewSegmentation);
+   connect(m_Controls->newSegmentationButton, &QToolButton::clicked, this, &Self::OnNewSegmentation);
 
-   connect(m_Controls->slicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
+   connect(m_Controls->slicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &Self::OnShowMarkerNodes);
 
-   connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::CurrentSelectionChanged, this, &QmitkSegmentationView::OnCurrentLabelSelectionChanged);
-   connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::GoToLabel, this, &QmitkSegmentationView::OnGoToLabel);
-   connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::LabelRenameRequested, this, &QmitkSegmentationView::OnLabelRenameRequested);
+   connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::CurrentSelectionChanged, this, &Self::OnCurrentLabelSelectionChanged);
+   connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::GoToLabel, this, &Self::OnGoToLabel);
+   connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::LabelRenameRequested, this, &Self::OnLabelRenameRequested);
 
-   auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-   command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
+   auto command = itk::SimpleMemberCommand<Self>::New();
+   command->SetCallbackFunction(this, &Self::ValidateSelectionInput);
    m_RenderingManagerObserverTag =
      mitk::RenderingManager::GetInstance()->AddObserver(mitk::RenderingManagerViewsInitializedEvent(), command);
 
@@ -631,7 +684,7 @@ void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* r
     {
       // react if the active tool changed, only if a render window part with decoupled render windows is used
       m_ToolManager->ActiveToolChanged +=
-        mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
+        mitk::MessageDelegate<Self>(this, &Self::ActiveToolChanged);
     }
   }
 }
@@ -646,7 +699,7 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
 
   // remove message-connection to make sure no message is processed if no render window part is available
   m_ToolManager->ActiveToolChanged -=
-    mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
+    mitk::MessageDelegate<Self>(this, &Self::ActiveToolChanged);
 
   m_Controls->slicesInterpolator->Uninitialize();
 }
@@ -971,8 +1024,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     m_Controls->toolSelectionBox3D->setEnabled(true);
 
     auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
-    auto activeLayer = labelSetImage->GetActiveLayer();
-    numberOfLabels = labelSetImage->GetNumberOfLabels(activeLayer);
+    numberOfLabels = labelSetImage->GetTotalNumberOfLabels();
 
     if (numberOfLabels > 0)
       m_Controls->slicesInterpolator->setEnabled(true);

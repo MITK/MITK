@@ -14,7 +14,6 @@ set(MITK_PLUGINS
   org.mitk.core.services:ON
   org.mitk.gui.common:ON
   org.mitk.planarfigure:ON
-  org.mitk.core.ext:OFF
   org.mitk.core.jobs:OFF
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.ext:OFF
@@ -61,7 +60,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.eventrecorder:OFF
   org.mitk.gui.qt.xnat:OFF
   org.mitk.gui.qt.igt.app.ultrasoundtrackingnavigation:OFF
-  org.mitk.gui.qt.classificationsegmentation:OFF
   org.mitk.gui.qt.overlaymanager:OFF
   org.mitk.gui.qt.igt.app.hummelprotocolmeasurements:OFF
   org.mitk.matchpoint.core.helper:OFF
@@ -73,7 +71,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.matchpoint.evaluator:OFF
   org.mitk.gui.qt.matchpoint.manipulator:OFF
   org.mitk.gui.qt.preprocessing.resampling:OFF
-  org.mitk.gui.qt.radiomics:OFF
   org.mitk.gui.qt.cest:OFF
   org.mitk.gui.qt.fit.demo:OFF
   org.mitk.gui.qt.fit.inspector:OFF

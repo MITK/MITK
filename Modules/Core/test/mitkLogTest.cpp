@@ -14,6 +14,8 @@ found in the LICENSE file.
 #include "mitkTestingMacros.h"
 #include <itksys/SystemTools.hxx>
 #include <mitkLog.h>
+#include <mitkLogBackend.h>
+#include <mitkLogBackendCout.h>
 #include <mitkNumericTypes.h>
 #include <mitkStandardFileLocations.h>
 #include <thread>
@@ -25,22 +27,25 @@ found in the LICENSE file.
  * used to process a message or not.
  * It is needed for the disable / enable backend test.
  */
-class TestBackendCout : public mbilog::BackendCout
+class TestBackendCout : public mitk::LogBackendCout
 {
 public:
   TestBackendCout()
+    : m_Called(false)
   {
-    m_Called = false;
-    mbilog::BackendCout();
   }
 
-  void ProcessMessage(const mbilog::LogMessage &l) override
+  void ProcessMessage(const mitk::LogMessage& message) override
   {
     m_Called = true;
-    mbilog::BackendCout::ProcessMessage(l);
+    mitk::LogBackendCout::ProcessMessage(message);
   }
 
-  bool WasCalled() { return m_Called; }
+  bool WasCalled()
+  {
+    return m_Called;
+  }
+
 private:
   bool m_Called;
 };
@@ -184,7 +189,7 @@ public:
       {
         std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/testthreadlog.log";
         itksys::SystemTools::RemoveFile(mitk::Utf8Util::Local8BitToUtf8(filename).c_str()); // remove old file, we do not want to append to large files
-        mitk::LoggingBackend::SetLogFile(filename.c_str());
+        mitk::LogBackend::SetLogFile(filename);
       }
 
       unsigned int numberOfThreads = 20;
@@ -237,43 +242,37 @@ public:
   static void TestLoggingToFile()
   {
     std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/testlog.log";
-    mitk::LoggingBackend::SetLogFile(filename.c_str());
-    MITK_INFO << "Test logging to default filename: " << mitk::LoggingBackend::GetLogFile();
+    mitk::LogBackend::SetLogFile(filename);
+    MITK_INFO << "Test logging to default filename: " << mitk::LogBackend::GetLogFile();
     MITK_TEST_CONDITION_REQUIRED(itksys::SystemTools::FileExists(mitk::Utf8Util::Local8BitToUtf8(filename).c_str()), "Testing if log file exists.");
     // TODO delete log file?
   }
 
   static void TestAddAndRemoveBackends()
   {
-    mbilog::BackendCout myBackend = mbilog::BackendCout();
-    mbilog::RegisterBackend(&myBackend);
+    mitk::LogBackendCout myBackend;
+    mitk::RegisterBackend(&myBackend);
     MITK_INFO << "Test logging";
-    mbilog::UnregisterBackend(&myBackend);
+    mitk::UnregisterBackend(&myBackend);
 
     // if no error occurred until now, everything is ok
     MITK_TEST_CONDITION_REQUIRED(true, "Test add/remove logging backend.");
   }
 
-  static void TestDefaultBackend()
-  {
-    // not possible now, because we cannot unregister the mitk logging backend in the moment. If such a method is added
-    // to mbilog utility one may add this test.
-  }
-
   static void TestEnableDisableBackends()
   {
-    TestBackendCout myCoutBackend = TestBackendCout();
-    mbilog::RegisterBackend(&myCoutBackend);
+    TestBackendCout myCoutBackend;
+    mitk::RegisterBackend(&myCoutBackend);
 
-    mbilog::DisableBackends(mbilog::Console);
+    mitk::DisableBackends(mitk::LogBackendBase::OutputType::Console);
     MITK_INFO << "There should be no output!";
     bool success = !myCoutBackend.WasCalled();
 
-    mbilog::EnableBackends(mbilog::Console);
+    mitk::EnableBackends(mitk::LogBackendBase::OutputType::Console);
     MITK_INFO << "Now there should be an output.";
     success &= myCoutBackend.WasCalled();
 
-    mbilog::UnregisterBackend(&myCoutBackend);
+    mitk::UnregisterBackend(&myCoutBackend);
     MITK_TEST_CONDITION_REQUIRED(success, "Test disable / enable logging backends.")
   }
 };

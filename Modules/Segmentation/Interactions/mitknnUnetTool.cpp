@@ -35,6 +35,7 @@ void mitk::nnUNetTool::Activated()
 {
   Superclass::Activated();
   this->SetLabelTransferScope(LabelTransferScope::AllLabels);
+  this->SetLabelTransferMode(LabelTransferMode::AddLabel);
 }
 
 void mitk::nnUNetTool::RenderOutputBuffer()
@@ -96,6 +97,14 @@ mitk::DataStorage *mitk::nnUNetTool::GetDataStorage()
 mitk::DataNode *mitk::nnUNetTool::GetRefNode()
 {
   return this->GetToolManager()->GetReferenceData(0);
+}
+
+void mitk::nnUNetTool::UpdatePrepare()
+{
+  Superclass::UpdatePrepare();
+  auto preview = this->GetPreviewSegmentation();
+  auto labelset = preview->GetLabelSet(preview->GetActiveLayer());
+  labelset->RemoveAllLabels();
 }
 
 namespace

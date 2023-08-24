@@ -121,8 +121,6 @@ mitk::TwoTissueCompartmentModel::ComputeModelfunction(const ParametersType& para
   double alpha1 = 0.5 * ((k2 + k3 + k4) - sqrt(square(k2 + k3 + k4) - 4 * k2 * k4));
   double alpha2 = 0.5 * ((k2 + k3 + k4) + sqrt(square(k2 + k3 + k4) - 4 * k2 * k4));
 
-  //double lambda1 = -alpha1;
-  //double lambda2 = -alpha2;
   mitk::ModelBase::ModelResultType exp1 = mitk::convoluteAIFWithExponential(this->m_TimeGrid,
                                           aterialInputFunction, alpha1);
   mitk::ModelBase::ModelResultType exp2 = mitk::convoluteAIFWithExponential(this->m_TimeGrid,

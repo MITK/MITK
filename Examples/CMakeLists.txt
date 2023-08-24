@@ -31,7 +31,7 @@ set(MITK_EXPORTS_FILE_INCLUDED 1)
 
 set(_example_dirs
   Dump
-  MbiLog
+  MitkLog
   QtFreeRender
   Tutorial
   FirstSteps

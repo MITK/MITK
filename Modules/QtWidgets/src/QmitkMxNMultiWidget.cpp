@@ -35,20 +35,13 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          const QString& multiWidgetName/* = "mxn"*/)
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
-  , m_TimeNavigationController(nullptr)
   , m_SynchronizedWidgetConnector(std::make_unique<QmitkSynchronizedWidgetConnector>())
   , m_CrosshairVisibility(false)
 {
-  m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
 }
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 {
-  auto allRenderWindows = this->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    m_TimeNavigationController->Disconnect(renderWindow->GetSliceNavigationController());
-  }
 }
 
 void QmitkMxNMultiWidget::InitializeMultiWidget()
@@ -136,7 +129,7 @@ void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
     currentPosition = this->GetSelectedPosition("");
 
     // store the current time step to set it again later, if the camera should not be reset
-    const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+    const mitk::TimePointType currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
     if (geometry->IsValidTimePoint(currentTimePoint))
     {
       imageTimeStep = geometry->TimePointToTimeStep(currentTimePoint);
@@ -150,7 +143,7 @@ void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
   if (!resetCamera)
   {
     this->SetSelectedPosition(currentPosition, "");
-    renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
+    renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(imageTimeStep);
   }
 }
 
@@ -160,7 +153,7 @@ void QmitkMxNMultiWidget::SetInteractionReferenceGeometry(const mitk::TimeGeomet
   auto allRenderWindows = this->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    auto* baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow->GetRenderWindow());
+    auto* baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow());
     baseRenderer->SetInteractionReferenceGeometry(referenceGeometry);
   }
 }
@@ -262,7 +255,7 @@ void QmitkMxNMultiWidget::ResetCrosshair()
     return;
   }
 
-  mitk::RenderingManager::GetInstance()->InitializeViewByBoundingObjects(renderWindow->GetRenderWindow(), dataStorage);
+  mitk::RenderingManager::GetInstance()->InitializeViewByBoundingObjects(renderWindow->GetVtkRenderWindow(), dataStorage);
 
   SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
 }
@@ -286,11 +279,6 @@ void QmitkMxNMultiWidget::SetWidgetPlaneMode(int userMode)
       SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
       break;
   }
-}
-
-mitk::SliceNavigationController* QmitkMxNMultiWidget::GetTimeNavigationController()
-{
-  return m_TimeNavigationController;
 }
 
 void QmitkMxNMultiWidget::EnableCrosshair()
@@ -332,22 +320,6 @@ void QmitkMxNMultiWidget::moveEvent(QMoveEvent* e)
   // it is necessary to readjust the position of the overlays as the MultiWidget has moved
   // unfortunately it's not done by QmitkRenderWindow::moveEvent -> must be done here
   emit Moved();
-}
-
-void QmitkMxNMultiWidget::RemoveRenderWindowWidget()
-{
-  auto renderWindowWidgets = this->GetRenderWindowWidgets();
-  auto iterator = renderWindowWidgets.find(this->GetNameFromIndex(this->GetNumberOfRenderWindowWidgets() - 1));
-  if (iterator == renderWindowWidgets.end())
-  {
-    return;
-  }
-
-  // disconnect each signal of this render window widget
-  RenderWindowWidgetPointer renderWindowWidgetToRemove = iterator->second;
-  m_TimeNavigationController->Disconnect(renderWindowWidgetToRemove->GetSliceNavigationController());
-
-  QmitkAbstractMultiWidget::RemoveRenderWindowWidget();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -409,11 +381,6 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
-
-  // connect time navigation controller to react on referenceGeometry time events with the render window's slice naviation controller
-  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow->GetSliceNavigationController());
-  // reverse connection between the render window's slice navigation controller and the time navigation controller
-  renderWindow->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
 
   return renderWindowWidget;
 }

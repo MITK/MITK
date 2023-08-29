@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkT2DecayModel_h
-#define mitkT2DecayModel_h
+#ifndef mitkExponentialDecayModel_h
+#define mitkExponentialDecayModel_h
 
 #include "mitkModelBase.h"
 
@@ -20,16 +20,16 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  /** @class T2DecayModel
+  /** @class ExponentialDecayModel
   * @brief Simple model of the MR T2 signal decay. This corresponds to an exponential decay in the form of:
   * f(t) = M0 * exp(-t/T2) with T2 being the transverse / spin-spin relaxation time. The derived parameter R2
   * is calculated from T2 by inversion.
   */
-  class MITKMODELFIT_EXPORT T2DecayModel : public mitk::ModelBase
+  class MITKMODELFIT_EXPORT ExponentialDecayModel : public mitk::ModelBase
   {
 
   public:
-    typedef T2DecayModel Self;
+    typedef ExponentialDecayModel Self;
     typedef mitk::ModelBase Superclass;
     typedef itk::SmartPointer< Self >                            Pointer;
     typedef itk::SmartPointer< const Self >                      ConstPointer;
@@ -42,7 +42,61 @@ namespace mitk
     itkCloneMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(T2DecayModel, ModelBase);
+    itkTypeMacro(ExponentialDecayModel, ModelBase);
+
+
+    static const std::string NAME_PARAMETER_y0;
+    static const std::string NAME_PARAMETER_lambda;
+
+    static const unsigned int NUMBER_OF_PARAMETERS;
+
+    static const std::string UNIT_PARAMETER_y0;
+    static const std::string UNIT_PARAMETER_lambda;
+
+    static const unsigned int POSITION_PARAMETER_y0;
+    static const unsigned int POSITION_PARAMETER_lambda;
+
+    static const std::string NAME_DERIVED_PARAMETER_k;
+
+    static const unsigned int NUMBER_OF_DERIVED_PARAMETERS;
+
+    static const std::string UNIT_DERIVED_PARAMETER_k;
+
+    static const unsigned int NUMBER_OF_STATIC_PARAMETERS;
+
+    static const std::string MODEL_DISPLAY_NAME;
+
+    static const std::string MODEL_TYPE;
+
+    static const std::string FUNCTION_STRING;
+
+    static const std::string X_NAME;
+
+    static const std::string X_AXIS_NAME;
+
+    static const std::string X_AXIS_UNIT;
+
+    static const std::string Y_AXIS_NAME;
+
+    static const std::string Y_AXIS_UNIT;
+
+    ParameterNamesType GetParameterNames() const override;
+
+    ParametersSizeType  GetNumberOfParameters() const override;
+
+    ParamterUnitMapType GetParameterUnits() const override;
+
+    ParameterNamesType GetDerivedParameterNames() const override;
+
+    ParametersSizeType  GetNumberOfDerivedParameters() const override;
+
+    ParamterUnitMapType GetDerivedParameterUnits() const override;
+
+    ParameterNamesType GetStaticParameterNames() const override;
+
+    ParametersSizeType GetNumberOfStaticParameters() const override;
+
+    ParamterUnitMapType GetStaticParameterUnits() const override;
 
     std::string GetModelDisplayName() const override;
 
@@ -52,24 +106,20 @@ namespace mitk
 
     std::string GetXName() const override;
 
-    ParameterNamesType GetParameterNames() const override;
+    std::string GetXAxisName() const override;
 
-    ParametersSizeType  GetNumberOfParameters() const override;
+    std::string GetXAxisUnit() const override;
 
-    ParameterNamesType GetStaticParameterNames() const override;
+    std::string GetYAxisName() const override;
 
-    ParametersSizeType GetNumberOfStaticParameters() const override;
-
-    DerivedParametersSizeType GetNumberOfDerivedParameters() const override;
-
-    DerivedParameterNamesType GetDerivedParameterNames() const override;
+    std::string GetYAxisUnit() const override;
 
     mitk::ModelBase::DerivedParameterMapType ComputeDerivedParameters(
       const mitk::ModelBase::ParametersType &parameters) const;
 
   protected:
-    T2DecayModel() {};
-    ~T2DecayModel() override {};
+    ExponentialDecayModel() {};
+    ~ExponentialDecayModel() override {};
 
     /**
      * Actual implementation of the clone method. This method should be reimplemeted
@@ -86,7 +136,7 @@ namespace mitk
   private:
 
     //No copy constructor allowed
-    T2DecayModel(const Self& source);
+    ExponentialDecayModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

@@ -10,25 +10,25 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkT2DecayModelFactory.h"
-#include "mitkT2DecayModelParameterizer.h"
+#include "mitkExponentialDecayModelFactory.h"
+#include "mitkExponentialDecayModelParameterizer.h"
 #include "mitkSimpleBarrierConstraintChecker.h"
 
-mitk::T2DecayModelFactory::T2DecayModelFactory()
+mitk::ExponentialDecayModelFactory::ExponentialDecayModelFactory()
 {
 };
 
-mitk::T2DecayModelFactory::~T2DecayModelFactory()
+mitk::ExponentialDecayModelFactory::~ExponentialDecayModelFactory()
 {
 };
 
 mitk::ModelParameterizerBase::ParametersType
-mitk::T2DecayModelFactory::GetDefaultInitialParameterization() const
+mitk::ExponentialDecayModelFactory::GetDefaultInitialParameterization() const
 {
-  return T2DecayModelParameterizer::New()->GetDefaultInitialParameterization();
+  return ExponentialDecayModelParameterizer::New()->GetDefaultInitialParameterization();
 };
 
-mitk::ConstraintCheckerBase::Pointer mitk::T2DecayModelFactory::CreateDefaultConstraints() const
+mitk::ConstraintCheckerBase::Pointer mitk::ExponentialDecayModelFactory::CreateDefaultConstraints() const
 {
   mitk::SimpleBarrierConstraintChecker::Pointer constraints = SimpleBarrierConstraintChecker::New();
 
@@ -38,8 +38,8 @@ mitk::ConstraintCheckerBase::Pointer mitk::T2DecayModelFactory::CreateDefaultCon
   return constraints.GetPointer();
 };
 
-mitk::ModelParameterizerBase::Pointer mitk::T2DecayModelFactory::DoCreateParameterizer(
+mitk::ModelParameterizerBase::Pointer mitk::ExponentialDecayModelFactory::DoCreateParameterizer(
   const modelFit::ModelFitInfo* /*fit*/) const
 {
-  return T2DecayModelParameterizer::New().GetPointer();
+  return ExponentialDecayModelParameterizer::New().GetPointer();
 };

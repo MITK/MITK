@@ -10,23 +10,23 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkT2DecayModelParameterizer.h"
+#include "mitkExponentialDecayModelParameterizer.h"
 
-mitk::T2DecayModelParameterizer::ParametersType
-mitk::T2DecayModelParameterizer::GetDefaultInitialParameterization() const
+mitk::ExponentialDecayModelParameterizer::ParametersType
+mitk::ExponentialDecayModelParameterizer::GetDefaultInitialParameterization() const
 {
   ParametersType initialParameters;
   initialParameters.SetSize(2);
-  initialParameters[0] = 10; //M0
-  initialParameters[1] = 1000; //T2
+  initialParameters[0] = 10; //y0
+  initialParameters[1] = 1000; //lambda
 
   return initialParameters;
 };
 
-mitk::T2DecayModelParameterizer::T2DecayModelParameterizer()
+mitk::ExponentialDecayModelParameterizer::ExponentialDecayModelParameterizer()
 {
 };
 
-mitk::T2DecayModelParameterizer::~T2DecayModelParameterizer()
+mitk::ExponentialDecayModelParameterizer::~ExponentialDecayModelParameterizer()
 {
 };

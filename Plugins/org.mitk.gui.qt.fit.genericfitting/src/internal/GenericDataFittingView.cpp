@@ -18,8 +18,8 @@ found in the LICENSE file.
 #include <mitkLinearModelParameterizer.h>
 #include <mitkGenericParamModelFactory.h>
 #include <mitkGenericParamModelParameterizer.h>
-#include <mitkT2DecayModelFactory.h>
-#include <mitkT2DecayModelParameterizer.h>
+#include <mitkExponentialDecayModelFactory.h>
+#include <mitkExponentialDecayModelParameterizer.h>
 #include <mitkExponentialSaturationModel.h>
 #include <mitkExponentialSaturationModelFactory.h>
 #include <mitkExponentialSaturationModelParameterizer.h>
@@ -260,7 +260,7 @@ void GenericDataFittingView::OnModellingButtonClicked()
                            (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isGenericFactory = dynamic_cast<mitk::GenericParamModelFactory*>
                             (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool isT2DecayFactory = dynamic_cast<mitk::T2DecayModelFactory*>
+    bool isExponentialDecayFactory = dynamic_cast<mitk::ExponentialDecayModelFactory*>
       (m_selectedModelFactory.GetPointer()) != nullptr;
 
     bool isExponentialSaturationFactory = dynamic_cast<mitk::ExponentialSaturationModelFactory*>
@@ -288,15 +288,15 @@ void GenericDataFittingView::OnModellingButtonClicked()
         GenerateModelFit_ROIBased<mitk::GenericParamModelParameterizer>(fitSession, generator);
       }
     }
-    else if (isT2DecayFactory)
+    else if (isExponentialDecayFactory)
     {
       if (this->m_Controls.radioPixelBased->isChecked())
       {
-        GenerateModelFit_PixelBased<mitk::T2DecayModelParameterizer>(fitSession, generator);
+        GenerateModelFit_PixelBased<mitk::ExponentialDecayModelParameterizer>(fitSession, generator);
       }
       else
       {
-        GenerateModelFit_ROIBased<mitk::T2DecayModelParameterizer>(fitSession, generator);
+        GenerateModelFit_ROIBased<mitk::ExponentialDecayModelParameterizer>(fitSession, generator);
       }
     }
     else if (isExponentialSaturationFactory)
@@ -586,7 +586,7 @@ GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
   m_FactoryStack.push_back(factory);
   factory = mitk::GenericParamModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
-  factory = mitk::T2DecayModelFactory::New().GetPointer();
+  factory = mitk::ExponentialDecayModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
   factory = mitk::ExponentialSaturationModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);

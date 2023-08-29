@@ -10,23 +10,23 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkT2DecayModelFactory_h
-#define mitkT2DecayModelFactory_h
+#ifndef mitkExponentialDecayModelFactory_h
+#define mitkExponentialDecayModelFactory_h
 
 #include <mitkCommon.h>
 
 #include "mitkConcreteModelFactoryBase.h"
-#include "mitkT2DecayModel.h"
+#include "mitkExponentialDecayModel.h"
 
 #include "MitkModelFitExports.h"
 
 namespace mitk
 {
 
-  class MITKMODELFIT_EXPORT T2DecayModelFactory : public ConcreteModelFactoryBase<T2DecayModel>
+  class MITKMODELFIT_EXPORT ExponentialDecayModelFactory : public ConcreteModelFactoryBase<ExponentialDecayModel>
   {
   public:
-    mitkClassMacroItkParent(T2DecayModelFactory, ConcreteModelFactoryBase<T2DecayModel>);
+    mitkClassMacroItkParent(ExponentialDecayModelFactory, ConcreteModelFactoryBase<ExponentialDecayModel>);
     itkFactorylessNewMacro(Self);
 
     ParametersType GetDefaultInitialParameterization() const override;
@@ -37,14 +37,14 @@ namespace mitk
     ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
     const override;
 
-    T2DecayModelFactory();
+    ExponentialDecayModelFactory();
 
-    ~T2DecayModelFactory() override;
+    ~ExponentialDecayModelFactory() override;
 
   private:
 
     //No copy constructor allowed
-    T2DecayModelFactory(const Self& source);
+    ExponentialDecayModelFactory(const Self& source);
     void operator=(const Self&);  //purposely not implemented
   };
 }

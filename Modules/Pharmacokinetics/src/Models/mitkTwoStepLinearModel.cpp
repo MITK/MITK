@@ -13,52 +13,117 @@ found in the LICENSE file.
 #include "mitkTwoStepLinearModel.h"
 #include <mitkIOUtil.h>
 
-const std::string mitk::TwoStepLinearModel::MODELL_NAME = "Two Step Linear Model";
 
-const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_y1 = "BaseValue";
-const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_a1 = "Slope_1";
-const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_t = "Change_Point";
-const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_a2 = "Slope_2";
-
-const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_y1 = 0;
-const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_t  = 1;
-const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_a1 = 2;
-const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_a2 = 3;
+const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_y0 = "y0";
+const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_x0 = "x0";
+const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_b0 = "b0";
+const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_b1 = "b1";
 
 const unsigned int mitk::TwoStepLinearModel::NUMBER_OF_PARAMETERS = 4;
 
+const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_y0 = "[y]";
+const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_x0 = "[x]";
+const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_b0 = "[y]/[x]";
+const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_b1 = "[y]/[x]";
+
+const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_y0 = 0;
+const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_x0 = 1;
+const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_b0 = 2;
+const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_b1 = 3;
+
+const std::string mitk::TwoStepLinearModel::NAME_DERIVED_PARAMETER_auc = "auc";
+const std::string mitk::TwoStepLinearModel::NAME_DERIVED_PARAMETER_y_fin = "y_fin";
+const std::string mitk::TwoStepLinearModel::NAME_DERIVED_PARAMETER_y_max = "y_max";
+const std::string mitk::TwoStepLinearModel::NAME_DERIVED_PARAMETER_y1 = "y1";
+
+const unsigned int mitk::TwoStepLinearModel::NUMBER_OF_DERIVED_PARAMETERS = 4;
+
+const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_auc = "[x]*[y]";
+const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_y_fin = "[y]";
+const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_y_max = "[y]";
+const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_y1 = "[y]";
+
+const unsigned int mitk::TwoStepLinearModel::NUMBER_OF_STATIC_PARAMETERS = 0;
+
+const std::string mitk::TwoStepLinearModel::MODEL_DISPLAY_NAME = "Two Step Linear Model";
+
+const std::string mitk::TwoStepLinearModel::MODEL_TYPE = "Generic";
+
+const std::string mitk::TwoStepLinearModel::FUNCTION_STRING = "if x < x0: y(x) = y0 + b0*x, else: y(x) = y1 + b1*x";
+
+const std::string mitk::TwoStepLinearModel::X_NAME = "x";
+
+const std::string mitk::TwoStepLinearModel::X_AXIS_NAME = "x";
+
+const std::string mitk::TwoStepLinearModel::X_AXIS_UNIT = "[x]";
+
+const std::string mitk::TwoStepLinearModel::Y_AXIS_NAME = "y";
+
+const std::string mitk::TwoStepLinearModel::Y_AXIS_UNIT = "[y]";
+
+
 std::string mitk::TwoStepLinearModel::GetModelDisplayName() const
 {
-  return MODELL_NAME;
+  return MODEL_DISPLAY_NAME;
 };
 
 std::string mitk::TwoStepLinearModel::GetModelType() const
 {
-  return "Generic";
+  return MODEL_TYPE;
 };
 
 mitk::TwoStepLinearModel::FunctionStringType mitk::TwoStepLinearModel::GetFunctionString() const
 {
-  return "Slope_1*t+Y_intercept_1 if t<Change_Point; Slope_2*t+Y_intercept_2 if ChangePoint<=t";
+  return FUNCTION_STRING;
 };
 
 std::string mitk::TwoStepLinearModel::GetXName() const
 {
-  return "x";
+  return X_NAME;
 };
+
+std::string mitk::TwoStepLinearModel::GetXAxisName() const
+{
+  return X_AXIS_NAME;
+};
+
+std::string mitk::TwoStepLinearModel::GetXAxisUnit() const
+{
+  return X_AXIS_UNIT;
+}
+
+std::string mitk::TwoStepLinearModel::GetYAxisName() const
+{
+  return Y_AXIS_NAME;
+};
+
+std::string mitk::TwoStepLinearModel::GetYAxisUnit() const
+{
+  return Y_AXIS_UNIT;
+}
 
 mitk::TwoStepLinearModel::ParameterNamesType
 mitk::TwoStepLinearModel::GetParameterNames() const
 {
   ParameterNamesType result;
-  result.push_back(NAME_PARAMETER_y1);
-  result.push_back(NAME_PARAMETER_t);
-  result.push_back(NAME_PARAMETER_a1);
-  result.push_back(NAME_PARAMETER_a2);
-
-
+  result.push_back(NAME_PARAMETER_y0);
+  result.push_back(NAME_PARAMETER_x0);
+  result.push_back(NAME_PARAMETER_b0);
+  result.push_back(NAME_PARAMETER_b1);
   return result;
 };
+
+mitk::TwoStepLinearModel::ParamterUnitMapType mitk::TwoStepLinearModel::GetParameterUnits() const
+{
+  ParamterUnitMapType result;
+
+  result.insert(std::make_pair(NAME_PARAMETER_y0, UNIT_PARAMETER_y0));
+  result.insert(std::make_pair(NAME_PARAMETER_x0, UNIT_PARAMETER_x0));
+  result.insert(std::make_pair(NAME_PARAMETER_b0, UNIT_PARAMETER_b0));
+  result.insert(std::make_pair(NAME_PARAMETER_b1, UNIT_PARAMETER_b1));
+
+  return result;
+}
 
 mitk::TwoStepLinearModel::ParametersSizeType
 mitk::TwoStepLinearModel::GetNumberOfParameters() const
@@ -70,23 +135,34 @@ mitk::TwoStepLinearModel::ParameterNamesType
 mitk::TwoStepLinearModel::GetDerivedParameterNames() const
 {
   ParameterNamesType result;
-  result.push_back("AUC");
-  result.push_back("FinalUptake");
-  result.push_back("Smax");
-  result.push_back("y-intercept2");
-
+  result.push_back(NAME_DERIVED_PARAMETER_auc);
+  result.push_back(NAME_DERIVED_PARAMETER_y_fin);
+  result.push_back(NAME_DERIVED_PARAMETER_y_max);
+  result.push_back(NAME_DERIVED_PARAMETER_y1);
   return result;
 };
 
 mitk::TwoStepLinearModel::ParametersSizeType
 mitk::TwoStepLinearModel::GetNumberOfDerivedParameters() const
 {
-  return 4;
+  return NUMBER_OF_DERIVED_PARAMETERS;
 };
 
-double mitk::TwoStepLinearModel::ComputeSignalFromParameters(double x, double t, double a1, double a2, double b1, double b2)
+mitk::TwoStepLinearModel::ParamterUnitMapType mitk::TwoStepLinearModel::GetDerivedParameterUnits() const
 {
-  return (x < t) ? (a1 * x + b1) : (a2 * x + b2);
+  ParamterUnitMapType result;
+
+  result.insert(std::make_pair(NAME_DERIVED_PARAMETER_auc, UNIT_DERIVED_PARAMETER_auc));
+  result.insert(std::make_pair(NAME_DERIVED_PARAMETER_y_fin, UNIT_DERIVED_PARAMETER_y_fin));
+  result.insert(std::make_pair(NAME_DERIVED_PARAMETER_y_max, UNIT_DERIVED_PARAMETER_y_max));
+  result.insert(std::make_pair(NAME_DERIVED_PARAMETER_y1, UNIT_DERIVED_PARAMETER_y1));
+
+  return result;
+};
+
+double mitk::TwoStepLinearModel::ComputeSignalFromParameters(double x, double x0, double b0, double b1, double y0, double y1)
+{
+  return (x < x0) ? (b0 * x + y0) : (b1 * x + y1);
 };
 
 
@@ -97,12 +173,13 @@ mitk::TwoStepLinearModel::ComputeModelfunction(const ParametersType& parameters)
 {
 
   //Model Parameters
-  const auto t = parameters[POSITION_PARAMETER_t] ;
-  const auto a1 = parameters[POSITION_PARAMETER_a1] ;
-  const auto a2 = parameters[POSITION_PARAMETER_a2] ;
-  const auto b1 = parameters[POSITION_PARAMETER_y1] ;
+  const auto y0 = parameters[POSITION_PARAMETER_y0];
+  const auto x0 = parameters[POSITION_PARAMETER_x0] ;
+  const auto b0 = parameters[POSITION_PARAMETER_b0] ;
+  const auto b1 = parameters[POSITION_PARAMETER_b1] ;
 
-  double b2 = (a1 - a2) * t + b1;
+  double y1 = (b0 - b1) * x0 + y0;
+  
 
   ModelResultType signal(m_TimeGrid.GetSize());
 
@@ -112,7 +189,7 @@ mitk::TwoStepLinearModel::ComputeModelfunction(const ParametersType& parameters)
 
   for (TimeGridType::const_iterator gridPos = m_TimeGrid.begin(); gridPos != timeGridEnd; ++gridPos, ++signalPos)
   {
-    *signalPos = ComputeSignalFromParameters(*gridPos, t, a1, a2, b1, b2);
+    *signalPos = ComputeSignalFromParameters(*gridPos, x0, b0, b1, y0, y1);
   }
 
   return signal;
@@ -129,6 +206,15 @@ mitk::TwoStepLinearModel::ParametersSizeType  mitk::TwoStepLinearModel::GetNumbe
 {
   return 0;
 }
+
+mitk::TwoStepLinearModel::ParamterUnitMapType mitk::TwoStepLinearModel::GetStaticParameterUnits() const
+{
+  ParamterUnitMapType result;
+
+  //do nothing
+
+  return result;
+};
 
 void mitk::TwoStepLinearModel::SetStaticParameter(const ParameterNameType& /*name*/,
     const StaticParameterValuesType& /*values*/)
@@ -149,30 +235,30 @@ mitk::TwoStepLinearModel::StaticParameterValuesType mitk::TwoStepLinearModel::Ge
 mitk::ModelBase::DerivedParameterMapType mitk::TwoStepLinearModel::ComputeDerivedParameters(
   const mitk::ModelBase::ParametersType& parameters) const
 {
-    const auto t = parameters[POSITION_PARAMETER_t] ;
-    const auto a1 = parameters[POSITION_PARAMETER_a1] ;
-    const auto a2 = parameters[POSITION_PARAMETER_a2] ;
-    const auto b1 = parameters[POSITION_PARAMETER_y1] ;
-    const auto b2 = (a1 - a2) * t + b1;
+    const auto y0 = parameters[POSITION_PARAMETER_y0];
+    const auto x0 = parameters[POSITION_PARAMETER_x0] ;
+    const auto b0 = parameters[POSITION_PARAMETER_b0] ;
+    const auto b1 = parameters[POSITION_PARAMETER_b1] ;
+    const auto y1 = (b0 - b1) * x0 + y0;
 
     unsigned int timeSteps = m_TimeGrid.GetSize();
 
     const double taq = (m_TimeGrid.empty() == false) ? (m_TimeGrid.GetElement(timeSteps - 1)) : (mitkThrow() << "An exception occured because time grid is empty, method can't continue.");
 
-    const double sfin = a2 * taq + b2;
+    const double y_fin = b1 * taq + y1;
 
-    double smax = sfin;
-    if ((a1 >= 0) && (a2 >= 0))
-      smax = sfin;
-    else if ((a1 < 0) && (a2 < 0))
-      smax = b1;
-    else if ((a1 > 0) && (a2 < 0))
-      smax = (a1 * t + b1);
+    double y_max = y_fin;
+    if ((b0 >= 0) && (b1 >= 0))
+      y_max = y_fin;
+    else if ((b0 < 0) && (b1 < 0))
+      y_max = y0;
+    else if ((b0 > 0) && (b1 < 0))
+      y_max = (b0 * x0 + y0);
     else
     {
-      if (abs(a1 * t) >= abs(a2 * (taq - t)))
-        smax = b1;
-      else smax = sfin;
+      if (abs(b0 * x0) >= abs(b1 * (taq - x0)))
+        y_max = y0;
+      else y_max = y_fin;
     }
 
     double auc = 0.0;
@@ -182,8 +268,8 @@ mitk::ModelBase::DerivedParameterMapType mitk::TwoStepLinearModel::ComputeDerive
       double currentGridPos = *gridPos;
       double nextGridPos = *(++gridPos);
       double deltaX = nextGridPos - currentGridPos;
-      double deltaY = ComputeSignalFromParameters(nextGridPos, t, a1, a2, b1, b2) - ComputeSignalFromParameters(currentGridPos, t, a1, a2, b1, b2);
-      double Yi = ComputeSignalFromParameters(currentGridPos, t, a1, a2, b1, b2);
+      double deltaY = ComputeSignalFromParameters(nextGridPos, x0, b0, b1, y0, y1) - ComputeSignalFromParameters(currentGridPos, x0, b0, b1, y0, y1);
+      double Yi = ComputeSignalFromParameters(currentGridPos, x0, b0, b1, y0, y1);
       double intI = 0.5 * deltaX * deltaY + Yi * deltaX;
       auc += std::abs(intI);
       --gridPos;
@@ -191,10 +277,10 @@ mitk::ModelBase::DerivedParameterMapType mitk::TwoStepLinearModel::ComputeDerive
 
     DerivedParameterMapType result;
 
-    result.insert(std::make_pair("AUC", auc));
-    result.insert(std::make_pair("FinalUptake", sfin));
-    result.insert(std::make_pair("Smax", smax));
-    result.insert(std::make_pair("y-intercept2", b2));
+    result.insert(std::make_pair(NAME_DERIVED_PARAMETER_auc, auc));
+    result.insert(std::make_pair(NAME_DERIVED_PARAMETER_y_fin, y_fin));
+    result.insert(std::make_pair(NAME_DERIVED_PARAMETER_y_max, y_max));
+    result.insert(std::make_pair(NAME_DERIVED_PARAMETER_y1, y1));
 
     return result;
 };

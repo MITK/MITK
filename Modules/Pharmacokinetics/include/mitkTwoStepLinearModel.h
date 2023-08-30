@@ -39,38 +39,87 @@ namespace mitk
     /** Run-time type information (and related methods). */
     itkTypeMacro(TwoStepLinearModel, ModelBase)
 
-    static const std::string MODELL_NAME;
-    static const std::string NAME_PARAMETER_y1;
-    static const std::string NAME_PARAMETER_t;
-    static const std::string NAME_PARAMETER_a1;
-    static const std::string NAME_PARAMETER_a2;
-
-    static const unsigned int POSITION_PARAMETER_y1;
-    static const unsigned int POSITION_PARAMETER_t;
-    static const unsigned int POSITION_PARAMETER_a1;
-    static const unsigned int POSITION_PARAMETER_a2;
+    static const std::string NAME_PARAMETER_y0;
+    static const std::string NAME_PARAMETER_x0;
+    static const std::string NAME_PARAMETER_b0;
+    static const std::string NAME_PARAMETER_b1;
 
     static const unsigned int NUMBER_OF_PARAMETERS;
 
-    virtual std::string GetModelDisplayName() const override;
+    static const std::string UNIT_PARAMETER_y0;
+    static const std::string UNIT_PARAMETER_x0;
+    static const std::string UNIT_PARAMETER_b0;
+    static const std::string UNIT_PARAMETER_b1;
 
-    virtual std::string GetModelType() const override;
+    static const unsigned int POSITION_PARAMETER_y0;
+    static const unsigned int POSITION_PARAMETER_x0;
+    static const unsigned int POSITION_PARAMETER_b0;
+    static const unsigned int POSITION_PARAMETER_b1;
 
-    virtual FunctionStringType GetFunctionString() const override;
+    static const std::string NAME_DERIVED_PARAMETER_auc;
+    static const std::string NAME_DERIVED_PARAMETER_y_fin;
+    static const std::string NAME_DERIVED_PARAMETER_y_max;
+    static const std::string NAME_DERIVED_PARAMETER_y1;
 
-    virtual std::string GetXName() const override;
+    static const unsigned int NUMBER_OF_DERIVED_PARAMETERS;
 
-    virtual ParameterNamesType GetParameterNames() const override;
+    static const std::string UNIT_DERIVED_PARAMETER_auc;
+    static const std::string UNIT_DERIVED_PARAMETER_y_fin;
+    static const std::string UNIT_DERIVED_PARAMETER_y_max;
+    static const std::string UNIT_DERIVED_PARAMETER_y1;
 
-    virtual ParametersSizeType  GetNumberOfParameters() const override;
+    static const unsigned int NUMBER_OF_STATIC_PARAMETERS;
 
-    virtual ParameterNamesType GetStaticParameterNames() const override;
+    static const std::string MODEL_DISPLAY_NAME;
 
-    virtual ParametersSizeType GetNumberOfStaticParameters() const override;
+    static const std::string MODEL_TYPE;
 
-    virtual ParameterNamesType GetDerivedParameterNames() const override;
+    static const std::string FUNCTION_STRING;
 
-    virtual ParametersSizeType  GetNumberOfDerivedParameters() const override;
+    static const std::string X_NAME;
+
+    static const std::string X_AXIS_NAME;
+
+    static const std::string X_AXIS_UNIT;
+
+    static const std::string Y_AXIS_NAME;
+
+    static const std::string Y_AXIS_UNIT;
+
+
+    ParameterNamesType GetParameterNames() const override;
+
+    ParametersSizeType  GetNumberOfParameters() const override;
+
+    ParamterUnitMapType GetParameterUnits() const override;
+
+    ParameterNamesType GetDerivedParameterNames() const override;
+
+    ParametersSizeType  GetNumberOfDerivedParameters() const override;
+
+    ParamterUnitMapType GetDerivedParameterUnits() const override;
+
+    ParameterNamesType GetStaticParameterNames() const override;
+
+    ParametersSizeType GetNumberOfStaticParameters() const override;
+
+    ParamterUnitMapType GetStaticParameterUnits() const override;
+
+    std::string GetModelDisplayName() const override;
+
+    std::string GetModelType() const override;
+
+    FunctionStringType GetFunctionString() const override;
+
+    std::string GetXName() const override;
+
+    std::string GetXAxisName() const override;
+
+    std::string GetXAxisUnit() const override;
+
+    std::string GetYAxisName() const override;
+
+    std::string GetYAxisUnit() const override;
 
 
   protected:

@@ -83,21 +83,15 @@ namespace mitk
   {
   public:
     mitkClassMacro(MonaiLabelTool, SegWithPreviewTool);
-    itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
     bool m_TEST = false; // cleanup later
 
-    const char *GetName() const override;
-    const char **GetXPM() const override;
-    us::ModuleResource GetIconResource() const override;
-
-    void Activated() override;
     void GetOverallInfo(std::string&, int&);
     std::unique_ptr<MonaiAppMetadata> m_InfoParameters; //contains all parameters from Server to serve the GUI
     std::unique_ptr<MonaiLabelRequest> m_RequestParameters;
-    std::vector<MonaiModelInfo> GetAutoSegmentationModels();
-    std::vector<MonaiModelInfo> GetInteractiveSegmentationModels();
-    std::vector<MonaiModelInfo> GetScribbleSegmentationModels();
+    std::vector<MonaiModelInfo> GetAutoSegmentationModels(int dim = -1);
+    std::vector<MonaiModelInfo> GetInteractiveSegmentationModels(int dim = -1);
+    std::vector<MonaiModelInfo> GetScribbleSegmentationModels(int dim = -1);
     void PostInferRequest(std::string &, int &, std::string &, std::string &);
 
     itkSetMacro(ModelName, std::string);
@@ -129,6 +123,6 @@ namespace mitk
     const std::set<std::string> m_INTERACTIVE_SEG_TYPE_NAME = {"deepedit", "deepgrow"};
     const std::string m_TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
     const std::string m_SERVER_503_ERROR_TEXT = "A connection to MonaiLabel server cannot be established.";
-  }; // class
-} // namespace
+  };
+}
 #endif

@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #include "QmitkMonaiLabelToolGUI.h"
 
 #include "mitkMonaiLabelTool.h"
@@ -10,11 +22,12 @@
 #include <usModuleContext.h>
 #include <QMessageBox>
 
-MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkMonaiLabelToolGUI, "")
 
-QmitkMonaiLabelToolGUI::QmitkMonaiLabelToolGUI()
+QmitkMonaiLabelToolGUI::QmitkMonaiLabelToolGUI(int dimension)
   : QmitkMultiLabelSegWithPreviewToolGUIBase(), m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
 {
+  m_Dimension = dimension;
+  MITK_INFO << "dimsion construc: " << m_Dimension;
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   { return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false; };
 }
@@ -68,7 +81,7 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
       if (nullptr != tool->m_InfoParameters)
       {
         std::string response = tool->m_InfoParameters->name;
-        std::vector<mitk::MonaiModelInfo> autoModels = tool->GetAutoSegmentationModels();
+        std::vector<mitk::MonaiModelInfo> autoModels = tool->GetAutoSegmentationModels(m_Dimension);
         m_Controls.responseNote->setText(QString::fromStdString(response));
         m_Controls.appBox->addItem(QString::fromStdString(response));
         for (auto &model : autoModels)

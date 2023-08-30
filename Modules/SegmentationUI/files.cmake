@@ -39,6 +39,8 @@ set(CPP_FILES
   Qmitk/QmitkLabelToggleItemDelegate.cpp
   Qmitk/QmitkFindSegmentationTaskDialog.cpp
   Qmitk/QmitkMonaiLabelToolGUI.cpp
+  Qmitk/QmitkMonaiLabel2DToolGUI.cpp
+  Qmitk/QmitkMonaiLabel3DToolGUI.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/QmitkContourModelToImageWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
@@ -91,6 +93,8 @@ set(MOC_H_FILES
   Qmitk/QmitkLabelToggleItemDelegate.h
   Qmitk/QmitkFindSegmentationTaskDialog.h
   Qmitk/QmitkMonaiLabelToolGUI.h
+  Qmitk/QmitkMonaiLabel2DToolGUI.h
+  Qmitk/QmitkMonaiLabel3DToolGUI.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkContourModelToImageWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h

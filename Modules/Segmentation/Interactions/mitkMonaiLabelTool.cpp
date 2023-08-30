@@ -10,27 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-// MITK
 #include "mitkMonaiLabelTool.h"
-
-// us
 #include "mitkIOUtil.h"
 #include <httplib.h>
 #include <itksys/SystemTools.hxx>
-#include <map>
-#include <nlohmann/json.hpp>
-#include <usGetModuleContext.h>
-#include <usModule.h>
-#include <usModuleContext.h>
-#include <usModuleResource.h>
-#include <usServiceReference.h>
-#include <vector>
 #include <mitkImageReadAccessor.h>
-
-namespace mitk
-{
-  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, MonaiLabelTool, "MonaiLabel");
-}
+#include <nlohmann/json.hpp>
 
 mitk::MonaiLabelTool::MonaiLabelTool()
 {
@@ -40,30 +25,6 @@ mitk::MonaiLabelTool::MonaiLabelTool()
 mitk::MonaiLabelTool::~MonaiLabelTool()
 {
   itksys::SystemTools::RemoveADirectory(this->GetMitkTempDir());
-}
-
-void mitk::MonaiLabelTool::Activated()
-{
-  Superclass::Activated();
-  this->SetLabelTransferScope(LabelTransferScope::AllLabels);
-  this->SetLabelTransferMode(LabelTransferMode::AddLabel);
-}
-
-const char **mitk::MonaiLabelTool::GetXPM() const
-{
-  return nullptr;
-}
-
-us::ModuleResource mitk::MonaiLabelTool::GetIconResource() const
-{
-  us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("AI.svg");
-  return resource;
-}
-
-const char *mitk::MonaiLabelTool::GetName() const
-{
-  return "MonaiLabel";
 }
 
 bool mitk::MonaiLabelTool::IsMonaiServerOn(std::string &hostName, int &port)
@@ -143,8 +104,8 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
 }
 
 void mitk::MonaiLabelTool::MapLabelsToSegmentation(const mitk::LabelSetImage *source,
-                                                         mitk::LabelSetImage *dest,
-                                                         std::map<std::string, mitk::Label::PixelType> &labelMap)
+                                                   mitk::LabelSetImage *dest,
+                                                   std::map<std::string, mitk::Label::PixelType> &labelMap)
 {
   std::map<mitk::Label::PixelType, std::string> flippedLabelMap;
   for (auto const &[key, val] : labelMap)
@@ -236,7 +197,7 @@ void mitk::MonaiLabelTool::PostInferRequest(std::string &hostName,
   // "application/octet-stream"}}};
 
   httplib::Client cli(hostName, port);
-  cli.set_read_timeout(60); // arbitary 1 minute time-out to avoid corner cases.
+  cli.set_read_timeout(60);                      // arbitary 1 minute time-out to avoid corner cases.
   if (auto response = cli.Post(postPath, items)) // cli.Post("/infer/deepedit_seg", items);
   {
     if (response->status == 200)
@@ -344,6 +305,7 @@ std::unique_ptr<mitk::MonaiAppMetadata> mitk::MonaiLabelTool::DataMapper(nlohman
     }
     modelInfo.type = _jsonObj["type"].get<std::string>();
     modelInfo.dimension = _jsonObj["dimension"].get<int>();
+    MITK_INFO << "DIMENSION: " << modelInfo.dimension;
     modelInfo.description = _jsonObj["description"].get<std::string>();
 
     object->models.push_back(modelInfo);
@@ -351,14 +313,14 @@ std::unique_ptr<mitk::MonaiAppMetadata> mitk::MonaiLabelTool::DataMapper(nlohman
   return object;
 }
 
-std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetAutoSegmentationModels()
+std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetAutoSegmentationModels(int dim)
 {
   std::vector<mitk::MonaiModelInfo> autoModels;
   if (nullptr != m_InfoParameters)
   {
     for (mitk::MonaiModelInfo &model : m_InfoParameters->models)
     {
-      if (m_AUTO_SEG_TYPE_NAME.find(model.type) != m_AUTO_SEG_TYPE_NAME.end())
+      if (m_AUTO_SEG_TYPE_NAME.find(model.type) != m_AUTO_SEG_TYPE_NAME.end() && model.dimension == dim)
       {
         autoModels.push_back(model);
       }
@@ -367,14 +329,14 @@ std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetAutoSegmentationModel
   return autoModels;
 }
 
-std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetInteractiveSegmentationModels()
+std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetInteractiveSegmentationModels(int dim)
 {
   std::vector<mitk::MonaiModelInfo> interactiveModels;
   if (nullptr != m_InfoParameters)
   {
     for (mitk::MonaiModelInfo &model : m_InfoParameters->models)
     {
-      if (m_INTERACTIVE_SEG_TYPE_NAME.find(model.type) != m_INTERACTIVE_SEG_TYPE_NAME.end())
+      if (m_INTERACTIVE_SEG_TYPE_NAME.find(model.type) != m_INTERACTIVE_SEG_TYPE_NAME.end() && model.dimension == dim)
       {
         interactiveModels.push_back(model);
       }
@@ -383,14 +345,14 @@ std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetInteractiveSegmentati
   return interactiveModels;
 }
 
-std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetScribbleSegmentationModels()
+std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetScribbleSegmentationModels(int dim)
 {
   std::vector<mitk::MonaiModelInfo> scribbleModels;
   if (nullptr != m_InfoParameters)
   {
     for (mitk::MonaiModelInfo &model : m_InfoParameters->models)
     {
-      if (m_SCRIBBLE_SEG_TYPE_NAME.find(model.type) != m_SCRIBBLE_SEG_TYPE_NAME.end())
+      if (m_SCRIBBLE_SEG_TYPE_NAME.find(model.type) != m_SCRIBBLE_SEG_TYPE_NAME.end() && model.dimension == dim)
       {
         scribbleModels.push_back(model);
       }

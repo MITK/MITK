@@ -15,9 +15,12 @@ found in the LICENSE file.
 #include <httplib.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkImageReadAccessor.h>
-#include <nlohmann/json.hpp>
+#include "mitkInteractionPositionEvent.h"
+#include "mitkPointSetShapeProperty.h"
+#include "mitkProperties.h"
+#include "mitkToolManager.h"
 
-mitk::MonaiLabelTool::MonaiLabelTool()
+mitk::MonaiLabelTool::MonaiLabelTool() : SegWithPreviewTool(true, "PressMoveReleaseAndPointSetting")
 {
   this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
 }
@@ -25,6 +28,153 @@ mitk::MonaiLabelTool::MonaiLabelTool()
 mitk::MonaiLabelTool::~MonaiLabelTool()
 {
   itksys::SystemTools::RemoveADirectory(this->GetMitkTempDir());
+}
+
+void mitk::MonaiLabelTool::ConnectActionsAndFunctions()
+{
+  CONNECT_FUNCTION("ShiftSecondaryButtonPressed", OnAddNegativePoint);
+  CONNECT_FUNCTION("ShiftPrimaryButtonPressed", OnAddPositivePoint);
+  CONNECT_FUNCTION("DeletePoint", OnDelete);
+}
+
+void mitk::MonaiLabelTool::Activated()
+{
+  Superclass::Activated();
+  m_PointSetPositive = mitk::PointSet::New();
+  m_PointSetNodePositive = mitk::DataNode::New();
+  m_PointSetNodePositive->SetData(m_PointSetPositive);
+  m_PointSetNodePositive->SetName(std::string(this->GetName()) + "_PointSetPositive");
+  m_PointSetNodePositive->SetBoolProperty("helper object", true);
+  m_PointSetNodePositive->SetColor(0.0, 1.0, 0.0);
+  m_PointSetNodePositive->SetVisibility(true);
+  m_PointSetNodePositive->SetProperty("Pointset.2D.shape",
+                                      mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
+  m_PointSetNodePositive->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
+  this->GetDataStorage()->Add(m_PointSetNodePositive, this->GetToolManager()->GetWorkingData(0));
+
+  m_PointSetNegative = mitk::PointSet::New();
+  m_PointSetNodeNegative = mitk::DataNode::New();
+  m_PointSetNodeNegative->SetData(m_PointSetNegative);
+  m_PointSetNodeNegative->SetName(std::string(this->GetName()) + "_PointSetNegative");
+  m_PointSetNodeNegative->SetBoolProperty("helper object", true);
+  m_PointSetNodeNegative->SetColor(1.0, 0.0, 0.0);
+  m_PointSetNodeNegative->SetVisibility(true);
+  m_PointSetNodeNegative->SetProperty("Pointset.2D.shape",
+                                      mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
+  m_PointSetNodeNegative->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
+  this->GetDataStorage()->Add(m_PointSetNodeNegative, this->GetToolManager()->GetWorkingData(0));
+
+  this->SetLabelTransferScope(LabelTransferScope::ActiveLabel);
+  this->SetLabelTransferMode(LabelTransferMode::MapLabel);
+}
+
+void mitk::MonaiLabelTool::Deactivated()
+{
+  this->ClearSeeds();
+  GetDataStorage()->Remove(m_PointSetNodePositive);
+  GetDataStorage()->Remove(m_PointSetNodeNegative);
+  m_PointSetNodePositive = nullptr;
+  m_PointSetNodeNegative = nullptr;
+  m_PointSetPositive = nullptr;
+  m_PointSetNegative = nullptr;
+  Superclass::Deactivated();
+}
+
+void mitk::MonaiLabelTool::OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent)
+{
+  /* if ("deepgrow" != m_RequestParameters->model.type || "deepedit" != m_RequestParameters->model.type)
+  {
+    return;
+  }
+  
+  if ((nullptr == this->GetWorkingPlaneGeometry()) ||
+      !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
+                   *(this->GetWorkingPlaneGeometry())))
+  {
+    this->ClearSeeds();
+    this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
+  }*/
+  if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
+  {
+    const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+    if (positionEvent != nullptr)
+    {
+      m_PointSetPositive->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
+      ++m_PointSetCount;
+      //this->UpdatePreview();
+    }
+  }
+}
+
+void mitk::MonaiLabelTool::OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent)
+{
+  /* if ("deepgrow" != m_RequestParameters->model.type)
+  {
+    return;
+  }
+  if ( m_PointSetPositive->GetSize() == 0 || nullptr == this->GetWorkingPlaneGeometry() ||
+      !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
+                   *(this->GetWorkingPlaneGeometry())))
+  {
+    return;
+  }*/
+  if (!this->IsUpdating() && m_PointSetNegative.IsNotNull())
+  {
+    const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+    if (positionEvent != nullptr)
+    {
+      m_PointSetNegative->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
+      m_PointSetCount++;
+      //this->UpdatePreview();
+    }
+  }
+}
+
+void mitk::MonaiLabelTool::OnDelete(StateMachineAction *, InteractionEvent *)
+{
+  if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
+  {
+    PointSet::Pointer removeSet = m_PointSetPositive;
+    decltype(m_PointSetPositive->GetMaxId().Index()) maxId = 0;
+    if (m_PointSetPositive->GetSize() > 0)
+    {
+      maxId = m_PointSetPositive->GetMaxId().Index();
+    }
+    if (m_PointSetNegative->GetSize() > 0 && (maxId < m_PointSetNegative->GetMaxId().Index()))
+    {
+      removeSet = m_PointSetNegative;
+    }
+    removeSet->RemovePointAtEnd(0);
+    --m_PointSetCount;
+    this->UpdatePreview();
+  }
+}
+
+void mitk::MonaiLabelTool::ClearPicks()
+{
+  this->ClearSeeds();
+  this->UpdatePreview();
+}
+
+bool mitk::MonaiLabelTool::HasPicks() const
+{
+  return this->m_PointSetPositive.IsNotNull() && this->m_PointSetPositive->GetSize() > 0;
+}
+
+void mitk::MonaiLabelTool::ClearSeeds()
+{
+  if (this->m_PointSetPositive.IsNotNull())
+  {
+    m_PointSetCount -= m_PointSetPositive->GetSize();
+    this->m_PointSetPositive = mitk::PointSet::New(); // renew pointset
+    this->m_PointSetNodePositive->SetData(this->m_PointSetPositive);
+  }
+  if (this->m_PointSetNegative.IsNotNull())
+  {
+    m_PointSetCount -= m_PointSetNegative->GetSize();
+    this->m_PointSetNegative = mitk::PointSet::New(); // renew pointset
+    this->m_PointSetNodeNegative->SetData(this->m_PointSetNegative);
+  }
 }
 
 bool mitk::MonaiLabelTool::IsMonaiServerOn(std::string &hostName, int &port)
@@ -305,7 +455,6 @@ std::unique_ptr<mitk::MonaiAppMetadata> mitk::MonaiLabelTool::DataMapper(nlohman
     }
     modelInfo.type = _jsonObj["type"].get<std::string>();
     modelInfo.dimension = _jsonObj["dimension"].get<int>();
-    MITK_INFO << "DIMENSION: " << modelInfo.dimension;
     modelInfo.description = _jsonObj["description"].get<std::string>();
 
     object->models.push_back(modelInfo);
@@ -316,11 +465,13 @@ std::unique_ptr<mitk::MonaiAppMetadata> mitk::MonaiLabelTool::DataMapper(nlohman
 std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetAutoSegmentationModels(int dim)
 {
   std::vector<mitk::MonaiModelInfo> autoModels;
+  bool checkDims = dim > -1;
   if (nullptr != m_InfoParameters)
   {
     for (mitk::MonaiModelInfo &model : m_InfoParameters->models)
     {
-      if (m_AUTO_SEG_TYPE_NAME.find(model.type) != m_AUTO_SEG_TYPE_NAME.end() && model.dimension == dim)
+      if (m_AUTO_SEG_TYPE_NAME.find(model.type) != m_AUTO_SEG_TYPE_NAME.end()
+          && (!checkDims || model.dimension == dim))
       {
         autoModels.push_back(model);
       }
@@ -332,11 +483,13 @@ std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetAutoSegmentationModel
 std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetInteractiveSegmentationModels(int dim)
 {
   std::vector<mitk::MonaiModelInfo> interactiveModels;
+  bool checkDims = dim > -1;
   if (nullptr != m_InfoParameters)
   {
     for (mitk::MonaiModelInfo &model : m_InfoParameters->models)
     {
-      if (m_INTERACTIVE_SEG_TYPE_NAME.find(model.type) != m_INTERACTIVE_SEG_TYPE_NAME.end() && model.dimension == dim)
+      if (m_INTERACTIVE_SEG_TYPE_NAME.find(model.type) != m_INTERACTIVE_SEG_TYPE_NAME.end()
+          && (!checkDims || model.dimension == dim))
       {
         interactiveModels.push_back(model);
       }
@@ -348,11 +501,13 @@ std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetInteractiveSegmentati
 std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetScribbleSegmentationModels(int dim)
 {
   std::vector<mitk::MonaiModelInfo> scribbleModels;
+  bool checkDims = dim > -1;
   if (nullptr != m_InfoParameters)
   {
     for (mitk::MonaiModelInfo &model : m_InfoParameters->models)
     {
-      if (m_SCRIBBLE_SEG_TYPE_NAME.find(model.type) != m_SCRIBBLE_SEG_TYPE_NAME.end() && model.dimension == dim)
+      if (m_SCRIBBLE_SEG_TYPE_NAME.find(model.type) != m_SCRIBBLE_SEG_TYPE_NAME.end()
+          && (!checkDims || model.dimension == dim))
       {
         scribbleModels.push_back(model);
       }

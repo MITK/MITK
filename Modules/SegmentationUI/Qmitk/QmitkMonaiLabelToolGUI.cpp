@@ -27,7 +27,6 @@ QmitkMonaiLabelToolGUI::QmitkMonaiLabelToolGUI(int dimension)
   : QmitkMultiLabelSegWithPreviewToolGUIBase(), m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
 {
   m_Dimension = dimension;
-  MITK_INFO << "dimsion construc: " << m_Dimension;
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   { return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false; };
 }
@@ -82,6 +81,8 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
       {
         std::string response = tool->m_InfoParameters->name;
         std::vector<mitk::MonaiModelInfo> autoModels = tool->GetAutoSegmentationModels(m_Dimension);
+        std::vector<mitk::MonaiModelInfo> interactiveModels = tool->GetInteractiveSegmentationModels(m_Dimension);
+        autoModels.insert(autoModels.end(), interactiveModels.begin(), interactiveModels.end());
         m_Controls.responseNote->setText(QString::fromStdString(response));
         m_Controls.appBox->addItem(QString::fromStdString(response));
         for (auto &model : autoModels)

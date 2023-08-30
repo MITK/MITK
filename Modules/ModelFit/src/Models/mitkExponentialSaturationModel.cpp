@@ -13,42 +13,138 @@ found in the LICENSE file.
 #include "mitkExponentialSaturationModel.h"
 #include "mitkNumericConstants.h"
 
+const std::string mitk::ExponentialSaturationModel::NAME_PARAMETER_BAT = "BAT";
+const std::string mitk::ExponentialSaturationModel::NAME_PARAMETER_y_bl = "y_bl";
+const std::string mitk::ExponentialSaturationModel::NAME_PARAMETER_y_fin = "y_fin";
+const std::string mitk::ExponentialSaturationModel::NAME_PARAMETER_k = "k";
+
+const unsigned int mitk::ExponentialSaturationModel::NUMBER_OF_PARAMETERS = 4;
+
+const std::string mitk::ExponentialSaturationModel::UNIT_PARAMETER_BAT = "[x]";
+const std::string mitk::ExponentialSaturationModel::UNIT_PARAMETER_y_bl = "[y]";
+const std::string mitk::ExponentialSaturationModel::UNIT_PARAMETER_y_fin = "[y]";
+const std::string mitk::ExponentialSaturationModel::UNIT_PARAMETER_k = "1/[x]";
+
+
+const unsigned int mitk::ExponentialSaturationModel::POSITION_PARAMETER_BAT = 0;
+const unsigned int mitk::ExponentialSaturationModel::POSITION_PARAMETER_y_bl = 1;
+const unsigned int mitk::ExponentialSaturationModel::POSITION_PARAMETER_y_fin = 2;
+const unsigned int mitk::ExponentialSaturationModel::POSITION_PARAMETER_k = 3;
+
+const unsigned int mitk::ExponentialSaturationModel::NUMBER_OF_DERIVED_PARAMETERS = 0;
+
+const unsigned int mitk::ExponentialSaturationModel::NUMBER_OF_STATIC_PARAMETERS = 0;
+
+const std::string mitk::ExponentialSaturationModel::MODEL_DISPLAY_NAME = "Exponential Saturation Model";
+
+const std::string mitk::ExponentialSaturationModel::MODEL_TYPE = "Generic";
+
+const std::string mitk::ExponentialSaturationModel::FUNCTION_STRING = "if x<BAT: y(x) = y_bl , else: y(x) = y_bl + (y_fin-y_bl) * (1 - exp(-1.0*k*(x-BAT)))";
+
+const std::string mitk::ExponentialSaturationModel::X_NAME = "x";
+
+const std::string mitk::ExponentialSaturationModel::X_AXIS_NAME = "x";
+
+const std::string mitk::ExponentialSaturationModel::X_AXIS_UNIT = "[x]";
+
+const std::string mitk::ExponentialSaturationModel::Y_AXIS_NAME = "y";
+
+const std::string mitk::ExponentialSaturationModel::Y_AXIS_UNIT = "[y]";
+
 std::string mitk::ExponentialSaturationModel::GetModelDisplayName() const
 {
-  return "Exponential Saturation Model";
+  return MODEL_DISPLAY_NAME;
 };
 
 std::string mitk::ExponentialSaturationModel::GetModelType() const
 {
-  return "Generic";
+  return MODEL_TYPE;
 };
 
 mitk::ExponentialSaturationModel::FunctionStringType mitk::ExponentialSaturationModel::GetFunctionString() const
 {
-  return "if x<BAT f(x) = S0 , else f(x) = A * (1-exp(-*B(x-BAT)))";
+  return FUNCTION_STRING;
 };
 
 std::string mitk::ExponentialSaturationModel::GetXName() const
 {
-  return "t";
+  return X_NAME;
 };
+
+std::string mitk::ExponentialSaturationModel::GetXAxisName() const
+{
+  return X_AXIS_NAME;
+};
+
+std::string mitk::ExponentialSaturationModel::GetXAxisUnit() const
+{
+  return X_AXIS_UNIT;
+}
+
+std::string mitk::ExponentialSaturationModel::GetYAxisName() const
+{
+  return Y_AXIS_NAME;
+};
+
+std::string mitk::ExponentialSaturationModel::GetYAxisUnit() const
+{
+  return Y_AXIS_UNIT;
+}
 
 mitk::ExponentialSaturationModel::ParameterNamesType
 mitk::ExponentialSaturationModel::GetParameterNames() const
 {
   ParameterNamesType result;
-  result.push_back("bat");
-  result.push_back("s0");
-  result.push_back("sfin");
-  result.push_back("rate");
+  result.push_back(NAME_PARAMETER_BAT);
+  result.push_back(NAME_PARAMETER_y_bl);
+  result.push_back(NAME_PARAMETER_y_fin);
+  result.push_back(NAME_PARAMETER_k);
   return result;
 };
+
+mitk::ExponentialSaturationModel::ParamterUnitMapType mitk::ExponentialSaturationModel::GetParameterUnits() const
+{
+  ParamterUnitMapType result;
+
+  result.insert(std::make_pair(NAME_PARAMETER_BAT, UNIT_PARAMETER_BAT));
+  result.insert(std::make_pair(NAME_PARAMETER_y_bl, UNIT_PARAMETER_y_bl));
+  result.insert(std::make_pair(NAME_PARAMETER_y_fin, UNIT_PARAMETER_y_fin));
+  result.insert(std::make_pair(NAME_PARAMETER_k, UNIT_PARAMETER_k));
+
+  return result;
+}
 
 mitk::ExponentialSaturationModel::ParametersSizeType
 mitk::ExponentialSaturationModel::GetNumberOfParameters() const
 {
-  return 4;
+  return NUMBER_OF_PARAMETERS;
 };
+
+mitk::ExponentialSaturationModel::ParameterNamesType
+mitk::ExponentialSaturationModel::GetDerivedParameterNames() const
+{
+  ParameterNamesType result;
+  
+  // do nothing
+
+  return result;
+};
+
+mitk::ExponentialSaturationModel::ParametersSizeType
+mitk::ExponentialSaturationModel::GetNumberOfDerivedParameters() const
+{
+  return NUMBER_OF_DERIVED_PARAMETERS;
+};
+
+mitk::ExponentialSaturationModel::ParamterUnitMapType mitk::ExponentialSaturationModel::GetDerivedParameterUnits() const
+{
+  ParamterUnitMapType result;
+
+  //do nothing
+
+  return result;
+};
+
 
 mitk::ExponentialSaturationModel::ModelResultType
 mitk::ExponentialSaturationModel::ComputeModelfunction(const ParametersType& parameters) const
@@ -85,6 +181,15 @@ mitk::ExponentialSaturationModel::ParametersSizeType  mitk::ExponentialSaturatio
 {
   return 0;
 }
+
+mitk::ExponentialSaturationModel::ParamterUnitMapType mitk::ExponentialSaturationModel::GetStaticParameterUnits() const
+{
+  ParamterUnitMapType result;
+
+  //do nothing
+
+  return result;
+};
 
 void mitk::ExponentialSaturationModel::SetStaticParameter(const ParameterNameType& /*name*/,
     const StaticParameterValuesType& /*values*/)

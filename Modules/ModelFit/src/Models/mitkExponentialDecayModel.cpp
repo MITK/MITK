@@ -13,22 +13,22 @@ found in the LICENSE file.
 #include "mitkExponentialDecayModel.h"
 #include "mitkNumericConstants.h"
 
-const std::string mitk::ExponentialDecayModel::NAME_PARAMETER_y0 = "y0";
+const std::string mitk::ExponentialDecayModel::NAME_PARAMETER_y0 = "y-intercept";
 const std::string mitk::ExponentialDecayModel::NAME_PARAMETER_lambda = "lambda";
 
 const unsigned int mitk::ExponentialDecayModel::NUMBER_OF_PARAMETERS = 2;
 
-const std::string mitk::ExponentialDecayModel::UNIT_PARAMETER_y0 = "[y]";
-const std::string mitk::ExponentialDecayModel::UNIT_PARAMETER_lambda = "[x]";
+const std::string mitk::ExponentialDecayModel::UNIT_PARAMETER_y0 = "[unit of y]";
+const std::string mitk::ExponentialDecayModel::UNIT_PARAMETER_lambda = "[unit of x]";
 
 const unsigned int mitk::ExponentialDecayModel::POSITION_PARAMETER_y0 = 0;
 const unsigned int mitk::ExponentialDecayModel::POSITION_PARAMETER_lambda = 1;
 
-const std::string mitk::ExponentialDecayModel::NAME_DERIVED_PARAMETER_k = "k";
+const std::string mitk::ExponentialDecayModel::NAME_DERIVED_PARAMETER_k = "rate";
 
 const unsigned int mitk::ExponentialDecayModel::NUMBER_OF_DERIVED_PARAMETERS = 1;
 
-const std::string mitk::ExponentialDecayModel::UNIT_DERIVED_PARAMETER_k = "1/[x]";
+const std::string mitk::ExponentialDecayModel::UNIT_DERIVED_PARAMETER_k = "1/[unit of x]";
 
 const unsigned int mitk::ExponentialDecayModel::NUMBER_OF_STATIC_PARAMETERS = 0;
 
@@ -36,17 +36,17 @@ const std::string mitk::ExponentialDecayModel::MODEL_DISPLAY_NAME = "Exponential
 
 const std::string mitk::ExponentialDecayModel::MODEL_TYPE = "Generic";
 
-const std::string mitk::ExponentialDecayModel::FUNCTION_STRING = "y(x) = y0 * exp(-t/lambda)";
+const std::string mitk::ExponentialDecayModel::FUNCTION_STRING = "y(x) = y-intercept * exp(-x/lambda)";
 
 const std::string mitk::ExponentialDecayModel::X_NAME = "x";
 
-const std::string mitk::ExponentialDecayModel::X_AXIS_NAME = "x";
+const std::string mitk::ExponentialDecayModel::X_AXIS_NAME = "X";
 
-const std::string mitk::ExponentialDecayModel::X_AXIS_UNIT = "[x]";
+const std::string mitk::ExponentialDecayModel::X_AXIS_UNIT = "unit of x";
 
-const std::string mitk::ExponentialDecayModel::Y_AXIS_NAME = "y";
+const std::string mitk::ExponentialDecayModel::Y_AXIS_NAME = "Y";
 
-const std::string mitk::ExponentialDecayModel::Y_AXIS_UNIT = "[y]";
+const std::string mitk::ExponentialDecayModel::Y_AXIS_UNIT = "unit of y";
 
 
 std::string mitk::ExponentialDecayModel::GetModelDisplayName() const
@@ -203,8 +203,8 @@ mitk::ModelBase::DerivedParameterMapType mitk::ExponentialDecayModel::ComputeDer
   double     y0 = parameters[POSITION_PARAMETER_y0];
   double     lambda = parameters[POSITION_PARAMETER_lambda];
 
-  double inverse = 1.0 / (lambda + mitk::eps);
-  result.insert(std::make_pair("k", inverse));
+  double k = 1.0 / (lambda + mitk::eps);
+  result.insert(std::make_pair(NAME_DERIVED_PARAMETER_k, k));
   return result;
 };
 

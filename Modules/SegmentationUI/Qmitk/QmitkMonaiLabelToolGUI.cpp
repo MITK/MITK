@@ -45,6 +45,9 @@ void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   connect(m_Controls.fetchUrl, SIGNAL(clicked()), this, SLOT(OnFetchBtnClicked()));
+  connect(m_Controls.modelBox,
+          QOverload<int>::of(&QComboBox::activated),
+          [=](int index) { OnModelChanged(m_Controls.modelBox->itemText(index)); });
 
   QIcon refreshIcon =
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
@@ -56,6 +59,26 @@ void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
 void QmitkMonaiLabelToolGUI::EnableWidgets(bool enabled)
 {
   Superclass::EnableWidgets(enabled);
+}
+
+void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
+{
+  auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
+  if (nullptr == tool)
+  {
+    return;
+  }
+  mitk::MonaiModelInfo model = tool->GetModelInfoFromName(modelName.toStdString());
+  if ("deepgrow" == model.type || "deepedit" == model.type)
+  {
+    m_Controls.responseNote->setText("Interactive model selected. Please press SHIFT + click on the render windows.");
+    m_Controls.previewButton->setEnabled(false);
+  }
+  else
+  {
+    m_Controls.responseNote->setText("Auto-segmentation model selected. Please click on Preview.");
+    m_Controls.previewButton->setEnabled(true);
+  }
 }
 
 void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
@@ -89,6 +112,7 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
         {
           m_Controls.modelBox->addItem(QString::fromStdString(model.name));
         }
+        m_Controls.modelBox->setCurrentIndex(-1);
       }
     }
     catch (const mitk::Exception &e)

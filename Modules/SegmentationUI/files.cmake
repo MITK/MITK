@@ -116,6 +116,7 @@ set(UI_FILES
   Qmitk/QmitkMultiLabelInspectorControls.ui
   Qmitk/QmitkMultiLabelManagerControls.ui
   Qmitk/QmitkFindSegmentationTaskDialog.ui
+  Qmitk/QmitkMonaiLabelToolGUIControls.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkContourModelToImageWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui

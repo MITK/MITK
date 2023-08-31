@@ -515,3 +515,21 @@ std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetScribbleSegmentationM
   }
   return scribbleModels;
 }
+
+mitk::MonaiModelInfo mitk::MonaiLabelTool::GetModelInfoFromName(std::string &modelName)
+{
+  if (nullptr == m_InfoParameters)
+  {
+    mitkThrow() << "No model information found.";
+  }
+  mitk::MonaiModelInfo retVal;
+  for (mitk::MonaiModelInfo &model : m_InfoParameters->models)
+  {
+    if (model.name == modelName)
+    {
+      retVal = model;
+      break;
+    }
+  }
+  return retVal;
+}

@@ -30,7 +30,7 @@ namespace us
 
 namespace mitk
 {
-  class MITKSEGMENTATION_EXPORT MonaiLabel2DTool : public MonaiLabelTool //SegWithPreviewTool
+  class MITKSEGMENTATION_EXPORT MonaiLabel2DTool : public MonaiLabelTool
   {
   public:
     mitkClassMacro(MonaiLabel2DTool, MonaiLabelTool);

@@ -95,7 +95,8 @@ namespace mitk
     std::vector<MonaiModelInfo> GetAutoSegmentationModels(int dim = -1);
     std::vector<MonaiModelInfo> GetInteractiveSegmentationModels(int dim = -1);
     std::vector<MonaiModelInfo> GetScribbleSegmentationModels(int dim = -1);
-    void PostInferRequest(std::string &, int &, std::string &, std::string &);
+    void PostInferRequest(std::string&, int&, std::string&, std::string&);
+    MonaiModelInfo GetModelInfoFromName(std::string&);
 
     itkSetMacro(ModelName, std::string);
     itkGetConstMacro(ModelName, std::string);

@@ -30,9 +30,6 @@ found in the LICENSE file.
 #include "mitkTwoTissueCompartmentFDGModelFactory.h"
 #include "mitkNumericTwoTissueCompartmentModelFactory.h"
 
-//general models
-//#include "mitkTwoStepLinearModelFactory.h"
-#include "mitkThreeStepLinearModelFactory.h"
 
 namespace mitk
 {
@@ -56,8 +53,6 @@ public:
   {
     m_RegisteredProviders.clear();
     RegisterProvider<mitk::ModelFitProviderBase<mitk::DescriptivePharmacokineticBrixModelFactory> >(context);
-    RegisterProvider<mitk::ModelFitProviderBase<mitk::ThreeStepLinearModelFactory> >(context);
-    //RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoStepLinearModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::ExtendedToftsModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::StandardToftsModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoCompartmentExchangeModelFactory> >(context);

@@ -24,8 +24,6 @@ found in the LICENSE file.
 #include <mitkDescriptivePharmacokineticBrixModelFactory.h>
 #include <mitkDescriptivePharmacokineticBrixModelParameterizer.h>
 #include <mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer.h>
-#include "mitkThreeStepLinearModelFactory.h"
-#include "mitkThreeStepLinearModelParameterizer.h"
 #include <mitkExtendedToftsModelFactory.h>
 #include <mitkExtendedToftsModelParameterizer.h>
 #include <mitkStandardToftsModelFactory.h>
@@ -369,8 +367,6 @@ void MRPerfusionView::OnModellingButtonClicked()
 
     bool isDescBrixFactory = dynamic_cast<mitk::DescriptivePharmacokineticBrixModelFactory*>
                              (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool is3LinearFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
-                             (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isExtToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>
                           (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isStanToftsFactory = dynamic_cast<mitk::StandardToftsModelFactory*>
@@ -389,17 +385,6 @@ void MRPerfusionView::OnModellingButtonClicked()
       else
       {
         GenerateDescriptiveBrixModel_ROIBased(fitSession, generator);
-      }
-    }
-    else if (is3LinearFactory)
-    {
-      if (this->m_Controls.radioPixelBased->isChecked())
-      {
-        GenerateLinearModelFit_PixelBased<mitk::ThreeStepLinearModelParameterizer>(fitSession, generator);
-      }
-      else
-      {
-        GenerateLinearModelFit_ROIBased<mitk::ThreeStepLinearModelParameterizer>(fitSession, generator);
       }
     }
     else if (isStanToftsFactory)
@@ -551,8 +536,6 @@ bool MRPerfusionView::CheckModelSettings() const
   {
     bool isDescBrixFactory = dynamic_cast<mitk::DescriptivePharmacokineticBrixModelFactory*>
                              (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool is3LinearFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
-                             (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isToftsFactory = dynamic_cast<mitk::StandardToftsModelFactory*>
                           (m_selectedModelFactory.GetPointer()) != nullptr||
                           dynamic_cast<mitk::ExtendedToftsModelFactory*>
@@ -566,40 +549,6 @@ bool MRPerfusionView::CheckModelSettings() const
     {
       //if all static parameters for this model are set, exit with true, Otherwise exit with false
       ok = m_Controls.injectiontime->value() > 0;
-    }
-    else if (is3LinearFactory)
-    {
-      if (this->m_Controls.radioButtonTurboFlash->isChecked())
-      {
-        ok = ok && (m_Controls.recoverytime->value() > 0);
-        ok = ok && (m_Controls.relaxationtime->value() > 0);
-        ok = ok && (m_Controls.relaxivity->value() > 0);
-        ok = ok && (m_Controls.AifRecoverytime->value() > 0);
-        ok = ok && CheckBaselineSelectionSettings();
-
-      }
-      else if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
-        || this->m_Controls.radioButton_relativeEnchancement->isChecked())
-      {
-        ok = ok && (m_Controls.factorSpinBox->value() > 0);
-        ok = ok && CheckBaselineSelectionSettings();
-      }
-      else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
-      {
-        ok = ok && (m_Controls.FlipangleSpinBox->value() > 0);
-        ok = ok && (m_Controls.TRSpinBox->value() > 0);
-        ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
-        ok = ok && (m_Controls.PDWImageNodeSelector->GetSelectedNode().IsNotNull());
-        ok = ok && CheckBaselineSelectionSettings();
-      }
-      else if (this->m_Controls.radioButtonNoConversion->isChecked())
-      {
-        ok = true;
-      }
-      else
-      {
-        ok = false;
-      }
     }
     else if (isToftsFactory || is2CXMFactory || isNum2CXMFactory)
     {
@@ -1081,8 +1030,6 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
 
   mitk::ModelFactoryBase::Pointer factory =
     mitk::DescriptivePharmacokineticBrixModelFactory::New().GetPointer();
-  m_FactoryStack.push_back(factory);
-  factory = mitk::ThreeStepLinearModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
   factory = mitk::StandardToftsModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);

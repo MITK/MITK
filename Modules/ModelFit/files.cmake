@@ -66,6 +66,9 @@ set(CPP_FILES
   Models/mitkTwoStepLinearModel.cpp
   Models/mitkTwoStepLinearModelFactory.cpp
   Models/mitkTwoStepLinearModelParameterizer.cpp
+  Models/mitkThreeStepLinearModel.cpp
+  Models/mitkThreeStepLinearModelFactory.cpp
+  Models/mitkThreeStepLinearModelParameterizer.cpp
   TestingHelper/mitkTestModel.cpp
   TestingHelper/mitkTestModelFactory.cpp
 )

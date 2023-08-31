@@ -19,12 +19,12 @@ found in the LICENSE file.
 #include "mitkThreeStepLinearModel.h"
 #include "mitkThreeStepLinearModelParameterizer.h"
 
-#include "MitkPharmacokineticsExports.h"
+#include "MitkModelFitExports.h"
 namespace mitk
 {
 
 
-  class MITKPHARMACOKINETICS_EXPORT ThreeStepLinearModelFactory : public ConcreteModelFactoryBase<ThreeStepLinearModel>
+  class MITKMODELFIT_EXPORT ThreeStepLinearModelFactory : public ConcreteModelFactoryBase<ThreeStepLinearModel>
   {
   public:
     mitkClassMacroItkParent(ThreeStepLinearModelFactory, ConcreteModelFactoryBase<ThreeStepLinearModel>);

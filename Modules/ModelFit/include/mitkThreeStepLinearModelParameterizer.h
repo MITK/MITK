@@ -19,7 +19,7 @@ found in the LICENSE file.
 namespace mitk
 {
 
-class MITKPHARMACOKINETICS_EXPORT ThreeStepLinearModelParameterizer : public
+class MITKMODELFIT_EXPORT ThreeStepLinearModelParameterizer : public
   mitk::ConcreteModelParameterizerBase<mitk::ThreeStepLinearModel>
 {
 public:

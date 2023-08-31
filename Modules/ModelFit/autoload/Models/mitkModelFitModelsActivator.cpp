@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include "mitkExpDecayOffsetModelFactory.h"
 #include "mitkExponentialSaturationModelFactory.h"
 #include "mitkTwoStepLinearModelFactory.h"
+#include "mitkThreeStepLinearModelFactory.h"
 
 namespace mitk
 {
@@ -51,6 +52,7 @@ public:
     RegisterProvider<mitk::ModelFitProviderBase<mitk::ExpDecayOffsetModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::ExponentialSaturationModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoStepLinearModelFactory> >(context);
+    RegisterProvider<mitk::ModelFitProviderBase<mitk::ThreeStepLinearModelFactory> >(context);
   }
 
   void Unload(us::ModuleContext* ) override

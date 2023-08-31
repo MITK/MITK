@@ -15,12 +15,12 @@ found in the LICENSE file.
 
 #include "mitkModelBase.h"
 
-#include "MitkPharmacokineticsExports.h"
+#include "MitkModelFitExports.h"
 
 namespace mitk
 {
 
-  class MITKPHARMACOKINETICS_EXPORT ThreeStepLinearModel : public mitk::ModelBase
+  class MITKMODELFIT_EXPORT ThreeStepLinearModel : public mitk::ModelBase
   {
 
   public:

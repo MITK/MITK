@@ -14,17 +14,17 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 
 
-const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_y0 = "y0";
-const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_x0 = "x0";
-const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_b0 = "b0";
-const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_b1 = "b1";
+const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_y0 = "y-intercept";
+const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_x0 = "x_changepoint";
+const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_b0 = "slope1";
+const std::string mitk::TwoStepLinearModel::NAME_PARAMETER_b1 = "slope2";
 
 const unsigned int mitk::TwoStepLinearModel::NUMBER_OF_PARAMETERS = 4;
 
-const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_y0 = "[y]";
-const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_x0 = "[x]";
-const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_b0 = "[y]/[x]";
-const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_b1 = "[y]/[x]";
+const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_y0 = "[unit of y]";
+const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_x0 = "[unit of x]";
+const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_b0 = "[unit of y]/[unit of x]";
+const std::string mitk::TwoStepLinearModel::UNIT_PARAMETER_b1 = "[unit of y]/[unit of x]";
 
 const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_y0 = 0;
 const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_x0 = 1;
@@ -32,16 +32,16 @@ const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_b0 = 2;
 const unsigned int mitk::TwoStepLinearModel::POSITION_PARAMETER_b1 = 3;
 
 const std::string mitk::TwoStepLinearModel::NAME_DERIVED_PARAMETER_auc = "auc";
-const std::string mitk::TwoStepLinearModel::NAME_DERIVED_PARAMETER_y_fin = "y_fin";
+const std::string mitk::TwoStepLinearModel::NAME_DERIVED_PARAMETER_y_fin = "y_final";
 const std::string mitk::TwoStepLinearModel::NAME_DERIVED_PARAMETER_y_max = "y_max";
-const std::string mitk::TwoStepLinearModel::NAME_DERIVED_PARAMETER_y1 = "y1";
+const std::string mitk::TwoStepLinearModel::NAME_DERIVED_PARAMETER_y1 = "y-intercept1";
 
 const unsigned int mitk::TwoStepLinearModel::NUMBER_OF_DERIVED_PARAMETERS = 4;
 
-const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_auc = "[x]*[y]";
-const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_y_fin = "[y]";
-const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_y_max = "[y]";
-const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_y1 = "[y]";
+const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_auc = "[unit of x]*[unit of y]";
+const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_y_fin = "[unit of y]";
+const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_y_max = "[unit of y]";
+const std::string mitk::TwoStepLinearModel::UNIT_DERIVED_PARAMETER_y1 = "[unit of y]";
 
 const unsigned int mitk::TwoStepLinearModel::NUMBER_OF_STATIC_PARAMETERS = 0;
 
@@ -49,17 +49,17 @@ const std::string mitk::TwoStepLinearModel::MODEL_DISPLAY_NAME = "Two Step Linea
 
 const std::string mitk::TwoStepLinearModel::MODEL_TYPE = "Generic";
 
-const std::string mitk::TwoStepLinearModel::FUNCTION_STRING = "if x < x0: y(x) = y0 + b0*x, else: y(x) = y1 + b1*x";
+const std::string mitk::TwoStepLinearModel::FUNCTION_STRING = "if x < x_changepoint: y(x) = y-intercept + slope1*x, else: y(x) = y-intercept1 + slope2*x";
 
 const std::string mitk::TwoStepLinearModel::X_NAME = "x";
 
-const std::string mitk::TwoStepLinearModel::X_AXIS_NAME = "x";
+const std::string mitk::TwoStepLinearModel::X_AXIS_NAME = "X";
 
-const std::string mitk::TwoStepLinearModel::X_AXIS_UNIT = "[x]";
+const std::string mitk::TwoStepLinearModel::X_AXIS_UNIT = "unit of x";
 
-const std::string mitk::TwoStepLinearModel::Y_AXIS_NAME = "y";
+const std::string mitk::TwoStepLinearModel::Y_AXIS_NAME = "Y";
 
-const std::string mitk::TwoStepLinearModel::Y_AXIS_UNIT = "[y]";
+const std::string mitk::TwoStepLinearModel::Y_AXIS_UNIT = "unit of y";
 
 
 std::string mitk::TwoStepLinearModel::GetModelDisplayName() const

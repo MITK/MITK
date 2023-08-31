@@ -13,11 +13,11 @@ found in the LICENSE file.
 #include "mitkThreeStepLinearModel.h"
 #include <mitkIOUtil.h>
 
-const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_y_bl = "y_bl";
-const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_x0 = "x0";
-const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_x1 = "x1";
-const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_b0 = "b0";
-const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_b1 = "b1";
+const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_y_bl = "baseline";
+const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_x0 = "x_changepoint1";
+const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_x1 = "x_changepoint2";
+const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_b0 = "slope1";
+const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_b1 = "slope2";
 
 const unsigned int mitk::ThreeStepLinearModel::NUMBER_OF_PARAMETERS = 5;
 
@@ -34,11 +34,11 @@ const unsigned int mitk::ThreeStepLinearModel::POSITION_PARAMETER_b0 = 3;
 const unsigned int mitk::ThreeStepLinearModel::POSITION_PARAMETER_b1 = 4;
 
 const std::string mitk::ThreeStepLinearModel::NAME_DERIVED_PARAMETER_auc = "auc";
-const std::string mitk::ThreeStepLinearModel::NAME_DERIVED_PARAMETER_x_fin = "x_fin";
-const std::string mitk::ThreeStepLinearModel::NAME_DERIVED_PARAMETER_y_fin = "y_fin";
+const std::string mitk::ThreeStepLinearModel::NAME_DERIVED_PARAMETER_x_fin = "x_final";
+const std::string mitk::ThreeStepLinearModel::NAME_DERIVED_PARAMETER_y_fin = "y_final";
 const std::string mitk::ThreeStepLinearModel::NAME_DERIVED_PARAMETER_y_max = "y_max";
-const std::string mitk::ThreeStepLinearModel::NAME_DERIVED_PARAMETER_y1 = "y1";
-const std::string mitk::ThreeStepLinearModel::NAME_DERIVED_PARAMETER_y2 = "y2";
+const std::string mitk::ThreeStepLinearModel::NAME_DERIVED_PARAMETER_y1 = "y-intercept1";
+const std::string mitk::ThreeStepLinearModel::NAME_DERIVED_PARAMETER_y2 = "y-intercept2";
 
 const unsigned int mitk::ThreeStepLinearModel::NUMBER_OF_DERIVED_PARAMETERS = 6;
 
@@ -55,7 +55,7 @@ const std::string mitk::ThreeStepLinearModel::MODEL_DISPLAY_NAME = "Three Step L
 
 const std::string mitk::ThreeStepLinearModel::MODEL_TYPE = "Generic";
 
-const std::string mitk::ThreeStepLinearModel::FUNCTION_STRING = "if x < x0: y(x) = y_bl, else if x0 <= x <= x1: y(x) = y1 + b0*x, else if x>x1: y(x) = y2 + b1*x";
+const std::string mitk::ThreeStepLinearModel::FUNCTION_STRING = "if x < x_changepoint1: y(x) = baseline, else if x_changepoint1 <= x <= x_changepoint2: y(x) = y-intercept1 + slope1*x, else if x>x_changepoint2: y(x) = y-intercept2 + slope2*x";
 
 const std::string mitk::ThreeStepLinearModel::X_NAME = "x";
 

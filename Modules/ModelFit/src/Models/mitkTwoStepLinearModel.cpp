@@ -179,7 +179,6 @@ mitk::TwoStepLinearModel::ComputeModelfunction(const ParametersType& parameters)
   const auto b1 = parameters[POSITION_PARAMETER_b1] ;
 
   double y1 = (b0 - b1) * x0 + y0;
-  
 
   ModelResultType signal(m_TimeGrid.GetSize());
 

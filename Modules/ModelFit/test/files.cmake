@@ -16,4 +16,5 @@ SET(MODULE_TESTS
   mitkExponentialDecayModelTest.cpp
   mitkLinearModelTest.cpp
   mitkExpDecayOffsetModelTest.cpp
+  mitkTwoStepLinearModelTest.cpp
 )

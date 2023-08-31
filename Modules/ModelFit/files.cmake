@@ -63,6 +63,9 @@ set(CPP_FILES
   Models/mitkExpDecayOffsetModel.cpp
   Models/mitkExpDecayOffsetModelFactory.cpp
   Models/mitkExpDecayOffsetModelParameterizer.cpp
+  Models/mitkTwoStepLinearModel.cpp
+  Models/mitkTwoStepLinearModelFactory.cpp
+  Models/mitkTwoStepLinearModelParameterizer.cpp
   TestingHelper/mitkTestModel.cpp
   TestingHelper/mitkTestModelFactory.cpp
 )

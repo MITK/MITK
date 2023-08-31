@@ -35,8 +35,8 @@ public:
   void setUp() override
   {
     // Parse JSON files
-    m_profile_json_obj = ParseJSONFile("Pharmacokinetics/mitkTwoStepLinearModelTest_profile.json");
-    m_modelValues_json_obj = ParseJSONFile("Pharmacokinetics/mitkTwoStepLinearModelTest_modelValues.json");
+    m_profile_json_obj = ParseJSONFile("ModelFit/mitkTwoStepLinearModelTest_profile.json");
+    m_modelValues_json_obj = ParseJSONFile("ModelFit/mitkTwoStepLinearModelTest_modelValues.json");
 
     // Generate test model
     m_testmodel = mitk::TwoStepLinearModel::New();

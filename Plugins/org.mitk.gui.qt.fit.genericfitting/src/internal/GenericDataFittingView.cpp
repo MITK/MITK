@@ -23,6 +23,8 @@ found in the LICENSE file.
 #include <mitkExponentialSaturationModel.h>
 #include <mitkExponentialSaturationModelFactory.h>
 #include <mitkExponentialSaturationModelParameterizer.h>
+#include "mitkTwoStepLinearModelFactory.h"
+#include "mitkTwoStepLinearModelParameterizer.h"
 
 #include <mitkValueBasedParameterizationDelegate.h>
 
@@ -262,6 +264,8 @@ void GenericDataFittingView::OnModellingButtonClicked()
                             (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isExponentialDecayFactory = dynamic_cast<mitk::ExponentialDecayModelFactory*>
       (m_selectedModelFactory.GetPointer()) != nullptr;
+    bool isTwoStepLinearFactory = dynamic_cast<mitk::TwoStepLinearModelFactory*>
+      (m_selectedModelFactory.GetPointer()) != nullptr;
 
     bool isExponentialSaturationFactory = dynamic_cast<mitk::ExponentialSaturationModelFactory*>
       (m_selectedModelFactory.GetPointer()) != nullptr;
@@ -297,6 +301,17 @@ void GenericDataFittingView::OnModellingButtonClicked()
       else
       {
         GenerateModelFit_ROIBased<mitk::ExponentialDecayModelParameterizer>(fitSession, generator);
+      }
+    }
+    else if (isTwoStepLinearFactory)
+    {
+      if (this->m_Controls.radioPixelBased->isChecked())
+      {
+        GenerateModelFit_PixelBased<mitk::TwoStepLinearModelParameterizer>(fitSession, generator);
+      }
+      else
+      {
+        GenerateModelFit_ROIBased<mitk::TwoStepLinearModelParameterizer>(fitSession, generator);
       }
     }
     else if (isExponentialSaturationFactory)
@@ -589,6 +604,8 @@ GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
   factory = mitk::ExponentialDecayModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
   factory = mitk::ExponentialSaturationModelFactory::New().GetPointer();
+  m_FactoryStack.push_back(factory);
+  factory = mitk::TwoStepLinearModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
 
   this->m_IsNotABinaryImagePredicate = mitk::NodePredicateAnd::New(

@@ -39,9 +39,6 @@ set(CPP_FILES
   Models/mitkExtendedOneTissueCompartmentModel.cpp
   Models/mitkExtendedOneTissueCompartmentModelFactory.cpp
   Models/mitkExtendedOneTissueCompartmentModelParameterizer.cpp
-  Models/mitkTwoStepLinearModel.cpp
-  Models/mitkTwoStepLinearModelFactory.cpp
-  Models/mitkTwoStepLinearModelParameterizer.cpp
   Models/mitkTwoTissueCompartmentModel.cpp
   Models/mitkTwoTissueCompartmentModelFactory.cpp
   Models/mitkTwoTissueCompartmentModelParameterizer.cpp

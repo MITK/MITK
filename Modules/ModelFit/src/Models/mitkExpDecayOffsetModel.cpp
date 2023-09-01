@@ -13,15 +13,15 @@ found in the LICENSE file.
 #include "mitkExpDecayOffsetModel.h"
 
 
-const std::string mitk::ExpDecayOffsetModel::NAME_PARAMETER_y0 = "y0";
-const std::string mitk::ExpDecayOffsetModel::NAME_PARAMETER_k = "k";
-const std::string mitk::ExpDecayOffsetModel::NAME_PARAMETER_y_bl = "y_bl";
+const std::string mitk::ExpDecayOffsetModel::NAME_PARAMETER_y0 = "y-intercept";
+const std::string mitk::ExpDecayOffsetModel::NAME_PARAMETER_k = "rate";
+const std::string mitk::ExpDecayOffsetModel::NAME_PARAMETER_y_bl = "baseline";
 
 const unsigned int mitk::ExpDecayOffsetModel::NUMBER_OF_PARAMETERS = 3;
 
-const std::string mitk::ExpDecayOffsetModel::UNIT_PARAMETER_y0 = "[y]";
-const std::string mitk::ExpDecayOffsetModel::UNIT_PARAMETER_k = "1/[x]";
-const std::string mitk::ExpDecayOffsetModel::UNIT_PARAMETER_y_bl = "[y]";
+const std::string mitk::ExpDecayOffsetModel::UNIT_PARAMETER_y0 = "[unit of y]";
+const std::string mitk::ExpDecayOffsetModel::UNIT_PARAMETER_k = "1/[unit of x]";
+const std::string mitk::ExpDecayOffsetModel::UNIT_PARAMETER_y_bl = "[unit of y]";
 
 const unsigned int mitk::ExpDecayOffsetModel::POSITION_PARAMETER_y0 = 0;
 const unsigned int mitk::ExpDecayOffsetModel::POSITION_PARAMETER_k = 1;
@@ -35,17 +35,17 @@ const std::string mitk::ExpDecayOffsetModel::MODEL_DISPLAY_NAME = "Exponential D
 
 const std::string mitk::ExpDecayOffsetModel::MODEL_TYPE = "Generic";
 
-const std::string mitk::ExpDecayOffsetModel::FUNCTION_STRING = "y(x) = y0 * exp(-k*x) + y_bl";
+const std::string mitk::ExpDecayOffsetModel::FUNCTION_STRING = "y(x) = y-intercept * exp(-rate*x) + baseline";
 
 const std::string mitk::ExpDecayOffsetModel::X_NAME = "x";
 
-const std::string mitk::ExpDecayOffsetModel::X_AXIS_NAME = "x";
+const std::string mitk::ExpDecayOffsetModel::X_AXIS_NAME = "X";
 
-const std::string mitk::ExpDecayOffsetModel::X_AXIS_UNIT = "[x]";
+const std::string mitk::ExpDecayOffsetModel::X_AXIS_UNIT = "unit of x";
 
-const std::string mitk::ExpDecayOffsetModel::Y_AXIS_NAME = "y";
+const std::string mitk::ExpDecayOffsetModel::Y_AXIS_NAME = "Y";
 
-const std::string mitk::ExpDecayOffsetModel::Y_AXIS_UNIT = "[y]";
+const std::string mitk::ExpDecayOffsetModel::Y_AXIS_UNIT = "unit of y";
 
 ///////////
 

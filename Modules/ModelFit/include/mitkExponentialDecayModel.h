@@ -21,9 +21,8 @@ namespace mitk
 {
 
   /** @class ExponentialDecayModel
-  * @brief Simple model of the MR T2 signal decay. This corresponds to an exponential decay in the form of:
-  * f(t) = M0 * exp(-t/T2) with T2 being the transverse / spin-spin relaxation time. The derived parameter R2
-  * is calculated from T2 by inversion.
+  * @brief Simple model of exponential decay in the form of:
+  * y(x) = y-intercept * exp(-x/lambda) with lambda being the decay constant.
   */
   class MITKMODELFIT_EXPORT ExponentialDecayModel : public mitk::ModelBase
   {

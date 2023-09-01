@@ -12,13 +12,13 @@ found in the LICENSE file.
 
 #include "mitkLinearModel.h"
 
-const std::string mitk::LinearModel::NAME_PARAMETER_b = "b";
-const std::string mitk::LinearModel::NAME_PARAMETER_y0 = "y0";
+const std::string mitk::LinearModel::NAME_PARAMETER_b = "slope";
+const std::string mitk::LinearModel::NAME_PARAMETER_y0 = "y-intercept";
 
 const unsigned int mitk::LinearModel::NUMBER_OF_PARAMETERS = 2;
 
-const std::string mitk::LinearModel::UNIT_PARAMETER_b = "[y]/[x]";
-const std::string mitk::LinearModel::UNIT_PARAMETER_y0 = "[y]";
+const std::string mitk::LinearModel::UNIT_PARAMETER_b = "[unit of y]/[unit of x]";
+const std::string mitk::LinearModel::UNIT_PARAMETER_y0 = "[unit of y]";
 
 const unsigned int mitk::LinearModel::POSITION_PARAMETER_b = 0;
 const unsigned int mitk::LinearModel::POSITION_PARAMETER_y0 = 1;
@@ -27,7 +27,7 @@ const std::string mitk::LinearModel::NAME_DERIVED_PARAMETER_x_intercept = "x-int
 
 const unsigned int mitk::LinearModel::NUMBER_OF_DERIVED_PARAMETERS = 1;
 
-const std::string mitk::LinearModel::UNIT_DERIVED_PARAMETER_x_intercept = "[x]";
+const std::string mitk::LinearModel::UNIT_DERIVED_PARAMETER_x_intercept = "[unit of x]";
 
 const unsigned int mitk::LinearModel::NUMBER_OF_STATIC_PARAMETERS = 0;
 
@@ -35,17 +35,17 @@ const std::string mitk::LinearModel::MODEL_DISPLAY_NAME = "Linear Model";
 
 const std::string mitk::LinearModel::MODEL_TYPE = "Generic";
 
-const std::string mitk::LinearModel::FUNCTION_STRING = "y(x) = y0 + b*x";
+const std::string mitk::LinearModel::FUNCTION_STRING = "y(x) = y-intercept + slope*x";
 
 const std::string mitk::LinearModel::X_NAME = "x";
 
-const std::string mitk::LinearModel::X_AXIS_NAME = "x";
+const std::string mitk::LinearModel::X_AXIS_NAME = "X";
 
-const std::string mitk::LinearModel::X_AXIS_UNIT = "[x]";
+const std::string mitk::LinearModel::X_AXIS_UNIT = "unit of x";
 
-const std::string mitk::LinearModel::Y_AXIS_NAME = "y";
+const std::string mitk::LinearModel::Y_AXIS_NAME = "Y";
 
-const std::string mitk::LinearModel::Y_AXIS_UNIT = "[y]";
+const std::string mitk::LinearModel::Y_AXIS_UNIT = "unit of y";
 
 
 std::string mitk::LinearModel::GetModelDisplayName() const

@@ -22,7 +22,7 @@ namespace mitk
 
   /** @class ExpDecayOffsetModel
    * @brief Implementation of a general exponential decay model with offset,
-   * following the function: f(x) = a * exp(-1.0 * x * b) + c.
+   * following the function: y(x) = y-intercept * exp(-rate*x) + baseline.
    */
   class MITKMODELFIT_EXPORT ExpDecayOffsetModel : public mitk::ModelBase
   {

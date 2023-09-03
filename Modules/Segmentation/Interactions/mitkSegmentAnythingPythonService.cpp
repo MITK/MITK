@@ -30,6 +30,7 @@ namespace mitk
   const std::string SIGNALCONSTANTS::KILL = "KILL";
   const std::string SIGNALCONSTANTS::OFF = "OFF";
   const std::string SIGNALCONSTANTS::CUDA_OUT_OF_MEMORY_ERROR = "CudaOutOfMemoryError";
+  const std::string SIGNALCONSTANTS::TIMEOUT_ERROR = "TimeOut";
   SegmentAnythingPythonService::Status SegmentAnythingPythonService::CurrentStatus =
     SegmentAnythingPythonService::Status::OFF;
 }
@@ -220,7 +221,8 @@ mitk::LabelSetImage::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFr
     {
       CurrentStatus = Status::OFF;
       m_DaemonExec->SetStop(true);
-      mitkThrow() << "Error: Operation Timed Out!";
+      mitkThrow() << SIGNALCONSTANTS::TIMEOUT_ERROR;
+      
     }
   }
   LabelSetImage::Pointer outputBuffer = mitk::IOUtil::Load<LabelSetImage>(outputImagePath);

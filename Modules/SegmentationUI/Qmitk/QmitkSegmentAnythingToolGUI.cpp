@@ -142,10 +142,23 @@ void QmitkSegmentAnythingToolGUI::ShowErrorMessage(const std::string &message, Q
 
 void QmitkSegmentAnythingToolGUI::StatusMessageListener(const std::string &message)
 {
-    if (message.rfind("Error", 0) == 0)
+  if (message.rfind("Error", 0) == 0)
   {
     this->EnableAll(true);
     this->WriteErrorMessage(QString::fromStdString(message));
+  }
+  else if (message == "TimeOut")
+  { // trying to re init the daemon
+    this->WriteErrorMessage(QString("<b>STATUS: </b><i>Sorry, operation timed out. Reactivating SAM tool...</i>"));
+    if (this->ActivateSAMDaemon())
+    {
+      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Segment Anything tool re-initialized.</i>"));
+    }
+    else
+    {
+      this->WriteErrorMessage(QString("<b>STATUS: </b><i>Couldn't init tool backend.</i>"));
+      this->EnableAll(true);
+    }
   }
   else
   {

@@ -106,6 +106,7 @@ void QmitkSegmentAnythingPreferencePage::Update()
 {
   auto* prefs = GetPreferences();
   m_Ui->samModelTypeComboBox->setCurrentText(QString::fromStdString(prefs->Get("sam modeltype", "vit_b")));
+  m_Ui->timeoutEdit->setText(QString::number(prefs->GetInt("sam timeout", 300)));
   int gpuId = prefs->GetInt("sam gpuid", -1);
   if (gpuId == -1)
   {

@@ -144,6 +144,7 @@ namespace mitk
     static const std::string KILL;
     static const std::string OFF;
     static const std::string CUDA_OUT_OF_MEMORY_ERROR;
+    static const std::string TIMEOUT_ERROR;
   };
 
 } // namespace

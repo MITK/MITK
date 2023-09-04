@@ -67,18 +67,18 @@ namespace mitk
   {
     MonaiModelInfo model;
     std::string hostName;
+    std::string requestLabel;
     int port;
 
     inline bool operator==(const MonaiLabelRequest &rhs) const
     { 
-      if (this->model == rhs.model && this->hostName == rhs.hostName && this->port == rhs.port)
+      if (this->model == rhs.model && this->hostName == rhs.hostName && this->port == rhs.port && this->requestLabel == rhs.requestLabel)
       {
         return true;
       }
       return false;
     }
   };
-
 
   class MITKSEGMENTATION_EXPORT MonaiLabelTool : public SegWithPreviewTool
   {
@@ -95,7 +95,7 @@ namespace mitk
     std::vector<MonaiModelInfo> GetAutoSegmentationModels(int dim = -1);
     std::vector<MonaiModelInfo> GetInteractiveSegmentationModels(int dim = -1);
     std::vector<MonaiModelInfo> GetScribbleSegmentationModels(int dim = -1);
-    void PostInferRequest(std::string&, int&, std::string&, std::string&);
+    void PostInferRequest(std::string &, int &, std::string &, std::string &, const mitk::BaseGeometry *);
     MonaiModelInfo GetModelInfoFromName(std::string&);
 
     itkSetMacro(ModelName, std::string);
@@ -145,7 +145,9 @@ namespace mitk
      * @brief Clear all seed points and call UpdatePreview to reset the segmentation Preview
      */
     void ClearSeeds();
-   
+
+    std::stringstream GetPointsAsListString(const mitk::BaseGeometry*, PointSet::Pointer);
+
   private:
     std::string m_MitkTempDir;
     std::vector<std::string> getPartsBetweenBoundary(const std::string &, const std::string &);

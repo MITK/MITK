@@ -76,9 +76,27 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
   }
   else
   {
-    m_Controls.responseNote->setText("Auto-segmentation model selected. Please click on Preview.");
+    m_Controls.responseNote->setText("Auto-segmentation model selected. Please click on Preview. Label selection is ignored.");
     m_Controls.previewButton->setEnabled(true);
   }
+  std::string selectedModel = m_Controls.modelBox->currentText().toStdString();
+  for (const mitk::MonaiModelInfo &modelObject : tool->m_InfoParameters->models)
+  {
+    if (modelObject.name == selectedModel)
+    {
+      auto requestObject = std::make_unique<mitk::MonaiLabelRequest>();
+      requestObject->model = modelObject;
+      requestObject->hostName = tool->m_InfoParameters->hostName;
+      requestObject->port = tool->m_InfoParameters->port;
+      tool->m_RequestParameters = std::move(requestObject);
+      for (const auto &label : modelObject.labels)
+      {
+        m_Controls.labelBox->addItem(QString::fromStdString(label.first));
+      }
+      break;
+    }
+  }
+  tool->m_RequestParameters->requestLabel = "ashis";
 }
 
 void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()

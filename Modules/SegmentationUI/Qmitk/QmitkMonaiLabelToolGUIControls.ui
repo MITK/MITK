@@ -104,25 +104,41 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="modelLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Models:</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="1" colspan="3">
       <widget class="ctkComboBox" name="appBox"/>
      </item>
+	 <item row="3" column="0">
+	    <widget class="QLabel" name="modelLabel">
+	   <property name="sizePolicy">
+		<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+		 <horstretch>0</horstretch>
+		 <verstretch>0</verstretch>
+	    </sizepolicy>
+	   </property>
+	   <property name="text">
+	    <string>Models:</string>
+	   </property>
+	  </widget>
+	 </item>
      <item row="3" column="1" colspan="3">
       <widget class="ctkComboBox" name="modelBox"/>
      </item>
+	 <item row="4" column="0">
+	  <widget class="QLabel" name="labelSetLabel">
+	   <property name="sizePolicy">
+		<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+		 <horstretch>0</horstretch>
+		 <verstretch>0</verstretch>
+		</sizepolicy>
+	   </property>
+	   <property name="text">
+		<string>Labels:</string>
+	   </property>
+	  </widget>
+	 </item>
+	 <item row="4" column="1" colspan="3">
+	  <widget class="ctkComboBox" name="labelBox"/>
+	 </item>
     </layout>
    </item>
    <item>

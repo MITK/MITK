@@ -21,7 +21,7 @@ mitk::NumericTwoTissueCompartmentModelParameterizer::GetDefaultInitialParameteri
   initialParameters[mitk::NumericTwoTissueCompartmentModel::POSITION_PARAMETER_k2] = 0.4;
   initialParameters[mitk::NumericTwoTissueCompartmentModel::POSITION_PARAMETER_k3] = 0.13;
   initialParameters[mitk::NumericTwoTissueCompartmentModel::POSITION_PARAMETER_k4] = 0.15;
-  initialParameters[mitk::NumericTwoTissueCompartmentModel::POSITION_PARAMETER_VB] = 0.03;
+  initialParameters[mitk::NumericTwoTissueCompartmentModel::POSITION_PARAMETER_vb] = 0.03;
 
   return initialParameters;
 };

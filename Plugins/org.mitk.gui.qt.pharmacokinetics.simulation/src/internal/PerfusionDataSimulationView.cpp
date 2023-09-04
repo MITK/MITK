@@ -473,7 +473,7 @@ void PerfusionDataSimulationView::FillParameterMap2TCM()
 
     m_selectedNode = m_Controls.comboBox_VB->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    stack.insert(std::make_pair(mitk::TwoTissueCompartmentModel::NAME_PARAMETER_VB,m_selectedImage));
+    stack.insert(std::make_pair(mitk::TwoTissueCompartmentModel::NAME_PARAMETER_vb,m_selectedImage));
 
     this->m_ParameterImageMap = stack;
 
@@ -827,9 +827,9 @@ for(ParameterMapType::const_iterator pos = this->m_ParameterImageMap.begin(); po
     {
         generator->SetParameterInputImage(mitk::TwoTissueCompartmentModel::POSITION_PARAMETER_k4, pos->second);
     }
-    if(pos->first == mitk::TwoTissueCompartmentModel::NAME_PARAMETER_VB)
+    if(pos->first == mitk::TwoTissueCompartmentModel::NAME_PARAMETER_vb)
     {
-        generator->SetParameterInputImage(mitk::TwoTissueCompartmentModel::POSITION_PARAMETER_VB, pos->second);
+        generator->SetParameterInputImage(mitk::TwoTissueCompartmentModel::POSITION_PARAMETER_vb, pos->second);
     }
 
 }

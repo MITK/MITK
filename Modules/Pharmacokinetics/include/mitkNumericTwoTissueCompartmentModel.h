@@ -45,21 +45,26 @@ namespace mitk
     static const std::string NAME_PARAMETER_k2;
     static const std::string NAME_PARAMETER_k3;
     static const std::string NAME_PARAMETER_k4;
-    static const std::string NAME_PARAMETER_VB;
+    static const std::string NAME_PARAMETER_vb;
 
     static const std::string UNIT_PARAMETER_K1;
     static const std::string UNIT_PARAMETER_k2;
     static const std::string UNIT_PARAMETER_k3;
     static const std::string UNIT_PARAMETER_k4;
-    static const std::string UNIT_PARAMETER_VB;
+    static const std::string UNIT_PARAMETER_vb;
 
     static const unsigned int POSITION_PARAMETER_K1;
     static const unsigned int POSITION_PARAMETER_k2;
     static const unsigned int POSITION_PARAMETER_k3;
     static const unsigned int POSITION_PARAMETER_k4;
-    static const unsigned int POSITION_PARAMETER_VB;
+    static const unsigned int POSITION_PARAMETER_vb;
 
     static const unsigned int NUMBER_OF_PARAMETERS;
+
+    static const unsigned int NUMBER_OF_DERIVED_PARAMETERS;
+
+    static const std::string MODEL_TYPE;
+
 
     std::string GetModelDisplayName() const override;
 
@@ -67,6 +72,7 @@ namespace mitk
 
     ParameterNamesType GetParameterNames() const override;
     ParametersSizeType  GetNumberOfParameters() const override;
+    ParametersSizeType  GetNumberOfDerivedParameters() const override;
 
     ParamterUnitMapType GetParameterUnits() const override;
 

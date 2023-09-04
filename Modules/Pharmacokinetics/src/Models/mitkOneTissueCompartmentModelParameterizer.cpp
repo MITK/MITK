@@ -17,7 +17,7 @@ mitk::OneTissueCompartmentModelParameterizer::GetDefaultInitialParameterization(
 {
   ParametersType initialParameters;
   initialParameters.SetSize(2);
-  initialParameters[mitk::OneTissueCompartmentModel::POSITION_PARAMETER_k1] = 0.5;
+  initialParameters[mitk::OneTissueCompartmentModel::POSITION_PARAMETER_K1] = 0.5;
   initialParameters[mitk::OneTissueCompartmentModel::POSITION_PARAMETER_k2] = 0.5;
 
   return initialParameters;

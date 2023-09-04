@@ -485,7 +485,7 @@ void PerfusionDataSimulationView::FillParameterMap1TCM()
 
     mitk::DataNode::Pointer m_selectedNode = m_Controls.comboBox_k1->GetSelectedNode();
     mitk::Image::Pointer m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    stack.insert(std::make_pair(mitk::OneTissueCompartmentModel::NAME_PARAMETER_k1,m_selectedImage));
+    stack.insert(std::make_pair(mitk::OneTissueCompartmentModel::NAME_PARAMETER_K1,m_selectedImage));
 
     m_selectedNode = m_Controls.comboBox_k2->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
@@ -901,9 +901,9 @@ mitk::OneTissueCompartmentModelParameterizer::Pointer modelParameterizer = mitk:
 
 for(ParameterMapType::const_iterator pos = this->m_ParameterImageMap.begin(); pos != this->m_ParameterImageMap.end(); ++pos)
 {
-    if(pos->first == mitk::OneTissueCompartmentModel::NAME_PARAMETER_k1)
+    if(pos->first == mitk::OneTissueCompartmentModel::NAME_PARAMETER_K1)
     {
-        generator->SetParameterInputImage(mitk::OneTissueCompartmentModel::POSITION_PARAMETER_k1, pos->second);
+        generator->SetParameterInputImage(mitk::OneTissueCompartmentModel::POSITION_PARAMETER_K1, pos->second);
     }
     if(pos->first == mitk::OneTissueCompartmentModel::NAME_PARAMETER_k2)
     {

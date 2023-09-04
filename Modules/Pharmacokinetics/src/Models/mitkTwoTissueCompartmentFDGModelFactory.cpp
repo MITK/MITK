@@ -24,12 +24,12 @@ mitk::TwoTissueCompartmentFDGModelFactory::CreateDefaultConstraints() const
   constraints->SetLowerBarrier(ModelType::POSITION_PARAMETER_K1, 0.0);
   constraints->SetLowerBarrier(ModelType::POSITION_PARAMETER_k2, 0, 0);
   constraints->SetLowerBarrier(ModelType::POSITION_PARAMETER_k3, 0, 0);
-  constraints->SetLowerBarrier(ModelType::POSITION_PARAMETER_VB, 0, 0);
+  constraints->SetLowerBarrier(ModelType::POSITION_PARAMETER_vb, 0, 0);
 
   constraints->SetUpperBarrier(ModelType::POSITION_PARAMETER_K1, 1.0, 0);
   constraints->SetUpperBarrier(ModelType::POSITION_PARAMETER_k2, 1.0, 0);
   constraints->SetUpperBarrier(ModelType::POSITION_PARAMETER_k3, 1.0, 0);
-  constraints->SetUpperBarrier(ModelType::POSITION_PARAMETER_VB, 1, 0);
+  constraints->SetUpperBarrier(ModelType::POSITION_PARAMETER_vb, 1, 0);
 
 
   return constraints.GetPointer();

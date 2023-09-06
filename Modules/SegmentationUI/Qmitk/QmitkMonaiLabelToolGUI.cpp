@@ -31,6 +31,15 @@ QmitkMonaiLabelToolGUI::QmitkMonaiLabelToolGUI(int dimension)
   { return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false; };
 }
 
+QmitkMonaiLabelToolGUI::~QmitkMonaiLabelToolGUI()
+{
+  auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
+  if (nullptr != tool)
+  {
+    tool->MonaiStatusEvent -= mitk::MessageDelegate1<QmitkMonaiLabelToolGUI, const bool>(this, &QmitkMonaiLabelToolGUI::StatusMessageListener);
+  }
+}
+
 void QmitkMonaiLabelToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 {
   Superclass::ConnectNewTool(newTool);
@@ -48,7 +57,7 @@ void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls.modelBox,
           QOverload<int>::of(&QComboBox::activated),
           [=](int index) { OnModelChanged(m_Controls.modelBox->itemText(index)); });
-
+  connect(m_Controls.labelBox, SIGNAL(currentTextChanged(const QString&)), this, SLOT(OnLabelChanged(const QString&)));
   QIcon refreshIcon =
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
   m_Controls.fetchUrl->setIcon(refreshIcon);
@@ -59,6 +68,22 @@ void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
 void QmitkMonaiLabelToolGUI::EnableWidgets(bool enabled)
 {
   Superclass::EnableWidgets(enabled);
+}
+
+void QmitkMonaiLabelToolGUI::StatusMessageListener(const bool status)
+{
+  if (!status)
+  {
+    return;
+  }
+  auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
+  if (nullptr == tool)
+  {
+    return;
+  }
+  this->SetLabelSetPreview(tool->GetPreviewSegmentation());
+  this->ActualizePreviewLabelVisibility();
+  m_FirstPreviewComputation = false;
 }
 
 void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
@@ -96,7 +121,17 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
       break;
     }
   }
-  tool->m_RequestParameters->requestLabel = "ashis";
+  tool->MonaiStatusEvent += mitk::MessageDelegate1<QmitkMonaiLabelToolGUI, const bool>(this, &QmitkMonaiLabelToolGUI::StatusMessageListener);
+}
+
+void QmitkMonaiLabelToolGUI::OnLabelChanged(const QString &label) 
+{
+  auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
+  if (nullptr == tool)
+  {
+    return;
+  }
+  tool->m_RequestParameters->requestLabel = label.toStdString();
 }
 
 void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
@@ -204,7 +239,7 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   }
   catch (...)
   {
-    MITK_ERROR << "Connection error"; //This catch is never reached when exception is thrown in UpdatePreview method
+    MITK_ERROR << "Connection error";
   }
   
 }

@@ -250,12 +250,14 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
     mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
     previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
     this->SetIsLastSuccess(true);
+    MonaiStatusEvent.Send(true);
   }
   catch (const mitk::Exception &e)
   {
     m_IsLastSuccess = false;
     MITK_ERROR << e.GetDescription();
     mitkThrow() << e.GetDescription();
+    MonaiStatusEvent.Send(false);
   }
 }
 

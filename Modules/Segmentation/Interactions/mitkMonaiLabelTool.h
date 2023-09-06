@@ -120,6 +120,8 @@ namespace mitk
      */
     bool HasPicks() const;
 
+    Message1<const bool> MonaiStatusEvent;
+
   protected:
     MonaiLabelTool();
     ~MonaiLabelTool();

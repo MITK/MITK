@@ -30,18 +30,24 @@ protected slots :
   void OnPreviewBtnClicked();
   void OnFetchBtnClicked();
   void OnModelChanged(const QString&);
+  void OnLabelChanged(const QString&);
 
 protected:
   QmitkMonaiLabelToolGUI(int);
-  ~QmitkMonaiLabelToolGUI() = default;
+  ~QmitkMonaiLabelToolGUI();
 
   void ConnectNewTool(mitk::SegWithPreviewTool* newTool) override;
   void InitializeUI(QBoxLayout* mainLayout) override;
 
   void EnableWidgets(bool enabled) override;
   
-  Ui_QmitkMonaiLabelToolGUIControls m_Controls;
+  /**
+   * @brief Function to listen to tool class status emitters.
+   */
+  void StatusMessageListener(const bool);
   
+private:
+  Ui_QmitkMonaiLabelToolGUIControls m_Controls;
   bool m_FirstPreviewComputation = true;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
   int m_Dimension;

@@ -200,7 +200,6 @@ mitk::ModelBase::DerivedParameterMapType mitk::ExponentialDecayModel::ComputeDer
   DerivedParameterMapType result;
 
   //Model Parameters
-  double     y0 = parameters[POSITION_PARAMETER_y0];
   double     lambda = parameters[POSITION_PARAMETER_lambda];
 
   double k = 1.0 / (lambda + mitk::eps);

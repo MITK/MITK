@@ -93,15 +93,16 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
   {
     return;
   }
+  m_Controls.labelBox->clear();
   mitk::MonaiModelInfo model = tool->GetModelInfoFromName(modelName.toStdString());
   if ("deepgrow" == model.type || "deepedit" == model.type)
   {
-    m_Controls.responseNote->setText("Interactive model selected. Please press SHIFT + click on the render windows.");
+    this->WriteStatusMessage("Interactive model selected. Please press SHIFT + click on the render windows.\n");
     m_Controls.previewButton->setEnabled(false);
   }
   else
   {
-    m_Controls.responseNote->setText("Auto-segmentation model selected. Please click on Preview. Label selection is ignored.");
+    this->WriteStatusMessage("Auto-segmentation model selected. Please click on Preview. Label selection will be ignored.\n");
     m_Controls.previewButton->setEnabled(true);
   }
   std::string selectedModel = m_Controls.modelBox->currentText().toStdString();
@@ -159,7 +160,7 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
         std::vector<mitk::MonaiModelInfo> autoModels = tool->GetAutoSegmentationModels(m_Dimension);
         std::vector<mitk::MonaiModelInfo> interactiveModels = tool->GetInteractiveSegmentationModels(m_Dimension);
         autoModels.insert(autoModels.end(), interactiveModels.begin(), interactiveModels.end());
-        m_Controls.responseNote->setText(QString::fromStdString(response));
+        this->WriteStatusMessage(QString::fromStdString(response));
         m_Controls.appBox->addItem(QString::fromStdString(response));
         for (auto &model : autoModels)
         {
@@ -232,14 +233,45 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   try
   {
     tool->UpdatePreview();
-    m_FirstPreviewComputation = false;
-    this->SetLabelSetPreview(tool->GetPreviewSegmentation());
-    tool->IsTimePointChangeAwareOn();
-    this->ActualizePreviewLabelVisibility();
+  }
+  catch (const std::exception &e)
+  {
+    std::stringstream errorMsg;
+    errorMsg << "<b>STATUS: </b>Error while processing parameters for TotalSegmentator segmentation. Reason: "
+             << e.what();
+    this->ShowErrorMessage(errorMsg.str());
+    this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
+    m_Controls.previewButton->setEnabled(true);
+    return;
   }
   catch (...)
   {
-    MITK_ERROR << "Connection error";
+    std::string errorMsg = "Unkown error occured while generation TotalSegmentator segmentation.";
+    this->ShowErrorMessage(errorMsg);
+    m_Controls.previewButton->setEnabled(true);
+    return;
   }
-  
+}
+
+void QmitkMonaiLabelToolGUI::WriteStatusMessage(const QString &message)
+{
+  m_Controls.responseNote->setText(message);
+  m_Controls.responseNote->setStyleSheet("font-weight: bold; color: white");
+  qApp->processEvents();
+}
+
+void QmitkMonaiLabelToolGUI::WriteErrorMessage(const QString &message)
+{
+  m_Controls.responseNote->setText(message);
+  m_Controls.responseNote->setStyleSheet("font-weight: bold; color: red");
+  qApp->processEvents();
+}
+
+void QmitkMonaiLabelToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)
+{
+  this->setCursor(Qt::ArrowCursor);
+  QMessageBox *messageBox = new QMessageBox(icon, nullptr, message.c_str());
+  messageBox->exec();
+  delete messageBox;
+  MITK_WARN << message;
 }

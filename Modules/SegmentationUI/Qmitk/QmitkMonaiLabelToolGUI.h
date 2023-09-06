@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
 #include "ui_QmitkMonaiLabelToolGUIControls.h"
 #include <MitkSegmentationUIExports.h>
+#include <QMessageBox>
 
 class MITKSEGMENTATIONUI_EXPORT QmitkMonaiLabelToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {
@@ -40,6 +41,21 @@ protected:
   void InitializeUI(QBoxLayout* mainLayout) override;
 
   void EnableWidgets(bool enabled) override;
+ 
+  /**
+   * @brief Writes any message in white on the tool pane.
+   */
+  void WriteStatusMessage(const QString &);
+
+  /**
+   * @brief Writes any message in red on the tool pane.
+   */
+  void WriteErrorMessage(const QString &);
+
+  /**
+   * @brief Creates a QMessage object and shows on screen.
+   */
+  void ShowErrorMessage(const std::string &, QMessageBox::Icon = QMessageBox::Critical);
   
   /**
    * @brief Function to listen to tool class status emitters.

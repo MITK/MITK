@@ -23,7 +23,10 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, MonaiLabel3DTool, "MonaiLabel3D");
 }
 
-mitk::MonaiLabel3DTool::MonaiLabel3DTool() {}
+mitk::MonaiLabel3DTool::MonaiLabel3DTool() 
+{
+  this->IsTimePointChangeAwareOff();
+}
 
 void mitk::MonaiLabel3DTool::Activated()
 {

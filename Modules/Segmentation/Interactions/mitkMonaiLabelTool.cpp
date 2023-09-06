@@ -80,6 +80,16 @@ void mitk::MonaiLabelTool::Deactivated()
   Superclass::Deactivated();
 }
 
+void mitk::MonaiLabelTool::UpdatePrepare()
+{
+  Superclass::UpdatePrepare();
+  auto preview = this->GetPreviewSegmentation();
+  for (LabelSetImage::GroupIndexType i = 0; i < preview->GetNumberOfLayers(); ++i)
+  {
+    preview->GetLabelSet(i)->RemoveAllLabels();
+  }
+}
+
 void mitk::MonaiLabelTool::OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   if ("deepgrow" == m_RequestParameters->model.type || "deepedit" == m_RequestParameters->model.type)

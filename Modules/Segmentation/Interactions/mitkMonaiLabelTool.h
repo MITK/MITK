@@ -88,6 +88,7 @@ namespace mitk
     bool m_TEST = false; // cleanup later
     void Activated() override;
     void Deactivated() override;
+    void UpdatePrepare() override;
 
     void GetOverallInfo(std::string&, int&);
     std::unique_ptr<MonaiAppMetadata> m_InfoParameters; //contains all parameters from Server to serve the GUI

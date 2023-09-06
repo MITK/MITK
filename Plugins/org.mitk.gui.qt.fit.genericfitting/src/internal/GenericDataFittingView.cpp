@@ -189,11 +189,15 @@ void GenericDataFittingView::OnModellSet(int index)
         MITK_WARN << "Invalid model index. Index outside of the factory stack. Factory stack size: "<< m_FactoryStack.size() << "; invalid index: "<< index;
     }
   }
-
   if (m_selectedModelFactory)
   {
     this->m_modelConstraints = dynamic_cast<mitk::SimpleBarrierConstraintChecker*>
       (m_selectedModelFactory->CreateDefaultConstraints().GetPointer());
+
+    if (this->m_modelConstraints.IsNull())
+    {
+      this->m_modelConstraints = mitk::SimpleBarrierConstraintChecker::New();
+    }
 
     m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
       m_selectedModelFactory->GetDefaultInitialParameterization());

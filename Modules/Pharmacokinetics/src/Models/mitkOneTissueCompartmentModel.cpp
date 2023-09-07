@@ -28,8 +28,6 @@ const unsigned int mitk::OneTissueCompartmentModel::POSITION_PARAMETER_k2 = 1;
 
 const unsigned int mitk::OneTissueCompartmentModel::NUMBER_OF_PARAMETERS = 2;
 
-const unsigned int mitk::OneTissueCompartmentModel::NUMBER_OF_DERIVED_PARAMETERS = 0;
-
 const std::string mitk::OneTissueCompartmentModel::MODEL_TYPE = "Dynamic.PET";
 
 std::string mitk::OneTissueCompartmentModel::GetModelDisplayName() const
@@ -80,12 +78,6 @@ mitk::OneTissueCompartmentModel::GetParameterUnits() const
   return result;
 };
 
-
-mitk::OneTissueCompartmentModel::ParametersSizeType
-mitk::OneTissueCompartmentModel::GetNumberOfDerivedParameters() const
-{
-  return NUMBER_OF_DERIVED_PARAMETERS;
-};
 
 mitk::OneTissueCompartmentModel::ModelResultType mitk::OneTissueCompartmentModel::ComputeModelfunction(
   const ParametersType& parameters) const

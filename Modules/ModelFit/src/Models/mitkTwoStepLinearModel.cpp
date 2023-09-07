@@ -206,15 +206,6 @@ mitk::TwoStepLinearModel::ParametersSizeType  mitk::TwoStepLinearModel::GetNumbe
   return 0;
 }
 
-mitk::TwoStepLinearModel::ParamterUnitMapType mitk::TwoStepLinearModel::GetStaticParameterUnits() const
-{
-  ParamterUnitMapType result;
-
-  //do nothing
-
-  return result;
-};
-
 void mitk::TwoStepLinearModel::SetStaticParameter(const ParameterNameType& /*name*/,
     const StaticParameterValuesType& /*values*/)
 {

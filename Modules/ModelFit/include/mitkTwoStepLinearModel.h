@@ -103,8 +103,6 @@ namespace mitk
 
     ParametersSizeType GetNumberOfStaticParameters() const override;
 
-    ParamterUnitMapType GetStaticParameterUnits() const override;
-
     std::string GetModelDisplayName() const override;
 
     std::string GetModelType() const override;

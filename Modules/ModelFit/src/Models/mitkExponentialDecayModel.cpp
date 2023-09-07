@@ -168,15 +168,6 @@ mitk::ExponentialDecayModel::ParametersSizeType  mitk::ExponentialDecayModel::Ge
   return NUMBER_OF_STATIC_PARAMETERS;
 }
 
-mitk::ExponentialDecayModel::ParamterUnitMapType mitk::ExponentialDecayModel::GetStaticParameterUnits() const
-{
-  ParamterUnitMapType result;
-
-  //do nothing
-
-  return result;
-};
-
 void mitk::ExponentialDecayModel::SetStaticParameter(const ParameterNameType& /*name*/,
     const StaticParameterValuesType& /*values*/)
 {

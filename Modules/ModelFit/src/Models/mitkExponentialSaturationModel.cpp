@@ -136,16 +136,6 @@ mitk::ExponentialSaturationModel::GetNumberOfDerivedParameters() const
   return NUMBER_OF_DERIVED_PARAMETERS;
 };
 
-mitk::ExponentialSaturationModel::ParamterUnitMapType mitk::ExponentialSaturationModel::GetDerivedParameterUnits() const
-{
-  ParamterUnitMapType result;
-
-  //do nothing
-
-  return result;
-};
-
-
 mitk::ExponentialSaturationModel::ModelResultType
 mitk::ExponentialSaturationModel::ComputeModelfunction(const ParametersType& parameters) const
 {

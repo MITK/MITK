@@ -120,16 +120,6 @@ mitk::ExponentialSaturationModel::GetNumberOfParameters() const
   return NUMBER_OF_PARAMETERS;
 };
 
-mitk::ExponentialSaturationModel::ParameterNamesType
-mitk::ExponentialSaturationModel::GetDerivedParameterNames() const
-{
-  ParameterNamesType result;
-  
-  // do nothing
-
-  return result;
-};
-
 mitk::ExponentialSaturationModel::ParametersSizeType
 mitk::ExponentialSaturationModel::GetNumberOfDerivedParameters() const
 {

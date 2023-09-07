@@ -85,8 +85,6 @@ namespace mitk
 
     ParamterUnitMapType GetParameterUnits() const override;
 
-    ParameterNamesType GetDerivedParameterNames() const override;
-
     ParametersSizeType  GetNumberOfDerivedParameters() const override;
 
     ParameterNamesType GetStaticParameterNames() const override;

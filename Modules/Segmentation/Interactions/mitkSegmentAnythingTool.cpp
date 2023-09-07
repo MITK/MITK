@@ -176,7 +176,7 @@ void mitk::SegmentAnythingTool::OnAddPositivePoint(StateMachineAction *, Interac
 
 void mitk::SegmentAnythingTool::OnDelete(StateMachineAction *, InteractionEvent *)
 {
-  if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
+  if (!this->IsUpdating() && m_PointSetPositive.IsNotNull() && m_PointSetNegative.IsNotNull())
   {
     PointSet::Pointer removeSet = m_PointSetPositive;
     decltype(m_PointSetPositive->GetMaxId().Index()) maxId = 0;

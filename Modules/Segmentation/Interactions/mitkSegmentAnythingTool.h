@@ -118,7 +118,9 @@ namespace mitk
     virtual void OnAddNegativePoint(StateMachineAction*, InteractionEvent *interactionEvent);
 
     /*
-     * @brief Delete action of StateMachine pattern
+     * @brief Delete action of StateMachine pattern. The function deletes positive or negative points in 
+       the reverse order of creation. This is done by finding & deleting the Point having the highest 
+       PointIdentifier value from either of the PointSets m_PointSetPositive & m_PointSetNegative.
      */
     virtual void OnDelete(StateMachineAction*, InteractionEvent*);
 

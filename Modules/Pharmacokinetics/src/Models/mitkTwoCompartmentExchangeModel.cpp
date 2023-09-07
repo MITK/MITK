@@ -33,11 +33,7 @@ const unsigned int mitk::TwoCompartmentExchangeModel::POSITION_PARAMETER_vp = 3;
 
 const unsigned int mitk::TwoCompartmentExchangeModel::NUMBER_OF_PARAMETERS = 4;
 
-const unsigned int mitk::TwoCompartmentExchangeModel::NUMBER_OF_DERIVED_PARAMETERS = 0;
-
 const std::string mitk::TwoCompartmentExchangeModel::MODEL_TYPE = "Perfusion.MR";
-
-const std::string mitk::TwoCompartmentExchangeModel::FUNCTION_STRING = "";
 
 
 

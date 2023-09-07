@@ -134,7 +134,6 @@ namespace mitk
     const std::string TRIGGER_FILENAME = "trigger.csv";
     const std::string SAM_PYTHON_FILE_NAME = "run_inference_daemon.py";
     std::future<void> m_Future;
-    //ProcessExecutor::Pointer m_DaemonExec;
     SegmentAnythingProcessExecutor::Pointer m_DaemonExec;
   };
 

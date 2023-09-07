@@ -35,7 +35,6 @@ namespace mitk
     using ConstPointer = ::itk::SmartPointer<const Self>;
     using mitk::ProcessExecutor::Execute;
 
-    itkTypeMacro(SegmentAnythingProcessExecutor, ::itk::Object);
     mitkNewMacro1Param(SegmentAnythingProcessExecutor, double&);
 
     itkSetMacro(Stop, bool);

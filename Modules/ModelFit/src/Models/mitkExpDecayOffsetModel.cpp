@@ -170,15 +170,6 @@ mitk::ExpDecayOffsetModel::ParametersSizeType  mitk::ExpDecayOffsetModel::GetNum
   return NUMBER_OF_STATIC_PARAMETERS;
 }
 
-mitk::ExpDecayOffsetModel::ParamterUnitMapType mitk::ExpDecayOffsetModel::GetStaticParameterUnits() const
-{
-  ParamterUnitMapType result;
-
-  //do nothing
-
-  return result;
-};
-
 void mitk::ExpDecayOffsetModel::SetStaticParameter(const ParameterNameType& /*name*/,
     const StaticParameterValuesType& /*values*/)
 {

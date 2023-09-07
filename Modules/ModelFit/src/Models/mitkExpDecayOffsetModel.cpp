@@ -116,16 +116,6 @@ mitk::ExpDecayOffsetModel::GetNumberOfParameters() const
   return NUMBER_OF_PARAMETERS;
 };
 
-mitk::ExpDecayOffsetModel::ParameterNamesType
-mitk::ExpDecayOffsetModel::GetDerivedParameterNames() const
-{
-  ParameterNamesType result;
-
-  //do nothing
-
-  return result;
-};
-
 mitk::ExpDecayOffsetModel::ParametersSizeType
 mitk::ExpDecayOffsetModel::GetNumberOfDerivedParameters() const
 {

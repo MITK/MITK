@@ -12,40 +12,106 @@ found in the LICENSE file.
 
 #include "mitkExpDecayOffsetModel.h"
 
+
+const std::string mitk::ExpDecayOffsetModel::NAME_PARAMETER_y0 = "y-intercept";
+const std::string mitk::ExpDecayOffsetModel::NAME_PARAMETER_k = "rate";
+const std::string mitk::ExpDecayOffsetModel::NAME_PARAMETER_y_bl = "baseline";
+
+const unsigned int mitk::ExpDecayOffsetModel::NUMBER_OF_PARAMETERS = 3;
+
+const std::string mitk::ExpDecayOffsetModel::UNIT_PARAMETER_y0 = "[unit of y]";
+const std::string mitk::ExpDecayOffsetModel::UNIT_PARAMETER_k = "1/[unit of x]";
+const std::string mitk::ExpDecayOffsetModel::UNIT_PARAMETER_y_bl = "[unit of y]";
+
+const unsigned int mitk::ExpDecayOffsetModel::POSITION_PARAMETER_y0 = 0;
+const unsigned int mitk::ExpDecayOffsetModel::POSITION_PARAMETER_k = 1;
+const unsigned int mitk::ExpDecayOffsetModel::POSITION_PARAMETER_y_bl = 2;
+
+const unsigned int mitk::ExpDecayOffsetModel::NUMBER_OF_STATIC_PARAMETERS = 0;
+
+const std::string mitk::ExpDecayOffsetModel::MODEL_DISPLAY_NAME = "Exponential Decay Offset Model";
+
+const std::string mitk::ExpDecayOffsetModel::MODEL_TYPE = "Generic";
+
+const std::string mitk::ExpDecayOffsetModel::FUNCTION_STRING = "y(x) = y-intercept * exp(-rate*x) + baseline";
+
+const std::string mitk::ExpDecayOffsetModel::X_NAME = "x";
+
+const std::string mitk::ExpDecayOffsetModel::X_AXIS_NAME = "X";
+
+const std::string mitk::ExpDecayOffsetModel::X_AXIS_UNIT = "unit of x";
+
+const std::string mitk::ExpDecayOffsetModel::Y_AXIS_NAME = "Y";
+
+const std::string mitk::ExpDecayOffsetModel::Y_AXIS_UNIT = "unit of y";
+
+///////////
+
 std::string mitk::ExpDecayOffsetModel::GetModelDisplayName() const
 {
-  return "Exponential Decay Offset Model";
+  return MODEL_DISPLAY_NAME;
 };
 
 std::string mitk::ExpDecayOffsetModel::GetModelType() const
 {
-  return "Generic";
+  return MODEL_TYPE;
 };
 
 mitk::ExpDecayOffsetModel::FunctionStringType mitk::ExpDecayOffsetModel::GetFunctionString() const
 {
-  return "a*exp(-1.0*x*b)+c";
+  return FUNCTION_STRING;
 };
 
 std::string mitk::ExpDecayOffsetModel::GetXName() const
 {
-  return "x";
+  return X_NAME;
 };
+
+std::string mitk::ExpDecayOffsetModel::GetXAxisName() const
+{
+  return X_AXIS_NAME;
+};
+
+std::string mitk::ExpDecayOffsetModel::GetXAxisUnit() const
+{
+  return X_AXIS_UNIT;
+}
+
+std::string mitk::ExpDecayOffsetModel::GetYAxisName() const
+{
+  return Y_AXIS_NAME;
+};
+
+std::string mitk::ExpDecayOffsetModel::GetYAxisUnit() const
+{
+  return Y_AXIS_UNIT;
+}
 
 mitk::ExpDecayOffsetModel::ParameterNamesType
 mitk::ExpDecayOffsetModel::GetParameterNames() const
 {
   ParameterNamesType result;
-  result.push_back("a");
-  result.push_back("b");
-  result.push_back("c");
+  result.push_back(NAME_PARAMETER_y0);
+  result.push_back(NAME_PARAMETER_k);
+  result.push_back(NAME_PARAMETER_y_bl);
   return result;
 };
+
+mitk::ExpDecayOffsetModel::ParamterUnitMapType mitk::ExpDecayOffsetModel::GetParameterUnits() const
+{
+  ParamterUnitMapType result;
+
+  result.insert(std::make_pair(NAME_PARAMETER_y0, UNIT_PARAMETER_y0));
+  result.insert(std::make_pair(NAME_PARAMETER_k, UNIT_PARAMETER_k));
+  result.insert(std::make_pair(NAME_PARAMETER_y_bl, UNIT_PARAMETER_y_bl));
+
+  return result;
+}
 
 mitk::ExpDecayOffsetModel::ParametersSizeType
 mitk::ExpDecayOffsetModel::GetNumberOfParameters() const
 {
-  return 3;
+  return NUMBER_OF_PARAMETERS;
 };
 
 mitk::ExpDecayOffsetModel::ModelResultType
@@ -72,7 +138,7 @@ mitk::ExpDecayOffsetModel::ParameterNamesType mitk::ExpDecayOffsetModel::GetStat
 
 mitk::ExpDecayOffsetModel::ParametersSizeType  mitk::ExpDecayOffsetModel::GetNumberOfStaticParameters() const
 {
-  return 0;
+  return NUMBER_OF_STATIC_PARAMETERS;
 }
 
 void mitk::ExpDecayOffsetModel::SetStaticParameter(const ParameterNameType& /*name*/,

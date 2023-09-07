@@ -14,13 +14,12 @@ found in the LICENSE file.
 #include "mitkConvolutionHelper.h"
 #include <fstream>
 
-const std::string mitk::TwoCompartmentExchangeModel::MODEL_DISPLAY_NAME =
- "Two Compartment Exchange Model";
+const std::string mitk::TwoCompartmentExchangeModel::MODEL_DISPLAY_NAME = "Two Compartment Exchange Model";
 
-const std::string mitk::TwoCompartmentExchangeModel::NAME_PARAMETER_F = "F";
+const std::string mitk::TwoCompartmentExchangeModel::NAME_PARAMETER_F = "F_p";
 const std::string mitk::TwoCompartmentExchangeModel::NAME_PARAMETER_PS = "PS";
-const std::string mitk::TwoCompartmentExchangeModel::NAME_PARAMETER_ve = "ve";
-const std::string mitk::TwoCompartmentExchangeModel::NAME_PARAMETER_vp = "vp";
+const std::string mitk::TwoCompartmentExchangeModel::NAME_PARAMETER_ve = "v_e";
+const std::string mitk::TwoCompartmentExchangeModel::NAME_PARAMETER_vp = "v_p";
 
 const std::string mitk::TwoCompartmentExchangeModel::UNIT_PARAMETER_F = "ml/min/100ml";
 const std::string mitk::TwoCompartmentExchangeModel::UNIT_PARAMETER_PS = "ml/min/100ml";
@@ -33,6 +32,10 @@ const unsigned int mitk::TwoCompartmentExchangeModel::POSITION_PARAMETER_ve = 2;
 const unsigned int mitk::TwoCompartmentExchangeModel::POSITION_PARAMETER_vp = 3;
 
 const unsigned int mitk::TwoCompartmentExchangeModel::NUMBER_OF_PARAMETERS = 4;
+
+const std::string mitk::TwoCompartmentExchangeModel::MODEL_TYPE = "Perfusion.MR";
+
+
 
 
 inline double square(double a)
@@ -47,7 +50,7 @@ std::string mitk::TwoCompartmentExchangeModel::GetModelDisplayName() const
 
 std::string mitk::TwoCompartmentExchangeModel::GetModelType() const
 {
-  return "Perfusion.MR";
+  return MODEL_TYPE;
 };
 
 mitk::TwoCompartmentExchangeModel::TwoCompartmentExchangeModel()

@@ -16,34 +16,43 @@ found in the LICENSE file.
 
 #include "itkArray2D.h"
 
+const unsigned int mitk::AIFBasedModelBase::NUMBER_OF_STATIC_PARAMETERS = 2;
 
-const std::string mitk::AIFBasedModelBase::NAME_STATIC_PARAMETER_AIF = "Aterial Input Function";
+const std::string mitk::AIFBasedModelBase::NAME_STATIC_PARAMETER_AIF = "Arterial Input Function";
 const std::string mitk::AIFBasedModelBase::NAME_STATIC_PARAMETER_AIFTimeGrid =
-  "Aterial Input Function Timegrid";
+  "Arterial Input Function Timegrid";
 
 //Assumed AIF is always extracted from concentration image
-const std::string mitk::AIFBasedModelBase::UNIT_STATIC_PARAMETER_AIF = "C";
+const std::string mitk::AIFBasedModelBase::UNIT_STATIC_PARAMETER_AIF = "mM";
 const std::string mitk::AIFBasedModelBase::UNIT_STATIC_PARAMETER_AIFTimeGrid =
   "s";
 
+const std::string mitk::AIFBasedModelBase::X_AXIS_NAME = "Time";
+
+const std::string mitk::AIFBasedModelBase::X_AXIS_UNIT = "s";
+
+const std::string mitk::AIFBasedModelBase::Y_AXIS_NAME = "Concentration";
+
+const std::string mitk::AIFBasedModelBase::Y_AXIS_UNIT = "mM";
+
 std::string mitk::AIFBasedModelBase::GetXAxisName() const
 {
-  return "Time";
+  return X_AXIS_NAME;
 };
 
 std::string mitk::AIFBasedModelBase::GetXAxisUnit() const
 {
-  return "s";
+  return X_AXIS_UNIT;
 }
 
 std::string mitk::AIFBasedModelBase::GetYAxisName() const
 {
-  return "";
+  return Y_AXIS_NAME;
 };
 
 std::string mitk::AIFBasedModelBase::GetYAxisUnit() const
 {
-  return "";
+  return Y_AXIS_UNIT;
 }
 
 mitk::AIFBasedModelBase::AIFBasedModelBase()
@@ -94,7 +103,7 @@ mitk::AIFBasedModelBase::ParameterNamesType mitk::AIFBasedModelBase::GetStaticPa
 mitk::AIFBasedModelBase::ParametersSizeType  mitk::AIFBasedModelBase::GetNumberOfStaticParameters()
 const
 {
-  return 2;
+  return NUMBER_OF_STATIC_PARAMETERS;
 }
 
 mitk::AIFBasedModelBase::ParamterUnitMapType
@@ -176,8 +185,8 @@ void mitk::AIFBasedModelBase::PrintSelf(std::ostream& os, ::itk::Indent indent) 
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "Aterial Input Function: " << m_AterialInputFunctionValues;
-  os << indent << "Aterial Input Function Time Grid: " << m_AterialInputFunctionTimeGrid;
+  os << indent << "Arterial Input Function: " << m_AterialInputFunctionValues;
+  os << indent << "Arterial Input Function Time Grid: " << m_AterialInputFunctionTimeGrid;
 };
 
 

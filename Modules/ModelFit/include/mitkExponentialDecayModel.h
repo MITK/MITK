@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_EXPONENTIAL_SATURATION_MODEL_H_
-#define __MITK_EXPONENTIAL_SATURATION_MODEL_H_
+#ifndef mitkExponentialDecayModel_h
+#define mitkExponentialDecayModel_h
 
 #include "mitkModelBase.h"
 
@@ -20,14 +20,15 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  /** @class ExponentialSaturationModel
-  * @brief This genric model has the form: if x<onset: y(x) = baseline , else: y(x) = baseline + (y_final-baseline) * (1 - exp(-rate*(x-onset)))
+  /** @class ExponentialDecayModel
+  * @brief Simple model of exponential decay in the form of:
+  * y(x) = y-intercept * exp(-x/lambda) with lambda being the decay constant.
   */
-  class MITKMODELFIT_EXPORT ExponentialSaturationModel : public mitk::ModelBase
+  class MITKMODELFIT_EXPORT ExponentialDecayModel : public mitk::ModelBase
   {
 
   public:
-    typedef ExponentialSaturationModel Self;
+    typedef ExponentialDecayModel Self;
     typedef mitk::ModelBase Superclass;
     typedef itk::SmartPointer< Self >                            Pointer;
     typedef itk::SmartPointer< const Self >                      ConstPointer;
@@ -40,24 +41,25 @@ namespace mitk
     itkCloneMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(ExponentialSaturationModel, ModelBase);
+    itkTypeMacro(ExponentialDecayModel, ModelBase);
 
-    static const std::string NAME_PARAMETER_BAT;
-    static const std::string NAME_PARAMETER_y_bl;
-    static const std::string NAME_PARAMETER_y_fin;
-    static const std::string NAME_PARAMETER_k;
+
+    static const std::string NAME_PARAMETER_y0;
+    static const std::string NAME_PARAMETER_lambda;
 
     static const unsigned int NUMBER_OF_PARAMETERS;
 
-    static const std::string UNIT_PARAMETER_BAT;
-    static const std::string UNIT_PARAMETER_y_bl;
-    static const std::string UNIT_PARAMETER_y_fin;
-    static const std::string UNIT_PARAMETER_k;
+    static const std::string UNIT_PARAMETER_y0;
+    static const std::string UNIT_PARAMETER_lambda;
 
-    static const unsigned int POSITION_PARAMETER_BAT;
-    static const unsigned int POSITION_PARAMETER_y_bl;
-    static const unsigned int POSITION_PARAMETER_y_fin;
-    static const unsigned int POSITION_PARAMETER_k;
+    static const unsigned int POSITION_PARAMETER_y0;
+    static const unsigned int POSITION_PARAMETER_lambda;
+
+    static const std::string NAME_DERIVED_PARAMETER_k;
+
+    static const unsigned int NUMBER_OF_DERIVED_PARAMETERS;
+
+    static const std::string UNIT_DERIVED_PARAMETER_k;
 
     static const unsigned int NUMBER_OF_STATIC_PARAMETERS;
 
@@ -83,6 +85,12 @@ namespace mitk
 
     ParamterUnitMapType GetParameterUnits() const override;
 
+    ParameterNamesType GetDerivedParameterNames() const override;
+
+    ParametersSizeType  GetNumberOfDerivedParameters() const override;
+
+    ParamterUnitMapType GetDerivedParameterUnits() const override;
+
     ParameterNamesType GetStaticParameterNames() const override;
 
     ParametersSizeType GetNumberOfStaticParameters() const override;
@@ -103,10 +111,12 @@ namespace mitk
 
     std::string GetYAxisUnit() const override;
 
+    mitk::ModelBase::DerivedParameterMapType ComputeDerivedParameters(
+      const mitk::ModelBase::ParametersType &parameters) const;
 
   protected:
-    ExponentialSaturationModel() {};
-    ~ExponentialSaturationModel() override {};
+    ExponentialDecayModel() {};
+    ~ExponentialDecayModel() override {};
 
     /**
      * Actual implementation of the clone method. This method should be reimplemeted
@@ -123,7 +133,7 @@ namespace mitk
   private:
 
     //No copy constructor allowed
-    ExponentialSaturationModel(const Self& source);
+    ExponentialDecayModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

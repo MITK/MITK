@@ -15,12 +15,12 @@ found in the LICENSE file.
 
 #include "mitkModelBase.h"
 
-#include "MitkPharmacokineticsExports.h"
+#include "MitkModelFitExports.h"
 
 namespace mitk
 {
 
-  class MITKPHARMACOKINETICS_EXPORT ThreeStepLinearModel : public mitk::ModelBase
+  class MITKMODELFIT_EXPORT ThreeStepLinearModel : public mitk::ModelBase
   {
 
   public:
@@ -39,32 +39,75 @@ namespace mitk
     /** Run-time type information (and related methods). */
     itkTypeMacro(ThreeStepLinearModel, ModelBase);
 
-    static const std::string MODEL_DISPLAY_NAME;
-    static const std::string NAME_PARAMETER_s0;
-    static const std::string NAME_PARAMETER_t1;
-    static const std::string NAME_PARAMETER_t2;
-    static const std::string NAME_PARAMETER_a1;
-    static const std::string NAME_PARAMETER_a2;
+    static const std::string NAME_PARAMETER_y_bl;
+    static const std::string NAME_PARAMETER_x0;
+    static const std::string NAME_PARAMETER_x1;
+    static const std::string NAME_PARAMETER_b0;
     static const std::string NAME_PARAMETER_b1;
-    static const std::string NAME_PARAMETER_b2;
-
-    static const std::string UNIT_PARAMETER_s0;
-    static const std::string UNIT_PARAMETER_t1;
-    static const std::string UNIT_PARAMETER_t2;
-    static const std::string UNIT_PARAMETER_a1;
-    static const std::string UNIT_PARAMETER_a2;
-    static const std::string UNIT_PARAMETER_b1;
-    static const std::string UNIT_PARAMETER_b2;
-
-    static const unsigned int POSITION_PARAMETER_s0;
-    static const unsigned int POSITION_PARAMETER_t1;
-    static const unsigned int POSITION_PARAMETER_t2;
-    static const unsigned int POSITION_PARAMETER_a1;
-    static const unsigned int POSITION_PARAMETER_a2;
-    static const unsigned int POSITION_PARAMETER_b1;
-    static const unsigned int POSITION_PARAMETER_b2;
 
     static const unsigned int NUMBER_OF_PARAMETERS;
+
+    static const std::string UNIT_PARAMETER_y_bl;
+    static const std::string UNIT_PARAMETER_x0;
+    static const std::string UNIT_PARAMETER_x1;
+    static const std::string UNIT_PARAMETER_b0;
+    static const std::string UNIT_PARAMETER_b1;
+
+    static const unsigned int POSITION_PARAMETER_y_bl;
+    static const unsigned int POSITION_PARAMETER_x0;
+    static const unsigned int POSITION_PARAMETER_x1;
+    static const unsigned int POSITION_PARAMETER_b0;
+    static const unsigned int POSITION_PARAMETER_b1;
+
+    static const std::string NAME_DERIVED_PARAMETER_auc;
+    static const std::string NAME_DERIVED_PARAMETER_x_fin;
+    static const std::string NAME_DERIVED_PARAMETER_y_fin;
+    static const std::string NAME_DERIVED_PARAMETER_y_max;
+    static const std::string NAME_DERIVED_PARAMETER_y1;
+    static const std::string NAME_DERIVED_PARAMETER_y2;
+
+    static const unsigned int NUMBER_OF_DERIVED_PARAMETERS;
+
+    static const std::string UNIT_DERIVED_PARAMETER_auc;
+    static const std::string UNIT_DERIVED_PARAMETER_x_fin;
+    static const std::string UNIT_DERIVED_PARAMETER_y_fin;
+    static const std::string UNIT_DERIVED_PARAMETER_y_max;
+    static const std::string UNIT_DERIVED_PARAMETER_y1;
+    static const std::string UNIT_DERIVED_PARAMETER_y2;
+
+    static const unsigned int NUMBER_OF_STATIC_PARAMETERS;
+
+    static const std::string MODEL_DISPLAY_NAME;
+
+    static const std::string MODEL_TYPE;
+
+    static const std::string FUNCTION_STRING;
+
+    static const std::string X_NAME;
+
+    static const std::string X_AXIS_NAME;
+
+    static const std::string X_AXIS_UNIT;
+
+    static const std::string Y_AXIS_NAME;
+
+    static const std::string Y_AXIS_UNIT;
+
+    ParameterNamesType GetParameterNames() const override;
+
+    ParametersSizeType  GetNumberOfParameters() const override;
+
+    ParamterUnitMapType GetParameterUnits() const override;
+
+    ParameterNamesType GetDerivedParameterNames() const override;
+
+    ParametersSizeType  GetNumberOfDerivedParameters() const override;
+
+    ParamterUnitMapType GetDerivedParameterUnits() const override;
+
+    ParameterNamesType GetStaticParameterNames() const override;
+
+    ParametersSizeType GetNumberOfStaticParameters() const override;
 
     std::string GetModelDisplayName() const override;
 
@@ -74,21 +117,13 @@ namespace mitk
 
     std::string GetXName() const override;
 
-    ParameterNamesType GetParameterNames() const override;
+    std::string GetXAxisName() const override;
 
-    ParametersSizeType  GetNumberOfParameters() const override;
+    std::string GetXAxisUnit() const override;
 
-    ParamterUnitMapType GetParameterUnits() const override;
+    std::string GetYAxisName() const override;
 
-    ParameterNamesType GetStaticParameterNames() const override;
-
-    ParametersSizeType GetNumberOfStaticParameters() const override;
-
-    ParameterNamesType GetDerivedParameterNames() const override;
-
-    ParametersSizeType  GetNumberOfDerivedParameters() const override;
-
-    ParamterUnitMapType GetDerivedParameterUnits() const override;
+    std::string GetYAxisUnit() const override;
 
 
   protected:

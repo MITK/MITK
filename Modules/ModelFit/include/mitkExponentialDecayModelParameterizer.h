@@ -10,27 +10,27 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkT2DecayModelParameterizer_h
-#define mitkT2DecayModelParameterizer_h
+#ifndef mitkExponentialDecayModelParameterizer_h
+#define mitkExponentialDecayModelParameterizer_h
 
 #include "mitkConcreteModelParameterizerBase.h"
-#include "mitkT2DecayModel.h"
+#include "mitkExponentialDecayModel.h"
 #include "MitkModelFitExports.h"
 
 namespace mitk
 {
 
-  class MITKMODELFIT_EXPORT T2DecayModelParameterizer : public
-    mitk::ConcreteModelParameterizerBase<mitk::T2DecayModel>
+  class MITKMODELFIT_EXPORT ExponentialDecayModelParameterizer : public
+    mitk::ConcreteModelParameterizerBase<mitk::ExponentialDecayModel>
   {
   public:
-    typedef T2DecayModelParameterizer Self;
-    typedef mitk::ConcreteModelParameterizerBase<mitk::T2DecayModel> Superclass;
+    typedef ExponentialDecayModelParameterizer Self;
+    typedef mitk::ConcreteModelParameterizerBase<mitk::ExponentialDecayModel> Superclass;
     typedef itk::SmartPointer< Self >                            Pointer;
     typedef itk::SmartPointer< const Self >                      ConstPointer;
 
-    itkTypeMacro(T2DecayModelParameterizer,
-      mitk::ConcreteModelParameterizerBase<mitk::T2DecayModel>);
+    itkTypeMacro(ExponentialDecayModelParameterizer,
+      mitk::ConcreteModelParameterizerBase<mitk::ExponentialDecayModel>);
     itkFactorylessNewMacro(Self);
 
     typedef Superclass::ModelBaseType ModelBaseType;
@@ -48,14 +48,14 @@ namespace mitk
     ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
-    T2DecayModelParameterizer();
+    ExponentialDecayModelParameterizer();
 
-    ~T2DecayModelParameterizer() override;
+    ~ExponentialDecayModelParameterizer() override;
 
   private:
 
     //No copy constructor allowed
-    T2DecayModelParameterizer(const Self& source);
+    ExponentialDecayModelParameterizer(const Self& source);
     void operator=(const Self&);  //purposely not implemented
   };
 }

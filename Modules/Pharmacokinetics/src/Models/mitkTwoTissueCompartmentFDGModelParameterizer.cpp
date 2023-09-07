@@ -20,7 +20,7 @@ mitk::TwoTissueCompartmentFDGModelParameterizer::GetDefaultInitialParameterizati
   initialParameters[mitk::TwoTissueCompartmentFDGModel::POSITION_PARAMETER_K1] = 0.5;
   initialParameters[mitk::TwoTissueCompartmentFDGModel::POSITION_PARAMETER_k2] = 0.5;
   initialParameters[mitk::TwoTissueCompartmentFDGModel::POSITION_PARAMETER_k3] = 0.5;
-  initialParameters[mitk::TwoTissueCompartmentFDGModel::POSITION_PARAMETER_VB] = 0.5;
+  initialParameters[mitk::TwoTissueCompartmentFDGModel::POSITION_PARAMETER_vb] = 0.5;
 
   return initialParameters;
 };

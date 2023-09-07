@@ -36,27 +36,30 @@ namespace mitk
     itkTypeMacro(TwoTissueCompartmentModel, ModelBase);
 
     /** Model Specifications */
-    static const std::string MODEL_DISPLAY_NAME;
 
     static const std::string NAME_PARAMETER_K1;
     static const std::string NAME_PARAMETER_k2;
     static const std::string NAME_PARAMETER_k3;
     static const std::string NAME_PARAMETER_k4;
-    static const std::string NAME_PARAMETER_VB;
+    static const std::string NAME_PARAMETER_vb;
 
     static const std::string UNIT_PARAMETER_K1;
     static const std::string UNIT_PARAMETER_k2;
     static const std::string UNIT_PARAMETER_k3;
     static const std::string UNIT_PARAMETER_k4;
-    static const std::string UNIT_PARAMETER_VB;
+    static const std::string UNIT_PARAMETER_vb;
 
     static const unsigned int POSITION_PARAMETER_K1;
     static const unsigned int POSITION_PARAMETER_k2;
     static const unsigned int POSITION_PARAMETER_k3;
     static const unsigned int POSITION_PARAMETER_k4;
-    static const unsigned int POSITION_PARAMETER_VB;
+    static const unsigned int POSITION_PARAMETER_vb;
 
     static const unsigned int NUMBER_OF_PARAMETERS;
+
+    static const std::string MODEL_DISPLAY_NAME;
+
+    static const std::string MODEL_TYPE;
 
     std::string GetModelDisplayName() const override;
 

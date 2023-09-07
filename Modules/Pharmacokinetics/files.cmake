@@ -18,9 +18,6 @@ set(CPP_FILES
   Models/mitkDescriptivePharmacokineticBrixModelFactory.cpp
   Models/mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer.cpp
   Models/mitkDescriptivePharmacokineticBrixModelParameterizer.cpp
-  Models/mitkThreeStepLinearModel.cpp
-  Models/mitkThreeStepLinearModelFactory.cpp
-  Models/mitkThreeStepLinearModelParameterizer.cpp
   Models/mitkTwoCompartmentExchangeModel.cpp
   Models/mitkTwoCompartmentExchangeModelFactory.cpp
   Models/mitkTwoCompartmentExchangeModelParameterizer.cpp
@@ -39,9 +36,6 @@ set(CPP_FILES
   Models/mitkExtendedOneTissueCompartmentModel.cpp
   Models/mitkExtendedOneTissueCompartmentModelFactory.cpp
   Models/mitkExtendedOneTissueCompartmentModelParameterizer.cpp
-  Models/mitkTwoStepLinearModel.cpp
-  Models/mitkTwoStepLinearModelFactory.cpp
-  Models/mitkTwoStepLinearModelParameterizer.cpp
   Models/mitkTwoTissueCompartmentModel.cpp
   Models/mitkTwoTissueCompartmentModelFactory.cpp
   Models/mitkTwoTissueCompartmentModelParameterizer.cpp

@@ -10,46 +10,44 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkThreeStepLinearModelFactory_h
-#define mitkThreeStepLinearModelFactory_h
+#ifndef mitkExponentialDecayModelFactory_h
+#define mitkExponentialDecayModelFactory_h
 
 #include <mitkCommon.h>
 
 #include "mitkConcreteModelFactoryBase.h"
-#include "mitkThreeStepLinearModel.h"
-#include "mitkThreeStepLinearModelParameterizer.h"
+#include "mitkExponentialDecayModel.h"
 
-#include "MitkPharmacokineticsExports.h"
+#include "MitkModelFitExports.h"
+
 namespace mitk
 {
 
-
-  class MITKPHARMACOKINETICS_EXPORT ThreeStepLinearModelFactory : public ConcreteModelFactoryBase<ThreeStepLinearModel>
+  class MITKMODELFIT_EXPORT ExponentialDecayModelFactory : public ConcreteModelFactoryBase<ExponentialDecayModel>
   {
   public:
-    mitkClassMacroItkParent(ThreeStepLinearModelFactory, ConcreteModelFactoryBase<ThreeStepLinearModel>);
+    mitkClassMacroItkParent(ExponentialDecayModelFactory, ConcreteModelFactoryBase<ExponentialDecayModel>);
     itkFactorylessNewMacro(Self);
 
-    /** This function returns the default parameterization (e.g. initial parametrization for fitting)
-     defined by the model developer for  for the given model.*/
     ParametersType GetDefaultInitialParameterization() const override;
+
+    ConstraintCheckerBase::Pointer CreateDefaultConstraints() const override;
 
   protected:
     ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
     const override;
 
-    ThreeStepLinearModelFactory();
+    ExponentialDecayModelFactory();
 
-    ~ThreeStepLinearModelFactory() override;
+    ~ExponentialDecayModelFactory() override;
 
   private:
 
     //No copy constructor allowed
-    ThreeStepLinearModelFactory(const Self& source);
+    ExponentialDecayModelFactory(const Self& source);
     void operator=(const Self&);  //purposely not implemented
-
   };
-
 }
+
 
 #endif

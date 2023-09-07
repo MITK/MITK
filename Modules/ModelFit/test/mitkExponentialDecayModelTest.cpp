@@ -14,12 +14,12 @@ found in the LICENSE file.
 #include "mitkModelTestFixture.h"
 
 //MITK includes
-#include "mitkT2DecayModel.h"
+#include "mitkExponentialDecayModel.h"
 
 
-  class mitkT2DecayModelTestSuite : public mitk::mitkModelTestFixture
+  class mitkExponentialDecayModelTestSuite : public mitk::mitkModelTestFixture
   {
-    CPPUNIT_TEST_SUITE(mitkT2DecayModelTestSuite);
+    CPPUNIT_TEST_SUITE(mitkExponentialDecayModelTestSuite);
     MITK_TEST(GetModelInfoTest);
     MITK_TEST(ComputeModelfunctionTest);
     MITK_TEST(ComputeDerivedParametersTest);
@@ -34,11 +34,11 @@ found in the LICENSE file.
     void setUp() override
     {
       // Parse JSON files
-      m_profile_json_obj = ParseJSONFile("ModelFit/mitkT2DecayModelTest_profile.json");
-      m_modelValues_json_obj = ParseJSONFile("ModelFit/mitkT2DecayModelTest_modelValues.json");
+      m_profile_json_obj = ParseJSONFile("ModelFit/mitkExponentialDecayModelTest_profile.json");
+      m_modelValues_json_obj = ParseJSONFile("ModelFit/mitkExponentialDecayModelTest_modelValues.json");
 
       // Generate test model
-      m_testmodel = mitk::T2DecayModel::New();
+      m_testmodel = mitk::ExponentialDecayModel::New();
     }
 
     void tearDown() override
@@ -63,4 +63,4 @@ found in the LICENSE file.
     }
   };
 
-MITK_TEST_SUITE_REGISTRATION(mitkT2DecayModel)
+MITK_TEST_SUITE_REGISTRATION(mitkExponentialDecayModel)

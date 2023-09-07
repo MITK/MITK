@@ -10,44 +10,46 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkT2DecayModelFactory_h
-#define mitkT2DecayModelFactory_h
+#ifndef mitkThreeStepLinearModelFactory_h
+#define mitkThreeStepLinearModelFactory_h
 
 #include <mitkCommon.h>
 
 #include "mitkConcreteModelFactoryBase.h"
-#include "mitkT2DecayModel.h"
+#include "mitkThreeStepLinearModel.h"
+#include "mitkThreeStepLinearModelParameterizer.h"
 
 #include "MitkModelFitExports.h"
-
 namespace mitk
 {
 
-  class MITKMODELFIT_EXPORT T2DecayModelFactory : public ConcreteModelFactoryBase<T2DecayModel>
+
+  class MITKMODELFIT_EXPORT ThreeStepLinearModelFactory : public ConcreteModelFactoryBase<ThreeStepLinearModel>
   {
   public:
-    mitkClassMacroItkParent(T2DecayModelFactory, ConcreteModelFactoryBase<T2DecayModel>);
+    mitkClassMacroItkParent(ThreeStepLinearModelFactory, ConcreteModelFactoryBase<ThreeStepLinearModel>);
     itkFactorylessNewMacro(Self);
 
+    /** This function returns the default parameterization (e.g. initial parametrization for fitting)
+     defined by the model developer for  for the given model.*/
     ParametersType GetDefaultInitialParameterization() const override;
-
-    ConstraintCheckerBase::Pointer CreateDefaultConstraints() const override;
 
   protected:
     ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
     const override;
 
-    T2DecayModelFactory();
+    ThreeStepLinearModelFactory();
 
-    ~T2DecayModelFactory() override;
+    ~ThreeStepLinearModelFactory() override;
 
   private:
 
     //No copy constructor allowed
-    T2DecayModelFactory(const Self& source);
+    ThreeStepLinearModelFactory(const Self& source);
     void operator=(const Self&);  //purposely not implemented
-  };
-}
 
+  };
+
+}
 
 #endif

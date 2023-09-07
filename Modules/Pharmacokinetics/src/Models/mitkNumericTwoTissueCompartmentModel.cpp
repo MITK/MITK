@@ -18,29 +18,31 @@ found in the LICENSE file.
 #include <boost/numeric/odeint.hpp>
 #include <fstream>
 
-const std::string mitk::NumericTwoTissueCompartmentModel::MODEL_DISPLAY_NAME =
-  "Numeric Two Tissue Compartment Model";
+const std::string mitk::NumericTwoTissueCompartmentModel::MODEL_DISPLAY_NAME = "Numeric Two Tissue Compartment Model";
 
-const std::string mitk::NumericTwoTissueCompartmentModel::NAME_PARAMETER_K1 = "K1";
-const std::string mitk::NumericTwoTissueCompartmentModel::NAME_PARAMETER_k2 = "k2";
-const std::string mitk::NumericTwoTissueCompartmentModel::NAME_PARAMETER_k3 = "k3";
-const std::string mitk::NumericTwoTissueCompartmentModel::NAME_PARAMETER_k4 = "k4";
-const std::string mitk::NumericTwoTissueCompartmentModel::NAME_PARAMETER_VB = "V_B";
+const std::string mitk::NumericTwoTissueCompartmentModel::NAME_PARAMETER_K1 = "K_1";
+const std::string mitk::NumericTwoTissueCompartmentModel::NAME_PARAMETER_k2 = "k_2";
+const std::string mitk::NumericTwoTissueCompartmentModel::NAME_PARAMETER_k3 = "k_3";
+const std::string mitk::NumericTwoTissueCompartmentModel::NAME_PARAMETER_k4 = "k_4";
+const std::string mitk::NumericTwoTissueCompartmentModel::NAME_PARAMETER_vb = "v_b";
 
 const std::string mitk::NumericTwoTissueCompartmentModel::UNIT_PARAMETER_K1 = "1/min";
 const std::string mitk::NumericTwoTissueCompartmentModel::UNIT_PARAMETER_k2 = "1/min";
 const std::string mitk::NumericTwoTissueCompartmentModel::UNIT_PARAMETER_k3 = "1/min";
 const std::string mitk::NumericTwoTissueCompartmentModel::UNIT_PARAMETER_k4 = "1/min";
-const std::string mitk::NumericTwoTissueCompartmentModel::UNIT_PARAMETER_VB = "ml/ml";
+const std::string mitk::NumericTwoTissueCompartmentModel::UNIT_PARAMETER_vb = "ml/ml";
 
 const unsigned int mitk::NumericTwoTissueCompartmentModel::POSITION_PARAMETER_K1 = 0;
 const unsigned int mitk::NumericTwoTissueCompartmentModel::POSITION_PARAMETER_k2 = 1;
 const unsigned int mitk::NumericTwoTissueCompartmentModel::POSITION_PARAMETER_k3 = 2;
 const unsigned int mitk::NumericTwoTissueCompartmentModel::POSITION_PARAMETER_k4 = 3;
-const unsigned int mitk::NumericTwoTissueCompartmentModel::POSITION_PARAMETER_VB = 4;
+const unsigned int mitk::NumericTwoTissueCompartmentModel::POSITION_PARAMETER_vb = 4;
 
 const unsigned int mitk::NumericTwoTissueCompartmentModel::NUMBER_OF_PARAMETERS = 5;
 
+const unsigned int mitk::NumericTwoTissueCompartmentModel::NUMBER_OF_DERIVED_PARAMETERS = 0;
+
+const std::string mitk::NumericTwoTissueCompartmentModel::MODEL_TYPE = "Dynamic.PET";
 
 std::string mitk::NumericTwoTissueCompartmentModel::GetModelDisplayName() const
 {
@@ -49,7 +51,7 @@ std::string mitk::NumericTwoTissueCompartmentModel::GetModelDisplayName() const
 
 std::string mitk::NumericTwoTissueCompartmentModel::GetModelType() const
 {
-  return "Dynamic.PET";
+  return MODEL_TYPE;
 };
 
 mitk::NumericTwoTissueCompartmentModel::NumericTwoTissueCompartmentModel()
@@ -71,7 +73,7 @@ mitk::NumericTwoTissueCompartmentModel::GetParameterNames() const
   result.push_back(NAME_PARAMETER_k2);
   result.push_back(NAME_PARAMETER_k3);
   result.push_back(NAME_PARAMETER_k4);
-  result.push_back(NAME_PARAMETER_VB);
+  result.push_back(NAME_PARAMETER_vb);
 
   return result;
 }
@@ -80,6 +82,12 @@ mitk::NumericTwoTissueCompartmentModel::ParametersSizeType
 mitk::NumericTwoTissueCompartmentModel::GetNumberOfParameters() const
 {
   return NUMBER_OF_PARAMETERS;
+}
+
+mitk::NumericTwoTissueCompartmentModel::ParametersSizeType
+mitk::NumericTwoTissueCompartmentModel::GetNumberOfDerivedParameters() const
+{
+  return NUMBER_OF_DERIVED_PARAMETERS;
 }
 
 mitk::NumericTwoTissueCompartmentModel::ParamterUnitMapType
@@ -91,7 +99,7 @@ mitk::NumericTwoTissueCompartmentModel::GetParameterUnits() const
   result.insert(std::make_pair(NAME_PARAMETER_k2, UNIT_PARAMETER_k2));
   result.insert(std::make_pair(NAME_PARAMETER_k3, UNIT_PARAMETER_k3));
   result.insert(std::make_pair(NAME_PARAMETER_k4, UNIT_PARAMETER_k4));
-  result.insert(std::make_pair(NAME_PARAMETER_VB, UNIT_PARAMETER_VB));
+  result.insert(std::make_pair(NAME_PARAMETER_vb, UNIT_PARAMETER_vb));
 
   return result;
 };
@@ -130,7 +138,7 @@ mitk::NumericTwoTissueCompartmentModel::ComputeModelfunction(const ParametersTyp
   double k2 = (double)parameters[POSITION_PARAMETER_k2] / 60.0;
   double k3 = (double)parameters[POSITION_PARAMETER_k3] / 60.0;
   double k4 = (double)parameters[POSITION_PARAMETER_k4] / 60.0;
-  double VB = parameters[POSITION_PARAMETER_VB];
+  double vb = parameters[POSITION_PARAMETER_vb];
 
 
   /** @brief Initialize class TwpTissueCompartmentModelDifferentialEquations defining the differential equations. AIF and Grid must be set so that at step t the aterial Concentration Ca(t) can be interpolated from AIF*/
@@ -188,7 +196,7 @@ mitk::NumericTwoTissueCompartmentModel::ComputeModelfunction(const ParametersTyp
   for (AterialInputFunctionType::const_iterator aifpos = aterialInputFunction.begin();
        aifpos != aterialInputFunction.end(); ++aifpos, ++C1Pos, ++C2Pos, ++signalPos)
   {
-    *signalPos = VB * (*aifpos) + (1 - VB) * (*C1Pos + *C2Pos);
+    *signalPos = vb * (*aifpos) + (1 - vb) * (*C1Pos + *C2Pos);
   }
 
   return signal;

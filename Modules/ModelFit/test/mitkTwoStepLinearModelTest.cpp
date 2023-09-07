@@ -14,19 +14,19 @@ found in the LICENSE file.
 #include "mitkModelTestFixture.h"
 
 //MITK includes
-#include "mitkThreeStepLinearModel.h"
+#include "mitkTwoStepLinearModel.h"
 
 
-  class mitkThreeStepLinearModelTestSuite : public mitk::mitkModelTestFixture
+  class mitkTwoStepLinearModelTestSuite : public mitk::mitkModelTestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkThreeStepLinearModelTestSuite);
+  CPPUNIT_TEST_SUITE(mitkTwoStepLinearModelTestSuite);
   MITK_TEST(GetModelInfoTest);
   MITK_TEST(ComputeModelfunctionTest);
   MITK_TEST(ComputeDerivedParametersTest);
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  mitk::ThreeStepLinearModel::Pointer m_testmodel;
+  mitk::TwoStepLinearModel::Pointer m_testmodel;
 
   json m_profile_json_obj;
   json m_modelValues_json_obj;
@@ -35,11 +35,11 @@ public:
   void setUp() override
   {
     // Parse JSON files
-    m_profile_json_obj = ParseJSONFile("Pharmacokinetics/mitkThreeStepLinearModelTest_profile.json");
-    m_modelValues_json_obj = ParseJSONFile("Pharmacokinetics/mitkThreeStepLinearModelTest_modelValues.json");
+    m_profile_json_obj = ParseJSONFile("ModelFit/mitkTwoStepLinearModelTest_profile.json");
+    m_modelValues_json_obj = ParseJSONFile("ModelFit/mitkTwoStepLinearModelTest_modelValues.json");
 
     // Generate test model
-    m_testmodel = mitk::ThreeStepLinearModel::New();
+    m_testmodel = mitk::TwoStepLinearModel::New();
  }
 
   void tearDown() override
@@ -63,4 +63,4 @@ public:
   }
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkThreeStepLinearModel)
+MITK_TEST_SUITE_REGISTRATION(mitkTwoStepLinearModel)

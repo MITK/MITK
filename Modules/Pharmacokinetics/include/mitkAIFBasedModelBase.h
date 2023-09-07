@@ -48,6 +48,16 @@ namespace mitk
     static const std::string UNIT_STATIC_PARAMETER_AIF;
     static const std::string UNIT_STATIC_PARAMETER_AIFTimeGrid;
 
+    static const unsigned int NUMBER_OF_STATIC_PARAMETERS;
+
+    static const std::string X_AXIS_NAME;
+
+    static const std::string X_AXIS_UNIT;
+
+    static const std::string Y_AXIS_NAME;
+
+    static const std::string Y_AXIS_UNIT;
+
     /** Typedef for Aterial InputFunction AIF(t)*/
     typedef itk::Array<double> AterialInputFunctionType;
 

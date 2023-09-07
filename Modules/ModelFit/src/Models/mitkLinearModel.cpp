@@ -185,16 +185,6 @@ mitk::LinearModel::StaticParameterValuesType mitk::LinearModel::GetStaticParamet
   return result;
 };
 
-mitk::LinearModel::ParamterUnitMapType mitk::LinearModel::GetStaticParameterUnits() const
-{
-  ParamterUnitMapType result;
-
-  //do nothing
-
-  return result;
-};
-
-
 mitk::ModelBase::DerivedParameterMapType mitk::LinearModel::ComputeDerivedParameters(
   const mitk::ModelBase::ParametersType& parameters) const
 {

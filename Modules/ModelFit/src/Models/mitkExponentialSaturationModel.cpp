@@ -25,13 +25,10 @@ const std::string mitk::ExponentialSaturationModel::UNIT_PARAMETER_y_bl = "[unit
 const std::string mitk::ExponentialSaturationModel::UNIT_PARAMETER_y_fin = "[unit of y]";
 const std::string mitk::ExponentialSaturationModel::UNIT_PARAMETER_k = "1/[unit of x]";
 
-
 const unsigned int mitk::ExponentialSaturationModel::POSITION_PARAMETER_BAT = 0;
 const unsigned int mitk::ExponentialSaturationModel::POSITION_PARAMETER_y_bl = 1;
 const unsigned int mitk::ExponentialSaturationModel::POSITION_PARAMETER_y_fin = 2;
 const unsigned int mitk::ExponentialSaturationModel::POSITION_PARAMETER_k = 3;
-
-const unsigned int mitk::ExponentialSaturationModel::NUMBER_OF_DERIVED_PARAMETERS = 0;
 
 const unsigned int mitk::ExponentialSaturationModel::NUMBER_OF_STATIC_PARAMETERS = 0;
 
@@ -118,12 +115,6 @@ mitk::ExponentialSaturationModel::ParametersSizeType
 mitk::ExponentialSaturationModel::GetNumberOfParameters() const
 {
   return NUMBER_OF_PARAMETERS;
-};
-
-mitk::ExponentialSaturationModel::ParametersSizeType
-mitk::ExponentialSaturationModel::GetNumberOfDerivedParameters() const
-{
-  return NUMBER_OF_DERIVED_PARAMETERS;
 };
 
 mitk::ExponentialSaturationModel::ModelResultType

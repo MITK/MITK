@@ -59,8 +59,6 @@ namespace mitk
     static const unsigned int POSITION_PARAMETER_y_fin;
     static const unsigned int POSITION_PARAMETER_k;
 
-    static const unsigned int NUMBER_OF_DERIVED_PARAMETERS;
-
     static const unsigned int NUMBER_OF_STATIC_PARAMETERS;
 
     static const std::string MODEL_DISPLAY_NAME;
@@ -84,8 +82,6 @@ namespace mitk
     ParametersSizeType  GetNumberOfParameters() const override;
 
     ParamterUnitMapType GetParameterUnits() const override;
-
-    ParametersSizeType  GetNumberOfDerivedParameters() const override;
 
     ParameterNamesType GetStaticParameterNames() const override;
 

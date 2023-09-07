@@ -179,17 +179,8 @@ mitk::ExponentialSaturationModel::ParameterNamesType mitk::ExponentialSaturation
 
 mitk::ExponentialSaturationModel::ParametersSizeType  mitk::ExponentialSaturationModel::GetNumberOfStaticParameters() const
 {
-  return 0;
+  return NUMBER_OF_STATIC_PARAMETERS;
 }
-
-mitk::ExponentialSaturationModel::ParamterUnitMapType mitk::ExponentialSaturationModel::GetStaticParameterUnits() const
-{
-  ParamterUnitMapType result;
-
-  //do nothing
-
-  return result;
-};
 
 void mitk::ExponentialSaturationModel::SetStaticParameter(const ParameterNameType& /*name*/,
     const StaticParameterValuesType& /*values*/)

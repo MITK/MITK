@@ -55,8 +55,6 @@ namespace mitk
 
     static const unsigned int NUMBER_OF_PARAMETERS;
 
-    static const unsigned int NUMBER_OF_DERIVED_PARAMETERS;
-
     static const std::string MODEL_TYPE;
 
     std::string GetModelDisplayName() const override;
@@ -65,7 +63,6 @@ namespace mitk
 
     ParameterNamesType GetParameterNames() const override;
     ParametersSizeType  GetNumberOfParameters() const override;
-    ParametersSizeType  GetNumberOfDerivedParameters() const override;
 
     ParamterUnitMapType GetParameterUnits() const override;
 

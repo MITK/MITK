@@ -32,8 +32,6 @@ const unsigned int mitk::TwoTissueCompartmentFDGModel::POSITION_PARAMETER_vb = 3
 
 const unsigned int mitk::TwoTissueCompartmentFDGModel::NUMBER_OF_PARAMETERS = 4;
 
-const unsigned int mitk::TwoTissueCompartmentFDGModel::NUMBER_OF_DERIVED_PARAMETERS = 0;
-
 const std::string mitk::TwoTissueCompartmentFDGModel::MODEL_TYPE = "Dynamic.PET";
 
 std::string mitk::TwoTissueCompartmentFDGModel::GetModelDisplayName() const
@@ -75,11 +73,6 @@ mitk::TwoTissueCompartmentFDGModel::GetNumberOfParameters() const
   return NUMBER_OF_PARAMETERS;
 }
 
-mitk::TwoTissueCompartmentFDGModel::ParametersSizeType
-mitk::TwoTissueCompartmentFDGModel::GetNumberOfDerivedParameters() const
-{
-  return NUMBER_OF_DERIVED_PARAMETERS;
-}
 
 mitk::TwoTissueCompartmentFDGModel::ParamterUnitMapType
 mitk::TwoTissueCompartmentFDGModel::GetParameterUnits() const

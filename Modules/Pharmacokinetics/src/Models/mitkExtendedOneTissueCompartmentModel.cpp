@@ -31,8 +31,6 @@ const unsigned int mitk::ExtendedOneTissueCompartmentModel::POSITION_PARAMETER_v
 
 const unsigned int mitk::ExtendedOneTissueCompartmentModel::NUMBER_OF_PARAMETERS = 3;
 
-const unsigned int mitk::ExtendedOneTissueCompartmentModel::NUMBER_OF_DERIVED_PARAMETERS = 0;
-
 const std::string mitk::ExtendedOneTissueCompartmentModel::MODEL_TYPE = "Dynamic.PET";
 
 std::string mitk::ExtendedOneTissueCompartmentModel::GetModelDisplayName() const
@@ -70,12 +68,6 @@ mitk::ExtendedOneTissueCompartmentModel::ParametersSizeType  mitk::ExtendedOneTi
 const
 {
   return NUMBER_OF_PARAMETERS;
-}
-
-mitk::ExtendedOneTissueCompartmentModel::ParametersSizeType  mitk::ExtendedOneTissueCompartmentModel::GetNumberOfDerivedParameters()
-const
-{
-  return NUMBER_OF_DERIVED_PARAMETERS;
 }
 
 mitk::ExtendedOneTissueCompartmentModel::ParamterUnitMapType

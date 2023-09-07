@@ -36,8 +36,6 @@ const std::string mitk::StandardToftsModel::UNIT_DERIVED_PARAMETER_kep = "1/min"
 
 const std::string mitk::StandardToftsModel::MODEL_TYPE = "Perfusion.MR";
 
-const std::string mitk::StandardToftsModel::FUNCTION_STRING = "";
-
 
 
 std::string mitk::StandardToftsModel::GetModelDisplayName() const

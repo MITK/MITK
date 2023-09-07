@@ -62,8 +62,6 @@ namespace mitk
 
     static const std::string MODEL_TYPE;
 
-    static const std::string FUNCTION_STRING;
-
 
 
     std::string GetModelDisplayName() const override;

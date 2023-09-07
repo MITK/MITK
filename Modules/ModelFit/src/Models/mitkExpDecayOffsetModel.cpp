@@ -132,17 +132,6 @@ mitk::ExpDecayOffsetModel::GetNumberOfDerivedParameters() const
   return NUMBER_OF_DERIVED_PARAMETERS;
 };
 
-mitk::ExpDecayOffsetModel::ParamterUnitMapType mitk::ExpDecayOffsetModel::GetDerivedParameterUnits() const
-{
-  ParamterUnitMapType result;
-
-  //do nothing
-
-  return result;
-};
-
-
-
 mitk::ExpDecayOffsetModel::ModelResultType
 mitk::ExpDecayOffsetModel::ComputeModelfunction(const ParametersType& parameters) const
 {

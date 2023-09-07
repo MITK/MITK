@@ -234,16 +234,6 @@ mitk::ThreeStepLinearModel::ParametersSizeType  mitk::ThreeStepLinearModel::GetN
   return 0;
 }
 
-mitk::ThreeStepLinearModel::ParamterUnitMapType mitk::ThreeStepLinearModel::GetStaticParameterUnits() const
-{
-  ParamterUnitMapType result;
-
-  //do nothing
-
-  return result;
-};
-
-
 void mitk::ThreeStepLinearModel::SetStaticParameter(const ParameterNameType&,
     const StaticParameterValuesType&)
 {

@@ -27,8 +27,6 @@ const unsigned int mitk::ExpDecayOffsetModel::POSITION_PARAMETER_y0 = 0;
 const unsigned int mitk::ExpDecayOffsetModel::POSITION_PARAMETER_k = 1;
 const unsigned int mitk::ExpDecayOffsetModel::POSITION_PARAMETER_y_bl = 2;
 
-const unsigned int mitk::ExpDecayOffsetModel::NUMBER_OF_DERIVED_PARAMETERS = 0;
-
 const unsigned int mitk::ExpDecayOffsetModel::NUMBER_OF_STATIC_PARAMETERS = 0;
 
 const std::string mitk::ExpDecayOffsetModel::MODEL_DISPLAY_NAME = "Exponential Decay Offset Model";
@@ -114,12 +112,6 @@ mitk::ExpDecayOffsetModel::ParametersSizeType
 mitk::ExpDecayOffsetModel::GetNumberOfParameters() const
 {
   return NUMBER_OF_PARAMETERS;
-};
-
-mitk::ExpDecayOffsetModel::ParametersSizeType
-mitk::ExpDecayOffsetModel::GetNumberOfDerivedParameters() const
-{
-  return NUMBER_OF_DERIVED_PARAMETERS;
 };
 
 mitk::ExpDecayOffsetModel::ModelResultType

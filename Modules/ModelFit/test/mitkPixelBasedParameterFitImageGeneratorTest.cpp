@@ -82,12 +82,12 @@ int mitkPixelBasedParameterFitImageGeneratorTest(int  /*argc*/, char*[] /*argv[]
 
     CPPUNIT_ASSERT_MESSAGE("Check number of parameter images", 2 == resultImages.size());
     MITK_TEST_CONDITION(resultImages.find("slope") != resultImages.end(),"Check if \"slope\" parameter image exists.");
-    MITK_TEST_CONDITION(resultImages.find("offset") != resultImages.end(),"Check if \"offset\" parameter image exists.");
+    MITK_TEST_CONDITION(resultImages.find("y-intercept") != resultImages.end(),"Check if \"y-intercept\" parameter image exists.");
     CPPUNIT_ASSERT_MESSAGE("Check number of derived parameter images", 1 == derivedResultImages.size());
     MITK_TEST_CONDITION(derivedResultImages.find("x-intercept") != derivedResultImages.end(),"Check if \"x-intercept\" derived parameter image exists.");
 
     mitk::ImagePixelReadAccessor<mitk::ScalarType,3> slopeAccessor(resultImages["slope"]);
-    mitk::ImagePixelReadAccessor<mitk::ScalarType,3> offsetAccessor(resultImages["offset"]);
+    mitk::ImagePixelReadAccessor<mitk::ScalarType,3> yinterceptAccessor(resultImages["y-intercept"]);
 
     double testValue = slopeAccessor.GetPixelByIndex(testIndex1);
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #1 (slope) at index #1");
@@ -98,14 +98,14 @@ int mitkPixelBasedParameterFitImageGeneratorTest(int  /*argc*/, char*[] /*argv[]
     testValue = slopeAccessor.GetPixelByIndex(testIndex4);
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(8000,testValue, 1e-4, true)==true, "Check param #1 (slope) at index #4");
 
-    testValue = offsetAccessor.GetPixelByIndex(testIndex1);
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (offset) at index #1");
-    testValue = offsetAccessor.GetPixelByIndex(testIndex2);
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(10,testValue, 1e-5, true)==true, "Check param #2 (offset) at index #2");
-    testValue = offsetAccessor.GetPixelByIndex(testIndex3);
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(20,testValue, 1e-5, true)==true, "Check param #2 (offset) at index #3");
-    testValue = offsetAccessor.GetPixelByIndex(testIndex4);
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (offset) at index #4");
+    testValue = yinterceptAccessor.GetPixelByIndex(testIndex1);
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (y-intercept) at index #1");
+    testValue = yinterceptAccessor.GetPixelByIndex(testIndex2);
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(10,testValue, 1e-5, true)==true, "Check param #2 (y-intercept) at index #2");
+    testValue = yinterceptAccessor.GetPixelByIndex(testIndex3);
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(20,testValue, 1e-5, true)==true, "Check param #2 (y-intercept) at index #3");
+    testValue = yinterceptAccessor.GetPixelByIndex(testIndex4);
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (y-intercept) at index #4");
 
     //Test with mask set
     mitk::Image::Pointer maskImage = mitk::GenerateTestMaskMITK();
@@ -118,12 +118,12 @@ int mitkPixelBasedParameterFitImageGeneratorTest(int  /*argc*/, char*[] /*argv[]
 
     CPPUNIT_ASSERT_MESSAGE("Check number of parameter images", 2 == resultImages.size());
     MITK_TEST_CONDITION(resultImages.find("slope") != resultImages.end(),"Check if \"slope\" parameter image exists.");
-    MITK_TEST_CONDITION(resultImages.find("offset") != resultImages.end(),"Check if \"offset\" parameter image exists.");
+    MITK_TEST_CONDITION(resultImages.find("y-intercept") != resultImages.end(),"Check if \"y-intercept\" parameter image exists.");
     CPPUNIT_ASSERT_MESSAGE("Check number of derived parameter images", 1 == derivedResultImages.size());
     MITK_TEST_CONDITION(derivedResultImages.find("x-intercept") != derivedResultImages.end(),"Check if \"x-intercept\" derived parameter image exists.");
 
     mitk::ImagePixelReadAccessor<mitk::ScalarType,3> slopeAccessor2(resultImages["slope"]);
-    mitk::ImagePixelReadAccessor<mitk::ScalarType,3> offsetAccessor2(resultImages["offset"]);
+    mitk::ImagePixelReadAccessor<mitk::ScalarType,3> yinterceptAccessor2(resultImages["y-intercept"]);
 
     testValue = slopeAccessor2.GetPixelByIndex(testIndex1);
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #1 (slope) at index #1");
@@ -138,18 +138,18 @@ int mitkPixelBasedParameterFitImageGeneratorTest(int  /*argc*/, char*[] /*argv[]
     testValue = slopeAccessor2.GetPixelByIndex(testIndex6);
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #1 (slope) at index #6");
 
-    testValue = offsetAccessor2.GetPixelByIndex(testIndex1);
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (offset) at index #1");
-    testValue = offsetAccessor2.GetPixelByIndex(testIndex2);
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(10,testValue, 1e-5, true)==true, "Check param #2 (offset) at index #2");
-    testValue = offsetAccessor2.GetPixelByIndex(testIndex3);
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (offset) at index #3");
-    testValue = offsetAccessor2.GetPixelByIndex(testIndex4);
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (offset) at index #4");
-    testValue = offsetAccessor2.GetPixelByIndex(testIndex5);
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(10,testValue, 1e-5, true)==true, "Check param #2 (offset) at index #5");
-    testValue = offsetAccessor2.GetPixelByIndex(testIndex6);
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (offset) at index #6");
+    testValue = yinterceptAccessor2.GetPixelByIndex(testIndex1);
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (y-intercept) at index #1");
+    testValue = yinterceptAccessor2.GetPixelByIndex(testIndex2);
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(10,testValue, 1e-5, true)==true, "Check param #2 (y-intercept) at index #2");
+    testValue = yinterceptAccessor2.GetPixelByIndex(testIndex3);
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (y-intercept) at index #3");
+    testValue = yinterceptAccessor2.GetPixelByIndex(testIndex4);
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (y-intercept) at index #4");
+    testValue = yinterceptAccessor2.GetPixelByIndex(testIndex5);
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(10,testValue, 1e-5, true)==true, "Check param #2 (y-intercept) at index #5");
+    testValue = yinterceptAccessor2.GetPixelByIndex(testIndex6);
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #2 (y-intercept) at index #6");
 
   MITK_TEST_END()
 }

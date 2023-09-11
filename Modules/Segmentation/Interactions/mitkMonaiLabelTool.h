@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <httplib.h>
 #include <nlohmann/json.hpp>
 #include "mitkPointSet.h"
+#include "mitkInteractionPositionEvent.h"
 
 
 namespace us
@@ -90,6 +91,7 @@ namespace mitk
     void Deactivated() override;
     void UpdatePrepare() override;
 
+    virtual void WriteImage(const Image*, std::string&) = 0;
     void GetOverallInfo(std::string&, int&);
     std::unique_ptr<MonaiAppMetadata> m_InfoParameters; //contains all parameters from Server to serve the GUI
     std::unique_ptr<MonaiLabelRequest> m_RequestParameters;
@@ -149,7 +151,14 @@ namespace mitk
      */
     void ClearSeeds();
 
-    std::stringstream GetPointsAsListString(const mitk::BaseGeometry*, PointSet::Pointer);
+    virtual std::stringstream GetPointsAsListString(const mitk::BaseGeometry*, PointSet::Pointer);
+    virtual void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) = 0;
+
+    PointSet::Pointer m_PointSetPositive;
+    PointSet::Pointer m_PointSetNegative;
+    DataNode::Pointer m_PointSetNodePositive;
+    DataNode::Pointer m_PointSetNodeNegative;
+    int m_PointSetCount = 0;
 
   private:
     std::string m_MitkTempDir;
@@ -161,11 +170,6 @@ namespace mitk
     std::string m_ModelName;
     std::string m_URL;
     nlohmann::json m_ResultMetadata;
-    PointSet::Pointer m_PointSetPositive;
-    PointSet::Pointer m_PointSetNegative;
-    DataNode::Pointer m_PointSetNodePositive;
-    DataNode::Pointer m_PointSetNodeNegative;
-    int m_PointSetCount = 0;
     const std::set<std::string> m_AUTO_SEG_TYPE_NAME = {"segmentation"};
     const std::set<std::string> m_SCRIBBLE_SEG_TYPE_NAME = {"scribbles"};
     const std::set<std::string> m_INTERACTIVE_SEG_TYPE_NAME = {"deepedit", "deepgrow"};

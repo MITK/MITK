@@ -15,7 +15,6 @@ found in the LICENSE file.
 #include <httplib.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkImageReadAccessor.h>
-#include "mitkInteractionPositionEvent.h"
 #include "mitkPointSetShapeProperty.h"
 #include "mitkProperties.h"
 #include "mitkToolManager.h"
@@ -225,7 +224,7 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
     m_IsLastSuccess = false;
     if (!m_TEST)
     {
-      IOUtil::Save(inputAtTimeStep, inputImagePath);
+      this->WriteImage(inputAtTimeStep, inputImagePath);
       PostInferRequest(hostName, port, inputImagePath, outputImagePath, inputAtTimeStep->GetGeometry());
     }
     else
@@ -257,8 +256,9 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
       std::map<std::string, mitk::Label::PixelType> labelMap{{m_RequestParameters->requestLabel, 1}};
       this->MapLabelsToSegmentation(outputBuffer, previewImage, labelMap);
     }
-    mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
-    previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
+    //mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
+    //previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
+    this->WriteBackResults(previewImage, outputBuffer.GetPointer(), timeStep);
     this->SetIsLastSuccess(true);
     MonaiStatusEvent.Send(true);
   }

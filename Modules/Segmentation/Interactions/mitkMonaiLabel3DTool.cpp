@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkMonaiLabel3DTool.h"
 
+#include "mitkIOUtil.h"
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>
@@ -23,7 +24,7 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, MonaiLabel3DTool, "MonaiLabel3D");
 }
 
-mitk::MonaiLabel3DTool::MonaiLabel3DTool() 
+mitk::MonaiLabel3DTool::MonaiLabel3DTool()
 {
   this->IsTimePointChangeAwareOff();
 }
@@ -50,4 +51,15 @@ us::ModuleResource mitk::MonaiLabel3DTool::GetIconResource() const
 const char *mitk::MonaiLabel3DTool::GetName() const
 {
   return "MonaiLabel3D";
+}
+
+void mitk::MonaiLabel3DTool::WriteImage(const Image *inputAtTimeStep, std::string &inputImagePath)
+{
+  MITK_INFO << "WriteImage: MonaiLabel3DTool";
+  IOUtil::Save(inputAtTimeStep, inputImagePath);
+}
+
+void mitk::MonaiLabel3DTool::WriteBackResults(LabelSetImage *previewImage, LabelSetImage *segResults, TimeStepType)
+{
+  MITK_INFO << "MonaiLabel3DTool WriteBackResults";
 }

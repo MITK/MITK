@@ -44,6 +44,7 @@ protected:
   void InitializeUI(QBoxLayout* mainLayout) override;
 
   void EnableWidgets(bool enabled) override;
+  void DisplayWidgets(bool enabled);
   void SetLabelSetPreview(const mitk::LabelSetImage* preview);
   void ActualizePreviewLabelVisibility();
 

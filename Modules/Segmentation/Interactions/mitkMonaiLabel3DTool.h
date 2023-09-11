@@ -33,8 +33,9 @@ namespace mitk
     const char *GetName() const override;
     const char **GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
-
     void Activated() override;
+    void WriteImage(const Image *, std::string &) override;
+    void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) override;
 
   protected:
     MonaiLabel3DTool();

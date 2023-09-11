@@ -42,7 +42,12 @@ namespace mitk
     us::ModuleResource GetIconResource() const override;
 
     void Activated() override;
-    
+    void WriteImage(const Image *, std::string &) override;
+    std::stringstream GetPointsAsListString(const mitk::BaseGeometry *, PointSet::Pointer) override;
+    void OnAddPositivePoint(StateMachineAction *, InteractionEvent *) override;
+    void OnAddNegativePoint(StateMachineAction *, InteractionEvent *) override;
+    void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) override;
+
   protected:
     MonaiLabel2DTool();
     ~MonaiLabel2DTool() = default;

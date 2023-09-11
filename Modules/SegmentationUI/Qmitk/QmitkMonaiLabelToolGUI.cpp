@@ -76,14 +76,21 @@ void QmitkMonaiLabelToolGUI::StatusMessageListener(const bool status)
   {
     return;
   }
-  auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
+  /* auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
   if (nullptr == tool)
   {
     return;
   }
   this->SetLabelSetPreview(tool->GetPreviewSegmentation());
-  this->ActualizePreviewLabelVisibility();
+  this->ActualizePreviewLabelVisibility();*/
+  Superclass::DisplayWidgets(false);
   m_FirstPreviewComputation = false;
+}
+
+void QmitkMonaiLabelToolGUI::DisplayWidgets(bool enabled)
+{
+  Superclass::DisplayWidgets(enabled);
+  m_Controls.previewButton->setVisible(enabled);
 }
 
 void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
@@ -99,11 +106,13 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
   {
     this->WriteStatusMessage("Interactive model selected. Please press SHIFT + click on the render windows.\n");
     m_Controls.previewButton->setEnabled(false);
+    this->DisplayWidgets(false);
   }
   else
   {
     this->WriteStatusMessage("Auto-segmentation model selected. Please click on Preview. Label selection will be ignored.\n");
     m_Controls.previewButton->setEnabled(true);
+    this->DisplayWidgets(true);
   }
   std::string selectedModel = m_Controls.modelBox->currentText().toStdString();
   for (const mitk::MonaiModelInfo &modelObject : tool->m_InfoParameters->models)

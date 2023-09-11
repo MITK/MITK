@@ -147,3 +147,21 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::SetLabelSetPreview(const mitk::La
     m_LabelSelectionList->SetLabelSetImage(preview);
   }
 }
+
+void QmitkMultiLabelSegWithPreviewToolGUIBase::DisplayWidgets(bool enabled)
+{
+  if (nullptr != m_LabelSelectionList)
+  {
+    m_LabelSelectionList->setVisible(enabled);
+  }
+
+  if (nullptr != m_RadioTransferAll)
+  {
+    m_RadioTransferAll->setVisible(enabled);
+  }
+
+  if (nullptr != m_RadioTransferSelected)
+  {
+    m_RadioTransferSelected->setVisible(enabled);
+  }
+}

@@ -41,6 +41,8 @@ protected:
   void InitializeUI(QBoxLayout* mainLayout) override;
 
   void EnableWidgets(bool enabled) override;
+
+  virtual void DisplayWidgets(bool enabled);
  
   /**
    * @brief Writes any message in white on the tool pane.

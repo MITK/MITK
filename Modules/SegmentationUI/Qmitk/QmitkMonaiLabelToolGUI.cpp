@@ -57,7 +57,6 @@ void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls.modelBox,
           QOverload<int>::of(&QComboBox::activated),
           [=](int index) { OnModelChanged(m_Controls.modelBox->itemText(index)); });
-  connect(m_Controls.labelBox, SIGNAL(currentTextChanged(const QString&)), this, SLOT(OnLabelChanged(const QString&)));
   QIcon refreshIcon =
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
   m_Controls.fetchUrl->setIcon(refreshIcon);
@@ -100,7 +99,7 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
   {
     return;
   }
-  m_Controls.labelBox->clear();
+  m_Controls.labelListLabel->clear();
   mitk::MonaiModelInfo model = tool->GetModelInfoFromName(modelName.toStdString());
   if ("deepgrow" == model.type || "deepedit" == model.type)
   {
@@ -124,24 +123,16 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
       requestObject->hostName = tool->m_InfoParameters->hostName;
       requestObject->port = tool->m_InfoParameters->port;
       tool->m_RequestParameters = std::move(requestObject);
+      QStringList supportedLabels;
       for (const auto &label : modelObject.labels)
       {
-        m_Controls.labelBox->addItem(QString::fromStdString(label.first));
+        supportedLabels << QString::fromStdString(label.first);
       }
+      m_Controls.labelListLabel->setText(supportedLabels.join(','));
       break;
     }
   }
   tool->MonaiStatusEvent += mitk::MessageDelegate1<QmitkMonaiLabelToolGUI, const bool>(this, &QmitkMonaiLabelToolGUI::StatusMessageListener);
-}
-
-void QmitkMonaiLabelToolGUI::OnLabelChanged(const QString &label) 
-{
-  auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
-  if (nullptr == tool)
-  {
-    return;
-  }
-  tool->m_RequestParameters->requestLabel = label.toStdString();
 }
 
 void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()

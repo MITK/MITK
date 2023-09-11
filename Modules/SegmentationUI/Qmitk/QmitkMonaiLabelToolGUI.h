@@ -31,7 +31,6 @@ protected slots :
   void OnPreviewBtnClicked();
   void OnFetchBtnClicked();
   void OnModelChanged(const QString&);
-  void OnLabelChanged(const QString&);
 
 protected:
   QmitkMonaiLabelToolGUI(int);

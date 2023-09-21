@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>475</width>
-    <height>836</height>
+    <height>866</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -210,7 +210,7 @@
            <item>
             <widget class="QGroupBox" name="groupBox_T1MapviaVFA">
              <property name="title">
-              <string>T1 Map via Variable Flip Angle Parameters:</string>
+              <string>Variable Flip Angle Parameters:</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
               <item row="0" column="0">

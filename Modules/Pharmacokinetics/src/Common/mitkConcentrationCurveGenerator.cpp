@@ -30,7 +30,7 @@ found in the LICENSE file.
 
 mitk::ConcentrationCurveGenerator::ConcentrationCurveGenerator() : m_isT2weightedImage(false), m_isTurboFlashSequence(false),
     m_AbsoluteSignalEnhancement(false), m_RelativeSignalEnhancement(0.0), m_UsingT1Map(false), m_Factor(0.0), m_RecoveryTime(0.0), m_RelaxationTime(0.0),
-    m_Relaxivity(0.0), m_FlipAngle(0.0), m_T2Factor(0.0), m_T2EchoTime(0.0)
+    m_Relaxivity(0.0), m_FlipAngle(0.0), m_FlipAnglePDW(0.0), m_T2Factor(0.0), m_T2EchoTime(0.0)
 {
 }
 
@@ -136,6 +136,8 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   typename Extract3DImageFilterType::Pointer Extract3DImageFilter = Extract3DImageFilterType::New();
   typename TPixel4DImageType::RegionType region_input = itkBaselineImage->GetLargestPossibleRegion();
 
+  MITK_INFO << "m_BaselineStartTimeStep: " << m_BaselineStartTimeStep;
+  MITK_INFO << "m_BaselineEndTimeStep: " << m_BaselineEndTimeStep;
   if (m_BaselineEndTimeStep > region_input.GetSize()[3])
   {
     mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. End time point is larger than total number of time points.";
@@ -256,21 +258,21 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
         }
         else if(this->m_UsingT1Map)
         {
-            typename ConvertedImageType::Pointer itkT10Image = ConvertedImageType::New();
-            mitk::CastToItkImage(m_T10Image, itkT10Image);
+            typename BaselineImageType::Pointer itkPDWImage = BaselineImageType::New();
+            mitk::CastToItkImage(m_PDWImage, itkPDWImage);
 
             typedef mitk::ConvertToConcentrationViaT1CalcFunctor <TPixel_input, TPixel_baseline, double, double> ConvertToConcentrationViaT1CalcFunctorType;
-            typedef itk::TernaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConvertedImageType, ConvertToConcentrationViaT1CalcFunctorType> FilterT1MapType;
+            typedef itk::TernaryFunctorImageFilter<InputImageType, BaselineImageType, BaselineImageType, ConvertedImageType, ConvertToConcentrationViaT1CalcFunctorType> FilterT1MapType;
 
             ConvertToConcentrationViaT1CalcFunctorType ConversionT1MapFunctor;
-            ConversionT1MapFunctor.initialize(this->m_Relaxivity, this->m_RecoveryTime, this->m_FlipAngle);
+            ConversionT1MapFunctor.initialize(this->m_Relaxivity, this->m_RepetitionTime, this->m_FlipAngle, this->m_FlipAnglePDW);
 
             typename FilterT1MapType::Pointer ConversionT1MapFilter = FilterT1MapType::New();
 
             ConversionT1MapFilter->SetFunctor(ConversionT1MapFunctor);
             ConversionT1MapFilter->SetInput1(itkInputImage);
             ConversionT1MapFilter->SetInput2(itkBaselineImage);
-            ConversionT1MapFilter->SetInput3(itkT10Image);
+            ConversionT1MapFilter->SetInput3(itkPDWImage);
 
             ConversionT1MapFilter->Update();
             m_ConvertSignalToConcentrationCurve_OutputImage = mitk::ImportItkImage(ConversionT1MapFilter->GetOutput())->Clone();

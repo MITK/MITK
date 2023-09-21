@@ -401,14 +401,16 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
   }
   else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
   {
-    concentrationGen->SetRecoveryTime(m_Controls.TRSpinBox->value());
+    concentrationGen->SetRepetitionTime(m_Controls.TRSpinBox->value());
     concentrationGen->SetRelaxivity(m_Controls.RelaxivitySpinBox->value());
-    concentrationGen->SetT10Image(dynamic_cast<mitk::Image*>(m_Controls.PDWImageNodeSelector->GetSelectedNode()->GetData()));
+    concentrationGen->SetPDWImage(dynamic_cast<mitk::Image*>(m_Controls.PDWImageNodeSelector->GetSelectedNode()->GetData()));
     concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
     concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
     //Convert Flipangle from degree to radiant
-      double alpha = m_Controls.FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
-      concentrationGen->SetFlipAngle(alpha);
+    double alpha = m_Controls.FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
+    concentrationGen->SetFlipAngle(alpha);
+    double alphaPDW = m_Controls.FlipanglePDWSpinBox->value() / 360 * 2 * boost::math::constants::pi<double>();
+    concentrationGen->SetFlipAnglePDW(alphaPDW);
   }
 
   else

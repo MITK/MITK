@@ -164,7 +164,7 @@ public:
     m_concentrationGen->SetUsingT1Map(true);
     m_concentrationGen->SetRecoveryTime(1.0);
     m_concentrationGen->SetRelaxivity(1.0);
-    m_concentrationGen->SetT10Image(PDWImage);
+    m_concentrationGen->SetPDWImage(PDWImage);
     m_concentrationGen->SetFlipAngle(1.0);
     m_concentrationGen->SetBaselineStartTimeStep(0);
     m_concentrationGen->SetBaselineEndTimeStep(0);

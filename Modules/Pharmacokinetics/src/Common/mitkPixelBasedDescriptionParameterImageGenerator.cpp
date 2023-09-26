@@ -24,13 +24,13 @@ void
   mitk::PixelBasedDescriptionParameterImageGenerator::
   onFitProgressEvent(::itk::Object* caller, const ::itk::EventObject& /*eventObject*/)
 {
-  this->InvokeEvent(::itk::ProgressEvent());
 
   itk::ProcessObject* process = dynamic_cast<itk::ProcessObject*>(caller);
   if (process)
   {
     this->m_Progress = process->GetProgress();
   }
+  this->InvokeEvent(::itk::ProgressEvent());
 };
 
 template <typename TPixel, unsigned int VDim>

@@ -20,7 +20,6 @@ void
 mitk::ROIBasedParameterFitImageGenerator::
 onFitProgressEvent(::itk::Object* caller, const ::itk::EventObject& /*eventObject*/)
 {
-  this->InvokeEvent(::itk::ProgressEvent());
 
   itk::ProcessObject* process = dynamic_cast<itk::ProcessObject*>(caller);
 
@@ -28,6 +27,7 @@ onFitProgressEvent(::itk::Object* caller, const ::itk::EventObject& /*eventObjec
   {
     this->m_Progress = process->GetProgress();
   }
+  this->InvokeEvent(::itk::ProgressEvent());
 };
 
 template <typename TPixel, unsigned int VDim>

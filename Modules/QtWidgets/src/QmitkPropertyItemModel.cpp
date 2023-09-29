@@ -149,7 +149,11 @@ QVariant QmitkPropertyItemModel::data(const QModelIndex &index, int role) const
       }
       else if (auto colorProperty = dynamic_cast<mitk::ColorProperty *>(property))
       {
-        return MitkToQt(colorProperty->GetValue());
+	      //T29013 : Making color property non editable.
+	      if (m_ClassName != "LabelSetImage")
+	      {
+		      return MitkToQt(colorProperty->GetValue());
+	      }
       }
     }
     else if (role == mitk::PropertyRole)

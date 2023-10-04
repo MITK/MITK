@@ -335,44 +335,7 @@ namespace mitk
 
     this->SetOrigin(origin);
   }
-
-  std::vector< int > PlaneGeometry::CalculateDominantAxes(mitk::AffineTransform3D::MatrixType::InternalMatrixType& rotation_matrix)
-  {
-    std::vector< int > axes;
-
-    bool dominant_axis_error = false;
-    for (int i = 0; i < 3; ++i)
-    {
-      int dominantAxis = itk::Function::Max3(
-          rotation_matrix[0][i],
-          rotation_matrix[1][i],
-          rotation_matrix[2][i]
-      );
-
-      for (int j=0; j<i; ++j)
-        if (axes[j] == dominantAxis)
-        {
-          dominant_axis_error = true;
-          break;
-        }
-      if (dominant_axis_error)
-        break;
-
-      axes.push_back(dominantAxis);
-    }
-
-    if (dominant_axis_error)
-    {
-      MITK_DEBUG << "Error during dominant axis calculation. Using default.";
-      MITK_DEBUG << "This is either caused by an imperfect rotation matrix or if the rotation is axactly 45° around one or more axis.";
-      axes.clear();
-      for (int i = 0; i < 3; ++i)
-        axes.push_back(i);
-    }
-
-    return axes;
-  }
-
+  
   void PlaneGeometry::InitializeStandardPlane(const BaseGeometry *geometry3D,
                                               AnatomicalPlane planeorientation,
                                               ScalarType zPosition,
@@ -384,28 +347,26 @@ namespace mitk
 
     ScalarType width, height;
 
-    // Inspired by:
-    // http://www.na-mic.org/Wiki/index.php/Coordinate_System_Conversion_Between_ITK_and_Slicer3
-
-    mitk::AffineTransform3D::MatrixType matrix = geometry3D->GetIndexToWorldTransform()->GetMatrix();
-
+    auto matrix = geometry3D->GetIndexToWorldTransform()->GetMatrix();
     matrix.GetVnlMatrix().normalize_columns();
-    mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetTranspose();
+    auto inverseMatrix = matrix.GetInverse();
 
-    /// The index of the sagittal, coronal and axial axes in the reference geometry.
-    auto axes = CalculateDominantAxes(inverseMatrix);
-    /// The direction of the sagittal, coronal and axial axes in the reference geometry.
-    /// +1 means that the direction is straight, i.e. greater index translates to greater
-    /// world coordinate. -1 means that the direction is inverted.
+    // The index of the sagittal, coronal and axial axes in the reference geometry.
+    int axes[3];
+    geometry3D->MapAxesToOrientations(axes);
+
+    // The direction of the sagittal, coronal and axial axes in the reference geometry.
+    // +1 means that the direction is straight, i.e. greater index translates to greater
+    // world coordinate. -1 means that the direction is inverted.
     int directions[3];
     ScalarType extents[3];
     ScalarType spacings[3];
     for (int i=0; i<3; ++i)
     {
-      int dominantAxis = axes.at(i);
-      directions[i] = itk::Function::Sign(inverseMatrix[dominantAxis][i]);
-      extents[i] = geometry3D->GetExtent(dominantAxis);
-      spacings[i] = geometry3D->GetSpacing()[dominantAxis];
+      int axis = axes[i];
+      directions[i] = itk::Function::Sign(inverseMatrix[axis][i]);
+      extents[i] = geometry3D->GetExtent(axis);
+      spacings[i] = geometry3D->GetSpacing()[axis];
     }
 
     // matrix(column) = inverseTransformMatrix(row) * flippedAxes * spacing
@@ -497,18 +458,11 @@ namespace mitk
       itkExceptionMacro("unknown AnatomicalPlane");
     }
 
-    // Inspired by:
-    // http://www.na-mic.org/Wiki/index.php/Coordinate_System_Conversion_Between_ITK_and_Slicer3
+    int axes[3];
+    geometry3D->MapAxesToOrientations(axes);
+    int axis = axes[worldAxis];
 
-    mitk::AffineTransform3D::ConstPointer affineTransform = geometry3D->GetIndexToWorldTransform();
-    mitk::AffineTransform3D::MatrixType matrix = affineTransform->GetMatrix();
-    matrix.GetVnlMatrix().normalize_columns();
-    mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
-
-    /// The index of the sagittal, coronal and axial axes in the reference geometry.
-    int dominantAxis = CalculateDominantAxes(inverseMatrix).at(worldAxis);
-
-    ScalarType zPosition = top ? 0.5 : geometry3D->GetExtent(dominantAxis) - 0.5;
+    ScalarType zPosition = top ? 0.5 : geometry3D->GetExtent(axis) - 0.5;
 
     InitializeStandardPlane(geometry3D, planeorientation, zPosition, frontside, rotated, top);
   }

@@ -108,7 +108,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
   mitk::TrackingDevice::Pointer trackingDevice = m_TrackingDevice;
   trackingDevice->SetData(m_TrackingDeviceData);
 
-  //set device to rotation mode transposed becaus we are working with VNL style quaternions
+  //set device to rotation mode transposed because we are working with VNL style quaternions
   if (m_InverseMode)
   {
     trackingDevice->SetRotationMode(mitk::TrackingDevice::RotationTransposed);
@@ -129,7 +129,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
     return;
   }
 
-  //set filter to rotation mode transposed becaus we are working with VNL style quaternions
+  //set filter to rotation mode transposed because we are working with VNL style quaternions
   if (m_InverseMode)
     m_ToolVisualizationFilter->SetRotationMode(mitk::NavigationDataObjectVisualizationFilter::RotationTransposed);
 

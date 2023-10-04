@@ -39,8 +39,8 @@ If you do not renew the session MITK notifies you if the session has expired:
 \imageMacro{QmitkXnat_IMGSessionExpired.png,"Notification that the session has expired", 6.00}
 
 \section org_mitk_gui_qt_xnatBrowsing Browse data
-Once you are connected to XNAT, MITK displays the XNAT data hierachy as a tree within the XNAT tree browser.
-You can browse through the data by expanding the tree items ( which ist also possible via double click).
+Once you are connected to XNAT, MITK displays the XNAT data hierarchy as a tree within the XNAT tree browser.
+You can browse through the data by expanding the tree items (which is also possible via double click).
 If you hover the mouse cursor over an item you will see a tool tip with detailed information.
 The following table gives an overview about the icons of the treeview and the related XNAT objects
 
@@ -63,7 +63,7 @@ If you have selected a XNAT project, subject or experiment, MITK displays detail
 \section org_mitk_gui_qt_xnatDownload Download data
 MITK allows you to download your data from XNAT. You can either simply download the data to your file system or your can download it and open it immediately in the workbench.
 \subsection org_mitk_gui_qt_xnatDownload_file_system Download data to file system
-If you just want to download data, simply right-click on a XNAT file or scan on the tree brower and select "Download". The data will be stored in the specified download location.
+If you just want to download data, simply right-click on a XNAT file or scan on the tree browser and select "Download". The data will be stored in the specified download location.
 \subsection org_mitk_gui_qt_xnatDownload_in_MITK Download data and open it in MITK
 You can download and open data in three ways:
 <ul>
@@ -72,7 +72,7 @@ You can download and open data in three ways:
 <li>The other one is via selecting a file or scan with left-click and then click on the download button above the tree view
 </ul>
 
-\imageMacro{QmitkXnat_IMGDownloadButton.png,"The XNAT dowload button", 16.00}
+\imageMacro{QmitkXnat_IMGDownloadButton.png,"The XNAT download button", 16.00}
 
 \section org_mitk_gui_qt_xnatUpload Upload data
 You can also upload data to XNAT from within the workbench. Please note that it is currently only possible to upload files as resources. Uploading DICOMs is not yet available.

@@ -61,7 +61,7 @@ void mitk::USNavigationExperimentLogging::SetResult(const itk::SmartPointer<mitk
   {
     size_t prefixSize = m_KeyPrefix.size();
 
-    // only write properties with keys begining with the prefix (if a prefix was set)
+    // only write properties with keys beginning with the prefix (if a prefix was set)
     if ( ! m_KeyPrefix.empty() && it->first.substr(0, prefixSize) != m_KeyPrefix ) { continue; }
 
     if ( prefixSize >= it->first.size() )
@@ -103,7 +103,7 @@ void mitk::USNavigationExperimentLogging::AddCurrentTimeAttributes(Poco::AutoPtr
 
 void mitk::USNavigationExperimentLogging::WriteXmlToFile()
 {
-  // open file and write tree if successfull
+  // open file and write tree if successful
   std::ofstream filestream(m_FileName.c_str());
   if ( filestream.is_open() )
   {

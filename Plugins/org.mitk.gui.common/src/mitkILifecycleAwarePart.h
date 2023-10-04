@@ -29,7 +29,7 @@ namespace mitk {
  * be achieved by registering a custom berry::IPartListener.
  *
  * \note There are no "Closed()" or "Opened()" methods. These correspond to the constructor and
- *       desctructor of the Workbench part class.
+ *       destructor of the Workbench part class.
  *
  * \see berry::IPartListener
  * \see mitk::IZombieViewPart

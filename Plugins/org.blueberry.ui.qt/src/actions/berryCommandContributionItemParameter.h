@@ -92,7 +92,7 @@ public:
 
   /**
    * The style of this menu contribution. See the CommandContributionItem
-   * STYLE_* contants.
+   * STYLE_* constants.
    */
   CommandContributionItem::Style style;
 
@@ -133,7 +133,7 @@ public:
    *            A command id for a defined command. Must not be
    *            <code>null</code>.
    * @param style
-   *            The style of this menu contribution. See the STYLE_* contants.
+   *            The style of this menu contribution. See the STYLE_* constants.
    */
   CommandContributionItemParameter(IServiceLocator* serviceLocator,
                                    const QString& id, const QString& commandId,
@@ -171,7 +171,7 @@ public:
    *            A tooltip for this item. May be <code>null</code>. Tooltips
    *            are currently only valid for toolbar contributions.
    * @param style
-   *            The style of this menu contribution. See the STYLE_* contants.
+   *            The style of this menu contribution. See the STYLE_* constants.
    * @param helpContextId
    *            the help context id to be applied to this contribution. May be
    *            <code>null</code>

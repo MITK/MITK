@@ -10,7 +10,7 @@
 
 \section org_mitk_views_clippingPlaneManualOverview Overview
 
-The <b>Clipping Plane view</b> allows you to create clipping planes and calculate the volumina of the devided parts.
+The <b>Clipping Plane view</b> allows you to create clipping planes and calculate the volumina of the divided parts.
 
 
 \section org_mitk_views_clippingPlaneTechnicalIssue Technical Issue
@@ -62,11 +62,11 @@ In Deformation mode you can change the surface of the clipping plane.
 
 \imageMacro{QmitkClippingPlane_UpdateVolumina.png,"The 'Update Volumina' button",5.00}
 
-Calculating the volumina of the segmentation parts, which are devided by the clipping plane(s).
+Calculating the volumina of the segmentation parts, which are divided by the clipping plane(s).
  - Create a segmentation (see Segmentation-Manual)
  - Create one or more clipping plane(s)
  - Use the interaction buttons (Translation, Rotation, Deformation) to adjust the clipping plane for intersecting the segmentation
- - (You can decide which planes shouldnt be included for the calculation by changing their visibility to invisible)
+ - (You can decide which planes shouldn't be included for the calculation by changing their visibility to invisible)
  - Click button "Update Volumina" button
  - The intersected parts are displayed in different colors and their volumina are shown beneath the "Update Volumina" button
 

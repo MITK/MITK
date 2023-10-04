@@ -95,7 +95,7 @@ struct BERRY_UI_QT IIntroPart : public virtual Object
      * </p>
      *
      * @param standby <code>true</code> to put this part in its partially
-     * visible standy mode, and <code>false</code> to make it fully visible
+     * visible standby mode, and <code>false</code> to make it fully visible
      */
     virtual void StandbyStateChanged(bool standby) = 0;
 

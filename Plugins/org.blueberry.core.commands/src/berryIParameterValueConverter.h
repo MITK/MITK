@@ -38,7 +38,7 @@ namespace berry {
  * <p>
  * This class will typically be extended so the subclass can be referenced from
  * the <code>converter</code> attribute of the
- * <code>commandParameterType</code> elemement of the
+ * <code>commandParameterType</code> element of the
  * <code>org.blueberry.ui.commands</code> extension-point. Objects implementing
  * this interface may also be passed directly to
  * {@link ParameterType#Define} by clients.

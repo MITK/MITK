@@ -104,7 +104,7 @@ void QmitkIGTTutorialView::OnStartIGT()
       //The tracking device object is used for the physical connection to the device. To use the
       //data inside of our tracking pipeline we need a source. This source encapsulate the tracking device
       //and provides objects of the type mitk::NavigationData as output. The NavigationData objects stores
-      //position, orientation, if the data is valid or not and special error informations in a covariance
+      //position, orientation, if the data is valid or not and special error information in a covariance
       //matrix.
       //
       //Typically the start of a pipeline is a TrackingDeviceSource. To work correct we have to set a
@@ -133,7 +133,7 @@ void QmitkIGTTutorialView::OnStartIGT()
       //The tracking device object is used for the physical connection to the device. To use the
       //data inside of our tracking pipeline we need a source. This source encapsulate the tracking device
       //and provides objects of the type mitk::NavigationData as output. The NavigationData objects stores
-      //position, orientation, if the data is valid or not and special error informations in a covariance
+      //position, orientation, if the data is valid or not and special error information in a covariance
       //matrix.
       //
       //Typically the start of a pipeline is a TrackingDeviceSource. To work correct we have to set a

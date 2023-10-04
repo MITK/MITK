@@ -405,7 +405,7 @@
             </size>
            </property>
            <property name="text">
-            <string>PERFOM GRID MATCHING</string>
+            <string>PERFORM GRID MATCHING</string>
            </property>
           </widget>
          </item>
@@ -831,7 +831,7 @@
                 <item>
                  <widget class="QLabel" name="label_25">
                   <property name="text">
-                   <string>Use every n-th smaple n:</string>
+                   <string>Use every n-th sample n:</string>
                   </property>
                  </widget>
                 </item>
@@ -960,7 +960,7 @@
                 <item row="0" column="1">
                  <widget class="QLabel" name="label_5">
                   <property name="text">
-                   <string>Colum number:</string>
+                   <string>Column number:</string>
                   </property>
                  </widget>
                 </item>

@@ -105,7 +105,7 @@ private slots:
   // reaction to the button "Change Label"
   void OnActiveLabelChanged(int pixelValue);
 
-  // LabelSetImage Dependet
+  // LabelSetImage Dependent
   void OnCreateDetailedSurface(bool);
   void OnCreateSmoothedSurface(bool);
   // reaction to the signal "createMask" from QmitkLabelSetTableWidget

@@ -24,7 +24,7 @@ found in the LICENSE file.
 
 
 /**
- * Display the text in the statusbar of the applikation
+ * Display the text in the statusbar of the application
  */
 void QmitkStatusBar::DisplayText(const char* t)
 {
@@ -34,7 +34,7 @@ void QmitkStatusBar::DisplayText(const char* t)
 }
 
 /**
- * Display the text in the statusbar of the applikation for ms seconds
+ * Display the text in the statusbar of the application for ms seconds
  */
 void QmitkStatusBar::DisplayText(const char* t, int ms)
 {

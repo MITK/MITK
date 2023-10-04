@@ -38,7 +38,7 @@ public:
   /** @brief Check if selections is valid. */
   void SelectionControl( unsigned int index, const mitk::DataNode* selection);
 
-  /** @brief Enable buttons if data selction is valid. */
+  /** @brief Enable buttons if data selection is valid. */
   void EnableButtons(bool enable = true);
 
   /** @brief Does the actual contour filling */

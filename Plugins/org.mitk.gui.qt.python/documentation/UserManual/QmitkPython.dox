@@ -12,7 +12,7 @@ The Python view provides the graphical front end to run Python code through the 
 Images and surfaces in the DataManager can be transferred via a drag & drop mechanism into the MITK Python Console.
 
 \section org_mitk_views_pythonUsage Transfer data
-Images and surfaces can be tranferred from the data manger into the python console. To transfer an image or
+Images and surfaces can be transferred from the data manager into the python console. To transfer an image or
 surface simply drag it from the data manager into the Variable Stack view, as shown in Figure.
 A new entry will appear in the Variable Stack, as soon as the data is transferred. As soon as the
 entry is available the object can be accessed and modified in the python console. Three dimensional

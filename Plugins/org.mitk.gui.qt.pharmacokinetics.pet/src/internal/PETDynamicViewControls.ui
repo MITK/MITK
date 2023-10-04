@@ -114,7 +114,7 @@
     <widget class="QComboBox" name="comboModel">
      <item>
       <property name="text">
-       <string>Select pharmacokinetic modell...</string>
+       <string>Select pharmacokinetic model...</string>
       </property>
      </item>
     </widget>

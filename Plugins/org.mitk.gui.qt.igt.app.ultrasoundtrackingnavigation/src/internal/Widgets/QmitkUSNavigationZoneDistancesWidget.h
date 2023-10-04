@@ -39,7 +39,7 @@ class QmitkUSNavigationZoneDistancesWidget : public QWidget
   Q_OBJECT
 
 signals:
-  /** \brief Emmited whenever a the distance to a zone falls below zero. */
+  /** \brief Emitted whenever a the distance to a zone falls below zero. */
   void SignalZoneViolated(const mitk::DataNode*, mitk::Point3D);
 
 public:

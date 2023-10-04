@@ -75,7 +75,7 @@ void mitk::USNavigationCombinedModalityPersistence::StoreCurrentDevices()
     mitk::USCombinedModality::Pointer currentDevice = dynamic_cast<mitk::USCombinedModality*>(context->GetService(*it));
     if ( currentDevice.IsNotNull() )
     {
-      // save manufacturer and model strig of the combined modality
+      // save manufacturer and model string of the combined modality
       deviceStrings.push_back(QString::fromStdString(currentDevice->GetUltrasoundDevice()->GetManufacturer()));
       deviceStrings.push_back(QString::fromStdString(currentDevice->GetUltrasoundDevice()->GetName()));
 

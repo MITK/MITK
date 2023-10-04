@@ -27,7 +27,7 @@ They are not intrinsically part of the actual data and are only persisted when s
 A typical example of such a property is "visible", which decides if the data should be rendered or hidden.
 
 The common data node property list is applied to all render windows but there are also render window specific data node property lists.
-Any property that is found in both the common list and a render window specific list is overriden by the latter one.
+Any property that is found in both the common list and a render window specific list is overridden by the latter one.
 For example, if you want to hide an image only in the 3d render window but show it in all other render windows, you check "visible" in the common list, add the same property to the 3d render window specific list, and uncheck it there.
 
 There is only a single data property list.

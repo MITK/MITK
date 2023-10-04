@@ -37,7 +37,7 @@ public:
 
     //##Documentation
     //##@brief Constructor;
-    //## holds param instance internaly and connects this to the mitkStatusBar
+    //## holds param instance internally and connects this to the mitkStatusBar
     QmitkStatusBar(QStatusBar* instance);
 
     //##Documentation

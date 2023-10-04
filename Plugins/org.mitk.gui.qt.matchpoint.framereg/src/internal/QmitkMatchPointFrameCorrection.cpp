@@ -258,7 +258,7 @@ void QmitkMatchPointFrameCorrection::CheckInputs()
   if (m_LoadedAlgorithm.IsNull())
   {
     m_Controls.m_lbLoadedAlgorithmName->setText(
-      QStringLiteral("<font color='red'>No algorithm seleted!</font>"));
+      QStringLiteral("<font color='red'>No algorithm selected!</font>"));
   }
   else
   {

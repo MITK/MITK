@@ -50,7 +50,7 @@ public:
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
   explicit QmitkSurfaceToImageWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
 
-  /** @brief Defaul destructor. */
+  /** @brief Default destructor. */
   ~QmitkSurfaceToImageWidget() override;
 
 private slots:
@@ -63,7 +63,7 @@ private slots:
 
 private:
 
-  /** @brief Enable buttons if data selction is valid. */
+  /** @brief Enable buttons if data selection is valid. */
   void EnableButtons(bool enable = true);
 
   /** @brief Convert a surface into an binary image. */

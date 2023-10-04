@@ -27,7 +27,7 @@ struct IWorkbenchPage;
  * \ingroup org_blueberry_ui_qt
  *
  * Implements a reference to a IWorkbenchPart.
- * The IWorkbenchPart will not be instanciated until the part
+ * The IWorkbenchPart will not be instantiated until the part
  * becomes visible or the API getPart is sent with true;
  * <p>
  * This interface is not intended to be implemented by clients.

@@ -65,7 +65,7 @@ private:
     Object::Pointer newValue;
 
     /**
-     * The object on which the property change occured
+     * The object on which the property change occurred
      */
     Object::Pointer source;
 

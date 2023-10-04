@@ -553,7 +553,7 @@ mitk::ModelSignalImageGenerator::Pointer generator = mitk::ModelSignalImageGener
 mitk::TwoCompartmentExchangeModelParameterizer::Pointer modelParameterizer = mitk::TwoCompartmentExchangeModelParameterizer::New();
 
 /** @todo #2  necessary? Generator need to have a map with Parameters in order of Model in order to pass vector parameters correctly to Model.
- * I wanted to make it independend from the order the images are passed on
+ * I wanted to make it independent from the order the images are passed on
  */
 for(ParameterMapType::const_iterator pos = this->m_ParameterImageMap.begin(); pos != this->m_ParameterImageMap.end(); ++pos)
 {

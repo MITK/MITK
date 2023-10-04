@@ -107,7 +107,7 @@ protected:
 
   void PrepareDoseNode(mitk::DataNode* doseNode) const;
 
-  /** Update the transfer funtion property for the color wash*/
+  /** Update the transfer function property for the color wash*/
   void UpdateColorWashTransferFunction();
 
   /** Method updates the list widget according to the current free iso values.*/
@@ -119,12 +119,12 @@ protected:
   /** Update the member widgets according to the information stored in the application preferences*/
   void UpdateByPreferences();
 
-  /**helper function that iterates throug all data nodes and sets there iso level set property
+  /**helper function that iterates through all data nodes and sets there iso level set property
   according to the selected preset.
   @TODO: should be moved outside the class, to be available for other classes at well.*/
   void ActualizeIsoLevelsForAllDoseDataNodes();
 
-  /**helper function that iterates throug all data nodes and sets there reference dose value
+  /**helper function that iterates through all data nodes and sets there reference dose value
   according to the preference.
   @TODO: should be moved outside the class, to be available for other classes at well.*/
   void ActualizeReferenceDoseForAllDoseDataNodes();

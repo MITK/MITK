@@ -95,7 +95,7 @@ private:
 
   /**
    * Called when a concrete part is about to be destroyed. This is called
-   * BEFORE disposal happens, so the part should still be accessable from the
+   * BEFORE disposal happens, so the part should still be accessible from the
    * part reference.
    *
    * @param ref

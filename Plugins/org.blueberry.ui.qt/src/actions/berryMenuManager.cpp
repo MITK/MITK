@@ -626,7 +626,7 @@ void MenuManager::Update(bool force, bool recursive)
   }
   else
   {
-    // I am not dirty. Check if I must recursivly walk down the hierarchy.
+    // I am not dirty. Check if I must recursively walk down the hierarchy.
     if (recursive)
     {
       foreach (IContributionItem::Pointer ci, this->GetItems())

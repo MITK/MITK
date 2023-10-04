@@ -20,7 +20,7 @@ namespace berry {
  * <p>
  * This class may be instantiated.
  * </p><p>
- * This class is not indended to be subclassed.
+ * This class is not intended to be subclassed.
  */
 class RegistryTimestamp
 {

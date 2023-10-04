@@ -288,7 +288,7 @@ void QmitkXnatConnectionPreferencePage::TestConnection()
   catch (const ctkException& e)
   {
     m_Controls.xnatTestConnectionLabel->setStyleSheet("color: red");
-    m_Controls.xnatTestConnectionLabel->setText("Connecting failed:\nInvalid Server Adress\nPossibly due to missing OpenSSL for HTTPS connections");
+    m_Controls.xnatTestConnectionLabel->setText("Connecting failed:\nInvalid Server Address\nPossibly due to missing OpenSSL for HTTPS connections");
     MITK_INFO << e.message().toStdString();
     mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();
   }

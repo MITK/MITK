@@ -104,7 +104,7 @@ private:
 
   /**
   * checks if appropriated nodes are selected in the data manager. If nodes are selected,
-  * they are stored m_MovingData and m_TargetData. It also sets the info lables accordingly.
+  * they are stored m_MovingData and m_TargetData. It also sets the info labels accordingly.
   * @return True: All inputs are set and valid (images). False: At least one input is not set
   * or invalid */
   bool CheckInputs();
@@ -120,7 +120,7 @@ private:
   void ConfigureProgressInfos();
 
   /**
-  Configure the node selectors predicates and informations according to the selected algorithm.
+  Configure the node selectors predicates and information according to the selected algorithm.
   */
   void ConfigureNodeSelectors();
 

@@ -120,7 +120,7 @@ void QmitkScreenshotMaker::MultichannelScreenshot(mitk::VtkPropRenderer* rendere
     mitk::PixelType chPixelType = image->GetImageDescriptor()->GetChannelTypeById(0);
     if (image->GetDimension() == 4)
     {
-      MITK_INFO << "LOOPING THROUGH FOURTH DIMESNION IS NOT IMPLEMENTED";
+      MITK_INFO << "LOOPING THROUGH FOURTH DIMENSION IS NOT IMPLEMENTED";
     }
     else if (chPixelType.GetNumberOfComponents()>1)
     {

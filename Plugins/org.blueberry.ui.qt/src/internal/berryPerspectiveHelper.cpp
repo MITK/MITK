@@ -311,7 +311,7 @@ void PerspectiveHelper::AddPart(LayoutPart::Pointer part)
   }
 
   // If there is no placeholder do a simple add. Otherwise, replace the
-  // placeholder if its not a pattern matching placholder
+  // placeholder if its not a pattern matching placeholder
   if (placeholder == 0)
   {
     part->Reparent(mainLayout->GetParent());

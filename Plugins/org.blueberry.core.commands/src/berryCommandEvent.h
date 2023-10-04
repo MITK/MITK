@@ -62,7 +62,7 @@ public:
    *            <code>true</code> iff the help context identifier changed;
    *            <code>false</code> otherwise.
    * @param enabledChanged
-   *            <code>true</code> iff the comand enablement changed;
+   *            <code>true</code> iff the command enablement changed;
    *            <code>false</code> otherwise.
    * @since 3.3
    */
@@ -120,7 +120,7 @@ public:
   /**
    * Return whether the enable property changed.
    *
-   * @return <code>true</code> iff the comand enablement changed
+   * @return <code>true</code> iff the command enablement changed
    * @since 3.3
    */
   bool IsEnabledChanged() const;

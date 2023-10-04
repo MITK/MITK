@@ -173,7 +173,7 @@
             <bool>false</bool>
            </property>
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Applys the registration by refining the geometry of the data and not by resampling it. This option can only be selected if the chosen registration is 3D and can be decomposed in a rotation matrix and offset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Applies the registration by refining the geometry of the data and not by resampling it. This option can only be selected if the chosen registration is 3D and can be decomposed in a rotation matrix and offset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>Refine geometry</string>
@@ -322,7 +322,7 @@
           </font>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allows that pixels may not be registred because they are outside of the field of view of the used registration. The location in the correlated input image pixel(s) are therefore unkown. The pixels will be marked witrh the given error value.&lt;/p&gt;&lt;p&gt;If unchecked the mapping will be aborted in a case of unregistered pixels.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allows that pixels may not be registered because they are outside of the field of view of the used registration. The location in the correlated input image pixel(s) are therefore unknown. The pixels will be marked with the given error value.&lt;/p&gt;&lt;p&gt;If unchecked the mapping will be aborted in a case of unregistered pixels.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="title">
           <string>Allow unregistered pixels</string>
@@ -359,7 +359,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Value of pixels that cannot be registered because of an unsufficient field of view of the selected registration instance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Value of pixels that cannot be registered because of an insufficient field of view of the selected registration instance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="minimum">
              <number>-5000</number>

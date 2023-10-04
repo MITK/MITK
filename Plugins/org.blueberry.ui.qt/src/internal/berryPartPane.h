@@ -306,7 +306,7 @@ public:
     public: SmartPointer<WorkbenchPage> GetPage();
 
     /**
-     * Add the Left,Right,Up,Botton menu items to the Size menu.
+     * Add the Left,Right,Up,Bottom menu items to the Size menu.
      */
 //    protected: void addSizeItems(Menu sizeMenu) {
 //        Sashes sashes = findSashes();

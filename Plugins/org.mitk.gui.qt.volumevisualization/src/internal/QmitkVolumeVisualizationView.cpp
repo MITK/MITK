@@ -129,7 +129,7 @@ void QmitkVolumeVisualizationView::OnMitkInternalPreset(int mode)
     if (--mode == -1)
       return;
 
-    // -- Creat new TransferFunction
+    // -- Create new TransferFunction
     mitk::TransferFunctionInitializer::Pointer tfInit = mitk::TransferFunctionInitializer::New(transferFuncProp->GetValue());
     tfInit->SetTransferFunctionMode(mode);
     RequestRenderWindowUpdate();

@@ -842,7 +842,7 @@ bool EditorRegistry::LoadAssociations()
 
 QString EditorRegistry::MappingKeyFor(const QString& type)
 {
-  // keep everyting lower case for case-sensitive platforms
+  // keep everything lower case for case-sensitive platforms
   return type.toLower();
 }
 

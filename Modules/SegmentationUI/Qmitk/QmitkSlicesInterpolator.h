@@ -326,7 +326,7 @@ protected:
     and calls Interpolate to further process this PlaneGeometry into an interpolation.
 
     \param e is a actually a mitk::SliceNavigationController::GeometrySliceEvent, sent by a SliceNavigationController
-    \param slicer the SliceNavigationController
+    \param sliceNavigationController the SliceNavigationController
         */
   bool TranslateAndInterpolateChangedSlice(const itk::EventObject &e,
                                            mitk::SliceNavigationController *sliceNavigationController);

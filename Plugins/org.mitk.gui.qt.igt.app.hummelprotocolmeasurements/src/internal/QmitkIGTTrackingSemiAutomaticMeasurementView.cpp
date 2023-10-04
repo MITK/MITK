@@ -173,7 +173,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnLoadMeasurementStorage()
   m_MeasurementStorage = ReadStorage(filename.toStdString());
 
   //update label
-  Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to seperate filename from path
+  Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to separate filename from path
   QString toolLabel = QString("Tool Storage: ") + QString::number(m_MeasurementStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
   m_Controls->m_MeasurementToolStorageLabel->setText(toolLabel);
 
@@ -194,7 +194,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnLoadReferenceStorage()
   m_ReferenceStorage = ReadStorage(filename.toStdString());
 
   //update label
-  Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to seperate filename from path
+  Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to separate filename from path
   QString toolLabel = QString("Tool Storage: ") + QString::number(m_ReferenceStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
   m_Controls->m_ReferenceToolStorageLabel->setText(toolLabel);
 }
@@ -209,7 +209,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnStartTracking()
   }
   else if (m_ReferenceStorage.IsNull() && m_Controls->m_UseReferenceTrackingSystem->isChecked())
   {
-    MessageBox("Error: No refernce tools loaded yet!");
+    MessageBox("Error: No reference tools loaded yet!");
     return;
   }
   else if (m_MeasurementStorage->GetToolCount() == 0)

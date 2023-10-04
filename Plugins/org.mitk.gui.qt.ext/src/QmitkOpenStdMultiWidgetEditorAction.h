@@ -14,9 +14,9 @@ found in the LICENSE file.
 #define QmitkOpenStdMultiWidgetEditorAction_h
 
 #ifdef __MINGW32__
-// We need to inlclude winbase.h here in order to declare
+// We need to include winbase.h here in order to declare
 // atomic intrinsics like InterlockedIncrement correctly.
-// Otherwhise, they would be declared wrong within qatomic_windows.h .
+// Otherwise, they would be declared wrong within qatomic_windows.h .
 #include <windows.h>
 #endif
 

@@ -81,7 +81,7 @@ struct BERRY_UI_QT IIntroManager
    *
    * @param part the intro part
    * @return <code>true</code> if the part in its partially
-   * visible standy mode, and <code>false</code> if in its fully visible state.
+   * visible standby mode, and <code>false</code> if in its fully visible state.
    * <code>false</code> is returned if part is <code>null</code> or it is not
    * the intro part returned by {@link #GetIntro}.
    */
@@ -100,7 +100,7 @@ struct BERRY_UI_QT IIntroManager
    *
    * @param part the intro part, or <code>null</code>
    * @param standby <code>true</code> to put the part in its partially
-   * visible standy mode, and <code>false</code> to make it fully visible.
+   * visible standby mode, and <code>false</code> to make it fully visible.
    */
   virtual void SetIntroStandby(IIntroPart::Pointer part, bool standby) = 0;
 
@@ -112,7 +112,7 @@ struct BERRY_UI_QT IIntroManager
    * @param preferredWindow the preferred workbench window, or
    * <code>null</code> to indicate the currently active workbench window
    * @param standby <code>true</code> to put the intro part in its partially
-   * visible standy mode, and <code>false</code> to make it fully visible
+   * visible standby mode, and <code>false</code> to make it fully visible
    * @return the newly-created or existing intro part, or <code>null</code>
    * if no intro part is available or if <code>preferredWindow</code> is
    * <code>null</code> and there is no currently active workbench window

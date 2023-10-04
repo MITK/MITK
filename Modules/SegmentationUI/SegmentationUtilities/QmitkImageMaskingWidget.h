@@ -47,7 +47,7 @@ public:
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
   explicit QmitkImageMaskingWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
 
-  /** @brief Defaul destructor. */
+  /** @brief Default destructor. */
   ~QmitkImageMaskingWidget() override;
 
 private slots:
@@ -66,7 +66,7 @@ private:
   /** @brief Check if selections is valid. */
   void SelectionControl( unsigned int index, const mitk::DataNode* selection);
 
-  /** @brief Enable buttons if data selction is valid. */
+  /** @brief Enable buttons if data selection is valid. */
   void EnableButtons(bool enable = true);
 
   /** @brief Mask an image with a given binary mask. Note that the input image and the mask image must be of the same size. */

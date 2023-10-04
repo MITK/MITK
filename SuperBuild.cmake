@@ -75,10 +75,10 @@ foreach(proj ${nice_external_projects})
   endif()
 endforeach()
 
-set(EXTERNAL_BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Path to Boost directory")
-mark_as_advanced(EXTERNAL_BOOST_ROOT)
-if(EXTERNAL_BOOST_ROOT)
-  set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
+set(EXTERNAL_Boost_ROOT "${Boost_ROOT}" CACHE PATH "Path to Boost directory")
+mark_as_advanced(EXTERNAL_Boost_ROOT)
+if(EXTERNAL_Boost_ROOT)
+  set(Boost_ROOT ${EXTERNAL_Boost_ROOT})
 endif()
 
 if(BUILD_TESTING)
@@ -451,7 +451,7 @@ ExternalProject_Add(${proj}
     -DMITK_EXTERNAL_PROJECT_PREFIX:PATH=${ep_prefix}
     -DCppMicroServices_DIR:PATH=${CppMicroServices_DIR}
     -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=${DCMTK_CMAKE_DEBUG_POSTFIX}
-    -DBOOST_ROOT:PATH=${BOOST_ROOT}
+    -DBoost_ROOT:PATH=${Boost_ROOT}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
     -DQt5_DIR:PATH=${Qt5_DIR}

@@ -602,7 +602,7 @@ private: bool SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Pointe
     public: void DescribeLayout(QString& buf) const;
 
     /**
-     * Sanity-checks the LayoutParts in this perspective. Throws an Assertation exception
+     * Sanity-checks the LayoutParts in this perspective. Throws an Assertion exception
      * if an object's internal state is invalid.
      */
     public: void TestInvariants();

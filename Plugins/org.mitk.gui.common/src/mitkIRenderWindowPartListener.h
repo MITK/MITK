@@ -25,7 +25,7 @@ namespace mitk {
    * \brief Interface for berry::IViewPart implementations to be notified about mitk::IRenderWindowPart lifecycle changes.
    *
    * This interface is intended to be implemented by subclasses of berry::IWorkbenchPart. If implemented,
-   * the interface methods are called automatically if a Workbench part which implementes mitk::IRenderWindowPart
+   * the interface methods are called automatically if a Workbench part which implements mitk::IRenderWindowPart
    * is activated or deactivated.
    *
    * The notion of activated and deactivated is slightly different from the usual Workbench part lifecycle.

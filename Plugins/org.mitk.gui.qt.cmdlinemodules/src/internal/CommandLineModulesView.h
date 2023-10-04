@@ -75,7 +75,7 @@ protected Q_SLOTS:
   void OnRunButtonPressed();
 
   /**
-   * \brief Alerts the user of any errors comming out of the directory watcher.
+   * \brief Alerts the user of any errors coming out of the directory watcher.
    */
   void OnDirectoryWatcherErrorsDetected(const QString&);
 
@@ -83,7 +83,7 @@ protected:
 
   /**
    * \brief Called by framework to set the focus on the right widget
-   * when this view has focus, so currently, thats the ctkMenuCombo box.
+   * when this view has focus, so currently, that's the ctkMenuCombo box.
    */
   void SetFocus() override;
 
@@ -211,7 +211,7 @@ private:
   QStringList m_ModulePaths;
 
   /**
-   * \brief We store the validation mode, accessisble via user preferences.
+   * \brief We store the validation mode, accessible via user preferences.
    */
   ctkCmdLineModuleManager::ValidationMode m_ValidationMode;
 

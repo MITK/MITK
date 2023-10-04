@@ -54,7 +54,7 @@ public:
    * Returns a shell provider that always returns the given shell.
    *
    * @param shell the shell which should always be returned,
-   *        or null if GetShell() should alway return null
+   *        or null if GetShell() should always return null
    */
   SameShellProvider(Shell::Pointer shell);
 

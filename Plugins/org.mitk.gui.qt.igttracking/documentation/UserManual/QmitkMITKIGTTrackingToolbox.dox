@@ -34,7 +34,7 @@ A general Workflow with the Tracking Toolbox may be:
 
 The tracking device can be specified in the tracking device configuration section located in the upper area of the tracking tab. As shown in the screenshot below, you choose your tracking device in the drop down menu.
 
-If you use a real tracking system, you might need to set some parameters like the serial port for Aurora or Polaris or the host name for your OpenIGTLink connection. Most implemented tracking device include an option to test your conection. Therefore you just need to press the button "test connection". The results are displayed in the small black box on the right.
+If you use a real tracking system, you might need to set some parameters like the serial port for Aurora or Polaris or the host name for your OpenIGTLink connection. Most implemented tracking device include an option to test your connection. Therefore you just need to press the button "test connection". The results are displayed in the small black box on the right.
 
 <b>Tutorial:</b> For a first introduction, please select the virtual tracking device in the drop-down-menu. You should see an option to add some jittering to the simulated data.
 
@@ -67,7 +67,7 @@ In the Tracking Device Configuration widget, a button "Auto Detection" appears. 
 \section QmitkMITKIGTTrackingToolboxStartTracking Start/stop tracking
 To start tracking, you first need to connect to your tracking device ("connect" button). If your tools or tool storage don't match the tracking device or if no connection can be established, this might give an error message here.
 \imageMacro{QmitkIGTTracking_TrackingControl.png,"Tracking Control to start tracking.", 9.00}
-If connected succesfully, the start tracking button is enabled. As soon as you clicked this button, the tool information and tools will be highlighted red or green (un-/successful tracking) and in case of successful tracking, it's position will be updated and the tools are visualized in the 3D view of MITK.
+If connected successfully, the start tracking button is enabled. As soon as you clicked this button, the tool information and tools will be highlighted red or green (un-/successful tracking) and in case of successful tracking, it's position will be updated and the tools are visualized in the 3D view of MITK.
 Note that options may not be changed after connecting the tracking device.
 
 You can start, freeze, unfreeze and stop the tracking as long as you are connected. If you want to finish your tracking, please stop an disconnect your tracking device.
@@ -76,12 +76,12 @@ You can start, freeze, unfreeze and stop the tracking as long as you are connect
 
 \section QmitkMITKIGTTrackingOptions Options
 
-In the options tab you can enable or disable the visualization of the tracking volume and of the tool quaternions. If enabled, the tool quaternions are shown in the tool information. You can also define the update rate of the tracking data. The update rate should not be set higher than the update rate of the tracking system. Other options might be available here depending on the newest developement within MITK-IGT.
+In the options tab you can enable or disable the visualization of the tracking volume and of the tool quaternions. If enabled, the tool quaternions are shown in the tool information. You can also define the update rate of the tracking data. The update rate should not be set higher than the update rate of the tracking system. Other options might be available here depending on the newest development within MITK-IGT.
 \imageMacro{QmitkIGTTracking_Options.png,"Recorded logging data.", 9.00}
 
 \section QmitkMITKIGTTrackingToolboxLogging Logging features
 The logging feature of the Tracking Toolbox supports logging in XML or CSV format.
-If your device is tracking, you are able to log the tracking data by using the logging tab. You first must define a file name. You can then choose whether you want comma seperated (csv) or xml format. Press "Start Logging" to start logging. You can also limit the number of logged frames, which will cause the logging to stop automatically after the given number.
+If your device is tracking, you are able to log the tracking data by using the logging tab. You first must define a file name. You can then choose whether you want comma separated (csv) or xml format. Press "Start Logging" to start logging. You can also limit the number of logged frames, which will cause the logging to stop automatically after the given number.
 
 \imageMacro{QmitkIGTTracking_LoggingWidget.png,"Tracking options.", 9.00}
 

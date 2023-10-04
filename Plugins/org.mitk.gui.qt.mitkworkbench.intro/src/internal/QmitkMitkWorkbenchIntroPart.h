@@ -32,7 +32,7 @@ found in the LICENSE file.
  * html start page is styled by an external css stylesheet. The required resources as well as the html pages are integrated
  * into the QtResource system. The QT resource system allows the storage of files like html pages, css pages, jpgs etc.
  * as binaries within the executable.
- * This minimizes the risk of loosing resource files as well as the risk of getting files deleted. In order to use the Qt
+ * This minimizes the risk of losing resource files as well as the risk of getting files deleted. In order to use the Qt
  * resource system the resource files have to be added to the associated qrt resource file list.
  *
  * The foundation is set to design more complex html pages. The Q::WebPage gives options to set a

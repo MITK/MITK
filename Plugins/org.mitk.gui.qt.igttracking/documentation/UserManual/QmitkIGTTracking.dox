@@ -9,7 +9,7 @@ As part of the tutorial, it is recommended to get familiar with each of the foll
 
 <ul>
 <li> \subpage org_mitk_views_igttrackingtoolbox : Allows for connecting a tracking system and logging/recording the tracked data.
-<li> \subpage org_mitk_views_igtnavigationtoolmanager : This view offers functionality to manage tool storages. Each tool storage holds a preconfigured tool collection. Once saved you can load a tool storage in the Tracking Toolbox and don't need to add every tool seperately.
+<li> \subpage org_mitk_views_igtnavigationtoolmanager : This view offers functionality to manage tool storages. Each tool storage holds a preconfigured tool collection. Once saved you can load a tool storage in the Tracking Toolbox and don't need to add every tool separately.
 <li> \subpage org_mitk_views_navigationdataplayer : Plays navigation data which was recorded with the Tracking Toolbox for example.
 <li> \subpage org_mitk_views_calibrationtoolmanager Calibration Tool Manager. This view offers functionality to calibrate navigation tools.
 <li> \subpage org_mitk_views_igtregistrationview : The IGTFiducialRegistration view allows the recording of real world landmarks and corresponding landmarks on a virtual object.

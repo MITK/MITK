@@ -37,7 +37,7 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
     void onIntro();
 
     /**
-     * @brief This slot is called if the user klicks the menu item "help->context help" or presses F1.
+     * @brief This slot is called if the user clicks the menu item "help->context help" or presses F1.
      * The help page is shown in a workbench editor.
      */
     void onHelp();

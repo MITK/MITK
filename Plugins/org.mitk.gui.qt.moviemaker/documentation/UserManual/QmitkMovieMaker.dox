@@ -23,7 +23,7 @@ The Movie Maker View uses the external FFmpeg command-line application to write 
 To create a movie, add an animation to the timeline by clicking the "Add animation" button.
 You can choose between the available types of animations, e.g., Orbit or Slice.
 
-The bottons sourroundng the timeline allow you to arrange, remove, or add further animations to your movie.
+The buttons surroundng the timeline allow you to arrange, remove, or add further animations to your movie.
 
 Each animation can be set to either begin with the previous animation, i.e., run in parallel, or to start after the previous animation, i.e., run sequentially.
 In combination with delays, rather complex animation arrangements are possible.
@@ -40,7 +40,7 @@ You can switch to the widespread *.mp4 file format using the non-free H.264 vide
 \subsection org_mitk_views_moviemakerOrbitUsage Orbit Animation
 
 The Orbit animation rotates the camera in the 3D window around the scene.
-Align the camera directly in the 3D window and enter the number of degrees for the orbitting.
+Align the camera directly in the 3D window and enter the number of degrees for the orbiting.
 If you are planning to have a specific view in the middle of your movie you can play the movie and pause it at the specific frame of interest.
 Adjust the camera in the 3D window and restart the animation.
 

@@ -21,7 +21,7 @@ namespace berry {
  * Interface for asking an object to store its state in a memento.
  * <p>
  * This interface is typically included in interfaces where
- * persistance is required.
+ * persistence is required.
  * </p><p>
  * When the workbench is shutdown objects which implement this interface
  * will be persisted.  At this time the <code>GetFactoryId</code> method

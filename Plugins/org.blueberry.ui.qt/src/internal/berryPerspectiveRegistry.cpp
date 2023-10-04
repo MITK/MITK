@@ -58,7 +58,7 @@ public:
     }
     else if (event.GetProperty() == PreferenceConstants::PERSPECTIVES)
     {
-      /* The list of perpsectives is being changed, merge */
+      /* The list of perspectives is being changed, merge */
       UpdatePreferenceList(event.GetSource());
     }
   }
@@ -69,7 +69,7 @@ public:
     if (event.GetNewValue().empty())
     {
       /*
-       * Perpsective is being removed; if the user has deleted or
+       * Perspective is being removed; if the user has deleted or
        * reverted a custom perspective, let the change pass
        * through. Otherwise, restore the custom perspective entry
        */

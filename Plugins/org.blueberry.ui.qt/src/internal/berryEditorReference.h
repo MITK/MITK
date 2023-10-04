@@ -78,7 +78,7 @@ private:
    * @param desc
    *            the descriptor from the declaration
    * @param editorState
-   *            propogate state from another editor. Can be <code>null</code>.
+   *            propagate state from another editor. Can be <code>null</code>.
    */
 public:
 

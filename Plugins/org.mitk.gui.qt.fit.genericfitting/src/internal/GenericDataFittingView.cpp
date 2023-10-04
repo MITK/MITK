@@ -79,7 +79,7 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
   connect(m_Controls.radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
 
-  //Gerneric setting
+  //Generic setting
   m_Controls.groupGeneric->hide();
   m_Controls.labelFormulaInfo->hide();
   connect(m_Controls.editFormula, SIGNAL(textChanged(const QString&)), this,
@@ -437,7 +437,7 @@ bool GenericDataFittingView::CheckModelSettings() const
 {
   bool ok = true;
 
-  //check wether any model is set at all. Otherwise exit with false
+  //check whether any model is set at all. Otherwise exit with false
   if (m_selectedModelFactory.IsNotNull())
   {
     bool isGenericFactory = dynamic_cast<mitk::GenericParamModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;

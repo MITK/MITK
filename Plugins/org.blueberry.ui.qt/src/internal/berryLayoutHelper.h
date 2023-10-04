@@ -48,7 +48,7 @@ public:
      * layout is the currently active perspective in its window, then activate
      * the views immediately.
      * <li> if the identifier becomes enabled and the perspective of the page
-     * layout is not the currently active perspecitve in its window, then add an
+     * layout is not the currently active perspective in its window, then add an
      * <code>IPerspectiveListener</code> to the window and activate the views
      * when the perspective becomes active.
      *

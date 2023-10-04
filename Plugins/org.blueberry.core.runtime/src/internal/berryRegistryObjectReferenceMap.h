@@ -32,7 +32,7 @@ public:
     HARD = 0,
 
     /**
-     *  Constant indiciating that soft references should be used.
+     *  Constant indicating that soft references should be used.
      */
     SOFT = 1
   };

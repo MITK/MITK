@@ -52,7 +52,7 @@ protected:
 
   // it is assumed that int has 32 bits (bits #0 to #31);
   // bits #0 - #29 are the offset (limited to about 1Gb)
-  // bit #30 - persistance flag
+  // bit #30 - persistence flag
   // bit #31 - registry object has no extra data offset
   // the bit#31 is a sign bit; bit#30 is the highest mantissa bit
   static const int EMPTY_MASK; // = 0x80000000; // only taking bit #31

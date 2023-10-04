@@ -306,7 +306,7 @@ private: int GetOpenMode() const;
   /* package */public: void SetID(const QString& anID);
 
   /**
-   * The Image to use to repesent this editor
+   * The Image to use to represent this editor
    */
   /* package */
   //    public : void SetImageDescriptor(ImageDescriptor desc) {

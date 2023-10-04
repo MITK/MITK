@@ -154,7 +154,7 @@ InternalJob::Pointer WorkerPool::StartJob(Worker* worker)
     {
       //if this job has a rule, then we are essentially acquiring a lock
       //if ((job.getRule() != 0) && !(job instanceof ThreadJob)) {
-      // //don't need to re-aquire locks because it was not recorded in the graph
+      // //don't need to re-acquire locks because it was not recorded in the graph
       // //that this thread waited to get this rule
       //  manager.getLockManager().addLockThread(Thread.currentThread(), job.getRule());
       //        }

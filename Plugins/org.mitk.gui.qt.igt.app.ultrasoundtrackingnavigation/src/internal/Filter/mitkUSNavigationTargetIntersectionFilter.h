@@ -51,12 +51,12 @@ public:
   itkGetMacro(IsIntersecting, bool);
 
   /**
-   * \return the position where the intersection occured, the result is not defined if no intersection occured
+   * \return the position where the intersection occurred, the result is not defined if no intersection occurred
    */
   mitk::Point3D GetIntersectionPoint();
 
   /**
-   * \return id of the nearest vertex of the target to the interseciont, the result is not defined if no intersection occured
+   * \return id of the nearest vertex of the target to the interseciont, the result is not defined if no intersection occurred
    */
   int GetIntersectionNearestSurfacePointId();
 

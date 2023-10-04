@@ -40,7 +40,7 @@
    <item row="0" column="0" colspan="3">
     <widget class="QCheckBox" name="m_EnableFlexibleZooming">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If activated, zooming and panning is limited to a certain space arround each image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If activated, zooming and panning is limited to a certain space around each image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="layoutDirection">
       <enum>Qt::LeftToRight</enum>

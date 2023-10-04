@@ -25,7 +25,7 @@ struct IContributionItem;
 
 /**
  * This interface is used by instances of <code>IContributionItem</code>
- * to determine if the values for certain properties have been overriden
+ * to determine if the values for certain properties have been overridden
  * by their manager.
  * <p>
  * This interface is internal to the framework; it should not be implemented outside
@@ -55,7 +55,7 @@ struct BERRY_UI_QT IContributionManagerOverrides : virtual Object
   virtual int GetEnabled(const IContributionItem* item) const = 0;
 
   /**
-   * Visiblity override.
+   * Visibility override.
    *
    * @param item the contribution item in question
    * @return <ul>

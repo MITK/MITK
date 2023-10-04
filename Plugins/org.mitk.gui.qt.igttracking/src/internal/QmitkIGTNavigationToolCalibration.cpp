@@ -314,7 +314,7 @@ void QmitkIGTNavigationToolCalibration::OnComputePivot()
   {
     mitk::NavigationData::Pointer markerTransformationTrackingCoordinates = m_PivotPoses.at(0);
 
-    //Get computed pivot transfromation in tool coordinates
+    //Get computed pivot transformation in tool coordinates
 
     mitk::NavigationData::Pointer ToolTipToTool = mitk::NavigationData::New();
     ToolTipToTool->SetPosition(myPivotCalibration->GetResultPivotPoint());
@@ -454,7 +454,7 @@ void QmitkIGTNavigationToolCalibration::OnStartManualToolTipCalibration()
 void QmitkIGTNavigationToolCalibration::OnManualEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)
 {
   //This function is called, when the toolTipEdit view is closed.
-  //if user pressed cancle, nullptr is returned. Do nothing. Else, set values.
+  //if user pressed cancel, nullptr is returned. Do nothing. Else, set values.
   if (toolTip)
   {
     mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(toolTip);//Convert to Navigation data for simple transversion to quaternion
@@ -497,7 +497,7 @@ void QmitkIGTNavigationToolCalibration::OnCalibrateToolAxis()
   if (!m_ComputedToolTipTransformation)
   {
     MITK_ERROR << "Please compute tool tip first.";
-    QMessageBox::information(nullptr, "Error", "Please compute / specifiy tool tip first");
+    QMessageBox::information(nullptr, "Error", "Please compute / specify tool tip first");
     return;
   }
   if (!m_AxisCalibration_ToolToCalibrate || !m_AxisCalibration_NavDataCalibratingTool)
@@ -661,7 +661,7 @@ void QmitkIGTNavigationToolCalibration::UpdateOffsetCoordinates()
     {
       mitk::NavigationData::Pointer ToolTipTransform = mitk::NavigationData::New();
       ToolTipTransform->SetPosition(m_ResultOffsetVector);
-      mitk::NavigationData::Pointer ToolTipInTrackingCoordinates = mitk::NavigationData::New(); //maybe store as for better peformance...
+      mitk::NavigationData::Pointer ToolTipInTrackingCoordinates = mitk::NavigationData::New(); //maybe store as for better performance...
       ToolTipInTrackingCoordinates->Compose(m_NavigationDataSourceOfToolToCalibrate->GetOutput(m_IDToolToCalibrate));
       ToolTipInTrackingCoordinates->Compose(ToolTipTransform);
       m_ToolTipPointPreview->GetData()->GetGeometry()->SetIndexToWorldTransform(ToolTipInTrackingCoordinates->GetAffineTransform3D());

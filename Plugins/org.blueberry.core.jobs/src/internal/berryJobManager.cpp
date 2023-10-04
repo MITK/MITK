@@ -734,7 +734,7 @@ Job::Pointer JobManager::NextJob()
 //    return members;
 //  }
 
-// dummy validateRule implemenation
+// dummy validateRule implementation
 void JobManager::ValidateRule(ISchedulingRule::Pointer sptr_rule)
 {
   //null rule always valid

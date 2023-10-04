@@ -3,7 +3,7 @@
 
 <plugin>
   <extension-point id="org.blueberry.core.expressions.propertyTesters" name="Property Tester Extension-Point" schema="schema/propertyTesters.exsd"/>
-  <extension-point id="org.blueberry.core.expressions.definitions" name="Defintions Extension-Point" schema="schema/definitions.exsd"/>
+  <extension-point id="org.blueberry.core.expressions.definitions" name="Definitions Extension-Point" schema="schema/definitions.exsd"/>
   <extension-point id="org.blueberry.core.expressions.commonExpression" name="Common Expressions Extension-Point" schema="schema/expressionLanguage.exsd"/>
 
   <extension point="org.blueberry.core.expressions.propertyTesters">

@@ -27,8 +27,8 @@ class LayoutPartSash;
 /**
  * \ingroup org_blueberry_ui_internal
  *
- * Implementation of a tree where the node is allways a sash
- * and it allways has two chidren. If a children is removed
+ * Implementation of a tree where the node is always a sash
+ * and it always has two children. If a children is removed
  * the sash, ie the node, is removed as well and its other children
  * placed on its parent.
  */
@@ -140,7 +140,7 @@ public:
   static int Subtract(int a, int b);
 
   /**
-   * Adds two positive integers. Treates INF as positive infinity.
+   * Adds two positive integers. Treats INF as positive infinity.
    *
    * @param a a positive integer
    * @param b a positive integer
@@ -180,7 +180,7 @@ protected:
    * @see org.blueberry.ui.presentations.StackPresentation#getSizeFlags(boolean)
    *
    * @param b indicates whether the caller wants the flags for computing widths (=true) or heights (=false)
-   * @return a bitwise combiniation of flags with the same meaning as StackPresentation.getSizeFlags(boolean)
+   * @return a bitwise combination of flags with the same meaning as StackPresentation.getSizeFlags(boolean)
    */
   virtual int DoGetSizeFlags(bool width);
 

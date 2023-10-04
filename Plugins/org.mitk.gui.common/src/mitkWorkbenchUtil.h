@@ -47,7 +47,7 @@ namespace mitk {
       BRING_TO_FRONT = 0x00000001,
       // Activate an mitk::IRenderWindowPart part (implies bringing it to the front).
       ACTIVATE = 0x00000002,
-      // Create an mitk::IRenderWindowPart if none is alredy opened.
+      // Create an mitk::IRenderWindowPart if none is already opened.
       OPEN = 0x00000004
     };
 

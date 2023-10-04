@@ -150,7 +150,7 @@ private:
   QString GetAvailableAppsMsg() const;
 
   /*
-   * Returns the application extension for the specified applicaiton ID.
+   * Returns the application extension for the specified application ID.
    * A RuntimeException is thrown if the extension does not exist for the
    * given application ID.
    */

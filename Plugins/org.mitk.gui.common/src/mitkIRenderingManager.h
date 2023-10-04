@@ -70,7 +70,7 @@ struct IRenderingManager {
 
   /**
    * Initializes the windows to the default viewing direction
-   * (geomtry information is NOT changed).
+   * (geometry information is NOT changed).
    */
   virtual bool InitializeViews( RenderingManager::RequestType type = RenderingManager::REQUEST_UPDATE_ALL ) = 0;
 
@@ -84,7 +84,7 @@ struct IRenderingManager {
 
   /**
    * Initializes the specified window to the default viewing direction
-   * (geomtry information is NOT changed).
+   * (geometry information is NOT changed).
    */
   virtual bool InitializeView( vtkRenderWindow *renderWindow ) = 0;
 

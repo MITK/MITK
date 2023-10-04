@@ -45,7 +45,7 @@ struct BERRY_UI_QT WorkbenchConstants
   // Default view category.
   static const QString DEFAULT_CATEGORY_ID; // = PlatformUI.PLUGIN_ID;
 
-  // Persistance tags.
+  // Persistence tags.
   static const QString TRUE_VAL; // = "true";
 
   static const QString FALSE_VAL; // = "false";

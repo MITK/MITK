@@ -23,7 +23,7 @@ namespace berry {
  * \ingroup org_blueberry_ui_internal
  *
  * Implementation of a tree node. The node represents a
- * sash and it allways has two children.
+ * sash and it always has two children.
  */
 class LayoutTreeNode : public LayoutTree {
 
@@ -101,7 +101,7 @@ public:
 
     /**
      * Sets the elements in the array of sashes with the
-     * Left,Rigth,Top and Botton sashes. The elements
+     * Left,Right,Top and Bottom sashes. The elements
      * may be null depending whether there is a shash
      * beside the <code>part</code>
      */

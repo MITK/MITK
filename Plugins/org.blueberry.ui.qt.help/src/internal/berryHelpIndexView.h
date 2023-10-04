@@ -32,7 +32,7 @@ Q_SIGNALS:
   /**
    * This signal is emitted when an item is activated and its
    * associated \a link should be shown. To know where the link
-   * belongs to, the \a keyword is given as a second paremeter.
+   * belongs to, the \a keyword is given as a second parameter.
    */
   void linkActivated(const QUrl &link, const QString &keyword);
 

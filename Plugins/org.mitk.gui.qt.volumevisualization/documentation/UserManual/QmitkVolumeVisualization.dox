@@ -31,7 +31,7 @@ Volume Visualization imposes following restrictions on images:
 
 \subsection QVV_LODGPU Dropdown menu for the blend modes
 
-Two dropdown menu is located right next to the 'Volume rendering' checkbox. It allows you to select a blend mode (Composite, Maximim intensity, Minimum intensity, Average intensity, and Additive intensity).
+Two dropdown menu is located right next to the 'Volume rendering' checkbox. It allows you to select a blend mode (Composite, Maximum intensity, Minimum intensity, Average intensity, and Additive intensity).
 
 Blend modes define how the volume voxels, intersected by the rendering rays, are pooled. The 'Composite' mode specifies standard volume rendering,
 for which each voxel contributes equally with opacity and color. Other 'blend' modes visualize the voxel of the maximum or minimum intensity or average or add the intensities along the rendering ray.
@@ -101,7 +101,7 @@ All three function editors have in common following:
 <ul>
 <li> By left-clicking a new point is added.
 <li> By right-clicking a point is deleted.
-<li> By left-clicking and holding, an exisiting point can be dragged.
+<li> By left-clicking and holding, an existing point can be dragged.
 <li> By pressing arrow keys, the currently selected point is moved.
 <li> By pressing the 'DELETE' key, the currently selected point is deleted.
 <li> Between points the transferfunctions are linear interpolated.

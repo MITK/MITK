@@ -87,7 +87,7 @@ protected:
   virtual void OnCancelProcessing() {}
 
   /**
-   * \brief Method for acutally loading the settings.
+   * \brief Method for actually loading the settings.
    * This method has to be implemented by a concrete subclass.
    */
   virtual void OnLoadSettingsProcessing() = 0;

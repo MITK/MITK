@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 // mitk qt widgets module
 #include "QmitkAbstractMultiWidget.h"
-#include "QmitkLevelWindowWidget.h"
 #include "QmitkMultiWidgetLayoutManager.h"
 #include "QmitkRenderWindowWidget.h"
 

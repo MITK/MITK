@@ -12,8 +12,7 @@ found in the LICENSE file.
 #include "QmitkLevelWindowWidget.h"
 #include "QmitkSliderLevelWindowWidget.h"
 
-#include "ui_QmitkLevelWindowWidget.h"
-
+#include <ui_QmitkLevelWindowWidget.h>
 
 QmitkLevelWindowWidget::QmitkLevelWindowWidget(QWidget *parent, Qt::WindowFlags f)
   : QWidget(parent, f), ui(new Ui::QmitkLevelWindow)

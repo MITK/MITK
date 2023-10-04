@@ -42,8 +42,7 @@ protected:
   mitk::LevelWindowManager::Pointer m_Manager;
 
 private:
-
- //!< GUI controls of this plugin.
+  // GUI controls of this plugin
   Ui::QmitkLevelWindow* ui;
 
 };

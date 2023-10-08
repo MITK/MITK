@@ -2,7 +2,7 @@
 
 \page BlueBerryExampleExtensionPoint Extension Points
 
-\brief A minimal applictaion that definines an extension point and collects extensions.
+\brief A minimal application that defines an extension point and collects extensions.
 
 -# \subpage IntroductionExtensionPoints "Introduction"
 -# \subpage ExtensionPointDefinition "Extension Point Definition"

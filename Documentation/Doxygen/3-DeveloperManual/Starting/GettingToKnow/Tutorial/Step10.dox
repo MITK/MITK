@@ -84,7 +84,7 @@ Please see \ref DataInteractionPage as an introduction to the MITK interaction m
 
 This tutorial is structured as follows: The first section deals with config files, describing all the parameters of events and how to use them
 in a configuration file. In the second section the basics are described that are needed to write a state machine pattern. The last section
-deals with brining configuration, state machine pattern and code together and gives an exemplary implementation of a mitk::DataInteractor.
+deals with bringing configuration, state machine pattern and code together and gives an exemplary implementation of a mitk::DataInteractor.
 
 \section ConfigFileDescriptionSection How to create a Config-File
 
@@ -255,7 +255,7 @@ For example this state machine will switch from state A to state B when the StdM
 
 \subsection EventClassSection Event Class
 
-The event class description supports the polymorphism of the event classes. Therefore state machine patters should be written in the most
+The event class description supports the polymorphism of the event classes. Therefore state machine patterns should be written in the most
 general ways possible.
 So for a given class hierarchy like this:
 \dot

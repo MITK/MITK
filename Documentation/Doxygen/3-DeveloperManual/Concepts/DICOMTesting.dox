@@ -10,7 +10,7 @@ DICOMITKSeriesGDCMReader (formerly: DicomSeriesReader) brings DICOM and MITK as 
 into mitk::Images, optionally grouping slices to 3D+t images.
 
 Since there are so many possible sources for mistakes with any change to this loading process, testing the many
-assumptions implemented in DICOMITKSeriesGDCMReader is worthwhile. This document describes what and how theses kind of tests are implemented.
+assumptions implemented in DICOMITKSeriesGDCMReader is worthwhile. This document describes what and how these kind of tests are implemented.
 
 \section DICOMTesting_problem Problem description
 
@@ -19,7 +19,7 @@ in the way that DICOM and MITK represent images:
 
  - DICOM images
    + are mostly stored as one slice per file
-   + do not describe how they can be arraged into image stacks with orthogonal axis
+   + do not describe how they can be arranged into image stacks with orthogonal axis
    + sometimes they cannot be arranged in image stacks as described above (e.g. tilted gantry)
  - mitk::Image (at least its mature areas)
    + represents image stacks with orthogonal axis (nothing like a tilted gantry)
@@ -118,9 +118,9 @@ From test set \b TinyCTAbdomen (see description.txt in this directory for detail
  - 3D_and_T : load a small set of slices with multiple time-steps
  - diff_orientation : load a set of files containing two differently oriented image blocks; at least two images (110,111) have minor errors in small decimal digits
  - diff_orientation_gaps : load a set of files containing two differently oriented image blocks, each missing slices, so blocks must be split
- - diff_spacing : load a set of files containint two set of slices with different spacings
+ - diff_spacing : load a set of files containing two set of slices with different spacings
  - gap : load slices that cannot form a single 3D block, because single slices are missing
- - gaps : slices missing in differnt locations, so multiple splits needed
+ - gaps : slices missing in different locations, so multiple splits needed
  - unsorted_gaps : as before, just file names are unsorted
  - single_negative_spacing : from reported bug related to single MR images with misleading spacing information
  - tilted_gantry : slice origins do not align along first slice normal (happens with tilted gantries)

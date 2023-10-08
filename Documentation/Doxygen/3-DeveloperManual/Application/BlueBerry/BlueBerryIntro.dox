@@ -19,7 +19,7 @@ The BlueBerry developer reference is available here:
 
 \page BlueBerryWorkbench The Workbench: What are Views, Editors, Perspectives?
 
-BlueBerry makes use of the Eclipse UI guidlines which state some concepts on how to build up a GUI. The different objects of the platform UI shall be described here:
+BlueBerry makes use of the Eclipse UI guidelines which state some concepts on how to build up a GUI. The different objects of the platform UI shall be described here:
 
 \section Workbench Workbench
 \li root object of the platform UI

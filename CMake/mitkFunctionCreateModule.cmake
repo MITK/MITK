@@ -291,7 +291,7 @@ function(mitk_create_module)
     endif()
 
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src")
-      # Preprend the "src" directory to the cpp file list
+      # Prepend the "src" directory to the cpp file list
       set(_cpp_files ${CPP_FILES})
       set(CPP_FILES )
       foreach(_cpp_file ${_cpp_files})

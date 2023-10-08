@@ -848,7 +848,7 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
       string(TOUPPER "${_package}" _package_uc)
       if(NOT (${_package}_FOUND OR ${_package_uc}_FOUND))
         if(DEFINED _temp_EP_${_package}_dir)
-            set(${_package}_DIR ${_temp_EP_${_package}_dir} CACHE PATH "externaly set dir of the package ${_package}" FORCE)
+            set(${_package}_DIR ${_temp_EP_${_package}_dir} CACHE PATH "externally set dir of the package ${_package}" FORCE)
         endif(DEFINED _temp_EP_${_package}_dir)
 
         find_package(${_package} REQUIRED)
@@ -876,7 +876,7 @@ endif()
 if(MITK_USE_DCMQI)
   # Due to the preferred CONFIG mode in find_package calls above,
   # the DCMQIConfig.cmake file is read, which does not provide useful
-  # package information. We explictly need MODULE mode to find DCMQI.
+  # package information. We explicitly need MODULE mode to find DCMQI.
     # Help our FindDCMQI.cmake script find our super-build DCMQI
   set(DCMQI_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
   find_package(DCMQI REQUIRED)

@@ -29,7 +29,7 @@ The main classes of the MITK rendering process can be illustrated like this:
 \imageMacro{qVtkRenderingClassOverview.png,"Rendering in MITK",16}
 
 A render request to the vtkRenderWindow does not only update the VTK pipeline, but also the MITK pipeline. However, the mitk::RenderingManager still coordinates the rendering update behavior.
-Update requests should be sent to the RenderingManager, which then, if needed, will request an update of the overall vtkRenderWindow. The vtkRenderWindow then starts to call the Render() function of all vtkRenderers, which are associated to the vtkRenderWindow. Currently, MITK uses specific vtkRenderers (outside the standard MITK rendering pipeline) for purposes, like displaying a gradient background (mitk::GradientBackground), displaying video sources (QmitkVideoBackround and mitk::VideoSource), or displaying a (department) logo (mitk::ManufacturerLogo), etc..
+Update requests should be sent to the RenderingManager, which then, if needed, will request an update of the overall vtkRenderWindow. The vtkRenderWindow then starts to call the Render() function of all vtkRenderers, which are associated to the vtkRenderWindow. Currently, MITK uses specific vtkRenderers (outside the standard MITK rendering pipeline) for purposes, like displaying a gradient background (mitk::GradientBackground), displaying video sources (QmitkVideoBackground and mitk::VideoSource), or displaying a (department) logo (mitk::ManufacturerLogo), etc..
 Despite these specific renderers, a kind of "SceneRenderer" is member of each QmitkRenderWindow. This vtkRenderer is associated with the custom vtkMitkRenderProp and is responsible for the MITK rendering.
 
 The vtkRenderer calls four different functions in vtkMitkRenderProp, namely RenderOpaqueGeometry(), RenderTranslucentPolygonalGeometry(), RenderVolumetricGeometry() and RenderOverlay(). These function calls are forwarded to the mitk::VtkPropRenderer.
@@ -109,9 +109,9 @@ However, you need to derive from the respective classes.
 In the following we provide some programming hints for writing a Vtk-based mapper:
 
 \li include mitkLocalStorageHandler.h  and derive from class BaseLocalStorage as a nested class in your own mapper. The LocalStorage instance should
-contain all VTK ressources such as actors, textures, mappers, polydata etc.
+contain all VTK resources such as actors, textures, mappers, polydata etc.
 The LocalStorageHandler is responsible for providing a LocalStorage to a concrete mitk::Mapper subclass. Each RenderWindow / mitk::BaseRenderer is
-assigned its own LocalStorage instance so that all contained ressources (actors, shaders, textures, ...) are provided individually per window.
+assigned its own LocalStorage instance so that all contained resources (actors, shaders, textures, ...) are provided individually per window.
 
 \li GenerateDataForRenderer() should be reimplemented in order to generate the primitives that should be rendered. This method is called in each Mapper::Update() pass, thus,
 all primitives that are rendered are recomputed. Employ LocalStorage::IsGenerateDataRequired() to determine whether it is necessary to generate the primitives again. It is not

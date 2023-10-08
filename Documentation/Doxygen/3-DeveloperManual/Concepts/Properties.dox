@@ -7,7 +7,7 @@
 
 Properties belong to a datanode and contain information relevant to the handling of the node by MITK. They provide a place to store additional information which is not part of the actual data, and as such have no reason to be contained within the data/file itself, but might be needed for such things as rendering (e.g. transfer functions) or interaction (e.g. the name of the node).
 
-Propteries can be read and set:
+Properties can be read and set:
 
 \code
 //1: Read a property
@@ -138,7 +138,7 @@ GetOpacity( opacity, BaseRenderer );
 (The BaseRenderer is usually known inside a mapper).
 
 
-  <li> reslice interpolation - This property takes effect in swivel mode or crosshair rotaiton  only. The interpolation modes "Nearest", "Linear", and "Cubic" are available and  effect the pixel outcome along the rotated plane.
+  <li> reslice interpolation - This property takes effect in swivel mode or crosshair rotation only. The interpolation modes "Nearest", "Linear", and "Cubic" are available and  effect the pixel outcome along the rotated plane.
   <li> texture interpolation - This property toggles interpolation of the texture. If enabled, edges between image pixels are blurred. If disabled, edges remain sharp.
   <li> visible - toggle node/image/surface being rendered at all
 </ul>
@@ -147,12 +147,12 @@ GetOpacity( opacity, BaseRenderer );
 
 <ul>
   <li> back color - in 2D, color of the normals outside the surface
-  <li> back normal lenth (px) - in 2D, length of the normals in pixels 
+  <li> back normal length (px) - in 2D, length of the normals in pixels 
 (When decreasing it the color using the front color is shorter?)
   <li> color mode -  (From VTK) Control how the scalar data is mapped to colors. By default (ColorModeToDefault), unsigned char scalars are treated as colors, and NOT mapped through the lookup table, while everything else is. Setting ColorModeToMapScalars means that all scalar data will be mapped through the lookup table.
   <li> draw normals 2d -  in 2D, toggles the presence of normals
   <li> front color - in 2D, color of the normals inside the surface
-  <li> front normal lenth (px) - in 2D, length of the normals in pixels 
+  <li> front normal length (px) - in 2D, length of the normals in pixels 
 (When decreasing it the color using the back color is shorter?)
   <li> invert normals - in 2D, switch front/back normals
   <li> line width - in 2D, controls the thickness of the line where the surface

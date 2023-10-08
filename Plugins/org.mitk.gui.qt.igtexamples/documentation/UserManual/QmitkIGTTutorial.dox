@@ -45,7 +45,7 @@ Let's now have a deeper look at these functions.
 
 \snippet QmitkIGTTutorialView.cpp OnStart 1
 
-We first check in a try environment, if we should use an NDI tracking device or a virtual device. Let's start with NDI, we hardcode the parameters here and give out a warning. In your proper application, the parameters should be set via the gui aswell (see \ref org_mitk_views_igttrackingtoolbox ), but for simplicity, we just set hardcoded parameters here. If you want to try it with your own NDI device, you need to adapt these parameters here in the code:
+We first check in a try environment, if we should use an NDI tracking device or a virtual device. Let's start with NDI, we hardcode the parameters here and give out a warning. In your proper application, the parameters should be set via the gui as well (see \ref org_mitk_views_igttrackingtoolbox ), but for simplicity, we just set hardcoded parameters here. If you want to try it with your own NDI device, you need to adapt these parameters here in the code:
 
 \snippet QmitkIGTTutorialView.cpp OnStart 2
 

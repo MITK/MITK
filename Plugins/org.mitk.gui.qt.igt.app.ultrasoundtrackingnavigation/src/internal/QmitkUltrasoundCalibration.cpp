@@ -393,7 +393,7 @@ void QmitkUltrasoundCalibration::OnStartCalibrationProcess()
 
   m_CombinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
   m_CombinedModality->SetCalibration(mitk::AffineTransform3D::New()); // dummy calibration because without a calibration
-                                                                      // the comined modality was laggy (maybe a bug?)
+                                                                      // the combined modality was laggy (maybe a bug?)
   if (m_CombinedModality.IsNull())
   {
     return;

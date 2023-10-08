@@ -174,7 +174,7 @@ set(CMAKE_MODULE_PATH ${MITK_CMAKE_MODULE_PATH} ${CMAKE_MODULE_PATH})
 if(MITK_USE_DCMTK)
   # Due to the preferred CONFIG mode in find_package calls above,
   # the DCMTKConfig.cmake file is read, which does not provide useful
-  # package information. We explictly need MODULE mode to find DCMTK.
+  # package information. We explicitly need MODULE mode to find DCMTK.
   if(${_dcmtk_dir_orig} MATCHES "${MITK_EXTERNAL_PROJECT_PREFIX}.*")
     # Help our FindDCMTK.cmake script find our super-build DCMTK
     set(DCMTK_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
@@ -190,7 +190,7 @@ endif()
 if(MITK_USE_DCMQI)
   # Due to the preferred CONFIG mode in find_package calls above,
   # the DCMQIConfig.cmake file is read, which does not provide useful
-  # package information. We explictly need MODULE mode to find DCMQI.
+  # package information. We explicitly need MODULE mode to find DCMQI.
     # Help our FindDCMQI.cmake script find our super-build DCMQI
   set(DCMQI_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
   find_package(DCMQI REQUIRED)

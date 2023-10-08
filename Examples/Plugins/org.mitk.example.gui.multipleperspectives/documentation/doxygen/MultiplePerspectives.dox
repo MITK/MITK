@@ -18,7 +18,7 @@
   The perspective bar:
   \image html Perspectivebar.png
 
-  The icons of the perspectives are definded by the extension declaration in the plugin.xml
+  The icons of the perspectives are defined by the extension declaration in the plugin.xml
   of the example and lie in the resources directory of the plug-in:
   \include org.mitk.example.gui.multipleperspectives/plugin.xml
 

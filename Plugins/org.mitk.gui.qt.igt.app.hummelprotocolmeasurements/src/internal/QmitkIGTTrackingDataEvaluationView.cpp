@@ -220,7 +220,7 @@ void QmitkIGTTrackingDataEvaluationView::OnOrientationCalculation_CalcRef()
     for (unsigned int j = 0; j < myPlayer->GetNumberOfOutputs(); ++j)
       myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j));
 
-    //update pipline until number of samples is reached
+    //update pipeline until number of samples is reached
     for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); ++j)
       myEvaluationFilter->Update();
 
@@ -465,7 +465,7 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateData()
       return;
     }
 
-    //update pipline until number of samples is reached
+    //update pipeline until number of samples is reached
     for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); j++)
       myEvaluationFilter->Update();
 
@@ -511,7 +511,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGeneratePointSetsOfSinglePositions()
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
 
-    //update pipline until number of samlples is reached and store every single point
+    //update pipeline until number of samlples is reached and store every single point
     for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); j++)
     {
       myPlayer->Update();
@@ -551,7 +551,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGeneratePointSet()
     //connect pipeline
     for (unsigned int j = 0; j < myPlayer->GetNumberOfOutputs(); ++j) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
 
-    //update pipline until number of samlples is reached
+    //update pipeline until number of samlples is reached
     for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); ++j) { myEvaluationFilter->Update(); }
 
     //add mean position to point set
@@ -593,7 +593,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGenerateRotationLines()
     //connect pipeline
     for (unsigned int j = 0; j < myPlayer->GetNumberOfOutputs(); ++j) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
 
-    //update pipline until number of samlples is reached
+    //update pipeline until number of samlples is reached
     for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); ++j)
       myEvaluationFilter->Update();
 
@@ -928,7 +928,7 @@ std::vector<mitk::NavigationDataEvaluationFilter::Pointer> QmitkIGTTrackingDataE
     for (unsigned int j = 0; j < myPlayer->GetNumberOfOutputs(); ++j)
       myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j));
 
-    //update pipline until number of samlples is reached
+    //update pipeline until number of samlples is reached
     for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); ++j)
       myEvaluationFilter->Update();
 

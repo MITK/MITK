@@ -62,7 +62,7 @@ message("Using MITK version of GetPrerequisites.cmake")
 # exclude "system" prerequisites.  If <recurse> is set to 1 all
 # prerequisites will be found recursively, if set to 0 only direct
 # prerequisites are listed.  <exepath> is the path to the top level
-# executable used for @executable_path replacment on the Mac.  <dirs> is
+# executable used for @executable_path replacement on the Mac.  <dirs> is
 # a list of paths where libraries might be found: these paths are
 # searched first when a target without any path info is given.  Then
 # standard system locations are also searched: PATH, Framework
@@ -80,7 +80,7 @@ message("Using MITK version of GetPrerequisites.cmake")
 # direct prerequisites are listed.  <exclude_system> must be 0 or 1
 # indicating whether to include or exclude "system" prerequisites.  With
 # <verbose> set to 0 only the full path names of the prerequisites are
-# printed, set to 1 extra informatin will be displayed.
+# printed, set to 1 extra information will be displayed.
 #
 # ::
 #

@@ -97,7 +97,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
     /** @brief This slot tries to start tracking with the current device. If start tracking fails the user gets an error message and tracking stays off.*/
     void OnStartTracking();
 
-    /** @brief This slot stops tracking. If tracking is not strated it does nothing.*/
+    /** @brief This slot stops tracking. If tracking is not started it does nothing.*/
     void OnStopTracking();
 
     /** @brief This slot is called if the user wants to choose a file name for logging. A new windows to navigate through the file system and choose
@@ -125,7 +125,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
         devices don't support auto detection.*/
     void OnAutoDetectTools();
 
-    /** @brief Slot for tracking timer. The timer updates the IGT pipline and also the logging filter if logging is activated.*/
+    /** @brief Slot for tracking timer. The timer updates the IGT pipeline and also the logging filter if logging is activated.*/
     void UpdateRenderTrackingTimer();
     void UpdateLoggingTrackingTimer();
 
@@ -211,7 +211,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
    mitk::IGTLServer::Pointer m_IGTLServer;
    mitk::IGTLMessageProvider::Pointer m_IGTLMessageProvider;
 
-   /** @brief This timer updates the IGT pipline and also the logging filter if logging is activated.*/
+   /** @brief This timer updates the IGT pipeline and also the logging filter if logging is activated.*/
    QTimer* m_TrackingRenderTimer;
    QTimer* m_TrackingLoggingTimer;
    QTimer* m_TimeoutTimer;

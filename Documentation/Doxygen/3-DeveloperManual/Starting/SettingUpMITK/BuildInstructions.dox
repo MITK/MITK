@@ -27,7 +27,7 @@ You need:
   -# <a href="https://www.qt.io/">Qt</a> \minimumQt5Version if you plan to develop Qt-based
      applications
   -# If you are using <b>macOS</b> you need an XCode installation and the
-     Command Line Tools as it provides the neccessary compilers and SDKs
+     Command Line Tools as it provides the necessary compilers and SDKs
 
 To build MITK on Linux, install the following packages, e. g. with APT:
 

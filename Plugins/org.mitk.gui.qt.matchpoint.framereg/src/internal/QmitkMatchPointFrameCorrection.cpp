@@ -191,7 +191,7 @@ void QmitkMatchPointFrameCorrection::CreateQtPartControl(QWidget* parent)
   this->m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
   this->m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
 
-  this->m_Controls.imageNodeSelector->SetInvalidInfo("Select dymamic image.");
+  this->m_Controls.imageNodeSelector->SetInvalidInfo("Select dynamic image.");
   this->m_Controls.imageNodeSelector->SetPopUpTitel("Select dynamic image.");
   this->m_Controls.imageNodeSelector->SetPopUpHint("Select a dynamic image (time resolved) that should be frame corrected.");
   this->m_Controls.maskNodeSelector->SetInvalidInfo("Select target mask.");

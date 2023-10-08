@@ -195,9 +195,9 @@ void PointSetInteractionMultispectrum::PlotReflectance(mitk::PointSet::Pointer m
   //    ////////////////  Qwt window configuration  /////////////////////////////////////////////
   delete m_Plot;
   m_Plot = new QwtPlot();                             // create a new plot               //
-  m_Plot->setAxisAutoScale(QwtPlot::xBottom);         // automatical scale -x            //
-  m_Plot->setAxisAutoScale(QwtPlot::yLeft);           // automatical scale -y            //
-  m_Plot->setTitle("Multispectral Reflectance");     // set the plot title              //
+  m_Plot->setAxisAutoScale(QwtPlot::xBottom);         // automatically scale -x          //
+  m_Plot->setAxisAutoScale(QwtPlot::yLeft);           // automatically scale -y          //
+  m_Plot->setTitle("Multispectral Reflectance");      // set the plot title              //
   m_Plot->setCanvasBackground(Qt::white);             // set the background color        //
   m_Plot->insertLegend(new QwtLegend());              // set the legend                  //
   QwtPlotGrid* grid = new QwtPlotGrid();              // set the grid                    //

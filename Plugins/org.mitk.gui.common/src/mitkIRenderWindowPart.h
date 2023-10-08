@@ -129,7 +129,7 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
   virtual void InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera) = 0;
 
   /**
-  * @brief Define the reference geometry for interaction withing a render window.
+  * @brief Define the reference geometry for interaction within a render window.
   *
   *        The concrete implementation is subclass-specific, no default implementation is provided here.
   *        An implementation can be found in 'QmitkAbstractMultiWidgetEditor' and will just

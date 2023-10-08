@@ -147,7 +147,7 @@ namespace mitk
     * @brief Initialize the given render window by the aggregated geometry of all objects that are held in
     *        the data storage.
     *
-    * @param renderWindow     The specifid render window to update
+    * @param renderWindow     The specified render window to update
     * @param dataStorage      The data storage from which the bounding object can be retrieved
     * @param resetCamera      If this parameter is set to true, the camera controller will be
     *                         set / fit to the center of the rendered image. If set to false, only the

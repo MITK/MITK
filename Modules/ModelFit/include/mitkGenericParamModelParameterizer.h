@@ -46,7 +46,7 @@ namespace mitk
 
     itkSetMacro(FunctionString, mitk::ModelBase::FunctionStringType);
 
-    /**@pre The Number of paremeters must be between 1 and 10.*/
+    /**@pre The Number of parameters must be between 1 and 10.*/
     itkSetClampMacro(NumberOfParameters, ParametersSizeType, 1, 10);
 
     mitk::ModelBase::FunctionStringType GetFunctionString() const override;

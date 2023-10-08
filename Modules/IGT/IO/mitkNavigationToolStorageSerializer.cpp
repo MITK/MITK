@@ -55,7 +55,7 @@ void mitk::NavigationToolStorageSerializer::Serialize(const std::string& filenam
     std::string tempFileName = m_tempDirectory + mitk::IOUtil::GetDirectorySeparator() + "NavigationTool" + convertIntToString(i) + ".tool";
     if (!myToolWriter->DoWrite(tempFileName,storage->GetTool(i)))
       {
-        mitkThrowException(mitk::IGTIOException) << "Could not write tool to tempory directory: " << tempFileName;
+        mitkThrowException(mitk::IGTIOException) << "Could not write tool to temporary directory: " << tempFileName;
       }
   }
   //add all files to zip archive

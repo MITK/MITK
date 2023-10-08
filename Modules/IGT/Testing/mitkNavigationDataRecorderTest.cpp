@@ -116,8 +116,8 @@ public:
 private:
 
   /*
-  * private hepler method that compares the recorded Dataset against the member variable.
-  * This is a reasonable test only under the assumption that the Data should be equal from coyping - It does not consider
+  * private helper method that compares the recorded Dataset against the member variable.
+  * This is a reasonable test only under the assumption that the Data should be equal from copying - It does not consider
   * homonymus Quaternions and NO FLOAT ROUNDING ISSUES
   */
   bool compareDataSet(mitk::NavigationDataSet::Pointer recorded)

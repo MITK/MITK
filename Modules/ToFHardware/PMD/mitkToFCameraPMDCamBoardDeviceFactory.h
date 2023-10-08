@@ -32,7 +32,7 @@ namespace mitk
   /**
   * \brief ToFPMDCamBoardDeviceFactory is an implementation of the factory pattern to generate CamBoard devices.
   * ToFPMDCamBoardDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
-  * This offers users the oppertunity to generate new CamBoard Devices via a global instance of this factory.
+  * This offers users the opportunity to generate new CamBoard Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
 

@@ -90,7 +90,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
   {
     _tprintf(szBuffer, _T("AVI Engine failed to initialize. Check filename %s."), m_sFile);
     m_sError = szBuffer;
-    // Check it succeded.
+    // Check it succeeded.
     switch (hr)
     {
       case AVIERR_BADFORMAT:
@@ -132,7 +132,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
                            &m_pStream, // returned stream pointer
                            &strHdr);   // stream header
 
-  // Check it succeded.
+  // Check it succeeded.
   if (hr != AVIERR_OK)
   {
     m_sError = _T("AVI Stream creation failed. Check Bitmap info.");
@@ -153,7 +153,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
   opts.fccHandler = mmioFOURCC('M', 'S', 'V', 'C');
   opts.dwQuality = 90000; // means 90% quality; dwQuality goes from [0...10000]
 
-// Poping codec dialog
+// Popping codec dialog
 // GUI Codec selection does not work in a vs 2005 compiled mitk, since we do not pass a hwnd as first parameter
 // of AVISaveOptions
 #if !(_MSC_VER >= 1400)

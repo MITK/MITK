@@ -64,7 +64,7 @@ namespace mitk {
     /** @return Returns the RMS of the error of the euler angles (theta_x, theta_y, theta_z) in degree of the specified input since the start of the statistic (last call of ResetStatistic()) */
     double GetEulerAnglesRMSDegree(int input);
 
-    /** @return Returns the mean distance to the mean postion (=mean error) to the specified input. */
+    /** @return Returns the mean distance to the mean position (=mean error) to the specified input. */
     double GetPositionErrorMean(int input);
     /** @return Returns the standard derivation of the errors of all positions to the specified input. */
     double GetPositionErrorStandardDeviation(int input);

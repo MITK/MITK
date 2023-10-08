@@ -25,7 +25,7 @@ mitk::ContourModelMapper3D::~ContourModelMapper3D()
 
 const mitk::ContourModel *mitk::ContourModelMapper3D::GetInput(void)
 {
-  // convient way to get the data from the dataNode
+  // convenient way to get the data from the dataNode
   return static_cast<const mitk::ContourModel *>(GetDataNode()->GetData());
 }
 

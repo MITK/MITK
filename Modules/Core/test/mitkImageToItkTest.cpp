@@ -110,7 +110,7 @@ public:
                                  "Casting float tensor (MITK) image to float tensor (ITK). Result shouldn't be nullptr");
 
     mitk::Image::Pointer mitkImageAfterCast = mitk::ImportItkImage(diffImage);
-    MITK_ASSERT_EQUAL(mitkImageAfterCast, m_TestImage, "Same type, images shoul be equal.");
+    MITK_ASSERT_EQUAL(mitkImageAfterCast, m_TestImage, "Same type, images should be equal.");
   }
 
   void ImageCastDoubleToTensorDouble_EmptyImage_ThrowsException()

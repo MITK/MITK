@@ -87,7 +87,7 @@ static void TestThreadSaveLog(bool toFile)
     testSucceded = false;
   }
 
-  // if no error occured until now, everything is ok
+  // if no error occurred until now, everything is ok
   MITK_TEST_CONDITION_REQUIRED(testSucceded, "Test logging in different threads.");
 }
 
@@ -96,7 +96,7 @@ int QmitkThreadedLogTest(int /* argc */, char * /*argv*/ [])
   // always start with this!
   MITK_TEST_BEGIN("QmitkThreadedLogTest")
 
-  MITK_TEST_OUTPUT(<< "TESTING ALL LOGGING OUTPUTS, ERROR MESSAGES ARE ALSO TESTED AND NOT MEANING AN ERROR OCCURED!")
+  MITK_TEST_OUTPUT(<< "TESTING ALL LOGGING OUTPUTS, ERROR MESSAGES ARE ALSO TESTED AND NOT MEANING AN ERROR OCCURRED!")
 
   TestThreadSaveLog(false); // false = to console
   TestThreadSaveLog(true);  // true = to file

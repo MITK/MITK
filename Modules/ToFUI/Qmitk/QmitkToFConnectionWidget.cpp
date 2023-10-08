@@ -75,7 +75,7 @@ void QmitkToFConnectionWidget::CreateConnections()
     //QmitkServiceListWidget::ServiceSelectionChanged as a Signal for the OnSlectCamera() slot
     connect( m_Controls->m_DeviceList, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnSelectCamera()));
 
-    /*Creating an other Datanode structur for Kinect is done here: As soon as a Kinect is connected, the KinectParameterWidget is enabled,
+    /*Creating an other Datanode structure for Kinect is done here: As soon as a Kinect is connected, the KinectParameterWidget is enabled,
     which can be used to trigger the KinectAcqusitionModeChanged-Method, to create a working Data-Node-structure*/
     connect( m_Controls->m_KinectParameterWidget, SIGNAL(AcquisitionModeChanged()), this, SIGNAL(KinectAcquisitionModeChanged()) );
   }
@@ -86,7 +86,7 @@ mitk::ToFImageGrabber::Pointer QmitkToFConnectionWidget::GetToFImageGrabber()
   return m_ToFImageGrabber;
 }
 
-//The OnSelectCamer-Method is in charge of activating the appropiate ParameterWidgets
+//The OnSelectCamer-Method is in charge of activating the appropriate ParameterWidgets
 void QmitkToFConnectionWidget::OnSelectCamera()
 {
   //Here we are getting our decvie through the QmitkServiceListWidget-Instance m_DeviceList through the GetSelectedService-Method
@@ -96,7 +96,7 @@ void QmitkToFConnectionWidget::OnSelectCamera()
   QString selectedCamera = QString::fromStdString(device->GetNameOfClass());
 
   this->HideAllParameterWidgets();
-  //reactivating the Widgets on slecting a device
+  //reactivating the Widgets on selecting a device
   if (selectedCamera.contains("PMD")) //Check if selectedCamera string contains ".." for each device
   {
     this->m_Controls->m_PMDParameterWidget->show(); //and activate the correct widget
@@ -163,7 +163,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
         //IF PMD-Player selected
         if (selectedCamera.contains("PMD"))
         {
-          fileFilter.append("PMD Files (*.pmd)");   //And seting the corresponding fileFilter
+          fileFilter.append("PMD Files (*.pmd)");   //And setting the corresponding fileFilter
         }
         else
         {
@@ -212,12 +212,12 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
             if (found == static_cast<int>(std::string::npos))  //If found =0
             {
-              found = baseFilename.rfind("_AmplitudeImage");  //If "_AmplitudeImage" is found, the found variable is 1-> the next if statment is false
+              found = baseFilename.rfind("_AmplitudeImage");  //If "_AmplitudeImage" is found, the found variable is 1-> the next if statement is false
             }
 
             if (found == static_cast<int>(std::string::npos))
             {
-              found = baseFilename.rfind("_IntensityImage"); //found = true if baseFilename cotains "_IntesityImage"
+              found = baseFilename.rfind("_IntensityImage"); //found = true if baseFilename contains "_IntesityImage"
             }
 
             if (found == static_cast<int>(std::string::npos))
@@ -351,7 +351,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       }
       m_Controls->m_ConnectCameraButton->setEnabled(true);
 
-      // ask wether camera parameters (intrinsics, ...) should be loaded
+      // ask whether camera parameters (intrinsics, ...) should be loaded
       if (QMessageBox::question(this,"Camera parameters","Do you want to specify your own camera intrinsics?",QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)
       {
         try {

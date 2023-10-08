@@ -119,7 +119,7 @@ private Q_SLOTS:
   // reaction to the change of labels. If multiple labels are selected, it is ignored.
   void OnSelectedLabelChanged(LabelValueVectorType labels);
 
-  // LabelSetImage Dependet
+  // LabelSetImage Dependent
   void OnCreateDetailedSurface(bool);
   void OnCreateSmoothedSurface(bool);
   // reaction to the signal "createMask" from QmitkLabelSetTableWidget

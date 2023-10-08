@@ -26,7 +26,7 @@ namespace mitk
   /**
    * @ingroup IO
    *
-   * @brief The MimeType class represens a registered mime-type. It is an immutable wrapper for mitk::CustomMimeType
+   * @brief The MimeType class represents a registered mime-type. It is an immutable wrapper for mitk::CustomMimeType
    * that makes memory handling easier by providing a stack-object for the user.
    *
    * If you want to register a new MimeType, use the CustomMimeType class instead. Wrapping will be performed for you

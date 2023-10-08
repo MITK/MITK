@@ -45,7 +45,7 @@ void mitk::USActivator::Unload(us::ModuleContext* context)
 {
   m_Context = context;
 
-  // no notifiation of the following unregistering is wanted
+  // no notification of the following unregistering is wanted
   context->RemoveServiceListener(this, &mitk::USActivator::OnServiceEvent);
 
   // store us video devices on the harddisk

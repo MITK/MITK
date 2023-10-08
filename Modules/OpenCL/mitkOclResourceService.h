@@ -66,7 +66,7 @@ public:
 
   /** @brief Get the maximum size of an image
    *
-   * @param dimension (unsigned int) identifier of the image diemsion in {0,1,2}
+   * @param dimension (unsigned int) identifier of the image dimension in {0,1,2}
    * @param image object type, either CL_MEM_OBJECT_IMAGE2D, CL_MEM_OBJECT_IMAGE3D
    */
   virtual unsigned int GetMaximumImageSize(unsigned int dimension, cl_mem_object_type image) = 0;

@@ -25,13 +25,13 @@ namespace mitk
   * This class can be used to calculate Neighbourhood Grey Tone Difference Features which have been introduced in
   * Amadasun and King: Textural features corresponding to textural properties. IEEE Transactions on Systems, Man and Cybernetricy, 1989.
   *
-  * The Neighbourhood Grey Tone Difference (NGTD) is based on a table and is calcualted using
+  * The Neighbourhood Grey Tone Difference (NGTD) is based on a table and is calculated using
   * a defined neighbourhood for each voxel. Within this neighbourhood, the mean intensity of the neighbouring
   * voxel is calculated \f$A_i\f$, i.e. the mean intensity of the neighbourhood excluding the center voxel.
   * Based on this a table with four columns is calculated. The first column represents the voxel
   * value, or in our implementation, the histogram bin index \f$i\f$. The second column represents the
   * number of voxel with this intensity value \f$n_i\f$. The proability for each intensity value \f$p_i\f$, which
-  * is equal to the bin probability. And the sum of the absolut differences of the intensity of all voxels with this
+  * is equal to the bin probability. And the sum of the absolute differences of the intensity of all voxels with this
   * intensity and the mean intensity of their neighbourhood: \f[s_i = \sum \left \| i- A_i \right \| \f].
   * Additional \f$ N_v\f$ is the number of voxels, \f$ N_g \f$ the number of bins, and \f$N_{g,p}\f$ the number of
   * bins with a non-zero probability.
@@ -40,7 +40,7 @@ namespace mitk
   *
   * The range that is used to calculate the local intensity can be set using the function <b>SetRange</b>.
   * To set it with parameters set the option <b>ngtd::range</b> which expects an int value n that is
-  * interpreted as voxel count. The neighbourhood includes symetrical n voxels additional
+  * interpreted as voxel count. The neighbourhood includes symmetrical n voxels additional
   * to the center voxel in each directions. The default value for this parameter is 1.
   *
   * The features are calculated based on a mask. It is assumed that the mask is

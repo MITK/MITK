@@ -51,7 +51,7 @@ protected:
   bool GetOnlyRegardOwnSeries() const;
 
 private:
-  /** Flags that constrols if the read() operation should only regard DICOM files of the same series
+  /** Flags that controls if the read() operation should only regard DICOM files of the same series
   if the specified GetLocalFileName() is a file. If it is a director, this flag has no impact (it is
   assumed false then).
   */

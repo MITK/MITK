@@ -36,7 +36,7 @@ int mitkTimeStampTest(int /* argc */, char* /*argv*/[])
   itk::Object::Pointer tester2 = itk::Object::New();
 
   //try methods without calling CreateInstance() before (error test cases)
-  MITK_TEST_OUTPUT(<<"Testing behavior of methodes if they are called at the wrong moment (error should occure).");
+  MITK_TEST_OUTPUT(<<"Testing behavior of methods if they are called at the wrong moment (error should occur).");
   mitk::IGTTimeStamp::GetInstance()->Start(tester2);
   mitk::IGTTimeStamp::GetInstance()->Stop(tester2);
 

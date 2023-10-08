@@ -113,14 +113,14 @@ namespace mitk
 
     /**
     * \brief Set the tool enabled for tracking.
-  * \return Return true if the enabling was successfull
+  * \return Return true if the enabling was successful
     * @throw mitk::IGTException Throws an exception if
     */
     bool Enable() override;
 
     /**
     * \brief Set the tool disabled for tracking.
-  * \return Return true if the disabling was successfull
+  * \return Return true if the disabling was successful
     * @throw mitk::IGTException Throws an exception if
     */
     bool Disable() override;
@@ -195,7 +195,7 @@ namespace mitk
     float* m_pivotPoint;
 
     /**
-    * \brief Number of Markers that blong to the tool
+    * \brief Number of Markers that belong to the tool
     */
     int m_numMarkers;
 

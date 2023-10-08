@@ -163,7 +163,7 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
 
   m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
 
-  //This is added as a workarround for T28252 (https://phabricator.mitk.org/T28252)
+  //This is added as a workaround for T28252 (https://phabricator.mitk.org/T28252)
   //can be removed if task is properly fixed.
   m_WebEngineView->settings()->setAttribute(QWebEngineSettings::ShowScrollBars, false);
 

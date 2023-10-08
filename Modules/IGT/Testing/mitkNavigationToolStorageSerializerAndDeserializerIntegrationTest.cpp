@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <mitkStandaloneDataStorage.h>
 #include <mitkIOUtil.h>
 
-//headers of IGT classes releated to the tested class
+//headers of IGT classes related to the tested class
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkNavigationToolStorage.h>
@@ -50,7 +50,7 @@ private:
   std::string m_FileName1;
 
 public:
-  /**@brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).*/
+  /**@brief Setup Always call this method before each Test-case to ensure correct and new initialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).*/
   void setUp() override
   {
   try {
@@ -79,7 +79,7 @@ public:
     }
     catch(...)
     {
-      MITK_ERROR << "Warning: Error occured when deleting test file!";
+      MITK_ERROR << "Warning: Error occurred when deleting test file!";
     }
   }
 

@@ -41,9 +41,9 @@ public:
   QmitkUSDeviceManagerWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
   ~QmitkUSDeviceManagerWidget() override;
 
-  /* @brief This method is part of the widget an needs not to be called seperately. */
+  /* @brief This method is part of the widget an needs not to be called separately. */
   virtual void CreateQtPartControl(QWidget *parent);
-  /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
+  /* @brief This method is part of the widget an needs not to be called separately. (Creation of the connections of main and control widget.)*/
   virtual void CreateConnections();
   /* @brief Disconnects all devices immediately. */
   virtual void DisconnectAllDevices();

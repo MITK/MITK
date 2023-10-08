@@ -193,7 +193,7 @@ void QmitkRegistrationJob::run()
   }
   catch (...)
   {
-    emit Error(QString("Unkown error when registering data."));
+    emit Error(QString("Unknown error when registering data."));
   }
 
   emit Finished();

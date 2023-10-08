@@ -54,7 +54,7 @@ namespace  mitk
     itkGetConstObjectMacro(FitInfo, mitk::modelFit::ModelFitInfo);
 
     IndexedValueFunctorBase::OutputPixelVectorType Compute(const InputPixelVectorType & value, const IndexType& currentIndex) const override;
-    /** Convinient overload because this functor does not need the value */
+    /** Convenient overload because this functor does not need the value */
     virtual IndexedValueFunctorBase::OutputPixelVectorType Compute(const IndexType& currentIndex) const;
 
     unsigned int GetNumberOfOutputs() const override;

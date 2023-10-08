@@ -148,7 +148,7 @@ void mitk::ImageToLiveWireContourFilter::ItkProcessImage(const itk::Image<TPixel
   ////get the shortest path as vector
   // std::vector< itk::Index<3> > shortestPath = shortestPathFilter->GetVectorPath();
 
-  ////fill the output contour with controll points from the path
+  ////fill the output contour with control points from the path
   // OutputType::Pointer outputContour = this->GetOutput();
   // mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
 

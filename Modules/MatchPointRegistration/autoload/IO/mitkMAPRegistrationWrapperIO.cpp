@@ -67,7 +67,7 @@ namespace mitk
   * moving and target dimensions on a passed MAPRegistrationWrapper instance.\n
   * It is helpful if you want to ensure that all combinations are checked/touched
   * (e.g. 3D 3D, 3D 2D, 2D 3D, 2D 2D) without generating a large switch yard.
-  * Think of n*m matrix (indicating the posible combinations). DimHelper walks from
+  * Think of n*m matrix (indicating the possible combinations). DimHelper walks from
   * one row to the next and uses DimHelperSub to iterate in a row.\n
   * For every element of the matrix the functor is executed on the passed object.
   */

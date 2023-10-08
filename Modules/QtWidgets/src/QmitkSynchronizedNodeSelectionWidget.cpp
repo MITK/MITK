@@ -203,7 +203,7 @@ void QmitkSynchronizedNodeSelectionWidget::SetSynchronized(bool synchronize)
       auto finding = std::find(std::begin(currentNodeSelection), std::end(currentNodeSelection), node);
       if (finding != std::end(currentNodeSelection)) // node found / part of the current selection
       {
-        // Set the relevant renderer-specific properties for the node using the curent base renderer.
+        // Set the relevant renderer-specific properties for the node using the current base renderer.
         // By transferring the values from the global / default property list,
         // the same property-state is kept when switching to non-synchronized mode.
         mitk::RenderWindowLayerUtilities::TransferRenderWindowProperties(node, baseRenderer, nullptr);

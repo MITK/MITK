@@ -47,7 +47,7 @@ void setupParser(mitkCommandLineParser& parser)
     // see mitkCommandLineParser::addArgument for more information
     parser.beginGroup("Required I/O parameters");
     parser.addArgument(
-        "inputs", "i", mitkCommandLineParser::StringList, "Input files", "Pathes to the input images that should be fused", us::Any(), false, false, false, mitkCommandLineParser::Input);
+        "inputs", "i", mitkCommandLineParser::StringList, "Input files", "Paths to the input images that should be fused", us::Any(), false, false, false, mitkCommandLineParser::Input);
     parser.addArgument("output",
         "o",
         mitkCommandLineParser::File,
@@ -59,7 +59,7 @@ void setupParser(mitkCommandLineParser& parser)
 
     parser.beginGroup("Optional parameters");
     parser.addArgument(
-        "time", "t", mitkCommandLineParser::StringList, "Time bounds", "Defines the time geometry of the resulting dynamic image in [ms]. The first number is the start time point of the first time step. All other numbers are the max bound of a time step. So the structure is [minBound0 maxBound1 [maxBound2 [... maxBoundN]]]; e.g. \"2 3.5 10\" encodes a time geometry with two time steps and that starts at 2 ms and the second time step starts at 3.5 ms and ends at 10 ms. If not set e propertional time geometry with 1 ms duration will be generated!", us::Any(), true, false, false, mitkCommandLineParser::Input);
+        "time", "t", mitkCommandLineParser::StringList, "Time bounds", "Defines the time geometry of the resulting dynamic image in [ms]. The first number is the start time point of the first time step. All other numbers are the max bound of a time step. So the structure is [minBound0 maxBound1 [maxBound2 [... maxBoundN]]]; e.g. \"2 3.5 10\" encodes a time geometry with two time steps and that starts at 2 ms and the second time step starts at 3.5 ms and ends at 10 ms. If not set e proportional time geometry with 1 ms duration will be generated!", us::Any(), true, false, false, mitkCommandLineParser::Input);
     parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
     parser.endGroup();
     //! [add arguments]

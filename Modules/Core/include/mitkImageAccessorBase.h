@@ -144,9 +144,9 @@ namespace mitk
     virtual const Image *GetImage() const = 0;
 
   private:
-    /** \brief System dependend thread method, to prevent recursive mutex access */
+    /** \brief System dependent thread method, to prevent recursive mutex access */
     ThreadIDType CurrentThreadHandle();
-    /** \brief System dependend thread method, to prevent recursive mutex access */
+    /** \brief System dependent thread method, to prevent recursive mutex access */
     inline bool CompareThreadHandles(ThreadIDType, ThreadIDType);
   };
 

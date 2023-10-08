@@ -168,7 +168,7 @@ void OclResourceServiceImpl::InvalidateStorage()
     unsigned int query = clGetProgramBuildInfo( it->second.program, m_ContextCollection->m_Devices[0], CL_PROGRAM_BUILD_STATUS, sizeof(cl_int), &status, nullptr );
     CHECK_OCL_ERR( query )
 
-    MITK_DEBUG << "Quering status for " << it->first << std::endl;
+    MITK_DEBUG << "Querying status for " << it->first << std::endl;
 
     // remove program if no succesfull build
     // we need to pay attention to the increment of the iterator when erasing current element
@@ -247,7 +247,7 @@ unsigned int OclResourceServiceImpl::GetMaximumImageSize(unsigned int dimension,
       clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_DEPTH, sizeof( size_t ), &retValue, nullptr);
     break;
   default:
-    MITK_WARN << "Could not recieve info. Desired dimension or object type does not exist. ";
+    MITK_WARN << "Could not receive info. Desired dimension or object type does not exist. ";
     break;
   }
 

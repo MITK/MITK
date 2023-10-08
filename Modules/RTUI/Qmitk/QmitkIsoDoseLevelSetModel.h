@@ -73,7 +73,7 @@ public:
     void setShowAbsoluteDose(bool showAbsoluteDose);
 
     /**
-    * \brief Slat that can be used to adjust wether the model allows to edit only visibilities (no dose value or color)
+    * \brief Slat that can be used to adjust whether the model allows to edit only visibilities (no dose value or color)
     */
     void setVisibilityEditOnly(bool onlyVisibility);
 

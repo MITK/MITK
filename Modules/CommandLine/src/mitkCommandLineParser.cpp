@@ -527,7 +527,7 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
       }
       else if (numberOfParametersToProcess > 0)
       {
-        string missingParameterError = "Argument %1 has %2 value(s) associated whereas exacly %3 are expected.";
+        string missingParameterError = "Argument %1 has %2 value(s) associated whereas exactly %3 are expected.";
         for (int j = 1; j <= numberOfParametersToProcess; ++j)
         {
           if (i + j >= arguments.size())

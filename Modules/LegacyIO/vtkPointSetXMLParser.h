@@ -64,7 +64,7 @@ namespace mitk
     void EndElement(const char *name) override;
 
     /**
-     * Handler function which is called, if characted data has been
+     * Handler function which is called, if character data has been
      * parsed by expat.
      * @param inData a char array containing the parsed string data
      * @param inLength the length of the parsed data string.

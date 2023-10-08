@@ -22,7 +22,7 @@ namespace mitk
   /** \brief Normalization filter for CEST images.
    *
    * This filter can be used to normalize CEST images, it only works with 4D images and assumes that the input
-   * mitk::Image has a property called mitk::CustomTagParser::m_OffsetsPropertyName, whith offsets separated by
+   * mitk::Image has a property called mitk::CustomTagParser::m_OffsetsPropertyName, with offsets separated by
    * spaces. The number of offsets has to match the number of timesteps.
    *
    * Each timestep with a corresponding offset greater than 299 or less than -299 will be interpreted as normalization (M0) image.

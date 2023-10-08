@@ -281,7 +281,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
     return nullptr;
   }
 
-  // Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
+  // Make sure that for reslicing and overwriting the same algorithm is used. We can specify the mode of the vtk reslicer
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
   // set to false to extract a slice
   reslice->SetOverwriteMode(false);
@@ -503,7 +503,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
 
   if (nullptr == m_LastEventSender)
   {
-    MITK_WARN << "Cannot write tool results. Tool seems to be in an invalid state, as no interaction event was recieved but is expected.";
+    MITK_WARN << "Cannot write tool results. Tool seems to be in an invalid state, as no interaction event was received but is expected.";
     return;
   }
 
@@ -605,7 +605,7 @@ void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const SliceInforma
     /*============= END undo/redo feature block ========================*/
   }
 
-  // Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk
+  // Make sure that for reslicing and overwriting the same algorithm is used. We can specify the mode of the vtk
   // reslicer
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 

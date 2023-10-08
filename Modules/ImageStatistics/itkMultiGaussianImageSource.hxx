@@ -561,7 +561,7 @@ namespace itk
   }
 
   //-----------------------------------------------------------------------------------------------------------------------
-  /* Start the octree recursion in eigth directions for the sphere with midpoint globalCoordinateMidpointSphere and, if uncommented, write this in a file, so that we can visualise it. */
+  /* Start the octree recursion in eight directions for the sphere with midpoint globalCoordinateMidpointSphere and, if uncommented, write this in a file, so that we can visualise it. */
   template< class TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -692,7 +692,7 @@ namespace itk
     MultiGaussianImageSource< TOutputImage >
     ::MultiGaussianFunctionValueAtPoint(double x, double y, double z)
   {
-    //this claculate the mean value in the voxel
+    //this calculates the mean value in the voxel
     //integrate over the voxel with midpoint [x, y, z]
     double summand0, summand1, summand2/*, power*/, value = 0.0, factor;
     double xMin, xMax, yMin, yMax, zMin, zMax, mean;

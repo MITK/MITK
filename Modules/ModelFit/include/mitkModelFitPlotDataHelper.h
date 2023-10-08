@@ -113,7 +113,7 @@ namespace mitk
   /** Helper function that actualizes min and max by the x values given in data.*/
   void CheckXMinMaxFromPlotDataValues(const PlotDataValues& data, double& min, double& max);
 
-  /** Function generates curve data for the signal defined by the passed informations.
+  /** Function generates curve data for the signal defined by the passed information.
    @param position The position in world coordinates the curve should be generated for.
    @param fitInfo Pointer to the fit info that defines the model/fit that produces the signal.
    @param timeGrid Defines the time grid of the generated signal.
@@ -125,7 +125,7 @@ namespace mitk
   MITKMODELFIT_EXPORT PlotDataCurve::Pointer
     GenerateModelSignalPlotData(const mitk::Point3D& position, const mitk::modelFit::ModelFitInfo* fitInfo, const mitk::ModelBase::TimeGridType& timeGrid, mitk::ModelParameterizerBase* parameterizer = nullptr);
 
-  /** Function generates curve data for all additinal inputs (e.g. ROI signal, AIF)
+  /** Function generates curve data for all additional inputs (e.g. ROI signal, AIF)
   stored in the fit information. The keys in the map are the same keys like in the fitInfo.
   @param position The position in world coordinates the curve should be generated for.
   @param fitInfo Pointer to the fit info that defines the model/fit that produces the signal.

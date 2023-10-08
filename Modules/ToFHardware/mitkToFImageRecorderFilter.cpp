@@ -93,7 +93,7 @@ void mitk::ToFImageRecorderFilter::StartRecording()
 {
   if(m_ToFImageWriter.IsNull())
   {
-    throw std::logic_error("ToFImageWriter is unitialized, set filename first!");
+    throw std::logic_error("ToFImageWriter is uninitialized, set filename first!");
     return;
   }
   m_ToFImageWriter->Open();

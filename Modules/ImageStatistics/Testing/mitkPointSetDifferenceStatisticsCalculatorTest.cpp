@@ -22,7 +22,7 @@ mitk::PointSetDifferenceStatisticsCalculator::Pointer m_myPointSetDifferenceStat
 mitk::PointSet::Pointer m_myTestPointSet1;
 mitk::PointSet::Pointer m_myTestPointSet2;
 
-//This method should be called before every new sub-test call in order to freshly intialize all relevant classes
+//This method should be called before every new sub-test call in order to freshly initialize all relevant classes
 void Setup()
 {
   // let's create an object of our class

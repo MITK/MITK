@@ -27,7 +27,7 @@ In this example, the header of the OpenCL-Kernel to be executed is the following
 
 The InitExec methods takes care of initializing the input and output images and their OpenCL counterparts.
 In addition both parameters are passed to the filter and the input data is copied (if necessary).
-If the first initialization part was successfull, we continue by passing in the values for the filter
+If the first initialization part was successful, we continue by passing in the values for the filter
 specific parameters:
 
 \snippet mitkOcl-binarythrfilter/main.cpp SetKernelArguments

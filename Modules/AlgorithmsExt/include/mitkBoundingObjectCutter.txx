@@ -47,7 +47,7 @@ namespace mitk
     // unfortunately, we cannot use input->GetRequestedRegion(), because it
     // has been destroyed by the mitk::CastToItkImage call of PART 1
     // (which sets the m_RequestedRegion to the LargestPossibleRegion).
-    // Thus, use our own member m_InputRequestedRegion insead.
+    // Thus, use our own member m_InputRequestedRegion instead.
 
     // first convert the index
     typename ItkRegionType::IndexType::IndexValueType tmpIndex[3];
@@ -163,7 +163,7 @@ namespace mitk
     // unfortunately, we cannot use input->GetRequestedRegion(), because it
     // has been destroyed by the mitk::CastToItkImage call of PART 1
     // (which sets the m_RequestedRegion to the LargestPossibleRegion).
-    // Thus, use our own member m_InputRequestedRegion insead.
+    // Thus, use our own member m_InputRequestedRegion instead.
 
     // first convert the index
     typename ItkRegionType::IndexType::IndexValueType tmpIndex[3];

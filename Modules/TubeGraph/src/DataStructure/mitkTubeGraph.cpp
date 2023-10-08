@@ -197,7 +197,7 @@ mitk::TubeGraph::Pointer mitk::TubeGraph::CreateSubGraph(std::vector<TubeDescrip
     // assigning map
     // target Vertex: get the subgraph VertexDescriptor  by the origin descriptor (tubeDescriptor->second)from the
     // assigning map
-    // edge data: copy the TubeGraphEdge object using the origin edge desciptor and the origin graph
+    // edge data: copy the TubeGraphEdge object using the origin edge descriptor and the origin graph
     VertexDescriptorType sourceVertex = vertexDescriptorOldToNewMap[it->first];
     VertexDescriptorType targetVertex = vertexDescriptorOldToNewMap[it->second];
     subGraph->AddEdge(sourceVertex, targetVertex, this->GetEdge(edgeDescriptor));

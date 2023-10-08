@@ -42,7 +42,7 @@ namespace mitk {
        *  - Standard: normal representation, rawdata from the device is not changed (DEFAULT)
        *
        *  - Transposed: the rotation is stored transposed, which is (by mistake!) expected by some older MITK classes due
-       *                to an ambigious method naming in VNL.
+       *                to an ambiguous method naming in VNL.
        *
        *  CAUTION: The rotation mode can only be changed for backward compatibility of old WRONG code.
        *           PLEASE DO NOT CHANGE THE ROTATION MODE UNLESS YOU ARE KNOWING EXACTLY WHAT YOU ARE DOING!

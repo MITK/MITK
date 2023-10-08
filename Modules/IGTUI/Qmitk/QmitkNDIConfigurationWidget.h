@@ -29,7 +29,7 @@ namespace mitk
 };
 
 /**@deprecated This widget is deprecated. The features (1) connection to NDI tracking devices and
-  *            (2) handling of navigation tools are available in the pluging org.mitk.gui.qt.igttracking
+  *            (2) handling of navigation tools are available in the plugin org.mitk.gui.qt.igttracking
   *            in a current version. The new concept to access the tracking devices is to use microservices.
   *            This can be achieved very simple by using the QmitkNavigationDataSourceSelectionWidget. You
   *            can find an example in the IGT tutorial step 2 / org.mitk.gui.qt.igtexamples (view TrackingLab).

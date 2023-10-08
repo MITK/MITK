@@ -24,7 +24,7 @@ namespace mitk
   /**
   * \brief ToFPlayerDeviceFactory is an implementation of the factory pattern to generate ToFPlayer devices.
   * ToFPlayerDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
-  * This offers users the oppertunity to generate new ToFPlayerDevices via a global instance of this factory.
+  * This offers users the opportunity to generate new ToFPlayerDevices via a global instance of this factory.
   * @ingroup ToFHardware
   */
 

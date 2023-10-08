@@ -321,7 +321,7 @@ bool mitk::Equal(const mitk::LabelSet &leftHandSide, const mitk::LabelSet &right
   returnValue = *lhsLUT == *rhsLUT;
   if (!returnValue)
   {
-    MITK_INFO(verbose) << "Lookup tabels not equal.";
+    MITK_INFO(verbose) << "Lookup tables not equal.";
     return returnValue;
     ;
   }

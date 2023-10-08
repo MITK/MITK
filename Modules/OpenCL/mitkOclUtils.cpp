@@ -220,7 +220,7 @@ cl_ulong oclGetGlobalMemSize(cl_device_id device)
 
 std::string GetOclErrorAsString( int _clErr )
 {
-  std::string returnString("unkown error number: "+std::to_string(_clErr)+" \n");
+  std::string returnString("unknown error number: "+std::to_string(_clErr)+" \n");
 
   switch(_clErr)
   {

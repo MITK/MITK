@@ -127,7 +127,7 @@ void
   }
 
   //
-  // Prepare calulation of Centre of mass shift
+  // Prepare calculation of Centre of mass shift
   //
   PointType normalCenter(0);
   PointType normalCenterUncorrected(0);

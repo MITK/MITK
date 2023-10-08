@@ -28,7 +28,7 @@ class QmitkImageStatisticsTreeItem;
 \class QmitkImageStatisticsTreeModel
 The class is used to represent the information of mitk::ImageStatisticsContainer in the set datastorage in the context of the QT view-model-concept.
 The represented ImageStatisticContainer are specified by setting the image and mask nodes that should be regarded.
-In addition you may specified the statistic computation property HistorgramNBins and IgnoreZeroValueVoxel to select the correct
+In addition you may specified the statistic computation property HistogramNBins and IgnoreZeroValueVoxel to select the correct
 statistics.
 */
 class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsTreeModel : public QmitkAbstractDataStorageModel

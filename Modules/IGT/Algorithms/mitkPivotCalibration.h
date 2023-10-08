@@ -36,7 +36,7 @@ namespace mitk {
       void AddNavigationData(mitk::NavigationData::Pointer data);
       /** @brief Computes the pivot point and rotation/axis on the given
         *        navigation datas. You can get the results afterwards.
-        * @return Returns true if the computation was successfull, false if not.
+        * @return Returns true if the computation was successful, false if not.
         */
       bool ComputePivotResult();
 
@@ -57,5 +57,5 @@ namespace mitk {
       double m_ResultRMSError;
 
     };
-} // Ende Namespace
+} // End Namespace
 #endif

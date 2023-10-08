@@ -50,7 +50,7 @@ public:
   void SetCompilerFlags(const char* flags);
 
   /**
-    * @brief Returns true if the initialization was successfull
+    * @brief Returns true if the initialization was successful
     */
   virtual bool IsInitialized();
 

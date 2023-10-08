@@ -26,7 +26,7 @@ namespace mitk
     /**
     * \brief Calculates the Grey level size zone based features.
     *
-    * Grey level size zone based features are similar to Grey Level Cooccurence features. But instead
+    * Grey level size zone based features are similar to Grey Level Cooccurrence features. But instead
     * of measuring the similarity within a given neighbourhood, the size of areas with the same intensity
     * is assessed. For this, a matrix is created that gives the number of areas \f$ m_{x,s} \f$ with the intensity \f$ x \f$ and
     * the size of \f$ s \f$. Each area is specified as connected voxels with the given intensity.
@@ -37,7 +37,7 @@ namespace mitk
     * quantification of the image can be controlled using the general binning parameters as defined
     * in AbstractGlobalImageFeature.
     *
-    * By default, the calculation is based on a 26 neighourhood for 3D and a 8 neighbourhood in 2D. It is further
+    * By default, the calculation is based on a 26 neighbourhood for 3D and a 8 neighbourhood in 2D. It is further
     * possible to exclude directions from the calculation, e.g. calculating the feature in 2D, even if a
     * 3D image is passed. This is controlled by  determine the
     * dimensionality of the neighbourhood using direction-related commands as described in AbstractGlobalImageFeature.
@@ -48,7 +48,7 @@ namespace mitk
     * The features are calculated based on a mask. It is assumed that the mask is
     * of the type of an unsigned short image. All voxels with the value 1 are treated as masked.
     *
-    * Several values are definied for the definition of the features. \f$ N_v \f$ is the number of masked voxels,
+    * Several values are defined for the definition of the features. \f$ N_v \f$ is the number of masked voxels,
     * \f$N_s \f$ is the number of different zones, \f$ m_{x,\cdot} = \sum_s m{x,s} \f$ is the number of all areas
     * with a given intensity value, and likewise \f$ m_{\cdot, s} = \sum_x m{x,s} \f$ is the number of all areas
     * with a given size. The features are then defined as:

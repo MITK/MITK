@@ -42,9 +42,9 @@ class MITKTOFUI_EXPORT QmitkToFPMDParameterWidget :public QWidget
     QmitkToFPMDParameterWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
     ~QmitkToFPMDParameterWidget() override;
 
-    /* @brief This method is part of the widget an needs not to be called seperately. */
+    /* @brief This method is part of the widget an needs not to be called separately. */
     virtual void CreateQtPartControl(QWidget *parent);
-    /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
+    /* @brief This method is part of the widget an needs not to be called separately. (Creation of the connections of main and control widget.)*/
     virtual void CreateConnections();
 
     /*!
@@ -67,7 +67,7 @@ class MITKTOFUI_EXPORT QmitkToFPMDParameterWidget :public QWidget
 
     /*!
     \brief This signal is sent if the user has connected the TOF camera.
-     *        The ToFImageGrabber is now availiable if the method GetToFImageGrabber() is called.
+     *        The ToFImageGrabber is now available if the method GetToFImageGrabber() is called.
     */
     void ToFCameraConnected();
     /*!

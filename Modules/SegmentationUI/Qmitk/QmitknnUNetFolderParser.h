@@ -31,9 +31,9 @@ struct FolderNode
 };
 
 /**
- * @brief Class to store and retreive folder hierarchy information
+ * @brief Class to store and retrieve folder hierarchy information
  * of RESULTS_FOLDER. Only Root node is explicitly stored in m_RootNode.
- * No. of sub levels in the hierachry is defined in the LEVEL constant.
+ * No. of sub levels in the hierarchry is defined in the LEVEL constant.
  *
  */
 class QmitknnUNetFolderParser

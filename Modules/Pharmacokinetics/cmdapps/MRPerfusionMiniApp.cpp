@@ -125,7 +125,7 @@ void setupParser(mitkCommandLineParser& parser)
     parser.addArgument(
       "aifmask", "n", mitkCommandLineParser::File, "AIF mask file", "Mask that defines the spatial image region that should be used as AIF for models that need one. Must have the same geometry as the AIF input image!", us::Any(), true, false, false, mitkCommandLineParser::Input);
     parser.addArgument(
-      "aifimage", "a", mitkCommandLineParser::File, "AIF image file", "3D+t image that defines the image that containes the AIF signal. If this flag is not set and the model needs a AIF, the CLI will assume that the AIF is encoded in the normal image. Must have the same geometry as the AIF mask!", us::Any(), true, false, false, mitkCommandLineParser::Input);
+      "aifimage", "a", mitkCommandLineParser::File, "AIF image file", "3D+t image that defines the image that contains the AIF signal. If this flag is not set and the model needs a AIF, the CLI will assume that the AIF is encoded in the normal image. Must have the same geometry as the AIF mask!", us::Any(), true, false, false, mitkCommandLineParser::Input);
     parser.addArgument(
       "hematocrit", "h", mitkCommandLineParser::Float, "Hematocrit Level", "Value needed for correct AIF computation. Only needed if model needs an AIF. Default value is 0.45.", us::Any(0.45));
     parser.endGroup();
@@ -136,9 +136,9 @@ void setupParser(mitkCommandLineParser& parser)
     parser.addArgument(
         "verbose", "v", mitkCommandLineParser::Bool, "Verbose Output", "Whether to produce verbose output");
     parser.addArgument(
-        "roibased", "r", mitkCommandLineParser::Bool, "Roi based fitting", "Will compute a mean intesity signal over the ROI before fitting it. If this mode is used a mask must be specified.");
+        "roibased", "r", mitkCommandLineParser::Bool, "Roi based fitting", "Will compute a mean intensity signal over the ROI before fitting it. If this mode is used a mask must be specified.");
     parser.addArgument(
-      "constraints", "c", mitkCommandLineParser::Bool, "Constraints", "Indicates if constraints should be used for the fitting (if flag is set the default contraints will be used.).", us::Any(false));
+      "constraints", "c", mitkCommandLineParser::Bool, "Constraints", "Indicates if constraints should be used for the fitting (if flag is set the default constraints will be used.).", us::Any(false));
     parser.addArgument(
       "preview", "p", mitkCommandLineParser::Bool, "Preview outputs", "The application previews the outputs (filename, type) it would produce with the current settings.");
     parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
@@ -830,7 +830,7 @@ int main(int argc, char* argv[])
           }
           else
           {
-            mitkThrow() << "Error. Cannot fit. Choosen model needs an AIF. Please specify AIF mask (--aifmask).";
+            mitkThrow() << "Error. Cannot fit. Chosen model needs an AIF. Please specify AIF mask (--aifmask).";
           }
           if (!aifImageFileName.empty())
           {

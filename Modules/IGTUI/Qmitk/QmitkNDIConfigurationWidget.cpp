@@ -658,12 +658,12 @@ void QmitkNDIConfigurationWidget::ShowToolRepresentationColumn()
   m_Controls->m_ToolTable->insertColumn(cols); // insert new column at end of table
 
 
-  m_Controls->m_ToolTable->setHorizontalHeaderItem(QmitkNDIToolDelegate::RepCol, new QTableWidgetItem(QString("Representation"))); // inser column header for new colum
+  m_Controls->m_ToolTable->setHorizontalHeaderItem(QmitkNDIToolDelegate::RepCol, new QTableWidgetItem(QString("Representation"))); // inser column header for new column
   //m_Controls->m_ToolTable->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
 
   int rows = m_Controls->m_ToolTable->rowCount();
 
- // make all representation colum items not editable
+ // make all representation column items not editable
   for(int i=0; i < rows; ++i)
   {
     m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::RepCol, new QTableWidgetItem("<click to select representation>"));       // Representation
@@ -730,7 +730,7 @@ void QmitkNDIConfigurationWidget::OnSaveTool()
   }
   catch( ... )
   {
-    QMessageBox::warning(nullptr, "Saving Tool Error", QString("An error occured! Could not save tool!\n\n"));
+    QMessageBox::warning(nullptr, "Saving Tool Error", QString("An error occurred! Could not save tool!\n\n"));
     MITK_ERROR<<"Could not save tool surface!";
     MITK_ERROR<< toolWriter->GetErrorMessage();
 
@@ -766,7 +766,7 @@ void QmitkNDIConfigurationWidget::OnLoadTool()
   }
   catch( ... )
   {
-    QMessageBox::warning(nullptr, "Loading Tool Error", QString("An error occured! Could not load tool!\n\n"));
+    QMessageBox::warning(nullptr, "Loading Tool Error", QString("An error occurred! Could not load tool!\n\n"));
     MITK_ERROR<<"Could not load tool surface!";
     MITK_ERROR<< toolReader->GetErrorMessage();
   }
@@ -829,7 +829,7 @@ mitk::NavigationTool::Pointer QmitkNDIConfigurationWidget::GenerateNavigationToo
   }
   catch( ... )
   {
-    QMessageBox::warning(nullptr, "Loading Surface Error", QString("An error occured! Could not load surface from .stl file!\n\n"));
+    QMessageBox::warning(nullptr, "Loading Surface Error", QString("An error occurred! Could not load surface from .stl file!\n\n"));
     MITK_ERROR<<"Could not load .stl tool surface!";
   }
 

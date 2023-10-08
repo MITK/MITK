@@ -47,7 +47,7 @@ namespace mitk
     itkCloneMacro(Self)
     /** Prints the framerate to the console every 100 frames.
      *  Mainly for debugging, deactivated by default.
-     *  Refers to a static variable, means it is acivated/deactivated
+     *  Refers to a static variable, means it is activated/deactivated
      *  for all instances.
      */
     itkSetMacro(PrintFrameRate, bool);

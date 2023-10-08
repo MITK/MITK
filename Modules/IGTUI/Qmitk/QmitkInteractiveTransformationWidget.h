@@ -42,7 +42,7 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QDialog
 
     /** This tool will be copied to m_ToolToEdit. It will not be changed.
         To apply any changes made by this widget, you will need to connect to the signal
-        EditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip) and set this transfrom
+        EditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip) and set this transform
         as calibrated tool tip.
         We do not directly modify the tool to allow to cancel/exit this widget without doing
         any harm.
@@ -50,7 +50,7 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QDialog
     void SetToolToEdit(const mitk::NavigationTool::Pointer _tool);
 
     /** The sliders and spinboxes will be set to these values.
-        When clicking "Revert Changes", sliders will be reseted to these values.
+        When clicking "Revert Changes", sliders will be reset to these values.
     */
     void SetDefaultOffset(const mitk::Point3D _defaultValues);
     void SetDefaultRotation(const mitk::Quaternion _defaultValues);

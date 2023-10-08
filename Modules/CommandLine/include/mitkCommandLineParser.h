@@ -107,7 +107,7 @@ public:
  * Returns a detailed error description if a call to <code>parseArguments()</code>
  * failed.
  *
- * @return The error description, empty if no error occured.
+ * @return The error description, empty if no error occurred.
  * @see parseArguments(const StringContainerType&, bool*)
  */
   std::string errorString() const;

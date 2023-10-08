@@ -20,7 +20,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * \brief Abstract class for elements which describes tubular structur.
+  * \brief Abstract class for elements which describes tubular structure.
   */
   class MITKTUBEGRAPH_EXPORT TubeElement
   {

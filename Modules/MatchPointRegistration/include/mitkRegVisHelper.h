@@ -42,7 +42,7 @@ namespace mitk
 void MITKMATCHPOINTREGISTRATION_EXPORT GetGridGeometryFromNode(const mitk::DataNode* regNode, mitk::Geometry3D::Pointer& gridDesc, unsigned int& gridFrequ);
 
 /**
- * Generates a 3D defomration gird according to a passed Geometry3D info. It is the basis
+ * Generates a 3D defomration grid according to a passed Geometry3D info. It is the basis
  * for most of the visualizations of a MatchPoint registration.
  */
 vtkSmartPointer<vtkPolyData> MITKMATCHPOINTREGISTRATION_EXPORT Generate3DDeformationGrid(const mitk::BaseGeometry* gridDesc, unsigned int gridFrequence, const map::core::RegistrationKernelBase<3,3>* regKernel = nullptr);

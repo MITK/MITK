@@ -341,6 +341,6 @@ mitk::DataNode* QmitkPatientTableModel::GetCurrentDataNode(const QModelIndex& in
       return nullptr;
     }
   }
-  // could not find a specif image
+  // could not find a specific image
   return nullptr;
 }

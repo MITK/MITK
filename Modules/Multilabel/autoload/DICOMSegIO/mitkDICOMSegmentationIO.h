@@ -54,7 +54,7 @@ namespace mitk
     /**
      * @brief Reads a number of DICOM segmentation from the file system
      * @return a vector of mitk::LabelSetImages
-     * @throws throws an mitk::Exception if an error ocurrs
+     * @throws throws an mitk::Exception if an error occurs
      */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 

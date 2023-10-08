@@ -332,7 +332,7 @@ void mitk::TubeGraphProperty::RenameLabel(LabelGroup *labelGroup, LabelGroup::La
   // LabelGroup? Check if it is a label in property class
   if (label)
   {
-    // rename the label in the assignement vector for tubes
+    // rename the label in the assignment vector for tubes
     for (auto it = m_TubeToLabelsMap.begin(); it != m_TubeToLabelsMap.end(); it++)
     {
       // Label group fit?

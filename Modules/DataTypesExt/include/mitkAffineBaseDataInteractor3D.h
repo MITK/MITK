@@ -90,7 +90,7 @@ namespace mitk
     virtual void RestoreNodeProperties();
 
     /**
-     * @brief InitMembers convinience method to avoid code duplication between InitRotate() and InitTranslate().
+     * @brief InitMembers convenience method to avoid code duplication between InitRotate() and InitTranslate().
      * @param interactionEvent
      */
     bool InitMembers(InteractionEvent *interactionEvent);

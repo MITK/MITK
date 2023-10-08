@@ -29,7 +29,7 @@ namespace mitk
    * The resulting surface depends on a filter pipeline based on vtkMedian (1) and a Gaussian filter with
    * vtkImageGaussianSmooth (2).
    * All voxel can be changed to an isotropic representation of the
-   * image (ATTANTION: the number of voxels in the will change). The
+   * image (ATTENTION: the number of voxels in the image will change). The
    * resulting isotropic image has 1mm isotropic voxel by default. But
    * can be varied freely.
    *

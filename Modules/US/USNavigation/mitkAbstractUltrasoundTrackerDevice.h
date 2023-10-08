@@ -174,7 +174,7 @@ namespace mitk {
     /**
     * \brief Remove this device from the micro service.
     * This method is public for mitk::USCombinedModality, because this devices
-    * can be completly removed. This is not possible for API devices, which
+    * can be completely removed. This is not possible for API devices, which
     * should be available while their sub module is loaded.
     */
     void UnregisterOnService();

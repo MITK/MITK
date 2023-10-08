@@ -123,7 +123,7 @@ cl_mem mitk::OclDataSet::GetGPUBuffer()
     cl_mem_object_type memInfo;
     clErr = clGetMemObjectInfo(this->m_gpuBuffer, CL_MEM_TYPE, sizeof(cl_mem_object_type), &memInfo, nullptr );
     CHECK_OCL_ERR(clErr);
-    MITK_DEBUG << "Querying info for object, recieving: " << memInfo;
+    MITK_DEBUG << "Querying info for object, receiving: " << memInfo;
     #endif
   }
 

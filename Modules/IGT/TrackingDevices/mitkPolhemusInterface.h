@@ -63,7 +63,7 @@ namespace mitk
 
     /**
     * \brief Clears all resources. After this method have been called the system isn't ready to track any longer.
-    * \return Returns true if the operation was succesful, false if not.
+    * \return Returns true if the operation was successful, false if not.
     */
     bool StopTracking();
 
@@ -113,7 +113,7 @@ namespace mitk
     /** @return Returns a single frame with all tools, which could be auto detected.*/
     std::vector<trackingData> AutoDetectTools();
 
-    /** @return Returns the last frame when the tracking device is in continous tracking mode. Returns an empty vector in case of an error.*/
+    /** @return Returns the last frame when the tracking device is in continuous tracking mode. Returns an empty vector in case of an error.*/
     std::vector<trackingData> GetLastFrame();
 
   protected:

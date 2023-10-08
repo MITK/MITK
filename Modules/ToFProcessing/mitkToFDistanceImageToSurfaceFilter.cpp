@@ -172,7 +172,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
       /** Here we have to incorporate spacing and origin to allow processing of cropped/resampled images
       * Usually origin will be [0, 0, 0] and spacing will be [1, 1, 1], but just in case the image is moved
-      * due to cropping or the spacing differes due to up- or downsampling.*/
+      * due to cropping or the spacing differs due to up- or downsampling.*/
       unsigned int completeIndexX = i*spacing[0]+origin[0];
       unsigned int completeIndexY = j*spacing[1]+origin[1];
 

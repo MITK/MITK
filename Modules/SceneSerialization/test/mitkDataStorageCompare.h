@@ -192,7 +192,7 @@ namespace mitk
     DataStorage::ConstPointer m_TestDS;
 
     /**
-     * \brief Structure associating "hierachy descriptors" to DataNodes.
+     * \brief Structure associating "hierarchy descriptors" to DataNodes.
      *
      * The string keys are "hierarchy descriptors" which are
      * built by GenerateHierarchyDescriptor() for individual nodes.
@@ -206,7 +206,7 @@ namespace mitk
     HierarchyDescriptorMap m_TestNodesByHierarchy;
 
     /**
-     * \brief Calculate hierachy descriptors for each node, store them in the result map.
+     * \brief Calculate hierarchy descriptors for each node, store them in the result map.
      *
      */
     void DescribeHierarchyOfNodes(DataStorage::ConstPointer storage, HierarchyDescriptorMap &result);

@@ -73,7 +73,7 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
   try
   {
     std::vector<ServiceReferenceU> refs = mc->GetServiceReferences("us::TestModuleBService");
-    US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Test that both the service from the shared and imported library are regsitered");
+    US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Test that both the service from the shared and imported library are registered");
 
     InterfaceMap o1 = mc->GetService(refs.front());
     US_TEST_CONDITION(!o1.empty(), "Test if first service object found");

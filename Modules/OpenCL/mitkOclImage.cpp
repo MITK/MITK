@@ -210,7 +210,7 @@ cl_mem mitk::OclImage::GetGPUImage(cl_command_queue gpuComQueue)
     CHECK_OCL_ERR(clErr);
   }
 
-  MITK_INFO << "Querying info for object, recieving: " << memInfo;
+  MITK_INFO << "Querying info for object, receiving: " << memInfo;
 
   // test if m_gpuImage CL_MEM_IMAGE_2/3D
   // if not, copy buffer to image

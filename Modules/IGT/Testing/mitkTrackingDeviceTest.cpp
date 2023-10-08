@@ -29,7 +29,7 @@ found in the LICENSE file.
 #include "mitkTrackingDeviceTypeCollection.h"
 #include "mitkUnspecifiedTrackingTypeInformation.h"
 
-//All Tracking devices, which should be avaiable by default
+//All Tracking devices, which should be available by default
 #include "mitkNDIAuroraTypeInformation.h"
 #include "mitkNDIPolarisTypeInformation.h"
 #include "mitkVirtualTrackerTypeInformation.h"
@@ -73,7 +73,7 @@ int mitkTrackingDeviceTest(int /* argc */, char* /*argv*/[])
 
   // Test instantiation of TrackingDevice
   TrackingDeviceTestClass::Pointer trackingDeviceTestClass = TrackingDeviceTestClass::New();
-  MITK_TEST_CONDITION(trackingDeviceTestClass.IsNotNull(),"Test instatiation");
+  MITK_TEST_CONDITION(trackingDeviceTestClass.IsNotNull(),"Test instantiation");
 
   // Test method GetState()
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetState()==mitk::TrackingDevice::Setup,"Mode should be initialized to SETUP");

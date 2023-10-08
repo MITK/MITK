@@ -146,7 +146,7 @@ struct TrackedTypeTraits<S,S*>
  * This specialization is "special" because the tracked type is not
  * void* (as specified in the second template parameter) but InterfaceMap.
  * This is in line with the ModuleContext::GetService(...) overloads to
- * return either S* or InterfaceMap dependening on the template parameter.
+ * return either S* or InterfaceMap depending on the template parameter.
  */
 template<>
 struct TrackedTypeTraits<void,void*>

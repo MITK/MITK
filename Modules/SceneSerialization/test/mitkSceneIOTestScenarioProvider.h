@@ -66,7 +66,7 @@ namespace mitk
         \param _isSerializable Do we expect that this can be stored in a .mitk file?
         \param _referenceArchiveFilename Absolute filename with a reference .mitk file.
         \param _isReferenceLoadable Do we expect that the reference can be loaded without errors?
-        \param _comparisonPrecision Precision used for floating point comparisions after save/load cycle (eps).
+        \param _comparisonPrecision Precision used for floating point comparisons after save/load cycle (eps).
       */
       Scenario(const std::string &_key,
                const SceneIOTestScenarioProvider *_scenarioProvider,

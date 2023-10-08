@@ -57,7 +57,7 @@ US_BEGIN_NAMESPACE
  * standard calls to the pthread condition variable.  On Win32
  * systems, there is no system provided condition variable.  This
  * class implements a condition variable using a critical section, a
- * semphore, an event and a number of counters.  The implementation is
+ * semaphore, an event and a number of counters.  The implementation is
  * almost an extract translation of the implementation presented by
  * Douglas C Schmidt and Irfan Pyarali in "Strategies for Implementing
  * POSIX Condition Variables on Win32".
@@ -335,7 +335,7 @@ bool WaitCondition<MutexHost>::Wait(Mutex& mutex, unsigned long timeoutMillis)
     }
     else
     {
-      // Always regain the external mutex since that's the guarentee we
+      // Always regain the external mutex since that's the guarantee we
       // give to our callers
       dw = WaitForSingleObject(mutex.m_Mtx, INFINITE);
       if (result && dw == WAIT_FAILED)

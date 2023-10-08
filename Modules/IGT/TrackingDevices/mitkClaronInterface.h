@@ -62,7 +62,7 @@ namespace mitk
 
     /**
     * \brief Clears all resources. After this method have been called the system isn't ready to track any longer.
-    * \return Returns true if the operation was succesful, false if not.
+    * \return Returns true if the operation was successful, false if not.
     */
     bool StopTracking();
 
@@ -103,14 +103,14 @@ namespace mitk
     void GrabFrame();
 
     /**
-    * \return Returns wether the tracking device is tracking or not.
+    * \return Returns whether the tracking device is tracking or not.
     */
     bool IsTracking();
 
     /**
-    * \return   Returns wether the MicronTracker is installed (means wether the C-Make-Variable "MITK_USE_MICRON_TRACKER" is set ON),
+    * \return   Returns whether the MicronTracker is installed (means whether the C-Make-Variable "MITK_USE_MICRON_TRACKER" is set ON),
     *           so returns true in this case. This is because the class mitkClaronInterfaceStub, in which the same Method returns false
-    *            is used otherways.
+    *           is used otherwise.
     */
     bool IsMicronTrackerInstalled();
 

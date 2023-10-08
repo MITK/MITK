@@ -58,7 +58,7 @@ public:
   ModuleHooks moduleHooks;
 
   /**
-   * Contruct a core context
+   * Construct a core context
    *
    */
   CoreModuleContext();

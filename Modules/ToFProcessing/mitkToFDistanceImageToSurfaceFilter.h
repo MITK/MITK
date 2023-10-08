@@ -79,7 +79,7 @@ namespace mitk
 
 
     /**
-     * @brief The ReconstructionModeType enum: Defines the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units  or interpixeldistances and focal length in mm. The Kinect option defines a special reconstruction mode for the kinect.
+     * @brief The ReconstructionModeType enum: Defines the reconstruction mode, if using no interpixeldistances and focal lengths in pixel units  or interpixeldistances and focal length in mm. The Kinect option defines a special reconstruction mode for the kinect.
      */
     enum ReconstructionModeType{ WithOutInterPixelDistance = 1, WithInterPixelDistance = 2, Kinect = 3};
 
@@ -181,7 +181,7 @@ namespace mitk
     int m_TextureIndex; ///< Index of the input used as texture image when no scalar image was set via SetIplScalarImage(). 0 = Distance, 1 = Amplitude, 2 = Intensity
     bool m_GenerateTriangularMesh;
 
-    ReconstructionModeType m_ReconstructionMode; ///< The ReconstructionModeType enum: Defines the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units  or interpixeldistances and focal length in mm. The Kinect option defines a special reconstruction mode for the kinect.
+    ReconstructionModeType m_ReconstructionMode; ///< The ReconstructionModeType enum: Defines the reconstruction mode, if using no interpixeldistances and focal lengths in pixel units  or interpixeldistances and focal length in mm. The Kinect option defines a special reconstruction mode for the kinect.
 
     vtkSmartPointer<vtkIdList> m_VertexIdList; ///< Make a vtkIdList to save the ID's of the polyData corresponding to the image pixel ID's. This can be accessed after generate data to obtain the mapping.
 

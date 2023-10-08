@@ -152,7 +152,7 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
         iErr = fscanf (intensityInfile, "%f", &intenVal);
       }
       else
-      {      //comma seperated values now
+      {      //comma separated values now
         dErr = fscanf (distanceInfile, ",%f", &distVal);
         aErr = fscanf (amplitudeInfile, ",%f", &amplVal);
         iErr = fscanf (intensityInfile, ",%f", &intenVal);

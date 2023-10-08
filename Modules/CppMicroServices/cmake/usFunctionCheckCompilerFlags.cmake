@@ -53,7 +53,7 @@ function(usFunctionCheckCompilerFlags FLAG_TO_TEST RESULT_VAR)
   # the same variable name skip the compilation step.
   # For that same reason, the usFunctionCheckCompilerFlags function appends a unique suffix to
   # the HAS_CXX_FLAG variable. This suffix is created using a 'clean version' of the
-  # flag to test. The value of HAS_CXX_FLAG_${suffix} additonally needs to be a valid
+  # flag to test. The value of HAS_CXX_FLAG_${suffix} additionally needs to be a valid
   # pre-processor token because CHECK_CXX_COMPILER_FLAG adds it as a definition to the compiler
   # arguments. An invalid token triggers compiler warnings, which in case of the "-Werror" flag
   # leads to false-negative checks.

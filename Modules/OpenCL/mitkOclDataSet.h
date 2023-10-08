@@ -74,7 +74,7 @@ public:
      */
   void Modified(int _type);
 
-  /** \brief Initialze the OclDataSet with data. */
+  /** \brief Initialize the OclDataSet with data. */
   void SetData(void* data)
   {
     this->m_cpuModified = true;

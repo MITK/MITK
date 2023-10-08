@@ -46,7 +46,7 @@ namespace mitk
     virtual QmitkAbstractDataStorageInspector* CreateInspector() const = 0;
 
     using InspectorIDType = std::string;
-    /** Return the uniqe ID for the inspector type provided.*/
+    /** Return the unique ID for the inspector type provided.*/
     virtual InspectorIDType GetInspectorID() const = 0;
     /** Return the display name (e.g. used in the UI) for the inspector type provided.*/
     virtual std::string GetInspectorDisplayName() const = 0;

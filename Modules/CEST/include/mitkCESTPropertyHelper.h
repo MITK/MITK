@@ -52,7 +52,7 @@ namespace mitk
 
   /**Helper function that gets the CEST duty cycle property ("CEST.DutyCycle") from the input image.
   If it is not possible to generate/get the value an mitk::Exception will be thrown.
-  The value is returned as scaling factor (1 == 100%), in contrast to the porperty where it is stored as
+  The value is returned as scaling factor (1 == 100%), in contrast to the property where it is stored as
   a percentage value (e.g. 56 %, so the function return will be 0.56).*/
   double MITKCEST_EXPORT GetCESTDutyCycle(const IPropertyProvider* provider);
 }

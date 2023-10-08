@@ -119,7 +119,7 @@ namespace mitk
 
     ///
     /// Saves the current frame count. Incremented in FetchFrame().
-    /// Resetted to 0 when StartCapturing() or StopCapturing() is called.
+    /// Reset to 0 when StartCapturing() or StopCapturing() is called.
     /// default: 0
     ///
     unsigned long m_FrameCount;

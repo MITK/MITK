@@ -54,7 +54,7 @@ protected:
   ctkSliderWidget* m_ThresholdSlider = nullptr;
 
   /** Indicates if the tool UI is used for a tool with upper an lower threshold (true)
-  ore only with one threshold (false)*/
+  or only with one threshold (false)*/
   bool m_ULMode;
 
   bool m_InternalUpdate = false;

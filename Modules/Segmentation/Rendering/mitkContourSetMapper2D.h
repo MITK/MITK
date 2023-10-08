@@ -45,7 +45,7 @@ namespace mitk
     void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * actor = nullptr) override;
 
     /**
-     * return a refernce of the rendered data object
+     * return a reference of the rendered data object
      */
     const mitk::ContourSet *GetInput(void);
 

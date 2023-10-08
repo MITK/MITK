@@ -105,7 +105,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
 
   // TODO prepare to detect errors (such as cycles) from wrongly written or edited xml files
 
-  // Get number of elements to initialze progress bar
+  // Get number of elements to initialize progress bar
   //   1. if there is a <data type="..." file="..."> element,
   //        - construct a name for the appropriate serializer
   //        - try to instantiate this serializer via itk object factory

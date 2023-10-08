@@ -251,7 +251,7 @@ mitk::ModelBase::DerivedParameterMapType mitk::ModelBase::GetDerivedParameters(
 {
   if (parameters.size() != this->GetNumberOfParameters())
   {
-    itkExceptionMacro("Cannot compute derived parametes. Passed parameters does not define all parameters correctly. Required size:"
+    itkExceptionMacro("Cannot compute derived parameters. Passed parameters does not define all parameters correctly. Required size:"
                       << this->GetNumberOfParameters() << "; passed size: " << parameters.size());
   }
 

@@ -184,7 +184,7 @@ namespace mitk
 
         for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
         {
-          // Thresold over the image with the given label value
+          // Threshold over the image with the given label value
           itk::ThresholdImageFilter<itkInternalImageType>::Pointer thresholdFilter =
             itk::ThresholdImageFilter<itkInternalImageType>::New();
           thresholdFilter->SetInput(itkLabelImage);

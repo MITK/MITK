@@ -24,7 +24,7 @@ int mitkKinectDeviceTest(int /* argc */, char* /*argv*/[])
   mitk::KinectDevice::Pointer kinectDevice = mitk::KinectDevice::New();
   try
   {
-  MITK_TEST_CONDITION_REQUIRED(kinectDevice.IsNotNull(),"Testing initialzation!");
+  MITK_TEST_CONDITION_REQUIRED(kinectDevice.IsNotNull(),"Testing initialization!");
   MITK_TEST_CONDITION_REQUIRED(kinectDevice->ConnectCamera(),"Testing ConnectCamera()");
   MITK_TEST_OUTPUT(<<"Testing StartCamera()");
   kinectDevice->StartCamera();

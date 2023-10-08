@@ -176,7 +176,7 @@ public:
       catch (const std::exception& e)
       {
         teststatus = false;
-        US_TEST_OUTPUT( << "*** Unexpected excpetion when trying to lookup a"
+        US_TEST_OUTPUT( << "*** Unexpected exception when trying to lookup a"
                           " service while it is in state UNREGISTERING: "
                           << e.what() );
       }
@@ -398,7 +398,7 @@ void frameSL25a()
     throw;
   }
 
-  // Start libModuleTestSL4 that will require the serivce interface and publish
+  // Start libModuleTestSL4 that will require the service interface and publish
   // us::FooService
   try
   {
@@ -411,7 +411,7 @@ void frameSL25a()
     throw;
   }
 
-  // Start libModuleTestSL3 that will require the serivce interface and get the service
+  // Start libModuleTestSL3 that will require the service interface and get the service
   try
   {
     US_TEST_OUTPUT( << "Starting libModuleTestSL3: " << libSL3.GetFilePath() );

@@ -267,8 +267,8 @@ mitk::GIFCooccurenceMatrix::GIFCooccurenceMatrix():
   m_Ranges({ 1.0 })
 {
   SetShortName("deprecated-cooc");
-  SetLongName("deprecated-cooccurence");
-  SetFeatureClassName("Deprecated Co-occurence Features");
+  SetLongName("deprecated-cooccurrence");
+  SetFeatureClassName("Deprecated Co-occurrence Features");
 }
 
 void mitk::GIFCooccurenceMatrix::SetRanges(std::vector<double> ranges)
@@ -321,7 +321,7 @@ void mitk::GIFCooccurenceMatrix::AddArguments(mitkCommandLineParser& parser) con
 {
   std::string name = this->GetOptionPrefix();
 
-  parser.addArgument(this->GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurence matrix", "calculates Co-occurence based features", us::Any());
+  parser.addArgument(this->GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurrence matrix", "calculates Co-occurrence based features", us::Any());
   parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "Cooc Range", "Define the range that is used (Semicolon-separated)", us::Any());
 }
 

@@ -170,7 +170,7 @@ namespace mitk {
       mitk::ExtractSliceFilter::Pointer m_Reslicer;
       /** \brief Filter for thick slices */
       vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
-      /** \brief PolyData object containg all lines/points needed for outlining the contour.
+      /** \brief PolyData object containing all lines/points needed for outlining the contour.
       This container is used to save a computed contour for the next rendering execution.
       For instance, if you zoom or pann, there is no need to recompute the contour. */
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
@@ -251,7 +251,7 @@ namespace mitk {
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     /** \brief This method uses the vtkCamera clipping range and the layer property
-    * to calcualte the depth of the object (e.g. image or contour). The depth is used
+    * to calculate the depth of the object (e.g. image or contour). The depth is used
     * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer* renderer);
 
@@ -262,7 +262,7 @@ namespace mitk {
     void ApplyLookuptable(mitk::BaseRenderer* renderer);
 
     /** \brief This method applies a color transfer function.
-    * Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous
+    * Internally, a vtkColorTransferFunction is used. This is useful for coloring continuous
     * images (e.g. float)
     * \warning To use the color transfer function, the property 'Image Rendering.Transfer Function' must be set and a 'Image Rendering.Mode' which uses the color transfer function must be set.
     */

@@ -327,7 +327,7 @@ namespace mitk
      * @param mode Optional parameter to set the openmode of the stream
      * @return The set of loaded BaseData objects. \c Should contain either one or zero elements, since a resource
      * stream
-     * respresents one object.
+     * represents one object.
      * @throws mitk::Exception if no reader was found for the stream.
      */
     static std::vector<BaseData::Pointer> Load(const us::ModuleResource &usResource,

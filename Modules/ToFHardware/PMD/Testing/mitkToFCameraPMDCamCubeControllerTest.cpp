@@ -24,7 +24,7 @@ int mitkToFCameraPMDCamCubeControllerTest(int /* argc */, char* /*argv*/[])
   try
   {
 
-  MITK_TEST_CONDITION_REQUIRED(camCubeController.IsNotNull(),"Testing initialzation!");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController.IsNotNull(),"Testing initialization!");
   MITK_TEST_CONDITION_REQUIRED(camCubeController->GetCaptureHeight()== 200 ,"Testing initialization of CaptureHeight");
   MITK_TEST_CONDITION_REQUIRED(camCubeController->GetCaptureWidth()== 200 ,"Testing initialization of CaptureWidth");
   MITK_TEST_CONDITION_REQUIRED(camCubeController->OpenCameraConnection(),"Testing opening of camera connection!");

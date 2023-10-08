@@ -78,14 +78,14 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLStreamingManagementWidget : public QWidg
 
  signals:
     /**
-    * \brief used for thread seperation, the worker thread must not call AdaptGUIToState directly.
-    * QT signals are thread safe and seperate the threads
+    * \brief used for thread separation, the worker thread must not call AdaptGUIToState directly.
+    * QT signals are thread safe and separate the threads
     */
     void AdaptGUIToStateSignal();
     /**
-    * \brief used for thread seperation, the worker thread must not call SelectSourceAndAdaptGUI
+    * \brief used for thread separation, the worker thread must not call SelectSourceAndAdaptGUI
     * directly.
-    * QT signals are thread safe and seperate the threads
+    * QT signals are thread safe and separate the threads
     */
     void SelectSourceAndAdaptGUISignal();
 

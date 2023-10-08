@@ -40,7 +40,7 @@ namespace mitk
      @param data Instance that properties should be configured.
      @param name Name of the parameter this data instance represents.
      @param dataType Type of the parameter this data instance represents.
-     @param fitInfo Instance to the fit info that containes the information of the fit that derived the parameter.
+     @param fitInfo Instance to the fit info that contains the information of the fit that derived the parameter.
      @pre Data must point to a valid instance.
      @pre fitInfo must point to an valid instance.
     */

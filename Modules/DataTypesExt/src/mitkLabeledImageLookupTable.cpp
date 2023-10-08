@@ -76,10 +76,10 @@ mitk::LabeledImageLookupTable &mitk::LabeledImageLookupTable::operator=(const mi
 /**
  * Sets the color for a given label
  * @param label The pixel value used as a label in the image
- * @param r The red component of the rgba color value. Values sould be given in the range [0,1]
- * @param g The green component of the rgba color value. Values sould be given in the range [0,1]
- * @param b The blue component of the rgba color value. Values sould be given in the range [0,1]
- * @param a The alpha component of the rgba color value. Values sould be given in the range [0,1]. Default is 1.
+ * @param r The red component of the rgba color value. Values should be given in the range [0,1]
+ * @param g The green component of the rgba color value. Values should be given in the range [0,1]
+ * @param b The blue component of the rgba color value. Values should be given in the range [0,1]
+ * @param a The alpha component of the rgba color value. Values should be given in the range [0,1]. Default is 1.
  */
 void mitk::LabeledImageLookupTable::SetColorForLabel(const mitk::LabeledImageLookupTable::LabelType &label,
                                                      const double &r,

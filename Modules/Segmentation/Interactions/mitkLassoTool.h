@@ -28,7 +28,7 @@ namespace mitk
     The tool always assumes that unconfirmed contours are always defined for the
     current time point. So the time step in which the contours will be stored as
     segmentations will be determined when the contours got confirmed. Then they
-    will be transfered to the slices of the currently selected time step.
+    will be transferred to the slices of the currently selected time step.
 
     \sa SegTool2D
 

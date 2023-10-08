@@ -131,7 +131,7 @@ void _mitkItkPictureWrite(itk::Image<TPixel, VImageDimension> *itkImage, const s
   }
   catch (const itk::ExceptionObject &e)
   {
-    MITK_ERROR << "ITK Exception occured: " << e.what();
+    MITK_ERROR << "ITK Exception occurred: " << e.what();
     mitkThrow() << "Caught ITK exception while writing image with scalar type \n" << e.what();
   }
 }
@@ -160,7 +160,7 @@ void _mitkItkPictureWriteComposite(itk::Image<TPixel, VImageDimension> *itkImage
   }
   catch (const itk::ExceptionObject &e)
   {
-    MITK_ERROR << "ITK Exception occured: " << e.what();
+    MITK_ERROR << "ITK Exception occurred: " << e.what();
     mitkThrow() << "Caught ITK exception while writing image with composite type \n" << e.what();
   }
 }

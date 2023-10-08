@@ -31,7 +31,7 @@ namespace mitk
 {
   /*!
   \brief RegEvaluationObject
-  Class that containes all data to realize an evaluation of registrations via images.
+  Class that contains all data to realize an evaluation of registrations via images.
   */
   class MITKMATCHPOINTREGISTRATION_EXPORT RegEvaluationObject: public mitk::BaseData
   {

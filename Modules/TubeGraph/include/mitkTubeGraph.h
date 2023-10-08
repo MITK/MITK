@@ -44,7 +44,7 @@ namespace mitk
   {
   public:
     /**
-    * Defines the type of the id of a single tube. It is allways the source and target descriptor: [uint, uint]
+    * Defines the type of the id of a single tube. It is always the source and target descriptor: [uint, uint]
     */
     typedef std::pair<VertexDescriptorType, VertexDescriptorType> TubeDescriptorType;
 

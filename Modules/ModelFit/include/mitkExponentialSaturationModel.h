@@ -21,7 +21,7 @@ namespace mitk
 {
 
   /** @class ExponentialSaturationModel
-  * @brief This genric model has the form: if x<onset: y(x) = baseline , else: y(x) = baseline + (y_final-baseline) * (1 - exp(-rate*(x-onset)))
+  * @brief This generic model has the form: if x<onset: y(x) = baseline , else: y(x) = baseline + (y_final-baseline) * (1 - exp(-rate*(x-onset)))
   */
   class MITKMODELFIT_EXPORT ExponentialSaturationModel : public mitk::ModelBase
   {

@@ -18,7 +18,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /*!
-    \brief Inferface for creating a sequence of nice/matching/appropriate/... colors.
+    \brief Interface for creating a sequence of nice/matching/appropriate/... colors.
 
     See derived classes for implemented sequences.
   */

@@ -92,7 +92,7 @@ void QmitkIGTLStreamingManagementWidget::CreateConnections()
     connect(m_Controls->stopStreamPushButton, SIGNAL(clicked()),
       this, SLOT(OnStopStreaming()));
   }
-  //this is used for thread seperation, otherwise the worker thread would change the ui elements
+  //this is used for thread separation, otherwise the worker thread would change the ui elements
   //which would cause an exception
   connect(this, SIGNAL(AdaptGUIToStateSignal()), this, SLOT(AdaptGUIToState()));
   connect(this, SIGNAL(SelectSourceAndAdaptGUISignal()), this, SLOT(SelectSourceAndAdaptGUI()));

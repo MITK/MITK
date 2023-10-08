@@ -25,7 +25,7 @@ found in the LICENSE file.
 
 /*!
 \class QmitkInitialValuesModel
-Model that handles the definition of inital model values.
+Model that handles the definition of initial model values.
 */
 class MITKMODELFITUI_EXPORT QmitkInitialValuesModel : public QAbstractTableModel
 {
@@ -42,7 +42,7 @@ public:
   void setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names,
                         const mitk::ModelTraitsInterface::ParametersType values);
   /**@overload
-   Convinience method that sets the default initial values always to zero.*/
+   Convenience method that sets the default initial values always to zero.*/
   void setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names);
 
   /** Adds an image as a source for the initial value of a parameter.

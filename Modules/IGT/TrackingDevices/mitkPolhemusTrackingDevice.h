@@ -40,7 +40,7 @@ namespace mitk
 
     /**
     * \brief Starts the tracking.
-    * \return Returns true if the tracking is started. Throws an exception if an error occures.
+    * \return Returns true if the tracking is started. Throws an exception if an error occurs.
     * @throw mitk::IGTHardwareException Throws an exception if there is an error during start tracking.
     */
     virtual bool StartTracking() override;

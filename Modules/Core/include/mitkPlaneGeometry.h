@@ -365,7 +365,7 @@ namespace mitk
     /**
     * \brief Calculate two points where another plane intersects the border of this plane
     *
-    * \return number of intersection points (0..2). First interection point (if existing)
+    * \return number of intersection points (0..2). First intersection point (if existing)
     * is returned in \a lineFrom, second in \a lineTo.
     */
     unsigned int IntersectWithPlane2D(const PlaneGeometry *plane, Point2D &lineFrom, Point2D &lineTo) const;

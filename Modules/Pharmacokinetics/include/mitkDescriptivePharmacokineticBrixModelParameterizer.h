@@ -77,7 +77,7 @@ namespace mitk
     /**injection time Tau in minutes [min]*/
     double m_Tau;
 
-    /**Pointer to the image that containes the values of the first timestep
+    /**Pointer to the image that contains the values of the first timestep
     (base value of the series that should be modelled)*/
     BaseImageType::ConstPointer m_BaseImage;
 

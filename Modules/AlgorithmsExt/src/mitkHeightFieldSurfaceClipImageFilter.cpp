@@ -257,7 +257,7 @@ namespace mitk
 
             bool clip;
 
-            // if the current point is outside of the plane region (RegionOfInterest)-->clip the pixel allways
+            // if the current point is outside of the plane region (RegionOfInterest)-->clip the pixel always
             if ((x0 < 0) || (x0 >= (int)m_HeightFieldResolutionX) || (y0 < 0) || (y0 >= (int)m_HeightFieldResolutionY))
             {
               clip = true;
@@ -301,7 +301,7 @@ namespace mitk
               }
             }
 
-            // different modes: differnt values for the clipped pixel
+            // different modes: different values for the clipped pixel
             if (clip)
             {
               if (clipImageFilter->m_ClippingMode == CLIPPING_MODE_CONSTANT)

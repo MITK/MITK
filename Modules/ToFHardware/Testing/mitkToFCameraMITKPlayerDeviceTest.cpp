@@ -115,7 +115,7 @@ public:
     }
     catch(std::exception  &e)
     {
-      MITK_ERROR << "Unknown exception occured: " << e.what();
+      MITK_ERROR << "Unknown exception occurred: " << e.what();
     }
   }
 
@@ -133,7 +133,7 @@ public:
     }
     catch(std::exception  &e)
     {
-      MITK_ERROR << "Unknown exception occured: " << e.what();
+      MITK_ERROR << "Unknown exception occurred: " << e.what();
     }
   }
 };

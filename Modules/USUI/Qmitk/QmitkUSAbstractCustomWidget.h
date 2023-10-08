@@ -75,7 +75,7 @@ public:
 
   /**
     * \brief Called every time a mitk::USDevice was set with QmitkUSAbstractCustomWidget::SetDevice().
-    * A sublcass can implement this function to handle initialiation actions
+    * A subclass can implement this function to handle initiaiization actions
     * necessary when a device was set.
     */
   virtual void OnDeviceSet() = 0;
@@ -102,7 +102,7 @@ public:
 
   /**
     * \brief Return pointer to copy of the object.
-    * Internally use of QmitkUSAbstractCustomWidget::Clone() with additionaly
+    * Internally use of QmitkUSAbstractCustomWidget::Clone() with additionally
     * setting an internal flag that the object was really cloned.
     */
   QmitkUSAbstractCustomWidget* CloneForQt(QWidget* parent = nullptr) const;

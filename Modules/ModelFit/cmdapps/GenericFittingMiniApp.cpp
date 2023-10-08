@@ -94,7 +94,7 @@ void setupParser(mitkCommandLineParser& parser)
     parser.addArgument(
         "verbose", "v", mitkCommandLineParser::Bool, "Verbose Output", "Whether to produce verbose output");
     parser.addArgument(
-        "roibased", "r", mitkCommandLineParser::Bool, "Roi based fitting", "Will compute a mean intesity signal over the ROI before fitting it. If this mode is used a mask must be specified.");
+        "roibased", "r", mitkCommandLineParser::Bool, "Roi based fitting", "Will compute a mean intensity signal over the ROI before fitting it. If this mode is used a mask must be specified.");
     parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
     parser.endGroup();
     //! [add arguments]
@@ -280,7 +280,7 @@ void doFitting()
         }
         else
         {
-            mitkThrow() << "Fitting error! Could not initalize fitting job.";
+            mitkThrow() << "Fitting error! Could not initialize fitting job.";
         }
 }
 

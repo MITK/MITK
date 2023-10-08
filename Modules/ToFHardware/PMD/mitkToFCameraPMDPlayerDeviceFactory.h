@@ -24,14 +24,14 @@ namespace mitk
   /**
   * \brief ToFPMDPlayerDeviceFactory is an implementation of the factory pattern to generate PMD Player Devices.
   * ToFPMDPlayerDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
-  * This offers users the oppertunity to generate new PMD Player Devices via a global instance of this factory.
+  * This offers users the opportunity to generate new PMD Player Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
 class MITKPMD_EXPORT ToFCameraPMDPlayerDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
   /**
-   * @brief ToFCameraPMDPlayerDeviceFactory Default contructor.
+   * @brief ToFCameraPMDPlayerDeviceFactory Default constructor.
    * This factory internally counts all PMD Player devices starting at 1.
    */
   ToFCameraPMDPlayerDeviceFactory()

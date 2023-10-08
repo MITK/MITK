@@ -30,7 +30,7 @@ namespace mitk
    * - An element has a name (alphanumric, - and space; "A-Za-z0-9- ") or is wildcarded ("*")
    * - A selection is either an index (e.g. "[1]") or a wildcard ("[*]").
    *
-   * Selections are used to indicate that the preceding element has multiple occurrences and which occurence is meant.
+   * Selections are used to indicate that the preceding element has multiple occurrences and which occurrence is meant.
    * Example property keys would be:
    * - prop : A simple property key
    * - prop.subprop1 : A property key consisting of two nodes

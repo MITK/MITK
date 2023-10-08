@@ -63,15 +63,15 @@ int mitkOclResourceServiceTest( int /*argc*/, char* /*argv*/[] )
   const char* progSource = testProgramSource.c_str();
   cl_program testProgram = clCreateProgramWithSource( first, 1, &progSource, &progSize, &err );
 
-  MITK_TEST_CONDITION_REQUIRED( err == CL_SUCCESS, "Test program loaded succesfully.");
+  MITK_TEST_CONDITION_REQUIRED( err == CL_SUCCESS, "Test program loaded successfully.");
 
   err = clBuildProgram(testProgram, 0, nullptr, nullptr, nullptr, nullptr);
-  MITK_TEST_CONDITION_REQUIRED( err == CL_SUCCESS, "Test program built succesfully.");
+  MITK_TEST_CONDITION_REQUIRED( err == CL_SUCCESS, "Test program built successfully.");
 
   resources->InsertProgram( testProgram, "test_program", true);
   MITK_TEST_CONDITION( resources->GetProgram("test_program") == testProgram, "Program correctly stored by ResourceService");
 
-  // the manger throws exception when accessing non-existant programs
+  // the manager throws exception when accessing non-existant programs
   MITK_TEST_FOR_EXCEPTION( mitk::Exception, resources->GetProgram("blah"); );
 
   // another test source, this one does not compile
@@ -84,11 +84,11 @@ int mitkOclResourceServiceTest( int /*argc*/, char* /*argv*/[] )
   cl_program notComp_testProgram = clCreateProgramWithSource( first, 1, &progSource2, &progSize, &err );
 
   // the error in the source code has no influence on loading the program
-  MITK_TEST_CONDITION_REQUIRED( err == CL_SUCCESS, "Test program 2 loaded succesfully.");
+  MITK_TEST_CONDITION_REQUIRED( err == CL_SUCCESS, "Test program 2 loaded successfully.");
 
   err = clBuildProgram(notComp_testProgram, 0, nullptr, nullptr, nullptr, nullptr);
   MITK_TEST_CONDITION_REQUIRED( err == CL_BUILD_PROGRAM_FAILURE, "Test program 2 failed to build.");
-  std::cout << " --> The (expected) OpenCL Build Error occured : ";// << GetOclErrorString(err);
+  std::cout << " --> The (expected) OpenCL Build Error occurred : ";// << GetOclErrorString(err);
 
   resources->InsertProgram( notComp_testProgram, "test_program_failed", true);
   MITK_TEST_CONDITION( resources->GetProgram("test_program_failed") == notComp_testProgram, "Program correctly stored by ResourceService");

@@ -102,7 +102,7 @@ class mitkNavigationToolTestClass
       mitk::Quaternion resultingToolAxisOrientation(0, -sqrt(2)/2.0, 0, sqrt(2)/2.0);
       // test calculation of ToolAxisOrientation
       myNavigationTool->SetToolAxis(toolAxis);
-      MITK_TEST_CONDITION(CompareQuaternions(myNavigationTool->GetToolAxisOrientation(),resultingToolAxisOrientation), "Testing caluclation of ToolAxisOrientation");
+      MITK_TEST_CONDITION(CompareQuaternions(myNavigationTool->GetToolAxisOrientation(),resultingToolAxisOrientation), "Testing calculation of ToolAxisOrientation");
     }
 
   };

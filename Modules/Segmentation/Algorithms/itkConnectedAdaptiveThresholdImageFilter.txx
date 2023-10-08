@@ -66,7 +66,7 @@ namespace itk
     outputImage->SetBufferedRegion(region);
     outputImage->Allocate();
     if (!m_FineDetectionMode)
-    { // only initalize the output image if we are using the raw segmentation mode
+    { // only initialize the output image if we are using the raw segmentation mode
       outputImage->FillBuffer((typename ConnectedAdaptiveThresholdImageFilter::OutputImagePixelType)initValue);
     }
 
@@ -88,7 +88,7 @@ namespace itk
     if ((this->GetLower()) > this->m_SeedpointValue || this->m_SeedpointValue > (this->GetUpper()))
     {
       // set m_SegmentationCancelled to true, so if it doesn't reach the point where it is set back to false
-      // we can asssume that there was an error
+      // we can assume that there was an error
       this->m_SegmentationCancelled = true;
       return;
     }
@@ -253,7 +253,7 @@ namespace itk
       maxValue = m_AdjLowerTh;
     }
 
-    // set all values <lower && >upper to zero (thresouldOutside uses < and > NOT <= and >=)
+    // set all values <lower && >upper to zero (thresholdOutside uses < and > NOT <= and >=)
     thresholdFilter->SetInput(m_OutoutImageMaskFineSegmentation);
     thresholdFilter->SetOutsideValue(0);
     thresholdFilter->ThresholdOutside(m_AdjLowerTh, maxValue);
@@ -278,7 +278,7 @@ namespace itk
     itk::Index<3> seedPoint,
     bool discardLeafSegmentation)
   {
-    // just to make sure we´re in the right mode and the mask exsits
+    // just to make sure we´re in the right mode and the mask exists
     if (m_FineDetectionMode && iteratorMaskForFineSegmentation)
     {
       m_OutoutImageMaskFineSegmentation = iteratorMaskForFineSegmentation;

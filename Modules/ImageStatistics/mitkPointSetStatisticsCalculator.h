@@ -46,7 +46,7 @@ public:
   /** @return Returns the sample standard derivation of each component (x, y and z) of the analysed point set (only valid navigation data). Returns [0;0;0] if there is no valid navigation data.*/
   mitk::Vector3D GetPositionSampleStandardDeviation();
 
-  /** @return Returns the mean distance to the mean postion (=mean error) of the analysed point set (only valid navigation data). Returns 0 if there is no valid navigation data. */
+  /** @return Returns the mean distance to the mean position (=mean error) of the analysed point set (only valid navigation data). Returns 0 if there is no valid navigation data. */
   double GetPositionErrorMean();
 
   /** @return Returns the standard derivation of the errors of all positions of the analysed point set (only valid navigation data). Returns 0 if there is no valid navigation data. */

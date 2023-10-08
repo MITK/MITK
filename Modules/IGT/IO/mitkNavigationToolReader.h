@@ -43,7 +43,7 @@ namespace mitk {
      * @brief          This method reads a navigation tool from a file.
      * @param filename The filename where the tool is stored, "C:\temp\myTool.igtTool" for example.
      * @return         Returns a pointer to the tool which was read. Returns nullptr, if something went
-     *                 wrong and no tool was read. In this case you may also want the error message which is availiable
+     *                 wrong and no tool was read. In this case you may also want the error message which is available
      *                 from the method GetErrorMessage().
      */
     mitk::NavigationTool::Pointer DoRead(std::string filename);

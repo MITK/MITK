@@ -393,7 +393,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PVWR(std::string* portHandle, const unsign
   std::string fullcommand;
   for (unsigned int j = 0; j < hexSROMData.size(); j += 128)
   {
-    sprintf(hexcharacter, "%s%04X", portHandle->c_str(), j/2);              // build the first two parameters: PortHandle and SROM device adress (not in hex characters, but in bytes)
+    sprintf(hexcharacter, "%s%04X", portHandle->c_str(), j/2);              // build the first two parameters: PortHandle and SROM device address (not in hex characters, but in bytes)
     fullcommand = basecommand + hexcharacter + hexSROMData.substr(j, 128);  // build complete command string
     returnValue = m_TrackingDevice->Send(&fullcommand, m_UseCRC);           // send command
     itksys::SystemTools::Delay(50);               // Wait for trackingsystem to process the data

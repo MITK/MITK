@@ -96,7 +96,7 @@ public:
       */
   void InitializeMITKImage();
 
-  /** \brief Initialze the OclImage with an mitkImage. */
+  /** \brief Initialize the OclImage with an mitkImage. */
   void InitializeByMitkImage(mitk::Image::Pointer _image);
 
   /*! \brief returns the specified image dimension size */

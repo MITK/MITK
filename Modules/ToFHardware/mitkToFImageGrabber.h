@@ -169,7 +169,7 @@ namespace mitk
     virtual void AllocateImageArrays();
 
     /**
-     * @brief InitializeImages Initialze the geometries of the images according to the device properties.
+     * @brief InitializeImages Initialize the geometries of the images according to the device properties.
      */
     void InitializeImages();
 

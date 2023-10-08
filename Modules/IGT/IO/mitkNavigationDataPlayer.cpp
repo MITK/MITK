@@ -51,7 +51,7 @@ void mitk::NavigationDataPlayer::GenerateData()
   m_TimeStampSinceStart = mitk::IGTTimeStamp::GetInstance()->GetElapsed() - m_StartPlayingTimeStamp;
 
   // add offset of the first navigation data to the timestamp to start playing
-  // imediatly with the first navigation data (not to wait till the first time
+  // immediately with the first navigation data (not to wait till the first time
   // stamp is reached)
   TimeStampType timeStampSinceStartWithOffset = m_TimeStampSinceStart
       + m_NavigationDataSet->Begin()->at(0)->GetIGTTimeStamp();

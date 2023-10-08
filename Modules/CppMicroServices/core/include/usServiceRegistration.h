@@ -40,7 +40,7 @@ US_BEGIN_NAMESPACE
  * The <code>ServiceRegistration</code> object may be used to update the
  * properties of the service or to unregister the service.
  *
- * @tparam S Class tyoe of the service interface
+ * @tparam S Class type of the service interface
  * @see ModuleContext#RegisterService()
  * @remarks This class is thread safe.
  */

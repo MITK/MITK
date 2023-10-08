@@ -62,7 +62,7 @@ namespace mitk
     FunctionStringType GetFunctionString() const override;
     itkSetStringMacro(FunctionString);
 
-    /**@pre The Number of paremeters must be between 1 and 10.*/
+    /**@pre The Number of parameters must be between 1 and 10.*/
     itkSetClampMacro(NumberOfParameters, ParametersSizeType, 1, 10);
 
     std::string GetXName() const override;

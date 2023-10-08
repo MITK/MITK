@@ -174,7 +174,7 @@ mitk::NumericTwoTissueCompartmentModel::ComputeModelfunction(const ParametersTyp
 
   }
 
-  /** @brief transfom result of Differential equations back to itk::Array and interpolate to m_TimeGrid (they are calculated on a different grid defined by stepsize of odeint)*/
+  /** @brief transform result of Differential equations back to itk::Array and interpolate to m_TimeGrid (they are calculated on a different grid defined by stepsize of odeint)*/
   ConcentrationCurveType ConcentrationCompartment1 = mitk::convertParameterToArray(C1);
   ConcentrationCurveType ConcentrationCompartment2 = mitk::convertParameterToArray(C2);
   ConcentrationCurveType rungeKuttaTimeGrid = mitk::convertParameterToArray(odeTimeGrid);

@@ -209,12 +209,12 @@ bool mitk::FileSeriesReader::GenerateFileList()
         itkWarningMacro(
           "The file "
           << *it
-          << " matches prefix and extension, but the string in beteen is not a single digit-sequence. Skipping file!");
+          << " matches prefix and extension, but the string in between is not a single digit-sequence. Skipping file!");
       }
       else
       {
         // convert the number string into an integer and
-        // insert the filname (including directory) into the SortedStringContainer
+        // insert the filename (including directory) into the SortedStringContainer
         unsigned int num = atoi(number.c_str());
         sortedFiles.insert(std::make_pair(num, directory + "/" + *it));
       }

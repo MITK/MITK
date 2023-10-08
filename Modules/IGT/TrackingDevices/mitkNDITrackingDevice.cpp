@@ -704,7 +704,7 @@ bool mitk::NDITrackingDevice::StartTracking()
 
 void mitk::NDITrackingDevice::TrackTools()
 {
-  /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
+  /* lock the TrackingFinishedMutex to signal that the execution rights are now transferred to the tracking thread */
   std::lock_guard<std::mutex> lock(m_TrackingFinishedMutex);
 
   if (this->GetState() != Tracking)
@@ -743,7 +743,7 @@ void mitk::NDITrackingDevice::TrackTools()
   returnvalue = m_DeviceProtocol->TSTOP();
   if (returnvalue != NDIOKAY)
   {
-    mitkThrowException(mitk::IGTHardwareException) << "An error occured while tracking tools.";
+    mitkThrowException(mitk::IGTHardwareException) << "An error occurred while tracking tools.";
   }
 
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread and transfer control back to main thread by releasing trackingFinishedLockHolder
@@ -788,7 +788,7 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
   /* StopTracking was called, thus the mode should be changed back to Ready now that the tracking loop has ended. */
   returnvalue = m_DeviceProtocol->DSTOP();
   if (returnvalue != NDIOKAY)
-    return;     // how can this thread tell the application, that an error has occured?
+    return;     // how can this thread tell the application, that an error has occurred?
 
   this->SetState(Ready);
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread

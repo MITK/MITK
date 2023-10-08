@@ -261,9 +261,9 @@ void mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::
   m_ContourRight = mitk::ContourModel::New();
 
   auto it = srcContour->IteratorBegin();
-  // part between nextPoint and end of Countour
+  // part between nextPoint and end of Contour
   bool upperPart = false;
-  // part between start of countour and previousPoint
+  // part between start of contour and previousPoint
   bool lowerPart = true;
 
   // edge cases when point right before first control vertex is selected or first control vertex is selected

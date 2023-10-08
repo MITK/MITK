@@ -22,7 +22,7 @@ found in the LICENSE file.
 * \class  QmitkOverlayContainerWidget
 * \brief Widget that overrides the paintEvent method to correctly display
 * the Qt based overlays when using the system-environment variable
-* QT_DEVIDE_PIXEL_RATIO.
+* QT_DEVICE_PIXEL_RATIO.
 */
 
 class MITKQTOVERLAYS_EXPORT QmitkOverlayContainerWidget : public QWidget

@@ -191,7 +191,7 @@ namespace mitk
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     /** \brief This method uses the vtkCamera clipping range and the layer property
-      * to calcualte the depth of the object (e.g. image or contour). The depth is used
+      * to calculate the depth of the object (e.g. image or contour). The depth is used
       * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer *renderer);
 
@@ -202,7 +202,7 @@ namespace mitk
     void ApplyLookuptable(mitk::BaseRenderer *renderer, int layer);
 
     /** \brief This method applies a color transfer function.
-     * Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous
+     * Internally, a vtkColorTransferFunction is used. This is useful for coloring continuous
      * images (e.g. float)
      * \warning To use the color transfer function, the property 'Image Rendering.Transfer Function' must be set and a
      * 'Image Rendering.Mode' which uses the color transfer function must be set.

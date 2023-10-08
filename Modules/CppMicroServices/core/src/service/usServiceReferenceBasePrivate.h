@@ -71,9 +71,9 @@ public:
    * Unget the service object.
    *
    * @param module Module who wants remove service.
-   * @param checkRefCounter If true decrement refence counter and remove service
+   * @param checkRefCounter If true decrement reference counter and remove service
    *                        if we reach zero. If false remove service without
-   *                        checking refence counter.
+   *                        checking reference counter.
    * @return True if service was removed or false if only reference counter was
    *         decremented.
    */

@@ -76,7 +76,7 @@ void mitk::CameraVisualization::GenerateData()
   quatTransform->Modified();
 
   /* because of an itk bug, the transform can not be calculated with float datatype.
-  To use it in the mitk geometry classes, it has to be transfered to mitk::ScalarType which is float */
+  To use it in the mitk geometry classes, it has to be transferred to mitk::ScalarType which is float */
   static AffineTransform3D::MatrixType m;
   //mitk::TransferMatrix(quatTransform->GetMatrix(), m);
   m = navigationData->GetOrientation().rotation_matrix_transpose();

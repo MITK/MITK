@@ -86,7 +86,7 @@ namespace mitk
     itkGetConstMacro(OutsideValue, ScalarType);
 
     //##Description
-    //## @brief If set to \a true the minimum of the ouput pixel type is
+    //## @brief If set to \a true the minimum of the output pixel type is
     //## used as outside value (default: \a false)
     itkSetMacro(AutoOutsideValue, bool);
     itkGetConstMacro(AutoOutsideValue, bool);
@@ -97,7 +97,7 @@ namespace mitk
 
     //##Description
     //## @brief If set to \a true both sides of the clipping
-    //## geometry will be labeld using m_AboveGeometryLabel and
+    //## geometry will be labeled using m_AboveGeometryLabel and
     //## m_BelowGeometryLabel
     itkSetMacro(LabelBothSides, bool);
     itkGetConstMacro(LabelBothSides, bool);
@@ -148,7 +148,7 @@ namespace mitk
     //## Used only if m_AutoOutsideValue is \a false.
     ScalarType m_OutsideValue;
     //##Description
-    //## @brief If \a true the minimum of the ouput pixel type is
+    //## @brief If \a true the minimum of the output pixel type is
     //## used as outside value (default: \a false)
     bool m_AutoOutsideValue;
 

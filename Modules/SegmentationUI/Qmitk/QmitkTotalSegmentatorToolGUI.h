@@ -92,7 +92,7 @@ protected:
   void EnableAll(bool);
 
   /**
-   * @brief Searches and parses paths of python virtual enviroments
+   * @brief Searches and parses paths of python virtual environments
    * from predefined lookout locations
    */
   void AutoParsePythonPaths();
@@ -121,7 +121,7 @@ protected:
 
   /**
    * @brief Adds GPU information to the gpu combo box.
-   * In case, there aren't any GPUs avaialble, the combo box will be
+   * In case, there aren't any GPUs available, the combo box will be
    * rendered editable.
    */
   void SetGPUInfo();

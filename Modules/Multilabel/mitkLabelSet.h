@@ -105,7 +105,7 @@ namespace mitk
     */
     Message<> AllLabelsModifiedEvent;
 
-    /** \brief Returns a const iterator poiting to the begining of the container.
+    /** \brief Returns a const iterator pointing to the beginning of the container.
     */
     LabelContainerConstIteratorType IteratorConstBegin() const;
 
@@ -113,7 +113,7 @@ namespace mitk
     */
     LabelContainerConstIteratorType IteratorConstEnd() const;
 
-    /** \brief Returns a iterator poiting to the begining of the container.
+    /** \brief Returns a iterator pointing to the beginning of the container.
     */
     LabelContainerIteratorType IteratorBegin();
 
@@ -231,7 +231,7 @@ namespace mitk
   };
 
   /**
-  * @brief Equal A function comparing two label sets  for beeing equal in data
+  * @brief Equal A function comparing two label sets  for being equal in data
   *
   * @ingroup MITKTestingAPI
   *

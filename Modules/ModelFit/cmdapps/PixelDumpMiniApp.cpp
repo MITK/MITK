@@ -113,7 +113,7 @@ void setupParser(mitkCommandLineParser& parser)
   parser.addArgument(
     "mask", "m", mitkCommandLineParser::File, "Mask file", "Mask that defines the spatial image region that should be dumped. Must have the same geometry as the input images!", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
-    "captions", "c", mitkCommandLineParser::StringList, "Captions of image columns", "If provided the pixel columns of the csv will be named according to the passed values instead of using the image pathes. Number of images and names must be equal.", us::Any(), false);
+    "captions", "c", mitkCommandLineParser::StringList, "Captions of image columns", "If provided the pixel columns of the csv will be named according to the passed values instead of using the image paths. Number of images and names must be equal.", us::Any(), false);
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.endGroup();
   //! [add arguments]

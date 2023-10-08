@@ -107,7 +107,7 @@ void mitk::ContourModelToSurfaceFilter::GenerateData()
       polygon->GetPointIds()->SetId(j, id);
 
       // create connections between the points
-      // no previous point for first point available (ingnore id=0)
+      // no previous point for first point available (ignore id=0)
       if (id > 0)
       {
         lines->InsertNextCell(2);

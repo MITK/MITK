@@ -16,7 +16,7 @@ found in the LICENSE file.
 QmitkColorPropertyView::QmitkColorPropertyView(const mitk::ColorProperty *property, QWidget *parent)
   : QLabel(parent), PropertyView(property), m_ColorProperty(property)
 {
-  setText("  "); // two spaces for some minimun height
+  setText("  "); // two spaces for some minimum height
   setMinimumSize(15, 15);
   PropertyChanged();
 

@@ -316,7 +316,7 @@ bool mitk::USDevice::Activate()
   {
     m_DeviceState = State_Activated;
 
-    // spawn thread for aquire images if us device is active
+    // spawn thread for acquire images if us device is active
     if (m_SpawnAcquireThread)
     {
       m_Thread = std::thread(&USDevice::Acquire, this);

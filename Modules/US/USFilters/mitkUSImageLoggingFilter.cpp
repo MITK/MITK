@@ -97,7 +97,7 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
   Poco::Path testPath(path);
   if(!testPath.isDirectory())
     {
-    mitkThrow() << "Attemting to write to directory " << path << " which is not valid! Aborting!";
+    mitkThrow() << "Attempting to write to directory " << path << " which is not valid! Aborting!";
     }
 
   //generate a unique ID which is used as part of the filenames, so we avoid to overwrite old files by mistake.

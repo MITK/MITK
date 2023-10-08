@@ -84,7 +84,7 @@ namespace mitk
     Image* GetInput(unsigned int idx);
     /*!
     \brief Sets the parameter of the temporal median filter
-    \param tmporalMedianFilterNumOfFrames number of frames to be considered for calulating the temporal median
+    \param tmporalMedianFilterNumOfFrames number of frames to be considered for calculating the temporal median
     */
     void SetTemporalMedianFilterParameter(int tmporalMedianFilterNumOfFrames);
     /*!

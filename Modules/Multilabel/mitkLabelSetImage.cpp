@@ -131,7 +131,7 @@ void mitk::LabelSetImage::Initialize(const mitk::Image *other)
   // Transfer some general DICOM properties from the source image to derived image (e.g. Patient information,...)
   DICOMQIPropertyHelper::DeriveDICOMSourceProperties(other, this);
 
-  // Add a inital LabelSet ans corresponding image data to the stack
+  // Add an initial LabelSet and corresponding image data to the stack
   if (this->GetNumberOfLayers() == 0)
   {
     AddLayer();
@@ -770,7 +770,7 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
   }
   catch (...)
   {
-    mitkThrow() << "Could not intialize by provided labeled image.";
+    mitkThrow() << "Could not initialize by provided labeled image.";
   }
   this->Modified();
 }

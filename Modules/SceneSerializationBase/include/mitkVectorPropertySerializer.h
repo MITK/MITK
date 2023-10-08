@@ -45,7 +45,7 @@ namespace mitk
   public:
     // Expand manually most of mitkClassMacro:
     // mitkClassMacro(VectorProperty<DATATYPE>, mitk::BaseProperty);
-    // This manual expansion is done to override explicitely
+    // This manual expansion is done to override explicitly
     // the GetNameOfClass methods
     typedef VectorProperty<DATATYPE> PropertyType;
     typedef VectorPropertySerializer<DATATYPE> Self;

@@ -105,7 +105,7 @@ bool mitk::USVideoDevice::OnDisconnection()
 
 bool mitk::USVideoDevice::OnActivation()
 {
-  // make sure that video device is ready before aquiring images
+  // make sure that video device is ready before acquiring images
   if (!m_Source->GetIsReady())
   {
     MITK_WARN("mitkUSDevice")("mitkUSVideoDevice") << "Could not activate us video device. Check if video grabber is configured correctly.";

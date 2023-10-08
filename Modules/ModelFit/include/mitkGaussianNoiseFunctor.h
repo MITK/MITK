@@ -60,7 +60,7 @@ namespace mitk
 
     /** @todo #2 Better function?
      * This function is meant to generate a random number from a normal distribution with the passed mean and standard deviation.
-     * I found this code online, under c++11 there is supposed to be a std - libary for that: std::normal_distribution
+     * I found this code online, under c++11 there is supposed to be a std - library for that: std::normal_distribution
      **/
     inline double noise(double mu,  double sigma) const
     {

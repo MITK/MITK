@@ -246,7 +246,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   else
   {
     //Message size information and actual data size don't match.
-    //this state is not suppossed to be reached, return unknown error
+    //this state is not supposed to be reached, return unknown error
     MITK_WARN << "IGTL status unknown";
     return IGTL_STATUS_UNKNOWN_ERROR;
   }

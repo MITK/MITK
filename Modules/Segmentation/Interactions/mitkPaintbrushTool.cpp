@@ -230,7 +230,7 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent *positio
       // the contour points in the lower right corner have same position but with negative y values
       q[1] *= -1;
       // correct for moved offset if size even = the midpoint is not the midpoint of the current pixel
-      // but its upper rigt corner
+      // but its upper right corner
       q[1] += 1;
       quarterCycleLowerRight.push_back(q);
 
@@ -252,7 +252,7 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent *positio
     }
   }
 
-  // fill contour with poins in right ordering, starting with the upperRight block
+  // fill contour with points in right ordering, starting with the upperRight block
   mitk::Point3D tempPoint;
   for (unsigned int i = 0; i < quarterCycleUpperRight.size(); i++)
   {

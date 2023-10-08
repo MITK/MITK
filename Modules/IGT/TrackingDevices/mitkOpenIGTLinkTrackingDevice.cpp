@@ -71,7 +71,7 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
   }
   catch (std::runtime_error &e)
   {
-    MITK_WARN << "AutoDetection: Open IGT Link device retruned an error while trying to connect: " << e.what();
+    MITK_WARN << "AutoDetection: Open IGT Link device returned an error while trying to connect: " << e.what();
     return mitk::NavigationToolStorage::New();
   }
 
@@ -115,7 +115,7 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
   }
   catch (std::runtime_error &e)
   {
-    MITK_WARN << "AutoDetection: Open IGT Link device retruned an error while trying to disconnect: " << e.what();
+    MITK_WARN << "AutoDetection: Open IGT Link device returned an error while trying to disconnect: " << e.what();
     return mitk::NavigationToolStorage::New();
   }
 
@@ -237,7 +237,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
   }
   catch (std::runtime_error &e)
   {
-    MITK_WARN << "Open IGT Link device retruned an error while trying to connect: " << e.what();
+    MITK_WARN << "Open IGT Link device returned an error while trying to connect: " << e.what();
     return false;
   }
 
@@ -371,7 +371,7 @@ bool mitk::OpenIGTLinkTrackingDevice::StartTracking()
   }
   catch (std::runtime_error &e)
   {
-    MITK_WARN << "Open IGT Link device retruned an error while starting communication: " << e.what();
+    MITK_WARN << "Open IGT Link device returned an error while starting communication: " << e.what();
     return false;
   }
 
@@ -408,7 +408,7 @@ bool mitk::OpenIGTLinkTrackingDevice::StopTracking()
   }
   catch (std::runtime_error &e)
   {
-    MITK_WARN << "Open IGT Link device retruned an error while stopping communication: " << e.what();
+    MITK_WARN << "Open IGT Link device returned an error while stopping communication: " << e.what();
     return false;
   }
   m_OpenIGTLinkClient->EnableNoBufferingMode(false);
@@ -444,7 +444,7 @@ bool mitk::OpenIGTLinkTrackingDevice::OpenConnection()
   }
   catch (std::runtime_error &e)
   {
-    MITK_WARN << "Open IGT Link device retruned an error while trying to connect: " << e.what();
+    MITK_WARN << "Open IGT Link device returned an error while trying to connect: " << e.what();
     return false;
   }
   this->SetState(Ready);
@@ -466,7 +466,7 @@ bool mitk::OpenIGTLinkTrackingDevice::CloseConnection()
   }
   catch (std::runtime_error &e)
   {
-    MITK_WARN << "Open IGT Link device retruned an error while trying to disconnect: " << e.what();
+    MITK_WARN << "Open IGT Link device returned an error while trying to disconnect: " << e.what();
     return false;
   }
 

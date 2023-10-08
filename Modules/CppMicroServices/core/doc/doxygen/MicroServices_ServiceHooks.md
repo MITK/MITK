@@ -45,12 +45,12 @@ The CppMicroServices API provides information about the registration, unregistra
 of services. However, it does not directly allow the introspection of modules to get information about
 what services a module is waiting for. Waiting for a service to arrive (via a registered service listener)
 before performing its function is a common pattern for modules. Listener Hooks provide a mechanism to
-get informed about all existing, newly registerd, and removed service listeners.
+get informed about all existing, newly registered, and removed service listeners.
 
 A Listener Hook object registered using the ServiceListenerHook interface will be notified about service
 listeners by being passed ServiceListenerHook::ListenerInfo objects. Each ListenerInfo object is related to
 the registration / unregistration cycle of a specific service listener. That is, registering the same service
-listener again, even with a different filter, will automatically unregister the previouse registration and
+listener again, even with a different filter, will automatically unregister the previous registration and
 the newly registered service listener is related to a different ListenerInfo object. ListenerInfo objects
 can be stored in unordered containers and compared with each other, e.g. to match ServiceListenerHook::Added
 and ServiceListenerHook::Removed calls.

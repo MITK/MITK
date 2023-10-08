@@ -76,7 +76,7 @@ namespace mitk
      *
      * The basic idea behind the Grey Level Distance Zone based features is to count the connected areas
      * with a given intensity value \f$x_i\f$ and a given distance to the border of each segmentation \f$d_i\f$.
-     * Several features are then calculated based on a matrix, that gives the number of occurence for each
+     * Several features are then calculated based on a matrix, that gives the number of occurrence for each
      * combination of \f$x_i\f$ and \f$ d_i \f$ as \f$m_{x,d}\f$.
      *
      * This feature calculator is activated by the option <b>-grey-level-distance-zone</b> or <b>-gldz</b>.

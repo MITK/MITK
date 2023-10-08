@@ -20,7 +20,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * \brief Calulates first order features based on a histogram.
+  * \brief Calculates first order features based on a histogram.
   *
   * This class can be used to calculate first order features based on a histogram.
   * For each feature, two variations are given, once the value of the feature that is
@@ -38,7 +38,7 @@ namespace mitk
   * are treated as masked.
   *
   * The resulting features are:
-  * - <b>First Order Histogram::Mean Value</b>: The mean intensity of all voxels, calulated by \f$ \mu_x  = \sum p_i  x_i\f$.
+  * - <b>First Order Histogram::Mean Value</b>: The mean intensity of all voxels, calculated by \f$ \mu_x  = \sum p_i  x_i\f$.
   * - <b>First Order Histogram::Variance Value</b> The variance intensity is calculated as : \f$ \sigma^2  = \sum p_i (x_i - \mu_x)^2\f$.
   * - <b>First Order Histogram::Skewness Value</b>: \f[ skewness = \frac{\sum p_i (x_i - \mu_x)^3}{\sigma^3} \f]
   * - <b>First Order Histogram::Excess Kurtosis Value</b>: \f[ skewness = \frac{\sum p_i (x_i - \mu_x)^4}{\sigma^4} - 3 \f]
@@ -58,7 +58,7 @@ namespace mitk
   * - <b>First Order Histogram::Quantile coefficient of Dispersion Value</b>: \f[ \textup{Quantile coefficient of Dispersion} = \frac{P75 - P25}{P75 + P25} \f]
   * - <b>First Order Histogram::Entropy Value</b>: The entropy is only based on histogram bins with a probability greater than 0.0000001: \f[ \textup{entropy} = - \sum p_i \textup{log}_2 p_i \f]
   * - <b>First Order Histogram::Uniformity Value</b>: \f$ \sum p_i^2 \f$
-  * - <b>First Order Histogram::Mean Index</b>: The mean index of all voxels, calulated by \f$ \mu_i  = \sum p_i  i\f$.
+  * - <b>First Order Histogram::Mean Index</b>: The mean index of all voxels, calculated by \f$ \mu_i  = \sum p_i  i\f$.
   * - <b>First Order Histogram::Variance Index</b>: The variance index is calculated as : \f$ \sigma_i^2  = \sum p_i (i - \mu_i)^2\f$.
   * - <b>First Order Histogram::Skewness Index</b>: \f[ skewness = \frac{\sum p_i (i - \mu_i)^3}{\sigma_i^3} \f]
   * - <b>First Order Histogram::Excess Kurtosis Index</b>: \f[ skewness = \frac{\sum p_i (i - \mu_i)^4}{\sigma_i^4} - 3 \f]
@@ -77,9 +77,9 @@ namespace mitk
   * - <b>First Order Histogram::Quantile coefficient of Dispersion Index</b>: \f[ \textup{Quantile coefficient of Dispersion} = \frac{P75 - P25}{P75 + P25} \f]
   * - <b>First Order Histogram::Entropy Index</b>: The entropy is only based on histogram bins with a probability greater than 0.0000001: \f$ \textup{entropy} = - \sum p_i \textup{log}_2 p_i \f$. Note that this is the same as the entropy value.
   * - <b>First Order Histogram::Uniformity Index</b>: \f$ \sum p_i^2 \f$. Note that this is the same as the uniformity value.
-  * - <b>First Order Histogram::Maximum Gradient</b>: The maximum difference between the probability of three neighbouring bins. For bins at the edge of the histogram, only two bins are used for the calulation.
+  * - <b>First Order Histogram::Maximum Gradient</b>: The maximum difference between the probability of three neighbouring bins. For bins at the edge of the histogram, only two bins are used for the calculation.
   * - <b>First Order Histogram::Maximum Gradient Index</b>: The index of the bin that belongs to the maximum gradient.
-  * - <b>First Order Histogram::Minimum Gradient</b>: The minimum difference between the probability of three neighbouring bins. For bins at the edge of the histogram, only two bins are used for the calulation.
+  * - <b>First Order Histogram::Minimum Gradient</b>: The minimum difference between the probability of three neighbouring bins. For bins at the edge of the histogram, only two bins are used for the calculation.
   * - <b>First Order Histogram::Minimum Gradient Index</b>:The index of the bin that belongs to the minimum gradient.
   * - <b>First Order Histogram::Robust Mean Index</b>: The mean index of all intensities between the 10% and 90% quantile.
   * - <b>First Order Histogram::Number of Bins</b>: The number of bins in the histogram. This is rather for control, as this parameter is likely to be determined by the configuration rather than the image.

@@ -30,7 +30,7 @@ namespace itk
 namespace Functor
 {
 
-/** \brief Functor for texture feature calculation based on the Cooccurence matrix
+/** \brief Functor for texture feature calculation based on the Cooccurrence matrix
  */
 
 template< typename TNeighborhoodType, typename TPixelOutputType>
@@ -190,7 +190,7 @@ public:
     MeasurementVectorType maxBorder;
     OffsetType g1, g2;
 
-    size.SetSize(2); // 2D Historgram
+    size.SetSize(2); // 2D Histogram
     size.Fill(m_levels); // 5 bins each dim
 
     minBorder.SetSize(2); // min range value

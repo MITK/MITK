@@ -54,7 +54,7 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
   mitk::NavigationData::OrientationType targetOri2(0.5, 0.5, 0.5, 0.5);
   mitk::NavigationData::OrientationType targetOri3(0.6, 0.6, 0.6, 0.6);
 
-  /*create helper objects: ND position accurancy and validity bool*/
+  /*create helper objects: ND position accuracy and validity bool*/
   mitk::ScalarType initialError(0.0);
   bool initialValid(true);
 

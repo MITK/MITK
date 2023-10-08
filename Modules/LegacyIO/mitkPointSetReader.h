@@ -31,7 +31,7 @@ namespace mitk
   /**
    * @brief reads xml representations of mitk::PointSets from a file
    *
-   * Reader for xml files containing one or multiple xml represenations of
+   * Reader for xml files containing one or multiple xml representations of
    * mitk::PointSets. If multiple mitk::PointSets are stored in one file,
    * these are assigned to multiple outputs of the filter. The number of point
    * sets which have be read can be retrieven by a call to GetNumberOfOutputs()

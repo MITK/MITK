@@ -202,7 +202,7 @@ mitk::VirtualTrackingTool* mitk::VirtualTrackingDevice::GetInternalTool(unsigned
 
 void mitk::VirtualTrackingDevice::TrackTools()
 {
-  /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
+  /* lock the TrackingFinishedMutex to signal that the execution rights are now transferred to the tracking thread */
   std::lock_guard<std::mutex> trackingFinishedLockHolder(m_TrackingFinishedMutex); // keep lock until end of scope
 
   if (this->GetState() != Tracking)

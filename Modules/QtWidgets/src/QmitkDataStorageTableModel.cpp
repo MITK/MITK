@@ -119,7 +119,7 @@ int QmitkDataStorageTableModel::rowCount(const QModelIndex &) const
 
 int QmitkDataStorageTableModel::columnCount(const QModelIndex &) const
 {
-  // show name, type and visible columnn
+  // show name, type and visible column
   int columns = 3;
   return columns;
 }

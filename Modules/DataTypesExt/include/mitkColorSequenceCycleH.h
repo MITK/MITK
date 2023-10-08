@@ -63,7 +63,7 @@ namespace mitk
     \brief Set the color cycle.
     The color cycle has to be an integer value between 0 and 5
     (see class description for an explanation). Use this in combination with
-    the hue value cahnge to generate your dream colors...
+    the hue value change to generate your dream colors...
     */
     virtual void SetColorCycle(unsigned short cycle);
 

@@ -40,7 +40,7 @@ namespace mitk
    * The class implements an extension of the weighted point based registration
    * from A. Danilchenko et al.
    * presented by L. Maier-Hein et al. in "Convergent Iterative Closest-Point Algorithm
-   * to Accomodate Anisotropic and Inhomogenous Localization Error.",
+   * to Accommodate Anisotropic and Inhomogenous Localization Error.",
    * IEEE T Pattern Anal 34 (8), 1520-1532, 2012. The extension computes, in order
    * to ensure the convergence of the algorithm, an isotropic estimation
    * by an unweighted point based registration algorithm as an initial estimate.

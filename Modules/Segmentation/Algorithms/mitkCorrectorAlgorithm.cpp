@@ -80,7 +80,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
 
   Image::Pointer temporarySlice;
 
-  // Convert to DefaultSegmentationDataType (because TobiasHeimannCorrectionAlgorithm relys on that data type)
+  // Convert to DefaultSegmentationDataType (because TobiasHeimannCorrectionAlgorithm relies on that data type)
   {
     itk::Image<DefaultSegmentationDataType, 2>::Pointer correctPixelTypeImage;
     CastToItkImage(m_WorkingImage, correctPixelTypeImage);

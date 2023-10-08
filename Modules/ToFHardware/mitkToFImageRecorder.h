@@ -136,10 +136,10 @@ protected:
   ToFCameraDevice::Pointer m_ToFCameraDevice; ///< ToFCameraDevice used for acquiring the images
   int m_ToFCaptureWidth; ///< width (x-dimension) of the images to record.
   int m_ToFCaptureHeight; ///< height (y-dimension) of the images to record.
-  int m_ToFPixelNumber; ///< number of pixels (widht*height) of the images to record
+  int m_ToFPixelNumber; ///< number of pixels (width*height) of the images to record
   int m_RGBCaptureWidth; ///< width (x-dimension) of the images to record.
   int m_RGBCaptureHeight; ///< height (y-dimension) of the images to record.
-  int m_RGBPixelNumber; ///< number of pixels (widht*height) of the images to record
+  int m_RGBPixelNumber; ///< number of pixels (width*height) of the images to record
   int m_SourceDataSize; ///< size of the source data provided by the device
   int m_ImageSequence; ///< number of images currently acquired
   float* m_IntensityArray; ///< array holding the intensity data

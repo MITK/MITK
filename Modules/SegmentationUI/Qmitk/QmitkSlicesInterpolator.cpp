@@ -1269,7 +1269,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   surfaceGeometry->SetStepDuration(timeBounds[1] - timeBounds[0]);
 
   // Typical file formats for surfaces do not save any time-related information. As a workaround at least for MITK scene files, we have the
-  // possibility to seralize this information as properties.
+  // possibility to serialize this information as properties.
 
   interpolatedSurface->SetProperty("ProportionalTimeGeometry.FirstTimePoint", mitk::FloatProperty::New(surfaceGeometry->GetFirstTimePoint()));
   interpolatedSurface->SetProperty("ProportionalTimeGeometry.StepDuration", mitk::FloatProperty::New(surfaceGeometry->GetStepDuration()));

@@ -62,7 +62,7 @@ namespace mitk {
       * \brief Is called during the connection process.
       * Connect to the Telemed API and try to get available probes from the device.
       *
-      * \return true if successfull, false if no device is connected to the pc
+      * \return true if successful, false if no device is connected to the pc
       * \throws mitk::Exception if something goes wrong at the API calls
       */
     virtual bool OnConnection();
@@ -99,7 +99,7 @@ namespace mitk {
     virtual bool OnDeactivation();
 
     /**
-      * \brief Changes scan state of the device if freeze is toggeled in mitk::USDevice.
+      * \brief Changes scan state of the device if freeze is toggled in mitk::USDevice.
       */
     virtual void OnFreeze(bool freeze);
 

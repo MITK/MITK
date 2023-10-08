@@ -50,7 +50,7 @@ namespace mitk
 
     /**
     * \brief Starts the tracking.
-    * \return Returns true if the tracking is started. Throws an exception if an error occures.
+    * \return Returns true if the tracking is started. Throws an exception if an error occurs.
     * @throw mitk::IGTHardwareException Throws an exception if there is an error during start tracking.
     */
     bool StartTracking() override;
@@ -133,7 +133,7 @@ namespace mitk
 
     /**
     * \brief Automatically detects tools in field of measurement of the tracking device.
-    * Tools can only be detected if their calibration file is availiable in the directory
+    * Tools can only be detected if their calibration file is available in the directory
     * for calibration files.
     * \return Returns all detected Tools.
     */

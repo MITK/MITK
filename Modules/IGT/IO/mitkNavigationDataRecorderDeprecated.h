@@ -194,7 +194,7 @@ namespace mitk
 
     int m_RecordCountLimit; ///< limits the number of frames, recording will be stopped if the limit is reached. -1 disables the limit
 
-    bool m_firstLine; //for the csv writer to detect wether the header must be written
+    bool m_firstLine; //for the csv writer to detect whether the header must be written
 
     unsigned int m_NumberOfRecordedFiles; ///< necessary for the naming of the file if there is more than one start-stop cycle
 

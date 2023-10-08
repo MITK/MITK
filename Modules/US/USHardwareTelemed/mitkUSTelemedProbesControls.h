@@ -33,7 +33,7 @@ namespace mitk {
     mitkNewMacro1Param(Self, itk::SmartPointer<USTelemedDevice>);
 
     /**
-      * Probe informations are fetched on activation. On deactivation there is nothing done.
+      * Probe information is fetched on activation. On deactivation there is nothing done.
       */
     virtual void SetIsActive(bool);
 

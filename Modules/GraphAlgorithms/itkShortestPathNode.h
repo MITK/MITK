@@ -24,7 +24,7 @@ namespace itk
   {
   public:
     DistanceType distance;     // minimal costs from StartPoint to this pixel
-    DistanceType distAndEst;   // Distance+Estimated Distnace to target
+    DistanceType distAndEst;   // Distance+Estimated Distance to target
     NodeNumType prevNode;      // previous node. Important to find the Shortest Path
     NodeNumType mainListIndex; // Indexnumber of this node in m_Nodes
     bool closed;               // determines if this node is closes, so its optimal path to startNode is known

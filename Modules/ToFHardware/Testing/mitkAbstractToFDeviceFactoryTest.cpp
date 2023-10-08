@@ -25,7 +25,7 @@ private:
 
   /**
    * @brief The DummyFactory struct inherits from AbstractToFDeviceFactory
-   * and overwrites all neccessary methods. Unfortunately, only GetCameraIntrinsics
+   * and overwrites all necessary methods. Unfortunately, only GetCameraIntrinsics
    * can be testet without actually offering a device. The rest of the methods
    * is tested in the ToFCameraMITKPlayerDeviceTest and the
    * ToFCameraMITKPlayerDeviceFactoryTest
@@ -60,7 +60,7 @@ public:
     //Load default calibration parameters from MITK-Data
     expected->FromXMLFile(GetTestDataFilePath("ToF-Data/CalibrationFiles/Default_Parameters.xml"));
 
-    //There is not Equal for mitk::CameraIntrinsics, thus we compare some paramters.
+    //There is not Equal for mitk::CameraIntrinsics, thus we compare some parameters.
     CPPUNIT_ASSERT(mitk::Equal(result->GetFocalLengthX(), expected->GetFocalLengthX()));
     CPPUNIT_ASSERT(mitk::Equal(result->GetFocalLengthY(), expected->GetFocalLengthY()));
 

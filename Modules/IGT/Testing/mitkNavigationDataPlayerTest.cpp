@@ -250,7 +250,7 @@ class mitkNavigationDataPlayerTestClass
     {
     MITK_TEST_OUTPUT(<<"#### Testing invalid input data: errors are expected. ####");
 
-    //declarate test variables
+    //declare test variables
     mitk::NavigationDataPlayer::Pointer player;
     std::string file;
 

@@ -78,7 +78,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::CreateQtPartControl(QWidget *parent)
   }
 
   // set the validator for the ip edit box (values must be between 0 and 255 and
-  // there are four of them, seperated with a point
+  // there are four of them, separated with a point
   QRegExpValidator *v = new QRegExpValidator(this);
   QRegExp rx("((1{0,1}[0-9]{0,2}|2[0-4]{1,1}[0-9]{1,1}|25[0-5]{1,1})\\.){3,3}(1{0,1}[0-9]{0,2}|2[0-4]{1,1}[0-9]{1,1}|25[0-5]{1,1})");
   v->setRegExp(rx);
@@ -112,7 +112,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::CreateConnections()
     connect(m_Controls->logMessageDetailsCheckBox, SIGNAL(clicked()),
       this, SLOT(OnLogMessageDetailsCheckBoxClicked()));
   }
-  //this is used for thread seperation, otherwise the worker thread would change the ui elements
+  //this is used for thread separation, otherwise the worker thread would change the ui elements
   //which would cause an exception
   connect(this, SIGNAL(AdaptGUIToStateSignal()), this, SLOT(AdaptGUIToState()));
 }

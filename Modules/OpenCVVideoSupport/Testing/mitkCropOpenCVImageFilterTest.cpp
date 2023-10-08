@@ -43,7 +43,7 @@ static void CropTestLoadedImage(std::string mitkImagePath, std::string mitkCropp
   MITK_TEST_CONDITION( ! cropFilter->FilterImage(testImage), "Filter function must return false if no region of interest is set.");
   MITK_TEST_CONDITION(ImagesAreEqualInGray(testImage, image), "Image should not be changed yet.");
 
-  // set region of interst now and then try to crop again
+  // set region of interest now and then try to crop again
   cv::Rect roi = cv::Rect(0,0, testImage.cols, testImage.rows);
   cropFilter->SetCropRegion(roi);
   MITK_TEST_CONDITION(cropFilter->FilterImage(testImage), "Filter function should return successfully.");
@@ -54,9 +54,9 @@ static void CropTestLoadedImage(std::string mitkImagePath, std::string mitkCropp
   roi = cv::Rect(0,0,2,2);
   cropFilter->SetCropRegion(roiWrong);
   MITK_TEST_CONDITION(cropFilter->FilterImage(testImage), "Filter function should return successfully.");
-  MITK_TEST_CONDITION(ImagesAreEqualInGray(testImage, image(roi)), "Image should be equal to directly cropped image whith correct roi.");
+  MITK_TEST_CONDITION(ImagesAreEqualInGray(testImage, image(roi)), "Image should be equal to directly cropped image with correct roi.");
 
-  // test whith "normal" roi
+  // test with "normal" roi
   testImage = image.clone();
   roi = cv::Rect( 150,100,100,100 );
   cropFilter->SetCropRegion(roi);

@@ -52,7 +52,7 @@ namespace mitk
     itkGetMacro(UseInsideValue, bool);
     itkBooleanMacro(UseInsideValue);
     //##Description
-    //## @brief If set to \a true the minimum of the ouput pixel type is
+    //## @brief If set to \a true the minimum of the output pixel type is
     //## used as outside value.
     itkSetMacro(AutoOutsideValue, bool);
     itkGetMacro(AutoOutsideValue, bool);
@@ -108,7 +108,7 @@ namespace mitk
     //## Used only if m_AutoOutsideValue is \a false.
     ScalarType m_OutsideValue;
     //##Description
-    //## @brief If \a true the minimum of the ouput pixel type is
+    //## @brief If \a true the minimum of the output pixel type is
     //## used as outside value (default: \a false)
     bool m_AutoOutsideValue;
     //##Description

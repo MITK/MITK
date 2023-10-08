@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-/** Simple widget that can be used to achive overlays. The overlay will lie above its parent.
+/** Simple widget that can be used to achieve overlays. The overlay will lie above its parent.
  * This implementation just renders a semi transparent black background. To add content to the
  * overlay derive from this class.*/
 class MITKQTWIDGETS_EXPORT QmitkOverlayWidget : public QWidget

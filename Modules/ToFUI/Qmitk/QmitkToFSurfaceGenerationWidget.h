@@ -106,7 +106,7 @@ protected slots:
     void OnReconstructionChanged(int index);
 
     /**
-     * @brief OnCompute3DDataCheckboxChecked Slot beeing called, if the "surface"-checkbox is clicked. This method initializes the surface once, if it is necessary.
+     * @brief OnCompute3DDataCheckboxChecked Slot being called, if the "surface"-checkbox is clicked. This method initializes the surface once, if it is necessary.
      * @param checked Is it checked or not?
      */
     void OnCompute3DDataCheckboxChecked(bool checked);
@@ -117,7 +117,7 @@ protected slots:
     void OnShowAdvancedOptionsCheckboxChecked(bool checked);
 
     /*!
-      \brief Slot trigged from the triangulation threshold spin box. Changed the threshold for connecting a vertex during triangulation.
+      \brief Slot triggered from the triangulation threshold spin box. Changed the threshold for connecting a vertex during triangulation.
       */
     void OnTriangulationThresholdSpinBoxChanged();
 

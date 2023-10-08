@@ -36,7 +36,7 @@ namespace mitk {
   *
   * One can then add Nodes to the filter via AddNode(). Make sure that the node has a geometry and position set
   * in the tracking coordinate system of the reference input. The Filter will then calculate the offset between
-  * Node and reference marker and continously update the node position accordign to the tracking data.
+  * Node and reference marker and continuously update the node position according to the tracking data.
   *
   * \ingroup US
   */
@@ -48,7 +48,7 @@ namespace mitk {
 
     /**
     * \brief Adds a node to the filter.
-    * The position of which will then be continously update relatively to the selected input stream.
+    * The position of which will then be continuously update relatively to the selected input stream.
     *
     * The node should have a geometry and position set in the coordinate system of the selected input stream
     */

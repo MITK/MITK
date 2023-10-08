@@ -47,7 +47,7 @@ namespace mitk {
     void AddMessageToCurrentImage(std::string message);
 
     /** Saves all logged data to the given path. Every image is written to a separate image file.
-     *  Additionaly a csv file containing a list of all images together with timestamps and messages is saved.
+     *  Additionally a csv file containing a list of all images together with timestamps and messages is saved.
      *  For one call of this method all files will start with a unique number to avoid overwrite of old files.
      *  @param[in]     path            Should contain a valid path were all logging data will be stored.
      *  @param[out]    imageFilenames  Returns a list of all images filenames which were stored to the harddisc.
@@ -58,7 +58,7 @@ namespace mitk {
     void SaveImages(std::string path, std::vector<std::string>& imageFilenames, std::string& csvFileName);
 
      /** Saves all logged data to the given path. Every image is written to a separate image file.
-     *  Additionaly a csv file containing a list of all images together with timestamps and messages is saved.
+     *  Additionally a csv file containing a list of all images together with timestamps and messages is saved.
      *  For one call of this method all files will start with a unique number to avoid overwrite of old files.
      *  @param[in]     path            Should contain a valid path were all logging data will be stored.
      *  @throw         mitk::Exception Throws an exception if there is a problem during writing the images. E.g.,
@@ -66,7 +66,7 @@ namespace mitk {
      */
     void SaveImages(std::string path);
 
-    /** Sets the extension of the output images which alse defines the file type. E.g., ".nrrd" or ".jpg".
+    /** Sets the extension of the output images which also defines the file type. E.g., ".nrrd" or ".jpg".
      *  ".nrrd" is default.
      *  @return Returns true if the file extension was successfully set which means it is supported. False if not.
      */

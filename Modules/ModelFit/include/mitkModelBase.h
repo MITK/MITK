@@ -157,11 +157,11 @@ namespace mitk
      * @remark Default implementation has no derived parameters*/
     DerivedParameterMapType GetDerivedParameters(const ParametersType& parameters) const;
 
-    /** Sets the time grid of the model. It indicates the time points correlated with the signal the modell should
+    /** Sets the time grid of the model. It indicates the time points correlated with the signal the model should
      produce.
      @remark The resolution of the time grid is in seconds. (Not in ms like the mitk::TimeGeometry)*/
     virtual void SetTimeGrid(const TimeGridType& grid);
-    /** Gets the time grid of the model. It indicates the time points correlated with the signal the modell should
+    /** Gets the time grid of the model. It indicates the time points correlated with the signal the model should
      produce.
      @remark The resolution of the time grid is in seconds. (Not in ms like the mitk::TimeGeometry)*/
     itkGetConstReferenceMacro(TimeGrid, TimeGridType);

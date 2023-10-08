@@ -193,7 +193,7 @@ static void CreateMessageBox(int statusCode, std::string errorMessage)
         nullptr, "UnknownServerError - 499", "An unknown error related to the server response was detected.");
       break;
     default:
-      ss << "An Http Error occured with error code " << statusCode << " and server message: " << errorMessage;
+      ss << "An Http Error occurred with error code " << statusCode << " and server message: " << errorMessage;
       QMessageBox::warning(nullptr, "HTTP ERROR", ss.str().c_str());
       break;
   }

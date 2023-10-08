@@ -323,7 +323,7 @@ public:
    * of this module and may begin with '/'. A path value of "/" indicates the root of this module.
    * @param filePattern The resource name pattern for selecting entries in the specified path.
    * The pattern is only matched against the last element of the resource path. Substring
-   * matching is supported using the wildcard charachter ('*'). If \c filePattern is empty,
+   * matching is supported using the wildcard character ('*'). If \c filePattern is empty,
    * this is equivalent to "*" and matches all resources.
    * @param recurse If \c true, recurse into subdirectories. Otherwise only return resources
    * from the specified path.

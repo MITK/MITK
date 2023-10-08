@@ -37,7 +37,7 @@ Ultrasound Devices are managed in a simple hierarchy:
 <ul>
   <li> mitk::USDevice: The common superclass for all ultrasound devices. Deriving from this class will make sure that US-specific GUI-Components will be able to interact with your class.
   Especially, the microservice life cycle is modeled in this class.
-  <li> mitk::USImageSource: Abstract class used by the mitk::USDevice for getting the images from the ultrasound device. The images are filtered by one ore more mitk::AbstractOpenCVImageFilter if they were set to the mitk::USImageSource object.
+  <li> mitk::USImageSource: Abstract class used by the mitk::USDevice for getting the images from the ultrasound device. The images are filtered by one or more mitk::AbstractOpenCVImageFilter if they were set to the mitk::USImageSource object.
   Each concrete subclass of mitk::USDevice has to subclass mitk::USImageSource to handle the actual receiving of images from the ultrasound device.
   <li> Two devices are implemented in the ultrasound module:
   <ul>
@@ -52,12 +52,12 @@ Ultrasound Devices are managed in a simple hierarchy:
 
 \section USDeviceLifeCycle Ultrasound Device Life Cycle
 
-Each mitk::USDevice follows a life cycle handling the availabilty as a micro service and the connection to the hardware:
+Each mitk::USDevice follows a life cycle handling the availability as a micro service and the connection to the hardware:
 \imageMacro{MicroServiceLifeCycle.png,"",16.00}
 
 For changing the states corresponding methods are available in mitk::USDevice: mitk::USDevice::Initialize() for initialization, mitk::USDevice::Connect() for connecting, mitk::USDevice::Disconnect() for disconnecting and so on. For example, once an object of mitk::USDevice is constructed it can be made available as a micro service via a call to mitk::USDevice::Initialize(). The state changes to Initialized then and the device is available to other modules or plugins (\link org_mitk_gui_qt_ultrasound UltrasoundSupport \endlink, QmitkUSDeviceManagerWidget) through the micro service framework.
 
-The methods for changing the states should not be overwritten by sublcasses. Instead mitk::USDevice::OnInitialization(), mitk::USDevice::OnConnection() and so on can be overwritten for handling everything that has to be done on the corresponding state change.
+The methods for changing the states should not be overwritten by subclasses. Instead mitk::USDevice::OnInitialization(), mitk::USDevice::OnConnection() and so on can be overwritten for handling everything that has to be done on the corresponding state change.
 
 When the mitk::USDevice object was created at first it is available just locally. An initialized device is available as a micro service, but not connected to the real hardware. A connected device is connected to the hardware, but no acquiring images. Finally, an activated device is acquiring images from the ultrasound hardware.
 
@@ -66,7 +66,7 @@ Capabilities of API-based ultrasound devices are available through control inter
 
 \imageMacro{USControlInterfaces.png,"",16.00}
 
-The control interfaces mitk::USControlInterfaceProbes and mitk::USControlInterfaceBMode are available, while mitk::USControlInterfaceDoppler is empty at the moment. Every sublcass of mitk::USDevice can use an implementation of each of these interfaces, but this is not necessary. The mitk::USVideoDevice for example uses a custom control interface only (mitk::USVideoDeviceCustomControls), which is a subclass of mitk::USAbstractControlInterface. The mitk::USTelemedDevice uses mitk::USTelemedBModeControls for handling the ultrasound b mode and mitk::USTelemedProbesControls for handling the connected ultrasound probe.
+The control interfaces mitk::USControlInterfaceProbes and mitk::USControlInterfaceBMode are available, while mitk::USControlInterfaceDoppler is empty at the moment. Every subclass of mitk::USDevice can use an implementation of each of these interfaces, but this is not necessary. The mitk::USVideoDevice for example uses a custom control interface only (mitk::USVideoDeviceCustomControls), which is a subclass of mitk::USAbstractControlInterface. The mitk::USTelemedDevice uses mitk::USTelemedBModeControls for handling the ultrasound b mode and mitk::USTelemedProbesControls for handling the connected ultrasound probe.
 
 Each custom control interface needs its own Widget (subclassed of QmitkUSAbstractCustomWidget), if it should be possible to control its functionality by using the \link org_mitk_gui_qt_ultrasound UltrasoundSupport\endlink plugin. For the standard interfaces mitk::USControlInterfaceProbes, mitk::USControlInterfaceBMode and mitk::USControlInterfaceDoppler there are Widgets available in the USUI module (QmitkUSControlsProbesWidget, QmitkUSControlsBModeWidget, QmitkUSControlsDopplerWidget) which can be used by plugins. For each Widget an object of the corresponding control interface must be set on its constructor call. A class diagram showing how the Widgets are connected to the control interfaces can be seen below:
 
@@ -88,6 +88,6 @@ The QmitkUSNewVideoDeviceWidget allows the user to configure a frame grabber or 
 
 \subsection USControlInterfaceWidgets Control Interface Widgets
 
-There exists several widgets for controling ultrasound devices: QmitkUSControlsBModeWidget, QmitkUSControlsProbesWidget, QmitkUSControlsCustomVideoDeviceWidget. Own custom control widgets can be added by subclassing the available QmitkUSAbstractCustomWidget.
+There exists several widgets for controlling ultrasound devices: QmitkUSControlsBModeWidget, QmitkUSControlsProbesWidget, QmitkUSControlsCustomVideoDeviceWidget. Own custom control widgets can be added by subclassing the available QmitkUSAbstractCustomWidget.
 
 */

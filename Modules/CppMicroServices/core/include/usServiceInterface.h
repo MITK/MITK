@@ -124,7 +124,7 @@ struct InterfaceType {};
  *
  * A map containing interfaces ids and their corresponding service object
  * pointers. InterfaceMap instances represent a complete service object
- * which implementes one or more service interfaces. For each implemented
+ * which implements one or more service interfaces. For each implemented
  * service interface, there is an entry in the map with the key being
  * the service interface id and the value a pointer to the service
  * interface implementation.
@@ -166,7 +166,7 @@ inline bool InsertInterfaceType<void>(InterfaceMap&, void*)
  *
  * Example usage:
  * \code
- * MyService service; // implementes I1 and I2
+ * MyService service; // implements I1 and I2
  * InterfaceMap im = MakeInterfaceMap<I1,I2>(&service);
  * \endcode
  *

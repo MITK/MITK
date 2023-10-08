@@ -51,7 +51,7 @@ mitk::OptitrackTrackingDevice::~OptitrackTrackingDevice()
   MITK_DEBUG << "Deleting OptitrackTrackingDevice";
   int result;
 
-  // If device is in Tracking mode, stop the Tracking firts
+  // If device is in Tracking mode, stop the Tracking first
   if (this->GetState() == mitk::TrackingDevice::Tracking)
   {
     MITK_DEBUG << "OptitrackTrackingDevice in Tracking State -> Stopping Tracking";
@@ -106,8 +106,8 @@ bool mitk::OptitrackTrackingDevice::OpenConnection()
     m_initialized = true; // Set the initialized variable to true
     this->SetState(mitk::TrackingDevice::Ready);
       if(this->m_calibrationPath.empty()){
-      MITK_INFO << "Numer of connected cameras = " << TT_CameraCount();
-      MITK_WARN << "Attention: No calibration File defined !!";
+      MITK_INFO << "Number of connected cameras = " << TT_CameraCount();
+      MITK_WARN << "Attention: No calibration file defined !!";
       return m_initialized;
     }
     else
@@ -236,7 +236,7 @@ bool mitk::OptitrackTrackingDevice::CloseConnection()
   {
     if(this->GetState() == mitk::TrackingDevice::Tracking)
   {
-      MITK_DEBUG << "Device state: Tracking -> Stoping the Tracking";
+      MITK_DEBUG << "Device state: Tracking -> Stopping the Tracking";
       resultStop = this->StopTracking(); //Stop tracking on close
     }
 
@@ -415,7 +415,7 @@ void mitk::OptitrackTrackingDevice::TrackTools()
     this->m_StopTrackingMutex.lock();  // update the local copy of m_StopTracking
     localStopTracking = this->m_StopTracking;
 
-    /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
+    /* lock the TrackingFinishedMutex to signal that the execution rights are now transferred to the tracking thread */
     if (!localStopTracking)
     {
     m_TrackingFinishedMutex.lock();

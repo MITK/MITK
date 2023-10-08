@@ -97,7 +97,7 @@ public:
   /*!
   \brief Returns the number of different tools from the current playing stream.
   *
-  * Retuns 0 if playback file is invalid.
+  * Returns 0 if playback file is invalid.
   */
   unsigned int GetNumberOfTools();
 
@@ -225,7 +225,7 @@ protected:
   virtual void CreateConnections();
 
   /*!
-  \brief Checks if an imput file with the set filename exists
+  \brief Checks if an input file with the set filename exists
   */
   bool CheckInputFileValid();
 

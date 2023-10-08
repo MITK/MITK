@@ -166,7 +166,7 @@ void mitk::GIFNeighbourhoodGreyLevelDifference::AddArguments(mitkCommandLinePars
 {
   std::string name = GetOptionPrefix();
 
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurrence matrix", "calculates Co-occurrence based features (new implementation)", us::Any());
   parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
   parser.addArgument(name + "::direction", name + "::dir", mitkCommandLineParser::Int, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... without dimension 0,1,2... ", us::Any());
   parser.addArgument(name + "::useCTRange", name + "::ct", mitkCommandLineParser::Bool, "Use CT range", "If flag is set only value in the CT range will be used for feature computation.", us::Any());

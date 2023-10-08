@@ -322,7 +322,7 @@ namespace mitk
       memcpy(rgbDataArray, this->m_RGBDataBuffer[pos], this->m_RGBBufferSize);
       m_ImageMutex->Unlock();
 
-      //Since the standard method GetAllImages does not allow transfering a surface,
+      //Since the standard method GetAllImages does not allow transferring a surface,
       //we use a property to pass the surface to the workbench.
       mitk::Surface::Pointer surface = mitk::Surface::New();
       surface->SetVtkPolyData(this->m_PolyData);

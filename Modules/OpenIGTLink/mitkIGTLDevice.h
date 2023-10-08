@@ -51,8 +51,8 @@ namespace mitk {
   * Setup is the initial state. From this state on you can call
   * OpenConnection() and arrive in the Ready state. From the Ready state you
   * call StartCommunication() to arrive in the Running state. Now the device
-  * is continuosly checking for new connections, receiving messages and
-  * sending messages. This runs in a seperate thread. To stop the communication
+  * is continuously checking for new connections, receiving messages and
+  * sending messages. This runs in a separate thread. To stop the communication
   * call StopCommunication() (to arrive in Ready state) or CloseConnection()
   * (to arrive in the Setup state).
   *
@@ -108,7 +108,7 @@ namespace mitk {
      * \brief Continuously calls the given function
      *
      * This may only be called if the device is in Running state and only from
-     * a seperate thread.
+     * a separate thread.
      *
      * \param ComFunction function pointer that specifies the method to be executed
      * \param mutex the mutex that corresponds to the function pointer

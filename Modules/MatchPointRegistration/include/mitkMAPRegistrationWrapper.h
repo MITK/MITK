@@ -218,7 +218,7 @@ public:
   @pre valid registration instance must be set.
   @return smart pointer to a FieldRepresentationDescriptor for the supported registration space in the moving domain.
   May be null if the direct registration kernel is global and thus not limited.
-  If there is a limitation, the retun value is not nullptr.
+  If there is a limitation, the return value is not nullptr.
   @retval nullptr no field representation set/requested by the creating registration algorithm.
   */
   mitk::Geometry3D GetDirectFieldRepresentation() const;
@@ -229,7 +229,7 @@ public:
   @pre valid registration instance must be set.
   @return a const FieldRepresentationDescriptor for the supported registration space in the target domain.
   May be null if the inverse registration kernel is global and thus not limited.
-  If there is a limitation, the retun value is not nullptr.
+  If there is a limitation, the return value is not nullptr.
   @retval nullptr no field representation set/requested by the creating registration algorithm.
   */
   mitk::Geometry3D GetInverseFieldRepresentation() const;

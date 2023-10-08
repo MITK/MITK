@@ -21,9 +21,9 @@ using namespace mitk;
   OpenCL resource service. To prevent segmentation faults
   a mutexed reference counter is implemented in the resource service.
   It tracks the number of opencl program references for the corresponding filter
-  and delete only the opencl programm if the reference count reaches 0.
+  and delete only the opencl program if the reference count reaches 0.
   Every new instance of a filter increases the reference count by 1.
-  This test runs successfull if the 2 filters are initialized, run
+  This test runs successful if the 2 filters are initialized, run
   and deleted without any crash.
   */
 int mitkOclReferenceCountTest( int /*argc*/, char* /*argv*/[] )
@@ -76,7 +76,7 @@ int mitkOclReferenceCountTest( int /*argc*/, char* /*argv*/[] )
   oclFilter2 = nullptr;
 
   // this is only visible if the delete did not cause a segmentation fault
-  // it is always true and successfull if the program reaches this state
+  // it is always true and successful if the program reaches this state
   MITK_TEST_CONDITION_REQUIRED( true, "2 Filters deleted without a crash -> success ");
 
   MITK_TEST_END();

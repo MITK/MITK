@@ -229,7 +229,7 @@ public:
   typedef Vector<double, TOutputImage::ImageDimension>        ItkVectorType;
   /** Typedef to describe the ImageRegionIteratorWithIndex type. */
   typedef ImageRegionIteratorWithIndex<TOutputImage>          IteratorType;
-  /** Typedef to describe the Poiner type at the output image. */
+  /** Typedef to describe the Pointer type at the output image. */
   typedef typename TOutputImage::Pointer                      ImageType;
 
   typedef  MapContainer<unsigned int, PointType>              MapContainerPoints;
@@ -244,7 +244,7 @@ public:
   itkSetMacro(Spacing, SpacingType);
   virtual void SetSpacing(SpacingValueArrayType spacingArray);
   virtual const SpacingValueType * GetSpacing() const;
-  /** Set/Get origin of the output image. This programm works proper only with origin [0.0, 0.0, 0.0] */
+  /** Set/Get origin of the output image. This program works proper only with origin [0.0, 0.0, 0.0] */
   itkSetMacro(Origin, PointType);
   virtual void SetOrigin(PointValueArrayType originArray);
   virtual const PointValueType * GetOrigin() const;
@@ -286,13 +286,13 @@ public:
   virtual double MultiGaussianFunctionValueAtCuboid(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax);
   /** Inseret the midpoints of cuboid in a vector m_Midpoints, so that we can visualise it. */
   virtual void InsertPoints( PointType globalCoordinateMidpointCuboid, double cuboidRadius);
-  /** Start the octree recursion in eigth directions for the sphere with midpoint globalCoordinateMidpointSphere. */
+  /** Start the octree recursion in eight directions for the sphere with midpoint globalCoordinateMidpointSphere. */
   virtual void GenerateCuboidSegmentationInSphere( PointType globalCoordinateMidpointSphere );
-  /** Get the  the values of the cumulative distribution function of the normal distribution. */
+  /** Get the values of the cumulative distribution function of the normal distribution. */
   virtual double FunctionPhi(double value);
   /** Check if a cuboid with midpoint globalCoordinateMidpointCuboid and side length sideLength intersect the sphere with midpoint globalCoordinateMidpointSphere boundary. */
   virtual  unsigned int IntersectTheSphere( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere, double sideLength);
-  /** Set the tabel values of the distribution function of the normal distribution. */
+  /** Set the table values of the distribution function of the normal distribution. */
   void SetNormalDistributionValues();
 
 
@@ -352,7 +352,7 @@ private:
   ItkVectorType                             m_RegionOfInterestMin;   //minimal values for the coordinates in the region of interest
   typename TOutputImage::PixelType          m_Min;                   //minimum possible value
   typename TOutputImage::PixelType          m_Max;                   //maximum possible value
-  PointType                                 m_GlobalCoordinate;      //physical coordiante of the sphere midpoint
+  PointType                                 m_GlobalCoordinate;      //physical coordinate of the sphere midpoint
   bool                                      m_WriteMPS;              //1 = write a MPS File to visualise the cuboid midpoints of one approximation of the sphere
   MapContainerPoints                        m_Midpoints;             //the midpoints of the cuboids
   MapContainerRadius                        m_RadiusCuboid;          //the radius ( = 0.5 * side length) of the cuboids (in the same order as the midpoints in m_Midpoints)

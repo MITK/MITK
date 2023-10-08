@@ -68,7 +68,7 @@ namespace mitk
      * @brief Transforms a point cloud with a Rotation and Translation.
      *
      * The method uses two point sets as input. It transforms every point from the
-     * source point set and saves the result in the destination. The soure is not
+     * source point set and saves the result in the destination. The source is not
      * modified. If the same point set is used as source and destination. The method
      * will modify the source and the transformation is done in place.
      *

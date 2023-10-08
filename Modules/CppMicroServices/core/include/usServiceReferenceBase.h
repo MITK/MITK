@@ -139,7 +139,7 @@ public:
   std::string GetInterfaceId() const;
 
   /**
-   * Checks wether this ServiceReferenceBase object can be converted to
+   * Checks whether this ServiceReferenceBase object can be converted to
    * another ServiceReferenceBase object, which will be bound to the
    * given interface identifier.
    *

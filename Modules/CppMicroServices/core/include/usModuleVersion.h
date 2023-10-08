@@ -65,7 +65,7 @@ private:
   /**
    * Called by the ModuleVersion constructors to validate the version components.
    *
-   * @return <code>true</code> if the validation was successfull, <code>false</code> otherwise.
+   * @return <code>true</code> if the validation was successful, <code>false</code> otherwise.
    */
   void Validate();
 

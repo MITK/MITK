@@ -60,8 +60,8 @@ public:
   std::unique_ptr<Editor> m_PropEditor;
 
   short m_DecimalPlaces;           // how many decimal places are shown
-  double m_FactorPropertyToSlider; // internal conversion factor. neccessary because slider ranges work only with ints
-  double m_FactorSliderToDisplay;  // internal conversion factor. neccessary because slider ranges work only with ints
+  double m_FactorPropertyToSlider; // internal conversion factor. necessary because slider ranges work only with ints
+  double m_FactorSliderToDisplay;  // internal conversion factor. necessary because slider ranges work only with ints
   bool m_ShowPercents;             // whether values are given in percent (0.5 -> 50%)
 
   bool m_SelfChangeLock;

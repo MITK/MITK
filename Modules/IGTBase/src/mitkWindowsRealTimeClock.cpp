@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 
 /**
-* \brief basic contructor
+* \brief basic constructor
 */
 mitk::WindowsRealTimeClock::WindowsRealTimeClock()
 {
@@ -26,7 +26,7 @@ mitk::WindowsRealTimeClock::WindowsRealTimeClock()
 }
 
 /**
-* \brief basic contructor
+* \brief basic constructor
 */
 mitk::WindowsRealTimeClock::~WindowsRealTimeClock()
 {

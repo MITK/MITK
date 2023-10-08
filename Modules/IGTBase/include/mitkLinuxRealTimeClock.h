@@ -38,12 +38,12 @@ namespace mitk {
     itkCloneMacro(Self);
 
     /**
-    * \brief basic contructor
+    * \brief basic constructor
     */
     LinuxRealTimeClock();
 
     /**
-    * \brief basic contructor
+    * \brief basic constructor
     */
     ~LinuxRealTimeClock() override;
 

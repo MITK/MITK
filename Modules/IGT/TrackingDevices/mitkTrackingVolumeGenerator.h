@@ -23,7 +23,7 @@ found in the LICENSE file.
 namespace mitk
 {
     /**Documentation
-    * \brief   An instance of this class represents a generator wich generates the tracking volume of a
+    * \brief   An instance of this class represents a generator which generates the tracking volume of a
     *    given tracking device as a mitk:Surface.
     *
     *  To generate the specific dimensions of the tracking volume of a tracking device
@@ -71,7 +71,7 @@ class MITKIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
 
     /**
     * \brief        Sets the tracking device data object which will be used to generate the volume. Each tracking device data object
-    *               has an unambiguous assignment to a tracking volume. See file mitkTrackingTypes.h for a list of all availiable object.
+    *               has an unambiguous assignment to a tracking volume. See file mitkTrackingTypes.h for a list of all available object.
     */
     void SetTrackingDeviceData(mitk::TrackingDeviceData deviceData);
 

@@ -76,7 +76,7 @@ void QmitkIGTLDeviceSourceManagementWidget::CreateConnections()
     connect( m_Controls->butSend, SIGNAL(clicked()),
              this, SLOT(OnSendMessage()));
   }
-  //this is used for thread seperation, otherwise the worker thread would change the ui elements
+  //this is used for thread separation, otherwise the worker thread would change the ui elements
   //which would cause an exception
   connect(this, SIGNAL(AdaptGUIToStateSignal()), this, SLOT(AdaptGUIToState()));
 }

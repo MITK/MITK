@@ -46,7 +46,7 @@ void QmitkComboBoxStepThrough::OnSetNextIndex()
 
 void QmitkComboBoxStepThrough::OnCurrentIndexChanged(int newIndex)
 {
-  // emit begin reached singal if index is zero now or was zero before
+  // emit begin reached signal if index is zero now or was zero before
   if ( m_LastIndex == 0 && newIndex > 0)
   {
     emit SignalReachedBegin(false);

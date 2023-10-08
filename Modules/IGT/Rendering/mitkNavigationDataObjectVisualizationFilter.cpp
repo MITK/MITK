@@ -135,7 +135,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
         mitk::NavigationData::OrientationType orientation = nd->GetOrientation();
 
         /* because of an itk bug, the transform can not be calculated with float data type.
-        To use it in the mitk geometry classes, it has to be transfered to mitk::ScalarType which is float */
+        To use it in the mitk geometry classes, it has to be transferred to mitk::ScalarType which is float */
         static AffineTransform3D::MatrixType m;
 
         // convert quaternion to rotation matrix depending on the rotation mode

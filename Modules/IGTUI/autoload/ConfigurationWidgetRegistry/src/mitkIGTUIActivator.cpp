@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include "mitkNPOptitrackTrackingTypeInformation.h"
 #include "mitkOpenIGTLinkTypeInformation.h"
 
-//standard tracking devices, which always should be avaiable
+//standard tracking devices, which always should be available
 #include "QmitkNDIAuroraWidget.h"
 #include "QmitkNDIPolarisWidget.h"
 #include "QmitkMicronTrackerWidget.h"

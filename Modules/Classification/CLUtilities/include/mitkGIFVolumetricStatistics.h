@@ -20,10 +20,10 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * \brief Calulates simpel shape-related features.
+  * \brief Calculates simpel shape-related features.
   *
   * This class can be used to calculate simple, shape-related features describing
-  * a given segmentation. There are no parameters that can be externaly set.
+  * a given segmentation. There are no parameters that can be externally set.
   *
   * This feature calculator is activated by the option "<b>-volume</b>" or "<b>-vol</b>"
   *
@@ -32,10 +32,10 @@ namespace mitk
   * to one are treated as masked. (Standard MITK mask)
   *
   * Some of the features are calculated twice using different methods. For voxel-
-  * based approaches, the corresponding parameter is calcualted using the voxel,
+  * based approaches, the corresponding parameter is calculated using the voxel,
   * for example the volume is then calculated by multiplying the volume of a
   * single volume with the number of voxels in the mask. In the second method, the
-  * mesh based appraoch, a mesh is created prior to the feature calculation which
+  * mesh based approach, a mesh is created prior to the feature calculation which
   * is then done using the features.
   *
   * Another difference between two features might be the evaluation of invalid
@@ -48,11 +48,11 @@ namespace mitk
   * The resulting features are:
   * - <b>Volumetric Features:: Voxel Volume</b>: \f$ V_{single\_voxel} \f$ , the volume of an single volume, calculated as the
   * multiplication of the voxel spacing in all directions.
-  * - <b>Volumetric Features:: Volume (voxel based)</b>: \f$ V_{voxel} \f$, the volume of the masked area. Calulated by
-  * multiplying the numer of voxels with the Voxel Volume.
+  * - <b>Volumetric Features:: Volume (voxel based)</b>: \f$ V_{voxel} \f$, the volume of the masked area. Calculated by
+  * multiplying the number of voxels with the Voxel Volume.
   * - <b>Volumetric Features:: Volume (mesh based)</b>: \f$ V_{shape} \f$, The volume based on the mesh-representation of
   * the mask.
-  * - <b>Volumetric Features:: Surface (voxel based)</b>: \f$ A_{voxel} \f$, the surface of the given mask. It is calulated
+  * - <b>Volumetric Features:: Surface (voxel based)</b>: \f$ A_{voxel} \f$, the surface of the given mask. It is calculated
   * by summing the surfaces between a masked and an unmasked voxel.
   * - <b>Volumetric Features:: Surface (mesh based)</b>: \f$ A_{mesh} \f$, the surface of the given mask calculated using
   * the mask representation
@@ -68,7 +68,7 @@ namespace mitk
   * - <b>Volumetric Features:: Compactness 1 old (voxel based)</b>:
   * - <b>Volumetric Features:: Compactness 1 old (mesh based)</b>: Some implementations use a slightly different definition of
   * compactness 1. Although this is most likely an error and leads to an non-dimensionless feature,
-  * this defition is still calculated as:
+  * this definition is still calculated as:
   * \f[ F_{compactness\_1\_old} = \frac{V}{\pi^{1/2} A^{2/3}}\f]
   * - <b>Volumetric Features:: Compactness 2 (voxel based)</b>:
   * - <b>Volumetric Features:: Compactness 2 (mesh based)</b>: The compatness is a measure how spheric a shape is given.

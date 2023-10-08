@@ -56,7 +56,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
 
         ///
         /// RUNS the conversion and returns the produced image as cv::Mat.
-        /// \return the produced OpenCVImage or an empty image if an error occured
+        /// \return the produced OpenCVImage or an empty image if an error occurred
         ///
         cv::Mat GetOpenCVMat();
 

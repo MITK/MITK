@@ -89,7 +89,7 @@ void mitk::SurfaceDeformationDataInteractor3D::SelectObject(StateMachineAction *
 
   this->GetDataNode()->SetColor(1.0, 0.0, 0.0);
 
-  // Colorize surface / wireframe dependend on distance from picked point
+  // Colorize surface / wireframe dependent on distance from picked point
   this->ColorizeSurface(polyData, timeStep, m_SurfaceColorizationCenter, COLORIZATION_GAUSS);
 
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -234,7 +234,7 @@ void mitk::SurfaceDeformationDataInteractor3D::ScaleRadius(StateMachineAction *,
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   vtkPolyData *polyData = m_Surface->GetVtkPolyData(timeStep);
 
-  // Colorize surface / wireframe dependend on sigma and distance from picked point
+  // Colorize surface / wireframe dependent on sigma and distance from picked point
   this->ColorizeSurface(polyData, timeStep, m_SurfaceColorizationCenter, COLORIZATION_GAUSS);
 
   RenderingManager::GetInstance()->RequestUpdateAll();

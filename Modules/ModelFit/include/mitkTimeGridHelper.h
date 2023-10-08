@@ -29,8 +29,8 @@ namespace mitk
 
   /** Super sample passed time grid by a given supersampling rate and interpolates linear in between original time steps.
    * @param grid
-   * @param samplingRate Defines how many samples should be generated between to original time steps (including the preceeding time step). E.g. a sampling rate of 1 will just returns the original grid untouched;
-   a sampling rate of 3 will generate to aditional steps between to original steps.*/
+   * @param samplingRate Defines how many samples should be generated between to original time steps (including the preceding time step). E.g. a sampling rate of 1 will just returns the original grid untouched;
+   a sampling rate of 3 will generate to additional steps between to original steps.*/
   MITKMODELFIT_EXPORT ModelBase::TimeGridType GenerateSupersampledTimeGrid(const mitk::ModelBase::TimeGridType& grid, const unsigned int samplingRate);
 }
 

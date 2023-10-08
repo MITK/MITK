@@ -35,7 +35,7 @@ namespace mitk {
       itkFactorylessNewMacro(Self);
       itkCloneMacro(Self)
       /**
-      * \brief this constructor creates an US Image identical to the recieved mitkImage. The Metadata are set to default.
+      * \brief this constructor creates an US Image identical to the received mitkImage. The Metadata are set to default.
       *  The image data is shared, so don't continue to manipulate the original image.
       * @throw mitk::Exception Throws an exception if there is a problem with access to the data while constructing the image.
       */
@@ -58,7 +58,7 @@ namespace mitk {
       */
       USImage();
       /**
-      * \brief this constructor creates an US Image identical to the recieved mitkImage. The Metadata are set to default.
+      * \brief this constructor creates an US Image identical to the received mitkImage. The Metadata are set to default.
       *  The image data is shared, so don't continue to manipulate the original image.
       */
       USImage(mitk::Image::Pointer image);

@@ -73,7 +73,7 @@ public:
 
 signals:
   ///
-  /// emitted when the input changed programatically or by the user
+  /// emitted when the input changed programmatically or by the user
   ///
   void NewFileSelected(const std::string &);
 

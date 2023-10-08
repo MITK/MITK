@@ -274,7 +274,7 @@ namespace mitk {
     };
 
     /**
-      * @brief Equal A function comparing two navigation data objects for beeing equal in meta- and imagedata
+      * @brief Equal A function comparing two navigation data objects for being equal in meta- and imagedata
       *
       * @ingroup MITKTestingAPI
       *

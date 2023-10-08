@@ -58,7 +58,7 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
       geometryBackup = Tool->GetDataNode()->GetData()->GetGeometry()->Clone();
       Tool->GetDataNode()->GetData()->GetGeometry()->SetIdentity();
       }
-  else {MITK_WARN << "Saving a tool with invalid data node, proceeding but errors might occure!";}
+  else {MITK_WARN << "Saving a tool with invalid data node, proceeding but errors might occur!";}
 
   //convert whole data to a mitk::DataStorage
   mitk::StandaloneDataStorage::Pointer saveStorage = mitk::StandaloneDataStorage::New();

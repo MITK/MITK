@@ -296,7 +296,7 @@ namespace mitk
     mitk::BoundingShapeCropper::RegionType outputRegion = output->GetRequestedRegion();
     mitk::BaseGeometry *inputImageGeometry = input->GetSlicedGeometry();
 
-    // iterate over all time steps and perform cropping or masking on all or a specific timestep (perviously specified
+    // iterate over all time steps and perform cropping or masking on all or a specific timestep (previously specified
     // by UseCurrentTimeStepOnly)
     int tstart = outputRegion.GetIndex(3);
     int tmax = tstart + outputRegion.GetSize(3);

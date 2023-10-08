@@ -200,7 +200,7 @@ void mitk::UnstructuredGridClusteringFilter::ExpandCluster(int id,
       {
         for (int j = 0; j < idList->GetNumberOfIds(); j++) // N = N joined with N'
         {
-          if (idList->GetId(j) < inpPoints->GetNumberOfPoints()) // a litte bit hacked ?!
+          if (idList->GetId(j) < inpPoints->GetNumberOfPoints()) // a little bit hacked ?!
           {
             pointIDs->InsertNextId(idList->GetId(j));
           }

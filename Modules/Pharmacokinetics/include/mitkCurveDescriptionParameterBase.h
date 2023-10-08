@@ -52,7 +52,7 @@ class MITKPHARMACOKINETICS_EXPORT CurveDescriptionParameterBase : public itk::Ob
      * @pre Curve value vector and curve grid must have the same size*/
     DescriptionParameterResultsType GetCurveDescriptionParameter(const CurveType& curve, const CurveGridType& grid) const;
 
-    /**Return the names of all descrition values that will be computed by the class.
+    /**Return the names of all description values that will be computed by the class.
      * @post The order of names equales the order of the results of GetCurveDescriptionParameter().*/
     virtual DescriptionParameterNamesType GetDescriptionParameterName() const = 0 ;
 

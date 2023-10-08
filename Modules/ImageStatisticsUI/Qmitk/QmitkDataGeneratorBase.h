@@ -35,8 +35,8 @@ specify how to generate the image ROI pairs, how to detect latest results, what 
 how to remove obsolete data from the storage, the base class takes care of the observation of the data storage
 and orchestrates the whole checking and generation workflow.
 In all the generation/orchestration process the data storage, passed to the generator, 1) serves as place where the final
-results are stored and searched and 2) it resembles the state of the genertion process with these final results and WIP
-place holder nodes that indicate planed or currently processed generation steps.
+results are stored and searched and 2) it resembles the state of the generation process with these final results and WIP
+place holder nodes that indicate planned or currently processed generation steps.
 */
 class MITKIMAGESTATISTICSUI_EXPORT QmitkDataGeneratorBase : public QObject
 {
@@ -63,9 +63,9 @@ public:
   bool IsGenerating() const;
 
   /** Checks data validity and triggers generation of data, if needed.
-  The generation itselfs will be done with a thread pool and is orchestrated by this class. To learn if the threads are finished and
+  The generation itself will be done with a thread pool and is orchestrated by this class. To learn if the threads are finished and
   everything is uptodate, listen to the signal GenerationFinished.
-  @return indicates if everything is already valid (true) or if the generation of new data was triggerd (false).*/
+  @return indicates if everything is already valid (true) or if the generation of new data was triggered (false).*/
   bool Generate() const;
 
   /** Indicates if for a given image and ROI a valid final result is available.*/
@@ -78,14 +78,14 @@ public slots:
   void SetAutoUpdate(bool autoUpdate);
 
 protected slots:
-  /** Used by QmitkDataGenerationJobBase to signal the generator that an error occured. */
+  /** Used by QmitkDataGenerationJobBase to signal the generator that an error occurred. */
   void OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob) const;
   /** Used by QmitkDataGenerationJobBase to signal and communicate the results of there computation. */
   void OnFinalResultsAvailable(JobResultMapType results, const QmitkDataGenerationJobBase *job) const;
 
 signals:
 
-  /*! @brief Signal that is emitted if a data generation job is started to generat outdated/inexistant data.
+  /*! @brief Signal that is emitted if a data generation job is started to generate outdated/inexistant data.
   */
   void DataGenerationStarted(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode, const QmitkDataGenerationJobBase* job) const;
 
@@ -113,7 +113,7 @@ protected:
 
   /** This method must be implemented by derived to indicate if a changed node is relevant and therefore if an update must be triggered.*/
   virtual bool ChangedNodeIsRelevant(const mitk::DataNode* changedNode) const = 0;
-  /** This method must be impemented by derived classes to return the pairs of images and ROIs
+  /** This method must be implemented by derived classes to return the pairs of images and ROIs
   (ROI may be null if no ROI is needed) for which data are needed.*/
   virtual InputPairVectorType GetAllImageROICombinations() const = 0;
   /** This method should indicate all missing and outdated (interim) results in the data storage, with new placeholder nodes and WIP dummy data
@@ -146,7 +146,7 @@ protected:
   /** Internal part of the generation strategy. Here is where the heavy lifting is done.*/
   bool DoGenerate() const;
 
-  /** Methods either directly calls generation or if its allready onging flags to restart the generation.*/
+  /** Methods either directly calls generation or if its already onging flags to restart the generation.*/
   void EnsureRecheckingAndGeneration() const;
 
   mitk::WeakPointer<mitk::DataStorage> m_Storage;

@@ -683,7 +683,7 @@ void mitk::GIFCooccurenceMatrix2::AddArguments(mitkCommandLineParser &parser) co
 
   std::string name = this->GetOptionPrefix();
 
-  parser.addArgument(this->GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
+  parser.addArgument(this->GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurrence matrix", "calculates Co-occurrence based features (new implementation)", us::Any());
   parser.addArgument(name+"::range", name+"::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
 }
 

@@ -100,7 +100,7 @@ bool mitk::MAPRegistrationWrapper::HasLimitedTargetRepresentation() const
 {
     if (m_spRegistration.IsNull())
     {
-        mitkThrow()<< "Error. Cannot determin HasLimitedTargetRepresentation(). Wrapper points to invalid registration (nullptr).";
+        mitkThrow()<< "Error. Cannot determine HasLimitedTargetRepresentation(). Wrapper points to invalid registration (nullptr).";
     }
     return m_spRegistration->hasLimitedTargetRepresentation();
 }
@@ -109,7 +109,7 @@ bool mitk::MAPRegistrationWrapper::HasLimitedMovingRepresentation() const
 {
     if (m_spRegistration.IsNull())
     {
-        mitkThrow()<< "Error. Cannot determin HasLimitedMovingRepresentation(). Wrapper points to invalid registration (nullptr).";
+        mitkThrow()<< "Error. Cannot determine HasLimitedMovingRepresentation(). Wrapper points to invalid registration (nullptr).";
     }
     return m_spRegistration->hasLimitedMovingRepresentation();
 }

@@ -38,7 +38,7 @@ namespace boost
 namespace mitk
 {
   /**
-  * \brief Template class for undirected graphs.Paramters should be the vertex and edge classes, which contains the
+  * \brief Template class for undirected graphs. Parameters should be the vertex and edge classes, which contains the
   * information.
   */
   template <class TVertex, class TEdge>

@@ -108,7 +108,7 @@ run()
     }
     catch (...)
     {
-        emit Error(QString("Unkown error when fitting the data."));
+        emit Error(QString("Unknown error when fitting the data."));
     }
 
     emit Finished();

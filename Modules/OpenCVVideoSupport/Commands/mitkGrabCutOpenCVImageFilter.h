@@ -42,7 +42,7 @@ class PointSet;
 /**
  * \brief Makes the OpenCV GrabCut filter available as OpenCVImageFilter.
  *
- * Image filtering is done asynchronly by using a worker thread as GrabCut segmentation
+ * Image filtering is done asynchronously by using a worker thread as GrabCut segmentation
  * can take up to some seconds. Calling the mitk::GrabCutOpenCVImageFilter::OnFilterImage()
  * method sets just the input image and wakes up the worker thread. It is not guaranteed
  * that every image gets segmented. If multiple new images where set before a segmentation

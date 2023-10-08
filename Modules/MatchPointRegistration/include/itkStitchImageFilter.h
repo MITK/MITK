@@ -28,7 +28,7 @@ namespace itk
   enum class StitchStrategy
   {
     Mean = 0, //use the mean value of all inputs that can provide a pixel vaule
-    BorderDistance = 1 //use the value that is largest minimal distance to its image borders (use e.g. if vaules tend to be not reliable at borders)
+    BorderDistance = 1 //use the value that is largest minimal distance to its image borders (use e.g. if values tend to be not reliable at borders)
   };
 
   std::ostream& operator<< (std::ostream& os, const itk::StitchStrategy& strategy)
@@ -38,7 +38,7 @@ namespace itk
     else if (itk::StitchStrategy::BorderDistance == strategy)
       os << "BorderDistance";
     else
-      os << "unkown";
+      os << "unknown";
 
     return os;
   };
@@ -51,7 +51,7 @@ namespace itk
  * for each input image). If multiple input images cover the output region the behavior depends on
  * the StitchStragy:
  * - Mean: a weighted sum of all voxels mapped input pixel values will be calculated.
- * - BorderDistance: the voxels will be choosen that have the largest minimal distance to its own image borders.
+ * - BorderDistance: the voxels will be chosen that have the largest minimal distance to its own image borders.
  *
  * All other behaviors are similar to itk::ResampleImageFilter. See the filter's description for
  * more details.
@@ -157,7 +157,7 @@ public:
   using Superclass::SetInput;
   void SetInput(const InputImageType* image) override;
   void SetInput(unsigned int index, const InputImageType* image) override;
-  /** Convinience methods that allows setting of input image and its transform in
+  /** Convenience methods that allows setting of input image and its transform in
    one call.*/
   virtual void SetInput(unsigned int index, const InputImageType* image, const TransformType* transform);
   virtual void SetInput(unsigned int index, const InputImageType* image, const TransformType* transform, InterpolatorType* interpolator);
@@ -189,7 +189,7 @@ public:
   /** Get the output image origin. */
   itkGetConstReferenceMacro(OutputOrigin, OriginPointType);
 
-  /** Set the output direciton cosine matrix. */
+  /** Set the output direction cosine matrix. */
   itkSetMacro(OutputDirection, DirectionType);
   itkGetConstReferenceMacro(OutputDirection, DirectionType);
 
@@ -204,7 +204,7 @@ public:
   itkGetConstReferenceMacro(OutputStartIndex, IndexType);
 
    /** Set a reference image to use to define the output information.
-    *  By default, output information is specificed through the
+    *  By default, output information is specified through the
     *  SetOutputSpacing, Origin, and Direction methods.  Alternatively,
     *  this method can be used to specify an image from which to
     *  copy the information. UseReferenceImageOn must be set to utilize the

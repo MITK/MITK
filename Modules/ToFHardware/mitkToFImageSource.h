@@ -56,7 +56,7 @@ namespace mitk
 
 /**
 ToFCameraDevice is declared a MicroService interface. See
-MicroService documenation for more details.
+MicroService documentation for more details.
 */
 US_DECLARE_SERVICE_INTERFACE(mitk::ToFImageSource, "org.mitk.services.ToFImageSource")
 #endif

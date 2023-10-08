@@ -65,7 +65,7 @@ public:
     registerProperty(mitk::ModelFitConstants::PARAMETER_SCALE_PROPERTY_NAME(), "modelfit_parameter_scale", "Scaling of the parameter. Default value: 1.");
     registerProperty(mitk::ModelFitConstants::PARAMETER_TYPE_PROPERTY_NAME(), "modelfit_parameter_type", "Type of the parameters. Default value: parameter. Other options: derived, criterion, evaluation.");
 
-    registerProperty(mitk::ModelFitConstants::MODEL_TYPE_PROPERTY_NAME(), "modelfit_model_type", "Value specifies the type of model (helpfull for classification; e.g. MR perfusion)");
+    registerProperty(mitk::ModelFitConstants::MODEL_TYPE_PROPERTY_NAME(), "modelfit_model_type", "Value specifies the type of model (helpful for classification; e.g. MR perfusion)");
     registerProperty(mitk::ModelFitConstants::MODEL_NAME_PROPERTY_NAME(), "modelfit_model_name", "Name of the specific fit. Only used for display.");
     registerProperty(mitk::ModelFitConstants::MODEL_FUNCTION_PROPERTY_NAME(), "modelfit_model_function", "Function string, that specifies the model and will be parsed, to plot the curves based on the parameter. Optional parameter that must not be set.");
     registerProperty(mitk::ModelFitConstants::MODEL_FUNCTION_CLASS_PROPERTY_NAME(), "modelfit_model_functionClass", "ID of the model class implementation.");

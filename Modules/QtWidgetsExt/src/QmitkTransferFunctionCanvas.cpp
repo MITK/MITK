@@ -111,7 +111,7 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent *mouseEvent)
         if (newPos.first <= this->GetFunctionX(m_GrabbedHandle - 1))
           newPos.first = this->GetFunctionX(m_GrabbedHandle);
 
-      // Check with sucessor
+      // Check with successor
       if (m_GrabbedHandle < this->GetFunctionSize() - 1)
         if (newPos.first >= this->GetFunctionX(m_GrabbedHandle + 1))
           newPos.first = this->GetFunctionX(m_GrabbedHandle);
@@ -225,7 +225,7 @@ void QmitkTransferFunctionCanvas::keyPressEvent(QKeyEvent *e)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-// Update immediatly while changing the transfer function
+// Update immediately while changing the transfer function
 void QmitkTransferFunctionCanvas::SetImmediateUpdate(bool state)
 {
   m_ImmediateUpdate = state;

@@ -54,7 +54,7 @@ namespace itk
   AdaptiveThresholdIterator<TImage, TFunction>::AdaptiveThresholdIterator(ImageType *imagePtr, FunctionType *fnPtr)
     : m_FineDetectionMode(false), m_DetectionStop(false)
   {
-    this->m_OutputImage = imagePtr; // here we store the image, we have to wite the result to
+    this->m_OutputImage = imagePtr; // here we store the image, we have to write the result to
     m_Function = fnPtr;
 
     // Set up the temporary image
@@ -116,7 +116,7 @@ namespace itk
     }
     else // fine leakage detection
     {
-      // counting voxels over interations; if above a critical value (to be extended) then set this to leakage
+      // counting voxels over iterations; if above a critical value (to be extended) then set this to leakage
       int diff = m_VoxelCounter - m_LastVoxelNumber;
       // std::cout<<"diff is: "<<diff<<"\n";
       if (diff <= criticalValue && (!m_DetectionStop))

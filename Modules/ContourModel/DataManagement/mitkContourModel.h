@@ -132,7 +132,7 @@ namespace mitk
 
     /** Clears the contour of destinationTimeStep and copies
         the contour of the passed source model at the sourceTimeStep.
-     @pre soureModel must point to a valid instance
+     @pre sourceModel must point to a valid instance
      @pre sourceTimePoint must be valid
      @note Updating a vertex to a timestep which exceeds the timebounds of the contour
       will not be added, the TimeGeometry will not be expanded.
@@ -330,9 +330,9 @@ namespace mitk
     bool SelectVertexAt(Point3D &point, float eps, TimeStepType timestep = 0);
 
     /*
-        \pararm point - query point in 3D space
-        \pararm eps - radius for nearest neighbour search (error bound).
-        \pararm timestep - search at this timestep
+        \param point - query point in 3D space
+        \param eps - radius for nearest neighbour search (error bound).
+        \param timestep - search at this timestep
 
         @return true = vertex found;  false = no vertex found
         */
@@ -443,7 +443,7 @@ namespace mitk
     */
     void ExecuteOperation(Operation *operation) override;
 
-    /** \brief Redistributes ontrol vertices with a given period (as number of vertices)
+    /** \brief Redistributes control vertices with a given period (as number of vertices)
     \param period - the number of vertices between control points.
     \param timestep - at this timestep all lines will be rebuilt.
     */

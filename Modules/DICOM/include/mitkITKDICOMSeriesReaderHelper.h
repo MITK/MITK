@@ -69,7 +69,7 @@ class ITKDICOMSeriesReaderHelper
     /** Returns the list of time bounds of all passed time step containers.
      (sa ExtractTimeBoundsOfTimeStep and ExtractDateTimeBoundsOfTimeStep).
      Time steps where no time bounds could be extracted
-     are indecated by "null" time bounds (both values "0"). The order of the returned
+     are indicated by "null" time bounds (both values "0"). The order of the returned
      list equals of passed filenamesOfTimeSteps order.
      @remark The function regards acquisition date time tags and trigger time tags.*/
     static TimeBoundsList ExtractTimeBoundsOfTimeSteps (const StringContainerList& filenamesOfTimeSteps);

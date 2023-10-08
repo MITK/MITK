@@ -55,7 +55,7 @@ namespace mitk
       mitk::ImageMappingInterpolator::Type interpolatorType = mitk::ImageMappingInterpolator::Linear);
 
     /**@overload
-     * Convinience version that uses identity transforms form the registrations.
+     * Convenience version that uses identity transforms form the registrations.
      */
     MITKMATCHPOINTREGISTRATION_EXPORT Image::Pointer StitchImages(std::vector<Image::ConstPointer> inputs,
       const BaseGeometry* resultGeometry,

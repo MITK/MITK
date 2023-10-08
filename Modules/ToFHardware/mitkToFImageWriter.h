@@ -120,9 +120,9 @@ namespace mitk
     int m_ToFCaptureHeight; ///< height (y-dimension) of the images to record.
     int m_RGBCaptureWidth; ///< width (x-dimension) of the images to record.
     int m_RGBCaptureHeight; ///< height (y-dimension) of the images to record.
-    int m_ToFPixelNumber; ///< number of pixels (widht*height) of the images to record
+    int m_ToFPixelNumber; ///< number of pixels (width*height) of the images to record
     int m_ToFImageSizeInBytes; ///< size of the image to save in bytes
-    int m_RGBPixelNumber; ///< number of pixels (widht*height) of the images to record
+    int m_RGBPixelNumber; ///< number of pixels (width*height) of the images to record
     int m_RGBImageSizeInBytes; ///< size of the image to save in bytes
     ToFImageWriter::ToFImageType m_ToFImageType; ///< type of image to be recorded: ToFImageType3D (0) or ToFImageType2DPlusT (1)
   };

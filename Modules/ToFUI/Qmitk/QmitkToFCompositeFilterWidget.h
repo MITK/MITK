@@ -39,9 +39,9 @@ class MITKTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
     QmitkToFCompositeFilterWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
     ~QmitkToFCompositeFilterWidget() override;
 
-    /* @brief This method is part of the widget an needs not to be called seperately. */
+    /* @brief This method is part of the widget an needs not to be called separately. */
     virtual void CreateQtPartControl(QWidget *parent);
-    /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
+    /* @brief This method is part of the widget an needs not to be called separately. (Creation of the connections of main and control widget.)*/
     virtual void CreateConnections();
 
     /*!
@@ -132,19 +132,19 @@ signals:
     */
     void OnBilateralFilterDomainSigmaSpinBoxValueChanged(double value);
     /*!
-    \brief slot updating the paramter "range sigma" of the bilateral filter in the ToFCompositeFilter
+    \brief slot updating the parameter "range sigma" of the bilateral filter in the ToFCompositeFilter
     */
     void OnBilateralFilterRangeSigmaSpinBoxValueChanged(double value);
     /*!
-    \brief slot updating the paramter "kernel radius" of the bilateral filter in the ToFCompositeFilter
+    \brief slot updating the parameter "kernel radius" of the bilateral filter in the ToFCompositeFilter
     */
     void OnBilateralFilterKernelRadiusSpinBoxValueChanged(int value);
     /*!
-    \brief slot updating the paramter "minimal threshold" of the threshold filter in the ToFCompositeFilter
+    \brief slot updating the parameter "minimal threshold" of the threshold filter in the ToFCompositeFilter
     */
     void OnThresholdFilterMinValueChanged(int value);
     /*!
-    \brief slot updating the paramter "maximal threshold" of the threshold filter in the ToFCompositeFilter
+    \brief slot updating the parameter "maximal threshold" of the threshold filter in the ToFCompositeFilter
     */
     void OnThresholdFilterMaxValueChanged(int value);
 

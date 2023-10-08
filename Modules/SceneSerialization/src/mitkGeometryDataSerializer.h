@@ -21,7 +21,7 @@ namespace mitk
     \brief Serializes mitk::GeometryData for mitk::SceneIO.
 
     \warning depends on mitk::GeometryDataWriterService which is first implemented only for the Geometry3D class!
-             See current status of that class if you want to use other geomety types.
+             See current status of that class if you want to use other geometry types.
   */
   class GeometryDataSerializer : public BaseDataSerializer
   {

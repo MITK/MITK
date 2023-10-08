@@ -23,9 +23,9 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFCooccurenceMatrix : public AbstractGlobalImageFeature
   {
     /**
-    * \brief Calculates features based on the co-occurence matrix.
+    * \brief Calculates features based on the co-occurrence matrix.
     *
-    * This filter calculates features based on the Co-Occurence Matrix.
+    * This filter calculates features based on the Co-Occurrence Matrix.
     *
     * \warning{ This is a legacy class only. If possible, avoid to use it. Use
     * GIFCooccurenceMatrix2 instead.}

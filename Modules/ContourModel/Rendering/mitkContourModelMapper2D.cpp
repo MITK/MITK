@@ -35,7 +35,7 @@ mitk::ContourModelMapper2D::~ContourModelMapper2D()
 
 const mitk::ContourModel *mitk::ContourModelMapper2D::GetInput(void)
 {
-  // convient way to get the data from the dataNode
+  // convenient way to get the data from the dataNode
   return static_cast<const mitk::ContourModel *>(GetDataNode()->GetData());
 }
 
@@ -274,7 +274,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
       {
         // slice through the data to get a 2D representation of the (possible) 3D contour
 
-        // needed because currently there is no outher solution if the contour is within the plane
+        // needed because currently there is no other solution if the contour is within the plane
         vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
         tubeFilter->SetInputData(polyDataIn3D);
         tubeFilter->SetRadius(0.05);

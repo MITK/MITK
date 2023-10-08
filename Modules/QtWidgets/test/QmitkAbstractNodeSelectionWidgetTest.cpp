@@ -500,7 +500,7 @@ public:
     widget.SetDataStorage(m_DataStorage);
     widget.SetCurrentSelection({ m_Node3 });
 
-    //Check OnNodeModified behavour without predicate
+    //Check OnNodeModified behaviour without predicate
     m_Node3->SetName("NewName");
     CPPUNIT_ASSERT_EQUAL(1, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);

@@ -75,7 +75,7 @@ namespace mitk {
     /**
     * \brief Remove this device from the micro service.
     * This method is public for mitk::USVideoDevice, because this devices
-    * can be completly removed. This is not possible for API devices, which
+    * can be completely removed. This is not possible for API devices, which
     * should be available while their sub module is loaded.
     */
     void UnregisterOnService();
@@ -121,7 +121,7 @@ namespace mitk {
     void RemoveProbeByName(std::string name) override;
 
     /**
-    \brief True, if this Device plays back a file, false if it recieves data from a device
+    \brief True, if this Device plays back a file, false if it receives data from a device
     */
     bool GetIsSourceFile();
 
@@ -193,7 +193,7 @@ namespace mitk {
     bool OnDisconnection() override;
 
     /**
-    * \brief Is called during the activation process. After this method is finsihed, the device should be generating images
+    * \brief Is called during the activation process. After this method is finished, the device should be generating images
     */
     bool OnActivation() override;
 
@@ -209,12 +209,12 @@ namespace mitk {
     void GenerateData() override;
 
     /**
-    * \brief The image source that we use to aquire data
+    * \brief The image source that we use to acquire data
     */
     mitk::USImageVideoSource::Pointer m_Source;
 
     /**
-    * \brief True, if this source plays back a file, false if it recieves data from a device
+    * \brief True, if this source plays back a file, false if it receives data from a device
     */
     bool m_SourceIsFile;
 

@@ -67,7 +67,7 @@ US_END_NAMESPACE
     US_TEST_OUTPUT(<< "Further test execution skipped.")                                      \
     US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestFailed();                            \
   } catch (const std::exception& ex) {                                                        \
-    US_TEST_OUTPUT(<< "Exception occured " << ex.what())                                      \
+    US_TEST_OUTPUT(<< "Exception occurred " << ex.what())                                      \
     US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestFailed();                            \
   }                                                                                           \
   if (US_PREPEND_NAMESPACE(TestManager)::GetInstance().NumberOfFailedTests() > 0) {           \

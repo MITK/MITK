@@ -99,7 +99,7 @@ int mitkImageDimensionConverterTest(int /*argc*/, char * /*argv*/ [])
 
   ///////////////////////////////////////
   // mitkImage2D is now a 2D image with 3D Geometry information.
-  // Save it without conversion and load it again. It should have an identitiy matrix
+  // Save it without conversion and load it again. It should have an identity matrix
   sstream.clear();
   sstream << MITK_TEST_OUTPUT_DIR << ""
           << "/rotatedImage2D.nrrd";

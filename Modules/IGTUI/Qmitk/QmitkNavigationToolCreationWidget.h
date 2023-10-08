@@ -123,7 +123,7 @@ protected:
 
   Ui::QmitkNavigationToolCreationWidgetControls* m_Controls;
 
-  /** @brief this pointer holds the tool which is edited. If finished is clicked, it will be copied to the final tool, if it is cancled, it is reseted and not used.
+  /** @brief this pointer holds the tool which is edited. If finished is clicked, it will be copied to the final tool, if it is canceled, it is reset and not used.
       This can be regarded as the clipboard for all changes.  */
   mitk::NavigationTool::Pointer m_ToolToBeEdited;
 

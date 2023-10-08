@@ -22,7 +22,7 @@ double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quater
   point[1] = rotationVector[1];
   point[2] = rotationVector[2];
 
-  //Quaternions used for rotations should alway be normalized, so just to be safe:
+  //Quaternions used for rotations should always be normalized, so just to be safe:
   a.normalize();
   b.normalize();
 

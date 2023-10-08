@@ -46,14 +46,14 @@ namespace mitk {
     bool IsCreateTrackingDeviceSourcePossible();
 
     /** @return Returns a new TrackingDeviceSource. Returns nullptr if there was an error on creating the
-     *          TrackingDeviceSource. If there was an error it's availiable as error message.
+     *          TrackingDeviceSource. If there was an error it's available as error message.
      */
     mitk::TrackingDeviceSource::Pointer CreateTrackingDeviceSource();
 
     /** @return Returns a new TrackingDeviceSource. Returns nullptr if there was an error on creating the
-     *          TrackingDeviceSource. If there was an error it's availiable as error message.
+     *          TrackingDeviceSource. If there was an error it's available as error message.
      *  @param visualizationFilter (return value) returns a visualization filter which is already connected to the tracking device source.
-     *                             This filter visualises the surfaces which are availiable by the navigation tool storage.
+     *                             This filter visualises the surfaces which are available by the navigation tool storage.
      */
     mitk::TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::NavigationDataObjectVisualizationFilter::Pointer &visualizationFilter);
 
@@ -74,7 +74,7 @@ namespace mitk {
     std::vector<std::string> GetToolIdentifiersInToolStorage();
 
     /** @return Returns a modified navigation tool storage which holds the tools currently in use in
-      *         the same order like the output ids of the pipline.
+      *         the same order like the output ids of the pipeline.
       */
     mitk::NavigationToolStorage::Pointer GetUpdatedNavigationToolStorage();
 

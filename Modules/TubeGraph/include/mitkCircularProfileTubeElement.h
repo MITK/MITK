@@ -20,7 +20,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * \brief Class for elements which describes tubular structur with a circular cross section.
+  * \brief Class for elements which describes tubular structure with a circular cross section.
   */
   class MITKTUBEGRAPH_EXPORT CircularProfileTubeElement : virtual public TubeElement
   {

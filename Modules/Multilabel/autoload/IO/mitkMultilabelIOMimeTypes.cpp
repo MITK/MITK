@@ -111,7 +111,7 @@ bool mitk::MitkMultilabelIOMimeTypes::LegacyLabelSetMimeType::AppliesTo(const st
   }
   catch(...)
   {
-    MITK_DEBUG << "Unkown error while try to anylize NRRD file for LegacyLabelSetMimeType. File: " << path;
+    MITK_DEBUG << "Unknown error while try to analyze NRRD file for LegacyLabelSetMimeType. File: " << path;
   }
 
   if (value.compare("org.mitk.image.multilabel") != 0)

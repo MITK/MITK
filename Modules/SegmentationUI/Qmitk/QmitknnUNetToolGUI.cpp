@@ -701,7 +701,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
     }
     catch (...)
     {
-      std::string errorMsg = "Unkown error occured while generation nnUNet segmentation.";
+      std::string errorMsg = "Unknown error occurred while generation nnUNet segmentation.";
       this->ShowErrorMessage(errorMsg);
       m_Controls.previewButton->setEnabled(true);
       tool->PredictOff();
@@ -1069,7 +1069,7 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
     {
       subIt.next();
       QString envName = subIt.fileName();
-      if (!envName.startsWith('.')) // Filter out irrelevent hidden folders, if any.
+      if (!envName.startsWith('.')) // Filter out irrelevant hidden folders, if any.
       {
         m_Controls.pythonEnvComboBox->insertItem(0, "(" + envName + "): " + subIt.filePath());
       }

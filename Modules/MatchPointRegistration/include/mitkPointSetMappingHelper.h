@@ -37,7 +37,7 @@ namespace mitk
      * @param registration Pointer to the registration instance that should be used for mapping
      * @param timeStep Indicates which time step of the point set should be mapped (the rest will just be copied). -1 (default) indicates that all time steps should be mapped.
      * @param throwOnMappingError Indicates if mapping should fail with an exception (true), if the registration does not cover/support the whole requested region for mapping into the result image.
-     * if set to false, points that cause an mapping error will be transfered without mapping but get the passed errorPointValue as data to indicate unmappable points;
+     * if set to false, points that cause an mapping error will be transferred without mapping but get the passed errorPointValue as data to indicate unmappable points;
      * @param errorPointValue Indicates the point data that should be used if an mapping error occurs (and throwOnMappingError is false).
      * @pre input must be valid
      * @pre registration must be valid

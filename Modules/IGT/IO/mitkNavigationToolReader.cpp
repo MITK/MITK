@@ -66,7 +66,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
   mitk::DataNode::Pointer myNode = loadedStorage->GetAll()->ElementAt(0);
   mitk::NavigationTool::Pointer returnValue = ConvertDataNodeToNavigationTool(myNode, tempDirectory);
 
-  //delete the data-storage file which is not needed any more. The toolfile must be left in the temporary directory becauses it is linked in the datatreenode of the tool
+  //delete the data-storage file which is not needed any more. The toolfile must be left in the temporary directory because it is linked in the datatreenode of the tool
   std::remove((std::string(tempDirectory + Poco::Path::separator() + GetFileWithoutPath(filename) + ".storage")).c_str());
 
   return returnValue;
@@ -97,11 +97,11 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   mitk::TrackingDeviceType device_type;
   node->GetStringProperty("tracking device type", device_type);
 
-  //For backward compability with old tool stroages (before 12/2015 device_type was an int value, now it is string)
+  //For backward compatibility with old tool storages (before 12/2015 device_type was an int value, now it is string)
   if (device_type.size() == 0)
   {
     /*
-    This was the old enum. Numbers inserted for better readibility. Don't delete this if-case to allow loading of ols storages...
+    This was the old enum. Numbers inserted for better readability. Don't delete this if-case to allow loading of ols storages...
     enum TrackingDeviceType
     {
     0 NDIPolaris,                 ///< Polaris: optical Tracker from NDI

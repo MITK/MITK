@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 namespace mitk {
   /**Documentation
-  * \brief An object of this class represents an exception of the MITK-IGT module which are releated to the hardware (e.g. connection problems, etc.).
+  * \brief An object of this class represents an exception of the MITK-IGT module which are related to the hardware (e.g. connection problems, etc.).
   *
   * \ingroup IGT
   */  class MITKIGT_EXPORT IGTHardwareException : public mitk::IGTException

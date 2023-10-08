@@ -160,7 +160,7 @@ protected:
   void PrintSelf( std::ostream& os, Indent indent ) const override;
 
   /**
-   * Points that the spline attempts to intepolate.
+   * Points that the spline attempts to interpolate.
    */
   PointListType         m_Points;
 

@@ -22,7 +22,7 @@ auto *context = us::GetModuleContext();
 
 \subsection REST_Technical Technical background
 
- The module uses the <a href="https://github.com/Microsoft/cpprestsdk">Microsoft C++ REST SDK</a> for REST mechanisms as well as JSON convertion and asynchronic programming.
+ The module uses the <a href="https://github.com/Microsoft/cpprestsdk">Microsoft C++ REST SDK</a> for REST mechanisms as well as JSON conversion and asynchronic programming.
 
 \section Use_REST How to use the REST Module
 

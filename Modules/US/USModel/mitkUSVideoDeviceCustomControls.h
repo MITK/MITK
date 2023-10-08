@@ -89,7 +89,7 @@ namespace mitk {
 
   protected:
     /**
-      * Class needs an mitk::USImageVideoSource object for beeing constructed.
+      * Class needs an mitk::USImageVideoSource object for being constructed.
       * This object will be manipulated by the custom controls methods.
       */
     USVideoDeviceCustomControls(itk::SmartPointer<USDevice> device);

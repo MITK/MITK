@@ -61,14 +61,14 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
     bool existsNot = tempdir.createDirectory();
     if (!existsNot)
     {
-      MITK_ERROR << "Warning: Directory already exitsts: " << uniquename << " (choosing another)";
+      MITK_ERROR << "Warning: Directory already exists: " << uniquename << " (choosing another)";
       returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() +
                     "SceneIOTempDirectory" + uidGen.GetUID();
       uniquename = returnValue + Poco::Path::separator();
       Poco::File tempdir2(uniquename);
       if (!tempdir2.createDirectory())
       {
-        MITK_ERROR << "Warning: Second directory also already exitsts: " << uniquename;
+        MITK_ERROR << "Warning: Second directory also already exists: " << uniquename;
       }
     }
   }
@@ -153,7 +153,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
     MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
   }
 
-  // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
+  // return new data storage, even if empty or incomplete (return as much as possible but notify calling method)
   return storage;
 }
 
@@ -210,7 +210,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
     MITK_ERROR << "There were errors while loading scene file " << indexfilename << ". Your data may be corrupted";
   }
 
-  // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
+  // return new data storage, even if empty or incomplete (return as much as possible but notify calling method)
   return storage;
 }
 

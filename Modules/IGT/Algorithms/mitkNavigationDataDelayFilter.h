@@ -53,7 +53,7 @@ namespace mitk {
     void GenerateData() override;
 
     /**
-    * \brief This field containes the buffered navigation datas. It is a queue of (pair of (time and vector of (several navigation datas from one point in time))
+    * \brief This field contains the buffered navigation datas. It is a queue of (pair of (time and vector of (several navigation datas from one point in time))
     * In more clarity: The top level queue contains (one Navigation Data for each inout and the time these NDs have been recorded at).
     */
     std::queue<BufferType> m_Buffer;

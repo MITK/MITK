@@ -28,7 +28,7 @@ namespace mitk
    *
    * with concentration curve Cp(t) of the Blood Plasma p and Ce(t) of the Extracellular Extravascular Space(EES)(interstitial volume). CA(t) is the aterial concentration, i.e. the AIF
    * Cp(t) and Ce(t) are found numerical via Runge-Kutta methode, implemented in Boosts numeric library ODEINT. Here we use a runge_kutta_cash_karp54 stepper with
-   * adaptive step size and error controll.
+   * adaptive step size and error control.
    * From the resulting curves Cp(t) and Ce(t) the measured concentration Ctotal(t) is found vial
    *
    * Ctotal(t) = vp * Cp(t) + ve * Ce(t)

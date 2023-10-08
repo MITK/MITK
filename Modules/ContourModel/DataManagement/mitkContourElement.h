@@ -27,10 +27,10 @@ namespace mitk
   To mark a vertex as a special one it can be set as a control point.
 
   \note This class assumes that it manages its vertices. So if a vertex instance is added to this
-  class the ownership of the vertex is transfered to the ContourElement instance.
+  class the ownership of the vertex is transferred to the ContourElement instance.
   The ContourElement instance takes care of deleting vertex instances if needed.
   It is highly not recommend to use this class directly as it is designed as a internal class of
-  ContourModel. Therefore it is adviced to use ContourModel if contour representations are needed in
+  ContourModel. Therefore it is advised to use ContourModel if contour representations are needed in
   MITK.
   */
   class MITKCONTOURMODEL_EXPORT ContourElement : public itk::LightObject
@@ -273,7 +273,7 @@ namespace mitk
     /** Returns a list pointing to all vertices that are indicated to be control
      points.
      \remark It is important to note, that the vertex pointers in the returned
-     list directly point to the vertices stored interanlly. So they are still
+     list directly point to the vertices stored internally. So they are still
      owned by the ContourElement instance that returns the list. If one wants
      to take over ownership, one has to clone the vertex instances.
      */

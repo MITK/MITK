@@ -264,7 +264,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
 
   mitk::Vector3D s = image->GetGeometry()->GetSpacing();
 
-  // ToDo: Check if this is a collumn or row vector from the matrix.
+  // ToDo: Check if this is a column or row vector from the matrix.
   // right now it works but not sure for rotated geometries
   mitk::FillVector3D(xDirection, transform[0][0]/s[0], transform[0][1]/s[1], transform[0][2]/s[2]);
   mitk::FillVector3D(yDirection, transform[1][0]/s[0], transform[1][1]/s[1], transform[1][2]/s[2]);

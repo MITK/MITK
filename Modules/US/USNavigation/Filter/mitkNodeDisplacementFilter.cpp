@@ -124,7 +124,7 @@ found in the LICENSE file.
       catch (mitk::Exception& e)
         {
           returnValue->SetDataValid(false);
-          MITK_WARN << "Excetion while returning navigation data: " << e.GetDescription();
+          MITK_WARN << "Exception while returning navigation data: " << e.GetDescription();
         }
       }
     else

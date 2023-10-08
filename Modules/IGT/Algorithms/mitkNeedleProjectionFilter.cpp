@@ -32,8 +32,8 @@ mitk::NeedleProjectionFilter::NeedleProjectionFilter()
   m_ToolAxis = toolAxis;
   InitializeOriginalPoints(toolAxis, m_ShowToolAxis);
 
-  MITK_DEBUG << "orginal point 0 set constructor" << m_OriginalPoints->GetPoint(0);
-  MITK_DEBUG << "orginal point 1 set constructor" << m_OriginalPoints->GetPoint(1);
+  MITK_DEBUG << "original point 0 set constructor" << m_OriginalPoints->GetPoint(0);
+  MITK_DEBUG << "original point 1 set constructor" << m_OriginalPoints->GetPoint(1);
 }
 
 void mitk::NeedleProjectionFilter::InitializeOriginalPoints(mitk::Point3D toolAxis, bool showToolAxis)
@@ -74,8 +74,8 @@ void mitk::NeedleProjectionFilter::SetToolAxisForFilter(mitk::Point3D point)
   m_ToolAxis = point;
   InitializeOriginalPoints(m_ToolAxis, m_ShowToolAxis);
 
-  MITK_DEBUG << "orginal point 1 set mutator" << m_OriginalPoints->GetPoint(1);
-  MITK_DEBUG << "orginal point 0 set mutator" << m_OriginalPoints->GetPoint(0);
+  MITK_DEBUG << "original point 1 set mutator" << m_OriginalPoints->GetPoint(1);
+  MITK_DEBUG << "original point 0 set mutator" << m_OriginalPoints->GetPoint(0);
 }
 
 mitk::NeedleProjectionFilter::~NeedleProjectionFilter()
@@ -168,7 +168,7 @@ mitk::AffineTransform3D::Pointer mitk::NeedleProjectionFilter::NavigationDataToT
   quatTransform->Modified();
 
   /* because of an itk bug, the transform can not be calculated with float data type.
-  To use it in the mitk geometry classes, it has to be transfered to mitk::ScalarType which is float */
+  To use it in the mitk geometry classes, it has to be transferred to mitk::ScalarType which is float */
   static AffineTransform3D::MatrixType m;
   mitk::TransferMatrix(quatTransform->GetMatrix(), m);
   affineTransform->SetMatrix(m);

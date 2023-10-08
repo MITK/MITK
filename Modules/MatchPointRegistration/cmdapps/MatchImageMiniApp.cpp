@@ -54,7 +54,7 @@ void SetupParser(mitkCommandLineParser& parser)
   parser.addArgument(
     "moving", "m",
     mitkCommandLineParser::File,
-    "Moving image files", "Path to the data that should be registred into the target space.",
+    "Moving image files", "Path to the data that should be registered into the target space.",
     us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
     "target", "t",
@@ -86,7 +86,7 @@ void SetupParser(mitkCommandLineParser& parser)
     us::Any(),
     false, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
-    "registrations", "r", mitkCommandLineParser::StringList, "Registration files", "Pathes to the registrations that should be used to map the input images. If this parameter is not set, identity transforms are assumed. If this parameter is set, it must have the same number of entries then the parameter inputs. If you want to use and identity transform for a specific input, specify an empty string. The application assumes that inputs and registrations have the same order, so the n-th input should use thr n-th registration.", us::Any(), true, false, false, mitkCommandLineParser::Input);
+    "registrations", "r", mitkCommandLineParser::StringList, "Registration files", "Paths to the registrations that should be used to map the input images. If this parameter is not set, identity transforms are assumed. If this parameter is set, it must have the same number of entries then the parameter inputs. If you want to use and identity transform for a specific input, specify an empty string. The application assumes that inputs and registrations have the same order, so the n-th input should use thr n-th registration.", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.endGroup();
 }
@@ -127,13 +127,13 @@ map::deployment::RegistrationAlgorithmBasePointer loadAlgorithm(const Settings& 
       "Cannot open deployed registration algorithm file.");
   }
 
-  std::cout << "... libary opened..." << std::endl;
+  std::cout << "... library opened..." << std::endl;
 
   std::cout << "Algorithm information: " << std::endl;
   spHandle->getAlgorithmUID().Print(std::cout, 2);
   std::cout << std::endl;
 
-  //Now load the algorthm from DLL
+  //Now load the algorithm from DLL
   spAlgorithmBase = map::deployment::getRegistrationAlgorithm(spHandle);
 
 
@@ -262,7 +262,7 @@ int main(int argc, char* argv[])
       movingImage = mitk::SelectImageByTimeStep(movingImage, 0)->Clone(); //we have to clone because SelectImageByTimeStep 
                                                                           //only generates as new view of the data and we
                                                                           //are overwriting the only smartpointer to the source.
-      std::cout << "Moving image has multiple time steps. Use first time step for registartion." << std::endl;
+      std::cout << "Moving image has multiple time steps. Use first time step for registration." << std::endl;
     }
 
     std::cout << "Load target data..." << std::endl;
@@ -279,7 +279,7 @@ int main(int argc, char* argv[])
       targetImage = mitk::SelectImageByTimeStep(targetImage, 0)->Clone(); //we have to clone because SelectImageByTimeStep 
                                                                           //only generates as new view of the data and we
                                                                           //are overwriting the only smartpointer to the source.
-      std::cout << "Target image has multiple time steps. Use first time step for registartion." << std::endl;
+      std::cout << "Target image has multiple time steps. Use first time step for registration." << std::endl;
     }
 
     std::cout << "Start registration...." << std::endl;

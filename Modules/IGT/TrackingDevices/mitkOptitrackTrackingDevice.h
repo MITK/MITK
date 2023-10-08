@@ -69,7 +69,7 @@ namespace mitk
     /**
     * \brief Open the Connection with the Tracker. Calls LoadCalibration function and set the system up with the calibration file.
     * Remember that you have to set a calibration file first to open a correct connection to the Optical Tracking System.
-    * \return Returns true if the connection is well done. Throws an exception if an error occures related to the Optitrack API messages.
+    * \return Returns true if the connection is well done. Throws an exception if an error occurs related to the Optitrack API messages.
     * @throw mitk::IGTException Throws an exception if InitializeCameras or LoadCalibration failed.
     */
     bool OpenConnection() override;
@@ -77,7 +77,7 @@ namespace mitk
     /**
     * \brief Close the Connection with the Tracker. Also CleanUp the Optitrack variables using the API: TT_CleanUp and TT_ShutDown.
     * Sometimes API does not work properly and some problems during the Clean Up has been reported.
-    * \return Returns true if the cleaning up and shutdown worked correctly. Throws an exception if an error occures related to the Optitrack API messages.
+    * \return Returns true if the cleaning up and shutdown worked correctly. Throws an exception if an error occurs related to the Optitrack API messages.
     * @throw mitk::IGTException Throws an exception if the System cannot ShutDown now or was not initialized.
     */
     bool CloseConnection() override;

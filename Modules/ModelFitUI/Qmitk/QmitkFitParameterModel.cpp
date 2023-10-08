@@ -177,7 +177,7 @@ data(const QModelIndex& index, int role) const
     }
   }
   else
-  { // realy want to get the values of the current fit
+  { // really want to get the values of the current fit
     const mitk::modelFit::ModelFitInfo* currentFit = nullptr;
 
     if (this->hasSingleFit() && !index.parent().isValid())

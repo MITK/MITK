@@ -34,16 +34,16 @@ namespace mitk {
   * time. High dynamic range means that strong and weak signals can be distinguished.
   * Lower dynamic range can lead to more contrast.
   *
-  * There is a getter and a setter defined for each kind of value. Additionaly
+  * There is a getter and a setter defined for each kind of value. Additionally
   * there are methods for getting the range of the possible values. For
   * uniformly distributed values there are three methods Get<VALUE>Min(),
   * Get<VALUE>Max() and Get<VALUE>Tick(). For non-uniformly distributed values
-  * there is one method Get<VALUE>Values() which shoule return a list of all
+  * there is one method Get<VALUE>Values() which should return a list of all
   * possible values.
   *
   * All getters of this interface must be implemented in a concrete
   * subclass. Additionally all OnSet* methods must be implemented. They handle
-  * the acutal setting of the values at the device api. The Set* methods are
+  * the actual setting of the values at the device api. The Set* methods are
   * already implemented in this class and should not be overwritten. There are
   * some pure virtual methods in the superclass
   * mitk::USAbstractControlInterface which must be implemented, too.

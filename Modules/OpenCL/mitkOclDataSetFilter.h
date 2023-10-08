@@ -27,7 +27,7 @@ class OclDataSetFilter;
    /**
     * \brief The OclDataSetFilter is the topmost class for all filter which take DataSets as input.
     *
-    * The input DataSet can be intialized via an oclDataSet or a pointer to the data
+    * The input DataSet can be initialized via an oclDataSet or a pointer to the data
     * This makes it possible to create a filter pipeline of GPU-based filters
     * and to bind this part into the CPU (ITK) filter pipeline.
     */

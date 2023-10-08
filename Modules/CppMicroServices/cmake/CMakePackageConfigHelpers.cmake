@@ -101,7 +101,7 @@
 # BasicConfigVersion-SameMajorVersion.cmake.in or BasicConfigVersion-AnyNewerVersion.cmake.in
 # is used. Please note that these two files are internal to CMake and you should
 # not call configure_file() on them yourself, but they can be used as starting
-# point to create more sophisticted custom ConfigVersion.cmake files.
+# point to create more sophisticated custom ConfigVersion.cmake files.
 #
 #
 # Example using both configure_package_config_file() and write_basic_package_version_file():

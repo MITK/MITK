@@ -83,7 +83,7 @@ namespace mitk
     /**
      * @brief Removes a whole group including all its labels.
      * @remark with removing a group all groups with greater index will be reindexed to
-     * close the gap. Hence externaly stored spatial group indices may become invalid.
+     * close the gap. Hence externally stored spatial group indices may become invalid.
      * @param group Group index of the spatial group that should be removed. If the spatial group does not exist, an
      * exception will be raised.
      * @pre group index must be valid.
@@ -98,7 +98,7 @@ namespace mitk
     ///**
     // * @brief Checks if a label belongs in a certain spatial group
     // * @param value the label value
-    // * @param groupIndex Indexp of the spacial group which should be checked for the label
+    // * @param groupIndex Indexp of the spatial group which should be checked for the label
     // * @return true if the label exists otherwise false
     // */
     //bool ExistLabel(LabelValueType value, GroupIndexType groupIndex) const;
@@ -260,7 +260,7 @@ namespace mitk
       void OnGroupModified(GroupIndexType groupIndex);
       void OnGroupRemoved(GroupIndexType groupIndex);
 
-      /** Reeinitalizes the internal maps based on the current layer/label content
+      /** Reeinitializes the internal maps based on the current layer/label content
       * of the instance. */
       void ReinitMaps();
 
@@ -538,7 +538,7 @@ namespace mitk
   };
 
   /**
-  * @brief Equal A function comparing two label set images for beeing equal in meta- and imagedata
+  * @brief Equal A function comparing two label set images for being equal in meta- and imagedata
   *
   * @ingroup MITKTestingAPI
   *
@@ -592,8 +592,8 @@ namespace mitk
   @param destinationImage Pointer to the LabelSetImage which active layer should be used as destination for the transfer.
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
-  The order in which the labels will be transfered is the same order of elements in the labelMapping.
-  If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transfering), keep in mind that
+  The order in which the labels will be transferred is the same order of elements in the labelMapping.
+  If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transferring), keep in mind that
   for the MergeStyle and OverwriteStyle only the destination label (second element) is relevant (e.g. what should be
   altered with MergeStyle Replace).
   @param mergeStyle indicates how the transfer should be done (merge or replace). For more details see documentation of
@@ -628,15 +628,15 @@ namespace mitk
   it is also an "old" value in the mapping table.
   @param sourceImage Pointer to the image that should be used as source for the transfer.
   @param destinationImage Pointer to the image that should be used as destination for the transfer.
-  @param destinationLabelSet Pointer to the label set specifying labels and lock states in the destination image. Unkown pixel
+  @param destinationLabelSet Pointer to the label set specifying labels and lock states in the destination image. Unknown pixel
   values in the destinationImage will be assumed to be unlocked.
   @param sourceBackground Value indicating the background in the source image.
   @param destinationBackground Value indicating the background in the destination image.
   @param destinationBackgroundLocked Value indicating the lock state of the background in the destination image.
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
-  The order in which the labels will be transfered is the same order of elements in the labelMapping.
-  If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transfering), keep in mind that
+  The order in which the labels will be transferred is the same order of elements in the labelMapping.
+  If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transferring), keep in mind that
   for the MergeStyle and OverwriteStyle only the destination label (second element) is relevant (e.g. what should be
   altered with MergeStyle Replace).
   @param mergeStyle indicates how the transfer should be done (merge or replace). For more details see documentation of

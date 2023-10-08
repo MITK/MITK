@@ -42,7 +42,7 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
   cv::compare(maskImageGray, 250, foregroundMask, cv::CMP_GE);
   cv::findNonZero(foregroundMask, foregroundPoints);
 
-  // push extracted forground points into a vector of itk indices
+  // push extracted foreground points into a vector of itk indices
   std::vector<itk::Index<2> > foregroundPointsVector;
   for ( size_t n = 0; n < foregroundPoints.total(); ++n)
   {
@@ -58,7 +58,7 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
 
   // test filtering with image set but no model points set
   {
-    MITK_TEST_CONDITION(grabCutFilter->FilterImage(image), "Filtering should return true for sucess.")
+    MITK_TEST_CONDITION(grabCutFilter->FilterImage(image), "Filtering should return true for success.")
     cv::Mat resultMask = grabCutFilter->GetResultMask();
     MITK_TEST_CONDITION(resultMask.empty(), "Result mask must be empty when no foreground points are set.")
   }
@@ -89,7 +89,7 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
   // test filtering with image and model points set
   {
     grabCutFilter->SetModelPoints(foregroundPointsVector);
-    MITK_TEST_CONDITION(grabCutFilter->FilterImage(image, ++currentImageId), "Filtering should return true for sucess.")
+    MITK_TEST_CONDITION(grabCutFilter->FilterImage(image, ++currentImageId), "Filtering should return true for success.")
 
     cv::Mat resultMask;
     // wait up to ten seconds for the segmentation to finish

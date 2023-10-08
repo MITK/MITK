@@ -30,7 +30,7 @@ void mitk::NavigationDataSmoothingFilter::GenerateData()
 
   this->CreateOutputsForAllInputs();
 
-  //initialize list if nessesary
+  //initialize list if necessary
   if ( m_LastValuesList.size() != numberOfInputs )
   {
     this->InitializeLastValuesList();

@@ -543,7 +543,7 @@ int main(int argc, char* argv[])
     } else
     {
       MITK_INFO << "The spacing of the mask and the input images is not equal.";
-      MITK_INFO << "Terminating the programm. You may use the '-fi' option";
+      MITK_INFO << "Terminating the program. You may use the '-fi' option";
       return -1;
     }
   }

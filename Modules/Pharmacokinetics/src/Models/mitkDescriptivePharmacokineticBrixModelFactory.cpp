@@ -70,7 +70,7 @@ mitk::DescriptivePharmacokineticBrixModelFactory::DoCreateParameterizer(
     if (!fit->inputData.ValueExists("ROI"))
     {
       mitkThrow() <<
-                  "Cannot generate parameterizer for fit of type ROIbased. Input data with the lable \"ROI\" is missing in fit.";
+                  "Cannot generate parameterizer for fit of type ROIbased. Input data with the label \"ROI\" is missing in fit.";
     }
 
     ScalarListLookupTable::ValueType signal = fit->inputData.GetTableValue("ROI");
@@ -78,7 +78,7 @@ mitk::DescriptivePharmacokineticBrixModelFactory::DoCreateParameterizer(
     if (signal.empty())
     {
       mitkThrow() <<
-                  "Cannot generate parameterizer for fit of type ROIbased. Input data with the lable \"ROI\" is invalid: No values available.";
+                  "Cannot generate parameterizer for fit of type ROIbased. Input data with the label \"ROI\" is invalid: No values available.";
     }
 
     modelParameterizer->SetBaseValue(signal[0]);

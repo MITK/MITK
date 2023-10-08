@@ -478,7 +478,7 @@ void QmitkPropertiesTableModel::Reset()
   // sort the list as indicated by m_SortDescending
   this->sort(m_SortDescending);
 
-  // model was resetted
+  // model was reset
   QAbstractTableModel::beginResetModel();
   QAbstractTableModel::endResetModel();
 }

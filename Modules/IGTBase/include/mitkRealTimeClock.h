@@ -37,7 +37,7 @@ namespace mitk {
     mitkClassMacroItkParent(RealTimeClock, itk::Object);
 
     /**
-    *\brief instanciates a new, operating-system dependant, instance of mitk::RealTimeClock.
+    *\brief instantiates a new, operating-system dependent, instance of mitk::RealTimeClock.
     */
     static Pointer New(void);
 

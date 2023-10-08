@@ -76,7 +76,7 @@ namespace mitk {
     const mitk::PointSet::Pointer GetTargetLandmarks();
 
     /**
-    * \brief Initializes the transform. Transform will be perfomed only if source and target points have the same size.
+    * \brief Initializes the transform. Transform will be performed only if source and target points have the same size.
     *
     * Returns "true" if transform has been initialized, else "false" is returned.
     **/

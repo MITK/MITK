@@ -94,7 +94,7 @@ int mitkPlayerLoadAndRenderRGBDataTest(int argc, char* argv[])
   }
   catch(std::exception  &e)
   {
-    MITK_ERROR << "Unknown exception occured: " << e.what();
+    MITK_ERROR << "Unknown exception occurred: " << e.what();
   }
 
   MITK_TEST_END();

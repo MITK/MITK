@@ -136,7 +136,7 @@ namespace mitk
     * This method tries to read numberOfBytes characters from the serial
     * interface or until an eol byte is received, whichever comes first. If
     * The ReceiveTimeout is set to 0, the Receive() method will wait
-    * indefinetly until all characters are received or an eol character is
+    * indefinitely until all characters are received or an eol character is
     * received. If the ReceiveTimeout is set to another value, it will return
     * after m_ReceiveTimeout milliseconds (or after all characters are read or
     * an eol character is received).
@@ -144,7 +144,7 @@ namespace mitk
     * \param[out] answer  String that stores the received characters. Note
     *                     that this will overwrite the content of answer!
     * \param[in] numberOfBytes  The number of bytes to read. When an eol
-    *                           character is used this is interpretted as the
+    *                           character is used this is interpreted as the
     *                           maximum number of bytes to read.
     * \param[in] eol  Pointer to an End-of-Line character. If this is nullptr
     *                 (the default) then no End-of-Line character is used.

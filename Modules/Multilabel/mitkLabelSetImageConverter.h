@@ -33,7 +33,7 @@ namespace mitk
 
   /** Function takes a label set and transfers all labels indicated in the label mapping (first element of pair) into a result label set. In the result label set
   the cloned labels will have the label value indicated by the mapping (second element of pair).
-  @remark: Only labels will be transfered, nothing else. So things like message observers or m_ReservedLabelValuesFunctor must be copied explicitly.*/
+  @remark: Only labels will be transferred, nothing else. So things like message observers or m_ReservedLabelValuesFunctor must be copied explicitly.*/
   MITKMULTILABEL_EXPORT LabelSet::Pointer GenerateLabelSetWithMappedValues(const LabelSet* sourceLabelset, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping);
 }
 

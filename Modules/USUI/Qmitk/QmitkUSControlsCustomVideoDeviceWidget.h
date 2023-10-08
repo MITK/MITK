@@ -44,7 +44,7 @@ class QmitkUSControlsCustomVideoDeviceWidget : public QmitkUSAbstractCustomWidge
   void OnDepthChanged();
 
   /**
-  * \brief Called when user chagnes the identifier for the probe of the ultrasoud machine
+  * \brief Called when user changes the identifier for the probe of the ultrasoud machine
   */
   void OnProbeChanged();
 
@@ -67,7 +67,7 @@ public:
     * and the same mitk::USVideoDeviceCustomControls which were set on the
     * original object.
     *
-    * This method is just for being calles by the factory. Use
+    * This method is just for being called by the factory. Use
     * QmitkUSAbstractCustomWidget::CloneForQt() instead, if you want a clone of
     * an object.
     */

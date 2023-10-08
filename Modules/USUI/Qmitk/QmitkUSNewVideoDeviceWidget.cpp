@@ -138,7 +138,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     // The IGTL Device can have different probe configurations,  as well.
   }
 
-  //At first: only ckeck, whether it is a USImageVideoSource or not (--> if it a IGTL Client)
+  //At first: only check, whether it is a USImageVideoSource or not (--> if it a IGTL Client)
   // Later: perhaps it would be helpful, if the IGTLMessageToUSImageFilter have a region of interest, as well.
   mitk::USImageVideoSource::Pointer imageSource =
     dynamic_cast<mitk::USImageVideoSource*>(
@@ -159,7 +159,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     }
   }
 
-  if (m_Controls->m_Probes->count() != 0 ) //there are informations about the probes of the device, so create the probes
+  if (m_Controls->m_Probes->count() != 0 ) //there is information about the probes of the device, so create the probes
   {
     this->AddProbesToDevice(newDevice);
   }
@@ -183,7 +183,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedFinishedEditing()
   m_TargetDevice->SetName(m_Controls->m_Model->text().toStdString());
   m_TargetDevice->SetComment(m_Controls->m_Comment->text().toStdString());
 
-  if (m_Controls->m_Probes->count() != 0) //there are informations about the probes of the device, so create the probes
+  if (m_Controls->m_Probes->count() != 0) //there is information about the probes of the device, so create the probes
   {
     this->AddProbesToDevice(m_TargetDevice);
   }
@@ -195,7 +195,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedFinishedEditing()
     m_TargetDevice->AddNewProbe(probe);
   }
 
-  //At first: only ckeck, whether it is a USImageVideoSource or not (--> if it a IGTL Client)
+  //At first: only check, whether it is a USImageVideoSource or not (--> if it a IGTL Client)
   // Later: perhaps it would be helpful, if the IGTLMessageToUSImageFilter have a region of interest, as well.
   mitk::USImageVideoSource::Pointer imageSource =
     dynamic_cast<mitk::USImageVideoSource*>(
@@ -267,7 +267,7 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
       device->GetDeviceClass().compare("IGTL Client") != 0)
   {
     // TODO Alert if bad path
-    mitkThrow() << "NewVideoDeviceWidget recieved an incompatible device type "
+    mitkThrow() << "NewVideoDeviceWidget received an incompatible device type "
       "to edit. Type was: " << device->GetDeviceClass();
   }
 

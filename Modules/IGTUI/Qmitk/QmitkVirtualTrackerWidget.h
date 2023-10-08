@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 
 /** Documentation:
-*   \brief Implementation of a configuration widget for a Vitrual Tracking Device.
+*   \brief Implementation of a configuration widget for a Virtual Tracking Device.
 *
 *   \ingroup IGTUI
 */

@@ -106,7 +106,7 @@ void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Imag
     if (bounds[4]!=0 || bounds[5]!=0)
     {
       //array "bounds" is constructed as [min Dim1, max Dim1, min Dim2, max Dim2, min Dim3, max Dim3]
-      //therfore [4] and [5] must be 0
+      //therefore [4] and [5] must be 0
 
       map::core::OStringStream str;
       str << "Dimension of defined result geometry does not equal the target dimension of the registration object ("<<registration->getTargetDimensions()<<").";
@@ -148,7 +148,7 @@ void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Imag
     /// If the MITK image contains any other rotation, the ITK image will have no rotation at all.
     /// Spacing is of course conserved in both cases.
 
-    // the following loop devides by spacing now to normalize columns.
+    // the following loop divides by spacing now to normalize columns.
     // counterpart of InitializeByItk in mitkImage.h line 372 of revision 15092.
 
     // Check if information is lost
@@ -300,7 +300,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
     //We need to clone the LabelSetImage due to its illposed design. It is state full
     //and we have to iterate through all layers as active layers to ensure the content
     //was really stored (directly working with the layer images does not work with the
-    //active layer). The clone wastes rescources but is the easiest and safest way to
+    //active layer). The clone wastes resources but is the easiest and safest way to
     //ensure 1) correct mapping 2) avoid race conditions with other parts of the
     //application because we would change the state of the input.
     //This whole code block should be reworked as soon as T28525 is done.
@@ -337,7 +337,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
   }
   if (!registration->GetRegistration())
   {
-    mitkThrow() << "Cannot map image. Passed registration wrapper containes no registration.";
+    mitkThrow() << "Cannot map image. Passed registration wrapper contains no registration.";
   }
   if (!input)
   {
@@ -436,7 +436,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
   }
   if (!registration->GetRegistration())
   {
-    mitkThrow() << "Cannot refine image geometry. Passed registration wrapper containes no registration.";
+    mitkThrow() << "Cannot refine image geometry. Passed registration wrapper contains no registration.";
   }
   if (!input)
   {
@@ -474,7 +474,7 @@ bool
   }
   if (!registration->GetRegistration())
   {
-    mitkThrow() << "Cannot check refine capability of registration. Passed registration wrapper containes no registration.";
+    mitkThrow() << "Cannot check refine capability of registration. Passed registration wrapper contains no registration.";
   }
 
   return canRefineGeometry(registration->GetRegistration());

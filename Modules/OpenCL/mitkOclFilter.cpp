@@ -286,7 +286,7 @@ void mitk::OclFilter::CompileSource()
       m_Initialized = false;
     }
 
-    // store the succesfully build program into the program storage provided by the resource service
+    // store the successfully build program into the program storage provided by the resource service
     resources->InsertProgram(m_ClProgram, m_FilterID, true);
 
     // free the char buffers with the source code

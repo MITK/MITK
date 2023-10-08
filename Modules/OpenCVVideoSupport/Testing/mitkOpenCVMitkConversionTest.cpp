@@ -136,7 +136,7 @@ void ComparePixels( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image )
   pixelIndex[1] = pos1.y;
   PixelType onePixel = image->GetPixel( pixelIndex );
 
-  MITK_TEST_CONDITION( color1[0] == onePixel.GetBlue(), "Testing if blue value (= " << static_cast<int>(color1[0]) << ") at postion "
+  MITK_TEST_CONDITION( color1[0] == onePixel.GetBlue(), "Testing if blue value (= " << static_cast<int>(color1[0]) << ") at position "
     << pos1.x << ", " << pos1.y << " in OpenCV image is "
     << "equals the blue value (= " <<  static_cast<int>(onePixel.GetBlue()) << ")"
     << " in the generated mitk image");
@@ -146,7 +146,7 @@ void ComparePixels( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image )
   pixelIndex[1] = pos2.y;
   onePixel = image->GetPixel( pixelIndex );
 
-  MITK_TEST_CONDITION( color2[1] == onePixel.GetGreen(), "Testing if green value (= " << static_cast<int>(color2[1]) << ") at postion "
+  MITK_TEST_CONDITION( color2[1] == onePixel.GetGreen(), "Testing if green value (= " << static_cast<int>(color2[1]) << ") at position "
     << pos2.x << ", " << pos2.y << " in OpenCV image is "
     << "equals the green value (= " <<  static_cast<int>(onePixel.GetGreen()) << ")"
     << " in the generated mitk image");
@@ -156,7 +156,7 @@ void ComparePixels( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image )
   pixelIndex[1] = pos3.y;
   onePixel = image->GetPixel( pixelIndex );
 
-  MITK_TEST_CONDITION( color3[2] == onePixel.GetRed(), "Testing if red value (= " << static_cast<int>(color3[2]) << ") at postion "
+  MITK_TEST_CONDITION( color3[2] == onePixel.GetRed(), "Testing if red value (= " << static_cast<int>(color3[2]) << ") at position "
     << pos3.x << ", " << pos3.y << " in OpenCV image is "
     << "equals the red value (= " <<  static_cast<int>(onePixel.GetRed()) << ")"
     << " in the generated mitk image");

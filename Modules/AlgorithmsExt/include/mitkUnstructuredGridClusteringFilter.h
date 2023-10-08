@@ -29,7 +29,7 @@ namespace mitk
   * @brief This filter uses the DBSCAN algorithm for clustering an
   * mitk::UnstructuredGrid. "MinPts" defines the number of neighbours which are
   * required to be a kernel point if a point is in range of a kernel point
-  * but hasnt enough neighbours this point is added to the cluster but is a
+  * but hasn't enough neighbours this point is added to the cluster but is a
   * density reachable point and the cluster ends at this point. "eps" is the
   * range in which the neighbours are searched. If "Meshing" is set the
   * clusteres UnstructuredGrid is meshed and visible in 2D renderwindows.
@@ -109,7 +109,7 @@ namespace mitk
     /** The distances of the points from the input UnstructuredGrid*/
     std::vector<vtkSmartPointer<vtkDoubleArray>> m_DistanceArrays;
 
-    /** The range for the neighbout search */
+    /** The range for the neighbour search */
     double m_eps;
 
     /** The number of the required neighbours */

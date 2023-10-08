@@ -85,14 +85,14 @@ namespace mitk
     void SetSubset( std::vector<itk::Index<3> > subset);
 
     /*!
-    \brief Sets the subset of indizes used for caluclation of output PointSet as a PointSet.
+    \brief Sets the subset of indizes used for calculation of output PointSet as a PointSet.
     Warning: make sure the points in your PointSet are index coordinates.
     \param pointSet specified in index coordinates.
     */
     void SetSubset( mitk::PointSet::Pointer pointSet);
 
     /*!
-    \brief Sets the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units (=true) or interpixeldistances and focal length in mm (=false)
+    \brief Sets the reconstruction mode, if using no interpixeldistances and focal lengths in pixel units (=true) or interpixeldistances and focal length in mm (=false)
     */
     void SetReconstructionMode(bool withoutInterpixdist = true);
 

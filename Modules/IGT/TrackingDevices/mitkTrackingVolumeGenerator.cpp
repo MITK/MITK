@@ -112,7 +112,7 @@ void mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Poi
 
 void mitk::TrackingVolumeGenerator::GenerateData()
 {
-  mitk::Surface::Pointer output = this->GetOutput();  //the surface wich represents the tracking volume
+  mitk::Surface::Pointer output = this->GetOutput();  //the surface which represents the tracking volume
 
   std::string filename = this->m_Data.VolumeModelLocation; // Name of the file or possibly a magic String, e.g. "cube"
 

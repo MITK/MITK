@@ -24,7 +24,7 @@ found in the LICENSE file.
 #include "mitkToFCameraPMDPlayerDeviceFactory.h"
 #include "mitkAbstractToFDeviceFactory.h"
 
-//The follwing heades only get implemented if the respective Devices are activated through Cmake
+//The following headers only get implemented if the respective Devices are activated through Cmake
 #ifdef MITK_USE_TOF_PMDCAMCUBE
 #include "mitkToFCameraPMDCamCubeDeviceFactory.h"
 #include "mitkToFCameraPMDRawDataCamCubeDeviceFactory.h"
@@ -54,7 +54,7 @@ public:
   */
   void Load(us::ModuleContext* context)
   {
-    //The PMD CamBoard-Factory gets activated as soon as the user toggels one the PMD-parameter in Cmake to on
+    //The PMD CamBoard-Factory gets activated as soon as the user toggles one the PMD-parameter in Cmake to on
 #ifdef MITK_USE_TOF_PMDCAMCUBE
     //Register Cam Cube Factory
     ToFCameraPMDCamCubeDeviceFactory* toFCameraPMDCamCubeDeviceFactory = new ToFCameraPMDCamCubeDeviceFactory();
@@ -76,7 +76,7 @@ public:
     m_Factories.push_back(toFCameraPMDRawDataCamCubeDeviceFactory);
 #endif
 
-    //The PMD O3-Factory gets activated as soon as the user toggels one the PMD-parameter in Cmake to on
+    //The PMD O3-Factory gets activated as soon as the user toggles one the PMD-parameter in Cmake to on
 #ifdef MITK_USE_TOF_PMDO3
     //Implementing PMD O3D DeviceFactory
     ToFCameraPMDO3DeviceFactory* toFCameraPMDO3DeviceFactory = new ToFCameraPMDO3DeviceFactory();
@@ -89,7 +89,7 @@ public:
     m_Factories.push_back(toFCameraPMDO3DeviceFactory);
 #endif
 
-    //The PMD CamBoard-Factory gets activated as soon as the user toggels one the PMD-parameter in Cmake to on
+    //The PMD CamBoard-Factory gets activated as soon as the user toggles one the PMD-parameter in Cmake to on
 #ifdef MITK_USE_TOF_PMDCAMBOARD
     //Implementing CamBoardDeviceFactory
     ToFCameraPMDCamBoardDeviceFactory* toFCameraPMDCamBoardDeviceFactory = new ToFCameraPMDCamBoardDeviceFactory();
@@ -112,8 +112,8 @@ public:
     m_Factories.push_back(toFCameraPMDRawDataCamBoardDeviceFactory);
 #endif
 
-    //The PMD Player Device Factory gets activated as soon as the user toggels one of the PMD-parameters in Cmake to on
-    //Registrating the PMD Player DeviceFactory
+    //The PMD Player Device Factory gets activated as soon as the user toggles one of the PMD-parameters in Cmake to on
+    //Registering the PMD Player DeviceFactory
     ToFCameraPMDPlayerDeviceFactory* toFCameraPMDPlayerDeviceFactory = new ToFCameraPMDPlayerDeviceFactory();
     us::ServiceProperties pMDPlayerFactoryProps;
     pMDPlayerFactoryProps["ToFFactoryName"] = toFCameraPMDPlayerDeviceFactory->GetFactoryName();

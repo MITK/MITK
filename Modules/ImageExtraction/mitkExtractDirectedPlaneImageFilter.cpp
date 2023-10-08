@@ -276,7 +276,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   pixelsPerMM[0] = 1.0 / mmPerPixel[0];
   pixelsPerMM[1] = 1.0 / mmPerPixel[1];
 
-  // calulate the originArray and the orientations for the reslice-filter
+  // calculate the originArray and the orientations for the reslice-filter
   double originArray[3];
   itk2vtk(origin, originArray);
 

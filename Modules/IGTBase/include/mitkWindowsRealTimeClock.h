@@ -38,7 +38,7 @@ namespace mitk {
     itkCloneMacro(Self);
 
     /**
-    * \brief basic contructor
+    * \brief basic constructor
     */
     WindowsRealTimeClock();
 

@@ -27,7 +27,7 @@ class OclImageFilter;
    /**
     * \brief The OclImageFilter is the topmost class for all filter which take images as input.
     *
-    * The input image can be intialized via an oclImage or an mitk::Image.
+    * The input image can be initialized via an oclImage or an mitk::Image.
     * This makes it possible to create a filter pipeline of GPU-based filters
     * and to bind this part into the CPU (ITK) filter pipeline.
     */

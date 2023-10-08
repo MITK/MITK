@@ -501,7 +501,7 @@ void QmitkIGTPlayerWidget::SetTrajectoryNames(const QStringList toolNames)
   if(cBox->count() > 0)
     this->ClearTrajectorySelectCombobox();
 
-  // before making changed to QComboBox it is recommended to disconnet it's SIGNALS and SLOTS
+  // before making changed to QComboBox it is recommended to disconnect it's SIGNALS and SLOTS
   disconnect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
 
   if(!toolNames.isEmpty())
@@ -518,7 +518,7 @@ int QmitkIGTPlayerWidget::GetResolution()
 
 void QmitkIGTPlayerWidget::ClearTrajectorySelectCombobox()
 {
-  // before making changed to QComboBox it is recommended to disconnet it's SIGNALS and SLOTS
+  // before making changed to QComboBox it is recommended to disconnect it's SIGNALS and SLOTS
   disconnect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
 
   m_Controls->trajectorySelectComboBox->clear();

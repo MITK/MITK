@@ -102,7 +102,7 @@ public:
     // Create empty segmentation working image
     mitk::DataNode::Pointer workingImageNode = mitk::DataNode::New();
     const std::string organName = "test";
-    mitk::Color color; // actually it dosn't matter which color we are using
+    mitk::Color color; // actually it doesn't matter which color we are using
     color.SetRed(1);   // but CreateEmptySegmentationNode expects a color parameter
     color.SetGreen(0);
     color.SetBlue(0);

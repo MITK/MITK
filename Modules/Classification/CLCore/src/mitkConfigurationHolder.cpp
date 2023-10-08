@@ -89,7 +89,7 @@ bool mitk::ConfigurationHolder::AsBool()
     mitkThrow() << "Cannot convert group data to bool";
     break;
   default:
-    mitkThrow() << "Unkown Data Type.";
+    mitkThrow() << "Unknown Data Type.";
     break;
   }
 }
@@ -124,7 +124,7 @@ unsigned int mitk::ConfigurationHolder::AsUnsignedInt()
     mitkThrow() << "Cannot convert group data to bool";
     break;
   default:
-    mitkThrow() << "Unkown Data Type.";
+    mitkThrow() << "Unknown Data Type.";
     break;
   }
 }
@@ -159,7 +159,7 @@ int mitk::ConfigurationHolder::AsInt()
     mitkThrow() << "Cannot convert group data to bool";
     break;
   default:
-    mitkThrow() << "Unkown Data Type.";
+    mitkThrow() << "Unknown Data Type.";
     break;
   }
 }
@@ -194,7 +194,7 @@ double mitk::ConfigurationHolder::AsDouble()
     mitkThrow() << "Cannot convert group data to bool";
     break;
   default:
-    mitkThrow() << "Unkown Data Type.";
+    mitkThrow() << "Unknown Data Type.";
     break;
   }
 }
@@ -228,7 +228,7 @@ std::string mitk::ConfigurationHolder::AsString()
     mitkThrow() << "Cannot convert group data to bool";
     break;
   default:
-    mitkThrow() << "Unkown Data Type.";
+    mitkThrow() << "Unknown Data Type.";
     break;
   }
   return strs.str();

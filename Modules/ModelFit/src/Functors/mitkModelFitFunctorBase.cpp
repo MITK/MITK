@@ -53,7 +53,7 @@ Compute(const InputPixelArrayType& value, const ModelBase* model,
 
   if (criteria.size() != this->GetCriterionNames().size())
   {
-    itkExceptionMacro("ModelFitInfo implementation seems to be inconsitent. Number of criterion values is not equal to number of criterion names.");
+    itkExceptionMacro("ModelFitInfo implementation seems to be inconsistent. Number of criterion values is not equal to number of criterion names.");
   }
 
   OutputPixelArrayType result(fittedParameters.Size() + derivedParameters.size() + criteria.size() +
@@ -89,7 +89,7 @@ Compute(const InputPixelArrayType& value, const ModelBase* model,
     DebugParameterMapType::const_iterator pos = debugParams.find(debugNames[j]);
     if (pos == debugParams.end())
     {
-      itkExceptionMacro("ModelFitInfo implementation seems to be inconsitent. Debug parameter defined by functor is not in its returned debug map. Invalid debug parameter name: "<<debugNames[j]);
+      itkExceptionMacro("ModelFitInfo implementation seems to be inconsistent. Debug parameter defined by functor is not in its returned debug map. Invalid debug parameter name: "<<debugNames[j]);
     }
     else
     {

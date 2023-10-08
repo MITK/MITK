@@ -63,7 +63,7 @@ public:
   * \brief get point and point ID that correspond to a given QModelIndex
   *
   * The mitk::PointSet uses a map to store points in an ID<-->Point relation.
-  * The IDs are not neccesarily continuously numbered, therefore, we can not
+  * The IDs are not necessarily continuously numbered, therefore, we can not
   * directly use the QModelIndex as point ID. This method returns the point and
   * the corresponding point id for a given QModelIndex. The point and the point ID
   * are returned in the outgoing parameters p and id. If a valid point and ID were
@@ -82,7 +82,7 @@ public:
   * \brief returns a QModelIndex for a given point ID
   *
   * The mitk::PointSet uses a map to store points in an ID<-->Point relation.
-  * The IDs are not neccesarily continuously numbered, therefore, we can not
+  * The IDs are not necessarily continuously numbered, therefore, we can not
   * directly use the point ID as a QModelIndex. This method returns a QModelIndex
   * for a given point ID in the outgoing parameter index.
   * \param[in] id The point ID for which the QModelIndex will be created

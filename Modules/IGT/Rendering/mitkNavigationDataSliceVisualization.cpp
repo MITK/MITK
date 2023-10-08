@@ -124,7 +124,7 @@ void mitk::NavigationDataSliceVisualization::GenerateData()
       // plane
       slicingPlaneYAxisVector[slicingPlaneXAxis] = 0.0;
 
-      // Do nothing for ambigous/undefined cases:
+      // Do nothing for ambiguous/undefined cases:
       //   - the R-L component of the x-axis is zero (for AxialOblique)
       //   - the S-I component of the x-axis is zero (for SagittalOblique)
       //   - the A-P component of the y-axis is zero

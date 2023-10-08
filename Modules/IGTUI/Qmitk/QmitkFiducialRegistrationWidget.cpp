@@ -400,7 +400,7 @@ void QmitkFiducialRegistrationWidget::Register()
     m_ImageNode->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
   }
 
-  //If this option is set, each point will be transformed and the acutal coordinates of the points change.
+  //If this option is set, each point will be transformed and the actual coordinates of the points change.
   if (this->m_Controls->m_MoveImagePoints->isChecked())
   {
     mitk::PointSet* pointSet_orig = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsNode->GetData());

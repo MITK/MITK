@@ -101,7 +101,7 @@ namespace mitk
     mitk::PropertyList::PropertyMap::const_iterator it;
     for (it = propertyList->GetMap()->begin(); it != propertyList->GetMap()->end(); ++it)
     {
-      // Create seralizer for this property
+      // Create serializer for this property
       const mitk::BaseProperty* prop = it->second;
       std::string serializerName = std::string(prop->GetNameOfClass()) + "Serializer";
       std::list<itk::LightObject::Pointer> allSerializers =
@@ -247,7 +247,7 @@ namespace mitk
       document.Parse(s.c_str());
       //Remark: didn't use *(this->GetInputStream()) >> document;
       //because our PlanarFigure files version 1 are illformed (multiple top level elements)
-      //and therefor tinyxml does not read them completly when streamed directly.
+      //and therefor tinyxml does not read them completely when streamed directly.
       //only the first (version element) is read.
     }
     else

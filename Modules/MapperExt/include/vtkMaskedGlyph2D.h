@@ -21,7 +21,7 @@ found in the LICENSE file.
 class vtkMaskPoints;
 /**
  * This class masked points of the input data set and glyphs
- * only the selected poitns. Points may be selected either by
+ * only the selected points. Points may be selected either by
  * random or by ratio.
  * Additionally, this class allows to set the InputScalars,
  * InputVectors and InputNormals by their field name in the

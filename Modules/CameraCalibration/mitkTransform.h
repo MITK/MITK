@@ -25,7 +25,7 @@ found in the LICENSE file.
 namespace mitk {
 
   ///
-  /// \brief class representing a transfrom in 3D
+  /// \brief class representing a transform in 3D
   ///
   /// internally it stores a mitk navigation data. this is more
   /// or less a wrapper for navigation data for easy casting

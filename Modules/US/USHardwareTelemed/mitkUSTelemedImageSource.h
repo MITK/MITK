@@ -60,7 +60,7 @@ protected:
   Usgfw2Lib::IUsgScanConverterPlugin*         m_Plugin;
   USTelemedScanConverterPlugin*               m_PluginCallback;
 
-  Usgfw2Lib::IUsgDataView* m_UsgDataView;  // main SDK object for comminucating with the Telemed API
+  Usgfw2Lib::IUsgDataView* m_UsgDataView;  // main SDK object for communicating with the Telemed API
 
   //API objects for communication, used to get the right geometry
   Usgfw2Lib::IUsgImageProperties* m_ImageProperties;

@@ -32,7 +32,7 @@ void mitk::NavigationDataSequentialPlayer::GoToSnapshot(unsigned int i)
 {
   if( !m_Repeat && (this->GetNumberOfSnapshots() <= i) )
   {
-    MITK_ERROR << "Snaphot " << i << " does not exist and repat is off: can't go to that snapshot!";
+    MITK_ERROR << "Snapshot " << i << " does not exist and repat is off: can't go to that snapshot!";
     mitkThrowException(mitk::IGTException) << "Snapshot " << i << " does not exist and repat is off: can't go to that snapshot!";
   }
 

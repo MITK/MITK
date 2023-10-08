@@ -27,7 +27,7 @@ std::string mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(int result)
         case 11:  message = "[Optitrack API] Invalid License"; break;
         case 14:  message = "[Optitrack API] No Frames Available"; break;
         case 100:  message = "Optitrack Tracking Tools is not installed in the computer"; break;
-        default: message = "[Optitrack API] Unknown error occured"; break;
+        default: message = "[Optitrack API] Unknown error occurred"; break;
       }
       return message;
    }

@@ -193,7 +193,7 @@ bool mitk::OptitrackTrackingTool::SetToolByFileName(std::string nameFile)
       resultTrackableTranslatePivot = TT_TrackableTranslatePivot(this->m_ID,this->m_pivotPoint[0],this->m_pivotPoint[1],this->m_pivotPoint[2]);
       if(NPRESULT_SUCCESS == resultCreateTrackable)
       {
-        MITK_INFO << "Pivot Translation Successfull";
+        MITK_INFO << "Pivot Translation Successful";
         fclose(calib_file);
         i=-1;
         return true;
@@ -334,7 +334,7 @@ void mitk::OptitrackTrackingTool::GetOrientation(mitk::Quaternion& orientation) 
 bool mitk::OptitrackTrackingTool::Enable()
 {
   MITK_DEBUG << "Enable";
-  // enable the tool, so that it will be tracked. Returns true if enabling was successfull
+  // enable the tool, so that it will be tracked. Returns true if enabling was successful
   TT_SetTrackableEnabled(this->m_ID, true);
 
   if(TT_TrackableEnabled(this->m_ID) == true)
@@ -357,7 +357,7 @@ bool mitk::OptitrackTrackingTool::Enable()
 bool mitk::OptitrackTrackingTool::Disable()
 {
   MITK_DEBUG << "Disable";
-  // disables the tool, so that it will not be tracked anymore. Returns true if disabling was successfull
+  // disables the tool, so that it will not be tracked anymore. Returns true if disabling was successful
   TT_SetTrackableEnabled(this->m_ID, false);
 
   if(TT_TrackableEnabled(this->m_ID) == true)

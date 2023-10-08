@@ -396,7 +396,7 @@ void mitk::SegmentationInterpolationController::ScanWholeVolume(const itk::Image
 
 void mitk::SegmentationInterpolationController::PrintStatus()
 {
-  unsigned int timeStep(0); // if needed, put a loop over time steps around everyting, but beware, output will be long
+  unsigned int timeStep(0); // if needed, put a loop over time steps around everything, but beware, output will be long
 
   MITK_INFO << "Interpolator status (timestep 0): dimensions " << m_SegmentationCountInSlice[timeStep][0].size() << " "
             << m_SegmentationCountInSlice[timeStep][1].size() << " " << m_SegmentationCountInSlice[timeStep][2].size()

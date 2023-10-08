@@ -231,7 +231,7 @@ const
     odeTimeGrid.push_back(t);
   }
 
-  /** @brief transfom result of Differential equations back to itk::Array and interpolate to m_TimeGrid (they are calculated on a different grid defined by stepsize of odeint)*/
+  /** @brief transform result of Differential equations back to itk::Array and interpolate to m_TimeGrid (they are calculated on a different grid defined by stepsize of odeint)*/
   ConcentrationCurveType plasmaConcentration = mitk::convertParameterToArray(Cp);
   ConcentrationCurveType EESConcentration = mitk::convertParameterToArray(Ce);
   ConcentrationCurveType rungeKuttaTimeGrid = mitk::convertParameterToArray(odeTimeGrid);

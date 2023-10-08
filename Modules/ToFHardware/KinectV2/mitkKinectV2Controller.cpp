@@ -49,7 +49,7 @@ namespace mitk
     //bool ErrorText(unsigned int error);
     IKinectSensor* m_pKinectSensor;///<Kinect V2 sensor object
     IMultiSourceFrameReader* m_pMultiSourceFrameReader;///< Multiframe reader to read all frames at once
-    ICoordinateMapper* m_pCoordinateMapper;///< Coordinate mapper allows for computation of wolrd coordinates and texture mapping
+    ICoordinateMapper* m_pCoordinateMapper;///< Coordinate mapper allows for computation of world coordinates and texture mapping
     RGBQUAD* m_pColorRGBX; ///< RGBX color format, to copy the color image
 
     bool m_ConnectionCheck; ///< check if camera is connected or not
@@ -141,7 +141,7 @@ namespace mitk
       }
       else
       {
-        MITK_INFO << "Kinect 2 succesfully connected";
+        MITK_INFO << "Kinect 2 successfully connected";
       }
     }
     return d->m_ConnectionCheck;
@@ -188,7 +188,7 @@ namespace mitk
 
   bool KinectV2Controller::UpdateCamera()
   {
-    //Acquire lastest frame updates the camera and for
+    //Acquire latest frame updates the camera and for
     //unknown reasons I cannot use it here in UpdateCamera()
     //without resulting in random crashes of the app.
     return true;

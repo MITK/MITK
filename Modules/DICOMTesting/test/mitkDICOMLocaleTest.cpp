@@ -102,7 +102,7 @@ int mitkDICOMLocaleTest(int argc, char* argv[])
   alllocales.push_back("de_DE@euro");
   alllocales.push_back("German_Germany");
 
-  // supressing this test to be run on MacOS X
+  // suppressing this test to be run on MacOS X
   // See bug #3894
 #if defined (__APPLE__) || defined(MACOSX)
   alllocales.push_back("C");

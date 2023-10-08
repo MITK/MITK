@@ -98,7 +98,7 @@ namespace mitk
     void AddNewContours(const std::vector<Surface::Pointer>& newContours, std::vector<const mitk::PlaneGeometry*>& contourPlanes, bool reinitializeAction = false);
 
     /**
-    * @brief Returns the contour for a given plane for the current selected segmenation
+    * @brief Returns the contour for a given plane for the current selected segmentation
     * @param contourInfo the contour which should be returned
     * @return the contour as an mitk::Surface. If no contour is available at the give position nullptr is returned
     */
@@ -191,7 +191,7 @@ namespace mitk
      * @brief Sets the minimum spacing of the current selected segmentation
      * This is needed since the contour points we reduced before they are used to interpolate the surface.
      *
-     * @param minSpacing Paramter to set
+     * @param minSpacing Parameter to set
      */
     void SetMinSpacing(double minSpacing);
 
@@ -271,7 +271,7 @@ namespace mitk
     ContourPositionInformationList* GetContours(unsigned int timeStep, unsigned int layerID);
 
     /**
-     * @brief Trigerred with the "Reinit Interpolation" action. The contours are used to repopulate the
+     * @brief Triggered with the "Reinit Interpolation" action. The contours are used to repopulate the
      *        surfaceInterpolator data structures so that interpolation can be performed after reloading data.
      *
      * @param contourList List of contours extracted
@@ -303,7 +303,7 @@ namespace mitk
     unsigned int GetNumberOfInterpolationSessions();
 
     /**
-     * @brief Removes the contour for a given plane for the current selected segmenation
+     * @brief Removes the contour for a given plane for the current selected segmentation
      * @param contourInfo the contour which should be removed
      * @return true if a contour was found and removed, false if no contour was found
      */
@@ -337,7 +337,7 @@ namespace mitk
     void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
 
     /**
-     * @brief Function that removes contours of a particular label when the "Remove Label" event is trigerred in the labelSetImage.
+     * @brief Function that removes contours of a particular label when the "Remove Label" event is triggered in the labelSetImage.
      *
      */
     void OnRemoveLabel(mitk::Label::PixelType removedLabelValue);

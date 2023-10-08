@@ -81,7 +81,7 @@ void mitk::IGTLClient::Receive()
   if (status == IGTL_STATUS_NOT_PRESENT)
   {
     this->StopCommunicationWithSocket(this->m_Socket);
-    //inform observers about loosing the connection to this socket
+    //inform observers about losing the connection to this socket
     this->InvokeEvent(LostConnectionEvent());
     MITK_WARN("IGTLClient") << "Lost connection to server socket.";
   }

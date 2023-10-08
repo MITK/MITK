@@ -75,7 +75,7 @@ public:
     ShrinkableVector<ServiceListenerHook::ListenerInfo>& listenerInfos = listeners[GetModuleContext()];
 
     // listener count should be 2 because the event listener hooks are called with
-    // the list of listeners before filtering them according to ther LDAP filter
+    // the list of listeners before filtering them according to their LDAP filter
     if (id == 1)
     {
 #ifdef US_BUILD_SHARED_LIBS

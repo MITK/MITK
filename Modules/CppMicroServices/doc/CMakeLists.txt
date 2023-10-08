@@ -57,7 +57,7 @@ if(NOT US_IS_EMBEDDED AND NOT US_NO_DOCUMENTATION)
                )
 
     if(NOT _result_var)
-      message(FATAL_ERROR "error: Faild to compile ${CMAKE_CURRENT_SOURCE_DIR}/CMakeDoxygenFilter.cpp (result: ${result_var})\n${_compile_output}")
+      message(FATAL_ERROR "error: Failed to compile ${CMAKE_CURRENT_SOURCE_DIR}/CMakeDoxygenFilter.cpp (result: ${result_var})\n${_compile_output}")
     endif()
 
     configure_file(doxygen.conf.in

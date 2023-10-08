@@ -112,7 +112,7 @@ static void TestInstatiation()
 {
   // Test instantiation of NavigationData
   mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
-  MITK_TEST_CONDITION(nd.IsNotNull(),"Test instatiation");
+  MITK_TEST_CONDITION(nd.IsNotNull(),"Test instantiation");
 }
 
 

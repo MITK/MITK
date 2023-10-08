@@ -64,7 +64,7 @@ bool mitk::ClaronInterface::StartTracking()
     for (int i=0; i<20; i++)//the first 20 frames are auto-adjustment frames, we ignore them
     {
       MTC( Cameras_GrabFrame(0) ); //Grab a frame (all cameras together)
-      MTC( Markers_ProcessFrame(0) ); //Proces the frame(s) to obtain measurements
+      MTC( Markers_ProcessFrame(0) ); //Process the frame(s) to obtain measurements
     }
 
     //Step 4: Initialize IdentifiedMarkers and PoseXf

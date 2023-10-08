@@ -223,7 +223,7 @@ void QmitkNavigationToolCreationWidget::OnLoadSurface()
   }
   catch (mitk::Exception &e)
   {
-    MITK_ERROR << "Exception occured: " << e.what();
+    MITK_ERROR << "Exception occurred: " << e.what();
     return;
   }
 
@@ -330,7 +330,7 @@ void QmitkNavigationToolCreationWidget::OnEditToolTip()
 
 void QmitkNavigationToolCreationWidget::OnEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)
 {
-  //if user pressed cancle, nullptr is returned. Do nothing. Else, set values.
+  //if user pressed cancel, nullptr is returned. Do nothing. Else, set values.
   if (toolTip)
   {
     m_ToolToBeEdited->SetToolTipPosition(mitk::Point3D(toolTip->GetOffset()));

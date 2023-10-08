@@ -31,6 +31,6 @@ void mitk::USTelemedActivator::Load(us::ModuleContext* context)
 void mitk::USTelemedActivator::Unload(us::ModuleContext* context)
 {
   // set smart pointer to null (device will be unregistered from
-  // micro service in it's destrcutor)
+  // micro service in it's destructor)
   m_Device = 0;
 }

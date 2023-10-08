@@ -59,7 +59,7 @@ int mitkToFCameraPMDPlayerControllerTest(int /* argc */, char* /*argv*/[])
   }
   else
   {
-    MITK_TEST_CONDITION_REQUIRED( true, "Test case skipped! Wrong platfrom configuration, no driver available!");
+    MITK_TEST_CONDITION_REQUIRED( true, "Test case skipped! Wrong platform configuration, no driver available!");
   }
   // test end
   MITK_TEST_END();

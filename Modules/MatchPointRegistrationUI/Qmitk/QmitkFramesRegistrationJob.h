@@ -38,7 +38,7 @@ found in the LICENSE file.
 
 #include <MitkMatchPointRegistrationUIExports.h>
 
-/** Simple helper job class that could be used to process a frame registration in a paralell thread.
+/** Simple helper job class that could be used to process a frame registration in a parallel thread.
  * This is e.g. used be plugins to keep the GUI responsive while doing a frame registration*/
 class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkFramesRegistrationJob : public QObject,
                                                                        public QRunnable,

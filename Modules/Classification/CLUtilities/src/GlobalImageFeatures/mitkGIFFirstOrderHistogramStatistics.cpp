@@ -322,6 +322,6 @@ void mitk::GIFFirstOrderHistogramStatistics::AddArguments(mitkCommandLineParser&
 
   std::string name = this->GetOptionPrefix();
 
-  parser.addArgument(this->GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
+  parser.addArgument(this->GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurrence matrix", "calculates Co-occurrence based features (new implementation)", us::Any());
 }
 

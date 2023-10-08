@@ -31,7 +31,7 @@ found in the LICENSE file.
  *          Once the tracking device is configurated there are two ways to reset
  *          the UI to allow the user for configuring a new device. The method Reset()
  *          can be called and there is also a button "reset" which can be pressed by
- *          the user. In both cases a signal "TrackingDeviceConfigurationReseted()"
+ *          the user. In both cases a signal "TrackingDeviceConfigurationReset()"
  *          is emitted and you may wait for a new configurated tracking device.
  *
  *

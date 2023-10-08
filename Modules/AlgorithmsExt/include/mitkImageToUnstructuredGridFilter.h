@@ -83,7 +83,7 @@ namespace mitk
   private:
 
     /**
-     * Geometry of the input image, needed to tranform the image points
+     * Geometry of the input image, needed to transform the image points
      * into world points
      */
     mitk::BaseGeometry *m_Geometry;

@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include "vnl/vnl_matrix.h"
 
-// IP Adress of the Camera, change here if needed
+// IP Address of the Camera, change here if needed
 #define CAMERA_ADDR "192.168.0.69"
 #define SOURCE_PARAM "192.168.0.69"
 #define PROC_PARAM ""

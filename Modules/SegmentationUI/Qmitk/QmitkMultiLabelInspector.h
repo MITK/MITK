@@ -31,7 +31,7 @@ namespace Ui
 
 /*
 * @brief This is an inspector that offers a tree view on the labels and groups of a MultiLabelSegmentation instance.
-* It also allows some manipulation operations an the labels/groups accordin to the UI/selection state.
+* It also allows some manipulation operations an the labels/groups according to the UI/selection state.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelInspector : public QWidget
 {
@@ -46,7 +46,7 @@ public:
   bool GetAllowVisibilityModification() const;
   bool GetAllowLockModification() const;
   bool GetAllowLabelModification() const;
-  /** Indicates if the inspector is currently modifiying the model/segmentation.
+  /** Indicates if the inspector is currently modifying the model/segmentation.
    Thus as long as the manipulation is ongoing, one should assume the model to be in an invalid state.*/
   bool GetModelManipulationOngoing() const;
 
@@ -278,9 +278,9 @@ private:
   bool m_ShowLock = true;
   bool m_ShowOther = false;
 
-  /** @brief Indicates if the context menu allows changes in visiblity.
+  /** @brief Indicates if the context menu allows changes in visibility.
   *
-  * Visiblity includes also color
+  * Visibility includes also color
   */
   bool m_AllowVisibilityModification = true;
 

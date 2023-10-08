@@ -128,7 +128,7 @@ private:
 
   void RemoveGuiLabels();
 
-  /** @brief Adds an empty label which tells the user that currently no tool is availiable. */
+  /** @brief Adds an empty label which tells the user that currently no tool is available. */
   void AddEmptyLabel();
 
   us::ModuleContext* m_Context;

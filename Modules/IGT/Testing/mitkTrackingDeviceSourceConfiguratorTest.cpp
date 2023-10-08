@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include "mitkTrackingDeviceTypeCollection.h"
 #include "mitkUnspecifiedTrackingTypeInformation.h"
 
-//All Tracking devices, which should be avaiable by default
+//All Tracking devices, which should be available by default
 #include "mitkNDIAuroraTypeInformation.h"
 #include "mitkNDIPolarisTypeInformation.h"
 #include "mitkVirtualTrackerTypeInformation.h"

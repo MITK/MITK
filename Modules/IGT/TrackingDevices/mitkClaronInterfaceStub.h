@@ -95,7 +95,7 @@ namespace mitk
     void GrabFrame();
 
     /**
-    * \return Returns wether the MicronTracker is installed (means wether the C-Make-Variable "MITK_USE_MICRON_TRACKER" is set),
+    * \return Returns whether the MicronTracker is installed (means whether the C-Make-Variable "MITK_USE_MICRON_TRACKER" is set),
     *         so returns false in this case.
     */
     bool IsMicronTrackerInstalled();

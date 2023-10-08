@@ -35,7 +35,7 @@ found in the LICENSE file.
   * The image content is then updated every time the Telemed API calls
   * the implemented callback function of this class.
   *
-  * For more infomration about the implemented COM interface refer to the
+  * For more information about the implemented COM interface refer to the
   * Telemed API documentation.
   */
 class USTelemedScanConverterPlugin : public IUsgfwScanConverterPluginCB
@@ -94,7 +94,7 @@ public:
     int nOutY2
     )  {return S_OK;}
 
-  // receves pointers to input media sample and intermediatesample buffer
+  // receives pointers to input media sample and intermediatesample buffer
   STDMETHOD(InInterimSampleCB) (
     IMediaSample *pSampleIn,
     PBYTE pBufferInterim,

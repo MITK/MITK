@@ -30,7 +30,7 @@ namespace mitk
       slicenumber you want to restore in the mitk::PlanePositionManager::AddNewPlanePosition() function.
 
       To restore a position call mitk::PlanePositionManagerService::GetPlanePosition(ID) where ID is the position
-      in the plane positionlist (returned by AddNewPlanePostion). This will give a mitk::RestorePlanePositionOperation
+      in the plane positionlist (returned by AddNewPlanePosition). This will give a mitk::RestorePlanePositionOperation
       which can be executed by the SliceNavigationController of the slicestack.
 
       \sa QmitkSegmentationView.cpp

@@ -25,7 +25,7 @@ int mitkKinectControllerTest(int /* argc */, char* /*argv*/[])
   //try to work with a kinect controller
   try
   {
-  MITK_TEST_CONDITION_REQUIRED(kinectController.IsNotNull(),"Testing initialzation!");
+  MITK_TEST_CONDITION_REQUIRED(kinectController.IsNotNull(),"Testing initialization!");
   MITK_TEST_CONDITION_REQUIRED(kinectController->GetCaptureHeight()== 480 ,"Testing initialization of CaptureHeight");
   MITK_TEST_CONDITION_REQUIRED(kinectController->GetCaptureWidth()== 640 ,"Testing initialization of CaptureWidth");
   MITK_TEST_CONDITION_REQUIRED(kinectController->OpenCameraConnection(),"Testing opening of camera connection!");

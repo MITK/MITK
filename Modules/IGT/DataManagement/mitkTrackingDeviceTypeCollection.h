@@ -24,7 +24,7 @@ found in the LICENSE file.
 namespace mitk {
   /** Documentation:
   *   \brief This class is a collection for information of all Tracking Device Types (derived from abstract TrackingDeviceTypeInformation)
-  *   The Collection is avaiable via Microservice.
+  *   The Collection is available via Microservice.
   *   If you want to add your own tracking device (e.g. to the Tracking Toolbox), you should register
   *   information about your tracking device in this collection using the RegisterTrackingDeviceType function.
   *
@@ -57,7 +57,7 @@ namespace mitk {
     std::vector<std::string> GetTrackingDeviceTypeNames();
 
     /**
-    * /brief Returns all devices compatibel to the given Line of Devices
+    * /brief Returns all devices compatible to the given Line of Devices
     */
     std::vector<TrackingDeviceData> GetDeviceDataForLine(TrackingDeviceType type);
 

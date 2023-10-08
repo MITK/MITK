@@ -69,7 +69,7 @@ public:
 
   /**
   * This test takes a generated gradient mitk image. Then an IGTL Message is produced
-  * using the ImageToIGTLMessageFilter. In the end it is tested, wether the image data in both images is equivalent.
+  * using the ImageToIGTLMessageFilter. In the end it is tested, whether the image data in both images is equivalent.
   */
   void Equal_ContentOfIGTLImageMessageAndMitkImage_True(unsigned int dim)
   {

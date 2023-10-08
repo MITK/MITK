@@ -189,7 +189,7 @@ int mitkFileWriterRegistryTest(int /*argc*/, char * /*argv*/ [])
 
   returned = writerRegistry->GetWriter("test");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyWriter2 *>(returned),
-                               "Testing correct priorized retrieval of FileWriter: Best Writer");
+                               "Testing correct prioritized retrieval of FileWriter: Best Writer");
 
   // Now to give those Writers some options, then we will try again
   mitk::IFileWriter::OptionList options;
@@ -240,7 +240,7 @@ int mitkFileWriterRegistryTest(int /*argc*/, char * /*argv*/ [])
     returnedList.size() == 2,
     "Testing correct return of two Writers when two matching Writer was found, asking for all compatibles");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyWriter2 *>(returnedList.front()),
-                               "Testing correct priorization of returned Writers with options 1/2");
+                               "Testing correct prioritization of returned Writers with options 1/2");
 
   optionFilter.clear();
   optionFilter.push_back("isAwesome");

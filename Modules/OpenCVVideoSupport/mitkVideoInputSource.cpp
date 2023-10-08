@@ -83,7 +83,7 @@ void mitk::VideoInputSource::StartCapturing()
   if(m_ShowSettingsWindow)
     m_VideoInput->showSettingsWindow(m_DeviceNumber);
 
-  //As requested width and height can not always be accomodated
+  //As requested width and height can not always be accommodated
   //make sure to check the size once the device is setup
 
   m_CaptureWidth  = m_VideoInput->getWidth(m_DeviceNumber);
@@ -97,7 +97,7 @@ void mitk::VideoInputSource::StartCapturing()
 
 void mitk::VideoInputSource::StopCapturing()
 {
-  MITK_INFO << "stopping cpaturing process";
+  MITK_INFO << "stopping capturing process";
   m_VideoInput->stopDevice(m_DeviceNumber);
   m_CapturingInProcess = false;
 

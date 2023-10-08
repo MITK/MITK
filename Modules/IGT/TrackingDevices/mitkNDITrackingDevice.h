@@ -73,7 +73,7 @@ namespace mitk
     * - initializing all manually added passive tools (user supplied srom file)
     * - initializing active tools that are connected to the tracking device
     * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
-    * @throw mitk::IGTException Throws a normal IGT exception if an error occures which is not related to the hardware.
+    * @throw mitk::IGTException Throws a normal IGT exception if an error occurs which is not related to the hardware.
     */
     bool OpenConnection() override;
 
@@ -108,7 +108,7 @@ namespace mitk
     * for them
     * \return True if the method was executed successful.
     * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
-    * @throw mitk::IGTException Throws a normal IGT exception if an error occures which is not related to the hardware.
+    * @throw mitk::IGTException Throws a normal IGT exception if an error occurs which is not related to the hardware.
     */
     bool DiscoverWiredTools();
 
@@ -175,7 +175,7 @@ namespace mitk
     itkGetConstMacro(HardwareHandshake, HardwareHandshake);              ///< returns the hardware handshake setting
     virtual void SetIlluminationActivationRate(const IlluminationActivationRate _arg); ///< set activation rate of IR illumator for polaris
     itkGetConstMacro(IlluminationActivationRate, IlluminationActivationRate);          ///< returns the activation rate of IR illumator for polaris
-    virtual void SetDataTransferMode(const DataTransferMode _arg);    ///< set data transfer mode to text (TX) or binary (BX). \warning: only TX is supportet at the moment
+    virtual void SetDataTransferMode(const DataTransferMode _arg);    ///< set data transfer mode to text (TX) or binary (BX). \warning: only TX is supported at the moment
     itkGetConstMacro(DataTransferMode, DataTransferMode);              ///< returns the data transfer mode
     virtual bool Beep(unsigned char count);   ///< Beep the tracking device 1 to 9 times
 
@@ -252,7 +252,7 @@ namespace mitk
     * \warning This method can remove TrackingTools from the tool list! After calling this method, GetTool(i) could return
     *          a different tool, because tool indices could have changed.
     * @throw mitk::IGTHardwareException Throws an exception if there are errors while communicating with the device.
-    * \return returns NDIOKAY if everything was sucessfull, returns an error code otherwise
+    * \return returns NDIOKAY if everything was successful, returns an error code otherwise
     */
     NDIErrorCode FreePortHandles();
 

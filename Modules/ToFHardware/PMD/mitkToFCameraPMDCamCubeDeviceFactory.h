@@ -32,7 +32,7 @@ namespace mitk
   /**
   * \brief ToFPMDCamBoardDeviceFactory is an implementation of the factory pattern to generate Cam Cube Devices.
   * ToFPMDCamCubeDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
-  * This offers users the oppertunity to generate new Cam Cube Devices via a global instance of this factory.
+  * This offers users the opportunity to generate new Cam Cube Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
 
@@ -40,7 +40,7 @@ class MITKPMD_EXPORT ToFCameraPMDCamCubeDeviceFactory : public itk::LightObject,
 
 public:
   /**
-   * @brief ToFCameraPMDCamCubeDeviceFactory Default contructor.
+   * @brief ToFCameraPMDCamCubeDeviceFactory Default constructor.
    * This factory internally counts all Cam Cube devices starting at 1.
    */
   ToFCameraPMDCamCubeDeviceFactory()

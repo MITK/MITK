@@ -45,7 +45,7 @@ public:
   /** Adds the tracker navigation data which is used when "add current instrument position" is clicked. */
   void setTrackerNavigationData(mitk::NavigationData::Pointer t);
 
-  /** Sets the data storage. This is required is the widget shoul add tracker points and perform
+  /** Sets the data storage. This is required is the widget should add tracker points and perform
    *  registrations internally. When not setting the data storage the widget can still be used
    *  by reacting on the signals and do custom actions outside.*/
   void setDataStorage(mitk::DataStorage::Pointer d);

@@ -25,7 +25,7 @@ namespace mitk
   (0x0029, 0x1020) to extract relevant CEST data.
 
   An initial parsing determines whether the provided string belongs to CEST data at all.
-  To make the check and extract the revision number the following rules are aplied: \n
+  To make the check and extract the revision number the following rules are applied: \n
   <ol>
     <li>Sequence name (tSequenceFileName) must either
       <ol>
@@ -106,7 +106,7 @@ namespace mitk
     /// Decides whether or not the image is likely to be a T1Map, if not it is assumed to be a CEST sequence
     bool IsT1Sequence(std::string preparationType, std::string recoveryMode, std::string spoilingType, std::string revisionString);
 
-    /// Get a string filled with the properly formated offsets based on the sampling type and offset
+    /// Get a string filled with the properly formatted offsets based on the sampling type and offset
     std::string GetOffsetString(std::string samplingType, std::string offset, std::string measurements);
 
     /// returns a vector revision numbers of all REVISIONNUMBER.json found beside the MitkCEST library

@@ -96,7 +96,7 @@ bool mitk::PivotCalibration::ComputePivotPoint()
   {
     x = svdA.solve(b); //x = the resulting pivot point
 
-    m_ResultRMSError = (A * x - b).rms();  //the root mean sqaure error of the computation
+    m_ResultRMSError = (A * x - b).rms();  //the root mean square error of the computation
 
     //sets the Pivot Point
     m_ResultPivotPoint[0] = x[0];

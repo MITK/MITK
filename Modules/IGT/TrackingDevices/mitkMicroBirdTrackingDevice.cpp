@@ -338,7 +338,7 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
 
 
   // lock the TrackingFinishedMutex to signal that the execution rights
-  //   are now transfered to the tracking thread
+  //   are now transferred to the tracking thread
   MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
 
   // Because m_StopTracking is used by two threads, access has to be guarded

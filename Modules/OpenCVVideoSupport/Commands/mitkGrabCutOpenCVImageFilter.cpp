@@ -223,7 +223,7 @@ mitk::GrabCutOpenCVImageFilter::ModelPointsList mitk::GrabCutOpenCVImageFilter::
 
 cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
 {
-  // initialize mask with values of propably background
+  // initialize mask with values of probably background
   cv::Mat mask(m_InputImage.size().height, m_InputImage.size().width, CV_8UC1, cv::GC_PR_BGD);
 
   // get foreground and background points (guarded by mutex)
@@ -325,7 +325,7 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::RunSegmentation(cv::Mat input, cv::Mat m
   cv::Mat bgdModel, fgdModel;
   cv::grabCut(input, mask, cv::Rect(), bgdModel, fgdModel, 1, cv::GC_INIT_WITH_MASK);
 
-  // set propably foreground pixels to white on result mask
+  // set probably foreground pixels to white on result mask
   cv::Mat result;
   cv::compare(mask, cv::GC_PR_FGD, result, cv::CMP_EQ);
 

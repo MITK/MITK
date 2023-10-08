@@ -57,7 +57,7 @@ namespace mitk
     */
     virtual bool GetDistances(float* distanceArray);
     /*!
-    \brief calls update on the camera -> a new ToF-image is aquired
+    \brief calls update on the camera -> a new ToF-image is acquired
     */
     virtual bool UpdateCamera();
     /*!
@@ -92,7 +92,7 @@ namespace mitk
     virtual void SetInputFileName(std::string inputFileName);
     /*!
     \brief Access the resolution of the image in x direction
-    \return widht of image in pixel
+    \return width of image in pixel
     */
     itkGetMacro(CaptureWidth, unsigned int);
     /*!
@@ -110,7 +110,7 @@ namespace mitk
     /*!
     \brief Method printing the current error message to the console and returning whether the previous command was successful
     \param error error number returned by the MESA function
-    \return flag indicating if an error occured (false) or not (true)
+    \return flag indicating if an error occurred (false) or not (true)
     */
     bool ErrorText(int error);
 

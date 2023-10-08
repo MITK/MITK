@@ -30,11 +30,11 @@ namespace mitk
   mapEventMacro(FrameRegistrationEvent, ::map::events::TaskBatchEvent, MITKMATCHPOINTREGISTRATION_EXPORT);
   mapEventMacro(FrameMappingEvent, ::map::events::TaskBatchEvent, MITKMATCHPOINTREGISTRATION_EXPORT);
 
-  /** Helper class that assumes that registeres time frames of an passed image and returns the resulting new image.
+  /** Helper class that assumes that registers time frames of an passed image and returns the resulting new image.
    * A typical use case for the helper class is motion correction in 3D+t images. Each selected frame will be registered
    * to the first frame of the image. The user can define frames that may be not registered. These frames will be copied directly.
    * Per default all frames will be registered.
-   * The user may set a mask for the target frame (1st frame). If this mask image has mulitple time steps, the first time step will be used.
+   * The user may set a mask for the target frame (1st frame). If this mask image has multiple time steps, the first time step will be used.
    * The helper class invokes three eventtypes: \n
    * - mitk::FrameRegistrationEvent: when ever a frame was registered.
    * - mitk::FrameMappingEvent: when ever a frame was mapped registered.
@@ -78,7 +78,7 @@ namespace mitk
     itkSetMacro(InterpolatorType, mitk::ImageMappingInterpolator::Type);
     itkGetConstMacro(InterpolatorType, mitk::ImageMappingInterpolator::Type);
 
-    /** cleares the ignore list. Therefore all frames will be processed.*/
+    /** Clears the ignore list. Therefore all frames will be processed.*/
     void ClearIgnoreList();
     void SetIgnoreList(const IgnoreListType& il);
     itkGetConstMacro(IgnoreList, IgnoreListType);

@@ -22,7 +22,7 @@ found in the LICENSE file.
 namespace mitk {
   /**Documentation
   * \brief Right now, the US Probe is only a fancy name for a string. Later, it could handle probe specific parameters
-  *  like the current frequency etc. It is able to compare itself to other probes for device managment though.
+  *  like the current frequency etc. It is able to compare itself to other probes for device management though.
   *
   * \ingroup US
   */

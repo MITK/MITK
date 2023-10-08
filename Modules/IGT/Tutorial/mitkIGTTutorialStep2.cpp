@@ -84,7 +84,7 @@ int main(int, char**)
   dataNode->SetColor(0.0, 1.0, 1.0);
   dataStorage->Add(dataNode);
 
-  //Filter for rendering the cone at correct postion and orientation
+  //Filter for rendering the cone at correct position and orientation
   mitk::NavigationDataObjectVisualizationFilter::Pointer visualizer = mitk::NavigationDataObjectVisualizationFilter::New();
   visualizer->SetInput(0, source->GetOutput());
   visualizer->SetRepresentationObject(0, cone.GetPointer());

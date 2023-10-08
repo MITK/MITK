@@ -649,7 +649,7 @@ static void CheckIntersectionWithRotatedGeometry90()
   image->Initialize(mitk::MakePixelType<int, int, 1>(), *(rotatedSlicedGeometry3D.GetPointer()));
 
   {
-    // first Slice in X Diection
+    // first Slice in X Direction
     mitk::Point3D originFirstSlice;
     originFirstSlice[0] = -1.0;
     originFirstSlice[1] = 0.0;

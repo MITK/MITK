@@ -24,7 +24,7 @@ found in the LICENSE file.
 namespace mitk {
 
   /**
-  * \brief Is a helper class to make measurments for latency and fps
+  * \brief Is a helper class to make measurements for latency and fps
   *
   * \ingroup OpenIGTLink
   */

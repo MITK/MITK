@@ -42,9 +42,9 @@ class MITKTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     QmitkToFVisualisationSettingsWidget (QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
     ~QmitkToFVisualisationSettingsWidget () override;
 
-    /* @brief This method is part of the widget an needs not to be called seperately. */
+    /* @brief This method is part of the widget an needs not to be called separately. */
     virtual void CreateQtPartControl(QWidget *parent);
-    /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
+    /* @brief This method is part of the widget an needs not to be called separately. (Creation of the connections of main and control widget.)*/
     virtual void CreateConnections();
     /*!
     \brief initialize the widget with the images to be shown
@@ -153,7 +153,7 @@ protected slots:
 
     /*!
     \brief Reset the color transfer function to the given type and range
-    \param colorTransferFunction vtkColorTransferfunction to be resetted
+    \param colorTransferFunction vtkColorTransferfunction to be reset
     \param type type of the transfer function: 0 = gray scale, 1 = color
     \param min minimal value to be set to the transfer function
     \param max maximal value to be set to the transfer function

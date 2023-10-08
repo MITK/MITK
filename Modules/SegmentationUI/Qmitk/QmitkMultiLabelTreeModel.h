@@ -26,7 +26,7 @@ class QmitkMultiLabelSegTreeItem;
 
 /*!
 \class QmitkMultiLabelTreeModel
-The class is used to represent the information of an MITK MultiLabel segmentation instance (labels, spacial groups...).
+The class is used to represent the information of an MITK MultiLabel segmentation instance (labels, spatial groups...).
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelTreeModel : public QAbstractItemModel
 {

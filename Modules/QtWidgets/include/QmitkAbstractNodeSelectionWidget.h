@@ -67,7 +67,7 @@ public:
 
   /** Returns the selected nodes, as emitted with CurrentSelectionChanged*/
   NodeList GetSelectedNodes() const;
-  /** Convinience method that returns the selected nodes as ConstNodeStdVector.
+  /** Convenience method that returns the selected nodes as ConstNodeStdVector.
    This is a type also often used in the  mitk code base.*/
   ConstNodeStdVector GetSelectedNodesStdVector() const;
 
@@ -151,7 +151,7 @@ protected:
   */
   virtual void OnNodePredicateChanged();
 
-  /** Method is called if the data storage has changed. The selection will be automatically be reseted afterwards.
+  /** Method is called if the data storage has changed. The selection will be automatically be reset afterwards.
   *   The default implementation does nothing.
   */
   virtual void OnDataStorageChanged();
@@ -182,7 +182,7 @@ protected:
   */
   virtual void OnNodeModified(const itk::Object* caller, const itk::EventObject& event);
 
-  /** Method is called if the internal selection has changed. It will call following methods, that can be overriden to change
+  /** Method is called if the internal selection has changed. It will call following methods, that can be overridden to change
   *   behavior in derived classes:
   *   - pre internal selection change: ReviseSelectionChanged()
   *   - post internal selection change: OnInternalSelectionChanged(), UpdateInfo() and AllowEmissionOfSelection() (via EmitSelection()).
@@ -210,7 +210,7 @@ protected:
   virtual bool AllowEmissionOfSelection(const NodeList& emissionCandidates) const;
 
   /** Checks if the new emission differs from the last emission. If this is the case and AllowEmissionOfSelection()
-  *   returns true the new selection will be emited.
+  *   returns true the new selection will be emitted.
   */
   void EmitSelection(const NodeList& emissionCandidates);
 

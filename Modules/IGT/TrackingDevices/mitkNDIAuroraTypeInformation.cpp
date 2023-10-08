@@ -71,7 +71,7 @@ namespace mitk
 
     try
     {
-      //connect to aurora to dectect tools automatically
+      //connect to aurora to detect tools automatically
       thisDevice->OpenConnection();
     }
     catch (mitk::IGTHardwareException& e)
@@ -120,7 +120,7 @@ namespace mitk
             dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolName(navigationTools->GetTool(j)->GetToolName());
             //set tip of tool
             dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolTipPosition(navigationTools->GetTool(j)->GetToolTipPosition(), navigationTools->GetTool(j)->GetToolAxisOrientation());
-            //rember that this tool was already found
+            //remember that this tool was already found
             alreadyFoundTools.push_back(j);
 
             toolFound = true;

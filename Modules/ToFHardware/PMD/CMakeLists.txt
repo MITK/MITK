@@ -24,7 +24,7 @@ ENDIF(MITK_USE_TOF_PMDO3 OR MITK_USE_TOF_PMDCAMCUBE OR MITK_USE_TOF_PMDCAMBOARD)
 
 #Creating Basics for all PMD devices
 IF(MITK_USE_PMD)
-  #-----Setting generall Path-----
+  #-----Setting general Path-----
   FIND_LIBRARY(MITK_PMD_LIB pmdaccess2 DOC "PMD access library.")
   GET_FILENAME_COMPONENT(MITK_PMD_SDK_DIR ${MITK_PMD_LIB} PATH)
   SET(MITK_PMD_SDK_DIR ${MITK_PMD_SDK_DIR}/.. CACHE INTERNAL "PMD SDK directory")

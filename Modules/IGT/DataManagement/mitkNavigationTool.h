@@ -31,7 +31,7 @@ namespace mitk {
   * \brief An object of this class represents a navigation tool in the view of the software.
   *        A few informations like an identifier, a toolname, a surface and a itk spatial
   *        object are stored in such an object. The classes NavigationToolReader and
-  *        are availiable to write/read tools to/from the harddisc. If you need a collection
+  *        are available to write/read tools to/from the harddisc. If you need a collection
   *        of navigation tools the class NavigationToolStorage could be used.
   *
   * \ingroup IGT
@@ -88,7 +88,7 @@ namespace mitk {
     bool IsToolTipSet();
 
     //Tool Landmarks:
-    /** For overview, here are descriptons of the two types of tool landmarks:
+    /** For overview, here are descriptions of the two types of tool landmarks:
      *
      *  control points: These landmarks may be used clearly define the tools pose only by
      *  using landmarks in the tool coordinate system. E.g., two landmarks for a 5DoF tool and three
@@ -96,7 +96,7 @@ namespace mitk {
      *  of a tool from image space to tracking space.
      *
      *  tool landmarks: These landmarks are designed for representing defined landmarks
-     *  on a tools surface. The number of these landmarks might exeed the number of tool control points
+     *  on a tools surface. The number of these landmarks might exceed the number of tool control points
      *  for reasons of redundancy and averaging. They are used for, e.g., manually registering
      *  the pose of a tool by visual markers in a CT scan. If you would use these landmarks to do a
      *  point based registration from image space to tracking space later, you might overweight the

@@ -108,7 +108,7 @@ protected slots:
   void SegmentationProcessFailed();
 
   /**
-   * @brief Qthread to capture sucessfull nnUNet segmentation.
+   * @brief Qthread to capture successful nnUNet segmentation.
    * Further, renders the LabelSet image
    */
   void SegmentationResultHandler(mitk::nnUNetTool *, bool forceRender = false);
@@ -230,7 +230,7 @@ private:
 
   /**
    * @brief Adds GPU information to the gpu combo box.
-   * In case, there aren't any GPUs avaialble, the combo box will be
+   * In case, there aren't any GPUs available, the combo box will be
    * rendered editable.
    */
   void SetGPUInfo();
@@ -287,7 +287,7 @@ private:
   void WriteErrorMessage(const QString&);
 
   /**
-   * @brief Searches and parses paths of python virtual enviroments
+   * @brief Searches and parses paths of python virtual environments
    * from predefined lookout locations
    */
   void AutoParsePythonPaths();

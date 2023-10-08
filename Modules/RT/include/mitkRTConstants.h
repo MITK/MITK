@@ -35,8 +35,8 @@ struct MITKRT_EXPORT RTConstants
   static const std::string PRESCRIBED_DOSE_PROPERTY_NAME;
 
   /**
-      * Name of the property that encodes the reference dose that should be used for relative dose vizualization/evaluation purpose.
-      * It is often the prescribed dose but may differ e.g. when to dose distributions sould be compared using the same reference.
+      * Name of the property that encodes the reference dose that should be used for relative dose visualization/evaluation purpose.
+      * It is often the prescribed dose but may differ e.g. when to dose distributions should be compared using the same reference.
       */
   static const std::string REFERENCE_DOSE_PROPERTY_NAME;
 

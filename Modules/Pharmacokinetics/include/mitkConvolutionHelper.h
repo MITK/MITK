@@ -20,7 +20,7 @@ found in the LICENSE file.
 namespace  mitk {
 /** @namespace convolution
  * @brief Helper for itk implementation of vnl fourier transformation
- * This namespace provides functions for the preperation of vnl_fft_1d, including a wrapper
+ * This namespace provides functions for the preparation of vnl_fft_1d, including a wrapper
  * for wrapping the convolution kernel (turning it inside out) and a function for zeropadding
  * to avoid convolution artefacts. */
   namespace convolution {
@@ -45,7 +45,7 @@ inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
             return wrappedKernel;
         }
 
-    /** @brief Fuction for zeropadding (adding zeros) of an Array/vnl_vector, so that is has size paddedDimensions
+    /** @brief Function for zeropadding (adding zeros) of an Array/vnl_vector, so that is has size paddedDimensions
      * @param unpaddedSpectrum
      * @param paddedDimension Dimensions that the Array should have after padding (convolution dimensions)
      * \remark dim = Dimensions of padded image --> PaddedDimension
@@ -88,7 +88,7 @@ inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
             }
             return scaledResult;
         }
-    /** @brief Convinience function for preparing 2 array for convolution with each other.
+    /** @brief Convenience function for preparing 2 array for convolution with each other.
      * Takes both arrays of type itk::Array, zeropadds them to the sum of their sizes and wraps
      * the one specified as kernel. Returns them as vnl_vector<vcl_complex<double> >, ready to
      * be entered in fwd_transform*/

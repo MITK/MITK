@@ -55,7 +55,7 @@ namespace mitk
 
   private:
 
-    char *m_IPAddress; ///< holds the ip adress the O3 camera is connected to
+    char *m_IPAddress; ///< holds the ip address the O3 camera is connected to
   };
 } //END mitk namespace
 #endif

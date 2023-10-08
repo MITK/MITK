@@ -38,7 +38,7 @@ public:
   /**
   * @brief SetInput Set the input image. Only 3D images are supported for now.
   * @param image a 3D image.
-  * @throw mitk::Exception if the dimesion is not 3.
+  * @throw mitk::Exception if the dimension is not 3.
   */
   void SetInput(Image::Pointer image);
 

@@ -51,7 +51,7 @@ namespace mitk
 
     /**
     * \brief Starts the tracking.
-    * \return Returns true if the tracking is started. Throws an exception if an error occures.
+    * \return Returns true if the tracking is started. Throws an exception if an error occurs.
     * @throw mitk::IGTHardwareException Throws an exception if there is an error during start tracking.
     */
     bool StartTracking() override;
@@ -90,7 +90,7 @@ namespace mitk
     *        is opened, the tools are discovered and added.
     * \param WaitingTime Defines how long the method waits for an answer from the server (in milliseconds). Default value is 10000 (10 seconds).
     * \return Returns true if the connection was established and the tools were discovered successfully and - if at least one tool was found - were added to this device.
-    *         Retruns false if no valid connection is available.
+    *         Returns false if no valid connection is available.
     */
     bool DiscoverTools(int WaitingTime = 10000);
 

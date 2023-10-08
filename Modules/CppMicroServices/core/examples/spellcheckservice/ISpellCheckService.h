@@ -46,7 +46,7 @@
  */
 struct SPELLCHECKSERVICE_EXPORT ISpellCheckService
 {
-  // Out-of-line virtual desctructor for proper dynamic cast
+  // Out-of-line virtual destructor for proper dynamic cast
   // support with older versions of gcc.
   virtual ~ISpellCheckService();
 

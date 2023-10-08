@@ -25,7 +25,7 @@ namespace mitk
 
 /** Base class for all model fit cost function that return a multiple cost value
  * It offers also a default implementation for the numerical computation of the
- * derivatives. Normaly you just have to (re)implement CalcMeasure().
+ * derivatives. Normally you just have to (re)implement CalcMeasure().
 */
 class MITKMODELFIT_EXPORT MVModelFitCostFunction : public itk::MultipleValuedCostFunction, public ModelFitCostFunctionInterface
 {

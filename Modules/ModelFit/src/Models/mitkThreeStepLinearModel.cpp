@@ -264,7 +264,7 @@ mitk::ModelBase::DerivedParameterMapType mitk::ThreeStepLinearModel::ComputeDeri
 
     unsigned int timeSteps = m_TimeGrid.GetSize();
 
-    const double x_fin = (m_TimeGrid.empty() == false) ? (m_TimeGrid.GetElement(timeSteps - 1)) : ( mitkThrow() << "An exception occured because time grid is empty, method can't continue.");
+    const double x_fin = (m_TimeGrid.empty() == false) ? (m_TimeGrid.GetElement(timeSteps - 1)) : ( mitkThrow() << "An exception occurred because time grid is empty, method can't continue.");
 
     const double y_fin = b1 * x_fin + y2;
 

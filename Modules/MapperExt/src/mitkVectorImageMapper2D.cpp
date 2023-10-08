@@ -110,7 +110,7 @@ void mitk::VectorImageMapper2D::Paint(mitk::BaseRenderer *renderer)
   // normally, we would need to transform the surface and cut the transformed surface with the cutter.
   // This might be quite slow. Thus, the idea is, to perform an inverse transform of the plane instead.
   //@todo It probably does not work for scaling operations yet:scaling operations have to be
-  // dealed with after the cut is performed by scaling the contour.
+  // dealt with after the cut is performed by scaling the contour.
   vtkLinearTransform *vtktransform = GetDataNode()->GetVtkTransform();
 
   vtkTransform *world2vtk = vtkTransform::New();

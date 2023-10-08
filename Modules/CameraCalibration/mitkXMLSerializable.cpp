@@ -56,7 +56,7 @@ namespace mitk
     }
     else
     {
-      // document did not exist, create new one with declration
+      // document did not exist, create new one with declaration
       doc.InsertEndChild( doc.NewDeclaration() );
     }
 

@@ -24,7 +24,7 @@ namespace mitk {
   *
   * All of the methods of this interface must be implemented in a concrete
   * subclass. There are some pure virtual methods in the superclass
-  * mitk::USAbstractControlInterface which must be implemente, too.
+  * mitk::USAbstractControlInterface which must be implemented, too.
   *
   */
 class MITKUS_EXPORT USControlInterfaceProbes : public USAbstractControlInterface

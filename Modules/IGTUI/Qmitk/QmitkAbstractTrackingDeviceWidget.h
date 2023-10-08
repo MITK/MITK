@@ -33,8 +33,8 @@ found in the LICENSE file.
  *                Attention: In former MITK versions, there was no pure virtual GetTrackingDevice function but a pure virtual ConstructTrackingDevice function.
  *                You can simply rename these, but you should give it a thought, if each time "Construct" was called, a new device needs to be constructed,
  *                or if you can store your TrackingDevice in a member variable and return this. Up to you.
- *         - Please create the UI elements in a function like CreateQtPartControl (e.g. see QmitkVitrualTrackerWidget).
- *         - You might want to use own buttons etc., please connect them in a private CreateConnections (e.g. see QmitkVitrualTrackerWidget).
+ *         - Please create the UI elements in a function like CreateQtPartControl (e.g. see QmitkVirtualTrackerWidget).
+ *         - You might want to use own buttons etc., please connect them in a private CreateConnections (e.g. see QmitkVirtualTrackerWidget).
  *         - Due to initialization of qt during autoloading of the IGT module, you constructor should be as slim as possible and only contain a call
  *           of the QmitkAbstractTrackingDeviceWidget constructor and simple variable initialization.
  *         - For the initialization, you must write an Iniltialize() function, which must include a call of InitializeSuperclassWidget() and should contain
@@ -62,7 +62,7 @@ public:
 
   /**
    * \brief Return pointer to copy of the object.
-   * Internally use of QmitkUSAbstractCustomWidget::Clone() with additionaly
+   * Internally use of QmitkUSAbstractCustomWidget::Clone() with additionally
    * setting an internal flag that the object was really cloned.
    */
   QmitkAbstractTrackingDeviceWidget* CloneForQt(QWidget* parent = nullptr) const;
@@ -127,7 +127,7 @@ public:
   /**
   * \brief Optional method to investigate if drivers etc for your device are installed.
   * The default value is "true" as most devices don't need this information.
-  * Others however migth crash, and for these you might implement this function (see QmitkMicronTrackerWidget)
+  * Others however might crash, and for these you might implement this function (see QmitkMicronTrackerWidget)
   */
   virtual bool IsDeviceInstalled() { return true; }
 

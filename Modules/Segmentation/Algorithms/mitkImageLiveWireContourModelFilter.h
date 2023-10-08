@@ -31,11 +31,11 @@ namespace mitk
 
    \brief Calculates a LiveWire contour between two points in an image.
 
-   For defining costs between two pixels specific features are extraced from the image and tranformed into a single cost
+   For defining costs between two pixels specific features are extracted from the image and transformed into a single cost
    value.
    \sa ShortestPathCostFunctionLiveWire
 
-   The filter is able to create dynamic cost tranfer map and thus use on the fly training.
+   The filter is able to create dynamic cost transfer map and thus use on the fly training.
    \note On the fly training will only be used for next update.
    The computation uses the last calculated segment to map cost according to features in the area of the segment.
 
@@ -69,7 +69,7 @@ namespace mitk
     itkSetMacro(EndPoint, mitk::Point3D);
     itkGetMacro(EndPoint, mitk::Point3D);
 
-    /** \brief Create dynamic cost tranfer map - use on the fly training.
+    /** \brief Create dynamic cost transfer map - use on the fly training.
     \note On the fly training will be used for next update only.
     The computation uses the last calculated segment to map cost according to features in the area of the segment.
     */
@@ -105,7 +105,7 @@ namespace mitk
 
     virtual void DumpMaskImage();
 
-    /** \brief Create dynamic cost tranfer map - on the fly training*/
+    /** \brief Create dynamic cost transfer map - on the fly training*/
     bool CreateDynamicCostMap(mitk::ContourModel *path = nullptr);
 
     void SetUseCostFunction(bool doUseCostFunction) { m_ShortestPathFilter->SetUseCostFunction(doUseCostFunction); };
@@ -139,7 +139,7 @@ namespace mitk
     /** \brief Shortest path filter according to cost function m_CostFunction*/
     ShortestPathImageFilterType::Pointer m_ShortestPathFilter;
 
-    /** \brief Flag to use a dynmic cost map or not*/
+    /** \brief Flag to use a dynamic cost map or not*/
     bool m_UseDynamicCostMap;
 
     unsigned int m_TimeStep;

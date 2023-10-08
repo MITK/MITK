@@ -206,7 +206,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   }
   catch (...)
   {
-    std::string errorMsg = "Unkown error occured while generation TotalSegmentator segmentation.";
+    std::string errorMsg = "Unknown error occurred while generation TotalSegmentator segmentation.";
     this->ShowErrorMessage(errorMsg);
     m_Controls.previewButton->setEnabled(true);
     return;
@@ -302,7 +302,7 @@ void QmitkTotalSegmentatorToolGUI::AutoParsePythonPaths()
     {
       subIt.next();
       QString envName = subIt.fileName();
-      if (!envName.startsWith('.')) // Filter out irrelevent hidden folders, if any.
+      if (!envName.startsWith('.')) // Filter out irrelevant hidden folders, if any.
       {
         m_Controls.sysPythonComboBox->addItem("(" + envName + "): " + subIt.filePath());
       }

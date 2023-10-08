@@ -58,13 +58,13 @@ void QmitkSegWithPreviewToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
 
     m_CheckMerge = new QCheckBox("Merge with existing content", this);
     m_CheckMerge->setChecked(m_Tool->GetMergeStyle()==mitk::MultiLabelSegmentation::MergeStyle::Merge);
-    m_CheckMerge->setToolTip("If checked, the preview segmantation will be merged with the existing segmantation into a union. If unchecked, the preview content will replace the old segmantation");
+    m_CheckMerge->setToolTip("If checked, the preview segmentation will be merged with the existing segmentation into a union. If unchecked, the preview content will replace the old segmentation");
 
     m_CheckProcessAll = new QCheckBox("Process all time steps", this);
     m_CheckProcessAll->setChecked(false);
     m_CheckProcessAll->setToolTip("Process all time steps of the dynamic segmentation and not just the currently visible time step.");
     m_CheckProcessAll->setVisible(!m_Mode2D);
-    //remark: keept m_CheckProcessAll deactivated in 2D because in this refactoring
+    //remark: keep m_CheckProcessAll deactivated in 2D because in this refactoring
     //it should be kept to the status quo and it was not clear how interpolation
     //would behave. As soon as it is sorted out we can remove that "feature switch"
     //or the comment.

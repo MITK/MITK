@@ -42,7 +42,7 @@ public:
     frame = usSource->GetNextImage()[0];
     MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Fifth frame should not be null.");
   }
-  /** This Test will fail if no device is attached. Since it basically covers the same non-OpenCV Functionality as TestOpenVideoFile, it is ommited
+  /** This Test will fail if no device is attached. Since it basically covers the same non-OpenCV Functionality as TestOpenVideoFile, it is omitted
   static void TestOpenDevice()
   {
   mitk::USImageVideoSource::Pointer usSource = mitk::USImageVideoSource::New();

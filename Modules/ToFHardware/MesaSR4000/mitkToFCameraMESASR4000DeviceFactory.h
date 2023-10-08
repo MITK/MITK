@@ -24,14 +24,14 @@ namespace mitk
   /**
   * \brief ToFCameraMESASR4000DeviceFactory is an implementation of the factory pattern to generate MESASR4000Devices.
   * ToFCameraMESASR4000DeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
-  * This offers users the oppertunity to generate new MESA SR4000 Devices via a global instance of this factory.
+  * This offers users the opportunity to generate new MESA SR4000 Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
   class MITKMESASR4000_EXPORT ToFCameraMESASR4000DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
   public:
     /**
-     * @brief ToFCameraMESASR4000DeviceFactory Default contructor.
+     * @brief ToFCameraMESASR4000DeviceFactory Default constructor.
      * This factory internally counts all MESA SR4000 devices starting at 1.
      */
     ToFCameraMESASR4000DeviceFactory()

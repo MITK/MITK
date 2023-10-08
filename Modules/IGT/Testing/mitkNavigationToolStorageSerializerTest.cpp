@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkIGTException.h>
 #include <mitkNavigationToolStorageTestHelper.h>
 
-//headers of IGT classes releated to the tested class
+//headers of IGT classes related to the tested class
 #include <mitkNavigationToolStorageSerializer.h>
 
 #include <Poco/Path.h>
@@ -40,7 +40,7 @@ private:
 
 public:
 
-  /**@brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).*/
+  /**@brief Setup Always call this method before each Test-case to ensure correct and new initialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).*/
   void setUp() override
   {
     try {
@@ -66,7 +66,7 @@ public:
     }
     catch(...)
     {
-      MITK_ERROR << "Warning: Error occured while deleting test file!";
+      MITK_ERROR << "Warning: Error occurred while deleting test file!";
     }
   }
 

@@ -43,7 +43,7 @@ public:
     itkSetConstObjectMacro(DynamicImage,Image);
     itkGetConstObjectMacro(DynamicImage,Image);
 
-    /** Parameters Relevant for conversion Calculation; Have to be Set externally (Sequence Dependend)*/
+    /** Parameters Relevant for conversion Calculation; Have to be Set externally (Sequence Dependent)*/
     itkSetMacro(RelaxationTime, double);
     itkGetConstReferenceMacro(RelaxationTime, double);
 

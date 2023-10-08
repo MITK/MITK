@@ -117,14 +117,14 @@ namespace mitk
 
                 if ( m_internalImage->GetDimension() == 3 )
                 {
-                    itk::Image<unsigned short, 3>::Pointer noneConstMaskImage; //needed to work arround the fact that CastToItkImage currently does not support const itk images.
+                    itk::Image<unsigned short, 3>::Pointer noneConstMaskImage; //needed to work around the fact that CastToItkImage currently does not support const itk images.
                     CastToItkImage(timeSliceMask, noneConstMaskImage);
                     m_internalMask3D = noneConstMaskImage;
                     AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 3, m_internalMask3D.GetPointer(), m_Label);
                 }
                 else if ( m_internalImage->GetDimension() == 2 )
                 {
-                    itk::Image<unsigned short, 2>::Pointer noneConstMaskImage; //needed to work arround the fact that CastToItkImage currently does not support const itk images.
+                    itk::Image<unsigned short, 2>::Pointer noneConstMaskImage; //needed to work around the fact that CastToItkImage currently does not support const itk images.
                     CastToItkImage(timeSliceMask, noneConstMaskImage);
                     m_internalMask2D = noneConstMaskImage;
                     AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 2, m_internalMask2D.GetPointer(), m_Label);
@@ -414,7 +414,7 @@ namespace mitk
               subVoxelOffset[2] < +0.5;
               subVoxelOffset[2] += subVoxelSizeInPixels)
             {
-              subVoxelIndexPosition = voxelPosition + subVoxelOffset; // this COULD be integrated into the for-loops if neccessary (add voxelPosition to initializer and end condition)
+              subVoxelIndexPosition = voxelPosition + subVoxelOffset; // this COULD be integrated into the for-loops if necessary (add voxelPosition to initializer and end condition)
               distanceSquared =
                 (subVoxelIndexPosition[0]-convolutionMaskCenterIndex[0]) * mmPerPixel[0] * (subVoxelIndexPosition[0]-convolutionMaskCenterIndex[0]) * mmPerPixel[0]
               + (subVoxelIndexPosition[1]-convolutionMaskCenterIndex[1]) * mmPerPixel[1] * (subVoxelIndexPosition[1]-convolutionMaskCenterIndex[1]) * mmPerPixel[1]

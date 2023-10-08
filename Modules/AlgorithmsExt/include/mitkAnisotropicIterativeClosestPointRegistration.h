@@ -39,11 +39,11 @@ namespace mitk
     * \ingroup AnisotropicRegistration
     *
     * @brief Implementation of the anisotropic iterative closest point (A-ICP)
-    * algoritm.
+    * algorithm.
     *
-    * This class implements the anisotropic interative closest point (A-ICP)
+    * This class implements the anisotropic iterative closest point (A-ICP)
     * algorithm presented in L. Maier-Hein et al. in "Convergent Iterative
-    * Closest-Point Algorithm to Accomodate Anisotropic and Inhomogenous
+    * Closest-Point Algorithm to Accommodate Anisotropic and Inhomogenous
     * Localization Error.", IEEE T Pattern Anal 34 (8), 1520-1532, 2012.
     * The algorithm computes the optimal transformation to align two surfaces.
     * In addition to the surfaces a list of covariance matrices is used as
@@ -234,7 +234,7 @@ namespace mitk
       /** Set search radius for the correspondence search.*/
       itkSetMacro(SearchRadius, double);
 
-      /** Set the maximim number of iterations used by the point based registration
+      /** Set the maximum number of iterations used by the point based registration
         * algorithm.
         */
       itkSetMacro(MaxIterationsInWeightedPointTransform, double);
@@ -247,7 +247,7 @@ namespace mitk
 
       /**
         * Factor that trimms the point set in percent for
-        * partial overlapping surfaces. E.g. 0.4 will use 40 precent
+        * partial overlapping surfaces. E.g. 0.4 will use 40 percent
         * of the point set. To enable the trimmed version a
         * factor > 0 and < 1 must be set. The default value is 0.0.
         */
@@ -297,7 +297,7 @@ namespace mitk
       * This method executes the algorithm.
       *
       * @warning The algorithm is only a simple calculation filter and can not be
-      * used in a mitk filter pipline.
+      * used in a mitk filter pipeline.
       *
       * @throws Exception if the search radius was doubled more than 20 times to
       * prevent endless loops. Re-run the with a different search radius that

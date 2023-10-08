@@ -51,7 +51,7 @@ namespace mitk {
     std::vector<std::string> GetFileContentLineByLine(std::string filename);
 
     /**
-     * /brief Calculates the Number of Tools based on the number of colums per line.
+     * /brief Calculates the Number of Tools based on the number of columns per line.
      */
     int getNumberOfToolsInLine(std::string line);
 
@@ -66,7 +66,7 @@ namespace mitk {
     double StringToDouble( const std::string& s );
 
     /**
-     * /brief Split line in elemens based on a given delim
+     * /brief Split line in elements based on a given delim
      */
     std::vector<std::string> splitLine(std::string line);
 

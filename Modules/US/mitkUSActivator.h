@@ -38,7 +38,7 @@ public:
   ~USActivator() override;
 
   /**
-    * \brief The mitk::USVideoDevice obejcts are loaded from hard disk and registered into micro service.
+    * \brief The mitk::USVideoDevice objects are loaded from hard disk and registered into micro service.
     */
   void Load(us::ModuleContext* context) override;
 

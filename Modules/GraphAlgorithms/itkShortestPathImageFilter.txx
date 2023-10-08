@@ -460,7 +460,7 @@ namespace itk
     m_Nodes[m_Graph_StartNode].distance = 0;
     m_Nodes[m_Graph_StartNode].distAndEst = 0;
 
-    // initalize cost function
+    // initialize cost function
     m_CostFunction->Initialize();
   }
 
@@ -719,7 +719,7 @@ namespace itk
       // Create ShortestPathImage (Output 0)
       for (shortestPathImageIt.GoToBegin(); !shortestPathImageIt.IsAtEnd(); ++shortestPathImageIt)
       {
-        // First intialize with background color
+        // First initialize with background color
         shortestPathImageIt.Set(BACKGROUND);
       }
 
@@ -731,7 +731,7 @@ namespace itk
           shortestPathImageIt.Set(FOREGROUND);
         }
       }
-      else // multiple pathes has been calculated, draw all
+      else // multiple paths has been calculated, draw all
       {
         for (unsigned int i = 0; i < m_MultipleVectorPaths.size(); i++)
         {
@@ -760,7 +760,7 @@ namespace itk
     // MITK_INFO << "GetVectorOrderImage";
     for (vectorOrderImageIt.GoToBegin(); !vectorOrderImageIt.IsAtEnd(); ++vectorOrderImageIt)
     {
-      // First intialize with background color
+      // First initialize with background color
       vectorOrderImageIt.Value() = BACKGROUND;
     }
     for (int i = 0; i < m_VectorOrder.size(); i++)
@@ -836,7 +836,7 @@ namespace itk
       // reverse it
       std::reverse(m_VectorPath.begin(), m_VectorPath.end());
     }
-    // Multiple end end points and pathes
+    // Multiple end end points and paths
     else
     {
       for (unsigned int i = 0; i < m_endPointsClosed.size(); i++)
@@ -876,7 +876,7 @@ namespace itk
     // Build Graph
     InitGraph();
 
-    // Calc Shortest Parth
+    // Calc Shortest Path
     StartShortestPathSearch();
 
     // Fill Shortest Path

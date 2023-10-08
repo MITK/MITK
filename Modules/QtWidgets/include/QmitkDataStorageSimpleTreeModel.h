@@ -94,7 +94,7 @@ private:
   TreeItem *m_Root;
 
   /**helper structure to check, if a tree item is really part of the model.
-  Prefered over iterating over the tree by hand because we can use std::find.*/
+  Preferred over iterating over the tree by hand because we can use std::find.*/
   std::list<const TreeItem*> m_TreeItems;
 };
 

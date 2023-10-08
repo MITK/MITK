@@ -48,7 +48,7 @@ Finally, we apply the new position of the tracked object (source->GetOutput) to 
 
 \snippet mitkIGTTutorialStep2.cpp Calculate Transform
 
-The red cylinder is now moved accodring to the tracked transform.
+The red cylinder is now moved according to the tracked transform.
 
 Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
 

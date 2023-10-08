@@ -65,7 +65,7 @@ namespace mitk {
   * To achieve this, call SetCalibration, and make sure that the subclass also calls apply
   * transformation at some point (The USDevice does not automatically apply the transformation to the image)
   *
-  * Note that USDevices will be removed from micro servive when their
+  * Note that USDevices will be removed from micro service when their
   * destructor is called. Registering into micro service is done when
   * mitk::USDevice::Initialize() is called.
   *
@@ -102,7 +102,7 @@ namespace mitk {
       const std::string US_PROPKEY_MANUFACTURER;
       const std::string US_PROPKEY_NAME;
       const std::string US_PROPKEY_COMMENT;
-      const std::string US_PROPKEY_LABEL;        // Human readable text represntation of this device
+      const std::string US_PROPKEY_LABEL;        // Human readable text representation of this device
       const std::string US_PROPKEY_ISCONNECTED;  // Whether this device is connected or not.
       const std::string US_PROPKEY_ISACTIVE;     // Whether this device is active or not.
       const std::string US_PROPKEY_CLASS;        // Class Name of this Object
@@ -199,7 +199,7 @@ namespace mitk {
     *  0. Check if the device is already connected. If yes, return true anyway, but don't do anything.
     *  1. Call OnConnection() Here, a device should establish it's connection with the hardware Afterwards, it should be ready to start transmitting images at any time.
     *  2. If OnConnection() returns true ("successful"), then the device is registered with the service.
-    *  3. if not, it the method itself returns false or may throw an expection, depeneding on the device implementation.
+    *  3. if not, it the method itself returns false or may throw an exception, depending on the device implementation.
     *
     */
     bool Connect();

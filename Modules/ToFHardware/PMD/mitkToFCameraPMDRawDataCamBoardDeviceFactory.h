@@ -32,7 +32,7 @@ namespace mitk
   /**
   * \brief ToFPMDRawPlayerDeviceFactory is an implementation of the factory pattern to generate Raw Player Devices.
   * ToFPMDRawPlayerDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
-  * This offers users the oppertunity to generate new Raw Player Devices via a global instance of this factory.
+  * This offers users the opportunity to generate new Raw Player Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
 

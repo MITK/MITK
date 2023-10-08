@@ -31,7 +31,7 @@ namespace mitk
   /**
   * \brief KinectDeviceFactory is an implementation of the factory pattern to generate Microsoft Kinect devices.
   * KinectDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
-  * This offers users the oppertunity to generate new KinectDevices via a global instance of this factory.
+  * This offers users the opportunity to generate new KinectDevices via a global instance of this factory.
   * @ingroup ToFHardware
   */
   class MITKKINECT_EXPORT KinectDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
@@ -39,7 +39,7 @@ namespace mitk
   public:
 
     /**
-     * @brief KinectDeviceFactory Default contructor.
+     * @brief KinectDeviceFactory Default constructor.
      * This factory internally counts all kinect devices starting at 1.
      */
     KinectDeviceFactory()

@@ -55,7 +55,7 @@ namespace mitk {
     * \brief creates a new instance of mitkTimeStamp
     *
     * This method  returns a pointer to the currently existing TimeStamp.
-    * If there is no exisiting instance, a new one is created and returned automatically
+    * If there is no existing instance, a new one is created and returned automatically
     *
     * DECREPATED: Use GetInstance instead
     */
@@ -65,7 +65,7 @@ namespace mitk {
     * \brief returns a pointer to the current instance of mitkTimeStamp
     *
     * This method  returns a pointer to the currently existing TimeStamp.
-    * If there is no exisiting instance, a new one is created and returned automatically
+    * If there is no existing instance, a new one is created and returned automatically
     */
     static IGTTimeStamp* GetInstance();
 
@@ -76,7 +76,7 @@ namespace mitk {
     * The current time is saved as a reference-value (m_Time = 0).
     * Internally the device (pointer) and its offset are saved in a map, so that
     * no device can call this method twice.
-    * If the user has not set its own RealTimeClock, a default one is created dependant on the OS
+    * If the user has not set its own RealTimeClock, a default one is created dependent on the OS
     * in use.
     *
     */
@@ -119,7 +119,7 @@ namespace mitk {
     *  reference-time in ms
     *
     * Device 'A' is the first device to call Start(). Device 'B' calls Start()
-    * some time later. This time-difference is the offset, that each device has realtive to the
+    * some time later. This time-difference is the offset, that each device has relative to the
     * device that started the time-acquisition.
     * Each device's offset is stored in a map with a pointer to the device.
     *
@@ -141,7 +141,7 @@ namespace mitk {
     *
     * Right now, none of these RealTimeClocks have been implemented!!
     *
-    * Notice: The mitk-implementation of an os-dependant RealTimeClock is used
+    * Notice: The mitk-implementation of an os-dependent RealTimeClock is used
     * by default.
     */
     void SetRealTimeClock(mitk::RealTimeClock::Pointer Clock);
@@ -149,7 +149,7 @@ namespace mitk {
     /**
     * \brief creates a new RealTimeClock
     *
-    * Instanciates a new RealTimeClock, that will be specific for the Operating System.
+    * Instantiates a new RealTimeClock, that will be specific for the Operating System.
     * This will only be called internally when no other RealTimeClock has been set
     * by the user.
     *

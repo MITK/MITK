@@ -147,7 +147,7 @@ private:
 
   mutable OclContextCollection* m_ContextCollection;
 
-  /** Map containing all available (allready compiled) OpenCL Programs */
+  /** Map containing all available (already compiled) OpenCL Programs */
   ProgramMapType m_ProgramStorage;
   /** mutex for manipulating the program storage */
   itk::FastMutexLock::Pointer m_ProgramStorageMutex;

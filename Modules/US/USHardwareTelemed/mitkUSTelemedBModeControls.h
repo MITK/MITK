@@ -75,7 +75,7 @@ namespace mitk {
     virtual double GetScanningDynamicRangeTick( );
 
     /**
-      * \brief Setter for the IUsgDataView necesary for communicating with the Telemed API.
+      * \brief Setter for the IUsgDataView necessary for communicating with the Telemed API.
       * This method is just for internal use of the mitk::USTelemedDevice.
       */
     void SetUsgDataView( Usgfw2Lib::IUsgDataView* );
@@ -91,7 +91,7 @@ namespace mitk {
 
     double GetScanningFrequencyAPI( );
 
-    Usgfw2Lib::IUsgDataView*             m_UsgDataView;         // main SDK object for comminucating with the Telemed API
+    Usgfw2Lib::IUsgDataView*             m_UsgDataView;         // main SDK object for communicating with the Telemed API
     Usgfw2Lib::IUsgPower*                m_PowerControl;        // control for scanning power
     Usgfw2Lib::IUsgProbeFrequency2*      m_FrequencyControl;    // control for scanning frequency
     Usgfw2Lib::IUsgDepth*                m_DepthControl;        // control for B mode scanning depth

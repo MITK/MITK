@@ -330,7 +330,7 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
           auto label = item->GetLabel();
 
           if (nullptr == label)
-            mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is refering to a label that does not exist.";
+            mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is referring to a label that does not exist.";
 
           QString name = QString::fromStdString(label->GetName());
 
@@ -345,7 +345,7 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
           auto label = item->GetLabel();
 
           if (nullptr == label)
-            mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is refering to a label that does not exist.";
+            mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is referring to a label that does not exist.";
 
           return QVariant(QString::fromStdString(label->GetName()) + QString(" [%1]").arg(item->GetLabelValue()));
         }
@@ -866,7 +866,7 @@ void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
     else
     {
       if (instanceItem->ParentItem()->m_childItems.size() < 3)
-      { //second instance item was added, so label item will now able to colapse
+      { //second instance item was added, so label item will now able to collapse
         // -> the whole label node has to be updated.
         auto labelIndex = GetIndexByItem(instanceItem->ParentItem(), this);
         emit dataChanged(labelIndex, labelIndex);
@@ -897,7 +897,7 @@ void QmitkMultiLabelTreeModel::OnLabelModified(LabelValueType labelValue)
 
   if (nullptr == instanceItem)
   {
-    mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel recieved a LabelModified signal for a label that is not represented in the model. Invalid label: " << labelValue;
+    mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel received a LabelModified signal for a label that is not represented in the model. Invalid label: " << labelValue;
   }
 
   auto labelItem = instanceItem->ParentItem();
@@ -920,7 +920,7 @@ void QmitkMultiLabelTreeModel::OnLabelRemoved(LabelValueType labelValue)
   if (labelValue == mitk::LabelSetImage::UnlabeledValue) return;
   auto instanceItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
-  if (nullptr == instanceItem) mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel recieved a LabelRemoved signal for a label that is not represented in the model. Invalid label: " << labelValue;
+  if (nullptr == instanceItem) mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel received a LabelRemoved signal for a label that is not represented in the model. Invalid label: " << labelValue;
 
   auto labelItem = instanceItem->ParentItem();
 

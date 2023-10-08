@@ -64,7 +64,7 @@ public:
   /**
    * \brief SetDatabaseDirectory sets database directory.
    *
-   * \param newDatabaseDirectory contains path to new database directoy.
+   * \param newDatabaseDirectory contains path to new database directory.
    */
   void SetDatabaseDirectory(QString newDatabaseDirectory);
 

@@ -52,7 +52,7 @@ namespace mitk
       * Constructs mitk::USTelemedProbe object with given API objects.
       *
       * \param probe API probe object which should be represented by the constructed object
-      * \param dataView API data view object conected to this probe object
+      * \param dataView API data view object connected to this probe object
       */
     USTelemedProbe(Usgfw2Lib::IProbe* probe, Usgfw2Lib::IUsgDataView* dataView);
     virtual ~USTelemedProbe();

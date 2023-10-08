@@ -33,7 +33,7 @@ mitk::SegmentationTaskList::SegmentationTaskList()
 {
   // A base data cannot be serialized if empty. To be not considered empty its
   // geometry must consist of at least one time step. However, a segmentation
-  // task would then appear as invisible spacial object in a scene. This can
+  // task would then appear as invisible spatial object in a scene. This can
   // be prevented by excluding it from the scene's bounding box calculations.
   this->GetTimeGeometry()->Expand(1);
   this->SetProperty("includeInBoundingBox", BoolProperty::New(false));

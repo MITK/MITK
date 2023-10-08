@@ -25,7 +25,7 @@ namespace mitk
   /**
   * \brief ToFCameraPMDO3DeviceFactory is an implementation of the factory pattern to generate Do3 Devices.
   * ToFPMDCamCubeDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
-  * This offers users the oppertunity to generate new Cam Cube Devices via a global instance of this factory.
+  * This offers users the opportunity to generate new Cam Cube Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
 

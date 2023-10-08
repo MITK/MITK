@@ -70,7 +70,7 @@ void mitk::USCombinedModality::GenerateData()
       m_Calibrations.find(calibrationKey);
     if (calibrationIterator != m_Calibrations.end())
     {
-      // transform image according to callibration if one is set
+      // transform image according to calibration if one is set
       // for current configuration of probe and depth
       this->GetOutput()->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
     }

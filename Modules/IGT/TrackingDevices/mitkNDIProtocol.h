@@ -99,7 +99,7 @@ namespace mitk
     typedef mitk::SerialCommunication::HardwareHandshake HardwareHandshake; ///< Hardware handshake mode of the serial connection
     typedef mitk::NDIPassiveTool::TrackingPriority TrackingPriority; ///< Tracking priority used for tracking a tool
     /**
-    * \brief Gives information about the tool which is assosiated with the port handle. Writes portInfo to the string.
+    * \brief Gives information about the tool which is associated with the port handle. Writes portInfo to the string.
     */
     NDIErrorCode APIREV(std::string* revision);
     NDIErrorCode PHINF(std::string portHandle, std::string* portInfo);

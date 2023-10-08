@@ -43,7 +43,7 @@ namespace mitk
     std::string featureClass;
     /**ID for the setting that is represented by parameters and is specified by the feature class while calculating the features. It must be as unique as the parameters themself.*/
     std::string settingID;
-    /**Alternative name that containes the legacy naming of the feature that encodes the parametersetting directly in the string.*/
+    /**Alternative name that contains the legacy naming of the feature that encodes the parametersetting directly in the string.*/
     std::string legacyName;
     /**Version of the feature definition*/
     std::string version = "1";
@@ -55,7 +55,7 @@ namespace mitk
     bool operator ==(const FeatureID& rh) const;
   };
 
-  /**Helper that takes a pass templateID clones it and populates it with the also passed informations befor returning it.
+  /**Helper that takes a pass templateID clones it and populates it with the also passed informations before returning it.
    * @param templateID reference ID that should be cloned.
    * @param name Name of the feature.*/
   MITKCLCORE_EXPORT FeatureID CreateFeatureID(FeatureID templateID, std::string name);
@@ -66,12 +66,12 @@ namespace mitk
   * ## Histogram Configuration ##
   * Most Feature Generation Classes that use histograms use the same parameters and
   * initialization logic. In general, all information can be passed either by the corresponding
-  * Setter (which does not differenciate between global setting and feature specific setting) and
+  * Setter (which does not differentiate between global setting and feature specific setting) and
   * a parameter object which can be obtained from the command line arguments, for example.
   *
-  * If the image values are used for the initializiation of the histogram, it can be defined
+  * If the image values are used for the initialization of the histogram, it can be defined
   * whether the whole image is used or only the masked areas to find minima and maxima. This is
-  * done by the option <b>SetIgnoreMask</b> or the corrsponding options
+  * done by the option <b>SetIgnoreMask</b> or the corresponding options
   * <b>-%NAME::ignore-mask-for-histogram</b> and <b>-ignore-mask-for-histogram</b>. If these are
   * true, the whole image is used for the calculation.
   *
@@ -113,11 +113,11 @@ namespace mitk
   * ### Remark about command line parameter####
   * There are generally two options to set a parameter via the command line. A global one that works for
   * all filters that use histograms and a local one that set this parameter specific for this filter. The
-  * local parameters start with the filter name (Indiciated by NAME) followed by two colons, for example
+  * local parameters start with the filter name (Indicated by NAME) followed by two colons, for example
   * <b>vol::min</b> to set the minimum intensity for the volume filter. The global parameter is overwritten
   * by the local parameter, if it is specified. Otherwise, it is still valid. If this prevents the specification
   * of an histogram initialization method (for example, because the binsize is globally specified but the histogram
-  * should be initialized using a fixed numbe of bins), the parameter <b>NAME::ignore-global-histogram</b> can be passed.
+  * should be initialized using a fixed number of bins), the parameter <b>NAME::ignore-global-histogram</b> can be passed.
   * Then, all global histogram parameters are ignored and only local ones are used.
   *
   * The maximum intensity can be set by different command line parameters: global for all filters that use histograms
@@ -143,9 +143,9 @@ namespace mitk
   * the Quantifier object. In order to use this object correctly, the AddArguments-Function should
   * contain the line <b>AddQuantifierArguments(parser);</b>, the CalculateFeaturesUsingParameters function
   * should contain the line <b>InitializeQuantifierFromParameters(feature, mask);</b> and the CalculateFeatures function
-  * sould contain the line <b>InitializeQuantifier(image, mask);</b>. These function
+  * should contain the line <b>InitializeQuantifier(image, mask);</b>. These function
   * calls ensure that the necessary options are given to the configuration file, and that the initialization
-  * of the quantifier is done correctly. This ensures an consistend behavior over all FeatureGeneration Classes.
+  * of the quantifier is done correctly. This ensures a consistent behavior over all FeatureGeneration Classes.
   *
   */
 class MITKCLCORE_EXPORT AbstractGlobalImageFeature : public BaseData
@@ -157,29 +157,29 @@ public:
   using ParametersType = FeatureID::ParametersType;
 
   /**
-  * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
+  * \brief Calculates the feature of this abstract interface. Does not necessarily considers the parameter settings.
   */
   FeatureListType CalculateFeatures(const Image* image, const Image* mask);
   virtual FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) = 0;
 
   /**
-  * \brief Calculates the given feature Slice-wise. Might not be availble for an individual filter!
+  * \brief Calculates the given feature Slice-wise. Might not be available for an individual filter!
   */
   FeatureListType CalculateFeaturesSlicewise(const Image::Pointer & image, const Image::Pointer &mask, int sliceID);
 
   /**
-  * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
+  * \brief Calculates the feature of this abstract interface. Does not necessarily considers the parameter settings.
   */
   virtual void CalculateAndAppendFeaturesSliceWise(const Image::Pointer & image, const Image::Pointer &mask, int sliceID, FeatureListType &featureList, bool checkParameterActivation = true);
 
   /**
-  * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
+  * \brief Calculates the feature of this abstract interface. Does not necessarily considers the parameter settings.
   * @param image
   * @param mask
   * @param maskNoNaN
   * @param featureList
   * @param checkParameterActivation Indicates if the features should only be calculated and added if the FeatureClass is activated in the parameters.
-  * True: only append if activated in the parametes. False: always and append it.
+  * True: only append if activated in the parameters. False: always and append it.
   */
   void CalculateAndAppendFeatures(const Image* image, const Image* mask, const Image* maskNoNaN, FeatureListType &featureList, bool checkParameterActivation = true);
 

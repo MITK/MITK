@@ -70,7 +70,7 @@ std::vector<mitk::USDevice::Pointer> mitk::USDevicePersistence::RestoreLastDevic
     }
     catch (...)
     {
-      MITK_ERROR << "Error occured while loading a USVideoDevice from persistence. Device assumed corrupt, will be deleted.";
+      MITK_ERROR << "Error occurred while loading a USVideoDevice from persistence. Device assumed corrupt, will be deleted.";
       //QMessageBox::warning(nullptr, "Could not load device" ,"A stored ultrasound device is corrupted and could not be loaded. The device will be deleted.");
     }
   }
@@ -320,8 +320,8 @@ double mitk::USDevicePersistence::spacingToDouble(std::string s)
   double x;
   if (!(i >> x))
   {
-    //something went wrong because the string contains characters which can not be convertet into double
-    mitkThrow() << "An error occured while trying to recover the spacing.";
+    //something went wrong because the string contains characters which can not be converted into double
+    mitkThrow() << "An error occurred while trying to recover the spacing.";
   }
   return x;
 }
@@ -332,8 +332,8 @@ int mitk::USDevicePersistence::depthToInt(std::string s)
   int x;
   if (!(i >> x))
   {
-    //something went wrong because the string contains characters which can not be convertet into int
-    mitkThrow() << "An error occured while trying to recover the scanning depth. " << s << " is not a valid scanning depth. ";
+    //something went wrong because the string contains characters which can not be converted into int
+    mitkThrow() << "An error occurred while trying to recover the scanning depth. " << s << " is not a valid scanning depth. ";
   }
   return x;
 }

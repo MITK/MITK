@@ -125,8 +125,8 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QWi
 
  signals:
     /**
-    * \brief used for thread seperation, the worker thread must not call AdaptGUIToState directly.
-    * QT signals are thread safe and seperate the threads
+    * \brief used for thread separation, the worker thread must not call AdaptGUIToState directly.
+    * QT signals are thread safe and separate the threads
     */
     void AdaptGUIToStateSignal();
 

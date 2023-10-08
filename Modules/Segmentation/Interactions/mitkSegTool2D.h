@@ -57,7 +57,7 @@ namespace mitk
     mitkClassMacro(SegTool2D, Tool);
 
     /**
-      \brief Calculates for a given Image and PlaneGeometry, which slice of the image (in index corrdinates) is meant by
+      \brief Calculates for a given Image and PlaneGeometry, which slice of the image (in index coordinates) is meant by
       the plane.
 
       \return false, if no slice direction seems right (e.g. rotated planes)
@@ -102,7 +102,7 @@ namespace mitk
     *
     * \param planeGeometry Geometry defining the slice that should be cut out.
     * \param image Image that should be sliced
-    * \param timeStep TimeStep of the image that shold be sliced
+    * \param timeStep TimeStep of the image that should be sliced
     * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
     *
     * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem
@@ -238,10 +238,10 @@ namespace mitk
 
     /** Writes the provided source slice into the target slice with the given pixel value.
      * If passed workingImage is a LabelSetImage the label set rules will be applied when
-     * writing all non zero source pixels into the target slice (e.g. locked lables will not be touched)
+     * writing all non zero source pixels into the target slice (e.g. locked labels will not be touched)
      * with the given paintingPixelValue.
      * @param targetSlice Pointer to the slice that should be filled with the content of the sourceSlice.
-     * @param sourceSlice Pointer to the slice that is the source/preview every pixel will be (tried to be) transfered .
+     * @param sourceSlice Pointer to the slice that is the source/preview every pixel will be (tried to be) transferred .
      * @param workingImage Will be used to check if LabeSetImageRules have to be applied and the label set state.
      * @param paintingPixelValue Value that will be used to paint onto target slice.
      * @pre targetSlice must point to a valid instance.
@@ -251,10 +251,10 @@ namespace mitk
       Image *targetSlice, const Image *sourceSlice, const Image *workingImage, int paintingPixelValue);
 
     /** Writes a provided slice into the passed working image. The content of working image that is covered
-    * by the slice will be completly overwritten. If asked for it also generates the needed
+    * by the slice will be completely overwritten. If asked for it also generates the needed
     * undo/redo steps.
     * @param workingImage Pointer to the image that is the target of the write operation.
-    * @param sliceInfo SliceInfo instance that containes the slice image, the defining plane geometry and time step.
+    * @param sliceInfo SliceInfo instance that contains the slice image, the defining plane geometry and time step.
     * @param allowUndo Indicates if undo/redo operations should be registered for the write operation
     * performed by this call. true: undo/redo will be generated; false: no undo/redo will be generated, so
     * this operation cannot be revoked by the user.

@@ -28,7 +28,7 @@ namespace mitk
   * F2i = Ci
   * F2i+1 = -1/16Ci-1 + 9/16Ci + 9/16Ci+1 - 1/16Ci+2
   *
-  * The number of interpolation iterations can be set via SetNumberOfIterations(int) which are 4 by dafault.
+  * The number of interpolation iterations can be set via SetNumberOfIterations(int) which are 4 by default.
   *
   * @ingroup MitkContourModelModule
   */

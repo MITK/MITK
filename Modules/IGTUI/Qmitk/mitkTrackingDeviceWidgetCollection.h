@@ -26,7 +26,7 @@ found in the LICENSE file.
 namespace mitk {
   /** Documentation:
   *   \brief This class is a collection for all TrackingDeviceWidgets (derived from AbstractTrackingDeviceWidget)
-  *   The Collection is avaiable via Microservice.
+  *   The Collection is available via Microservice.
   *   If you want to add your own tracking device to the Tracking Toolbox, you should register your widget configuring your device
   *   to this collection using the RegisterTrackingDeviceWidget function.
   *   \ingroup IGTUI

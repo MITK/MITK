@@ -104,7 +104,7 @@ namespace mitk
     PlaneProposer &operator=(const PlaneProposer &); // not implemented on purpose
 
     /**
-     * @brief Creates a plane suggestion based on the cluster centriods
+     * @brief Creates a plane suggestion based on the cluster centroids
      */
     PlaneInfo CreatePlaneByCentroids(const std::vector<std::pair<int, int>> &sizeIDs,
                                      const std::vector<std::pair<double, int>> &avgDistances);

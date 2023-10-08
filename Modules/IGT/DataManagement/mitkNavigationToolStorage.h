@@ -41,7 +41,7 @@ namespace mitk {
   public:
     mitkClassMacroItkParent(NavigationToolStorage,itk::Object);
     /** @brief Constructs a NavigationToolStorage without reference to a DataStorage. The Data Nodes of tools have to be added and removed to a data storage outside this class.
-     *         Normaly the other constructor should be used.
+     *         Normally the other constructor should be used.
      */
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self)
@@ -108,7 +108,7 @@ namespace mitk {
     mitk::NavigationTool::Pointer GetToolByName(std::string name);
 
     /** Assigns the given number to the tool with the given identifier. This means the tool is swapped with another tool in the internal tool vector.
-     *  @return Returns true if the assignment was successfull. Returns false if assignment is not possible, e.g. because the identifier does not exist or if the given number is not available.
+     *  @return Returns true if the assignment was successful. Returns false if assignment is not possible, e.g. because the identifier does not exist or if the given number is not available.
      **/
     bool AssignToolNumber(std::string identifier1, int number2);
 
@@ -161,7 +161,7 @@ namespace mitk {
     std::string GetSourceID() const;
 
     /** Locks the storage. A logged storage may not be modified.
-     *  If a method tries to modify the storage anyway a waring message is given.
+     *  If a method tries to modify the storage anyway a warning message is given.
      *  The storage is unlocked by default. A Storage might be locked when a
      *  tracking device is active and needs the storage to stay consistent.
      */

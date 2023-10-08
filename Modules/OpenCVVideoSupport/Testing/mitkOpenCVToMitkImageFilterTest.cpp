@@ -24,7 +24,7 @@ found in the LICENSE file.
 /** Documentation
 *
 * @brief Objects of this class can start an internal thread by calling the Start() method.
-*        The thread is then updateing the tested object until the method Stop() is called. The class
+*        The thread is then updating the tested object until the method Stop() is called. The class
 *        can be used to test if a filter is thread-save by using multiple objects and let
 *        them update simuntanously.
 */

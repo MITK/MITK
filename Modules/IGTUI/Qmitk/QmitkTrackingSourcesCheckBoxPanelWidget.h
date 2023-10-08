@@ -77,7 +77,7 @@ public:
   void SetActionPerformButtonCheckable(bool checkable);
 
   /**
-  \brief Hides or shows the action perfom button.
+  \brief Hides or shows the action perform button.
   */
   void HideActionPerformButton(bool hide);
 
@@ -97,7 +97,7 @@ public:
   void DeselectAll();
 
   /**
-  \brief Selets the checkbox at the given position.
+  \brief Selects the checkbox at the given position.
   */
   void SelectCheckbox(unsigned int idx);
 
@@ -124,9 +124,9 @@ public:
 signals:
   void Selected(int id); /// when a checkbox is selected
   void Deselected(int id); /// when a checkbox is deselected
-  void PerformAction(); /// when action perfom button is pressed
+  void PerformAction(); /// when action perform button is pressed
   void StopAction();  /// when action perform button is released
-  void Action(); /// when action perfom button is clicked
+  void Action(); /// when action perform button is clicked
 
 public slots:
   void ClearPanel(); /// clearing checkboxes from panel

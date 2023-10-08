@@ -44,7 +44,7 @@ public Q_SLOTS:
   /** Set the widget into an optional mode. Optional means that the selection of no valid
   node does not mean an invalid state. Thus no node is a valid "node" selection too.
   The state influences if the info text is handled as an information (optional) or a
-  warning (optiona==false).*/
+  warning (optional==false).*/
   void SetSelectionIsOptional(bool isOptional);
 
 protected:

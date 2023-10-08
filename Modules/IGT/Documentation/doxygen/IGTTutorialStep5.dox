@@ -47,7 +47,7 @@ That's why we use thread workers
 ...which are connected to functions
 \snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 3
 
-The thread will be startet, if we connect a tracking device by pushing the connect button or start tracking etc:
+The thread will be started, if we connect a tracking device by pushing the connect button or start tracking etc:
 \snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 4
 
 ...and finished afterwards:

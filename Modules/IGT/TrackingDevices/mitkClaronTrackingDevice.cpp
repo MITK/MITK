@@ -215,7 +215,7 @@ void mitk::ClaronTrackingDevice::TrackTools()
 {
   try
   {
-    /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
+    /* lock the TrackingFinishedMutex to signal that the execution rights are now transferred to the tracking thread */
     std::lock_guard<std::mutex> trackingFinishedLockHolder(m_TrackingFinishedMutex); // keep lock until end of scope
 
     bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here

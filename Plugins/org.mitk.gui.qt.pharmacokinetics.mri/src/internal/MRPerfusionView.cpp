@@ -30,8 +30,6 @@ found in the LICENSE file.
 #include <mitkStandardToftsModelParameterizer.h>
 #include "mitkTwoCompartmentExchangeModelFactory.h"
 #include "mitkTwoCompartmentExchangeModelParameterizer.h"
-#include "mitkNumericTwoCompartmentExchangeModelFactory.h"
-#include "mitkNumericTwoCompartmentExchangeModelParameterizer.h"
 #include <mitkInitialParameterizationDelegateBase.h>
 
 #include <mitkNodePredicateAnd.h>
@@ -252,17 +250,12 @@ void MRPerfusionView::UpdateGUIControls()
                          dynamic_cast<mitk::ExtendedToftsModelFactory*>
                                   (m_selectedModelFactory.GetPointer()) != nullptr;
   bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>
-                       (m_selectedModelFactory.GetPointer()) != nullptr ||
-                       dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
                        (m_selectedModelFactory.GetPointer()) != nullptr;
 
-  bool isNum2CXMFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
-                          (m_selectedModelFactory.GetPointer()) != nullptr;
 
 
   m_Controls.groupAIF->setVisible(isToftsFactory || is2CXMFactory);
   m_Controls.groupDescBrix->setVisible(isDescBrixFactory);
-  m_Controls.groupNum2CXM->setVisible(isNum2CXMFactory);
   m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory );
 
   m_Controls.groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
@@ -373,8 +366,6 @@ void MRPerfusionView::OnModellingButtonClicked()
                           (m_selectedModelFactory.GetPointer()) != nullptr;
     bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>
                          (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool isNum2CXMFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
-                            (m_selectedModelFactory.GetPointer()) != nullptr;
 
     if (isDescBrixFactory)
     {
@@ -418,19 +409,6 @@ void MRPerfusionView::OnModellingButtonClicked()
       else
       {
         GenerateAIFbasedModelFit_ROIBased<mitk::TwoCompartmentExchangeModelParameterizer>(fitSession, generator);
-      }
-    }
-    else if (isNum2CXMFactory)
-    {
-      if (this->m_Controls.radioPixelBased->isChecked())
-      {
-        GenerateAIFbasedModelFit_PixelBased<mitk::NumericTwoCompartmentExchangeModelParameterizer>(fitSession,
-            generator);
-      }
-      else
-      {
-        GenerateAIFbasedModelFit_ROIBased<mitk::NumericTwoCompartmentExchangeModelParameterizer>(fitSession,
-            generator);
       }
     }
 
@@ -542,15 +520,13 @@ bool MRPerfusionView::CheckModelSettings() const
                           (m_selectedModelFactory.GetPointer()) != nullptr;
     bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>
                          (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool isNum2CXMFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
-                            (m_selectedModelFactory.GetPointer()) != nullptr;
 
     if (isDescBrixFactory)
     {
       //if all static parameters for this model are set, exit with true, Otherwise exit with false
       ok = m_Controls.injectiontime->value() > 0;
     }
-    else if (isToftsFactory || is2CXMFactory || isNum2CXMFactory)
+    else if (isToftsFactory || is2CXMFactory)
     {
       if (this->m_Controls.radioAIFImage->isChecked())
       {
@@ -600,11 +576,6 @@ bool MRPerfusionView::CheckModelSettings() const
       else
       {
         ok = false;
-      }
-
-      if (isNum2CXMFactory)
-      {
-        ok = ok && (this->m_Controls.odeStepSize->value() > 0);
       }
 
     }
@@ -858,14 +829,6 @@ void MRPerfusionView::GenerateAIFbasedModelFit_PixelBased(mitk::modelFit::ModelF
 
   this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
 
-  mitk::NumericTwoCompartmentExchangeModelParameterizer* numTCXParametrizer =
-    dynamic_cast<mitk::NumericTwoCompartmentExchangeModelParameterizer*>
-    (modelParameterizer.GetPointer());
-
-  if (numTCXParametrizer)
-  {
-    numTCXParametrizer->SetODEINTStepSize(this->m_Controls.odeStepSize->value());
-  }
 
   //Specify fitting strategy and criterion parameters
   mitk::ModelFitFunctorBase::Pointer fitFunctor = CreateDefaultFitFunctor(modelParameterizer);
@@ -928,14 +891,6 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
 
   this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
 
-  mitk::NumericTwoCompartmentExchangeModelParameterizer* numTCXParametrizer =
-    dynamic_cast<mitk::NumericTwoCompartmentExchangeModelParameterizer*>
-    (modelParameterizer.GetPointer());
-
-  if (numTCXParametrizer)
-  {
-    numTCXParametrizer->SetODEINTStepSize(this->m_Controls.odeStepSize->value());
-  }
 
   //Compute ROI signal
   mitk::MaskedDynamicImageStatisticsGenerator::Pointer signalGenerator =
@@ -1036,8 +991,6 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
   factory = mitk::ExtendedToftsModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
   factory = mitk::TwoCompartmentExchangeModelFactory::New().GetPointer();
-  m_FactoryStack.push_back(factory);
-  factory = mitk::NumericTwoCompartmentExchangeModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
 
   mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");

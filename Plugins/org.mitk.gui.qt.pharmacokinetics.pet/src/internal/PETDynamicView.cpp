@@ -25,9 +25,6 @@ found in the LICENSE file.
 #include "mitkTwoTissueCompartmentFDGModelParameterizer.h"
 #include "mitkTwoTissueCompartmentModelFactory.h"
 #include "mitkTwoTissueCompartmentModelParameterizer.h"
-#include "mitkNumericTwoTissueCompartmentModelFactory.h"
-#include "mitkNumericTwoTissueCompartmentModelParameterizer.h"
-
 
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
@@ -176,8 +173,6 @@ void PETDynamicView::UpdateGUIControls()
                         (m_selectedModelFactory.GetPointer()) != nullptr;
 
   bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>
-                       (m_selectedModelFactory.GetPointer()) != nullptr ||
-                       dynamic_cast<mitk::NumericTwoTissueCompartmentModelFactory*>
                        (m_selectedModelFactory.GetPointer()) != nullptr;
 
 
@@ -294,8 +289,6 @@ void PETDynamicView::OnModellingButtonClicked()
 
     bool isTTCFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>
                         (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool isNumTTCFactory = dynamic_cast<mitk::NumericTwoTissueCompartmentModelFactory*>
-                           (m_selectedModelFactory.GetPointer()) != nullptr;
 
 
     if (isOTCFactory)
@@ -346,19 +339,6 @@ void PETDynamicView::OnModellingButtonClicked()
       }
     }
 
-    else if (isNumTTCFactory)
-    {
-      if (this->m_Controls.radioPixelBased->isChecked())
-      {
-        GenerateModelFit_PixelBased<mitk::NumericTwoTissueCompartmentModelParameterizer>(fitSession,
-            generator);
-      }
-      else
-      {
-        GenerateModelFit_ROIBased<mitk::NumericTwoTissueCompartmentModelParameterizer>(fitSession,
-            generator);
-      }
-    }
 
     //add other models with else if
 
@@ -477,10 +457,8 @@ bool PETDynamicView::CheckModelSettings() const
                         (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isTTCFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>
                         (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool isNumTTCFactory = dynamic_cast<mitk::NumericTwoTissueCompartmentModelFactory*>
-                           (m_selectedModelFactory.GetPointer()) != nullptr;
 
-    if (isOTCFactory || isextOTCFactory || isFDGFactory || isTTCFactory || isNumTTCFactory)
+    if (isOTCFactory || isextOTCFactory || isFDGFactory || isTTCFactory)
     {
         if (this->m_Controls.radioAIFImage->isChecked())
         {
@@ -713,8 +691,7 @@ PETDynamicView::PETDynamicView() : m_FittingInProgress(false)
     m_FactoryStack.push_back(factory);
     factory = mitk::TwoTissueCompartmentFDGModelFactory::New().GetPointer();
     m_FactoryStack.push_back(factory);
-    factory = mitk::NumericTwoTissueCompartmentModelFactory::New().GetPointer();
-    m_FactoryStack.push_back(factory);
+
 
   mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");

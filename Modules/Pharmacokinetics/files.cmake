@@ -39,9 +39,6 @@ set(CPP_FILES
   Models/mitkTwoTissueCompartmentFDGModel.cpp
   Models/mitkTwoTissueCompartmentFDGModelFactory.cpp
   Models/mitkTwoTissueCompartmentFDGModelParameterizer.cpp
-  Models/mitkNumericTwoTissueCompartmentModel.cpp
-  Models/mitkNumericTwoTissueCompartmentModelFactory.cpp
-  Models/mitkNumericTwoTissueCompartmentModelParameterizer.cpp  
   SimulationFramework/mitkImageGenerationHelper.cpp
 )
 

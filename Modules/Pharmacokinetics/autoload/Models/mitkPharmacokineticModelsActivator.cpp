@@ -27,7 +27,6 @@ found in the LICENSE file.
 #include "mitkExtendedOneTissueCompartmentModelFactory.h"
 #include "mitkTwoTissueCompartmentModelFactory.h"
 #include "mitkTwoTissueCompartmentFDGModelFactory.h"
-#include "mitkNumericTwoTissueCompartmentModelFactory.h"
 
 
 namespace mitk
@@ -59,7 +58,6 @@ public:
     RegisterProvider<mitk::ModelFitProviderBase<mitk::ExtendedOneTissueCompartmentModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoTissueCompartmentFDGModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoTissueCompartmentModelFactory> >(context);
-    RegisterProvider<mitk::ModelFitProviderBase<mitk::NumericTwoTissueCompartmentModelFactory> >(context);
   }
 
   void Unload(us::ModuleContext* ) override

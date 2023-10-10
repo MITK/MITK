@@ -21,9 +21,6 @@ set(CPP_FILES
   Models/mitkTwoCompartmentExchangeModel.cpp
   Models/mitkTwoCompartmentExchangeModelFactory.cpp
   Models/mitkTwoCompartmentExchangeModelParameterizer.cpp
-  Models/mitkNumericTwoCompartmentExchangeModel.cpp
-  Models/mitkNumericTwoCompartmentExchangeModelFactory.cpp
-  Models/mitkNumericTwoCompartmentExchangeModelParameterizer.cpp
   Models/mitkExtendedToftsModel.cpp
   Models/mitkExtendedToftsModelFactory.cpp
   Models/mitkExtendedToftsModelParameterizer.cpp

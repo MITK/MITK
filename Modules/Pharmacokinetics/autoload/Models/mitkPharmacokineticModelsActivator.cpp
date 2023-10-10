@@ -21,7 +21,6 @@ found in the LICENSE file.
 #include "mitkExtendedToftsModelFactory.h"
 #include "mitkStandardToftsModelFactory.h"
 #include "mitkTwoCompartmentExchangeModelFactory.h"
-#include "mitkNumericTwoCompartmentExchangeModelFactory.h"
 
 //PET perfusion models
 #include "mitkOneTissueCompartmentModelFactory.h"
@@ -56,7 +55,6 @@ public:
     RegisterProvider<mitk::ModelFitProviderBase<mitk::ExtendedToftsModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::StandardToftsModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoCompartmentExchangeModelFactory> >(context);
-    RegisterProvider<mitk::ModelFitProviderBase<mitk::NumericTwoCompartmentExchangeModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::OneTissueCompartmentModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::ExtendedOneTissueCompartmentModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoTissueCompartmentFDGModelFactory> >(context);

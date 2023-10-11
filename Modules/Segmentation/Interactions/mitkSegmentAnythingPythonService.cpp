@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <filesystem>
 #include <itkImageFileWriter.h>
 #include "mitkImageAccessByItk.h"
+#include <mitkLocaleSwitch.h>
 
 using namespace std::chrono_literals;
 using sys_clock = std::chrono::system_clock;
@@ -249,6 +250,7 @@ void mitk::SegmentAnythingPythonService::ITKWriter(const itk::Image<TPixel, VIma
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::ImageFileWriter<ImageType> WriterType;
   typename WriterType::Pointer writer = WriterType::New();
+  mitk::LocaleSwitch localeSwitch("C");
   writer->SetFileName(outputFilename);
   writer->SetInput(image);
   try

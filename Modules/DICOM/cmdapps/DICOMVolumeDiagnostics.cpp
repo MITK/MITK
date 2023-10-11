@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
       if (check3DPlusT) selector->LoadBuiltIn3DnTConfigs();
 
       nlohmann::json readerInfos;
-      for (const auto reader : selector->GetAllConfiguredReaders())
+      for (const auto& reader : selector->GetAllConfiguredReaders())
       { 
         nlohmann::json readerInfo;
         readerInfo["class_name"] = reader->GetNameOfClass();

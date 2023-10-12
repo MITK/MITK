@@ -56,7 +56,7 @@ namespace mitk {
             const double b = (a - 1.0) / (a * cos(m_flipanglePDW) - cos(m_flipangle));
             const double T10 = static_cast<double>((-1.0) * m_TR / log(b));
             const double lambda = exp((-1.0) * m_TR / T10);
-            const double S0 = pdw * (1-lambda * cos(m_flipanglePDW)) / ((1 - lambda) * sin(m_flipanglePDW));
+            const double S0 = pdw * (1.0-lambda * cos(m_flipanglePDW)) / ((1.0 - lambda) * sin(m_flipanglePDW));
 
             // calculate T1
             const double c = (value - S0 * sin(m_flipangle)) / (value * cos(m_flipangle) - S0 * sin(m_flipangle));

@@ -53,17 +53,17 @@ namespace mitk {
           {
             // calculate signal scaling factor S0 and pre-contrast T1 relaxation time T10
             double a = pdw * sin(m_flipangle) / (baseline * sin(m_flipanglePDW));
-            double b = (a - 1) / (a * cos(m_flipanglePDW) - cos(m_flipangle));
-            double T10 = (double)(-1.0) * m_TR / log(b);
-            double lambda = exp((-1) * m_TR / T10);
+            double b = (a - 1.0) / (a * cos(m_flipanglePDW) - cos(m_flipangle));
+            double T10 = static_cast<double>((-1.0) * m_TR / log(b));
+            double lambda = exp((-1.0) * m_TR / T10);
             double S0 = pdw * (1-lambda * cos(m_flipanglePDW)) / ((1 - lambda) * sin(m_flipanglePDW));
 
             // calculate T1
             double c = (value - S0 * sin(m_flipangle)) / (value * cos(m_flipangle) - S0 * sin(m_flipangle));
-            double T1 = (double)(-1) * m_TR / log(c);
+            double T1 = static_cast<double>((-1.0) * m_TR / log(c));
 
             //calculate concentration
-            concentration = (double)(1 / T1 - 1 / T10) / (m_relaxivity/1000.0);
+            concentration = static_cast<double>((1.0 / T1 - 1.0 / T10) / (m_relaxivity/1000.0));
           }
           else
           {

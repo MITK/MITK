@@ -284,7 +284,7 @@ void mitk::TotalSegmentatorTool::ParseLabelMapTotalDefault()
       std::string temp;
       while (std::getline(newfile, temp))
       {
-        if (line > 112 && line < 230)
+        if (line > 111 && line < 229)
         {
           buffer << temp;
         }

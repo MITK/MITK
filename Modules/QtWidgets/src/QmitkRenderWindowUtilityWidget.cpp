@@ -142,6 +142,8 @@ void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)
 
   mitk::TimeStepType timeStep = sliceNavigationController->GetStepper()->GetPos();
   mitk::BaseGeometry::ConstPointer geometry = inputTimeGeometry->GetGeometryForTimeStep(timeStep);
+  if (geometry == nullptr)
+    return;
 
   mitk::AffineTransform3D::MatrixType matrix = geometry->GetIndexToWorldTransform()->GetMatrix();
   matrix.GetVnlMatrix().normalize_columns();

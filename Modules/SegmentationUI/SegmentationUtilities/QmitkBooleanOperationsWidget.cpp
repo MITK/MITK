@@ -15,7 +15,8 @@ found in the LICENSE file.
 
 #include <mitkDataStorage.h>
 #include <mitkException.h>
-#include <mitkSliceNavigationController.h>
+#include <mitkRenderingManager.h>
+#include <mitkTimeNavigationController.h>
 
 #include <QMessageBox>
 
@@ -61,10 +62,8 @@ namespace
   }
 }
 
-QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage,
-                                                           mitk::SliceNavigationController* timeNavigationController,
-                                                           QWidget* parent)
-  : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
+QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
+  : QWidget(parent)
 {
   m_Controls = new Ui::QmitkBooleanOperationsWidgetControls;
   m_Controls->setupUi(this);
@@ -128,7 +127,7 @@ void QmitkBooleanOperationsWidget::OnUnionButtonClicked()
 
 void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Type type)
 {
-  auto timeNavigationController = this->GetTimeNavigationController();
+  const auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
   assert(timeNavigationController != nullptr);
 
   mitk::Image::Pointer segmentationA = dynamic_cast<mitk::Image*>(m_Controls->dataSelectionWidget->GetSelection(0)->GetData());

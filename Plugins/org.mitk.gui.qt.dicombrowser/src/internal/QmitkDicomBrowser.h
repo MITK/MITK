@@ -115,7 +115,7 @@ protected:
     /// \brief TestHandler initializes event handler.
     void TestHandler();
 
-    /// \brief CreateTemporaryDirectory creates temporary directory in which temorary dicom objects are stored.
+    /// \brief CreateTemporaryDirectory creates temporary directory in which temporary dicom objects are stored.
     void CreateTemporaryDirectory();
 
     /// \brief StartDicomDirectoryListener starts dicom directory listener.

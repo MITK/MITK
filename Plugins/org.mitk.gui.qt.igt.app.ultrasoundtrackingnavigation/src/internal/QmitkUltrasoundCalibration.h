@@ -147,7 +147,7 @@ protected slots:
   void OnGetPlusCalibration();
 
   /**
-  \*brief Convert the recieved igtl::Matrix into an mitk::AffineTransform3D which can be used to calibrate the
+  \*brief Convert the received igtl::Matrix into an mitk::AffineTransform3D which can be used to calibrate the
   CombinedModality
   */
   void ProcessPlusCalibration(igtl::Matrix4x4 &imageToTracker);
@@ -218,7 +218,7 @@ protected slots:
 
 signals:
   /**
-   * \brief used for thread seperation, the worker thread must not call OnNewConnection directly.
+   * \brief used for thread separation, the worker thread must not call OnNewConnection directly.
    * QT signals are thread safe and separate the threads
    */
   void NewConnectionSignal();

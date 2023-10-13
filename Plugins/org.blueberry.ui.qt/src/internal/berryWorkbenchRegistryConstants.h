@@ -441,7 +441,7 @@ struct WorkbenchRegistryConstants {
   static const QString ATT_RETURN_TYPE_ID; // "returnTypeId";
 
   /**
-   * Role attribue. Value <code>role</code>.
+   * Role attribute. Value <code>role</code>.
    */
   static const QString ATT_ROLE; // "role";
 
@@ -522,7 +522,7 @@ struct WorkbenchRegistryConstants {
 
   /**
    * The name of the type attribute, which appears on bar elements and
-   * commandParameterType elments.
+   * commandParameterType elements.
    */
   static const QString ATT_TYPE; // "type";
 

@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 
-#include <QmitkSegmentationUtilityWidget.h>
-
 #include "itkSmartPointer.h"
+
+#include <QWidget>
 
 namespace Ui
 {
@@ -41,18 +41,16 @@ namespace mitk
   image. The resulting binary image has the same dimension, size, and
   Geometry3D as the input image.
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkSurfaceToImageWidget : public QmitkSegmentationUtilityWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkSurfaceToImageWidget : public QWidget
 {
   Q_OBJECT
 
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkSurfaceToImageWidget(mitk::DataStorage* dataStorage,
-                                     mitk::SliceNavigationController* timeNavigationController,
-                                     QWidget* parent = nullptr);
+  explicit QmitkSurfaceToImageWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
 
-  /** @brief Defaul destructor. */
+  /** @brief Default destructor. */
   ~QmitkSurfaceToImageWidget() override;
 
 private slots:
@@ -65,7 +63,7 @@ private slots:
 
 private:
 
-  /** @brief Enable buttons if data selction is valid. */
+  /** @brief Enable buttons if data selection is valid. */
   void EnableButtons(bool enable = true);
 
   /** @brief Convert a surface into an binary image. */

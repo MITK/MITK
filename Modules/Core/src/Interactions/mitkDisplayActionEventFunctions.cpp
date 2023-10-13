@@ -13,13 +13,14 @@ found in the LICENSE file.
 #include "mitkDisplayActionEventFunctions.h"
 
 // mitk core
-#include "mitkBaseRenderer.h"
-#include "mitkCameraController.h"
-#include "mitkDisplayActionEvents.h"
-#include "mitkInteractionPositionEvent.h"
-#include "mitkLevelWindow.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkNodePredicateDataType.h"
+#include <mitkBaseRenderer.h>
+#include <mitkCameraController.h>
+#include <mitkDisplayActionEvents.h>
+#include <mitkInteractionPositionEvent.h>
+#include <mitkLevelWindow.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkTimeNavigationController.h>
 
 //////////////////////////////////////////////////////////////////////////
 // STANDARD FUNCTIONS
@@ -111,20 +112,21 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
       {
         return;
       }
-      mitk::Stepper* sliceStepper = sliceNavigationController->GetSlice();
-      if (nullptr == sliceStepper)
+      mitk::Stepper* stepper = sliceNavigationController->GetStepper();
+      if (nullptr == stepper)
       {
         return;
       }
 
       // if only a single slice image was loaded, scrolling will affect the time steps
-      if (sliceStepper->GetSteps() <= 1)
+      if (stepper->GetSteps() <= 1)
       {
-        sliceStepper = sliceNavigationController->GetTime();
+        auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+        stepper = timeNavigationController->GetStepper();
       }
 
-      sliceStepper->SetAutoRepeat(displayActionEvent->GetAutoRepeat());
-      sliceStepper->MoveSlice(displayActionEvent->GetSliceDelta());
+      stepper->SetAutoRepeat(displayActionEvent->GetAutoRepeat());
+      stepper->MoveSlice(displayActionEvent->GetSliceDelta());
     }
   };
 
@@ -297,20 +299,21 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
           {
             return;
           }
-          mitk::Stepper* sliceStepper = sliceNavigationController->GetSlice();
-          if (nullptr == sliceStepper)
+          mitk::Stepper* stepper = sliceNavigationController->GetStepper();
+          if (nullptr == stepper)
           {
             return;
           }
 
           // if only a single slice image was loaded, scrolling will affect the time steps
-          if (sliceStepper->GetSteps() <= 1)
+          if (stepper->GetSteps() <= 1)
           {
-            sliceStepper = sliceNavigationController->GetTime();
+            auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+            stepper = timeNavigationController->GetStepper();
           }
 
-          sliceStepper->SetAutoRepeat(displayActionEvent->GetAutoRepeat());
-          sliceStepper->MoveSlice(displayActionEvent->GetSliceDelta());
+          stepper->SetAutoRepeat(displayActionEvent->GetAutoRepeat());
+          stepper->MoveSlice(displayActionEvent->GetSliceDelta());
         }
       }
     }

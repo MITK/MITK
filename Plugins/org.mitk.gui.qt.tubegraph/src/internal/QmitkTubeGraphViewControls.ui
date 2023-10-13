@@ -468,7 +468,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QPushButton" name="editSelectionSeperateButton">
          <property name="text">
-          <string>Seperate</string>
+          <string>Separate</string>
          </property>
         </widget>
        </item>

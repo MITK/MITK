@@ -100,7 +100,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
     /** @brief This slot stops tracking. If tracking is not strated it does nothing.*/
     void OnStopTracking();
 
-    /** @brief This slot is called if the user want's to choose a file name for logging. A new windows to navigate through the file system and choose
+    /** @brief This slot is called if the user wants to choose a file name for logging. A new windows to navigate through the file system and choose
                a file opens.*/
     void OnChooseFileClicked();
 
@@ -152,7 +152,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
     */
     void OnToolStorageChanged(const ctkServiceEvent event);
 
-  /* This slot enables selction of tool for projection*/
+  /* This slot enables selection of tool for projection*/
     void SelectToolProjection(int idx);
 
   protected slots:
@@ -219,7 +219,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
    bool m_SimpleModeEnabled; ///>Stores if simple UI mode is enabled
 
    /** Replaces the current navigation tool storage which is stored in m_toolStorage.
-    *  Basically handles the microservice stuff: unregisteres the old storage, then
+    *  Basically handles the microservice stuff: unregisters the old storage, then
     *  replaces the storage and registers the new one.
     */
    void ReplaceCurrentToolStorage(mitk::NavigationToolStorage::Pointer newStorage, std::string newStorageName);
@@ -238,7 +238,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
     */
    void UpdateToolStorageLabel(QString pathOfLoadedStorage);
    /**
-    * Auto saves the current tool storage to a temporary file. This ist used for persistence.
+    * Auto saves the current tool storage to a temporary file. This is used for persistence.
   */
    void AutoSaveToolStorage();
 

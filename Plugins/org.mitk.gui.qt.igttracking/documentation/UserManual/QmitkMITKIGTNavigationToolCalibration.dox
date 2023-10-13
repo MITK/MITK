@@ -50,7 +50,7 @@ Click on Start Edit Tooltip and in the new window you can enter the values for t
 After you entered the values you can click "Use Manipulated ToolTip" to perform the Calibration on the Tool to calibrate. The box "Current Tool Tip Orientation" will show you the results. It will list the resulting values of the Quaternion, the Euler Angles and the Matrix.
 \imageMacro{QmitkIGTTracking_ToolCalibration_Manual_After.png,"MITK Screenshot of the Current Tool Tip Orientation Box after the tool was manually calibrated",5.00}
 To save the result permanently just click "Save Calibrated Navigation Tool" and you can save the calibrated tool as an IGTTool for later use with your tracking device in a navigation application.
-If you are not satisfied with the results you can click "Start Edit Tooltip" again and either change the values for the rotation and translation again or just reset everything by clicking on "Reset to Identity". To write the new values or reseted values into the tool just click "Use Manipulated Tool Tip" again. Now you can save your relust just as described above.
+If you are not satisfied with the results you can click "Start Edit Tooltip" again and either change the values for the rotation and translation again or just reset everything by clicking on "Reset to Identity". To write the new values or resetted values into the tool just click "Use Manipulated Tool Tip" again. Now you can save your relust just as described above.
 
 \subsection QmitkMITKIGTNavigationToolCalibrationReference Tool Tip Calibration with a single Reference Tool
 
@@ -64,7 +64,7 @@ If you are not satisfied with the result of the calibration just repeat the step
 
 \subsection QmitkMITKIGTNavigationToolCalibrationPivot Tool Tip Calibration via Pivoting
 
-To calibrate your tool via pivoting place it on its tip an pivot it around its tip. Be careful not to move the tip otherwise the calibration result will be inaccurate. You can define the number of poses that should be collected. After starting the collecting process pivote the tool to different poses until the collection ends. Then click on "Comute Pivot Point" to compute the pivot point. Finally you can use the pivot result as tooltip transformation and save the calibrated tool to the hard disc for later use.
+To calibrate your tool via pivoting place it on its tip an pivot it around its tip. Be careful not to move the tip otherwise the calibration result will be inaccurate. You can define the number of poses that should be collected. After starting the collecting process pivote the tool to different poses until the collection ends. Then click on "Compute Pivot Point" to compute the pivot point. Finally you can use the pivot result as tooltip transformation and save the calibrated tool to the hard disc for later use.
 
 \subsection QmitkMITKIGTNavigationToolCalibration Tool Landmark Calibration
 
@@ -78,7 +78,7 @@ Both sets of landmarks are defined in the tool coordinate space.
 
 Control points are virtual and can only defined manually. These landmarks clearly define the tools pose only by using landmarks in the tool coordinate system. E.g., two landmarks for a 5DoF tool and three landmarks for a 6DoF tool. They may be used, e.g., for a point based registration of a tool from image space to tracking space. A typical set of three control points for a 6 DoF tool might be [1;0;0], [0;1;0], [0;0;1].
 
-Tool landmarks are designed for representing defined landmarks on a tool. The number of these landmarks might exeed the number of control points for reasons of redundancy and averaging. They are used for, e.g., manually registering the pose of a tool by visual markers in a CT scan. If you would use these landmarks to do a point based registration from image space to tracking space later, you might overweight the tool because of two many landmarks compared to other markers. The tool landmarks can be calibrated manually or by using a second tracked pointer, move it to each landmark and press "Add Pointer Position".
+Tool landmarks are designed for representing defined landmarks on a tool. The number of these landmarks might exceed the number of control points for reasons of redundancy and averaging. They are used for, e.g., manually registering the pose of a tool by visual markers in a CT scan. If you would use these landmarks to do a point based registration from image space to tracking space later, you might overweight the tool because of two many landmarks compared to other markers. The tool landmarks can be calibrated manually or by using a second tracked pointer, move it to each landmark and press "Add Pointer Position".
 
 Return to the overview of the IGT Tracking Plugin views: \ref org_mitk_gui_qt_igttracking
 

@@ -462,7 +462,7 @@ void RTDoseVisualizer::UpdateColorWashTransferFunction()
     m_selectedNode->GetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),referenceDose);
     mitk::TransferFunction::ControlPoints scalarOpacityPoints;
     scalarOpacityPoints.push_back( std::make_pair(0, 1 ) );
-    //Backgroud
+    //Background
     transferFunction->AddHSVPoint(((isoDoseLevelSet->Begin())->GetDoseValue()*referenceDose)-0.001,0,0,0,1.0,1.0);
 
     for(mitk::IsoDoseLevelSet::ConstIterator itIsoDoseLevel = isoDoseLevelSet->Begin(); itIsoDoseLevel != isoDoseLevelSet->End(); ++itIsoDoseLevel)

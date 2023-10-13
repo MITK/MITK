@@ -13,4 +13,10 @@ SET(MODULE_TESTS
   mitkConcreteModelFactoryBaseTest.cpp
   mitkFormulaParserTest.cpp
   mitkModelFitResultRelationRuleTest.cpp
+  mitkExponentialDecayModelTest.cpp
+  mitkLinearModelTest.cpp
+  mitkExpDecayOffsetModelTest.cpp
+  mitkTwoStepLinearModelTest.cpp
+  mitkThreeStepLinearModelTest.cpp
+  mitkExponentialSaturationModelTest.cpp
 )

@@ -41,8 +41,6 @@ namespace mitk
     /** Run-time type information (and related methods). */
     itkTypeMacro(ExtendedToftsModel, ModelBase);
 
-    static const std::string MODEL_DISPLAY_NAME;
-
     static const std::string NAME_PARAMETER_Ktrans;
     static const std::string NAME_PARAMETER_ve;
     static const std::string NAME_PARAMETER_vp;
@@ -56,6 +54,17 @@ namespace mitk
     static const unsigned int POSITION_PARAMETER_vp;
 
     static const unsigned int NUMBER_OF_PARAMETERS;
+
+    static const std::string NAME_DERIVED_PARAMETER_kep;
+
+    static const unsigned int NUMBER_OF_DERIVED_PARAMETERS;
+
+    static const std::string UNIT_DERIVED_PARAMETER_kep;
+
+    static const std::string MODEL_DISPLAY_NAME;
+
+    static const std::string MODEL_TYPE;
+
 
     std::string GetModelDisplayName() const override;
 

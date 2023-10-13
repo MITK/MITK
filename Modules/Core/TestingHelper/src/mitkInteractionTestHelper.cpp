@@ -15,7 +15,9 @@ found in the LICENSE file.
 #include <mitkInteractionEventConst.h>
 #include <mitkInteractionTestHelper.h>
 #include <mitkPlaneGeometryDataMapper2D.h>
+#include <mitkRenderingManager.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkTimeNavigationController.h>
 
 // VTK
 #include <vtkCamera.h>
@@ -37,9 +39,6 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
   tinyxml2::XMLDocument document;
   if (tinyxml2::XML_SUCCESS == document.LoadFile(interactionXmlFilePath.c_str()))
   {
-    // get RenderingManager instance
-    auto rm = mitk::RenderingManager::GetInstance();
-
     // create data storage
     m_DataStorage = mitk::StandaloneDataStorage::New();
 
@@ -150,17 +149,9 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       rw->GetVtkRenderWindow()->Render();
       rw->GetVtkRenderWindow()->WaitForCompletion();
 
-      // connect SliceNavigationControllers to timestep changed event of TimeNavigationController
-      rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController());
-      rm->GetTimeNavigationController()->ConnectGeometryTimeEvent(rw->GetSliceNavigationController());
-
       // add to list of known render windows
       m_RenderWindowList.push_back(rw);
     }
-
-    // TODO: check the following lines taken from QmitkStdMultiWidget and adapt them to be executed in our code here.
-    //    mitkWidget1->GetSliceNavigationController()
-    //      ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
 
     // register interaction event obserer to handle scroll events
     InitializeDisplayActionEventHandling();
@@ -184,19 +175,16 @@ void mitk::InteractionTestHelper::InitializeDisplayActionEventHandling()
 
 mitk::InteractionTestHelper::~InteractionTestHelper()
 {
-  mitk::RenderingManager *rm = mitk::RenderingManager::GetInstance();
-
   // unregister renderers
   auto it = m_RenderWindowList.begin();
   auto end = m_RenderWindowList.end();
 
   for (; it != end; ++it)
   {
-    rm->GetTimeNavigationController()->Disconnect((*it)->GetSliceNavigationController());
-    (*it)->GetSliceNavigationController()->Disconnect(rm->GetTimeNavigationController());
     mitk::BaseRenderer::RemoveInstance((*it)->GetVtkRenderWindow());
   }
-  rm->RemoveAllObservers();
+
+  mitk::RenderingManager::GetInstance()->RemoveAllObservers();
 }
 
 mitk::DataStorage::Pointer mitk::InteractionTestHelper::GetDataStorage()
@@ -263,15 +251,14 @@ void mitk::InteractionTestHelper::LoadInteraction()
 
 void mitk::InteractionTestHelper::SetTimeStep(int newTimeStep)
 {
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
+  auto rm = mitk::RenderingManager::GetInstance();
+  rm->InitializeViewsByBoundingObjects(m_DataStorage);
 
-  bool timeStepIsvalid =
-    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetCreatedWorldGeometry()->IsValidTimeStep(
-      newTimeStep);
+  bool timeStepIsvalid = rm->GetTimeNavigationController()->GetInputWorldTimeGeometry()->IsValidTimeStep(newTimeStep);
 
   if (timeStepIsvalid)
   {
-    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(newTimeStep);
+    rm->GetTimeNavigationController()->GetStepper()->SetPos(newTimeStep);
   }
 }
 

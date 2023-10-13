@@ -84,7 +84,7 @@ namespace mitk
     /**
      * \brief Updates radius attribute according to position event.
      * Calculates distance between the data node origin and the current position
-     * event and updates the data node attribue "zone.size" accordingly. The
+     * event and updates the data node attribute "zone.size" accordingly. The
      * mitk::USZonesInteractor::UpdateSurface() function is called then.
      *
      * \return false if interaction event isn't a position event, true otherwise

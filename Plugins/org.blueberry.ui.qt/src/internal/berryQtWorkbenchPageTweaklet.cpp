@@ -45,7 +45,7 @@ QWidget* QtWorkbenchPageTweaklet::CreatePaneControl(QWidget* parent)
   QWidget* qParent = static_cast<QWidget*>(parent);
   auto   control = new QtControlWidget(qParent, nullptr);
   // the object name is used in the global event filter to find
-  // the pane control over which a mouse pressed event occured
+  // the pane control over which a mouse pressed event occurred
   // --> do not change the object name
   control->setObjectName("PartPaneControl");
 

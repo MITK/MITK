@@ -21,18 +21,13 @@ found in the LICENSE file.
 #include "mitkExtendedToftsModelFactory.h"
 #include "mitkStandardToftsModelFactory.h"
 #include "mitkTwoCompartmentExchangeModelFactory.h"
-#include "mitkNumericTwoCompartmentExchangeModelFactory.h"
 
 //PET perfusion models
 #include "mitkOneTissueCompartmentModelFactory.h"
 #include "mitkExtendedOneTissueCompartmentModelFactory.h"
 #include "mitkTwoTissueCompartmentModelFactory.h"
 #include "mitkTwoTissueCompartmentFDGModelFactory.h"
-#include "mitkNumericTwoTissueCompartmentModelFactory.h"
 
-//general models
-#include "mitkTwoStepLinearModelFactory.h"
-#include "mitkThreeStepLinearModelFactory.h"
 
 namespace mitk
 {
@@ -56,17 +51,13 @@ public:
   {
     m_RegisteredProviders.clear();
     RegisterProvider<mitk::ModelFitProviderBase<mitk::DescriptivePharmacokineticBrixModelFactory> >(context);
-    RegisterProvider<mitk::ModelFitProviderBase<mitk::ThreeStepLinearModelFactory> >(context);
-    RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoStepLinearModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::ExtendedToftsModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::StandardToftsModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoCompartmentExchangeModelFactory> >(context);
-    RegisterProvider<mitk::ModelFitProviderBase<mitk::NumericTwoCompartmentExchangeModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::OneTissueCompartmentModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::ExtendedOneTissueCompartmentModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoTissueCompartmentFDGModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoTissueCompartmentModelFactory> >(context);
-    RegisterProvider<mitk::ModelFitProviderBase<mitk::NumericTwoTissueCompartmentModelFactory> >(context);
   }
 
   void Unload(us::ModuleContext* ) override

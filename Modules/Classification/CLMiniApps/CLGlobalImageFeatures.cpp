@@ -322,8 +322,8 @@ void SaveSliceOrImageAsPNG(mitk::Image::Pointer image, mitk::Image::Pointer mask
   unsigned int numberOfSteps = 1;
   if (sliceNaviController)
   {
-    numberOfSteps = sliceNaviController->GetSlice()->GetSteps();
-    sliceNaviController->GetSlice()->SetPos(0);
+    numberOfSteps = sliceNaviController->GetStepper()->GetSteps();
+    sliceNaviController->GetStepper()->SetPos(0);
   }
 
   renderWindow.show();
@@ -333,7 +333,7 @@ void SaveSliceOrImageAsPNG(mitk::Image::Pointer image, mitk::Image::Pointer mask
   {
     if (sliceNaviController)
     {
-      sliceNaviController->GetSlice()->SetPos(currentStep);
+      sliceNaviController->GetStepper()->SetPos(currentStep);
     }
 
     renderWindow.GetRenderer()->PrepareRender();

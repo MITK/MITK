@@ -21,7 +21,7 @@ namespace mitk
 {
 
   /** @class ExponentialSaturationModel
-  * @brief This genric model has the form: if x<BAT f(x) = S0 , else f(x) = A * (1-exp(-*B(x-BAT)))
+  * @brief This genric model has the form: if x<onset: y(x) = baseline , else: y(x) = baseline + (y_final-baseline) * (1 - exp(-rate*(x-onset)))
   */
   class MITKMODELFIT_EXPORT ExponentialSaturationModel : public mitk::ModelBase
   {
@@ -42,6 +42,51 @@ namespace mitk
     /** Run-time type information (and related methods). */
     itkTypeMacro(ExponentialSaturationModel, ModelBase);
 
+    static const std::string NAME_PARAMETER_BAT;
+    static const std::string NAME_PARAMETER_y_bl;
+    static const std::string NAME_PARAMETER_y_fin;
+    static const std::string NAME_PARAMETER_k;
+
+    static const unsigned int NUMBER_OF_PARAMETERS;
+
+    static const std::string UNIT_PARAMETER_BAT;
+    static const std::string UNIT_PARAMETER_y_bl;
+    static const std::string UNIT_PARAMETER_y_fin;
+    static const std::string UNIT_PARAMETER_k;
+
+    static const unsigned int POSITION_PARAMETER_BAT;
+    static const unsigned int POSITION_PARAMETER_y_bl;
+    static const unsigned int POSITION_PARAMETER_y_fin;
+    static const unsigned int POSITION_PARAMETER_k;
+
+    static const unsigned int NUMBER_OF_STATIC_PARAMETERS;
+
+    static const std::string MODEL_DISPLAY_NAME;
+
+    static const std::string MODEL_TYPE;
+
+    static const std::string FUNCTION_STRING;
+
+    static const std::string X_NAME;
+
+    static const std::string X_AXIS_NAME;
+
+    static const std::string X_AXIS_UNIT;
+
+    static const std::string Y_AXIS_NAME;
+
+    static const std::string Y_AXIS_UNIT;
+
+    ParameterNamesType GetParameterNames() const override;
+
+    ParametersSizeType  GetNumberOfParameters() const override;
+
+    ParamterUnitMapType GetParameterUnits() const override;
+
+    ParameterNamesType GetStaticParameterNames() const override;
+
+    ParametersSizeType GetNumberOfStaticParameters() const override;
+
     std::string GetModelDisplayName() const override;
 
     std::string GetModelType() const override;
@@ -50,13 +95,14 @@ namespace mitk
 
     std::string GetXName() const override;
 
-    ParameterNamesType GetParameterNames() const override;
+    std::string GetXAxisName() const override;
 
-    ParametersSizeType  GetNumberOfParameters() const override;
+    std::string GetXAxisUnit() const override;
 
-    ParameterNamesType GetStaticParameterNames() const override;
+    std::string GetYAxisName() const override;
 
-    ParametersSizeType GetNumberOfStaticParameters() const override;
+    std::string GetYAxisUnit() const override;
+
 
   protected:
     ExponentialSaturationModel() {};

@@ -46,12 +46,12 @@ class QmitkUSZoneManagementWidget : public QWidget
 
 signals:
   /**
-   * \brief Emmited whenever a new zone was added to the data model.
+   * \brief Emitted whenever a new zone was added to the data model.
    */
   void ZoneAdded();
 
   /**
-   * \brief Emmited whenever a new zone was removed from the data mode.
+   * \brief Emitted whenever a new zone was removed from the data mode.
    */
   void ZoneRemoved();
 
@@ -122,7 +122,7 @@ public:
    * \brief Setter for the DataStorage where the zone nodes will be stored.
    * The nodes will be derivates of the base nodes.
    *
-   * \param dataStorage data storage where the zone nodes will be strored
+   * \param dataStorage data storage where the zone nodes will be stored
    * \param baseNode data node which will be the source node of all zone nodes
    */
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage, itk::SmartPointer<mitk::DataNode> baseNode);

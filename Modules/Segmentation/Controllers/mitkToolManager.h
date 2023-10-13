@@ -294,7 +294,7 @@ namespace mitk
     /** Tag of the observer that listens to time changes*/
     unsigned long m_TimePointObserverTag = 0;
     /** Pointer to the observed time stepper*/
-    WeakPointer<SliceNavigationController> m_CurrentTimeNavigationController;
+    WeakPointer<TimeNavigationController> m_CurrentTimeNavigationController;
   };
 
 } // namespace

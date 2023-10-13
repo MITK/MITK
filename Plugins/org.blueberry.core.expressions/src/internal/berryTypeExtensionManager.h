@@ -98,13 +98,13 @@ protected:
 
   /*
    * This method doesn't need to be synchronized since it is called
-   * from withing the getProperty method which is synchronized
+   * from within the getProperty method which is synchronized
    */
   TypeExtension::Pointer Get(const Reflection::TypeInfo& typeInfo);
 
   /*
    * This method doesn't need to be synchronized since it is called
-   * from withing the getProperty method which is synchronized
+   * from within the getProperty method which is synchronized
    */
   QList<IPropertyTester::Pointer> LoadTesters(const QString& typeName);
 

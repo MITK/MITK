@@ -1090,7 +1090,7 @@ mitk::Quaternion QmitkIGTTrackingDataEvaluationView::GetSLERPAverage(mitk::Navig
 {
   mitk::Quaternion average;
 
-  //build a vector of quaternions from the evaulation filter (caution always takes the first (0) input of the filter
+  //build a vector of quaternions from the evaluation filter (caution always takes the first (0) input of the filter
   std::vector<mitk::Quaternion> quaternions = std::vector<mitk::Quaternion>();
   for (int i = 0; i < evaluationFilter->GetNumberOfAnalysedNavigationData(0); i++)
   {

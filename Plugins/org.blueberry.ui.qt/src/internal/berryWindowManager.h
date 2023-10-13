@@ -95,7 +95,7 @@ public:
      * Attempts to close all windows managed by this window manager,
      * as well as windows managed by any descendent window managers.
      *
-     * @return <code>true</code> if all windows were sucessfully closed,
+     * @return <code>true</code> if all windows were successfully closed,
      * and <code>false</code> if any window refused to close
      */
     bool Close();

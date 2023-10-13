@@ -19,7 +19,8 @@ found in the LICENSE file.
 #include <mitkContourModelSet.h>
 #include <mitkContourModelSetToImageFilter.h>
 #include <mitkLabelSetImage.h>
-#include <mitkSliceNavigationController.h>
+#include <mitkRenderingManager.h>
+#include <mitkTimeNavigationController.h>
 
 #include <QtConcurrentRun>
 #include <QFuture>
@@ -37,7 +38,7 @@ public:
   /** @brief Check if selections is valid. */
   void SelectionControl( unsigned int index, const mitk::DataNode* selection);
 
-  /** @brief Enable buttons if data selction is valid. */
+  /** @brief Enable buttons if data selection is valid. */
   void EnableButtons(bool enable = true);
 
   /** @brief Does the actual contour filling */
@@ -192,7 +193,7 @@ void QmitkContourModelToImageWidget::OnProcessPressed()
     return;
   }
 
-  const auto timePoint = this->GetTimeNavigationController()->GetSelectedTimePoint();
+  const mitk::TimePointType timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
   if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
   {
     MITK_ERROR << "Error writing contours into image! Currently selected time point is not supported by selected image data.";
@@ -225,11 +226,9 @@ void QmitkContourModelToImageWidget::OnProcessPressed()
   d->m_Watcher.setFuture(future);
 }
 
-QmitkContourModelToImageWidget::QmitkContourModelToImageWidget(mitk::DataStorage* dataStorage,
-                                                               mitk::SliceNavigationController* timeNavigationController,
-                                                               QWidget* parent)
-  : QmitkSegmentationUtilityWidget(timeNavigationController, parent),
-    d_ptr(new QmitkContourModelToImageWidgetPrivate())
+QmitkContourModelToImageWidget::QmitkContourModelToImageWidget(mitk::DataStorage* dataStorage, QWidget* parent)
+  : QWidget(parent)
+  , d_ptr(new QmitkContourModelToImageWidgetPrivate())
 {
   Q_D(QmitkContourModelToImageWidget);
 

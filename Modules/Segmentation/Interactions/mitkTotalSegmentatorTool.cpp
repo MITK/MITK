@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <filesystem>
 #include <itksys/SystemTools.hxx>
+#include <regex>
 
 // us
 #include <usGetModuleContext.h>
@@ -296,6 +297,7 @@ void mitk::TotalSegmentatorTool::ParseLabelMapTotalDefault()
 {
   if (!this->GetLabelMapPath().empty())
   {
+    std::regex sanitizer(R"([^A-Za-z0-9_])");
     std::fstream newfile;
     newfile.open(this->GetLabelMapPath(), ios::in);
     std::stringstream buffer;
@@ -315,7 +317,8 @@ void mitk::TotalSegmentatorTool::ParseLabelMapTotalDefault()
     std::string key, val;
     while (std::getline(std::getline(buffer, key, ':'), val, ','))
     {
-      m_LabelMapTotal[std::stoi(key)] = val;
+      std::string sanitized = std::regex_replace(val, sanitizer, "");
+      m_LabelMapTotal[std::stoi(key)] = sanitized;
     }
   }
 }

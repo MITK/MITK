@@ -21,7 +21,7 @@ mitk::DescriptivePharmacokineticBrixModelParameterizer::GetGlobalStaticParameter
   StaticParameterMapType result;
   StaticParameterValuesType values;
   values.push_back(m_Tau);
-  result.insert(std::make_pair(ModelType::NAME_STATIC_PARAMETER_Tau, values));
+  result.insert(std::make_pair(ModelType::NAME_STATIC_PARAMETER_tau, values));
   return result;
 };
 
@@ -35,7 +35,7 @@ mitk::DescriptivePharmacokineticBrixModelParameterizer::GetLocalStaticParameters
 
   StaticParameterValuesType values;
   values.push_back(s0);
-  result.insert(std::make_pair(ModelType::NAME_STATIC_PARAMETER_S0, values));
+  result.insert(std::make_pair(ModelType::NAME_STATIC_PARAMETER_s0, values));
 
   return result;
 };
@@ -48,7 +48,7 @@ mitk::DescriptivePharmacokineticBrixModelParameterizer::GetDefaultInitialParamet
   initialParameters[mitk::DescriptivePharmacokineticBrixModel::POSITION_PARAMETER_A] = 1.0;
   initialParameters[mitk::DescriptivePharmacokineticBrixModel::POSITION_PARAMETER_kep] = 4.0;
   initialParameters[mitk::DescriptivePharmacokineticBrixModel::POSITION_PARAMETER_kel] = 0.2;
-  initialParameters[mitk::DescriptivePharmacokineticBrixModel::POSITION_PARAMETER_tlag] = 1.0;
+  initialParameters[mitk::DescriptivePharmacokineticBrixModel::POSITION_PARAMETER_BAT] = 1.0;
 
   return initialParameters;
 }

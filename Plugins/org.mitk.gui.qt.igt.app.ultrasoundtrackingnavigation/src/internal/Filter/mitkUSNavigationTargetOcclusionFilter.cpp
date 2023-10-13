@@ -125,7 +125,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
   {
     vtkSmartPointer<vtkPolyData> polyData = dynamic_cast<mitk::Surface*>(it->Value()->GetData())->GetVtkPolyData();
 
-    // transform the obstacle strucutre according to the mitk geometry
+    // transform the obstacle structure according to the mitk geometry
     vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter =
       vtkSmartPointer<vtkTransformPolyDataFilter>::New();
     transformFilter->SetInputData(0, polyData);

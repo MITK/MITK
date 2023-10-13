@@ -25,9 +25,6 @@ found in the LICENSE file.
 #include "mitkTwoCompartmentExchangeModel.h"
 #include "mitkTwoCompartmentExchangeModelParameterizer.h"
 #include "mitkTwoCompartmentExchangeModelFactory.h"
-#include "mitkNumericTwoCompartmentExchangeModel.h"
-#include "mitkNumericTwoCompartmentExchangeModelParameterizer.h"
-#include "mitkNumericTwoCompartmentExchangeModelFactory.h"
 #include "mitkExtendedToftsModel.h"
 #include "mitkExtendedToftsModelFactory.h"
 #include "mitkExtendedToftsModelParameterizer.h"
@@ -203,7 +200,7 @@ void PerfusionDataSimulationView::OnModellSet(int index)
   }
 
   bool isToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
-  bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr || dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+  bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
   bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
   bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
 
@@ -234,7 +231,7 @@ bool PerfusionDataSimulationView::CheckModelSettings()
     }
 
     bool isToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
-    bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr || dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+    bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
     bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
     bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
 
@@ -378,7 +375,7 @@ void PerfusionDataSimulationView::LoadAIFFile()
 
 
 }
-/** @todo #2 Same function for Numeric and analytic version of FillParameterMap2CXM
+/** @todo #2 Same function for analytic version of FillParameterMap2CXM
  */
 void PerfusionDataSimulationView::FillParameterMap2CXM()
 {
@@ -405,29 +402,6 @@ void PerfusionDataSimulationView::FillParameterMap2CXM()
 }
 
 
-void PerfusionDataSimulationView::FillParameterMapNumeric2CXM()
-{
-    ParameterMapType stack;
-
-    mitk::DataNode::Pointer m_selectedNode = m_Controls.comboBox_F->GetSelectedNode();
-    mitk::Image::Pointer m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    stack.insert(std::make_pair(mitk::NumericTwoCompartmentExchangeModel::NAME_PARAMETER_F,m_selectedImage));
-
-    m_selectedNode = m_Controls.comboBox_PS->GetSelectedNode();
-    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    stack.insert(std::make_pair(mitk::NumericTwoCompartmentExchangeModel::NAME_PARAMETER_PS,m_selectedImage));
-
-    m_selectedNode = m_Controls.comboBox_fp->GetSelectedNode();
-    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    stack.insert(std::make_pair(mitk::NumericTwoCompartmentExchangeModel::NAME_PARAMETER_vp,m_selectedImage));
-
-    m_selectedNode = m_Controls.comboBox_fi->GetSelectedNode();
-    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    stack.insert(std::make_pair(mitk::NumericTwoCompartmentExchangeModel::NAME_PARAMETER_ve,m_selectedImage));
-
-    this->m_ParameterImageMap = stack;
-
-}
 
 
 void PerfusionDataSimulationView::FillParameterMapETM()
@@ -473,7 +447,7 @@ void PerfusionDataSimulationView::FillParameterMap2TCM()
 
     m_selectedNode = m_Controls.comboBox_VB->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    stack.insert(std::make_pair(mitk::TwoTissueCompartmentModel::NAME_PARAMETER_VB,m_selectedImage));
+    stack.insert(std::make_pair(mitk::TwoTissueCompartmentModel::NAME_PARAMETER_vb,m_selectedImage));
 
     this->m_ParameterImageMap = stack;
 
@@ -485,7 +459,7 @@ void PerfusionDataSimulationView::FillParameterMap1TCM()
 
     mitk::DataNode::Pointer m_selectedNode = m_Controls.comboBox_k1->GetSelectedNode();
     mitk::Image::Pointer m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    stack.insert(std::make_pair(mitk::OneTissueCompartmentModel::NAME_PARAMETER_k1,m_selectedImage));
+    stack.insert(std::make_pair(mitk::OneTissueCompartmentModel::NAME_PARAMETER_K1,m_selectedImage));
 
     m_selectedNode = m_Controls.comboBox_k2->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
@@ -501,7 +475,6 @@ void PerfusionDataSimulationView::OnGenerateDataButtonClicked()
 
     bool isToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
     bool isPhysBrixFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
-    bool isNumPhysBrixFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
     bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
     bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
 
@@ -518,11 +491,6 @@ void PerfusionDataSimulationView::OnGenerateDataButtonClicked()
         m_DynamicImage = this->Generate2CXModelData();
     }
 
-    if (isNumPhysBrixFactory)
-    {
-        this->FillParameterMapNumeric2CXM();
-        m_DynamicImage = this->GenerateNumeric2CXModelData();
-    }
 
     if (is2TCMFactory)
     {
@@ -553,7 +521,7 @@ mitk::ModelSignalImageGenerator::Pointer generator = mitk::ModelSignalImageGener
 mitk::TwoCompartmentExchangeModelParameterizer::Pointer modelParameterizer = mitk::TwoCompartmentExchangeModelParameterizer::New();
 
 /** @todo #2  necessary? Generator need to have a map with Parameters in order of Model in order to pass vector parameters correctly to Model.
- * I wanted to make it independend from the order the images are passed on
+ * I wanted to make it independent from the order the images are passed on
  */
 for(ParameterMapType::const_iterator pos = this->m_ParameterImageMap.begin(); pos != this->m_ParameterImageMap.end(); ++pos)
 {
@@ -634,92 +602,6 @@ return resultImage;
 }
 
 
-/** @todo #2  Synergie? Function implementation for every Model to complicated?
- */
-mitk::Image::Pointer PerfusionDataSimulationView::GenerateNumeric2CXModelData()
-{
-mitk::ModelSignalImageGenerator::Pointer generator = mitk::ModelSignalImageGenerator::New();
-mitk::NumericTwoCompartmentExchangeModelParameterizer::Pointer modelParameterizer = mitk::NumericTwoCompartmentExchangeModelParameterizer::New();
-
-for(ParameterMapType::const_iterator pos = this->m_ParameterImageMap.begin(); pos != this->m_ParameterImageMap.end(); ++pos)
-{
-    if(pos->first == mitk::NumericTwoCompartmentExchangeModel::NAME_PARAMETER_F)
-    {
-        generator->SetParameterInputImage(mitk::NumericTwoCompartmentExchangeModel::POSITION_PARAMETER_F, pos->second);
-    }
-    if(pos->first == mitk::NumericTwoCompartmentExchangeModel::NAME_PARAMETER_PS)
-    {
-        generator->SetParameterInputImage(mitk::NumericTwoCompartmentExchangeModel::POSITION_PARAMETER_PS, pos->second);
-    }
-    if(pos->first == mitk::NumericTwoCompartmentExchangeModel::NAME_PARAMETER_ve)
-    {
-        generator->SetParameterInputImage(mitk::NumericTwoCompartmentExchangeModel::POSITION_PARAMETER_ve, pos->second);
-    }
-    if(pos->first == mitk::NumericTwoCompartmentExchangeModel::NAME_PARAMETER_vp)
-    {
-        generator->SetParameterInputImage(mitk::NumericTwoCompartmentExchangeModel::POSITION_PARAMETER_vp, pos->second);
-    }
-}
-
-modelParameterizer->SetAIF(this->m_AterialInputFunction);
-modelParameterizer->SetAIFTimeGrid(this->m_TimeGrid);
-modelParameterizer->SetDefaultTimeGrid(this->m_TimeGrid);
-modelParameterizer->SetODEINTStepSize(0.05);
-
-generator->SetParameterizer(modelParameterizer);
-
-mitk::Image::Pointer generatedImage = generator->GetGeneratedImage();
-
-
-mitk::Image::Pointer resultImage = mitk::Image::New();
-if(m_Controls.NoiseCheckBox->isChecked())
-{
-   typedef itk::Image<double,3> ImageType;
-
-   mitk::Image::Pointer tempImage = mitk::Image::New();
-   tempImage->Initialize(generatedImage);
-
-   mitk::ArbitraryTimeGeometry* timeGeometry = dynamic_cast<mitk::ArbitraryTimeGeometry*> (generatedImage->GetTimeGeometry());
-
-   tempImage->SetTimeGeometry(timeGeometry);
-
-   ImageType::Pointer itkImage = ImageType::New();
-   mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-   imageTimeSelector->SetInput(generatedImage);
-
-   for(unsigned int i = 0; i< generatedImage->GetTimeSteps(); ++i)
-   {
-       imageTimeSelector->SetTimeNr(i);
-       imageTimeSelector->UpdateLargestPossibleRegion();
-
-       mitk::Image::Pointer mitkInputImage = imageTimeSelector->GetOutput();
-
-       mitk::CastToItkImage(mitkInputImage, itkImage );
-
-       typedef mitk::GaussianNoiseFunctor<double,double> NoiseFunctorType;
-       typedef itk::UnaryFunctorImageFilter<ImageType,ImageType, NoiseFunctorType > NoiseFilterType;
-       NoiseFilterType::Pointer noiseFilter = NoiseFilterType::New();
-       NoiseFunctorType noiseFunctor;
-       noiseFunctor.SetMean(0.0);
-       noiseFunctor.SetSigma(this->m_Sigma);
-       noiseFilter->SetFunctor(noiseFunctor);
-
-       noiseFilter->SetInput(itkImage);
-
-       mitk::Image::Pointer outputImage = mitk::ImportItkImage(noiseFilter->GetOutput())->Clone();
-
-       mitk::ImageReadAccessor accessor(outputImage);
-       tempImage->SetVolume(accessor.GetData(), i);
-   }
-
-  resultImage = tempImage->Clone();
-}
-else
-{
-   resultImage = generatedImage;
-}
-return resultImage;
-}
 
 mitk::Image::Pointer PerfusionDataSimulationView::GenerateETModelData()
 {
@@ -827,9 +709,9 @@ for(ParameterMapType::const_iterator pos = this->m_ParameterImageMap.begin(); po
     {
         generator->SetParameterInputImage(mitk::TwoTissueCompartmentModel::POSITION_PARAMETER_k4, pos->second);
     }
-    if(pos->first == mitk::TwoTissueCompartmentModel::NAME_PARAMETER_VB)
+    if(pos->first == mitk::TwoTissueCompartmentModel::NAME_PARAMETER_vb)
     {
-        generator->SetParameterInputImage(mitk::TwoTissueCompartmentModel::POSITION_PARAMETER_VB, pos->second);
+        generator->SetParameterInputImage(mitk::TwoTissueCompartmentModel::POSITION_PARAMETER_vb, pos->second);
     }
 
 }
@@ -901,9 +783,9 @@ mitk::OneTissueCompartmentModelParameterizer::Pointer modelParameterizer = mitk:
 
 for(ParameterMapType::const_iterator pos = this->m_ParameterImageMap.begin(); pos != this->m_ParameterImageMap.end(); ++pos)
 {
-    if(pos->first == mitk::OneTissueCompartmentModel::NAME_PARAMETER_k1)
+    if(pos->first == mitk::OneTissueCompartmentModel::NAME_PARAMETER_K1)
     {
-        generator->SetParameterInputImage(mitk::OneTissueCompartmentModel::POSITION_PARAMETER_k1, pos->second);
+        generator->SetParameterInputImage(mitk::OneTissueCompartmentModel::POSITION_PARAMETER_K1, pos->second);
     }
     if(pos->first == mitk::OneTissueCompartmentModel::NAME_PARAMETER_k2)
     {
@@ -982,8 +864,6 @@ PerfusionDataSimulationView::PerfusionDataSimulationView()
      mitk::ModelFactoryBase::Pointer factory = mitk::ExtendedToftsModelFactory::New().GetPointer();
      m_FactoryStack.push_back(factory);
      factory = mitk::TwoCompartmentExchangeModelFactory::New().GetPointer();
-     m_FactoryStack.push_back(factory);
-     factory = mitk::NumericTwoCompartmentExchangeModelFactory::New().GetPointer();
      m_FactoryStack.push_back(factory);
      factory = mitk::TwoTissueCompartmentModelFactory::New().GetPointer();
      m_FactoryStack.push_back(factory);

@@ -129,7 +129,7 @@ QtPlatformLogModel::~QtPlatformLogModel()
   disconnect(this, SIGNAL(signalFlushLogEntries()), this, SLOT( slotFlushLogEntries() ));
   QtLogPlugin::GetInstance()->GetContext()->disconnectFrameworkListener(this);
 
-  // dont delete and unregister backend, only deactivate it to avoid thread syncronization issues cause mitk::UnregisterBackend is not threadsafe
+  // dont delete and unregister backend, only deactivate it to avoid thread synchronization issues cause mitk::UnregisterBackend is not threadsafe
   // will be fixed.
   //  delete myBackend;
   //  delete m_Active;
@@ -289,7 +289,7 @@ QtPlatformLogModel::headerData(int section, Qt::Orientation orientation, int rol
         case 6: return QVariant(" Line ");
       }
     }
-    else //!m_ShowAdvancedFiels, m_ShowCategory is not handled seperately because it only activates case 2
+    else //!m_ShowAdvancedFiels, m_ShowCategory is not handled separately because it only activates case 2
     {
       switch (section)
       {

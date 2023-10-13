@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkRenderingManagerFactory.h>
 #include <mitkBaseRenderer.h>
 #include <mitkCameraController.h>
+#include <mitkTimeNavigationController.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProportionalTimeGeometry.h>
@@ -41,7 +42,7 @@ namespace mitk
       m_LODIncreaseBlocked(false),
       m_LODAbortMechanismEnabled(false),
       m_ClippingPlaneEnabled(false),
-      m_TimeNavigationController(SliceNavigationController::New()),
+      m_TimeNavigationController(TimeNavigationController::New()),
       m_DataStorage(nullptr),
       m_ConstrainedPanningZooming(true),
       m_FocusedRenderWindow(nullptr),
@@ -341,6 +342,12 @@ namespace mitk
       mitkReThrow(exception);
     }
 
+    if (boundingBoxInitialized)
+    {
+      this->GetTimeNavigationController()->SetInputWorldTimeGeometry(modifiedGeometry);
+    }
+    this->GetTimeNavigationController()->Update();
+
     RenderWindowVector allRenderWindows = this->GetAllRegisteredRenderWindows();
     RenderWindowVector::const_iterator it;
     for (it = allRenderWindows.cbegin(); it != allRenderWindows.cend(); ++it)
@@ -356,12 +363,6 @@ namespace mitk
         this->InternalViewInitialization(baseRenderer, modifiedGeometry, boundingBoxInitialized, id, resetCamera);
       }
     }
-
-    if (boundingBoxInitialized)
-    {
-      this->GetTimeNavigationController()->SetInputWorldTimeGeometry(modifiedGeometry);
-    }
-    this->GetTimeNavigationController()->Update();
 
     this->RequestUpdateAll(type);
 
@@ -416,18 +417,17 @@ namespace mitk
       mitkReThrow(exception);
     }
 
-    BaseRenderer* baseRenderer = BaseRenderer::GetInstance(renderWindow);
-    baseRenderer->SetConstrainZoomingAndPanning(this->GetConstrainedPanningZooming());
-
-    int id = baseRenderer->GetMapperID();
-    this->InternalViewInitialization(baseRenderer, modifiedGeometry, boundingBoxInitialized, id, resetCamera);
-
     if (boundingBoxInitialized)
     {
       this->GetTimeNavigationController()->SetInputWorldTimeGeometry(modifiedGeometry);
     }
-
     this->GetTimeNavigationController()->Update();
+
+    BaseRenderer* baseRenderer = BaseRenderer::GetInstance(renderWindow);
+    baseRenderer->SetConstrainZoomingAndPanning(this->GetConstrainedPanningZooming());
+
+    const int id = baseRenderer->GetMapperID();
+    this->InternalViewInitialization(baseRenderer, modifiedGeometry, boundingBoxInitialized, id, resetCamera);
 
     this->RequestUpdate(renderWindow);
 
@@ -468,7 +468,7 @@ namespace mitk
         if (mapperID == BaseRenderer::Standard2D)
         {
           // For 2D SNCs, steppers are set so that the cross is centered in the image
-          nc->GetSlice()->SetPos(nc->GetSlice()->GetSteps() / 2);
+          nc->GetStepper()->SetPos(nc->GetStepper()->GetSteps() / 2);
           baseRenderer->GetCameraController()->Fit();
         }
         else if (mapperID == BaseRenderer::Standard3D)
@@ -529,12 +529,12 @@ namespace mitk
     return boundingBoxInitialized;
   }
 
-  const SliceNavigationController *RenderingManager::GetTimeNavigationController() const
+  const TimeNavigationController *RenderingManager::GetTimeNavigationController() const
   {
     return m_TimeNavigationController.GetPointer();
   }
 
-  SliceNavigationController *RenderingManager::GetTimeNavigationController()
+  TimeNavigationController *RenderingManager::GetTimeNavigationController()
   {
     return m_TimeNavigationController.GetPointer();
   }

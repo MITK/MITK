@@ -73,7 +73,7 @@ void SetFocus() override;
 
 protected slots:
 
-/** This timer updates the IGT pipline, when nessecary:
+/** This timer updates the IGT pipline, when necessary:
 *   1: if permanent registration is activated, then the permanent
 *      registration filter has to be updated
 *   2: if the camera view is on it also must be updated
@@ -197,7 +197,7 @@ mitk::NavigationData::Pointer m_ObjectmarkerNavigationDataLastUpdate; ///< this 
 //######################## some internal help methods ############################
 /**
 * Checks if the difference between two given transformations is high which means the method returns
-* true if the difference exeeds the given position and angular threshold.
+* true if the difference exceeds the given position and angular threshold.
 */
 bool IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB, double euclideanDistanceThreshold = .8, double angularDifferenceThreshold = .8);
 

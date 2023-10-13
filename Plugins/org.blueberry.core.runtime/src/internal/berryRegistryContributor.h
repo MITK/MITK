@@ -87,7 +87,7 @@ public:
    * (e.g., "org.eclipse.core.runtime"). If contributor does not rely on a host, then
    * <code>null</code> should be used as the host name.
    * </p><p>
-   * There should be 1-to-1 mapping between the contributor and the contibutor ID.
+   * There should be 1-to-1 mapping between the contributor and the contributor ID.
    * The IDs (either actual or host) can not be re-used in the same registry.
    * For example, if ID of 12 was used to identify contributorA, the ID of 12 can not
    * be used to identify contributorB or a host for the contributorC.

@@ -254,7 +254,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Overrride original image</string>
+         <string>Override original image</string>
         </property>
         <property name="checked">
          <bool>false</bool>

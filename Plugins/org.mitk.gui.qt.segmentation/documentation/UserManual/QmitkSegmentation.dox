@@ -115,7 +115,7 @@ Groups can be <b>locked</b> and <b>unlocked</b> as a whole from their context me
 \section org_mitk_views_segmentationlabelsuggestions Label name and color suggestions
 
 When renaming label instances or creating new label instances with enforced manual naming in the Segmentation preferences, entering names is supported by auto-completion for common label names.
-The list of predefined label names and colors for the auto-completion feature can be either extented or replaced by a custom list of label name and color suggestions.
+The list of predefined label names and colors for the auto-completion feature can be either extended or replaced by a custom list of label name and color suggestions.
 This custom list must be specified as a JSON file, just containing an array of objects, each with a mandatory "name" string and an optional "color" string.
 The JSON file can be set in the Segmentation preferences as well as a few options on how to apply these suggestions.
 
@@ -131,9 +131,10 @@ The actual pixel contents of label instances are unaffected as label set presets
 
 \imageMacro{QmitkSegmentation_Preset.png,"Saving and loading label set presets", 10.00}
 
-\subsection org_mitk_views_segmentationdefaultlabelpresets Applying label set presets by default
+If you work on a repetitive segmentation task, manually loading the same label set preset for each and every new segmentation can be tedious.
+To streamline your workflow, you can set a default label set preset in the Segmentation preferences (Ctrl+P). When set, this label set preset will be applied to all new segmentations instead of creating the default red "Label 1" label instance.
 
-If you work on a repetetive segmentation task, manually loading the same label set preset for each and every new segmentation can be tedious.
+If you work on a repetitive segmentation task, manually loading the same label set preset for each and every new segmentation can be tedious.
 To streamline your workflow, you can set a default label set preset in the Segmentation preferences (Ctrl+P). When set, this label set preset will be applied to all new segmentations instead of creating the default red "Label 1" label instance.
 
 \section org_mitk_views_segmentationpreferences Preferences

@@ -229,32 +229,30 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
     orientation == AnatomicalPlane::Sagittal ? 0 :
     orientation == AnatomicalPlane::Coronal  ? 1 : 2;
 
-  // Inspired by:
-  // http://www.na-mic.org/Wiki/index.php/Coordinate_System_Conversion_Between_ITK_and_Slicer3
+  int axes[3];
+  geometry3D->MapAxesToOrientations(axes);
+  int axis = axes[worldAxis];
 
-  mitk::AffineTransform3D::MatrixType matrix = geometry3D->GetIndexToWorldTransform()->GetMatrix();
-  matrix.GetVnlMatrix().normalize_columns();
-  mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetTranspose();
+  ScalarType viewSpacing = geometry3D->GetSpacing()[axis];
+  unsigned int slices = static_cast<unsigned int>(geometry3D->GetExtent(axis) + 0.5);
 
-  int dominantAxis = planeGeometry->CalculateDominantAxes(inverseMatrix).at(worldAxis);
-  ScalarType viewSpacing = geometry3D->GetSpacing()[dominantAxis];
-
-  /// Although the double value returned by GetExtent() holds a round number,
-  /// you need to add 0.5 to safely convert it to unsigned it. I have seen a
-  /// case when the result was less by one without this.
-  auto slices = static_cast<unsigned int>(geometry3D->GetExtent(dominantAxis) + 0.5);
-  if ( slices == 0 && geometry3D->GetExtent(dominantAxis) > 0) {
-      // require at least one slice if there is _some_ extent
-      slices = 1;
+  if (slices == 0 && geometry3D->GetExtent(axis) > 0)
+  {
+    // require at least one slice if there is _some_ extent
+    slices = 1;
   }
 
 #ifndef NDEBUG
-  int upDirection = itk::Function::Sign(inverseMatrix[dominantAxis][worldAxis]);
+  auto matrix = geometry3D->GetIndexToWorldTransform()->GetMatrix();
+  matrix.GetVnlMatrix().normalize_columns();
+  auto inverseMatrix = matrix.GetInverse();
+
+  int upDirection = itk::Function::Sign(inverseMatrix[axis][worldAxis]);
 
   /// The normal vector of an imaginary plane that points from the world origin (bottom left back
   /// corner or the world, with the lowest physical coordinates) towards the inside of the volume,
   /// along the renderer axis. Length is the slice thickness.
-  Vector3D worldPlaneNormal = inverseMatrix.get_row(dominantAxis) * (upDirection * viewSpacing);
+  Vector3D worldPlaneNormal = inverseMatrix.get_row(axis) * (upDirection * viewSpacing);
 
   /// The normal of the standard plane geometry just created.
   Vector3D standardPlaneNormal = planeGeometry->GetNormal();
@@ -375,7 +373,7 @@ void mitk::SlicedGeometry3D::ReinitializePlanes(const Point3D &center, const Poi
   }
 
   // Reinitialize SNC with new number of slices
-  m_SliceNavigationController->GetSlice()->SetSteps(m_Slices);
+  m_SliceNavigationController->GetStepper()->SetSteps(m_Slices);
 
   this->Modified();
 }
@@ -904,7 +902,7 @@ void mitk::SlicedGeometry3D::ExecuteOperation(Operation *operation)
             m_PlaneGeometries[0] = planeGeometry;
           }
 
-          m_SliceNavigationController->GetSlice()->SetSteps(m_Slices);
+          m_SliceNavigationController->GetStepper()->SetSteps(m_Slices);
 
           this->Modified();
 
@@ -912,7 +910,7 @@ void mitk::SlicedGeometry3D::ExecuteOperation(Operation *operation)
 
           if (m_SliceNavigationController)
           {
-            m_SliceNavigationController->GetSlice()->SetPos(restorePlaneOp->GetPos());
+            m_SliceNavigationController->GetStepper()->SetPos(restorePlaneOp->GetPos());
             m_SliceNavigationController->AdjustSliceStepperRange();
           }
           BaseGeometry::ExecuteOperation(restorePlaneOp);

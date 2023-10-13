@@ -308,7 +308,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 
   selectedNode->SetBoolProperty("visible", false);
 
-  //set some properties for clipping the image-->Output: labled Image
+  //set some properties for clipping the image-->Output: labeled Image
   mitk::HeightFieldSurfaceClipImageFilter::Pointer surfaceClipFilter = mitk::HeightFieldSurfaceClipImageFilter::New();
 
   surfaceClipFilter->SetInput(dynamic_cast<mitk::Image*>(selectedNode->GetData()));

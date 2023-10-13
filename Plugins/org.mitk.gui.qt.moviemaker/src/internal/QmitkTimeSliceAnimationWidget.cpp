@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "QmitkTimeSliceAnimationItem.h"
 #include "QmitkTimeSliceAnimationWidget.h"
 #include <mitkRenderingManager.h>
-#include <mitkSliceNavigationController.h>
+#include <mitkTimeNavigationController.h>
 #include <mitkStepper.h>
 #include <ui_QmitkTimeSliceAnimationWidget.h>
 
@@ -21,7 +21,7 @@ namespace
 {
   int GetNumberOfSlices()
   {
-    mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
+    mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetStepper();
 
     if (stepper != nullptr)
       return std::max(1, static_cast<int>(stepper->GetSteps()));

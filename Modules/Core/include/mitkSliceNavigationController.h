@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <mitkMessage.h>
 #include <mitkAnatomicalPlanes.h>
 #include <mitkRenderingManager.h>
-#include <mitkRestorePlanePositionOperation.h>
 #include <mitkTimeGeometry.h>
 
 #pragma GCC visibility push(default)
@@ -53,17 +52,17 @@ namespace mitk
    * \brief Controls the selection of the slice the associated BaseRenderer
    * will display
    *
-   * A SliceNavigationController takes a BaseGeometry or a TimeGeometry as input world geometry
-   * (TODO what are the exact requirements?) and generates a TimeGeometry
-   * as output. The TimeGeometry holds a number of SlicedGeometry3Ds and
+   * A SliceNavigationController takes a TimeGeometry as input world time geometry
+   * and generates a different TimeGeometry as output, depending on the current
+   * view direction and the current time step.
+   * The TimeGeometry holds a number of SlicedGeometry3Ds and
    * these in turn hold a series of PlaneGeometries. One of these PlaneGeometries is
    * selected as world geometry for the BaseRenderers associated to 2D views.
    *
-   * The SliceNavigationController holds has Steppers (one for the slice, a
-   * second for the time step), which control the selection of a single
-   * PlaneGeometry from the TimeGeometry. SliceNavigationController generates
-   * ITK events to tell observers, like a BaseRenderer, when the selected slice
-   * or timestep changes.
+   * The SliceNavigationController holds a Stepper, which controls the
+   * slice-selection of a single PlaneGeometry from the TimeGeometry.
+   * SliceNavigationController generates ITK events to tell observers,
+   * like a BaseRenderer, when the selected slice changes.
    *
    * Example:
    * \code
@@ -79,9 +78,8 @@ namespace mitk
    *
    * // Connect one or more BaseRenderer to this navigation controller, i.e.:
    * // events sent by the navigation controller when stepping through the slices
-   * // (e.g. by sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer
-   * // (in this example only slice-changes, see also ConnectGeometryTimeEvent
-   * // and ConnectGeometryEvents.)
+   * // (e.g. by sliceCtrl->GetStepper()->Next()) will be received by the BaseRenderer
+   * // (in this example only slice-changes, see also ConnectGeometryEvents.)
    * sliceCtrl->ConnectGeometrySliceEvent(renderer.GetPointer());
    *
    * //create a world geometry and send the information to the connected renderer(s)
@@ -98,13 +96,13 @@ namespace mitk
    *   new QmitkSliceNavigationWidget(parent);
    *
    * // Connect the navigation widget to the slice-stepper of the
-   * // SliceNavigationController. For initialization (position, mininal and
+   * // SliceNavigationController. For initialization (position, minimal and
    * // maximal values) the values of the SliceNavigationController are used.
    * // Thus, accessing methods of a navigation widget is normally not necessary,
    * // since everything can be set via the (Qt-independent) SliceNavigationController.
    * // The QmitkStepperAdapter converts the Qt-signals to Qt-independent
    * // itk-events.
-   * new QmitkStepperAdapter(navigationWidget, sliceCtrl->GetSlice());
+   * new QmitkStepperAdapter(navigationWidget, sliceCtrl->GetStepper());
    * \endcode
    *
    * If you do not want that all renderwindows are updated when a new slice is
@@ -140,8 +138,8 @@ namespace mitk
      * \brief Set the input world time geometry out of which the
      * geometries for slicing will be created.
      *
-     * Any previous previous set input geometry (3D or Time) will
-     * be ignored in future.
+     * Any previous set input geometry (3D or Time) will
+     * be ignored in the future.
      */
     void SetInputWorldTimeGeometry(const TimeGeometry* geometry);
     itkGetConstObjectMacro(InputWorldTimeGeometry, TimeGeometry);
@@ -215,14 +213,6 @@ namespace mitk
      */
     virtual void SendSlice();
 
-    /**
-     * \brief Send the currently selected time to the connected
-     * observers (renderers)
-     *
-     * Called by Update().
-     */
-    virtual void SendTime();
-
     class MITKCORE_EXPORT TimeGeometryEvent : public itk::AnyEvent
     {
     public:
@@ -247,7 +237,6 @@ namespace mitk
 
     mitkTimeGeometryEventMacro(GeometrySendEvent, TimeGeometryEvent);
     mitkTimeGeometryEventMacro(GeometryUpdateEvent, TimeGeometryEvent);
-    mitkTimeGeometryEventMacro(GeometryTimeEvent, TimeGeometryEvent);
     mitkTimeGeometryEventMacro(GeometrySliceEvent, TimeGeometryEvent);
 
     template <typename T>
@@ -277,23 +266,6 @@ namespace mitk
       m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
 
-    template <typename T>
-    void ConnectGeometryTimeEvent(T* receiver)
-    {
-      auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
-      eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
-      unsigned long tag = AddObserver(GeometryTimeEvent(nullptr, 0), eventReceptorCommand);
-      m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
-    }
-
-    template <typename T>
-    void ConnectGeometryEvents(T* receiver)
-    {
-      // connect sendEvent only once
-      ConnectGeometrySliceEvent(receiver, false);
-      ConnectGeometryTimeEvent(receiver);
-    }
-
     // use a templated method to get the right offset when casting to void*
     template <typename T>
     void Disconnect(T* receiver)
@@ -310,25 +282,6 @@ namespace mitk
     }
 
     Message1<const Point3D&> SetCrosshairEvent;
-
-    /**
-     * \brief To connect multiple SliceNavigationController, we can
-     * act as an observer ourselves: implemented interface
-     * \warning not implemented
-     */
-    virtual void SetGeometry(const itk::EventObject& geometrySliceEvent);
-
-    /**
-     * \brief To connect multiple SliceNavigationController, we can
-     * act as an observer ourselves: implemented interface
-     */
-    virtual void SetGeometrySlice(const itk::EventObject& geometrySliceEvent);
-
-    /**
-     * \brief To connect multiple SliceNavigationController, we can
-     * act as an observer ourselves: implemented interface
-     */
-    virtual void SetGeometryTime(const itk::EventObject& geometryTimeEvent);
 
     /** \brief Positions the SNC according to the specified point */
     void SelectSliceByPoint(const Point3D& point);
@@ -386,14 +339,6 @@ namespace mitk
      * the current geometry orientation of this SNC's SlicedGeometry.
      */
     void AdjustSliceStepperRange();
-
-    /** \brief Convenience method that returns the time step currently selected by the controller.*/
-    TimeStepType GetSelectedTimeStep() const;
-
-    /** \brief Convenience method that returns the time point that corresponds to the selected
-     * time step. The conversion is done using the time geometry of the SliceNavigationController.
-     * If the time geometry is not yet set, this function will always return 0.0.*/
-    TimePointType GetSelectedTimePoint() const;
 
   protected:
 

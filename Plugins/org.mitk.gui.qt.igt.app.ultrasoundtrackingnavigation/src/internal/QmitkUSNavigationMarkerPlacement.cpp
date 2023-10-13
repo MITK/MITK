@@ -360,7 +360,7 @@ void QmitkUSNavigationMarkerPlacement::OnTimeout()
 {
   if (m_CombinedModality.IsNull())
     return;
-  m_CombinedModality->Modified(); // shouldn't be nessecary ... fix in abstract ultrasound tracker device!
+  m_CombinedModality->Modified(); // shouldn't be necessary ... fix in abstract ultrasound tracker device!
   m_CombinedModality->Update();
   if (m_ToolVisualizationFilter.IsNotNull())
   {
@@ -758,7 +758,7 @@ void QmitkUSNavigationMarkerPlacement::CreateOverlays()
   m_WarnOverlay->SetText("Warning: No calibration available for current depth.");
 
   // set position and font size for the text overlay
-  // (nonesense postition as a layouter is used, but it ignored
+  // (nonsense position as a layouter is used, but it ignored
   // the overlay without setting a position here)
   mitk::Point2D overlayPosition;
   overlayPosition.SetElement(0, -50.0f);

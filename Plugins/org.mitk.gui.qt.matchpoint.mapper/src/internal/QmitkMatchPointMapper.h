@@ -107,7 +107,7 @@ private:
      * Checks if appropriated nodes are selected in the data manager. If nodes are selected,
      * they are stored m_spSelectedRegNode, m_spSelectedInputNode and m_spSelectedRefNode.
      * They are also checked for vadility and stored in m_ValidInput,... .
-     * It also sets the info lables accordingly.*/
+     * It also sets the info labels accordingly.*/
     void CheckInputs();
 
     /** Methods checks the validity of the currently stored
@@ -122,7 +122,7 @@ private:
     void ConfigureMappingControls();
 
     /**
-     * Configures the progress bars accoarding to the choosen algorithm.
+     * Configures the progress bars accoarding to the chosen algorithm.
      */
     void ConfigureProgressInfos();
 

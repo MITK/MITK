@@ -32,7 +32,7 @@ the user can pause, resume or cancel running jobs and see console output for eac
 
 As a consequence of the very flexible nature of this plugin, these instructions can only describe how to launch
 command line modules in a general sense. The examples shown have been constructed by the latest version of the NiftyReg package.
-Futher information on the NiftyReg package, including links to the source code, can be found on the wiki page <a href="http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg">here</a>.
+Further information on the NiftyReg package, including links to the source code, can be found on the wiki page <a href="http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg">here</a>.
 NiftyReg provides valid XML descriptors to enable the integration of the NiftyReg affine (RegAladin) and and non-rigid (RegF3D) image registration algorithms, as well
 as utility programs to resample an image, and calculate a Jacobian image. These same XML descriptors work within
 <a href="https://www.slicer.org/">Slicer</a> and <a href="https://www.mitk.org/">MITK</a> based applications.
@@ -152,7 +152,7 @@ user to delete them when they are finished.
 
 It is easy to run multiple jobs. The green button simply launches the job corresponding to the current tab repeatedly.
 It is up to the user to make sure that any output file names are changed between successive invocations of the same command
-line module to avoid overwritting output data.
+line module to avoid overwriting output data.
 
 In addition, each set of parameters contains an "About" section containing details of the contributors, the licence and acknowledgements and also
 a "Help" section containing a description and a link to any online documentation.

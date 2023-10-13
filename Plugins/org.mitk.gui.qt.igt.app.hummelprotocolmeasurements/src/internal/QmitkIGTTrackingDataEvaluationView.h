@@ -59,9 +59,9 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkAbstractView
     void OnPerfomGridMatching();
     void OnComputeRotation();
 
-    /** Reads in exactly three position files als reference. */
+    /** Reads in exactly three position files as reference. */
     void OnOrientationCalculation_CalcRef();
-    /** Uses always three positions (1,2,3: first orientation; 4,5,6: second orientation; and so on) in every file to calcualte a orientation. */
+    /** Uses always three positions (1,2,3: first orientation; 4,5,6: second orientation; and so on) in every file to calculate a orientation. */
     void OnOrientationCalculation_CalcOrientandWriteToFile();
 
 
@@ -84,7 +84,7 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkAbstractView
 
     double m_scalingfactor; //scaling factor for visualization, 1 by default
 
-    //angle diffrences: seperated file
+    //angle differences: separated file
     std::fstream m_CurrentAngleDifferencesWriteFile;
     void CalculateDifferenceAngles();
     void WriteDifferenceAnglesHeader();

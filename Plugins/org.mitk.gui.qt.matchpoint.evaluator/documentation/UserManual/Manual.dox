@@ -48,7 +48,7 @@ You can choose from the following visualization styles to evaluate the registrat
 \li "Contour": Blend mode that displays one image as blue "background" and the other image in yellow contours. You can choose the role of the images.
 \imageMacro{map_style_contour.png, "Example for mode: Contour", 5}
 \li "Difference": Displays the absolute difference of both images.
-\li "Wipe": Blend mode that makes a rectilinear combination of the images. You can choose the mode how the images are splitted. The split is synchronized with the current selection. So you may interact with the split border to position it on interesting areas.
+\li "Wipe": Blend mode that makes a rectilinear combination of the images. You can choose the mode how the images are split. The split is synchronized with the current selection. So you may interact with the split border to position it on interesting areas.
 \imageMacro{map_style_wipe_cross.png, "Example for mode: Wipe cross", 5}
 \imageMacro{map_style_wipe_horizontal.png, "Example for mode: Wipe horizontal", 5}
 

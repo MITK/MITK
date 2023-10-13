@@ -81,7 +81,7 @@ private:
    * Maps a stack's id to its current bounds
    * this is used to capture the current bounds of all
    * stacks -before- starting a maximize (since the
-   * iterative 'minimize' calls cause the intial stack's
+   * iterative 'minimize' calls cause the initial stack's
    * bounds to change.
    */
   QHash<QString, QRect> boundsMap;

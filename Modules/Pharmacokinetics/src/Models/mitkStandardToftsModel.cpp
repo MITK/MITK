@@ -17,8 +17,8 @@ found in the LICENSE file.
 
 const std::string mitk::StandardToftsModel::MODEL_DISPLAY_NAME = "Standard Tofts Model";
 
-const std::string mitk::StandardToftsModel::NAME_PARAMETER_Ktrans = "KTrans";
-const std::string mitk::StandardToftsModel::NAME_PARAMETER_ve = "ve";
+const std::string mitk::StandardToftsModel::NAME_PARAMETER_Ktrans = "K^trans";
+const std::string mitk::StandardToftsModel::NAME_PARAMETER_ve = "v_e";
 
 const std::string mitk::StandardToftsModel::UNIT_PARAMETER_Ktrans = "ml/min/100ml";
 const std::string mitk::StandardToftsModel::UNIT_PARAMETER_ve = "ml/ml";
@@ -28,6 +28,16 @@ const unsigned int mitk::StandardToftsModel::POSITION_PARAMETER_ve = 1;
 
 const unsigned int mitk::StandardToftsModel::NUMBER_OF_PARAMETERS = 2;
 
+const std::string mitk::StandardToftsModel::NAME_DERIVED_PARAMETER_kep = "k_{e->p}";
+
+const unsigned int mitk::StandardToftsModel::NUMBER_OF_DERIVED_PARAMETERS = 1;
+
+const std::string mitk::StandardToftsModel::UNIT_DERIVED_PARAMETER_kep = "1/min";
+
+const std::string mitk::StandardToftsModel::MODEL_TYPE = "Perfusion.MR";
+
+
+
 std::string mitk::StandardToftsModel::GetModelDisplayName() const
 {
   return MODEL_DISPLAY_NAME;
@@ -35,7 +45,7 @@ std::string mitk::StandardToftsModel::GetModelDisplayName() const
 
 std::string mitk::StandardToftsModel::GetModelType() const
 {
-  return "Perfusion.MR";
+  return MODEL_TYPE;
 };
 
 mitk::StandardToftsModel::StandardToftsModel()
@@ -78,21 +88,21 @@ mitk::StandardToftsModel::ParameterNamesType
 mitk::StandardToftsModel::GetDerivedParameterNames() const
 {
   ParameterNamesType result;
-  result.push_back("kep");
+  result.push_back(NAME_DERIVED_PARAMETER_kep);
   return result;
 };
 
 mitk::StandardToftsModel::ParametersSizeType
 mitk::StandardToftsModel::GetNumberOfDerivedParameters() const
 {
-  return 1;
+  return NUMBER_OF_DERIVED_PARAMETERS;
 };
 
 mitk::StandardToftsModel::ParamterUnitMapType mitk::StandardToftsModel::GetDerivedParameterUnits() const
 {
   ParamterUnitMapType result;
 
-  result.insert(std::make_pair("kep", "1/min"));
+  result.insert(std::make_pair(NAME_DERIVED_PARAMETER_kep, UNIT_DERIVED_PARAMETER_kep));
 
   return result;
 };
@@ -146,7 +156,7 @@ mitk::ModelBase::DerivedParameterMapType mitk::StandardToftsModel::ComputeDerive
 {
   DerivedParameterMapType result;
   double kep = parameters[POSITION_PARAMETER_Ktrans] / parameters[POSITION_PARAMETER_ve];
-  result.insert(std::make_pair("kep", kep));
+  result.insert(std::make_pair(NAME_DERIVED_PARAMETER_kep, kep));
   return result;
 };
 

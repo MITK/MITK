@@ -108,7 +108,7 @@ private:
   /** holds the navigation tool of the needle for the meta data (tool axis etc.)*/
   mitk::NavigationTool::Pointer m_NeedleNavigationTool;
 
-  std::map<mitk::DataNode::Pointer,mitk::Color> m_OldColors; //stores the original color of the critical structrue nodes
+  std::map<mitk::DataNode::Pointer,mitk::Color> m_OldColors; //stores the original color of the critical structure nodes
 
   //some help variables for the CheckSphereLineIntersection()-Method
   vtkSmartPointer<vtkSphereSource> m_SphereSource;

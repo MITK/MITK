@@ -285,7 +285,7 @@ bool PerspectiveDescriptor::RestoreState(IMemento::Pointer memento)
 
     if (descriptor)
     {
-      // Copy the state from the registred descriptor.
+      // Copy the state from the registered descriptor.
       imageDescriptor = descriptor->GetImageDescriptor();
     }
   }

@@ -53,7 +53,7 @@ namespace ResetGeometryAction
 
     // store the current time step to set it again later, if the camera should not be reset
     auto* renderingManager = mitk::RenderingManager::GetInstance();
-    const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+    const mitk::TimePointType currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
     if (referenceGeometry->IsValidTimePoint(currentTimePoint))
     {
       imageTimeStep = referenceGeometry->TimePointToTimeStep(currentTimePoint);
@@ -69,7 +69,7 @@ namespace ResetGeometryAction
     }
 
     renderWindowPart->SetSelectedPosition(currentPosition);
-    renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
+    renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(imageTimeStep);
   }
 } // namespace ResetGeometryAction
 

@@ -328,7 +328,7 @@ void QmitkRenderWindowMenu::AutoRotateNextStep()
 {
   if (m_Renderer->GetCameraRotationController())
   {
-    m_Renderer->GetCameraRotationController()->GetSlice()->Next();
+    m_Renderer->GetCameraRotationController()->GetStepper()->Next();
   }
 }
 
@@ -337,11 +337,11 @@ void QmitkRenderWindowMenu::OnAutoRotationActionTriggered()
   if (m_AutoRotationTimer->isActive())
   {
     m_AutoRotationTimer->stop();
-    m_Renderer->GetCameraRotationController()->GetSlice()->PingPongOff();
+    m_Renderer->GetCameraRotationController()->GetStepper()->PingPongOff();
   }
   else
   {
-    m_Renderer->GetCameraRotationController()->GetSlice()->PingPongOn();
+    m_Renderer->GetCameraRotationController()->GetStepper()->PingPongOn();
     m_AutoRotationTimer->start();
   }
 }

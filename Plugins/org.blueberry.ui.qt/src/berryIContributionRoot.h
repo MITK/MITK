@@ -47,7 +47,7 @@ struct IContributionRoot : public Object
                                    const SmartPointer<Expression>& visibleWhen) = 0;
 
   /**
-   * Registers visibilty for arbitrary {@link IContributionItem} instances
+   * Registers visibility for arbitrary {@link IContributionItem} instances
    * that are <b>NOT</b> direct children of this container. Ie: children of a
    * {@link IContributionManager} that has been previously registered with a
    * call to AddContributionItem().

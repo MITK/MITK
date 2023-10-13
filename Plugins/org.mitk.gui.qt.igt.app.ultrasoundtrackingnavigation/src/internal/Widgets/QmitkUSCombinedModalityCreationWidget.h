@@ -31,13 +31,13 @@ class QmitkUSCombinedModalityCreationWidget : public QWidget
   Q_OBJECT
 
 signals:
-  /** \brief Emmited when the user clicks the "Cancel" button. */
+  /** \brief Emitted when the user clicks the "Cancel" button. */
   void SignalAborted();
 
-  /** \brief Emmited when the user clicked the "Create" button and the creation is successfull. */
+  /** \brief Emitted when the user clicked the "Create" button and the creation is successful. */
   void SignalCreated(mitk::USCombinedModality::Pointer combinedModality);
 
-  /** \brief Emmited when the user clicked the "Create" button and the creation is successfull. */
+  /** \brief Emitted when the user clicked the "Create" button and the creation is successful. */
   void SignalCreated();
 
 protected slots:

@@ -145,7 +145,7 @@ struct IContributionItem : public virtual Object
   virtual bool IsSeparator() const = 0;
 
   /**
-   * Returns whether this contribution item is visibile within its manager.
+   * Returns whether this contribution item is visible within its manager.
    *
    * @return <code>true</code> if this item is visible, and
    *  <code>false</code> otherwise
@@ -166,7 +166,7 @@ struct IContributionItem : public virtual Object
   virtual void SetParent(IContributionManager* parent) = 0;
 
   /**
-   * Sets whether this contribution item is visibile within its manager.
+   * Sets whether this contribution item is visible within its manager.
    *
    * @param visible <code>true</code> if this item should be visible, and
    *  <code>false</code> otherwise

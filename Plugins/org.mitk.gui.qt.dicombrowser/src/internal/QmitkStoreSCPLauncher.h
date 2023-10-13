@@ -67,7 +67,7 @@ signals:
     void SignalStatusOfStoreSCP(const QString&);
 
     /**
-    * \brief signal is emitted an error occours while storage provider process is running.
+    * \brief signal is emitted an error occurs while storage provider process is running.
     * \param QString containing m_ErrorText.
     */
     void SignalStoreSCPError(const QString& errorText = "");

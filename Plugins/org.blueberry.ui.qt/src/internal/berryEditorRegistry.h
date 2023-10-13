@@ -350,7 +350,7 @@ private: QList<FileEditorMapping::Pointer> GetMappingForFilename(const QString& 
 public: QList<IEditorDescriptor::Pointer> GetSortedEditorsFromPlugins();
 
   /**
-   * Answer an intial id to editor map. This will create a new map and
+   * Answer an initial id to editor map. This will create a new map and
    * populate it with the default system editors.
    *
    * @param initialSize
@@ -391,7 +391,7 @@ private: void SetProductDefaults(const QString& defaultEditors);
    *
    * @param editorTable
    *            Editor table to store the editor definitions.
-   * @return true if the table is built succesfully.
+   * @return true if the table is built successfully.
    */
 private: bool ReadEditors(QHash<QString, EditorDescriptor::Pointer>& editorTable);
 
@@ -425,7 +425,7 @@ private: bool Contains(const QList<IEditorDescriptor::Pointer>& editorsArray,
    *
    * @param editorTable
    *            The editor table containing the defined editors.
-   * @return true if the resources are read succesfully.
+   * @return true if the resources are read successfully.
    */
 private: bool ReadResources(QHash<QString, EditorDescriptor::Pointer>& editorTable);
 
@@ -479,7 +479,7 @@ public: void SaveAssociations();
    * operation will rebuild the internal editor mappings.
    *
    * @param newResourceTypes
-   *            te new file editor mappings.
+   *            the new file editor mappings.
    */
 public: void SetFileEditorMappings(const QList<FileEditorMapping::Pointer>& newResourceTypes);
 

@@ -14,17 +14,24 @@ found in the LICENSE file.
 #define QmitkLevelWindowWidget_h
 
 #include <MitkQtWidgetsExports.h>
-
-#include "ui_QmitkLevelWindowWidget.h"
+#include <mitkLevelWindowManager.h>
 
 #include <QWidget>
 
+// Forward declarations
+namespace Ui
+{
+  class QmitkLevelWindow;
+}
+
 /// \ingroup QmitkModule
-class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidget : public QWidget, public Ui::QmitkLevelWindow
+class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidget : public QWidget
 {
   Q_OBJECT
 public:
   QmitkLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  ~QmitkLevelWindowWidget() override;
+
   mitk::LevelWindowManager *GetManager();
 
 public slots:
@@ -33,5 +40,10 @@ public slots:
 protected:
   // unsigned long m_ObserverTag;
   mitk::LevelWindowManager::Pointer m_Manager;
+
+private:
+  // GUI controls of this plugin
+  Ui::QmitkLevelWindow* ui;
+
 };
 #endif

@@ -251,7 +251,7 @@ void QmitkImageCropperView::OnCreateNewBoundingBox()
 
   // get current timestep to support 3d+t images
   auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
-  const auto timePoint = renderWindowPart->GetSelectedTimePoint();
+  const mitk::TimePointType timePoint = renderWindowPart->GetSelectedTimePoint();
   const auto imageGeometry = imageNode->GetData()->GetTimeGeometry()->GetGeometryForTimePoint(timePoint);
 
   auto boundingBox = mitk::GeometryData::New();

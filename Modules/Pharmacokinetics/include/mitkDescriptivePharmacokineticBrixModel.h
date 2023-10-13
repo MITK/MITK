@@ -42,25 +42,37 @@ namespace mitk
     static const std::string NAME_PARAMETER_A;
     static const std::string NAME_PARAMETER_kep;
     static const std::string NAME_PARAMETER_kel;
-    static const std::string NAME_PARAMETER_tlag;
-    static const std::string NAME_STATIC_PARAMETER_Tau;
-    static const std::string NAME_STATIC_PARAMETER_S0;
+    static const std::string NAME_PARAMETER_BAT;
+
+    static const std::string NAME_STATIC_PARAMETER_tau;
+    static const std::string NAME_STATIC_PARAMETER_s0;
 
     static const std::string UNIT_PARAMETER_A;
     static const std::string UNIT_PARAMETER_kep;
     static const std::string UNIT_PARAMETER_kel;
-    static const std::string UNIT_PARAMETER_tlag;
-    static const std::string UNIT_STATIC_PARAMETER_Tau;
-    static const std::string UNIT_STATIC_PARAMETER_S0;
+    static const std::string UNIT_PARAMETER_BAT;
+
+    static const std::string UNIT_STATIC_PARAMETER_tau;
+    static const std::string UNIT_STATIC_PARAMETER_s0;
 
     static const unsigned int POSITION_PARAMETER_A;
     static const unsigned int POSITION_PARAMETER_kep;
     static const unsigned int POSITION_PARAMETER_kel;
-
-    //tlag in minutes
-    static const unsigned int POSITION_PARAMETER_tlag;
+    static const unsigned int POSITION_PARAMETER_BAT;
 
     static const unsigned int NUMBER_OF_PARAMETERS;
+
+    static const unsigned int NUMBER_OF_STATIC_PARAMETERS;
+
+    static const std::string MODEL_TYPE;
+
+    static const std::string X_AXIS_NAME;
+
+    static const std::string X_AXIS_UNIT;
+
+    static const std::string Y_AXIS_NAME;
+
+    static const std::string Y_AXIS_UNIT;
 
     itkSetMacro(Tau, double);
     itkGetConstReferenceMacro(Tau, double);
@@ -104,10 +116,10 @@ namespace mitk
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
     void SetStaticParameter(const ParameterNameType& name,
-                                    const StaticParameterValuesType& values) override;
+      const StaticParameterValuesType& values) override;
+
     StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const
     override;
-
 
     void PrintSelf(std::ostream& os, ::itk::Indent indent) const override;
 

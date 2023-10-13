@@ -25,7 +25,7 @@ namespace mitk
  *
  * \brief The plug-in activator for the planar figure module
  *
- * When the plug-in is started by the framework, it initialzes planar figure specific things.
+ * When the plug-in is started by the framework, it initializes planar figure specific things.
  */
 class PlanarFigureActivator :
   public QObject, public ctkPluginActivator

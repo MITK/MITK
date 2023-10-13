@@ -26,14 +26,14 @@ found in the LICENSE file.
 *
 *        Most segmentation tools / algorithms need some kind of user interaction, where the
 *        user is asked to draw something in the image display or set some seed points / start values.
-*        The tools also often provide additional propeties so that a user can modify the
+*        The tools also often provide additional properties so that a user can modify the
 *        algorithm's behavior.
 *
 *        This class additionally provides options to work with different layers (create new layers,
 *        switch between layers).
 *        Moreover, a multilabel widget displays all the existing labels of a multilabel segmentation
 *        for the currently active layer.
-*        The multilabel widget allows to control the labels by creatin new one, removing existing ones,
+*        The multilabel widget allows to control the labels by creating new ones, removing existing ones,
 *        showing / hiding single labels, merging labels, (re-)naming them etc.
 *
 *        Additionally the view provides an option to create "2D"- and "3D"-interpolations between

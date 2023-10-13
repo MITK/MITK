@@ -83,7 +83,7 @@ public slots:
     void OnDirectoryChanged(const QString&);
 
     /**
-    * \brief called when error occours during dicom store request
+    * \brief called when error occurs during dicom store request
     */
     void OnDicomNetworkError(const QString&);
 

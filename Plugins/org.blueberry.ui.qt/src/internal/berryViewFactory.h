@@ -70,14 +70,14 @@ public:
     static QString GetKey(IViewReference::Pointer viewRef);
 
     /**
-     * Extracts ths primary id portion of a compound id.
+     * Extracts the primary id portion of a compound id.
      * @param compoundId a compound id of the form: primaryId [':' secondaryId]
      * @return the primary id
      */
     static QString ExtractPrimaryId(const QString& compoundId);
 
     /**
-     * Extracts ths secondary id portion of a compound id.
+     * Extracts the secondary id portion of a compound id.
      * @param compoundId a compound id of the form: primaryId [':' secondaryId]
      * @return the secondary id, or <code>null</code> if none
      */

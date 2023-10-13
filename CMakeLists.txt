@@ -26,6 +26,10 @@ endif()
  ]]
 cmake_policy(SET CMP0091 OLD)
 
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 NEW) # https://cmake.org/cmake/help/v3.24/policy/CMP0135.html
+endif()
+
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #-----------------------------------------------------------------------------

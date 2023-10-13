@@ -23,7 +23,7 @@ namespace mitk {
  * \brief Extends the IRenderWindowPart interface with methods for controlling linked
  *        render windows.
  *
- * This inteface should be implemented by subclasses of berry::IWorkbenchPart if they
+ * This interface should be implemented by subclasses of berry::IWorkbenchPart if they
  * provided several linked QmitkRenderWindow instances.
  */
 struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWindowPart {

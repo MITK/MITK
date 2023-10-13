@@ -355,7 +355,7 @@ public:
    *
    * @param event
    *            The execution event that contains the application context
-   * @return <code>true</code> whe the values are same, <code>false</code>
+   * @return <code>true</code> when the values are same, <code>false</code>
    *         otherwise
    *
    * @throws ExecutionException

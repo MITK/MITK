@@ -29,8 +29,11 @@ found in the LICENSE file.
 #include "itkMeanProjectionImageFilter.h"
 
 mitk::ConcentrationCurveGenerator::ConcentrationCurveGenerator() : m_isT2weightedImage(false), m_isTurboFlashSequence(false),
-    m_AbsoluteSignalEnhancement(false), m_RelativeSignalEnhancement(0.0), m_UsingT1Map(false), m_Factor(0.0), m_RecoveryTime(0.0), m_RelaxationTime(0.0),
-    m_Relaxivity(0.0), m_FlipAngle(0.0), m_FlipAnglePDW(0.0), m_T2Factor(0.0), m_T2EchoTime(0.0), m_RepetitionTime(0.0)
+    m_AbsoluteSignalEnhancement(false), m_RelativeSignalEnhancement(false), m_UsingT1Map(false), m_Factor(std::numeric_limits<double>::quiet_NaN()),
+    m_RecoveryTime(std::numeric_limits<double>::quiet_NaN()), m_RelaxationTime(std::numeric_limits<double>::quiet_NaN()),
+    m_Relaxivity(std::numeric_limits<double>::quiet_NaN()), m_FlipAngle(std::numeric_limits<double>::quiet_NaN()),
+    m_FlipAnglePDW(std::numeric_limits<double>::quiet_NaN()), m_T2Factor(std::numeric_limits<double>::quiet_NaN()),
+    m_T2EchoTime(std::numeric_limits<double>::quiet_NaN()), m_RepetitionTime(std::numeric_limits<double>::quiet_NaN())
 {
 }
 

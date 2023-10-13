@@ -78,15 +78,7 @@ void SetupParser(mitkCommandLineParser& parser)
   parser.endGroup();
 
   parser.beginGroup("Optional parameters");
-  parser.addArgument("template",
-    "t",
-    mitkCommandLineParser::File,
-    "Output template image.",
-    "File path to an image that serves as template for the output geometry.",
-    us::Any(),
-    false, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
-    "registrations", "r", mitkCommandLineParser::StringList, "Registration files", "Pathes to the registrations that should be used to map the input images. If this parameter is not set, identity transforms are assumed. If this parameter is set, it must have the same number of entries then the parameter inputs. If you want to use and identity transform for a specific input, specify an empty string. The application assumes that inputs and registrations have the same order, so the n-th input should use thr n-th registration.", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.endGroup();
 }

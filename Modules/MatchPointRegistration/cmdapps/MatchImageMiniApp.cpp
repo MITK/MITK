@@ -28,10 +28,14 @@ found in the LICENSE file.
 #include <mapImageRegistrationAlgorithmInterface.h>
 #include <mapPointSetRegistrationAlgorithmInterface.h>
 #include <mapMaskedRegistrationAlgorithmInterface.h>
+#include <mapMetaPropertyAlgorithmInterface.h>
+#include <mapMetaProperty.h>
 #include <mapConvert.h>
 #include <mapDeploymentDLLAccess.h>
 #include <mapDeploymentDLLHandle.h>
 #include <mapRegistrationBase.h>
+
+#include <nlohmann/json.hpp>
 
 struct Settings
 {
@@ -39,6 +43,7 @@ struct Settings
   std::string targetFileName = "";
   std::string outFileName = "";
   std::string algFileName = "";
+  std::string parameters = "";
 };
 
 void SetupParser(mitkCommandLineParser& parser)
@@ -79,6 +84,7 @@ void SetupParser(mitkCommandLineParser& parser)
 
   parser.beginGroup("Optional parameters");
   parser.addArgument(
+    "parameters", "p", mitkCommandLineParser::String, "Parameters", "Json string containing a json object that contains the parameters that should be passed to the algorithm as key value paires.");
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.endGroup();
 }
@@ -94,6 +100,10 @@ bool ConfigureApplicationSettings(std::map<std::string, us::Any> parsedArgs, Set
     settings.targetFileName = us::any_cast<std::string>(parsedArgs["target"]);
     settings.outFileName = us::any_cast<std::string>(parsedArgs["output"]);
     settings.algFileName = us::any_cast<std::string>(parsedArgs["algorithm"]);
+    if (parsedArgs.count("parameters") > 0)
+    {
+      settings.parameters = us::any_cast<std::string>(parsedArgs["parameters"]);
+    }
   }
   catch (...)
   {
@@ -149,6 +159,103 @@ mitk::Image::Pointer ExtractFirstFrame(const mitk::Image* dynamicImage)
 
   return imageTimeSelector->GetOutput();
 }
+
+template <typename TValueType>
+map::core::MetaPropertyBase::Pointer
+CheckCastAndSetProp(const nlohmann::json& value)
+{
+  map::core::MetaPropertyBase::Pointer prop;
+
+  try
+  {
+    const auto castedValue = value.template get<TValueType>();
+    prop = map::core::MetaProperty<TValueType>::New(castedValue).GetPointer();
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "Cannot convert value \"" << value << "\" into type: " << typeid(TValueType).name() << ". Details: " << e.what();
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unkown error. Cannot convert value \"" << value << "\" into type: " << typeid(TValueType).name();
+  }
+
+  return prop;
+};
+
+template <typename TValueType>
+map::core::MetaPropertyBase::Pointer
+CheckCastAndSetItkArrayProp(const nlohmann::json& valueSequence)
+{
+  using ArrayType = ::itk::Array<TValueType>;
+  ArrayType castedValue;
+  map::core::MetaPropertyBase::Pointer prop;
+
+  try
+  {
+    castedValue.SetSize(valueSequence.size());
+
+    typename ::itk::Array<TValueType>::SizeValueType index = 0;
+    for (const auto& element : valueSequence)
+    {
+      const auto castedElement = element.template get<TValueType>();
+      castedValue[index] = castedElement;
+    }
+    prop = map::core::MetaProperty<::itk::Array<TValueType>>::New(castedValue).GetPointer();
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "Cannot convert value \"" << valueSequence << "\" into type: " << typeid(ArrayType).name() << ". Details: " << e.what();
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unkown error. Cannot convert value \"" << valueSequence << "\" into type: " << typeid(ArrayType).name();
+  }
+
+  return prop;
+};
+
+::map::core::MetaPropertyBase::Pointer
+WrapIntoMetaProperty(const ::map::algorithm::MetaPropertyInfo* pInfo, const nlohmann::json& value)
+{
+  map::core::MetaPropertyBase::Pointer metaProp;
+
+  if (pInfo == nullptr)
+  {
+    return metaProp;
+  }
+
+  if (pInfo->getTypeInfo() == typeid(int)) {
+    metaProp = CheckCastAndSetProp<int>(value);
+  }
+  else if (pInfo->getTypeInfo() == typeid(unsigned int)) {
+    metaProp = CheckCastAndSetProp<unsigned int>(value);
+  }
+  else if (pInfo->getTypeInfo() == typeid(long)) {
+    metaProp = CheckCastAndSetProp<long>(value);
+  }
+  else if (pInfo->getTypeInfo() == typeid(unsigned long)) {
+    metaProp = CheckCastAndSetProp<unsigned long>(value);
+  }
+  else if (pInfo->getTypeInfo() == typeid(float)) {
+    metaProp = CheckCastAndSetProp<float>(value);
+  }
+  else if (pInfo->getTypeInfo() == typeid(double)) {
+    metaProp = CheckCastAndSetProp<double>(value);
+  }
+  else if (pInfo->getTypeInfo() == typeid(::itk::Array<double>)) {
+    metaProp = CheckCastAndSetItkArrayProp< double >(value);
+  }
+  else if (pInfo->getTypeInfo() == typeid(bool)) {
+    metaProp = CheckCastAndSetProp< bool >(value);
+  }
+  else if (pInfo->getTypeInfo() == typeid(::map::core::String))
+  {
+    metaProp = map::core::MetaProperty<map::core::String>::New(value).GetPointer();
+  }
+
+  return metaProp;
+};
 
 void OnMapAlgorithmEvent(::itk::Object*, const itk::EventObject& event, void*)
 {
@@ -231,7 +338,6 @@ int main(int argc, char* argv[])
   std::cout << "Output file:        " << settings.outFileName << std::endl;
   std::cout << "Algorithm location: " << settings.algFileName << std::endl;
 
-  //load algorithm
   try
   {
     auto algorithm = loadAlgorithm(settings);
@@ -239,6 +345,72 @@ int main(int argc, char* argv[])
     auto command = ::itk::CStyleCommand::New();
     command->SetCallback(OnMapAlgorithmEvent);
     algorithm->AddObserver(::map::events::AlgorithmEvent(), command);
+
+    auto metaPropInterface = dynamic_cast<map::algorithm::facet::MetaPropertyAlgorithmInterface*>(algorithm.GetPointer());
+
+    if (!settings.parameters.empty())
+    {
+      if (nullptr == metaPropInterface)
+      {
+        MITK_WARN << "loaded algorithm does not support custom parameterization. Passed user parameters are ignored.";
+      }
+      else
+      {
+        nlohmann::json paramMap;
+
+        std::string parseError = "";
+        try
+        {
+          paramMap = nlohmann::json::parse(settings.parameters);
+        }
+        catch (const std::exception& e)
+        {
+          parseError = e.what();
+        }
+        if (!parseError.empty())
+        {
+          mitkThrow() << "Cannot parametrize algorithm. Passed JSON parameter string seems to be invalid. Passed string: \"" << settings.parameters << "\". Error details: " << parseError;
+        }
+
+        std::cout << "Configuring algorithm with user specified parameters ..." << std::endl;
+
+        for (const auto& [key, val] : paramMap.items())
+        {
+          const auto info = metaPropInterface->getPropertyInfo(key);
+
+          if (info.IsNotNull())
+          {
+            if (info->isWritable())
+            {
+              std::cout << "Set meta property: " << key << " = " << val << std::endl;
+              ::map::core::MetaPropertyBase::Pointer prop = WrapIntoMetaProperty(info, val);
+              if (prop.IsNull())
+              {
+                mitkThrow() << "Error. Cannot set specified meta property. Type conversion is not supported or value cannot be converted into type. Property name: " << info->getName() << "; property type: " << info->getTypeName();
+              }
+              else
+              {
+                metaPropInterface->setProperty(key, prop);
+              }
+            }
+            else
+            {
+              mitkThrow() << "Cannot parametrize algorithm. A passed parameter is not writable for the algorithm. Violating parameter: \"" << key << "\".";
+            }
+          }
+          else
+          {
+            auto knownProps = metaPropInterface->getPropertyInfos();
+            std::ostringstream knownPropsNameString;
+            for (const auto& knownProp : knownProps)
+            {
+              knownPropsNameString << knownProp->getName() << "; ";
+            }
+            mitkThrow() << "Cannot parametrize algorithm. A parameter is unkown to algorithm. Unkown passed parameter: \"" << key << "\". Known parameters: " << knownPropsNameString.str();
+          }
+        }
+      }
+    }
 
     std::cout << "Load moving data..." << std::endl;
     auto movingImage = mitk::IOUtil::Load<mitk::Image>(settings.movingFileName);

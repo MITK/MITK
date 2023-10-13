@@ -35,6 +35,9 @@
     <page id="org.mitk.gui.qt.application.SegmentationPreferencePage" name="Segmentation" class="QmitkSegmentationPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords"></keywordreference>
     </page>
+    	<page id="org.mitk.gui.qt.application.SegmentAnythingPreferencePage" name="Segment Anything" class="QmitkSegmentAnythingPreferencePage" category="org.mitk.gui.qt.application.SegmentationPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords"></keywordreference>
+    </page>
   </extension>
 
    <extension point="org.blueberry.ui.keywords">

@@ -419,14 +419,14 @@ Remark: The tool assumes that you have a Python3 environment with nnU-Net v1 (pi
 
 \imageMacro{QmitkSegmentation_nnUnetTool.png,"TotalSegmentator tool",10.00}
 
-This tool provides a GUI to the deep learning-based segmentation algorithm called the TotalSegmentator. With this tool, you can get a segmentation mask predicted for 104 classes in CT images, loaded in MITK. 
+This tool provides a GUI to the deep learning-based segmentation algorithm called the TotalSegmentator (v2). With this tool, you can get a segmentation mask predicted for 117 classes in CT images, loaded in MITK. 
 For a detailed explanation on tasks and supported classes etc., please refer to https://github.com/wasserth/TotalSegmentator <br>
-The tool assumes that you have Python 3 installed and available on your machine. We recommend to install TotalSegmentator via MITK. The "Install TotalSegmentator" action implicitly creates a python virtual environment in an MITK mainitained
+The tool assumes that you have Python >= 3.9 installed and available on your machine. We recommend to install TotalSegmentator via MITK. The "Install TotalSegmentator" action implicitly creates a python virtual environment in an MITK mainitained
 directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv package using the following command:  `apt install python3-venv`. For best results, your machine should be ideally equipped with a CUDA-enabled GPU. 
 \imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator Settings",5}
 
 \subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow:
-    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 1.5.5) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 2.0.2) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
     Once installed, the "Install TotalSegmentator" button is grayed out.
     -# If Python is not found by MITK goto "Install Options" & select the "System Python Path" drop-down to see if MITK has automatically detected other Python environments.
     Click on a fitting Python installation for TotalSegmentator to use or click "Select" in the dropdown to choose an unlisted installation of Python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".

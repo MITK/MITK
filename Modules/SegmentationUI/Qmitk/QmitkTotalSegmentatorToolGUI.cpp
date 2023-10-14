@@ -251,7 +251,7 @@ void QmitkTotalSegmentatorToolGUI::WriteErrorMessage(const QString &message)
 bool QmitkTotalSegmentatorToolGUI::IsTotalSegmentatorInstalled(const QString &pythonPath)
 {
   QString fullPath = pythonPath;
-  bool isPythonExists, isExists = false;
+  bool isPythonExists = false, isExists = false;
 #ifdef _WIN32
   isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
   if (!(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))

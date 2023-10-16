@@ -30,10 +30,10 @@ found in the LICENSE file.
 
 mitk::ConcentrationCurveGenerator::ConcentrationCurveGenerator() : m_isT2weightedImage(false), m_isTurboFlashSequence(false),
     m_AbsoluteSignalEnhancement(false), m_RelativeSignalEnhancement(false), m_UsingT1Map(false), m_Factor(std::numeric_limits<double>::quiet_NaN()),
-    m_RecoveryTime(std::numeric_limits<double>::quiet_NaN()), m_RelaxationTime(std::numeric_limits<double>::quiet_NaN()),
-    m_Relaxivity(std::numeric_limits<double>::quiet_NaN()), m_FlipAngle(std::numeric_limits<double>::quiet_NaN()),
-    m_FlipAnglePDW(std::numeric_limits<double>::quiet_NaN()), m_T2Factor(std::numeric_limits<double>::quiet_NaN()),
-    m_T2EchoTime(std::numeric_limits<double>::quiet_NaN()), m_RepetitionTime(std::numeric_limits<double>::quiet_NaN())
+    m_RecoveryTime(std::numeric_limits<double>::quiet_NaN()), m_RepetitionTime(std::numeric_limits<double>::quiet_NaN()),
+    m_RelaxationTime(std::numeric_limits<double>::quiet_NaN()), m_Relaxivity(std::numeric_limits<double>::quiet_NaN()),
+    m_FlipAngle(std::numeric_limits<double>::quiet_NaN()), m_FlipAnglePDW(std::numeric_limits<double>::quiet_NaN()),
+    m_T2Factor(std::numeric_limits<double>::quiet_NaN()), m_T2EchoTime(std::numeric_limits<double>::quiet_NaN())
 {
 }
 

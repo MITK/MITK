@@ -145,8 +145,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.checkDedicatedAIFImage->setEnabled(true);
   m_Controls.HCLSpinBox->setValue(mitk::AterialInputFunctionGenerator::DEFAULT_HEMATOCRIT_LEVEL);
-  m_Controls.spinBox_baselineEndTimeStep->setMinimum(0);
-  m_Controls.spinBox_baselineStartTimeStep->setMinimum(0);
 
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.labelAIFMask, SLOT(setVisible(bool)));
@@ -197,8 +195,14 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.spinBox_baselineStartTimeStep->setValue(0);
   m_Controls.spinBox_baselineEndTimeStep->setValue(0);
+  m_Controls.spinBox_baselineEndTimeStep->setMinimum(0);
+  m_Controls.spinBox_baselineStartTimeStep->setMinimum(0);
+  m_Controls.groupBox_baselineRangeSelection->hide();
+
+
 
   connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash, SLOT(setVisible(bool)));
+  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
   connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.relaxationtime, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.recoverytime, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
@@ -207,13 +211,16 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
+  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
   connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
+  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
 
   connect(m_Controls.factorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.spinBox_baselineEndTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
 
   connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.groupBox_T1MapviaVFA, SLOT(setVisible(bool)));
+  connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
   connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.FlipangleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.RelaxivitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
@@ -1111,6 +1118,7 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
   concentrationGen->SetRelativeSignalEnhancement(m_Controls.radioButton_relativeEnchancement->isChecked());
   concentrationGen->SetUsingT1Map(m_Controls.radioButtonUsingT1viaVFA->isChecked());
 
+
   if (IsTurboFlashSequenceFlag())
   {
     if (AIFMode)
@@ -1126,11 +1134,10 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
     concentrationGen->SetRelaxivity(m_Controls.relaxivity->value());
     concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
     concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
-
   }
   else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
   {
-      concentrationGen->SetRecoveryTime(m_Controls.TRSpinBox->value());
+      concentrationGen->SetRepetitionTime(m_Controls.TRSpinBox->value());
       concentrationGen->SetRelaxivity(m_Controls.RelaxivitySpinBox->value());
       concentrationGen->SetPDWImage(dynamic_cast<mitk::Image*>(m_Controls.PDWImageNodeSelector->GetSelectedNode()->GetData()));
       concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
@@ -1138,6 +1145,9 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
       //Convert Flipangle from degree to radiant
       double alpha = m_Controls.FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
       concentrationGen->SetFlipAngle(alpha);
+      double alphaPDW = m_Controls.FlipanglePDWSpinBox->value() / 360 * 2 * boost::math::constants::pi<double>();
+      concentrationGen->SetFlipAnglePDW(alphaPDW);
+
   }
   else
   {

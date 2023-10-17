@@ -46,6 +46,10 @@ void QmitkNodeDescriptorManager::Initialize()
   auto isSegmentationTaskList = mitk::NodePredicateDataType::New("SegmentationTaskList");
   AddDescriptor(new QmitkNodeDescriptor("SegmentationTaskList", segmentationTaskListIcon, isSegmentationTaskList, this));
 
+  auto roiIcon = QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/ROIIcon.svg"));
+  auto isROI = mitk::NodePredicateDataType::New("ROI");
+  AddDescriptor(new QmitkNodeDescriptor("ROI", roiIcon, isROI, this));
+
   auto isPointSet = mitk::NodePredicateDataType::New("PointSet");
   AddDescriptor(new QmitkNodeDescriptor(tr("PointSet"), QString(":/Qmitk/PointSet_48.png"), isPointSet, this));
 

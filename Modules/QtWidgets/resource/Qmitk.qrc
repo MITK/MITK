@@ -30,5 +30,6 @@
 		<file>invisible.svg</file>
 		<file>visible.svg</file>
 		<file>SegmentationTaskListIcon.svg</file>
+		<file>ROIIcon.svg</file>
 	</qresource>
 </RCC>

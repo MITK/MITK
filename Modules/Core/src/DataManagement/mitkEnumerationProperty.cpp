@@ -164,3 +164,18 @@ const mitk::EnumerationProperty::EnumStringsContainerType & mitk::EnumerationPro
 {
   return m_NameMap;
 }
+
+void mitk::EnumerationProperty::ToJSON(nlohmann::json& j) const
+{
+  j = this->GetValueAsString();
+}
+
+void mitk::EnumerationProperty::FromJSON(const nlohmann::json& j)
+{
+  auto name = j.get<std::string>();
+
+  if (!this->IsValidEnumerationValue(name))
+    mitkThrow() << '"' << name << "\" is not a valid enumeration value for " << this->GetNameOfClass() << '!';
+
+  this->SetValue(name);
+}

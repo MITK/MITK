@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 #include <string>
+#include <nlohmann/json.hpp>
 
 namespace mitk
 {
@@ -62,6 +63,9 @@ namespace mitk
     bool AssignProperty(const BaseProperty &property);
 
     virtual std::string GetValueAsString() const;
+
+    virtual void ToJSON(nlohmann::json& j) const = 0;
+    virtual void FromJSON(const nlohmann::json& j) = 0;
 
     /**
      * @brief Default return value if a property which can not be returned as string

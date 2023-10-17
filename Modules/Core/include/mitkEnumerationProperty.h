@@ -164,6 +164,9 @@ namespace mitk
     EnumIdsContainerType &GetEnumIds();
     EnumStringsContainerType &GetEnumStrings();
 
+    void ToJSON(nlohmann::json& j) const override;
+    void FromJSON(const nlohmann::json& j) override;
+
     using BaseProperty::operator=;
     EnumerationProperty & operator=(const EnumerationProperty &) = delete;
 
@@ -182,10 +185,6 @@ namespace mitk
 
   private:
     IdType m_CurrentValue;
-
-    typedef std::map<std::string, EnumIdsContainerType> IdMapForClassNameContainerType;
-    typedef std::map<std::string, EnumStringsContainerType> StringMapForClassNameContainerType;
-
     EnumIdsContainerType m_IdMap;
     EnumStringsContainerType m_NameMap;
   };

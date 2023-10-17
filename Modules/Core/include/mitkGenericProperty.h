@@ -61,6 +61,16 @@ namespace mitk
       return myStr.str();
     }
 
+    void ToJSON(nlohmann::json& j) const override
+    {
+      j = this->GetValue();
+    }
+
+    void FromJSON(const nlohmann::json& j) override
+    {
+      this->SetValue(j.get<T>());
+    }
+
     using BaseProperty::operator=;
 
   protected:

@@ -43,6 +43,16 @@ std::string mitk::StringProperty::GetValueAsString() const
   return m_Value;
 }
 
+void mitk::StringProperty::ToJSON(nlohmann::json& j) const
+{
+  j = this->GetValueAsString();
+}
+
+void mitk::StringProperty::FromJSON(const nlohmann::json& j)
+{
+  this->SetValue(j.get<std::string>());
+}
+
 itk::LightObject::Pointer mitk::StringProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

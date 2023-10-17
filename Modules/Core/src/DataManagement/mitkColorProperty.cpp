@@ -82,6 +82,16 @@ const mitk::Color &mitk::ColorProperty::GetValue() const
   return GetColor();
 }
 
+void mitk::ColorProperty::ToJSON(nlohmann::json& j) const
+{
+  j = this->GetColor();
+}
+
+void mitk::ColorProperty::FromJSON(const nlohmann::json& j)
+{
+  this->SetColor(j.get<Color>());
+}
+
 itk::LightObject::Pointer mitk::ColorProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

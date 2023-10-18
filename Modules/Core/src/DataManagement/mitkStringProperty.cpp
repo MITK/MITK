@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkStringProperty.h"
+#include <nlohmann/json.hpp>
 
 const char *mitk::StringProperty::PATH = "path";
 mitk::StringProperty::StringProperty(const char *string) : m_Value()
@@ -43,14 +44,16 @@ std::string mitk::StringProperty::GetValueAsString() const
   return m_Value;
 }
 
-void mitk::StringProperty::ToJSON(nlohmann::json& j) const
+bool mitk::StringProperty::ToJSON(nlohmann::json& j) const
 {
   j = this->GetValueAsString();
+  return true;
 }
 
-void mitk::StringProperty::FromJSON(const nlohmann::json& j)
+bool mitk::StringProperty::FromJSON(const nlohmann::json& j)
 {
   this->SetValue(j.get<std::string>());
+  return true;
 }
 
 itk::LightObject::Pointer mitk::StringProperty::InternalClone() const

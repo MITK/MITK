@@ -75,8 +75,8 @@ namespace mitk
     void SetValue(const mitk::Color &color);
     void SetColor(float red, float green, float blue);
 
-    void ToJSON(nlohmann::json &j) const override;
-    void FromJSON(const nlohmann::json &j) override;
+    bool ToJSON(nlohmann::json &j) const override;
+    bool FromJSON(const nlohmann::json &j) override;
 
     using BaseProperty::operator=;
 

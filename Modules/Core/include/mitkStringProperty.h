@@ -55,8 +55,8 @@ namespace mitk
 
     std::string GetValueAsString() const override;
 
-    void ToJSON(nlohmann::json& j) const override;
-    void FromJSON(const nlohmann::json& j) override;
+    bool ToJSON(nlohmann::json& j) const override;
+    bool FromJSON(const nlohmann::json& j) override;
 
     static const char *PATH;
 

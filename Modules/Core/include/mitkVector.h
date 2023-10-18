@@ -146,7 +146,7 @@ namespace mitk
   void from_json(const nlohmann::json &j, Vector<TCoordRep, NVectorDimension> &v)
   {
     for (size_t i = 0; i < NVectorDimension; ++i)
-      v[i] = j.at(i).get<TCoordRep>();
+      j.at(i).get_to(v[i]);
   }
 
   // convenience typedefs for often used mitk::Vector representations.

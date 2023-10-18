@@ -96,3 +96,19 @@ itk::LightObject::Pointer mitk::AnnotationProperty::InternalClone() const
   result->UnRegister();
   return result;
 }
+
+bool mitk::AnnotationProperty::ToJSON(nlohmann::json& j) const
+{
+  j = nlohmann::json{
+    {"Label", this->GetLabel()},
+    {"Position", this->GetPosition()}};
+
+  return true;
+}
+
+bool mitk::AnnotationProperty::FromJSON(const nlohmann::json& j)
+{
+  this->SetLabel(j["Label"].get<std::string>());
+  this->SetPosition(j["Position"].get<Point3D>());
+  return true;
+}

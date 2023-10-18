@@ -57,6 +57,9 @@ namespace mitk
     static std::string GetReferenceUIDFor(itk::Object *);
     static void RegisterPointerTarget(itk::Object *, const std::string uid);
 
+    bool ToJSON(nlohmann::json& j) const override;
+    bool FromJSON(const nlohmann::json& j) override;
+
     using BaseProperty::operator=;
 
   protected:

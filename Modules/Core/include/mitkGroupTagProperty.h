@@ -37,7 +37,10 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      using BaseProperty::operator=;
+    bool ToJSON(nlohmann::json& j) const override;
+    bool FromJSON(const nlohmann::json& j) override;
+
+    using BaseProperty::operator=;
 
   protected:
     GroupTagProperty();

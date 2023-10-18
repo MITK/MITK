@@ -106,7 +106,7 @@ namespace mitk
   void from_json(const nlohmann::json& j, Point<TCoordRep, NPointDimension>& p)
   {
     for (size_t i = 0; i < NPointDimension; ++i)
-      p[i] = j.at(i).get<TCoordRep>();
+      j.at(i).get_to(p[i]);
   }
 
   typedef Point<ScalarType, 2> Point2D;

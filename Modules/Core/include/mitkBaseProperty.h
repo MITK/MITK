@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 #include <string>
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 namespace mitk
 {
@@ -64,8 +64,21 @@ namespace mitk
 
     virtual std::string GetValueAsString() const;
 
-    virtual void ToJSON(nlohmann::json& j) const = 0;
-    virtual void FromJSON(const nlohmann::json& j) = 0;
+    /** \brief Serialize property value(s) to JSON.
+     *
+     * Rely on exceptions for error handling when implementing serialization.
+     *
+     * \return False if not serializable by design, true otherwise.
+     */
+    virtual bool ToJSON(nlohmann::json& j) const = 0;
+
+    /** \brief Deserialize property value(s) from JSON.
+    *
+    * Rely on exceptions for error handling when implementing deserialization.
+    *
+    * \return False if not deserializable by design, true otherwise.
+    */
+    virtual bool FromJSON(const nlohmann::json& j) = 0;
 
     /**
      * @brief Default return value if a property which can not be returned as string

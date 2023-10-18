@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkLookupTableProperty.h"
+#include <nlohmann/json.hpp>
 
 mitk::LookupTableProperty::LookupTableProperty()
 {
@@ -65,7 +66,7 @@ void mitk::LookupTableProperty::SetValue(const ValueType &value)
   SetLookupTable(value);
 }
 
-void mitk::LookupTableProperty::ToJSON(nlohmann::json& j) const
+bool mitk::LookupTableProperty::ToJSON(nlohmann::json& j) const
 {
   auto lut = this->GetValue()->GetVtkLookupTable();
 
@@ -82,7 +83,7 @@ void mitk::LookupTableProperty::ToJSON(nlohmann::json& j) const
     table.push_back(value);
   }
 
-  j = nlohmann::json::object({
+  j = nlohmann::json{{
     { "NumberOfColors", static_cast<int>(lut->GetNumberOfTableValues()) },
     { "Scale", lut->GetScale() },
     { "Ramp", lut->GetRamp() },
@@ -92,10 +93,12 @@ void mitk::LookupTableProperty::ToJSON(nlohmann::json& j) const
     { "AlphaRange", nlohmann::json::array({ lut->GetAlphaRange()[0], lut->GetAlphaRange()[1] }) },
     { "TableRange", nlohmann::json::array({ lut->GetTableRange()[0], lut->GetTableRange()[1] }) },
     { "Table", table }
-  });
+  }};
+
+  return true;
 }
 
-void mitk::LookupTableProperty::FromJSON(const nlohmann::json& j)
+bool mitk::LookupTableProperty::FromJSON(const nlohmann::json& j)
 {
   auto lut = vtkSmartPointer<vtkLookupTable>::New();
 
@@ -139,6 +142,8 @@ void mitk::LookupTableProperty::FromJSON(const nlohmann::json& j)
   auto mitkLut = LookupTable::New();
   mitkLut->SetVtkLookupTable(lut);
   this->SetLookupTable(mitkLut);
+
+  return true;
 }
 
 itk::LightObject::Pointer mitk::LookupTableProperty::InternalClone() const

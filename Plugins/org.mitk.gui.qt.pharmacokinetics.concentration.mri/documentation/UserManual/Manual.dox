@@ -7,7 +7,7 @@
 
 \section org_mitk_views_pharmacokinetics_concentration_mri_overview Overview
 This view offers a dedicated tool for the conversion of DCE MR image signal intensities to contrast agent (CA) concentration.
-It contains a subset of the conversion tools for T1-weighted signal intensities, which are also a part of the DCE MR Perfusion Datafit View see \ref org_mitk_views_pharmacokinetics_mri ).
+It contains a subset of the conversion tools for T1-weighted signal intensities, which are also a part of the DCE MR Perfusion Datafit View.
 Additionally, it allows for the conversion between T2-weighted MR signal intensities and contrast agent concentration.
 
 \section org_mitk_views_pharmacokinetics_concentration_mri_Contact Contact information
@@ -17,7 +17,7 @@ If you have any questions, need support, find a bug or have a feature request, f
 
 \imageMacro{concentration_curve_converter_T1_weighted4D.png,"Example screenshot of the conversion of T1-weighted MR images",3.0 }
 The view offers the choice between a <i>3D Image</i> and a <i>4D image</i>. If a 4D image is selected, the <i>Selected Time Series</i> needs to be specified.
-For all 4D images the range of the time points which are part of the baseline can be specified. The baseline signal <i>S<sub>BL</sub></i> will be averaged between the signal of the time points within this range.
+For 4D images, for all conversion methods which require a baseline value, the range of the time points which are part of the baseline can be specified. The baseline signal <i>S<sub>BL</sub></i> will be averaged between the signal of the time points within this range.
 If not specified, the baseline signal <i>S<sub>BL</sub></i> is set as the signal of the first time point image of the time series.
 In case of a 3D image to be converted, additionally to the selected 3D image a <i>Baseline Image (without CA)</i> has to be specified.\n\n
 

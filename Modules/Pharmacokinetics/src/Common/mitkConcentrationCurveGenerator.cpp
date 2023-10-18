@@ -29,8 +29,11 @@ found in the LICENSE file.
 #include "itkMeanProjectionImageFilter.h"
 
 mitk::ConcentrationCurveGenerator::ConcentrationCurveGenerator() : m_isT2weightedImage(false), m_isTurboFlashSequence(false),
-    m_AbsoluteSignalEnhancement(false), m_RelativeSignalEnhancement(0.0), m_UsingT1Map(false), m_Factor(0.0), m_RecoveryTime(0.0), m_RelaxationTime(0.0),
-    m_Relaxivity(0.0), m_FlipAngle(0.0), m_T2Factor(0.0), m_T2EchoTime(0.0)
+    m_AbsoluteSignalEnhancement(false), m_RelativeSignalEnhancement(false), m_UsingT1Map(false), m_Factor(std::numeric_limits<double>::quiet_NaN()),
+    m_RecoveryTime(std::numeric_limits<double>::quiet_NaN()), m_RepetitionTime(std::numeric_limits<double>::quiet_NaN()),
+    m_RelaxationTime(std::numeric_limits<double>::quiet_NaN()), m_Relaxivity(std::numeric_limits<double>::quiet_NaN()),
+    m_FlipAngle(std::numeric_limits<double>::quiet_NaN()), m_FlipAnglePDW(std::numeric_limits<double>::quiet_NaN()),
+    m_T2Factor(std::numeric_limits<double>::quiet_NaN()), m_T2EchoTime(std::numeric_limits<double>::quiet_NaN())
 {
 }
 
@@ -215,23 +218,37 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
 
     if (this->m_isT2weightedImage)
     {
-        typedef mitk::ConvertT2ConcentrationFunctor <TPixel_input, TPixel_baseline, double> ConversionFunctorT2Type;
-        typedef itk::BinaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConversionFunctorT2Type> FilterT2Type;
+      typedef mitk::ConvertT2ConcentrationFunctor <TPixel_input, TPixel_baseline, double> ConversionFunctorT2Type;
+      typedef itk::BinaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConversionFunctorT2Type> FilterT2Type;
 
 
-        ConversionFunctorT2Type ConversionT2Functor;
+      ConversionFunctorT2Type ConversionT2Functor;
+
+      if (std::isnan(this->m_T2Factor))
+      {
+        mitkThrow() << "The conversion factor k for T2-weighted images must be set.";
+      }
+      else if (std::isnan(this->m_T2EchoTime))
+      {
+        mitkThrow() << "The echo time TE for T2-weighted images must be set.";
+      }
+      else
+      {
         ConversionT2Functor.initialize(this->m_T2Factor, this->m_T2EchoTime);
+      }
 
-        typename FilterT2Type::Pointer ConversionT2Filter = FilterT2Type::New();
+
+
+      typename FilterT2Type::Pointer ConversionT2Filter = FilterT2Type::New();
 
         ConversionT2Filter->SetFunctor(ConversionT2Functor);
-        ConversionT2Filter->SetInput1(itkInputImage);
-        ConversionT2Filter->SetInput2(itkBaselineImage);
+      ConversionT2Filter->SetInput1(itkInputImage);
+      ConversionT2Filter->SetInput2(itkBaselineImage);
 
-        ConversionT2Filter->Update();
+      ConversionT2Filter->Update();
 
-        m_ConvertSignalToConcentrationCurve_OutputImage = mitk::ImportItkImage(ConversionT2Filter->GetOutput())->Clone();
-      }
+      m_ConvertSignalToConcentrationCurve_OutputImage = mitk::ImportItkImage(ConversionT2Filter->GetOutput())->Clone();
+    }
 
     else
     {
@@ -241,7 +258,24 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
             typedef itk::BinaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConversionFunctorTurboFlashType> FilterTurboFlashType;
 
             ConversionFunctorTurboFlashType ConversionTurboFlashFunctor;
-            ConversionTurboFlashFunctor.initialize(this->m_RelaxationTime, this->m_Relaxivity, this->m_RecoveryTime);
+
+            if (std::isnan(this->m_RelaxationTime))
+            {
+              mitkThrow() << "The relaxation time must be set.";
+            }
+            else if (std::isnan(this->m_Relaxivity))
+            {
+              mitkThrow() << "The relaxivity must be set.";
+            }
+            else if (std::isnan(this->m_RecoveryTime))
+            {
+              mitkThrow() << "The recovery time must be set.";
+            }
+            else
+            {
+              ConversionTurboFlashFunctor.initialize(this->m_RelaxationTime, this->m_Relaxivity, this->m_RecoveryTime);
+            }
+
 
             typename FilterTurboFlashType::Pointer ConversionTurboFlashFilter = FilterTurboFlashType::New();
 
@@ -256,21 +290,41 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
         }
         else if(this->m_UsingT1Map)
         {
-            typename ConvertedImageType::Pointer itkT10Image = ConvertedImageType::New();
-            mitk::CastToItkImage(m_T10Image, itkT10Image);
+            typename BaselineImageType::Pointer itkPDWImage = BaselineImageType::New();
+            mitk::CastToItkImage(m_PDWImage, itkPDWImage);
 
             typedef mitk::ConvertToConcentrationViaT1CalcFunctor <TPixel_input, TPixel_baseline, double, double> ConvertToConcentrationViaT1CalcFunctorType;
-            typedef itk::TernaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConvertedImageType, ConvertToConcentrationViaT1CalcFunctorType> FilterT1MapType;
+            typedef itk::TernaryFunctorImageFilter<InputImageType, BaselineImageType, BaselineImageType, ConvertedImageType, ConvertToConcentrationViaT1CalcFunctorType> FilterT1MapType;
 
             ConvertToConcentrationViaT1CalcFunctorType ConversionT1MapFunctor;
-            ConversionT1MapFunctor.initialize(this->m_Relaxivity, this->m_RecoveryTime, this->m_FlipAngle);
+
+            if (std::isnan(this->m_Relaxivity))
+            {
+              mitkThrow() << "The relaxivity must be set.";
+            }
+            else if (std::isnan(this->m_RepetitionTime))
+            {
+              mitkThrow() << "The repetition time must be set.";
+            }
+            else if (std::isnan(this->m_FlipAngle))
+            {
+              mitkThrow() << "The flip angle must be set.";
+            }
+            else if (std::isnan(this->m_FlipAnglePDW))
+            {
+              mitkThrow() << "The flip angle of the PDW image must be set.";
+            }
+            else
+            {
+              ConversionT1MapFunctor.initialize(this->m_Relaxivity, this->m_RepetitionTime, this->m_FlipAngle, this->m_FlipAnglePDW);
+            }
 
             typename FilterT1MapType::Pointer ConversionT1MapFilter = FilterT1MapType::New();
 
             ConversionT1MapFilter->SetFunctor(ConversionT1MapFunctor);
             ConversionT1MapFilter->SetInput1(itkInputImage);
             ConversionT1MapFilter->SetInput2(itkBaselineImage);
-            ConversionT1MapFilter->SetInput3(itkT10Image);
+            ConversionT1MapFilter->SetInput3(itkPDWImage);
 
             ConversionT1MapFilter->Update();
             m_ConvertSignalToConcentrationCurve_OutputImage = mitk::ImportItkImage(ConversionT1MapFilter->GetOutput())->Clone();
@@ -284,7 +338,15 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
             typedef itk::BinaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConversionFunctorAbsoluteType> FilterAbsoluteType;
 
             ConversionFunctorAbsoluteType ConversionAbsoluteFunctor;
-            ConversionAbsoluteFunctor.initialize(this->m_Factor);
+
+            if (std::isnan(this->m_Factor))
+            {
+              mitkThrow() << "The conversion factor k must be set.";
+            }
+            else
+            {
+              ConversionAbsoluteFunctor.initialize(this->m_Factor);
+            }
 
             typename FilterAbsoluteType::Pointer ConversionAbsoluteFilter = FilterAbsoluteType::New();
 
@@ -303,7 +365,15 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
             typedef itk::BinaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConversionFunctorRelativeType> FilterRelativeType;
 
             ConversionFunctorRelativeType ConversionRelativeFunctor;
-            ConversionRelativeFunctor.initialize(this->m_Factor);
+
+            if (std::isnan(this->m_Factor))
+            {
+              mitkThrow() << "The conversion factor k must be set.";
+            }
+            else
+            {
+              ConversionRelativeFunctor.initialize(this->m_Factor);
+            }
 
             typename FilterRelativeType::Pointer ConversionRelativeFilter = FilterRelativeType::New();
 

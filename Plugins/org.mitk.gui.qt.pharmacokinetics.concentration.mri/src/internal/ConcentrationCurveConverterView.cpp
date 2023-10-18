@@ -86,6 +86,8 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.groupBox4D->hide();
     m_Controls.groupBoxTurboFlash->hide();
     m_Controls.groupConcentration->hide();
+    m_Controls.groupBox_baselineRangeSelection->hide();
+    m_Controls.groupBox_BaselineRangeSelectionT2->hide();
 
     connect(m_Controls.radioButton_T1, SIGNAL(toggled(bool)),this, SLOT(OnSettingChanged()));
     connect(m_Controls.radioButton_T2, SIGNAL(toggled(bool)),this, SLOT(OnSettingChanged()));
@@ -112,7 +114,9 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.spinBox_baselineEndTimeStepT2->setMinimum(0);
     m_Controls.spinBox_baselineStartTimeStepT2->setMinimum(0);
 
+
     connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash, SLOT(setVisible(bool)));
+    connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
     connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.relaxationtime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.recoverytime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
@@ -124,10 +128,13 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     connect(m_Controls.t2TimeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnNodeSelectionChanged);
     connect(m_Controls.PDWImageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSettingChanged);
 
-    connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
-    connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
+    connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
+    connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
+
     connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
+    connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
+    connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
 
     connect(m_Controls.factorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(OnSettingChanged()));
@@ -136,6 +143,7 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     connect(m_Controls.spinBox_baselineEndTimeStepT2, SIGNAL(valueChanged(int)), this, SLOT(OnSettingChanged()));
 
     connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.groupBox_T1MapviaVFA, SLOT(setVisible(bool)));
+    connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
     connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.FlipangleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.RelaxivitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
@@ -155,6 +163,8 @@ void ConcentrationCurveConverterView::OnSettingChanged()
   bool ok = false;
   m_Controls.groupBox_T1->setVisible(m_Controls.radioButton_T1->isChecked());
   m_Controls.groupBox_T2->setVisible(m_Controls.radioButton_T2->isChecked());
+  m_Controls.groupBox_BaselineRangeSelectionT2->setVisible(m_Controls.radioButton_T2->isChecked());
+
 
   if(m_Controls.radioButton_T1->isChecked())
   {
@@ -164,13 +174,15 @@ void ConcentrationCurveConverterView::OnSettingChanged()
       if(m_Controls.radioButton4D->isChecked())
       {
           m_Controls.groupConcentration->setVisible(true);
+          if (m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked() || m_Controls.radioButtonTurboFlash->isChecked())
+          m_Controls.groupBox_baselineRangeSelection->setVisible(true);
           ok = m_selectedImage.IsNotNull() && CheckSettings();
       }
       else if(m_Controls.radioButton3D->isChecked())
       {
           m_Controls.groupConcentration->setVisible(true);
+          m_Controls.groupBox_baselineRangeSelection->hide();
           ok = m_selectedImage.IsNotNull() && m_selectedBaselineImage.IsNotNull() && CheckSettings();
-
       }
   }
   else if (m_Controls.radioButton_T2->isChecked())
@@ -401,14 +413,16 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
   }
   else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
   {
-    concentrationGen->SetRecoveryTime(m_Controls.TRSpinBox->value());
+    concentrationGen->SetRepetitionTime(m_Controls.TRSpinBox->value());
     concentrationGen->SetRelaxivity(m_Controls.RelaxivitySpinBox->value());
-    concentrationGen->SetT10Image(dynamic_cast<mitk::Image*>(m_Controls.PDWImageNodeSelector->GetSelectedNode()->GetData()));
+    concentrationGen->SetPDWImage(dynamic_cast<mitk::Image*>(m_Controls.PDWImageNodeSelector->GetSelectedNode()->GetData()));
     concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
     concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
     //Convert Flipangle from degree to radiant
-      double alpha = m_Controls.FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
-      concentrationGen->SetFlipAngle(alpha);
+    double alpha = m_Controls.FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
+    concentrationGen->SetFlipAngle(alpha);
+    double alphaPDW = m_Controls.FlipanglePDWSpinBox->value() / 360 * 2 * boost::math::constants::pi<double>();
+    concentrationGen->SetFlipAnglePDW(alphaPDW);
   }
 
   else

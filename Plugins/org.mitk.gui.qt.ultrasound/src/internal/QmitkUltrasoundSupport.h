@@ -82,7 +82,7 @@ public:
   void OnDeviceServiceEvent(const ctkServiceEvent event);
 
   /*
-  * \brief This is the main imaging loop that updates the image and is called regularily during the imaging process
+  * \brief This is the main imaging loop that updates the image and is called regularly during the imaging process
   */
   void UpdateImage();
 
@@ -114,7 +114,7 @@ protected:
   /** Keeps track of the amount of output Nodes*/
   unsigned int m_AmountOfOutputs;
 
-  /** The device that is currently used to aquire images */
+  /** The device that is currently used to acquire images */
   mitk::USDevice::Pointer m_Device;
 
   void SetTimerIntervals(int intervalPipeline, int interval2D, int interval3D);
@@ -128,7 +128,7 @@ protected:
   QTime  m_Clock2d;
   QTime  m_Clock3d;
 
-  /** A counter to comute the framerate. */
+  /** A counter to compute the framerate. */
   int m_FrameCounterPipeline;
   int m_FrameCounter2d;
   int m_FrameCounter3d;
@@ -155,7 +155,7 @@ protected:
 
   void SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type);
 
-  /** The seperated slices from m_Image */
+  /** The separated slices from m_Image */
   std::vector<mitk::Image::Pointer>   m_curOutput;
 
   /** The old geometry of m_Image. It is needed to check if the geometry changed (e.g. because

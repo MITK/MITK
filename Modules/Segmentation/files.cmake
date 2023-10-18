@@ -59,10 +59,13 @@ set(CPP_FILES
   Interactions/mitkPickingTool.cpp
   Interactions/mitknnUnetTool.cpp
   Interactions/mitkProcessExecutor.cpp
+  Interactions/mitkSegmentAnythingProcessExecutor.cpp
   Interactions/mitkMonaiLabelTool.cpp
   Interactions/mitkMonaiLabel2DTool.cpp
   Interactions/mitkMonaiLabel3DTool.cpp
   Interactions/mitkTotalSegmentatorTool.cpp
+  Interactions/mitkSegmentAnythingTool.cpp
+  Interactions/mitkSegmentAnythingPythonService.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp

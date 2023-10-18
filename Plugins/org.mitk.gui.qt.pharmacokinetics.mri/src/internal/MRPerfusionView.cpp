@@ -24,18 +24,12 @@ found in the LICENSE file.
 #include <mitkDescriptivePharmacokineticBrixModelFactory.h>
 #include <mitkDescriptivePharmacokineticBrixModelParameterizer.h>
 #include <mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer.h>
-#include "mitkThreeStepLinearModelFactory.h"
-#include "mitkThreeStepLinearModelParameterizer.h"
-#include "mitkTwoStepLinearModelFactory.h"
-#include "mitkTwoStepLinearModelParameterizer.h"
 #include <mitkExtendedToftsModelFactory.h>
 #include <mitkExtendedToftsModelParameterizer.h>
 #include <mitkStandardToftsModelFactory.h>
 #include <mitkStandardToftsModelParameterizer.h>
 #include "mitkTwoCompartmentExchangeModelFactory.h"
 #include "mitkTwoCompartmentExchangeModelParameterizer.h"
-#include "mitkNumericTwoCompartmentExchangeModelFactory.h"
-#include "mitkNumericTwoCompartmentExchangeModelParameterizer.h"
 #include <mitkInitialParameterizationDelegateBase.h>
 
 #include <mitkNodePredicateAnd.h>
@@ -256,22 +250,13 @@ void MRPerfusionView::UpdateGUIControls()
                          dynamic_cast<mitk::ExtendedToftsModelFactory*>
                                   (m_selectedModelFactory.GetPointer()) != nullptr;
   bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>
-                       (m_selectedModelFactory.GetPointer()) != nullptr ||
-                       dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
                        (m_selectedModelFactory.GetPointer()) != nullptr;
 
-  bool isNum2CXMFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
-                          (m_selectedModelFactory.GetPointer()) != nullptr;
 
-  bool isSLFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
-    (m_selectedModelFactory.GetPointer()) != nullptr ||
-    dynamic_cast<mitk::TwoStepLinearModelFactory*>
-    (m_selectedModelFactory.GetPointer()) != nullptr;
 
   m_Controls.groupAIF->setVisible(isToftsFactory || is2CXMFactory);
   m_Controls.groupDescBrix->setVisible(isDescBrixFactory);
-  m_Controls.groupNum2CXM->setVisible(isNum2CXMFactory);
-  m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory || isSLFactory);
+  m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory );
 
   m_Controls.groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
 
@@ -375,18 +360,12 @@ void MRPerfusionView::OnModellingButtonClicked()
 
     bool isDescBrixFactory = dynamic_cast<mitk::DescriptivePharmacokineticBrixModelFactory*>
                              (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool is3LinearFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
-                             (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool is2LinearFactory = dynamic_cast<mitk::TwoStepLinearModelFactory*>
-                             (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isExtToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>
                           (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isStanToftsFactory = dynamic_cast<mitk::StandardToftsModelFactory*>
                           (m_selectedModelFactory.GetPointer()) != nullptr;
     bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>
                          (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool isNum2CXMFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
-                            (m_selectedModelFactory.GetPointer()) != nullptr;
 
     if (isDescBrixFactory)
     {
@@ -397,28 +376,6 @@ void MRPerfusionView::OnModellingButtonClicked()
       else
       {
         GenerateDescriptiveBrixModel_ROIBased(fitSession, generator);
-      }
-    }
-    else if (is2LinearFactory)
-    {
-      if (this->m_Controls.radioPixelBased->isChecked())
-      {
-        GenerateLinearModelFit_PixelBased<mitk::TwoStepLinearModelParameterizer>(fitSession, generator);
-      }
-      else
-      {
-        GenerateLinearModelFit_ROIBased<mitk::TwoStepLinearModelParameterizer>(fitSession, generator);
-      }
-    }
-    else if (is3LinearFactory)
-    {
-      if (this->m_Controls.radioPixelBased->isChecked())
-      {
-        GenerateLinearModelFit_PixelBased<mitk::ThreeStepLinearModelParameterizer>(fitSession, generator);
-      }
-      else
-      {
-        GenerateLinearModelFit_ROIBased<mitk::ThreeStepLinearModelParameterizer>(fitSession, generator);
       }
     }
     else if (isStanToftsFactory)
@@ -452,19 +409,6 @@ void MRPerfusionView::OnModellingButtonClicked()
       else
       {
         GenerateAIFbasedModelFit_ROIBased<mitk::TwoCompartmentExchangeModelParameterizer>(fitSession, generator);
-      }
-    }
-    else if (isNum2CXMFactory)
-    {
-      if (this->m_Controls.radioPixelBased->isChecked())
-      {
-        GenerateAIFbasedModelFit_PixelBased<mitk::NumericTwoCompartmentExchangeModelParameterizer>(fitSession,
-            generator);
-      }
-      else
-      {
-        GenerateAIFbasedModelFit_ROIBased<mitk::NumericTwoCompartmentExchangeModelParameterizer>(fitSession,
-            generator);
       }
     }
 
@@ -565,14 +509,10 @@ bool MRPerfusionView::CheckModelSettings() const
 {
   bool ok = true;
 
-  //check wether any model is set at all. Otherwise exit with false
+  //check whether any model is set at all. Otherwise exit with false
   if (m_selectedModelFactory.IsNotNull())
   {
     bool isDescBrixFactory = dynamic_cast<mitk::DescriptivePharmacokineticBrixModelFactory*>
-                             (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool is3LinearFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
-                             (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool is2LinearFactory = dynamic_cast<mitk::TwoStepLinearModelFactory*>
                              (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isToftsFactory = dynamic_cast<mitk::StandardToftsModelFactory*>
                           (m_selectedModelFactory.GetPointer()) != nullptr||
@@ -580,49 +520,13 @@ bool MRPerfusionView::CheckModelSettings() const
                           (m_selectedModelFactory.GetPointer()) != nullptr;
     bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>
                          (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool isNum2CXMFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
-                            (m_selectedModelFactory.GetPointer()) != nullptr;
 
     if (isDescBrixFactory)
     {
       //if all static parameters for this model are set, exit with true, Otherwise exit with false
       ok = m_Controls.injectiontime->value() > 0;
     }
-    else if (is3LinearFactory || is2LinearFactory)
-    {
-        if (this->m_Controls.radioButtonTurboFlash->isChecked() )
-        {
-          ok = ok && (m_Controls.recoverytime->value() > 0);
-          ok = ok && (m_Controls.relaxationtime->value() > 0);
-          ok = ok && (m_Controls.relaxivity->value() > 0);
-          ok = ok && (m_Controls.AifRecoverytime->value() > 0);
-          ok = ok && CheckBaselineSelectionSettings();
-
-        }
-        else if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
-                 || this->m_Controls.radioButton_relativeEnchancement->isChecked() )
-        {
-          ok = ok && (m_Controls.factorSpinBox->value() > 0);
-          ok = ok && CheckBaselineSelectionSettings();
-        }
-        else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked() )
-        {
-          ok = ok && (m_Controls.FlipangleSpinBox->value() > 0);
-          ok = ok && (m_Controls.TRSpinBox->value() > 0);
-          ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
-          ok = ok && (m_Controls.PDWImageNodeSelector->GetSelectedNode().IsNotNull());
-          ok = ok && CheckBaselineSelectionSettings();
-        }
-        else if (this->m_Controls.radioButtonNoConversion->isChecked())
-        {
-          ok = true;
-        }
-        else
-        {
-          ok = false;
-        }
-    }
-    else if (isToftsFactory || is2CXMFactory || isNum2CXMFactory)
+    else if (isToftsFactory || is2CXMFactory)
     {
       if (this->m_Controls.radioAIFImage->isChecked())
       {
@@ -674,13 +578,8 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = false;
       }
 
-      if (isNum2CXMFactory)
-      {
-        ok = ok && (this->m_Controls.odeStepSize->value() > 0);
-      }
-
     }
-    //add other models as else if and check wether all needed static parameters are set
+    //add other models as else if and check whether all needed static parameters are set
     else
     {
       ok = false;
@@ -930,14 +829,6 @@ void MRPerfusionView::GenerateAIFbasedModelFit_PixelBased(mitk::modelFit::ModelF
 
   this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
 
-  mitk::NumericTwoCompartmentExchangeModelParameterizer* numTCXParametrizer =
-    dynamic_cast<mitk::NumericTwoCompartmentExchangeModelParameterizer*>
-    (modelParameterizer.GetPointer());
-
-  if (numTCXParametrizer)
-  {
-    numTCXParametrizer->SetODEINTStepSize(this->m_Controls.odeStepSize->value());
-  }
 
   //Specify fitting strategy and criterion parameters
   mitk::ModelFitFunctorBase::Pointer fitFunctor = CreateDefaultFitFunctor(modelParameterizer);
@@ -1000,14 +891,6 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
 
   this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
 
-  mitk::NumericTwoCompartmentExchangeModelParameterizer* numTCXParametrizer =
-    dynamic_cast<mitk::NumericTwoCompartmentExchangeModelParameterizer*>
-    (modelParameterizer.GetPointer());
-
-  if (numTCXParametrizer)
-  {
-    numTCXParametrizer->SetODEINTStepSize(this->m_Controls.odeStepSize->value());
-  }
 
   //Compute ROI signal
   mitk::MaskedDynamicImageStatisticsGenerator::Pointer signalGenerator =
@@ -1103,17 +986,11 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
   mitk::ModelFactoryBase::Pointer factory =
     mitk::DescriptivePharmacokineticBrixModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
-  factory = mitk::TwoStepLinearModelFactory::New().GetPointer();
-  m_FactoryStack.push_back(factory);
-  factory = mitk::ThreeStepLinearModelFactory::New().GetPointer();
-  m_FactoryStack.push_back(factory);
   factory = mitk::StandardToftsModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
   factory = mitk::ExtendedToftsModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
   factory = mitk::TwoCompartmentExchangeModelFactory::New().GetPointer();
-  m_FactoryStack.push_back(factory);
-  factory = mitk::NumericTwoCompartmentExchangeModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
 
   mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
@@ -1359,7 +1236,7 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
   }
   else
   {
-    mitkThrow() << "Cannot generate AIF. View is in a invalide state. No AIF mode selected.";
+    mitkThrow() << "Cannot generate AIF. View is in a invalid state. No AIF mode selected.";
   }
 }
 

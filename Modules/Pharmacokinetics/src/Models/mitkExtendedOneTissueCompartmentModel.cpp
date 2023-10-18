@@ -17,19 +17,21 @@ found in the LICENSE file.
 
 const std::string mitk::ExtendedOneTissueCompartmentModel::MODEL_DISPLAY_NAME = "Extended One Tissue Compartment Model (with blood volume)";
 
-const std::string mitk::ExtendedOneTissueCompartmentModel::NAME_PARAMETER_k1 = "K1";
-const std::string mitk::ExtendedOneTissueCompartmentModel::NAME_PARAMETER_k2 = "k2";
-const std::string mitk::ExtendedOneTissueCompartmentModel::NAME_PARAMETER_VB = "VB";
+const std::string mitk::ExtendedOneTissueCompartmentModel::NAME_PARAMETER_K1 = "K_1";
+const std::string mitk::ExtendedOneTissueCompartmentModel::NAME_PARAMETER_k2 = "k_2";
+const std::string mitk::ExtendedOneTissueCompartmentModel::NAME_PARAMETER_vb = "v_b";
 
-const std::string mitk::ExtendedOneTissueCompartmentModel::UNIT_PARAMETER_k1 = "1/min";
+const std::string mitk::ExtendedOneTissueCompartmentModel::UNIT_PARAMETER_K1 = "1/min";
 const std::string mitk::ExtendedOneTissueCompartmentModel::UNIT_PARAMETER_k2 = "1/min";
-const std::string mitk::ExtendedOneTissueCompartmentModel::UNIT_PARAMETER_VB = "ml/ml";
+const std::string mitk::ExtendedOneTissueCompartmentModel::UNIT_PARAMETER_vb = "ml/ml";
 
-const unsigned int mitk::ExtendedOneTissueCompartmentModel::POSITION_PARAMETER_k1 = 0;
+const unsigned int mitk::ExtendedOneTissueCompartmentModel::POSITION_PARAMETER_K1 = 0;
 const unsigned int mitk::ExtendedOneTissueCompartmentModel::POSITION_PARAMETER_k2 = 1;
-const unsigned int mitk::ExtendedOneTissueCompartmentModel::POSITION_PARAMETER_VB = 2;
+const unsigned int mitk::ExtendedOneTissueCompartmentModel::POSITION_PARAMETER_vb = 2;
 
 const unsigned int mitk::ExtendedOneTissueCompartmentModel::NUMBER_OF_PARAMETERS = 3;
+
+const std::string mitk::ExtendedOneTissueCompartmentModel::MODEL_TYPE = "Dynamic.PET";
 
 std::string mitk::ExtendedOneTissueCompartmentModel::GetModelDisplayName() const
 {
@@ -38,7 +40,7 @@ std::string mitk::ExtendedOneTissueCompartmentModel::GetModelDisplayName() const
 
 std::string mitk::ExtendedOneTissueCompartmentModel::GetModelType() const
 {
-  return "Dynamic.PET";
+  return MODEL_TYPE;
 };
 
 mitk::ExtendedOneTissueCompartmentModel::ExtendedOneTissueCompartmentModel()
@@ -55,9 +57,9 @@ mitk::ExtendedOneTissueCompartmentModel::ParameterNamesType mitk::ExtendedOneTis
 {
   ParameterNamesType result;
 
-  result.push_back(NAME_PARAMETER_k1);
+  result.push_back(NAME_PARAMETER_K1);
   result.push_back(NAME_PARAMETER_k2);
-  result.push_back(NAME_PARAMETER_VB);
+  result.push_back(NAME_PARAMETER_vb);
 
   return result;
 }
@@ -73,9 +75,9 @@ mitk::ExtendedOneTissueCompartmentModel::GetParameterUnits() const
 {
   ParamterUnitMapType result;
 
-  result.insert(std::make_pair(NAME_PARAMETER_k1, UNIT_PARAMETER_k1));
+  result.insert(std::make_pair(NAME_PARAMETER_K1, UNIT_PARAMETER_K1));
   result.insert(std::make_pair(NAME_PARAMETER_k2, UNIT_PARAMETER_k2));
-  result.insert(std::make_pair(NAME_PARAMETER_VB, UNIT_PARAMETER_VB));
+  result.insert(std::make_pair(NAME_PARAMETER_vb, UNIT_PARAMETER_vb));
 
   return result;
 };
@@ -96,9 +98,9 @@ mitk::ExtendedOneTissueCompartmentModel::ModelResultType mitk::ExtendedOneTissue
   unsigned int timeSteps = this->m_TimeGrid.GetSize();
 
   //Model Parameters
-  double     K1 = (double) parameters[POSITION_PARAMETER_k1] / 60.0;
+  double     K1 = (double) parameters[POSITION_PARAMETER_K1] / 60.0;
   double     k2 = (double) parameters[POSITION_PARAMETER_k2] / 60.0;
-  double     VB = parameters[POSITION_PARAMETER_VB];
+  double     vb = parameters[POSITION_PARAMETER_vb];
 
 
 
@@ -116,7 +118,7 @@ mitk::ExtendedOneTissueCompartmentModel::ModelResultType mitk::ExtendedOneTissue
 
   for (mitk::ModelBase::ModelResultType::const_iterator res = convolution.begin(); res != convolution.end(); ++res, ++signalPos, ++aifPos)
   {
-    *signalPos = VB * (*aifPos) + (1 - VB) * K1 * (*res);
+    *signalPos = vb * (*aifPos) + (1 - vb) * K1 * (*res);
   }
 
   return signal;

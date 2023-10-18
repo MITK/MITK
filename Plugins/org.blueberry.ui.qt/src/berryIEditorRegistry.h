@@ -216,7 +216,7 @@ struct BERRY_UI_QT IEditorRegistry {
    * @return the descriptor of the image to display next to the file
    * @since 3.1
    */
-   // virtual ImageDescriptor* GetImageDescriptor(const std::tring& filename, IContentType contentType) = 0;
+   // virtual ImageDescriptor* GetImageDescriptor(const std::string& filename, IContentType contentType) = 0;
 
     /*
      * Removes the given property listener from this registry.

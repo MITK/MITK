@@ -306,7 +306,7 @@ int ModelFitInspectorView::ActualizeFitSelectionWidget()
     if (cmbIndex == -1)
     {
       MITK_WARN <<
-        "Model fit Inspector in invalid state. Selected fit seems to be not avaible in plugin selection. Failed fit UID:"
+        "Model fit Inspector in invalid state. Selected fit seems to be not available in plugin selection. Failed fit UID:"
         << selectedFitUD;
     }
   };

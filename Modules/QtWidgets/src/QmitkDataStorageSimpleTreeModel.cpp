@@ -199,6 +199,10 @@ QVariant QmitkDataStorageSimpleTreeModel::data(const QModelIndex &index, int rol
 
   mitk::DataNode *dataNode = treeItem->GetDataNode();
 
+  // No need to access dataNode if that is pointing to nullptr, it will always give segfault
+  if (!dataNode)
+    return QModelIndex();
+
   QString nodeName = QString::fromStdString(dataNode->GetName());
   if (nodeName.isEmpty())
   {

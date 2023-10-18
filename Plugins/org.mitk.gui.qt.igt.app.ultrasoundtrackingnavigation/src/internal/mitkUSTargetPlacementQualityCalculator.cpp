@@ -95,7 +95,7 @@ void mitk::USTargetPlacementQualityCalculator::Update()
   plannedTargetsCenterPoint[2] = plannedCenter[2];
 
   MITK_INFO("QmitkUSAbstractNavigationStep")("QmitkUSNavigationStepPlacementPlanning")
-    << "Center of mass of the planned target points caclulated as: " << plannedTargetsCenterPoint;
+    << "Center of mass of the planned target points calculated as: " << plannedTargetsCenterPoint;
 
   m_CentersOfMassDistance = targetCenterPoint.EuclideanDistanceTo(plannedTargetsCenterPoint);
   MITK_INFO("QmitkUSAbstractNavigationStep")("QmitkUSNavigationStepPlacementPlanning")

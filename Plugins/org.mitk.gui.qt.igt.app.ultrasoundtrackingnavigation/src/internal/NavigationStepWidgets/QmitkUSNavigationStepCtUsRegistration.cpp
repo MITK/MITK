@@ -953,7 +953,7 @@ bool QmitkUSNavigationStepCtUsRegistration::EliminateFiducialCandidatesByEuclide
   }
 
   //Classify the rested fiducial candidates by its characteristic Euclidean distances
-  // between the canidates and remove all candidates with a false distance configuration:
+  // between the candidates and remove all candidates with a false distance configuration:
   this->ClassifyFiducialCandidates();
   return true;
 }
@@ -1660,7 +1660,7 @@ void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
     m_ImageNode->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
   }*/
 
-  //If this option is set, each point will be transformed and the acutal coordinates of the points change.
+  //If this option is set, each point will be transformed and the actual coordinates of the points change.
 
   if( !m_PerformingGroundTruthProtocolEvaluation )
   {

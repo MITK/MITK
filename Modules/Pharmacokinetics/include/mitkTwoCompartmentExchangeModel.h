@@ -54,7 +54,6 @@ namespace mitk
     itkTypeMacro(TwoCompartmentExchangeModel, ModelBase);
 
     /** Model Specifications */
-    static const std::string MODEL_DISPLAY_NAME;
 
     static const std::string NAME_PARAMETER_F;
     static const std::string NAME_PARAMETER_PS;
@@ -72,6 +71,10 @@ namespace mitk
     static const std::string UNIT_PARAMETER_vp;
 
     static const unsigned int NUMBER_OF_PARAMETERS;
+
+    static const std::string MODEL_DISPLAY_NAME;
+
+    static const std::string MODEL_TYPE;
 
     std::string GetModelDisplayName() const override;
 

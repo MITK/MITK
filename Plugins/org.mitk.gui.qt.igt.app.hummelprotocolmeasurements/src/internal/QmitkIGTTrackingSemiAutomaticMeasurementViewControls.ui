@@ -375,7 +375,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QLabel" name="m_ReferencePosAtStart">
          <property name="text">
-          <string>Reference Postion: &lt;none&gt;</string>
+          <string>Reference Position: &lt;none&gt;</string>
          </property>
         </widget>
        </item>

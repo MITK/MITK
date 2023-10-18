@@ -35,9 +35,9 @@ QmitkGPULoader::QmitkGPULoader()
     gpuDetails = infoString.split(",");
     if(gpuDetails.count() == 2)
     {
-      spec.name = gpuDetails.at(0);
+      spec.name = gpuDetails.at(0).trimmed();
       spec.id = count;
-      spec.memory = gpuDetails.at(1);
+      spec.memory = gpuDetails.at(1).trimmed();
       this->m_Gpus.push_back(spec);
       ++count;
     }

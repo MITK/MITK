@@ -78,7 +78,7 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
     void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
-    /// parse string and set data vector returns true if succesfull
+    /// parse string and set data vector returns true if successful
     bool SetZSpectrum(mitk::StringProperty* zSpectrumProperty);
 
     /** Checks whether the currently set data appears reasonable

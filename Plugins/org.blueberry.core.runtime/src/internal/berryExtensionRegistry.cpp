@@ -904,7 +904,7 @@ ExtensionRegistry::~ExtensionRegistry()
 void ExtensionRegistry::Stop(QObject* /*key*/)
 {
   // If the registry creator specified a key token, check that the key mathches it
-  // (it is assumed that registry owner keeps the key to prevent unautorized accesss).
+  // (it is assumed that registry owner keeps the key to prevent unautorized access).
   if (masterToken != nullptr && masterToken != nullptr)
   {
     throw ctkInvalidArgumentException("Unauthorized access to the ExtensionRegistry.stop() method. Check if proper access token is supplied."); //$NON-NLS-1$

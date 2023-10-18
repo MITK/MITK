@@ -197,7 +197,7 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
     tracker.SetRectangle(startRect);
   }
 
-  // Tracking Loop...tracking is preformed on the 'SWT.Move' listener registered
+  // Tracking Loop...tracking is performed on the 'SWT.Move' listener registered
   // against the tracker.
 
   //  // HACK:

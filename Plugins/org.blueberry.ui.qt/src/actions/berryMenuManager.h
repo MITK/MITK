@@ -231,7 +231,7 @@ public:
   SmartPointer<IContributionManagerOverrides> GetOverrides() override;
 
   /**
-   * Returns the parent contribution manager of this manger.
+   * Returns the parent contribution manager of this manager.
    *
    * @return the parent contribution manager
    */

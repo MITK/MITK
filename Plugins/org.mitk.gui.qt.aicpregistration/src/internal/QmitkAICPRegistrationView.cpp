@@ -129,12 +129,12 @@ void QmitkAICPRegistrationView::CreateQtPartControl( QWidget *parent )
   m_Controls.m_FixedSurfaceComboBox->setToolTip("Set the fixed surface of the A-ICP algorithm");
   m_Controls.m_EnableTreCalculation->setToolTip("Enable the trimmed version of the algorithm.");
   m_Controls.m_TrimmFactorSpinbox->setToolTip("Set the trimmfactor. The algorithm will use a percentage of the Moving pointset for the registration. Valid number are between 0 and 1.");
-  m_Controls.m_ThresholdSpinbox->setToolTip("Set the threshold to wich the algorithm will converge.");
+  m_Controls.m_ThresholdSpinbox->setToolTip("Set the threshold to which the algorithm will converge.");
   m_Controls.m_MaxIterationsSpinbox->setToolTip("The maximum number of iterations used by the algorithm.");
   m_Controls.m_SearchRadius->setToolTip("Set the search radius in mm for the calculation of the correspondences.");
   m_Controls.m_RegisterSurfaceButton->setToolTip("Start the registration.");
   m_Controls.m_EnableTrimming->setToolTip("Enables the trimmed version of the algorithm.");
-  m_Controls.m_TrimmFactorSpinbox->setToolTip("Set teh overlapping part of the surface in %. The valid range is between 0 and 1.");
+  m_Controls.m_TrimmFactorSpinbox->setToolTip("Set the overlapping part of the surface in %. The valid range is between 0 and 1.");
   m_Controls.m_MovingTargets->setToolTip("Select the targets for the moving surface.");
   m_Controls.m_FixedTargets->setToolTip("Select the targets for the fixed surface.");
 

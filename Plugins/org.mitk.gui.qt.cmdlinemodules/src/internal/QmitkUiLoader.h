@@ -20,7 +20,7 @@ found in the LICENSE file.
 /**
  * \class QmitkUiLoader
  * \brief Derived from ctkCmdLineModuleQtGuiLoader to enable us to instantiate widgets from Qmitk at runtime,
- * and currently we instatiate QmitkDataStorageComboBoxWithSelectNone, used for image input widgets.
+ * and currently we instantiate QmitkDataStorageComboBoxWithSelectNone, used for image input widgets.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  * \sa ctkCmdLineModuleQtUiLoader

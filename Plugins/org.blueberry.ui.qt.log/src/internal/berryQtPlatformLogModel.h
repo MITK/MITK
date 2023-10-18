@@ -51,7 +51,7 @@ public:
   QVariant data(const QModelIndex& index, int) const override;
 
   /** Documentation
-   *  @return Retruns the complete table data as string representation.
+   *  @return Returns the complete table data as string representation.
    */
   QString GetDataAsString();
 

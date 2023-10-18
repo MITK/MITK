@@ -38,6 +38,7 @@ set(CPP_FILES
   Qmitk/QmitkLabelColorItemDelegate.cpp
   Qmitk/QmitkLabelToggleItemDelegate.cpp
   Qmitk/QmitkFindSegmentationTaskDialog.cpp
+  Qmitk/QmitkSegmentAnythingToolGUI.cpp
   Qmitk/QmitkMonaiLabelToolGUI.cpp
   Qmitk/QmitkMonaiLabel2DToolGUI.cpp
   Qmitk/QmitkMonaiLabel3DToolGUI.cpp
@@ -92,6 +93,7 @@ set(MOC_H_FILES
   Qmitk/QmitkLabelColorItemDelegate.h
   Qmitk/QmitkLabelToggleItemDelegate.h
   Qmitk/QmitkFindSegmentationTaskDialog.h
+  Qmitk/QmitkSegmentAnythingToolGUI.h
   Qmitk/QmitkMonaiLabelToolGUI.h
   Qmitk/QmitkMonaiLabel2DToolGUI.h
   Qmitk/QmitkMonaiLabel3DToolGUI.h
@@ -116,6 +118,7 @@ set(UI_FILES
   Qmitk/QmitkMultiLabelInspectorControls.ui
   Qmitk/QmitkMultiLabelManagerControls.ui
   Qmitk/QmitkFindSegmentationTaskDialog.ui
+  Qmitk/QmitkSegmentAnythingGUIControls.ui
   Qmitk/QmitkMonaiLabelToolGUIControls.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkContourModelToImageWidgetControls.ui

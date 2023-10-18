@@ -42,7 +42,7 @@ JobQueue::JobQueue(bool allowConflictOvertaking) :
   dummy->SetPrevious(dummy);
 }
 
-//TODO JobQueue Constructor IStatus Implementierung
+//TODO JobQueue Constructor IStatus Implementation
 //TODO Constructor JobQueue IStatus .. implementation
 //  public JobQueue(boolean allowConflictOvertaking) {
 //  //compareTo on dummy is never called

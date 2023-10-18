@@ -17,16 +17,18 @@ found in the LICENSE file.
 
 const std::string mitk::OneTissueCompartmentModel::MODEL_DISPLAY_NAME = "One Tissue Compartment Model";
 
-const std::string mitk::OneTissueCompartmentModel::NAME_PARAMETER_k1 = "K1";
-const std::string mitk::OneTissueCompartmentModel::NAME_PARAMETER_k2 = "k2";
+const std::string mitk::OneTissueCompartmentModel::NAME_PARAMETER_K1 = "K_1";
+const std::string mitk::OneTissueCompartmentModel::NAME_PARAMETER_k2 = "k_2";
 
-const std::string mitk::OneTissueCompartmentModel::UNIT_PARAMETER_k1 = "1/min";
+const std::string mitk::OneTissueCompartmentModel::UNIT_PARAMETER_K1 = "1/min";
 const std::string mitk::OneTissueCompartmentModel::UNIT_PARAMETER_k2 = "1/min";
 
-const unsigned int mitk::OneTissueCompartmentModel::POSITION_PARAMETER_k1 = 0;
+const unsigned int mitk::OneTissueCompartmentModel::POSITION_PARAMETER_K1 = 0;
 const unsigned int mitk::OneTissueCompartmentModel::POSITION_PARAMETER_k2 = 1;
 
 const unsigned int mitk::OneTissueCompartmentModel::NUMBER_OF_PARAMETERS = 2;
+
+const std::string mitk::OneTissueCompartmentModel::MODEL_TYPE = "Dynamic.PET";
 
 std::string mitk::OneTissueCompartmentModel::GetModelDisplayName() const
 {
@@ -35,7 +37,7 @@ std::string mitk::OneTissueCompartmentModel::GetModelDisplayName() const
 
 std::string mitk::OneTissueCompartmentModel::GetModelType() const
 {
-  return "Dynamic.PET";
+  return MODEL_TYPE;
 };
 
 mitk::OneTissueCompartmentModel::OneTissueCompartmentModel()
@@ -52,7 +54,7 @@ mitk::OneTissueCompartmentModel::ParameterNamesType mitk::OneTissueCompartmentMo
 {
   ParameterNamesType result;
 
-  result.push_back(NAME_PARAMETER_k1);
+  result.push_back(NAME_PARAMETER_K1);
   result.push_back(NAME_PARAMETER_k2);
 
   return result;
@@ -70,11 +72,12 @@ mitk::OneTissueCompartmentModel::GetParameterUnits() const
 {
   ParamterUnitMapType result;
 
-  result.insert(std::make_pair(NAME_PARAMETER_k1, UNIT_PARAMETER_k1));
+  result.insert(std::make_pair(NAME_PARAMETER_K1, UNIT_PARAMETER_K1));
   result.insert(std::make_pair(NAME_PARAMETER_k2, UNIT_PARAMETER_k2));
 
   return result;
 };
+
 
 mitk::OneTissueCompartmentModel::ModelResultType mitk::OneTissueCompartmentModel::ComputeModelfunction(
   const ParametersType& parameters) const
@@ -92,7 +95,7 @@ mitk::OneTissueCompartmentModel::ModelResultType mitk::OneTissueCompartmentModel
   unsigned int timeSteps = this->m_TimeGrid.GetSize();
 
   //Model Parameters
-  double     K1 = (double) parameters[POSITION_PARAMETER_k1] / 60.0;
+  double     K1 = (double) parameters[POSITION_PARAMETER_K1] / 60.0;
   double     k2 = (double) parameters[POSITION_PARAMETER_k2] / 60.0;
 
 

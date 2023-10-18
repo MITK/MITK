@@ -15,7 +15,7 @@ To use the plugin a registration algorithm must be loaded and moving data as wel
 
 The type of data supported depends on the chosen algorithm. Basically the plugin supports the registration of images and point sets.
 The moving data is registered onto the target data. Thus in case of images, the result is a mapped input image in the geometry (field of view, orientation, spacing) defined by the target image.\n
-All inputs that should be used for the registration are selected via the respective selection widgets shown in the image below. The box with the mask input selectors are only shown if the chosen algorithm supports masks. It is also optional to set only one ore both masks. (Remark: implications of which mask to set may depend on the specific algorithms; e.g. sometimes it is computationally more efficient to set at least the moving mask if possible.)
+All inputs that should be used for the registration are selected via the respective selection widgets shown in the image below. The box with the mask input selectors are only shown if the chosen algorithm supports masks. It is also optional to set only one or both masks. (Remark: implications of which mask to set may depend on the specific algorithms; e.g. sometimes it is computationally more efficient to set at least the moving mask if possible.)
 
 \imageMacro{map_control_inputs.png, "Input selections for the registration. Moving and target inputs are mandatory. Moving and target masks are only available if the algorithm supports them and are optional.", 5}
 

@@ -93,7 +93,7 @@ protected:
   mitk::DataNode::Pointer m_ToolSurfaceInToolCoordinatesDataNode; //<<< holds the tool surface in tool coordinates (for preview purposes)
   int m_IDCalibrationPointer; //<<< id of the calibration pointer (of the corresponding navigation data source)
   QTimer* m_TrackingTimer; //<<< tracking timer that updates the status widgets
-  void ApplyToolTipTransform(mitk::NavigationData::Pointer ToolTipTransformInToolCoordinates, std::string message = "Tool was updated with the calibrated tool tip!"); //<<< applys the given tool tip transform to the tool to calibrate
+  void ApplyToolTipTransform(mitk::NavigationData::Pointer ToolTipTransformInToolCoordinates, std::string message = "Tool was updated with the calibrated tool tip!"); //<<< applies the given tool tip transform to the tool to calibrate
   bool CheckInitialization(bool CalibrationPointerRequired = true); //<<< checks if the tool to calibrate and (if required) the calibration pointer is initialized. Displays a warning and returns false if not.
   mitk::NavigationData::Pointer m_ComputedToolTipTransformation; //<<< holds the new tooltip transformation after it was computed to write it into the tool later
 

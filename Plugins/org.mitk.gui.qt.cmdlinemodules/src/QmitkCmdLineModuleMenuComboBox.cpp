@@ -175,7 +175,7 @@ void QmitkCmdLineModuleMenuComboBox::RebuildMenu()
     }
   }
 
-  // Clearup termporary data structure
+  // Clearup temporary data structure
   for (int i = 0; i < list.size(); i++)
   {
     delete list[i];

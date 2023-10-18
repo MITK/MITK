@@ -91,7 +91,7 @@ class DiffSliceOperationApplier. The operation itself observes the image, which 
 so no undo operation will be executed on/for images that have already been destroyed.
 <li> <b>GUI</b>: The top-level GUI is the view
 QmitkSegmentation, which is very thin in comparison to ERIS. There are
-separate widgets for image and tool selection, for interpolation. Additionaly,
+separate widgets for image and tool selection, for interpolation. Additionally,
 there are some methods to create, delete, crop, load and save segmentations.
 </ol>
 

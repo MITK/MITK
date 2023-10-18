@@ -83,7 +83,7 @@ class QmitkUSNavigationMarkerPlacement : public QmitkAbstractView
   void OnImageAndNavigationDataLoggingTimeout();
 
   /**
-  * \brief Initializes anything neccessary for an experiment.
+  * \brief Initializes anything necessary for an experiment.
   * The user is asked for a directory for storing the results and the logging
   * is started.
   */

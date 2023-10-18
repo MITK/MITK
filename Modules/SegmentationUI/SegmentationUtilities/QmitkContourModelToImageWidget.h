@@ -47,7 +47,7 @@ public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
   explicit QmitkContourModelToImageWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
-  /** @brief Defaul destructor. */
+  /** @brief Default destructor. */
   ~QmitkContourModelToImageWidget() override;
 
 private slots:

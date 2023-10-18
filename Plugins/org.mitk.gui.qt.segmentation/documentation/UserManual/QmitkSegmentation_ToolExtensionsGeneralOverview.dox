@@ -138,7 +138,7 @@ For all .cpp files in \c TOOL_FILES and \c TOOL_QT3GUI_FILES there will be facto
 created assuming the naming conventions described in the sections above.
 Files listed in \c TOOL_ADDITIONAL_CPPS will just be compiled. Files listed in
 \c TOOL_ADDITIONAL_MOC_H will be run through Qts meta object compiler \c moc --
-this is neccessary for all objects that have the Q_OBJECT macro in their declaration.
+this is necessary for all objects that have the Q_OBJECT macro in their declaration.
 \c moc will create new files that will also be compiled into the library.
 
 \section ToolExtensionsGeneralOverview5 Compiling the extension

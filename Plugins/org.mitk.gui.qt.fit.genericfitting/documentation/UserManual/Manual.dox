@@ -23,10 +23,16 @@ Therefore, apart from the image to be fitted (<i>Selected Time Series</i>), a RO
 The view currently offers <i>Pixel based</i> and/or <i>ROI based</i> averaged fits of time-varying curves. The <i>ROI based</i> fitting option becomes enabled, if a mask is selected.
 
 \section FIT_GENERIC_General_models Supported models
-Currently the following models are available for fitting:
--	<b> Linear model </b>: y = offset + slope*x
--       <b> Generic parameter model </b>: A simple formula can be manually provided and will be parsed for fitting.
--       <b> T2 decay model </b>: y = A*exp(-t/B)
+The supported models are generic model which can represent any kind of data values y with generic units of y on any kind of data grid x with generic units of x.
+When using these model for fitting to your data, be aware that you have to keep track of the quantities and units.
+Currently the following models are available:
+-	    <b> Linear Model </b>: <br> <i> y(x) = y-intercept + slope*x </i>
+-       <b> Generic parameter Model </b>: <br> A simple formula can be manually provided and will be parsed for fitting.
+-       <b> Exponential Decay Model </b>: <br> <i> y(x) = y-intercept * exp(-x/&lambda;) </i>
+-       <b> Exponential Decay Offset Model</b>: <br> <i> y(x) = y-intercept * exp(-x/&lambda;) + baseline </i>
+-		<b> Exponential Saturation Model </b>: <br> <i> if x<onset: y(x) = baseline, <br> else: y(x) = baseline + (y_final-baseline) * (1 - exp(-rate*(x-onset))) </i>
+-       <b> Two Step Linear Model </b>: <br> <i> if x < x_changepoint: y(x) = y-intercept + slope1*x, <br> else: y(x) = y-intercept1 + slope2*x </i>
+-       <b> Three Step Linear Model </b>: <br> <i> if x < x_changepoint1: y(x) = baseline, <br> else if x_changepoint1 <= x <= x_changepoint2: y(x) = y-intercept1 + slope1*x, <br> else if x>x_changepoint2: y(x) = y-intercept2 + slope2*x </i> <br>,
 
 
 \section FIT_GENERIC_Settings Model settings

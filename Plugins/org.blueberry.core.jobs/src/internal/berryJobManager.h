@@ -314,7 +314,7 @@ private:
   //   static const Object lock ;
   //
   //  //private LockManager lockManager = new LockManager();
-  //   static const LockManger lockManager;
+  //   static const LockManager lockManager;
   /**
    * The pool of worker threads.
    */

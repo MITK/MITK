@@ -139,7 +139,7 @@ public:
   void SetEnabled(const Object::Pointer& evaluationContext) override;
 
   /**
-   * Passes the dipose on to the proxied handler, if it has been loaded.
+   * Passes the dispose on to the proxied handler, if it has been loaded.
    */
   void Dispose() override;
 
@@ -209,7 +209,7 @@ private:
   void HandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent) override;
 
   /**
-   * Retrives the ConfigurationElement attribute according to the
+   * Retrieves the ConfigurationElement attribute according to the
    * <code>handlerAttributeName</code>.
    *
    * @return the handlerAttributeName value, may be <code>null</code>.

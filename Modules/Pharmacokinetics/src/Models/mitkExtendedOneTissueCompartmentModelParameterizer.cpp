@@ -17,9 +17,9 @@ mitk::ExtendedOneTissueCompartmentModelParameterizer::GetDefaultInitialParameter
 {
   ParametersType initialParameters;
   initialParameters.SetSize(3);
-  initialParameters[mitk::ExtendedOneTissueCompartmentModel::POSITION_PARAMETER_k1] = 0.5;
+  initialParameters[mitk::ExtendedOneTissueCompartmentModel::POSITION_PARAMETER_K1] = 0.5;
   initialParameters[mitk::ExtendedOneTissueCompartmentModel::POSITION_PARAMETER_k2] = 0.5;
-  initialParameters[mitk::ExtendedOneTissueCompartmentModel::POSITION_PARAMETER_VB] = 0.5;
+  initialParameters[mitk::ExtendedOneTissueCompartmentModel::POSITION_PARAMETER_vb] = 0.5;
 
   return initialParameters;
 };

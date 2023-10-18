@@ -97,7 +97,7 @@ protected:
   //timer
   QTimer* m_Timer;
 
-  //memebers for reference checking
+  //members for reference checking
   std::vector<mitk::Point3D> m_ReferenceStartPositions;
   bool m_referenceValid;
 

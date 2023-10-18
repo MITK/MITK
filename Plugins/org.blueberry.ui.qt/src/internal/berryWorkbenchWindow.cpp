@@ -1062,7 +1062,7 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
   //      }
   //
   //    } else {
-  //      // For older workbenchs
+  //      // For older workbenches
   //      coolBarMem = memento
   //          .getChild(IWorkbenchConstants.TAG_TOOLBAR_LAYOUT);
   //      if (coolBarMem != null) {

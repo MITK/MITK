@@ -645,7 +645,7 @@
        <string>Plot data export</string>
       </attribute>
       <attribute name="toolTip">
-       <string>Display and export option for the current data samples, model signals and additinal fitting informations of the plot.</string>
+       <string>Display and export option for the current data samples, model signals and additional fitting information of the plot.</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <property name="spacing">

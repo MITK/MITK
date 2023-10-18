@@ -508,7 +508,7 @@ void QmitkUltrasoundCalibration::OnStartPlusCalibration()
     m_Controls.m_StartStreaming->setEnabled(false);
     m_Controls.m_SavePlusCalibration->setEnabled(false);
     m_Controls.m_SetupStatus->setStyleSheet("QLabel { color : green; }");
-    m_Controls.m_SetupStatus->setText("Setup successfull you can now connect PLUS");
+    m_Controls.m_SetupStatus->setText("Setup successful you can now connect PLUS");
   }
   else
   {
@@ -563,7 +563,7 @@ void QmitkUltrasoundCalibration::OnNewConnection()
 {
   m_Controls.m_StartStreaming->setEnabled(true);
   m_Controls.m_ConnectionStatus->setStyleSheet("QLabel { color : green; }");
-  m_Controls.m_ConnectionStatus->setText("Connection successfull you can now start streaming");
+  m_Controls.m_ConnectionStatus->setText("Connection successful you can now start streaming");
 }
 
 void QmitkUltrasoundCalibration::OnStreamingTimerTimeout()
@@ -676,7 +676,7 @@ void QmitkUltrasoundCalibration::ProcessPlusCalibration(igtl::Matrix4x4 &imageTo
   m_Controls.m_ToolBox->setItemEnabled(2, true);
   m_Controls.m_SavePlusCalibration->setEnabled(true);
   m_Controls.m_GotCalibrationLabel->setStyleSheet("QLabel { color : green; }");
-  m_Controls.m_GotCalibrationLabel->setText("Recieved Calibration from PLUS you can now save it");
+  m_Controls.m_GotCalibrationLabel->setText("Received Calibration from PLUS you can now save it");
 }
 
 void QmitkUltrasoundCalibration::OnStopCalibrationProcess()

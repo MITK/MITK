@@ -361,7 +361,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
   if(on)
     {
     //######################################################################
-    //######################## inititalization #############################
+    //######################## initialization ##############################
     //######################################################################
 
     //some initial checks
@@ -673,7 +673,7 @@ bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
     initializationErrorDetected = true;
   }
 
-  // finaly: if an err was detected, give a warning and an error popup, then return false
+  // finally: if an err was detected, give a warning and an error popup, then return false
   if(initializationErrorDetected)
   {
     MITK_WARN << warningMessage;

@@ -180,7 +180,7 @@ void LayoutTreeNode::FindSashes(LayoutTree::Pointer child, PartPane::Sashes sash
   {
     LayoutPartSash::Pointer partSash = this->GetSash();
     //If the child is in the left, the sash
-    //is in the rigth and so on.
+    //is in the right and so on.
     if (leftOrTop)
     {
       if (partSash->IsVertical())

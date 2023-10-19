@@ -13,7 +13,8 @@ found in the LICENSE file.
 #ifndef mitkSceneReaderV1_h
 #define mitkSceneReaderV1_h
 
-#include "mitkSceneReader.h"
+#include <mitkSceneReader.h>
+#include <mitkUIDGenerator.h>
 
 namespace tinyxml2
 {

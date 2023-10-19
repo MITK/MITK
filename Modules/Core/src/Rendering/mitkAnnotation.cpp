@@ -10,8 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAnnotation.h"
-#include "usGetModuleContext.h"
+#include <mitkAnnotation.h>
+#include <mitkUIDGenerator.h>
+#include <usGetModuleContext.h>
 
 const std::string mitk::Annotation::US_INTERFACE_NAME = "org.mitk.services.Annotation";
 const std::string mitk::Annotation::US_PROPKEY_AnnotationNAME = US_INTERFACE_NAME + ".name";

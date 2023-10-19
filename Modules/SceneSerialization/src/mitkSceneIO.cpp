@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include "mitkStandaloneDataStorage.h"
 #include <mitkLocaleSwitch.h>
 #include <mitkStandardFileLocations.h>
+#include <mitkUIDGenerator.h>
 
 #include <itkObjectFactoryBase.h>
 

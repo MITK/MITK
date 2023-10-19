@@ -356,17 +356,17 @@ bool mitk::TemporoSpatialStringProperty::ToJSON(nlohmann::json& j) const
       const auto& maxTimePointID = t.first.second;
 
       auto value = nlohmann::json::object();
-      value.push_back({"z", minSliceID});
+      value["z"] = minSliceID;
 
       if (minSliceID != maxSliceID)
-        value.push_back({"zmax", maxSliceID});
+        value["zmax"] = maxSliceID;
 
-      value.push_back({"t", minTimePointID});
+      value["t"] = minTimePointID;
 
       if (minTimePointID != maxTimePointID)
-        value.push_back({"tmax", maxTimePointID});
+        value["tmax"] = maxTimePointID;
 
-      value.push_back({"value", t.second});
+      value["value"] = t.second;
 
       values.push_back(value);
     }

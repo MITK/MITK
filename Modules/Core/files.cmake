@@ -97,6 +97,7 @@ set(CPP_FILES
   DataManagement/mitkIPersistenceService.cpp
   DataManagement/mitkIPropertyAliases.cpp
   DataManagement/mitkIPropertyDescriptions.cpp
+  DataManagement/mitkIPropertyDeserialization.cpp
   DataManagement/mitkIPropertyExtensions.cpp
   DataManagement/mitkIPropertyFilters.cpp
   DataManagement/mitkIPropertyOwner.cpp
@@ -110,7 +111,7 @@ set(CPP_FILES
   DataManagement/mitkLevelWindowProperty.cpp
   DataManagement/mitkLookupTable.cpp
   DataManagement/mitkLookupTableProperty.cpp
-  DataManagement/mitkLookupTables.cpp # specializations of GenericLookupTable
+  DataManagement/mitkLookupTables.cpp
   DataManagement/mitkMaterial.cpp
   DataManagement/mitkMemoryUtilities.cpp
   DataManagement/mitkModalityProperty.cpp
@@ -140,6 +141,7 @@ set(CPP_FILES
   DataManagement/mitkProperties.cpp
   DataManagement/mitkPropertyAliases.cpp
   DataManagement/mitkPropertyDescriptions.cpp
+  DataManagement/mitkPropertyDeserialization.cpp
   DataManagement/mitkPropertyExtension.cpp
   DataManagement/mitkPropertyExtensions.cpp
   DataManagement/mitkPropertyFilter.cpp

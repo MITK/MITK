@@ -13,21 +13,11 @@ found in the LICENSE file.
 #ifndef mitkPropertyList_h
 #define mitkPropertyList_h
 
-#include "mitkBaseProperty.h"
-#include "mitkGenericProperty.h"
-#include "mitkUIDGenerator.h"
-#include "mitkIPropertyOwner.h"
-#include <MitkCoreExports.h>
-
-#include <itkObjectFactory.h>
-
-#include <map>
-#include <string>
+#include <mitkIPropertyOwner.h>
+#include <nlohmann/json_fwd.hpp>
 
 namespace mitk
 {
-  class XMLWriter;
-
   /**
    * @brief Key-value list holding instances of BaseProperty
    *
@@ -233,6 +223,9 @@ namespace mitk
     const PropertyMap *GetMap() const { return &m_Properties; }
     bool IsEmpty() const { return m_Properties.empty(); }
     virtual void Clear();
+
+    void ToJSON(nlohmann::json& j) const;
+    void FromJSON(const nlohmann::json& j);
 
   protected:
     PropertyList();

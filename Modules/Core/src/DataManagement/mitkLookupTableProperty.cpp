@@ -83,17 +83,16 @@ bool mitk::LookupTableProperty::ToJSON(nlohmann::json& j) const
     table.push_back(value);
   }
 
-  j = nlohmann::json{{
-    { "NumberOfColors", static_cast<int>(lut->GetNumberOfTableValues()) },
-    { "Scale", lut->GetScale() },
-    { "Ramp", lut->GetRamp() },
-    { "HueRange", nlohmann::json::array({ lut->GetHueRange()[0], lut->GetHueRange()[1] }) },
-    { "ValueRange", nlohmann::json::array({ lut->GetValueRange()[0], lut->GetValueRange()[1] }) },
-    { "SaturationRange", nlohmann::json::array({ lut->GetSaturationRange()[0], lut->GetSaturationRange()[1] }) },
-    { "AlphaRange", nlohmann::json::array({ lut->GetAlphaRange()[0], lut->GetAlphaRange()[1] }) },
-    { "TableRange", nlohmann::json::array({ lut->GetTableRange()[0], lut->GetTableRange()[1] }) },
-    { "Table", table }
-  }};
+  j = nlohmann::json::object();
+  j["NumberOfColors"] = static_cast<int>(lut->GetNumberOfTableValues());
+  j["Scale"] = lut->GetScale();
+  j["Ramp"] = lut->GetRamp();
+  j["HueRange"] = nlohmann::json::array({ lut->GetHueRange()[0], lut->GetHueRange()[1] });
+  j["ValueRange"] = nlohmann::json::array({ lut->GetValueRange()[0], lut->GetValueRange()[1] });
+  j["SaturationRange"] = nlohmann::json::array({ lut->GetSaturationRange()[0], lut->GetSaturationRange()[1] });
+  j["AlphaRange"] = nlohmann::json::array({ lut->GetAlphaRange()[0], lut->GetAlphaRange()[1] });
+  j["TableRange"] = nlohmann::json::array({ lut->GetTableRange()[0], lut->GetTableRange()[1] });
+  j["Table"] = table;
 
   return true;
 }

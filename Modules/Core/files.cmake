@@ -108,7 +108,6 @@ set(CPP_FILES
   DataManagement/mitkLevelWindowManager.cpp
   DataManagement/mitkLevelWindowPreset.cpp
   DataManagement/mitkLevelWindowProperty.cpp
-  DataManagement/mitkLine.cpp
   DataManagement/mitkLookupTable.cpp
   DataManagement/mitkLookupTableProperty.cpp
   DataManagement/mitkLookupTables.cpp # specializations of GenericLookupTable
@@ -174,7 +173,6 @@ set(CPP_FILES
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkTemporoSpatialStringProperty.cpp
   DataManagement/mitkUIDManipulator.cpp
-  DataManagement/mitkVector.cpp
   DataManagement/mitkVectorProperty.cpp
   DataManagement/mitkVtkInterpolationProperty.cpp
   DataManagement/mitkVtkRepresentationProperty.cpp
@@ -240,7 +238,6 @@ set(CPP_FILES
   IO/mitkIFileWriter.cpp
   IO/mitkGeometryDataReaderService.cpp
   IO/mitkGeometryDataWriterService.cpp
-  IO/mitkImageGenerator.cpp
   IO/mitkImageVtkLegacyIO.cpp
   IO/mitkImageVtkXmlIO.cpp
   IO/mitkIMimeTypeProvider.cpp

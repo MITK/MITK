@@ -189,7 +189,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   //Concentration
   m_Controls.groupConcentration->hide();
   m_Controls.groupBoxEnhancement->hide();
-  m_Controls.groupBoxTurboFlash->hide();
   m_Controls.radioButtonNoConversion->setChecked(true);
   m_Controls.groupBox_T1MapviaVFA->hide();
 
@@ -201,12 +200,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
 
 
-  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash, SLOT(setVisible(bool)));
-  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
-  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.relaxationtime, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.recoverytime, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.relaxivity, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
 
   connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
@@ -236,10 +229,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   UpdateGUIControls();
 }
 
-bool MRPerfusionView::IsTurboFlashSequenceFlag() const
-{
-  return this->m_Controls.radioButtonTurboFlash->isChecked();
-};
 
 
 
@@ -280,8 +269,8 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.btnModelling->setEnabled(m_selectedImage.IsNotNull()
                                       && m_selectedModelFactory.IsNotNull() && !m_FittingInProgress && CheckModelSettings());
 
-  m_Controls.spinBox_baselineStartTimeStep->setEnabled(m_Controls.radioButtonTurboFlash->isChecked() || m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
-  m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked() || m_Controls.radioButtonTurboFlash->isChecked());
+  m_Controls.spinBox_baselineStartTimeStep->setEnabled( m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
+  m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
 
 
 }
@@ -553,16 +542,7 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = false;
       }
 
-      if (this->m_Controls.radioButtonTurboFlash->isChecked() )
-      {
-        ok = ok && (m_Controls.recoverytime->value() > 0);
-        ok = ok && (m_Controls.relaxationtime->value() > 0);
-        ok = ok && (m_Controls.relaxivity->value() > 0);
-        ok = ok && (m_Controls.AifRecoverytime->value() > 0);
-        ok = ok && CheckBaselineSelectionSettings();
-
-      }
-      else if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
+      if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
                || this->m_Controls.radioButton_relativeEnchancement->isChecked() )
       {
         ok = ok && (m_Controls.factorSpinBox->value() > 0);
@@ -1113,29 +1093,12 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
     concentrationGen->SetDynamicImage(this->m_selectedImage);
   }
 
-  concentrationGen->SetisTurboFlashSequence(IsTurboFlashSequenceFlag());
   concentrationGen->SetAbsoluteSignalEnhancement(m_Controls.radioButton_absoluteEnhancement->isChecked());
   concentrationGen->SetRelativeSignalEnhancement(m_Controls.radioButton_relativeEnchancement->isChecked());
   concentrationGen->SetUsingT1Map(m_Controls.radioButtonUsingT1viaVFA->isChecked());
 
 
-  if (IsTurboFlashSequenceFlag())
-  {
-    if (AIFMode)
-    {
-      concentrationGen->SetRecoveryTime(m_Controls.AifRecoverytime->value());
-    }
-    else
-    {
-      concentrationGen->SetRecoveryTime(m_Controls.recoverytime->value());
-    }
-
-    concentrationGen->SetRelaxationTime(m_Controls.relaxationtime->value());
-    concentrationGen->SetRelaxivity(m_Controls.relaxivity->value());
-    concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
-    concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
-  }
-  else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
+  if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
   {
       concentrationGen->SetRepetitionTime(m_Controls.TRSpinBox->value());
       concentrationGen->SetRelaxivity(m_Controls.RelaxivitySpinBox->value());
@@ -1318,7 +1281,7 @@ void MRPerfusionView::PrepareAIFConcentrationImage()
 
   if (!this->m_Controls.radioButtonNoConversion->isChecked())
   {
-    if (!IsTurboFlashSequenceFlag() && !this->m_Controls.checkDedicatedAIFImage->isChecked())
+    if (!this->m_Controls.checkDedicatedAIFImage->isChecked())
     {
       if (m_inputImage.IsNull())
       {

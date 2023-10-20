@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include "mitkConcentrationCurveGenerator.h"
 #include "mitkTestDynamicImageGenerator.h"
 #include "mitkImagePixelReadAccessor.h"
+#include "boost/math/constants/constants.hpp"
 
 
 class mitkConvertSignalToConcentrationTestSuite : public mitk::TestFixture
@@ -160,22 +161,26 @@ public:
   void GetConvertedImageVFATest()
   {
     mitk::Image::Pointer PDWImage;
-    PDWImage = mitk::GenerateTestFrame(1.0);
+    PDWImage = mitk::GenerateTestFrame(2.0);
     m_concentrationGen->SetUsingT1Map(true);
-    m_concentrationGen->SetRecoveryTime(1.0);
-    m_concentrationGen->SetRelaxivity(1.0);
-    m_concentrationGen->SetT10Image(PDWImage);
-    m_concentrationGen->SetFlipAngle(1.0);
+    m_concentrationGen->SetRepetitionTime(1.0);
+    m_concentrationGen->SetRelaxivity(1.0/1000.0);
+    m_concentrationGen->SetPDWImage(PDWImage);
+    m_concentrationGen->SetFlipAngle(2.0 / 360 * 2 * boost::math::constants::pi<double>());
+    m_concentrationGen->SetFlipAnglePDW(1.0 / 360 * 2 * boost::math::constants::pi<double>());
     m_concentrationGen->SetBaselineStartTimeStep(0);
     m_concentrationGen->SetBaselineEndTimeStep(0);
     m_convertedImage = m_concentrationGen->GetConvertedImage();
+
+    mitk::ImagePixelReadAccessor<double, 3> readAccessPDW(PDWImage, PDWImage->GetSliceData(3));
+    mitk::ImagePixelReadAccessor<double, 4> readAccessDyn(m_dynamicImage, m_dynamicImage->GetSliceData(4));
     mitk::ImagePixelReadAccessor<double, 4> readAccess(m_convertedImage, m_convertedImage->GetSliceData(4));
     std::vector <double> refValues;
     refValues.push_back(0.0);
-    refValues.push_back(2.956868);
+    refValues.push_back(7871.5616001);
+    refValues.push_back(-1059.012343);
     refValues.push_back(0.0);
-    refValues.push_back(0.0);
-    refValues.push_back(3.989374);
+    refValues.push_back(-3251.392613);
 
     std::stringstream ss;
     for (long unsigned int i = 0; i < m_testIndices.size(); i++)

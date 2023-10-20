@@ -61,5 +61,6 @@ void mitk::MonaiLabel3DTool::WriteImage(const Image *inputAtTimeStep, std::strin
 
 void mitk::MonaiLabel3DTool::WriteBackResults(LabelSetImage *previewImage, LabelSetImage *segResults, TimeStepType)
 {
+  this->SetSelectedLabels({1});
   MITK_INFO << "MonaiLabel3DTool WriteBackResults";
 }

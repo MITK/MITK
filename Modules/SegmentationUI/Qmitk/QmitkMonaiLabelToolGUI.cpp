@@ -75,14 +75,14 @@ void QmitkMonaiLabelToolGUI::StatusMessageListener(const bool status)
   {
     return;
   }
-  /* auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
+  auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
   if (nullptr == tool)
   {
     return;
   }
   this->SetLabelSetPreview(tool->GetPreviewSegmentation());
-  this->ActualizePreviewLabelVisibility();*/
-  Superclass::DisplayWidgets(false);
+  this->ActualizePreviewLabelVisibility();
+  //Superclass::DisplayWidgets(false);
   m_FirstPreviewComputation = false;
 }
 

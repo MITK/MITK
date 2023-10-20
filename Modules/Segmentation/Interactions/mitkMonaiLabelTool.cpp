@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include "mitkPointSetShapeProperty.h"
 #include "mitkProperties.h"
 #include "mitkToolManager.h"
+#include <mitkLabelSetImageHelper.h>
 
 mitk::MonaiLabelTool::MonaiLabelTool() : SegWithPreviewTool(true, "PressMoveReleaseAndPointSetting")
 {
@@ -253,11 +254,11 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
     }
     else
     {
-      std::map<std::string, mitk::Label::PixelType> labelMap{{m_RequestParameters->requestLabel, 1}};
+      std::map<std::string, mitk::Label::PixelType> labelMap; //{{m_RequestParameters->requestLabel, 1}};
       this->MapLabelsToSegmentation(outputBuffer, previewImage, labelMap);
     }
-    //mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
-    //previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
+    mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
+    previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
     this->WriteBackResults(previewImage, outputBuffer.GetPointer(), timeStep);
     this->SetIsLastSuccess(true);
     MonaiStatusEvent.Send(true);
@@ -275,12 +276,19 @@ void mitk::MonaiLabelTool::MapLabelsToSegmentation(const mitk::LabelSetImage *so
                                                    mitk::LabelSetImage *dest,
                                                    std::map<std::string, mitk::Label::PixelType> &labelMap)
 {
+  auto labelset = dest->GetLabelSet();
+  if (labelMap.empty())
+  {
+    auto label = LabelSetImageHelper::CreateNewLabel(dest, "object");
+    label->SetValue(1);
+    labelset->AddLabel(label, false);
+    return;
+  }
   std::map<mitk::Label::PixelType, std::string> flippedLabelMap;
   for (auto const &[key, val] : labelMap)
   {
     flippedLabelMap[val] = key;
   }
-  auto labelset = dest->GetLabelSet();
   auto lookupTable = mitk::LookupTable::New();
   lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
   //mitk::Label::PixelType labelId = 0;

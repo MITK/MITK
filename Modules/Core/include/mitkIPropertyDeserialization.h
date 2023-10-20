@@ -13,22 +13,33 @@ found in the LICENSE file.
 #ifndef mitkIPropertyDeserialization_h
 #define mitkIPropertyDeserialization_h
 
-#include <MitkCoreExports.h>
+#include <mitkBaseProperty.h>
 #include <mitkServiceInterface.h>
+#include <MitkCoreExports.h>
+
 #include <itkSmartPointer.h>
+
 #include <string>
+#include <type_traits>
 
 namespace mitk
 {
-  class BaseProperty;
-
   class MITKCORE_EXPORT IPropertyDeserialization
   {
   public:
     virtual ~IPropertyDeserialization();
 
-    virtual void RegisterProperty(const BaseProperty* property) = 0;
-    virtual itk::SmartPointer<BaseProperty> CreateInstance(const std::string& className) = 0;
+    virtual BaseProperty::Pointer CreateInstance(const std::string& className) = 0;
+
+    template <typename T, typename = std::enable_if_t<std::is_base_of_v<BaseProperty, T>>>
+    void RegisterProperty()
+    {
+      this->InternalRegisterProperty(T::New());
+    }
+
+  protected:
+
+    virtual void InternalRegisterProperty(const BaseProperty* property) = 0;
   };
 }
 

@@ -21,12 +21,6 @@ mitk::PropertyDeserialization::~PropertyDeserialization()
 {
 }
 
-void mitk::PropertyDeserialization::RegisterProperty(const BaseProperty* property)
-{
-  if (property != nullptr)
-    m_Map[property->GetNameOfClass()] = static_cast<BaseProperty*>(property->CreateAnother().GetPointer());
-}
-
 mitk::BaseProperty::Pointer mitk::PropertyDeserialization::CreateInstance(const std::string& className)
 {
   auto it = m_Map.find(className);
@@ -35,4 +29,9 @@ mitk::BaseProperty::Pointer mitk::PropertyDeserialization::CreateInstance(const 
     return static_cast<BaseProperty*>(it->second->CreateAnother().GetPointer());
 
   return nullptr;
+}
+
+void mitk::PropertyDeserialization::InternalRegisterProperty(const BaseProperty* property)
+{
+  m_Map[property->GetNameOfClass()] = property;
 }

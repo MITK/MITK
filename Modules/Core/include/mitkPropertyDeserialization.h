@@ -27,11 +27,13 @@ namespace mitk
     PropertyDeserialization(const PropertyDeserialization&) = delete;
     PropertyDeserialization& operator=(const PropertyDeserialization&) = delete;
 
-    void RegisterProperty(const BaseProperty* property) override;
     itk::SmartPointer<BaseProperty> CreateInstance(const std::string& className) override;
 
+  protected:
+    void InternalRegisterProperty(const BaseProperty* property) override;
+
   private:
-    using MapType = std::map<std::string, itk::SmartPointer<BaseProperty>>;
+    using MapType = std::map<std::string, BaseProperty::ConstPointer>;
     MapType m_Map;
   };
 }

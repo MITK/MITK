@@ -165,9 +165,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.groupDescBrix->hide();
   connect(m_Controls.injectiontime, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
 
-  //Num2CX setting
-  m_Controls.groupNum2CXM->hide();
-  connect(m_Controls.odeStepSize, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
 
   //Model fit configuration
   m_Controls.groupBox_FitConfiguration->hide();
@@ -260,7 +257,6 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.comboModel->setEnabled(!m_FittingInProgress);
   m_Controls.groupAIF->setEnabled(!m_FittingInProgress);
   m_Controls.groupDescBrix->setEnabled(!m_FittingInProgress);
-  m_Controls.groupNum2CXM->setEnabled(!m_FittingInProgress);
   m_Controls.groupConcentration->setEnabled(!m_FittingInProgress);
   m_Controls.groupBox_FitConfiguration->setEnabled(!m_FittingInProgress);
 

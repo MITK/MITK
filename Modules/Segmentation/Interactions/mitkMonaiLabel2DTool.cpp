@@ -38,7 +38,6 @@ void mitk::MonaiLabel2DTool::Activated()
 {
   Superclass::Activated();
   this->SetLabelTransferScope(LabelTransferScope::AllLabels);
-  this->SetLabelTransferMode(LabelTransferMode::AddLabel);
 }
 
 const char **mitk::MonaiLabel2DTool::GetXPM() const
@@ -108,11 +107,6 @@ void mitk::MonaiLabel2DTool::OnAddNegativePoint(StateMachineAction *, Interactio
 
 void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, std::string &inputImagePath)
 {
-  MITK_INFO << "WriteImage: MonaiLabel2DTool";
-
-  for (unsigned int i = 0; i < inputAtTimeStep->GetDimension(); i++)
-    MITK_INFO << "Dim " << i << ":" << inputAtTimeStep->GetDimension(i);
-
   mitk::Image::Pointer extendedImg = mitk::Image::New();
   unsigned int dim[] = {inputAtTimeStep->GetDimension(0), inputAtTimeStep->GetDimension(1), 1};
   mitk::PixelType pt = inputAtTimeStep->GetPixelType();
@@ -120,9 +114,6 @@ void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, std::strin
 
   mitk::ImageReadAccessor newMitkImgAcc(inputAtTimeStep);
   extendedImg->SetVolume(newMitkImgAcc.GetData());
-
-  for (unsigned int i = 0; i < extendedImg->GetDimension(); i++)
-    MITK_INFO << "Dim " << i << ":" << extendedImg->GetDimension(i);
 
   IOUtil::Save(extendedImg.GetPointer(), inputImagePath);
 }
@@ -160,5 +151,4 @@ void mitk::MonaiLabel2DTool::WriteBackResults(LabelSetImage *previewImage,
                                               TimeStepType timeStep)
 {
   mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), segResults, timeStep, false);
-  this->SetSelectedLabels({1});
 }

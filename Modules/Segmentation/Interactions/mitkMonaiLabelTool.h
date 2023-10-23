@@ -86,7 +86,6 @@ namespace mitk
   public:
     mitkClassMacro(MonaiLabelTool, SegWithPreviewTool);
     itkCloneMacro(Self);
-    bool m_TEST = false; // cleanup later
     void Activated() override;
     void Deactivated() override;
     void UpdatePrepare() override;
@@ -134,12 +133,12 @@ namespace mitk
     /*
      * @brief Add positive seed point action of StateMachine pattern
      */
-    virtual void OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent);
+    virtual void OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
 
     /*
      * @brief Add negative seed point action of StateMachine pattern
      */
-    virtual void OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent);
+    virtual void OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
 
     /*
      * @brief Delete action of StateMachine pattern
@@ -172,9 +171,10 @@ namespace mitk
     nlohmann::json m_ResultMetadata;
     const std::set<std::string> m_AUTO_SEG_TYPE_NAME = {"segmentation"};
     const std::set<std::string> m_SCRIBBLE_SEG_TYPE_NAME = {"scribbles"};
-    const std::set<std::string> m_INTERACTIVE_SEG_TYPE_NAME = {"deepedit", "deepgrow"};
+    const std::set<std::string> m_INTERACTIVE_SEG_TYPE_NAME = {"deepgrow"}; // deepedit not supported yet 
     const std::string m_TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
     const std::string m_SERVER_503_ERROR_TEXT = "A connection to MonaiLabel server cannot be established.";
+    const Label::PixelType MASK_VALUE = 1;
   };
 }
 #endif

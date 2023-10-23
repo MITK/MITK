@@ -34,6 +34,8 @@ namespace mitk
     const char **GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
     void Activated() override;
+    void OnAddPositivePoint(StateMachineAction *, InteractionEvent *) override;
+    void OnAddNegativePoint(StateMachineAction *, InteractionEvent *) override;
     void WriteImage(const Image *, std::string &) override;
     void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) override;
 

@@ -26,23 +26,23 @@ public:
   mitkClassMacro(QmitkMonaiLabelToolGUI, QmitkMultiLabelSegWithPreviewToolGUIBase);
   itkCloneMacro(Self);
 
-protected slots :
+protected slots:
 
   void OnPreviewBtnClicked();
   void OnFetchBtnClicked();
-  void OnModelChanged(const QString&);
+  void OnModelChanged(const QString &);
 
 protected:
   QmitkMonaiLabelToolGUI(int);
   ~QmitkMonaiLabelToolGUI();
 
-  void ConnectNewTool(mitk::SegWithPreviewTool* newTool) override;
-  void InitializeUI(QBoxLayout* mainLayout) override;
+  void ConnectNewTool(mitk::SegWithPreviewTool *newTool) override;
+  void InitializeUI(QBoxLayout *mainLayout) override;
 
   void EnableWidgets(bool enabled) override;
 
   virtual void DisplayWidgets(bool enabled);
- 
+
   /**
    * @brief Writes any message in white on the tool pane.
    */
@@ -57,12 +57,12 @@ protected:
    * @brief Creates a QMessage object and shows on screen.
    */
   void ShowErrorMessage(const std::string &, QMessageBox::Icon = QMessageBox::Critical);
-  
+
   /**
    * @brief Function to listen to tool class status emitters.
    */
   void StatusMessageListener(const bool);
-  
+
 private:
   Ui_QmitkMonaiLabelToolGUIControls m_Controls;
   bool m_FirstPreviewComputation = true;
@@ -70,6 +70,17 @@ private:
   int m_Dimension;
   QString m_CONFIRM_QUESTION_TEXT =
     "Data will be sent to the processing server devoid of any patient information. Are you sure you want continue?";
+  const QStringList SUPPORTED_MODELS = {
+    "deepgrow_2d",
+    "deepgrow_3d",
+    "deepedit_seg",
+    "localization_vertebra",
+    "segmentation",
+    "segmentation_spleen",
+    "segmentation_vertebra",
+    "deepgrow_pipeline",
+    "vertebra_pipeline,"
+  };
 };
 
 #endif

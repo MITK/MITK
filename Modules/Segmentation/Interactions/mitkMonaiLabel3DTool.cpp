@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usModuleResource.h>
 #include <usServiceReference.h>
+#include <mitkImageReadAccessor.h>
 
 namespace mitk
 {
@@ -33,7 +34,6 @@ void mitk::MonaiLabel3DTool::Activated()
 {
   Superclass::Activated();
   this->SetLabelTransferScope(LabelTransferScope::AllLabels);
-  this->SetLabelTransferMode(LabelTransferMode::AddLabel);
 }
 
 const char **mitk::MonaiLabel3DTool::GetXPM() const
@@ -55,12 +55,48 @@ const char *mitk::MonaiLabel3DTool::GetName() const
 
 void mitk::MonaiLabel3DTool::WriteImage(const Image *inputAtTimeStep, std::string &inputImagePath)
 {
-  MITK_INFO << "WriteImage: MonaiLabel3DTool";
   IOUtil::Save(inputAtTimeStep, inputImagePath);
 }
 
-void mitk::MonaiLabel3DTool::WriteBackResults(LabelSetImage *previewImage, LabelSetImage *segResults, TimeStepType)
+void mitk::MonaiLabel3DTool::WriteBackResults(LabelSetImage *previewImage,
+                                              LabelSetImage *segResults,
+                                              TimeStepType timeStep)
 {
-  this->SetSelectedLabels({1});
-  MITK_INFO << "MonaiLabel3DTool WriteBackResults";
+  mitk::ImageReadAccessor newMitkImgAcc(segResults);
+  previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
+}
+
+void mitk::MonaiLabel3DTool::OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent)
+{
+  if ("deepgrow" == m_RequestParameters->model.type || "deepedit" == m_RequestParameters->model.type)
+  {
+    if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
+    {
+      const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+      if (positionEvent != nullptr)
+      {
+        m_PointSetPositive->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
+        ++m_PointSetCount;
+        this->UpdatePreview();
+      }
+    }
+  }
+}
+
+void mitk::MonaiLabel3DTool::OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent)
+{
+  if ("deepgrow" != m_RequestParameters->model.type)
+  {
+    return;
+  }
+  if (!this->IsUpdating() && m_PointSetNegative.IsNotNull())
+  {
+    const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+    if (positionEvent != nullptr)
+    {
+      m_PointSetNegative->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
+      m_PointSetCount++;
+      this->UpdatePreview();
+    }
+  }
 }

@@ -13,8 +13,7 @@ found in the LICENSE file.
 #include "mitkMonaiLabelTool.h"
 #include "mitkIOUtil.h"
 #include <httplib.h>
-#include <itksys/SystemTools.hxx>
-#include <mitkImageReadAccessor.h>
+#include <filesystem>
 #include "mitkPointSetShapeProperty.h"
 #include "mitkProperties.h"
 #include "mitkToolManager.h"
@@ -27,7 +26,7 @@ mitk::MonaiLabelTool::MonaiLabelTool() : SegWithPreviewTool(true, "PressMoveRele
 
 mitk::MonaiLabelTool::~MonaiLabelTool()
 {
-  itksys::SystemTools::RemoveADirectory(this->GetMitkTempDir());
+  std::filesystem::remove_all(this->GetMitkTempDir());
 }
 
 void mitk::MonaiLabelTool::ConnectActionsAndFunctions()
@@ -63,9 +62,6 @@ void mitk::MonaiLabelTool::Activated()
                                       mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
   m_PointSetNodeNegative->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
   this->GetDataStorage()->Add(m_PointSetNodeNegative, this->GetToolManager()->GetWorkingData(0));
-
-  this->SetLabelTransferScope(LabelTransferScope::ActiveLabel);
-  this->SetLabelTransferMode(LabelTransferMode::MapLabel);
 }
 
 void mitk::MonaiLabelTool::Deactivated()
@@ -87,54 +83,6 @@ void mitk::MonaiLabelTool::UpdatePrepare()
   for (LabelSetImage::GroupIndexType i = 0; i < preview->GetNumberOfLayers(); ++i)
   {
     preview->GetLabelSet(i)->RemoveAllLabels();
-  }
-}
-
-void mitk::MonaiLabelTool::OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent)
-{
-  if ("deepgrow" == m_RequestParameters->model.type || "deepedit" == m_RequestParameters->model.type)
-  {
-    /* if ((nullptr == this->GetWorkingPlaneGeometry()) ||
-        !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
-                     *(this->GetWorkingPlaneGeometry())))
-    {
-      this->ClearSeeds();
-      this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
-    }*/
-    if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
-    {
-      const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-      if (positionEvent != nullptr)
-      {
-        m_PointSetPositive->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
-        ++m_PointSetCount;
-        this->UpdatePreview();
-      }
-    }
-  }
-}
-
-void mitk::MonaiLabelTool::OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent)
-{
-  if ("deepgrow" != m_RequestParameters->model.type)
-  {
-    return;
-  }
-  /* if (m_PointSetPositive->GetSize() == 0 || nullptr == this->GetWorkingPlaneGeometry() ||
-      !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
-                   *(this->GetWorkingPlaneGeometry())))
-  {
-    return;
-  }*/
-  if (!this->IsUpdating() && m_PointSetNegative.IsNotNull())
-  {
-    const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-    if (positionEvent != nullptr)
-    {
-      m_PointSetNegative->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
-      m_PointSetCount++;
-      this->UpdatePreview();
-    }
   }
 }
 
@@ -204,11 +152,10 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
 {
   std::string &hostName = m_RequestParameters->hostName;
   int port = m_RequestParameters->port;
-  if (!m_TEST)
-    if (!IsMonaiServerOn(hostName, port))
-    {
-      mitkThrow() << m_SERVER_503_ERROR_TEXT;
-    }
+  if (!IsMonaiServerOn(hostName, port))
+  {
+    mitkThrow() << m_SERVER_503_ERROR_TEXT;
+  }
   std::string inDir, outDir, inputImagePath, outputImagePath;
   inDir = IOUtil::CreateTemporaryDirectory("monai-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
@@ -223,42 +170,25 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
   try
   {
     m_IsLastSuccess = false;
-    if (!m_TEST)
-    {
-      this->WriteImage(inputAtTimeStep, inputImagePath);
-      PostInferRequest(hostName, port, inputImagePath, outputImagePath, inputAtTimeStep->GetGeometry());
-    }
-    else
-    {
-      std::string metaData_test =
-        "{\"label_names\":{\"spleen\": 1, \"right kidney\": 2, \"left kidney\": 3, \"liver\": 6, \"stomach\": 7, "
-        "\"aorta\": 8, \"inferior "
-        "vena cava\": 9, \"background\": 0}, \"latencies\": {\"pre\": 0.64, \"infer\": 1.13, \"invert\": 0.03, "
-        "\"post\": 0.06, \"write\": 0.1, \"total\": 1.96, \"transform\": {\"pre\": {\"LoadImaged\": 0.1483, "
-        "\"EnsureChannelFirstd\": 0.0, \"Orientationd\": 0.0, \"ScaleIntensityRanged\": 0.0403, \"Resized\": 0.0401, "
-        "\"DiscardAddGuidanced\": 0.0297, \"EnsureTyped\": 0.3703}, \"post\": {\"EnsureTyped\": 0.0, \"Activationsd\": "
-        "0.0, \"AsDiscreted\": 0.0, \"SqueezeDimd\": 0.0, \"ToNumpyd\": 0.0473, \"Restored\": 0.0001}}}}";
-      m_ResultMetadata = nlohmann::json::parse(metaData_test);
-      outputImagePath = "C:/DKFZ/MONAI_work/monai_test_python/output.nii.gz";
-    }
-
+    this->WriteImage(inputAtTimeStep, inputImagePath);
+    PostInferRequest(hostName, port, inputImagePath, outputImagePath, inputAtTimeStep->GetGeometry());
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     auto outputBuffer = mitk::LabelSetImage::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
-    outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
-
     if (m_AUTO_SEG_TYPE_NAME.find(m_RequestParameters->model.type) != m_AUTO_SEG_TYPE_NAME.end())
     {
+      outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
       std::map<std::string, mitk::Label::PixelType> labelMap = m_ResultMetadata["label_names"];
       this->MapLabelsToSegmentation(outputBuffer, previewImage, labelMap);
+      this->SetLabelTransferMode(LabelTransferMode::AddLabel);
     }
     else
     {
-      std::map<std::string, mitk::Label::PixelType> labelMap; //{{m_RequestParameters->requestLabel, 1}};
+      std::map<std::string, mitk::Label::PixelType> labelMap; // empty map.
       this->MapLabelsToSegmentation(outputBuffer, previewImage, labelMap);
+      this->SetLabelTransferMode(LabelTransferMode::MapLabel);
+      this->SetSelectedLabels({MASK_VALUE});
     }
-    mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
-    previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
     this->WriteBackResults(previewImage, outputBuffer.GetPointer(), timeStep);
     this->SetIsLastSuccess(true);
     MonaiStatusEvent.Send(true);
@@ -291,10 +221,8 @@ void mitk::MonaiLabelTool::MapLabelsToSegmentation(const mitk::LabelSetImage *so
   }
   auto lookupTable = mitk::LookupTable::New();
   lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
-  //mitk::Label::PixelType labelId = 0;
   for (auto const &[key, val] : flippedLabelMap)
   {
-    //if (source->ExistLabel(labelId, source->GetActiveLayer()))
     if (source->ExistLabel(key, source->GetActiveLayer()))
     {
       Label::Pointer label = Label::New(key, val);
@@ -311,7 +239,6 @@ void mitk::MonaiLabelTool::MapLabelsToSegmentation(const mitk::LabelSetImage *so
     {
       MITK_INFO << "Label not found for " << val;
     }
-    // labelId++;
   }
 }
 
@@ -323,7 +250,7 @@ void mitk::MonaiLabelTool::GetOverallInfo(std::string &hostName, int &port)
     Tool::ErrorMessage.Send(m_SERVER_503_ERROR_TEXT);
     mitkThrow() << m_SERVER_503_ERROR_TEXT;
   }
-  httplib::Client cli(hostName, port); // httplib::Client cli("localhost", 8000);
+  httplib::Client cli(hostName, port);
   if (auto response = cli.Get("/info/"))
   {
     if (response->status == 200)
@@ -354,12 +281,9 @@ void mitk::MonaiLabelTool::PostInferRequest(std::string &hostName,
                                             std::string &outFile, 
                                             const mitk::BaseGeometry *baseGeometry)
 {
-  // std::string url = "http://localhost:8000/infer/deepedit_seg"; // + m_ModelName;
   std::string &modelName = m_RequestParameters->model.name; // Get this from args as well.
   std::string postPath = "/infer/";                         // make this separate class of constants
   postPath.append(modelName);
-
-  // std::string filePath = "C:/DKFZ/MONAI_work/monai_test_python/la_030.nii.gz";
   std::ifstream input(filePath, std::ios::binary);
   if (!input)
   {
@@ -374,18 +298,21 @@ void mitk::MonaiLabelTool::PostInferRequest(std::string &hostName,
     std::stringstream foreground = this->GetPointsAsListString(baseGeometry, m_PointSetPositive);
     std::stringstream background = this->GetPointsAsListString(baseGeometry, m_PointSetNegative);
     std::stringstream paramString;
-    paramString << "{\"foreground\":" << foreground.str() << ",\"background\":" << background.str() << "}";
-    MITK_INFO << foreground.str(); MITK_INFO << background.str(); MITK_INFO << paramString.str();
+    paramString << "{" 
+                << "\"foreground\":" << foreground.str() 
+                << ",\"background\":" << background.str()
+                << "}";
+    MITK_INFO << paramString.str();
     items.push_back({"params", paramString.str()});
   }
-  //httplib::MultipartFormDataItems items = {
-    //{"params", "{\"restore_label_idx\": true} "},
-    //{"params", "{\"foreground\" : [[ 59, 43, 56 ]], \"background\" : []}"},
-    //{"file", buffer_lf_img.str(), "post_from_mitk.nii.gz", "application/octet-stream"}};
+  else // Auto models
+  {
+    items.push_back({"params", "{\"restore_label_idx\": true}"});
+  }
   items.push_back({"file", buffer_lf_img.str(), "post_from_mitk.nii.gz", "application/octet-stream"});
   httplib::Client cli(hostName, port);
   cli.set_read_timeout(60);                      // arbitary 1 minute time-out to avoid corner cases.
-  if (auto response = cli.Post(postPath, items)) // cli.Post("/infer/deepedit_seg", items);
+  if (auto response = cli.Post(postPath, items))
   {
     if (response->status == 200)
     {

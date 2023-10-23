@@ -94,7 +94,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to MONAI Label App in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to MONAI Label. MITK does not ship with any apps. Make sure to have a started a MONAI Label server beforehand. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/MIC-DKFZ/nnUNet&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://docs.monai.io/projects/label/en/latest/&lt;/span&gt;&lt;/a&gt; to learn everything about the MONAI Label App.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Provide a valid URL (eg. http://localhost:8000) to the server &amp;amp; start the workflow.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to MONAI Label App in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to MONAI Label. MITK does not ship with any apps. Make sure to have a started a MONAI Label server beforehand. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://docs.monai.io/projects/label/en/latest/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://docs.monai.io/projects/label/en/latest/&lt;/span&gt;&lt;/a&gt; to learn everything about the MONAI Label App.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Provide a valid URL (eg. http://localhost:8000) to the server &amp;amp; start the workflow.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>

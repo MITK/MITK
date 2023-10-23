@@ -19,6 +19,33 @@ found in the LICENSE file.
 #include <filesystem>
 #include <fstream>
 
+namespace
+{
+  mitk::Geometry3D::Pointer ReadGeometry(const nlohmann::json& jsonGeometry)
+  {
+    auto result = mitk::Geometry3D::New();
+    result->ImageGeometryOn();
+
+    if (!jsonGeometry.is_object())
+      mitkThrow() << "Geometry is expected to be a JSON object.";
+
+    if (jsonGeometry.contains("Origin"))
+      result->SetOrigin(jsonGeometry["Origin"].get<mitk::Point3D>());
+
+    if (jsonGeometry.contains("Spacing"))
+      result->SetSpacing(jsonGeometry["Spacing"].get<mitk::Vector3D>());
+
+    if (jsonGeometry.contains("Size"))
+    {
+      auto size = jsonGeometry["Size"].get<mitk::Vector3D>();
+      mitk::BaseGeometry::BoundsArrayType bounds({ 0.0, size[0], 0.0, size[1], 0.0, size[2] });
+      result->SetBounds(bounds);
+    }
+
+    return result;
+  }
+}
+
 mitk::ROIIO::ROIIO()
   : AbstractFileIO(ROI::GetStaticNameOfClass(), MitkROIIOMimeTypes::ROI_MIMETYPE(), "MITK ROI")
 {
@@ -45,67 +72,30 @@ std::vector<mitk::BaseData::Pointer> mitk::ROIIO::DoRead()
     stream = &fileStream;
   }
 
-  nlohmann::json json;
+  auto result = ROI::New();
 
   try
   {
-    json = nlohmann::json::parse(*stream);
+    auto json = nlohmann::json::parse(*stream);
+
+    if ("MITK ROI" != json["FileFormat"].get<std::string>())
+      mitkThrow() << "Unknown file format (expected \"MITK ROI\")!";
+
+    if (1 != json["Version"].get<int>())
+      mitkThrow() << "Unknown file format version (expected version 1)!";
+
+    result->SetGeometry(ReadGeometry(json["Geometry"]));
+
+    for (const auto& jsonROI : json["ROIs"])
+    {
+    }
   }
   catch (const nlohmann::json::exception &e)
   {
     mitkThrow() << e.what();
   }
 
-  if (!json.is_object())
-    mitkThrow() << "Unknown file format (expected JSON object as root)!";
-
-  if ("MITK ROI" != json.value("FileFormat", ""))
-    mitkThrow() << "Unknown file format (expected \"MITK ROI\")!";
-
-  if (1 != json.value<int>("Version", 0))
-    mitkThrow() << "Unknown file format version (expected \"1\")!";
-
-  auto geometry = Geometry3D::New();
-
-  if (json.contains("Geometry"))
-  {
-    auto jsonGeometry = json["Geometry"];
-
-    if (!jsonGeometry.is_object())
-      mitkThrow() << "Geometry is expected to be a JSON object.";
-
-    auto geometryType = jsonGeometry.value<std::string>("Type", "Embedded");
-
-    if (geometryType != "Embedded")
-      mitkThrow() << "Unknown geometry type \"" << geometryType << "\"!";
-
-    if (jsonGeometry.contains("Origin"))
-      geometry->SetOrigin(jsonGeometry["Origin"].get<Point3D>());
-
-    if (jsonGeometry.contains("Spacing"))
-      geometry->SetSpacing(jsonGeometry["Spacing"].get<Vector3D>());
-  }
-
-  if (!json.contains("ROIs") || !json["ROIs"].is_array())
-    mitkThrow() << "ROIs array not found!";
-
-  std::vector<BaseData::Pointer> results;
-
-  try
-  {
-    for (const auto& roi : json["ROIs"])
-    {
-      auto result = ROI::New();
-      result->SetGeometry(geometry);
-      results.push_back(result.GetPointer());
-    }
-  }
-  catch (const nlohmann::json::type_error &e)
-  {
-    mitkThrow() << e.what();
-  }
-
-  return results;
+  return { result };
 }
 
 void mitk::ROIIO::Write()

@@ -84,7 +84,7 @@ void SetupParser(mitkCommandLineParser& parser)
 
   parser.beginGroup("Optional parameters");
   parser.addArgument(
-    "parameters", "p", mitkCommandLineParser::String, "Parameters", "Json string containing a json object that contains the parameters that should be passed to the algorithm as key value paires.");
+    "parameters", "p", mitkCommandLineParser::String, "Parameters", "Json string containing a json object that contains the parameters that should be passed to the algorithm as key value pairs.");
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.endGroup();
 }
@@ -168,7 +168,7 @@ CheckCastAndSetProp(const nlohmann::json& value)
 
   try
   {
-    const auto castedValue = value.template get<TValueType>();
+    const auto castedValue = value.get<TValueType>();
     prop = map::core::MetaProperty<TValueType>::New(castedValue).GetPointer();
   }
   catch (const std::exception& e)

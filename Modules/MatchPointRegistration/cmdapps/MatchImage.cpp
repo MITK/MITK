@@ -48,7 +48,7 @@ struct Settings
 
 void SetupParser(mitkCommandLineParser& parser)
 {
-  parser.setTitle("Image Matcher");
+  parser.setTitle("Match Image");
   parser.setCategory("Registration Tools");
   parser.setDescription("");
   parser.setContributor("MIC, German Cancer Research Center (DKFZ)");
@@ -312,7 +312,7 @@ void OnMapAlgorithmEvent(::itk::Object*, const itk::EventObject& event, void*)
 
 int main(int argc, char* argv[])
 {
-  std::cout << "MitkRegistrationMiniApp - Generic light weight image registration tool based on MatchPoint." << std::endl;
+  std::cout << "MitkMatchImage - Generic light weight image registration tool based on MatchPoint." << std::endl;
 
   Settings settings;
   mitkCommandLineParser parser;

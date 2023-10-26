@@ -302,11 +302,11 @@ void mitk::MonaiLabelTool::PostInferRequest(std::string &hostName,
                 << ",\"background\":" << background.str()
                 << "}";
     MITK_INFO << paramString.str();
-    items.push_back({"params", paramString.str()});
+    items.push_back({"params", paramString.str(), "", ""});
   }
   else // Auto models
   {
-    items.push_back({"params", "{\"restore_label_idx\": true}"});
+    items.push_back({"params", "{\"restore_label_idx\": true}", "", ""});
   }
   items.push_back({"file", buffer_lf_img.str(), "post_from_mitk.nii.gz", "application/octet-stream"});
   httplib::Client cli(hostName, port);

@@ -94,7 +94,8 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
     return;
   }
   m_Controls.labelListLabel->clear();
-  mitk::MonaiModelInfo model = tool->GetModelInfoFromName(modelName.toStdString());
+  std::string _modelName = modelName.toStdString();
+  mitk::MonaiModelInfo model = tool->GetModelInfoFromName(_modelName);
   if (model.IsInteractive())
   {
     this->WriteStatusMessage("Interactive model selected. Please press SHIFT + click on the render windows.\n");
@@ -151,11 +152,11 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
   QUrl url(urlString);
   if (url.isValid() && !url.isLocalFile() && !url.hasFragment() && !url.hasQuery()) // sanity check
   {
-    QString hostName = url.host();
+    std::string hostName = url.host().toStdString();
     int port = url.port();
     try
     {
-      tool->GetOverallInfo(hostName.toStdString(), port);
+      tool->GetOverallInfo(hostName, port);
       if (nullptr != tool->m_InfoParameters)
       {
         std::string response = tool->m_InfoParameters->name;

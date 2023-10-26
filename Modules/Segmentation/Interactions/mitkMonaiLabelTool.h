@@ -265,7 +265,7 @@ namespace mitk
      * 
      * @return std::unique_ptr<MonaiAppMetadata> 
      */
-    std::unique_ptr<MonaiAppMetadata> mitk::MonaiLabelTool::DataMapper(nlohmann::json&);
+    std::unique_ptr<MonaiAppMetadata> DataMapper(nlohmann::json&);
     /**
      * @brief Applies the give std::map lookup table on the preview segmentation LabelSetImage.
      * 

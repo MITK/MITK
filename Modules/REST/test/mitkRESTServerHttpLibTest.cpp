@@ -68,18 +68,24 @@ public:
       ;
 
     httplib::Client cli("http://localhost:8080");
-    auto response = cli.Get("/msg/0");
     try
     {
-      if (NULL == response)
+      if (auto response = cli.Get("/msg/0"))
       {
-        CPPUNIT_ASSERT_MESSAGE("A connection duty cannot be established", false);
+        if (response->status == 200)
+        {
+          auto js = nlohmann::json::parse(response->body);
+          std::string msg = js["msg"];
+          CPPUNIT_ASSERT_MESSAGE("Result is the expected JSON value", msg == msgdb[0]);
+        }
+        else
+        {
+          CPPUNIT_ASSERT_MESSAGE("A connection cannot be established", false);
+        }
       }
-      if (response->status == 200)
+      else
       {
-        auto js = nlohmann::json::parse(response->body);
-        std::string msg = js["msg"];
-        CPPUNIT_ASSERT_MESSAGE("Result is the expected JSON value", msg == msgdb[0]);
+        CPPUNIT_ASSERT_MESSAGE("A connection cannot be established", false);
       }
     }
     catch (const std::exception &e)

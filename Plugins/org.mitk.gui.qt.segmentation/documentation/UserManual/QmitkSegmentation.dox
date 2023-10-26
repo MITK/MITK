@@ -286,27 +286,10 @@ Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow sett
     -# Once the tool is initialized, Press SHIFT+Left Click on any of the 3 render windows to start click guided segmentation on that slice.
     -# Press SHIFT+Right Click for negative clicks to adjust the preview mask on the render window.
 
-\subsection org_mitk_views_segmentationMonaiLabel MONAI Label Tool
+\subsection org_mitk_views_segmentationMonaiLabel2D MONAI Label 2D Tool
 
-\imageMacro{QmitkSegmentation_nnUnetTool.png,"MONAI Label tool",10.00}
-
-\imageMacro{QmitkSegmentation_SAMTool.png,"MONAI Label tool",10.00}
-
-MONAI Label is a server-client system that facilitates interactive medical image annotation by using AI. MONAI Label typically hosts different "Apps" e.g. Radiology, Pathology etc. Each App hosts a set of pretrained models on pertaining datasets.
-MITK is tested for Radiology app and only supports auto and click-based "deepgrow" models. For internal reasons, MITK doesn't support "deepedit" and "localization_spine" models specifically.
-The tool requires that you have MONAI Label server hosted and URL available to it.
-For a detailed explanation of what MONAI Label is capable, please refer to https://docs.monai.io/projects/label/en/latest/ <br>
-While using any of the click-based "deepgrow" models, any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow setting impacts the segmentation. However, any applied color maps are ignored.
-
-\subsubsection org_mitk_views_segmentationSegmentAnythingWorkflow Workflow:
-    -# Enter the available server URL in the text box and press the refresh button next to it. This connects MITK to the MONAI Label server and fetches exposed information from it.
-    
-    -# Click "Initialize Segment Anything" to start the tool backend. This will invoke downloading of the selected model type from the internet. This might take a while. It is a one time job, though.
-    -# Once the tool is initialized, Press SHIFT+Left Click on any of the 3 render windows to start click guided segmentation on that slice.
-    -# Press SHIFT+Right Click for negative clicks to adjust the preview mask on the render window.
-
-
-
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"MONAILabel2D tool",10.00}
+Read more about the tool here at \subpage org_mitk_views_segmentationMonaiLabel3D
 
 \subsection org_mitk_views_segmentationinterpolation 2D and 3D Interpolation
 
@@ -458,6 +441,27 @@ directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv 
     -# In the "Advanced" section, you can also activate other options like "Fast" for faster runtime and less memory requirements. Use "Fast" if you only have a CPU for inferencing.
     -# Use "Advanced" > "GPU Id" combobox to change the preferred GPU for inferencing. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
     -# In case you want to use your own virtual environment containing TotalSegmentator, goto "Install Options" & check "Use Custom Installation" checkbox. Then, select the environment of your choice by using "Custom Env. Path".
+
+\subsection org_mitk_views_segmentationMonaiLabel3D MONAI Label 3D Tool
+
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"MONAILabel3D tool",10.00}
+
+\imageMacro{QmitkSegmentation_SAMTool.png,"MONAI Label tool",10.00}
+
+MONAI Label is a server-client system that facilitates interactive medical image annotation by using AI. MONAI Label typically hosts different "Apps" e.g. Radiology, Pathology etc. Each App hosts a set of pretrained models on pertaining datasets.
+MITK is tested for Radiology app and only supports auto and click-based "deepgrow" models. For internal reasons, MITK doesn't support "deepedit" and "localization_spine" models specifically.
+The tool requires that you have MONAI Label server hosted and URL available to it.
+For a detailed explanation of what MONAI Label is capable, please refer to https://docs.monai.io/projects/label/en/latest/ <br>
+Note that any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow setting or, applied color maps are ignored.
+
+\subsubsection org_mitk_views_segmentationSegmentAnythingWorkflow Workflow:
+    -# Enter your URL in the "MONAI Server URL" box and press the refresh button next to it. This connects MITK to the MONAI Label server and fetches exposed metadata.
+    -# Select the Radiology app e.g. from the "Available Apps" combobox. This will load all supported model names in the "Models" combo box below it.
+    -# From the "Models" box select the model you want to use. Immediately, all supported classes of the model on which the model was trained will be shown below it.
+    -# If an interactive model is selected e.g. "deepgrow_3d", Press SHIFT+Left Click on any of the 3 render windows to start click guided segmentation.
+    Press SHIFT+Right Click for negative clicks to adjust the preview mask on the render window.
+    -# If an auto-segmentation model is selected e.g. "deepedit_seg", simply click "Preview" for generating masks.
+
 
 \section org_mitk_views_segmentationpostprocessing Additional things you can do with segmentations
 

@@ -30,6 +30,14 @@ namespace us
 
 namespace mitk
 {
+  /**
+  \brief MonaiLabel segmentation 2D tool.
+
+  \ingroup ToolManagerEtAl
+  \sa mitk::Tool
+  \sa QmitkInteractiveSegmentation
+
+  */
   class MITKSEGMENTATION_EXPORT MonaiLabel2DTool : public MonaiLabelTool
   {
   public:
@@ -49,9 +57,8 @@ namespace mitk
     void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) override;
 
   protected:
-    MonaiLabel2DTool();
+    MonaiLabel2DTool() = default;
     ~MonaiLabel2DTool() = default;
-   
   };
 }
 #endif

@@ -30,6 +30,10 @@ namespace us
 
 namespace mitk
 {
+  /**
+   * @brief Struct to hold featured models individual info
+   * 
+   */
   struct MonaiModelInfo
   {
     std::string name;
@@ -37,7 +41,7 @@ namespace mitk
     std::unordered_map<std::string, int> labels;
     int dimension;
     std::string description;
-    std::unordered_map<bool, std::string> config; //TODO: find the full extent
+    std::unordered_map<bool, std::string> config;
 
     inline bool operator==(const MonaiModelInfo &rhs) const
     {
@@ -47,8 +51,21 @@ namespace mitk
       }
       return false;
     }
+
+    inline bool IsInteractive() const
+    {
+      if ("deepgrow" == type || "deepedit" == type)
+      {
+        return true;
+      }
+      return false;
+    }
   };
 
+  /**
+   * @brief Struct to store MonaiLabel server metadata including all model infos
+   * 
+   */
   struct MonaiAppMetadata
   {
     std::string hostName;
@@ -62,8 +79,10 @@ namespace mitk
   };
 
   /**
-  * Parameters that goes into infer POST
-  */
+   * @brief Request class to pack model and other necessary server information 
+   * from GUI.
+   * 
+   */
   struct MonaiLabelRequest
   {
     MonaiModelInfo model;
@@ -81,6 +100,14 @@ namespace mitk
     }
   };
 
+  /**
+    \brief MonaiLabel segmentation tool base class.
+
+    \ingroup Interaction
+    \ingroup ToolManagerEtAl
+
+    \warning Only to be instantiated by mitk::ToolManager.
+  */
   class MITKSEGMENTATION_EXPORT MonaiLabelTool : public SegWithPreviewTool
   {
   public:
@@ -90,14 +117,68 @@ namespace mitk
     void Deactivated() override;
     void UpdatePrepare() override;
 
-    virtual void WriteImage(const Image*, std::string&) = 0;
+    /**
+     * @brief Writes image to disk as the tool desires.
+     * Default implementation does nothing.
+     */
+    virtual void WriteImage(const Image*, std::string&);
+
+    /**
+     * @brief Method does the GET Rest call to fetch MonaiLabel
+     * server metadata including all models' info.
+     */
     void GetOverallInfo(std::string&, int&);
-    std::unique_ptr<MonaiAppMetadata> m_InfoParameters; //contains all parameters from Server to serve the GUI
-    std::unique_ptr<MonaiLabelRequest> m_RequestParameters;
+
+    /**
+     * @brief Holds all parameters of the server to serve the UI
+     * 
+     */
+    std::unique_ptr<MonaiAppMetadata> m_InfoParameters;
+    
+    /**
+     * @brief Variable to set selected model's and other data needed
+     * for the POST call.
+     */
+    std::unique_ptr<MonaiLabelRequest> m_RequestParameters; 
+
+    /**
+     * @brief Get the Auto Segmentation Models info for the given 
+     * dimension. 
+     * 
+     * @param dim 
+     * @return std::vector<MonaiModelInfo> 
+     */
     std::vector<MonaiModelInfo> GetAutoSegmentationModels(int dim = -1);
+
+    /**
+     * @brief Get the Interactive Segmentation Models info for the given 
+     * dimension.
+     * 
+     * @param dim 
+     * @return std::vector<MonaiModelInfo> 
+     */
     std::vector<MonaiModelInfo> GetInteractiveSegmentationModels(int dim = -1);
+
+    /**
+     * @brief Get the Scribble Segmentation Models info for the given 
+     * dimension. 
+     * 
+     * @param dim 
+     * @return std::vector<MonaiModelInfo> 
+     */
     std::vector<MonaiModelInfo> GetScribbleSegmentationModels(int dim = -1);
+
+    /**
+     * @brief Function to prepare the Rest request and does the POST call.
+     * Writes the POST responses back to disk.
+     */
     void PostInferRequest(std::string &, int &, std::string &, std::string &, const mitk::BaseGeometry *);
+
+    /**
+     * @brief Helper function to get full model info object from model name.
+     * 
+     * @return MonaiModelInfo 
+     */
     MonaiModelInfo GetModelInfoFromName(std::string&);
 
     itkSetMacro(ModelName, std::string);
@@ -106,8 +187,6 @@ namespace mitk
     itkGetConstMacro(URL, std::string);
     itkSetMacro(MitkTempDir, std::string);
     itkGetConstMacro(MitkTempDir, std::string);
-    itkSetMacro(IsLastSuccess, bool);
-    itkGetConstMacro(IsLastSuccess, bool);
 
     /**
      * @brief  Clears all picks and updates the preview.
@@ -131,7 +210,7 @@ namespace mitk
     void ConnectActionsAndFunctions() override;
 
     /*
-     * @brief Add positive seed point action of StateMachine pattern
+     * @brief Add positive seed point action of StateMachine pattern. 
      */
     virtual void OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
 
@@ -150,7 +229,19 @@ namespace mitk
      */
     void ClearSeeds();
 
-    virtual std::stringstream GetPointsAsListString(const mitk::BaseGeometry*, PointSet::Pointer);
+    /**
+     * @brief Get the Points from given pointset as csv string.
+     * 
+     * @param baseGeometry
+     * @param pointSet
+     * @return std::stringstream
+     */
+    virtual std::stringstream GetPointsAsListString(const mitk::BaseGeometry*, PointSet::Pointer) = 0;
+
+    /**
+     * @brief Writes back segmentation results in 3D or 2D shape to preview LabelSetImage.
+     * 
+     */
     virtual void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) = 0;
 
     PointSet::Pointer m_PointSetPositive;
@@ -161,11 +252,32 @@ namespace mitk
 
   private:
     std::string m_MitkTempDir;
+
+    /**
+     * @brief Helper function to get the Parts of the POST response
+     * 
+     * @return std::vector<std::string> 
+     */
     std::vector<std::string> getPartsBetweenBoundary(const std::string &, const std::string &);
+
+    /**
+     * @brief Converts the json GET response from the MonaiLabel server to MonaiAppMetadata object
+     * 
+     * @return std::unique_ptr<MonaiAppMetadata> 
+     */
     std::unique_ptr<MonaiAppMetadata> mitk::MonaiLabelTool::DataMapper(nlohmann::json&);
+    /**
+     * @brief Applies the give std::map lookup table on the preview segmentation LabelSetImage.
+     * 
+     */
     void MapLabelsToSegmentation(const mitk::LabelSetImage*, mitk::LabelSetImage*, std::map<std::string, mitk::Label::PixelType>&);
+
+    /**
+     * @brief Checks if MonaiLabel server is alive
+     * 
+     * @return bool 
+     */
     bool IsMonaiServerOn(std::string &, int &);
-    bool m_IsLastSuccess = false;
     std::string m_ModelName;
     std::string m_URL;
     nlohmann::json m_ResultMetadata;

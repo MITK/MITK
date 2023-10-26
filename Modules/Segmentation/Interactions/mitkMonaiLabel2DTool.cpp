@@ -28,12 +28,6 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, MonaiLabel2DTool, "MonaiLabel2D");
 }
 
-mitk::MonaiLabel2DTool::MonaiLabel2DTool()
-{
-  this->ResetsToEmptyPreviewOn();
-  this->IsTimePointChangeAwareOff();
-}
-
 void mitk::MonaiLabel2DTool::Activated()
 {
   Superclass::Activated();

@@ -132,7 +132,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Supported Labels:</string>
+        <string>Supported Classes:</string>
        </property>
       </widget>
      </item>

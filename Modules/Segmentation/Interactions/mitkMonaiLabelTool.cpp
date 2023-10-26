@@ -19,9 +19,10 @@ found in the LICENSE file.
 #include "mitkToolManager.h"
 #include <mitkLabelSetImageHelper.h>
 
-mitk::MonaiLabelTool::MonaiLabelTool() : SegWithPreviewTool(true, "PressMoveReleaseAndPointSetting")
+mitk::MonaiLabelTool::MonaiLabelTool() : SegWithPreviewTool(true, "PressMoveReleaseAndPointSetting") 
 {
-  this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
+  this->ResetsToEmptyPreviewOn();
+  this->IsTimePointChangeAwareOff();
 }
 
 mitk::MonaiLabelTool::~MonaiLabelTool()
@@ -136,8 +137,7 @@ void mitk::MonaiLabelTool::ClearSeeds()
 bool mitk::MonaiLabelTool::IsMonaiServerOn(std::string &hostName, int &port)
 {
   httplib::Client cli(hostName, port);
-  while (cli.is_socket_open())
-    ;
+  while (cli.is_socket_open());
   if (auto response = cli.Get("/info/"))
   {
     return true;
@@ -156,6 +156,10 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
   {
     mitkThrow() << m_SERVER_503_ERROR_TEXT;
   }
+  if (this->m_MitkTempDir.empty())
+  {
+    this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
+  }
   std::string inDir, outDir, inputImagePath, outputImagePath;
   inDir = IOUtil::CreateTemporaryDirectory("monai-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
@@ -166,36 +170,31 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
   std::string token = fileName.substr(0, fileName.find("_"));
   outDir = IOUtil::CreateTemporaryDirectory("monai-out-XXXXXX", this->GetMitkTempDir());
   outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
-
   try
   {
-    m_IsLastSuccess = false;
     this->WriteImage(inputAtTimeStep, inputImagePath);
-    PostInferRequest(hostName, port, inputImagePath, outputImagePath, inputAtTimeStep->GetGeometry());
+    this->PostInferRequest(hostName, port, inputImagePath, outputImagePath, inputAtTimeStep->GetGeometry());
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     auto outputBuffer = mitk::LabelSetImage::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
-    if (m_AUTO_SEG_TYPE_NAME.find(m_RequestParameters->model.type) != m_AUTO_SEG_TYPE_NAME.end())
+    std::map<std::string, mitk::Label::PixelType> labelMap; // empty map
+    if (m_RequestParameters->model.IsInteractive())
     {
-      outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
-      std::map<std::string, mitk::Label::PixelType> labelMap = m_ResultMetadata["label_names"];
-      this->MapLabelsToSegmentation(outputBuffer, previewImage, labelMap);
-      this->SetLabelTransferMode(LabelTransferMode::AddLabel);
-    }
-    else
-    {
-      std::map<std::string, mitk::Label::PixelType> labelMap; // empty map.
-      this->MapLabelsToSegmentation(outputBuffer, previewImage, labelMap);
       this->SetLabelTransferMode(LabelTransferMode::MapLabel);
       this->SetSelectedLabels({MASK_VALUE});
     }
+    else
+    {
+      outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
+      labelMap = m_ResultMetadata["label_names"];
+      this->SetLabelTransferMode(LabelTransferMode::AddLabel);
+    }
+    this->MapLabelsToSegmentation(outputBuffer, previewImage, labelMap);
     this->WriteBackResults(previewImage, outputBuffer.GetPointer(), timeStep);
-    this->SetIsLastSuccess(true);
     MonaiStatusEvent.Send(true);
   }
   catch (const mitk::Exception &e)
   {
-    m_IsLastSuccess = false;
     MITK_ERROR << e.GetDescription();
     mitkThrow() << e.GetDescription();
     MonaiStatusEvent.Send(false);
@@ -498,31 +497,4 @@ mitk::MonaiModelInfo mitk::MonaiLabelTool::GetModelInfoFromName(std::string &mod
   return retVal;
 }
 
-std::stringstream mitk::MonaiLabelTool::GetPointsAsListString(const mitk::BaseGeometry *baseGeometry,
-                                                              PointSet::Pointer pointSet)
-{
-  MITK_INFO << "No.of points: " << pointSet->GetSize();
-  std::stringstream pointsAndLabels;
-  pointsAndLabels << "[";
-  mitk::PointSet::PointsConstIterator pointSetItPos = pointSet->Begin();
-  const char COMMA = ',';
-  while (pointSetItPos != pointSet->End())
-  {
-    mitk::Point3D point3d = pointSetItPos.Value();
-    if (baseGeometry->IsInside(point3d))
-    {
-      mitk::Point3D index3D;
-      baseGeometry->WorldToIndex(point3d, index3D);
-      pointsAndLabels << "[";
-      pointsAndLabels << static_cast<int>(index3D[0]) << COMMA << static_cast<int>(index3D[1]) << COMMA
-                      << static_cast<int>(index3D[2]) << "],";
-    }
-    ++pointSetItPos;
-  }
-  if (pointsAndLabels.tellp() > 1)
-  {
-    pointsAndLabels.seekp(-1, pointsAndLabels.end); // remove last added comma character
-  }
-  pointsAndLabels << "]";
-  return pointsAndLabels;
-}
+void mitk::MonaiLabelTool::WriteImage(const Image*, std::string&) {}

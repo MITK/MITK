@@ -44,9 +44,14 @@ protected:
   void InitializeUI(QBoxLayout* mainLayout) override;
 
   void EnableWidgets(bool enabled) override;
-  void DisplayWidgets(bool enabled);
   void SetLabelSetPreview(const mitk::LabelSetImage* preview);
   void ActualizePreviewLabelVisibility();
+
+  /**
+   * @brief To toggle visibility of "Transfer all labels" and
+   * "Transfer selected labels" radio buttons.
+   */
+  void DisplayTransferWidgets(bool enabled);
 
 private:
   QmitkSimpleLabelSetListWidget* m_LabelSelectionList = nullptr;

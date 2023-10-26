@@ -22,8 +22,15 @@ namespace us
 
 namespace mitk
 {
+  /**
+    \brief MonaiLabel segmentation 3D tool.
 
-  class MITKSEGMENTATION_EXPORT MonaiLabel3DTool : public MonaiLabelTool // SegWithPreviewTool
+    \ingroup Interaction
+    \ingroup ToolManagerEtAl
+
+    \warning Only to be instantiated by mitk::ToolManager.
+  */
+  class MITKSEGMENTATION_EXPORT MonaiLabel3DTool : public MonaiLabelTool
   {
   public:
     mitkClassMacro(MonaiLabel3DTool, MonaiLabelTool);
@@ -36,11 +43,12 @@ namespace mitk
     void Activated() override;
     void OnAddPositivePoint(StateMachineAction *, InteractionEvent *) override;
     void OnAddNegativePoint(StateMachineAction *, InteractionEvent *) override;
+    std::stringstream GetPointsAsListString(const mitk::BaseGeometry *, PointSet::Pointer) override;
     void WriteImage(const Image *, std::string &) override;
     void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) override;
 
   protected:
-    MonaiLabel3DTool();
+    MonaiLabel3DTool() = default;
     ~MonaiLabel3DTool() = default;
   };
 } // namespace mitk

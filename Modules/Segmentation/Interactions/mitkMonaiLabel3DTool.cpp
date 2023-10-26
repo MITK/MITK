@@ -25,11 +25,6 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, MonaiLabel3DTool, "MonaiLabel3D");
 }
 
-mitk::MonaiLabel3DTool::MonaiLabel3DTool()
-{
-  this->IsTimePointChangeAwareOff();
-}
-
 void mitk::MonaiLabel3DTool::Activated()
 {
   Superclass::Activated();
@@ -100,3 +95,33 @@ void mitk::MonaiLabel3DTool::OnAddNegativePoint(StateMachineAction *, Interactio
     }
   }
 }
+
+std::stringstream mitk::MonaiLabel3DTool::GetPointsAsListString(const mitk::BaseGeometry *baseGeometry,
+                                                              PointSet::Pointer pointSet)
+{
+  MITK_INFO << "No.of points: " << pointSet->GetSize();
+  std::stringstream pointsAndLabels;
+  pointsAndLabels << "[";
+  mitk::PointSet::PointsConstIterator pointSetItPos = pointSet->Begin();
+  const char COMMA = ',';
+  while (pointSetItPos != pointSet->End())
+  {
+    mitk::Point3D point3d = pointSetItPos.Value();
+    if (baseGeometry->IsInside(point3d))
+    {
+      mitk::Point3D index3D;
+      baseGeometry->WorldToIndex(point3d, index3D);
+      pointsAndLabels << "[";
+      pointsAndLabels << static_cast<int>(index3D[0]) << COMMA << static_cast<int>(index3D[1]) << COMMA
+                      << static_cast<int>(index3D[2]) << "],";
+    }
+    ++pointSetItPos;
+  }
+  if (pointsAndLabels.tellp() > 1)
+  {
+    pointsAndLabels.seekp(-1, pointsAndLabels.end); // remove last added comma character
+  }
+  pointsAndLabels << "]";
+  return pointsAndLabels;
+}
+

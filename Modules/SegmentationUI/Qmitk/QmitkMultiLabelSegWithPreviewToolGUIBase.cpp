@@ -148,13 +148,8 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::SetLabelSetPreview(const mitk::La
   }
 }
 
-void QmitkMultiLabelSegWithPreviewToolGUIBase::DisplayWidgets(bool enabled)
+void QmitkMultiLabelSegWithPreviewToolGUIBase::DisplayTransferWidgets(bool enabled)
 {
-  if (nullptr != m_LabelSelectionList)
-  {
-    m_LabelSelectionList->setVisible(enabled);
-  }
-
   if (nullptr != m_RadioTransferAll)
   {
     m_RadioTransferAll->setVisible(enabled);

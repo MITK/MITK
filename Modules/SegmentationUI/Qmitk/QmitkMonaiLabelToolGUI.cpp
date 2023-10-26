@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "QmitkMonaiLabelToolGUI.h"
 
 #include "mitkMonaiLabelTool.h"
-#include "usServiceReference.h"
 #include <QIcon>
 #include <QMessageBox>
 #include <QUrl>
@@ -40,7 +39,6 @@ QmitkMonaiLabelToolGUI::~QmitkMonaiLabelToolGUI()
 void QmitkMonaiLabelToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 {
   Superclass::ConnectNewTool(newTool);
-  newTool->IsTimePointChangeAwareOff();
   m_FirstPreviewComputation = true;
 }
 
@@ -84,7 +82,7 @@ void QmitkMonaiLabelToolGUI::StatusMessageListener(const bool status)
 
 void QmitkMonaiLabelToolGUI::DisplayWidgets(bool enabled)
 {
-  Superclass::DisplayWidgets(enabled);
+  Superclass::DisplayTransferWidgets(enabled);
   m_Controls.previewButton->setVisible(enabled);
 }
 
@@ -97,7 +95,7 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
   }
   m_Controls.labelListLabel->clear();
   mitk::MonaiModelInfo model = tool->GetModelInfoFromName(modelName.toStdString());
-  if ("deepgrow" == model.type || "deepedit" == model.type)
+  if (model.IsInteractive())
   {
     this->WriteStatusMessage("Interactive model selected. Please press SHIFT + click on the render windows.\n");
     m_Controls.previewButton->setEnabled(false);
@@ -105,8 +103,7 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
   }
   else
   {
-    this->WriteStatusMessage(
-      "Auto-segmentation model selected. Please click on Preview. Label selection will be ignored.\n");
+    this->WriteStatusMessage("Auto-segmentation model selected. Please click on Preview. Label selection will be ignored.\n");
     m_Controls.previewButton->setEnabled(true);
     this->DisplayWidgets(true);
   }
@@ -125,7 +122,7 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
       {
         supportedLabels << QString::fromStdString(label.first);
       }
-      m_Controls.labelListLabel->setText(supportedLabels.join(','));
+      m_Controls.labelListLabel->setText(supportedLabels.join(QChar(',') + QChar::Space));
       break;
     }
   }
@@ -158,7 +155,7 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
     int port = url.port();
     try
     {
-      tool->GetOverallInfo(hostName.toStdString(), port); // tool->GetOverallInfo("localhost",8000");
+      tool->GetOverallInfo(hostName.toStdString(), port);
       if (nullptr != tool->m_InfoParameters)
       {
         std::string response = tool->m_InfoParameters->name;
@@ -208,15 +205,7 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
       requestObject->model = modelObject;
       requestObject->hostName = tool->m_InfoParameters->hostName;
       requestObject->port = tool->m_InfoParameters->port;
-      if (!m_FirstPreviewComputation && tool->GetIsLastSuccess() && *requestObject == *(tool->m_RequestParameters))
-      {
-        MITK_INFO << "won't do segmentation...";
-        return;
-      }
-      else
-      {
-        tool->m_RequestParameters = std::move(requestObject);
-      }
+      tool->m_RequestParameters = std::move(requestObject);
       break;
     }
   }

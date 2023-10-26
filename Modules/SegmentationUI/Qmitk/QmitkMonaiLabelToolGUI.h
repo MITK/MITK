@@ -70,7 +70,7 @@ private:
   int m_Dimension;
   QString m_CONFIRM_QUESTION_TEXT =
     "Data will be sent to the processing server devoid of any patient information. Are you sure you want continue?";
-  const QStringList SUPPORTED_MODELS = {
+  const QStringList SUPPORTED_MODELS = { // deepedit and localization_spine not supported
     "deepgrow_2d",
     "deepgrow_3d",
     "deepedit_seg",

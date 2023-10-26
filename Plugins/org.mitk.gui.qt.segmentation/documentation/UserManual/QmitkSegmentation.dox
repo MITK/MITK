@@ -446,7 +446,7 @@ directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv 
 
 \imageMacro{QmitkSegmentation_nnUnetTool.png,"MONAILabel3D tool",10.00}
 
-\imageMacro{QmitkSegmentation_SAMTool.png,"MONAI Label tool",10.00}
+\imageMacro{QmitkSegmentation_MonaiLabelTool.png,"MONAI Label tool",10.00}
 
 MONAI Label is a server-client system that facilitates interactive medical image annotation by using AI. MONAI Label typically hosts different "Apps" e.g. Radiology, Pathology etc. Each App hosts a set of pretrained models on pertaining datasets.
 MITK is tested for Radiology app and only supports auto and click-based "deepgrow" models. For internal reasons, MITK doesn't support "deepedit" and "localization_spine" models specifically.

@@ -39,6 +39,8 @@ mitk::GenericParamModelFactory::DoCreateParameterizer(
     GenericParamModel::NAME_STATIC_PARAMETER_number);
   modelParameterizer->SetNumberOfParameters(paramCount[0]);
 
+  modelParameterizer->SetFunctionString(fit->function);
+
   result = modelParameterizer.GetPointer();
 
   return result;

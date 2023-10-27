@@ -18,34 +18,35 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper.h>
 #include <vtkSmartPointer.h>
 
-namespace
+// Used by both ROIMapper2D and ROIMapper3D
+void ApplyIndividualColorAndOpacityProperties(const mitk::IPropertyProvider* properties, vtkActor* actor)
 {
-  void ApplyIndividualColorAndOpacityProperties(const mitk::IPropertyProvider* properties, vtkActor* actor)
+  actor->GetProperty()->SetRepresentationToWireframe();
+  actor->GetProperty()->LightingOff();
+
+  auto property = properties->GetConstProperty("color");
+
+  if (property.IsNotNull())
   {
-    auto property = properties->GetConstProperty("color");
+    auto colorProperty = dynamic_cast<const mitk::ColorProperty*>(property.GetPointer());
 
-    if (property.IsNotNull())
+    if (colorProperty != nullptr)
     {
-      auto colorProperty = dynamic_cast<const mitk::ColorProperty*>(property.GetPointer());
-
-      if (colorProperty != nullptr)
-      {
-        const auto color = colorProperty->GetColor();
-        actor->GetProperty()->SetColor(color[0], color[1], color[2]);
-      }
+      const auto color = colorProperty->GetColor();
+      actor->GetProperty()->SetColor(color[0], color[1], color[2]);
     }
+  }
 
-    property = properties->GetConstProperty("opacity");
+  property = properties->GetConstProperty("opacity");
 
-    if (property.IsNotNull())
+  if (property.IsNotNull())
+  {
+    auto opacityProperty = dynamic_cast<const mitk::FloatProperty*>(property.GetPointer());
+
+    if (opacityProperty != nullptr)
     {
-      auto opacityProperty = dynamic_cast<const mitk::FloatProperty*>(property.GetPointer());
-
-      if (opacityProperty != nullptr)
-      {
-        const auto opacity = opacityProperty->GetValue();
-        actor->GetProperty()->SetOpacity(actor->GetProperty()->GetOpacity() * opacity);
-      }
+      const auto opacity = opacityProperty->GetValue();
+      actor->GetProperty()->SetOpacity(actor->GetProperty()->GetOpacity() * opacity);
     }
   }
 }
@@ -100,13 +101,13 @@ void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
   if (data == nullptr)
     return;
 
-  const auto* geometry = data->GetGeometry();
-  const auto halfSpacing = geometry->GetSpacing() * 0.5f;
-
   auto propAssembly = vtkSmartPointer<vtkPropAssembly>::New();
 
   if (dataNode->IsVisible(renderer))
   {
+    const auto* geometry = data->GetGeometry();
+    const auto halfSpacing = geometry->GetSpacing() * 0.5f;
+
     for (const auto& roi : *data)
     {
       Point3D min;
@@ -129,10 +130,6 @@ void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
 
       this->ApplyColorAndOpacityProperties(renderer, actor);
       ApplyIndividualColorAndOpacityProperties(roi.Properties, actor);
-
-      auto* property = actor->GetProperty();
-      property->SetRepresentationToWireframe();
-      property->LightingOff();
 
       propAssembly->AddPart(actor);
     }

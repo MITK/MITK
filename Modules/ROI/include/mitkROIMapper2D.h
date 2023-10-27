@@ -31,9 +31,14 @@ namespace mitk
       ~LocalStorage() override;
 
       vtkPropAssembly* GetPropAssembly() const;
+      void SetPropAssembly(vtkPropAssembly* propAssembly);
+
+      const PlaneGeometry* GetLastPlaneGeometry() const;
+      void SetLastPlaneGeometry(const PlaneGeometry* planeGeometry);
 
     protected:
       vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
+      PlaneGeometry::ConstPointer m_LastPlaneGeometry;
     };
 
   public:
@@ -47,6 +52,9 @@ namespace mitk
   protected:
     ROIMapper2D();
     ~ROIMapper2D() override;
+
+    void GenerateDataForRenderer(BaseRenderer* renderer) override;
+    void ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor) override;
 
   private:
     LocalStorageHandler<LocalStorage> m_LocalStorageHandler;

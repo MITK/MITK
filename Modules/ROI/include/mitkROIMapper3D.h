@@ -31,6 +31,7 @@ namespace mitk
       ~LocalStorage() override;
 
       vtkPropAssembly* GetPropAssembly() const;
+      void SetPropAssembly(vtkPropAssembly* propAssembly);
 
     protected:
       vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
@@ -47,6 +48,9 @@ namespace mitk
   protected:
     ROIMapper3D();
     ~ROIMapper3D() override;
+
+    void GenerateDataForRenderer(BaseRenderer* renderer) override;
+    void ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor) override;
 
   private:
     LocalStorageHandler<LocalStorage> m_LocalStorageHandler;

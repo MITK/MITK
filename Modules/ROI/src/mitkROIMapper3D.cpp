@@ -126,6 +126,10 @@ void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
       this->ApplyColorAndOpacityProperties(renderer, actor);
       ApplyIndividualColorAndOpacityProperties(roi.Properties, actor);
 
+      auto* property = actor->GetProperty();
+      property->SetRepresentationToWireframe();
+      property->LightingOff();
+
       propAssembly->AddPart(actor);
     }
   }

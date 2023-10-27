@@ -101,6 +101,8 @@ void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
     return;
 
   const auto* geometry = data->GetGeometry();
+  const auto halfSpacing = geometry->GetSpacing() * 0.5f;
+
   auto propAssembly = vtkSmartPointer<vtkPropAssembly>::New();
 
   if (dataNode->IsVisible(renderer))
@@ -109,9 +111,11 @@ void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
     {
       Point3D min;
       geometry->IndexToWorld(roi.Min, min);
+      min -= halfSpacing;
 
       Point3D max;
       geometry->IndexToWorld(roi.Max, max);
+      max += halfSpacing;
 
       auto cube = vtkSmartPointer<vtkCubeSource>::New();
       cube->SetBounds(min[0], max[0], min[1], max[1], min[2], max[2]);

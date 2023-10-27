@@ -88,6 +88,14 @@ std::vector<mitk::BaseData::Pointer> mitk::ROIIO::DoRead()
 
     for (const auto& jsonROI : json["ROIs"])
     {
+      ROI::Element roi;
+      jsonROI["Min"].get_to(roi.Min);
+      jsonROI["Max"].get_to(roi.Max);
+
+      if (jsonROI.contains("Properties"))
+        roi.Properties->FromJSON(jsonROI["Properties"]);
+
+      result->AddElement(roi);
     }
   }
   catch (const nlohmann::json::exception &e)

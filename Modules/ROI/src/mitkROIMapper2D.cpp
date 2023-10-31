@@ -13,15 +13,14 @@ found in the LICENSE file.
 #include <mitkROIMapper2D.h>
 #include <mitkROI.h>
 
-#include <vtkActor.h>
 #include <vtkCubeSource.h>
-#include <vtkCutter.h>
 #include <vtkPlane.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkPolyDataPlaneCutter.h>
 #include <vtkSmartPointer.h>
 
 // Implemented in mitkROIMapper3D.cpp
-extern void ApplyIndividualColorAndOpacityProperties(const mitk::IPropertyProvider* properties, vtkActor* actor);
+extern void ApplyIndividualProperties(const mitk::IPropertyProvider* properties, vtkActor* actor);
 
 mitk::ROIMapper2D::LocalStorage::LocalStorage()
   : m_PropAssembly(vtkSmartPointer<vtkPropAssembly>::New())
@@ -112,20 +111,22 @@ void mitk::ROIMapper2D::GenerateDataForRenderer(BaseRenderer* renderer)
       auto cube = vtkSmartPointer<vtkCubeSource>::New();
       cube->SetBounds(min[0], max[0], min[1], max[1], min[2], max[2]);
 
-      auto cutter = vtkSmartPointer<vtkCutter>::New();
+      auto cutter = vtkSmartPointer<vtkPolyDataPlaneCutter>::New();
       cutter->SetInputConnection(cube->GetOutputPort());
-      cutter->SetCutFunction(plane);
+      cutter->SetPlane(plane);
       cutter->Update();
+
+      if (cutter->GetOutput()->GetNumberOfLines() == 0)
+        continue;
 
       auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
       mapper->SetInputConnection(cutter->GetOutputPort());
-      mapper->SetResolveCoincidentTopologyToPolygonOffset();
 
       auto actor = vtkSmartPointer<vtkActor>::New();
       actor->SetMapper(mapper);
 
       this->ApplyColorAndOpacityProperties(renderer, actor);
-      ApplyIndividualColorAndOpacityProperties(roi.Properties, actor);
+      ApplyIndividualProperties(roi.Properties, actor);
 
       propAssembly->AddPart(actor);
     }

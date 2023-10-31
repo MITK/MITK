@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 
 // Used by both ROIMapper2D and ROIMapper3D
-void ApplyIndividualColorAndOpacityProperties(const mitk::IPropertyProvider* properties, vtkActor* actor)
+void ApplyIndividualProperties(const mitk::IPropertyProvider* properties, vtkActor* actor)
 {
   actor->GetProperty()->SetRepresentationToWireframe();
   actor->GetProperty()->LightingOff();
@@ -47,6 +47,19 @@ void ApplyIndividualColorAndOpacityProperties(const mitk::IPropertyProvider* pro
     {
       const auto opacity = opacityProperty->GetValue();
       actor->GetProperty()->SetOpacity(actor->GetProperty()->GetOpacity() * opacity);
+    }
+  }
+
+  property = properties->GetConstProperty("lineWidth");
+
+  if (property.IsNotNull())
+  {
+    auto lineWidthProperty = dynamic_cast<const mitk::FloatProperty*>(property.GetPointer());
+
+    if (lineWidthProperty != nullptr)
+    {
+      const auto lineWidth = lineWidthProperty->GetValue();
+      actor->GetProperty()->SetLineWidth(lineWidth);
     }
   }
 }
@@ -129,7 +142,7 @@ void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
       actor->SetMapper(mapper);
 
       this->ApplyColorAndOpacityProperties(renderer, actor);
-      ApplyIndividualColorAndOpacityProperties(roi.Properties, actor);
+      ApplyIndividualProperties(roi.Properties, actor);
 
       propAssembly->AddPart(actor);
     }

@@ -86,6 +86,13 @@ std::vector<mitk::BaseData::Pointer> mitk::ROIIO::DoRead()
 
     result->SetGeometry(ReadGeometry(json["Geometry"]));
 
+    if (json.contains("Properties"))
+    {
+      auto properties = mitk::PropertyList::New();
+      properties->FromJSON(json["Properties"]);
+      result->GetPropertyList()->ConcatenatePropertyList(properties);
+    }
+
     for (const auto& jsonROI : json["ROIs"])
     {
       ROI::Element roi;

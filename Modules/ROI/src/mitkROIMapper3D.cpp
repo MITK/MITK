@@ -86,7 +86,11 @@ void mitk::ROIMapper3D::LocalStorage::SetPropAssembly(vtkPropAssembly* propAssem
 void mitk::ROIMapper3D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer, bool override)
 {
   Superclass::SetDefaultProperties(node, renderer, override);
+
   node->AddProperty("opacity", mitk::FloatProperty::New(1.0f), renderer, override);
+  node->AddProperty("font.bold", mitk::BoolProperty::New(false), renderer, override);
+  node->AddProperty("font.italic", mitk::BoolProperty::New(false), renderer, override);
+  node->AddProperty("font.size", mitk::IntProperty::New(16), renderer, override);
 }
 
 mitk::ROIMapper3D::ROIMapper3D()

@@ -212,7 +212,7 @@ namespace mitk
           | ('/' >> factor[_val /= _1]));
 
       factor = primary[_val = _1]
-      >> *('^' >> primary[_val = phx::bind<FormulaParser::ValueType, FormulaParser::ValueType, FormulaParser::ValueType>(std::pow, _val, _1)]);
+        >> *('^' >> primary[_val = phx::bind<FormulaParser::ValueType, FormulaParser::ValueType, FormulaParser::ValueType>(std::pow, _val, _1)]);
 
       variable = as_string[alpha >> *(alnum | char_('_'))]
         [_val = phx::bind(&FormulaParser::lookupVariable, &formulaParser, _1)];

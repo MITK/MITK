@@ -17,8 +17,11 @@ found in the LICENSE file.
 #include <mitkVtkMapper.h>
 #include <MitkROIExports.h>
 
-#include <vtkPropAssembly.h>
-#include <vtkSmartPointer.h>
+template <class T>
+class vtkSmartPointer;
+
+class vtkPropAssembly;
+class vtkCaptionActor2D;
 
 namespace mitk
 {
@@ -57,6 +60,8 @@ namespace mitk
     void ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor) override;
 
   private:
+    vtkSmartPointer<vtkCaptionActor2D> CreateCaptionActor(const std::string& caption, double* attachmentPoint, vtkProperty* property, const BaseRenderer* renderer) const;
+
     LocalStorageHandler<LocalStorage> m_LocalStorageHandler;
   };
 }

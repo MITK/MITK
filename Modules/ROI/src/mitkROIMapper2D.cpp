@@ -11,20 +11,18 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkROIMapper2D.h>
-#include <mitkROI.h>
 
-#include <vtkCaptionActor2D.h>
+#include "mitkROIMapperHelper.h"
+
 #include <vtkCubeSource.h>
 #include <vtkPlane.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataPlaneCutter.h>
 #include <vtkPropAssembly.h>
-#include <vtkSmartPointer.h>
-#include <vtkTextActor.h>
-#include <vtkTextProperty.h>
 
-// Implemented in mitkROIMapper3D.cpp
-extern void ApplyIndividualProperties(const mitk::IPropertyProvider* properties, vtkActor* actor);
+#include <boost/algorithm/string.hpp>
+
+#include <regex>
 
 namespace
 {
@@ -98,7 +96,8 @@ void mitk::ROIMapper2D::LocalStorage::SetLastPlaneGeometry(const PlaneGeometry* 
 
 void mitk::ROIMapper2D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer, bool override)
 {
-  // Implemented in ROIMapper3D
+  Superclass::SetDefaultProperties(node, renderer, override);
+  ROIMapperHelper::SetDefaultProperties(node, renderer, override);
 }
 
 mitk::ROIMapper2D::ROIMapper2D()
@@ -173,18 +172,21 @@ void mitk::ROIMapper2D::GenerateDataForRenderer(BaseRenderer* renderer)
       actor->SetMapper(mapper);
 
       this->ApplyColorAndOpacityProperties(renderer, actor);
-      ApplyIndividualProperties(roi.Properties, actor);
+      ROIMapperHelper::ApplyIndividualProperties(roi.Properties, actor);
 
       propAssembly->AddPart(actor);
 
-      auto name = GetName(roi);
-
-      if (!name.empty())
+      if (std::string caption; dataNode->GetStringProperty("caption", caption, renderer))
       {
-        auto bottomLeftPoint = GetBottomLeftPoint(slicePolyData->GetPoints(), renderer);
-        auto captionActor = CreateCaptionActor(name, bottomLeftPoint.data(), actor->GetProperty(), renderer);
+        caption = ROIMapperHelper::ParseCaption(caption, roi);
 
-        propAssembly->AddPart(captionActor);
+        if (!caption.empty())
+        {
+          auto bottomLeftPoint = GetBottomLeftPoint(slicePolyData->GetPoints(), renderer);
+          auto captionActor = ROIMapperHelper::CreateCaptionActor(caption, bottomLeftPoint, actor->GetProperty(), dataNode, renderer);
+
+          propAssembly->AddPart(captionActor);
+        }
       }
     }
   }
@@ -205,36 +207,4 @@ void mitk::ROIMapper2D::ApplyColorAndOpacityProperties(BaseRenderer* renderer, v
 vtkProp* mitk::ROIMapper2D::GetVtkProp(BaseRenderer* renderer)
 {
   return m_LocalStorageHandler.GetLocalStorage(renderer)->GetPropAssembly();
-}
-
-vtkSmartPointer<vtkCaptionActor2D> mitk::ROIMapper2D::CreateCaptionActor(const std::string& caption, double* attachmentPoint, vtkProperty* property, const BaseRenderer* renderer) const
-{
-  auto captionActor = vtkSmartPointer<vtkCaptionActor2D>::New();
-  captionActor->SetPosition(property->GetLineWidth() * 0.5, property->GetLineWidth() * 0.5);
-  captionActor->GetTextActor()->SetTextScaleModeToNone();
-  captionActor->SetAttachmentPoint(attachmentPoint);
-  captionActor->SetCaption(caption.c_str());
-  captionActor->BorderOff();
-  captionActor->LeaderOff();
-
-  auto* textProperty = captionActor->GetCaptionTextProperty();
-  textProperty->SetColor(property->GetColor());
-  textProperty->SetOpacity(property->GetOpacity());
-  textProperty->ShadowOff();
-
-  auto* dataNode = this->GetDataNode();
-
-  int fontSize = 16;
-  dataNode->GetIntProperty("font.size", fontSize, renderer);
-  textProperty->SetFontSize(fontSize);
-
-  bool bold = false;
-  dataNode->GetBoolProperty("font.bold", bold, renderer);
-  textProperty->SetBold(bold);
-
-  bool italic = false;
-  dataNode->GetBoolProperty("font.italic", italic, renderer);
-  textProperty->SetItalic(italic);
-
-  return captionActor;
 }

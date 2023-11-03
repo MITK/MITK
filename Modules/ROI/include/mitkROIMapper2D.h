@@ -21,7 +21,6 @@ template <class T>
 class vtkSmartPointer;
 
 class vtkPropAssembly;
-class vtkCaptionActor2D;
 
 namespace mitk
 {
@@ -60,8 +59,6 @@ namespace mitk
     void ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor) override;
 
   private:
-    vtkSmartPointer<vtkCaptionActor2D> CreateCaptionActor(const std::string& caption, double* attachmentPoint, vtkProperty* property, const BaseRenderer* renderer) const;
-
     LocalStorageHandler<LocalStorage> m_LocalStorageHandler;
   };
 }

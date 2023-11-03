@@ -96,6 +96,7 @@ std::vector<mitk::BaseData::Pointer> mitk::ROIIO::DoRead()
     for (const auto& jsonROI : json["ROIs"])
     {
       ROI::Element roi;
+      jsonROI["ID"].get_to(roi.ID);
       jsonROI["Min"].get_to(roi.Min);
       jsonROI["Max"].get_to(roi.Max);
 

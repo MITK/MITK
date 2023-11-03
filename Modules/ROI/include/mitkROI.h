@@ -34,6 +34,7 @@ namespace mitk
       void SetProperty(const std::string& propertyKey, BaseProperty* property, const std::string& contextName = "", bool fallBackOnDefaultContext = false) override;
       void RemoveProperty(const std::string& propertyKey, const std::string& contextName = "", bool fallBackOnDefaultContext = false) override;
 
+      unsigned int ID;
       Point3D Min;
       Point3D Max;
       PropertyList::Pointer Properties;

@@ -32,8 +32,8 @@ void InitializeCommandLineParser(mitkCommandLineParser& parser)
 
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("only-own-series", "s", mitkCommandLineParser::Bool, "Only own series", "Analyze only files in the same directory that have the same DICOM Series UID, if a file is provided as input.", us::Any());
-  parser.addArgument("check-3D", "d", mitkCommandLineParser::Bool, "Check 3D configs", "Analyze the input by using all known 3D configurations. If flag is not set all configurations (3D and 3D+t) will be used.", us::Any());
-  parser.addArgument("check-3D+t", "t", mitkCommandLineParser::Bool, "Check 3D+t configs", "Analyze the input by using all known 3D+t configurations (thus dynamic image configurations). If flag is not set all configurations (3D and 3D+t) will be used.", us::Any());
+  parser.addArgument("check-3d", "d", mitkCommandLineParser::Bool, "Check 3D configs", "Analyze the input by using all known 3D configurations. If flag is not set all configurations (3D and 3D+t) will be used.", us::Any());
+  parser.addArgument("check-3d+t", "t", mitkCommandLineParser::Bool, "Check 3D+t configs", "Analyze the input by using all known 3D+t configurations (thus dynamic image configurations). If flag is not set all configurations (3D and 3D+t) will be used.", us::Any());
   parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file or path", "Input contour(s)", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file", "Output file where the diagnostics results are stored as json.", us::Any());
 }
@@ -48,7 +48,10 @@ int main(int argc, char* argv[])
   auto args = parser.parseArguments(argc, argv);
 
   if (args.empty())
+  {
+    std::cout << parser.helpText();
     return EXIT_FAILURE;
+  }
 
   nlohmann::json diagnosticsResult;
 
@@ -57,8 +60,8 @@ int main(int argc, char* argv[])
     auto inputFilename = us::any_cast<std::string>(args["input"]);
     auto outputFilename = args.count("output")==0 ? std::string() : us::any_cast<std::string>(args["output"]);
     bool onlyOwnSeries = args.count("only-own-series");
-    bool check3D = args.count("check-3D");
-    bool check3DPlusT = args.count("check-3D+t");
+    bool check3D = args.count("check-3d");
+    bool check3DPlusT = args.count("check-3d+t");
 
     if (!check3D && !check3DPlusT)
     { //if no check option is selected all are activated by default.
@@ -68,8 +71,8 @@ int main(int argc, char* argv[])
 
     diagnosticsResult["input"] = inputFilename;
     diagnosticsResult["only-own-series"] = onlyOwnSeries;
-    diagnosticsResult["check-3D"] = check3D;
-    diagnosticsResult["check-3D+t"] = check3DPlusT;
+    diagnosticsResult["check-3d"] = check3D;
+    diagnosticsResult["check-3d+t"] = check3DPlusT;
 
     mitk::StringList relevantFiles = mitk::GetDICOMFilesInSameDirectory(inputFilename);
 
@@ -79,7 +82,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-      bool pathIsDirectory = std::filesystem::is_directory(std::filesystem::path(inputFilename));
+      bool pathIsDirectory = std::filesystem::is_directory(inputFilename);
 
       if (!pathIsDirectory && onlyOwnSeries)
       {
@@ -95,12 +98,12 @@ int main(int argc, char* argv[])
 
       nlohmann::json readerInfos;
       for (const auto& reader : selector->GetAllConfiguredReaders())
-      { 
+      {
         nlohmann::json readerInfo;
         readerInfo["class_name"] = reader->GetNameOfClass();
         readerInfo["configuration_label"] = reader->GetConfigurationLabel();
         readerInfo["configuration_description"] = reader->GetConfigurationDescription();
-        readerInfos.emplace_back(readerInfo);
+        readerInfos.push_back(readerInfo);
       }
       diagnosticsResult["checked_readers"] = readerInfos;
 
@@ -129,7 +132,7 @@ int main(int argc, char* argv[])
 
         unsigned int relevantOutputCount = 0;
         const auto nrOfOutputs = reader->GetNumberOfOutputs();
-        for (unsigned int outputIndex = 0; outputIndex < nrOfOutputs; ++outputIndex)
+        for (std::remove_const_t<decltype(nrOfOutputs)> outputIndex = 0; outputIndex < nrOfOutputs; ++outputIndex)
         {
           bool isRelevantOutput = true;
           if (!pathIsDirectory)
@@ -146,7 +149,7 @@ int main(int argc, char* argv[])
 
           if (isRelevantOutput)
           {
-            relevantOutputCount++;
+            ++relevantOutputCount;
             nlohmann::json outputInfo;
 
             const auto output = reader->GetOutput(outputIndex);
@@ -158,14 +161,14 @@ int main(int argc, char* argv[])
             outputInfo["files"] = outputFiles;
             outputInfo["timesteps"] = output.GetNumberOfTimeSteps();
             outputInfo["frames_per_timesteps"] = output.GetNumberOfFramesPerTimeStep();
-            outputInfos.emplace_back(outputInfo);
+            outputInfos.push_back(outputInfo);
           }
         }
         diagnosticsResult["volume_count"] = relevantOutputCount;
         diagnosticsResult["volumes"] = outputInfos;
       }
     }
-    std::cout << std::endl << "### DIAGNOSTICS REPORT ###" << std::endl << std::endl;
+    std::cout << "\n### DIAGNOSTICS REPORT ###\n" << std::endl;
     std::cout << std::setw(2) << diagnosticsResult << std::endl;
 
     if (!outputFilename.empty())
@@ -188,6 +191,7 @@ int main(int argc, char* argv[])
   }
   catch (...)
   {
+    MITK_ERROR << "An unknown error occurred!";
     return EXIT_FAILURE;
   }
 

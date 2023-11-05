@@ -188,7 +188,7 @@
 			 </sizepolicy>
 			</property>
 			<property name="text">
-			  <string>System Python:</string>
+			  <string>System Python (>=3.9):</string>
 			</property>
 		   </widget>
 		  </item>

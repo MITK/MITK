@@ -142,8 +142,10 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.AIFImageNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.AIFImageNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
   m_Controls.AIFImageNodeSelector->setEnabled(false);
+  m_Controls.AIFImageNodeSelector->setVisible(false);
 
   m_Controls.checkDedicatedAIFImage->setEnabled(true);
+
   m_Controls.HCLSpinBox->setValue(mitk::AterialInputFunctionGenerator::DEFAULT_HEMATOCRIT_LEVEL);
 
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setVisible(bool)));
@@ -152,12 +154,13 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setVisible(bool)));
   connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setEnabled(bool)));
+  connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.btnAIFFile, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+
 
   connect(m_Controls.btnAIFFile, SIGNAL(clicked()), this, SLOT(LoadAIFfromFile()));
 
@@ -165,9 +168,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.groupDescBrix->hide();
   connect(m_Controls.injectiontime, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
 
-  //Num2CX setting
-  m_Controls.groupNum2CXM->hide();
-  connect(m_Controls.odeStepSize, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
 
   //Model fit configuration
   m_Controls.groupBox_FitConfiguration->hide();
@@ -189,7 +189,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   //Concentration
   m_Controls.groupConcentration->hide();
   m_Controls.groupBoxEnhancement->hide();
-  m_Controls.groupBoxTurboFlash->hide();
   m_Controls.radioButtonNoConversion->setChecked(true);
   m_Controls.groupBox_T1MapviaVFA->hide();
 
@@ -201,12 +200,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
 
 
-  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash, SLOT(setVisible(bool)));
-  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
-  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.relaxationtime, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.recoverytime, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.relaxivity, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
 
   connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
@@ -236,10 +229,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   UpdateGUIControls();
 }
 
-bool MRPerfusionView::IsTurboFlashSequenceFlag() const
-{
-  return this->m_Controls.radioButtonTurboFlash->isChecked();
-};
 
 
 
@@ -271,7 +260,6 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.comboModel->setEnabled(!m_FittingInProgress);
   m_Controls.groupAIF->setEnabled(!m_FittingInProgress);
   m_Controls.groupDescBrix->setEnabled(!m_FittingInProgress);
-  m_Controls.groupNum2CXM->setEnabled(!m_FittingInProgress);
   m_Controls.groupConcentration->setEnabled(!m_FittingInProgress);
   m_Controls.groupBox_FitConfiguration->setEnabled(!m_FittingInProgress);
 
@@ -280,8 +268,8 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.btnModelling->setEnabled(m_selectedImage.IsNotNull()
                                       && m_selectedModelFactory.IsNotNull() && !m_FittingInProgress && CheckModelSettings());
 
-  m_Controls.spinBox_baselineStartTimeStep->setEnabled(m_Controls.radioButtonTurboFlash->isChecked() || m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
-  m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked() || m_Controls.radioButtonTurboFlash->isChecked());
+  m_Controls.spinBox_baselineStartTimeStep->setEnabled( m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
+  m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
 
 
 }
@@ -553,16 +541,7 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = false;
       }
 
-      if (this->m_Controls.radioButtonTurboFlash->isChecked() )
-      {
-        ok = ok && (m_Controls.recoverytime->value() > 0);
-        ok = ok && (m_Controls.relaxationtime->value() > 0);
-        ok = ok && (m_Controls.relaxivity->value() > 0);
-        ok = ok && (m_Controls.AifRecoverytime->value() > 0);
-        ok = ok && CheckBaselineSelectionSettings();
-
-      }
-      else if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
+      if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
                || this->m_Controls.radioButton_relativeEnchancement->isChecked() )
       {
         ok = ok && (m_Controls.factorSpinBox->value() > 0);
@@ -1113,29 +1092,12 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
     concentrationGen->SetDynamicImage(this->m_selectedImage);
   }
 
-  concentrationGen->SetisTurboFlashSequence(IsTurboFlashSequenceFlag());
   concentrationGen->SetAbsoluteSignalEnhancement(m_Controls.radioButton_absoluteEnhancement->isChecked());
   concentrationGen->SetRelativeSignalEnhancement(m_Controls.radioButton_relativeEnchancement->isChecked());
   concentrationGen->SetUsingT1Map(m_Controls.radioButtonUsingT1viaVFA->isChecked());
 
 
-  if (IsTurboFlashSequenceFlag())
-  {
-    if (AIFMode)
-    {
-      concentrationGen->SetRecoveryTime(m_Controls.AifRecoverytime->value());
-    }
-    else
-    {
-      concentrationGen->SetRecoveryTime(m_Controls.recoverytime->value());
-    }
-
-    concentrationGen->SetRelaxationTime(m_Controls.relaxationtime->value());
-    concentrationGen->SetRelaxivity(m_Controls.relaxivity->value());
-    concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
-    concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
-  }
-  else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
+  if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
   {
       concentrationGen->SetRepetitionTime(m_Controls.TRSpinBox->value());
       concentrationGen->SetRelaxivity(m_Controls.RelaxivitySpinBox->value());
@@ -1318,7 +1280,7 @@ void MRPerfusionView::PrepareAIFConcentrationImage()
 
   if (!this->m_Controls.radioButtonNoConversion->isChecked())
   {
-    if (!IsTurboFlashSequenceFlag() && !this->m_Controls.checkDedicatedAIFImage->isChecked())
+    if (!this->m_Controls.checkDedicatedAIFImage->isChecked())
     {
       if (m_inputImage.IsNull())
       {

@@ -157,7 +157,7 @@
    <item>
     <widget class="QGroupBox" name="groupAIF">
      <property name="title">
-      <string>AIF Mask:</string>
+      <string>Arterial Input Function (AIF):</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
@@ -384,8 +384,8 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-66</y>
-           <width>449</width>
+           <y>0</y>
+           <width>345</width>
            <height>306</height>
           </rect>
          </property>

@@ -62,7 +62,8 @@ public:
   void RequestUpdate();
   void ForceImmediateUpdate();
 
-  void AddUtilityWidget(QWidget* utilityWidget);
+  enum UtilityWidgetPosition {Top, Bottom, Left, Right};
+  void AddUtilityWidget(QWidget* utilityWidget, UtilityWidgetPosition position = Top);
 
   void SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower);
   void ShowGradientBackground(bool enable);
@@ -106,7 +107,8 @@ private:
   void ResetGeometry(const mitk::TimeGeometry* referenceGeometry);
 
   QString m_WidgetName;
-  QVBoxLayout* m_Layout;
+  QVBoxLayout* m_VerticalLayout;
+  QHBoxLayout* m_HorizontalLayout;
 
   mitk::DataStorage* m_DataStorage;
 

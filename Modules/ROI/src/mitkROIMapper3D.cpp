@@ -45,7 +45,6 @@ mitk::ROIMapper3D::~ROIMapper3D()
 void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
 {
   const auto timePoint = renderer->GetWorldTimeGeometry()->TimeStepToTimePoint(renderer->GetTimeStep());
-  const auto* planeGeometry = renderer->GetCurrentWorldPlaneGeometry();
   auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
   const auto* dataNode = this->GetDataNode();
 

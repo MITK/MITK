@@ -44,21 +44,25 @@ mitk::ROIMapper3D::~ROIMapper3D()
 
 void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
 {
+  const auto timePoint = renderer->GetWorldTimeGeometry()->TimeStepToTimePoint(renderer->GetTimeStep());
+  const auto* planeGeometry = renderer->GetCurrentWorldPlaneGeometry();
+  auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
   const auto* dataNode = this->GetDataNode();
 
-  if (dataNode == nullptr)
+  if (localStorage->GetLastGenerateDataTime() >= dataNode->GetMTime() &&
+      localStorage->GetLastTimePoint() == timePoint)
+  {
+    return;
+  }
+
+  localStorage->SetLastTimePoint(timePoint);
+
+  auto data = static_cast<const ROI*>(this->GetData());
+
+  if (!data->GetTimeGeometry()->IsValidTimePoint(timePoint))
     return;
 
-  auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
-
-  if (localStorage->GetLastGenerateDataTime() >= dataNode->GetMTime())
-    return;
-
-  const auto* data = dynamic_cast<ROI*>(this->GetData());
-
-  if (data == nullptr)
-    return;
-
+  const auto t = data->GetTimeGeometry()->TimePointToTimeStep(timePoint);
   auto propAssembly = vtkSmartPointer<vtkPropAssembly>::New();
 
   if (dataNode->IsVisible(renderer))
@@ -66,14 +70,17 @@ void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
     const auto* geometry = data->GetGeometry();
     const auto halfSpacing = geometry->GetSpacing() * 0.5f;
 
-    for (const auto& roi : *data)
+    for (const auto& [id, roi] : *data)
     {
+      if (!roi.HasTimeStep(t))
+        continue;
+
       Point3D min;
-      geometry->IndexToWorld(roi.Min, min);
+      geometry->IndexToWorld(roi.GetMin(t), min);
       min -= halfSpacing;
 
       Point3D max;
-      geometry->IndexToWorld(roi.Max, max);
+      geometry->IndexToWorld(roi.GetMax(t), max);
       max += halfSpacing;
 
       auto cube = vtkSmartPointer<vtkCubeSource>::New();
@@ -87,7 +94,7 @@ void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
       actor->SetMapper(mapper);
 
       this->ApplyColorAndOpacityProperties(renderer, actor);
-      ROIMapperHelper::ApplyIndividualProperties(roi.Properties, actor);
+      ROIMapperHelper::ApplyIndividualProperties(roi, t, actor);
 
       propAssembly->AddPart(actor);
     }

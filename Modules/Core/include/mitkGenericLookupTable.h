@@ -27,6 +27,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  template <typename T> class GenericLookupTable;
+  template <typename T> void from_json(const nlohmann::json&, GenericLookupTable<T>&);
+
   /**
    * @brief Template class for generating lookup-tables
    *

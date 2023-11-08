@@ -14,6 +14,8 @@ found in the LICENSE file.
 #define mitkPropertyList_h
 
 #include <mitkIPropertyOwner.h>
+#include <mitkGenericProperty.h>
+
 #include <nlohmann/json_fwd.hpp>
 
 namespace mitk

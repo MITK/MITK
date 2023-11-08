@@ -108,7 +108,7 @@ void mitk::ROIMapper3D::ApplyColorAndOpacityProperties(BaseRenderer* renderer, v
   auto* property = actor->GetProperty();
 
   float opacity = 1.0f;
-  this->GetOpacity(opacity, renderer);
+  this->GetDataNode()->GetOpacity(opacity, renderer);
   property->SetOpacity(opacity);
 }
 

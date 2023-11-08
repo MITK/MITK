@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkROIIO.h"
+#include <mitkProportionalTimeGeometry.h>
 #include <mitkROI.h>
 #include <mitkROIIOMimeTypes.h>
 
@@ -21,26 +22,33 @@ found in the LICENSE file.
 
 namespace
 {
-  mitk::Geometry3D::Pointer ReadGeometry(const nlohmann::json& jsonGeometry)
+  mitk::TimeGeometry::Pointer ReadGeometry(const nlohmann::json& jsonGeometry)
   {
-    auto result = mitk::Geometry3D::New();
-    result->ImageGeometryOn();
+    auto geometry = mitk::Geometry3D::New();
+    geometry->ImageGeometryOn();
 
     if (!jsonGeometry.is_object())
       mitkThrow() << "Geometry is expected to be a JSON object.";
 
     if (jsonGeometry.contains("Origin"))
-      result->SetOrigin(jsonGeometry["Origin"].get<mitk::Point3D>());
+      geometry->SetOrigin(jsonGeometry["Origin"].get<mitk::Point3D>());
 
     if (jsonGeometry.contains("Spacing"))
-      result->SetSpacing(jsonGeometry["Spacing"].get<mitk::Vector3D>());
+      geometry->SetSpacing(jsonGeometry["Spacing"].get<mitk::Vector3D>());
 
     if (jsonGeometry.contains("Size"))
     {
       auto size = jsonGeometry["Size"].get<mitk::Vector3D>();
       mitk::BaseGeometry::BoundsArrayType bounds({ 0.0, size[0], 0.0, size[1], 0.0, size[2] });
-      result->SetBounds(bounds);
+      geometry->SetBounds(bounds);
     }
+
+    auto timeSteps = jsonGeometry.contains("TimeSteps")
+      ? jsonGeometry["TimeSteps"].get<mitk::TimeStepType>()
+      : 1;
+
+    auto result = mitk::ProportionalTimeGeometry::New();
+    result->Initialize(geometry, timeSteps);
 
     return result;
   }
@@ -84,7 +92,7 @@ std::vector<mitk::BaseData::Pointer> mitk::ROIIO::DoRead()
     if (1 != json["Version"].get<int>())
       mitkThrow() << "Unknown file format version (expected version 1)!";
 
-    result->SetGeometry(ReadGeometry(json["Geometry"]));
+    result->SetTimeGeometry(ReadGeometry(json["Geometry"]));
 
     if (json.contains("Properties"))
     {
@@ -95,13 +103,37 @@ std::vector<mitk::BaseData::Pointer> mitk::ROIIO::DoRead()
 
     for (const auto& jsonROI : json["ROIs"])
     {
-      ROI::Element roi;
-      jsonROI["ID"].get_to(roi.ID);
-      jsonROI["Min"].get_to(roi.Min);
-      jsonROI["Max"].get_to(roi.Max);
+      ROI::Element roi(jsonROI["ID"].get<unsigned int>());
+
+      if (jsonROI.contains("TimeSteps"))
+      {
+        for (const auto& jsonTimeStep : jsonROI["TimeSteps"])
+        {
+          auto t = jsonTimeStep["t"].get<TimeStepType>();
+
+          roi.SetMin(jsonTimeStep["Min"].get<Point3D>(), t);
+          roi.SetMax(jsonTimeStep["Max"].get<Point3D>(), t);
+
+          if (jsonTimeStep.contains("Properties"))
+          {
+            auto properties = mitk::PropertyList::New();
+            properties->FromJSON(jsonTimeStep["Properties"]);
+            roi.SetProperties(properties, t);
+          }
+        }
+      }
+      else
+      {
+        roi.SetMin(jsonROI["Min"].get<Point3D>());
+        roi.SetMax(jsonROI["Max"].get<Point3D>());
+      }
 
       if (jsonROI.contains("Properties"))
-        roi.Properties->FromJSON(jsonROI["Properties"]);
+      {
+        auto properties = mitk::PropertyList::New();
+        properties->FromJSON(jsonROI["Properties"]);
+        roi.SetDefaultProperties(properties);
+      }
 
       result->AddElement(roi);
     }

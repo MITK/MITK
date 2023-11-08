@@ -13,38 +13,196 @@ found in the LICENSE file.
 #include <mitkROI.h>
 
 mitk::ROI::Element::Element()
-  : Properties(PropertyList::New())
+  : Element(0)
 {
+}
+
+mitk::ROI::Element::Element(unsigned int id)
+  : m_ID(id),
+    m_DefaultProperties(PropertyList::New())
+{
+}
+
+unsigned int mitk::ROI::Element::GetID() const
+{
+  return m_ID;
+}
+
+void mitk::ROI::Element::SetID(unsigned int id)
+{
+  m_ID = id;
+}
+
+bool mitk::ROI::Element::HasTimeStep(TimeStepType t) const
+{
+  return m_Min.count(t) != 0 && m_Max.count(t) != 0;
+}
+
+mitk::Point3D mitk::ROI::Element::GetMin(TimeStepType t) const
+{
+  return m_Min.at(t);
+}
+
+void mitk::ROI::Element::SetMin(const Point3D& min, TimeStepType t)
+{
+  m_Min[t] = min;
+}
+
+mitk::Point3D mitk::ROI::Element::GetMax(TimeStepType t) const
+{
+  return m_Max.at(t);
+}
+
+void mitk::ROI::Element::SetMax(const Point3D& max, TimeStepType t)
+{
+  m_Max[t] = max;
+}
+
+mitk::PropertyList* mitk::ROI::Element::GetDefaultProperties() const
+{
+  return m_DefaultProperties;
+}
+
+void mitk::ROI::Element::SetDefaultProperties(PropertyList* properties)
+{
+  m_DefaultProperties = properties;
+}
+
+mitk::PropertyList* mitk::ROI::Element::GetProperties(TimeStepType t) const
+{
+  if (m_Properties.count(t) != 0)
+    return m_Properties.at(t);
+
+  return nullptr;
+}
+
+void mitk::ROI::Element::SetProperties(PropertyList* properties, TimeStepType t)
+{
+  m_Properties[t] = properties;
 }
 
 mitk::BaseProperty::ConstPointer mitk::ROI::Element::GetConstProperty(const std::string& propertyKey, const std::string& contextName, bool fallBackOnDefaultContext) const
 {
-  return Properties->GetConstProperty(propertyKey, contextName, fallBackOnDefaultContext);
+  if (!contextName.empty())
+  {
+    const TimeStepType t = std::stoul(contextName);
+    auto it = m_Properties.find(t);
+
+    if (it != m_Properties.end() && it->second.IsNotNull())
+    {
+      auto property = it->second->GetConstProperty(propertyKey);
+
+      if (property.IsNotNull())
+        return property;
+    }
+
+    if (!fallBackOnDefaultContext)
+      return nullptr;
+  }
+
+  return m_DefaultProperties->GetConstProperty(propertyKey);
 }
 
 std::vector<std::string> mitk::ROI::Element::GetPropertyKeys(const std::string& contextName, bool includeDefaultContext) const
 {
-  return Properties->GetPropertyKeys(contextName, includeDefaultContext);
+  if (!contextName.empty())
+  {
+    const TimeStepType t = std::stoul(contextName);
+    auto it = m_Properties.find(t);
+
+    std::vector<std::string> result;
+
+    if (it != m_Properties.end() && it->second.IsNotNull())
+      result = it->second->GetPropertyKeys();
+
+    if (includeDefaultContext)
+    {
+      auto keys = m_DefaultProperties->GetPropertyKeys();
+      auto end = result.cend();
+
+      std::remove_copy_if(keys.cbegin(), keys.cend(), std::back_inserter(result), [&, result, end](const std::string& key) {
+        return end != std::find(result.cbegin(), end, key);
+      });
+    }
+
+    return result;
+  }
+
+  return m_DefaultProperties->GetPropertyKeys();
 }
 
 std::vector<std::string> mitk::ROI::Element::GetPropertyContextNames() const
 {
-  return Properties->GetPropertyContextNames();
+  std::vector<std::string> result;
+  result.reserve(m_Properties.size());
+
+  std::transform(m_Properties.cbegin(), m_Properties.cend(), std::back_inserter(result), [](const PropertyListsType::value_type& property) {
+    return std::to_string(property.first);
+  });
+
+  return result;
 }
 
 mitk::BaseProperty* mitk::ROI::Element::GetNonConstProperty(const std::string& propertyKey, const std::string& contextName, bool fallBackOnDefaultContext)
 {
-  return Properties->GetNonConstProperty(propertyKey, contextName, fallBackOnDefaultContext);
+  if (!contextName.empty())
+  {
+    const TimeStepType t = std::stoul(contextName);
+    auto it = m_Properties.find(t);
+
+    if (it != m_Properties.end() && it->second.IsNotNull())
+    {
+      auto* property = it->second->GetNonConstProperty(propertyKey);
+
+      if (property != nullptr)
+        return property;
+    }
+
+    if (!fallBackOnDefaultContext)
+      return nullptr;
+  }
+
+  return m_DefaultProperties->GetNonConstProperty(propertyKey);
 }
 
 void mitk::ROI::Element::SetProperty(const std::string& propertyKey, BaseProperty* property, const std::string& contextName, bool fallBackOnDefaultContext)
 {
-  Properties->SetProperty(propertyKey, property, contextName, fallBackOnDefaultContext);
+  if (!contextName.empty())
+  {
+    const TimeStepType t = std::stoul(contextName);
+    auto it = m_Properties.find(t);
+
+    if (it != m_Properties.end() && it->second.IsNotNull())
+    {
+      it->second->SetProperty(propertyKey, property);
+    }
+    else if (!fallBackOnDefaultContext)
+    {
+      mitkThrow() << "Context \"" << contextName << "\" does not exist!";
+    }
+  }
+
+  m_DefaultProperties->SetProperty(propertyKey, property);
 }
 
 void mitk::ROI::Element::RemoveProperty(const std::string& propertyKey, const std::string& contextName, bool fallBackOnDefaultContext)
 {
-  Properties->RemoveProperty(propertyKey, contextName, fallBackOnDefaultContext);
+  if (!contextName.empty())
+  {
+    const TimeStepType t = std::stoul(contextName);
+    auto it = m_Properties.find(t);
+
+    if (it != m_Properties.end() && it->second.IsNotNull())
+    {
+      it->second->RemoveProperty(propertyKey);
+    }
+    else if (!fallBackOnDefaultContext)
+    {
+      mitkThrow() << "Context \"" << contextName << "\" does not exist!";
+    }
+  }
+
+  m_DefaultProperties->RemoveProperty(propertyKey);
 }
 
 mitk::ROI::ROI()
@@ -65,20 +223,24 @@ size_t mitk::ROI::GetNumberOfElements() const
   return m_Elements.size();
 }
 
-size_t mitk::ROI::AddElement(const Element& element)
+void mitk::ROI::AddElement(const Element& element)
 {
-  m_Elements.push_back(element);
-  return m_Elements.size() - 1;
+  const auto id = element.GetID();
+
+  if (m_Elements.count(id) != 0)
+    mitkThrow() << "ROI already contains an element with ID " << std::to_string(id) << '.';
+
+  m_Elements[id] = element;
 }
 
-const mitk::ROI::Element* mitk::ROI::GetElement(size_t index) const
+const mitk::ROI::Element& mitk::ROI::GetElement(unsigned int id) const
 {
-  return &m_Elements.at(index);
+  return m_Elements.at(id);
 }
 
-mitk::ROI::Element* mitk::ROI::GetElement(size_t index)
+mitk::ROI::Element& mitk::ROI::GetElement(unsigned int id)
 {
-  return &m_Elements.at(index);
+  return m_Elements.at(id);
 }
 
 mitk::ROI::ConstIterator mitk::ROI::begin() const

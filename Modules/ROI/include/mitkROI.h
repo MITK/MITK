@@ -21,9 +21,14 @@ namespace mitk
   class MITKROI_EXPORT ROI : public BaseData
   {
   public:
-    struct MITKROI_EXPORT Element : IPropertyOwner
+    class MITKROI_EXPORT Element : public IPropertyOwner
     {
+    public:
+      using PointsType = std::map<TimeStepType, Point3D>;
+      using PropertyListsType = std::map<TimeStepType, PropertyList::Pointer>;
+
       Element();
+      explicit Element(unsigned int id);
       ~Element() = default;
 
       BaseProperty::ConstPointer GetConstProperty(const std::string& propertyKey, const std::string& contextName = "", bool fallBackOnDefaultContext = true) const override;
@@ -34,25 +39,44 @@ namespace mitk
       void SetProperty(const std::string& propertyKey, BaseProperty* property, const std::string& contextName = "", bool fallBackOnDefaultContext = false) override;
       void RemoveProperty(const std::string& propertyKey, const std::string& contextName = "", bool fallBackOnDefaultContext = false) override;
 
-      unsigned int ID;
-      Point3D Min;
-      Point3D Max;
-      PropertyList::Pointer Properties;
+      unsigned int GetID() const;
+      void SetID(unsigned int id);
+
+      bool HasTimeStep(TimeStepType t) const;
+
+      Point3D GetMin(TimeStepType t = 0) const;
+      void SetMin(const Point3D& min, TimeStepType t = 0);
+
+      Point3D GetMax(TimeStepType t = 0) const;
+      void SetMax(const Point3D& max, TimeStepType t = 0);
+
+      PropertyList* GetDefaultProperties() const;
+      void SetDefaultProperties(PropertyList* properties);
+
+      PropertyList* GetProperties(TimeStepType t = 0) const;
+      void SetProperties(PropertyList* properties, TimeStepType t = 0);
+
+    private:
+      unsigned int m_ID;
+      PointsType m_Min;
+      PointsType m_Max;
+      PropertyList::Pointer m_DefaultProperties;
+      PropertyListsType m_Properties;
     };
 
     mitkClassMacro(ROI, BaseData)
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    using ElementsType = std::vector<Element>;
+    using ElementsType = std::map<unsigned int, Element>;
     using Iterator = ElementsType::iterator;
     using ConstIterator = ElementsType::const_iterator;
 
     size_t GetNumberOfElements() const;
-    size_t AddElement(const Element& element);
+    void AddElement(const Element& element);
 
-    const Element* GetElement(size_t index) const;
-    Element* GetElement(size_t index);
+    const Element& GetElement(unsigned int id) const;
+    Element& GetElement(unsigned int id);
 
     ConstIterator begin() const;
     ConstIterator end() const;

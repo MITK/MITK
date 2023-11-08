@@ -19,26 +19,28 @@ found in the LICENSE file.
 
 #include <regex>
 
-void mitk::ROIMapperHelper::ApplyIndividualProperties(const IPropertyProvider* properties, vtkActor* actor)
+void mitk::ROIMapperHelper::ApplyIndividualProperties(const IPropertyProvider& properties, TimeStepType t, vtkActor* actor)
 {
   auto* property = actor->GetProperty();
 
   property->SetRepresentationToWireframe();
   property->LightingOff();
 
-  if (auto colorProperty = GetConstProperty<ColorProperty>("color", properties); colorProperty != nullptr)
+  const auto contextName = std::to_string(t);
+
+  if (auto colorProperty = GetConstProperty<ColorProperty>("color", properties, contextName); colorProperty != nullptr)
   {
     const auto color = colorProperty->GetColor();
     property->SetColor(color[0], color[1], color[2]);
   }
 
-  if (auto opacityProperty = GetConstProperty<FloatProperty>("opacity", properties); opacityProperty != nullptr)
+  if (auto opacityProperty = GetConstProperty<FloatProperty>("opacity", properties, contextName); opacityProperty != nullptr)
   {
     const auto opacity = opacityProperty->GetValue();
     property->SetOpacity(property->GetOpacity() * opacity);
   }
 
-  if (auto lineWidthProperty = GetConstProperty<FloatProperty>("lineWidth", properties); lineWidthProperty != nullptr)
+  if (auto lineWidthProperty = GetConstProperty<FloatProperty>("lineWidth", properties, contextName); lineWidthProperty != nullptr)
   {
     const auto lineWidth = lineWidthProperty->GetValue();
     property->SetLineWidth(lineWidth);
@@ -75,7 +77,7 @@ vtkSmartPointer<vtkCaptionActor2D> mitk::ROIMapperHelper::CreateCaptionActor(con
   return captionActor;
 }
 
-std::string mitk::ROIMapperHelper::ParseCaption(const std::string& captionTemplate, const ROI::Element& roi)
+std::string mitk::ROIMapperHelper::ParseCaption(const std::string& captionTemplate, const ROI::Element& roi, TimeStepType t)
 {
   std::regex regex(R"(\{([^}]*)\})"); // Anything between curly braces (considered as placeholder).
 
@@ -95,11 +97,11 @@ std::string mitk::ROIMapperHelper::ParseCaption(const std::string& captionTempla
 
     if (match[1] == "ID")
     {
-      caption.append(std::to_string(roi.ID));
+      caption.append(std::to_string(roi.GetID()));
     }
     else
     {
-      auto property = roi.GetConstProperty(match[1]);
+      auto property = roi.GetConstProperty(match[1], std::to_string(t));
 
       if (property.IsNotNull())
         caption.append(property->GetValueAsString());

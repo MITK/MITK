@@ -24,18 +24,18 @@ namespace mitk
 {
   namespace ROIMapperHelper
   {
-    void ApplyIndividualProperties(const IPropertyProvider* properties, vtkActor* actor);
+    void ApplyIndividualProperties(const IPropertyProvider& properties, TimeStepType t, vtkActor* actor);
 
     vtkSmartPointer<vtkCaptionActor2D> CreateCaptionActor(const std::string& caption, const Point3D& attachmentPoint, vtkProperty* property, const DataNode* dataNode, const BaseRenderer* renderer);
 
-    std::string ParseCaption(const std::string& captionTemplate, const ROI::Element& roi);
+    std::string ParseCaption(const std::string& captionTemplate, const ROI::Element& roi, TimeStepType t = 0);
 
     void SetDefaultProperties(DataNode* node, BaseRenderer* renderer, bool override);
 
     template <class T>
-    const T* GetConstProperty(const std::string& propertyKey, const mitk::IPropertyProvider* properties)
+    const T* GetConstProperty(const std::string& propertyKey, const mitk::IPropertyProvider& properties, const std::string& contextName = "")
     {
-      auto property = properties->GetConstProperty(propertyKey);
+      auto property = properties.GetConstProperty(propertyKey, contextName);
 
       if (property.IsNotNull())
         return dynamic_cast<const T*>(property.GetPointer());

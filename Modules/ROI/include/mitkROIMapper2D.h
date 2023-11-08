@@ -14,32 +14,24 @@ found in the LICENSE file.
 #define mitkROIMapper2D_h
 
 #include <mitkLocalStorageHandler.h>
+#include <mitkROIMapperLocalStorage.h>
 #include <mitkVtkMapper.h>
 #include <MitkROIExports.h>
-
-template <class T>
-class vtkSmartPointer;
-
-class vtkPropAssembly;
 
 namespace mitk
 {
   class MITKROI_EXPORT ROIMapper2D : public VtkMapper
   {
-    class LocalStorage : public Mapper::BaseLocalStorage
+    class LocalStorage : public ROIMapperLocalStorage
     {
     public:
       LocalStorage();
       ~LocalStorage() override;
 
-      vtkPropAssembly* GetPropAssembly() const;
-      void SetPropAssembly(vtkPropAssembly* propAssembly);
-
       const PlaneGeometry* GetLastPlaneGeometry() const;
       void SetLastPlaneGeometry(const PlaneGeometry* planeGeometry);
 
     protected:
-      vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
       PlaneGeometry::ConstPointer m_LastPlaneGeometry;
     };
 

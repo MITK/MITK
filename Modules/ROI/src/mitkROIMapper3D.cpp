@@ -21,22 +21,11 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 
 mitk::ROIMapper3D::LocalStorage::LocalStorage()
-  : m_PropAssembly(vtkSmartPointer<vtkPropAssembly>::New())
 {
 }
 
 mitk::ROIMapper3D::LocalStorage::~LocalStorage()
 {
-}
-
-vtkPropAssembly* mitk::ROIMapper3D::LocalStorage::GetPropAssembly() const
-{
-  return m_PropAssembly;
-}
-
-void mitk::ROIMapper3D::LocalStorage::SetPropAssembly(vtkPropAssembly* propAssembly)
-{
-  m_PropAssembly = propAssembly;
 }
 
 void mitk::ROIMapper3D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer, bool override)

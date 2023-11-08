@@ -66,22 +66,11 @@ namespace
 }
 
 mitk::ROIMapper2D::LocalStorage::LocalStorage()
-  : m_PropAssembly(vtkSmartPointer<vtkPropAssembly>::New())
 {
 }
 
 mitk::ROIMapper2D::LocalStorage::~LocalStorage()
 {
-}
-
-vtkPropAssembly* mitk::ROIMapper2D::LocalStorage::GetPropAssembly() const
-{
-  return m_PropAssembly;
-}
-
-void mitk::ROIMapper2D::LocalStorage::SetPropAssembly(vtkPropAssembly* propAssembly)
-{
-  m_PropAssembly = propAssembly;
 }
 
 const mitk::PlaneGeometry* mitk::ROIMapper2D::LocalStorage::GetLastPlaneGeometry() const

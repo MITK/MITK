@@ -13,9 +13,12 @@ found in the LICENSE file.
 #ifndef mitkColorProperty_h
 #define mitkColorProperty_h
 
-#include "mitkBaseProperty.h"
+#include <mitkBaseProperty.h>
 #include <MitkCoreExports.h>
+
 #include <itkRGBPixel.h>
+
+#include <nlohmann/json.hpp>
 
 namespace mitk
 {

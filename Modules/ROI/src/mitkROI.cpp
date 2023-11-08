@@ -364,6 +364,6 @@ bool mitk::ROI::VerifyRequestedRegion()
   return true;
 }
 
-void mitk::ROI::SetRequestedRegion(const itk::DataObject* data)
+void mitk::ROI::SetRequestedRegion(const itk::DataObject*)
 {
 }

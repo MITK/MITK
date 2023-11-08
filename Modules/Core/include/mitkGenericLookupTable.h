@@ -85,8 +85,7 @@ namespace mitk
       }
     }
 
-    template<typename T>
-    friend void from_json(const nlohmann::json&, GenericLookupTable<T>&);
+    friend void from_json<>(const nlohmann::json&, GenericLookupTable<T>&);
 
   protected:
     LookupTableType m_LookupTable;

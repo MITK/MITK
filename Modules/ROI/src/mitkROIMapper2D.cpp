@@ -99,46 +99,49 @@ mitk::ROIMapper2D::~ROIMapper2D()
 
 void mitk::ROIMapper2D::GenerateDataForRenderer(BaseRenderer* renderer)
 {
+  const auto timePoint = renderer->GetWorldTimeGeometry()->TimeStepToTimePoint(renderer->GetTimeStep());
+  const auto* planeGeometry = renderer->GetCurrentWorldPlaneGeometry();
+  auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
   const auto* dataNode = this->GetDataNode();
 
-  if (dataNode == nullptr)
-    return;
-
-  auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
-  const auto* planeGeometry = renderer->GetCurrentWorldPlaneGeometry();
-
   if (localStorage->GetLastPlaneGeometry() != nullptr && localStorage->GetLastPlaneGeometry()->IsOnPlane(planeGeometry) &&
-      localStorage->GetLastGenerateDataTime() >= dataNode->GetMTime())
+      localStorage->GetLastGenerateDataTime() >= dataNode->GetMTime() &&
+      localStorage->GetLastTimePoint() == timePoint)
   {
     return;
   }
 
   localStorage->SetLastPlaneGeometry(planeGeometry->Clone());
+  localStorage->SetLastTimePoint(timePoint);
 
-  const auto* data = dynamic_cast<ROI*>(this->GetData());
+  auto data = static_cast<const ROI*>(this->GetData());
 
-  if (data == nullptr)
+  if (!data->GetTimeGeometry()->IsValidTimePoint(timePoint))
     return;
 
+  const auto t = data->GetTimeGeometry()->TimePointToTimeStep(timePoint);
   auto propAssembly = vtkSmartPointer<vtkPropAssembly>::New();
 
   if (dataNode->IsVisible(renderer))
   {
-    const auto* geometry = data->GetGeometry();
+    const auto* geometry = data->GetGeometry(t);
     const auto halfSpacing = geometry->GetSpacing() * 0.5f;
 
     auto plane = vtkSmartPointer<vtkPlane>::New();
     plane->SetOrigin(planeGeometry->GetOrigin().data());
     plane->SetNormal(planeGeometry->GetNormal().data());
 
-    for (const auto& roi : *data)
+    for (const auto& [id, roi] : *data)
     {
+      if (!roi.HasTimeStep(t))
+        continue;
+
       Point3D min;
-      geometry->IndexToWorld(roi.Min, min);
+      geometry->IndexToWorld(roi.GetMin(t), min);
       min -= halfSpacing;
 
       Point3D max;
-      geometry->IndexToWorld(roi.Max, max);
+      geometry->IndexToWorld(roi.GetMax(t), max);
       max += halfSpacing;
 
       auto cube = vtkSmartPointer<vtkCubeSource>::New();
@@ -161,13 +164,13 @@ void mitk::ROIMapper2D::GenerateDataForRenderer(BaseRenderer* renderer)
       actor->SetMapper(mapper);
 
       this->ApplyColorAndOpacityProperties(renderer, actor);
-      ROIMapperHelper::ApplyIndividualProperties(roi.Properties, actor);
+      ROIMapperHelper::ApplyIndividualProperties(roi, t, actor);
 
       propAssembly->AddPart(actor);
 
       if (std::string caption; dataNode->GetStringProperty("caption", caption, renderer))
       {
-        caption = ROIMapperHelper::ParseCaption(caption, roi);
+        caption = ROIMapperHelper::ParseCaption(caption, roi, t);
 
         if (!caption.empty())
         {

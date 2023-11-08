@@ -11,7 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <usModuleActivator.h>
+
 #include <memory>
+#include <vector>
 
 namespace mitk
 {

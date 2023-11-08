@@ -26,21 +26,6 @@ found in the LICENSE file.
 
 namespace
 {
-  std::string GetName(const mitk::ROI::Element& roi)
-  {
-    auto property = roi.GetConstProperty("name");
-
-    if (property.IsNotNull())
-    {
-      auto nameProperty = dynamic_cast<const mitk::StringProperty*>(property.GetPointer());
-
-      if (nameProperty != nullptr)
-        return nameProperty->GetValue();
-    }
-
-    return "";
-  }
-
   mitk::Point3D GetBottomLeftPoint(vtkPoints* points, mitk::BaseRenderer* renderer)
   {
     mitk::Point3D point = points->GetPoint(0);

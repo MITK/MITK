@@ -12,6 +12,74 @@ found in the LICENSE file.
 
 #include <mitkROI.h>
 
+void mitk::to_json(nlohmann::json& j, const ROI::Element& roi)
+{
+  j["ID"] = roi.GetID();
+
+  if (roi.HasTimeSteps())
+  {
+    auto timeSteps = roi.GetTimeSteps();
+
+    for (const auto t : timeSteps)
+    {
+      nlohmann::json jTimeStep = {
+        { "t", t },
+        { "Min", roi.GetMin(t) },
+        { "Max", roi.GetMax(t) }
+      };
+
+      if (auto* properties = roi.GetProperties(t); properties != nullptr && !properties->IsEmpty())
+        properties->ToJSON(jTimeStep["Properties"]);
+
+      j["TimeSteps"].push_back(jTimeStep);
+    }
+  }
+  else
+  {
+    j["Min"] = roi.GetMin();
+    j["Max"] = roi.GetMax();
+  }
+
+  if (auto* properties = roi.GetDefaultProperties(); properties != nullptr && !properties->IsEmpty())
+    properties->ToJSON(j["Properties"]);
+}
+
+void mitk::from_json(const nlohmann::json& j, ROI::Element& roi)
+{
+  auto id = j["ID"].get<unsigned int>();
+  roi.SetID(id);
+
+  if (j.contains("TimeSteps"))
+  {
+    for (const auto& jTimeStep : j["TimeSteps"])
+    {
+      auto t = jTimeStep["t"].get<TimeStepType>();
+
+      roi.SetMin(jTimeStep["Min"].get<Point3D>(), t);
+      roi.SetMax(jTimeStep["Max"].get<Point3D>(), t);
+
+      if (jTimeStep.contains("Properties"))
+      {
+        auto properties = mitk::PropertyList::New();
+        properties->FromJSON(jTimeStep["Properties"]);
+        roi.SetProperties(properties, t);
+      }
+    }
+  }
+  else
+  {
+    roi.SetMin(j["Min"].get<Point3D>());
+    roi.SetMax(j["Max"].get<Point3D>());
+  }
+
+  if (j.contains("Properties"))
+  {
+    auto properties = mitk::PropertyList::New();
+    properties->FromJSON(j["Properties"]);
+    roi.SetDefaultProperties(properties);
+  }
+}
+
 mitk::ROI::Element::Element()
   : Element(0)
 {
@@ -36,6 +104,25 @@ void mitk::ROI::Element::SetID(unsigned int id)
 bool mitk::ROI::Element::HasTimeStep(TimeStepType t) const
 {
   return m_Min.count(t) != 0 && m_Max.count(t) != 0;
+}
+
+bool mitk::ROI::Element::HasTimeSteps() const
+{
+  return m_Min.size() > 1 && m_Max.size() > 1;
+}
+
+std::vector<mitk::TimeStepType> mitk::ROI::Element::GetTimeSteps() const
+{
+  std::vector<TimeStepType> result;
+  result.reserve(m_Min.size());
+
+  for (const auto& [t, min] : m_Min)
+  {
+    if (m_Max.count(t) != 0)
+      result.push_back(t);
+  }
+
+  return result;
 }
 
 mitk::Point3D mitk::ROI::Element::GetMin(TimeStepType t) const

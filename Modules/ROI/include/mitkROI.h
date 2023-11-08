@@ -43,6 +43,8 @@ namespace mitk
       void SetID(unsigned int id);
 
       bool HasTimeStep(TimeStepType t) const;
+      bool HasTimeSteps() const;
+      std::vector<TimeStepType> GetTimeSteps() const;
 
       Point3D GetMin(TimeStepType t = 0) const;
       void SetMin(const Point3D& min, TimeStepType t = 0);
@@ -99,6 +101,9 @@ namespace mitk
   private:
     ElementsType m_Elements;
   };
+
+  MITKROI_EXPORT void to_json(nlohmann::json& j, const ROI::Element& roi);
+  MITKROI_EXPORT void from_json(const nlohmann::json& j, ROI::Element& roi);
 }
 
 #endif

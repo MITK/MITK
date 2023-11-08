@@ -15,40 +15,83 @@ found in the LICENSE file.
 #include <mitkROI.h>
 #include <mitkROIIOMimeTypes.h>
 
-#include <nlohmann/json.hpp>
-
 #include <filesystem>
 #include <fstream>
 
 namespace
 {
-  mitk::TimeGeometry::Pointer ReadGeometry(const nlohmann::json& jsonGeometry)
+  int CheckFileFormat(const nlohmann::json& json)
+  {
+    if ("MITK ROI" != json["FileFormat"].get<std::string>())
+      mitkThrow() << "Unknown file format (expected \"MITK ROI\")!";
+
+    auto version = json["Version"].get<int>();
+
+    if (1 != version)
+      mitkThrow() << "Unknown file format version (expected version 1)!";
+
+    return version;
+  }
+
+  mitk::Vector3D GetSize(const mitk::BaseGeometry* geometry)
+  {
+    auto bounds = geometry->GetBounds();
+
+    mitk::Vector3D result;
+    result[0] = bounds[1];
+    result[1] = bounds[3];
+    result[2] = bounds[5];
+
+    return result;
+  }
+
+  void SetSize(mitk::BaseGeometry* geometry, const mitk::Vector3D& size)
+  {
+    mitk::BaseGeometry::BoundsArrayType bounds({ 0.0, size[0], 0.0, size[1], 0.0, size[2] });
+    geometry->SetBounds(bounds);
+  }
+
+  mitk::TimeGeometry::Pointer ReadGeometry(const nlohmann::json& jGeometry)
   {
     auto geometry = mitk::Geometry3D::New();
     geometry->ImageGeometryOn();
 
-    if (!jsonGeometry.is_object())
+    if (!jGeometry.is_object())
       mitkThrow() << "Geometry is expected to be a JSON object.";
 
-    if (jsonGeometry.contains("Origin"))
-      geometry->SetOrigin(jsonGeometry["Origin"].get<mitk::Point3D>());
+    if (jGeometry.contains("Origin"))
+      geometry->SetOrigin(jGeometry["Origin"].get<mitk::Point3D>());
 
-    if (jsonGeometry.contains("Spacing"))
-      geometry->SetSpacing(jsonGeometry["Spacing"].get<mitk::Vector3D>());
+    if (jGeometry.contains("Spacing"))
+      geometry->SetSpacing(jGeometry["Spacing"].get<mitk::Vector3D>());
 
-    if (jsonGeometry.contains("Size"))
-    {
-      auto size = jsonGeometry["Size"].get<mitk::Vector3D>();
-      mitk::BaseGeometry::BoundsArrayType bounds({ 0.0, size[0], 0.0, size[1], 0.0, size[2] });
-      geometry->SetBounds(bounds);
-    }
+    if (jGeometry.contains("Size"))
+      SetSize(geometry, jGeometry["Size"].get<mitk::Vector3D>());
 
-    auto timeSteps = jsonGeometry.contains("TimeSteps")
-      ? jsonGeometry["TimeSteps"].get<mitk::TimeStepType>()
+    auto timeSteps = jGeometry.contains("TimeSteps")
+      ? jGeometry["TimeSteps"].get<mitk::TimeStepType>()
       : 1;
 
     auto result = mitk::ProportionalTimeGeometry::New();
     result->Initialize(geometry, timeSteps);
+
+    return result;
+  }
+
+  nlohmann::json WriteGeometry(const mitk::TimeGeometry* timeGeometry)
+  {
+    auto geometry = timeGeometry->GetGeometryForTimeStep(0);
+
+    nlohmann::json result = {
+      { "Origin", geometry->GetOrigin() },
+      { "Spacing", geometry->GetSpacing() },
+      { "Size", GetSize(geometry) }
+    };
+
+    auto timeSteps = timeGeometry->CountTimeSteps();
+
+    if (timeSteps > 1)
+      result["TimeSteps"] = timeSteps;
 
     return result;
   }
@@ -84,59 +127,21 @@ std::vector<mitk::BaseData::Pointer> mitk::ROIIO::DoRead()
 
   try
   {
-    auto json = nlohmann::json::parse(*stream);
+    auto j = nlohmann::json::parse(*stream);
 
-    if ("MITK ROI" != json["FileFormat"].get<std::string>())
-      mitkThrow() << "Unknown file format (expected \"MITK ROI\")!";
+    CheckFileFormat(j);
 
-    if (1 != json["Version"].get<int>())
-      mitkThrow() << "Unknown file format version (expected version 1)!";
+    auto geometry = ReadGeometry(j["Geometry"]);
+    result->SetTimeGeometry(geometry);
 
-    result->SetTimeGeometry(ReadGeometry(json["Geometry"]));
+    if (j.contains("Name"))
+      result->SetProperty("name", mitk::StringProperty::New(j["Name"].get<std::string>()));
 
-    if (json.contains("Properties"))
-    {
-      auto properties = mitk::PropertyList::New();
-      properties->FromJSON(json["Properties"]);
-      result->GetPropertyList()->ConcatenatePropertyList(properties);
-    }
+    if (j.contains("Caption"))
+      result->SetProperty("caption", mitk::StringProperty::New(j["Caption"].get<std::string>()));
 
-    for (const auto& jsonROI : json["ROIs"])
-    {
-      ROI::Element roi(jsonROI["ID"].get<unsigned int>());
-
-      if (jsonROI.contains("TimeSteps"))
-      {
-        for (const auto& jsonTimeStep : jsonROI["TimeSteps"])
-        {
-          auto t = jsonTimeStep["t"].get<TimeStepType>();
-
-          roi.SetMin(jsonTimeStep["Min"].get<Point3D>(), t);
-          roi.SetMax(jsonTimeStep["Max"].get<Point3D>(), t);
-
-          if (jsonTimeStep.contains("Properties"))
-          {
-            auto properties = mitk::PropertyList::New();
-            properties->FromJSON(jsonTimeStep["Properties"]);
-            roi.SetProperties(properties, t);
-          }
-        }
-      }
-      else
-      {
-        roi.SetMin(jsonROI["Min"].get<Point3D>());
-        roi.SetMax(jsonROI["Max"].get<Point3D>());
-      }
-
-      if (jsonROI.contains("Properties"))
-      {
-        auto properties = mitk::PropertyList::New();
-        properties->FromJSON(jsonROI["Properties"]);
-        roi.SetDefaultProperties(properties);
-      }
-
-      result->AddElement(roi);
-    }
+    for (const auto& roi : j["ROIs"])
+      result->AddElement(roi.get<ROI::Element>());
   }
   catch (const nlohmann::json::exception &e)
   {
@@ -148,6 +153,55 @@ std::vector<mitk::BaseData::Pointer> mitk::ROIIO::DoRead()
 
 void mitk::ROIIO::Write()
 {
+  auto input = dynamic_cast<const ROI*>(this->GetInput());
+
+  if (input == nullptr)
+    mitkThrow() << "Invalid input for writing!";
+
+  if (input->GetNumberOfElements() == 0)
+    mitkThrow() << "No ROIs found!";
+
+  auto* stream = this->GetOutputStream();
+  std::ofstream fileStream;
+
+  if (stream == nullptr)
+  {
+    auto filename = this->GetOutputLocation();
+
+    if (filename.empty())
+      mitkThrow() << "Neither an output stream nor an output filename was specified!";
+
+    fileStream.open(filename);
+
+    if (!fileStream.is_open())
+      mitkThrow() << "Could not open file \"" << filename << "\" for writing!";
+
+    stream = &fileStream;
+  }
+
+  if (!stream->good())
+    mitkThrow() << "Stream for writing is not good!";
+
+  nlohmann::ordered_json j = {
+    { "FileFormat", "MITK ROI" },
+    { "Version", 1 },
+    { "Name", input->GetProperty("name")->GetValueAsString() },
+    { "Geometry", WriteGeometry(input->GetTimeGeometry()) }
+  };
+
+  auto caption = input->GetConstProperty("caption");
+
+  if (caption.IsNotNull())
+    j["Caption"] = caption->GetValueAsString();
+
+  nlohmann::json rois;
+
+  for (const auto& roi : *input)
+    rois.push_back(roi.second);
+
+  j["ROIs"] = rois;
+
+  *stream << std::setw(2) << j << std::endl;
 }
 
 mitk::ROIIO* mitk::ROIIO::IOClone() const

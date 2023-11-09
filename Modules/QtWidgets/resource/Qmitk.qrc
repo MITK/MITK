@@ -31,5 +31,6 @@
 		<file>visible.svg</file>
 		<file>SegmentationTaskListIcon.svg</file>
 		<file>ROIIcon.svg</file>
+		<file>GeometryDataIcon.svg</file>
 	</qresource>
 </RCC>

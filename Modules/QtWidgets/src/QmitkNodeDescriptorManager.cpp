@@ -50,6 +50,10 @@ void QmitkNodeDescriptorManager::Initialize()
   auto isROI = mitk::NodePredicateDataType::New("ROI");
   AddDescriptor(new QmitkNodeDescriptor("ROI", roiIcon, isROI, this));
 
+  auto geometryDataIcon = QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/GeometryDataIcon.svg"));
+  auto isGeometryData = mitk::NodePredicateDataType::New("GeometryData");
+  AddDescriptor(new QmitkNodeDescriptor("GeometryData", geometryDataIcon, isGeometryData, this));
+
   auto isPointSet = mitk::NodePredicateDataType::New("PointSet");
   AddDescriptor(new QmitkNodeDescriptor(tr("PointSet"), QString(":/Qmitk/PointSet_48.png"), isPointSet, this));
 

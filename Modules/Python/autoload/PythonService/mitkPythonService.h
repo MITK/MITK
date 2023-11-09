@@ -13,6 +13,10 @@ found in the LICENSE file.
 #define mitkPythonService_h
 
 #include <ctkAbstractPythonManager.h>
+#ifdef snprintf
+#undef snprintf
+#endif
+
 #include <mitkIPythonService.h>
 #include <mitkSurface.h>
 #include <itkLightObject.h>

@@ -17,26 +17,14 @@ found in the LICENSE file.
 #include <vtkActor2D.h>
 #include <vtkAppendPolyData.h>
 #include <vtkCoordinate.h>
-#include <vtkCubeSource.h>
 #include <vtkMath.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper2D.h>
 #include <vtkProperty2D.h>
-#include <vtkSphereSource.h>
 #include <vtkStripper.h>
 #include <vtkTransformFilter.h>
 #include <vtkTransformPolyDataFilter.h>
-
-static vtkSmartPointer<vtkSphereSource> CreateHandle()
-{
-  auto handle = vtkSmartPointer<vtkSphereSource>::New();
-
-  handle->SetPhiResolution(8);
-  handle->SetThetaResolution(16);
-
-  return handle;
-}
 
 namespace mitk
 {
@@ -89,7 +77,7 @@ mitk::BoundingShapeVtkMapper2D::LocalStorage::LocalStorage()
   m_Cutter->SetCutFunction(m_CuttingPlane);
 
   for (int i = 0; i < 6; ++i)
-    m_Handles.push_back(CreateHandle());
+    m_Handles.push_back(vtkSmartPointer<vtkCubeSource>::New());
 
   m_PropAssembly->AddPart(m_Actor);
   m_PropAssembly->AddPart(m_HandleActor);
@@ -365,7 +353,9 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       {
         Point3D handleCenter = m_Impl->HandlePropertyList[handleIdx].GetPosition();
 
-        handle->SetRadius(handleSize);
+        handle->SetXLength(handleSize);
+        handle->SetYLength(handleSize);
+        handle->SetZLength(handleSize);
         handle->SetCenter(handleCenter[0], handleCenter[1], handleCenter[2]);
 
         // show handles only if the corresponding face is aligned to the render window

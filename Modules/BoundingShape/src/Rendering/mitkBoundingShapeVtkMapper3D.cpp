@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <vtkMath.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkSphereSource.h>
 #include <vtkTransformFilter.h>
 
 namespace mitk
@@ -36,7 +35,7 @@ namespace mitk
       LocalStorage(const LocalStorage &) = delete;
       LocalStorage &operator=(const LocalStorage &) = delete;
 
-      std::vector<vtkSmartPointer<vtkSphereSource>> Handles;
+      std::vector<vtkSmartPointer<vtkCubeSource>> Handles;
       vtkSmartPointer<vtkActor> Actor;
       vtkSmartPointer<vtkActor> HandleActor;
       vtkSmartPointer<vtkActor> SelectedHandleActor;
@@ -66,7 +65,7 @@ mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::LocalStorage()
     PropAssembly(vtkSmartPointer<vtkPropAssembly>::New())
 {
   for (int i = 0; i < 6; i++)
-    Handles.push_back(vtkSmartPointer<vtkSphereSource>::New());
+    Handles.push_back(vtkSmartPointer<vtkCubeSource>::New());
 }
 
 mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::~LocalStorage()
@@ -250,7 +249,9 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
     {
       Point3D handlecenter = m_Impl->HandlePropertyList[i].GetPosition();
       handle->SetCenter(handlecenter[0], handlecenter[1], handlecenter[2]);
-      handle->SetRadius(handlesize);
+      handle->SetXLength(handlesize);
+      handle->SetYLength(handlesize);
+      handle->SetZLength(handlesize);
       handle->Update();
       if (activeHandleId == nullptr)
       {

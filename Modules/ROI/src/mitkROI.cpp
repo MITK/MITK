@@ -108,7 +108,16 @@ bool mitk::ROI::Element::HasTimeStep(TimeStepType t) const
 
 bool mitk::ROI::Element::HasTimeSteps() const
 {
-  return m_Min.size() > 1 && m_Max.size() > 1;
+  // Check for multiple time steps.
+  if (m_Min.size() > 1 && m_Max.size() > 1)
+    return true;
+
+  // Check for single time step that is not 0.
+  if (m_Min.size() >= 1 && m_Max.size() >= 1)
+    return m_Min.count(0) == 0 && m_Max.count(0) == 0;
+
+  // Single time step 0.
+  return false;
 }
 
 std::vector<mitk::TimeStepType> mitk::ROI::Element::GetTimeSteps() const

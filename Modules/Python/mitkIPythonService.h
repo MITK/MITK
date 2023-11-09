@@ -13,11 +13,13 @@ found in the LICENSE file.
 #define mitkIPythonService_h
 
 // mitk
+#include <mitkImage.h>
+#include <mitkSurface.h>
 #include <MitkPythonExports.h>
-#include "mitkImage.h"
+
 //for microservices
 #include <mitkServiceInterface.h>
-#include "mitkSurface.h"
+
 #include <vector>
 
 

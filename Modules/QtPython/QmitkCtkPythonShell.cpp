@@ -12,12 +12,12 @@ found in the LICENSE file.
 
 #include "QmitkCtkPythonShell.h"
 
+#include <mitkIPythonService.h>
 #include <ctkAbstractPythonManager.h>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
 #include <QUrl>
-#include "mitkIPythonService.h"
 #include <usModuleContext.h>
 #include <usServiceReference.h>
 #include <usGetModuleContext.h>

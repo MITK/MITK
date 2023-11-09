@@ -12,10 +12,10 @@ found in the LICENSE file.
 #ifndef mitkPythonService_h
 #define mitkPythonService_h
 
+#include <mitkIPythonService.h>
+#include <mitkSurface.h>
 #include <ctkAbstractPythonManager.h>
-#include "mitkIPythonService.h"
 #include <itkLightObject.h>
-#include "mitkSurface.h"
 
 namespace mitk
 {

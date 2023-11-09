@@ -48,7 +48,7 @@ us::ModuleResource mitk::MonaiLabel2DTool::GetIconResource() const
 
 const char *mitk::MonaiLabel2DTool::GetName() const
 {
-  return "MonaiLabel2D";
+  return "MONAI Label 2D";
 }
 
 void mitk::MonaiLabel2DTool::OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -61,6 +61,8 @@ void mitk::MonaiLabel2DTool::OnAddPositivePoint(StateMachineAction *, Interactio
     {
       this->ClearSeeds();
       this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
+      this->ResetPreviewContentAtTimeStep(
+        RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint());
     }
     if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
     {

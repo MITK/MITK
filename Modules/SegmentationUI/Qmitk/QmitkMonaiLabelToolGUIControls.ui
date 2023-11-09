@@ -58,7 +58,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Monai Server URL:</string>
+        <string>MONAI Label Server URL:</string>
        </property>
       </widget>
      </item>
@@ -163,7 +163,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to Monai Label in MITK. [Experimental]&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to MONAI Label in MITK. [Experimental]&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="textFormat">
       <enum>Qt::RichText</enum>

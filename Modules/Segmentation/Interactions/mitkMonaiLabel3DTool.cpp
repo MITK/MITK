@@ -45,7 +45,7 @@ us::ModuleResource mitk::MonaiLabel3DTool::GetIconResource() const
 
 const char *mitk::MonaiLabel3DTool::GetName() const
 {
-  return "MonaiLabel3D";
+  return "MONAI Label 3D";
 }
 
 void mitk::MonaiLabel3DTool::WriteImage(const Image *inputAtTimeStep, std::string &inputImagePath)

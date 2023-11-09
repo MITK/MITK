@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include "ui_QmitkMonaiLabelToolGUIControls.h"
 #include <MitkSegmentationUIExports.h>
 #include <QMessageBox>
+#include <mitkIPreferences.h>
+#include <mitkMonaiLabelTool.h>
 
 class MITKSEGMENTATIONUI_EXPORT QmitkMonaiLabelToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {
@@ -63,14 +65,30 @@ protected:
    */
   void StatusMessageListener(const bool);
 
+  /**
+   * @brief Function to listen to Preference changes
+   */
+  void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &);
+
+  /**
+   * @brief Helper function to write MONAI model info in to model combo box
+   */
+  void PopulateModelBox(std::vector<mitk::MonaiModelInfo> models, bool allowAllModels);
+
+  /**
+   * @brief Helper function to populate required server metadata into UI
+   */
+  void PopulateUI(bool);
+
 private:
+  mitk::IPreferences *m_Preferences;
   Ui_QmitkMonaiLabelToolGUIControls m_Controls;
   bool m_FirstPreviewComputation = true;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
   int m_Dimension;
   QString m_CONFIRM_QUESTION_TEXT =
     "Data will be sent to the processing server devoid of any patient information. Are you sure you want continue?";
-  const QStringList SUPPORTED_MODELS = { // deepedit and localization_spine not supported
+  const QStringList WHITELISTED_MODELS = {
     "deepgrow_2d",
     "deepgrow_3d",
     "deepedit_seg",
@@ -80,6 +98,10 @@ private:
     "segmentation_vertebra",
     "deepgrow_pipeline",
     "vertebra_pipeline,"
+  };
+  const QStringList BLACKLISTED_MODELS = {
+    "deepedit",
+    "localization_spine",
   };
 };
 

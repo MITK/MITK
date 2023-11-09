@@ -12,11 +12,21 @@ found in the LICENSE file.
 
 #include "QmitkMonaiLabelToolGUI.h"
 
-#include "mitkMonaiLabelTool.h"
 #include <QIcon>
 #include <QMessageBox>
 #include <QUrl>
 #include <QmitkStyleManager.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+
+namespace
+{
+  mitk::IPreferences *GetPreferences()
+  {
+    auto *preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
+  }
+} // namespace
 
 QmitkMonaiLabelToolGUI::QmitkMonaiLabelToolGUI(int dimension)
   : QmitkMultiLabelSegWithPreviewToolGUIBase(), m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
@@ -24,6 +34,10 @@ QmitkMonaiLabelToolGUI::QmitkMonaiLabelToolGUI(int dimension)
   m_Dimension = dimension;
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   { return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false; };
+  m_Preferences = GetPreferences();
+  m_Preferences->OnPropertyChanged +=
+    mitk::MessageDelegate1<QmitkMonaiLabelToolGUI, const mitk::IPreferences::ChangeEvent &>(
+      this, &QmitkMonaiLabelToolGUI::OnPreferenceChangedEvent);
 }
 
 QmitkMonaiLabelToolGUI::~QmitkMonaiLabelToolGUI()
@@ -34,6 +48,9 @@ QmitkMonaiLabelToolGUI::~QmitkMonaiLabelToolGUI()
     tool->MonaiStatusEvent -=
       mitk::MessageDelegate1<QmitkMonaiLabelToolGUI, const bool>(this, &QmitkMonaiLabelToolGUI::StatusMessageListener);
   }
+  m_Preferences->OnPropertyChanged -=
+    mitk::MessageDelegate1<QmitkMonaiLabelToolGUI, const mitk::IPreferences::ChangeEvent &>(
+      this, &QmitkMonaiLabelToolGUI::OnPreferenceChangedEvent);
 }
 
 void QmitkMonaiLabelToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
@@ -55,7 +72,7 @@ void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
   QIcon refreshIcon =
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
   m_Controls.fetchUrl->setIcon(refreshIcon);
-
+  m_Controls.previewButton->setEnabled(false);
   Superclass::InitializeUI(mainLayout);
 }
 
@@ -133,6 +150,8 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
 
 void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
 {
+  m_Controls.previewButton->setEnabled(false);
+  m_Controls.labelListLabel->clear();
   QMessageBox::StandardButton reply;
   reply = QMessageBox::question(this, "Confirm", m_CONFIRM_QUESTION_TEXT, QMessageBox::Yes | QMessageBox::No);
   if (reply == QMessageBox::No)
@@ -146,8 +165,6 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
     return;
   }
   tool->m_InfoParameters.reset();
-  m_Controls.modelBox->clear();
-  m_Controls.appBox->clear();
   QString urlString = m_Controls.urlBox->text();
   QUrl url(urlString);
   if (url.isValid() && !url.isLocalFile() && !url.hasFragment() && !url.hasQuery()) // sanity check
@@ -157,24 +174,8 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
     try
     {
       tool->GetOverallInfo(hostName, port);
-      if (nullptr != tool->m_InfoParameters)
-      {
-        std::string response = tool->m_InfoParameters->name;
-        std::vector<mitk::MonaiModelInfo> autoModels = tool->GetAutoSegmentationModels(m_Dimension);
-        std::vector<mitk::MonaiModelInfo> interactiveModels = tool->GetInteractiveSegmentationModels(m_Dimension);
-        autoModels.insert(autoModels.end(), interactiveModels.begin(), interactiveModels.end());
-        this->WriteStatusMessage(QString::fromStdString(response));
-        m_Controls.appBox->addItem(QString::fromStdString(response));
-        for (auto &model : autoModels)
-        {
-          QString modelName = QString::fromStdString(model.name);
-          if (SUPPORTED_MODELS.contains(modelName))
-          {
-            m_Controls.modelBox->addItem(modelName);
-          }
-        }
-        m_Controls.modelBox->setCurrentIndex(-1);
-      }
+      bool allowAllModels = m_Preferences->GetBool("monailabel allow all models", false);
+      PopulateUI(allowAllModels);
     }
     catch (const mitk::Exception &e)
     {
@@ -233,6 +234,50 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   }
 }
 
+void QmitkMonaiLabelToolGUI::PopulateUI(bool allowAllModels)
+{
+  auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
+  if (nullptr == tool)
+  {
+    return;
+  }
+  m_Controls.appBox->clear();
+  if (nullptr != tool->m_InfoParameters)
+  {
+    std::string response = tool->m_InfoParameters->name;
+    std::vector<mitk::MonaiModelInfo> autoModels = tool->GetAutoSegmentationModels(m_Dimension);
+    std::vector<mitk::MonaiModelInfo> interactiveModels = tool->GetInteractiveSegmentationModels(m_Dimension);
+    autoModels.insert(autoModels.end(), interactiveModels.begin(), interactiveModels.end());
+    this->WriteStatusMessage(QString::fromStdString(response));
+    m_Controls.appBox->addItem(QString::fromStdString(response));
+    PopulateModelBox(autoModels, allowAllModels);
+    m_Controls.modelBox->setCurrentIndex(-1);
+  }
+}
+
+void QmitkMonaiLabelToolGUI::PopulateModelBox(std::vector<mitk::MonaiModelInfo> models, bool allowAllModels)
+{
+  m_Controls.modelBox->clear();
+  for (auto &model : models)
+  {
+    QString modelName = QString::fromStdString(model.name);
+    if (allowAllModels)
+    {
+      if (!BLACKLISTED_MODELS.contains(modelName))
+      {
+        m_Controls.modelBox->addItem(modelName);
+      }
+    }
+    else
+    {
+      if (WHITELISTED_MODELS.contains(modelName))
+      {
+        m_Controls.modelBox->addItem(modelName);
+      }
+    }
+  }
+}
+
 void QmitkMonaiLabelToolGUI::WriteStatusMessage(const QString &message)
 {
   m_Controls.responseNote->setText(message);
@@ -254,4 +299,13 @@ void QmitkMonaiLabelToolGUI::ShowErrorMessage(const std::string &message, QMessa
   messageBox->exec();
   delete messageBox;
   MITK_WARN << message;
+}
+
+void QmitkMonaiLabelToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event)
+{
+  if (QString::fromStdString(event.GetProperty()).startsWith("monai"))
+  {
+    bool allowAllModels = m_Preferences->GetBool("monailabel allow all models", false);
+    PopulateUI(allowAllModels);
+  }
 }

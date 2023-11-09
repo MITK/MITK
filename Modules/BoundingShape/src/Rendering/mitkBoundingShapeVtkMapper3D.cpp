@@ -75,6 +75,7 @@ mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::~LocalStorage()
 void mitk::BoundingShapeVtkMapper3D::SetDefaultProperties(DataNode *node, BaseRenderer *renderer, bool overwrite)
 {
   Superclass::SetDefaultProperties(node, renderer, overwrite);
+  node->AddProperty("opacity", FloatProperty::New(0.2f), renderer, overwrite);
 }
 
 mitk::BoundingShapeVtkMapper3D::BoundingShapeVtkMapper3D() : m_Impl(new Impl)
@@ -86,9 +87,17 @@ mitk::BoundingShapeVtkMapper3D::~BoundingShapeVtkMapper3D()
   delete m_Impl;
 }
 
-void mitk::BoundingShapeVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*)
+void mitk::BoundingShapeVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor)
 {
-  //Superclass::ApplyColorAndOpacityProperties(renderer, actor);
+  auto* property = actor->GetProperty();
+
+  std::array<float, 3> color = { 1.0, 0.0, 0.0 };
+  this->GetDataNode()->GetColor(color.data(), renderer);
+  property->SetColor(color[0], color[1], color[2]);
+
+  float opacity = 0.2f;
+  this->GetDataNode()->GetOpacity(opacity, renderer);
+  property->SetOpacity(opacity);
 }
 
 void mitk::BoundingShapeVtkMapper3D::ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *actor)
@@ -284,14 +293,6 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
 
     localStorage->Actor->SetMapper(mapper);
     localStorage->Actor->GetMapper()->SetInputDataObject(polydata);
-    localStorage->Actor->GetProperty()->SetOpacity(0.3);
-
-    mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty *>(dataNode->GetProperty("color"));
-    if (selectedColor != nullptr)
-    {
-      mitk::Color color = selectedColor->GetColor();
-      localStorage->Actor->GetProperty()->SetColor(color[0], color[1], color[2]);
-    }
 
     localStorage->HandleActor->SetMapper(handlemapper);
     if (activeHandleId == nullptr)
@@ -307,11 +308,7 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
 
     this->ApplyColorAndOpacityProperties(renderer, localStorage->Actor);
     this->ApplyBoundingShapeProperties(renderer, localStorage->Actor);
-
-    this->ApplyColorAndOpacityProperties(renderer, localStorage->HandleActor);
     this->ApplyBoundingShapeProperties(renderer, localStorage->HandleActor);
-
-    this->ApplyColorAndOpacityProperties(renderer, localStorage->SelectedHandleActor);
     this->ApplyBoundingShapeProperties(renderer, localStorage->SelectedHandleActor);
 
     // apply properties read from the PropertyList

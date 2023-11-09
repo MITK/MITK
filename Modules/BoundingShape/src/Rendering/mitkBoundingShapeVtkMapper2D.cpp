@@ -59,7 +59,6 @@ mitk::BoundingShapeVtkMapper2D::LocalStorage::LocalStorage()
   m_ZoomFactor(1.0)
 {
   m_Actor->SetMapper(m_Mapper);
-  m_Actor->GetProperty()->SetOpacity(0.3);
   m_Actor->VisibilityOn();
 
   m_HandleActor->SetMapper(m_HandleMapper);
@@ -127,6 +126,7 @@ void mitk::BoundingShapeVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 void mitk::BoundingShapeVtkMapper2D::SetDefaultProperties(DataNode *node, BaseRenderer *renderer, bool overwrite)
 {
   Superclass::SetDefaultProperties(node, renderer, overwrite);
+  node->AddProperty("opacity", FloatProperty::New(0.2f), renderer, overwrite);
 }
 
 mitk::BoundingShapeVtkMapper2D::BoundingShapeVtkMapper2D() : m_Impl(new Impl)
@@ -406,12 +406,8 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       cutPolyData->SetPolys(stripper->GetOutput()->GetLines());
 
       localStorage->m_Actor->GetMapper()->SetInputDataObject(cutPolyData);
-      mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty *>(node->GetProperty("color"));
-      if (selectedColor != nullptr)
-      {
-        mitk::Color color = selectedColor->GetColor();
-        localStorage->m_Actor->GetProperty()->SetColor(color[0], color[1], color[2]);
-      }
+
+      this->ApplyColorAndOpacityProperties(renderer, localStorage->m_Actor);
 
       if (activeHandleId != nullptr)
       {
@@ -452,6 +448,15 @@ vtkProp *mitk::BoundingShapeVtkMapper2D::GetVtkProp(BaseRenderer *renderer)
   return m_Impl->LocalStorageHandler.GetLocalStorage(renderer)->m_PropAssembly;
 }
 
-void mitk::BoundingShapeVtkMapper2D::ApplyColorAndOpacityProperties(BaseRenderer *, vtkActor *)
+void mitk::BoundingShapeVtkMapper2D::ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor)
 {
+  auto* property = actor->GetProperty();
+
+  std::array<float, 3> color = { 1.0, 0.0, 0.0 };
+  this->GetDataNode()->GetColor(color.data(), renderer);
+  property->SetColor(color[0], color[1], color[2]);
+
+  float opacity = 0.2f;
+  this->GetDataNode()->GetOpacity(opacity, renderer);
+  property->SetOpacity(opacity);
 }

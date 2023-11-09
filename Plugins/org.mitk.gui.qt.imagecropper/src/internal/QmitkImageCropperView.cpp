@@ -259,8 +259,6 @@ void QmitkImageCropperView::OnCreateNewBoundingBox()
   auto boundingBoxNode = mitk::DataNode::New();
   boundingBoxNode->SetData(boundingBox);
   boundingBoxNode->SetProperty("name", mitk::StringProperty::New(name.toStdString()));
-  boundingBoxNode->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
-  boundingBoxNode->SetProperty("opacity", mitk::FloatProperty::New(0.6));
   boundingBoxNode->SetProperty("layer", mitk::IntProperty::New(99));
   boundingBoxNode->AddProperty("Bounding Shape.Handle Size Factor", mitk::DoubleProperty::New(0.02));
   boundingBoxNode->SetBoolProperty("pickable", true);

@@ -226,7 +226,26 @@ namespace mitk
     bool IsEmpty() const { return m_Properties.empty(); }
     virtual void Clear();
 
+    /**
+     * @brief Serialize the property list to JSON.
+     *
+     * @note Properties of a certain type can only be deseralized again if their type has been
+     * registered via the IPropertyDeserialization core service.
+     *
+     * @sa CoreServices
+     * @sa IPropertyDeserialization::RegisterProperty
+     */
     void ToJSON(nlohmann::json& j) const;
+
+    /**
+     * @brief Deserialize the property list from JSON.
+     *
+     * @note Properties of a certain type can only be deseralized again if their type has been
+     * registered via the IPropertyDeserialization core service.
+     *
+     * @sa CoreServices
+     * @sa IPropertyDeserialization::RegisterProperty
+     */
     void FromJSON(const nlohmann::json& j);
 
   protected:

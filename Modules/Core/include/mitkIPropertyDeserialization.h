@@ -24,6 +24,13 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \ingroup MicroServices_Interfaces
+   * \brief Interface of property deserialization service.
+   *
+   * This service allows you to register custom property types (derived from BaseProperty) for deserialization.
+   * If a property type is not registered, it cannot be deserialized, e.g. when deserializing a PropertyList.
+   */
   class MITKCORE_EXPORT IPropertyDeserialization
   {
   public:
@@ -31,6 +38,13 @@ namespace mitk
 
     virtual BaseProperty::Pointer CreateInstance(const std::string& className) = 0;
 
+    /**
+     * \brief Register a custom property type for deserialization.
+     *
+     * The module activator of the module defining a property type is a good location to register
+     * custom property types of that module. See the implementation of MitkCoreActivator for
+     * examples.
+     */
     template <typename T, typename = std::enable_if_t<std::is_base_of_v<BaseProperty, T>>>
     void RegisterProperty()
     {
@@ -38,7 +52,6 @@ namespace mitk
     }
 
   protected:
-
     virtual void InternalRegisterProperty(const BaseProperty* property) = 0;
   };
 }

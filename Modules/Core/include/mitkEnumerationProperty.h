@@ -164,7 +164,18 @@ namespace mitk
     EnumIdsContainerType &GetEnumIds();
     EnumStringsContainerType &GetEnumStrings();
 
+    /**
+     * Serializes the property to JSON.
+     * @note Classes deriving from EnumerationProperty are covered by this implementation and do not
+     * need to override this method again.
+     */
     bool ToJSON(nlohmann::json& j) const override;
+
+    /**
+     * Deserializes the property to JSON.
+     * @note Classes deriving from EnumerationProperty are covered by this implementation and do not
+     * need to override this method again.
+     */
     bool FromJSON(const nlohmann::json& j) override;
 
     using BaseProperty::operator=;

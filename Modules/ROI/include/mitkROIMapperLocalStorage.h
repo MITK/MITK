@@ -22,6 +22,8 @@ class vtkPropAssembly;
 
 namespace mitk
 {
+  /** \brief Common base class for both 2-d and 3-d %ROI mapper local storages.
+    */
   class ROIMapperLocalStorage : public Mapper::BaseLocalStorage
   {
   public:

@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkCtkPythonShell.h"
 
-#include <mitkIPythonService.h>
 #include <ctkAbstractPythonManager.h>
+#include <mitkIPythonService.h>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>

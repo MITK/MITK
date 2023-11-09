@@ -237,7 +237,7 @@ void QmitkImageCropperView::OnCreateNewBoundingBox()
     return;
   }
 
-  QString name = QString::fromStdString(imageNode->GetName() + " Bounding Shape");
+  QString name = QString::fromStdString(imageNode->GetName() + " Bounding Box");
 
   auto boundingShape = this->GetDataStorage()->GetNode(mitk::NodePredicateFunction::New([&name](const mitk::DataNode *node)
   {

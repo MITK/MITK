@@ -340,7 +340,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       if (handleSizeProperty != nullptr)
         initialHandleSize = handleSizeProperty->GetValue();
       else
-        initialHandleSize = 1.0 / 40.0;
+        initialHandleSize = 0.02;
 
       mitk::Point2D displaySize = renderer->GetDisplaySizeInMM();
       double handleSize = ((displaySize[0] + displaySize[1]) / 2.0) * initialHandleSize;

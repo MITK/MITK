@@ -228,7 +228,7 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
     if (handleSizeProperty != nullptr)
       initialHandleSize = handleSizeProperty->GetValue();
     else
-      initialHandleSize = 1.0 / 40.0;
+      initialHandleSize = 0.02;
 
     double handlesize =
       ((camera->GetDistance() * std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()))) / 2.0) *

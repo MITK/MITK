@@ -136,7 +136,8 @@ void mitk::MonaiLabelTool::ClearSeeds()
 
 bool mitk::MonaiLabelTool::IsMonaiServerOn(std::string &hostName, int &port)
 {
-  httplib::Client cli(hostName, port);
+  httplib::SSLClient cli(hostName, port);
+  cli.enable_server_certificate_verification(false);
   while (cli.is_socket_open());
   if (auto response = cli.Get("/info/"))
   {
@@ -249,7 +250,8 @@ void mitk::MonaiLabelTool::GetOverallInfo(std::string &hostName, int &port)
     Tool::ErrorMessage.Send(m_SERVER_503_ERROR_TEXT);
     mitkThrow() << m_SERVER_503_ERROR_TEXT;
   }
-  httplib::Client cli(hostName, port);
+  httplib::SSLClient cli(hostName, port);
+  cli.enable_server_certificate_verification(false);
   if (auto response = cli.Get("/info/"))
   {
     if (response->status == 200)
@@ -309,8 +311,9 @@ void mitk::MonaiLabelTool::PostInferRequest(std::string &hostName,
     items.push_back({"params", "{\"restore_label_idx\": true}", "", ""});
   }
   items.push_back({"file", buffer_lf_img.str(), "post_from_mitk.nii.gz", "application/octet-stream"});
-  httplib::Client cli(hostName, port);
+  httplib::SSLClient cli(hostName, port);
   cli.set_read_timeout(60);                      // arbitary 1 minute time-out to avoid corner cases.
+  cli.enable_server_certificate_verification(false);
   if (auto response = cli.Post(postPath, items))
   {
     if (response->status == 200)

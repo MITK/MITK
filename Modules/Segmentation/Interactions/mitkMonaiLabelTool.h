@@ -12,6 +12,7 @@ found in the LICENSE file.
 #ifndef MITKMONAILABELTOOL_H
 #define MITKMONAILABELTOOL_H
 
+#define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "mitkSegWithPreviewTool.h"
 #include <MitkSegmentationExports.h>
 #include <memory>

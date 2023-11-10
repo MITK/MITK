@@ -121,7 +121,7 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
   }
   else
   {
-    this->WriteStatusMessage("Auto-segmentation model selected. Please click on Preview. Label selection will be ignored.\n");
+    this->WriteStatusMessage("Auto-segmentation model selected. Please click on Preview.\n");
     m_Controls.previewButton->setEnabled(true);
     this->DisplayWidgets(true);
   }
@@ -175,7 +175,7 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
     {
       tool->GetOverallInfo(hostName, port);
       bool allowAllModels = m_Preferences->GetBool("monailabel allow all models", false);
-      PopulateUI(allowAllModels);
+      this->PopulateUI(allowAllModels);
     }
     catch (const mitk::Exception &e)
     {
@@ -250,7 +250,7 @@ void QmitkMonaiLabelToolGUI::PopulateUI(bool allowAllModels)
     autoModels.insert(autoModels.end(), interactiveModels.begin(), interactiveModels.end());
     this->WriteStatusMessage(QString::fromStdString(response));
     m_Controls.appBox->addItem(QString::fromStdString(response));
-    PopulateModelBox(autoModels, allowAllModels);
+    this->PopulateModelBox(autoModels, allowAllModels);
     m_Controls.modelBox->setCurrentIndex(-1);
   }
 }
@@ -306,6 +306,6 @@ void QmitkMonaiLabelToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::
   if (QString::fromStdString(event.GetProperty()).startsWith("monai"))
   {
     bool allowAllModels = m_Preferences->GetBool("monailabel allow all models", false);
-    PopulateUI(allowAllModels);
+    this->PopulateUI(allowAllModels);
   }
 }

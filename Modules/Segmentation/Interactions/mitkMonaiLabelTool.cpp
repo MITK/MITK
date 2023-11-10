@@ -292,7 +292,7 @@ void mitk::MonaiLabelTool::PostInferRequest(std::string &hostName,
   buffer_lf_img << input.rdbuf();
   input.close();
   httplib::MultipartFormDataItems items;
-  if (m_INTERACTIVE_SEG_TYPE_NAME.find(m_RequestParameters->model.type) != m_INTERACTIVE_SEG_TYPE_NAME.end())
+  if (m_RequestParameters->model.IsInteractive())
   {
     std::stringstream foreground = this->GetPointsAsListString(baseGeometry, m_PointSetPositive);
     std::stringstream background = this->GetPointsAsListString(baseGeometry, m_PointSetNegative);

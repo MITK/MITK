@@ -184,10 +184,13 @@ void mitk::ROIIO::Write()
 
   nlohmann::ordered_json j = {
     { "FileFormat", "MITK ROI" },
-    { "Version", 1 },
-    { "Name", input->GetProperty("name")->GetValueAsString() },
-    { "Geometry", WriteGeometry(input->GetTimeGeometry()) }
+    { "Version", 1 }
   };
+
+  if (auto name = input->GetProperty("name"); name.IsNotNull())
+    j["Name"] = name->GetValueAsString();
+
+  j["Geometry"] = WriteGeometry(input->GetTimeGeometry());
 
   auto caption = input->GetConstProperty("caption");
 

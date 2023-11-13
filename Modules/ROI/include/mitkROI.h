@@ -20,6 +20,8 @@ namespace mitk
 {
   /** \brief A collection of region of interests (ROIs).
     *
+    * \note This class is considered experimental and subject to substational change. We mean it.
+    *
     * ROIs, essentially defined by the minimum and maximum index coordinates of an axis-aligned box, are
     * represented by the nested ROI::Element class. These index coordinates are relative to a common
     * TimeGeometry.

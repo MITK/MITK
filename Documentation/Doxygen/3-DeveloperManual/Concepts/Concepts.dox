@@ -14,7 +14,7 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage ReaderWriterPage
  -# \subpage MitkImagePage
  -# \subpage MITKSegmentationTaskListsPage
- -# \subpage MITKROIsPage
+ -# \subpage MITKROIPage
  -# \subpage PropertiesPage
  -# \subpage GeometryOverviewPage
  -# \subpage PipelineingConceptPage

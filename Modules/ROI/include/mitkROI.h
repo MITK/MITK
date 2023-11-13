@@ -51,7 +51,7 @@ namespace mitk
     *   - \c font.bold (BoolProperty) Bold font style
     *   - \c font.italic (BoolProperty) Italic font style
     *
-    * See \ref MITKROIsPage for details on the JSON-based MITK %ROI file format.
+    * See \ref MITKROIPage for details on the JSON-based MITK %ROI file format.
     */
   class MITKROI_EXPORT ROI : public BaseData
   {

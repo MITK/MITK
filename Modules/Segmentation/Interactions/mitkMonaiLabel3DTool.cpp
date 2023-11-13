@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkMonaiLabel3DTool.h"
 
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>

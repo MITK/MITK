@@ -17,6 +17,9 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 #include <nlohmann/json.hpp>
 #include <thread>
+#include <chrono>
+
+using namespace std::chrono_literals;
 
 class mitkRESTServerHttpLibTestSuite : public mitk::TestFixture
 {
@@ -35,7 +38,9 @@ public:
             { res.set_content("Hello World from MITK!", "text/plain"); });
     std::future<void> ft = std::async(std::launch::async, [&]() { svr.listen("localhost", 8080); });
     while (!svr.is_running())
-      ;
+    {
+      std::this_thread::sleep_for(100ms);
+    }
     CPPUNIT_ASSERT_MESSAGE("Server is running", svr.is_running());
     svr.stop();
   }
@@ -65,8 +70,9 @@ public:
             });
     std::future<void> ft = std::async(std::launch::async, [&]() { svr.listen("localhost", 8080); });
     while (!svr.is_running())
-      ;
-
+    {
+      std::this_thread::sleep_for(100ms);
+    }
     httplib::Client cli("http://localhost:8080");
     try
     {

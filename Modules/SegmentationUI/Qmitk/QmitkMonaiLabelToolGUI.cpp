@@ -26,12 +26,32 @@ namespace
     auto *preferencesService = mitk::CoreServices::GetPreferencesService();
     return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   }
-} // namespace
+}
+
+const QString QmitkMonaiLabelToolGUI::CONFIRM_QUESTION_TEXT =
+  "Data will be sent to the processing server devoid of any patient information. Are you sure you want continue?";
+
+const QStringList QmitkMonaiLabelToolGUI::WHITELISTED_MODELS = {
+  "deepgrow_2d",
+  "deepgrow_3d",
+  "deepedit_seg",
+  "localization_vertebra",
+  "segmentation",
+  "segmentation_spleen",
+  "segmentation_vertebra",
+  "deepgrow_pipeline",
+  "vertebra_pipeline"
+};
+const QStringList QmitkMonaiLabelToolGUI::BLACKLISTED_MODELS = {
+  "deepedit",
+  "localization_spine",
+};
 
 QmitkMonaiLabelToolGUI::QmitkMonaiLabelToolGUI(int dimension)
-  : QmitkMultiLabelSegWithPreviewToolGUIBase(), m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
+  : QmitkMultiLabelSegWithPreviewToolGUIBase(),
+    m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc),
+    m_Dimension(dimension)
 {
-  m_Dimension = dimension;
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   { return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false; };
   m_Preferences = GetPreferences();
@@ -111,8 +131,7 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
     return;
   }
   m_Controls.labelListLabel->clear();
-  std::string _modelName = modelName.toStdString();
-  mitk::MonaiModelInfo model = tool->GetModelInfoFromName(_modelName);
+  mitk::MonaiModelInfo model = tool->GetModelInfoFromName(modelName.toStdString());
   if (model.IsInteractive())
   {
     this->WriteStatusMessage("Interactive model selected. Please press SHIFT + click on the render windows.\n");
@@ -125,8 +144,8 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
     m_Controls.previewButton->setEnabled(true);
     this->DisplayWidgets(true);
   }
-  std::string selectedModel = m_Controls.modelBox->currentText().toStdString();
-  for (const mitk::MonaiModelInfo &modelObject : tool->m_InfoParameters->models)
+  auto selectedModel = m_Controls.modelBox->currentText().toStdString();
+  for (const auto &modelObject : tool->m_InfoParameters->models)
   {
     if (modelObject.name == selectedModel)
     {
@@ -152,8 +171,7 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
 {
   m_Controls.previewButton->setEnabled(false);
   m_Controls.labelListLabel->clear();
-  QMessageBox::StandardButton reply;
-  reply = QMessageBox::question(this, "Confirm", m_CONFIRM_QUESTION_TEXT, QMessageBox::Yes | QMessageBox::No);
+  auto reply = QMessageBox::question(this, "Confirm", CONFIRM_QUESTION_TEXT, QMessageBox::Yes | QMessageBox::No);
   if (reply == QMessageBox::No)
   {
     MITK_INFO << "Didn't went ahead with Monai Label inferencing";
@@ -199,7 +217,7 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
     return;
   }
   std::string selectedModel = m_Controls.modelBox->currentText().toStdString();
-  for (const mitk::MonaiModelInfo &modelObject : tool->m_InfoParameters->models)
+  for (const auto &modelObject : tool->m_InfoParameters->models)
   {
     if (modelObject.name == selectedModel)
     {
@@ -244,9 +262,9 @@ void QmitkMonaiLabelToolGUI::PopulateUI(bool allowAllModels)
   m_Controls.appBox->clear();
   if (nullptr != tool->m_InfoParameters)
   {
-    std::string response = tool->m_InfoParameters->name;
-    std::vector<mitk::MonaiModelInfo> autoModels = tool->GetAutoSegmentationModels(m_Dimension);
-    std::vector<mitk::MonaiModelInfo> interactiveModels = tool->GetInteractiveSegmentationModels(m_Dimension);
+    auto response = tool->m_InfoParameters->name;
+    auto autoModels = tool->GetAutoSegmentationModels(m_Dimension);
+    auto interactiveModels = tool->GetInteractiveSegmentationModels(m_Dimension);
     autoModels.insert(autoModels.end(), interactiveModels.begin(), interactiveModels.end());
     this->WriteStatusMessage(QString::fromStdString(response));
     m_Controls.appBox->addItem(QString::fromStdString(response));
@@ -258,7 +276,7 @@ void QmitkMonaiLabelToolGUI::PopulateUI(bool allowAllModels)
 void QmitkMonaiLabelToolGUI::PopulateModelBox(std::vector<mitk::MonaiModelInfo> models, bool allowAllModels)
 {
   m_Controls.modelBox->clear();
-  for (auto &model : models)
+  for (const auto &model : models)
   {
     QString modelName = QString::fromStdString(model.name);
     if (allowAllModels)
@@ -292,18 +310,16 @@ void QmitkMonaiLabelToolGUI::WriteErrorMessage(const QString &message)
   qApp->processEvents();
 }
 
-void QmitkMonaiLabelToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)
+void QmitkMonaiLabelToolGUI::ShowErrorMessage(const std::string &message)
 {
   this->setCursor(Qt::ArrowCursor);
-  QMessageBox *messageBox = new QMessageBox(icon, nullptr, message.c_str());
-  messageBox->exec();
-  delete messageBox;
+  QMessageBox::critical(nullptr, "MONAI Label", message.c_str());
   MITK_WARN << message;
 }
 
 void QmitkMonaiLabelToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event)
 {
-  if (QString::fromStdString(event.GetProperty()).startsWith("monai"))
+  if (event.GetProperty().rfind("monai", 0) == 0)
   {
     bool allowAllModels = m_Preferences->GetBool("monailabel allow all models", false);
     this->PopulateUI(allowAllModels);

@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 // MITK
 #include "mitkMonaiLabel2DTool.h"
+#include <mitkIOUtil.h>
+#include <mitkImageReadAccessor.h>
 
 // us
-#include "mitkIOUtil.h"
-#include <mitkImageReadAccessor.h>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>
@@ -62,7 +62,7 @@ void mitk::MonaiLabel2DTool::OnAddPositivePoint(StateMachineAction *, Interactio
       this->ClearSeeds();
       this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
       this->ResetPreviewContentAtTimeStep(
-        RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint());
+        RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimeStep());
     }
     if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
     {
@@ -103,31 +103,30 @@ void mitk::MonaiLabel2DTool::OnAddNegativePoint(StateMachineAction *, Interactio
 
 void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, std::string &inputImagePath)
 {
-  mitk::Image::Pointer extendedImg = mitk::Image::New();
-  unsigned int dim[] = {inputAtTimeStep->GetDimension(0), inputAtTimeStep->GetDimension(1), 1};
+  Image::Pointer extendedImage = Image::New();
+  std::array<unsigned int, 3> dim = {inputAtTimeStep->GetDimension(0), inputAtTimeStep->GetDimension(1), 1};
   mitk::PixelType pt = inputAtTimeStep->GetPixelType();
-  extendedImg->Initialize(pt, 3, dim);
+  extendedImage->Initialize(pt, 3, dim.data());
 
-  mitk::ImageReadAccessor newMitkImgAcc(inputAtTimeStep);
-  extendedImg->SetVolume(newMitkImgAcc.GetData());
+  ImageReadAccessor readAccessor(inputAtTimeStep);
+  extendedImage->SetVolume(readAccessor.GetData());
 
-  IOUtil::Save(extendedImg.GetPointer(), inputImagePath);
+  IOUtil::Save(extendedImage.GetPointer(), inputImagePath);
 }
 
 std::stringstream mitk::MonaiLabel2DTool::GetPointsAsListString(const mitk::BaseGeometry *baseGeometry,
                                                                 PointSet::Pointer pointSet)
 {
-  MITK_INFO << "No.of points: " << pointSet->GetSize();
   std::stringstream pointsAndLabels;
   pointsAndLabels << "[";
-  mitk::PointSet::PointsConstIterator pointSetItPos = pointSet->Begin();
+  auto pointSetItPos = pointSet->Begin();
   const char COMMA = ',';
   while (pointSetItPos != pointSet->End())
   {
-    mitk::Point3D point3d = pointSetItPos.Value();
+    auto point3d = pointSetItPos.Value();
     if (baseGeometry->IsInside(point3d))
     {
-      mitk::Point3D index3D;
+      Point3D index3D;
       baseGeometry->WorldToIndex(point3d, index3D);
       pointsAndLabels << "[";
       pointsAndLabels << static_cast<int>(index3D[0]) << COMMA << static_cast<int>(index3D[1]) << COMMA << 0 << "],";

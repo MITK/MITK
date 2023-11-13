@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKMONAILABEL3DTOOL_H
-#define MITKMONAILABEL3DTOOL_H
+#ifndef mitkMonaiLabel3DTool_h
+#define mitkMonaiLabel3DTool_h
 
 #include "mitkMonaiLabelTool.h"
 #include <MitkSegmentationExports.h>

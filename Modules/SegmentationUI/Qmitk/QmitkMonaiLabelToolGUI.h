@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkMonaiLabelToolGUI_h_Included
-#define QmitkMonaiLabelToolGUI_h_Included
+#ifndef QmitkMonaiLabelToolGUI_h
+#define QmitkMonaiLabelToolGUI_h
 
 #include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
 #include "ui_QmitkMonaiLabelToolGUIControls.h"
@@ -58,7 +58,7 @@ protected:
   /**
    * @brief Creates a QMessage object and shows on screen.
    */
-  void ShowErrorMessage(const std::string &, QMessageBox::Icon = QMessageBox::Critical);
+  void ShowErrorMessage(const std::string &message);
 
   /**
    * @brief Function to listen to tool class status emitters.
@@ -78,7 +78,7 @@ protected:
   /**
    * @brief Helper function to populate required server metadata into UI
    */
-  void PopulateUI(bool);
+  void PopulateUI(bool allowAllModels);
 
 private:
   mitk::IPreferences *m_Preferences;
@@ -86,23 +86,9 @@ private:
   bool m_FirstPreviewComputation = true;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
   int m_Dimension;
-  QString m_CONFIRM_QUESTION_TEXT =
-    "Data will be sent to the processing server devoid of any patient information. Are you sure you want continue?";
-  const QStringList WHITELISTED_MODELS = {
-    "deepgrow_2d",
-    "deepgrow_3d",
-    "deepedit_seg",
-    "localization_vertebra",
-    "segmentation",
-    "segmentation_spleen",
-    "segmentation_vertebra",
-    "deepgrow_pipeline",
-    "vertebra_pipeline,"
-  };
-  const QStringList BLACKLISTED_MODELS = {
-    "deepedit",
-    "localization_spine",
-  };
+  static const QString CONFIRM_QUESTION_TEXT;
+  static const QStringList WHITELISTED_MODELS;
+  static const QStringList BLACKLISTED_MODELS;
 };
 
 #endif

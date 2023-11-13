@@ -9,8 +9,9 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QmitkMonaiLabelTool3DGUI_h_Included
-#define QmitkMonaiLabelTool3DGUI_h_Included
+
+#ifndef QmitkMonaiLabelTool3DGUI_h
+#define QmitkMonaiLabelTool3DGUI_h
 
 #include <MitkSegmentationUIExports.h>
 #include "QmitkMonaiLabelToolGUI.h"

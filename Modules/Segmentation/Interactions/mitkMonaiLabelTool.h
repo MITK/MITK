@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKMONAILABELTOOL_H
-#define MITKMONAILABELTOOL_H
+#ifndef mitkMonaiLabelTool_h
+#define mitkMonaiLabelTool_h
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "mitkSegWithPreviewTool.h"
@@ -20,8 +20,8 @@ found in the LICENSE file.
 #include <set>
 #include <httplib.h>
 #include <nlohmann/json.hpp>
-#include "mitkPointSet.h"
-#include "mitkInteractionPositionEvent.h"
+#include <mitkPointSet.h>
+#include <mitkInteractionPositionEvent.h>
 
 
 namespace us
@@ -46,20 +46,12 @@ namespace mitk
 
     inline bool operator==(const MonaiModelInfo &rhs) const
     {
-      if (this->name == rhs.name && this->type == rhs.type) // Comparing only name and type, for now.
-      {
-        return true;
-      }
-      return false;
+      return (this->name == rhs.name && this->type == rhs.type); // Comparing only name and type, for now.
     }
 
     inline bool IsInteractive() const
     {
-      if ("deepgrow" == type || "deepedit" == type)
-      {
-        return true;
-      }
-      return false;
+      return ("deepgrow" == type || "deepedit" == type);
     }
   };
 
@@ -69,13 +61,13 @@ namespace mitk
    */
   struct MonaiAppMetadata
   {
+    std::string name;
+    std::string description;
+    std::vector<std::string> labels;
+    std::string version;
     std::string hostName;
     int port;
     std::string origin;
-    std::string name;
-    std::string description;
-    std::string version;
-    std::vector<std::string> labels;
     std::vector<MonaiModelInfo> models;
   };
 
@@ -93,11 +85,8 @@ namespace mitk
 
     inline bool operator==(const MonaiLabelRequest &rhs) const
     { 
-      if (this->model == rhs.model && this->hostName == rhs.hostName && this->port == rhs.port && this->requestLabel == rhs.requestLabel)
-      {
-        return true;
-      }
-      return false;
+      return (this->model == rhs.model && this->hostName == rhs.hostName && this->port == rhs.port &&
+              this->requestLabel == rhs.requestLabel);
     }
   };
 
@@ -144,50 +133,39 @@ namespace mitk
 
     /**
      * @brief Get the Auto Segmentation Models info for the given 
-     * dimension. 
-     * 
-     * @param dim 
-     * @return std::vector<MonaiModelInfo> 
+     * dimension.
      */
-    std::vector<MonaiModelInfo> GetAutoSegmentationModels(int dim = -1);
+    std::vector<MonaiModelInfo> GetAutoSegmentationModels(int dim = -1) const;
 
     /**
      * @brief Get the Interactive Segmentation Models info for the given 
      * dimension.
-     * 
-     * @param dim 
-     * @return std::vector<MonaiModelInfo> 
      */
-    std::vector<MonaiModelInfo> GetInteractiveSegmentationModels(int dim = -1);
+    std::vector<MonaiModelInfo> GetInteractiveSegmentationModels(int dim = -1) const;
 
     /**
      * @brief Get the Scribble Segmentation Models info for the given 
      * dimension. 
-     * 
-     * @param dim 
-     * @return std::vector<MonaiModelInfo> 
      */
-    std::vector<MonaiModelInfo> GetScribbleSegmentationModels(int dim = -1);
+    std::vector<MonaiModelInfo> GetScribbleSegmentationModels(int dim = -1) const;
 
     /**
      * @brief Function to prepare the Rest request and does the POST call.
      * Writes the POST responses back to disk.
      */
-    void PostInferRequest(std::string &, int &, std::string &, std::string &, const mitk::BaseGeometry *);
-
+    void PostInferRequest(const std::string &hostName, const int &port, std::string &filePath, std::string &outFile, 
+                          const mitk::BaseGeometry *baseGeometry);
     /**
-     * @brief Helper function to get full model info object from model name.
-     * 
-     * @return MonaiModelInfo 
+     * @brief Helper function to get full model info object from model name. 
      */
-    MonaiModelInfo GetModelInfoFromName(std::string&);
+    MonaiModelInfo GetModelInfoFromName(std::string&) const;
 
     itkSetMacro(ModelName, std::string);
     itkGetConstMacro(ModelName, std::string);
     itkSetMacro(URL, std::string);
     itkGetConstMacro(URL, std::string);
-    itkSetMacro(MitkTempDir, std::string);
-    itkGetConstMacro(MitkTempDir, std::string);
+    itkSetMacro(TempDir, std::string);
+    itkGetConstMacro(TempDir, std::string);
 
     /**
      * @brief  Clears all picks and updates the preview.
@@ -241,7 +219,6 @@ namespace mitk
 
     /**
      * @brief Writes back segmentation results in 3D or 2D shape to preview LabelSetImage.
-     * 
      */
     virtual void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) = 0;
 
@@ -252,33 +229,55 @@ namespace mitk
     int m_PointSetCount = 0;
 
   private:
-    std::string m_MitkTempDir;
+    std::string m_TempDir;
+
+    /**
+     * @brief Helper function to create temp directory for writing/reading images
+     * Returns input and output file names expected as a pair.
+     * @return std::vector<std::string>
+     */
+    std::pair<std::string, std::string> CreateTempDirs(const std::string &filePattern);
 
     /**
      * @brief Helper function to get the Parts of the POST response
      * 
      * @return std::vector<std::string> 
      */
-    std::vector<std::string> getPartsBetweenBoundary(const std::string &, const std::string &);
-
+    std::vector<std::string> GetPartsBetweenBoundary(const std::string &body, const std::string &boundary);
     /**
      * @brief Converts the json GET response from the MonaiLabel server to MonaiAppMetadata object
      * 
      * @return std::unique_ptr<MonaiAppMetadata> 
      */
-    std::unique_ptr<MonaiAppMetadata> DataMapper(nlohmann::json&);
+    std::unique_ptr<MonaiAppMetadata> MapJSONToObject(nlohmann::json&);
     /**
      * @brief Applies the give std::map lookup table on the preview segmentation LabelSetImage.
      * 
      */
-    void MapLabelsToSegmentation(const mitk::LabelSetImage*, mitk::LabelSetImage*, std::map<std::string, mitk::Label::PixelType>&);
+    void MapLabelsToSegmentation(const mitk::LabelSetImage *source, mitk::LabelSetImage *dest,
+                                 std::map<std::string, mitk::Label::PixelType> &labelMap);
 
     /**
      * @brief Checks if MonaiLabel server is alive
      * 
      * @return bool 
      */
-    bool IsMonaiServerOn(std::string &, int &);
+    bool IsMonaiServerOn(const std::string &hostName, const int &port) const;
+
+    /**
+     * @brief Returns boundary string from Httplib response
+     *
+     * @return std::string
+     */
+    std::string GetBoundaryString(httplib::Result &response);
+
+    /**
+     * @brief Returns image data string from monai label overall response
+     *
+     * @return std::string
+     */
+    std::string GetResponseImageString(std::string &imagePart);
+
     std::string m_ModelName;
     std::string m_URL;
     nlohmann::json m_ResultMetadata;

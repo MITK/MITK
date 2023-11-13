@@ -271,11 +271,11 @@ void mitk::ROI::Element::SetProperty(const std::string& propertyKey, BasePropert
     if (it != m_Properties.end() && it->second.IsNotNull())
     {
       it->second->SetProperty(propertyKey, property);
+      return;
     }
-    else if (!fallBackOnDefaultContext)
-    {
+
+    if (!fallBackOnDefaultContext)
       mitkThrow() << "Context \"" << contextName << "\" does not exist!";
-    }
   }
 
   m_DefaultProperties->SetProperty(propertyKey, property);
@@ -291,11 +291,11 @@ void mitk::ROI::Element::RemoveProperty(const std::string& propertyKey, const st
     if (it != m_Properties.end() && it->second.IsNotNull())
     {
       it->second->RemoveProperty(propertyKey);
+      return;
     }
-    else if (!fallBackOnDefaultContext)
-    {
+
+    if (!fallBackOnDefaultContext)
       mitkThrow() << "Context \"" << contextName << "\" does not exist!";
-    }
   }
 
   m_DefaultProperties->RemoveProperty(propertyKey);

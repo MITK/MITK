@@ -10,7 +10,7 @@ if(MITK_USE_Eigen)
   endif()
 
   set(proj Eigen)
-  set(proj_DEPENDENCIES )
+  set(proj_DEPENDENCIES Boost)
   set(Eigen_DEPENDS ${proj})
 
   if(NOT DEFINED Eigen_DIR)
@@ -23,12 +23,14 @@ if(MITK_USE_Eigen)
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS
         ${ep_common_args}
+        "-DBoost_DIR:PATH=${Boost_DIR}"
         -DBUILD_TESTING:BOOL=ON
         -DEIGEN_BUILD_PKGCONFIG:BOOL=OFF
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS
         ${ep_common_cache_default_args}
+      DEPENDS ${proj_DEPENDENCIES}
     )
 
     set(Eigen_DIR ${ep_prefix})

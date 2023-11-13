@@ -140,7 +140,6 @@ protected:
   mitk::SimpleBarrierConstraintChecker::Pointer m_modelConstraints;
 
 private:
-  bool IsTurboFlashSequenceFlag() const;
 
   bool m_FittingInProgress;
 

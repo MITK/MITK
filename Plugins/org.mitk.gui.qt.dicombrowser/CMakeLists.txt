@@ -8,7 +8,7 @@ find_program(DCMTK_STORESCP
   NAMES storescp storescp${DCMTK_CMAKE_DEBUG_POSTFIX} storescp${CMAKE_DEBUG_POSTFIX}
   PATHS "${MITK_EXTERNAL_PROJECT_PREFIX}/bin"
   PATH_SUFFIXES Release Debug
-  DOC "Dcmtk storage provider which is used to store dicom files which are transfered over network."
+  DOC "Dcmtk storage provider which is used to store dicom files which are transferred over network."
   NO_DEFAULT_PATH
 )
 mark_as_advanced(DCMTK_STORESCP)

@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include <mitkImageTimeSelector.h>
 #include <mitkRenderingManager.h>
-#include <mitkSliceNavigationController.h>
+#include <mitkTimeNavigationController.h>
 
 mitk::Image::Pointer mitk::SegmentationHelper::GetStaticSegmentationTemplate(const Image* referenceImage)
 {

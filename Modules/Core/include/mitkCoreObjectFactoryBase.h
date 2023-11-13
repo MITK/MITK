@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkCoreObjectFactoryBase_h
 #define mitkCoreObjectFactoryBase_h
 
-// the mbilog header is necessary for CMake test drivers.
+// the mitkLog.h header is necessary for CMake test drivers.
 // Since the EXTRA_INCLUDE parameter of CREATE_TEST_SOURCELIST only
 // allows one extra include file, we specify mitkLog.h here so it will
 // be available to all classes implementing this interface.
-#include "mitkLog.h"
+#include <mitkLog.h>
 
 #include "mitkFileWriterWithInformation.h"
 #include "mitkMapper.h"

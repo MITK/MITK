@@ -300,7 +300,7 @@ void DoseVisualizationPreferencePage::OnAddPresetClicked(bool)
 
     if (!ok)
     {
-      return; //cancled by user;
+      return; //canceled by user;
     }
 
     bool uniqueName = m_Presets.find(name.toStdString()) == m_Presets.end();

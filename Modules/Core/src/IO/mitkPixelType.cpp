@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkPixelType.h"
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 mitk::PixelType::PixelType(const mitk::PixelType &other)
   : m_ComponentType(other.m_ComponentType),

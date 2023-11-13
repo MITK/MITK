@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <filesystem>
 #include <itksys/SystemTools.hxx>
+#include <regex>
 
 // us
 #include <usGetModuleContext.h>
@@ -100,6 +101,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onPythonProcessEvent);
   spExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
+  m_ProgressCommand->SetProgress(5);
 
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   inDir = IOUtil::CreateTemporaryDirectory("totalseg-in-XXXXXX", this->GetMitkTempDir());
@@ -111,21 +113,15 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   std::string token = fileName.substr(0, fileName.find("_"));
   outDir = IOUtil::CreateTemporaryDirectory("totalseg-out-XXXXXX", this->GetMitkTempDir());
   LabelSetImage::Pointer outputBuffer;
-
+  m_ProgressCommand->SetProgress(20);
   IOUtil::Save(inputAtTimeStep, inputImagePath);
+  m_ProgressCommand->SetProgress(50);
 
   outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
   const bool isSubTask = (this->GetSubTask() != DEFAULT_TOTAL_TASK);
   if (isSubTask)
   {
     outputImagePath = outDir;
-  }
-
-  this->run_totalsegmentator(
-    spExec, inputImagePath, outputImagePath, this->GetFast(), !isSubTask, this->GetGpuId(), DEFAULT_TOTAL_TASK);
-
-  if (isSubTask)
-  { // Run total segmentator again
     this->run_totalsegmentator(
       spExec, inputImagePath, outputImagePath, !isSubTask, !isSubTask, this->GetGpuId(), this->GetSubTask());
     // Construct Label Id map
@@ -138,11 +134,14 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   }
   else
   {
+    this->run_totalsegmentator(
+      spExec, inputImagePath, outputImagePath, this->GetFast(), !isSubTask, this->GetGpuId(), DEFAULT_TOTAL_TASK);
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     outputBuffer = mitk::LabelSetImage::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
     outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
   }
+  m_ProgressCommand->SetProgress(180);
   mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
   this->MapLabelsToSegmentation(outputBuffer, previewImage, m_LabelMapTotal);
   previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
@@ -228,28 +227,10 @@ void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor* spExec,
 {
   ProcessExecutor::ArgumentListType args;
   std::string command = "TotalSegmentator";
-#if defined(__APPLE__) || defined(_WIN32)
-  command = "python";
-#endif
-
-  args.clear();
-
 #ifdef _WIN32
-  std::string ending = "Scripts";
-  if (0 == this->GetPythonPath().compare(this->GetPythonPath().length() - ending.length(), ending.length(), ending))
-  {
-    args.push_back("TotalSegmentator");
-  }
-  else
-  {
-    args.push_back("Scripts/TotalSegmentator");
-  }
+  command += ".exe";
 #endif
-
-#if defined(__APPLE__)
-  args.push_back("TotalSegmentator");
-#endif
-
+  args.clear();
   args.push_back("-i");
   args.push_back(inputImagePath);
 
@@ -296,6 +277,7 @@ void mitk::TotalSegmentatorTool::ParseLabelMapTotalDefault()
 {
   if (!this->GetLabelMapPath().empty())
   {
+    std::regex sanitizer(R"([^A-Za-z0-9_])");
     std::fstream newfile;
     newfile.open(this->GetLabelMapPath(), ios::in);
     std::stringstream buffer;
@@ -305,7 +287,7 @@ void mitk::TotalSegmentatorTool::ParseLabelMapTotalDefault()
       std::string temp;
       while (std::getline(newfile, temp))
       {
-        if (line > 1 && line < 106)
+        if (line > 111 && line < 229)
         {
           buffer << temp;
         }
@@ -315,7 +297,8 @@ void mitk::TotalSegmentatorTool::ParseLabelMapTotalDefault()
     std::string key, val;
     while (std::getline(std::getline(buffer, key, ':'), val, ','))
     {
-      m_LabelMapTotal[std::stoi(key)] = val;
+      std::string sanitized = std::regex_replace(val, sanitizer, "");
+      m_LabelMapTotal[std::stoi(key)] = sanitized;
     }
   }
 }

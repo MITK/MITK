@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "berryQtPlatformLogModel.h"
 #include "berryQtLogPlugin.h"
 
-#include "mbilogLoggingTypes.h"
+#include <mitkLogLevel.h>
 
 #include <sstream>
 #include <string>
@@ -57,15 +57,14 @@ void QtPlatformLogModel::slotFlushLogEntries()
   }
 }
 
-void QtPlatformLogModel::addLogEntry(const mbilog::LogMessage &msg)
+void QtPlatformLogModel::addLogEntry(const mitk::LogMessage &msg)
 {
   m_Mutex.lock();
-  //mbilog::BackendCout::FormatSmart(msg); FormatSmart is not static any more. So commented out this statement. Todo: fix
+  //mitk::LogBackendCout::FormatSmart(msg); FormatSmart is not static any more. So commented out this statement. Todo: fix
   m_Active->push_back(ExtendedLogMessage(msg));
   m_Mutex.unlock();
 
   emit signalFlushLogEntries();
-
 }
 
 void
@@ -92,23 +91,23 @@ void QtPlatformLogModel::SetShowCategory( bool showCategory )
 void
 QtPlatformLogModel::addLogEntry(const ctkPluginFrameworkEvent& event)
 {
-  int level = mbilog::Info;
+  auto level = mitk::LogLevel::Info;
   if (event.getType() == ctkPluginFrameworkEvent::PLUGIN_ERROR)
   {
-    level = mbilog::Error;
+    level = mitk::LogLevel::Error;
   }
   else if (event.getType() == ctkPluginFrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT ||
            event.getType() == ctkPluginFrameworkEvent::PLUGIN_WARNING)
   {
-    level = mbilog::Warn;
+    level = mitk::LogLevel::Warn;
   }
 
-  mbilog::LogMessage msg(level,"n/a",-1,"n/a");
+  mitk::LogMessage msg(level,"n/a",-1,"n/a");
 
   QString str;
   QDebug dbg(&str);
   dbg << event;
-  msg.message = str.toStdString();
+  msg.Message = str.toStdString();
   //msg.moduleName = event.getPlugin()->getSymbolicName().toStdString();
 
   addLogEntry(msg);
@@ -130,7 +129,7 @@ QtPlatformLogModel::~QtPlatformLogModel()
   disconnect(this, SIGNAL(signalFlushLogEntries()), this, SLOT( slotFlushLogEntries() ));
   QtLogPlugin::GetInstance()->GetContext()->disconnectFrameworkListener(this);
 
-  // dont delete and unregister backend, only deactivate it to avoid thread syncronization issues cause mbilog::UnregisterBackend is not threadsafe
+  // dont delete and unregister backend, only deactivate it to avoid thread synchronization issues cause mitk::UnregisterBackend is not threadsafe
   // will be fixed.
   //  delete myBackend;
   //  delete m_Active;
@@ -173,20 +172,20 @@ QtPlatformLogModel::columnCount(const QModelIndex&) const
     QString category;
     QString function;
 
-    LogEntry(const mbilog::LogMessage &msg)
+    LogEntry(const mitk::LogMessage &msg)
     {
-      message = msg.message.c_str();
+      message = msg.Message.c_str();
 
 
       filePath = msg.filePath;
 
       std::stringstream out;
-      out << msg.lineNumber;
+      out << msg.LineNumber;
       lineNumber = out.str().c_str();
 
-      moduleName = msg.moduleName;
-      category = msg.category.c_str();
-      function = msg.functionName;
+      moduleName = msg.ModuleName;
+      category = msg.Category.c_str();
+      function = msg.FunctionName;
 
       time=std::clock();
     }
@@ -239,13 +238,13 @@ QVariant QtPlatformLogModel::data(const QModelIndex& index, int role) const
     {
       QString file ( ":/org_blueberry_ui_qt_log/information.png" );
 
-      if( msg->message.level == mbilog::Error )
+      if( msg->message.Level == mitk::LogLevel::Error )
         file = ":/org_blueberry_ui_qt_log/error.png";
-      else if( msg->message.level == mbilog::Warn )
+      else if( msg->message.Level == mitk::LogLevel::Warn )
         file = ":/org_blueberry_ui_qt_log/warning.png";
-      else if( msg->message.level == mbilog::Debug )
+      else if( msg->message.Level == mitk::LogLevel::Debug )
         file = ":/org_blueberry_ui_qt_log/debug.png";
-      else if( msg->message.level == mbilog::Fatal )
+      else if( msg->message.Level == mitk::LogLevel::Fatal )
         file = ":/org_blueberry_ui_qt_log/fatal.png";
 
       QIcon icon(file);
@@ -290,7 +289,7 @@ QtPlatformLogModel::headerData(int section, Qt::Orientation orientation, int rol
         case 6: return QVariant(" Line ");
       }
     }
-    else //!m_ShowAdvancedFiels, m_ShowCategory is not handled seperately because it only activates case 2
+    else //!m_ShowAdvancedFiels, m_ShowCategory is not handled separately because it only activates case 2
     {
       switch (section)
       {

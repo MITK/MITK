@@ -22,7 +22,7 @@ namespace mitk
 
   /** @class ExpDecayOffsetModel
    * @brief Implementation of a general exponential decay model with offset,
-   * following the function: f(x) = a * exp(-1.0 * x * b) + c.
+   * following the function: y(x) = y-intercept * exp(-rate*x) + baseline.
    */
   class MITKMODELFIT_EXPORT ExpDecayOffsetModel : public mitk::ModelBase
   {
@@ -43,6 +43,48 @@ namespace mitk
     /** Run-time type information (and related methods). */
     itkTypeMacro(ExpDecayOffsetModel, ModelBase);
 
+    static const std::string NAME_PARAMETER_y0;
+    static const std::string NAME_PARAMETER_k;
+    static const std::string NAME_PARAMETER_y_bl;
+
+    static const unsigned int NUMBER_OF_PARAMETERS;
+
+    static const std::string UNIT_PARAMETER_y0;
+    static const std::string UNIT_PARAMETER_k;
+    static const std::string UNIT_PARAMETER_y_bl;
+
+    static const unsigned int POSITION_PARAMETER_y0;
+    static const unsigned int POSITION_PARAMETER_k;
+    static const unsigned int POSITION_PARAMETER_y_bl;
+
+    static const unsigned int NUMBER_OF_STATIC_PARAMETERS;
+
+    static const std::string MODEL_DISPLAY_NAME;
+
+    static const std::string MODEL_TYPE;
+
+    static const std::string FUNCTION_STRING;
+
+    static const std::string X_NAME;
+
+    static const std::string X_AXIS_NAME;
+
+    static const std::string X_AXIS_UNIT;
+
+    static const std::string Y_AXIS_NAME;
+
+    static const std::string Y_AXIS_UNIT;
+
+    ParameterNamesType GetParameterNames() const override;
+
+    ParametersSizeType  GetNumberOfParameters() const override;
+
+    ParamterUnitMapType GetParameterUnits() const override;
+
+    ParameterNamesType GetStaticParameterNames() const override;
+
+    ParametersSizeType GetNumberOfStaticParameters() const override;
+
     std::string GetModelDisplayName() const override;
 
     std::string GetModelType() const override;
@@ -51,13 +93,13 @@ namespace mitk
 
     std::string GetXName() const override;
 
-    ParameterNamesType GetParameterNames() const override;
+    std::string GetXAxisName() const override;
 
-    ParametersSizeType  GetNumberOfParameters() const override;
+    std::string GetXAxisUnit() const override;
 
-    ParameterNamesType GetStaticParameterNames() const override;
+    std::string GetYAxisName() const override;
 
-    ParametersSizeType GetNumberOfStaticParameters() const override;
+    std::string GetYAxisUnit() const override;
 
   protected:
     ExpDecayOffsetModel() {};

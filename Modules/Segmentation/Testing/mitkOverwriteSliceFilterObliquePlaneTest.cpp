@@ -227,7 +227,7 @@ int mitkOverwriteSliceFilterObliquePlaneTest(int, char *[])
   imgRegion.SetIndex(start);
 
   image->SetRegions(imgRegion);
-  image->SetSpacing(1.0);
+  image->SetSpacing(mitk::Vector(1.0));
   image->Allocate();
 
   ImageIterator imageIterator(image, image->GetLargestPossibleRegion());

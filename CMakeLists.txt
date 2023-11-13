@@ -26,6 +26,10 @@ endif()
  ]]
 cmake_policy(SET CMP0091 OLD)
 
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 NEW) # https://cmake.org/cmake/help/v3.24/policy/CMP0135.html
+endif()
+
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #-----------------------------------------------------------------------------
@@ -37,7 +41,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2023.04.00)
+  project(MITK VERSION 2023.04.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -572,8 +576,55 @@ endforeach()
 #-----------------------------------------------------------------------------
 
 if(OpenSSL_FOUND AND WIN32)
-  set(MITK_OPENSSL_SSL_DLL "" CACHE FILEPATH "")
-  set(MITK_OPENSSL_CRYPTO_DLL "" CACHE FILEPATH "")
+  #[[ On Windows, CMake is able to locate the link libraries for OpenSSL but it
+      does not look for the corresponding DLLs that we need to copy to our
+      binary directories and include in packaging.
+
+      Setting these paths manually is cumbersome so we try to use a simple
+      heuristic to automatically set them:
+
+        - Based on the link libraries (usually located in a lib folder),
+          try to find the "../bin" binary directory.
+        - Use the base file names of the link libraries to find corresponding
+          DLLs like "<base name>*.dll", that usually are named like
+          "<base name>-1_1-x64.dll" or similar.
+   ]]
+  set(openssl_ssl_dll "")
+  set(openssl_crypto_dll "")
+
+  if(OPENSSL_SSL_LIBRARY AND EXISTS "${OPENSSL_SSL_LIBRARY}")
+    get_filename_component(openssl_bin_dir "${OPENSSL_SSL_LIBRARY}" DIRECTORY)
+    get_filename_component(openssl_bin_dir "${openssl_bin_dir}" DIRECTORY)
+    set(openssl_bin_dir "${openssl_bin_dir}/bin")
+
+    if(EXISTS "${openssl_bin_dir}")
+      get_filename_component(openssl_ssl_basename "${OPENSSL_SSL_LIBRARY}" NAME_WE)
+      file(GLOB openssl_ssl_dll "${openssl_bin_dir}/${openssl_ssl_basename}*.dll")
+      list(LENGTH openssl_ssl_dll num_findings)
+      if(num_findings GREATER 1)
+        set(openssl_ssl_dll "")
+      endif()
+
+      get_filename_component(openssl_crypto_basename "${OPENSSL_CRYPTO_LIBRARY}" NAME_WE)
+      file(GLOB openssl_crypto_dll "${openssl_bin_dir}/${openssl_crypto_basename}*.dll")
+      list(LENGTH openssl_crypto_dll num_findings)
+      if(num_findings GREATER 1)
+        set(openssl_crypto_dll "")
+      endif()
+    endif()
+  endif()
+
+  set(MITK_OPENSSL_SSL_DLL "${openssl_ssl_dll}" CACHE FILEPATH "")
+
+  if(DEFINED CACHE{MITK_OPENSSL_SSL_DLL} AND NOT MITK_OPENSSL_SSL_DLL AND openssl_ssl_dll)
+    set(MITK_OPENSSL_SSL_DLL "${openssl_ssl_dll}" CACHE FILEPATH "" FORCE)
+  endif()
+
+  set(MITK_OPENSSL_CRYPTO_DLL "${openssl_crypto_dll}" CACHE FILEPATH "")
+
+  if(DEFINED CACHE{MITK_OPENSSL_CRYPTO_DLL} AND NOT MITK_OPENSSL_CRYPTO_DLL AND openssl_crypto_dll)
+    set(MITK_OPENSSL_CRYPTO_DLL "${openssl_crypto_dll}" CACHE FILEPATH "" FORCE)
+  endif()
 
   if(MITK_OPENSSL_SSL_DLL AND EXISTS "${MITK_OPENSSL_SSL_DLL}" AND MITK_OPENSSL_CRYPTO_DLL AND EXISTS "${MITK_OPENSSL_CRYPTO_DLL}")
     foreach(config_type ${CMAKE_CONFIGURATION_TYPES})

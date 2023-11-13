@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 /**
  * \brief QPushButton for freezing and unfreezing a combined modality.
- * The button already has an icon and a text. On every successfull
+ * The button already has an icon and a text. On every successful
  * freeze or unfreeze the signal SignalFrezzed() is emitted. One should
  * listen to this signal rather than to the clicked() signal of the
  * QPushButton as the combined modality may not be freezed after

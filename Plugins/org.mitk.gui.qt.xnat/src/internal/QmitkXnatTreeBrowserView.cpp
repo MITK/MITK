@@ -459,8 +459,8 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
   QDir rootDownloadDir(m_DownloadPath);
   if(isDirWriteable(rootDownloadDir) == false)
   {
-    MITK_INFO << "Download directory access permission unsufficient! " << m_DownloadPath;
-    QMessageBox::critical(nullptr,"Download directory access permission unsufficient!",
+    MITK_INFO << "Download directory access permission insufficient! " << m_DownloadPath;
+    QMessageBox::critical(nullptr,"Download directory access permission insufficient!",
                           "You have no permission to write to selected download directory " + m_DownloadPath +"!\n\nChange Download Path in Settings!");
     QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
     _PreferencesDialog.SetSelectedPage("org.mitk.gui.qt.application.XnatConnectionPreferencePage");
@@ -660,7 +660,7 @@ void QmitkXnatTreeBrowserView::InternalDICOMDownload(ctkXnatObject *obj, QDir &D
 
   this->SetStatusInformation("Downloading DICOM series " + obj->parent()->name());
   // In case of DICOM zip download we do not know the total file size
-  // Because of that the dowload progres cannot be calculated
+  // Because of that the download progress cannot be calculated
   // Because of that we use the busy indicator of the progress bar by setting min and max to 0
   m_Controls.progressBar->setMinimum(0);
   m_Controls.progressBar->setMaximum(0);

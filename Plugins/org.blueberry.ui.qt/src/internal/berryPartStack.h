@@ -411,7 +411,7 @@ public:
     protected: WorkbenchPage::Pointer GetPage();
 
     /**
-     * Set the active appearence on the tab folder.
+     * Set the active appearance on the tab folder.
      *
      * @param active
      */

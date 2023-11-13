@@ -51,7 +51,7 @@ void QmitkOrbitAnimationItem::Animate(double s)
   if (renderWindow == nullptr)
     return;
 
-  mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice();
+  mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetStepper();
 
   if (stepper == nullptr)
     return;

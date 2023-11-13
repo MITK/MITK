@@ -115,7 +115,7 @@ Groups can be <b>locked</b> and <b>unlocked</b> as a whole from their context me
 \section org_mitk_views_segmentationlabelsuggestions Label name and color suggestions
 
 When renaming label instances or creating new label instances with enforced manual naming in the Segmentation preferences, entering names is supported by auto-completion for common label names.
-The list of predefined label names and colors for the auto-completion feature can be either extented or replaced by a custom list of label name and color suggestions.
+The list of predefined label names and colors for the auto-completion feature can be either extended or replaced by a custom list of label name and color suggestions.
 This custom list must be specified as a JSON file, just containing an array of objects, each with a mandatory "name" string and an optional "color" string.
 The JSON file can be set in the Segmentation preferences as well as a few options on how to apply these suggestions.
 
@@ -131,9 +131,10 @@ The actual pixel contents of label instances are unaffected as label set presets
 
 \imageMacro{QmitkSegmentation_Preset.png,"Saving and loading label set presets", 10.00}
 
-\subsection org_mitk_views_segmentationdefaultlabelpresets Applying label set presets by default
+If you work on a repetitive segmentation task, manually loading the same label set preset for each and every new segmentation can be tedious.
+To streamline your workflow, you can set a default label set preset in the Segmentation preferences (Ctrl+P). When set, this label set preset will be applied to all new segmentations instead of creating the default red "Label 1" label instance.
 
-If you work on a repetetive segmentation task, manually loading the same label set preset for each and every new segmentation can be tedious.
+If you work on a repetitive segmentation task, manually loading the same label set preset for each and every new segmentation can be tedious.
 To streamline your workflow, you can set a default label set preset in the Segmentation preferences (Ctrl+P). When set, this label set preset will be applied to all new segmentations instead of creating the default red "Label 1" label instance.
 
 \section org_mitk_views_segmentationpreferences Preferences
@@ -258,10 +259,36 @@ The Live Wire Tool acts as a magnetic lasso with a contour snapping to edges of 
 
 The tool handling is the same like the Lasso tool (see for more info), except it generates live wire contours instead of straight lines.
 
+\subsection org_mitk_views_segmentationSegmentAnything Segment Anything Tool
+
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"Segment Anything tool",10.00}
+
+\imageMacro{QmitkSegmentation_SAMTool.png,"Segment Anything tool",10.00}
+
+The Segment Anything Tool is a deep learning-based interactive segmentation tool. Originally created by MetaAI, MITK presents this model for medical image segmentation tasks.
+The tool requires that you have Python 3 installed and available on your machine. Note: On Debian/Ubuntu systems, you need to install git, python3-pip, python3-venv package using the following command: `apt install git python3-pip python3-venv`. For best experience, your machine should be ideally equipped with a CUDA-enabled GPU. 
+For a detailed explanation of what this algorithm is able to, please refer to https://ai.facebook.com/research/publications/segment-anything/ <br>
+Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow setting impacts the segmentation. However, any applied color maps are ignored.
+
+\subsubsection org_mitk_views_segmentationSegmentAnythingWorkflow Workflow:
+    -# Install Segment Anything: Goto Preferences (Cntl+P) > Segment Anything and click "Install Segment Anything" to install Segment Anything (version: 1.0). 
+    The installation process implicitly creates a python virtual environment using the Python located in "System Python" in an MITK mainitained directory. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    Once installed, the "Install Segment Anything" button is grayed out.
+    \imageMacro{QmitkSegmentation_SAMTool_Preferences.png,"Segment Anything Preferences",10.00}
+
+    -# Note: If Python is not listed by MITK in "System Python", click "Select..." in the dropdown to choose an unlisted installation of Python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".
+    No need to navigate all the way into "../usr/bin/python3", for example.
+    -# Select a specific model type in the "Model Type" dropdown. The default is "vit_b" for low memory footprint. However, more larger models "vit_l" and "vit_h" are also available for selection.
+    -# Select inference hardware, i.e. any GPU or CPU. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
+    -# Click "OK" to save the preference settings.
+    -# Goto Segmentation View > 2D tools > Segment Anything.
+    -# Click "Initialize Segment Anything" to start the tool backend. This will invoke downloading of the selected model type from the internet. This might take a while. It is a one time job, though.
+    -# Once the tool is initialized, Press SHIFT+Left Click on any of the 3 render windows to start click guided segmentation on that slice.
+    -# Press SHIFT+Right Click for negative clicks to adjust the preview mask on the render window.
+
 \subsection org_mitk_views_segmentationinterpolation 2D and 3D Interpolation
 
 Creating segmentations using 2D manual contouring for large image volumes may be very time-consuming, because structures of interest may cover a large range of slices.
-Note: Interpolation is currently disabled for segmentations containing more than one label.
 The segmentation view offers two helpful features to mitigate this drawback:
 
 <ul>
@@ -392,14 +419,14 @@ Remark: The tool assumes that you have a Python3 environment with nnU-Net v1 (pi
 
 \imageMacro{QmitkSegmentation_nnUnetTool.png,"TotalSegmentator tool",10.00}
 
-This tool provides a GUI to the deep learning-based segmentation algorithm called the TotalSegmentator. With this tool, you can get a segmentation mask predicted for 104 classes in CT images, loaded in MITK. 
+This tool provides a GUI to the deep learning-based segmentation algorithm called the TotalSegmentator (v2). With this tool, you can get a segmentation mask predicted for 117 classes in CT images, loaded in MITK. 
 For a detailed explanation on tasks and supported classes etc., please refer to https://github.com/wasserth/TotalSegmentator <br>
-The tool assumes that you have Python 3 installed and available on your machine. We recommend to install TotalSegmentator via MITK. The "Install TotalSegmentator" action implicitly creates a python virtual environment in an MITK mainitained
+The tool assumes that you have Python >= 3.9 installed and available on your machine. We recommend to install TotalSegmentator via MITK. The "Install TotalSegmentator" action implicitly creates a python virtual environment in an MITK mainitained
 directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv package using the following command:  `apt install python3-venv`. For best results, your machine should be ideally equipped with a CUDA-enabled GPU. 
 \imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator Settings",5}
 
 \subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow:
-    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 1.5.5) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 2.0.5) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
     Once installed, the "Install TotalSegmentator" button is grayed out.
     -# If Python is not found by MITK goto "Install Options" & select the "System Python Path" drop-down to see if MITK has automatically detected other Python environments.
     Click on a fitting Python installation for TotalSegmentator to use or click "Select" in the dropdown to choose an unlisted installation of Python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".

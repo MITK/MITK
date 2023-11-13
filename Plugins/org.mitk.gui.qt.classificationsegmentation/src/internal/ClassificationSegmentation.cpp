@@ -519,7 +519,7 @@ std::vector<mitk::Image::Pointer> ClassificationSegmentation::ManualSegmentation
 
   if(raw_image.IsNull() || mask_image.IsNull())
   {
-    MITK_WARN << "Please provide input iamge and mask image";
+    MITK_WARN << "Please provide input image and mask image";
     //return nullptr;
   }
 
@@ -809,7 +809,7 @@ std::vector<mitk::Image::Pointer> ClassificationSegmentation::PostProcessingCall
   mitk::Image::Pointer BRA_PMap = m_ResultImageVector[3]->Clone();
   mitk::Image::Pointer mask = m_ResultImageVector[0]->Clone();
 
-  MITK_INFO("PostProcessingCallback") << "ProbabilityMap merg strat ...";
+  MITK_INFO("PostProcessingCallback") << "ProbabilityMap merge start ...";
 
   {
     mitk::Image::Pointer resultmask = mask->Clone();
@@ -862,7 +862,7 @@ std::vector<mitk::Image::Pointer> ClassificationSegmentation::PostProcessingCall
       mitk::CLUtil::ClosingBinary(brain_mask,brain_mask,2,mitk::CLUtil::All);
       mitk::CLUtil::LogicalAndImages(resultmask, brain_mask, resultmask);
     }
-    MITK_INFO("PostProcessingCallback") << "ProbabilityMap merg end!";
+    MITK_INFO("PostProcessingCallback") << "ProbabilityMap merge end!";
 
     resultvector.push_back(resultmask);
   }
@@ -870,7 +870,7 @@ std::vector<mitk::Image::Pointer> ClassificationSegmentation::PostProcessingCall
   return resultvector;
 
   //  {
-  //    MITK_INFO << "Morphological processing strat ...";
+  //    MITK_INFO << "Morphological processing start ...";
   //    mitk::Image::Pointer resultmask =  mask->Clone();
 
   //    mitk::Image::Pointer csf_mask;

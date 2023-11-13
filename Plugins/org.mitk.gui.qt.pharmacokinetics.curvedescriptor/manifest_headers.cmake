@@ -1,5 +1,5 @@
 set(Plugin-Name "Perfusion Curve Description Parameter Plugin")
 set(Plugin-Version "1.0")
-set(Plugin-Vendor "DKFZ, Software Development For Integrated Diagnostics and Therapy")
-set(Plugin-ContactAddress "c.debus@dkfz.de")
-set(Require-Plugin org.mitk.gui.qt.common)
+set(Plugin-Vendor "German Cancer Research Center (DKFZ) Heidelberg, Division of Medical Image Computing, Germany")
+set(Plugin-ContactAddress "Contact via www.MITK.org")
+set(Require-Plugin org.mitk.gui.qt.common org.mitk.gui.qt.pharmacokinetics.concentration.mri)

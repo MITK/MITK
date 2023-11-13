@@ -13,7 +13,8 @@ found in the LICENSE file.
 #ifndef mitkIModelProvider_h
 #define mitkIModelProvider_h
 
-
+#include <mitkDataStorage.h>
+#include <mitkIFileIO.h>
 #include <mitkServiceInterface.h>
 
 namespace mitk
@@ -44,7 +45,7 @@ namespace mitk
    *
    * \sa ModelFitProviderBase
    */
-  struct MITKCORE_EXPORT IFileReader : public IFileIO
+  struct MITKCORE_EXPORT IFileReader /** \cond */ : public IFileIO /** \endcond */
   {
     virtual ~IFileReader();
 

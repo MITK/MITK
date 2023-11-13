@@ -51,7 +51,7 @@ public:
 
   //Boolean: true; // = replace dirty editor if no other editors to reuse
   // (prompt for save);
-  //      false; // = open a new editor if no other editors to resuse
+  //      false; // = open a new editor if no other editors to reuse
   static const std::string REUSE_DIRTY_EDITORS; // = "REUSE_DIRTY_EDITORS";
 
   //On/Off option for the two preceding options.
@@ -85,7 +85,7 @@ public:
   static const std::string STICKY_CYCLE; // = "STICKY_CYCLE";
 
   //List of plugins but that extends "startup" extension point but are
-  // overriden by the user.
+  // overridden by the user.
   //std::string of plugin unique ids separated by ";"
   static const std::string PLUGINS_NOT_ACTIVATED_ON_STARTUP; // = "PLUGINS_NOT_ACTIVATED_ON_STARTUP";
 

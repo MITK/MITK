@@ -60,6 +60,7 @@ private:
   void OnTaskListChanged(mitk::SegmentationTaskList* task);
   void OnPreviousButtonClicked();
   void OnNextButtonClicked();
+  void OnFindButtonClicked();
   void OnCurrentTaskChanged();
   void UpdateLoadButton();
   void UpdateNavigationButtons();
@@ -79,6 +80,7 @@ private:
   void OnUnsavedChangesSaved();
   void OnPreviousTaskShortcutActivated();
   void OnNextTaskShortcutActivated();
+  void OnFindTaskShortcutActivated();
   void OnLoadTaskShortcutActivated();
   void OnStoreInterimResultShortcutActivated();
   void OnAcceptSegmentationShortcutActivated();

@@ -43,7 +43,7 @@ mitk::DescriptivePharmacokineticBrixModelFactory::DoCreateParameterizer(
       DescriptivePharmacokineticBrixModelParameterizer::New();
 
     modelFit::StaticParameterMap::ValueType tau = fit->staticParamMap.Get(
-          DescriptivePharmacokineticBrixModel::NAME_STATIC_PARAMETER_Tau);
+          DescriptivePharmacokineticBrixModel::NAME_STATIC_PARAMETER_tau);
     modelParameterizer->SetTau(tau[0]);
 
     mitk::ImageTimeSelector::Pointer imageTimeSelector =	mitk::ImageTimeSelector::New();
@@ -64,7 +64,7 @@ mitk::DescriptivePharmacokineticBrixModelFactory::DoCreateParameterizer(
       DescriptivePharmacokineticBrixModelValueBasedParameterizer::New();
 
     modelFit::StaticParameterMap::ValueType tau = fit->staticParamMap.Get(
-          DescriptivePharmacokineticBrixModel::NAME_STATIC_PARAMETER_Tau);
+          DescriptivePharmacokineticBrixModel::NAME_STATIC_PARAMETER_tau);
     modelParameterizer->SetTau(tau[0]);
 
     if (!fit->inputData.ValueExists("ROI"))

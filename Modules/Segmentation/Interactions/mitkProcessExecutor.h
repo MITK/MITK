@@ -86,7 +86,7 @@ namespace mitk
      * @brief Executes the process. This version assumes that the executable name is the first argument in the argument
      * list and has already been converted to its OS dependent name via the static convert function of this class.
      */
-    bool Execute(const std::string &executionPath, const ArgumentListType &argumentList);
+    virtual bool Execute(const std::string &executionPath, const ArgumentListType &argumentList);
 
     int GetExitValue();
     static std::string EnsureCorrectOSPathSeparator(const std::string &);

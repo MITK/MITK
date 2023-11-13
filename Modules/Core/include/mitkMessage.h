@@ -589,7 +589,7 @@ namespace mitk
 
 /* Here is an example how to use the macros and templates:
 *
-* // An object to be send around
+* // An object to be sent around
 * class Law
 * {
 *   private:

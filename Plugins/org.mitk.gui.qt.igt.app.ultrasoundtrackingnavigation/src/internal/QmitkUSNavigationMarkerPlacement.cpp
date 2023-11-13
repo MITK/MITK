@@ -360,7 +360,7 @@ void QmitkUSNavigationMarkerPlacement::OnTimeout()
 {
   if (m_CombinedModality.IsNull())
     return;
-  m_CombinedModality->Modified(); // shouldn't be nessecary ... fix in abstract ultrasound tracker device!
+  m_CombinedModality->Modified(); // shouldn't be necessary ... fix in abstract ultrasound tracker device!
   m_CombinedModality->Update();
   if (m_ToolVisualizationFilter.IsNotNull())
   {
@@ -590,7 +590,7 @@ void QmitkUSNavigationMarkerPlacement::OnStartExperiment()
       // initialize and register logging backend
       QString loggingFilename = m_ExperimentResultsSubDirectory + QDir::separator() + "logging.txt";
       m_LoggingBackend.SetOutputFileName(loggingFilename.toStdString());
-      mbilog::RegisterBackend(&m_LoggingBackend);
+      mitk::RegisterBackend(&m_LoggingBackend);
 
       // initialize and start navigation data recorder form xml recording
       m_NavigationDataRecorder->StartRecording();
@@ -651,7 +651,7 @@ void QmitkUSNavigationMarkerPlacement::OnFinishExperiment()
                                    << csvNavigationMessagesFilename.str();
   m_LoggingBackend.WriteCSVFileWithNavigationMessages(csvNavigationMessagesFilename.str());
 
-  mbilog::UnregisterBackend(&m_LoggingBackend);
+  mitk::UnregisterBackend(&m_LoggingBackend);
 
   m_IsExperimentRunning = false;
 
@@ -758,7 +758,7 @@ void QmitkUSNavigationMarkerPlacement::CreateOverlays()
   m_WarnOverlay->SetText("Warning: No calibration available for current depth.");
 
   // set position and font size for the text overlay
-  // (nonesense postition as a layouter is used, but it ignored
+  // (nonsense position as a layouter is used, but it ignored
   // the overlay without setting a position here)
   mitk::Point2D overlayPosition;
   overlayPosition.SetElement(0, -50.0f);

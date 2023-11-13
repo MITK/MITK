@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
+#include <mitkTimeNavigationController.h>
+
 #include <berryUIException.h>
 
 class QmitkAbstractRenderEditorPrivate
@@ -112,7 +114,7 @@ void QmitkAbstractRenderEditor::ForceImmediateUpdate(mitk::RenderingManager::Req
     GetRenderingManager()->ForceImmediateUpdateAll(requestType);
 }
 
-mitk::SliceNavigationController* QmitkAbstractRenderEditor::GetTimeNavigationController() const
+mitk::TimeNavigationController* QmitkAbstractRenderEditor::GetTimeNavigationController() const
 {
   if (GetRenderingManager())
     return GetRenderingManager()->GetTimeNavigationController();

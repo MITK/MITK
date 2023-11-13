@@ -58,7 +58,7 @@ public:
 
   SmartPointer<RegistryObject> GetObject(int id, short type) const override;
 
-  // The current impementation of this method assumes that we don't cache dynamic
+  // The current implementation of this method assumes that we don't cache dynamic
   // extension. In this case all extensions not yet loaded (i.e. not in the memory cache)
   // are "not dynamic" and we actually check memory objects to see if they are dynamic.
   //
@@ -215,8 +215,8 @@ private:
 
   //Those two data structures are only used when the addition or the removal of a plugin occurs.
   //They are used to keep track on a contributor basis of the extension being added or removed
-  KeyedHashSet newContributions; //represents the contributers added during this session.
-  mutable KeyedHashSet formerContributions; //represents the contributers encountered in previous sessions. This is loaded lazily.
+  KeyedHashSet newContributions; //represents the contributors added during this session.
+  mutable KeyedHashSet formerContributions; //represents the contributors encountered in previous sessions. This is loaded lazily.
   mutable bool formerContributionsLoaded;
 
   mutable QHash<QString, SmartPointer<RegistryContributor> > contributors; // key: contributor ID; value: contributor name

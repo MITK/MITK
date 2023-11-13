@@ -24,7 +24,7 @@ namespace berry {
  *
  * The primary interface between a view part and the workbench.
  * <p>
- * The workbench exposes its implemention of view part sites via this interface,
+ * The workbench exposes its implementation of view part sites via this interface,
  * which is not intended to be implemented or extended by clients.
  * </p>
  */

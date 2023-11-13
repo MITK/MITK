@@ -30,7 +30,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
@@ -314,7 +314,7 @@ void QmitkPreferencesDialog::UpdateTree()
     }
   }
 
-  //First, set all pages to hidden to avoid prolems
+  //First, set all pages to hidden to avoid problems
   //when iterating over the child page first which contains a specific keyword
   //and sets the parent to visible
   //but after this the parent is searched for the keyword. However, the keyword might not be available

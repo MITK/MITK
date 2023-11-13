@@ -32,7 +32,7 @@ namespace mitk
 {
   class RenderingManagerFactory;
   class BaseGeometry;
-  class SliceNavigationController;
+  class TimeNavigationController;
   class BaseRenderer;
   class DataStorage;
 
@@ -261,13 +261,13 @@ namespace mitk
     */
     virtual bool InitializeView(vtkRenderWindow *renderWindow);
 
-    /** Gets the (global) SliceNavigationController responsible for
+    /** Gets the (global) TimeNavigationController responsible for
      * time-slicing. */
-    const SliceNavigationController *GetTimeNavigationController() const;
+    const TimeNavigationController* GetTimeNavigationController() const;
 
-    /** Gets the (global) SliceNavigationController responsible for
+    /** Gets the (global) TimeNavigationController responsible for
      * time-slicing. */
-    SliceNavigationController *GetTimeNavigationController();
+    TimeNavigationController* GetTimeNavigationController();
 
     ~RenderingManager() override;
 
@@ -420,7 +420,7 @@ namespace mitk
 
     RenderWindowCallbacksList m_RenderWindowCallbacksList;
 
-    itk::SmartPointer<SliceNavigationController> m_TimeNavigationController;
+    itk::SmartPointer<TimeNavigationController> m_TimeNavigationController;
 
     static RenderingManager::Pointer s_Instance;
     static RenderingManagerFactory *s_RenderingManagerFactory;

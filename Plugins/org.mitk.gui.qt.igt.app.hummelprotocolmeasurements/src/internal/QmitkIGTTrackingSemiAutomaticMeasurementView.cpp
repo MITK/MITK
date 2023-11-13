@@ -26,7 +26,7 @@ found in the LICENSE file.
 // MITK
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkTrackingDeviceSourceConfigurator.h>
-#include <mitkLog.h>
+#include <mitkLogBackend.h>
 #include "mitkHummelProtocolEvaluation.h"
 
 // POCO
@@ -54,9 +54,9 @@ QmitkIGTTrackingSemiAutomaticMeasurementView::~QmitkIGTTrackingSemiAutomaticMeas
 void QmitkIGTTrackingSemiAutomaticMeasurementView::CreateResults()
 {
   QString LogFileName = m_Controls->m_OutputPath->text() + "_results.log";
-  mitk::LoggingBackend::Unregister();
-  mitk::LoggingBackend::SetLogFile(LogFileName.toStdString().c_str());
-  mitk::LoggingBackend::Register();
+  mitk::LogBackend::Unregister();
+  mitk::LogBackend::SetLogFile(LogFileName.toStdString());
+  mitk::LogBackend::Register();
 
   double RMSmean = 0;
   for (std::size_t i = 0; i < m_RMSValues.size(); ++i)
@@ -173,7 +173,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnLoadMeasurementStorage()
   m_MeasurementStorage = ReadStorage(filename.toStdString());
 
   //update label
-  Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to seperate filename from path
+  Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to separate filename from path
   QString toolLabel = QString("Tool Storage: ") + QString::number(m_MeasurementStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
   m_Controls->m_MeasurementToolStorageLabel->setText(toolLabel);
 
@@ -194,7 +194,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnLoadReferenceStorage()
   m_ReferenceStorage = ReadStorage(filename.toStdString());
 
   //update label
-  Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to seperate filename from path
+  Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to separate filename from path
   QString toolLabel = QString("Tool Storage: ") + QString::number(m_ReferenceStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
   m_Controls->m_ReferenceToolStorageLabel->setText(toolLabel);
 }
@@ -209,7 +209,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnStartTracking()
   }
   else if (m_ReferenceStorage.IsNull() && m_Controls->m_UseReferenceTrackingSystem->isChecked())
   {
-    MessageBox("Error: No refernce tools loaded yet!");
+    MessageBox("Error: No reference tools loaded yet!");
     return;
   }
   else if (m_MeasurementStorage->GetToolCount() == 0)
@@ -425,9 +425,9 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::StartNextMeasurement()
   if (!myPath.exists()) myPath.createDirectory();
 
   QString LogFileName = m_Controls->m_OutputPath->text() + QString(m_FilenameVector.at(m_NextFile).c_str()) + ".log";
-  mitk::LoggingBackend::Unregister();
-  mitk::LoggingBackend::SetLogFile(LogFileName.toStdString().c_str());
-  mitk::LoggingBackend::Register();
+  mitk::LogBackend::Unregister();
+  mitk::LogBackend::SetLogFile(LogFileName.toStdString());
+  mitk::LogBackend::Register();
 
   //initialize logging filters
   m_MeasurementLoggingFilterXML = mitk::NavigationDataRecorderDeprecated::New();

@@ -12,14 +12,22 @@ found in the LICENSE file.
 #include "QmitkLevelWindowWidget.h"
 #include "QmitkSliderLevelWindowWidget.h"
 
-QmitkLevelWindowWidget::QmitkLevelWindowWidget(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f)
+#include <ui_QmitkLevelWindowWidget.h>
+
+QmitkLevelWindowWidget::QmitkLevelWindowWidget(QWidget *parent, Qt::WindowFlags f)
+  : QWidget(parent, f), ui(new Ui::QmitkLevelWindow)
 {
-  this->setupUi(this);
+  ui->setupUi(this);
 
   m_Manager = mitk::LevelWindowManager::New();
 
-  SliderLevelWindowWidget->SetLevelWindowManager(m_Manager.GetPointer());
-  LineEditLevelWindowWidget->SetLevelWindowManager(m_Manager.GetPointer());
+  ui->SliderLevelWindowWidget->SetLevelWindowManager(m_Manager.GetPointer());
+  ui->LineEditLevelWindowWidget->SetLevelWindowManager(m_Manager.GetPointer());
+}
+
+QmitkLevelWindowWidget::~QmitkLevelWindowWidget()
+{
+     delete ui;
 }
 
 void QmitkLevelWindowWidget::SetDataStorage(mitk::DataStorage *ds)

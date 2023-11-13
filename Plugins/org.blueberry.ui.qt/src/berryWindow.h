@@ -121,7 +121,7 @@ public:
      * Handle the exception.
      *
      * @param t
-     *            The exception that occured.
+     *            The exception that occurred.
      */
     virtual void HandleException(const std::exception& t) = 0;
   };
@@ -313,7 +313,7 @@ protected:
    * getLayout() to return null.
    *
    * <p>
-   * It is common practise to create and return a single composite that
+   * It is common practice to create and return a single composite that
    * contains the entire window contents.
    * </p>
    *

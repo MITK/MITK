@@ -54,7 +54,7 @@ public Q_SLOTS:
 
   /**
   * Sets the auto selection mode (default is false).
-  * If auto select is true and the following conditions are fullfilled, the widget will
+  * If auto select is true and the following conditions are fulfilled, the widget will
   * select a node automatically from the data storage:
   *  - a data storage is set
   *  - data storage contains at least one node that matches the given predicate
@@ -85,7 +85,7 @@ protected:
   void AutoSelectNodes();
 
   /** Helper function that gets a suitable auto selected node from the datastorage that fits to the predicate settings.
-   @param ignoreNodes You may pass a list of nodes that must not be choosen as auto selected node. */
+   @param ignoreNodes You may pass a list of nodes that must not be chosen as auto selected node. */
   mitk::DataNode::Pointer DetermineAutoSelectNode(const NodeList& ignoreNodes = {});
 
   /** See documentation of SetAutoSelectNewNodes for details*/

@@ -46,7 +46,7 @@ QmitkTubeGraphNewAnnotationDialog::QmitkTubeGraphNewAnnotationDialog(QWidget* pa
   buttonLayout->addWidget(okButton, 0, Qt::AlignRight);
   connect( okButton, SIGNAL(clicked()), this, SLOT(OnAddingAnnotation()) );
 
-  cancleButton = new QPushButton("Cancle", this);
+  cancleButton = new QPushButton("Cancel", this);
   buttonLayout->addWidget(cancleButton,  0, Qt::AlignRight);
   connect( cancleButton, SIGNAL(clicked()), this, SLOT(reject()) );
 

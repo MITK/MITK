@@ -53,6 +53,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
 
   auto menuBar = new QMenuBar(this);
   menuBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+  menuBar->setNativeMenuBar(false);
   auto dataMenu = menuBar->addMenu("Data");
   QWidgetAction* dataAction = new QWidgetAction(dataMenu);
   dataAction->setDefaultWidget(m_NodeSelectionWidget);
@@ -76,7 +77,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   auto* sliceNavigationController = m_BaseRenderer->GetSliceNavigationController();
   m_SliceNavigationWidget = new QmitkSliceNavigationWidget(this);
   m_StepperAdapter =
-    new QmitkStepperAdapter(m_SliceNavigationWidget, sliceNavigationController->GetSlice());
+    new QmitkStepperAdapter(m_SliceNavigationWidget, sliceNavigationController->GetStepper());
   layout->addWidget(m_SliceNavigationWidget);
 
   mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer{ m_BaseRenderer };
@@ -87,6 +88,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_ViewDirectionSelector = new QComboBox(this);
   QStringList viewDirections{ "axial", "coronal", "sagittal"};
   m_ViewDirectionSelector->insertItems(0, viewDirections);
+  m_ViewDirectionSelector->setMinimumContentsLength(12);
   connect(m_ViewDirectionSelector, &QComboBox::currentTextChanged, this, &QmitkRenderWindowUtilityWidget::ChangeViewDirection);
   UpdateViewPlaneSelection();
 
@@ -140,8 +142,10 @@ void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)
   const auto* inputTimeGeometry = sliceNavigationController->GetInputWorldTimeGeometry();
   const mitk::BaseGeometry* rendererGeometry = m_BaseRenderer->GetCurrentWorldGeometry();
 
-  mitk::TimeStepType timeStep = sliceNavigationController->GetTime()->GetPos();
+  mitk::TimeStepType timeStep = sliceNavigationController->GetStepper()->GetPos();
   mitk::BaseGeometry::ConstPointer geometry = inputTimeGeometry->GetGeometryForTimeStep(timeStep);
+  if (geometry == nullptr)
+    return;
 
   mitk::AffineTransform3D::MatrixType matrix = geometry->GetIndexToWorldTransform()->GetMatrix();
   matrix.GetVnlMatrix().normalize_columns();

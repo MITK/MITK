@@ -48,7 +48,6 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestCoronalInitialization);
   MITK_TEST(TestSagittalInitialization);
   MITK_TEST(TestLefthandedCoordinateSystem);
-  MITK_TEST(TestDominantAxesError);
   MITK_TEST(TestCheckRotationMatrix);
 
   // Currently commented out, see See bug 15990
@@ -112,14 +111,6 @@ public:
     plane = mitk::PlaneGeometry::New();
     mitk::AbstractTransformGeometry::Pointer atg = dynamic_cast<mitk::AbstractTransformGeometry *>(plane.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("PlaneGeometry should not be castable to AbstractTransofrmGeometry", atg.IsNull());
-  }
-
-  void TestDominantAxesError()
-  {
-    auto image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("NotQuiteARotationMatrix.nrrd"));
-    auto matrix = image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().transpose();
-    std::vector< int > axes = mitk::PlaneGeometry::CalculateDominantAxes(matrix);
-    CPPUNIT_ASSERT_MESSAGE("Domiant axes cannot be determined in this dataset. Output should be default ordering.", axes.at(0)==0 && axes.at(1)==1 && axes.at(2)==2);
   }
 
   void TestCheckRotationMatrix()

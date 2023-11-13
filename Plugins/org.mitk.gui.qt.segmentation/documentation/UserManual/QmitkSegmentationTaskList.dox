@@ -42,6 +42,15 @@ The Segmentation Task List View can be used even more efficiently with the follo
 - <tt>Ctrl</tt> + <tt>Alt</tt> + <tt>L</tt>: <b>L</b>oad currently shown task
 - <tt>Ctrl</tt> + <tt>Alt</tt> + <tt>S</tt>: <b>S</b>tore interim result
 - <tt>Ctrl</tt> + <tt>Alt</tt> + <tt>A</tt>: <b>A</b>ccept task and store result
+- <tt>Ctrl</tt> + <tt>F</tt>: <b>F</b>ind task...
+
+\section org_mitk_views_segmentationtasklist_find Finding tasks
+
+\imageMacro{QmitkFindSegmentationTaskDialog.png,"Find Segmentation Task dialog", 12.00}
+
+To find a specific task in a segmentation task list, click on the "Find task..." button (magnifier icon) or press <tt>Ctrl</tt> + <tt>F</tt>.
+A dedicated dialog will appear for filtering and searching the current segmentation task list.
+Enter a task number and press <tt>Return</tt> to immediately load the according task or filter the shown list of tasks and double click on a result to load the task.
 
 \section org_mitk_views_segmentationtasklist_fileformat MITK Segmentation Task List file format
 

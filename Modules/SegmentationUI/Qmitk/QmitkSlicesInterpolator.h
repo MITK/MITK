@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkSegmentationInterpolationController.h"
-#include "mitkSliceNavigationController.h"
 #include "mitkSurfaceInterpolationController.h"
 #include "mitkToolManager.h"
 #include <MitkSegmentationUIExports.h>
@@ -46,6 +45,7 @@ namespace mitk
 {
   class PlaneGeometry;
   class SliceNavigationController;
+  class TimeNavigationController;
 }
 
 class QPushButton;
@@ -313,8 +313,10 @@ protected slots:
   void OnRemoveLabelSetConnection(mitk::LabelSetImage* labelSetImage, unsigned int layerID);
 
 protected:
-  const std::map<QAction *, mitk::SliceNavigationController *> createActionToSlicer(const QList<QmitkRenderWindow*>& windows);
-  std::map<QAction *, mitk::SliceNavigationController *> m_ActionToSlicer;
+
+  typedef std::map<QAction*, mitk::SliceNavigationController*> ActionToSliceDimensionMapType;
+  const ActionToSliceDimensionMapType CreateActionToSlicer(const QList<QmitkRenderWindow*>& windows);
+  ActionToSliceDimensionMapType m_ActionToSlicerMap;
 
   void AcceptAllInterpolations(mitk::SliceNavigationController *slicer);
 
@@ -324,18 +326,18 @@ protected:
     and calls Interpolate to further process this PlaneGeometry into an interpolation.
 
     \param e is a actually a mitk::SliceNavigationController::GeometrySliceEvent, sent by a SliceNavigationController
-    \param slicer the SliceNavigationController
+    \param sliceNavigationController the SliceNavigationController
         */
-  bool TranslateAndInterpolateChangedSlice(const itk::EventObject &e, mitk::SliceNavigationController *slicer);
+  bool TranslateAndInterpolateChangedSlice(const itk::EventObject &e,
+                                           mitk::SliceNavigationController *sliceNavigationController);
 
+  bool TranslateAndInterpolateChangedSlice(const mitk::TimeGeometry* timeGeometry);
   /**
     Given a PlaneGeometry, this method figures out which slice of the first working image (of the associated
     ToolManager)
     should be interpolated. The actual work is then done by our SegmentationInterpolation object.
    */
-  void Interpolate(mitk::PlaneGeometry *plane, mitk::TimePointType timePoint, mitk::SliceNavigationController *slicer);
-
-  // void InterpolateSurface();
+  void Interpolate(mitk::PlaneGeometry *plane);
 
   /**
     Called internally to update the interpolation suggestion. Finds out about the focused render window and requests an
@@ -364,7 +366,7 @@ private:
   mitk::ToolManager::Pointer m_ToolManager;
   bool m_Initialized;
 
-  QHash<mitk::SliceNavigationController *, int> m_ControllerToTimeObserverTag;
+  unsigned int m_ControllerToTimeObserverTag;
   QHash<mitk::SliceNavigationController *, int> m_ControllerToSliceObserverTag;
   QHash<mitk::SliceNavigationController *, int> m_ControllerToDeleteObserverTag;
 
@@ -395,7 +397,7 @@ private:
   mitk::SliceNavigationController *m_LastSNC;
   unsigned int m_LastSliceIndex;
 
-  QHash<mitk::SliceNavigationController *, mitk::TimePointType> m_TimePoints;
+  mitk::TimePointType m_TimePoint;
 
   bool m_2DInterpolationEnabled;
   bool m_3DInterpolationEnabled;

@@ -9,3 +9,4 @@ MITK_CREATE_MODULE(
 
 add_subdirectory(test)
 add_subdirectory(autoload/DICOMImageIO)
+add_subdirectory(cmdapps)

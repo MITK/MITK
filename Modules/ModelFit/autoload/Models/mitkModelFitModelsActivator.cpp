@@ -19,8 +19,11 @@ found in the LICENSE file.
 //general models
 #include "mitkGenericParamModelFactory.h"
 #include "mitkLinearModelFactory.h"
-#include "mitkT2DecayModelFactory.h"
+#include "mitkExponentialDecayModelFactory.h"
 #include "mitkExpDecayOffsetModelFactory.h"
+#include "mitkExponentialSaturationModelFactory.h"
+#include "mitkTwoStepLinearModelFactory.h"
+#include "mitkThreeStepLinearModelFactory.h"
 
 namespace mitk
 {
@@ -45,8 +48,11 @@ public:
     m_RegisteredProviders.clear();
     RegisterProvider<mitk::ModelFitProviderBase<mitk::GenericParamModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::LinearModelFactory> >(context);
-    RegisterProvider<mitk::ModelFitProviderBase<mitk::T2DecayModelFactory> >(context);
+    RegisterProvider<mitk::ModelFitProviderBase<mitk::ExponentialDecayModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::ExpDecayOffsetModelFactory> >(context);
+    RegisterProvider<mitk::ModelFitProviderBase<mitk::ExponentialSaturationModelFactory> >(context);
+    RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoStepLinearModelFactory> >(context);
+    RegisterProvider<mitk::ModelFitProviderBase<mitk::ThreeStepLinearModelFactory> >(context);
   }
 
   void Unload(us::ModuleContext* ) override

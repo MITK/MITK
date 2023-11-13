@@ -18,9 +18,15 @@ found in the LICENSE file.
 #include <mitkLinearModelParameterizer.h>
 #include <mitkGenericParamModelFactory.h>
 #include <mitkGenericParamModelParameterizer.h>
-#include <mitkT2DecayModelFactory.h>
-#include <mitkT2DecayModelParameterizer.h>
-
+#include <mitkExponentialDecayModelFactory.h>
+#include <mitkExponentialDecayModelParameterizer.h>
+#include <mitkExponentialSaturationModel.h>
+#include <mitkExponentialSaturationModelFactory.h>
+#include <mitkExponentialSaturationModelParameterizer.h>
+#include "mitkTwoStepLinearModelFactory.h"
+#include "mitkTwoStepLinearModelParameterizer.h"
+#include "mitkThreeStepLinearModelFactory.h"
+#include "mitkThreeStepLinearModelParameterizer.h"
 
 #include <mitkValueBasedParameterizationDelegate.h>
 
@@ -73,7 +79,7 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
   connect(m_Controls.radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
 
-  //Gerneric setting
+  //Generic setting
   m_Controls.groupGeneric->hide();
   m_Controls.labelFormulaInfo->hide();
   connect(m_Controls.editFormula, SIGNAL(textChanged(const QString&)), this,
@@ -89,15 +95,17 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
   m_Controls.checkBox_Constraints->setEnabled(false);
   m_Controls.constraintManager->setEnabled(false);
   m_Controls.initialValuesManager->setEnabled(false);
+  m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
 
-  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)), this,
-          SLOT(UpdateGUIControls()));
+  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls.initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
+
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), this,
           SLOT(UpdateGUIControls()));
-
   connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)),
           m_Controls.initialValuesManager,
           SLOT(setEnabled(bool)));
+
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager,
           SLOT(setEnabled(bool)));
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager,
@@ -185,6 +193,23 @@ void GenericDataFittingView::OnModellSet(int index)
         MITK_WARN << "Invalid model index. Index outside of the factory stack. Factory stack size: "<< m_FactoryStack.size() << "; invalid index: "<< index;
     }
   }
+  if (m_selectedModelFactory)
+  {
+    this->m_modelConstraints = dynamic_cast<mitk::SimpleBarrierConstraintChecker*>
+      (m_selectedModelFactory->CreateDefaultConstraints().GetPointer());
+
+    if (this->m_modelConstraints.IsNull())
+    {
+      this->m_modelConstraints = mitk::SimpleBarrierConstraintChecker::New();
+    }
+
+    m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
+      m_selectedModelFactory->GetDefaultInitialParameterization());
+
+    m_Controls.constraintManager->setChecker(this->m_modelConstraints,
+      this->m_selectedModelFactory->GetParameterNames());
+
+  }
 
   UpdateGUIControls();
 }
@@ -243,7 +268,14 @@ void GenericDataFittingView::OnModellingButtonClicked()
                            (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isGenericFactory = dynamic_cast<mitk::GenericParamModelFactory*>
                             (m_selectedModelFactory.GetPointer()) != nullptr;
-    bool isT2DecayFactory = dynamic_cast<mitk::T2DecayModelFactory*>
+    bool isExponentialDecayFactory = dynamic_cast<mitk::ExponentialDecayModelFactory*>
+      (m_selectedModelFactory.GetPointer()) != nullptr;
+    bool isTwoStepLinearFactory = dynamic_cast<mitk::TwoStepLinearModelFactory*>
+      (m_selectedModelFactory.GetPointer()) != nullptr;
+    bool isThreeStepLinearFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
+      (m_selectedModelFactory.GetPointer()) != nullptr;
+
+    bool isExponentialSaturationFactory = dynamic_cast<mitk::ExponentialSaturationModelFactory*>
       (m_selectedModelFactory.GetPointer()) != nullptr;
 
     if (isLinearFactory)
@@ -268,15 +300,48 @@ void GenericDataFittingView::OnModellingButtonClicked()
         GenerateModelFit_ROIBased<mitk::GenericParamModelParameterizer>(fitSession, generator);
       }
     }
-    else if (isT2DecayFactory)
+    else if (isExponentialDecayFactory)
     {
       if (this->m_Controls.radioPixelBased->isChecked())
       {
-        GenerateModelFit_PixelBased<mitk::T2DecayModelParameterizer>(fitSession, generator);
+        GenerateModelFit_PixelBased<mitk::ExponentialDecayModelParameterizer>(fitSession, generator);
       }
       else
       {
-        GenerateModelFit_ROIBased<mitk::T2DecayModelParameterizer>(fitSession, generator);
+        GenerateModelFit_ROIBased<mitk::ExponentialDecayModelParameterizer>(fitSession, generator);
+      }
+    }
+    else if (isTwoStepLinearFactory)
+    {
+      if (this->m_Controls.radioPixelBased->isChecked())
+      {
+        GenerateModelFit_PixelBased<mitk::TwoStepLinearModelParameterizer>(fitSession, generator);
+      }
+      else
+      {
+        GenerateModelFit_ROIBased<mitk::TwoStepLinearModelParameterizer>(fitSession, generator);
+      }
+    }
+    else if (isThreeStepLinearFactory)
+    {
+      if (this->m_Controls.radioPixelBased->isChecked())
+      {
+        GenerateModelFit_PixelBased<mitk::ThreeStepLinearModelParameterizer>(fitSession, generator);
+      }
+      else
+      {
+        GenerateModelFit_ROIBased<mitk::ThreeStepLinearModelParameterizer>(fitSession, generator);
+      }
+    }
+    else if (isExponentialSaturationFactory)
+    {
+      if (this->m_Controls.radioPixelBased->isChecked())
+      {
+        GenerateModelFit_PixelBased<mitk::ExponentialSaturationModelParameterizer>(fitSession, generator);
+      }
+      else
+      {
+        GenerateModelFit_ROIBased<mitk::ExponentialSaturationModelParameterizer>(fitSession, generator);
       }
     }
     //add other models with else if
@@ -372,7 +437,7 @@ bool GenericDataFittingView::CheckModelSettings() const
 {
   bool ok = true;
 
-  //check wether any model is set at all. Otherwise exit with false
+  //check whether any model is set at all. Otherwise exit with false
   if (m_selectedModelFactory.IsNotNull())
   {
     bool isGenericFactory = dynamic_cast<mitk::GenericParamModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
@@ -386,6 +451,14 @@ bool GenericDataFittingView::CheckModelSettings() const
   {
     ok = false;
   }
+  if (this->m_Controls.radioButton_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
+  {
+    std::string warning = "Warning. Invalid start parameters. At least one parameter has an invalid image setting as source.";
+    MITK_ERROR << warning;
+    m_Controls.infoBox->append(QString("<font color='red'><b>") + QString::fromStdString(warning) + QString("</b></font>"));
+
+    ok = false;
+  };
 
   return ok;
 }
@@ -547,7 +620,13 @@ GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
   m_FactoryStack.push_back(factory);
   factory = mitk::GenericParamModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
-  factory = mitk::T2DecayModelFactory::New().GetPointer();
+  factory = mitk::ExponentialDecayModelFactory::New().GetPointer();
+  m_FactoryStack.push_back(factory);
+  factory = mitk::ExponentialSaturationModelFactory::New().GetPointer();
+  m_FactoryStack.push_back(factory);
+  factory = mitk::TwoStepLinearModelFactory::New().GetPointer();
+  m_FactoryStack.push_back(factory);
+  factory = mitk::ThreeStepLinearModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
 
   this->m_IsNotABinaryImagePredicate = mitk::NodePredicateAnd::New(

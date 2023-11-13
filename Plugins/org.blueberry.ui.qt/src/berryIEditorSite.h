@@ -22,7 +22,7 @@ namespace berry {
  *
  * The primary interface between an editor part and the workbench.
  * <p>
- * The workbench exposes its implemention of editor part sites via this
+ * The workbench exposes its implementation of editor part sites via this
  * interface, which is not intended to be implemented or extended by clients.
  * </p>
  */
@@ -35,7 +35,7 @@ struct BERRY_UI_QT IEditorSite : public virtual IWorkbenchPartSite {
     /**
      * Returns the action bar contributor for this editor.
      * <p>
-     * An action contributor is responsable for the creation of actions.
+     * An action contributor is responsible for the creation of actions.
      * By design, this contributor is used for one or more editors of the same type.
      * Thus, the contributor returned by this method is not owned completely
      * by the editor - it is shared.

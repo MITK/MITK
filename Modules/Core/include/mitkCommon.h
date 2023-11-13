@@ -24,7 +24,7 @@ found in the LICENSE file.
 #include "mitkConfig.h"
 #include "mitkExceptionMacro.h"
 #include "mitkGetClassHierarchy.h"
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 
 typedef unsigned int MapperSlotId;
 

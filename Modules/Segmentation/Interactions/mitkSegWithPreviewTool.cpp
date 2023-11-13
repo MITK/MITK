@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include "mitkDataStorage.h"
 #include "mitkRenderingManager.h"
+#include <mitkTimeNavigationController.h>
 
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
@@ -183,6 +184,7 @@ void mitk::SegWithPreviewTool::ConfirmSegmentation()
   {
     this->GetToolManager()->ActivateTool(-1);
   }
+  this->ConfirmCleanUp();
 }
 
 void  mitk::SegWithPreviewTool::InitiateToolByInput()
@@ -445,7 +447,23 @@ void mitk::SegWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage,
     if (nullptr != this->GetWorkingPlaneGeometry())
     {
       auto sourceSlice = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), sourceImage, timeStep);
-      SegTool2D::WriteBackSegmentationResult(this->GetTargetSegmentationNode(), m_WorkingPlaneGeometry, sourceSlice, timeStep);
+      auto resultSlice =
+        SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), destinationImage, timeStep)->Clone();
+      auto destLSImage = dynamic_cast<LabelSetImage *>(destinationImage);
+      //We need to transfer explictly to a copy of the current working image to ensure that labelMapping is done and things
+      //like merge style, overwrite style and locks are regarded.
+      TransferLabelContentAtTimeStep(sourceSlice,
+                                     resultSlice,
+                                     destLSImage->GetActiveLabelSet(),
+                                     timeStep,
+                                     0,
+                                     0,
+                                     destLSImage->GetUnlabeledLabelLock(),
+                                     labelMapping,
+                                     m_MergeStyle,
+                                     m_OverwriteStyle);
+      //We use WriteBackSegmentationResult to ensure undo/redo is supported also by derived tools of this class.
+      SegTool2D::WriteBackSegmentationResult(this->GetTargetSegmentationNode(), m_WorkingPlaneGeometry, resultSlice, timeStep);
     }
     else
     { //take care of the full segmentation volume
@@ -472,7 +490,7 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
 
     if (resultSegmentationNode.IsNotNull())
     {
-      const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+      const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
       auto resultSegmentation = dynamic_cast<Image*>(resultSegmentationNode->GetData());
 
       // REMARK: the following code in this scope assumes that previewImage and resultSegmentation
@@ -551,7 +569,7 @@ void mitk::SegWithPreviewTool::OnTimePointChanged()
 {
   if (m_IsTimePointChangeAware && m_PreviewSegmentationNode.IsNotNull() && m_SegmentationInputNode.IsNotNull())
   {
-    const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
     const bool isStaticSegOnDynamicImage = m_PreviewSegmentationNode->GetData()->GetTimeSteps() == 1 && m_SegmentationInputNode->GetData()->GetTimeSteps() > 1;
     if (timePoint!=m_LastTimePointOfUpdate && (isStaticSegOnDynamicImage || m_LazyDynamicPreviews))
@@ -596,7 +614,7 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 
   this->UpdatePrepare();
 
-  const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   try
   {
@@ -690,6 +708,12 @@ void mitk::SegWithPreviewTool::UpdateCleanUp()
 {
   // default implementation does nothing
   //reimplement in derived classes for special behavior
+}
+
+void mitk::SegWithPreviewTool::ConfirmCleanUp()
+{
+  // default implementation does nothing
+  // reimplement in derived classes for special behavior
 }
 
 void mitk::SegWithPreviewTool::TransferLabelInformation(const LabelMappingType& labelMapping,

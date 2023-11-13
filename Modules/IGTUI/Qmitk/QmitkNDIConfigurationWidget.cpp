@@ -731,8 +731,8 @@ void QmitkNDIConfigurationWidget::OnSaveTool()
   catch( ... )
   {
     QMessageBox::warning(nullptr, "Saving Tool Error", QString("An error occured! Could not save tool!\n\n"));
-    MBI_ERROR<<"Could not save tool surface!";
-    MBI_ERROR<< toolWriter->GetErrorMessage();
+    MITK_ERROR<<"Could not save tool surface!";
+    MITK_ERROR<< toolWriter->GetErrorMessage();
 
     QFile maybeCorruptFile(filename);
 
@@ -767,8 +767,8 @@ void QmitkNDIConfigurationWidget::OnLoadTool()
   catch( ... )
   {
     QMessageBox::warning(nullptr, "Loading Tool Error", QString("An error occured! Could not load tool!\n\n"));
-    MBI_ERROR<<"Could not load tool surface!";
-    MBI_ERROR<< toolReader->GetErrorMessage();
+    MITK_ERROR<<"Could not load tool surface!";
+    MITK_ERROR<< toolReader->GetErrorMessage();
   }
 
   int currSelectedToolID = m_Controls->m_ToolSelectionComboBox->currentIndex();
@@ -830,7 +830,7 @@ mitk::NavigationTool::Pointer QmitkNDIConfigurationWidget::GenerateNavigationToo
   catch( ... )
   {
     QMessageBox::warning(nullptr, "Loading Surface Error", QString("An error occured! Could not load surface from .stl file!\n\n"));
-    MBI_ERROR<<"Could not load .stl tool surface!";
+    MITK_ERROR<<"Could not load .stl tool surface!";
   }
 
 
@@ -873,8 +873,8 @@ mitk::Surface::Pointer QmitkNDIConfigurationWidget::LoadSurfaceFromSTLFile(QStri
     }
     catch(std::exception& e )
     {
-      MBI_ERROR<<"Could not load surface for tool!";
-      MBI_ERROR<< e.what();
+      MITK_ERROR<<"Could not load surface for tool!";
+      MITK_ERROR<< e.what();
       throw e;
     }
   }

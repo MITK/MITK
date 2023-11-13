@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 //mitk
 #include <mitkCommon.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 //itk
 #include <itkLightObject.h>

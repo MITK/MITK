@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 // Qmitk
 #include "QmitkDicomLocalStorageWidget.h"
-//#include <mitkLogMacros.h>
 
 // Qt
 #include <QLabel>

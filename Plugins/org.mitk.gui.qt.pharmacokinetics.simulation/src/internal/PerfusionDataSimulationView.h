@@ -74,10 +74,8 @@ protected:
   void InitModelComboBox() const;
 
   mitk::Image::Pointer Generate2CXModelData();
-  mitk::Image::Pointer GenerateNumeric2CXModelData();
   mitk::Image::Pointer GenerateETModelData();
   void FillParameterMap2CXM();
-  void FillParameterMapNumeric2CXM();
   void FillParameterMapETM();
 
   ///////////////////// dynamic PET Models///////////////

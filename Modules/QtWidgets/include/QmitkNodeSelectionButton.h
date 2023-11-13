@@ -24,7 +24,7 @@ found in the LICENSE file.
 * @class QmitkNodeSelectionButton
 * @brief Button class that can be used to display information about a given node.
 *        If the given node is a nullptr the node info text will be shown.
-*        The node info can be formated text (e.g. HTML code; like the tooltip text).
+*        The node info can be formatted text (e.g. HTML code; like the tooltip text).
 */
 class MITKQTWIDGETS_EXPORT QmitkNodeSelectionButton : public QPushButton
 {

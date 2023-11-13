@@ -28,7 +28,7 @@ found in the LICENSE file.
 // used for PI
 #include <itkMath.h>
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 static const double PI = itk::Math::pi;
 

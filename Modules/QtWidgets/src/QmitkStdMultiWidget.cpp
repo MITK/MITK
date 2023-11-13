@@ -48,18 +48,11 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          const QString &name/* = "stdmulti"*/)
   : QmitkAbstractMultiWidget(parent, f, name)
-  , m_TimeNavigationController(nullptr)
 {
-  m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
 }
 
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
 {
-  auto allRenderWindows = this->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    m_TimeNavigationController->Disconnect(renderWindow->GetSliceNavigationController());
-  }
 }
 
 void QmitkStdMultiWidget::InitializeMultiWidget()
@@ -144,7 +137,7 @@ void QmitkStdMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
     currentPosition = this->GetSelectedPosition("");
 
     // store the current time step to set it again later, if the camera should not be reset
-    const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+    const mitk::TimePointType currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
     if (geometry->IsValidTimePoint(currentTimePoint))
     {
       imageTimeStep = geometry->TimePointToTimeStep(currentTimePoint);
@@ -157,7 +150,7 @@ void QmitkStdMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
   if (!resetCamera)
   {
     this->SetSelectedPosition(currentPosition, "");
-    renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
+    renderingManager->GetTimeNavigationController()->GetStepper()->SetPos(imageTimeStep);
   }
 }
 
@@ -289,11 +282,6 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode(int userMode)
   }
 
   emit NotifyCrosshairRotationModeChanged(userMode);
-}
-
-mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationController()
-{
-  return m_TimeNavigationController;
 }
 
 void QmitkStdMultiWidget::AddPlanesToDataStorage()
@@ -696,20 +684,6 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget4);
 
   SetActiveRenderWindowWidget(renderWindowWidget1);
-
-  // connect to the "time navigation controller": send time via sliceNavigationControllers
-  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow1->GetSliceNavigationController());
-  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow2->GetSliceNavigationController());
-  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow3->GetSliceNavigationController());
-  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow4->GetSliceNavigationController());
-  renderWindow1->GetSliceNavigationController()->ConnectGeometrySendEvent(
-    mitk::BaseRenderer::GetInstance(renderWindow4->renderWindow()));
-
-  // reverse connection between sliceNavigationControllers and timeNavigationController
-  renderWindow1->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
-  renderWindow2->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
-  renderWindow3->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
-  //renderWindow4->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
 
   auto layoutManager = GetMultiWidgetLayoutManager();
   connect(renderWindow1, &QmitkRenderWindow::ResetView, this, &QmitkStdMultiWidget::ResetCrosshair);

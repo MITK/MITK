@@ -38,7 +38,7 @@ CTK_DECLARE_EXCEPTION(BERRY_COMMANDS, ParameterValueConversionException, Command
 CTK_DECLARE_EXCEPTION(BERRY_COMMANDS, ParameterValuesException, CommandException)
 
 /**
- * Signals that an exception occured while serializing a
+ * Signals that an exception occurred while serializing a
  * {@link ParameterizedCommand} to a string or deserializing a string to a
  * {@link ParameterizedCommand}.
  *

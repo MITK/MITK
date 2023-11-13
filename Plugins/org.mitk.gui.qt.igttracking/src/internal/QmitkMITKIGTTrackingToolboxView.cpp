@@ -20,7 +20,7 @@ found in the LICENSE file.
 // Qt
 #include <QMessageBox>
 #include <QSettings>
-#include <qfiledialog.h>
+#include <QFileDialog>
 
 // MITK
 #include <mitkNavigationToolStorageDeserializer.h>
@@ -29,7 +29,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkIOUtil.h>
-#include <mitkLog.h>
+#include <mitkLogBackend.h>
 #include <mitkTrackingDeviceTypeCollection.h>
 #include <mitkUnspecifiedTrackingTypeInformation.h>
 #include <mitkNeedleProjectionFilter.h>
@@ -60,11 +60,11 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_NeedleProjectionFilter = mitk::NeedleProjectionFilter::New();
 
   //create filename for autosaving of tool storage
-  QString loggingPathWithoutFilename = QString(mitk::LoggingBackend::GetLogFile().c_str());
+  auto loggingPathWithoutFilename = QString::fromStdString(mitk::LogBackend::GetLogFile());
   if (!loggingPathWithoutFilename.isEmpty()) //if there already is a path for the MITK logging file use this one
   {
     //extract path from path+filename (if someone knows a better way to do this feel free to change it)
-    int lengthOfFilename = QFileInfo(QString::fromStdString(mitk::LoggingBackend::GetLogFile())).fileName().size();
+    int lengthOfFilename = QFileInfo(QString::fromStdString(mitk::LogBackend::GetLogFile())).fileName().size();
     loggingPathWithoutFilename.resize(loggingPathWithoutFilename.size() - lengthOfFilename);
     m_AutoSaveFilename = loggingPathWithoutFilename + "TrackingToolboxAutoSave.IGTToolStorage";
   }
@@ -579,7 +579,7 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
   m_Controls->m_StartTrackingSimpleMode->setEnabled(true);
   m_connected = true;
 
-  //During connection, thi sourceID of the tool storage changed. However, Microservice can't be updated on a different thread.
+  //During connection, the sourceID of the tool storage changed. However, Microservice can't be updated on a different thread.
   //UpdateMicroservice is necessary to use filter to get the right storage belonging to a source.
   //Don't do it before m_connected is true, as we don't want to call content of OnToolStorageChanged.
   m_toolStorage->UpdateMicroservice();
@@ -673,7 +673,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   //if activated enable open IGT link microservice
   if (m_Controls->m_EnableOpenIGTLinkMicroService->isChecked())
   {
-    //create convertion filter
+    //create conversion filter
     m_IGTLConversionFilter = mitk::NavigationDataToIGTLMessageFilter::New();
     m_IGTLConversionFilter->SetName("IGT Tracking Toolbox");
     QString dataModeSelection = this->m_Controls->m_OpenIGTLinkDataFormat->currentText();
@@ -862,7 +862,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 
 void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QString errorMessage)
 {
-  //Check, if the thread is running. There might have been a timeOut inbetween and this causes crashes...
+  //Check, if the thread is running. There might have been a timeOut in between and this causes crashes...
   if (m_WorkerThread->isRunning())
   {
     m_TimeoutTimer->stop();
@@ -1004,7 +1004,7 @@ void QmitkMITKIGTTrackingToolboxView::OnToggleFileExtension()
   // check if csv radio button is clicked
   if (this->m_Controls->m_CsvFormat->isChecked())
   {
-    // you needn't add a seperator to the input text when currentpath is the rootpath
+    // you needn't add a separator to the input text when currentpath is the rootpath
     if (currentPath.isRoot())
     {
       this->m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(currentPath.absolutePath()) + currentFile + ".csv");
@@ -1018,7 +1018,7 @@ void QmitkMITKIGTTrackingToolboxView::OnToggleFileExtension()
   // check if xml radio button is clicked
   else if (this->m_Controls->m_XmlFormat->isChecked())
   {
-    // you needn't add a seperator to the input text when currentpath is the rootpath
+    // you needn't add a separator to the input text when currentpath is the rootpath
     if (currentPath.isRoot())
     {
       this->m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(currentPath.absolutePath()) + currentFile + ".xml");
@@ -1360,7 +1360,7 @@ void QmitkMITKIGTTrackingToolboxView::StoreUISettings()
 
   settings.beginGroup(QString::fromStdString(VIEW_ID));
   MITK_DEBUG << "Store UI settings";
-  // set the values of some widgets and attrbutes to the QSettings
+  // set the values of some widgets and attributes to the QSettings
   settings.setValue("ShowTrackingVolume", QVariant(m_Controls->m_ShowTrackingVolume->isChecked()));
   settings.setValue("toolStorageFilename", QVariant(m_ToolStorageFilename));
   settings.setValue("VolumeSelectionBox", QVariant(m_Controls->m_VolumeSelectionBox->currentIndex()));
@@ -1419,7 +1419,7 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
 
 void QmitkMITKIGTTrackingToolboxView::UpdateToolStorageLabel(QString pathOfLoadedStorage)
 {
-  QFileInfo myPath(pathOfLoadedStorage); //use this to seperate filename from path
+  QFileInfo myPath(pathOfLoadedStorage); //use this to separate filename from path
   QString toolLabel = myPath.fileName();
   if (toolLabel.size() > 45) //if the tool storage name is to long trimm the string
   {

@@ -22,10 +22,10 @@ namespace mitk {
 * \brief An object of this class represents an exception of the MITK-IGT module.
 *
 * \ingroup IGT
-*/  class MITKIGTBASE_EXPORT IGTException : public mitk::Exception
+*/  class MITKIGTBASE_EXPORT IGTException /** \cond */ : public mitk::Exception /** \endcond */
 {
   public:
-    mitkExceptionClassMacro(IGTException,mitk::Exception);
+    mitkExceptionClassMacro(IGTException, mitk::Exception)
   };
 } // namespace mitk
 #endif

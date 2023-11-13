@@ -105,7 +105,7 @@
      <item row="1" column="0" colspan="2">
       <widget class="QLabel" name="labelSetPresetCmdLineArgLabel">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;The default label set preset is currently overriden by the &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New'; color:#ff0000;&quot;&gt;Segmentation.labelSetPreset&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; command-line argument.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;The default label set preset is currently overridden by the &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New'; color:#ff0000;&quot;&gt;Segmentation.labelSetPreset&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; command-line argument.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>

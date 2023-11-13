@@ -189,7 +189,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Dowloading file ...</string>
+      <string>Downloading file ...</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>

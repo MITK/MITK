@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkPoint.h>
 #include <mitkRenderingManager.h>
 #include <mitkSlicedGeometry3D.h>
-#include <mitkSliceNavigationController.h>
+#include <mitkTimeNavigationController.h>
 
 unsigned int mitk::SliceNavigationHelper::SelectSliceByPoint(const TimeGeometry* timeGeometry,
                                                              const Point3D& point)
@@ -29,8 +29,8 @@ unsigned int mitk::SliceNavigationHelper::SelectSliceByPoint(const TimeGeometry*
   }
 
   // get the BaseGeometry of the selected time point
-  auto selectedTimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  auto currentGeometry = timeGeometry->GetGeometryForTimePoint(selectedTimePoint);
+  const auto selectedTimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  const auto currentGeometry = timeGeometry->GetGeometryForTimePoint(selectedTimePoint);
   if (nullptr == currentGeometry)
   {
     // time point not valid for the ime geometry
@@ -62,7 +62,7 @@ unsigned int mitk::SliceNavigationHelper::SelectSliceByPoint(const TimeGeometry*
   }
   else
   {
-    int numberOfSlices = slicedGeometry->GetSlices();
+    const int numberOfSlices = slicedGeometry->GetSlices();
     Point3D projectedPoint;
     for (int slice = 0; slice < numberOfSlices; ++slice)
     {
@@ -102,7 +102,7 @@ mitk::TimeGeometry::Pointer mitk::SliceNavigationHelper::CreateOrientedTimeGeome
   BaseGeometry::ConstPointer currentGeometry;
 
   // get the BaseGeometry of the selected time point
-  auto selectedTimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  const auto selectedTimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
   currentGeometry = timeGeometry->GetGeometryForTimePoint(selectedTimePoint);
   if(nullptr == currentGeometry)
   {

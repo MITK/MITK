@@ -134,7 +134,7 @@ public:
    *            The values for this parameter; must not be <code>null</code>.
    * @param parameterType
    *            the type for this parameter; may be <code>null</code> if the
-   *            parmeter doesn't declare type.
+   *            parameter doesn't declare type.
    * @param optional
    *            Whether this parameter is optional (as opposed to required).
    * @param commandService

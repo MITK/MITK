@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkCameraController.h>
 #include <mitkCameraRotationController.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkTimeNavigationController.h>
 
 #include <mitkBindDispatcherInteractor.h>
 #include <mitkDispatcher.h>

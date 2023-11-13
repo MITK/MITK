@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "mitkCoreServices.h"
 #include "mitkIMimeTypeProvider.h"
 #include "mitkIOMimeTypes.h"
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 
 #include <usGetModuleContext.h>
 #include <usLDAPProp.h>

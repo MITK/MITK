@@ -53,15 +53,21 @@ public:
     itkSetMacro(RecoveryTime, double);
     itkGetConstReferenceMacro(RecoveryTime, double);
 
+    itkSetMacro(RepetitionTime, double);
+    itkGetConstReferenceMacro(RepetitionTime, double);
+
     itkSetMacro(FlipAngle, double);
     itkGetConstReferenceMacro(FlipAngle, double);
+
+    itkSetMacro(FlipAnglePDW, double);
+    itkGetConstReferenceMacro(FlipAnglePDW, double);
 
     itkSetMacro(Factor, double);
     itkGetConstReferenceMacro(Factor, double);
 
-    /** Getter and Setter for T10 Map image*/
-    itkSetConstObjectMacro(T10Image,Image);
-    itkGetConstObjectMacro(T10Image,Image);
+    /** Getter and Setter for PDW Map image*/
+    itkSetConstObjectMacro(PDWImage,Image);
+    itkGetConstObjectMacro(PDWImage,Image);
 
     itkSetMacro(T2Factor, double);
     itkGetConstReferenceMacro(T2Factor, double);
@@ -123,7 +129,7 @@ protected:
 private:
     Image::ConstPointer m_DynamicImage;
     Image::ConstPointer m_BaselineImage;
-    Image::ConstPointer m_T10Image;
+    Image::ConstPointer m_PDWImage;
     Image::Pointer m_ConvertSignalToConcentrationCurve_OutputImage;
     Image::Pointer m_ConvertedImage;
 
@@ -135,14 +141,18 @@ private:
     bool m_UsingT1Map;
 
     double m_Factor;
-    //=Repetition Time TR
+    //=Recovery Time
     double m_RecoveryTime;
+    //=Repetition Time TR
+    double m_RepetitionTime;
     //= pre-CA T1 time
     double m_RelaxationTime;
     //= contrast agent relaxivity
     double m_Relaxivity;
 
     double m_FlipAngle;
+
+    double m_FlipAnglePDW;
 
     double m_T2Factor;
     double m_T2EchoTime;

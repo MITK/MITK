@@ -60,7 +60,7 @@ If the custom pixel value is out of the valid bounds of the pixel type, it is op
 
 \section org_mitk_views_segmentationUtilitiesMorphologicalOperations Morphological operations
 
-Morphological operations are applied to a single segmentation image. Based on a given structuring element the underlying segmentation will be modfied.
+Morphological operations are applied to a single segmentation image. Based on a given structuring element the underlying segmentation will be modified.
 The plugin provides a <b>ball</b> and a <b>cross</b> as structuring elements. The follow operations are available:
 
 <ul>

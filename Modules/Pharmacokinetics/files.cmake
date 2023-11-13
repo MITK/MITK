@@ -18,15 +18,9 @@ set(CPP_FILES
   Models/mitkDescriptivePharmacokineticBrixModelFactory.cpp
   Models/mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer.cpp
   Models/mitkDescriptivePharmacokineticBrixModelParameterizer.cpp
-  Models/mitkThreeStepLinearModel.cpp
-  Models/mitkThreeStepLinearModelFactory.cpp
-  Models/mitkThreeStepLinearModelParameterizer.cpp
   Models/mitkTwoCompartmentExchangeModel.cpp
   Models/mitkTwoCompartmentExchangeModelFactory.cpp
   Models/mitkTwoCompartmentExchangeModelParameterizer.cpp
-  Models/mitkNumericTwoCompartmentExchangeModel.cpp
-  Models/mitkNumericTwoCompartmentExchangeModelFactory.cpp
-  Models/mitkNumericTwoCompartmentExchangeModelParameterizer.cpp
   Models/mitkExtendedToftsModel.cpp
   Models/mitkExtendedToftsModelFactory.cpp
   Models/mitkExtendedToftsModelParameterizer.cpp
@@ -39,18 +33,12 @@ set(CPP_FILES
   Models/mitkExtendedOneTissueCompartmentModel.cpp
   Models/mitkExtendedOneTissueCompartmentModelFactory.cpp
   Models/mitkExtendedOneTissueCompartmentModelParameterizer.cpp
-  Models/mitkTwoStepLinearModel.cpp
-  Models/mitkTwoStepLinearModelFactory.cpp
-  Models/mitkTwoStepLinearModelParameterizer.cpp
   Models/mitkTwoTissueCompartmentModel.cpp
   Models/mitkTwoTissueCompartmentModelFactory.cpp
   Models/mitkTwoTissueCompartmentModelParameterizer.cpp
   Models/mitkTwoTissueCompartmentFDGModel.cpp
   Models/mitkTwoTissueCompartmentFDGModelFactory.cpp
   Models/mitkTwoTissueCompartmentFDGModelParameterizer.cpp
-  Models/mitkNumericTwoTissueCompartmentModel.cpp
-  Models/mitkNumericTwoTissueCompartmentModelFactory.cpp
-  Models/mitkNumericTwoTissueCompartmentModelParameterizer.cpp  
   SimulationFramework/mitkImageGenerationHelper.cpp
 )
 

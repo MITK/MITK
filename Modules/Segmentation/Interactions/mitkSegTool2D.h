@@ -227,7 +227,7 @@ namespace mitk
 
     /** \brief Writes all provided source slices into the data of the passed workingNode.
      * The function does the following: 1) for every passed slice write it to workingNode (and generate and undo/redo step);
-     * 2) update the surface interpolation and 3) marke the node as modified.
+     * 2) update the surface interpolation and 3) mark the node as modified.
      * @param workingNode Pointer to the node that contains the working image.
      * @param sliceList Vector of all slices that should be written into the workingNode. If the list is
      * empty, the function call does nothing.

@@ -11,7 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkTimeSliceAnimationItem.h"
-#include <mitkBaseRenderer.h>
+
+#include <mitkRenderingManager.h>
+#include <mitkTimeNavigationController.h>
 
 QmitkTimeSliceAnimationItem::QmitkTimeSliceAnimationItem(int from, int to, bool reverse, double duration, double delay, bool startWithPrevious)
   : QmitkAnimationItem("Time", duration, delay, startWithPrevious)
@@ -57,7 +59,7 @@ void QmitkTimeSliceAnimationItem::SetReverse(bool reverse)
 
 void QmitkTimeSliceAnimationItem::Animate(double s)
 {
-  mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
+  mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetStepper();
 
   if (stepper == nullptr)
     return;

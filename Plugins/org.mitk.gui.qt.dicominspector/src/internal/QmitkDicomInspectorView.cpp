@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkPixelTypeMultiplex.h>
+#include <mitkTimeNavigationController.h>
 
 // Qt
 #include <QMessageBox>
@@ -31,8 +32,10 @@ found in the LICENSE file.
 const std::string QmitkDicomInspectorView::VIEW_ID = "org.mitk.views.dicominspector";
 
 QmitkDicomInspectorView::ObserverInfo::ObserverInfo(mitk::SliceNavigationController* controller,
-  int observerTag, const std::string& renderWindowName, mitk::IRenderWindowPart* part) : controller(controller), observerTag(observerTag),
-  renderWindowName(renderWindowName), renderWindowPart(part)
+  int observerTag, mitk::IRenderWindowPart* part)
+  : controller(controller)
+  , observerTag(observerTag)
+  , renderWindowPart(part)
 {
 }
 
@@ -100,6 +103,12 @@ bool QmitkDicomInspectorView::InitObservers()
 {
   bool result = true;
 
+  auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+  itk::SimpleMemberCommand<QmitkDicomInspectorView>::Pointer cmdTimeEvent =
+    itk::SimpleMemberCommand<QmitkDicomInspectorView>::New();
+  cmdTimeEvent->SetCallbackFunction(this, &QmitkDicomInspectorView::OnTimeChanged);
+  m_ControllerToTimeObserverTag = timeNavigationController->AddObserver(mitk::TimeNavigationController::TimeEvent(0), cmdTimeEvent);
+
   typedef QHash<QString, QmitkRenderWindow*> WindowMapType;
   WindowMapType windowMap = m_RenderWindowPart->GetQmitkRenderWindows();
 
@@ -107,10 +116,9 @@ bool QmitkDicomInspectorView::InitObservers()
 
   while (i != windowMap.end())
   {
-    mitk::SliceNavigationController* sliceNavController =
-      i.value()->GetSliceNavigationController();
+    mitk::SliceNavigationController* sliceNavController = i.value()->GetSliceNavigationController();
 
-    if (sliceNavController)
+    if (nullptr != sliceNavController)
     {
       auto cmdSliceEvent = itk::SimpleMemberCommand<QmitkDicomInspectorView>::New();
       cmdSliceEvent->SetCallbackFunction(this, &QmitkDicomInspectorView::OnSliceChanged);
@@ -118,22 +126,14 @@ bool QmitkDicomInspectorView::InitObservers()
         mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), cmdSliceEvent);
 
       m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-        i.key().toStdString(), m_RenderWindowPart)));
-
-      auto cmdTimeEvent = itk::SimpleMemberCommand<QmitkDicomInspectorView>::New();
-      cmdTimeEvent->SetCallbackFunction(this, &QmitkDicomInspectorView::OnSliceChanged);
-      tag = sliceNavController->AddObserver(
-        mitk::SliceNavigationController::GeometryTimeEvent(nullptr, 0), cmdTimeEvent);
-
-      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-        i.key().toStdString(), m_RenderWindowPart)));
+        m_RenderWindowPart)));
 
       auto cmdDelEvent = itk::MemberCommand<QmitkDicomInspectorView>::New();
       cmdDelEvent->SetCallbackFunction(this, &QmitkDicomInspectorView::OnSliceNavigationControllerDeleted);
       tag = sliceNavController->AddObserver(itk::DeleteEvent(), cmdDelEvent);
 
       m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-        i.key().toStdString(), m_RenderWindowPart)));
+        m_RenderWindowPart)));
     }
 
     ++i;
@@ -215,9 +215,9 @@ void QmitkDicomInspectorView::OnSliceNavigationControllerDeleted(const itk::Obje
 
 void QmitkDicomInspectorView::ValidateAndSetCurrentPosition()
 {
-  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
-  auto currentSelectedPosition = renderWindowPart->GetSelectedPosition(nullptr);
-  const auto currentSelectedTimePoint = renderWindowPart->GetSelectedTimePoint();
+  const auto currentSelectedPosition = m_RenderWindowPart->GetSelectedPosition();
+  const auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+  const mitk::TimeStepType currentSelectedTimePoint = timeNavigationController->GetSelectedTimePoint();
 
   if (m_SelectedPosition != currentSelectedPosition
     || m_SelectedTimePoint != currentSelectedTimePoint
@@ -260,6 +260,18 @@ void QmitkDicomInspectorView::OnSliceChangedDelayed()
 {
   m_PendingSliceChangedEvent = false;
 
+  ValidateAndSetCurrentPosition();
+
+  m_Controls.tableTags->setEnabled(m_ValidSelectedPosition);
+
+  if (m_SelectedNode.IsNotNull())
+  {
+    RenderTable();
+  }
+}
+
+void QmitkDicomInspectorView::OnTimeChanged()
+{
   ValidateAndSetCurrentPosition();
 
   m_Controls.tableTags->setEnabled(m_ValidSelectedPosition);

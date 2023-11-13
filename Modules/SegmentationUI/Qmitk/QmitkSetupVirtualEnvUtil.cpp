@@ -12,7 +12,7 @@ found in the LICENSE file.s
 
 #include "QmitkSetupVirtualEnvUtil.h"
 
-#include "mitkLogMacros.h"
+#include "mitkLog.h"
 #include <QStandardPaths>
 #include <itkCommand.h>
 
@@ -115,9 +115,10 @@ void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir,
   args.push_back("-m");
   args.push_back("pip");
   args.push_back("install");
-  args.push_back("light-the-torch");
+  args.push_back("light-the-torch==0.7.5");
   spExec->Execute(workingDir, "python", args);
-  PipInstall("torch", workingDir, callback, "ltt");
+  PipInstall("torch==2.0.0", workingDir, callback, "ltt");
+  PipInstall("torchvision==0.15.0", workingDir, callback, "ltt");
 }
 
 void QmitkSetupVirtualEnvUtil::InstallPytorch()

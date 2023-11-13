@@ -182,7 +182,7 @@ public:
   /**
    * Called when this window is about to be closed.
    *
-   * Subclasses may overide to add code that returns <code>false</code> to
+   * Subclasses may override to add code that returns <code>false</code> to
    * prevent closing under certain conditions.
    */
   virtual bool OkToClose();

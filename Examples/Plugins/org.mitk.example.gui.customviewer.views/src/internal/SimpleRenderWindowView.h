@@ -110,7 +110,7 @@ public:
   /**
    * \see mitk::IRenderWindowPart::GetTimeNavigationController()
    */
-  mitk::SliceNavigationController *GetTimeNavigationController() const override;
+  mitk::TimeNavigationController* GetTimeNavigationController() const override;
 
   /**
    * \see mitk::IRenderWindowPart::GetSelectionPosition()

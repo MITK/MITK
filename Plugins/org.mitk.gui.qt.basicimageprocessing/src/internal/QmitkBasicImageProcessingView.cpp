@@ -32,6 +32,7 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkImageStatisticsHolder.h>
+#include <mitkTimeNavigationController.h>
 
 // Includes for image casting between ITK and MITK
 #include <mitkImageCast.h>
@@ -240,14 +241,10 @@ void QmitkBasicImageProcessing::CreateConnections()
 
 void QmitkBasicImageProcessing::InternalGetTimeNavigationController()
 {
-  auto renwin_part = GetRenderWindowPart();
-  if( renwin_part != nullptr )
+  auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+  if (nullptr != timeNavigationController)
   {
-    auto tnc = renwin_part->GetTimeNavigationController();
-    if( tnc != nullptr )
-    {
-      m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget, tnc->GetTime());
-    }
+    m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget, timeNavigationController->GetStepper());
   }
 }
 
@@ -623,7 +620,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   }
   catch ( std::exception &e )
   {
-  QString exceptionString = tr("An error occured during image loading:\n");
+  QString exceptionString = tr("An error occurred during image loading:\n");
   exceptionString.append( e.what() );
     QMessageBox::warning( nullptr, "Basic Image Processing", exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
     this->BusyCursorOff();

@@ -5,8 +5,8 @@
 include(mitkFunctionGetMSVCVersion)
 
 #[[ Sanity checks ]]
-if(DEFINED BOOST_ROOT AND NOT EXISTS ${BOOST_ROOT})
-  message(FATAL_ERROR "BOOST_ROOT variable is defined but corresponds to non-existing directory")
+if(DEFINED Boost_ROOT AND NOT EXISTS ${Boost_ROOT})
+  message(FATAL_ERROR "Boost_ROOT variable is defined but corresponds to non-existing directory")
 endif()
 
 string(REPLACE "^^" ";" MITK_USE_Boost_LIBRARIES "${MITK_USE_Boost_LIBRARIES}")
@@ -15,18 +15,18 @@ set(proj Boost)
 set(proj_DEPENDENCIES )
 set(Boost_DEPENDS ${proj})
 
-if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
+if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
   #[[ Reset variables. ]]
   set(patch_cmd "")
   set(configure_cmd "")
   set(install_cmd "")
 
-  set(BOOST_ROOT ${ep_prefix})
-  set(Boost_DIR "${BOOST_ROOT}/lib/cmake/Boost-1.80.0")
+  set(Boost_ROOT ${ep_prefix})
+  set(Boost_DIR "${Boost_ROOT}/lib/cmake/Boost-1.82.0")
 
   if(WIN32)
-    set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib")
+    set(BOOST_LIBRARYDIR "${Boost_ROOT}/lib")
   endif()
 
   #[[ If you update Boost, make sure that the FindBoost module of the minimum
@@ -63,8 +63,8 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
           or use another option in the future, we do not forget to remove our
           copy of the FindBoost module again. ]]
 
-  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_80_0.tar.gz")
-  set(md5 077f074743ea7b0cb49c6ed43953ae95)
+  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_82_0.tar.gz")
+  set(md5 f7050f554a65f6a42ece221eaeec1660)
 
   if(MITK_USE_Boost_LIBRARIES)
 

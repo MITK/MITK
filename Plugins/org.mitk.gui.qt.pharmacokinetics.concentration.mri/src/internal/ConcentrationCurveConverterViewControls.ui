@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>475</width>
-    <height>825</height>
+    <height>866</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -135,10 +135,13 @@
       <item>
        <widget class="QWidget" name="groupConcentration" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
          <item>
-          <layout class="QVBoxLayout" name="concentrationOptionsLayout">
-           <property name="topMargin">
-            <number>10</number>
+          <layout class="QVBoxLayout" name="concentrationOptionsLayout" stretch="0,0,0,0">
+           <property name="spacing">
+            <number>4</number>
            </property>
            <item>
             <widget class="QRadioButton" name="radioButton_absoluteEnhancement">
@@ -157,14 +160,7 @@
            <item>
             <widget class="QRadioButton" name="radioButtonUsingT1viaVFA">
              <property name="text">
-              <string>Using T1 Map via Variable Flip Angle</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButtonTurboFlash">
-             <property name="text">
-              <string>TurboFLASH Sequence</string>
+              <string>Variable Flip Angle</string>
              </property>
             </widget>
            </item>
@@ -201,80 +197,49 @@
               <item>
                <widget class="QDoubleSpinBox" name="factorSpinBox"/>
               </item>
-              <item>
-               <widget class="QLabel" name="label_baselineRange">
-                <property name="text">
-                 <string>Baseline Range Selection:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <layout class="QGridLayout" name="gridLayout_4">
-                <item row="0" column="1">
-                 <widget class="QSpinBox" name="spinBox_baselineStartTimeStep"/>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_baselineStartTimeStep">
-                  <property name="text">
-                   <string>Start Time Frame</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_baselineEndTimeStep">
-                  <property name="text">
-                   <string>End Time Frame</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QSpinBox" name="spinBox_baselineEndTimeStep"/>
-                </item>
-               </layout>
-              </item>
              </layout>
             </widget>
            </item>
            <item>
             <widget class="QGroupBox" name="groupBox_T1MapviaVFA">
              <property name="title">
-              <string>T1 Map via Variable Flip Angle Parameters:</string>
+              <string>Variable Flip Angle Parameters:</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_7">
-                <property name="text">
-                 <string>Flip Angle [ ° ] : </string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label_6">
                 <property name="text">
-                 <string>Repetition Time TR [ms] :</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_9">
-                <property name="text">
-                 <string>Relaxivity [mM⁻¹ s⁻¹] : </string>
+                 <string>Repetition Time [ms] :</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
                <widget class="QDoubleSpinBox" name="FlipangleSpinBox"/>
               </item>
-              <item row="2" column="1">
-               <widget class="QDoubleSpinBox" name="RelaxivitySpinBox"/>
-              </item>
-              <item row="3" column="0">
+              <item row="4" column="0">
                <widget class="QLabel" name="label_8">
                 <property name="text">
                  <string>Proton Density Weighted Image :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="FlipanglePDWSpinBox"/>
+              </item>
+              <item row="4" column="1">
+               <widget class="QmitkSingleNodeSelectionWidget" name="PDWImageNodeSelector" native="true"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Relaxivity [mM⁻¹ s⁻¹] : </string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Flip Angle PDW Image [°]</string>
                 </property>
                </widget>
               </item>
@@ -285,58 +250,42 @@
                 </property>
                </widget>
               </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Flip Angle [ ° ] : </string>
+                </property>
+               </widget>
+              </item>
               <item row="3" column="1">
-               <widget class="QmitkSingleNodeSelectionWidget" name="PDWImageNodeSelector" native="true"/>
+               <widget class="QDoubleSpinBox" name="RelaxivitySpinBox"/>
               </item>
              </layout>
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBoxTurboFlash">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
+            <widget class="QGroupBox" name="groupBox_baselineRangeSelection">
              <property name="title">
-              <string>Turbo FLASH Parameters:</string>
+              <string>Baseline Range Selection:</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="1" column="0">
-               <widget class="QLabel" name="lable_TRec">
-                <property name="text">
-                 <string>Recovery Time [s]:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QDoubleSpinBox" name="relaxationtime"/>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_25">
-                <property name="text">
-                 <string>AIF Recovery Time [s]:</string>
-                </property>
-               </widget>
-              </item>
+             <layout class="QGridLayout" name="gridLayout_7">
               <item row="0" column="1">
-               <widget class="QDoubleSpinBox" name="AifRecoverytime"/>
-              </item>
-              <item row="3" column="1">
-               <widget class="QDoubleSpinBox" name="relaxivity"/>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_T10">
-                <property name="text">
-                 <string>Relaxation Time [s]:</string>
-                </property>
-               </widget>
+               <widget class="QSpinBox" name="spinBox_baselineStartTimeStep"/>
               </item>
               <item row="1" column="1">
-               <widget class="QDoubleSpinBox" name="recoverytime"/>
+               <widget class="QSpinBox" name="spinBox_baselineEndTimeStep"/>
               </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label__alpha">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_baselineStartTimeStep">
                 <property name="text">
-                 <string>Relaxivity [ ]:</string>
+                 <string>Start Time Frame</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_baselineEndTimeStep">
+                <property name="text">
+                 <string>End Time Frame</string>
                 </property>
                </widget>
               </item>
@@ -376,53 +325,6 @@
       <string>T2 weighted images</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="1" column="1">
-       <widget class="QmitkSingleNodeSelectionWidget" name="t2TimeSeriesNodeSelector" native="true"/>
-      </item>
-      <item row="5" column="1">
-       <widget class="QDoubleSpinBox" name="T2EchoTimeSpinBox"/>
-      </item>
-      <item row="6" column="0" colspan="2">
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="3" column="1">
-         <widget class="QSpinBox" name="spinBox_baselineEndTimeStepT2"/>
-        </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="spinBox_baselineStartTimeStepT2"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_baselineStartTimeStepT2">
-          <property name="text">
-           <string>Start Time Frame</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_baselineEndTimeStepT2">
-          <property name="text">
-           <string>End Time Frame</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_baselineRangeT2">
-          <property name="text">
-           <string>Baseline Range Selection:</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="4" column="1">
-       <widget class="QDoubleSpinBox" name="T2FactorSpinBox"/>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_12">
-        <property name="text">
-         <string>Echo Time TE [ms]</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="T2_SeriesLabel">
         <property name="text">
@@ -436,6 +338,51 @@
          <string>Conversion Factor k</string>
         </property>
        </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QmitkSingleNodeSelectionWidget" name="t2TimeSeriesNodeSelector" native="true"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>Echo Time TE [ms]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QDoubleSpinBox" name="T2EchoTimeSpinBox"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="T2FactorSpinBox"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_BaselineRangeSelectionT2">
+     <property name="title">
+      <string>Baseline Range Selection:</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_baselineStartTimeStepT2">
+        <property name="text">
+         <string>Start Time Frame</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_baselineEndTimeStepT2">
+        <property name="text">
+         <string>End Time Frame</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="spinBox_baselineStartTimeStepT2"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="spinBox_baselineEndTimeStepT2"/>
       </item>
      </layout>
     </widget>

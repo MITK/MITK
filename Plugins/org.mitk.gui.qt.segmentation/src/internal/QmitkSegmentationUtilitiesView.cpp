@@ -35,18 +35,12 @@ void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
 {
   m_Controls.setupUi(parent);
 
-  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
-
-  mitk::SliceNavigationController* timeNavigationController = renderWindowPart != nullptr
-    ? renderWindowPart->GetTimeNavigationController()
-    : nullptr;
-
   auto dataStorage = this->GetDataStorage();
-  m_BooleanOperationsWidget = new QmitkBooleanOperationsWidget(dataStorage, timeNavigationController, parent);
-  m_ContourModelToImageWidget = new QmitkContourModelToImageWidget(dataStorage, timeNavigationController, parent);
-  m_ImageMaskingWidget = new QmitkImageMaskingWidget(dataStorage, timeNavigationController, parent);
-  m_MorphologicalOperationsWidget = new QmitkMorphologicalOperationsWidget(dataStorage, timeNavigationController, parent);
-  m_SurfaceToImageWidget = new QmitkSurfaceToImageWidget(dataStorage, timeNavigationController, parent);
+  m_BooleanOperationsWidget = new QmitkBooleanOperationsWidget(dataStorage, parent);
+  m_ContourModelToImageWidget = new QmitkContourModelToImageWidget(dataStorage, parent);
+  m_ImageMaskingWidget = new QmitkImageMaskingWidget(dataStorage, parent);
+  m_MorphologicalOperationsWidget = new QmitkMorphologicalOperationsWidget(dataStorage, parent);
+  m_SurfaceToImageWidget = new QmitkSurfaceToImageWidget(dataStorage, parent);
 
   this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
   this->AddUtilityWidget(m_ContourModelToImageWidget, QIcon(":/SegmentationUtilities/ContourModelSetToImage_48x48.png"), "Contour to Image");
@@ -65,22 +59,10 @@ void QmitkSegmentationUtilitiesView::SetFocus()
   m_Controls.toolBox->setFocus();
 }
 
-void QmitkSegmentationUtilitiesView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+void QmitkSegmentationUtilitiesView::RenderWindowPartActivated(mitk::IRenderWindowPart*)
 {
-  mitk::SliceNavigationController* timeNavigationController = renderWindowPart->GetTimeNavigationController();
-
-  m_BooleanOperationsWidget->SetTimeNavigationController(timeNavigationController);
-  m_ContourModelToImageWidget->SetTimeNavigationController(timeNavigationController);
-  m_ImageMaskingWidget->SetTimeNavigationController(timeNavigationController);
-  m_MorphologicalOperationsWidget->SetTimeNavigationController(timeNavigationController);
-  m_SurfaceToImageWidget->SetTimeNavigationController(timeNavigationController);
 }
 
 void QmitkSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
-  m_BooleanOperationsWidget->SetTimeNavigationController(nullptr);
-  m_ContourModelToImageWidget->SetTimeNavigationController(nullptr);
-  m_ImageMaskingWidget->SetTimeNavigationController(nullptr);
-  m_MorphologicalOperationsWidget->SetTimeNavigationController(nullptr);
-  m_SurfaceToImageWidget->SetTimeNavigationController(nullptr);
 }

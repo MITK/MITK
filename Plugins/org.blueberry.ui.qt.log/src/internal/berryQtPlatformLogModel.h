@@ -51,13 +51,13 @@ public:
   QVariant data(const QModelIndex& index, int) const override;
 
   /** Documentation
-   *  @return Retruns the complete table data as string representation.
+   *  @return Returns the complete table data as string representation.
    */
   QString GetDataAsString();
 
   QVariant headerData(int section, Qt::Orientation orientation, int) const override;
 
-  void addLogEntry(const mbilog::LogMessage &msg);
+  void addLogEntry(const mitk::LogMessage &msg);
 
   Q_SLOT void addLogEntry(const ctkPluginFrameworkEvent& event);
 
@@ -72,7 +72,7 @@ private:
    *         internally used to store logging data in the table data model.
    */
   struct ExtendedLogMessage {
-    mbilog::LogMessage message;
+    mitk::LogMessage message;
     clock_t time;
     int threadid;
 
@@ -80,7 +80,7 @@ private:
     {
     }
 
-    ExtendedLogMessage(const mbilog::LogMessage &msg):message(msg),time(std::clock()),threadid(0)
+    ExtendedLogMessage(const mitk::LogMessage &msg):message(msg),time(std::clock()),threadid(0)
     {
     }
 
@@ -91,58 +91,54 @@ private:
 
     QVariant getLevel() const
     {
-    switch(this->message.level)
+    switch(this->message.Level)
         {
           default:
-          case mbilog::Info:
+          case mitk::LogLevel::Info:
             return QVariant(Info);
 
-          case mbilog::Warn:
+          case mitk::LogLevel::Warn:
             return QVariant(Warn);
 
-          case mbilog::Error:
+          case mitk::LogLevel::Error:
             return QVariant(Error);
 
-          case mbilog::Fatal:
+          case mitk::LogLevel::Fatal:
             return QVariant(Fatal);
 
-          case mbilog::Debug:
+          case mitk::LogLevel::Debug:
             return QVariant(Debug);
         }
     }
 
     QVariant getMessage() const
     {
-    return QVariant(QString(this->message.message.c_str()));
+    return QVariant(QString::fromStdString(this->message.Message));
     }
 
     QVariant getCategory() const
     {
-    return QVariant(QString(this->message.category.c_str()));
+    return QVariant(QString::fromStdString(this->message.Category));
     }
 
     QVariant getModuleName() const
     {
-    return QVariant(QString(this->message.moduleName));
+    return QVariant(QString::fromStdString(this->message.ModuleName));
     }
 
     QVariant getFunctionName() const
     {
-    return QVariant(QString(this->message.functionName));
+    return QVariant(QString::fromStdString(this->message.FunctionName));
     }
 
     QVariant getPath() const
     {
-    return QVariant(QString(this->message.filePath));
+    return QVariant(QString::fromStdString(this->message.FilePath));
     }
 
     QVariant getLine() const
     {
-    std::stringstream out;
-    std::locale C("C");
-    out.imbue(C);
-    out << this->message.lineNumber;
-    return QVariant(QString(out.str().c_str()));
+    return QVariant(QString::number(this->message.LineNumber));
     }
 
     /** This method is implemented in the cpp file to save includes. */
@@ -150,7 +146,7 @@ private:
 
   };
 
-  class QtLogBackend : public mbilog::BackendBase
+  class QtLogBackend : public mitk::LogBackendBase
   {
     public:
 
@@ -158,24 +154,24 @@ private:
       {
         myModel=_myModel;
         deactivated = false;
-        mbilog::RegisterBackend(this);
-        BERRY_INFO << "BlueBerry mbilog backend registered";
+        mitk::RegisterBackend(this);
+        BERRY_INFO << "BlueBerry log backend registered";
       }
 
       ~QtLogBackend() override
       {
-        mbilog::UnregisterBackend(this);
+        mitk::UnregisterBackend(this);
       }
 
-      void ProcessMessage(const mbilog::LogMessage &l ) override
+      void ProcessMessage(const mitk::LogMessage &l ) override
       {
         if(!deactivated)
           myModel->addLogEntry(l);
       }
 
-      mbilog::OutputType GetOutputType() const override
+      mitk::LogBackendBase::OutputType GetOutputType() const override
       {
-        return mbilog::Other;
+        return mitk::LogBackendBase::OutputType::Other;
       }
 
       void Deactivate()

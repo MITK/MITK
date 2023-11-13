@@ -99,7 +99,7 @@ struct BERRY_JOBS IJobChangeListener
   }
 
   /**
-   * Notification that a job has completed execution, either due to cancelation, successful
+   * Notification that a job has completed execution, either due to cancellation, successful
    * completion, or failure.  The event status object indicates how the job finished,
    * and the reason for failure, if applicable.
    */

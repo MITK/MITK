@@ -11,7 +11,9 @@ if(BUILD_MatchPointCmdApps OR MITK_BUILD_ALL_APPS)
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
     set( cmdapps
-    StitchImagesMiniApp^^
+    StitchImages^^
+    MatchImage^^
+    MapImage^^
     )
 
     foreach(cmdapp ${cmdapps})

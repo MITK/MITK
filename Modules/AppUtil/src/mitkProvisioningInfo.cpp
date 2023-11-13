@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkProvisioningInfo.h"
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <QCoreApplication>
 #include <QFile>

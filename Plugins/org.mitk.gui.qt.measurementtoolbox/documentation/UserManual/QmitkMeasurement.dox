@@ -5,7 +5,7 @@
 
 <h1>Overview</h1>
 
-The Measurement view allows you to measure distances, angles, paths and several geometric figures on 2D images or image slices of 3D and 4D images. The measurement view is repeatedly useable with the same or different measurement figures that are related to the chosen image and can be saved together with it for future use. 
+The Measurement view allows you to measure distances, angles, paths and several geometric figures on 2D images or image slices of 3D and 4D images. The measurement view is repeatedly usable with the same or different measurement figures that are related to the chosen image and can be saved together with it for future use. 
 
 
 \imageMacro{QmitkMeasurementToolbox_BasicScreenEdited.jpg,"Image with measurements",16.00}

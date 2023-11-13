@@ -20,7 +20,7 @@ If you use the view for your research please cite our work as reference:\n\n
 Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, <i>MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI</i>. https://doi.org/10.1186/s12859-018-2588-1 (BMC Bioinformatics 2019 20:31)
 
 \section FIT_DCE_Data_and_ROI_Selection Time series and mask selection
-\imageMacro{dce_mri_maskAndFittingStrategy.png, "Time series and mask selection.", 10}
+\imageMacro{dce_mri_maskAndFittingStrategy.png, "Time series and mask selection.", 3.0}
 In principle, every model can be fitted on the entire image. However, for model configuration reasons (e.g. AIF required) and computational time cost, this is often not advisable.
 Therefore, apart from the image to be fitted (<i>Selected Time Series</i>), a ROI segmentation can be defined (<i>Selected Mask</i>), within which model fitting is performed.
 The view currently offers <i>Pixel based</i> and/or <i>ROI based</i> averaged fits of time-varying curves. The <i>ROI based</i> fitting option becomes enabled, if a mask is selected.
@@ -28,9 +28,8 @@ The view currently offers <i>Pixel based</i> and/or <i>ROI based</i> averaged fi
 
 \section FIT_DCE_General_models Supported models
 Currently the following pharmacokinetic models for gadolinium-based contrast agent are available:
--	The Descriptive Brix model \ref FIT_DCE_lit_ref1 "[1]"
--	A semi-quantitative two/three segment linear model (2SL/3SL)
--	The standard tofts model \ref FIT_DCE_lit_ref2 "[2]"
+-	The descriptive Brix model \ref FIT_DCE_lit_ref1 "[1]"
+-	The standard Tofts model \ref FIT_DCE_lit_ref2 "[2]"
 -	The extended Tofts model \ref FIT_DCE_lit_ref3 "[3]"
 -	The two compartment exchange model (2CXM) \ref FIT_DCE_lit_ref4 "[4, 5]"
 
@@ -40,7 +39,6 @@ Currently the following pharmacokinetic models for gadolinium-based contrast age
 \subsection FIT_DCE_Settings_model Model specific settings
 Selecting one of the \ref FIT_DCE_General_models "supported models" will open below tabs for further configuration of the model.
 - The descriptive Brix model requires only definition of the duration of the bolus, i.e. the overall time of the injection (<i>Injection Time [min]</i>).
-- The 3SL is a semi-quantitative descriptive model that distinguishes three different segments of the signal: A constant baseline, the initial fast rise (wash-in) and the final slow rise / signal decrease (washout). Each of these segments is approximated by a linear curve, with change points in-between. It requires no further configuration.
 - The standard Tofts model, the extended Tofts model and the 2CXM are compartment models that require the input of the concentration time curve in the tissue feeding artery, the arterial input function (AIF).
 In the DCE MR Perfusion Datafit View, the arterial input function can be defined in several ways. For patient individual image derived AIFs, select the radio button <i>Select AIF from Image</i>.
 In that case, a segmentation ROI for the artery has to be selected. This can be done by clicking on the <i>AIF Mask</i> selection widget and selecting a suitable AIF segmentation from the data loaded in the Data Manager. In cases where the respective artery does not lie in the same image as the investigated tissue (e.g. in animal experiments, where a slice through the heart is used for AIF extraction), a dedicated AIF image can be selected using the corresponding <i>Dedicated AIF image</i> selection widget.
@@ -67,10 +65,10 @@ The second column <i>Type</i> defines whether the constraint defines an upper or
 \imageMacro{dce_mri_concentration.png, "Example screenshot for concentration conversion settings.", 10}
 Most models require contrast agent concentration values as input rather than raw signal intensities (i.e. all compartment models).
 The DCE MR Perfusion DataFit View offers a variety of tools for the conversion from signal to concentration:
-by means of relative and absolute signal enhancement, via a T1-map calculated by the variable flip angle method, as well as a special conversion for turbo flash sequences.
-A more detailed description of these conversion methods, for example the exact formulas used for the absolute and relative signal enhancement calculations, can be found here: \ref org_mitk_views_pharmacokinetics_concentration_mri.
+by means of relative and absolute signal enhancement and via a T1-map calculated by the variable flip angle method.
+A more detailed description of these conversion methods can be found here: \ref org_mitk_views_pharmacokinetics_concentration_mri.
 For the conversion methods, a baseline image prior to contrast agent arrival is required.
-In many data sets, multiple baseline images are available. The <i>Baseline Range Selection</i> allows for selection of a range of time frames, from which the average image (along the time dimension) is calculated and set as baseline input image.
+In many dynamic data sets, multiple images are part of the baseline. The <i>Baseline Range Selection</i> allows for selection of a range of time frames, from which the average image (along the time dimension) is calculated and set as baseline input image.
 Remark: The number of the first time frame is 0.
 
 \section FIT_DCE_Fitting Executing a fit

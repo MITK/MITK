@@ -51,8 +51,6 @@ vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering2;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering3;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering4;
 
-mitk::SliceNavigationController *m_TimeNavigationController = nullptr;
-
 mitk::DataStorage::Pointer m_DataStorage;
 mitk::DataNode::Pointer m_PlaneNode1;
 mitk::DataNode::Pointer m_PlaneNode2;
@@ -66,21 +64,6 @@ void InitializeWindows()
   mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Sagittal);
   mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Coronal);
   mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Original);
-
-  // initialize m_TimeNavigationController: send time via sliceNavigationControllers
-  m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
-  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget1->GetSliceNavigationController());
-  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget2->GetSliceNavigationController());
-  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget3->GetSliceNavigationController());
-  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget4->GetSliceNavigationController());
-  mitkWidget1->GetSliceNavigationController()->ConnectGeometrySendEvent(
-    mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow()));
-
-  // reverse connection between sliceNavigationControllers and m_TimeNavigationController
-  mitkWidget1->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
-  mitkWidget2->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
-  mitkWidget3->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
-  mitkWidget4->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
 
   mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.1, 0.1, 0.1);
   mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.5, 0.5, 0.5);

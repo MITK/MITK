@@ -86,7 +86,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
   m_DistanceImageITK->SetOrigin(originAsWorld);
   m_DistanceImageITK->SetDirection(m_ReferenceImage->GetDirection());
   m_DistanceImageITK->SetRegions(lpRegion);
-  m_DistanceImageITK->SetSpacing(m_DistanceImageSpacing);
+  m_DistanceImageITK->SetSpacing(itk::Vector<double, 3>(m_DistanceImageSpacing));
   m_DistanceImageITK->Allocate();
 
   // First of all the image is initialized with the value 10*m_DistanceImageSpacing for each pixel

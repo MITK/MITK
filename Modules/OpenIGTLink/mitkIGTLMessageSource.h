@@ -62,7 +62,7 @@ namespace mitk {
      */
     itkGetMacro(Type,std::string);
 
-    /** @return Returns a human readable type of this source. There will be a
+    /** @brief Sets the human readable type of this source. There will be a
      * default type, or you can set the name with the method SetType(). You have
      * to set this parameter otherwise it will not be found by the message
      * provider.

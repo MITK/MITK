@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMFileReaderSelector.h>
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <itkGDCMImageIO.h>
 

@@ -55,7 +55,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to TotalSegmentator tool in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to TotalSegmentator. MITK does not ship with TotalSegmentator. Make sure to have a working internet connection to install TotalSegmentator. Or, choose an python environment with TotalSegmentator in it before inferencing.
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to TotalSegmentator v2 tool in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to TotalSegmentator. MITK does not ship with TotalSegmentator. Make sure to have a working internet connection to install TotalSegmentator. Or, choose an python environment with TotalSegmentator in it before inferencing.
 		 Currently, the tool is pretrained on CT images only. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/wasserth/TotalSegmentator&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/wasserth/TotalSegmentator&lt;/span&gt;&lt;/a&gt; to learn everything about the TotalSegmentator.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="textFormat">
@@ -188,7 +188,7 @@
 			 </sizepolicy>
 			</property>
 			<property name="text">
-			  <string>System Python:</string>
+			  <string>System Python (>=3.9):</string>
 			</property>
 		   </widget>
 		  </item>

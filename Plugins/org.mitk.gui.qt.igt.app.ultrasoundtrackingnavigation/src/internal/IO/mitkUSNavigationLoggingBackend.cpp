@@ -36,13 +36,13 @@ void mitk::USNavigationLoggingBackend::SetOutputFileName(std::string filename)
   }
 }
 
-void mitk::USNavigationLoggingBackend::ProcessMessage(const mbilog::LogMessage& logMessage)
+void mitk::USNavigationLoggingBackend::ProcessMessage(const LogMessage& logMessage)
 {
   if ( m_OutputStream.is_open()) {this->FormatSmart(m_OutputStream, logMessage);}
-  if (logMessage.category == "USNavigationLogging")
+  if (logMessage.Category == "USNavigationLogging")
     {
-      m_lastNavigationMessages.push_back(logMessage.message);
-      m_allNavigationMessages.push_back(logMessage.message);
+      m_lastNavigationMessages.push_back(logMessage.Message);
+      m_allNavigationMessages.push_back(logMessage.Message);
     }
 }
 
@@ -68,7 +68,7 @@ void mitk::USNavigationLoggingBackend::ClearNavigationMessages()
 m_lastNavigationMessages = std::vector<std::string>();
 }
 
-mbilog::OutputType mitk::USNavigationLoggingBackend::GetOutputType() const
+mitk::LogBackendBase::OutputType mitk::USNavigationLoggingBackend::GetOutputType() const
 {
-  return mbilog::File;
+  return OutputType::File;
 }

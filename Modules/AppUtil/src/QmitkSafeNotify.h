@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define QmitkSafeNotify_h
 
 #include <mitkException.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <QMessageBox>
 

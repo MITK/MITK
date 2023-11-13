@@ -8,6 +8,12 @@ mitk_create_module(
    PRIVATE VTK|ImagingGeneral+ImagingHybrid
 )
 
+if(BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()
+add_subdirectory(autoload/IO)
+add_subdirectory(cmdapps)
+
 if(TARGET ${MODULE_TARGET})
   set(ALG_PROFILE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/algorithms)
 
@@ -20,10 +26,5 @@ if(TARGET ${MODULE_TARGET})
     CREATE_ALGORITHM_PROFILE(${profile_name} ${ALG_PROFILE_DIR}/${profile_file})
   endforeach()
 
-  add_subdirectory(autoload/IO)
   add_subdirectory(deployment)
-  if(BUILD_TESTING)
-    add_subdirectory(Testing)
-  endif()
-  add_subdirectory(cmdapps)
 endif()

@@ -12,7 +12,7 @@ found in the LICENSE file.
 #include "QmitkStoreSCPLauncher.h"
 #include <QMessageBox>
 #include <QProcessEnvironment>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <fstream>
 #include <iostream>
@@ -64,7 +64,7 @@ void QmitkStoreSCPLauncher::FindPathToStoreSCP()
 
         m_PathToStoreSCP = appPath + fileName;
 
-        //In developement the storescp isn't copied into bin directory
+        //In development the storescp isn't copied into bin directory
         if(!QFile::exists(m_PathToStoreSCP))
         {
             m_PathToStoreSCP = static_cast<QString>(DCMTK_STORESCP);

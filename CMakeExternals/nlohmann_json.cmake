@@ -25,7 +25,7 @@ if(MITK_USE_nlohmann_json)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/nlohmann/json.git
-      GIT_TAG v3.10.5
+      GIT_TAG v3.11.2
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS

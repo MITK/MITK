@@ -43,7 +43,7 @@ class MITKQTWIDGETS_EXPORT QmitkSynchronizedWidgetConnector : public QObject
 
 public:
 
-  using NodeList = QList<mitk::DataNode::Pointer>;
+  using NodeList = QmitkSynchronizedNodeSelectionWidget::NodeList;
 
   QmitkSynchronizedWidgetConnector();
 
@@ -63,7 +63,7 @@ public:
   *
   * @param nodeSelectionWidget    The synchronized node selection widget to be connected / synchronized.
   */
-  void ConnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget) const;
+  void ConnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget);
   /*
   * @brief This function disconnects the different signals and slot of this instance and the given
   *        given node selection widget, such that changes to the current list of nodes
@@ -71,7 +71,7 @@ public:
   *
   * @param nodeSelectionWidget    The synchronized node selection widget to be disconnected / desynchronized.
   */
-  void DisconnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget) const;
+  void DisconnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget);
   /*
   * @brief This function sets the current selection and the selection mode of the given node selection widget
   *        to the values of this instance. The required values are stored in this class internally.
@@ -139,11 +139,21 @@ public Q_SLOTS:
   *                     False otherwise.
   */
   void ChangeSelectionMode(bool selectAll);
+  /*
+  * @brief Decrease the internal counter of connections to keep track of how many
+  *        QmitkSynchronizedNodeSelectionWidgets are synchronized.
+  *
+  *        This slot itself is connected to the 'DeregisterSynchronization'-signal of each
+  *        QmitkSynchronizedNodeSelectionWidget to get notified when a synchronized
+  *        widget is deleted.
+  */
+  void DeregisterWidget();
 
 private:
 
   NodeList m_InternalSelection;
   bool m_SelectAll;
+  unsigned int m_ConnectionCounter;
 
 };
 

@@ -21,15 +21,20 @@ namespace mitk {
     class MITKPHARMACOKINETICS_EXPORT ConvertToConcentrationTurboFlashFunctor
     {
 
+    private:
+      double m_Trec;
+      double m_alpha;
+      double m_T10;
+
     public:
         ConvertToConcentrationTurboFlashFunctor() : m_Trec(0), m_alpha(0), m_T10(0) {};
         ~ConvertToConcentrationTurboFlashFunctor() {};
 
         void initialize(double relaxationtime, double relaxivity, double recoverytime)
         {
-            m_Trec = relaxationtime;
+            m_Trec = recoverytime;
             m_alpha = relaxivity;
-            m_T10 = recoverytime;
+            m_T10 = relaxationtime;
         }
 
         bool operator!=( const ConvertToConcentrationTurboFlashFunctor & other)const
@@ -56,10 +61,7 @@ namespace mitk {
             return concentration;
         }
 
-    private:
-        double m_Trec;
-        double m_alpha;
-        double m_T10;
+
     };
 
 }

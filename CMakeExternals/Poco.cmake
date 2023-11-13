@@ -46,8 +46,8 @@ if(MITK_USE_Poco)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      GIT_REPOSITORY https://github.com/pocoproject/poco.git
-      GIT_TAG poco-1.12.2-release
+      GIT_REPOSITORY https://github.com/mitk/poco.git
+      GIT_TAG 7a7d81fd049088d93e42d0f7b8f7f7d5d1af3708 # poco-1.12.4-patched
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS

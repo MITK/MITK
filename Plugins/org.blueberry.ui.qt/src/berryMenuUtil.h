@@ -102,7 +102,7 @@ public:
   /**
    * @param id
    *            The toolbar's id
-   * @return The lcoation URI for a toolbar with the given id
+   * @return The location URI for a toolbar with the given id
    */
   static QString ToolbarUri(const QString& id);
 

@@ -11,10 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Qmitk
-#include "QmitkRenderWindow.h"
-#include "QmitkSliceNavigationListener.h"
+#include <QmitkRenderWindow.h>
+#include <QmitkSliceNavigationListener.h>
 
-#include "mitkIRenderWindowPart.h"
+#include <mitkIRenderWindowPart.h>
+#include <mitkTimeNavigationController.h>
 
 // Qt
 #include <QTimer>
@@ -53,18 +54,11 @@ void QmitkSliceNavigationListener::OnSliceChangedDelayed()
   if (nullptr != m_renderWindowPart)
   {
     const auto newSelectedPosition = m_renderWindowPart->GetSelectedPosition();
-    const auto newSelectedTimePoint = m_renderWindowPart->GetSelectedTimePoint();
 
     if (newSelectedPosition != m_CurrentSelectedPosition)
     {
       m_CurrentSelectedPosition = newSelectedPosition;
       emit SelectedPositionChanged(newSelectedPosition);
-    }
-
-    if (newSelectedTimePoint != m_CurrentSelectedTimePoint)
-    {
-      m_CurrentSelectedTimePoint = newSelectedTimePoint;
-      emit SelectedTimePointChanged(newSelectedTimePoint);
     }
   }
 }
@@ -82,6 +76,27 @@ void QmitkSliceNavigationListener::OnSliceChangedInternal(const itk::EventObject
   }
 }
 
+void QmitkSliceNavigationListener::OnTimeChangedInternal(itk::Object* sender, const itk::EventObject& e)
+{
+  if (!dynamic_cast<const mitk::TimeNavigationController::TimeEvent*>(&e))
+  {
+    return;
+  }
+
+  const auto* timeNavigationController = dynamic_cast<mitk::TimeNavigationController*>(sender);
+  if (nullptr == timeNavigationController)
+  {
+    return;
+  }
+
+  const mitk::TimePointType newSelectedTimePoint = timeNavigationController->GetSelectedTimePoint();
+  if (newSelectedTimePoint != m_CurrentSelectedTimePoint)
+  {
+    m_CurrentSelectedTimePoint = newSelectedTimePoint;
+    emit SelectedTimePointChanged(newSelectedTimePoint);
+  }
+}
+
 void QmitkSliceNavigationListener::OnSliceNavigationControllerDeleted(const itk::Object* sender, const itk::EventObject& /*e*/)
 {
   const mitk::SliceNavigationController* sendingSlicer =
@@ -96,13 +111,19 @@ void QmitkSliceNavigationListener::RenderWindowPartActivated(mitk::IRenderWindow
   {
     m_renderWindowPart = renderWindowPart;
 
+    auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    itk::MemberCommand<QmitkSliceNavigationListener>::Pointer cmdTimeEvent =
+      itk::MemberCommand<QmitkSliceNavigationListener>::New();
+    cmdTimeEvent->SetCallbackFunction(this, &QmitkSliceNavigationListener::OnTimeChangedInternal);
+    m_ControllerToTimeObserverTag = timeNavigationController->AddObserver(mitk::TimeNavigationController::TimeEvent(0), cmdTimeEvent);
+
     if (!InitObservers())
     {
       QMessageBox::information(nullptr, "Error", "Unable to set up the event observers.");
     }
 
     m_CurrentSelectedPosition = m_renderWindowPart->GetSelectedPosition();
-    m_CurrentSelectedTimePoint = m_renderWindowPart->GetSelectedTimePoint();
+    m_CurrentSelectedTimePoint = timeNavigationController->GetSelectedTimePoint();
   }
 }
 
@@ -122,7 +143,9 @@ void QmitkSliceNavigationListener::RenderWindowPartInputChanged(mitk::IRenderWin
     }
 
     m_CurrentSelectedPosition = m_renderWindowPart->GetSelectedPosition();
-    m_CurrentSelectedTimePoint = m_renderWindowPart->GetSelectedTimePoint();
+
+    const auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    m_CurrentSelectedTimePoint = timeNavigationController->GetSelectedTimePoint();
   }
 }
 
@@ -137,13 +160,12 @@ bool QmitkSliceNavigationListener::InitObservers()
 
   while (i != windowMap.end())
   {
-    mitk::SliceNavigationController* sliceNavController =
-      i.value()->GetSliceNavigationController();
+    mitk::SliceNavigationController* sliceNavController = i.value()->GetSliceNavigationController();
 
-    if (sliceNavController)
+    if (nullptr != sliceNavController)
     {
       bool observersInitialized = this->ObserversInitialized(sliceNavController);
-      if(false == observersInitialized)
+      if (false == observersInitialized)
       {
         itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::Pointer cmdSliceEvent =
           itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::New();
@@ -151,16 +173,6 @@ bool QmitkSliceNavigationListener::InitObservers()
         int tag = sliceNavController->AddObserver(
           mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0),
           cmdSliceEvent);
-
-        m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-          i.key().toStdString(), m_renderWindowPart)));
-
-        itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::Pointer cmdTimeEvent =
-          itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::New();
-        cmdTimeEvent->SetCallbackFunction(this, &QmitkSliceNavigationListener::OnSliceChangedInternal);
-        tag = sliceNavController->AddObserver(
-          mitk::SliceNavigationController::GeometryTimeEvent(nullptr, 0),
-          cmdTimeEvent);
 
         m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
           i.key().toStdString(), m_renderWindowPart)));
@@ -220,6 +232,9 @@ void QmitkSliceNavigationListener::RemoveAllObservers(mitk::IRenderWindowPart* d
       m_ObserverMap.erase(delPos);
     }
   }
+
+  auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+  timeNavigationController->RemoveObserver(m_ControllerToTimeObserverTag);
 }
 
 bool QmitkSliceNavigationListener::ObserversInitialized(mitk::SliceNavigationController* controller)

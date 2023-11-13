@@ -34,13 +34,13 @@ from CD or a folder on your hard drive or it will open the query retrieve screen
 If you open the dicom plugin the dicom data storage will be displayed. You are able to see all your stored dicom image data.
 You can browse your data by clicking on the left arrow beside the name of your data. There are three levels available.
 The first level is the patient level where you can see the patient data. On the second level you can see the dicom studies for the patient.
-on the third level you can see all available series refering to it's study.
+on the third level you can see all available series referring to its study.
 You can delete the data by selecting it and pressing the delete button.
-Be careful if you have selected a patient or a study all refering data be deleted.
-So if you delete a patient the patient and all studies and series refered to the patient will be deleted.
+Be careful if you have selected a patient or a study all referring data be deleted.
+So if you delete a patient the patient and all studies and series referred to the patient will be deleted.
 If you delete a study all series of the study will be deleted.
 If you want to view the dicom data you have to select a series and click on the View button.
-The data will appear in the DataManager and will be dispayed.
+The data will appear in the DataManager and will be displayed.
 \imageMacro{QmitkDicom_DisplayDataManager.png,"Viewed image",16.00}
 <ul>
 <li> Click on the arrow on the left of your data to expand or hide dicom data levels.
@@ -50,11 +50,11 @@ The data will appear in the DataManager and will be dispayed.
 
 \subsection org_mitk_gui_qt_dicomImport Data import
 \imageMacro{QmitkDicom_ImportDialog.png,"The import dialog checked",9.53}
-There are two diffrent ways to import DICOM data.
-The First one is to directly imort it into your DICOM data storage. To achieve this you should toggle the checkbox 'Copy on import'.
+There are two different ways to import DICOM data.
+The First one is to directly import it into your DICOM data storage. To achieve this you should toggle the checkbox 'Copy on import'.
 The second approach is, to have a look at the data first before importing it.
 To do that you simply don't check 'Copy on import'.
-This will leed you to the leed you to the 'External Dicom Data' screen which provides you a preview of the data containing in youre choosen folder.
+This will leed you to the leed you to the 'External Dicom Data' screen which provides you a preview of the data containing in you're chosen folder.
 You can import the data here by selecting it and pressing the 'Download' button.
 It is also possible to view DICOM series directly in Mitk by selecting it here and pressing the 'View' button.
 <ul>
@@ -84,23 +84,23 @@ The query retrieve workflow allows you to get DICOM data from a server.
 By performing a DICOM query you will ask a server for it's DICOM data.
 This requires to setup the DICOM network configuration of your system and the server.
 By clicking on 'Add Server' a new plain server field will appear. Now you can give it a name of your choice.
-Fill the servers "DICOM name" the AETitle. Type in it's url, it's port and the specific DICOM protocoll you want to use for image transfer.
-\note I recommend not to use CGET because most of the PACS systems (Image Servers) don't support that protocoll.
+Fill the servers "DICOM name" the AETitle. Type in it's url, it's port and the specific DICOM protocol you want to use for image transfer.
+\note I recommend not to use CGET because most of the PACS systems (Image Servers) don't support that protocol.
 
 You can configure the DICOM network configuration of your machine by editing the 'Calling AETiltle', the 'Storage AETitle' and The 'Storage Port' text fields.
-But normaly you don't have to change your configuration.
+But normally you don't have to change your configuration.
 \imageMacro{QmitkDicom_FilterWidget.png,"The DICOM search options",3.66}
 After you have finished your network configuration and before you start the query you should use the 'Search Options' to specify your query.
 Otherwise all data on the server will be queried and you will have to wait for a long time.
 You can specify your query by searching for a specific patient name or a study or a serie or a specific DICOM object by it's id.
-You are allowed to include or exclude DICOM modalities from your query and you can specify a specific time in which the DICOM images you are searching fo might been captured.
+You are allowed to include or exclude DICOM modalities from your query and you can specify a specific time in which the DICOM images you are searching for might been captured.
 When you finished that you can click the query button and the queried DICOM data will appear.
 <ul>
 <li> Click on the 'Add Server' button.
     <ul>
     <li> Edit 'Name' field.
 	<li> Edit 'AETitle' field.
-	<li> Edit 'Adress' field.
+	<li> Edit 'Address' field.
     <li> Edit 'Port' field.
     </ul>
 <li> Set search options.

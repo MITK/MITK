@@ -18,11 +18,15 @@ found in the LICENSE file.
 #include <mitkImageWriteAccessor.h>
 #include <mitkProgressBar.h>
 #include <mitkTimeHelper.h>
-
+#include <mitkLabel.h>
 #include <mitkVtkImageOverwrite.h>
 
 mitk::ContourModelSetToImageFilter::ContourModelSetToImageFilter()
-  : m_MakeOutputBinary(true), m_TimeStep(0), m_ReferenceImage(nullptr)
+  : m_MakeOutputBinary(true),
+    m_MakeOutputLabelPixelType(false),
+    m_PaintingPixelValue(1),
+    m_TimeStep(0),
+    m_ReferenceImage(nullptr)
 {
   // Create the output.
   itk::DataObject::Pointer output = this->MakeOutput(0);
@@ -33,6 +37,32 @@ mitk::ContourModelSetToImageFilter::ContourModelSetToImageFilter()
 
 mitk::ContourModelSetToImageFilter::~ContourModelSetToImageFilter()
 {
+}
+
+void mitk::ContourModelSetToImageFilter::SetMakeOutputBinary(bool makeOutputBinary)
+{
+  if (m_MakeOutputBinary != makeOutputBinary)
+  {
+    m_MakeOutputBinary = makeOutputBinary;
+
+    if (m_MakeOutputBinary)
+      m_MakeOutputLabelPixelType = false;
+
+    this->Modified();
+  }
+}
+
+void mitk::ContourModelSetToImageFilter::SetMakeOutputLabelPixelType(bool makeOutputLabelPixelType)
+{
+  if (m_MakeOutputLabelPixelType != makeOutputLabelPixelType)
+  {
+    m_MakeOutputLabelPixelType = makeOutputLabelPixelType;
+
+    if (m_MakeOutputLabelPixelType)
+      m_MakeOutputBinary = false;
+
+    this->Modified();
+  }
 }
 
 void mitk::ContourModelSetToImageFilter::GenerateInputRequestedRegion()
@@ -54,7 +84,11 @@ void mitk::ContourModelSetToImageFilter::GenerateOutputInformation()
       (m_ReferenceImage->GetTimeGeometry() == nullptr))
     return;
 
-  if (m_MakeOutputBinary)
+  if (m_MakeOutputLabelPixelType)
+  {
+    output->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), *m_ReferenceImage->GetTimeGeometry(), 1);
+  }
+  else if (m_MakeOutputBinary)
   {
     output->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *m_ReferenceImage->GetTimeGeometry(), 1);
   }
@@ -212,7 +246,7 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     // 3. Fill contour into slice
     mitk::ContourModel::Pointer projectedContour =
       mitk::ContourModelUtils::ProjectContourTo2DSlice(slice, contour);
-    mitk::ContourModelUtils::FillContourInSlice(projectedContour, slice, outputImage);
+    mitk::ContourModelUtils::FillContourInSlice(projectedContour, slice, outputImage, m_PaintingPixelValue);
 
     // 4. Write slice back into image volume
     reslice->SetInputSlice(slice->GetVtkImageData());

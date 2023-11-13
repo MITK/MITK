@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "MitkCoreExports.h"
 
 #include <mitkCommon.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <mitkServiceInterface.h>
 #include <usGetModuleContext.h>

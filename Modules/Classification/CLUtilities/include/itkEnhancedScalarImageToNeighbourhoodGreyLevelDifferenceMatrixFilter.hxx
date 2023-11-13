@@ -43,7 +43,7 @@ found in the LICENSE file.
 #include "itkRelabelComponentImageFilter.h"
 #include "itkCastImageFilter.h"
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 namespace itk
 {

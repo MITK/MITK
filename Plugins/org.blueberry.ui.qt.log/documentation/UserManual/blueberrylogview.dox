@@ -11,6 +11,6 @@ There are different features available in the view. The 'Filter' text field prov
 
 In the simple logging view, you'll see logging messages and logging levels. A brief description of the logging levels can be found in the \ref LoggingPage "logging concept documentation". With two checkboxes more information on every logging message can be activated. The checkbox 'categories' adds a column for the category. The checkbox 'advanced fields' additionally displays the time from application start to the log message entry and the function, filename and line number of the logging message origin.
 
-\imageMacro{LogViewExplain.png,"Details on the Vizualized Logging Information",16.00}
+\imageMacro{LogViewExplain.png,"Details on the Visualized Logging Information",16.00}
 
 */

@@ -54,12 +54,21 @@ set(CPP_FILES
   Models/mitkGenericParamModelFactory.cpp
   Models/mitkGenericParamModelParameterizer.cpp
   Models/mitkValueBasedParameterizationDelegate.cpp
-  Models/mitkT2DecayModel.cpp
-  Models/mitkT2DecayModelFactory.cpp
-  Models/mitkT2DecayModelParameterizer.cpp
+  Models/mitkExponentialDecayModel.cpp
+  Models/mitkExponentialDecayModelFactory.cpp
+  Models/mitkExponentialDecayModelParameterizer.cpp
+  Models/mitkExponentialSaturationModel.cpp
+  Models/mitkExponentialSaturationModelFactory.cpp
+  Models/mitkExponentialSaturationModelParameterizer.cpp
   Models/mitkExpDecayOffsetModel.cpp
   Models/mitkExpDecayOffsetModelFactory.cpp
   Models/mitkExpDecayOffsetModelParameterizer.cpp
+  Models/mitkTwoStepLinearModel.cpp
+  Models/mitkTwoStepLinearModelFactory.cpp
+  Models/mitkTwoStepLinearModelParameterizer.cpp
+  Models/mitkThreeStepLinearModel.cpp
+  Models/mitkThreeStepLinearModelFactory.cpp
+  Models/mitkThreeStepLinearModelParameterizer.cpp
   TestingHelper/mitkTestModel.cpp
   TestingHelper/mitkTestModelFactory.cpp
 )

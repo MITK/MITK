@@ -78,7 +78,7 @@ private:
   * Checks if appropriated nodes are selected in the data manager. If nodes are selected,
   * they are stored m_spSelectedRegNode, m_spSelectedInputNode and m_spSelectedRefNode.
   * They are also checked for vadility and stored in m_ValidInput,... .
-  * It also sets the info lables accordingly.*/
+  * It also sets the info labels accordingly.*/
   void CheckInputs();
 
   /**

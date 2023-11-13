@@ -258,7 +258,7 @@ void QmitkMatchPointFrameCorrection::CheckInputs()
   if (m_LoadedAlgorithm.IsNull())
   {
     m_Controls.m_lbLoadedAlgorithmName->setText(
-      QStringLiteral("<font color='red'>No algorithm seleted!</font>"));
+      QStringLiteral("<font color='red'>No algorithm selected!</font>"));
   }
   else
   {
@@ -718,7 +718,7 @@ void QmitkMatchPointFrameCorrection::UpdateAlgorithmSelection(berry::ISelection:
       // only the first selection is of interest, the rest will be skipped.
       this->m_SelectedAlgorithmInfo = infoVector[0];
     }
+    this->OnSelectedAlgorithmChanged();
   }
 
-  this->OnSelectedAlgorithmChanged();
 };

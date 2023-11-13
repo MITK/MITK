@@ -6,7 +6,7 @@
 
 \section QmitkMITKIGTNavigationToolManager Introduction
 
-This view allows for creating and editing NavigationToolStorages. These storages contains naviagtion tools of a tracking device, can be saved permanently and used later for any other IGT application.
+This view allows for creating and editing NavigationToolStorages. These storages contains navigation tools of a tracking device, can be saved permanently and used later for any other IGT application.
 
 \tableofcontents
 
@@ -29,7 +29,7 @@ Note that not all properties are needed for all types of tools. A tool definitio
 
 \section QmitkMITKIGTNavigationToolManagerManagingNavigationToolStorage Managing Navigation Tool Storage
 
-In order to create edit a tool storage container, you can select one of the available tool storages listed in the upper part of the UI. The list shows all tool storages which are available throug the micro services concept of MITK. The list also shows the current tool storage of the IGT tracking toolbox view if it is active. In addition to the listed tool storages, you can load new storages from the hard disc which will then appear in the list and might be edited as all other storage by simply selecting it in the list. You may also save a selected tool storage to the hard disc or create a new one.
+In order to create edit a tool storage container, you can select one of the available tool storages listed in the upper part of the UI. The list shows all tool storages which are available through the micro services concept of MITK. The list also shows the current tool storage of the IGT tracking toolbox view if it is active. In addition to the listed tool storages, you can load new storages from the hard disc which will then appear in the list and might be edited as all other storage by simply selecting it in the list. You may also save a selected tool storage to the hard disc or create a new one.
 
 In the lower part of the UI you always see the list of tools of the tool storage which is currently selected in the upper part. Use the buttons "add", "edit" and "delete" to manage the contained navigation tools. If you click "edit" or "delete" the operation is applied on the currently selected tool, as shown in the screenshot below.
 
@@ -37,13 +37,13 @@ In the lower part of the UI you always see the list of tools of the tool storage
 
 \section QmitkMITKIGTNavigationToolManagerAddingEditingNavigationTools Adding / Editing Navigation Tools
 
-If you add or edit a navigation tool, an input mask, as shown in the screenshot below, appears. The tool identifier is filled automatically, if you change it, remember that it is unique in the current storage. Also, choose a valid surface for every tool, this is nessesary for correct tool visualization. By default, a cone is displayed. The other information depends on the tracking system type, e.g. choose a tool file for the Polaris or the MicronTracker system and type in a serial number for the Aurora system. Two identical tools with the same serial number are also possible, they are assigned by the order in which they are attached to the device. As long as they also have the same surface as representation, this should not be a problem for most of the use cases.
+If you add or edit a navigation tool, an input mask, as shown in the screenshot below, appears. The tool identifier is filled automatically, if you change it, remember that it is unique in the current storage. Also, choose a valid surface for every tool, this is necessary for correct tool visualization. By default, a cone is displayed. The other information depends on the tracking system type, e.g. choose a tool file for the Polaris or the MicronTracker system and type in a serial number for the Aurora system. Two identical tools with the same serial number are also possible, they are assigned by the order in which they are attached to the device. As long as they also have the same surface as representation, this should not be a problem for most of the use cases.
 
 The tool type is additional information which is not needed by the tracking device but might be needed by further IGT applications. The same applies to the tool landmarks which might be defined for a tool. There are two different types of landmarks which are designed as described here:
 
 <ul>
 <li> Tool Calibration Landmarks: These landmarks may be used clearly define the tools pose only by  using landmarks in the tool coordinate system. E.g., two landmarks for a 5DoF tool and three landmarks for a 6DoF tool. These landmarks may be used, e.g., for a point based registration of a tool from image space to tracking space.
-<li> Tool Registration Landmarks: These landmarks are designed for representing defined landmarks on a tools surface. The number of these landmarks might exeed the number of tool calibration landmarks for reasons of redundancy and averaging. They are used for, e.g., manually registering the pose of a tool by visual markers in a CT scan. If you would use these landmarks to do a point based registration from image space to tracking space later, you might overweight the tool because of two many landmarks compared to other markers.
+<li> Tool Registration Landmarks: These landmarks are designed for representing defined landmarks on a tools surface. The number of these landmarks might exceed the number of tool calibration landmarks for reasons of redundancy and averaging. They are used for, e.g., manually registering the pose of a tool by visual markers in a CT scan. If you would use these landmarks to do a point based registration from image space to tracking space later, you might overweight the tool because of two many landmarks compared to other markers.
 </ul>
 
 \imageMacro{QmitkIGTTracking_NavigationToolManagementAddTool.png,"Screenshot of add/edit navigation tool screen",9.19}

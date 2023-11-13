@@ -21,7 +21,7 @@ namespace berry {
 /**
  * The primary interface between an intro part and the workbench.
  * <p>
- * The workbench exposes its implemention of intro part sites via this
+ * The workbench exposes its implementation of intro part sites via this
  * interface, which is not intended to be implemented or extended by clients.
  * </p>
  */

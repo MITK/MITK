@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   // Select a slice
   mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();
   if (sliceNaviController)
-    sliceNaviController->GetSlice()->SetPos(2);
+    sliceNaviController->GetStepper()->SetPos(2);
 
   //*************************************************************************
   // Part V: Qt-specific initialization

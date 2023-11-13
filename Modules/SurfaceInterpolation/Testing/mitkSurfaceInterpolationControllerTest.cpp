@@ -726,7 +726,7 @@ public:
     contourInfo3.ContourNormal = normal_1;
     contourInfo3.ContourPoint = center_1;
     // Shift the new contour so that it is different
-    contourInfo3.ContourPoint += 0.5;
+    contourInfo3.ContourPoint += mitk::Vector(0.5);
 
     bool success = m_Controller->RemoveContour(contourInfo3);
     CPPUNIT_ASSERT_MESSAGE("Remove failed - contour was unintentionally removed!",
@@ -741,7 +741,7 @@ public:
                            (m_Controller->GetNumberOfContours() == 1) && success);
 
     // // Let's see if the other contour No. 1 is still there
-    contourInfo3.ContourPoint -= 0.5;
+    contourInfo3.ContourPoint -= mitk::Vector(0.5);
     const mitk::Surface *remainingContour = m_Controller->GetContour(contourInfo3);
     CPPUNIT_ASSERT_MESSAGE(
       "Remove failed - contour was accidentally removed!",

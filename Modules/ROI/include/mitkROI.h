@@ -78,6 +78,7 @@ namespace mitk
         * An empty context name addresses the default properties.
         */
       BaseProperty::ConstPointer GetConstProperty(const std::string& propertyKey, const std::string& contextName = "", bool fallBackOnDefaultContext = true) const override;
+      BaseProperty::ConstPointer GetConstProperty(const std::string& propertyKey, TimeStepType t, bool fallBackOnDefaultContext = true) const;
 
       /** \brief Get all property keys.
         *
@@ -85,6 +86,7 @@ namespace mitk
         * An empty context name addresses the default properties.
         */
       std::vector<std::string> GetPropertyKeys(const std::string& contextName = "", bool includeDefaultContext = false) const override;
+      std::vector<std::string> GetPropertyKeys(TimeStepType t, bool includeDefaultContext = false) const;
 
       /** \brief Get all property context names (stringified time steps).
         */
@@ -96,6 +98,7 @@ namespace mitk
         * An empty context name addresses the default properties.
         */
       BaseProperty* GetNonConstProperty(const std::string& propertyKey, const std::string& contextName = "", bool fallBackOnDefaultContext = true) override;
+      BaseProperty* GetNonConstProperty(const std::string& propertyKey, TimeStepType t, bool fallBackOnDefaultContext = true);
 
       /** \brief Set a property.
         *
@@ -103,6 +106,7 @@ namespace mitk
         * An empty context name addresses the default properties.
         */
       void SetProperty(const std::string& propertyKey, BaseProperty* property, const std::string& contextName = "", bool fallBackOnDefaultContext = false) override;
+      void SetProperty(const std::string& propertyKey, BaseProperty* property, TimeStepType t, bool fallBackOnDefaultContext = false);
 
       /** \brief Remove a property.
         *
@@ -110,6 +114,7 @@ namespace mitk
         * An empty context name addresses the default properties.
         */
       void RemoveProperty(const std::string& propertyKey, const std::string& contextName = "", bool fallBackOnDefaultContext = false) override;
+      void RemoveProperty(const std::string& propertyKey, TimeStepType t, bool fallBackOnDefaultContext = false);
 
       unsigned int GetID() const;
       void SetID(unsigned int id);

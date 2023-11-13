@@ -179,52 +179,56 @@ void mitk::ROI::Element::SetProperties(PropertyList* properties, TimeStepType t)
 
 mitk::BaseProperty::ConstPointer mitk::ROI::Element::GetConstProperty(const std::string& propertyKey, const std::string& contextName, bool fallBackOnDefaultContext) const
 {
-  if (!contextName.empty())
+  return !contextName.empty()
+    ? this->GetConstProperty(propertyKey, std::stoul(contextName), fallBackOnDefaultContext)
+    : m_DefaultProperties->GetConstProperty(propertyKey);
+}
+
+mitk::BaseProperty::ConstPointer mitk::ROI::Element::GetConstProperty(const std::string& propertyKey, TimeStepType t, bool fallBackOnDefaultContext) const
+{
+  auto it = m_Properties.find(t);
+
+  if (it != m_Properties.end() && it->second.IsNotNull())
   {
-    const TimeStepType t = std::stoul(contextName);
-    auto it = m_Properties.find(t);
+    auto property = it->second->GetConstProperty(propertyKey);
 
-    if (it != m_Properties.end() && it->second.IsNotNull())
-    {
-      auto property = it->second->GetConstProperty(propertyKey);
-
-      if (property.IsNotNull())
-        return property;
-    }
-
-    if (!fallBackOnDefaultContext)
-      return nullptr;
+    if (property.IsNotNull())
+      return property;
   }
+
+  if (!fallBackOnDefaultContext)
+    return nullptr;
 
   return m_DefaultProperties->GetConstProperty(propertyKey);
 }
 
 std::vector<std::string> mitk::ROI::Element::GetPropertyKeys(const std::string& contextName, bool includeDefaultContext) const
 {
-  if (!contextName.empty())
+  return !contextName.empty()
+    ? this->GetPropertyKeys(std::stoul(contextName), includeDefaultContext)
+    : m_DefaultProperties->GetPropertyKeys();
+}
+
+std::vector<std::string> mitk::ROI::Element::GetPropertyKeys(TimeStepType t, bool includeDefaultContext) const
+{
+  auto it = m_Properties.find(t);
+
+  std::vector<std::string> result;
+
+  if (it != m_Properties.end() && it->second.IsNotNull())
+    result = it->second->GetPropertyKeys();
+
+  if (includeDefaultContext)
   {
-    const TimeStepType t = std::stoul(contextName);
-    auto it = m_Properties.find(t);
+    auto keys = m_DefaultProperties->GetPropertyKeys();
+    auto end = result.cend();
 
-    std::vector<std::string> result;
-
-    if (it != m_Properties.end() && it->second.IsNotNull())
-      result = it->second->GetPropertyKeys();
-
-    if (includeDefaultContext)
-    {
-      auto keys = m_DefaultProperties->GetPropertyKeys();
-      auto end = result.cend();
-
-      std::remove_copy_if(keys.cbegin(), keys.cend(), std::back_inserter(result), [&, result, end](const std::string& key) {
-        return end != std::find(result.cbegin(), end, key);
-      });
-    }
-
-    return result;
+    std::remove_copy_if(keys.cbegin(), keys.cend(), std::back_inserter(result), [&, result, end](const std::string& key) {
+      return end != std::find(result.cbegin(), end, key);
+    });
   }
 
-  return m_DefaultProperties->GetPropertyKeys();
+  return result;
 }
 
 std::vector<std::string> mitk::ROI::Element::GetPropertyContextNames() const
@@ -241,22 +245,25 @@ std::vector<std::string> mitk::ROI::Element::GetPropertyContextNames() const
 
 mitk::BaseProperty* mitk::ROI::Element::GetNonConstProperty(const std::string& propertyKey, const std::string& contextName, bool fallBackOnDefaultContext)
 {
-  if (!contextName.empty())
+  return !contextName.empty()
+    ? this->GetNonConstProperty(propertyKey, std::stoul(contextName), fallBackOnDefaultContext)
+    : m_DefaultProperties->GetNonConstProperty(propertyKey);
+}
+
+mitk::BaseProperty* mitk::ROI::Element::GetNonConstProperty(const std::string& propertyKey, TimeStepType t, bool fallBackOnDefaultContext)
+{
+  auto it = m_Properties.find(t);
+
+  if (it != m_Properties.end() && it->second.IsNotNull())
   {
-    const TimeStepType t = std::stoul(contextName);
-    auto it = m_Properties.find(t);
+    auto* property = it->second->GetNonConstProperty(propertyKey);
 
-    if (it != m_Properties.end() && it->second.IsNotNull())
-    {
-      auto* property = it->second->GetNonConstProperty(propertyKey);
-
-      if (property != nullptr)
-        return property;
-    }
-
-    if (!fallBackOnDefaultContext)
-      return nullptr;
+    if (property != nullptr)
+      return property;
   }
+
+  if (!fallBackOnDefaultContext)
+    return nullptr;
 
   return m_DefaultProperties->GetNonConstProperty(propertyKey);
 }
@@ -265,18 +272,25 @@ void mitk::ROI::Element::SetProperty(const std::string& propertyKey, BasePropert
 {
   if (!contextName.empty())
   {
-    const TimeStepType t = std::stoul(contextName);
-    auto it = m_Properties.find(t);
-
-    if (it != m_Properties.end() && it->second.IsNotNull())
-    {
-      it->second->SetProperty(propertyKey, property);
-      return;
-    }
-
-    if (!fallBackOnDefaultContext)
-      mitkThrow() << "Context \"" << contextName << "\" does not exist!";
+    this->SetProperty(propertyKey, property, std::stoul(contextName), fallBackOnDefaultContext);
+    return;
   }
+
+  m_DefaultProperties->SetProperty(propertyKey, property);
+}
+
+void mitk::ROI::Element::SetProperty(const std::string& propertyKey, BaseProperty* property, TimeStepType t, bool fallBackOnDefaultContext)
+{
+  auto it = m_Properties.find(t);
+
+  if (it != m_Properties.end() && it->second.IsNotNull())
+  {
+    it->second->SetProperty(propertyKey, property);
+    return;
+  }
+
+  if (!fallBackOnDefaultContext)
+    mitkThrow() << "Time step " << t << " does not exist!";
 
   m_DefaultProperties->SetProperty(propertyKey, property);
 }
@@ -285,18 +299,25 @@ void mitk::ROI::Element::RemoveProperty(const std::string& propertyKey, const st
 {
   if (!contextName.empty())
   {
-    const TimeStepType t = std::stoul(contextName);
-    auto it = m_Properties.find(t);
-
-    if (it != m_Properties.end() && it->second.IsNotNull())
-    {
-      it->second->RemoveProperty(propertyKey);
-      return;
-    }
-
-    if (!fallBackOnDefaultContext)
-      mitkThrow() << "Context \"" << contextName << "\" does not exist!";
+    this->RemoveProperty(propertyKey, std::stoul(contextName), fallBackOnDefaultContext);
+    return;
   }
+
+  m_DefaultProperties->RemoveProperty(propertyKey);
+}
+
+void mitk::ROI::Element::RemoveProperty(const std::string& propertyKey, TimeStepType t, bool fallBackOnDefaultContext)
+{
+  auto it = m_Properties.find(t);
+
+  if (it != m_Properties.end() && it->second.IsNotNull())
+  {
+    it->second->RemoveProperty(propertyKey);
+    return;
+  }
+
+  if (!fallBackOnDefaultContext)
+    mitkThrow() << "Time step " << t << " does not exist!";
 
   m_DefaultProperties->RemoveProperty(propertyKey);
 }

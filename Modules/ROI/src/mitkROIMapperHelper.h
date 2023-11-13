@@ -26,7 +26,7 @@ namespace mitk
   {
     /** \brief Apply %ROI properties at a certain time step to the given actor.
       */
-    void ApplyIndividualProperties(const IPropertyProvider& properties, TimeStepType t, vtkActor* actor);
+    void ApplyIndividualProperties(const ROI::Element& roi, TimeStepType t, vtkActor* actor);
 
     /** \brief Create an actor for the %ROI caption located at a certain attachment point considering several properties. 
       */
@@ -42,12 +42,12 @@ namespace mitk
       */
     void SetDefaultProperties(DataNode* node, BaseRenderer* renderer, bool override);
 
-    /** \brief Syntactic sugar for getting properties.
+    /** \brief Syntactic sugar for getting %ROI properties.
       */
     template <class T>
-    const T* GetConstProperty(const std::string& propertyKey, const mitk::IPropertyProvider& properties, const std::string& contextName = "")
+    const T* GetConstProperty(const std::string& propertyKey, const ROI::Element& roi, TimeStepType t)
     {
-      auto property = properties.GetConstProperty(propertyKey, contextName);
+      auto property = roi.GetConstProperty(propertyKey, t);
 
       if (property.IsNotNull())
         return dynamic_cast<const T*>(property.GetPointer());

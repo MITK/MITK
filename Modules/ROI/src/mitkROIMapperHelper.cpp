@@ -19,28 +19,26 @@ found in the LICENSE file.
 
 #include <regex>
 
-void mitk::ROIMapperHelper::ApplyIndividualProperties(const IPropertyProvider& properties, TimeStepType t, vtkActor* actor)
+void mitk::ROIMapperHelper::ApplyIndividualProperties(const ROI::Element& roi, TimeStepType t, vtkActor* actor)
 {
   auto* property = actor->GetProperty();
 
   property->SetRepresentationToWireframe();
   property->LightingOff();
 
-  const auto contextName = std::to_string(t);
-
-  if (auto colorProperty = GetConstProperty<ColorProperty>("color", properties, contextName); colorProperty != nullptr)
+  if (auto colorProperty = GetConstProperty<ColorProperty>("color", roi, t); colorProperty != nullptr)
   {
     const auto color = colorProperty->GetColor();
     property->SetColor(color[0], color[1], color[2]);
   }
 
-  if (auto opacityProperty = GetConstProperty<FloatProperty>("opacity", properties, contextName); opacityProperty != nullptr)
+  if (auto opacityProperty = GetConstProperty<FloatProperty>("opacity", roi, t); opacityProperty != nullptr)
   {
     const auto opacity = opacityProperty->GetValue();
     property->SetOpacity(property->GetOpacity() * opacity);
   }
 
-  if (auto lineWidthProperty = GetConstProperty<FloatProperty>("lineWidth", properties, contextName); lineWidthProperty != nullptr)
+  if (auto lineWidthProperty = GetConstProperty<FloatProperty>("lineWidth", roi, t); lineWidthProperty != nullptr)
   {
     const auto lineWidth = lineWidthProperty->GetValue();
     property->SetLineWidth(lineWidth);
@@ -101,7 +99,7 @@ std::string mitk::ROIMapperHelper::ParseCaption(const std::string& captionTempla
     }
     else
     {
-      auto property = roi.GetConstProperty(match[1], std::to_string(t));
+      auto property = roi.GetConstProperty(match[1], t);
 
       if (property.IsNotNull())
         caption.append(property->GetValueAsString());

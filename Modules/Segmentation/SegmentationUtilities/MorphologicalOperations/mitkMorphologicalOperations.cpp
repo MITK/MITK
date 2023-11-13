@@ -229,7 +229,7 @@ void mitk::MorphologicalOperations::itkClosing(
     closingFilter->SetForegroundValue(1);
     closingFilter->UpdateLargestPossibleRegion();
 
-    mitk::CastToMitkImage(closingFilter->GetOutput(), resultImage);
+    resultImage->SetVolume(closingFilter->GetOutput()->GetBufferPointer());
   }
   else
   {
@@ -241,7 +241,7 @@ void mitk::MorphologicalOperations::itkClosing(
     closingFilter->SetForegroundValue(1);
     closingFilter->UpdateLargestPossibleRegion();
 
-    mitk::CastToMitkImage(closingFilter->GetOutput(), resultImage);
+    resultImage->SetVolume(closingFilter->GetOutput()->GetBufferPointer());
   }
 }
 
@@ -268,7 +268,7 @@ void mitk::MorphologicalOperations::itkErode(
     erodeFilter->SetErodeValue(1);
     erodeFilter->UpdateLargestPossibleRegion();
 
-    mitk::CastToMitkImage(erodeFilter->GetOutput(), resultImage);
+    resultImage->SetVolume(erodeFilter->GetOutput()->GetBufferPointer());
   }
   else
   {
@@ -280,7 +280,7 @@ void mitk::MorphologicalOperations::itkErode(
     erodeFilter->SetErodeValue(1);
     erodeFilter->UpdateLargestPossibleRegion();
 
-    mitk::CastToMitkImage(erodeFilter->GetOutput(), resultImage);
+    resultImage->SetVolume(erodeFilter->GetOutput()->GetBufferPointer());
   }
 }
 
@@ -307,7 +307,7 @@ void mitk::MorphologicalOperations::itkDilate(
     dilateFilter->SetDilateValue(1);
     dilateFilter->UpdateLargestPossibleRegion();
 
-    mitk::CastToMitkImage(dilateFilter->GetOutput(), resultImage);
+    resultImage->SetVolume(dilateFilter->GetOutput()->GetBufferPointer());
   }
   else
   {
@@ -319,7 +319,7 @@ void mitk::MorphologicalOperations::itkDilate(
     dilateFilter->SetDilateValue(1);
     dilateFilter->UpdateLargestPossibleRegion();
 
-    mitk::CastToMitkImage(dilateFilter->GetOutput(), resultImage);
+    resultImage->SetVolume(dilateFilter->GetOutput()->GetBufferPointer());
   }
 }
 
@@ -347,7 +347,7 @@ void mitk::MorphologicalOperations::itkOpening(
     openingFilter->SetBackgroundValue(0);
     openingFilter->UpdateLargestPossibleRegion();
 
-    mitk::CastToMitkImage(openingFilter->GetOutput(), resultImage);
+    resultImage->SetVolume(openingFilter->GetOutput()->GetBufferPointer());
   }
   else
   {
@@ -360,7 +360,7 @@ void mitk::MorphologicalOperations::itkOpening(
     openingFilter->SetBackgroundValue(0);
     openingFilter->UpdateLargestPossibleRegion();
 
-    mitk::CastToMitkImage(openingFilter->GetOutput(), resultImage);
+    resultImage->SetVolume(openingFilter->GetOutput()->GetBufferPointer());
   }
 }
 
@@ -376,7 +376,7 @@ void mitk::MorphologicalOperations::itkFillHoles(itk::Image<TPixel, VDimension> 
   fillHoleFilter->SetForegroundValue(1);
   fillHoleFilter->UpdateLargestPossibleRegion();
 
-  mitk::CastToMitkImage(fillHoleFilter->GetOutput(), resultImage);
+  resultImage->SetVolume(fillHoleFilter->GetOutput()->GetBufferPointer());
 }
 
 template <class TStructuringElement>

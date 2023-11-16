@@ -554,9 +554,6 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::LabelSetImage::Gr
   auto nextIndex = m_Model->ClosestLabelInstanceIndex(currentIndex);
   auto labelVariant = nextIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
 
-  if (labelVariant.isValid() && m_Segmentation->GetGroupIndexOfLabel(labelVariant.value<LabelValueType>()) == groupID)
-    labelVariant = QVariant(); // Invalidate, since found label is child of group that is about to get removed
-
   try
   {
     this->WaitCursorOn();

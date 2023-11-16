@@ -537,26 +537,41 @@ QModelIndex QmitkMultiLabelTreeModel::ClosestLabelInstanceIndex(const QModelInde
 
   while (searchItem != rootItem)
   {
-    resultItem = GetFirstInstanceLikeItem(searchItem->NextSibblingItem());
-    if (nullptr != resultItem) break;
+    const auto* sibling = searchItem;
 
-    //no next closest label instance on this level -> check for closest before
-    resultItem = GetFirstInstanceLikeItem(searchItem->PrevSibblingItem());
-    if (nullptr != resultItem) break;
+    while (sibling != nullptr)
+    {
+      sibling = sibling->NextSibblingItem();
+      resultItem = GetFirstInstanceLikeItem(sibling);
 
-    //no closest label instance before current on this level -> moeve one level up
+      if (nullptr != resultItem)
+        break;
+    }
+
+    if (nullptr != resultItem)
+      break;
+
+    // No next closest label instance on this level -> check for closest before
+    sibling = searchItem;
+
+    while (sibling != nullptr)
+    {
+      sibling = sibling->PrevSibblingItem();
+      resultItem = GetFirstInstanceLikeItem(sibling);
+
+      if (nullptr != resultItem)
+        break;
+    }
+
+    if (nullptr != resultItem)
+      break;
+
+    // No closest label instance before current on this level -> moeve one level up
     searchItem = searchItem->ParentItem();
   }
 
   if (nullptr == resultItem)
-  {
-    // Try to find any other instance as a last resort...
-    resultItem = GetFirstInstanceLikeItem(rootItem);
-
-    // ...as long as it is not itself.
-    if (currentItem == resultItem || nullptr == resultItem)
-      return QModelIndex();
-  }
+    return QModelIndex();
 
   return GetIndexByItem(resultItem, this);
 }

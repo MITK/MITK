@@ -549,7 +549,14 @@ QModelIndex QmitkMultiLabelTreeModel::ClosestLabelInstanceIndex(const QModelInde
   }
 
   if (nullptr == resultItem)
-    return QModelIndex();
+  {
+    // Try to find any other instance as a last resort...
+    resultItem = GetFirstInstanceLikeItem(rootItem);
+
+    // ...as long as it is not itself.
+    if (currentItem == resultItem || nullptr == resultItem)
+      return QModelIndex();
+  }
 
   return GetIndexByItem(resultItem, this);
 }

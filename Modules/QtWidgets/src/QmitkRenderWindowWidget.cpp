@@ -71,15 +71,15 @@ void QmitkRenderWindowWidget::ForceImmediateUpdate()
 
 void QmitkRenderWindowWidget::AddUtilityWidget(QWidget* utilityWidget, UtilityWidgetPosition position)
 {
-    if (position == Top) {
-        m_VerticalLayout->insertWidget(0, utilityWidget);
-    } else if (position == Bottom) {
-        m_VerticalLayout->insertWidget(m_VerticalLayout->count(), utilityWidget);
-    } else if (position == Left) {
-        m_HorizontalLayout->insertWidget(0, utilityWidget);
-    } else if (position == Right) {
-        m_HorizontalLayout->insertWidget(m_HorizontalLayout->count(), utilityWidget);
-    }
+  if (position == Top) {
+    m_VerticalLayout->insertWidget(0, utilityWidget);
+  } else if (position == Bottom) {
+    m_VerticalLayout->insertWidget(-1, utilityWidget);
+  } else if (position == Left) {
+    m_HorizontalLayout->insertWidget(0, utilityWidget);
+  } else if (position == Right) {
+    m_HorizontalLayout->insertWidget(-1, utilityWidget);
+  }
 }
 
 void QmitkRenderWindowWidget::SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower)

@@ -406,11 +406,9 @@ QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::C
         }
         else
         {
-          const mitk::PlanarFigure* planar2 = dynamic_cast<const mitk::PlanarFigure*>(rightNode->GetData());
-          if (planar2)
-          {
-            validGeometry = mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planar2->GetPlaneGeometry(), imageNodeData->GetGeometry());
-          }
+          const mitk::PlanarFigure* planarFigure = dynamic_cast<const mitk::PlanarFigure*>(rightNode->GetData());
+          const auto imageGeometry = imageNodeData->GetGeometry();
+          validGeometry = CheckPlanarFigureMatchesGeometry(planarFigure, imageGeometry);
         }
 
         if (!validGeometry)
@@ -452,11 +450,8 @@ mitk::NodePredicateBase::Pointer QmitkImageStatisticsView::GenerateROIPredicate(
       }
       else
       {
-        const auto planar2 = dynamic_cast<const mitk::PlanarFigure*>(node->GetData());
-        if (planar2)
-        {
-          sameGeometry = mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planar2->GetPlaneGeometry(), image->GetGeometry());
-        }
+        const auto planarFigure = dynamic_cast<const mitk::PlanarFigure*>(node->GetData());
+        sameGeometry = CheckPlanarFigureMatchesGeometry(planarFigure, image->GetGeometry());
       }
 
       return sameGeometry;
@@ -466,4 +461,25 @@ mitk::NodePredicateBase::Pointer QmitkImageStatisticsView::GenerateROIPredicate(
   }
 
   return result;
+}
+
+bool QmitkImageStatisticsView::CheckPlanarFigureMatchesGeometry(const mitk::PlanarFigure* planarFigure, const mitk::BaseGeometry* imageGeometry)
+{
+  if (!planarFigure || !imageGeometry)
+  {
+    return false;
+  }
+
+  bool matchesGeometry = mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planarFigure->GetPlaneGeometry(), imageGeometry);
+
+  for (int i = 0; i < planarFigure->GetNumberOfControlPoints(); ++i)
+  {
+    const auto controlPoint = planarFigure->GetWorldControlPoint(i);
+    if (!imageGeometry->IsInside(controlPoint))
+    {
+      matchesGeometry = false;
+    }
+  }
+
+  return matchesGeometry;
 }

@@ -497,7 +497,9 @@ void mitk::PointSetDataInteractor::SetMaxPoints(unsigned int maxNumber)
 
 int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, unsigned int time, float accuracy)
 {
-  // iterate over point set and check if it contains a point close enough to the pointer to be selected
+  // Iterate over point set and check if any point is close enough to the pointer to be selected.
+  // Choose the closest one of these candidates.
+
   auto *points = dynamic_cast<PointSet *>(GetDataNode()->GetData());
   int index = -1;
   if (points == nullptr)
@@ -510,16 +512,19 @@ int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, unsi
 
   PointSet::PointsContainer *pointsContainer = points->GetPointSet(time)->GetPoints();
 
-  float minDistance = m_SelectionAccuracy;
-  if (accuracy != -1)
-    minDistance = accuracy;
+  if (accuracy == -1)
+    accuracy = m_SelectionAccuracy;
 
-  for (PointSet::PointsIterator it = pointsContainer->Begin(); it != pointsContainer->End(); it++)
+  const auto end = pointsContainer->End();
+  float minDistance = accuracy;
+  float distance;
+
+  for (auto it = pointsContainer->Begin(); it != end; ++it)
   {
-    float distance = sqrt(position.SquaredEuclideanDistanceTo(points->GetPoint(it->Index(), time)));
-    if (distance <
-        minDistance) // if several points fall within the margin, choose the one with minimal distance to position
+    distance = sqrtf(position.SquaredEuclideanDistanceTo(points->GetPoint(it->Index(), time)));
+    if (distance < minDistance)
     {
+      minDistance = distance;
       index = it->Index();
     }
   }

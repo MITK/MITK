@@ -472,7 +472,7 @@ bool QmitkImageStatisticsView::CheckPlanarFigureMatchesGeometry(const mitk::Plan
 
   bool matchesGeometry = mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planarFigure->GetPlaneGeometry(), imageGeometry);
 
-  for (int i = 0; i < planarFigure->GetNumberOfControlPoints(); ++i)
+  for (unsigned int i = 0; i < planarFigure->GetNumberOfControlPoints(); ++i)
   {
     const auto controlPoint = planarFigure->GetWorldControlPoint(i);
     if (!imageGeometry->IsInside(controlPoint))

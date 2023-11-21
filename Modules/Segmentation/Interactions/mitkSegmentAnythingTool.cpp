@@ -257,7 +257,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                 LabelSetImage *previewImage,
                                                 TimeStepType timeStep)
 {
-  if (nullptr != previewImage && m_PointSetPositive.IsNotNull())
+  if (nullptr != previewImage && m_PointSetPositive.IsNotNull() && this->IsImageAtTimeStepValid(inputAtTimeStep))
   {
     if (this->HasPicks() && nullptr != m_PythonService)
     {
@@ -307,6 +307,15 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
       RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     }
   }
+}
+
+bool mitk::SegmentAnythingTool::IsImageAtTimeStepValid(const Image *inputAtTimeStep) const
+{
+  int total = 0;
+  total += (inputAtTimeStep->GetDimension(0) > 1);
+  total += (inputAtTimeStep->GetDimension(1) > 1);
+  total += (inputAtTimeStep->GetDimension(2) > 1);
+  return (total > 1);
 }
 
 std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane(const mitk::LevelWindow &levelWindow)

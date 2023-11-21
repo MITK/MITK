@@ -203,7 +203,7 @@ namespace mitk
      * @param inputAtTimeStep 
      * @return bool 
      */
-    bool IsImageAtTimeStepValid(const Image *inputAtTimeStep);
+    bool IsImageAtTimeStepValid(const Image *inputAtTimeStep) const;
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;

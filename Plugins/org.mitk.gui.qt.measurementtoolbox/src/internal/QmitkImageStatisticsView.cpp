@@ -40,6 +40,26 @@ found in the LICENSE file.
 
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
 
+namespace {
+  bool CheckPlanarFigureMatchesGeometry(const mitk::PlanarFigure* planarFigure, const mitk::BaseGeometry* imageGeometry)
+  {
+    if (!planarFigure || !imageGeometry)
+      return false;
+
+    if (!mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planarFigure->GetPlaneGeometry(), imageGeometry))
+      return false;
+
+    const auto numControlPoints = planarFigure->GetNumberOfControlPoints();
+    for (unsigned int i = 0; i < numControlPoints; ++i)
+    {
+      if (!imageGeometry->IsInside(planarFigure->GetWorldControlPoint(i)))
+        return false;
+    }
+
+    return true;
+  }
+} // unnamed namespace
+
 QmitkImageStatisticsView::~QmitkImageStatisticsView()
 {
 }
@@ -330,7 +350,6 @@ void QmitkImageStatisticsView::OnROISelectionChanged(QmitkAbstractNodeSelectionW
   this->UpdateIntensityProfile();
 }
 
-
 void QmitkImageStatisticsView::OnButtonSelectionPressed()
 {
   QmitkNodeSelectionDialog* dialog = new QmitkNodeSelectionDialog(nullptr, "Select input for the statistic","You may select images and ROIs to compute their statistic. ROIs may be segmentations or planar figures.");
@@ -406,7 +425,7 @@ QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::C
         }
         else
         {
-          const mitk::PlanarFigure* planarFigure = dynamic_cast<const mitk::PlanarFigure*>(rightNode->GetData());
+          const auto planarFigure = dynamic_cast<const mitk::PlanarFigure*>(rightNode->GetData());
           const auto imageGeometry = imageNodeData->GetGeometry();
           validGeometry = CheckPlanarFigureMatchesGeometry(planarFigure, imageGeometry);
         }
@@ -461,25 +480,4 @@ mitk::NodePredicateBase::Pointer QmitkImageStatisticsView::GenerateROIPredicate(
   }
 
   return result;
-}
-
-bool QmitkImageStatisticsView::CheckPlanarFigureMatchesGeometry(const mitk::PlanarFigure* planarFigure, const mitk::BaseGeometry* imageGeometry)
-{
-  if (!planarFigure || !imageGeometry)
-  {
-    return false;
-  }
-
-  bool matchesGeometry = mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planarFigure->GetPlaneGeometry(), imageGeometry);
-
-  for (unsigned int i = 0; i < planarFigure->GetNumberOfControlPoints(); ++i)
-  {
-    const auto controlPoint = planarFigure->GetWorldControlPoint(i);
-    if (!imageGeometry->IsInside(controlPoint))
-    {
-      matchesGeometry = false;
-    }
-  }
-
-  return matchesGeometry;
 }

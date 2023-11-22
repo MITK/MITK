@@ -82,7 +82,6 @@ protected:
   Ui::QmitkImageStatisticsViewControls m_Controls;
 
 private:
-  static bool CheckPlanarFigureMatchesGeometry(const mitk::PlanarFigure* planarFigure, const mitk::BaseGeometry* imageGeometry);
   QmitkNodeSelectionDialog::SelectionCheckFunctionType CheckForSameGeometry() const;
   mitk::NodePredicateBase::Pointer GenerateROIPredicate() const;
 

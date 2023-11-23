@@ -31,11 +31,12 @@ bool NodeListsEqual(const QmitkSynchronizedWidgetConnector::NodeList& selection1
 
 QmitkSynchronizedWidgetConnector::QmitkSynchronizedWidgetConnector()
   : m_SelectAll(true)
+  , m_ConnectionCounter(0)
 {
 
 }
 
-void QmitkSynchronizedWidgetConnector::ConnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget) const
+void QmitkSynchronizedWidgetConnector::ConnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget)
 {
   connect(nodeSelectionWidget, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkSynchronizedWidgetConnector::ChangeSelection);
@@ -48,9 +49,14 @@ void QmitkSynchronizedWidgetConnector::ConnectWidget(const QmitkSynchronizedNode
 
   connect(this, &QmitkSynchronizedWidgetConnector::SelectionModeChanged,
     nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SetSelectAll);
+
+  connect(nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::DeregisterSynchronization,
+    this, &QmitkSynchronizedWidgetConnector::DeregisterWidget);
+
+  m_ConnectionCounter++;
 }
 
-void QmitkSynchronizedWidgetConnector::DisconnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget) const
+void QmitkSynchronizedWidgetConnector::DisconnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget)
 {
   disconnect(nodeSelectionWidget, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkSynchronizedWidgetConnector::ChangeSelection);
@@ -63,12 +69,27 @@ void QmitkSynchronizedWidgetConnector::DisconnectWidget(const QmitkSynchronizedN
 
   disconnect(this, &QmitkSynchronizedWidgetConnector::SelectionModeChanged,
     nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SetSelectAll);
+
+  disconnect(nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::DeregisterSynchronization,
+    this, &QmitkSynchronizedWidgetConnector::DeregisterWidget);
+
+  this->DeregisterWidget();
 }
 
 void QmitkSynchronizedWidgetConnector::SynchronizeWidget(QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget) const
 {
-  // widget is newly synchronized / connected so an initial setup needs to be made
-  nodeSelectionWidget->SetCurrentSelection(m_InternalSelection);
+  // We need to explicitly differentiate when "Select All" is active, since the internal selection
+  // might not contain all nodes. When no selection widget is synchronized, the m_InternalSelection
+  // won't be updated.
+  if (m_SelectAll)
+  {
+    nodeSelectionWidget->SelectAll();
+  }
+  else
+  {
+    nodeSelectionWidget->SetCurrentSelection(m_InternalSelection);
+  }
+
   nodeSelectionWidget->SetSelectAll(m_SelectAll);
 }
 
@@ -97,5 +118,17 @@ void QmitkSynchronizedWidgetConnector::ChangeSelectionMode(bool selectAll)
   {
     m_SelectAll = selectAll;
     emit SelectionModeChanged(m_SelectAll);
+  }
+}
+
+void QmitkSynchronizedWidgetConnector::DeregisterWidget()
+{
+  m_ConnectionCounter--;
+
+  // When no more widgets are synchronized anymore, turn on SelectAll to avoid losing
+  // nodes that are added until synchronization of a widget is turned on again.
+  if (m_ConnectionCounter == 0)
+  {
+    m_SelectAll = true;
   }
 }

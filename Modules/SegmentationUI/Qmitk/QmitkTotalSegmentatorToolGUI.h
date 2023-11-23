@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef QmitkTotalSegmentatorToolGUI_h_Included
 #define QmitkTotalSegmentatorToolGUI_h_Included
 
@@ -19,11 +31,9 @@
 class QmitkTotalSegmentatorToolInstaller : public QmitkSetupVirtualEnvUtil
 {
 public:
-  const QString VENV_NAME = ".totalsegmentator";
-  const QString TOTALSEGMENTATOR_VERSION = "1.5.5";
-  const std::vector<QString> PACKAGES = {QString("Totalsegmentator==") + TOTALSEGMENTATOR_VERSION,
-                                         QString("scipy==1.9.1"),
-                                         QString("urllib3==1.26.15")};
+  const QString VENV_NAME = ".totalsegmentator_v2";
+  const QString TOTALSEGMENTATOR_VERSION = "2.0.5";
+  const std::vector<QString> PACKAGES = {QString("Totalsegmentator==") + TOTALSEGMENTATOR_VERSION};
   const QString STORAGE_DIR;
   inline QmitkTotalSegmentatorToolInstaller(
     const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() 

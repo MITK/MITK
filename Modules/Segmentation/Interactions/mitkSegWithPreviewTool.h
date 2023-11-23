@@ -175,6 +175,11 @@ namespace mitk
     UpdatePreview. Default implementation does nothing.*/
     virtual void UpdateCleanUp();
 
+    /** This member function offers derived classes the possibility to alter what should
+    happen directly after the Confirmation of the preview is performed. It is called by
+    ConfirmSegmentation. Default implementation does nothing.*/
+    virtual void ConfirmCleanUp();
+
     using LabelMappingType = std::vector<std::pair<Label::PixelType, Label::PixelType> >;
 
     /** This member function offers derived classes the possibility to alter what should

@@ -21,9 +21,6 @@ set(CPP_FILES
   Models/mitkTwoCompartmentExchangeModel.cpp
   Models/mitkTwoCompartmentExchangeModelFactory.cpp
   Models/mitkTwoCompartmentExchangeModelParameterizer.cpp
-  Models/mitkNumericTwoCompartmentExchangeModel.cpp
-  Models/mitkNumericTwoCompartmentExchangeModelFactory.cpp
-  Models/mitkNumericTwoCompartmentExchangeModelParameterizer.cpp
   Models/mitkExtendedToftsModel.cpp
   Models/mitkExtendedToftsModelFactory.cpp
   Models/mitkExtendedToftsModelParameterizer.cpp
@@ -42,9 +39,6 @@ set(CPP_FILES
   Models/mitkTwoTissueCompartmentFDGModel.cpp
   Models/mitkTwoTissueCompartmentFDGModelFactory.cpp
   Models/mitkTwoTissueCompartmentFDGModelParameterizer.cpp
-  Models/mitkNumericTwoTissueCompartmentModel.cpp
-  Models/mitkNumericTwoTissueCompartmentModelFactory.cpp
-  Models/mitkNumericTwoTissueCompartmentModelParameterizer.cpp  
   SimulationFramework/mitkImageGenerationHelper.cpp
 )
 

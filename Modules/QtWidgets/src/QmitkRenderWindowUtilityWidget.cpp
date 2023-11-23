@@ -53,6 +53,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
 
   auto menuBar = new QMenuBar(this);
   menuBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+  menuBar->setNativeMenuBar(false);
   auto dataMenu = menuBar->addMenu("Data");
   QWidgetAction* dataAction = new QWidgetAction(dataMenu);
   dataAction->setDefaultWidget(m_NodeSelectionWidget);
@@ -87,6 +88,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_ViewDirectionSelector = new QComboBox(this);
   QStringList viewDirections{ "axial", "coronal", "sagittal"};
   m_ViewDirectionSelector->insertItems(0, viewDirections);
+  m_ViewDirectionSelector->setMinimumContentsLength(12);
   connect(m_ViewDirectionSelector, &QComboBox::currentTextChanged, this, &QmitkRenderWindowUtilityWidget::ChangeViewDirection);
   UpdateViewPlaneSelection();
 
@@ -142,6 +144,8 @@ void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)
 
   mitk::TimeStepType timeStep = sliceNavigationController->GetStepper()->GetPos();
   mitk::BaseGeometry::ConstPointer geometry = inputTimeGeometry->GetGeometryForTimeStep(timeStep);
+  if (geometry == nullptr)
+    return;
 
   mitk::AffineTransform3D::MatrixType matrix = geometry->GetIndexToWorldTransform()->GetMatrix();
   matrix.GetVnlMatrix().normalize_columns();

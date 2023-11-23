@@ -586,6 +586,10 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::LabelSetImage::Gr
       mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
     }
   }
+  else
+  {
+    this->SetSelectedLabels({});
+  }
 
   emit ModelUpdated();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -605,14 +609,18 @@ void QmitkMultiLabelInspector::RemoveGroup()
     return;
   }
 
-  auto question = QStringLiteral("Do you really want to delete the group of the selected label with all labels?");
-  auto answer = QMessageBox::question(this, "Delete group", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+  const auto* selectedLabel = this->GetFirstSelectedLabelObject();
+
+  if (selectedLabel == nullptr)
+    return;
+
+  const auto group = m_Segmentation->GetGroupIndexOfLabel(selectedLabel->GetValue());
+
+  auto question = QStringLiteral("Do you really want to delete group %1 including all of its labels?").arg(group);
+  auto answer = QMessageBox::question(this, QStringLiteral("Delete group %1").arg(group), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
   if (answer != QMessageBox::Yes)
     return;
-
-  auto selectedLabel = this->GetFirstSelectedLabelObject();
-  const auto group = m_Segmentation->GetGroupIndexOfLabel(selectedLabel->GetValue());
 
   this->RemoveGroupInternal(group);
 }
@@ -632,8 +640,8 @@ void QmitkMultiLabelInspector::OnDeleteGroup()
   {
     auto groupID = groupIDVariant.value<mitk::LabelSetImage::GroupIndexType>();
 
-    auto question = QStringLiteral("Do you really want to delete the current group with all labels?");
-    auto answer = QMessageBox::question(this, QString("Delete group %1").arg(groupID), question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+    auto question = QStringLiteral("Do you really want to delete group %1 including all of its labels?").arg(groupID);
+    auto answer = QMessageBox::question(this, QString("Delete group %1").arg(groupID), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
     if (answer != QMessageBox::Yes)
       return;

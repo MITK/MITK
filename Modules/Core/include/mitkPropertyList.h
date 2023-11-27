@@ -13,21 +13,13 @@ found in the LICENSE file.
 #ifndef mitkPropertyList_h
 #define mitkPropertyList_h
 
-#include "mitkBaseProperty.h"
-#include "mitkGenericProperty.h"
-#include "mitkUIDGenerator.h"
-#include "mitkIPropertyOwner.h"
-#include <MitkCoreExports.h>
+#include <mitkIPropertyOwner.h>
+#include <mitkGenericProperty.h>
 
-#include <itkObjectFactory.h>
-
-#include <map>
-#include <string>
+#include <nlohmann/json_fwd.hpp>
 
 namespace mitk
 {
-  class XMLWriter;
-
   /**
    * @brief Key-value list holding instances of BaseProperty
    *
@@ -233,6 +225,28 @@ namespace mitk
     const PropertyMap *GetMap() const { return &m_Properties; }
     bool IsEmpty() const { return m_Properties.empty(); }
     virtual void Clear();
+
+    /**
+     * @brief Serialize the property list to JSON.
+     *
+     * @note Properties of a certain type can only be deseralized again if their type has been
+     * registered via the IPropertyDeserialization core service.
+     *
+     * @sa CoreServices
+     * @sa IPropertyDeserialization::RegisterProperty
+     */
+    void ToJSON(nlohmann::json& j) const;
+
+    /**
+     * @brief Deserialize the property list from JSON.
+     *
+     * @note Properties of a certain type can only be deseralized again if their type has been
+     * registered via the IPropertyDeserialization core service.
+     *
+     * @sa CoreServices
+     * @sa IPropertyDeserialization::RegisterProperty
+     */
+    void FromJSON(const nlohmann::json& j);
 
   protected:
     PropertyList();

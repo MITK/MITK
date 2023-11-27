@@ -15,9 +15,11 @@ found in the LICENSE file.
 
 #include <itkPoint.h>
 
-#include "mitkArray.h"
-#include "mitkEqual.h"
-#include "mitkNumericConstants.h"
+#include <mitkArray.h>
+#include <mitkEqual.h>
+#include <mitkNumericConstants.h>
+
+#include <nlohmann/json.hpp>
 
 namespace mitk
 {
@@ -90,6 +92,22 @@ namespace mitk
       mitk::ToArray<ArrayType, TCoordRep, NPointDimension>(array, *this);
     }
   };
+
+  template <class TCoordRep, unsigned int NPointDimension>
+  void to_json(nlohmann::json& j, const Point<TCoordRep, NPointDimension>& p)
+  {
+    j = nlohmann::json::array();
+
+    for (size_t i = 0; i < NPointDimension; ++i)
+      j.push_back(p[i]);
+  }
+
+  template <class TCoordRep, unsigned int NPointDimension>
+  void from_json(const nlohmann::json& j, Point<TCoordRep, NPointDimension>& p)
+  {
+    for (size_t i = 0; i < NPointDimension; ++i)
+      j.at(i).get_to(p[i]);
+  }
 
   typedef Point<ScalarType, 2> Point2D;
   typedef Point<ScalarType, 3> Point3D;

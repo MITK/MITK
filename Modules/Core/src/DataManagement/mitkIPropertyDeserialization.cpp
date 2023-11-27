@@ -10,4 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVector.h"
+#include "mitkIPropertyDeserialization.h"
+
+mitk::IPropertyDeserialization::~IPropertyDeserialization()
+{
+}

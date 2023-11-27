@@ -13,6 +13,21 @@ found in the LICENSE file.
 #include "mitkScalarListLookupTable.h"
 #include <stdexcept>
 #include <iostream>
+#include <nlohmann/json.hpp>
+
+namespace mitk
+{
+	void to_json(nlohmann::json& j, const ScalarListLookupTable& lut)
+	{
+		j = lut.GetLookupTable();
+	}
+
+	void from_json(const nlohmann::json& j, ScalarListLookupTable& lut)
+	{
+		lut.SetLookupTable(j.get<ScalarListLookupTable::LookupTableType>());
+	}
+}
+
 const char* mitk::ScalarListLookupTable::GetNameOfClass() const
 {
 	return "ScalarListLookupTable";

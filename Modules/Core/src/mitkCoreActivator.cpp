@@ -53,6 +53,27 @@ found in the LICENSE file.
 #include <usModuleSettings.h>
 #include <usServiceTracker.h>
 
+// Properties
+#include <mitkAnnotationProperty.h>
+#include <mitkClippingProperty.h>
+#include <mitkColorProperty.h>
+#include <mitkGroupTagProperty.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkModalityProperty.h>
+#include <mitkPlaneOrientationProperty.h>
+#include <mitkPointSetShapeProperty.h>
+#include <mitkProperties.h>
+#include <mitkRenderingModeProperty.h>
+#include <mitkStringProperty.h>
+#include <mitkTemporoSpatialStringProperty.h>
+#include <mitkTransferFunctionProperty.h>
+#include <mitkVectorProperty.h>
+#include <mitkVtkInterpolationProperty.h>
+#include <mitkVtkRepresentationProperty.h>
+#include <mitkVtkResliceInterpolationProperty.h>
+#include <mitkVtkScalarModeProperty.h>
+
 // ITK "injects" static initialization code for IO factories
 // via the itkImageIOFactoryRegisterManager.h header (which
 // is generated in the application library build directory).
@@ -61,10 +82,12 @@ found in the LICENSE file.
 // method), we include the ITK header here.
 #include <itkImageIOFactoryRegisterManager.h>
 
-void HandleMicroServicesMessages(us::MsgType type, const char *msg)
+namespace
 {
-  switch (type)
+  void HandleMicroServicesMessages(us::MsgType type, const char* msg)
   {
+    switch (type)
+    {
     case us::DebugMsg:
       MITK_DEBUG << msg;
       break;
@@ -77,59 +100,100 @@ void HandleMicroServicesMessages(us::MsgType type, const char *msg)
     case us::ErrorMsg:
       MITK_ERROR << msg;
       break;
+    }
   }
-}
 
-void AddMitkAutoLoadPaths(const std::string &programPath)
-{
-  us::ModuleSettings::AddAutoLoadPath(programPath);
-#ifdef __APPLE__
-  // Walk up three directories since that is where the .dylib files are located
-  // for build trees.
-  std::string additionalPath = programPath;
-  bool addPath = true;
-  for (int i = 0; i < 3; ++i)
+  void AddMitkAutoLoadPaths(const std::string& programPath)
   {
-    std::size_t index = additionalPath.find_last_of('/');
-    if (index != std::string::npos)
+    us::ModuleSettings::AddAutoLoadPath(programPath);
+#ifdef __APPLE__
+    // Walk up three directories since that is where the .dylib files are located
+    // for build trees.
+    std::string additionalPath = programPath;
+    bool addPath = true;
+    for (int i = 0; i < 3; ++i)
     {
-      additionalPath = additionalPath.substr(0, index);
+      std::size_t index = additionalPath.find_last_of('/');
+      if (index != std::string::npos)
+      {
+        additionalPath = additionalPath.substr(0, index);
+      }
+      else
+      {
+        addPath = false;
+        break;
+      }
+    }
+    if (addPath)
+    {
+      us::ModuleSettings::AddAutoLoadPath(additionalPath);
+    }
+#endif
+  }
+
+  void AddPropertyPersistence(const mitk::PropertyKeyPath& propPath)
+  {
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> persistenceService(mitk::CoreServices::GetPropertyPersistence());
+
+    auto info = mitk::PropertyPersistenceInfo::New();
+    if (propPath.IsExplicit())
+    {
+      std::string name = mitk::PropertyKeyPathToPropertyName(propPath);
+      std::string key = name;
+      std::replace(key.begin(), key.end(), '.', '_');
+      info->SetNameAndKey(name, key);
     }
     else
     {
-      addPath = false;
-      break;
+      std::string key = mitk::PropertyKeyPathToPersistenceKeyRegEx(propPath);
+      std::string keyTemplate = mitk::PropertyKeyPathToPersistenceKeyTemplate(propPath);
+      std::string propRegEx = mitk::PropertyKeyPathToPropertyRegEx(propPath);
+      std::string propTemplate = mitk::PropertyKeyPathToPersistenceNameTemplate(propPath);
+      info->UseRegEx(propRegEx, propTemplate, key, keyTemplate);
     }
-  }
-  if (addPath)
-  {
-    us::ModuleSettings::AddAutoLoadPath(additionalPath);
-  }
-#endif
-}
 
-void AddPropertyPersistence(const mitk::PropertyKeyPath& propPath)
-{
-  mitk::CoreServicePointer<mitk::IPropertyPersistence> persistenceService(mitk::CoreServices::GetPropertyPersistence());
-
-  auto info = mitk::PropertyPersistenceInfo::New();
-  if (propPath.IsExplicit())
-  {
-    std::string name = mitk::PropertyKeyPathToPropertyName(propPath);
-    std::string key = name;
-    std::replace(key.begin(), key.end(), '.', '_');
-    info->SetNameAndKey(name, key);
-  }
-  else
-  {
-    std::string key = mitk::PropertyKeyPathToPersistenceKeyRegEx(propPath);
-    std::string keyTemplate = mitk::PropertyKeyPathToPersistenceKeyTemplate(propPath);
-    std::string propRegEx = mitk::PropertyKeyPathToPropertyRegEx(propPath);
-    std::string propTemplate = mitk::PropertyKeyPathToPersistenceNameTemplate(propPath);
-    info->UseRegEx(propRegEx, propTemplate, key, keyTemplate);
+    persistenceService->AddInfo(info);
   }
 
-  persistenceService->AddInfo(info);
+  void RegisterProperties()
+  {
+    mitk::CoreServicePointer<mitk::IPropertyDeserialization> service(mitk::CoreServices::GetPropertyDeserialization());
+
+    service->RegisterProperty<mitk::AnnotationProperty>();
+    service->RegisterProperty<mitk::ClippingProperty>();
+    service->RegisterProperty<mitk::ColorProperty>();
+    service->RegisterProperty<mitk::BoolProperty>();
+    service->RegisterProperty<mitk::BoolLookupTableProperty>();
+    service->RegisterProperty<mitk::DoubleProperty>();
+    service->RegisterProperty<mitk::DoubleVectorProperty>();
+    service->RegisterProperty<mitk::FloatProperty>();
+    service->RegisterProperty<mitk::FloatLookupTableProperty>();
+    service->RegisterProperty<mitk::GroupTagProperty>();
+    service->RegisterProperty<mitk::IntProperty>();
+    service->RegisterProperty<mitk::IntLookupTableProperty>();
+    service->RegisterProperty<mitk::IntVectorProperty>();
+    service->RegisterProperty<mitk::LevelWindowProperty>();
+    service->RegisterProperty<mitk::LookupTableProperty>();
+    service->RegisterProperty<mitk::PlaneOrientationProperty>();
+    service->RegisterProperty<mitk::Point2dProperty>();
+    service->RegisterProperty<mitk::Point3dProperty>();
+    service->RegisterProperty<mitk::Point3iProperty>();
+    service->RegisterProperty<mitk::Point4dProperty>();
+    service->RegisterProperty<mitk::PointSetShapeProperty>();
+    service->RegisterProperty<mitk::ModalityProperty>();
+    service->RegisterProperty<mitk::RenderingModeProperty>();
+    service->RegisterProperty<mitk::StringProperty>();
+    service->RegisterProperty<mitk::StringLookupTableProperty>();
+    service->RegisterProperty<mitk::TemporoSpatialStringProperty>();
+    service->RegisterProperty<mitk::TransferFunctionProperty>();
+    service->RegisterProperty<mitk::UIntProperty>();
+    service->RegisterProperty<mitk::UShortProperty>();
+    service->RegisterProperty<mitk::Vector3DProperty>();
+    service->RegisterProperty<mitk::VtkInterpolationProperty>();
+    service->RegisterProperty<mitk::VtkRepresentationProperty>();
+    service->RegisterProperty<mitk::VtkResliceInterpolationProperty>();
+    service->RegisterProperty<mitk::VtkScalarModeProperty>();
+  }
 }
 
 class FixedNiftiImageIO : public itk::NiftiImageIO
@@ -182,6 +246,9 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_PropertyDescriptions.reset(new mitk::PropertyDescriptions);
   context->RegisterService<mitk::IPropertyDescriptions>(m_PropertyDescriptions.get());
 
+  m_PropertyDeserialization.reset(new mitk::PropertyDeserialization);
+  context->RegisterService<mitk::IPropertyDeserialization>(m_PropertyDeserialization.get());
+
   m_PropertyExtensions.reset(new mitk::PropertyExtensions);
   context->RegisterService<mitk::IPropertyExtensions>(m_PropertyExtensions.get());
 
@@ -224,6 +291,8 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIRelationUIDPropertyKeyPath());
   AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIRuleIDPropertyKeyPath());
   AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIPropertyKeyPath("","").AddAnyElement());
+
+  RegisterProperties();
 
   /*
     There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.

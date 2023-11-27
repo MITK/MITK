@@ -36,9 +36,10 @@ namespace mitk
       - an operator<< so that the properties value can be put into a std::stringstream
       - an operator== so that two properties can be checked for equality
 
-    Note: you must use the macro mitkSpecializeGenericProperty to provide specializations
-    for concrete types (e.g. BoolProperty). Please see mitkProperties.h for examples. If you
-    don't use the mitkSpecializeGenericProperty Macro, GetNameOfClass() returns a wrong name.
+    Note: you must use the macros mitkDeclareGenericProperty and mitkDefineGenericProperty to
+    provide specializations for concrete types (e.g. BoolProperty). See mitkProperties.h for
+    examples. If you don't use these macros, GetNameOfClass() will return "GenericProperty",
+    which will mess up serialization for example.
 
   */
   template <typename T>
@@ -59,6 +60,16 @@ namespace mitk
       std::stringstream myStr;
       myStr << GetValue();
       return myStr.str();
+    }
+
+    bool ToJSON(nlohmann::json&) const override
+    {
+      return false;
+    }
+
+    bool FromJSON(const nlohmann::json&) override
+    {
+      return false;
     }
 
     using BaseProperty::operator=;
@@ -117,6 +128,9 @@ namespace mitk
     itkCloneMacro(Self);                                                                                               \
     mitkNewMacro1Param(PropertyName, Type);                                                                            \
                                                                                                                        \
+    bool ToJSON(nlohmann::json& j) const override;                                                                     \
+    bool FromJSON(const nlohmann::json& j) override;                                                                   \
+                                                                                                                       \
     using BaseProperty::operator=;                                                                                     \
                                                                                                                        \
   protected:                                                                                                           \
@@ -137,6 +151,17 @@ namespace mitk
     itk::LightObject::Pointer result(new Self(*this));                                                                 \
     result->UnRegister();                                                                                              \
     return result;                                                                                                     \
+  }                                                                                                                    \
+  bool mitk::PropertyName::ToJSON(nlohmann::json& j) const                                                             \
+  {                                                                                                                    \
+    j = this->GetValue();                                                                                              \
+    return true;                                                                                                       \
+  }                                                                                                                    \
+                                                                                                                       \
+  bool mitk::PropertyName::FromJSON(const nlohmann::json& j)                                                           \
+  {                                                                                                                    \
+    this->SetValue(j.get<Type>());                                                                                     \
+    return true;                                                                                                       \
   }
 
 #endif

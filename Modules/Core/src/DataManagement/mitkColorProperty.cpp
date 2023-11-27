@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkColorProperty.h"
 #include <sstream>
+#include <nlohmann/json.hpp>
 
 mitk::ColorProperty::ColorProperty() : m_Color(0.0f)
 {
@@ -80,6 +81,18 @@ std::string mitk::ColorProperty::GetValueAsString() const
 const mitk::Color &mitk::ColorProperty::GetValue() const
 {
   return GetColor();
+}
+
+bool mitk::ColorProperty::ToJSON(nlohmann::json& j) const
+{
+  j = this->GetColor();
+  return true;
+}
+
+bool mitk::ColorProperty::FromJSON(const nlohmann::json& j)
+{
+  this->SetColor(j.get<Color>());
+  return true;
 }
 
 itk::LightObject::Pointer mitk::ColorProperty::InternalClone() const

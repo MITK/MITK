@@ -96,6 +96,16 @@ std::string mitk::IsoDoseLevelVectorProperty::GetValueAsString() const
   return myStr.str();
 }
 
+bool mitk::IsoDoseLevelVectorProperty::ToJSON(nlohmann::json&) const
+{
+  return false; // Not implemented
+}
+
+bool mitk::IsoDoseLevelVectorProperty::FromJSON(const nlohmann::json&)
+{
+  return false; // Not implemented
+}
+
 itk::LightObject::Pointer mitk::IsoDoseLevelVectorProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

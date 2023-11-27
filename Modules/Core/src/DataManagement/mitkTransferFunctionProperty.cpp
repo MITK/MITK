@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkTransferFunctionProperty.h"
+#include <nlohmann/json.hpp>
 
 namespace mitk
 {
@@ -41,6 +42,77 @@ namespace mitk
   TransferFunctionProperty::TransferFunctionProperty(mitk::TransferFunction::Pointer value)
     : BaseProperty(), m_Value(value)
   {
+  }
+
+  bool TransferFunctionProperty::ToJSON(nlohmann::json& j) const
+  {
+    auto tf = this->GetValue();
+
+    auto scalarOpacity = nlohmann::json::array();
+
+    for (const auto& point : tf->GetScalarOpacityPoints())
+      scalarOpacity.push_back(point);
+
+    auto gradientOpacity = nlohmann::json::array();
+
+    for (const auto& point : tf->GetGradientOpacityPoints())
+      gradientOpacity.push_back(point);
+
+    auto* ctf = tf->GetColorTransferFunction();
+    auto size = ctf->GetSize();
+
+    std::array<double, 6> value;
+    auto color = nlohmann::json::array();
+
+    for (int i = 0; i < size; ++i)
+    {
+      ctf->GetNodeValue(i, value.data());
+      color.push_back(value);
+    }
+
+    j = nlohmann::json{
+      {"ScalarOpacity", scalarOpacity},
+      {"GradientOpacity", gradientOpacity},
+      {"Color", color}};
+
+    return true;
+  }
+
+  bool TransferFunctionProperty::FromJSON(const nlohmann::json& j)
+  {
+    auto tf = TransferFunction::New();
+    TransferFunction::ControlPoints::value_type point; 
+
+    tf->ClearScalarOpacityPoints();
+
+    for (const auto& opacity : j["ScalarOpacity"])
+    {
+      opacity.get_to(point);
+      tf->AddScalarOpacityPoint(point.first, point.second);
+    }
+
+    tf->ClearGradientOpacityPoints();
+
+    for (const auto& opacity : j["GradientOpacity"])
+    {
+      opacity.get_to(point);
+      tf->AddGradientOpacityPoint(point.first, point.second);
+    }
+
+    auto* ctf = tf->GetColorTransferFunction();
+    ctf->RemoveAllPoints();
+
+    std::array<double, 6> value;
+
+    for (const auto& color : j["Color"])
+    {
+      color.get_to(value);
+      ctf->AddRGBPoint(value[0], value[1], value[2], value[3], value[4], value[5]);
+    }
+
+    this->SetValue(tf);
+
+    return true;
   }
 
   itk::LightObject::Pointer TransferFunctionProperty::InternalClone() const

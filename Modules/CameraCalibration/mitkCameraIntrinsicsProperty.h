@@ -42,6 +42,9 @@ public:
 
   std::string GetValueAsString() const override;
 
+  bool ToJSON(nlohmann::json& j) const override;
+  bool FromJSON(const nlohmann::json& j) override;
+
   using BaseProperty::operator=;
 
 protected:

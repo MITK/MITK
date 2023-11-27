@@ -81,6 +81,25 @@ namespace mitk
     return myStr.str();
   }
 
+  bool ClippingProperty::ToJSON(nlohmann::json& j) const
+  {
+    j = nlohmann::json{
+      {"Enabled", this->GetClippingEnabled()},
+      {"Origin", this->GetOrigin()},
+      {"Normal", this->GetNormal()}};
+
+    return true;
+  }
+
+  bool ClippingProperty::FromJSON(const nlohmann::json& j)
+  {
+    this->SetClippingEnabled(j["Enabled"].get<bool>());
+    this->SetOrigin(j["Origin"].get<Point3D>());
+    this->SetNormal(j["Normal"].get<Vector3D>());
+
+    return true;
+  }
+
   itk::LightObject::Pointer ClippingProperty::InternalClone() const
   {
     itk::LightObject::Pointer result(new Self(*this));

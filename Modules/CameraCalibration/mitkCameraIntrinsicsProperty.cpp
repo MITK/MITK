@@ -55,5 +55,15 @@ itk::LightObject::Pointer CameraIntrinsicsProperty::InternalClone() const
   return result;
 }
 
+bool CameraIntrinsicsProperty::ToJSON(nlohmann::json&) const
+{
+  return false;
+}
+
+bool CameraIntrinsicsProperty::FromJSON(const nlohmann::json&)
+{
+  return false;
+}
+
 }
 // namespace mitk

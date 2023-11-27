@@ -128,6 +128,16 @@ std::string mitk::SmartPointerProperty::GetValueAsString() const
     return std::string("nullptr");
 }
 
+bool mitk::SmartPointerProperty::ToJSON(nlohmann::json&) const
+{
+  return false;
+}
+
+bool mitk::SmartPointerProperty::FromJSON(const nlohmann::json&)
+{
+  return false;
+}
+
 itk::LightObject::Pointer mitk::SmartPointerProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

@@ -72,6 +72,18 @@ std::string mitk::LevelWindowProperty::GetValueAsString() const
   return myStr.str();
 }
 
+bool mitk::LevelWindowProperty::ToJSON(nlohmann::json& j) const
+{
+  j = this->GetLevelWindow();
+  return true;
+}
+
+bool mitk::LevelWindowProperty::FromJSON(const nlohmann::json& j)
+{
+  this->SetLevelWindow(j.get<LevelWindow>());
+  return true;
+}
+
 itk::LightObject::Pointer mitk::LevelWindowProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

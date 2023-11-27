@@ -48,8 +48,6 @@ namespace mitk
     BoundingObject();
     ~BoundingObject() override;
 
-    bool WriteXMLData(XMLWriter &xmlWriter);
-
     //##Documentation
     //## \brief If \a true, the Boundingobject describes a positive volume,
     //## if \a false a negative volume.

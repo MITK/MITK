@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "mitkNavigationDataDisplacementFilter.h"
 #include "mitkNavigationDataSmoothingFilter.h"
 #include "mitkTrackingDeviceSource.h"
+#include <mitkUIDGenerator.h>
 
 // US Control Interfaces
 #include "mitkUSControlInterfaceBMode.h"

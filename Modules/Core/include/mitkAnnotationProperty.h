@@ -49,6 +49,10 @@ namespace mitk
     void SetPosition(const Point3D &position);
 
     std::string GetValueAsString() const override;
+
+    bool ToJSON(nlohmann::json& j) const override;
+    bool FromJSON(const nlohmann::json& j) override;
+
     virtual BaseProperty &operator=(const BaseProperty &other) { return Superclass::operator=(other); }
     using BaseProperty::operator=;
 

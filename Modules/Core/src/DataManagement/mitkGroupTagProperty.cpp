@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkGroupTagProperty.h"
+#include <nlohmann/json.hpp>
 
 mitk::GroupTagProperty::GroupTagProperty() : mitk::BaseProperty()
 {
@@ -27,6 +28,17 @@ bool mitk::GroupTagProperty::IsEqual(const BaseProperty & /*property*/) const
 }
 
 bool mitk::GroupTagProperty::Assign(const BaseProperty & /*property*/)
+{
+  return true;
+}
+
+bool mitk::GroupTagProperty::ToJSON(nlohmann::json& j) const
+{
+  j = nlohmann::json::object();
+  return true;
+}
+
+bool mitk::GroupTagProperty::FromJSON(const nlohmann::json&)
 {
   return true;
 }

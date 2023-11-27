@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <string>
 #include <vector>
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include "MitkModelFitExports.h"
 
@@ -86,6 +87,9 @@ namespace mitk
      */
     MITKMODELFIT_EXPORT std::ostream& operator<<(std::ostream& stream,
             const ScalarListLookupTable& l);
+
+    MITKMODELFIT_EXPORT void to_json(nlohmann::json& j, const ScalarListLookupTable& lut);
+    MITKMODELFIT_EXPORT void from_json(const nlohmann::json& j, ScalarListLookupTable& lut);
 }
 
 #endif

@@ -10,4 +10,25 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLine.h"
+#ifndef mitkROISerializer_h
+#define mitkROISerializer_h
+
+#include <mitkBaseDataSerializer.h>
+
+namespace mitk
+{
+  class ROISerializer : public BaseDataSerializer
+  {
+  public:
+    mitkClassMacro(ROISerializer, BaseDataSerializer)
+    itkFactorylessNewMacro(Self)
+
+    std::string Serialize() override;
+
+  protected:
+    ROISerializer();
+    ~ROISerializer() override;
+  };
+}
+
+#endif

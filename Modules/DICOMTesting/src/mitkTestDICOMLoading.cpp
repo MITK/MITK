@@ -431,6 +431,25 @@ mitk::TestDICOMLoading::CompareSpacedValueFields( const std::string& reference,
   return result;
 }
 
+
+bool
+mitk::TestDICOMLoading::CompareJSON(const std::string& reference, const std::string& test)
+{
+  try
+  {
+    auto jReference = nlohmann::json::parse(reference);
+    auto jTest = nlohmann::json::parse(test);
+
+    return jReference == jTest;
+  }
+  catch (const nlohmann::json::exception& e)
+  {
+    MITK_ERROR << e.what();
+    return false;
+  }
+}
+
+
 bool
 mitk::TestDICOMLoading::CompareImageInformationDumps( const std::string& referenceDump,
                                                       const std::string& testDump )
@@ -464,6 +483,11 @@ mitk::TestDICOMLoading::CompareImageInformationDumps( const std::string& referen
         testResult &= thisTestResult;
 
         MITK_DEBUG << refKey << ": '" << gdcm::Version::GetVersion() << "' == '" << testValue << "' ? " << (thisTestResult ? "YES" : "NO");
+      }
+      else if (refKey == mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_FILES()))
+      {
+        bool thisTestResult = CompareJSON(refValue, testValue);
+        testResult &= thisTestResult;
       }
       else
       {

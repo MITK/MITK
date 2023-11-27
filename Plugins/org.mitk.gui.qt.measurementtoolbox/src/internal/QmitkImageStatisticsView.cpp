@@ -49,6 +49,7 @@ namespace {
     if (!mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planarFigure->GetPlaneGeometry(), imageGeometry))
       return false;
 
+    // The rest from here on is only needed until T30279 has been solved.
     if (planarFigure->IsClosed())
       return true;
 

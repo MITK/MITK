@@ -72,6 +72,9 @@ class MITKDICOMTESTING_EXPORT TestDICOMLoading
                                    const std::string& test,
                                    double eps = mitk::eps );
 
+    bool CompareJSON( const std::string& reference,
+                      const std::string& test );
+
     /**
        Compress whitespace in string
        \param pString input string

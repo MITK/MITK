@@ -49,6 +49,9 @@ namespace {
     if (!mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planarFigure->GetPlaneGeometry(), imageGeometry))
       return false;
 
+    if (planarFigure->IsClosed())
+      return true;
+
     const auto numControlPoints = planarFigure->GetNumberOfControlPoints();
     for (unsigned int i = 0; i < numControlPoints; ++i)
     {

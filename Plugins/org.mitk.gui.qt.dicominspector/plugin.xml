@@ -4,7 +4,10 @@
     <view id="org.mitk.views.dicominspector"
           name="Dicom Inspector"
           class="QmitkDicomInspectorView"
-          icon="resources/inspector.png" />
+          icon="resources/dicom_inspector.svg"
+          category="Data">
+          <description>View DICOM information stored as properties in data instances.</description>
+	</view>
   </extension>
 
 </plugin>

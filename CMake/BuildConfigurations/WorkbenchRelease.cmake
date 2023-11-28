@@ -13,12 +13,14 @@ set(MITK_CONFIG_PLUGINS ${MITK_CONFIG_PLUGINS}
   org.mitk.gui.qt.matchpoint.visualizer
   org.mitk.gui.qt.matchpoint.evaluator
   org.mitk.gui.qt.matchpoint.manipulator
+  org.mitk.gui.qt.dicominspector
 )
 
 if(NOT MITK_USE_SUPERBUILD)
   set(BUILD_CoreCmdApps ON CACHE BOOL "" FORCE)
   set(BUILD_MatchPointCmdApps ON CACHE BOOL "" FORCE)
   set(BUILD_SegmentationCmdApps ON CACHE BOOL "" FORCE)
+  set(BUILD_DICOMCmdApps ON CACHE BOOL "" FORCE)
 endif()
 
 set(MITK_VTK_DEBUG_LEAKS OFF CACHE BOOL "Enable VTK Debug Leaks" FORCE)

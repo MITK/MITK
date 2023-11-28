@@ -20,6 +20,9 @@ found in the LICENSE file.
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkTimeNavigationController.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 
 // Qt
 #include <QMessageBox>
@@ -80,9 +83,14 @@ void QmitkDicomInspectorView::CreateQtPartControl(QWidget* parent)
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
 
+  auto nodePredicate = mitk::NodePredicateAnd::New();
+  nodePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  nodePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+
   m_Controls.singleSlot->SetDataStorage(GetDataStorage());
   m_Controls.singleSlot->SetSelectionIsOptional(true);
   m_Controls.singleSlot->SetAutoSelectNewNodes(true);
+  m_Controls.singleSlot->SetNodePredicate(nodePredicate);
   m_Controls.singleSlot->SetEmptyInfo(QString("Please select a data node"));
   m_Controls.singleSlot->SetPopUpTitel(QString("Select data node"));
 

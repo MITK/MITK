@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QDir>
 
 /**
  * @brief Installer class for TotalSegmentator Tool.
@@ -72,7 +73,7 @@ protected slots:
   /**
    * @brief Qt Slot
    */
-  QString OnSystemPythonChanged(const QString &);
+  std::pair<QString, QString> OnSystemPythonChanged(const QString &);
 
   /**
    * @brief Qt Slot
@@ -150,13 +151,6 @@ protected:
    * @return QString 
    */
   QString GetPythonPathFromUI(const QString &) const;
-
-  /**
-   * @brief Get the Exact Python Path for any OS
-   * from the virtual environment path.
-   * @return QString 
-   */
-  QString GetExactPythonPath(const QString &) const;
 
   /**
    * @brief For storing values like Python path across sessions.

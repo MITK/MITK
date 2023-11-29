@@ -93,6 +93,7 @@ void QmitkSliceNavigationListener::OnTimeChangedInternal(itk::Object* sender, co
   if (newSelectedTimePoint != m_CurrentSelectedTimePoint)
   {
     m_CurrentSelectedTimePoint = newSelectedTimePoint;
+    emit SliceChanged();
     emit SelectedTimePointChanged(newSelectedTimePoint);
   }
 }

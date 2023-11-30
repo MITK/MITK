@@ -171,7 +171,7 @@ cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 project(MyProject)
 
-find_package(MITK 2023.04 REQUIRED)
+find_package(MITK 2023.12 REQUIRED)
 
 add_executable(MyApp main.cpp)
 

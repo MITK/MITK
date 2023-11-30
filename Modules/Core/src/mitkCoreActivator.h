@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mitkPlanePositionManager.h>
 #include <mitkPropertyAliases.h>
 #include <mitkPropertyDescriptions.h>
+#include <mitkPropertyDeserialization.h>
 #include <mitkPropertyExtensions.h>
 #include <mitkPropertyFilters.h>
 #include <mitkPropertyPersistence.h>
@@ -59,6 +60,7 @@ private:
   std::unique_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
   std::unique_ptr<mitk::PropertyAliases> m_PropertyAliases;
   std::unique_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
+  std::unique_ptr<mitk::PropertyDeserialization> m_PropertyDeserialization;
   std::unique_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
   std::unique_ptr<mitk::PropertyFilters> m_PropertyFilters;
   std::unique_ptr<mitk::PropertyPersistence> m_PropertyPersistence;

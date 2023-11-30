@@ -87,6 +87,9 @@ namespace mitk
     information to retrieve the stored value.*/
     bool IsUniform() const;
 
+    bool ToJSON(nlohmann::json& j) const override;
+    bool FromJSON(const nlohmann::json& j) override;
+
     using BaseProperty::operator=;
 
   protected:
@@ -118,7 +121,7 @@ namespace mitk
   namespace PropertyPersistenceSerialization
   {
     /** Serialization of a TemporoSpatialStringProperty into a JSON string.*/
-    MITKCORE_EXPORT::std::string serializeTemporoSpatialStringPropertyToJSON(const mitk::BaseProperty *prop);
+    MITKCORE_EXPORT std::string serializeTemporoSpatialStringPropertyToJSON(const mitk::BaseProperty *prop);
   }
 
   namespace PropertyPersistenceDeserialization

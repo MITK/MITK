@@ -20,6 +20,9 @@ found in the LICENSE file.
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkTimeNavigationController.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 
 // Qt
 #include <QMessageBox>
@@ -31,18 +34,36 @@ found in the LICENSE file.
 
 const std::string QmitkDicomInspectorView::VIEW_ID = "org.mitk.views.dicominspector";
 
-QmitkDicomInspectorView::ObserverInfo::ObserverInfo(mitk::SliceNavigationController* controller,
-  int observerTag, mitk::IRenderWindowPart* part)
-  : controller(controller)
-  , observerTag(observerTag)
-  , renderWindowPart(part)
+namespace
 {
+  QmitkAbstractNodeSelectionWidget::NodeList GetInitialSelection(berry::ISelection::ConstPointer selection)
+  {
+    if (selection.IsNotNull() && !selection->IsEmpty())
+    {
+      auto dataNodeSelection = dynamic_cast<const mitk::DataNodeSelection*>(selection.GetPointer());
+
+      if (nullptr != dataNodeSelection)
+      {
+        auto firstSelectedDataNode = dataNodeSelection->GetSelectedDataNodes().front();
+
+        if (firstSelectedDataNode.IsNotNull())
+        {
+          QmitkAbstractNodeSelectionWidget::NodeList initialSelection;
+          initialSelection.push_back(firstSelectedDataNode);
+
+          return initialSelection;
+        }
+      }
+    }
+
+    return QmitkAbstractNodeSelectionWidget::NodeList();
+  }
 }
 
 QmitkDicomInspectorView::QmitkDicomInspectorView()
   : m_RenderWindowPart(nullptr)
-  , m_PendingSliceChangedEvent(false)
   , m_SelectedNode(nullptr)
+  , m_ValidSelectedPosition(false)
   , m_SelectedTimePoint(0.)
   , m_CurrentSelectedZSlice(0)
 {
@@ -51,7 +72,6 @@ QmitkDicomInspectorView::QmitkDicomInspectorView()
 
 QmitkDicomInspectorView::~QmitkDicomInspectorView()
 {
-  this->RemoveAllObservers();
 }
 
 void QmitkDicomInspectorView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -60,19 +80,14 @@ void QmitkDicomInspectorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
   {
     m_RenderWindowPart = renderWindowPart;
 
-    if (!InitObservers())
-    {
-      QMessageBox::information(nullptr, "Error", "Unable to set up the event observers. The " \
-        "plot will not be triggered on changing the crosshair, " \
-        "position or time step.");
-    }
+    this->m_SliceNavigationListener.RenderWindowPartActivated(renderWindowPart);
   }
 }
 
 void QmitkDicomInspectorView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
 {
   m_RenderWindowPart = nullptr;
-  this->RemoveAllObservers(renderWindowPart);
+  this->m_SliceNavigationListener.RenderWindowPartDeactivated(renderWindowPart);
 }
 
 void QmitkDicomInspectorView::CreateQtPartControl(QWidget* parent)
@@ -80,9 +95,13 @@ void QmitkDicomInspectorView::CreateQtPartControl(QWidget* parent)
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
 
+  auto nodePredicate = mitk::NodePredicateAnd::New();
+  nodePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  nodePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+
   m_Controls.singleSlot->SetDataStorage(GetDataStorage());
   m_Controls.singleSlot->SetSelectionIsOptional(true);
-  m_Controls.singleSlot->SetAutoSelectNewNodes(true);
+  m_Controls.singleSlot->SetNodePredicate(nodePredicate);
   m_Controls.singleSlot->SetEmptyInfo(QString("Please select a data node"));
   m_Controls.singleSlot->SetPopUpTitel(QString("Select data node"));
 
@@ -97,78 +116,14 @@ void QmitkDicomInspectorView::CreateQtPartControl(QWidget* parent)
 
   mitk::IRenderWindowPart* renderWindowPart = GetRenderWindowPart();
   RenderWindowPartActivated(renderWindowPart);
-}
+  this->m_SliceNavigationListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+  connect(&m_SliceNavigationListener, &QmitkSliceNavigationListener::SliceChanged, this, &QmitkDicomInspectorView::OnSliceChanged);
 
-bool QmitkDicomInspectorView::InitObservers()
-{
-  bool result = true;
+  auto selection = this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
+  auto currentSelection = GetInitialSelection(selection);
 
-  auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
-  itk::SimpleMemberCommand<QmitkDicomInspectorView>::Pointer cmdTimeEvent =
-    itk::SimpleMemberCommand<QmitkDicomInspectorView>::New();
-  cmdTimeEvent->SetCallbackFunction(this, &QmitkDicomInspectorView::OnTimeChanged);
-  m_ControllerToTimeObserverTag = timeNavigationController->AddObserver(mitk::TimeNavigationController::TimeEvent(0), cmdTimeEvent);
-
-  typedef QHash<QString, QmitkRenderWindow*> WindowMapType;
-  WindowMapType windowMap = m_RenderWindowPart->GetQmitkRenderWindows();
-
-  auto i = windowMap.begin();
-
-  while (i != windowMap.end())
-  {
-    mitk::SliceNavigationController* sliceNavController = i.value()->GetSliceNavigationController();
-
-    if (nullptr != sliceNavController)
-    {
-      auto cmdSliceEvent = itk::SimpleMemberCommand<QmitkDicomInspectorView>::New();
-      cmdSliceEvent->SetCallbackFunction(this, &QmitkDicomInspectorView::OnSliceChanged);
-      int tag = sliceNavController->AddObserver(
-        mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), cmdSliceEvent);
-
-      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-        m_RenderWindowPart)));
-
-      auto cmdDelEvent = itk::MemberCommand<QmitkDicomInspectorView>::New();
-      cmdDelEvent->SetCallbackFunction(this, &QmitkDicomInspectorView::OnSliceNavigationControllerDeleted);
-      tag = sliceNavController->AddObserver(itk::DeleteEvent(), cmdDelEvent);
-
-      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-        m_RenderWindowPart)));
-    }
-
-    ++i;
-
-    result = result && sliceNavController;
-  }
-
-  return result;
-}
-
-void QmitkDicomInspectorView::RemoveObservers(const mitk::SliceNavigationController* deletedSlicer)
-{
-  std::pair<ObserverMapType::const_iterator, ObserverMapType::const_iterator> obsRange =
-    m_ObserverMap.equal_range(deletedSlicer);
-
-  for (ObserverMapType::const_iterator pos = obsRange.first; pos != obsRange.second; ++pos)
-  {
-    pos->second.controller->RemoveObserver(pos->second.observerTag);
-  }
-
-  m_ObserverMap.erase(deletedSlicer);
-}
-
-void QmitkDicomInspectorView::RemoveAllObservers(mitk::IRenderWindowPart* deletedPart)
-{
-  for (ObserverMapType::const_iterator pos = m_ObserverMap.begin(); pos != m_ObserverMap.end();)
-  {
-    ObserverMapType::const_iterator delPos = pos++;
-
-    if (nullptr == deletedPart || deletedPart == delPos->second.renderWindowPart)
-    {
-      delPos->second.controller->RemoveObserver(delPos->second.observerTag);
-      m_ObserverMap.erase(delPos);
-    }
-  }
+  if (!currentSelection.isEmpty())
+    m_Controls.singleSlot->SetCurrentSelection(currentSelection);
 }
 
 void QmitkDicomInspectorView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
@@ -189,28 +144,8 @@ void QmitkDicomInspectorView::OnCurrentSelectionChanged(QList<mitk::DataNode::Po
 
     m_SelectedNodeTime.Modified();
     UpdateData();
-    OnSliceChangedDelayed();
+    OnSliceChanged();
   }
-}
-
-void QmitkDicomInspectorView::OnSliceChanged()
-{
-  // Since there are always 3 events arriving (one for each render window) every time the slice
-  // or time changes, the slot OnSliceChangedDelayed is triggered - and only if it hasn't been
-  // triggered yet - so it is only executed once for every slice/time change.
-  if (!m_PendingSliceChangedEvent)
-  {
-    m_PendingSliceChangedEvent = true;
-
-    QTimer::singleShot(0, this, SLOT(OnSliceChangedDelayed()));
-  }
-}
-
-void QmitkDicomInspectorView::OnSliceNavigationControllerDeleted(const itk::Object* sender, const itk::EventObject& /*e*/)
-{
-  auto sendingSlicer = dynamic_cast<const mitk::SliceNavigationController*>(sender);
-
-  this->RemoveObservers(sendingSlicer);
 }
 
 void QmitkDicomInspectorView::ValidateAndSetCurrentPosition()
@@ -256,21 +191,7 @@ void QmitkDicomInspectorView::ValidateAndSetCurrentPosition()
   }
 }
 
-void QmitkDicomInspectorView::OnSliceChangedDelayed()
-{
-  m_PendingSliceChangedEvent = false;
-
-  ValidateAndSetCurrentPosition();
-
-  m_Controls.tableTags->setEnabled(m_ValidSelectedPosition);
-
-  if (m_SelectedNode.IsNotNull())
-  {
-    RenderTable();
-  }
-}
-
-void QmitkDicomInspectorView::OnTimeChanged()
+void QmitkDicomInspectorView::OnSliceChanged()
 {
   ValidateAndSetCurrentPosition();
 

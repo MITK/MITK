@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkIMimeTypeProvider.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
+#include <mitkIPropertyDeserialization.h>
 #include <mitkIPropertyExtensions.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkIPropertyPersistence.h>
@@ -72,6 +73,11 @@ namespace mitk
   IPropertyDescriptions *CoreServices::GetPropertyDescriptions(us::ModuleContext *context)
   {
     return GetCoreService<IPropertyDescriptions>(context);
+  }
+
+  IPropertyDeserialization* CoreServices::GetPropertyDeserialization(us::ModuleContext* context)
+  {
+    return GetCoreService<IPropertyDeserialization>(context);
   }
 
   IPropertyExtensions *CoreServices::GetPropertyExtensions(us::ModuleContext *context)

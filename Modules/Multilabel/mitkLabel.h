@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "MitkMultilabelExports.h"
 #include <mitkColorProperty.h>
 #include <mitkPropertyList.h>
+#include <mitkPoint.h>
 #include <mitkVector.h>
 
 namespace mitk

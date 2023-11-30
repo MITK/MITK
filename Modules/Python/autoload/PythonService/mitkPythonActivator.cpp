@@ -13,9 +13,9 @@ found in the LICENSE file.
 #define mitkPythonActivator_h
 
 // Microservices
+#include "mitkPythonService.h"
 #include <usModuleActivator.h>
 #include "usModuleContext.h"
-#include "mitkPythonService.h"
 #include <usServiceRegistration.h>
 
 namespace mitk

@@ -15,6 +15,10 @@
     </view>
   </extension>
 
+  <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
+    <contextMenuAction nodeDescriptorName="GeometryData" label="Convert to ROI" icon="" class="QmitkConvertGeometryDataToROIAction" />
+  </extension>
+
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.views.imagecropper.ViewKeyword" label="Size" />
     <keyword id="org.mitk.views.imagecropper.ViewKeyword" label="Match Size" />

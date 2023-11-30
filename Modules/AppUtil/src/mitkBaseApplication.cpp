@@ -29,6 +29,7 @@ found in the LICENSE file.
 
 #include <usModuleSettings.h>
 
+#include <vtkLogger.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <QVTKOpenGLNativeWidget.h>
 
@@ -663,6 +664,8 @@ namespace mitk
   {
     if (nullptr == qApp)
     {
+      vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_WARNING);
+
       vtkOpenGLRenderWindow::SetGlobalMaximumNumberOfMultiSamples(0);
 
       auto defaultFormat = QVTKOpenGLNativeWidget::defaultFormat();

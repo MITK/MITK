@@ -13,9 +13,13 @@ found in the LICENSE file.
 #define mitkPythonService_h
 
 #include <ctkAbstractPythonManager.h>
-#include "mitkIPythonService.h"
+#ifdef snprintf
+#undef snprintf
+#endif
+
+#include <mitkIPythonService.h>
+#include <mitkSurface.h>
 #include <itkLightObject.h>
-#include "mitkSurface.h"
 
 namespace mitk
 {

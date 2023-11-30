@@ -14,11 +14,13 @@ found in the LICENSE file.
 
 #include "mitkPluginActivator.h"
 #include "QmitkImageCropperView.h"
+#include "QmitkConvertGeometryDataToROIAction.h"
 
 void mitk::mitkPluginActivator::start(ctkPluginContext* context)
 {
   RegisterBoundingShapeObjectFactory();
   BERRY_REGISTER_EXTENSION_CLASS(QmitkImageCropperView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertGeometryDataToROIAction, context)
 }
 
 void mitk::mitkPluginActivator::stop(ctkPluginContext*)

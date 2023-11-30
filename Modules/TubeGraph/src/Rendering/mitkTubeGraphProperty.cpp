@@ -426,3 +426,13 @@ itk::LightObject::Pointer mitk::TubeGraphProperty::InternalClone() const
   itk::LightObject::Pointer result(new Self(*this));
   return result;
 }
+
+bool mitk::TubeGraphProperty::ToJSON(nlohmann::json&) const
+{
+  return false; // Not implemented
+}
+
+bool mitk::TubeGraphProperty::FromJSON(const nlohmann::json&)
+{
+  return false; // Not implemented
+}

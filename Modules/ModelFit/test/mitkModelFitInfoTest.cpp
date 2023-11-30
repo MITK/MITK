@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include "mitkModelFitResultRelationRule.h"
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
+#include <mitkUIDGenerator.h>
 
 
 mitk::modelFit::ModelFitInfo::UIDType ensureModelFitUID(mitk::BaseData * data)

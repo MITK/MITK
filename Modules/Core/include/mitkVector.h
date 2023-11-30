@@ -17,10 +17,12 @@ found in the LICENSE file.
 #include <vnl/vnl_vector.h>
 #include <vnl/vnl_vector_fixed.h>
 
-#include "mitkArray.h"
-#include "mitkEqual.h"
-#include "mitkExceptionMacro.h"
-#include "mitkNumericConstants.h"
+#include <mitkArray.h>
+#include <mitkEqual.h>
+#include <mitkExceptionMacro.h>
+#include <mitkNumericConstants.h>
+
+#include <nlohmann/json.hpp>
 
 namespace mitk
 {
@@ -130,6 +132,22 @@ namespace mitk
      */
     operator vnl_vector<TCoordRep>() const { return this->GetVnlVector(); }
   }; // end mitk::Vector
+
+  template <class TCoordRep, unsigned int NVectorDimension>
+  void to_json(nlohmann::json &j, const Vector<TCoordRep, NVectorDimension> &v)
+  {
+    j = nlohmann::json::array();
+
+    for (size_t i = 0; i < NVectorDimension; ++i)
+      j.push_back(v[i]);
+  }
+
+  template <class TCoordRep, unsigned int NVectorDimension>
+  void from_json(const nlohmann::json &j, Vector<TCoordRep, NVectorDimension> &v)
+  {
+    for (size_t i = 0; i < NVectorDimension; ++i)
+      j.at(i).get_to(v[i]);
+  }
 
   // convenience typedefs for often used mitk::Vector representations.
 

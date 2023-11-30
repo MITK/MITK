@@ -137,7 +137,7 @@ void mitk::BoundingShapeInteractor::DataNodeChanged()
     newInputNode->AddProperty(selectedColorPropertyName, mitk::ColorProperty::New(0.0, 1.0, 0.0));
 
   if (deselectedColor.IsNull())
-    newInputNode->AddProperty(deselectedColorPropertyName, mitk::ColorProperty::New(1.0, 1.0, 1.0));
+    newInputNode->AddProperty(deselectedColorPropertyName, mitk::ColorProperty::New(1.0, 0.0, 0.0));
 
   newInputNode->SetProperty(boundingShapePropertyName, mitk::BoolProperty::New(true));
   newInputNode->AddProperty(activeHandleIdPropertyName, mitk::IntProperty::New(-1));

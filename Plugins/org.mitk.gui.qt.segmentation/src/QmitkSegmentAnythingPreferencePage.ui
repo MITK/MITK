@@ -48,7 +48,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="pythonLabel">
        <property name="text">
-        <string>System Python</string>
+        <string>System Python (v3.9 - v3.11)</string>
        </property>
       </widget>
      </item>

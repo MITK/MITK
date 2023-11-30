@@ -17,26 +17,14 @@ found in the LICENSE file.
 #include <vtkActor2D.h>
 #include <vtkAppendPolyData.h>
 #include <vtkCoordinate.h>
-#include <vtkCubeSource.h>
 #include <vtkMath.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper2D.h>
 #include <vtkProperty2D.h>
-#include <vtkSphereSource.h>
 #include <vtkStripper.h>
 #include <vtkTransformFilter.h>
 #include <vtkTransformPolyDataFilter.h>
-
-static vtkSmartPointer<vtkSphereSource> CreateHandle()
-{
-  auto handle = vtkSmartPointer<vtkSphereSource>::New();
-
-  handle->SetPhiResolution(8);
-  handle->SetThetaResolution(16);
-
-  return handle;
-}
 
 namespace mitk
 {
@@ -71,7 +59,6 @@ mitk::BoundingShapeVtkMapper2D::LocalStorage::LocalStorage()
   m_ZoomFactor(1.0)
 {
   m_Actor->SetMapper(m_Mapper);
-  m_Actor->GetProperty()->SetOpacity(0.3);
   m_Actor->VisibilityOn();
 
   m_HandleActor->SetMapper(m_HandleMapper);
@@ -89,7 +76,7 @@ mitk::BoundingShapeVtkMapper2D::LocalStorage::LocalStorage()
   m_Cutter->SetCutFunction(m_CuttingPlane);
 
   for (int i = 0; i < 6; ++i)
-    m_Handles.push_back(CreateHandle());
+    m_Handles.push_back(vtkSmartPointer<vtkCubeSource>::New());
 
   m_PropAssembly->AddPart(m_Actor);
   m_PropAssembly->AddPart(m_HandleActor);
@@ -139,6 +126,7 @@ void mitk::BoundingShapeVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 void mitk::BoundingShapeVtkMapper2D::SetDefaultProperties(DataNode *node, BaseRenderer *renderer, bool overwrite)
 {
   Superclass::SetDefaultProperties(node, renderer, overwrite);
+  node->AddProperty("opacity", FloatProperty::New(0.2f), renderer, overwrite);
 }
 
 mitk::BoundingShapeVtkMapper2D::BoundingShapeVtkMapper2D() : m_Impl(new Impl)
@@ -340,7 +328,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       if (handleSizeProperty != nullptr)
         initialHandleSize = handleSizeProperty->GetValue();
       else
-        initialHandleSize = 1.0 / 40.0;
+        initialHandleSize = 0.02;
 
       mitk::Point2D displaySize = renderer->GetDisplaySizeInMM();
       double handleSize = ((displaySize[0] + displaySize[1]) / 2.0) * initialHandleSize;
@@ -365,7 +353,9 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       {
         Point3D handleCenter = m_Impl->HandlePropertyList[handleIdx].GetPosition();
 
-        handle->SetRadius(handleSize);
+        handle->SetXLength(handleSize);
+        handle->SetYLength(handleSize);
+        handle->SetZLength(handleSize);
         handle->SetCenter(handleCenter[0], handleCenter[1], handleCenter[2]);
 
         // show handles only if the corresponding face is aligned to the render window
@@ -416,12 +406,8 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       cutPolyData->SetPolys(stripper->GetOutput()->GetLines());
 
       localStorage->m_Actor->GetMapper()->SetInputDataObject(cutPolyData);
-      mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty *>(node->GetProperty("color"));
-      if (selectedColor != nullptr)
-      {
-        mitk::Color color = selectedColor->GetColor();
-        localStorage->m_Actor->GetProperty()->SetColor(color[0], color[1], color[2]);
-      }
+
+      this->ApplyColorAndOpacityProperties(renderer, localStorage->m_Actor);
 
       if (activeHandleId != nullptr)
       {
@@ -462,6 +448,15 @@ vtkProp *mitk::BoundingShapeVtkMapper2D::GetVtkProp(BaseRenderer *renderer)
   return m_Impl->LocalStorageHandler.GetLocalStorage(renderer)->m_PropAssembly;
 }
 
-void mitk::BoundingShapeVtkMapper2D::ApplyColorAndOpacityProperties(BaseRenderer *, vtkActor *)
+void mitk::BoundingShapeVtkMapper2D::ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor)
 {
+  auto* property = actor->GetProperty();
+
+  std::array<float, 3> color = { 1.0, 0.0, 0.0 };
+  this->GetDataNode()->GetColor(color.data(), renderer);
+  property->SetColor(color[0], color[1], color[2]);
+
+  float opacity = 0.2f;
+  this->GetDataNode()->GetOpacity(opacity, renderer);
+  property->SetOpacity(opacity);
 }

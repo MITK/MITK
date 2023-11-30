@@ -93,6 +93,9 @@ namespace mitk
     /// sets the content vector
     virtual void SetValue(const VectorType &parameter_vector);
 
+    bool ToJSON(nlohmann::json& j) const override;
+    bool FromJSON(const nlohmann::json& j) override;
+
   private:
     /// purposely not implemented
     VectorProperty &operator=(const Self &);

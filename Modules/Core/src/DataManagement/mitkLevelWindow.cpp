@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "mitkImageStatisticsHolder.h"
 
 #include <algorithm>
+#include <nlohmann/json.hpp>
 
 void mitk::LevelWindow::EnsureConsistency()
 {
@@ -506,5 +507,42 @@ mitk::LevelWindow &mitk::LevelWindow::operator=(const mitk::LevelWindow &levWin)
     m_Fixed = levWin.GetFixed();
     m_IsFloatingImage = levWin.IsFloatingValues();
     return *this;
+  }
+}
+
+namespace mitk
+{
+  void to_json(nlohmann::json& j, const LevelWindow& lw)
+  {
+    j = nlohmann::json{
+      {"Fixed", lw.IsFixed()},
+      {"IsFloatingImage", lw.IsFloatingValues()},
+      {"CurrentSettings", {
+        {"Level", lw.GetLevel()},
+        {"Window", lw.GetWindow()}}},
+      {"DefaultSettings", {
+        {"Level", lw.GetDefaultLevel()},
+        {"Window", lw.GetDefaultWindow()}}},
+      {"CurrentRange", {
+        {"Min", lw.GetRangeMin()},
+        {"Max", lw.GetRangeMax()}}}};
+  }
+
+  void from_json(const nlohmann::json& j, LevelWindow& lw)
+  {
+    lw.SetRangeMinMax(
+      j["CurrentRange"]["Min"].get<ScalarType>(),
+      j["CurrentRange"]["Max"].get<ScalarType>());
+
+    lw.SetDefaultLevelWindow(
+      j["DefaultSettings"]["Level"].get<ScalarType>(),
+      j["DefaultSettings"]["Window"].get<ScalarType>());
+
+    lw.SetLevelWindow(
+      j["CurrentSettings"]["Level"].get<ScalarType>(),
+      j["CurrentSettings"]["Window"].get<ScalarType>());
+
+    lw.SetFixed(j["Fixed"].get<bool>());
+    lw.SetFloatingValues(j["IsFloatingImage"].get<bool>());
   }
 }

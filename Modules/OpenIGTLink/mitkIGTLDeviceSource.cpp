@@ -15,8 +15,7 @@ found in the LICENSE file.
 #include "mitkIGTLDevice.h"
 #include "mitkIGTLMessage.h"
 
-//#include "mitkIGTTimeStamp.h"
-//#include "mitkIGTException.h"
+#include <mitkUIDGenerator.h>
 
 //Microservices
 #include <usGetModuleContext.h>

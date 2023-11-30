@@ -96,6 +96,16 @@ std::string mitk::IsoDoseLevelSetProperty::GetValueAsString() const
   return myStr.str();
 }
 
+bool mitk::IsoDoseLevelSetProperty::ToJSON(nlohmann::json&) const
+{
+  return false; // Not implemented
+}
+
+bool mitk::IsoDoseLevelSetProperty::FromJSON(const nlohmann::json&)
+{
+  return false; // Not implemented
+}
+
 itk::LightObject::Pointer mitk::IsoDoseLevelSetProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

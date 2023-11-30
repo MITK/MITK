@@ -40,7 +40,7 @@ bool mitk::PolhemusInterface::SetupDevice()
   m_pdiDev->SetPnoBuffer(MotionBuf, 0x1FA400);
   m_pdiDev->SetMetric(true); //use cm instead of inches
 
-  m_pdiDev->StartPipeExport();
+  //m_pdiDev->StartPipeExport();
 
   CPDImdat pdiMDat;
   pdiMDat.Empty();
@@ -94,13 +94,13 @@ bool mitk::PolhemusInterface::OpenConnection()
     switch (eType)
     {
     case PI_CNX_USB:
-      MITK_INFO << "USB Connection: " << m_pdiDev->GetLastResultStr();
+      MITK_INFO << "USB Connection";
       break;
     case PI_CNX_SERIAL:
-      MITK_INFO << "Serial Connection: " << m_pdiDev->GetLastResultStr();
+      MITK_INFO << "Serial Connection";
       break;
     default:
-      MITK_INFO << "DiscoverCnx result: " << m_pdiDev->GetLastResultStr();
+      MITK_INFO << "DiscoverCnx";
       break;
     }
 
@@ -185,7 +185,7 @@ bool mitk::PolhemusInterface::Disconnect()
   }
 
   returnValue = m_pdiDev->Disconnect();
-  MITK_INFO << "Disconnect: " << m_pdiDev->GetLastResultStr();
+  MITK_INFO << "Disconnect";
   return returnValue;
 }
 
@@ -217,7 +217,7 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetL
   DWORD dwSize;
 
   //read one frame
-  if (!m_pdiDev->LastPnoPtr(pBuf, dwSize)) { MITK_WARN << m_pdiDev->GetLastResultStr(); }
+  if (!m_pdiDev->LastPnoPtr(pBuf, dwSize)) { MITK_WARN << "There is an issue"; }
 
   std::vector<mitk::PolhemusInterface::trackingData> returnValue = ParsePolhemusRawData(pBuf, dwSize);
 
@@ -241,7 +241,7 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetS
 
   //read one frame
   if (!m_pdiDev->ReadSinglePnoBuf(pBuf, dwSize)) {
-    MITK_WARN << m_pdiDev->GetLastResultStr();
+    MITK_WARN << "There is an issue";
     return std::vector<mitk::PolhemusInterface::trackingData>();
   }
 

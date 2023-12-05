@@ -21,7 +21,6 @@ found in the LICENSE file.
  * \brief Widget to contain a ctkPathListWidget and a ctkPathListButtonsWidget
  * and provide simple directory access for readable, executable directories.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
- * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  */
 class QmitkDirectoryListWidget : public QWidget, public Ui::QmitkPathListWidget
 {

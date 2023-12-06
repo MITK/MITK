@@ -14,6 +14,11 @@ set(MITK_CONFIG_PLUGINS ${MITK_CONFIG_PLUGINS}
   org.mitk.gui.qt.matchpoint.evaluator
   org.mitk.gui.qt.matchpoint.manipulator
   org.mitk.gui.qt.dicominspector
+  org.mitk.gui.qt.fit.genericfitting
+  org.mitk.gui.qt.fit.inspector
+  org.mitk.gui.qt.pharmacokinetics.mri
+  org.mitk.gui.qt.pharmacokinetics.concentration.mri
+  org.mitk.gui.qt.pharmacokinetics.curvedescriptor
 )
 
 if(NOT MITK_USE_SUPERBUILD)

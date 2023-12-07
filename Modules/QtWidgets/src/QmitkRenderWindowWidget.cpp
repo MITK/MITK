@@ -69,9 +69,17 @@ void QmitkRenderWindowWidget::ForceImmediateUpdate()
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_RenderWindow->renderWindow());
 }
 
-void QmitkRenderWindowWidget::AddUtilityWidget(QWidget* utilityWidget)
+void QmitkRenderWindowWidget::AddUtilityWidget(QWidget* utilityWidget, UtilityWidgetPosition position)
 {
-  m_Layout->insertWidget(0, utilityWidget);
+  if (position == Top) {
+    m_VerticalLayout->insertWidget(0, utilityWidget);
+  } else if (position == Bottom) {
+    m_VerticalLayout->insertWidget(-1, utilityWidget);
+  } else if (position == Left) {
+    m_HorizontalLayout->insertWidget(0, utilityWidget);
+  } else if (position == Right) {
+    m_HorizontalLayout->insertWidget(-1, utilityWidget);
+  }
 }
 
 void QmitkRenderWindowWidget::SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower)
@@ -179,11 +187,15 @@ void QmitkRenderWindowWidget::DisableCrosshair()
 
 void QmitkRenderWindowWidget::InitializeGUI()
 {
-  m_Layout = new QVBoxLayout(this);
-  m_Layout->setMargin(0);
-  setLayout(m_Layout);
+  m_VerticalLayout = new QVBoxLayout(this);
+  m_VerticalLayout->setMargin(0);
+  setLayout(m_VerticalLayout);
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setContentsMargins(0, 0, 0, 0);
+
+  m_HorizontalLayout = new QHBoxLayout(this);
+  m_HorizontalLayout->setMargin(0);
+  m_VerticalLayout->addItem(m_HorizontalLayout);
 
   if (nullptr == m_DataStorage)
   {
@@ -201,7 +213,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
   auto* sliceNavigationController = this->GetSliceNavigationController();
   sliceNavigationController->SetDefaultViewDirection(mitk::AnatomicalPlane::Sagittal);
 
-  m_Layout->addWidget(m_RenderWindow);
+  m_HorizontalLayout->addWidget(m_RenderWindow);
 
   // set colors and corner annotation
   InitializeDecorations();

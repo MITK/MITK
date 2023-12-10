@@ -121,7 +121,7 @@ public:
    * @param text the text for the menu, or <code>""</code> if none
    * @param id the menu id, or <code>""</code> if it is to have no id
    */
-  MenuManager(const QString& text = QString(), const QString& id = QString());
+  MenuManager(const QString& text, const QString& id = QString());
 
   ~MenuManager() override;
 

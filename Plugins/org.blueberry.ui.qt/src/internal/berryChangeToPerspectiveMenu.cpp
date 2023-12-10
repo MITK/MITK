@@ -78,7 +78,7 @@ void ChangeToPerspectiveMenu::Fill(QMenu* menu, QAction* before)
     return;
   }
 
-  MenuManager::Pointer manager(new MenuManager());
+  MenuManager::Pointer manager(new MenuManager(""));
   FillMenu(manager.GetPointer());
 
   QList<IContributionItem::Pointer> items = manager->GetItems();

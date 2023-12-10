@@ -394,7 +394,7 @@ void Window::AddMenuBar()
 
 SmartPointer<MenuManager> Window::CreateMenuManager()
 {
-  MenuManager::Pointer manager(new MenuManager());
+  MenuManager::Pointer manager(new MenuManager(""));
   return manager;
 }
 

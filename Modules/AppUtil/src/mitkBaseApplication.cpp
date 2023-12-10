@@ -567,25 +567,21 @@ namespace mitk
     // 2. Initialize the Qt framework (by creating a QCoreApplication)
     this->initializeQt();
 
-    // 3. Seed the random number generator, once at startup.
-    QTime time = QTime::currentTime();
-    qsrand((uint)time.msec());
-
-    // 4. Load the "default" configuration, which involves parsing
+    // 3. Load the "default" configuration, which involves parsing
     //    an optional <executable-name>.ini file and parsing any
     //    command line arguments
     this->loadConfiguration();
 
-    // 5. Add configuration data from the command line and the
+    // 4. Add configuration data from the command line and the
     //    optional <executable-name>.ini file as CTK plugin
     //    framework properties.
     d->initializeCTKPluginFrameworkProperties(this->config());
 
-    // 6. Initialize splash screen if an image path is provided
+    // 5. Initialize splash screen if an image path is provided
     //    in the .ini file
     this->initializeSplashScreen(qApp);
 
-    // 7. Set the custom CTK Plugin Framework storage directory
+    // 6. Set the custom CTK Plugin Framework storage directory
     QString storageDir = this->getCTKFrameworkStorageDir();
 
     if (!storageDir.isEmpty())
@@ -597,7 +593,7 @@ namespace mitk
       preferencesService->InitializeStorage(storageDir.toStdString() + "/data/3/prefs.xml");
     }
 
-    // 8. Set the library search paths and the pre-load library property
+    // 7. Set the library search paths and the pre-load library property
     this->initializeLibraryPaths();
 
     auto preloadLibs = this->getPreloadLibraries();
@@ -605,17 +601,17 @@ namespace mitk
     if (!preloadLibs.isEmpty())
       d->m_FWProps[ctkPluginConstants::FRAMEWORK_PRELOAD_LIBRARIES] = preloadLibs;
 
-    // 9. Initialize the CppMicroServices library.
+    // 8. Initialize the CppMicroServices library.
     //    The initializeCppMicroServices() method reuses the
     //    FRAMEWORK_STORAGE property, so we call it after the
     //    getCTKFrameworkStorageDir method.
     this->initializeCppMicroServices();
 
-    // 10. Parse the (optional) provisioning file and set the
+    // 9. Parse the (optional) provisioning file and set the
     //     correct framework properties.
     d->parseProvisioningFile(this->getProvisioningFilePath());
 
-    // 11. Set the CTK Plugin Framework properties
+    // 10. Set the CTK Plugin Framework properties
     ctkPluginFrameworkLauncher::setFrameworkProperties(d->m_FWProps);
   }
 

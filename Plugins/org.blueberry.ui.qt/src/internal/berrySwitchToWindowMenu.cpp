@@ -67,7 +67,7 @@ QString SwitchToWindowMenu::CalcText(int number, IWorkbenchWindow* window)
   }
   else
   {
-    sb.append(suffix.leftRef(MAX_TEXT_LENGTH));
+    sb.append(QStringView(suffix).left(MAX_TEXT_LENGTH));
     sb.append("...");
   }
   return sb;

@@ -89,7 +89,7 @@ QString ReopenEditorMenu::CalcText(int index, const QString& name, const QString
     if (length > MAX_TEXT_LENGTH)
     {
       // file name does not fit within length, truncate it
-      sb += fileName.leftRef(MAX_TEXT_LENGTH - 3);
+      sb += QStringView(fileName).left(MAX_TEXT_LENGTH - 3);
       sb += "...";
     }
     else if (length > MAX_TEXT_LENGTH - 7)
@@ -121,7 +121,7 @@ QString ReopenEditorMenu::CalcText(int index, const QString& name, const QString
           else if (i == 0)
           {
             // append at least part of the first segment
-            sb += segment.leftRef(MAX_TEXT_LENGTH - length);
+            sb += QStringView(segment).left(MAX_TEXT_LENGTH - length);
             length = MAX_TEXT_LENGTH;
             break;
           }

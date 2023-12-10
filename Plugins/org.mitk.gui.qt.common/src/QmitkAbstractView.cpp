@@ -210,7 +210,7 @@ void QmitkAbstractView::CreatePartControl(QWidget* parent)
   // add the scroll area to the real parent (the view tabbar)
   QWidget* parentQWidget = static_cast<QWidget*>(parent);
   auto   parentLayout = new QVBoxLayout(parentQWidget);
-  parentLayout->setMargin(0);
+  parentLayout->setContentsMargins({});
   parentLayout->setSpacing(0);
   parentLayout->addWidget(scrollArea);
 

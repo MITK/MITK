@@ -39,7 +39,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
   m_View = mitk::AnatomicalPlane::Axial;
 
   QHBoxLayout *hlayout = new QHBoxLayout(container);
-  hlayout->setMargin(0);
+  hlayout->setContentsMargins({});
 
   // create widget
   QString composedName("QmitkSliceWidget::");

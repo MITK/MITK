@@ -102,7 +102,7 @@ void HelpIndexView::CreateQtPartControl(QWidget* parent)
     connect(m_SearchLineEdit, SIGNAL(textChanged(QString)), this,
             SLOT(filterIndices(QString)));
     m_SearchLineEdit->installEventFilter(this);
-    layout->setMargin(0);
+    layout->setContentsMargins({});
     layout->setSpacing(2);
     layout->addWidget(m_SearchLineEdit);
 

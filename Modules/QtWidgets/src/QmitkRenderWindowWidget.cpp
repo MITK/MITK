@@ -180,7 +180,7 @@ void QmitkRenderWindowWidget::DisableCrosshair()
 void QmitkRenderWindowWidget::InitializeGUI()
 {
   m_Layout = new QVBoxLayout(this);
-  m_Layout->setMargin(0);
+  m_Layout->setContentsMargins({});
   setLayout(m_Layout);
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setContentsMargins(0, 0, 0, 0);

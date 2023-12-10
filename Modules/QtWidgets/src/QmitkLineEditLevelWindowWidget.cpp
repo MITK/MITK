@@ -43,7 +43,7 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget *parent, 
   m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this);
 
   auto layout = new QVBoxLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins({});
   layout->setSpacing(0);
 
   m_LevelInput = new QLineEdit(this);

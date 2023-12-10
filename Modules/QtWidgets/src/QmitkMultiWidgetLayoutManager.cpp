@@ -120,7 +120,7 @@ void QmitkMultiWidgetLayoutManager::SetDefaultLayout()
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
   m_MultiWidget->setLayout(hBoxLayout);
-  hBoxLayout->setMargin(0);
+  hBoxLayout->setContentsMargins({});
 
   auto mainSplit = new QSplitter(Qt::Vertical, m_MultiWidget);
   hBoxLayout->addWidget(mainSplit);
@@ -164,7 +164,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DTop3DBottomLayout()
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
   m_MultiWidget->setLayout(hBoxLayout);
-  hBoxLayout->setMargin(0);
+  hBoxLayout->setContentsMargins({});
 
   auto mainSplit = new QSplitter(Qt::Vertical, m_MultiWidget);
   hBoxLayout->addWidget(mainSplit);
@@ -217,7 +217,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DLeft3DRightLayout()
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
   m_MultiWidget->setLayout(hBoxLayout);
-  hBoxLayout->setMargin(0);
+  hBoxLayout->setContentsMargins({});
 
   auto mainSplit = new QSplitter(m_MultiWidget);
   hBoxLayout->addWidget(mainSplit);
@@ -270,7 +270,7 @@ void QmitkMultiWidgetLayoutManager::SetOneBigLayout()
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
   m_MultiWidget->setLayout(hBoxLayout);
-  hBoxLayout->setMargin(0);
+  hBoxLayout->setContentsMargins({});
 
   auto mainSplit = new QSplitter(m_MultiWidget);
   hBoxLayout->addWidget(mainSplit);
@@ -297,7 +297,7 @@ void QmitkMultiWidgetLayoutManager::SetOnly2DHorizontalLayout()
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
   m_MultiWidget->setLayout(hBoxLayout);
-  hBoxLayout->setMargin(0);
+  hBoxLayout->setContentsMargins({});
 
   auto mainSplit = new QSplitter(m_MultiWidget);
   hBoxLayout->addWidget(mainSplit);
@@ -332,7 +332,7 @@ void QmitkMultiWidgetLayoutManager::SetOnly2DVerticalLayout()
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
   m_MultiWidget->setLayout(hBoxLayout);
-  hBoxLayout->setMargin(0);
+  hBoxLayout->setContentsMargins({});
 
   auto mainSplit = new QSplitter(Qt::Vertical, m_MultiWidget);
   hBoxLayout->addWidget(mainSplit);
@@ -367,7 +367,7 @@ void QmitkMultiWidgetLayoutManager::SetOneTop3DBottomLayout()
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
   m_MultiWidget->setLayout(hBoxLayout);
-  hBoxLayout->setMargin(0);
+  hBoxLayout->setContentsMargins({});
 
   auto mainSplit = new QSplitter(Qt::Vertical, m_MultiWidget);
   hBoxLayout->addWidget(mainSplit);
@@ -412,7 +412,7 @@ void QmitkMultiWidgetLayoutManager::SetOneLeft3DRightLayout()
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
   m_MultiWidget->setLayout(hBoxLayout);
-  hBoxLayout->setMargin(0);
+  hBoxLayout->setContentsMargins({});
 
   auto mainSplit = new QSplitter(m_MultiWidget);
   hBoxLayout->addWidget(mainSplit);
@@ -457,7 +457,7 @@ void QmitkMultiWidgetLayoutManager::SetAllHorizontalLayout()
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
   m_MultiWidget->setLayout(hBoxLayout);
-  hBoxLayout->setMargin(0);
+  hBoxLayout->setContentsMargins({});
 
   auto mainSplit = new QSplitter(m_MultiWidget);
   hBoxLayout->addWidget(mainSplit);
@@ -497,7 +497,7 @@ void QmitkMultiWidgetLayoutManager::SetAllVerticalLayout()
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
   hBoxLayout->setContentsMargins(0, 0, 0, 0);
   m_MultiWidget->setLayout(hBoxLayout);
-  hBoxLayout->setMargin(0);
+  hBoxLayout->setContentsMargins({});
 
   auto mainSplit = new QSplitter(Qt::Vertical, m_MultiWidget);
   hBoxLayout->addWidget(mainSplit);

@@ -18,11 +18,12 @@ found in the LICENSE file.
 #include "mitkBaseRenderer.h"
 
 #include <QList>
-#include <qapplication.h>
-#include <qlayout.h>
-#include <qmessagebox.h>
-#include <qtoolbutton.h>
-#include <qtooltip.h>
+#include <QApplication>
+#include <QLayout>
+#include <QMessageBox>
+#include <QToolButton>
+#include <QToolTip>
+#include <QRegularExpression>
 
 #include <queue>
 

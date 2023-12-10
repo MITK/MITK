@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include "QmitkMimeTypes.h"
 #include "QmitkNodeDescriptorManager.h"
 
+#include <QIODevice>
+
 QmitkRenderWindowDataStorageTreeModel::QmitkRenderWindowDataStorageTreeModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractDataStorageModel(parent)
   , m_Root(nullptr)

@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include "QmitkMimeTypes.h"
 #include "QmitkNodeDescriptorManager.h"
 
+#include <QIODevice>
+
 QmitkRenderWindowDataStorageListModel::QmitkRenderWindowDataStorageListModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractDataStorageModel(parent)
 {

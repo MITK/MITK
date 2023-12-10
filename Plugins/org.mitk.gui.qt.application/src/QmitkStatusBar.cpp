@@ -13,10 +13,10 @@ found in the LICENSE file.
 
 #include "QmitkStatusBar.h"
 
-#include <qmainwindow.h>
-#include <qstatusbar.h>
-#include <qapplication.h>
-#include <qdesktopwidget.h>
+#include <QMainWindow>
+#include <QScreen>
+#include <QStatusBar>
+#include <QGuiApplication>
 
 #include <mitkStatusBar.h>
 

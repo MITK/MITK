@@ -23,6 +23,8 @@ found in the LICENSE file.
 #include <QmitkStyleManager.h>
 
 #include <QIcon>
+#include <QIODevice>
+
 #include <itkCommand.h>
 
 QmitkRenderWindowDataNodeTableModel::QmitkRenderWindowDataNodeTableModel(QObject* parent /*= nullptr*/)

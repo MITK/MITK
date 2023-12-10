@@ -30,6 +30,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QSet>
 #include <QString>
+#include <QStringList>
 
 // ITK
 #include <itksys/SystemTools.hxx>

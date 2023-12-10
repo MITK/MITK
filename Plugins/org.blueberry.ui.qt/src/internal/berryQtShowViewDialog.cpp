@@ -77,7 +77,7 @@ protected:
         int numChildren = sourceModel()->rowCount(sourceIndex);
         for (int i = 0; i < numChildren; ++i)
         {
-          keywords.push_back(sourceModel()->data(sourceIndex.child(i, 0)).toString());
+          keywords.push_back(sourceModel()->data(sourceModel()->index(i, 0, sourceIndex)).toString());
         }
       }
       else

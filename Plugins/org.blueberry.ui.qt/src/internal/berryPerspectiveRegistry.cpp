@@ -110,7 +110,7 @@ public:
         // perspective does not already exist in registry, add
         // it
         PerspectiveDescriptor::Pointer desc(new PerspectiveDescriptor(
-                                              QString::null, QString::null, PerspectiveDescriptor::Pointer()));
+                                              QString(), QString(), PerspectiveDescriptor::Pointer()));
         std::stringstream reader;
         std::string xmlStr = event.GetNewValue();
         reader.str(xmlStr);
@@ -449,7 +449,7 @@ void PerspectiveRegistry::LoadCustom()
       // Restore the layout state.
       XMLMemento::Pointer memento = XMLMemento::CreateReadRoot(*reader);
       PerspectiveDescriptor::Pointer newPersp(new PerspectiveDescriptor(
-                                                QString::null, QString::null,
+                                                QString(), QString(),
                                                 PerspectiveDescriptor::Pointer(nullptr)));
       newPersp->RestoreState(memento);
       QString id = newPersp->GetId();
@@ -461,7 +461,7 @@ void PerspectiveRegistry::LoadCustom()
     }
     catch (const std::ios_base::failure&)
     {
-      UnableToLoadPerspective(QString::null);
+      UnableToLoadPerspective(QString());
     }
     catch (const WorkbenchException& e)
     {

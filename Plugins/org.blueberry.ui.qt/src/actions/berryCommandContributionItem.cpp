@@ -246,7 +246,7 @@ void CommandContributionItem::Fill(QToolBar *parent, QAction *before)
 
 void CommandContributionItem::Update()
 {
-  this->Update(QString::null);
+  this->Update(QString());
 }
 
 void CommandContributionItem::Update(const QString& /*id*/)

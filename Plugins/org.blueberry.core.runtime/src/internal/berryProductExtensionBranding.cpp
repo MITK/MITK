@@ -65,7 +65,7 @@ QString ProductExtensionBranding::GetId() const
 QString ProductExtensionBranding::GetProperty(const QString& key) const
 {
   auto iter = properties.find(key);
-  return iter != properties.end() ? iter.value() : QString::null;
+  return iter != properties.end() ? iter.value() : QString();
 }
 
 SmartPointer<IProduct> ProductExtensionBranding::GetProduct() const

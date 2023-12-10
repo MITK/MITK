@@ -51,7 +51,7 @@ QString SwitchToWindowMenu::CalcText(int number, IWorkbenchWindow* window)
   QString suffix = window->GetShell()->GetText();
   if (suffix.isEmpty())
   {
-    return QString::null;
+    return QString();
   }
 
   QString sb;

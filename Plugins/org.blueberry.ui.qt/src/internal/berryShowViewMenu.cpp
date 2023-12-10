@@ -49,7 +49,7 @@ ShowViewMenu::ShowViewMenu(IWorkbenchWindow *window, const QString& id)
 {
   CommandContributionItemParameter::Pointer showDlgItemParms(
         new CommandContributionItemParameter(
-          window, QString::null, IWorkbenchCommandConstants::VIEWS_SHOW_VIEW,
+          window, QString(), IWorkbenchCommandConstants::VIEWS_SHOW_VIEW,
           CommandContributionItem::STYLE_PUSH));
   showDlgItemParms->label = "&Other...";
   showDlgItem = new CommandContributionItem(showDlgItemParms);

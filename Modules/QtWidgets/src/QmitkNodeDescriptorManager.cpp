@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <QmitkStyleManager.h>
 #include <QList>
 #include <QSet>
+#include <QResource>
 
 QmitkNodeDescriptorManager* QmitkNodeDescriptorManager::GetInstance()
 {
@@ -30,17 +31,17 @@ QmitkNodeDescriptorManager* QmitkNodeDescriptorManager::GetInstance()
 void QmitkNodeDescriptorManager::Initialize()
 {
   auto isImage = mitk::NodePredicateDataType::New("Image");
-  AddDescriptor(new QmitkNodeDescriptor(tr("Image"), QString(":/Qmitk/Images_48.png"), isImage, this));
+  AddDescriptor(new QmitkNodeDescriptor("Image", ":/Qmitk/Images_48.png", isImage, this));
 
   auto isMultiComponentImage = mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateProperty::New("Image.Displayed Component"));
-  AddDescriptor(new QmitkNodeDescriptor(tr("MultiComponentImage"), QString(": / Qmitk / Images_48.png"), isMultiComponentImage, this));
+  AddDescriptor(new QmitkNodeDescriptor("MultiComponentImage", ":/Qmitk/Images_48.png", isMultiComponentImage, this));
 
   auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   auto isBinaryImage = mitk::NodePredicateAnd::New(isBinary, isImage);
-  AddDescriptor(new QmitkNodeDescriptor(tr("ImageMask"), QString(":/Qmitk/Binaerbilder_48.png"), isBinaryImage, this));
+  AddDescriptor(new QmitkNodeDescriptor("ImageMask", ":/Qmitk/Binaerbilder_48.png", isBinaryImage, this));
 
   auto isLabelSetImage = mitk::NodePredicateDataType::New("LabelSetImage");
-  AddDescriptor(new QmitkNodeDescriptor(tr("LabelSetImage"), QString(":/Qmitk/LabelSetImage_48.png"), isLabelSetImage, this));
+  AddDescriptor(new QmitkNodeDescriptor("LabelSetImage", ":/Qmitk/LabelSetImage_48.png", isLabelSetImage, this));
 
   auto segmentationTaskListIcon = QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/SegmentationTaskListIcon.svg"));
   auto isSegmentationTaskList = mitk::NodePredicateDataType::New("SegmentationTaskList");
@@ -55,14 +56,48 @@ void QmitkNodeDescriptorManager::Initialize()
   AddDescriptor(new QmitkNodeDescriptor("GeometryData", geometryDataIcon, isGeometryData, this));
 
   auto isPointSet = mitk::NodePredicateDataType::New("PointSet");
-  AddDescriptor(new QmitkNodeDescriptor(tr("PointSet"), QString(":/Qmitk/PointSet_48.png"), isPointSet, this));
+  AddDescriptor(new QmitkNodeDescriptor("PointSet", ":/Qmitk/PointSet_48.png", isPointSet, this));
 
   auto isSurface = mitk::NodePredicateDataType::New("Surface");
-  AddDescriptor(new QmitkNodeDescriptor(tr("Surface"), QString(":/Qmitk/Surface_48.png"), isSurface, this));
+  AddDescriptor(new QmitkNodeDescriptor("Surface", ":/Qmitk/Surface_48.png", isSurface, this));
 
   auto isNotBinary = mitk::NodePredicateNot::New(isBinary);
   auto isNoneBinaryImage = mitk::NodePredicateAnd::New(isImage, isNotBinary);
-  AddDescriptor(new QmitkNodeDescriptor(tr("NoneBinaryImage"), QString(":/Qmitk/Images_48.png"), isNoneBinaryImage, this));
+  AddDescriptor(new QmitkNodeDescriptor("NoneBinaryImage", ":/Qmitk/Images_48.png", isNoneBinaryImage, this));
+
+  auto isPlanarLine = mitk::NodePredicateDataType::New("PlanarLine");
+  AddDescriptor(new QmitkNodeDescriptor("PlanarLine", ":/Qmitk/PlanarLine_48.png", isPlanarLine, this));
+
+  auto isPlanarCircle = mitk::NodePredicateDataType::New("PlanarCircle");
+  AddDescriptor(new QmitkNodeDescriptor("PlanarCircle", ":/Qmitk/PlanarCircle_48.png", isPlanarCircle, this));
+
+  auto isPlanarEllipse = mitk::NodePredicateDataType::New("PlanarEllipse");
+  AddDescriptor(new QmitkNodeDescriptor("PlanarEllipse", ":/Qmitk/PlanarEllipse_48.png", isPlanarEllipse, this));
+
+  auto isPlanarAngle = mitk::NodePredicateDataType::New("PlanarAngle");
+  AddDescriptor(new QmitkNodeDescriptor("PlanarAngle", ":/Qmitk/PlanarAngle_48.png", isPlanarAngle, this));
+
+  auto isPlanarFourPointAngle = mitk::NodePredicateDataType::New("PlanarFourPointAngle");
+  AddDescriptor(new QmitkNodeDescriptor("PlanarFourPointAngle", ":/Qmitk/PlanarFourPointAngle_48.png", isPlanarFourPointAngle, this));
+
+  auto isPlanarRectangle = mitk::NodePredicateDataType::New("PlanarRectangle");
+  AddDescriptor(new QmitkNodeDescriptor("PlanarRectangle", ":/Qmitk/PlanarRectangle_48.png", isPlanarRectangle, this));
+
+  auto isPlanarPolygon = mitk::NodePredicateDataType::New("PlanarPolygon");
+  AddDescriptor(new QmitkNodeDescriptor("PlanarPolygon", ":/Qmitk/PlanarPolygon_48.png", isPlanarPolygon, this));
+
+  auto isNotClosedPolygon = mitk::NodePredicateProperty::New("ClosedPlanarPolygon", mitk::BoolProperty::New(false));
+  auto isPlanarPath = mitk::NodePredicateAnd::New(isNotClosedPolygon, isPlanarPolygon);
+  AddDescriptor(new QmitkNodeDescriptor("PlanarPath", ":/Qmitk/PlanarPath_48.png", isPlanarPath, this));
+
+  auto isPlanarDoubleEllipse = mitk::NodePredicateDataType::New("PlanarDoubleEllipse");
+  AddDescriptor(new QmitkNodeDescriptor("PlanarDoubleEllipse", ":/Qmitk/PlanarDoubleEllipse_48.png", isPlanarDoubleEllipse, this));
+
+  auto isPlanarBezierCurve = mitk::NodePredicateDataType::New("PlanarBezierCurve");
+  AddDescriptor(new QmitkNodeDescriptor("PlanarBezierCurve", ":/Qmitk/PlanarBezierCurve_48.png", isPlanarBezierCurve, this));
+
+  auto isPlanarSubdivisionPolygon = mitk::NodePredicateDataType::New("PlanarSubdivisionPolygon");
+  AddDescriptor(new QmitkNodeDescriptor("PlanarSubdivisionPolygon", ":/Qmitk/PlanarSubdivisionPolygon_48.png", isPlanarSubdivisionPolygon, this));
 }
 
 void QmitkNodeDescriptorManager::AddDescriptor(QmitkNodeDescriptor* descriptor)
@@ -177,7 +212,7 @@ QmitkNodeDescriptorManager::~QmitkNodeDescriptorManager()
   // qDeleteAll(m_NodeDescriptors);
 }
 
-QmitkNodeDescriptor *QmitkNodeDescriptorManager::GetUnknownDataNodeDescriptor() const
+QmitkNodeDescriptor *QmitkNodeDescriptorManager::GetUnknownDataNodeDescriptor()
 {
   return m_UnknownDataNodeDescriptor;
 }

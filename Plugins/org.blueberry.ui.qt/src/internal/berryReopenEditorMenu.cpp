@@ -190,7 +190,7 @@ void ReopenEditorMenu::Fill(QMenu* menu, QAction* before)
   // Get items.
   QList<EditorHistoryItem::Pointer> historyItems = history->GetItems();
 
-  int n = std::min(itemsToShow, historyItems.size());
+  int n = std::min(itemsToShow, static_cast<int>(historyItems.size()));
   if (n <= 0)
   {
     return;

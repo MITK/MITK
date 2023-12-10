@@ -108,7 +108,6 @@ void QmitkComboBoxListView::paintEvent(QPaintEvent *event)
       menuOption.checkType = QStyleOptionMenuItem::NotCheckable;
       menuOption.menuRect = event->rect();
       menuOption.maxIconWidth = 0;
-      menuOption.tabWidth = 0;
 
       QPainter painter(this->viewport());
       m_ComboBox->style()->drawControl(QStyle::CE_MenuEmptyArea, &menuOption, &painter, this);
@@ -128,15 +127,14 @@ void QmitkComboBoxListView::resizeEvent(QResizeEvent *event)
   QListView::resizeEvent(event);
 }
 
-QStyleOptionViewItem QmitkComboBoxListView::viewOptions() const
+void QmitkComboBoxListView::initViewItemOption(QStyleOptionViewItem* option) const
 {
-  QStyleOptionViewItem option = QListView::viewOptions();
-  option.showDecorationSelected = true;
+  QListView::initViewItemOption(option);
+
+  option->showDecorationSelected = true;
 
   if (m_ComboBox != nullptr)
-    option.font = m_ComboBox->font();
-
-  return option;
+    option->font = m_ComboBox->font();
 }
 
 class PropertyEqualTo

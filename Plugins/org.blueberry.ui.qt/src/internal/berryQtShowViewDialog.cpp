@@ -51,7 +51,7 @@ public:
     if (m_FilterOnKeywords != filterOnKeywords)
     {
       m_FilterOnKeywords = filterOnKeywords;
-      this->filterChanged();
+      this->invalidateFilter();
     }
   }
 

@@ -476,7 +476,7 @@ void HandlerAuthority::ProcessChangedCommands()
     const int size = changedCommandIds.size();
     if (size > 0)
     {
-      CommandTracing::PrintTrace(TRACING_COMPONENT, QString::number(size) + " command ids changed in " + elapsedTime + "ms");
+      CommandTracing::PrintTrace(TRACING_COMPONENT, QString("%1 command ids changed in %2 ms").arg(size).arg(elapsedTime));
     }
   }
 }

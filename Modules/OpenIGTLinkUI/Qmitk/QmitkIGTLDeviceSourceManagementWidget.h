@@ -52,7 +52,7 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public QW
      */
     void LoadSource(mitk::IGTLDeviceSource::Pointer sourceToLoad);
 
-    QmitkIGTLDeviceSourceManagementWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+    QmitkIGTLDeviceSourceManagementWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
     ~QmitkIGTLDeviceSourceManagementWidget() override;
 
 

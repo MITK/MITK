@@ -40,7 +40,7 @@ class MITKIGTUI_EXPORT QmitkIGTLoggerWidget : public QWidget
   public:
     static const std::string VIEW_ID;
 
-    QmitkIGTLoggerWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+    QmitkIGTLoggerWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
     ~QmitkIGTLoggerWidget() override;
 
     void SetDataStorage(mitk::DataStorage* dataStorage);

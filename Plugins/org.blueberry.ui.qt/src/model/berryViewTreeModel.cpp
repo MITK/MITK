@@ -250,7 +250,7 @@ QVariant ViewTreeModel::data(const QModelIndex& index, int role) const
 
 Qt::ItemFlags ViewTreeModel::flags(const QModelIndex& index) const
 {
-  if (!index.isValid()) return nullptr;
+  if (!index.isValid()) return {};
 
   return static_cast<ViewTreeItem*>(index.internalPointer())->flags();
 }

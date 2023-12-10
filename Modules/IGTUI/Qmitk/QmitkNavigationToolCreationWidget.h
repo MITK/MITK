@@ -63,7 +63,7 @@ public:
   /** @brief Sets the default tracking device type. You may also define if it is changeable or not.*/
   void SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable = true);
 
-    QmitkNavigationToolCreationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+    QmitkNavigationToolCreationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
     ~QmitkNavigationToolCreationWidget() override;
   /** @brief Sets the default data of all input fields. The default data is used from the default tool which is given as parameter. */
   void SetDefaultData(mitk::NavigationTool::Pointer DefaultTool);

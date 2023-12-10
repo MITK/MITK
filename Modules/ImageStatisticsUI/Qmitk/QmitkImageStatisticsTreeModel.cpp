@@ -122,7 +122,7 @@ QModelIndex QmitkImageStatisticsTreeModel::parent(const QModelIndex &child) cons
 Qt::ItemFlags QmitkImageStatisticsTreeModel::flags(const QModelIndex &index) const
 {
   if (!index.isValid())
-    return nullptr;
+    return {};
 
   return QAbstractItemModel::flags(index);
 }

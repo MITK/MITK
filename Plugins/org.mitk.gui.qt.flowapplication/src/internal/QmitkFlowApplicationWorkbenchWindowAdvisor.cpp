@@ -1153,6 +1153,6 @@ void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onHelpOpenHelpPerspective()
 
 void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onAbout()
 {
-  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), nullptr);
+  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow());
   aboutDialog->open();
 }

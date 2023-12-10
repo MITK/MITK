@@ -123,7 +123,7 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
 {
   if (nullptr == m_MenuWidget)
   {
-    m_MenuWidget = new QmitkRenderWindowMenu(this, nullptr, m_Renderer);
+    m_MenuWidget = new QmitkRenderWindowMenu(this, {}, m_Renderer);
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
   }
 

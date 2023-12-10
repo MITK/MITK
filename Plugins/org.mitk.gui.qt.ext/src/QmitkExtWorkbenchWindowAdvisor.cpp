@@ -1223,7 +1223,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onHelpOpenHelpPerspective()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onAbout()
 {
-  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(),nullptr);
+  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), {});
   aboutDialog->open();
 }
 

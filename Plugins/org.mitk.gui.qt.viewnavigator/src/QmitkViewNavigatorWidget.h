@@ -37,7 +37,7 @@ public:
 
     QmitkViewNavigatorWidget(berry::IWorkbenchWindow::Pointer window,
                              QWidget* parent = nullptr,
-                             Qt::WindowFlags f = nullptr);
+                             Qt::WindowFlags f = {});
     ~QmitkViewNavigatorWidget() override;
 
     void SetFocus();

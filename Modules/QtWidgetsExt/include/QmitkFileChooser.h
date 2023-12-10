@@ -33,7 +33,7 @@ public:
   ///
   /// standard ctor, init values to defaults (see methods for values)
   ///
-  explicit QmitkFileChooser(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  explicit QmitkFileChooser(QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
   ///
   /// determines whether the button "Select file" is shown on the left

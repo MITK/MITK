@@ -56,7 +56,7 @@ class MITKIGTUI_EXPORT QmitkAbstractTrackingDeviceWidget : public QWidget
 public:
   static const std::string VIEW_ID;
 
-  QmitkAbstractTrackingDeviceWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkAbstractTrackingDeviceWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
 
   ~QmitkAbstractTrackingDeviceWidget() override;
 

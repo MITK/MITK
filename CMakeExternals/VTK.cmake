@@ -33,10 +33,9 @@ if(NOT DEFINED VTK_DIR)
     -DVTK_DEBUG_LEAKS:BOOL=${MITK_VTK_DEBUG_LEAKS}
     )
 
-  if(MITK_USE_Qt5)
+  if(MITK_USE_Qt6)
     list(APPEND additional_cmake_args
       -DVTK_GROUP_ENABLE_Qt:STRING=YES
-      -DQt5_DIR:PATH=${Qt5_DIR}
       )
   endif()
 
@@ -66,7 +65,7 @@ if(NOT DEFINED VTK_DIR)
       -DVTK_MODULE_ENABLE_VTK_GUISupportQtQuick:STRING=NO
       -DVTK_MODULE_ENABLE_VTK_IOIOSS:STRING=NO # See T29633
       -DVTK_MODULE_ENABLE_VTK_ioss:STRING=NO   # See T29633
-      -DVTK_QT_VERSION:STRING=5
+      -DVTK_QT_VERSION:STRING=6
       ${additional_cmake_args}
       ${${proj}_CUSTOM_CMAKE_ARGS}
     CMAKE_CACHE_ARGS

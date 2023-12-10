@@ -27,13 +27,16 @@ function(mitkFunctionConfigureVisualStudioUserProjectFile)
 
   cmake_parse_arguments(VSUPF "${_function_options}" "${_function_params}" "${_function_multiparams}" ${ARGN})
 
-  SET(VS_BUILD_TYPE_DEB debug)
-  SET(VS_BUILD_TYPE_REL release)
-  SET(VS_BUILD_TYPE_RELDEB relwithdebinfo)
+  mitkFunctionGetLibrarySearchPaths(PATH_DEBUG debug DEBUG)
+  mitkFunctionGetLibrarySearchPaths(PATH_RELEASE release RELEASE)
+  mitkFunctionGetLibrarySearchPaths(PATH_RELWITHDEBINFO relwithdebinfo RELWITHDEBINFO)
+  mitkFunctionGetLibrarySearchPaths(PATH_MINSIZEREL minsizerel MINSIZEREL)
 
-  mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_DEB ${VS_BUILD_TYPE_DEB} DEBUG)
-  mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_REL ${VS_BUILD_TYPE_REL} RELEASE)
-  mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_RELWITHDEBINFO ${VS_BUILD_TYPE_RELDEB} RELWITHDEBINFO)
-  CONFIGURE_FILE("${MITK_SOURCE_DIR}/CMake/MITK.vcxproj.user.in" ${CMAKE_CURRENT_BINARY_DIR}/${VSUPF_NAME}.vcxproj.user @ONLY)
+  set_target_properties(${VSUPF_NAME} PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=\
+$<$<CONFIG:Debug>:${PATH_DEBUG}>\
+$<$<CONFIG:Release>:${PATH_RELEASE}>\
+$<$<CONFIG:RelWithDebInfo>:${PATH_RELWITHDEBINFO}>\
+$<$<CONFIG:MinSizeRel>:${PATH_MINSIZEREL}>\
+$<SEMICOLON>%PATH%")
 
 endfunction()

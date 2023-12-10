@@ -46,8 +46,7 @@ if(MITK_USE_CTK)
         # a non-empty CMAKE_DEBUG_POSTFIX for the plugin
         # libraries yet.
         -DCMAKE_DEBUG_POSTFIX:STRING=
-        -DCTK_QT_VERSION:STRING=5
-        "-DQt5_DIR=${Qt5_DIR}"
+        -DCTK_QT_VERSION:STRING=6
         "-DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}"
         -DCTK_LIB_PluginFramework:BOOL=ON
         -DCTK_LIB_DICOM/Widgets:BOOL=ON

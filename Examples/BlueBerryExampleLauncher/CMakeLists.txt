@@ -16,10 +16,10 @@ set(_source_ui_files
 # this is a workaround for Visual Studio. The relative include paths in the generated
 # moc files can get very long and can't be resolved by the MSVC compiler.
 foreach(_moc_src ${_source_moc_h_files})
-  qt5_wrap_cpp(_source_files ${_moc_src} OPTIONS -f${_moc_src})
+  qt_wrap_cpp(_source_files ${_moc_src} OPTIONS -f${_moc_src})
 endforeach()
 
-qt5_wrap_ui(_source_files ${_source_ui_files})
+qt_wrap_ui(_source_files ${_source_ui_files})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}

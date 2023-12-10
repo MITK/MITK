@@ -59,8 +59,8 @@ protected:
 
   bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override
   {
-    QRegExp regExp = filterRegExp();
-    if (!regExp.isValid() || regExp.isEmpty()) return true;
+    QRegularExpression regExp = filterRegularExpression();
+    if (!regExp.isValid() || regExp.pattern().isEmpty()) return true;
 
     QModelIndex sourceIndex = sourceModel()->index(sourceRow, 0, sourceParent);
     QStringList keywords;

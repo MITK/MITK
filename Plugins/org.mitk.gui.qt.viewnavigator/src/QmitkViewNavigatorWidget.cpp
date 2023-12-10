@@ -104,7 +104,7 @@ private:
     QString type = sourceModel()->data(index, Qt::DisplayRole).toString();
     QStandardItem* item = dynamic_cast<QStandardItemModel*>(sourceModel())->itemFromIndex(index);
 
-    if (type.contains(filterRegExp()))
+    if (type.contains(filterRegularExpression()))
     {
         return true;
     }
@@ -114,12 +114,12 @@ private:
     {
         for (const auto& tag : viewItem->m_Tags)
         {
-            if (tag.contains(filterRegExp()))
+            if (tag.contains(filterRegularExpression()))
             {
                 return true;
             }
         }
-        if (viewItem->m_Description.contains(filterRegExp()))
+        if (viewItem->m_Description.contains(filterRegularExpression()))
         {
             return true;
         }
@@ -130,12 +130,12 @@ private:
     {
         for (const auto& tag : perspectiveItem->m_Tags)
         {
-            if (tag.contains(filterRegExp()))
+            if (tag.contains(filterRegularExpression()))
             {
                 return true;
             }
         }
-        if (perspectiveItem->m_Description.contains(filterRegExp()))
+        if (perspectiveItem->m_Description.contains(filterRegularExpression()))
         {
             return true;
         }
@@ -403,11 +403,10 @@ void QmitkViewNavigatorWidget::FilterChanged()
     QString filterString = m_Controls.lineEdit->text();
     m_Controls.m_PluginTreeView->expandAll();
 
-    Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive;
     QString strPattern = "^*" + filterString;
-    QRegExp regExp(strPattern, caseSensitivity);
+    QRegularExpression regExp(strPattern, QRegularExpression::CaseInsensitiveOption);
 
-    m_FilterProxyModel->setFilterRegExp(regExp);
+    m_FilterProxyModel->setFilterRegularExpression(regExp);
 }
 
 void QmitkViewNavigatorWidget::ItemClicked(const QModelIndex &index)

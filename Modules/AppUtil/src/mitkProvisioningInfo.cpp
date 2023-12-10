@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QTextStream>
 
 namespace mitk
@@ -36,7 +37,7 @@ namespace mitk
     QFile file(filePath);
     file.open(QFile::ReadOnly);
     QTextStream fileStream(&file);
-    QRegExp sep("\\s+");
+    QRegularExpression sep("\\s+");
     QString line;
     int count = 1;
     do

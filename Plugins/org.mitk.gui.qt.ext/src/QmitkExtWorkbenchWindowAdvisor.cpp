@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <QStatusBar>
 #include <QString>
 #include <QFile>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QSettings>
 
@@ -1142,8 +1142,8 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
     berry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro();
   if (!hasIntro)
   {
-    QRegExp reg("(.*)<title>(\\n)*");
-    QRegExp reg2("(\\n)*</title>(.*)");
+    QRegularExpression reg("(.*)<title>(\\n)*");
+    QRegularExpression reg2("(\\n)*</title>(.*)");
     QFile file(":/org.mitk.gui.qt.ext/index.html");
     file.open(QIODevice::ReadOnly | QIODevice::Text); //text file only for reading
 

@@ -37,7 +37,6 @@ found in the LICENSE file.
 
 // Qt
 #include <QListView>
-#include <QRegExp>
 #include <QModelIndex>
 #include <QDir>
 #include <QDirIterator>

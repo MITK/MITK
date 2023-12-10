@@ -133,7 +133,7 @@ void QmitkMatchPointBrowser::OnAlgoListSelectionChanged(const QModelIndex& index
 
 void QmitkMatchPointBrowser::OnSearchChanged(const QString& text)
 {
-    m_filterProxy->setFilterRegExp(text);
+    m_filterProxy->setFilterRegularExpression(text);
     m_filterProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
 };
 

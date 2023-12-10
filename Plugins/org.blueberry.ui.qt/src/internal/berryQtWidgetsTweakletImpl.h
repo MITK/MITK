@@ -78,10 +78,10 @@ class QtWidgetsTweakletImpl
   void SetData(QWidget* widget, const QString& id, Object::Pointer data);
   Object::Pointer GetData(QWidget* widget, const QString& id);
 
-  QRect GetScreenSize(int i = -1);
+  QRect GetScreenSize(int i = 0);
   unsigned int GetScreenNumber();
   int GetPrimaryScreenNumber();
-  QRect GetAvailableScreenSize(int i = -1);
+  QRect GetAvailableScreenSize(int i = 0);
   int GetClosestScreenNumber(const QRect&);
 
   QPoint GetCursorLocation();

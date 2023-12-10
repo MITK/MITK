@@ -143,7 +143,7 @@ public:
   /** Gets the reference count on this object. */
   int GetReferenceCount() const
   {
-    return m_ReferenceCount.load();
+    return m_ReferenceCount.loadRelaxed();
   }
 
   /** Sets the reference count on this object. This is a dangerous

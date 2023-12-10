@@ -92,11 +92,8 @@ namespace mitk
             PointType imageOrigin = m_Image->GetOrigin();
             PointType maskOrigin = m_Mask->GetOrigin();
 
-            typedef itk::ContinuousIndex<double, VImageDimension> ContinousIndexType;
-            ContinousIndexType maskOriginContinousIndex, imageOriginContinousIndex;
-
-            m_Image->TransformPhysicalPointToContinuousIndex(maskOrigin, maskOriginContinousIndex);
-            m_Image->TransformPhysicalPointToContinuousIndex(imageOrigin, imageOriginContinousIndex);
+            auto maskOriginContinousIndex = m_Image->TransformPhysicalPointToContinuousIndex<PointType::ValueType, double>(maskOrigin);
+            auto imageOriginContinousIndex = m_Image->TransformPhysicalPointToContinuousIndex<PointType::ValueType, double>(imageOrigin);
 
             for ( unsigned int i = 0; i < ImageType::ImageDimension; ++i )
             {

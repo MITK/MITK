@@ -66,7 +66,7 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
     QKeySequence showInfo = QKeySequence(QString::fromStdString(prefs->Get("Show node information", "Ctrl+I")));
 
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-    QKeySequence keySequence = QKeySequence(keyEvent->modifiers() + keyEvent->key());
+    QKeySequence keySequence = QKeySequence(keyEvent->modifiers() | keyEvent->key());
     // if no modifier was pressed the sequence is now empty
     if (keySequence.isEmpty())
     {

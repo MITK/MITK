@@ -58,7 +58,7 @@ void QmitkHotkeyLineEdit::keyPressEvent(QKeyEvent* event)
   }
   else
   {
-    m_KeySequence = QKeySequence(event->modifiers() + event->key());
+    m_KeySequence = QKeySequence(event->modifiers() | event->key());
   }
 
   SetKeySequence(m_KeySequence);
@@ -86,7 +86,7 @@ QString QmitkHotkeyLineEdit::GetKeySequenceAsString()
 
 bool QmitkHotkeyLineEdit::Matches(QKeyEvent* event)
 {
-  QKeySequence keySequence = QKeySequence(event->modifiers() + event->key());
+  QKeySequence keySequence = QKeySequence(event->modifiers() | event->key());
 
   return keySequence == m_KeySequence;
 }

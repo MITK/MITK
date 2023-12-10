@@ -18,7 +18,7 @@ set(PLUGIN_exported_include_suffixes
 
 if(MITK_USE_Qt6)
   set(PLUGIN_package_depends
-    PUBLIC Qt6|Widgets+Svg
+    PUBLIC Qt6|Widgets+PrintSupport+Svg
   )
 endif()
 

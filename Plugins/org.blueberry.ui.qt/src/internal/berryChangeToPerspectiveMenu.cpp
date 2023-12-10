@@ -52,7 +52,7 @@ ChangeToPerspectiveMenu::ChangeToPerspectiveMenu(IWorkbenchWindow* window, const
 
   CommandContributionItemParameter::Pointer showDlgItemParms(
         new CommandContributionItemParameter(
-          window, QString::null, IWorkbenchCommandConstants::PERSPECTIVES_SHOW_PERSPECTIVE,
+          window, QString(), IWorkbenchCommandConstants::PERSPECTIVES_SHOW_PERSPECTIVE,
           CommandContributionItem::STYLE_PUSH));
   showDlgItemParms->label = "&Other...";
   showDlgItem = new CommandContributionItem(showDlgItemParms);

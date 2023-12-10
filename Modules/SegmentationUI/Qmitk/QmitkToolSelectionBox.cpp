@@ -578,7 +578,7 @@ void QmitkToolSelectionBox::SetDisplayedToolGroups(const std::string &toolGroups
   {
     QString q_DisplayedGroups = toolGroups.c_str();
     // quote all unquoted single words
-    q_DisplayedGroups = q_DisplayedGroups.replace(QRegExp("\\b(\\w+)\\b|'([^']+)'"), "'\\1\\2'");
+    q_DisplayedGroups = q_DisplayedGroups.replace(QRegularExpression("\\b(\\w+)\\b|'([^']+)'"), "'\\1\\2'");
     MITK_DEBUG << "m_DisplayedGroups was \"" << toolGroups << "\"";
 
     m_DisplayedGroups = q_DisplayedGroups.toLocal8Bit().constData();

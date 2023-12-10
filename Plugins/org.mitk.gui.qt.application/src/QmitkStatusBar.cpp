@@ -75,7 +75,7 @@ QmitkStatusBar::QmitkStatusBar(QStatusBar* instance)
 :StatusBarImplementation()
 {
     m_StatusBar = instance;
-    m_GreyValueLabel = new QLabel(m_StatusBar,nullptr);
+    m_GreyValueLabel = new QLabel(m_StatusBar);
     int xResolution = QGuiApplication::primaryScreen()->geometry().width()-100;
     m_GreyValueLabel->setMaximumSize(QSize(xResolution,50));
     m_GreyValueLabel->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Fixed);

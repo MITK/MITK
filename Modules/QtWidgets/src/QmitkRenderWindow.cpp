@@ -248,7 +248,7 @@ bool QmitkRenderWindow::event(QEvent* e)
   return QVTKOpenGLNativeWidget::event(e);
 }
 
-void QmitkRenderWindow::enterEvent(QEvent *e)
+void QmitkRenderWindow::enterEvent(QEnterEvent *e)
 {
   auto* baseRenderer = mitk::BaseRenderer::GetInstance(this->GetVtkRenderWindow());
   this->ShowOverlayMessage(!baseRenderer->GetReferenceGeometryAligned());

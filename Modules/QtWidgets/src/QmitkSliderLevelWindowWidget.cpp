@@ -421,7 +421,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
   }
 }
 
-void QmitkSliderLevelWindowWidget::enterEvent(QEvent * /*event*/)
+void QmitkSliderLevelWindowWidget::enterEvent(QEnterEvent * /*event*/)
 {
   QPoint p = QCursor::pos();
   p = this->mapFromGlobal(p);

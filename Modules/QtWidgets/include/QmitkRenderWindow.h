@@ -98,7 +98,7 @@ protected:
   // overloaded show handler
   void showEvent(QShowEvent *event) override;
   // overloaded enter handler
-  void enterEvent(QEvent *) override;
+  void enterEvent(QEnterEvent *) override;
   // overloaded leave handler
   void leaveEvent(QEvent *) override;
 

@@ -153,7 +153,7 @@ protected:
   */
   void mouseMoveEvent(QMouseEvent *mouseEvent) override;
 
-  void enterEvent(QEvent *event) override;
+  void enterEvent(QEnterEvent *event) override;
 
   /*!
   *  registers events when a mousebutton is pressed

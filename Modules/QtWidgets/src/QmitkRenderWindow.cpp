@@ -336,7 +336,7 @@ mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetEventButton(QMouseEve
   case Qt::RightButton:
     eventButton = mitk::InteractionEvent::RightMouseButton;
     break;
-  case Qt::MidButton:
+  case Qt::MiddleButton:
     eventButton = mitk::InteractionEvent::MiddleMouseButton;
     break;
   default:
@@ -358,7 +358,7 @@ mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetButtonState(QMouseEve
   {
     buttonState = buttonState | mitk::InteractionEvent::RightMouseButton;
   }
-  if (me->buttons() & Qt::MidButton)
+  if (me->buttons() & Qt::MiddleButton)
   {
     buttonState = buttonState | mitk::InteractionEvent::MiddleMouseButton;
   }
@@ -396,7 +396,7 @@ mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetButtonState(QWheelEve
   {
     buttonState = buttonState | mitk::InteractionEvent::RightMouseButton;
   }
-  if (we->buttons() & Qt::MidButton)
+  if (we->buttons() & Qt::MiddleButton)
   {
     buttonState = buttonState | mitk::InteractionEvent::MiddleMouseButton;
   }

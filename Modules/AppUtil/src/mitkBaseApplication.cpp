@@ -41,6 +41,7 @@ found in the LICENSE file.
 #include <QStandardPaths>
 #include <QTime>
 #include <QWebEngineUrlScheme>
+#include <QQuickWindow>
 
 namespace
 {
@@ -531,6 +532,9 @@ namespace mitk
   {
     if (nullptr != qApp)
       return;
+
+    // Prevent conflicts between native OpenGL applications and QWebEngine
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
 
 #ifdef Q_OS_LINUX
     qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--single-process"); // See T29332

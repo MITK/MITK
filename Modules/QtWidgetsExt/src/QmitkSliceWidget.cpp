@@ -188,7 +188,7 @@ void QmitkSliceWidget::wheelEvent(QWheelEvent *e)
 {
   int val = sliceNavigationWidget->GetPos();
 
-  if (e->orientation() * e->delta() > 0)
+  if (e->angleDelta().y() > 0)
   {
     sliceNavigationWidget->SetPos(val + 1);
   }

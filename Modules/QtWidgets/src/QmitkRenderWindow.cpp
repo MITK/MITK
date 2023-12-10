@@ -319,9 +319,9 @@ mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent *we) const
 {
   mitk::Point2D point;
   const auto scale = this->devicePixelRatioF();
-  point[0] = we->x()*scale;
+  point[0] = we->position().x()*scale;
   // We need to convert the y component, as the display and vtk have other definitions for the y direction
-  point[1] = m_Renderer->GetSizeY() - we->y()*scale;
+  point[1] = m_Renderer->GetSizeY() - we->position().y()*scale;
   return point;
 }
 
@@ -503,7 +503,7 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
 
 int QmitkRenderWindow::GetDelta(QWheelEvent *we) const
 {
-  return we->delta();
+  return we->angleDelta().y();
 }
 
 void QmitkRenderWindow::UpdateStatusBar(mitk::Point2D pointerPositionOnScreen)

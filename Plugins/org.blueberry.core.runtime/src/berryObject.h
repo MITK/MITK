@@ -98,15 +98,6 @@ public:
    * delete method will not work with reference counting.  */
   virtual void Delete();
 
-
-#ifdef _WIN32
-  /** Used to avoid dll boundary problems.  */
-  void* operator new(size_t);
-  void* operator new[](size_t);
-  void operator delete(void*);
-  void operator delete[](void*, size_t);
-#endif
-
   /**
    * Cause the object to print itself out. This is usually used to provide
    * detailed information about the object's state. It just calls the

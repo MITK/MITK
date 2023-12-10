@@ -33,36 +33,6 @@ void Object::Delete()
   this->UnRegister();
 }
 
-#ifdef _WIN32
-void*
-Object
-::operator new(size_t n)
-{
-  return new char[n];
-}
-
-void*
-Object
-::operator new[](size_t n)
-{
-  return new char[n];
-}
-
-void
-Object
-::operator delete(void* m)
-{
-  delete [] (char*)m;
-}
-
-void
-Object
-::operator delete[](void* m, size_t)
-{
-  delete [] (char*)m;
-}
-#endif
-
 const char* Object::GetStaticClassName()
 {
   return "berry::Object";

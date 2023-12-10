@@ -35,7 +35,7 @@ int main(int argc, char **argv)
   // We create the application id relying on a convention:
   // org.mitk.example.<configuration-name>
   QString appId = "org.mitk.example.";
-  QStringList appIdTokens = QFileInfo(selectedConfiguration).baseName().toLower().split('_', QString::SkipEmptyParts);
+  QStringList appIdTokens = QFileInfo(selectedConfiguration).baseName().toLower().split('_', Qt::SkipEmptyParts);
   appId += appIdTokens.size() > 1 ? appIdTokens.at(1) : appIdTokens.at(0);
 
   // Special cases

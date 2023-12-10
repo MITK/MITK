@@ -99,7 +99,7 @@ QString ReopenEditorMenu::CalcText(int index, const QString& name, const QString
     else
     {
       sb += fileName;
-      QStringList pathSegments = path.absoluteFilePath().split('/', QString::SkipEmptyParts);
+      QStringList pathSegments = path.absoluteFilePath().split('/', Qt::SkipEmptyParts);
       int segmentCount = pathSegments.size();
       if (segmentCount > 0)
       {

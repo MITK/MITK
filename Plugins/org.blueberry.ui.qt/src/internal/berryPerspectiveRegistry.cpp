@@ -429,7 +429,7 @@ void PerspectiveRegistry::LoadCustom()
 
   /* Get the space-delimited list of custom perspective ids */
   QString customPerspectives = QString::fromStdString(prefs->Get(PreferenceConstants::PERSPECTIVES, ""));
-  QStringList perspectivesList = customPerspectives.split(' ', QString::SkipEmptyParts);
+  QStringList perspectivesList = customPerspectives.split(' ', Qt::SkipEmptyParts);
 
   for (int i = 0; i < perspectivesList.size(); i++)
   {

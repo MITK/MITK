@@ -382,7 +382,7 @@ QSet<QString> DescriptorTreeItem::keywordLabels() const
   for(const auto &id : qAsConst(ids))
   {
     QString label = registry->GetKeywordLabel(id);
-    for (const auto &keyword : label.split(' ', QString::SkipEmptyParts))
+    for (const auto &keyword : label.split(' ', Qt::SkipEmptyParts))
     {
       keywords.insert(keyword);
     }

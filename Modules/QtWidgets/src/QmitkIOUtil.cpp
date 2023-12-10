@@ -284,7 +284,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
         parent,
         "Saving not possible",
         QString("File \"%2\" contains invalid characters.\n\nPlease avoid any of \"%1\"")
-          .arg(Impl::s_InvalidFilenameCharacters.split("", QString::SkipEmptyParts).join(" "))
+          .arg(Impl::s_InvalidFilenameCharacters.split("", Qt::SkipEmptyParts).join(" "))
           .arg(nextName));
       continue;
     }

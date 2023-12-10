@@ -243,7 +243,7 @@ void QtStylePreferencePage::Update()
   auto* prefs = GetPreferences();
 
   auto paths = QString::fromStdString(prefs->Get(berry::QtPreferences::QT_STYLE_SEARCHPATHS, ""));
-  QStringList pathList = paths.split(";", QString::SkipEmptyParts);
+  QStringList pathList = paths.split(";", Qt::SkipEmptyParts);
   QStringListIterator it(pathList);
   while (it.hasNext())
   {

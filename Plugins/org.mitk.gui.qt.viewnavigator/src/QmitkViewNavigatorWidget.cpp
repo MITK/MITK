@@ -610,7 +610,7 @@ void QmitkViewNavigatorWidget::AddPerspectivesToTree()
 {
   berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
   QList<berry::IPerspectiveDescriptor::Pointer> perspectiveDescriptors(perspRegistry->GetPerspectives());
-  qSort(perspectiveDescriptors.begin(), perspectiveDescriptors.end(), comparePerspectives);
+  std::sort(perspectiveDescriptors.begin(), perspectiveDescriptors.end(), comparePerspectives);
 
   QStandardItem* perspectiveRootItem = new QStandardItem("Perspectives");
   perspectiveRootItem->setFont(getLargeFont());
@@ -626,7 +626,7 @@ void QmitkViewNavigatorWidget::AddViewsToTree()
 {
   berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
   QList<berry::IViewDescriptor::Pointer> viewDescriptors(viewRegistry->GetViews());
-  qSort(viewDescriptors.begin(), viewDescriptors.end(), compareViews);
+  std::sort(viewDescriptors.begin(), viewDescriptors.end(), compareViews);
 
   auto largeFont = getLargeFont();
 

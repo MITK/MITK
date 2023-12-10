@@ -152,7 +152,7 @@ void PerspectivesPreferencePage::Update()
   {
     perspectives.push_back(persps[i].Cast<PerspectiveDescriptor>());
   }
-  qSort(perspectives.begin(), perspectives.end(), PerspectiveComparator);
+  std::sort(perspectives.begin(), perspectives.end(), PerspectiveComparator);
   defaultPerspectiveId = perspRegistry->GetDefaultPerspective();
   UpdatePerspectivesTable();
 }

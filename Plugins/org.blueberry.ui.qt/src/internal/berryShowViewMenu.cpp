@@ -150,7 +150,7 @@ void ShowViewMenu::FillMenu(IMenuManager* innerMgr)
       actions.append(item);
     }
   }
-  qSort(actions.begin(), actions.end(), ActionComparator());
+  std::sort(actions.begin(), actions.end(), ActionComparator());
   foreach (CommandContributionItemParameter::Pointer ccip, actions)
   {
 //    if (WorkbenchActivityHelper.filterItem(ccip)) {

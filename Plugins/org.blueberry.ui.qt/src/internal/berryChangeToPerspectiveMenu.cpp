@@ -121,7 +121,7 @@ void ChangeToPerspectiveMenu::FillMenu(IMenuManager* manager)
 
   // Collect and sort perspective descriptors.
   QList<IPerspectiveDescriptor::Pointer> persps = GetPerspectiveShortcuts();
-  qSort(persps.begin(), persps.end(), PerspectiveComparator);
+  std::sort(persps.begin(), persps.end(), PerspectiveComparator);
 
   /*
    * Convert the perspective descriptors to command parameters, and filter

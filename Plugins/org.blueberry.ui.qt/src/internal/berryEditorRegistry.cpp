@@ -1040,7 +1040,7 @@ QList<IEditorDescriptor::Pointer> EditorRegistry::SortEditors(
 
 void EditorRegistry::SortInternalEditors()
 {
-  qSort(sortedEditorsFromPlugins.begin(), sortedEditorsFromPlugins.end(), CmpEditorDescriptor());
+  std::sort(sortedEditorsFromPlugins.begin(), sortedEditorsFromPlugins.end(), CmpEditorDescriptor());
 }
 
 void EditorRegistry::EditorMap::PutDefault(const QString& key,

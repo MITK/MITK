@@ -23,6 +23,7 @@ found in the LICENSE file.
 
 #include <QIcon>
 #include <QBrush>
+#include <QStringList>
 
 namespace berry {
 
@@ -73,7 +74,7 @@ struct ViewTreeItem
   {
     m_children.push_back(child);
     child->m_parent = this;
-    qSort(m_children.begin(), m_children.end(), CompareViewTreeItem);
+    std::sort(m_children.begin(), m_children.end(), CompareViewTreeItem);
   }
 
   void removeChild(ViewTreeItem* child)

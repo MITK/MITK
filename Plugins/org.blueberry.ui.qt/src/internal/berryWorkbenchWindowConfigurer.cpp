@@ -200,7 +200,7 @@ void WorkbenchWindowConfigurer::AddEditorAreaTransfer(const QStringList& transfe
   {
     QtDnDControlWidget* dropTarget =
         static_cast<QtDnDControlWidget*>(page->GetEditorPresentation()->GetLayoutPart().Cast<EditorSashContainer>()->GetParent());
-    dropTarget->SetTransferTypes(transferTypes.toList());
+    dropTarget->SetTransferTypes(transferTypes.values());
   }
 }
 
@@ -220,7 +220,7 @@ void WorkbenchWindowConfigurer::ConfigureEditorAreaDropListener(IDropTargetListe
 
 QStringList WorkbenchWindowConfigurer::GetTransfers() const
 {
-  return transferTypes.toList();
+  return transferTypes.values();
 }
 
 IDropTargetListener* WorkbenchWindowConfigurer::GetDropTargetListener() const

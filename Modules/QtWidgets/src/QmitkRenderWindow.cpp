@@ -290,7 +290,8 @@ void QmitkRenderWindow::dropEvent(QDropEvent *event)
   QList<mitk::DataNode *> dataNodeList = QmitkMimeTypes::ToDataNodePtrList(event->mimeData());
   if (!dataNodeList.empty())
   {
-    emit NodesDropped(this, dataNodeList.toVector().toStdVector());
+    std::vector dataNodes(dataNodeList.begin(), dataNodeList.end());
+    emit NodesDropped(this, dataNodes);
   }
 }
 

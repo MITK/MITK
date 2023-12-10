@@ -1091,7 +1091,7 @@ QList<FileEditorMapping::Pointer> EditorRegistry::EditorMap::AllMappings()
     resultSet.insert(iter.value());
   }
 
-  return resultSet.toList();
+  return resultSet.values();
 }
 
 QList<FileEditorMapping::Pointer> EditorRegistry::EditorMap::UserMappings()

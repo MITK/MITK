@@ -52,7 +52,7 @@ struct ViewTreeItem
     {
       if (m_keywordCache.isEmpty())
       {
-        m_keywordCache = QStringList(keywordLabels().toList());
+        m_keywordCache = keywordLabels().values();
       }
       return m_keywordCache;
     }

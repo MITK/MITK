@@ -463,8 +463,12 @@ void QmitkAbstractView::OnNullSelection(berry::IWorkbenchPart::Pointer /*part*/)
 
 QList<mitk::DataNode::Pointer> QmitkAbstractViewPrivate::DataNodeSelectionToQList(mitk::DataNodeSelection::ConstPointer currentSelection) const
 {
-  if (currentSelection.IsNull()) return QList<mitk::DataNode::Pointer>();
-  return QList<mitk::DataNode::Pointer>::fromStdList(currentSelection->GetSelectedDataNodes());
+  if (currentSelection.IsNull())
+    return QList<mitk::DataNode::Pointer>();
+
+  auto nodes = currentSelection->GetSelectedDataNodes();
+
+  return QList<mitk::DataNode::Pointer>(nodes.begin(), nodes.end());
 }
 
 void QmitkAbstractView::NodeAdded( const mitk::DataNode*  /*node*/ )

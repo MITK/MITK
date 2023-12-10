@@ -29,7 +29,7 @@ namespace mitk
 #endif
 
   ProvisioningInfo::ProvisioningInfo(const QString &file) { this->readProvisioningFile(file); }
-  QStringList ProvisioningInfo::getPluginDirs() const { return pluginDirs.toList(); }
+  QStringList ProvisioningInfo::getPluginDirs() const { return pluginDirs.values(); }
   QList<QUrl> ProvisioningInfo::getPluginsToInstall() const { return pluginsToInstall; }
   QList<QUrl> ProvisioningInfo::getPluginsToStart() const { return pluginsToStart; }
   void ProvisioningInfo::readProvisioningFile(const QString &filePath)

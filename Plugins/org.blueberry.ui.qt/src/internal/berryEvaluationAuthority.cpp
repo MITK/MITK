@@ -43,7 +43,7 @@ QStringList EvaluationAuthority::GetNames(const SmartPointer<IEvaluationReferenc
   }
 
   allNames.unite(info.GetAccessedPropertyNames());
-  return allNames.toList();
+  return allNames.values();
 }
 
 void EvaluationAuthority::RefsWithSameExpression(const QList<SmartPointer<EvaluationReference> >& refs)
@@ -169,7 +169,7 @@ void EvaluationAuthority::SourceChanged(const QStringList& sourceNames)
       {
         if (!(expressionCaches[j].isEmpty()))
         {
-          QList<EvaluationReference::Pointer> refs = expressionCaches[j].toList();
+          QList<EvaluationReference::Pointer> refs = expressionCaches[j].values();
           RefsWithSameExpression(refs);
         }
       }

@@ -269,7 +269,8 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& /*pos*/)
   if (selection.IsNull() || selection->IsEmpty())
     return;
 
-  m_SelectedNodes = QList<mitk::DataNode::Pointer>::fromStdList(selection->GetSelectedDataNodes());
+  auto nodes = selection->GetSelectedDataNodes();
+  m_SelectedNodes = QList<mitk::DataNode::Pointer>(nodes.begin(), nodes.end());
 
   if (!m_SelectedNodes.isEmpty())
   {

@@ -153,7 +153,7 @@ void SlaveHandlerService::DeactivateHandlers(const QList<SmartPointer<IHandlerAc
 
 void SlaveHandlerService::Dispose()
 {
-  parent->DeactivateHandlers(parentActivations.toList());
+  parent->DeactivateHandlers(parentActivations.values());
   parentActivations.clear();
   localActivationsToParentActivations.clear();
 

@@ -175,9 +175,8 @@ QtTracker::QtTracker() :
   rubberBand = new QRubberBand(QRubberBand::Rectangle);
   QPalette rubberPalette(rubberBand->palette());
   //rubberPalette.setColor(QPalette::Button, QColor(Qt::darkRed));
-  rubberPalette.setBrush(QPalette::Foreground, QBrush(Qt::darkRed));
+  rubberPalette.setBrush(QPalette::WindowText, QBrush(Qt::darkRed));
   rubberPalette.setBrush(QPalette::Window, QBrush(Qt::darkRed));
-  rubberPalette.setBrush(QPalette::Background, QBrush(Qt::darkRed));
   rubberPalette.setBrush(QPalette::Base, QBrush(Qt::darkRed));
   rubberPalette.setBrush(QPalette::Text, QBrush(Qt::darkRed));
   rubberBand->setPalette(rubberPalette);

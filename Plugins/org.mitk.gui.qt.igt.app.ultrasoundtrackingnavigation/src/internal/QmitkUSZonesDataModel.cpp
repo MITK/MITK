@@ -178,7 +178,7 @@ QVariant QmitkUSZonesDataModel::data ( const QModelIndex& index, int role ) cons
 
   switch (role)
   {
-  case Qt::BackgroundColorRole:
+  case Qt::BackgroundRole:
   {
     float color[3];
     if ( curNode->GetColor(color) )

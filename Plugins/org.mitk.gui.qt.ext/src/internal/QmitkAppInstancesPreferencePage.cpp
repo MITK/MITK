@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkAppInstancesPreferencePage.h"
+#include <ui_QmitkAppInstancesPreferencePage.h>
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
@@ -26,19 +27,18 @@ namespace
 }
 
 QmitkAppInstancesPreferencePage::QmitkAppInstancesPreferencePage()
+  : controls(new Ui::QmitkAppInstancesPreferencePage)
 {
-
 }
 
 void QmitkAppInstancesPreferencePage::Init(berry::IWorkbench::Pointer )
 {
-
 }
 
 void QmitkAppInstancesPreferencePage::CreateQtControl(QWidget* parent)
 {
   mainWidget = new QWidget(parent);
-  controls.setupUi(mainWidget);
+  controls->setupUi(mainWidget);
 
   Update();
 }
@@ -52,8 +52,8 @@ bool QmitkAppInstancesPreferencePage::PerformOk()
 {
   auto* prefs = GetPreferences();
 
-  prefs->PutBool("newInstance.always", controls.newInstanceAlways->isChecked());
-  prefs->PutBool("newInstance.scene", controls.newInstanceScene->isChecked());
+  prefs->PutBool("newInstance.always", controls->newInstanceAlways->isChecked());
+  prefs->PutBool("newInstance.scene", controls->newInstanceScene->isChecked());
 
   return true;
 }
@@ -70,6 +70,6 @@ void QmitkAppInstancesPreferencePage::Update()
   bool always = prefs->GetBool("newInstance.always", false);
   bool scene = prefs->GetBool("newInstance.scene", true);
 
-  controls.newInstanceAlways->setChecked(always);
-  controls.newInstanceScene->setChecked(scene);
+  controls->newInstanceAlways->setChecked(always);
+  controls->newInstanceScene->setChecked(scene);
 }

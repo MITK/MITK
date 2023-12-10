@@ -152,8 +152,7 @@ void QmitkMapPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel 
     if (data.type() == QVariant::Color)
     {
       QWidget *colorBtn = qobject_cast<QWidget *>(editor);
-      QVariant colorVariant;
-      colorVariant.setValue<QColor>(colorBtn->palette().color(QPalette::Button));
+      auto colorVariant = QVariant::fromValue(colorBtn->palette().color(QPalette::Button));
       model->setData(index, colorVariant);
     }
 
@@ -187,8 +186,7 @@ void QmitkMapPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel 
       QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
       QString comboBoxValue = comboBox->currentText();
 
-      QVariant comboBoxValueVariant;
-      comboBoxValueVariant.setValue<QString>(comboBoxValue);
+      auto comboBoxValueVariant = QVariant::fromValue(comboBoxValue);
       model->setData(index, comboBoxValueVariant);
     }
 

@@ -204,7 +204,7 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
     {
       QWidget *colorBtn = qobject_cast<QWidget *>(editor);
       QVariant colorVariant;
-      colorVariant.setValue<QColor>(colorBtn->palette().color(QPalette::Button));
+      colorVariant.setValue(colorBtn->palette().color(QPalette::Button));
       model->setData(index, colorVariant);
     }
 
@@ -236,7 +236,7 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
       QString comboBoxValue = comboBox->currentText();
 
       QVariant comboBoxValueVariant;
-      comboBoxValueVariant.setValue<QString>(comboBoxValue);
+      comboBoxValueVariant.setValue(comboBoxValue);
       model->setData(index, comboBoxValueVariant);
     }
 

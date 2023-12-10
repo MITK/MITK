@@ -63,7 +63,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage 
   }
 
   // reactions to signals
-  connect(m_ToolButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(toolButtonClicked(int)));
+  connect(m_ToolButtonGroup, &QButtonGroup::idClicked, this, &QmitkToolSelectionBox::toolButtonClicked);
 
   // reactions to ToolManager events
 

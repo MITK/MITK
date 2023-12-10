@@ -88,8 +88,9 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   //m_DataNodeContextMenu->SetSurfaceDecimation(m_SurfaceDecimation);
 
   // connect objects
-  connect(m_Controls.comboBoxRenderWindowSelection, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged),
-          this, &QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged);
+  connect(m_Controls.comboBoxRenderWindowSelection, &QComboBox::currentIndexChanged, [this](int index) {
+    OnRenderWindowSelectionChanged(m_Controls.comboBoxRenderWindowSelection->itemText(index));
+  });
   connect(m_InspectorView, &QAbstractItemView::customContextMenuRequested,
           m_DataNodeContextMenu, &QmitkDataNodeContextMenu::OnContextMenuRequested);
 

@@ -32,7 +32,7 @@ You need:
 To build MITK on Linux, install the following packages, e. g. with APT:
 
 \code{.unparsed}
-sudo apt install build-essential doxygen git graphviz libfreetype6-dev libglu1-mesa-dev libssl-dev libtiff5-dev libxcomposite1 libxcursor1 libxdamage-dev libxi-dev libxkbcommon-x11-dev libxt-dev mesa-common-dev
+sudo apt install build-essential doxygen git graphviz libfreetype6-dev libglu1-mesa-dev libssl-dev libtiff5-dev libxcomposite1 libxcursor-dev libxcb-cursor-dev libxdamage-dev libxi-dev libxkbcommon-x11-dev libxt-dev mesa-common-dev
 \endcode
 
 For the optional and experimental (!) Python integration, install NumPy and SimpleITK v1.x, e. g.:

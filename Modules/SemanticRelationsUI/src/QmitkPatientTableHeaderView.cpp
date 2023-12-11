@@ -49,7 +49,7 @@ void QmitkPatientTableHeaderView::paintSection(QPainter* painter, const QRect& r
 
     QModelIndex leafIndex = HeaderIndex(logicalIndex);
     QModelIndexList indexes = ParentIndexList(leafIndex);
-    for (const auto& index : qAsConst(indexes))
+    for (const auto& index : std::as_const(indexes))
     {
       top = PaintHeader(painter, index, logicalIndex, rect, top);
     }

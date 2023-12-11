@@ -272,7 +272,7 @@ void QtShowViewDialog::SaveState()
   geomChild->PutTextData(geom.toBase64().constData());
 
   // expanded categories
-  for (const QPersistentModelIndex &index : qAsConst(m_ExpandedCategories))
+  for (const QPersistentModelIndex &index : std::as_const(m_ExpandedCategories))
   {
     if (index.isValid())
     {
@@ -316,7 +316,7 @@ QtShowViewDialog::GetSelection() const
   QList<QString> selected;
 
   QModelIndexList indices = m_UserInterface.m_TreeView->selectionModel()->selectedIndexes();
-  for(QModelIndex index : qAsConst(indices))
+  for(QModelIndex index : std::as_const(indices))
   {
     QString id = m_FilterModel->data(index, ViewTreeModel::Id).toString();
     selected.push_back(id);

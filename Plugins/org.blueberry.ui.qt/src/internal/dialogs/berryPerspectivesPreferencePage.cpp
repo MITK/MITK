@@ -231,7 +231,7 @@ void PerspectivesPreferencePage::UpdateButtons()
 void PerspectivesPreferencePage::UpdatePerspectivesTable()
 {
   ui->perspectivesListWidget->clear();
-  for (const PerspectiveDescriptor::Pointer &desc : qAsConst(perspectives))
+  for (const PerspectiveDescriptor::Pointer &desc : std::as_const(perspectives))
   {
     NewPerspectivesTableItem(desc);
   }

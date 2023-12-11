@@ -715,7 +715,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     if (showViewMenuItem)
     {
-      for (auto viewAction : qAsConst(viewActions))
+      for (auto viewAction : std::as_const(viewActions))
       {
         viewMenu->addAction(viewAction);
       }
@@ -899,7 +899,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
           });
         }
 
-        for (const auto &viewDescriptor : qAsConst(viewDescriptorsInCurrentCategory))
+        for (const auto &viewDescriptor : std::as_const(viewDescriptorsInCurrentCategory))
         {
           auto viewAction = new berry::QtShowViewAction(window, viewDescriptor);
           toolbar->addAction(viewAction);

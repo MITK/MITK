@@ -86,7 +86,7 @@ struct QmitkIOUtil::Impl
     QFileInfo fi(fullFilename);
     auto filename = fi.fileName();
 
-    for (const auto &ch : qAsConst(s_InvalidFilenameCharacters))
+    for (const auto &ch : std::as_const(s_InvalidFilenameCharacters))
     {
       if (filename.contains(ch))
       {

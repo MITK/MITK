@@ -79,7 +79,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
   if (indices.size() > 0)
   {
     // find largest row and column
-    for (const auto& modelIndex : qAsConst(indices))
+    for (const auto& modelIndex : std::as_const(indices))
     {
       if (modelIndex.row() > row)
       {

@@ -135,7 +135,7 @@ IBranding* ApplicationContainer::GetBranding() const
     return branding.data();
   }
   QList<IConfigurationElement::Pointer> elements = extensionRegistry->GetConfigurationElementsFor(PI_RUNTIME, PT_PRODUCTS);
-  for (const auto &element : qAsConst(elements))
+  for (const auto &element : std::as_const(elements))
   {
     if (element->GetName().compare("provider", Qt::CaseInsensitive) == 0)
     {
@@ -143,7 +143,7 @@ IBranding* ApplicationContainer::GetBranding() const
       {
         IProductProvider* provider = element->CreateExecutableExtension<IProductProvider>("run");
         QList<IProduct::Pointer> products = provider->GetProducts();
-        for (const auto &product : qAsConst(products))
+        for (const auto &product : std::as_const(products))
         {
           if (productId.compare(product->GetId(), Qt::CaseInsensitive) == 0)
           {
@@ -375,7 +375,7 @@ QString ApplicationContainer::GetAvailableAppsMsg() const
   if (!availableApps.isEmpty())
   {
     availableAppsMsg = availableApps.front()->GetUniqueIdentifier();
-    for (const auto &availableApp : qAsConst(availableApps))
+    for (const auto &availableApp : std::as_const(availableApps))
     {
       availableAppsMsg = availableAppsMsg + ", " + availableApp->GetUniqueIdentifier();
     }
@@ -484,7 +484,7 @@ void ApplicationContainer::StopAllApps()
 {
   // get a stapshot of running applications
   QList<ctkServiceReference> runningRefs = context->getServiceReferences<ctkApplicationHandle>("(!(application.state=STOPPING))");
-  for (const auto &runningRef : qAsConst(runningRefs))
+  for (const auto &runningRef : std::as_const(runningRefs))
   {
     ctkApplicationHandle* handle = context->getService<ctkApplicationHandle>(runningRef);
     try

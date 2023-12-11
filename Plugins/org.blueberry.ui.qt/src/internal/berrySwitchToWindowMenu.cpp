@@ -120,7 +120,7 @@ void SwitchToWindowMenu::Fill(QMenu* menu, QAction* before)
   auto   signalMapper = new QSignalMapper(menu);
   connect(signalMapper, SIGNAL(mapped(int)), SLOT(MenuItemTriggered(int)));
   int count = 0;
-  for (auto window : qAsConst(windows))
+  for (auto window : std::as_const(windows))
   {
     // can encounter disposed shells if this update is in response to a shell closing
     //if (!window->GetShell()->IsDisposed())

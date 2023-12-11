@@ -276,7 +276,7 @@ bool QmitkRenderWindowDataStorageListModel::dropMimeData(const QMimeData* data, 
     }
 
     auto dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
-    for (const auto& dataNode : qAsConst(dataNodeList))
+    for (const auto& dataNode : std::as_const(dataNodeList))
     {
       m_RenderWindowLayerController->MoveNodeToPosition(dataNode, layer, baseRenderer);
     }

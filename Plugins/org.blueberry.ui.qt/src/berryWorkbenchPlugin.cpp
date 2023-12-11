@@ -361,13 +361,13 @@ void WorkbenchPlugin::Log(const SmartPointer<IStatus>& status)
 
 void WorkbenchPlugin::start(ctkPluginContext* context)
 {
-  // Dummy code to force linkage to Qt5PrintSupport (issue with GCC 7.3)
-  QPrinterInfo forceQt5PrintSupportLinkage;
-  forceQt5PrintSupportLinkage.isNull();
+  // Dummy code to force linkage to Qt6PrintSupport (issue with GCC 7.3)
+  QPrinterInfo forceQt6PrintSupportLinkage;
+  forceQt6PrintSupportLinkage.isNull();
 
-  // Same for Qt5Svg
-  QSvgGenerator forceQt5SvgLinkage;
-  forceQt5SvgLinkage.title();
+  // Same for Qt6Svg
+  QSvgGenerator forceQt6SvgLinkage;
+  forceQt6SvgLinkage.title();
 
   //context.addBundleListener(getBundleListener());
   AbstractUICTKPlugin::start(context);

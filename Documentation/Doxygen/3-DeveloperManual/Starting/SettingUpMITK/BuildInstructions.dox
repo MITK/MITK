@@ -24,7 +24,7 @@ You need:
      clients available). We recommend using Git, but see below for a way how to
      get the current source code without using it.
   -# <a href="https://cmake.org/">CMake</a> (version \minimumCMakeVersion or higher)
-  -# <a href="https://www.qt.io/">Qt</a> \minimumQt5Version if you plan to develop Qt-based
+  -# <a href="https://www.qt.io/">Qt</a> \minimumQt6Version if you plan to develop Qt-based
      applications
   -# If you are using <b>macOS</b> you need an XCode installation and the
      Command Line Tools as it provides the neccessary compilers and SDKs
@@ -51,8 +51,9 @@ for all supported platforms</a>.
 We highly recommend to install Qt to the default location of the installer as it will allow MITK to automatically find Qt without any further action needed.
 
 Make sure to also select the following <b>required components</b>:
-  - QtWebEngine
-  - QtScript
+  - Qt 5 Compatibility Module
+  - Qt State Machines
+  - Qt WebEngine
 
 On Windows, the Qt installer offers a welcome and straight forward way to install <b>OpenSSL</b>.
 You find it under the Tools node.
@@ -99,7 +100,7 @@ CMake will present you a couple of options, these are the most important ones:
    will download and build OpenCV 2.4)
  - <tt><b>MITK_USE_Python3</b></tt> Enables Python wrapping in MITK. This will also
    configure ITK, VTK, and OpenCV (if enabled) to build Python wrappers.
- - <tt><b>MITK_USE_Qt5</b></tt> Build MITK code which depends on Qt 5
+ - <tt><b>MITK_USE_Qt6</b></tt> Build MITK code which depends on Qt 6
 
 If you are satisfied with the configuration of your MITK superbuild, generate
 the project files with CMake by pressing "Generate".

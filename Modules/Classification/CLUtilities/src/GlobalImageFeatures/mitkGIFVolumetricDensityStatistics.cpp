@@ -224,7 +224,6 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
     Q(3, i) = 1.0;
   }
 
-  int count = 1;
   double error = 1;
   Eigen::VectorXd u_vector(numberOfPoints);
   u_vector.fill(1.0 / numberOfPoints);
@@ -256,7 +255,6 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
     double stepsize = (maximumValue - dimension - 1) / ((dimension + 1) * (maximumValue - 1));
     Eigen::DiagonalMatrix<double, Eigen::Dynamic> new_u = (1.0 - stepsize) * u;
     new_u.diagonal()[maximumPosition] = (new_u.diagonal())(maximumPosition) + stepsize;
-    ++count;
     error = (new_u.diagonal() - u.diagonal()).norm();
     u.diagonal() = new_u.diagonal();
   }

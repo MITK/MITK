@@ -72,8 +72,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
       while (!feof(f))
       {
         char s[300], *p;
-        char *ignored = fgets(s, 200, f);
-        ++ignored;
+        fgets(s, 200, f);
         if (strstr(s, "Max. number of cardiac phases"))
         {
           p = strchr(s, ':') + 1;
@@ -218,8 +217,7 @@ void mitk::ParRecFileReader::GenerateData()
             fseek(f, slicePlusTimeSize * z + (sliceSize + 1) * t, SEEK_SET);
           else
             fseek(f, slicePlusTimeSize * z + sliceSize * t, SEEK_SET);
-          size_t ignored = fread(data, sliceSize, 1, f);
-          ++ignored;
+          fread(data, sliceSize, 1, f);
           output->SetSlice(data, z, t, 0);
         }
     }

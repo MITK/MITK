@@ -427,8 +427,6 @@ void PartStack::DescribeLayout(QString& buf) const
 
   ChildVector children = this->GetChildren();
 
-  int visibleChildren = 0;
-
   for (ChildVector::iterator iter = children.begin(); iter != children.end(); ++iter)
   {
 
@@ -446,8 +444,6 @@ void PartStack::DescribeLayout(QString& buf) const
       }
 
       next->DescribeLayout(buf);
-
-      visibleChildren++;
     }
   }
 

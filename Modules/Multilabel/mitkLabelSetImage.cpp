@@ -64,6 +64,8 @@ void CreateLabelMaskProcessing(mitk::Image *layerImage, mitk::Image *mask, mitk:
   }
 }
 
+const mitk::LabelSetImage::LabelValueType mitk::LabelSetImage::UnlabeledValue = 0;
+
 mitk::LabelSetImage::LabelSetImage()
   : mitk::Image(), m_UnlabeledLabelLock(false), m_ActiveLayer(0), m_activeLayerInvalid(false)
 {

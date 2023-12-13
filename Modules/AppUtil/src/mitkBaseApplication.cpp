@@ -505,7 +505,7 @@ namespace mitk
         basePath.cdUp();
         basePath.cdUp();
         basePath.cdUp();
-        provFile = basePath.absoluteFilePath(provFileName);
+        provFile.setFile(basePath.absoluteFilePath(provFileName));
       }
 #endif
 
@@ -694,11 +694,9 @@ namespace mitk
       defaultFormat.setSamples(0);
       QSurfaceFormat::setDefaultFormat(defaultFormat);
 
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
       QCoreApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
-
-      QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
       QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);

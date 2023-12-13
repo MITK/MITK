@@ -262,7 +262,7 @@ void QmitkFileSaveAction::Run()
   try
   {
     auto setPathProperty = true;
-    auto fileNames = QmitkIOUtil::Save(data, names, path, d->m_Action->parentWidget(), setPathProperty);
+    auto fileNames = QmitkIOUtil::Save(data, names, path, qobject_cast<QWidget*>(d->m_Action->parent()), setPathProperty);
 
     if (!fileNames.empty())
       d->SetLastFileSavePath(QFileInfo(fileNames.back()).absolutePath());

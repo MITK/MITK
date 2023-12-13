@@ -65,10 +65,10 @@ void QmitkColorWidget::SetColor(QColor color)
 
 void QmitkColorWidget::OnLineEditEditingFinished()
 {
-  if (!QColor::isValidColor(m_LineEdit->text()))
+  if (!QColor::isValidColorName(m_LineEdit->text()))
     m_LineEdit->setText("#000000");
 
-  m_Color.setNamedColor(m_LineEdit->text());
+  m_Color = QColor::fromString(m_LineEdit->text());
 }
 
 void QmitkColorWidget::OnButtonClicked()
@@ -166,7 +166,7 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
 
   if (data.isValid())
   {
-    if (data.type() == QVariant::Int)
+    if (data.typeId() == QMetaType::Int)
     {
       QSpinBox *spinBox = new QSpinBox(parent);
 
@@ -191,7 +191,7 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
       return spinBox;
     }
 
-    if (data.type() == QVariant::Double || static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
+    if (data.typeId() == QMetaType::Double || data.typeId() == QMetaType::Float)
     {
       QDoubleSpinBox *spinBox = new QDoubleSpinBox(parent);
 
@@ -228,7 +228,7 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
       return spinBox;
     }
 
-    if (data.type() == QVariant::StringList)
+    if (data.typeId() == QMetaType::QStringList)
     {
       QComboBox *comboBox = new QComboBox(parent);
       comboBox->setView(new QmitkComboBoxListView(comboBox));
@@ -240,7 +240,7 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
       return comboBox;
     }
 
-    if (data.type() == QVariant::Color)
+    if (data.typeId() == QMetaType::QColor)
     {
       QmitkColorWidget *colorWidget = new QmitkColorWidget(parent);
 
@@ -303,7 +303,7 @@ void QmitkPropertyItemDelegate::paint(QPainter *painter,
 {
   QVariant data = index.data();
 
-  if (index.column() == 1 && data.type() == QVariant::Color)
+  if (index.column() == 1 && data.typeId() == QMetaType::QColor)
   {
     painter->fillRect(option.rect, data.value<QColor>());
     return;
@@ -319,12 +319,12 @@ void QmitkPropertyItemDelegate::setEditorData(QWidget *editor, const QModelIndex
   if (!data.isValid())
     return;
 
-  if (data.type() == QVariant::StringList)
+  if (data.typeId() == QMetaType::QStringList)
   {
     QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
     comboBox->setCurrentIndex(comboBox->findText(index.data().toString()));
   }
-  if (data.type() == QVariant::Color)
+  if (data.typeId() == QMetaType::QColor)
   {
     QmitkColorWidget *colorWidget = qobject_cast<QmitkColorWidget *>(editor);
     colorWidget->SetColor(data.value<QColor>());
@@ -342,27 +342,27 @@ void QmitkPropertyItemDelegate::setModelData(QWidget *editor, QAbstractItemModel
   if (!data.isValid())
     return;
 
-  if (data.type() == QVariant::Int)
+  if (data.typeId() == QMetaType::Int)
   {
     QSpinBox *spinBox = qobject_cast<QSpinBox *>(editor);
     model->setData(index, spinBox->value());
   }
-  else if (data.type() == QVariant::Double)
+  else if (data.typeId() == QMetaType::Double)
   {
     QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>(editor);
     model->setData(index, spinBox->value());
   }
-  else if (static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
+  else if (data.typeId() == QMetaType::Float)
   {
     QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>(editor);
     model->setData(index, static_cast<float>(spinBox->value()));
   }
-  else if (data.type() == QVariant::StringList)
+  else if (data.typeId() == QMetaType::QStringList)
   {
     QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
     model->setData(index, comboBox->currentText());
   }
-  else if (data.type() == QVariant::Color)
+  else if (data.typeId() == QMetaType::QColor)
   {
     QmitkColorWidget *colorWidget = qobject_cast<QmitkColorWidget *>(editor);
     model->setData(index, colorWidget->GetColor());

@@ -536,9 +536,9 @@ namespace mitk
     // Prevent conflicts between native OpenGL applications and QWebEngine
     QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
 
-#ifdef Q_OS_LINUX
+/*#ifdef Q_OS_LINUX
     qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--single-process"); // See T29332
-#endif
+#endif*/
 
     // If parameters have been set before, we have to store them to hand them
     // through to the application

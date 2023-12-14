@@ -23,6 +23,19 @@ if(NOT DEFINED VTK_DIR)
     list(APPEND additional_cmake_args
       -DVTK_MODULE_USE_EXTERNAL_VTK_freetype:BOOL=ON
       )
+
+    if(NOT APPLE)
+      if(NOT DEFINED OpenGL_GL_PREFERENCE OR OpenGL_GL_PREFERENCE STREQUAL GLVND)
+        find_package(OpenGL REQUIRED OPTIONAL_COMPONENTS EGL)
+        if(TARGET OpenGL::EGL)
+          list(APPEND additional_cmake_args "-DVTK_OPENGL_HAS_EGL:BOOL=ON")
+        endif()
+      endif()
+      if(DEFINED OpenGL_GL_PREFERENCE)
+        list(APPEND additional_cmake_args "-DOpenGL_GL_PREFERENCE:STRING=${OpenGL_GL_PREFERENCE}")
+      endif()
+    endif()
+
   endif()
 
   # Optionally enable memory leak checks for any objects derived from vtkObject. This
@@ -56,7 +69,6 @@ if(NOT DEFINED VTK_DIR)
     CMAKE_GENERATOR_PLATFORM ${gen_platform}
     CMAKE_ARGS
       ${ep_common_args}
-      -DOpenGL_GL_PREFERENCE:STRING=LEGACY
       -DVTK_ENABLE_WRAPPING:BOOL=OFF
       -DVTK_LEGACY_REMOVE:BOOL=ON
       -DVTK_MODULE_ENABLE_VTK_TestingRendering:STRING=YES

@@ -698,9 +698,7 @@ namespace mitk
       QCoreApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
       QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-#endif
       QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
       d->m_QApp = this->getSingleMode()

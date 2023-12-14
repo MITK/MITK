@@ -33,20 +33,7 @@ QmitkEditableContourToolGUIBase::QmitkEditableContourToolGUIBase()
   m_ModeButtonGroup->addButton(m_Controls->m_AddMode, static_cast<int>(Mode::Add));
   m_ModeButtonGroup->addButton(m_Controls->m_SubtractMode, static_cast<int>(Mode::Subtract));
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
-  auto onModeToggled = [this](QAbstractButton* button) {
-    Mode mode = button == m_Controls->m_AddMode
-      ? Mode::Add
-      : Mode::Subtract;
-
-    this->OnModeToggled(mode);
-  };
-
-  connect(m_ModeButtonGroup, QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked), onModeToggled);
-#else
   connect(m_ModeButtonGroup, &QButtonGroup::idClicked, [this](int id) { this->OnModeToggled(static_cast<Mode>(id)); });
-#endif
-
   connect(this, &Self::NewToolAssociated, this, &Self::OnNewToolAssociated);
   connect(m_Controls->m_AutoCheck, &QCheckBox::toggled, this, &Self::OnAutoConfirm);
   connect(m_Controls->m_ConfirmButton, &QPushButton::clicked, this, &Self::OnConfirmSegmentation);

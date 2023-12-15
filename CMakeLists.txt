@@ -315,6 +315,10 @@ if(MITK_USE_Qt6)
       set(_compilers ${_compilers64})
     endif()
 
+    if(APPLE)
+      list(APPEND _compilers macos)
+    endif()
+
     foreach(_dir_candidate ${_dir_candidates})
       get_filename_component(_dir_candidate ${_dir_candidate} REALPATH)
       foreach(_compiler ${_compilers})

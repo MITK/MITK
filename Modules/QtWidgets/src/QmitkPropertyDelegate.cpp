@@ -43,7 +43,7 @@ void QmitkPropertyDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
   QString name = data.value<QString>();
 
-  if (index.column() == 1 && data.type() == QVariant::Color)
+  if (index.column() == 1 && data.typeId() == QMetaType::QColor)
   {
     QColor qcol = data.value<QColor>();
 
@@ -76,7 +76,7 @@ QWidget *QmitkPropertyDelegate::createEditor(QWidget *parent,
   {
     QWidget *editorWidget = nullptr;
 
-    if (data.type() == QVariant::Color)
+    if (data.typeId() == QMetaType::QColor)
     {
       auto colorBtn = new QPushButton(parent);
       QColor color = data.value<QColor>();
@@ -105,7 +105,7 @@ QWidget *QmitkPropertyDelegate::createEditor(QWidget *parent,
       editorWidget = colorBtn;
     }
 
-    else if (data.type() == QVariant::Int)
+    else if (data.typeId() == QMetaType::Int)
     {
       auto spinBox = new QSpinBox(parent);
       spinBox->setSingleStep(1);
@@ -113,9 +113,8 @@ QWidget *QmitkPropertyDelegate::createEditor(QWidget *parent,
       spinBox->setMaximum(std::numeric_limits<int>::max());
       editorWidget = spinBox;
     }
-    // see qt documentation. cast is correct, it would be obsolete if we
-    // store doubles
-    else if (static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
+
+    else if (data.typeId() == QMetaType::Float)
     {
       auto spinBox = new QDoubleSpinBox(parent);
       spinBox->setDecimals(2);
@@ -134,7 +133,7 @@ QWidget *QmitkPropertyDelegate::createEditor(QWidget *parent,
       editorWidget = spinBox;
     }
 
-    else if (data.type() == QVariant::StringList)
+    else if (data.typeId() == QMetaType::QStringList)
     {
       QStringList entries = data.value<QStringList>();
       auto comboBox = new QComboBox(parent);
@@ -168,20 +167,20 @@ void QmitkPropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &in
 
   if (data.isValid())
   {
-    if (data.type() == QVariant::Int)
+    if (data.typeId() == QMetaType::Int)
     {
       QSpinBox *spinBox = qobject_cast<QSpinBox *>(editor);
       spinBox->setValue(data.toInt());
     }
     // see qt documentation. cast is correct, it would be obsolete if we
     // store doubles
-    else if (static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
+    else if (data.typeId() == QMetaType::Float)
     {
       QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>(editor);
       spinBox->setValue(data.toDouble());
     }
 
-    else if (data.type() == QVariant::StringList)
+    else if (data.typeId() == QMetaType::QStringList)
     {
       QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
       QString displayString = displayData.value<QString>();
@@ -200,7 +199,7 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
 
   if (data.isValid())
   {
-    if (data.type() == QVariant::Color)
+    if (data.typeId() == QMetaType::QColor)
     {
       QWidget *colorBtn = qobject_cast<QWidget *>(editor);
       QVariant colorVariant;
@@ -208,7 +207,7 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
       model->setData(index, colorVariant);
     }
 
-    else if (data.type() == QVariant::Int)
+    else if (data.typeId() == QMetaType::Int)
     {
       QSpinBox *spinBox = qobject_cast<QSpinBox *>(editor);
       int intValue = spinBox->value();
@@ -218,7 +217,7 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
       model->setData(index, intValueVariant);
     }
 
-    else if (static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
+    else if (data.typeId() == QMetaType::Float)
     {
       QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>(editor);
       double doubleValue = spinBox->value();
@@ -228,7 +227,7 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
       model->setData(index, doubleValueVariant);
     }
 
-    else if (data.type() == QVariant::StringList)
+    else if (data.typeId() == QMetaType::QStringList)
     {
       QString displayData = data.value<QString>();
 

@@ -253,7 +253,7 @@ void CommandContributionItem::Update(const QString& /*id*/)
 {
   if (action)
   {
-    QWidget* parent = action->parentWidget();
+    auto parent = qobject_cast<QWidget*>(action->parent());
     if(qobject_cast<QMenu*>(parent))
     {
       this->UpdateMenuItem();

@@ -83,7 +83,7 @@ QtLocalPeer::QtLocalPeer(QObject *parent, const QString &appId) : QObject(parent
   prefix.truncate(6);
 
   QByteArray idc = id.toUtf8();
-  quint16 idNum = qChecksum(idc.constData(), idc.size());
+  quint16 idNum = qChecksum(idc);
   socketName = QLatin1String("qtsingleapp-") + prefix + QLatin1Char('-') + QString::number(idNum, 16);
 
 #if defined(Q_OS_WIN)

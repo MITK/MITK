@@ -423,9 +423,9 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
 
 void QmitkSliderLevelWindowWidget::enterEvent(QEnterEvent * /*event*/)
 {
-  QPoint p = QCursor::pos();
-  p = this->mapFromGlobal(p);
-  QMouseEvent ev(QEvent::MouseMove, p, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+  const auto pos = QCursor::pos();
+  const auto localPos = this->mapFromGlobal(pos);
+  QMouseEvent ev(QEvent::MouseMove, localPos, pos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
   this->mouseMoveEvent(&ev);
 }
 

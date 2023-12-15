@@ -85,7 +85,7 @@ bool QtDragManager::eventFilter(QObject* o, QEvent* e)
   if (e->type() == QEvent::MouseMove)
   {
     QMouseEvent* me = (QMouseEvent *) e;
-    this->Move(me->globalPos());
+    this->Move(me->globalPosition().toPoint());
     return true;
   }
   else if (e->type() == QEvent::MouseButtonRelease)

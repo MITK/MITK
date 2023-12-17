@@ -592,9 +592,12 @@ namespace mitk
     {
       d->m_FWProps[ctkPluginConstants::FRAMEWORK_STORAGE] = storageDir;
 
+      if (!(storageDir.endsWith('/') || storageDir.endsWith('\\')))
+        storageDir.append('/');
+
       // Initialize core service preferences at the exact same location as their predecessor BlueBerry preferences
       mitk::CoreServicePointer preferencesService(mitk::CoreServices::GetPreferencesService());
-      preferencesService->InitializeStorage(storageDir.toStdString() + "/data/3/prefs.xml");
+      preferencesService->InitializeStorage(storageDir.toStdString() + "data/3/prefs.xml");
     }
 
     // 7. Set the library search paths and the pre-load library property

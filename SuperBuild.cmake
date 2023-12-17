@@ -134,7 +134,11 @@ if(_has_rpath_flag)
   if(APPLE)
     set(_install_rpath_linkflag "-Wl,-rpath,@loader_path/../lib")
   else()
-    set(_install_rpath_linkflag "-Wl,-rpath='$ORIGIN/../lib'")
+    set(_install_rpath_linkflag "-Wl,-rpath='$ORIGIN/../lib")
+    if(Qt6_DIR)
+      set(_install_rpath_linkflag "${_install_rpath_linkflag}:${Qt6_DIR}/../..")
+    endif()
+    set(_install_rpath_linkflag "${_install_rpath_linkflag}'")
   endif()
 endif()
 
@@ -144,6 +148,9 @@ if(APPLE)
 elseif(UNIX)
   # this work for libraries as well as executables
   set(_install_rpath "\$ORIGIN/../lib")
+  if(Qt6_DIR)
+    set(_install_rpath "${_install_rpath}:${Qt6_DIR}/../..")
+  endif()
 endif()
 
 set(ep_common_args

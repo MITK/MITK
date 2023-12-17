@@ -72,7 +72,8 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
       while (!feof(f))
       {
         char s[300], *p;
-        fgets(s, 200, f);
+        if (fgets(s, 200, f) == nullptr)
+          throw itk::ImageFileReaderException(__FILE__, __LINE__, "Could not read header");
         if (strstr(s, "Max. number of cardiac phases"))
         {
           p = strchr(s, ':') + 1;
@@ -217,7 +218,8 @@ void mitk::ParRecFileReader::GenerateData()
             fseek(f, slicePlusTimeSize * z + (sliceSize + 1) * t, SEEK_SET);
           else
             fseek(f, slicePlusTimeSize * z + sliceSize * t, SEEK_SET);
-          fread(data, sliceSize, 1, f);
+          if(fread(data, sliceSize, 1, f) < 1)
+            throw itk::ImageFileReaderException(__FILE__, __LINE__, "Could not read slice.");
           output->SetSlice(data, z, t, 0);
         }
     }

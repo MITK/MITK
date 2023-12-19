@@ -365,7 +365,13 @@ endif()
 if(MITK_USE_Python3)
   set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
 
-  find_package(Python3 3.9 REQUIRED COMPONENTS Interpreter Development NumPy)
+  if(APPLE)
+    set(python3_mininum_version 3.11)
+  else()
+    set(python3_mininum_version 3.8)
+  endif()
+
+  find_package(Python3 ${python3_mininum_version} REQUIRED COMPONENTS Interpreter Development NumPy)
 
   if(WIN32)
     string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")

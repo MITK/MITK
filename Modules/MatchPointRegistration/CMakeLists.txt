@@ -15,6 +15,12 @@ add_subdirectory(autoload/IO)
 add_subdirectory(cmdapps)
 
 if(TARGET ${MODULE_TARGET})
+  if(MSVC)
+    # Warning 4834 leaks into MITK from MatchPoint (remove after MatchPoint is fixed):
+    # Discarding return value of function with nodiscard attribute.
+    target_compile_options(${MODULE_TARGET} PUBLIC /wd4834)
+  endif()
+
   set(ALG_PROFILE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/algorithms)
 
   include(${MatchPoint_SOURCE_DIR}/CMake/mapFunctionCreateAlgorithmProfile.cmake)

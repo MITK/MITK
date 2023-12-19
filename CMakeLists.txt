@@ -365,11 +365,7 @@ endif()
 if(MITK_USE_Python3)
   set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
 
-  if(APPLE AND CMAKE_FRAMEWORK_PATH AND CMAKE_FRAMEWORK_PATH MATCHES "python3\\.?([0-9]+)")
-    find_package(Python3 3.${CMAKE_MATCH_1} EXACT REQUIRED COMPONENTS Interpreter Development NumPy)
-  else()
-    find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
-  endif()
+  find_package(Python3 3.9 REQUIRED COMPONENTS Interpreter Development NumPy)
 
   if(WIN32)
     string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")

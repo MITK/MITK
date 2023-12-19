@@ -212,7 +212,7 @@ QmitkNodeDescriptorManager::~QmitkNodeDescriptorManager()
   // qDeleteAll(m_NodeDescriptors);
 }
 
-QmitkNodeDescriptor *QmitkNodeDescriptorManager::GetUnknownDataNodeDescriptor()
+QmitkNodeDescriptor *QmitkNodeDescriptorManager::GetUnknownDataNodeDescriptor() const
 {
   return m_UnknownDataNodeDescriptor;
 }

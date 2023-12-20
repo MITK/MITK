@@ -18,7 +18,59 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
-using namespace nlohmann;
+using CondensedTimeKeyType = std::pair<mitk::TimeStepType, mitk::TimeStepType>;
+using CondensedTimePointsType = std::map<CondensedTimeKeyType, std::string>;
+
+using CondensedSliceKeyType = std::pair<mitk::TemporoSpatialStringProperty::IndexValueType, mitk::TemporoSpatialStringProperty::IndexValueType>;
+using CondensedSlicesType = std::map<CondensedSliceKeyType, CondensedTimePointsType>;
+
+namespace
+{
+  /** Helper function that checks if between an ID and a successive ID is no gap.*/
+  template<typename TValue>
+  bool isGap(const TValue& value, const TValue& successor)
+  {
+    return value<successor || value > successor + 1;
+  }
+
+
+  template<typename TNewKey, typename TNewValue, typename TMasterKey, typename TMasterValue, typename TCondensedContainer>
+  void CheckAndCondenseElement(const TNewKey& newKeyMinID, const TNewValue& newValue, TMasterKey& masterKey, TMasterValue& masterValue, TCondensedContainer& condensedContainer)
+  {
+    if (newValue != masterValue
+      || isGap(newKeyMinID, masterKey.second))
+    {
+      condensedContainer[masterKey] = masterValue;
+      masterValue = newValue;
+      masterKey.first = newKeyMinID;
+    }
+    masterKey.second = newKeyMinID;
+  }
+
+  /** Helper function that tries to condense the values of time points for a slice as much as possible and returns all slices with condensed timepoint values.*/
+  CondensedSlicesType CondenseTimePointValuesOfProperty(const mitk::TemporoSpatialStringProperty* tsProp)
+  {
+    CondensedSlicesType uncondensedSlices;
+
+    auto zs = tsProp->GetAvailableSlices();
+    for (const auto z : zs)
+    {
+      CondensedTimePointsType condensedTimePoints;
+      auto timePointIDs = tsProp->GetAvailableTimeSteps(z);
+      CondensedTimeKeyType condensedKey = { timePointIDs.front(),timePointIDs.front() };
+      auto refValue = tsProp->GetValue(timePointIDs.front(), z);
+
+      for (const auto timePointID : timePointIDs)
+      {
+        const auto& newVal = tsProp->GetValue(timePointID, z);
+        CheckAndCondenseElement(timePointID, newVal, condensedKey, refValue, condensedTimePoints);
+      }
+      condensedTimePoints[condensedKey] = refValue;
+      uncondensedSlices[{ z, z }] = condensedTimePoints;
+    }
+    return uncondensedSlices;
+  }
+}
 
 mitk::TemporoSpatialStringProperty::TemporoSpatialStringProperty(const char *s)
 {
@@ -267,212 +319,67 @@ void mitk::TemporoSpatialStringProperty::SetValue(const ValueType &value)
   this->SetValue(0, 0, value);
 };
 
-// Create necessary escape sequences from illegal characters
-// REMARK: This code is based upon code from boost::ptree::json_writer.
-// The corresponding boost function was not used directly, because it is not part of
-// the public interface of ptree::json_writer. :(
-// A own serialization strategy was implemented instead of using boost::ptree::json_write because
-// currently (<= boost 1.60) everything (even numbers) are converted into string representations
-// by the writer, so e.g. it becomes "t":"2" instead of "t":2
-template <class Ch>
-std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
+bool mitk::TemporoSpatialStringProperty::ToJSON(nlohmann::json& j) const
 {
-  std::basic_string<Ch> result;
-  typename std::basic_string<Ch>::const_iterator b = s.begin();
-  typename std::basic_string<Ch>::const_iterator e = s.end();
-  while (b != e)
-  {
-    using UCh = std::make_unsigned_t<Ch>;
-    UCh c(*b);
-    // This assumes an ASCII superset.
-    // We escape everything outside ASCII, because this code can't
-    // handle high unicode characters.
-    if (c == 0x20 || c == 0x21 || (c >= 0x23 && c <= 0x2E) || (c >= 0x30 && c <= 0x5B) || (c >= 0x5D && c <= 0x7F))
-      result += *b;
-    else if (*b == Ch('\b'))
-      result += Ch('\\'), result += Ch('b');
-    else if (*b == Ch('\f'))
-      result += Ch('\\'), result += Ch('f');
-    else if (*b == Ch('\n'))
-      result += Ch('\\'), result += Ch('n');
-    else if (*b == Ch('\r'))
-      result += Ch('\\'), result += Ch('r');
-    else if (*b == Ch('\t'))
-      result += Ch('\\'), result += Ch('t');
-    else if (*b == Ch('/'))
-      result += Ch('\\'), result += Ch('/');
-    else if (*b == Ch('"'))
-      result += Ch('\\'), result += Ch('"');
-    else if (*b == Ch('\\'))
-      result += Ch('\\'), result += Ch('\\');
-    else
-    {
-      const char *hexdigits = "0123456789ABCDEF";
-      unsigned long u = (std::min)(static_cast<unsigned long>(static_cast<UCh>(*b)), 0xFFFFul);
-      int d1 = u / 4096;
-      u -= d1 * 4096;
-      int d2 = u / 256;
-      u -= d2 * 256;
-      int d3 = u / 16;
-      u -= d3 * 16;
-      int d4 = u;
-      result += Ch('\\');
-      result += Ch('u');
-      result += Ch(hexdigits[d1]);
-      result += Ch(hexdigits[d2]);
-      result += Ch(hexdigits[d3]);
-      result += Ch(hexdigits[d4]);
-    }
-    ++b;
-  }
-  return result;
-}
-
-using CondensedTimeKeyType = std::pair<mitk::TimeStepType, mitk::TimeStepType>;
-using CondensedTimePointsType = std::map<CondensedTimeKeyType, std::string>;
-
-using CondensedSliceKeyType = std::pair<mitk::TemporoSpatialStringProperty::IndexValueType, mitk::TemporoSpatialStringProperty::IndexValueType>;
-using CondensedSlicesType = std::map<CondensedSliceKeyType, CondensedTimePointsType>;
-
-/** Helper function that checks if between an ID and a successive ID is no gap.*/
-template<typename TValue>
-bool isGap(const TValue& value, const TValue& successor)
-{
-  return value<successor || value > successor + 1;
-}
-
-
-template<typename TNewKey, typename TNewValue, typename TMasterKey, typename TMasterValue, typename TCondensedContainer>
-void CheckAndCondenseElement(const TNewKey& newKeyMinID, const TNewValue& newValue, TMasterKey& masterKey, TMasterValue& masterValue, TCondensedContainer& condensedContainer)
-{
-  if (newValue != masterValue
-    || isGap(newKeyMinID, masterKey.second))
-  {
-    condensedContainer[masterKey] = masterValue;
-    masterValue = newValue;
-    masterKey.first = newKeyMinID;
-  }
-  masterKey.second = newKeyMinID;
-}
-
-/** Helper function that tries to condense the values of time points for a slice as much as possible and returns all slices with condensed timepoint values.*/
-CondensedSlicesType CondenseTimePointValuesOfProperty(const mitk::TemporoSpatialStringProperty* tsProp)
-{
-  CondensedSlicesType uncondensedSlices;
-
-  auto zs = tsProp->GetAvailableSlices();
-  for (const auto z : zs)
-  {
-    CondensedTimePointsType condensedTimePoints;
-    auto timePointIDs = tsProp->GetAvailableTimeSteps(z);
-    CondensedTimeKeyType condensedKey = { timePointIDs.front(),timePointIDs.front() };
-    auto refValue = tsProp->GetValue(timePointIDs.front(), z);
-
-    for (const auto timePointID : timePointIDs)
-    {
-      const auto& newVal = tsProp->GetValue(timePointID, z);
-      CheckAndCondenseElement(timePointID, newVal, condensedKey, refValue, condensedTimePoints);
-    }
-    condensedTimePoints[condensedKey] = refValue;
-    uncondensedSlices[{ z, z }] = condensedTimePoints;
-  }
-  return uncondensedSlices;
-}
-
-::std::string mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(
-  const mitk::BaseProperty *prop)
-{
-  // REMARK: Implemented own serialization instead of using boost::ptree::json_write because
-  // currently (<= boost 1.60) everything (even numbers) are converted into string representations
-  // by the writer, so e.g. it becomes "t":"2" instead of "t":2
-  // If this problem is fixed with boost, we should switch back to json_writer (and remove the custom
-  // implementation of CreateJSONEscapes (see above)).
-  const auto *tsProp = dynamic_cast<const mitk::TemporoSpatialStringProperty *>(prop);
-
-  if (!tsProp)
-  {
-    mitkThrow() << "Cannot serialize properties of types other than TemporoSpatialStringProperty.";
-  }
-
-  std::ostringstream stream;
-  stream.imbue(std::locale("C"));
-  stream << "{\"values\":[";
-
-  //we condense the content of the property to have a compact serialization.
-  //we start with condensing time points and then slices (in difference to the
-  //internal layout). Reason: There is more entropy in slices (looking at DICOM)
-  //than across time points for one slice, so we can "compress" to a higher rate.
-  //We don't wanted to change the internal structure of the property as it would
-  //introduce API inconvenience and subtle changes in behavior.
-  CondensedSlicesType uncondensedSlices = CondenseTimePointValuesOfProperty(tsProp);
-
-  //now condense the slices
+  // We condense the content of the property to have a compact serialization.
+  // We start with condensing time points and then slices (in difference to the
+  // internal layout). Reason: There is more entropy in slices (looking at DICOM)
+  // than across time points for one slice, so we can "compress" at a higher rate.
+  // We didn't want to change the internal structure of the property as it would
+  // introduce API inconvenience and subtle changes in behavior.
+  auto uncondensedSlices = CondenseTimePointValuesOfProperty(this);
   CondensedSlicesType condensedSlices;
+
   if(!uncondensedSlices.empty())
   {
-    CondensedTimePointsType& masterSlice = uncondensedSlices.begin()->second;
-    CondensedSliceKeyType masterSliceKey = uncondensedSlices.begin()->first;
+    auto& masterSlice = uncondensedSlices.begin()->second;
+    auto masterSliceKey = uncondensedSlices.begin()->first;
 
     for (const auto& uncondensedSlice : uncondensedSlices)
     {
       const auto& uncondensedSliceID = uncondensedSlice.first.first;
       CheckAndCondenseElement(uncondensedSliceID, uncondensedSlice.second, masterSliceKey, masterSlice, condensedSlices);
     }
+
     condensedSlices[masterSliceKey] = masterSlice;
   }
 
+  auto values = nlohmann::json::array();
 
-  bool first = true;
   for (const auto& z : condensedSlices)
   {
     for (const auto& t : z.second)
     {
-      if (first)
-      {
-        first = false;
-      }
-      else
-      {
-        stream << ", ";
-      }
-
       const auto& minSliceID = z.first.first;
       const auto& maxSliceID = z.first.second;
       const auto& minTimePointID = t.first.first;
       const auto& maxTimePointID = t.first.second;
 
-      stream << "{\"z\":" << minSliceID << ", ";
-      if (minSliceID != maxSliceID)
-      {
-        stream << "\"zmax\":" << maxSliceID << ", ";
-      }
-      stream << "\"t\":" << minTimePointID << ", ";
-      if (minTimePointID != maxTimePointID)
-      {
-        stream << "\"tmax\":" << maxTimePointID << ", ";
-      }
+      auto value = nlohmann::json::object();
+      value["z"] = minSliceID;
 
-      const auto& value = t.second;
-      stream << "\"value\":\"" << CreateJSONEscapes(value) << "\"}";
+      if (minSliceID != maxSliceID)
+        value["zmax"] = maxSliceID;
+
+      value["t"] = minTimePointID;
+
+      if (minTimePointID != maxTimePointID)
+        value["tmax"] = maxTimePointID;
+
+      value["value"] = t.second;
+
+      values.push_back(value);
     }
   }
 
-  stream << "]}";
+  j = nlohmann::json{{"values", values}};
 
-  return stream.str();
+  return true;
 }
 
-mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializeJSONToTemporoSpatialStringProperty(
-  const std::string &value)
+bool mitk::TemporoSpatialStringProperty::FromJSON(const nlohmann::json& j)
 {
-  if (value.empty())
-    return nullptr;
-
-  mitk::TemporoSpatialStringProperty::Pointer prop = mitk::TemporoSpatialStringProperty::New();
-
-  auto root = json::parse(value);
-
-  for (const auto& element : root["values"])
+  for (const auto& element : j["values"])
   {
     auto value = element.value("value", "");
     auto z = element.value<TemporoSpatialStringProperty::IndexValueType>("z", 0);
@@ -484,10 +391,36 @@ mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializ
     {
       for (auto currentZ = z; currentZ <= zmax; ++currentZ)
       {
-        prop->SetValue(currentT, currentZ, value);
+        this->SetValue(currentT, currentZ, value);
       }
     }
   }
+
+  return true;
+}
+
+std::string mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(const mitk::BaseProperty *prop)
+{
+  const auto *tsProp = dynamic_cast<const mitk::TemporoSpatialStringProperty *>(prop);
+
+  if (!tsProp)
+    mitkThrow() << "Cannot serialize properties of types other than TemporoSpatialStringProperty.";
+
+  nlohmann::json j;
+  tsProp->ToJSON(j);
+
+  return j.dump();
+}
+
+mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializeJSONToTemporoSpatialStringProperty(const std::string &value)
+{
+  if (value.empty())
+    return nullptr;
+
+  auto prop = mitk::TemporoSpatialStringProperty::New();
+
+  auto root = nlohmann::json::parse(value);
+  prop->FromJSON(root);
 
   return prop.GetPointer();
 }

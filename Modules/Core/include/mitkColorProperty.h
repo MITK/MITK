@@ -13,9 +13,12 @@ found in the LICENSE file.
 #ifndef mitkColorProperty_h
 #define mitkColorProperty_h
 
-#include "mitkBaseProperty.h"
+#include <mitkBaseProperty.h>
 #include <MitkCoreExports.h>
+
 #include <itkRGBPixel.h>
+
+#include <nlohmann/json.hpp>
 
 namespace mitk
 {
@@ -75,6 +78,9 @@ namespace mitk
     void SetValue(const mitk::Color &color);
     void SetColor(float red, float green, float blue);
 
+    bool ToJSON(nlohmann::json &j) const override;
+    bool FromJSON(const nlohmann::json &j) override;
+
     using BaseProperty::operator=;
 
   private:
@@ -92,5 +98,24 @@ namespace mitk
 #endif
 
 } // namespace mitk
+
+namespace itk
+{
+  template <typename TComponent>
+  void to_json(nlohmann::json& j, const RGBPixel<TComponent>& c)
+  {
+    j = nlohmann::json::array();
+
+    for (size_t i = 0; i < 3; ++i)
+      j.push_back(c[i]);
+  }
+
+  template <typename TComponent>
+  void from_json(const nlohmann::json& j, RGBPixel<TComponent>& c)
+  {
+    for (size_t i = 0; i < 3; ++i)
+      j.at(i).get_to(c[i]);
+  }
+} // namespace itk
 
 #endif

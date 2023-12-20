@@ -253,13 +253,11 @@ int testItkImageIsCenterBased()
   mitk::Point3D globalOrigin;
   mitk::FillVector3D(globalOrigin, 0, 0, 0);
 
-  itk::ContinuousIndex<mitk::ScalarType, 3> originContinuousIndex;
-  itkintimage->TransformPhysicalPointToContinuousIndex(origin, originContinuousIndex);
+  auto originContinuousIndex = itkintimage->TransformPhysicalPointToContinuousIndex<mitk::ScalarType, mitk::ScalarType>(origin);
   MITK_TEST_CONDITION_REQUIRED(originContinuousIndex == globalOrigin, "");
 
   MITK_TEST_OUTPUT(<< " Testing itk::Image::TransformPhysicalPointToIndex(origin)==(0,0,0)");
-  itk::Index<3> itkindex;
-  itkintimage->TransformPhysicalPointToIndex(origin, itkindex);
+  itk::Index<3> itkindex = itkintimage->TransformPhysicalPointToIndex(origin);
   itk::Index<3> globalOriginIndex;
   mitk::vtk2itk(globalOrigin, globalOriginIndex);
   MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
@@ -268,21 +266,21 @@ int testItkImageIsCenterBased()
   mitk::Vector3D halfSpacingStep = itkintimage->GetSpacing() * 0.5;
   mitk::Matrix3D rotation;
   mitk::Point3D originOffCenter = origin - halfSpacingStep;
-  itkintimage->TransformPhysicalPointToIndex(originOffCenter, itkindex);
+  itkindex = itkintimage->TransformPhysicalPointToIndex(originOffCenter);
   MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
 
   MITK_TEST_OUTPUT(
     << " Testing itk::Image::TransformPhysicalPointToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)");
   originOffCenter = origin + halfSpacingStep;
   originOffCenter -= mitk::Vector(0.0001);
-  itkintimage->TransformPhysicalPointToIndex(originOffCenter, itkindex);
+  itkindex = itkintimage->TransformPhysicalPointToIndex(originOffCenter);
   MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
 
   MITK_TEST_OUTPUT(<< " Testing itk::Image::TransformPhysicalPointToIndex(origin+0.5*spacing, itk::Index)==(1,1,1)");
   originOffCenter = origin + halfSpacingStep;
   itk::Index<3> global111;
   mitk::FillVector3D(global111, 1, 1, 1);
-  itkintimage->TransformPhysicalPointToIndex(originOffCenter, itkindex);
+  itkindex = itkintimage->TransformPhysicalPointToIndex(originOffCenter);
   MITK_TEST_CONDITION_REQUIRED(itkindex == global111, "");
 
   MITK_TEST_OUTPUT(<< "=> Yes, itk::Image coordinates are center-based.");

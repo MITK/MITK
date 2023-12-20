@@ -120,6 +120,9 @@ namespace mitk
 
     std::string GetValueAsString() const override;
 
+    bool ToJSON(nlohmann::json& j) const override;
+    bool FromJSON(const nlohmann::json& j) override;
+
   protected:
     TubeGraphProperty();
     TubeGraphProperty(const TubeGraphProperty &other);

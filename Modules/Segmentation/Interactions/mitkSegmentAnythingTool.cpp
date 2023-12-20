@@ -252,12 +252,26 @@ void mitk::SegmentAnythingTool::ITKWindowing(const itk::Image<TPixel, VImageDime
   filter->GetOutput()->GetPixelContainer()->ContainerManageMemoryOff();
 }
 
+namespace
+{
+  // Checks if the image has valid size across each dimension. The check is
+  // critical for 2D images since 2D image are not valid in Saggital and Coronal views.
+  bool IsImageAtTimeStepValid(const mitk::Image *inputAtTimeStep)
+  {
+    int total = 0;
+    total += (inputAtTimeStep->GetDimension(0) > 1);
+    total += (inputAtTimeStep->GetDimension(1) > 1);
+    total += (inputAtTimeStep->GetDimension(2) > 1);
+    return (total > 1);
+  }
+}
+
 void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                 const Image * /*oldSegAtTimeStep*/,
                                                 LabelSetImage *previewImage,
                                                 TimeStepType timeStep)
 {
-  if (nullptr != previewImage && m_PointSetPositive.IsNotNull())
+  if (nullptr != previewImage && m_PointSetPositive.IsNotNull() && ::IsImageAtTimeStepValid(inputAtTimeStep))
   {
     if (this->HasPicks() && nullptr != m_PythonService)
     {

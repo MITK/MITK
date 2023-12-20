@@ -694,6 +694,11 @@ vtkMatrix4x4 *mitk::BaseGeometry::GetVtkMatrix()
   return m_GeometryTransform->GetVtkMatrix();
 }
 
+const vtkMatrix4x4* mitk::BaseGeometry::GetVtkMatrix() const
+{
+  return m_GeometryTransform->GetVtkMatrix();
+}
+
 bool mitk::BaseGeometry::IsBoundingBoxNull() const
 {
   return m_BoundingBox.IsNull();

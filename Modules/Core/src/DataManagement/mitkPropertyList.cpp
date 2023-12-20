@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPropertyList.h"
-
-#include "mitkNumericTypes.h"
-#include "mitkProperties.h"
-#include "mitkStringProperty.h"
+#include <mitkPropertyList.h>
+#include <mitkCoreServices.h>
+#include <mitkIPropertyDeserialization.h>
+#include <mitkProperties.h>
+#include <mitkStringProperty.h>
 
 mitk::BaseProperty::ConstPointer mitk::PropertyList::GetConstProperty(const std::string &propertyKey, const std::string &/*contextName*/, bool /*fallBackOnDefaultContext*/) const
 {
@@ -373,4 +373,50 @@ bool mitk::PropertyList::GetDoubleProperty(const char *propertyKey, double &doub
 void mitk::PropertyList::SetDoubleProperty(const char *propertyKey, double doubleValue)
 {
   SetProperty(propertyKey, mitk::DoubleProperty::New(doubleValue));
+}
+
+void mitk::PropertyList::ToJSON(nlohmann::json& j) const
+{
+  j = nlohmann::json::object();
+
+  for (const auto& [name, property] : m_Properties)
+  {
+    nlohmann::json serializedProperty;
+
+    if (property->ToJSON(serializedProperty))
+      j[property->GetNameOfClass()][name] = serializedProperty;
+  }
+
+  auto test = PropertyList::New();
+  test->FromJSON(j);
+}
+
+void mitk::PropertyList::FromJSON(const nlohmann::json& j)
+{
+  mitk::CoreServicePointer<mitk::IPropertyDeserialization> service(mitk::CoreServices::GetPropertyDeserialization());
+  PropertyMap properties;
+
+  auto jObject = j.get<nlohmann::json::object_t>();
+
+  for (const auto& [type, serializedProperties] : jObject)
+  {
+    auto prototype = service->CreateInstance(type);
+
+    if (prototype.IsNull())
+    {
+      MITK_ERROR << "Cannot create instance(s) of class \"" << type << "\"!";
+      continue;
+    }
+
+    auto serializedPropertiesObject = serializedProperties.get<nlohmann::json::object_t>();
+
+    for (const auto& [name, serializedProperty] : serializedPropertiesObject)
+    {
+      BaseProperty::Pointer property = static_cast<BaseProperty*>(prototype->CreateAnother().GetPointer());
+      property->FromJSON(serializedProperty);
+      properties[name] = property;
+    }
+  }
+
+  m_Properties = properties;
 }

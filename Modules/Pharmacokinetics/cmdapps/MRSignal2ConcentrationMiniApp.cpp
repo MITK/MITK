@@ -36,7 +36,6 @@ bool verbose(false);
 
 bool t1_absolute(false);
 bool t1_relative(false);
-bool t1_flash(false);
 bool t2(false);
 
 float k(1.0);
@@ -76,8 +75,6 @@ void setupParser(mitkCommandLineParser& parser)
       "t1-absolute", "", mitkCommandLineParser::Bool, "T1 absolute signal enhancement", "Activate conversion for T1 absolute signal enhancement.");
     parser.addArgument(
       "t1-relative", "", mitkCommandLineParser::Bool, "T1 relative signal enhancement", "Activate conversion for T1 relative signal enhancement.");
-    parser.addArgument(
-      "t1-flash", "", mitkCommandLineParser::Bool, "T1 turbo flash", "Activate specific conversion for T1 turbo flash sequences.");
     parser.addArgument(
       "t2", "", mitkCommandLineParser::Bool, "T2 signal conversion", "Activate conversion for T2 signal enhancement to concentration.");
 
@@ -126,11 +123,6 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
       t1_relative = us::any_cast<bool>(parsedArgs["t1-relative"]);
     }
 
-    t1_flash = false;
-    if (parsedArgs.count("t1-flash"))
-    {
-      t1_flash = us::any_cast<bool>(parsedArgs["t1-flash"]);
-    }
 
     t2 = false;
     if (parsedArgs.count("t2"))
@@ -171,7 +163,6 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
     //consistency checks
     int modeCount = 0;
     if (t1_absolute) ++modeCount;
-    if (t1_flash) ++modeCount;
     if (t1_relative) ++modeCount;
     if (t2) ++modeCount;
 
@@ -195,10 +186,6 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
       mitkThrow() << "Invalid program call. Please set 'te', if you use t2 mode.";
     }
 
-    if ((!rec_time||!rel_time||!relaxivity) && t1_flash)
-    {
-      mitkThrow() << "Invalid program call. Please set 'recovery-time', 'relaxation-time' and 'relaxivity', if you use t1-flash mode.";
-    }
 
     return true;
 }
@@ -209,19 +196,13 @@ void doConversion()
       mitk::ConcentrationCurveGenerator::New();
     concentrationGen->SetDynamicImage(image);
 
-    concentrationGen->SetisTurboFlashSequence(t1_flash);
+    //concentrationGen->SetisTurboFlashSequence(t1_flash);
     concentrationGen->SetAbsoluteSignalEnhancement(t1_absolute);
     concentrationGen->SetRelativeSignalEnhancement(t1_relative);
 
     concentrationGen->SetisT2weightedImage(t2);
 
-    if (t1_flash)
-    {
-      concentrationGen->SetRecoveryTime(rec_time);
-      concentrationGen->SetRelaxationTime(rel_time);
-      concentrationGen->SetRelaxivity(relaxivity);
-    }
-    else if (t2)
+    if (t2)
     {
       concentrationGen->SetT2Factor(k);
       concentrationGen->SetT2EchoTime(te);

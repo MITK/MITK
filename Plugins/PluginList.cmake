@@ -13,7 +13,6 @@ set(MITK_PLUGINS
   org.blueberry.ui.qt.objectinspector:OFF
   org.mitk.core.services:ON
   org.mitk.gui.common:ON
-  org.mitk.planarfigure:ON
   org.mitk.core.jobs:OFF
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.ext:OFF
@@ -22,7 +21,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.common:ON
   org.mitk.gui.qt.stdmultiwidgeteditor:ON
   org.mitk.gui.qt.mxnmultiwidgeteditor:OFF
-  org.mitk.gui.qt.cmdlinemodules:OFF
   org.mitk.gui.qt.chartExample:OFF
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.datamanagerlight:OFF

@@ -29,6 +29,7 @@ found in the LICENSE file.
 
 #include <usModuleSettings.h>
 
+#include <vtkLogger.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <QVTKOpenGLNativeWidget.h>
 
@@ -43,7 +44,30 @@ found in the LICENSE file.
 
 namespace
 {
-  void outputQtMessage(QtMsgType type, const QMessageLogContext&, const QString& msg)
+  void outputImportantQtMessage(QtMsgType type, const QMessageLogContext&, const QString& msg)
+  {
+    auto message = msg.toStdString();
+
+    switch (type)
+    {
+    case QtWarningMsg:
+      MITK_WARN << message;
+      break;
+
+    case QtCriticalMsg:
+      MITK_ERROR << message;
+      break;
+
+    case QtFatalMsg:
+      MITK_ERROR << message;
+      abort();
+
+    default:
+      break;
+    }
+  }
+
+  void outputQtMessage(QtMsgType type, const QMessageLogContext& context, const QString& msg)
   {
     auto message = msg.toStdString();
 
@@ -58,16 +82,14 @@ namespace
         break;
 
       case QtWarningMsg:
-        MITK_WARN << message;
-        break;
+        [[fallthrough]];
 
       case QtCriticalMsg:
-        MITK_ERROR << message;
-        break;
+        [[fallthrough]];
 
       case QtFatalMsg:
-        MITK_ERROR << message;
-        abort();
+        outputImportantQtMessage(type, context, msg);
+        break;
 
       default:
         MITK_INFO << message;
@@ -528,8 +550,9 @@ namespace mitk
     this->setOrganizationName(orgName);
     this->setOrganizationDomain(orgDomain);
 
-    if (d->m_LogQtMessages)
-      qInstallMessageHandler(outputQtMessage);
+    qInstallMessageHandler(!d->m_LogQtMessages
+      ? outputImportantQtMessage
+      : outputQtMessage);
 
     QWebEngineUrlScheme qtHelpScheme("qthelp");
     qtHelpScheme.setFlags(QWebEngineUrlScheme::LocalScheme | QWebEngineUrlScheme::LocalAccessAllowed);
@@ -663,6 +686,8 @@ namespace mitk
   {
     if (nullptr == qApp)
     {
+      vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_WARNING);
+
       vtkOpenGLRenderWindow::SetGlobalMaximumNumberOfMultiSamples(0);
 
       auto defaultFormat = QVTKOpenGLNativeWidget::defaultFormat();

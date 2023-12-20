@@ -426,7 +426,7 @@ directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv 
 \imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator Settings",5}
 
 \subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow:
-    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 2.0.2) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 2.0.5) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
     Once installed, the "Install TotalSegmentator" button is grayed out.
     -# If Python is not found by MITK goto "Install Options" & select the "System Python Path" drop-down to see if MITK has automatically detected other Python environments.
     Click on a fitting Python installation for TotalSegmentator to use or click "Select" in the dropdown to choose an unlisted installation of Python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".

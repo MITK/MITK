@@ -101,8 +101,6 @@ EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter<TImageType, TH
 ::AddOffsets( const std::vector<OffsetType> _offsets )
 {
   OffsetVectorPointer offsetVector = OffsetVector::New();
-  typename OffsetVector::ConstIterator offsets;
-  //MITK_WARN << "We have " << this->GetOffsets()->size() << " offsets!";
   for( std::size_t i = 0; i < _offsets.size(); i++)
   {
   offsetVector->push_back(_offsets[i]);

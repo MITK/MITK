@@ -42,6 +42,13 @@ QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidg
 
 QmitkSynchronizedNodeSelectionWidget::~QmitkSynchronizedNodeSelectionWidget()
 {
+  bool isSynchronized = this->IsSynchronized();
+  if (isSynchronized)
+  {
+    emit DeregisterSynchronization();
+    return;
+  }
+
   auto baseRenderer = m_BaseRenderer.Lock();
   if (baseRenderer.IsNull())
   {
@@ -54,18 +61,14 @@ QmitkSynchronizedNodeSelectionWidget::~QmitkSynchronizedNodeSelectionWidget()
     return;
   }
 
-  bool isSynchronized = this->IsSynchronized();
-  if (!isSynchronized)
+  // If the model is not synchronized,
+  // we know that renderer-specific properties exist for all nodes.
+  // These properties need to be removed from the nodes.
+  auto allNodes = dataStorage->GetAll();
+  for (auto& node : *allNodes)
   {
-    // If the model is not synchronizes,
-    // we know that renderer-specific properties exist for all nodes.
-    // These properties need to be removed from the nodes.
-    auto allNodes = dataStorage->GetAll();
-    for (auto& node : *allNodes)
-    {
-      // Delete the relevant renderer-specific properties for the node using the current base renderer.
-      mitk::RenderWindowLayerUtilities::DeleteRenderWindowProperties(node, baseRenderer);
-    }
+    // Delete the relevant renderer-specific properties for the node using the current base renderer.
+    mitk::RenderWindowLayerUtilities::DeleteRenderWindowProperties(node, baseRenderer);
   }
 }
 
@@ -244,20 +247,7 @@ void QmitkSynchronizedNodeSelectionWidget::OnSelectionModeChanged(bool selectAll
 
   if (selectAll)
   {
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
-    {
-      return;
-    }
-
-    auto allNodes = m_NodePredicate ? dataStorage->GetSubset(m_NodePredicate) : dataStorage->GetAll();
-    NodeList currentSelection;
-    for (auto& node : *allNodes)
-    {
-      currentSelection.append(node);
-    }
-
-    this->HandleChangeOfInternalSelection(currentSelection);
+    this->SelectAll();
   }
 }
 
@@ -698,4 +688,22 @@ void QmitkSynchronizedNodeSelectionWidget::DeselectNode(mitk::DataNode* dataNode
     // Explicitly set the visibility to false for the node to hide them in the render window.
     dataNode->SetVisibility(false, baseRenderer);
   }
+}
+
+void QmitkSynchronizedNodeSelectionWidget::SelectAll()
+{
+  auto dataStorage = m_DataStorage.Lock();
+  if (dataStorage.IsNull())
+  {
+    return;
+  }
+
+  auto allNodes = m_NodePredicate ? dataStorage->GetSubset(m_NodePredicate) : dataStorage->GetAll();
+  NodeList currentSelection;
+  for (auto& node : *allNodes)
+  {
+    currentSelection.append(node);
+  }
+
+  this->HandleChangeOfInternalSelection(currentSelection);
 }

@@ -54,12 +54,14 @@ public:
 
   void SetSelectAll(bool selectAll);
   bool GetSelectAll() const;
+  void SelectAll();
   void SetSynchronized(bool synchronize);
   bool IsSynchronized() const;
 
 Q_SIGNALS:
 
   void SelectionModeChanged(bool selectAll);
+  void DeregisterSynchronization();
 
 private Q_SLOTS:
 

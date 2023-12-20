@@ -123,12 +123,11 @@ public:
     MITK_TEST_CONDITION_REQUIRED(d == 7,
       "Testing if division produces the correct result");
 
-    /*!	@TODO:	Reactivate as soon as exponentiation works again */
     // exponentiation
-    //TEST_NOTHROW(d = parser->parse("2^3"),
-    //	"Testing if exponentiation throws an unwanted exception");
-    //MITK_TEST_CONDITION_REQUIRED(d == 8,
-    //	"Testing if exponentiation produces the correct result");
+    TEST_NOTHROW(d = parser->parse("2^3"),
+      "Testing if exponentiation throws an unwanted exception");
+    MITK_TEST_CONDITION_REQUIRED(d == 8,
+      "Testing if exponentiation produces the correct result");
 
     // algebraic signs
     TEST_NOTHROW(d = parser->parse("-7 + +1 - -1"),

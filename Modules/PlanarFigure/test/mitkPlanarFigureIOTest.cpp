@@ -269,7 +269,7 @@ public:
     for (it1 = referencePfs.begin(); it1 != referencePfs.end(); ++it1)
     {
       bool planarFigureFound = false;
-      int j = 0;
+
       for (it2 = testPfs.begin(); it2 != testPfs.end(); ++it2)
       {
         // Compare PlanarFigures (returns false if different types)
@@ -277,7 +277,6 @@ public:
         {
           planarFigureFound = true;
         }
-        ++j;
       }
 
       // Test if (at least) on PlanarFigure of the first type was found in the second list

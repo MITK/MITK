@@ -203,6 +203,7 @@ namespace mitk
 
     //## Get the Vtk Matrix which describes the transform.
     vtkMatrix4x4 *GetVtkMatrix();
+    const vtkMatrix4x4* GetVtkMatrix() const;
 
     //##Documentation
     //## @brief Get the m_IndexToWorldTransform as a vtkLinearTransform

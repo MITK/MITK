@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkEnumerationProperty.h>
 #include <algorithm>
+#include <nlohmann/json.hpp>
 
 mitk::EnumerationProperty::EnumerationProperty()
   : m_CurrentValue(0)
@@ -163,4 +164,20 @@ mitk::EnumerationProperty::EnumStringsContainerType & mitk::EnumerationProperty:
 const mitk::EnumerationProperty::EnumStringsContainerType & mitk::EnumerationProperty::GetEnumStrings() const
 {
   return m_NameMap;
+}
+
+bool mitk::EnumerationProperty::ToJSON(nlohmann::json& j) const
+{
+  j = this->GetValueAsString();
+  return true;
+}
+
+bool mitk::EnumerationProperty::FromJSON(const nlohmann::json& j)
+{
+  auto name = j.get<std::string>();
+
+  if (!this->SetValue(name))
+    mitkThrow() << '"' << name << "\" is not a valid enumeration value for " << this->GetNameOfClass() << '!';
+
+  return true;
 }

@@ -1,6 +1,7 @@
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkImageCropperView.cpp
+  QmitkConvertGeometryDataToROIAction.cpp
 )
 
 set(UI_FILES
@@ -10,6 +11,7 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkImageCropperView.h
+  src/internal/QmitkConvertGeometryDataToROIAction.h
 )
 
 set(CACHED_RESOURCE_FILES

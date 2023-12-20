@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include "mitkNumericTypes.h"
 #include <MitkCoreExports.h>
+#include <nlohmann/json_fwd.hpp>
 
 namespace mitk
 {
@@ -259,5 +260,9 @@ namespace mitk
     */
     inline void EnsureConsistency();
   };
+
+  MITKCORE_EXPORT void to_json(nlohmann::json& j, const LevelWindow& lw);
+  MITKCORE_EXPORT void from_json(const nlohmann::json& j, LevelWindow& lw);
+
 } // namespace mitk
 #endif

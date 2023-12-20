@@ -164,17 +164,20 @@ public:
 
   void serializeTemporoSpatialStringPropertyToJSON()
   {
-    std::string data = mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(refProp);
-    CPPUNIT_ASSERT(refJSON ==
-      data); //"Testing serializeTemporoSpatialStringPropertyToJSON() producing correct string.");
+    auto data = nlohmann::json::parse(mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(refProp));
+    auto ref = nlohmann::json::parse(refJSON);
 
-    data = mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(refPartlyCondensibleProp);
-    CPPUNIT_ASSERT(refPartlyCondensibleJSON ==
-      data);
+    CPPUNIT_ASSERT(ref == data); //"Testing serializeTemporoSpatialStringPropertyToJSON() producing correct string.");
 
-    data = mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(refCondensibleProp);
-    CPPUNIT_ASSERT(refCondensibleJSON ==
-      data);
+    data = nlohmann::json::parse(mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(refPartlyCondensibleProp));
+    ref = nlohmann::json::parse(refPartlyCondensibleJSON);
+
+    CPPUNIT_ASSERT(ref == data);
+
+    data = nlohmann::json::parse(mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(refCondensibleProp));
+    ref = nlohmann::json::parse(refCondensibleJSON);
+
+    CPPUNIT_ASSERT(ref == data);
   }
 
   void deserializeJSONToTemporoSpatialStringProperty()

@@ -69,6 +69,7 @@ if(NOT DEFINED VTK_DIR)
     CMAKE_GENERATOR_PLATFORM ${gen_platform}
     CMAKE_ARGS
       ${ep_common_args}
+      "-DQt6_DIR:PATH=${Qt6_DIR}"
       -DVTK_ENABLE_WRAPPING:BOOL=OFF
       -DVTK_LEGACY_REMOVE:BOOL=ON
       -DVTK_MODULE_ENABLE_VTK_TestingRendering:STRING=YES

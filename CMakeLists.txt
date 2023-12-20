@@ -330,14 +330,15 @@ if(MITK_USE_Qt6)
     endforeach()
   endif()
 
-  if(Qt6_DIR)
-    list(APPEND CMAKE_PREFIX_PATH "${Qt6_DIR}/../../..")
-  endif()
-
   find_package(Qt6 ${MITK_QT6_MINIMUM_VERSION} COMPONENTS ${MITK_QT6_COMPONENTS} REQUIRED HINTS ${MITK_QT6_HINTS})
 
   get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake LOCATION)
   get_target_property(QT_HELPGENERATOR_EXECUTABLE Qt6::qhelpgenerator LOCATION)
+endif()
+
+if(Qt6_DIR)
+  list(APPEND CMAKE_PREFIX_PATH "${Qt6_DIR}/../../..")
+  list(REMOVE_DUPLICATES CMAKE_PREFIX_PATH)
 endif()
 
 # -----------------------------------------

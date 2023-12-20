@@ -31,6 +31,7 @@ if(NOT DEFINED ${proj}_DIR)
        ${ep_common_args}
        ${additional_cmake_args}
      CMAKE_CACHE_ARGS
+       "-DQt6_DIR:PATH=${Qt6_DIR}"
        -DQWT_QT_VERSION_MAJOR:STRING=6
        -DQWT_DESIGNER:BOOL=OFF
        -DQWT_OPENGL:BOOL=OFF

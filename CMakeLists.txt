@@ -353,6 +353,10 @@ endif()
 
 find_package(OpenSSL 3)
 
+if(NOT OpenSSL_FOUND)
+  find_package(OpenSSL 1.1.1)
+endif()
+
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
 
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")

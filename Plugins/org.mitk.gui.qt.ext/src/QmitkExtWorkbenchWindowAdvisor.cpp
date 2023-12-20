@@ -1428,8 +1428,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowClose()
   berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow = static_cast<QMainWindow*> (window->GetShell()->GetControl());
 
-  QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
-  settings.setValue("ToolbarPosition", mainWindow->saveState());
+  auto fileName = this->GetQSettingsFile();
+
+  if (!fileName.isEmpty())
+  {
+    QSettings settings(fileName, QSettings::IniFormat);
+    settings.setValue("ToolbarPosition", mainWindow->saveState());
+  }
 }
 
 QString QmitkExtWorkbenchWindowAdvisor::GetQSettingsFile() const

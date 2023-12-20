@@ -476,7 +476,6 @@ namespace itk
     bool timeout = false;
     NodeNumType mainNodeListIndex = 0;
     DistanceType curNodeDistance = 0;
-    NodeNumType numberOfNodesChecked = 0;
 
     // Create Multimap (tree structure for fast searching)
     std::multimap<double, ShortestPathNode *> myMap;
@@ -492,13 +491,6 @@ namespace itk
     // update its neighbors and eventually delete it from the discovered Nodes list.
     while (!myMap.empty())
     {
-      numberOfNodesChecked++;
-      /*if ( (numberOfNodesChecked % (m_Graph_NumberOfNodes/100)) == 0)
-      {
-        MITK_INFO << "Checked " << ( numberOfNodesChecked / (m_Graph_NumberOfNodes/100) ) << "% List: " << myMap.size()
-      << "\n";
-      }*/
-
       // Get element with lowest score
       mainNodeListIndex = myMap.begin()->second->mainListIndex;
       curNodeDistance = myMap.begin()->second->distance;

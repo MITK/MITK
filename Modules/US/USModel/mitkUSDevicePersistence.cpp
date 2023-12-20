@@ -75,7 +75,8 @@ std::vector<mitk::USDevice::Pointer> mitk::USDevicePersistence::RestoreLastDevic
     }
   }
 
-  MITK_INFO << "Restoring " << numberOfSavedDevices << " US devices.";
+  if (numberOfSavedDevices > 0)
+    MITK_INFO << "Restoring " << numberOfSavedDevices << " US devices.";
 
   return devices;
 }

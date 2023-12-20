@@ -394,10 +394,15 @@ mitk::DICOMTagBasedSorter
     //    - sorting order (ascending, descending)
     //    - sort numerically
     //    - ... ?
+#ifdef MBILOG_ENABLE_DEBUG
     unsigned int groupIndex(0);
+#endif
     for (auto gIter = groups.begin();
          gIter != groups.end();
-         ++groupIndex, ++gIter)
+#ifdef MBILOG_ENABLE_DEBUG
+         ++groupIndex,
+#endif
+         ++gIter)
     {
       DICOMDatasetList& dsList = gIter->second;
 

@@ -93,7 +93,7 @@ struct QmitkIOUtil::Impl
       }
     }
 
-    if (filename.startsWith(' ' || filename.endsWith(' ')))
+    if (filename.startsWith(' ') || filename.endsWith(' '))
     {
       return true;
     }

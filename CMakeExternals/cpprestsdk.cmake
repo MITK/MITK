@@ -23,8 +23,8 @@ if(MITK_USE_${proj})
     endif()
 
     ExternalProject_Add(${proj}
-      GIT_REPOSITORY https://github.com/microsoft/cpprestsdk.git
-      GIT_TAG v2.10.18
+      GIT_REPOSITORY https://github.com/MITK/cpprestsdk.git
+      GIT_TAG v2.10.19-patched
       SOURCE_SUBDIR Release
       CMAKE_ARGS
         "-DBoost_DIR:PATH=${Boost_DIR}"

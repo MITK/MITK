@@ -47,7 +47,6 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \subpage org_mitk_gui_qt_flow_segmentation </li>
   <li> \subpage org_mitk_gui_qt_aicpregistration </li>
   <li> \subpage org_mitk_gui_qt_cest </li>
-  <li> \subpage org_mitk_views_cmdlinemodules </li>
   <li> \subpage org_mitk_views_pharmacokinetics_concentration_mri </li>
   <li> \subpage org_mitk_views_pharmacokinetics_mri </li>
   <li> \subpage org_mitk_views_pharmacokinetics_pet </li>

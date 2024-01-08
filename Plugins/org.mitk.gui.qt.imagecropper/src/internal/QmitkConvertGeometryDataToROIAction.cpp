@@ -21,22 +21,25 @@ found in the LICENSE file.
 
 namespace
 {
-  void handleInvalidNodeSelection()
+  void HandleInvalidNodeSelection()
   {
-    auto message = QStringLiteral("All selected bounding boxes must be child nodes of a single common reference image with a non-rotated geometry!");
+    auto message = QStringLiteral(
+      "All selected bounding boxes must be child nodes of a single common reference image "
+      "with a non-rotated geometry and positive pixel spacing!");
+
     MITK_ERROR << message;
     QMessageBox::warning(nullptr, QStringLiteral("Convert to ROI"), message);
   }
 
-  bool isRotated(const mitk::BaseGeometry* geometry)
+  bool IsRotated(const mitk::BaseGeometry* geometry)
   {
-    const auto* matrix = geometry->GetVtkMatrix();
+    auto matrix = geometry->GetVtkMatrix();
 
     for (int j = 0; j < 3; ++j)
     {
       for (int i = 0; i < 3; ++i)
       {
-        if (i != j && matrix->GetElement(i, j) > mitk::eps)
+        if (i != j && std::abs(matrix->GetElement(i, j)) > mitk::eps)
           return true;
       }
     }
@@ -44,7 +47,20 @@ namespace
     return false;
   }
 
-  std::pair<std::vector<const mitk::DataNode*>, mitk::DataNode*> getValidInput(const QList<mitk::DataNode::Pointer>& selectedNodes, const mitk::DataStorage* dataStorage)
+  bool HasNegativeSpacing(const mitk::BaseGeometry* geometry)
+  {
+    auto matrix = geometry->GetVtkMatrix();
+
+    for (int i = 0; i < 3; ++i)
+    {
+      if (matrix->GetElement(i, i) < 0.0)
+        return true;
+    }
+
+    return false;
+  }
+
+  std::pair<std::vector<const mitk::DataNode*>, mitk::DataNode*> GetValidInput(const QList<mitk::DataNode::Pointer>& selectedNodes, const mitk::DataStorage* dataStorage)
   {
     std::pair<std::vector<const mitk::DataNode*>, mitk::DataNode*> result;
     result.first.reserve(selectedNodes.size());
@@ -62,7 +78,12 @@ namespace
 
       if (result.second == nullptr)
       {
-        if (isRotated(sourceNodes->front()->GetData()->GetGeometry()))
+        auto geometry = sourceNodes->front()->GetData()->GetGeometry();
+
+        if (IsRotated(geometry))
+          mitkThrow();
+
+        if (HasNegativeSpacing(geometry))
           mitkThrow();
 
         result.second = sourceNodes->front();
@@ -89,7 +110,7 @@ void QmitkConvertGeometryDataToROIAction::Run(const QList<mitk::DataNode::Pointe
 {
   try
   {
-    auto [nodes, referenceNode] = getValidInput(selectedNodes, m_DataStorage);
+    auto [nodes, referenceNode] = GetValidInput(selectedNodes, m_DataStorage);
 
     auto roi = mitk::ROI::New();
     roi->SetClonedGeometry(referenceNode->GetData()->GetGeometry());
@@ -132,7 +153,7 @@ void QmitkConvertGeometryDataToROIAction::Run(const QList<mitk::DataNode::Pointe
   }
   catch (const mitk::Exception&)
   {
-    handleInvalidNodeSelection();
+    HandleInvalidNodeSelection();
   }
 }
 

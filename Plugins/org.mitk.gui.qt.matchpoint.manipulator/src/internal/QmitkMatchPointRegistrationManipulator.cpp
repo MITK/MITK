@@ -247,7 +247,7 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
 {
   if (!m_activeManipulation)
   {
-    QString name = "ManuelRegistration";
+    QString name = "ManualRegistration";
 
     if (m_SelectedPreRegNode.IsNotNull())
     {

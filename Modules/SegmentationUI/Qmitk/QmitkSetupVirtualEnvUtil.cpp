@@ -189,18 +189,40 @@ bool QmitkSetupVirtualEnvUtil::IsPythonPath(const QString &pythonPath)
 
 namespace
 {
-  std::mutex mutex;
-  std::string pyVersionCaptured;
-
-  void CapturePyVersion(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
+  class PyCaptureWorker
   {
-    std::string testCOUT;
-    const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
-    if (pEvent)
+  private:
+    inline static PyCaptureWorker *captureWorker = nullptr;
+    PyCaptureWorker() = default;
+
+  public:
+    std::mutex mutex;
+    std::string pyVersionCaptured;
+
+    inline static void CapturePyVersion(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
     {
-      pyVersionCaptured = pEvent->GetOutput();
+      if (nullptr != captureWorker)
+      {
+        std::string testCOUT;
+        const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
+        if (pEvent)
+        {
+          captureWorker->pyVersionCaptured = pEvent->GetOutput();
+        }
+      }
     }
-  }
+
+    inline static PyCaptureWorker *Create()
+    {
+      if (nullptr == captureWorker)
+      {
+        captureWorker = new PyCaptureWorker();
+      }
+      return captureWorker;
+    }
+
+    PyCaptureWorker(const PyCaptureWorker &) = delete;
+  };
 
   std::vector<int> SplitVersionString(const std::string& version)
   {
@@ -255,19 +277,20 @@ std::pair<QString, QString> QmitkSetupVirtualEnvUtil::GetExactPythonPath(const Q
   std::pair<QString, QString> pythonPath;
   if (pythonDoesExist)
   {
-    ::mutex.lock();
+    auto *pyWorker = PyCaptureWorker::Create();
+    pyWorker->mutex.lock();
     std::regex sanitizer(R"([^3\.(\d+)])");
     mitk::ProcessExecutor::ArgumentListType args;
     auto spExec = mitk::ProcessExecutor::New();
     auto spCommand = itk::CStyleCommand::New();
-    spCommand->SetCallback(&::CapturePyVersion);
+    spCommand->SetCallback(&PyCaptureWorker::CapturePyVersion);
     spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
     args.push_back("--version");
     spExec->Execute(fullPath.toStdString(), PYTHON_EXE, args);
-    std::string pyVersionNumber = std::regex_replace(::pyVersionCaptured, sanitizer, "");
+    std::string pyVersionNumber = std::regex_replace(pyWorker->pyVersionCaptured, sanitizer, "");
     isSupportedVersion = ::IsSupported(pyVersionNumber, "3.8", "3.13");
     pythonPath.second = QString::fromStdString(pyVersionNumber);
-    ::mutex.unlock();
+    pyWorker->mutex.unlock();
   }
   pythonPath.first = pythonDoesExist &&isSupportedVersion ? fullPath : "";
   return pythonPath;

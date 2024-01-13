@@ -16,10 +16,8 @@ found in the LICENSE file.s
 #include <QStandardPaths>
 #include <itkCommand.h>
 #include <regex>
-#include <sstream>
 #include <QDir>
 #include <QApplication>
-#include <mutex>
 #include <QProcess>
 #include <QTextCodec>
 

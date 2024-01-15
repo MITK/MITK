@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include "berryRegistryObjectFactory.h"
 #include "berryRegistryObjectManager.h"
 
-#include <QTime>
+#include <QElapsedTimer>
 
 namespace berry {
 
@@ -227,17 +227,17 @@ ExtensionsParser::parseManifest(QXmlReader* reader, QXmlInputSource* in,
                                 const SmartPointer<RegistryContribution>& currentNamespace,
                                 QTranslator* translator)
 {
-  QTime start;
+  QElapsedTimer timer;
   this->resources = translator;
   this->objectManager = registryObjects;
   //initialize the parser with this object
   this->contribution = currentNamespace;
   if (registry->Debug())
-    start.start();
+    timer.start();
 
   if (reader == nullptr)
   {
-    cumulativeTime += start.elapsed();
+    cumulativeTime += timer.elapsed();
     throw ctkInvalidArgumentException("XML Reader not available");
   }
 
@@ -252,7 +252,7 @@ ExtensionsParser::parseManifest(QXmlReader* reader, QXmlInputSource* in,
 
   if (registry->Debug())
   {
-    cumulativeTime += start.elapsed();
+    cumulativeTime += timer.elapsed();
     BERRY_INFO << "Cumulative parse time so far : " << cumulativeTime;
   }
 

@@ -49,7 +49,7 @@ void QmitkPatientTableHeaderView::paintSection(QPainter* painter, const QRect& r
 
     QModelIndex leafIndex = HeaderIndex(logicalIndex);
     QModelIndexList indexes = ParentIndexList(leafIndex);
-    for (const auto& index : qAsConst(indexes))
+    for (const auto& index : std::as_const(indexes))
     {
       top = PaintHeader(painter, index, logicalIndex, rect, top);
     }
@@ -198,7 +198,7 @@ QModelIndex QmitkPatientTableHeaderView::FindHeader(const QModelIndex& currentIn
     {
       for (int i = 0; i < childCount; ++i)
       {
-        QModelIndex modelIndex = FindHeader(currentIndex.child(0, i), sectionIndex, currentHeaderIndex);
+        QModelIndex modelIndex = FindHeader(currentIndex.model()->index(0, i, currentIndex), sectionIndex, currentHeaderIndex);
         if (modelIndex.isValid())
         {
           return modelIndex;
@@ -228,7 +228,7 @@ QModelIndexList QmitkPatientTableHeaderView::ListHeader(const QModelIndex& curre
     {
       for (int i = 0; i < childCount; ++i)
       {
-        headerList += ListHeader(currentIndex.child(0, i));
+        headerList += ListHeader(currentIndex.model()->index(0, i, currentIndex));
       }
     }
     else

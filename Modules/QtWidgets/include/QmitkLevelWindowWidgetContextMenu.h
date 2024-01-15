@@ -33,7 +33,7 @@ class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidgetContextMenu : public QWidget
 
 public:
   /// constructor
-  QmitkLevelWindowWidgetContextMenu(QWidget *parent, Qt::WindowFlags f = nullptr);
+  QmitkLevelWindowWidgetContextMenu(QWidget *parent, Qt::WindowFlags f = {});
   ~QmitkLevelWindowWidgetContextMenu() override;
 
   /*!

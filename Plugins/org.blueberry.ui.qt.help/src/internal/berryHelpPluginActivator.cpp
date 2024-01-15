@@ -86,6 +86,7 @@ HelpPluginActivator::start(ctkPluginContext* context)
 
   QFileInfo qhcInfo = context->getDataFile("qthelpcollection.qhc");
   helpEngine.reset(new QHelpEngineWrapper(qhcInfo.absoluteFilePath()));
+  helpEngine->setReadOnly(false);
   if (!helpEngine->setupData())
   {
     BERRY_ERROR << "QHelpEngine set-up failed: " << helpEngine->error().toStdString();

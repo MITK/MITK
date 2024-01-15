@@ -10,7 +10,7 @@ mitk_create_plugin(
   MODULE_DEPENDS PUBLIC MitkCore
   PACKAGE_DEPENDS
     PUBLIC Poco|Foundation+Util+XML
-    PRIVATE Qt5|Gui+Xml
+    PRIVATE Qt6|Gui+Xml
 )
 
 target_compile_definitions(${PLUGIN_TARGET} PUBLIC "$<$<PLATFORM_ID:Windows>:WIN32_LEAN_AND_MEAN>")

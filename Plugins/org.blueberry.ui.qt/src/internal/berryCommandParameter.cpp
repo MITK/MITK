@@ -134,7 +134,7 @@ QString CommandParameter::ToString() const
       QDebug dbg(&paramValuesStr);
       dbg << values->GetParameterValues();
     }
-    str = "Parameter(" + id + ',' + name + ',' + paramValuesStr + ',' + optional +')';
+    str = QString("Parameter(%1,%2,%3,%4)").arg(id).arg(name).arg(paramValuesStr).arg(optional);
   }
 
   return str;

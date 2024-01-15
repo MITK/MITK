@@ -7,7 +7,7 @@ if(UNIX AND NOT APPLE)
       libraries without absolute paths. Use LD_LIBRARY_PATH as workaround.
       See T26955. ]]
   if(TARGET ${TESTDRIVER})
-    get_target_property(ld_library_path Qt5::Core IMPORTED_LOCATION_RELEASE)
+    get_target_property(ld_library_path Qt6::Core IMPORTED_LOCATION_RELEASE)
     get_filename_component(ld_library_path "${ld_library_path}" DIRECTORY)
 
     add_test(

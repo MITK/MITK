@@ -39,7 +39,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
   m_View = mitk::AnatomicalPlane::Axial;
 
   QHBoxLayout *hlayout = new QHBoxLayout(container);
-  hlayout->setMargin(0);
+  hlayout->setContentsMargins({});
 
   // create widget
   QString composedName("QmitkSliceWidget::");
@@ -188,7 +188,7 @@ void QmitkSliceWidget::wheelEvent(QWheelEvent *e)
 {
   int val = sliceNavigationWidget->GetPos();
 
-  if (e->orientation() * e->delta() > 0)
+  if (e->angleDelta().y() > 0)
   {
     sliceNavigationWidget->SetPos(val + 1);
   }

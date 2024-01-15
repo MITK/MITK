@@ -2,7 +2,7 @@ message(STATUS "Configuring MITK Navigation Modules Build")
 
 set(MITK_CONFIG_PACKAGES
   ACVD
-  Qt5
+  Qt6
   BLUEBERRY
 )
 

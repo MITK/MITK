@@ -33,7 +33,7 @@ found in the LICENSE file.
 //poco headers
 #include <Poco/Path.h>
 
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 
 const std::string QmitkIGTLDeviceSetupConnectionWidget::VIEW_ID =
 "org.mitk.views.igtldevicesetupconnectionwidget";
@@ -79,9 +79,9 @@ void QmitkIGTLDeviceSetupConnectionWidget::CreateQtPartControl(QWidget *parent)
 
   // set the validator for the ip edit box (values must be between 0 and 255 and
   // there are four of them, seperated with a point
-  QRegExpValidator *v = new QRegExpValidator(this);
-  QRegExp rx("((1{0,1}[0-9]{0,2}|2[0-4]{1,1}[0-9]{1,1}|25[0-5]{1,1})\\.){3,3}(1{0,1}[0-9]{0,2}|2[0-4]{1,1}[0-9]{1,1}|25[0-5]{1,1})");
-  v->setRegExp(rx);
+  auto v = new QRegularExpressionValidator(this);
+  QRegularExpression rx("((1{0,1}[0-9]{0,2}|2[0-4]{1,1}[0-9]{1,1}|25[0-5]{1,1})\\.){3,3}(1{0,1}[0-9]{0,2}|2[0-4]{1,1}[0-9]{1,1}|25[0-5]{1,1})");
+  v->setRegularExpression(rx);
   m_Controls->editIP->setValidator(v);
   // set the validator for the port edit box (values must be between 1 and 65535)
   m_Controls->editPort->setValidator(new QIntValidator(1, 65535, this));

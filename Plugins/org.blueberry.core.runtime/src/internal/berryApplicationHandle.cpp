@@ -188,7 +188,7 @@ QVariant ApplicationHandle::run(const QVariant& context_)
       waitCondition.wakeAll();
     }
     tempResult = application->Start(this);
-    if (!tempResult.isValid()) tempResult = QVariant(QVariant::Int);
+    if (!tempResult.isValid()) tempResult = QVariant();
 
     tempResult = SetInternalResult(tempResult, nullptr);
   }

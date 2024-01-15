@@ -71,7 +71,7 @@ void QtStylePreferencePage::FillStyleCombo(const berry::IQtStyleManager::Style& 
   styles.clear();
   styleManager->GetStyles(styles);
 
-  qSort(styles);
+  std::sort(styles.begin(), styles.end());
   for (int i = 0; i < styles.size(); ++i)
   {
     controls.m_StylesCombo->addItem(styles.at(i).name, QVariant(styles.at(i).fileName));
@@ -243,7 +243,7 @@ void QtStylePreferencePage::Update()
   auto* prefs = GetPreferences();
 
   auto paths = QString::fromStdString(prefs->Get(berry::QtPreferences::QT_STYLE_SEARCHPATHS, ""));
-  QStringList pathList = paths.split(";", QString::SkipEmptyParts);
+  QStringList pathList = paths.split(";", Qt::SkipEmptyParts);
   QStringListIterator it(pathList);
   while (it.hasNext())
   {

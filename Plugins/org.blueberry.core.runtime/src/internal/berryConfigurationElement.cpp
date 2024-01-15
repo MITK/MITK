@@ -25,7 +25,7 @@ found in the LICENSE file.
 #include "berryObjectString.h"
 #include "berryObjectStringMap.h"
 
-#include <QRegExp>
+#include <QRegularExpression>
 
 namespace berry {
 
@@ -207,7 +207,7 @@ QObject* ConfigurationElement::CreateExecutableExtension(const QString& attribut
   else
   {
     // simple property or element value, parse it into its components
-    i = prop.indexOf(QRegExp("[^:]:[^:]"));
+    i = prop.indexOf(QRegularExpression("[^:]:[^:]"));
     if (i != -1)
     {
       executable = prop.left(i+1).trimmed();

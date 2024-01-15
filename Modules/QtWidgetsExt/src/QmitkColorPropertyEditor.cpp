@@ -13,7 +13,6 @@ found in the LICENSE file.
 
 #include <QApplication>
 #include <QCloseEvent>
-#include <QDesktopWidget>
 #include <QLayout>
 #include <QMouseEvent>
 #include <QPainter>
@@ -227,16 +226,9 @@ int QmitkColorPropertyEditor::colorChooserRefCount = 0;
 QmitkColorPropertyEditor::QmitkColorPropertyEditor(const mitk::ColorProperty *property, QWidget *parent)
   : QmitkColorPropertyView(property, parent)
 {
-  // our popup belongs to the whole screen, so it could be drawn outside the toplevel window's borders
-  int scr;
-  if (QApplication::desktop()->isVirtualDesktop())
-    scr = QApplication::desktop()->screenNumber(parent->mapToGlobal(pos()));
-  else
-    scr = QApplication::desktop()->screenNumber(parent);
-
   if (colorChooserRefCount == 0)
   {
-    colorChooser = new QmitkPopupColorChooser(QApplication::desktop()->screen(scr), 50);
+    colorChooser = new QmitkPopupColorChooser(nullptr, 50);
   }
   ++colorChooserRefCount;
 }

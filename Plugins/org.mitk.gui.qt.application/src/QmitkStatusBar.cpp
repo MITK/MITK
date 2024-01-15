@@ -13,10 +13,10 @@ found in the LICENSE file.
 
 #include "QmitkStatusBar.h"
 
-#include <qmainwindow.h>
-#include <qstatusbar.h>
-#include <qapplication.h>
-#include <qdesktopwidget.h>
+#include <QMainWindow>
+#include <QScreen>
+#include <QStatusBar>
+#include <QGuiApplication>
 
 #include <mitkStatusBar.h>
 
@@ -75,8 +75,8 @@ QmitkStatusBar::QmitkStatusBar(QStatusBar* instance)
 :StatusBarImplementation()
 {
     m_StatusBar = instance;
-    m_GreyValueLabel = new QLabel(m_StatusBar,nullptr);
-    int xResolution = QApplication::desktop()->screenGeometry(0).width()-100;
+    m_GreyValueLabel = new QLabel(m_StatusBar);
+    int xResolution = QGuiApplication::primaryScreen()->geometry().width()-100;
     m_GreyValueLabel->setMaximumSize(QSize(xResolution,50));
     m_GreyValueLabel->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Fixed);
     m_StatusBar->addPermanentWidget(m_GreyValueLabel);

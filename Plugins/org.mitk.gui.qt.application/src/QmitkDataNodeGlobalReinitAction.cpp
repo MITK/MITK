@@ -18,6 +18,8 @@ found in the LICENSE file.
 // mitk gui common plugin
 #include <mitkWorkbenchUtil.h>
 
+#include <QWidget>
+
 const QString QmitkDataNodeGlobalReinitAction::ACTION_ID = "org.mitk.gui.qt.application.globalreinitaction";
 
 // namespace that contains the concrete action

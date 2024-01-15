@@ -20,7 +20,7 @@ QmitkLesionTextDialog::QmitkLesionTextDialog(QWidget* parent)
   : QDialog(parent)
 {
   QBoxLayout* verticalLayout = new QVBoxLayout(this);
-  verticalLayout->setMargin(5);
+  verticalLayout->setContentsMargins(QMargins(5, 5, 5, 5));
   verticalLayout->setSpacing(5);
 
   QLabel* dialogLabel = new QLabel(tr("Set lesion information"), this);

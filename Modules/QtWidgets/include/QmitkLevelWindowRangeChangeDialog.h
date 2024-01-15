@@ -25,7 +25,7 @@ class MITKQTWIDGETS_EXPORT QmitkLevelWindowRangeChangeDialog : public QDialog, p
   Q_OBJECT
 
 public:
-  QmitkLevelWindowRangeChangeDialog(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkLevelWindowRangeChangeDialog(QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
   double getLowerLimit();
 

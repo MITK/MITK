@@ -1525,7 +1525,7 @@ void QmitkSlicesInterpolator::PrepareInputsFor3DInterpolation()
       if (ret == QMessageBox::Yes)
       {
         //  Maybe set the segmentation node here
-        m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+        m_Future = QtConcurrent::run(&QmitkSlicesInterpolator::Run3DInterpolation, this);
         m_Watcher.setFuture(m_Future);
       }
       else
@@ -1618,7 +1618,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::Event
       return;
 
     m_SurfaceInterpolator->AddActiveLabelContoursForInterpolation(label->GetValue());
-    m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+    m_Future = QtConcurrent::run(&QmitkSlicesInterpolator::Run3DInterpolation, this);
     m_Watcher.setFuture(m_Future);
   }
 }

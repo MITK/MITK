@@ -29,33 +29,6 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
         )
   endif()
 
-  # Determine the Qt5 library installation prefix
-  set(_qmake_location )
-  if(MITK_USE_Qt5 AND TARGET ${Qt5Core_QMAKE_EXECUTABLE})
-    get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
-                 PROPERTY IMPORT_LOCATION)
-  endif()
-  if(_qmake_location)
-    if(NOT _qt_install_libs)
-      if(WIN32)
-        execute_process(COMMAND ${_qmake_location} -query QT_INSTALL_BINS
-                        OUTPUT_VARIABLE _qt_install_libs
-                        OUTPUT_STRIP_TRAILING_WHITESPACE)
-      else()
-        execute_process(COMMAND ${_qmake_location} -query QT_INSTALL_LIBS
-                        OUTPUT_VARIABLE _qt_install_libs
-                        OUTPUT_STRIP_TRAILING_WHITESPACE)
-      endif()
-      file(TO_CMAKE_PATH "${_qt_install_libs}" _qt_install_libs)
-      set(_qt_install_libs ${_qt_install_libs} CACHE INTERNAL "Qt library installation prefix" FORCE)
-    endif()
-    if(_qt_install_libs)
-      list(APPEND _dir_candidates ${_qt_install_libs})
-    endif()
-  elseif(MITK_USE_Qt5)
-    message(WARNING "The qmake executable could not be found.")
-  endif()
-
   get_property(_additional_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
 
   if(TARGET OpenSSL::SSL)
@@ -183,6 +156,28 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
       list(APPEND _search_dirs "${_dir}")
     endif()
   endforeach()
+
+  # Determine the Qt6 library installation prefix
+  if(QT_QMAKE_EXECUTABLE)
+    if(NOT _qt_install_libs)
+      if(WIN32)
+        execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_BINS
+                        OUTPUT_VARIABLE _qt_install_libs
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+      else()
+        execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_LIBS
+                        OUTPUT_VARIABLE _qt_install_libs
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+      endif()
+      file(TO_CMAKE_PATH "${_qt_install_libs}" _qt_install_libs)
+      set(_qt_install_libs ${_qt_install_libs} CACHE INTERNAL "Qt library installation prefix" FORCE)
+    endif()
+    if(_qt_install_libs)
+      list(APPEND _search_dirs ${_qt_install_libs})
+    endif()
+  elseif(MITK_USE_Qt6)
+    message(WARNING "The qmake executable could not be found.")
+  endif()
 
   # Special handling for "internal" search dirs. The intermediate directory
   # might not have been created yet, so we can't check for its existence.

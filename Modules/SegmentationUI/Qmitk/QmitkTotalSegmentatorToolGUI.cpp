@@ -138,7 +138,7 @@ unsigned int QmitkTotalSegmentatorToolGUI::FetchSelectedGPUFromUI() const
   }
   else
   {
-    QString gpuId = gpuInfo.split(":", QString::SplitBehavior::SkipEmptyParts).first();
+    QString gpuId = gpuInfo.split(":", Qt::SkipEmptyParts).first();
     return static_cast<unsigned int>(gpuId.toInt());
   }
 }

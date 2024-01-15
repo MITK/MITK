@@ -22,6 +22,8 @@ found in the LICENSE file.
 #include "internal/QmitkCommonExtPlugin.h"
 #include <mitkIDataStorageService.h>
 
+#include <QWidget>
+
 class ctkPluginContext;
 
 QmitkOpenStdMultiWidgetEditorAction::QmitkOpenStdMultiWidgetEditorAction(berry::IWorkbenchWindow::Pointer window)

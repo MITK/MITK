@@ -75,7 +75,8 @@ void QtLogView::slotScrollDown( )
 
 void QtLogView::slotFilterChange( const QString& q )
 {
-  filterModel->setFilterRegExp(QRegExp(q, Qt::CaseInsensitive, QRegExp::FixedString));
+  QRegularExpression regExp(QRegularExpression::escape(q), QRegularExpression::CaseInsensitiveOption);
+  filterModel->setFilterRegularExpression(regExp);
 }
 
 

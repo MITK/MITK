@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <ctkSearchBox.h>
 
 #include <QHelpIndexWidget>
+#include <QHelpLink>
 #include <QLayout>
 #include <QLabel>
 #include <QMenu>
@@ -51,14 +52,21 @@ void HelpIndexWidget::showLink(const QModelIndex &index)
   if (v.isValid())
     name = v.toString();
 
-  QMap<QString, QUrl> links = indexModel->linksForKeyword(name);
+  QHelpEngineWrapper& helpEngine = HelpPluginActivator::getInstance()->getQHelpEngine();
+  auto links = helpEngine.documentsForKeyword(name);
+
   if (links.count() == 1)
   {
-    emit linkActivated(links.constBegin().value(), name);
+    emit linkActivated(links[0].url, name);
   }
   else if (links.count() > 1)
   {
-    emit linksActivated(links, name);
+    QMap<QString, QUrl> legacyLinks;
+
+    for (const auto& link : links)
+      legacyLinks.insert(link.title, link.url);
+
+    emit linksActivated(legacyLinks, name);
   }
 }
 
@@ -102,7 +110,7 @@ void HelpIndexView::CreateQtPartControl(QWidget* parent)
     connect(m_SearchLineEdit, SIGNAL(textChanged(QString)), this,
             SLOT(filterIndices(QString)));
     m_SearchLineEdit->installEventFilter(this);
-    layout->setMargin(0);
+    layout->setContentsMargins({});
     layout->setSpacing(2);
     layout->addWidget(m_SearchLineEdit);
 
@@ -205,7 +213,7 @@ bool HelpIndexView::eventFilter(QObject *obj, QEvent *e)
     {
       Qt::MouseButtons button = mouseEvent->button();
       if (((button == Qt::LeftButton) && (mouseEvent->modifiers() & Qt::ControlModifier))
-          || (button == Qt::MidButton))
+          || (button == Qt::MiddleButton))
       {
         open(m_IndexWidget, idx);
       }
@@ -268,18 +276,25 @@ void HelpIndexView::open(HelpIndexWidget* indexWidget, const QModelIndex &index)
   if (model)
   {
     QString keyword = model->data(index, Qt::DisplayRole).toString();
-    QMap<QString, QUrl> links = model->linksForKeyword(keyword);
+
+    QHelpEngineWrapper& helpEngine = HelpPluginActivator::getInstance()->getQHelpEngine();
+    auto links = helpEngine.documentsForKeyword(keyword);
 
     QUrl url;
     if (links.count() > 1)
     {
-      HelpTopicChooser tc(m_IndexWidget, keyword, links);
+      QMap<QString, QUrl> legacyLinks;
+
+      for (const auto& link : links)
+        legacyLinks.insert(link.title, link.url);
+
+      HelpTopicChooser tc(m_IndexWidget, keyword, legacyLinks);
       if (tc.exec() == QDialog::Accepted)
         url = tc.link();
     }
     else if (links.count() == 1)
     {
-      url = links.constBegin().value();
+      url = links[0].url;
     }
     else
     {

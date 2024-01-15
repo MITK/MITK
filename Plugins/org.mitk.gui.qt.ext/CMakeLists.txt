@@ -4,7 +4,7 @@ project(org_mitk_gui_qt_ext)
 set(additional_dependencies "")
 
 if(APPLE)
- set(additional_dependencies Qt5|DBus)
+ set(additional_dependencies Qt6|DBus)
 endif()
 
 mitk_create_plugin(

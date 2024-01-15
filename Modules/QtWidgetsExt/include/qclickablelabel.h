@@ -32,8 +32,8 @@ class MITKQTWIDGETSEXT_EXPORT QClickableLabel : public QLabel
   Q_OBJECT
 
 public:
-  QClickableLabel(QWidget *parent, Qt::WindowFlags f = nullptr);
-  QClickableLabel(const QString &text, QWidget *parent, Qt::WindowFlags f = nullptr);
+  QClickableLabel(QWidget *parent, Qt::WindowFlags f = {});
+  QClickableLabel(const QString &text, QWidget *parent, Qt::WindowFlags f = {});
   ~QClickableLabel() override;
 
   void AddHotspot(const QString &name, const QRect position);

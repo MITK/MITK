@@ -38,7 +38,7 @@ found in the LICENSE file.
 #include "berryStatus.h"
 
 #include <QThread>
-#include <QTime>
+#include <QElapsedTimer>
 
 namespace berry {
 
@@ -794,7 +794,7 @@ ExtensionRegistry::ExtensionRegistry(RegistryStrategy* registryStrategy, QObject
   if (strategy->CacheUse())
   {
     // Try to read the registry from the cache first. If that fails, create a new registry
-    QTime timer;
+    QElapsedTimer timer;
     if (Debug())
       timer.start();
 

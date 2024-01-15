@@ -23,6 +23,8 @@ found in the LICENSE file.
 #include <QmitkStyleManager.h>
 
 #include <QIcon>
+#include <QIODevice>
+
 #include <itkCommand.h>
 
 QmitkRenderWindowDataNodeTableModel::QmitkRenderWindowDataNodeTableModel(QObject* parent /*= nullptr*/)
@@ -356,7 +358,7 @@ bool QmitkRenderWindowDataNodeTableModel::dropMimeData(const QMimeData* data, Qt
     }
 
     auto dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
-    for (const auto& dataNode : qAsConst(dataNodeList))
+    for (const auto& dataNode : std::as_const(dataNodeList))
     {
       m_RenderWindowLayerController->MoveNodeToPosition(dataNode, layer, baseRenderer);
     }

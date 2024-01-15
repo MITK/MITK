@@ -15,6 +15,8 @@ found in the LICENSE file.
 // mitk core
 #include <mitkRenderingManager.h>
 
+#include <QWidget>
+
 QmitkDataNodeTextureInterpolationAction::QmitkDataNodeTextureInterpolationAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(workbenchpartSite)

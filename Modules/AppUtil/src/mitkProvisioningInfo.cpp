@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QTextStream>
 
 namespace mitk
@@ -28,7 +29,7 @@ namespace mitk
 #endif
 
   ProvisioningInfo::ProvisioningInfo(const QString &file) { this->readProvisioningFile(file); }
-  QStringList ProvisioningInfo::getPluginDirs() const { return pluginDirs.toList(); }
+  QStringList ProvisioningInfo::getPluginDirs() const { return pluginDirs.values(); }
   QList<QUrl> ProvisioningInfo::getPluginsToInstall() const { return pluginsToInstall; }
   QList<QUrl> ProvisioningInfo::getPluginsToStart() const { return pluginsToStart; }
   void ProvisioningInfo::readProvisioningFile(const QString &filePath)
@@ -36,7 +37,7 @@ namespace mitk
     QFile file(filePath);
     file.open(QFile::ReadOnly);
     QTextStream fileStream(&file);
-    QRegExp sep("\\s+");
+    QRegularExpression sep("\\s+");
     QString line;
     int count = 1;
     do

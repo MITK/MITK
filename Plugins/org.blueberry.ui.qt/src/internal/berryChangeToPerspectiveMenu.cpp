@@ -52,7 +52,7 @@ ChangeToPerspectiveMenu::ChangeToPerspectiveMenu(IWorkbenchWindow* window, const
 
   CommandContributionItemParameter::Pointer showDlgItemParms(
         new CommandContributionItemParameter(
-          window, QString::null, IWorkbenchCommandConstants::PERSPECTIVES_SHOW_PERSPECTIVE,
+          window, QString(), IWorkbenchCommandConstants::PERSPECTIVES_SHOW_PERSPECTIVE,
           CommandContributionItem::STYLE_PUSH));
   showDlgItemParms->label = "&Other...";
   showDlgItem = new CommandContributionItem(showDlgItemParms);
@@ -78,7 +78,7 @@ void ChangeToPerspectiveMenu::Fill(QMenu* menu, QAction* before)
     return;
   }
 
-  MenuManager::Pointer manager(new MenuManager());
+  MenuManager::Pointer manager(new MenuManager(""));
   FillMenu(manager.GetPointer());
 
   QList<IContributionItem::Pointer> items = manager->GetItems();
@@ -121,13 +121,13 @@ void ChangeToPerspectiveMenu::FillMenu(IMenuManager* manager)
 
   // Collect and sort perspective descriptors.
   QList<IPerspectiveDescriptor::Pointer> persps = GetPerspectiveShortcuts();
-  qSort(persps.begin(), persps.end(), PerspectiveComparator);
+  std::sort(persps.begin(), persps.end(), PerspectiveComparator);
 
   /*
    * Convert the perspective descriptors to command parameters, and filter
    * using the activity/capability mechanism.
    */
-  for (const IPerspectiveDescriptor::Pointer &descriptor : qAsConst(persps))
+  for (const IPerspectiveDescriptor::Pointer &descriptor : std::as_const(persps))
   {
     CommandContributionItemParameter::Pointer ccip = GetItem(descriptor);
 

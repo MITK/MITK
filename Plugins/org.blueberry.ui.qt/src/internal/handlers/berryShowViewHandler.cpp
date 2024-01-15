@@ -40,9 +40,9 @@ Object::Pointer ShowViewHandler::Execute(const ExecutionEvent::ConstPointer& eve
   // Get the view identifier, if any.
   const ExecutionEvent::ParameterMap& parameters = event->GetParameters();
   ExecutionEvent::ParameterMap::const_iterator result = parameters.find(IWorkbenchCommandConstants::VIEWS_SHOW_VIEW_PARM_ID);
-  QString viewId = result != parameters.end() ? result.value() : QString::null;
+  QString viewId = result != parameters.end() ? result.value() : QString();
   result = parameters.find(IWorkbenchCommandConstants::VIEWS_SHOW_VIEW_SECONDARY_ID);
-  QString secondary = result != parameters.end() ? result.value() : QString::null;
+  QString secondary = result != parameters.end() ? result.value() : QString();
 
   if (viewId.isEmpty())
   {

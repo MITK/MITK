@@ -23,6 +23,7 @@ found in the LICENSE file.
 
 #include <QIcon>
 #include <QBrush>
+#include <QStringList>
 
 namespace berry {
 
@@ -52,7 +53,7 @@ struct ViewTreeItem
     {
       if (m_keywordCache.isEmpty())
       {
-        m_keywordCache = QStringList(keywordLabels().toList());
+        m_keywordCache = keywordLabels().values();
       }
       return m_keywordCache;
     }
@@ -73,7 +74,7 @@ struct ViewTreeItem
   {
     m_children.push_back(child);
     child->m_parent = this;
-    qSort(m_children.begin(), m_children.end(), CompareViewTreeItem);
+    std::sort(m_children.begin(), m_children.end(), CompareViewTreeItem);
   }
 
   void removeChild(ViewTreeItem* child)
@@ -202,7 +203,7 @@ ViewTreeModel::ViewTreeModel(const IWorkbenchWindow* window, QObject* parent)
   QList<CategoryTreeItem*> categoryItems;
 
   QList<IViewCategory::Pointer> categories = d->viewRegistry.GetCategories();
-  for (const auto &category : qAsConst(categories))
+  for (const auto &category : std::as_const(categories))
   {
     if (category->GetViews().isEmpty()) continue;
     CategoryTreeItem* categoryItem = new CategoryTreeItem(this, category);
@@ -221,7 +222,7 @@ ViewTreeModel::ViewTreeModel(const IWorkbenchWindow* window, QObject* parent)
   if (categoryItems.size() == 1)
   {
     QList<ViewTreeItem*> items = categoryItems.front()->takeChildren();
-    for (auto item : qAsConst(items))
+    for (auto item : std::as_const(items))
     {
       d->rootItem->appendChild(item);
     }
@@ -229,7 +230,7 @@ ViewTreeModel::ViewTreeModel(const IWorkbenchWindow* window, QObject* parent)
   }
   else
   {
-    for (auto category : qAsConst(categoryItems))
+    for (auto category : std::as_const(categoryItems))
     {
       d->rootItem->appendChild(category);
     }
@@ -250,7 +251,7 @@ QVariant ViewTreeModel::data(const QModelIndex& index, int role) const
 
 Qt::ItemFlags ViewTreeModel::flags(const QModelIndex& index) const
 {
-  if (!index.isValid()) return nullptr;
+  if (!index.isValid()) return {};
 
   return static_cast<ViewTreeItem*>(index.internalPointer())->flags();
 }
@@ -379,10 +380,10 @@ QSet<QString> DescriptorTreeItem::keywordLabels() const
   QStringList ids = m_descriptor->GetKeywordReferences();
   QSet<QString> keywords;
   keywords.insert(m_descriptor->GetLabel());
-  for(const auto &id : qAsConst(ids))
+  for(const auto &id : std::as_const(ids))
   {
     QString label = registry->GetKeywordLabel(id);
-    for (const auto &keyword : label.split(' ', QString::SkipEmptyParts))
+    for (const auto &keyword : label.split(' ', Qt::SkipEmptyParts))
     {
       keywords.insert(keyword);
     }
@@ -439,7 +440,7 @@ void CategoryTreeItem::CreateChildren()
 {
   auto viewDescriptors = m_category->GetViews();
   RemoveIntroView(viewDescriptors);
-  for(const auto &viewDescriptor : qAsConst(viewDescriptors))
+  for(const auto &viewDescriptor : std::as_const(viewDescriptors))
   {
     new DescriptorTreeItem(this->m_model, viewDescriptor, this);
   }

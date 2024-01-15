@@ -30,7 +30,7 @@ QmitkTubeGraphNewLabelGroupDialog::QmitkTubeGraphNewLabelGroupDialog(QWidget* pa
   QDialog::setFixedSize(200, 200);
 
   layout = new QVBoxLayout(this);
-  layout->setMargin(5);
+  layout->setContentsMargins(QMargins(5, 5, 5, 5));
   layout->setSpacing(5);
 
   newLabelGroupButton = new QPushButton("Create new label group", this);

@@ -32,7 +32,7 @@ HelpEditorFindWidget::HelpEditorFindWidget(QWidget *parent)
   QString resourcePath = QLatin1String(":/org.blueberry.ui.qt.help");
 
 #ifndef Q_OS_MAC
-  hboxLayout->setMargin(0);
+  hboxLayout->setContentsMargins({});
   hboxLayout->setSpacing(6);
 #endif
 

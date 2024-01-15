@@ -15,6 +15,8 @@ found in the LICENSE file.
 // mitk core
 #include <mitkRenderingManager.h>
 
+#include <QWidget>
+
 namespace HideAllAction
 {
   void Run(const QList<mitk::DataNode::Pointer>& selectedNodes, mitk::BaseRenderer* baseRenderer /*= nullptr*/)

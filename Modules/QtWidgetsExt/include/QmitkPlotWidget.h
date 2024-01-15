@@ -84,7 +84,7 @@ public:
   QmitkPlotWidget(QWidget *parent = nullptr,
                   const char *title = nullptr,
                   const char *name = nullptr,
-                  Qt::WindowFlags f = nullptr);
+                  Qt::WindowFlags f = {});
 
   /**
   * Virtual destructor

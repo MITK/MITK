@@ -48,6 +48,7 @@ found in the LICENSE file.
 #include <QDesktopServices>
 #include <QDebug>
 #include <QMutexLocker>
+#include <QStringList>
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
@@ -477,7 +478,7 @@ QList<QSharedPointer<ctkPlugin> > InternalPlatform::GetPlugins(const QString &sy
   }
   QList<QSharedPointer<ctkPlugin> > sortedPlugins = selected.values();
   QList<QSharedPointer<ctkPlugin> > reversePlugins;
-  qCopyBackward(sortedPlugins.begin(), sortedPlugins.end(), reversePlugins.end());
+  std::copy_backward(sortedPlugins.begin(), sortedPlugins.end(), reversePlugins.end());
   return reversePlugins;
 }
 

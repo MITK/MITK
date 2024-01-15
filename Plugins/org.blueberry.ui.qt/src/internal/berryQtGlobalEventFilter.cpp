@@ -34,7 +34,7 @@ bool QtGlobalEventFilter::eventFilter(QObject*  /*obj*/, QEvent* event)
   if (event->type() == QEvent::MouseButtonPress)
   {
     QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-    QWidget* widget = QApplication::widgetAt(mouseEvent->globalPos());
+    QWidget* widget = QApplication::widgetAt(mouseEvent->globalPosition().toPoint());
     if (widget)
     {
       QObject* parent = widget;

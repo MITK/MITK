@@ -226,7 +226,7 @@ int QmitkSegmentAnythingPreferencePage::FetchSelectedGPUFromUI() const
   }
   else
   {
-    QString gpuId = gpuInfo.split(":", QString::SplitBehavior::SkipEmptyParts).first();
+    QString gpuId = gpuInfo.split(":", Qt::SkipEmptyParts).first();
     return static_cast<int>(gpuId.toInt());
   }
 }

@@ -29,7 +29,7 @@ class MITKIGTUI_EXPORT QmitkNPOptitrackWidget : public QmitkAbstractTrackingDevi
 public:
   static const std::string VIEW_ID;
 
-  QmitkNPOptitrackWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkNPOptitrackWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
   ~QmitkNPOptitrackWidget() override;
 
   void Initialize() override;

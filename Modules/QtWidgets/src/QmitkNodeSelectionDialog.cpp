@@ -228,7 +228,7 @@ void QmitkNodeSelectionDialog::OnSelectionChanged(NodeList selectedNodes)
 
 void QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked()
 {
-  for (auto node : qAsConst(m_SelectedNodes))
+  for (auto node : std::as_const(m_SelectedNodes))
   {
     node->SetBoolProperty("org.mitk.selection.favorite", true);
   }
@@ -236,7 +236,7 @@ void QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked()
 
 void QmitkNodeSelectionDialog::OnOK()
 {
-  for (const auto &node : qAsConst(m_SelectedNodes))
+  for (const auto &node : std::as_const(m_SelectedNodes))
   {
     QmitkDataStorageSelectionHistoryInspector::AddNodeToHistory(node);
   }

@@ -1,5 +1,5 @@
 set(MITK_CONFIG_PACKAGES
-  Qt5
+  Qt6
   BLUEBERRY
 )
 

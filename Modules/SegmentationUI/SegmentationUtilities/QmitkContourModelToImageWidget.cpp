@@ -222,7 +222,7 @@ void QmitkContourModelToImageWidget::OnProcessPressed()
   d->EnableButtons(false);
 
   // Start the computation in a background thread
-  QFuture< mitk::LabelSetImage::Pointer > future = QtConcurrent::run(d, &QmitkContourModelToImageWidgetPrivate::FillContourModelSetIntoImage, image, contourSet, timePoint);
+  auto future = QtConcurrent::run(&QmitkContourModelToImageWidgetPrivate::FillContourModelSetIntoImage, d, image, contourSet, timePoint);
   d->m_Watcher.setFuture(future);
 }
 

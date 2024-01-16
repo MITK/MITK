@@ -138,7 +138,7 @@ void QmitkNDIToolDelegate::setModelData(QWidget *editor, QAbstractItemModel* mod
       QmitkDataStorageComboBox* dsc = qobject_cast<QmitkDataStorageComboBox*>(editor);
       if (dsc->GetSelectedNode().IsNotNull())
       {
-        model->setData(index, qVariantFromValue(dsc->GetSelectedNode()), OrganNodeRole);
+        model->setData(index, QVariant::fromValue(dsc->GetSelectedNode()), OrganNodeRole);
         //model->setData(index, QString::fromStdString(dsc->GetSelectedNode()->GetName()), Qt::DisplayRole);
         model->setData(index, QString::fromStdString(dsc->GetSelectedNode()->GetName()));
         if ((m_TagProperty.IsNotNull()) && (m_TagPropertyName.empty() == false))  // tag this node as selected

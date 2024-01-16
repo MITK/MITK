@@ -29,7 +29,7 @@ class MITKIGTUI_EXPORT QmitkOpenIGTLinkWidget : public QmitkAbstractTrackingDevi
 public:
   static const std::string VIEW_ID;
 
-  QmitkOpenIGTLinkWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkOpenIGTLinkWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
   ~QmitkOpenIGTLinkWidget() override;
 
   void Initialize() override;

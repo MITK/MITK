@@ -88,7 +88,7 @@ struct ExtensionTracker::Impl::HandlerWrapper : public IRegistryEventListener
             associatedObjects.insert(ptr.Lock());
           }
         }
-        removedObjects.push_back(associatedObjects.toList());
+        removedObjects.push_back(associatedObjects.values());
       }
     }
     for (int i = 0; i < extensions.size(); ++i)
@@ -179,7 +179,7 @@ QList<SmartPointer<Object> > ExtensionTracker::GetObjects(const IExtension::Poin
   QSet<Object::Pointer> objectSet;
 
   QMutexLocker lock(&d->mutex);
-  if (d->closed) return objectSet.toList();
+  if (d->closed) return objectSet.values();
 
   auto iter = d->extensionToStrongObjects.find(element);
   if (iter != d->extensionToStrongObjects.end())
@@ -194,7 +194,7 @@ QList<SmartPointer<Object> > ExtensionTracker::GetObjects(const IExtension::Poin
       if (!ptr.Expired()) objectSet.insert(ptr.Lock());
     }
   }
-  return objectSet.toList();
+  return objectSet.values();
 }
 
 void ExtensionTracker::Close()
@@ -235,7 +235,7 @@ QList<SmartPointer<Object> > ExtensionTracker::UnregisterObject(const SmartPoint
   QSet<Object::Pointer> objectSet;
 
   QMutexLocker lock(&d->mutex);
-  if (d->closed) return objectSet.toList();
+  if (d->closed) return objectSet.values();
 
   auto iter = d->extensionToStrongObjects.find(extension);
   if (iter != d->extensionToStrongObjects.end())
@@ -253,7 +253,7 @@ QList<SmartPointer<Object> > ExtensionTracker::UnregisterObject(const SmartPoint
     d->extensionToWeakObjects.erase(iter2);
   }
 
-  return objectSet.toList();
+  return objectSet.values();
 }
 
 IExtensionPointFilter ExtensionTracker::CreateExtensionPointFilter(const SmartPointer<IExtensionPoint>& xpt)

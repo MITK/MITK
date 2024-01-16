@@ -169,7 +169,7 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
 
   connect(m_WebEngineView, SIGNAL(loadFinished(bool)), parent, SLOT(OnLoadFinished(bool)));
   auto layout = new QGridLayout(parent);
-  layout->setMargin(0);
+  layout->setContentsMargins({});
   layout->addWidget(m_WebEngineView);
   m_ChartTypeToName.emplace(ChartType::bar, "bar");
   m_ChartTypeToName.emplace(ChartType::line, "line");

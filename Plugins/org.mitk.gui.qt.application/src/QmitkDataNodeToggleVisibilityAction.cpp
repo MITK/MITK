@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
+#include <QWidget>
+
 // namespace that contains the concrete action
 namespace ToggleVisibilityAction
 {

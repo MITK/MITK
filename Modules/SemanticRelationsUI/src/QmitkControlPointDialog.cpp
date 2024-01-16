@@ -22,7 +22,7 @@ QmitkControlPointDialog::QmitkControlPointDialog(QWidget* parent)
   : QDialog(parent)
 {
   QBoxLayout* verticalLayout = new QVBoxLayout(this);
-  verticalLayout->setMargin(5);
+  verticalLayout->setContentsMargins(QMargins(5, 5, 5, 5));
   verticalLayout->setSpacing(5);
 
   QLabel* dateLabel = new QLabel(tr("Set date"), this);

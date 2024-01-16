@@ -16,9 +16,10 @@ add_subdirectory(cmdapps)
 
 if(TARGET ${MODULE_TARGET})
   if(MSVC)
-    # Warning 4834 leaks into MITK from MatchPoint (remove after MatchPoint is fixed):
-    # Discarding return value of function with nodiscard attribute.
-    target_compile_options(${MODULE_TARGET} PUBLIC /wd4834)
+    # The following warnings leak into MITK from MatchPoint (remove after MatchPoint is fixed):
+    #   - C4828: The file contains a character that is illegal in the current source character set.
+    #   - C4834: Discarding return value of function with nodiscard attribute.
+    target_compile_options(${MODULE_TARGET} PUBLIC /wd4828 /wd4834)
   endif()
 
   set(ALG_PROFILE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/algorithms)

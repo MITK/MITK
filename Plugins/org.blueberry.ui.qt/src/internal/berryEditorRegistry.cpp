@@ -1040,7 +1040,7 @@ QList<IEditorDescriptor::Pointer> EditorRegistry::SortEditors(
 
 void EditorRegistry::SortInternalEditors()
 {
-  qSort(sortedEditorsFromPlugins.begin(), sortedEditorsFromPlugins.end(), CmpEditorDescriptor());
+  std::sort(sortedEditorsFromPlugins.begin(), sortedEditorsFromPlugins.end(), CmpEditorDescriptor());
 }
 
 void EditorRegistry::EditorMap::PutDefault(const QString& key,
@@ -1091,7 +1091,7 @@ QList<FileEditorMapping::Pointer> EditorRegistry::EditorMap::AllMappings()
     resultSet.insert(iter.value());
   }
 
-  return resultSet.toList();
+  return resultSet.values();
 }
 
 QList<FileEditorMapping::Pointer> EditorRegistry::EditorMap::UserMappings()

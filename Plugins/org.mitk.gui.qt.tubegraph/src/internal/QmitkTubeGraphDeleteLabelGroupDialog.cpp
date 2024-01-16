@@ -27,7 +27,7 @@ QmitkTubeGraphDeleteLabelGroupDialog::QmitkTubeGraphDeleteLabelGroupDialog(QWidg
   QDialog::setFixedSize(400, 400);
 
   auto   layout = new QVBoxLayout(this);
-  layout->setMargin(5);
+  layout->setContentsMargins(QMargins(5, 5, 5, 5));
   layout->setSpacing(5);
 
   descriptionLabel = new QLabel("Which Label Group should be removed?", this);

@@ -29,7 +29,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkSliceWidget : public QWidget, public Ui::Qmit
   Q_OBJECT
 
 public:
-  QmitkSliceWidget(QWidget *parent = nullptr, const char *name = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkSliceWidget(QWidget *parent = nullptr, const char *name = nullptr, Qt::WindowFlags f = {});
 
   mitk::VtkPropRenderer *GetRenderer();
 

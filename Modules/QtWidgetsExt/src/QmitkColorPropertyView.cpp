@@ -47,5 +47,5 @@ void QmitkColorPropertyView::DisplayColor()
 
   QColor color(ROUND_P(tmp_col[0] * 255.0), ROUND_P(tmp_col[1] * 255.0), ROUND_P(tmp_col[2] * 255.0));
 
-  m_WidgetPalette.setColor(QPalette::Background, color);
+  m_WidgetPalette.setColor(QPalette::Window, color);
 }

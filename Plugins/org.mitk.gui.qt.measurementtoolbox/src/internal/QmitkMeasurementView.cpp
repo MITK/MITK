@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkMeasurementView.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
 #include <QClipboard>
 #include <QGridLayout>

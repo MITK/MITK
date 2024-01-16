@@ -202,7 +202,7 @@ void QmitkDataNodeContextMenu::InitExtensionPointActions()
   DescriptorActionListType descriptorActionList;
   m_ConfigElements.clear();
 
-  for (const auto& customMenuConfig : qAsConst(customMenuConfigs))
+  for (const auto& customMenuConfig : std::as_const(customMenuConfigs))
   {
     auto descriptorName = customMenuConfig->GetAttribute("nodeDescriptorName");
     auto actionLabel = customMenuConfig->GetAttribute("label");
@@ -269,7 +269,8 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& /*pos*/)
   if (selection.IsNull() || selection->IsEmpty())
     return;
 
-  m_SelectedNodes = QList<mitk::DataNode::Pointer>::fromStdList(selection->GetSelectedDataNodes());
+  auto nodes = selection->GetSelectedDataNodes();
+  m_SelectedNodes = QList<mitk::DataNode::Pointer>(nodes.begin(), nodes.end());
 
   if (!m_SelectedNodes.isEmpty())
   {

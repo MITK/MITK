@@ -61,7 +61,7 @@ public:
   using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
 
   QmitkAbstractMultiWidget(QWidget* parent = 0,
-                           Qt::WindowFlags f = 0,
+                           Qt::WindowFlags f = {},
                            const QString& multiWidgetName = "multiwidget");
 
   virtual ~QmitkAbstractMultiWidget();

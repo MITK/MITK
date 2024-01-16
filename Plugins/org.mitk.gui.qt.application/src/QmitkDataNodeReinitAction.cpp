@@ -22,6 +22,8 @@ found in the LICENSE file.
 // mitk gui common plugin
 #include <mitkWorkbenchUtil.h>
 
+#include <QWidget>
+
 // namespace that contains the concrete action
 namespace ReinitAction
 {

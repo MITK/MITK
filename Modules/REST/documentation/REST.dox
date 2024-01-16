@@ -123,7 +123,7 @@ The steps you need to make are the following:
   <li> Get the result of the request. You can get the JSON-value of the result by callint <code>.get()</code>. At this point, an exception is thrown if something in the previous tasks threw an exception.
   <li> Do something with the result.
   \note If you want to modify GUI elements within the <code>.then(...)</code> block, you need to do this by using signals and slots because GUI elements can only be modified by th Qt Main Thread.
-  For more information, visit https://doc.qt.io/Qt-5/thread-basics.html#gui-thread-and-worker-thread
+  For more information, visit https://doc.qt.io/qt-6/thread-basics.html#gui-thread-and-worker-thread
   <li> Exception handling. Here you can define the behaviour if an exception is thrown, exceptions from ascendent tasks are also catched here.
 </ol>
 

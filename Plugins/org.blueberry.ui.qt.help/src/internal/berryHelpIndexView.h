@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <QModelIndex>
 #include <QListView>
+#include <QUrl>
 
 class ctkSearchBox;
 class QHelpIndexWidget;

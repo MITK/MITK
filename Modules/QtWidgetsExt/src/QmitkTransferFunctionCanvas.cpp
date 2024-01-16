@@ -80,13 +80,14 @@ void QmitkTransferFunctionCanvas::mousePressEvent(QMouseEvent *mouseEvent)
       m_YEdit->clear();
   }
 
-  m_GrabbedHandle = GetNearHandle(mouseEvent->pos().x(), mouseEvent->pos().y());
+  const auto pos = mouseEvent->position().toPoint();
+  m_GrabbedHandle = GetNearHandle(pos.x(), pos.y());
 
   if ((mouseEvent->button() & Qt::LeftButton) && m_GrabbedHandle == -1)
   {
-    this->AddFunctionPoint(this->CanvasToFunction(std::make_pair(mouseEvent->pos().x(), mouseEvent->pos().y())).first,
-                           this->CanvasToFunction(std::make_pair(mouseEvent->x(), mouseEvent->y())).second);
-    m_GrabbedHandle = GetNearHandle(mouseEvent->pos().x(), mouseEvent->pos().y());
+    auto [x, value] = this->CanvasToFunction(std::make_pair(pos.x(), pos.y()));
+    this->AddFunctionPoint(x, value);
+    m_GrabbedHandle = GetNearHandle(pos.x(), pos.y());
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else if ((mouseEvent->button() & Qt::RightButton) && m_GrabbedHandle != -1 && this->GetFunctionSize() > 1)
@@ -102,7 +103,8 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent *mouseEvent)
 {
   if (m_GrabbedHandle != -1)
   {
-    std::pair<double, double> newPos = this->CanvasToFunction(std::make_pair(mouseEvent->x(), mouseEvent->y()));
+    const auto pos = mouseEvent->position().toPoint();
+    std::pair<double, double> newPos = this->CanvasToFunction(std::make_pair(pos.x(), pos.y()));
 
     // X Clamping
     {

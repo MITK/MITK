@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include <berryIWorkbenchPage.h>
 #include <berryUIException.h>
 
+#include <QWidget>
+
 namespace berry
 {
 
@@ -22,7 +24,7 @@ QtShowViewAction::QtShowViewAction(IWorkbenchWindow::Pointer window,
     IViewDescriptor::Pointer desc) :
   QAction(nullptr)
 {
-  this->setParent(static_cast<QWidget*>(window->GetShell()->GetControl()));
+  this->setParent(window->GetShell()->GetControl());
   this->setText(desc->GetLabel());
   this->setToolTip(desc->GetLabel());
   this->setIconVisibleInMenu(true);

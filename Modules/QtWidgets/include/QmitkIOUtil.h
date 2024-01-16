@@ -36,7 +36,6 @@ found in the LICENSE file.
 
 class QWidget;
 class QString;
-class QStringList;
 
 namespace mitk
 {

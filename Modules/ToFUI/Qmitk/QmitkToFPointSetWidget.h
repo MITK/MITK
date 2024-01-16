@@ -55,7 +55,7 @@ class MITKTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFPointSetWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+    QmitkToFPointSetWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = {});
     ~QmitkToFPointSetWidget() override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */

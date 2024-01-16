@@ -212,7 +212,7 @@ QStringList PerspectiveDescriptor::GetCategoryPath() const
   if (configElement.IsNotNull())
   {
     QString category = configElement->GetAttribute(WorkbenchRegistryConstants::TAG_CATEGORY);
-    categoryPath = category.split('/', QString::SkipEmptyParts);
+    categoryPath = category.split('/', Qt::SkipEmptyParts);
   }
   return categoryPath;
 }

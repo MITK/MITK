@@ -91,7 +91,7 @@ void QmitkRenderWindowDataStorageInspector::SetUpConnections()
   changeViewDirectionSignalMapper->setMapping(m_Controls.radioButtonCoronal, QString("coronal"));
   changeViewDirectionSignalMapper->setMapping(m_Controls.radioButtonSagittal, QString("sagittal"));
   changeViewDirectionSignalMapper->setMapping(m_Controls.radioButton3D, QString("3D"));
-  connect(changeViewDirectionSignalMapper, static_cast<void(QSignalMapper::*)(const QString&)>(&QSignalMapper::mapped), this, &QmitkRenderWindowDataStorageInspector::ChangeViewDirection);
+  connect(changeViewDirectionSignalMapper, static_cast<void(QSignalMapper::*)(const QString&)>(&QSignalMapper::mappedString), this, &QmitkRenderWindowDataStorageInspector::ChangeViewDirection);
 
   connect(m_Controls.radioButtonAxial, &QRadioButton::clicked, changeViewDirectionSignalMapper, static_cast<void(QSignalMapper::*)()>(&QSignalMapper::map));
   connect(m_Controls.radioButtonCoronal, &QRadioButton::clicked, changeViewDirectionSignalMapper, static_cast<void(QSignalMapper::*)()>(&QSignalMapper::map));

@@ -94,6 +94,17 @@ mitk::XMLPreferencesStorage::XMLPreferencesStorage(const std::filesystem::path& 
       MITK_ERROR << "Could not load preferences from \"" << filename.string() << "\"!";
     }
   }
+  else
+  {
+    try
+    {
+      std::filesystem::create_directories(filename.parent_path());
+    }
+    catch (const std::exception& e)
+    {
+      MITK_ERROR << "Could not create directories for \"" << filename.string() << "\": " << e.what();
+    }
+  }
 
   m_Root = std::make_unique<Preferences>(Preferences::Properties(), "", nullptr, this);
 }

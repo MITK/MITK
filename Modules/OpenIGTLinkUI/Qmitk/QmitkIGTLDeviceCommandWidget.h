@@ -54,7 +54,7 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLDeviceCommandWidget : public QWidget
      */
     void Initialize(mitk::IGTLDevice::Pointer device);
 
-    QmitkIGTLDeviceCommandWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+    QmitkIGTLDeviceCommandWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
     ~QmitkIGTLDeviceCommandWidget() override;
 
 

@@ -27,8 +27,7 @@ QtMainWindowControl::QtMainWindowControl(Shell* shell, QWidget* parent, Qt::Wind
   controller = new QtWidgetController(shell);
 
   // TODO WeakPointer: QVariant should hold a weak pointer
-  QVariant variant(QVariant::UserType);
-  variant.setValue(controller);
+  auto variant = QVariant::fromValue(controller);
   this->setProperty(QtWidgetController::PROPERTY_ID, variant);
 }
 

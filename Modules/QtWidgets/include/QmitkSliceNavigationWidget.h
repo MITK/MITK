@@ -27,7 +27,7 @@ class MITKQTWIDGETS_EXPORT QmitkSliceNavigationWidget : public QWidget, public U
 
 public:
 
-  QmitkSliceNavigationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkSliceNavigationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
 
   /**
    * \brief Convert the passed value to a QString representation.

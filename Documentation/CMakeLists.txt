@@ -34,31 +34,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${MITK_DOXYGEN_STYLESHEET}
 # Create QCH files for MITK and external projects
 set(MITK_DOXYGEN_GENERATE_QHP "NO")
 if(MITK_DOXYGEN_GENERATE_QCH_FILES)
-
-  find_program(QT_HELPGENERATOR_EXECUTABLE
-    NAMES qhelpgenerator qhelpgenerator-qt5 qhelpgenerator5
-    PATHS ${QT_BINARY_DIR}
-    DOC "The location of the the Qt help generator executable"
-    NO_DEFAULT_PATH
-  )
-  mark_as_advanced(QT_HELPGENERATOR_EXECUTABLE)
-
   if(NOT QT_HELPGENERATOR_EXECUTABLE)
     message(SEND_ERROR "The Qt help generator could not be found. Disabling qch generation")
   else()
     set(MITK_DOXYGEN_GENERATE_QHP "YES")
   endif()
-
-  # The name of the generated MITK qch file, relative to the
-  # Doxygen HTML output folder
-  set(MITK_DOXYGEN_QCH_FILE "${MITK_BINARY_DIR}/MITK-${MITK_REVISION_ID}.qch")
-
-  # Generating ITK and VTK docs it not done yet
-  #option(MITK_DOXYGEN_GENERATE_VTK_QCH_FILE "Use doxygen to generate a Qt compressed help file for VTK docs" OFF)
-  #option(MITK_DOXYGEN_GENERATE_ITK_QCH_FILE "Use doxygen to generate a Qt compressed help file for ITK docs" OFF)
-  #mark_as_advanced(MITK_DOXYGEN_GENERATE_VTK_QCH_FILE MITK_DOXYGEN_GENERATE_ITK_QCH_FILE)
-
 endif()
+
+# The name of the generated MITK qch file, relative to the
+# Doxygen HTML output folder
+set(MITK_DOXYGEN_QCH_FILE "${MITK_BINARY_DIR}/MITK-${MITK_REVISION_ID}.qch")
 
 # Compile a doxygen input filter for processing CMake scripts
 include(mitkFunctionCMakeDoxygenFilterCompile)

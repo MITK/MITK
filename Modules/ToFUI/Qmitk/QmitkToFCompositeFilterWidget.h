@@ -36,7 +36,7 @@ class MITKTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFCompositeFilterWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+    QmitkToFCompositeFilterWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = {});
     ~QmitkToFCompositeFilterWidget() override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */

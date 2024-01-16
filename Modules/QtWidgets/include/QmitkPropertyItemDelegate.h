@@ -59,7 +59,7 @@ public:
 protected:
   void paintEvent(QPaintEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
-  QStyleOptionViewItem viewOptions() const override;
+  void initViewItemOption(QStyleOptionViewItem *option) const override;
 
 private:
   QComboBox *m_ComboBox;

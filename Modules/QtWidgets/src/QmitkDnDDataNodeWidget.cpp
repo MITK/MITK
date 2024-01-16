@@ -61,7 +61,8 @@ void QmitkDnDDataNodeWidget::dropEvent(QDropEvent* event)
   QList<mitk::DataNode*> dataNodeList = QmitkMimeTypes::ToDataNodePtrList(event->mimeData());
   if (!dataNodeList.empty())
   {
-    emit NodesDropped(dataNodeList.toVector().toStdVector());
+    std::vector<mitk::DataNode*> nodes(dataNodeList.begin(), dataNodeList.end());
+    emit NodesDropped(nodes);
   }
 
   event->acceptProposedAction();

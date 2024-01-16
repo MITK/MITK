@@ -50,7 +50,7 @@ QtShowPerspectiveDialog::~QtShowPerspectiveDialog()
 QString QtShowPerspectiveDialog::GetSelection() const
 {
   const QItemSelection selection = ui->m_ListView->selectionModel()->selection();
-  if (selection.isEmpty()) return QString::null;
+  if (selection.isEmpty()) return QString();
 
   return selection.indexes().front().data(PerspectiveListModel::Id).toString();
 }

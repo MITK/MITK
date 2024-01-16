@@ -118,7 +118,8 @@ void QmitkSelectionServiceConnector::OnServiceSelectionChanged(const berry::IWor
   }
   else
   {
-    nodes = QList<mitk::DataNode::Pointer>::fromStdList(dataNodeSelection->GetSelectedDataNodes());
+    auto selectedNodes = dataNodeSelection->GetSelectedDataNodes();
+    nodes = QList<mitk::DataNode::Pointer>(selectedNodes.begin(), selectedNodes.end());
   }
 
   // send new (possibly empty) list of selected nodes

@@ -91,7 +91,7 @@ void QmitkInitialValuesDelegate::setModelData(QWidget* editor, QAbstractItemMode
   if (data.isValid() && valueType(index) == 1)
   {
     QmitkDataStorageComboBox* box = qobject_cast<QmitkDataStorageComboBox*>(editor);
-    QVariant newNode = qVariantFromValue<void*>(static_cast<void*>(box->GetSelectedNode().GetPointer()));
+    QVariant newNode = QVariant::fromValue(static_cast<void*>(box->GetSelectedNode().GetPointer()));
     model->setData(index, newNode);
   }
   else

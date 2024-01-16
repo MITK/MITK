@@ -371,8 +371,8 @@ std::pair<QStringList, QStringList> QmitknnUNetToolGUI::ExtractTrainerPlannerFro
   QStringList trainers, planners;
   for (const auto &trainerPlanner : trainerPlanners)
   {
-    trainers << trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts).first();
-    planners << trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts).last();
+    trainers << trainerPlanner.split(splitterString, Qt::SkipEmptyParts).first();
+    planners << trainerPlanner.split(splitterString, Qt::SkipEmptyParts).last();
   }
   trainers.removeDuplicates();
   planners.removeDuplicates();
@@ -392,7 +392,7 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckab
     QString foldQString = foldBox->itemText(index.row());
     if(foldQString != "dummy_element_that_nobody_can_see")
     {
-    foldQString = foldQString.split("_", QString::SplitBehavior::SkipEmptyParts).last();
+    foldQString = foldQString.split("_", Qt::SkipEmptyParts).last();
     folds.push_back(foldQString.toStdString());
     }
     else
@@ -442,7 +442,7 @@ unsigned int QmitknnUNetToolGUI::FetchSelectedGPUFromUI()
   }
   else
   {
-    QString gpuId = gpuInfo.split(":", QString::SplitBehavior::SkipEmptyParts).first();
+    QString gpuId = gpuInfo.split(":", Qt::SkipEmptyParts).first();
     return static_cast<unsigned int>(gpuId.toInt());
   }
 }

@@ -21,7 +21,7 @@ namespace berry
 int ContainerPlaceholder::nextId = 0;
 
 ContainerPlaceholder::ContainerPlaceholder(const QString& id) :
-  PartPlaceholder(id == "" ? QString("Container Placeholder ") + nextId++ : id)
+  PartPlaceholder(id == "" ? QString("Container Placeholder %1").arg(nextId++) : id)
 {
 
 }

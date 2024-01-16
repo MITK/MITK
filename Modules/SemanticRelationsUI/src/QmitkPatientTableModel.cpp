@@ -113,7 +113,7 @@ QVariant QmitkPatientTableModel::data(const QModelIndex& index, int role/* = Qt:
     return emptyPixmap;
   }
 
-  if (Qt::BackgroundColorRole == role)
+  if (Qt::BackgroundRole == role)
   {
     auto it = m_LesionPresence.find(dataNode);
     if (it != m_LesionPresence.end())

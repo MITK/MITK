@@ -80,7 +80,7 @@ class MITKQTWIDGETS_EXPORT QmitkSliderLevelWindowWidget : public QWidget
 
 public:
   /// constructor
-  QmitkSliderLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkSliderLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
   /// destructor
   ~QmitkSliderLevelWindowWidget() override;
@@ -153,7 +153,7 @@ protected:
   */
   void mouseMoveEvent(QMouseEvent *mouseEvent) override;
 
-  void enterEvent(QEvent *event) override;
+  void enterEvent(QEnterEvent *event) override;
 
   /*!
   *  registers events when a mousebutton is pressed

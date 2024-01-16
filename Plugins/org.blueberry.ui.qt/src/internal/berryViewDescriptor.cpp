@@ -193,7 +193,7 @@ void ViewDescriptor::LoadFromExtension()
   if (!category.isEmpty())
   {
     // Parse the path tokens and store them
-    foreach (QString pathElement, category.split('/', QString::SkipEmptyParts))
+    foreach (QString pathElement, category.split('/', Qt::SkipEmptyParts))
     {
       if (!pathElement.trimmed().isEmpty())
       {

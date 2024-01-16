@@ -104,7 +104,7 @@ QList<QString> Category<T>::GetParentPath()
   }
 
   QString unparsedPath(this->GetRawParentPath());
-  foreach(QString token, unparsedPath.split('/', QString::SkipEmptyParts))
+  foreach(QString token, unparsedPath.split('/', Qt::SkipEmptyParts))
   {
     parentPath.push_back(token.trimmed());
   }

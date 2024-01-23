@@ -8,7 +8,9 @@ if(DEFINED ITK_DIR AND NOT EXISTS ${ITK_DIR})
 endif()
 
 set(proj ITK)
-set(proj_DEPENDENCIES GDCM)
+mitk_query_custom_ep_vars()
+
+set(proj_DEPENDENCIES GDCM ${${proj}_CUSTOM_DEPENDENCIES})
 
 if(MITK_USE_HDF5)
   list(APPEND proj_DEPENDENCIES HDF5)
@@ -38,8 +40,6 @@ if(NOT DEFINED ITK_DIR)
       "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
     )
   endif()
-
-  mitk_query_custom_ep_vars()
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}

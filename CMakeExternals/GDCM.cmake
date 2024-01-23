@@ -16,9 +16,10 @@ if(ITK_DIR)
   endif()
 endif()
 
-
 set(proj GDCM)
-set(proj_DEPENDENCIES )
+mitk_query_custom_ep_vars()
+
+set(proj_DEPENDENCIES ${${proj}_CUSTOM_DEPENDENCIES})
 set(GDCM_DEPENDS ${proj})
 
 if(NOT DEFINED GDCM_DIR)
@@ -36,8 +37,6 @@ if(NOT DEFINED GDCM_DIR)
       "-DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG} -DNDEBUG"
     )
   endif()
-
-  mitk_query_custom_ep_vars()
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}

@@ -153,9 +153,8 @@ control the MITK configuration:
  <li> \b MITK_USE_BLUEBERRY Enable the use of the BlueBerry application framework
  <li> \b MITK_USE_CTK Download, compile, and use CTK in MITK
  <li> \b MITK_USE_DCMTK Download, compile, and use DCMTK in MITK
- <li> \b MITK_USE_OpenCV Download, compile, and use OpenCV in MITK
- <li> \b MITK_USE_Python3 Download and compile 1CableSwig and enable Python
-      wrapping in ITK, VTK, OpenCV, and MITK
+ <li> \b MITK_USE_Python3 Download and compile CableSwig and enable Python
+      wrapping in ITK, VTK, and MITK
  <li> \b MITK_USE_Qt6 Use the Qt 6 framework in MITK
 </ul>
 
@@ -168,7 +167,6 @@ superbuild in the MITK superbuild by using any of the following %CMake variables
  <li> \b MITK_DCMTK_DIR Reuse a DCMKT build directory in MITK.
  <li> \b MITK_GDCM_DIR Reuse a GDCM build directory in MITK.
  <li> \b MITK_ITK_DIR Reuse a ITK build directory in MITK.
- <li> \b MITK_OpenCV_DIR Reuse a OpenCV build directory in MITK.
  <li> \b MITK_VTK_DIR Reuse a VTK build directory in MITK.
 </ul>
 

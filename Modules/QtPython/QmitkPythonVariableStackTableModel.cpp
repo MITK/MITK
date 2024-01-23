@@ -73,31 +73,14 @@ bool QmitkPythonVariableStackTableModel::dropMimeData(const QMimeData * data, Qt
             if( i > 0 )
               varName = QString("%1%2").arg(varName).arg(i);
 
-            bool exportAsCvImage = mitkImage->GetDimension() == 2 && m_PythonService->IsOpenCvPythonWrappingAvailable();
-
-            if( exportAsCvImage )
+            if( m_PythonService->IsSimpleItkPythonWrappingAvailable() )
             {
-              int ret = QMessageBox::question(nullptr, "Export option",
-                "2D image detected. Export as OpenCV image to Python instead of an SimpleITK image?",
-                                              QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-              exportAsCvImage = ret == QMessageBox::Yes;
-              if(exportAsCvImage)
-              {
-                m_PythonService->CopyToPythonAsCvImage( mitkImage, varName.toStdString() );
-                ++i;
-              }
+              m_PythonService->CopyToPythonAsSimpleItkImage( mitkImage, varName.toStdString() );
+              ++i;
             }
-            if( !exportAsCvImage )
+            else
             {
-              if( m_PythonService->IsSimpleItkPythonWrappingAvailable() )
-              {
-                m_PythonService->CopyToPythonAsSimpleItkImage( mitkImage, varName.toStdString() );
-                ++i;
-              }
-              else
-              {
-                MITK_ERROR << "SimpleITK Python wrapping not available. Skipping export for image " << node->GetName();
-              }
+              MITK_ERROR << "SimpleITK Python wrapping not available. Skipping export for image " << node->GetName();
             }
           }
           else

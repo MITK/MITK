@@ -1,6 +1,0 @@
-MITK_CREATE_MODULE( IGTDeviceRegistry
-  INCLUDE_DIRS
-    PRIVATE src/DeviceRegistry
-  DEPENDS PRIVATE MitkIGT
-  AUTOLOAD_WITH MitkIGT
-)

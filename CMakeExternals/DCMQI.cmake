@@ -22,10 +22,6 @@ if(MITK_USE_DCMQI)
       )
     endif()
 
-    if(MITK_USE_OpenCV)
-      list(APPEND additional_cmake_args "-DCMAKE_CONFIGURATION_TYPES:STRING=Debug$<SEMICOLON>Release")
-    endif()
-
     mitk_query_custom_ep_vars()
 
     ExternalProject_Add(${proj}

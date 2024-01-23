@@ -914,10 +914,6 @@ if(MITK_USE_DCMQI)
   find_package(DCMQI REQUIRED)
 endif()
 
-if(MITK_USE_OpenIGTLink)
-  link_directories(${OpenIGTLink_LIBRARY_DIRS})
-endif()
-
 if(MITK_USE_OpenMP)
   find_package(OpenMP REQUIRED COMPONENTS CXX)
 else()

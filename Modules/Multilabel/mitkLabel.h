@@ -83,6 +83,9 @@ namespace mitk
     itk::LightObject::Pointer InternalClone() const override;
   };
 
+  using LabelVector = std::vector<Label::Pointer>;
+  using ConstLabelVector = std::vector<Label::ConstPointer>;
+
   /**
   * @brief Equal A function comparing two labels for beeing equal in data
   *

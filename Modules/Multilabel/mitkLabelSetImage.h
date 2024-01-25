@@ -294,6 +294,7 @@ namespace mitk
 
       /** Helper to ensure that the maps are correctly populated for a new label instance.*/
       void AddLabelToMap(LabelValueType labelValue, Label* label, GroupIndexType groupID);
+      void RemoveLabelFromMap(LabelValueType labelValue);
       /** Helper to ensure label events are correctly connected and lookup table is updated for a new label instance.*/
       void RegisterLabel(Label* label);
       /** Helper to ensure label events are unregistered.*/
@@ -480,19 +481,15 @@ namespace mitk
     /**
     * \brief Replaces the labels of a group with a given vector of labels.
     *
-    * @param groupID Indicating the gRemark: The passed LabelSet instance will be cloned before added to ensure clear ownership
-    * of the new LabelSet addition.
-    *
-    * This will replace an existing labelSet if one exists. Throws an exceptions if you are trying
-    * to add a labelSet to a non-existing layer.
-    *
-    * If there are no labelSets for layers with an id less than layerIdx default ones will be added
-    * for them.
-    *
-    * \param layerIdx The index of the layer the LabelSet should be added to
-    * \param labelSet The LabelSet that should be added
+    * @remark The passed label instances will be cloned before added to ensure clear ownership
+    * of the new labels.
+    * @remark The pixel content of the old labels will not be removed.
+    * \param groupID The index of the group that should have its labels replaced
+    * \param newLabels The vector of new labels
+    * @pre Group that shuold be replaced must exist.
+    * Qpre new label values must not be used in other groups.
     */
-    void ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& labelSet);
+    void ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& newLabels);
 
     /**
       * \brief  */

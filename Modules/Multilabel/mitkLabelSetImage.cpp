@@ -275,12 +275,20 @@ void mitk::LabelSetImage::ReplaceGroupLabels(const GroupIndexType groupID, const
   }
 
   //remove old group labels
-  this->RemoveLabels(this->m_GroupToLabelMap[groupID]);
+  auto oldLabels = this->m_GroupToLabelMap[groupID];
+  for (auto labelID : this->m_GroupToLabelMap[groupID])
+  {
+    this->RemoveLabelFromMap(groupID);
+    this->m_LabelRemovedMessage.Send(labelID);
+
+  }
+  this->m_LabelsChangedMessage.Send(oldLabels);
+  this->m_GroupModifiedMessage.Send(groupID);
 
   //add new labels to group
   for (auto label : labelSet)
   {
-    this->AddLabel(label->Clone(), groupID, false, false);
+    this->AddLabel(label->Clone(), groupID, true, false);
   }
 }
 
@@ -426,14 +434,8 @@ void mitk::LabelSetImage::RemoveLabel(LabelValueType pixelValue)
 
   //first erase the pixel content (also triggers a LabelModified event)
   this->EraseLabel(pixelValue);
-  //now remove the label entry itself
-  this->ReleaseLabel(m_LabelMap[pixelValue]);
+  this->RemoveLabelFromMap(pixelValue);
 
-  m_LabelMap.erase(pixelValue);
-  m_LabelToGroupMap.erase(pixelValue);
-  auto labelsInGroup = m_GroupToLabelMap[groupID];
-  labelsInGroup.erase(std::remove(labelsInGroup.begin(), labelsInGroup.end(), pixelValue), labelsInGroup.end());
-  m_GroupToLabelMap[groupID] = labelsInGroup;
 
   if (m_ActiveLabelValue == pixelValue)
   {
@@ -443,6 +445,21 @@ void mitk::LabelSetImage::RemoveLabel(LabelValueType pixelValue)
   this->m_LabelRemovedMessage.Send(pixelValue);
   this->m_LabelsChangedMessage.Send({ pixelValue });
   this->m_GroupModifiedMessage.Send(groupID);
+}
+
+void mitk::LabelSetImage::RemoveLabelFromMap(LabelValueType pixelValue)
+{
+  if (m_LabelMap.find(pixelValue) == m_LabelMap.end()) mitkThrow()<<"Invalid state of of instance. RemoveLabelFromMap was called for unkown label id. invalid label id: "<<pixelValue;
+
+  auto groupID = this->GetGroupIndexOfLabel(pixelValue);
+
+  this->ReleaseLabel(m_LabelMap[pixelValue]);
+  //now remove the label entry itself
+  m_LabelMap.erase(pixelValue);
+  m_LabelToGroupMap.erase(pixelValue);
+  auto labelsInGroup = m_GroupToLabelMap[groupID];
+  labelsInGroup.erase(std::remove(labelsInGroup.begin(), labelsInGroup.end(), pixelValue), labelsInGroup.end());
+  m_GroupToLabelMap[groupID] = labelsInGroup;
 }
 
 void mitk::LabelSetImage::RemoveLabels(const LabelValueVectorType& vectorOfLabelPixelValues)

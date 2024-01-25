@@ -742,7 +742,14 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType *
 
   while (!sourceIter.IsAtEnd())
   {
-    auto sourceValue = static_cast<PixelType>(sourceIter.Get());
+    const auto originalSourceValue = sourceIter.Get();
+    const auto sourceValue = static_cast<PixelType>(originalSourceValue);
+
+    if (originalSourceValue > mitk::Label::MAX_LABEL_VALUE)
+    {
+      mitkThrow() << "Cannot initialize MultiLabelSegmentation by image. Image contains a pixel value that exceeds the label value range. Invalid pixel value:" << originalSourceValue;
+    }
+
     targetIter.Set(sourceValue);
 
     if (LabelSetImage::UnlabeledValue!=sourceValue && !this->ExistLabel(sourceValue))
@@ -751,7 +758,8 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType *
       {
         mitkThrow() << "Cannot initialize MultiLabelSegmentation by image. Image contains to many labels.";
       }
-        this->AddLayer();
+
+      this->AddLayer();
 
       std::stringstream name;
       name << "object-" << sourceValue;

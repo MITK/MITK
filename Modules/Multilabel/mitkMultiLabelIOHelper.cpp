@@ -52,8 +52,10 @@ bool mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(const std::string &preset
     layerElement->SetAttribute("labels", inputImage->GetNumberOfLabels(layerIndex));
     rootElement->InsertEndChild(layerElement);
 
-    for (unsigned int labelIndex = 0; labelIndex < inputImage->GetNumberOfLabels(layerIndex); labelIndex++)
-      layerElement->InsertEndChild(MultiLabelIOHelper::GetLabelAsXMLElement(xmlDocument, inputImage->GetLabel(labelIndex, layerIndex)));
+    auto labelsInGroup = inputImage->GetConstLabelsInGroup(layerIndex);
+
+    for (const auto label : labelsInGroup)
+      layerElement->InsertEndChild(MultiLabelIOHelper::GetLabelAsXMLElement(xmlDocument, label));
   }
 
   return tinyxml2::XML_SUCCESS == xmlDocument.SaveFile(filename.c_str());
@@ -101,9 +103,12 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
     int numberOfLabels = 0;
     layerElement->QueryIntAttribute("labels", &numberOfLabels);
 
-    if (nullptr == inputImage->GetLabelSet(layerIndex))
+    if (!inputImage->ExistGroup(layerIndex))
     {
-      inputImage->AddLayer();
+      while (!inputImage->ExistGroup(layerIndex))
+      {
+        inputImage->AddLayer();
+      }
     }
     else
     {
@@ -122,18 +127,16 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
 
       if (LabelSetImage::UnlabeledValue != labelValue)
       {
-        auto* labelSet = inputImage->GetLabelSet(layerIndex);
-        auto* alreadyExistingLabel = labelSet->GetLabel(labelValue);
-
-        if (nullptr != alreadyExistingLabel)
+        if (inputImage->ExistLabel(labelValue))
         {
           // Override existing label with label from preset
+          auto alreadyExistingLabel = inputImage->GetLabel(labelValue);
           alreadyExistingLabel->ConcatenatePropertyList(label);
-          labelSet->UpdateLookupTable(labelValue);
+          inputImage->UpdateLookupTable(labelValue);
         }
         else
         {
-          labelSet->AddLabel(label);
+          inputImage->AddLabel(label, layerIndex, false);
         }
       }
 
@@ -154,7 +157,7 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
   return true;
 }
 
-tinyxml2::XMLElement *mitk::MultiLabelIOHelper::GetLabelAsXMLElement(tinyxml2::XMLDocument &doc, Label *label)
+tinyxml2::XMLElement *mitk::MultiLabelIOHelper::GetLabelAsXMLElement(tinyxml2::XMLDocument &doc, const Label *label)
 {
   auto *labelElem = doc.NewElement("Label");
 
@@ -328,7 +331,7 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
     nlohmann::json jgroup;
     nlohmann::json jlabels;
 
-    for (const auto& label : inputImage->GetLabelsInGroup(i))
+    for (const auto& label : inputImage->GetConstLabelsInGroup(i))
     {
       jlabels.emplace_back(SerializeLabelToJSON(label));
     }
@@ -338,21 +341,20 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
   return result;
 };
 
-std::vector<mitk::LabelSet::Pointer> mitk::MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets)
+std::vector<mitk::LabelVector> mitk::MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets)
 {
-  std::vector<LabelSet::Pointer> result;
+  std::vector<LabelVector> result;
 
   for (const auto& jlabelset : listOfLabelSets)
   {
-    LabelSet::Pointer labelSet = LabelSet::New();
+    LabelVector labelSet;
     if (jlabelset.find("labels") != jlabelset.end())
     {
       auto jlabels = jlabelset["labels"];
 
       for (const auto& jlabel : jlabels)
       {
-        auto label = DeserializeLabelFromJSON(jlabel);
-        labelSet->AddLabel(label, false);
+        labelSet.push_back(DeserializeLabelFromJSON(jlabel));
       }
     }
     result.emplace_back(labelSet);

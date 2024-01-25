@@ -170,10 +170,17 @@ namespace mitk
      * @brief Returns a vector of all labels located on the specified group.
      * @param index the index of the group for which the vector of labels should be retrieved.
      * If an invalid index is passed an exception will be raised.
+     * @return the respective vector of const labels.
+     * @pre group index must exist.
+     */
+    const ConstLabelVectorType GetConstLabelsInGroup(GroupIndexType index) const;
+    /**
+     * @brief Returns a vector of all labels located on the specified group.
+     * @param index the index of the group for which the vector of labels should be retrieved.
+     * If an invalid index is passed an exception will be raised.
      * @return the respective vector of labels.
      * @pre group index must exist.
      */
-    const ConstLabelVectorType GetLabelsInGroup(GroupIndexType index) const;
     const LabelVectorType GetLabelsInGroup(GroupIndexType index);
 
     itkGetConstMacro(UnlabeledLabelLock, bool);

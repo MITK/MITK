@@ -492,13 +492,7 @@ namespace mitk
     * \param layerIdx The index of the layer the LabelSet should be added to
     * \param labelSet The LabelSet that should be added
     */
-    void AddLabelSetToLayer(const unsigned int layerIdx, const mitk::LabelSet* labelSet);
-
-    /**
-     * @brief Removes the active layer and the respective mitk::LabelSet and image information.
-     *        The new active layer is the one below, if exists
-     */
-    void RemoveLayer();
+    void ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& labelSet);
 
     /**
       * \brief  */

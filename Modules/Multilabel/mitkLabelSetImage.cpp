@@ -38,29 +38,27 @@ found in the LICENSE file.
 #include <itkBinaryFunctorImageFilter.h>
 
 
-template <typename TPixel, unsigned int VDimensions>
-void SetToZero(itk::Image<TPixel, VDimensions> *source)
+namespace mitk
 {
-  source->FillBuffer(0);
-}
-
-template <unsigned int VImageDimension = 3>
-void CreateLabelMaskProcessing(mitk::Image *layerImage, mitk::Image *mask, mitk::LabelSetImage::LabelValueType index)
-{
-  mitk::ImagePixelReadAccessor<mitk::Label::PixelType, VImageDimension> readAccessor(layerImage);
-  mitk::ImagePixelWriteAccessor<mitk::Label::PixelType, VImageDimension> writeAccessor(mask);
-
-  std::size_t numberOfPixels = 1;
-  for (int dim = 0; dim < static_cast<int>(VImageDimension); ++dim)
-    numberOfPixels *= static_cast<std::size_t>(readAccessor.GetDimension(dim));
-
-  auto src = readAccessor.GetData();
-  auto dest = writeAccessor.GetData();
-
-  for (std::size_t i = 0; i < numberOfPixels; ++i)
+  template <typename ImageType>
+  void ClearBufferProcessing(ImageType* itkImage)
   {
-    if (index == *(src + i))
-      *(dest + i) = 1;
+    itkImage->FillBuffer(0);
+  }
+
+  void ClearImageBuffer(mitk::Image* image)
+  {
+    if (image->GetDimension() == 4)
+    { //remark: this extra branch was added, because LabelSetImage instances can be
+      //dynamic (4D), but AccessByItk by support only supports 2D and 3D.
+      //The option to change the CMake default dimensions for AccessByItk was
+      //dropped (for details see discussion in T28756)
+      AccessFixedDimensionByItk(image, ClearBufferProcessing, 4);
+    }
+    else
+    {
+      AccessByItk(image, ClearBufferProcessing);
+    }
   }
 }
 
@@ -112,14 +110,7 @@ void mitk::LabelSetImage::Initialize(const mitk::Image *other)
   this->SetTimeGeometry(originalGeometry);
 
   // initialize image memory to zero
-  if (4 == this->GetDimension())
-  {
-    AccessFixedDimensionByItk(this, SetToZero, 4);
-  }
-  else
-  {
-    AccessByItk(this, SetToZero);
-  }
+  ClearImageBuffer(this);
 
   // Transfer some general DICOM properties from the source image to derived image (e.g. Patient information,...)
   DICOMQIPropertyHelper::DeriveDICOMSourceProperties(other, this);
@@ -205,6 +196,34 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
   this->Modified();
 }
 
+mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::ExtractLabelValuesFromLabelVector(const LabelVectorType& labels)
+{
+  LabelValueVectorType result;
+
+  for (auto label : labels)
+  {
+    result.emplace_back(label->GetValue());
+  }
+  return result;
+}
+
+mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::ExtractLabelValuesFromLabelVector(const ConstLabelVectorType& labels)
+{
+  LabelValueVectorType result;
+
+  for (auto label : labels)
+  {
+    result.emplace_back(label->GetValue());
+  }
+  return result;
+}
+
+mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::ConvertLabelVectorConst(const LabelVectorType& labels)
+{
+  ConstLabelVectorType result(labels.begin(), labels.end());
+  return result;
+};
+
 mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValues() const
 {
   LabelValueVectorType result = { UnlabeledValue };
@@ -225,14 +244,7 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(ConstLabelVect
                        this->GetImageDescriptor()->GetNumberOfChannels());
   newImage->SetTimeGeometry(this->GetTimeGeometry()->Clone());
 
-  if (newImage->GetDimension() < 4)
-  {
-    AccessByItk(newImage, SetToZero);
-  }
-  else
-  {
-    AccessFixedDimensionByItk(newImage, SetToZero, 4);
-  }
+  ClearImageBuffer(newImage);
 
   return this->AddLayer(newImage, labels);
 }
@@ -290,6 +302,25 @@ void mitk::LabelSetImage::ReplaceGroupLabels(const GroupIndexType groupID, const
   {
     this->AddLabel(label->Clone(), groupID, true, false);
   }
+}
+
+void mitk::LabelSetImage::ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& labelSet)
+{
+  return ReplaceGroupLabels(groupID, ConvertLabelVectorConst(labelSet));
+}
+
+mitk::Image* mitk::LabelSetImage::GetGroupImage(GroupIndexType groupID)
+{
+  if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
+
+  return groupID == this->GetActiveLayer() ? this : m_LayerContainer[groupID];
+}
+
+const mitk::Image* mitk::LabelSetImage::GetGroupImage(GroupIndexType groupID) const
+{
+  if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
+
+  return groupID == this->GetActiveLayer() ? this : m_LayerContainer[groupID].GetPointer();
 }
 
 void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
@@ -362,17 +393,7 @@ void mitk::LabelSetImage::ClearBuffer()
 {
   try
   {
-    if (this->GetDimension() == 4)
-    { //remark: this extra branch was added, because LabelSetImage instances can be
-      //dynamic (4D), but AccessByItk by support only supports 2D and 3D.
-      //The option to change the CMake default dimensions for AccessByItk was
-      //dropped (for details see discussion in T28756)
-      AccessFixedDimensionByItk(this, ClearBufferProcessing,4);
-    }
-    else
-    {
-      AccessByItk(this, ClearBufferProcessing);
-    }
+    ClearImageBuffer(this);
     this->Modified();
   }
   catch (itk::ExceptionObject &e)
@@ -570,7 +591,7 @@ mitk::Label *mitk::LabelSetImage::GetActiveLabel()
   return m_ActiveLabel == UnlabeledValue ? nullptr : m_LabelMap[m_ActiveLabel];
 }
 
-const mitk::Label* mitk::LabelSetImage::GetActiveLabel(unsigned int layer) const
+const mitk::Label* mitk::LabelSetImage::GetActiveLabel() const
 {
   return m_ActiveLabel == UnlabeledValue ? nullptr : m_LabelMap.at(m_ActiveLabel);
 }
@@ -790,7 +811,7 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType *itkImage, mitk::Image *
   TargetIteratorType targetIter(itkImage, itkImage->GetLargestPossibleRegion());
   targetIter.GoToBegin();
 
-  int activeLabel = this->GetActiveLabel(GetActiveLayer())->GetValue();
+  const auto activeLabel = this->GetActiveLabel()->GetValue();
 
   while (!sourceIter.IsAtEnd())
   {
@@ -830,12 +851,6 @@ void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType *itkImage, L
   this->GetLabel(pixelValue)->SetCenterOfMassIndex(pos);
   this->GetSlicedGeometry()->IndexToWorld(pos, pos);
   this->GetLabel(pixelValue)->SetCenterOfMassCoordinates(pos);
-}
-
-template <typename ImageType>
-void mitk::LabelSetImage::ClearBufferProcessing(ImageType *itkImage)
-{
-  itkImage->FillBuffer(0);
 }
 
 template <typename TPixel, unsigned int VImageDimension>
@@ -932,10 +947,13 @@ void mitk::LabelSetImage::AddLabelToMap(LabelValueType labelValue, mitk::Label* 
   if (m_LabelMap.find(labelValue)!=m_LabelMap.end())
     mitkThrow() << "Segmentation is in an invalid state: Label value collision. A label was added with a LabelValue already in use. LabelValue: " << labelValue;
 
+  if (!this->ExistGroup(groupID))
+    mitkThrow() << "Cannot add label. Defined group is unkown. Invalid group index: " << groupID;
+
   m_LabelMap[labelValue] = label;
   m_LabelToGroupMap[labelValue] = groupID;
-  auto groupFinding = std::find(m_GroupToLabelMap.begin(), m_GroupToLabelMap.end(), groupID);
-  if (groupFinding == m_GroupToLabelMap.end())
+  auto groupFinding = std::find(m_GroupToLabelMap[groupID].begin(), m_GroupToLabelMap[groupID].end(), groupID);
+  if (groupFinding == m_GroupToLabelMap[groupID].end())
   {
     m_GroupToLabelMap[groupID] = { labelValue };
   }
@@ -1298,7 +1316,7 @@ public:
         else
         {
           auto labelFinding = this->m_DestinationLabels.find(existingDestinationValue);
-          if (labelFinding==this->m_DestinationLabels.end() || !labelFinding->GetLocked())
+          if (labelFinding==this->m_DestinationLabels.end() || !labelFinding->second->GetLocked())
           {
             return this->m_NewDestinationLabel;
           }
@@ -1318,7 +1336,7 @@ public:
   }
 
 private:
-  const ConstLabelMapType m_DestinationLabels;
+  ConstLabelMapType m_DestinationLabels;
   mitk::Label::PixelType m_SourceBackground = 0;
   mitk::Label::PixelType m_DestinationBackground = 0;
   bool m_DestinationBackgroundLocked = false;
@@ -1350,7 +1368,7 @@ void TransferLabelContentAtTimeStepHelper(const itk::Image<mitk::Label::PixelTyp
   typedef LabelTransferFunctor <mitk::Label::PixelType, mitk::Label::PixelType, mitk::Label::PixelType> LabelTransferFunctorType;
   typedef itk::BinaryFunctorImageFilter<ContentImageType, ContentImageType, ContentImageType, LabelTransferFunctorType> FilterType;
 
-  LabelTransferFunctorType transferFunctor(destinationLabels, sourceBackground, destinationBackground,
+  LabelTransferFunctorType transferFunctor(ConvertLabelVectorToMap(destinationLabels), sourceBackground, destinationBackground,
     destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeStyle, overwriteStyle);
 
   auto transferFilter = FilterType::New();
@@ -1366,7 +1384,7 @@ void TransferLabelContentAtTimeStepHelper(const itk::Image<mitk::Label::PixelTyp
 
 void mitk::TransferLabelContentAtTimeStep(
   const Image* sourceImage, Image* destinationImage, const mitk::ConstLabelVector& destinationLabels, const TimeStepType timeStep, mitk::Label::PixelType sourceBackground,
-  mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping,
+  mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked, LabelValueMappingVector labelMapping,
   MultiLabelSegmentation::MergeStyle mergeStyle, MultiLabelSegmentation::OverwriteStyle overwriteStlye)
 {
   if (nullptr == sourceImage)
@@ -1410,7 +1428,7 @@ void mitk::TransferLabelContentAtTimeStep(
 
 void mitk::TransferLabelContent(
   const Image* sourceImage, Image* destinationImage, const mitk::ConstLabelVector& destinationLabels, mitk::Label::PixelType sourceBackground,
-  mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping,
+  mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked, LabelValueMappingVector labelMapping,
   MultiLabelSegmentation::MergeStyle mergeStyle, MultiLabelSegmentation::OverwriteStyle overwriteStlye)
 {
   if (nullptr == sourceImage)
@@ -1437,7 +1455,7 @@ void mitk::TransferLabelContent(
 
 void mitk::TransferLabelContentAtTimeStep(
   const LabelSetImage* sourceImage, LabelSetImage* destinationImage, const TimeStepType timeStep,
-  std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping,
+  LabelValueMappingVector labelMapping,
   MultiLabelSegmentation::MergeStyle mergeStyle, MultiLabelSegmentation::OverwriteStyle overwriteStlye)
 {
   if (nullptr == sourceImage)
@@ -1461,7 +1479,7 @@ void mitk::TransferLabelContentAtTimeStep(
 
 void mitk::TransferLabelContent(
   const LabelSetImage* sourceImage, LabelSetImage* destinationImage,
-  std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping,
+  LabelValueMappingVector labelMapping,
   MultiLabelSegmentation::MergeStyle mergeStyle, MultiLabelSegmentation::OverwriteStyle overwriteStlye)
 {
   if (nullptr == sourceImage)

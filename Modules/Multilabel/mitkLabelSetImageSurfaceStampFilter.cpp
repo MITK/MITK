@@ -74,7 +74,7 @@ void mitk::LabelSetImageSurfaceStampFilter::ItkImageProcessing(itk::Image<TPixel
     TargetIteratorType targetIter(itkImage, itkImage->GetLargestPossibleRegion());
     targetIter.GoToBegin();
 
-    int activeLabel = (LabelSetInputImage->GetActiveLabel(LabelSetInputImage->GetActiveLayer()))->GetValue();
+    int activeLabel = LabelSetInputImage->GetActiveLabel()->GetValue();
 
     while (!sourceIter.IsAtEnd())
     {

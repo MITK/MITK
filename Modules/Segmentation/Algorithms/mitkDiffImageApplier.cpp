@@ -167,7 +167,7 @@ void mitk::DiffImageApplier::ExecuteOperation(Operation *operation)
       TransferLabelContentAtTimeStep(
         m_SliceDifferenceImage,
         labelSetImage,
-        labelSetImage->GetActiveLabelSet(),
+        labelSetImage->GetConstLabelsInGroup(labelSetImage->GetActiveLayer()),
         m_TimeStep,
         0,
         0,

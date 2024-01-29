@@ -180,15 +180,15 @@ namespace mitk
         itkLabelImage->DisconnectPipeline();
 
         // Iterate over all labels. For each label a segmentation image will be created
-        const LabelSet *labelSet = input->GetLabelSet(layer);
+        auto labelSet = input->GetConstLabelsInGroup(layer);
 
-        for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
+        for (const auto label : labelSet)
         {
           // Thresold over the image with the given label value
           itk::ThresholdImageFilter<itkInternalImageType>::Pointer thresholdFilter =
             itk::ThresholdImageFilter<itkInternalImageType>::New();
           thresholdFilter->SetInput(itkLabelImage);
-          thresholdFilter->ThresholdOutside(labelIter->first, labelIter->first);
+          thresholdFilter->ThresholdOutside(label->GetValue(), label->GetValue());
           thresholdFilter->SetOutsideValue(0);
           thresholdFilter->Update();
           itkInternalImageType::Pointer segmentImage = thresholdFilter->GetOutput();
@@ -374,7 +374,7 @@ namespace mitk
           labelSetImage = LabelSetImage::New();
           labelSetImage->InitializeByLabeledImage(layerImage);
           // Already a label was generated, so set the information to this
-          newLabel = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer());
+          newLabel = labelSetImage->GetActiveLabel();
           newLabel->SetName(labelName.c_str());
           newLabel->SetColor(Color(tmp));
           newLabel->SetValue(segValue);
@@ -389,7 +389,7 @@ namespace mitk
           newLabel->SetName(labelName.c_str());
           newLabel->SetColor(Color(tmp));
           newLabel->SetValue(segValue);
-          labelSetImage->GetLabelSet(labelSetImage->GetActiveLayer())->AddLabel(newLabel);
+          labelSetImage->AddLabel(newLabel, labelSetImage->GetActiveLayer());
         }
 
         // Add some more label properties
@@ -484,12 +484,10 @@ namespace mitk
     handler.setInstanceNumber("1");
     handler.setBodyPartExamined("");
 
-    const LabelSet *labelSet = image->GetLabelSet(layer);
+    auto labelSet = image->GetConstLabelsInGroup(layer);
 
-    for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
+    for (const auto label : labelSet)
     {
-      const Label *label = labelIter->second;
-
       if (label != nullptr)
       {
         TemporoSpatialStringProperty *segmentNumberProp = dynamic_cast<mitk::TemporoSpatialStringProperty *>(label->GetProperty(

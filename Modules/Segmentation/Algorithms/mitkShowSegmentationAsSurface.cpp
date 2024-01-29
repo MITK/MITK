@@ -98,7 +98,7 @@ namespace mitk
 
     if (nullptr != labelSetImage)
     {
-      auto numberOfLayers = labelSetImage->GetNumberOfLayers();
+      const auto labels = labelSetImage->GetLabels();
 
       for (decltype(numberOfLayers) layerIndex = 0; layerIndex < numberOfLayers; ++layerIndex)
       {

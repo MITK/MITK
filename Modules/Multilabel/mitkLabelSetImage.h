@@ -430,16 +430,9 @@ namespace mitk
      */
     unsigned int GetTotalNumberOfLabels() const;
 
-    // This function will need to be ported to an external class
-    // it requires knowledge of pixeltype and dimension and includes
-    // too much algorithm to be sensibly part of a data class
-    ///**
-    //  * \brief  */
-    // void SurfaceStamp(mitk::Surface* surface, bool forceOverwrite);
-
     /**
       * \brief  */
-    mitk::Image::Pointer CreateLabelMask(PixelType index, bool useActiveLayer = true, unsigned int layer = 0);
+    mitk::Image::Pointer CreateLabelMask(PixelType index);
 
     /**
      * @brief Initialize a new mitk::LabelSetImage by an given image.

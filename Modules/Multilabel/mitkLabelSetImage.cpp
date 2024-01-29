@@ -651,54 +651,26 @@ void mitk::LabelSetImage::MaskStamp(mitk::Image *mask, bool forceOverwrite)
   }
 }
 
-mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index, bool useActiveLayer, unsigned int layer)
+mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index)
 {
-  auto previousActiveLayer = this->GetActiveLayer();
+  if (!this->ExistLabel(index)) mitkThrow() << "Error, cannot return label mask. Label ID is invalid. Invalid ID: " << index;
+
   auto mask = mitk::Image::New();
 
-  try
-  {
-    // mask->Initialize(this) does not work here if this label set image has a single slice,
-    // since the mask would be automatically flattened to a 2-d image, whereas we expect the
-    // original dimension of this label set image. Hence, initialize the mask more explicitly:
-    mask->Initialize(this->GetPixelType(), this->GetDimension(), this->GetDimensions());
-    mask->SetTimeGeometry(this->GetTimeGeometry()->Clone());
+  // mask->Initialize(this) does not work here if this label set image has a single slice,
+  // since the mask would be automatically flattened to a 2-d image, whereas we expect the
+  // original dimension of this label set image. Hence, initialize the mask more explicitly:
+  mask->Initialize(this->GetPixelType(), this->GetDimension(), this->GetDimensions());
+  mask->SetTimeGeometry(this->GetTimeGeometry()->Clone());
 
-    auto byteSize = sizeof(LabelSetImage::PixelType);
-    for (unsigned int dim = 0; dim < mask->GetDimension(); ++dim)
-      byteSize *= mask->GetDimension(dim);
+  ClearImageBuffer(mask);
 
-    {
-      ImageWriteAccessor accessor(mask);
-      memset(accessor.GetData(), 0, byteSize);
-    }
+  const auto groupID = this->GetGroupIndexOfLabel(index);
 
-    if (!useActiveLayer)
-      this->SetActiveLayer(layer);
-
-    if (4 == this->GetDimension())
-    {
-      ::CreateLabelMaskProcessing<4>(this, mask, index);
-    }
-    else if (3 == this->GetDimension())
-    {
-      ::CreateLabelMaskProcessing(this, mask, index);
-    }
-    else
-    {
-      mitkThrow();
-    }
-  }
-  catch (...)
-  {
-    if (!useActiveLayer)
-      this->SetActiveLayer(previousActiveLayer);
-
-    mitkThrow() << "Could not create a mask out of the selected label.";
-  }
-
-  if (!useActiveLayer)
-    this->SetActiveLayer(previousActiveLayer);
+  TransferLabelContent(this->GetGroupImage(groupID), mask.GetPointer(),
+    this->GetConstLabelsInGroup(groupID),
+    LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false,
+    { { index, 1 } }, MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
 
   return mask;
 }

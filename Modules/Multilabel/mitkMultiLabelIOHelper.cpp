@@ -52,7 +52,7 @@ bool mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(const std::string &preset
     layerElement->SetAttribute("labels", inputImage->GetNumberOfLabels(layerIndex));
     rootElement->InsertEndChild(layerElement);
 
-    auto labelsInGroup = inputImage->GetConstLabelsInGroup(layerIndex);
+    auto labelsInGroup = inputImage->GetConstLabelsByValue(inputImage->GetLabelValuesByGroup(layerIndex));
 
     for (const auto label : labelsInGroup)
       layerElement->InsertEndChild(MultiLabelIOHelper::GetLabelAsXMLElement(xmlDocument, label));
@@ -331,7 +331,7 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
     nlohmann::json jgroup;
     nlohmann::json jlabels;
 
-    for (const auto& label : inputImage->GetConstLabelsInGroup(i))
+    for (const auto& label : inputImage->GetConstLabelsByValue(inputImage->GetLabelValuesByGroup(i)))
     {
       jlabels.emplace_back(SerializeLabelToJSON(label));
     }

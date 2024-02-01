@@ -166,31 +166,51 @@ namespace mitk
     const ConstLabelVectorType GetLabels() const;
     const LabelVectorType GetLabels();
 
+    const LabelVectorType GetLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing = true);
+    const ConstLabelVectorType GetConstLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing = false) const;
+
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const ConstLabelVectorType& labels);
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const LabelVectorType& labels);
 
     static ConstLabelVectorType ConvertLabelVectorConst(const LabelVectorType& labels);
 
     /**
-     * @brief Returns a vector of all labels located on the specified group.
+     * @brief Returns a vector of all label values located on the specified group.
      * @param index the index of the group for which the vector of labels should be retrieved.
      * If an invalid index is passed an exception will be raised.
-     * @return the respective vector of const labels.
+     * @return the respective vector of label values.
      * @pre group index must exist.
      */
-    const ConstLabelVectorType GetConstLabelsInGroup(GroupIndexType index) const;
+    const LabelValueVectorType GetLabelValuesByGroup(GroupIndexType index) const;
+
     /**
-     * @brief Returns a vector of all labels located on the specified group.
+     * @brief Returns a vector of all label values located on the specified group having a certain name.
      * @param index the index of the group for which the vector of labels should be retrieved.
      * If an invalid index is passed an exception will be raised.
-     * @return the respective vector of labels.
+     * @param name Name of the label instances one is looking for.
+     * @return the respective vector of label values.
      * @pre group index must exist.
      */
-    const LabelVectorType GetLabelsInGroup(GroupIndexType index);
+    const LabelValueVectorType GetLabelValuesByName(GroupIndexType index, std::string_view name) const;
+
+    std::vector<std::string> GetLabelClassNames() const;
+    std::vector<std::string> GetLabelClassNamesByGroup(GroupIndexType index) const;
 
     itkGetConstMacro(UnlabeledLabelLock, bool);
     itkSetMacro(UnlabeledLabelLock, bool);
     itkBooleanMacro(UnlabeledLabelLock);
+
+    /** \brief
+    */
+    void SetAllLabelsVisible(bool visible);
+    void SetAllLabelsVisibleByGroup(GroupIndexType group, bool visible);
+    void SetAllLabelsVisibleByName(GroupIndexType group, std::string_view name, bool visible);
+
+    /** \brief
+    */
+    void SetAllLabelsLocked(bool locked);
+    void SetAllLabelsLockedByGroup(GroupIndexType group, bool locked);
+    void SetAllLabelsLockedByName(GroupIndexType group, std::string_view name, bool locked);
 
     /**
     * \brief Replaces the labels of a group with a given vector of labels.
@@ -325,6 +345,9 @@ namespace mitk
       void RegisterLabel(Label* label);
       /** Helper to ensure label events are unregistered.*/
       void ReleaseLabel(Label* label);
+
+      void ApplyToLabels(const LabelValueVectorType& values, std::function<void(Label*)>&& lambda);
+      void VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const;
 
       using LabelMapType = std::map<LabelValueType, Label::Pointer>;
       LabelMapType m_LabelMap;

@@ -180,7 +180,7 @@ namespace mitk
         itkLabelImage->DisconnectPipeline();
 
         // Iterate over all labels. For each label a segmentation image will be created
-        auto labelSet = input->GetConstLabelsInGroup(layer);
+        auto labelSet = input->GetConstLabelsByValue(input->GetLabelValuesByGroup(layer));
 
         for (const auto label : labelSet)
         {
@@ -397,7 +397,7 @@ namespace mitk
         ++segmentIter;
       }
 
-      labelSetImage->GetLabelSet()->SetAllLabelsVisible(true);
+      labelSetImage->SetAllLabelsVisible(true);
 
       // Add some general DICOM Segmentation properties
       mitk::IDICOMTagsOfInterest *toiSrv = DICOMIOHelper::GetTagsOfInterestService();
@@ -484,7 +484,7 @@ namespace mitk
     handler.setInstanceNumber("1");
     handler.setBodyPartExamined("");
 
-    auto labelSet = image->GetConstLabelsInGroup(layer);
+    auto labelSet = image->GetConstLabelsByValue(image->GetLabelValuesByGroup(layer));
 
     for (const auto label : labelSet)
     {

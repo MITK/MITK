@@ -311,7 +311,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
       {
         resultLabelSetImage->AddLayer();
       }
-      resultLabelSetImage->ReplaceGroupLabels(layerID, inputLabelSetImage->GetConstLabelsInGroup(layerID));
+      resultLabelSetImage->ReplaceGroupLabels(layerID, inputLabelSetImage->GetConstLabelsByValue(inputLabelSetImage->GetLabelValuesByGroup(layerID)));
       cloneInput->SetActiveLayer(layerID);
       resultLabelSetImage->SetActiveLayer(layerID);
 

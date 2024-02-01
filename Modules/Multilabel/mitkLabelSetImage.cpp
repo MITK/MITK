@@ -689,7 +689,7 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index)
   const auto groupID = this->GetGroupIndexOfLabel(index);
 
   TransferLabelContent(this->GetGroupImage(groupID), mask.GetPointer(),
-    this->GetConstLabelsInGroup(groupID),
+    this->GetConstLabelsByValue(this->GetLabelValuesByGroup(groupID)),
     LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false,
     { { index, 1 } }, MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
 
@@ -981,6 +981,20 @@ void mitk::LabelSetImage::ReleaseLabel(Label* label)
   label->RemoveAllObservers();
 }
 
+void mitk::LabelSetImage::ApplyToLabels(const LabelValueVectorType& values, std::function<void(Label*)>&& lambda)
+{
+  auto labels = this->GetLabelsByValue(values);
+  std::for_each(labels.begin(), labels.end(), lambda);
+  m_LabelsChangedMessage.Send(values);
+}
+
+void mitk::LabelSetImage::VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const
+{
+  auto labels = this->GetConstLabelsByValue(values);
+  std::for_each(labels.begin(), labels.end(), lambda);
+}
+
+
 void mitk::LabelSetImage::OnLabelModified(const Object* sender, const itk::EventObject&)
 {
   auto label = dynamic_cast<const Label*>(sender);
@@ -1091,42 +1105,115 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabels()
   return result;
 }
 
-const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetConstLabelsInGroup(GroupIndexType index) const
+const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing)
 {
-  if (!this->ExistGroup(index))
-    mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
-
-  mitk::LabelSetImage::ConstLabelVectorType result;
-  const auto labelValues = m_GroupToLabelMap[index];
-
-  for (const auto& labelValue : labelValues)
-  {
-    const auto* label = this->GetLabel(labelValue);
-
-    if (label != nullptr)
-      result.emplace_back(label);
-  }
-
-  return result;
-}
-
-const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabelsInGroup(GroupIndexType index)
-{
-  if (!this->ExistGroup(index))
-    mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
-
-  mitk::LabelSetImage::LabelVectorType result;
-  const auto labelValues = m_GroupToLabelMap[index];
-
+  LabelVectorType result;
   for (const auto& labelValue : labelValues)
   {
     auto* label = this->GetLabel(labelValue);
 
     if (label != nullptr)
-      result.emplace_back(label);
+    {
+      if (ignoreMissing) result.emplace_back(label);
+      else mitkThrow() << "Error cannot get labels by Value. At least one passed value is unknown. Unknown value: " << labelValue;
+    }
   }
+  return result;
+}
+
+const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetConstLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing) const
+{
+  ConstLabelVectorType result;
+  for (const auto& labelValue : labelValues)
+  {
+    const auto* label = this->GetLabel(labelValue);
+
+    if (label != nullptr)
+    {
+      if (ignoreMissing) result.emplace_back(label);
+      else mitkThrow() << "Error cannot get labels by Value. At least one passed value is unknown. Unknown value: " << labelValue;
+    }
+  }
+  return result;
+}
+
+const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelValuesByGroup(GroupIndexType index) const
+{
+  if (!this->ExistGroup(index))
+    mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
+
+  return m_GroupToLabelMap[index];
+}
+
+const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelValuesByName(GroupIndexType index, std::string_view name) const
+{
+  LabelValueVectorType result;
+
+  auto searchName = [&result, name](const Label* l) { if(l->GetName() == name) result.push_back(l->GetValue()); };
+
+  this->VisitLabels(this->GetLabelValuesByGroup(index), searchName);
 
   return result;
+}
+
+std::vector<std::string> mitk::LabelSetImage::GetLabelClassNames() const
+{
+  std::set<std::string> names;
+  auto searchName = [&names](const Label* l) { names.emplace(l->GetName()); };
+  this->VisitLabels(this->GetUsedLabelValues(), searchName);
+
+  return std::vector<std::string>(names.begin(), names.end());
+}
+
+std::vector<std::string> mitk::LabelSetImage::GetLabelClassNamesByGroup(GroupIndexType index) const
+{
+  std::set<std::string> names;
+  auto searchName = [&names](const Label* l) { names.emplace(l->GetName()); };
+  this->VisitLabels(this->GetLabelValuesByGroup(index), searchName);
+
+  return std::vector<std::string>(names.begin(), names.end());
+}
+
+void mitk::LabelSetImage::SetAllLabelsVisible(bool visible)
+{
+  auto setVisibility = [visible](Label* l) { l->SetVisible(visible); };
+
+  this->ApplyToLabels(this->GetUsedLabelValues(), setVisibility);
+}
+
+void mitk::LabelSetImage::SetAllLabelsVisibleByGroup(GroupIndexType group, bool visible)
+{
+  auto setVisibility = [visible](Label* l) { l->SetVisible(visible); };
+
+  this->ApplyToLabels(this->GetLabelValuesByGroup(group), setVisibility);
+}
+
+void mitk::LabelSetImage::SetAllLabelsVisibleByName(GroupIndexType group, std::string_view name, bool visible)
+{
+  auto setVisibility = [visible](Label* l) { l->SetVisible(visible); };
+
+  this->ApplyToLabels(this->GetLabelValuesByName(group, name), setVisibility);
+}
+
+void mitk::LabelSetImage::SetAllLabelsLocked(bool locked)
+{
+  auto setLock = [locked](Label* l) { l->SetLocked(locked); };
+
+  this->ApplyToLabels(this->GetUsedLabelValues(), setLock);
+}
+
+void mitk::LabelSetImage::SetAllLabelsLockedByGroup(GroupIndexType group, bool locked)
+{
+  auto setLock = [locked](Label* l) { l->SetLocked(locked); };
+
+  this->ApplyToLabels(this->GetLabelValuesByGroup(group), setLock);
+}
+
+void mitk::LabelSetImage::SetAllLabelsLockedByName(GroupIndexType group, std::string_view name, bool locked)
+{
+  auto setLock = [locked](Label* l) { l->SetLocked(locked); };
+
+  this->ApplyToLabels(this->GetLabelValuesByName(group, name), setLock);
 }
 
 bool mitk::Equal(const mitk::LabelSetImage &leftHandSide,
@@ -1204,8 +1291,8 @@ bool mitk::Equal(const mitk::LabelSetImage &leftHandSide,
     }
 
     // label data
-    auto leftLabelsInGroup = leftHandSide.GetConstLabelsInGroup(layerIndex);
-    auto rightLabelsInGroup = rightHandSide.GetConstLabelsInGroup(layerIndex);
+    auto leftLabelsInGroup = leftHandSide.GetLabelValuesByGroup(layerIndex);
+    auto rightLabelsInGroup = rightHandSide.GetLabelValuesByGroup(layerIndex);
 
     if (leftLabelsInGroup.size()!=rightLabelsInGroup.size())
     {
@@ -1215,7 +1302,7 @@ bool mitk::Equal(const mitk::LabelSetImage &leftHandSide,
 
     for (ConstLabelVector::size_type index = 0; index < leftLabelsInGroup.size(); ++index)
     {
-      if (mitk::Equal(*leftLabelsInGroup[index], *rightLabelsInGroup[index],eps,verbose))
+      if (mitk::Equal(*(leftHandSide.GetLabel(leftLabelsInGroup[index])), *(rightHandSide.GetLabel(rightLabelsInGroup[index])),eps,verbose))
       {
         MITK_INFO(verbose) << "At least one label in layer is not equal. Invalid layer:" << layerIndex;
         return false;
@@ -1463,7 +1550,7 @@ void mitk::TransferLabelContentAtTimeStep(
     mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; sourceImage must not be null.";
   }
 
-  auto destinationLabels = destinationImage->GetConstLabelsInGroup(destinationImage->GetActiveLayer());
+  auto destinationLabels = destinationImage->GetConstLabelsByValue(destinationImage->GetLabelValuesByGroup(destinationImage->GetActiveLayer()));
 
   for (const auto& mappingElement : labelMapping)
   {

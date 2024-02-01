@@ -399,7 +399,7 @@ void QmitkImageCropperView::ProcessImage(bool mask)
 
       for (unsigned int i = 0; i < labelsetImageInput->GetNumberOfLayers(); i++)
       {
-        labelSetImage->ReplaceGroupLabels(i, labelsetImageInput->GetConstLabelsInGroup(i));
+        labelSetImage->ReplaceGroupLabels(i, labelsetImageInput->GetConstLabelsByValue(labelsetImageInput->GetLabelValuesByGroup(i)));
       }
 
       croppedImageNode->SetData(labelSetImage);

@@ -1149,8 +1149,8 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& id,
     else if (part->IsPlaceHolder()
              && part.Cast<PartPlaceholder>()->HasWildCard())
     {
-      QRegExp re(id, Qt::CaseInsensitive);
-      if (re.exactMatch(part->GetID()))
+      QRegularExpression re(QString("^%1$").arg(id), QRegularExpression::CaseInsensitiveOption);
+      if (re.match(part->GetID()).hasMatch())
       {
         matchingParts.push_back(MatchingPart(part->GetID(), "", part));
       }
@@ -1229,11 +1229,11 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& primaryId,
         return part;
       }
       // check for partial matching pair
-      QRegExp pre(phPrimaryId, Qt::CaseInsensitive);
-      if (pre.exactMatch(primaryId))
+      QRegularExpression pre(QString("^%1$").arg(phPrimaryId), QRegularExpression::CaseInsensitiveOption);
+      if (pre.match(primaryId).hasMatch())
       {
-        QRegExp sre(phSecondaryId, Qt::CaseInsensitive);
-        if (sre.exactMatch(secondaryId))
+        QRegularExpression sre(QString("^%1$").arg(phSecondaryId), QRegularExpression::CaseInsensitiveOption);
+        if (sre.match(secondaryId).hasMatch())
         {
           matchingParts.push_back(MatchingPart(phPrimaryId, phSecondaryId, part));
         }

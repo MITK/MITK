@@ -152,7 +152,7 @@ void PerspectivesPreferencePage::Update()
   {
     perspectives.push_back(persps[i].Cast<PerspectiveDescriptor>());
   }
-  qSort(perspectives.begin(), perspectives.end(), PerspectiveComparator);
+  std::sort(perspectives.begin(), perspectives.end(), PerspectiveComparator);
   defaultPerspectiveId = perspRegistry->GetDefaultPerspective();
   UpdatePerspectivesTable();
 }
@@ -231,7 +231,7 @@ void PerspectivesPreferencePage::UpdateButtons()
 void PerspectivesPreferencePage::UpdatePerspectivesTable()
 {
   ui->perspectivesListWidget->clear();
-  for (const PerspectiveDescriptor::Pointer &desc : qAsConst(perspectives))
+  for (const PerspectiveDescriptor::Pointer &desc : std::as_const(perspectives))
   {
     NewPerspectivesTableItem(desc);
   }

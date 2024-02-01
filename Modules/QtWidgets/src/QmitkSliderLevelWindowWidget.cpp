@@ -114,8 +114,8 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
   painter.setPen(this->palette().color(this->foregroundRole()));
 
   QColor c(51, 153, 204);
-  QColor cl = c.light();
-  QColor cd = c.dark();
+  QColor cl = c.lighter();
+  QColor cd = c.darker();
 
   painter.setBrush(c);
   painter.drawRect(m_Rect);
@@ -421,11 +421,11 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
   }
 }
 
-void QmitkSliderLevelWindowWidget::enterEvent(QEvent * /*event*/)
+void QmitkSliderLevelWindowWidget::enterEvent(QEnterEvent * /*event*/)
 {
-  QPoint p = QCursor::pos();
-  p = this->mapFromGlobal(p);
-  QMouseEvent ev(QEvent::MouseMove, p, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+  const auto pos = QCursor::pos();
+  const auto localPos = this->mapFromGlobal(pos);
+  QMouseEvent ev(QEvent::MouseMove, localPos, pos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
   this->mouseMoveEvent(&ev);
 }
 

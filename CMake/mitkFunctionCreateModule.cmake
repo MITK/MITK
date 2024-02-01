@@ -10,7 +10,7 @@
 #! mitk_create_module(
 #!     DEPENDS PUBLIC MitkCore
 #!     PACKAGE_DEPENDS
-#!       PRIVATE Qt5|Xml+Networking
+#!       PRIVATE Qt6|Xml+Network
 #!       PUBLIC  ITK|Watersheds
 #! \endcode
 #!
@@ -253,10 +253,10 @@ function(mitk_create_module)
     set(QRC_FILES )
 
     # clear other variables
-    set(Q${KITNAME}_GENERATED_CPP )
-    set(Q${KITNAME}_GENERATED_MOC_CPP )
-    set(Q${KITNAME}_GENERATED_QRC_CPP )
-    set(Q${KITNAME}_GENERATED_UI_CPP )
+    set(GENERATED_CPP )
+    set(GENERATED_MOC_CPP )
+    set(GENERATED_QRC_CPP )
+    set(GENERATED_UI_CPP )
 
     # check and set-up auto-loading
     if(MODULE_AUTOLOAD_WITH)
@@ -404,19 +404,19 @@ function(mitk_create_module)
       endif()
     endif()
 
-    if(MITK_USE_Qt5)
+    if(MITK_USE_Qt6)
       if(UI_FILES)
-        qt5_wrap_ui(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
+        qt_wrap_ui(GENERATED_UI_CPP ${UI_FILES})
       endif()
       if(MOC_H_FILES)
-        qt5_wrap_cpp(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+        qt_wrap_cpp(GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
       endif()
       if(QRC_FILES)
-        qt5_add_resources(Q${KITNAME}_GENERATED_QRC_CPP ${QRC_FILES})
+        qt_add_resources(GENERATED_QRC_CPP ${QRC_FILES})
       endif()
     endif()
 
-    set(Q${KITNAME}_GENERATED_CPP ${Q${KITNAME}_GENERATED_CPP} ${Q${KITNAME}_GENERATED_UI_CPP} ${Q${KITNAME}_GENERATED_MOC_CPP} ${Q${KITNAME}_GENERATED_QRC_CPP})
+    set(GENERATED_CPP ${GENERATED_CPP} ${GENERATED_UI_CPP} ${GENERATED_MOC_CPP} ${GENERATED_QRC_CPP})
 
     mitkFunctionOrganizeSources(
       SOURCE ${CPP_FILES}
@@ -425,9 +425,9 @@ function(mitk_create_module)
       DOC ${DOX_FILES}
       UI ${UI_FILES}
       QRC ${QRC_FILES}
-      MOC ${Q${KITNAME}_GENERATED_MOC_CPP}
-      GEN_QRC ${Q${KITNAME}_GENERATED_QRC_CPP}
-      GEN_UI ${Q${KITNAME}_GENERATED_UI_CPP}
+      MOC ${GENERATED_MOC_CPP}
+      GEN_QRC ${GENERATED_QRC_CPP}
+      GEN_UI ${GENERATED_UI_CPP}
       )
 
     set(coverage_sources
@@ -449,7 +449,7 @@ function(mitk_create_module)
           set(_SHOW_CONSOLE_OPTION WIN32)
         endif()
         add_executable(${MODULE_TARGET} ${_SHOW_CONSOLE_OPTION}
-                       ${MODULE_CPP_FILES} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
+                       ${MODULE_CPP_FILES} ${coverage_sources} ${CPP_FILES_GENERATED} ${GENERATED_CPP}
                        ${DOX_FILES} ${UI_FILES} ${QRC_FILES} ${WINDOWS_ICON_RESOURCE_FILE})
         if(WIN32)
           mitk_add_manifest(${MODULE_TARGET})
@@ -458,7 +458,7 @@ function(mitk_create_module)
         set(_us_module_name main)
       else()
         add_library(${MODULE_TARGET} ${_STATIC}
-                    ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
+                    ${coverage_sources} ${CPP_FILES_GENERATED} ${GENERATED_CPP}
                     ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
         set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules")
         set(_us_module_name ${MODULE_TARGET})

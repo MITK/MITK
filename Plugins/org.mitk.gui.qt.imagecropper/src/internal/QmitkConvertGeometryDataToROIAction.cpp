@@ -21,22 +21,25 @@ found in the LICENSE file.
 
 namespace
 {
-  void handleInvalidNodeSelection()
+  void HandleInvalidNodeSelection()
   {
-    auto message = QStringLiteral("All selected bounding boxes must be child nodes of a single common reference image with a non-rotated geometry!");
+    auto message = QStringLiteral(
+      "All selected bounding boxes must be child nodes of a single common reference image "
+      "with a non-rotated geometry!");
+
     MITK_ERROR << message;
     QMessageBox::warning(nullptr, QStringLiteral("Convert to ROI"), message);
   }
 
-  bool isRotated(const mitk::BaseGeometry* geometry)
+  bool IsRotated(const mitk::BaseGeometry* geometry)
   {
-    const auto* matrix = geometry->GetVtkMatrix();
+    auto matrix = geometry->GetVtkMatrix();
 
     for (int j = 0; j < 3; ++j)
     {
       for (int i = 0; i < 3; ++i)
       {
-        if (i != j && matrix->GetElement(i, j) > mitk::eps)
+        if (i != j && std::abs(matrix->GetElement(i, j)) > mitk::eps)
           return true;
       }
     }
@@ -44,7 +47,37 @@ namespace
     return false;
   }
 
-  std::pair<std::vector<const mitk::DataNode*>, mitk::DataNode*> getValidInput(const QList<mitk::DataNode::Pointer>& selectedNodes, const mitk::DataStorage* dataStorage)
+  void FlipAxis(mitk::BaseGeometry* geometry, int axis)
+  {
+    auto matrix = geometry->GetVtkMatrix();
+    matrix->SetElement(axis, axis, -matrix->GetElement(axis, axis));
+    matrix->SetElement(axis, 3, matrix->GetElement(axis, 3) - geometry->GetExtentInMM(axis));
+
+    geometry->SetIndexToWorldTransformByVtkMatrix(matrix);
+
+    auto bounds = geometry->GetBounds();
+    int minIndex = 2 * axis;
+    bounds[minIndex] *= -1;
+    bounds[minIndex + 1] += 2 * bounds[minIndex];
+
+    geometry->SetBounds(bounds);
+  }
+
+  mitk::BaseGeometry::Pointer RectifyGeometry(const mitk::BaseGeometry* geometry)
+  {
+    auto rectifiedGeometry = geometry->Clone();
+    auto matrix = rectifiedGeometry->GetVtkMatrix();
+
+    for (int axis = 0; axis < 3; ++axis)
+    {
+      if (matrix->GetElement(axis, axis) < 0.0)
+        FlipAxis(rectifiedGeometry, axis);
+    }
+
+    return rectifiedGeometry;
+  }
+
+  std::pair<std::vector<const mitk::DataNode*>, mitk::DataNode*> GetValidInput(const QList<mitk::DataNode::Pointer>& selectedNodes, const mitk::DataStorage* dataStorage)
   {
     std::pair<std::vector<const mitk::DataNode*>, mitk::DataNode*> result;
     result.first.reserve(selectedNodes.size());
@@ -62,7 +95,9 @@ namespace
 
       if (result.second == nullptr)
       {
-        if (isRotated(sourceNodes->front()->GetData()->GetGeometry()))
+        auto geometry = sourceNodes->front()->GetData()->GetGeometry();
+
+        if (IsRotated(geometry))
           mitkThrow();
 
         result.second = sourceNodes->front();
@@ -89,10 +124,10 @@ void QmitkConvertGeometryDataToROIAction::Run(const QList<mitk::DataNode::Pointe
 {
   try
   {
-    auto [nodes, referenceNode] = getValidInput(selectedNodes, m_DataStorage);
+    auto [nodes, referenceNode] = GetValidInput(selectedNodes, m_DataStorage);
 
     auto roi = mitk::ROI::New();
-    roi->SetClonedGeometry(referenceNode->GetData()->GetGeometry());
+    roi->SetGeometry(RectifyGeometry(referenceNode->GetData()->GetGeometry()));
 
     unsigned int id = 0;
 
@@ -104,7 +139,7 @@ void QmitkConvertGeometryDataToROIAction::Run(const QList<mitk::DataNode::Pointe
       if (auto* color = node->GetProperty("Bounding Shape.Deselected Color"); color != nullptr)
         element.SetProperty("color", color);
 
-      const auto* geometry = node->GetData()->GetGeometry();
+      auto geometry = RectifyGeometry(node->GetData()->GetGeometry());
       const auto origin = geometry->GetOrigin() - roi->GetGeometry()->GetOrigin();
       const auto spacing = geometry->GetSpacing();
       const auto bounds = geometry->GetBounds();
@@ -132,7 +167,7 @@ void QmitkConvertGeometryDataToROIAction::Run(const QList<mitk::DataNode::Pointe
   }
   catch (const mitk::Exception&)
   {
-    handleInvalidNodeSelection();
+    HandleInvalidNodeSelection();
   }
 }
 

@@ -60,7 +60,7 @@ namespace mitk
 
     using GroupIndexType = std::size_t;
     using LabelValueType = mitk::Label::PixelType;
-    const static LabelValueType UnlabeledValue = 0;
+    const static LabelValueType UnlabeledValue;
     using ConstLabelVectorType = std::vector<Label::ConstPointer>;
     using LabelVectorType = std::vector<Label::Pointer>;
     using LabelValueVectorType = std::vector<LabelValueType>;

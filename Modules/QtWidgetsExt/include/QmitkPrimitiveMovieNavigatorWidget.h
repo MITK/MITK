@@ -23,7 +23,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPrimitiveMovieNavigatorWidget : public QWidge
   Q_OBJECT
 
 public:
-  QmitkPrimitiveMovieNavigatorWidget(QWidget *parent = nullptr, Qt::WindowFlags fl = nullptr);
+  QmitkPrimitiveMovieNavigatorWidget(QWidget *parent = nullptr, Qt::WindowFlags fl = {});
   ~QmitkPrimitiveMovieNavigatorWidget() override;
 
   virtual int getTimerInterval();

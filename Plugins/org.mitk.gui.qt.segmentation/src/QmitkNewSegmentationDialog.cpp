@@ -90,7 +90,7 @@ namespace
       QColor color;
 
       if (obj.contains("color"))
-        color.setNamedColor(QString::fromStdString(obj["color"]));
+        color = QColor::fromString(QString::fromStdString(obj["color"]));
 
       auto it = std::find_if(begin(parsedSuggestions), end(parsedSuggestions), [&name](const auto& suggestion) {
         return name == suggestion.first;

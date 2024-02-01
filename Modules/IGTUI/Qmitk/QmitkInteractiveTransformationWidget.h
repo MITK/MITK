@@ -37,7 +37,7 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QDialog
   public:
     static const std::string VIEW_ID;
 
-    QmitkInteractiveTransformationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+    QmitkInteractiveTransformationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
     ~QmitkInteractiveTransformationWidget() override;
 
     /** This tool will be copied to m_ToolToEdit. It will not be changed.

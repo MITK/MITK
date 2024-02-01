@@ -103,7 +103,6 @@ namespace mitk
 
       if (listElement)
       {
-        unsigned int index(0);
         std::string valueString;
         DATATYPE value;
         for (auto *valueElement = listElement->FirstChildElement("Value"); valueElement;
@@ -127,7 +126,6 @@ namespace mitk
           }
 
           datalist.push_back(value);
-          ++index;
         }
 
         typename PropertyType::Pointer property = PropertyType::New();

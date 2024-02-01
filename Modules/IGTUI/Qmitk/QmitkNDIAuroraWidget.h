@@ -29,7 +29,7 @@ class MITKIGTUI_EXPORT QmitkNDIAuroraWidget : public QmitkNDIAbstractDeviceWidge
 public:
   static const std::string VIEW_ID;
 
-  QmitkNDIAuroraWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkNDIAuroraWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
   ~QmitkNDIAuroraWidget() override;
 
   void Initialize() override;

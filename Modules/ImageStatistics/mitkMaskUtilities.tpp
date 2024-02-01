@@ -89,14 +89,9 @@ namespace mitk
 
             // check alignment
             // Make sure that the voxels of mask and image are correctly "aligned", i.e., voxel boundaries are the same in both images
-            PointType imageOrigin = m_Image->GetOrigin();
             PointType maskOrigin = m_Mask->GetOrigin();
 
-            typedef itk::ContinuousIndex<double, VImageDimension> ContinousIndexType;
-            ContinousIndexType maskOriginContinousIndex, imageOriginContinousIndex;
-
-            m_Image->TransformPhysicalPointToContinuousIndex(maskOrigin, maskOriginContinousIndex);
-            m_Image->TransformPhysicalPointToContinuousIndex(imageOrigin, imageOriginContinousIndex);
+            auto maskOriginContinousIndex = m_Image->template TransformPhysicalPointToContinuousIndex<typename PointType::ValueType>(maskOrigin);
 
             for ( unsigned int i = 0; i < ImageType::ImageDimension; ++i )
             {

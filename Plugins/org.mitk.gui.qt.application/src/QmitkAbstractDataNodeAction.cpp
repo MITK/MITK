@@ -35,7 +35,8 @@ QList<mitk::DataNode::Pointer> AbstractDataNodeAction::GetSelectedNodes(berry::I
     return selectedNodes;
   }
 
-  selectedNodes = QList<mitk::DataNode::Pointer>::fromStdList(currentSelection->GetSelectedDataNodes());
+  auto nodes = currentSelection->GetSelectedDataNodes();
+  selectedNodes = QList<mitk::DataNode::Pointer>(nodes.begin(), nodes.end());
   return selectedNodes;
 }
 

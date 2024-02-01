@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <QStatusBar>
 #include <QString>
 #include <QFile>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QSettings>
 
@@ -933,8 +933,13 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowClose()
   berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow = static_cast<QMainWindow*> (window->GetShell()->GetControl());
 
-  QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
-  settings.setValue("ToolbarPosition", mainWindow->saveState());
+  auto fileName = this->GetQSettingsFile();
+
+  if (!fileName.isEmpty())
+  {
+    QSettings settings(fileName, QSettings::IniFormat);
+    settings.setValue("ToolbarPosition", mainWindow->saveState());
+  }
 }
 
 QString QmitkFlowApplicationWorkbenchWindowAdvisor::GetQSettingsFile() const
@@ -1067,8 +1072,8 @@ void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onIntro()
     berry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro();
   if (!hasIntro)
   {
-    QRegExp reg("(.*)<title>(\\n)*");
-    QRegExp reg2("(\\n)*</title>(.*)");
+    QRegularExpression reg("(.*)<title>(\\n)*");
+    QRegularExpression reg2("(\\n)*</title>(.*)");
     QFile file(":/org.mitk.gui.qt.ext/index.html");
     file.open(QIODevice::ReadOnly | QIODevice::Text); //text file only for reading
 
@@ -1148,6 +1153,6 @@ void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onHelpOpenHelpPerspective()
 
 void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onAbout()
 {
-  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), nullptr);
+  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow());
   aboutDialog->open();
 }

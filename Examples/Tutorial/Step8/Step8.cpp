@@ -35,14 +35,14 @@ void Step8::SetupWidgets()
 
   // Create toplevel widget with vertical layout
   QVBoxLayout *vlayout = new QVBoxLayout(this);
-  vlayout->setMargin(0);
+  vlayout->setContentsMargins({});
   vlayout->setSpacing(2);
 
   // Create viewParent widget with horizontal layout
   QWidget *viewParent = new QWidget(this);
   vlayout->addWidget(viewParent);
   QHBoxLayout *hlayout = new QHBoxLayout(viewParent);
-  hlayout->setMargin(0);
+  hlayout->setContentsMargins({});
 
   //*************************************************************************
   // Part Ia: create and initialize QmitkStdMultiWidget

@@ -18,11 +18,12 @@ found in the LICENSE file.
 #include "mitkBaseRenderer.h"
 
 #include <QList>
-#include <qapplication.h>
-#include <qlayout.h>
-#include <qmessagebox.h>
-#include <qtoolbutton.h>
-#include <qtooltip.h>
+#include <QApplication>
+#include <QLayout>
+#include <QMessageBox>
+#include <QToolButton>
+#include <QToolTip>
+#include <QRegularExpression>
 
 #include <queue>
 
@@ -63,7 +64,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage 
   }
 
   // reactions to signals
-  connect(m_ToolButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(toolButtonClicked(int)));
+  connect(m_ToolButtonGroup, &QButtonGroup::idClicked, this, &QmitkToolSelectionBox::toolButtonClicked);
 
   // reactions to ToolManager events
 
@@ -214,7 +215,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
     // mmueller
     // uncheck all other buttons
     QAbstractButton *tmpBtn = nullptr;
-    QList<QAbstractButton *>::iterator it;
+
     for (int i = 0; i < m_ToolButtonGroup->buttons().size(); ++i)
     {
       tmpBtn = m_ToolButtonGroup->buttons().at(i);
@@ -329,7 +330,7 @@ void QmitkToolSelectionBox::UpdateButtonsEnabledState()
     workingData = workingDataNode->GetData();
   }
 
-  for (const auto& button : qAsConst(buttons))
+  for (const auto& button : std::as_const(buttons))
   {
     const auto buttonID = m_ToolButtonGroup->id(button);
     const auto toolID = m_ToolIDForButtonID[buttonID];
@@ -562,13 +563,13 @@ void QmitkToolSelectionBox::OnToolGUIProcessEventsMessage()
 void QmitkToolSelectionBox::OnToolErrorMessage(std::string s)
 {
   QMessageBox::critical(
-    this, "MITK", QString(s.c_str()), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+    this, "MITK", QString(s.c_str()), QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
 }
 
 void QmitkToolSelectionBox::OnGeneralToolMessage(std::string s)
 {
   QMessageBox::information(
-    this, "MITK", QString(s.c_str()), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+    this, "MITK", QString(s.c_str()), QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
 }
 
 void QmitkToolSelectionBox::SetDisplayedToolGroups(const std::string &toolGroups)
@@ -577,7 +578,7 @@ void QmitkToolSelectionBox::SetDisplayedToolGroups(const std::string &toolGroups
   {
     QString q_DisplayedGroups = toolGroups.c_str();
     // quote all unquoted single words
-    q_DisplayedGroups = q_DisplayedGroups.replace(QRegExp("\\b(\\w+)\\b|'([^']+)'"), "'\\1\\2'");
+    q_DisplayedGroups = q_DisplayedGroups.replace(QRegularExpression("\\b(\\w+)\\b|'([^']+)'"), "'\\1\\2'");
     MITK_DEBUG << "m_DisplayedGroups was \"" << toolGroups << "\"";
 
     m_DisplayedGroups = q_DisplayedGroups.toLocal8Bit().constData();

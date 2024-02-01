@@ -220,8 +220,8 @@ void QmitkChartExampleView::UpdateSelectedData()
     auto x = data->GetXData();
     auto y = data->GetYData();
 
-    auto xVector = x.toVector().toStdVector();
-    auto yVector = y.toVector().toStdVector();
+    std::vector<QVariant> xVector(x.begin(), x.end());
+    std::vector<QVariant> yVector(y.begin(), y.end());
 
     QString xString = QString::fromStdString(ConvertToText(xVector));
     QString yString = QString::fromStdString(ConvertToText(yVector));

@@ -135,7 +135,7 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
 
   switch (role)
   {
-  case Qt::BackgroundColorRole:
+  case Qt::BackgroundRole:
   {
     if ( isCalibratedForCurrentDepth )
     {

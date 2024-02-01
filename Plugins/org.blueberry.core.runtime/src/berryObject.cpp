@@ -33,36 +33,6 @@ void Object::Delete()
   this->UnRegister();
 }
 
-#ifdef _WIN32
-void*
-Object
-::operator new(size_t n)
-{
-  return new char[n];
-}
-
-void*
-Object
-::operator new[](size_t n)
-{
-  return new char[n];
-}
-
-void
-Object
-::operator delete(void* m)
-{
-  delete [] (char*)m;
-}
-
-void
-Object
-::operator delete[](void* m, size_t)
-{
-  delete [] (char*)m;
-}
-#endif
-
 const char* Object::GetStaticClassName()
 {
   return "berry::Object";
@@ -134,7 +104,7 @@ void Object::UnRegister(bool del) const
 void Object::SetReferenceCount(int ref)
 {
   QMutexLocker lock(&m_ReferenceCountLock);
-  m_ReferenceCount.store(ref);
+  m_ReferenceCount.storeRelaxed(ref);
 
   if (ref == 0)
   {
@@ -176,7 +146,7 @@ Object::~Object()
    * warn user if reference counting is on and the object is being referenced
    * by another object.
    */
-  if (m_ReferenceCount.load() > 0)
+  if (m_ReferenceCount.loadRelaxed() > 0)
   {
     // A general exception safety rule is that destructors should
     // never throw.  Something is wrong with a program that reaches
@@ -202,7 +172,7 @@ QDebug Object::PrintSelf(QDebug os, Indent Indent) const
 {
   QString demangledName = Reflection::DemangleName(typeid(*this).name());
   os << Indent << "RTTI typeinfo:   " << demangledName << '\n';
-  os << Indent << "Reference Count: " << m_ReferenceCount.load() << '\n';
+  os << Indent << "Reference Count: " << m_ReferenceCount.loadRelaxed() << '\n';
   return os;
 }
 

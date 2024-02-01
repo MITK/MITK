@@ -36,7 +36,7 @@ class MITKIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
   public:
     static const std::string VIEW_ID;
 
-    QmitkNavigationDataSourceSelectionWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+    QmitkNavigationDataSourceSelectionWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
     ~QmitkNavigationDataSourceSelectionWidget() override;
 
     /** @return Returns the currently selected NavigationDataSource. Returns null if no source is selected at the moment. */

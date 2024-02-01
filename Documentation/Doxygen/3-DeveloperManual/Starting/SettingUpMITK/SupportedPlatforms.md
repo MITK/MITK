@@ -28,7 +28,7 @@ Errors or bugs discovered in these platforms are prioritized and corrected as so
 
 | Platform                            | Compilers
 | ----------------------------------- | --------------------------------------------------
-| Microsoft Windows 10                | Visual Studio 2019 (latest update)
+| Microsoft Windows 10                | Visual Studio 2022
 | Linux Ubuntu 22.04                  | Default GCC version
 | Linux Ubuntu 20.04                  | Default GCC version
 
@@ -42,9 +42,10 @@ as well as in the current master branch.
 
 | Platform                            | Compilers
 | ----------------------------------- | --------------------------------------------------
-| Microsoft Windows 10                | Visual Studio 2022 (latest update)
-| Apple macOS 11 "Big Sur"            | Default Apple Clang version
-| Apple macOS 10.15 "Catalina"        | Default Apple Clang version
+| Microsoft Windows 11                | Visual Studio 2022
+| Microsoft Windows 10                | Visual Studio 2019
+| Apple macOS Ventura 13              | Default Apple Clang version
+| Apple macOS Monterey 12             | Default Apple Clang version
 
 All platforms not listed above are not officially supported by the MITK team. However, we will happily accept
 contributions to improve support for other platforms as long as we have the hardware and capacity for maintenance.

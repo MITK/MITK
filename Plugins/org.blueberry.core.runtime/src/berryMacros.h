@@ -18,8 +18,6 @@ found in the LICENSE file.
 #include "berryReflection.h"
 #include "berryExtensionType.h"
 
-class QStringList;
-
 #define berryArgGlue(x, y) x y
 #define berryArgCount(_1,_2,_3,_4,_5,_6,_7,_8,count,...) count
 #define berryExpandArgs(args) berryArgCount args

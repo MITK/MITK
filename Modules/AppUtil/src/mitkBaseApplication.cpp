@@ -41,10 +41,34 @@ found in the LICENSE file.
 #include <QStandardPaths>
 #include <QTime>
 #include <QWebEngineUrlScheme>
+#include <QQuickWindow>
 
 namespace
 {
-  void outputQtMessage(QtMsgType type, const QMessageLogContext&, const QString& msg)
+  void outputImportantQtMessage(QtMsgType type, const QMessageLogContext&, const QString& msg)
+  {
+    auto message = msg.toStdString();
+
+    switch (type)
+    {
+    case QtWarningMsg:
+      MITK_WARN << message;
+      break;
+
+    case QtCriticalMsg:
+      MITK_ERROR << message;
+      break;
+
+    case QtFatalMsg:
+      MITK_ERROR << message;
+      abort();
+
+    default:
+      break;
+    }
+  }
+
+  void outputQtMessage(QtMsgType type, const QMessageLogContext& context, const QString& msg)
   {
     auto message = msg.toStdString();
 
@@ -59,16 +83,14 @@ namespace
         break;
 
       case QtWarningMsg:
-        MITK_WARN << message;
-        break;
+        [[fallthrough]];
 
       case QtCriticalMsg:
-        MITK_ERROR << message;
-        break;
+        [[fallthrough]];
 
       case QtFatalMsg:
-        MITK_ERROR << message;
-        abort();
+        outputImportantQtMessage(type, context, msg);
+        break;
 
       default:
         MITK_INFO << message;
@@ -320,7 +342,7 @@ namespace mitk
 
           auto pluginUrlsToStart = provInfo.getPluginsToStart();
 
-          for (const auto& url : qAsConst(pluginUrlsToStart))
+          for (const auto& url : std::as_const(pluginUrlsToStart))
             pluginsToStart.push_back(url.toString());
         }
       }
@@ -483,7 +505,7 @@ namespace mitk
         basePath.cdUp();
         basePath.cdUp();
         basePath.cdUp();
-        provFile = basePath.absoluteFilePath(provFileName);
+        provFile.setFile(basePath.absoluteFilePath(provFileName));
       }
 #endif
 
@@ -511,9 +533,12 @@ namespace mitk
     if (nullptr != qApp)
       return;
 
-#ifdef Q_OS_LINUX
+    // Prevent conflicts between native OpenGL applications and QWebEngine
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
+
+/*#ifdef Q_OS_LINUX
     qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--single-process"); // See T29332
-#endif
+#endif*/
 
     // If parameters have been set before, we have to store them to hand them
     // through to the application
@@ -529,8 +554,9 @@ namespace mitk
     this->setOrganizationName(orgName);
     this->setOrganizationDomain(orgDomain);
 
-    if (d->m_LogQtMessages)
-      qInstallMessageHandler(outputQtMessage);
+    qInstallMessageHandler(!d->m_LogQtMessages
+      ? outputImportantQtMessage
+      : outputQtMessage);
 
     QWebEngineUrlScheme qtHelpScheme("qthelp");
     qtHelpScheme.setFlags(QWebEngineUrlScheme::LocalScheme | QWebEngineUrlScheme::LocalAccessAllowed);
@@ -545,37 +571,36 @@ namespace mitk
     // 2. Initialize the Qt framework (by creating a QCoreApplication)
     this->initializeQt();
 
-    // 3. Seed the random number generator, once at startup.
-    QTime time = QTime::currentTime();
-    qsrand((uint)time.msec());
-
-    // 4. Load the "default" configuration, which involves parsing
+    // 3. Load the "default" configuration, which involves parsing
     //    an optional <executable-name>.ini file and parsing any
     //    command line arguments
     this->loadConfiguration();
 
-    // 5. Add configuration data from the command line and the
+    // 4. Add configuration data from the command line and the
     //    optional <executable-name>.ini file as CTK plugin
     //    framework properties.
     d->initializeCTKPluginFrameworkProperties(this->config());
 
-    // 6. Initialize splash screen if an image path is provided
+    // 5. Initialize splash screen if an image path is provided
     //    in the .ini file
     this->initializeSplashScreen(qApp);
 
-    // 7. Set the custom CTK Plugin Framework storage directory
+    // 6. Set the custom CTK Plugin Framework storage directory
     QString storageDir = this->getCTKFrameworkStorageDir();
 
     if (!storageDir.isEmpty())
     {
       d->m_FWProps[ctkPluginConstants::FRAMEWORK_STORAGE] = storageDir;
 
+      if (!(storageDir.endsWith('/') || storageDir.endsWith('\\')))
+        storageDir.append('/');
+
       // Initialize core service preferences at the exact same location as their predecessor BlueBerry preferences
       mitk::CoreServicePointer preferencesService(mitk::CoreServices::GetPreferencesService());
-      preferencesService->InitializeStorage(storageDir.toStdString() + "/data/3/prefs.xml");
+      preferencesService->InitializeStorage(storageDir.toStdString() + "data/3/prefs.xml");
     }
 
-    // 8. Set the library search paths and the pre-load library property
+    // 7. Set the library search paths and the pre-load library property
     this->initializeLibraryPaths();
 
     auto preloadLibs = this->getPreloadLibraries();
@@ -583,17 +608,17 @@ namespace mitk
     if (!preloadLibs.isEmpty())
       d->m_FWProps[ctkPluginConstants::FRAMEWORK_PRELOAD_LIBRARIES] = preloadLibs;
 
-    // 9. Initialize the CppMicroServices library.
+    // 8. Initialize the CppMicroServices library.
     //    The initializeCppMicroServices() method reuses the
     //    FRAMEWORK_STORAGE property, so we call it after the
     //    getCTKFrameworkStorageDir method.
     this->initializeCppMicroServices();
 
-    // 10. Parse the (optional) provisioning file and set the
+    // 9. Parse the (optional) provisioning file and set the
     //     correct framework properties.
     d->parseProvisioningFile(this->getProvisioningFilePath());
 
-    // 11. Set the CTK Plugin Framework properties
+    // 10. Set the CTK Plugin Framework properties
     ctkPluginFrameworkLauncher::setFrameworkProperties(d->m_FWProps);
   }
 
@@ -672,15 +697,11 @@ namespace mitk
       defaultFormat.setSamples(0);
       QSurfaceFormat::setDefaultFormat(defaultFormat);
 
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
       QCoreApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
-      QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
       QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-#endif
       QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
       d->m_QApp = this->getSingleMode()
@@ -718,7 +739,7 @@ namespace mitk
     // Walk one directory up and add bin and lib sub-dirs; this might be redundant
     appDir.cdUp();
 
-    for (const auto& suffix : qAsConst(suffixes))
+    for (const auto& suffix : std::as_const(suffixes))
       ctkPluginFrameworkLauncher::addSearchPath(appDir.absoluteFilePath(suffix));
   }
 

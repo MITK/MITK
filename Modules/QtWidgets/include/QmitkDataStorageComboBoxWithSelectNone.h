@@ -27,7 +27,6 @@ found in the LICENSE file.
  * hence always return a nullptr mitk::DataNode* if asked for the node at index 0.
  *
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
- * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  * \sa QmitkDataStorageComboBox
  */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox

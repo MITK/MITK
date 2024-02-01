@@ -60,7 +60,7 @@ QWidget *QmitkMapPropertyDelegate::createEditor(QWidget *parent,
   {
     QWidget *editorWidget = nullptr;
 
-    if (data.type() == QVariant::Int)
+    if (data.typeId() == QMetaType::Int)
     {
       QSpinBox *spinBox = new QSpinBox(parent);
       spinBox->setSingleStep(1);
@@ -68,9 +68,7 @@ QWidget *QmitkMapPropertyDelegate::createEditor(QWidget *parent,
       spinBox->setMaximum(std::numeric_limits<int>::max());
       editorWidget = spinBox;
     }
-    // see qt documentation. cast is correct, it would be obsolete if we
-    // store doubles
-    else if (static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
+    else if (data.typeId() == QMetaType::Float)
     {
       QDoubleSpinBox *spinBox = new QDoubleSpinBox(parent);
       spinBox->setDecimals(5);
@@ -80,7 +78,7 @@ QWidget *QmitkMapPropertyDelegate::createEditor(QWidget *parent,
 
       editorWidget = spinBox;
     }
-    else if (data.type() == QVariant::StringList)
+    else if (data.typeId() == QMetaType::QStringList)
     {
       QStringList entries = data.value<QStringList>();
       QComboBox *comboBox = new QComboBox(parent);
@@ -115,14 +113,14 @@ void QmitkMapPropertyDelegate::setEditorData(QWidget *editor, const QModelIndex 
 
   if (data.isValid())
   {
-    if (data.type() == QVariant::Int)
+    if (data.typeId() == QMetaType::Int)
     {
       QSpinBox *spinBox = qobject_cast<QSpinBox *>(editor);
       spinBox->setValue(data.toInt());
     }
     // see qt documentation. cast is correct, it would be obsolete if we
     // store doubles
-    else if (static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
+    else if (data.typeId() == QMetaType::Float)
     {
       QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>(editor);
       spinBox->setValue(data.toDouble());
@@ -130,7 +128,7 @@ void QmitkMapPropertyDelegate::setEditorData(QWidget *editor, const QModelIndex 
       std::cout << "Set EDITOR DATA : " << spinBox->value() << std::endl;
     }
 
-    else if (data.type() == QVariant::StringList)
+    else if (data.typeId() == QMetaType::QStringList)
     {
       QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
       QString displayString = displayData.value<QString>();
@@ -149,15 +147,14 @@ void QmitkMapPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel 
 
   if (data.isValid())
   {
-    if (data.type() == QVariant::Color)
+    if (data.typeId() == QMetaType::QColor)
     {
       QWidget *colorBtn = qobject_cast<QWidget *>(editor);
-      QVariant colorVariant;
-      colorVariant.setValue<QColor>(colorBtn->palette().color(QPalette::Button));
+      auto colorVariant = QVariant::fromValue(colorBtn->palette().color(QPalette::Button));
       model->setData(index, colorVariant);
     }
 
-    else if (data.type() == QVariant::Int)
+    else if (data.typeId() == QMetaType::Int)
     {
       QSpinBox *spinBox = qobject_cast<QSpinBox *>(editor);
       int intValue = spinBox->value();
@@ -167,7 +164,7 @@ void QmitkMapPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel 
       model->setData(index, intValueVariant);
     }
 
-    else if (static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
+    else if (data.typeId() == QMetaType::Float)
     {
       QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>(editor);
       double doubleValue = spinBox->value();
@@ -180,15 +177,14 @@ void QmitkMapPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel 
       model->setData(index, doubleValueVariant);
     }
 
-    else if (data.type() == QVariant::StringList)
+    else if (data.typeId() == QMetaType::QStringList)
     {
       QString displayData = data.value<QString>();
 
       QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
       QString comboBoxValue = comboBox->currentText();
 
-      QVariant comboBoxValueVariant;
-      comboBoxValueVariant.setValue<QString>(comboBoxValue);
+      auto comboBoxValueVariant = QVariant::fromValue(comboBoxValue);
       model->setData(index, comboBoxValueVariant);
     }
 

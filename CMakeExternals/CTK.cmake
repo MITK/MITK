@@ -16,22 +16,6 @@ if(MITK_USE_CTK)
   if(NOT DEFINED CTK_DIR)
 
     set(ctk_optional_cache_args )
-    if(MITK_USE_Python3)
-      list(APPEND ctk_optional_cache_args
-           -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
-           -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
-           -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
-           "-DPYTHON_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIRS}"
-           "-DPYTHON_LIBRARY:FILEPATH=${Python3_LIBRARY_RELEASE}"
-      )
-    else()
-      list(APPEND ctk_optional_cache_args
-           -DCTK_LIB_Scripting/Python/Widgets:BOOL=OFF
-           -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
-           -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
-           -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
-      )
-    endif()
 
     if(CTEST_USE_LAUNCHERS)
       list(APPEND ctk_optional_cache_args
@@ -47,15 +31,10 @@ if(MITK_USE_CTK)
 
     mitk_query_custom_ep_vars()
 
-    set(pythonqt_location_args
-      "-DPythonQt_GIT_REPOSITORY:STRING=https://github.com/MITK/PythonQt.git"
-      -DPythonQt_REVISION_TAG:STRING=patched-10-patched
-    )
-
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/MITK/CTK.git
-      GIT_TAG ec816cbb-patched
+      GIT_TAG 37aff99226ed936b930b1ef07df046877771ea03 # branch: qt-6
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
@@ -63,23 +42,21 @@ if(MITK_USE_CTK)
       CMAKE_ARGS
         ${ep_common_args}
         ${ctk_optional_cache_args}
+        "-DQt6_DIR:PATH=${Qt6_DIR}"
         # The CTK PluginFramework cannot cope with
         # a non-empty CMAKE_DEBUG_POSTFIX for the plugin
         # libraries yet.
         -DCMAKE_DEBUG_POSTFIX:STRING=
-        -DCTK_QT_VERSION:STRING=5
-        -DQt5_DIR=${Qt5_DIR}
-        -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
-        -DCTK_BUILD_QTDESIGNER_PLUGINS:BOOL=ON
-        -DCTK_LIB_CommandLineModules/Backend/LocalProcess:BOOL=ON
-        -DCTK_LIB_CommandLineModules/Frontend/QtGui:BOOL=ON
+        -DCTK_QT_VERSION:STRING=6
+        "-DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}"
+        -DCTK_BUILD_QTDESIGNER_PLUGINS:BOOL=OFF
         -DCTK_LIB_PluginFramework:BOOL=ON
         -DCTK_LIB_DICOM/Widgets:BOOL=ON
         -DCTK_LIB_XNAT/Core:BOOL=ON
         -DCTK_PLUGIN_org.commontk.eventadmin:BOOL=ON
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
-        -DDCMTK_DIR:PATH=${DCMTK_DIR}
-        ${pythonqt_location_args}
+        -DCTK_USE_SYSTEM_DCMTK:BOOL=ON
+        "-DDCMTK_ROOT:PATH=${ep_prefix}"
         ${${proj}_CUSTOM_CMAKE_ARGS}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}

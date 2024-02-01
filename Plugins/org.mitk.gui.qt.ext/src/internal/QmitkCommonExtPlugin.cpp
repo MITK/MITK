@@ -36,6 +36,7 @@ found in the LICENSE file.
 
 #include <Poco/Util/OptionProcessor.h>
 
+#include <QApplication>
 #include <QProcess>
 #include <QMainWindow>
 

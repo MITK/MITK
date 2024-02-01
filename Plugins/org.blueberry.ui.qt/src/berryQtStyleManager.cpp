@@ -91,7 +91,7 @@ void QtStyleManager::ReadPreferences()
   auto* stylePref = WorkbenchPlugin::GetDefault()->GetPreferences()->Node(QtPreferences::QT_STYLES_NODE);
 
   QString paths = QString::fromStdString(stylePref->Get(QtPreferences::QT_STYLE_SEARCHPATHS, ""));
-  QStringList pathList = paths.split(";", QString::SkipEmptyParts);
+  QStringList pathList = paths.split(";", Qt::SkipEmptyParts);
   QStringListIterator it(pathList);
   while (it.hasNext())
   {

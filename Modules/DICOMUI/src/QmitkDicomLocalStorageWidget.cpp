@@ -98,7 +98,7 @@ bool QmitkDicomLocalStorageWidget::DeletePatients()
   {
     QStringList studyUIDs;
 
-    for (const auto &patientUID : qAsConst(selectedPatientUIDs))
+    for (const auto &patientUID : std::as_const(selectedPatientUIDs))
       studyUIDs.append(m_LocalDatabase->studiesForPatient(patientUID));
 
     QStringList seriesUIDs;
@@ -119,7 +119,7 @@ bool QmitkDicomLocalStorageWidget::DeletePatients()
 
     if (answer == QMessageBox::Yes)
     {
-      for (const auto &patientUID : qAsConst(selectedPatientUIDs))
+      for (const auto &patientUID : std::as_const(selectedPatientUIDs))
         m_LocalDatabase->removePatient(patientUID);
     }
 
@@ -137,7 +137,7 @@ bool QmitkDicomLocalStorageWidget::DeleteStudies()
   {
     QStringList seriesUIDs;
 
-    for (const auto &studyUID : qAsConst(selectedStudyUIDs))
+    for (const auto &studyUID : std::as_const(selectedStudyUIDs))
       seriesUIDs.append(m_LocalDatabase->seriesForStudy(studyUID));
 
     auto answer = QMessageBox::question(nullptr,
@@ -151,7 +151,7 @@ bool QmitkDicomLocalStorageWidget::DeleteStudies()
 
     if (answer == QMessageBox::Yes)
     {
-      for (const auto &studyUID : qAsConst(selectedStudyUIDs))
+      for (const auto &studyUID : std::as_const(selectedStudyUIDs))
         m_LocalDatabase->removeStudy(studyUID);
     }
 
@@ -176,7 +176,7 @@ bool QmitkDicomLocalStorageWidget::DeleteSeries()
 
     if (answer == QMessageBox::Yes)
     {
-      for (const auto &seriesUID : qAsConst(selectedSeriesUIDs))
+      for (const auto &seriesUID : std::as_const(selectedSeriesUIDs))
         m_LocalDatabase->removeSeries(seriesUID);
     }
 

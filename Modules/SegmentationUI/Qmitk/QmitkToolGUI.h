@@ -46,14 +46,11 @@ public:
   ~QmitkToolGUI() override;
 
 signals:
-
   void NewToolAssociated(mitk::Tool *);
 
-public slots:
-
-protected slots:
-
 protected:
+  QmitkToolGUI() = default;
+
   mitk::Tool::Pointer m_Tool;
 
   virtual void BusyStateChanged(bool){};

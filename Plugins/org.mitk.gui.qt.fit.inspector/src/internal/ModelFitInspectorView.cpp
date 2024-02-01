@@ -738,7 +738,7 @@ void ModelFitInspectorView::RenderFitInfo()
             QTableWidgetItem* newItem = new QTableWidgetItem(QString::fromStdString(pos->first));
             m_Controls.tableInputData->setItem(rowIndex, 0, newItem);
             newItem = new QTableWidgetItem();
-            newItem->setBackgroundColor(dataColor);
+            newItem->setBackground(dataColor);
             m_Controls.tableInputData->setItem(rowIndex, 1, newItem);
         }
     }

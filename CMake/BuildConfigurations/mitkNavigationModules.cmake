@@ -2,7 +2,7 @@ message(STATUS "Configuring MITK Navigation Modules Build")
 
 set(MITK_CONFIG_PACKAGES
   ACVD
-  Qt5
+  Qt6
   BLUEBERRY
 )
 
@@ -20,7 +20,6 @@ set(MITK_CONFIG_PLUGINS
   org.mitk.gui.qt.properties
   org.mitk.gui.qt.segmentation
   org.mitk.gui.qt.volumevisualization
-  org.mitk.planarfigure
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.pointsetinteraction
   org.mitk.gui.qt.registration

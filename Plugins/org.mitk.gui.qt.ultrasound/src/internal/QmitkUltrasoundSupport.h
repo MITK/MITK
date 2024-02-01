@@ -31,7 +31,7 @@ found in the LICENSE file.
 #include <QmitkLevelWindowWidget.h>
 #include <QmitkSliceWidget.h>
 
-#include <QTime>
+#include <QElapsedTimer>
 
 #include <ctkServiceEvent.h>
 
@@ -124,9 +124,9 @@ protected:
   QTimer* m_RenderingTimer3d;
 
   /** These clocks are used to compute the framerate in the methods DisplayImage(),RenderImage2d() and RenderImage3d(). */
-  QTime  m_Clock;
-  QTime  m_Clock2d;
-  QTime  m_Clock3d;
+  QElapsedTimer m_Clock;
+  QElapsedTimer m_Clock2d;
+  QElapsedTimer m_Clock3d;
 
   /** A counter to compute the framerate. */
   int m_FrameCounterPipeline;

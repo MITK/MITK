@@ -142,7 +142,7 @@ QVariant QmitkLesionTreeModel::data(const QModelIndex& index, int role) const
     }
   }
 
-  if (Qt::BackgroundColorRole == role)
+  if (Qt::BackgroundRole == role)
   {
     auto it = m_DataNodePresence.find(currentItem->GetData().GetLesion().UID);
     if (it != m_DataNodePresence.end())
@@ -242,7 +242,7 @@ void QmitkLesionTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesion)
 void QmitkLesionTreeModel::SetSelectedDataNodesPresence()
 {
   m_DataNodePresence.clear();
-  for (const auto& dataNode : qAsConst(m_SelectedDataNodes))
+  for (const auto& dataNode : std::as_const(m_SelectedDataNodes))
   {
     if (!mitk::SemanticRelationsInference::InstanceExists(dataNode))
     {

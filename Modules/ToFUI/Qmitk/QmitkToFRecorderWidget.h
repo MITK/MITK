@@ -48,7 +48,7 @@ class MITKTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFRecorderWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+    QmitkToFRecorderWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = {});
     ~QmitkToFRecorderWidget() override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
@@ -145,7 +145,7 @@ class MITKTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
                                    const QString &dir = QString(),
                                    const QString &filter = QString(),
                                    QString *selectedFilter = nullptr,
-                                   QFileDialog::Options options = nullptr
+                                   QFileDialog::Options options = {}
                                    );
     /*!
     \brief method creating a filename from the given information

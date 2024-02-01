@@ -114,7 +114,7 @@ function(mitk_use_modules)
   if(package_depends)
     _mitk_parse_package_args(${package_depends})
 
-    # Some package config files like MITK_Qt5_Config.cmake rely on a
+    # Some package config files like MITK_Qt6_Config.cmake rely on a
     # properly set "MODULE_NAME" variable for the current target.
     set(MODULE_NAME ${USE_TARGET})
     # Read all package information

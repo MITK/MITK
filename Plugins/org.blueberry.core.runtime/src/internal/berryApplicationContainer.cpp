@@ -135,7 +135,7 @@ IBranding* ApplicationContainer::GetBranding() const
     return branding.data();
   }
   QList<IConfigurationElement::Pointer> elements = extensionRegistry->GetConfigurationElementsFor(PI_RUNTIME, PT_PRODUCTS);
-  for (const auto &element : qAsConst(elements))
+  for (const auto &element : std::as_const(elements))
   {
     if (element->GetName().compare("provider", Qt::CaseInsensitive) == 0)
     {
@@ -143,7 +143,7 @@ IBranding* ApplicationContainer::GetBranding() const
       {
         IProductProvider* provider = element->CreateExecutableExtension<IProductProvider>("run");
         QList<IProduct::Pointer> products = provider->GetProducts();
-        for (const auto &product : qAsConst(products))
+        for (const auto &product : std::as_const(products))
         {
           if (productId.compare(product->GetId(), Qt::CaseInsensitive) == 0)
           {
@@ -176,7 +176,7 @@ ApplicationDescriptor* ApplicationContainer::GetAppDescriptor(const QString& app
 {
   ApplicationDescriptor* result = nullptr;
   {
-    QMutexLocker l(&lock);
+    QMutexLocker l(&appDescLock);
     auto iter = apps.find(applicationId);
     result = iter == apps.end() ? nullptr : iter.value();
   }
@@ -185,7 +185,7 @@ ApplicationDescriptor* ApplicationContainer::GetAppDescriptor(const QString& app
   {
     RegisterAppDescriptor(applicationId); // try again just in case we are waiting for an event
     {
-      QMutexLocker l(&lock);
+      QMutexLocker l(&appDescLock);
       auto iter = apps.find(applicationId);
       result = iter == apps.end() ? nullptr : iter.value();
     }
@@ -201,7 +201,7 @@ ApplicationDescriptor* ApplicationContainer::CreateAppDescriptor(const SmartPoin
   }
   QString iconPath;
   {
-    QMutexLocker l(&lock);
+    QMutexLocker l(&appDescLock);
     auto iter = apps.find(appExtension->GetUniqueIdentifier());
     ApplicationDescriptor* appDescriptor = iter == apps.end() ? nullptr : iter.value();
     if (appDescriptor != nullptr)
@@ -286,7 +286,7 @@ ApplicationDescriptor*ApplicationContainer::RemoveAppDescriptor(const QString& a
   }
 
   {
-    QMutexLocker l(&lock);
+    QMutexLocker l(&appDescLock);
     ApplicationDescriptor* appDescriptor = apps.take(applicationId);
     if (appDescriptor == nullptr)
     {
@@ -375,7 +375,7 @@ QString ApplicationContainer::GetAvailableAppsMsg() const
   if (!availableApps.isEmpty())
   {
     availableAppsMsg = availableApps.front()->GetUniqueIdentifier();
-    for (const auto &availableApp : qAsConst(availableApps))
+    for (const auto &availableApp : std::as_const(availableApps))
     {
       availableAppsMsg = availableAppsMsg + ", " + availableApp->GetUniqueIdentifier();
     }
@@ -484,7 +484,7 @@ void ApplicationContainer::StopAllApps()
 {
   // get a stapshot of running applications
   QList<ctkServiceReference> runningRefs = context->getServiceReferences<ctkApplicationHandle>("(!(application.state=STOPPING))");
-  for (const auto &runningRef : qAsConst(runningRefs))
+  for (const auto &runningRef : std::as_const(runningRefs))
   {
     ctkApplicationHandle* handle = context->getService<ctkApplicationHandle>(runningRef);
     try
@@ -529,7 +529,7 @@ void ApplicationContainer::Lock(ApplicationHandle* /*appHandle*/)
   /*
   ApplicationDescriptor eclipseApp = (ApplicationDescriptor) appHandle.getApplicationDescriptor();
   {
-    QMutexLocker l(&lock);
+    QMutexLocker l(&appDescLock);
     switch (isLocked(eclipseApp))
     {
     case NOT_LOCKED :
@@ -586,7 +586,7 @@ void ApplicationContainer::Lock(ApplicationHandle* /*appHandle*/)
 void ApplicationContainer::Unlock(ApplicationHandle* /*appHandle*/)
 {
   /*
-  QMutexLocker l(&lock);
+  QMutexLocker l(&appDescLock);
   if (activeGlobalSingleton == appHandle)
     activeGlobalSingleton = null;
   else if (activeScopedSingleton == appHandle)
@@ -609,7 +609,7 @@ int ApplicationContainer::IsLocked(const ApplicationDescriptor* /*eclipseApp*/) 
 {
   /*
   {
-    QMutexLocker l(&lock);
+    QMutexLocker l(&appDescLock);
     if (activeGlobalSingleton != null)
       return LOCKED_SINGLETON_GLOBAL_RUNNING;
     switch (eclipseApp.getCardinalityType()) {
@@ -706,7 +706,7 @@ void ApplicationContainer::Removed(const QList<SmartPointer<IExtensionPoint> >& 
 
 void ApplicationContainer::RefreshAppDescriptors()
 {
-  QMutexLocker l(&lock);
+  QMutexLocker l(&appDescLock);
   for (ApplicationDescriptor* app : apps.values())
   {
     app->RefreshProperties();

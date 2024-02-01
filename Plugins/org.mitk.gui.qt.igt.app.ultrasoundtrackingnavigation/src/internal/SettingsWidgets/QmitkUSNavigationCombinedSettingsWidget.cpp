@@ -88,7 +88,7 @@ void QmitkUSNavigationCombinedSettingsWidget::OnSetSettingsNode(itk::SmartPointe
     QString needleNames = QString::fromStdString(stringProperty);
 
     ui->needleNameComboBox->clear();
-    ui->needleNameComboBox->addItems(needleNames.split(";", QString::SkipEmptyParts));
+    ui->needleNameComboBox->addItems(needleNames.split(";", Qt::SkipEmptyParts));
 
     if ( ! settingsNode->GetStringProperty("settings.needle-name-selected", stringProperty) ) { stringProperty = ""; }
     int index = ui->needleNameComboBox->findText(QString::fromStdString(stringProperty));
@@ -106,7 +106,7 @@ void QmitkUSNavigationCombinedSettingsWidget::OnSetSettingsNode(itk::SmartPointe
     QString referenceNames = QString::fromStdString(stringProperty);
 
     ui->referenceNameComboBox->clear();
-    ui->referenceNameComboBox->addItems(referenceNames.split(";", QString::SkipEmptyParts));
+    ui->referenceNameComboBox->addItems(referenceNames.split(";", Qt::SkipEmptyParts));
 
     if ( ! settingsNode->GetStringProperty("settings.reference-name-selected", stringProperty) ) { stringProperty = ""; }
     index = ui->referenceNameComboBox->findText(QString::fromStdString(stringProperty));

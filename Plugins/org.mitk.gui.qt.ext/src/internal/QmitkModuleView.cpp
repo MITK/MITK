@@ -34,7 +34,7 @@ void QmitkModuleView::SetFocus()
 void QmitkModuleView::CreateQtPartControl(QWidget *parent)
 {
   auto   layout = new QHBoxLayout();
-  layout->setMargin(0);
+  layout->setContentsMargins({});
   parent->setLayout(layout);
 
   tableView = new QTableView(parent);

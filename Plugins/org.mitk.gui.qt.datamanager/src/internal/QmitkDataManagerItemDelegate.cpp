@@ -29,7 +29,7 @@ void QmitkDataManagerItemDelegate::setEditorData(QWidget* editor, const QModelIn
   if (!data.isValid())
     return;
 
-  if (data.type() == QVariant::String)
+  if (data.typeId() == QMetaType::QString)
   {
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(editor);
     lineEdit->setText(data.toString());

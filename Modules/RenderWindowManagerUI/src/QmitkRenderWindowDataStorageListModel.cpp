@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include "QmitkMimeTypes.h"
 #include "QmitkNodeDescriptorManager.h"
 
+#include <QIODevice>
+
 QmitkRenderWindowDataStorageListModel::QmitkRenderWindowDataStorageListModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractDataStorageModel(parent)
 {
@@ -274,7 +276,7 @@ bool QmitkRenderWindowDataStorageListModel::dropMimeData(const QMimeData* data, 
     }
 
     auto dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
-    for (const auto& dataNode : qAsConst(dataNodeList))
+    for (const auto& dataNode : std::as_const(dataNodeList))
     {
       m_RenderWindowLayerController->MoveNodeToPosition(dataNode, layer, baseRenderer);
     }

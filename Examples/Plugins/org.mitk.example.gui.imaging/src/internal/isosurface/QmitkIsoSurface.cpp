@@ -109,7 +109,7 @@ void QmitkIsoSurface::CreateSurface()
                                 "crash. How do you want to go on?",
                                 "Proceed anyway!",
                                 "Cancel immediately! (maybe you want to insert an other threshold)!",
-                                QString::null,
+                                QString(),
                                 0,
                                 1) == 1)
       {

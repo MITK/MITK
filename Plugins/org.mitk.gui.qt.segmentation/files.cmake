@@ -1,7 +1,6 @@
 set(SRC_CPP_FILES
   QmitkSegmentationPreferencePage.cpp
   QmitkNewSegmentationDialog.cpp
-  QmitkLabelSetWidget.cpp
   QmitkSegmentAnythingPreferencePage.cpp
 )
 
@@ -19,27 +18,21 @@ set(INTERNAL_CPP_FILES
   QmitkConvertMaskToLabelAction.cpp
   QmitkConvertToMultiLabelSegmentationAction.cpp
   QmitkCreateMultiLabelSegmentationAction.cpp
-  Common/QmitkLabelsWidget.cpp
-  Common/QmitkLayersWidget.cpp
 )
 
 set(UI_FILES
   src/QmitkSegmentationPreferencePageControls.ui
   src/QmitkSegmentAnythingPreferencePage.ui
   src/QmitkNewSegmentationDialog.ui
-  src/QmitkLabelSetWidgetControls.ui
   src/internal/QmitkSegmentationViewControls.ui
   src/internal/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/QmitkSegmentationTaskListView.ui
-  src/internal/Common/QmitkLabelsWidgetControls.ui
-  src/internal/Common/QmitkLayersWidgetControls.ui
 )
 
 set(MOC_H_FILES
   src/QmitkSegmentationPreferencePage.h
   src/QmitkSegmentAnythingPreferencePage.h
   src/QmitkNewSegmentationDialog.h
-  src/QmitkLabelSetWidget.h
   src/internal/mitkPluginActivator.h
   src/internal/QmitkSegmentationView.h
   src/internal/QmitkSegmentationUtilitiesView.h
@@ -53,8 +46,6 @@ set(MOC_H_FILES
   src/internal/QmitkConvertMaskToLabelAction.h
   src/internal/QmitkConvertToMultiLabelSegmentationAction.h
   src/internal/QmitkCreateMultiLabelSegmentationAction.h
-  src/internal/Common/QmitkLabelsWidget.h
-  src/internal/Common/QmitkLayersWidget.h
 )
 
 set(CACHED_RESOURCE_FILES

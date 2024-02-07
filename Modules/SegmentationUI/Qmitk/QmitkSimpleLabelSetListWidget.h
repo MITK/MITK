@@ -51,9 +51,6 @@ protected:
   void OnLayerChanged();
   void OnLabelChanged(mitk::LabelSetImage::LabelValueType lv);
 
-  void OnLooseLabelSetConnection();
-  void OnEstablishLabelSetConnection();
-
   void ResetList();
 
   mitk::LabelSetImage::ConstPointer m_LabelSetImage;

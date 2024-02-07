@@ -54,11 +54,11 @@ private:                                                                        
   ::mitk::Message1<type1> m_##msgHandleObject##Message;                                                                \
                                                                                                                        \
 public:                                                                                                                \
-  void Add##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate1<type1> &delegate)                         \
+  void Add##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate1<type1> &delegate) const                   \
   {                                                                                                                    \
     m_##msgHandleObject##Message += delegate;                                                                          \
   }                                                                                                                    \
-  void Remove##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate1<type1> &delegate)                      \
+  void Remove##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate1<type1> &delegate) const                \
   {                                                                                                                    \
     m_##msgHandleObject##Message -= delegate;                                                                          \
   }

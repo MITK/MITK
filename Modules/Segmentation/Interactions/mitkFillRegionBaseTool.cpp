@@ -107,7 +107,7 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
     return; //nothing to fill;
   }
 
-  if (labelSetImage->IsLabelLocked(m_SeedLabelValue) && m_SeedLabelValue!=labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue())
+  if (labelSetImage->IsLabelLocked(m_SeedLabelValue) && m_SeedLabelValue!=labelSetImage->GetActiveLabel()->GetValue())
   {
     ErrorMessage.Send("Label of selected region is locked. Tool operation has no effect.");
     return;
@@ -120,14 +120,13 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
   //the active label can always be changed even if locked)
   //we realize that by cloning the relevant label set and changing the lock state
   //this fillLabelSet is used for the transfer.
-  auto fillLabelSet = labelSetImage->GetActiveLabelSet()->Clone();
-  auto activeLabelClone = fillLabelSet->GetLabel(labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue());
+  auto activeLabelClone = labelSetImage->GetActiveLabel()->Clone();
   if (nullptr != activeLabelClone)
   {
     activeLabelClone->SetLocked(false);
   }
 
-  TransferLabelContentAtTimeStep(fillImage, workingSlice, fillLabelSet, 0, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false, { {1, m_FillLabelValue} }, m_MergeStyle);
+  TransferLabelContentAtTimeStep(fillImage, workingSlice, { activeLabelClone }, 0, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false, { {1, m_FillLabelValue} }, m_MergeStyle);
 
   this->WriteBackSegmentationResult(positionEvent, workingSlice);
 

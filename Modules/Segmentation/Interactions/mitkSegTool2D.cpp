@@ -545,7 +545,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
   try{
     auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
     activeLayerID = labelSetImage->GetActiveLayer();
-    activeLabelValue = labelSetImage->GetActiveLabelSet()->GetActiveLabel()->GetValue();
+    activeLabelValue = labelSetImage->GetActiveLabel()->GetValue();
   }
   catch(...)
   {

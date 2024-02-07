@@ -484,14 +484,13 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
   //the active label can always be changed even if locked)
   //we realize that by cloning the relevant label set and changing the lock state
   //this fillLabelSet is used for the transfer.
-  auto fillLabelSet = workingImage->GetActiveLabelSet()->Clone();
-  auto activeLabelClone = fillLabelSet->GetLabel(workingImage->GetActiveLabel(workingImage->GetActiveLayer())->GetValue());
+  auto activeLabelClone = workingImage->GetActiveLabel()->Clone();
   if (nullptr != activeLabelClone)
   {
     activeLabelClone->SetLocked(false);
   }
 
-  TransferLabelContentAtTimeStep(m_PaintingSlice, m_WorkingSlice, fillLabelSet, 0, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false, { {m_InternalFillValue, activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
+  TransferLabelContentAtTimeStep(m_PaintingSlice, m_WorkingSlice, { activeLabelClone }, 0, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false, { {m_InternalFillValue, activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
 
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 

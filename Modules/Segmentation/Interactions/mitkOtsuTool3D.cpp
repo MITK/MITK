@@ -92,17 +92,13 @@ void mitk::OtsuTool3D::UpdatePrepare()
 {
   Superclass::UpdatePrepare();
   auto preview = this->GetPreviewSegmentation();
-  auto labelset = preview->GetLabelSet(preview->GetActiveLayer());
-  for (LabelSetImage::GroupIndexType i = 0; i<preview->GetNumberOfLayers(); ++i)
-  {
-    preview->GetLabelSet(i)->RemoveAllLabels();
-  }
+  preview->RemoveLabels(preview->GetAllLabelValues());
 
   for (unsigned int i = 0; i < m_NumberOfRegions; ++i)
   {
-    auto label = LabelSetImageHelper::CreateNewLabel(preview, "Otsu");
+    auto label = LabelSetImageHelper::CreateNewLabel(preview, "Otsu " + std::to_string(i));
     label->SetValue(i + 1);
-    labelset->AddLabel(label, false);
+    preview->AddLabel(label, preview->GetActiveLayer(), false, false);
   }
 }
 

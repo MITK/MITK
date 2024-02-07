@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkSurfaceInterpolationController_h
 
 #include <mitkDataStorage.h>
-#include <mitkImage.h>
+#include <mitkLabelSetImage.h>
 #include <mitkLabel.h>
 #include <mitkSurface.h>
 
@@ -38,34 +38,27 @@ namespace mitk
     struct MITKSURFACEINTERPOLATION_EXPORT ContourPositionInformation
     {
       int Pos;
-      unsigned int SliceIndex;
-      Surface::Pointer Contour;
+      Surface::ConstPointer Contour;
       Vector3D ContourNormal;
       Point3D ContourPoint;
-      mitk::PlaneGeometry* Plane;
-      mitk::Label::PixelType LabelValue;
-      unsigned int LayerValue;
-      size_t TimeStep;
+      PlaneGeometry::ConstPointer Plane;
+      Label::PixelType LabelValue;
+      TimeStepType TimeStep;
 
       ContourPositionInformation()
         : Pos(-1),
-          SliceIndex(0),
           Plane(nullptr),
-          LabelValue(std::numeric_limits<mitk::Label::PixelType>::max()),
-          LayerValue(std::numeric_limits<unsigned int>::max()),
-          TimeStep(std::numeric_limits<size_t>::max())
+          LabelValue(std::numeric_limits<Label::PixelType>::max()),
+          TimeStep(std::numeric_limits<TimeStepType>::max())
       {
       }
     };
 
-    typedef std::vector<ContourPositionInformation> ContourPositionInformationList;
-    typedef std::vector<ContourPositionInformationList> ContourPositionInformationVec2D;
+    typedef std::vector<ContourPositionInformation> CPIVector;
+    typedef std::map<TimeStepType, CPIVector> CPITimeStepMap;
+    typedef std::map<LabelSetImage::LabelValueType, CPITimeStepMap> CPITimeStepLabelMap;
 
-    //  first index is the current time step. second index is the layerID. third index is the contour index.
-    typedef std::vector<ContourPositionInformationVec2D> ContourPositionInformationVec3D;
-
-    typedef std::map<mitk::Image *, ContourPositionInformationVec3D> ContourListMap;
-    typedef std::map<mitk::Image *, ContourPositionInformationVec2D> ContourContainer;
+    typedef std::map<LabelSetImage*, CPITimeStepLabelMap> CPITimeStepLabelSegMap;
 
     static SurfaceInterpolationController *GetInstance();
 
@@ -114,20 +107,6 @@ namespace mitk
     mitk::Point3D ComputeInteriorPointOfContour(const ContourPositionInformation& contour,
                                                  mitk::LabelSetImage * labelSetImage);
 
-    /**
-     * @brief Make the surface interpolator responsive to the segmentation image by subscribing to events from the image.
-     *
-     */
-    void AddLabelSetConnection();
-
-    /**
-     * @brief Make the surface interpolator responsive to the segmentation image by stopping subscription to events from the image.
-     *
-     */
-    void RemoveLabelSetConnection();
-
-    void RemoveLabelSetConnection(mitk::LabelSetImage* labelSetImage, unsigned int layerID);
-
 
     /**
      * @brief Resets the pipeline for interpolation. The various filters used are reset.
@@ -136,43 +115,6 @@ namespace mitk
     void ReinitializeInterpolation();
 
     void RemoveObservers();
-
-    void AddLabelSetConnection(unsigned int layerID);
-
-    void UnsetSelectedImage()
-    {
-      m_SelectedSegmentation = nullptr;
-    }
-
-    /**
-     * @brief Returns the number of layers in the current segmentation image.
-     *
-     */
-    unsigned int GetNumberOfLayersInCurrentSegmentation() const;
-
-    /**
-     * @brief Set the number of layers in the current segmentation image.
-     *
-     */
-    void SetNumberOfLayersInCurrentSegmentation(unsigned int);
-
-    /**
-     * @brief Function that does the data management when a layer is removed.
-     *
-     */
-    void OnRemoveLayer();
-
-    /**
-     * @brief  Function that does the data management when a layer is added.
-     *
-     */
-    void OnAddLayer();
-
-    /**
-    * @brief Returns the number of available contours for the current selected segmentation
-    * @return the number of contours
-    */
-    unsigned int GetNumberOfContours();
 
     /**
      * @brief Performs the interpolation.
@@ -212,7 +154,7 @@ namespace mitk
      * @brief Get the current selected segmentation for which the interpolation is performed
      * @return the current segmentation image
      */
-    mitk::Image::Pointer GetCurrentSegmentation();
+    mitk::LabelSetImage* GetCurrentSegmentation();
 
     Surface *GetContoursAsSurface();
 
@@ -220,46 +162,22 @@ namespace mitk
 
     /**
      * Sets the current list of contourpoints which is used for the surface interpolation
-     * @param segmentation The current selected segmentation
-     * \deprecatedSince{2014_03}
-     */
-    DEPRECATED(void SetCurrentSegmentationInterpolationList(mitk::Image::Pointer segmentation));
-
-    /**
-     * Sets the current list of contourpoints which is used for the surface interpolation
      * @param currentSegmentationImage The current selected segmentation
      */
-    void SetCurrentInterpolationSession(mitk::Image::Pointer currentSegmentationImage);
-
-    /**
-     * Removes the segmentation and all its contours from the list
-     * @param segmentation The segmentation to be removed
-     * \deprecatedSince{2014_03}
-     */
-    DEPRECATED(void RemoveSegmentationFromContourList(mitk::Image *segmentation));
+    void SetCurrentInterpolationSession(LabelSetImage* currentSegmentationImage);
 
     /**
      * @brief Remove interpolation session
      * @param segmentationImage the session to be removed
      */
-    void RemoveInterpolationSession(mitk::Image::Pointer segmentationImage);
-
-    /**
-     * Replaces the current interpolation session with a new one. All contours form the old
-     * session will be applied to the new session. This only works if the two images have the
-     * geometry
-     * @param oldSession the session which should be replaced
-     * @param newSession the new session which replaces the old one
-     * @return true it the the replacement was successful, false if not (e.g. the image's geometry differs)
-     */
-    bool ReplaceInterpolationSession(mitk::Image::Pointer oldSession, mitk::Image::Pointer newSession);
+    void RemoveInterpolationSession(LabelSetImage* segmentationImage);
 
     /**
      * @brief Removes all sessions
      */
     void RemoveAllInterpolationSessions();
 
-    mitk::Image *GetImage();
+    mitk::Image *GetInterpolationImage();
 
     /**
      * @brief Get the Contours at a certain timeStep and layerID.
@@ -268,7 +186,7 @@ namespace mitk
      * @param layerID Layer from which to get the contours.
      * @return std::vector<ContourPositionInformation> Returns contours.
      */
-    ContourPositionInformationList* GetContours(unsigned int timeStep, unsigned int layerID);
+    CPIVector* GetContours(TimeStepType timeStep, LabelSetImage::LabelValueType labelValue);
 
     /**
      * @brief Trigerred with the "Reinit Interpolation" action. The contours are used to repopulate the
@@ -281,13 +199,22 @@ namespace mitk
                                            std::vector<const mitk::PlaneGeometry *>& contourPlanes);
 
     /**
-     * @brief Removes contours of a particular label, at a given time step and layerID.
+     * @brief Removes contours of a particular label and at a given time step for the current session/segmentation.
      *
      * @param label Label of contour to remove.
      * @param timeStep Time step in which to remove the contours.
-     * @param layerID Layer in which the contour should be removed.
+     * @remark if the label or time step does not exist, nothing happens.
      */
-    void RemoveContours(mitk::Label::PixelType label, unsigned int timeStep, unsigned int layerID);
+    void RemoveContours(mitk::Label::PixelType label, TimeStepType timeStep);
+
+    /**
+     * @brief Removes contours of a particular label and at a given time step for the current session/segmentation.
+     *
+     * @param label Label of contour to remove.
+     * @param timeStep Time step in which to remove the contours.
+     * @remark if the label or time step does not exist, nothing happens.
+     */
+    void RemoveContours(mitk::Label::PixelType label);
 
     /**
      * Estimates the memory which is needed to build up the equationsystem for the interpolation.
@@ -315,8 +242,6 @@ namespace mitk
      * @return DataNode* returns the DataNode containing the segmentation image.
      */
     mitk::DataNode* GetSegmentationImageNode();
-
-
 
   protected:
     SurfaceInterpolationController();
@@ -353,12 +278,6 @@ namespace mitk
     void AddPlaneGeometryNodeToDataStorage(const ContourPositionInformation& contourInfo);
 
     /**
-     * @brief Function that toggles active label, when the active label is changed.
-     *
-     */
-    void OnActiveLabel(mitk::Label::PixelType);
-
-    /**
      * @brief Clears the interpolation data structures. Called from CompleteReinitialization().
      *
      */
@@ -372,12 +291,6 @@ namespace mitk
      */
     void AddToInterpolationPipeline(ContourPositionInformation& contourInfo, bool reinitializationAction = false);
 
-    /**
-     * @brief Function to respond to layer changed
-     *
-     */
-    void OnLayerChanged();
-
     itk::SmartPointer<ReduceContourSetFilter> m_ReduceFilter;
     itk::SmartPointer<ComputeContourSetNormalsFilter> m_NormalsFilter;
     itk::SmartPointer<CreateDistanceImageFromSurfaceFilter> m_InterpolateSurfaceFilter;
@@ -390,29 +303,19 @@ namespace mitk
 
     mitk::DataStorage::Pointer m_DataStorage;
 
-    ContourContainer m_ListOfInterpolationSessions;
-    ContourListMap m_ListOfContours;
+    CPITimeStepLabelSegMap m_CPIMap;
 
     mitk::Surface::Pointer m_InterpolationResult;
 
     unsigned int m_CurrentNumberOfReducedContours;
-    unsigned int m_NumberOfConnectionsAdded;
 
-    mitk::Image *m_SelectedSegmentation;
+    mitk::LabelSetImage::Pointer m_SelectedSegmentation;
 
     std::map<mitk::Image *, unsigned long> m_SegmentationObserverTags;
 
     mitk::TimePointType m_CurrentTimePoint;
 
-    unsigned int m_ContourIndex;
     unsigned int m_ContourPosIndex;
-    unsigned int m_NumberOfLayersInCurrentSegmentation;
-
-    mitk::Label::PixelType m_PreviousActiveLabelValue;
-    mitk::Label::PixelType m_CurrentActiveLabelValue;
-
-    unsigned int m_PreviousLayerIndex;
-    unsigned int m_CurrentLayerIndex;
   };
 
   namespace ContourExt

@@ -32,9 +32,9 @@ class mitkLegacyLabelSetImageIOTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  mitk::LabelSet::Pointer m_labelSet1;
-  mitk::LabelSet::Pointer m_labelSet2;
-  mitk::LabelSet::Pointer m_labelSet2_adapted;
+  mitk::LabelSetImage::ConstLabelVectorType m_labelSet1;
+  mitk::LabelSetImage::ConstLabelVectorType m_labelSet2;
+  mitk::LabelSetImage::ConstLabelVectorType m_labelSet2_adapted;
 
 public:
   mitk::Label::Pointer GenerateLabel(mitk::Label::PixelType value, const std::string& name, float r, float g, float b) const
@@ -51,35 +51,26 @@ public:
 
   void setUp() override
   {
-    m_labelSet1 = mitk::LabelSet::New();
     auto label = GenerateLabel(1, "Label 1", 0.745098054f, 0.f, 0.196078435f);
-    m_labelSet1->AddLabel(label,false);
-    label = GenerateLabel(2, "Label 2", 0.952941179, 0.764705896, 0);
-    m_labelSet1->AddLabel(label, false);
+    auto label2 = GenerateLabel(2, "Label 2", 0.952941179, 0.764705896, 0);
+    m_labelSet1 = { label, label2 };
 
-    m_labelSet2 = mitk::LabelSet::New();
     label = GenerateLabel(1, "Label 3", 0.552941203, 0.713725507, 0);
-    m_labelSet2->AddLabel(label, false);
-    label = GenerateLabel(2, "Label 4", 0.631372571, 0.792156875, 0.945098042);
-    m_labelSet2->AddLabel(label, false);
-    label = GenerateLabel(3, "Label 5", 0.639215708, 0.250980407, 0.725490212);
-    m_labelSet2->AddLabel(label, false);
+    label2 = GenerateLabel(2, "Label 4", 0.631372571, 0.792156875, 0.945098042);
+    auto label3 = GenerateLabel(3, "Label 5", 0.639215708, 0.250980407, 0.725490212);
+    m_labelSet2 = { label, label2, label3 };
 
-    m_labelSet2_adapted = mitk::LabelSet::New();
     label = GenerateLabel(3, "Label 3", 0.552941203, 0.713725507, 0);
-    m_labelSet2_adapted->AddLabel(label, false);
-    label = GenerateLabel(4, "Label 4", 0.631372571, 0.792156875, 0.945098042);
-    m_labelSet2_adapted->AddLabel(label, false);
-    label = GenerateLabel(5, "Label 5", 0.639215708, 0.250980407, 0.725490212);
-    m_labelSet2_adapted->AddLabel(label, false);
-    m_labelSet2_adapted->SetLayer(1);
+    label2 = GenerateLabel(4, "Label 4", 0.631372571, 0.792156875, 0.945098042);
+    label3 = GenerateLabel(5, "Label 5", 0.639215708, 0.250980407, 0.725490212);
+    m_labelSet2_adapted = { label, label2, label3 };
   }
 
   void tearDown() override
   {
-    m_labelSet1 = nullptr;
-    m_labelSet2 = nullptr;
-    m_labelSet2_adapted = nullptr;
+    m_labelSet1.clear();
+    m_labelSet2.clear();
+    m_labelSet2_adapted.clear();
   }
   
   void TestRead3DLabelSetImage_Default()
@@ -91,8 +82,12 @@ public:
     auto lsimage1 = dynamic_cast<mitk::LabelSetImage*>(testImages[0].GetPointer());
 
     CPPUNIT_ASSERT_MESSAGE("Number of layers is not correct", lsimage1->GetNumberOfLayers() == 2);
-    CPPUNIT_ASSERT_MESSAGE("Error layer 0 is not equal", mitk::Equal(*m_labelSet1, *(lsimage1->GetLabelSet(0)), mitk::eps, true));
-    CPPUNIT_ASSERT_MESSAGE("Error layer 1 is not equal", mitk::Equal(*m_labelSet2_adapted, *(lsimage1->GetLabelSet(1)), mitk::eps, true));
+
+    auto loadedLabels = lsimage1->GetConstLabelsByValue(lsimage1->GetLabelValuesByGroup(0));
+    CPPUNIT_ASSERT_MESSAGE("Error layer 0 is not equal", mitk::Equal(m_labelSet1, loadedLabels, mitk::eps, true));
+
+    loadedLabels = lsimage1->GetConstLabelsByValue(lsimage1->GetLabelValuesByGroup(1));
+    CPPUNIT_ASSERT_MESSAGE("Error layer 1 is not equal", mitk::Equal(m_labelSet2_adapted, loadedLabels, mitk::eps, true));
 
     CPPUNIT_ASSERT_MESSAGE("Error, read image has different UID", "c236532b-f95a-4f22-a4c6-7abe4e41ad10"== lsimage1->GetUID());
   }
@@ -107,8 +102,12 @@ public:
     auto lsimage1 = dynamic_cast<mitk::LabelSetImage*>(testImages[0].GetPointer());
 
     CPPUNIT_ASSERT_MESSAGE("Number of layers is not correct", lsimage1->GetNumberOfLayers() == 2);
-    CPPUNIT_ASSERT_MESSAGE("Error layer 0 is not equal", mitk::Equal(*m_labelSet1, *(lsimage1->GetLabelSet(0)), mitk::eps, true));
-    CPPUNIT_ASSERT_MESSAGE("Error layer 1 is not equal", mitk::Equal(*m_labelSet2_adapted, *(lsimage1->GetLabelSet(1)), mitk::eps, true));
+
+    auto loadedLabels = lsimage1->GetConstLabelsByValue(lsimage1->GetLabelValuesByGroup(0));
+    CPPUNIT_ASSERT_MESSAGE("Error layer 0 is not equal", mitk::Equal(m_labelSet1, loadedLabels, mitk::eps, true));
+
+    loadedLabels = lsimage1->GetConstLabelsByValue(lsimage1->GetLabelValuesByGroup(1));
+    CPPUNIT_ASSERT_MESSAGE("Error layer 1 is not equal", mitk::Equal(m_labelSet2_adapted, loadedLabels, mitk::eps, true));
 
     CPPUNIT_ASSERT_MESSAGE("Error, read image has different UID", "c236532b-f95a-4f22-a4c6-7abe4e41ad10" == lsimage1->GetUID());
   }
@@ -125,8 +124,12 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Number of layers in image 1 isnot correct", lsimage1->GetNumberOfLayers() == 1);
     CPPUNIT_ASSERT_MESSAGE("Number of layers in image 2 is not correct", lsimage2->GetNumberOfLayers() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Error layer 0 is not equal", mitk::Equal(*m_labelSet1, *(lsimage1->GetLabelSet(0)), mitk::eps, true));
-    CPPUNIT_ASSERT_MESSAGE("Error layer 1 is not equal", mitk::Equal(*m_labelSet2, *(lsimage2->GetLabelSet(0)), mitk::eps, true));
+
+    auto loadedLabels = lsimage1->GetConstLabelsByValue(lsimage1->GetLabelValuesByGroup(0));
+    CPPUNIT_ASSERT_MESSAGE("Error layer 0 is not equal", mitk::Equal(m_labelSet1, loadedLabels, mitk::eps, true));
+
+    loadedLabels = lsimage2->GetConstLabelsByValue(lsimage1->GetLabelValuesByGroup(0));
+    CPPUNIT_ASSERT_MESSAGE("Error layer 1 is not equal", mitk::Equal(m_labelSet2, loadedLabels, mitk::eps, true));
 
     CPPUNIT_ASSERT_MESSAGE("Error, read image has same UID", "c236532b-f95a-4f22-a4c6-7abe4e41ad10" != lsimage1->GetUID());
 

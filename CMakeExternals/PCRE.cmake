@@ -55,8 +55,8 @@ if(MITK_USE_PCRE)
 
     ExternalProject_add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/pcre-8.35.tar.gz
-      URL_MD5 "ed58bcbe54d3b1d59e9f5415ef45ce1c"
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/pcre-8.45.tar.gz
+      URL_MD5 "01b80f8177ab91da63e7e5c5d5dfcb83"
       ${configure_cmd}
       DEPENDS "${${proj}_DEPENDENCIES}"
       )

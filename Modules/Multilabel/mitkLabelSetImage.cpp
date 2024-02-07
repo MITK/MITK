@@ -143,6 +143,8 @@ const mitk::Image *mitk::LabelSetImage::GetLayerImage(unsigned int layer) const
 
 unsigned int mitk::LabelSetImage::GetActiveLayer() const
 {
+  if (m_LayerContainer.size() == 0) mitkThrow() << "Cannot return active layer index. No layer is available.";
+
   return m_ActiveLayer;
 }
 
@@ -224,6 +226,17 @@ mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::ConvertLabelVecto
   return result;
 };
 
+const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetAllLabelValues() const
+{
+  LabelValueVectorType result;
+
+  for (auto [value, label] : m_LabelMap)
+  {
+    result.emplace_back(value);
+  }
+  return result;
+}
+
 mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValues() const
 {
   LabelValueVectorType result = { UnlabeledValue };
@@ -232,6 +245,7 @@ mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValue
   {
     result.emplace_back(value);
   }
+
   return result;
 }
 
@@ -529,6 +543,12 @@ void mitk::LabelSetImage::EraseLabels(const std::vector<PixelType>& VectorOfLabe
   }
 }
 
+mitk::LabelSetImage::LabelValueType mitk::LabelSetImage::GetUnusedLabelValue() const
+{
+  auto usedValues = this->GetUsedLabelValues();
+  return usedValues.back() + 1;
+}
+
 mitk::Label* mitk::LabelSetImage::AddLabel(mitk::Label* label, GroupIndexType groupID, bool addAsClone, bool correctLabelValue)
 {
   unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
@@ -545,7 +565,7 @@ mitk::Label* mitk::LabelSetImage::AddLabel(mitk::Label* label, GroupIndexType gr
   {
     if (correctLabelValue)
     {
-      pixelValue = usedValues.back() + 1;
+      pixelValue = this->GetUnusedLabelValue();
       newLabel->SetValue(pixelValue);
     }
     else
@@ -1160,7 +1180,7 @@ std::vector<std::string> mitk::LabelSetImage::GetLabelClassNames() const
 {
   std::set<std::string> names;
   auto searchName = [&names](const Label* l) { names.emplace(l->GetName()); };
-  this->VisitLabels(this->GetUsedLabelValues(), searchName);
+  this->VisitLabels(this->GetAllLabelValues(), searchName);
 
   return std::vector<std::string>(names.begin(), names.end());
 }
@@ -1178,7 +1198,7 @@ void mitk::LabelSetImage::SetAllLabelsVisible(bool visible)
 {
   auto setVisibility = [visible](Label* l) { l->SetVisible(visible); };
 
-  this->ApplyToLabels(this->GetUsedLabelValues(), setVisibility);
+  this->ApplyToLabels(this->GetAllLabelValues(), setVisibility);
 }
 
 void mitk::LabelSetImage::SetAllLabelsVisibleByGroup(GroupIndexType group, bool visible)
@@ -1199,7 +1219,7 @@ void mitk::LabelSetImage::SetAllLabelsLocked(bool locked)
 {
   auto setLock = [locked](Label* l) { l->SetLocked(locked); };
 
-  this->ApplyToLabels(this->GetUsedLabelValues(), setLock);
+  this->ApplyToLabels(this->GetAllLabelValues(), setLock);
 }
 
 void mitk::LabelSetImage::SetAllLabelsLockedByGroup(GroupIndexType group, bool locked)
@@ -1307,6 +1327,37 @@ bool mitk::Equal(const mitk::LabelSetImage &leftHandSide,
         MITK_INFO(verbose) << "At least one label in layer is not equal. Invalid layer:" << layerIndex;
         return false;
       }
+    }
+  }
+
+  return returnValue;
+}
+
+bool mitk::Equal(const mitk::LabelSetImage::ConstLabelVectorType& leftHandSide,
+  const mitk::LabelSetImage::ConstLabelVectorType& rightHandSide, ScalarType eps, bool verbose)
+{
+  bool returnValue = true;
+
+  // container size;
+  returnValue = leftHandSide.size() == rightHandSide.size();
+  if (!returnValue)
+  {
+    MITK_INFO(verbose) << "Number of labels not equal.";
+    return returnValue;
+    ;
+  }
+
+  // m_LabelContainer;
+  auto lhsit = leftHandSide.begin();
+  auto rhsit = rightHandSide.begin();
+  for (; lhsit != leftHandSide.end(); ++lhsit, ++rhsit)
+  {
+    returnValue = rhsit == lhsit;
+    if (!returnValue)
+    {
+      MITK_INFO(verbose) << "Label in label container not equal.";
+      return returnValue;
+      ;
     }
   }
 

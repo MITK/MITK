@@ -174,6 +174,8 @@ namespace mitk
 
     static ConstLabelVectorType ConvertLabelVectorConst(const LabelVectorType& labels);
 
+    const LabelValueVectorType GetAllLabelValues() const;
+
     /**
      * @brief Returns a vector of all label values located on the specified group.
      * @param index the index of the group for which the vector of labels should be retrieved.
@@ -195,6 +197,12 @@ namespace mitk
 
     std::vector<std::string> GetLabelClassNames() const;
     std::vector<std::string> GetLabelClassNamesByGroup(GroupIndexType index) const;
+
+    /** Helper that returns an unused label value, that could be used e.g. if one wants to define a label externally
+    before adding it.
+     @return A label value currently not in use.
+     @remark is no unused label value can be provided an exception will be thrown.*/
+    LabelValueType GetUnusedLabelValue() const;
 
     itkGetConstMacro(UnlabeledLabelLock, bool);
     itkSetMacro(UnlabeledLabelLock, bool);
@@ -446,6 +454,7 @@ namespace mitk
     /**
      * @brief Gets the ID of the currently active layer
      * @return the ID of the active layer
+     * @pre at least on group must exist.
      */
     unsigned int GetActiveLayer() const;
 
@@ -543,8 +552,8 @@ namespace mitk
     template <typename LabelSetImageType, typename ImageType>
     void InitializeByLabeledImageProcessing(LabelSetImageType *input, ImageType *other);
 
-    /** helper needed for ensuring unique values in all layers until the refactoring is done.
-      returns a sorted list of all labels.*/
+    /** helper needed for ensuring unique values.
+      returns a sorted list of all labels (including the value for Unlabeled pixels..*/
     LabelValueVectorType GetUsedLabelValues() const;
 
     std::vector<Image::Pointer> m_LayerContainer;
@@ -576,6 +585,25 @@ namespace mitk
                                    const mitk::LabelSetImage &rightHandSide,
                                    ScalarType eps,
                                    bool verbose);
+
+  /**
+  * @brief Equal A function comparing two vectors of labels for beeing equal in data
+  *
+  * @ingroup MITKTestingAPI
+  *
+  * Following aspects are tested for equality:
+  *  - Labels in vector
+  *
+  * @param rightHandSide An vector of labels to be compared
+  * @param leftHandSide An vector of labels to be compared
+  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+  * @param verbose Flag indicating if the user wants detailed console output or not.
+  * @return true, if all subsequent comparisons are true, false otherwise
+  */
+  MITKMULTILABEL_EXPORT bool Equal(const mitk::LabelSetImage::ConstLabelVectorType& leftHandSide,
+    const mitk::LabelSetImage::ConstLabelVectorType& rightHandSide,
+    ScalarType eps,
+    bool verbose);
 
 
   /** temporery namespace that is used until the new class MultiLabelSegmentation is

@@ -450,7 +450,7 @@ bool QmitkMultiLabelTreeModel::setData(const QModelIndex& index, const QVariant&
           label->SetVisible(value.toBool());
         }
         auto groupID = m_Segmentation->GetGroupIndexOfLabel(label->GetValue());
-        m_Segmentation->GetLabelSet(groupID)->UpdateLookupTable(label->GetValue());
+        m_Segmentation->UpdateLookupTable(label->GetValue());
         m_Segmentation->Modified();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
@@ -772,14 +772,14 @@ QmitkMultiLabelSegTreeItem* AddLabelToGroupTree(mitk::Label* label, QmitkMultiLa
 
 void QmitkMultiLabelTreeModel::GenerateInternalGroupTree(unsigned int groupID, QmitkMultiLabelSegTreeItem* groupItem)
 {
-  auto labelSet = m_Segmentation->GetLabelSet(groupID);
+  auto labels = m_Segmentation->GetLabelsByValue(m_Segmentation->GetLabelValuesByGroup(groupID));
 
-  for (auto lIter = labelSet->IteratorConstBegin(); lIter != labelSet->IteratorConstEnd(); lIter++)
+  for (auto& label : labels)
   {
-    if (lIter->first== mitk::LabelSetImage::UnlabeledValue) continue;
+    if (label->GetValue()== mitk::LabelSetImage::UnlabeledValue) continue;
 
     bool newItemCreated = false;
-    AddLabelToGroupTree(lIter->second, groupItem, newItemCreated);
+    AddLabelToGroupTree(label, groupItem, newItemCreated);
   }
 }
 

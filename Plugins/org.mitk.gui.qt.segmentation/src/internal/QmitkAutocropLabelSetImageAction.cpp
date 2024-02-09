@@ -221,7 +221,7 @@ namespace
         }
 
         croppedLabelSetImage->SetImportVolume(croppedVolume, timeStep, 0, mitk::Image::ReferenceMemory);
-        croppedLabelSetImage->AddLabelSetToLayer(layer, labelSetImage->GetLabelSet(layer));
+        croppedLabelSetImage->ReplaceGroupLabels(layer, labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(layer)));
       }
     }
 

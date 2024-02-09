@@ -345,8 +345,18 @@ void QmitkSegmentationView::OnLabelToggleShortcutActivated()
   }
 
   this->WaitCursorOn();
-  workingImage->GetActiveLabelSet()->SetNextActiveLabel();
-  workingImage->Modified();
+  auto labels = workingImage->GetLabelValuesByGroup(workingImage->GetActiveLayer());
+  auto it = std::find(labels.begin(), labels.end(), workingImage->GetActiveLabel()->GetValue());
+
+  if (it != labels.end())
+    ++it;
+
+  if (it == labels.end())
+  {
+    it = labels.begin();
+  }
+
+  workingImage->SetActiveLabel(*it);
   this->WaitCursorOff();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -417,7 +427,7 @@ void QmitkSegmentationView::OnNewSegmentation()
     if (!m_DefaultLabelNaming)
       QmitkNewSegmentationDialog::DoRenameLabel(newLabel, nullptr, m_Parent);
 
-    newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
+    newLabelSetImage->AddLabel(newLabel, newLabelSetImage->GetActiveLayer());
   }
 
   if (!this->GetDataStorage()->Exists(newSegmentationNode))
@@ -484,9 +494,7 @@ void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManage
   auto segmentation = this->GetCurrentSegmentation();
 
   const auto labelValue = labels.front();
-  const auto groupID = segmentation->GetGroupIndexOfLabel(labelValue);
-  if (groupID != segmentation->GetActiveLayer()) segmentation->SetActiveLayer(groupID);
-  if (labelValue != segmentation->GetActiveLabelSet()->GetActiveLabel()->GetValue()) segmentation->GetActiveLabelSet()->SetActiveLabel(labelValue);
+  if (labelValue != segmentation->GetActiveLabel()->GetValue()) segmentation->SetActiveLabel(labelValue);
 
   segmentation->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -784,7 +792,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   context->ungetService(ppmRef);
   service = nullptr;
 
-  mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+  auto image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
   mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
 }
 

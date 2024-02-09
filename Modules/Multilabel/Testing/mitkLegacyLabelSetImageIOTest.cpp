@@ -128,7 +128,7 @@ public:
     auto loadedLabels = lsimage1->GetConstLabelsByValue(lsimage1->GetLabelValuesByGroup(0));
     CPPUNIT_ASSERT_MESSAGE("Error layer 0 is not equal", mitk::Equal(m_labelSet1, loadedLabels, mitk::eps, true));
 
-    loadedLabels = lsimage2->GetConstLabelsByValue(lsimage1->GetLabelValuesByGroup(0));
+    loadedLabels = lsimage2->GetConstLabelsByValue(lsimage2->GetLabelValuesByGroup(0));
     CPPUNIT_ASSERT_MESSAGE("Error layer 1 is not equal", mitk::Equal(m_labelSet2, loadedLabels, mitk::eps, true));
 
     CPPUNIT_ASSERT_MESSAGE("Error, read image has same UID", "c236532b-f95a-4f22-a4c6-7abe4e41ad10" != lsimage1->GetUID());

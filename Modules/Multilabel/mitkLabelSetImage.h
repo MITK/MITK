@@ -470,7 +470,7 @@ namespace mitk
      * @param layer the layer ID for which the active mitk::Labels should be retrieved
      * @return the number of all existing mitk::Labels for the given layer
      */
-    unsigned int GetNumberOfLabels(unsigned int layer = 0) const;
+    unsigned int GetNumberOfLabels(unsigned int layer) const;
 
     /**
      * @brief Returns the number of all labels summed up across all layers
@@ -483,10 +483,10 @@ namespace mitk
     mitk::Image::Pointer CreateLabelMask(PixelType index);
 
     /**
-     * @brief Initialize a new mitk::LabelSetImage by an given image.
+     * @brief Initialize a new mitk::LabelSetImage by a given image.
      * For all distinct pixel values of the parameter image new labels will
      * be created. If the number of distinct pixel values exceeds mitk::Label::MAX_LABEL_VALUE
-     * a new layer will be created
+     * an excption will be raised.
      * @param image the image which is used for initialization
      */
     void InitializeByLabeledImage(mitk::Image::Pointer image);
@@ -559,8 +559,6 @@ namespace mitk
     std::vector<Image::Pointer> m_LayerContainer;
 
     int m_ActiveLayer;
-    LabelValueType m_ActiveLabel;
-
     bool m_activeLayerInvalid;
   };
 

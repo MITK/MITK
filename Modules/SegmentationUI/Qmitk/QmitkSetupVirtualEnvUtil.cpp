@@ -19,7 +19,7 @@ found in the LICENSE file.s
 #include <QDir>
 #include <QApplication>
 #include <QProcess>
-#include <QTextCodec>
+#include <QStringDecoder>
 
 QmitkSetupVirtualEnvUtil::QmitkSetupVirtualEnvUtil()
 {
@@ -222,7 +222,7 @@ std::pair<QString, QString> QmitkSetupVirtualEnvUtil::GetExactPythonPath(const Q
                           QProcess::ReadOnly);
     if (pyProcess.waitForFinished())
     {
-      auto pyVersionCaptured = QTextCodec::codecForName("UTF-8")->toUnicode(pyProcess.readAllStandardOutput()).toStdString();
+      auto pyVersionCaptured = QString(QStringDecoder(QStringDecoder::Utf8)(pyProcess.readAllStandardOutput())).toStdString();
       std::smatch match; // Expecting "Python 3.xx.xx" or "Python 3.xx"
       if (std::regex_search(pyVersionCaptured, match, sanitizer) && !match.empty())
       {

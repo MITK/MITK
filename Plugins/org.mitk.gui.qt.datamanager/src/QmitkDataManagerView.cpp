@@ -16,10 +16,12 @@ found in the LICENSE file.
 #include "internal/QmitkDataManagerItemDelegate.h"
 #include "internal/QmitkNodeTableViewKeyFilter.h"
 
+
 // mitk core
 #include <mitkCommon.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkEnumerationProperty.h>
+
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkLookupTableProperty.h>

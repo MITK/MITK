@@ -91,11 +91,11 @@ namespace mitk
     void AddNewContours(const std::vector<Surface::Pointer>& newContours, std::vector<const mitk::PlaneGeometry*>& contourPlanes, bool reinitializeAction = false);
 
     /**
-    * @brief Returns the contour for a given plane for the current selected segmenation
-    * @param contourInfo the contour which should be returned
-    * @return the contour as an mitk::Surface. If no contour is available at the give position nullptr is returned
-    */
-    const mitk::Surface *GetContour(const ContourPositionInformation& contourInfo);
+     * @brief Removes the contour for a given plane for the current selected segmenation
+     * @param contourInfo the contour which should be removed
+     * @return true if a contour was found and removed, false if no contour was found
+     */
+    bool RemoveContour(ContourPositionInformation contourInfo);
 
     /**
      * @brief Computes an interior point of the input contour. It's used to detect merge and erase operations.
@@ -230,13 +230,6 @@ namespace mitk
     unsigned int GetNumberOfInterpolationSessions();
 
     /**
-     * @brief Removes the contour for a given plane for the current selected segmenation
-     * @param contourInfo the contour which should be removed
-     * @return true if a contour was found and removed, false if no contour was found
-     */
-    bool RemoveContour(ContourPositionInformation contourInfo);
-
-    /**
      * @brief Get the Segmentation Image Node object
      *
      * @return DataNode* returns the DataNode containing the segmentation image.
@@ -299,8 +292,6 @@ namespace mitk
 
     double m_DistanceImageSpacing;
 
-    vtkSmartPointer<vtkPolyData> m_PolyData;
-
     mitk::DataStorage::Pointer m_DataStorage;
 
     CPITimeStepLabelSegMap m_CPIMap;
@@ -309,13 +300,11 @@ namespace mitk
 
     unsigned int m_CurrentNumberOfReducedContours;
 
-    mitk::LabelSetImage::Pointer m_SelectedSegmentation;
+    WeakPointer<LabelSetImage> m_SelectedSegmentation;
 
     std::map<mitk::Image *, unsigned long> m_SegmentationObserverTags;
 
     mitk::TimePointType m_CurrentTimePoint;
-
-    unsigned int m_ContourPosIndex;
   };
 
   namespace ContourExt

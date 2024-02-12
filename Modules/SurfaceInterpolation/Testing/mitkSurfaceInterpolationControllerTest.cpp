@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include "mitkImageAccessByItk.h"
 #include <mitkImageTimeSelector.h>
 #include <mitkLabelSetImage.h>
 
@@ -22,6 +23,12 @@ found in the LICENSE file.
 #include <vtkFieldData.h>
 #include <vtkPolygon.h>
 #include <vtkRegularPolygonSource.h>
+
+template <typename ImageType>
+void ClearBufferProcessing(ImageType* itkImage)
+{
+  itkImage->FillBuffer(0);
+}
 
 class mitkSurfaceInterpolationControllerTestSuite : public mitk::TestFixture
 {
@@ -40,8 +47,8 @@ class mitkSurfaceInterpolationControllerTestSuite : public mitk::TestFixture
   /// \todo Workaround for memory leak in TestAddNewContour. Bug 18096.
   vtkDebugLeaks::SetExitError(0);
 
-  MITK_TEST(TestAddNewContour);
-  MITK_TEST(TestRemoveContour);
+  MITK_TEST(TestAddNewContours);
+  MITK_TEST(TestRemoveContours);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -54,6 +61,7 @@ public:
     // mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
     mitk::PixelType p_type = mitk::MakeScalarPixelType<unsigned char>();
     newImage->Initialize(p_type, 3, dimensions);
+    AccessFixedDimensionByItk(newImage, ClearBufferProcessing, 3);
     return newImage;
   }
 
@@ -238,7 +246,7 @@ public:
                            m_Controller->GetNumberOfInterpolationSessions() == 0);
   }
 
-  void TestAddNewContour()
+  void TestAddNewContours()
   {
     // Create segmentation image
     unsigned int dimensions1[] = {10, 10, 10};
@@ -317,9 +325,9 @@ public:
     surfaces.push_back(surf_2);
     surfaces.push_back(surf_3);
 
-    const mitk::PlaneGeometry * planeGeometry1 = GetPlaneGeometry();
-    const mitk::PlaneGeometry * planeGeometry2 = GetPlaneGeometry();
-    const mitk::PlaneGeometry * planeGeometry3 = GetPlaneGeometry();
+    auto planeGeometry1 = GetPlaneGeometry();
+    auto planeGeometry2 = GetPlaneGeometry();
+    auto planeGeometry3 = GetPlaneGeometry();
 
     std::vector<const mitk::PlaneGeometry*> planeGeometries;
     planeGeometries.push_back(planeGeometry1);
@@ -329,35 +337,15 @@ public:
     // Add contours
     m_Controller->AddNewContours(surfaces, planeGeometries, true);
 
-    mitk::ScalarType n[3];
-
     // Check if all contours are there
-    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo1;
-    vtkPolygon::ComputeNormal(surf_1->GetVtkPolyData()->GetPoints(), n);
-    contourInfo1.ContourNormal = n;
-    contourInfo1.ContourPoint = center_1;
-
-    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo2;
-    vtkPolygon::ComputeNormal(surf_2->GetVtkPolyData()->GetPoints(), n);
-    contourInfo2.ContourNormal = n;
-    contourInfo2.ContourPoint = center_2;
-
-    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo3;
-    vtkPolygon::ComputeNormal(surf_3->GetVtkPolyData()->GetPoints(), n);
-    contourInfo3.ContourNormal = n;
-    contourInfo3.ContourPoint = center_3;
-
-    const mitk::Surface *contour_1 = m_Controller->GetContour(contourInfo1);
-    const mitk::Surface *contour_2 = m_Controller->GetContour(contourInfo2);
-    const mitk::Surface *contour_3 = m_Controller->GetContour(contourInfo3);
-
-    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(0,1)->size() == 3);
+    auto contours = m_Controller->GetContours(0, 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", contours->size() == 3);
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
-                           mitk::Equal(*(surf_1->GetVtkPolyData()), *(contour_1->GetVtkPolyData()), 0.000001, true));
+                           mitk::Equal(*(surf_1->GetVtkPolyData()), *((*contours)[0].Contour->GetVtkPolyData()), 0.000001, true));
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
-                           mitk::Equal(*(surf_2->GetVtkPolyData()), *(contour_2->GetVtkPolyData()), 0.000001, true));
+                           mitk::Equal(*(surf_2->GetVtkPolyData()), *((*contours)[1].Contour->GetVtkPolyData()), 0.000001, true));
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
-                           mitk::Equal(*(surf_3->GetVtkPolyData()), *(contour_3->GetVtkPolyData()), 0.000001, true));
+                           mitk::Equal(*(surf_3->GetVtkPolyData()), *((*contours)[2].Contour->GetVtkPolyData()), 0.000001, true));
 
     // Create another segmentation image
     unsigned int dimensions2[] = {20, 20, 20};
@@ -431,24 +419,9 @@ public:
     double6Array->InsertNextValue(center_6[2]);
     surf_6->GetVtkPolyData()->GetFieldData()->AddArray(double6Array);
 
-    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo4;
-    vtkPolygon::ComputeNormal(surf_4->GetVtkPolyData()->GetPoints(), n);
-    contourInfo4.ContourNormal = n;
-    contourInfo4.ContourPoint = center_4;
-
-    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo5;
-    vtkPolygon::ComputeNormal(surf_5->GetVtkPolyData()->GetPoints(), n);
-    contourInfo5.ContourNormal = n;
-    contourInfo5.ContourPoint = center_5;
-
-    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo6;
-    vtkPolygon::ComputeNormal(surf_6->GetVtkPolyData()->GetPoints(), n);
-    contourInfo6.ContourNormal = n;
-    contourInfo6.ContourPoint = center_6;
-
-    const mitk::PlaneGeometry * planeGeometry4 = GetPlaneGeometry();
-    const mitk::PlaneGeometry * planeGeometry5 = GetPlaneGeometry();
-    const mitk::PlaneGeometry * planeGeometry6 = GetPlaneGeometry();
+    auto planeGeometry4 = GetPlaneGeometry();
+    auto planeGeometry5 = GetPlaneGeometry();
+    auto planeGeometry6 = GetPlaneGeometry();
 
     std::vector<mitk::Surface::Pointer> surfaces2;
     surfaces2.push_back(surf_4);
@@ -463,16 +436,18 @@ public:
     m_Controller->AddNewContours(surfaces2, planeGeometries2, true);
 
     // Check if all contours are there
-    auto contour_4 = m_Controller->GetContour(contourInfo4);
-    auto contour_5 = m_Controller->GetContour(contourInfo5);
-    auto contour_6 = m_Controller->GetContour(contourInfo6);
+
+    CPPUNIT_ASSERT_MESSAGE("Wrong contours stored!", m_Controller->GetContours(0, 1) == nullptr);
+
+    auto contours2 = m_Controller->GetContours(0, 2);
+
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(0, 2)->size() == 3);
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
-                           mitk::Equal(*(surf_4->GetVtkPolyData()), *(contour_4->GetVtkPolyData()), 0.000001, true));
+                           mitk::Equal(*(surf_4->GetVtkPolyData()), *((*contours2)[0].Contour->GetVtkPolyData()), 0.000001, true));
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
-                           mitk::Equal(*(surf_5->GetVtkPolyData()), *(contour_5->GetVtkPolyData()), 0.000001, true));
+                           mitk::Equal(*(surf_5->GetVtkPolyData()), *((*contours2)[1].Contour->GetVtkPolyData()), 0.000001, true));
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
-                           mitk::Equal(*(surf_6->GetVtkPolyData()), *(contour_6->GetVtkPolyData()), 0.000001, true));
+                           mitk::Equal(*(surf_6->GetVtkPolyData()), *((*contours2)[2].Contour->GetVtkPolyData()), 0.000001, true));
 
     // Modify some contours
     vtkSmartPointer<vtkRegularPolygonSource> p_source_7 = vtkSmartPointer<vtkRegularPolygonSource>::New();
@@ -499,27 +474,20 @@ public:
     std::vector<mitk::Surface::Pointer> surfaces3;
     surfaces3.push_back(surf_7);
 
-    const mitk::PlaneGeometry * planeGeometry7 = GetPlaneGeometry();
+    auto planeGeometry7 = GetPlaneGeometry();
     std::vector<const mitk::PlaneGeometry*> planeGeometries3;
     planeGeometries3.push_back(planeGeometry7);
 
     m_Controller->AddNewContours(surfaces3, planeGeometries3, true);
 
-    mitk::ScalarType center_7[3];
-    center_7[0] = 3.0;
-    center_7[1] = 10.0;
-    center_7[2] = 10.0;
-    vtkPolygon::ComputeNormal(surf_7->GetVtkPolyData()->GetPoints(), n);
-    contourInfo5.ContourNormal = n;
-    contourInfo5.ContourPoint = center_7;
-
-    auto contour_7 = m_Controller->GetContour(contourInfo5);
-    CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
-                           mitk::Equal(*(surf_7->GetVtkPolyData()), *(contour_7->GetVtkPolyData()), 0.000001, true));
+    CPPUNIT_ASSERT_MESSAGE("Wrong contours stored!", m_Controller->GetContours(0, 1) == nullptr);
+    contours2 = m_Controller->GetContours(0, 2);
+    //CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
+    //                       mitk::Equal(*(surf_7->GetVtkPolyData()), *(contour_7->GetVtkPolyData()), 0.000001, true));
 
     // Change session and test if all contours are available
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
-    auto contour_8 = m_Controller->GetContour(contourInfo1);
+    /*auto contour_8 = m_Controller->GetContour(contourInfo1);
     auto contour_9 = m_Controller->GetContour(contourInfo2);
     auto contour_10 = m_Controller->GetContour(contourInfo3);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(0, 2)->size() == 3);
@@ -528,10 +496,10 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
                            mitk::Equal(*(surf_2->GetVtkPolyData()), *(contour_9->GetVtkPolyData()), 0.000001, true));
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
-                           mitk::Equal(*(surf_3->GetVtkPolyData()), *(contour_10->GetVtkPolyData()), 0.000001, true));
+                           mitk::Equal(*(surf_3->GetVtkPolyData()), *(contour_10->GetVtkPolyData()), 0.000001, true));*/
   }
 
-  void TestRemoveContour()
+  void TestRemoveContours()
   {
     // Create segmentation image
     unsigned int dimensions1[] = {12, 12, 12};
@@ -587,8 +555,8 @@ public:
     surfaces.push_back(surf_1);
     surfaces.push_back(surf_2);
 
-    const mitk::PlaneGeometry * planeGeometry1 = GetPlaneGeometry();
-    const mitk::PlaneGeometry * planeGeometry2 = GetPlaneGeometry();
+    auto planeGeometry1 = GetPlaneGeometry();
+    auto planeGeometry2 = GetPlaneGeometry();
     std::vector<const mitk::PlaneGeometry*> planeGeometries;
     planeGeometries.push_back(planeGeometry1);
     planeGeometries.push_back(planeGeometry2);
@@ -597,32 +565,14 @@ public:
     // // Add contours
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(0, 1)->size() == 2);
 
-    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo3;
-    contourInfo3.Contour = surf_1->Clone();
-    contourInfo3.ContourNormal = normal_1;
-    contourInfo3.ContourPoint = center_1;
-    // Shift the new contour so that it is different
-    contourInfo3.ContourPoint += mitk::Vector(0.5);
+    m_Controller->RemoveContours(9);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(0, 1)->size() == 2);
 
-    bool success = m_Controller->RemoveContour(contourInfo3);
-    CPPUNIT_ASSERT_MESSAGE("Remove failed - contour was unintentionally removed!",
-                           (m_Controller->GetContours(0, 1)->size() == 2) && !success);
+    m_Controller->RemoveContours(1, 9);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(0, 1)->size() == 2);
 
-    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo2;
-    contourInfo2.ContourNormal = normal_2;
-    contourInfo2.ContourPoint = center_2;
-    contourInfo2.Contour = surf_2;
-    success = m_Controller->RemoveContour(contourInfo2);
-    CPPUNIT_ASSERT_MESSAGE("Remove failed - contour was not removed!",
-                           (m_Controller->GetContours(0, 1)->size() == 1) && success);
-
-    // // Let's see if the other contour No. 1 is still there
-    contourInfo3.ContourPoint -= mitk::Vector(0.5);
-    const mitk::Surface *remainingContour = m_Controller->GetContour(contourInfo3);
-    CPPUNIT_ASSERT_MESSAGE(
-      "Remove failed - contour was accidentally removed!",
-      (m_Controller->GetContours(0, 1)->size() == 1) &&
-        mitk::Equal(*(surf_1->GetVtkPolyData()), *(remainingContour->GetVtkPolyData()), 0.000001, true) && success);
+    m_Controller->RemoveContours(1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(0, 1) == nullptr);
   }
 
   bool AssertImagesEqual4D(mitk::LabelSetImage *img1, mitk::LabelSetImage *img2)

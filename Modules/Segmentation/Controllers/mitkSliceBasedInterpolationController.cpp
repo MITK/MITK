@@ -63,7 +63,7 @@ mitk::SliceBasedInterpolationController::~SliceBasedInterpolationController()
 void mitk::SliceBasedInterpolationController::ResetLabelCount()
 {
   m_LabelCountInSlice.clear();
-  int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
+  int numberOfLabels = m_WorkingImage->GetNumberOfLabels(0);
   m_LabelCountInSlice.resize(m_WorkingImage->GetTimeSteps());
 
   for (unsigned int timeStep = 0; timeStep < m_WorkingImage->GetTimeSteps(); ++timeStep)
@@ -162,7 +162,7 @@ void mitk::SliceBasedInterpolationController::SetChangedSlice(const Image *slice
     return;
 
   // check if the number of labels has changed
-  auto numberOfLabels = m_WorkingImage->GetNumberOfLabels();
+  auto numberOfLabels = m_WorkingImage->GetNumberOfLabels(0);
   if (m_LabelCountInSlice[0][0][0].size() != numberOfLabels)
     return;
 
@@ -210,7 +210,7 @@ void mitk::SliceBasedInterpolationController::ScanSliceITKProcessing(const itk::
   unsigned int dim1(options.dim1);
 
   std::vector<int> numberOfPixels; // number of pixels in the current slice that are equal to the active label
-  unsigned int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
+  unsigned int numberOfLabels = m_WorkingImage->GetNumberOfLabels(m_WorkingImage->GetActiveLayer());
   numberOfPixels.resize(numberOfLabels);
 
   typedef itk::Image<PixelType, 2> ImageType;
@@ -253,7 +253,7 @@ void mitk::SliceBasedInterpolationController::ScanImageITKProcessing(itk::Image<
   unsigned int z = 0;
 
   std::vector<int> numberOfPixels; // number of pixels per slice that are equal to the active label
-  unsigned int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
+  unsigned int numberOfLabels = m_WorkingImage->GetNumberOfLabels(m_WorkingImage->GetActiveLayer());
   numberOfPixels.resize(numberOfLabels);
 
   iter.GoToBegin();

@@ -80,17 +80,13 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
     m_LookupTable(other.m_LookupTable->Clone()),
     m_ActiveLabelValue(other.m_ActiveLabelValue)
 {
-  m_Groups = other.m_Groups;
-
-  for (auto [value, label] : other.m_LabelMap)
+  GroupIndexType i = 0;
+  for (auto groupImage : other.m_LayerContainer)
   {
-    auto labelClone = label->Clone();
-    auto groupID = other.m_LabelToGroupMap.at(value);
-
-    DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(labelClone);
-    this->AddLabelToMap(value, labelClone, groupID);
-    this->RegisterLabel(labelClone);
+    this->AddLayer(groupImage->Clone(), other.GetConstLabelsByValue(other.GetLabelValuesByGroup(i)));
+    i++;
   }
+  m_Groups = other.m_Groups;
 
   // Add some DICOM Tags as properties to segmentation image
   DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
@@ -310,7 +306,6 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(mitk::Image::P
     this->RegisterLabel(labelClone);
   }
 
-  SetActiveLayer(newGroupID);
   this->Modified();
   this->m_GroupAddedMessage.Send(newGroupID);
 

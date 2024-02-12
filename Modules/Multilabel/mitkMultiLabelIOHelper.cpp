@@ -110,10 +110,6 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
         inputImage->AddLayer();
       }
     }
-    else
-    {
-      inputImage->SetActiveLayer(layerIndex);
-    }
 
     auto *labelElement = layerElement->FirstChildElement("Label");
 

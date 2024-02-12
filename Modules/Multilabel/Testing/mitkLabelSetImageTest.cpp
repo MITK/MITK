@@ -22,6 +22,7 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkLabelSetImageTestSuite);
   MITK_TEST(TestInitialize);
+  MITK_TEST(TestClone);
   MITK_TEST(TestAddLayer);
   MITK_TEST(TestGetActiveLabelSet);
   MITK_TEST(TestGetActiveLabel);
@@ -83,6 +84,27 @@ public:
                            m_LabelSetImage->GetActiveLabel() == nullptr);
   }
 
+  void TestClone()
+  {
+    mitk::Label::Pointer label1 = mitk::Label::New();
+    label1->SetName("Label1");
+    label1->SetValue(1);
+
+    mitk::Label::Pointer label2 = mitk::Label::New();
+    label2->SetName("Label2");
+    label2->SetValue(200);
+
+    mitk::Label::Pointer label3 = mitk::Label::New();
+    label2->SetName("Label3");
+    label2->SetValue(300);
+
+    m_LabelSetImage->AddLabel(label1, 0);
+    m_LabelSetImage->AddLayer({ label2, label3 });
+
+    auto clone = m_LabelSetImage->Clone();
+    MITK_ASSERT_EQUAL(m_LabelSetImage, clone, "LabelSetImage clone is not equal.");
+  }
+
   void TestAddLayer()
   {
     CPPUNIT_ASSERT_MESSAGE("Number of layers is not zero", m_LabelSetImage->GetNumberOfLayers() == 1);
@@ -91,7 +113,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - number of layers is not one",
                            m_LabelSetImage->GetNumberOfLayers() == 2);
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - active layer has wrong ID",
-                           m_LabelSetImage->GetActiveLayer() == 1);
+                           m_LabelSetImage->GetActiveLayer() == 0);
 
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - no active label should be selected",
                            m_LabelSetImage->GetActiveLabel() == nullptr);
@@ -314,6 +336,7 @@ public:
 
     mitk::LabelSetImage::ConstLabelVectorType newlayer = { label1, label2 };
     unsigned int layerID = m_LabelSetImage->AddLayer(newlayer);
+    m_LabelSetImage->SetActiveLayer(layerID);
 
     auto activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
     CPPUNIT_ASSERT_MESSAGE("Wrong active labelset returned",

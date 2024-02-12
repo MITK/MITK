@@ -232,6 +232,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(const Image *ori
     const unsigned int dimensions[] = {original->GetDimension(0), original->GetDimension(1), 1};
     segmentation->Initialize(pixelType, 3, dimensions);
     segmentation->AddLayer();
+    segmentation->SetActiveLayer(0);
   }
   else
   {

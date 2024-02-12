@@ -182,7 +182,8 @@ namespace
     for (std::remove_const_t<decltype(numLayers)> layer = 0; layer < numLayers; ++layer)
     {
       labelSetImage->SetActiveLayer(layer);
-      croppedLabelSetImage->AddLayer();
+      auto groupID = croppedLabelSetImage->AddLayer();
+      croppedLabelSetImage->SetActiveLayer(groupID);
 
       for (std::remove_const_t<decltype(numTimeSteps)> timeStep = 0; timeStep < numTimeSteps; ++timeStep)
       {

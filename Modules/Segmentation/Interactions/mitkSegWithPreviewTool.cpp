@@ -302,6 +302,7 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
       if (newPreviewImage->GetNumberOfLayers() == 0)
       {
         newPreviewImage->AddLayer();
+        newPreviewImage->SetActiveLayer(0);
       }
 
       auto* activeLabel = newPreviewImage->GetActiveLabel();

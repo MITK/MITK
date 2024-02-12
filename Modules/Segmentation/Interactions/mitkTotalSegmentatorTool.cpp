@@ -182,6 +182,7 @@ mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(s
   aggloLabelImage->Initialize(initImage);
   aggloLabelImage->SetGeometry(geometry);
   const auto layerIndex = aggloLabelImage->AddLayer();
+  aggloLabelImage->SetActiveLayer(layerIndex);
 
   for (auto const &outputImagePath : filePaths)
   {

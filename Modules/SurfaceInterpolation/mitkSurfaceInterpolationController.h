@@ -13,6 +13,8 @@ found in the LICENSE file.
 #ifndef mitkSurfaceInterpolationController_h
 #define mitkSurfaceInterpolationController_h
 
+#include <shared_mutex>
+
 #include <mitkDataStorage.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabel.h>
@@ -305,6 +307,8 @@ namespace mitk
     std::map<mitk::Image *, unsigned long> m_SegmentationObserverTags;
 
     mitk::TimePointType m_CurrentTimePoint;
+
+    std::shared_mutex m_CPIMutex;
   };
 
   namespace ContourExt

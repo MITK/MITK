@@ -80,13 +80,6 @@ namespace mitk
     TimePointType GetCurrentTimePoint() const { return m_CurrentTimePoint; };
 
     /**
-     * @brief Adds a new extracted contour to the list
-     * @param newContour the contour to be added. If a contour at that position
-     *        already exists the related contour will be updated
-     */
-    void AddNewContour(Surface::Pointer newContour);
-
-    /**
      * @brief Adds new extracted contours to the list. If one or more contours at a given position
      *        already exist they will be updated respectively
      */

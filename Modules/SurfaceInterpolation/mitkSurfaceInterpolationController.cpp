@@ -128,19 +128,11 @@ mitk::SurfaceInterpolationController::~SurfaceInterpolationController()
 void mitk::SurfaceInterpolationController::RemoveObservers()
 {
   // Removing all observers
-  auto dataIter = m_SegmentationObserverTags.begin();
-  for (; dataIter != m_SegmentationObserverTags.end(); ++dataIter)
+  for (auto& [segmentation, tag] : m_SegmentationObserverTags)
   {
-    (*dataIter).first->RemoveObserver((*dataIter).second);
+    this->RemoveObserversInternal(segmentation);
   }
   m_SegmentationObserverTags.clear();
-
-  auto selectedSegmentation = m_SelectedSegmentation.Lock();
-  if (selectedSegmentation.IsNotNull())
-  {
-    selectedSegmentation->RemoveLabelRemovedListener(mitk::MessageDelegate1<SurfaceInterpolationController, mitk::LabelSetImage::LabelValueType>(
-      this, &SurfaceInterpolationController::OnRemoveLabel));
-  }
 }
 
 mitk::SurfaceInterpolationController *mitk::SurfaceInterpolationController::GetInstance()
@@ -627,12 +619,6 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
     return;
   }
 
-  if (selectedSegmentation.IsNotNull())
-  {
-    selectedSegmentation->RemoveLabelRemovedListener(mitk::MessageDelegate1<SurfaceInterpolationController, mitk::LabelSetImage::LabelValueType>(
-      this, &SurfaceInterpolationController::OnRemoveLabel));
-  }
-
   m_SelectedSegmentation = currentSegmentationImage;
   selectedSegmentation = m_SelectedSegmentation.Lock();
 
@@ -648,10 +634,10 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
       auto command = itk::MemberCommand<SurfaceInterpolationController>::New();
       command->SetCallbackFunction(this, &SurfaceInterpolationController::OnSegmentationDeleted);
       m_SegmentationObserverTags[selectedSegmentation] = selectedSegmentation->AddObserver(itk::DeleteEvent(), command);
+      selectedSegmentation->AddLabelRemovedListener(mitk::MessageDelegate1<SurfaceInterpolationController, mitk::LabelSetImage::LabelValueType>(
+        this, &SurfaceInterpolationController::OnRemoveLabel));
     }
 
-    selectedSegmentation->AddLabelRemovedListener(mitk::MessageDelegate1<SurfaceInterpolationController, mitk::LabelSetImage::LabelValueType>(
-      this, &SurfaceInterpolationController::OnRemoveLabel));
   }
 
   m_InterpolationResult = nullptr;
@@ -676,16 +662,21 @@ void mitk::SurfaceInterpolationController::RemoveInterpolationSession(mitk::Labe
 
     {
       std::lock_guard<std::shared_mutex> guard(m_CPIMutex);
+      RemoveObserversInternal(segmentationImage);
       m_CPIMap.erase(segmentationImage);
     }
 
-    // Remove observer
-    auto pos = m_SegmentationObserverTags.find(segmentationImage);
-    if (pos != m_SegmentationObserverTags.end())
-    {
-      segmentationImage->RemoveObserver((*pos).second);
-      m_SegmentationObserverTags.erase(pos);
-    }
+  }
+}
+
+void mitk::SurfaceInterpolationController::RemoveObserversInternal(mitk::LabelSetImage* segmentationImage)
+{
+  auto pos = m_SegmentationObserverTags.find(segmentationImage);
+  if (pos != m_SegmentationObserverTags.end())
+  {
+    segmentationImage->RemoveObserver((*pos).second);
+    segmentationImage->RemoveLabelRemovedListener(mitk::MessageDelegate1<SurfaceInterpolationController, mitk::LabelSetImage::LabelValueType>(
+      this, &SurfaceInterpolationController::OnRemoveLabel));
   }
 }
 

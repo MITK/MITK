@@ -278,6 +278,8 @@ namespace mitk
      */
     void ClearInterpolationSession();
 
+    void RemoveObserversInternal(mitk::LabelSetImage* segmentationImage);
+
     /**
      * @brief Add contour to the interpolation pipeline
      *
@@ -304,7 +306,7 @@ namespace mitk
 
     WeakPointer<LabelSetImage> m_SelectedSegmentation;
 
-    std::map<mitk::Image *, unsigned long> m_SegmentationObserverTags;
+    std::map<mitk::LabelSetImage*, unsigned long> m_SegmentationObserverTags;
 
     mitk::TimePointType m_CurrentTimePoint;
 

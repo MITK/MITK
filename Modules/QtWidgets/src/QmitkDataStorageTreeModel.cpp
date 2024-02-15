@@ -287,7 +287,14 @@ bool QmitkDataStorageTreeModel::dropMimeData(
       }
       else
       {
-        this->beginInsertRows(parentModelIndex, dropIndex, dropIndex + listOfItemsToDrop.size() - 1);
+        if (row == -1) // drag onto a node, insert in the parents child list
+        {
+          this->beginInsertRows(parentModelIndex, dropIndex, dropIndex + listOfItemsToDrop.size() - 1);
+        }
+        else // drag between nodes (i.e. onto the parent of these nodes), insert in the dropped item's child list which *is* the parent of these nodes
+        {
+          this->beginInsertRows(dropItemModelIndex, dropIndex, dropIndex + listOfItemsToDrop.size() - 1);
+        }
       }
 
       for (diIter = listOfItemsToDrop.begin(); diIter != listOfItemsToDrop.end(); diIter++)

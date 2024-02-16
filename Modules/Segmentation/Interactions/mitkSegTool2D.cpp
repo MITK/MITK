@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include "mitkDataStorage.h"
 #include "mitkPlaneGeometry.h"
 #include <mitkTimeNavigationController.h>
+#include "mitkImageAccessByItk.h"
 
 // Include of the new ImageExtractor
 #include "mitkMorphologicalOperations.h"
@@ -144,27 +145,43 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice(const Image *image,
   return true;
 }
 
-void mitk::SegTool2D::UpdateSurfaceInterpolation(const Image *slice,
-                                                 const Image *workingImage,
+void mitk::SegTool2D::UpdateAllSurfaceInterpolations(const LabelSetImage *workingImage,
+                                                 TimeStepType timeStep,
                                                  const PlaneGeometry *plane,
                                                  bool detectIntersection)
 {
-  std::vector<SliceInformation> slices = { SliceInformation(slice, plane, 0)};
-  Self::UpdateSurfaceInterpolation(slices, workingImage, detectIntersection, 0, 0);
+  if (nullptr == workingImage) mitkThrow() << "Cannot update surface interpolation. Invalid working image passed.";
+  if (nullptr == plane) mitkThrow() << "Cannot update surface interpolation. Invalid plane passed.";
+
+  auto affectedLabels = mitk::SurfaceInterpolationController::GetInstance()->GetAffectedLabels(workingImage, timeStep, plane);
+  for (auto affectedLabel : affectedLabels)
+  {
+    auto groupID = workingImage->GetGroupIndexOfLabel(affectedLabel);
+    auto slice = GetAffectedImageSliceAs2DImage(plane, workingImage->GetGroupImage(groupID), timeStep);
+    std::vector<SliceInformation> slices = { SliceInformation(slice, plane, timeStep) };
+    Self::UpdateSurfaceInterpolation(slices, workingImage, detectIntersection, affectedLabel);
+  }
 }
 
-void  mitk::SegTool2D::RemoveContourFromInterpolator(const SliceInformation& sliceInfo)
+void  mitk::SegTool2D::RemoveContourFromInterpolator(const SliceInformation& sliceInfo, LabelSetImage::LabelValueType labelValue)
 {
   mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo;
-  contourInfo.ContourNormal = sliceInfo.plane->GetNormal();
-  contourInfo.ContourPoint = sliceInfo.plane->GetOrigin();
-  mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(contourInfo);
+  contourInfo.LabelValue = labelValue;
+  contourInfo.TimeStep = sliceInfo.timestep;
+  contourInfo.Plane = sliceInfo.plane;
+
+  mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(contourInfo, true);
+}
+
+template <typename ImageType>
+void ClearBufferProcessing(ImageType* itkImage)
+{
+  itkImage->FillBuffer(0);
 }
 
 void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformation>& sliceInfos,
   const Image* workingImage,
   bool detectIntersection,
-  unsigned int activeLayerID,
   mitk::Label::PixelType activeLabelValue)
 {
   if (!m_SurfaceInterpolationEnabled)
@@ -197,16 +214,30 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
     for (const auto& sliceInfo : sliceInfos)
     {
       // Test whether there is something to extract or whether the slice just contains intersections of others
-      mitk::Image::Pointer slice2 = sliceInfo.slice->Clone();
-      mitk::MorphologicalOperations::Erode(slice2, 2, mitk::MorphologicalOperations::Ball);
 
+      //Remark we cannot just errode the clone of sliceInfo.slice, because Erode currently only
+      //works on pixel value 1. But we need to erode active label. Therefore we use TransferLabelContent
+      //as workarround.
+      //If MorphologicalOperations::Erode is supports user defined pixel values, the workarround
+      //can be removed.
+      //Workarround starts
+      mitk::Image::Pointer slice2 = Image::New();
+      slice2->Initialize(sliceInfo.slice);
+      AccessByItk(slice2, ClearBufferProcessing);
+      LabelSetImage::LabelValueType erodeValue = 1;
+      auto label = Label::New(erodeValue, "");
+      TransferLabelContent(sliceInfo.slice, slice2, { label }, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false, { {activeLabelValue, erodeValue} });
+      //Workarround ends
+
+      mitk::MorphologicalOperations::Erode(slice2, 2, mitk::MorphologicalOperations::Ball);
       contourExtractor->SetInput(slice2);
+      contourExtractor->SetContourValue(erodeValue);
       contourExtractor->Update();
       mitk::Surface::Pointer contour = contourExtractor->GetOutput();
 
       if (contour->GetVtkPolyData()->GetNumberOfPoints() == 0)
       {
-        Self::RemoveContourFromInterpolator(sliceInfo);
+        Self::RemoveContourFromInterpolator(sliceInfo, activeLabelValue);
       }
       else
       {
@@ -218,7 +249,7 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
   if (relevantSlices.empty())
     return;
 
-  std::vector<const mitk::PlaneGeometry*> contourPlanes;
+  SurfaceInterpolationController::CPIVector cpis;
   for (const auto& sliceInfo : relevantSlices)
   {
     contourExtractor->SetInput(sliceInfo.slice);
@@ -228,21 +259,15 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
 
     if (contour->GetVtkPolyData()->GetNumberOfPoints() == 0)
     {
-      Self::RemoveContourFromInterpolator(sliceInfo);
+      Self::RemoveContourFromInterpolator(sliceInfo, activeLabelValue);
     }
     else
     {
-      vtkSmartPointer<vtkIntArray> intArray = vtkSmartPointer<vtkIntArray>::New();
-      intArray->InsertNextValue(activeLabelValue);
-      intArray->InsertNextValue(activeLayerID);
-      contour->GetVtkPolyData()->GetFieldData()->AddArray(intArray);
-      contour->DisconnectPipeline();
-      contourList.push_back(contour);
-      contourPlanes.push_back(sliceInfo.plane);
+      cpis.emplace_back(contour, sliceInfo.plane->Clone(), activeLabelValue, sliceInfo.timestep);
     }
   }
 
-  mitk::SurfaceInterpolationController::GetInstance()->AddNewContours(contourList, contourPlanes);
+  mitk::SurfaceInterpolationController::GetInstance()->AddNewContours(cpis);
 }
 
 
@@ -540,11 +565,9 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
   auto image = dynamic_cast<Image*>(workingNode->GetData());
 
   mitk::Label::PixelType activeLabelValue = 0;
-  unsigned int activeLayerID = 0;
 
   try{
     auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-    activeLayerID = labelSetImage->GetActiveLayer();
     activeLabelValue = labelSetImage->GetActiveLabel()->GetValue();
   }
   catch(...)
@@ -566,7 +589,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
     }
   }
 
-  SegTool2D::UpdateSurfaceInterpolation(sliceList, image, false, activeLayerID, activeLabelValue);
+  SegTool2D::UpdateSurfaceInterpolation(sliceList, image, false, activeLabelValue);
 
   // also mark its node as modified (T27308). Can be removed if T27307
   // is properly solved

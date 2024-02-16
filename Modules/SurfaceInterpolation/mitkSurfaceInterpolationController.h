@@ -48,6 +48,7 @@ namespace mitk
           TimeStep(std::numeric_limits<TimeStepType>::max())
       {
       }
+
       ContourPositionInformation(Surface::ConstPointer contour,
         PlaneGeometry::ConstPointer plane,
         Label::PixelType labelValue,
@@ -58,6 +59,11 @@ namespace mitk
         LabelValue(labelValue),
         TimeStep(timeStep)
       {
+      }
+
+      bool IsPlaceHolder() const
+      {
+        return Contour.IsNull();
       }
     };
 
@@ -91,7 +97,7 @@ namespace mitk
      * @param contourInfo the contour which should be removed
      * @return true if a contour was found and removed, false if no contour was found
      */
-    bool RemoveContour(ContourPositionInformation contourInfo);
+    bool RemoveContour(ContourPositionInformation contourInfo, bool keepPlaceholderForUndo = false);
 
     /**
      * @brief Resets the pipeline for interpolation. The various filters used are reset.
@@ -153,7 +159,7 @@ namespace mitk
      * @brief Remove interpolation session
      * @param segmentationImage the session to be removed
      */
-    void RemoveInterpolationSession(LabelSetImage* segmentationImage);
+    void RemoveInterpolationSession(const LabelSetImage* segmentationImage);
 
     /**
      * @brief Removes all sessions
@@ -258,7 +264,7 @@ namespace mitk
      */
     void ClearInterpolationSession();
 
-    void RemoveObserversInternal(mitk::LabelSetImage* segmentationImage);
+    void RemoveObserversInternal(const mitk::LabelSetImage* segmentationImage);
 
     /**
      * @brief Add contour to the interpolation pipeline
@@ -266,7 +272,7 @@ namespace mitk
      * @param contourInfo Contour information to be added
      * @param reinitializationAction If the contour is coming from a reinitialization process or not
      */
-    void AddToInterpolationPipeline(ContourPositionInformation& contourInfo, bool reinitializationAction = false);
+    void AddToCPIMap(ContourPositionInformation& contourInfo, bool reinitializationAction = false);
 
     itk::SmartPointer<ReduceContourSetFilter> m_ReduceFilter;
     itk::SmartPointer<ComputeContourSetNormalsFilter> m_NormalsFilter;

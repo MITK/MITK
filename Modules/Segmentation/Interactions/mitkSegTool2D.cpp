@@ -782,32 +782,6 @@ void mitk::SegTool2D::InteractiveSegmentationBugMessage(const std::string &messa
              << "  - What happened (not)? What did you expect?" << std::endl;
 }
 
-void mitk::SegTool2D::WritePreviewOnWorkingImage(
-  Image *targetSlice, const Image *sourceSlice, const Image *workingImage, int paintingPixelValue)
-{
-  if (nullptr == targetSlice)
-  {
-    mitkThrow() << "Cannot write preview on working image. Target slice does not point to a valid instance.";
-  }
-
-  if (nullptr == sourceSlice)
-  {
-    mitkThrow() << "Cannot write preview on working image. Source slice does not point to a valid instance.";
-  }
-
-  if (nullptr == workingImage)
-  {
-    mitkThrow() << "Cannot write preview on working image. Working image does not point to a valid instance.";
-  }
-
-  auto constVtkSource = sourceSlice->GetVtkImageData();
-  /*Need to const cast because Vtk interface does not support const correctly.
-   (or I am not experienced enough to use it correctly)*/
-  auto nonConstVtkSource = const_cast<vtkImageData*>(constVtkSource);
-
-  ContourModelUtils::FillSliceInSlice(nonConstVtkSource, targetSlice->GetVtkImageData(), workingImage, paintingPixelValue, 1.0);
-}
-
 bool mitk::SegTool2D::IsPositionEventInsideImageRegion(mitk::InteractionPositionEvent* positionEvent,
   const mitk::BaseData* data)
 {

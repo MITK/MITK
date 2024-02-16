@@ -236,20 +236,6 @@ namespace mitk
      * @pre workingNode must point to a valid instance and contain an image instance as data.*/
     static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true);
 
-    /** Writes the provided source slice into the target slice with the given pixel value.
-     * If passed workingImage is a LabelSetImage the label set rules will be applied when
-     * writing all non zero source pixels into the target slice (e.g. locked lables will not be touched)
-     * with the given paintingPixelValue.
-     * @param targetSlice Pointer to the slice that should be filled with the content of the sourceSlice.
-     * @param sourceSlice Pointer to the slice that is the source/preview every pixel will be (tried to be) transfered .
-     * @param workingImage Will be used to check if LabeSetImageRules have to be applied and the label set state.
-     * @param paintingPixelValue Value that will be used to paint onto target slice.
-     * @pre targetSlice must point to a valid instance.
-     * @pre sourceSlice must point to a valid instance.
-     * @pre workingImage must point to a valid instance.*/
-    static void WritePreviewOnWorkingImage(
-      Image *targetSlice, const Image *sourceSlice, const Image *workingImage, int paintingPixelValue);
-
     /** Writes a provided slice into the passed working image. The content of working image that is covered
     * by the slice will be completly overwritten. If asked for it also generates the needed
     * undo/redo steps.

@@ -13,8 +13,6 @@ found in the LICENSE file.
 #ifndef mitkSurfaceInterpolationController_h
 #define mitkSurfaceInterpolationController_h
 
-#include <shared_mutex>
-
 #include <mitkDataStorage.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabel.h>
@@ -39,28 +37,31 @@ namespace mitk
 
     struct MITKSURFACEINTERPOLATION_EXPORT ContourPositionInformation
     {
-      int Pos;
       Surface::ConstPointer Contour;
-      Vector3D ContourNormal;
-      Point3D ContourPoint;
       PlaneGeometry::ConstPointer Plane;
       Label::PixelType LabelValue;
       TimeStepType TimeStep;
 
       ContourPositionInformation()
-        : Pos(-1),
-          Plane(nullptr),
+        : Plane(nullptr),
           LabelValue(std::numeric_limits<Label::PixelType>::max()),
           TimeStep(std::numeric_limits<TimeStepType>::max())
+      {
+      }
+      ContourPositionInformation(Surface::ConstPointer contour,
+        PlaneGeometry::ConstPointer plane,
+        Label::PixelType labelValue,
+        TimeStepType timeStep)
+        :
+        Contour(contour),
+        Plane(plane),
+        LabelValue(labelValue),
+        TimeStep(timeStep)
       {
       }
     };
 
     typedef std::vector<ContourPositionInformation> CPIVector;
-    typedef std::map<TimeStepType, CPIVector> CPITimeStepMap;
-    typedef std::map<LabelSetImage::LabelValueType, CPITimeStepMap> CPITimeStepLabelMap;
-
-    typedef std::map<LabelSetImage*, CPITimeStepLabelMap> CPITimeStepLabelSegMap;
 
     static SurfaceInterpolationController *GetInstance();
 
@@ -83,7 +84,7 @@ namespace mitk
      * @brief Adds new extracted contours to the list. If one or more contours at a given position
      *        already exist they will be updated respectively
      */
-    void AddNewContours(const std::vector<Surface::Pointer>& newContours, std::vector<const mitk::PlaneGeometry*>& contourPlanes, bool reinitializeAction = false);
+    void AddNewContours(const std::vector<ContourPositionInformation>& newCPIs, bool reinitializeAction = false);
 
     /**
      * @brief Removes the contour for a given plane for the current selected segmenation
@@ -91,17 +92,6 @@ namespace mitk
      * @return true if a contour was found and removed, false if no contour was found
      */
     bool RemoveContour(ContourPositionInformation contourInfo);
-
-    /**
-     * @brief Computes an interior point of the input contour. It's used to detect merge and erase operations.
-     *
-     * @param contour Contour for which to compute the contour
-     * @param labelSetImage LabelSetImage used input to check contour Label.
-     * @return mitk::Point3D 3D Interior point of the contour returned.
-     */
-    mitk::Point3D ComputeInteriorPointOfContour(const ContourPositionInformation& contour,
-                                                 mitk::LabelSetImage * labelSetImage);
-
 
     /**
      * @brief Resets the pipeline for interpolation. The various filters used are reset.
@@ -151,8 +141,6 @@ namespace mitk
      */
     mitk::LabelSetImage* GetCurrentSegmentation();
 
-    Surface *GetContoursAsSurface();
-
     void SetDataStorage(DataStorage::Pointer ds);
 
     /**
@@ -178,10 +166,12 @@ namespace mitk
      * @brief Get the Contours at a certain timeStep and layerID.
      *
      * @param timeStep Time Step from which to get the contours.
-     * @param layerID Layer from which to get the contours.
+     * @param labelValue label from which to get the contours.
      * @return std::vector<ContourPositionInformation> Returns contours.
      */
-    CPIVector* GetContours(TimeStepType timeStep, LabelSetImage::LabelValueType labelValue);
+    CPIVector* GetContours(LabelSetImage::LabelValueType labelValue, TimeStepType timeStep);
+
+    std::vector<LabelSetImage::LabelValueType> GetAffectedLabels(const LabelSetImage* seg, TimeStepType timeStep, const PlaneGeometry* plane) const;
 
     /**
      * @brief Trigerred with the "Reinit Interpolation" action. The contours are used to repopulate the
@@ -190,8 +180,7 @@ namespace mitk
      * @param contourList List of contours extracted
      * @param contourPlanes List of planes at which the contours were extracted
      */
-    void CompleteReinitialization(const std::vector<mitk::Surface::Pointer>& contourList,
-                                           std::vector<const mitk::PlaneGeometry *>& contourPlanes);
+    void CompleteReinitialization(const std::vector<ContourPositionInformation>& newCPIs);
 
     /**
      * @brief Removes contours of a particular label and at a given time step for the current session/segmentation.
@@ -212,12 +201,6 @@ namespace mitk
     void RemoveContours(mitk::Label::PixelType label);
 
     /**
-     * Estimates the memory which is needed to build up the equationsystem for the interpolation.
-     * \returns The percentage of the real memory which will be used by the interpolation
-     */
-    double EstimatePortionOfNeededMemory();
-
-    /**
      * Adds Contours from the active Label to the interpolation pipeline
      */
     void AddActiveLabelContoursForInterpolation(mitk::Label::PixelType activeLabel);
@@ -229,7 +212,7 @@ namespace mitk
      *
      * @return DataNode* returns the DataNode containing the segmentation image.
      */
-    mitk::DataNode* GetSegmentationImageNode();
+    mitk::DataNode* GetSegmentationImageNode() const;
 
   protected:
     SurfaceInterpolationController();
@@ -263,7 +246,11 @@ namespace mitk
      *
      * @param contourInfo contourInfo struct to add to data storage.
      */
-    void AddPlaneGeometryNodeToDataStorage(const ContourPositionInformation& contourInfo);
+    void AddPlaneGeometryNodeToDataStorage(const ContourPositionInformation& contourInfo) const;
+
+    DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode) const;
+    DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, LabelSetImage::LabelValueType labelValue) const;
+    DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep) const;
 
     /**
      * @brief Clears the interpolation data structures. Called from CompleteReinitialization().
@@ -285,13 +272,9 @@ namespace mitk
     itk::SmartPointer<ComputeContourSetNormalsFilter> m_NormalsFilter;
     itk::SmartPointer<CreateDistanceImageFromSurfaceFilter> m_InterpolateSurfaceFilter;
 
-    mitk::Surface::Pointer m_Contours;
-
     double m_DistanceImageSpacing;
 
     mitk::DataStorage::Pointer m_DataStorage;
-
-    CPITimeStepLabelSegMap m_CPIMap;
 
     mitk::Surface::Pointer m_InterpolationResult;
 
@@ -299,61 +282,8 @@ namespace mitk
 
     WeakPointer<LabelSetImage> m_SelectedSegmentation;
 
-    std::map<mitk::LabelSetImage*, unsigned long> m_SegmentationObserverTags;
-
     mitk::TimePointType m_CurrentTimePoint;
-
-    std::shared_mutex m_CPIMutex;
   };
-
-  namespace ContourExt
-  {
-    /**
-     * @brief Returns the plane the contour belongs to.
-     *
-     * @param ContourNormal
-     * @return size_t
-     */
-    size_t GetContourOrientation(const mitk::Vector3D& ContourNormal);
-
-    /**
-     * @brief Function used to compute an interior point of the contour.
-     *        Used to react to the merge label and erase label actions.
-     *
-     *
-     * @tparam VImageDimension Dimension of the image
-     * @param contour Contour for which to compute the interior point
-     * @param labelSetImage Label Set Image For which to find the contour
-     * @param currentTimePoint Current Time Point of the Image
-     * @return mitk::Point3D The returned point in the interior of the contour.s
-     */
-    template<unsigned int VImageDimension>
-    mitk::Point3D ComputeInteriorPointOfContour(const mitk::SurfaceInterpolationController::ContourPositionInformation& contour,
-                                                 mitk::LabelSetImage * labelSetImage,
-                                                 mitk::TimePointType currentTimePoint);
-    /**
-     * @brief Get a Grid points within the bounding box of the contour at a certain spacing.
-     *
-     * @param planeDimension  Plane orientation (Sagittal, Coronal, Axial)
-     * @param startDim1 Starting coordinate along dimension 1 to start the grid point sampling from
-     * @param numPointsToSampleDim1 Number of points to sample along dimension 1
-     * @param deltaDim1 Spacing for dimension 1 at which points should be sampled
-     * @param startDim2 Starting coordinate along dimension 2 to start the grid point sampling from
-     * @param numPointsToSampleDim2 Number of points to sample along dimension 2
-     * @param deltaDim2 Spacing for dimension 1 at which points should be sampled
-     * @param valuePlaneDim Slice index of the plane in the volume
-     * @return std::vector< mitk::Point3D > The computed grid points are returned by the function.
-     */
-    std::vector< mitk::Point3D > GetBoundingBoxGridPoints(size_t planeDimension,
-                                            double startDim1,
-                                            size_t numPointsToSampleDim1,
-                                            double deltaDim1,
-                                            double startDim2,
-                                            size_t numPointsToSampleDim2,
-                                            double deltaDim2,
-                                            double valuePlaneDim);
-  };
-
 }
 
 #endif

@@ -494,10 +494,13 @@ void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManage
   auto segmentation = this->GetCurrentSegmentation();
 
   const auto labelValue = labels.front();
-  if (labelValue != segmentation->GetActiveLabel()->GetValue()) segmentation->SetActiveLabel(labelValue);
+  if (nullptr == segmentation->GetActiveLabel() || labelValue != segmentation->GetActiveLabel()->GetValue())
+  {
+    segmentation->SetActiveLabel(labelValue);
+    m_Controls->slicesInterpolator->SetActiveLabelValue(labelValue);
 
-  segmentation->Modified();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType /*label*/, const mitk::Point3D& pos)

@@ -102,46 +102,6 @@ const QmitkSlicesInterpolator::ActionToSliceDimensionMapType QmitkSlicesInterpol
   return actionToSliceDimension;
 }
 
-// Check whether the given contours are coplanar
-bool AreContoursCoplanar(mitk::SurfaceInterpolationController::ContourPositionInformation leftHandSide,
-                      mitk::SurfaceInterpolationController::ContourPositionInformation rightHandSide)
-{
-  // Here we check two things:
-  // 1. Whether the normals of both contours are at least parallel
-  // 2. Whether both contours lie in the same plane
-
-  // Check for coplanarity:
-  // a. Span a vector between two points one from each contour
-  // b. Calculate dot product for the vector and one of the normals
-  // c. If the dot is zero the two vectors are orthogonal and the contours are coplanar
-
-  double vec[3];
-  vec[0] = leftHandSide.ContourPoint[0] - rightHandSide.ContourPoint[0];
-  vec[1] = leftHandSide.ContourPoint[1] - rightHandSide.ContourPoint[1];
-  vec[2] = leftHandSide.ContourPoint[2] - rightHandSide.ContourPoint[2];
-  double n[3];
-  n[0] = rightHandSide.ContourNormal[0];
-  n[1] = rightHandSide.ContourNormal[1];
-  n[2] = rightHandSide.ContourNormal[2];
-  double dot = vtkMath::Dot(n, vec);
-
-  double n2[3];
-  n2[0] = leftHandSide.ContourNormal[0];
-  n2[1] = leftHandSide.ContourNormal[1];
-  n2[2] = leftHandSide.ContourNormal[2];
-
-  // The normals of both contours have to be parallel but not of the same orientation
-  double lengthLHS = leftHandSide.ContourNormal.GetNorm();
-  double lengthRHS = rightHandSide.ContourNormal.GetNorm();
-  double dot2 = vtkMath::Dot(n, n2);
-  bool contoursParallel = mitk::Equal(fabs(lengthLHS * lengthRHS), fabs(dot2), 0.001);
-
-  if (mitk::Equal(dot, 0.0, 0.001) && contoursParallel)
-    return true;
-  else
-    return false;
-}
-
 mitk::Image::Pointer ExtractSliceFromImage(mitk::Image* image,
                                           const mitk::PlaneGeometry * contourPlane,
                                           unsigned int timeStep)
@@ -160,88 +120,6 @@ mitk::Image::Pointer ExtractSliceFromImage(mitk::Image* image,
   extractor->Update();
   mitk::Image::Pointer slice = extractor->GetOutput();
   return slice;
-}
-
-
-template <unsigned int VImageDimension = 3>
-std::vector<mitk::Label::PixelType> GetPixelValuesPresentInImage(mitk::LabelSetImage* labelSetImage)
-{
-  std::vector<mitk::Label::PixelType> pixelsPresent;
-  mitk::ImagePixelReadAccessor<mitk::LabelSet::PixelType, VImageDimension> readAccessor(labelSetImage);
-
-  std::size_t numberOfPixels = 1;
-  for (size_t dim = 0; dim < VImageDimension; ++dim)
-    numberOfPixels *= static_cast<std::size_t>(readAccessor.GetDimension(dim));
-
-  auto src = readAccessor.GetData();
-  for (std::size_t i = 0; i < numberOfPixels; ++i)
-  {
-    mitk::Label::PixelType pixelVal = *(src + i);
-    if ( (std::find(pixelsPresent.begin(), pixelsPresent.end(), pixelVal) == pixelsPresent.end()) && (pixelVal != mitk::LabelSetImage::UnlabeledValue) )
-      pixelsPresent.push_back(pixelVal);
-  }
-  return pixelsPresent;
-}
-
-
-template <unsigned int VImageDimension = 3>
-ModifyLabelActionTrigerred ModifyLabelProcessing(mitk::LabelSetImage* labelSetImage,
-                          mitk::SurfaceInterpolationController::Pointer surfaceInterpolator,
-                          unsigned int timePoint)
-{
-  auto currentLabelID = labelSetImage->GetActiveLabel()->GetValue();
-  auto numTimeSteps = labelSetImage->GetTimeSteps();
-
-  ModifyLabelActionTrigerred actionTriggered = ModifyLabelActionTrigerred::Null;
-  auto* currentContourList = surfaceInterpolator->GetContours(timePoint, currentLabelID);
-
-  while (nullptr == currentContourList)
-  {
-    currentContourList = surfaceInterpolator->GetContours(timePoint, currentLabelID);
-  }
-
-  mitk::LabelSetImage::Pointer labelSetImage2 = labelSetImage->Clone();
-
-  mitk::ImagePixelReadAccessor<mitk::LabelSetImage::LabelValueType, VImageDimension> readAccessor(labelSetImage2.GetPointer());
-
-  for (auto& contour : *currentContourList)
-  {
-    mitk::Label::PixelType contourPixelValue;
-
-    itk::Index<3> itkIndex;
-    labelSetImage2->GetGeometry()->WorldToIndex(contour.ContourPoint, itkIndex);
-    if (VImageDimension == 4)
-    {
-      itk::Index<VImageDimension> time3DIndex;
-      for (size_t i = 0; i < itkIndex.size(); ++i)
-        time3DIndex[i] = itkIndex[i];
-      time3DIndex[3] = timePoint;
-      contourPixelValue = readAccessor.GetPixelByIndexSafe(time3DIndex);
-    }
-    else if (VImageDimension == 3)
-    {
-      itk::Index<VImageDimension> geomIndex;
-      for (size_t i = 0; i < itkIndex.size(); ++i)
-        geomIndex[i] = itkIndex[i];
-      contourPixelValue = readAccessor.GetPixelByIndexSafe(geomIndex);
-    }
-
-    if (contour.LabelValue != contourPixelValue)
-    {
-      if (contourPixelValue == 0)   //  Erase label
-      {
-        for (size_t t = 0; t < numTimeSteps; ++t)
-          surfaceInterpolator->RemoveContours(contour.LabelValue, t);
-        actionTriggered = ModifyLabelActionTrigerred::Erase;
-      }
-      else
-      {
-        contour.LabelValue = contourPixelValue;
-        actionTriggered = ModifyLabelActionTrigerred::Merge;
-      }
-    }
-  }
-  return actionTriggered;
 }
 
 QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /*name*/)
@@ -344,16 +222,6 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   m_InterpolatedSurfaceNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_InterpolatedSurfaceNode->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_InterpolatedSurfaceNode->SetVisibility(false);
-
-  m_3DContourNode = mitk::DataNode::New();
-  m_3DContourNode->SetProperty("color", mitk::ColorProperty::New(0.0, 0.0, 0.0));
-  m_3DContourNode->SetProperty("hidden object", mitk::BoolProperty::New(true));
-  m_3DContourNode->SetProperty("name", mitk::StringProperty::New("Drawn Contours"));
-  m_3DContourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
-  m_3DContourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
-  m_3DContourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
-  m_3DContourNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-  m_3DContourNode->SetVisibility(false);
 
   QWidget::setContentsMargins(0, 0, 0, 0);
   if (QWidget::layout() != nullptr)
@@ -508,7 +376,6 @@ for (auto* slicer : m_ControllerToSliceObserverTag.keys())
     slicer->RemoveObserver(m_ControllerToSliceObserverTag.take(slicer));
   }
 
-  this->ClearSegmentationObservers();
   m_ActionToSlicerMap.clear();
   m_ToolManager = nullptr;
 
@@ -530,8 +397,7 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
     m_DataStorage->RemoveNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::NodeRemoved)
     );
-    if (m_DataStorage->Exists(m_3DContourNode))
-      m_DataStorage->Remove(m_3DContourNode);
+
     if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
       m_DataStorage->Remove(m_InterpolatedSurfaceNode);
   }
@@ -672,40 +538,21 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
-  this->ClearSegmentationObservers();
-
   if (m_ToolManager->GetWorkingData(0) != nullptr)
   {
     m_Segmentation = dynamic_cast<mitk::Image *>(m_ToolManager->GetWorkingData(0)->GetData());
-    auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
     m_BtnReinit3DInterpolation->setEnabled(true);
-    try {
-      if (m_SegmentationObserverTags.find(labelSetImage) == m_SegmentationObserverTags.end())
-      {
-        auto command2 = itk::MemberCommand<QmitkSlicesInterpolator>::New();
-        command2->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnModifyLabelChanged);
-        auto workingImage = dynamic_cast<mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
-        m_SegmentationObserverTags[workingImage] = workingImage->AddObserver(itk::ModifiedEvent(), command2);
-      }
-    }
-    catch (const std::exception& e)
-    {
-      MITK_ERROR << "Error casting node data to LabelSetImage\n";
-    }
   }
   else
   {
     // If no workingdata is set, remove the interpolation feedback
     this->GetDataStorage()->Remove(m_FeedbackNode);
     m_FeedbackNode->SetData(nullptr);
-    this->GetDataStorage()->Remove(m_3DContourNode);
-    m_3DContourNode->SetData(nullptr);
     this->GetDataStorage()->Remove(m_InterpolatedSurfaceNode);
     m_InterpolatedSurfaceNode->SetData(nullptr);
     m_BtnReinit3DInterpolation->setEnabled(false);
     m_CmbInterpolation->setCurrentIndex(0);
     return;
-
   }
   // Updating the current selected segmentation for the 3D interpolation
   this->SetCurrentContourListID();
@@ -743,7 +590,6 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object *sender, const itk::Even
     m_SurfaceInterpolator->SetCurrentTimePoint(m_TimePoint);
     if (m_3DInterpolationEnabled)
     {
-      m_3DContourNode->SetData(nullptr);
       m_InterpolatedSurfaceNode->SetData(nullptr);
     }
     m_SurfaceInterpolator->Modified();
@@ -830,30 +676,6 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const mitk::Ti
   return true;
 }
 
-//void QmitkSlicesInterpolator::OnLayerChanged()
-//{
-//  auto* workingNode = m_ToolManager->GetWorkingData(0);
-//
-//  if (workingNode != nullptr)
-//  {
-//    m_3DContourNode->SetData(nullptr);
-//    this->Show3DInterpolationResult(false);
-//  }
-//
-//  if (m_3DInterpolationEnabled)
-//  {
-//    m_SurfaceInterpolator->Modified();
-//  }
-//  if (m_2DInterpolationEnabled)
-//  {
-//    m_FeedbackNode->SetData(nullptr);
-//    this->OnInterpolationActivated(true);
-//    m_LastSNC->SendSlice();
-//  }
-//  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-//  this->UpdateVisibleSuggestion();
-//}
-
 void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
 {
   if (nullptr == m_ToolManager)
@@ -932,9 +754,6 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
     // m_BtnSuggestPlane->setEnabled(true);
 
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
-
-    m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
-
     this->Show3DInterpolationResult(true);
 
     if (!m_DataStorage->Exists(m_InterpolatedSurfaceNode))
@@ -1087,7 +906,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     // Distribute slice interpolations to multiple threads
     const auto numThreads = std::min(std::thread::hardware_concurrency(), numSlices);
-    // const auto numThreads = 1;
     std::vector<std::vector<unsigned int>> sliceIndices(numThreads);
 
     for (std::remove_const_t<decltype(numSlices)> sliceIndex = 0; sliceIndex < numSlices; ++sliceIndex)
@@ -1302,38 +1120,28 @@ void QmitkSlicesInterpolator::OnReinit3DInterpolation()
 
   if (contourNodes->Size() != 0)
   {
-    std::vector<const mitk::PlaneGeometry*> contourPlanes;
-    std::vector<mitk::Surface::Pointer> contourList;
     if (m_ToolManager->GetWorkingData(0) != nullptr)
     {
       try
       {
         auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
-        auto activeLayerID = labelSetImage->GetActiveLayer();
         if (!labelSetImage->GetTimeGeometry()->IsValidTimePoint(m_TimePoint))
         {
           MITK_ERROR << "Invalid time point requested for interpolation pipeline.";
           return;
         }
 
-        //  Adding layer, label and timeStep information for the contourNodes.
+        mitk::SurfaceInterpolationController::CPIVector newCPIs;
+        //  Adding label and timeStep information for the contourNodes.
         for (auto it = contourNodes->Begin(); it != contourNodes->End(); ++it)
         {
           auto contourNode = it->Value();
-          auto layerID = dynamic_cast<mitk::UIntProperty *>(contourNode->GetProperty("layerID"))->GetValue();
           auto labelID = dynamic_cast<mitk::UShortProperty *>(contourNode->GetProperty("labelID"))->GetValue();
           auto timeStep = dynamic_cast<mitk::IntProperty *>(contourNode->GetProperty("timeStep"))->GetValue();
 
-          auto px = dynamic_cast<mitk::DoubleProperty *>(contourNode->GetProperty("px"))->GetValue();
-          auto py = dynamic_cast<mitk::DoubleProperty *>(contourNode->GetProperty("py"))->GetValue();
-          auto pz = dynamic_cast<mitk::DoubleProperty *>(contourNode->GetProperty("pz"))->GetValue();
-
-          // auto layerImage = labelSetImage->GetLayerImage(layerID);
-
           auto planeGeometry = dynamic_cast<mitk::PlanarFigure *>(contourNode->GetData())->GetPlaneGeometry();
-          labelSetImage->SetActiveLayer(layerID);
-          auto sliceImage = ExtractSliceFromImage(labelSetImage, planeGeometry, timeStep);
-          labelSetImage->SetActiveLayer(activeLayerID);
+          auto groupID = labelSetImage->GetGroupIndexOfLabel(labelID);
+          auto sliceImage = ExtractSliceFromImage(labelSetImage->GetGroupImage(groupID), planeGeometry, timeStep);
           mitk::ImageToContourFilter::Pointer contourExtractor = mitk::ImageToContourFilter::New();
           contourExtractor->SetInput(sliceImage);
           contourExtractor->SetContourValue(labelID);
@@ -1343,28 +1151,10 @@ void QmitkSlicesInterpolator::OnReinit3DInterpolation()
           if (contour->GetVtkPolyData()->GetNumberOfPoints() == 0)
             continue;
 
-          vtkSmartPointer<vtkIntArray> intArray = vtkSmartPointer<vtkIntArray>::New();
-          intArray->InsertNextValue(labelID);
-          intArray->InsertNextValue(layerID);
-          intArray->InsertNextValue(timeStep);
-          contour->GetVtkPolyData()->GetFieldData()->AddArray(intArray);
-          vtkSmartPointer<vtkDoubleArray> doubleArray = vtkSmartPointer<vtkDoubleArray>::New();
-          doubleArray->InsertNextValue(px);
-          doubleArray->InsertNextValue(py);
-          doubleArray->InsertNextValue(pz);
-          contour->GetVtkPolyData()->GetFieldData()->AddArray(doubleArray);
           contour->DisconnectPipeline();
-          contourList.push_back(contour);
-          contourPlanes.push_back(planeGeometry);
+          newCPIs.emplace_back(contour, planeGeometry->Clone(),labelID,timeStep);
         }
-        labelSetImage->SetActiveLayer(activeLayerID);
-        // size_t activeLayer = labelSetImage->GetActiveLayer();
-        for (size_t l = 0; l < labelSetImage->GetNumberOfLayers(); ++l)
-        {
-          this->OnAddLabelSetConnection(l);
-        }
-        // labelSetImage->SetActiveLayer(activeLayer);
-        m_SurfaceInterpolator->CompleteReinitialization(contourList, contourPlanes);
+        m_SurfaceInterpolator->CompleteReinitialization(newCPIs);
       }
       catch(const std::exception& e)
       {
@@ -1403,7 +1193,6 @@ void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction *action)
     errorInfo.setText("An error occurred during interpolation. Possible cause: Not enough memory!");
     errorInfo.exec();
 
-    // additional error message on std::cerr
     std::cerr << "Ill construction in " __FILE__ " l. " << __LINE__ << std::endl;
   }
 }
@@ -1487,7 +1276,6 @@ void QmitkSlicesInterpolator::StopUpdateInterpolationTimer()
     const auto* workingNode = m_ToolManager->GetWorkingData(0);
     const auto activeColor = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData())->GetActiveLabel()->GetColor();
     m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(activeColor));
-    m_3DContourNode->SetProperty("color", mitk::ColorProperty::New(activeColor));
   }
 
   m_Timer->stop();
@@ -1502,61 +1290,6 @@ void QmitkSlicesInterpolator::ChangeSurfaceColor()
   m_InterpolatedSurfaceNode->Update();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
-}
-
-void QmitkSlicesInterpolator::PrepareInputsFor3DInterpolation()
-{
-  if (m_DataStorage.IsNotNull() && m_ToolManager && m_3DInterpolationEnabled)
-  {
-    auto *workingNode = m_ToolManager->GetWorkingData(0);
-    if (workingNode != nullptr)
-    {
-      int ret = QMessageBox::Yes;
-
-      if (m_SurfaceInterpolator->EstimatePortionOfNeededMemory() > 0.5)
-      {
-        QMessageBox msgBox;
-        msgBox.setText("Due to short handed system memory the 3D interpolation may be very slow!");
-        msgBox.setInformativeText("Are you sure you want to activate the 3D interpolation?");
-        msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
-        ret = msgBox.exec();
-      }
-
-      auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-      const auto activeLabel = labelSetImage->GetActiveLabel()->GetValue();
-
-      m_SurfaceInterpolator->AddActiveLabelContoursForInterpolation(activeLabel);
-
-      if (m_Watcher.isRunning())
-        m_Watcher.waitForFinished();
-
-      if (ret == QMessageBox::Yes)
-      {
-        //  Maybe set the segmentation node here
-        m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
-        m_Watcher.setFuture(m_Future);
-      }
-      else
-      {
-        m_CmbInterpolation->setCurrentIndex(0);
-      }
-    }
-    else
-    {
-      QWidget::setEnabled(false);
-      m_ChkShowPositionNodes->setEnabled(m_3DInterpolationEnabled);
-    }
-
-  }
-  if (!m_3DInterpolationEnabled)
-  {
-    this->Show3DInterpolationResult(false);
-    m_BtnApply3D->setEnabled(m_3DInterpolationEnabled);
-    // T28261
-    // m_BtnSuggestPlane->setEnabled(m_3DInterpolationEnabled);
-  }
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
@@ -1612,7 +1345,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::Event
 
   if (m_3DInterpolationEnabled)
   {
-    m_3DContourNode->SetData(nullptr);
+
     m_InterpolatedSurfaceNode->SetData(nullptr);
     auto* workingNode = m_ToolManager->GetWorkingData(0);
 
@@ -1639,18 +1372,6 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
   if (m_DataStorage.IsNotNull() && m_ToolManager && m_LastSNC)
   {
     mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
-
-    try{
-        auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
-        for (size_t layerID = 0; layerID < labelSetImage->GetNumberOfLayers(); ++layerID)
-        {
-          this->OnAddLabelSetConnection(layerID);
-        }
-    }
-    catch (std::exception &e)
-    {
-      MITK_ERROR << e.what() << "\n";
-    }
 
     if (workingNode)
     {
@@ -1702,21 +1423,11 @@ void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
   if (m_InterpolatedSurfaceNode.IsNotNull())
     m_InterpolatedSurfaceNode->SetVisibility(status);
 
-  if (m_3DContourNode.IsNotNull())
-  {
-    auto allRenderWindows = mitk::BaseRenderer::GetAll3DRenderWindows();
-    for (auto mapit = allRenderWindows.begin(); mapit != allRenderWindows.end(); ++mapit)
-    {
-      m_3DContourNode->SetVisibility(status, mapit->second);
-    }
-  }
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSlicesInterpolator::OnActiveLabelChanged(mitk::Label::PixelType)
 {
-  m_3DContourNode->SetData(nullptr);
   m_FeedbackNode->SetData(nullptr);
   m_InterpolatedSurfaceNode->SetData(nullptr);
 
@@ -1786,238 +1497,9 @@ void QmitkSlicesInterpolator::WaitForFutures()
 void QmitkSlicesInterpolator::NodeRemoved(const mitk::DataNode* node)
 {
   if ((m_ToolManager && m_ToolManager->GetWorkingData(0) == node) ||
-      node == m_3DContourNode ||
       node == m_FeedbackNode ||
       node == m_InterpolatedSurfaceNode)
   {
     WaitForFutures();
   }
-}
-
-//void QmitkSlicesInterpolator::OnAddLabelSetConnection(unsigned int layerID)
-//{
-//  if (m_ToolManager->GetWorkingData(0) != nullptr)
-//  {
-//    try
-//    {
-//      auto workingImage = dynamic_cast<mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
-//      auto labelSet = workingImage->GetLabelSet(layerID);
-//      labelSet->RemoveLabelEvent += mitk::MessageDelegate1<QmitkSlicesInterpolator, mitk::Label::PixelType>(
-//        this, &QmitkSlicesInterpolator::OnRemoveLabel);
-//      labelSet->ActiveLabelEvent += mitk::MessageDelegate1<QmitkSlicesInterpolator,mitk::Label::PixelType>(
-//            this, &QmitkSlicesInterpolator::OnActiveLabelChanged);
-//      workingImage->AfterChangeLayerEvent += mitk::MessageDelegate<QmitkSlicesInterpolator>(
-//        this, &QmitkSlicesInterpolator::OnLayerChanged);
-//      m_SurfaceInterpolator->AddLabelSetConnection(layerID);
-//    }
-//    catch(const std::exception& e)
-//    {
-//      MITK_ERROR << e.what() << '\n';
-//    }
-//  }
-//}
-
-
-
-//void QmitkSlicesInterpolator::OnAddLabelSetConnection()
-//{
-//  if (m_ToolManager->GetWorkingData(0) != nullptr)
-//  {
-//    try
-//    {
-//      auto workingImage = dynamic_cast<mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
-//      workingImage->GetActiveLabelSet()->RemoveLabelEvent += mitk::MessageDelegate1<QmitkSlicesInterpolator, mitk::Label::PixelType>(
-//        this, &QmitkSlicesInterpolator::OnRemoveLabel);
-//      workingImage->GetActiveLabelSet()->ActiveLabelEvent += mitk::MessageDelegate1<QmitkSlicesInterpolator,mitk::Label::PixelType>(
-//            this, &QmitkSlicesInterpolator::OnActiveLabelChanged);
-//      workingImage->AfterChangeLayerEvent += mitk::MessageDelegate<QmitkSlicesInterpolator>(
-//        this, &QmitkSlicesInterpolator::OnLayerChanged);
-//      m_SurfaceInterpolator->AddLabelSetConnection();
-//    }
-//    catch(const std::exception& e)
-//    {
-//      MITK_ERROR << e.what() << '\n';
-//    }
-//  }
-//}
-
-//void QmitkSlicesInterpolator::OnRemoveLabelSetConnection(mitk::LabelSetImage* labelSetImage, unsigned int layerID)
-//{
-//  size_t previousLayerID = labelSetImage->GetActiveLayer();
-//  labelSetImage->SetActiveLayer(layerID);
-//  labelSetImage->GetActiveLabelSet()->RemoveLabelEvent -= mitk::MessageDelegate1<QmitkSlicesInterpolator, mitk::Label::PixelType>(
-//        this, &QmitkSlicesInterpolator::OnRemoveLabel);
-//  labelSetImage->GetActiveLabelSet()->ActiveLabelEvent -= mitk::MessageDelegate1<QmitkSlicesInterpolator,mitk::Label::PixelType>(
-//            this, &QmitkSlicesInterpolator::OnActiveLabelChanged);
-//  labelSetImage->AfterChangeLayerEvent -= mitk::MessageDelegate<QmitkSlicesInterpolator>(
-//        this, &QmitkSlicesInterpolator::OnLayerChanged);
-//  m_SurfaceInterpolator->RemoveLabelSetConnection(labelSetImage, layerID);
-//  labelSetImage->SetActiveLayer(previousLayerID);
-//}
-
-//void QmitkSlicesInterpolator::OnRemoveLabelSetConnection()
-//{
-//  if (m_ToolManager->GetWorkingData(0) != nullptr)
-//  {
-//    try
-//    {
-//      auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
-//      workingImage->GetActiveLabelSet()->RemoveLabelEvent -= mitk::MessageDelegate1<QmitkSlicesInterpolator, mitk::Label::PixelType>(
-//        this, &QmitkSlicesInterpolator::OnRemoveLabel);
-//      workingImage->GetActiveLabelSet()->ActiveLabelEvent -= mitk::MessageDelegate1<QmitkSlicesInterpolator,mitk::Label::PixelType>(
-//            this, &QmitkSlicesInterpolator::OnActiveLabelChanged);
-//      workingImage->AfterChangeLayerEvent -= mitk::MessageDelegate<QmitkSlicesInterpolator>(
-//        this, &QmitkSlicesInterpolator::OnLayerChanged);
-//    }
-//    catch(const std::exception& e)
-//    {
-//      MITK_ERROR << e.what() << '\n';
-//    }
-//  }
-//}
-
-void QmitkSlicesInterpolator::OnModifyLabelChanged(const itk::Object *caller,
-                                                      const itk::EventObject & /*event*/)
-{
-  auto *tempImage = dynamic_cast<mitk::LabelSetImage *>(const_cast<itk::Object *>(caller) ) ;
-  if( tempImage == nullptr)
-  {
-    MITK_ERROR << "Unable to cast caller to LabelSetImage.";
-    return;
-  }
-
-  ModifyLabelActionTrigerred actionTriggered = ModifyLabelActionTrigerred::Null;
-  if(m_ToolManager->GetWorkingData(0) != nullptr)
-  {
-    auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
-    if (labelSetImage == tempImage)
-    {
-      if (!labelSetImage->GetTimeGeometry()->IsValidTimePoint(m_TimePoint))
-      {
-        MITK_ERROR << "Invalid time point requested for interpolation pipeline.";
-        return;
-      }
-      auto timeStep = labelSetImage->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
-
-      //auto numLayersInCurrentSegmentation = m_SurfaceInterpolator->GetNumberOfLayersInCurrentSegmentation();
-      ////  This handles the add layer or remove layer operation.
-      //if (labelSetImage->GetNumberOfLayers() != numLayersInCurrentSegmentation)
-      //{
-      //  bool addLayer = (labelSetImage->GetNumberOfLayers() == (numLayersInCurrentSegmentation +1) );
-      //  bool removeLayer = (labelSetImage->GetNumberOfLayers() == (numLayersInCurrentSegmentation - 1) );
-
-      //  m_SurfaceInterpolator->SetNumberOfLayersInCurrentSegmentation(labelSetImage->GetNumberOfLayers());
-
-      //  if (addLayer)
-      //  {
-      //    m_SurfaceInterpolator->OnAddLayer();
-      //    this->OnAddLabelSetConnection();
-      //  }
-      //  if (removeLayer)
-      //  {
-      //    m_SurfaceInterpolator->OnRemoveLayer();
-      //  }
-      //  return;
-      //}
-
-      //  Get the pixels present in the image.
-      //  This portion of the code deals with the merge and erase labels operations.
-      auto imageDimension = labelSetImage->GetDimension();
-      if (imageDimension == 4)
-      {
-        actionTriggered = ModifyLabelProcessing<4>(labelSetImage, m_SurfaceInterpolator, timeStep);
-      }
-      else
-      {
-        actionTriggered = ModifyLabelProcessing<3>(labelSetImage, m_SurfaceInterpolator, timeStep);
-      }
-
-      if (actionTriggered == ModifyLabelActionTrigerred::Erase)
-      {
-        m_InterpolatedSurfaceNode->SetData(nullptr);
-      }
-
-      auto currentLabelID = labelSetImage->GetActiveLabel()->GetValue();
-      if (actionTriggered == ModifyLabelActionTrigerred::Merge)
-      {
-        this->MergeContours(timeStep, currentLabelID);
-        m_SurfaceInterpolator->Modified();
-      }
-    }
-  }
-}
-
-void QmitkSlicesInterpolator::MergeContours(unsigned int timeStep,
-                                            unsigned int labelID)
-{
-  auto* contours = m_SurfaceInterpolator->GetContours(timeStep, labelID);
-
-  if (nullptr == contours)
-    return;
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  for (auto& contour1 : *contours)
-  {
-    for (auto& contour2 : *contours)
-    {
-      //  And Labels are the same and Layers are the same.
-      bool areContoursCoplanar = AreContoursCoplanar(contour1, contour2);
-
-      if ( areContoursCoplanar  && (contour1.LabelValue == contour2.LabelValue) )
-      {
-        //  Update the contour by re-extracting the slice from the corresponding plane.
-        mitk::Image::Pointer slice = ExtractSliceFromImage(m_Segmentation, contour1.Plane, timeStep);
-        mitk::ImageToContourFilter::Pointer contourExtractor = mitk::ImageToContourFilter::New();
-        contourExtractor->SetInput(slice);
-        contourExtractor->SetContourValue(contour1.LabelValue);
-        contourExtractor->Update();
-        mitk::Surface::Pointer contour = contourExtractor->GetOutput();
-        contour1.Contour = contour;
-
-        //  Update the interior point of the contour
-        contour1.ContourPoint = m_SurfaceInterpolator->ComputeInteriorPointOfContour(contour1,dynamic_cast<mitk::LabelSetImage *>(m_Segmentation));
-
-        //  marking the source contour for removal.
-        contour2.Pos = -2;
-      }
-    }
-  }
-
-  auto segmentationNode = m_SurfaceInterpolator->GetSegmentationImageNode();
-
-  if (segmentationNode == nullptr)
-  {
-    MITK_ERROR << "segmentation Image Node not found\n";
-  }
-
-  auto isContourPlaneGeometry = mitk::NodePredicateProperty::New("isContourPlaneGeometry", mitk::BoolProperty::New(true));
-
-  mitk::DataStorage::SetOfObjects::ConstPointer contourNodes =
-    m_DataStorage->GetDerivations(segmentationNode, isContourPlaneGeometry);
-
-  //  Remove empty contour nodes.
-  auto isContourEmpty = [] (const mitk::SurfaceInterpolationController::ContourPositionInformation& contour)
-  {
-    return (contour.Pos == -2);
-  };
-
-  auto it = std::remove_if((*contours).begin(), (*contours).end(), isContourEmpty);
-  (*contours).erase(it, (*contours).end());
-}
-
-void QmitkSlicesInterpolator::ClearSegmentationObservers()
-{
-  auto dataIter = m_SegmentationObserverTags.begin();
-  while (dataIter != m_SegmentationObserverTags.end())
-  {
-    auto labelSetImage = (*dataIter).first;
-    labelSetImage->RemoveObserver((*dataIter).second);
-    for (size_t layerID = 0; layerID < labelSetImage->GetNumberOfLayers(); ++layerID)
-    {
-      this->OnRemoveLabelSetConnection(labelSetImage, layerID);
-    }
-    ++dataIter;
-  }
-  m_SegmentationObserverTags.clear();
 }

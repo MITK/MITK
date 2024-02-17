@@ -89,14 +89,14 @@ namespace mitk
      * @brief Performs the interpolation.
      *
      */
-    Surface::Pointer Interpolate(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep);
+    void Interpolate(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep);
 
     /**
      * @brief Get the Result of the interpolation operation.
      *
      * @return mitk::Surface::Pointer
      */
-    mitk::Surface::Pointer GetInterpolationResult();
+    mitk::Surface::Pointer GetInterpolationResult(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep);
 
     /**
      * @brief Sets the minimum spacing of the current selected segmentation

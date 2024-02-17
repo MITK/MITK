@@ -313,7 +313,6 @@ private:
 
   mitk::DataNode::Pointer m_FeedbackNode;
   mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
-  mitk::Surface::Pointer m_LastInterpolatedSurface;
 
   mitk::Image *m_Segmentation;
 

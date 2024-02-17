@@ -732,8 +732,6 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
 
 void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 {
-//  mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
-
   mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
 
   mitk::PlaneGeometry::Pointer slicingPlane = mitk::PlaneGeometry::New();
@@ -743,31 +741,43 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
   FillVector3D(origin, 0.0, 0.0, 0.0);
   slicingPlane->InitializePlane(origin, slicingPlaneNormalVector);
 
-  if (m_LastInterpolatedSurface.IsNotNull() && workingNode)
+  if (workingNode && workingNode->GetData())
   {
-    m_BtnApply3D->setEnabled(true);
+    const auto segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
 
-    // T28261
-    // m_BtnSuggestPlane->setEnabled(true);
-
-    m_InterpolatedSurfaceNode->SetData(m_LastInterpolatedSurface);
-    this->Show3DInterpolationResult(true);
-
-    if (!m_DataStorage->Exists(m_InterpolatedSurfaceNode))
+    if (segmentation == nullptr)
     {
-      m_DataStorage->Add(m_InterpolatedSurfaceNode);
+      MITK_ERROR << "Run3DInterpolation triggered with no MultiLabelSegmentation as working data.";
+      return;
     }
-  }
-  else if (m_LastInterpolatedSurface.IsNull())
-  {
-    m_BtnApply3D->setEnabled(false);
+    mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult(segmentation, m_CurrentActiveLabelValue, segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint));
 
-    // T28261
-    // m_BtnSuggestPlane->setEnabled(false);
-
-    if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
+    if (interpolatedSurface.IsNotNull())
     {
-      this->Show3DInterpolationResult(false);
+      m_BtnApply3D->setEnabled(true);
+
+      // T28261
+      // m_BtnSuggestPlane->setEnabled(true);
+
+      m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
+      this->Show3DInterpolationResult(true);
+
+      if (!m_DataStorage->Exists(m_InterpolatedSurfaceNode))
+      {
+        m_DataStorage->Add(m_InterpolatedSurfaceNode);
+      }
+    }
+    else
+    {
+      m_BtnApply3D->setEnabled(false);
+
+      // T28261
+      // m_BtnSuggestPlane->setEnabled(false);
+
+      if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
+      {
+        this->Show3DInterpolationResult(false);
+      }
     }
   }
 
@@ -1273,7 +1283,7 @@ void QmitkSlicesInterpolator::Run3DInterpolation()
     return;
   }
 
-  m_LastInterpolatedSurface = m_SurfaceInterpolator->Interpolate(segmentation,m_CurrentActiveLabelValue,segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint));
+  m_SurfaceInterpolator->Interpolate(segmentation,m_CurrentActiveLabelValue,segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint));
 }
 
 void QmitkSlicesInterpolator::StartUpdateInterpolationTimer()
@@ -1359,7 +1369,6 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::Event
   {
 
     m_InterpolatedSurfaceNode->SetData(nullptr);
-    m_LastInterpolatedSurface = nullptr;
     m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
     m_Watcher.setFuture(m_Future);
   }

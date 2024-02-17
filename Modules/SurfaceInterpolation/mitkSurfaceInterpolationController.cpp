@@ -33,8 +33,14 @@ found in the LICENSE file.
 #include <vtkMath.h>
 #include <vtkPolygon.h>
 
+struct CPICache
+{
+  mitk::SurfaceInterpolationController::CPIVector cpis;
+  itk::TimeStamp cpiTimeStamp;
+  mitk::Surface::Pointer cachedSurface;
+};
 
-typedef std::map<mitk::TimeStepType, mitk::SurfaceInterpolationController::CPIVector> CPITimeStepMap;
+typedef std::map<mitk::TimeStepType, CPICache> CPITimeStepMap;
 typedef std::map<mitk::LabelSetImage::LabelValueType, CPITimeStepMap> CPITimeStepLabelMap;
 
 typedef std::map<const mitk::LabelSetImage*, CPITimeStepLabelMap> CPITimeStepLabelSegMap;
@@ -274,7 +280,8 @@ void mitk::SurfaceInterpolationController::AddToCPIMap(ContourPositionInformatio
 
     auto& currentImageContours = cpiMap[selectedSegmentation];
     auto& currentLabelContours = currentImageContours[currentLabelValue];
-    auto& currentContourList = currentLabelContours[currentTimeStep];
+    auto& currentCPICache = currentLabelContours[currentTimeStep];
+    auto& currentContourList = currentCPICache.cpis;
 
     auto finding = std::find_if(currentContourList.begin(), currentContourList.end(), [contourInfo](const ContourPositionInformation& element) {return contourInfo.Plane->IsOnPlane(element.Plane); });
 
@@ -287,6 +294,7 @@ void mitk::SurfaceInterpolationController::AddToCPIMap(ContourPositionInformatio
     {
       currentContourList.push_back(contourInfo);
     }
+    currentCPICache.cpiTimeStamp.Modified();
   }
 
   if (!reinitializationAction)
@@ -315,10 +323,11 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
 
     const auto currentTimeStep = contourInfo.TimeStep;
     const auto currentLabel = contourInfo.LabelValue;
-    auto it = cpiMap.at(selectedSegmentation).at(currentLabel).at(currentTimeStep).begin();
+    auto& cpiCache = cpiMap.at(selectedSegmentation).at(currentLabel).at(currentTimeStep);
+    auto it = cpiCache.cpis.begin();
 
 
-    while (it != cpiMap.at(selectedSegmentation).at(currentLabel).at(currentTimeStep).end())
+    while (it != cpiCache.cpis.end())
     {
       const ContourPositionInformation& currentContour = (*it);
       if (currentContour.Plane->IsOnPlane(contourInfo.Plane))
@@ -329,8 +338,9 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
         }
         else
         {
-          cpiMap.at(selectedSegmentation).at(currentLabel).at(currentTimeStep).erase(it);
+          cpiCache.cpis.erase(it);
         }
+        cpiCache.cpiTimeStamp.Modified();
         removedIt = true;
 
         if (m_DataStorage.IsNotNull())
@@ -367,7 +377,7 @@ void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolatio
 {
   std::shared_lock<std::shared_mutex> guard(cpiMutex);
 
-  auto& currentImageContours = cpiMap.at(segmentationImage);
+  const auto& currentImageContours = cpiMap.at(segmentationImage);
 
   auto finding = currentImageContours.find(labelValue);
   if (finding == currentImageContours.end())
@@ -376,7 +386,7 @@ void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolatio
     return;
   }
 
-  auto currentLabelContoursMap = finding->second;
+  const auto& currentLabelContoursMap = finding->second;
 
   auto tsfinding = currentLabelContoursMap.find(timeStep);
   if (tsfinding == currentLabelContoursMap.end())
@@ -385,7 +395,7 @@ void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolatio
     return;
   }
 
-  CPIVector& currentContours = tsfinding->second;
+  const auto& currentContours = tsfinding->second.cpis;
 
   unsigned int index = 0;
   for (const auto&  cpi : currentContours)
@@ -398,7 +408,50 @@ void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolatio
   }
 }
 
-mitk::Surface::Pointer mitk::SurfaceInterpolationController::Interpolate(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep)
+bool CPICacheIsOutdated(const mitk::LabelSetImage* segmentationImage, mitk::LabelSetImage::LabelValueType labelValue, mitk::TimeStepType timeStep)
+{
+  const auto& currentImageContours = cpiMap.at(segmentationImage);
+
+  auto finding = currentImageContours.find(labelValue);
+  if (finding == currentImageContours.end())
+  {
+    return false;
+  }
+
+  const auto& currentLabelContoursMap = finding->second;
+
+  auto tsfinding = currentLabelContoursMap.find(timeStep);
+  if (tsfinding == currentLabelContoursMap.end())
+  {
+    return false;
+  }
+
+  bool result = tsfinding->second.cachedSurface.IsNull() || tsfinding->second.cachedSurface->GetMTime() < tsfinding->second.cpiTimeStamp.GetMTime();
+  return result;
+}
+
+void SetCPICacheSurface(mitk::Surface* surface, const mitk::LabelSetImage* segmentationImage, mitk::LabelSetImage::LabelValueType labelValue, mitk::TimeStepType timeStep)
+{
+  const auto& currentImageContours = cpiMap.at(segmentationImage);
+
+  auto finding = currentImageContours.find(labelValue);
+  if (finding == currentImageContours.end())
+  {
+    return;
+  }
+
+  const auto& currentLabelContoursMap = finding->second;
+
+  auto tsfinding = currentLabelContoursMap.find(timeStep);
+  if (tsfinding == currentLabelContoursMap.end())
+  {
+    return;
+  }
+
+  cpiMap[segmentationImage][labelValue][timeStep].cachedSurface = surface;
+}
+
+void mitk::SurfaceInterpolationController::Interpolate(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep)
 {
   if (nullptr == segmentationImage)
   {
@@ -420,6 +473,8 @@ mitk::Surface::Pointer mitk::SurfaceInterpolationController::Interpolate(const L
   {
     mitkThrow() << "Cannot interpolate contours. No valid time step requested. Invalid time step:" << timeStep;
   }
+
+  if (!CPICacheIsOutdated(segmentationImage, labelValue, timeStep)) return;
 
   mitk::Surface::Pointer interpolationResult = nullptr;
 
@@ -518,12 +573,48 @@ mitk::Surface::Pointer mitk::SurfaceInterpolationController::Interpolate(const L
     interpolationResult = nullptr;
   }
 
-  return interpolationResult;
+  SetCPICacheSurface(interpolationResult, segmentationImage, labelValue, timeStep);
 }
 
-mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationResult()
+mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationResult(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep)
 {
-  return nullptr;
+  if (nullptr == segmentationImage)
+  {
+    mitkThrow() << "Cannot interpolate contours. No valid segmentation passed.";
+  }
+
+  if (cpiMap.find(segmentationImage) == cpiMap.end())
+  {
+    mitkThrow() << "Cannot interpolate contours. Passed segmentation is not registered at controller.";
+  }
+
+  if (!segmentationImage->ExistLabel(labelValue))
+  {
+    mitkThrow() << "Cannot interpolate contours. None existant label request. Invalid label:" << labelValue;
+  }
+
+  if (!segmentationImage->GetTimeGeometry()->IsValidTimeStep(timeStep))
+  {
+    mitkThrow() << "Cannot interpolate contours. No valid time step requested. Invalid time step:" << timeStep;
+  }
+
+  const auto& currentImageContours = cpiMap.at(segmentationImage);
+
+  auto finding = currentImageContours.find(labelValue);
+  if (finding == currentImageContours.end())
+  {
+    return nullptr;
+  }
+
+  const auto& currentLabelContoursMap = finding->second;
+
+  auto tsfinding = currentLabelContoursMap.find(timeStep);
+  if (tsfinding == currentLabelContoursMap.end())
+  {
+    return nullptr;
+  }
+
+  return tsfinding->second.cachedSurface;
 }
 
 void mitk::SurfaceInterpolationController::SetDataStorage(DataStorage::Pointer ds)
@@ -714,7 +805,7 @@ mitk::SurfaceInterpolationController::CPIVector* mitk::SurfaceInterpolationContr
 
     if (tsFinding != labelFinding->second.end())
     {
-      return &(tsFinding->second);
+      return &(tsFinding->second.cpis);
     }
   }
 
@@ -729,14 +820,14 @@ std::vector<mitk::LabelSetImage::LabelValueType> mitk::SurfaceInterpolationContr
 
   auto finding = cpiMap.find(seg);
   if (finding == cpiMap.end()) return result;
-  auto currentImageContours = finding->second;
+  const auto& currentImageContours = cpiMap[seg];
 
-  for (auto [label, contours] : currentImageContours)
+  for (const auto& [label, contours] : currentImageContours)
   {
     auto tsFinding = contours.find(timeStep);
     if (tsFinding != contours.end())
     {
-      auto cpis = tsFinding->second;
+      const auto& cpis = contours.at(timeStep).cpis;
       auto finding = std::find_if(cpis.begin(), cpis.end(), [plane](const ContourPositionInformation& element) {return plane->IsOnPlane(element.Plane); });
 
       if (finding != cpis.end())

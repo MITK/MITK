@@ -93,7 +93,6 @@ public:
   {
     m_Controller = mitk::SurfaceInterpolationController::GetInstance();
     m_Controller->RemoveAllInterpolationSessions();
-    m_Controller->SetCurrentTimePoint(0);
 
     vtkSmartPointer<vtkRegularPolygonSource> polygonSource = vtkSmartPointer<vtkRegularPolygonSource>::New();
     polygonSource->SetRadius(100);
@@ -601,7 +600,6 @@ public:
       unsigned int dimensions1[] = {10, 10, 10, 7};
       mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
       m_Controller->SetCurrentInterpolationSession(segmentation_1);
-      m_Controller->SetCurrentTimePoint(3);
     }
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 0",
                            m_Controller->GetNumberOfInterpolationSessions() == 0);

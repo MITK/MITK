@@ -159,8 +159,10 @@ void mitk::SegTool2D::UpdateAllSurfaceInterpolations(const LabelSetImage *workin
     auto groupID = workingImage->GetGroupIndexOfLabel(affectedLabel);
     auto slice = GetAffectedImageSliceAs2DImage(plane, workingImage->GetGroupImage(groupID), timeStep);
     std::vector<SliceInformation> slices = { SliceInformation(slice, plane, timeStep) };
-    Self::UpdateSurfaceInterpolation(slices, workingImage, detectIntersection, affectedLabel);
+    Self::UpdateSurfaceInterpolation(slices, workingImage, detectIntersection, affectedLabel, true);
   }
+
+  if(!affectedLabels.empty()) mitk::SurfaceInterpolationController::GetInstance()->Modified();
 }
 
 void  mitk::SegTool2D::RemoveContourFromInterpolator(const SliceInformation& sliceInfo, LabelSetImage::LabelValueType labelValue)
@@ -182,7 +184,7 @@ void ClearBufferProcessing(ImageType* itkImage)
 void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformation>& sliceInfos,
   const Image* workingImage,
   bool detectIntersection,
-  mitk::Label::PixelType activeLabelValue)
+  mitk::Label::PixelType activeLabelValue, bool silent)
 {
   if (!m_SurfaceInterpolationEnabled)
     return;
@@ -246,9 +248,6 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
     }
   }
 
-  if (relevantSlices.empty())
-    return;
-
   SurfaceInterpolationController::CPIVector cpis;
   for (const auto& sliceInfo : relevantSlices)
   {
@@ -267,7 +266,8 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
     }
   }
 
-  mitk::SurfaceInterpolationController::GetInstance()->AddNewContours(cpis);
+  //this call is relevant even if cpis is empty to ensure SurfaceInterpolationController::Modified is triggered if silent==false;
+  mitk::SurfaceInterpolationController::GetInstance()->AddNewContours(cpis, false, silent);
 }
 
 

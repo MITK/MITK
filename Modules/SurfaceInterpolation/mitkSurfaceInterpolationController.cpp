@@ -45,22 +45,9 @@ std::shared_mutex cpiMutex;
 std::map<mitk::LabelSetImage*, unsigned long> segmentationObserverTags;
 
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
-  : m_SelectedSegmentation(nullptr),
-    m_CurrentTimePoint(0.)
+  : m_DistanceImageVolume(50000),
+    m_SelectedSegmentation(nullptr)
 {
-  m_DistanceImageSpacing = 0.0;
-  m_ReduceFilter = ReduceContourSetFilter::New();
-  m_NormalsFilter = ComputeContourSetNormalsFilter::New();
-  m_InterpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
-
-  m_ReduceFilter->SetUseProgressBar(false);
-  m_NormalsFilter->SetUseProgressBar(true);
-  m_NormalsFilter->SetProgressStepSize(1);
-  m_InterpolateSurfaceFilter->SetUseProgressBar(true);
-  m_InterpolateSurfaceFilter->SetProgressStepSize(7);
-
-  m_InterpolationResult = nullptr;
-  m_CurrentNumberOfReducedContours = 0;
 }
 
 mitk::SurfaceInterpolationController::~SurfaceInterpolationController()
@@ -89,7 +76,7 @@ mitk::SurfaceInterpolationController *mitk::SurfaceInterpolationController::GetI
 }
 
 void mitk::SurfaceInterpolationController::AddNewContours(const std::vector<ContourPositionInformation>& newCPIs,
-  bool reinitializationAction)
+  bool reinitializationAction, bool silent)
 {
   auto selectedSegmentation = m_SelectedSegmentation.Lock();
   if (selectedSegmentation.IsNull()) return;
@@ -101,7 +88,7 @@ void mitk::SurfaceInterpolationController::AddNewContours(const std::vector<Cont
       this->AddToCPIMap(cpi, reinitializationAction);
     }
   }
-  this->Modified();
+  if (!silent) this->Modified();
 }
 
 
@@ -186,7 +173,7 @@ void mitk::SurfaceInterpolationController::AddPlaneGeometryNodeToDataStorage(con
     mitkThrow()<< "Cannot add plane geometries. No valid segmentation selected.";
   }
 
-  if (!selectedSegmentation->GetTimeGeometry()->IsValidTimePoint(m_CurrentTimePoint))
+  if (!selectedSegmentation->GetTimeGeometry()->IsValidTimeStep(contourInfo.TimeStep))
   {
     MITK_ERROR << "Invalid time point requested in AddPlaneGeometryNodeToDataStorage.";
     return;
@@ -261,9 +248,9 @@ void mitk::SurfaceInterpolationController::AddToCPIMap(ContourPositionInformatio
   if (selectedSegmentation.IsNull())
     return;
 
-  if (!selectedSegmentation->GetTimeGeometry()->IsValidTimePoint(m_CurrentTimePoint))
+  if (!selectedSegmentation->GetTimeGeometry()->IsValidTimeStep(contourInfo.TimeStep))
   {
-    MITK_ERROR << "Invalid time point requested for interpolation pipeline.";
+    MITK_ERROR << "Invalid time step requested for interpolation pipeline.";
     return;
   }
 
@@ -316,7 +303,7 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
     return false;
   }
 
-  if (!selectedSegmentation->GetTimeGeometry()->IsValidTimePoint(m_CurrentTimePoint))
+  if (!selectedSegmentation->GetTimeGeometry()->IsValidTimeStep(contourInfo.TimeStep))
   {
     return false;
   }
@@ -373,52 +360,25 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
     }
   }
 
-  if (removedIt)
-  {
-    this->ReinitializeInterpolation();
-    this->Modified();
-  }
-
   return removedIt;
 }
 
-void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolation(mitk::Label::PixelType activeLabel)
+void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolation(ReduceContourSetFilter* reduceFilter, const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep)
 {
-  this->ReinitializeInterpolation();
-
-  auto selectedSegmentation = m_SelectedSegmentation.Lock();
-  if (selectedSegmentation.IsNull())
-  {
-    mitkThrow() << "Cannot add active label contours. No valid segmentation selected.";
-  }
-
-  if (!selectedSegmentation->GetTimeGeometry()->IsValidTimePoint(m_CurrentTimePoint))
-  {
-    MITK_ERROR << "Invalid time point requested for interpolation pipeline.";
-    return;
-  }
-
-  if (!selectedSegmentation->GetTimeGeometry()->IsValidTimePoint(m_CurrentTimePoint))
-  {
-    MITK_ERROR << "Invalid time point requested for interpolation pipeline.";
-    return;
-  }
-  const auto currentTimeStep = selectedSegmentation->GetTimeGeometry()->TimePointToTimeStep(m_CurrentTimePoint);
-
   std::shared_lock<std::shared_mutex> guard(cpiMutex);
 
-  auto& currentImageContours = cpiMap.at(selectedSegmentation);
+  auto& currentImageContours = cpiMap.at(segmentationImage);
 
-  auto finding = currentImageContours.find(activeLabel);
+  auto finding = currentImageContours.find(labelValue);
   if (finding == currentImageContours.end())
   {
-    MITK_INFO << "Contours for label don't exist. Label value: " << activeLabel;
+    MITK_INFO << "Contours for label don't exist. Label value: " << labelValue;
     return;
   }
 
   auto currentLabelContoursMap = finding->second;
 
-  auto tsfinding = currentLabelContoursMap.find(currentTimeStep);
+  auto tsfinding = currentLabelContoursMap.find(timeStep);
   if (tsfinding == currentLabelContoursMap.end())
   {
     MITK_INFO << "Contours for current time step don't exist.";
@@ -428,102 +388,142 @@ void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolatio
   CPIVector& currentContours = tsfinding->second;
 
   unsigned int index = 0;
-  m_ReduceFilter->Reset();
   for (const auto&  cpi : currentContours)
   {
     if (!cpi.IsPlaceHolder())
     {
-      m_ReduceFilter->SetInput(index, cpi.Contour);
+      reduceFilter->SetInput(index, cpi.Contour);
       ++index;
     }
   }
 }
 
-void mitk::SurfaceInterpolationController::Interpolate()
+mitk::Surface::Pointer mitk::SurfaceInterpolationController::Interpolate(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep)
 {
-  auto selectedSegmentation = m_SelectedSegmentation.Lock();
-  if (selectedSegmentation.IsNull())
+  if (nullptr == segmentationImage)
   {
-    mitkThrow() << "Cannot interpolate. No valid segmentation selected.";
+    mitkThrow() << "Cannot interpolate contours. No valid segmentation passed.";
   }
 
-  if (!selectedSegmentation->GetTimeGeometry()->IsValidTimePoint(m_CurrentTimePoint))
+  auto it = cpiMap.find(segmentationImage);
+  if (it == cpiMap.end())
   {
-    MITK_WARN << "No interpolation possible, currently selected timepoint is not in the time bounds of currently selected segmentation. Time point: " << m_CurrentTimePoint;
-    m_InterpolationResult = nullptr;
-    return;
+    mitkThrow() << "Cannot interpolate contours. Passed segmentation is not registered at controller.";
   }
-  const auto currentTimeStep = selectedSegmentation->GetTimeGeometry()->TimePointToTimeStep(m_CurrentTimePoint);
-  m_ReduceFilter->Update();
-  m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
 
-  if (m_CurrentNumberOfReducedContours == 1)
+  if (!segmentationImage->ExistLabel(labelValue))
   {
-    vtkPolyData *tmp = m_ReduceFilter->GetOutput(0)->GetVtkPolyData();
-    if (tmp == nullptr)
+    mitkThrow() << "Cannot interpolate contours. None existant label request. Invalid label:" << labelValue;
+  }
+
+  if (!segmentationImage->GetTimeGeometry()->IsValidTimeStep(timeStep))
+  {
+    mitkThrow() << "Cannot interpolate contours. No valid time step requested. Invalid time step:" << timeStep;
+  }
+
+  mitk::Surface::Pointer interpolationResult = nullptr;
+
+  auto reduceFilter = ReduceContourSetFilter::New();
+  auto normalsFilter = ComputeContourSetNormalsFilter::New();
+  auto interpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
+
+  const auto spacing = segmentationImage->GetGeometry(timeStep)->GetSpacing();
+  double minSpacing = 100;
+  double maxSpacing = 0;
+  for (int i = 0; i < 3; i++)
+  {
+    if (spacing[i] < minSpacing)
     {
-      m_CurrentNumberOfReducedContours = 0;
+      minSpacing = spacing[i];
+    }
+    if (spacing[i] > maxSpacing)
+    {
+      maxSpacing = spacing[i];
     }
   }
+  reduceFilter->SetMinSpacing(minSpacing);
+  reduceFilter->SetMaxSpacing(maxSpacing);
+  normalsFilter->SetMaxSpacing(maxSpacing);
+  interpolateSurfaceFilter->SetDistanceImageVolume(m_DistanceImageVolume);
 
-  //  We use the timeSelector to get the segmentation image for the current segmentation.
+  reduceFilter->SetUseProgressBar(false);
+  normalsFilter->SetUseProgressBar(true);
+  normalsFilter->SetProgressStepSize(1);
+  interpolateSurfaceFilter->SetUseProgressBar(true);
+  interpolateSurfaceFilter->SetProgressStepSize(7);
+
+  //  Set reference image for interpolation surface filter
+  itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-  timeSelector->SetInput(selectedSegmentation);
-  timeSelector->SetTimeNr(currentTimeStep);
+  timeSelector->SetInput(segmentationImage);
+  timeSelector->SetTimeNr(timeStep);
   timeSelector->SetChannelNr(0);
   timeSelector->Update();
-
   mitk::Image::Pointer refSegImage = timeSelector->GetOutput();
+  AccessFixedDimensionByItk_1(refSegImage, GetImageBase, 3, itkImage);
+  interpolateSurfaceFilter->SetReferenceImage(itkImage.GetPointer());
 
-  m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);
-
-  for (size_t i = 0; i < m_CurrentNumberOfReducedContours; ++i)
+  try
   {
-    mitk::Surface::Pointer reducedContour = m_ReduceFilter->GetOutput(i);
-    reducedContour->DisconnectPipeline();
-    m_NormalsFilter->SetInput(i, reducedContour);
-    m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
+    this->AddActiveLabelContoursForInterpolation(reduceFilter, segmentationImage, labelValue, timeStep);
+    reduceFilter->Update();
+    auto currentNumberOfReducedContours = reduceFilter->GetNumberOfOutputs();
+
+    if (currentNumberOfReducedContours < 2)
+    {
+      // If no interpolation is possible reset the interpolation result
+      MITK_INFO << "Interpolation impossible: not enough contours.";
+    }
+    else
+    {
+      normalsFilter->SetSegmentationBinaryImage(refSegImage);
+
+      for (size_t i = 0; i < currentNumberOfReducedContours; ++i)
+      {
+        mitk::Surface::Pointer reducedContour = reduceFilter->GetOutput(i);
+        reducedContour->DisconnectPipeline();
+        normalsFilter->SetInput(i, reducedContour);
+        interpolateSurfaceFilter->SetInput(i, normalsFilter->GetOutput(i));
+      }
+
+      // Setting up progress bar
+      mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
+
+      // create a surface from the distance-image
+      auto imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
+      imageToSurfaceFilter->SetInput(interpolateSurfaceFilter->GetOutput());
+      imageToSurfaceFilter->SetThreshold(0);
+      imageToSurfaceFilter->SetSmooth(true);
+      imageToSurfaceFilter->SetSmoothIteration(1);
+      imageToSurfaceFilter->Update();
+
+      interpolationResult = mitk::Surface::New();
+      interpolationResult->Expand(segmentationImage->GetTimeSteps());
+
+      auto geometry = segmentationImage->GetTimeGeometry()->Clone();
+      geometry->ReplaceTimeStepGeometries(mitk::Geometry3D::New());
+      interpolationResult->SetTimeGeometry(geometry);
+
+      interpolationResult->SetVtkPolyData(imageToSurfaceFilter->GetOutput()->GetVtkPolyData(), timeStep);
+      interpolationResult->DisconnectPipeline();
+
+      // Last progress step
+      mitk::ProgressBar::GetInstance()->Progress(20);
+
+    }
+  }
+  catch (const Exception& e)
+  {
+    MITK_ERROR << "Interpolation failed: " << e.what();
+    interpolationResult = nullptr;
   }
 
-  if (m_CurrentNumberOfReducedContours < 2)
-  {
-    // If no interpolation is possible reset the interpolation result
-    MITK_INFO << "Interpolation impossible: not enough contours.";
-    m_InterpolationResult = nullptr;
-    return;
-  }
-
-  // Setting up progress bar
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
-
-  // create a surface from the distance-image
-  mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
-  imageToSurfaceFilter->SetInput(m_InterpolateSurfaceFilter->GetOutput());
-  imageToSurfaceFilter->SetThreshold(0);
-  imageToSurfaceFilter->SetSmooth(true);
-  imageToSurfaceFilter->SetSmoothIteration(1);
-  imageToSurfaceFilter->Update();
-
-  mitk::Surface::Pointer interpolationResult = mitk::Surface::New();
-  interpolationResult->Expand(selectedSegmentation->GetTimeSteps());
-
-  auto geometry = selectedSegmentation->GetTimeGeometry()->Clone();
-  geometry->ReplaceTimeStepGeometries(mitk::Geometry3D::New());
-  interpolationResult->SetTimeGeometry(geometry);
-
-  interpolationResult->SetVtkPolyData(imageToSurfaceFilter->GetOutput()->GetVtkPolyData(), currentTimeStep);
-  m_InterpolationResult = interpolationResult;
-
-  m_DistanceImageSpacing = m_InterpolateSurfaceFilter->GetDistanceImageSpacing();
-
-  // Last progress step
-  mitk::ProgressBar::GetInstance()->Progress(20);
-  m_InterpolationResult->DisconnectPipeline();
+  return interpolationResult;
 }
 
 mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationResult()
 {
-  return m_InterpolationResult;
+  return nullptr;
 }
 
 void mitk::SurfaceInterpolationController::SetDataStorage(DataStorage::Pointer ds)
@@ -531,30 +531,14 @@ void mitk::SurfaceInterpolationController::SetDataStorage(DataStorage::Pointer d
   m_DataStorage = ds;
 }
 
-void mitk::SurfaceInterpolationController::SetMinSpacing(double minSpacing)
-{
-  m_ReduceFilter->SetMinSpacing(minSpacing);
-}
-
-void mitk::SurfaceInterpolationController::SetMaxSpacing(double maxSpacing)
-{
-  m_ReduceFilter->SetMaxSpacing(maxSpacing);
-  m_NormalsFilter->SetMaxSpacing(maxSpacing);
-}
-
 void mitk::SurfaceInterpolationController::SetDistanceImageVolume(unsigned int distImgVolume)
 {
-  m_InterpolateSurfaceFilter->SetDistanceImageVolume(distImgVolume);
+  m_DistanceImageVolume = distImgVolume;
 }
 
 mitk::LabelSetImage* mitk::SurfaceInterpolationController::GetCurrentSegmentation()
 {
   return m_SelectedSegmentation.Lock();
-}
-
-mitk::Image *mitk::SurfaceInterpolationController::GetInterpolationImage()
-{
-  return m_InterpolateSurfaceFilter->GetOutput();
 }
 
 unsigned int mitk::SurfaceInterpolationController::GetNumberOfInterpolationSessions()
@@ -596,13 +580,7 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
       selectedSegmentation->AddLabelRemovedListener(mitk::MessageDelegate1<SurfaceInterpolationController, mitk::LabelSetImage::LabelValueType>(
         this, &SurfaceInterpolationController::OnRemoveLabel));
     }
-
   }
-
-  m_InterpolationResult = nullptr;
-  m_CurrentNumberOfReducedContours = 0;
-  m_NormalsFilter->SetSegmentationBinaryImage(nullptr);
-  this->ReinitializeInterpolation();
 }
 
 void mitk::SurfaceInterpolationController::RemoveInterpolationSession(const mitk::LabelSetImage* segmentationImage)
@@ -706,39 +684,6 @@ void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Obje
   if (tempImage)
   {
     this->RemoveInterpolationSession(tempImage);
-  }
-}
-
-void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
-{
-  // If session has changed reset the pipeline
-  m_ReduceFilter->Reset();
-  m_NormalsFilter->Reset();
-  m_InterpolateSurfaceFilter->Reset();
-
-  itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
-
-  auto selectedSegmentation = m_SelectedSegmentation.Lock();
-
-  if (selectedSegmentation.IsNotNull())
-  {
-    if (!selectedSegmentation->GetTimeGeometry()->IsValidTimePoint(m_CurrentTimePoint))
-    {
-      MITK_WARN << "Interpolation cannot be reinitialized. Currently selected timepoint is not in the time bounds of the currently selected segmentation. Time point: " << m_CurrentTimePoint;
-      return;
-    }
-
-    const auto currentTimeStep = selectedSegmentation->GetTimeGeometry()->TimePointToTimeStep(m_CurrentTimePoint);
-
-    //  Set reference image for interpolation surface filter
-    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(selectedSegmentation);
-    timeSelector->SetTimeNr(currentTimeStep);
-    timeSelector->SetChannelNr(0);
-    timeSelector->Update();
-    mitk::Image::Pointer refSegImage = timeSelector->GetOutput();
-    AccessFixedDimensionByItk_1(refSegImage, GetImageBase, 3, itkImage);
-    m_InterpolateSurfaceFilter->SetReferenceImage(itkImage.GetPointer());
   }
 }
 

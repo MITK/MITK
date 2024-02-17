@@ -178,13 +178,14 @@ namespace mitk
      * @param workingImage the segmentation image
      * @param detectIntersection if true the slice is eroded before contour extraction. If the slice is empty after the
      * @param activeLabelValue The label value of the active label.
+     * @param silent Indicates if the modification event of the SurfaceInterpolationController should be triggered.
      * erosion it is most
      *        likely an intersecting contour an will not be added to the SurfaceInterpolationController
      */
     static void UpdateSurfaceInterpolation(const std::vector<SliceInformation>& sliceInfos,
       const Image* workingImage,
       bool detectIntersection,
-      mitk::Label::PixelType activeLabelValue);
+      mitk::Label::PixelType activeLabelValue, bool silent = false);
 
 
     /**

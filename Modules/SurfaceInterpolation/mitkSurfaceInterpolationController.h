@@ -33,7 +33,6 @@ namespace mitk
     mitkClassMacroItkParent(SurfaceInterpolationController, itk::Object);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
-    itkGetMacro(DistanceImageSpacing, double);
 
     struct MITKSURFACEINTERPOLATION_EXPORT ContourPositionInformation
     {
@@ -71,26 +70,11 @@ namespace mitk
 
     static SurfaceInterpolationController *GetInstance();
 
-    void SetCurrentTimePoint(TimePointType tp)
-    {
-      if (m_CurrentTimePoint != tp)
-      {
-        m_CurrentTimePoint = tp;
-
-        if (m_SelectedSegmentation)
-        {
-          this->ReinitializeInterpolation();
-        }
-      }
-    };
-
-    TimePointType GetCurrentTimePoint() const { return m_CurrentTimePoint; };
-
     /**
      * @brief Adds new extracted contours to the list. If one or more contours at a given position
      *        already exist they will be updated respectively
      */
-    void AddNewContours(const std::vector<ContourPositionInformation>& newCPIs, bool reinitializeAction = false);
+    void AddNewContours(const std::vector<ContourPositionInformation>& newCPIs, bool reinitializeAction = false, bool silent = false);
 
     /**
      * @brief Removes the contour for a given plane for the current selected segmenation
@@ -99,19 +83,13 @@ namespace mitk
      */
     bool RemoveContour(ContourPositionInformation contourInfo, bool keepPlaceholderForUndo = false);
 
-    /**
-     * @brief Resets the pipeline for interpolation. The various filters used are reset.
-     *
-     */
-    void ReinitializeInterpolation();
-
     void RemoveObservers();
 
     /**
      * @brief Performs the interpolation.
      *
      */
-    void Interpolate();
+    Surface::Pointer Interpolate(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep);
 
     /**
      * @brief Get the Result of the interpolation operation.
@@ -166,8 +144,6 @@ namespace mitk
      */
     void RemoveAllInterpolationSessions();
 
-    mitk::Image *GetInterpolationImage();
-
     /**
      * @brief Get the Contours at a certain timeStep and layerID.
      *
@@ -205,11 +181,6 @@ namespace mitk
      * @remark if the label or time step does not exist, nothing happens.
      */
     void RemoveContours(mitk::Label::PixelType label);
-
-    /**
-     * Adds Contours from the active Label to the interpolation pipeline
-     */
-    void AddActiveLabelContoursForInterpolation(mitk::Label::PixelType activeLabel);
 
     unsigned int GetNumberOfInterpolationSessions();
 
@@ -259,6 +230,11 @@ namespace mitk
     DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep) const;
 
     /**
+     * Adds Contours from the active Label to the interpolation pipeline
+     */
+    void AddActiveLabelContoursForInterpolation(ReduceContourSetFilter* reduceFilter, const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep);
+
+    /**
      * @brief Clears the interpolation data structures. Called from CompleteReinitialization().
      *
      */
@@ -274,21 +250,10 @@ namespace mitk
      */
     void AddToCPIMap(ContourPositionInformation& contourInfo, bool reinitializationAction = false);
 
-    itk::SmartPointer<ReduceContourSetFilter> m_ReduceFilter;
-    itk::SmartPointer<ComputeContourSetNormalsFilter> m_NormalsFilter;
-    itk::SmartPointer<CreateDistanceImageFromSurfaceFilter> m_InterpolateSurfaceFilter;
-
-    double m_DistanceImageSpacing;
-
+    unsigned int m_DistanceImageVolume;
     mitk::DataStorage::Pointer m_DataStorage;
 
-    mitk::Surface::Pointer m_InterpolationResult;
-
-    unsigned int m_CurrentNumberOfReducedContours;
-
     WeakPointer<LabelSetImage> m_SelectedSegmentation;
-
-    mitk::TimePointType m_CurrentTimePoint;
   };
 }
 

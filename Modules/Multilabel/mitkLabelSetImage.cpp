@@ -31,7 +31,6 @@ found in the LICENSE file.
 #include <itkQuadEdgeMesh.h>
 #include <itkTriangleMeshToBinaryImageFilter.h>
 #include <itkLabelGeometryImageFilter.h>
-//#include <itkRelabelComponentImageFilter.h>
 
 #include <itkCommand.h>
 

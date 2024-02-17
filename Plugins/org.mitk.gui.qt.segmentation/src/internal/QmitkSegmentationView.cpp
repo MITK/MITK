@@ -497,10 +497,9 @@ void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManage
   if (nullptr == segmentation->GetActiveLabel() || labelValue != segmentation->GetActiveLabel()->GetValue())
   {
     segmentation->SetActiveLabel(labelValue);
-    m_Controls->slicesInterpolator->SetActiveLabelValue(labelValue);
-
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+  m_Controls->slicesInterpolator->SetActiveLabelValue(labelValue);
 }
 
 void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType /*label*/, const mitk::Point3D& pos)
@@ -1041,6 +1040,11 @@ void QmitkSegmentationView::ValidateSelectionInput()
       m_Controls->slicesInterpolator->setEnabled(true);
 
     m_Controls->multiLabelWidget->SetMultiLabelSegmentation(dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData()));
+
+    if (!m_Controls->multiLabelWidget->GetSelectedLabels().empty())
+    {
+      m_Controls->slicesInterpolator->SetActiveLabelValue(m_Controls->multiLabelWidget->GetSelectedLabels().front());
+    }
   }
   else
   {

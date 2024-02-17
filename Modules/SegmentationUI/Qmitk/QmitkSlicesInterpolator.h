@@ -313,6 +313,7 @@ private:
 
   mitk::DataNode::Pointer m_FeedbackNode;
   mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
+  mitk::Surface::Pointer m_LastInterpolatedSurface;
 
   mitk::Image *m_Segmentation;
 
@@ -339,11 +340,8 @@ private:
   QFuture<void> m_PlaneFuture;
   QFutureWatcher<void> m_PlaneWatcher;
 
-  mitk::Label::PixelType m_PreviousActiveLabelValue;
   mitk::Label::PixelType m_CurrentActiveLabelValue;
 
-  unsigned int m_PreviousLayerIndex;
-  unsigned int m_CurrentLayerIndex;
   bool m_FirstRun;
 };
 

@@ -157,10 +157,6 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   m_BtnApply3D = new QPushButton("Confirm", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply3D);
 
-  // T28261
-  // m_BtnSuggestPlane = new QPushButton("Suggest a plane", m_GroupBoxEnableExclusiveInterpolationMode);
-  // vboxLayout->addWidget(m_BtnSuggestPlane);
-
   m_BtnReinit3DInterpolation = new QPushButton("Reinit Interpolation", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnReinit3DInterpolation);
 
@@ -475,9 +471,6 @@ void QmitkSlicesInterpolator::Show3DInterpolationControls(bool show)
 {
   m_BtnApply3D->setVisible(show);
 
-  // T28261
-  // m_BtnSuggestPlane->setVisible(show);
-
   m_ChkShowPositionNodes->setVisible(show);
   m_BtnReinit3DInterpolation->setVisible(show);
 }
@@ -734,13 +727,6 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 {
   mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
 
-  mitk::PlaneGeometry::Pointer slicingPlane = mitk::PlaneGeometry::New();
-  mitk::Vector3D slicingPlaneNormalVector;
-  FillVector3D(slicingPlaneNormalVector,0.0,1.0,0.0);
-  mitk::Point3D origin;
-  FillVector3D(origin, 0.0, 0.0, 0.0);
-  slicingPlane->InitializePlane(origin, slicingPlaneNormalVector);
-
   if (workingNode && workingNode->GetData())
   {
     const auto segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -754,10 +740,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
     if (interpolatedSurface.IsNotNull())
     {
-      m_BtnApply3D->setEnabled(true);
-
-      // T28261
-      // m_BtnSuggestPlane->setEnabled(true);
+      m_BtnApply3D->setEnabled(true);;
 
       m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
       this->Show3DInterpolationResult(true);
@@ -770,9 +753,6 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
     else
     {
       m_BtnApply3D->setEnabled(false);
-
-      // T28261
-      // m_BtnSuggestPlane->setEnabled(false);
 
       if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
       {

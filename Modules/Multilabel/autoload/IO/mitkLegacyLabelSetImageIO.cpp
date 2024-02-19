@@ -111,7 +111,7 @@ namespace mitk
 
         label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem);
 
-        if (label->GetValue() != mitk::LabelSetImage::UnlabeledValue)
+        if (label->GetValue() != mitk::LabelSetImage::UNLABELED_VALUE)
         {
           labelSet.push_back(label);
         }
@@ -177,7 +177,7 @@ namespace mitk
     }
     else
     { //Avoid label id collision.
-      LabelSetImage::LabelValueType maxValue = LabelSetImage::UnlabeledValue;
+      LabelSetImage::LabelValueType maxValue = LabelSetImage::UNLABELED_VALUE;
       auto imageIterator = groupImages.begin();
       std::vector<mitk::LabelSetImage::LabelVectorType> adaptedLabelSets;
 
@@ -191,18 +191,18 @@ namespace mitk
         { //have to use reverse loop because TransferLabelContent (used to adapt content in the same image; see below)
           //would potentially corrupt otherwise the content due to "value collision between old values still present
           //and already adapted values. By going from highest value to lowest, we avoid that.
-          if (LabelSetImage::UnlabeledValue != *vIter)
+          if (LabelSetImage::UNLABELED_VALUE != *vIter)
             labelMapping.push_back({*vIter, *vIter + maxValue});
         }
 
-        if (LabelSetImage::UnlabeledValue != maxValue)
+        if (LabelSetImage::UNLABELED_VALUE != maxValue)
         {
           //adapt labelset
           auto mappedLabelSet = GenerateLabelSetWithMappedValues(LabelSetImage::ConvertLabelVectorConst(labelset), labelMapping);
           adaptedLabelSets.emplace_back(mappedLabelSet);
 
           //adapt image (it is an inplace operation. the image instance stays the same.
-          TransferLabelContent(*imageIterator, *imageIterator, LabelSetImage::ConvertLabelVectorConst(mappedLabelSet), LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue,
+          TransferLabelContent(*imageIterator, *imageIterator, LabelSetImage::ConvertLabelVectorConst(mappedLabelSet), LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE,
             false, labelMapping, MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
         }
         else

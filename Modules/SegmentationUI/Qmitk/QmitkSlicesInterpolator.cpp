@@ -799,9 +799,9 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     segmentationImage->GetConstLabelsByValue(segmentationImage->GetLabelValuesByGroup(segmentationImage->GetActiveLayer())),
     timeStep,
     0,
-    mitk::LabelSetImage::UnlabeledValue,
+    mitk::LabelSetImage::UNLABELED_VALUE,
     false,
-    { {0, mitk::LabelSetImage::UnlabeledValue}, {1, activeValue} }
+    { {0, mitk::LabelSetImage::UNLABELED_VALUE}, {1, activeValue} }
   );
 
   mitk::SegTool2D::WriteBackSegmentationResult(workingNode, planeGeometry, interpolatedSlice, timeStep);

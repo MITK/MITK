@@ -126,7 +126,7 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
     activeLabelClone->SetLocked(false);
   }
 
-  TransferLabelContentAtTimeStep(fillImage, workingSlice, { activeLabelClone }, 0, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false, { {1, m_FillLabelValue} }, m_MergeStyle);
+  TransferLabelContentAtTimeStep(fillImage, workingSlice, { activeLabelClone }, 0, LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false, { {1, m_FillLabelValue} }, m_MergeStyle);
 
   this->WriteBackSegmentationResult(positionEvent, workingSlice);
 

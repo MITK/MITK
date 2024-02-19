@@ -719,8 +719,8 @@ void mitk::SegWithPreviewTool::TransferLabelInformation(const LabelMappingType& 
 {
   for (const auto& [sourceLabel, targetLabel] : labelMapping)
   {
-    if (LabelSetImage::UnlabeledValue != sourceLabel &&
-        LabelSetImage::UnlabeledValue != targetLabel &&
+    if (LabelSetImage::UNLABELED_VALUE != sourceLabel &&
+        LabelSetImage::UNLABELED_VALUE != targetLabel &&
         !target->ExistLabel(targetLabel, target->GetActiveLayer()))
     {
       if (!source->ExistLabel(sourceLabel, source->GetActiveLayer()))

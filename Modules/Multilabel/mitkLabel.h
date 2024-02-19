@@ -39,6 +39,9 @@ namespace mitk
     /// The maximum value a label can get: Since the value is of type unsigned short MAX_LABEL_VALUE = 65535
     static const PixelType MAX_LABEL_VALUE;
 
+    //** Value indicating pixels that are not labeled at all.*/
+    const static PixelType UNLABELED_VALUE = 0;
+
     void SetLocked(bool locked);
     bool GetLocked() const;
 

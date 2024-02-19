@@ -228,7 +228,7 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
       AccessByItk(slice2, ClearBufferProcessing);
       LabelSetImage::LabelValueType erodeValue = 1;
       auto label = Label::New(erodeValue, "");
-      TransferLabelContent(sliceInfo.slice, slice2, { label }, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false, { {activeLabelValue, erodeValue} });
+      TransferLabelContent(sliceInfo.slice, slice2, { label }, LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false, { {activeLabelValue, erodeValue} });
       //Workarround ends
 
       mitk::MorphologicalOperations::Erode(slice2, 2, mitk::MorphologicalOperations::Ball);

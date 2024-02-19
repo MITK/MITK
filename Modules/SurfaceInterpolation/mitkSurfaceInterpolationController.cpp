@@ -375,8 +375,6 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
 
 void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolation(ReduceContourSetFilter* reduceFilter, const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep)
 {
-  std::shared_lock<std::shared_mutex> guard(cpiMutex);
-
   const auto& currentImageContours = cpiMap.at(segmentationImage);
 
   auto finding = currentImageContours.find(labelValue);
@@ -458,6 +456,7 @@ void mitk::SurfaceInterpolationController::Interpolate(const LabelSetImage* segm
     mitkThrow() << "Cannot interpolate contours. No valid segmentation passed.";
   }
 
+  std::lock_guard<std::shared_mutex> guard(cpiMutex);
   auto it = cpiMap.find(segmentationImage);
   if (it == cpiMap.end())
   {
@@ -582,6 +581,8 @@ mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationRes
   {
     mitkThrow() << "Cannot interpolate contours. No valid segmentation passed.";
   }
+
+  std::shared_lock<std::shared_mutex> guard(cpiMutex);
 
   if (cpiMap.find(segmentationImage) == cpiMap.end())
   {

@@ -642,7 +642,14 @@ const mitk::Label* mitk::LabelSetImage::GetActiveLabel() const
 
 void mitk::LabelSetImage::UpdateCenterOfMass(PixelType pixelValue)
 {
-  this->UpdateCenterOfMass(pixelValue, this->GetGroupIndexOfLabel(pixelValue));
+  if (4 == this->GetDimension())
+  {
+    AccessFixedDimensionByItk_1(this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue)), CalculateCenterOfMassProcessing, 4, pixelValue);
+  }
+  else
+  {
+    AccessByItk_1(this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue)), CalculateCenterOfMassProcessing, pixelValue);
+  }
 }
 
 void mitk::LabelSetImage::SetLookupTable(mitk::LookupTable* lut)
@@ -665,18 +672,6 @@ void mitk::LabelSetImage::UpdateLookupTable(PixelType pixelValue)
   else
     rgba[3] = 0.0;
   m_LookupTable->SetTableValue(static_cast<int>(pixelValue), rgba);
-}
-
-void mitk::LabelSetImage::UpdateCenterOfMass(PixelType pixelValue, unsigned int layer)
-{
-  if (4 == this->GetDimension())
-  {
-    AccessFixedDimensionByItk_1(this, CalculateCenterOfMassProcessing, 4, pixelValue);
-  }
-  else
-  {
-    AccessByItk_1(this, CalculateCenterOfMassProcessing, pixelValue);
-  }
 }
 
 unsigned int mitk::LabelSetImage::GetNumberOfLabels(unsigned int layer) const

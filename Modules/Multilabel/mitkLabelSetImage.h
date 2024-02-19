@@ -427,10 +427,6 @@ namespace mitk
     void MergeLabels(PixelType pixelValue, const std::vector<PixelType>& vectorOfSourcePixelValues, unsigned int layer = 0);
 
     /**
-      * \brief  */
-    void UpdateCenterOfMass(PixelType pixelValue, unsigned int layer);
-
-    /**
      * @brief Erases the label with the given value from the labelset image.
      *        The label itself will not be erased from the respective mitk::LabelSet. In order to
      *        remove the label itself use mitk::LabelSetImage::RemoveLabels()

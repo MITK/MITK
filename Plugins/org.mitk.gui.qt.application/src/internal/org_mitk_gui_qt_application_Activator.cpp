@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include "QmitkGeneralPreferencePage.h"
 #include "QmitkEditorsPreferencePage.h"
+#include "QmitkToolBarsPreferencePage.h"
 
 #include <QmitkRegisterClasses.h>
 
@@ -33,6 +34,7 @@ namespace mitk
 
     BERRY_REGISTER_EXTENSION_CLASS(QmitkGeneralPreferencePage, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkEditorsPreferencePage, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkToolBarsPreferencePage, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkShowPreferencePageHandler, context)
 
     QmitkRegisterClasses();

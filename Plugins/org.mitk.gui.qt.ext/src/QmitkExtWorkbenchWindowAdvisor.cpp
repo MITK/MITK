@@ -57,6 +57,7 @@ found in the LICENSE file.
 #include <QmitkOpenDicomEditorAction.h>
 #include <QmitkOpenMxNMultiWidgetEditorAction.h>
 #include <QmitkOpenStdMultiWidgetEditorAction.h>
+#include <QmitkApplicationConstants.h>
 
 #include <itkConfigure.h>
 #include <mitkVersion.h>
@@ -847,8 +848,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   if (showViewToolbar)
   {
     auto* prefService = mitk::CoreServices::GetPreferencesService();
+
     auto* stylePrefs = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
     bool showCategoryNames = stylePrefs->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true);
+
+    auto* toolBarsPrefs = prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
 
     // Order view descriptors by category
 
@@ -873,8 +877,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       if (!viewDescriptorsInCurrentCategory.isEmpty())
       {
         auto toolbar = new QToolBar;
-        toolbar->setObjectName(category + " View Toolbar");
+        toolbar->setObjectName(category);
         mainWindow->addToolBar(toolbar);
+
+        toolbar->setVisible(toolBarsPrefs->GetBool(category.toStdString(), true));
 
         if (showCategoryNames && !category.isEmpty())
         {
@@ -904,6 +910,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
           auto viewAction = new berry::QtShowViewAction(window, viewDescriptor);
           toolbar->addAction(viewAction);
         }
+
+
       }
     }
   }

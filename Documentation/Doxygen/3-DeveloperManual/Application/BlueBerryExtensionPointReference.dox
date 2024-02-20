@@ -95,12 +95,12 @@ Otherwise \c EvaluationResult.FALSE is returned.
 \endcode
 
 This element is used to evaluate the property state of the object in focus.
-The set of testable properties can be extended using the propery tester extension point.
+The set of testable properties can be extended using the property tester extension point.
 The test expression returns \c EvaluationResult.NOT_LOADED if the property tester doing the actual testing isn't loaded yet and the attribute \c forcePluginActivation is set to \c false.
 If \c forcePluginActivation is set to \c true and the evaluation context used to evaluate this expression support plug-in activation then evaluating the property will result in activating the plug-in defining the tester.
 
 - <tt>property</tt>: The name of an object's property to test.
-- <tt>args</tt>: Additional arguments passed to the property tester. Multiple arguments are seperated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
+- <tt>args</tt>: Additional arguments passed to the property tester. Multiple arguments are separated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
 - <tt>value</tt>: The expected value of the property. Can be omitted if the property is a boolean property. The test expression is supposed to return \c EvaluationResult.TRUE if the property matches the value and \c EvaluationResult.FALSE otherwise. The value attribute is converted into a Java base type using the following rules:
  - The string \c "true" is converted into \c Boolean.TRUE .
  - The string \c "false" is converted into \c Boolean.FALSE .
@@ -173,7 +173,7 @@ If the variable can not be resolved then the expression will throw an \c Express
 The children of a with expression are combined using the and operator.
 
 - <tt>variable</tt>: The name of the variable to be resolved. This variable is then used as the object in focus for child element evaluation. It is up to the evaluator of an extension point to provide a corresponding variable resolver (see berry::IVariableResolver) through the evaluation context passed to the root expression element when evaluating the expression.
-- <tt>args</tt>: Additional arguments passed to the variable resolver. Multiple arguments are seperated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
+- <tt>args</tt>: Additional arguments passed to the variable resolver. Multiple arguments are separated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
 
 \code{.unparsed}
 <!ELEMENT adapt (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
@@ -299,12 +299,12 @@ Otherwise \c EvaluationResult.FALSE is returned.
 \endcode
 
 This element is used to evaluate the property state of the object in focus.
-The set of testable properties can be extended using the propery tester extension point.
+The set of testable properties can be extended using the property tester extension point.
 The test expression returns \c EvaluationResult.NOT_LOADED if the property tester doing the actual testing isn't loaded yet and the attribute \c forcePluginActivation is set to false.
 If \c forcePluginActivation is set to \c true and the evaluation context used to evaluate this expression support plug-in activation then evaluating the property will result in activating the plug-in defining the tester.
 
 - <tt>property</tt>: The name of an object's property to test.
-- <tt>args</tt>: Additional arguments passed to the property tester. Multiple arguments are seperated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
+- <tt>args</tt>: Additional arguments passed to the property tester. Multiple arguments are separated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
 - <tt>value</tt>: The expected value of the property. Can be omitted if the property is a boolean property. The test expression is supposed to return EvaluationResult.TRUE if the property matches the value and EvaluationResult.FALSE otherwise. The value attribute is converted into a Java base type using the following rules:
  - The string "true" is converted into \c Boolean.TRUE
  - The string "false" is converted into \c Boolean.FALSE
@@ -377,7 +377,7 @@ If the variable can not be resolved then the expression will throw an \c Express
 The children of a with expression are combined using the and operator.
 
 - <tt>variable</tt>: The name of the variable to be resolved. This variable is then used as the object in focus for child element evaluation. It is up to the evaluator of an extension point to provide a corresponding variable resolver (see berry::IVariableResolver) through the evaluation context passed to the root expression element when evaluating the expression.
-- <tt>args</tt>: Additional arguments passed to the variable resolver. Multiple arguments are seperated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
+- <tt>args</tt>: Additional arguments passed to the variable resolver. Multiple arguments are separated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
 
 \code{.unparsed}
 <!ELEMENT adapt (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
@@ -1130,7 +1130,7 @@ Contribute services to the workbench.
   factoryClass CDATA #REQUIRED>
 \endcode
 
-Match a service interface to a factory that can supply a hierachical implementation of that service.
+Match a service interface to a factory that can supply a hierarchical implementation of that service.
 
 - <tt>factoryClass</tt>: The factory that extends \c AbstractServiceFactory and can create the implementation for the \c serviceClass.
 
@@ -1310,12 +1310,12 @@ An optional subelement whose body should contain text providing a short descript
 A sticky view is a view that will appear by default across all perspectives in a window once it is opened.
 Its initial placement is governemed by the location attribute, but nothing prevents it from being moved or closed by the user.
 Use of this element will only cause a placeholder for the view to be created, it will not show the view.
-Please note that usage of this element should be done with great care and should only be applied to views that truely have a need to live across perspectives.
+Please note that usage of this element should be done with great care and should only be applied to views that truly have a need to live across perspectives.
 
 - <tt>id</tt>: the id of the view to be made sticky.
 - <tt>location</tt>: optional attribute that specifies the location of the sticky view relative to the editor area. If absent, the view will be docked to the right of the editor area.
-- <tt>closeable</tt>: optional attribute that specifies wether the view should be closeable. If absent it will be closeable.
-- <tt>moveable</tt>: optional attribute that specifies wether the view should be moveable. If absent it will be moveable.
+- <tt>closeable</tt>: optional attribute that specifies whether the view should be closeable. If absent it will be closeable.
+- <tt>moveable</tt>: optional attribute that specifies whether the view should be moveable. If absent it will be moveable.
 
 \subsection BlueBerryExtPointsIndex_Workbench_Views_Examples Examples
 

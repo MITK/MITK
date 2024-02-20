@@ -1194,7 +1194,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
 
   // If another window that has the workspace root as input and the
   // requested
-  // perpective open and active, then the window is given focus.
+  // perspective open and active, then the window is given focus.
   IAdaptable* input = GetDefaultPageInput();
   QList<IWorkbenchWindow::Pointer> windows(GetWorkbenchWindows());
   for (int i = 0; i < windows.size(); i++)
@@ -1326,7 +1326,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
   //    }
   //
   //    // If another window has the requested input and the requested
-  //    // perpective open and active, then that window is given focus.
+  //    // perspective open and active, then that window is given focus.
   //    IWorkbenchWindow[] windows = getWorkbenchWindows();
   //    for (int i = 0; i < windows.length; i++) {
   //      win = (WorkbenchWindow) windows[i];

@@ -13,7 +13,7 @@ In the real world, a pipeline connects a source of some kind with a consumer of 
 2. The pipeline, which transports the data. Many different pipeline segments can be switched in line to achieve this.
 3. The consumer, which uses the data to do something of interest.
 
-The analogy to real pipelines falls a little short in one point: A physical pipeline would never process it's contents, while in software development a pipeline usually does (this is why they are often dubbed filters as well). One might ask why one shouldn't just implement the processing logic in the consumer onject itself, since it onviously knows best what to do with it's data. The two main reasons for this are reusability and flexibility. Say, one wants to display a bone segmentation from a CT-image. Let's also assume for the sake of this introduction, that this is a simple task. One could build a monolithic class that solves the problem. Or one builds a pipeline between the displaying class and the source. We know that bones are very bright in a CT Scan, so we use a treshold filter, and then a segmentation Filter to solve the problem.
+The analogy to real pipelines falls a little short in one point: A physical pipeline would never process it's contents, while in software development a pipeline usually does (this is why they are often dubbed filters as well). One might ask why one shouldn't just implement the processing logic in the consumer onject itself, since it onviously knows best what to do with it's data. The two main reasons for this are reusability and flexibility. Say, one wants to display a bone segmentation from a CT-image. Let's also assume for the sake of this introduction, that this is a simple task. One could build a monolithic class that solves the problem. Or one builds a pipeline between the displaying class and the source. We know that bones are very bright in a CT Scan, so we use a threshold filter, and then a segmentation Filter to solve the problem.
 
 \imageMacro{pipelining_example_ct.png,"",10}
 
@@ -38,7 +38,7 @@ The flow of data inside a pipeline is triggered by only one function call to the
 
 \subsection PipelineingConceptPage_Hierarchy     The Pipeline Hierarchy
 
-Tha base class for all parts of the pipeline except the consumer (which can be of any class) is mitk::Baseprocess. This class introduces the ability to process data, has an output and may have an input as well. You will however rarly work with this class directly.
+The base class for all parts of the pipeline except the consumer (which can be of any class) is mitk::Baseprocess. This class introduces the ability to process data, has an output and may have an input as well. You will however rarly work with this class directly.
 
 \imageMacro{pipelining_hierarchy.png,"",16}
 
@@ -57,7 +57,7 @@ The filters themselves extend one of the source classes. This may not immediatel
     TestUSFilter::Pointer filter = TestUSFilter::New();
     // Make Videodevice produce it's first set of Data, so it's output isn't empty
     videoDevice->Update();
-    // attacht filter input to device output
+    // attach filter input to device output
     filter->SetInput(videoDevice->GetOutput());
     // Pipeline is now functional
     filter->Update();
@@ -79,7 +79,7 @@ mitk::Image::Pointer newOutput = mitk::Image::New();
 this->SetNthOutput(0, newOutput);
 \endverbatim
 
-- Implement MakeOutput(). This Method creats a new, clean Output that can be written to. Refer to Filters with similiar task for this.
+- Implement MakeOutput(). This Method creates a new, clean Output that can be written to. Refer to Filters with similar task for this.
 - Implement GenerateData(). This Method will generate the output based on the input it. At time of execution you can assume that the Data in input is a new set.
 
 */

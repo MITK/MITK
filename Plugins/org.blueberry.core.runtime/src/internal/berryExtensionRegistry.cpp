@@ -903,7 +903,7 @@ ExtensionRegistry::~ExtensionRegistry()
 
 void ExtensionRegistry::Stop(QObject* /*key*/)
 {
-  // If the registry creator specified a key token, check that the key mathches it
+  // If the registry creator specified a key token, check that the key matches it
   // (it is assumed that registry owner keeps the key to prevent unautorized access).
   if (masterToken != nullptr && masterToken != nullptr)
   {

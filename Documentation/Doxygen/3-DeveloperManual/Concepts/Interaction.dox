@@ -46,7 +46,7 @@ Event 1 is sent to the state machine. This leads the current state from state 1 
 
 \subsection InteractionPage_XMLDefinitionStatemachine Definition of a State machine
 Due to the separation of the definition of an interaction sequence and its implementation, the definition has to be archived somewhere, where the application can reach it during startup and build up all the objects (states, transitions and actions) that represent the sequence of a special interaction.
-In MITK, these informations are defined in an XML-file (i.e. DisplayInteraction.xml or BoundingShapeInteraction.xml)
+In MITK, this information is defined in an XML-file (i.e. DisplayInteraction.xml or BoundingShapeInteraction.xml)
 \note Please note that since this is a resource which is compiled into the executable, changes you make to this file will only be reflected in application behavior after you recompile your code.
 
 The structure is the following (from \ref InteractionPage_ExampleA) :
@@ -73,7 +73,7 @@ The structure is the following (from \ref InteractionPage_ExampleA) :
 \endcode
 
 The identification numbers (ID) inside a state machine have to be unique. Each state machine has to have one state, that is defined as the start-state of that state machine. This means, initially, the current state of the state machine is the start-state. 
-The Event-Ids seen above are also defined in the statemachine.xml file. They specify a unique number for a combination of input-conditions (key, mouse and so on). See \ref InteractionPage_InteractionEvents for further informations.
+The Event-Ids seen above are also defined in the statemachine.xml file. They specify a unique number for a combination of input-conditions (key, mouse and so on). See \ref InteractionPage_InteractionEvents for further information.
 
 The statemachine is compiled into an application at compile time.
 The definition of one single state machine is called the \a statemachine-pattern. Since this pattern is build up during startup with objects (states, transitions and actions) and these objects only hold information about what interaction may be done at the current state, we can also reuse the pattern. 
@@ -111,7 +111,7 @@ See mitk::Interactor
 
 \subsection InteractionPage_ExecOperations Executing Operations
 The class mitkOperation and its subclasses basically holds all information needed to execute a certain change of data.
-This change of data is only done inside the data-class itself, which is derived from the interface \a mitkOperationActor. Interactors handle the interaction through state-differentiation and combine all informations about the change in a \a mitkOperation and send this operation-object to the method ExecuteOperation (of data-class). Here the necessary data is extracted and then the change of data is performed. 
+This change of data is only done inside the data-class itself, which is derived from the interface \a mitkOperationActor. Interactors handle the interaction through state-differentiation and combine all information about the change in a \a mitkOperation and send this operation-object to the method ExecuteOperation (of data-class). Here the necessary data is extracted and then the change of data is performed. 
 
 When the operation-object, here called do-operation, is created inside the method \a ExecuteAction (in class \a mitkInteractor), an undo-operation is also created and together with the do-operation stored in an object called \a OperationEvent. After the Interactor has sent the do-operation to the data, the operation-event-object then is sent to the instance of class \a mitkUndoController, which administrates the undo-mechanism.
 

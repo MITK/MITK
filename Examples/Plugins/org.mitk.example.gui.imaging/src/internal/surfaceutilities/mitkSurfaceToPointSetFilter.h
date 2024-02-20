@@ -22,7 +22,7 @@ namespace mitk
   /** Documentation
    *  @brief This filter converts the input surface into a point set. The output point set contains every point exactly
    * one time
-   *         (no dublicated points like in the stl-format).
+   *         (no duplicated points like in the stl-format).
    */
 
   class SurfaceToPointSetFilter : public mitk::PointSetSource

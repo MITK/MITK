@@ -75,7 +75,7 @@ Follow these steps to implement a new Reader:
 
 A) Create a new cpp and h file in an appropriate submodule. Usually, a reader or writer should be located in the same module as the BaseData derivate it reads/writes.
 
-B) Extend AbstractFileReader . This is highly recommended because it enables integration of your Reader into the Registery. It will then automatically be used by the application to load this type of files.
+B) Extend AbstractFileReader . This is highly recommended because it enables integration of your Reader into the Registry. It will then automatically be used by the application to load this type of files.
 
 C) Provide a constructor . It should contain a minimal amount of information and might look like this:
 

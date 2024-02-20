@@ -51,7 +51,7 @@ endfunction()
 #
 # mitkFunctionFindWhitelists
 #
-#! Adds all whitelists found in specfied whitelist paths to the advanced cache
+#! Adds all whitelists found in specified whitelist paths to the advanced cache
 #! variable <prefix>_WHITELIST as enumeration entries.
 #!
 #! USAGE:

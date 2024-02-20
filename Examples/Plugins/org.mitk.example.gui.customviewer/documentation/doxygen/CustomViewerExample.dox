@@ -149,7 +149,7 @@ For our purposes, we want to place the QtPerspectiveSwitcherTabBar and the View-
 \skip for correct initial layout
 \until this->GetWindowConfigurer
 
-The OpenFile-Button and the QtPerspectiveSwitcherTabBar will be laid out together in a HBoxLayout called PerspectivesLayer. The PerspectivesLayer will be vertically arranged with the PageComposite widget in a VBoxLayout called CentralWidgetLayout. This CentralWidgetLayout will be assigned a QWidget being set the CentralWidget of our MainWindow. Caveat: we need to call the activate- and update-Methods of our CentralWidgetLayout; otherweise the widgets will not be laid out properly. See Bug-1654 for further details. See our bulk custom viewer application depicted below.
+The OpenFile-Button and the QtPerspectiveSwitcherTabBar will be laid out together in a HBoxLayout called PerspectivesLayer. The PerspectivesLayer will be vertically arranged with the PageComposite widget in a VBoxLayout called CentralWidgetLayout. This CentralWidgetLayout will be assigned a QWidget being set the CentralWidget of our MainWindow. Caveat: we need to call the activate- and update-Methods of our CentralWidgetLayout; otherwise the widgets will not be laid out properly. See Bug-1654 for further details. See our bulk custom viewer application depicted below.
 
 \imageMacro{BulkApplicationWindow.png,"Our bulk application showing two empty perspectives managed with a tab-bar based perspectives bar",16.00}
 
@@ -243,7 +243,7 @@ In it, a dialog is opened that asks for the user for a number of files to open. 
 
 \snippet CustomViewerWorkbenchWindowAdvisor.cpp WorkbenchWindowAdvisorOpenFilePerspActive
 
-Before we can examine the loaded data, we have to manually invoke a reinit on it. The render window concept in mitk is actually undergoing some work, where this inconvenience will also be adressed. The images below show the resulting file opening functionality.
+Before we can examine the loaded data, we have to manually invoke a reinit on it. The render window concept in mitk is actually undergoing some work, where this inconvenience will also be addressed. The images below show the resulting file opening functionality.
 
 \imageMacro{OpenFileDialog.png,"The open file dialog",16.00}
 \imageMacro{FileOpened.png,"Opened file shown in the render window view",16.00}
@@ -261,12 +261,12 @@ In a final step, we want to further customize the appearance of our mainWindow t
 <LI> DICOM Import functionality </LI>
 </UL>
 
-For GUI customization, we will modify the Qt-Stylesheets files already used by blueberry applications. Within the Qt-Stylesheet-Files, all widgets can globally and locally be adressed inside the main window for style changes. We have to adress the berry::IQtStyleManager to tell the BlueBerry workbench to use a specific Qt-Stylesheet. This is done inside the WorkbenchAdvisor in the CustomViewerWorkbenchAdvisor::Initialize() method:
+For GUI customization, we will modify the Qt-Stylesheets files already used by blueberry applications. Within the Qt-Stylesheet-Files, all widgets can globally and locally be addressed inside the main window for style changes. We have to address the berry::IQtStyleManager to tell the BlueBerry workbench to use a specific Qt-Stylesheet. This is done inside the WorkbenchAdvisor in the CustomViewerWorkbenchAdvisor::Initialize() method:
 
 \snippet CustomViewerWorkbenchAdvisor.cpp WorkbenchAdvisorInit
 
 The style manager is taken from the application's plugin context via service reference. Invoking the berry::IQtStyleManager::AddStyle() and berry::IQtStyleManager::SetStyle() methods, the workbench will now use the announced qss-File to style our Workbench Window. In a production system, the stylesheets are usually compiled into the plug-in or application using the Qt resource system.
-However, during developement of the stylesheets it is often more convenient to reference them using a hard-coded path to the local file system (see live update functionality below).
+However, during development of the stylesheets it is often more convenient to reference them using a hard-coded path to the local file system (see live update functionality below).
 
 Before we start customization we will first provide some customization convenience. We add an UpdateStyle()-slot to our CustomViewerWorkbenchWindowAdvisor where we explicitly reset the css-File to the style manager:
 

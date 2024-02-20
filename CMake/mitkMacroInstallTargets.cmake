@@ -1,5 +1,5 @@
 #
-# MITK specific cross plattform install macro
+# MITK specific cross platform install macro
 #
 # Usage: MITK_INSTALL_TARGETS(target1 [target2] ....)
 #

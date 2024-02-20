@@ -10,7 +10,7 @@ function(mitkFunctionOrganizeSources)
   # are later accessed by the keyword foreach(MYFILE ${ARGV})
 
   # output: after calling the macro, files that were found
-  # correspondigly to the given files are stored in the
+  # correspondingly to the given files are stored in the
   # variable:
   # ${CORRESPONDING_H_FILES}
   # ${CORRESPONDING_TXX_FILES}

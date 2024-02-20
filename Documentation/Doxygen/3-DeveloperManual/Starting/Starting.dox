@@ -4,7 +4,7 @@
 
 This introduction will acquaint you with the most important workflows to get you started with your MITK development.
 First, \ref Architecture will explain the differences between the application and the toolkit.
-\ref SettingUpMITK will get you started with a working environment for MITK development. \ref GettingToKnowMITK will walk you trough the folder structure, the module system, and plugin system. This chapter also contains an extensive tutorial on how to work with MITK.
+\ref SettingUpMITK will get you started with a working environment for MITK development. \ref GettingToKnowMITK will walk you through the folder structure, the module system, and plugin system. This chapter also contains an extensive tutorial on how to work with MITK.
 The \ref FirstSteps section will then show you how to extend MITK for your own project.
 
 <ul>

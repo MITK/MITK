@@ -51,7 +51,7 @@ MyAccessMethod(itk::Image<TPixel, VImageDimension>* itkImage)
 If you don't understand this template syntax, you should read any C++ text book. Understanding template syntax is crucial to successfully using ITK.
 
 To call this templated method with an (untemplated) mitk::Image, you can use the AccessByItk macro from mitkImageAccessByItk.h. This macro checks for
-the actual image type of the mitk::Image and does any neccessary conversions. Look into "Modules / Adaptor classes" for more information.
+the actual image type of the mitk::Image and does any necessary conversions. Look into "Modules / Adaptor classes" for more information.
 
 \code
 AccessByItk(mitkImage, MyAccessMethod)

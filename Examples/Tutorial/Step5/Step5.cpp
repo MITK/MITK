@@ -42,7 +42,7 @@ found in the LICENSE file.
 //## on which the interactor reacts (e.g., which mouse buttons are used to
 //## set a point), the @em transition to the next state (e.g., the initial
 //## may be "empty point set") and associated @a actions (e.g., add a point
-//## at the position where the mouse-click occured).
+//## at the position where the mouse-click occurred).
 int main(int argc, char *argv[])
 {
   QApplication qtapplication(argc, argv);

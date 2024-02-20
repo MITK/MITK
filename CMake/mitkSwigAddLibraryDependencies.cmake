@@ -20,7 +20,7 @@ function(mitkSwigAddLibraryDependencies swig_module library_names)
         get_property(LIBRARY_INCLUDES
                      TARGET ${library_name}
                      PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
-        # Checking each given librarie to include all includes from this library.
+        # Checking each given library to include all includes from this library.
 
     endforeach()
 

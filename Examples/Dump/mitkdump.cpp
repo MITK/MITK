@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
   }
 
   mitk::DICOMFileReaderSelector::Pointer configSelector = mitk::DICOMFileReaderSelector::New();
-  configSelector->LoadBuiltIn3DConfigs(); // a set of compiled in ressources with standard configurations that work well
+  configSelector->LoadBuiltIn3DConfigs(); // a set of compiled in resources with standard configurations that work well
   configSelector->SetInputFiles(inputFiles);
   mitk::DICOMFileReader::Pointer reader = configSelector->GetFirstReaderWithMinimumNumberOfOutputImages();
   if (reader.IsNull())

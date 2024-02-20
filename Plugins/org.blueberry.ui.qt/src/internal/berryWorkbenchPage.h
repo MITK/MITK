@@ -1248,7 +1248,7 @@ protected:
   QList<SmartPointer<Perspective> > GetOpenInternalPerspectives();
 
   /**
-   * Checks perspectives in the order they were activiated
+   * Checks perspectives in the order they were activated
    * for the specified part.  The first sorted perspective
    * that contains the specified part is returned.
    *

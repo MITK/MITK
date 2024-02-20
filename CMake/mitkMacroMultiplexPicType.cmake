@@ -4,7 +4,7 @@
 # instantiation
 #
 # Param "file" should be named like mitkMyAlgo-TYPE.cpp
-# in the file, every occurence of @TYPE@ is replaced by the
+# in the file, every occurrence of @TYPE@ is replaced by the
 # datatype. For each datatype, a new file mitkMyAlgo-datatype.cpp
 # is generated and added to CPP_FILES_GENERATED.
 #

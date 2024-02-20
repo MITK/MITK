@@ -1,7 +1,7 @@
 /**
 \page PluginListPage MITK Plugin Manuals
 
-The plugins and bundles provide much of the extended functionality of MITK. Each encapsulates a solution to a problem and associated features. This way one can easily assemble the necessary capabilites for a workflow without adding a lot of bloat, by combining plugins as needed.
+The plugins and bundles provide much of the extended functionality of MITK. Each encapsulates a solution to a problem and associated features. This way one can easily assemble the necessary capabilities for a workflow without adding a lot of bloat, by combining plugins as needed.
 
 <ul>
   <li> \subpage org_mitk_views_basicimageprocessing </li>

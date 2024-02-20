@@ -39,7 +39,7 @@ protected:
   QString description;
 
   /**
-   * The name of this handle. This valud should not be <code>null</code>
+   * The name of this handle. This value should not be <code>null</code>
    * unless the handle is undefined.
    */
   QString name;

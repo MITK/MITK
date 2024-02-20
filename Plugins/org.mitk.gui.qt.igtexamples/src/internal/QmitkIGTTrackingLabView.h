@@ -73,7 +73,7 @@ void SetFocus() override;
 
 protected slots:
 
-/** This timer updates the IGT pipline, when necessary:
+/** This timer updates the IGT pipeline, when necessary:
 *   1: if permanent registration is activated, then the permanent
 *      registration filter has to be updated
 *   2: if the camera view is on it also must be updated
@@ -159,7 +159,7 @@ void DestroyIGTPipeline();
 //####################### Members for the IGT pipeline ######################################
 // The IGT pipeline is basically initialized in the method OnSetupNavigation(). Further initialization
 // is done in the methods OnPermanentRegistration(), OnPointSetRecording() and OnVirtualCamera().
-// The pipline is updated in the method UpdateTimer(). When the complete pipeline is active, it is
+// The pipeline is updated in the method UpdateTimer(). When the complete pipeline is active, it is
 // structured as follows:
 //          ,-> m_PermanentRegistrationFilter
 // m_Source -> m_Visualizer

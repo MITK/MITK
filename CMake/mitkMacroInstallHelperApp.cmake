@@ -1,4 +1,4 @@
-#! MITK specific cross plattform install macro
+#! MITK specific cross platform install macro
 #!
 #! Usage: MITK_INSTALL_HELPER_APP(target1 [target2] ....)
 #!

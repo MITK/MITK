@@ -5,7 +5,7 @@
 
 Selecting data nodes is frequently done when working with the MITK workbench.
 Most of the views in MITK require one or more selected data nodes that will be somehow processed by the underlying algorithms, such as image segmentation, image registration, basic image processing, image statistics computation etc..
-In order to overcome some disadvantages of the old data node seletion concept, the following new selection concept has been implemented.
+In order to overcome some disadvantages of the old data node selection concept, the following new selection concept has been implemented.
 <br>
 This page introduces the concept and the corresponding implementation.
 The document starts with a brief explanation of the disadvantages of the old concepts and justifies a need for the new concept.
@@ -258,7 +258,7 @@ The document starts with a brief explanation of the disadvantages of the old con
 		A plugin view can connect a function to the CurrentSelectionChanged-signal to immediately react on a new selection of the QmitkMultiNodeSelectionWidget.
 		Using QmitkAbstractNodeSelectionWidget::GetSelectedNodes the currently selected node of the selection widget can be retrieved anytime.
 
-		QmitkMultiNodeSelectionWidget::SetSelectionCheckFunction allows to define a function that puts a constraint on the node selection (dialog) to only allow specific combinations or seletions of nodes.
+		QmitkMultiNodeSelectionWidget::SetSelectionCheckFunction allows to define a function that puts a constraint on the node selection (dialog) to only allow specific combinations or selections of nodes.
 		The result of the constraint check has to be either an empty string (indicating a valid node selection) or a string that explains the error / constraint violation.
 		A simple check function can look like this:
 		\code

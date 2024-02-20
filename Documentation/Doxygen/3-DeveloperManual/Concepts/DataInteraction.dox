@@ -20,7 +20,7 @@ See the \ref DataInteractionTechnicalPage page for a more technical explanation.
 Consult \ref HowToUseDataInteractor for usage information.\n
 See \ref SectionImplementationDataInteractor for an example on how to implement a new mitk::DataInteractor \n
 for information about how to create new events refer to ImplementNewEventsPage.\n
-The documentation of the depricated former concept can be found at \ref InteractionPage.
+The documentation of the deprecated former concept can be found at \ref InteractionPage.
 \n
 For a list of changes with respect to the previous interaction concept please refer to the \ref InteractionMigration
 
@@ -70,7 +70,7 @@ digraph linker_deps {
 \enddot
 
 \subsection DataInteractionPage_DataInteractorsSection DataInteractors
-DataInteractors are specialized mitk::InteractionEventHandler which handle events for one spefific DataNode. They are implemented following a concept called state machines
+DataInteractors are specialized mitk::InteractionEventHandler which handle events for one specific DataNode. They are implemented following a concept called state machines
 (see e.g. <a href="https://en.wikipedia.org/wiki/Mealy_machine"> Wikipedia </a>).
 
 \subsubsection DataInteractionPage_StateMachinesSection StateMachines

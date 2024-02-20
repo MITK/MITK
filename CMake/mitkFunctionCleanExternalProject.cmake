@@ -6,7 +6,7 @@
     cleaning of previous build artifacts to prevent MITK from referring to
     mixed versions of the same external project.
 
-    This function tries to mimic the manual cleaning of old build articafts
+    This function tries to mimic the manual cleaning of old build artifacts
     by removing the source, build, and stamp directory of the external project
     as well as all files in the external project's install manifest, if found.
 

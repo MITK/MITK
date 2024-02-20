@@ -130,7 +130,7 @@ public:
      * supplied plugin ID and extension point.
      *
      * @param registry the registry to read from
-     * @param pluginId the plugin id of the extenion point
+     * @param pluginId the plugin id of the extension point
      * @param extensionPoint the extension point id
      */
     virtual void ReadRegistry(IExtensionRegistry* registry,

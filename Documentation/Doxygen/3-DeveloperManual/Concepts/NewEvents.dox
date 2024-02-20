@@ -6,12 +6,12 @@
 
 \section WhenUseEvents When to use this guide
 
-In general there are no restriction about how events are created and processed. The intention of this page is to provide how to contruct Events
+In general there are no restriction about how events are created and processed. The intention of this page is to provide how to construct Events
 in order to use them with the MITK Interaction Concept.
 
 \section OriginEvents Origin and processing of Events
 
-\ref DataInteractionPage gives a brief description of how events are generated and proccessed. After events are created they need to be send
+\ref DataInteractionPage gives a brief description of how events are generated and processed. After events are created they need to be send
 via mitk::RenderWindowBase::HandleEvent() so that they are relayed to a Dispatcher which handles the event distribution to the DataInteractors.
 
 \section EventImplementation Event Implementation

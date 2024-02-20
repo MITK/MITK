@@ -12,7 +12,7 @@ Available sections:
 
 \section QmitkIsoSurfaceUserManualOverview Overview
 
-IsoSurface is a program module for creating surfaces (e.g. polygon structures) out of images. The user defines a threshold that seperates object and background inside the image. Pixels that belong to the object need grey values below the threshold. Pixles with grey values above the threshold will be ignored. The result is a polygon object 
+IsoSurface is a program module for creating surfaces (e.g. polygon structures) out of images. The user defines a threshold that separates object and background inside the image. Pixels that belong to the object need grey values below the threshold. Pixles with grey values above the threshold will be ignored. The result is a polygon object 
 that can be saved as an *.stl-object. 
 
 \section QmitkIsoSurfaceUserManualFeatures Features

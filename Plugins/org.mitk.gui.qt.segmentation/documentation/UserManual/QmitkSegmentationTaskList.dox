@@ -24,7 +24,7 @@ The Segmentation Task List View shows the progress of the whole Segmentation Tas
 
 Below the progress indictator you can navigate between tasks, read their descriptions and related information, as well as load/activate the currently shown task.
 This will unload all data from a previously active task, if any, and load all data of the current task.
-To prevent any accidental data loss, unsaved task data will interfer task switches and you can decide on how to proceed.
+To prevent any accidental data loss, unsaved task data will interfere task switches and you can decide on how to proceed.
 
 Above the task description, the status of tasks is displayed as a pair of colored labels, indicating if a task is either active or inactive and if it is considered not to be done, having unsaved changes, or to be done.
 

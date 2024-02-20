@@ -11,7 +11,7 @@ Available sections:
 
 An automatic rendering test is a powerful tool to test rendering results automatically via dashboard.
 Regarding rendering lots of different sources influence the output on the screen (e.g. different
-mappers, renderes, camera settings or the algorithm creating the data). Thus, during the rendering
+mappers, renderers, camera settings or the algorithm creating the data). Thus, during the rendering
 process of an image many different classes are involved and can have impact on the output. A minor
 change in an important class (e.g. mitkVtkPropRenderer) can have major impact on the actual rendering.
 An automatic rendering test takes an arbitrary object as input (e.g. image, surface, point set),
@@ -67,7 +67,7 @@ screen shot is highly important and has to be proven if is correct. The
 Capturing a reference screen shot should happen just once and NOT be a permanent part of the test.
 
 It is also possible to set the option -T /path/to/directory/. This option is internally used by VTK
-to save a difference image. This is meant for debugging and should not be used for the final implemenation of a test.
+to save a difference image. This is meant for debugging and should not be used for the final implementation of a test.
 
 
 \subsection RenderingTests_HowToCreateATest_Sub2 Coding the test

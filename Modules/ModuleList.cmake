@@ -60,8 +60,6 @@ set(MITK_MODULES
   XNAT
   BoundingShape
   RenderWindowManagerUI
-  SemanticRelations
-  SemanticRelationsUI
   CEST
   BasicImageProcessing
   ModelFit

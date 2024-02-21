@@ -36,7 +36,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.viewnavigator:OFF
-  org.mitk.gui.qt.materialeditor:OFF
   org.mitk.gui.qt.measurementtoolbox:OFF
   org.mitk.gui.qt.moviemaker:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF

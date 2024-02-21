@@ -422,11 +422,6 @@ namespace mitk
     */
     GroupIndexType AddLayer(mitk::Image::Pointer layerImage, ConstLabelVector labels = {});
 
-    /**
-      * \brief  */
-    mitk::Image *GetLayerImage(unsigned int layer);
-    const mitk::Image *GetLayerImage(unsigned int layer) const;
-
   protected:
     mitkCloneMacro(Self);
 

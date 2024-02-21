@@ -116,16 +116,6 @@ mitk::LabelSetImage::~LabelSetImage()
   m_LabelMap.clear();
 }
 
-mitk::Image *mitk::LabelSetImage::GetLayerImage(unsigned int layer)
-{
-  return m_LayerContainer[layer];
-}
-
-const mitk::Image *mitk::LabelSetImage::GetLayerImage(unsigned int layer) const
-{
-  return m_LayerContainer[layer];
-}
-
 unsigned int mitk::LabelSetImage::GetActiveLayer() const
 {
   if (m_LayerContainer.size() == 0) mitkThrow() << "Cannot return active layer index. No layer is available.";
@@ -517,9 +507,7 @@ void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
   {
     auto groupID = this->GetGroupIndexOfLabel(pixelValue);
 
-    mitk::Image* groupImage = this->GetActiveLayer() != groupID
-       ? this->GetLayerImage(groupID)
-       : this;
+    mitk::Image* groupImage = this->GetGroupImage(groupID);
 
     if (4 == this->GetDimension())
     {

@@ -34,12 +34,11 @@ static void ConvertLabelSetImageToImage(const itk::Image<TPixel, VDimension> *,
   if (numberOfLayers > 1)
   {
     auto vectorImageComposer = ComposeFilterType::New();
-    auto activeLayer = labelSetImage->GetActiveLayer();
 
     for (decltype(numberOfLayers) layer = 0; layer < numberOfLayers; ++layer)
     {
       auto layerImage = mitk::ImageToItkImage<TPixel, VDimension>(
-        layer != activeLayer ? labelSetImage->GetLayerImage(layer) : labelSetImage);
+        labelSetImage->GetGroupImage(layer));
 
       vectorImageComposer->SetInput(layer, layerImage);
     }
@@ -75,7 +74,7 @@ mitk::Image::Pointer mitk::ConvertLabelSetImageToImage(LabelSetImage::ConstPoint
     }
     else
     {
-      AccessByItk_2(labelSetImage->GetLayerImage(0), ::ConvertLabelSetImageToImage, labelSetImage, image);
+      AccessByItk_2(labelSetImage->GetGroupImage(0), ::ConvertLabelSetImageToImage, labelSetImage, image);
     }
 
     image->SetTimeGeometry(labelSetImage->GetTimeGeometry()->Clone());

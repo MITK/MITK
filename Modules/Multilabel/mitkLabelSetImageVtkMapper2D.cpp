@@ -144,13 +144,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
   for (int lidx = 0; lidx < numberOfLayers; ++lidx)
   {
-    mitk::Image *layerImage = nullptr;
-
-    // set main input for ExtractSliceFilter
-    if (lidx == activeLayer)
-      layerImage = image;
-    else
-      layerImage = image->GetLayerImage(lidx);
+    const auto layerImage = image->GetGroupImage(lidx);
 
     localStorage->m_ReslicerVector[lidx]->SetInput(layerImage);
     localStorage->m_ReslicerVector[lidx]->SetWorldGeometry(worldGeometry);

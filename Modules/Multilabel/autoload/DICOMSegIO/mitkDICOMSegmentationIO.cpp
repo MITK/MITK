@@ -162,10 +162,7 @@ namespace mitk
 
       try
       {
-        // Hack: Remove the const attribute to switch between the layer images. Normally you could get the different
-        // layer images by input->GetLayerImage(layer)
-        mitk::LabelSetImage *mitkLayerImage = const_cast<mitk::LabelSetImage *>(input);
-        mitkLayerImage->SetActiveLayer(layer);
+        auto mitkLayerImage = input->GetGroupImage(layer);
 
         // Cast mitk layer image to itk
         ImageToItk<itkInputImageType>::Pointer imageToItkFilter = ImageToItk<itkInputImageType>::New();

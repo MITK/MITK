@@ -45,7 +45,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.python:OFF
   org.mitk.gui.qt.remeshing:OFF
   org.mitk.gui.qt.segmentation:OFF
-  org.mitk.gui.qt.deformableclippingplane:OFF
   org.mitk.gui.qt.aicpregistration:OFF
   org.mitk.gui.qt.renderwindowmanager:OFF
   org.mitk.gui.qt.toftutorial:OFF

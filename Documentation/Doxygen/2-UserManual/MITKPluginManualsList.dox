@@ -50,7 +50,6 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \subpage org_mitk_views_pharmacokinetics_mri </li>
   <li> \subpage org_mitk_views_pharmacokinetics_pet </li>
   <li> \subpage org_mitk_gui_qt_examples </li>
-  <li> \subpage org_mitk_gui_qt_geometrytools </li>
   <li> \subpage org_mitk_gui_qt_igtexample </li>
   <li> \subpage org_mitk_gui_qt_igttracking </li>
   <li> \subpage org_mitk_views_igttrackingsemiautomaticmeasurement </li>

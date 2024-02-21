@@ -30,7 +30,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.dicombrowser:OFF
   org.mitk.gui.qt.dicominspector:OFF
   org.mitk.gui.qt.dosevisualization:OFF
-  org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF
   org.mitk.gui.qt.igttracking:OFF
   org.mitk.gui.qt.openigtlink:OFF

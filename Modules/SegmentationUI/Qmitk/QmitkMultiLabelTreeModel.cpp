@@ -12,9 +12,10 @@ found in the LICENSE file.
 
 #include "QmitkMultiLabelTreeModel.h"
 
-#include "mitkRenderingManager.h"
+#include <mitkMultiLabelEvents.h>
+#include <mitkRenderingManager.h>
 
-#include "QmitkStyleManager.h"
+#include <QmitkStyleManager.h>
 
 
 class QmitkMultiLabelSegTreeItem
@@ -270,7 +271,6 @@ QmitkMultiLabelSegTreeItem* GetLabelItemInGroup(const std::string& labelName, Qm
 }
 
 QmitkMultiLabelTreeModel::QmitkMultiLabelTreeModel(QObject *parent) : QAbstractItemModel(parent)
-, m_Observed(false)
 {
   m_RootItem = std::make_unique<QmitkMultiLabelSegTreeItem>();
 }
@@ -721,7 +721,6 @@ void QmitkMultiLabelTreeModel::SetSegmentation(mitk::LabelSetImage* segmentation
 {
   if (m_Segmentation != segmentation)
   {
-    this->RemoveObserver();
     this->m_Segmentation = segmentation;
     this->AddObserver();
 
@@ -810,49 +809,61 @@ void QmitkMultiLabelTreeModel::UpdateInternalTree()
   emit modelChanged();
 }
 
-void QmitkMultiLabelTreeModel::AddObserver()
+void QmitkMultiLabelTreeModel::ITKEventHandler(const itk::EventObject& e)
 {
-  if (this->m_Segmentation.IsNotNull())
+  if (mitk::LabelAddedEvent().CheckEvent(&e))
   {
-    if (m_Observed)
-    {
-      MITK_DEBUG << "Invalid observer state in QmitkMultiLabelTreeModel. There is already a registered observer. Internal logic is not correct. May be an old observer was not removed.";
-    }
-
-    this->m_Segmentation->AddLabelAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelTreeModel::OnLabelAdded));
-    this->m_Segmentation->AddLabelModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelTreeModel::OnLabelModified));
-    this->m_Segmentation->AddLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelTreeModel::OnLabelRemoved));
-    this->m_Segmentation->AddGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
-      this, &QmitkMultiLabelTreeModel::OnGroupAdded));
-    this->m_Segmentation->AddGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
-      this, &QmitkMultiLabelTreeModel::OnGroupModified));
-    this->m_Segmentation->AddGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
-      this, &QmitkMultiLabelTreeModel::OnGroupRemoved));
-    m_Observed = true;
+    auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&e);
+    this->OnLabelAdded(labelEvent->GetLabelValue());
+  }
+  else if (mitk::LabelModifiedEvent().CheckEvent(&e))
+  {
+    auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&e);
+    this->OnLabelModified(labelEvent->GetLabelValue());
+  }
+  else if (mitk::LabelRemovedEvent().CheckEvent(&e))
+  {
+    auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&e);
+    this->OnLabelRemoved(labelEvent->GetLabelValue());
+  }
+  else if (mitk::GroupAddedEvent().CheckEvent(&e))
+  {
+    auto labelEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&e);
+    this->OnGroupAdded(labelEvent->GetGroupID());
+  }
+  else if (mitk::GroupModifiedEvent().CheckEvent(&e))
+  {
+    auto labelEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&e);
+    this->OnGroupModified(labelEvent->GetGroupID());
+  }
+  else if (mitk::GroupRemovedEvent().CheckEvent(&e))
+  {
+    auto labelEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&e);
+    this->OnGroupRemoved(labelEvent->GetGroupID());
   }
 }
 
-void QmitkMultiLabelTreeModel::RemoveObserver()
+void QmitkMultiLabelTreeModel::AddObserver()
 {
+  m_LabelAddedObserver.Reset();
+  m_LabelModifiedObserver.Reset();
+  m_LabelRemovedObserver.Reset();
+  m_GroupAddedObserver.Reset();
+  m_GroupModifiedObserver.Reset();
+  m_GroupRemovedObserver.Reset();
+
   if (this->m_Segmentation.IsNotNull())
   {
-    this->m_Segmentation->RemoveLabelAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelTreeModel::OnLabelAdded));
-    this->m_Segmentation->RemoveLabelModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelTreeModel::OnLabelModified));
-    this->m_Segmentation->RemoveLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelTreeModel::OnLabelRemoved));
-    this->m_Segmentation->RemoveGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
-      this, &QmitkMultiLabelTreeModel::OnGroupAdded));
-    this->m_Segmentation->RemoveGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
-      this, &QmitkMultiLabelTreeModel::OnGroupModified));
-    this->m_Segmentation->RemoveGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
-      this, &QmitkMultiLabelTreeModel::OnGroupRemoved));
+    auto& model = *this;
+
+    m_LabelAddedObserver.Reset(m_Segmentation, mitk::LabelAddedEvent(), [&model](const itk::EventObject& event){model.ITKEventHandler(event);});
+    m_LabelModifiedObserver.Reset(m_Segmentation, mitk::LabelModifiedEvent(), [&model](const itk::EventObject& event) {model.ITKEventHandler(event); });
+    m_LabelRemovedObserver.Reset(m_Segmentation, mitk::LabelRemovedEvent(), [&model](const itk::EventObject& event) {model.ITKEventHandler(event); });
+    m_GroupAddedObserver.Reset(m_Segmentation, mitk::GroupAddedEvent(), [&model](const itk::EventObject& event) {
+      model.ITKEventHandler(event); });
+    m_GroupModifiedObserver.Reset(m_Segmentation, mitk::GroupModifiedEvent(), [&model](const itk::EventObject& event) {model.ITKEventHandler(event); });
+    m_GroupRemovedObserver.Reset(m_Segmentation, mitk::GroupRemovedEvent(), [&model](const itk::EventObject& event) {model.ITKEventHandler(event); });
   }
-  m_Observed = false;
 }
 
 void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)

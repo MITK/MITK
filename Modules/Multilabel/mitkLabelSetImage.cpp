@@ -195,7 +195,7 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
     this->ReleaseLabel(label);
     m_LabelToGroupMap.erase(labelValue);
     m_LabelMap.erase(labelValue);
-    this->m_LabelRemovedMessage.Send(labelValue);
+    this->InvokeEvent(LabelRemovedEvent(labelValue));
   }
   // remove the group entries in the maps and the image.
   m_Groups.erase(m_Groups.begin() + indexToDelete);
@@ -211,8 +211,8 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
   //correct active layer index
   m_ActiveLayer = newActiveIndex;
 
-  this->m_LabelsChangedMessage.Send(relevantLabels);
-  this->m_GroupRemovedMessage.Send(indexToDelete);
+  this->InvokeEvent(LabelsChangedEvent(relevantLabels));
+  this->InvokeEvent(GroupRemovedEvent(indexToDelete));
   this->Modified();
 }
 
@@ -306,7 +306,7 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(mitk::Image::P
   }
 
   this->Modified();
-  this->m_GroupAddedMessage.Send(newGroupID);
+  this->InvokeEvent(GroupAddedEvent(newGroupID));
 
   return newGroupID;
 }
@@ -323,11 +323,11 @@ void mitk::LabelSetImage::ReplaceGroupLabels(const GroupIndexType groupID, const
   for (auto labelID : oldLabels)
   {
     this->RemoveLabelFromMap(labelID);
-    this->m_LabelRemovedMessage.Send(labelID);
+    this->InvokeEvent(LabelRemovedEvent(labelID));
 
   }
-  this->m_LabelsChangedMessage.Send(oldLabels);
-  this->m_GroupModifiedMessage.Send(groupID);
+  this->InvokeEvent(LabelsChangedEvent(oldLabels));
+  this->InvokeEvent(GroupModifiedEvent(groupID));
 
   //add new labels to group
   for (auto label : labelSet)
@@ -450,9 +450,9 @@ void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, PixelType sourcePixel
     mitkThrow() << e.GetDescription();
   }
   this->SetActiveLabel(pixelValue);
-  this->m_LabelModifiedMessage.Send(sourcePixelValue);
-  this->m_LabelModifiedMessage.Send(pixelValue);
-  this->m_LabelsChangedMessage.Send({ sourcePixelValue, pixelValue });
+  this->InvokeEvent(LabelModifiedEvent(sourcePixelValue));
+  this->InvokeEvent(LabelModifiedEvent(pixelValue));
+  this->InvokeEvent(LabelsChangedEvent({ sourcePixelValue, pixelValue }));
   Modified();
 }
 
@@ -463,7 +463,7 @@ void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, const std::vector<Pi
     for (unsigned int idx = 0; idx < vectorOfSourcePixelValues.size(); idx++)
     {
       AccessByItk_2(this, MergeLabelProcessing, pixelValue, vectorOfSourcePixelValues[idx]);
-      this->m_LabelModifiedMessage.Send(vectorOfSourcePixelValues[idx]);
+      this->InvokeEvent(LabelModifiedEvent(vectorOfSourcePixelValues[idx]));
     }
   }
   catch (itk::ExceptionObject &e)
@@ -471,10 +471,10 @@ void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, const std::vector<Pi
     mitkThrow() << e.GetDescription();
   }
   this->SetActiveLabel(pixelValue);
-  this->m_LabelModifiedMessage.Send(pixelValue);
+  this->InvokeEvent(LabelModifiedEvent(pixelValue));
   auto modifiedValues = vectorOfSourcePixelValues;
   modifiedValues.push_back(pixelValue);
-  this->m_LabelsChangedMessage.Send(modifiedValues);
+  this->InvokeEvent(LabelsChangedEvent(modifiedValues));
 
   Modified();
 }
@@ -495,9 +495,9 @@ void mitk::LabelSetImage::RemoveLabel(LabelValueType pixelValue)
     this->SetActiveLabel(0);
   }
 
-  this->m_LabelRemovedMessage.Send(pixelValue);
-  this->m_LabelsChangedMessage.Send({ pixelValue });
-  this->m_GroupModifiedMessage.Send(groupID);
+  this->InvokeEvent(LabelRemovedEvent(pixelValue));
+  this->InvokeEvent(LabelsChangedEvent({ pixelValue }));
+  this->InvokeEvent(GroupModifiedEvent(groupID));
 }
 
 void mitk::LabelSetImage::RemoveLabelFromMap(LabelValueType pixelValue)
@@ -521,7 +521,7 @@ void mitk::LabelSetImage::RemoveLabels(const LabelValueVectorType& vectorOfLabel
   {
     this->RemoveLabel(labelValue);
   }
-  this->m_LabelsChangedMessage.Send(vectorOfLabelPixelValues);
+  this->InvokeEvent(LabelsChangedEvent(vectorOfLabelPixelValues));
 }
 
 void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
@@ -548,8 +548,8 @@ void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
     mitkThrow() << e.GetDescription();
   }
 
-  this->m_LabelModifiedMessage.Send(pixelValue);
-  this->m_LabelsChangedMessage.Send({ pixelValue });
+  this->InvokeEvent(LabelModifiedEvent(pixelValue));
+  this->InvokeEvent(LabelsChangedEvent({ pixelValue }));
   Modified();
 }
 
@@ -598,7 +598,7 @@ mitk::Label* mitk::LabelSetImage::AddLabel(mitk::Label* label, GroupIndexType gr
   this->AddLabelToMap(pixelValue, newLabel, groupID);
   this->RegisterLabel(newLabel);
 
-  m_LabelAddedMessage.Send(newLabel->GetValue());
+  this->InvokeEvent(LabelAddedEvent(newLabel->GetValue()));
   m_ActiveLabelValue = newLabel->GetValue();
   this->Modified();
 
@@ -1022,7 +1022,7 @@ void mitk::LabelSetImage::ApplyToLabels(const LabelValueVectorType& values, std:
 {
   auto labels = this->GetLabelsByValue(values);
   std::for_each(labels.begin(), labels.end(), lambda);
-  m_LabelsChangedMessage.Send(values);
+  this->InvokeEvent(LabelsChangedEvent(values));
 }
 
 void mitk::LabelSetImage::VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const
@@ -1039,7 +1039,7 @@ void mitk::LabelSetImage::OnLabelModified(const Object* sender, const itk::Event
     mitkThrow() << "LabelSet is in wrong state. LabelModified event is not send by a label instance.";
 
   Superclass::Modified();
-  this->m_LabelModifiedMessage.Send(label->GetValue());
+  this->InvokeEvent(LabelModifiedEvent(label->GetValue()));
 }
 
 bool mitk::LabelSetImage::ExistLabel(LabelValueType value) const

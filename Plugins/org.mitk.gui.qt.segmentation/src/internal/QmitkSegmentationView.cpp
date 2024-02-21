@@ -299,22 +299,31 @@ void QmitkSegmentationView::AddObserversToWorkingImage()
 
   if (workingImage != nullptr)
   {
-    workingImage->AddLabelAddedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelAdded));
-    workingImage->AddLabelRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelRemoved));
-    workingImage->AddGroupRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::GroupIndexType>(this, &Self::OnGroupRemoved));
+    auto& widget = *this;
+    m_LabelAddedObserver.Reset(workingImage, mitk::LabelAddedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelAdded(labelEvent->GetLabelValue());
+      });
+    m_LabelRemovedObserver.Reset(workingImage, mitk::LabelRemovedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelRemoved(labelEvent->GetLabelValue());
+      });
+
+    m_GroupRemovedObserver.Reset(workingImage, mitk::GroupRemovedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto groupEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&event);
+        widget.OnGroupRemoved(groupEvent->GetGroupID());
+      });
   }
 }
 
 void QmitkSegmentationView::RemoveObserversFromWorkingImage()
 {
-  auto* workingImage = this->GetWorkingImage();
-
-  if (workingImage != nullptr)
-  {
-    workingImage->RemoveLabelAddedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelAdded));
-    workingImage->RemoveLabelRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelRemoved));
-    workingImage->RemoveGroupRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::GroupIndexType>(this, &Self::OnGroupRemoved));
-  }
+  m_LabelAddedObserver.Reset();
+  m_LabelRemovedObserver.Reset();
+  m_GroupRemovedObserver.Reset();
 }
 
 void QmitkSegmentationView::OnVisibilityShortcutActivated()

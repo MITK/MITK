@@ -58,7 +58,11 @@ namespace mitk
   itk::EventObject * classname::MakeObject() const { return new classname; } \
   static_assert(true, "Compile time eliminated. Used to require a semi-colon at end of macro.")
 
-  /**
+  /** Base event class for all events that are about a label in a MultiLabel class.
+  *
+  * It has a member that indicates the label id the event is refering to.
+  * Use the ANY_LABEL value if you want to define an rvent (e.g. for adding an observer)
+  * that reacts to every label and not just to a special one.
   */
   class MITKMULTILABEL_EXPORT AnyLabelEvent : public itk::ModifiedEvent
   {
@@ -82,10 +86,38 @@ namespace mitk
     Label::PixelType m_LabelValue = std::numeric_limits<mitk::Label::PixelType>::max();
   };
 
+  /** Event class that is used to indicated if a label is added in a MultiLabel class.
+  *
+  * It has a member that indicates the label id the event is refering to.
+  * Use the ANY_LABEL value if you want to define an rvent (e.g. for adding an observer)
+  * that reacts to every label and not just to a special one.
+  */
   mitkMultiLabelEventMacroDeclaration(LabelAddedEvent, AnyLabelEvent, Label::PixelType);
+
+  /** Event class that is used to indicated if a label is modified in a MultiLabel class.
+  *
+  * It has a member that indicates the label id the event is refering to.
+  * Use the ANY_LABEL value if you want to define an rvent (e.g. for adding an observer)
+  * that reacts to every label and not just to a special one.
+  */
   mitkMultiLabelEventMacroDeclaration(LabelModifiedEvent, AnyLabelEvent, Label::PixelType);
+
+  /** Event class that is used to indicated if a label is removed in a MultiLabel class.
+  *
+  * It has a member that indicates the label id the event is refering to.
+  * Use the ANY_LABEL value if you want to define an rvent (e.g. for adding an observer)
+  * that reacts to every label and not just to a special one.
+  */
   mitkMultiLabelEventMacroDeclaration(LabelRemovedEvent, AnyLabelEvent, Label::PixelType);
 
+  /** Event class that is used to indicated if a set of labels is changed in a MultiLabel class.
+  *
+  * In difference to the other label events LabelsChangedEvent is send only *one time* after
+  * the modification of the MultiLableImage instance is finished. So e.g. even if 4 labels are
+  * changed by a merge operation, this event will only be sent once (compared to LabelRemoved
+  * or LabelModified).
+  * It has a member that indicates the label ids the event is refering to.
+  */
   class MITKMULTILABEL_EXPORT LabelsChangedEvent : public itk::ModifiedEvent
   {
   public:
@@ -107,6 +139,12 @@ namespace mitk
     std::vector<Label::PixelType> m_LabelValues;
   };
 
+  /** Base event class for all events that are about a group in a MultiLabel class.
+  *
+  * It has a member that indicates the group id the event is refering to.
+  * Use the ANY_GROUP value if you want to define an event (e.g. for adding an observer)
+  * that reacts to every group and not just to a special one.
+  */
   class MITKMULTILABEL_EXPORT AnyGroupEvent : public itk::ModifiedEvent
   {
   public:
@@ -130,8 +168,28 @@ namespace mitk
     GroupIndexType m_GroupID = std::numeric_limits<GroupIndexType>::max();
   };
 
+  /** Event class that is used to indicated if a group is added in a MultiLabel class.
+  *
+  * It has a member that indicates the group id the event is refering to.
+  * Use the ANY_GROUP value if you want to define an rvent (e.g. for adding an observer)
+  * that reacts to every group and not just to a special one.
+  */
   mitkMultiLabelEventMacroDeclaration(GroupAddedEvent, AnyGroupEvent, AnyGroupEvent::GroupIndexType);
+
+  /** Event class that is used to indicated if a group is modified in a MultiLabel class.
+  *
+  * It has a member that indicates the group id the event is refering to.
+  * Use the ANY_GROUP value if you want to define an rvent (e.g. for adding an observer)
+  * that reacts to every group and not just to a special one.
+  */
   mitkMultiLabelEventMacroDeclaration(GroupModifiedEvent, AnyGroupEvent, AnyGroupEvent::GroupIndexType);
+
+  /** Event class that is used to indicated if a group is removed in a MultiLabel class.
+  *
+  * It has a member that indicates the group id the event is refering to.
+  * Use the ANY_GROUP value if you want to define an rvent (e.g. for adding an observer)
+  * that reacts to every group and not just to a special one.
+  */
   mitkMultiLabelEventMacroDeclaration(GroupRemovedEvent, AnyGroupEvent, AnyGroupEvent::GroupIndexType);
 
 }

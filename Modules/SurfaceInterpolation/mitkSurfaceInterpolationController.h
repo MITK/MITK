@@ -171,7 +171,7 @@ namespace mitk
      * @param timeStep Time step in which to remove the contours.
      * @remark if the label or time step does not exist, nothing happens.
      */
-    void RemoveContours(mitk::Label::PixelType label, TimeStepType timeStep);
+    void RemoveContours(const LabelSetImage* segmentationImage, mitk::Label::PixelType label, TimeStepType timeStep);
 
     /**
      * @brief Removes contours of a particular label and at a given time step for the current session/segmentation.
@@ -180,7 +180,7 @@ namespace mitk
      * @param timeStep Time step in which to remove the contours.
      * @remark if the label or time step does not exist, nothing happens.
      */
-    void RemoveContours(mitk::Label::PixelType label);
+    void RemoveContours(const LabelSetImage* segmentationImage, mitk::Label::PixelType label);
 
     unsigned int GetNumberOfInterpolationSessions();
 
@@ -213,7 +213,7 @@ namespace mitk
      * @brief Function that removes contours of a particular label when the "Remove Label" event is trigerred in the labelSetImage.
      *
      */
-    void OnRemoveLabel(mitk::Label::PixelType removedLabelValue);
+    void OnRemoveLabel(const itk::Object* caller, const itk::EventObject& event);
 
     /**
      * @brief When a new contour is added to the pipeline or an existing contour is replaced,

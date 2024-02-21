@@ -49,6 +49,7 @@ CPITimeStepLabelSegMap cpiMap;
 std::shared_mutex cpiMutex;
 
 std::map<mitk::LabelSetImage*, unsigned long> segmentationObserverTags;
+std::map<mitk::LabelSetImage*, unsigned long> labelRemovedObserverTags;
 
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   : m_DistanceImageVolume(50000),
@@ -669,8 +670,12 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
       auto command = itk::MemberCommand<SurfaceInterpolationController>::New();
       command->SetCallbackFunction(this, &SurfaceInterpolationController::OnSegmentationDeleted);
       segmentationObserverTags[selectedSegmentation] = selectedSegmentation->AddObserver(itk::DeleteEvent(), command);
-      selectedSegmentation->AddLabelRemovedListener(mitk::MessageDelegate1<SurfaceInterpolationController, mitk::LabelSetImage::LabelValueType>(
-        this, &SurfaceInterpolationController::OnRemoveLabel));
+      auto& controller = *this;
+      const auto sender = selectedSegmentation.GetPointer();
+      labelRemovedObserverTags[selectedSegmentation] = selectedSegmentation->AddObserver(mitk::LabelRemovedEvent(), [&controller, sender](const itk::EventObject& event)
+        {
+          controller.OnRemoveLabel(sender, event);
+        });
     }
   }
 }
@@ -705,9 +710,14 @@ void mitk::SurfaceInterpolationController::RemoveObserversInternal(const mitk::L
   if (pos != segmentationObserverTags.end())
   {
     pos->first->RemoveObserver((*pos).second);
-    segmentationImage->RemoveLabelRemovedListener(mitk::MessageDelegate1<SurfaceInterpolationController, mitk::LabelSetImage::LabelValueType>(
-      this, &SurfaceInterpolationController::OnRemoveLabel));
     segmentationObserverTags.erase(const_cast<mitk::LabelSetImage*>(segmentationImage));
+  }
+
+  auto pos2 = labelRemovedObserverTags.find(const_cast<mitk::LabelSetImage*>(segmentationImage));
+  if (pos2 != labelRemovedObserverTags.end())
+  {
+    pos2->first->RemoveObserver((*pos2).second);
+    labelRemovedObserverTags.erase(const_cast<mitk::LabelSetImage*>(segmentationImage));
   }
 }
 
@@ -719,53 +729,63 @@ void mitk::SurfaceInterpolationController::RemoveAllInterpolationSessions()
   }
 }
 
-void mitk::SurfaceInterpolationController::RemoveContours(mitk::Label::PixelType label,
+void mitk::SurfaceInterpolationController::RemoveContours(const LabelSetImage* segmentationImage,
+  mitk::Label::PixelType label,
   TimeStepType timeStep)
 {
-  auto selectedSegmentation = m_SelectedSegmentation.Lock();
-  if (selectedSegmentation.IsNull())
+  if (nullptr == segmentationImage)
   {
-    mitkThrow() << "Cannot remove contours. No valid segmentation selected.";
+    mitkThrow() << "Cannot remove contours. No valid segmentation passed.";
   }
 
   std::lock_guard<std::shared_mutex> guard(cpiMutex);
 
-  auto& cpiLabelMap = cpiMap[selectedSegmentation];
-  auto finding = cpiLabelMap.find(label);
+  auto segfinding = cpiMap.find(segmentationImage);
 
-  if (finding != cpiLabelMap.end())
+  if (segfinding != cpiMap.end())
   {
-    finding->second.erase(timeStep);
-  }
+    auto& cpiLabelMap = cpiMap[segmentationImage];
+    auto finding = cpiLabelMap.find(label);
 
-  if (m_DataStorage.IsNotNull())
-  {
-    //remove relevant plane nodes
-    auto nodes = this->GetPlaneGeometryNodeFromDataStorage(GetSegmentationImageNodeInternal(this->m_DataStorage, selectedSegmentation), label, timeStep);
+    if (finding != cpiLabelMap.end())
+    {
+      cpiLabelMap[label].erase(timeStep);
+    }
 
-    this->m_DataStorage->Remove(nodes);
+    if (m_DataStorage.IsNotNull())
+    {
+      //remove relevant plane nodes
+      auto nodes = this->GetPlaneGeometryNodeFromDataStorage(GetSegmentationImageNodeInternal(this->m_DataStorage, segmentationImage), label, timeStep);
+
+      this->m_DataStorage->Remove(nodes);
+    }
+    this->Modified();
   }
-  this->Modified();
 }
 
-void mitk::SurfaceInterpolationController::RemoveContours(mitk::Label::PixelType label)
+void mitk::SurfaceInterpolationController::RemoveContours(const LabelSetImage* segmentationImage,
+  mitk::Label::PixelType label)
 {
-  auto selectedSegmentation = m_SelectedSegmentation.Lock();
-  if (selectedSegmentation.IsNull())
+  if (nullptr == segmentationImage)
   {
-    mitkThrow() << "Cannot remove contours. No valid segmentation selected.";
+    mitkThrow() << "Cannot remove contours. No valid segmentation passed.";
   }
 
   std::lock_guard<std::shared_mutex> guard(cpiMutex);
-  cpiMap[selectedSegmentation].erase(label);
 
-  if (m_DataStorage.IsNotNull())
+  auto finding = cpiMap.find(segmentationImage);
+  if (finding != cpiMap.end())
   {
-    //remove relevant plane nodes
-    auto nodes = this->GetPlaneGeometryNodeFromDataStorage(GetSegmentationImageNodeInternal(this->m_DataStorage, selectedSegmentation), label);
-    this->m_DataStorage->Remove(nodes);
+    cpiMap[segmentationImage].erase(label);
+
+    if (m_DataStorage.IsNotNull())
+    {
+      //remove relevant plane nodes
+      auto nodes = this->GetPlaneGeometryNodeFromDataStorage(GetSegmentationImageNodeInternal(this->m_DataStorage, segmentationImage), label);
+      this->m_DataStorage->Remove(nodes);
+    }
+    this->Modified();
   }
-  this->Modified();
 }
 
 
@@ -779,13 +799,15 @@ void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Obje
   }
 }
 
-void mitk::SurfaceInterpolationController::OnRemoveLabel(mitk::Label::PixelType removedLabelValue)
+void mitk::SurfaceInterpolationController::OnRemoveLabel(const itk::Object* caller, const itk::EventObject& event)
 {
-  auto selectedSegmentation = m_SelectedSegmentation.Lock();
+  auto sendingSegmentation = dynamic_cast<const LabelSetImage*>(caller);
 
-  if (selectedSegmentation.IsNotNull())
+  auto removeEvent = dynamic_cast<const mitk::LabelRemovedEvent*>(&event);
+
+  if (nullptr != sendingSegmentation && nullptr != removeEvent)
   {
-    this->RemoveContours(removedLabelValue);
+    this->RemoveContours(sendingSegmentation, removeEvent->GetLabelValue());
   }
 }
 

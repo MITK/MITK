@@ -15,26 +15,32 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 #include <mitkLabel.h>
-#include <mitkMessage.h>
 #include <mitkLookupTable.h>
+#include <mitkMultiLabelEvents.h>
+#include <mitkMessage.h>
 
 #include <MitkMultilabelExports.h>
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief LabelSetImage class for handling labels and layers in a segmentation session.
-  //##
-  //## Handles operations for adding, removing, erasing and editing labels and layers.
-  //## @ingroup Data
+  /** @brief LabelSetImage class for handling labels and layers in a segmentation session.
+  *
+  * Events that are potentially send by the class in regard to groups or labels:
+  * - LabelAddedEvent is emitted whenever a new label has been added.
+  * - LabelModifiedEvent is emitted whenever a label has been modified.
+  * - LabelRemovedEvent is emitted whenever a label has been removed.
+  * - LabelsChangedEvent is emitted when labels are changed (added, removed, modified). In difference to the other label events LabelsChanged is send only *one time* after the modification of the
+  * MultiLableImage instance is finished. So e.g. even if 4 labels are changed by a merge operation, this event will
+  * only be sent once (compared to LabelRemoved or LabelModified).
+  * - GroupAddedEvent is emitted whenever a new group has been added.
+  * - GroupModifiedEvent is emitted whenever a group has been modified.
+  * - GroupRemovedEvent is emitted whenever a label has been removed.
+  *
+  * @ingroup Data
+  */
   class MITKMULTILABEL_EXPORT LabelSetImage : public Image
   {
   public:
-    mitkClassMacro(LabelSetImage, Image);
-    itkNewMacro(Self);
-
-    typedef mitk::Label::PixelType PixelType;
-
     /**
     * \brief BeforeChangeLayerEvent (e.g. used for GUI integration)
     * As soon as active labelset should be changed, the signal emits.
@@ -58,6 +64,10 @@ namespace mitk
     // because some of the planned features are already urgently needed.
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
+    mitkClassMacro(LabelSetImage, Image);
+    itkNewMacro(Self);
+
+    typedef mitk::Label::PixelType PixelType;
 
     using GroupIndexType = std::size_t;
     using LabelValueType = mitk::Label::PixelType;
@@ -240,106 +250,11 @@ namespace mitk
      *@pre groupID must reference an existing group.*/
     const mitk::Image* GetGroupImage(GroupIndexType groupID) const;
 
-    ////////////////////////////////////////////////////////////////////
-    //Message slots that allow to react to changes in an instance
-
-    using LabelEventType = Message1<LabelValueType>;
-    using LabelsEventType = Message1<LabelValueVectorType>;
-    using GroupEventType = Message1<GroupIndexType>;
-
-    /**
-    * \brief LabelAdded is emitted whenever a new label has been added.
-    *
-    * Observers should register to this event by calling this->AddLabelAddedListener(myObject,
-    * MyObject::MyMethod).
-    * After registering, myObject->MyMethod() will be called every time a new label has been added to the MultiLabelSegmentation.
-    * Observers should unregister by calling this->RemoveLabelAddedListener(myObject, MyObject::MyMethod).
-    * The registered method will be called with the label value of the added label.
-    * @remark the usage of the message object is thread safe.
+    itkGetModifiableObjectMacro(LookupTable, mitk::LookupTable);
+    /** \brief
     */
-    mitkNewMessage1Macro(LabelAdded, LabelValueType);
-
-    /**
-    * \brief LabelModified is emitted whenever a label has been modified.
-    *
-    * A label is modified if either its pixel content was changed, its spatial group or the label instance
-    * information.
-    * If you just want to get notified at the end of a MultiLabelSegmentation instance manipulation in the
-    * case that at least one label was modified (e.g. to avoid getting a signal for each label
-    * individually), use LabelsChanged instead.
-    * Observers should register to this event by calling this->AddLabelModifiedListener(myObject,
-    * MyObject::MyMethod).
-    * After registering, myObject->MyMethod() will be called every time a new label has been added to the MultiLabelSegmentation.
-    * Observers should unregister by calling this->RemoveLabelModifiedListener(myObject, MyObject::MyMethod).
-    * The registered method will be called with the label value of the modified label.
-    * @remark the usage of the message object is thread safe.
-    */
-    mitkNewMessage1Macro(LabelModified, LabelValueType);
-
-    /**
-    * \brief LabelRemoved is emitted whenever a label has been removed.
-    *
-    * Observers should register to this event by calling this->AddLabelRemovedListener(myObject,
-    * MyObject::MyMethod).
-    * After registering, myObject->MyMethod() will be called every time a new label has been added to the MultiLabelSegmentation.
-    * Observers should unregister by calling this->RemoveLabelRemovedListener(myObject, MyObject::MyMethod).
-    * The registered method will be called with the label value of the removed label.*
-    * @remark the usage of the message object is thread safe.
-    */
-    mitkNewMessage1Macro(LabelRemoved, LabelValueType);
-
-    /**
-    * \brief LabelsChanged is emitted when labels are changed (added, removed, modified).
-    *
-    * In difference to the other label events LabelsChanged is send only *one time* after the modification of the
-    * MultiLableImage instance is finished. So e.g. even if 4 labels are changed by a merge operation, this event will
-    * only be sent once (compared to LabelRemoved or LabelModified).
-    * Observers should register to this event by calling myMultiLabelSegmentation->AddLabelsChangedListener(myObject,
-    * MyObject::MyMethod).
-    * After registering, myObject->MyMethod() will be called every time a new label has been removed from the MultiLabelSegmentation.
-    * Observers should unregister by calling myMultiLabelSegmentation->RemoveLabelsChangedListener(myObject,
-    * MyObject::MyMethod).
-    * The registered method will be called with the vector of label values of the modified labels.*
-    * @remark the usage of the message object is thread safe.
-    */
-    mitkNewMessage1Macro(LabelsChanged, LabelValueVectorType);
-
-    /**
-    * \brief GroupAdded is emitted whenever a new group has been added.
-    *
-    * Observers should register to this event by calling this->AddGroupAddedListener(myObject,
-    * MyObject::MyMethod).
-    * After registering, myObject->MyMethod() will be called every time a new group has been added to the MultiLabelSegmentation.
-    * Observers should unregister by calling this->RemoveGroupAddedListener(myObject, MyObject::MyMethod).
-    * The registered method will be called with the group index of the added group.
-    * @remark the usage of the message object is thread safe.
-    */
-    mitkNewMessage1Macro(GroupAdded, GroupIndexType);
-
-    /**
-    * \brief GroupModified is emitted whenever a group has been modified.
-    *
-    * A group is modified if the set of labels associated with it are changed or the group's meta data.
-    * Observers should register to this event by calling this->AddGroupModifiedListener(myObject,
-    * MyObject::MyMethod).
-    * After registering, myObject->MyMethod() will be called every time a new label has been added to the MultiLabelSegmentation.
-    * Observers should unregister by calling this->RemoveGroupModifiedListener(myObject, MyObject::MyMethod).
-    * The registered method will be called with the group index of the added group.
-    * @remark the usage of the message object is thread safe.
-    */
-    mitkNewMessage1Macro(GroupModified, GroupIndexType);
-
-    /**
-    * \brief GroupRemoved is emitted whenever a label has been removed.
-    *
-    * Observers should register to this event by calling this->AddGroupRemovedListener(myObject,
-    * MyObject::MyMethod).
-    * After registering, myObject->MyMethod() will be called every time a new label has been added to the MultiLabelSegmentation.
-    * Observers should unregister by calling this->RemoveGroupRemovedListener(myObject, MyObject::MyMethod).
-    * The registered method will be called with the group index of the removed group.*
-    * @remark the usage of the message object is thread safe.
-    */
-    mitkNewMessage1Macro(GroupRemoved, GroupIndexType);
+    void SetLookupTable(LookupTable* lut);
+    void UpdateLookupTable(PixelType pixelValue);
 
     protected:
 
@@ -379,22 +294,15 @@ namespace mitk
 
     public:
 
-      /**
-        * \brief  */
-      void UpdateCenterOfMass(PixelType pixelValue);
-
-      itkGetModifiableObjectMacro(LookupTable, mitk::LookupTable);
-      /** \brief
-      */
-      void SetLookupTable(LookupTable* lut);
-      void UpdateLookupTable(PixelType pixelValue);
-
 
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
     // END FUTURE MultiLabelSegmentation
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
+    /**
+      * \brief  */
+      void UpdateCenterOfMass(PixelType pixelValue);
 
     /**
      * @brief Initialize an empty mitk::LabelSetImage using the information

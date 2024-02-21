@@ -38,6 +38,7 @@ class mitkSurfaceInterpolationControllerTestSuite : public mitk::TestFixture
   MITK_TEST(TestRemoveAllInterpolationSessions);
   MITK_TEST(TestRemoveInterpolationSession);
   MITK_TEST(TestOnSegmentationDeleted);
+  MITK_TEST(TestOnLabelRemoved);
 
   MITK_TEST(TestSetCurrentInterpolationSession4D);
   MITK_TEST(TestRemoveAllInterpolationSessions4D);
@@ -260,8 +261,8 @@ public:
   void TestAddNewContours()
   {
     // Create segmentation image
-    unsigned int dimensions1[] = {10, 10, 10};
-    auto segmentation_1 = createLabelSetImage(dimensions1);
+    unsigned int dimensions1[] = {10, 10, 10, 4};
+    auto segmentation_1 = createLabelSetImage4D(dimensions1);
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
 
     auto surf_1 = CreateContour(3);
@@ -308,8 +309,8 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Invalid CPIs exists!", contours == nullptr);
 
     // Create another segmentation image
-    unsigned int dimensions2[] = {20, 20, 20};
-    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage(dimensions2);
+    unsigned int dimensions2[] = {20, 20, 20, 4};
+    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
     m_Controller->SetCurrentInterpolationSession(segmentation_2);
 
     auto planeGeometry4 = CreatePlaneGeometry(4);
@@ -386,8 +387,8 @@ public:
   void TestRemoveContours()
   {
     // Create segmentation image
-    unsigned int dimensions1[] = {12, 12, 12};
-    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage(dimensions1);
+    unsigned int dimensions1[] = {12, 12, 12, 3};
+    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
 
 
@@ -410,35 +411,86 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(2, 0)->size() == 2);
 
     //Remove unkown label
-    m_Controller->RemoveContours(9);
+    m_Controller->RemoveContours(segmentation_1, 9);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 0)->size() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 1)->size() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 2)->size() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(2, 0)->size() == 2);
 
     //Remove unkown time step
-    m_Controller->RemoveContours(1,3);
+    m_Controller->RemoveContours(segmentation_1, 1,3);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 0)->size() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 1)->size() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 2)->size() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(2, 0)->size() == 2);
 
 
-    m_Controller->RemoveContours(1, 1);
+    m_Controller->RemoveContours(segmentation_1, 1, 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 0)->size() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 1) == nullptr);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 2)->size() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(2, 0)->size() == 2);
 
-    m_Controller->RemoveContours(1);
+    m_Controller->RemoveContours(segmentation_1, 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 0) == nullptr);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 1) == nullptr);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 2) == nullptr);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(2, 0)->size() == 2);
 
-    m_Controller->RemoveContours(2);
+    m_Controller->RemoveContours(segmentation_1, 2);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(2, 0) == nullptr);
   }
+
+  void TestOnLabelRemoved()
+  {
+    // Create segmentation image
+    unsigned int dimensions[] = { 20, 10, 30, 4 };
+    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions);
+    segmentation_1->AddLabel(mitk::Label::New(1, "Label1"), 0);
+    segmentation_1->AddLabel(mitk::Label::New(2, "Label2"), 0);
+    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage4D(dimensions);
+    segmentation_2->AddLabel(mitk::Label::New(1, "Label1"), 0);
+    segmentation_2->AddLabel(mitk::Label::New(2, "Label2"), 0);
+
+    auto surf_1 = CreateContour(3);
+    auto surf_2 = CreateContour(3);
+    auto surf_3 = CreateContour(3);
+
+    auto planeGeometry1 = CreatePlaneGeometry(1);
+    auto planeGeometry2 = CreatePlaneGeometry(2);
+    auto planeGeometry3 = CreatePlaneGeometry(3);
+
+    mitk::SurfaceInterpolationController::CPIVector cpis = { {surf_1, planeGeometry1, 1, 0},
+      {surf_2, planeGeometry2, 1, 1}, {surf_3, planeGeometry3, 1, 2},
+      {surf_1, planeGeometry1, 2, 0}, {surf_2, planeGeometry3, 2, 0}
+    };
+
+    m_Controller->SetCurrentInterpolationSession(segmentation_1);
+    m_Controller->AddNewContours(cpis);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 0)->size() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 1)->size() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 2)->size() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(2, 0)->size() == 2);
+
+    m_Controller->SetCurrentInterpolationSession(segmentation_2);
+    m_Controller->AddNewContours(cpis);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 0)->size() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 1)->size() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 2)->size() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(2, 0)->size() == 2);
+
+    segmentation_1->RemoveLabel(1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 0)->size() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 1)->size() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 2)->size() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(2, 0)->size() == 2);
+    m_Controller->SetCurrentInterpolationSession(segmentation_1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 0) == nullptr);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 1) == nullptr);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(1, 2) == nullptr);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetContours(2, 0)->size() == 2);
+  }
+
 
   bool AssertImagesEqual4D(mitk::LabelSetImage *img1, mitk::LabelSetImage *img2)
   {

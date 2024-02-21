@@ -36,12 +36,6 @@ QmitkSimpleLabelSetListWidget::~QmitkSimpleLabelSetListWidget()
   {
     m_LabelSetImage->AfterChangeLayerEvent -= mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
       this, &QmitkSimpleLabelSetListWidget::OnLayerChanged);
-    m_LabelSetImage->RemoveLabelAddedListener(mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-      this, &QmitkSimpleLabelSetListWidget::OnLabelChanged));
-    m_LabelSetImage->RemoveLabelModifiedListener(mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-      this, &QmitkSimpleLabelSetListWidget::OnLabelChanged));
-    m_LabelSetImage->RemoveLabelRemovedListener(mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-      this, &QmitkSimpleLabelSetListWidget::OnLabelChanged));
   }
 }
 
@@ -69,30 +63,33 @@ void QmitkSimpleLabelSetListWidget::SetLabelSetImage(const mitk::LabelSetImage* 
 {
   if (image != m_LabelSetImage)
   {
-    if (m_LabelSetImage.IsNotNull())
-    {
-      m_LabelSetImage->AfterChangeLayerEvent -= mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
-        this, &QmitkSimpleLabelSetListWidget::OnLayerChanged);
-      m_LabelSetImage->RemoveLabelAddedListener(mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-        this, &QmitkSimpleLabelSetListWidget::OnLabelChanged));
-      m_LabelSetImage->RemoveLabelModifiedListener(mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-        this, &QmitkSimpleLabelSetListWidget::OnLabelChanged));
-      m_LabelSetImage->RemoveLabelRemovedListener(mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-        this, &QmitkSimpleLabelSetListWidget::OnLabelChanged));
-    }
+    m_LabelAddedObserver.Reset();
+    m_LabelModifiedObserver.Reset();
+    m_LabelRemovedObserver.Reset();
 
     m_LabelSetImage = image;
 
     if (m_LabelSetImage.IsNotNull())
     {
+      auto& widget = *this;
+      m_LabelAddedObserver.Reset(m_LabelSetImage, mitk::LabelAddedEvent(), [&widget](const itk::EventObject& event)
+        {
+          auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+          widget.OnLabelChanged(labelEvent->GetLabelValue());
+        });
+      m_LabelModifiedObserver.Reset(m_LabelSetImage, mitk::LabelModifiedEvent(), [&widget](const itk::EventObject& event)
+        {
+          auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+          widget.OnLabelChanged(labelEvent->GetLabelValue());
+        });
+      m_LabelRemovedObserver.Reset(m_LabelSetImage, mitk::LabelRemovedEvent(), [&widget](const itk::EventObject& event)
+        {
+          auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+          widget.OnLabelChanged(labelEvent->GetLabelValue());
+        });
+
       m_LabelSetImage->AfterChangeLayerEvent += mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
         this, &QmitkSimpleLabelSetListWidget::OnLayerChanged);
-      m_LabelSetImage->AddLabelAddedListener(mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-        this, &QmitkSimpleLabelSetListWidget::OnLabelChanged));
-      m_LabelSetImage->AddLabelModifiedListener(mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-        this, &QmitkSimpleLabelSetListWidget::OnLabelChanged));
-      m_LabelSetImage->AddLabelRemovedListener(mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-        this, &QmitkSimpleLabelSetListWidget::OnLabelChanged));
     }
   }
 }

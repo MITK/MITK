@@ -30,32 +30,24 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.dicombrowser:OFF
   org.mitk.gui.qt.dicominspector:OFF
   org.mitk.gui.qt.dosevisualization:OFF
-  org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF
   org.mitk.gui.qt.igttracking:OFF
   org.mitk.gui.qt.openigtlink:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.viewnavigator:OFF
-  org.mitk.gui.qt.materialeditor:OFF
   org.mitk.gui.qt.measurementtoolbox:OFF
   org.mitk.gui.qt.moviemaker:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
-  org.mitk.gui.qt.pointsetinteractionmultispectrum:OFF
   org.mitk.gui.qt.python:OFF
   org.mitk.gui.qt.remeshing:OFF
   org.mitk.gui.qt.segmentation:OFF
-  org.mitk.gui.qt.deformableclippingplane:OFF
   org.mitk.gui.qt.aicpregistration:OFF
   org.mitk.gui.qt.renderwindowmanager:OFF
-  org.mitk.gui.qt.semanticrelations:OFF
   org.mitk.gui.qt.toftutorial:OFF
   org.mitk.gui.qt.tofutil:OFF
-  org.mitk.gui.qt.tubegraph:OFF
-  org.mitk.gui.qt.ugvisualization:OFF
   org.mitk.gui.qt.ultrasound:OFF
   org.mitk.gui.qt.volumevisualization:OFF
-  org.mitk.gui.qt.eventrecorder:OFF
   org.mitk.gui.qt.xnat:OFF
   org.mitk.gui.qt.igt.app.ultrasoundtrackingnavigation:OFF
   org.mitk.gui.qt.overlaymanager:OFF

@@ -40,7 +40,6 @@ set(MITK_MODULES
   IGTBase
   IGT
   CameraCalibration
-  OpenCL
   OpenCVVideoSupport
   QtOverlays
   ToFHardware
@@ -59,11 +58,8 @@ set(MITK_MODULES
   RTUI
   IOExt
   XNAT
-  TubeGraph
   BoundingShape
   RenderWindowManagerUI
-  SemanticRelations
-  SemanticRelationsUI
   CEST
   BasicImageProcessing
   ModelFit

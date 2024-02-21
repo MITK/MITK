@@ -58,7 +58,6 @@ set(MITK_MODULES
   RTUI
   IOExt
   XNAT
-  TubeGraph
   BoundingShape
   RenderWindowManagerUI
   SemanticRelations

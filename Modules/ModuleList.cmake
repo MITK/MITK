@@ -40,7 +40,6 @@ set(MITK_MODULES
   IGTBase
   IGT
   CameraCalibration
-  OpenCL
   OpenCVVideoSupport
   QtOverlays
   ToFHardware

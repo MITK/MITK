@@ -206,7 +206,6 @@ endforeach()
 # MITK superbuild
 
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 option(MITK_USE_OpenMP "Use OpenMP" OFF)
 option(MITK_USE_Python3 "Use Python 3" OFF)
 
@@ -917,10 +916,6 @@ endif()
 
 if(MITK_USE_OpenIGTLink)
   link_directories(${OpenIGTLink_LIBRARY_DIRS})
-endif()
-
-if(MITK_USE_OpenCL)
-  find_package(OpenCL REQUIRED)
 endif()
 
 if(MITK_USE_OpenMP)

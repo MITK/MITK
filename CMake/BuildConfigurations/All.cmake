@@ -4,7 +4,6 @@ set(_apple_package_excludes)
 
 set(_package_excludes
   ${_apple_package_excludes}
-  OpenCL
   OpenMP
   SYSTEM_Boost
   Boost_LIBRARIES

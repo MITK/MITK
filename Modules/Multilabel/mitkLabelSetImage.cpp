@@ -12,28 +12,15 @@ found in the LICENSE file.
 
 #include "mitkLabelSetImage.h"
 
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkImagePixelReadAccessor.h"
-#include "mitkImagePixelWriteAccessor.h"
-#include "mitkInteractionConst.h"
-#include "mitkLookupTableProperty.h"
-#include "mitkPadImageFilter.h"
-#include "mitkRenderingManager.h"
-#include "mitkDICOMSegmentationPropertyHelper.h"
-#include "mitkDICOMQIPropertyHelper.h"
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkImagePixelWriteAccessor.h>
+#include <mitkPadImageFilter.h>
+#include <mitkDICOMSegmentationPropertyHelper.h>
+#include <mitkDICOMQIPropertyHelper.h>
 
-#include <vtkCell.h>
-#include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
-
-#include <itkImageRegionIterator.h>
-#include <itkQuadEdgeMesh.h>
-#include <itkTriangleMeshToBinaryImageFilter.h>
 #include <itkLabelGeometryImageFilter.h>
-
 #include <itkCommand.h>
-
 #include <itkBinaryFunctorImageFilter.h>
 
 

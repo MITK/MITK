@@ -17,21 +17,14 @@ found in the LICENSE file.
 #include <mitkCreateDistanceImageFromSurfaceFilter.h>
 #include <mitkComputeContourSetNormalsFilter.h>
 #include <mitkImageAccessByItk.h>
-#include <mitkImagePixelReadAccessor.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkImageToSurfaceFilter.h>
-#include <mitkLabelSetImage.h>
-#include <mitkMemoryUtilities.h>
 #include <mitkNodePredicateDataUID.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkPlanarCircle.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkReduceContourSetFilter.h>
-
-#include <vtkFieldData.h>
-#include <vtkMath.h>
-#include <vtkPolygon.h>
 
 struct CPICache
 {

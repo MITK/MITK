@@ -48,7 +48,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.tofutil:OFF
   org.mitk.gui.qt.ultrasound:OFF
   org.mitk.gui.qt.volumevisualization:OFF
-  org.mitk.gui.qt.eventrecorder:OFF
   org.mitk.gui.qt.xnat:OFF
   org.mitk.gui.qt.igt.app.ultrasoundtrackingnavigation:OFF
   org.mitk.gui.qt.overlaymanager:OFF

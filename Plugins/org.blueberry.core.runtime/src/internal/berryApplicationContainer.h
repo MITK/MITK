@@ -70,7 +70,7 @@ private:
 
   ctkPluginContext* context;
 
-  QMutex lock;
+  QMutex appDescLock;
 
   // A map of ApplicationDescriptors keyed by application ID
   /* @GuardedBy(lock) */

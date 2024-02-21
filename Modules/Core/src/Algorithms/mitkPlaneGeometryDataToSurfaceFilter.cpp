@@ -28,11 +28,10 @@ found in the LICENSE file.
 #include <vtkGeneralTransform.h>
 #include <vtkPPolyDataNormals.h>
 #include <vtkPlane.h>
-#include <vtkStripper.h>
 #include <vtkTextureMapToPlane.h>
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
-#include <vtkTriangleFilter.h>
+#include <vtkContourTriangulator.h>
 
 mitk::PlaneGeometryDataToSurfaceFilter::PlaneGeometryDataToSurfaceFilter()
   : m_UseGeometryParametricBounds(true),
@@ -49,10 +48,8 @@ mitk::PlaneGeometryDataToSurfaceFilter::PlaneGeometryDataToSurfaceFilter()
 
   m_Plane = vtkPlane::New();
   m_PlaneCutter = vtkCutter::New();
-  m_PlaneStripper = vtkStripper::New();
-  m_PlanePolyData = vtkPolyData::New();
+  m_ContourTriangulator = vtkContourTriangulator::New();
   m_NormalsUpdater = vtkPPolyDataNormals::New();
-  m_PlaneTriangler = vtkTriangleFilter::New();
   m_TextureMapToPlane = vtkTextureMapToPlane::New();
 
   m_Box = vtkBox::New();
@@ -72,10 +69,8 @@ mitk::PlaneGeometryDataToSurfaceFilter::~PlaneGeometryDataToSurfaceFilter()
 
   m_Plane->Delete();
   m_PlaneCutter->Delete();
-  m_PlaneStripper->Delete();
-  m_PlanePolyData->Delete();
+  m_ContourTriangulator->Delete();
   m_NormalsUpdater->Delete();
-  m_PlaneTriangler->Delete();
   m_TextureMapToPlane->Delete();
 
   m_Box->Delete();
@@ -275,27 +270,23 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
 
       // Cut the plane with the cube.
       m_PlaneCutter->SetInputConnection(m_PolyDataTransformer->GetOutputPort());
+      m_PlaneCutter->GenerateTrianglesOff();
       m_PlaneCutter->SetCutFunction(m_Plane);
 
       // The output of the cutter must be converted into appropriate poly data.
-      m_PlaneStripper->SetInputConnection(m_PlaneCutter->GetOutputPort());
-      m_PlaneStripper->Update();
+      m_ContourTriangulator->SetInputConnection(m_PlaneCutter->GetOutputPort());
+      m_ContourTriangulator->Update();
 
-      if (m_PlaneStripper->GetOutput()->GetNumberOfPoints() < 3)
+      if (m_ContourTriangulator->GetTriangulationError())
       {
         return;
       }
 
-      m_PlanePolyData->SetPoints(m_PlaneStripper->GetOutput()->GetPoints());
-      m_PlanePolyData->SetPolys(m_PlaneStripper->GetOutput()->GetLines());
-
-      m_PlaneTriangler->SetInputData(m_PlanePolyData);
-
       // Get bounds of the resulting surface and use it to generate the texture
       // mapping information
-      m_PlaneTriangler->Update();
-      m_PlaneTriangler->GetOutput()->ComputeBounds();
-      double *surfaceBounds = m_PlaneTriangler->GetOutput()->GetBounds();
+      m_ContourTriangulator->Update();
+      m_ContourTriangulator->GetOutput()->ComputeBounds();
+      double *surfaceBounds = m_ContourTriangulator->GetOutput()->GetBounds();
 
       origin[0] = surfaceBounds[0];
       origin[1] = surfaceBounds[2];
@@ -311,7 +302,7 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
 
       // Now we tell the data how it shall be textured afterwards;
       // description see above.
-      m_TextureMapToPlane->SetInputConnection(m_PlaneTriangler->GetOutputPort());
+      m_TextureMapToPlane->SetInputConnection(m_ContourTriangulator->GetOutputPort());
       m_TextureMapToPlane->AutomaticPlaneGenerationOn();
       m_TextureMapToPlane->SetOrigin(origin[0], origin[1], origin[2]);
       m_TextureMapToPlane->SetPoint1(right[0], right[1], right[2]);

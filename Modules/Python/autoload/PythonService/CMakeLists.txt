@@ -6,7 +6,7 @@ if(CTKScriptingPythonCore_INCLUDE_DIRS AND CTKScriptingPythonWidgets_INCLUDE_DIR
       PRIVATE src/PythonService
     DEPENDS PUBLIC MitkPython
     PACKAGE_DEPENDS
-      PUBLIC Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
+      PUBLIC Qt6|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
       PRIVATE Python3|NumPy
     AUTOLOAD_WITH MitkPython
   )

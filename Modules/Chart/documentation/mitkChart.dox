@@ -12,7 +12,7 @@ The MITK chart module is able to show different types of charts in a widget with
 
 \subsection Chart_Technical Technical background
 
-The module uses the java script library <a href="https://plot.ly/javascript/">plotly</a> to display the chart in a <a href="https://doc.qt.io/qt-5/qwebengineview.html">QWebEngineView</a> (that renders html/js content).
+The module uses the java script library <a href="https://plot.ly/javascript/">plotly</a> to display the chart in a <a href="https://doc.qt.io/qt-6/qwebengineview.html">QWebEngineView</a> (that renders html/js content).
 
 For examples, please visit https://plot.ly/javascript/.
 
@@ -20,7 +20,7 @@ For examples, please visit https://plot.ly/javascript/.
 
 \note Be sure that the dependency to the Chart Module is resolved in the CMakeLists.txt of the plugin: <code>MODULE_DEPENDS MitkChart</code>.
 
-Open the ui file of the plugin. Then add a widget (we always use the name <code>chartWidget</code> in the following) at the desired position. Change the class of the widget to a user-defined widget (right click &rarr; user defined classes, see https://doc.qt.io/qt-5/designer-using-custom-widgets.html). Set "QWidget" as base class. Set "QmitkChartWidget" as class name and "QmitkChartWidget.h" as include file.
+Open the ui file of the plugin. Then add a widget (we always use the name <code>chartWidget</code> in the following) at the desired position. Change the class of the widget to a user-defined widget (right click &rarr; user defined classes, see https://doc.qt.io/qt-6/designer-using-custom-widgets.html). Set "QWidget" as base class. Set "QmitkChartWidget" as class name and "QmitkChartWidget.h" as include file.
 
 \imageMacro{userDefinedWidget.png,"User defined widget",10}
 

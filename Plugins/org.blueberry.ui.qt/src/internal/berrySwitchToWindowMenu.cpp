@@ -51,7 +51,7 @@ QString SwitchToWindowMenu::CalcText(int number, IWorkbenchWindow* window)
   QString suffix = window->GetShell()->GetText();
   if (suffix.isEmpty())
   {
-    return QString::null;
+    return QString();
   }
 
   QString sb;
@@ -67,7 +67,7 @@ QString SwitchToWindowMenu::CalcText(int number, IWorkbenchWindow* window)
   }
   else
   {
-    sb.append(suffix.leftRef(MAX_TEXT_LENGTH));
+    sb.append(QStringView(suffix).left(MAX_TEXT_LENGTH));
     sb.append("...");
   }
   return sb;
@@ -120,7 +120,7 @@ void SwitchToWindowMenu::Fill(QMenu* menu, QAction* before)
   auto   signalMapper = new QSignalMapper(menu);
   connect(signalMapper, SIGNAL(mapped(int)), SLOT(MenuItemTriggered(int)));
   int count = 0;
-  for (auto window : qAsConst(windows))
+  for (auto window : std::as_const(windows))
   {
     // can encounter disposed shells if this update is in response to a shell closing
     //if (!window->GetShell()->IsDisposed())

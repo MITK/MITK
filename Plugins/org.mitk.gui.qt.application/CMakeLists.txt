@@ -4,5 +4,5 @@ mitk_create_plugin(
   EXPORT_DIRECTIVE MITK_QT_APP
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS MitkQtWidgets MitkQtWidgetsExt
-  PACKAGE_DEPENDS Qt5|OpenGL+Xml
+  PACKAGE_DEPENDS Qt6|OpenGL+Xml
   )

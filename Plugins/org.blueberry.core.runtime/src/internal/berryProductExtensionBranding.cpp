@@ -65,7 +65,7 @@ QString ProductExtensionBranding::GetId() const
 QString ProductExtensionBranding::GetProperty(const QString& key) const
 {
   auto iter = properties.find(key);
-  return iter != properties.end() ? iter.value() : QString::null;
+  return iter != properties.end() ? iter.value() : QString();
 }
 
 SmartPointer<IProduct> ProductExtensionBranding::GetProduct() const
@@ -77,7 +77,7 @@ void ProductExtensionBranding::LoadProperties(const SmartPointer<IConfigurationE
 {
   QList<IConfigurationElement::Pointer> children = element->GetChildren();
   properties.clear();
-  for (const auto &child : qAsConst(children))
+  for (const auto &child : std::as_const(children))
   {
     QString key = child->GetAttribute(ATTR_NAME);
     QString value = child->GetAttribute(ATTR_VALUE);

@@ -30,7 +30,7 @@ class MITKIGTUI_EXPORT QmitkMicronTrackerWidget : public QmitkAbstractTrackingDe
 public:
   static const std::string VIEW_ID;
 
-  QmitkMicronTrackerWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkMicronTrackerWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
   ~QmitkMicronTrackerWidget() override;
 
   void Initialize() override;

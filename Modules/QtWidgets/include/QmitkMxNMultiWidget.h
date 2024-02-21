@@ -37,7 +37,7 @@ class MITKQTWIDGETS_EXPORT QmitkMxNMultiWidget : public QmitkAbstractMultiWidget
 public:
 
   QmitkMxNMultiWidget(QWidget* parent = nullptr,
-                      Qt::WindowFlags f = 0,
+                      Qt::WindowFlags f = {},
                       const QString& multiWidgetName = "mxn");
 
   ~QmitkMxNMultiWidget();

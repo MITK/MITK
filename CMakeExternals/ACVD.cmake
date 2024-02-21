@@ -32,7 +32,6 @@ if(MITK_USE_ACVD)
         ${additional_args}
         -DUSE_MULTITHREADING:BOOL=ON
         -DBUILD_EXAMPLES:BOOL=OFF
-        -DQt5_DIR:PATH=${Qt5_DIR}
         -DVTK_DIR:PATH=${VTK_DIR}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}

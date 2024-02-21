@@ -39,7 +39,7 @@ class MITKTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFConnectionWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+    QmitkToFConnectionWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = {});
     ~QmitkToFConnectionWidget() override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */

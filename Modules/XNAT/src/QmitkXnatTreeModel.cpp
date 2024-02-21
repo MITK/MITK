@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <QmitkMimeTypes.h>
 
 #include <QIcon>
+#include <QRegularExpression>
 
 #include <ctkXnatDataModel.h>
 #include <ctkXnatExperiment.h>
@@ -38,8 +39,10 @@ QModelIndexList QmitkXnatTreeModel::match(
   const QModelIndex &start, int role, const QVariant &value, int hits, Qt::MatchFlags flags) const
 {
   QModelIndexList result;
-  uint matchType = flags & 0x0F;
-  Qt::CaseSensitivity cs = flags & Qt::MatchCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
+  uint matchType = flags & Qt::MatchTypeMask;
+  Qt::CaseSensitivity cs = flags.testFlag(Qt::MatchCaseSensitive)
+    ? Qt::CaseSensitive
+    : Qt::CaseInsensitive;
   bool recurse = flags & Qt::MatchRecursive;
   bool wrap = flags & Qt::MatchWrap;
   bool allHits = (hits == -1);
@@ -70,14 +73,22 @@ QModelIndexList QmitkXnatTreeModel::match(
         QString t = v.toString();
         switch (matchType)
         {
-          case Qt::MatchRegExp:
-            if (!QRegExp(text, cs).exactMatch(t))
+          case Qt::MatchRegularExpression:
+          {
+            QRegularExpression::PatternOptions options;
+            options.setFlag(QRegularExpression::CaseInsensitiveOption, !flags.testFlag(Qt::MatchCaseSensitive));
+            QRegularExpression regExp(QString("^%1$").arg(text), options);
+            if (!regExp.match(t).hasMatch())
               result.append(idx);
             break;
+          }
           case Qt::MatchWildcard:
-            if (!QRegExp(text, cs, QRegExp::Wildcard).exactMatch(t))
+          {
+            auto regExp = QRegularExpression::fromWildcard(text, cs);
+            if (!regExp.match(t).hasMatch())
               result.append(idx);
             break;
+          }
           case Qt::MatchStartsWith:
             if (!t.startsWith(text, cs))
               result.append(idx);

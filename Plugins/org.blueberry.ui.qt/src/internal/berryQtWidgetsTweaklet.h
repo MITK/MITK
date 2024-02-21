@@ -58,7 +58,7 @@ public:
   //IMenu::Pointer CreateMenu(IMenu::Pointer parent);
   //IMenuItem::Pointer CreateMenuItem(IMenu::Pointer, IMenuItem::Style, int index = -1);
 
-  QRect GetScreenSize(int i = -1) override;
+  QRect GetScreenSize(int i = 0) override;
   unsigned int GetScreenNumber() override;
   int GetPrimaryScreenNumber() override;
   QRect GetAvailableScreenSize(int i = -1) override;

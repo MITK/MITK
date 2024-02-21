@@ -38,7 +38,7 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkUSDeviceManagerWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+  QmitkUSDeviceManagerWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = {});
   ~QmitkUSDeviceManagerWidget() override;
 
   /* @brief This method is part of the widget an needs not to be called seperately. */

@@ -129,21 +129,13 @@ void QtSash::mouseMoveEvent(QMouseEvent *e)
   if (!dragging && !(e->buttons() & Qt::LeftButton))
     return;
 
-  QPoint eventPoint(e->globalX(), e->globalY());
+  auto eventPoint = e->globalPosition().toPoint();
   eventPoint = this->parentWidget()->mapFromGlobal(eventPoint);
+
   int eventX = eventPoint.x();
   int eventY = eventPoint.y();
-//  int eventX = e->globalX();
-//  int eventY = e->globalY();
-
-  //int x = OS.GTK_WIDGET_X (handle);
-  //int y = OS.GTK_WIDGET_Y (handle);
   int width = this->geometry().width();
   int height = this->geometry().height();
-  //int parentBorder = 0;
-  //int parentWidth = OS.GTK_WIDGET_WIDTH (parent.handle);
-  //int parentHeight = OS.GTK_WIDGET_HEIGHT (parent.handle);
-
   int newX = lastX;
   int newY = lastY;
 
@@ -288,7 +280,7 @@ void QtSash::drawRubberBand(int x, int y, int width, int height)
 void QtSash::paintEvent(QPaintEvent*)
 {
   QStyleOption opt;
-  opt.init(this);
+  opt.initFrom(this);
   QPainter p(this);
   style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }

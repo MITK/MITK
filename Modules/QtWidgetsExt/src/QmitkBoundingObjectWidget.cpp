@@ -193,10 +193,10 @@ void QmitkBoundingObjectWidget::AddItem(mitk::DataNode *node)
     QList<QTreeWidgetItem *> items = m_TreeWidget->selectedItems();
     for (int i = 0; i < items.size(); i++)
     {
-      m_TreeWidget->setItemSelected(items.at(i), false);
+      items.at(i)->setSelected(false);
     }
 
-    m_TreeWidget->setItemSelected(item, true);
+    item->setSelected(true);
   }
   else
     MITK_ERROR << name << " is not a bounding object or does not exist in data storage" << endl;

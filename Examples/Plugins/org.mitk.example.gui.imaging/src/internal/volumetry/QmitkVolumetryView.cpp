@@ -149,7 +149,7 @@ void QmitkVolumetryView::OnTimeSeriesButtonClicked()
       vs << timeStep++ << "\t" << *it << std::endl;
     }
     m_Controls->m_TextEdit->setText(vs.str().c_str());
-    m_Controls->m_TextEdit->setTabStopWidth(20);
+    m_Controls->m_TextEdit->setTabStopDistance(20);
     m_Controls->m_SaveCsvButton->setEnabled(true);
   }
 }

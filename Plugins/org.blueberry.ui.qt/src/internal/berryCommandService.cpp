@@ -116,12 +116,12 @@ QList<SmartPointer<CommandCategory> > CommandService::GetDefinedCategories() con
 
 QStringList CommandService::GetDefinedCategoryIds() const
 {
-  return commandManager->GetDefinedCategoryIds().toList();
+  return commandManager->GetDefinedCategoryIds().values();
 }
 
 QStringList CommandService::GetDefinedCommandIds() const
 {
-  return commandManager->GetDefinedCommandIds().toList();
+  return commandManager->GetDefinedCommandIds().values();
 }
 
 QList<SmartPointer<Command> > CommandService::GetDefinedCommands() const
@@ -131,7 +131,7 @@ QList<SmartPointer<Command> > CommandService::GetDefinedCommands() const
 
 QStringList CommandService::GetDefinedParameterTypeIds() const
 {
-  return commandManager->GetDefinedParameterTypeIds().toList();
+  return commandManager->GetDefinedParameterTypeIds().values();
 }
 
 QList<SmartPointer<ParameterType> > CommandService::GetDefinedParameterTypes() const

@@ -55,11 +55,11 @@ QString DemangleName(const char* mangledName)
   if (unmangled)
   {
     QString unmangledName(unmangled);
-    name = unmangledName.split(' ', QString::SkipEmptyParts).back();
+    name = unmangledName.split(' ', Qt::SkipEmptyParts).back();
     free(unmangled);
   }
 #else
-  name = name.split(' ', QString::SkipEmptyParts).back();
+  name = name.split(' ', Qt::SkipEmptyParts).back();
 #endif
   return name;
 }

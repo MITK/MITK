@@ -38,7 +38,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
 {
   this->setParent(parent);
   auto layout = new QHBoxLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins({});
 
   mitk::NodePredicateAnd::Pointer noHelperObjects = mitk::NodePredicateAnd::New();
   noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));

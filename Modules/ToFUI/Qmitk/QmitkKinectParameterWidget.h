@@ -35,7 +35,7 @@ class MITKTOFUI_EXPORT QmitkKinectParameterWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkKinectParameterWidget(QWidget* p = nullptr, Qt::WindowFlags f = nullptr);
+    QmitkKinectParameterWidget(QWidget* p = nullptr, Qt::WindowFlags f = {});
     ~QmitkKinectParameterWidget() override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */

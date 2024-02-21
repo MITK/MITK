@@ -42,7 +42,7 @@ class MITKIGTUI_EXPORT QmitkNavigationToolStorageSelectionWidget : public QWidge
   public:
     static const std::string VIEW_ID;
 
-    QmitkNavigationToolStorageSelectionWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+    QmitkNavigationToolStorageSelectionWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
     ~QmitkNavigationToolStorageSelectionWidget() override;
 
     /** @return Returns the currently selected NavigationToolStorage. Returns null if no storage is selected at the moment. */

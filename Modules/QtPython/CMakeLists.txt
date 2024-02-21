@@ -5,7 +5,7 @@ if(MITK_USE_Python3)
     mitk_create_module(
       DEPENDS MitkCore MitkQtWidgets MitkPython
       PACKAGE_DEPENDS
-      PUBLIC Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
+      PUBLIC Qt6|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
     )
   endif()
 

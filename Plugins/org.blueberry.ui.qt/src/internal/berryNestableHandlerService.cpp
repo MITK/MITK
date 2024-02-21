@@ -52,7 +52,7 @@ void NestableHandlerService::Deactivate()
     return;
   }
 
-  DeactivateHandlers(parentActivations.toList());
+  DeactivateHandlers(parentActivations.values());
   parentActivations.clear();
 
   QList<IHandlerActivation::Pointer> localActivations = localActivationsToParentActivations.keys();

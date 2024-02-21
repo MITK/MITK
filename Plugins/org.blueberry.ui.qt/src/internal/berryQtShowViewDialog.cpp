@@ -51,7 +51,7 @@ public:
     if (m_FilterOnKeywords != filterOnKeywords)
     {
       m_FilterOnKeywords = filterOnKeywords;
-      this->filterChanged();
+      this->invalidateFilter();
     }
   }
 
@@ -59,8 +59,8 @@ protected:
 
   bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override
   {
-    QRegExp regExp = filterRegExp();
-    if (!regExp.isValid() || regExp.isEmpty()) return true;
+    QRegularExpression regExp = filterRegularExpression();
+    if (!regExp.isValid() || regExp.pattern().isEmpty()) return true;
 
     QModelIndex sourceIndex = sourceModel()->index(sourceRow, 0, sourceParent);
     QStringList keywords;
@@ -77,7 +77,7 @@ protected:
         int numChildren = sourceModel()->rowCount(sourceIndex);
         for (int i = 0; i < numChildren; ++i)
         {
-          keywords.push_back(sourceModel()->data(sourceIndex.child(i, 0)).toString());
+          keywords.push_back(sourceModel()->data(sourceModel()->index(i, 0, sourceIndex)).toString());
         }
       }
       else
@@ -272,7 +272,7 @@ void QtShowViewDialog::SaveState()
   geomChild->PutTextData(geom.toBase64().constData());
 
   // expanded categories
-  for (const QPersistentModelIndex &index : qAsConst(m_ExpandedCategories))
+  for (const QPersistentModelIndex &index : std::as_const(m_ExpandedCategories))
   {
     if (index.isValid())
     {
@@ -316,7 +316,7 @@ QtShowViewDialog::GetSelection() const
   QList<QString> selected;
 
   QModelIndexList indices = m_UserInterface.m_TreeView->selectionModel()->selectedIndexes();
-  for(QModelIndex index : qAsConst(indices))
+  for(QModelIndex index : std::as_const(indices))
   {
     QString id = m_FilterModel->data(index, ViewTreeModel::Id).toString();
     selected.push_back(id);

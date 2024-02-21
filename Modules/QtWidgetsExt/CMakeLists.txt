@@ -1,8 +1,8 @@
 MITK_CREATE_MODULE(
   DEPENDS MitkAlgorithmsExt MitkQtWidgets PRIVATE MitkSceneSerializationBase
   PACKAGE_DEPENDS
-    PUBLIC Qwt CTK|CTKWidgets
-    PRIVATE Qt5|Concurrent+Svg+Xml VTK|IOImage
+    PUBLIC Qt6Qwt6 CTK|CTKWidgets
+    PRIVATE Qt6|Concurrent+Svg+Xml VTK|IOImage
 )
 
 if (TARGET ${MODULE_TARGET} AND MSVC)

@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <QStatusBar>
 #include <QString>
 #include <QFile>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QSettings>
 
@@ -51,6 +51,7 @@ found in the LICENSE file.
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
+#include <QmitkApplicationConstants.h>
 #include "QmitkExtFileSaveProjectAction.h"
 
 #include <itkConfigure.h>
@@ -598,8 +599,11 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   if (showViewToolbar)
   {
     auto* prefService = mitk::CoreServices::GetPreferencesService();
+
     auto* stylePrefs = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
     bool showCategoryNames = stylePrefs->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true);
+
+    auto* toolBarsPrefs = prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
 
     // Order view descriptors by category
 
@@ -634,8 +638,10 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
       if (!relevantViewDescriptors.isEmpty())
       {
         auto toolbar = new QToolBar;
-        toolbar->setObjectName(category + " View Toolbar");
+        toolbar->setObjectName(category);
         mainWindow->addToolBar(toolbar);
+
+        toolbar->setVisible(toolBarsPrefs->GetBool(category.toStdString(), true));
 
         if (showCategoryNames && !category.isEmpty())
         {
@@ -1072,8 +1078,8 @@ void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onIntro()
     berry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro();
   if (!hasIntro)
   {
-    QRegExp reg("(.*)<title>(\\n)*");
-    QRegExp reg2("(\\n)*</title>(.*)");
+    QRegularExpression reg("(.*)<title>(\\n)*");
+    QRegularExpression reg2("(\\n)*</title>(.*)");
     QFile file(":/org.mitk.gui.qt.ext/index.html");
     file.open(QIODevice::ReadOnly | QIODevice::Text); //text file only for reading
 
@@ -1153,6 +1159,6 @@ void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onHelpOpenHelpPerspective()
 
 void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onAbout()
 {
-  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), nullptr);
+  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow());
   aboutDialog->open();
 }

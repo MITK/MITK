@@ -28,15 +28,20 @@ if(MITK_USE_HDF5)
 
     ExternalProject_Add(${proj}
        GIT_REPOSITORY https://github.com/HDFGroup/hdf5.git
-       GIT_TAG hdf5-1_8_17
+       GIT_TAG 8b5cac6bc498546efa5639f99bb7dbbc1a2d5d90 # hdf5-1_14_3 (2023-10-28)
        CMAKE_GENERATOR ${gen}
        CMAKE_GENERATOR_PLATFORM ${gen_platform}
        CMAKE_ARGS
          ${ep_common_args}
          ${additional_args}
-         -DHDF5_BUILD_HL_LIB:BOOL=ON
-         -DHDF5_BUILD_CPP_LIB:BOOL=ON
+         -DBUILD_TESTING:BOOL=OFF
          -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+         -DDEFAULT_API_VERSION:STRING=v18
+         -DHDF5_BUILD_CPP_LIB:BOOL=ON
+         -DHDF5_BUILD_EXAMPLES:BOOL=OFF
+         -DHDF5_BUILD_HL_LIB:BOOL=ON
+         -DHDF5_DISABLE_COMPILER_WARNINGS:BOOL=ON
+         -DHDF5_ENABLE_ALL_WARNINGS:BOOL=OFF
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}
        CMAKE_CACHE_DEFAULT_ARGS

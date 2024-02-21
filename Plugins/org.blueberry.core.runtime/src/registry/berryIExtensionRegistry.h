@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <berrySmartPointer.h>
 
 #include <QList>
+#include <QtPlugin>
 
 class QTranslator;
 

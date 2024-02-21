@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include "berryExtensionRegistry.h"
 #include "berryRegistryObjectManager.h"
 
+#include <QLocale>
+
 namespace berry {
 
 // it is assumed that int has 32 bits (bits #0 to #31);

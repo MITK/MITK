@@ -55,7 +55,7 @@ public:
   using LayoutDesign = QmitkMultiWidgetLayoutManager::LayoutDesign;
 
   QmitkRenderWindowMenu(QWidget *parent = nullptr,
-                        Qt::WindowFlags f = nullptr,
+                        Qt::WindowFlags f = {},
                         mitk::BaseRenderer *b = nullptr);
   ~QmitkRenderWindowMenu() override;
 

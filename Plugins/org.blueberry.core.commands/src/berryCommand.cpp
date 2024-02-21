@@ -34,7 +34,7 @@ bool Command::DEBUG_COMMAND_EXECUTION = false;
 
 bool Command::DEBUG_HANDLERS = false;
 
-QString Command::DEBUG_HANDLERS_COMMAND_ID = QString::null;
+QString Command::DEBUG_HANDLERS_COMMAND_ID = QString();
 
 
 Command::Command(const QString& id)

@@ -449,7 +449,6 @@ bool QmitkMultiLabelTreeModel::setData(const QModelIndex& index, const QVariant&
         {
           label->SetVisible(value.toBool());
         }
-        auto groupID = m_Segmentation->GetGroupIndexOfLabel(label->GetValue());
         m_Segmentation->UpdateLookupTable(label->GetValue());
         m_Segmentation->Modified();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();

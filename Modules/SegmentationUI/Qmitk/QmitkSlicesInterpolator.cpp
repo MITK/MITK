@@ -1367,8 +1367,6 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
     {
       QWidget::setEnabled(true);
 
-      // In case the time is not valid use 0 to access the time geometry of the working node
-      unsigned int time_position = 0;
       if (!workingNode->GetData()->GetTimeGeometry()->IsValidTimePoint(m_TimePoint))
       {
         MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of WorkingImage. Time point: " << m_TimePoint;

@@ -51,7 +51,7 @@ namespace mitk
 const mitk::LabelSetImage::LabelValueType mitk::LabelSetImage::UNLABELED_VALUE = 0;
 
 mitk::LabelSetImage::LabelSetImage()
-  : mitk::Image(), m_UnlabeledLabelLock(false), m_ActiveLayer(0), m_activeLayerInvalid(false), m_ActiveLabelValue(0)
+  : mitk::Image(), m_ActiveLabelValue(0), m_UnlabeledLabelLock(false), m_ActiveLayer(0), m_activeLayerInvalid(false)
 {
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
@@ -62,11 +62,11 @@ mitk::LabelSetImage::LabelSetImage()
 
 mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
   : Image(other),
+    m_ActiveLabelValue(other.m_ActiveLabelValue),
+    m_LookupTable(other.m_LookupTable->Clone()),
     m_UnlabeledLabelLock(other.m_UnlabeledLabelLock),
     m_ActiveLayer(other.GetActiveLayer()),
-    m_activeLayerInvalid(false),
-    m_LookupTable(other.m_LookupTable->Clone()),
-    m_ActiveLabelValue(other.m_ActiveLabelValue)
+    m_activeLayerInvalid(false)
 {
   GroupIndexType i = 0;
   for (auto groupImage : other.m_LayerContainer)
@@ -413,7 +413,7 @@ void mitk::LabelSetImage::ClearBuffer()
   }
 }
 
-void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, PixelType sourcePixelValue, unsigned int layer)
+void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, PixelType sourcePixelValue)
 {
   try
   {
@@ -430,7 +430,7 @@ void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, PixelType sourcePixel
   Modified();
 }
 
-void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, const std::vector<PixelType>& vectorOfSourcePixelValues, unsigned int layer)
+void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, const std::vector<PixelType>& vectorOfSourcePixelValues)
 {
   try
   {
@@ -748,7 +748,7 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
       mitkThrow() << image->GetDimension() << "-dimensional label set images not yet supported";
     }
   }
-  catch (Exception e)
+  catch (Exception& e)
   {
     mitkReThrow(e) << "Could not intialize by provided labeled image.";
   }

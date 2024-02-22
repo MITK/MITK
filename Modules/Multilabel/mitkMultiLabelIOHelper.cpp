@@ -54,7 +54,7 @@ bool mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(const std::string &preset
 
     auto labelsInGroup = inputImage->GetConstLabelsByValue(inputImage->GetLabelValuesByGroup(layerIndex));
 
-    for (const auto label : labelsInGroup)
+    for (const auto& label : labelsInGroup)
       layerElement->InsertEndChild(MultiLabelIOHelper::GetLabelAsXMLElement(xmlDocument, label));
   }
 

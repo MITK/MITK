@@ -949,7 +949,7 @@ void QmitkMultiLabelInspector::OnMergeLabels(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
-    m_Segmentation->MergeLabels(currentLabel->GetValue(), this->GetSelectedLabels(), m_Segmentation->GetActiveLayer());
+    m_Segmentation->MergeLabels(currentLabel->GetValue(), this->GetSelectedLabels());
     this->WaitCursorOff();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

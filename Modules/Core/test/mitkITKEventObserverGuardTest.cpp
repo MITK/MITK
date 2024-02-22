@@ -131,7 +131,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, m_DummyCommand->ExecutionCount);
 
     {
-      mitk::ITKEventObserverGuard guard(m_TestObject, itk::ModifiedEvent(), [this](const itk::EventObject& e) {++(this->m_DummyCommand->ExecutionCount); });
+      mitk::ITKEventObserverGuard guard(m_TestObject, itk::ModifiedEvent(), [this](const itk::EventObject&) {++(this->m_DummyCommand->ExecutionCount); });
 
       CPPUNIT_ASSERT(guard.IsInitialized());
       m_TestObject->InvokeEvent(itk::ModifiedEvent());
@@ -217,7 +217,7 @@ public:
     m_TestObject->InvokeEvent(itk::ModifiedEvent());
     CPPUNIT_ASSERT_EQUAL(1, m_DummyCommand->ExecutionCount);
 
-    guard.Reset(m_TestObject, itk::ProgressEvent(), [this](const itk::EventObject& e) {++(this->m_DummyCommand2->ExecutionCount); });
+    guard.Reset(m_TestObject, itk::ProgressEvent(), [this](const itk::EventObject&) {++(this->m_DummyCommand2->ExecutionCount); });
     CPPUNIT_ASSERT(guard.IsInitialized());
     m_TestObject->InvokeEvent(itk::ModifiedEvent());
     CPPUNIT_ASSERT_EQUAL(1, m_DummyCommand->ExecutionCount);
@@ -237,7 +237,7 @@ public:
     m_TestObject->InvokeEvent(itk::ModifiedEvent());
     CPPUNIT_ASSERT_EQUAL(1, m_DummyCommand->ExecutionCount);
 
-    auto guard2 = mitk::ITKEventObserverGuard(m_TestObject, itk::ProgressEvent(), [this](const itk::EventObject& e) {++(this->m_DummyCommand2->ExecutionCount); });
+    auto guard2 = mitk::ITKEventObserverGuard(m_TestObject, itk::ProgressEvent(), [this](const itk::EventObject&) {++(this->m_DummyCommand2->ExecutionCount); });
     CPPUNIT_ASSERT(guard.IsInitialized());
     CPPUNIT_ASSERT(guard2.IsInitialized());
     m_TestObject->InvokeEvent(itk::ProgressEvent());

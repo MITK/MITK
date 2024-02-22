@@ -134,7 +134,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::SurfaceInterpolationControll
 
     for (auto it = nodes->Begin(); it != nodes->End(); ++it)
     {
-      auto aTS = dynamic_cast<mitk::IntProperty*>(it->Value()->GetProperty("timeStep"))->GetValue();
+      auto aTS = static_cast<TimeStepType>(dynamic_cast<mitk::IntProperty*>(it->Value()->GetProperty("timeStep"))->GetValue());
       bool sameTS = (timeStep == aTS);
 
       if (sameTS)

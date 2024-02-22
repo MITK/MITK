@@ -179,7 +179,7 @@ namespace mitk
         // Iterate over all labels. For each label a segmentation image will be created
         auto labelSet = input->GetConstLabelsByValue(input->GetLabelValuesByGroup(layer));
 
-        for (const auto label : labelSet)
+        for (const auto& label : labelSet)
         {
           // Thresold over the image with the given label value
           itk::ThresholdImageFilter<itkInternalImageType>::Pointer thresholdFilter =
@@ -483,7 +483,7 @@ namespace mitk
 
     auto labelSet = image->GetConstLabelsByValue(image->GetLabelValuesByGroup(layer));
 
-    for (const auto label : labelSet)
+    for (const auto& label : labelSet)
     {
       if (label != nullptr)
       {

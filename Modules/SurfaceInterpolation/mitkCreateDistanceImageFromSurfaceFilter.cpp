@@ -95,8 +95,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
 
   // Now we move the origin of the distanceImage 2 index-Coordinates
   // in all directions
-  DistanceImageType::IndexType originAsIndex;
-  m_DistanceImageITK->TransformPhysicalPointToIndex(originAsWorld, originAsIndex);
+  auto originAsIndex = m_DistanceImageITK->TransformPhysicalPointToIndex(originAsWorld);
   originAsIndex[0] -= 2;
   originAsIndex[1] -= 2;
   originAsIndex[2] -= 2;
@@ -313,8 +312,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::FillDistanceImage()
   currentPointAsPoint[2] = currentPoint[2];
 
   // Transform the input point in world-coordinates to index-coordinates
-  DistanceImageType::IndexType currentIndex;
-  m_DistanceImageITK->TransformPhysicalPointToIndex(currentPointAsPoint, currentIndex);
+  auto currentIndex = m_DistanceImageITK->TransformPhysicalPointToIndex(currentPointAsPoint);
 
   assert(
     m_DistanceImageITK->GetLargestPossibleRegion().IsInside(currentIndex)); // we are quite certain this should hold
@@ -552,8 +550,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::DetermineBounds(
   tmpPoint[2] = firstCenter[2];
 
   // transform the first point from world-coordinates to index-coordinates
-  itk::ContinuousIndex<double, 3> tmpIndex;
-  m_ReferenceImage->TransformPhysicalPointToContinuousIndex(tmpPoint, tmpIndex);
+  auto tmpIndex = m_ReferenceImage->TransformPhysicalPointToContinuousIndex<DistanceImageType::PointType::ValueType>(tmpPoint);
 
   // initialize the variables with this first point
   DistanceImageType::IndexValueType xmin = tmpIndex[0];
@@ -572,7 +569,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::DetermineBounds(
     tmpPoint[2] = (*centerIter)[2];
 
     // transform each point from world-coordinates to index-coordinates
-    m_ReferenceImage->TransformPhysicalPointToContinuousIndex(tmpPoint, tmpIndex);
+    tmpIndex = m_ReferenceImage->TransformPhysicalPointToContinuousIndex<DistanceImageType::PointType::ValueType>(tmpPoint);
 
     // and set the variables accordingly to find the minimum
     // and maximum in all directions in index-coordinates

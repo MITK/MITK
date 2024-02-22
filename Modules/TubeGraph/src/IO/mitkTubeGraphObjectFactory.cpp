@@ -24,9 +24,7 @@ mitk::TubeGraphObjectFactory::TubeGraphObjectFactory() : CoreObjectFactoryBase()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_INFO << "TubeGraphObjectFactory c'tor" << std::endl;
     CreateFileExtensionsMap();
-
     alreadyDone = true;
   }
 }

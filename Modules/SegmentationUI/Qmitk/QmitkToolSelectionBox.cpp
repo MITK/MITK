@@ -214,7 +214,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
     // mmueller
     // uncheck all other buttons
     QAbstractButton *tmpBtn = nullptr;
-    QList<QAbstractButton *>::iterator it;
+
     for (int i = 0; i < m_ToolButtonGroup->buttons().size(); ++i)
     {
       tmpBtn = m_ToolButtonGroup->buttons().at(i);

@@ -48,6 +48,8 @@ namespace mitk
   }
 }
 
+const mitk::LabelSetImage::LabelValueType mitk::LabelSetImage::UNLABELED_VALUE = 0;
+
 mitk::LabelSetImage::LabelSetImage()
   : mitk::Image(), m_UnlabeledLabelLock(false), m_ActiveLayer(0), m_activeLayerInvalid(false), m_ActiveLabelValue(0)
 {

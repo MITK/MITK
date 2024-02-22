@@ -71,10 +71,11 @@ namespace mitk
 
     using GroupIndexType = std::size_t;
     using LabelValueType = mitk::Label::PixelType;
-    const static LabelValueType UNLABELED_VALUE = 0;
     using ConstLabelVectorType = ConstLabelVector;
     using LabelVectorType = LabelVector;
     using LabelValueVectorType = std::vector<LabelValueType>;
+
+    const static LabelValueType UNLABELED_VALUE;
 
     /** \brief Adds a label instance to a group of the multi label image.
     * @remark By default, if the pixel value of the label is already used in the image, the label

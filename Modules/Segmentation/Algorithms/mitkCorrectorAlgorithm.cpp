@@ -176,7 +176,6 @@ bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(
 
   int currentColor = (pic->GetPixel(previousIndex) == m_FillColor);
   TSegData currentSegment;
-  int countOfSegments = 1;
 
   bool firstSegment = true;
   auto contourEnd = projectedContour->End();
@@ -212,7 +211,6 @@ bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(
           firstSegment = false;
         }
         currentSegment = TSegData();
-        ++countOfSegments;
         currentColor = (pic->GetPixel(temporaryIndex) == m_FillColor);
       }
       currentSegment.points.push_back(temporaryIndex);

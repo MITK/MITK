@@ -166,8 +166,6 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
                                       const ServiceEvent& evt,
                                       ServiceListenerEntries& matchBefore)
 {
-  int n = 0;
-
   if (!matchBefore.empty())
   {
     for (ServiceListenerEntries::const_iterator l = receivers.begin();
@@ -184,7 +182,6 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
     {
       try
       {
-        ++n;
         l->CallDelegate(evt);
       }
       catch (...)
@@ -195,8 +192,6 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
       }
     }
   }
-
-  //US_DEBUG << "Notified " << n << " listeners";
 }
 
 void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& set,

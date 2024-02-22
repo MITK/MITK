@@ -86,7 +86,6 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
 
   vtkSmartPointer<vtkPoints> expectedResult = vtkSmartPointer<vtkPoints>::New();
   expectedResult->SetDataTypeToDouble();
-  unsigned int counter = 0;
   double* point = new double[3];
 //  MITK_INFO<<"Test";
 //  MITK_INFO<<"focal: "<<focalLength;
@@ -121,12 +120,10 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
       point[2] = coordinate[2];
       unsigned int pointID = index[0] + index[1]*dimY;
       //MITK_INFO<<"id: "<<pointID;
-      //MITK_INFO<<"counter: "<<counter;
       if (distance!=0)
       {
         expectedResult->InsertPoint(pointID,point);
       }
-      counter++;
     }
   }
   filter->Update();
@@ -167,7 +164,6 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   ToFScalarType focalLength = (focalLengthX*interPixelDistance[0]+focalLengthY*interPixelDistance[1])/2.0;
   expectedResult = vtkSmartPointer<vtkPoints>::New();
   expectedResult->SetDataTypeToDouble();
-  counter = 0;
   point = new double[3];
 //  MITK_INFO<<"Test";
 //  MITK_INFO<<"focal: "<<focalLength;
@@ -199,12 +195,10 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
       point[2] = coordinate[2];
       unsigned int pointID = index[0] + index[1]*dimY;
       //MITK_INFO<<"id: "<<pointID;
-      //MITK_INFO<<"counter: "<<counter;
       if (distance!=0)
       {
         expectedResult->InsertPoint(pointID,point);
       }
-      counter++;
     }
   }
   filter->Modified();

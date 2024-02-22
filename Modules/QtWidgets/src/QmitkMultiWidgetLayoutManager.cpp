@@ -111,7 +111,7 @@ void QmitkMultiWidgetLayoutManager::SetCurrentRenderWindowWidget(QmitkRenderWind
 
 void QmitkMultiWidgetLayoutManager::SetDefaultLayout()
 {
-  MITK_INFO << "Set default layout" << std::endl;
+  MITK_DEBUG << "Set default layout";
 
   m_MultiWidget->ActivateMenuWidget(false);
 
@@ -155,7 +155,7 @@ void QmitkMultiWidgetLayoutManager::SetDefaultLayout()
 
 void QmitkMultiWidgetLayoutManager::SetAll2DTop3DBottomLayout()
 {
-  MITK_INFO << "Set all 2D top and 3D bottom layout" << std::endl;
+  MITK_DEBUG << "Set all 2D top and 3D bottom layout";
 
   m_MultiWidget->ActivateMenuWidget(false);
 
@@ -208,7 +208,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DTop3DBottomLayout()
 
 void QmitkMultiWidgetLayoutManager::SetAll2DLeft3DRightLayout()
 {
-  MITK_INFO << "Set all 2D left and 3D right layout" << std::endl;
+  MITK_DEBUG << "Set all 2D left and 3D right layout";
 
   m_MultiWidget->ActivateMenuWidget(false);
 
@@ -261,7 +261,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DLeft3DRightLayout()
 
 void QmitkMultiWidgetLayoutManager::SetOneBigLayout()
 {
-  MITK_INFO << "Set single 2D layout" << std::endl;
+  MITK_DEBUG << "Set single 2D layout";
 
   m_MultiWidget->ActivateMenuWidget(false);
 
@@ -288,7 +288,7 @@ void QmitkMultiWidgetLayoutManager::SetOneBigLayout()
 
 void QmitkMultiWidgetLayoutManager::SetOnly2DHorizontalLayout()
 {
-  MITK_INFO << "Set only 2D layout" << std::endl;
+  MITK_DEBUG << "Set only 2D layout";
 
   m_MultiWidget->ActivateMenuWidget(false);
 
@@ -323,7 +323,7 @@ void QmitkMultiWidgetLayoutManager::SetOnly2DHorizontalLayout()
 
 void QmitkMultiWidgetLayoutManager::SetOnly2DVerticalLayout()
 {
-  MITK_INFO << "Set only 2D layout" << std::endl;
+  MITK_DEBUG << "Set only 2D layout";
 
   m_MultiWidget->ActivateMenuWidget(false);
 
@@ -358,7 +358,7 @@ void QmitkMultiWidgetLayoutManager::SetOnly2DVerticalLayout()
 
 void QmitkMultiWidgetLayoutManager::SetOneTop3DBottomLayout()
 {
-  MITK_INFO << "Set one top and all 3D bottom layout" << std::endl;
+  MITK_DEBUG << "Set one top and all 3D bottom layout";
 
   m_MultiWidget->ActivateMenuWidget(false);
 
@@ -403,7 +403,7 @@ void QmitkMultiWidgetLayoutManager::SetOneTop3DBottomLayout()
 
 void QmitkMultiWidgetLayoutManager::SetOneLeft3DRightLayout()
 {
-  MITK_INFO << "Set one left and all 3D right layout" << std::endl;
+  MITK_DEBUG << "Set one left and all 3D right layout";
 
   m_MultiWidget->ActivateMenuWidget(false);
 
@@ -448,7 +448,7 @@ void QmitkMultiWidgetLayoutManager::SetOneLeft3DRightLayout()
 
 void QmitkMultiWidgetLayoutManager::SetAllHorizontalLayout()
 {
-  MITK_INFO << "Set default layout" << std::endl;
+  MITK_DEBUG << "Set all horizontal layout";
 
   m_MultiWidget->ActivateMenuWidget(false);
 
@@ -488,7 +488,7 @@ void QmitkMultiWidgetLayoutManager::SetAllHorizontalLayout()
 
 void QmitkMultiWidgetLayoutManager::SetAllVerticalLayout()
 {
-  MITK_INFO << "Set all vertical" << std::endl;
+  MITK_DEBUG << "Set all vertical layout";
 
   m_MultiWidget->ActivateMenuWidget(false);
 
@@ -525,7 +525,7 @@ void QmitkMultiWidgetLayoutManager::SetAllVerticalLayout()
 
 void QmitkMultiWidgetLayoutManager::RemoveOneLayout()
 {
-  MITK_INFO << "Remove single render window" << std::endl;
+  MITK_DEBUG << "Remove single render window";
 
   m_MultiWidget->ActivateMenuWidget(false);
 

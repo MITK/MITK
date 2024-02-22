@@ -344,9 +344,15 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
 
   MITK_DEBUG << "================================================================================";
   MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ": " << input.size() << " groups input";
+#if defined( MBILOG_ENABLE_DEBUG )
   unsigned int groupIndex = 0;
+#endif
 
-  for ( auto blockIter = input.cbegin(); blockIter != input.cend(); ++groupIndex, ++blockIter )
+  for ( auto blockIter = input.cbegin(); blockIter != input.cend();
+#if defined( MBILOG_ENABLE_DEBUG )
+    ++groupIndex,
+#endif
+    ++blockIter )
   {
     const DICOMDatasetAccessingImageFrameList& gdcmInfoFrameList = *blockIter;
     const DICOMDatasetList datasetList               = ConvertToDICOMDatasetList( gdcmInfoFrameList );

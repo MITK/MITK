@@ -186,7 +186,7 @@ std::string ModuleContext::GetDataFile(const std::string &filename) const
   if (d->module->storagePath.empty())
   {
     char buf[50];
-    sprintf(buf, "%ld", d->module->info.id);
+    snprintf(buf, sizeof(buf), "%ld", d->module->info.id);
     d->module->storagePath = baseStoragePath + separator + buf + "_" + d->module->info.name + separator;
   }
   return d->module->storagePath + filename;

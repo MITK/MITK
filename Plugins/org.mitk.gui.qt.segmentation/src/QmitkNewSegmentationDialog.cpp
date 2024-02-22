@@ -367,9 +367,8 @@ bool QmitkNewSegmentationDialog::DoRenameLabel(mitk::Label* label, mitk::LabelSe
     mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label is null.";
 
   const auto labelValue = label->GetValue();
-  mitk::LabelSetImage::GroupIndexType groupIndex;
 
-  if (nullptr != segmentation && !segmentation->IsLabelInGroup(labelValue, groupIndex))
+  if (nullptr != segmentation && !segmentation->ExistLabel(labelValue))
     mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label value does not exist in segmentation.";
 
   QmitkNewSegmentationDialog dialog(parent, segmentation, mode);

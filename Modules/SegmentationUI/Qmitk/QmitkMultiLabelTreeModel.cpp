@@ -868,57 +868,50 @@ void QmitkMultiLabelTreeModel::AddObserver()
 
 void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
 {
-  GroupIndexType groupIndex = 0;
-  if (m_Segmentation->IsLabelInGroup(labelValue, groupIndex))
+  GroupIndexType groupIndex = m_Segmentation->GetGroupIndexOfLabel(labelValue);
+  auto label = m_Segmentation->GetLabel(labelValue);
+  if (nullptr == label) mitkThrow() << "Invalid internal state. Segmentation signaled the addition of an label that does not exist in the segmentation. Invalid label value:" << labelValue;
+  if (labelValue == mitk::LabelSetImage::UNLABELED_VALUE) return;
+
+  auto groupItem = GetGroupItem(groupIndex, this->m_RootItem.get());
+
+  bool newLabelCreated = false;
+  auto instanceItem = AddLabelToGroupTree(label, groupItem, newLabelCreated);
+
+  if (newLabelCreated)
   {
-    auto label = m_Segmentation->GetLabel(labelValue);
-    if (nullptr == label) mitkThrow() << "Invalid internal state. Segmentation signaled the addition of an label that does not exist in the segmentation. Invalid label value:" << labelValue;
-    if (labelValue == mitk::LabelSetImage::UNLABELED_VALUE) return;
-
-    auto groupItem = GetGroupItem(groupIndex, this->m_RootItem.get());
-
-    bool newLabelCreated = false;
-    auto instanceItem = AddLabelToGroupTree(label, groupItem, newLabelCreated);
-
-    if (newLabelCreated)
-    {
-      if (groupItem->m_childItems.size() == 1)
-      { //first label added
-        auto groupIndex = GetIndexByItem(groupItem, this);
-        emit dataChanged(groupIndex, groupIndex);
-        this->beginInsertRows(groupIndex, instanceItem->ParentItem()->Row(), instanceItem->ParentItem()->Row());
-        this->endInsertRows();
-      }
-      else
-      { //whole new label level added to group item
-        auto groupIndex = GetIndexByItem(groupItem, this);
-        this->beginInsertRows(groupIndex, instanceItem->ParentItem()->Row(), instanceItem->ParentItem()->Row());
-        this->endInsertRows();
-      }
+    if (groupItem->m_childItems.size() == 1)
+    { //first label added
+      auto groupIndex = GetIndexByItem(groupItem, this);
+      emit dataChanged(groupIndex, groupIndex);
+      this->beginInsertRows(groupIndex, instanceItem->ParentItem()->Row(), instanceItem->ParentItem()->Row());
+      this->endInsertRows();
     }
     else
-    {
-      if (instanceItem->ParentItem()->m_childItems.size() < 3)
-      { //second instance item was added, so label item will now able to colapse
-        // -> the whole label node has to be updated.
-        auto labelIndex = GetIndexByItem(instanceItem->ParentItem(), this);
-        emit dataChanged(labelIndex, labelIndex);
-        this->beginInsertRows(labelIndex, 0, instanceItem->ParentItem()->m_childItems.size()-1);
-        this->endInsertRows();
-      }
-      else
-      {
-        // instance item was added to existing label item with multiple instances
-        //-> just notify the row insertion
-        auto labelIndex = GetIndexByItem(instanceItem->ParentItem(), this);
-        this->beginInsertRows(labelIndex, instanceItem->Row(), instanceItem->Row());
-        this->endInsertRows();
-      }
+    { //whole new label level added to group item
+      auto groupIndex = GetIndexByItem(groupItem, this);
+      this->beginInsertRows(groupIndex, instanceItem->ParentItem()->Row(), instanceItem->ParentItem()->Row());
+      this->endInsertRows();
     }
   }
   else
   {
-    mitkThrow() << "Group less labels are not supported in the current implementation.";
+    if (instanceItem->ParentItem()->m_childItems.size() < 3)
+    { //second instance item was added, so label item will now able to colapse
+      // -> the whole label node has to be updated.
+      auto labelIndex = GetIndexByItem(instanceItem->ParentItem(), this);
+      emit dataChanged(labelIndex, labelIndex);
+      this->beginInsertRows(labelIndex, 0, instanceItem->ParentItem()->m_childItems.size()-1);
+      this->endInsertRows();
+    }
+    else
+    {
+      // instance item was added to existing label item with multiple instances
+      //-> just notify the row insertion
+      auto labelIndex = GetIndexByItem(instanceItem->ParentItem(), this);
+      this->beginInsertRows(labelIndex, instanceItem->Row(), instanceItem->Row());
+      this->endInsertRows();
+    }
   }
 }
 

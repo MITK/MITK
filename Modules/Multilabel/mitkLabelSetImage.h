@@ -103,24 +103,48 @@ namespace mitk
     */
     mitk::Label* AddLabel(const std::string& name, const Color& color, GroupIndexType groupID);
 
-    /** \brief
+    /** \brief allows to adapt name and color of a certain label
+    * @param labelValue Value of the label that should be changed
+    * @param name New name for the label
+    * @param color New color for the label
+    * @pre Indicated label value must exist.
     */
-    void RenameLabel(LabelValueType labelValue, const std::string&, const Color&);
+    void RenameLabel(LabelValueType labelValue, const std::string& name, const Color& color);
 
     /**
      * @brief Removes the label with the given value.
-     *        The label is removed from the labelset and
-     *        the pixel with the value of the label are set to UNLABELED_VALUE.
-     * @param labelValue the pixel value of the label to be removed
+     * The label is removed from the labelset and
+     * the pixel with the value of the label are set to UNLABELED_VALUE.
+     * @param labelValue the pixel value of the label to be removed. If the label is unknown,
+     * the method will return without doing anything.
      */
     void RemoveLabel(LabelValueType labelValue);
 
     /**
      * @brief Removes labels from the mitk::MultiLabelSegmentation.
+     * The label is removed from the labelset and
+     * the pixel with the value of the label are set to UNLABELED_VALUE.
      * If a label value does not exist, it will be ignored.
      * @param vectorOfLabelPixelValues a list of labels to be removed
      */
     void RemoveLabels(const LabelValueVectorType& vectorOfLabelPixelValues);
+
+    /**
+     * @brief Erases the label with the given value from the labelset image.
+     * The label itself will not be erased from the respective mitk::LabelSet. In order to
+     * remove the label itself use mitk::LabelSetImage::RemoveLabels()
+     * @param labelValue the pixel value of the label that will be erased from the labelset image
+     * @pre labelValue must exist.
+     */
+    void EraseLabel(LabelValueType labelValue);
+
+    /**
+     * @brief Erases a list of labels with the given values from the labelset image.
+     * @param labelValues the list of pixel values of the labels
+     * that will be erased from the labelset image
+     * @pre label values must exist
+     */
+    void EraseLabels(const LabelValueVectorType& labelValues);
 
     /**
      * @brief Removes a whole group including all its labels.
@@ -150,9 +174,6 @@ namespace mitk
       */
     bool ExistGroup(GroupIndexType index) const;
 
-    bool IsLabelInGroup(LabelValueType value) const;
-    bool IsLabelInGroup(LabelValueType value, GroupIndexType& groupIndex) const;
-
     /** Returns the group id of the based label value.
     * @pre label value must exists.
     */
@@ -161,29 +182,42 @@ namespace mitk
     /**
      * @brief Returns the mitk::Label with the given value.
      * @param value the pixel value of the label
-     * @return the mitk::Label if available otherwise nullptr
+     * @return the label instance if defined in the segmentation, otherwise nullptr.
      */
     const mitk::Label* GetLabel(LabelValueType value) const;
     mitk::Label* GetLabel(LabelValueType value);
 
-    /** Returns the lock state of the label (including UnlabeledLabel value).
-     @pre Requested label does exist.*/
-    bool IsLabelLocked(LabelValueType value) const;
-
-    /** Returns a vector with all labels currently defined in the MultiLabelSegmentation
+    /** Returns a vector with pointers to all labels currently defined in the MultiLabelSegmentation
     instance.*/
     const ConstLabelVectorType GetLabels() const;
     const LabelVectorType GetLabels();
 
+    /** Returns a vector of all label values currently defined in the MultiLabelSegmentation
+    instance.*/
+    const LabelValueVectorType GetAllLabelValues() const;
+
+    /** @brief Returns a vector with pointers to all labels in the MultiLabelSegmentation indicated
+    * by the passed label value vector.
+    * @param labelValues Vector of values of labels that should be returned.
+    * @ignoreMissing If true(Default) unknown labels Will be skipped in the result. If false,
+    * an exception will be raised, if a label is requested.
+    instance.*/
     const LabelVectorType GetLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing = true);
+
+    /** @brief Returns a vector with const pointers to all labels in the MultiLabelSegmentation indicated
+    * by the passed label value vector.
+    * For details see GetLabelsByValue();
+    */
     const ConstLabelVectorType GetConstLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing = false) const;
 
+    /** Helper function that can be used to extract a vector of label values of a vector of label instance pointers.
+     @overload.*/
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const ConstLabelVectorType& labels);
+    /** Helper function that can be used to extract a vector of label values are vector of label instancess.*/
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const LabelVectorType& labels);
 
+    /** Helper function that converts a given vector of label instance pointers into a vector of const pointers.*/
     static ConstLabelVectorType ConvertLabelVectorConst(const LabelVectorType& labels);
-
-    const LabelValueVectorType GetAllLabelValues() const;
 
     /**
      * @brief Returns a vector of all label values located on the specified group.
@@ -204,29 +238,59 @@ namespace mitk
      */
     const LabelValueVectorType GetLabelValuesByName(GroupIndexType index, std::string_view name) const;
 
+    /**
+    * Returns a vector with (class) names of all label instances used in the segmentation (over all groups)
+    */
     std::vector<std::string> GetLabelClassNames() const;
+
+    /**
+    * Returns a vector with (class) names of all label instances present in a certain group.
+    * @param index ID of the group, for which the label class names should be returned
+    * @pre Indicated group must exist. */
     std::vector<std::string> GetLabelClassNamesByGroup(GroupIndexType index) const;
 
     /** Helper that returns an unused label value, that could be used e.g. if one wants to define a label externally
-    before adding it.
-     @return A label value currently not in use.
-     @remark is no unused label value can be provided an exception will be thrown.*/
+    * before adding it.
+    * @return A label value currently not in use.
+    * @remark is no unused label value can be provided an exception will be thrown.*/
     LabelValueType GetUnusedLabelValue() const;
 
     itkGetConstMacro(UnlabeledLabelLock, bool);
     itkSetMacro(UnlabeledLabelLock, bool);
     itkBooleanMacro(UnlabeledLabelLock);
 
-    /** \brief
+    /** Set the visibility of all label instances accordingly to the passed state.
     */
     void SetAllLabelsVisible(bool visible);
+
+    /** Set the visibility of all label instances in a group accordingly to the passed state.
+    * @pre The specified group must exist.
+    */
     void SetAllLabelsVisibleByGroup(GroupIndexType group, bool visible);
+
+    /** Set the visibility of all label instances In a group with a given class name
+    * accordingly to the passed state.
+    * @pre The specified group must exist.
+    */
     void SetAllLabelsVisibleByName(GroupIndexType group, std::string_view name, bool visible);
 
-    /** \brief
+    /** Returns the lock state of the label (including UnlabeledLabel value).
+     @pre Requested label does exist.*/
+    bool IsLabelLocked(LabelValueType value) const;
+
+    /** Set the lock state of all label instances accordingly to the passed state.
     */
     void SetAllLabelsLocked(bool locked);
+
+    /** Set the lock state of all label instances in a group accordingly to the passed state.
+    * @pre The specified group must exist.
+    */
     void SetAllLabelsLockedByGroup(GroupIndexType group, bool locked);
+
+    /** Set the lock state of all label instances In a group with a given class name
+    * accordingly to the passed state.
+    * @pre The specified group must exist.
+    */
     void SetAllLabelsLockedByName(GroupIndexType group, std::string_view name, bool locked);
 
     /**
@@ -235,25 +299,29 @@ namespace mitk
     * @remark The passed label instances will be cloned before added to ensure clear ownership
     * of the new labels.
     * @remark The pixel content of the old labels will not be removed.
-    * \param groupID The index of the group that should have its labels replaced
-    * \param newLabels The vector of new labels
+    * @param groupID The index of the group that should have its labels replaced
+    * @param newLabels The vector of new labels
     * @pre Group that shuold be replaced must exist.
-    * Qpre new label values must not be used in other groups.
+    * @pre new label values must not be used in other groups.
     */
     void ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& newLabels);
+
+    /**@overload for none-const label vectors. */
     void ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& newLabels);
 
     /** Returns the pointer to the image that containes the labeling of the indicate group.
      *@pre groupID must reference an existing group.*/
     mitk::Image* GetGroupImage(GroupIndexType groupID);
+
     /** Returns the pointer to the image that containes the labeling of the indicate group.
      *@pre groupID must reference an existing group.*/
     const mitk::Image* GetGroupImage(GroupIndexType groupID) const;
 
     itkGetModifiableObjectMacro(LookupTable, mitk::LookupTable);
-    /** \brief
-    */
     void SetLookupTable(LookupTable* lut);
+    /** Updates the lookup table for a label indicated by the passe label value using the color of the label.
+    * @pre labelValue must esist.
+    */
     void UpdateLookupTable(PixelType pixelValue);
 
     protected:
@@ -268,27 +336,36 @@ namespace mitk
       /** Helper to ensure label events are unregistered.*/
       void ReleaseLabel(Label* label);
 
+      /** Helper class used internally to apply lamba functions to the labels specified by tha passed label value vector.
+      */
       void ApplyToLabels(const LabelValueVectorType& values, std::function<void(Label*)>&& lambda);
+      /** Helper class used internally to for visiting the labels specified by tha passed label value vector
+      * with the lambda function.
+      */
       void VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const;
 
+      LabelValueType m_ActiveLabelValue;
+
+    private:
       using LabelMapType = std::map<LabelValueType, Label::Pointer>;
+      /** Dictionary that holds all known labels (label value is the key).*/
       LabelMapType m_LabelMap;
 
       using GroupNameVectorType = std::vector<std::string>;
+      /** Vector storing the names of all groups. If a group has no user name defined, string is empty.*/
       GroupNameVectorType m_Groups;
 
       /**This type is internally used to track which label is currently
        * associated with which layer.*/
       using GroupToLabelMapType = std::vector<LabelValueVectorType>;
+      /* Dictionary that maps between group id (key) and label values in the group (vector of label value).*/
       GroupToLabelMapType m_GroupToLabelMap;
       using LabelToGroupMapType = std::map<LabelValueType, GroupIndexType>;
+      /* Dictionary that maps between label value (key) and group id (value)*/
       LabelToGroupMapType m_LabelToGroupMap;
 
       LookupTable::Pointer m_LookupTable;
 
-      LabelValueType m_ActiveLabelValue;
-
-    private:
       /** Indicates if the MultiLabelSegmentation allows to overwrite unlabeled pixels in normal pixel manipulation operations (e.g. TransferLabelConent).*/
       bool m_UnlabeledLabelLock;
 
@@ -313,7 +390,7 @@ namespace mitk
     void Initialize(const mitk::Image *image) override;
 
     /**
-      * \brief  */
+      * \brief removes all pixel content form the active layer.*/
     void ClearBuffer();
 
     /**
@@ -333,26 +410,6 @@ namespace mitk
      * @param layer                       the layer in which the merge should be performed
      */
     void MergeLabels(PixelType pixelValue, const std::vector<PixelType>& vectorOfSourcePixelValues, unsigned int layer = 0);
-
-    /**
-     * @brief Erases the label with the given value from the labelset image.
-     *        The label itself will not be erased from the respective mitk::LabelSet. In order to
-     *        remove the label itself use mitk::LabelSetImage::RemoveLabels()
-     * @param pixelValue the pixel value of the label that will be erased from the labelset image
-     */
-    void EraseLabel(PixelType pixelValue);
-
-    /**
-     * @brief Erases a list of labels with the given values from the labelset image.
-     * @param VectorOfLabelPixelValues the list of pixel values of the labels
-     *                                 that will be erased from the labelset image
-     */
-    void EraseLabels(const std::vector<PixelType> &VectorOfLabelPixelValues);
-
-    /**
-      * \brief  Returns true if the labelset exists*/
-    //[[deprecated("Will be removed with T28524")]]
-    DEPRECATED(bool ExistLabelSet(unsigned int layer) const);
 
     /**
      * @brief Gets the ID of the currently active layer

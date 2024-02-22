@@ -278,9 +278,9 @@ public:
 
     m_LabelSetImage->AddLayer({label1, label2});
 
-    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistLabelSet(0) == true);
-    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistLabelSet(1) == true);
-    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistLabelSet(20) == false);
+    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(0) == true);
+    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(1) == true);
+    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(20) == false);
   }
 
   void TestSetActiveLayer()
@@ -345,23 +345,23 @@ public:
     m_LabelSetImage->RemoveGroup(1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of layers, after a layer was removed",
                            m_LabelSetImage->GetNumberOfLayers() == 2);
-    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistLabelSet(2) == false);
-    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistLabelSet(1) == true);
-    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistLabelSet(0) == true);
+    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(2) == false);
+    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(1) == true);
+    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(0) == true);
 
     m_LabelSetImage->RemoveGroup(1);
     activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
     CPPUNIT_ASSERT_MESSAGE("Wrong number of layers, after a layer was removed",
                            m_LabelSetImage->GetNumberOfLayers() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistLabelSet(1) == false);
-    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistLabelSet(0) == true);
+    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(1) == false);
+    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(0) == true);
     CPPUNIT_ASSERT_MESSAGE("Wrong active layer",
                            mitk::Equal(refActiveLayer, activeLayer, 0.00001, true));
 
     m_LabelSetImage->RemoveGroup(0);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of layers, after a layer was removed",
                            m_LabelSetImage->GetNumberOfLayers() == 0);
-    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistLabelSet(0) == false);
+    CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(0) == false);
     CPPUNIT_ASSERT_THROW_MESSAGE("GetActiveLayers does not fail although all layer have been removed",
                            m_LabelSetImage->GetActiveLayer(), mitk::Exception);
   }

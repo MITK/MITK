@@ -411,11 +411,6 @@ void mitk::LabelSetImage::ClearBuffer()
   }
 }
 
-bool mitk::LabelSetImage::ExistLabelSet(unsigned int layer) const
-{
-  return layer < m_LayerContainer.size();
-}
-
 void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, PixelType sourcePixelValue, unsigned int layer)
 {
   try
@@ -501,7 +496,7 @@ void mitk::LabelSetImage::RemoveLabels(const LabelValueVectorType& vectorOfLabel
   this->InvokeEvent(LabelsChangedEvent(vectorOfLabelPixelValues));
 }
 
-void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
+void mitk::LabelSetImage::EraseLabel(LabelValueType pixelValue)
 {
   try
   {
@@ -528,11 +523,11 @@ void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
   Modified();
 }
 
-void mitk::LabelSetImage::EraseLabels(const std::vector<PixelType>& VectorOfLabelPixelValues)
+void mitk::LabelSetImage::EraseLabels(const LabelValueVectorType& labelValues)
 {
-  for (unsigned int idx = 0; idx < VectorOfLabelPixelValues.size(); idx++)
+  for (auto labelValue : labelValues)
   {
-    this->EraseLabel(VectorOfLabelPixelValues[idx]);
+    this->EraseLabel(labelValue);
   }
 }
 
@@ -591,6 +586,8 @@ mitk::Label* mitk::LabelSetImage::AddLabel(const std::string& name, const mitk::
 void mitk::LabelSetImage::RenameLabel(PixelType pixelValue, const std::string& name, const mitk::Color& color)
 {
   mitk::Label* label = GetLabel(pixelValue);
+  if (nullptr == label) mitkThrow() << "Cannot rename label.Unknown label value provided. Unkoen label value:" << pixelValue;
+
   label->SetName(name);
   label->SetColor(color);
 
@@ -1036,23 +1033,6 @@ bool mitk::LabelSetImage::ExistLabel(LabelValueType value, GroupIndexType groupI
 bool mitk::LabelSetImage::ExistGroup(GroupIndexType index) const
 {
   return index < m_LayerContainer.size();
-}
-
-bool mitk::LabelSetImage::IsLabelInGroup(LabelValueType value) const
-{
-  GroupIndexType dummy;
-  return this->IsLabelInGroup(value, dummy);
-}
-
-bool mitk::LabelSetImage::IsLabelInGroup(LabelValueType value, GroupIndexType& groupIndex) const
-{
-  auto finding = m_LabelToGroupMap.find(value);
-  if (m_LabelToGroupMap.end() != finding)
-  {
-    groupIndex = finding->second;
-    return true;
-  }
-  return false;
 }
 
 mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::GetGroupIndexOfLabel(LabelValueType value) const

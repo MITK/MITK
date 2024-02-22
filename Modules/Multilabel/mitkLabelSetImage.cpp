@@ -583,7 +583,7 @@ mitk::Label* mitk::LabelSetImage::AddLabel(const std::string& name, const mitk::
   return AddLabel(newLabel,groupID,false);
 }
 
-void mitk::LabelSetImage::RenameLabel(PixelType pixelValue, const std::string& name, const mitk::Color& color)
+void mitk::LabelSetImage::RenameLabel(LabelValueType pixelValue, const std::string& name, const mitk::Color& color)
 {
   mitk::Label* label = GetLabel(pixelValue);
   if (nullptr == label) mitkThrow() << "Cannot rename label.Unknown label value provided. Unkoen label value:" << pixelValue;
@@ -648,6 +648,7 @@ void mitk::LabelSetImage::UpdateLookupTable(PixelType pixelValue)
 
 unsigned int mitk::LabelSetImage::GetNumberOfLabels(unsigned int layer) const
 {
+  if (layer >= m_Groups.size()) mitkThrow() << "Cannot get number of labels in group. Group is unkown. Invalid index:" << layer;
   return m_GroupToLabelMap[layer].size();
 }
 

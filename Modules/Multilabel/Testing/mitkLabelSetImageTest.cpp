@@ -18,6 +18,41 @@ found in the LICENSE file.
 
 #include <mitkAutoCropImageFilter.h>
 
+namespace CppUnit
+{
+  namespace StringHelper
+  {
+    template<> inline std::string toString(const mitk::LabelSetImage::LabelValueVectorType& lvs)
+    {
+      std::ostringstream stream;
+      stream << "[";
+      for (mitk::LabelSetImage::LabelValueVectorType::const_iterator iter = lvs.begin(); iter!=lvs.end(); ++iter)
+      {
+        stream << *iter;
+        if (iter + 1 != lvs.end()) stream << ", ";
+
+      }
+      stream << "]";
+      return stream.str();
+    }
+
+    template<> inline std::string toString(const std::vector<std::string>& strings)
+    {
+      std::ostringstream stream;
+      stream << "[";
+      for (std::vector<std::string>::const_iterator iter = strings.begin(); iter != strings.end(); ++iter)
+      {
+        stream << *iter;
+        if (iter + 1 != strings.end()) stream << ", ";
+
+      }
+      stream << "]";
+      return stream.str();
+    }
+
+  }
+}
+
 class mitkLabelSetImageTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkLabelSetImageTestSuite);
@@ -28,10 +63,13 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestGetActiveLabel);
   MITK_TEST(TestInitializeByLabeledImage);
   MITK_TEST(TestGetLabel);
+  MITK_TEST(TestGetLabelValues);
+  MITK_TEST(TestGetLabelClassNames);
   MITK_TEST(TestSetUnlabeledLabelLock);
   MITK_TEST(TestGetTotalNumberOfLabels);
+  MITK_TEST(TestGetNumberOfLabels);
   MITK_TEST(TestExistsLabel);
-  MITK_TEST(TestExistsLabelSet);
+  MITK_TEST(TestExistsGroup);
   MITK_TEST(TestSetActiveLayer);
   MITK_TEST(TestRemoveLayer);
   MITK_TEST(TestRemoveLabels);
@@ -42,6 +80,13 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
 
 private:
   mitk::LabelSetImage::Pointer m_LabelSetImage;
+  int m_LabelAddedEventCount;
+  int m_LabelModifiedEventCount;
+  int m_LabelRemovedEventCount;
+  int m_LabelsChangedEventCount;
+  int m_GroupAddedEventCount;
+  int m_GroupModifiedEventCount;
+  int m_GroupRemovedEventCount;
 
 public:
   void setUp() override
@@ -52,12 +97,52 @@ public:
     unsigned int dimensions[3] = { 96, 128, 52 };
     regularImage->Initialize(mitk::MakeScalarPixelType<char>(), 3, dimensions);
     m_LabelSetImage->Initialize(regularImage);
+
+    this->ResetEvents();
+    m_LabelSetImage->AddObserver(mitk::LabelAddedEvent(), [this](const itk::EventObject&) { ++(this->m_LabelAddedEventCount); });
+    m_LabelSetImage->AddObserver(mitk::LabelModifiedEvent(), [this](const itk::EventObject&) { ++(this->m_LabelModifiedEventCount); });
+    m_LabelSetImage->AddObserver(mitk::LabelRemovedEvent(), [this](const itk::EventObject&) { ++(this->m_LabelRemovedEventCount); });
+    m_LabelSetImage->AddObserver(mitk::LabelsChangedEvent(), [this](const itk::EventObject&) { ++(this->m_LabelsChangedEventCount); });
+    m_LabelSetImage->AddObserver(mitk::GroupAddedEvent(), [this](const itk::EventObject&) { ++(this->m_GroupAddedEventCount); });
+    m_LabelSetImage->AddObserver(mitk::GroupModifiedEvent(), [this](const itk::EventObject&) { ++(this->m_GroupModifiedEventCount); });
+    m_LabelSetImage->AddObserver(mitk::GroupRemovedEvent(), [this](const itk::EventObject&) { ++(this->m_GroupRemovedEventCount); });
   }
 
   void tearDown() override
   {
     // Delete LabelSetImage
     m_LabelSetImage = nullptr;
+  }
+
+  void ResetEvents()
+  {
+    m_LabelAddedEventCount = 0;
+    m_LabelModifiedEventCount = 0;
+    m_LabelRemovedEventCount = 0;
+    m_LabelsChangedEventCount = 0;
+    m_GroupAddedEventCount = 0;
+    m_GroupModifiedEventCount = 0;
+    m_GroupRemovedEventCount = 0;
+  }
+
+  bool CheckEvents(int lAdd, int lMod, int lRem, int lsC, int gAdd, int gMod, int gRem)
+  {
+    return m_GroupAddedEventCount == gAdd && m_GroupModifiedEventCount == gMod && m_GroupRemovedEventCount == gRem
+      && m_LabelAddedEventCount == lAdd && m_LabelModifiedEventCount == lMod && m_LabelRemovedEventCount == lRem
+      && m_LabelsChangedEventCount == lsC;
+  }
+
+  void InitializeTestSegmentation()
+  {
+    mitk::Label::Pointer label1 = mitk::Label::New(1, "Label1");
+    mitk::Label::Pointer label2 = mitk::Label::New(20, "Label2");
+    mitk::Label::Pointer label22 = mitk::Label::New(22, "Label2");
+    mitk::Label::Pointer label3 = mitk::Label::New(30, "Label3");
+
+    m_LabelSetImage->AddLabel(label1, 0);
+    m_LabelSetImage->AddLayer({ label2, label22, label3 });
+    m_LabelSetImage->AddLayer();
+    this->ResetEvents();
   }
 
   void TestInitialize()
@@ -118,6 +203,8 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - no active label should be selected",
                            m_LabelSetImage->GetActiveLabel() == nullptr);
 
+    CPPUNIT_ASSERT_MESSAGE("Event count incorrect", CheckEvents(0,0,0,0,1,0,0));
+
     mitk::Label::Pointer label1 = mitk::Label::New();
     label1->SetName("Label1");
     label1->SetValue(1);
@@ -135,6 +222,8 @@ public:
                            m_LabelSetImage->GetActiveLayer() == layerID);
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - active label is wrong",
                            m_LabelSetImage->GetActiveLabel()->GetValue() == 200);
+
+    CPPUNIT_ASSERT_MESSAGE("Event count incorrect", CheckEvents(0, 0, 0, 0, 2, 0, 0));
   }
 
   void TestGetActiveLabelSet()
@@ -195,28 +284,93 @@ public:
 
   void TestGetLabel()
   {
-    mitk::Label::Pointer label1 = mitk::Label::New();
-    label1->SetName("Label1");
-    mitk::Label::PixelType value1 = 1;
-    label1->SetValue(value1);
-
-    mitk::Label::Pointer label2 = mitk::Label::New();
-    label2->SetName("Label2");
-    mitk::Label::PixelType value2 = 200;
-    label2->SetValue(value2);
+    mitk::Label::Pointer label1 = mitk::Label::New(1, "Label1");
+    mitk::Label::Pointer label2 = mitk::Label::New(20,"Label2");
 
     m_LabelSetImage->AddLabel(label1,0);
     m_LabelSetImage->AddLayer();
     m_LabelSetImage->AddLabel(label2,1);
+    this->ResetEvents();
 
     CPPUNIT_ASSERT_MESSAGE("Wrong label retrieved for active layer",
                            mitk::Equal(*m_LabelSetImage->GetLabel(1), *label1, 0.0001, true));
     CPPUNIT_ASSERT_MESSAGE("Wrong label retrieved for layer 1",
-                           mitk::Equal(*m_LabelSetImage->GetLabel(200), *label2, 0.0001, true));
+                           mitk::Equal(*m_LabelSetImage->GetLabel(20), *label2, 0.0001, true));
 
     // Try to get a non existing label
-    mitk::Label *label3 = m_LabelSetImage->GetLabel(1000);
-    CPPUNIT_ASSERT_MESSAGE("Non existing label should be nullptr", label3 == nullptr);
+    mitk::Label *unkownLabel = m_LabelSetImage->GetLabel(1000);
+    CPPUNIT_ASSERT_MESSAGE("Non existing label should be nullptr", unkownLabel == nullptr);
+    CPPUNIT_ASSERT_MESSAGE("Event count incorrect", CheckEvents(0, 0, 0, 0, 0, 0, 0));
+  }
+
+  void TestGetLabelValues()
+  {
+    InitializeTestSegmentation();
+
+    auto labels = m_LabelSetImage->GetLabelValuesByGroup(0);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for group 0",
+      mitk::LabelSetImage::LabelValueVectorType({ 1 }), labels);
+
+    labels = m_LabelSetImage->GetLabelValuesByGroup(1);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for group 1",
+      mitk::LabelSetImage::LabelValueVectorType({ 20, 22, 30 }), labels);
+
+    labels = m_LabelSetImage->GetLabelValuesByGroup(2);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for group 2",
+      mitk::LabelSetImage::LabelValueVectorType(), labels);
+
+    CPPUNIT_ASSERT_THROW(m_LabelSetImage->GetLabelValuesByGroup(3), mitk::Exception);
+
+    labels = m_LabelSetImage->GetLabelValuesByName(0, "Label1");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for \"Label2\" in group 0",
+      mitk::LabelSetImage::LabelValueVectorType({ 1 }), labels);
+
+    labels = m_LabelSetImage->GetLabelValuesByName(1, "Label2");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for \"Label2\" in group 1",
+      mitk::LabelSetImage::LabelValueVectorType({ 20, 22 }), labels);
+
+    labels = m_LabelSetImage->GetLabelValuesByName(1, "Label3");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for \"Label3\" in group 1",
+      mitk::LabelSetImage::LabelValueVectorType({ 30 }), labels);
+
+    labels = m_LabelSetImage->GetLabelValuesByName(2, "Label1");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for group 2",
+      mitk::LabelSetImage::LabelValueVectorType(), labels);
+
+    labels = m_LabelSetImage->GetLabelValuesByName(0, "unkown");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for unkown name",
+      mitk::LabelSetImage::LabelValueVectorType(), labels);
+
+    CPPUNIT_ASSERT_THROW(m_LabelSetImage->GetLabelValuesByName(3,"invalid"), mitk::Exception);
+
+    labels = m_LabelSetImage->GetAllLabelValues();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for unkown name",
+      mitk::LabelSetImage::LabelValueVectorType({1,20,22,30}), labels);
+
+    CPPUNIT_ASSERT_MESSAGE("Event count incorrect", CheckEvents(0, 0, 0, 0, 0, 0, 0));
+  }
+
+
+  void TestGetLabelClassNames()
+  {
+    InitializeTestSegmentation();
+
+    auto names = m_LabelSetImage->GetLabelClassNames();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong names retrieved",
+      std::vector<std::string>({ "Label1", "Label2", "Label3"}), names);
+    names = m_LabelSetImage->GetLabelClassNamesByGroup(0);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong names retrieved for group 0",
+      std::vector<std::string>({ "Label1"}), names);
+    names = m_LabelSetImage->GetLabelClassNamesByGroup(1);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong names retrieved for group 1",
+      std::vector<std::string>({"Label2", "Label3" }), names);
+    names = m_LabelSetImage->GetLabelClassNamesByGroup(2);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong names retrieved for group 2",
+      std::vector<std::string>(), names);
+
+    CPPUNIT_ASSERT_THROW(m_LabelSetImage->GetLabelValuesByGroup(3), mitk::Exception);
+
+    CPPUNIT_ASSERT_MESSAGE("Event count incorrect", CheckEvents(0, 0, 0, 0, 0, 0, 0));
   }
 
   void TestSetUnlabeledLabelLock()
@@ -233,22 +387,29 @@ public:
 
   void TestGetTotalNumberOfLabels()
   {
-    mitk::Label::Pointer label1 = mitk::Label::New();
-    label1->SetName("Label1");
-    mitk::Label::PixelType value1 = 1;
-    label1->SetValue(value1);
-
-    mitk::Label::Pointer label2 = mitk::Label::New();
-    label2->SetName("Label2");
-    mitk::Label::PixelType value2 = 200;
-    label2->SetValue(value2);
-
-    m_LabelSetImage->AddLabel(label1,0);
-    m_LabelSetImage->AddLayer();
-    m_LabelSetImage->AddLabel(label2,1);
+    this->InitializeTestSegmentation();
     CPPUNIT_ASSERT_MESSAGE(
       "Wrong total number of labels",
-      m_LabelSetImage->GetTotalNumberOfLabels() == 2);
+      m_LabelSetImage->GetTotalNumberOfLabels() == 4);
+    CPPUNIT_ASSERT_MESSAGE("Event count incorrect", CheckEvents(0, 0, 0, 0, 0, 0, 0));
+  }
+
+  void TestGetNumberOfLabels()
+  {
+    this->InitializeTestSegmentation();
+    CPPUNIT_ASSERT_MESSAGE(
+      "Wrong number of labels in group 0",
+      m_LabelSetImage->GetNumberOfLabels(0) == 1);
+    CPPUNIT_ASSERT_MESSAGE(
+      "Wrong number of labels in group 1",
+      m_LabelSetImage->GetNumberOfLabels(1) == 3);
+    CPPUNIT_ASSERT_MESSAGE(
+      "Wrong number of labels in group 2",
+      m_LabelSetImage->GetNumberOfLabels(2) == 0);
+
+    CPPUNIT_ASSERT_THROW(m_LabelSetImage->GetNumberOfLabels(3), mitk::Exception);
+
+    CPPUNIT_ASSERT_MESSAGE("Event count incorrect", CheckEvents(0, 0, 0, 0, 0, 0, 0));
   }
 
   void TestExistsLabel()
@@ -266,7 +427,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Non existing label was found", m_LabelSetImage->ExistLabel(10000) == false);
   }
 
-  void TestExistsLabelSet()
+  void TestExistsGroup()
   {
     mitk::Label::Pointer label1 = mitk::Label::New();
     label1->SetName("Label1");

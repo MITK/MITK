@@ -2,6 +2,6 @@ MITK_CREATE_MODULE(
   INCLUDE_DIRS Qmitk Helper
   DEPENDS MitkRT
   PACKAGE_DEPENDS
-    PUBLIC Qt5|Widgets
+    PUBLIC Qt6|Widgets
     PRIVATE CTK|CTKWidgets
 )

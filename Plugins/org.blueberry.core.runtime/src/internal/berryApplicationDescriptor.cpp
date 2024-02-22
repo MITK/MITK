@@ -181,7 +181,7 @@ QString ApplicationDescriptor::GetInstanceID() const
     instanceId = 0;
   }
   // create a unique instance id
-  return getApplicationId() + "." + instanceId++;
+  return QString("%1.%2").arg(getApplicationId()).arg(instanceId++);
 }
 
 QString ApplicationDescriptor::GetLocation() const

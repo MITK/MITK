@@ -39,7 +39,7 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkUSNewVideoDeviceWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+  QmitkUSNewVideoDeviceWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = {});
   ~QmitkUSNewVideoDeviceWidget() override;
 
   /* @brief This method is part of the widget an needs not to be called seperately. */

@@ -25,7 +25,7 @@ function build_mitk {
     cmake \
         -DBUILD_TESTING:BOOL=OFF \
         -DMITK_USE_SWIG:BOOL=ON \
-        -DMITK_USE_Qt5:BOOL=OFF \
+        -DMITK_USE_Qt6:BOOL=OFF \
         -DMITK_USE_CTK:BOOL=OFF \
         -DMITK_USE_BLUEBERRY:BOOL=OFF \
         -DCMAKE_C_COMPILER:FILEPATH=/usr/local/bin/gcc \

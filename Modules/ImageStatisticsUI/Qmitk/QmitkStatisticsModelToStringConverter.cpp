@@ -113,7 +113,7 @@ QString QmitkStatisticsModelToStringConverter::Iterate(const QModelIndex &index,
     if (index.isValid())
     {
       auto data = index.data();
-      if (static_cast<QMetaType::Type>(data.type()) == QMetaType::Double)
+      if (data.typeId() == QMetaType::Double)
       {
         content = QString("%L1").arg(data.toDouble(), 0, 'f');
       }

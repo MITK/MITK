@@ -117,7 +117,7 @@ void QmitkImageCropperView::OnImageSelectionChanged(QList<mitk::DataNode::Pointe
       QMessageBox::warning(nullptr,
         tr("Invalid image selected"),
         tr("ImageCropper only works with 3 or more dimensions."),
-        QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+        QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
       SetDefaultGUI();
       return;
     }
@@ -390,7 +390,7 @@ void QmitkImageCropperView::ProcessImage(bool mask)
       {
         std::string message = std::string("The Cropping filter could not process because of: \n ") + e.GetDescription();
         QMessageBox::warning(nullptr, tr("Cropping not possible!"), tr(message.c_str()),
-          QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+          QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
         return;
       }
 
@@ -438,7 +438,7 @@ void QmitkImageCropperView::ProcessImage(bool mask)
       {
         std::string message = std::string("The Cropping filter could not process because of: \n ") + e.GetDescription();
         QMessageBox::warning(nullptr, tr("Cropping not possible!"), tr(message.c_str()),
-          QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+          QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
         return;
       }
 

@@ -29,7 +29,7 @@ class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidget : public QWidget
 {
   Q_OBJECT
 public:
-  QmitkLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = {});
   ~QmitkLevelWindowWidget() override;
 
   mitk::LevelWindowManager *GetManager();

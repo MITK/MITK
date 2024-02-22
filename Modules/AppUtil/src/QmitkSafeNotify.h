@@ -46,8 +46,8 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
   msgBox.setText("An error occurred. You should save all data and quit the program to prevent possible data loss.");
   msgBox.setDetailedText(msg);
   msgBox.setIcon(QMessageBox::Critical);
-  msgBox.addButton(app->trUtf8("Exit immediately"), QMessageBox::YesRole);
-  msgBox.addButton(app->trUtf8("Ignore"), QMessageBox::NoRole);
+  msgBox.addButton("Exit immediately", QMessageBox::YesRole);
+  msgBox.addButton("Ignore", QMessageBox::NoRole);
 
   int ret = msgBox.exec();
 

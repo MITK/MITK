@@ -27,7 +27,7 @@ if(MITK_USE_OpenCV)
 
     ExternalProject_Add(${proj}
       GIT_REPOSITORY https://github.com/opencv/opencv.git
-      GIT_TAG 4.6.0
+      GIT_TAG 4.9.0
       LIST_SEPARATOR ${sep}
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
@@ -43,9 +43,9 @@ if(MITK_USE_OpenCV)
         -DBUILD_TESTS:BOOL=OFF
         -DBUILD_DOCS:BOOL=OFF
         -DBUILD_EXAMPLES:BOOL=OFF
+        -DOPENCV_PYTHON_SKIP_DETECTION:BOOL=ON
         -DWITH_CUDA:BOOL=OFF
         -DWITH_VTK:BOOL=OFF
-        -DENABLE_CXX11:BOOL=ON
         -DWITH_IPP:BOOL=OFF
         -DBUILD_IPP_IW:BOOL=OFF
         -DENABLE_PRECOMPILED_HEADERS:BOOL=OFF

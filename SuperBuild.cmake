@@ -134,7 +134,11 @@ if(_has_rpath_flag)
   if(APPLE)
     set(_install_rpath_linkflag "-Wl,-rpath,@loader_path/../lib")
   else()
-    set(_install_rpath_linkflag "-Wl,-rpath='$ORIGIN/../lib'")
+    set(_install_rpath_linkflag "-Wl,-rpath='$ORIGIN/../lib")
+    if(Qt6_DIR)
+      set(_install_rpath_linkflag "${_install_rpath_linkflag}:${Qt6_DIR}/../..")
+    endif()
+    set(_install_rpath_linkflag "${_install_rpath_linkflag}'")
   endif()
 endif()
 
@@ -144,6 +148,9 @@ if(APPLE)
 elseif(UNIX)
   # this work for libraries as well as executables
   set(_install_rpath "\$ORIGIN/../lib")
+  if(Qt6_DIR)
+    set(_install_rpath "${_install_rpath}:${Qt6_DIR}/../..")
+  endif()
 endif()
 
 set(ep_common_args
@@ -268,10 +275,9 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_ALL_PLUGINS
   MITK_BUILD_ALL_APPS
   MITK_BUILD_EXAMPLES
-  MITK_USE_Qt5
+  MITK_USE_Qt6
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
-  MITK_USE_OpenCL
   MITK_USE_OpenMP
   )
 
@@ -454,7 +460,7 @@ ExternalProject_Add(${proj}
     -DBoost_ROOT:PATH=${Boost_ROOT}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
-    -DQt5_DIR:PATH=${Qt5_DIR}
+    -DQt6_DIR:PATH=${Qt6_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}

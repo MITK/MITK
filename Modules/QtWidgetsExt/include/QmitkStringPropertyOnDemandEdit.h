@@ -26,7 +26,7 @@ signals:
   void clicked();
 
 public:
-  QClickableLabel2(QWidget *parent, Qt::WindowFlags f = nullptr) : QLabel(parent, f) {}
+  QClickableLabel2(QWidget *parent, Qt::WindowFlags f = {}) : QLabel(parent, f) {}
   void mouseReleaseEvent(QMouseEvent *) override { emit clicked(); }
 };
 

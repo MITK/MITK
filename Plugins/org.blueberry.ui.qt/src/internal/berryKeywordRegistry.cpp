@@ -71,7 +71,7 @@ void KeywordRegistry::AddExtension(IExtensionTracker* tracker, const SmartPointe
 QString KeywordRegistry::GetKeywordLabel(const QString& id)
 {
   auto it = internalKeywordMap.find(id);
-  return it == internalKeywordMap.end() ? QString::null : *it;
+  return it == internalKeywordMap.end() ? QString() : *it;
 }
 
 void KeywordRegistry::RemoveExtension(const SmartPointer<IExtension>& /*extension*/, const QList<SmartPointer<Object> >& objects)

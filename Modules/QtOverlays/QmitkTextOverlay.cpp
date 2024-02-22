@@ -82,7 +82,7 @@ void QmitkTextOverlay::UpdateFontProperties(mitk::PropertyList::Pointer pl)
   }
 
   mitk::Color color = colorProp->GetColor();
-  palette.setColor(QPalette::Foreground, QColor(color[0], color[1], color[2], 255));
+  palette.setColor(QPalette::WindowText, QColor(color[0], color[1], color[2], 255));
   palette.setColor(QPalette::Window, Qt::transparent);
   m_Label->setPalette(palette);
 

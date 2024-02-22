@@ -605,7 +605,7 @@ QList<Object::Pointer> SaveablesList::TestGetSourcesForModel(
 
 QList<ISaveablesSource::Pointer> SaveablesList::GetNonPartSources()
 {
-  return nonPartSources.toList();
+  return nonPartSources.values();
 }
 
 QList<IWorkbenchPart::Pointer> SaveablesList::GetPartsForSaveable(

@@ -42,12 +42,12 @@ if(MITK_USE_CTK)
       CMAKE_ARGS
         ${ep_common_args}
         ${ctk_optional_cache_args}
+        "-DQt6_DIR:PATH=${Qt6_DIR}"
         # The CTK PluginFramework cannot cope with
         # a non-empty CMAKE_DEBUG_POSTFIX for the plugin
         # libraries yet.
         -DCMAKE_DEBUG_POSTFIX:STRING=
-        -DCTK_QT_VERSION:STRING=5
-        "-DQt5_DIR=${Qt5_DIR}"
+        -DCTK_QT_VERSION:STRING=6
         "-DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}"
         -DCTK_BUILD_QTDESIGNER_PLUGINS:BOOL=OFF
         -DCTK_LIB_PluginFramework:BOOL=ON

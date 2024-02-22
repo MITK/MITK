@@ -132,9 +132,9 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @see GetScreenNumber()
    * @see GetPrimaryScreenNumber()
    */
-  virtual QRect GetScreenSize(int i = -1) = 0;
+  virtual QRect GetScreenSize(int i = 0) = 0;
 
-  virtual QRect GetAvailableScreenSize(int i = -1) = 0;
+  virtual QRect GetAvailableScreenSize(int i = 0) = 0;
 
   virtual int GetClosestScreenNumber(const QRect&) = 0;
 

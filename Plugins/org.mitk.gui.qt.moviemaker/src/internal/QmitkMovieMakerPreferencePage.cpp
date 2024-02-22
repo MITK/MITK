@@ -62,8 +62,8 @@ void QmitkMovieMakerPreferencePage::CreateQtControl(QWidget* parent)
 
   m_FFmpegProcess = new QProcess(m_Control);
 
-  connect(m_FFmpegProcess, qOverload<QProcess::ProcessError>(&QProcess::error), this, &Self::OnFFmpegProcessError);
-  connect(m_FFmpegProcess, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this, &Self::OnFFmpegProcessFinished);
+  connect(m_FFmpegProcess, &QProcess::errorOccurred, this, &Self::OnFFmpegProcessError);
+  connect(m_FFmpegProcess, &QProcess::finished, this, &Self::OnFFmpegProcessFinished);
 
   this->Update();
 }

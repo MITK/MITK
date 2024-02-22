@@ -21,8 +21,8 @@ found in the LICENSE file.
 #include <berryConstants.h>
 
 #include <QAbstractButton>
-#include <QDesktopWidget>
 #include <QApplication>
+#include <QScreen>
 #include <QVariant>
 
 
@@ -112,38 +112,51 @@ void QtWidgetsTweakletImpl::RemoveSelectionListener(QWidget* widget,
 
 QRect QtWidgetsTweakletImpl::GetScreenSize(int i)
 {
-  QDesktopWidget *desktop = QApplication::desktop();
-  if (i < 0) return desktop->screen()->geometry();
-  return desktop->screenGeometry(i);
+  return QGuiApplication::screens().at(i)->geometry();
 }
 
 unsigned int QtWidgetsTweakletImpl::GetScreenNumber()
 {
-  QDesktopWidget *desktop = QApplication::desktop();
-  // get the primary screen
-  unsigned int numScreens = desktop->numScreens();
-  return numScreens;
+  return QGuiApplication::screens().size();
 }
 
 int QtWidgetsTweakletImpl::GetPrimaryScreenNumber()
 {
-  QDesktopWidget *desktop = QApplication::desktop();
-  // get the primary screen
-  int primaryScreenNr = desktop->primaryScreen();
-  return primaryScreenNr;
+  auto primaryScreenHandle = QGuiApplication::primaryScreen()->handle();
+  auto screens = QGuiApplication::screens();
+  const auto numberOfScreens = static_cast<int>(screens.size());
+
+  for (int i = 0; i < numberOfScreens; ++i)
+  {
+    if (screens[i]->handle() == primaryScreenHandle)
+      return i;
+  }
+
+  return 0;
 }
 
 QRect QtWidgetsTweakletImpl::GetAvailableScreenSize(int i)
 {
-  QDesktopWidget *desktop = QApplication::desktop();
-  if (i < 0) return desktop->screen()->geometry();
-  return desktop->availableGeometry(i);
+  return QGuiApplication::screens().at(i)->availableGeometry();
 }
 
 int QtWidgetsTweakletImpl::GetClosestScreenNumber(const QRect& r)
 {
-  QDesktopWidget *desktop = QApplication::desktop();
-  return desktop->screenNumber(QPoint(r.x() + r.width()/2, r.y() + r.height()/2));
+  auto screen = QGuiApplication::screenAt(QPoint(r.x() + r.width() / 2, r.y() + r.height() / 2));
+
+  if (screen != nullptr)
+  {
+    auto screens = QGuiApplication::screens();
+    const auto numberOfScreens = static_cast<int>(screens.size());
+
+    for (int i = 0; i < numberOfScreens; ++i)
+    {
+      if (screens[i]->handle() == screen->handle())
+        return i;
+    }
+  }
+
+  return 0;
 }
 
 void QtWidgetsTweakletImpl::AddControlListener(QtWidgetController* controller,

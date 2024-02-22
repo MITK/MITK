@@ -65,7 +65,7 @@ bool EditorRegistryReader::ReadElement(const IConfigurationElement::Pointer& ele
   QString extensionsString = element->GetAttribute(WorkbenchRegistryConstants::ATT_EXTENSIONS);
   if (!extensionsString.isEmpty())
   {
-    QStringList tokens = extensionsString.split(',', QString::SkipEmptyParts);
+    QStringList tokens = extensionsString.split(',', Qt::SkipEmptyParts);
     foreach(QString token, tokens)
     {
       extensionsVector.push_back(token.trimmed());
@@ -74,7 +74,7 @@ bool EditorRegistryReader::ReadElement(const IConfigurationElement::Pointer& ele
   QString filenamesString = element->GetAttribute(WorkbenchRegistryConstants::ATT_FILENAMES);
   if (!filenamesString.isEmpty())
   {
-    QStringList tokens = filenamesString.split(',', QString::SkipEmptyParts);
+    QStringList tokens = filenamesString.split(',', Qt::SkipEmptyParts);
     foreach(QString token, tokens)
     {
       filenamesVector.push_back(token.trimmed());

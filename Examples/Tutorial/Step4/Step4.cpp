@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
   QWidget toplevelWidget;
   QHBoxLayout layout;
   layout.setSpacing(2);
-  layout.setMargin(0);
+  layout.setContentsMargins({});
   toplevelWidget.setLayout(&layout);
 
   //*************************************************************************

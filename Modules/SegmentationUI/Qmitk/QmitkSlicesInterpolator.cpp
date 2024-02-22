@@ -1349,7 +1349,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::Event
   {
 
     m_InterpolatedSurfaceNode->SetData(nullptr);
-    m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+    m_Future = QtConcurrent::run(&QmitkSlicesInterpolator::Run3DInterpolation, this);
     m_Watcher.setFuture(m_Future);
   }
 }

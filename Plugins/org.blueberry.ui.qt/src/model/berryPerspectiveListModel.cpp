@@ -104,7 +104,7 @@ QVariant PerspectiveListModel::headerData(int section, Qt::Orientation /*orienta
 
 QString PerspectiveListModel::perspectiveName(const QModelIndex& index) const
 {
-  if (!index.isValid()) return QString::null;
+  if (!index.isValid()) return QString();
 
   return d->m_Perspectives.at(index.row())->GetLabel();
 }

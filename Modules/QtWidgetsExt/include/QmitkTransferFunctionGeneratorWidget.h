@@ -29,7 +29,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionGeneratorWidget : public QWid
   Q_OBJECT
 
 public:
-  QmitkTransferFunctionGeneratorWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkTransferFunctionGeneratorWidget(QWidget *parent = nullptr, Qt::WindowFlags f = {});
   ~QmitkTransferFunctionGeneratorWidget() override;
 
   void SetDataNode(mitk::DataNode *node, mitk::TimeStepType timestep = 0);

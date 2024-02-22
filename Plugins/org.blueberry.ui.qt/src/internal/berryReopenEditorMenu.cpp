@@ -89,7 +89,7 @@ QString ReopenEditorMenu::CalcText(int index, const QString& name, const QString
     if (length > MAX_TEXT_LENGTH)
     {
       // file name does not fit within length, truncate it
-      sb += fileName.leftRef(MAX_TEXT_LENGTH - 3);
+      sb += QStringView(fileName).left(MAX_TEXT_LENGTH - 3);
       sb += "...";
     }
     else if (length > MAX_TEXT_LENGTH - 7)
@@ -99,7 +99,7 @@ QString ReopenEditorMenu::CalcText(int index, const QString& name, const QString
     else
     {
       sb += fileName;
-      QStringList pathSegments = path.absoluteFilePath().split('/', QString::SkipEmptyParts);
+      QStringList pathSegments = path.absoluteFilePath().split('/', Qt::SkipEmptyParts);
       int segmentCount = pathSegments.size();
       if (segmentCount > 0)
       {
@@ -121,7 +121,7 @@ QString ReopenEditorMenu::CalcText(int index, const QString& name, const QString
           else if (i == 0)
           {
             // append at least part of the first segment
-            sb += segment.leftRef(MAX_TEXT_LENGTH - length);
+            sb += QStringView(segment).left(MAX_TEXT_LENGTH - length);
             length = MAX_TEXT_LENGTH;
             break;
           }
@@ -190,7 +190,7 @@ void ReopenEditorMenu::Fill(QMenu* menu, QAction* before)
   // Get items.
   QList<EditorHistoryItem::Pointer> historyItems = history->GetItems();
 
-  int n = std::min(itemsToShow, historyItems.size());
+  int n = std::min(itemsToShow, static_cast<int>(historyItems.size()));
   if (n <= 0)
   {
     return;

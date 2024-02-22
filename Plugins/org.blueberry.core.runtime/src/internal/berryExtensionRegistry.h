@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include "berryCombinedEventDelta.h"
 #include "berryListenerList.h"
 
+#include <QObject>
 #include <QReadWriteLock>
 #include <QWaitCondition>
 

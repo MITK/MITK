@@ -49,7 +49,7 @@ ShowViewMenu::ShowViewMenu(IWorkbenchWindow *window, const QString& id)
 {
   CommandContributionItemParameter::Pointer showDlgItemParms(
         new CommandContributionItemParameter(
-          window, QString::null, IWorkbenchCommandConstants::VIEWS_SHOW_VIEW,
+          window, QString(), IWorkbenchCommandConstants::VIEWS_SHOW_VIEW,
           CommandContributionItem::STYLE_PUSH));
   showDlgItemParms->label = "&Other...";
   showDlgItem = new CommandContributionItem(showDlgItemParms);
@@ -89,7 +89,7 @@ void ShowViewMenu::Fill(QMenu* menu, QAction* before)
     return;
   }
 
-  MenuManager::Pointer manager(new MenuManager());
+  MenuManager::Pointer manager(new MenuManager(""));
   FillMenu(manager.GetPointer());
 
   QList<IContributionItem::Pointer> items = manager->GetItems();
@@ -150,7 +150,7 @@ void ShowViewMenu::FillMenu(IMenuManager* innerMgr)
       actions.append(item);
     }
   }
-  qSort(actions.begin(), actions.end(), ActionComparator());
+  std::sort(actions.begin(), actions.end(), ActionComparator());
   foreach (CommandContributionItemParameter::Pointer ccip, actions)
   {
 //    if (WorkbenchActivityHelper.filterItem(ccip)) {

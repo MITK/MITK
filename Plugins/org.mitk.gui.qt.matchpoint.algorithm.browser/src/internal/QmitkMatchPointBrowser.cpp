@@ -133,7 +133,7 @@ void QmitkMatchPointBrowser::OnAlgoListSelectionChanged(const QModelIndex& index
 
 void QmitkMatchPointBrowser::OnSearchChanged(const QString& text)
 {
-    m_filterProxy->setFilterRegExp(text);
+    m_filterProxy->setFilterRegularExpression(text);
     m_filterProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
 };
 
@@ -239,7 +239,7 @@ void QmitkMatchPointBrowser::RetrieveAndStorePreferenceValues()
             QString pathSeparator(":");
 #endif
 
-            QStringList splitPath = paths.split(pathSeparator, QString::SkipEmptyParts);
+            QStringList splitPath = paths.split(pathSeparator, Qt::SkipEmptyParts);
 
             foreach(QString path, splitPath)
             {
@@ -252,11 +252,11 @@ void QmitkMatchPointBrowser::RetrieveAndStorePreferenceValues()
 
     // We get additional directory paths from preferences.
     const auto pathString = QString::fromStdString(prefs->Get(MatchPointBrowserConstants::MDAR_DIRECTORIES_NODE_NAME, ""));
-    QStringList additionalPaths = pathString.split(";", QString::SkipEmptyParts);
+    QStringList additionalPaths = pathString.split(";", Qt::SkipEmptyParts);
     newPaths << additionalPaths;
 
     const auto additionalAlgorirthmsString = QString::fromStdString(prefs->Get(MatchPointBrowserConstants::MDAR_FILES_NODE_NAME, ""));
-    additionalPaths = additionalAlgorirthmsString.split(";", QString::SkipEmptyParts);
+    additionalPaths = additionalAlgorirthmsString.split(";", Qt::SkipEmptyParts);
     newPaths << additionalPaths;
 
     m_currentSearchPaths = newPaths;

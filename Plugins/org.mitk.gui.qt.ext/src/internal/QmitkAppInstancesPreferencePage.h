@@ -16,7 +16,10 @@ found in the LICENSE file.
 
 #include <berryIQtPreferencePage.h>
 
-#include <ui_QmitkAppInstancesPreferencePage.h>
+namespace Ui
+{
+  class QmitkAppInstancesPreferencePage;
+}
 
 class QmitkAppInstancesPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -27,7 +30,6 @@ class QmitkAppInstancesPreferencePage : public QObject, public berry::IQtPrefere
 public:
 
   QmitkAppInstancesPreferencePage();
-  QmitkAppInstancesPreferencePage(const QmitkAppInstancesPreferencePage& other);
 
   void Init(berry::IWorkbench::Pointer workbench) override;
 
@@ -40,7 +42,7 @@ public:
 
 private:
 
-  Ui::QmitkAppInstancesPreferencePage controls;
+  Ui::QmitkAppInstancesPreferencePage* controls;
   QWidget* mainWidget;
 };
 

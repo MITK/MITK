@@ -31,8 +31,7 @@ QtControlWidget::QtControlWidget(QWidget* parent, Shell* shell, Qt::WindowFlags 
   this->setFrameStyle(QFrame::NoFrame);
 
   // TODO WeakPointer: QVariant should hold a weak pointer
-  QVariant variant(QVariant::UserType);
-  variant.setValue(controller);
+  auto variant = QVariant::fromValue(controller);
   this->setProperty(QtWidgetController::PROPERTY_ID, variant);
 }
 

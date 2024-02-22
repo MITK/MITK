@@ -334,8 +334,8 @@ void mitk::ChartExampleTestHelper::Add(int dataSet)
 
 std::vector< std::pair<double, double> > mitk::ChartExampleTestHelper::ToStdPairList(QVariantList xData, QVariantList yData)
 {
-  auto xDataConverted = xData.toVector().toStdVector();
-  auto yDataConverted = yData.toVector().toStdVector();
+  std::vector<QVariant> xDataConverted(xData.begin(), xData.end());
+  std::vector<QVariant> yDataConverted(yData.begin(), yData.end());
 
   std::vector< std::pair<double, double> > data;
   for (size_t i = 0; i < xDataConverted.size(); i++)

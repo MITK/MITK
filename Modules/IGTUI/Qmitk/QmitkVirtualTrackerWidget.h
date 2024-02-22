@@ -29,7 +29,7 @@ class MITKIGTUI_EXPORT QmitkVirtualTrackerWidget : public QmitkAbstractTrackingD
 public:
   static const std::string VIEW_ID;
 
-  QmitkVirtualTrackerWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkVirtualTrackerWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
   ~QmitkVirtualTrackerWidget() override;
 
   void Initialize() override;

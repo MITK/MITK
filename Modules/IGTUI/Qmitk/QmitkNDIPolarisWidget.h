@@ -29,7 +29,7 @@ class MITKIGTUI_EXPORT QmitkNDIPolarisWidget : public QmitkNDIAbstractDeviceWidg
 public:
   static const std::string VIEW_ID;
 
-  QmitkNDIPolarisWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkNDIPolarisWidget(QWidget* parent = nullptr, Qt::WindowFlags f = {});
   ~QmitkNDIPolarisWidget() override;
 
   void Initialize() override;

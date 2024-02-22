@@ -212,7 +212,7 @@ QmitkMultiLabelInspector::LabelValueVectorType QmitkMultiLabelInspector::GetSele
 {
   LabelValueVectorType result;
   QModelIndexList selectedIndexes = m_Controls->view->selectionModel()->selectedIndexes();
-  for (const auto& index : qAsConst(selectedIndexes))
+  for (const auto& index : std::as_const(selectedIndexes))
   {
     QVariant qvariantDataNode = m_Model->data(index, QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
     if (qvariantDataNode.canConvert<mitk::LabelSetImage::LabelValueType>())

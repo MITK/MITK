@@ -39,7 +39,7 @@ class MITKTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFVisualisationSettingsWidget (QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+    QmitkToFVisualisationSettingsWidget (QWidget* p = nullptr, Qt::WindowFlags f1 = {});
     ~QmitkToFVisualisationSettingsWidget () override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */

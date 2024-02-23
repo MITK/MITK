@@ -11,7 +11,6 @@ set(CPP_FILES
   Algorithms/mitkGrowCutSegmentationFilter.cpp
   Algorithms/mitkImageLiveWireContourModelFilter.cpp
   Algorithms/mitkImageToContourFilter.cpp
-  #Algorithms/mitkImageToContourModelFilter.cpp
   Algorithms/mitkImageToLiveWireContourFilter.cpp
   Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkOtsuSegmentationFilter.cpp
@@ -70,7 +69,6 @@ set(CPP_FILES
   SegmentationUtilities/BooleanOperations/mitkBooleanOperation.cpp
   SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp
 #Added from ML
-  Controllers/mitkSliceBasedInterpolationController.cpp
   Algorithms/mitkSurfaceStampImageFilter.cpp
 )
 

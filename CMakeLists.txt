@@ -1156,13 +1156,30 @@ endif()
 
 set(MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS)
 set(MITK_DOXYGEN_ADDITIONAL_IMAGE_PATHS)
+set(MITK_DOXYGEN_ADDITIONAL_EXAMPLE_PATHS)
 
 foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})
   set(MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS "${MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS} \"${MITK_EXTENSION_DIR}\"")
   set(MITK_DOXYGEN_ADDITIONAL_IMAGE_PATHS "${MITK_DOXYGEN_ADDITIONAL_IMAGE_PATHS} \"${MITK_EXTENSION_DIR}\"")
+  # MITK_DOXYGEN_ADDITIONAL_EXAMPLE_PATHS should be modified by MITK extensions as needed
 endforeach()
 
 if(DOXYGEN_FOUND)
+  foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})
+    set(MITK_DOCUMENTATION_EXTENSION_DIR "${MITK_EXTENSION_DIR}/Documentation")
+    file(GLOB MITK_DOCUMENTATION_EXTENSION_FILES CONFIGURE_DEPENDS "${MITK_DOCUMENTATION_EXTENSION_DIR}/*.cmake")
+    foreach(doc_file ${MITK_DOCUMENTATION_EXTENSION_FILES})
+      include("${doc_file}")
+    endforeach()
+  endforeach()
+
+  # Transform list of example paths into space-separated string of quoted paths
+  unset(example_paths)
+  foreach(example_path ${MITK_DOXYGEN_ADDITIONAL_EXAMPLE_PATHS})
+    set(example_paths "${example_paths} \"${example_path}\"")
+  endforeach()
+  set(MITK_DOXYGEN_ADDITIONAL_EXAMPLE_PATHS "${example_paths}")
+
   add_subdirectory(Documentation)
 endif()
 

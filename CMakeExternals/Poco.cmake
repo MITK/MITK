@@ -10,7 +10,9 @@ if(MITK_USE_Poco)
   endif()
 
   set(proj Poco)
-  set(proj_DEPENDENCIES )
+  mitk_query_custom_ep_vars()
+
+  set(proj_DEPENDENCIES ${${proj}_CUSTOM_DEPENDENCIES})
   set(${proj}_DEPENDS ${proj})
 
   if(NOT DEFINED ${proj}_DIR)
@@ -21,8 +23,6 @@ if(MITK_USE_Poco)
         "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
       )
     endif()
-
-    mitk_query_custom_ep_vars()
 
     set(ssl_args
       -DENABLE_CRYPTO:BOOL=OFF

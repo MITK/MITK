@@ -35,7 +35,7 @@ When a MITK scene with stored property list is loaded within MITK the list will 
 this->GetPersistenceService()->AddPropertyListReplacedObserver(this);
 \endcode
 
-An example implementation for the use of the mitk::PersistenceService can be found in the module OpenCVVideoSupport (class QmitkOpenCVVideoControls) and in the corresponding unit test mitkPersistenceTest in the Persistence module.
+An example implementation for the use of the mitk::PersistenceService can be found in the corresponding unit test mitkPersistenceTest in the Persistence module.
 
 \section PersistenceQTSetting Qt Settings
 Within the UI dependent modules inside MITK, the Qt::settings class can also be used to store variables permanently. The following code snippet shows an example:

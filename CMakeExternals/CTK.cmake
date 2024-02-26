@@ -10,7 +10,9 @@ if(MITK_USE_CTK)
   endif()
 
   set(proj CTK)
-  set(proj_DEPENDENCIES DCMTK)
+  mitk_query_custom_ep_vars()
+
+  set(proj_DEPENDENCIES DCMTK ${${proj}_CUSTOM_DEPENDENCIES})
   set(CTK_DEPENDS ${proj})
 
   if(NOT DEFINED CTK_DIR)
@@ -28,8 +30,6 @@ if(MITK_USE_CTK)
         LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
       ENDIF()
     ENDFOREACH()
-
-    mitk_query_custom_ep_vars()
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}

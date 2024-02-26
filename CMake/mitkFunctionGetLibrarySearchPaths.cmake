@@ -78,28 +78,10 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     endif()
   endif()
 
-  # If OpenCV is built within the MITK superbuild set the binary directory
-  # according to the lib path provided by OpenCV.
-  # In the case where an external OpenCV is provided use the binary directory
-  #  of this OpenCV directory
-  if(MITK_USE_OpenCV)
-    if(WIN32)
-      if (EXISTS ${OpenCV_LIB_PATH})
-        list(APPEND _dir_candidates "${OpenCV_LIB_PATH}/../bin") # OpenCV is built in superbuild
-      else()
-        list(APPEND _dir_candidates "${OpenCV_DIR}/bin") # External OpenCV build is used
-      endif()
-    endif()
-  endif()
-
   if(MITK_USE_Python3)
     list(APPEND _dir_candidates "${CTK_DIR}/CMakeExternals/Install/bin")
     get_filename_component(_python_dir "${Python3_EXECUTABLE}" DIRECTORY)
     list(APPEND _dir_candidates "${_python_dir}")
-  endif()
-
-  if(MITK_USE_TOF_PMDO3 OR MITK_USE_TOF_PMDCAMCUBE OR MITK_USE_TOF_PMDCAMBOARD)
-    list(APPEND _dir_candidates "${MITK_PMD_SDK_DIR}/plugins" "${MITK_PMD_SDK_DIR}/bin")
   endif()
 
   if(MITK_USE_CTK)

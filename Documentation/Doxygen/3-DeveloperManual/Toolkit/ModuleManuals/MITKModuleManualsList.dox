@@ -10,14 +10,9 @@ The modules are shared libraries that provide functionality that can be used by 
 <ul>
   <li> \ref AnnotationModulePage
   <li> \ref ChartModule
-  <li> \ref IGTConcepts
-  <li> \ref NavigationGeneralModulePage
-  <li> \ref IGTTutorialOverview
   <li> \ref LegacyGLModule
   <li> \ref mitkPython_Overview
   <li> \ref RESTModule
-  <li> \ref GeneratingDeviceModulesPage
-  <li> \ref USModulePage
 </ul>
 
 \subpage MITKModuleManualsListPageAdditionalInformation Additional Information on Certain Modules

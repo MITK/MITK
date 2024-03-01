@@ -22,14 +22,13 @@ found in the LICENSE file.
 
 QmitkImageStatisticsTreeModel::QmitkImageStatisticsTreeModel(QObject *parent) : QmitkAbstractDataStorageModel(parent)
 {
-  m_RootItem = new QmitkImageStatisticsTreeItem();
+  m_RootItem = std::make_unique<QmitkImageStatisticsTreeItem>();
 }
 
 QmitkImageStatisticsTreeModel ::~QmitkImageStatisticsTreeModel()
 {
   // set data storage to nullptr so that the event listener gets removed
   this->SetDataStorage(nullptr);
-  delete m_RootItem;
 };
 
 void QmitkImageStatisticsTreeModel::DataStorageChanged()
@@ -61,7 +60,7 @@ int QmitkImageStatisticsTreeModel::rowCount(const QModelIndex &parent) const
     return 0;
 
   if (!parent.isValid())
-    parentItem = m_RootItem;
+    parentItem = m_RootItem.get();
   else
     parentItem = static_cast<QmitkImageStatisticsTreeItem *>(parent.internalPointer());
 
@@ -94,7 +93,7 @@ QModelIndex QmitkImageStatisticsTreeModel::index(int row, int column, const QMod
   QmitkImageStatisticsTreeItem *parentItem;
 
   if (!parent.isValid())
-    parentItem = m_RootItem;
+    parentItem = m_RootItem.get();
   else
     parentItem = static_cast<QmitkImageStatisticsTreeItem *>(parent.internalPointer());
 
@@ -113,7 +112,7 @@ QModelIndex QmitkImageStatisticsTreeModel::parent(const QModelIndex &child) cons
   QmitkImageStatisticsTreeItem *childItem = static_cast<QmitkImageStatisticsTreeItem *>(child.internalPointer());
   QmitkImageStatisticsTreeItem *parentItem = childItem->parentItem();
 
-  if (parentItem == m_RootItem)
+  if (parentItem == m_RootItem.get())
     return QModelIndex();
 
   return createIndex(parentItem->row(), 0, parentItem);
@@ -176,7 +175,7 @@ void QmitkImageStatisticsTreeModel::SetMaskNodes(const std::vector<mitk::DataNod
     if (data)
     {
       auto timeSteps = data->GetTimeSteps();
-      // special case: apply one mask to each timestep of an 4D image
+      // special case: apply one mask to each time step of an 4D image
       if (timeSteps == 1 && m_TimeStepResolvedImageNodes.size() > 1)
       {
         timeSteps = m_TimeStepResolvedImageNodes.size();
@@ -283,17 +282,75 @@ void QmitkImageStatisticsTreeModel::UpdateByDataStorage()
   {
     std::lock_guard<std::mutex> locked(m_Mutex);
     m_Statistics = newStatistics;
-  }
 
-  m_StatisticNames = mitk::GetAllStatisticNames(m_Statistics);
-  BuildHierarchicalModel();
+    m_StatisticNames = mitk::GetAllStatisticNames(m_Statistics);
+    BuildHierarchicalModel();
+    m_BuildTime.Modified();
+  }
+}
+
+void AddTimeStepTreeItems(const mitk::ImageStatisticsContainer* statistic, mitk::ImageStatisticsContainer::LabelValueType labelValue, const std::vector<std::string>& statisticNames, bool isWIP, QmitkImageStatisticsTreeItem* parentItem, bool& hasMultipleTimesteps)
+{
+  // 4. hierarchy level: time steps (optional, only if >1 time step)
+  if (statistic->GetTimeSteps() > 1)
+  {
+    for (unsigned int i = 0; i < statistic->GetTimeSteps(); i++)
+    {
+      QString timeStepLabel = "[" + QString::number(i) + "] " +
+        QString::number(statistic->GetTimeGeometry()->TimeStepToTimePoint(i)) + " ms";
+      if (statistic->StatisticsExist(labelValue, i))
+      {
+        auto statisticsItem = new QmitkImageStatisticsTreeItem(
+          statistic->GetStatistics(labelValue,i), statisticNames, timeStepLabel, isWIP, parentItem);
+        parentItem->appendChild(statisticsItem);
+      }
+      else
+      {
+        auto statisticsItem = new QmitkImageStatisticsTreeItem(statisticNames, QStringLiteral("N/A"), isWIP, parentItem);
+      }
+    }
+  }
+  hasMultipleTimesteps = hasMultipleTimesteps || (statistic->GetTimeSteps() > 1);
+}
+
+void AddLabelTreeItems(const mitk::ImageStatisticsContainer* statistic, const mitk::DataNode* maskNode, mitk::ImageStatisticsContainer::LabelValueVectorType labelValues, const std::vector<std::string>& statisticNames, bool isWIP, QmitkImageStatisticsTreeItem* parentItem, bool& hasMultipleTimesteps)
+{
+  // 3. hierarchy level: labels (optional, only if labels >1)
+  for (const auto labelValue : labelValues)
+  {
+    if (labelValue != mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE)
+    {
+      //currently we only show statistics of the labeled pixel if a mask is provided
+      QString labelLabel = QStringLiteral("unnamed label");
+      const auto multiLabelSeg = dynamic_cast<mitk::LabelSetImage*>(maskNode->GetData());
+      if (nullptr != multiLabelSeg)
+      {
+        auto labelInstance = multiLabelSeg->GetLabel(labelValue);
+        labelLabel = QString::fromStdString(labelInstance->GetName() + " (" + labelInstance->GetTrackingID() + ")");
+      }
+      QmitkImageStatisticsTreeItem* labelItem = nullptr;
+
+      if (statistic->GetTimeSteps() == 1)
+      {
+        // add statistical values directly in this hierarchy level
+        auto statisticsObject = statistic->GetStatistics(labelValue, 0);
+        labelItem = new QmitkImageStatisticsTreeItem(statisticsObject, statisticNames, labelLabel, isWIP, parentItem);
+      }
+      else
+      {
+        labelItem = new QmitkImageStatisticsTreeItem(statisticNames, labelLabel, isWIP, parentItem);
+        AddTimeStepTreeItems(statistic, labelValue, statisticNames, isWIP, labelItem, hasMultipleTimesteps);
+      }
+
+      parentItem->appendChild(labelItem);
+    }
+  }
 }
 
 void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
 {
   // reset old model
-  delete m_RootItem;
-  m_RootItem = new QmitkImageStatisticsTreeItem();
+  m_RootItem.reset(new QmitkImageStatisticsTreeItem());
 
   bool hasMask = false;
   bool hasMultipleTimesteps = false;
@@ -322,39 +379,40 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
     // image: 1. hierarchy level
     QmitkImageStatisticsTreeItem *imageItem = nullptr;
     auto search = dataNodeToTreeItem.find(image);
-    // the tree item was created previously
     if (search != dataNodeToTreeItem.end())
     {
+      // the tree item was created previously
       imageItem = search->second;
     }
-    // create the tree item
     else
     {
       QString imageLabel = QString::fromStdString(image->GetName());
       if (statistic->GetTimeSteps() == 1 && maskFinding == m_MaskNodes.end())
       {
-        auto statisticsObject = statistic->GetStatisticsForTimeStep(0);
-        imageItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, imageLabel, isWIP, m_RootItem);
+        // create the final statistics tree item
+        auto statisticsObject = isWIP ? mitk::ImageStatisticsContainer::ImageStatisticsObject() : statistic->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0);
+        imageItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, imageLabel, isWIP, m_RootItem.get());
       }
       else
       {
-        imageItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, imageLabel, isWIP, m_RootItem);
+        imageItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, imageLabel, isWIP, m_RootItem.get());
       }
       m_RootItem->appendChild(imageItem);
       dataNodeToTreeItem.emplace(image, imageItem);
     }
 
-    // mask: 2. hierarchy level (optional, only if mask exists)
-    QmitkImageStatisticsTreeItem *lastParent = nullptr;
+    const auto labelValues = statistic->GetExistingLabelValues(true); //currently we not support showing the statistics for unlabeled pixels if a mask exist
     if (maskFinding != m_MaskNodes.end())
     {
+      // mask: 2. hierarchy level exists
       auto& mask = *maskFinding;
       QString maskLabel = QString::fromStdString(mask->GetName());
-      QmitkImageStatisticsTreeItem *maskItem;
-      // add statistical values directly in this hierarchy level
-      if (statistic->GetTimeSteps() == 1)
+      QmitkImageStatisticsTreeItem* maskItem;
+
+      if (statistic->GetTimeSteps() == 1 && labelValues.size() == 1)
       {
-        auto statisticsObject = statistic->GetStatisticsForTimeStep(0);
+        // add statistical values directly in this hierarchy level
+        auto statisticsObject = isWIP ? mitk::ImageStatisticsContainer::ImageStatisticsObject() : statistic->GetStatistics(labelValues.front(), 0);
         maskItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, maskLabel, isWIP, imageItem);
       }
       else
@@ -363,28 +421,23 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       }
 
       imageItem->appendChild(maskItem);
-      lastParent = maskItem;
       hasMask = true;
+
+      // 3. hierarchy level: labels (optional, only if more then one label in statistic)
+      if (labelValues.size() > 1)
+      {
+        AddLabelTreeItems(statistic, mask, labelValues, m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps);
+      }
+      else
+      {
+        mitk::Label::PixelType labelValue = isWIP ? 0 : labelValues.front();
+        AddTimeStepTreeItems(statistic, labelValue, m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps);
+      }
     }
     else
     {
-      lastParent = imageItem;
-    }
-    // 3. hierarchy level (optional, only if >1 timestep)
-    if (statistic->GetTimeSteps() > 1)
-    {
-      for (unsigned int i = 0; i < statistic->GetTimeSteps(); i++)
-      {
-        QString timeStepLabel = "[" + QString::number(i) + "] " +
-                                QString::number(statistic->GetTimeGeometry()->TimeStepToTimePoint(i)) + " ms";
-        if (statistic->TimeStepExists(i))
-        {
-          auto statisticsItem = new QmitkImageStatisticsTreeItem(
-                statistic->GetStatisticsForTimeStep(i), m_StatisticNames, timeStepLabel, isWIP, lastParent);
-          lastParent->appendChild(statisticsItem);
-        }
-      }
-      hasMultipleTimesteps = true;
+      //no mask -> but multi time step
+      AddTimeStepTreeItems(statistic, mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, m_StatisticNames, isWIP, imageItem, hasMultipleTimesteps);
     }
   }
   QString headerString = "Images";
@@ -399,26 +452,46 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
   m_HeaderFirstColumn = headerString;
 }
 
-void QmitkImageStatisticsTreeModel::NodeRemoved(const mitk::DataNode *)
+void QmitkImageStatisticsTreeModel::NodeRemoved(const mitk::DataNode* changedNode)
 {
-  emit beginResetModel();
-  UpdateByDataStorage();
-  emit endResetModel();
-  emit modelChanged();
+  bool isRelevantNode = (nullptr != dynamic_cast<const mitk::ImageStatisticsContainer*>(changedNode->GetData()));
+
+  if (isRelevantNode)
+  {
+    emit beginResetModel();
+    UpdateByDataStorage();
+    emit endResetModel();
+    emit modelChanged();
+  }
 }
 
-void QmitkImageStatisticsTreeModel::NodeAdded(const mitk::DataNode *)
+void QmitkImageStatisticsTreeModel::NodeAdded(const mitk::DataNode * changedNode)
 {
-  emit beginResetModel();
-  UpdateByDataStorage();
-  emit endResetModel();
-  emit modelChanged();
+  bool isRelevantNode = (nullptr != dynamic_cast<const mitk::ImageStatisticsContainer*>(changedNode->GetData()));
+
+  if (isRelevantNode)
+  {
+      emit beginResetModel();
+      UpdateByDataStorage();
+      emit endResetModel();
+      emit modelChanged();
+  }
 }
 
-void QmitkImageStatisticsTreeModel::NodeChanged(const mitk::DataNode *)
+void QmitkImageStatisticsTreeModel::NodeChanged(const mitk::DataNode * changedNode)
 {
-  emit beginResetModel();
-  UpdateByDataStorage();
-  emit endResetModel();
-  emit modelChanged();
+  bool isRelevantNode = m_ImageNodes.end() != std::find(m_ImageNodes.begin(), m_ImageNodes.end(), changedNode);
+  isRelevantNode = isRelevantNode || (m_MaskNodes.end() != std::find(m_MaskNodes.begin(), m_MaskNodes.end(), changedNode));
+  isRelevantNode = isRelevantNode || (nullptr != dynamic_cast<const mitk::ImageStatisticsContainer*>(changedNode->GetData()));
+
+  if (isRelevantNode)
+  {
+    if (m_BuildTime.GetMTime() < changedNode->GetData()->GetMTime())
+    {
+      emit beginResetModel();
+      UpdateByDataStorage();
+      emit endResetModel();
+      emit modelChanged();
+    }
+  }
 }

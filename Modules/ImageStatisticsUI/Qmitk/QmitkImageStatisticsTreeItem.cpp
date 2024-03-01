@@ -21,7 +21,7 @@ QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
 {
 }
 
- QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(StatisticNameVector statisticNames,
+ QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(const StatisticNameVector& statisticNames,
                                                            QVariant label,
                                                            bool isWIP,
                                                            QmitkImageStatisticsTreeItem *parentItem)

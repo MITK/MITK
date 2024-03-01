@@ -160,6 +160,11 @@ std::string mitk::Label::GetName() const
   return name;
 }
 
+std::string mitk::Label::GetTrackingID() const
+{
+  return std::to_string(this->GetValue());
+}
+
 void mitk::Label::SetValue(PixelType pixelValue)
 {
   mitk::UShortProperty *property = dynamic_cast<mitk::UShortProperty *>(GetProperty("value"));

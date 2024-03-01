@@ -124,6 +124,7 @@ void QmitkImageStatisticsDataGenerator::IndicateFutureResults(const mitk::DataNo
   if (resultDataNode.IsNull())
   {
     auto dummyStats = mitk::ImageStatisticsContainer::New();
+    dummyStats->SetTimeGeometry(image->GetTimeGeometry()->Clone());
 
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
     imageRule->Connect(dummyStats, image);

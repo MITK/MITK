@@ -221,28 +221,34 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
 
         if (statistics)
         {
-          const auto timeStep = imageNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(m_TimePointChangeListener.GetCurrentSelectedTimePoint());
+          auto labelValues = statistics->GetExistingLabelValues(true);
 
-          if (statistics->TimeStepExists(timeStep))
+          if (labelValues.size() == 1)
           {
-            std::stringstream label;
-            label << imageNode->GetName();
-            if (imageNode->GetData()->GetTimeSteps() > 1)
-            {
-              label << "[" << timeStep << "]";
-            }
+            //currently only supported rois with one label due to histogram widget limitations.
+            const auto timeStep = imageNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(m_TimePointChangeListener.GetCurrentSelectedTimePoint());
 
-            if (roiNode)
+            if (statistics->StatisticsExist(labelValues.front(), timeStep))
             {
-              label << " with " << roiNode->GetName();
-            }
+              std::stringstream label;
+              label << imageNode->GetName();
+              if (imageNode->GetData()->GetTimeSteps() > 1)
+              {
+                label << "[" << timeStep << "]";
+              }
 
-            //Hardcoded labels are currently needed because the current histogram widget (and ChartWidget)
-            //do not allow correct removal or sound update/insertion of several charts.
-            //only thing that works for now is always to update/overwrite the same data label
-            //This is a quick fix for T28223 and T28221
-            m_Controls.widget_histogram->SetHistogram(statistics->GetHistogramForTimeStep(timeStep), "histogram");
-            m_Controls.groupBox_histogram->setVisible(true);
+              if (roiNode)
+              {
+                label << " with " << roiNode->GetName();
+              }
+
+              //Hardcoded labels are currently needed because the current histogram widget (and ChartWidget)
+              //do not allow correct removal or sound update/insertion of several charts.
+              //only thing that works for now is always to update/overwrite the same data label
+              //This is a quick fix for T28223 and T28221
+              m_Controls.widget_histogram->SetHistogram(statistics->GetHistogram(labelValues.front(), timeStep), "histogram");
+              m_Controls.groupBox_histogram->setVisible(true);
+            }
           }
         }
       }

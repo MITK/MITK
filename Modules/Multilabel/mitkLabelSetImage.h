@@ -237,7 +237,7 @@ namespace mitk
      * @return the respective vector of label values.
      * @pre group index must exist.
      */
-    const LabelValueVectorType GetLabelValuesByName(GroupIndexType index, std::string_view name) const;
+    const LabelValueVectorType GetLabelValuesByName(GroupIndexType index, const std::string_view name) const;
 
     /**
     * Returns a vector with (class) names of all label instances used in the segmentation (over all groups)
@@ -273,7 +273,7 @@ namespace mitk
     * accordingly to the passed state.
     * @pre The specified group must exist.
     */
-    void SetAllLabelsVisibleByName(GroupIndexType group, std::string_view name, bool visible);
+    void SetAllLabelsVisibleByName(GroupIndexType group, const std::string_view name, bool visible);
 
     /** Returns the lock state of the label (including UnlabeledLabel value).
      @pre Requested label does exist.*/
@@ -292,7 +292,7 @@ namespace mitk
     * accordingly to the passed state.
     * @pre The specified group must exist.
     */
-    void SetAllLabelsLockedByName(GroupIndexType group, std::string_view name, bool locked);
+    void SetAllLabelsLockedByName(GroupIndexType group, const std::string_view name, bool locked);
 
     /**
     * \brief Replaces the labels of a group with a given vector of labels.

@@ -30,7 +30,7 @@ public:
   QmitkImageStatisticsTreeItem();
   explicit QmitkImageStatisticsTreeItem(ImageStatisticsObject statisticsData,
     StatisticNameVector statisticNames, QVariant label, bool isWIP, QmitkImageStatisticsTreeItem *parentItem = nullptr);
-  explicit QmitkImageStatisticsTreeItem(StatisticNameVector statisticNames,
+  explicit QmitkImageStatisticsTreeItem(const StatisticNameVector& statisticNames,
     QVariant label, bool isWIP, QmitkImageStatisticsTreeItem *parentItem = nullptr);
   ~QmitkImageStatisticsTreeItem();
 
@@ -44,7 +44,7 @@ public:
   QmitkImageStatisticsTreeItem *parentItem();
 
   /**indicates that the statistic container owned by this instance is only a dummy
-  WIP containter and the calculation of the up-to-date statistic is not yet finished.**/
+  WIP container and the calculation of the up-to-date statistic is not yet finished.**/
   bool isWIP() const;
 
 private:

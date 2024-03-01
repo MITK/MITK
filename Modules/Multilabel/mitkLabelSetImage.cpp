@@ -1140,7 +1140,7 @@ const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelVal
   return m_GroupToLabelMap[index];
 }
 
-const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelValuesByName(GroupIndexType index, std::string_view name) const
+const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelValuesByName(GroupIndexType index, const std::string_view name) const
 {
   LabelValueVectorType result;
 
@@ -1183,7 +1183,7 @@ void mitk::LabelSetImage::SetAllLabelsVisibleByGroup(GroupIndexType group, bool 
   this->ApplyToLabels(this->GetLabelValuesByGroup(group), setVisibility);
 }
 
-void mitk::LabelSetImage::SetAllLabelsVisibleByName(GroupIndexType group, std::string_view name, bool visible)
+void mitk::LabelSetImage::SetAllLabelsVisibleByName(GroupIndexType group, const std::string_view name, bool visible)
 {
   auto setVisibility = [visible](Label* l) { l->SetVisible(visible); };
 
@@ -1204,7 +1204,7 @@ void mitk::LabelSetImage::SetAllLabelsLockedByGroup(GroupIndexType group, bool l
   this->ApplyToLabels(this->GetLabelValuesByGroup(group), setLock);
 }
 
-void mitk::LabelSetImage::SetAllLabelsLockedByName(GroupIndexType group, std::string_view name, bool locked)
+void mitk::LabelSetImage::SetAllLabelsLockedByName(GroupIndexType group, const std::string_view name, bool locked)
 {
   auto setLock = [locked](Label* l) { l->SetLocked(locked); };
 

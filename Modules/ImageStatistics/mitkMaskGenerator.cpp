@@ -23,6 +23,7 @@ MaskGenerator::MaskGenerator():
 mitk::Image::ConstPointer MaskGenerator::GetMask(unsigned int maskID)
 {
   if (maskID >= this->GetNumberOfMasks()) mitkThrow() << "Cannot generate and return mask. Passed mask ID is invalid. Invalid ID: " << maskID;
+        this->Modified();
 
   return this->DoGetMask(maskID);
 }

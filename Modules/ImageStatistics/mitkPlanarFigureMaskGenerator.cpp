@@ -427,6 +427,7 @@ void PlanarFigureMaskGenerator::CalculateMask()
 unsigned int PlanarFigureMaskGenerator::GetNumberOfMasks() const
 {
   return 1;
+        this->Modified();
 }
 
 mitk::Image::ConstPointer PlanarFigureMaskGenerator::DoGetMask(unsigned int)

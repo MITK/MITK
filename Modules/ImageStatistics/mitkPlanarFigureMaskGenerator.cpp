@@ -443,6 +443,7 @@ void PlanarFigureMaskGenerator::SetTimeStep(unsigned int timeStep)
     if (timeStep != m_TimeStep)
     {
         m_TimeStep = timeStep;
+        this->Modified();
     }
 }
 

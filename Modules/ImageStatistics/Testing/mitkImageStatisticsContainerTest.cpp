@@ -175,22 +175,22 @@ public:
     {
         m_StatisticsContainer->SetTimeGeometry(m_TimeGeometry);
 
-        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Previous added time step was not saved correctly.", m_StatisticsContainer->TimeStepExists(0), true);
-        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Previous added time step was not saved correctly.", m_StatisticsContainer->TimeStepExists(1), true);
-        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Previous added time step was not saved correctly.", m_StatisticsContainer->TimeStepExists(2), true);
-        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Previous added time step was not saved correctly.", m_StatisticsContainer->TimeStepExists(3), true);
-        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Previous added time step was not saved correctly.", m_StatisticsContainer->TimeStepExists(4), true);
+        m_StatisticsContainer->SetStatistics(1,0, m_StatisticsObject);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Previous added time step was not saved correctly.", m_StatisticsContainer->StatisticsExist(1, 0), true);
+        m_StatisticsContainer->SetStatistics(1,1, m_StatisticsObject);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Previous added time step was not saved correctly.", m_StatisticsContainer->StatisticsExist(1, 1), true);
+        m_StatisticsContainer->SetStatistics(1,2, m_StatisticsObject);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Previous added time step was not saved correctly.", m_StatisticsContainer->StatisticsExist(1, 2), true);
+        m_StatisticsContainer->SetStatistics(1,3, m_StatisticsObject);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Previous added time step was not saved correctly.", m_StatisticsContainer->StatisticsExist(1, 3), true);
+        m_StatisticsContainer->SetStatistics(1,4, m_StatisticsObject);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Previous added time step was not saved correctly.", m_StatisticsContainer->StatisticsExist(1, 4), true);
 
-        CPPUNIT_ASSERT_THROW_MESSAGE("Out of timeStep geometry bounds timeStep was added but no exception was thrown.", m_StatisticsContainer->SetStatisticsForTimeStep(42, m_StatisticsObject), mitk::Exception);
+        CPPUNIT_ASSERT_THROW_MESSAGE("Out of timeStep geometry bounds timeStep was added but no exception was thrown.", m_StatisticsContainer->SetStatistics(1,42, m_StatisticsObject), mitk::Exception);
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistics container does not contain the right amount of timeSteps.", static_cast<int> (m_StatisticsContainer->GetNumberOfTimeSteps()), 5);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistics container does not contain the right amount of timeSteps.", static_cast<int> (m_StatisticsContainer->GetExistingTimeSteps(1).size()), 5);
 
-        CPPUNIT_ASSERT_THROW_MESSAGE("A statistic for a non existing time steps was found.", m_StatisticsContainer->GetStatisticsForTimeStep(42), mitk::Exception);
+        CPPUNIT_ASSERT_THROW_MESSAGE("A statistic for a non existing time steps was found.", m_StatisticsContainer->GetStatistics(1, 42), mitk::Exception);
     }
 
     void PrintSelf()
@@ -204,11 +204,11 @@ public:
 
         m_StatisticsObject.AddStatistic("Test", 4.2);
 
-        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,0, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,1, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,2, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,3, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,4, m_StatisticsObject);
 
         // Check print function for filled container
         CPPUNIT_ASSERT_NO_THROW_MESSAGE("Print function throws an exception.", m_StatisticsContainer->Print(print));
@@ -220,27 +220,27 @@ public:
 
         m_StatisticsObject.AddStatistic("Test", 4.2);
 
-        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,0, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,1, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,2, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,3, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,4, m_StatisticsObject);
 
         auto clone = m_StatisticsContainer->Clone();
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", m_StatisticsContainer->GetNumberOfTimeSteps(), clone->GetNumberOfTimeSteps());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", m_StatisticsContainer->GetExistingTimeSteps(1).size(), clone->GetExistingTimeSteps(1).size());
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->TimeStepExists(0), true);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->TimeStepExists(1), true);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->TimeStepExists(2), true);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->TimeStepExists(3), true);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->TimeStepExists(4), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->StatisticsExist(1, 0), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->StatisticsExist(1, 1), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->StatisticsExist(1, 2), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->StatisticsExist(1, 3), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->StatisticsExist(1, 4), true);
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatisticsForTimeStep(0).HasStatistic("Test"), true);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatisticsForTimeStep(1).HasStatistic("Test"), true);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatisticsForTimeStep(2).HasStatistic("Test"), true);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatisticsForTimeStep(3).HasStatistic("Test"), true);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatisticsForTimeStep(4).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatistics(1,0).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatistics(1,1).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatistics(1,2).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatistics(1,3).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatistics(1,4).HasStatistic("Test"), true);
     }
 
     void StatisticNames()
@@ -254,28 +254,28 @@ public:
         m_StatisticsObject3.AddStatistic("Test3", 4.2);
 
         // Setting the same statistics for different time steps will only add the statistics name once.
-        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,0, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,1, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,2, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,3, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,4, m_StatisticsObject);
 
         // Setting the same statistics for different time steps will only add the statistics name once.
-        m_StatisticsContainer2->SetStatisticsForTimeStep(0, m_StatisticsObject2);
-        m_StatisticsContainer2->SetStatisticsForTimeStep(1, m_StatisticsObject2);
-        m_StatisticsContainer2->SetStatisticsForTimeStep(2, m_StatisticsObject2);
-        m_StatisticsContainer2->SetStatisticsForTimeStep(3, m_StatisticsObject2);
-        m_StatisticsContainer2->SetStatisticsForTimeStep(4, m_StatisticsObject2);
+        m_StatisticsContainer2->SetStatistics(1,0, m_StatisticsObject2);
+        m_StatisticsContainer2->SetStatistics(1,1, m_StatisticsObject2);
+        m_StatisticsContainer2->SetStatistics(1,2, m_StatisticsObject2);
+        m_StatisticsContainer2->SetStatistics(1,3, m_StatisticsObject2);
+        m_StatisticsContainer2->SetStatistics(1,4, m_StatisticsObject2);
 
         // Setting the same statistics for different time steps will only add the statistics name once.
-        m_StatisticsContainer3->SetStatisticsForTimeStep(0, m_StatisticsObject3);
-        m_StatisticsContainer3->SetStatisticsForTimeStep(1, m_StatisticsObject3);
-        m_StatisticsContainer3->SetStatisticsForTimeStep(2, m_StatisticsObject3);
-        m_StatisticsContainer3->SetStatisticsForTimeStep(3, m_StatisticsObject3);
-        m_StatisticsContainer3->SetStatisticsForTimeStep(4, m_StatisticsObject3);
+        m_StatisticsContainer3->SetStatistics(1,0, m_StatisticsObject3);
+        m_StatisticsContainer3->SetStatistics(1,1, m_StatisticsObject3);
+        m_StatisticsContainer3->SetStatistics(1,2, m_StatisticsObject3);
+        m_StatisticsContainer3->SetStatistics(1,3, m_StatisticsObject3);
+        m_StatisticsContainer3->SetStatistics(1,4, m_StatisticsObject3);
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Estimated statistics names are not correct.", mitk::GetAllStatisticNames(m_StatisticsContainer).size(), estimatedDefaultStatisticNames.size() + 1);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(0).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatistics(1,0).HasStatistic("Test"), true);
 
         std::vector<mitk::ImageStatisticsContainer::ConstPointer> containers;
 
@@ -283,8 +283,8 @@ public:
         containers.push_back(m_StatisticsContainer3.GetPointer());
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Estimated statistics names are not correct.", mitk::GetAllStatisticNames(containers).size(), estimatedDefaultStatisticNames.size() + 2);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer2->GetStatisticsForTimeStep(0).HasStatistic("Test2"), true);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer3->GetStatisticsForTimeStep(0).HasStatistic("Test3"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer2->GetStatistics(1,0).HasStatistic("Test2"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer3->GetStatistics(1,0).HasStatistic("Test3"), true);
     }
 
     void OverwriteStatistic()
@@ -293,18 +293,18 @@ public:
 
         m_StatisticsObject.AddStatistic("Test", 4.2);
 
-        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,0, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,1, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,2, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,3, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,4, m_StatisticsObject);
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was not correctly added to StatisticsObject.", boost::get<double> (m_StatisticsContainer->GetStatisticsForTimeStep(0).GetValueNonConverted("Test")), 4.2);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was not correctly added to StatisticsObject.", boost::get<double> (m_StatisticsContainer->GetStatistics(1,0).GetValueNonConverted("Test")), 4.2);
 
         // An existing statistic won't be updated by adding another statistic with same name to that object.
         m_StatisticsObject.AddStatistic("Test", 42.0);
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was overwritten.", boost::get<double>(m_StatisticsContainer->GetStatisticsForTimeStep(0).GetValueNonConverted("Test")), 4.2);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was overwritten.", boost::get<double>(m_StatisticsContainer->GetStatistics(1,0).GetValueNonConverted("Test")), 4.2);
     }
 
     void AllStatisticNamesForContainer()
@@ -315,11 +315,11 @@ public:
         m_StatisticsObject2.AddStatistic("Test2", 4.2);
 
         // Setting the same statistics for different time steps will only add the statistics name once.
-        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject2);
-        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject2);
-        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,0, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,1, m_StatisticsObject2);
+        m_StatisticsContainer->SetStatistics(1,2, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,3, m_StatisticsObject2);
+        m_StatisticsContainer->SetStatistics(1,4, m_StatisticsObject);
 
         std::vector<mitk::ImageStatisticsContainer::ConstPointer> containers;
 
@@ -336,8 +336,8 @@ public:
         containers.push_back(m_StatisticsContainer.GetPointer());
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Estimated statistics names are not correct.", mitk::GetAllStatisticNames(containers).size(), estimatedDefaultStatisticNames.size() + 2);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(0).HasStatistic("Test"), true);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(1).HasStatistic("Test2"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatistics(1,0).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatistics(1,1).HasStatistic("Test2"), true);
     }
 
     void Reset()
@@ -346,32 +346,19 @@ public:
 
         m_StatisticsObject.AddStatistic("Test", 4.2);
 
-        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject);
-        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,0, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,1, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,2, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,3, m_StatisticsObject);
+        m_StatisticsContainer->SetStatistics(1,4, m_StatisticsObject);
 
         m_StatisticsContainer->Reset();
 
         m_StatisticsObject.Reset();
 
-        m_TimeGeometry->ClearAllGeometries();
-        
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic object for time step was not deleted correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(0).GetExistingStatisticNames().size(), size_t());
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic object for time step was not deleted correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(0).GetCustomStatisticNames().size(), size_t());
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic object for time step was not deleted correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(1).GetExistingStatisticNames().size(), size_t());
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic object for time step was not deleted correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(1).GetCustomStatisticNames().size(), size_t());
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic object for time step was not deleted correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(2).GetExistingStatisticNames().size(), size_t());
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic object for time step was not deleted correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(2).GetCustomStatisticNames().size(), size_t());
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic object for time step was not deleted correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(3).GetExistingStatisticNames().size(), size_t());
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic object for time step was not deleted correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(3).GetCustomStatisticNames().size(), size_t());
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic object for time step was not deleted correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(4).GetExistingStatisticNames().size(), size_t());
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic object for time step was not deleted correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(4).GetCustomStatisticNames().size(), size_t());
+        CPPUNIT_ASSERT_MESSAGE("Statistics container was reseted correctly.", m_StatisticsContainer->GetExistingLabelValues(false).empty());
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was not deleted correctly.", m_StatisticsObject.HasStatistic("Test"), false);
-        
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Time geometry was not cleared correctly.", m_TimeGeometry->IsValid(), false);
     }
 };
 

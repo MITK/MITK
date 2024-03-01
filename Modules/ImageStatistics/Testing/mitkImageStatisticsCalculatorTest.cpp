@@ -104,10 +104,25 @@ private:
   mitk::PlanarPolygon::Pointer GeneratePlanarPolygon(mitk::PlaneGeometry::Pointer geometry, std::vector <mitk::Point2D> points);
 
   // universal function to calculate statistics
-  const mitk::ImageStatisticsContainer::Pointer ComputeStatistics(mitk::Image::ConstPointer image,
-    mitk::MaskGenerator::Pointer maskGen = nullptr,
-    mitk::MaskGenerator::Pointer secondardMaskGen = nullptr,
-    unsigned short label = 1);
+  const mitk::ImageStatisticsContainer::Pointer
+    mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::ConstPointer image,
+      mitk::MaskGenerator::Pointer maskGen = nullptr,
+      mitk::MaskGenerator::Pointer secondardMaskGen = nullptr)
+  {
+    mitk::ImageStatisticsCalculator::Pointer imgStatCalc = mitk::ImageStatisticsCalculator::New();
+    imgStatCalc->SetInputImage(image);
+
+    if (maskGen.IsNotNull())
+    {
+      imgStatCalc->SetMask(maskGen.GetPointer());
+      if (secondardMaskGen.IsNotNull())
+      {
+        imgStatCalc->SetSecondaryMask(secondardMaskGen.GetPointer());
+      }
+    }
+
+    return imgStatCalc->GetStatistics();
+  }
 
   void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
     mitk::ImageStatisticsContainer::RealType testMean, mitk::ImageStatisticsContainer::RealType testSD, mitk::ImageStatisticsContainer::RealType testMedian = 0);
@@ -170,7 +185,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase1()
         planFigMaskGen->SetPlanarFigure(figure.GetPointer());
 
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 255.0, 0.0, 255.0);
 }
@@ -200,7 +215,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase2()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1,0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 255.0, 0.0, 255.0);
 }
@@ -229,7 +244,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase3()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 255.0, 0.0, 255.0);
 }
@@ -259,7 +274,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase4()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 191.25, 127.5, 253.72499847412109);
 }
@@ -289,7 +304,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase5()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 191.50, 89.802561210691536, 128.63499999046327);
 }
@@ -319,7 +334,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase6()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 191.5, 89.802561210691536, 128.63499999046327);
 }
@@ -349,7 +364,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase7()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 127.666666666666667, 127.50032679696680, 128.7750015258789);
 }
@@ -379,7 +394,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase8()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 128.0, 0.0, 128.0);
 }
@@ -409,7 +424,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase9()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 191.5, 89.802561210691536, 128.63499999046327);
 }
@@ -439,7 +454,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase10()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 127.666666666666667, 127.50032679696680, 128.7750015258789);
 }
@@ -469,7 +484,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase11()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 204.0, 105.58003057938019, 253.724998474121083);
 }
@@ -498,7 +513,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase12()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, planFigMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 212.666666666666667, 73.323484187082443, 254.36499786376954);
 }
@@ -537,7 +552,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedNoMask()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage));
-  auto statisticsObject = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObject = statisticsContainer->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0);
 
   VerifyStatistics(statisticsObject,
     expected_N,
@@ -595,8 +610,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
   imgMaskGen->SetTimeStep(0);
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr, 1));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr));
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   VerifyStatistics(statisticsObjectTimestep0,
     expected_N,
@@ -616,7 +631,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
 {
-  MITK_INFO << std::endl << "Test Pic3D cropped multilabel mask:-----------------------------------------------------------------------------------";
+  MITK_INFO << std::endl << "Test Pic3D cropped multi-label mask:-----------------------------------------------------------------------------------";
 
   std::string Pic3DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D_cropped.nrrd");
   m_Pic3DCroppedImage = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedFile);
@@ -624,7 +639,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
 
   std::string Pic3DCroppedMultilabelMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D_croppedMultilabelMask.nrrd");
   m_Pic3DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedMultilabelMaskFile);
-  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D multilabel mask", m_Pic3DCroppedMultilabelMask.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D multi-label mask", m_Pic3DCroppedMultilabelMask.IsNotNull());
   //calculated ground truth via script
   mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.5;
   mitk::ImageStatisticsContainer::RealType expected_MPP = -nan("");
@@ -654,8 +669,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
   imgMaskGen->SetTimeStep(0);
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr, 2));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr));
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(2, 0);
 
   VerifyStatistics(statisticsObjectTimestep0,
     expected_N,
@@ -713,7 +728,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedPlanarFigure()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, pfMaskGen.GetPointer()));
-  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(1, 0);
 
   VerifyStatistics(statisticsObjectTimestep0,
     expected_N,
@@ -733,7 +748,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedPlanarFigure()
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
 {
-  MITK_INFO << std::endl << "Test US4D cropped without mask timestep 1:-----------------------------------------------------------------------------------";
+  MITK_INFO << std::endl << "Test US4D cropped without mask time step 1:-----------------------------------------------------------------------------------";
 
         std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
   m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
@@ -763,7 +778,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer=mitk::ImageStatisticsContainer::New();
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage));
-  auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
+  auto statisticsObjectTimestep1 = statisticsContainer->GetStatistics(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 1);
 
   VerifyStatistics(statisticsObjectTimestep1,
     expected_N,
@@ -783,7 +798,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 {
-  MITK_INFO << std::endl << "Test US4D cropped with binary mask timestep 1:-----------------------------------------------------------------------------------";
+  MITK_INFO << std::endl << "Test US4D cropped with binary mask time step 1:-----------------------------------------------------------------------------------";
 
   std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
   m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
@@ -820,8 +835,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
   imgMask1->SetImageMask(m_US4DCroppedBinMask);
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer=mitk::ImageStatisticsContainer::New();
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr, 1));
-  auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr));
+  auto statisticsObjectTimestep1 = statisticsContainer->GetStatistics(1, 1);
 
   VerifyStatistics(statisticsObjectTimestep1,
     expected_N,
@@ -841,7 +856,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeStep1()
 {
-  MITK_INFO << std::endl << "Test US4D cropped with mulitlabel mask timestep 1:-----------------------------------------------------------------------------------";
+  MITK_INFO << std::endl << "Test US4D cropped with multi-label mask time step 1:-----------------------------------------------------------------------------------";
 
   std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
   m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
@@ -849,7 +864,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
 
   std::string US4DCroppedMultilabelMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_croppedMultilabelMask.nrrd");
   m_US4DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::Image>(US4DCroppedMultilabelMaskFile);
-  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D multilabel mask", m_US4DCroppedMultilabelMask.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D multi-label mask", m_US4DCroppedMultilabelMask.IsNotNull());
   //calculated ground truth via script
   mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.0432484564918287;
   mitk::ImageStatisticsContainer::RealType expected_MPP = 159.75;
@@ -878,8 +893,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
   imgMask1->SetImageMask(m_US4DCroppedMultilabelMask);
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr, 1));
-  auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr));
+  auto statisticsObjectTimestep1 = statisticsContainer->GetStatistics(1, 1);
 
   VerifyStatistics(statisticsObjectTimestep1,
     expected_N,
@@ -899,7 +914,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep1()
 {
-  MITK_INFO << std::endl << "Test US4D cropped planar figure timestep 1:-----------------------------------------------------------------------------------";
+  MITK_INFO << std::endl << "Test US4D cropped planar figure time step 1:-----------------------------------------------------------------------------------";
 
   std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
   m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
@@ -937,7 +952,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, pfMaskGen.GetPointer()));
-  auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
+  auto statisticsObjectTimestep1 = statisticsContainer->GetStatistics(1, 1);
 
   VerifyStatistics(statisticsObjectTimestep1,
     expected_N,
@@ -956,7 +971,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep
 
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedAllTimesteps()
 {
-  MITK_INFO << std::endl << "Test US4D cropped all timesteps:-----------------------------------------------------------------------------------";
+  MITK_INFO << std::endl << "Test US4D cropped all time steps:-----------------------------------------------------------------------------------";
 
   std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
   m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
@@ -965,7 +980,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedAllTimesteps()
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage));
   for (int i = 0; i < 4; i++)
   {
-    CPPUNIT_ASSERT_MESSAGE("Error computing statistics for multiple timestep", statisticsContainer->TimeStepExists(i));
+    CPPUNIT_ASSERT_MESSAGE("Error computing statistics for multiple time steps", statisticsContainer->StatisticsExist(mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE, i));
   }
 }
 
@@ -1008,8 +1023,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCropped3DMask()
   imgMask1->SetImageMask(m_US4DCropped3DBinMask);
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer = mitk::ImageStatisticsContainer::New();
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr, 1));
-  auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr));
+  auto statisticsObjectTimestep1 = statisticsContainer->GetStatistics(1, 1);
 
   VerifyStatistics(statisticsObjectTimestep1,
     expected_N,
@@ -1038,27 +1053,6 @@ mitk::PlanarPolygon::Pointer mitkImageStatisticsCalculatorTestSuite::GeneratePla
   return figure;
 }
 
-const mitk::ImageStatisticsContainer::Pointer
-mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::ConstPointer image,
-  mitk::MaskGenerator::Pointer maskGen,
-  mitk::MaskGenerator::Pointer secondardMaskGen,
-  unsigned short label)
-{
-  mitk::ImageStatisticsCalculator::Pointer imgStatCalc = mitk::ImageStatisticsCalculator::New();
-  imgStatCalc->SetInputImage(image);
-
-  if (maskGen.IsNotNull())
-  {
-    imgStatCalc->SetMask(maskGen.GetPointer());
-    if (secondardMaskGen.IsNotNull())
-    {
-      imgStatCalc->SetSecondaryMask(secondardMaskGen.GetPointer());
-    }
-  }
-
-  return imgStatCalc->GetStatistics(label);
-}
-
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
   mitk::ImageStatisticsContainer::RealType testMean, mitk::ImageStatisticsContainer::RealType testSD, mitk::ImageStatisticsContainer::RealType testMedian)
 {
@@ -1068,9 +1062,9 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
   CPPUNIT_ASSERT_NO_THROW(meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN()));
   CPPUNIT_ASSERT_NO_THROW(standardDeviationObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION()));
   CPPUNIT_ASSERT_NO_THROW(medianObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEDIAN()));
-  CPPUNIT_ASSERT_MESSAGE("Calculated mean grayvalue is not equal to the desired value.", std::abs(meanObject - testMean) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated grayvalue sd is not equal to the desired value.", std::abs(standardDeviationObject - testSD) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated median grayvalue is not equal to the desired value.", std::abs(medianObject - testMedian) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated mean gray value is not equal to the desired value.", std::abs(meanObject - testMean) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated gray value sd is not equal to the desired value.", std::abs(standardDeviationObject - testSD) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated median gray value is not equal to the desired value.", std::abs(medianObject - testMedian) < mitk::eps);
 }
 
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
@@ -1106,8 +1100,6 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
   CPPUNIT_ASSERT_NO_THROW(skewnessObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::SKEWNESS()));
   CPPUNIT_ASSERT_NO_THROW(kurtosisObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::KURTOSIS()));
   CPPUNIT_ASSERT_NO_THROW(varianceObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::VARIANCE()));
-  if (std::abs(varianceObject - variance) >= mitk::eps)
-    MITK_INFO << "xxx";
   CPPUNIT_ASSERT_NO_THROW(standardDeviationObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION()));
   CPPUNIT_ASSERT_NO_THROW(minObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MINIMUM()));
   CPPUNIT_ASSERT_NO_THROW(maxObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MAXIMUM()));
@@ -1117,7 +1109,7 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
 
   CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", numberOfVoxelsObject - N == 0);
   CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(meanObject - mean) < mitk::eps);
-  // in three test cases MPP is None because the roi has no positive pixels
+  // in three test cases MPP is None because the ROI has no positive pixels
   if (!std::isnan(mppObject))
   {
     CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(mppObject - MPP) < mitk::eps);

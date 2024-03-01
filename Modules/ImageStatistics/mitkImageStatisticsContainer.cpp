@@ -38,7 +38,7 @@ namespace mitk
 
   ImageStatisticsContainer::ImageStatisticsObject::ImageStatisticsObject() { Reset(); }
 
-  void ImageStatisticsContainer::ImageStatisticsObject::AddStatistic(const std::string &key, StatisticsVariantType value)
+  void ImageStatisticsContainer::ImageStatisticsObject::AddStatistic(const std::string_view key, StatisticsVariantType value)
   {
     m_Statistics.emplace(key, value);
 
@@ -85,13 +85,13 @@ namespace mitk
     return names;
   }
 
-  bool ImageStatisticsContainer::ImageStatisticsObject::HasStatistic(const std::string &name) const
+  bool ImageStatisticsContainer::ImageStatisticsObject::HasStatistic(const std::string_view name) const
   {
     return m_Statistics.find(name) != m_Statistics.cend();
   }
 
   ImageStatisticsContainer::StatisticsVariantType ImageStatisticsContainer::ImageStatisticsObject::GetValueNonConverted(
-    const std::string &name) const
+    const std::string_view name) const
   {
     if (HasStatistic(name))
     {
@@ -109,51 +109,55 @@ namespace mitk
     m_CustomNames.clear();
   }
 
-  bool ImageStatisticsContainer::TimeStepExists(TimeStepType timeStep) const
+  const static ImageStatisticsContainer::LabelValueType NO_MASK_LABEL_VALUE = 1;
+
+  bool ImageStatisticsContainer::StatisticsExist(LabelValueType labelValue, TimeStepType timeStep) const
   {
-    return m_TimeStepMap.find(timeStep) != m_TimeStepMap.end();
+    auto labelFinding = m_LabelTimeStep2StatisticsMap.find(labelValue);
+    if (labelFinding == m_LabelTimeStep2StatisticsMap.end()) return false;
+
+    auto timeFinding = labelFinding->second.find(timeStep);
+
+    return timeFinding != labelFinding->second.end();
   }
 
   const ImageStatisticsContainer::HistogramType*
-    ImageStatisticsContainer::GetHistogramForTimeStep(TimeStepType timeStep) const
+    ImageStatisticsContainer::GetHistogram(LabelValueType labelValue, TimeStepType timeStep) const
   {
-    return this->GetStatisticsForTimeStep(timeStep).m_Histogram;
+    return this->GetStatistics(labelValue, timeStep).m_Histogram;
   }
 
-  const ImageStatisticsContainer::ImageStatisticsObject &ImageStatisticsContainer::GetStatisticsForTimeStep(
+  const ImageStatisticsContainer::ImageStatisticsObject &ImageStatisticsContainer::GetStatistics(LabelValueType labelValue,
     TimeStepType timeStep) const
   {
-    auto it = m_TimeStepMap.find(timeStep);
-    if (it != m_TimeStepMap.end())
-    {
-      return it->second;
-    }
-    mitkThrow() << "StatisticsObject for timeStep " << timeStep << " not found!";
+    auto labelFinding = m_LabelTimeStep2StatisticsMap.find(labelValue);
+    if (labelFinding == m_LabelTimeStep2StatisticsMap.end()) mitkThrow() << "Cannot get statistics. Requested label value does not exist. Invalid label:" <<labelValue;
+
+    auto timeFinding = labelFinding->second.find(timeStep);
+    if (timeFinding == labelFinding->second.end()) mitkThrow() << "Cannot get statistics. Requested time step does not exist. Invalid time step:" << timeStep;
+
+    return timeFinding->second;
   }
 
-  void ImageStatisticsContainer::SetStatisticsForTimeStep(TimeStepType timeStep, ImageStatisticsObject statistics)
+  void ImageStatisticsContainer::SetStatistics(LabelValueType labelValue, TimeStepType timeStep, const ImageStatisticsObject& statistics)
   {
-    if (timeStep < this->GetTimeSteps())
-    {
-      m_TimeStepMap.emplace(timeStep, statistics);
-      this->Modified();
-    }
-    else
-    {
-      mitkThrow() << "Given timeStep " << timeStep
-                  << " out of timeStep geometry bounds. TimeSteps in geometry: " << this->GetTimeSteps();
-    }
+    
+    if (!this->GetTimeGeometry()->IsValidTimeStep(timeStep)) mitkThrow() << "Given timeStep " << timeStep
+      << " out of TimeGeometry bounds of the object. TimeSteps in geometry: " << this->GetTimeSteps();
+
+    m_LabelTimeStep2StatisticsMap[labelValue][timeStep] = statistics;
+    this->Modified();
   }
 
   void ImageStatisticsContainer::PrintSelf(std::ostream &os, itk::Indent indent) const
   {
     Superclass::PrintSelf(os, indent);
-    for (unsigned int i = 0; i < this->GetTimeSteps(); i++)
+    for (const auto& [labelValue, timeMap] : m_LabelTimeStep2StatisticsMap)
     {
-      os << std::endl << indent << "Statistics instance for timeStep " << i << ":";
-      if (this->TimeStepExists(i))
+      for (const auto& [timeStep, container] : timeMap)
       {
-        auto statisticsValues = GetStatisticsForTimeStep(i);
+        os << std::endl << indent << "Statistics instance (Label "<< labelValue << ", TimeStep "<< timeStep << "):";
+        auto statisticsValues = GetStatistics(labelValue,timeStep);
 
         auto statisticKeys = statisticsValues.GetExistingStatisticNames();
         os << std::endl << indent << "Number of entries: " << statisticKeys.size();
@@ -162,21 +166,41 @@ namespace mitk
           os << std::endl << indent.GetNextIndent() << aKey << ": " << statisticsValues.GetValueNonConverted(aKey);
         }
       }
-      else
-      {
-        os << std::endl << indent << "N/A";
-      }
     }
   }
 
-  unsigned int ImageStatisticsContainer::GetNumberOfTimeSteps() const { return this->GetTimeSteps(); }
+
+  ImageStatisticsContainer::LabelValueVectorType ImageStatisticsContainer::GetExistingLabelValues(bool ignoreUnlabeled) const
+  {
+    LabelValueVectorType result;
+    for (const auto& [labelValue, timeMap] : m_LabelTimeStep2StatisticsMap)
+    {
+      if (!ignoreUnlabeled || labelValue != NO_MASK_LABEL_VALUE)
+      {
+        result.push_back(labelValue);
+      }
+    }
+    return result;
+  }
+
+  ImageStatisticsContainer::TimeStepVectorType ImageStatisticsContainer::GetExistingTimeSteps(LabelValueType labelValue) const
+  {
+    TimeStepVectorType result;
+
+    auto labelFinding = m_LabelTimeStep2StatisticsMap.find(labelValue);
+    if (labelFinding == m_LabelTimeStep2StatisticsMap.end()) mitkThrow() << "Cannot get existing time steps. Requested label value does not exist. Invalid label:" << labelValue;
+
+    for (const auto& [timestep, stats] : labelFinding->second)
+    {
+      result.push_back(timestep);
+    }
+    return result;
+  }
 
   void ImageStatisticsContainer::Reset()
   {
-    for (auto iter = m_TimeStepMap.begin(); iter != m_TimeStepMap.end(); iter++)
-    {
-      iter->second.Reset();
-    }
+    m_LabelTimeStep2StatisticsMap.clear();
+    this->Modified();
   }
 
   itk::LightObject::Pointer ImageStatisticsContainer::InternalClone() const
@@ -190,13 +214,11 @@ namespace mitk
                         << " failed.");
     }
 
-    rval->SetTimeStepMap(m_TimeStepMap);
+    rval->m_LabelTimeStep2StatisticsMap = m_LabelTimeStep2StatisticsMap;
     rval->SetTimeGeometry(this->GetTimeGeometry()->Clone());
 
     return ioPtr;
   }
-
-  void ImageStatisticsContainer::SetTimeStepMap(TimeStepMapType map) { m_TimeStepMap = map; }
 
   ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector GetAllStatisticNames(
     const ImageStatisticsContainer *container)
@@ -208,10 +230,17 @@ namespace mitk
     {
       std::set<std::string> customKeys;
 
-      for (unsigned int i = 0; i < container->GetTimeSteps(); i++)
+      auto labelValues = container->GetExistingLabelValues(false);
+
+      for (const auto labelValue : labelValues)
       {
-        auto statisticKeys = container->GetStatisticsForTimeStep(i).GetCustomStatisticNames();
-        customKeys.insert(statisticKeys.cbegin(), statisticKeys.cend());
+        auto timeSteps = container->GetExistingTimeSteps(labelValue);
+
+        for (const auto timeStep : timeSteps)
+        {
+          auto statisticKeys = container->GetStatistics(labelValue, timeStep).GetCustomStatisticNames();
+          customKeys.insert(statisticKeys.cbegin(), statisticKeys.cend());
+        }
       }
 
       names.insert(names.cend(), customKeys.cbegin(), customKeys.cend());
@@ -230,14 +259,22 @@ namespace mitk
 
     for (const auto &container : containers)
     {
-      for (unsigned int i = 0; i < container->GetTimeSteps(); i++)
+      std::set<std::string> customKeys;
+
+      auto labelValues = container->GetExistingLabelValues(false);
+
+      for (const auto labelValue : labelValues)
       {
-        if(container->TimeStepExists(i))
+        auto timeSteps = container->GetExistingTimeSteps(labelValue);
+
+        for (const auto timeStep : timeSteps)
         {
-          auto statisticKeys = container->GetStatisticsForTimeStep(i).GetCustomStatisticNames();
+          auto statisticKeys = container->GetStatistics(labelValue, timeStep).GetCustomStatisticNames();
           customKeys.insert(statisticKeys.cbegin(), statisticKeys.cend());
         }
       }
+
+      names.insert(names.cend(), customKeys.cbegin(), customKeys.cend());
     }
 
     names.insert(names.end(), customKeys.begin(), customKeys.end());

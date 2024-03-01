@@ -24,6 +24,7 @@ found in the LICENSE file.
 
 // Qt
 #include <QMessageBox>
+#include <QThreadPool>
 #include <qclipboard.h>
 
 // qwt
@@ -107,7 +108,7 @@ const std::string QmitkCESTStatisticsView::VIEW_ID = "org.mitk.views.cest.statis
 
 QmitkCESTStatisticsView::QmitkCESTStatisticsView(QObject * /*parent*/, const char * /*name*/)
 {
-  this->m_CalculatorJob = new QmitkImageStatisticsCalculationJob();
+  this->m_CalculatorJob = new QmitkImageStatisticsCalculationRunnable();
 
   m_currentSelectedPosition.Fill(0.0);
   m_currentSelectedTimePoint = 0.;
@@ -116,7 +117,7 @@ QmitkCESTStatisticsView::QmitkCESTStatisticsView(QObject * /*parent*/, const cha
 
 QmitkCESTStatisticsView::~QmitkCESTStatisticsView()
 {
-  while (this->m_CalculatorJob->isRunning()) // wait until thread has finished
+  while (this->m_CalculatorJob->IsRunning()) // wait until thread has finished
   {
     itksys::SystemTools::Delay(100);
   }
@@ -135,7 +136,7 @@ void QmitkCESTStatisticsView::CreateQtPartControl(QWidget *parent)
   connect(
     m_Controls.threeDimToFourDimPushButton, SIGNAL(clicked()), this, SLOT(OnThreeDimToFourDimPushButtonClicked()));
   connect((QObject *)this->m_CalculatorJob,
-          SIGNAL(finished()),
+          SIGNAL(ResultsAvailable()),
           this,
           SLOT(OnThreadedStatisticsCalculationEnds()),
           Qt::QueuedConnection);
@@ -302,7 +303,7 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
     try
     {
       // Compute statistics
-      this->m_CalculatorJob->start();
+      QThreadPool::globalInstance()->start(m_CalculatorJob);
     }
     catch (const mitk::Exception &e)
     {
@@ -329,7 +330,7 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
       m_Controls.labelWarning->show();
     }
 
-    while (this->m_CalculatorJob->isRunning()) // wait until thread has finished
+    while (this->m_CalculatorJob->IsRunning()) // wait until thread has finished
     {
       itksys::SystemTools::Delay(100);
     }
@@ -353,7 +354,7 @@ void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
   this->m_Controls.m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::xBottom, "delta w");
   this->m_Controls.m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::yLeft, "z");
 
-  if (this->m_CalculatorJob->GetStatisticsUpdateSuccessFlag())
+  if (this->m_CalculatorJob->GetComputationSuccessFlag())
   {
     auto statistics = this->m_CalculatorJob->GetStatisticsData();
 
@@ -383,10 +384,10 @@ void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
     for (unsigned int index = 0; index < numberOfSpectra; ++index)
     {
       means[index] =
-        statistics->GetStatisticsForTimeStep(index).GetValueConverted<mitk::ImageStatisticsContainer::RealType>(
+        statistics->GetStatistics(1,index).GetValueConverted<mitk::ImageStatisticsContainer::RealType>(
           mitk::ImageStatisticsConstants::MEAN());
       stdevs[index] =
-        statistics->GetStatisticsForTimeStep(index).GetValueConverted<mitk::ImageStatisticsContainer::RealType>(
+        statistics->GetStatistics(1,index).GetValueConverted<mitk::ImageStatisticsContainer::RealType>(
           mitk::ImageStatisticsConstants::STANDARDDEVIATION());
     }
 

@@ -219,16 +219,17 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
       {
         auto statistics = dynamic_cast<const mitk::ImageStatisticsContainer*>(statisticsNode->GetData());
 
-        if (statistics)
+        if (statistics && !statistics->IsWIP())
         {
+          //currently only supports rois with one label due to histogram widget limitations.
           auto labelValues = statistics->GetExistingLabelValues(true);
-
-          if (labelValues.size() == 1)
+          if (labelValues.size() == 1 || (!(statistics->IgnoresZeroVoxel()) && labelValues.empty()))
           {
-            //currently only supported rois with one label due to histogram widget limitations.
+            auto labelValue = labelValues.empty() ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : labelValues.front();
+
             const auto timeStep = imageNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(m_TimePointChangeListener.GetCurrentSelectedTimePoint());
 
-            if (statistics->StatisticsExist(labelValues.front(), timeStep))
+            if (statistics->StatisticsExist(labelValue, timeStep))
             {
               std::stringstream label;
               label << imageNode->GetName();
@@ -246,7 +247,7 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
               //do not allow correct removal or sound update/insertion of several charts.
               //only thing that works for now is always to update/overwrite the same data label
               //This is a quick fix for T28223 and T28221
-              m_Controls.widget_histogram->SetHistogram(statistics->GetHistogram(labelValues.front(), timeStep), "histogram");
+              m_Controls.widget_histogram->SetHistogram(statistics->GetHistogram(labelValue, timeStep), "histogram");
               m_Controls.groupBox_histogram->setVisible(true);
             }
           }

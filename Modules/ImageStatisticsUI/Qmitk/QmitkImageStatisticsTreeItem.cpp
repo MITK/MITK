@@ -13,8 +13,8 @@ found in the LICENSE file.
 #include "QmitkImageStatisticsTreeItem.h"
 
 QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
-  ImageStatisticsObject statisticsData,
-  StatisticNameVector statisticNames,
+  const ImageStatisticsObject& statisticsData,
+  const StatisticNameVector& statisticNames,
   QVariant label, bool isWIP,
   QmitkImageStatisticsTreeItem *parent)
   : m_statistics(statisticsData) , m_statisticNames(statisticNames), m_label(label), m_parentItem(parent), m_IsWIP(isWIP)

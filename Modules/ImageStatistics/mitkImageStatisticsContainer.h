@@ -159,6 +159,10 @@ namespace mitk
     @pre timeStep must be valid*/
     const HistogramType* GetHistogram(LabelValueType labelValue, TimeStepType timeStep) const;
 
+    bool IgnoresZeroVoxel() const;
+
+    bool IsWIP() const;
+
   protected:
     ImageStatisticsContainer();
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;

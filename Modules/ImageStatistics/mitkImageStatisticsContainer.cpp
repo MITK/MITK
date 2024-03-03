@@ -11,6 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 #include <mitkImageStatisticsContainer.h>
 
+#include <mitkImageStatisticsContainerManager.h>
+#include <mitkProperties.h>
+
 #include <algorithm>
 
 namespace mitk
@@ -125,6 +128,24 @@ namespace mitk
     ImageStatisticsContainer::GetHistogram(LabelValueType labelValue, TimeStepType timeStep) const
   {
     return this->GetStatistics(labelValue, timeStep).m_Histogram;
+  }
+
+  bool ImageStatisticsContainer::IgnoresZeroVoxel() const
+  {
+    const auto prop = this->GetProperty(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str());
+    const auto boolProp = dynamic_cast<const mitk::BoolProperty*>(prop.GetPointer());
+
+    if (nullptr != boolProp)
+    {
+      return boolProp->GetValue();
+    }
+
+    return false;
+  }
+
+  bool ImageStatisticsContainer::IsWIP() const
+  {
+    return this->GetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str()).IsNotNull();
   }
 
   const ImageStatisticsContainer::ImageStatisticsObject &ImageStatisticsContainer::GetStatistics(LabelValueType labelValue,

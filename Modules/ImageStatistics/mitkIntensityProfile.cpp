@@ -350,7 +350,7 @@ void mitk::ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer inte
   IntensityProfile::MeasurementType max;
   mitk::ComputeGlobalMinimum( intensityProfile, min );
   mitk::ComputeGlobalMaximum( intensityProfile, max );
-  auto numSamples = static_cast<mitk::ImageStatisticsContainer::VoxelCountType>(statsVec.size());
+  auto numSamples = static_cast<ImageStatisticsContainer::VoxelCountType>(statsVec.size());
 
   double mean = 0.0;
   double rms = 0.0;

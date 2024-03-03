@@ -61,7 +61,7 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   imgMask->SetInputImage(image);
   imgMask->SetImageMask(m_SegmentationMask);
 
-  auto stats = statCalc->GetStatistics()->GetStatisticsForTimeStep(0);
+  auto stats = statCalc->GetStatistics()->GetStatistics(ImageStatisticsContainer::NO_MASK_LABEL_VALUE,0);
   double mean = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEAN());
   double stdDev = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
 

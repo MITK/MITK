@@ -28,8 +28,8 @@ public:
   using ImageStatisticsObject = mitk::ImageStatisticsContainer::ImageStatisticsObject;
   using StatisticNameVector = mitk::ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector;
   QmitkImageStatisticsTreeItem();
-  explicit QmitkImageStatisticsTreeItem(ImageStatisticsObject statisticsData,
-    StatisticNameVector statisticNames, QVariant label, bool isWIP, QmitkImageStatisticsTreeItem *parentItem = nullptr);
+  explicit QmitkImageStatisticsTreeItem(const ImageStatisticsObject& statisticsData,
+    const StatisticNameVector& statisticNames, QVariant label, bool isWIP, QmitkImageStatisticsTreeItem *parentItem = nullptr);
   explicit QmitkImageStatisticsTreeItem(const StatisticNameVector& statisticNames,
     QVariant label, bool isWIP, QmitkImageStatisticsTreeItem *parentItem = nullptr);
   ~QmitkImageStatisticsTreeItem();

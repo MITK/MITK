@@ -21,7 +21,7 @@ found in the LICENSE file.
 Generates ImageStatisticContainers by using QmitkImageStatisticsCalculationRunnables for each pair if image and ROIs and ensures their
 validity.
 It also encodes the HistogramNBins and IgnoreZeroValueVoxel as properties to the results as these settings are important criteria for
-discreminating statistics results.
+discriminating statistics results.
 For more details of how the generation is done see QmitkDataGenerationBase.
 */
 class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsDataGenerator : public QmitkImageAndRoiDataGeneratorBase

@@ -69,7 +69,7 @@ bool QmitkImageStatisticsDataGenerator::ChangedNodeIsRelevant(const mitk::DataNo
     if (changedNode->GetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str()) == nullptr)
     {
       auto stats = dynamic_cast<const mitk::ImageStatisticsContainer*>(changedNode->GetData());
-      result = stats != nullptr;
+      result = stats != nullptr && stats->GetMTime()> this->m_GenerationTime.GetMTime();
     }
   }
   return result;

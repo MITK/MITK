@@ -84,13 +84,13 @@ QmitkImageAndRoiDataGeneratorBase::ChangedNodeIsRelevant(const mitk::DataNode* c
     auto finding = std::find(m_ImageNodes.begin(), m_ImageNodes.end(), changedNode);
     if (finding != m_ImageNodes.end())
     {
-      return true;
+      return (*finding)->GetData()->GetMTime() > this->m_GenerationTime.GetMTime();
     }
 
     finding = std::find(m_ROINodes.begin(), m_ROINodes.end(), changedNode);
     if (finding != m_ROINodes.end())
     {
-      return true;
+      return (*finding)->GetData()->GetMTime() > this->m_GenerationTime.GetMTime();
     }
   }
 

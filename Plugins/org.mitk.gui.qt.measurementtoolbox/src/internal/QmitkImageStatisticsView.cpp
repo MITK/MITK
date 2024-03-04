@@ -72,7 +72,7 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 {
   m_Controls.setupUi(parent);
   m_Controls.widget_intensityProfile->SetTheme(GetColorTheme());
-  m_Controls.groupBox_histogram->setVisible(true);
+  m_Controls.groupBox_histogram->setVisible(false);
   m_Controls.groupBox_intensityProfile->setVisible(false);
   m_Controls.label_currentlyComputingStatistics->setVisible(false);
   m_Controls.sliderWidget_histogram->setPrefix("Time: ");

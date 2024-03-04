@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkITKEventObserverGuard_h
 
 #include <functional>
-
+#include <memory>
 #include "MitkCoreExports.h"
 
 namespace itk
@@ -31,11 +31,11 @@ namespace mitk
     
     This helper class can be used to ensure itk event observers are removed form
     a sender object at the end of a certain scope.
-    This class behaves simelar to a std::unique_ptr but for event observers.
-    Therfore the observer will be removed from the sender when one of the following
+    This class behaves similar to a std::unique_ptr but for event observers.
+    Therefore the observer will be removed from the sender when one of the following
     conditions are met:
     - the guard is destroyed
-    - the guard is resetted (by Reset() or operator = )
+    - the guard is reseted (by Reset() or operator = )
 
     Sample usage:
      \code
@@ -59,8 +59,8 @@ namespace mitk
     ITKEventObserverGuard(const itk::Object* sender, unsigned long observerTag);
     ITKEventObserverGuard(const itk::Object* sender, const itk::EventObject& event, itk::Command* command);
     ITKEventObserverGuard(const itk::Object* sender, const itk::EventObject& event, std::function<void(const itk::EventObject&)> function);
-    ITKEventObserverGuard(ITKEventObserverGuard&);
-    ITKEventObserverGuard& operator=(ITKEventObserverGuard&);
+    ITKEventObserverGuard(ITKEventObserverGuard&&);
+    ITKEventObserverGuard& operator=(ITKEventObserverGuard&&);
 
     ~ITKEventObserverGuard();
 
@@ -77,14 +77,14 @@ namespace mitk
     void Reset(const itk::Object* sender, const itk::EventObject& event, itk::Command* command);
 
     /** Resets the guard by first removing the currently guarded observer. Then a observer will be added for
-     * the passed sender with the passed event and lamba function. The new observer is now guarded.*/
+     * the passed sender with the passed event and lambda function. The new observer is now guarded.*/
     void Reset(const itk::Object* sender, const itk::EventObject& event, std::function<void(const itk::EventObject&)> function);
 
     bool IsInitialized() const;
 
   private:
     struct Impl;
-    Impl *m_ITKEventObserverGuardImpl;
+    std::unique_ptr<Impl> m_ITKEventObserverGuardImpl;
   };
 
 

@@ -243,7 +243,7 @@ public:
     m_TestObject->InvokeEvent(itk::ProgressEvent());
     CPPUNIT_ASSERT_EQUAL(1, m_DummyCommand2->ExecutionCount);
 
-    guard = guard2;
+    guard = std::move(guard2);
 
     CPPUNIT_ASSERT(guard.IsInitialized());
     CPPUNIT_ASSERT(!guard2.IsInitialized());

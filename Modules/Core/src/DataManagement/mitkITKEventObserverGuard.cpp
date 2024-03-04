@@ -52,56 +52,51 @@ namespace mitk
   ITKEventObserverGuard::ITKEventObserverGuard(const itk::Object* sender, const itk::EventObject& event, itk::Command* command)
   {
     auto tag = sender->AddObserver(event, command);
-    m_ITKEventObserverGuardImpl = new Impl(sender, tag);
+    m_ITKEventObserverGuardImpl = std::make_unique<Impl>(sender, tag);
   }
 
   ITKEventObserverGuard::ITKEventObserverGuard(const itk::Object* sender, const itk::EventObject& event, std::function<void(const itk::EventObject&)> function)
   {
     auto tag = sender->AddObserver(event, function);
-    m_ITKEventObserverGuardImpl = new Impl(sender, tag);
+    m_ITKEventObserverGuardImpl = std::make_unique<Impl>(sender, tag);
   }
 
-  ITKEventObserverGuard::ITKEventObserverGuard(ITKEventObserverGuard& g)
+  ITKEventObserverGuard::ITKEventObserverGuard(ITKEventObserverGuard&& other): m_ITKEventObserverGuardImpl(std::move(other.m_ITKEventObserverGuardImpl))
   {
-    m_ITKEventObserverGuardImpl = nullptr;
-    
-    std::swap(m_ITKEventObserverGuardImpl, g.m_ITKEventObserverGuardImpl);
   }
 
-  ITKEventObserverGuard& ITKEventObserverGuard::operator=(ITKEventObserverGuard& g)
-  {
-    this->Reset();
+  ITKEventObserverGuard::~ITKEventObserverGuard() { }
 
-    std::swap(m_ITKEventObserverGuardImpl, g.m_ITKEventObserverGuardImpl);
+  ITKEventObserverGuard& ITKEventObserverGuard::operator=(ITKEventObserverGuard&& other)
+  {
+    if (&other != this)
+    {
+      m_ITKEventObserverGuardImpl = std::move(other.m_ITKEventObserverGuardImpl);
+    }
+
     return *this;
   }
 
-  ITKEventObserverGuard::~ITKEventObserverGuard() { delete m_ITKEventObserverGuardImpl; }
-
   void ITKEventObserverGuard::Reset()
   {
-    delete m_ITKEventObserverGuardImpl;
-    m_ITKEventObserverGuardImpl = nullptr;
+    m_ITKEventObserverGuardImpl.reset();
   }
 
   void ITKEventObserverGuard::Reset(const itk::Object* sender, unsigned long observerTag)
   {
-    delete m_ITKEventObserverGuardImpl;
-    m_ITKEventObserverGuardImpl = new Impl(sender, observerTag);
+    m_ITKEventObserverGuardImpl.reset(new Impl(sender, observerTag));
   }
 
   void ITKEventObserverGuard::Reset(const itk::Object* sender, const itk::EventObject& event, itk::Command* command)
   {
-    delete m_ITKEventObserverGuardImpl;
     auto tag = sender->AddObserver(event, command);
-    m_ITKEventObserverGuardImpl = new Impl(sender, tag);
+    m_ITKEventObserverGuardImpl.reset(new Impl(sender, tag));
   }
 
   void ITKEventObserverGuard::Reset(const itk::Object* sender, const itk::EventObject& event, std::function<void(const itk::EventObject&)> function)
   {
-    delete m_ITKEventObserverGuardImpl;
     auto tag = sender->AddObserver(event, function);
-    m_ITKEventObserverGuardImpl = new Impl(sender, tag);
+    m_ITKEventObserverGuardImpl.reset(new Impl(sender, tag));
   }
 
   bool ITKEventObserverGuard::IsInitialized() const

@@ -3,14 +3,9 @@
 
   \li \subpage AnnotationModulePage
   \li \subpage ChartModule
-  \li \subpage IGTConcepts
-  \li \subpage NavigationGeneralModulePage
-  \li \subpage IGTTutorialOverview
   \li \subpage LegacyGLModule
   \li \subpage mitkPython_Overview
   \li \subpage RESTModule
-  \li \subpage GeneratingDeviceModulesPage
-  \li \subpage USModulePage
 
 */
 

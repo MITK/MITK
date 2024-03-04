@@ -77,10 +77,6 @@ void QmitkPythonVariableStackTableView::OnVariableStackDoubleClicked(const QMode
     {
       mitkImage = m_PythonService->CopySimpleItkImageFromPython(varName.toStdString());
     }
-    else if( type.startsWith("numpy.ndarray") )
-    {
-      mitkImage = m_PythonService->CopyCvImageFromPython(varName.toStdString());
-    }
     else if( value.startsWith("(vtkCommonDataModelPython.vtkPolyData)") )
     {
       mitkSurface = m_PythonService->CopyVtkPolyDataFromPython(varName.toStdString());

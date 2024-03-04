@@ -24,10 +24,6 @@ if(MITK_USE_MatchPoint)
 
     set(additional_cmake_args)
 
-    if(MITK_USE_OpenCV)
-      list(APPEND additional_cmake_args "-DCMAKE_CONFIGURATION_TYPES:STRING=Debug$<SEMICOLON>Release")
-    endif()
-
     if(MatchPoint_SOURCE_DIR)
       set(download_step SOURCE_DIR ${MatchPoint_SOURCE_DIR})
     else()

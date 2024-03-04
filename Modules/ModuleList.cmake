@@ -36,24 +36,12 @@ set(MITK_MODULES
   MatchPointRegistration
   MatchPointRegistrationUI
   Classification
-  OpenIGTLink
-  IGTBase
-  IGT
-  CameraCalibration
-  OpenCVVideoSupport
   QtOverlays
-  ToFHardware
-  ToFProcessing
-  ToFUI
-  US
-  USUI
   DICOMUI
   Remeshing
   Python
   QtPython
   Persistence
-  OpenIGTLinkUI
-  IGTUI
   RT
   RTUI
   IOExt

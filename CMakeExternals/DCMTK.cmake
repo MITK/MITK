@@ -10,7 +10,9 @@ if(MITK_USE_DCMTK)
   endif()
 
   set(proj DCMTK)
-  set(proj_DEPENDENCIES )
+  mitk_query_custom_ep_vars()
+
+  set(proj_DEPENDENCIES ${${proj}_CUSTOM_DEPENDENCIES})
   set(DCMTK_DEPENDS ${proj})
 
   if(NOT DEFINED DCMTK_DIR)
@@ -25,8 +27,6 @@ if(MITK_USE_DCMTK)
         "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
       )
     endif()
-
-    mitk_query_custom_ep_vars()
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}

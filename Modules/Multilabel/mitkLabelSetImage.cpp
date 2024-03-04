@@ -138,7 +138,7 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
 
   auto newActiveIndex = activeIndex;
   auto newActiveIndexBeforeDeletion = activeIndex;
-  //determin new active group index (afte the group will be removed);
+  //determine new active group index (afte the group will be removed);
   if (indexToDelete < activeIndex)
   { //lower the index because position in m_LayerContainer etc has changed
     newActiveIndex = activeIndex-1;
@@ -151,7 +151,7 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
     }
     else
     {
-      //we have to add/substract one more because we have not removed the layer yet, thus the group count is to 1 high.
+      //we have to add/subtract one more because we have not removed the layer yet, thus the group count is to 1 high.
       newActiveIndex = indexToDelete+1 < GetNumberOfLayers() ? indexToDelete : GetNumberOfLayers() - 2;
       newActiveIndexBeforeDeletion = indexToDelete + 1 < GetNumberOfLayers() ? indexToDelete+1 : indexToDelete -1;
     }
@@ -181,7 +181,7 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
   m_GroupToLabelMap.erase(m_GroupToLabelMap.begin() + indexToDelete);
   m_LayerContainer.erase(m_LayerContainer.begin() + indexToDelete);
 
-  //update old indeces in m_GroupToLabelMap to new layer indices
+  //update old indexes in m_GroupToLabelMap to new layer indexes
   for (auto& element : m_LabelToGroupMap)
   {
     if (element.second > indexToDelete) element.second = element.second -1;
@@ -294,7 +294,7 @@ void mitk::LabelSetImage::ReplaceGroupLabels(const GroupIndexType groupID, const
 {
   if (m_LayerContainer.size() <= groupID)
   {
-    mitkThrow() << "Trying to replace labels of non-exising group. Invalid group id: "<<groupID;
+    mitkThrow() << "Trying to replace labels of non-existing group. Invalid group id: "<<groupID;
   }
 
   //remove old group labels
@@ -476,7 +476,7 @@ void mitk::LabelSetImage::RemoveLabel(LabelValueType pixelValue)
 
 void mitk::LabelSetImage::RemoveLabelFromMap(LabelValueType pixelValue)
 {
-  if (m_LabelMap.find(pixelValue) == m_LabelMap.end()) mitkThrow()<<"Invalid state of of instance. RemoveLabelFromMap was called for unkown label id. invalid label id: "<<pixelValue;
+  if (m_LabelMap.find(pixelValue) == m_LabelMap.end()) mitkThrow()<<"Invalid state of instance. RemoveLabelFromMap was called for unknown label id. invalid label id: "<<pixelValue;
 
   auto groupID = this->GetGroupIndexOfLabel(pixelValue);
 
@@ -588,7 +588,7 @@ mitk::Label* mitk::LabelSetImage::AddLabel(const std::string& name, const mitk::
 void mitk::LabelSetImage::RenameLabel(LabelValueType pixelValue, const std::string& name, const mitk::Color& color)
 {
   mitk::Label* label = GetLabel(pixelValue);
-  if (nullptr == label) mitkThrow() << "Cannot rename label.Unknown label value provided. Unkoen label value:" << pixelValue;
+  if (nullptr == label) mitkThrow() << "Cannot rename label.Unknown label value provided. Unknown label value:" << pixelValue;
 
   label->SetName(name);
   label->SetColor(color);
@@ -650,7 +650,7 @@ void mitk::LabelSetImage::UpdateLookupTable(PixelType pixelValue)
 
 unsigned int mitk::LabelSetImage::GetNumberOfLabels(unsigned int layer) const
 {
-  if (layer >= m_Groups.size()) mitkThrow() << "Cannot get number of labels in group. Group is unkown. Invalid index:" << layer;
+  if (layer >= m_Groups.size()) mitkThrow() << "Cannot get number of labels in group. Group is unknown. Invalid index:" << layer;
   return m_GroupToLabelMap[layer].size();
 }
 
@@ -750,11 +750,11 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
   }
   catch (Exception& e)
   {
-    mitkReThrow(e) << "Could not intialize by provided labeled image.";
+    mitkReThrow(e) << "Could not initialize by provided labeled image.";
   }
   catch (...)
   {
-    mitkThrow() << "Could not intialize by provided labeled image due to unkown error.";
+    mitkThrow() << "Could not initialize by provided labeled image due to unknown error.";
   }
   this->Modified();
 }
@@ -967,7 +967,7 @@ void mitk::LabelSetImage::AddLabelToMap(LabelValueType labelValue, mitk::Label* 
     mitkThrow() << "Segmentation is in an invalid state: Label value collision. A label was added with a LabelValue already in use. LabelValue: " << labelValue;
 
   if (!this->ExistGroup(groupID))
-    mitkThrow() << "Cannot add label. Defined group is unkown. Invalid group index: " << groupID;
+    mitkThrow() << "Cannot add label. Defined group is unknown. Invalid group index: " << groupID;
 
   m_LabelMap[labelValue] = label;
   m_LabelToGroupMap[labelValue] = groupID;
@@ -1229,7 +1229,7 @@ bool mitk::Equal(const mitk::LabelSetImage &leftHandSide,
   returnValue = *lhsLUT == *rhsLUT;
   if (!returnValue)
   {
-    MITK_INFO(verbose) << "Lookup tabels not equal.";
+    MITK_INFO(verbose) << "Lookup tables not equal.";
     return returnValue;
     ;
   }

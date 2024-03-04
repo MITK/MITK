@@ -149,8 +149,8 @@ namespace mitk
 
     /**
      * @brief Removes a whole group including all its labels.
-     * @remark with removing a group all groups with greater index will be reindexed to
-     * close the gap. Hence externaly stored spatial group indices may become invalid.
+     * @remark with removing a group all groups with greater index will be re-indexed to
+     * close the gap. Hence externally stored spatial group indices may become invalid.
      * @param group Group index of the spatial group that should be removed. If the spatial group does not exist, an
      * exception will be raised.
      * @pre group index must be valid.
@@ -163,7 +163,7 @@ namespace mitk
     /**
      * @brief Checks if a label belongs in a certain spatial group
      * @param value the label value
-     * @param groupIndex Indexp of the spacial group which should be checked for the label
+     * @param groupIndex Index of the spacial group which should be checked for the label
      * @return true if the label exists otherwise false
      */
     bool ExistLabel(LabelValueType value, GroupIndexType groupIndex) const;
@@ -214,7 +214,7 @@ namespace mitk
     /** Helper function that can be used to extract a vector of label values of a vector of label instance pointers.
      @overload.*/
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const ConstLabelVectorType& labels);
-    /** Helper function that can be used to extract a vector of label values are vector of label instancess.*/
+    /** Helper function that can be used to extract a vector of label values are vector of label instances.*/
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const LabelVectorType& labels);
 
     /** Helper function that converts a given vector of label instance pointers into a vector of const pointers.*/
@@ -302,7 +302,7 @@ namespace mitk
     * @remark The pixel content of the old labels will not be removed.
     * @param groupID The index of the group that should have its labels replaced
     * @param newLabels The vector of new labels
-    * @pre Group that shuold be replaced must exist.
+    * @pre Group that should be replaced must exist.
     * @pre new label values must not be used in other groups.
     */
     void ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& newLabels);
@@ -310,18 +310,18 @@ namespace mitk
     /**@overload for none-const label vectors. */
     void ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& newLabels);
 
-    /** Returns the pointer to the image that containes the labeling of the indicate group.
+    /** Returns the pointer to the image that contains the labeling of the indicate group.
      *@pre groupID must reference an existing group.*/
     mitk::Image* GetGroupImage(GroupIndexType groupID);
 
-    /** Returns the pointer to the image that containes the labeling of the indicate group.
+    /** Returns the pointer to the image that contains the labeling of the indicate group.
      *@pre groupID must reference an existing group.*/
     const mitk::Image* GetGroupImage(GroupIndexType groupID) const;
 
     itkGetModifiableObjectMacro(LookupTable, mitk::LookupTable);
     void SetLookupTable(LookupTable* lut);
-    /** Updates the lookup table for a label indicated by the passe label value using the color of the label.
-    * @pre labelValue must esist.
+    /** Updates the lookup table for a label indicated by the passed label value using the color of the label.
+    * @pre labelValue must exist.
     */
     void UpdateLookupTable(PixelType pixelValue);
 
@@ -337,10 +337,10 @@ namespace mitk
       /** Helper to ensure label events are unregistered.*/
       void ReleaseLabel(Label* label);
 
-      /** Helper class used internally to apply lamba functions to the labels specified by tha passed label value vector.
+      /** Helper class used internally to apply lambda functions to the labels specified by the passed label value vector.
       */
       void ApplyToLabels(const LabelValueVectorType& values, std::function<void(Label*)>&& lambda);
-      /** Helper class used internally to for visiting the labels specified by tha passed label value vector
+      /** Helper class used internally to for visiting the labels specified by the passed label value vector
       * with the lambda function.
       */
       void VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const;
@@ -445,7 +445,7 @@ namespace mitk
      * @brief Initialize a new mitk::LabelSetImage by a given image.
      * For all distinct pixel values of the parameter image new labels will
      * be created. If the number of distinct pixel values exceeds mitk::Label::MAX_LABEL_VALUE
-     * an excption will be raised.
+     * an exception will be raised.
      * @param image the image which is used for initialization
      */
     void InitializeByLabeledImage(mitk::Image::Pointer image);
@@ -539,7 +539,7 @@ namespace mitk
                                    bool verbose);
 
   /**
-  * @brief Equal A function comparing two vectors of labels for beeing equal in data
+  * @brief Equal A function comparing two vectors of labels for being equal in data
   *
   * @ingroup MITKTestingAPI
   *
@@ -548,7 +548,7 @@ namespace mitk
   *
   * @param rightHandSide An vector of labels to be compared
   * @param leftHandSide An vector of labels to be compared
-  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+  * @param eps Tolerance for comparison. You can use mitk::eps in most cases.
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return true, if all subsequent comparisons are true, false otherwise
   */
@@ -558,7 +558,7 @@ namespace mitk
     bool verbose);
 
 
-  /** temporery namespace that is used until the new class MultiLabelSegmentation is
+  /** temporary namespace that is used until the new class MultiLabelSegmentation is
     introduced. It allows to already introduce/use some upcoming definitions, while
     refactoring code.*/
   namespace MultiLabelSegmentation
@@ -581,7 +581,7 @@ namespace mitk
   using LabelValueMappingVector = std::vector < std::pair<Label::PixelType, Label::PixelType> >;
 
   /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
-  a specified destination label for a specific timestep. Function processes the whole image volume of the specified time step.
+  a specified destination label for a specific time step. Function processes the whole image volume of the specified time step.
   @remark in its current implementation the function only transfers contents of the active layer of the passed LabelSetImages.
   @remark the function assumes that it is only called with source and destination image of same geometry.
   @remark CAUTION: The function is not save if sourceImage and destinationImage are the same instance and more than one label is transferred,
@@ -593,7 +593,7 @@ namespace mitk
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
   The order in which the labels will be transfered is the same order of elements in the labelMapping.
-  If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transfering), keep in mind that
+  If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transferring), keep in mind that
   for the MergeStyle and OverwriteStyle only the destination label (second element) is relevant (e.g. what should be
   altered with MergeStyle Replace).
   @param mergeStyle indicates how the transfer should be done (merge or replace). For more details see documentation of
@@ -620,15 +620,15 @@ namespace mitk
 
 
   /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
-  a specified destination label for a specific timestep. Function processes the whole image volume of the specified time step.
+  a specified destination label for a specific time step. Function processes the whole image volume of the specified time step.
   @remark the function assumes that it is only called with source and destination image of same geometry.
   @remark CAUTION: The function is not save, if sourceImage and destinationImage are the same instance and you transfer more then one
-  label, because the changes are made inplace for performance reasons but not in one pass. If a mapped value A equals a "old value"
+  label, because the changes are made in-place for performance reasons but not in one pass. If a mapped value A equals a "old value"
   that is later in the mapping, one ends up with a wrong transfer, as a pixel would be first mapped to A and then latter again, because
   it is also an "old" value in the mapping table.
   @param sourceImage Pointer to the image that should be used as source for the transfer.
   @param destinationImage Pointer to the image that should be used as destination for the transfer.
-  @param destinationLabelVector Reference to the vector of labels (incl. lock states) in the destination image. Unkown pixel
+  @param destinationLabelVector Reference to the vector of labels (incl. lock states) in the destination image. Unknown pixel
   values in the destinationImage will be assumed to be unlocked.
   @param sourceBackground Value indicating the background in the source image.
   @param destinationBackground Value indicating the background in the destination image.
@@ -636,7 +636,7 @@ namespace mitk
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
   The order in which the labels will be transfered is the same order of elements in the labelMapping.
-  If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transfering), keep in mind that
+  If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transferring), keep in mind that
   for the MergeStyle and OverwriteStyle only the destination label (second element) is relevant (e.g. what should be
   altered with MergeStyle Replace).
   @param mergeStyle indicates how the transfer should be done (merge or replace). For more details see documentation of

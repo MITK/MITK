@@ -98,6 +98,49 @@ namespace
         break;
     }
   }
+
+  void defineQtOptions(Poco::Util::OptionSet& options)
+  {
+    // See https://doc.qt.io/qt-6/qguiapplication.html#supported-command-line-options
+
+    std::array<std::pair<std::string, bool>, 12> qtOptions {{
+      { "platform", true },
+      { "platformpluginpath", true },
+      { "platformtheme", true },
+      { "plugin", true },
+      { "qmljsdebugger", true },
+      { "qwindowgeometry", true },
+      { "qwindowicon", true },
+      { "qwindowtitle", true },
+      { "reverse", false },
+      { "session", true },
+      { "display", true },
+      { "geometry", true }
+    }};
+
+    for (const auto& qtOption : qtOptions)
+    {
+      Poco::Util::Option option(qtOption.first, qtOption.first, "qt");
+
+      if (qtOption.second)
+        option.argument("<arg>");
+
+      options.addOption(option);
+    }
+  }
+
+  Poco::Util::OptionSet excludeQtOptions(const Poco::Util::OptionSet& options)
+  {
+    Poco::Util::OptionSet remainingOptions;
+
+    for (const auto& option : options)
+    {
+      if (option.description() != "qt")
+        remainingOptions.addOption(option);
+    }
+
+    return remainingOptions;
+  }
 }
 
 namespace mitk
@@ -378,7 +421,9 @@ namespace mitk
 
   void BaseApplication::printHelp(const std::string &, const std::string &)
   {
-    Poco::Util::HelpFormatter help(this->options());
+    const auto remainingOptions = excludeQtOptions(this->options());
+
+    Poco::Util::HelpFormatter help(remainingOptions);
     help.setAutoIndent();
     help.setCommand(this->commandName());
     help.format(std::cout);
@@ -841,6 +886,10 @@ namespace mitk
     Poco::Util::Option labelSuggestionsOption(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "", "use this list of predefined suggestions for segmentation labels");
     labelSuggestionsOption.argument("<filename>").binding(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString());
     options.addOption(labelSuggestionsOption);
+
+    // Make Poco aware of QGuiApplication command-line options, even though they are only parsed by
+    // Qt. Otherwise, Poco would throw exceptions for unknown options.
+    defineQtOptions(options);
 
     Poco::Util::Application::defineOptions(options);
   }

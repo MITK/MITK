@@ -101,7 +101,8 @@ namespace
 
   void defineQtOptions(Poco::Util::OptionSet& options)
   {
-    // See https://doc.qt.io/qt-6/qguiapplication.html#supported-command-line-options
+    // Manage Qt options as array of pairs, consisting of argument name and argument value requirement.
+    // Qt command-line options: https://doc.qt.io/qt-6/qguiapplication.html#supported-command-line-options
 
     std::array<std::pair<std::string, bool>, 12> qtOptions {{
       { "platform", true },
@@ -120,10 +121,14 @@ namespace
 
     for (const auto& qtOption : qtOptions)
     {
+      // Qt uses short name syntax (-arg), while Poco requires a full name (--arg) in addition.
+      // Hence, set both to the same value. Always set description to "qt" for easy distinction
+      // between regular arguments and Qt arguments.
+
       Poco::Util::Option option(qtOption.first, qtOption.first, "qt");
 
       if (qtOption.second)
-        option.argument("<arg>");
+        option.argument("<arg>"); // A short generic string as we don't care but Poco requires a non-empty string.
 
       options.addOption(option);
     }
@@ -135,7 +140,7 @@ namespace
 
     for (const auto& option : options)
     {
-      if (option.description() != "qt")
+      if (option.description() != "qt") // All Qt options have "qt" as description (see above).
         remainingOptions.addOption(option);
     }
 

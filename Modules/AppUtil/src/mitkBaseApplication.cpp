@@ -938,6 +938,7 @@ namespace mitk
   {
     try
     {
+      this->setUnixOptions(true);
       this->init(d->m_Argc, d->m_Argv);
     }
     catch (const Poco::Util::OptionException& e)

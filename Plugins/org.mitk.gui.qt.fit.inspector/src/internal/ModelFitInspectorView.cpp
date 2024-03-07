@@ -708,11 +708,7 @@ void ModelFitInspectorView::RenderFitInfo()
     // configure data table
     m_Controls.tableInputData->clearContents();
 
-    if (m_currentFit.IsNull())
-    {
-        infoOutput << "No fit selected. Only raw image data is plotted.";
-    }
-    else
+    if (m_currentFit.IsNotNull())
     {
         m_Controls.groupSettings->setVisible(true);
         m_Controls.tableInputData->setRowCount(m_PlotCurves.staticPlots->size());

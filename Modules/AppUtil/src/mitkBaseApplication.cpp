@@ -867,9 +867,9 @@ namespace mitk
     registryMultiLanguageOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
     options.addOption(registryMultiLanguageOption);
 
-  Poco::Util::Option splashScreenOption(ARG_SPLASH_IMAGE.toStdString(), "", "optional picture to use as a splash screen");
-  splashScreenOption.argument("<filename>").binding(ARG_SPLASH_IMAGE.toStdString());
-  options.addOption(splashScreenOption);
+    Poco::Util::Option splashScreenOption(ARG_SPLASH_IMAGE.toStdString(), "", "optional picture to use as a splash screen");
+    splashScreenOption.argument("<filename>").binding(ARG_SPLASH_IMAGE.toStdString());
+    options.addOption(splashScreenOption);
 
     Poco::Util::Option xargsOption(ARG_XARGS.toStdString(), "", "Extended argument list");
     xargsOption.argument("<args>").binding(ARG_XARGS.toStdString());

@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <QmitkSingleApplication.h>
 
 #include <Poco/Util/HelpFormatter.h>
+#include <Poco/Util/OptionException.h>
 
 #include <ctkPluginFramework.h>
 #include <ctkPluginFramework_global.h>
@@ -177,7 +178,8 @@ namespace mitk
     QString m_ProvFile;
 
     Impl(int argc, char **argv)
-      : m_Argc(argc),
+      : m_QApp(nullptr),
+        m_Argc(argc),
         m_Argv(argv),
 #ifdef Q_OS_MAC
         m_Argv_macOS(),
@@ -885,7 +887,16 @@ namespace mitk
 
   int BaseApplication::run()
   {
-    this->init(d->m_Argc, d->m_Argv);
+    try
+    {
+      this->init(d->m_Argc, d->m_Argv);
+    }
+    catch (const Poco::Util::OptionException& e)
+    {
+      MITK_ERROR << e.name() << ": " << e.message();
+      return EXIT_FAILURE;
+    }
+
     return Application::run();
   }
 

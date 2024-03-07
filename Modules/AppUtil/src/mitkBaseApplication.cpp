@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <QmitkSingleApplication.h>
 
 #include <Poco/Util/HelpFormatter.h>
+#include <Poco/Util/OptionException.h>
 
 #include <ctkPluginFramework.h>
 #include <ctkPluginFramework_global.h>
@@ -96,6 +97,54 @@ namespace
         MITK_INFO << message;
         break;
     }
+  }
+
+  void defineQtOptions(Poco::Util::OptionSet& options)
+  {
+    // Manage Qt options as array of pairs, consisting of argument name and argument value requirement.
+    // Qt command-line options: https://doc.qt.io/qt-6/qguiapplication.html#supported-command-line-options
+
+    std::array<std::pair<std::string, bool>, 12> qtOptions {{
+      { "platform", true },
+      { "platformpluginpath", true },
+      { "platformtheme", true },
+      { "plugin", true },
+      { "qmljsdebugger", true },
+      { "qwindowgeometry", true },
+      { "qwindowicon", true },
+      { "qwindowtitle", true },
+      { "reverse", false },
+      { "session", true },
+      { "display", true },
+      { "geometry", true }
+    }};
+
+    for (const auto& qtOption : qtOptions)
+    {
+      // Qt uses short name syntax (-arg), while Poco requires a full name (--arg) in addition.
+      // Hence, set both to the same value. Always set description to "qt" for easy distinction
+      // between regular arguments and Qt arguments.
+
+      Poco::Util::Option option(qtOption.first, qtOption.first, "qt");
+
+      if (qtOption.second)
+        option.argument("<arg>"); // A short generic string as we don't care but Poco requires a non-empty string.
+
+      options.addOption(option);
+    }
+  }
+
+  Poco::Util::OptionSet excludeQtOptions(const Poco::Util::OptionSet& options)
+  {
+    Poco::Util::OptionSet remainingOptions;
+
+    for (const auto& option : options)
+    {
+      if (option.description() != "qt") // All Qt options have "qt" as description (see above).
+        remainingOptions.addOption(option);
+    }
+
+    return remainingOptions;
   }
 }
 
@@ -177,7 +226,8 @@ namespace mitk
     QString m_ProvFile;
 
     Impl(int argc, char **argv)
-      : m_Argc(argc),
+      : m_QApp(nullptr),
+        m_Argc(argc),
         m_Argv(argv),
 #ifdef Q_OS_MAC
         m_Argv_macOS(),
@@ -376,7 +426,9 @@ namespace mitk
 
   void BaseApplication::printHelp(const std::string &, const std::string &)
   {
-    Poco::Util::HelpFormatter help(this->options());
+    const auto remainingOptions = excludeQtOptions(this->options());
+
+    Poco::Util::HelpFormatter help(remainingOptions);
     help.setAutoIndent();
     help.setCommand(this->commandName());
     help.format(std::cout);
@@ -820,9 +872,9 @@ namespace mitk
     registryMultiLanguageOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
     options.addOption(registryMultiLanguageOption);
 
-  Poco::Util::Option splashScreenOption(ARG_SPLASH_IMAGE.toStdString(), "", "optional picture to use as a splash screen");
-  splashScreenOption.argument("<filename>").binding(ARG_SPLASH_IMAGE.toStdString());
-  options.addOption(splashScreenOption);
+    Poco::Util::Option splashScreenOption(ARG_SPLASH_IMAGE.toStdString(), "", "optional picture to use as a splash screen");
+    splashScreenOption.argument("<filename>").binding(ARG_SPLASH_IMAGE.toStdString());
+    options.addOption(splashScreenOption);
 
     Poco::Util::Option xargsOption(ARG_XARGS.toStdString(), "", "Extended argument list");
     xargsOption.argument("<args>").binding(ARG_XARGS.toStdString());
@@ -839,6 +891,10 @@ namespace mitk
     Poco::Util::Option labelSuggestionsOption(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "", "use this list of predefined suggestions for segmentation labels");
     labelSuggestionsOption.argument("<filename>").binding(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString());
     options.addOption(labelSuggestionsOption);
+
+    // Make Poco aware of QGuiApplication command-line options, even though they are only parsed by
+    // Qt. Otherwise, Poco would throw exceptions for unknown options.
+    defineQtOptions(options);
 
     Poco::Util::Application::defineOptions(options);
   }
@@ -885,7 +941,17 @@ namespace mitk
 
   int BaseApplication::run()
   {
-    this->init(d->m_Argc, d->m_Argv);
+    try
+    {
+      this->setUnixOptions(true);
+      this->init(d->m_Argc, d->m_Argv);
+    }
+    catch (const Poco::Util::OptionException& e)
+    {
+      MITK_ERROR << e.name() << ": " << e.message();
+      return EXIT_FAILURE;
+    }
+
     return Application::run();
   }
 

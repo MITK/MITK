@@ -16,31 +16,19 @@ namespace mitk
 {
 
 MaskGenerator::MaskGenerator():
-    m_TimeStep(0)
+    m_TimePoint(0)
 {
-    m_inputImage = nullptr;
 }
 
-void MaskGenerator::SetTimeStep(unsigned int timeStep)
+mitk::Image::ConstPointer MaskGenerator::GetMask(unsigned int maskID)
 {
-    if (timeStep != m_TimeStep)
-    {
-        m_TimeStep = timeStep;
-        this->Modified();
-    }
-}
+  if (maskID >= this->GetNumberOfMasks()) mitkThrow() << "Cannot generate and return mask. Passed mask ID is invalid. Invalid ID: " << maskID;
 
-void MaskGenerator::SetInputImage(mitk::Image::ConstPointer inputImg)
-{
-    if (inputImg != m_inputImage)
-    {
-        m_inputImage = inputImg;
-        this->Modified();
-    }
+  return this->DoGetMask(maskID);
 }
 
 mitk::Image::ConstPointer MaskGenerator::GetReferenceImage()
 {
-    return m_inputImage;
+    return m_InputImage;
 }
 }

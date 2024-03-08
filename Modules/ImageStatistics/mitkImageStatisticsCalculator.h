@@ -86,19 +86,19 @@ namespace mitk
     private:
         //Calculates statistics for each timestep for image
         template < typename TPixel, unsigned int VImageDimension > void InternalCalculateStatisticsUnmasked(
-                typename itk::Image< TPixel, VImageDimension >* image, const TimeGeometry* timeGeometry, TimeStepType timeStep);
+                typename const itk::Image< TPixel, VImageDimension >* image, const TimeGeometry* timeGeometry, TimeStepType timeStep);
 
         template < typename TPixel, unsigned int VImageDimension > void InternalCalculateStatisticsMasked(
-                typename itk::Image< TPixel, VImageDimension >* image, const TimeGeometry* timeGeometry,
+                typename const itk::Image< TPixel, VImageDimension >* image, const TimeGeometry* timeGeometry,
                 unsigned int timeStep);
 
         template < typename TPixel, unsigned int VImageDimension >
-        double GetVoxelVolume(typename itk::Image<TPixel, VImageDimension>* image) const;
+        double GetVoxelVolume(typename const itk::Image<TPixel, VImageDimension>* image) const;
 
         bool IsUpdateRequired() const;
 
         mitk::Image::ConstPointer m_Image;
-        mitk::Image::Pointer m_ImageTimeSlice;
+        mitk::Image::ConstPointer m_ImageTimeSlice;
         mitk::Image::ConstPointer m_InternalImageForStatistics;
 
         mitk::MaskGenerator::Pointer m_MaskGenerator;

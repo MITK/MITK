@@ -13,8 +13,12 @@ found in the LICENSE file.
 #include "QmitkImageStatisticsCalculationRunnable.h"
 
 #include "mitkImageStatisticsCalculator.h"
-#include <mitkImageMaskGenerator.h>
+#include <mitkPlanarFigure.h>
+#include <mitkImage.h>
+#include <mitkLabelSetImage.h>
 #include <mitkPlanarFigureMaskGenerator.h>
+#include <mitkImageMaskGenerator.h>
+#include <mitkMultiLabelMaskGenerator.h>
 #include <mitkIgnorePixelMaskGenerator.h>
 #include "mitkStatisticsToImageRelationRule.h"
 #include "mitkStatisticsToMaskRelationRule.h"
@@ -24,8 +28,7 @@ found in the LICENSE file.
 QmitkImageStatisticsCalculationRunnable::QmitkImageStatisticsCalculationRunnable()
   : QmitkDataGenerationJobBase()
   , m_StatisticsImage(nullptr)
-  , m_BinaryMask(nullptr)
-  , m_PlanarFigureMask(nullptr)
+  , m_MaskData(nullptr)
   , m_IgnoreZeros(false)
   , m_HistogramNBins(100)
 {
@@ -35,13 +38,15 @@ QmitkImageStatisticsCalculationRunnable::~QmitkImageStatisticsCalculationRunnabl
 {
 }
 
-void QmitkImageStatisticsCalculationRunnable::Initialize(const mitk::Image *image,
-  const mitk::Image *binaryImage,
-  const mitk::PlanarFigure *planarFig)
+void QmitkImageStatisticsCalculationRunnable::Initialize(const mitk::Image* image, const mitk::BaseData* mask)
 {
+  if (nullptr!= mask &&
+      nullptr == dynamic_cast<const mitk::LabelSetImage*>(mask) &&
+      nullptr == dynamic_cast<const mitk::Image*>(mask) &&
+      nullptr == dynamic_cast<const mitk::PlanarFigure*>(mask))
+    mitkThrow() << "Cannot initialize QmitkImageStatisticsCalculationRunnable. Mask data is not a supported type.";
   this->m_StatisticsImage = image;
-  this->m_BinaryMask = binaryImage;
-  this->m_PlanarFigureMask = planarFig;
+  this->m_MaskData = mask;
 }
 
 mitk::ImageStatisticsContainer* QmitkImageStatisticsCalculationRunnable::GetStatisticsData() const
@@ -54,14 +59,9 @@ const mitk::Image* QmitkImageStatisticsCalculationRunnable::GetStatisticsImage()
   return this->m_StatisticsImage.GetPointer();
 }
 
-const mitk::Image* QmitkImageStatisticsCalculationRunnable::GetMaskImage() const
+const mitk::BaseData* QmitkImageStatisticsCalculationRunnable::GetMaskData() const
 {
-  return this->m_BinaryMask.GetPointer();
-}
-
-const mitk::PlanarFigure* QmitkImageStatisticsCalculationRunnable::GetPlanarFigure() const
-{
-  return this->m_PlanarFigureMask.GetPointer();
+  return this->m_MaskData.GetPointer();
 }
 
 void QmitkImageStatisticsCalculationRunnable::SetIgnoreZeroValueVoxel(bool _arg)
@@ -110,18 +110,28 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
   // the same holds for the ::SetPlanarFigure()
   try
   {
-    if (this->m_BinaryMask.IsNotNull())
+    auto multiLabelMask = dynamic_cast<const mitk::LabelSetImage*>(m_MaskData.GetPointer());
+    auto binLabelMask = dynamic_cast<const mitk::Image*>(m_MaskData.GetPointer());
+    auto pfMask = dynamic_cast<const mitk::PlanarFigure*>(m_MaskData.GetPointer());
+
+    if (nullptr != multiLabelMask)
+    {
+      mitk::MultiLabelMaskGenerator::Pointer imgMask = mitk::MultiLabelMaskGenerator::New();
+      imgMask->SetMultiLabelSegmentation(multiLabelMask);
+      calculator->SetMask(imgMask.GetPointer());
+    }
+    else if (nullptr != binLabelMask)
     {
       mitk::ImageMaskGenerator::Pointer imgMask = mitk::ImageMaskGenerator::New();
       imgMask->SetInputImage(m_StatisticsImage);
-      imgMask->SetImageMask(m_BinaryMask);
+      imgMask->SetImageMask(binLabelMask);
       calculator->SetMask(imgMask.GetPointer());
     }
-    if (this->m_PlanarFigureMask.IsNotNull())
+    else if (nullptr != pfMask)
     {
       mitk::PlanarFigureMaskGenerator::Pointer pfMaskGen = mitk::PlanarFigureMaskGenerator::New();
       pfMaskGen->SetInputImage(m_StatisticsImage);
-      pfMaskGen->SetPlanarFigure(m_PlanarFigureMask->Clone());
+      pfMaskGen->SetPlanarFigure(pfMask->Clone());
       calculator->SetMask(pfMaskGen.GetPointer());
     }
   }
@@ -164,16 +174,10 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
     imageRule->Connect(m_StatisticsContainer, m_StatisticsImage);
 
-    if (nullptr != m_PlanarFigureMask)
+    if (nullptr != m_MaskData)
     {
       auto maskRule = mitk::StatisticsToMaskRelationRule::New();
-      maskRule->Connect(m_StatisticsContainer, m_PlanarFigureMask);
-    }
-
-    if (nullptr != m_BinaryMask)
-    {
-      auto maskRule = mitk::StatisticsToMaskRelationRule::New();
-      maskRule->Connect(m_StatisticsContainer, m_BinaryMask);
+      maskRule->Connect(m_StatisticsContainer, m_MaskData);
     }
 
     m_StatisticsContainer->SetProperty(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(m_HistogramNBins));

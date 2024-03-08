@@ -222,8 +222,8 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
         if (statistics && !statistics->IsWIP())
         {
           //currently only supports rois with one label due to histogram widget limitations.
-          auto labelValues = statistics->GetExistingLabelValues(true);
-          if (labelValues.size() == 1 || (!(statistics->IgnoresZeroVoxel()) && labelValues.empty()))
+          auto labelValues = statistics->GetExistingLabelValues();
+          if (labelValues.size() == 1)
           {
             auto labelValue = labelValues.empty() ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : labelValues.front();
 

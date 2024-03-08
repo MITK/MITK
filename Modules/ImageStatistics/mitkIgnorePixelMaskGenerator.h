@@ -44,30 +44,20 @@ public:
      */
     void SetIgnoredPixelValue(RealType pixelValue);
 
-    /**
-     * @brief Computes and returns the mask
-     */
-    mitk::Image::ConstPointer GetMask() override;
-
-    /**
-     * @brief SetTimeStep is used to set the time step for which the mask is to be generated
-     * @param timeStep
-     */
-    void SetTimeStep(unsigned int timeStep) override;
+    unsigned int GetNumberOfMasks() const override;
 
 protected:
     IgnorePixelMaskGenerator():
-       m_IgnoredPixelValue(std::numeric_limits<RealType>::min())
+       m_IgnoredPixelValue(std::numeric_limits<RealType>::min()), m_InternalMaskUpdateTime(0)
     {
-        m_TimeStep = 0;
-        m_InternalMaskUpdateTime = 0;
-        m_InternalMask = mitk::Image::New();
     }
 
-    ~IgnorePixelMaskGenerator() override{}
+    ~IgnorePixelMaskGenerator() = default;
+
+    mitk::Image::ConstPointer DoGetMask(unsigned int maskID) override;
 
     template <typename TPixel, unsigned int VImageDimension>
-    void InternalCalculateMask(typename itk::Image<TPixel, VImageDimension>* image);
+    void InternalCalculateMask(typename const itk::Image<TPixel, VImageDimension>* image);
 
 private:
     bool IsUpdateRequired() const;

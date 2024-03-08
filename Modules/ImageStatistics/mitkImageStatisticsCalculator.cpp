@@ -109,49 +109,55 @@ namespace mitk
       m_StatisticContainer->SetTimeGeometry(timeGeometry->Clone());
 
       // always compute statistics on all timesteps
-      for (unsigned int timeStep = 0; timeStep < m_Image->GetTimeSteps(); timeStep++)
+      for (TimeStepType timeStep = 0; timeStep < m_Image->GetTimeSteps(); timeStep++)
       {
-        if (m_MaskGenerator.IsNotNull())
+        const unsigned int numbersOfMasks = m_MaskGenerator.IsNotNull() ? m_MaskGenerator->GetNumberOfMasks() : 1;
+        auto timePoint = m_Image->GetTimeGeometry()->TimeStepToTimePoint(timeStep);
+        //hard coded 0 is
+        //a workaround , open up a task refer to it that it should be removed
+        //  as soon as the secondary mask is removed anyways and solved by a generator chain.
+        if (m_SecondaryMaskGenerator.IsNotNull())
         {
-          m_MaskGenerator->SetTimeStep(timeStep);
-          m_InternalMask = m_MaskGenerator->GetMask();
-          if (m_MaskGenerator->GetReferenceImage().IsNotNull())
+          if (m_SecondaryMaskGenerator->GetNumberOfMasks() != 1)
+            mitkThrow() << "Cannot generate secondary mask. ImageStatisticsCalculator does only support secondary mask generators with on mask. Number of masks provided: "
+            << m_SecondaryMaskGenerator->GetNumberOfMasks();
+          m_SecondaryMaskGenerator->SetTimePoint(timePoint);
+          m_SecondaryMask = m_SecondaryMaskGenerator->GetMask(0);
+        }
+
+        for (unsigned int maskID = 0; maskID < numbersOfMasks; ++maskID)
+        {
+          if (m_MaskGenerator.IsNotNull())
           {
-            m_InternalImageForStatistics = m_MaskGenerator->GetReferenceImage();
+            m_MaskGenerator->SetTimePoint(timePoint);
+            m_InternalMask = m_MaskGenerator->GetMask(maskID);
+            if (m_MaskGenerator->GetReferenceImage().IsNotNull())
+            {
+              m_InternalImageForStatistics = m_MaskGenerator->GetReferenceImage();
+            }
+            else
+            {
+              m_InternalImageForStatistics = m_Image;
+            }
           }
           else
           {
             m_InternalImageForStatistics = m_Image;
           }
-        }
-        else
-        {
-          m_InternalImageForStatistics = m_Image;
-        }
 
-        if (m_SecondaryMaskGenerator.IsNotNull())
-        {
-          m_SecondaryMaskGenerator->SetTimeStep(timeStep);
-          m_SecondaryMask = m_SecondaryMaskGenerator->GetMask();
-        }
+          m_ImageTimeSlice = SelectImageByTimeStep(m_InternalImageForStatistics, timeStep);
 
-        ImageTimeSelector::Pointer imgTimeSel = ImageTimeSelector::New();
-        imgTimeSel->SetInput(m_InternalImageForStatistics);
-        imgTimeSel->SetTimeNr(timeStep);
-        imgTimeSel->UpdateLargestPossibleRegion();
-        imgTimeSel->Update();
-        m_ImageTimeSlice = imgTimeSel->GetOutput();
-
-        // Calculate statistics with/without mask
-        if (m_MaskGenerator.IsNull() && m_SecondaryMaskGenerator.IsNull())
-        {
-          // 1) calculate statistics unmasked:
-          AccessByItk_2(m_ImageTimeSlice, InternalCalculateStatisticsUnmasked, timeGeometry, timeStep)
-        }
-        else
-        {
-          // 2) calculate statistics masked
-          AccessByItk_2(m_ImageTimeSlice, InternalCalculateStatisticsMasked, timeGeometry, timeStep)
+          // Calculate statistics with/without mask
+          if (m_MaskGenerator.IsNull() && m_SecondaryMaskGenerator.IsNull())
+          {
+            // 1) calculate statistics unmasked:
+            AccessByItk_2(m_ImageTimeSlice, InternalCalculateStatisticsUnmasked, timeGeometry, timeStep)
+          }
+          else
+          {
+            // 2) calculate statistics masked
+            AccessByItk_2(m_ImageTimeSlice, InternalCalculateStatisticsMasked, timeGeometry, timeStep)
+          }
         }
       }
     }
@@ -161,7 +167,7 @@ namespace mitk
 
   template <typename TPixel, unsigned int VImageDimension>
   void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
-    typename itk::Image<TPixel, VImageDimension> *image, const TimeGeometry *timeGeometry, TimeStepType timeStep)
+    typename const itk::Image<TPixel, VImageDimension> *image, const TimeGeometry *timeGeometry, TimeStepType timeStep)
   {
     typedef typename itk::Image<TPixel, VImageDimension> ImageType;
     typedef typename mitk::StatisticsImageFilter<ImageType> ImageStatisticsFilterType;
@@ -259,7 +265,7 @@ namespace mitk
   }
 
   template <typename TPixel, unsigned int VImageDimension>
-  double ImageStatisticsCalculator::GetVoxelVolume(typename itk::Image<TPixel, VImageDimension> *image) const
+  double ImageStatisticsCalculator::GetVoxelVolume(typename const itk::Image<TPixel, VImageDimension> *image) const
   {
     auto spacing = image->GetSpacing();
     double voxelVolume = 1.;
@@ -271,7 +277,7 @@ namespace mitk
   }
 
   template <typename TPixel, unsigned int VImageDimension>
-  void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(typename itk::Image<TPixel, VImageDimension> *image,
+  void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(typename const itk::Image<TPixel, VImageDimension> *image,
                                                                     const TimeGeometry *timeGeometry,
                                                                     unsigned int timeStep)
   {
@@ -282,8 +288,8 @@ namespace mitk
     typedef MaskUtilities<TPixel, VImageDimension> MaskUtilType;
     typedef typename itk::MinMaxLabelImageFilterWithIndex<ImageType, MaskType> MinMaxLabelFilterType;
 
-    // workaround: if m_SecondaryMaskGenerator ist not null but m_MaskGenerator is! (this is the case if we request a
-    // 'ignore zuero valued pixels' mask in the gui but do not define a primary mask)
+    // workaround: if m_SecondaryMaskGenerator is not null but m_MaskGenerator is! (this is the case if we request a
+    // 'ignore zero valued pixels' mask in the gui but do not define a primary mask)
     bool swapMasks = false;
     if (m_SecondaryMask.IsNotNull() && m_InternalMask.IsNull())
     {
@@ -301,9 +307,8 @@ namespace mitk
       maskImage = ImageToItkImage<MaskPixelType, VImageDimension>(m_InternalMask);
     }
     catch (const itk::ExceptionObject &)
-
     {
-      typename MaskType::Pointer noneConstMaskImage; //needed to work arround the fact that CastToItkImage currently does not support const itk images.
+      typename MaskType::Pointer noneConstMaskImage; //needed to work around the fact that CastToItkImage currently does not support const itk images.
       // if the pixel type of the mask is not short, then we have to make a copy of m_InternalMask (and cast the values)
       CastToItkImage(m_InternalMask, noneConstMaskImage);
       maskImage = noneConstMaskImage;
@@ -319,7 +324,7 @@ namespace mitk
       {
         Image::ConstPointer old_img = m_SecondaryMaskGenerator->GetReferenceImage();
         m_SecondaryMaskGenerator->SetInputImage(m_MaskGenerator->GetReferenceImage());
-        m_SecondaryMask = m_SecondaryMaskGenerator->GetMask();
+        m_SecondaryMask = m_SecondaryMaskGenerator->GetMask(0);
         m_SecondaryMaskGenerator->SetInputImage(old_img);
       }
       typename MaskType::ConstPointer secondaryMaskImage = MaskType::New();
@@ -399,6 +404,12 @@ namespace mitk
 
     for (auto labelValue : labels)
     {
+      if (labelValue == ImageStatisticsContainer::NO_MASK_LABEL_VALUE)
+      {
+        //we ignore the background of a mask if we compute mask statistics.
+        continue;
+      }
+
       ImageStatisticsContainer::ImageStatisticsObject statObj;
 
       // find min, max, minindex and maxindex
@@ -454,6 +465,9 @@ namespace mitk
       statObj.AddStatistic(ImageStatisticsConstants::UPP(), imageStatisticsFilter->GetUPP(labelValue));
       statObj.m_Histogram = imageStatisticsFilter->GetHistogram(labelValue);
 
+      if (m_StatisticContainer->StatisticsExist(labelValue, timeStep))
+        mitkThrow() << "Invalid state/input data. Statistic for a specific label/time step pair was computed more then once. Conflicting label ID: "
+        << labelValue << " ; conflicting time step: " << timeStep;
       m_StatisticContainer->SetStatistics(labelValue, timeStep, statObj);
     }
 

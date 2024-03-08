@@ -294,7 +294,9 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
   {
     // initialize thread and trigger it
     this->m_CalculatorJob->SetIgnoreZeroValueVoxel(false);
-    this->m_CalculatorJob->Initialize(m_ZImage.GetPointer(), m_MaskImage.GetPointer(), m_MaskPlanarFigure.GetPointer());
+    const mitk::BaseData* maskData = m_MaskImage.GetPointer();
+    if (m_MaskImage.IsNull()) maskData = m_MaskPlanarFigure.GetPointer();
+    this->m_CalculatorJob->Initialize(m_ZImage.GetPointer(), maskData);
     std::stringstream message;
     message << "<font color='red'>Calculating statistics...</font>";
     m_Controls.labelWarning->setText(message.str().c_str());
@@ -363,15 +365,10 @@ void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
     imageRule->Connect(statistics, m_CalculatorJob->GetStatisticsImage());
 
-    if (m_CalculatorJob->GetMaskImage())
+    if (m_CalculatorJob->GetMaskData())
     {
       auto maskRule = mitk::StatisticsToMaskRelationRule::New();
-      maskRule->Connect(statistics, m_CalculatorJob->GetMaskImage());
-    }
-    else if (m_CalculatorJob->GetPlanarFigure())
-    {
-      auto planarFigureRule = mitk::StatisticsToMaskRelationRule::New();
-      planarFigureRule->Connect(statistics, m_CalculatorJob->GetPlanarFigure());
+      maskRule->Connect(statistics, m_CalculatorJob->GetMaskData());
     }
 
     this->GetDataStorage()->Add(statisticsNode);

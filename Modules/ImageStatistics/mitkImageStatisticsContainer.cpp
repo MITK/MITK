@@ -191,15 +191,12 @@ namespace mitk
   }
 
 
-  ImageStatisticsContainer::LabelValueVectorType ImageStatisticsContainer::GetExistingLabelValues(bool ignoreUnlabeled) const
+  ImageStatisticsContainer::LabelValueVectorType ImageStatisticsContainer::GetExistingLabelValues() const
   {
     LabelValueVectorType result;
     for (const auto& [labelValue, timeMap] : m_LabelTimeStep2StatisticsMap)
     {
-      if (!ignoreUnlabeled || labelValue != NO_MASK_LABEL_VALUE)
-      {
-        result.push_back(labelValue);
-      }
+      result.push_back(labelValue);
     }
     return result;
   }
@@ -251,7 +248,7 @@ namespace mitk
     {
       std::set<std::string> customKeys;
 
-      auto labelValues = container->GetExistingLabelValues(false);
+      auto labelValues = container->GetExistingLabelValues();
 
       for (const auto labelValue : labelValues)
       {
@@ -282,7 +279,7 @@ namespace mitk
     {
       std::set<std::string> customKeys;
 
-      auto labelValues = container->GetExistingLabelValues(false);
+      auto labelValues = container->GetExistingLabelValues();
 
       for (const auto labelValue : labelValues)
       {

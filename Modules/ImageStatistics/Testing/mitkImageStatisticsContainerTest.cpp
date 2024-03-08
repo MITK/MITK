@@ -356,7 +356,7 @@ public:
 
         m_StatisticsObject.Reset();
 
-        CPPUNIT_ASSERT_MESSAGE("Statistics container was reseted correctly.", m_StatisticsContainer->GetExistingLabelValues(false).empty());
+        CPPUNIT_ASSERT_MESSAGE("Statistics container was reseted correctly.", m_StatisticsContainer->GetExistingLabelValues().empty());
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was not deleted correctly.", m_StatisticsObject.HasStatistic("Test"), false);
     }

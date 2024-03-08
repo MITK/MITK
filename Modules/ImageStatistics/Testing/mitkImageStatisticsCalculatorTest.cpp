@@ -607,7 +607,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
   mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
   imgMaskGen->SetImageMask(m_Pic3DCroppedBinMask);
   imgMaskGen->SetInputImage(m_Pic3DCroppedImage);
-  imgMaskGen->SetTimeStep(0);
+  imgMaskGen->SetTimePoint(m_Pic3DCroppedImage->GetTimeGeometry()->TimeStepToTimePoint(0));
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr));
@@ -666,7 +666,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
   mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
   imgMaskGen->SetImageMask(m_Pic3DCroppedMultilabelMask);
   imgMaskGen->SetInputImage(m_Pic3DCroppedImage);
-  imgMaskGen->SetTimeStep(0);
+  imgMaskGen->SetTimePoint(m_Pic3DCroppedImage->GetTimeGeometry()->TimeStepToTimePoint(0));
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr));

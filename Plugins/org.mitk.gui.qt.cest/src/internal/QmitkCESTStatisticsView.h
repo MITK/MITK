@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include "ui_QmitkCESTStatisticsViewControls.h"
 #include <QmitkImageStatisticsCalculationRunnable.h>
 
+#include <mitkPlanarFigure.h>
 #include <mitkPointSet.h>
 
 #include <mitkIRenderWindowPartListener.h>

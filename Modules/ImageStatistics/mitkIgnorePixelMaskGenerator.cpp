@@ -28,40 +28,28 @@ void IgnorePixelMaskGenerator::SetIgnoredPixelValue(RealType pixelValue)
     }
 }
 
-void IgnorePixelMaskGenerator::SetTimeStep(unsigned int timeStep)
+unsigned int IgnorePixelMaskGenerator::GetNumberOfMasks() const
 {
-    if (m_TimeStep != timeStep)
-    {
-        m_TimeStep = timeStep;
-    }
+  return 1;
 }
 
-mitk::Image::ConstPointer IgnorePixelMaskGenerator::GetMask()
+mitk::Image::ConstPointer IgnorePixelMaskGenerator::DoGetMask(unsigned int maskID)
 {
     if (IsUpdateRequired())
     {
-        if (m_inputImage.IsNull())
+        if (m_InputImage.IsNull())
         {
-            MITK_ERROR << "Image not set!";
+            mitkThrow() << "Image not set!";
         }
 
         if (m_IgnoredPixelValue == std::numeric_limits<RealType>::min())
         {
-            MITK_ERROR << "IgnotePixelValue not set!";
+          mitkThrow() << "IgnotePixelValue not set!";
         }
 
-        if (m_TimeStep > (m_inputImage->GetTimeSteps() - 1))
-        {
-            MITK_ERROR << "Invalid time step: " << m_TimeStep << ". The image has " << m_inputImage->GetTimeSteps() << " timeSteps!";
-        }
+        auto timeSliceImage = mitk::SelectImageByTimePoint(m_InputImage, m_TimePoint);
 
-        // extractimage time slice
-        ImageTimeSelector::Pointer imgTimeSel = ImageTimeSelector::New();
-        imgTimeSel->SetInput(m_inputImage);
-        imgTimeSel->SetTimeNr(m_TimeStep);
-        imgTimeSel->UpdateLargestPossibleRegion();
-
-        mitk::Image::Pointer timeSliceImage = imgTimeSel->GetOutput();
+        if (timeSliceImage.IsNull()) mitkThrow() << "Cannot generate mask. Passed time point is not supported by input image. Invalid time point: "<< m_TimePoint;
 
         // update m_InternalMask
         AccessByItk(timeSliceImage, InternalCalculateMask);
@@ -74,7 +62,7 @@ mitk::Image::ConstPointer IgnorePixelMaskGenerator::GetMask()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void IgnorePixelMaskGenerator::InternalCalculateMask(typename itk::Image<TPixel, VImageDimension>* image)
+void IgnorePixelMaskGenerator::InternalCalculateMask(typename const itk::Image<TPixel, VImageDimension>* image)
 {
     typedef itk::Image<TPixel, VImageDimension> ImageType;
     typedef itk::Image<unsigned short, VImageDimension> MaskType;
@@ -108,8 +96,8 @@ void IgnorePixelMaskGenerator::InternalCalculateMask(typename itk::Image<TPixel,
 bool IgnorePixelMaskGenerator::IsUpdateRequired() const
 {
     unsigned long thisClassTimeStamp = this->GetMTime();
-    unsigned long internalMaskTimeStamp = m_InternalMask->GetMTime();
-    unsigned long inputImageTimeStamp = m_inputImage->GetMTime();
+    unsigned long internalMaskTimeStamp = m_InternalMask.IsNull() ? 0 : m_InternalMask->GetMTime();
+    unsigned long inputImageTimeStamp = m_InputImage->GetMTime();
 
     if (thisClassTimeStamp > m_InternalMaskUpdateTime) // inputs have changed
     {

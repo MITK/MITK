@@ -134,7 +134,7 @@ namespace mitk
     /** Value that can be used to query for the statistic if no mask was provided.*/
     const static LabelValueType NO_MASK_LABEL_VALUE = Label::UNLABELED_VALUE;
     using LabelValueVectorType = LabelSetImage::LabelValueVectorType;
-    LabelValueVectorType GetExistingLabelValues(bool ignoreUnlabeled) const;
+    LabelValueVectorType GetExistingLabelValues() const;
 
     /**
     @brief Deletes all stored values*/

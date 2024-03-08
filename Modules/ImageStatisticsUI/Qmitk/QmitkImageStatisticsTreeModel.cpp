@@ -403,10 +403,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       QString imageLabel = QString::fromStdString(image->GetName());
       if (statistic->GetTimeSteps() == 1 && maskFinding == m_MaskNodes.end())
       {
-        bool noZero = statistic->IgnoresZeroVoxel();
-        //we have to check if statistics are calculated with no zero voxels, because then
-        //we have a label/mask (no zero mask), even if no mask is officially defined.
-        auto labelValue = (!isWIP && noZero) ? statistic->GetExistingLabelValues(true).front() : mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE;
+        auto labelValue = isWIP ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : statistic->GetExistingLabelValues().front();
 
         auto statisticsObject = isWIP ? mitk::ImageStatisticsContainer::ImageStatisticsObject() : statistic->GetStatistics(labelValue, 0);
         // create the final statistics tree item
@@ -420,9 +417,10 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       dataNodeToTreeItem.emplace(image, imageItem);
     }
 
-    const auto labelValues = statistic->GetExistingLabelValues(true); //currently we not support showing the statistics for unlabeled pixels if a mask exist
     if (maskFinding != m_MaskNodes.end())
     {
+      const auto labelValues = statistic->GetExistingLabelValues(); //currently we not support showing the statistics for unlabeled pixels if a mask exist
+
       // mask: 2. hierarchy level exists
       auto& mask = *maskFinding;
       QString maskLabel = QString::fromStdString(mask->GetName());
@@ -456,10 +454,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
     else
     {
       //no mask -> but multi time step
-      bool noZero = statistic->IgnoresZeroVoxel();
-      //we have to check if statistics are calculated with no zero voxels, because then
-      //we have a label/mask (no zero mask), even if no mask is officially defined.
-      auto labelValue = (!isWIP && noZero) ? statistic->GetExistingLabelValues(true).front() : mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE;
+      auto labelValue = isWIP ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : statistic->GetExistingLabelValues().front();
 
       AddTimeStepTreeItems(statistic, image, nullptr, labelValue, m_StatisticNames, isWIP, imageItem, hasMultipleTimesteps);
     }

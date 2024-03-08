@@ -24,110 +24,60 @@ found in the LICENSE file.
 namespace mitk
 {
     HotspotMaskGenerator::HotspotMaskGenerator():
-        m_HotspotRadiusinMM(6.2035049089940),   // radius of a 1cm3 sphere in mm
+        m_HotspotRadiusInMM(6.2035049089940),   // radius of a 1cm3 sphere in mm
         m_HotspotMustBeCompletelyInsideImage(true),
         m_Label(1)
     {
-        m_TimeStep = 0;
         m_InternalMask = mitk::Image::New();
         m_InternalMaskUpdateTime = 0;
-    }
-
-    void HotspotMaskGenerator::SetInputImage(mitk::Image::Pointer inputImage)
-    {
-        if (inputImage != m_inputImage)
-        {
-            m_inputImage = inputImage;
-            m_ConvolutionImageMaxIndex.set_size(inputImage->GetDimension());
-            m_ConvolutionImageMinIndex.set_size(inputImage->GetDimension());
-            this->Modified();
-        }
-    }
-
-    void HotspotMaskGenerator::SetMask(MaskGenerator::Pointer mask)
-    {
-        if (mask != m_Mask)
-        {
-            m_Mask = mask;
-            this->Modified();
-        }
     }
 
     HotspotMaskGenerator::~HotspotMaskGenerator()
     {
     }
 
-    void HotspotMaskGenerator::SetHotspotRadiusInMM(double radiusInMillimeter)
+    unsigned int HotspotMaskGenerator::GetNumberOfMasks() const
     {
-        if(radiusInMillimeter != m_HotspotRadiusinMM)
-        {
-            m_HotspotRadiusinMM = radiusInMillimeter;
-            this->Modified();
-        }
+      return 1;
     }
 
-    const double& HotspotMaskGenerator::GetHotspotRadiusinMM() const
-    {
-        return m_HotspotRadiusinMM;
-    }
-
-    bool HotspotMaskGenerator::GetHotspotMustBeCompletelyInsideImage() const
-    {
-        return m_HotspotMustBeCompletelyInsideImage;
-    }
-
-    void HotspotMaskGenerator::SetHotspotMustBeCompletelyInsideImage(bool mustBeCompletelyInImage)
-    {
-        if (m_HotspotMustBeCompletelyInsideImage != mustBeCompletelyInImage)
-        {
-            m_HotspotMustBeCompletelyInsideImage = mustBeCompletelyInImage;
-            this->Modified();
-        }
-    }
-
-
-    mitk::Image::ConstPointer HotspotMaskGenerator::GetMask()
+    mitk::Image::ConstPointer HotspotMaskGenerator::DoGetMask(unsigned int)
     {
         if (IsUpdateRequired())
         {
-            if ( m_inputImage.IsNull() )
+            if ( m_InputImage.IsNull() )
             {
               throw std::runtime_error( "Error: image empty!" );
             }
 
-            if ( m_TimeStep >= m_inputImage->GetTimeSteps() )
+            if ( m_InputImage->GetTimeGeometry()->IsValidTimePoint(m_TimePoint) )
             {
               throw std::runtime_error( "Error: invalid time step!" );
             }
 
-            mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-            imageTimeSelector->SetInput( m_inputImage );
-            imageTimeSelector->SetTimeNr( m_TimeStep );
-            imageTimeSelector->UpdateLargestPossibleRegion();
-            mitk::Image::Pointer timeSliceImage = imageTimeSelector->GetOutput();
+            auto timeSliceImage = SelectImageByTimePoint(m_InputImage, m_TimePoint);
 
-            m_internalImage = timeSliceImage;
             m_internalMask2D = nullptr; // is this correct when this variable holds a smart pointer?
             m_internalMask3D = nullptr;
 
             if ( m_Mask != nullptr )
             {
-                m_Mask->SetTimeStep(m_TimeStep);
-                mitk::Image::ConstPointer timeSliceMask = m_Mask->GetMask();
+                m_Mask->SetTimePoint(m_TimePoint);
+                mitk::Image::ConstPointer timeSliceMask = m_Mask->GetMask(0);
 
-                if ( m_internalImage->GetDimension() == 3 )
+                if ( timeSliceImage->GetDimension() == 3 )
                 {
                     itk::Image<unsigned short, 3>::Pointer noneConstMaskImage; //needed to work arround the fact that CastToItkImage currently does not support const itk images.
                     CastToItkImage(timeSliceMask, noneConstMaskImage);
                     m_internalMask3D = noneConstMaskImage;
-                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 3, m_internalMask3D.GetPointer(), m_Label);
+                    AccessFixedDimensionByItk_2(timeSliceImage, CalculateHotspotMask, 3, m_internalMask3D.GetPointer(), m_Label);
                 }
-                else if ( m_internalImage->GetDimension() == 2 )
+                else if ( timeSliceImage->GetDimension() == 2 )
                 {
                     itk::Image<unsigned short, 2>::Pointer noneConstMaskImage; //needed to work arround the fact that CastToItkImage currently does not support const itk images.
                     CastToItkImage(timeSliceMask, noneConstMaskImage);
                     m_internalMask2D = noneConstMaskImage;
-                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 2, m_internalMask2D.GetPointer(), m_Label);
+                    AccessFixedDimensionByItk_2(timeSliceImage, CalculateHotspotMask, 2, m_internalMask2D.GetPointer(), m_Label);
                 }
                 else
                 {
@@ -137,13 +87,13 @@ namespace mitk
             else
             {
 
-                if ( m_internalImage->GetDimension() == 3 )
+                if ( timeSliceImage->GetDimension() == 3 )
                 {
-                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 3, m_internalMask3D.GetPointer(), m_Label);
+                    AccessFixedDimensionByItk_2(timeSliceImage, CalculateHotspotMask, 3, m_internalMask3D.GetPointer(), m_Label);
                 }
-                else if ( m_internalImage->GetDimension() == 2 )
+                else if ( timeSliceImage->GetDimension() == 2 )
                 {
-                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 2, m_internalMask2D.GetPointer(), m_Label);
+                    AccessFixedDimensionByItk_2(timeSliceImage, CalculateHotspotMask, 2, m_internalMask2D.GetPointer(), m_Label);
                 }
                 else
                 {
@@ -155,35 +105,6 @@ namespace mitk
 
         m_InternalMaskUpdateTime = m_InternalMask->GetMTime();
         return m_InternalMask;
-    }
-
-    void HotspotMaskGenerator::SetTimeStep(unsigned int timeStep)
-    {
-        if (m_TimeStep != timeStep)
-        {
-            m_TimeStep = timeStep;
-        }
-    }
-
-    void HotspotMaskGenerator::SetLabel(unsigned short label)
-    {
-        if (label != m_Label)
-        {
-            m_Label = label;
-            this->Modified();
-        }
-    }
-
-    vnl_vector<int> HotspotMaskGenerator::GetConvolutionImageMinIndex()
-    {
-        this->GetMask(); // make sure we are up to date
-        return m_ConvolutionImageMinIndex;
-    }
-
-    vnl_vector<int> HotspotMaskGenerator::GetHotspotIndex()
-    {
-        this->GetMask(); // make sure we are up to date
-        return m_ConvolutionImageMaxIndex;
     }
 
     template <typename TPixel, unsigned int VImageDimension  >
@@ -445,7 +366,7 @@ namespace mitk
 
       // update convolution kernel
       typedef itk::Image< float, VImageDimension > KernelImageType;
-      typename KernelImageType::Pointer convolutionKernel = this->GenerateHotspotSearchConvolutionKernel<VImageDimension>(mmPerPixel, m_HotspotRadiusinMM);
+      typename KernelImageType::Pointer convolutionKernel = this->GenerateHotspotSearchConvolutionKernel<VImageDimension>(mmPerPixel, m_HotspotRadiusInMM);
 
       // update convolution image
       typedef itk::Image< TPixel, VImageDimension > InputImageType;
@@ -504,7 +425,7 @@ namespace mitk
 
     template <typename TPixel, unsigned int VImageDimension>
     void
-      HotspotMaskGenerator::CalculateHotspotMask(itk::Image<TPixel, VImageDimension>* inputImage,
+      HotspotMaskGenerator::CalculateHotspotMask(const itk::Image<TPixel, VImageDimension>* inputImage,
                                               const itk::Image<unsigned short, VImageDimension>* maskImage,
                                               unsigned int label)
     {
@@ -543,7 +464,7 @@ namespace mitk
         }
 
         // find maximum in convolution image, given the current mask
-        double requiredDistanceToBorder = m_HotspotMustBeCompletelyInsideImage ? m_HotspotRadiusinMM : -1.0;
+        double requiredDistanceToBorder = m_HotspotMustBeCompletelyInsideImage ? m_HotspotRadiusInMM : -1.0;
         ImageExtrema convolutionImageInformation = CalculateExtremaWorld(convolutionImage.GetPointer(), usedMask.GetPointer(), requiredDistanceToBorder, label);
 
         bool isHotspotDefined = convolutionImageInformation.Defined;
@@ -583,7 +504,7 @@ namespace mitk
           typename ConvolutionImageType::PointType maskCenter;
           inputImage->TransformIndexToPhysicalPoint(maskCenterIndex,maskCenter);
 
-          FillHotspotMaskPixels(hotspotMaskITK.GetPointer(), maskCenter, m_HotspotRadiusinMM);
+          FillHotspotMaskPixels(hotspotMaskITK.GetPointer(), maskCenter, m_HotspotRadiusInMM);
 
           //obtain mitk::Image::Pointer from itk::Image
           mitk::Image::Pointer hotspotMaskAsMITKImage = mitk::GrabItkImageMemory(hotspotMaskITK);
@@ -599,7 +520,7 @@ namespace mitk
         unsigned long thisClassTimeStamp = this->GetMTime();
         unsigned long internalMaskTimeStamp = m_InternalMask->GetMTime();
         unsigned long maskGeneratorTimeStamp = m_Mask->GetMTime();
-        unsigned long inputImageTimeStamp = m_inputImage->GetMTime();
+        unsigned long inputImageTimeStamp = m_InputImage->GetMTime();
 
         if (thisClassTimeStamp > m_InternalMaskUpdateTime) // inputs have changed
         {

@@ -585,12 +585,23 @@ namespace mitk
     if (nullptr != qApp)
       return;
 
+#ifdef Q_OS_LINUX
+    const auto& argv = this->argv();
+
+    if (std::find(argv.cbegin(), argv.cend(), "-platform") == argv.cend())
+    {
+      // If not set explicitly otherwise, prefer xcb as platform on Linux, as we had issues
+      // with wayland in combination with VTK and GLEW. Note that the shell scripts for
+      // excutables in our installers also set the platform to xcb.
+      if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
+        qputenv("QT_QPA_PLATFORM", "xcb");
+    }
+
+    // qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--single-process"); // See T29332
+#endif
+
     // Prevent conflicts between native OpenGL applications and QWebEngine
     QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
-
-/*#ifdef Q_OS_LINUX
-    qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--single-process"); // See T29332
-#endif*/
 
     // If parameters have been set before, we have to store them to hand them
     // through to the application

@@ -144,13 +144,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
   for (int lidx = 0; lidx < numberOfLayers; ++lidx)
   {
-    mitk::Image *layerImage = nullptr;
-
-    // set main input for ExtractSliceFilter
-    if (lidx == activeLayer)
-      layerImage = image;
-    else
-      layerImage = image->GetLayerImage(lidx);
+    const auto layerImage = image->GetGroupImage(lidx);
 
     localStorage->m_ReslicerVector[lidx]->SetInput(layerImage);
     localStorage->m_ReslicerVector[lidx]->SetWorldGeometry(worldGeometry);
@@ -216,7 +210,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     localStorage->m_LevelWindowFilterVector[lidx]->SetClippingBounds(textureClippingBounds);
 
     localStorage->m_LevelWindowFilterVector[lidx]->SetLookupTable(
-      image->GetLabelSet(lidx)->GetLookupTable()->GetVtkLookupTable());
+      image->GetLookupTable()->GetVtkLookupTable());
 
     // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
     localStorage->m_LayerTextureVector[lidx]->SetColorModeToDirectScalars();
@@ -245,7 +239,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     localStorage->m_LayerActorVector[lidx]->GetProperty()->SetOpacity(opacity);
   }
 
-  mitk::Label* activeLabel = image->GetActiveLabel(activeLayer);
+  mitk::Label* activeLabel = image->GetActiveLabel();
   if (nullptr != activeLabel)
   {
     bool contourActive = false;
@@ -488,7 +482,7 @@ void mitk::LabelSetImageVtkMapper2D::ApplyLookuptable(mitk::BaseRenderer *render
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   auto *input = dynamic_cast<mitk::LabelSetImage *>(this->GetDataNode()->GetData());
   localStorage->m_LevelWindowFilterVector[layer]->SetLookupTable(
-    input->GetLabelSet(layer)->GetLookupTable()->GetVtkLookupTable());
+    input->GetLookupTable()->GetVtkLookupTable());
 }
 
 void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)

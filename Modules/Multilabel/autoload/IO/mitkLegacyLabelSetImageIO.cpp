@@ -80,9 +80,9 @@ namespace mitk
       return Unsupported;
   }
 
-  std::vector<mitk::LabelSet::Pointer> ExtractLabelSetsFromMetaData(const itk::MetaDataDictionary& dictionary)
+  std::vector<mitk::LabelSetImage::LabelVectorType> ExtractLabelSetsFromMetaData(const itk::MetaDataDictionary& dictionary)
   {
-    std::vector<mitk::LabelSet::Pointer> result;
+    std::vector<mitk::LabelSetImage::LabelVectorType> result;
 
     // get labels and add them as properties to the image
     char keybuffer[256];
@@ -96,7 +96,7 @@ namespace mitk
       sprintf(keybuffer, "layer_%03u", layerIdx);
       int numberOfLabels = MultiLabelIOHelper::GetIntByKey(dictionary, keybuffer);
 
-      mitk::LabelSet::Pointer labelSet = mitk::LabelSet::New();
+      mitk::LabelSetImage::LabelVectorType labelSet;
 
       for (int labelIdx = 0; labelIdx < numberOfLabels; labelIdx++)
       {
@@ -111,10 +111,9 @@ namespace mitk
 
         label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem);
 
-        if (label->GetValue() != mitk::LabelSetImage::UnlabeledValue)
+        if (label->GetValue() != mitk::LabelSetImage::UNLABELED_VALUE)
         {
-          labelSet->AddLabel(label);
-          labelSet->SetLayer(layerIdx);
+          labelSet.push_back(label);
         }
         else
         {
@@ -162,8 +161,7 @@ namespace mitk
       for (auto image : groupImages)
       {
         auto output = ConvertImageToLabelSetImage(image);
-        output->AddLabelSetToLayer(0, *labelSetIterator);
-        output->GetLabelSet(0)->SetLayer(0);
+        output->ReplaceGroupLabels(0, *labelSetIterator);
 
         //meta data handling
         for (auto& [name, prop] : *(props->GetMap()))
@@ -179,13 +177,13 @@ namespace mitk
     }
     else
     { //Avoid label id collision.
-      LabelSetImage::LabelValueType maxValue = LabelSetImage::UnlabeledValue;
+      LabelSetImage::LabelValueType maxValue = LabelSetImage::UNLABELED_VALUE;
       auto imageIterator = groupImages.begin();
-      std::vector<mitk::LabelSet::Pointer> adaptedLabelSets;
+      std::vector<mitk::LabelSetImage::LabelVectorType> adaptedLabelSets;
 
       for (auto labelset : labelsets)
       {
-        const auto setValues = labelset->GetUsedLabelValues();
+        const auto setValues = LabelSetImage::ExtractLabelValuesFromLabelVector(labelset);
 
         //generate mapping table;
         std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping;
@@ -193,19 +191,18 @@ namespace mitk
         { //have to use reverse loop because TransferLabelContent (used to adapt content in the same image; see below)
           //would potentially corrupt otherwise the content due to "value collision between old values still present
           //and already adapted values. By going from highest value to lowest, we avoid that.
-          if (LabelSetImage::UnlabeledValue != *vIter)
-            labelMapping.push_back({ *vIter, *vIter + maxValue });
+          if (LabelSetImage::UNLABELED_VALUE != *vIter)
+            labelMapping.push_back({*vIter, *vIter + maxValue});
         }
 
-
-        if (LabelSetImage::UnlabeledValue != maxValue)
+        if (LabelSetImage::UNLABELED_VALUE != maxValue)
         {
           //adapt labelset
-          auto mappedLabelSet = GenerateLabelSetWithMappedValues(labelset, labelMapping);
+          auto mappedLabelSet = GenerateLabelSetWithMappedValues(LabelSetImage::ConvertLabelVectorConst(labelset), labelMapping);
           adaptedLabelSets.emplace_back(mappedLabelSet);
 
           //adapt image (it is an inplace operation. the image instance stays the same.
-          TransferLabelContent(*imageIterator, *imageIterator, mappedLabelSet, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue,
+          TransferLabelContent(*imageIterator, *imageIterator, LabelSetImage::ConvertLabelVectorConst(mappedLabelSet), LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE,
             false, labelMapping, MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
         }
         else
@@ -213,8 +210,12 @@ namespace mitk
           adaptedLabelSets.emplace_back(labelset);
         }
 
-        const auto setMaxValue = *(std::max_element(setValues.begin(), setValues.end()));
-        maxValue += setMaxValue;
+        const auto maxFinding = std::max_element(setValues.begin(), setValues.end());
+        if (maxFinding != setValues.end())
+        {
+          const auto setMaxValue = *(maxFinding);
+          maxValue += setMaxValue;
+        }
         imageIterator++;
       }
 
@@ -223,7 +224,7 @@ namespace mitk
       LabelSetImage::GroupIndexType id = 0;
       for (auto labelset : adaptedLabelSets)
       {
-        output->AddLabelSetToLayer(id, labelset);
+        output->ReplaceGroupLabels(id, labelset);
         id++;
       }
 

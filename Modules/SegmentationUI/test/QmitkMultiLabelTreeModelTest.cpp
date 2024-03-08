@@ -80,16 +80,18 @@ public:
   void PopulateSegmentation(mitk::LabelSetImage* seg)
   {
     seg->SetActiveLayer(0);
-    seg->GetActiveLabelSet()->AddLabel(CreateLabel("A", 1));
-    seg->GetActiveLabelSet()->AddLabel(CreateLabel("A", 5));
-    seg->GetActiveLabelSet()->AddLabel(CreateLabel("B", 4));
+
+    seg->AddLabel(CreateLabel("A", 1),0);
+    seg->AddLabel(CreateLabel("A", 5),0);
+    seg->AddLabel(CreateLabel("B", 4),0);
+
     seg->AddLayer();
     seg->AddLayer();
-    seg->SetActiveLayer(2);
-    seg->GetActiveLabelSet()->AddLabel(CreateLabel("B", 9));
-    seg->SetActiveLayer(0);
-    seg->GetActiveLabelSet()->AddLabel(CreateLabel("D", 2));
-    seg->GetActiveLabelSet()->AddLabel(CreateLabel("A", 10));
+
+    seg->AddLabel(CreateLabel("B", 9),2);
+
+    seg->AddLabel(CreateLabel("D", 2),0);
+    seg->AddLabel(CreateLabel("A", 10),0);
   }
 
   void setUp() override
@@ -219,7 +221,7 @@ public:
     m_Segmentation->SetActiveLayer(0);
     auto newLabel = CreateLabel("A", 100);
     newLabel->SetVisible(false);
-    m_Segmentation->GetActiveLabelSet()->AddLabel(newLabel);
+    m_Segmentation->AddLabel(newLabel,0);
 
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0 }, { QString("Group 0"), QVariant(), QVariant(), QVariant() }));
@@ -243,7 +245,7 @@ public:
     m_Segmentation->SetActiveLayer(0);
     newLabel = CreateLabel("A", 7);
     newLabel->SetLocked(false);
-    m_Segmentation->GetActiveLabelSet()->AddLabel(newLabel);
+    m_Segmentation->AddLabel(newLabel,0);
 
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0 }, { QString("Group 0"), QVariant(), QVariant(), QVariant() }));
@@ -272,7 +274,7 @@ public:
     //Add label instance to an empty group
     m_Segmentation->SetActiveLayer(1);
     newLabel = CreateLabel("A", 3);
-    m_Segmentation->GetActiveLabelSet()->AddLabel(newLabel);
+    m_Segmentation->AddLabel(newLabel,1);
 
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
     CheckModelGroup0Default(model);
@@ -374,8 +376,7 @@ public:
     QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
     //remove group in the middle
-    m_Segmentation->SetActiveLayer(1);
-    m_Segmentation->RemoveLayer();
+    m_Segmentation->RemoveGroup(1);
     CPPUNIT_ASSERT_EQUAL(2, model.rowCount(QModelIndex()));
     CheckModelGroup0Default(model);
     CPPUNIT_ASSERT(CheckModelRow(model, { 1 }, { QString("Group 1"), QVariant(), QVariant(), QVariant() }));
@@ -384,14 +385,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 1,0 })));
 
     //remove groups in the end
-    m_Segmentation->SetActiveLayer(1);
-    m_Segmentation->RemoveLayer();
+    m_Segmentation->RemoveGroup(1);
     CPPUNIT_ASSERT_EQUAL(1, model.rowCount(QModelIndex()));
     CheckModelGroup0Default(model);
 
     //remove all groups
-    m_Segmentation->SetActiveLayer(0);
-    m_Segmentation->RemoveLayer();
+    m_Segmentation->RemoveGroup(0);
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(QModelIndex()));
 
     //reset everything
@@ -400,8 +399,7 @@ public:
     model.SetSegmentation(m_Segmentation);
 
     //remove first group
-    m_Segmentation->SetActiveLayer(0);
-    m_Segmentation->RemoveLayer();
+    m_Segmentation->RemoveGroup(0);
     CPPUNIT_ASSERT_EQUAL(2, model.rowCount(QModelIndex()));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0 }, { QString("Group 0"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 0 })));
@@ -417,7 +415,7 @@ public:
     QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
     //move from multiple instance to new label in the middle
-    auto label = m_Segmentation->GetLabel(5,0);
+    auto label = m_Segmentation->GetLabel(5);
     label->SetName("C");
 
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
@@ -437,7 +435,7 @@ public:
     CheckModelGroup2Default(model);
 
     //move from multiple instance to new label at the end
-    label = m_Segmentation->GetLabel(10, 0);
+    label = m_Segmentation->GetLabel(10);
     label->SetName("E");
 
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
@@ -457,7 +455,7 @@ public:
     CheckModelGroup2Default(model);
 
     //move last instance to new label
-    label = m_Segmentation->GetLabel(10, 0);
+    label = m_Segmentation->GetLabel(10);
     label->SetName("F");
 
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
@@ -501,7 +499,7 @@ public:
     QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
 
-    auto label = m_Segmentation->GetLabel(9, 2);
+    auto label = m_Segmentation->GetLabel(9);
 
     //check single instance modifications
     label->SetVisible(false);
@@ -525,7 +523,7 @@ public:
 
     //check instance modifications with multi instance label
     m_Segmentation->SetActiveLayer(2);
-    m_Segmentation->GetActiveLabelSet()->AddLabel(CreateLabel("B", 33));
+    m_Segmentation->AddLabel(CreateLabel("B", 33),2);
     label->SetVisible(true);
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
     CheckModelGroup0Default(model);

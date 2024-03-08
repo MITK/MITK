@@ -151,10 +151,7 @@ void mitk::TotalSegmentatorTool::UpdatePrepare()
 {
   Superclass::UpdatePrepare();
   auto preview = this->GetPreviewSegmentation();
-  for (LabelSetImage::GroupIndexType i = 0; i < preview->GetNumberOfLayers(); ++i)
-  {
-    preview->GetLabelSet(i)->RemoveAllLabels();
-  }
+  preview->RemoveLabels(preview->GetAllLabelValues());
   if (m_LabelMapTotal.empty())
   {
     this->ParseLabelMapTotalDefault();
@@ -184,14 +181,13 @@ mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(s
   initImage->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dimensions);
   aggloLabelImage->Initialize(initImage);
   aggloLabelImage->SetGeometry(geometry);
-  mitk::LabelSet::Pointer newlayer = mitk::LabelSet::New();
-  newlayer->SetLayer(0);
-  aggloLabelImage->AddLayer(newlayer);
+  const auto layerIndex = aggloLabelImage->AddLayer();
+  aggloLabelImage->SetActiveLayer(layerIndex);
 
   for (auto const &outputImagePath : filePaths)
   {
     double rgba[4];
-    aggloLabelImage->GetActiveLabelSet()->GetLookupTable()->GetTableValue(labelId, rgba);
+    aggloLabelImage->GetLookupTable()->GetTableValue(labelId, rgba);
     mitk::Color color;
     color.SetRed(rgba[0]);
     color.SetGreen(rgba[1]);
@@ -203,15 +199,14 @@ mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(s
     label->SetColor(color);
     label->SetOpacity(rgba[3]);
 
-    aggloLabelImage->GetActiveLabelSet()->AddLabel(label);
+    aggloLabelImage->AddLabel(label, layerIndex, false, false);
 
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     auto source = mitk::LabelSetImage::New();
     source->InitializeByLabeledImage(outputImage);
     source->SetGeometry(geometry);
 
-    auto labelSet = aggloLabelImage->GetActiveLabelSet();
-    mitk::TransferLabelContent(source, aggloLabelImage, labelSet, 0, 0, false, {{1, labelId}});
+    mitk::TransferLabelContent(source, aggloLabelImage, aggloLabelImage->GetConstLabelsByValue(aggloLabelImage->GetLabelValuesByGroup(layerIndex)), 0, 0, false, {{1, labelId}});
     labelId++;
   }
   return aggloLabelImage;
@@ -307,7 +302,6 @@ void mitk::TotalSegmentatorTool::MapLabelsToSegmentation(const mitk::LabelSetIma
                                                          mitk::LabelSetImage* dest,
                                                          std::map<mitk::Label::PixelType, std::string> &labelMap)
 {
-  auto labelset = dest->GetLabelSet();
   auto lookupTable = mitk::LookupTable::New();
   lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
   for (auto const &[key, val] : labelMap)
@@ -322,7 +316,7 @@ void mitk::TotalSegmentatorTool::MapLabelsToSegmentation(const mitk::LabelSetIma
       color.SetGreen(lookupTableColor[1]);
       color.SetBlue(lookupTableColor[2]);
       label->SetColor(color);
-      labelset->AddLabel(label, false);
+      dest->AddLabel(label, 0,false);
     }
   }
 }

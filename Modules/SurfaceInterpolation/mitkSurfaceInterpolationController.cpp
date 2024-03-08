@@ -459,7 +459,7 @@ void mitk::SurfaceInterpolationController::Interpolate(const LabelSetImage* segm
 
   if (!segmentationImage->ExistLabel(labelValue))
   {
-    mitkThrow() << "Cannot interpolate contours. None existant label request. Invalid label:" << labelValue;
+    mitkThrow() << "Cannot interpolate contours. None existent label request. Invalid label:" << labelValue;
   }
 
   if (!segmentationImage->GetTimeGeometry()->IsValidTimeStep(timeStep))
@@ -585,7 +585,7 @@ mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationRes
 
   if (!segmentationImage->ExistLabel(labelValue))
   {
-    mitkThrow() << "Cannot interpolate contours. None existant label request. Invalid label:" << labelValue;
+    mitkThrow() << "Cannot interpolate contours. None existent label request. Invalid label:" << labelValue;
   }
 
   if (!segmentationImage->GetTimeGeometry()->IsValidTimeStep(timeStep))

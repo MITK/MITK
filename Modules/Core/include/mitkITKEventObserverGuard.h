@@ -35,7 +35,7 @@ namespace mitk
     Therefore the observer will be removed from the sender when one of the following
     conditions are met:
     - the guard is destroyed
-    - the guard is reseted (by Reset() or operator = )
+    - the guard is resetted (by Reset() or operator = )
 
     Sample usage:
      \code

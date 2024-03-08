@@ -1263,6 +1263,12 @@ void QmitkSlicesInterpolator::Run3DInterpolation()
     return;
   }
 
+  if (!segmentation->ExistLabel(m_CurrentActiveLabelValue))
+  {
+    MITK_ERROR << "Run3DInterpolation triggered with no valid label selected. Currently selected invalid label: "<<m_CurrentActiveLabelValue;
+    return;
+  }
+
   m_SurfaceInterpolator->Interpolate(segmentation,m_CurrentActiveLabelValue,segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint));
 }
 
@@ -1342,12 +1348,33 @@ void QmitkSlicesInterpolator::OnInterpolationAborted(const itk::EventObject& /*e
 
 void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::EventObject & /*e*/)
 {
+  auto workingNode = m_ToolManager->GetWorkingData(0);
+
+  if (workingNode == nullptr)
+  {
+    MITK_DEBUG << "OnSurfaceInterpolationInfoChanged triggered with no working data set.";
+    return;
+  }
+
+  const auto segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+
+  if (segmentation == nullptr)
+  {
+    MITK_DEBUG << "OnSurfaceInterpolationInfoChanged triggered with no MultiLabelSegmentation as working data.";
+    return;
+  }
+
+  if (!segmentation->ExistLabel(m_CurrentActiveLabelValue))
+  {
+    MITK_DEBUG << "OnSurfaceInterpolationInfoChanged triggered with no valid label selected. Currently selected invalid label: " << m_CurrentActiveLabelValue;
+    return;
+  }
+
   if (m_Watcher.isRunning())
     m_Watcher.waitForFinished();
 
   if (m_3DInterpolationEnabled)
   {
-
     m_InterpolatedSurfaceNode->SetData(nullptr);
     m_Future = QtConcurrent::run(&QmitkSlicesInterpolator::Run3DInterpolation, this);
     m_Watcher.setFuture(m_Future);

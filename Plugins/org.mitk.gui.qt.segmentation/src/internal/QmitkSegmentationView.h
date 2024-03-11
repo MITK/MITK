@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "ui_QmitkSegmentationViewControls.h"
 
 #include <QmitkAbstractView.h>
+#include <mitkITKEventObserverGuard.h>
 #include <mitkIRenderWindowPartListener.h>
 
 /**
@@ -170,6 +171,10 @@ private:
   bool m_DefaultLabelNaming;
 
   bool m_SelectionChangeIsAlreadyBeingHandled;
+
+  mitk::ITKEventObserverGuard m_LabelAddedObserver;
+  mitk::ITKEventObserverGuard m_LabelRemovedObserver;
+  mitk::ITKEventObserverGuard m_GroupRemovedObserver;
 };
 
 #endif

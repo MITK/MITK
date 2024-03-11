@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 #include <mitkDataNode.h>
 #include <mitkNumericTypes.h>
+#include <mitkITKEventObserverGuard.h>
 
 #include <QWidget>
 
@@ -171,6 +172,12 @@ private:
   mitk::DataNode::Pointer m_SegmentationNode;
   mitk::DataStorage* m_DataStorage;
 
+  mitk::ITKEventObserverGuard m_LabelAddedObserver;
+  mitk::ITKEventObserverGuard m_LabelModifiedObserver;
+  mitk::ITKEventObserverGuard m_LabelRemovedObserver;
+  mitk::ITKEventObserverGuard m_GroupAddedObserver;
+  mitk::ITKEventObserverGuard m_GroupModifiedObserver;
+  mitk::ITKEventObserverGuard m_GroupRemovedObserver;
 };
 
 #endif

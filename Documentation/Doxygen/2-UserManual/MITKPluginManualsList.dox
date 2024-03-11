@@ -39,7 +39,6 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   </li>
   <li> \subpage org_mitk_editors_stdmultiwidget </li>
   <li> \subpage org_mitk_editors_mxnmultiwidget </li>
-  <li> \subpage org_mitk_views_deformableclippingplane </li>
   <li> \subpage org_mitk_views_viewnavigator </li>
   <li> \subpage org_mitk_views_volumevisualization </li>
   <li> \subpage org_mitk_views_properties </li>
@@ -51,22 +50,14 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \subpage org_mitk_views_pharmacokinetics_mri </li>
   <li> \subpage org_mitk_views_pharmacokinetics_pet </li>
   <li> \subpage org_mitk_gui_qt_examples </li>
-  <li> \subpage org_mitk_gui_qt_geometrytools </li>
-  <li> \subpage org_mitk_gui_qt_igtexample </li>
-  <li> \subpage org_mitk_gui_qt_igttracking </li>
-  <li> \subpage org_mitk_views_igttrackingsemiautomaticmeasurement </li>
   <li> \subpage org_mitk_views_fit_demo </li>
   <li> \subpage org_mitk_views_fit_genericfitting </li>
   <li> \subpage org_mitk_views_fit_inspector </li>
-  <li> \subpage org_mitkexamplesopencv </li>
   <li> \subpage org_mitk_gui_qt_overlaymanager </li>
   <li> \subpage org_mitk_gui_qt_preprocessing_resampling </li>
   <li> \subpage org_mitk_views_pharmacokinetics_curvedescriptor </li>
   <li> \subpage org_mitk_views_pharmacokinetics_simulation </li>
-  <li> \subpage org_surfacematerialeditor </li>
-  <li> \subpage org_toftutorial </li>
   <li> \subpage org_blueberry_ui_qt_objectinspector </li>
-  <li> \subpage org_mitk_gui_qt_ultrasound </li>
   <li> \subpage org_mitk_gui_qt_xnat </li>
 </ul>
 

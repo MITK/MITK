@@ -329,9 +329,8 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
     mitkThrow() << "QmitkMultiLabelInspector is in an invalid state. AddNewLabelInstanceInternal was called with a non existing label as template";
 
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(templateLabel->GetValue());
-  auto group = m_Segmentation->GetLabelSet(groupID);
   m_ModelManipulationOngoing = true;
-  auto newLabel = group->AddLabel(templateLabel, true);
+  auto newLabel = m_Segmentation->AddLabel(templateLabel, groupID, true);
   m_ModelManipulationOngoing = false;
   this->SetSelectedLabel(newLabel->GetValue());
 
@@ -365,10 +364,8 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::LabelSetI
   if (!m_DefaultLabelNaming)
     emit LabelRenameRequested(newLabel, false);
 
-  auto group = m_Segmentation->GetLabelSet(containingGroup);
-
   m_ModelManipulationOngoing = true;
-  group->AddLabel(newLabel, false);
+  m_Segmentation->AddLabel(newLabel, containingGroup, false);
   m_ModelManipulationOngoing = false;
 
   this->SetSelectedLabel(newLabel->GetValue());
@@ -523,6 +520,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewGroup()
   {
     this->WaitCursorOn();
     groupID = m_Segmentation->AddLayer();
+    m_Segmentation->SetActiveLayer(groupID);
     this->WaitCursorOff();
     newLabel =  this->AddNewLabelInternal(groupID);
   }
@@ -842,10 +840,6 @@ QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
 
   if (!relevantLabelValues.empty())
   {
-    //we assume here that all affacted label belong to one group.
-    auto groupID = m_Segmentation->GetGroupIndexOfLabel(relevantLabelValues.front());
-    auto group = m_Segmentation->GetLabelSet(groupID);
-
     for (auto value : relevantLabelValues)
     {
       auto label = this->m_Segmentation->GetLabel(value);
@@ -863,13 +857,13 @@ QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
     opacitySlider->setValue(static_cast<int>(opacity * 100));
     auto segmentation = m_Segmentation;
 
-    QObject::connect(opacitySlider, &QSlider::valueChanged, this, [segmentation, relevantLabels, group](const int value)
+    QObject::connect(opacitySlider, &QSlider::valueChanged, this, [segmentation, relevantLabels](const int value)
     {
       auto opacity = static_cast<float>(value) / 100.0f;
       for (auto label : relevantLabels)
       {
         label->SetOpacity(opacity);
-        group->UpdateLookupTable(label->GetValue());
+        segmentation->UpdateLookupTable(label->GetValue());
       }
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -955,7 +949,7 @@ void QmitkMultiLabelInspector::OnMergeLabels(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
-    m_Segmentation->MergeLabels(currentLabel->GetValue(), this->GetSelectedLabels(), m_Segmentation->GetActiveLayer());
+    m_Segmentation->MergeLabels(currentLabel->GetValue(), this->GetSelectedLabels());
     this->WaitCursorOff();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -1007,10 +1001,6 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
 
   emit LabelRenameRequested(currentLabel, true);
 
-  //we assume here that all affacted label belong to one group.
-  auto groupID = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
-  auto group = m_Segmentation->GetLabelSet(groupID);
-
   for (auto value : relevantLabelValues)
   {
     if (value != currentLabel->GetValue())
@@ -1021,7 +1011,7 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
 
       label->SetName(currentLabel->GetName());
       label->SetColor(currentLabel->GetColor());
-      group->UpdateLookupTable(label->GetValue());
+      m_Segmentation->UpdateLookupTable(label->GetValue());
       mitk::DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
     }
   }
@@ -1062,17 +1052,13 @@ void QmitkMultiLabelInspector::SetVisibilityOfAffectedLabels(bool visible) const
 
   if (!relevantLabelValues.empty())
   {
-    //we assume here that all affacted label belong to one group.
-    auto groupID = m_Segmentation->GetGroupIndexOfLabel(relevantLabelValues.front());
-    auto group = m_Segmentation->GetLabelSet(groupID);
-
     for (auto value : relevantLabelValues)
     {
       auto label = this->m_Segmentation->GetLabel(value);
       if (nullptr == label)
         mitkThrow() << "Invalid state. Internal model returned a label value that does not exist in segmentation. Invalid value:" << value;
       label->SetVisible(visible);
-      group->UpdateLookupTable(label->GetValue());
+      m_Segmentation->UpdateLookupTable(label->GetValue());
     }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -1092,12 +1078,10 @@ void QmitkMultiLabelInspector::OnSetOnlyActiveLabelVisible(bool /*value*/)
 {
   auto currentLabel = GetFirstSelectedLabelObject();
   const auto labelID = currentLabel->GetValue();
-  auto groupID = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
-  auto group = m_Segmentation->GetLabelSet(groupID);
-  group->SetAllLabelsVisible(false);
+  m_Segmentation->SetAllLabelsVisible(false);
 
   currentLabel->SetVisible(true);
-  group->UpdateLookupTable(labelID);
+  m_Segmentation->UpdateLookupTable(labelID);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   this->PrepareGoToLabel(labelID);

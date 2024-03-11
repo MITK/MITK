@@ -311,7 +311,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
       {
         resultLabelSetImage->AddLayer();
       }
-      resultLabelSetImage->AddLabelSetToLayer(layerID, inputLabelSetImage->GetLabelSet(layerID)->Clone());
+      resultLabelSetImage->ReplaceGroupLabels(layerID, inputLabelSetImage->GetConstLabelsByValue(inputLabelSetImage->GetLabelValuesByGroup(layerID)));
       cloneInput->SetActiveLayer(layerID);
       resultLabelSetImage->SetActiveLayer(layerID);
 
@@ -319,7 +319,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
     }
 
     resultLabelSetImage->SetActiveLayer(inputLabelSetImage->GetActiveLayer());
-    resultLabelSetImage->GetLabelSet(inputLabelSetImage->GetActiveLayer())->SetActiveLabel(inputLabelSetImage->GetActiveLabel(inputLabelSetImage->GetActiveLayer())->GetValue());
+    resultLabelSetImage->SetActiveLabel(inputLabelSetImage->GetActiveLabel()->GetValue());
     result = resultLabelSetImage;
   }
 

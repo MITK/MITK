@@ -50,17 +50,10 @@ namespace mitk
 
     // Set DICOM properties for each label
     // Iterate over all layers
-    for (unsigned int layer = 0; layer < dicomSegImage->GetNumberOfLayers(); ++layer)
+    auto labels = dicomSegImage->GetLabels();
+    for (auto label : labels)
     {
-      // Iterate over all labels
-      const LabelSet *labelSet = dicomSegImage->GetLabelSet(layer);
-      auto labelIter = labelSet->IteratorConstBegin();
-
-      for (; labelIter != labelSet->IteratorConstEnd(); ++labelIter)
-      {
-        Label::Pointer label = labelIter->second;
-        SetDICOMSegmentProperties(label);
-      }
+      SetDICOMSegmentProperties(label);
     }
   }
 

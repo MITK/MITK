@@ -16,10 +16,10 @@ found in the LICENSE file.s
 #include <QStandardPaths>
 #include <itkCommand.h>
 #include <regex>
-#include <sstream>
 #include <QDir>
 #include <QApplication>
-#include <mutex>
+#include <QProcess>
+#include <QStringDecoder>
 
 QmitkSetupVirtualEnvUtil::QmitkSetupVirtualEnvUtil()
 {
@@ -187,46 +187,6 @@ bool QmitkSetupVirtualEnvUtil::IsPythonPath(const QString &pythonPath)
   return isExists;
 }
 
-namespace
-{
-  std::mutex mutex;
-  std::string pyVersionCaptured;
-
-  void CapturePyVersion(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
-  {
-    std::string testCOUT;
-    const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
-    if (pEvent)
-    {
-      pyVersionCaptured = pEvent->GetOutput();
-    }
-  }
-
-  std::vector<int> SplitVersionString(const std::string& version)
-  {
-    std::vector<int> splits;
-    std::string part;
-    std::istringstream tokenStream(version);
-    while (std::getline(tokenStream, part, '.'))
-    {
-      splits.push_back(std::stoi(part));
-    }
-    return splits;
-  }
-  
-  bool IsSupported(const std::string& version, const std::string& low, const std::string& high)
-  {
-    std::vector<int> inHandVersion = SplitVersionString(version);
-    std::vector<int> targetLowVersion = SplitVersionString(low);
-    std::vector<int> targetHighVersion = SplitVersionString(high);
-    if (inHandVersion.size() > 1 && targetLowVersion.size() > 1 && targetHighVersion.size() > 1)
-    { // comparing second part of the version 
-      return (inHandVersion[1] > targetLowVersion[1] && inHandVersion[1] < targetHighVersion[1]);
-    }
-    return false; 
-  }
-}
-
 std::pair<QString, QString> QmitkSetupVirtualEnvUtil::GetExactPythonPath(const QString &pyEnv)
 {
   QString fullPath = pyEnv;
@@ -255,19 +215,23 @@ std::pair<QString, QString> QmitkSetupVirtualEnvUtil::GetExactPythonPath(const Q
   std::pair<QString, QString> pythonPath;
   if (pythonDoesExist)
   {
-    ::mutex.lock();
-    std::regex sanitizer(R"([^3\.(\d+)])");
-    mitk::ProcessExecutor::ArgumentListType args;
-    auto spExec = mitk::ProcessExecutor::New();
-    auto spCommand = itk::CStyleCommand::New();
-    spCommand->SetCallback(&::CapturePyVersion);
-    spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
-    args.push_back("--version");
-    spExec->Execute(fullPath.toStdString(), PYTHON_EXE, args);
-    std::string pyVersionNumber = std::regex_replace(::pyVersionCaptured, sanitizer, "");
-    isSupportedVersion = ::IsSupported(pyVersionNumber, "3.8", "3.13");
-    pythonPath.second = QString::fromStdString(pyVersionNumber);
-    ::mutex.unlock();
+    std::regex sanitizer(R"(3\.(\d+))");
+    QProcess pyProcess;
+    pyProcess.start(fullPath + QDir::separator() + QString::fromStdString(PYTHON_EXE),
+                          QStringList() << "--version",
+                          QProcess::ReadOnly);
+    if (pyProcess.waitForFinished())
+    {
+      auto pyVersionCaptured = QString(QStringDecoder(QStringDecoder::Utf8)(pyProcess.readAllStandardOutput())).toStdString();
+      std::smatch match; // Expecting "Python 3.xx.xx" or "Python 3.xx"
+      if (std::regex_search(pyVersionCaptured, match, sanitizer) && !match.empty())
+      {
+        std::string pyVersionNumber = match[0];
+        int pySubVersion = std::stoi(match[1]);
+        isSupportedVersion = (pySubVersion > 8) ? (pySubVersion < 13) : false;
+        pythonPath.second = QString::fromStdString(pyVersionNumber);
+      }
+    }
   }
   pythonPath.first = pythonDoesExist &&isSupportedVersion ? fullPath : "";
   return pythonPath;

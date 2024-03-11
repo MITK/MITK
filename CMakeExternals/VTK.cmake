@@ -8,7 +8,9 @@ if(DEFINED VTK_DIR AND NOT EXISTS ${VTK_DIR})
 endif()
 
 set(proj VTK)
-set(proj_DEPENDENCIES )
+mitk_query_custom_ep_vars()
+
+set(proj_DEPENDENCIES ${${proj}_CUSTOM_DEPENDENCIES})
 set(VTK_DEPENDS ${proj})
 
 if(NOT DEFINED VTK_DIR)
@@ -25,12 +27,6 @@ if(NOT DEFINED VTK_DIR)
       )
 
     if(NOT APPLE)
-      if(NOT DEFINED OpenGL_GL_PREFERENCE OR OpenGL_GL_PREFERENCE STREQUAL GLVND)
-        find_package(OpenGL REQUIRED OPTIONAL_COMPONENTS EGL)
-        if(TARGET OpenGL::EGL)
-          list(APPEND additional_cmake_args "-DVTK_OPENGL_HAS_EGL:BOOL=ON")
-        endif()
-      endif()
       if(DEFINED OpenGL_GL_PREFERENCE)
         list(APPEND additional_cmake_args "-DOpenGL_GL_PREFERENCE:STRING=${OpenGL_GL_PREFERENCE}")
       endif()
@@ -58,12 +54,10 @@ if(NOT DEFINED VTK_DIR)
       )
   endif()
 
-  mitk_query_custom_ep_vars()
-
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    GIT_REPOSITORY https://github.com/Kitware/VTK.git
-    GIT_TAG v9.2.6
+    GIT_REPOSITORY https://github.com/MITK/VTK.git
+    GIT_TAG ef49b4f7b240ec62b4a7014fe97858be54fe9157 # v9.3.0-patched
     GIT_SUBMODULES ""
     CMAKE_GENERATOR ${gen}
     CMAKE_GENERATOR_PLATFORM ${gen_platform}

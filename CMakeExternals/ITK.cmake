@@ -8,11 +8,9 @@ if(DEFINED ITK_DIR AND NOT EXISTS ${ITK_DIR})
 endif()
 
 set(proj ITK)
-set(proj_DEPENDENCIES GDCM)
+mitk_query_custom_ep_vars()
 
-if(MITK_USE_OpenCV)
-  list(APPEND proj_DEPENDENCIES OpenCV)
-endif()
+set(proj_DEPENDENCIES GDCM ${${proj}_CUSTOM_DEPENDENCIES})
 
 if(MITK_USE_HDF5)
   list(APPEND proj_DEPENDENCIES HDF5)
@@ -29,14 +27,6 @@ if(NOT DEFINED ITK_DIR)
     -DITK_LEGACY_REMOVE:BOOL=ON
   )
 
-  if(MITK_USE_OpenCV)
-    list(APPEND additional_cmake_args
-         -DModule_ITKVideoBridgeOpenCV:BOOL=ON
-         -DOpenCV_DIR:PATH=${OpenCV_DIR}
-         "-DCMAKE_CONFIGURATION_TYPES:STRING=Debug$<SEMICOLON>Release"
-        )
-  endif()
-
   # Keep the behaviour of ITK 4.3 which by default turned on ITK Review
   # see MITK bug #17338
   list(APPEND additional_cmake_args
@@ -50,8 +40,6 @@ if(NOT DEFINED ITK_DIR)
       "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
     )
   endif()
-
-  mitk_query_custom_ep_vars()
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}

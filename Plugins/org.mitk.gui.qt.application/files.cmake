@@ -1,5 +1,6 @@
 set(SRC_CPP_FILES
   QmitkAbstractDataNodeAction.cpp
+  QmitkApplicationConstants.cpp
   QmitkCloseProjectAction.cpp
   QmitkDataNodeColorAction.cpp
   QmitkDataNodeColorMapAction.cpp
@@ -31,6 +32,7 @@ set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_application_Activator.cpp
   QmitkEditorsPreferencePage.cpp
   QmitkGeneralPreferencePage.cpp
+  QmitkToolBarsPreferencePage.cpp
   QmitkShowPreferencePageHandler.cpp
 )
 
@@ -62,11 +64,14 @@ set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_application_Activator.h
   src/internal/QmitkEditorsPreferencePage.h
   src/internal/QmitkGeneralPreferencePage.h
+  src/internal/QmitkToolBarsPreferencePage.h
   src/internal/QmitkShowPreferencePageHandler.h
 )
 
 set(UI_FILES
   src/QmitkPreferencesDialog.ui
+
+  src/internal/QmitkToolBarsPreferencePage.ui
 )
 
 set(CACHED_RESOURCE_FILES

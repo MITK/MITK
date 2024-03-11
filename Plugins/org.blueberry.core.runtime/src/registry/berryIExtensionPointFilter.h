@@ -37,7 +37,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionPointFilter
     virtual ~Concept();
   };
 
-  IExtensionPointFilter(const Concept* concept);
+  IExtensionPointFilter(const Concept* c);
 
   bool IsNull() const;
 

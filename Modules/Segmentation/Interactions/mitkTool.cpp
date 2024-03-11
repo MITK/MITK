@@ -232,6 +232,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(const Image *ori
     const unsigned int dimensions[] = {original->GetDimension(0), original->GetDimension(1), 1};
     segmentation->Initialize(pixelType, 3, dimensions);
     segmentation->AddLayer();
+    segmentation->SetActiveLayer(0);
   }
   else
   {
@@ -242,8 +243,8 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(const Image *ori
   label->SetName(organName);
   label->SetColor(color);
   label->SetValue(1);
-  segmentation->GetActiveLabelSet()->AddLabel(label);
-  segmentation->GetActiveLabelSet()->SetActiveLabel(1);
+  segmentation->AddLabel(label,segmentation->GetActiveLayer());
+  segmentation->SetActiveLabel(label->GetValue());
 
   unsigned int byteSize = sizeof(mitk::Label::PixelType);
 

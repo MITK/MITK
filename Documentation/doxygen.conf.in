@@ -1053,11 +1053,8 @@ EXAMPLE_PATH           = "@MITK_SOURCE_DIR@/Examples/" \
                          "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/snippets/" \
                          "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/examples/" \
                          "@MITK_SOURCE_DIR@/Modules/CppMicroServices/" \
-                         "@MITK_SOURCE_DIR@/Modules/OpenCL/Documentation/doxygen/snippets/" \
-                         "@MITK_SOURCE_DIR@/Modules/IGT/Tutorial/" \
                          "@MITK_SOURCE_DIR@/Plugins/org.mitk.gui.common/src/" \
-                         "@MITK_SOURCE_DIR@/Plugins/org.mitk.gui.qt.igtexamples/" \
-                         "@MITK_SOURCE_DIR@/Plugins/org.mitk.gui.qt.igttracking/"
+                         @MITK_DOXYGEN_ADDITIONAL_EXAMPLE_PATHS@
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and

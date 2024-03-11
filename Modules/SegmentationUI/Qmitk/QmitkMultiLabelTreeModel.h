@@ -15,6 +15,7 @@ found in the LICENSE file.
 #define QmitkMultiLabelTreeModel_h
 
 #include "mitkLabelSetImage.h"
+#include <mitkITKEventObserverGuard.h>
 
 // qt
 #include <QAbstractItemModel>
@@ -126,6 +127,8 @@ Q_SIGNALS:
   void modelChanged();
 
 protected:
+  void ITKEventHandler(const itk::EventObject& e);
+
   void OnLabelAdded(LabelValueType labelValue);
   void OnLabelModified(LabelValueType labelValue);
   void OnLabelRemoved(LabelValueType labelValue);
@@ -135,24 +138,16 @@ protected:
 
 private:
   void AddObserver();
-  void RemoveObserver();
 
   void UpdateInternalTree();
   void GenerateInternalGroupTree(unsigned int layerID, QmitkMultiLabelSegTreeItem* layerItem);
   QmitkMultiLabelSegTreeItem* GenerateInternalTree();
-
-  /* builds a hierarchical tree model for the image statistics
-  1. Level: Image
-  --> 2. Level: Mask [if exist]
-      --> 3. Level: Timestep [if >1 exist] */
-  void BuildHierarchicalModel();
 
   mitk::LabelSetImage::Pointer m_Segmentation;
 
   std::mutex m_Mutex;
   std::unique_ptr<QmitkMultiLabelSegTreeItem> m_RootItem;
 
-  bool m_Observed;
   bool m_ShowGroups = true;
 
   bool m_ShowVisibility = true;
@@ -161,6 +156,13 @@ private:
 
   bool m_AllowVisibilityModification = true;
   bool m_AllowLockModification = true;
+
+  mitk::ITKEventObserverGuard m_LabelAddedObserver;
+  mitk::ITKEventObserverGuard m_LabelModifiedObserver;
+  mitk::ITKEventObserverGuard m_LabelRemovedObserver;
+  mitk::ITKEventObserverGuard m_GroupAddedObserver;
+  mitk::ITKEventObserverGuard m_GroupModifiedObserver;
+  mitk::ITKEventObserverGuard m_GroupRemovedObserver;
 };
 
 #endif

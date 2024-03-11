@@ -23,13 +23,12 @@ class vtkCubeSource;
 class vtkTransform;
 class vtkPlane;
 class vtkCutter;
-class vtkStripper;
 class vtkPolyData;
 class vtkPPolyDataNormals;
-class vtkTriangleFilter;
 class vtkTextureMapToPlane;
 class vtkBox;
 class vtkClipPolyData;
+class vtkContourTriangulator;
 
 namespace mitk
 {
@@ -209,10 +208,8 @@ namespace mitk
 
     vtkPlane *m_Plane;
     vtkCutter *m_PlaneCutter;
-    vtkStripper *m_PlaneStripper;
-    vtkPolyData *m_PlanePolyData;
+    vtkContourTriangulator *m_ContourTriangulator;
     vtkPPolyDataNormals *m_NormalsUpdater;
-    vtkTriangleFilter *m_PlaneTriangler;
     vtkTextureMapToPlane *m_TextureMapToPlane;
 
     vtkBox *m_Box;

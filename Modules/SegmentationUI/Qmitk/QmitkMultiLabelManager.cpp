@@ -473,38 +473,49 @@ void QmitkMultiLabelManager::AddSegmentationObserver()
 {
   if (this->m_Segmentation.IsNotNull())
   {
-    this->m_Segmentation->AddLabelAddedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
-      this, &QmitkMultiLabelManager::OnLabelEvent));
-    this->m_Segmentation->AddLabelModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
-      this, &QmitkMultiLabelManager::OnLabelEvent));
-    this->m_Segmentation->AddLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
-      this, &QmitkMultiLabelManager::OnLabelEvent));
-    this->m_Segmentation->AddGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
-      this, &QmitkMultiLabelManager::OnGroupEvent));
-    this->m_Segmentation->AddGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
-      this, &QmitkMultiLabelManager::OnGroupEvent));
-    this->m_Segmentation->AddGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
-      this, &QmitkMultiLabelManager::OnGroupEvent));
+    auto& widget = *this;
+    m_LabelAddedObserver.Reset(m_Segmentation, mitk::LabelAddedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelEvent(labelEvent->GetLabelValue());
+      });
+    m_LabelModifiedObserver.Reset(m_Segmentation, mitk::LabelModifiedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelEvent(labelEvent->GetLabelValue());
+      });
+    m_LabelRemovedObserver.Reset(m_Segmentation, mitk::LabelRemovedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelEvent(labelEvent->GetLabelValue());
+      });
+
+    m_GroupAddedObserver.Reset(m_Segmentation, mitk::GroupAddedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto groupEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&event);
+        widget.OnGroupEvent(groupEvent->GetGroupID());
+      });
+    m_GroupModifiedObserver.Reset(m_Segmentation, mitk::GroupModifiedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto groupEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&event);
+        widget.OnGroupEvent(groupEvent->GetGroupID());
+      });
+    m_GroupRemovedObserver.Reset(m_Segmentation, mitk::GroupRemovedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto groupEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&event);
+        widget.OnGroupEvent(groupEvent->GetGroupID());
+      });
   }
 }
 
 void QmitkMultiLabelManager::RemoveSegmentationObserver()
 {
-  if (this->m_Segmentation.IsNotNull())
-  {
-    this->m_Segmentation->RemoveLabelAddedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
-      this, &QmitkMultiLabelManager::OnLabelEvent));
-    this->m_Segmentation->RemoveLabelModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
-      this, &QmitkMultiLabelManager::OnLabelEvent));
-    this->m_Segmentation->RemoveLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
-      this, &QmitkMultiLabelManager::OnLabelEvent));
-    this->m_Segmentation->RemoveGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
-      this, &QmitkMultiLabelManager::OnGroupEvent));
-    this->m_Segmentation->RemoveGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
-      this, &QmitkMultiLabelManager::OnGroupEvent));
-    this->m_Segmentation->RemoveGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
-      this, &QmitkMultiLabelManager::OnGroupEvent));
-  }
+  m_LabelAddedObserver.Reset();
+  m_LabelModifiedObserver.Reset();
+  m_LabelRemovedObserver.Reset();
+  m_GroupAddedObserver.Reset();
+  m_GroupModifiedObserver.Reset();
+  m_GroupRemovedObserver.Reset();
 }
 
 void QmitkMultiLabelManager::OnLabelEvent(mitk::LabelSetImage::LabelValueType /*labelValue*/)

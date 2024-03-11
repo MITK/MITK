@@ -147,7 +147,6 @@ namespace mitk
     /**
      * @brief Get the Points from positive and negative pointsets as std::vector.
      * 
-     * @param baseGeometry of Image
      * @return std::vector<std::pair<mitk::Point2D, std::string>> 
      */
     std::vector<std::pair<mitk::Point2D, std::string>> GetPointsAsVector(const mitk::BaseGeometry*);

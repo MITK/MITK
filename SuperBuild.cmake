@@ -278,7 +278,6 @@ set(mitk_cmake_boolean_args
   MITK_USE_Qt6
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
-  MITK_USE_OpenCL
   MITK_USE_OpenMP
   )
 
@@ -341,10 +340,6 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
     list(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
   endif()
 endforeach()
-
-if(MITK_USE_OpenCV)
-  list(APPEND mitk_optional_cache_args "-DCMAKE_CONFIGURATION_TYPES:STRING=Debug$<SEMICOLON>Release")
-endif()
 
 # Optional python variables
 if(MITK_USE_Python3)

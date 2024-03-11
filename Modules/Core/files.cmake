@@ -103,6 +103,7 @@ set(CPP_FILES
   DataManagement/mitkIPropertyOwner.cpp
   DataManagement/mitkIPropertyPersistence.cpp
   DataManagement/mitkIPropertyProvider.cpp
+  DataManagement/mitkITKEventObserverGuard.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjector.cpp
   DataManagement/mitkLevelWindow.cpp

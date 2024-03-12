@@ -174,6 +174,7 @@ set(UI_FILES
   src/QmitkDataStorageTreeInspector.ui
   src/QmitkDataStorageSelectionHistoryInspector.ui
   src/QmitkSynchronizedNodeSelectionWidget.ui
+  src/QmitkNodeDetailsDialog.ui
 )
 
 set(RESOURCE_FILES

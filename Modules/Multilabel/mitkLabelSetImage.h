@@ -13,6 +13,7 @@ found in the LICENSE file.
 #ifndef mitkLabelSetImage_h
 #define mitkLabelSetImage_h
 
+#include <shared_mutex>
 #include <mitkImage.h>
 #include <mitkLabel.h>
 #include <mitkLookupTable.h>
@@ -373,6 +374,9 @@ namespace mitk
 
       /** Indicates if the MultiLabelSegmentation allows to overwrite unlabeled pixels in normal pixel manipulation operations (e.g. TransferLabelConent).*/
       bool m_UnlabeledLabelLock;
+
+      /** Mutex used to secure manipulations of the internal state of label and group maps.*/
+      std::shared_mutex m_LabelNGroupMapsMutex;
 
     public:
 

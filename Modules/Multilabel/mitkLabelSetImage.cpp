@@ -138,7 +138,7 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
 
   auto newActiveIndex = activeIndex;
   auto newActiveIndexBeforeDeletion = activeIndex;
-  //determine new active group index (afte the group will be removed);
+  //determine new active group index (after the group will be removed);
   if (indexToDelete < activeIndex)
   { //lower the index because position in m_LayerContainer etc has changed
     newActiveIndex = activeIndex-1;
@@ -167,19 +167,22 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
 
   auto relevantLabels = m_GroupToLabelMap[indexToDelete];
 
-  // remove labels of group
-  for (auto labelValue : relevantLabels)
   {
-    auto label = m_LabelMap[labelValue];
-    this->ReleaseLabel(label);
-    m_LabelToGroupMap.erase(labelValue);
-    m_LabelMap.erase(labelValue);
-    this->InvokeEvent(LabelRemovedEvent(labelValue));
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+    // remove labels of group
+    for (auto labelValue : relevantLabels)
+    {
+      auto label = m_LabelMap[labelValue];
+      this->ReleaseLabel(label);
+      m_LabelToGroupMap.erase(labelValue);
+      m_LabelMap.erase(labelValue);
+      this->InvokeEvent(LabelRemovedEvent(labelValue));
+    }
+    // remove the group entries in the maps and the image.
+    m_Groups.erase(m_Groups.begin() + indexToDelete);
+    m_GroupToLabelMap.erase(m_GroupToLabelMap.begin() + indexToDelete);
+    m_LayerContainer.erase(m_LayerContainer.begin() + indexToDelete);
   }
-  // remove the group entries in the maps and the image.
-  m_Groups.erase(m_Groups.begin() + indexToDelete);
-  m_GroupToLabelMap.erase(m_GroupToLabelMap.begin() + indexToDelete);
-  m_LayerContainer.erase(m_LayerContainer.begin() + indexToDelete);
 
   //update old indexes in m_GroupToLabelMap to new layer indexes
   for (auto& element : m_LabelToGroupMap)
@@ -298,12 +301,16 @@ void mitk::LabelSetImage::ReplaceGroupLabels(const GroupIndexType groupID, const
   }
 
   //remove old group labels
-  auto oldLabels = this->m_GroupToLabelMap[groupID];
-  for (auto labelID : oldLabels)
+  LabelValueVectorType oldLabels;
   {
-    this->RemoveLabelFromMap(labelID);
-    this->InvokeEvent(LabelRemovedEvent(labelID));
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+    oldLabels = this->m_GroupToLabelMap[groupID];
+    for (auto labelID : oldLabels)
+    {
+      this->RemoveLabelFromMap(labelID);
+      this->InvokeEvent(LabelRemovedEvent(labelID));
 
+    }
   }
   this->InvokeEvent(LabelsChangedEvent(oldLabels));
   this->InvokeEvent(GroupModifiedEvent(groupID));
@@ -455,18 +462,22 @@ void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, const std::vector<Pi
 
 void mitk::LabelSetImage::RemoveLabel(LabelValueType pixelValue)
 {
-  if (m_LabelMap.find(pixelValue) == m_LabelMap.end()) return;
-
-  auto groupID = this->GetGroupIndexOfLabel(pixelValue);
-
-  //first erase the pixel content (also triggers a LabelModified event)
-  this->EraseLabel(pixelValue);
-  this->RemoveLabelFromMap(pixelValue);
-
-
-  if (m_ActiveLabelValue == pixelValue)
+  GroupIndexType groupID = 0;
   {
-    this->SetActiveLabel(0);
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+    if (m_LabelMap.find(pixelValue) == m_LabelMap.end()) return;
+
+    groupID = this->GetGroupIndexOfLabel(pixelValue);
+
+    //first erase the pixel content (also triggers a LabelModified event)
+    this->EraseLabel(pixelValue);
+    this->RemoveLabelFromMap(pixelValue);
+
+
+    if (m_ActiveLabelValue == pixelValue)
+    {
+      this->SetActiveLabel(0);
+    }
   }
 
   this->InvokeEvent(LabelRemovedEvent(pixelValue));
@@ -541,34 +552,40 @@ mitk::LabelSetImage::LabelValueType mitk::LabelSetImage::GetUnusedLabelValue() c
 
 mitk::Label* mitk::LabelSetImage::AddLabel(mitk::Label* label, GroupIndexType groupID, bool addAsClone, bool correctLabelValue)
 {
-  unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
-  if (m_LayerContainer.size() >= max_size)
-    return nullptr;
+  mitk::Label::Pointer newLabel = label;
 
-  mitk::Label::Pointer newLabel = addAsClone ? label->Clone() : Label::Pointer(label);
-
-  auto pixelValue = newLabel->GetValue();
-  auto usedValues = this->GetUsedLabelValues();
-  auto finding = std::find(usedValues.begin(), usedValues.end(), pixelValue);
-
-  if (!usedValues.empty() && usedValues.end() != finding)
   {
-    if (correctLabelValue)
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+
+    unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
+    if (m_LayerContainer.size() >= max_size)
+      return nullptr;
+
+    if (addAsClone) newLabel = label->Clone();
+
+    auto pixelValue = newLabel->GetValue();
+    auto usedValues = this->GetUsedLabelValues();
+    auto finding = std::find(usedValues.begin(), usedValues.end(), pixelValue);
+
+    if (!usedValues.empty() && usedValues.end() != finding)
     {
-      pixelValue = this->GetUnusedLabelValue();
-      newLabel->SetValue(pixelValue);
+      if (correctLabelValue)
+      {
+        pixelValue = this->GetUnusedLabelValue();
+        newLabel->SetValue(pixelValue);
+      }
+      else
+      {
+        mitkThrow() << "Cannot add label due to conflicting label value that already exists in the MultiLabelSegmentation. Conflicting label value: " << pixelValue;
+      }
     }
-    else
-    {
-      mitkThrow() << "Cannot add label due to conflicting label value that already exists in the MultiLabelSegmentation. Conflicting label value: " << pixelValue;
-    }
+
+    // add DICOM information of the label
+    DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(newLabel);
+
+    this->AddLabelToMap(pixelValue, newLabel, groupID);
+    this->RegisterLabel(newLabel);
   }
-
-  // add DICOM information of the label
-  DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(newLabel);
-
-  this->AddLabelToMap(pixelValue, newLabel, groupID);
-  this->RegisterLabel(newLabel);
 
   this->InvokeEvent(LabelAddedEvent(newLabel->GetValue()));
   m_ActiveLabelValue = newLabel->GetValue();
@@ -587,6 +604,8 @@ mitk::Label* mitk::LabelSetImage::AddLabel(const std::string& name, const mitk::
 
 void mitk::LabelSetImage::RenameLabel(LabelValueType pixelValue, const std::string& name, const mitk::Color& color)
 {
+  std::shared_lock<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+
   mitk::Label* label = GetLabel(pixelValue);
   if (nullptr == label) mitkThrow() << "Cannot rename label.Unknown label value provided. Unknown label value:" << pixelValue;
 

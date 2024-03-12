@@ -39,6 +39,7 @@ QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::Const
 
 QmitkNodeDetailsDialog::~QmitkNodeDetailsDialog()
 {
+  disconnect(m_Ui->dataStorageComboBox, &QmitkDataStorageComboBox::OnSelectionChanged, this, &QmitkNodeDetailsDialog::OnSelectionChanged);
   delete m_Ui;
 }
 

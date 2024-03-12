@@ -660,6 +660,7 @@ bool ModelFitInspectorView::RefreshPlotData()
   return changed;
 }
 
+
 void ModelFitInspectorView::RenderFitInfo()
 {
     assert(m_renderWindowPart != nullptr);
@@ -728,13 +729,16 @@ void ModelFitInspectorView::RenderFitInfo()
             {
                 //Use HSV schema of QColor to calculate a different color depending on the
                 //number of already existing free iso lines.
-                dataColor.setHsv(((rowIndex + 1) * 85) % 360, 255, 255);
+                dataColor.setHsv(((rowIndex + 1) * 85) % 360, 255, 150);
             }
 
             QTableWidgetItem* newItem = new QTableWidgetItem(QString::fromStdString(pos->first));
             m_Controls.tableInputData->setItem(rowIndex, 0, newItem);
             newItem = new QTableWidgetItem();
             newItem->setBackground(dataColor);
+
+
+
             m_Controls.tableInputData->setItem(rowIndex, 1, newItem);
         }
     }

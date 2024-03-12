@@ -30,14 +30,22 @@ class QmitkImageStatisticsTreeItem
 public:
   using ImageStatisticsObject = mitk::ImageStatisticsContainer::ImageStatisticsObject;
   using StatisticNameVector = mitk::ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector;
+
   QmitkImageStatisticsTreeItem();
+
   explicit QmitkImageStatisticsTreeItem(const ImageStatisticsObject& statisticsData,
     const StatisticNameVector& statisticNames, QVariant itemText, bool isWIP,
     QmitkImageStatisticsTreeItem* parentItem = nullptr, const mitk::DataNode* imageNode = nullptr,
     const mitk::DataNode* maskNode = nullptr, const mitk::Label* label = nullptr);
+
   explicit QmitkImageStatisticsTreeItem(const StatisticNameVector& statisticNames,
     QVariant itemText, bool isWIP, QmitkImageStatisticsTreeItem *parentItem = nullptr, const mitk::DataNode* imageNode = nullptr,
     const mitk::DataNode* maskNode = nullptr, const mitk::Label* label = nullptr);
+
+  explicit QmitkImageStatisticsTreeItem(const StatisticNameVector& statisticNames,
+    QVariant itemText, QmitkImageStatisticsTreeItem* parentItem = nullptr, const mitk::DataNode* imageNode = nullptr,
+    const mitk::DataNode* maskNode = nullptr);
+
   ~QmitkImageStatisticsTreeItem();
 
   void appendChild(QmitkImageStatisticsTreeItem *child);
@@ -66,6 +74,7 @@ private:
   mitk::WeakPointer<const mitk::Label> m_Label;
 
   bool m_IsWIP;
+  bool m_NA;
 };
 
 #endif

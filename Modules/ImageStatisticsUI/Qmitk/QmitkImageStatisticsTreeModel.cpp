@@ -432,24 +432,28 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
         auto statisticsObject = isWIP ? mitk::ImageStatisticsContainer::ImageStatisticsObject() : statistic->GetStatistics(labelValues.front(), 0);
         maskItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, maskLabel, isWIP, imageItem, image, mask);
       }
+      else if(labelValues.empty())
+      {
+        //all labels are empty -> no stats are computed
+        maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, imageItem, image, mask);
+      }
       else
       {
         maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, isWIP, imageItem, image, mask);
+        // 3. hierarchy level: labels (optional, only if more then one label in statistic)
+        if (labelValues.size() > 1)
+        {
+          AddLabelTreeItems(statistic, image, mask, labelValues, m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps);
+        }
+        else if (!labelValues.empty())
+        {
+          mitk::Label::PixelType labelValue = isWIP ? 0 : labelValues.front();
+          AddTimeStepTreeItems(statistic, image, mask, labelValue, m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps);
+        }
       }
 
       imageItem->appendChild(maskItem);
       hasMask = true;
-
-      // 3. hierarchy level: labels (optional, only if more then one label in statistic)
-      if (labelValues.size() > 1)
-      {
-        AddLabelTreeItems(statistic, image, mask, labelValues, m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps);
-      }
-      else
-      {
-        mitk::Label::PixelType labelValue = isWIP ? 0 : labelValues.front();
-        AddTimeStepTreeItems(statistic, image, mask, labelValue, m_StatisticNames, isWIP, maskItem, hasMultipleTimesteps);
-      }
     }
     else
     {

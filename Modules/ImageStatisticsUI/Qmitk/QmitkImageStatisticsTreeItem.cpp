@@ -19,11 +19,11 @@ QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
   QmitkImageStatisticsTreeItem *parent, const mitk::DataNode* imageNode,
   const mitk::DataNode* maskNode, const mitk::Label* label)
   : m_statistics(statisticsData) , m_statisticNames(statisticNames), m_ItemText(itemText), m_parentItem(parent),
-    m_ImageNode(imageNode), m_MaskNode(maskNode), m_Label(label), m_IsWIP(isWIP)
+    m_ImageNode(imageNode), m_MaskNode(maskNode), m_Label(label), m_IsWIP(isWIP), m_NA(false)
 {
 }
 
- QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(const StatisticNameVector& statisticNames,
+QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(const StatisticNameVector& statisticNames,
                                                            QVariant itemText,
                                                            bool isWIP,
                                                            QmitkImageStatisticsTreeItem *parentItem, const mitk::DataNode* imageNode,
@@ -32,7 +32,17 @@ QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
 {
 }
 
- QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem() : QmitkImageStatisticsTreeItem(StatisticNameVector(), QVariant(), false, nullptr ) {}
+QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
+  const StatisticNameVector& statisticNames,
+  QVariant itemText,
+  QmitkImageStatisticsTreeItem* parent, const mitk::DataNode* imageNode,
+  const mitk::DataNode* maskNode)
+  : m_statistics(ImageStatisticsObject()), m_statisticNames(statisticNames), m_ItemText(itemText), m_parentItem(parent),
+  m_ImageNode(imageNode), m_MaskNode(maskNode), m_IsWIP(false), m_NA(true)
+{
+}
+
+QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem() : QmitkImageStatisticsTreeItem(StatisticNameVector(), QVariant(), false, nullptr ) {}
 
 QmitkImageStatisticsTreeItem::~QmitkImageStatisticsTreeItem()
 {
@@ -90,6 +100,10 @@ QVariant QmitkImageStatisticsTreeItem::data(int column) const
       if (m_IsWIP)
       {
         result = QVariant(QString("..."));
+      }
+      else if (m_NA)
+      {
+        result = QVariant(QString("N/A"));
       }
       else
       {

@@ -32,7 +32,7 @@ found in the LICENSE file.
 #include <ui_QmitkMultiLabelInspectorControls.h>
 
 QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/)
-  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelInspector)
+  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelInspector), m_SegmentationNodeDataMTime(0)
 {
   m_Controls->setupUi(this);
 
@@ -151,8 +151,56 @@ void QmitkMultiLabelInspector::SetMultiLabelSegmentation(mitk::LabelSetImage* se
   {
     m_Segmentation = segmentation;
     this->Initialize();
+    emit SegmentationChanged();
   }
 }
+
+mitk::LabelSetImage* QmitkMultiLabelInspector::GetMultiLabelSegmentation() const
+{
+  return m_Segmentation;
+}
+
+void QmitkMultiLabelInspector::SetMultiLabelNode(mitk::DataNode* node)
+{
+  if (node != this->m_SegmentationNode.GetPointer())
+  {
+    m_SegmentationObserver.Reset();
+    m_SegmentationNode = node;
+    m_SegmentationNodeDataMTime = 0;
+
+    mitk::LabelSetImage* seg = nullptr;
+
+    if (m_SegmentationNode.IsNotNull())
+    {
+      auto& widget = *this;
+      auto checkAndSetSeg = [&widget, &node](const itk::EventObject& event)
+        {
+          mitk::LabelSetImage* newSeg = nullptr;
+          if (widget.m_SegmentationNodeDataMTime < node->GetDataReferenceChangedTime())
+          {
+            newSeg = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+            if (nullptr == newSeg) mitkThrow() << "Invalid usage. Node set does not contain a segmentation.";
+
+            widget.m_SegmentationNodeDataMTime = node->GetDataReferenceChangedTime();
+            widget.SetMultiLabelSegmentation(newSeg);
+          }
+        };
+
+      m_SegmentationObserver.Reset(node, itk::ModifiedEvent(), checkAndSetSeg);
+      checkAndSetSeg(itk::ModifiedEvent());
+    }
+    else
+    {
+      this->SetMultiLabelSegmentation(nullptr);
+    }
+  }
+}
+
+mitk::DataNode* QmitkMultiLabelInspector::GetMultiLabelNode() const
+{
+  return m_SegmentationNode;
+}
+
 
 bool QmitkMultiLabelInspector::GetModelManipulationOngoing() const
 {

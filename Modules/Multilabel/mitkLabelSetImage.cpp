@@ -980,17 +980,19 @@ void mitk::LabelSetImage::AddLabelToMap(LabelValueType labelValue, mitk::Label* 
 
 void mitk::LabelSetImage::RegisterLabel(mitk::Label* label)
 {
+  if (nullptr == label) mitkThrow() << "Invalid call of RegisterLabel with a nullptr.";
+
   UpdateLookupTable(label->GetValue());
 
   auto command = itk::MemberCommand<LabelSetImage>::New();
   command->SetCallbackFunction(this, &LabelSetImage::OnLabelModified);
-  label->AddObserver(itk::ModifiedEvent(), command);
+  m_LabelModEventGuardMap.emplace(label->GetValue(), ITKEventObserverGuard(label, itk::ModifiedEvent(), command));
 }
 
 void mitk::LabelSetImage::ReleaseLabel(Label* label)
 {
   if (nullptr == label) mitkThrow() << "Invalid call of ReleaseLabel with a nullptr.";
-  label->RemoveAllObservers();
+  m_LabelModEventGuardMap.erase(label->GetValue());
 }
 
 void mitk::LabelSetImage::ApplyToLabels(const LabelValueVectorType& values, std::function<void(Label*)>&& lambda)

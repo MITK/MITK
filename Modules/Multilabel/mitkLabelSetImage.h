@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkLookupTable.h>
 #include <mitkMultiLabelEvents.h>
 #include <mitkMessage.h>
+#include <mitkITKEventObserverGuard.h>
 
 #include <MitkMultilabelExports.h>
 
@@ -97,7 +98,7 @@ namespace mitk
 
     /** \brief Adds a new label to a group of the image by providing name and color.
     * @param name (Class) name of the label instance that should be added.
-    * @param color Color of the new label sinstance.
+    * @param color Color of the new label instance.
     * @param groupID The id of the group the label should be added to.
     * @return Instance of the label as it was added to the label set.
     * @pre groupID must indicate an existing group.
@@ -171,7 +172,7 @@ namespace mitk
     /**
       * @brief  Returns true if the spatial group exists in the MultiLabelSegmentation instance.
       *
-      * @param index Group index of the group that should be checked for existance.
+      * @param index Group index of the group that should be checked for existence.
       */
     bool ExistGroup(GroupIndexType index) const;
 
@@ -364,6 +365,9 @@ namespace mitk
       using LabelToGroupMapType = std::map<LabelValueType, GroupIndexType>;
       /* Dictionary that maps between label value (key) and group id (value)*/
       LabelToGroupMapType m_LabelToGroupMap;
+
+      using LabelEventGuardMapType = std::map<LabelValueType, ITKEventObserverGuard>;
+      LabelEventGuardMapType m_LabelModEventGuardMap;
 
       LookupTable::Pointer m_LookupTable;
 

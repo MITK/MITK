@@ -35,7 +35,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="ctkRangeSlider" name="m_RangeSlider">
+      <widget class="ctkDoubleRangeSlider" name="m_RangeSlider">
        <property name="toolTip">
         <string>Change transfer function window range.</string>
        </property>

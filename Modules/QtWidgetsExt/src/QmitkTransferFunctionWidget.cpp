@@ -30,7 +30,8 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget *parent, Qt::Wi
 
   m_RangeSlider->setMinimum(-2048);
   m_RangeSlider->setMaximum(2048);
-  connect(m_RangeSlider, SIGNAL(valuesChanged(int, int)), this, SLOT(OnSpanChanged(int, int)));
+  UpdateStepSize();
+  connect(m_RangeSlider, SIGNAL(valuesChanged(double, double)), this, SLOT(OnSpanChanged(double, double)));
 
   // reset button
   connect(m_RangeSliderReset, SIGNAL(pressed()), this, SLOT(OnResetSlider()));
@@ -130,6 +131,7 @@ void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode *node, mitk::TimeSt
 
       m_RangeSliderMin = h->GetMin();
       m_RangeSliderMax = h->GetMax();
+      UpdateStepSize();
 
       m_RangeSlider->blockSignals(true);
       m_RangeSlider->setMinimum(m_RangeSliderMin);
@@ -227,8 +229,8 @@ void QmitkTransferFunctionWidget::SetXValueColor(const QString text)
 
 void QmitkTransferFunctionWidget::UpdateRanges()
 {
-  int lower = m_RangeSlider->minimumValue();
-  int upper = m_RangeSlider->maximumValue();
+  double lower = m_RangeSlider->minimumValue();
+  double upper = m_RangeSlider->maximumValue();
 
   m_ScalarOpacityFunctionCanvas->SetMin(lower);
   m_ScalarOpacityFunctionCanvas->SetMax(upper);
@@ -240,7 +242,13 @@ void QmitkTransferFunctionWidget::UpdateRanges()
   m_ColorTransferFunctionCanvas->SetMax(upper);
 }
 
-void QmitkTransferFunctionWidget::OnSpanChanged(int, int)
+void QmitkTransferFunctionWidget::UpdateStepSize()
+{
+  double step = (m_RangeSliderMax - m_RangeSliderMin) / 1000.;
+  m_RangeSlider->setSingleStep(step);
+}
+
+void QmitkTransferFunctionWidget::OnSpanChanged(double, double)
 {
   UpdateRanges();
 

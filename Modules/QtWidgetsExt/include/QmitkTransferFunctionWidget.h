@@ -63,15 +63,16 @@ public slots:
 
   void OnUpdateCanvas();
   void UpdateRanges();
+  void UpdateStepSize();
   void OnResetSlider();
 
-  void OnSpanChanged(int lower, int upper);
+  void OnSpanChanged(double lower, double upper);
 
 protected:
   mitk::TransferFunctionProperty::Pointer tfpToChange;
 
-  int m_RangeSliderMin;
-  int m_RangeSliderMax;
+  double m_RangeSliderMin;
+  double m_RangeSliderMax;
 
   mitk::SimpleHistogramCache histogramCache;
 };

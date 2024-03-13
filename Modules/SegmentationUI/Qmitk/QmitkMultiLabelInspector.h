@@ -158,8 +158,9 @@ public Q_SLOTS:
   * @brief Sets the segmentation node that will be used /monitored by the widget.
   *
   * @param node A pointer to the segmentation node.
-  * @remark If not set some features of the inspectors are not active.
-  * Currently it is also needed to circumvent the fact that
+  * @remark If not set some features (e.g. highlighting in render windows) of the inspectors
+  * are not active.
+  * @remark Currently it is also needed to circumvent the fact that
   * modification of data does not directly trigger modification of the
   * node (see T27307).
   */

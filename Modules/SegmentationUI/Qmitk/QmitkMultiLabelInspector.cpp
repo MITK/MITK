@@ -173,7 +173,7 @@ void QmitkMultiLabelInspector::SetMultiLabelNode(mitk::DataNode* node)
     if (m_SegmentationNode.IsNotNull())
     {
       auto& widget = *this;
-      auto checkAndSetSeg = [&widget, &node](const itk::EventObject& event)
+      auto checkAndSetSeg = [&widget, node](const itk::EventObject& event)
         {
           mitk::LabelSetImage* newSeg = nullptr;
           if (widget.m_SegmentationNodeDataMTime < node->GetDataReferenceChangedTime())
@@ -237,7 +237,7 @@ void QmitkMultiLabelInspector::SetSelectedLabels(const LabelValueVectorType& sel
 
 void QmitkMultiLabelInspector::UpdateSelectionModel(const LabelValueVectorType& selectedLabels)
 {
-  // create new selection by retrieving the corresponding indices of the labels
+  // create new selection by retrieving the corresponding indexes of the labels
   QItemSelection newCurrentSelection;
   for (const auto& labelID : selectedLabels)
   {
@@ -402,7 +402,18 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstance()
   if (nullptr == currentLabel)
     return nullptr;
 
-  return this->AddNewLabelInstanceInternal(currentLabel);
+  auto result = this->AddNewLabelInstanceInternal(currentLabel);
+
+  // this is needed as workaround for (T27307). It circumvents the fact that modifications
+  // of data (here the segmentation) does not directly trigger the modification of the
+  // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+  // listens to the datastorage for modification would not get notified.
+  if (m_SegmentationNode.IsNotNull())
+  {
+    m_SegmentationNode->Modified();
+  }
+
+  return result;
 }
 
 mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::LabelSetImage::GroupIndexType& containingGroup)
@@ -446,7 +457,18 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabel()
     ? m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue())
     : 0;
 
-  return AddNewLabelInternal(groupID);
+  auto result = AddNewLabelInternal(groupID);
+
+  // this is needed as workaround for (T27307). It circumvents the fact that modifications
+  // of data (here the segmentation) does not directly trigger the modification of the
+  // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+  // listens to the datastorage for modification would not get notified.
+  if (m_SegmentationNode.IsNotNull())
+  {
+    m_SegmentationNode->Modified();
+  }
+
+  return result;
 }
 
 void QmitkMultiLabelInspector::DeleteLabelInstance()
@@ -469,7 +491,18 @@ void QmitkMultiLabelInspector::DeleteLabelInstance()
   auto answer = QMessageBox::question(this, QString("Delete label instances"), question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
   if (answer == QMessageBox::Yes)
+  {
     this->DeleteLabelInternal({ label->GetValue() });
+
+    // this is needed as workaround for (T27307). It circumvents the fact that modifications
+    // of data (here the segmentation) does not directly trigger the modification of the
+    // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+    // listens to the datastorage for modification would not get notified.
+    if (m_SegmentationNode.IsNotNull())
+    {
+      m_SegmentationNode->Modified();
+    }
+  }
 }
 
 void QmitkMultiLabelInspector::DeleteLabel()
@@ -496,7 +529,18 @@ void QmitkMultiLabelInspector::DeleteLabel()
   auto answer = QMessageBox::question(this, QString("Delete label"), question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
   if (answer == QMessageBox::Yes)
+  {
     this->DeleteLabelInternal(relevantLabels);
+
+    // this is needed as workaround for (T27307). It circumvents the fact that modifications
+    // of data (here the segmentation) does not directly trigger the modification of the
+    // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+    // listens to the datastorage for modification would not get notified.
+    if (m_SegmentationNode.IsNotNull())
+    {
+      m_SegmentationNode->Modified();
+    }
+  }
 }
 
 void QmitkMultiLabelInspector::DeleteLabelInternal(const LabelValueVectorType& labelValues)
@@ -582,6 +626,16 @@ mitk::Label* QmitkMultiLabelInspector::AddNewGroup()
   m_ModelManipulationOngoing = false;
 
   emit ModelUpdated();
+
+  // this is needed as workaround for (T27307). It circumvents the fact that modifications
+  // of data (here the segmentation) does not directly trigger the modification of the
+  // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+  // listens to the datastorage for modification would not get notified.
+  if (m_SegmentationNode.IsNotNull())
+  {
+    m_SegmentationNode->Modified();
+  }
+
   return newLabel;
 }
 
@@ -693,6 +747,15 @@ void QmitkMultiLabelInspector::OnDeleteGroup()
       return;
 
     this->RemoveGroupInternal(groupID);
+
+    // this is needed as workaround for (T27307). It circumvents the fact that modifications
+    // of data (here the segmentation) does not directly trigger the modification of the
+    // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+    // listens to the datastorage for modification would not get notified.
+    if (m_SegmentationNode.IsNotNull())
+    {
+      m_SegmentationNode->Modified();
+    }
   }
 };
 
@@ -945,7 +1008,14 @@ void QmitkMultiLabelInspector::OnClearLabels(bool /*value*/)
     this->WaitCursorOn();
     m_Segmentation->EraseLabels(this->GetSelectedLabels());
     this->WaitCursorOff();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    // this is needed as workaround for (T27307). It circumvents the fact that modifications
+    // of data (here the segmentation) does not directly trigger the modification of the
+    // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+    // listens to the datastorage for modification would not get notified.
+    if (m_SegmentationNode.IsNotNull())
+    {
+      m_SegmentationNode->Modified();
+    }
   }
 }
 
@@ -969,6 +1039,15 @@ void QmitkMultiLabelInspector::OnDeleteAffectedLabel()
   if (answerButton == QMessageBox::Yes)
   {
     this->DeleteLabelInternal(affectedLabels);
+
+    // this is needed as workaround for (T27307). It circumvents the fact that modifications
+    // of data (here the segmentation) does not directly trigger the modification of the
+    // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+    // listens to the datastorage for modification would not get notified.
+    if (m_SegmentationNode.IsNotNull())
+    {
+      m_SegmentationNode->Modified();
+    }
   }
 }
 
@@ -983,6 +1062,15 @@ void QmitkMultiLabelInspector::OnDeleteLabels(bool /*value*/)
     this->WaitCursorOn();
     m_Segmentation->RemoveLabels(this->GetSelectedLabels());
     this->WaitCursorOff();
+
+    // this is needed as workaround for (T27307). It circumvents the fact that modifications
+    // of data (here the segmentation) does not directly trigger the modification of the
+    // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+    // listens to the datastorage for modification would not get notified.
+    if (m_SegmentationNode.IsNotNull())
+    {
+      m_SegmentationNode->Modified();
+    }
   }
 }
 
@@ -1000,7 +1088,14 @@ void QmitkMultiLabelInspector::OnMergeLabels(bool /*value*/)
     m_Segmentation->MergeLabels(currentLabel->GetValue(), this->GetSelectedLabels());
     this->WaitCursorOff();
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    // this is needed as workaround for (T27307). It circumvents the fact that modifications
+    // of data (here the segmentation) does not directly trigger the modification of the
+    // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+    // listens to the datastorage for modification would not get notified.
+    if (m_SegmentationNode.IsNotNull())
+    {
+      m_SegmentationNode->Modified();
+    }
   }
 }
 
@@ -1013,6 +1108,15 @@ void QmitkMultiLabelInspector::OnAddLabel()
   {
     auto groupID = groupIDVariant.value<mitk::LabelSetImage::GroupIndexType>();
     this->AddNewLabelInternal(groupID);
+
+    // this is needed as workaround for (T27307). It circumvents the fact that modifications
+    // of data (here the segmentation) does not directly trigger the modification of the
+    // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+    // listens to the datastorage for modification would not get notified.
+    if (m_SegmentationNode.IsNotNull())
+    {
+      m_SegmentationNode->Modified();
+    }
   }
 }
 
@@ -1023,6 +1127,15 @@ void QmitkMultiLabelInspector::OnAddLabelInstance()
     return;
 
   this->AddNewLabelInstanceInternal(currentLabel);
+
+  // this is needed as workaround for (T27307). It circumvents the fact that modifications
+  // of data (here the segmentation) does not directly trigger the modification of the
+  // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+  // listens to the datastorage for modification would not get notified.
+  if (m_SegmentationNode.IsNotNull())
+  {
+    m_SegmentationNode->Modified();
+  }
 }
 
 void QmitkMultiLabelInspector::OnClearLabel(bool /*value*/)
@@ -1038,7 +1151,15 @@ void QmitkMultiLabelInspector::OnClearLabel(bool /*value*/)
     this->WaitCursorOn();
     m_Segmentation->EraseLabel(currentLabel->GetValue());
     this->WaitCursorOff();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+    // this is needed as workaround for (T27307). It circumvents the fact that modifications
+    // of data (here the segmentation) does not directly trigger the modification of the
+    // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+    // listens to the datastorage for modification would not get notified.
+    if (m_SegmentationNode.IsNotNull())
+    {
+      m_SegmentationNode->Modified();
+    }
   }
 }
 
@@ -1061,6 +1182,15 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
       label->SetColor(currentLabel->GetColor());
       m_Segmentation->UpdateLookupTable(label->GetValue());
       mitk::DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
+
+      // this is needed as workaround for (T27307). It circumvents the fact that modifications
+      // of data (here the segmentation) does not directly trigger the modification of the
+      // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+      // listens to the datastorage for modification would not get notified.
+      if (m_SegmentationNode.IsNotNull())
+      {
+        m_SegmentationNode->Modified();
+      }
     }
   }
   emit ModelUpdated();

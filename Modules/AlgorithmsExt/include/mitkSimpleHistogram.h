@@ -75,7 +75,7 @@ namespace mitk
     HistogramType::ConstPointer histogram;
 
     bool valid;
-    int nBins = 256;
+    unsigned int nBins = 256;
     double invLogHighest;
 
   public:

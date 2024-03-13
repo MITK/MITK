@@ -57,7 +57,7 @@ protected:
     mitk::Image::ConstPointer DoGetMask(unsigned int maskID) override;
 
     template <typename TPixel, unsigned int VImageDimension>
-    void InternalCalculateMask(typename const itk::Image<TPixel, VImageDimension>* image);
+    void InternalCalculateMask(const itk::Image<TPixel, VImageDimension>* image);
 
 private:
     bool IsUpdateRequired() const;

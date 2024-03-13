@@ -33,7 +33,7 @@ unsigned int IgnorePixelMaskGenerator::GetNumberOfMasks() const
   return 1;
 }
 
-mitk::Image::ConstPointer IgnorePixelMaskGenerator::DoGetMask(unsigned int maskID)
+mitk::Image::ConstPointer IgnorePixelMaskGenerator::DoGetMask(unsigned int)
 {
     if (IsUpdateRequired())
     {
@@ -62,7 +62,7 @@ mitk::Image::ConstPointer IgnorePixelMaskGenerator::DoGetMask(unsigned int maskI
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void IgnorePixelMaskGenerator::InternalCalculateMask(typename const itk::Image<TPixel, VImageDimension>* image)
+void IgnorePixelMaskGenerator::InternalCalculateMask(const itk::Image<TPixel, VImageDimension>* image)
 {
     typedef itk::Image<TPixel, VImageDimension> ImageType;
     typedef itk::Image<unsigned short, VImageDimension> MaskType;

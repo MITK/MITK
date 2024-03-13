@@ -319,7 +319,8 @@ void AddTimeStepTreeItems(const mitk::ImageStatisticsContainer* statistic, const
       }
       else
       {
-        auto statisticsItem = new QmitkImageStatisticsTreeItem(statisticNames, QStringLiteral("N/A"), isWIP, parentItem, imageNode, maskNode);
+        auto statisticsItem = new QmitkImageStatisticsTreeItem(statisticNames, timeStepLabel, parentItem, imageNode, maskNode);
+        parentItem->appendChild(statisticsItem);
       }
     }
   }

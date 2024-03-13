@@ -112,8 +112,6 @@ namespace mitk
     m_CustomNames.clear();
   }
 
-  const static ImageStatisticsContainer::LabelValueType NO_MASK_LABEL_VALUE = 1;
-
   bool ImageStatisticsContainer::StatisticsExist(LabelValueType labelValue, TimeStepType timeStep) const
   {
     auto labelFinding = m_LabelTimeStep2StatisticsMap.find(labelValue);

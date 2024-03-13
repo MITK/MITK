@@ -112,7 +112,7 @@ namespace mitk
       for (TimeStepType timeStep = 0; timeStep < m_Image->GetTimeSteps(); timeStep++)
       {
         const unsigned int numbersOfMasks = m_MaskGenerator.IsNotNull() ? m_MaskGenerator->GetNumberOfMasks() : 1;
-        auto timePoint = m_Image->GetTimeGeometry()->TimeStepToTimePoint(timeStep);
+        auto timePoint = timeGeometry->TimeStepToTimePoint(timeStep);
         //hard coded 0 is
         //a workaround , open up a task refer to it that it should be removed
         //  as soon as the secondary mask is removed anyways and solved by a generator chain.
@@ -151,12 +151,12 @@ namespace mitk
           if (m_MaskGenerator.IsNull() && m_SecondaryMaskGenerator.IsNull())
           {
             // 1) calculate statistics unmasked:
-            AccessByItk_2(m_ImageTimeSlice, InternalCalculateStatisticsUnmasked, timeGeometry, timeStep)
+            AccessByItk_1(m_ImageTimeSlice, InternalCalculateStatisticsUnmasked, timeStep)
           }
           else
           {
             // 2) calculate statistics masked
-            AccessByItk_2(m_ImageTimeSlice, InternalCalculateStatisticsMasked, timeGeometry, timeStep)
+            AccessByItk_1(m_ImageTimeSlice, InternalCalculateStatisticsMasked, timeStep)
           }
         }
       }
@@ -167,7 +167,7 @@ namespace mitk
 
   template <typename TPixel, unsigned int VImageDimension>
   void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
-    typename const itk::Image<TPixel, VImageDimension> *image, const TimeGeometry *timeGeometry, TimeStepType timeStep)
+    const itk::Image<TPixel, VImageDimension> *image, TimeStepType timeStep)
   {
     typedef typename itk::Image<TPixel, VImageDimension> ImageType;
     typedef typename mitk::StatisticsImageFilter<ImageType> ImageStatisticsFilterType;
@@ -265,7 +265,7 @@ namespace mitk
   }
 
   template <typename TPixel, unsigned int VImageDimension>
-  double ImageStatisticsCalculator::GetVoxelVolume(typename const itk::Image<TPixel, VImageDimension> *image) const
+  double ImageStatisticsCalculator::GetVoxelVolume(const itk::Image<TPixel, VImageDimension> *image) const
   {
     auto spacing = image->GetSpacing();
     double voxelVolume = 1.;
@@ -277,9 +277,8 @@ namespace mitk
   }
 
   template <typename TPixel, unsigned int VImageDimension>
-  void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(typename const itk::Image<TPixel, VImageDimension> *image,
-                                                                    const TimeGeometry *timeGeometry,
-                                                                    unsigned int timeStep)
+  void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(const itk::Image<TPixel, VImageDimension> *image,
+    TimeStepType timeStep)
   {
     typedef itk::Image<TPixel, VImageDimension> ImageType;
     typedef itk::Image<MaskPixelType, VImageDimension> MaskType;

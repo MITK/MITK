@@ -132,7 +132,7 @@ namespace mitk
     TimeStepVectorType GetExistingTimeSteps(LabelValueType labelValue) const;
 
     /** Value that can be used to query for the statistic if no mask was provided.*/
-    const static LabelValueType NO_MASK_LABEL_VALUE = Label::UNLABELED_VALUE;
+    static constexpr LabelValueType NO_MASK_LABEL_VALUE = Label::UNLABELED_VALUE;
     using LabelValueVectorType = LabelSetImage::LabelValueVectorType;
     LabelValueVectorType GetExistingLabelValues() const;
 

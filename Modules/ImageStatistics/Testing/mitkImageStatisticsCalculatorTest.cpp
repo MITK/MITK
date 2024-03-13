@@ -105,7 +105,7 @@ private:
 
   // universal function to calculate statistics
   const mitk::ImageStatisticsContainer::Pointer
-    mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::ConstPointer image,
+    ComputeStatistics(mitk::Image::ConstPointer image,
       mitk::MaskGenerator::Pointer maskGen = nullptr,
       mitk::MaskGenerator::Pointer secondardMaskGen = nullptr)
   {

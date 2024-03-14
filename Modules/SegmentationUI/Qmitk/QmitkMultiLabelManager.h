@@ -57,7 +57,7 @@ Q_SIGNALS:
   *
   * @param labels A list of label values that are now selected.
   */
-  void CurrentSelectionChanged(LabelValueVectorType labels);
+  void CurrentSelectionChanged(const LabelValueVectorType& labels);
 
   /**
   * @brief A signal that will be emitted if the user has requested to "go to" a certain label.
@@ -118,7 +118,7 @@ private Q_SLOTS:
   // reaction to "returnPressed" signal from ...
   void OnSearchLabel();
   // reaction to the change of labels. If multiple labels are selected, it is ignored.
-  void OnSelectedLabelChanged(LabelValueVectorType labels);
+  void OnSelectedLabelChanged(const LabelValueVectorType& labels);
 
   // LabelSetImage Dependet
   void OnCreateDetailedSurface(bool);

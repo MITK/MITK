@@ -168,17 +168,14 @@ void QmitkMultiLabelInspector::SetMultiLabelNode(mitk::DataNode* node)
     m_SegmentationNode = node;
     m_SegmentationNodeDataMTime = 0;
 
-    mitk::LabelSetImage* seg = nullptr;
-
     if (m_SegmentationNode.IsNotNull())
     {
       auto& widget = *this;
-      auto checkAndSetSeg = [&widget, node](const itk::EventObject& event)
+      auto checkAndSetSeg = [&widget, node](const itk::EventObject&)
         {
-          mitk::LabelSetImage* newSeg = nullptr;
           if (widget.m_SegmentationNodeDataMTime < node->GetDataReferenceChangedTime())
           {
-            newSeg = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+            auto newSeg = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
             if (nullptr == newSeg) mitkThrow() << "Invalid usage. Node set does not contain a segmentation.";
 
             widget.m_SegmentationNodeDataMTime = node->GetDataReferenceChangedTime();

@@ -125,7 +125,7 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
   }
 }
 
-void QmitkMultiLabelManager::OnSelectedLabelChanged(LabelValueVectorType labels)
+void QmitkMultiLabelManager::OnSelectedLabelChanged(const LabelValueVectorType& labels)
 {
   this->UpdateControls();
   if (labels.empty() || labels.size() > 1) return;

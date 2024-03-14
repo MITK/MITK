@@ -23,26 +23,17 @@ QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
 {
 }
 
-QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(const StatisticNameVector& statisticNames,
-                                                           QVariant itemText,
-                                                           bool isWIP,
-                                                           QmitkImageStatisticsTreeItem *parentItem, const mitk::DataNode* imageNode,
-   const mitk::DataNode* maskNode, const mitk::Label* label)
+QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
+  const StatisticNameVector& statisticNames, QVariant itemText, bool isWIP,
+  bool isNA, QmitkImageStatisticsTreeItem *parentItem,
+  const mitk::DataNode* imageNode, const mitk::DataNode* maskNode,
+  const mitk::Label* label)
   : QmitkImageStatisticsTreeItem(ImageStatisticsObject(), statisticNames, itemText, isWIP, parentItem, imageNode, maskNode, label )
 {
+  m_NA = isNA;
 }
 
-QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
-  const StatisticNameVector& statisticNames,
-  QVariant itemText,
-  QmitkImageStatisticsTreeItem* parent, const mitk::DataNode* imageNode,
-  const mitk::DataNode* maskNode)
-  : m_statistics(ImageStatisticsObject()), m_statisticNames(statisticNames), m_ItemText(itemText), m_parentItem(parent),
-  m_ImageNode(imageNode), m_MaskNode(maskNode), m_IsWIP(false), m_NA(true)
-{
-}
-
-QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem() : QmitkImageStatisticsTreeItem(StatisticNameVector(), QVariant(), false, nullptr ) {}
+QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem() : QmitkImageStatisticsTreeItem(StatisticNameVector(), QVariant(), false, false, nullptr ) {}
 
 QmitkImageStatisticsTreeItem::~QmitkImageStatisticsTreeItem()
 {

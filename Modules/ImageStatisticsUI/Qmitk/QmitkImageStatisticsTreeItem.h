@@ -39,12 +39,8 @@ public:
     const mitk::DataNode* maskNode = nullptr, const mitk::Label* label = nullptr);
 
   explicit QmitkImageStatisticsTreeItem(const StatisticNameVector& statisticNames,
-    QVariant itemText, bool isWIP, QmitkImageStatisticsTreeItem *parentItem = nullptr, const mitk::DataNode* imageNode = nullptr,
+    QVariant itemText, bool isWIP, bool isNA, QmitkImageStatisticsTreeItem *parentItem = nullptr, const mitk::DataNode* imageNode = nullptr,
     const mitk::DataNode* maskNode = nullptr, const mitk::Label* label = nullptr);
-
-  explicit QmitkImageStatisticsTreeItem(const StatisticNameVector& statisticNames,
-    QVariant itemText, QmitkImageStatisticsTreeItem* parentItem = nullptr, const mitk::DataNode* imageNode = nullptr,
-    const mitk::DataNode* maskNode = nullptr);
 
   ~QmitkImageStatisticsTreeItem();
 

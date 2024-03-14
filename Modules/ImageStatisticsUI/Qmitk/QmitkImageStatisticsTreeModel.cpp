@@ -319,7 +319,7 @@ void AddTimeStepTreeItems(const mitk::ImageStatisticsContainer* statistic, const
       }
       else
       {
-        auto statisticsItem = new QmitkImageStatisticsTreeItem(statisticNames, timeStepLabel, parentItem, imageNode, maskNode);
+        auto statisticsItem = new QmitkImageStatisticsTreeItem(statisticNames, timeStepLabel, isWIP, true, parentItem, imageNode, maskNode);
         parentItem->appendChild(statisticsItem);
       }
     }
@@ -353,7 +353,7 @@ void AddLabelTreeItems(const mitk::ImageStatisticsContainer* statistic, const mi
       }
       else
       {
-        labelItem = new QmitkImageStatisticsTreeItem(statisticNames, labelLabel, isWIP, parentItem, imageNode, maskNode, labelInstance);
+        labelItem = new QmitkImageStatisticsTreeItem(statisticNames, labelLabel, isWIP, false, parentItem, imageNode, maskNode, labelInstance);
         AddTimeStepTreeItems(statistic, imageNode, maskNode, labelValue, statisticNames, isWIP, labelItem, hasMultipleTimesteps);
       }
 
@@ -412,7 +412,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       }
       else
       {
-        imageItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, imageLabel, isWIP, m_RootItem.get(), image);
+        imageItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, imageLabel, isWIP, true, m_RootItem.get(), image);
       }
       m_RootItem->appendChild(imageItem);
       dataNodeToTreeItem.emplace(image, imageItem);
@@ -436,11 +436,11 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       else if(labelValues.empty())
       {
         //all labels are empty -> no stats are computed
-        maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, imageItem, image, mask);
+        maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, isWIP, true, imageItem, image, mask);
       }
       else
       {
-        maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, isWIP, imageItem, image, mask);
+        maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, isWIP, false, imageItem, image, mask);
         // 3. hierarchy level: labels (optional, only if more then one label in statistic)
         if (labelValues.size() > 1)
         {

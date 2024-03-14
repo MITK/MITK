@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "mitkImageReadAccessor.h"
 #include "mitkSimpleUnstructuredGridHistogram.h"
 #include "mitkUnstructuredGrid.h"
+#include <mitkHistogramGenerator.h>
 
 namespace mitk
 {
@@ -31,161 +32,19 @@ namespace mitk
     else if (source->IsEmpty())
       return;
 
-    // dummy histogram
+    auto generator = mitk::HistogramGenerator::New();
+    generator->SetImage(source);
+    generator->SetSize(nBins);
+    generator->ComputeHistogram();
+    histogram = static_cast<mitk::SimpleImageHistogram::HistogramType::ConstPointer> (generator->GetHistogram());
+
+    CountType highest = 0;
+    for (unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
     {
-      min = 0;
-      max = 1;
-      first = 0;
-      last = 1;
+      CountType count = histogram->GetFrequency(i);
+      if (count > highest)
+        highest = count;
     }
-
-    {
-      int typInt = 0;
-      {
-        auto typ = source->GetPixelType().GetComponentType();
-        if (typ == itk::IOComponentEnum::UCHAR)
-          typInt = 0;
-        else if (typ == itk::IOComponentEnum::CHAR)
-          typInt = 1;
-        else if (typ == itk::IOComponentEnum::USHORT)
-          typInt = 2;
-        else if (typ == itk::IOComponentEnum::SHORT)
-          typInt = 3;
-        else if (typ == itk::IOComponentEnum::INT)
-          typInt = 4;
-        else if (typ == itk::IOComponentEnum::UINT)
-          typInt = 5;
-        else if (typ == itk::IOComponentEnum::LONG)
-          typInt = 6;
-        else if (typ == itk::IOComponentEnum::ULONG)
-          typInt = 7;
-        else if (typ == itk::IOComponentEnum::FLOAT)
-          typInt = 8;
-        else if (typ == itk::IOComponentEnum::DOUBLE)
-          typInt = 9;
-        else
-        {
-          MITK_WARN << "Pixel type not supported by SimpleImageHistogram";
-          return;
-        }
-      }
-
-      first = -32768;
-      last = 65535; // support at least full signed and unsigned short range
-
-      if (histogram)
-        delete histogram;
-
-      histogram = new CountType[last - first + 1];
-      memset(histogram, 0, sizeof(CountType) * (last - first + 1));
-      highest = 0;
-      max = first - 1;
-      min = last + 1;
-
-      unsigned int num = 1;
-      for (unsigned int r = 0; r < source->GetDimension(); r++)
-        num *= source->GetDimension(r);
-
-      // MITK_INFO << "building histogramm of integer image: 0=" << source->GetDimension(0) << " 1=" <<
-      // source->GetDimension(1) << " 2=" << source->GetDimension(2) << " 3=" <<  source->GetDimension(3);
-
-      ImageReadAccessor sourceAcc(source);
-      const void *src = sourceAcc.GetData();
-
-      do
-      {
-        int value = 0;
-
-        switch (typInt)
-        {
-          case 0:
-          {
-            auto *t = (unsigned char *)src;
-            value = *t++;
-            src = (void *)t;
-          }
-          break;
-          case 1:
-          {
-            auto *t = (signed char *)src;
-            value = *t++;
-            src = (void *)t;
-          }
-          break;
-          case 2:
-          {
-            auto *t = (unsigned short *)src;
-            value = *t++;
-            src = (void *)t;
-          }
-          break;
-          case 3:
-          {
-            auto *t = (signed short *)src;
-            value = *t++;
-            src = (void *)t;
-          }
-          break;
-          case 4:
-          {
-            auto *t = (signed int *)src;
-            value = *t++;
-            src = (void *)t;
-          }
-          break;
-          case 5:
-          {
-            auto *t = (unsigned int *)src;
-            value = *t++;
-            src = (void *)t;
-          }
-          break;
-          case 6:
-          {
-            auto *t = (signed long *)src;
-            value = *t++;
-            src = (void *)t;
-          }
-          break;
-          case 7:
-          {
-            auto *t = (unsigned long *)src;
-            value = *t++;
-            src = (void *)t;
-          }
-          break;
-          case 8:
-          {
-            auto *t = (float *)src;
-            value = *t++;
-            src = (void *)t;
-          }
-          break;
-          case 9:
-          {
-            auto *t = (double *)src;
-            value = *t++;
-            src = (void *)t;
-          }
-          break;
-        }
-
-        if (value >= first && value <= last)
-        {
-          if (value < min)
-            min = value;
-          if (value > max)
-            max = value;
-          CountType tmp = ++histogram[value - first];
-          if (tmp > highest)
-            highest = tmp;
-        }
-      } while (--num);
-
-      MITK_INFO << "histogramm computed: min=" << min << " max=" << max << " highestBin=" << highest
-                << " samples=" << num;
-    }
-
     invLogHighest = 1.0 / log(double(highest));
     valid = true;
   }
@@ -196,33 +55,34 @@ namespace mitk
     if (!valid)
       return 0.0f;
 
-    int iLeft = floorf(left);
-    int iRight = ceilf(right);
-
-    /*
-     double sum = 0;
-
-     for( int r = 0 ; r < 256 ; r++)
-     {
-       int pos = left + (right-left) * r/255.0;
-       int posInArray = floorf(pos+0.5f) - first;
-       sum += float(log(double(histogram[posInArray])));
-     }
-
-     sum /= 256.0;
-     return float(sum*invLogHighest);
-    */
-
     CountType maximum = 0;
 
-    for (int i = iLeft; i <= iRight; i++)
+    for (unsigned int i = 0; i < nBins; i++)
     {
-      int posInArray = i - first;
-      if (histogram[posInArray] > maximum)
-        maximum = histogram[posInArray];
+      auto binMin = histogram->GetBinMin(0, i);
+      auto binMax = histogram->GetBinMax(0, i);
+      if (left < binMax && right > binMin)
+      {
+        maximum = histogram->GetFrequency(i);
+      }
     }
-
     return float(log(double(maximum)) * invLogHighest);
+  }
+
+  double SimpleImageHistogram::GetMin() const
+  {
+    if (!valid)
+      return 0;
+
+    return histogram->GetBinMin(0, 0);
+  }
+
+  double SimpleImageHistogram::GetMax() const
+  {
+    if (!valid)
+      return 1;
+
+    return histogram->GetBinMax(0, nBins - 1);
   }
 
   class ImageHistogramCacheElement : public SimpleHistogramCache::Element

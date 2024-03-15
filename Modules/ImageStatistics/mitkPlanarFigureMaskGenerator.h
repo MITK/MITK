@@ -69,7 +69,7 @@ namespace mitk
     void CalculateMask();
 
     template <typename TPixel, unsigned int VImageDimension>
-    void InternalCalculateMaskFromPlanarFigure(const itk::Image<TPixel, VImageDimension> *image, unsigned int axis);
+    void InternalCalculateMaskFromClosedPlanarFigure(const itk::Image<TPixel, VImageDimension> *image, unsigned int axis);
 
     template <typename TPixel, unsigned int VImageDimension>
     void InternalCalculateMaskFromOpenPlanarFigure(const itk::Image<TPixel, VImageDimension> *image, unsigned int axis);

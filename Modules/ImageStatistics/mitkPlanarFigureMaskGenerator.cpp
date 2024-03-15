@@ -76,7 +76,7 @@ mitk::Image::ConstPointer PlanarFigureMaskGenerator::GetReferenceImage()
 }
 
 template < typename TPixel, unsigned int VImageDimension >
-void PlanarFigureMaskGenerator::InternalCalculateMaskFromPlanarFigure(
+void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
   const itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
 {
   typedef itk::Image< unsigned short, 2 > MaskImage2DType;
@@ -373,7 +373,6 @@ void PlanarFigureMaskGenerator::CalculateMask()
     m_InternalITKImageMask2D = nullptr;
     const PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
     const auto *planarFigureGeometry = dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
-    //const BaseGeometry *imageGeometry = m_inputImage->GetGeometry();
 
     // Find principal direction of PlanarFigure in input image
     unsigned int axis;
@@ -393,7 +392,6 @@ void PlanarFigureMaskGenerator::CalculateMask()
 
     // extract image slice which corresponds to the planarFigure and store it in m_InternalImageSlice
     mitk::Image::ConstPointer inputImageSlice = Extract2DImageSlice(timePointImage, axis, slice);
-    //mitk::IOUtil::Save(inputImageSlice, "/home/fabian/inputSliceImage.nrrd");
     // Compute mask from PlanarFigure
     // rastering for open planar figure:
     if ( !m_PlanarFigure->IsClosed() )
@@ -405,29 +403,21 @@ void PlanarFigureMaskGenerator::CalculateMask()
     else//for closed planar figure
     {
       AccessFixedDimensionByItk_1(inputImageSlice,
-                                  InternalCalculateMaskFromPlanarFigure,
+                                  InternalCalculateMaskFromClosedPlanarFigure,
                                   2, axis)
     }
 
     //convert itk mask to mitk::Image::Pointer and return it
     mitk::Image::Pointer planarFigureMaskImage;
     planarFigureMaskImage = mitk::GrabItkImageMemory(m_InternalITKImageMask2D);
-    //mitk::IOUtil::Save(planarFigureMaskImage, "/home/fabian/planarFigureMaskImage.nrrd");
-
-    //Convert2Dto3DImageFilter::Pointer sliceTo3DImageConverter = Convert2Dto3DImageFilter::New();
-    //sliceTo3DImageConverter->SetInput(planarFigureMaskImage);
-    //sliceTo3DImageConverter->Update();
-    //mitk::IOUtil::Save(sliceTo3DImageConverter->GetOutput(), "/home/fabian/3DsliceImage.nrrd");
 
     m_ReferenceImage = inputImageSlice;
-    //mitk::IOUtil::Save(m_ReferenceImage, "/home/fabian/referenceImage.nrrd");
     m_InternalMask = planarFigureMaskImage;
 }
 
 unsigned int PlanarFigureMaskGenerator::GetNumberOfMasks() const
 {
   return 1;
-        this->Modified();
 }
 
 mitk::Image::ConstPointer PlanarFigureMaskGenerator::DoGetMask(unsigned int)

@@ -38,7 +38,7 @@ protected:
   MultiLabelMaskGenerator() = default;
   ~MultiLabelMaskGenerator() = default;
 
-  Image::ConstPointer DoGetMask(unsigned int) override;
+  Image::ConstPointer DoGetMask(unsigned int maskID) override;
 
 private:
     mitk::LabelSetImage::ConstPointer m_MultiLabelSegmentation;

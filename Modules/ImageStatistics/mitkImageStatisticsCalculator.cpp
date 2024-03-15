@@ -113,13 +113,14 @@ namespace mitk
       {
         const unsigned int numbersOfMasks = m_MaskGenerator.IsNotNull() ? m_MaskGenerator->GetNumberOfMasks() : 1;
         auto timePoint = timeGeometry->TimeStepToTimePoint(timeStep);
-        //hard coded 0 is
-        //a workaround , open up a task refer to it that it should be removed
-        //  as soon as the secondary mask is removed anyways and solved by a generator chain.
+
+        // Hard coded maskID == 0 for secondary mask is a workaround.
+        // As soon as T30372 is done and it is solved by a generator chain,
+        // the complete secondary mask code is removed anyways.
         if (m_SecondaryMaskGenerator.IsNotNull())
         {
           if (m_SecondaryMaskGenerator->GetNumberOfMasks() != 1)
-            mitkThrow() << "Cannot generate secondary mask. ImageStatisticsCalculator does only support secondary mask generators with on mask. Number of masks provided: "
+            mitkThrow() << "Cannot generate secondary mask. ImageStatisticsCalculator does only support secondary mask generators with one mask. Number of masks provided: "
             << m_SecondaryMaskGenerator->GetNumberOfMasks();
           m_SecondaryMaskGenerator->SetTimePoint(timePoint);
           m_SecondaryMask = m_SecondaryMaskGenerator->GetMask(0);

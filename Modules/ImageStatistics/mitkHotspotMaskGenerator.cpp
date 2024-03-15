@@ -52,7 +52,7 @@ namespace mitk
 
             if ( m_InputImage->GetTimeGeometry()->IsValidTimePoint(m_TimePoint) )
             {
-              throw std::runtime_error( "Error: invalid time step!" );
+              throw std::runtime_error( "Error: invalid time point!" );
             }
 
             auto timeSliceImage = SelectImageByTimePoint(m_InputImage, m_TimePoint);

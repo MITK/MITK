@@ -400,12 +400,10 @@ bool QmitkViewNavigatorWidget::FillTreeList()
 
 void QmitkViewNavigatorWidget::FilterChanged()
 {
-    QString filterString = m_Controls.lineEdit->text();
     m_Controls.m_PluginTreeView->expandAll();
 
-    QString strPattern = "^*" + filterString;
-    QRegularExpression regExp(strPattern, QRegularExpression::CaseInsensitiveOption);
-
+    auto pattern = m_Controls.lineEdit->text();
+    QRegularExpression regExp(pattern, QRegularExpression::CaseInsensitiveOption);
     m_FilterProxyModel->setFilterRegularExpression(regExp);
 }
 

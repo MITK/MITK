@@ -38,7 +38,7 @@ namespace mitk
       CUDAError
     };
 
-    SegmentAnythingPythonService(std::string, std::string, std::string, unsigned int);
+    SegmentAnythingPythonService(std::string, std::string, std::string, unsigned int, std::string);
     ~SegmentAnythingPythonService();
     
     itkSetMacro(MitkTempDir, std::string);
@@ -128,6 +128,7 @@ namespace mitk
     std::string m_ModelType;
     std::string m_CheckpointPath;
     std::string m_InDir, m_OutDir;
+    std::string m_Backend;
     std::string m_CurrentUId;
     int m_GpuId = 0;
     const std::string PARENT_TEMP_DIR_PATTERN = "mitk-sam-XXXXXX";

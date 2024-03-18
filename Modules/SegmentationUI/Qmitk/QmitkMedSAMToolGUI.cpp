@@ -10,10 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSegmentAnythingToolGUI.h"
+#include "QmitkMedSAMToolGUI.h"
 
-#include <mitkSegmentAnythingTool.h>
-#include <mitkProcessExecutor.h>
+#include <mitkMedSAMTool.h>
 #include <QApplication>
 #include <QDir>
 #include <QmitkStyleManager.h>
@@ -23,7 +22,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 
-MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkSegmentAnythingToolGUI, "")
+MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkMedSAMToolGUI, "")
 
 namespace
 {
@@ -34,7 +33,7 @@ namespace
   }
 }
 
-QmitkSegmentAnythingToolGUI::QmitkSegmentAnythingToolGUI() : QmitkSegWithPreviewToolGUIBase(true)
+QmitkMedSAMToolGUI::QmitkMedSAMToolGUI() : QmitkSegWithPreviewToolGUIBase(true)
 {
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   {
@@ -48,21 +47,56 @@ QmitkSegmentAnythingToolGUI::QmitkSegmentAnythingToolGUI() : QmitkSegWithPreview
   };
   m_Preferences = GetPreferences();
   m_Preferences->OnPropertyChanged +=
-    mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI, const mitk::IPreferences::ChangeEvent &>(
-      this, &QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent);
+    mitk::MessageDelegate1<QmitkMedSAMToolGUI, const mitk::IPreferences::ChangeEvent &>(
+      this, &QmitkMedSAMToolGUI::OnPreferenceChangedEvent);
 }
 
-QmitkSegmentAnythingToolGUI::~QmitkSegmentAnythingToolGUI() 
+QmitkMedSAMToolGUI::~QmitkMedSAMToolGUI() 
 {
   auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
   if (nullptr != tool)
   {
-    tool->SAMStatusMessageEvent -= mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI, const std::string&>(
-      this, &QmitkSegmentAnythingToolGUI::StatusMessageListener);
+    tool->SAMStatusMessageEvent -=
+      mitk::MessageDelegate1<QmitkMedSAMToolGUI, const std::string &>(
+      this, &QmitkMedSAMToolGUI::StatusMessageListener);
   }
 }
 
-void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
+void QmitkMedSAMToolGUI::EnableAll(bool isEnable)
+{
+  m_Controls.activateButton->setEnabled(isEnable);
+}
+
+void QmitkMedSAMToolGUI::WriteStatusMessage(const QString &message)
+{
+  m_Controls.statusLabel->setText(message);
+  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: white");
+  qApp->processEvents();
+}
+
+void QmitkMedSAMToolGUI::WriteErrorMessage(const QString &message)
+{
+  m_Controls.statusLabel->setText(message);
+  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: red");
+  qApp->processEvents();
+}
+
+void QmitkMedSAMToolGUI::ShowProgressBar(bool enabled)
+{
+  m_Controls.samProgressBar->setEnabled(enabled);
+  m_Controls.samProgressBar->setVisible(enabled);
+}
+
+void QmitkMedSAMToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)
+{
+  this->setCursor(Qt::ArrowCursor);
+  QMessageBox *messageBox = new QMessageBox(icon, nullptr, message.c_str());
+  messageBox->exec();
+  delete messageBox;
+  MITK_WARN << message;
+}
+
+void QmitkMedSAMToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
@@ -70,12 +104,12 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   QString welcomeText;
   if (m_GpuLoader.GetGPUCount() != 0)
   {
-    welcomeText = "<b>STATUS: </b><i>Welcome to Segment Anything tool. You're in luck: " +
+    welcomeText = "<b>STATUS: </b><i>Welcome to MedSAM Anything tool. You're in luck: " +
                   QString::number(m_GpuLoader.GetGPUCount()) + " GPU(s) were detected.</i>";
   }
   else
   {
-    welcomeText = "<b>STATUS: </b><i>Welcome to Segment Anything tool. Sorry, " +
+    welcomeText = "<b>STATUS: </b><i>Welcome to MedSAM Anything tool. Sorry, " +
                   QString::number(m_GpuLoader.GetGPUCount()) + " GPUs were detected.</i>";
   }
   connect(m_Controls.activateButton, SIGNAL(clicked()), this, SLOT(OnActivateBtnClicked()));
@@ -93,7 +127,7 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   }
   else
   {
-    welcomeText += " SAM tool is not configured correctly. Please go to Preferences (Cntl+P) > Segment Anything to configure and/or install SAM.";
+    welcomeText += " MedSAM tool is not configured correctly. Please go to Preferences (Cntl+P) > Segment Anything to configure and/or install SAM.";
   }
   this->EnableAll(isInstalled);
   this->WriteStatusMessage(welcomeText);
@@ -103,7 +137,7 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   Superclass::InitializeUI(mainLayout);
 }
 
-bool QmitkSegmentAnythingToolGUI::ValidatePrefences()
+bool QmitkMedSAMToolGUI::ValidatePrefences()
 {
   const QString storageDir = QString::fromStdString(m_Preferences->Get("sam python path", ""));
   bool isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(storageDir);
@@ -112,35 +146,7 @@ bool QmitkSegmentAnythingToolGUI::ValidatePrefences()
   return (isInstalled && !modelType.empty() && !path.empty());
 }
 
-void QmitkSegmentAnythingToolGUI::EnableAll(bool isEnable)
-{
-  m_Controls.activateButton->setEnabled(isEnable);
-}
-
-void QmitkSegmentAnythingToolGUI::WriteStatusMessage(const QString &message)
-{
-  m_Controls.statusLabel->setText(message);
-  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: white");
-  qApp->processEvents();
-}
-
-void QmitkSegmentAnythingToolGUI::WriteErrorMessage(const QString &message)
-{
-  m_Controls.statusLabel->setText(message);
-  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: red");
-  qApp->processEvents();
-}
-
-void QmitkSegmentAnythingToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)
-{
-  this->setCursor(Qt::ArrowCursor);
-  QMessageBox *messageBox = new QMessageBox(icon, nullptr, message.c_str());
-  messageBox->exec();
-  delete messageBox;
-  MITK_WARN << message;
-}
-
-void QmitkSegmentAnythingToolGUI::StatusMessageListener(const std::string &message)
+void QmitkMedSAMToolGUI::StatusMessageListener(const std::string &message)
 {
   if (message.rfind("Error", 0) == 0)
   {
@@ -166,9 +172,35 @@ void QmitkSegmentAnythingToolGUI::StatusMessageListener(const std::string &messa
   }
 }
 
-void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
+bool QmitkMedSAMToolGUI::ActivateSAMDaemon()
 {
-  auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
+  auto tool = this->GetConnectedToolAs<mitk::MedSAMTool>();
+  if (nullptr == tool)
+  {
+    return false;
+  }
+  this->ShowProgressBar(true);
+  qApp->processEvents();
+  try
+  {
+    tool->InitSAMPythonProcess();
+    while (!tool->IsPythonReady())
+    {
+      qApp->processEvents();
+    }
+    tool->IsReadyOn();
+  }
+  catch (...)
+  {
+    tool->IsReadyOff();
+  }
+  this->ShowProgressBar(false);
+  return tool->GetIsReady();
+}
+
+void QmitkMedSAMToolGUI::OnActivateBtnClicked()
+{
+  auto tool = this->GetConnectedToolAs<mitk::MedSAMTool>();
   if (nullptr == tool)
   {
     return;
@@ -184,18 +216,16 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     }
     tool->SetPythonPath(pythonPath.toStdString());
     tool->SetGpuId(m_Preferences->GetInt("sam gpuid", -1));
-    const QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));  
-    tool->SetModelType(modelType.toStdString());
+    tool->SetModelType("vit_b");
     tool->SetTimeOutLimit(m_Preferences->GetInt("sam timeout", 300));
     tool->SetCheckpointPath(m_Preferences->Get("sam parent path", ""));
-    tool->SetBackend("SAM");
+    tool->SetBackend("MedSAM");
     this->WriteStatusMessage(
-      QString("<b>STATUS: </b><i>Initializing Segment Anything Model...</i>"));
-    tool->SAMStatusMessageEvent += mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI,const std::string&>(
-      this, &QmitkSegmentAnythingToolGUI::StatusMessageListener);
+      QString("<b>STATUS: </b><i>Initializing MedSAM...</i>"));
+    tool->SAMStatusMessageEvent += mitk::MessageDelegate1<QmitkMedSAMToolGUI, const std::string &>(this, &QmitkMedSAMToolGUI::StatusMessageListener);
     if (this->ActivateSAMDaemon())
     {
-      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Segment Anything tool initialized.</i>"));
+      this->WriteStatusMessage(QString("<b>STATUS: </b><i>MedSAM tool initialized.</i>"));
     }
     else
     {
@@ -221,79 +251,11 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
   }
 }
 
-bool QmitkSegmentAnythingToolGUI::ActivateSAMDaemon()
-{
-  auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
-  if (nullptr == tool)
-  {
-    return false;
-  }
-  this->ShowProgressBar(true);
-  qApp->processEvents();
-  try
-  {
-    tool->InitSAMPythonProcess();
-    while (!tool->IsPythonReady())
-    {
-      qApp->processEvents();
-    }
-    tool->IsReadyOn();
-  }
-  catch (...)
-  {
-    tool->IsReadyOff();
-  }
-  this->ShowProgressBar(false);
-  return tool->GetIsReady();
-}
-
-void QmitkSegmentAnythingToolGUI::ShowProgressBar(bool enabled)
-{
-  m_Controls.samProgressBar->setEnabled(enabled);
-  m_Controls.samProgressBar->setVisible(enabled);
-}
-
-bool QmitkSegmentAnythingToolGUI::IsSAMInstalled(const QString &pythonPath)
-{
-  QString fullPath = pythonPath;
-  bool isPythonExists = false;
-  bool isSamExists = false;
-#ifdef _WIN32
-  isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
-  if (!(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
-  {
-    fullPath += QDir::separator() + QString("Scripts");
-    isPythonExists =
-      (!isPythonExists) ? QFile::exists(fullPath + QDir::separator() + QString("python.exe")) : isPythonExists;
-  }
-#else
-  isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python3"));
-  if (!(fullPath.endsWith("bin", Qt::CaseInsensitive) || fullPath.endsWith("bin/", Qt::CaseInsensitive)))
-  {
-    fullPath += QDir::separator() + QString("bin");
-    isPythonExists =
-      (!isPythonExists) ? QFile::exists(fullPath + QDir::separator() + QString("python3")) : isPythonExists;
-  }
-#endif
-  isSamExists = QFile::exists(fullPath + QDir::separator() + QString("run_inference_daemon.py"));
-  bool isExists = isSamExists && isPythonExists;
-  return isExists;
-}
-
-void QmitkSegmentAnythingToolGUI::OnResetPicksClicked()
-{
-  auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
-  if (nullptr != tool)
-  {
-    tool->ClearPicks();
-  }
-}
-
-void QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent&)
+void QmitkMedSAMToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &)
 {
   this->EnableAll(true);
   this->WriteStatusMessage("A Preference change was detected. Please initialize the tool again.");
-  auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
+  auto tool = this->GetConnectedToolAs<mitk::MedSAMTool>();
   if (nullptr != tool)
   {
     tool->IsReadyOff();

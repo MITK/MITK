@@ -37,11 +37,12 @@ namespace mitk
 }
 
 mitk::SegmentAnythingPythonService::SegmentAnythingPythonService(
-  std::string workingDir, std::string modelType, std::string checkPointPath, unsigned int gpuId)
+  std::string workingDir, std::string modelType, std::string checkPointPath, unsigned int gpuId, std::string backend)
   : m_PythonPath(workingDir),
     m_ModelType(modelType),
     m_CheckpointPath(checkPointPath),
-    m_GpuId(gpuId)
+    m_GpuId(gpuId),
+    m_Backend(backend)
 {
   this->CreateTempDirs(PARENT_TEMP_DIR_PATTERN);
 }
@@ -158,6 +159,9 @@ void mitk::SegmentAnythingPythonService::start_python_daemon()
 
   args.push_back("--checkpoint");
   args.push_back(m_CheckpointPath);
+
+  args.push_back("--backend");
+  args.push_back(m_Backend);
 
   args.push_back("--device");
   if (m_GpuId == -1)

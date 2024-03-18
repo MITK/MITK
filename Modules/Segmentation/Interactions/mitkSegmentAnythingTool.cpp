@@ -119,7 +119,7 @@ void mitk::SegmentAnythingTool::InitSAMPythonProcess()
   }
   this->ClearPicks();
   m_PythonService = std::make_unique<mitk::SegmentAnythingPythonService>(
-    this->GetPythonPath(), this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId());
+    this->GetPythonPath(), this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId(), this->GetBackend());
   m_PythonService->StartAsyncProcess();
 }
 

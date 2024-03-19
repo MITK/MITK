@@ -11,3 +11,18 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkMultiLabelMaskGenerator.h>
+#include <mitkImageTimeSelector.h>
+
+unsigned int mitk::MultiLabelMaskGenerator::GetNumberOfMasks() const
+{
+  if (m_MultiLabelSegmentation.IsNull()) mitkThrow() << "Invalid state. Cannot get number of masks. MultiLabelSegmentation is not set.";
+  return m_MultiLabelSegmentation->GetNumberOfLayers();
+}
+
+mitk::Image::ConstPointer mitk::MultiLabelMaskGenerator::DoGetMask(unsigned int maskID)
+{
+  if (m_MultiLabelSegmentation.IsNull()) mitkThrow() << "Invalid state. Cannot get number of masks. MultiLabelSegmentation is not set.";
+
+  auto groupImage = m_MultiLabelSegmentation->GetGroupImage(maskID);
+  return SelectImageByTimePoint(groupImage, m_TimePoint);
+}

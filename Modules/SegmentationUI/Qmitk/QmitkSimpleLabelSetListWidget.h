@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include "mitkLabel.h"
 #include "mitkLabelSetImage.h"
+#include <mitkITKEventObserverGuard.h>
 #include <MitkSegmentationUIExports.h>
 #include <QListWidget>
 
@@ -51,14 +52,15 @@ protected:
   void OnLayerChanged();
   void OnLabelChanged(mitk::LabelSetImage::LabelValueType lv);
 
-  void OnLooseLabelSetConnection();
-  void OnEstablishLabelSetConnection();
-
   void ResetList();
 
   mitk::LabelSetImage::ConstPointer m_LabelSetImage;
   QListWidget* m_LabelList;
   bool m_Emmiting;
+
+  mitk::ITKEventObserverGuard m_LabelAddedObserver;
+  mitk::ITKEventObserverGuard m_LabelModifiedObserver;
+  mitk::ITKEventObserverGuard m_LabelRemovedObserver;
 };
 
 #endif

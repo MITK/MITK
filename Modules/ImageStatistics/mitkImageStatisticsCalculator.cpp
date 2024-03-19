@@ -90,7 +90,7 @@ namespace mitk
 
   double ImageStatisticsCalculator::GetBinSizeForHistogramStatistics() const { return m_binSizeForHistogramStatistics; }
 
-  mitk::ImageStatisticsContainer* ImageStatisticsCalculator::GetStatistics(LabelIndex label)
+  mitk::ImageStatisticsContainer* ImageStatisticsCalculator::GetStatistics()
   {
     if (m_Image.IsNull())
     {
@@ -102,93 +102,77 @@ namespace mitk
       mitkThrow() << "Image not initialized!";
     }
 
-    if (IsUpdateRequired(label))
+    if (IsUpdateRequired())
     {
       auto timeGeometry = m_Image->GetTimeGeometry();
+      m_StatisticContainer = ImageStatisticsContainer::New();
+      m_StatisticContainer->SetTimeGeometry(timeGeometry->Clone());
+
       // always compute statistics on all timesteps
-      for (unsigned int timeStep = 0; timeStep < m_Image->GetTimeSteps(); timeStep++)
+      for (TimeStepType timeStep = 0; timeStep < m_Image->GetTimeSteps(); timeStep++)
       {
-        if (m_MaskGenerator.IsNotNull())
+        const unsigned int numbersOfMasks = m_MaskGenerator.IsNotNull() ? m_MaskGenerator->GetNumberOfMasks() : 1;
+        auto timePoint = timeGeometry->TimeStepToTimePoint(timeStep);
+
+        // Hard coded maskID == 0 for secondary mask is a workaround.
+        // As soon as T30372 is done and it is solved by a generator chain,
+        // the complete secondary mask code is removed anyways.
+        if (m_SecondaryMaskGenerator.IsNotNull())
         {
-          m_MaskGenerator->SetTimeStep(timeStep);
-          //See T25625: otherwise, the mask is not computed again after setting a different time step
-          m_MaskGenerator->Modified();
-          m_InternalMask = m_MaskGenerator->GetMask();
-          if (m_MaskGenerator->GetReferenceImage().IsNotNull())
+          if (m_SecondaryMaskGenerator->GetNumberOfMasks() != 1)
+            mitkThrow() << "Cannot generate secondary mask. ImageStatisticsCalculator does only support secondary mask generators with one mask. Number of masks provided: "
+            << m_SecondaryMaskGenerator->GetNumberOfMasks();
+          m_SecondaryMaskGenerator->SetTimePoint(timePoint);
+          m_SecondaryMask = m_SecondaryMaskGenerator->GetMask(0);
+        }
+
+        for (unsigned int maskID = 0; maskID < numbersOfMasks; ++maskID)
+        {
+          if (m_MaskGenerator.IsNotNull())
           {
-            m_InternalImageForStatistics = m_MaskGenerator->GetReferenceImage();
+            m_MaskGenerator->SetTimePoint(timePoint);
+            m_InternalMask = m_MaskGenerator->GetMask(maskID);
+            if (m_MaskGenerator->GetReferenceImage().IsNotNull())
+            {
+              m_InternalImageForStatistics = m_MaskGenerator->GetReferenceImage();
+            }
+            else
+            {
+              m_InternalImageForStatistics = m_Image;
+            }
           }
           else
           {
             m_InternalImageForStatistics = m_Image;
           }
-        }
-        else
-        {
-          m_InternalImageForStatistics = m_Image;
-        }
 
-        if (m_SecondaryMaskGenerator.IsNotNull())
-        {
-          m_SecondaryMaskGenerator->SetTimeStep(timeStep);
-          m_SecondaryMask = m_SecondaryMaskGenerator->GetMask();
-        }
+          m_ImageTimeSlice = SelectImageByTimeStep(m_InternalImageForStatistics, timeStep);
 
-        ImageTimeSelector::Pointer imgTimeSel = ImageTimeSelector::New();
-        imgTimeSel->SetInput(m_InternalImageForStatistics);
-        imgTimeSel->SetTimeNr(timeStep);
-        imgTimeSel->UpdateLargestPossibleRegion();
-        imgTimeSel->Update();
-        m_ImageTimeSlice = imgTimeSel->GetOutput();
-
-        // Calculate statistics with/without mask
-        if (m_MaskGenerator.IsNull() && m_SecondaryMaskGenerator.IsNull())
-        {
-          // 1) calculate statistics unmasked:
-          AccessByItk_2(m_ImageTimeSlice, InternalCalculateStatisticsUnmasked, timeGeometry, timeStep)
-        }
-        else
-        {
-          // 2) calculate statistics masked
-          AccessByItk_2(m_ImageTimeSlice, InternalCalculateStatisticsMasked, timeGeometry, timeStep)
+          // Calculate statistics with/without mask
+          if (m_MaskGenerator.IsNull() && m_SecondaryMaskGenerator.IsNull())
+          {
+            // 1) calculate statistics unmasked:
+            AccessByItk_1(m_ImageTimeSlice, InternalCalculateStatisticsUnmasked, timeStep)
+          }
+          else
+          {
+            // 2) calculate statistics masked
+            AccessByItk_1(m_ImageTimeSlice, InternalCalculateStatisticsMasked, timeStep)
+          }
         }
       }
     }
 
-    auto it = m_StatisticContainers.find(label);
-    if (it != m_StatisticContainers.end())
-    {
-      return (it->second).GetPointer();
-    }
-    else
-    {
-      mitkThrow() << "unknown label";
-      return nullptr;
-    }
+    return m_StatisticContainer;
   }
 
   template <typename TPixel, unsigned int VImageDimension>
   void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
-    typename itk::Image<TPixel, VImageDimension> *image, const TimeGeometry *timeGeometry, TimeStepType timeStep)
+    const itk::Image<TPixel, VImageDimension> *image, TimeStepType timeStep)
   {
     typedef typename itk::Image<TPixel, VImageDimension> ImageType;
     typedef typename mitk::StatisticsImageFilter<ImageType> ImageStatisticsFilterType;
     typedef typename itk::MinMaxImageFilterWithIndex<ImageType> MinMaxFilterType;
-
-    // reset statistics container if exists
-    ImageStatisticsContainer::Pointer statisticContainerForImage;
-    LabelIndex labelNoMask = 1;
-    auto it = m_StatisticContainers.find(labelNoMask);
-    if (it != m_StatisticContainers.end())
-    {
-      statisticContainerForImage = it->second;
-    }
-    else
-    {
-      statisticContainerForImage = ImageStatisticsContainer::New();
-      statisticContainerForImage->SetTimeGeometry(const_cast<mitk::TimeGeometry*>(timeGeometry));
-      m_StatisticContainers.emplace(labelNoMask, statisticContainerForImage);
-    }
 
     auto statObj = ImageStatisticsContainer::ImageStatisticsObject();
 
@@ -258,30 +242,31 @@ namespace mitk
     auto rms =
       std::sqrt(std::pow(statisticsFilter->GetMean(), 2.) + statisticsFilter->GetVariance()); // variance = sigma^2
 
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::NUMBEROFVOXELS(),
+    statObj.AddStatistic(ImageStatisticsConstants::NUMBEROFVOXELS(),
                          static_cast<ImageStatisticsContainer::VoxelCountType>(numberOfPixels));
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::VOLUME(), volume);
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::MEAN(), statisticsFilter->GetMean());
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::MINIMUM(),
+    statObj.AddStatistic(ImageStatisticsConstants::VOLUME(), volume);
+    statObj.AddStatistic(ImageStatisticsConstants::MEAN(), statisticsFilter->GetMean());
+    statObj.AddStatistic(ImageStatisticsConstants::MINIMUM(),
                          static_cast<ImageStatisticsContainer::RealType>(statisticsFilter->GetMinimum()));
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::MAXIMUM(),
+    statObj.AddStatistic(ImageStatisticsConstants::MAXIMUM(),
                          static_cast<ImageStatisticsContainer::RealType>(statisticsFilter->GetMaximum()));
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::STANDARDDEVIATION(), statisticsFilter->GetSigma());
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::VARIANCE(), variance);
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::SKEWNESS(), statisticsFilter->GetSkewness());
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::KURTOSIS(), statisticsFilter->GetKurtosis());
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::RMS(), rms);
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::MPP(), statisticsFilter->GetMPP());
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::ENTROPY(), statisticsFilter->GetEntropy());
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::MEDIAN(), statisticsFilter->GetMedian());
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::UNIFORMITY(), statisticsFilter->GetUniformity());
-    statObj.AddStatistic(mitk::ImageStatisticsConstants::UPP(), statisticsFilter->GetUPP());
+    statObj.AddStatistic(ImageStatisticsConstants::STANDARDDEVIATION(), statisticsFilter->GetSigma());
+    statObj.AddStatistic(ImageStatisticsConstants::VARIANCE(), variance);
+    statObj.AddStatistic(ImageStatisticsConstants::SKEWNESS(), statisticsFilter->GetSkewness());
+    statObj.AddStatistic(ImageStatisticsConstants::KURTOSIS(), statisticsFilter->GetKurtosis());
+    statObj.AddStatistic(ImageStatisticsConstants::RMS(), rms);
+    statObj.AddStatistic(ImageStatisticsConstants::MPP(), statisticsFilter->GetMPP());
+    statObj.AddStatistic(ImageStatisticsConstants::ENTROPY(), statisticsFilter->GetEntropy());
+    statObj.AddStatistic(ImageStatisticsConstants::MEDIAN(), statisticsFilter->GetMedian());
+    statObj.AddStatistic(ImageStatisticsConstants::UNIFORMITY(), statisticsFilter->GetUniformity());
+    statObj.AddStatistic(ImageStatisticsConstants::UPP(), statisticsFilter->GetUPP());
     statObj.m_Histogram = statisticsFilter->GetHistogram();
-    statisticContainerForImage->SetStatisticsForTimeStep(timeStep, statObj);
+
+    m_StatisticContainer->SetStatistics(ImageStatisticsContainer::NO_MASK_LABEL_VALUE, timeStep, statObj);
   }
 
   template <typename TPixel, unsigned int VImageDimension>
-  double ImageStatisticsCalculator::GetVoxelVolume(typename itk::Image<TPixel, VImageDimension> *image) const
+  double ImageStatisticsCalculator::GetVoxelVolume(const itk::Image<TPixel, VImageDimension> *image) const
   {
     auto spacing = image->GetSpacing();
     double voxelVolume = 1.;
@@ -293,9 +278,8 @@ namespace mitk
   }
 
   template <typename TPixel, unsigned int VImageDimension>
-  void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(typename itk::Image<TPixel, VImageDimension> *image,
-                                                                    const TimeGeometry *timeGeometry,
-                                                                    unsigned int timeStep)
+  void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(const itk::Image<TPixel, VImageDimension> *image,
+    TimeStepType timeStep)
   {
     typedef itk::Image<TPixel, VImageDimension> ImageType;
     typedef itk::Image<MaskPixelType, VImageDimension> MaskType;
@@ -304,8 +288,8 @@ namespace mitk
     typedef MaskUtilities<TPixel, VImageDimension> MaskUtilType;
     typedef typename itk::MinMaxLabelImageFilterWithIndex<ImageType, MaskType> MinMaxLabelFilterType;
 
-    // workaround: if m_SecondaryMaskGenerator ist not null but m_MaskGenerator is! (this is the case if we request a
-    // 'ignore zuero valued pixels' mask in the gui but do not define a primary mask)
+    // workaround: if m_SecondaryMaskGenerator is not null but m_MaskGenerator is! (this is the case if we request a
+    // 'ignore zero valued pixels' mask in the gui but do not define a primary mask)
     bool swapMasks = false;
     if (m_SecondaryMask.IsNotNull() && m_InternalMask.IsNull())
     {
@@ -323,9 +307,8 @@ namespace mitk
       maskImage = ImageToItkImage<MaskPixelType, VImageDimension>(m_InternalMask);
     }
     catch (const itk::ExceptionObject &)
-
     {
-      typename MaskType::Pointer noneConstMaskImage; //needed to work arround the fact that CastToItkImage currently does not support const itk images.
+      typename MaskType::Pointer noneConstMaskImage; //needed to work around the fact that CastToItkImage currently does not support const itk images.
       // if the pixel type of the mask is not short, then we have to make a copy of m_InternalMask (and cast the values)
       CastToItkImage(m_InternalMask, noneConstMaskImage);
       maskImage = noneConstMaskImage;
@@ -339,9 +322,9 @@ namespace mitk
       if (m_InternalMask->GetDimension() == 2 &&
           (m_SecondaryMask->GetDimension() == 3 || m_SecondaryMask->GetDimension() == 4))
       {
-        mitk::Image::ConstPointer old_img = m_SecondaryMaskGenerator->GetReferenceImage();
+        Image::ConstPointer old_img = m_SecondaryMaskGenerator->GetReferenceImage();
         m_SecondaryMaskGenerator->SetInputImage(m_MaskGenerator->GetReferenceImage());
-        m_SecondaryMask = m_SecondaryMaskGenerator->GetMask();
+        m_SecondaryMask = m_SecondaryMaskGenerator->GetMask(0);
         m_SecondaryMaskGenerator->SetInputImage(old_img);
       }
       typename MaskType::ConstPointer secondaryMaskImage = MaskType::New();
@@ -417,25 +400,14 @@ namespace mitk
     imageStatisticsFilter->SetHistogramParameters(nBins, minVals, maxVals);
     imageStatisticsFilter->Update();
 
-    auto labels = imageStatisticsFilter->GetValidLabelValues();
-    auto it = labels.begin();
+    const auto labels = imageStatisticsFilter->GetValidLabelValues();
 
-    while (it != labels.end())
+    for (auto labelValue : labels)
     {
-      ImageStatisticsContainer::Pointer statisticContainerForLabelImage;
-      auto labelIt = m_StatisticContainers.find(*it);
-      // reset if statisticContainer already exist
-      if (labelIt != m_StatisticContainers.end())
+      if (labelValue == ImageStatisticsContainer::NO_MASK_LABEL_VALUE)
       {
-        statisticContainerForLabelImage = labelIt->second;
-      }
-      // create new statisticContainer
-      else
-      {
-        statisticContainerForLabelImage = ImageStatisticsContainer::New();
-        statisticContainerForLabelImage->SetTimeGeometry(const_cast<mitk::TimeGeometry*>(timeGeometry));
-        // link label (*it) to statisticContainer
-        m_StatisticContainers.emplace(*it, statisticContainerForLabelImage);
+        //we ignore the background of a mask if we compute mask statistics.
+        continue;
       }
 
       ImageStatisticsContainer::ImageStatisticsObject statObj;
@@ -444,12 +416,12 @@ namespace mitk
       // make sure to only look in the masked region, use a masker for this
 
       vnl_vector<int> minIndex, maxIndex;
-      mitk::Point3D worldCoordinateMin;
-      mitk::Point3D worldCoordinateMax;
-      mitk::Point3D indexCoordinateMin;
-      mitk::Point3D indexCoordinateMax;
-      m_InternalImageForStatistics->GetGeometry()->IndexToWorld(minMaxFilter->GetMinIndex(*it), worldCoordinateMin);
-      m_InternalImageForStatistics->GetGeometry()->IndexToWorld(minMaxFilter->GetMaxIndex(*it), worldCoordinateMax);
+      Point3D worldCoordinateMin;
+      Point3D worldCoordinateMax;
+      Point3D indexCoordinateMin;
+      Point3D indexCoordinateMax;
+      m_InternalImageForStatistics->GetGeometry()->IndexToWorld(minMaxFilter->GetMinIndex(labelValue), worldCoordinateMin);
+      m_InternalImageForStatistics->GetGeometry()->IndexToWorld(minMaxFilter->GetMaxIndex(labelValue), worldCoordinateMax);
       m_Image->GetGeometry()->WorldToIndex(worldCoordinateMin, indexCoordinateMin);
       m_Image->GetGeometry()->WorldToIndex(worldCoordinateMax, indexCoordinateMax);
 
@@ -463,37 +435,40 @@ namespace mitk
         maxIndex[i] = indexCoordinateMax[i];
       }
 
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::MINIMUMPOSITION(), minIndex);
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::MAXIMUMPOSITION(), maxIndex);
+      statObj.AddStatistic(ImageStatisticsConstants::MINIMUMPOSITION(), minIndex);
+      statObj.AddStatistic(ImageStatisticsConstants::MAXIMUMPOSITION(), maxIndex);
 
       auto voxelVolume = GetVoxelVolume<TPixel, VImageDimension>(image);
       auto numberOfVoxels =
-        static_cast<unsigned long>(imageStatisticsFilter->GetCount(*it));
+        static_cast<unsigned long>(imageStatisticsFilter->GetCount(labelValue));
       auto volume = static_cast<double>(numberOfVoxels) * voxelVolume;
-      auto rms = std::sqrt(std::pow(imageStatisticsFilter->GetMean(*it), 2.) +
-                           imageStatisticsFilter->GetVariance(*it)); // variance = sigma^2
-      auto variance = imageStatisticsFilter->GetSigma(*it) * imageStatisticsFilter->GetSigma(*it);
+      auto rms = std::sqrt(std::pow(imageStatisticsFilter->GetMean(labelValue), 2.) +
+                           imageStatisticsFilter->GetVariance(labelValue)); // variance = sigma^2
+      auto variance = imageStatisticsFilter->GetSigma(labelValue) * imageStatisticsFilter->GetSigma(labelValue);
 
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::NUMBEROFVOXELS(), numberOfVoxels);
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::VOLUME(), volume);
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::MEAN(), imageStatisticsFilter->GetMean(*it));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::MINIMUM(),
-        static_cast<ImageStatisticsContainer::RealType>(imageStatisticsFilter->GetMinimum(*it)));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::MAXIMUM(),
-        static_cast<ImageStatisticsContainer::RealType>(imageStatisticsFilter->GetMaximum(*it)));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::STANDARDDEVIATION(), imageStatisticsFilter->GetSigma(*it));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::VARIANCE(), variance);
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::SKEWNESS(), imageStatisticsFilter->GetSkewness(*it));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::KURTOSIS(), imageStatisticsFilter->GetKurtosis(*it));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::RMS(), rms);
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::MPP(), imageStatisticsFilter->GetMPP(*it));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::ENTROPY(), imageStatisticsFilter->GetEntropy(*it));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::MEDIAN(), imageStatisticsFilter->GetMedian(*it));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::UNIFORMITY(), imageStatisticsFilter->GetUniformity(*it));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::UPP(), imageStatisticsFilter->GetUPP(*it));
-      statObj.m_Histogram = imageStatisticsFilter->GetHistogram(*it);
-      statisticContainerForLabelImage->SetStatisticsForTimeStep(timeStep, statObj);
-      ++it;
+      statObj.AddStatistic(ImageStatisticsConstants::NUMBEROFVOXELS(), numberOfVoxels);
+      statObj.AddStatistic(ImageStatisticsConstants::VOLUME(), volume);
+      statObj.AddStatistic(ImageStatisticsConstants::MEAN(), imageStatisticsFilter->GetMean(labelValue));
+      statObj.AddStatistic(ImageStatisticsConstants::MINIMUM(),
+        static_cast<ImageStatisticsContainer::RealType>(imageStatisticsFilter->GetMinimum(labelValue)));
+      statObj.AddStatistic(ImageStatisticsConstants::MAXIMUM(),
+        static_cast<ImageStatisticsContainer::RealType>(imageStatisticsFilter->GetMaximum(labelValue)));
+      statObj.AddStatistic(ImageStatisticsConstants::STANDARDDEVIATION(), imageStatisticsFilter->GetSigma(labelValue));
+      statObj.AddStatistic(ImageStatisticsConstants::VARIANCE(), variance);
+      statObj.AddStatistic(ImageStatisticsConstants::SKEWNESS(), imageStatisticsFilter->GetSkewness(labelValue));
+      statObj.AddStatistic(ImageStatisticsConstants::KURTOSIS(), imageStatisticsFilter->GetKurtosis(labelValue));
+      statObj.AddStatistic(ImageStatisticsConstants::RMS(), rms);
+      statObj.AddStatistic(ImageStatisticsConstants::MPP(), imageStatisticsFilter->GetMPP(labelValue));
+      statObj.AddStatistic(ImageStatisticsConstants::ENTROPY(), imageStatisticsFilter->GetEntropy(labelValue));
+      statObj.AddStatistic(ImageStatisticsConstants::MEDIAN(), imageStatisticsFilter->GetMedian(labelValue));
+      statObj.AddStatistic(ImageStatisticsConstants::UNIFORMITY(), imageStatisticsFilter->GetUniformity(labelValue));
+      statObj.AddStatistic(ImageStatisticsConstants::UPP(), imageStatisticsFilter->GetUPP(labelValue));
+      statObj.m_Histogram = imageStatisticsFilter->GetHistogram(labelValue);
+
+      if (m_StatisticContainer->StatisticsExist(labelValue, timeStep))
+        mitkThrow() << "Invalid state/input data. Statistic for a specific label/time step pair was computed more then once. Conflicting label ID: "
+        << labelValue << " ; conflicting time step: " << timeStep;
+      m_StatisticContainer->SetStatistics(labelValue, timeStep, statObj);
     }
 
     // swap maskGenerators back
@@ -504,18 +479,17 @@ namespace mitk
     }
   }
 
-  bool ImageStatisticsCalculator::IsUpdateRequired(LabelIndex label) const
+  bool ImageStatisticsCalculator::IsUpdateRequired() const
   {
-    unsigned long thisClassTimeStamp = this->GetMTime();
-    unsigned long inputImageTimeStamp = m_Image->GetMTime();
+    const auto thisClassTimeStamp = this->GetMTime();
+    const auto inputImageTimeStamp = m_Image->GetMTime();
 
-    auto it = m_StatisticContainers.find(label);
-    if (it == m_StatisticContainers.end())
+    if (m_StatisticContainer.IsNull())
     {
       return true;
     }
 
-    unsigned long statisticsTimeStamp = it->second->GetMTime();
+    const auto statisticsTimeStamp = m_StatisticContainer->GetMTime();
 
     if (thisClassTimeStamp > statisticsTimeStamp) // inputs have changed
     {
@@ -529,7 +503,7 @@ namespace mitk
 
     if (m_MaskGenerator.IsNotNull())
     {
-      unsigned long maskGeneratorTimeStamp = m_MaskGenerator->GetMTime();
+      const auto maskGeneratorTimeStamp = m_MaskGenerator->GetMTime();
       if (maskGeneratorTimeStamp > statisticsTimeStamp) // there is a mask generator and it has changed
       {
         return true;
@@ -538,7 +512,7 @@ namespace mitk
 
     if (m_SecondaryMaskGenerator.IsNotNull())
     {
-      unsigned long maskGeneratorTimeStamp = m_SecondaryMaskGenerator->GetMTime();
+      const auto maskGeneratorTimeStamp = m_SecondaryMaskGenerator->GetMTime();
       if (maskGeneratorTimeStamp > statisticsTimeStamp) // there is a secondary mask generator and it has changed
       {
         return true;

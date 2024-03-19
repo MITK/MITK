@@ -299,22 +299,31 @@ void QmitkSegmentationView::AddObserversToWorkingImage()
 
   if (workingImage != nullptr)
   {
-    workingImage->AddLabelAddedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelAdded));
-    workingImage->AddLabelRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelRemoved));
-    workingImage->AddGroupRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::GroupIndexType>(this, &Self::OnGroupRemoved));
+    auto& widget = *this;
+    m_LabelAddedObserver.Reset(workingImage, mitk::LabelAddedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelAdded(labelEvent->GetLabelValue());
+      });
+    m_LabelRemovedObserver.Reset(workingImage, mitk::LabelRemovedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelRemoved(labelEvent->GetLabelValue());
+      });
+
+    m_GroupRemovedObserver.Reset(workingImage, mitk::GroupRemovedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto groupEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&event);
+        widget.OnGroupRemoved(groupEvent->GetGroupID());
+      });
   }
 }
 
 void QmitkSegmentationView::RemoveObserversFromWorkingImage()
 {
-  auto* workingImage = this->GetWorkingImage();
-
-  if (workingImage != nullptr)
-  {
-    workingImage->RemoveLabelAddedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelAdded));
-    workingImage->RemoveLabelRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelRemoved));
-    workingImage->RemoveGroupRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::GroupIndexType>(this, &Self::OnGroupRemoved));
-  }
+  m_LabelAddedObserver.Reset();
+  m_LabelRemovedObserver.Reset();
+  m_GroupRemovedObserver.Reset();
 }
 
 void QmitkSegmentationView::OnVisibilityShortcutActivated()
@@ -345,8 +354,18 @@ void QmitkSegmentationView::OnLabelToggleShortcutActivated()
   }
 
   this->WaitCursorOn();
-  workingImage->GetActiveLabelSet()->SetNextActiveLabel();
-  workingImage->Modified();
+  auto labels = workingImage->GetLabelValuesByGroup(workingImage->GetActiveLayer());
+  auto it = std::find(labels.begin(), labels.end(), workingImage->GetActiveLabel()->GetValue());
+
+  if (it != labels.end())
+    ++it;
+
+  if (it == labels.end())
+  {
+    it = labels.begin();
+  }
+
+  workingImage->SetActiveLabel(*it);
   this->WaitCursorOff();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -417,7 +436,7 @@ void QmitkSegmentationView::OnNewSegmentation()
     if (!m_DefaultLabelNaming)
       QmitkNewSegmentationDialog::DoRenameLabel(newLabel, nullptr, m_Parent);
 
-    newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
+    newLabelSetImage->AddLabel(newLabel, newLabelSetImage->GetActiveLayer());
   }
 
   if (!this->GetDataStorage()->Exists(newSegmentationNode))
@@ -484,12 +503,12 @@ void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManage
   auto segmentation = this->GetCurrentSegmentation();
 
   const auto labelValue = labels.front();
-  const auto groupID = segmentation->GetGroupIndexOfLabel(labelValue);
-  if (groupID != segmentation->GetActiveLayer()) segmentation->SetActiveLayer(groupID);
-  if (labelValue != segmentation->GetActiveLabelSet()->GetActiveLabel()->GetValue()) segmentation->GetActiveLabelSet()->SetActiveLabel(labelValue);
-
-  segmentation->Modified();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if (nullptr == segmentation->GetActiveLabel() || labelValue != segmentation->GetActiveLabel()->GetValue())
+  {
+    segmentation->SetActiveLabel(labelValue);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  m_Controls->slicesInterpolator->SetActiveLabelValue(labelValue);
 }
 
 void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType /*label*/, const mitk::Point3D& pos)
@@ -784,7 +803,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   context->ungetService(ppmRef);
   service = nullptr;
 
-  mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+  auto image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
   mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
 }
 
@@ -1029,11 +1048,16 @@ void QmitkSegmentationView::ValidateSelectionInput()
     if (numberOfLabels > 0)
       m_Controls->slicesInterpolator->setEnabled(true);
 
-    m_Controls->multiLabelWidget->SetMultiLabelSegmentation(dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData()));
+    m_Controls->multiLabelWidget->SetMultiLabelNode(workingNode);
+
+    if (!m_Controls->multiLabelWidget->GetSelectedLabels().empty())
+    {
+      m_Controls->slicesInterpolator->SetActiveLabelValue(m_Controls->multiLabelWidget->GetSelectedLabels().front());
+    }
   }
   else
   {
-    m_Controls->multiLabelWidget->SetMultiLabelSegmentation(nullptr);
+    m_Controls->multiLabelWidget->SetMultiLabelNode(nullptr);
   }
 
   toolSelectionBoxesEnabled &= numberOfLabels > 0;

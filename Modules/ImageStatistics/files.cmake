@@ -4,7 +4,8 @@ set(CPP_FILES
   mitkPointSetStatisticsCalculator.cpp
   mitkPointSetDifferenceStatisticsCalculator.cpp
   mitkIntensityProfile.cpp
-  mitkHotspotMaskGenerator.cpp
+  #See T30375
+  #mitkHotspotMaskGenerator.cpp
   mitkMaskGenerator.cpp
   mitkPlanarFigureMaskGenerator.cpp
   mitkMultiLabelMaskGenerator.cpp

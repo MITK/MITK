@@ -97,7 +97,8 @@ private:
     /* builds a hierarchical tree model for the image statistics
     1. Level: Image
     --> 2. Level: Mask [if exist]
-        --> 3. Level: Timestep [if >1 exist] */
+        --> 3. Level: Label instances [if Mask has more then one label]
+           --> 4. Level: Timestep [if >1 exist] */
     void BuildHierarchicalModel();
 
     StatisticsContainerVector m_Statistics;
@@ -117,8 +118,9 @@ private:
     std::vector<std::string> m_StatisticNames;
 
     std::mutex m_Mutex;
-    QmitkImageStatisticsTreeItem *m_RootItem;
+    std::unique_ptr<QmitkImageStatisticsTreeItem> m_RootItem;
     QVariant m_HeaderFirstColumn;
+    itk::TimeStamp m_BuildTime;
 
     bool m_IgnoreZeroValueVoxel = false;
     unsigned int m_HistogramNBins = 100;

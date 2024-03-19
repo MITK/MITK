@@ -1,4 +1,5 @@
 set(enabled_modules
+  Log
   Core
   CppMicroServices
   DICOM

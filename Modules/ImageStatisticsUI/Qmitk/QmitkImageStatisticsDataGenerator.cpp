@@ -69,7 +69,7 @@ bool QmitkImageStatisticsDataGenerator::ChangedNodeIsRelevant(const mitk::DataNo
     if (changedNode->GetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str()) == nullptr)
     {
       auto stats = dynamic_cast<const mitk::ImageStatisticsContainer*>(changedNode->GetData());
-      result = stats != nullptr;
+      result = stats != nullptr && stats->GetMTime()> this->m_GenerationTime.GetMTime();
     }
   }
   return result;
@@ -124,6 +124,7 @@ void QmitkImageStatisticsDataGenerator::IndicateFutureResults(const mitk::DataNo
   if (resultDataNode.IsNull())
   {
     auto dummyStats = mitk::ImageStatisticsContainer::New();
+    dummyStats->SetTimeGeometry(image->GetTimeGeometry()->Clone());
 
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
     imageRule->Connect(dummyStats, image);
@@ -166,17 +167,15 @@ std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer> QmitkImageStatis
       mitkThrow() << "Image node date is nullptr or no image.";
     }
 
-    const mitk::Image* mask = nullptr;
-    const mitk::PlanarFigure* planar = nullptr;
+    const mitk::BaseData* mask = nullptr;
     if (roiNode != nullptr)
     {
-      mask = dynamic_cast<const mitk::Image*>(roiNode->GetData());
-      planar = dynamic_cast<const mitk::PlanarFigure*>(roiNode->GetData());
+      mask = roiNode->GetData();
     }
 
     auto newJob = new QmitkImageStatisticsCalculationRunnable;
 
-    newJob->Initialize(image, mask, planar);
+    newJob->Initialize(image, mask);
     newJob->SetIgnoreZeroValueVoxel(m_IgnoreZeroValueVoxel);
     newJob->SetHistogramNBins(m_HistogramNBins);
 
@@ -233,13 +232,8 @@ mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::PrepareResultForStora
     resultNode->SetProperty("helper object", mitk::BoolProperty::New(true));
     resultNode->SetVisibility(false);
     resultNode->SetData(result);
-    
-    const mitk::BaseData* roi = statsJob->GetMaskImage();
-    if (roi == nullptr)
-    {
-      roi = statsJob->GetPlanarFigure();
-    }
-    resultNode->SetName(this->GenerateStatisticsNodeName(statsJob->GetStatisticsImage(), roi));
+
+    resultNode->SetName(this->GenerateStatisticsNodeName(statsJob->GetStatisticsImage(), statsJob->GetMaskData()));
 
     return resultNode;
   }

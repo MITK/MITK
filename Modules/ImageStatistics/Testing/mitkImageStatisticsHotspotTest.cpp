@@ -544,7 +544,7 @@ struct mitkImageStatisticsHotspotTestClass
       MITK_DEBUG << "Masking is set to hotspot only";
     }
 
-    return statisticsCalculator->GetStatistics()->GetStatisticsForTimeStep(0);
+    return statisticsCalculator->GetStatistics()->GetStatistics(label,0);
   }
 
   static void ValidateStatisticsItem(const std::string& label, double testvalue, double reference, double tolerance)

@@ -76,7 +76,7 @@ mitk::Image::ConstPointer PlanarFigureMaskGenerator::GetReferenceImage()
 }
 
 template < typename TPixel, unsigned int VImageDimension >
-void PlanarFigureMaskGenerator::InternalCalculateMaskFromPlanarFigure(
+void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
   const itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
 {
   typedef itk::Image< unsigned short, 2 > MaskImage2DType;
@@ -96,7 +96,7 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromPlanarFigure(
   // a vtkImageStencil.
   const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
   const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
-  const mitk::BaseGeometry *imageGeometry3D = m_inputImage->GetGeometry( 0 );
+  const mitk::BaseGeometry *imageGeometry3D = m_InputImage->GetGeometry( 0 );
   // If there is a second poly line in a closed planar figure, treat it as a hole.
   PlanarFigure::PolyLineType planarFigureHolePolyline;
 
@@ -255,7 +255,7 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
   // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
   const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
   const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
-  const mitk::BaseGeometry *imageGeometry3D = m_inputImage->GetGeometry( 0 );
+  const mitk::BaseGeometry *imageGeometry3D = m_InputImage->GetGeometry( 0 );
 
   // Determine x- and y-dimensions depending on principal axis
   // TODO use plane geometry normal to determine that automatically, then check whether the PF is aligned with one of the three principal axis
@@ -350,44 +350,29 @@ bool PlanarFigureMaskGenerator::GetPrincipalAxis(
 
 void PlanarFigureMaskGenerator::CalculateMask()
 {
-    if (m_inputImage.IsNull())
+    if (m_InputImage.IsNull())
     {
-        MITK_ERROR << "Image is not set.";
+      mitkThrow() << "Image is not set.";
     }
 
     if (m_PlanarFigure.IsNull())
     {
-        MITK_ERROR << "PlanarFigure is not set.";
+      mitkThrow() << "PlanarFigure is not set.";
     }
 
-    if (m_TimeStep != 0)
-    {
-        MITK_WARN << "Multiple TimeSteps are not supported in PlanarFigureMaskGenerator (yet).";
-    }
-
-    const BaseGeometry *imageGeometry = m_inputImage->GetGeometry();
+    const BaseGeometry *imageGeometry = m_InputImage->GetGeometry();
     if ( imageGeometry == nullptr )
     {
-      throw std::runtime_error( "Image geometry invalid!" );
+      mitkThrow() << "Image geometry invalid!";
     }
 
-    if (m_inputImage->GetTimeSteps() > 0)
-    {
-        mitk::ImageTimeSelector::Pointer imgTimeSel = mitk::ImageTimeSelector::New();
-        imgTimeSel->SetInput(m_inputImage);
-        imgTimeSel->SetTimeNr(m_TimeStep);
-        imgTimeSel->UpdateLargestPossibleRegion();
-        m_InternalTimeSliceImage = imgTimeSel->GetOutput();
-    }
-    else
-    {
-        m_InternalTimeSliceImage = m_inputImage;
-    }
+    auto timePointImage = SelectImageByTimePoint(m_InputImage, m_TimePoint);
+
+    if (timePointImage.IsNull()) mitkThrow() << "Cannot generate mask. Passed time point is not supported by input image.";
 
     m_InternalITKImageMask2D = nullptr;
     const PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
     const auto *planarFigureGeometry = dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
-    //const BaseGeometry *imageGeometry = m_inputImage->GetGeometry();
 
     // Find principal direction of PlanarFigure in input image
     unsigned int axis;
@@ -406,8 +391,7 @@ void PlanarFigureMaskGenerator::CalculateMask()
     m_PlanarFigureSlice = slice;
 
     // extract image slice which corresponds to the planarFigure and store it in m_InternalImageSlice
-    mitk::Image::ConstPointer inputImageSlice = extract2DImageSlice(axis, slice);
-    //mitk::IOUtil::Save(inputImageSlice, "/home/fabian/inputSliceImage.nrrd");
+    mitk::Image::ConstPointer inputImageSlice = Extract2DImageSlice(timePointImage, axis, slice);
     // Compute mask from PlanarFigure
     // rastering for open planar figure:
     if ( !m_PlanarFigure->IsClosed() )
@@ -419,34 +403,24 @@ void PlanarFigureMaskGenerator::CalculateMask()
     else//for closed planar figure
     {
       AccessFixedDimensionByItk_1(inputImageSlice,
-                                  InternalCalculateMaskFromPlanarFigure,
+                                  InternalCalculateMaskFromClosedPlanarFigure,
                                   2, axis)
     }
 
     //convert itk mask to mitk::Image::Pointer and return it
     mitk::Image::Pointer planarFigureMaskImage;
     planarFigureMaskImage = mitk::GrabItkImageMemory(m_InternalITKImageMask2D);
-    //mitk::IOUtil::Save(planarFigureMaskImage, "/home/fabian/planarFigureMaskImage.nrrd");
-
-    //Convert2Dto3DImageFilter::Pointer sliceTo3DImageConverter = Convert2Dto3DImageFilter::New();
-    //sliceTo3DImageConverter->SetInput(planarFigureMaskImage);
-    //sliceTo3DImageConverter->Update();
-    //mitk::IOUtil::Save(sliceTo3DImageConverter->GetOutput(), "/home/fabian/3DsliceImage.nrrd");
 
     m_ReferenceImage = inputImageSlice;
-    //mitk::IOUtil::Save(m_ReferenceImage, "/home/fabian/referenceImage.nrrd");
     m_InternalMask = planarFigureMaskImage;
 }
 
-void PlanarFigureMaskGenerator::SetTimeStep(unsigned int timeStep)
+unsigned int PlanarFigureMaskGenerator::GetNumberOfMasks() const
 {
-    if (timeStep != m_TimeStep)
-    {
-        m_TimeStep = timeStep;
-    }
+  return 1;
 }
 
-mitk::Image::ConstPointer PlanarFigureMaskGenerator::GetMask()
+mitk::Image::ConstPointer PlanarFigureMaskGenerator::DoGetMask(unsigned int)
 {
     if (IsUpdateRequired())
     {
@@ -458,15 +432,15 @@ mitk::Image::ConstPointer PlanarFigureMaskGenerator::GetMask()
     return m_InternalMask;
 }
 
-mitk::Image::ConstPointer PlanarFigureMaskGenerator::extract2DImageSlice(unsigned int axis, unsigned int slice)
+mitk::Image::ConstPointer PlanarFigureMaskGenerator::Extract2DImageSlice(const Image* input, unsigned int axis, unsigned int slice) const
 {
     // Extract slice with given position and direction from image
-    unsigned int dimension = m_InternalTimeSliceImage->GetDimension();
+    unsigned int dimension = input->GetDimension();
 
     if (dimension == 3)
     {
       ExtractImageFilter::Pointer imageExtractor = ExtractImageFilter::New();
-      imageExtractor->SetInput( m_InternalTimeSliceImage );
+      imageExtractor->SetInput( input );
       imageExtractor->SetSliceDimension( axis );
       imageExtractor->SetSliceIndex( slice );
       imageExtractor->Update();
@@ -474,7 +448,7 @@ mitk::Image::ConstPointer PlanarFigureMaskGenerator::extract2DImageSlice(unsigne
     }
     else if(dimension == 2)
     {
-      return m_InternalTimeSliceImage;
+      return input;
     }
     else
     {
@@ -488,7 +462,7 @@ bool PlanarFigureMaskGenerator::IsUpdateRequired() const
     unsigned long thisClassTimeStamp = this->GetMTime();
     unsigned long internalMaskTimeStamp = m_InternalMask->GetMTime();
     unsigned long planarFigureTimeStamp = m_PlanarFigure->GetMTime();
-    unsigned long inputImageTimeStamp = m_inputImage->GetMTime();
+    unsigned long inputImageTimeStamp = m_InputImage->GetMTime();
 
     if (thisClassTimeStamp > m_InternalMaskUpdateTime) // inputs have changed
     {

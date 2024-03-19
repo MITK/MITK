@@ -34,12 +34,11 @@ static void ConvertLabelSetImageToImage(const itk::Image<TPixel, VDimension> *,
   if (numberOfLayers > 1)
   {
     auto vectorImageComposer = ComposeFilterType::New();
-    auto activeLayer = labelSetImage->GetActiveLayer();
 
     for (decltype(numberOfLayers) layer = 0; layer < numberOfLayers; ++layer)
     {
       auto layerImage = mitk::ImageToItkImage<TPixel, VDimension>(
-        layer != activeLayer ? labelSetImage->GetLayerImage(layer) : labelSetImage);
+        labelSetImage->GetGroupImage(layer));
 
       vectorImageComposer->SetInput(layer, layerImage);
     }
@@ -75,7 +74,7 @@ mitk::Image::Pointer mitk::ConvertLabelSetImageToImage(LabelSetImage::ConstPoint
     }
     else
     {
-      AccessByItk_2(labelSetImage->GetLayerImage(0), ::ConvertLabelSetImageToImage, labelSetImage, image);
+      AccessByItk_2(labelSetImage->GetGroupImage(0), ::ConvertLabelSetImageToImage, labelSetImage, image);
     }
 
     image->SetTimeGeometry(labelSetImage->GetTimeGeometry()->Clone());
@@ -177,22 +176,19 @@ mitk::LabelSetImage::Pointer mitk::ConvertImageVectorToLabelSetImage(const std::
   return labelSetImage;
 }
 
-mitk::LabelSet::Pointer mitk::GenerateLabelSetWithMappedValues(const LabelSet* sourceLabelset, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping)
+mitk::LabelSetImage::LabelVectorType mitk::GenerateLabelSetWithMappedValues(const LabelSetImage::ConstLabelVectorType& sourceLabelset, LabelValueMappingVector labelMapping)
 {
-  if (nullptr == sourceLabelset)
+  LabelSetImage::LabelVectorType result;
+
+  for (auto oldLabel : sourceLabelset)
   {
-    mitkThrow() << "Invalid usage; nullptr passed as labelset to GenerateLabelSetWithMappedValues.";
+    auto finding = std::find_if(labelMapping.begin(), labelMapping.end(), [oldLabel](const std::pair<Label::PixelType, Label::PixelType>& mapping) {return oldLabel->GetValue() == mapping.first; });
+    if (finding != labelMapping.end())
+    {
+      auto clonedLabel = oldLabel->Clone();
+      clonedLabel->SetValue(finding->second);
+      result.push_back(clonedLabel);
+    }
   }
-
-  auto result = LabelSet::New();
-
-  for (auto [sourceLabelID, destLabelID] : labelMapping)
-  {
-    auto clonedLabel = sourceLabelset->GetLabel(sourceLabelID)->Clone();
-    clonedLabel->SetValue(destLabelID);
-    result->AddLabel(clonedLabel, false);
-  }
-  result->SetLayer(sourceLabelset->GetLayer());
-
   return result;
 }

@@ -49,6 +49,8 @@ public:
 
   std::string GetLastErrorMessage() const;
 
+  bool IsRunning() const;
+
 signals:
     void Error(QString err, const QmitkDataGenerationJobBase* job);
     /*! @brief Signal is emitted when results are available. 
@@ -69,6 +71,7 @@ protected:
 
 private:
   bool m_ComputationSuccessful = false;
+  bool m_IsRunning = false;
 };
 
 #endif

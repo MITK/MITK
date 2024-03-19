@@ -137,14 +137,25 @@ namespace mitk
       {
         auto command = itk::SimpleMemberCommand<WeakPointer>::New();
         command->SetCallbackFunction(this, &WeakPointer::OnDeleteEvent);
-        m_ObserverTag = m_RawPointer->AddObserver(itk::DeleteEvent(), command);
+
+        using TWithoutConst = typename std::remove_const<T>::type;
+        //cast the pointer to non const before adding the observer. This is done to ensure that
+        //weak pointer also supports const pointers.
+        auto nonConstPointer = const_cast<TWithoutConst*>(m_RawPointer);
+        m_ObserverTag = nonConstPointer->AddObserver(itk::DeleteEvent(), command);
       }
     }
 
     void RemoveDeleteEventObserver()
     {
       if (nullptr != m_RawPointer)
-        m_RawPointer->RemoveObserver(m_ObserverTag);
+      {
+        using TWithoutConst = typename std::remove_const<T>::type;
+        //cast the pointer to non const before removing the observer. This is done to ensure that
+        //weak pointer also supports const pointers.
+        auto nonConstPointer = const_cast<TWithoutConst*>(m_RawPointer);
+        nonConstPointer->RemoveObserver(m_ObserverTag);
+      }
     }
 
     void OnDeleteEvent() noexcept

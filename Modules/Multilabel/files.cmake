@@ -1,6 +1,5 @@
 set(CPP_FILES
   mitkLabel.cpp
-  mitkLabelSet.cpp
   mitkLabelSetImage.cpp
   mitkLabelSetImageConverter.cpp
   mitkLabelSetImageSource.cpp
@@ -11,6 +10,7 @@ set(CPP_FILES
   mitkLabelSetImageVtkMapper2D.cpp
   mitkMultilabelObjectFactory.cpp
   mitkMultiLabelIOHelper.cpp
+  mitkMultiLabelEvents.cpp
   mitkDICOMSegmentationPropertyHelper.cpp
   mitkDICOMSegmentationConstants.cpp
   mitkSegmentationTaskList.cpp

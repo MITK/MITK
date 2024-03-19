@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 #include <mitkDataNode.h>
 #include <mitkNumericTypes.h>
+#include <mitkITKEventObserverGuard.h>
 
 #include <QWidget>
 
@@ -50,18 +51,21 @@ public:
   */
   LabelValueVectorType GetSelectedLabels() const;
 
+  mitk::LabelSetImage* GetMultiLabelSegmentation() const;
+  mitk::DataNode* GetMultiLabelNode() const;
+
 Q_SIGNALS:
   /**
   * @brief A signal that will be emitted if the selected labels change.
   *
   * @param labels A list of label values that are now selected.
   */
-  void CurrentSelectionChanged(LabelValueVectorType labels);
+  void CurrentSelectionChanged(const LabelValueVectorType& labels);
 
   /**
   * @brief A signal that will be emitted if the user has requested to "go to" a certain label.
   *
-  * Going to a label would be e.g. to focus the renderwindows on the centroid of the label.
+  * Going to a label would be e.g. to focus the render windows on the centroid of the label.
   * @param label The label that should be focused.
   * @param point in World coordinate that should be focused.
   */
@@ -89,14 +93,27 @@ public Q_SLOTS:
   * @brief Selects the passed label instance and sets a new selection of the view
   *
   * @param selectedLabel Value of the label instance that should be selected.
-  */  void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
+  */
+  void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
 
   /**
   * @brief Sets the segmentation that will be used /monitored by the widget.
   *
   * @param segmentation      A pointer to the segmentation to set.
+  * @remark You cannot set the segmentation directly if a segmentation node is
+  * also set. Reset the node (nullptr) if you want to change to direct segmentation
+  * setting.
+  * @pre Segmentation node is nullptr.
   */
   void SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation);
+
+  /**
+  * @brief Sets the segmentation node that will be used /monitored by the widget.
+  *
+  * @param node A pointer to the segmentation node.
+  * @remark If not set some features of the manager are not active
+  */
+  void SetMultiLabelNode(mitk::DataNode* node);
 
   void SetDataStorage(mitk::DataStorage *storage);
 
@@ -117,7 +134,7 @@ private Q_SLOTS:
   // reaction to "returnPressed" signal from ...
   void OnSearchLabel();
   // reaction to the change of labels. If multiple labels are selected, it is ignored.
-  void OnSelectedLabelChanged(LabelValueVectorType labels);
+  void OnSelectedLabelChanged(const LabelValueVectorType& labels);
 
   // LabelSetImage Dependet
   void OnCreateDetailedSurface(bool);
@@ -133,6 +150,7 @@ private Q_SLOTS:
   void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position) const;
   void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
   void OnModelUpdated();
+  void OnSegmentationChanged();
 
 private:
   enum TableColumns
@@ -167,10 +185,14 @@ private:
 
   bool m_ProcessingManualSelection;
 
-  mitk::LabelSetImage::Pointer m_Segmentation;
-  mitk::DataNode::Pointer m_SegmentationNode;
   mitk::DataStorage* m_DataStorage;
 
+  mitk::ITKEventObserverGuard m_LabelAddedObserver;
+  mitk::ITKEventObserverGuard m_LabelModifiedObserver;
+  mitk::ITKEventObserverGuard m_LabelRemovedObserver;
+  mitk::ITKEventObserverGuard m_GroupAddedObserver;
+  mitk::ITKEventObserverGuard m_GroupModifiedObserver;
+  mitk::ITKEventObserverGuard m_GroupRemovedObserver;
 };
 
 #endif

@@ -54,10 +54,10 @@
        <item>
         <widget class="QPushButton" name="buttonSelection">
          <property name="toolTip">
-          <string>Quick selector button for input data.</string>
+          <string>Quick selector button for selecting the input data.</string>
          </property>
          <property name="text">
-          <string>+</string>
+          <string>Select data ...</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -185,7 +185,7 @@
      </widget>
      <widget class="QWidget" name="tabData">
       <attribute name="title">
-       <string>Input data</string>
+       <string>Selected data</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <property name="leftMargin">

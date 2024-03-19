@@ -3,7 +3,6 @@ set(CPP_FILES
   Qmitk/QmitkImageStatisticsCalculationRunnable.cpp
   Qmitk/QmitkIntensityProfileVisualizationWidget.cpp
   Qmitk/QmitkImageStatisticsTreeModel.cpp
-  Qmitk/QmitkImageStatisticsCalculationJob.cpp
   Qmitk/QmitkStatisticsModelToStringConverter.cpp
   Qmitk/QmitkImageStatisticsWidget.cpp
   Qmitk/QmitkImageStatisticsTreeItem.cpp
@@ -31,7 +30,6 @@ set(MOC_H_FILES
   Qmitk/QmitkImageStatisticsCalculationRunnable.h
   Qmitk/QmitkIntensityProfileVisualizationWidget.h
   Qmitk/QmitkImageStatisticsTreeModel.h
-  Qmitk/QmitkImageStatisticsCalculationJob.h
   Qmitk/QmitkImageStatisticsWidget.h
   Qmitk/QmitkDataGenerationJobBase.h
   Qmitk/QmitkDataGeneratorBase.h

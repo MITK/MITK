@@ -31,10 +31,10 @@ namespace mitk
 
   MITKMULTILABEL_EXPORT std::vector<mitk::Image::Pointer> SplitVectorImage(const Image* vecImage);
 
-  /** Function takes a label set and transfers all labels indicated in the label mapping (first element of pair) into a result label set. In the result label set
-  the cloned labels will have the label value indicated by the mapping (second element of pair).
+  /** Function takes a vector of labels and transfers all labels as clones with adapted label values to the result vector.
+  The values will be adapted according to the provided mapping (key is the old value, value the new).
   @remark: Only labels will be transfered, nothing else. So things like message observers or m_ReservedLabelValuesFunctor must be copied explicitly.*/
-  MITKMULTILABEL_EXPORT LabelSet::Pointer GenerateLabelSetWithMappedValues(const LabelSet* sourceLabelset, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping);
+  MITKMULTILABEL_EXPORT LabelSetImage::LabelVectorType GenerateLabelSetWithMappedValues(const LabelSetImage::ConstLabelVectorType&, LabelValueMappingVector labelMapping);
 }
 
 #endif

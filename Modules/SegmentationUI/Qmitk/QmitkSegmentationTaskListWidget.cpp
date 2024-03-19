@@ -775,7 +775,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       if (m_TaskList->HasLabelName(current))
         label->SetName(m_TaskList->GetLabelName(current));
 
-      segmentation->GetActiveLabelSet()->AddLabel(label);
+      segmentation->AddLabel(label, segmentation->GetActiveLayer());
     }
 
     m_DataStorage->Add(segmentationNode, imageNode);

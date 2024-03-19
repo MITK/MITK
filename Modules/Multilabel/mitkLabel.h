@@ -40,7 +40,7 @@ namespace mitk
     static const PixelType MAX_LABEL_VALUE;
 
     //** Value indicating pixels that are not labeled at all.*/
-    const static PixelType UNLABELED_VALUE = 0;
+    static constexpr PixelType UNLABELED_VALUE = 0;
 
     void SetLocked(bool locked);
     bool GetLocked() const;
@@ -53,6 +53,8 @@ namespace mitk
 
     void SetName(const std::string &name);
     std::string GetName() const;
+
+    std::string GetTrackingID() const;
 
     void SetCenterOfMassIndex(const mitk::Point3D &center);
     mitk::Point3D GetCenterOfMassIndex() const;

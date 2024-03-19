@@ -39,21 +39,11 @@ namespace mitk
     itkNewMacro(Self); /** Runtime information support. */
       itkTypeMacro(PlanarFigureMaskGenerator, MaskGenerator);
 
-      /**
-       * @brief GetMask Computes and returns the mask
-       * @return mitk::Image::Pointer of the generated mask
-       */
-    mitk::Image::ConstPointer GetMask() override;
+    unsigned int GetNumberOfMasks() const override;
 
     void SetPlanarFigure(mitk::PlanarFigure* planarFigure);
 
     mitk::Image::ConstPointer GetReferenceImage() override;
-
-    /**
-     * @brief SetTimeStep is used to set the time step for which the mask is to be generated
-     * @param timeStep
-     */
-    void SetTimeStep(unsigned int timeStep) override;
 
     itkGetConstMacro(PlanarFigureAxis, unsigned int);
     itkGetConstMacro(PlanarFigureSlice, unsigned int);
@@ -73,16 +63,18 @@ namespace mitk
       m_InternalMask = mitk::Image::New();
     }
 
+    Image::ConstPointer DoGetMask(unsigned int) override;
+
   private:
     void CalculateMask();
 
     template <typename TPixel, unsigned int VImageDimension>
-    void InternalCalculateMaskFromPlanarFigure(const itk::Image<TPixel, VImageDimension> *image, unsigned int axis);
+    void InternalCalculateMaskFromClosedPlanarFigure(const itk::Image<TPixel, VImageDimension> *image, unsigned int axis);
 
     template <typename TPixel, unsigned int VImageDimension>
     void InternalCalculateMaskFromOpenPlanarFigure(const itk::Image<TPixel, VImageDimension> *image, unsigned int axis);
 
-    mitk::Image::ConstPointer extract2DImageSlice(unsigned int axis, unsigned int slice);
+    mitk::Image::ConstPointer Extract2DImageSlice(const Image* input, unsigned int axis, unsigned int slice) const;
 
     /** Helper function that deduces if the passed vector is equal to one of the primary axis of the geometry.*/
     static bool GetPrincipalAxis(const BaseGeometry *geometry, Vector3D vector, unsigned int &axis);
@@ -133,7 +125,6 @@ namespace mitk
 
     mitk::PlanarFigure::Pointer m_PlanarFigure;
     itk::Image<unsigned short, 2>::Pointer m_InternalITKImageMask2D;
-    mitk::Image::ConstPointer m_InternalTimeSliceImage;
     mitk::Image::ConstPointer m_ReferenceImage;
     unsigned int m_PlanarFigureAxis;
     unsigned long m_InternalMaskUpdateTime;

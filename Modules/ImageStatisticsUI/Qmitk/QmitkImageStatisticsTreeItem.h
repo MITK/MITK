@@ -16,6 +16,9 @@ found in the LICENSE file.
 #include <QList>
 #include <QVariant>
 
+#include <mitkWeakPointer.h>
+#include <mitkDataNode.h>
+
 #include "mitkImageStatisticsContainer.h"
 
 /*!
@@ -27,11 +30,18 @@ class QmitkImageStatisticsTreeItem
 public:
   using ImageStatisticsObject = mitk::ImageStatisticsContainer::ImageStatisticsObject;
   using StatisticNameVector = mitk::ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector;
+
   QmitkImageStatisticsTreeItem();
-  explicit QmitkImageStatisticsTreeItem(ImageStatisticsObject statisticsData,
-    StatisticNameVector statisticNames, QVariant label, bool isWIP, QmitkImageStatisticsTreeItem *parentItem = nullptr);
-  explicit QmitkImageStatisticsTreeItem(StatisticNameVector statisticNames,
-    QVariant label, bool isWIP, QmitkImageStatisticsTreeItem *parentItem = nullptr);
+
+  explicit QmitkImageStatisticsTreeItem(const ImageStatisticsObject& statisticsData,
+    const StatisticNameVector& statisticNames, QVariant itemText, bool isWIP,
+    QmitkImageStatisticsTreeItem* parentItem = nullptr, const mitk::DataNode* imageNode = nullptr,
+    const mitk::DataNode* maskNode = nullptr, const mitk::Label* label = nullptr);
+
+  explicit QmitkImageStatisticsTreeItem(const StatisticNameVector& statisticNames,
+    QVariant itemText, bool isWIP, bool isNA, QmitkImageStatisticsTreeItem *parentItem = nullptr, const mitk::DataNode* imageNode = nullptr,
+    const mitk::DataNode* maskNode = nullptr, const mitk::Label* label = nullptr);
+
   ~QmitkImageStatisticsTreeItem();
 
   void appendChild(QmitkImageStatisticsTreeItem *child);
@@ -44,16 +54,23 @@ public:
   QmitkImageStatisticsTreeItem *parentItem();
 
   /**indicates that the statistic container owned by this instance is only a dummy
-  WIP containter and the calculation of the up-to-date statistic is not yet finished.**/
+  WIP container and the calculation of the up-to-date statistic is not yet finished.**/
   bool isWIP() const;
+
+  mitk::Label::ConstPointer GetLabelInstance() const;
 
 private:
   ImageStatisticsObject m_statistics;
   StatisticNameVector m_statisticNames;
-  QVariant m_label;
+  QVariant m_ItemText;
   QmitkImageStatisticsTreeItem *m_parentItem = nullptr;
   QList<QmitkImageStatisticsTreeItem *> m_childItems;
+  mitk::WeakPointer<const mitk::DataNode> m_ImageNode;
+  mitk::WeakPointer<const mitk::DataNode> m_MaskNode;
+  mitk::WeakPointer<const mitk::Label> m_Label;
+
   bool m_IsWIP;
+  bool m_NA;
 };
 
 #endif

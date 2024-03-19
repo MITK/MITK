@@ -13,11 +13,13 @@ found in the LICENSE file.
 #ifndef mitkLabelSetImage_h
 #define mitkLabelSetImage_h
 
+#include <shared_mutex>
 #include <mitkImage.h>
 #include <mitkLabel.h>
 #include <mitkLookupTable.h>
 #include <mitkMultiLabelEvents.h>
 #include <mitkMessage.h>
+#include <mitkITKEventObserverGuard.h>
 
 #include <MitkMultilabelExports.h>
 
@@ -97,7 +99,7 @@ namespace mitk
 
     /** \brief Adds a new label to a group of the image by providing name and color.
     * @param name (Class) name of the label instance that should be added.
-    * @param color Color of the new label sinstance.
+    * @param color Color of the new label instance.
     * @param groupID The id of the group the label should be added to.
     * @return Instance of the label as it was added to the label set.
     * @pre groupID must indicate an existing group.
@@ -171,7 +173,7 @@ namespace mitk
     /**
       * @brief  Returns true if the spatial group exists in the MultiLabelSegmentation instance.
       *
-      * @param index Group index of the group that should be checked for existance.
+      * @param index Group index of the group that should be checked for existence.
       */
     bool ExistGroup(GroupIndexType index) const;
 
@@ -237,7 +239,7 @@ namespace mitk
      * @return the respective vector of label values.
      * @pre group index must exist.
      */
-    const LabelValueVectorType GetLabelValuesByName(GroupIndexType index, std::string_view name) const;
+    const LabelValueVectorType GetLabelValuesByName(GroupIndexType index, const std::string_view name) const;
 
     /**
     * Returns a vector with (class) names of all label instances used in the segmentation (over all groups)
@@ -273,7 +275,7 @@ namespace mitk
     * accordingly to the passed state.
     * @pre The specified group must exist.
     */
-    void SetAllLabelsVisibleByName(GroupIndexType group, std::string_view name, bool visible);
+    void SetAllLabelsVisibleByName(GroupIndexType group, const std::string_view name, bool visible);
 
     /** Returns the lock state of the label (including UnlabeledLabel value).
      @pre Requested label does exist.*/
@@ -292,7 +294,7 @@ namespace mitk
     * accordingly to the passed state.
     * @pre The specified group must exist.
     */
-    void SetAllLabelsLockedByName(GroupIndexType group, std::string_view name, bool locked);
+    void SetAllLabelsLockedByName(GroupIndexType group, const std::string_view name, bool locked);
 
     /**
     * \brief Replaces the labels of a group with a given vector of labels.
@@ -365,10 +367,16 @@ namespace mitk
       /* Dictionary that maps between label value (key) and group id (value)*/
       LabelToGroupMapType m_LabelToGroupMap;
 
+      using LabelEventGuardMapType = std::map<LabelValueType, ITKEventObserverGuard>;
+      LabelEventGuardMapType m_LabelModEventGuardMap;
+
       LookupTable::Pointer m_LookupTable;
 
       /** Indicates if the MultiLabelSegmentation allows to overwrite unlabeled pixels in normal pixel manipulation operations (e.g. TransferLabelConent).*/
       bool m_UnlabeledLabelLock;
+
+      /** Mutex used to secure manipulations of the internal state of label and group maps.*/
+      std::shared_mutex m_LabelNGroupMapsMutex;
 
     public:
 

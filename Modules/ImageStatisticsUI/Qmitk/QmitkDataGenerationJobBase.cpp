@@ -12,6 +12,10 @@ found in the LICENSE file.
 
 #include "QmitkDataGenerationJobBase.h"
 
+bool QmitkDataGenerationJobBase::IsRunning() const
+{
+  return m_IsRunning;
+}
 
 std::string QmitkDataGenerationJobBase::GetLastErrorMessage() const
 {
@@ -27,6 +31,7 @@ void QmitkDataGenerationJobBase::run()
 {
   try
   {
+    m_IsRunning = true;
     m_ComputationSuccessful = this->RunComputation();
     if (m_ComputationSuccessful)
     {
@@ -48,4 +53,5 @@ void QmitkDataGenerationJobBase::run()
     m_LastErrorMessage = "Unknown exception";
     emit Error(QStringLiteral("Error while running computation. Error description: ") + QString::fromStdString(m_LastErrorMessage), this);
   }
+  m_IsRunning = false;
 }

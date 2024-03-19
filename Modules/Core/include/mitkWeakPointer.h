@@ -138,7 +138,7 @@ namespace mitk
         auto command = itk::SimpleMemberCommand<WeakPointer>::New();
         command->SetCallbackFunction(this, &WeakPointer::OnDeleteEvent);
 
-        using TWithoutConst = typename std::remove_const<T>::type;
+        using TWithoutConst = typename std::remove_const_t<T>;
         //cast the pointer to non const before adding the observer. This is done to ensure that
         //weak pointer also supports const pointers.
         auto nonConstPointer = const_cast<TWithoutConst*>(m_RawPointer);
@@ -150,7 +150,7 @@ namespace mitk
     {
       if (nullptr != m_RawPointer)
       {
-        using TWithoutConst = typename std::remove_const<T>::type;
+        using TWithoutConst = typename std::remove_const_t<T>;
         //cast the pointer to non const before removing the observer. This is done to ensure that
         //weak pointer also supports const pointers.
         auto nonConstPointer = const_cast<TWithoutConst*>(m_RawPointer);

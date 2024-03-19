@@ -8,6 +8,8 @@ set(MODULE_TESTS
 )
 
 set(MODULE_CUSTOM_TESTS
-  mitkImageStatisticsHotspotTest.cpp
+# see T30375 for mitkImageStatisticsHotspotTest
+# mitkImageStatisticsHotspotTest.cpp
+
 #  mitkMultiGaussianTest.cpp # TODO: activate test to generate new test cases for mitkImageStatisticsHotspotTest
 )

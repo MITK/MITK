@@ -26,6 +26,8 @@ found in the LICENSE file.
 namespace mitk
 {
 /**
+     * @warning Until T30375 is not clarified the class should be deemed deprecated/erroneous and should not
+     * be used
      * @brief The HotspotMaskGenerator class is used when a hotspot has to be found in an image. A hotspot is
      * the region of the image where the mean intensity is maximal (=brightest spot). It is usually used in PET scans.
      * The identification of the hotspot is done as follows: First a cubic (or circular, if image is 2d)

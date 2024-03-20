@@ -1,4 +1,4 @@
-set(Plugin-Name "View Navigator 2")
+set(Plugin-Name "View Navigator")
 set(Plugin-Version "0.1")
 set(Plugin-Vendor "German Cancer Research Center (DKFZ)")
 set(Plugin-ContactAddress "")

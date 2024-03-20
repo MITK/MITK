@@ -414,12 +414,6 @@ IWorkbenchPart::Pointer WorkbenchPartReference::GetPart(bool restore)
 
     if (state == STATE_CREATION_IN_PROGRESS)
     {
-      //                IStatus result = WorkbenchPlugin.getStatus(
-      //                        new PartInitException(NLS.bind("Warning: Detected recursive attempt by part {0} to create itself (this is probably, but not necessarily, a bug)",  //$NON-NLS-1$
-      //                                getId())));
-      WorkbenchPlugin::Log("Warning: Detected recursive attempt by part "
-          + GetId()
-          + " to create itself (this is probably, but not necessarily, a bug)");
       return IWorkbenchPart::Pointer(nullptr);
     }
 

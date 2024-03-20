@@ -13,32 +13,48 @@ found in the LICENSE file.
 #ifndef QmitkViewNavigatorView_h
 #define QmitkViewNavigatorView_h
 
+#include <berryIPartListener.h>
 #include <QmitkAbstractView.h>
 
-class QmitkViewNavigatorWidget;
+class QmitkViewModel;
+class QmitkViewProxyModel;
 
-/**
-* @brief
-*
-*/
-class QmitkViewNavigatorView : public QmitkAbstractView
+namespace berry
+{
+  struct IPartService;
+  struct IWorkbenchPage;
+}
+
+namespace Ui
+{
+  class QmitkViewNavigatorView;
+}
+
+class QmitkViewNavigatorView : public QmitkAbstractView, public berry::IPartListener
 {
   Q_OBJECT
 
 public:
-
-  static const std::string VIEW_ID;
-
-protected:
-
-  void CreateQtPartControl(QWidget *parent) override;
-
-  void SetFocus() override;
+  QmitkViewNavigatorView();
+  ~QmitkViewNavigatorView() override;
 
 private:
+  void CreateQtPartControl(QWidget* parent) override;
+  void SetFocus() override;
 
-  QmitkViewNavigatorWidget* m_ViewNavigatorWidget;
+  Events::Types GetPartEventTypes() const override;
+  void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
+  berry::IWorkbenchPage* GetActivePage() const;
+  berry::IPartService* GetPartService() const;
+
+  void OnFilterTextChanged(const QString& pattern);
+  void OnItemDoubleClicked(const QModelIndex& index);
+
+  Ui::QmitkViewNavigatorView* m_Ui;
+  QmitkViewModel* m_Model;
+  QmitkViewProxyModel* m_ProxyModel;
 };
 
 #endif

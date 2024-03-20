@@ -10,14 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPluginActivator.h"
-#include "QmitkViewNavigatorView.h"
+#ifndef QmitkCategoryItem_h
+#define QmitkCategoryItem_h
 
-void mitk::PluginActivator::start(ctkPluginContext* context)
-{
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkViewNavigatorView, context)
-}
+#include <QRegularExpression>
+#include <QStandardItem>
 
-void mitk::PluginActivator::stop(ctkPluginContext*)
+class QmitkCategoryItem : public QStandardItem
 {
-}
+public:
+  explicit QmitkCategoryItem(const QString& category);
+  ~QmitkCategoryItem() override;
+
+  bool HasMatch(const QRegularExpression& re) const;
+};
+
+#endif

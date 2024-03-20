@@ -24,7 +24,8 @@
       name="Modules"
       category="org.mitk.views.general"
       class="QmitkModuleView"
-      icon="resources/ModuleView.png" />
+      icon="resources/ModuleView.png"
+      enumerate="false" />
   </extension>
 
   <extension point="org.blueberry.ui.handlers">

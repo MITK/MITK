@@ -72,6 +72,8 @@ namespace berry {
 
   const QString WorkbenchRegistryConstants::ATT_ENABLES_FOR = "enablesFor"; //$NON-NLS-1$
 
+  const QString WorkbenchRegistryConstants::ATT_ENUMERATE = "enumerate"; //$NON-NLS-1$
+
   const QString WorkbenchRegistryConstants::ATT_EXTENSIONS = "extensions";//$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::ATT_FAST_VIEW_WIDTH_RATIO = "fastViewWidthRatio"; //$NON-NLS-1$

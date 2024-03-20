@@ -97,9 +97,16 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
   /**
    * Returns whether this view can be restored upon workbench restart.
    *
-   * @return whether whether this view can be restored upon workbench restart
+   * @return whether this view can be restored upon workbench restart
    */
   virtual bool IsRestorable() const = 0;
+
+  /**
+   * Return whether this view should be considered in enumerations in the UI.
+   *
+   * @return whether this view should be enumerated
+   */
+  virtual bool Enumerate() const = 0;
 
   bool operator==(const Object*) const override = 0;
 };

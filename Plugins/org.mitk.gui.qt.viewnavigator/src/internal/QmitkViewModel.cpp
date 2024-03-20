@@ -38,7 +38,7 @@ QmitkViewModel::QmitkViewModel(QObject* parent)
 
   for (const auto& view : views)
   {
-    if (!view->Enumerate())
+    if (view->IsInternal() || view->GetId() == "org.mitk.views.viewnavigator")
       continue;
 
     auto category = GetCategory(view.GetPointer());

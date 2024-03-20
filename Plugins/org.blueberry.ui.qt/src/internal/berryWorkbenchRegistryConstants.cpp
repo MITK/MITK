@@ -72,8 +72,6 @@ namespace berry {
 
   const QString WorkbenchRegistryConstants::ATT_ENABLES_FOR = "enablesFor"; //$NON-NLS-1$
 
-  const QString WorkbenchRegistryConstants::ATT_ENUMERATE = "enumerate"; //$NON-NLS-1$
-
   const QString WorkbenchRegistryConstants::ATT_EXTENSIONS = "extensions";//$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::ATT_FAST_VIEW_WIDTH_RATIO = "fastViewWidthRatio"; //$NON-NLS-1$
@@ -99,6 +97,8 @@ namespace berry {
   const QString WorkbenchRegistryConstants::ATT_ID = "id"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::ATT_IMAGE_STYLE = "imageStyle"; //$NON-NLS-1$
+
+  const QString WorkbenchRegistryConstants::ATT_INTERNAL = "internal"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::ATT_IS_EDITABLE = "isEditable"; //$NON-NLS-1$
 

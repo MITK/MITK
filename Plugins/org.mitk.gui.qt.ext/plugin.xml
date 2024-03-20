@@ -25,7 +25,7 @@
       category="org.mitk.views.general"
       class="QmitkModuleView"
       icon="resources/ModuleView.png"
-      enumerate="false" />
+      internal="true" />
   </extension>
 
   <extension point="org.blueberry.ui.handlers">

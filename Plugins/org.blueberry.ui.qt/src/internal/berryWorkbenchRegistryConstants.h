@@ -173,11 +173,6 @@ struct WorkbenchRegistryConstants {
   static const QString ATT_ENABLES_FOR; // "enablesFor";
 
   /**
-   * Enumerate attribute. Value <code>enumerate</code>.
-   */
-  static const QString ATT_ENUMERATE; // "enumerate";
-
-  /**
    * Editor extensions attribute. Value <code>extensions</code>.
    */
   static const QString ATT_EXTENSIONS; // "extensions";
@@ -243,6 +238,11 @@ struct WorkbenchRegistryConstants {
    * in the menus extension point.
    */
   static const QString ATT_IMAGE_STYLE; // "imageStyle";
+
+  /**
+   * Internal attribute. Value <code>internal</code>.
+   */
+  static const QString ATT_INTERNAL; // "internal";
 
   /**
    * Is-editable attribute. Value <code>isEditable</code>.

@@ -102,11 +102,12 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
   virtual bool IsRestorable() const = 0;
 
   /**
-   * Return whether this view should be considered in enumerations in the UI.
+   * Return whether this view should be considered internal, e.g.,
+   * excluded from view enumerations in the UI.
    *
-   * @return whether this view should be enumerated
+   * @return whether this view is internal
    */
-  virtual bool Enumerate() const = 0;
+  virtual bool IsInternal() const = 0;
 
   bool operator==(const Object*) const override = 0;
 };

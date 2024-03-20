@@ -393,7 +393,7 @@
             category="org.blueberry.ui"
             name="Welcome"
             id="org.blueberry.ui.internal.introview"
-            enumerate="false"/>
+            internal="true"/>
       <stickyView
             location="RIGHT"
             id="org.blueberry.ui.internal.introview"/>

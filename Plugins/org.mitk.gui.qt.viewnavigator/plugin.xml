@@ -4,7 +4,6 @@
     <view id="org.mitk.views.viewnavigator"
           name="View Navigator"
           class="QmitkViewNavigatorView"
-          icon="resources/view-manager.svg"
-          enumerate="false" />
+          icon="resources/view-manager.svg" />
   </extension>
 </plugin>

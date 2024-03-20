@@ -1277,7 +1277,7 @@ In order to reduce the visual clutter in the Show View Dialog, views should be g
   name               CDATA #REQUIRED
   category           IDREF #IMPLIED
   class              CDATA #REQUIRED
-  enumerate          (true | false)
+  internal           (true | false)
   icon               CDATA #IMPLIED
   fastViewWidthRatio CDATA #IMPLIED
   allowMultiple      (true | false)
@@ -1288,7 +1288,7 @@ In order to reduce the visual clutter in the Show View Dialog, views should be g
 - <tt>name</tt>: a translatable name that will be used in the UI for this view
 - <tt>category</tt>: an optional attribute that is composed of the category IDs separated by '/'. Each referenced category must be declared in a corresponding category element.
 - <tt>class</tt>: a fully qualified name of the class that implements berry::IViewPart. A common practice is to subclass berry::ViewPart or berry::QtViewPart in order to inherit the default functionality.
-- <tt>enumerate</tt>: a hint if the view should be typically enumerated in the UI.
+- <tt>internal</tt>: a hint if the view should be considered internal, e.g., in enumerations of views in the UI.
 - <tt>icon</tt>: a relative name of the icon that will be associated with the view.
 - <tt>fastViewWidthRatio</tt>: the percentage of the width of the workbench that the view will take up as an active fast view. This must be defined as a floating point value and lie between 0.05 and 0.95. If no value is supplied, a default ratio will be used.
 - <tt>allowMultiple</tt>: flag indicating whether this view allows multiple instances to be created using IWorkbenchPage::ShowView(QString id, QString secondaryId). The default is false.

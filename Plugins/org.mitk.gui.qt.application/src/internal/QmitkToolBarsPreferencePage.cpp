@@ -52,7 +52,7 @@ namespace
       if (auto categoryPath = view->GetCategoryPath(); !categoryPath.isEmpty())
         category = categoryPath.back();
 
-      if (!category.isEmpty() && !category.contains('.'))
+      if (!category.isEmpty() && !category.contains('.') && view->Enumerate())
         result.emplace(category, view);
     }
 

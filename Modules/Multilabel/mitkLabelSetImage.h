@@ -202,9 +202,9 @@ namespace mitk
     /** @brief Returns a vector with pointers to all labels in the MultiLabelSegmentation indicated
     * by the passed label value vector.
     * @param labelValues Vector of values of labels that should be returned.
-    * @ignoreMissing If true(Default) unknown labels Will be skipped in the result. If false,
+    * @param ignoreMissing If true (default), unknown labels Will be skipped in the result. If false,
     * an exception will be raised, if a label is requested.
-    instance.*/
+    */
     const LabelVectorType GetLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing = true);
 
     /** @brief Returns a vector with const pointers to all labels in the MultiLabelSegmentation indicated
@@ -213,8 +213,7 @@ namespace mitk
     */
     const ConstLabelVectorType GetConstLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing = false) const;
 
-    /** Helper function that can be used to extract a vector of label values of a vector of label instance pointers.
-     @overload.*/
+    /** Helper function that can be used to extract a vector of label values of a vector of label instance pointers.*/
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const ConstLabelVectorType& labels);
     /** Helper function that can be used to extract a vector of label values are vector of label instances.*/
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const LabelVectorType& labels);
@@ -309,7 +308,6 @@ namespace mitk
     */
     void ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& newLabels);
 
-    /**@overload for none-const label vectors. */
     void ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& newLabels);
 
     /** Returns the pointer to the image that contains the labeling of the indicate group.
@@ -425,11 +423,8 @@ namespace mitk
      */
     unsigned int GetActiveLayer() const;
 
-    /** \brief
-*/
     Label* GetActiveLabel();
-    /** \brief
-    */
+
     const Label* GetActiveLabel() const;
 
     /**
@@ -445,8 +440,6 @@ namespace mitk
      */
     unsigned int GetTotalNumberOfLabels() const;
 
-    /**
-      * \brief  */
     mitk::Image::Pointer CreateLabelMask(PixelType index);
 
     /**
@@ -458,22 +451,16 @@ namespace mitk
      */
     void InitializeByLabeledImage(mitk::Image::Pointer image);
 
-    /**
-      * \brief  */
     void MaskStamp(mitk::Image *mask, bool forceOverwrite);
 
-    /**
-      * \brief  */
     void SetActiveLayer(unsigned int layer);
     void SetActiveLabel(LabelValueType label);
 
-    /**
-      * \brief  */
     unsigned int GetNumberOfLayers() const;
 
     /**
      * \brief Adds a new layer to the LabelSetImage. The new layer will be set as the active one.
-     * \param labelSet a labelset that will be added to the new layer if provided
+     * \param labels Labels that will be added to the new layer if provided
      * \return the layer ID of the new layer
      */
     GroupIndexType AddLayer(ConstLabelVector labels = {});

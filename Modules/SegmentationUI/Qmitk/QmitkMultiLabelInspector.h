@@ -124,7 +124,7 @@ Q_SIGNALS:
   /** @brief Signal that is emitted, if the model was updated (e.g. by a delete or add operation).*/
   void ModelUpdated() const;
 
-  /** @briefe Signal is emitted, if the segmentation is changed that is observed by the inspector.*/
+  /** @brief Signal is emitted, if the segmentation is changed that is observed by the inspector.*/
   void SegmentationChanged() const;
 
 public Q_SLOTS:

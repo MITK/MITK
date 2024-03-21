@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkPadImageFilter.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
 #include <mitkDICOMQIPropertyHelper.h>
+#include <mitkNodePredicateGeometry.h>
 
 #include <itkLabelGeometryImageFilter.h>
 #include <itkCommand.h>
@@ -263,9 +264,19 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(ConstLabelVect
   return this->AddLayer(newImage, labels);
 }
 
-mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, ConstLabelVector labels)
+mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(mitk::Image* layerImage, ConstLabelVector labels)
 {
   GroupIndexType newGroupID = m_Groups.size();
+
+  if (nullptr == layerImage) mitkThrow() << "Cannot add group. Passed group image is nullptr.";
+
+  if (!Equal(*(this->GetTimeGeometry()), *(layerImage->GetTimeGeometry()),
+    NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION,
+    NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, false))
+    mitkThrow() << "Cannot add group. Passed group image has not the same geometry like segmentation.";
+
+  if (layerImage->GetPixelType() != MakePixelType<LabelValueType, LabelValueType, 1>())
+    mitkThrow() << "Cannot add group. Passed group image has incorrect pixel type. Only LabelValueType is supported. Invalid pixel type: "<< layerImage->GetPixelType().GetTypeAsString();
 
   // push a new working image for the new layer
   m_LayerContainer.push_back(layerImage);

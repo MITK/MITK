@@ -470,8 +470,11 @@ namespace mitk
     * \param layerImage is added to the vector of label images
     * \param labels labels that will be cloned and added to the new layer if provided
     * \return the layer ID of the new layer
+    * \pre layerImage must be valid instance
+    * \pre layerImage needs to have the same geometry then the segmentation
+    * \pre layerImage must have the pixel value equal to LabelValueType.
     */
-    GroupIndexType AddLayer(mitk::Image::Pointer layerImage, ConstLabelVector labels = {});
+    GroupIndexType AddLayer(mitk::Image* layerImage, ConstLabelVector labels = {});
 
   protected:
     mitkCloneMacro(Self);

@@ -30,6 +30,8 @@ QmitkViewProxyModel::~QmitkViewProxyModel()
 
 bool QmitkViewProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
+  // Primarily filter view items. Include their parent category items, though.
+
   auto model = dynamic_cast<QStandardItemModel*>(this->sourceModel());
 
   if (model == nullptr)
@@ -54,10 +56,12 @@ bool QmitkViewProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sou
 
 bool QmitkViewProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
+  // Sort by item text in ascending order.
+
   auto model = this->sourceModel();
-  auto leftLabel = model->data(left).toString();
-  auto rightLabel = model->data(right).toString();
+  auto leftText = model->data(left).toString();
+  auto rightText = model->data(right).toString();
   auto caseSensitivity = this->sortCaseSensitivity();
 
-  return leftLabel.compare(rightLabel, caseSensitivity) > 0;
+  return leftText.compare(rightText, caseSensitivity) > 0;
 }

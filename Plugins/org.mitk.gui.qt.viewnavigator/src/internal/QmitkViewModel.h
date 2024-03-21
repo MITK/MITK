@@ -24,7 +24,16 @@ public:
   explicit QmitkViewModel(QObject* parent = nullptr);
   ~QmitkViewModel() override;
 
+  /** \brief Get category item by category name.
+   *
+   * \sa QmitkCategoryItem
+   */
   QmitkCategoryItem* GetCategoryItem(const QString& category) const;
+
+  /** \brief Get view item by view id.
+   *
+   * \sa QmitkViewItem
+   */
   QmitkViewItem* GetViewItemFromId(const QString& id) const;
 
 private:

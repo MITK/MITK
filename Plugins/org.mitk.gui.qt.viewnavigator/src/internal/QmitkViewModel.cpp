@@ -38,19 +38,23 @@ QmitkViewModel::QmitkViewModel(QObject* parent)
 
   for (const auto& view : views)
   {
+    // Ignore internal views and self (View Navigator).
     if (view->IsInternal() || view->GetId() == "org.mitk.views.viewnavigator")
       continue;
 
     auto category = GetCategory(view.GetPointer());
 
+    // If a view is not categorized, put it into a virtual "Other" category.
     if (category.isEmpty())
       category = "Other";
 
+    // Get corresponding category item or create it on the fly as needed.
     auto categoryItem = this->GetCategoryItem(category);
 
     if (categoryItem == nullptr)
       categoryItem = this->CreateCategoryItem(category);
 
+    // Add the new view item as child node to the corresponding category item.
     categoryItem->appendRow(new QmitkViewItem(view.GetPointer()));
   }
 }

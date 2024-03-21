@@ -49,7 +49,7 @@ private:
   berry::IWorkbenchPage* GetActivePage() const;
   berry::IPartService* GetPartService() const;
 
-  void OnFilterTextChanged(const QString& pattern);
+  void OnFilterTextChanged(const QString& filter);
   void OnItemDoubleClicked(const QModelIndex& index);
 
   Ui::QmitkViewNavigatorView* m_Ui;

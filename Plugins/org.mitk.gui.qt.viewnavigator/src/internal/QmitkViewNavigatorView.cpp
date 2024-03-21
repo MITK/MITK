@@ -47,7 +47,7 @@ void QmitkViewNavigatorView::CreateQtPartControl(QWidget* parent)
   connect(m_Ui->filterLineEdit, &QLineEdit::textChanged, this, &QmitkViewNavigatorView::OnFilterTextChanged);
   connect(m_Ui->viewTreeView, &QTreeView::doubleClicked, this, &QmitkViewNavigatorView::OnItemDoubleClicked);
 
-  this->GetPartService()->AddPartListener(this);
+  this->GetPartService()->AddPartListener(this); // The part service is not available earlier (e.g. in the constructor).
 }
 
 void QmitkViewNavigatorView::SetFocus()
@@ -77,9 +77,9 @@ berry::IPartService* QmitkViewNavigatorView::GetPartService() const
   return nullptr;
 }
 
-void QmitkViewNavigatorView::OnFilterTextChanged(const QString& pattern)
+void QmitkViewNavigatorView::OnFilterTextChanged(const QString& filter)
 {
-  m_ProxyModel->setFilterWildcard(pattern);
+  m_ProxyModel->setFilterFixedString(filter);
   m_Ui->viewTreeView->expandAll();
 }
 
@@ -119,6 +119,10 @@ void QmitkViewNavigatorView::PartOpened(const berry::IWorkbenchPartReference::Po
   }
   else if (auto activePage = this->GetActivePage(); activePage != nullptr)
   {
+    // The active page is not available during view initialization. Hence, we hook
+    // into PartOpened() for the View Navigator itself, which is called shortly after,
+    // to initialize the state of all views.
+
     for (const auto& view : activePage->GetViews())
     {
       auto viewItem = m_Model->GetViewItemFromId(view->GetSite()->GetId());

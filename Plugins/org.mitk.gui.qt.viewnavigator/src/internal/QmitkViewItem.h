@@ -30,12 +30,22 @@ public:
   explicit QmitkViewItem(const berry::IViewDescriptor* view);
   ~QmitkViewItem() override;
 
+  /** \brief Enable or disable bold font for this item.
+   */
   void SetBoldFont(bool enable);
 
+  /** \brief Get view keywords as optionally specified in a corresponding plugin.xml file.
+   */
   QStringList GetKeywords() const;
-  void SetKeywords(const QStringList& keywords);
 
+  /** \brief Match item against regular expression.
+   *
+   * View name (text), description (tool tip), and keywords are considered.
+   */
   bool Match(const QRegularExpression& re) const;
+
+private:
+  void SetKeywords(const QStringList& keywords);
 };
 
 #endif

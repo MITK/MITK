@@ -22,6 +22,10 @@ public:
   explicit QmitkCategoryItem(const QString& category);
   ~QmitkCategoryItem() override;
 
+  /** \brief Check if any view item child of this category item matches the given regular expression.
+   *
+   * \sa QmitkViewItem::Match()
+   */
   bool HasMatch(const QRegularExpression& re) const;
 };
 

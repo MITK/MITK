@@ -91,6 +91,7 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
   m_Controls.inputNodeSelector->SetPopUpTitel(QString("Choose 3D+t input data that should be viewed!"));
   m_Controls.inputNodeSelector->SetSelectionIsOptional(false);
   m_Controls.inputNodeSelector->SetSelectOnlyVisibleNodes(true);
+  m_Controls.groupSettings->setVisible(false);
 
   auto predicate = mitk::NodePredicateFunction::New([](const mitk::DataNode *node) {
     bool isModelFitNode = node->GetData() && node->GetData()->GetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str()).IsNotNull();
@@ -686,7 +687,6 @@ void ModelFitInspectorView::RenderFitInfo()
     std::stringstream infoOutput;
 
   m_Controls.fitParametersWidget->setVisible(false);
-    m_Controls.groupSettings->setVisible(false);
 
     if (m_currentFit.IsNull())
     {
@@ -711,7 +711,7 @@ void ModelFitInspectorView::RenderFitInfo()
 
     if (m_currentFit.IsNotNull())
     {
-        m_Controls.groupSettings->setVisible(true);
+        m_Controls.groupSettings->setVisible(false);
         m_Controls.tableInputData->setRowCount(m_PlotCurves.staticPlots->size());
 
         unsigned int rowIndex = 0;

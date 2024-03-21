@@ -160,8 +160,8 @@ private:
   NodeTagMapType m_ReferenceDataObserverTags;
   unsigned int m_RenderingManagerObserverTag;
 
-  mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
-  mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
+  mitk::NodePredicateBase::Pointer m_ReferencePredicate;
+  mitk::NodePredicateBase::Pointer m_SegmentationPredicate;
 
   bool m_DrawOutline;
   bool m_SelectionMode;

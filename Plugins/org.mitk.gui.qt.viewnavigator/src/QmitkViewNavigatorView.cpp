@@ -12,9 +12,16 @@ found in the LICENSE file.
 
 #include "QmitkViewNavigatorView.h"
 
+#include "QmitkCategoryItem.h"
 #include "QmitkViewItem.h"
 #include "QmitkViewModel.h"
 #include "QmitkViewProxyModel.h"
+
+#include <QmitkApplicationConstants.h>
+
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <berryUIException.h>
 
@@ -42,7 +49,6 @@ void QmitkViewNavigatorView::CreateQtPartControl(QWidget* parent)
   m_ProxyModel->setSourceModel(m_Model);
 
   m_Ui->viewTreeView->setModel(m_ProxyModel);
-  m_Ui->viewTreeView->expandAll();
 
   connect(m_Ui->filterLineEdit, &QLineEdit::textChanged, this, &QmitkViewNavigatorView::OnFilterTextChanged);
   connect(m_Ui->viewTreeView, &QTreeView::doubleClicked, this, &QmitkViewNavigatorView::OnItemDoubleClicked);
@@ -53,6 +59,23 @@ void QmitkViewNavigatorView::CreateQtPartControl(QWidget* parent)
 void QmitkViewNavigatorView::SetFocus()
 {
   m_Ui->filterLineEdit->setFocus();
+}
+
+mitk::IPreferences* QmitkViewNavigatorView::GetPreferences() const
+{
+  auto prefService = mitk::CoreServices::GetPreferencesService();
+  return prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
+}
+
+void QmitkViewNavigatorView::OnPreferencesChanged(const mitk::IPreferences* prefs)
+{
+  for (const auto& category : prefs->Keys())
+  {
+    if (auto* categoryItem = m_Model->GetCategoryItem(QString::fromStdString(category)); categoryItem != nullptr)
+      categoryItem->SetVisible(prefs->GetBool(category, true));
+  }
+
+  m_Ui->viewTreeView->expandAll();
 }
 
 berry::IWorkbenchPage* QmitkViewNavigatorView::GetActivePage() const

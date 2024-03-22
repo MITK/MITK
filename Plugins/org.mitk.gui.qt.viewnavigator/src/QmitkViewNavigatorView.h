@@ -41,6 +41,8 @@ public:
 private:
   void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override;
+  mitk::IPreferences* GetPreferences() const override;
+  void OnPreferencesChanged(const mitk::IPreferences* prefs) override;
 
   Events::Types GetPartEventTypes() const override;
   void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;

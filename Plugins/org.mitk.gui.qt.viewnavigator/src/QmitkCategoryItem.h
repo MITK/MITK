@@ -27,6 +27,14 @@ public:
    * \sa QmitkViewItem::Match()
    */
   bool HasMatch(const QRegularExpression& re) const;
+
+  /** \brief Get visibility of this item including its children.
+   */
+  bool GetVisible() const;
+
+  /** \brief Enable or disable visibility of this item including its children.
+   */
+  void SetVisible(bool visible);
 };
 
 #endif

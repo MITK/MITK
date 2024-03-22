@@ -11,7 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkPluginActivator.h"
+
 #include <QmitkViewNavigatorView.h>
+
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 void mitk::PluginActivator::start(ctkPluginContext* context)
 {

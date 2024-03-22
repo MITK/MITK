@@ -30,7 +30,8 @@ QmitkViewProxyModel::~QmitkViewProxyModel()
 
 bool QmitkViewProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
-  // Primarily filter view items. Include their parent category items, though.
+  // Primarily filter view items. Include their parent category items, though. Consider only
+  // views of visible categories.
 
   auto model = dynamic_cast<QStandardItemModel*>(this->sourceModel());
 
@@ -44,10 +45,19 @@ bool QmitkViewProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sou
 
   if (auto viewItem = dynamic_cast<const QmitkViewItem*>(item); viewItem != nullptr)
   {
+    if (auto categoryItem = dynamic_cast<const QmitkCategoryItem*>(viewItem->parent()); categoryItem != nullptr)
+    {
+      if (!categoryItem->GetVisible())
+        return false;
+    }
+
     return viewItem->Match(re);
   }
   else if (auto categoryItem = dynamic_cast<const QmitkCategoryItem*>(item); categoryItem != nullptr)
   {
+    if (!categoryItem->GetVisible())
+      return false;
+
     return categoryItem->HasMatch(re);
   }
 

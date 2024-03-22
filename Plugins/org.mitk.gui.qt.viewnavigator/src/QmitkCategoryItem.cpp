@@ -21,6 +21,8 @@ QmitkCategoryItem::QmitkCategoryItem(const QString& category)
   auto font = this->font();
   font.setPointSizeF(font.pointSizeF() * 1.25);
   this->setFont(font);
+
+  this->SetVisible(true);
 }
 
 QmitkCategoryItem::~QmitkCategoryItem()
@@ -44,4 +46,14 @@ bool QmitkCategoryItem::HasMatch(const QRegularExpression& re) const
   }
 
   return false;
+}
+
+bool QmitkCategoryItem::GetVisible() const
+{
+  return this->data().toBool();
+}
+
+void QmitkCategoryItem::SetVisible(bool visible)
+{
+  this->setData(visible);
 }

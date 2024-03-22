@@ -33,24 +33,30 @@ const char *mitk::MedSAMTool::GetName() const
   return "MedSAM";
 }
 
-void mitk::MedSAMTool::Activated()
+/* void mitk::MedSAMTool::Activated()
 {
   SegWithPreviewTool::Activated();
   this->SetLabelTransferScope(LabelTransferScope::ActiveLabel);
   this->SetLabelTransferMode(LabelTransferMode::MapLabel);
-}
+}*/
 
-void mitk::MedSAMTool::ConnectActionsAndFunctions() {}
+//void mitk::MedSAMTool::ConnectActionsAndFunctions() {}
 
-bool mitk::MedSAMTool::HasPicks() const
+/* bool mitk::MedSAMTool::HasPicks() const
 {
   return true; // check if bounding box is ready
-}
+}*/
 
-std::stringstream mitk::MedSAMTool::GetPointsAsCSVString(const mitk::BaseGeometry * /*baseGeometry*/)
+std::stringstream mitk::MedSAMTool::GetPointsAsCSVString(const mitk::BaseGeometry * baseGeometry)
 {
   std::stringstream pointsAndLabels;
   pointsAndLabels << "Coordinates\n";
-  pointsAndLabels << "198 130 230 220";
+  //pointsAndLabels << "20 20 450 450";
+  auto tmp = baseGeometry->GetBounds();
+
+  int coordinate1 = static_cast<int>(tmp[1]*0.25);
+  int coordinate2 = static_cast<int>(tmp[3]*0.75);
+  const char SPACE = ' ';
+  pointsAndLabels << coordinate1 << SPACE << coordinate1 << SPACE << coordinate2 << SPACE << coordinate2;
   return pointsAndLabels;
 }

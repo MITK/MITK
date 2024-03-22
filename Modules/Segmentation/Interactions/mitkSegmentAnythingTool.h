@@ -160,7 +160,7 @@ namespace mitk
      * @param baseGeometry 
      * @return std::stringstream 
      */
-    std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry);
+    virtual std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry);
 
     /**
      * @brief Get the Hash For Current Plane from current working plane geometry.

@@ -46,9 +46,9 @@ namespace mitk
 
     const char *GetName() const override;
 
-    void Activated() override;
-    bool HasPicks() const;
-    void ConnectActionsAndFunctions() override;
+    //void Activated() override;
+    //bool HasPicks() const;
+    //void ConnectActionsAndFunctions() override;
     std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *);
 
   protected:

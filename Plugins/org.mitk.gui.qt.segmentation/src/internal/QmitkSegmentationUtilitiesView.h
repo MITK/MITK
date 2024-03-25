@@ -18,10 +18,9 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 
 class QmitkBooleanOperationsWidget;
-class QmitkContourModelToImageWidget;
 class QmitkImageMaskingWidget;
 class QmitkMorphologicalOperationsWidget;
-class QmitkSurfaceToImageWidget;
+class QmitkConvertToMultiLabelSegmentationWidget;
 
 class QmitkSegmentationUtilitiesView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -42,10 +41,9 @@ private:
 
   Ui::QmitkSegmentationUtilitiesViewControls m_Controls;
   QmitkBooleanOperationsWidget* m_BooleanOperationsWidget;
-  QmitkContourModelToImageWidget* m_ContourModelToImageWidget;
   QmitkImageMaskingWidget* m_ImageMaskingWidget;
   QmitkMorphologicalOperationsWidget* m_MorphologicalOperationsWidget;
-  QmitkSurfaceToImageWidget* m_SurfaceToImageWidget;
+  QmitkConvertToMultiLabelSegmentationWidget* m_ConvertToSegWidget;
 };
 
 #endif

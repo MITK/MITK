@@ -35,6 +35,11 @@ namespace mitk
   The values will be adapted according to the provided mapping (key is the old value, value the new).
   @remark: Only labels will be transfered, nothing else. So things like message observers or m_ReservedLabelValuesFunctor must be copied explicitly.*/
   MITKMULTILABEL_EXPORT LabelSetImage::LabelVectorType GenerateLabelSetWithMappedValues(const LabelSetImage::ConstLabelVectorType&, LabelValueMappingVector labelMapping);
+
+  MITKMULTILABEL_EXPORT Image::Pointer ConvertImageToGroupImage(const Image* inputImage, mitk::LabelSetImage::LabelValueVectorType& foundLabels);
+
+  MITKMULTILABEL_EXPORT bool CheckForLabelValueConflictsAndResolve(const mitk::LabelSetImage::LabelValueVectorType& newValues, mitk::LabelSetImage::LabelValueVectorType& usedLabelValues, mitk::LabelSetImage::LabelValueVectorType& correctedLabelValues);
+
 }
 
 #endif

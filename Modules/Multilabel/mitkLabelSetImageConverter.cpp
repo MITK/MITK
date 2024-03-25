@@ -192,3 +192,107 @@ mitk::LabelSetImage::LabelVectorType mitk::GenerateLabelSetWithMappedValues(cons
   }
   return result;
 }
+
+template <typename SourceImageType>
+void ConvertImageToGroupImageInternal(const SourceImageType* sourceImage, mitk::Image* groupImage, mitk::LabelSetImage::LabelValueVectorType& foundLabels)
+{
+  using GroupImageType = typename SourceImageType::RebindImageType<mitk::LabelSetImage::LabelValueType>;
+
+  typedef itk::ImageRegionConstIteratorWithIndex<SourceImageType> SourceIteratorType;
+  typedef itk::ImageRegionIterator<GroupImageType> TargetIteratorType;
+
+  auto targetImage = mitk::ImageToItkImage< mitk::LabelSetImage::LabelValueType, SourceImageType::ImageDimension>(groupImage);
+
+  TargetIteratorType targetIter(targetImage, targetImage->GetRequestedRegion());
+  targetIter.GoToBegin();
+
+  SourceIteratorType sourceIter(sourceImage, sourceImage->GetRequestedRegion());
+  sourceIter.GoToBegin();
+
+  std::set< mitk::LabelSetImage::LabelValueType> detecteValues;
+
+  while (!sourceIter.IsAtEnd())
+  {
+    const auto originalSourceValue = sourceIter.Get();
+    const auto sourceValue = static_cast<mitk::LabelSetImage::LabelValueType>(originalSourceValue);
+
+    if (originalSourceValue > mitk::Label::MAX_LABEL_VALUE)
+    {
+      mitkThrow() << "Cannot initialize MultiLabelSegmentation by image. Image contains a pixel value that exceeds the label value range. Invalid pixel value:" << originalSourceValue;
+    }
+
+    targetIter.Set(sourceValue);
+
+    if (sourceValue != mitk::Label::UNLABELED_VALUE)
+      detecteValues.insert(sourceValue);
+
+    ++sourceIter;
+    ++targetIter;
+  }
+
+  foundLabels.clear();
+  foundLabels.insert(foundLabels.begin(), detecteValues.begin(), detecteValues.end());
+}
+
+mitk::Image::Pointer mitk::ConvertImageToGroupImage(const Image* inputImage, mitk::LabelSetImage::LabelValueVectorType& foundLabels)
+{
+  if (nullptr == inputImage || inputImage->IsEmpty() || !inputImage->IsInitialized())
+    mitkThrow() << "Invalid labeled image.";
+
+  auto result = Image::New();
+  result->Initialize(mitk::MakePixelType<mitk::LabelSetImage::LabelValueType, mitk::LabelSetImage::LabelValueType, 1>(), *(inputImage->GetTimeGeometry()));
+
+  try
+  {
+    if (result->GetDimension() == 3)
+    {
+      AccessFixedDimensionByItk_2(inputImage, ConvertImageToGroupImageInternal, 3, result, foundLabels);
+    }
+    else if (result->GetDimension() == 4)
+    {
+      AccessFixedDimensionByItk_2(inputImage, ConvertImageToGroupImageInternal, 4, result, foundLabels);
+    }
+    else
+    {
+      mitkThrow() << result->GetDimension() << "-dimensional group images not yet supported";
+    }
+  }
+  catch (Exception& e)
+  {
+    mitkReThrow(e) << "Could not initialize by provided labeled image.";
+  }
+  catch (...)
+  {
+    mitkThrow() << "Could not initialize by provided labeled image due to unknown error.";
+  }
+
+  return result;
+}
+
+bool mitk::CheckForLabelValueConflictsAndResolve(const mitk::LabelSetImage::LabelValueVectorType& newValues, mitk::LabelSetImage::LabelValueVectorType& usedLabelValues, mitk::LabelSetImage::LabelValueVectorType& correctedLabelValues)
+{
+  bool corrected = false;
+  correctedLabelValues.clear();
+
+  for (const auto newV : newValues)
+  {
+    auto finding = std::find(usedLabelValues.begin(), usedLabelValues.end(), newV);
+    if (finding == usedLabelValues.end())
+    {
+      correctedLabelValues.push_back(newV);
+      usedLabelValues.push_back(newV);
+    }
+    else
+    {
+      const auto maxFinding = std::max_element(usedLabelValues.begin(), usedLabelValues.end());
+      if (*maxFinding == Label::MAX_LABEL_VALUE) mitkThrow() << "Cannot correct label values. All available values are used. A segmentation cannot contain more labels.";
+
+      const auto correctedV = *(maxFinding)+1;
+      correctedLabelValues.push_back(correctedV);
+      usedLabelValues.push_back(correctedV);
+      corrected = true;
+    }
+  }
+
+  return corrected;
+}

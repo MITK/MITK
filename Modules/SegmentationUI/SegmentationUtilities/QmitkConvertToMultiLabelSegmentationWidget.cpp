@@ -62,7 +62,7 @@ mitk::NodePredicateBase::Pointer GetInputPredicate()
 const mitk::DataNode* GetNodeWithLargestImageGeometry(const QmitkNodeSelectionDialog::NodeList& nodes)
 {
   mitk::BaseGeometry::ConstPointer refGeometry;
-  mitk::DataNode* result;
+  mitk::DataNode* result = nullptr;
 
   for (auto& node : nodes)
   {
@@ -120,28 +120,26 @@ QmitkNodeSelectionDialog::SelectionCheckFunctionType CheckForSameGeometry(const 
       return std::string();
     }
 
-    mitk::BaseGeometry::ConstPointer refGeometry;
+    mitk::NodePredicateSubGeometry::Pointer geoPredicate;
     bool usedExternalGeo = false;
     std::string refNodeName;
 
     if (refNodeLambda.IsNotNull() && nullptr != refNodeLambda->GetData())
     {
-      refGeometry = refNodeLambda->GetData()->GetGeometry();
+      geoPredicate = mitk::NodePredicateSubGeometry::New(refNodeLambda->GetData()->GetGeometry());
       usedExternalGeo = true;
       refNodeName = refNodeLambda->GetName();
     }
 
-    if (refGeometry.IsNull())
+    if (geoPredicate.IsNull())
     {
       auto imageNode = GetNodeWithLargestImageGeometry(nodes);
       if (nullptr != imageNode)
       {
-        refGeometry = imageNode->GetData()->GetGeometry();
+        geoPredicate = mitk::NodePredicateSubGeometry::New(imageNode->GetData()->GetGeometry());
         refNodeName = imageNode->GetName();
       }
     }
-
-    auto geoPredicate = mitk::NodePredicateSubGeometry::New(refGeometry);
 
     for (auto& node : nodes)
     {
@@ -191,11 +189,23 @@ QmitkConvertToMultiLabelSegmentationWidget::QmitkConvertToMultiLabelSegmentation
   m_Controls->outputSegSelector->SetPopUpHint(QStringLiteral("Select the segmentation where the converted inputs should be added."));
   m_Controls->outputSegSelector->SetAutoSelectNewNodes(true);
 
+  m_Controls->refNodeSelector->SetDataStorage(dataStorage);
+  m_Controls->refNodeSelector->SetNodePredicate(mitk::NodePredicateOr::New(GetInputPredicate(),mitk::GetMultiLabelSegmentationPredicate()));
+  m_Controls->refNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->refNodeSelector->SetInvalidInfo(QStringLiteral("Please select a reference image or segmentation"));
+  m_Controls->refNodeSelector->SetPopUpTitel(QStringLiteral("Select a reference image or segmentation"));
+  m_Controls->refNodeSelector->SetPopUpHint(QStringLiteral("Select the image or segmentation that by used for the geometry of the conversion."));
+
+
   this->ConfigureWidgets();
 
   connect (m_Controls->btnConvert, &QAbstractButton::clicked, this, &QmitkConvertToMultiLabelSegmentationWidget::OnConvertPressed);
   connect(m_Controls->inputNodesSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkConvertToMultiLabelSegmentationWidget::OnInputSelectionChanged);
+  connect(m_Controls->refNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkConvertToMultiLabelSegmentationWidget::OnRefSelectionChanged);
+  connect(m_Controls->outputSegSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkConvertToMultiLabelSegmentationWidget::OnOutputSelectionChanged);
   auto widget = this;
   connect(m_Controls->radioAddToSeg, &QRadioButton::toggled,
     m_Controls->outputSegSelector, [widget](bool checked) {widget->ConfigureWidgets(); });
@@ -223,7 +233,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConfigureWidgets()
     auto selectedNode = m_Controls->refNodeSelector->GetSelectedNode();
   }
   m_Controls->checkMultipleOutputs->setVisible(m_Controls->radioNewSeg->isChecked());
-  bool refNeeded = m_Controls->radioAddToSeg->isChecked() && !m_Controls->inputNodesSelector->GetSelectedNodes().empty() && nullptr == GetNodeWithLargestImageGeometry(m_Controls->inputNodesSelector->GetSelectedNodes());
+  bool refNeeded = m_Controls->radioNewSeg->isChecked() && !m_Controls->inputNodesSelector->GetSelectedNodes().empty() && nullptr == GetNodeWithLargestImageGeometry(m_Controls->inputNodesSelector->GetSelectedNodes());
   m_Controls->refNodeSelector->setVisible(refNeeded);
 
   if (refNeeded) m_Controls->inputNodesSelector->SetSelectionCheckFunction(CheckForSameGeometry(m_Controls->refNodeSelector->GetSelectedNode()));

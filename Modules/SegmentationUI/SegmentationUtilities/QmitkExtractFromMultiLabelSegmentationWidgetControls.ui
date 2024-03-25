@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkExtractFromMultiLabelSegmentationWidgetControls</class>
+ <widget class="QWidget" name="QmitkExtractFromMultiLabelSegmentationWidgetControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>408</width>
+    <height>316</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Segmentation;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkSingleNodeSelectionWidget" name="segNodeSelector" native="true"/>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkExtractSelected">
+     <property name="text">
+      <string>Extract only selected label(s)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkMultiLabelInspector" name="labelInspector" native="true"/>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupOutput">
+     <property name="title">
+      <string>Outputs:</string>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>4</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="checkClassMap">
+        <property name="toolTip">
+         <string>If activated, the conversion will generate separate multi label segmentations for each input instead of joining all inputs in one multi label segmentation.</string>
+        </property>
+        <property name="text">
+         <string>Label class map(s)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkInstanceMap">
+        <property name="text">
+         <string>Label instance map(s)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkInstanceMask">
+        <property name="text">
+         <string>Label instance mask(s)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnExtract">
+     <property name="text">
+      <string>Extract</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkMultiLabelInspector</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkMultiLabelInspector.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

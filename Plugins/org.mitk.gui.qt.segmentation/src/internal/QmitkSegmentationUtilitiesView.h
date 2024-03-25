@@ -21,6 +21,7 @@ class QmitkBooleanOperationsWidget;
 class QmitkImageMaskingWidget;
 class QmitkMorphologicalOperationsWidget;
 class QmitkConvertToMultiLabelSegmentationWidget;
+class QmitkExtractFromMultiLabelSegmentationWidget;
 
 class QmitkSegmentationUtilitiesView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -43,6 +44,7 @@ private:
   QmitkBooleanOperationsWidget* m_BooleanOperationsWidget;
   QmitkImageMaskingWidget* m_ImageMaskingWidget;
   QmitkMorphologicalOperationsWidget* m_MorphologicalOperationsWidget;
+  QmitkExtractFromMultiLabelSegmentationWidget* m_ExtractFromSegWidget;
   QmitkConvertToMultiLabelSegmentationWidget* m_ConvertToSegWidget;
 };
 

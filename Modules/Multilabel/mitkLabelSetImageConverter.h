@@ -40,6 +40,15 @@ namespace mitk
 
   MITKMULTILABEL_EXPORT bool CheckForLabelValueConflictsAndResolve(const mitk::LabelSetImage::LabelValueVectorType& newValues, mitk::LabelSetImage::LabelValueVectorType& usedLabelValues, mitk::LabelSetImage::LabelValueVectorType& correctedLabelValues);
 
+  /** Function creates a binary mask representing only the specified label of the multi label segmentation.
+  * @param segmentation Pointer to the segmentation that is the source for the mask.
+  * @param labelValue the label that should be extracted.
+  * @param createBinaryMap indicates if the label pixels should be indicated by the value 1 (createBinaryMap==true) or by the value of the label
+  * (createBinaryMap==false).
+  * @pre segmentation must point to a valid instance.
+  * @pre labelValue must exist in segmentation.*/
+  MITKMULTILABEL_EXPORT Image::Pointer CreateLabelMask(const LabelSetImage* segmentation, LabelSetImage::LabelValueType labelValue, bool createBinaryMap = true);
+
 }
 
 #endif

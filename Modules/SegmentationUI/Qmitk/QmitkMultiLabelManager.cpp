@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageToSurfaceThreadedFilter.h>
+#include <mitkLabelSetImageConverter.h>
 #include <mitkRenderingManager.h>
 #include <mitkShowSegmentationAsSurface.h>
 #include <mitkStatusBar.h>
@@ -279,7 +280,7 @@ void QmitkMultiLabelManager::OnCreateCroppedMask(bool)
     this->WaitCursorOn();
 
     mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
-    cropFilter->SetInput(this->GetMultiLabelSegmentation()->CreateLabelMask(pixelValue));
+    cropFilter->SetInput(mitk::CreateLabelMask(this->GetMultiLabelSegmentation(),pixelValue));
     cropFilter->SetBackgroundValue(0);
     cropFilter->SetMarginFactor(1.15);
     cropFilter->Update();
@@ -327,7 +328,7 @@ void QmitkMultiLabelManager::OnCreateMask(bool /*triggered*/)
   try
   {
     this->WaitCursorOn();
-    maskImage = GetMultiLabelSegmentation()->CreateLabelMask(pixelValue);
+    maskImage = mitk::CreateLabelMask(GetMultiLabelSegmentation(),pixelValue);
     this->WaitCursorOff();
   }
   catch (mitk::Exception &e)

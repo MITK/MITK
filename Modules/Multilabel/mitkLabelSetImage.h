@@ -440,9 +440,6 @@ namespace mitk
      */
     unsigned int GetTotalNumberOfLabels() const;
 
-    mitk::Image::Pointer CreateLabelMask(PixelType index);
-
-    /**
      * @brief Initialize a new mitk::LabelSetImage by a given image.
      * For all distinct pixel values of the parameter image new labels will
      * be created. If the number of distinct pixel values exceeds mitk::Label::MAX_LABEL_VALUE

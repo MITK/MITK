@@ -716,33 +716,6 @@ void mitk::LabelSetImage::MaskStamp(mitk::Image *mask, bool forceOverwrite)
   }
 }
 
-mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index)
-{
-  if (!this->ExistLabel(index)) mitkThrow() << "Error, cannot return label mask. Label ID is invalid. Invalid ID: " << index;
-
-  auto mask = mitk::Image::New();
-
-  // mask->Initialize(this) does not work here if this label set image has a single slice,
-  // since the mask would be automatically flattened to a 2-d image, whereas we expect the
-  // original dimension of this label set image. Hence, initialize the mask more explicitly:
-  mask->Initialize(this->GetPixelType(), this->GetDimension(), this->GetDimensions());
-  mask->SetTimeGeometry(this->GetTimeGeometry()->Clone());
-
-  ClearImageBuffer(mask);
-
-  const auto groupID = this->GetGroupIndexOfLabel(index);
-
-  auto destinationLabel = this->GetLabel(index)->Clone();
-  destinationLabel->SetValue(1);
-
-  TransferLabelContent(this->GetGroupImage(groupID), mask.GetPointer(),
-    {destinationLabel},
-    LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false,
-    { { index, destinationLabel->GetValue()}}, MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
-
-  return mask;
-}
-
 void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
 {
   if (image.IsNull() || image->IsEmpty() || !image->IsInitialized())

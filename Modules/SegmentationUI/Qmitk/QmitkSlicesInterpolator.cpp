@@ -48,6 +48,7 @@ found in the LICENSE file.
 //  Includes for the merge operation
 #include "mitkImageToContourFilter.h"
 #include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageConverter.h>
 
 #include <QCheckBox>
 #include <QCursor>
@@ -837,7 +838,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       try
       {
         auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(m_Segmentation);
-        activeLabelImage = labelSetImage->CreateLabelMask(labelSetImage->GetActiveLabel()->GetValue());
+        activeLabelImage = mitk::CreateLabelMask(labelSetImage, labelSetImage->GetActiveLabel()->GetValue());
       }
       catch (const std::exception& e)
       {
@@ -1231,7 +1232,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
       const auto* segmentation = dynamic_cast<mitk::Image*>(workingNode->GetData());
       if (nullptr != activeLabel && nullptr != segmentation)
       {
-        auto activeLabelImage = labelSetImage->CreateLabelMask(activeLabel->GetValue());
+        auto activeLabelImage = mitk::CreateLabelMask(labelSetImage, activeLabel->GetValue());
         m_Interpolator->SetSegmentationVolume(activeLabelImage);
 
         if (referenceNode)

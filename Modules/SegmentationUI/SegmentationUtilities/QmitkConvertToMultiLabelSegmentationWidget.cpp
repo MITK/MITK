@@ -325,6 +325,26 @@ mitk::Image::Pointer ConvertContourModelSetToImage(mitk::Image* refImage, mitk::
   return contourFiller->GetOutput();
 }
 
+void CheckForLabelCollisionHelper(const QmitkNodeSelectionDialog::NodeList& nodes,
+  const std::map<const mitk::DataNode*, mitk::LabelSetImage::LabelValueVectorType>& foundLabelsMap,
+  mitk::LabelSetImage::LabelValueVectorType& usedLabelValues,
+  std::map<const mitk::DataNode*, mitk::LabelValueMappingVector>& labelsMappingMap)
+{
+  for (const auto& node : nodes)
+  {
+    mitk::ProgressBar::GetInstance()->Progress();
+
+    const auto& foundLabels = foundLabelsMap.at(node);
+    mitk::LabelSetImage::LabelValueVectorType correctedLabelValues;
+    bool correctionNeeded = mitk::CheckForLabelValueConflictsAndResolve(foundLabels, usedLabelValues, correctedLabelValues);
+
+    mitk::LabelValueMappingVector mapping;
+    std::transform(foundLabels.begin(), foundLabels.end(), correctedLabelValues.begin(), std::back_inserter(mapping),
+      [](mitk::LabelSetImage::LabelValueType a, mitk::LabelSetImage::LabelValueType b) { return std::make_pair(a, b); });
+    labelsMappingMap.emplace(node, mapping);
+  }
+}
+
 void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSelectionDialog::NodeList& nodes)
 {
   auto noneImageNodes = GetNoneImageNodes(nodes);
@@ -427,34 +447,8 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   //check for label collision and fix if needed
   mitk::LabelSetImage::LabelValueVectorType usedLabelValues = outputSeg->GetAllLabelValues();
   std::map<const mitk::DataNode*, mitk::LabelValueMappingVector> labelsMappingMap;
-  for (const auto& node : imageNodes)
-  {
-    mitk::ProgressBar::GetInstance()->Progress();
-
-    const auto& foundLabels = foundLabelsMap[node];
-    mitk::LabelSetImage::LabelValueVectorType correctedLabelValues;
-    bool correctionNeeded = mitk::CheckForLabelValueConflictsAndResolve(foundLabels, usedLabelValues, correctedLabelValues);
-
-    mitk::LabelValueMappingVector mapping;
-    std::transform(foundLabels.begin(), foundLabels.end(), correctedLabelValues.begin(), std::back_inserter(mapping),
-      [](mitk::LabelSetImage::LabelValueType a, mitk::LabelSetImage::LabelValueType b) { return std::make_pair(a, b); });
-    labelsMappingMap.emplace(node, mapping);
-  }
-
-  for (const auto& node : noneImageNodes)
-  {
-    mitk::ProgressBar::GetInstance()->Progress();
-
-    const auto& foundLabels = foundLabelsMap[node];
-    mitk::LabelSetImage::LabelValueVectorType correctedLabelValues;
-    bool correctionNeeded = mitk::CheckForLabelValueConflictsAndResolve(foundLabels, usedLabelValues, correctedLabelValues);
-
-    mitk::LabelValueMappingVector mapping;
-    std::transform(foundLabels.begin(), foundLabels.end(), correctedLabelValues.begin(), std::back_inserter(mapping),
-      [](mitk::LabelSetImage::LabelValueType a, mitk::LabelSetImage::LabelValueType b) { return std::make_pair(a, b); });
-    labelsMappingMap.emplace(node, mapping);
-  }
-
+  CheckForLabelCollisionHelper(imageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
+  CheckForLabelCollisionHelper(noneImageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
 
   //Ensure that we have the first layer to add
   mitk::LabelSetImage::GroupIndexType currentGroupIndex = 0;

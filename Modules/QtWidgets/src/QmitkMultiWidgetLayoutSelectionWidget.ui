@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>224</width>
-    <height>290</height>
+    <height>337</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -31,19 +31,19 @@
      <attribute name="horizontalHeaderVisible">
       <bool>false</bool>
      </attribute>
-     <attribute name="horizontalHeaderDefaultSectionSize">
+     <attribute name="horizontalHeaderMinimumSectionSize">
       <number>50</number>
      </attribute>
-     <attribute name="horizontalHeaderMinimumSectionSize">
+     <attribute name="horizontalHeaderDefaultSectionSize">
       <number>50</number>
      </attribute>
      <attribute name="verticalHeaderVisible">
       <bool>false</bool>
      </attribute>
-     <attribute name="verticalHeaderDefaultSectionSize">
+     <attribute name="verticalHeaderMinimumSectionSize">
       <number>50</number>
      </attribute>
-     <attribute name="verticalHeaderMinimumSectionSize">
+     <attribute name="verticalHeaderDefaultSectionSize">
       <number>50</number>
      </attribute>
      <row/>
@@ -77,10 +77,39 @@
       </size>
      </property>
      <property name="lineWidth">
-      <number>1</number>
+      <number>2</number>
      </property>
      <property name="midLineWidth">
-      <number>0</number>
+      <number>10</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="dataBasedLayoutButton">
+     <property name="text">
+      <string>Data-based layout</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Sunken</enum>
+     </property>
+     <property name="lineWidth">
+      <number>2</number>
+     </property>
+     <property name="midLineWidth">
+      <number>10</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>

@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "MitkQtWidgetsExports.h"
 
 #include "ui_QmitkMultiWidgetLayoutSelectionWidget.h"
+#include "QmitkAutomatedLayoutWidget.h"
 
 #include <nlohmann/json.hpp>
 
@@ -48,6 +49,7 @@ private Q_SLOTS:
 
   void OnTableItemSelectionChanged();
   void OnSetLayoutButtonClicked();
+  void OnDataBasedLayoutButtonClicked();
   void OnSaveLayoutButtonClicked();
   void OnLoadLayoutButtonClicked();
   void OnLayoutPresetSelected(int index);
@@ -59,6 +61,7 @@ private:
 
   Ui::QmitkMultiWidgetLayoutSelectionWidget ui;
   std::map<int, nlohmann::json> m_PresetMap;
+  QmitkAutomatedLayoutWidget* m_AutomatedDataLayoutWidget;
 
 };
 

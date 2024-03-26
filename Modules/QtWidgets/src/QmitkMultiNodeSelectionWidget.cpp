@@ -65,6 +65,7 @@ void QmitkMultiNodeSelectionWidget::OnEditSelection()
   }
   m_Controls.btnChange->setChecked(false);
 
+  emit DialogClosed();
   delete dialog;
 }
 

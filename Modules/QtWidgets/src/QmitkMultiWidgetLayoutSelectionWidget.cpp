@@ -32,8 +32,12 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
   auto stylesheet = "QTableWidget::item{background-color: white;}\nQTableWidget::item:selected{background-color: #1C97EA;}";
   ui.tableWidget->setStyleSheet(stylesheet);
 
+  m_AutomatedDataLayoutWidget = new QmitkAutomatedLayoutWidget(this);
+  m_AutomatedDataLayoutWidget->hide();
+
   connect(ui.tableWidget, &QTableWidget::itemSelectionChanged, this, &QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged);
   connect(ui.setLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked);
+  connect(ui.dataBasedLayoutButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnDataBasedLayoutButtonClicked);
   connect(ui.loadLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked);
   connect(ui.saveLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked);
   connect(ui.selectDefaultLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected);
@@ -95,6 +99,14 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
     emit LayoutSet(row+1, column+1);
   }
   ui.selectDefaultLayoutComboBox->setCurrentIndex(0);
+}
+
+void QmitkMultiWidgetLayoutSelectionWidget::OnDataBasedLayoutButtonClicked()
+{
+  this->hide();
+  m_AutomatedDataLayoutWidget->setWindowFlags(Qt::Popup);
+  m_AutomatedDataLayoutWidget->move(this->pos().x() - m_AutomatedDataLayoutWidget->width() + this->width(), this->pos().y());
+  m_AutomatedDataLayoutWidget->show();
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked()

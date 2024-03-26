@@ -5,6 +5,7 @@ set(CPP_FILES
   QmitkAbstractMultiWidget.cpp
   QmitkAbstractNodeSelectionWidget.cpp
   QmitkApplicationCursor.cpp
+  QmitkAutomatedLayoutWidget.cpp
   QmitkDataStorageComboBox.cpp
   QmitkDataStorageDefaultListModel.cpp
   QmitkDataStorageHistoryModel.cpp
@@ -90,6 +91,7 @@ set(MOC_H_FILES
   include/QmitkAbstractDataStorageModel.h
   include/QmitkAbstractMultiWidget.h
   include/QmitkAbstractNodeSelectionWidget.h
+  include/QmitkAutomatedLayoutWidget.h
   include/QmitkDataStorageComboBox.h
   include/QmitkDataStorageTableModel.h
   include/QmitkDataStorageTreeModel.h
@@ -156,6 +158,7 @@ set(MOC_H_FILES
 )
 
 set(UI_FILES
+  src/QmitkAutomatedLayoutWidget.ui
   src/QmitkFileReaderOptionsDialog.ui
   src/QmitkFileWriterOptionsDialog.ui
   src/QmitkLevelWindowPresetDefinition.ui

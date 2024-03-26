@@ -12,15 +12,12 @@ found in the LICENSE file.
 
 #include "QmitkMedSAMToolGUI.h"
 
-#include <mitkMedSAMTool.h>
 #include <QApplication>
-#include <QDir>
-#include <QmitkStyleManager.h>
-#include <QDirIterator>
 #include <QFileDialog>
-
+#include <QmitkStyleManager.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
+#include <mitkMedSAMTool.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkMedSAMToolGUI, "")
 
@@ -31,14 +28,14 @@ namespace
     auto *preferencesService = mitk::CoreServices::GetPreferencesService();
     return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   }
-}
+} // namespace
 
 QmitkMedSAMToolGUI::QmitkMedSAMToolGUI() : QmitkSegWithPreviewToolGUIBase(true)
 {
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   {
     bool result = false;
-    auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
+    auto tool = this->GetConnectedToolAs<mitk::MedSAMTool>();
     if (nullptr != tool)
     {
       result = enabled && tool->HasPicks();
@@ -51,14 +48,13 @@ QmitkMedSAMToolGUI::QmitkMedSAMToolGUI() : QmitkSegWithPreviewToolGUIBase(true)
       this, &QmitkMedSAMToolGUI::OnPreferenceChangedEvent);
 }
 
-QmitkMedSAMToolGUI::~QmitkMedSAMToolGUI() 
+QmitkMedSAMToolGUI::~QmitkMedSAMToolGUI()
 {
-  auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
+  auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>(); // check -ashis
   if (nullptr != tool)
   {
     tool->SAMStatusMessageEvent -=
-      mitk::MessageDelegate1<QmitkMedSAMToolGUI, const std::string &>(
-      this, &QmitkMedSAMToolGUI::StatusMessageListener);
+      mitk::MessageDelegate1<QmitkMedSAMToolGUI, const std::string &>(this, &QmitkMedSAMToolGUI::StatusMessageListener);
   }
 }
 
@@ -112,6 +108,8 @@ void QmitkMedSAMToolGUI::InitializeUI(QBoxLayout *mainLayout)
     welcomeText = "<b>STATUS: </b><i>Welcome to MedSAM Anything tool. Sorry, " +
                   QString::number(m_GpuLoader.GetGPUCount()) + " GPUs were detected.</i>";
   }
+
+  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   connect(m_Controls.activateButton, SIGNAL(clicked()), this, SLOT(OnActivateBtnClicked()));
   connect(m_Controls.resetButton, SIGNAL(clicked()), this, SLOT(OnResetPicksClicked()));
 
@@ -123,11 +121,12 @@ void QmitkMedSAMToolGUI::InitializeUI(QBoxLayout *mainLayout)
   if (isInstalled)
   {
     QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));
-    welcomeText += " SAM is already found installed. Model type '" + modelType + "' selected in Preferences.";
+    welcomeText += " MedSAM is already found installed.";
   }
   else
   {
-    welcomeText += " MedSAM tool is not configured correctly. Please go to Preferences (Cntl+P) > Segment Anything to configure and/or install SAM.";
+    welcomeText += " MedSAM tool is not configured correctly. Please go to Preferences (Cntl+P) > Segment Anything to "
+                   "configure and/or install SAM & MedSAM.";
   }
   this->EnableAll(isInstalled);
   this->WriteStatusMessage(welcomeText);
@@ -216,13 +215,13 @@ void QmitkMedSAMToolGUI::OnActivateBtnClicked()
     }
     tool->SetPythonPath(pythonPath.toStdString());
     tool->SetGpuId(m_Preferences->GetInt("sam gpuid", -1));
-    tool->SetModelType("vit_b");
+    tool->SetModelType("vit_b"); // MedSAM only works with vit_b
     tool->SetTimeOutLimit(m_Preferences->GetInt("sam timeout", 300));
     tool->SetCheckpointPath(m_Preferences->Get("sam parent path", ""));
     tool->SetBackend("MedSAM");
-    this->WriteStatusMessage(
-      QString("<b>STATUS: </b><i>Initializing MedSAM...</i>"));
-    tool->SAMStatusMessageEvent += mitk::MessageDelegate1<QmitkMedSAMToolGUI, const std::string &>(this, &QmitkMedSAMToolGUI::StatusMessageListener);
+    this->WriteStatusMessage(QString("<b>STATUS: </b><i>Initializing MedSAM...</i>"));
+    tool->SAMStatusMessageEvent +=
+      mitk::MessageDelegate1<QmitkMedSAMToolGUI, const std::string &>(this, &QmitkMedSAMToolGUI::StatusMessageListener);
     if (this->ActivateSAMDaemon())
     {
       this->WriteStatusMessage(QString("<b>STATUS: </b><i>MedSAM tool initialized.</i>"));
@@ -236,7 +235,7 @@ void QmitkMedSAMToolGUI::OnActivateBtnClicked()
   catch (const std::exception &e)
   {
     std::stringstream errorMsg;
-    errorMsg << "<b>STATUS: </b>Error while processing parameters for Segment Anything segmentation. Reason: " << e.what();
+    errorMsg << "<b>STATUS: </b>Error while processing parameters for MedSAM segmentation. Reason: " << e.what();
     this->ShowErrorMessage(errorMsg.str());
     this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
     this->EnableAll(true);
@@ -244,10 +243,28 @@ void QmitkMedSAMToolGUI::OnActivateBtnClicked()
   }
   catch (...)
   {
-    std::string errorMsg = "Unkown error occured while generation Segment Anything segmentation.";
+    std::string errorMsg = "Unkown error occured while generation MedSAM segmentation.";
     this->ShowErrorMessage(errorMsg);
     this->EnableAll(true);
     return;
+  }
+}
+
+void QmitkMedSAMToolGUI::OnPreviewBtnClicked()
+{
+  auto tool = this->GetConnectedToolAs<mitk::MedSAMTool>();
+  if (nullptr != tool)
+  {
+    tool->UpdatePreview();
+  }
+}
+
+void QmitkMedSAMToolGUI::OnResetPicksClicked()
+{
+  auto tool = this->GetConnectedToolAs<mitk::MedSAMTool>();
+  if (nullptr != tool)
+  {
+    tool->ClearPicks();
   }
 }
 

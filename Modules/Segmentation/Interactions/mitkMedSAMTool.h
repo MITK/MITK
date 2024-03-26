@@ -14,13 +14,9 @@ found in the LICENSE file.
 #define mitkMedSAMTool_h
 
 #include "mitkSegmentAnythingTool.h"
-#include "mitkSegWithPreviewTool.h"
-#include "mitkPointSet.h"
-#include "mitkProcessExecutor.h"
-#include "mitkSegmentAnythingPythonService.h"
+#include "mitkBoundingShapeInteractor.h"
 #include <MitkSegmentationExports.h>
-#include <itkImage.h>
-#include <mitkLevelWindow.h>
+#include <mitkRenderingManager.h>
 
 namespace us
 {
@@ -46,14 +42,23 @@ namespace mitk
 
     const char *GetName() const override;
 
-    //void Activated() override;
-    //bool HasPicks() const;
-    //void ConnectActionsAndFunctions() override;
+    void Activated() override;
+    void Deactivated() override;
+    bool HasPicks() const override;
+    void ClearPicks() override;
+    void ConnectActionsAndFunctions() override;
+    void OnRenderWindowClicked(StateMachineAction *, InteractionEvent *);
     std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *);
 
   protected:
     MedSAMTool() = default;
     ~MedSAMTool() = default;
+
+  private:
+    void CreateBoundingShapeInteractor(bool);
+    mitk::Geometry3D::Pointer InitializeWithImageGeometry(const mitk::BaseGeometry *) const;
+    DataNode::Pointer m_BoundingBoxNode;
+    BoundingShapeInteractor::Pointer m_BoundingShapeInteractor;
   };
 } // namespace
 

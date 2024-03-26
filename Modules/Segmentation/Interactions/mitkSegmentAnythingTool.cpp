@@ -271,7 +271,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                 LabelSetImage *previewImage,
                                                 TimeStepType timeStep)
 {
-  if (nullptr != previewImage && m_PointSetPositive.IsNotNull() && ::IsImageAtTimeStepValid(inputAtTimeStep))
+  if (nullptr != previewImage && ::IsImageAtTimeStepValid(inputAtTimeStep))
   {
     if (this->HasPicks() && nullptr != m_PythonService)
     {

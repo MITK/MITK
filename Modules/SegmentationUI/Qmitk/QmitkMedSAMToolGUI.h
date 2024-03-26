@@ -84,6 +84,16 @@ protected slots:
    */
   void OnActivateBtnClicked();
 
+  /**
+   * @brief Qt Slot
+   */
+  void OnPreviewBtnClicked();
+
+  /**
+   * @brief Qt Slot
+   */
+  void OnResetPicksClicked();
+
 private:
   mitk::IPreferences *m_Preferences;
   QmitkGPULoader m_GpuLoader;

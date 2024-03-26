@@ -53,7 +53,7 @@ namespace mitk
     /**
      * @brief  Clears all picks and updates the preview.
      */
-    void ClearPicks();
+    virtual void ClearPicks();
 
     /**
      * @brief Checks if any point exists in the either
@@ -61,7 +61,7 @@ namespace mitk
      * 
      * @return bool 
      */
-    bool HasPicks() const;
+    virtual bool HasPicks() const;
 
     itkSetMacro(MitkTempDir, std::string);
     itkGetConstMacro(MitkTempDir, std::string);
@@ -188,7 +188,6 @@ namespace mitk
     template <typename TPixel, unsigned int VImageDimension>
     void ITKWindowing(const itk::Image<TPixel, VImageDimension>*, mitk::Image*, ScalarType, ScalarType);
 
-  private:
     /**
      * @brief Convert 3D world coordinates to 2D indices.
      * 
@@ -198,6 +197,9 @@ namespace mitk
      */
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, const mitk::Point3D&);
 
+    std::unique_ptr<SegmentAnythingPythonService> m_PythonService;
+
+  private:
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_ModelType;
@@ -212,7 +214,6 @@ namespace mitk
     bool m_IsReady = false;
     int m_PointSetCount = 0;
     long m_TimeOutLimit = -1;
-    std::unique_ptr<SegmentAnythingPythonService> m_PythonService;
     const Label::PixelType MASK_VALUE = 1;
   };
 } // namespace

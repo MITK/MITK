@@ -55,7 +55,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to Medical Segment Anything Model (MedSAM) tool in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to MedSAM. MITK does not ship with SAM. Make sure to have a working internet connection to install MedSAM via MITK. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://segment-anything.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://segment-anything.com&lt;/span&gt;&lt;/a&gt; to learn everything about the Segment Anything Model.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to Segment anything in medical images (MedSAM) tool in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to MedSAM. MITK does not ship with MedSAM. Make sure to have a working internet connection to install MedSAM via MITK. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://www.nature.com/articles/s41467-024-44824-z&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.nature.com/articles/s41467-024-44824-z&lt;/span&gt;&lt;/a&gt; to learn everything about the Segment anything in medical images.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
@@ -75,7 +75,7 @@
        </property>
        <property name="text">
         <string>
-Press SHIFT+Left-click and drag for RoI.
+Press SHIFT+Left-click and drag for RoI on the render windows.
         </string>
        </property>
       </widget>
@@ -146,22 +146,28 @@ Press SHIFT+Left-click and drag for RoI.
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QPushButton" name="previewButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100000</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Preview</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>ctkComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">ctkComboBox.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ctkCollapsibleGroupBox</class>
-   <extends>QWidget</extends>
-   <header>ctkCollapsibleGroupBox.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

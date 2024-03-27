@@ -152,6 +152,9 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
   this->EnsureBookmarkPointSet();
   m_Controls.inspectionPositionWidget->SetPositionBookmarkNode(m_PositionBookmarksNode.Lock());
 
+
+
+
   connect(m_Controls.inspectionPositionWidget, SIGNAL(PositionBookmarksChanged()), this, SLOT(OnPositionBookmarksChanged()));
 
   // For some reason this needs to be called to set the plot widget's minimum width to an
@@ -504,6 +507,7 @@ void ModelFitInspectorView::OnSliceChanged()
 
 void ModelFitInspectorView::OnPositionBookmarksChanged()
 {
+    m_Controls.inspectionPositionWidget->GetPositionBookmarks()->Modified();
     if (RefreshPlotData())
     {
       RenderPlot();
@@ -610,7 +614,7 @@ bool ModelFitInspectorView::RefreshPlotData()
     {
       if (m_validSelectedPosition)
       {
-        m_PlotCurves.currentPositionPlots = RefreshPlotDataCurveCollection(m_currentSelectedPosition,input,m_currentFit, timeGrid, m_currentModelParameterizer);
+        m_PlotCurves.currentPositionPlots = RefreshPlotDataCurveCollection(m_currentSelectedPosition, input, m_currentFit, timeGrid, m_currentModelParameterizer);
       }
       else
       {
@@ -620,27 +624,25 @@ bool ModelFitInspectorView::RefreshPlotData()
       changed = true;
     }
 
-    auto bookmarks = m_PositionBookmarks.Lock();
-    if (bookmarks.IsNotNull())
-    {
+    auto bookmarks = m_Controls.inspectionPositionWidget->GetPositionBookmarks();
       if (m_currentFitTime > m_lastRefreshTime || bookmarks->GetMTime() > m_lastRefreshTime)
       {
         m_PlotCurves.positionalPlots.clear();
-
-        auto endIter = bookmarks->End();
-        for (auto iter = bookmarks->Begin(); iter != endIter; iter++)
+        if (!bookmarks->IsEmpty())
         {
-          auto collection = RefreshPlotDataCurveCollection(iter.Value(), input, m_currentFit, timeGrid, m_currentModelParameterizer);
-          m_PlotCurves.positionalPlots.emplace(iter.Index(), std::make_pair(iter.Value(), collection));
+          auto endIter = bookmarks->End();
+          for (auto iter = bookmarks->Begin(); iter != endIter; iter++)
+          {
+            auto collection = RefreshPlotDataCurveCollection(iter.Value(), input, m_currentFit, timeGrid, m_currentModelParameterizer);
+            m_PlotCurves.positionalPlots.emplace(iter.Index(), std::make_pair(iter.Value(), collection));
+          }
         }
-
+        else
+        {
+          m_PlotCurves.positionalPlots.clear();
+        }
         changed = true;
       }
-    }
-    else
-    {
-      m_PlotCurves.positionalPlots.clear();
-    }
 
     // input data curve
     if (m_currentFitTime > m_lastRefreshTime)
@@ -657,7 +659,6 @@ bool ModelFitInspectorView::RefreshPlotData()
 
     m_lastRefreshTime.Modified();
   }
-
   return changed;
 }
 
@@ -702,7 +703,8 @@ void ModelFitInspectorView::RenderFitInfo()
         m_Controls.fitParametersWidget->setVisible(true);
     m_Controls.fitParametersWidget->setFits({ m_currentFit });
 
-    m_Controls.fitParametersWidget->setPositionBookmarks(m_PositionBookmarks.Lock());
+    //m_Controls.fitParametersWidget->setPositionBookmarks(m_PositionBookmarks.Lock());
+    m_Controls.fitParametersWidget->setPositionBookmarks(m_Controls.inspectionPositionWidget->GetPositionBookmarks());
     m_Controls.fitParametersWidget->setCurrentPosition(m_currentSelectedPosition);
     }
 
@@ -914,5 +916,8 @@ void ModelFitInspectorView::EnsureBookmarkPointSet()
     }
 
     m_PositionBookmarks = pointSet;
+
+
   }
+
 }

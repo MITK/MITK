@@ -263,15 +263,14 @@ void QmitkPointListWidget::OnBtnLoadPoints()
     }
 
     // loading successful
-
     this->SetPointSet(pointSet);
   }
   catch (...)
   {
     QMessageBox::warning(this, "Load point set", QString("File reader collapsed while reading %1").arg(filename));
   }
-  emit PointListChanged();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  emit PointListChanged();
 }
 
 mitk::PointSet *QmitkPointListWidget::GetPointSet()
@@ -352,6 +351,7 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
         m_DataInteractor->SetEventConfig("PointSetConfig.xml");
         // set the DataNode (which already is added to the DataStorage
         m_DataInteractor->SetDataNode(m_PointSetNode);
+
       }
     }
     else
@@ -359,7 +359,7 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
       m_PointSetNode->SetDataInteractor(nullptr);
       m_DataInteractor = nullptr;
     }
-    emit EditPointSets(checked);
+    emit PointListChanged();
   }
 }
 
@@ -382,6 +382,7 @@ void QmitkPointListWidget::OnBtnAddPointManually()
 
   editPointDialog.exec();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  emit PointListChanged();
 }
 
 void QmitkPointListWidget::OnListDoubleClick()

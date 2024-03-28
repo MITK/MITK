@@ -27,8 +27,13 @@ class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelTreeView : public QTreeView
 public:
   QmitkMultiLabelTreeView(QWidget* parent = nullptr);
 
+Q_SIGNALS:
+  void MouseLeave() const;
+
 protected:
   QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const QEvent* event = nullptr) const override;
+
+  void leaveEvent(QEvent* event) override;
 };
 
 #endif

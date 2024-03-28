@@ -296,6 +296,9 @@ private Q_SLOTS:
 
   void PrepareGoToLabel(LabelValueType labelID) const;
 
+  void OnEntered(const QModelIndex& index) const;
+  void OnMouseLeave() const;
+
   QWidgetAction* CreateOpacityAction();
 
 private:

@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
+#include <mitkVectorProperty.h>
 
 // Qmitk
 #include <QmitkMultiLabelTreeModel.h>
@@ -67,6 +68,8 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnChangeModelSelection(const QItemSelection&, const QItemSelection&)));
   connect(view, &QAbstractItemView::customContextMenuRequested, this, &QmitkMultiLabelInspector::OnContextMenuRequested);
   connect(view, &QAbstractItemView::doubleClicked, this, &QmitkMultiLabelInspector::OnItemDoubleClicked);
+  connect(view, &QAbstractItemView::entered, this, &QmitkMultiLabelInspector::OnEntered);
+  connect(view, &QmitkMultiLabelTreeView::MouseLeave, this, &QmitkMultiLabelInspector::OnMouseLeave);
 }
 
 QmitkMultiLabelInspector::~QmitkMultiLabelInspector()
@@ -1334,3 +1337,44 @@ void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) 
   }
 }
 
+void QmitkMultiLabelInspector::OnEntered(const QModelIndex& index) const
+{
+  if (m_SegmentationNode.IsNotNull())
+  {
+    auto labelVariant = index.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
+
+    auto highlightedValues = m_Model->GetLabelsInSubTree(index);
+
+    std::string propertyName = "org.mitk.multilabel.labels.highlighted";
+
+    mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(m_SegmentationNode->GetNonConstProperty(propertyName));
+    if (nullptr == prop)
+    {
+      prop = mitk::IntVectorProperty::New();
+      m_SegmentationNode->SetProperty("org.mitk.multilabel.labels.highlighted", prop);
+    }
+
+    mitk::IntVectorProperty::VectorType intValues(highlightedValues.begin(), highlightedValues.end());
+    prop->SetValue(intValues);
+    prop->Modified(); //see T30386; needed because VectorProperty::SetValue does currently trigger no modified
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+void QmitkMultiLabelInspector::OnMouseLeave() const
+{
+  if (m_SegmentationNode.IsNotNull())
+  {
+    std::string propertyName = "org.mitk.multilabel.labels.highlighted";
+
+    mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(m_SegmentationNode->GetNonConstProperty(propertyName));
+    if (nullptr != prop)
+    {
+      prop->SetValue({});
+      prop->Modified(); //see T30386; needed because VectorProperty::SetValue does currently trigger no modified
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
+}

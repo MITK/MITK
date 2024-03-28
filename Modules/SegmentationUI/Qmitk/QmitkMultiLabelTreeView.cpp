@@ -30,3 +30,9 @@ QItemSelectionModel::SelectionFlags QmitkMultiLabelTreeView::selectionCommand(co
 
   return   QAbstractItemView::selectionCommand(index, event);
 }
+
+void QmitkMultiLabelTreeView::leaveEvent(QEvent* event)
+{
+  QTreeView::leaveEvent(event);
+  emit MouseLeave();
+}

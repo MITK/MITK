@@ -1538,9 +1538,33 @@ void mitk::TransferLabelContentAtTimeStep(
   {
     mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; sourceImage does not have the requested time step: " << timeStep;
   }
+
   if (nullptr == destinationImageAtTimeStep)
   {
     mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; destinationImage does not have the requested time step: " << timeStep;
+  }
+
+  if (!Equal(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+  {
+    if (IsSubGeometry(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+    {
+      //we have to pad the source image
+      //because ImageToImageFilters always check for origin matching even if
+      //the requested output region is fitting :(
+      auto padFilter = mitk::PadImageFilter::New();
+      padFilter->SetInput(0, sourceImageAtTimeStep);
+      padFilter->SetInput(1, destinationImageAtTimeStep);
+      padFilter->SetPadConstant(Label::UNLABELED_VALUE);
+      padFilter->SetBinaryFilter(false);
+
+      padFilter->Update();
+
+      sourceImageAtTimeStep = padFilter->GetOutput();
+    }
+    else
+    {
+      mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; source image has neither the same geometry than destination image nor has the source image a sub geometry.";
+    }
   }
 
   auto destLabelMap = ConvertLabelVectorToMap(destinationLabels);

@@ -227,6 +227,10 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConfigureWidgets()
     auto selectedNode = m_Controls->outputSegSelector->GetSelectedNode();
     m_Controls->inputNodesSelector->SetSelectionCheckFunction(CheckForSameGeometry(selectedNode));
   }
+  else
+  {
+    m_Controls->inputNodesSelector->SetSelectionCheckFunction(CheckForSameGeometry(nullptr));
+  }
   m_Controls->outputSegSelector->setVisible(m_Controls->radioAddToSeg->isChecked());
 
   if (m_Controls->radioNewSeg->isChecked())

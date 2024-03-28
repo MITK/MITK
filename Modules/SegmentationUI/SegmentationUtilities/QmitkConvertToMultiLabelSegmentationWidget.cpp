@@ -31,6 +31,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateSubGeometry.h>
+#include <mitkNodePredicateGeometry.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkLabelSetImageConverter.h>
@@ -69,7 +70,7 @@ const mitk::DataNode* GetNodeWithLargestImageGeometry(const QmitkNodeSelectionDi
     auto castedData = dynamic_cast<const mitk::Image*>(node->GetData());
     if (castedData != nullptr)
     {
-      if (refGeometry.IsNull() || mitk::IsSubGeometry(*refGeometry, *(castedData->GetGeometry())))
+      if (refGeometry.IsNull() || mitk::IsSubGeometry(*refGeometry, *(castedData->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
       {
         refGeometry = castedData->GetGeometry();
         result = node;

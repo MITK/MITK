@@ -27,7 +27,6 @@ struct BERRY_UI_QT QtPreferences
   static const std::string QT_STYLE_SEARCHPATHS; // = "searchpaths";
   static const std::string QT_FONT_NAME; // = "fontname";
   static const std::string QT_FONT_SIZE; // = "fontsize";
-  static const std::string QT_SHOW_TOOLBAR_CATEGORY_NAMES; // = "show_toolbar_category_names";
 };
 }
 

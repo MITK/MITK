@@ -85,8 +85,8 @@ namespace
     return result;
   }
 
-  // Find a toolbar by object name and apply visibility.
-  bool ApplyVisibility(const std::vector<QToolBar*>& toolBars, const QString& name, bool isVisible)
+  // Find a toolbar by object name and apply preferences.
+  bool ApplyPreferences(const std::vector<QToolBar*>& toolBars, const QString& name, bool isVisible, bool showCategory)
   {
     auto it = std::find_if(toolBars.cbegin(), toolBars.cend(), [&name](const QToolBar* toolBar) {
       return toolBar->objectName() == name;
@@ -94,7 +94,18 @@ namespace
 
     if (it != toolBars.cend())
     {
-      (*it)->setVisible(isVisible);
+      auto toolBar = *it;
+      toolBar->setVisible(isVisible);
+
+      for (auto action : toolBar->actions())
+      {
+        if (action->objectName() == "category")
+        {
+          action->setVisible(showCategory);
+          break;
+        }
+      }
+
       return true;
     }
 
@@ -136,6 +147,7 @@ void QmitkToolBarsPreferencePage::CreateQtControl(QWidget* parent)
     {
       auto viewItem = new QTreeWidgetItem;
       viewItem->setText(0, view->second->GetLabel());
+      viewItem->setIcon(0, view->second->GetImageDescriptor());
 
       categoryItem->addChild(viewItem);
     }
@@ -154,6 +166,10 @@ QWidget* QmitkToolBarsPreferencePage::GetQtControl() const
 bool QmitkToolBarsPreferencePage::PerformOk()
 {
   auto prefs = GetPreferences();
+  bool showCategories = m_Ui->showCategoriesCheckBox->isChecked();
+
+  prefs->PutBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, showCategories);
+
   const auto toolBars = GetToolBars();
 
   for (int i = 0, count = m_Ui->treeWidget->topLevelItemCount(); i < count; ++i)
@@ -164,7 +180,7 @@ bool QmitkToolBarsPreferencePage::PerformOk()
 
     prefs->PutBool(category.toStdString(), isVisible);
 
-    if (!ApplyVisibility(toolBars, category, isVisible))
+    if (!ApplyPreferences(toolBars, category, isVisible, showCategories))
       MITK_WARN << "Could not find tool bar for category \"" << category << "\" to set its visibility!";
   }
 
@@ -178,6 +194,8 @@ void QmitkToolBarsPreferencePage::PerformCancel()
 void QmitkToolBarsPreferencePage::Update()
 {
   const auto prefs = GetPreferences();
+
+  m_Ui->showCategoriesCheckBox->setChecked(prefs->GetBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, true));
 
   for (int i = 0, count = m_Ui->treeWidget->topLevelItemCount(); i < count; ++i)
   {

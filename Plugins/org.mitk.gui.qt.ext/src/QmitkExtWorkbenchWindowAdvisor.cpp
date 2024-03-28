@@ -851,11 +851,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   if (showViewToolbar)
   {
     auto* prefService = mitk::CoreServices::GetPreferencesService();
-
-    auto* stylePrefs = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
-    bool showCategoryNames = stylePrefs->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true);
-
     auto* toolBarsPrefs = prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
+    bool showCategories = toolBarsPrefs->GetBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, true);
 
     // Order view descriptors by category
 
@@ -885,13 +882,16 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
         toolbar->setVisible(toolBarsPrefs->GetBool(category.toStdString(), true));
 
-        if (showCategoryNames && !category.isEmpty())
+        if (!category.isEmpty())
         {
           auto categoryButton = new QToolButton;
           categoryButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
           categoryButton->setText(category);
           categoryButton->setStyleSheet("background: transparent; margin: 0; padding: 0;");
-          toolbar->addWidget(categoryButton);
+
+          auto action = toolbar->addWidget(categoryButton);
+          action->setObjectName("category");
+          action->setVisible(showCategories);
 
           connect(categoryButton, &QToolButton::clicked, [toolbar]()
           {

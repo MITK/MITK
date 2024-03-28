@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkPadImageFilter.h"
 #include "mitkImageCast.h"
-
+#include <mitkImageAccessByItk.h>
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkConstantPadImageFilter.h"
 
@@ -31,20 +31,18 @@ mitk::PadImageFilter::~PadImageFilter()
 {
 }
 
-void mitk::PadImageFilter::GenerateData()
+
+template <typename SourceImageType>
+void mitk::PadImageFilter::GenerateDataInternal(SourceImageType* sourceItkImage, mitk::Image::Pointer outputImage)
 {
-  mitk::Image::ConstPointer image = this->GetInput(0);
+  mitk::Image::ConstPointer sourceImage = this->GetInput(0);
   mitk::Image::ConstPointer referenceImage = this->GetInput(1);
 
-  typedef itk::Image<short, 3> ImageType;
-  ImageType::Pointer itkImage = ImageType::New();
-  mitk::CastToItkImage(image, itkImage);
-
-  mitk::BaseGeometry *imageGeometry = image->GetGeometry();
+  mitk::BaseGeometry* imageGeometry = sourceImage->GetGeometry();
   mitk::Point3D origin = imageGeometry->GetOrigin();
   mitk::Vector3D spacing = imageGeometry->GetSpacing();
 
-  mitk::BaseGeometry *referenceImageGeometry = referenceImage->GetGeometry();
+  mitk::BaseGeometry* referenceImageGeometry = referenceImage->GetGeometry();
   mitk::Point3D referenceOrigin = referenceImageGeometry->GetOrigin();
 
   double outputOrigin[3];
@@ -58,28 +56,26 @@ void mitk::PadImageFilter::GenerateData()
 
     padLowerBound[i] = static_cast<unsigned long>((origin[i] - referenceOrigin[i]) / spacing[i] + 0.5);
 
-    padUpperBound[i] = referenceImage->GetDimension(i) - image->GetDimension(i) - padLowerBound[i];
+    padUpperBound[i] = referenceImage->GetDimension(i) - sourceImage->GetDimension(i) - padLowerBound[i];
   }
 
   // The origin of the input image is passed through the filter and used as
   // output origin as well. Hence, it needs to be overwritten accordingly.
-  itkImage->SetOrigin(outputOrigin);
+  sourceItkImage->SetOrigin(outputOrigin);
 
-  typedef itk::ConstantPadImageFilter<ImageType, ImageType> PadFilterType;
+  typedef itk::ConstantPadImageFilter<SourceImageType, SourceImageType> PadFilterType;
   PadFilterType::Pointer padFilter = PadFilterType::New();
-  padFilter->SetInput(itkImage);
+  padFilter->SetInput(sourceItkImage);
   padFilter->SetConstant(m_PadConstant);
   padFilter->SetPadLowerBound(padLowerBound);
   padFilter->SetPadUpperBound(padUpperBound);
-
-  mitk::Image::Pointer outputImage = this->GetOutput();
 
   // If the Binary flag is set, use an additional binary threshold filter after
   // padding.
   if (m_BinaryFilter)
   {
     typedef itk::Image<unsigned char, 3> BinaryImageType;
-    typedef itk::BinaryThresholdImageFilter<ImageType, BinaryImageType> BinaryFilterType;
+    typedef itk::BinaryThresholdImageFilter<SourceImageType, BinaryImageType> BinaryFilterType;
     BinaryFilterType::Pointer binaryFilter = BinaryFilterType::New();
 
     binaryFilter->SetInput(padFilter->GetOutput());
@@ -96,6 +92,14 @@ void mitk::PadImageFilter::GenerateData()
     padFilter->Update();
     mitk::CastToMitkImage(padFilter->GetOutput(), outputImage);
   }
+}
+
+void mitk::PadImageFilter::GenerateData()
+{
+  mitk::Image::Pointer image = this->GetInput(0);
+  mitk::Image::Pointer outputImage = this->GetOutput();
+
+  AccessFixedDimensionByItk_1(image, GenerateDataInternal, 3, outputImage);
 
   outputImage->SetRequestedRegionToLargestPossibleRegion();
 }

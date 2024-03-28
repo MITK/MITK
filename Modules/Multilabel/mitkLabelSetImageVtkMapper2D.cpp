@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkResliceMethodProperty.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkVtkResliceInterpolationProperty.h>
+#include <mitkVectorProperty.h>
 
 // MITK Rendering
 #include "vtkMitkLevelWindowFilter.h"
@@ -69,6 +70,49 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage *mitk::LabelSetImageVtkMapper2D::Ge
   mitk::BaseRenderer *renderer)
 {
   return m_LSH.GetLocalStorage(renderer);
+}
+
+void mitk::LabelSetImageVtkMapper2D::GenerateLookupTable(mitk::BaseRenderer* renderer)
+{
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+  mitk::DataNode* node = this->GetDataNode();
+  auto* image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  assert(image && image->IsInitialized());
+
+  localStorage->m_LabelLookupTable = image->GetLookupTable()->Clone();
+
+  std::string propertyName = "org.mitk.multilabel.labels.highlighted";
+
+  mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(propertyName));
+  if (nullptr != prop)
+  {
+    const auto highlightedLabelValues = prop->GetValue();
+
+    if (!highlightedLabelValues.empty())
+    {
+      auto lookUpTable  = localStorage->m_LabelLookupTable->GetVtkLookupTable();
+      const auto noValues = lookUpTable->GetNumberOfTableValues();
+
+      double rgba[4];
+
+      auto highlightEnd = highlightedLabelValues.cend();
+      for (int i = 0; i < noValues; i++)
+      {
+        lookUpTable->GetTableValue(i, rgba);
+        if (highlightEnd == std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), i))
+        { //make all none highlighted values more transparent
+          rgba[3] *= 0.3;
+        }
+        else if (rgba[3]!=0)
+        { //if highlighted values are visible set them to opaque to pop out
+          rgba[3] = 1.; 
+        }
+        lookUpTable->SetTableValue(i, rgba);
+      }
+      localStorage->m_LabelLookupTable->Modified(); // need to call modified, since LookupTableProperty seems to be unchanged so no widget-update is
+      // executed
+    }
+  }
 }
 
 void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
@@ -210,7 +254,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     localStorage->m_LevelWindowFilterVector[lidx]->SetClippingBounds(textureClippingBounds);
 
     localStorage->m_LevelWindowFilterVector[lidx]->SetLookupTable(
-      image->GetLookupTable()->GetVtkLookupTable());
+      localStorage->m_LabelLookupTable->GetVtkLookupTable());
 
     // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
     localStorage->m_LayerTextureVector[lidx]->SetColorModeToDirectScalars();
@@ -485,6 +529,17 @@ void mitk::LabelSetImageVtkMapper2D::ApplyLookuptable(mitk::BaseRenderer *render
     input->GetLookupTable()->GetVtkLookupTable());
 }
 
+itk::ModifiedTimeType PropertyTimeStampIsNewer(const mitk::IPropertyProvider* provider, mitk::BaseRenderer* renderer, const std::string& propName, itk::ModifiedTimeType refMT)
+{
+  const std::string context = renderer != nullptr ? renderer->GetName() : "";
+  auto prop = provider->GetConstProperty(propName, context);
+  if (prop != nullptr)
+  {
+    return prop->GetTimeStamp() > refMT;
+  }
+  return false;
+}
+
 void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 {
   bool visible = true;
@@ -514,6 +569,13 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   // check if something important has changed and we need to re-render
+
+  if (localStorage->m_LabelLookupTable.IsNull() || 
+    (localStorage->m_LabelLookupTable->GetMTime() < image->GetLookupTable()->GetMTime()) ||
+    PropertyTimeStampIsNewer(node,renderer, "org.mitk.multilabel.labels.highlighted", localStorage->m_LabelLookupTable->GetMTime()))
+  {
+    this->GenerateLookupTable(renderer);
+  }
 
   if ((localStorage->m_LastDataUpdateTime < image->GetMTime()) ||
       (localStorage->m_LastDataUpdateTime < image->GetPipelineMTime()) ||
@@ -640,4 +702,6 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
 
   m_OutlineActor->SetVisibility(false);
   m_OutlineShadowActor->SetVisibility(false);
+
+//  m_LabelLookupTable = mitk::LookupTable::New();
 }

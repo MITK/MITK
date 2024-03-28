@@ -114,6 +114,9 @@ namespace mitk
       /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
       mitk::ScalarType *m_mmPerPixel;
 
+      /** look up table for label colors. */
+      mitk::LookupTable::Pointer m_LabelLookupTable;
+
       int m_NumberOfLayers;
 
       /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
@@ -189,6 +192,20 @@ namespace mitk
       *
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+
+    /** \brief Does the actual resampling, without rendering the image yet.
+      * All the data is generated inside this method. The vtkProp (or Actor)
+      * is filled with content (i.e. the resliced image).
+      *
+      * After generation, a 4x4 transformation matrix(t) of the current slice is obtained
+      * from the vtkResliceImage object via GetReslicesAxis(). This matrix is
+      * applied to each textured plane (actor->SetUserTransform(t)) to transform everything
+      * to the actual 3D position (cf. the following image).
+      *
+      * \image html cameraPositioning3D.png
+      *
+      */
+    void GenerateLookupTable(mitk::BaseRenderer* renderer);
 
     /** \brief This method uses the vtkCamera clipping range and the layer property
       * to calcualte the depth of the object (e.g. image or contour). The depth is used

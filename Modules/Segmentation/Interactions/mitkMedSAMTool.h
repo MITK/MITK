@@ -48,6 +48,7 @@ namespace mitk
     void ClearPicks() override;
     void ConnectActionsAndFunctions() override;
     void OnRenderWindowClicked(StateMachineAction *, InteractionEvent *);
+    void OnDelete(StateMachineAction *, InteractionEvent *);
     std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *);
 
   protected:

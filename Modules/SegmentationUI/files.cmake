@@ -40,10 +40,8 @@ set(CPP_FILES
   Qmitk/QmitkFindSegmentationTaskDialog.cpp
   Qmitk/QmitkSegmentAnythingToolGUI.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
-  SegmentationUtilities/QmitkContourModelToImageWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.cpp
-  SegmentationUtilities/QmitkSurfaceToImageWidget.cpp
   SegmentationUtilities/QmitkDataSelectionWidget.cpp
   SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidget.cpp
   SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidget.cpp
@@ -94,10 +92,8 @@ set(MOC_H_FILES
   Qmitk/QmitkFindSegmentationTaskDialog.h
   Qmitk/QmitkSegmentAnythingToolGUI.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
-  SegmentationUtilities/QmitkContourModelToImageWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.h
-  SegmentationUtilities/QmitkSurfaceToImageWidget.h
   SegmentationUtilities/QmitkDataSelectionWidget.h
   SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidget.h
   SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidget.h
@@ -118,10 +114,8 @@ set(UI_FILES
   Qmitk/QmitkFindSegmentationTaskDialog.ui
   Qmitk/QmitkSegmentAnythingGUIControls.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
-  SegmentationUtilities/QmitkContourModelToImageWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
   SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui
-  SegmentationUtilities/QmitkSurfaceToImageWidgetControls.ui
   SegmentationUtilities/QmitkDataSelectionWidgetControls.ui
   SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidgetControls.ui
   SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidgetControls.ui

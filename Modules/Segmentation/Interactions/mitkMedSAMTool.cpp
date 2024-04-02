@@ -101,10 +101,8 @@ void mitk::MedSAMTool::CreateBoundingShapeInteractor(bool rotationEnabled)
 
 mitk::Geometry3D::Pointer mitk::MedSAMTool::InitializeWithImageGeometry(const mitk::BaseGeometry *geometry) const
 {
-  // convert a BaseGeometry into a Geometry3D (otherwise IO is not working properly)
   if (geometry == nullptr)
     mitkThrow() << "Geometry is not valid.";
-
   auto boundingGeometry = mitk::Geometry3D::New();
   boundingGeometry->SetBounds(geometry->GetBounds());
   boundingGeometry->SetImageGeometry(geometry->GetImageGeometry());

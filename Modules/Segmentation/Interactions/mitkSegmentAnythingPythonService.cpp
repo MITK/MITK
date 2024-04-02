@@ -41,8 +41,8 @@ mitk::SegmentAnythingPythonService::SegmentAnythingPythonService(
   : m_PythonPath(workingDir),
     m_ModelType(modelType),
     m_CheckpointPath(checkPointPath),
-    m_GpuId(gpuId),
-    m_Backend(backend)
+    m_Backend(backend),
+    m_GpuId(gpuId)
 {
   this->CreateTempDirs(PARENT_TEMP_DIR_PATTERN);
 }

@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "QmitkMedSAMToolGUI.h"
 
 #include <QApplication>
-#include <QFileDialog>
 #include <QmitkStyleManager.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
@@ -28,7 +27,7 @@ namespace
     auto *preferencesService = mitk::CoreServices::GetPreferencesService();
     return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   }
-} // namespace
+}
 
 QmitkMedSAMToolGUI::QmitkMedSAMToolGUI() : QmitkSegWithPreviewToolGUIBase(true)
 {

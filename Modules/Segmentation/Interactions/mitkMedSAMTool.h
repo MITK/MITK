@@ -47,20 +47,38 @@ namespace mitk
     bool HasPicks() const override;
     void ClearPicks() override;
     void ConnectActionsAndFunctions() override;
+    std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *) override;
+
+    /**
+     * @brief Adds bounding box in the render window when clicked.
+     * 
+     */
     void OnRenderWindowClicked(StateMachineAction *, InteractionEvent *);
+
+    /**
+     * @brief Deletes bounding box from the render window.
+     * 
+     */
     void OnDelete(StateMachineAction *, InteractionEvent *);
-    std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *);
 
   protected:
     MedSAMTool() = default;
     ~MedSAMTool() = default;
 
   private:
+    /**
+     * @brief Initializes the Bounding Shape Interactor object
+     * 
+     */
     void CreateBoundingShapeInteractor(bool);
+
+    /**
+     * @brief initializes a new bounding shape using the selected image geometry.
+     * 
+     */
     mitk::Geometry3D::Pointer InitializeWithImageGeometry(const mitk::BaseGeometry *) const;
     DataNode::Pointer m_BoundingBoxNode;
     BoundingShapeInteractor::Pointer m_BoundingShapeInteractor;
   };
-} // namespace
-
+}
 #endif

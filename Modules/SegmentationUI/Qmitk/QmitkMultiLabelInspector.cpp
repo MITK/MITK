@@ -875,17 +875,35 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
 
     if (this->GetMultiSelectionMode() && selectedLabelValues.size() > 1)
     {
-      QAction* mergeAction = new QAction(QIcon(":/Qmitk/MergeLabels.png"), "Merge selection on current label", this);
-      QObject::connect(mergeAction, SIGNAL(triggered(bool)), this, SLOT(OnMergeLabels(bool)));
-      menu->addAction(mergeAction);
+      if (m_AllowLabelModification)
+      {
+        QAction* mergeAction = new QAction(QIcon(":/Qmitk/MergeLabels.png"), "Merge selection on current label", this);
+        QObject::connect(mergeAction, SIGNAL(triggered(bool)), this, SLOT(OnMergeLabels(bool)));
+        menu->addAction(mergeAction);
 
-      QAction* removeLabelsAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")), "&Delete selected labels", this);
-      QObject::connect(removeLabelsAction, SIGNAL(triggered(bool)), this, SLOT(OnDeleteLabels(bool)));
-      menu->addAction(removeLabelsAction);
+        QAction* removeLabelsAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")), "&Delete selected labels", this);
+        QObject::connect(removeLabelsAction, SIGNAL(triggered(bool)), this, SLOT(OnDeleteLabels(bool)));
+        menu->addAction(removeLabelsAction);
 
-      QAction* clearLabelsAction = new QAction(QIcon(":/Qmitk/EraseLabel.png"), "&Clear selected labels", this);
-      QObject::connect(clearLabelsAction, SIGNAL(triggered(bool)), this, SLOT(OnClearLabels(bool)));
-      menu->addAction(clearLabelsAction);
+        QAction* clearLabelsAction = new QAction(QIcon(":/Qmitk/EraseLabel.png"), "&Clear selected labels", this);
+        QObject::connect(clearLabelsAction, SIGNAL(triggered(bool)), this, SLOT(OnClearLabels(bool)));
+        menu->addAction(clearLabelsAction);
+      }
+
+      if (m_AllowVisibilityModification)
+      {
+        if (m_AllowLabelModification) menu->addSeparator();
+
+        QAction* viewOnlyAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "Hide everything but this", this);
+        QObject::connect(viewOnlyAction, SIGNAL(triggered(bool)), this, SLOT(OnSetOnlyActiveLabelVisible(bool)));
+        menu->addAction(viewOnlyAction);
+
+        menu->addSeparator();
+
+        auto opacityAction = this->CreateOpacityAction();
+        if (nullptr != opacityAction)
+          menu->addAction(opacityAction);
+      }
     }
     else
     {
@@ -925,8 +943,9 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
 
       if (m_AllowVisibilityModification)
       {
-        menu->addSeparator();
-        QAction* viewOnlyAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "Hide everything in group but this", this);
+        if (m_AllowLabelModification) menu->addSeparator();
+
+        QAction* viewOnlyAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "Hide everything but this", this);
         QObject::connect(viewOnlyAction, SIGNAL(triggered(bool)), this, SLOT(OnSetOnlyActiveLabelVisible(bool)));
         menu->addAction(viewOnlyAction);
 
@@ -943,7 +962,10 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
 
 QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
 {
-  auto relevantLabelValues = this->GetCurrentlyAffactedLabelInstances();
+  auto selectedLabelValues = this->GetSelectedLabels();
+
+  auto relevantLabelValues = (this->GetMultiSelectionMode() && selectedLabelValues.size() > 1) ? selectedLabelValues : this->GetCurrentlyAffactedLabelInstances();
+
   std::vector<mitk::Label*> relevantLabels;
 
   if (!relevantLabelValues.empty())
@@ -1251,15 +1273,21 @@ void QmitkMultiLabelInspector::OnSetAffectedLabelsInvisible()
 
 void QmitkMultiLabelInspector::OnSetOnlyActiveLabelVisible(bool /*value*/)
 {
-  auto currentLabel = GetFirstSelectedLabelObject();
-  const auto labelID = currentLabel->GetValue();
+  auto selectedLabelValues = this->GetSelectedLabels();
+
+  if (selectedLabelValues.empty()) return;
+
   m_Segmentation->SetAllLabelsVisible(false);
 
-  currentLabel->SetVisible(true);
-  m_Segmentation->UpdateLookupTable(labelID);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  for (auto selectedValue : selectedLabelValues)
+  {
+    auto currentLabel = m_Segmentation->GetLabel(selectedValue);
+    currentLabel->SetVisible(true);
+    m_Segmentation->UpdateLookupTable(selectedValue);
+  }
 
-  this->PrepareGoToLabel(labelID);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  this->PrepareGoToLabel(selectedLabelValues.front());
 }
 
 void QmitkMultiLabelInspector::OnItemDoubleClicked(const QModelIndex& index)

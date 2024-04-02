@@ -39,6 +39,8 @@ QmitkExtractFromMultiLabelSegmentationWidget::QmitkExtractFromMultiLabelSegmenta
   m_Controls->segNodeSelector->SetPopUpTitel(QStringLiteral("Select segmentation"));
   m_Controls->segNodeSelector->SetPopUpHint(QStringLiteral("Select the segmentation that should be used as source for extraction."));
 
+  m_Controls->labelInspector->SetMultiSelectionMode(true);
+
   m_Controls->checkExtractSelected->setChecked(false);
 
   m_Controls->checkClassMap->setChecked(false);

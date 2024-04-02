@@ -47,8 +47,7 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
   m_Control = new QWidget(parent);
   m_Ui->setupUi(m_Control);
 
-  m_Ui->samModelTipLabel->hide(); // TODO: All models except for vit_b seem to be unsupported by SAM?
-
+  m_Ui->samModelTipLabel->hide();
 #ifndef _WIN32
   m_Ui->sysPythonComboBox->addItem("/usr/bin");
 #endif
@@ -71,12 +70,12 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
   {
     m_PythonPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(storageDir).first;
     m_Installer.SetVirtualEnvPath(m_PythonPath);
-    welcomeText += " Segment Anything tool is already found installed.";
+    welcomeText += " Segment Anything tool & MedSAM is already found installed.";
     m_Ui->installSAMButton->setEnabled(false);
   }
   else
   {
-    welcomeText += " Segment Anything tool not installed. Please click on \"Install SAM\" above. \
+    welcomeText += " Segment Anything tool & MedSAM not installed. Please click on \"Install SAM with MedSAM\" above. \
       The installation will create a new virtual environment using the System Python selected above.";
     m_Ui->installSAMButton->setEnabled(true);
   }
@@ -251,7 +250,7 @@ void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
   {
     return;
   }
-  this->WriteStatusMessage("<b>STATUS: </b>Installing SAM...");
+  this->WriteStatusMessage("<b>STATUS: </b>Installing SAM & MedSAM...");
   m_Ui->installSAMButton->setEnabled(false);
   m_Installer.SetSystemPythonPath(path);
   bool isInstalled = false;
@@ -262,11 +261,11 @@ void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
   if (isInstalled)
   {
     m_PythonPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(m_Installer.GetVirtualEnvPath()).first;
-    this->WriteStatusMessage("<b>STATUS: </b>Successfully installed SAM.");
+    this->WriteStatusMessage("<b>STATUS: </b>Successfully installed SAM & MedSAM.");
   }
   else
   {
-    this->WriteErrorMessage("<b>ERROR: </b>Couldn't install SAM.");
+    this->WriteErrorMessage("<b>ERROR: </b>Couldn't install SAM & MedSAM.");
     m_Ui->installSAMButton->setEnabled(true);
   }
 }

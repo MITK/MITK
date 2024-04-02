@@ -53,6 +53,12 @@ public:
    */
   void ShowProgressBar(bool);
 
+  /**
+   * @brief Requests the tool class to spawn the SAM python daemon
+   * process. Waits until the daemon is started.
+   *
+   * @return bool
+   */
   bool ActivateSAMDaemon();
 
   /**
@@ -65,6 +71,11 @@ public:
    */
   void ShowErrorMessage(const std::string &, QMessageBox::Icon = QMessageBox::Critical);
 
+  /**
+   * @brief Checks if the preferences are correctly set by the user.
+   *
+   * @return bool
+   */
   bool ValidatePrefences();
 
 protected:

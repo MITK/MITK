@@ -145,7 +145,7 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
     {
       for (auto& labelValue : labelValues)
       {
-        auto image = mitk::CreateLabelMask(seg,labelValue);
+        auto image = mitk::CreateLabelMask(seg,labelValue,false);
         std::string name = "LabelMask " + seg->GetLabel(labelValue)->GetName() + " [" + std::to_string(labelValue) + "]";
         this->StoreToDataStorage(image, name, node);
         mitk::ProgressBar::GetInstance()->Progress();

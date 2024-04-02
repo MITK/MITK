@@ -158,7 +158,7 @@ mitk::LabelSetImageHelper::SplitLabelValuesByGroup(const LabelSetImage* labelSet
   {
     auto groupID = labelSetImage->GetGroupIndexOfLabel(value);
 
-    auto& values = result[groupID]; //if groupID does not exist in result this call will init an empty vector.
+    //if groupID does not exist in result this call will also init an empty vector.
     result[groupID].push_back(value);
   }
 
@@ -184,10 +184,13 @@ mitk::LabelSetImageHelper::SplitLabelValuesByClassNamwe(const LabelSetImage* lab
 
   for (auto value : labelValues)
   {
-    auto className = labelSetImage->GetLabel(value)->GetName();
+    if (labelSetImage->GetGroupIndexOfLabel(value) == groupID)
+    {
+      auto className = labelSetImage->GetLabel(value)->GetName();
 
-    auto& values = result[className]; //if className does not exist in result this call will init an empty vector.
-    result[className].push_back(value);
+      //if className does not exist in result this call will also init an empty vector.
+      result[className].push_back(value);
+    }
   }
 
   return result;

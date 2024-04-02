@@ -199,7 +199,7 @@ mitk::LabelSetImage::LabelVectorType mitk::GenerateLabelSetWithMappedValues(cons
 template <typename SourceImageType>
 void ConvertImageToGroupImageInternal(const SourceImageType* sourceImage, mitk::Image* groupImage, mitk::LabelSetImage::LabelValueVectorType& foundLabels)
 {
-  using GroupImageType = typename SourceImageType::RebindImageType<mitk::LabelSetImage::LabelValueType>;
+  using GroupImageType = typename SourceImageType::template Rebind<mitk::LabelSetImage::LabelValueType>::Type;
 
   typedef itk::ImageRegionConstIteratorWithIndex<SourceImageType> SourceIteratorType;
   typedef itk::ImageRegionIterator<GroupImageType> TargetIteratorType;

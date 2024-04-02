@@ -56,13 +56,13 @@ QmitkExtractFromMultiLabelSegmentationWidget::QmitkExtractFromMultiLabelSegmenta
 
   auto widget = this;
   connect(m_Controls->checkInstanceMap, &QCheckBox::toggled,
-    this, [widget](bool checked) {widget->ConfigureWidgets(); });
+    this, [widget](bool) {widget->ConfigureWidgets(); });
   connect(m_Controls->checkClassMap, &QCheckBox::toggled,
-    this, [widget](bool checked) {widget->ConfigureWidgets(); });
+    this, [widget](bool) {widget->ConfigureWidgets(); });
   connect(m_Controls->checkInstanceMask, &QCheckBox::toggled,
-    this, [widget](bool checked) {widget->ConfigureWidgets(); });
+    this, [widget](bool) {widget->ConfigureWidgets(); });
   connect(m_Controls->checkExtractSelected, &QCheckBox::toggled,
-    this, [widget](bool checked) {widget->ConfigureWidgets(); });
+    this, [widget](bool) {widget->ConfigureWidgets(); });
 
   m_Controls->segNodeSelector->SetAutoSelectNewNodes(true);
 }

@@ -64,7 +64,7 @@ void mitk::PadImageFilter::GenerateDataInternal(SourceImageType* sourceItkImage,
   sourceItkImage->SetOrigin(outputOrigin);
 
   typedef itk::ConstantPadImageFilter<SourceImageType, SourceImageType> PadFilterType;
-  PadFilterType::Pointer padFilter = PadFilterType::New();
+  typename PadFilterType::Pointer padFilter = PadFilterType::New();
   padFilter->SetInput(sourceItkImage);
   padFilter->SetConstant(m_PadConstant);
   padFilter->SetPadLowerBound(padLowerBound);
@@ -76,7 +76,7 @@ void mitk::PadImageFilter::GenerateDataInternal(SourceImageType* sourceItkImage,
   {
     typedef itk::Image<unsigned char, 3> BinaryImageType;
     typedef itk::BinaryThresholdImageFilter<SourceImageType, BinaryImageType> BinaryFilterType;
-    BinaryFilterType::Pointer binaryFilter = BinaryFilterType::New();
+    typename BinaryFilterType::Pointer binaryFilter = BinaryFilterType::New();
 
     binaryFilter->SetInput(padFilter->GetOutput());
     binaryFilter->SetLowerThreshold(m_LowerThreshold);

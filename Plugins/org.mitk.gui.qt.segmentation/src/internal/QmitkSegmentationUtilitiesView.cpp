@@ -22,8 +22,8 @@ QmitkSegmentationUtilitiesView::QmitkSegmentationUtilitiesView()
   : m_BooleanOperationsWidget(nullptr),
     m_ImageMaskingWidget(nullptr),
     m_MorphologicalOperationsWidget(nullptr),
-  m_ConvertToSegWidget(nullptr),
-  m_ExtractFromSegWidget(nullptr)
+    m_ConvertToSegWidget(nullptr),
+    m_ExtractFromSegWidget(nullptr)
 {
 }
 

@@ -40,8 +40,6 @@ found in the LICENSE file.
 
 #include <qmessagebox.h>
 
-static const char* const HelpText = "Select an image and a surface above";
-
 mitk::NodePredicateBase::Pointer GetInputPredicate()
 {
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -209,9 +207,9 @@ QmitkConvertToMultiLabelSegmentationWidget::QmitkConvertToMultiLabelSegmentation
     this, &QmitkConvertToMultiLabelSegmentationWidget::OnOutputSelectionChanged);
   auto widget = this;
   connect(m_Controls->radioAddToSeg, &QRadioButton::toggled,
-    m_Controls->outputSegSelector, [widget](bool checked) {widget->ConfigureWidgets(); });
+    m_Controls->outputSegSelector, [widget](bool) {widget->ConfigureWidgets(); });
   connect(m_Controls->checkMultipleOutputs, &QCheckBox::toggled,
-    m_Controls->outputSegSelector, [widget](bool checked) {widget->ConfigureWidgets(); });
+    m_Controls->outputSegSelector, [widget](bool) {widget->ConfigureWidgets(); });
 }
 
 QmitkConvertToMultiLabelSegmentationWidget::~QmitkConvertToMultiLabelSegmentationWidget()
@@ -351,7 +349,7 @@ void CheckForLabelCollisionHelper(const QmitkNodeSelectionDialog::NodeList& node
 
     const auto& foundLabels = foundLabelsMap.at(node);
     mitk::LabelSetImage::LabelValueVectorType correctedLabelValues;
-    bool correctionNeeded = mitk::CheckForLabelValueConflictsAndResolve(foundLabels, usedLabelValues, correctedLabelValues);
+    mitk::CheckForLabelValueConflictsAndResolve(foundLabels, usedLabelValues, correctedLabelValues);
 
     mitk::LabelValueMappingVector mapping;
     std::transform(foundLabels.begin(), foundLabels.end(), correctedLabelValues.begin(), std::back_inserter(mapping),

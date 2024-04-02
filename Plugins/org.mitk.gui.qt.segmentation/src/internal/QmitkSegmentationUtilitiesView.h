@@ -44,8 +44,8 @@ private:
   QmitkBooleanOperationsWidget* m_BooleanOperationsWidget;
   QmitkImageMaskingWidget* m_ImageMaskingWidget;
   QmitkMorphologicalOperationsWidget* m_MorphologicalOperationsWidget;
-  QmitkExtractFromMultiLabelSegmentationWidget* m_ExtractFromSegWidget;
   QmitkConvertToMultiLabelSegmentationWidget* m_ConvertToSegWidget;
+  QmitkExtractFromMultiLabelSegmentationWidget* m_ExtractFromSegWidget;
 };
 
 #endif

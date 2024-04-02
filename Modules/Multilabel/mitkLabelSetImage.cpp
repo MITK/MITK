@@ -1198,21 +1198,33 @@ std::vector<std::string> mitk::LabelSetImage::GetLabelClassNamesByGroup(GroupInd
 
 void mitk::LabelSetImage::SetAllLabelsVisible(bool visible)
 {
-  auto setVisibility = [visible](Label* l) { l->SetVisible(visible); };
+  auto setVisibility = [this, visible](Label* l)
+    {
+      l->SetVisible(visible);
+      this->UpdateLookupTable(l->GetValue());
+    };
 
   this->ApplyToLabels(this->GetAllLabelValues(), setVisibility);
 }
 
 void mitk::LabelSetImage::SetAllLabelsVisibleByGroup(GroupIndexType group, bool visible)
 {
-  auto setVisibility = [visible](Label* l) { l->SetVisible(visible); };
+  auto setVisibility = [this, visible](Label* l)
+    {
+      l->SetVisible(visible);
+      this->UpdateLookupTable(l->GetValue());
+    };
 
   this->ApplyToLabels(this->GetLabelValuesByGroup(group), setVisibility);
 }
 
 void mitk::LabelSetImage::SetAllLabelsVisibleByName(GroupIndexType group, const std::string_view name, bool visible)
 {
-  auto setVisibility = [visible](Label* l) { l->SetVisible(visible); };
+  auto setVisibility = [this, visible](Label* l)
+    {
+      l->SetVisible(visible);
+      this->UpdateLookupTable(l->GetValue());
+    };
 
   this->ApplyToLabels(this->GetLabelValuesByName(group, name), setVisibility);
 }

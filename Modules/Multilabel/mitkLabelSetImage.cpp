@@ -345,11 +345,31 @@ mitk::Image* mitk::LabelSetImage::GetGroupImage(GroupIndexType groupID)
   return groupID == this->GetActiveLayer() ? this : m_LayerContainer[groupID];
 }
 
+
 const mitk::Image* mitk::LabelSetImage::GetGroupImage(GroupIndexType groupID) const
 {
   if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
 
-  return groupID == this->GetActiveLayer() ? this : m_LayerContainer[groupID].GetPointer();
+  return groupID == this->GetActiveLayer() ? this : m_LayerContainer.at(groupID).GetPointer();
+}
+
+const mitk::Image* mitk::LabelSetImage::GetGroupImageWorkarround(GroupIndexType groupID) const
+{
+  if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
+
+  if (groupID == this->GetActiveLayer() && this->GetMTime()> m_LayerContainer[groupID]->GetMTime())
+  { //we have to transfer the content first into the group image
+    if (4 == this->GetDimension())
+    {
+      AccessFixedDimensionByItk_n(this, ImageToLayerContainerProcessing, 4, (groupID));
+    }
+    else
+    {
+      AccessByItk_1(this, ImageToLayerContainerProcessing, groupID);
+    }
+  }
+
+  return m_LayerContainer[groupID].GetPointer();
 }
 
 void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
@@ -901,7 +921,7 @@ void mitk::LabelSetImage::LayerContainerToImageProcessing(itk::Image<TPixel, VIm
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::LabelSetImage::ImageToLayerContainerProcessing(itk::Image<TPixel, VImageDimension> *source,
+void mitk::LabelSetImage::ImageToLayerContainerProcessing(const itk::Image<TPixel, VImageDimension> *source,
                                                           unsigned int layer) const
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
@@ -924,6 +944,8 @@ void mitk::LabelSetImage::ImageToLayerContainerProcessing(itk::Image<TPixel, VIm
     ++sourceIter;
     ++targetIter;
   }
+
+  m_LayerContainer[layer]->Modified();
 }
 
 template <typename ImageType>

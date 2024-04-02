@@ -384,6 +384,13 @@ namespace mitk
     // END FUTURE MultiLabelSegmentation
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
+
+    /** DON'T USE. WORKARROUND method that is used until the rework is finished to
+    ensure always getting a group image and not this.
+    @warning Don't use. This method is going to be removed as soon as T30194 is
+    solved.*/
+      const mitk::Image* GetGroupImageWorkarround(GroupIndexType groupID) const;
+
     /**
       * \brief  */
       void UpdateCenterOfMass(PixelType pixelValue);
@@ -484,7 +491,7 @@ namespace mitk
     void LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension> *source, unsigned int layer);
 
     template <typename TPixel, unsigned int VImageDimension>
-    void ImageToLayerContainerProcessing(itk::Image<TPixel, VImageDimension> *source, unsigned int layer) const;
+    void ImageToLayerContainerProcessing(const itk::Image<TPixel, VImageDimension> *source, unsigned int layer) const;
 
     template <typename ImageType>
     void CalculateCenterOfMassProcessing(ImageType *input, LabelValueType index);

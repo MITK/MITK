@@ -95,7 +95,29 @@ namespace mitk
     * @pre If correctLabelValue==false, label value must be non conflicting.
     * @pre groupID must indicate an existing group.
     */
-    mitk::Label* AddLabel(mitk::Label* label, GroupIndexType groupID, bool addAsClone = true, bool correctLabelValue = true);
+    mitk::Label* AddLabel(Label* label, GroupIndexType groupID, bool addAsClone = true, bool correctLabelValue = true);
+
+    /** \brief Adds a label instance to a group of the multi label image including its pixel content.
+    * @remark By default, if the pixel value of the label is already used in the image, the label
+    * will get a new none conflicting value assigned. This can be controlled by correctLabelValue.
+    * @param label Instance of an label that should be added or used as template
+    * @param groupID The id of the group the label should be added to.
+    * @param labelContent Pointer to an image that contains the pixel content of the label that should be added.
+    * @param contentLabelValue Pixel value in the content image that indicates the label (may not be the same like the label value
+    * used in the segmentation after addition).
+    * @param addAsClone Flag that controls, if the passed instance should be added (false; the image will then take ownership,
+    * be aware that e.g. event observers will be added)
+    * a clone of the instance (true).
+    * @param correctLabelValue Flag that controls, if the value of the passed label should be correct, if this value is already used in
+    * the multi label image. True: Conflicting values will be corrected, be assigning a none conflicting value. False: If the value is conflicting
+    * an exception will be thrown.
+    * @return Instance of the label as it was added to the label set.
+    * @pre label must point to a valid instance.
+    * @pre If correctLabelValue==false, label value must be non conflicting.
+    * @pre groupID must indicate an existing group.
+    * @pre labelContent must point to a valid image that has the same geometry like the segmentation.
+    */
+    mitk::Label* AddLabelWithContent(Label* label, const Image* labelContent, GroupIndexType groupID, LabelValueType contentLabelValue, bool addAsClone = true, bool correctLabelValue = true);
 
     /** \brief Adds a new label to a group of the image by providing name and color.
     * @param name (Class) name of the label instance that should be added.

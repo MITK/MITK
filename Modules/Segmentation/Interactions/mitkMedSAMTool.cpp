@@ -22,8 +22,6 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usModuleResource.h>
 
-using namespace std::chrono_literals;
-
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, MedSAMTool, "MedSAMTool");
@@ -65,8 +63,7 @@ void mitk::MedSAMTool::OnRenderWindowClicked(StateMachineAction *, InteractionEv
       !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
                    *(this->GetWorkingPlaneGeometry())))
   {
-    this->GetDataStorage()->Remove(m_BoundingBoxNode);
-    m_BoundingBoxNode = nullptr;
+    this->ClearPicks();
     this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
     auto boundingBox = mitk::GeometryData::New();
     boundingBox->SetGeometry(static_cast<mitk::Geometry3D *>(
@@ -127,9 +124,10 @@ void mitk::MedSAMTool::ClearPicks()
 {
   this->GetDataStorage()->Remove(m_BoundingBoxNode);
   m_BoundingBoxNode = nullptr;
+  this->SetWorkingPlaneGeometry(nullptr);
 }
 
-std::stringstream mitk::MedSAMTool::GetPointsAsCSVString(const mitk::BaseGeometry * /*baseGeometry*/)
+std::stringstream mitk::MedSAMTool::GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry)
 {
   auto geometry = m_BoundingBoxNode->GetData()->GetGeometry();
   mitk::BoundingBox::ConstPointer boundingBox = geometry->GetBoundingBox();
@@ -138,7 +136,11 @@ std::stringstream mitk::MedSAMTool::GetPointsAsCSVString(const mitk::BaseGeometr
   std::stringstream pointsAndLabels;
   pointsAndLabels << "Coordinates\n";
   const char SPACE = ' ';
-  pointsAndLabels << abs(static_cast<int>(BBmin[0])) << SPACE << abs(static_cast<int>(BBmin[1])) << SPACE
-                  << abs(static_cast<int>(BBmax[0])) << SPACE << abs(static_cast<int>(BBmax[1]));
+  Point2D p2D_min =
+    this->Get2DIndicesfrom3DWorld(baseGeometry, geometry->GetIndexToWorldTransform()->TransformPoint(BBmin));
+  Point2D p2D_max =
+    this->Get2DIndicesfrom3DWorld(baseGeometry, geometry->GetIndexToWorldTransform()->TransformPoint(BBmax));
+  pointsAndLabels << abs(static_cast<int>(p2D_min[0])) << SPACE << abs(static_cast<int>(p2D_min[1])) << SPACE
+                  << abs(static_cast<int>(p2D_max[0])) << SPACE << abs(static_cast<int>(p2D_max[1]));
   return pointsAndLabels;
 }

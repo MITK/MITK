@@ -13,10 +13,10 @@ found in the LICENSE file.
 #include "QmitkMorphologicalOperationsWidget.h"
 #include <ui_QmitkMorphologicalOperationsWidgetControls.h>
 
+#include <mitkMultiLabelPredicateHelper.h>
 #include <mitkProgressBar.h>
-#include <QCheckBox>
-
-static const char* const HelpText = "Select a segmentation above";
+#include <mitkLabelSetImageConverter.h>
+#include <mitkLabelSetImageHelper.h>
 
 QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
   : QWidget(parent)
@@ -24,9 +24,12 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Dat
   m_Controls = new Ui::QmitkMorphologicalOperationsWidgetControls;
   m_Controls->setupUi(this);
 
-  m_Controls->dataSelectionWidget->SetDataStorage(dataStorage);
-  m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SegmentationPredicate);
-  m_Controls->dataSelectionWidget->SetHelpText(HelpText);
+  m_Controls->segNodeSelector->SetDataStorage(dataStorage);
+  m_Controls->segNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
+  m_Controls->segNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->segNodeSelector->SetInvalidInfo(QStringLiteral("Please select segmentation"));
+  m_Controls->segNodeSelector->SetPopUpTitel(QStringLiteral("Select segmentation"));
+  m_Controls->segNodeSelector->SetPopUpHint(QStringLiteral("Select the segmentation that should be modified."));
 
   connect(m_Controls->btnClosing, SIGNAL(clicked()), this, SLOT(OnClosingButtonClicked()));
   connect(m_Controls->btnOpening, SIGNAL(clicked()), this, SLOT(OnOpeningButtonClicked()));
@@ -35,35 +38,36 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Dat
   connect(m_Controls->btnFillHoles, SIGNAL(clicked()), this, SLOT(OnFillHolesButtonClicked()));
   connect(m_Controls->radioButtonMorphoCross, SIGNAL(clicked()), this, SLOT(OnRadioButtonsClicked()));
   connect(m_Controls->radioButtonMorphoBall, SIGNAL(clicked()), this, SLOT(OnRadioButtonsClicked()));
-  connect(m_Controls->dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)), this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
+  connect(m_Controls->segNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkMorphologicalOperationsWidget::OnSelectionChanged);
 
-  if (m_Controls->dataSelectionWidget->GetSelection(0).IsNotNull())
-    this->OnSelectionChanged(0, m_Controls->dataSelectionWidget->GetSelection(0));
+  auto widget = this;
+  connect(m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged,
+    this, [widget](mitk::LabelSetImage::LabelValueVectorType labels) {widget->ConfigureButtons(); });
+
+
+  m_Controls->segNodeSelector->SetAutoSelectNewNodes(true);
 }
 
 QmitkMorphologicalOperationsWidget::~QmitkMorphologicalOperationsWidget()
 {
+  m_Controls->labelInspector->SetMultiLabelNode(nullptr);
 }
 
-void QmitkMorphologicalOperationsWidget::OnSelectionChanged(unsigned int, const mitk::DataNode*)
+void QmitkMorphologicalOperationsWidget::OnSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/)
 {
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  auto node = m_Controls->segNodeSelector->GetSelectedNode();
+  m_Controls->labelInspector->SetMultiLabelNode(node);
 
-  if (node.IsNotNull())
-  {
-    m_Controls->dataSelectionWidget->SetHelpText("");
-    this->EnableButtons(true);
-  }
-  else
-  {
-    m_Controls->dataSelectionWidget->SetHelpText(HelpText);
-    this->EnableButtons(false);
-  }
+  this->ConfigureButtons();
 }
 
-void QmitkMorphologicalOperationsWidget::EnableButtons(bool enable)
+void QmitkMorphologicalOperationsWidget::ConfigureButtons()
 {
+  auto node = m_Controls->segNodeSelector->GetSelectedNode();
+
+  bool enable = node.IsNotNull() && !m_Controls->labelInspector->GetSelectedLabels().empty();
+
   m_Controls->btnClosing->setEnabled(enable);
   m_Controls->btnDilatation->setEnabled(enable);
   m_Controls->btnErosion->setEnabled(enable);
@@ -81,161 +85,36 @@ void QmitkMorphologicalOperationsWidget::OnRadioButtonsClicked()
 
 void QmitkMorphologicalOperationsWidget::OnClosingButtonClicked()
 {
-  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
-  mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-  mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
-  try
-  {
-    int factor = m_Controls->spinBoxMorphFactor->isEnabled()
-      ? m_Controls->spinBoxMorphFactor->value()
-      : 1;
-
-    mitk::MorphologicalOperations::Closing(image, factor, structuralElement);
-  }
-  catch (const itk::ExceptionObject& exception)
-  {
-    MITK_WARN << "Exception caught: " << exception.GetDescription();
-
-    QApplication::restoreOverrideCursor();
-    return;
-  }
-
-  node->SetData(image);
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QApplication::restoreOverrideCursor();
+  this->Processing(mitk::MorphologicalOperations::Closing, "Closing");
 }
 
 void QmitkMorphologicalOperationsWidget::OnOpeningButtonClicked()
 {
-  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
-  mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-
-  mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
-
-  try
-  {
-    int factor = m_Controls->spinBoxMorphFactor->isEnabled()
-      ? m_Controls->spinBoxMorphFactor->value()
-      : 1;
-
-     mitk::MorphologicalOperations::Opening(image, factor, structuralElement);
-  }
-  catch (const itk::ExceptionObject& exception)
-  {
-     MITK_WARN << "Exception caught: " << exception.GetDescription();
-
-     QApplication::restoreOverrideCursor();
-     return;
-  }
-
-  node->SetData(image);
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QApplication::restoreOverrideCursor();
+  this->Processing(mitk::MorphologicalOperations::Opening, "Open");
 }
 
 void QmitkMorphologicalOperationsWidget::OnDilatationButtonClicked()
 {
-  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
-  mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-  mitk::MorphologicalOperations::StructuralElementType structuralElement = this->CreateStructerElement_UI();
-
-  try
-  {
-    int factor = m_Controls->spinBoxMorphFactor->isEnabled()
-      ? m_Controls->spinBoxMorphFactor->value()
-      : 1;
-
-    mitk::MorphologicalOperations::Dilate(image, factor, structuralElement);
-  }
-  catch (const itk::ExceptionObject& exception)
-  {
-    MITK_WARN << "Exception caught: " << exception.GetDescription();
-
-    QApplication::restoreOverrideCursor();
-    return;
-  }
-
-  node->SetData(image);
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QApplication::restoreOverrideCursor();
+  this->Processing(mitk::MorphologicalOperations::Dilate, "Dilate");
 }
 
 void QmitkMorphologicalOperationsWidget::OnErosionButtonClicked()
 {
-  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
-  mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
-
-  try
-  {
-    int factor = m_Controls->spinBoxMorphFactor->isEnabled()
-      ? m_Controls->spinBoxMorphFactor->value()
-      : 1;
-
-    mitk::MorphologicalOperations::Erode(image, factor, structuralElement);
-  }
-  catch (const itk::ExceptionObject& exception)
-  {
-    MITK_WARN << "Exception caught: " << exception.GetDescription();
-
-    QApplication::restoreOverrideCursor();
-    return;
- }
-
-  node->SetData(image);
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QApplication::restoreOverrideCursor();
+  this->Processing(mitk::MorphologicalOperations::Erode, "Erode");
 }
 
 void QmitkMorphologicalOperationsWidget::OnFillHolesButtonClicked()
 {
-  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  auto wrapper = [](mitk::Image::Pointer& image, int,
+    mitk::MorphologicalOperations::StructuralElementType)
+    {
+      mitk::MorphologicalOperations::FillHoles(image);
+    };
 
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
-  mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-
-  try
-  {
-    mitk::MorphologicalOperations::FillHoles(image);
-  }
-  catch (const itk::ExceptionObject& exception)
-  {
-    MITK_WARN << "Exception caught: " << exception.GetDescription();
-
-    QApplication::restoreOverrideCursor();
-    return;
-  }
-
-  node->SetData(image);
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QApplication::restoreOverrideCursor();
+  this->Processing(wrapper, "FillHoles");
 }
 
-
-mitk::MorphologicalOperations::StructuralElementType QmitkMorphologicalOperationsWidget::CreateStructerElement_UI()
+mitk::MorphologicalOperations::StructuralElementType QmitkMorphologicalOperationsWidget::CreateStructerElement_UI() const
 {
   bool ball = m_Controls->radioButtonMorphoBall->isChecked();
   int accum_flag = 0;
@@ -251,4 +130,84 @@ mitk::MorphologicalOperations::StructuralElementType QmitkMorphologicalOperation
     if(m_Controls->planeSelectionComboBox->currentIndex() == 3) accum_flag = mitk::MorphologicalOperations::Cross_Coronal;
   }
   return (mitk::MorphologicalOperations::StructuralElementType)accum_flag;
+}
+
+mitk::Image::Pointer QmitkMorphologicalOperationsWidget::GetSelectedLabelMask() const
+{
+  auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation(); 
+  if (seg == nullptr) mitkThrow() << "Widget is in invalid state. Processing was triggered with no segmentation selected.";
+
+  auto labels = m_Controls->labelInspector->GetSelectedLabels();
+  if (labels.empty()) mitkThrow() << "Widget is in invalid state. Processing was triggered with no label selected.";
+
+  return mitk::CreateLabelMask(seg, labels.front(), true);
+}
+
+void QmitkMorphologicalOperationsWidget::SaveResultLabelMask(const mitk::Image* resultMask, const std::string& labelName) const
+{
+  auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
+  if (seg == nullptr) mitkThrow() << "Widget is in invalid state. Processing was triggered with no segmentation selected.";
+
+  auto labels = m_Controls->labelInspector->GetSelectedLabels();
+  if (labels.empty()) mitkThrow() << "Widget is in invalid state. Processing was triggered with no label selected.";
+
+  if (m_Controls->checkNewLabel->isChecked())
+  {
+    auto groupID = seg->AddLayer();
+    auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(seg, labelName, true);
+    seg->AddLabelWithContent(newLabel, resultMask, groupID, 1);
+  }
+  else
+  {
+    auto groupID = seg->GetGroupIndexOfLabel(labels.front());
+    mitk::TransferLabelContent(resultMask, seg->GetGroupImage(groupID), seg->GetConstLabelsByValue(seg->GetLabelValuesByGroup(groupID)),
+      mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, { {1, labels.front()} },
+      mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+  }
+
+  m_Controls->labelInspector->GetMultiLabelSegmentation()->Modified();
+  m_Controls->labelInspector->GetMultiLabelNode()->Modified();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkMorphologicalOperationsWidget::Processing(std::function<MorphFunctionType> morphFunction, const std::string& opsName) const
+{
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+  mitk::ProgressBar::GetInstance()->Reset();
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(3);
+
+  mitk::Image::Pointer image = this->GetSelectedLabelMask();
+  mitk::ProgressBar::GetInstance()->Progress();
+
+  mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
+
+  int factor = m_Controls->spinBoxMorphFactor->isEnabled()
+    ? m_Controls->spinBoxMorphFactor->value()
+    : 1;
+
+  try
+  {
+    morphFunction(image, factor, structuralElement);
+  }
+  catch (const itk::ExceptionObject& exception)
+  {
+    MITK_WARN << "Exception caught: " << exception.GetDescription();
+
+    QApplication::restoreOverrideCursor();
+    mitk::ProgressBar::GetInstance()->Reset();
+    return;
+  }
+  mitk::ProgressBar::GetInstance()->Progress();
+
+  auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
+  auto labels = m_Controls->labelInspector->GetSelectedLabels();
+
+  std::stringstream labelName;
+  labelName << opsName << " " << seg->GetLabel(labels.front())->GetName() << " (r=" << factor << ")";
+
+  this->SaveResultLabelMask(image, labelName.str());
+  mitk::ProgressBar::GetInstance()->Progress();
+
+  QApplication::restoreOverrideCursor();
+  mitk::ProgressBar::GetInstance()->Reset();
 }

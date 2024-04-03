@@ -109,6 +109,7 @@ void QmitkExtractFromMultiLabelSegmentationWidget::StoreToDataStorage(mitk::Imag
 
 void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
 {
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   auto node = m_Controls->segNodeSelector->GetSelectedNodes().front();
 
   auto seg = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
@@ -155,4 +156,5 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
     }
   }
   mitk::ProgressBar::GetInstance()->Reset();
+  QApplication::restoreOverrideCursor();
 }

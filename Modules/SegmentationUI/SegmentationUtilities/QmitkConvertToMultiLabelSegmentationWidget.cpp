@@ -360,6 +360,8 @@ void CheckForLabelCollisionHelper(const QmitkNodeSelectionDialog::NodeList& node
 
 void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSelectionDialog::NodeList& nodes)
 {
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+
   auto noneImageNodes = GetNoneImageNodes(nodes);
   auto imageNodes = GetImageNodes(nodes);
 
@@ -540,4 +542,5 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     dataStorage->Add(outNode);
   }
   mitk::ProgressBar::GetInstance()->Reset();
+  QApplication::restoreOverrideCursor();
 }

@@ -63,6 +63,7 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   view->setContextMenuPolicy(Qt::CustomContextMenu);
 
   connect(m_Model, &QAbstractItemModel::modelReset, this, &QmitkMultiLabelInspector::OnModelReset);
+  connect(m_Model, &QAbstractItemModel::dataChanged, this, &QmitkMultiLabelInspector::OnDataChanged);
   connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnChangeModelSelection(const QItemSelection&, const QItemSelection&)));
   connect(view, &QAbstractItemView::customContextMenuRequested, this, &QmitkMultiLabelInspector::OnContextMenuRequested);
   connect(view, &QAbstractItemView::doubleClicked, this, &QmitkMultiLabelInspector::OnItemDoubleClicked);
@@ -208,6 +209,13 @@ void QmitkMultiLabelInspector::OnModelReset()
 {
   m_LastValidSelectedLabels = {};
   m_ModelManipulationOngoing = false;
+}
+
+void QmitkMultiLabelInspector::OnDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,
+  const QList<int>& roles)
+{
+  if (!m_ModelManipulationOngoing && topLeft.isValid())
+    m_Controls->view->expand(topLeft);
 }
 
 bool EqualLabelSelections(const QmitkMultiLabelInspector::LabelValueVectorType& selection1, const QmitkMultiLabelInspector::LabelValueVectorType& selection2)

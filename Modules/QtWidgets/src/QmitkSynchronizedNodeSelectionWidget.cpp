@@ -35,6 +35,7 @@ QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidg
   m_Controls.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls.tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_Controls.tableView->resizeColumnsToContents();
 
   this->SetUpConnections();
   this->Initialize();

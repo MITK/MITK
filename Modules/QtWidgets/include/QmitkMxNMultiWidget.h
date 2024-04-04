@@ -102,6 +102,7 @@ public Q_SLOTS:
   void moveEvent(QMoveEvent* e) override;
   void LoadLayout(const nlohmann::json* jsonData);
   void SaveLayout(std::ostream* outStream);
+  void SetDataBasedLayout(QmitkAbstractNodeSelectionWidget::NodeList nodes);
 
 Q_SIGNALS:
 
@@ -116,6 +117,7 @@ private:
   void SetInteractionSchemeImpl() override { }
 
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();
+  QmitkAbstractMultiWidget::RenderWindowWidgetPointer GetWindowFromIndex(size_t index);
   void SetInitialSelection();
   void ToggleSynchronization(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
 

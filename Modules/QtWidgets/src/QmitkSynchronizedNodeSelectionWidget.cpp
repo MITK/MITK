@@ -326,6 +326,12 @@ void QmitkSynchronizedNodeSelectionWidget::SetUpConnections()
     this, &QmitkSynchronizedNodeSelectionWidget::OnTableClicked);
 }
 
+void QmitkSynchronizedNodeSelectionWidget::SetSelection(const NodeList& newSelection)
+{
+  this->HandleChangeOfInternalSelection(newSelection);
+  m_Controls.selectionModeCheckBox->setChecked(false);
+}
+
 void QmitkSynchronizedNodeSelectionWidget::Initialize()
 {
   auto baseRenderer = m_BaseRenderer.Lock();

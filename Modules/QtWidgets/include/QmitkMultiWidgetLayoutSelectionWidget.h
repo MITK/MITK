@@ -35,10 +35,12 @@ class MITKQTWIDGETS_EXPORT QmitkMultiWidgetLayoutSelectionWidget : public QWidge
 public:
 
   QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent = nullptr);
+  void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);
+  void SetDataBasedLayout(QmitkAbstractNodeSelectionWidget::NodeList nodes);
 
   // needs to be connected via Qt::DirectConnection (usually default), to ensure the stream pointers validity
   void SaveLayout(std::ostream* outStream);

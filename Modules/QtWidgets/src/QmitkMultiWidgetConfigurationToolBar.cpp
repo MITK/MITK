@@ -40,6 +40,7 @@ void QmitkMultiWidgetConfigurationToolBar::InitializeToolBar()
   AddButtons();
 
   connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::LayoutSet, this, &QmitkMultiWidgetConfigurationToolBar::LayoutSet);
+  connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout, this, &QmitkMultiWidgetConfigurationToolBar::SetDataBasedLayout);
   connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::SaveLayout, this, &QmitkMultiWidgetConfigurationToolBar::SaveLayout);
   connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::LoadLayout, this, &QmitkMultiWidgetConfigurationToolBar::LoadLayout);
 }
@@ -61,6 +62,13 @@ void QmitkMultiWidgetConfigurationToolBar::AddButtons()
   m_InteractionSchemeChangeAction->setChecked(false);
   connect(m_InteractionSchemeChangeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged);
   QToolBar::addAction(m_InteractionSchemeChangeAction);
+}
+
+void QmitkMultiWidgetConfigurationToolBar::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
+{
+  if (m_LayoutSelectionPopup == nullptr)
+    return;
+  m_LayoutSelectionPopup->SetDataStorage(dataStorage);
 }
 
 void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()

@@ -33,6 +33,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
   ui.tableWidget->setStyleSheet(stylesheet);
 
   m_AutomatedDataLayoutWidget = new QmitkAutomatedLayoutWidget(this);
+  connect(m_AutomatedDataLayoutWidget, &QmitkAutomatedLayoutWidget::SetDataBasedLayout, this, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout);
   m_AutomatedDataLayoutWidget->hide();
 
   connect(ui.tableWidget, &QTableWidget::itemSelectionChanged, this, &QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged);
@@ -52,6 +53,13 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
     ui.selectDefaultLayoutComboBox->addItem(QString::fromStdString(resourceName));
     m_PresetMap[ui.selectDefaultLayoutComboBox->count() - 1] = data;
   }
+}
+
+void QmitkMultiWidgetLayoutSelectionWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
+{
+  if (m_AutomatedDataLayoutWidget == nullptr)
+    return;
+  m_AutomatedDataLayoutWidget->SetDataStorage(dataStorage);
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged()

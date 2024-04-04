@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mitkCrosshairManager.h>
 #include <mitkDataStorage.h>
 #include <mitkRenderWindow.h>
+#include "QmitkRenderWindowUtilityWidget.h"
 
 // qt
 #include <QFrame>
@@ -63,6 +64,7 @@ public:
   void ForceImmediateUpdate();
 
   void AddUtilityWidget(QWidget* utilityWidget);
+  QmitkRenderWindowUtilityWidget* GetUtilityWidget();
 
   void SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower);
   void ShowGradientBackground(bool enable);

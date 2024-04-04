@@ -63,6 +63,9 @@ Q_SIGNALS:
   void SelectionModeChanged(bool selectAll);
   void DeregisterSynchronization();
 
+public Q_SLOTS:
+  void SetSelection(const NodeList& newSelection);
+
 private Q_SLOTS:
 
   void OnModelUpdated();

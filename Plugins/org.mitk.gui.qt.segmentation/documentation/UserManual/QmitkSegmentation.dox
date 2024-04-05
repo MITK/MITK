@@ -271,7 +271,7 @@ For a detailed explanation of what this algorithm is able to, please refer to ht
 Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow setting impacts the segmentation. However, any applied color maps are ignored.
 
 \subsubsection org_mitk_views_segmentationSegmentAnythingWorkflow Workflow:
-    -# Install Segment Anything: Goto Preferences (Cntl+P) > Segment Anything and click "Install Segment Anything" to install Segment Anything (version: 1.0). 
+    -# Install Segment Anything: Goto Preferences (Cntl+P) > Segment Anything and click "Install Segment Anything with MedSAM" to install Segment Anything (version: 1.0). 
     The installation process implicitly creates a python virtual environment using the Python located in "System Python" in an MITK mainitained directory. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
     Once installed, the "Install Segment Anything" button is grayed out.
     \imageMacro{QmitkSegmentation_SAMTool_Preferences.png,"Segment Anything Preferences",10.00}
@@ -285,6 +285,28 @@ Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow sett
     -# Click "Initialize Segment Anything" to start the tool backend. This will invoke downloading of the selected model type from the internet. This might take a while. It is a one time job, though.
     -# Once the tool is initialized, Press SHIFT+Left Click on any of the 3 render windows to start click guided segmentation on that slice.
     -# Press SHIFT+Right Click for negative clicks to adjust the preview mask on the render window.
+
+\subsection org_mitk_views_segmentationMedSAM MedSAM Tool
+
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"MedSAM tool",10.00}
+
+\imageMacro{QmitkSegmentation_SAMTool.png,"MedSAM tool",10.00}
+
+The MedSAM (Segment Anything in medical images) tool is the Segment Anything Tool albeit, with a new model backend. The MedSAM is designed as a foundation model designed universal medical image segmentation. 
+Just like the Segment Anything tool, MedSAM tool requires that you have Python 3 installed and available on your machine. Note: On Debian/Ubuntu systems, you need to install git, python3-pip, python3-venv package using the following command: `apt install git python3-pip python3-venv`. For best experience, your machine should be ideally equipped with a CUDA-enabled GPU. 
+For a detailed explanation of what this algorithm is able to, please refer to https://www.nature.com/articles/s41467-024-44824-z<br>
+Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow setting impacts the segmentation. However, any applied color maps are ignored.
+
+\subsubsection org_mitk_views_segmentationMedSAMWorkflow Workflow:
+    -# Install MedSAM: Goto Preferences (Cntl+P) > Segment Anything and click "Install Segment Anything with MedSAM" to install Segment Anything (version: 1.0) & MedSAM tool backends together. 
+    The installation process implicitly creates a python virtual environment using the Python located in "System Python" in an MITK mainitained directory. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    Once installed, the "Install Segment Anything with MedSAM" button is grayed out. For details, refer to the Segment Anything tool workflow.
+
+    -# Goto Segmentation View > 2D tools > MedSAM.
+    -# Click "Initialize MedSAM" to start the tool backend. This will start downloading the model [weights] from the internet, if not done before. This might take a while. It is a one time job, though.
+    -# Once the tool is initialized, Press SHIFT+Left Click on any of the 3 render windows to invoke a bounding box over that slice.
+    -# Click on the anchor points of the bounding box to adjust the Region of Interest.
+    -# Click on Preview to generate segmentation from MedSAM model.
 
 \subsection org_mitk_views_segmentationinterpolation 2D and 3D Interpolation
 

@@ -11,11 +11,21 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkAutomatedLayoutWidget.h"
+#include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateAnd.h"
+#include "mitkNodePredicateNot.h"
+#include "mitkNodePredicateProperty.h"
+#include "mitkImage.h"
 
 QmitkAutomatedLayoutWidget::QmitkAutomatedLayoutWidget(QWidget* parent)
 {
   m_Controls.setupUi(this);
 
+  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+  auto isNotHelper = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"));
+  auto isNotHidden = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object"));
+  auto isValidImage = mitk::NodePredicateAnd::New(isImage, isNotHelper, isNotHidden);
+  m_Controls.dataSelector->SetNodePredicate(isValidImage);
   m_Controls.dataSelector->SetInvalidInfo(QStringLiteral("Please select images for the layout"));
   m_Controls.dataSelector->SetPopUpTitel(QStringLiteral("Select input images"));
   m_Controls.dataSelector->SetPopUpHint(QStringLiteral("Select as many images as you want to compare"));

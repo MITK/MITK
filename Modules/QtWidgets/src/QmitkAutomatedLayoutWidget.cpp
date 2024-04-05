@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include "mitkImage.h"
 
 QmitkAutomatedLayoutWidget::QmitkAutomatedLayoutWidget(QWidget* parent)
+  : QWidget(parent)
 {
   m_Controls.setupUi(this);
 

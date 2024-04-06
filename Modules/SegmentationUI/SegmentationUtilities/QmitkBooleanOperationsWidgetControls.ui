@@ -6,19 +6,70 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>210</width>
-    <height>91</height>
+    <width>249</width>
+    <height>227</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QmitkDataSelectionWidget" name="dataSelectionWidget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="QmitkSingleNodeSelectionWidget" name="segNodeSelector" native="true"/>
+   </item>
+   <item>
+    <widget class="QmitkMultiLabelInspector" name="labelInspector" native="true"/>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Selected operands:</string>
      </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label2nd">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label1st">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="line1stLabel">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>select 1st label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineOtherLabels">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>select label</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -41,9 +92,8 @@
         <string>Difference</string>
        </property>
        <property name="icon">
-        <iconset>
-         <normaloff>:/Qmitk/BooleanDifference_48x48.png</normaloff>:/Qmitk/BooleanDifference_48x48.png
-        </iconset>
+        <iconset resource="../resources/SegmentationUI.qrc">
+         <normaloff>:/Qmitk/BooleanDifference_48x48.png</normaloff>:/Qmitk/BooleanDifference_48x48.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -83,9 +133,8 @@
         <string>Intersection</string>
        </property>
        <property name="icon">
-        <iconset>
-         <normaloff>:/Qmitk/BooleanIntersection_48x48.png</normaloff>:/Qmitk/BooleanIntersection_48x48.png
-        </iconset>
+        <iconset resource="../resources/SegmentationUI.qrc">
+         <normaloff>:/Qmitk/BooleanIntersection_48x48.png</normaloff>:/Qmitk/BooleanIntersection_48x48.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -125,9 +174,8 @@
         <string>Union</string>
        </property>
        <property name="icon">
-        <iconset>
-         <normaloff>:/Qmitk/BooleanUnion_48x48.png</normaloff>:/Qmitk/BooleanUnion_48x48.png
-        </iconset>
+        <iconset resource="../resources/SegmentationUI.qrc">
+         <normaloff>:/Qmitk/BooleanUnion_48x48.png</normaloff>:/Qmitk/BooleanUnion_48x48.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -168,9 +216,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataSelectionWidget</class>
+   <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkDataSelectionWidget.h</header>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkMultiLabelInspector</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkMultiLabelInspector.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

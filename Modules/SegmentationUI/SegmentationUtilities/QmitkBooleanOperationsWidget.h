@@ -13,11 +13,13 @@ found in the LICENSE file.
 #ifndef QmitkBooleanOperationsWidget_h
 #define QmitkBooleanOperationsWidget_h
 
-#include <MitkSegmentationUIExports.h>
+#include <mitkLabelSetImage.h>
 
-#include <mitkBooleanOperation.h>
+#include <QmitkAbstractNodeSelectionWidget.h>
 
 #include <QWidget>
+
+#include <MitkSegmentationUIExports.h>
 
 namespace Ui
 {
@@ -39,14 +41,16 @@ public:
   ~QmitkBooleanOperationsWidget() override;
 
 private slots:
-  void OnSelectionChanged(unsigned int index, const mitk::DataNode* selection);
+  void OnSegSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
+  void OnLabelSelectionChanged(mitk::LabelSetImage::LabelValueVectorType labels);
   void OnDifferenceButtonClicked();
   void OnIntersectionButtonClicked();
   void OnUnionButtonClicked();
 
 private:
-  void EnableButtons(bool enable = true);
-  void DoBooleanOperation(mitk::BooleanOperation::Type type);
+  void ConfigureWidgets();
+  void SaveResultLabelMask(const mitk::Image* resultMask, const std::string& labelName) const;
+
 
   Ui::QmitkBooleanOperationsWidgetControls* m_Controls;
 };

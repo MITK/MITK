@@ -13,23 +13,27 @@ found in the LICENSE file.
 #include "QmitkImageStatisticsTreeItem.h"
 
 QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
-  ImageStatisticsObject statisticsData,
-  StatisticNameVector statisticNames,
-  QVariant label, bool isWIP,
-  QmitkImageStatisticsTreeItem *parent)
-  : m_statistics(statisticsData) , m_statisticNames(statisticNames), m_label(label), m_parentItem(parent), m_IsWIP(isWIP)
+  const ImageStatisticsObject& statisticsData,
+  const StatisticNameVector& statisticNames,
+  QVariant itemText, bool isWIP,
+  QmitkImageStatisticsTreeItem *parent, const mitk::DataNode* imageNode,
+  const mitk::DataNode* maskNode, const mitk::Label* label)
+  : m_statistics(statisticsData) , m_statisticNames(statisticNames), m_ItemText(itemText), m_parentItem(parent),
+    m_ImageNode(imageNode), m_MaskNode(maskNode), m_Label(label), m_IsWIP(isWIP), m_NA(false)
 {
 }
 
- QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(StatisticNameVector statisticNames,
-                                                           QVariant label,
-                                                           bool isWIP,
-                                                           QmitkImageStatisticsTreeItem *parentItem)
-  : QmitkImageStatisticsTreeItem(ImageStatisticsObject(), statisticNames, label, isWIP, parentItem )
+QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
+  const StatisticNameVector& statisticNames, QVariant itemText, bool isWIP,
+  bool isNA, QmitkImageStatisticsTreeItem *parentItem,
+  const mitk::DataNode* imageNode, const mitk::DataNode* maskNode,
+  const mitk::Label* label)
+  : QmitkImageStatisticsTreeItem(ImageStatisticsObject(), statisticNames, itemText, isWIP, parentItem, imageNode, maskNode, label )
 {
+  m_NA = isNA;
 }
 
- QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem() : QmitkImageStatisticsTreeItem(StatisticNameVector(), QVariant(), false, nullptr ) {}
+QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem() : QmitkImageStatisticsTreeItem(StatisticNameVector(), QVariant(), false, false, nullptr ) {}
 
 QmitkImageStatisticsTreeItem::~QmitkImageStatisticsTreeItem()
 {
@@ -88,6 +92,10 @@ QVariant QmitkImageStatisticsTreeItem::data(int column) const
       {
         result = QVariant(QString("..."));
       }
+      else if (m_NA)
+      {
+        result = QVariant(QString("N/A"));
+      }
       else
       {
         auto statisticKey = m_statisticNames.at(column - 1);
@@ -108,7 +116,7 @@ QVariant QmitkImageStatisticsTreeItem::data(int column) const
   }
   else if (column == 0)
   {
-    result = m_label;
+    result = m_ItemText;
   }
   return result;
 }
@@ -129,4 +137,9 @@ int QmitkImageStatisticsTreeItem::row() const
 bool QmitkImageStatisticsTreeItem::isWIP() const
 {
   return m_IsWIP;
+}
+
+mitk::Label::ConstPointer QmitkImageStatisticsTreeItem::GetLabelInstance() const
+{
+  return m_Label.Lock();
 }

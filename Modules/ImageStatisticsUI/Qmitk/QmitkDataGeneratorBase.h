@@ -27,15 +27,15 @@ found in the LICENSE file.
 
 /*!
 \brief QmitkDataGeneratorBase
-BaseClass that implements the organisation of (statistic) data generation for pairs of images and ROIs.
+BaseClass that implements the organization of (statistic) data generation for pairs of images and ROIs.
 The key idea is that this class ensures that for vector of given image ROI pairs (defined by derived classes)
 a result instance (e.g ImageStatisticsContainer) will be calculated, if needed (e.g. because it is missing or
-not uptodate anymore), and stored in the data storage passed to a generator instance. While derived classes i.a.
+not up to date anymore), and stored in the data storage passed to a generator instance. While derived classes i.a.
 specify how to generate the image ROI pairs, how to detect latest results, what the next generation step is and
 how to remove obsolete data from the storage, the base class takes care of the observation of the data storage
 and orchestrates the whole checking and generation workflow.
 In all the generation/orchestration process the data storage, passed to the generator, 1) serves as place where the final
-results are stored and searched and 2) it resembles the state of the genertion process with these final results and WIP
+results are stored and searched and 2) it resembles the state of the generation process with these final results and WIP
 place holder nodes that indicate planed or currently processed generation steps.
 */
 class MITKIMAGESTATISTICSUI_EXPORT QmitkDataGeneratorBase : public QObject
@@ -63,9 +63,9 @@ public:
   bool IsGenerating() const;
 
   /** Checks data validity and triggers generation of data, if needed.
-  The generation itselfs will be done with a thread pool and is orchestrated by this class. To learn if the threads are finished and
+  The generation itself will be done with a thread pool and is orchestrated by this class. To learn if the threads are finished and
   everything is uptodate, listen to the signal GenerationFinished.
-  @return indicates if everything is already valid (true) or if the generation of new data was triggerd (false).*/
+  @return indicates if everything is already valid (true) or if the generation of new data was triggered (false).*/
   bool Generate() const;
 
   /** Indicates if for a given image and ROI a valid final result is available.*/
@@ -78,14 +78,14 @@ public slots:
   void SetAutoUpdate(bool autoUpdate);
 
 protected slots:
-  /** Used by QmitkDataGenerationJobBase to signal the generator that an error occured. */
+  /** Used by QmitkDataGenerationJobBase to signal the generator that an error occurred. */
   void OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob) const;
   /** Used by QmitkDataGenerationJobBase to signal and communicate the results of there computation. */
   void OnFinalResultsAvailable(JobResultMapType results, const QmitkDataGenerationJobBase *job) const;
 
 signals:
 
-  /*! @brief Signal that is emitted if a data generation job is started to generat outdated/inexistant data.
+  /*! @brief Signal that is emitted if a data generation job is started to generate outdated/inexistent data.
   */
   void DataGenerationStarted(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode, const QmitkDataGenerationJobBase* job) const;
 
@@ -113,19 +113,19 @@ protected:
 
   /** This method must be implemented by derived to indicate if a changed node is relevant and therefore if an update must be triggered.*/
   virtual bool ChangedNodeIsRelevant(const mitk::DataNode* changedNode) const = 0;
-  /** This method must be impemented by derived classes to return the pairs of images and ROIs
+  /** This method must be implemented by derived classes to return the pairs of images and ROIs
   (ROI may be null if no ROI is needed) for which data are needed.*/
   virtual InputPairVectorType GetAllImageROICombinations() const = 0;
   /** This method should indicate all missing and outdated (interim) results in the data storage, with new placeholder nodes and WIP dummy data
    added to the storage. The placeholder nodes will be replaced by the real results as soon as they are ready.
-   The strategy how to detact which placeholder node is need and how the dummy data should look like must be implemented by derived classes.*/
+   The strategy how to detect which placeholder node is need and how the dummy data should look like must be implemented by derived classes.*/
   virtual void IndicateFutureResults(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const = 0;
   /*! @brief Is called to generate the next job instance that needs to be done and is associated dummy node
       in order to progress the data generation workflow.
    @remark The method can assume that the caller takes care of the job instance deletion.
    @return std::pair of job pointer and placeholder node associated with the job. Following combinations are possible:
    - Both are null: nothing to do;
-   - Both are set: there is something to do for a pending dumme node -> trigger computation;
+   - Both are set: there is something to do for a pending dummy node -> trigger computation;
    - Job null and node set: a job for this node is already work in progress -> pass on till its finished.*/
   virtual std::pair<QmitkDataGenerationJobBase*,mitk::DataNode::Pointer> GetNextMissingGenerationJob(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const =0;
   /** Remove all obsolete data nodes for the given image and ROI node from the data storage.
@@ -146,7 +146,7 @@ protected:
   /** Internal part of the generation strategy. Here is where the heavy lifting is done.*/
   bool DoGenerate() const;
 
-  /** Methods either directly calls generation or if its allready onging flags to restart the generation.*/
+  /** Methods either directly calls generation or if its already ongoing flags to restart the generation.*/
   void EnsureRecheckingAndGeneration() const;
 
   mitk::WeakPointer<mitk::DataStorage> m_Storage;
@@ -154,6 +154,9 @@ protected:
   bool m_AutoUpdate = false;
 
   mutable std::mutex m_DataMutex;
+
+  /** Time stamp for the last successful run through with the current image roi pairs.*/
+  mutable itk::TimeStamp m_GenerationTime;
 
 private: 
   /** Indicates if we are currently in the Generation() verification and generation of pending jobs triggering loop.

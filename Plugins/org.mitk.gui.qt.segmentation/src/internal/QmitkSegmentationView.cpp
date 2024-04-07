@@ -1048,7 +1048,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     if (numberOfLabels > 0)
       m_Controls->slicesInterpolator->setEnabled(true);
 
-    m_Controls->multiLabelWidget->SetMultiLabelSegmentation(dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData()));
+    m_Controls->multiLabelWidget->SetMultiLabelNode(workingNode);
 
     if (!m_Controls->multiLabelWidget->GetSelectedLabels().empty())
     {
@@ -1057,7 +1057,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
   }
   else
   {
-    m_Controls->multiLabelWidget->SetMultiLabelSegmentation(nullptr);
+    m_Controls->multiLabelWidget->SetMultiLabelNode(nullptr);
   }
 
   toolSelectionBoxesEnabled &= numberOfLabels > 0;

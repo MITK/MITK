@@ -37,7 +37,7 @@ namespace mitk
         typedef std::map<std::string, statisticsValueType> statisticsMapType;
         typedef itk::Statistics::Histogram<double> HistogramType;
         typedef unsigned short MaskPixelType;
-        using LabelIndex = ImageStatisticsContainer::LabelIndex;
+        using LabelIndex = ImageStatisticsContainer::LabelValueType;
 
         /**Documentation
         @brief Set the image for which the statistics are to be computed.*/
@@ -71,10 +71,9 @@ namespace mitk
         double GetBinSizeForHistogramStatistics() const;
 
         /**Documentation
-        @brief Returns the statistics for label @a label. If these requested statistics are not computed yet the computation is done as well.
-        For performance reasons, statistics for all labels in the image are computed at once.
+        @brief Returns the statistics. If these requested statistics are not computed yet the computation is done as well.
          */
-        ImageStatisticsContainer* GetStatistics(LabelIndex label=1);
+        ImageStatisticsContainer* GetStatistics();
 
     protected:
         ImageStatisticsCalculator(){
@@ -86,20 +85,19 @@ namespace mitk
 
     private:
         //Calculates statistics for each timestep for image
-        template < typename TPixel, unsigned int VImageDimension > void InternalCalculateStatisticsUnmasked(
-                typename itk::Image< TPixel, VImageDimension >* image, const TimeGeometry* timeGeometry, TimeStepType timeStep);
-
-        template < typename TPixel, unsigned int VImageDimension > void InternalCalculateStatisticsMasked(
-                typename itk::Image< TPixel, VImageDimension >* image, const TimeGeometry* timeGeometry,
-                unsigned int timeStep);
+        template < typename TPixel, unsigned int VImageDimension >
+        void InternalCalculateStatisticsUnmasked(const itk::Image< TPixel, VImageDimension >* image, TimeStepType timeStep);
 
         template < typename TPixel, unsigned int VImageDimension >
-        double GetVoxelVolume(typename itk::Image<TPixel, VImageDimension>* image) const;
+        void InternalCalculateStatisticsMasked(const itk::Image< TPixel, VImageDimension >* image, TimeStepType timeStep);
 
-        bool IsUpdateRequired(LabelIndex label) const;
+        template < typename TPixel, unsigned int VImageDimension >
+        double GetVoxelVolume(const itk::Image<TPixel, VImageDimension>* image) const;
+
+        bool IsUpdateRequired() const;
 
         mitk::Image::ConstPointer m_Image;
-        mitk::Image::Pointer m_ImageTimeSlice;
+        mitk::Image::ConstPointer m_ImageTimeSlice;
         mitk::Image::ConstPointer m_InternalImageForStatistics;
 
         mitk::MaskGenerator::Pointer m_MaskGenerator;
@@ -112,7 +110,7 @@ namespace mitk
         double m_binSizeForHistogramStatistics;
         bool m_UseBinSizeOverNBins;
 
-        std::map<LabelIndex,ImageStatisticsContainer::Pointer> m_StatisticContainers;
+        ImageStatisticsContainer::Pointer m_StatisticContainer;
     };
 
 }

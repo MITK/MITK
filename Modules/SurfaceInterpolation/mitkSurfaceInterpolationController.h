@@ -77,8 +77,9 @@ namespace mitk
     void AddNewContours(const std::vector<ContourPositionInformation>& newCPIs, bool reinitializeAction = false, bool silent = false);
 
     /**
-     * @brief Removes the contour for a given plane for the current selected segmenation
+     * @brief Removes the contour for a given plane for the current selected segmentation
      * @param contourInfo the contour which should be removed
+     * @param keepPlaceholderForUndo
      * @return true if a contour was found and removed, false if no contour was found
      */
     bool RemoveContour(ContourPositionInformation contourInfo, bool keepPlaceholderForUndo = false);
@@ -158,15 +159,13 @@ namespace mitk
     /**
      * @brief Triggered with the "Reinit Interpolation" action. The contours are used to repopulate the
      *        surfaceInterpolator data structures so that interpolation can be performed after reloading data.
-     *
-     * @param contourList List of contours extracted
-     * @param contourPlanes List of planes at which the contours were extracted
      */
     void CompleteReinitialization(const std::vector<ContourPositionInformation>& newCPIs);
 
     /**
      * @brief Removes contours of a particular label and at a given time step for the current session/segmentation.
      *
+     * @param segmentationImage
      * @param label Label of contour to remove.
      * @param timeStep Time step in which to remove the contours.
      * @remark if the label or time step does not exist, nothing happens.
@@ -176,8 +175,8 @@ namespace mitk
     /**
      * @brief Removes contours of a particular label and at a given time step for the current session/segmentation.
      *
+     * @param segmentationImage
      * @param label Label of contour to remove.
-     * @param timeStep Time step in which to remove the contours.
      * @remark if the label or time step does not exist, nothing happens.
      */
     void RemoveContours(const LabelSetImage* segmentationImage, mitk::Label::PixelType label);

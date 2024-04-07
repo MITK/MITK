@@ -13,11 +13,13 @@ found in the LICENSE file.
 #ifndef mitkLabelSetImage_h
 #define mitkLabelSetImage_h
 
+#include <shared_mutex>
 #include <mitkImage.h>
 #include <mitkLabel.h>
 #include <mitkLookupTable.h>
 #include <mitkMultiLabelEvents.h>
 #include <mitkMessage.h>
+#include <mitkITKEventObserverGuard.h>
 
 #include <MitkMultilabelExports.h>
 
@@ -97,7 +99,7 @@ namespace mitk
 
     /** \brief Adds a new label to a group of the image by providing name and color.
     * @param name (Class) name of the label instance that should be added.
-    * @param color Color of the new label sinstance.
+    * @param color Color of the new label instance.
     * @param groupID The id of the group the label should be added to.
     * @return Instance of the label as it was added to the label set.
     * @pre groupID must indicate an existing group.
@@ -171,7 +173,7 @@ namespace mitk
     /**
       * @brief  Returns true if the spatial group exists in the MultiLabelSegmentation instance.
       *
-      * @param index Group index of the group that should be checked for existance.
+      * @param index Group index of the group that should be checked for existence.
       */
     bool ExistGroup(GroupIndexType index) const;
 
@@ -200,9 +202,9 @@ namespace mitk
     /** @brief Returns a vector with pointers to all labels in the MultiLabelSegmentation indicated
     * by the passed label value vector.
     * @param labelValues Vector of values of labels that should be returned.
-    * @ignoreMissing If true(Default) unknown labels Will be skipped in the result. If false,
+    * @param ignoreMissing If true (default), unknown labels Will be skipped in the result. If false,
     * an exception will be raised, if a label is requested.
-    instance.*/
+    */
     const LabelVectorType GetLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing = true);
 
     /** @brief Returns a vector with const pointers to all labels in the MultiLabelSegmentation indicated
@@ -211,8 +213,7 @@ namespace mitk
     */
     const ConstLabelVectorType GetConstLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing = false) const;
 
-    /** Helper function that can be used to extract a vector of label values of a vector of label instance pointers.
-     @overload.*/
+    /** Helper function that can be used to extract a vector of label values of a vector of label instance pointers.*/
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const ConstLabelVectorType& labels);
     /** Helper function that can be used to extract a vector of label values are vector of label instances.*/
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const LabelVectorType& labels);
@@ -237,7 +238,7 @@ namespace mitk
      * @return the respective vector of label values.
      * @pre group index must exist.
      */
-    const LabelValueVectorType GetLabelValuesByName(GroupIndexType index, std::string_view name) const;
+    const LabelValueVectorType GetLabelValuesByName(GroupIndexType index, const std::string_view name) const;
 
     /**
     * Returns a vector with (class) names of all label instances used in the segmentation (over all groups)
@@ -273,7 +274,7 @@ namespace mitk
     * accordingly to the passed state.
     * @pre The specified group must exist.
     */
-    void SetAllLabelsVisibleByName(GroupIndexType group, std::string_view name, bool visible);
+    void SetAllLabelsVisibleByName(GroupIndexType group, const std::string_view name, bool visible);
 
     /** Returns the lock state of the label (including UnlabeledLabel value).
      @pre Requested label does exist.*/
@@ -292,7 +293,7 @@ namespace mitk
     * accordingly to the passed state.
     * @pre The specified group must exist.
     */
-    void SetAllLabelsLockedByName(GroupIndexType group, std::string_view name, bool locked);
+    void SetAllLabelsLockedByName(GroupIndexType group, const std::string_view name, bool locked);
 
     /**
     * \brief Replaces the labels of a group with a given vector of labels.
@@ -307,7 +308,6 @@ namespace mitk
     */
     void ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& newLabels);
 
-    /**@overload for none-const label vectors. */
     void ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& newLabels);
 
     /** Returns the pointer to the image that contains the labeling of the indicate group.
@@ -365,10 +365,16 @@ namespace mitk
       /* Dictionary that maps between label value (key) and group id (value)*/
       LabelToGroupMapType m_LabelToGroupMap;
 
+      using LabelEventGuardMapType = std::map<LabelValueType, ITKEventObserverGuard>;
+      LabelEventGuardMapType m_LabelModEventGuardMap;
+
       LookupTable::Pointer m_LookupTable;
 
       /** Indicates if the MultiLabelSegmentation allows to overwrite unlabeled pixels in normal pixel manipulation operations (e.g. TransferLabelConent).*/
       bool m_UnlabeledLabelLock;
+
+      /** Mutex used to secure manipulations of the internal state of label and group maps.*/
+      std::shared_mutex m_LabelNGroupMapsMutex;
 
     public:
 
@@ -417,11 +423,8 @@ namespace mitk
      */
     unsigned int GetActiveLayer() const;
 
-    /** \brief
-*/
     Label* GetActiveLabel();
-    /** \brief
-    */
+
     const Label* GetActiveLabel() const;
 
     /**
@@ -437,8 +440,6 @@ namespace mitk
      */
     unsigned int GetTotalNumberOfLabels() const;
 
-    /**
-      * \brief  */
     mitk::Image::Pointer CreateLabelMask(PixelType index);
 
     /**
@@ -450,22 +451,16 @@ namespace mitk
      */
     void InitializeByLabeledImage(mitk::Image::Pointer image);
 
-    /**
-      * \brief  */
     void MaskStamp(mitk::Image *mask, bool forceOverwrite);
 
-    /**
-      * \brief  */
     void SetActiveLayer(unsigned int layer);
     void SetActiveLabel(LabelValueType label);
 
-    /**
-      * \brief  */
     unsigned int GetNumberOfLayers() const;
 
     /**
      * \brief Adds a new layer to the LabelSetImage. The new layer will be set as the active one.
-     * \param labelSet a labelset that will be added to the new layer if provided
+     * \param labels Labels that will be added to the new layer if provided
      * \return the layer ID of the new layer
      */
     GroupIndexType AddLayer(ConstLabelVector labels = {});

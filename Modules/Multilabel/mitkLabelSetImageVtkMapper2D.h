@@ -35,8 +35,8 @@ class vtkImageReslice;
 class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
-class vtkMitkLevelWindowFilter;
 class vtkNeverTranslucentTexture;
+class vtkImageMapToColors;
 
 namespace mitk
 {
@@ -90,6 +90,7 @@ namespace mitk
       std::vector<vtkSmartPointer<vtkActor>> m_LayerActorVector;
       std::vector<vtkSmartPointer<vtkPolyDataMapper>> m_LayerMapperVector;
       std::vector<vtkSmartPointer<vtkImageData>> m_ReslicedImageVector;
+      std::vector<vtkSmartPointer<vtkImageMapToColors>> m_LayerImageMapToColors;
       std::vector<vtkSmartPointer<vtkNeverTranslucentTexture>> m_LayerTextureVector;
 
       vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
@@ -107,9 +108,10 @@ namespace mitk
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastDataUpdateTime;
-
       /** \brief Timestamp of last update of a property. */
       itk::TimeStamp m_LastPropertyUpdateTime;
+      /** \brief Timestamp of last update of a property. */
+      itk::TimeStamp m_LastActiveLabelUpdateTime;
 
       /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
       mitk::ScalarType *m_mmPerPixel;
@@ -118,10 +120,6 @@ namespace mitk
       mitk::LookupTable::Pointer m_LabelLookupTable;
 
       int m_NumberOfLayers;
-
-      /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
-      // vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;
-      std::vector<vtkSmartPointer<vtkMitkLevelWindowFilter>> m_LevelWindowFilterVector;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
@@ -193,17 +191,11 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    /** \brief Does the actual resampling, without rendering the image yet.
-      * All the data is generated inside this method. The vtkProp (or Actor)
-      * is filled with content (i.e. the resliced image).
-      *
-      * After generation, a 4x4 transformation matrix(t) of the current slice is obtained
-      * from the vtkResliceImage object via GetReslicesAxis(). This matrix is
-      * applied to each textured plane (actor->SetUserTransform(t)) to transform everything
-      * to the actual 3D position (cf. the following image).
-      *
-      * \image html cameraPositioning3D.png
-      *
+    bool GenerateImageSlice(mitk::BaseRenderer* renderer);
+
+    void GenerateActiveLabelOutline(mitk::BaseRenderer* renderer);
+
+    /** \brief Generates the look up table that should be used.
       */
     void GenerateLookupTable(mitk::BaseRenderer* renderer);
 

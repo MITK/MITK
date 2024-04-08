@@ -588,6 +588,8 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(QmitkAbstractNodeSelectionWidget::N
       utilityWidget->SetDataSelection(QList({ node }));
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();
+      auto baseRenderer = mitk::BaseRenderer::GetInstance(window->GetRenderWindow()->GetVtkRenderWindow());
+      mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), node->GetData()->GetTimeGeometry());
       hSplit->addWidget(window.get());
       window->show();
       windowCounter++;

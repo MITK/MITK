@@ -703,7 +703,6 @@ void ModelFitInspectorView::RenderFitInfo()
         m_Controls.fitParametersWidget->setVisible(true);
     m_Controls.fitParametersWidget->setFits({ m_currentFit });
 
-    //m_Controls.fitParametersWidget->setPositionBookmarks(m_PositionBookmarks.Lock());
     m_Controls.fitParametersWidget->setPositionBookmarks(m_Controls.inspectionPositionWidget->GetPositionBookmarks());
     m_Controls.fitParametersWidget->setCurrentPosition(m_currentSelectedPosition);
     }

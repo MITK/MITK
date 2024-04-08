@@ -296,8 +296,8 @@ private Q_SLOTS:
 
   void PrepareGoToLabel(LabelValueType labelID) const;
 
-  void OnEntered(const QModelIndex& index) const;
-  void OnMouseLeave() const;
+  void OnEntered(const QModelIndex& index);
+  void OnMouseLeave();
 
   QWidgetAction* CreateOpacityAction();
 
@@ -324,6 +324,7 @@ private:
 
   bool m_ModelManipulationOngoing = false;
 
+  bool m_AboutToShowContextMenu = false;
   mitk::DataNode::Pointer m_SegmentationNode;
   unsigned long m_SegmentationNodeDataMTime;
   mitk::ITKEventObserverGuard m_SegmentationObserver;

@@ -775,10 +775,16 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
 
   const auto indexLevel = this->GetCurrentLevelType();
 
+  auto currentIndex = this->m_Controls->view->currentIndex();
+  //this ensures correct highlighting is the context menu is triggered while
+  //another context menu is already open.
+  if (currentIndex.isValid() && this->m_AboutToShowContextMenu) this->OnEntered(this->m_Controls->view->currentIndex());
+
+
+  QMenu* menu = new QMenu(this);
+
   if (IndexLevelType::Group == indexLevel)
   {
-    QMenu* menu = new QMenu(this);
-
     if (m_AllowLabelModification)
     {
       QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")), "&Add label", this);
@@ -823,12 +829,9 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       if (nullptr != opacityAction)
         menu->addAction(opacityAction);
     }
-    menu->popup(QCursor::pos());
   }
   else if (IndexLevelType::LabelClass == indexLevel)
   {
-    QMenu* menu = new QMenu(this);
-
     if (m_AllowLabelModification)
     {
       QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "Add label instance", this);
@@ -874,15 +877,12 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       if (nullptr!=opacityAction)
         menu->addAction(opacityAction);
     }
-    menu->popup(QCursor::pos());
   }
   else
   {
     auto selectedLabelValues = this->GetSelectedLabels();
     if (selectedLabelValues.empty())
       return;
-
-    QMenu* menu = new QMenu(this);
 
     if (this->GetMultiSelectionMode() && selectedLabelValues.size() > 1)
     {
@@ -967,8 +967,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
           menu->addAction(opacityAction);
       }
     }
-    menu->popup(QCursor::pos());
   }
+
+  QObject::connect(menu, &QMenu::aboutToHide, this, &QmitkMultiLabelInspector::OnMouseLeave);
+  m_AboutToShowContextMenu = true;
+  menu->popup(QCursor::pos());
 }
 
 QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
@@ -1270,6 +1273,7 @@ void QmitkMultiLabelInspector::SetVisibilityOfAffectedLabels(bool visible) const
       label->SetVisible(visible);
       m_Segmentation->UpdateLookupTable(label->GetValue());
     }
+    m_Segmentation->GetLookupTable()->Modified();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -1337,7 +1341,7 @@ void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) 
   }
 }
 
-void QmitkMultiLabelInspector::OnEntered(const QModelIndex& index) const
+void QmitkMultiLabelInspector::OnEntered(const QModelIndex& index)
 {
   if (m_SegmentationNode.IsNotNull())
   {
@@ -1360,11 +1364,12 @@ void QmitkMultiLabelInspector::OnEntered(const QModelIndex& index) const
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+  m_AboutToShowContextMenu = false;
 }
 
-void QmitkMultiLabelInspector::OnMouseLeave() const
+void QmitkMultiLabelInspector::OnMouseLeave()
 {
-  if (m_SegmentationNode.IsNotNull())
+  if (m_SegmentationNode.IsNotNull() && !m_AboutToShowContextMenu)
   {
     std::string propertyName = "org.mitk.multilabel.labels.highlighted";
 
@@ -1376,5 +1381,9 @@ void QmitkMultiLabelInspector::OnMouseLeave() const
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
+  }
+  else
+  {
+    m_AboutToShowContextMenu = false;
   }
 }

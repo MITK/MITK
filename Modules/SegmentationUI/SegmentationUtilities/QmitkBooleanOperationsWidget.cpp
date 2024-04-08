@@ -53,6 +53,7 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* da
   connect(m_Controls->unionButton, SIGNAL(clicked()), this, SLOT(OnUnionButtonClicked()));
 
   m_Controls->segNodeSelector->SetAutoSelectNewNodes(true);
+  this->ConfigureWidgets();
 }
 
 QmitkBooleanOperationsWidget::~QmitkBooleanOperationsWidget()
@@ -73,29 +74,54 @@ void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::LabelSetImage::
   this->ConfigureWidgets();
 }
 
+namespace
+{
+  std::string GenerateLabelHTML(const mitk::Label* label)
+  {
+    std::stringstream stream;
+    auto color = label->GetColor();
+    stream << "<span style='color: #" << std::hex << std::setfill('0')
+      << std::setw(2) << static_cast<int>(color.GetRed()*255)
+      << std::setw(2) << static_cast<int>(color.GetGreen()*255)
+      << std::setw(2) << static_cast<int>(color.GetBlue()*255)
+      << "; font-size: 20px '>&#x25A0;</span>" << std::dec;
+
+    stream << "<font class=\"normal\"> " << label->GetName()<< "</font>";
+    return stream.str();
+  }
+}
 void QmitkBooleanOperationsWidget::ConfigureWidgets()
 {
   auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
+  auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
+
+  auto styleSheet = qApp->styleSheet();
+
+  m_Controls->line1stLabel->document()->setDefaultStyleSheet(styleSheet);
+  m_Controls->lineOtherLabels->document()->setDefaultStyleSheet(styleSheet);
 
   if (selectedLabelValues.empty())
   {
-    m_Controls->line1stLabel->setText("");
+    m_Controls->line1stLabel->setHtml(QStringLiteral("<font class=\"warning\">Select 1st label to proceed.</font>"));
   }
   else
   {
-    m_Controls->line1stLabel->setText(QString::fromStdString(std::to_string(selectedLabelValues.front())));
+    auto label = seg->GetLabel(selectedLabelValues.front());
+    m_Controls->line1stLabel->setText(QString::fromStdString(GenerateLabelHTML(label)));
   }
 
   if (selectedLabelValues.size() < 2)
   {
-    m_Controls->lineOtherLabels->setText("");
+    m_Controls->lineOtherLabels->setHtml(QStringLiteral("<font class=\"warning\">Select secondary label(s) to proceed.</font>"));
   }
   else
   {
     std::stringstream stream;
     for (mitk::LabelSetImage::LabelValueVectorType::iterator iter = selectedLabelValues.begin() + 1; iter != selectedLabelValues.end(); ++iter)
     {
-      stream << *iter << "; ";
+      auto label = seg->GetLabel(*iter);
+      if (stream.rdbuf()->in_avail() != 0) stream << "; ";
+      stream << GenerateLabelHTML(label);
     }
 
     m_Controls->lineOtherLabels->setText(QString::fromStdString(stream.str()));

@@ -140,6 +140,18 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
   MITK_DEBUG << "toolButtonClicked(" << id << "): id translates to tool ID " << m_ToolIDForButtonID[id];
 
   QToolButton *toolButton = dynamic_cast<QToolButton *>(m_ToolButtonGroup->buttons().at(id));
+  mitk::Tool *tool = m_ToolManager->GetActiveTool();
+  if (tool && tool->ConfirmBeforeExit() &&
+      QMessageBox::No == QMessageBox::question(nullptr,
+                                               QString(tool->GetName()),
+                                               QString("WARNING: Are you sure you want to exit the tool?"),
+                                               QMessageBox::Yes | QMessageBox::No,
+                                               QMessageBox::No))
+  {
+    toolButton->setChecked(false);
+    return;
+  }
+
   if (toolButton)
   {
     if ((m_ButtonIDForToolID.find(m_ToolManager->GetActiveToolID()) !=

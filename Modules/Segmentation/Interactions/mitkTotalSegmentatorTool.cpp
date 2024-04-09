@@ -145,6 +145,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
   this->MapLabelsToSegmentation(outputBuffer, previewImage, m_LabelMapTotal);
   previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
+  m_IsPreviewGenerated = true;
 }
 
 void mitk::TotalSegmentatorTool::UpdatePrepare()
@@ -345,4 +346,9 @@ std::string mitk::TotalSegmentatorTool::GetLabelMapPath()
   pythonFileName = pathToLabelMap.string() + "/site-packages/totalsegmentator/map_to_binary.py";
 #endif
   return pythonFileName;
+}
+
+bool mitk::TotalSegmentatorTool::ConfirmBeforeExit()
+{
+  return m_IsPreviewGenerated;
 }

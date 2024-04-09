@@ -964,7 +964,9 @@ QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
 {
   auto selectedLabelValues = this->GetSelectedLabels();
 
-  auto relevantLabelValues = (this->GetMultiSelectionMode() && selectedLabelValues.size() > 1) ? selectedLabelValues : this->GetCurrentlyAffactedLabelInstances();
+  auto relevantLabelValues = !this->GetMultiSelectionMode() || selectedLabelValues.size() <= 1
+    ? this->GetCurrentlyAffactedLabelInstances()
+    : selectedLabelValues;
 
   std::vector<mitk::Label*> relevantLabels;
 

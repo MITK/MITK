@@ -27,11 +27,11 @@ mitk::NodePredicateBase::Pointer mitk::GetMultiLabelSegmentationPredicate(const 
   segPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   segPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
 
-  if (nullptr == referenceGeometry)
-    return segPredicate.GetPointer();
-  else
-    return mitk::NodePredicateAnd::New(mitk::NodePredicateSubGeometry::New(referenceGeometry),
+  if (nullptr != referenceGeometry)
+    segPredicate = mitk::NodePredicateAnd::New(mitk::NodePredicateSubGeometry::New(referenceGeometry),
       segPredicate.GetPointer()).GetPointer();
+
+  return segPredicate.GetPointer();
 }
 
 mitk::NodePredicateBase::Pointer mitk::GetSegmentationReferenceImagePredicate()

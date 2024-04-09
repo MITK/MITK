@@ -23,7 +23,6 @@ found in the LICENSE file.
 #include <mitkContourModel.h>
 #include <mitkContourModelSet.h>
 #include <mitkContourModelSetToImageFilter.h>
-#include <mitkImage.h>
 #include <mitkLabelSetImage.h>
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkNodePredicateOr.h>
@@ -37,8 +36,6 @@ found in the LICENSE file.
 #include <mitkLabelSetImageConverter.h>
 
 #include <QmitkNodeSelectionDialog.h>
-
-#include <qmessagebox.h>
 
 mitk::NodePredicateBase::Pointer GetInputPredicate()
 {
@@ -78,7 +75,7 @@ const mitk::DataNode* GetNodeWithLargestImageGeometry(const QmitkNodeSelectionDi
   return result;
 }
 
-QmitkNodeSelectionDialog::NodeList GetNoneImageNodes(const QmitkNodeSelectionDialog::NodeList& nodes)
+QmitkNodeSelectionDialog::NodeList GetNonimageNodes(const QmitkNodeSelectionDialog::NodeList& nodes)
 {
   QmitkNodeSelectionDialog::NodeList result;
 
@@ -185,7 +182,7 @@ QmitkConvertToMultiLabelSegmentationWidget::QmitkConvertToMultiLabelSegmentation
   m_Controls->outputSegSelector->SetSelectionIsOptional(false);
   m_Controls->outputSegSelector->SetInvalidInfo(QStringLiteral("Please select the target segmentation"));
   m_Controls->outputSegSelector->SetPopUpTitel(QStringLiteral("Select target segmentation"));
-  m_Controls->outputSegSelector->SetPopUpHint(QStringLiteral("Select the segmentation where the converted inputs should be added."));
+  m_Controls->outputSegSelector->SetPopUpHint(QStringLiteral("Select the segmentation to which the converted inputs should be added."));
   m_Controls->outputSegSelector->SetAutoSelectNewNodes(true);
 
   m_Controls->refNodeSelector->SetDataStorage(dataStorage);
@@ -193,7 +190,7 @@ QmitkConvertToMultiLabelSegmentationWidget::QmitkConvertToMultiLabelSegmentation
   m_Controls->refNodeSelector->SetSelectionIsOptional(false);
   m_Controls->refNodeSelector->SetInvalidInfo(QStringLiteral("Please select a reference image or segmentation"));
   m_Controls->refNodeSelector->SetPopUpTitel(QStringLiteral("Select a reference image or segmentation"));
-  m_Controls->refNodeSelector->SetPopUpHint(QStringLiteral("Select the image or segmentation that by used for the geometry of the conversion."));
+  m_Controls->refNodeSelector->SetPopUpHint(QStringLiteral("Select the image or segmentation that defines the geometry of the conversion result."));
 
 
   this->ConfigureWidgets();
@@ -338,7 +335,7 @@ mitk::Image::Pointer ConvertContourModelSetToImage(mitk::Image* refImage, mitk::
   return contourFiller->GetOutput();
 }
 
-void CheckForLabelCollisionHelper(const QmitkNodeSelectionDialog::NodeList& nodes,
+void CheckForLabelCollision(const QmitkNodeSelectionDialog::NodeList& nodes,
   const std::map<const mitk::DataNode*, mitk::LabelSetImage::LabelValueVectorType>& foundLabelsMap,
   mitk::LabelSetImage::LabelValueVectorType& usedLabelValues,
   std::map<const mitk::DataNode*, mitk::LabelValueMappingVector>& labelsMappingMap)
@@ -362,7 +359,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 {
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
 
-  auto noneImageNodes = GetNoneImageNodes(nodes);
+  auto nonimageNodes = GetNonimageNodes(nodes);
   auto imageNodes = GetImageNodes(nodes);
 
   mitk::LabelSetImage::Pointer outputSeg;
@@ -405,10 +402,10 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     }
   }
 
-  //convert none image nodes to images
+  //convert non-image nodes to images
   std::map<const mitk::DataNode*, mitk::Image::Pointer> preparedImageMap;
   std::map<const mitk::DataNode*, mitk::LabelSetImage::LabelValueVectorType> foundLabelsMap;
-  for (const auto& node : noneImageNodes)
+  for (const auto& node : nonimageNodes)
   {
     mitk::ProgressBar::GetInstance()->Progress();
     mitk::Image::Pointer convertedImage;
@@ -438,7 +435,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     if (convertedImage.IsNotNull())
     {
       preparedImageMap.emplace(node, convertedImage);
-      //all none image data is converted to binary maps
+      //all non-image data is converted to binary maps
       foundLabelsMap.emplace(node, mitk::LabelSetImage::LabelValueVectorType({ 1 }));
     }
     else
@@ -462,8 +459,8 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   //check for label collision and fix if needed
   mitk::LabelSetImage::LabelValueVectorType usedLabelValues = outputSeg->GetAllLabelValues();
   std::map<const mitk::DataNode*, mitk::LabelValueMappingVector> labelsMappingMap;
-  CheckForLabelCollisionHelper(imageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
-  CheckForLabelCollisionHelper(noneImageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
+  CheckForLabelCollision(imageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
+  CheckForLabelCollision(nonimageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
 
   //Ensure that we have the first layer to add
   mitk::LabelSetImage::GroupIndexType currentGroupIndex = 0;
@@ -498,11 +495,11 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
       mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, labelsMapping);
   }
 
-  for (const auto& node : noneImageNodes)
+  for (const auto& node : nonimageNodes)
   {
     mitk::ProgressBar::GetInstance()->Progress();
 
-    if (m_Controls->radioSingleGroup->isChecked() && (node != noneImageNodes.front() || !imageNodes.empty()))
+    if (m_Controls->radioSingleGroup->isChecked() && (node != nonimageNodes.front() || !imageNodes.empty()))
       currentGroupIndex = outputSeg->AddLayer();
 
     const auto& labelsMapping = labelsMappingMap.at(node);

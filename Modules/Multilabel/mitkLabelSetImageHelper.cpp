@@ -111,10 +111,14 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const LabelSetIma
   }
 
   auto newLabel = mitk::Label::New();
-  if (hideIDIfUnique && 0==maxGenericLabelNumber)
+  if (hideIDIfUnique && 0 == maxGenericLabelNumber)
+  {
     newLabel->SetName(namePrefix);
+  }
   else
+  {
     newLabel->SetName(namePrefix + " " + std::to_string(maxGenericLabelNumber + 1));
+  }
 
   auto lookupTable = mitk::LookupTable::New();
   lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
@@ -182,7 +186,7 @@ mitk::LabelSetImageHelper::SplitLabelValuesByClassNamwe(const LabelSetImage* lab
 
   LabelClassNameToLabelValueMapType result;
 
-  for (auto value : labelValues)
+  for (const auto value : labelValues)
   {
     if (labelSetImage->GetGroupIndexOfLabel(value) == groupID)
     {

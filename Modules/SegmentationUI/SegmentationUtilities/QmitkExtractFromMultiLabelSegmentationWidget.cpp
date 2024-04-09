@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkProgressBar.h>
 #include <mitkProperties.h>
-#include <mitkImage.h>
 #include <mitkLabelSetImage.h>
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkLabelSetImageHelper.h>
@@ -132,7 +131,7 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
   {
     if (m_Controls->checkInstanceMap->isChecked())
     {
-      auto image = seg->GetGroupImageWorkarround(groupID)->Clone();
+      auto image = seg->GetGroupImageWorkaround(groupID)->Clone();
       std::string name = "InstanceMap group "+std::to_string(groupID);
       this->StoreToDataStorage(image, name, node);
       mitk::ProgressBar::GetInstance()->Progress();

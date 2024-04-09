@@ -268,11 +268,17 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(mitk::Image* l
 {
   GroupIndexType newGroupID = m_Groups.size();
 
-  if (nullptr == layerImage) mitkThrow() << "Cannot add group. Passed group image is nullptr.";
+  if (nullptr == layerImage)
+    mitkThrow() << "Cannot add group. Passed group image is nullptr.";
 
-  if (!Equal(*(this->GetTimeGeometry()), *(layerImage->GetTimeGeometry()),
+  bool equalGeometries = Equal(
+    *(this->GetTimeGeometry()),
+    *(layerImage->GetTimeGeometry()),
     NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION,
-    NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, false))
+    NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION,
+    false);
+
+  if (!equalGeometries)
     mitkThrow() << "Cannot add group. Passed group image has not the same geometry like segmentation.";
 
   if (layerImage->GetPixelType() != MakePixelType<LabelValueType, LabelValueType, 1>())
@@ -353,9 +359,10 @@ const mitk::Image* mitk::LabelSetImage::GetGroupImage(GroupIndexType groupID) co
   return groupID == this->GetActiveLayer() ? this : m_LayerContainer.at(groupID).GetPointer();
 }
 
-const mitk::Image* mitk::LabelSetImage::GetGroupImageWorkarround(GroupIndexType groupID) const
+const mitk::Image* mitk::LabelSetImage::GetGroupImageWorkaround(GroupIndexType groupID) const
 {
-  if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
+  if (!this->ExistGroup(groupID))
+    mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
 
   if (groupID == this->GetActiveLayer() && this->GetMTime()> m_LayerContainer[groupID]->GetMTime())
   { //we have to transfer the content first into the group image

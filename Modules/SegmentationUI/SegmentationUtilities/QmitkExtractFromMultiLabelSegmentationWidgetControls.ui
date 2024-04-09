@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>408</width>
+    <width>313</width>
     <height>316</height>
    </rect>
   </property>
@@ -56,26 +56,32 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="checkClassMap">
+       <widget class="QCheckBox" name="checkInstanceMask">
         <property name="toolTip">
-         <string>If activated, the conversion will generate separate multi label segmentations for each input instead of joining all inputs in one multi label segmentation.</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked, a binary mask image is generated for each selected label.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>Label class map(s)</string>
+         <string>Label instance mask(s)</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="checkInstanceMap">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked, an image is generated for each selected group containing all selected label instances of that group.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Label instance map(s)</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="checkInstanceMask">
+       <widget class="QCheckBox" name="checkClassMap">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked, an image is generated for each selected group containing all classes of selected label instances of that group.&lt;/p&gt;&lt;p&gt;So basically all label instances with the same label name will get the same pixel value in the map.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
-         <string>Label instance mask(s)</string>
+         <string>Label class map(s)</string>
         </property>
        </widget>
       </item>

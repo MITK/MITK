@@ -17,8 +17,6 @@ found in the LICENSE file.
 #include <QmitkAbstractNodeSelectionWidget.h>
 #include <QmitkNodeSelectionDialog.h>
 
-#include "itkSmartPointer.h"
-
 #include <QWidget>
 
 namespace Ui

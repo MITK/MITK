@@ -271,7 +271,7 @@ For a detailed explanation of what this algorithm is able to, please refer to ht
 Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow setting impacts the segmentation. However, any applied color maps are ignored.
 
 \subsubsection org_mitk_views_segmentationSegmentAnythingWorkflow Workflow:
-    -# Install Segment Anything: Goto Preferences (Ctnl+P) > Segment Anything and click "Install Segment Anything with MedSAM" to install Segment Anything (version: 1.0). 
+    -# Install Segment Anything: Goto Preferences (Ctrl+P) > Segment Anything and click "Install Segment Anything with MedSAM" to install Segment Anything (version: 1.0). 
     The installation process implicitly creates a python virtual environment using the Python located in "System Python" in an MITK mainitained directory. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
     Once installed, the "Install Segment Anything" button is grayed out.
     \imageMacro{QmitkSegmentation_SAMTool_Preferences.png,"Segment Anything Preferences",10.00}
@@ -293,7 +293,7 @@ Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow sett
 \imageMacro{QmitkSegmentation_SAMTool.png,"MedSAM tool",10.00}
 
 The MedSAM (Segment Anything in Medical Images) tool is a specialization of the the Segment Anything (SAM) tool. A new foundation model in the back end is dedicated to universal medical image segmentation.
-Just like the Segment Anything tool, the MedSAM tool requires that you have Python 3 installed and available on your machine. Note: On Debian/Ubuntu systems, you need to install the git, python3-pip, and python3-venv package using the following command: `sudo apt install git python3-pip python3-venv`. 
+Just like the Segment Anything tool, the MedSAM tool requires that you have Python 3 installed and available on your machine. Note: On Debian/Ubuntu systems, you need to install the git, python3-pip, and python3-venv packages using the following command: `sudo apt install git python3-pip python3-venv`. 
 For best experience, your machine should be ideally equipped with a CUDA-enabled GPU. 
 Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow setting impacts the segmentation. However, any applied color maps are ignored.
 

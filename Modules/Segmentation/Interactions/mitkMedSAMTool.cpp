@@ -124,6 +124,7 @@ void mitk::MedSAMTool::ClearPicks()
 {
   this->GetDataStorage()->Remove(m_BoundingBoxNode);
   m_BoundingBoxNode = nullptr;
+  this->UpdatePreview();
   this->SetWorkingPlaneGeometry(nullptr);
 }
 

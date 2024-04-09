@@ -946,7 +946,8 @@ void QmitkMultiLabelTreeModel::OnLabelRemoved(LabelValueType labelValue)
   if (labelValue == mitk::LabelSetImage::UNLABELED_VALUE) return;
   auto instanceItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
-  if (nullptr == instanceItem) mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel received a LabelRemoved signal for a label that is not represented in the model. Invalid label: " << labelValue;
+  if (nullptr == instanceItem)
+    mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel received a LabelRemoved signal for a label that is not represented in the model. Invalid label: " << labelValue;
 
   auto labelItem = instanceItem->ParentItem();
 

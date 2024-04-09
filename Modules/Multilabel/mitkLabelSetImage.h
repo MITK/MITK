@@ -385,11 +385,11 @@ namespace mitk
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
 
-    /** DON'T USE. WORKARROUND method that is used until the rework is finished to
+    /** DON'T USE. WORKAROUND method that is used until the rework is finished to
     ensure always getting a group image and not this.
     @warning Don't use. This method is going to be removed as soon as T30194 is
     solved.*/
-      const mitk::Image* GetGroupImageWorkarround(GroupIndexType groupID) const;
+      const mitk::Image* GetGroupImageWorkaround(GroupIndexType groupID) const;
 
     /**
       * \brief  */
@@ -447,7 +447,7 @@ namespace mitk
      */
     unsigned int GetTotalNumberOfLabels() const;
 
-     * @brief Initialize a new mitk::LabelSetImage by a given image.
+    /** @brief Initialize a new mitk::LabelSetImage by a given image.
      * For all distinct pixel values of the parameter image new labels will
      * be created. If the number of distinct pixel values exceeds mitk::Label::MAX_LABEL_VALUE
      * an exception will be raised.

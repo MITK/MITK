@@ -201,8 +201,8 @@ void ConvertImageToGroupImageInternal(const SourceImageType* sourceImage, mitk::
 {
   using GroupImageType = typename SourceImageType::template Rebind<mitk::LabelSetImage::LabelValueType>::Type;
 
-  typedef itk::ImageRegionConstIteratorWithIndex<SourceImageType> SourceIteratorType;
-  typedef itk::ImageRegionIterator<GroupImageType> TargetIteratorType;
+  using SourceIteratorType = itk::ImageRegionConstIteratorWithIndex<SourceImageType>;
+  using TargetIteratorType = itk::ImageRegionIterator<GroupImageType>;
 
   auto targetImage = mitk::ImageToItkImage< mitk::LabelSetImage::LabelValueType, SourceImageType::ImageDimension>(groupImage);
 
@@ -212,7 +212,7 @@ void ConvertImageToGroupImageInternal(const SourceImageType* sourceImage, mitk::
   SourceIteratorType sourceIter(sourceImage, sourceImage->GetRequestedRegion());
   sourceIter.GoToBegin();
 
-  std::set< mitk::LabelSetImage::LabelValueType> detecteValues;
+  std::set<mitk::LabelSetImage::LabelValueType> detectedValues;
 
   while (!sourceIter.IsAtEnd())
   {
@@ -227,14 +227,14 @@ void ConvertImageToGroupImageInternal(const SourceImageType* sourceImage, mitk::
     targetIter.Set(sourceValue);
 
     if (sourceValue != mitk::Label::UNLABELED_VALUE)
-      detecteValues.insert(sourceValue);
+      detectedValues.insert(sourceValue);
 
     ++sourceIter;
     ++targetIter;
   }
 
   foundLabels.clear();
-  foundLabels.insert(foundLabels.begin(), detecteValues.begin(), detecteValues.end());
+  foundLabels.insert(foundLabels.begin(), detectedValues.begin(), detectedValues.end());
 }
 
 mitk::Image::Pointer mitk::ConvertImageToGroupImage(const Image* inputImage, mitk::LabelSetImage::LabelValueVectorType& foundLabels)
@@ -287,10 +287,10 @@ bool mitk::CheckForLabelValueConflictsAndResolve(const mitk::LabelSetImage::Labe
     }
     else
     {
-      const auto maxFinding = std::max_element(usedLabelValues.begin(), usedLabelValues.end());
-      if (*maxFinding == Label::MAX_LABEL_VALUE) mitkThrow() << "Cannot correct label values. All available values are used. A segmentation cannot contain more labels.";
+      const auto maxValue = *(std::max_element(usedLabelValues.begin(), usedLabelValues.end()));
+      if (maxValue == Label::MAX_LABEL_VALUE) mitkThrow() << "Cannot correct label values. All available values are used. A segmentation cannot contain more labels.";
 
-      const auto correctedV = *(maxFinding)+1;
+      const auto correctedV = maxValue+1;
       correctedLabelValues.push_back(correctedV);
       usedLabelValues.push_back(correctedV);
       corrected = true;
@@ -326,8 +326,11 @@ namespace
 
 mitk::Image::Pointer mitk::CreateLabelMask(const LabelSetImage* segmentation, LabelSetImage::LabelValueType labelValue, bool createBinaryMap)
 {
-  if (nullptr==segmentation) mitkThrow() << "Error, cannot create label mask. Passed segmentation is nullptr.";
-  if (!segmentation->ExistLabel(labelValue)) mitkThrow() << "Error, cannot create label mask. Label ID is invalid. Invalid ID: " << labelValue;
+  if (nullptr==segmentation)
+    mitkThrow() << "Error, cannot create label mask. Passed segmentation is nullptr.";
+  
+  if (!segmentation->ExistLabel(labelValue))
+    mitkThrow() << "Error, cannot create label mask. Label ID is invalid. Invalid ID: " << labelValue;
 
   auto mask = mitk::Image::New();
 
@@ -344,10 +347,14 @@ mitk::Image::Pointer mitk::CreateLabelMask(const LabelSetImage* segmentation, La
   auto destinationLabel = segmentation->GetLabel(labelValue)->Clone();
   if (createBinaryMap) destinationLabel->SetValue(1);
 
-  TransferLabelContent(segmentation->GetGroupImage(groupID), mask.GetPointer(),
+  TransferLabelContent(segmentation->GetGroupImage(groupID),
+    mask.GetPointer(),
     { destinationLabel },
-    LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false,
-    { { labelValue, destinationLabel->GetValue()} }, MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
+    LabelSetImage::UNLABELED_VALUE,
+    LabelSetImage::UNLABELED_VALUE, false,
+    { { labelValue, destinationLabel->GetValue()} },
+    MultiLabelSegmentation::MergeStyle::Replace,
+    MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
 
   return mask;
 }
@@ -369,13 +376,19 @@ std::pair<mitk::Image::Pointer, mitk::IDToLabelClassNameMapType> mitk::CreateLab
 
   // get relevant labels (as intersect of groupLabels and selectedLabels
   auto groupValues = segmentation->GetLabelValuesByGroup(groupID);
-  LabelSetImage::LabelValueVectorType relevantGroupValues = std::accumulate(groupValues.begin(), groupValues.end(), LabelSetImage::LabelValueVectorType(),
-    [&selectedLabels](LabelSetImage::LabelValueVectorType& result, LabelSetImage::LabelValueType element) {
-      if (std::find(selectedLabels.begin(), selectedLabels.end(), element) != selectedLabels.end()) {
+  auto relevantDetectLamba = [&selectedLabels](LabelSetImage::LabelValueVectorType& result, LabelSetImage::LabelValueType element)
+    {
+      if (std::find(selectedLabels.begin(), selectedLabels.end(), element) != selectedLabels.end())
+      {
         result.push_back(element);
       }
       return result;
-    });
+    };
+
+  auto relevantGroupValues = std::accumulate(groupValues.begin(),
+    groupValues.end(),
+    LabelSetImage::LabelValueVectorType(),
+    relevantDetectLamba);
 
   // construct class mapping
   auto classToValueMap = LabelSetImageHelper::SplitLabelValuesByClassNamwe(segmentation, groupID, relevantGroupValues);

@@ -10,35 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkViewNavigatorView_h
-#define QmitkViewNavigatorView_h
+#ifndef QmitkViewProxyModel_h
+#define QmitkViewProxyModel_h
 
-#include <QmitkAbstractView.h>
+#include <QSortFilterProxyModel>
 
-class QmitkViewNavigatorWidget;
-
-/**
-* @brief
-*
-*/
-class QmitkViewNavigatorView : public QmitkAbstractView
+class QmitkViewProxyModel : public QSortFilterProxyModel
 {
-  Q_OBJECT
-
 public:
-
-  static const std::string VIEW_ID;
-
-protected:
-
-  void CreateQtPartControl(QWidget *parent) override;
-
-  void SetFocus() override;
+  explicit QmitkViewProxyModel(QObject* parent = nullptr);
+  ~QmitkViewProxyModel() override;
 
 private:
-
-  QmitkViewNavigatorWidget* m_ViewNavigatorWidget;
-
+  bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
+  bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
 };
 
 #endif

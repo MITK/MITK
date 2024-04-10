@@ -92,6 +92,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateLookupTable(mitk::BaseRenderer* ren
   assert(image && image->IsInitialized());
 
   localStorage->m_LabelLookupTable = image->GetLookupTable()->Clone();
+  const auto labelValues = image->GetAllLabelValues();
 
   std::string propertyName = "org.mitk.multilabel.labels.highlighted";
 
@@ -103,15 +104,13 @@ void mitk::LabelSetImageVtkMapper2D::GenerateLookupTable(mitk::BaseRenderer* ren
     if (!highlightedLabelValues.empty())
     {
       auto lookUpTable  = localStorage->m_LabelLookupTable->GetVtkLookupTable();
-      const auto noValues = lookUpTable->GetNumberOfTableValues();
+      auto highlightEnd = highlightedLabelValues.cend();
 
       double rgba[4];
-
-      auto highlightEnd = highlightedLabelValues.cend();
-      for (int i = 0; i < noValues; i++)
+      for (const auto& value : labelValues)
       {
-        lookUpTable->GetTableValue(i, rgba);
-        if (highlightEnd == std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), i))
+        lookUpTable->GetTableValue(value, rgba);
+        if (highlightEnd == std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), value))
         { //make all none highlighted values more transparent
           rgba[3] *= 0.3;
         }
@@ -119,7 +118,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateLookupTable(mitk::BaseRenderer* ren
         { //if highlighted values are visible set them to opaque to pop out
           rgba[3] = 1.; 
         }
-        lookUpTable->SetTableValue(i, rgba);
+        lookUpTable->SetTableValue(value, rgba);
       }
       localStorage->m_LabelLookupTable->Modified(); // need to call modified, since LookupTableProperty seems to be unchanged so no widget-update is
       // executed

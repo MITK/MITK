@@ -643,7 +643,7 @@ mitk::Label* mitk::LabelSetImage::AddLabelWithContent(Label* label, const Image*
   auto newLabel = this->AddLabel(label, groupID, addAsClone, correctLabelValue);
 
   mitk::TransferLabelContent(labelContent, this->GetGroupImage(groupID), this->GetConstLabelsByValue(this->GetLabelValuesByGroup(groupID)),
-    mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, { {1, newLabel->GetValue()}},
+    mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, { {contentLabelValue, newLabel->GetValue()}},
     mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
   this->Modified();

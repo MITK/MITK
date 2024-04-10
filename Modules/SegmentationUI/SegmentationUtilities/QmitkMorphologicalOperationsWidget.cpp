@@ -41,10 +41,8 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Dat
   connect(m_Controls->segNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkMorphologicalOperationsWidget::OnSelectionChanged);
 
-  auto widget = this;
   connect(m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged,
-    this, [widget](mitk::LabelSetImage::LabelValueVectorType labels) {widget->ConfigureButtons(); });
-
+    this, [this](mitk::LabelSetImage::LabelValueVectorType /*labels*/) {this->ConfigureButtons(); });
 
   m_Controls->segNodeSelector->SetAutoSelectNewNodes(true);
 }

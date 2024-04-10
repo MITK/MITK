@@ -211,8 +211,8 @@ void QmitkMultiLabelInspector::OnModelReset()
   m_ModelManipulationOngoing = false;
 }
 
-void QmitkMultiLabelInspector::OnDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,
-  const QList<int>& roles)
+void QmitkMultiLabelInspector::OnDataChanged(const QModelIndex& topLeft, const QModelIndex& /*bottomRight*/,
+  const QList<int>& /*roles*/)
 {
   if (!m_ModelManipulationOngoing && topLeft.isValid())
     m_Controls->view->expand(topLeft);

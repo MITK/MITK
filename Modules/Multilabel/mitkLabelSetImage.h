@@ -491,7 +491,7 @@ namespace mitk
      */
     GroupIndexType AddLayer(ConstLabelVector labels = {});
 
-    /**
+   /**
     * \brief Adds a layer based on a provided mitk::Image.
     * \param layerImage is added to the vector of label images
     * \param labels labels that will be cloned and added to the new layer if provided

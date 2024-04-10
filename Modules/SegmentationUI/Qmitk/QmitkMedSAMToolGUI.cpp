@@ -153,10 +153,10 @@ void QmitkMedSAMToolGUI::StatusMessageListener(const std::string &message)
   }
   else if (message == "TimeOut")
   { // trying to re init the daemon
-    this->WriteErrorMessage(QString("<b>STATUS: </b><i>Sorry, operation timed out. Reactivating SAM tool...</i>"));
+    this->WriteErrorMessage(QString("<b>STATUS: </b><i>Sorry, operation timed out. Reactivating MedSAM tool...</i>"));
     if (this->ActivateSAMDaemon())
     {
-      this->WriteStatusMessage(QString("<b>STATUS: </b><i>Segment Anything tool re-initialized.</i>"));
+      this->WriteStatusMessage(QString("<b>STATUS: </b><i>MedSAM tool re-initialized.</i>"));
     }
     else
     {
@@ -267,8 +267,13 @@ void QmitkMedSAMToolGUI::OnResetPicksClicked()
   }
 }
 
-void QmitkMedSAMToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &)
+void QmitkMedSAMToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &event)
 {
+  const std::string property = event.GetProperty();
+  const std::string modelType = "modeltype";
+  if (property.compare(property.size() - modelType.size(), modelType.size(), modelType) == 0)
+    return; // Model type change ignored.
+
   this->EnableAll(true);
   this->WriteStatusMessage("A Preference change was detected. Please initialize the tool again.");
   auto tool = this->GetConnectedToolAs<mitk::MedSAMTool>();

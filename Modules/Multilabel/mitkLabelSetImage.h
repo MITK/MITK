@@ -384,6 +384,13 @@ namespace mitk
     // END FUTURE MultiLabelSegmentation
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
+
+    /** DON'T USE. WORKAROUND method that is used until the rework is finished to
+    ensure always getting a group image and not this.
+    @warning Don't use. This method is going to be removed as soon as T30194 is
+    solved.*/
+      const mitk::Image* GetGroupImageWorkaround(GroupIndexType groupID) const;
+
     /**
       * \brief  */
       void UpdateCenterOfMass(PixelType pixelValue);
@@ -440,10 +447,7 @@ namespace mitk
      */
     unsigned int GetTotalNumberOfLabels() const;
 
-    mitk::Image::Pointer CreateLabelMask(PixelType index);
-
-    /**
-     * @brief Initialize a new mitk::LabelSetImage by a given image.
+    /** @brief Initialize a new mitk::LabelSetImage by a given image.
      * For all distinct pixel values of the parameter image new labels will
      * be created. If the number of distinct pixel values exceeds mitk::Label::MAX_LABEL_VALUE
      * an exception will be raised.
@@ -470,8 +474,11 @@ namespace mitk
     * \param layerImage is added to the vector of label images
     * \param labels labels that will be cloned and added to the new layer if provided
     * \return the layer ID of the new layer
+    * \pre layerImage must be valid instance
+    * \pre layerImage needs to have the same geometry then the segmentation
+    * \pre layerImage must have the pixel value equal to LabelValueType.
     */
-    GroupIndexType AddLayer(mitk::Image::Pointer layerImage, ConstLabelVector labels = {});
+    GroupIndexType AddLayer(mitk::Image* layerImage, ConstLabelVector labels = {});
 
   protected:
     mitkCloneMacro(Self);
@@ -484,7 +491,7 @@ namespace mitk
     void LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension> *source, unsigned int layer);
 
     template <typename TPixel, unsigned int VImageDimension>
-    void ImageToLayerContainerProcessing(itk::Image<TPixel, VImageDimension> *source, unsigned int layer) const;
+    void ImageToLayerContainerProcessing(const itk::Image<TPixel, VImageDimension> *source, unsigned int layer) const;
 
     template <typename ImageType>
     void CalculateCenterOfMassProcessing(ImageType *input, LabelValueType index);

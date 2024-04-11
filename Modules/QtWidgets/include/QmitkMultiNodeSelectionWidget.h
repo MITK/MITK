@@ -54,6 +54,9 @@ public:
   */
   void SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction);
 
+  /** Returns if the current internal selection is violating the current check function, if set.*/
+  bool CurrentSelectionViolatesCheckFunction() const;
+
 public Q_SLOTS:
   void OnEditSelection();
 

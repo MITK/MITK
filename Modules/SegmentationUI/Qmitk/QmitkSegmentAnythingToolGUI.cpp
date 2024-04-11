@@ -275,7 +275,9 @@ bool QmitkSegmentAnythingToolGUI::IsSAMInstalled(const QString &pythonPath)
       (!isPythonExists) ? QFile::exists(fullPath + QDir::separator() + QString("python3")) : isPythonExists;
   }
 #endif
-  isSamExists = QFile::exists(fullPath + QDir::separator() + QString("run_inference_daemon.py"));
+  isSamExists = QFile::exists(fullPath + QDir::separator() + QString("run_inference_daemon.py"))
+                && QFile::exists(fullPath + QDir::separator() + QString("sam_runner.py"))
+                && QFile::exists(fullPath + QDir::separator() + QString("medsam_runner.py"));
   bool isExists = isSamExists && isPythonExists;
   return isExists;
 }

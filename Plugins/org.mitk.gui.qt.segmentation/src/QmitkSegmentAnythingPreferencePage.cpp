@@ -232,6 +232,7 @@ int QmitkSegmentAnythingPreferencePage::FetchSelectedGPUFromUI() const
 
 void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
 {
+  this->OnClearInstall(); // Clear any installation before
   const auto [path, version] = OnSystemPythonChanged(m_Ui->sysPythonComboBox->currentText());
   if (path.isEmpty())
   {

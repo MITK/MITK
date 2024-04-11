@@ -201,7 +201,7 @@ void QmitkMorphologicalOperationsWidget::Processing(std::function<MorphFunctionT
   auto labels = m_Controls->labelInspector->GetSelectedLabels();
 
   std::stringstream labelName;
-  labelName << opsName << " " << seg->GetLabel(labels.front())->GetName() << " (r=" << factor << ")";
+  labelName << opsName << " " << " (r=" << factor << ")" << seg->GetLabel(labels.front())->GetName();
 
   this->SaveResultLabelMask(image, labelName.str());
   mitk::ProgressBar::GetInstance()->Progress();

@@ -372,6 +372,32 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
       }
     }
   }
+  else if (role == Qt::ToolTipRole)
+  {
+    if (item->m_ItemType == QmitkMultiLabelSegTreeItem::ItemType::Group)
+    {
+      return QVariant(QString("Group %1").arg(item->GetGroupID()));
+    }
+    else
+    {
+      auto label = item->GetLabel();
+
+      if (nullptr == label)
+        mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is referring to a label that does not exist.";
+
+      QString name = QString::fromStdString("<b>"+label->GetName()+"</b>");
+
+      if (!item->HandleAsInstance())
+      {
+        name = QString("Label class: %1\nContaining %2 instances").arg(name).arg(item->m_childItems.size());
+      }
+      else
+      {
+        name = QString::fromStdString(label->GetName()) + QString("\nLabel instance ID: %1\nPixel value: %2").arg(item->GetLabelValue()).arg(item->GetLabelValue());
+      }
+      return QVariant(name);
+    }
+  }
   else if (role == ItemModelRole::LabelDataRole)
   {
     auto label = item->GetLabel();

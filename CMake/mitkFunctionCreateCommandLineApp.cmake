@@ -55,4 +55,5 @@ function(mitkFunctionCreateCommandLineApp)
   CPP_FILES ${CMDAPP_CPP_FILES}
   ${_CMDAPP_OPTIONS}
   )
+  set_target_properties(${EXECUTABLE_TARGET} PROPERTIES COMMAND_LINE_APP TRUE)
 endfunction()

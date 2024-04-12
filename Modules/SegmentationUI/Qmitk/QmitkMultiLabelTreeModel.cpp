@@ -955,8 +955,7 @@ void QmitkMultiLabelTreeModel::OnLabelModified(LabelValueType labelValue)
 
   if (labelItem->m_ClassName == instanceItem->GetLabel()->GetName())
   { //only the state of the label changed, but not its position in the model tree.
-
-    auto index = GetIndexByItem(labelItem, this);
+    auto index = labelItem->HandleAsInstance() ? GetIndexByItem(labelItem, this) : GetIndexByItem(instanceItem, this);
     auto rightIndex = index.sibling(index.row(), this->columnCount() - 1);
     emit dataChanged(index, rightIndex);
   }

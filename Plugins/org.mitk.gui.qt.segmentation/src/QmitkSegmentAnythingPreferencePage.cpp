@@ -240,11 +240,11 @@ void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
     return;
   }
   //check if python 3.12 and ask for confirmation
-  if (version.startsWith("3.12") &&
+  if (version.startsWith("3.13") &&
        QMessageBox::No == QMessageBox::question(nullptr,
                             "Installing Segment Anything",
                             QString("WARNING: This is an unsupported version of Python that may not work. "
-                                    "We recommend using a supported Python version between 3.9 and 3.11.\n\n"
+                                    "We recommend using a supported Python version between 3.9 and 3.12.\n\n"
                                     "Continue anyway?"),
                             QMessageBox::Yes | QMessageBox::No,
                             QMessageBox::No))

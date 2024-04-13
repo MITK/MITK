@@ -159,7 +159,7 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
     this->WriteErrorMessage("<b>ERROR: </b>Couldn't find compatible Python.");
     return;
   }
-  // check if python 3.12 and ask for confirmation
+  // check if python 3.13 and ask for confirmation
   if (version.startsWith("3.13") &&
       QMessageBox::No == QMessageBox::question(
                           nullptr,

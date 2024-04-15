@@ -13,13 +13,16 @@ found in the LICENSE file.
 #ifndef QmitkAutomatedLayoutDialog_h
 #define QmitkAutomatedLayoutDialog_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
-#include "ui_QmitkAutomatedLayoutWidget.h"
+#include <mitkDataStorage.h>
 
-#include "mitkDataStorage.h"
+#include <QWidget>
 
-#include <qwidget.h>
+namespace Ui
+{
+  class QmitkAutomatedLayoutWidget;
+}
 
 class MITKQTWIDGETS_EXPORT QmitkAutomatedLayoutWidget : public QWidget
 {
@@ -30,17 +33,17 @@ private Q_SLOTS:
   void OnSelectionDialogClosed();
 
 Q_SIGNALS:
-  void SetDataBasedLayout(QmitkAbstractNodeSelectionWidget::NodeList nodes);
+  void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);
 
 
 public:
-  QmitkAutomatedLayoutWidget(QWidget* parent = nullptr);
+  explicit QmitkAutomatedLayoutWidget(QWidget* parent = nullptr);
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
 private:
 
-  Ui::QmitkAutomatedLayoutWidget m_Controls;
-  mitk::DataStorage::Pointer m_DataStorage = nullptr;
+  Ui::QmitkAutomatedLayoutWidget* m_Controls;
+  mitk::DataStorage::Pointer m_DataStorage;
 };
 
 

@@ -15,13 +15,17 @@ found in the LICENSE file.
 
 #include "MitkQtWidgetsExports.h"
 
-#include "ui_QmitkMultiWidgetLayoutSelectionWidget.h"
-#include "QmitkAutomatedLayoutWidget.h"
+#include <QmitkAutomatedLayoutWidget.h>
 
 #include <nlohmann/json.hpp>
 
 // qt
 #include "QWidget"
+
+namespace Ui
+{
+  class QmitkMultiWidgetLayoutSelectionWidget;
+}
 
 /**
 * @brief
@@ -40,7 +44,7 @@ public:
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);
-  void SetDataBasedLayout(QmitkAbstractNodeSelectionWidget::NodeList nodes);
+  void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);
 
   // needs to be connected via Qt::DirectConnection (usually default), to ensure the stream pointers validity
   void SaveLayout(std::ostream* outStream);
@@ -61,7 +65,7 @@ private:
   void Init();
 
 
-  Ui::QmitkMultiWidgetLayoutSelectionWidget ui;
+  Ui::QmitkMultiWidgetLayoutSelectionWidget* ui;
   std::map<int, nlohmann::json> m_PresetMap;
   QmitkAutomatedLayoutWidget* m_AutomatedDataLayoutWidget;
 

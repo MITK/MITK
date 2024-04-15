@@ -22,7 +22,7 @@ found in the LICENSE file.
 #include <mitkCrosshairManager.h>
 #include <mitkDataStorage.h>
 #include <mitkRenderWindow.h>
-#include "QmitkRenderWindowUtilityWidget.h"
+#include <QmitkRenderWindowUtilityWidget.h>
 
 // qt
 #include <QFrame>

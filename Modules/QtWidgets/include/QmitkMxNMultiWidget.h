@@ -102,7 +102,7 @@ public Q_SLOTS:
   void moveEvent(QMoveEvent* e) override;
   void LoadLayout(const nlohmann::json* jsonData);
   void SaveLayout(std::ostream* outStream);
-  void SetDataBasedLayout(QmitkAbstractNodeSelectionWidget::NodeList nodes);
+  void SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes);
 
 Q_SIGNALS:
 

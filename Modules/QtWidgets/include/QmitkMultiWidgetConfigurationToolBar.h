@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef QmitkMultiWidgetConfigurationToolBar_h
 #define QmitkMultiWidgetConfigurationToolBar_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 #include <mitkInteractionSchemeSwitcher.h>
-#include "mitkDataStorage.h"
+#include <mitkDataStorage.h>
 
 #include <nlohmann/json.hpp>
 
@@ -46,7 +46,7 @@ Q_SIGNALS:
   void LayoutSet(int row, int column);
   void SaveLayout(std::ostream* outStream);
   void LoadLayout(const nlohmann::json* jsonData);
-  void SetDataBasedLayout(QList<mitk::DataNode::Pointer> nodes);
+  void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);
   void Synchronized(bool synchronized);
   void InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 

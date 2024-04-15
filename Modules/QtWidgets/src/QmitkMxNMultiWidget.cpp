@@ -566,7 +566,7 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
 
 }
 
-void QmitkMxNMultiWidget::SetDataBasedLayout(QmitkAbstractNodeSelectionWidget::NodeList nodes)
+void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)
 {
   auto vSplit = new QSplitter(Qt::Vertical);
 
@@ -577,7 +577,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(QmitkAbstractNodeSelectionWidget::N
     for (auto viewPlane : { mitk::AnatomicalPlane::Axial, mitk::AnatomicalPlane::Coronal, mitk::AnatomicalPlane::Sagittal })
     {
       // repurpose existing render windows as far as they already exist
-      auto window = GetWindowFromIndex(windowCounter);
+      auto window = GetWindowFromIndex(windowCounter++);
       if (window == nullptr)
       {
         window = CreateRenderWindowWidget();
@@ -592,7 +592,6 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(QmitkAbstractNodeSelectionWidget::N
       mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), node->GetData()->GetTimeGeometry());
       hSplit->addWidget(window.get());
       window->show();
-      windowCounter++;
     }
     auto sizes = QList<int>({1, 1, 1});
     hSplit->setSizes(sizes);

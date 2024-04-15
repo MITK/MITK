@@ -34,6 +34,7 @@ protected:
   QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const QEvent* event = nullptr) const override;
 
   void leaveEvent(QEvent* event) override;
+  void mouseMoveEvent(QMouseEvent* event) override;
 };
 
 #endif

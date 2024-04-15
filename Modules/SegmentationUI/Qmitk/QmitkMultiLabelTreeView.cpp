@@ -13,8 +13,7 @@ found in the LICENSE file.
 #include <QmitkMultiLabelTreeView.h>
 
 #include <QmitkMultiLabelTreeModel.h>
-#include <QHelpEvent>
-#include <QToolTip>
+#include <QMouseEvent>
 
 QmitkMultiLabelTreeView::QmitkMultiLabelTreeView(QWidget* parent) : QTreeView(parent)
 {
@@ -35,4 +34,18 @@ void QmitkMultiLabelTreeView::leaveEvent(QEvent* event)
 {
   QTreeView::leaveEvent(event);
   emit MouseLeave();
+}
+
+void QmitkMultiLabelTreeView::mouseMoveEvent(QMouseEvent* event)
+{
+  QModelIndex index = this->indexAt(event->pos());
+  if (!index.isValid())
+  {
+    if (viewport()->rect().contains(event->pos()))
+    {
+      emit MouseLeave();
+    }
+  }
+
+  QTreeView::mouseMoveEvent(event);
 }

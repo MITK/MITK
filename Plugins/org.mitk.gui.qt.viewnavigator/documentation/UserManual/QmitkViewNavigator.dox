@@ -1,43 +1,16 @@
 /**
 \page org_mitk_views_viewnavigator The View Navigator
 
-\imageMacro{view-manager.png,"Icon of the view navigator",2.00}
-
-\tableofcontents
+\imageMacro{view-manager.png, "Icon of the view navigator", 2.00}
 
 \section org_mitk_views_viewnavigatorOverview Overview
 
-This view allows for the easy navigation of the available views.
+The View Navigator allows for easy navigation of available views.
+To open a view, double-click on it in the grouped and searchable list of views.
 
-You can select which view to open by double-clicking the name of the view in the view navigator. It provides a keyworded, grouped and searchable list of views.
+Some views are tagged with certain keywords behind the scenes, which are considered when searching for views.
+Hence, also try typing the action you want to perform.
+For example, typing in "thres" will already reduce the list of shown views to a small subset including the Segmentation view, as it provides thresholding as functionality.
 
-\section org_mitk_views_viewnavigatorUsage Usage
-
-You can toggle the View Navigator on and off by clicking on its icon in the menu bar. Alternatively it is also available via the Window->Show Views dialog.
-
-\imageMacro{QmitkViewNavigatorGUI.png,"The View Navigator GUI",6.00}
-
-Once the View Navigator has been opened you will see a list divided in workflows/perspectives and views. Via this list you can access any view or perspective provided by the application. They are further organized based on their associated category.
-
-An entry on the list is opened by a double left-click.
-
-\subsection org_mitk_views_viewnavigatorSearch Search
-
-You can search the lists for view/workflow names, keywords or categories.
-
-\imageMacro{QmitkViewNavigatorSearch.png,"Search the View Navigator",4.00}
-
-\subsection org_mitk_views_viewnavigatorCustomWorkflows Custom Workflows
-
-\imageMacro{QmitkViewNavigatorContextMenuWorkflows.png,"The workflow context menu",4.00}
-
-A right click on a workflow opens a context menu that allows you to copy that workflow to create your own custom one.
-\note The duplicated workflow will look like the basic state of the original workflow. Any changes to the original workflow will not be copied.
-
-\imageMacro{QmitkViewNavigatorNewWorkflow.png,"Custom workflow creation dialog",4.00}
-
-Your new workflow will appear in the list and you can modify it independently of the original workflow. Any changes will be stored for future sessions unless the workflow is deleted.
-\note Resetting a custom perspective will return it to the original state after duplicating.
-
-\imageMacro{QmitkViewNavigatorContextMenuCustomWorkflow.png,"Custom workflow context menu",4.00}
+The visibility of view/tool bar categories can be set in the preferences, which will not only show or hide their tool bar but also their entry in the View Navigator.
 */

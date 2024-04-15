@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageConverter.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -646,7 +647,7 @@ public:
     m_LabelSetImage = mitk::LabelSetImage::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
 
-    auto labelMask = m_LabelSetImage->CreateLabelMask(6);
+    auto labelMask = mitk::CreateLabelMask(m_LabelSetImage,6);
 
     mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
     cropFilter->SetInput(labelMask);

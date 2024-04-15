@@ -59,6 +59,9 @@ namespace mitk
     void GenerateData() override;
 
   private:
+    template <typename SourceImageType>
+    void GenerateDataInternal(SourceImageType* sourceItkImage, mitk::Image::Pointer outputImage);
+
     bool m_BinaryFilter;
     int m_PadConstant, m_LowerThreshold, m_UpperThreshold;
   };

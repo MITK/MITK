@@ -563,9 +563,6 @@ include(mitkMacroInstallHelperApp)
 include(mitkMacroInstallTargets)
 include(mitkMacroMultiplexPicType)
 
-# Deprecated
-include(mitkMacroCreateCTKPlugin)
-
 #-----------------------------------------------------------------------------
 # Global CMake variables
 #-----------------------------------------------------------------------------

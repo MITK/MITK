@@ -225,9 +225,6 @@ bool QtStylePreferencePage::PerformOk()
   prefs->Put(berry::QtPreferences::QT_FONT_NAME, controls.m_FontComboBox->currentText().toStdString());
   prefs->Put(berry::QtPreferences::QT_FONT_SIZE, std::to_string(controls.m_FontSizeSpinBox->value()));
 
-  prefs->PutBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES,
-    controls.m_ToolbarCategoryCheckBox->isChecked());
-
   return true;
 }
 
@@ -264,9 +261,6 @@ void QtStylePreferencePage::Update()
   styleManager->UpdateWorkbenchFont();
 
   FillFontCombo(styleManager->GetFont());
-
-  controls.m_ToolbarCategoryCheckBox->setChecked(
-    prefs->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true));
 }
 
 }

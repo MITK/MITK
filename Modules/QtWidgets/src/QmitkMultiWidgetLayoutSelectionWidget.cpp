@@ -10,7 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMultiWidgetLayoutSelectionWidget.h"
+#include <QmitkMultiWidgetLayoutSelectionWidget.h>
+#include <ui_QmitkMultiWidgetLayoutSelectionWidget.h>
 
 #include <QFileDialog>
 
@@ -21,38 +22,51 @@ found in the LICENSE file.
 
 QmitkMultiWidgetLayoutSelectionWidget::QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent/* = 0*/)
   : QWidget(parent)
+  , ui(new Ui::QmitkMultiWidgetLayoutSelectionWidget)
 {
   Init();
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::Init()
 {
-  ui.setupUi(this);
+  ui->setupUi(this);
 
   auto stylesheet = "QTableWidget::item{background-color: white;}\nQTableWidget::item:selected{background-color: #1C97EA;}";
-  ui.tableWidget->setStyleSheet(stylesheet);
+  ui->tableWidget->setStyleSheet(stylesheet);
 
-  connect(ui.tableWidget, &QTableWidget::itemSelectionChanged, this, &QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged);
-  connect(ui.setLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked);
-  connect(ui.loadLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked);
-  connect(ui.saveLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked);
-  connect(ui.selectDefaultLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected);
+  m_AutomatedDataLayoutWidget = new QmitkAutomatedLayoutWidget(this);
+  connect(m_AutomatedDataLayoutWidget, &QmitkAutomatedLayoutWidget::SetDataBasedLayout, this, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout);
+  m_AutomatedDataLayoutWidget->hide();
 
-  ui.selectDefaultLayoutComboBox->addItem("Select a layout preset");
+  connect(ui->tableWidget, &QTableWidget::itemSelectionChanged, this, &QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged);
+  connect(ui->setLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked);
+  connect(ui->dataBasedLayoutButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnDataBasedLayoutButtonClicked);
+  connect(ui->loadLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked);
+  connect(ui->saveLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked);
+  connect(ui->selectDefaultLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected);
+
+  ui->selectDefaultLayoutComboBox->addItem("Select a layout preset");
   auto presetResources = us::GetModuleContext()->GetModule()->FindResources("/", "mxnLayout_*.json", false);
   for (const auto& resource : presetResources)
   {
     us::ModuleResourceStream jsonStream(resource);
     auto data = nlohmann::json::parse(jsonStream);
     auto resourceName = data["name"].get<std::string>();
-    ui.selectDefaultLayoutComboBox->addItem(QString::fromStdString(resourceName));
-    m_PresetMap[ui.selectDefaultLayoutComboBox->count() - 1] = data;
+    ui->selectDefaultLayoutComboBox->addItem(QString::fromStdString(resourceName));
+    m_PresetMap[ui->selectDefaultLayoutComboBox->count() - 1] = data;
   }
+}
+
+void QmitkMultiWidgetLayoutSelectionWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
+{
+  if (m_AutomatedDataLayoutWidget == nullptr)
+    return;
+  m_AutomatedDataLayoutWidget->SetDataStorage(dataStorage);
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged()
 {
-  QItemSelectionModel* selectionModel = ui.tableWidget->selectionModel();
+  QItemSelectionModel* selectionModel = ui->tableWidget->selectionModel();
 
   int row = 0;
   int column = 0;
@@ -62,8 +76,8 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged()
     row = indices[0].row();
     column = indices[0].column();
 
-    QModelIndex topLeft = ui.tableWidget->model()->index(0, 0, QModelIndex());
-    QModelIndex bottomRight = ui.tableWidget->model()->index(row, column, QModelIndex());
+    QModelIndex topLeft = ui->tableWidget->model()->index(0, 0, QModelIndex());
+    QModelIndex bottomRight = ui->tableWidget->model()->index(row, column, QModelIndex());
 
     QItemSelection cellSelection;
     cellSelection.select(topLeft, bottomRight);
@@ -75,7 +89,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
 {
   int row = 0;
   int column = 0;
-  QModelIndexList indices = ui.tableWidget->selectionModel()->selectedIndexes();
+  QModelIndexList indices = ui->tableWidget->selectionModel()->selectedIndexes();
   if (indices.size() > 0)
   {
     // find largest row and column
@@ -94,7 +108,15 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
     close();
     emit LayoutSet(row+1, column+1);
   }
-  ui.selectDefaultLayoutComboBox->setCurrentIndex(0);
+  ui->selectDefaultLayoutComboBox->setCurrentIndex(0);
+}
+
+void QmitkMultiWidgetLayoutSelectionWidget::OnDataBasedLayoutButtonClicked()
+{
+  this->hide();
+  m_AutomatedDataLayoutWidget->setWindowFlags(Qt::Popup);
+  m_AutomatedDataLayoutWidget->move(this->pos().x() - m_AutomatedDataLayoutWidget->width() + this->width(), this->pos().y());
+  m_AutomatedDataLayoutWidget->show();
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked()
@@ -117,7 +139,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked()
   if (filename.isEmpty())
     return;
 
-  ui.selectDefaultLayoutComboBox->setCurrentIndex(0);
+  ui->selectDefaultLayoutComboBox->setCurrentIndex(0);
 
   std::ifstream f(filename.toStdString());
   auto jsonData = nlohmann::json::parse(f);

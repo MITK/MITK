@@ -63,9 +63,11 @@ Q_SIGNALS:
   void SelectionModeChanged(bool selectAll);
   void DeregisterSynchronization();
 
+public Q_SLOTS:
+  void SetSelection(const NodeList& newSelection);
+
 private Q_SLOTS:
 
-  void OnModelUpdated();
   void OnSelectionModeChanged(bool selectAll);
   void OnEditSelection();
   void OnTableClicked(const QModelIndex& index);

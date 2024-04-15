@@ -57,6 +57,9 @@ public:
   /** Returns if the current internal selection is violating the current check function, if set.*/
   bool CurrentSelectionViolatesCheckFunction() const;
 
+Q_SIGNALS:
+  void DialogClosed();
+
 public Q_SLOTS:
   void OnEditSelection();
 

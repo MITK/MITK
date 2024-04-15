@@ -59,11 +59,13 @@ public Q_SLOTS:
 Q_SIGNALS:
 
   void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
+  void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
 
 private:
 
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
+  QPushButton* m_SynchPushButton;
   QmitkSliceNavigationWidget* m_SliceNavigationWidget;
   QmitkStepperAdapter* m_StepperAdapter;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;

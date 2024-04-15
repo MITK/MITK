@@ -590,6 +590,8 @@ mitk::LabelSetImage::LabelValueType mitk::LabelSetImage::GetUnusedLabelValue() c
 
 mitk::Label* mitk::LabelSetImage::AddLabel(mitk::Label* label, GroupIndexType groupID, bool addAsClone, bool correctLabelValue)
 {
+  if (nullptr == label) mitkThrow() << "Invalid use of AddLabel. label is not valid.";
+
   mitk::Label::Pointer newLabel = label;
 
   {
@@ -627,6 +629,23 @@ mitk::Label* mitk::LabelSetImage::AddLabel(mitk::Label* label, GroupIndexType gr
 
   this->InvokeEvent(LabelAddedEvent(newLabel->GetValue()));
   m_ActiveLabelValue = newLabel->GetValue();
+  this->Modified();
+
+  return newLabel;
+}
+
+mitk::Label* mitk::LabelSetImage::AddLabelWithContent(Label* label, const Image* labelContent, GroupIndexType groupID, LabelValueType contentLabelValue, bool addAsClone, bool correctLabelValue)
+{
+  if (nullptr == labelContent) mitkThrow() << "Invalid use of AddLabel. labelContent is not valid.";
+  if (!Equal(*(this->GetTimeGeometry()), *(labelContent->GetTimeGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+    mitkThrow() << "Invalid use of AddLabel. labelContent has not the same geometry like the segmentation.";
+
+  auto newLabel = this->AddLabel(label, groupID, addAsClone, correctLabelValue);
+
+  mitk::TransferLabelContent(labelContent, this->GetGroupImage(groupID), this->GetConstLabelsByValue(this->GetLabelValuesByGroup(groupID)),
+    mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, { {contentLabelValue, newLabel->GetValue()}},
+    mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
   this->Modified();
 
   return newLabel;

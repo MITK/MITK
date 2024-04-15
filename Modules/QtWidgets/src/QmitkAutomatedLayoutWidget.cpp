@@ -21,7 +21,7 @@ found in the LICENSE file.
 
 QmitkAutomatedLayoutWidget::QmitkAutomatedLayoutWidget(QWidget* parent)
   : QWidget(parent)
-  , m_Controls(nullptr)
+  , m_Controls(new Ui::QmitkAutomatedLayoutWidget)
 {
   m_Controls->setupUi(this);
 

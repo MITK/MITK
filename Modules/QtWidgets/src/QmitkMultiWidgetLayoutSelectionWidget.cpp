@@ -22,7 +22,7 @@ found in the LICENSE file.
 
 QmitkMultiWidgetLayoutSelectionWidget::QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent/* = 0*/)
   : QWidget(parent)
-  , ui(nullptr)
+  , ui(new Ui::QmitkMultiWidgetLayoutSelectionWidget)
 {
   Init();
 }

@@ -114,9 +114,9 @@ void QmitkMorphologicalOperationsWidget::OnFillHolesButtonClicked()
 
 mitk::MorphologicalOperations::StructuralElementType QmitkMorphologicalOperationsWidget::CreateStructerElement_UI() const
 {
-  bool ball = m_Controls->radioButtonMorphoBall->isChecked();
+  bool isBall = m_Controls->radioButtonMorphoBall->isChecked();
   int accum_flag = 0;
-  if(ball){
+  if(isBall){
    if(m_Controls->planeSelectionComboBox->currentIndex() == 0) accum_flag = mitk::MorphologicalOperations::Ball; // 3D Operation
    if(m_Controls->planeSelectionComboBox->currentIndex() == 1) accum_flag = mitk::MorphologicalOperations::Ball_Axial; // 2D Operation - Axial plane
    if(m_Controls->planeSelectionComboBox->currentIndex() == 2) accum_flag = mitk::MorphologicalOperations::Ball_Sagittal; // 2D Operation - Sagittal plane
@@ -201,7 +201,7 @@ void QmitkMorphologicalOperationsWidget::Processing(std::function<MorphFunctionT
   auto labels = m_Controls->labelInspector->GetSelectedLabels();
 
   std::stringstream labelName;
-  labelName << opsName << " " << " (r=" << factor << ")" << seg->GetLabel(labels.front())->GetName();
+  labelName << opsName << " " << " (r=" << factor << ") " << seg->GetLabel(labels.front())->GetName();
 
   this->SaveResultLabelMask(image, labelName.str());
   mitk::ProgressBar::GetInstance()->Progress();

@@ -143,8 +143,10 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
   mitk::Tool *tool = m_ToolManager->GetActiveTool();
   if (tool && tool->ConfirmBeforeExit() &&
       QMessageBox::No == QMessageBox::question(nullptr,
-                                               QString(tool->GetName()),
-                                               QString("WARNING: Are you sure you want to exit the tool?"),
+                                               tool->GetName(),
+                                               QStringLiteral("The tool currently has unconfirmed results. "
+                                                              "Do you really want to discard the results by "
+                                                              "exiting the tool now?"),
                                                QMessageBox::Yes | QMessageBox::No,
                                                QMessageBox::No))
   {

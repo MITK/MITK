@@ -69,7 +69,7 @@ void QmitkBooleanOperationsWidget::OnSegSelectionChanged(QmitkAbstractNodeSelect
   this->ConfigureWidgets();
 }
 
-void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::LabelSetImage::LabelValueVectorType labels)
+void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::LabelSetImage::LabelValueVectorType /*labels*/)
 {
   this->ConfigureWidgets();
 }

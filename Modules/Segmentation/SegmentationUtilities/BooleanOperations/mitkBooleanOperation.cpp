@@ -44,10 +44,10 @@ public:
   bool operator==(const BoolOpsFunctor& other) const
   {
     if ((this->m_Function.target_type() == other.m_Function.target_type())
-      && (this->m_Function.target<int(*)(int)>() && other.m_Function.target<int(*)(int)>())
+      && (this->m_Function.template target<BoolOpsFunctionType>() && other.m_Function.template target<BoolOpsFunctionType>())
       // If both std::function objects hold function pointers of the same signature,
       // we can compare the pointers to check if they point to the same function.
-      && (*this->m_Function.target<int(*)(int)>() == *other.m_Function.target<int(*)(int)>()))
+      && (*this->m_Function.template target<BoolOpsFunctionType>() == *other.m_Function.template target<BoolOpsFunctionType>()))
     {
       return true;
     }
@@ -86,7 +86,7 @@ mitk::Image::Pointer GenerateInternal(const mitk::LabelSetImage* segmentation, m
     using OpsFilterType = itk::NaryFunctorImageFilter<ITKGroupImageType, ITKGroupImageType, BoolOpsFunctor<mitk::LabelSetImage::LabelValueType> >;
     auto opsFilter = OpsFilterType::New();
 
-    mitk::ITKEventObserverGuard eventGuard(opsFilter, itk::ProgressEvent(), [&opsFilter, progressCallback, timeStepCount](const itk::EventObject& event)
+    mitk::ITKEventObserverGuard eventGuard(opsFilter, itk::ProgressEvent(), [&opsFilter, progressCallback, timeStepCount](const itk::EventObject& /*event*/)
       { progressCallback(opsFilter->GetProgress() / static_cast<float>(timeStepCount)); });
 
     BoolOpsFunctor<mitk::LabelSetImage::LabelValueType> functor(opsFunction);

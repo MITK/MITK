@@ -88,7 +88,6 @@ namespace mitk
      */
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
     void UpdatePrepare() override;
-    bool ConfirmBeforeExit() override;
 
   private:
 
@@ -135,7 +134,6 @@ namespace mitk
     unsigned int m_GpuId = 0;
     std::map<mitk::Label::PixelType, std::string> m_LabelMapTotal;
     bool m_Fast = true;
-    bool m_IsPreviewGenerated = false;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
     const std::string DEFAULT_TOTAL_TASK = "total";
     const std::unordered_map<std::string, std::vector<std::string>> SUBTASKS_MAP =

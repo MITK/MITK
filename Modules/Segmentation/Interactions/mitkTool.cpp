@@ -338,7 +338,7 @@ us::ModuleResource mitk::Tool::GetCursorIconResource() const
   return us::ModuleResource();
 }
 
-bool mitk::Tool::ConfirmBeforeExit()
+bool mitk::Tool::ConfirmBeforeDeactivation()
 {
   return false;
 }

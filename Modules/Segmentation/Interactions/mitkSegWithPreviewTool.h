@@ -66,6 +66,10 @@ namespace mitk
     itkGetMacro(UseSpecialPreviewColor, bool);
     itkBooleanMacro(UseSpecialPreviewColor);
 
+    itkSetMacro(RequestDeactivationConfirmation, bool);
+    itkGetMacro(RequestDeactivationConfirmation, bool);
+    itkBooleanMacro(RequestDeactivationConfirmation);
+
     /*itk macro was not used on purpose, to aviod the change of mtime.*/
     void SetMergeStyle(MultiLabelSegmentation::MergeStyle mergeStyle);
     itkGetMacro(MergeStyle, MultiLabelSegmentation::MergeStyle);
@@ -241,6 +245,8 @@ namespace mitk
     itkSetObjectMacro(WorkingPlaneGeometry, PlaneGeometry);
     itkGetConstObjectMacro(WorkingPlaneGeometry, PlaneGeometry);
 
+    bool ConfirmBeforeDeactivation() override;
+
   private:
     void TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep, const LabelMappingType& labelMapping);
 
@@ -319,6 +325,13 @@ namespace mitk
     SelectedLabelVectorType m_SelectedLabels = {};
 
     LabelTransferMode m_LabelTransferMode = LabelTransferMode::MapLabel;
+
+    bool m_IsPreviewGenerated = false;
+
+    /** This variable tracks if there should be a user-confirmation before a tool is deactivated or not.
+     * Call RequestDeactivationConfirmationOn() in the tool class to avail this feature.
+     */
+    bool m_RequestDeactivationConfirmation = false;
   };
 
 } // namespace

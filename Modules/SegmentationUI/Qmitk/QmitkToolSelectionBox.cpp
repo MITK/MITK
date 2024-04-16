@@ -141,7 +141,7 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
 
   QToolButton *toolButton = dynamic_cast<QToolButton *>(m_ToolButtonGroup->buttons().at(id));
   mitk::Tool *tool = m_ToolManager->GetActiveTool();
-  if (tool && tool->ConfirmBeforeExit() &&
+  if (tool && tool->ConfirmBeforeDeactivation() &&
       QMessageBox::No == QMessageBox::question(nullptr,
                                                tool->GetName(),
                                                QStringLiteral("The tool currently has unconfirmed results. "

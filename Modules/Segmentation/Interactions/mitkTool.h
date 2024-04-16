@@ -199,7 +199,7 @@ namespace mitk
      * The method can be reimplemented in the respective tool class with business logic 
      * on when there should be a confirmation dialog from the user before the tool exits.
      */
-    virtual bool ConfirmBeforeExit();
+    virtual bool ConfirmBeforeDeactivation();
 
   protected:
     friend class ToolManager;

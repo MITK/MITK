@@ -144,9 +144,9 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
   if (tool && tool->ConfirmBeforeDeactivation() &&
       QMessageBox::No == QMessageBox::question(nullptr,
                                                tool->GetName(),
-                                               QStringLiteral("The tool currently has unconfirmed results. "
+                                               QStringLiteral("The %1 tool currently has unconfirmed results. "
                                                               "Do you really want to discard the results by "
-                                                              "exiting the tool now?"),
+                                                              "exiting the tool now?").arg(tool->GetName()),
                                                QMessageBox::Yes | QMessageBox::No,
                                                QMessageBox::No))
   {

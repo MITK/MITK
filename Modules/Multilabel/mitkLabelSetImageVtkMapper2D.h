@@ -204,34 +204,6 @@ namespace mitk
       * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer *renderer);
 
-    /** \brief This method applies (or modifies) the lookuptable for all types of images.
-     * \warning To use the lookup table, the property 'Lookup Table' must be set and a 'Image Rendering.Mode'
-     * which uses the lookup table must be set.
-  */
-    void ApplyLookuptable(mitk::BaseRenderer *renderer, int layer);
-
-    /** \brief This method applies a color transfer function.
-     * Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous
-     * images (e.g. float)
-     * \warning To use the color transfer function, the property 'Image Rendering.Transfer Function' must be set and a
-     * 'Image Rendering.Mode' which uses the color transfer function must be set.
-  */
-    void ApplyColorTransferFunction(mitk::BaseRenderer *renderer);
-
-    /**
-     * @brief ApplyLevelWindow Apply the level window for the given renderer.
-     * \warning To use the level window, the property 'LevelWindow' must be set and a 'Image Rendering.Mode' which uses
-     * the level window must be set.
-     * @param renderer Level window for which renderer?
-     */
-    void ApplyLevelWindow(mitk::BaseRenderer *renderer);
-
-    /** \brief Set the color of the image/polydata */
-    void ApplyColor(mitk::BaseRenderer *renderer, const mitk::Color &color);
-
-    /** \brief Set the opacity of the actor. */
-    void ApplyOpacity(mitk::BaseRenderer *renderer, int layer);
-
     /**
       * \brief Calculates whether the given rendering geometry intersects the
       * given SlicedGeometry3D.

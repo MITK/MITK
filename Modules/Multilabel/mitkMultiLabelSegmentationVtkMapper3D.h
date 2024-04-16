@@ -59,9 +59,6 @@ namespace mitk
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
-    /** \brief Get the Image to map */
-    const mitk::Image *GetInput(void);
-
     /** \brief Checks whether this mapper needs to update itself and generate
      * data. */
     void Update(mitk::BaseRenderer *renderer) override;
@@ -114,17 +111,7 @@ namespace mitk
     /** \brief Set the default properties for general image rendering. */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
-    /** \brief This method switches between different rendering modes (e.g. use a lookup table or a transfer function).
-     * Detailed documentation about the modes can be found here: \link mitk::RenderingModeProperty \endlink
-     */
-    void ApplyRenderingMode(mitk::BaseRenderer *renderer);
-
   protected:
-    /** \brief Transforms the actor to the actual position in 3D.
-      *   \param renderer The current renderer corresponding to the render window.
-      */
-    void TransformActor(mitk::BaseRenderer *renderer);
-
     /** Default constructor */
     MultiLabelSegmentationVtkMapper3D();
     /** Default deconstructor */
@@ -144,16 +131,11 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    bool GenerateImageSlice(mitk::BaseRenderer* renderer);
+    bool GenerateVolumeMapping(mitk::BaseRenderer* renderer);
 
     /** \brief Generates the look up table that should be used.
       */
     void GenerateLookupTable(mitk::BaseRenderer* renderer);
-
-    /** \brief This method uses the vtkCamera clipping range and the layer property
-      * to calcualte the depth of the object (e.g. image or contour). The depth is used
-      * to keep the correct order for the final VTK rendering.*/
-    float CalculateLayerDepth(mitk::BaseRenderer *renderer);
   };
 
 } // namespace mitk

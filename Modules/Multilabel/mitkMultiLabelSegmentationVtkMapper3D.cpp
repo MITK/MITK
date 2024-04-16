@@ -13,18 +13,8 @@ found in the LICENSE file.
 #include "mitkMultiLabelSegmentationVtkMapper3D.h"
 
 // MITK
-#include <mitkAbstractTransformGeometry.h>
 #include <mitkDataNode.h>
-#include <mitkImageSliceSelector.h>
-#include <mitkImageStatisticsHolder.h>
-#include <mitkLevelWindowProperty.h>
-#include <mitkLookupTableProperty.h>
-#include <mitkPixelType.h>
-#include <mitkPlaneClipping.h>
-#include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
-#include <mitkResliceMethodProperty.h>
-#include <mitkTransferFunctionProperty.h>
 #include <mitkVectorProperty.h>
 
 // MITK Rendering
@@ -36,15 +26,11 @@ found in the LICENSE file.
 #include <vtkSmartVolumeMapper.h>
 #include <vtkVolumeProperty.h>
 #include <vtkSmartPointer.h>
+#include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
 
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
-#include <vtkTransform.h>
-#include <vtkImageMapToColors.h>
-
-// ITK
-#include <itkRGBAPixel.h>
-#include <mitkRenderingModeProperty.h>
 
 namespace
 {
@@ -153,7 +139,6 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
     this->GenerateLookupTable(renderer);
   }
 
-
   bool isDataModified = (localStorage->m_LastDataUpdateTime < image->GetMTime()) ||
     (localStorage->m_LastDataUpdateTime < image->GetPipelineMTime()) ||
     (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
@@ -161,20 +146,14 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
 
   if (isDataModified)
   {
-    auto hasValidContent = this->GenerateImageSlice(renderer);
+    auto hasValidContent = this->GenerateVolumeMapping(renderer);
     if (!hasValidContent) return;
   }
-
-  auto numberOfLayers = image->GetNumberOfLayers();
 
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
 
-  if (isDataModified && isLookupModified)
-  {
-
-  }
-
+  auto numberOfLayers = image->GetNumberOfLayers();
   for (int lidx = 0; lidx < numberOfLayers; ++lidx)
   {
     localStorage->m_LayerVolumeProperties[lidx]->SetColor(localStorage->m_TransferFunction);
@@ -184,7 +163,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   }
 }
 
-bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateImageSlice(mitk::BaseRenderer* renderer)
+bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRenderer* renderer)
 {
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
   mitk::DataNode* node = this->GetDataNode();
@@ -272,13 +251,6 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
     this->GenerateDataForRenderer(renderer);
     localStorage->m_LastPropertyUpdateTime.Modified();
   }
-  else if ((localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
-           (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
-           (localStorage->m_LastPropertyUpdateTime < image->GetPropertyList()->GetMTime()))
-  {
-    this->GenerateDataForRenderer(renderer);
-    localStorage->m_LastPropertyUpdateTime.Modified();
-  }
 }
 
 void mitk::MultiLabelSegmentationVtkMapper3D::SetDefaultProperties(mitk::DataNode *node,
@@ -287,17 +259,6 @@ void mitk::MultiLabelSegmentationVtkMapper3D::SetDefaultProperties(mitk::DataNod
 {
   // add/replace the following properties
   node->SetProperty("opacity", FloatProperty::New(1.0f), renderer);
-  node->SetProperty("binary", BoolProperty::New(false), renderer);
-
-  mitk::RenderingModeProperty::Pointer renderingModeProperty =
-    mitk::RenderingModeProperty::New(RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-  node->SetProperty("Image Rendering.Mode", renderingModeProperty, renderer);
-
-  mitk::LevelWindow levelwindow(32767.5, 65535);
-  mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New(levelwindow);
-
-  levWinProp->SetLevelWindow(levelwindow);
-  node->SetProperty("levelwindow", levWinProp, renderer);
 
   node->SetProperty("labelset.contour.active", BoolProperty::New(true), renderer);
   node->SetProperty("labelset.contour.width", FloatProperty::New(2.0), renderer);

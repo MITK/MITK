@@ -194,6 +194,13 @@ namespace mitk
      This parameter can be null if no working data is specified so far.*/
     virtual bool CanHandle(const BaseData *referenceData, const BaseData *workingData) const;
 
+    /**
+     * @brief Method call to invoke a dialog box just before exiting.
+     * The method can be reimplemented in the respective tool class with business logic 
+     * on when there should be a confirmation dialog from the user before the tool exits.
+     */
+    virtual bool ConfirmBeforeDeactivation();
+
   protected:
     friend class ToolManager;
 

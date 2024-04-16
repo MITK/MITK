@@ -140,6 +140,20 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
   MITK_DEBUG << "toolButtonClicked(" << id << "): id translates to tool ID " << m_ToolIDForButtonID[id];
 
   QToolButton *toolButton = dynamic_cast<QToolButton *>(m_ToolButtonGroup->buttons().at(id));
+  mitk::Tool *tool = m_ToolManager->GetActiveTool();
+  if (tool && tool->ConfirmBeforeDeactivation() &&
+      QMessageBox::No == QMessageBox::question(nullptr,
+                                               tool->GetName(),
+                                               QStringLiteral("The %1 tool currently has unconfirmed results. "
+                                                              "Do you really want to discard the results by "
+                                                              "exiting the tool now?").arg(tool->GetName()),
+                                               QMessageBox::Yes | QMessageBox::No,
+                                               QMessageBox::No))
+  {
+    toolButton->setChecked(false);
+    return;
+  }
+
   if (toolButton)
   {
     if ((m_ButtonIDForToolID.find(m_ToolManager->GetActiveToolID()) !=

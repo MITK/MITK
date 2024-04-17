@@ -151,6 +151,18 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   bool isGeometryModified = (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
     (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime());
 
+  // check if there is a valid worldGeometry
+  if (isGeometryModified)
+  {
+    const PlaneGeometry* worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
+    isGeometryModified = !((worldGeometry == nullptr)
+      || (!worldGeometry->IsValid())
+      || (!worldGeometry->HasReferenceGeometry())
+      || (localStorage->m_WorldPlane.IsNotNull() && Equal(*worldGeometry, *(localStorage->m_WorldPlane.GetPointer()))));
+
+    localStorage->m_WorldPlane = worldGeometry->Clone();
+  }
+
   if (isGeometryModified)
   {
     //if geometry is outdated all groups need regeneration
@@ -163,6 +175,10 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     auto hasValidContent = this->GenerateImageSlice(renderer, outdatedGroups);
     if (!hasValidContent) return;
   }
+
+  auto activeLayer = image->GetActiveLayer();
+  mitk::Label* activeLabel = image->GetActiveLabel();
+  bool activeGroupIsOutdated = std::find(outdatedGroups.begin(), outdatedGroups.end(), activeLayer) != outdatedGroups.end();
 
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
@@ -199,10 +215,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     localStorage->m_LayerActorVector[groupID]->GetProperty()->SetOpacity(opacity);
   }
 
-  auto activeLayer = image->GetActiveLayer();
-  mitk::Label* activeLabel = image->GetActiveLabel();
-  auto findIt = std::find(outdatedGroups.begin(), outdatedGroups.end(), activeLayer);
-  if (findIt != outdatedGroups.end()
+  if (activeGroupIsOutdated
       || PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LastActiveLabelUpdateTime.GetMTime())
       || PropertyTimeStampIsNewer(node, renderer, "labelset.contour.active", localStorage->m_LastActiveLabelUpdateTime.GetMTime())
       || PropertyTimeStampIsNewer(node, renderer, "labelset.contour.width", localStorage->m_LastActiveLabelUpdateTime.GetMTime())
@@ -221,9 +234,12 @@ bool mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* rend
 
   // check if there is a valid worldGeometry
   const PlaneGeometry* worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
-  if ((worldGeometry == nullptr) || (!worldGeometry->IsValid()) || (!worldGeometry->HasReferenceGeometry()))
+  if ((worldGeometry == nullptr)
+    || (!worldGeometry->IsValid())
+    || (!worldGeometry->HasReferenceGeometry()))
     return false;
 
+  localStorage->m_WorldPlane = worldGeometry->Clone();
   image->Update();
 
   const auto numberOfLayers = image->GetNumberOfLayers();

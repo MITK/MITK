@@ -125,6 +125,8 @@ namespace mitk
       /** look up table for label colors. */
       mitk::LookupTable::Pointer m_LabelLookupTable;
 
+      mitk::PlaneGeometry::Pointer m_WorldPlane;
+
       int m_NumberOfLayers;
 
       /** \brief Default constructor of the local storage. */

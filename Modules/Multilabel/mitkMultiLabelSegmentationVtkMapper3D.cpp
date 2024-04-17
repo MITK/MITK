@@ -74,6 +74,8 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
   assert(image && image->IsInitialized());
 
   localStorage->m_LabelLookupTable = image->GetLookupTable()->Clone();
+  auto lookUpTable = localStorage->m_LabelLookupTable->GetVtkLookupTable();
+
   const auto labelValues = image->GetAllLabelValues();
 
   std::string propertyName = "org.mitk.multilabel.labels.highlighted";
@@ -85,7 +87,6 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
 
     if (!highlightedLabelValues.empty())
     {
-      auto lookUpTable = localStorage->m_LabelLookupTable->GetVtkLookupTable();
       auto highlightEnd = highlightedLabelValues.cend();
 
       double rgba[4];
@@ -94,7 +95,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
         lookUpTable->GetTableValue(value, rgba);
         if (highlightEnd == std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), value))
         { //make all none highlighted values more transparent
-          rgba[3] *= 0.15;
+          rgba[3] *= 0.05;
         }
         else if (rgba[3] != 0)
         { //if highlighted values are visible set them to opaque to pop out
@@ -104,22 +105,43 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
       }
       localStorage->m_LabelLookupTable->Modified(); // need to call modified, since LookupTableProperty seems to be unchanged so no widget-update is
       // executed
+    }
+  }
 
+  localStorage->m_TransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+  localStorage->m_OpacityTransferFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
 
-      localStorage->m_TransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-      localStorage->m_OpacityTransferFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+  localStorage->m_TransferFunction->AddRGBPoint(0, 0., 0., 1.);
+  localStorage->m_OpacityTransferFunction->AddPoint(0, 0.);
 
-      localStorage->m_TransferFunction->AddRGBPoint(0, 0., 0., 1.);
-      localStorage->m_OpacityTransferFunction->AddPoint(0, 0.);
+  for (const auto& value : labelValues)
+  {
+    double* color = lookUpTable->GetTableValue(value);
+    localStorage->m_TransferFunction->AddRGBPoint(value, color[0], color[1], color[2]);
 
-      for (const auto& value : labelValues)
+    localStorage->m_OpacityTransferFunction->AddPoint(value, color[3]);
+  }
+}
+
+namespace
+{
+  std::vector<mitk::LabelSetImage::GroupIndexType> GetOutdatedGroups(const mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls, const mitk::LabelSetImage* seg)
+  {
+    const auto nrOfGroups = seg->GetNumberOfLayers();
+    std::vector<mitk::LabelSetImage::GroupIndexType> result;
+
+    for (mitk::LabelSetImage::GroupIndexType groupID = 0; groupID < nrOfGroups; ++groupID)
+    {
+      const auto groupImage = seg->GetGroupImage(groupID);
+      if (groupImage->GetMTime() > ls->m_LastDataUpdateTime
+        || groupImage->GetPipelineMTime() > ls->m_LastDataUpdateTime
+        || ls->m_GroupImageIDs.size() <= groupID
+        || groupImage != ls->m_GroupImageIDs[groupID])
       {
-        double* color = lookUpTable->GetTableValue(value);
-        localStorage->m_TransferFunction->AddRGBPoint(value, color[0], color[1], color[2]);
-
-        localStorage->m_OpacityTransferFunction->AddPoint(value, color[3]);
+        result.push_back(groupID);
       }
     }
+    return result;
   }
 }
 
@@ -138,32 +160,45 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   {
     this->GenerateLookupTable(renderer);
   }
+  
+  auto outdatedGroups = GetOutdatedGroups(localStorage, image);
 
-  bool isDataModified = (localStorage->m_LastDataUpdateTime < image->GetMTime()) ||
-    (localStorage->m_LastDataUpdateTime < image->GetPipelineMTime()) ||
-    (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
+  bool isGeometryModified = (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
     (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime());
 
-  if (isDataModified)
+  if (isGeometryModified)
   {
-    auto hasValidContent = this->GenerateVolumeMapping(renderer);
+    //if geometry is outdated all groups need regeneration
+    outdatedGroups.resize(image->GetNumberOfLayers());
+    std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
+  }
+
+  if (!outdatedGroups.empty())
+  {
+    auto hasValidContent = this->GenerateVolumeMapping(renderer, outdatedGroups);
     if (!hasValidContent) return;
   }
 
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
 
-  auto numberOfLayers = image->GetNumberOfLayers();
-  for (int lidx = 0; lidx < numberOfLayers; ++lidx)
+  if (isLookupModified)
   {
-    localStorage->m_LayerVolumeProperties[lidx]->SetColor(localStorage->m_TransferFunction);
-    localStorage->m_LayerVolumeProperties[lidx]->SetScalarOpacity(localStorage->m_OpacityTransferFunction);
-    localStorage->m_LayerVolumes[lidx]->SetMapper(localStorage->m_LayerVolumeMappers[lidx]);
-    localStorage->m_LayerVolumes[lidx]->SetProperty(localStorage->m_LayerVolumeProperties[lidx]);
+    //if lookup table is modified all groups need a new color mapping
+    outdatedGroups.resize(image->GetNumberOfLayers());
+    std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
+  }
+
+  for (const auto groupID : outdatedGroups)
+  {
+    localStorage->m_LayerVolumeProperties[groupID]->SetColor(localStorage->m_TransferFunction);
+    localStorage->m_LayerVolumeProperties[groupID]->SetScalarOpacity(localStorage->m_OpacityTransferFunction);
+    localStorage->m_LayerVolumes[groupID]->SetMapper(localStorage->m_LayerVolumeMappers[groupID]);
+    localStorage->m_LayerVolumes[groupID]->SetProperty(localStorage->m_LayerVolumeProperties[groupID]);
   }
 }
 
-bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRenderer* renderer)
+bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs)
 {
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
   mitk::DataNode* node = this->GetDataNode();
@@ -172,37 +207,49 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRe
 
   image->Update();
 
-  auto numberOfLayers = image->GetNumberOfLayers();
+  const auto numberOfLayers = image->GetNumberOfLayers();
 
   if (numberOfLayers != localStorage->m_NumberOfLayers)
   {
+    if (numberOfLayers > localStorage->m_NumberOfLayers)
+    {
+      for (int lidx = localStorage->m_NumberOfLayers; lidx < numberOfLayers; ++lidx)
+      {
+        localStorage->m_GroupImageIDs.push_back(nullptr);
+        localStorage->m_LayerImages.push_back(vtkSmartPointer<vtkImageData>::New());
+        localStorage->m_LayerVolumeMappers.push_back(vtkSmartPointer<vtkSmartVolumeMapper>::New());
+        localStorage->m_LayerVolumeProperties.push_back(vtkSmartPointer<vtkVolumeProperty>::New());
+        localStorage->m_LayerVolumes.push_back(vtkSmartPointer<vtkVolume>::New());
+      }
+    }
+    else
+    {
+      localStorage->m_GroupImageIDs.resize(numberOfLayers);
+      localStorage->m_LayerImages.resize(numberOfLayers);
+      localStorage->m_LayerVolumeMappers.resize(numberOfLayers);
+      localStorage->m_LayerVolumeProperties.resize(numberOfLayers);
+      localStorage->m_LayerVolumes.resize(numberOfLayers);
+    }
+
     localStorage->m_NumberOfLayers = numberOfLayers;
-    localStorage->m_LayerImages.clear();
-    localStorage->m_LayerVolumeMappers.clear();
-    localStorage->m_LayerVolumeProperties.clear();
-    localStorage->m_LayerVolumes.clear();
 
     localStorage->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
 
     for (int lidx = 0; lidx < numberOfLayers; ++lidx)
     {
-      localStorage->m_LayerImages.push_back(vtkSmartPointer<vtkImageData>::New());
-      localStorage->m_LayerVolumeMappers.push_back(vtkSmartPointer<vtkSmartVolumeMapper>::New());
-      localStorage->m_LayerVolumeProperties.push_back(vtkSmartPointer<vtkVolumeProperty>::New());
-      localStorage->m_LayerVolumes.push_back(vtkSmartPointer<vtkVolume>::New());
-
       localStorage->m_Actors->AddPart(localStorage->m_LayerVolumes[lidx]);
     }
   }
 
-  for (int lidx = 0; lidx < numberOfLayers; ++lidx)
+  for (const auto groupID : outdatedGroupIDs)
   {
-    const auto layerImage = image->GetGroupImage(lidx);
+    const auto groupImage = image->GetGroupImage(groupID);
+    localStorage->m_GroupImageIDs[groupID] = groupImage;
 
-    localStorage->m_LayerImages[lidx] = layerImage->GetVtkImageData(this->GetTimestep());
-    localStorage->m_LayerVolumeMappers[lidx]->SetInputData(localStorage->m_LayerImages[lidx]);
-    localStorage->m_LayerVolumeProperties[lidx]->ShadeOff();
-    localStorage->m_LayerVolumeProperties[lidx]->SetInterpolationTypeToNearest();
+    localStorage->m_LayerImages[groupID] = groupImage->GetVtkImageData(this->GetTimestep());
+    localStorage->m_LayerVolumeMappers[groupID]->SetInputData(localStorage->m_LayerImages[groupID]);
+    localStorage->m_LayerVolumeProperties[groupID]->ShadeOff();
+    localStorage->m_LayerVolumeProperties[groupID]->SetInterpolationTypeToNearest();
   }
   localStorage->m_LastDataUpdateTime.Modified();
   return true;

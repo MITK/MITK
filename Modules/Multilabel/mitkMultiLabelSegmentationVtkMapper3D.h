@@ -84,6 +84,12 @@ namespace mitk
       std::vector<vtkSmartPointer<vtkVolume>> m_LayerVolumes;
       std::vector<vtkSmartPointer<vtkVolumeProperty>> m_LayerVolumeProperties;
 
+      /** Vector containing the pointer of the currently used group images.
+       * IMPORTANT: This member must not be used to access any data.
+       * Its purpose is to allow checking if the order of the groups has changed
+       * in order to adapt the pipe line accordingly*/
+      std::vector<const Image*> m_GroupImageIDs;
+
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastDataUpdateTime;
       /** \brief Timestamp of last update of a property. */
@@ -98,7 +104,7 @@ namespace mitk
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
-      /** \brief Default deconstructor of the local storage. */
+      /** \brief Default destructor of the local storage. */
       ~LocalStorage() override;
     };
 
@@ -131,7 +137,7 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    bool GenerateVolumeMapping(mitk::BaseRenderer* renderer);
+    bool GenerateVolumeMapping(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs);
 
     /** \brief Generates the look up table that should be used.
       */

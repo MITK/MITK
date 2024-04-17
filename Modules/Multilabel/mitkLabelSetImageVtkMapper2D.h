@@ -87,6 +87,12 @@ namespace mitk
     public:
       vtkSmartPointer<vtkPropAssembly> m_Actors;
 
+      /** Vector containing the pointer of the currently used group images.
+       * IMPORTANT: This member must not be used to access any data.
+       * Its purpose is to allow checking if the order of the groups has changed
+       * in order to adapt the pipe line accordingly*/
+      std::vector<const Image*> m_GroupImageIDs;
+
       std::vector<vtkSmartPointer<vtkActor>> m_LayerActorVector;
       std::vector<vtkSmartPointer<vtkPolyDataMapper>> m_LayerMapperVector;
       std::vector<vtkSmartPointer<vtkImageData>> m_ReslicedImageVector;
@@ -123,7 +129,7 @@ namespace mitk
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
-      /** \brief Default deconstructor of the local storage. */
+      /** \brief Default destructor of the local storage. */
       ~LocalStorage() override;
     };
 
@@ -191,7 +197,7 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    bool GenerateImageSlice(mitk::BaseRenderer* renderer);
+    bool GenerateImageSlice(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs);
 
     void GenerateActiveLabelOutline(mitk::BaseRenderer* renderer);
 

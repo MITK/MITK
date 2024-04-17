@@ -88,6 +88,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   {
     m_Controls.pythonEnvComboBox->insertItem(0, lastSelectedPyEnv);
   }
+  m_Controls.fastBox->setChecked(m_Settings.value("TotalSeg/LastFast").toBool());
   const QString storageDir = m_Installer.GetVirtualEnvPath();
   m_IsInstalled = this->IsTotalSegmentatorInstalled(storageDir);
   if (m_IsInstalled)
@@ -246,6 +247,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
       m_Settings.setValue("TotalSeg/LastCustomPythonPath", pythonPathTextItem);
     }
   }
+  m_Settings.setValue("TotalSeg/LastFast", m_Controls.fastBox->isChecked());
 }
 
 void QmitkTotalSegmentatorToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)

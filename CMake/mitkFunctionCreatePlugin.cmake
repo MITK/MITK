@@ -336,7 +336,3 @@ function(_FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP qch_file)
   set(${qch_file} ${${qch_file}} PARENT_SCOPE)
 
 endfunction()
-
-function(MACRO_CREATE_MITK_CTK_PLUGIN)
-  message(SEND_ERROR "The function MACRO_CREATE_MITK_CTK_PLUGIN was renamed to mitk_create_plugin in MITK 2015.05.")
-endfunction()

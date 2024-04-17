@@ -74,13 +74,11 @@ namespace mitk
     /**
      * @brief Updates the surface interpolations by extracting the contour form the given slice for all labels
      * that have a surface contour information stored for the given plane at the given timestep.
-     * @param slice the slice from which the contour should be extracted
      * @param workingImage the segmentation image
      * @param timeStep the time step for wich the surface interpolation information should be updated.
      * @param plane the plane in which the slice lies
      * @param detectIntersection if true the slice is eroded before contour extraction. If the slice is empty after the
-     * erosion it is most
-     *        likely an intersecting contour an will not be added to the SurfaceInterpolationController
+     * erosion it is most likely an intersecting contour an will not be added to the SurfaceInterpolationController
      */
     static void UpdateAllSurfaceInterpolations(const LabelSetImage* workingImage,
                                            TimeStepType timeStep,

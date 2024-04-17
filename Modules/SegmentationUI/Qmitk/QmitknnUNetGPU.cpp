@@ -16,7 +16,7 @@ found in the LICENSE file.s
 QmitkGPULoader::QmitkGPULoader()
 {
   QProcess process;
-  process.start("nvidia-smi --query-gpu=name,memory.total --format=csv");
+  process.start("nvidia-smi", QStringList() << "--query-gpu=name,memory.total" << "--format=csv");
   process.waitForFinished(-1);
   QStringList infoStringList;
   while (process.canReadLine())

@@ -337,3 +337,8 @@ us::ModuleResource mitk::Tool::GetCursorIconResource() const
   // Each specific tool should load its own resource. This one will be invalid
   return us::ModuleResource();
 }
+
+bool mitk::Tool::ConfirmBeforeDeactivation()
+{
+  return false;
+}

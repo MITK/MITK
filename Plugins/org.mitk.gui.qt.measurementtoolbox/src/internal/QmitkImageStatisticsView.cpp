@@ -94,7 +94,7 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_Controls.imageNodesSelector->SetSelectionIsOptional(false);
   m_Controls.imageNodesSelector->SetInvalidInfo(QStringLiteral("Please select images for statistics"));
   m_Controls.imageNodesSelector->SetPopUpTitel(QStringLiteral("Select input images"));
-  m_Controls.roiNodesSelector->SetPopUpHint(QStringLiteral("You may select multiple images for the statistics computation. But all selected images must have the same geometry."));
+  m_Controls.imageNodesSelector->SetPopUpHint(QStringLiteral("You may select multiple images for the statistics computation. But all selected images must have the same geometry."));
 
   m_Controls.roiNodesSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.roiNodesSelector->SetNodePredicate(this->GenerateROIPredicate());

@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkWorkbenchUtil.h>
 #include <mitkIPreferences.h>
+#include <mitkMultiLabelPredicateHelper.h>
 
 // Qmitk
 #include <QmitkRenderWindow.h>
@@ -85,28 +86,9 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_DefaultLabelNaming(true)
   , m_SelectionChangeIsAlreadyBeingHandled(false)
 {
-  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
-  auto isDti = mitk::NodePredicateDataType::New("TensorImage");
-  auto isOdf = mitk::NodePredicateDataType::New("OdfImage");
-  auto isSegment = mitk::NodePredicateDataType::New("Segment");
+  m_SegmentationPredicate = mitk::GetMultiLabelSegmentationPredicate();
 
-  auto validImages = mitk::NodePredicateOr::New();
-  validImages->AddPredicate(mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isSegment)));
-  validImages->AddPredicate(isDwi);
-  validImages->AddPredicate(isDti);
-  validImages->AddPredicate(isOdf);
-
-  m_SegmentationPredicate = mitk::NodePredicateAnd::New();
-  m_SegmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
-
-  m_ReferencePredicate = mitk::NodePredicateAnd::New();
-  m_ReferencePredicate->AddPredicate(validImages);
-  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(m_SegmentationPredicate));
-  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+  m_ReferencePredicate = mitk::GetSegmentationReferenceImagePredicate();
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
@@ -206,9 +188,7 @@ void QmitkSegmentationView::OnAnySelectionChanged()
     else
     {
       // With a reference image, only allow segmentations that fit the geometry of the reference image to be selected.
-      m_Controls->workingNodeSelector->SetNodePredicate(mitk::NodePredicateAnd::New(
-        mitk::NodePredicateSubGeometry::New(m_ReferenceNode->GetData()->GetGeometry()),
-        m_SegmentationPredicate.GetPointer()));
+      m_Controls->workingNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_ReferenceNode->GetData()->GetGeometry()));
 
       m_SelectionChangeIsAlreadyBeingHandled = false;
 

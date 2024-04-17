@@ -43,11 +43,11 @@ set(CPP_FILES
   Qmitk/QmitkMonaiLabel2DToolGUI.cpp
   Qmitk/QmitkMonaiLabel3DToolGUI.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
-  SegmentationUtilities/QmitkContourModelToImageWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.cpp
-  SegmentationUtilities/QmitkSurfaceToImageWidget.cpp
   SegmentationUtilities/QmitkDataSelectionWidget.cpp
+  SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidget.cpp
+  SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidget.cpp
 )
 
 set(H_FILES
@@ -98,11 +98,11 @@ set(MOC_H_FILES
   Qmitk/QmitkMonaiLabel2DToolGUI.h
   Qmitk/QmitkMonaiLabel3DToolGUI.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
-  SegmentationUtilities/QmitkContourModelToImageWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.h
-  SegmentationUtilities/QmitkSurfaceToImageWidget.h
   SegmentationUtilities/QmitkDataSelectionWidget.h
+  SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidget.h
+  SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidget.h
 )
 
 set(UI_FILES
@@ -121,11 +121,11 @@ set(UI_FILES
   Qmitk/QmitkSegmentAnythingGUIControls.ui
   Qmitk/QmitkMonaiLabelToolGUIControls.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
-  SegmentationUtilities/QmitkContourModelToImageWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
   SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui
-  SegmentationUtilities/QmitkSurfaceToImageWidgetControls.ui
   SegmentationUtilities/QmitkDataSelectionWidgetControls.ui
+  SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidgetControls.ui
+  SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidgetControls.ui
 )
 
 set(QRC_FILES

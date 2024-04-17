@@ -95,7 +95,29 @@ namespace mitk
     * @pre If correctLabelValue==false, label value must be non conflicting.
     * @pre groupID must indicate an existing group.
     */
-    mitk::Label* AddLabel(mitk::Label* label, GroupIndexType groupID, bool addAsClone = true, bool correctLabelValue = true);
+    mitk::Label* AddLabel(Label* label, GroupIndexType groupID, bool addAsClone = true, bool correctLabelValue = true);
+
+    /** \brief Adds a label instance to a group of the multi label image including its pixel content.
+    * @remark By default, if the pixel value of the label is already used in the image, the label
+    * will get a new none conflicting value assigned. This can be controlled by correctLabelValue.
+    * @param label Instance of a label that should be added or used as template
+    * @param groupID The id of the group the label should be added to.
+    * @param labelContent Pointer to an image that contains the pixel content of the label that should be added.
+    * @param contentLabelValue Pixel value in the content image that indicates the label (may not be the same like the label value
+    * used in the segmentation after addition).
+    * @param addAsClone Flag that controls, if the passed instance should be added (false; the image will then take ownership,
+    * be aware that e.g. event observers will be added)
+    * a clone of the instance (true).
+    * @param correctLabelValue Flag that controls, if the value of the passed label should be corrected, if this value is already used in
+    * the multi label image. True: Conflicting values will be corrected, by assigning a none conflicting value. False: If the value is conflicting
+    * an exception will be thrown.
+    * @return Instance of the label as it was added to the label set.
+    * @pre label must point to a valid instance.
+    * @pre If correctLabelValue==false, label value must be non conflicting.
+    * @pre groupID must indicate an existing group.
+    * @pre labelContent must point to a valid image that has the same geometry like the segmentation.
+    */
+    mitk::Label* AddLabelWithContent(Label* label, const Image* labelContent, GroupIndexType groupID, LabelValueType contentLabelValue, bool addAsClone = true, bool correctLabelValue = true);
 
     /** \brief Adds a new label to a group of the image by providing name and color.
     * @param name (Class) name of the label instance that should be added.
@@ -202,9 +224,9 @@ namespace mitk
     /** @brief Returns a vector with pointers to all labels in the MultiLabelSegmentation indicated
     * by the passed label value vector.
     * @param labelValues Vector of values of labels that should be returned.
-    * @ignoreMissing If true(Default) unknown labels Will be skipped in the result. If false,
+    * @param ignoreMissing If true (default), unknown labels Will be skipped in the result. If false,
     * an exception will be raised, if a label is requested.
-    instance.*/
+    */
     const LabelVectorType GetLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing = true);
 
     /** @brief Returns a vector with const pointers to all labels in the MultiLabelSegmentation indicated
@@ -213,8 +235,7 @@ namespace mitk
     */
     const ConstLabelVectorType GetConstLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing = false) const;
 
-    /** Helper function that can be used to extract a vector of label values of a vector of label instance pointers.
-     @overload.*/
+    /** Helper function that can be used to extract a vector of label values of a vector of label instance pointers.*/
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const ConstLabelVectorType& labels);
     /** Helper function that can be used to extract a vector of label values are vector of label instances.*/
     static LabelValueVectorType ExtractLabelValuesFromLabelVector(const LabelVectorType& labels);
@@ -309,7 +330,6 @@ namespace mitk
     */
     void ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& newLabels);
 
-    /**@overload for none-const label vectors. */
     void ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& newLabels);
 
     /** Returns the pointer to the image that contains the labeling of the indicate group.
@@ -386,6 +406,13 @@ namespace mitk
     // END FUTURE MultiLabelSegmentation
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
+
+    /** DON'T USE. WORKAROUND method that is used until the rework is finished to
+    ensure always getting a group image and not this.
+    @warning Don't use. This method is going to be removed as soon as T30194 is
+    solved.*/
+      const mitk::Image* GetGroupImageWorkaround(GroupIndexType groupID) const;
+
     /**
       * \brief  */
       void UpdateCenterOfMass(PixelType pixelValue);
@@ -425,11 +452,8 @@ namespace mitk
      */
     unsigned int GetActiveLayer() const;
 
-    /** \brief
-*/
     Label* GetActiveLabel();
-    /** \brief
-    */
+
     const Label* GetActiveLabel() const;
 
     /**
@@ -445,12 +469,7 @@ namespace mitk
      */
     unsigned int GetTotalNumberOfLabels() const;
 
-    /**
-      * \brief  */
-    mitk::Image::Pointer CreateLabelMask(PixelType index);
-
-    /**
-     * @brief Initialize a new mitk::LabelSetImage by a given image.
+    /** @brief Initialize a new mitk::LabelSetImage by a given image.
      * For all distinct pixel values of the parameter image new labels will
      * be created. If the number of distinct pixel values exceeds mitk::Label::MAX_LABEL_VALUE
      * an exception will be raised.
@@ -458,33 +477,30 @@ namespace mitk
      */
     void InitializeByLabeledImage(mitk::Image::Pointer image);
 
-    /**
-      * \brief  */
     void MaskStamp(mitk::Image *mask, bool forceOverwrite);
 
-    /**
-      * \brief  */
     void SetActiveLayer(unsigned int layer);
     void SetActiveLabel(LabelValueType label);
 
-    /**
-      * \brief  */
     unsigned int GetNumberOfLayers() const;
 
     /**
      * \brief Adds a new layer to the LabelSetImage. The new layer will be set as the active one.
-     * \param labelSet a labelset that will be added to the new layer if provided
+     * \param labels Labels that will be added to the new layer if provided
      * \return the layer ID of the new layer
      */
     GroupIndexType AddLayer(ConstLabelVector labels = {});
 
-    /**
+   /**
     * \brief Adds a layer based on a provided mitk::Image.
     * \param layerImage is added to the vector of label images
     * \param labels labels that will be cloned and added to the new layer if provided
     * \return the layer ID of the new layer
+    * \pre layerImage must be valid instance
+    * \pre layerImage needs to have the same geometry then the segmentation
+    * \pre layerImage must have the pixel value equal to LabelValueType.
     */
-    GroupIndexType AddLayer(mitk::Image::Pointer layerImage, ConstLabelVector labels = {});
+    GroupIndexType AddLayer(mitk::Image* layerImage, ConstLabelVector labels = {});
 
   protected:
     mitkCloneMacro(Self);
@@ -497,7 +513,7 @@ namespace mitk
     void LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension> *source, unsigned int layer);
 
     template <typename TPixel, unsigned int VImageDimension>
-    void ImageToLayerContainerProcessing(itk::Image<TPixel, VImageDimension> *source, unsigned int layer) const;
+    void ImageToLayerContainerProcessing(const itk::Image<TPixel, VImageDimension> *source, unsigned int layer) const;
 
     template <typename ImageType>
     void CalculateCenterOfMassProcessing(ImageType *input, LabelValueType index);

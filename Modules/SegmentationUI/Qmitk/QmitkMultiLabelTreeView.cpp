@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include <QmitkMultiLabelTreeView.h>
 
 #include <QmitkMultiLabelTreeModel.h>
+#include <QHelpEvent>
+#include <QToolTip>
 
 QmitkMultiLabelTreeView::QmitkMultiLabelTreeView(QWidget* parent) : QTreeView(parent)
 {
@@ -28,4 +30,3 @@ QItemSelectionModel::SelectionFlags QmitkMultiLabelTreeView::selectionCommand(co
 
   return   QAbstractItemView::selectionCommand(index, event);
 }
-

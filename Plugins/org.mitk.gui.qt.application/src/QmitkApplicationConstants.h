@@ -16,4 +16,5 @@ found in the LICENSE file.
 struct MITK_QT_APP QmitkApplicationConstants
 {
   static const std::string TOOL_BARS_PREFERENCES;
+  static const std::string TOOL_BARS_SHOW_CATEGORIES;
 };

@@ -609,7 +609,7 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 
   this->CurrentlyBusy.Send(true);
   m_IsUpdating = true;
-
+  m_IsPreviewGenerated = false;
   this->UpdatePrepare();
 
   const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
@@ -665,6 +665,10 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
         this->DoUpdatePreview(feedBackImage, currentSegImage, previewImage, timeStep);
       }
       RenderingManager::GetInstance()->RequestUpdateAll();
+      if (previewImage->GetNumberOfLabels(previewImage->GetActiveLayer()) > 0)
+      { // check if labels exits for the preview
+        m_IsPreviewGenerated = true;
+      }
     }
   }
   catch (itk::ExceptionObject & excep)
@@ -837,4 +841,9 @@ void mitk::SegWithPreviewTool::TransferLabelSetImageContent(const LabelSetImage*
   TransferLabelInformation(labelMapping, source, target);
 
   target->SetVolume(newMitkImgAcc.GetData(), timeStep);
+}
+
+bool mitk::SegWithPreviewTool::ConfirmBeforeDeactivation()
+{
+  return m_IsPreviewGenerated && m_RequestDeactivationConfirmation;
 }

@@ -13,10 +13,10 @@ The <b>Segmentation Utilities View</b> allows to postprocess existing segmentati
 
 <ul>
 	<li> \ref org_mitk_views_segmentationUtilitiesBooleanOperations
-	<li> \ref org_mitk_views_segmentationUtilitiesContourToImage
 	<li> \ref org_mitk_views_segmentationUtilitiesImageMasking
 	<li> \ref org_mitk_views_segmentationUtilitiesMorphologicalOperations
-	<li> \ref org_mitk_views_segmentationUtilitiesSurfaceToImage
+	<li> \ref org_mitk_views_segmentationUtilitiesConvertToSegmentation
+	<li> \ref org_mitk_views_segmentationUtilitiesExtractFromSegmentation
 </ul>
 
 \section org_mitk_views_segmentationUtilitiesDataSelection Data Selection
@@ -37,14 +37,6 @@ The selected segmentations must have the same geometry (size, spacing, ...) in o
 The result will be stored in a new data node as a child node of the first selected segmentation.
 
 \imageMacro{QmitkSegmentationUtilities_BooleanOperations.png,"Boolean operations",6.00}
-
-\section org_mitk_views_segmentationUtilitiesContourToImage Contour to image
-
-Contour to image allows to create a segmentation out of a given contour-model.
-The operation requires a contour model set and a reference image.
-The created segmentation image will have the same geometrical properties like the reference image (dimension, size and Geometry3D).
-
-\imageMacro{QmitkSegmentationUtilities_ContourToImage.png,"Contour to image",6.00}
 
 \section org_mitk_views_segmentationUtilitiesImageMasking Image masking
 
@@ -73,12 +65,35 @@ The plugin provides a <b>ball</b> and a <b>cross</b> as structuring elements. Th
 
 \imageMacro{QmitkSegmentationUtilities_MorphologicalOperations.png,"Morphological operations",6.00}
 
-\section org_mitk_views_segmentationUtilitiesSurfaceToImage Surface to image
+\section org_mitk_views_segmentationUtilitiesConvertToSegmentation Convert to Segmentation
 
-Surface to image allows to create a segmentation out of a given surface.
-The operation requires a surface and a reference image.
-The created segmentation image will have the same geometrical properties like the reference image (dimension, size and Geometry3D).
+Convert to segmentation allows to convert one or multiple input data into a multi-label segmentation. The supported input data types are surfaces, contour models and images. Surfaces and contour models will be converted into a new label (with the same color then the respective input data). Input images will be analyzed for their pixel content. Each pixel value (different to 0; which marks unlabeled pixels) will be associated with the new label.
+The conversion can have the following outputs:
+<ul>
+	<li> <b>Convert to new segmentation:</b> The inputs will be converted and integrated in a new segmentation. The geometry of the output segmentation is determined by the largest geometry of the input images. If no images are selected as input, one has to specify an image or segmentation as reference. If sub mode "Convert inputs separately" is selected, each input will be converted into its own multi-label segmentation output.
+	<li> <b>Add to existing segmentation:</b> The inputs will be converted and integrated as new group(s) in a selected segmentation.
+</ul>
 
-\imageMacro{QmitkSegmentationUtilities_SurfaceToImage.png,"Surface to image",6.00}
+For the output the following grouping modes can be selected (if the output is not new separate segmentation):
+<ul>
+	<li> <b>Merge all inputs ...:</b> All inputs will be merged into a new group. Remark: If inputs overlap the inputs might overwrite each other.
+	<li> <b>New group per input:</b> Each input will be added as a new group to the multi-label segmentation.
+</ul>
+
+<b>Remark on label values:</b> when converting inputs into a multi-labels segmentation the conversion process tries to keep the label value the same like the original value. In cases of surfaces or contour models it would be 1. In case of images it would be the respective pixel value. In cases of the label value collision (the label value is already used in the segmentation) a new value will be assigned to resolve the conflict. Therefore it is only guaranteed that values are kept, if you convert only one input into a new or empty segmentation.
+
+<b>Remark unsupported geometries:</b> if you select images as input, these images have to have either the same geometry or must be a sub geometry. If an reference is defined or you want to add them to an existing segmentation, the imports images also have to have the same geometry like the target or be a sub geometry of it. 
+
+
+\section org_mitk_views_segmentationUtilitiesExtractFromSegmentation Extract from Segmentation
+
+Extract from segmentation allows to extract the content of a multi-label segmentation (either all labeled or a selection of labels) in various ways and stores it as simple images in the data storage.
+
+The following output options are available (at least one must be selected):
+<ul>
+	<li> <b>label class map(s):</b> This generates an image where each pixel value (different from 0, which indicates unlabeled pixels) indicates a label class. Label class comprises all label instances that have the same label name. One can also see that has the semantic segmentation result. This mode will generate an output for each group indicated by the selected labels (or all groups).
+	<li> <b>Label instance map(s):</b> This generates an image where each pixel value (different from 0, which indicates unlabeled pixels) indicates a label instance. The used pixel values are equivalent to the label value of each instance. This mode will generate an output for each group indicated by the selected labels (or all groups).
+	<li> <b>Label instance mask(s):</b> This generates an image for one label instance where each pixel value (different from 0, which indicates unlabeled pixels) indicates the label instance. The used pixel value is equivalent to the label value of the label instance.
+</ul>
 
 **/

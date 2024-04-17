@@ -157,3 +157,8 @@ bool QmitkMultiNodeSelectionWidget::AllowEmissionOfSelection(const NodeList& emi
   m_CheckResponse = m_CheckFunction(emissionCandidates);
   return m_CheckResponse.empty();
 }
+
+bool QmitkMultiNodeSelectionWidget::CurrentSelectionViolatesCheckFunction() const
+{
+  return !m_CheckResponse.empty();
+}

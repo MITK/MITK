@@ -6,23 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>480</height>
+    <width>609</width>
+    <height>312</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
+   <item>
+    <widget class="QCheckBox" name="showCategoriesCheckBox">
+     <property name="text">
+      <string>Show category names</string>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QTreeWidget" name="treeWidget">
      <property name="editTriggers">
@@ -37,10 +32,19 @@
      <property name="headerHidden">
       <bool>true</bool>
      </property>
+     <column>
+      <property name="text">
+       <string notr="true">1</string>
+      </property>
+     </column>
     </widget>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>showCategoriesCheckBox</tabstop>
+  <tabstop>treeWidget</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

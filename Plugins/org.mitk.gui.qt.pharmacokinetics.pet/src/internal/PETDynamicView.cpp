@@ -84,6 +84,7 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
   m_Controls.errorMessageLabel->hide();
 
   this->InitModelComboBox();
+  m_Controls.labelMaskInfo->hide();
 
   connect(m_Controls.btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
 
@@ -129,6 +130,8 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
 
   connect(m_Controls.btnAIFFile, SIGNAL(clicked()), this, SLOT(LoadAIFfromFile()));
+  connect(m_Controls.checkMaskInfo, SIGNAL(toggled(bool)), m_Controls.labelMaskInfo,
+    SLOT(setVisible(bool)));
 
   //Model fit configuration
   m_Controls.groupBox_FitConfiguration->hide();

@@ -93,6 +93,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.btnModelling->setEnabled(false);
 
   this->InitModelComboBox();
+  m_Controls.labelMaskInfo->hide();
 
   m_Controls.timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
   m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
@@ -108,6 +109,9 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
   connect(m_Controls.radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+
+  connect(m_Controls.checkMaskInfo, SIGNAL(toggled(bool)), m_Controls.labelMaskInfo,
+    SLOT(setVisible(bool)));
 
   connect(m_Controls.timeSeriesNodeSelector,
           &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,

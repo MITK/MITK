@@ -59,6 +59,20 @@
       </layout>
      </item>
      <item>
+      <widget class="QCheckBox" name="checkMaskInfo">
+       <property name="text">
+        <string>Show mask info</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelMaskInfo">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Please only use static segmentation masks as input in order to get sensible parametric map results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
         <string>Fitting strategy</string>
@@ -222,8 +236,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>518</width>
-           <height>105</height>
+           <width>528</width>
+           <height>155</height>
           </rect>
          </property>
          <attribute name="label">
@@ -254,8 +268,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>492</width>
-           <height>258</height>
+           <width>158</width>
+           <height>232</height>
           </rect>
          </property>
          <attribute name="label">

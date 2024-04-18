@@ -74,6 +74,7 @@ void mitk::MultilabelObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   if (dynamic_cast<LabelSetImage *>(node->GetData()) != nullptr)
   {
     mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(node);
+    mitk::MultiLabelSegmentationVtkMapper3D::SetDefaultProperties(node);
 
     auto propertyFilters = CoreServices::GetPropertyFilters();
 

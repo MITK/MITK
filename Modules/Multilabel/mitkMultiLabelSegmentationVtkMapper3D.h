@@ -82,7 +82,9 @@ namespace mitk
       std::vector<vtkSmartPointer<vtkSmartVolumeMapper>> m_LayerVolumeMappers;
       std::vector<vtkSmartPointer<vtkImageData>> m_LayerImages;
       std::vector<vtkSmartPointer<vtkVolume>> m_LayerVolumes;
-      std::vector<vtkSmartPointer<vtkVolumeProperty>> m_LayerVolumeProperties;
+
+      std::vector <vtkSmartPointer<vtkColorTransferFunction> > m_TransferFunctions;
+      std::vector <vtkSmartPointer<vtkPiecewiseFunction> > m_OpacityTransferFunctions;
 
       /** Vector containing the pointer of the currently used group images.
        * IMPORTANT: This member must not be used to access any data.
@@ -97,8 +99,6 @@ namespace mitk
 
       /** look up table for label colors. */
       mitk::LookupTable::Pointer m_LabelLookupTable;
-      vtkSmartPointer<vtkColorTransferFunction> m_TransferFunction;
-      vtkSmartPointer<vtkPiecewiseFunction> m_OpacityTransferFunction;
 
       int m_NumberOfLayers;
 

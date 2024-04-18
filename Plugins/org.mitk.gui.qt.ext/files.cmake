@@ -5,6 +5,7 @@ set(SRC_CPP_FILES
   QmitkOpenDicomEditorAction.cpp
   QmitkOpenMxNMultiWidgetEditorAction.cpp
   QmitkOpenStdMultiWidgetEditorAction.cpp
+  QmitkStartupDialog.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -18,6 +19,7 @@ set(INTERNAL_CPP_FILES
 set(UI_FILES
   src/internal/QmitkAppInstancesPreferencePage.ui
   src/internal/QmitkExternalProgramsPreferencePage.ui
+  src/QmitkStartupDialog.ui
 )
 
 set(MOC_H_FILES
@@ -33,6 +35,7 @@ set(MOC_H_FILES
   src/QmitkOpenDicomEditorAction.h
   src/QmitkOpenMxNMultiWidgetEditorAction.h
   src/QmitkOpenStdMultiWidgetEditorAction.h
+  src/QmitkStartupDialog.h
 )
 
 set(CACHED_RESOURCE_FILES

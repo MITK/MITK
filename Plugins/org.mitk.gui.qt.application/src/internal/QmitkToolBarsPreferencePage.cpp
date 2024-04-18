@@ -37,7 +37,7 @@ namespace
   // Exclude views without category and categories that contain a literal '.', e.g.
   // "org.blueberry.ui" or "org.mitk.views.general", as they typically do not have
   // a corresponding tool bar.
-  std::multimap<QString, berry::IViewDescriptor::Pointer> GetViews()
+  std::multimap<QString, berry::IViewDescriptor::Pointer> GetViewsByCategory()
   {
     std::multimap<QString, berry::IViewDescriptor::Pointer> result;
 
@@ -133,7 +133,7 @@ void QmitkToolBarsPreferencePage::CreateQtControl(QWidget* parent)
 
   m_Ui->setupUi(m_Control);
 
-  const auto views = GetViews();
+  const auto views = GetViewsByCategory();
 
   for (auto category = views.cbegin(), end = views.cend(); category != end; category = views.upper_bound(category->first))
   {

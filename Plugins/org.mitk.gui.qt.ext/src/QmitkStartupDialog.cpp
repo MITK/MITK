@@ -32,6 +32,7 @@ namespace
 
 QT_BEGIN_NAMESPACE
 
+  // Make nlohmann_json understand QString for deserialization.
   void from_json(const nlohmann::json& j, QString& result)
   {
     result = QString::fromStdString(j.get<std::string>());
@@ -46,6 +47,7 @@ public:
   static constexpr int InfoRole = Qt::UserRole + 1;
   static constexpr int CategoriesRole = Qt::UserRole + 2;
 
+  // Load preset from file. See remarks on the Inherit() method below.
   explicit Preset(const QString& filename)
   {
     QFile file(filename);
@@ -62,7 +64,9 @@ public:
     this->Deserialize(j);
   }
 
-  void Inherit(QList<Preset*>& presets)
+  // When all presets are loaded, their inheritances have to be resolved by
+  // iterating through them once and calling Inherit() on each preset.
+  void Inherit(const QList<Preset*>& presets)
   {
     if (m_Ancestor.isEmpty())
       return;
@@ -76,10 +80,10 @@ public:
                   << m_Ancestor.toLatin1() << "\" because it couldn't be found.";
     }
 
-    (*ancestor)->Inherit(presets);
-    this->MergeCategories(*ancestor);
+    (*ancestor)->Inherit(presets); // Recursively resolve inheritance of ancestors
+    this->MergeCategories(*ancestor); // Inherit by merging categories
 
-    m_Ancestor.clear();
+    m_Ancestor.clear(); // No need to resolve inheritance again for this preset
   }
 
   QString GetName() const
@@ -150,12 +154,15 @@ QStringList QmitkStartupDialog::GetPresetCategories() const
   return m_Ui->presetListWidget->currentItem()->data(Preset::CategoriesRole).toStringList();
 }
 
+// Check if "Do not show this dialog again" is ticked off.
 bool QmitkStartupDialog::SkipDialog() const
 {
   auto prefs = GetPreferences();
   return prefs->GetBool("skip", false);
 }
 
+// Load preset resources.
+// See "resources/org_mitk_presets.qrc".
 void QmitkStartupDialog::LoadPresets()
 {
   QList<Preset*> presets;
@@ -164,6 +171,8 @@ void QmitkStartupDialog::LoadPresets()
   while (it.hasNext())
     presets.append(new Preset(it.next()));
 
+  // Only after all presets are loaded their inheritances can be resolved
+  // and the presets finally added to the list widget.
   for (auto preset : presets)
   {
     preset->Inherit(presets);
@@ -171,6 +180,7 @@ void QmitkStartupDialog::LoadPresets()
   }
 }
 
+// Load presets and restore previous settings.
 void QmitkStartupDialog::showEvent(QShowEvent*)
 {
   if (this->SkipDialog())
@@ -222,6 +232,7 @@ void QmitkStartupDialog::OnSelectedPresetChanged(const QItemSelection& selected,
   m_Ui->presetLabel->setText(m_Ui->presetListWidget->selectedItems().front()->data(Preset::InfoRole).toString());
 }
 
+// Save settings to restore them next time.
 void QmitkStartupDialog::OnFinished(int result)
 {
   auto prefs = GetPreferences();

@@ -100,7 +100,7 @@ namespace mitk
       /** look up table for label colors. */
       mitk::LookupTable::Pointer m_LabelLookupTable;
 
-      int m_NumberOfLayers;
+      unsigned int m_NumberOfGroups;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();

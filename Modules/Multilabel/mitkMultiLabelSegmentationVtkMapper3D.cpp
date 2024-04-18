@@ -107,20 +107,21 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
     }
   }
 
-  for (int lidx = 0; lidx < image->GetNumberOfLayers(); ++lidx)
+  const auto nrOfGroups = image->GetNumberOfLayers();
+  for (unsigned int groupID = 0; groupID < nrOfGroups; ++groupID)
   {
-    localStorage->m_TransferFunctions[lidx] = vtkSmartPointer<vtkColorTransferFunction>::New();
-    localStorage->m_OpacityTransferFunctions[lidx] = vtkSmartPointer<vtkPiecewiseFunction>::New();
+    localStorage->m_TransferFunctions[groupID] = vtkSmartPointer<vtkColorTransferFunction>::New();
+    localStorage->m_OpacityTransferFunctions[groupID] = vtkSmartPointer<vtkPiecewiseFunction>::New();
 
-    localStorage->m_TransferFunctions[lidx]->AddRGBPoint(0, 0., 0., 1.);
-    localStorage->m_OpacityTransferFunctions[lidx]->AddPoint(0, 0.);
+    localStorage->m_TransferFunctions[groupID]->AddRGBPoint(0, 0., 0., 1.);
+    localStorage->m_OpacityTransferFunctions[groupID]->AddPoint(0, 0.);
 
-    for (const auto& value : image->GetLabelValuesByGroup(lidx))
+    for (const auto& value : image->GetLabelValuesByGroup(groupID))
     {
       double* color = lookUpTable->GetTableValue(value);
-      localStorage->m_TransferFunctions[lidx]->AddRGBPoint(value, color[0], color[1], color[2]);
+      localStorage->m_TransferFunctions[groupID]->AddRGBPoint(value, color[0], color[1], color[2]);
 
-      localStorage->m_OpacityTransferFunctions[lidx]->AddPoint(value, color[3]);
+      localStorage->m_OpacityTransferFunctions[groupID]->AddPoint(value, color[3]);
     }
   }
 }
@@ -205,13 +206,13 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRe
 
   image->Update();
 
-  const auto numberOfLayers = image->GetNumberOfLayers();
+  const auto numberOfGroups = image->GetNumberOfLayers();
 
-  if (numberOfLayers != localStorage->m_NumberOfLayers)
+  if (numberOfGroups != localStorage->m_NumberOfGroups)
   {
-    if (numberOfLayers > localStorage->m_NumberOfLayers)
+    if (numberOfGroups > localStorage->m_NumberOfGroups)
     {
-      for (int lidx = localStorage->m_NumberOfLayers; lidx < numberOfLayers; ++lidx)
+      for (unsigned int groupID = localStorage->m_NumberOfGroups; groupID < numberOfGroups; ++groupID)
       {
         localStorage->m_GroupImageIDs.push_back(nullptr);
         localStorage->m_LayerImages.push_back(vtkSmartPointer<vtkImageData>::New());
@@ -224,22 +225,22 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRe
     }
     else
     {
-      localStorage->m_GroupImageIDs.resize(numberOfLayers);
-      localStorage->m_LayerImages.resize(numberOfLayers);
-      localStorage->m_LayerVolumeMappers.resize(numberOfLayers);
-      localStorage->m_LayerVolumes.resize(numberOfLayers);
+      localStorage->m_GroupImageIDs.resize(numberOfGroups);
+      localStorage->m_LayerImages.resize(numberOfGroups);
+      localStorage->m_LayerVolumeMappers.resize(numberOfGroups);
+      localStorage->m_LayerVolumes.resize(numberOfGroups);
 
-      localStorage->m_TransferFunctions.resize(numberOfLayers);
-      localStorage->m_OpacityTransferFunctions.resize(numberOfLayers);
+      localStorage->m_TransferFunctions.resize(numberOfGroups);
+      localStorage->m_OpacityTransferFunctions.resize(numberOfGroups);
     }
 
-    localStorage->m_NumberOfLayers = numberOfLayers;
+    localStorage->m_NumberOfGroups = numberOfGroups;
 
     localStorage->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
 
-    for (int lidx = 0; lidx < numberOfLayers; ++lidx)
+    for (unsigned int groupID = 0; groupID < numberOfGroups; ++groupID)
     {
-      localStorage->m_Actors->AddPart(localStorage->m_LayerVolumes[lidx]);
+      localStorage->m_Actors->AddPart(localStorage->m_LayerVolumes[groupID]);
     }
   }
 
@@ -335,5 +336,5 @@ mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::LocalStorage()
   // Do as much actions as possible in here to avoid double executions.
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
 
-  m_NumberOfLayers = 0;
+  m_NumberOfGroups = 0;
 }

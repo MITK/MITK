@@ -127,7 +127,7 @@ namespace mitk
 
       mitk::PlaneGeometry::Pointer m_WorldPlane;
 
-      int m_NumberOfLayers;
+      unsigned int m_NumberOfLayers;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();

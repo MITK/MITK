@@ -177,7 +177,6 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   }
 
   auto activeLayer = image->GetActiveLayer();
-  mitk::Label* activeLabel = image->GetActiveLabel();
   bool activeGroupIsOutdated = std::find(outdatedGroups.begin(), outdatedGroups.end(), activeLayer) != outdatedGroups.end();
 
   float opacity = 1.0f;
@@ -248,7 +247,7 @@ bool mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* rend
   {
     if (numberOfLayers > localStorage->m_NumberOfLayers)
     {
-      for (int lidx = localStorage->m_NumberOfLayers; lidx < numberOfLayers; ++lidx)
+      for (unsigned int lidx = localStorage->m_NumberOfLayers; lidx < numberOfLayers; ++lidx)
       {
         localStorage->m_GroupImageIDs.push_back(nullptr);
         localStorage->m_ReslicedImageVector.push_back(vtkSmartPointer<vtkImageData>::New());
@@ -278,7 +277,7 @@ bool mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* rend
 
     localStorage->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
 
-    for (int lidx = 0; lidx < numberOfLayers; ++lidx)
+    for (unsigned int lidx = 0; lidx < numberOfLayers; ++lidx)
     {
       localStorage->m_Actors->AddPart(localStorage->m_LayerActorVector[lidx]);
     }
@@ -293,7 +292,7 @@ bool mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* rend
     // set image to nullptr, to clear the texture in 3D, because
     // the latest image is used there if the plane is out of the geometry
     // see bug-13275
-    for (int lidx = 0; lidx < numberOfLayers; ++lidx)
+    for (unsigned int lidx = 0; lidx < numberOfLayers; ++lidx)
     {
       localStorage->m_ReslicedImageVector[lidx] = nullptr;
       localStorage->m_LayerMapperVector[lidx]->SetInputData(localStorage->m_EmptyPolyData);
@@ -683,7 +682,7 @@ void mitk::LabelSetImageVtkMapper2D::TransformActor(mitk::BaseRenderer *renderer
   vtkSmartPointer<vtkMatrix4x4> matrix = localStorage->m_ReslicerVector[0]->GetResliceAxes(); // same for all layers
   trans->SetMatrix(matrix);
 
-  for (int lidx = 0; lidx < localStorage->m_NumberOfLayers; ++lidx)
+  for (unsigned int lidx = 0; lidx < localStorage->m_NumberOfLayers; ++lidx)
   {
     // transform the plane/contour (the actual actor) to the corresponding view (axial, coronal or sagittal)
     localStorage->m_LayerActorVector[lidx]->SetUserTransform(trans);

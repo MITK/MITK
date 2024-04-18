@@ -117,7 +117,7 @@ namespace mitk
      * @brief Method does the GET Rest call to fetch MonaiLabel
      * server metadata including all models' info.
      */
-    void GetOverallInfo(std::string&, int&);
+    void GetOverallInfo(const std::string&, const int&);
 
     /**
      * @brief Holds all parameters of the server to serve the UI
@@ -158,7 +158,7 @@ namespace mitk
     /**
      * @brief Helper function to get full model info object from model name. 
      */
-    MonaiModelInfo GetModelInfoFromName(std::string&) const;
+    MonaiModelInfo GetModelInfoFromName(const std::string) const;
 
     itkSetMacro(ModelName, std::string);
     itkGetConstMacro(ModelName, std::string);

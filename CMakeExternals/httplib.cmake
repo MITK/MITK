@@ -24,7 +24,7 @@ if(MITK_USE_${proj})
 
     ExternalProject_Add(${proj}
       GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
-      GIT_TAG a609330e4c6374f741d3b369269f7848255e1954 # v0.14.1
+      GIT_TAG 5c00bbf36ba8ff47b4fb97712fc38cb2884e5b98 # v0.15.3
       CMAKE_ARGS ${ep_common_args}
       CMAKE_CACHE_ARGS ${cmake_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS ${ep_common_cache_default_args}

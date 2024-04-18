@@ -81,10 +81,7 @@ void mitk::MonaiLabelTool::UpdatePrepare()
 {
   Superclass::UpdatePrepare();
   auto preview = this->GetPreviewSegmentation();
-  for (LabelSetImage::GroupIndexType i = 0; i < preview->GetNumberOfLayers(); ++i)
-  {
-    preview->GetLabelSet(i)->RemoveAllLabels();
-  }
+  preview->RemoveLabels(preview->GetAllLabelValues());
 }
 
 void mitk::MonaiLabelTool::OnDelete(StateMachineAction *, InteractionEvent *)
@@ -196,12 +193,11 @@ void mitk::MonaiLabelTool::MapLabelsToSegmentation(const mitk::LabelSetImage *so
                                                    mitk::LabelSetImage *dest,
                                                    std::map<std::string, mitk::Label::PixelType> &labelMap)
 {
-  auto labelset = dest->GetLabelSet();
   if (labelMap.empty())
   {
     auto label = LabelSetImageHelper::CreateNewLabel(dest, "object");
     label->SetValue(1);
-    labelset->AddLabel(label, false);
+    dest->AddLabel(label, false);
     return;
   }
   std::map<mitk::Label::PixelType, std::string> flippedLabelMap;
@@ -223,7 +219,7 @@ void mitk::MonaiLabelTool::MapLabelsToSegmentation(const mitk::LabelSetImage *so
       color.SetGreen(lookupTableColor[1]);
       color.SetBlue(lookupTableColor[2]);
       label->SetColor(color);
-      labelset->AddLabel(label, false);
+      dest->AddLabel(label, false);
     }
     else
     {
@@ -232,7 +228,7 @@ void mitk::MonaiLabelTool::MapLabelsToSegmentation(const mitk::LabelSetImage *so
   }
 }
 
-void mitk::MonaiLabelTool::GetOverallInfo(std::string &hostName, int &port)
+void mitk::MonaiLabelTool::GetOverallInfo(const std::string &hostName, const int &port)
 {
   if (!IsMonaiServerOn(hostName, port))
   {
@@ -479,7 +475,7 @@ std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetScribbleSegmentationM
   return scribbleModels;
 }
 
-mitk::MonaiModelInfo mitk::MonaiLabelTool::GetModelInfoFromName(std::string &modelName) const
+mitk::MonaiModelInfo mitk::MonaiLabelTool::GetModelInfoFromName(const std::string modelName) const
 {
   if (nullptr == m_InfoParameters)
   {

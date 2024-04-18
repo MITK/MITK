@@ -1119,9 +1119,13 @@ void QmitkExtWorkbenchWindowAdvisorHack::onViewNavigator()
   SafeHandleNavigatorView("org.mitk.views.viewnavigator");
 }
 
-void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()
+void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences(const QString& selectedPage)
 {
   QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
+
+  if (!selectedPage.isEmpty())
+    _PreferencesDialog.SetSelectedPage(selectedPage);
+
   _PreferencesDialog.exec();
 }
 

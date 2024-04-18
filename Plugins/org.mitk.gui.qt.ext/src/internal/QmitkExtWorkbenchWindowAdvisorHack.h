@@ -28,7 +28,7 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
     void onRedo();
     void onImageNavigator();
     void onViewNavigator();
-    void onEditPreferences();
+    void onEditPreferences(const QString& selectedPage = "");
     void onQuit();
 
     void onResetPerspective();

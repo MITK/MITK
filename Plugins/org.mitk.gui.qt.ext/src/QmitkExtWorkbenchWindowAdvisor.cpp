@@ -81,6 +81,7 @@ found in the LICENSE file.
 #include <QMouseEvent>
 #include <QLabel>
 #include <QmitkAboutDialog.h>
+#include <QmitkStartupDialog.h>
 
 QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack =
   new QmitkExtWorkbenchWindowAdvisorHack();
@@ -88,6 +89,44 @@ QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack
 QString QmitkExtWorkbenchWindowAdvisor::QT_SETTINGS_FILENAME = "QtSettings.ini";
 
 static bool USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS = false;
+
+namespace
+{
+  void ExecuteStartupDialog()
+  {
+    QmitkStartupDialog startupDialog;
+
+    try
+    {
+      if (startupDialog.exec() != QDialog::Accepted)
+        return;
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << e.GetDescription();
+      return;
+    }
+
+    QStringList categories;
+
+    if (startupDialog.UsePreset())
+    {
+      categories = startupDialog.GetPresetCategories();
+
+      if (categories.isEmpty())
+      {
+        QmitkExtWorkbenchWindowAdvisorHack::undohack->onEditPreferences("org.mitk.ToolBarsPreferencePage");
+        return;
+      }
+    }
+    else
+    {
+      // TODO: Enumerate all categories
+    }
+
+    // TODO: Show/hide tool bars accordingly
+  }
+}
 
 class PartListenerForTitle: public berry::IPartListener
 {
@@ -996,6 +1035,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
   {
     configurer->GetWindow()->GetWorkbench()->GetIntroManager()->ShowIntro(GetWindowConfigurer()->GetWindow(), false);
   }
+
+  ExecuteStartupDialog();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onIntro()

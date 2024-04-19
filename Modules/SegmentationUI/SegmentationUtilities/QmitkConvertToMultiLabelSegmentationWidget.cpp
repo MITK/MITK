@@ -37,22 +37,25 @@ found in the LICENSE file.
 
 #include <QmitkNodeSelectionDialog.h>
 
-mitk::NodePredicateBase::Pointer GetInputPredicate()
+namespace
 {
-  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto isNotSeg = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
+  mitk::NodePredicateBase::Pointer GetInputPredicate()
+  {
+    auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+    auto isNotSeg = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
 
-  auto isSurface = mitk::TNodePredicateDataType<mitk::Surface>::New();
-  auto isContourModel = mitk::TNodePredicateDataType<mitk::ContourModel>::New();
-  auto isContourModelSet = mitk::TNodePredicateDataType<mitk::ContourModelSet>::New();
+    auto isSurface = mitk::TNodePredicateDataType<mitk::Surface>::New();
+    auto isContourModel = mitk::TNodePredicateDataType<mitk::ContourModel>::New();
+    auto isContourModelSet = mitk::TNodePredicateDataType<mitk::ContourModelSet>::New();
 
-  auto isData = mitk::NodePredicateOr::New(isImage, isContourModel, isContourModelSet);
-  isData->AddPredicate(isSurface);
+    auto isData = mitk::NodePredicateOr::New(isImage, isContourModel, isContourModelSet);
+    isData->AddPredicate(isSurface);
 
-  auto isValidInput = mitk::NodePredicateAnd::New(isNotSeg, isData);
-  isValidInput->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-  isValidInput->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
-  return isValidInput.GetPointer();
+    auto isValidInput = mitk::NodePredicateAnd::New(isNotSeg, isData);
+    isValidInput->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+    isValidInput->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+    return isValidInput.GetPointer();
+  }
 }
 
 const mitk::DataNode* GetNodeWithLargestImageGeometry(const QmitkNodeSelectionDialog::NodeList& nodes)

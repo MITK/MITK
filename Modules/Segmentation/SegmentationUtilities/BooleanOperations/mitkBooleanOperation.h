@@ -25,12 +25,12 @@ namespace mitk
   namespace BooleanOperation
   {
 
-    Image::Pointer MITKSEGMENTATION_EXPORT GenerateUnion(const LabelSetImage*, LabelSetImage::LabelValueVectorType labeValues,
+    Image::Pointer MITKSEGMENTATION_EXPORT GenerateUnion(const LabelSetImage*, LabelSetImage::LabelValueVectorType labelValues,
       std::function<void(float progress)> progressCallback = [](float) {});
     Image::Pointer MITKSEGMENTATION_EXPORT GenerateIntersection(const LabelSetImage*, LabelSetImage::LabelValueVectorType labelValues,
       std::function<void(float progress)> progressCallback = [](float) {});
     Image::Pointer MITKSEGMENTATION_EXPORT GenerateDifference(const LabelSetImage*, LabelSetImage::LabelValueType minuendLabelValue,
-      LabelSetImage::LabelValueVectorType subtrahendLabelValues, std::function<void(float progress)> progressCallback = [](float) {});
+      const LabelSetImage::LabelValueVectorType subtrahendLabelValues, std::function<void(float progress)> progressCallback = [](float) {});
 
   };
 }

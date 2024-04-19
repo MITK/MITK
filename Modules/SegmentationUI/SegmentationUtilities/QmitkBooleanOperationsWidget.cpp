@@ -48,9 +48,9 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* da
   connect(m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged,
     this, &QmitkBooleanOperationsWidget::OnLabelSelectionChanged);
 
-  connect(m_Controls->differenceButton, SIGNAL(clicked()), this, SLOT(OnDifferenceButtonClicked()));
-  connect(m_Controls->intersectionButton, SIGNAL(clicked()), this, SLOT(OnIntersectionButtonClicked()));
-  connect(m_Controls->unionButton, SIGNAL(clicked()), this, SLOT(OnUnionButtonClicked()));
+  connect(m_Controls->differenceButton, &QToolButton::clicked, this, &QmitkBooleanOperationsWidget::OnDifferenceButtonClicked);
+  connect(m_Controls->intersectionButton, &QToolButton::clicked, this, &QmitkBooleanOperationsWidget::OnIntersectionButtonClicked);
+  connect(m_Controls->unionButton, &QToolButton::clicked, this, &QmitkBooleanOperationsWidget::OnUnionButtonClicked);
 
   m_Controls->segNodeSelector->SetAutoSelectNewNodes(true);
   this->ConfigureWidgets();
@@ -117,7 +117,7 @@ void QmitkBooleanOperationsWidget::ConfigureWidgets()
   else
   {
     std::stringstream stream;
-    for (mitk::LabelSetImage::LabelValueVectorType::iterator iter = selectedLabelValues.begin() + 1; iter != selectedLabelValues.end(); ++iter)
+    for (auto iter = selectedLabelValues.cbegin() + 1; iter != selectedLabelValues.cend(); ++iter)
     {
       auto label = seg->GetLabel(*iter);
       if (stream.rdbuf()->in_avail() != 0) stream << "; ";
@@ -158,7 +158,7 @@ void QmitkBooleanOperationsWidget::OnDifferenceButtonClicked()
   auto resultMask = mitk::BooleanOperation::GenerateDifference(seg, minuend, subtrahends, progressCallback);
 
   std::stringstream name;
-  name << "Difference " << seg->GetLabel(minuend)->GetName() << " - ";
+  name << "Difference " << seg->GetLabel(minuend)->GetName() << " -";
   for (auto label : subtrahends)
   {
     name << " " << seg->GetLabel(label)->GetName();

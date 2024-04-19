@@ -105,7 +105,10 @@ private:
   void Deserialize(const nlohmann::json& j)
   {
     this->setData(Preset::NameRole, j["name"].get<QString>());
-    this->setData(Preset::InfoRole, j.value("info", QString()));
+
+    // Prepend name as header to info text
+    this->setData(Preset::InfoRole, QString("<h3>%1 preset</h3>\n\n%2").arg(this->GetName()).arg(j.value("info", QString())));
+
     this->m_Ancestor = j.value("ancestor", QString());
 
     if (j.contains("categories"))

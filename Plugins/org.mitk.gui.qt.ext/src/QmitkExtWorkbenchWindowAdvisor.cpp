@@ -96,6 +96,9 @@ namespace
   {
     QmitkStartupDialog startupDialog;
 
+    if (startupDialog.SkipDialog())
+      return;
+
     try
     {
       if (startupDialog.exec() != QDialog::Accepted)

@@ -27,12 +27,13 @@ public:
   explicit QmitkStartupDialog(QWidget* parent = nullptr);
   ~QmitkStartupDialog() override;
 
+  bool SkipDialog() const;
+
   bool UsePreset() const;
   QString GetPresetName() const;
   QStringList GetPresetCategories() const;
 
 private:
-  bool SkipDialog() const;
   void LoadPresets();
 
   void showEvent(QShowEvent* event) override;

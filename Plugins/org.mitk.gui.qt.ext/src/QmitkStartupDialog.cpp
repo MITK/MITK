@@ -202,9 +202,6 @@ void QmitkStartupDialog::LoadPresets()
 // Load presets and restore previous settings.
 void QmitkStartupDialog::showEvent(QShowEvent*)
 {
-  if (this->SkipDialog())
-    this->reject();
-
   this->LoadPresets();
 
   auto prefs = GetPreferences();

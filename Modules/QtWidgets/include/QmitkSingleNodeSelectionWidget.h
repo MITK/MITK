@@ -81,6 +81,7 @@ protected:
 
   void OnDataStorageChanged() override;
   void OnNodeAddedToStorage(const mitk::DataNode* node) override;
+  void OnNodePredicateChanged() override;
 
   void AutoSelectNodes();
 

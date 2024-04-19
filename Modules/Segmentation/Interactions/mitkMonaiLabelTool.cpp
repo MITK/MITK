@@ -11,15 +11,16 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkMonaiLabelTool.h"
-#include <mitkIOUtil.h>
-#include <httplib.h>
+
 #include <filesystem>
+#include <httplib.h>
+#include <mitkIOUtil.h>
+#include <mitkLabelSetImageHelper.h>
 #include <mitkPointSetShapeProperty.h>
 #include <mitkProperties.h>
 #include <mitkToolManager.h>
-#include <mitkLabelSetImageHelper.h>
 
-mitk::MonaiLabelTool::MonaiLabelTool() : SegWithPreviewTool(true, "PressMoveReleaseAndPointSetting") 
+mitk::MonaiLabelTool::MonaiLabelTool() : SegWithPreviewTool(true, "PressMoveReleaseAndPointSetting")
 {
   this->ResetsToEmptyPreviewOn();
   this->IsTimePointChangeAwareOff();
@@ -135,9 +136,142 @@ bool mitk::MonaiLabelTool::IsMonaiServerOn(const std::string &hostName, const in
 {
   httplib::SSLClient cli(hostName, port);
   cli.enable_server_certificate_verification(false);
-  while (cli.is_socket_open());
+  while (cli.is_socket_open())
+    ;
   return cli.Get("/info/");
 }
+
+namespace mitk
+{
+  // Converts the json GET response from the MonaiLabel server to MonaiAppMetadata object.
+  void from_json(const nlohmann::json &jsonObj, mitk::MonaiAppMetadata &appData)
+  {
+    jsonObj["name"].get_to(appData.name);
+    jsonObj["description"].get_to(appData.description);
+    jsonObj["labels"].get_to(appData.labels);
+    auto modelJsonMap = jsonObj["models"].get<std::map<std::string, nlohmann::json>>();
+    for (const auto &[_name, _jsonObj] : modelJsonMap)
+    {
+      if (_jsonObj.is_discarded() || !_jsonObj.is_object())
+      {
+        MITK_ERROR << "Could not parse JSON object.";
+      }
+      mitk::MonaiModelInfo modelInfo;
+      modelInfo.name = _name;
+      try
+      {
+        auto labels = _jsonObj["labels"].get<std::unordered_map<std::string, int>>();
+        modelInfo.labels = labels;
+      }
+      catch (const std::exception &)
+      {
+        auto labels = _jsonObj["labels"].get<std::vector<std::string>>();
+        for (const auto &label : labels)
+        {
+          modelInfo.labels[label] = -1; // Hardcode -1 as label id
+        }
+      }
+      _jsonObj["type"].get_to(modelInfo.type);
+      _jsonObj["dimension"].get_to(modelInfo.dimension);
+      _jsonObj["description"].get_to(modelInfo.description);
+      appData.models.push_back(modelInfo);
+    }
+  }
+} // namespace mitk
+
+namespace
+{
+  /**
+   * @brief Returns boundary string from Httplib response.
+   */
+  std::string GetBoundaryString(const httplib::Result &response)
+  {
+    httplib::Headers headers = response->headers;
+    std::string contentType = headers.find("content-type")->second;
+    std::string delimiter = "boundary=";
+    std::string boundaryString =
+      contentType.substr(contentType.find(delimiter) + delimiter.length(), std::string::npos);
+    boundaryString.insert(0, "--");
+    return boundaryString;
+  }
+
+  /**
+   * @brief Returns image data string from monai label overall response.
+   */
+  std::string GetResponseImageString(const std::string &imagePart)
+  {
+    std::string contentTypeStream = "Content-Type: application/octet-stream";
+    size_t ctPos = imagePart.find(contentTypeStream) + contentTypeStream.length();
+    std::string imageDataPart = imagePart.substr(ctPos);
+    std::string whitespaces = " \n\r";
+    imageDataPart.erase(0, imageDataPart.find_first_not_of(whitespaces)); // clean up
+    return imageDataPart;
+  }
+
+  /**
+   * @brief Helper function to get the Parts of the POST response.
+   */
+  std::vector<std::string> GetPartsBetweenBoundary(const std::string &body, const std::string &boundary)
+  {
+    std::vector<std::string> retVal;
+    std::string master = body;
+    size_t boundaryPos = master.find(boundary);
+    size_t beginPos = 0;
+    while (boundaryPos != std::string::npos)
+    {
+      std::string part = master.substr(beginPos, boundaryPos);
+      if (!part.empty())
+      {
+        retVal.push_back(part);
+      }
+      master.erase(beginPos, boundaryPos + boundary.length());
+      boundaryPos = master.find(boundary);
+    }
+    return retVal;
+  }
+
+  /**
+   * @brief Applies the give std::map lookup table on the preview segmentation LabelSetImage.
+   */
+  void MapLabelsToSegmentation(const mitk::LabelSetImage *source,
+                               mitk::LabelSetImage *dest,
+                               const std::map<std::string, mitk::Label::PixelType> &labelMap)
+  {
+    if (labelMap.empty())
+    {
+      auto label = mitk::LabelSetImageHelper::CreateNewLabel(dest, "object");
+      label->SetValue(1);
+      dest->AddLabel(label, false);
+      return;
+    }
+    std::map<mitk::Label::PixelType, std::string> flippedLabelMap;
+    for (auto const &[key, val] : labelMap)
+    {
+      flippedLabelMap[val] = key;
+    }
+    auto lookupTable = mitk::LookupTable::New();
+    lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
+    for (auto const &[key, val] : flippedLabelMap)
+    {
+      if (source->ExistLabel(key, source->GetActiveLayer()))
+      {
+        auto label = mitk::Label::New(key, val);
+        std::array<double, 3> lookupTableColor;
+        lookupTable->GetColor(key, lookupTableColor.data());
+        mitk::Color color;
+        color.SetRed(lookupTableColor[0]);
+        color.SetGreen(lookupTableColor[1]);
+        color.SetBlue(lookupTableColor[2]);
+        label->SetColor(color);
+        dest->AddLabel(label, false);
+      }
+      else
+      {
+        MITK_INFO << "Label not found for " << val;
+      }
+    }
+  }
+} // namespace
 
 void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                            const Image * /*oldSegAtTimeStep*/,
@@ -177,7 +311,7 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
       labelMap = m_ResultMetadata["label_names"];
       this->SetLabelTransferMode(LabelTransferMode::AddLabel);
     }
-    this->MapLabelsToSegmentation(outputBuffer, previewImage, labelMap);
+    ::MapLabelsToSegmentation(outputBuffer, previewImage, labelMap);
     this->WriteBackResults(previewImage, outputBuffer.GetPointer(), timeStep);
     MonaiStatusEvent.Send(true);
   }
@@ -186,45 +320,6 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
     MITK_ERROR << e.GetDescription();
     mitkThrow() << e.GetDescription();
     MonaiStatusEvent.Send(false);
-  }
-}
-
-void mitk::MonaiLabelTool::MapLabelsToSegmentation(const mitk::LabelSetImage *source,
-                                                   mitk::LabelSetImage *dest,
-                                                   std::map<std::string, mitk::Label::PixelType> &labelMap)
-{
-  if (labelMap.empty())
-  {
-    auto label = LabelSetImageHelper::CreateNewLabel(dest, "object");
-    label->SetValue(1);
-    dest->AddLabel(label, false);
-    return;
-  }
-  std::map<mitk::Label::PixelType, std::string> flippedLabelMap;
-  for (auto const &[key, val] : labelMap)
-  {
-    flippedLabelMap[val] = key;
-  }
-  auto lookupTable = mitk::LookupTable::New();
-  lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
-  for (auto const &[key, val] : flippedLabelMap)
-  {
-    if (source->ExistLabel(key, source->GetActiveLayer()))
-    {
-      Label::Pointer label = Label::New(key, val);
-      std::array<double, 3> lookupTableColor;
-      lookupTable->GetColor(key, lookupTableColor.data());
-      Color color;
-      color.SetRed(lookupTableColor[0]);
-      color.SetGreen(lookupTableColor[1]);
-      color.SetBlue(lookupTableColor[2]);
-      label->SetColor(color);
-      dest->AddLabel(label, false);
-    }
-    else
-    {
-      MITK_INFO << "Label not found for " << val;
-    }
   }
 }
 
@@ -247,7 +342,8 @@ void mitk::MonaiLabelTool::GetOverallInfo(const std::string &hostName, const int
         MITK_ERROR << "Could not parse response from MONAILabel server as JSON object!";
         return;
       }
-      m_InfoParameters = MapJSONToObject(jsonObj);
+      auto appData = jsonObj.template get<mitk::MonaiAppMetadata>();
+      m_InfoParameters = std::make_unique<mitk::MonaiAppMetadata>(appData);
       if (nullptr != m_InfoParameters)
       {
         m_InfoParameters->hostName = hostName;
@@ -263,8 +359,8 @@ void mitk::MonaiLabelTool::GetOverallInfo(const std::string &hostName, const int
 
 void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
                                             const int &port,
-                                            std::string &filePath,
-                                            std::string &outFile, 
+                                            const std::string &filePath,
+                                            const std::string &outFile,
                                             const mitk::BaseGeometry *baseGeometry)
 {
   std::string &modelName = m_RequestParameters->model.name; // Get this from args as well.
@@ -304,12 +400,12 @@ void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
     if (response->status == 200)
     {
       // Find boundary
-      std::string boundaryString = this->GetBoundaryString(response);
+      std::string boundaryString = ::GetBoundaryString(response);
       MITK_DEBUG << "boundary hash: " << boundaryString;
 
       // Parse metadata JSON
       std::string resBody = response->body;
-      std::vector<std::string> multiPartResponse = this->GetPartsBetweenBoundary(resBody, boundaryString);
+      std::vector<std::string> multiPartResponse = ::GetPartsBetweenBoundary(resBody, boundaryString);
 
       std::string metaData = multiPartResponse[0];
       std::string contentTypeJson = "Content-Type: application/json";
@@ -328,7 +424,7 @@ void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
       }
       // Parse response image string
       std::string imagePart = multiPartResponse[1];
-      std::string imageData = GetResponseImageString(imagePart);
+      std::string imageData = ::GetResponseImageString(imagePart);
       std::ofstream output(outFile, std::ios::out | std::ios::app | std::ios::binary);
       output << imageData;
       output.unsetf(std::ios::skipws);
@@ -341,86 +437,6 @@ void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
       mitkThrow() << "An HTTP POST error: " << httplib::to_string(err) << " occured.";
     }
   }
-}
-
-std::string mitk::MonaiLabelTool::GetBoundaryString(httplib::Result& response)
-{
-  httplib::Headers headers = response->headers;
-  std::string contentType = headers.find("content-type")->second;
-  std::string delimiter = "boundary=";
-  std::string boundaryString = contentType.substr(contentType.find(delimiter) + delimiter.length(), std::string::npos);
-  boundaryString.insert(0, "--");
-  return boundaryString;
-}
-
-std::string mitk::MonaiLabelTool::GetResponseImageString(std::string &imagePart)
-{
-  std::string contentTypeStream = "Content-Type: application/octet-stream";
-  size_t ctPos = imagePart.find(contentTypeStream) + contentTypeStream.length();
-  std::string imageDataPart = imagePart.substr(ctPos);
-  std::string whitespaces = " \n\r";
-  imageDataPart.erase(0, imageDataPart.find_first_not_of(whitespaces)); // clean up
-  return imageDataPart;
-}
-
-std::vector<std::string> mitk::MonaiLabelTool::GetPartsBetweenBoundary(const std::string &body,
-                                                                       const std::string &boundary)
-{
-  std::vector<std::string> retVal;
-  std::string master = body;
-  size_t boundaryPos = master.find(boundary);
-  size_t beginPos = 0;
-  while (boundaryPos != std::string::npos)
-  {
-    std::string part = master.substr(beginPos, boundaryPos);
-    if (!part.empty())
-    {
-      retVal.push_back(part);
-    }
-    master.erase(beginPos, boundaryPos + boundary.length());
-    boundaryPos = master.find(boundary);
-  }
-  return retVal;
-}
-
-std::unique_ptr<mitk::MonaiAppMetadata> mitk::MonaiLabelTool::MapJSONToObject(nlohmann::json &jsonObj)
-{
-  mitk::MonaiAppMetadata appData{
-    jsonObj["name"].template get<std::string>(),
-    jsonObj["description"].template get<std::string>(),
-    jsonObj["labels"].template get<std::vector<std::string>>()
-  };
-  auto object = std::make_unique<MonaiAppMetadata>(appData);
-  auto modelJsonMap = jsonObj["models"].get<std::map<std::string, nlohmann::json>>();
-
-  for (const auto &[_name, _jsonObj] : modelJsonMap)
-  {
-    if (_jsonObj.is_discarded() || !_jsonObj.is_object())
-    {
-      MITK_ERROR << "Could not parse JSON object.";
-    }
-    MonaiModelInfo modelInfo;
-    modelInfo.name = _name;
-    try
-    {
-      auto labels = _jsonObj["labels"].get<std::unordered_map<std::string, int>>();
-      modelInfo.labels = labels;
-    }
-    catch (const std::exception &)
-    {
-      auto labels = _jsonObj["labels"].get<std::vector<std::string>>();
-      for (const auto &label : labels)
-      {
-        modelInfo.labels[label] = -1; // Hardcode -1 as label id
-      }
-    }
-    modelInfo.type = _jsonObj["type"].get<std::string>();
-    modelInfo.dimension = _jsonObj["dimension"].get<int>();
-    modelInfo.description = _jsonObj["description"].get<std::string>();
-
-    object->models.push_back(modelInfo);
-  }
-  return object;
 }
 
 std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetAutoSegmentationModels(int dim) const
@@ -493,9 +509,9 @@ mitk::MonaiModelInfo mitk::MonaiLabelTool::GetModelInfoFromName(const std::strin
   return retVal;
 }
 
-void mitk::MonaiLabelTool::WriteImage(const Image*, std::string&) {}
+void mitk::MonaiLabelTool::WriteImage(const Image*, const std::string&) {}
 
-std::pair<std::string, std::string> mitk::MonaiLabelTool::CreateTempDirs(const std::string &filePattern)
+std::pair<std::string, std::string> mitk::MonaiLabelTool::CreateTempDirs(const std::string &filePattern) const
 {
   std::string inDir, outDir, inputImagePath, outputImagePath;
   inDir = IOUtil::CreateTemporaryDirectory("monai-in-XXXXXX", this->GetTempDir());

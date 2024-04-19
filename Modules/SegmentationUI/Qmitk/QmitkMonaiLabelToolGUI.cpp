@@ -236,7 +236,7 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   catch (const std::exception &e)
   {
     std::stringstream errorMsg;
-    errorMsg << "<b>STATUS: </b>Error while processing parameters for TotalSegmentator segmentation. Reason: "
+    errorMsg << "<b>STATUS: </b>Error while processing parameters for MONAI Label segmentation. Reason: "
              << e.what();
     this->ShowErrorMessage(errorMsg.str());
     this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
@@ -245,7 +245,7 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   }
   catch (...)
   {
-    std::string errorMsg = "Unkown error occured while generation TotalSegmentator segmentation.";
+    std::string errorMsg = "Unkown error occured while generation MONAI Label segmentation.";
     this->ShowErrorMessage(errorMsg);
     m_Controls.previewButton->setEnabled(true);
     return;

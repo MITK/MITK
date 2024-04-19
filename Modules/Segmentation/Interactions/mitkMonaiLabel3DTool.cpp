@@ -48,7 +48,7 @@ const char *mitk::MonaiLabel3DTool::GetName() const
   return "MONAI Label 3D";
 }
 
-void mitk::MonaiLabel3DTool::WriteImage(const Image *inputAtTimeStep, std::string &inputImagePath)
+void mitk::MonaiLabel3DTool::WriteImage(const Image *inputAtTimeStep, const std::string &inputImagePath)
 {
   IOUtil::Save(inputAtTimeStep, inputImagePath);
 }
@@ -97,16 +97,16 @@ void mitk::MonaiLabel3DTool::OnAddNegativePoint(StateMachineAction *, Interactio
 }
 
 std::stringstream mitk::MonaiLabel3DTool::GetPointsAsListString(const mitk::BaseGeometry *baseGeometry,
-                                                              PointSet::Pointer pointSet)
+                                                                const PointSet::Pointer pointSet)
 {
   MITK_INFO << "No.of points: " << pointSet->GetSize();
   std::stringstream pointsAndLabels;
   pointsAndLabels << "[";
-  mitk::PointSet::PointsConstIterator pointSetItPos = pointSet->Begin();
+  mitk::PointSet::PointsConstIterator pointSetIter = pointSet->Begin();
   const char COMMA = ',';
-  while (pointSetItPos != pointSet->End())
+  while (pointSetIter != pointSet->End())
   {
-    mitk::Point3D point3d = pointSetItPos.Value();
+    mitk::Point3D point3d = pointSetIter.Value();
     if (baseGeometry->IsInside(point3d))
     {
       mitk::Point3D index3D;
@@ -115,7 +115,7 @@ std::stringstream mitk::MonaiLabel3DTool::GetPointsAsListString(const mitk::Base
       pointsAndLabels << static_cast<int>(index3D[0]) << COMMA << static_cast<int>(index3D[1]) << COMMA
                       << static_cast<int>(index3D[2]) << "],";
     }
-    ++pointSetItPos;
+    ++pointSetIter;
   }
   if (pointsAndLabels.tellp() > 1)
   {

@@ -12,16 +12,8 @@ found in the LICENSE file.
 #ifndef mitkMonaiLabel2DTool_h
 #define mitkMonaiLabel2DTool_h
 
-#include "mitkSegWithPreviewTool.h"
 #include "mitkMonaiLabelTool.h"
 #include <MitkSegmentationExports.h>
-#include <memory>
-#include <unordered_map>
-#include <set>
-#include <httplib.h>
-#include <nlohmann/json.hpp>
-#include "mitkMonaiLabelTool.h"
-
 
 namespace us
 {
@@ -50,8 +42,8 @@ namespace mitk
     us::ModuleResource GetIconResource() const override;
 
     void Activated() override;
-    void WriteImage(const Image *, std::string &) override;
-    std::stringstream GetPointsAsListString(const mitk::BaseGeometry *, PointSet::Pointer) override;
+    void WriteImage(const Image *, const std::string &) override;
+    std::stringstream GetPointsAsListString(const mitk::BaseGeometry *, const PointSet::Pointer) override;
     void OnAddPositivePoint(StateMachineAction *, InteractionEvent *) override;
     void OnAddNegativePoint(StateMachineAction *, InteractionEvent *) override;
     void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) override;

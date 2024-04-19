@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include "mitkMonaiLabel2DTool.h"
 #include <mitkIOUtil.h>
 #include <mitkImageReadAccessor.h>
+#include <mitkSegTool2D.h>
 
 // us
 #include <usGetModuleContext.h>
@@ -21,7 +22,6 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usModuleResource.h>
 #include <usServiceReference.h>
-#include <mitkSegTool2D.h>
 
 namespace mitk
 {
@@ -53,7 +53,7 @@ const char *mitk::MonaiLabel2DTool::GetName() const
 
 void mitk::MonaiLabel2DTool::OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  if ("deepgrow" == m_RequestParameters->model.type || "deepedit" == m_RequestParameters->model.type)
+  if (m_RequestParameters->model.IsInteractive())
   {
     if ((nullptr == this->GetWorkingPlaneGeometry()) ||
         !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
@@ -101,9 +101,9 @@ void mitk::MonaiLabel2DTool::OnAddNegativePoint(StateMachineAction *, Interactio
   }
 }
 
-void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, std::string &inputImagePath)
+void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, const std::string &inputImagePath)
 {
-  Image::Pointer extendedImage = Image::New();
+  auto extendedImage = Image::New();
   std::array<unsigned int, 3> dim = {inputAtTimeStep->GetDimension(0), inputAtTimeStep->GetDimension(1), 1};
   mitk::PixelType pt = inputAtTimeStep->GetPixelType();
   extendedImage->Initialize(pt, 3, dim.data());
@@ -115,15 +115,15 @@ void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, std::strin
 }
 
 std::stringstream mitk::MonaiLabel2DTool::GetPointsAsListString(const mitk::BaseGeometry *baseGeometry,
-                                                                PointSet::Pointer pointSet)
+                                                                const PointSet::Pointer pointSet)
 {
   std::stringstream pointsAndLabels;
   pointsAndLabels << "[";
-  auto pointSetItPos = pointSet->Begin();
+  auto pointSetIter = pointSet->Begin();
   const char COMMA = ',';
-  while (pointSetItPos != pointSet->End())
+  while (pointSetIter != pointSet->End())
   {
-    auto point3d = pointSetItPos.Value();
+    auto point3d = pointSetIter.Value();
     if (baseGeometry->IsInside(point3d))
     {
       Point3D index3D;
@@ -131,7 +131,7 @@ std::stringstream mitk::MonaiLabel2DTool::GetPointsAsListString(const mitk::Base
       pointsAndLabels << "[";
       pointsAndLabels << static_cast<int>(index3D[0]) << COMMA << static_cast<int>(index3D[1]) << COMMA << 0 << "],";
     }
-    ++pointSetItPos;
+    ++pointSetIter;
   }
   if (pointsAndLabels.tellp() > 1)
   {

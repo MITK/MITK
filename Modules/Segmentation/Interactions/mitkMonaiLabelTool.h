@@ -111,7 +111,7 @@ namespace mitk
      * @brief Writes image to disk as the tool desires.
      * Default implementation does nothing.
      */
-    virtual void WriteImage(const Image*, std::string&);
+    virtual void WriteImage(const Image*, const std::string&);
 
     /**
      * @brief Method does the GET Rest call to fetch MonaiLabel
@@ -153,7 +153,7 @@ namespace mitk
      * @brief Function to prepare the Rest request and does the POST call.
      * Writes the POST responses back to disk.
      */
-    void PostInferRequest(const std::string &hostName, const int &port, std::string &filePath, std::string &outFile, 
+    void PostInferRequest(const std::string &hostName, const int &port, const std::string &filePath, const std::string &outFile, 
                           const mitk::BaseGeometry *baseGeometry);
     /**
      * @brief Helper function to get full model info object from model name. 
@@ -173,10 +173,8 @@ namespace mitk
     void ClearPicks();
 
     /**
-     * @brief Checks if any point exists in the either
-     * of the pointsets
-     *
-     * @return bool
+     * @brief Checks if any point exists in the either of the PointSetPositive
+     * or PointSetNegative.
      */
     bool HasPicks() const;
 
@@ -211,11 +209,8 @@ namespace mitk
     /**
      * @brief Get the Points from given pointset as csv string.
      * 
-     * @param baseGeometry
-     * @param pointSet
-     * @return std::stringstream
      */
-    virtual std::stringstream GetPointsAsListString(const mitk::BaseGeometry*, PointSet::Pointer) = 0;
+    virtual std::stringstream GetPointsAsListString(const mitk::BaseGeometry*, const PointSet::Pointer) = 0;
 
     /**
      * @brief Writes back segmentation results in 3D or 2D shape to preview LabelSetImage.
@@ -229,55 +224,19 @@ namespace mitk
     int m_PointSetCount = 0;
 
   private:
-    std::string m_TempDir;
 
     /**
      * @brief Helper function to create temp directory for writing/reading images
      * Returns input and output file names expected as a pair.
-     * @return std::vector<std::string>
      */
-    std::pair<std::string, std::string> CreateTempDirs(const std::string &filePattern);
+    std::pair<std::string, std::string> CreateTempDirs(const std::string &filePattern) const;
 
     /**
-     * @brief Helper function to get the Parts of the POST response
-     * 
-     * @return std::vector<std::string> 
-     */
-    std::vector<std::string> GetPartsBetweenBoundary(const std::string &body, const std::string &boundary);
-    /**
-     * @brief Converts the json GET response from the MonaiLabel server to MonaiAppMetadata object
-     * 
-     * @return std::unique_ptr<MonaiAppMetadata> 
-     */
-    std::unique_ptr<MonaiAppMetadata> MapJSONToObject(nlohmann::json&);
-    /**
-     * @brief Applies the give std::map lookup table on the preview segmentation LabelSetImage.
-     * 
-     */
-    void MapLabelsToSegmentation(const mitk::LabelSetImage *source, mitk::LabelSetImage *dest,
-                                 std::map<std::string, mitk::Label::PixelType> &labelMap);
-
-    /**
-     * @brief Checks if MonaiLabel server is alive
-     * 
-     * @return bool 
+     * @brief Checks if MonaiLabel server is alive.
      */
     bool IsMonaiServerOn(const std::string &hostName, const int &port) const;
-
-    /**
-     * @brief Returns boundary string from Httplib response
-     *
-     * @return std::string
-     */
-    std::string GetBoundaryString(httplib::Result &response);
-
-    /**
-     * @brief Returns image data string from monai label overall response
-     *
-     * @return std::string
-     */
-    std::string GetResponseImageString(std::string &imagePart);
-
+    
+    std::string m_TempDir;
     std::string m_ModelName;
     std::string m_URL;
     nlohmann::json m_ResultMetadata;

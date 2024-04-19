@@ -113,14 +113,11 @@ void mitk::MaskImageFilter::GenerateData()
   if ((output->IsInitialized() == false) || (nullptr == mask) || (mask->GetTimeGeometry()->CountTimeSteps() == 0))
     return;
 
-  mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
-  const mitk::TimeGeometry *outputTimeGeometry = output->GetTimeGeometry();
   const mitk::TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
-  const mitk::TimeGeometry *maskTimeGeometry = mask->GetTimeGeometry();
 
   for (TimeStepType t = 0; t < inputTimeGeometry->CountTimeSteps(); ++t)
   {
-    auto timeInMS = outputTimeGeometry->TimeStepToTimePoint(t);
+    auto timeInMS = inputTimeGeometry->TimeStepToTimePoint(t);
 
     m_CurrentOutputTS = t;
     auto inputFrame = SelectImageByTimePoint(input, timeInMS);

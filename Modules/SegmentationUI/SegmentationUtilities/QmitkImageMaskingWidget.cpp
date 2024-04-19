@@ -46,8 +46,6 @@ namespace
   }
 }
 
-static const char* const HelpText = "Select an image and a segmentation or surface";
-
 QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::DataStorage* dataStorage, QWidget* parent)
   : QWidget(parent), m_DataStorage(dataStorage)
 {

@@ -34,7 +34,7 @@ namespace
   {
     auto it = std::find_if(toolBars.cbegin(), toolBars.cend(), [&name](const QToolBar* toolBar) {
       return toolBar->objectName() == name;
-      });
+    });
 
     if (it != toolBars.cend())
     {

@@ -65,6 +65,17 @@ struct BERRY_UI_QT IViewRegistry
   virtual QList<IViewDescriptor::Pointer> GetViews() const = 0;
 
   /**
+   * @brief Get views as multi map with categories as keys.
+   *
+   * Exclude views without category and categories that contain a literal '.', e.g.
+   * "org.blueberry.ui" or "org.mitk.views.general", as they typically do not have
+   * a corresponding tool bar.
+   *
+   * @return the views by vategory as described above.
+   */
+  virtual QMultiMap<QString, IViewDescriptor::Pointer> GetViewsByCategory() const = 0;
+
+  /**
    * Return a list of sticky views defined in the registry.
    *
    * @return the sticky views.  Never <code>null</code>.

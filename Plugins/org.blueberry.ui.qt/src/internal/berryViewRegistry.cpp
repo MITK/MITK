@@ -208,6 +208,26 @@ QList<IViewDescriptor::Pointer> ViewRegistry::GetViews() const
   return views;
 }
 
+QMultiMap<QString, IViewDescriptor::Pointer> ViewRegistry::GetViewsByCategory() const
+{
+  QMultiMap<QString, IViewDescriptor::Pointer> result;
+
+  const auto views = this->GetViews();
+
+  for (auto view : views)
+  {
+    QString category;
+
+    if (auto categoryPath = view->GetCategoryPath(); !categoryPath.isEmpty())
+      category = categoryPath.back();
+
+    if (!category.isEmpty() && !category.contains('.') && !view->IsInternal())
+      result.insert(category, view);
+  }
+
+  return result;
+}
+
 void ViewRegistry::MapViewsToCategories()
 {
   if (dirtyViewCategoryMappings)

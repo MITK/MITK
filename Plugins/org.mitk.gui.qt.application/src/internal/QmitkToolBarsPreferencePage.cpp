@@ -32,33 +32,6 @@ namespace
     return prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
   }
 
-  // Get views as multimap with categories as keys.
-  //
-  // Exclude views without category and categories that contain a literal '.', e.g.
-  // "org.blueberry.ui" or "org.mitk.views.general", as they typically do not have
-  // a corresponding tool bar.
-  std::multimap<QString, berry::IViewDescriptor::Pointer> GetViewsByCategory()
-  {
-    std::multimap<QString, berry::IViewDescriptor::Pointer> result;
-
-    const auto workbench = berry::PlatformUI::GetWorkbench();
-    const auto viewRegistry = workbench->GetViewRegistry();
-    const auto views = viewRegistry->GetViews();
-
-    for (auto view : views)
-    {
-      QString category;
-
-      if (auto categoryPath = view->GetCategoryPath(); !categoryPath.isEmpty())
-        category = categoryPath.back();
-
-      if (!category.isEmpty() && !category.contains('.') && !view->IsInternal())
-        result.emplace(category, view);
-    }
-
-    return result;
-  }
-
   // Get all toolbars of all (typically one) Workbench windows.
   std::vector<QToolBar*> GetToolBars()
   {
@@ -133,23 +106,24 @@ void QmitkToolBarsPreferencePage::CreateQtControl(QWidget* parent)
 
   m_Ui->setupUi(m_Control);
 
-  const auto views = GetViewsByCategory();
+  const auto views = berry::PlatformUI::GetWorkbench()->GetViewRegistry()->GetViewsByCategory();
 
-  for (auto category = views.cbegin(), end = views.cend(); category != end; category = views.upper_bound(category->first))
+  for(const auto category : views.uniqueKeys())
   {
     auto categoryItem = new QTreeWidgetItem;
-    categoryItem->setText(0, category->first);
+    categoryItem->setText(0, category);
     categoryItem->setCheckState(0, Qt::Checked);
 
-    const auto range = views.equal_range(category->first);
+    auto [viewIter, end] = views.equal_range(category);
 
-    for (auto view = range.first; view != range.second; ++view)
+    while (viewIter != end)
     {
       auto viewItem = new QTreeWidgetItem;
-      viewItem->setText(0, view->second->GetLabel());
-      viewItem->setIcon(0, view->second->GetImageDescriptor());
+      viewItem->setText(0, (*viewIter)->GetLabel());
+      viewItem->setIcon(0, (*viewIter)->GetImageDescriptor());
 
       categoryItem->addChild(viewItem);
+      ++viewIter;
     }
 
     m_Ui->treeWidget->addTopLevelItem(categoryItem);

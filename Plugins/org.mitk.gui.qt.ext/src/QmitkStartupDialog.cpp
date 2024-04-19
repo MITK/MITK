@@ -102,6 +102,22 @@ public:
   }
 
 private:
+  /* Disclaimer:
+   *   This is an internal, probably only temporal file format.
+   *
+   * Example:
+   *   {
+   *     "name": "Mandatory name that is displayed in UI",
+   *     "info": "Optional info text in Qt's <b>RichText format</b> that is displayed when the preset is selected",
+   *     "ancestor": "Optional name of another preset of which the categories are merged with this preset",
+   *     "categories": [
+   *       "List of categoried (resp. tool bars)",
+   *       "Strictly speaking it is optional but its absence is a special case for the custom preset",
+   *       "Hence, think of it as mandatory",
+   *       "BTW, only use <h4> and smaller for headers, if any, in the info text above"
+   *     ]
+   *   }
+   */
   void Deserialize(const nlohmann::json& j)
   {
     this->setData(Preset::NameRole, j["name"].get<QString>());

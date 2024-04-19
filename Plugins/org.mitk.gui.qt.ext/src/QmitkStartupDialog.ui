@@ -25,18 +25,14 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QLabel" name="welcomeLabel">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <italic>false</italic>
-       <bold>true</bold>
-      </font>
-     </property>
      <property name="text">
-      <string>Welcome to the MITK Workbench</string>
+      <string>&lt;h2&gt;Welcome to the MITK Workbench&lt;/h2&gt;</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::RichText</enum>
      </property>
      <property name="margin">
-      <number>8</number>
+      <number>4</number>
      </property>
     </widget>
    </item>
@@ -118,7 +114,7 @@
           <x>0</x>
           <y>0</y>
           <width>438</width>
-          <height>200</height>
+          <height>210</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">

@@ -12,14 +12,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QmitkDataSelectionWidget" name="dataSelectionWidget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
+    <widget class="QmitkSingleNodeSelectionWidget" name="imageNodeSelector" native="true"/>
+   </item>
+   <item>
+    <widget class="QmitkSingleNodeSelectionWidget" name="segNodeSelector" native="true"/>
+   </item>
+   <item>
+    <widget class="QmitkMultiLabelInspector" name="labelInspector" native="true"/>
    </item>
    <item>
     <widget class="QGroupBox" name="grpBackgroundValue">
@@ -98,9 +97,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataSelectionWidget</class>
+   <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkDataSelectionWidget.h</header>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkMultiLabelInspector</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkMultiLabelInspector.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

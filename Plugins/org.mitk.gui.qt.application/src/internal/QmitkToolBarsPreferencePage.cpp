@@ -21,9 +21,6 @@ found in the LICENSE file.
 
 #include <berryPlatformUI.h>
 
-#include <QMainWindow>
-#include <QToolBar>
-
 namespace
 {
   mitk::IPreferences* GetPreferences()
@@ -32,34 +29,8 @@ namespace
     return prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
   }
 
-  // Get all toolbars of all (typically one) Workbench windows.
-  std::vector<QToolBar*> GetToolBars()
-  {
-    std::vector<QToolBar*> result;
-
-    const auto* workbench = berry::PlatformUI::GetWorkbench();
-    auto workbenchWindows = workbench->GetWorkbenchWindows();
-
-    for (auto workbenchWindow : workbenchWindows)
-    {
-      if (auto shell = workbenchWindow->GetShell(); shell.IsNotNull())
-      {
-        if (const auto* mainWindow = qobject_cast<QMainWindow*>(shell->GetControl()); mainWindow != nullptr)
-        {
-          for (auto child : mainWindow->children())
-          {
-            if (auto toolBar = qobject_cast<QToolBar*>(child); toolBar != nullptr)
-              result.push_back(toolBar);
-          }
-        }
-      }
-    }
-
-    return result;
-  }
-
   // Find a toolbar by object name and apply preferences.
-  bool ApplyPreferences(const std::vector<QToolBar*>& toolBars, const QString& name, bool isVisible, bool showCategory)
+  bool ApplyPreferences(const QList<QToolBar*>& toolBars, const QString& name, bool isVisible, bool showCategory)
   {
     auto it = std::find_if(toolBars.cbegin(), toolBars.cend(), [&name](const QToolBar* toolBar) {
       return toolBar->objectName() == name;
@@ -144,7 +115,7 @@ bool QmitkToolBarsPreferencePage::PerformOk()
 
   prefs->PutBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, showCategories);
 
-  const auto toolBars = GetToolBars();
+  const auto toolBars = berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows().first()->GetToolBars();
 
   for (int i = 0, count = m_Ui->treeWidget->topLevelItemCount(); i < count; ++i)
   {

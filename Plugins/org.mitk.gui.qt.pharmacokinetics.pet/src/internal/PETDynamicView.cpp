@@ -31,6 +31,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
+#include "mitkNodePredicateFunction.h"
 #include <mitkPixelBasedParameterFitImageGenerator.h>
 #include <mitkROIBasedParameterFitImageGenerator.h>
 #include <mitkLevenbergMarquardtModelFitFunctor.h>
@@ -81,10 +82,31 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
   m_Controls.setupUi(parent);
 
   m_Controls.btnModelling->setEnabled(false);
-  m_Controls.errorMessageLabel->hide();
 
   this->InitModelComboBox();
   m_Controls.labelMaskInfo->hide();
+
+  m_Controls.timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
+  m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
+  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
+
+  m_Controls.maskNodeSelector->SetNodePredicate(this->m_IsMaskPredicate);
+  m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
+  m_Controls.maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
+
+
+  connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnNodeSelectionChanged);
+
+  connect(m_Controls.maskNodeSelector,&QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnNodeSelectionChanged);
+
+  connect(m_Controls.AIFMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::UpdateGUIControls);
+
+  connect(m_Controls.AIFImageNodeSelector,
+    &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::UpdateGUIControls);
+
 
   connect(m_Controls.btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
 
@@ -94,44 +116,38 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
   //AIF setting
   m_Controls.groupAIF->hide();
   m_Controls.btnAIFFile->setEnabled(false);
-  m_Controls.btnAIFFile->setEnabled(false);
+  m_Controls.btnAIFFile->setVisible(false);
+  m_Controls.aifFilePath->setEnabled(false);
+  m_Controls.aifFilePath->setVisible(false);
   m_Controls.radioAIFImage->setChecked(true);
-  m_Controls.comboAIFMask->SetDataStorage(this->GetDataStorage());
-  m_Controls.comboAIFMask->SetPredicate(m_IsMaskPredicate);
-  m_Controls.comboAIFMask->setVisible(true);
-  m_Controls.comboAIFMask->setEnabled(true);
-  m_Controls.comboAIFImage->SetDataStorage(this->GetDataStorage());
-  m_Controls.comboAIFImage->SetPredicate(m_IsNoMaskImagePredicate);
-  m_Controls.comboAIFImage->setEnabled(false);
-  m_Controls.checkDedicatedAIFImage->setEnabled(true);
+  m_Controls.AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
+  m_Controls.AIFMaskNodeSelector->setVisible(true);
+  m_Controls.AIFMaskNodeSelector->setEnabled(true);
+  m_Controls.AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
+  m_Controls.AIFImageNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.AIFImageNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls.AIFImageNodeSelector->setEnabled(false);
+  m_Controls.AIFImageNodeSelector->setVisible(false);
   m_Controls.HCLSpinBox->setValue(0.0);
 
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.comboAIFMask,
-          SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.labelAIFMask,
-          SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage,
-          SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.comboAIFMask,
-          SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage,
-          SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage,
-          SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.comboAIFImage,
-          SLOT(setVisible(bool)));
-  connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.comboAIFImage,
-          SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.btnAIFFile,
-          SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath,
-          SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  m_Controls.checkDedicatedAIFImage->setEnabled(true);
 
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setVisible(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.labelAIFMask, SLOT(setVisible(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setVisible(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setEnabled(bool)));
+  connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setEnabled(bool)));
+  connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setVisible(bool)));
+  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.btnAIFFile, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.btnAIFFile, SLOT(setVisible(bool)));
+  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setVisible(bool)));
+  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.btnAIFFile, SIGNAL(clicked()), this, SLOT(LoadAIFfromFile()));
-  connect(m_Controls.checkMaskInfo, SIGNAL(toggled(bool)), m_Controls.labelMaskInfo,
-    SLOT(setVisible(bool)));
+
+  connect(m_Controls.checkMaskInfo, SIGNAL(toggled(bool)), m_Controls.labelMaskInfo, SLOT(setVisible(bool)));
 
   //Model fit configuration
   m_Controls.groupBox_FitConfiguration->hide();
@@ -181,6 +197,9 @@ void PETDynamicView::UpdateGUIControls()
 
   m_Controls.groupAIF->setVisible(is1TCMFactory || isExt1TCMFactory || isFDGCMFactory || is2TCMFactory);
 
+  m_Controls.AIFImageNodeSelector->setVisible(!m_Controls.radioAIFFile->isChecked());
+  m_Controls.AIFImageNodeSelector->setVisible(m_Controls.radioAIFImage->isChecked() && m_Controls.checkDedicatedAIFImage->isChecked());
+
   m_Controls.groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
 
   m_Controls.groupBox->setEnabled(!m_FittingInProgress);
@@ -194,12 +213,8 @@ void PETDynamicView::UpdateGUIControls()
                                       && m_selectedModelFactory.IsNotNull() && !m_FittingInProgress && CheckModelSettings());
 }
 
-//void PETDynamicView::OnModelSettingChanged()
-//{
-//  bool ok = m_selectedImage.IsNotNull() && m_selectedModelFactory.IsNotNull() && !m_FittingInProgress && CheckModelSettings();
 
-//  m_Controls.btnModelling->setEnabled(ok);
-//}
+
 
 
 void PETDynamicView::OnModellSet(int index)
@@ -374,74 +389,58 @@ void PETDynamicView::OnModellingButtonClicked()
   }
 }
 
-
-void PETDynamicView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-                                        const QList<mitk::DataNode::Pointer>& selectedNodes)
+void PETDynamicView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
-    m_selectedMaskNode = nullptr;
-    m_selectedMask = nullptr;
+  m_selectedMaskNode = nullptr;
+  m_selectedMask = nullptr;
 
-    m_Controls.errorMessageLabel->setText("");
-    m_Controls.masklabel->setText("No (valid) mask selected.");
-    m_Controls.timeserieslabel->setText("No (valid) series selected.");
+  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
+  {
+    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
+    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
 
-    QList<mitk::DataNode::Pointer> nodes = selectedNodes;
-
-    if (nodes.size() > 0 && this->m_IsNoMaskImagePredicate->CheckNode(nodes.front()))
+    if (m_selectedImage)
     {
-      this->m_selectedNode = nodes.front();
-      auto selectedImage = dynamic_cast<mitk::Image*>(this->m_selectedNode->GetData());
-      m_Controls.timeserieslabel->setText((this->m_selectedNode->GetName()).c_str());
-
-      if (selectedImage != this->m_selectedImage)
-      {
-        if (selectedImage)
-        {
-          this->m_Controls.initialValuesManager->setReferenceImageGeometry(selectedImage->GetGeometry());
-        }
-        else
-        {
-          this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
-        }
-      }
-      this->m_selectedImage = selectedImage;
-      nodes.pop_front();
+      this->m_Controls.initialValuesManager->setReferenceImageGeometry(m_selectedImage->GetGeometry());
     }
     else
     {
-      this->m_selectedNode = nullptr;
-      this->m_selectedImage = nullptr;
       this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
     }
+  }
+  else
+  {
+    this->m_selectedNode = nullptr;
+    this->m_selectedImage = nullptr;
+    this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
+  }
 
-    if (nodes.size() > 0 && this->m_IsMaskPredicate->CheckNode(nodes.front()))
+
+  if (m_Controls.maskNodeSelector->GetSelectedNode().IsNotNull())
+  {
+    this->m_selectedMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
+    this->m_selectedMask = dynamic_cast<mitk::Image*>(m_selectedMaskNode->GetData());
+
+    if (this->m_selectedMask.IsNotNull() && this->m_selectedMask->GetTimeSteps() > 1)
     {
-        this->m_selectedMaskNode = nodes.front();
-        this->m_selectedMask = dynamic_cast<mitk::Image*>(this->m_selectedMaskNode->GetData());
-
-        if (this->m_selectedMask->GetTimeSteps() > 1)
-        {
-          MITK_INFO <<
-                    "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
-                    m_selectedMaskNode->GetName();
-          mitk::ImageTimeSelector::Pointer maskedImageTimeSelector = mitk::ImageTimeSelector::New();
-          maskedImageTimeSelector->SetInput(this->m_selectedMask);
-          maskedImageTimeSelector->SetTimeNr(0);
-          maskedImageTimeSelector->UpdateLargestPossibleRegion();
-          this->m_selectedMask = maskedImageTimeSelector->GetOutput();
-        }
-
-        m_Controls.masklabel->setText((this->m_selectedMaskNode->GetName()).c_str());
+      MITK_INFO <<
+        "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
+        m_Controls.maskNodeSelector->GetSelectedNode()->GetName();
+      mitk::ImageTimeSelector::Pointer maskedImageTimeSelector = mitk::ImageTimeSelector::New();
+      maskedImageTimeSelector->SetInput(this->m_selectedMask);
+      maskedImageTimeSelector->SetTimeNr(0);
+      maskedImageTimeSelector->UpdateLargestPossibleRegion();
+      this->m_selectedMask = maskedImageTimeSelector->GetOutput();
     }
+  }
 
-    if (m_selectedMask.IsNull())
-    {
-      this->m_Controls.radioPixelBased->setChecked(true);
-    }
+  if (m_selectedMask.IsNull())
+  {
+    this->m_Controls.radioPixelBased->setChecked(true);
+  }
 
-    m_Controls.errorMessageLabel->show();
 
-    UpdateGUIControls();
+  UpdateGUIControls();
 }
 
 bool PETDynamicView::CheckModelSettings() const
@@ -465,11 +464,12 @@ bool PETDynamicView::CheckModelSettings() const
     {
         if (this->m_Controls.radioAIFImage->isChecked())
         {
-          ok = ok && m_Controls.comboAIFMask->GetSelectedNode().IsNotNull();
+          ok = ok && m_Controls.AIFMaskNodeSelector->GetSelectedNode().IsNotNull();
 
           if (this->m_Controls.checkDedicatedAIFImage->isChecked())
           {
-            ok = ok && m_Controls.comboAIFImage->GetSelectedNode().IsNotNull();
+            ok = ok && m_Controls.AIFImageNodeSelector->GetSelectedNode().IsNotNull();
+
           }
         }
         else if (this->m_Controls.radioAIFFile->isChecked())
@@ -656,8 +656,8 @@ void PETDynamicView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
 {
   std::stringstream message;
   message << "<font color='green'>" << "Fitting Data Set . . ." << "</font>";
-  m_Controls.errorMessageLabel->setText(message.str().c_str());
-  m_Controls.errorMessageLabel->show();
+ // m_Controls.errorMessageLabel->setText(message.str().c_str());
+  //m_Controls.errorMessageLabel->show();
 
   /////////////////////////
   //create job and put it into the thread pool
@@ -700,13 +700,19 @@ PETDynamicView::PETDynamicView() : m_FittingInProgress(false)
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
   mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
-
   mitk::NodePredicateOr::Pointer isMask = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
   mitk::NodePredicateAnd::Pointer isNoMask = mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isMask));
 
   this->m_IsMaskPredicate = mitk::NodePredicateAnd::New(isMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
   this->m_IsNoMaskImagePredicate = mitk::NodePredicateAnd::New(isNoMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+
+  auto isDynamicData = mitk::NodePredicateFunction::New([](const mitk::DataNode* node)
+  {
+    return  (node && node->GetData() && node->GetData()->GetTimeSteps() > 1);
+  });
+
+  this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);
 
 }
 
@@ -731,8 +737,6 @@ void PETDynamicView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitResultNode
   //(handles the correct generation of the nodes and their properties)
   mitk::modelFit::StoreResultsInDataStorage(this->GetDataStorage(), results, pJob->GetParentNode());
 
-  m_Controls.errorMessageLabel->setText("");
-  m_Controls.errorMessageLabel->hide();
 };
 
 void PETDynamicView::OnJobProgress(double progress)
@@ -838,7 +842,7 @@ void PETDynamicView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& a
     aifGenerator->SetHCL(this->m_Controls.HCLSpinBox->value());
 
     //mask settings
-    this->m_selectedAIFMaskNode = m_Controls.comboAIFMask->GetSelectedNode();
+    this->m_selectedAIFMaskNode = m_Controls.AIFMaskNodeSelector->GetSelectedNode();
     this->m_selectedAIFMask = dynamic_cast<mitk::Image*>(this->m_selectedAIFMaskNode->GetData());
 
     if (this->m_selectedAIFMask->GetTimeSteps() > 1)
@@ -862,7 +866,7 @@ void PETDynamicView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& a
     //image settings
     if (this->m_Controls.checkDedicatedAIFImage->isChecked())
     {
-      this->m_selectedAIFImageNode = m_Controls.comboAIFImage->GetSelectedNode();
+      this->m_selectedAIFImageNode = m_Controls.AIFImageNodeSelector->GetSelectedNode();
       this->m_selectedAIFImage = dynamic_cast<mitk::Image*>(this->m_selectedAIFImageNode->GetData());
     }
     else
@@ -904,7 +908,7 @@ void PETDynamicView::LoadAIFfromFile()
 
   if (!in1.is_open())
   {
-    m_Controls.errorMessageLabel->setText("Could not open AIF File!");
+    this->m_Controls.infoBox->append(QString("Could not open AIF File!"));
   }
 
 
@@ -915,8 +919,6 @@ void PETDynamicView::LoadAIFfromFile()
   {
     Tokenizer tok(line1);
     vec1.assign(tok.begin(), tok.end());
-
-    //        if (vec1.size() < 3) continue;
 
     this->AIFinputGrid.push_back(convertToDouble(vec1[0]));
     this->AIFinputFunction.push_back(convertToDouble(vec1[1]));

@@ -105,8 +105,7 @@ protected:
 
   void InitModelComboBox() const;
 
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& selectedNodes) override;
+  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 
   // Variables
 
@@ -146,6 +145,10 @@ private:
 
   mitk::NodePredicateBase::Pointer m_IsNotABinaryImagePredicate;
   mitk::NodePredicateBase::Pointer m_IsBinaryImagePredicate;
+  //mitk::NodePredicateBase::Pointer m_IsNoMaskImagePredicate;
+  mitk::NodePredicateBase::Pointer m_IsMaskPredicate;
+  mitk::NodePredicateBase::Pointer m_isValidTimeSeriesImagePredicate;
+
 };
 
 #endif

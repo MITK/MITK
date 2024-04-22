@@ -140,9 +140,6 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
 
   QVBoxLayout *vboxLayout = new QVBoxLayout(m_GroupBoxEnableExclusiveInterpolationMode);
 
-  m_EdgeDetector = mitk::FeatureBasedEdgeDetectionFilter::New();
-  m_PointScorer = mitk::PointCloudScoringFilter::New();
-
   m_CmbInterpolation = new QComboBox(m_GroupBoxEnableExclusiveInterpolationMode);
   m_CmbInterpolation->addItem("Disabled");
   m_CmbInterpolation->addItem("2-Dimensional");

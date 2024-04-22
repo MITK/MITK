@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include "MitkAlgorithmsExtExports.h"
 #include "mitkCommon.h"
-#include "mitkImageTimeSelector.h"
 #include "mitkImageToImageFilter.h"
 
 #include "itkImage.h"
@@ -34,20 +33,9 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      void SetMask(const mitk::Image *mask);
-    const mitk::Image *GetMask() const;
-
-    /**
-    * get/set the min Value of the original image in the masked area
-    **/
-    itkGetMacro(MinValue, mitk::ScalarType);
-    itkSetMacro(MinValue, mitk::ScalarType);
-
-    /**
-    * get/set the max Value of the original image in the masked area
-    **/
-    itkGetMacro(MaxValue, mitk::ScalarType);
-    itkSetMacro(MaxValue, mitk::ScalarType);
+    void SetMask(const mitk::Image *mask);
+    const Image *GetMask() const;
+    Image* GetMask();
 
     /**
      * This value is used as outside value. This only works
@@ -88,21 +76,15 @@ namespace mitk
 
     void GenerateData() override;
 
-    template <typename TPixel, unsigned int VImageDimension>
-    void InternalComputeMask(itk::Image<TPixel, VImageDimension> *itkImage);
-
-    mitk::Image::Pointer m_Mask;
-    mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
-    mitk::ImageTimeSelector::Pointer m_MaskTimeSelector;
-    mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
+    template <typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
+    void InternalComputeMask(itk::Image<TPixel1, VImageDimension1>* itkInput, itk::Image<TPixel2, VImageDimension2>* itkMask);
 
     //##Description
     //## @brief Time when Header was last initialized
     itk::TimeStamp m_TimeOfHeaderInitialization;
 
     mitk::ScalarType m_OutsideValue;
-    mitk::ScalarType m_MinValue;
-    mitk::ScalarType m_MaxValue;
+    TimeStepType m_CurrentOutputTS;
     bool m_OverrideOutsideValue;
   };
 

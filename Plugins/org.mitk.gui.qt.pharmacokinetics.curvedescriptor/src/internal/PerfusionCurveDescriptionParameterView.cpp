@@ -59,7 +59,7 @@ void PerfusionCurveDescriptionParameterView::CreateQtPartControl(QWidget* parent
   connect(m_Controls.timeSeriesNodeSelector,
     &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this,
-    &PerfusionCurveDescriptionParameterView::OnSelectionChanged);
+    &PerfusionCurveDescriptionParameterView::OnNodeSelectionChanged);
 
   connect(m_Controls.btnCalculateParameters, SIGNAL(clicked()), this,
           SLOT(OnCalculateParametersButtonClicked()));
@@ -70,7 +70,7 @@ void PerfusionCurveDescriptionParameterView::CreateQtPartControl(QWidget* parent
 
 
 
-void PerfusionCurveDescriptionParameterView::OnSelectionChanged( const QList<mitk::DataNode::Pointer>& /*nodes*/)
+void PerfusionCurveDescriptionParameterView::OnNodeSelectionChanged( const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
 
   m_Controls.btnCalculateParameters->setEnabled(false);

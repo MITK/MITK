@@ -81,7 +81,7 @@ protected:
   void ConfigureFunctor(mitk::CurveParameterFunctor* functor) const;
 
 
-  void OnSelectionChanged(const QList<mitk::DataNode::Pointer>& nodes);
+  void OnNodeSelectionChanged(const QList<mitk::DataNode::Pointer>& nodes);
 
 	// Variables
 

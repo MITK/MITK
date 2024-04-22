@@ -26,6 +26,14 @@ found in the LICENSE file.
 #include "mitkCurveParameterFunctor.h"
 #include "mitkExtractTimeGrid.h"
 
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateDimension.h>
+#include "mitkNodePredicateFunction.h"
+
 #include <iostream>
 
 const std::string PerfusionCurveDescriptionParameterView::VIEW_ID =
@@ -42,6 +50,16 @@ void PerfusionCurveDescriptionParameterView::CreateQtPartControl(QWidget* parent
   m_Controls.btnCalculateParameters->setEnabled(false);
 
 
+  m_Controls.timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
+  m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
+  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
+
+  connect(m_Controls.timeSeriesNodeSelector,
+    &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+    this,
+    &PerfusionCurveDescriptionParameterView::OnSelectionChanged);
 
   connect(m_Controls.btnCalculateParameters, SIGNAL(clicked()), this,
           SLOT(OnCalculateParametersButtonClicked()));
@@ -51,40 +69,28 @@ void PerfusionCurveDescriptionParameterView::CreateQtPartControl(QWidget* parent
 }
 
 
-void PerfusionCurveDescriptionParameterView::OnSelectionChanged(
-  berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& /*nodes*/)
+
+void PerfusionCurveDescriptionParameterView::OnSelectionChanged( const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
 
   m_Controls.btnCalculateParameters->setEnabled(false);
 
 
-
-  QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
-
-  if (dataNodes.empty())
+  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
   {
-    m_selectedNode = nullptr;
-    m_selectedImage = nullptr;
+    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
+    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
   }
   else
   {
-    m_selectedNode = dataNodes[0];
-    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+    this->m_selectedNode = nullptr;
+    this->m_selectedImage = nullptr;
   }
 
-  m_Controls.lableSelectedImage->setText("No series selected.");
 
   if (m_selectedImage.IsNotNull())
   {
-    if (m_selectedImage->GetTimeGeometry()->CountTimeSteps() > 1)
-    {
       m_Controls.btnCalculateParameters->setEnabled(true);
-      m_Controls.lableSelectedImage->setText((this->m_selectedNode->GetName()).c_str());
-    }
-    else
-    {
-      this->OnJobStatusChanged("Cannot compute parameters. Selected image must have multiple time steps.");
-    }
   }
   else if (m_selectedNode.IsNotNull())
   {
@@ -100,7 +106,27 @@ PerfusionCurveDescriptionParameterView::PerfusionCurveDescriptionParameterView()
 {
   m_selectedNode = nullptr;
   m_selectedImage = nullptr;
-  m_selectedMask = nullptr;
+
+  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
+  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
+  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+  mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
+  mitk::NodePredicateDimension::Pointer is3D = mitk::NodePredicateDimension::New(3);
+  mitk::NodePredicateOr::Pointer isMask = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
+  mitk::NodePredicateAnd::Pointer isNoMask = mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isMask));
+  mitk::NodePredicateAnd::Pointer is3DImage = mitk::NodePredicateAnd::New(isImage, is3D, isNoMask);
+
+  this->m_IsMaskPredicate = mitk::NodePredicateAnd::New(isMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+
+  this->m_IsNoMaskImagePredicate = mitk::NodePredicateAnd::New(isNoMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+
+  auto isDynamicData = mitk::NodePredicateFunction::New([](const mitk::DataNode* node)
+  {
+    return  (node && node->GetData() && node->GetData()->GetTimeSteps() > 1);
+  });
+
+
+  this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);
 }
 
 void PerfusionCurveDescriptionParameterView::InitParameterList()
@@ -158,7 +184,6 @@ void PerfusionCurveDescriptionParameterView::OnCalculateParametersButtonClicked(
 
   generator->SetFunctor(functor);
   generator->SetDynamicImage(m_selectedImage);
-  generator->SetMask(m_selectedMask);
 
 
   /////////////////////////
@@ -180,6 +205,8 @@ void PerfusionCurveDescriptionParameterView::OnCalculateParametersButtonClicked(
   QThreadPool* threadPool = QThreadPool::globalInstance();
   threadPool->start(pJob);
 }
+
+
 
 void PerfusionCurveDescriptionParameterView::OnJobFinished()
 {

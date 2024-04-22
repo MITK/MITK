@@ -80,8 +80,8 @@ protected:
   /** Configures the passed functor according to the selected image and parameters*/
   void ConfigureFunctor(mitk::CurveParameterFunctor* functor) const;
 
-  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes) override;
+
+  void OnSelectionChanged(const QList<mitk::DataNode::Pointer>& nodes);
 
 	// Variables
 
@@ -96,7 +96,12 @@ private:
     ParameterMapType m_ParameterMap;
 
     mitk::Image::Pointer m_selectedImage;
-    mitk::Image::Pointer m_selectedMask;
+
+
+    mitk::NodePredicateBase::Pointer m_IsNoMaskImagePredicate;
+    mitk::NodePredicateBase::Pointer m_IsMaskPredicate;
+    mitk::NodePredicateBase::Pointer m_isValidTimeSeriesImagePredicate;
+
 };
 
 #endif

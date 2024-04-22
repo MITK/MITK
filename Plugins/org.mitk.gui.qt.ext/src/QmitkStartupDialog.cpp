@@ -53,13 +53,13 @@ public:
     QFile file(filename);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-      mitkThrow() << "Couldn't open \"" << filename.toLatin1() << "\"!";
+      mitkThrow() << "Couldn't open \"" << filename.toStdString() << "\"!";
 
     auto fileContents = QTextStream(&file).readAll().toStdString();
     auto j = nlohmann::json::parse(fileContents, nullptr, false, true);
 
     if (j.is_discarded())
-      mitkThrow() << "Couldn't parse \"" << filename.toLatin1() << "\"!";
+      mitkThrow() << "Couldn't parse \"" << filename.toStdString() << "\"!";
 
     this->Deserialize(j);
   }
@@ -76,8 +76,8 @@ public:
 
     if (ancestor == presets.end())
     {
-      mitkThrow() << "Preset \"" << this->GetName().toLatin1() << "\" cannot inherit from \""
-                  << m_Ancestor.toLatin1() << "\" because it couldn't be found.";
+      mitkThrow() << "Preset \"" << this->GetName().toStdString() << "\" cannot inherit from \""
+                  << m_Ancestor.toStdString() << "\" because it couldn't be found.";
     }
 
     (*ancestor)->Inherit(presets); // Recursively resolve inheritance of ancestors

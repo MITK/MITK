@@ -79,7 +79,7 @@ void QmitkToolBarsPreferencePage::CreateQtControl(QWidget* parent)
 
   const auto views = berry::PlatformUI::GetWorkbench()->GetViewRegistry()->GetViewsByCategory();
 
-  for(const auto category : views.uniqueKeys())
+  for(const auto& category : views.uniqueKeys())
   {
     auto categoryItem = new QTreeWidgetItem;
     categoryItem->setText(0, category);

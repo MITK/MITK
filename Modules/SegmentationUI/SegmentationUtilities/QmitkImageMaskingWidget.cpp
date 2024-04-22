@@ -55,16 +55,16 @@ QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::DataStorage* dataStorage,
   m_Controls->imageNodeSelector->SetDataStorage(dataStorage);
   m_Controls->imageNodeSelector->SetNodePredicate(GetInputPredicate());
   m_Controls->imageNodeSelector->SetSelectionIsOptional(false);
-  m_Controls->imageNodeSelector->SetInvalidInfo(QStringLiteral("Please select image for masking"));
+  m_Controls->imageNodeSelector->SetInvalidInfo(QStringLiteral("Please select an image for masking"));
   m_Controls->imageNodeSelector->SetPopUpTitel(QStringLiteral("Select image"));
   m_Controls->imageNodeSelector->SetPopUpHint(QStringLiteral("Select an image that you want to mask."));
 
   m_Controls->segNodeSelector->SetDataStorage(dataStorage);
   m_Controls->segNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls->segNodeSelector->SetSelectionIsOptional(false);
-  m_Controls->segNodeSelector->SetInvalidInfo(QStringLiteral("Please select segmentation and its label"));
+  m_Controls->segNodeSelector->SetInvalidInfo(QStringLiteral("Please select a segmentation and its label"));
   m_Controls->segNodeSelector->SetPopUpTitel(QStringLiteral("Select segmentation"));
-  m_Controls->segNodeSelector->SetPopUpHint(QStringLiteral("Select the segmentation that should be used for masking.\nSegmentation must have the same geometry like the image that should be masked."));
+  m_Controls->segNodeSelector->SetPopUpHint(QStringLiteral("Select the segmentation that should be used for masking.\nThe segmentation must have the same geometry as the image that should be masked."));
 
   this->ConfigureWidgets();
 

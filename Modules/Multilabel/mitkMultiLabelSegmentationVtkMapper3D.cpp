@@ -278,8 +278,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
   const DataNode *node = this->GetDataNode();
   node->GetVisibility(visible, renderer, "visible");
   node->GetBoolProperty("multilabel.3D.visualize", has3Dvisualize, renderer);
-
-  if (!visible)
+  if (!visible || !has3Dvisualize)
     return;
 
   auto *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
@@ -325,7 +324,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::SetDefaultProperties(mitk::DataNod
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 
   // add/replace the following properties
-  node->SetProperty("multilabel.3D.visualize", BoolProperty::New(true), renderer);
+  node->SetProperty("multilabel.3D.visualize", BoolProperty::New(false), renderer);
 }
 
 mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::~LocalStorage()

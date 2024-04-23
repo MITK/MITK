@@ -351,7 +351,6 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
         m_DataInteractor->SetEventConfig("PointSetConfig.xml");
         // set the DataNode (which already is added to the DataStorage
         m_DataInteractor->SetDataNode(m_PointSetNode);
-
       }
     }
     else

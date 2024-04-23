@@ -272,13 +272,19 @@ data(const QModelIndex& index, int role) const
               else
               {
                 QString concatenatedValues;
-                for (long unsigned int i = 0; i < currentFit->staticParamMap.Get(staticParamName).size(); i++)
+                for (const auto &value : currentFit->staticParamMap.Get(staticParamName))
                 {
-                  auto value = currentFit->staticParamMap.Get(staticParamName).at(i);
                   concatenatedValues += QString::number(value) + ", ";
                 }
-                concatenatedValues.chop(2);
+                if (!concatenatedValues.isEmpty())
+                {
+                  concatenatedValues.chop(2);
+                }
                 result = QVariant(concatenatedValues);
+
+
+
+
               }
             }
             else if (role == Qt::ToolTipRole)

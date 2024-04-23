@@ -96,9 +96,19 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
         { //make all none highlighted values more transparent
           rgba[3] *= 0.05;
         }
-        else if (rgba[3] != 0)
-        { //if highlighted values are visible set them to opaque to pop out
-          rgba[3] = 1.;
+        else
+        {
+          if (rgba[3] != 0)
+          { //if highlighted values are visible set them to opaque to pop out
+            rgba[3] = 1.;
+          }
+          else
+          { //if highlighted values are invisible the opacity is increased a bit
+            //to give a visual hint that the are highlighted but also invisible.
+            //e.g. needed to see a difference if you change the visibility of
+            //a highlighted label in the MultiLabelInspector
+            rgba[3] = 0.2;
+          }
         }
         lookUpTable->SetTableValue(value, rgba);
       }

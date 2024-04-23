@@ -665,7 +665,7 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
         this->DoUpdatePreview(feedBackImage, currentSegImage, previewImage, timeStep);
       }
       RenderingManager::GetInstance()->RequestUpdateAll();
-      if (previewImage->GetNumberOfLabels(previewImage->GetActiveLayer()) > 0)
+      if (!previewImage->GetAllLabelValues().empty())
       { // check if labels exits for the preview
         m_IsPreviewGenerated = true;
       }

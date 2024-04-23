@@ -323,7 +323,14 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
       switch (item->m_ItemType)
       {
         case QmitkMultiLabelSegTreeItem::ItemType::Group:
-          return QVariant(QString("Group %1").arg(item->GetGroupID()));
+        {
+          const auto groupID = item->GetGroupID();
+          const auto groupName = m_Segmentation->GetGroupName(groupID);
+          if (groupName.empty())
+            return QVariant(QString("Group %1").arg(item->GetGroupID() + 1));
+          else
+            return QVariant(QString::fromStdString(groupName));
+        }
 
         case QmitkMultiLabelSegTreeItem::ItemType::Label:
         {

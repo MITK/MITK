@@ -132,6 +132,7 @@ void mitk::SegWithPreviewTool::Activated()
   {
     this->GetToolManager()->ActivateTool(-1);
   }
+  m_IsPreviewGenerated = false;
 }
 
 void mitk::SegWithPreviewTool::Deactivated()

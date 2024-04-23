@@ -214,9 +214,9 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     tool->SetFast(isFast);
     tool->SetSubTask(subTask.toStdString());
     this->WriteStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
+    m_FirstPreviewComputation = false;
     tool->UpdatePreview();
     m_Controls.previewButton->setEnabled(true);
-    m_FirstPreviewComputation = false;
   }
   catch (const std::exception &e)
   {
@@ -226,6 +226,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     this->ShowErrorMessage(errorMsg.str());
     this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
     m_Controls.previewButton->setEnabled(true);
+    m_FirstPreviewComputation = true;
     return;
   }
   catch (...)
@@ -233,6 +234,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     std::string errorMsg = "Unkown error occured while generation TotalSegmentator segmentation.";
     this->ShowErrorMessage(errorMsg);
     m_Controls.previewButton->setEnabled(true);
+    m_FirstPreviewComputation = true;
     return;
   }
   this->SetLabelSetPreview(tool->GetPreviewSegmentation());

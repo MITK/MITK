@@ -35,6 +35,8 @@ QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidg
   m_Controls.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls.tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_Controls.tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  m_Controls.tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
   this->SetUpConnections();
   this->Initialize();
@@ -235,12 +237,6 @@ bool QmitkSynchronizedNodeSelectionWidget::IsSynchronized() const
   return m_StorageModel->GetCurrentRenderer().IsNull();
 }
 
-void QmitkSynchronizedNodeSelectionWidget::OnModelUpdated()
-{
-  m_Controls.tableView->resizeRowsToContents();
-  m_Controls.tableView->resizeColumnsToContents();
-}
-
 void QmitkSynchronizedNodeSelectionWidget::OnSelectionModeChanged(bool selectAll)
 {
   emit SelectionModeChanged(selectAll);
@@ -313,9 +309,6 @@ void QmitkSynchronizedNodeSelectionWidget::OnTableClicked(const QModelIndex& ind
 
 void QmitkSynchronizedNodeSelectionWidget::SetUpConnections()
 {
-  connect(m_StorageModel.get(), &QmitkRenderWindowDataNodeTableModel::ModelUpdated,
-    this, &QmitkSynchronizedNodeSelectionWidget::OnModelUpdated);
-  
   connect(m_Controls.selectionModeCheckBox, &QCheckBox::clicked,
     this, &QmitkSynchronizedNodeSelectionWidget::OnSelectionModeChanged);
   connect(m_Controls.changeSelectionButton, &QPushButton::clicked,
@@ -323,6 +316,12 @@ void QmitkSynchronizedNodeSelectionWidget::SetUpConnections()
 
   connect(m_Controls.tableView, &QTableView::clicked,
     this, &QmitkSynchronizedNodeSelectionWidget::OnTableClicked);
+}
+
+void QmitkSynchronizedNodeSelectionWidget::SetSelection(const NodeList& newSelection)
+{
+  this->HandleChangeOfInternalSelection(newSelection);
+  m_Controls.selectionModeCheckBox->setChecked(false);
 }
 
 void QmitkSynchronizedNodeSelectionWidget::Initialize()

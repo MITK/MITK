@@ -227,6 +227,8 @@ public Q_SLOTS:
 protected:
   void Initialize();
   void OnModelReset();
+  void OnDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,
+    const QList<int>& roles = QList<int>());
 
   QmitkMultiLabelTreeModel* m_Model;
   mitk::LabelSetImage::Pointer m_Segmentation;

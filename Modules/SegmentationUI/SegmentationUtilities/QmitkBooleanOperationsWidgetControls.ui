@@ -6,19 +6,126 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>210</width>
-    <height>91</height>
+    <width>249</width>
+    <height>293</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QmitkDataSelectionWidget" name="dataSelectionWidget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="QmitkSingleNodeSelectionWidget" name="segNodeSelector" native="true"/>
+   </item>
+   <item>
+    <widget class="QmitkMultiLabelInspector" name="labelInspector" native="true"/>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Selected operands:</string>
      </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label2nd">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QTextEdit" name="line1stLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>26</height>
+         </size>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="lineWrapMode">
+         <enum>QTextEdit::NoWrap</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Test text&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label1st">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QTextEdit" name="lineOtherLabels">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>26</height>
+         </size>
+        </property>
+        <property name="contextMenuPolicy">
+         <enum>Qt::NoContextMenu</enum>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="lineWrapMode">
+         <enum>QTextEdit::NoWrap</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -41,9 +148,8 @@
         <string>Difference</string>
        </property>
        <property name="icon">
-        <iconset>
-         <normaloff>:/Qmitk/BooleanDifference_48x48.png</normaloff>:/Qmitk/BooleanDifference_48x48.png
-        </iconset>
+        <iconset resource="../resources/SegmentationUI.qrc">
+         <normaloff>:/Qmitk/BooleanDifference_48x48.png</normaloff>:/Qmitk/BooleanDifference_48x48.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -83,9 +189,8 @@
         <string>Intersection</string>
        </property>
        <property name="icon">
-        <iconset>
-         <normaloff>:/Qmitk/BooleanIntersection_48x48.png</normaloff>:/Qmitk/BooleanIntersection_48x48.png
-        </iconset>
+        <iconset resource="../resources/SegmentationUI.qrc">
+         <normaloff>:/Qmitk/BooleanIntersection_48x48.png</normaloff>:/Qmitk/BooleanIntersection_48x48.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -125,9 +230,8 @@
         <string>Union</string>
        </property>
        <property name="icon">
-        <iconset>
-         <normaloff>:/Qmitk/BooleanUnion_48x48.png</normaloff>:/Qmitk/BooleanUnion_48x48.png
-        </iconset>
+        <iconset resource="../resources/SegmentationUI.qrc">
+         <normaloff>:/Qmitk/BooleanUnion_48x48.png</normaloff>:/Qmitk/BooleanUnion_48x48.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -168,9 +272,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataSelectionWidget</class>
+   <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkDataSelectionWidget.h</header>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkMultiLabelInspector</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkMultiLabelInspector.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

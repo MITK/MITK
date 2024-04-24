@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>489</width>
+    <width>526</width>
     <height>1124</height>
    </rect>
   </property>
@@ -74,6 +74,20 @@
         </widget>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkMaskInfo">
+       <property name="text">
+        <string>Show mask info</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelMaskInfo">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A separate segmentation mask is required each for the tissue and AIF mask input. &lt;br/&gt;Multilabel images (e.g. one segmentation with a tissue and an AIF label) are currently not supported in this view yet.&lt;/p&gt;&lt;p&gt;Please only use static segmentation masks as input in order to get sensible parametric map results.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QGroupBox" name="groupBox">
@@ -315,8 +329,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>459</width>
-           <height>112</height>
+           <width>496</width>
+           <height>49</height>
           </rect>
          </property>
          <attribute name="label">

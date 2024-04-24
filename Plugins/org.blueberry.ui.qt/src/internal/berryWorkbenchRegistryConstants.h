@@ -240,6 +240,11 @@ struct WorkbenchRegistryConstants {
   static const QString ATT_IMAGE_STYLE; // "imageStyle";
 
   /**
+   * Internal attribute. Value <code>internal</code>.
+   */
+  static const QString ATT_INTERNAL; // "internal";
+
+  /**
    * Is-editable attribute. Value <code>isEditable</code>.
    */
   static const QString ATT_IS_EDITABLE; // "isEditable";

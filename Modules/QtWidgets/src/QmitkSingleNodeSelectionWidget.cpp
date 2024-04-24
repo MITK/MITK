@@ -182,6 +182,11 @@ void QmitkSingleNodeSelectionWidget::OnNodeAddedToStorage(const mitk::DataNode* 
   this->AutoSelectNodes();
 }
 
+void QmitkSingleNodeSelectionWidget::OnNodePredicateChanged()
+{
+  this->AutoSelectNodes();
+}
+
 bool QmitkSingleNodeSelectionWidget::GetAutoSelectNewNodes() const
 {
   return m_AutoSelectNodes;

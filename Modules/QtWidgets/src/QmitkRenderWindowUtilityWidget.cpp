@@ -50,6 +50,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_NodeSelectionWidget->SetBaseRenderer(m_BaseRenderer);
   m_NodeSelectionWidget->SetDataStorage(dataStorage);
   m_NodeSelectionWidget->SetNodePredicate(noHelperObjects);
+  connect(this, &QmitkRenderWindowUtilityWidget::SetDataSelection, m_NodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SetSelection);
 
   auto menuBar = new QMenuBar(this);
   menuBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
@@ -60,19 +61,19 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   dataMenu->addAction(dataAction);
   layout->addWidget(menuBar);
 
-  auto* synchPushButton = new QPushButton(this);
+  m_SynchPushButton = new QPushButton(this);
   auto* synchIcon = new QIcon();
   auto synchronizeSvg = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/lock.svg"));
   auto desynchronizeSvg = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/unlock.svg"));
   synchIcon->addPixmap(synchronizeSvg.pixmap(64), QIcon::Normal, QIcon::On);
   synchIcon->addPixmap(desynchronizeSvg.pixmap(64), QIcon::Normal, QIcon::Off);
-  synchPushButton->setIcon(*synchIcon);
-  synchPushButton->setToolTip("Synchronize / desynchronize data management");
-  synchPushButton->setCheckable(true);
-  synchPushButton->setChecked(true);
-  connect(synchPushButton, &QPushButton::clicked,
+  m_SynchPushButton->setIcon(*synchIcon);
+  m_SynchPushButton->setToolTip("Synchronize / desynchronize data management");
+  m_SynchPushButton->setCheckable(true);
+  m_SynchPushButton->setChecked(true);
+  connect(m_SynchPushButton, &QPushButton::clicked,
     this, &QmitkRenderWindowUtilityWidget::ToggleSynchronization);
-  layout->addWidget(synchPushButton);
+  layout->addWidget(m_SynchPushButton);
 
   auto* sliceNavigationController = m_BaseRenderer->GetSliceNavigationController();
   m_SliceNavigationWidget = new QmitkSliceNavigationWidget(this);
@@ -104,6 +105,10 @@ QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
 
 void QmitkRenderWindowUtilityWidget::ToggleSynchronization(bool synchronized)
 {
+  if (m_SynchPushButton->isChecked() != synchronized)
+  {
+    m_SynchPushButton->setChecked(synchronized);
+  }
   m_NodeSelectionWidget->SetSynchronized(synchronized);
   emit SynchronizationToggled(m_NodeSelectionWidget);
 }

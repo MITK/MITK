@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "mitkVtkRepresentationProperty.h"
 #include <mitkCoreObjectFactory.h>
 #include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageConverter.h>
 #include <vtkPolyDataNormals.h>
 
 namespace mitk
@@ -102,7 +103,7 @@ namespace mitk
 
       for (auto label : labels)
       {
-        auto labelImage = labelSetImage->CreateLabelMask(label->GetValue());
+        auto labelImage = CreateLabelMask(labelSetImage, label->GetValue());
 
         if (labelImage.IsNull())
           continue;

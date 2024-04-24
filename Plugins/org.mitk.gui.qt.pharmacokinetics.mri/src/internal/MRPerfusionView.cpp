@@ -93,6 +93,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.btnModelling->setEnabled(false);
 
   this->InitModelComboBox();
+  m_Controls.labelMaskInfo->hide();
 
   m_Controls.timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
   m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
@@ -108,6 +109,9 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
   connect(m_Controls.radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+
+  connect(m_Controls.checkMaskInfo, SIGNAL(toggled(bool)), m_Controls.labelMaskInfo,
+    SLOT(setVisible(bool)));
 
   connect(m_Controls.timeSeriesNodeSelector,
           &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
@@ -132,7 +136,9 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   //AIF setting
   m_Controls.groupAIF->hide();
   m_Controls.btnAIFFile->setEnabled(false);
-  m_Controls.btnAIFFile->setEnabled(false);
+  m_Controls.btnAIFFile->setVisible(false);
+  m_Controls.aifFilePath->setEnabled(false);
+  m_Controls.aifFilePath->setVisible(false);
   m_Controls.radioAIFImage->setChecked(true);
   m_Controls.AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
@@ -149,20 +155,22 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.HCLSpinBox->setValue(mitk::AterialInputFunctionGenerator::DEFAULT_HEMATOCRIT_LEVEL);
 
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setVisible(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.labelAIFMask, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setVisible(bool)));
   connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setEnabled(bool)));
   connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.btnAIFFile, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.btnAIFFile, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
 
 
   connect(m_Controls.btnAIFFile, SIGNAL(clicked()), this, SLOT(LoadAIFfromFile()));
+
+
 
   //Brix setting
   m_Controls.groupDescBrix->hide();
@@ -250,9 +258,20 @@ void MRPerfusionView::UpdateGUIControls()
 
 
 
+
   m_Controls.groupAIF->setVisible(isToftsFactory || is2CXMFactory);
   m_Controls.groupDescBrix->setVisible(isDescBrixFactory);
+  if (isDescBrixFactory)
+  {
+    m_Controls.toolboxConfiguration->setItemEnabled(2, false);
+  }
+  else
+  {
+    m_Controls.toolboxConfiguration->setItemEnabled(2, true);
+  }
   m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory );
+  m_Controls.AIFImageNodeSelector->setVisible(!m_Controls.radioAIFFile->isChecked());
+  m_Controls.AIFImageNodeSelector->setVisible(m_Controls.radioAIFImage->isChecked() && m_Controls.checkDedicatedAIFImage->isChecked());
 
   m_Controls.groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
 
@@ -262,6 +281,7 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.groupDescBrix->setEnabled(!m_FittingInProgress);
   m_Controls.groupConcentration->setEnabled(!m_FittingInProgress);
   m_Controls.groupBox_FitConfiguration->setEnabled(!m_FittingInProgress);
+
 
   m_Controls.radioROIbased->setEnabled(m_selectedMask.IsNotNull());
 

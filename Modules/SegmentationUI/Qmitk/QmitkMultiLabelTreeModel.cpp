@@ -476,6 +476,7 @@ bool QmitkMultiLabelTreeModel::setData(const QModelIndex& index, const QVariant&
           label->SetVisible(value.toBool());
         }
         m_Segmentation->UpdateLookupTable(label->GetValue());
+        m_Segmentation->GetLookupTable()->Modified();
         m_Segmentation->Modified();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }

@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
+#include <mitkVectorProperty.h>
 
 // Qmitk
 #include <QmitkMultiLabelTreeModel.h>
@@ -30,6 +31,40 @@ found in the LICENSE file.
 #include <QMessageBox>
 
 #include <ui_QmitkMultiLabelInspectorControls.h>
+
+namespace
+{
+  void ActivateLabelHighlights(mitk::DataNode* node, const mitk::LabelSetImage::LabelValueVectorType highlightedValues)
+  {
+    const std::string propertyName = "org.mitk.multilabel.labels.highlighted";
+
+    mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(propertyName));
+    if (nullptr == prop)
+    {
+      prop = mitk::IntVectorProperty::New();
+      node->SetProperty(propertyName, prop);
+    }
+
+    mitk::IntVectorProperty::VectorType intValues(highlightedValues.begin(), highlightedValues.end());
+    prop->SetValue(intValues);
+    prop->Modified(); //see T30386; needed because VectorProperty::SetValue does currently trigger no modified
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+
+  void DeactivateLabelHighlights(mitk::DataNode* node)
+  {
+    std::string propertyName = "org.mitk.multilabel.labels.highlighted";
+
+    mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(propertyName));
+    if (nullptr != prop)
+    {
+      prop->SetValue({});
+      prop->Modified(); //see T30386; needed because VectorProperty::SetValue does currently trigger no modified
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
+}
 
 QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/)
   : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelInspector), m_SegmentationNodeDataMTime(0)
@@ -67,6 +102,8 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnChangeModelSelection(const QItemSelection&, const QItemSelection&)));
   connect(view, &QAbstractItemView::customContextMenuRequested, this, &QmitkMultiLabelInspector::OnContextMenuRequested);
   connect(view, &QAbstractItemView::doubleClicked, this, &QmitkMultiLabelInspector::OnItemDoubleClicked);
+  connect(view, &QAbstractItemView::entered, this, &QmitkMultiLabelInspector::OnEntered);
+  connect(view, &QmitkMultiLabelTreeView::MouseLeave, this, &QmitkMultiLabelInspector::OnMouseLeave);
 }
 
 QmitkMultiLabelInspector::~QmitkMultiLabelInspector()
@@ -772,10 +809,16 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
 
   const auto indexLevel = this->GetCurrentLevelType();
 
+  auto currentIndex = this->m_Controls->view->currentIndex();
+  //this ensures correct highlighting is the context menu is triggered while
+  //another context menu is already open.
+  if (currentIndex.isValid() && this->m_AboutToShowContextMenu) this->OnEntered(this->m_Controls->view->currentIndex());
+
+
+  QMenu* menu = new QMenu(this);
+
   if (IndexLevelType::Group == indexLevel)
   {
-    QMenu* menu = new QMenu(this);
-
     if (m_AllowLabelModification)
     {
       QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")), "&Add label", this);
@@ -820,12 +863,9 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       if (nullptr != opacityAction)
         menu->addAction(opacityAction);
     }
-    menu->popup(QCursor::pos());
   }
   else if (IndexLevelType::LabelClass == indexLevel)
   {
-    QMenu* menu = new QMenu(this);
-
     if (m_AllowLabelModification)
     {
       QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "Add label instance", this);
@@ -871,15 +911,12 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       if (nullptr!=opacityAction)
         menu->addAction(opacityAction);
     }
-    menu->popup(QCursor::pos());
   }
   else
   {
     auto selectedLabelValues = this->GetSelectedLabels();
     if (selectedLabelValues.empty())
       return;
-
-    QMenu* menu = new QMenu(this);
 
     if (this->GetMultiSelectionMode() && selectedLabelValues.size() > 1)
     {
@@ -964,8 +1001,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
           menu->addAction(opacityAction);
       }
     }
-    menu->popup(QCursor::pos());
   }
+
+  QObject::connect(menu, &QMenu::aboutToHide, this, &QmitkMultiLabelInspector::OnMouseLeave);
+  m_AboutToShowContextMenu = true;
+  menu->popup(QCursor::pos());
 }
 
 QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
@@ -996,18 +1036,32 @@ QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
     auto opacity = relevantLabels.front()->GetOpacity();
     opacitySlider->setValue(static_cast<int>(opacity * 100));
     auto segmentation = m_Segmentation;
+    auto node = m_SegmentationNode;
 
-    QObject::connect(opacitySlider, &QSlider::valueChanged, this, [segmentation, relevantLabels](const int value)
-    {
-      auto opacity = static_cast<float>(value) / 100.0f;
-      for (auto label : relevantLabels)
+    auto onChangeLambda = [segmentation, relevantLabels](const int value)
       {
-        label->SetOpacity(opacity);
-        segmentation->UpdateLookupTable(label->GetValue());
-      }
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-    );
+        auto opacity = static_cast<float>(value) / 100.0f;
+        for (auto label : relevantLabels)
+        {
+          label->SetOpacity(opacity);
+          segmentation->UpdateLookupTable(label->GetValue());
+        }
+        segmentation->GetLookupTable()->Modified();
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      };
+    QObject::connect(opacitySlider, &QSlider::valueChanged, this, onChangeLambda);
+
+    auto onPressedLambda = [node]()
+      {
+        DeactivateLabelHighlights(node);
+      };
+    QObject::connect(opacitySlider, &QSlider::sliderPressed, this, onPressedLambda);
+
+    auto onReleasedLambda = [node, relevantLabelValues]()
+      {
+        ActivateLabelHighlights(node, relevantLabelValues);
+      };
+    QObject::connect(opacitySlider, &QSlider::sliderReleased, this, onReleasedLambda);
 
     QLabel* opacityLabel = new QLabel("Opacity: ");
     QVBoxLayout* opacityWidgetLayout = new QVBoxLayout;
@@ -1267,6 +1321,7 @@ void QmitkMultiLabelInspector::SetVisibilityOfAffectedLabels(bool visible) const
       label->SetVisible(visible);
       m_Segmentation->UpdateLookupTable(label->GetValue());
     }
+    m_Segmentation->GetLookupTable()->Modified();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -1334,3 +1389,27 @@ void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) 
   }
 }
 
+void QmitkMultiLabelInspector::OnEntered(const QModelIndex& index)
+{
+  if (m_SegmentationNode.IsNotNull())
+  {
+    auto labelVariant = index.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
+
+    auto highlightedValues = m_Model->GetLabelsInSubTree(index);
+
+    ActivateLabelHighlights(m_SegmentationNode, highlightedValues);
+  }
+  m_AboutToShowContextMenu = false;
+}
+
+void QmitkMultiLabelInspector::OnMouseLeave()
+{
+  if (m_SegmentationNode.IsNotNull() && !m_AboutToShowContextMenu)
+  {
+    DeactivateLabelHighlights(m_SegmentationNode);
+  }
+  else
+  {
+    m_AboutToShowContextMenu = false;
+  }
+}

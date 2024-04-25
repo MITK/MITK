@@ -71,7 +71,7 @@ struct BERRY_UI_QT IViewRegistry
    * "org.blueberry.ui" or "org.mitk.views.general", as they typically do not have
    * a corresponding tool bar.
    *
-   * @return the views by vategory as described above.
+   * @return the views by category as described above.
    */
   virtual QMultiMap<QString, IViewDescriptor::Pointer> GetViewsByCategory() const = 0;
 

@@ -208,6 +208,8 @@ public:
    */
   QList<IViewDescriptor::Pointer> GetViews() const override;
 
+  QMultiMap<QString, IViewDescriptor::Pointer> GetViewsByCategory() const override;
+
   /**
    * Adds each view in the registry to a particular category.
    * The view category may be defined in xml.  If not, the view is

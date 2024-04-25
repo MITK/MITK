@@ -83,8 +83,6 @@ void mitk::MaskAndCutRoiImageFilter::GenerateData()
 
   m_MaskFilter->SetOutsideValue(-32765);
   m_MaskFilter->Update();
-  m_MaxValue = m_MaskFilter->GetMaxValue();
-  m_MinValue = m_MaskFilter->GetMinValue();
 
   // temporary fix for bug #
   m_outputImage = m_MaskFilter->GetOutput();

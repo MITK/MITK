@@ -104,12 +104,20 @@ QAbstractItemView {
   background-color: #252526;
 }
 
+QAbstractItemView:disabled {
+  background-color: #1b1b1c;
+}
+
 QAbstractItemView::item {
   color: #f1f1f1;
 }
 
 QAbstractItemView::item:selected {
   background-color: #1c97ea;
+}
+
+QAbstractItemView::item:disabled {
+  color: #656565;
 }
 
 QHeaderView::section {

@@ -132,6 +132,8 @@ public:
 
   IWorkbench* GetWorkbench() const override;
 
+  QList<QToolBar*> GetToolBars() const override;
+
   IPartService* GetPartService() override;
 
   ISelectionService* GetSelectionService() const override;

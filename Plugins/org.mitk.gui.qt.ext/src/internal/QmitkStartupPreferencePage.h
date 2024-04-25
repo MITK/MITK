@@ -10,26 +10,24 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkExternalProgramsPreferencePage_h
-#define QmitkExternalProgramsPreferencePage_h
+#ifndef QmitkStartupPreferencePage_h
+#define QmitkStartupPreferencePage_h
 
 #include <berryIQtPreferencePage.h>
-#include <QProcess>
-#include <QScopedPointer>
 
 namespace Ui
 {
-  class QmitkExternalProgramsPreferencePage;
+  class QmitkStartupPreferencePage;
 }
 
-class QmitkExternalProgramsPreferencePage : public QObject, public berry::IQtPreferencePage
+class QmitkStartupPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPreferencePage)
 
 public:
-  QmitkExternalProgramsPreferencePage();
-  ~QmitkExternalProgramsPreferencePage() override;
+  QmitkStartupPreferencePage();
+  ~QmitkStartupPreferencePage() override;
 
   void CreateQtControl(QWidget* parent) override;
   QWidget* GetQtControl() const override;
@@ -38,17 +36,9 @@ public:
   bool PerformOk() override;
   void Update() override;
 
-private slots:
-  void OnGnuplotButtonClicked();
-  void OnGnuplotProcessError(QProcess::ProcessError error);
-  void OnGnuplotProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
-
 private:
-  QScopedPointer<Ui::QmitkExternalProgramsPreferencePage> m_Ui;
+  Ui::QmitkStartupPreferencePage* m_Ui;
   QWidget* m_Control;
-
-  QProcess* m_GnuplotProcess;
-  QString m_GnuplotPath;
 };
 
 #endif

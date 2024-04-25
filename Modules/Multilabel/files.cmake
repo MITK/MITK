@@ -15,6 +15,7 @@ set(CPP_FILES
   mitkDICOMSegmentationPropertyHelper.cpp
   mitkDICOMSegmentationConstants.cpp
   mitkSegmentationTaskList.cpp
+  mitkMultiLabelSegmentationVtkMapper3D.cpp
 )
 
 set(RESOURCE_FILES

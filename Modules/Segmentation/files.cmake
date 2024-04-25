@@ -7,7 +7,6 @@ set(CPP_FILES
   Algorithms/mitkDiffImageApplier.cpp
   Algorithms/mitkDiffSliceOperation.cpp
   Algorithms/mitkDiffSliceOperationApplier.cpp
-  Algorithms/mitkFeatureBasedEdgeDetectionFilter.cpp
   Algorithms/mitkGrowCutSegmentationFilter.cpp
   Algorithms/mitkImageLiveWireContourModelFilter.cpp
   Algorithms/mitkImageToContourFilter.cpp

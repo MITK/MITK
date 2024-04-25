@@ -73,6 +73,7 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
   m_Controls.btnModelling->setEnabled(false);
 
   this->InitModelComboBox();
+  m_Controls.labelMaskInfo->hide();
 
   connect(m_Controls.btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
 
@@ -88,6 +89,8 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
           SLOT(setVisible(bool)));
   connect(m_Controls.nrOfParams, SIGNAL(valueChanged(int)), this, SLOT(OnNrOfParamsChanged()));
 
+  connect(m_Controls.checkMaskInfo, SIGNAL(toggled(bool)), m_Controls.labelMaskInfo,
+    SLOT(setVisible(bool)));
 
   //Model fit configuration
   m_Controls.groupBox_FitConfiguration->hide();

@@ -314,7 +314,6 @@ void mitk::TemporoSpatialStringProperty::SetValue(const TimeStepType &timeStep,
 
 void mitk::TemporoSpatialStringProperty::SetValue(const ValueType &value)
 {
-  this->Modified();
   m_Values.clear();
   this->SetValue(0, 0, value);
 };

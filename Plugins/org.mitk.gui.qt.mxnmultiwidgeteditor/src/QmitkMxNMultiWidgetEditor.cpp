@@ -193,6 +193,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   if (nullptr == m_Impl->m_ConfigurationToolBar)
   {
     m_Impl->m_ConfigurationToolBar = new QmitkMultiWidgetConfigurationToolBar(multiWidget);
+    m_Impl->m_ConfigurationToolBar->SetDataStorage(GetDataStorage());
     layout->addWidget(m_Impl->m_ConfigurationToolBar);
   }
 
@@ -202,6 +203,8 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
           this, &QmitkMxNMultiWidgetEditor::OnSynchronize);
   connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::InteractionSchemeChanged,
           this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
+  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::SetDataBasedLayout,
+    static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::SetDataBasedLayout);
   connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::SaveLayout,
     static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::SaveLayout, Qt::DirectConnection);
   connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::LoadLayout,

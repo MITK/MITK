@@ -5,13 +5,13 @@
   <extension point="org.blueberry.ui.preferencePages">
     <page id="org.mitk.GeneralPreferencePage" name="General" class="QmitkGeneralPreferencePage"/>
     <page id="org.mitk.EditorsPreferencePage" name="Editors" class="QmitkEditorsPreferencePage"/>
-    <page id="org.mitk.ToolBarsPreferencePage" name="Tool Bars" class="QmitkToolBarsPreferencePage">
+    <page id="org.mitk.ToolBarsPreferencePage" name="Tool Bars" class="QmitkToolBarsPreferencePage" category="org.mitk.GeneralPreferencePage">
       <keywordreference id="org.mitk.ToolBarsPreferencePageKeywords"/>
     </page>
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.ToolBarsPreferencePageKeywords" label="tool bars toolbars"/>
+    <keyword id="org.mitk.ToolBarsPreferencePageKeywords" label="tool bars toolbars category categories preset"/>
   </extension>
 
   <extension point="org.blueberry.ui.handlers">

@@ -14,7 +14,6 @@ set(CPP_FILES
   QmitkEditPointDialog.cpp
   QmitkEnumerationPropertyWidget.cpp
   QmitkFileChooser.cpp
-  QmitkGnuplotWidget.cpp
   QmitkHistogram.cpp
   QmitkHotkeyLineEdit.cpp
   QmitkModulesDialog.cpp
@@ -57,7 +56,6 @@ set(MOC_H_FILES
   include/QmitkEditPointDialog.h
   include/QmitkEnumerationPropertyWidget.h
   include/QmitkFileChooser.h
-  include/QmitkGnuplotWidget.h
   include/QmitkHotkeyLineEdit.h
   include/QmitkNumberPropertyEditor.h
   include/QmitkNumberPropertySlider.h
@@ -82,7 +80,6 @@ set(MOC_H_FILES
 
 set(UI_FILES
   src/QmitkAboutDialogGUI.ui
-  src/QmitkGnuplotWidget.ui
   src/QmitkPrimitiveMovieNavigatorWidget.ui
   src/QmitkSliceWidget.ui
   src/QmitkTransferFunctionGeneratorWidget.ui

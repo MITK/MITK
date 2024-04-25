@@ -45,7 +45,6 @@ set(CPP_FILES
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.cpp
-  SegmentationUtilities/QmitkDataSelectionWidget.cpp
   SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidget.cpp
   SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidget.cpp
 )
@@ -100,7 +99,6 @@ set(MOC_H_FILES
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.h
-  SegmentationUtilities/QmitkDataSelectionWidget.h
   SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidget.h
   SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidget.h
 )
@@ -123,7 +121,6 @@ set(UI_FILES
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
   SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui
-  SegmentationUtilities/QmitkDataSelectionWidgetControls.ui
   SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidgetControls.ui
   SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidgetControls.ui
 )

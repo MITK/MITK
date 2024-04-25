@@ -660,6 +660,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
         tool->m_InputBuffer = nullptr;
         this->WriteStatusMessage(
           QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
+        m_FirstPreviewComputation = false;
         tool->UpdatePreview();
         if (nullptr == tool->GetOutputBuffer())
         {
@@ -697,6 +698,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
       m_Controls.previewButton->setEnabled(true);
       tool->PredictOff();
+      m_FirstPreviewComputation = true;
       return;
     }
     catch (...)
@@ -705,6 +707,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       this->ShowErrorMessage(errorMsg);
       m_Controls.previewButton->setEnabled(true);
       tool->PredictOff();
+      m_FirstPreviewComputation = true;
       return;
     }
     if (!pythonPathTextItem.isEmpty())
@@ -1080,6 +1083,7 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
 
 void QmitknnUNetToolGUI::SegmentationProcessFailed()
 {
+  m_FirstPreviewComputation = true;
   this->WriteErrorMessage(
     "<b>STATUS: </b><i>Error in the segmentation process. <br>No resulting segmentation can be loaded.</i>");
   this->setCursor(Qt::ArrowCursor);
@@ -1094,7 +1098,6 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, bool 
   {
     tool->RenderOutputBuffer();
   }
-  m_FirstPreviewComputation = false;
   this->SetLabelSetPreview(tool->GetPreviewSegmentation());
   this->WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
   this->ActualizePreviewLabelVisibility();

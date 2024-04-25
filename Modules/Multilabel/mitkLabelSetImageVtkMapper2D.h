@@ -126,6 +126,7 @@ namespace mitk
       mitk::LookupTable::Pointer m_LabelLookupTable;
 
       mitk::PlaneGeometry::Pointer m_WorldPlane;
+      bool m_HasValidContent;
 
       unsigned int m_NumberOfLayers;
 
@@ -199,7 +200,7 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    bool GenerateImageSlice(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs);
+    void GenerateImageSlice(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs);
 
     void GenerateActiveLabelOutline(mitk::BaseRenderer* renderer);
 
@@ -222,7 +223,7 @@ namespace mitk
       * sign (all positive or all negative) there is no intersection.
       * If the distances have different sign, there is an intersection.
       **/
-    bool RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry, SlicedGeometry3D *imageGeometry);
+    bool RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry, const BaseGeometry* imageGeometry) const;
   };
 
 } // namespace mitk

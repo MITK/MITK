@@ -144,11 +144,11 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   mitk::DataNode *node = this->GetDataNode();
-  auto *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
-  assert(image && image->IsInitialized());
+  auto *segmentation = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
+  assert(segmentation && segmentation->IsInitialized());
 
   bool isLookupModified = localStorage->m_LabelLookupTable.IsNull() ||
-    (localStorage->m_LabelLookupTable->GetMTime() < image->GetLookupTable()->GetMTime()) ||
+    (localStorage->m_LabelLookupTable->GetMTime() < segmentation->GetLookupTable()->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.labels.highlighted", localStorage->m_LabelLookupTable->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime());
 
@@ -157,38 +157,65 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     this->GenerateLookupTable(renderer);
   }
 
-  auto outdatedGroups = GetOutdatedGroups(localStorage, image);
+  auto outdatedGroups = GetOutdatedGroups(localStorage, segmentation);
 
   bool isGeometryModified = (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
     (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime());
+
+  bool rendererGeometryIsValid = true;
 
   // check if there is a valid worldGeometry
   if (isGeometryModified)
   {
     const PlaneGeometry* worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
-    isGeometryModified = !((worldGeometry == nullptr)
-      || (!worldGeometry->IsValid())
-      || (!worldGeometry->HasReferenceGeometry())
-      || (localStorage->m_WorldPlane.IsNotNull() && Equal(*worldGeometry, *(localStorage->m_WorldPlane.GetPointer()))));
+    rendererGeometryIsValid = worldGeometry != nullptr
+      && worldGeometry->IsValid()
+      && worldGeometry->HasReferenceGeometry();
 
-    localStorage->m_WorldPlane = worldGeometry->Clone();
+    isGeometryModified = rendererGeometryIsValid
+      && localStorage->m_WorldPlane.IsNotNull() && !Equal(*worldGeometry, *(localStorage->m_WorldPlane.GetPointer()));
+
+    localStorage->m_WorldPlane = rendererGeometryIsValid ? worldGeometry->Clone() : nullptr;
   }
 
-  if (isGeometryModified)
+  bool hasValidContent = rendererGeometryIsValid && RenderingGeometryIntersectsImage(localStorage->m_WorldPlane, segmentation->GetSlicedGeometry());
+
+  if (!hasValidContent && localStorage->m_HasValidContent)
   {
-    //if geometry is outdated all groups need regeneration
-    outdatedGroups.resize(image->GetNumberOfLayers());
+    // set image to nullptr, to clear the texture in 3D, because
+    // the latest image is used there if the plane is out of the geometry
+    // see bug-13275
+    for (unsigned int lidx = 0; lidx < localStorage->m_NumberOfLayers; ++lidx)
+    {
+      localStorage->m_ReslicedImageVector[lidx] = nullptr;
+      localStorage->m_LayerMapperVector[lidx]->SetInputData(localStorage->m_EmptyPolyData);
+      localStorage->m_OutlineActor->SetVisibility(false);
+      localStorage->m_OutlineShadowActor->SetVisibility(false);
+    }
+    localStorage->m_LastDataUpdateTime.Modified();
+  }
+
+  if (isGeometryModified || (hasValidContent && !localStorage->m_HasValidContent))
+  {
+    //if geometry is outdated or we have valid content again
+    // -> all groups need regeneration
+    outdatedGroups.resize(segmentation->GetNumberOfLayers());
     std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
+  }
+
+  localStorage->m_HasValidContent = hasValidContent;
+
+  if (!hasValidContent)
+  {
+    // early out if there is no intersection of the current rendering geometry
+    // and the geometry of the image that is to be rendered.
+    return;
   }
 
   if (!outdatedGroups.empty())
   {
-    auto hasValidContent = this->GenerateImageSlice(renderer, outdatedGroups);
-    if (!hasValidContent) return;
+    this->GenerateImageSlice(renderer, outdatedGroups);
   }
-
-  auto activeLayer = image->GetActiveLayer();
-  bool activeGroupIsOutdated = std::find(outdatedGroups.begin(), outdatedGroups.end(), activeLayer) != outdatedGroups.end();
 
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
@@ -196,7 +223,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   if (isLookupModified)
   {
     //if lookup table is modified all groups need a new color mapping
-    outdatedGroups.resize(image->GetNumberOfLayers());
+    outdatedGroups.resize(segmentation->GetNumberOfLayers());
     std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
   }
 
@@ -225,6 +252,9 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     localStorage->m_LayerActorVector[groupID]->GetProperty()->SetOpacity(opacity);
   }
 
+  auto activeLayer = segmentation->GetActiveLayer();
+  bool activeGroupIsOutdated = std::find(outdatedGroups.begin(), outdatedGroups.end(), activeLayer) != outdatedGroups.end();
+
   if (activeGroupIsOutdated
       || PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LastActiveLabelUpdateTime.GetMTime())
       || PropertyTimeStampIsNewer(node, renderer, "labelset.contour.active", localStorage->m_LastActiveLabelUpdateTime.GetMTime())
@@ -235,24 +265,16 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   }
 }
 
-bool mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs)
+void mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs)
 {
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
   mitk::DataNode* node = this->GetDataNode();
-  auto* image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
-  assert(image && image->IsInitialized());
+  auto* segmentation = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  assert(segmentation && segmentation->IsInitialized());
 
-  // check if there is a valid worldGeometry
-  const PlaneGeometry* worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
-  if ((worldGeometry == nullptr)
-    || (!worldGeometry->IsValid())
-    || (!worldGeometry->HasReferenceGeometry()))
-    return false;
+  segmentation->Update();
 
-  localStorage->m_WorldPlane = worldGeometry->Clone();
-  image->Update();
-
-  const auto numberOfLayers = image->GetNumberOfLayers();
+  const auto numberOfLayers = segmentation->GetNumberOfLayers();
 
   if (numberOfLayers != localStorage->m_NumberOfLayers)
   {
@@ -296,31 +318,13 @@ bool mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* rend
     localStorage->m_Actors->AddPart(localStorage->m_OutlineActor);
   }
 
-  // early out if there is no intersection of the current rendering geometry
-  // and the geometry of the image that is to be rendered.
-  if (!RenderingGeometryIntersectsImage(worldGeometry, image->GetSlicedGeometry()))
-  {
-    // set image to nullptr, to clear the texture in 3D, because
-    // the latest image is used there if the plane is out of the geometry
-    // see bug-13275
-    for (unsigned int lidx = 0; lidx < numberOfLayers; ++lidx)
-    {
-      localStorage->m_ReslicedImageVector[lidx] = nullptr;
-      localStorage->m_LayerMapperVector[lidx]->SetInputData(localStorage->m_EmptyPolyData);
-      localStorage->m_OutlineActor->SetVisibility(false);
-      localStorage->m_OutlineShadowActor->SetVisibility(false);
-    }
-    localStorage->m_LastDataUpdateTime.Modified();
-    return false;
-  }
-
   for (const auto groupID : outdatedGroupIDs)
   {
-    const auto groupImage = image->GetGroupImage(groupID);
+    const auto groupImage = segmentation->GetGroupImage(groupID);
     localStorage->m_GroupImageIDs[groupID] = groupImage;
 
     localStorage->m_ReslicerVector[groupID]->SetInput(groupImage);
-    localStorage->m_ReslicerVector[groupID]->SetWorldGeometry(worldGeometry);
+    localStorage->m_ReslicerVector[groupID]->SetWorldGeometry(localStorage->m_WorldPlane);
     localStorage->m_ReslicerVector[groupID]->SetTimeStep(this->GetTimestep());
 
     // set the transformation of the image to adapt reslice axis
@@ -362,7 +366,6 @@ bool mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* rend
     localStorage->m_ReslicedImageVector[groupID] = localStorage->m_ReslicerVector[groupID]->GetVtkOutput();
   }
   localStorage->m_LastDataUpdateTime.Modified();
-  return true;
 }
 
 void mitk::LabelSetImageVtkMapper2D::GenerateActiveLabelOutline(mitk::BaseRenderer* renderer)
@@ -410,7 +413,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateActiveLabelOutline(mitk::BaseRender
 
 
 bool mitk::LabelSetImageVtkMapper2D::RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry,
-                                                                      SlicedGeometry3D *imageGeometry)
+  const BaseGeometry *imageGeometry) const
 {
   // if either one of the two geometries is nullptr we return true
   // for safety reasons
@@ -740,6 +743,7 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
   m_OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_OutlineShadowActor = vtkSmartPointer<vtkActor>::New();
 
+  m_HasValidContent = false;
   m_NumberOfLayers = 0;
   m_mmPerPixel = nullptr;
 

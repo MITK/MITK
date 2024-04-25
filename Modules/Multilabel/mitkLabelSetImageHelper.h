@@ -74,6 +74,7 @@ namespace mitk
     MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassNamwe(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID);
     MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassNamwe(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID, const LabelSetImage::LabelValueVectorType& labelValues);
 
+    MITKMULTILABEL_EXPORT std::string CreateDisplayGroupName(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID);
 
   } // namespace LabelSetImageHelper
 } // namespace mitk

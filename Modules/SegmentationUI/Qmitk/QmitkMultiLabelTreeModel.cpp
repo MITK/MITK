@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <mitkMultiLabelEvents.h>
 #include <mitkRenderingManager.h>
+#include <mitkLabelSetImageHelper.h>
 
 #include <QmitkStyleManager.h>
 
@@ -325,11 +326,11 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
         case QmitkMultiLabelSegTreeItem::ItemType::Group:
         {
           const auto groupID = item->GetGroupID();
-          const auto groupName = m_Segmentation->GetGroupName(groupID);
-          if (groupName.empty())
-            return QVariant(QString("Group %1").arg(item->GetGroupID() + 1));
-          else
-            return QVariant(QString::fromStdString(groupName));
+          if (m_Segmentation->ExistGroup(groupID))
+          {
+            return QVariant(QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID)));
+          }
+          return QVariant(QString("unknown group"));
         }
 
         case QmitkMultiLabelSegTreeItem::ItemType::Label:

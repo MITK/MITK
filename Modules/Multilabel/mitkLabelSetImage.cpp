@@ -390,7 +390,7 @@ const std::string& mitk::LabelSetImage::GetGroupName(GroupIndexType groupID) con
 void mitk::LabelSetImage::SetGroupName(GroupIndexType groupID, const std::string& name)
 {
   if (!this->ExistGroup(groupID))
-    mitkThrow() << "Error, cannot return group name. Group ID is invalid. Invalid ID: " << groupID;
+    mitkThrow() << "Error, cannot set group name. Group ID is invalid. Invalid ID: " << groupID;
 
   m_Groups[groupID] = name;
   this->InvokeEvent(GroupModifiedEvent(groupID));

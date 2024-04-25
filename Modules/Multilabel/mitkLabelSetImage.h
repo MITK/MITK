@@ -340,7 +340,7 @@ namespace mitk
      *@pre groupID must reference an existing group.*/
     const mitk::Image* GetGroupImage(GroupIndexType groupID) const;
 
-    /** Returns the name of the indicate group. String may be empty if no name was defined.
+    /** Returns the name of the indicated group. String may be empty if no name was defined.
      * Remark: The name neither is guaranteed to be defined nor that it is unique. Use the index
      * to uniquely refer to a group.
      *@pre groupID must reference an existing group.*/

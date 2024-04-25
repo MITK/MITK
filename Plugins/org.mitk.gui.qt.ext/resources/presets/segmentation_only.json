@@ -1,0 +1,9 @@
+{
+  "name": "Segmentation only",
+  "info": "Display only essential plugins necessary for segmentation.",
+  "categories": [
+    "Data",
+    "General",
+    "Segmentation"
+  ]
+}

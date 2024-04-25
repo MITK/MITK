@@ -23,6 +23,8 @@ found in the LICENSE file.
 
 #include "services/berryIServiceLocator.h"
 
+#include <QToolBar>
+
 namespace berry {
 
 struct IPartService;
@@ -132,6 +134,11 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    * @return the workbench
    */
   virtual IWorkbench* GetWorkbench() const = 0;
+
+  /**
+   * Returns all tool bars for this window.
+   */
+  virtual QList<QToolBar*> GetToolBars() const = 0;
 
   /**
    * Creates and opens a new workbench page. The perspective of the new page

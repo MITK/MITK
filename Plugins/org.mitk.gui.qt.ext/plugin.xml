@@ -6,9 +6,13 @@
           class="QmitkAppInstancesPreferencePage" category="org.mitk.GeneralPreferencePage">
       <keywordreference id="org.mitk.AppInstancesPreferencePageKeywords"/>
     </page>
+    <page id="org.mitk.StartupPreferencePage" name="Application Startup" class="QmitkStartupPreferencePage" category="org.mitk.GeneralPreferencePage">
+      <keywordreference id="org.mitk.StartupPreferencePageKeywords"/>
+    </page>
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.StartupPreferencePageKeywords" label="startup toolbars preset"/>
     <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="application instances running multiple behavior repeated invocations mitk"/>
     <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="scene file .mitk"/>
   </extension>

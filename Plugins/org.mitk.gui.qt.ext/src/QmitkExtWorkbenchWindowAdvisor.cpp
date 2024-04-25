@@ -81,6 +81,7 @@ found in the LICENSE file.
 #include <QMouseEvent>
 #include <QLabel>
 #include <QmitkAboutDialog.h>
+#include <QmitkStartupDialog.h>
 
 QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack =
   new QmitkExtWorkbenchWindowAdvisorHack();
@@ -88,6 +89,70 @@ QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack
 QString QmitkExtWorkbenchWindowAdvisor::QT_SETTINGS_FILENAME = "QtSettings.ini";
 
 static bool USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS = false;
+
+namespace
+{
+  void ExecuteStartupDialog()
+  {
+    QmitkStartupDialog startupDialog;
+
+    if (startupDialog.SkipDialog())
+      return;
+
+    try
+    {
+      if (startupDialog.exec() != QDialog::Accepted)
+        return;
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << e.GetDescription();
+      return;
+    }
+
+    // Create two lists: one for all categories and one subset for visible categories.
+
+    QStringList allCategories = berry::PlatformUI::GetWorkbench()->GetViewRegistry()->GetViewsByCategory().uniqueKeys();
+    QStringList visibleCategories;
+
+    if (startupDialog.UsePreset())
+    {
+      visibleCategories = startupDialog.GetPresetCategories();
+
+      if (visibleCategories.isEmpty()) // "Custom" preset
+      {
+        // Early-out and show the "Tool Bars" preference page instead.
+        QmitkExtWorkbenchWindowAdvisorHack::undohack->onEditPreferences("org.mitk.ToolBarsPreferencePage");
+        return;
+      }
+    }
+    else
+    {
+      visibleCategories = allCategories;
+    }
+
+    // Now set the visibility preferences for all categories and apply them instantly.
+
+    auto prefsService = mitk::CoreServices::GetPreferencesService();
+    auto prefs = prefsService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
+    const auto toolBars = berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows().first()->GetToolBars();
+
+    for (const auto& category : allCategories)
+    {
+      bool isVisible = visibleCategories.contains(category);
+      prefs->PutBool(category.toStdString(), isVisible);
+
+      auto toolBarIter = std::find_if(toolBars.cbegin(), toolBars.cend(), [&category](const QToolBar* toolBar) {
+        return toolBar->objectName() == category;
+      });
+
+      if (toolBarIter != toolBars.cend())
+        (*toolBarIter)->setVisible(isVisible);
+    }
+
+    prefs->Flush();
+  }
+}
 
 class PartListenerForTitle: public berry::IPartListener
 {
@@ -996,6 +1061,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
   {
     configurer->GetWindow()->GetWorkbench()->GetIntroManager()->ShowIntro(GetWindowConfigurer()->GetWindow(), false);
   }
+
+  ExecuteStartupDialog();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onIntro()
@@ -1119,9 +1186,13 @@ void QmitkExtWorkbenchWindowAdvisorHack::onViewNavigator()
   SafeHandleNavigatorView("org.mitk.views.viewnavigator");
 }
 
-void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()
+void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences(const QString& selectedPage)
 {
   QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
+
+  if (!selectedPage.isEmpty())
+    _PreferencesDialog.SetSelectedPage(selectedPage);
+
   _PreferencesDialog.exec();
 }
 

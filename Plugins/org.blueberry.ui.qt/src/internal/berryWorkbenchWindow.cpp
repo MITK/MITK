@@ -649,6 +649,25 @@ IWorkbench* WorkbenchWindow::GetWorkbench() const
   return PlatformUI::GetWorkbench();
 }
 
+QList<QToolBar*> WorkbenchWindow::GetToolBars() const
+{
+  QList<QToolBar*> result;
+
+  if (auto shell = this->GetShell(); shell.IsNotNull())
+  {
+    if (const auto* mainWindow = qobject_cast<QMainWindow*>(shell->GetControl()); mainWindow != nullptr)
+    {
+      for (auto child : mainWindow->children())
+      {
+        if (auto toolBar = qobject_cast<QToolBar*>(child); toolBar != nullptr)
+          result.append(toolBar);
+      }
+    }
+  }
+
+  return result;
+}
+
 IPartService* WorkbenchWindow::GetPartService()
 {
   return &partService;

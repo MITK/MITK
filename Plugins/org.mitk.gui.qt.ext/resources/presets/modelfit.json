@@ -1,0 +1,9 @@
+{
+  "name": "ModelFit",
+  "info": "Display plugins for model fits and their exploration, including:\n\n<ul>\n  <li>A general purpose fitting tool using frequently used generic models and formula parsing</li>\n  <li>Pharmacokinetic analysis for DCE MRI using compartment models</li>\n  <li>Semi-quantitative analysis for dynamic images using non-compartmental approaches</li>\n  <li>Voxel-wise fit visualization for evaluation of fit quality</li>\n</ul>",
+  "ancestor": "Classic",
+  "categories": [
+    "Fitting",
+    "Perfusion"
+  ]
+}

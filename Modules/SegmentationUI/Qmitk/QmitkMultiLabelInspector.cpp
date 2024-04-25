@@ -756,15 +756,16 @@ void QmitkMultiLabelInspector::RemoveGroup()
   if (selectedLabel == nullptr)
     return;
 
-  const auto group = m_Segmentation->GetGroupIndexOfLabel(selectedLabel->GetValue());
+  const auto groupID = m_Segmentation->GetGroupIndexOfLabel(selectedLabel->GetValue());
+  auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
 
-  auto question = QStringLiteral("Do you really want to delete group %1 including all of its labels?").arg(group);
-  auto answer = QMessageBox::question(this, QStringLiteral("Delete group %1").arg(group), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+  auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
+  auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
   if (answer != QMessageBox::Yes)
     return;
 
-  this->RemoveGroupInternal(group);
+  this->RemoveGroupInternal(groupID);
 }
 
 void QmitkMultiLabelInspector::OnDeleteGroup()
@@ -781,9 +782,9 @@ void QmitkMultiLabelInspector::OnDeleteGroup()
   if (groupIDVariant.isValid())
   {
     auto groupID = groupIDVariant.value<mitk::LabelSetImage::GroupIndexType>();
-
-    auto question = QStringLiteral("Do you really want to delete group %1 including all of its labels?").arg(groupID);
-    auto answer = QMessageBox::question(this, QString("Delete group %1").arg(groupID), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
+    auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
+    auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
     if (answer != QMessageBox::Yes)
       return;

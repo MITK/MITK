@@ -199,3 +199,12 @@ mitk::LabelSetImageHelper::SplitLabelValuesByClassNamwe(const LabelSetImage* lab
 
   return result;
 }
+
+std::string mitk::LabelSetImageHelper::CreateDisplayGroupName(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID)
+{
+  const auto groupName = labelSetImage->GetGroupName(groupID);
+  if (groupName.empty())
+    return "Group "+std::to_string(groupID + 1);
+
+  return groupName;
+}

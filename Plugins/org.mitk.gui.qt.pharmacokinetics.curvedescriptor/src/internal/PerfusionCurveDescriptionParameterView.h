@@ -98,8 +98,6 @@ private:
     mitk::Image::Pointer m_selectedImage;
 
 
-    mitk::NodePredicateBase::Pointer m_IsNoMaskImagePredicate;
-    mitk::NodePredicateBase::Pointer m_IsMaskPredicate;
     mitk::NodePredicateBase::Pointer m_isValidTimeSeriesImagePredicate;
 
 };

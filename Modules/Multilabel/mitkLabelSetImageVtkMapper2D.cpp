@@ -157,8 +157,6 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     this->GenerateLookupTable(renderer);
   }
 
-  auto outdatedGroups = GetOutdatedGroups(localStorage, segmentation);
-
   bool isGeometryModified = (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
     (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime());
 
@@ -195,16 +193,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     localStorage->m_LastDataUpdateTime.Modified();
   }
 
-  if (isGeometryModified || (hasValidContent && !localStorage->m_HasValidContent))
-  {
-    //if geometry is outdated or we have valid content again
-    // -> all groups need regeneration
-    outdatedGroups.resize(segmentation->GetNumberOfLayers());
-    std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
-  }
-
   localStorage->m_HasValidContent = hasValidContent;
-
   if (!hasValidContent)
   {
     // early out if there is no intersection of the current rendering geometry
@@ -212,10 +201,27 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     return;
   }
 
+  std::vector<mitk::LabelSetImage::GroupIndexType> outdatedGroups;
+  auto currentTimestep = this->GetTimestep();
+  if (isGeometryModified || (hasValidContent && !localStorage->m_HasValidContent) || localStorage->m_LastTimeStep!= currentTimestep)
+  {
+    //if geometry is outdated or we have valid content again
+    // -> all groups need regeneration
+    outdatedGroups.resize(segmentation->GetNumberOfLayers());
+    std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
+  }
+  else
+  {
+    outdatedGroups = GetOutdatedGroups(localStorage, segmentation);
+  }
+
   if (!outdatedGroups.empty())
   {
     this->GenerateImageSlice(renderer, outdatedGroups);
   }
+
+  localStorage->m_LastTimeStep = currentTimestep;
+
 
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
@@ -746,6 +752,7 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
   m_HasValidContent = false;
   m_NumberOfLayers = 0;
   m_mmPerPixel = nullptr;
+  m_LastTimeStep = 0;
 
   m_OutlineActor->SetMapper(m_OutlineMapper);
   m_OutlineShadowActor->SetMapper(m_OutlineMapper);

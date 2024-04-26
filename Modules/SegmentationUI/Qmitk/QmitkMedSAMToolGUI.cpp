@@ -49,7 +49,7 @@ QmitkMedSAMToolGUI::QmitkMedSAMToolGUI() : QmitkSegWithPreviewToolGUIBase(true)
 
 QmitkMedSAMToolGUI::~QmitkMedSAMToolGUI()
 {
-  auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>(); // check -ashis
+  auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
   if (nullptr != tool)
   {
     tool->SAMStatusMessageEvent -=

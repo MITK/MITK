@@ -128,7 +128,7 @@ void mitk::MedSAMTool::ClearPicks()
   this->SetWorkingPlaneGeometry(nullptr);
 }
 
-std::stringstream mitk::MedSAMTool::GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry)
+std::string mitk::MedSAMTool::GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry) const
 {
   auto geometry = m_BoundingBoxNode->GetData()->GetGeometry();
   mitk::BoundingBox::ConstPointer boundingBox = geometry->GetBoundingBox();
@@ -143,5 +143,5 @@ std::stringstream mitk::MedSAMTool::GetPointsAsCSVString(const mitk::BaseGeometr
     this->Get2DIndicesfrom3DWorld(baseGeometry, geometry->GetIndexToWorldTransform()->TransformPoint(BBmax));
   pointsAndLabels << abs(static_cast<int>(p2D_min[0])) << SPACE << abs(static_cast<int>(p2D_min[1])) << SPACE
                   << abs(static_cast<int>(p2D_max[0])) << SPACE << abs(static_cast<int>(p2D_max[1]));
-  return pointsAndLabels;
+  return pointsAndLabels.str();
 }

@@ -152,28 +152,28 @@ namespace mitk
      * 
      * @return std::vector<std::pair<mitk::Point2D, std::string>> 
      */
-    std::vector<std::pair<mitk::Point2D, std::string>> GetPointsAsVector(const mitk::BaseGeometry*);
+    std::vector<std::pair<mitk::Point2D, std::string>> GetPointsAsVector(const mitk::BaseGeometry *baseGeometry) const;
 
     /**
      * @brief Get the Points from positive and negative pointsets as csv string.
      * 
      * @param baseGeometry 
-     * @return std::stringstream 
+     * @return std::string 
      */
-    virtual std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry);
+    virtual std::string GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry) const;
 
     /**
      * @brief Get the Hash For Current Plane from current working plane geometry.
      * 
      * @return std::string 
      */
-    std::string GetHashForCurrentPlane(const mitk::LevelWindow&);
+    std::string GetHashForCurrentPlane(const mitk::LevelWindow &levelWindow) const;
 
     /**
      * @brief Emits message to connected Listnerers.
      * 
      */
-    void EmitSAMStatusMessageEvent(const std::string&);
+    void EmitSAMStatusMessageEvent(const std::string &status);
 
     /**
      * @brief Cleans up segmentation preview and clears all seeds.
@@ -191,11 +191,11 @@ namespace mitk
     /**
      * @brief Convert 3D world coordinates to 2D indices.
      * 
-     * @param baseGeometry 
-     * @param mitk::Point3D
+     * @param baseGeometry Base Geometry of image
+     * @param mitk::Point3D 3D world coordinates
      * @return mitk::Point2D 
      */
-    static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, const mitk::Point3D&);
+    static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry *baseGeometry, const mitk::Point3D &point3d);
 
     std::unique_ptr<SegmentAnythingPythonService> m_PythonService;
 

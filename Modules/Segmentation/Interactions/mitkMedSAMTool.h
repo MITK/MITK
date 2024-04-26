@@ -47,13 +47,13 @@ namespace mitk
     bool HasPicks() const override;
     void ClearPicks() override;
     void ConnectActionsAndFunctions() override;
-    std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *) override;
+    std::string GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry) const override;
 
     /**
      * @brief Adds bounding box in the render window when clicked.
      * 
      */
-    void OnRenderWindowClicked(StateMachineAction *, InteractionEvent *);
+    void OnRenderWindowClicked(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /**
      * @brief Deletes bounding box from the render window.
@@ -70,13 +70,13 @@ namespace mitk
      * @brief Initializes the Bounding Shape Interactor object
      * 
      */
-    void CreateBoundingShapeInteractor(bool);
+    void CreateBoundingShapeInteractor(bool rotationEnabled);
 
     /**
      * @brief initializes a new bounding shape using the selected image geometry.
      * 
      */
-    mitk::Geometry3D::Pointer InitializeWithImageGeometry(const mitk::BaseGeometry *) const;
+    mitk::Geometry3D::Pointer InitializeWithImageGeometry(const mitk::BaseGeometry *geometry) const;
     DataNode::Pointer m_BoundingBoxNode;
     BoundingShapeInteractor::Pointer m_BoundingShapeInteractor;
   };

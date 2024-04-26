@@ -38,7 +38,23 @@ namespace mitk
       CUDAError
     };
 
-    SegmentAnythingPythonService(std::string, std::string, std::string, unsigned int, std::string);
+    /**
+     * @brief Construct a new Segment Anything Python Service object. Specify working directory,
+     * ViT model type, checkpoint path, gpu id and backend
+     * 
+     * @param workingDir of python process
+     * @param modelType of ViT
+     * @param checkPointPath of specified model type
+     * @param gpuId 
+     * @param backend SAM or MedSAM
+     */
+    SegmentAnythingPythonService(std::string workingDir, std::string modelType,
+                                 std::string checkPointPath, unsigned int gpuId, std::string backend);
+    
+    /**
+     * @brief Destroy the Segment Anything Python Service object. Stop the async python process
+     * and deletes temporary directories
+     */
     ~SegmentAnythingPythonService();
     
     itkSetMacro(MitkTempDir, std::string);
@@ -77,22 +93,22 @@ namespace mitk
      * @brief Writes image as nifity file with unique id (UId) as file name. 
      * 
      */
-    void TransferImageToProcess(const Image*, std::string &UId);
+    void TransferImageToProcess(const Image *inputAtTimeStep, std::string &UId);
 
     /**
      * @brief Writes csv stringstream of points to a csv file for 
      * python daemon to read.
      * 
      */
-    void TransferPointsToProcess(std::stringstream&);
+    void TransferPointsToProcess(const std::string &triggerCSV) const;
 
     /**
      * @brief Waits for output nifity file from the daemon to appear and 
      * reads it as a mitk::Image
      * 
-     * @return Image::Pointer 
+     * @return LabelSetImage::Pointer 
      */
-    LabelSetImage::Pointer RetrieveImageFromProcess(long timeOut= -1);
+    LabelSetImage::Pointer RetrieveImageFromProcess(long timeOut= -1) const;
 
     static Status CurrentStatus;
 
@@ -101,26 +117,26 @@ namespace mitk
      * @brief Runs SAM python daemon using mitk::ProcessExecutor
      * 
      */
-    void start_python_daemon();
+    void start_python_daemon() const;
 
     /**
      * @brief Writes stringstream content into control file.
      * 
      */
-    void WriteControlFile(std::stringstream&);
+    void WriteControlFile(std::string &statusString) const;
 
     /**
      * @brief Create a Temp Dirs
      * 
      */
-    void CreateTempDirs(const std::string&);
+    void CreateTempDirs(const std::string &dirPattern);
 
     /**
      * @brief ITK-based file writer for dumping inputs into python daemon
      *
      */
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKWriter(const itk::Image<TPixel, VImageDimension> *image, std::string& outputFilename);
+    void ITKWriter(const itk::Image<TPixel, VImageDimension> *image, std::string& outputFilename) const;
 
 
     std::string m_MitkTempDir;

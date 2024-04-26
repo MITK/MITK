@@ -28,7 +28,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Install Segment Anything</string>
+        <string>Install Segment Anything with MedSAM</string>
        </property>
       </widget>
      </item>

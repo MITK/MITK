@@ -53,7 +53,7 @@ namespace mitk
     /**
      * @brief  Clears all picks and updates the preview.
      */
-    void ClearPicks();
+    virtual void ClearPicks();
 
     /**
      * @brief Checks if any point exists in the either
@@ -61,7 +61,7 @@ namespace mitk
      * 
      * @return bool 
      */
-    bool HasPicks() const;
+    virtual bool HasPicks() const;
 
     itkSetMacro(MitkTempDir, std::string);
     itkGetConstMacro(MitkTempDir, std::string);
@@ -74,6 +74,9 @@ namespace mitk
 
     itkSetMacro(CheckpointPath, std::string);
     itkGetConstMacro(CheckpointPath, std::string);
+
+    itkSetMacro(Backend, std::string);
+    itkGetConstMacro(Backend, std::string);
 
     itkSetMacro(GpuId, int);
     itkGetConstMacro(GpuId, int);
@@ -149,28 +152,28 @@ namespace mitk
      * 
      * @return std::vector<std::pair<mitk::Point2D, std::string>> 
      */
-    std::vector<std::pair<mitk::Point2D, std::string>> GetPointsAsVector(const mitk::BaseGeometry*);
+    std::vector<std::pair<mitk::Point2D, std::string>> GetPointsAsVector(const mitk::BaseGeometry *baseGeometry) const;
 
     /**
      * @brief Get the Points from positive and negative pointsets as csv string.
      * 
      * @param baseGeometry 
-     * @return std::stringstream 
+     * @return std::string 
      */
-    std::stringstream GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry);
+    virtual std::string GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry) const;
 
     /**
      * @brief Get the Hash For Current Plane from current working plane geometry.
      * 
      * @return std::string 
      */
-    std::string GetHashForCurrentPlane(const mitk::LevelWindow&);
+    std::string GetHashForCurrentPlane(const mitk::LevelWindow &levelWindow) const;
 
     /**
      * @brief Emits message to connected Listnerers.
      * 
      */
-    void EmitSAMStatusMessageEvent(const std::string&);
+    void EmitSAMStatusMessageEvent(const std::string &status);
 
     /**
      * @brief Cleans up segmentation preview and clears all seeds.
@@ -185,20 +188,23 @@ namespace mitk
     template <typename TPixel, unsigned int VImageDimension>
     void ITKWindowing(const itk::Image<TPixel, VImageDimension>*, mitk::Image*, ScalarType, ScalarType);
 
-  private:
     /**
      * @brief Convert 3D world coordinates to 2D indices.
      * 
-     * @param baseGeometry 
-     * @param mitk::Point3D
+     * @param baseGeometry Base Geometry of image
+     * @param mitk::Point3D 3D world coordinates
      * @return mitk::Point2D 
      */
-    static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry*, const mitk::Point3D&);
+    static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry *baseGeometry, const mitk::Point3D &point3d);
 
+    std::unique_ptr<SegmentAnythingPythonService> m_PythonService;
+
+  private:
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_ModelType;
     std::string m_CheckpointPath;
+    std::string m_Backend;
     int m_GpuId = 0;
     PointSet::Pointer m_PointSetPositive;
     PointSet::Pointer m_PointSetNegative;
@@ -208,7 +214,6 @@ namespace mitk
     bool m_IsReady = false;
     int m_PointSetCount = 0;
     long m_TimeOutLimit = -1;
-    std::unique_ptr<SegmentAnythingPythonService> m_PythonService;
     const Label::PixelType MASK_VALUE = 1;
   };
 } // namespace

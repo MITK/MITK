@@ -37,10 +37,11 @@ namespace mitk
 }
 
 mitk::SegmentAnythingPythonService::SegmentAnythingPythonService(
-  std::string workingDir, std::string modelType, std::string checkPointPath, unsigned int gpuId)
+  std::string workingDir, std::string modelType, std::string checkPointPath, unsigned int gpuId, std::string backend)
   : m_PythonPath(workingDir),
     m_ModelType(modelType),
     m_CheckpointPath(checkPointPath),
+    m_Backend(backend),
     m_GpuId(gpuId)
 {
   this->CreateTempDirs(PARENT_TEMP_DIR_PATTERN);
@@ -89,9 +90,7 @@ void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object*, cons
 
 void mitk::SegmentAnythingPythonService::StopAsyncProcess()
 {
-  std::stringstream controlStream;
-  controlStream << SIGNALCONSTANTS::KILL;
-  this->WriteControlFile(controlStream);
+  this->WriteControlFile(SIGNALCONSTANTS::KILL);
   m_DaemonExec->SetStop(true);
   m_Future.get();
 }
@@ -106,9 +105,7 @@ void mitk::SegmentAnythingPythonService::StartAsyncProcess()
   {
     this->CreateTempDirs(PARENT_TEMP_DIR_PATTERN);
   }
-  std::stringstream controlStream;
-  controlStream << SIGNALCONSTANTS::READY;
-  this->WriteControlFile(controlStream);
+  this->WriteControlFile(SIGNALCONSTANTS::READY);
   double timeout = 1;
   m_DaemonExec = SegmentAnythingProcessExecutor::New(timeout);
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
@@ -117,26 +114,26 @@ void mitk::SegmentAnythingPythonService::StartAsyncProcess()
   m_Future = std::async(std::launch::async, &mitk::SegmentAnythingPythonService::start_python_daemon, this);
   }
 
-void mitk::SegmentAnythingPythonService::TransferPointsToProcess(std::stringstream &triggerCSV)
+void mitk::SegmentAnythingPythonService::TransferPointsToProcess(const std::string &triggerCSV) const
 {
   this->CheckStatus();
   std::string triggerFilePath = m_InDir + IOUtil::GetDirectorySeparator() + TRIGGER_FILENAME;
   std::ofstream csvfile;
   csvfile.open(triggerFilePath, std::ofstream::out | std::ofstream::trunc);
-  csvfile << triggerCSV.rdbuf();
+  csvfile << triggerCSV;
   csvfile.close();
 }
 
-void mitk::SegmentAnythingPythonService::WriteControlFile(std::stringstream &statusStream)
+void mitk::SegmentAnythingPythonService::WriteControlFile(const std::string &statusString) const
 {
   std::string controlFilePath = m_InDir + IOUtil::GetDirectorySeparator() + "control.txt";
   std::ofstream controlFile;
   controlFile.open(controlFilePath, std::ofstream::out | std::ofstream::trunc);
-  controlFile << statusStream.rdbuf();
+  controlFile << statusString;
   controlFile.close();
 }
 
-void mitk::SegmentAnythingPythonService::start_python_daemon()
+void mitk::SegmentAnythingPythonService::start_python_daemon() const
 {
   ProcessExecutor::ArgumentListType args;
   std::string command = "python";
@@ -158,6 +155,9 @@ void mitk::SegmentAnythingPythonService::start_python_daemon()
 
   args.push_back("--checkpoint");
   args.push_back(m_CheckpointPath);
+
+  args.push_back("--backend");
+  args.push_back(m_Backend);
 
   args.push_back("--device");
   if (m_GpuId == -1)
@@ -210,7 +210,7 @@ void mitk::SegmentAnythingPythonService::CreateTempDirs(const std::string &dirPa
   m_OutDir = IOUtil::CreateTemporaryDirectory("sam-out-XXXXXX", m_MitkTempDir);
 }
 
-mitk::LabelSetImage::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProcess(long timeOut)
+mitk::LabelSetImage::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProcess(long timeOut) const
 {
   std::string outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + m_CurrentUId + ".nrrd";
   auto start = sys_clock::now();
@@ -245,7 +245,7 @@ void mitk::SegmentAnythingPythonService::TransferImageToProcess(const Image *inp
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::SegmentAnythingPythonService::ITKWriter(const itk::Image<TPixel, VImageDimension> *image, std::string& outputFilename)
+void mitk::SegmentAnythingPythonService::ITKWriter(const itk::Image<TPixel, VImageDimension> *image, std::string& outputFilename) const
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::ImageFileWriter<ImageType> WriterType;

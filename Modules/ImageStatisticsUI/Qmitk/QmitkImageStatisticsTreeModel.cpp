@@ -412,7 +412,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       }
       else
       {
-        imageItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, imageLabel, isWIP, true, m_RootItem.get(), image);
+        imageItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, imageLabel, isWIP, false, m_RootItem.get(), image);
       }
       m_RootItem->appendChild(imageItem);
       dataNodeToTreeItem.emplace(image, imageItem);

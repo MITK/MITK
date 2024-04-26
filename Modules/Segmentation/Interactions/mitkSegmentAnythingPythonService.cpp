@@ -90,9 +90,7 @@ void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object*, cons
 
 void mitk::SegmentAnythingPythonService::StopAsyncProcess()
 {
-  std::stringstream controlStream;
-  controlStream << SIGNALCONSTANTS::KILL;
-  this->WriteControlFile(controlStream.str());
+  this->WriteControlFile(SIGNALCONSTANTS::KILL);
   m_DaemonExec->SetStop(true);
   m_Future.get();
 }
@@ -107,9 +105,7 @@ void mitk::SegmentAnythingPythonService::StartAsyncProcess()
   {
     this->CreateTempDirs(PARENT_TEMP_DIR_PATTERN);
   }
-  std::stringstream controlStream;
-  controlStream << SIGNALCONSTANTS::READY;
-  this->WriteControlFile(controlStream.str());
+  this->WriteControlFile(SIGNALCONSTANTS::READY);
   double timeout = 1;
   m_DaemonExec = SegmentAnythingProcessExecutor::New(timeout);
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
@@ -128,7 +124,7 @@ void mitk::SegmentAnythingPythonService::TransferPointsToProcess(const std::stri
   csvfile.close();
 }
 
-void mitk::SegmentAnythingPythonService::WriteControlFile(std::string &statusString) const
+void mitk::SegmentAnythingPythonService::WriteControlFile(const std::string &statusString) const
 {
   std::string controlFilePath = m_InDir + IOUtil::GetDirectorySeparator() + "control.txt";
   std::ofstream controlFile;

@@ -123,7 +123,7 @@ namespace mitk
      * @brief Writes stringstream content into control file.
      * 
      */
-    void WriteControlFile(std::string &statusString) const;
+    void WriteControlFile(const std::string &statusString) const;
 
     /**
      * @brief Create a Temp Dirs

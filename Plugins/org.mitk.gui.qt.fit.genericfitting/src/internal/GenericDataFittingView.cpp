@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include "mitkTwoStepLinearModelParameterizer.h"
 #include "mitkThreeStepLinearModelFactory.h"
 #include "mitkThreeStepLinearModelParameterizer.h"
+#include <mitkLabelSetImageConverter.h>
 
 #include <mitkValueBasedParameterizationDelegate.h>
 
@@ -94,6 +95,8 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
   connect(m_Controls.radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
 
+  connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnImageNodeSelectionChanged);
+  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnMaskNodeSelectionChanged);
   connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnNodeSelectionChanged);
   connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnNodeSelectionChanged);
 
@@ -398,10 +401,8 @@ void GenericDataFittingView::OnModellingButtonClicked()
 }
 
 
-void GenericDataFittingView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
+void GenericDataFittingView::OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
-  m_selectedMaskNode = nullptr;
-  m_selectedMask = nullptr;
 
   if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
   {
@@ -424,22 +425,36 @@ void GenericDataFittingView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointe
     this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
   }
 
+  UpdateGUIControls();
+}
+
+void GenericDataFittingView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
+{
+  m_selectedMaskNode = nullptr;
+  m_selectedMask = nullptr;
 
   if (m_Controls.maskNodeSelector->GetSelectedNode().IsNotNull())
   {
     this->m_selectedMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
-    this->m_selectedMask = dynamic_cast<mitk::Image*>(m_selectedMaskNode->GetData());
+    auto selectedLabelSetMask = dynamic_cast<mitk::LabelSetImage*>(m_selectedMaskNode->GetData());
+
+    if (selectedLabelSetMask != nullptr)
+    {
+      if (selectedLabelSetMask->GetAllLabelValues().size() > 1)
+      {
+        MITK_INFO << "Selected mask has multiple labels. Only use first used to mask the model fit.";
+      }
+      this->m_selectedMask = mitk::CreateLabelMask(selectedLabelSetMask, selectedLabelSetMask->GetAllLabelValues().front(), true);
+    }
+
 
     if (this->m_selectedMask.IsNotNull() && this->m_selectedMask->GetTimeSteps() > 1)
     {
       MITK_INFO <<
         "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
-        m_Controls.maskNodeSelector->GetSelectedNode()->GetName();
-      mitk::ImageTimeSelector::Pointer maskedImageTimeSelector = mitk::ImageTimeSelector::New();
-      maskedImageTimeSelector->SetInput(this->m_selectedMask);
-      maskedImageTimeSelector->SetTimeNr(0);
-      maskedImageTimeSelector->UpdateLargestPossibleRegion();
-      this->m_selectedMask = maskedImageTimeSelector->GetOutput();
+      m_Controls.maskNodeSelector->GetSelectedNode()->GetName();
+      this->m_selectedMask = SelectImageByTimeStep(m_selectedMask, 0);
+
     }
   }
 
@@ -448,9 +463,29 @@ void GenericDataFittingView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointe
     this->m_Controls.radioPixelBased->setChecked(true);
   }
 
-
   UpdateGUIControls();
 }
+
+void GenericDataFittingView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
+{
+
+  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
+  {
+    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
+    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+    const mitk::BaseGeometry* refGeometry = nullptr;
+    if (nullptr != m_selectedImage)
+    {
+      refGeometry = m_selectedImage->GetGeometry();
+    }
+
+    m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(refGeometry));
+
+    UpdateGUIControls();
+  }
+}
+
+
 
 bool GenericDataFittingView::CheckModelSettings() const
 {
@@ -650,6 +685,7 @@ GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
 
 
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
+
   auto isDynamicData = mitk::NodePredicateFunction::New([](const mitk::DataNode* node)
   {
     return  (node && node->GetData() && node->GetData()->GetTimeSteps() > 1);

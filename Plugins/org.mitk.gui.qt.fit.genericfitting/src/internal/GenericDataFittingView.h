@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <QString>
 
 #include "QmitkAbstractView.h"
-
 #include "itkCommand.h"
 
 #include "ui_GenericDataFittingViewControls.h"
@@ -104,6 +103,10 @@ protected:
   bool CheckModelSettings() const;
 
   void InitModelComboBox() const;
+
+  void OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
+
+  void OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 
   void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 

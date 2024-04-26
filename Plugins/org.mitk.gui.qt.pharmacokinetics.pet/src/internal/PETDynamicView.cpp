@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include "mitkTwoTissueCompartmentFDGModelParameterizer.h"
 #include "mitkTwoTissueCompartmentModelFactory.h"
 #include "mitkTwoTissueCompartmentModelParameterizer.h"
+#include <mitkLabelSetImageConverter.h>
 
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
@@ -32,6 +33,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
 #include "mitkNodePredicateFunction.h"
+#include <mitkMultiLabelPredicateHelper.h>
 #include <mitkPixelBasedParameterFitImageGenerator.h>
 #include <mitkROIBasedParameterFitImageGenerator.h>
 #include <mitkLevenbergMarquardtModelFitFunctor.h>
@@ -92,15 +94,17 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
   m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
   m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
-  m_Controls.maskNodeSelector->SetNodePredicate(this->m_IsMaskPredicate);
+  m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
   m_Controls.maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
 
 
+  connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnImageNodeSelectionChanged);
+  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnMaskNodeSelectionChanged);
   connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnNodeSelectionChanged);
+  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnNodeSelectionChanged);
 
-  connect(m_Controls.maskNodeSelector,&QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnNodeSelectionChanged);
 
   connect(m_Controls.AIFMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::UpdateGUIControls);
 
@@ -121,7 +125,7 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
   m_Controls.aifFilePath->setVisible(false);
   m_Controls.radioAIFImage->setChecked(true);
   m_Controls.AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
+  m_Controls.AIFMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls.AIFMaskNodeSelector->setVisible(true);
   m_Controls.AIFMaskNodeSelector->setEnabled(true);
   m_Controls.AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
@@ -389,10 +393,8 @@ void PETDynamicView::OnModellingButtonClicked()
   }
 }
 
-void PETDynamicView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
+void PETDynamicView::OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
-  m_selectedMaskNode = nullptr;
-  m_selectedMask = nullptr;
 
   if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
   {
@@ -416,21 +418,37 @@ void PETDynamicView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*node
   }
 
 
+  UpdateGUIControls();
+}
+
+
+void PETDynamicView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
+{
+  m_selectedMaskNode = nullptr;
+  m_selectedMask = nullptr;
+
   if (m_Controls.maskNodeSelector->GetSelectedNode().IsNotNull())
   {
     this->m_selectedMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
-    this->m_selectedMask = dynamic_cast<mitk::Image*>(m_selectedMaskNode->GetData());
+    auto selectedLabelSetMask = dynamic_cast<mitk::LabelSetImage*>(m_selectedMaskNode->GetData());
+
+    if (selectedLabelSetMask != nullptr)
+    {
+      if (selectedLabelSetMask->GetAllLabelValues().size() > 1)
+      {
+        MITK_INFO << "Selected mask has multiple labels. Only use first used to mask the model fit.";
+      }
+      this->m_selectedMask = mitk::CreateLabelMask(selectedLabelSetMask, selectedLabelSetMask->GetAllLabelValues().front(), true);
+    }
+
 
     if (this->m_selectedMask.IsNotNull() && this->m_selectedMask->GetTimeSteps() > 1)
     {
       MITK_INFO <<
         "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
         m_Controls.maskNodeSelector->GetSelectedNode()->GetName();
-      mitk::ImageTimeSelector::Pointer maskedImageTimeSelector = mitk::ImageTimeSelector::New();
-      maskedImageTimeSelector->SetInput(this->m_selectedMask);
-      maskedImageTimeSelector->SetTimeNr(0);
-      maskedImageTimeSelector->UpdateLargestPossibleRegion();
-      this->m_selectedMask = maskedImageTimeSelector->GetOutput();
+      this->m_selectedMask = SelectImageByTimeStep(m_selectedMask, 0);
+
     }
   }
 
@@ -439,9 +457,31 @@ void PETDynamicView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*node
     this->m_Controls.radioPixelBased->setChecked(true);
   }
 
-
   UpdateGUIControls();
 }
+
+void PETDynamicView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
+{
+
+  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
+  {
+    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
+    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+    const mitk::BaseGeometry* refGeometry = nullptr;
+    if (nullptr != m_selectedImage)
+    {
+      refGeometry = m_selectedImage->GetGeometry();
+    }
+
+    m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(refGeometry));
+
+    UpdateGUIControls();
+  }
+}
+
+
+
+
 
 bool PETDynamicView::CheckModelSettings() const
 {
@@ -656,8 +696,6 @@ void PETDynamicView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
 {
   std::stringstream message;
   message << "<font color='green'>" << "Fitting Data Set . . ." << "</font>";
- // m_Controls.errorMessageLabel->setText(message.str().c_str());
-  //m_Controls.errorMessageLabel->show();
 
   /////////////////////////
   //create job and put it into the thread pool
@@ -695,17 +733,9 @@ PETDynamicView::PETDynamicView() : m_FittingInProgress(false)
     factory = mitk::TwoTissueCompartmentFDGModelFactory::New().GetPointer();
     m_FactoryStack.push_back(factory);
 
+   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
 
-  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
-  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
-  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
-  mitk::NodePredicateOr::Pointer isMask = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
-  mitk::NodePredicateAnd::Pointer isNoMask = mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isMask));
-
-  this->m_IsMaskPredicate = mitk::NodePredicateAnd::New(isMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
-
-  this->m_IsNoMaskImagePredicate = mitk::NodePredicateAnd::New(isNoMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+  auto isNoMask = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
 
   auto isDynamicData = mitk::NodePredicateFunction::New([](const mitk::DataNode* node)
   {

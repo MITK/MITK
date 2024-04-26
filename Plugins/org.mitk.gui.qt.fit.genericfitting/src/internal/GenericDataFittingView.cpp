@@ -36,6 +36,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
 #include "mitkNodePredicateFunction.h"
+#include <mitkMultiLabelPredicateHelper.h>
 #include <mitkPixelBasedParameterFitImageGenerator.h>
 #include <mitkROIBasedParameterFitImageGenerator.h>
 #include <mitkLevenbergMarquardtModelFitFunctor.h>
@@ -82,7 +83,7 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
   m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
   m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
-  m_Controls.maskNodeSelector->SetNodePredicate(this->m_IsMaskPredicate);
+  m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
   m_Controls.maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
@@ -647,15 +648,6 @@ GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
   factory = mitk::ThreeStepLinearModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
 
-  this->m_IsNotABinaryImagePredicate = mitk::NodePredicateAnd::New(
-                                         mitk::TNodePredicateDataType<mitk::Image>::New(),
-                                         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary",
-                                             mitk::BoolProperty::New(true))),
-                                         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
-  this->m_IsBinaryImagePredicate = mitk::NodePredicateAnd::New(
-                                     mitk::TNodePredicateDataType<mitk::Image>::New(),
-                                     mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)),
-                                     mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
   auto isDynamicData = mitk::NodePredicateFunction::New([](const mitk::DataNode* node)
@@ -663,13 +655,7 @@ GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
     return  (node && node->GetData() && node->GetData()->GetTimeSteps() > 1);
   });
 
-  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
-  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
-  mitk::NodePredicateOr::Pointer isMask = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
-  mitk::NodePredicateAnd::Pointer isNoMask = mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isMask));
-
-  this->m_IsMaskPredicate = mitk::NodePredicateAnd::New(isMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+  auto isNoMask = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
 
   this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);
 }

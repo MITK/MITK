@@ -143,10 +143,6 @@ private:
   /**Returns the current set name of the fit (either default name or use defined name).*/
   std::string GetFitName() const;
 
-  mitk::NodePredicateBase::Pointer m_IsNotABinaryImagePredicate;
-  mitk::NodePredicateBase::Pointer m_IsBinaryImagePredicate;
-  //mitk::NodePredicateBase::Pointer m_IsNoMaskImagePredicate;
-  mitk::NodePredicateBase::Pointer m_IsMaskPredicate;
   mitk::NodePredicateBase::Pointer m_isValidTimeSeriesImagePredicate;
 
 };

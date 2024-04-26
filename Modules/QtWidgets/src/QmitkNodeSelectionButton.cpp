@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <vtkMitkLevelWindowFilter.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPropertyNameHelper.h>
+#include <mitkLabelSetImage.h>
 
 // mitk qt widgets module
 #include <QmitkNodeDescriptorManager.h>
@@ -36,7 +37,16 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
     return QPixmap();
   }
 
-  const mitk::Image* image = dynamic_cast<const mitk::Image*>(dataNode->GetData());
+  const mitk::Image* image = nullptr;
+
+  const mitk::LabelSetImage* segmentation = dynamic_cast<const mitk::LabelSetImage*>(dataNode->GetData());
+  if (nullptr != segmentation && segmentation->GetNumberOfLayers()>0)
+  {
+    image = segmentation->GetGroupImage(0);
+  }
+
+  if (nullptr == image) image = dynamic_cast<const mitk::Image*>(dataNode->GetData());
+
   if ((nullptr == image || !image->IsInitialized()) || // -> must be an image
     (image->GetPixelType().GetNumberOfComponents() != 1)) // -> for now only single component are allowed
   {
@@ -53,7 +63,7 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 
   mitk::ExtractSliceFilter::Pointer extractSliceFilter = mitk::ExtractSliceFilter::New();
   extractSliceFilter->SetInput(image);
-  extractSliceFilter->SetInterpolationMode(mitk::ExtractSliceFilter::RESLICE_CUBIC);
+  extractSliceFilter->SetInterpolationMode(mitk::ExtractSliceFilter::RESLICE_NEAREST);
   extractSliceFilter->SetResliceTransformByGeometry(image->GetGeometry());
   extractSliceFilter->SetWorldGeometry(planeGeometry);
   extractSliceFilter->SetOutputDimensionality(2);
@@ -62,14 +72,23 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 
   vtkImageData* imageData = extractSliceFilter->GetVtkOutput();
 
-  mitk::LevelWindow levelWindow;
-  dataNode->GetLevelWindow(levelWindow);
   vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
-  lookupTable->SetRange(levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound());
-  lookupTable->SetSaturationRange(0.0, 0.0);
-  lookupTable->SetValueRange(0.0, 1.0);
-  lookupTable->SetHueRange(0.0, 0.0);
-  lookupTable->SetRampToLinear();
+
+  if (nullptr != segmentation)
+  {
+    lookupTable->DeepCopy(const_cast<vtkLookupTable*>(segmentation->GetLookupTable()->GetVtkLookupTable().GetPointer()));
+    lookupTable->SetTableValue(0, 0., 0., 0.);
+  }
+  else
+  {
+    mitk::LevelWindow levelWindow;
+    dataNode->GetLevelWindow(levelWindow);
+    lookupTable->SetRange(levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound());
+    lookupTable->SetSaturationRange(0.0, 0.0);
+    lookupTable->SetValueRange(0.0, 1.0);
+    lookupTable->SetHueRange(0.0, 0.0);
+    lookupTable->SetRampToLinear();
+  }
 
   vtkSmartPointer<vtkMitkLevelWindowFilter> levelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();
   levelWindowFilter->SetLookupTable(lookupTable);

@@ -290,7 +290,7 @@ Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow sett
 
 \imageMacro{QmitkSegmentation_nnUnetTool.png,"MedSAM tool",10.00}
 
-\imageMacro{QmitkSegmentation_SAMTool.png,"MedSAM tool",10.00}
+\imageMacro{QmitkSegmentation_MedSAMTool.png,"MedSAM tool",10.00}
 
 The MedSAM (Segment Anything in Medical Images) tool is a specialization of the the Segment Anything (SAM) tool. A new foundation model in the back end is dedicated to universal medical image segmentation.
 Just like the Segment Anything tool, the MedSAM tool requires that you have Python 3 installed and available on your machine. Note: On Debian/Ubuntu systems, you need to install the git, python3-pip, and python3-venv packages using the following command: `sudo apt install git python3-pip python3-venv`. 

@@ -176,9 +176,11 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     localStorage->m_WorldPlane = rendererGeometryIsValid ? worldGeometry->Clone() : nullptr;
   }
 
-  bool hasValidContent = rendererGeometryIsValid && RenderingGeometryIntersectsImage(localStorage->m_WorldPlane, segmentation->GetSlicedGeometry());
+  const bool hasValidContent = rendererGeometryIsValid && RenderingGeometryIntersectsImage(localStorage->m_WorldPlane, segmentation->GetSlicedGeometry());
+  const bool contentBecameValid = hasValidContent && !localStorage->m_HasValidContent;
+  const bool contentBecameInvalid = !hasValidContent && localStorage->m_HasValidContent;
 
-  if (!hasValidContent && localStorage->m_HasValidContent)
+  if (contentBecameInvalid)
   {
     // set image to nullptr, to clear the texture in 3D, because
     // the latest image is used there if the plane is out of the geometry
@@ -203,7 +205,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
   std::vector<mitk::LabelSetImage::GroupIndexType> outdatedGroups;
   auto currentTimestep = this->GetTimestep();
-  if (isGeometryModified || (hasValidContent && !localStorage->m_HasValidContent) || localStorage->m_LastTimeStep!= currentTimestep)
+  if (isGeometryModified || contentBecameValid || localStorage->m_LastTimeStep!= currentTimestep)
   {
     //if geometry is outdated or we have valid content again
     // -> all groups need regeneration

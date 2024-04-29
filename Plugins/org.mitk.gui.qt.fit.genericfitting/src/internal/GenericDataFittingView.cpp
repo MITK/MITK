@@ -412,10 +412,12 @@ void GenericDataFittingView::OnImageNodeSelectionChanged(QList<mitk::DataNode::P
     if (m_selectedImage)
     {
       this->m_Controls.initialValuesManager->setReferenceImageGeometry(m_selectedImage->GetGeometry());
+      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_selectedImage->GetGeometry()));
     }
     else
     {
       this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
+      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(nullptr));
     }
   }
   else

@@ -119,7 +119,7 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  if (this->GetTimestep() == -1)
+  if (this->GetTimestep() == TIMESTEP_INVALID)
   {
     return;
   }

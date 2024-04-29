@@ -97,8 +97,8 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnImageNodeSelectionChanged);
   connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnMaskNodeSelectionChanged);
-  connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnNodeSelectionChanged);
-  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnNodeSelectionChanged);
+  //connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnNodeSelectionChanged);
+  //connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnNodeSelectionChanged);
 
 
   //Generic setting
@@ -466,25 +466,6 @@ void GenericDataFittingView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Po
   }
 
   UpdateGUIControls();
-}
-
-void GenericDataFittingView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
-{
-
-  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
-  {
-    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
-    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    const mitk::BaseGeometry* refGeometry = nullptr;
-    if (nullptr != m_selectedImage)
-    {
-      refGeometry = m_selectedImage->GetGeometry();
-    }
-
-    m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(refGeometry));
-
-    UpdateGUIControls();
-  }
 }
 
 

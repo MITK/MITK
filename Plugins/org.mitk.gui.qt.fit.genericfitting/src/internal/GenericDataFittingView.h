@@ -108,7 +108,6 @@ protected:
 
   void OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 
-  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 
   // Variables
 

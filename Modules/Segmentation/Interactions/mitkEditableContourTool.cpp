@@ -34,6 +34,7 @@ void mitk::EditableContourTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("FinishContour", OnFinish);
   CONNECT_FUNCTION("CtrlMovePoint", OnMouseMoved);
   CONNECT_CONDITION("InsideCorrectPlane", OnCheckPlane);
+  CONNECT_CONDITION("EnoughDistanceToControlPoint", OnCheckDistanceToControlPoint);
 }
 
 void mitk::EditableContourTool::Activated()
@@ -359,6 +360,23 @@ bool mitk::EditableContourTool::OnCheckPlane(const InteractionEvent* interaction
   }
 
   return true;
+}
+
+bool mitk::EditableContourTool::OnCheckDistanceToControlPoint(const InteractionEvent* interactionEvent)
+{
+  auto positionEvent = dynamic_cast<const mitk::InteractionPositionEvent*>(interactionEvent);
+
+  if (nullptr != positionEvent && m_PlaneGeometry.IsNotNull())
+  {
+    const auto contour = this->GetContour();
+    const auto lastVertex = contour->GetVertexAt(contour->GetNumberOfVertices()-1);
+
+    const auto voxelSize = m_PlaneGeometry->GetSpacing().GetNorm();
+
+    return lastVertex->Coordinates.EuclideanDistanceTo(positionEvent->GetPositionInWorld()) > voxelSize;
+  }
+
+  return false;
 }
 
 void mitk::EditableContourTool::ReleaseHelperObjects(bool includeWorkingContour)

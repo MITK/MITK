@@ -160,6 +160,11 @@ void mitk::SegmentAnythingTool::OnAddPositivePoint(StateMachineAction *, Interac
   {
     m_IsGenerateEmbeddings = true;
     this->ClearSeeds();
+    auto previewImage = this->GetPreviewSegmentation();
+    for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
+    {
+      this->ResetPreviewContentAtTimeStep(timeStep);
+    }
     this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
   }
   if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())

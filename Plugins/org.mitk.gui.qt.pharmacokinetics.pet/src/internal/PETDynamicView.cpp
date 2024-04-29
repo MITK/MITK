@@ -102,8 +102,6 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnImageNodeSelectionChanged);
   connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnMaskNodeSelectionChanged);
-  connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnNodeSelectionChanged);
-  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnNodeSelectionChanged);
 
 
   connect(m_Controls.AIFMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::UpdateGUIControls);
@@ -404,10 +402,12 @@ void PETDynamicView::OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer>/
     if (m_selectedImage)
     {
       this->m_Controls.initialValuesManager->setReferenceImageGeometry(m_selectedImage->GetGeometry());
+      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_selectedImage->GetGeometry()));
     }
     else
     {
       this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
+      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(nullptr));
     }
   }
   else
@@ -458,25 +458,6 @@ void PETDynamicView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*
   }
 
   UpdateGUIControls();
-}
-
-void PETDynamicView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
-{
-
-  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
-  {
-    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
-    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    const mitk::BaseGeometry* refGeometry = nullptr;
-    if (nullptr != m_selectedImage)
-    {
-      refGeometry = m_selectedImage->GetGeometry();
-    }
-
-    m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(refGeometry));
-
-    UpdateGUIControls();
-  }
 }
 
 

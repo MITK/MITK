@@ -98,6 +98,14 @@ void mitk::ImageLiveWireContourModelFilter::GenerateData()
   input->GetGeometry()->WorldToIndex(m_StartPoint, m_StartPointInIndex);
   input->GetGeometry()->WorldToIndex(m_EndPoint, m_EndPointInIndex);
 
+  m_StartPointInIndex[0] = std::round(m_StartPointInIndex[0]);
+  m_StartPointInIndex[1] = std::round(m_StartPointInIndex[1]);
+  m_StartPointInIndex[2] = std::round(m_StartPointInIndex[2]);
+
+  m_EndPointInIndex[0] = std::round(m_EndPointInIndex[0]);
+  m_EndPointInIndex[1] = std::round(m_EndPointInIndex[1]);
+  m_EndPointInIndex[2] = std::round(m_EndPointInIndex[2]);
+
   // only start calculating if both indices are inside image geometry
   if (input->GetGeometry()->IsIndexInside(this->m_StartPointInIndex) &&
       input->GetGeometry()->IsIndexInside(this->m_EndPointInIndex))

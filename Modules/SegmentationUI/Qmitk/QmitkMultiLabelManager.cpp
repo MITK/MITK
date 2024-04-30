@@ -107,9 +107,6 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   auto* deleteLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_D), this);
   connect(deleteLabelShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::DeleteLabelInstance);
 
-  auto* deleteLabelShortcut2 = new QShortcut(QKeySequence(Qt::Key::Key_Delete), this);
-  connect(deleteLabelShortcut2, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::DeleteLabelInstance);
-
   this->UpdateControls();
 }
 

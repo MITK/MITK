@@ -371,9 +371,17 @@ bool mitk::EditableContourTool::OnCheckDistanceToControlPoint(const InteractionE
     const auto contour = this->GetContour();
     const auto lastVertex = contour->GetVertexAt(contour->GetNumberOfVertices()-1);
 
-    const auto voxelSize = m_PlaneGeometry->GetSpacing().GetNorm();
+    const auto xSize = m_PlaneGeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).magnitude();
+    const auto ySize = m_PlaneGeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1).magnitude();
 
-    return lastVertex->Coordinates.EuclideanDistanceTo(positionEvent->GetPositionInWorld()) > voxelSize;
+    Point2D lastVertex2D;
+    m_PlaneGeometry->Map(lastVertex->Coordinates, lastVertex2D);
+    Point2D position2D;
+    m_PlaneGeometry->Map(positionEvent->GetPositionInWorld(), position2D);
+
+    auto distance = lastVertex2D - position2D;
+
+    return std::abs(distance[0]) > xSize || std::abs(distance[1]) > ySize;
   }
 
   return false;

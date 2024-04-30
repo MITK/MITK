@@ -305,7 +305,9 @@ void mitk::EditableContourTool::OnMouseMoved(StateMachineAction*, InteractionEve
   }
 
   this->UpdatePreviewContour(positionEvent->GetPositionInWorld());
-  this->UpdateClosureContour(positionEvent->GetPositionInWorld());
+
+  auto endPoint = m_PreviewContour->GetNumberOfVertices()==0 ? positionEvent->GetPositionInWorld() : m_PreviewContour->GetVertexAt(m_PreviewContour->GetNumberOfVertices() - 1)->Coordinates;
+  this->UpdateClosureContour(endPoint);
 
   RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }

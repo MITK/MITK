@@ -346,6 +346,7 @@ void QmitkSegmentationView::OnLabelToggleShortcutActivated()
   }
 
   workingImage->SetActiveLabel(*it);
+  m_Controls->multiLabelWidget->SetSelectedLabel(*it);
   this->WaitCursorOff();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -538,7 +539,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // *------------------------
    QShortcut* visibilityShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_H), parent);
    connect(visibilityShortcut, &QShortcut::activated, this, &Self::OnVisibilityShortcutActivated);
-   QShortcut* labelToggleShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), parent);
+   QShortcut* labelToggleShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_N), parent);
    connect(labelToggleShortcut, &QShortcut::activated, this, &Self::OnLabelToggleShortcutActivated);
 
    // *------------------------

@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include "mitkTwoStepLinearModelParameterizer.h"
 #include "mitkThreeStepLinearModelFactory.h"
 #include "mitkThreeStepLinearModelParameterizer.h"
+#include <mitkLabelSetImageConverter.h>
 
 #include <mitkValueBasedParameterizationDelegate.h>
 
@@ -35,6 +36,8 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
+#include "mitkNodePredicateFunction.h"
+#include <mitkMultiLabelPredicateHelper.h>
 #include <mitkPixelBasedParameterFitImageGenerator.h>
 #include <mitkROIBasedParameterFitImageGenerator.h>
 #include <mitkLevenbergMarquardtModelFitFunctor.h>
@@ -75,10 +78,25 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
   this->InitModelComboBox();
   m_Controls.labelMaskInfo->hide();
 
+  m_Controls.timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
+  m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
+  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
+
+  m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
+  m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
+  m_Controls.maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
+
   connect(m_Controls.btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
+
 
   connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
   connect(m_Controls.radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+
+  connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnImageNodeSelectionChanged);
+  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnMaskNodeSelectionChanged);
 
   //Generic setting
   m_Controls.groupGeneric->hide();
@@ -380,52 +398,63 @@ void GenericDataFittingView::OnModellingButtonClicked()
 }
 
 
-void GenericDataFittingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-    const QList<mitk::DataNode::Pointer>& selectedNodes)
+void GenericDataFittingView::OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
-  m_selectedNode = nullptr;
-  m_selectedImage = nullptr;
+
+  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
+  {
+    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
+    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+
+    if (m_selectedImage)
+    {
+      this->m_Controls.initialValuesManager->setReferenceImageGeometry(m_selectedImage->GetGeometry());
+      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_selectedImage->GetGeometry()));
+    }
+    else
+    {
+      this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
+      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(nullptr));
+    }
+  }
+  else
+  {
+    this->m_selectedNode = nullptr;
+    this->m_selectedImage = nullptr;
+    this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
+  }
+
+  UpdateGUIControls();
+}
+
+void GenericDataFittingView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
+{
   m_selectedMaskNode = nullptr;
   m_selectedMask = nullptr;
 
-  m_Controls.masklabel->setText("No (valid) mask selected.");
-  m_Controls.timeserieslabel->setText("No (valid) series selected.");
-
-  QList<mitk::DataNode::Pointer> nodes = selectedNodes;
-
-  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
-  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
-  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
-
-  mitk::NodePredicateOr::Pointer maskPredicate = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
-
-  if (nodes.size() > 0 && isImage->CheckNode(nodes.front()))
+  if (m_Controls.maskNodeSelector->GetSelectedNode().IsNotNull())
   {
-    this->m_selectedNode = nodes.front();
-    this->m_selectedImage = dynamic_cast<mitk::Image*>(this->m_selectedNode->GetData());
-    m_Controls.timeserieslabel->setText((this->m_selectedNode->GetName()).c_str());
-    nodes.pop_front();
-  }
+    this->m_selectedMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
+    auto selectedLabelSetMask = dynamic_cast<mitk::LabelSetImage*>(m_selectedMaskNode->GetData());
 
-  if (nodes.size() > 0 && maskPredicate->CheckNode(nodes.front()))
-  {
-      this->m_selectedMaskNode = nodes.front();
-      this->m_selectedMask = dynamic_cast<mitk::Image*>(this->m_selectedMaskNode->GetData());
-
-      if (this->m_selectedMask->GetTimeSteps() > 1)
+    if (selectedLabelSetMask != nullptr)
+    {
+      if (selectedLabelSetMask->GetAllLabelValues().size() > 1)
       {
-        MITK_INFO <<
-                  "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
-                  m_selectedMaskNode->GetName();
-        mitk::ImageTimeSelector::Pointer maskedImageTimeSelector = mitk::ImageTimeSelector::New();
-        maskedImageTimeSelector->SetInput(this->m_selectedMask);
-        maskedImageTimeSelector->SetTimeNr(0);
-        maskedImageTimeSelector->UpdateLargestPossibleRegion();
-        this->m_selectedMask = maskedImageTimeSelector->GetOutput();
+        MITK_INFO << "Selected mask has multiple labels. Only use first used to mask the model fit.";
       }
+      this->m_selectedMask = mitk::CreateLabelMask(selectedLabelSetMask, selectedLabelSetMask->GetAllLabelValues().front(), true);
+    }
 
-      m_Controls.masklabel->setText((this->m_selectedMaskNode->GetName()).c_str());
+
+    if (this->m_selectedMask.IsNotNull() && this->m_selectedMask->GetTimeSteps() > 1)
+    {
+      MITK_INFO <<
+        "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
+      m_Controls.maskNodeSelector->GetSelectedNode()->GetName();
+      this->m_selectedMask = SelectImageByTimeStep(m_selectedMask, 0);
+
+    }
   }
 
   if (m_selectedMask.IsNull())
@@ -435,6 +464,8 @@ void GenericDataFittingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
 
   UpdateGUIControls();
 }
+
+
 
 bool GenericDataFittingView::CheckModelSettings() const
 {
@@ -632,15 +663,17 @@ GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
   factory = mitk::ThreeStepLinearModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
 
-  this->m_IsNotABinaryImagePredicate = mitk::NodePredicateAnd::New(
-                                         mitk::TNodePredicateDataType<mitk::Image>::New(),
-                                         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary",
-                                             mitk::BoolProperty::New(true))),
-                                         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
-  this->m_IsBinaryImagePredicate = mitk::NodePredicateAnd::New(
-                                     mitk::TNodePredicateDataType<mitk::Image>::New(),
-                                     mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)),
-                                     mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+
+  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
+
+  auto isDynamicData = mitk::NodePredicateFunction::New([](const mitk::DataNode* node)
+  {
+    return  (node && node->GetData() && node->GetData()->GetTimeSteps() > 1);
+  });
+
+  auto isNoMask = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
+
+  this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);
 }
 
 void GenericDataFittingView::OnJobFinished()

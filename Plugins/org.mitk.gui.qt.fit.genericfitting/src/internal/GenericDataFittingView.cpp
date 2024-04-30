@@ -97,9 +97,6 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnImageNodeSelectionChanged);
   connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnMaskNodeSelectionChanged);
-  //connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnNodeSelectionChanged);
-  //connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &GenericDataFittingView::OnNodeSelectionChanged);
-
 
   //Generic setting
   m_Controls.groupGeneric->hide();

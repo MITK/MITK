@@ -83,14 +83,14 @@ void mitk::ImageLiveWireContourModelFilter::GenerateData()
   if (!input)
   {
     MITK_ERROR << "No input available.";
-    itkExceptionMacro("mitk::ImageToLiveWireContourFilter: No input available. Please set the input!");
+    itkExceptionMacro("mitk::ImageToLiveWireContourModelFilter: No input available. Please set the input!");
     return;
   }
 
   if (input->GetDimension() != 2)
   {
     MITK_ERROR << "Filter is only working on 2D images.";
-    itkExceptionMacro("mitk::ImageToLiveWireContourFilter: Filter is only working on 2D images.. Please make sure that "
+    itkExceptionMacro("mitk::ImageToLiveWireContourModelFilter: Filter is only working on 2D images.. Please make sure that "
                       "the input is 2D!");
     return;
   }

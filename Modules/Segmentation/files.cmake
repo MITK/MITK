@@ -10,7 +10,6 @@ set(CPP_FILES
   Algorithms/mitkGrowCutSegmentationFilter.cpp
   Algorithms/mitkImageLiveWireContourModelFilter.cpp
   Algorithms/mitkImageToContourFilter.cpp
-  Algorithms/mitkImageToLiveWireContourFilter.cpp
   Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkOtsuSegmentationFilter.cpp
   Algorithms/mitkSegmentationHelper.cpp

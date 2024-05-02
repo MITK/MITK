@@ -83,20 +83,28 @@ void mitk::ImageLiveWireContourModelFilter::GenerateData()
   if (!input)
   {
     MITK_ERROR << "No input available.";
-    itkExceptionMacro("mitk::ImageToLiveWireContourFilter: No input available. Please set the input!");
+    itkExceptionMacro("mitk::ImageToLiveWireContourModelFilter: No input available. Please set the input!");
     return;
   }
 
   if (input->GetDimension() != 2)
   {
     MITK_ERROR << "Filter is only working on 2D images.";
-    itkExceptionMacro("mitk::ImageToLiveWireContourFilter: Filter is only working on 2D images.. Please make sure that "
+    itkExceptionMacro("mitk::ImageToLiveWireContourModelFilter: Filter is only working on 2D images.. Please make sure that "
                       "the input is 2D!");
     return;
   }
 
   input->GetGeometry()->WorldToIndex(m_StartPoint, m_StartPointInIndex);
   input->GetGeometry()->WorldToIndex(m_EndPoint, m_EndPointInIndex);
+
+  m_StartPointInIndex[0] = std::round(m_StartPointInIndex[0]);
+  m_StartPointInIndex[1] = std::round(m_StartPointInIndex[1]);
+  m_StartPointInIndex[2] = std::round(m_StartPointInIndex[2]);
+
+  m_EndPointInIndex[0] = std::round(m_EndPointInIndex[0]);
+  m_EndPointInIndex[1] = std::round(m_EndPointInIndex[1]);
+  m_EndPointInIndex[2] = std::round(m_EndPointInIndex[2]);
 
   // only start calculating if both indices are inside image geometry
   if (input->GetGeometry()->IsIndexInside(this->m_StartPointInIndex) &&

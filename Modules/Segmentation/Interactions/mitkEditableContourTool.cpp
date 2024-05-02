@@ -34,6 +34,7 @@ void mitk::EditableContourTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("FinishContour", OnFinish);
   CONNECT_FUNCTION("CtrlMovePoint", OnMouseMoved);
   CONNECT_CONDITION("InsideCorrectPlane", OnCheckPlane);
+  CONNECT_CONDITION("EnoughDistanceToControlPoint", OnCheckDistanceToControlPoint);
 }
 
 void mitk::EditableContourTool::Activated()
@@ -304,7 +305,9 @@ void mitk::EditableContourTool::OnMouseMoved(StateMachineAction*, InteractionEve
   }
 
   this->UpdatePreviewContour(positionEvent->GetPositionInWorld());
-  this->UpdateClosureContour(positionEvent->GetPositionInWorld());
+
+  auto endPoint = m_PreviewContour->GetNumberOfVertices()==0 ? positionEvent->GetPositionInWorld() : m_PreviewContour->GetVertexAt(m_PreviewContour->GetNumberOfVertices() - 1)->Coordinates;
+  this->UpdateClosureContour(endPoint);
 
   RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
@@ -359,6 +362,31 @@ bool mitk::EditableContourTool::OnCheckPlane(const InteractionEvent* interaction
   }
 
   return true;
+}
+
+bool mitk::EditableContourTool::OnCheckDistanceToControlPoint(const InteractionEvent* interactionEvent)
+{
+  auto positionEvent = dynamic_cast<const mitk::InteractionPositionEvent*>(interactionEvent);
+
+  if (nullptr != positionEvent && m_PlaneGeometry.IsNotNull())
+  {
+    const auto contour = this->GetContour();
+    const auto lastVertex = contour->GetVertexAt(contour->GetNumberOfVertices()-1);
+
+    const auto xSize = m_PlaneGeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).magnitude();
+    const auto ySize = m_PlaneGeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1).magnitude();
+
+    Point2D lastVertex2D;
+    m_PlaneGeometry->Map(lastVertex->Coordinates, lastVertex2D);
+    Point2D position2D;
+    m_PlaneGeometry->Map(positionEvent->GetPositionInWorld(), position2D);
+
+    auto distance = lastVertex2D - position2D;
+
+    return std::abs(distance[0]) > xSize || std::abs(distance[1]) > ySize;
+  }
+
+  return false;
 }
 
 void mitk::EditableContourTool::ReleaseHelperObjects(bool includeWorkingContour)

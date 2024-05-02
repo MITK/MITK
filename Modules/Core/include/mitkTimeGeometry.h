@@ -26,6 +26,8 @@ namespace mitk
   typedef mitk::ScalarType TimePointType;
   typedef std::size_t TimeStepType;
 
+  static const TimeStepType TIMESTEP_INVALID = -1;
+
   /**
   * \brief Manages the geometries of a data object for each time step
   *

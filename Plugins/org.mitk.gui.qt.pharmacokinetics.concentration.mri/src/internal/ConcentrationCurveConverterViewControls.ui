@@ -301,13 +301,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnConvertToConcentration">
-     <property name="text">
-      <string>Convert To Concentration</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QGroupBox" name="groupBox_T2">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -385,6 +378,13 @@
        <widget class="QSpinBox" name="spinBox_baselineEndTimeStepT2"/>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnConvertToConcentration">
+     <property name="text">
+      <string>Convert To Concentration</string>
+     </property>
     </widget>
    </item>
    <item>

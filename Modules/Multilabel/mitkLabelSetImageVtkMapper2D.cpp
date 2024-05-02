@@ -16,40 +16,36 @@ found in the LICENSE file.
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkDataNode.h>
 #include <mitkImageSliceSelector.h>
-#include <mitkImageStatisticsHolder.h>
-#include <mitkLevelWindowProperty.h>
-#include <mitkLookupTableProperty.h>
-#include <mitkPixelType.h>
-#include <mitkPlaneClipping.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
-#include <mitkResliceMethodProperty.h>
-#include <mitkTransferFunctionProperty.h>
-#include <mitkVtkResliceInterpolationProperty.h>
+#include <mitkVectorProperty.h>
 
 // MITK Rendering
-#include "vtkMitkLevelWindowFilter.h"
-#include "vtkMitkThickSlicesFilter.h"
 #include "vtkNeverTranslucentTexture.h"
 
 // VTK
 #include <vtkCamera.h>
-#include <vtkCellArray.h>
 #include <vtkImageData.h>
 #include <vtkImageReslice.h>
 #include <vtkLookupTable.h>
-#include <vtkMatrix4x4.h>
 #include <vtkPlaneSource.h>
-#include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
-#include <vtkTransform.h>
-//#include <vtkOpenGLTexture.h>
+#include <vtkImageMapToColors.h>
 
-// ITK
-#include <itkRGBAPixel.h>
-#include <mitkRenderingModeProperty.h>
+namespace
+{
+  itk::ModifiedTimeType PropertyTimeStampIsNewer(const mitk::IPropertyProvider* provider, mitk::BaseRenderer* renderer, const std::string& propName, itk::ModifiedTimeType refMT)
+  {
+    const std::string context = renderer != nullptr ? renderer->GetName() : "";
+    auto prop = provider->GetConstProperty(propName, context);
+    if (prop != nullptr)
+    {
+      return prop->GetTimeStamp() > refMT;
+    }
+    return false;
+  }
+}
 
 mitk::LabelSetImageVtkMapper2D::LabelSetImageVtkMapper2D()
 {
@@ -71,100 +67,289 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage *mitk::LabelSetImageVtkMapper2D::Ge
   return m_LSH.GetLocalStorage(renderer);
 }
 
+void mitk::LabelSetImageVtkMapper2D::GenerateLookupTable(mitk::BaseRenderer* renderer)
+{
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+  mitk::DataNode* node = this->GetDataNode();
+  auto* image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  assert(image && image->IsInitialized());
+
+  localStorage->m_LabelLookupTable = image->GetLookupTable()->Clone();
+  const auto labelValues = image->GetAllLabelValues();
+
+  std::string propertyName = "org.mitk.multilabel.labels.highlighted";
+
+  mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(propertyName));
+  if (nullptr != prop)
+  {
+    const auto highlightedLabelValues = prop->GetValue();
+
+    if (!highlightedLabelValues.empty())
+    {
+      auto lookUpTable  = localStorage->m_LabelLookupTable->GetVtkLookupTable();
+      auto highlightEnd = highlightedLabelValues.cend();
+
+      double rgba[4];
+      for (const auto& value : labelValues)
+      {
+        lookUpTable->GetTableValue(value, rgba);
+        if (highlightEnd == std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), value))
+        { //make all none highlighted values more transparent
+          rgba[3] *= 0.3;
+        }
+        else
+        {
+          if (rgba[3] != 0)
+          { //if highlighted values are visible set them to opaque to pop out
+            rgba[3] = 1.;
+          }
+          else
+          { //if highlighted values are invisible the opacity is increased a bit
+            //to give a visual hint that the are highlighted but also invisible.
+            //e.g. needed to see a difference if you change the visibility of
+            //a highlighted label in the MultiLabelInspector
+            rgba[3] = 0.4;
+          }
+        }
+        lookUpTable->SetTableValue(value, rgba);
+      }
+      localStorage->m_LabelLookupTable->Modified();
+    }
+  }
+}
+
+namespace
+{
+  std::vector<mitk::LabelSetImage::GroupIndexType> GetOutdatedGroups(const mitk::LabelSetImageVtkMapper2D::LocalStorage* ls, const mitk::LabelSetImage* seg)
+  {
+    const auto nrOfGroups = seg->GetNumberOfLayers();
+    std::vector<mitk::LabelSetImage::GroupIndexType> result;
+
+    for (mitk::LabelSetImage::GroupIndexType groupID = 0; groupID < nrOfGroups; ++groupID)
+    {
+      const auto groupImage = seg->GetGroupImage(groupID);
+      if (groupImage->GetMTime() > ls->m_LastDataUpdateTime
+        || groupImage->GetPipelineMTime() > ls->m_LastDataUpdateTime
+        || ls->m_GroupImageIDs.size() <= groupID
+        || groupImage != ls->m_GroupImageIDs[groupID])
+      {
+        result.push_back(groupID);
+      }
+    }
+    return result;
+  }
+}
+
 void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   mitk::DataNode *node = this->GetDataNode();
-  auto *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
-  assert(image && image->IsInitialized());
+  auto *segmentation = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
+  assert(segmentation && segmentation->IsInitialized());
 
-  // check if there is a valid worldGeometry
-  const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
-  if ((worldGeometry == nullptr) || (!worldGeometry->IsValid()) || (!worldGeometry->HasReferenceGeometry()))
-    return;
+  bool isLookupModified = localStorage->m_LabelLookupTable.IsNull() ||
+    (localStorage->m_LabelLookupTable->GetMTime() < segmentation->GetLookupTable()->GetMTime()) ||
+    PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.labels.highlighted", localStorage->m_LabelLookupTable->GetMTime()) ||
+    PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime());
 
-  image->Update();
-
-  int numberOfLayers = image->GetNumberOfLayers();
-  int activeLayer = image->GetActiveLayer();
-
-  float opacity = 1.0f;
-  node->GetOpacity(opacity, renderer, "opacity");
-
-  if (numberOfLayers != localStorage->m_NumberOfLayers)
+  if (isLookupModified)
   {
-    localStorage->m_NumberOfLayers = numberOfLayers;
-    localStorage->m_ReslicedImageVector.clear();
-    localStorage->m_ReslicerVector.clear();
-    localStorage->m_LayerTextureVector.clear();
-    localStorage->m_LevelWindowFilterVector.clear();
-    localStorage->m_LayerMapperVector.clear();
-    localStorage->m_LayerActorVector.clear();
-
-    localStorage->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
-
-    for (int lidx = 0; lidx < numberOfLayers; ++lidx)
-    {
-      localStorage->m_ReslicedImageVector.push_back(vtkSmartPointer<vtkImageData>::New());
-      localStorage->m_ReslicerVector.push_back(mitk::ExtractSliceFilter::New());
-      localStorage->m_LayerTextureVector.push_back(vtkSmartPointer<vtkNeverTranslucentTexture>::New());
-      localStorage->m_LevelWindowFilterVector.push_back(vtkSmartPointer<vtkMitkLevelWindowFilter>::New());
-      localStorage->m_LayerMapperVector.push_back(vtkSmartPointer<vtkPolyDataMapper>::New());
-      localStorage->m_LayerActorVector.push_back(vtkSmartPointer<vtkActor>::New());
-
-      // do not repeat the texture (the image)
-      localStorage->m_LayerTextureVector[lidx]->RepeatOff();
-
-      // set corresponding mappers for the actors
-      localStorage->m_LayerActorVector[lidx]->SetMapper(localStorage->m_LayerMapperVector[lidx]);
-
-      localStorage->m_Actors->AddPart(localStorage->m_LayerActorVector[lidx]);
-    }
-
-    localStorage->m_Actors->AddPart(localStorage->m_OutlineShadowActor);
-    localStorage->m_Actors->AddPart(localStorage->m_OutlineActor);
+    this->GenerateLookupTable(renderer);
   }
 
-  // early out if there is no intersection of the current rendering geometry
-  // and the geometry of the image that is to be rendered.
-  if (!RenderingGeometryIntersectsImage(worldGeometry, image->GetSlicedGeometry()))
+  bool isGeometryModified = (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
+    (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime());
+
+  bool rendererGeometryIsValid = true;
+
+  // check if there is a valid worldGeometry
+  if (isGeometryModified)
+  {
+    const PlaneGeometry* worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
+    rendererGeometryIsValid = worldGeometry != nullptr
+      && worldGeometry->IsValid()
+      && worldGeometry->HasReferenceGeometry();
+
+    isGeometryModified = rendererGeometryIsValid
+      && localStorage->m_WorldPlane.IsNotNull() && !Equal(*worldGeometry, *(localStorage->m_WorldPlane.GetPointer()));
+
+    localStorage->m_WorldPlane = rendererGeometryIsValid ? worldGeometry->Clone() : nullptr;
+  }
+
+  const bool hasValidContent = rendererGeometryIsValid && RenderingGeometryIntersectsImage(localStorage->m_WorldPlane, segmentation->GetSlicedGeometry());
+  const bool contentBecameValid = hasValidContent && !localStorage->m_HasValidContent;
+  const bool contentBecameInvalid = !hasValidContent && localStorage->m_HasValidContent;
+
+  if (contentBecameInvalid)
   {
     // set image to nullptr, to clear the texture in 3D, because
     // the latest image is used there if the plane is out of the geometry
     // see bug-13275
-    for (int lidx = 0; lidx < numberOfLayers; ++lidx)
+    for (unsigned int lidx = 0; lidx < localStorage->m_NumberOfLayers; ++lidx)
     {
       localStorage->m_ReslicedImageVector[lidx] = nullptr;
       localStorage->m_LayerMapperVector[lidx]->SetInputData(localStorage->m_EmptyPolyData);
       localStorage->m_OutlineActor->SetVisibility(false);
       localStorage->m_OutlineShadowActor->SetVisibility(false);
     }
+    localStorage->m_LastDataUpdateTime.Modified();
+  }
+
+  localStorage->m_HasValidContent = hasValidContent;
+  if (!hasValidContent)
+  {
+    // early out if there is no intersection of the current rendering geometry
+    // and the geometry of the image that is to be rendered.
     return;
   }
 
-  for (int lidx = 0; lidx < numberOfLayers; ++lidx)
+  std::vector<mitk::LabelSetImage::GroupIndexType> outdatedGroups;
+  auto currentTimestep = this->GetTimestep();
+  if (isGeometryModified || contentBecameValid || localStorage->m_LastTimeStep!= currentTimestep)
   {
-    const auto layerImage = image->GetGroupImage(lidx);
+    //if geometry is outdated or we have valid content again
+    // -> all groups need regeneration
+    outdatedGroups.resize(segmentation->GetNumberOfLayers());
+    std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
+  }
+  else
+  {
+    outdatedGroups = GetOutdatedGroups(localStorage, segmentation);
+  }
 
-    localStorage->m_ReslicerVector[lidx]->SetInput(layerImage);
-    localStorage->m_ReslicerVector[lidx]->SetWorldGeometry(worldGeometry);
-    localStorage->m_ReslicerVector[lidx]->SetTimeStep(this->GetTimestep());
+  if (!outdatedGroups.empty())
+  {
+    this->GenerateImageSlice(renderer, outdatedGroups);
+  }
+
+  localStorage->m_LastTimeStep = currentTimestep;
+
+
+  float opacity = 1.0f;
+  node->GetOpacity(opacity, renderer, "opacity");
+
+  if (isLookupModified)
+  {
+    //if lookup table is modified all groups need a new color mapping
+    outdatedGroups.resize(segmentation->GetNumberOfLayers());
+    std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
+  }
+
+  for (const auto groupID: outdatedGroups)
+  {
+    localStorage->m_LayerImageMapToColors[groupID]->SetLookupTable(localStorage->m_LabelLookupTable->GetVtkLookupTable());
+    localStorage->m_LayerImageMapToColors[groupID]->SetInputData(localStorage->m_ReslicedImageVector[groupID]);
+    localStorage->m_LayerImageMapToColors[groupID]->Update();
+
+    // check for texture interpolation property
+    bool textureInterpolation = false;
+    node->GetBoolProperty("texture interpolation", textureInterpolation, renderer);
+
+    // set the interpolation modus according to the property
+    localStorage->m_LayerTextureVector[groupID]->SetInterpolate(textureInterpolation);
+
+    localStorage->m_LayerTextureVector[groupID]->SetInputConnection(
+      localStorage->m_LayerImageMapToColors[groupID]->GetOutputPort());
+    this->TransformActor(renderer);
+
+    // set the plane as input for the mapper
+    localStorage->m_LayerMapperVector[groupID]->SetInputConnection(localStorage->m_Plane->GetOutputPort());
+
+    // set the texture for the actor
+    localStorage->m_LayerActorVector[groupID]->SetTexture(localStorage->m_LayerTextureVector[groupID]);
+    localStorage->m_LayerActorVector[groupID]->GetProperty()->SetOpacity(opacity);
+  }
+
+  auto activeLayer = segmentation->GetActiveLayer();
+  bool activeGroupIsOutdated = std::find(outdatedGroups.begin(), outdatedGroups.end(), activeLayer) != outdatedGroups.end();
+
+  if (activeGroupIsOutdated
+      || PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LastActiveLabelUpdateTime.GetMTime())
+      || PropertyTimeStampIsNewer(node, renderer, "labelset.contour.active", localStorage->m_LastActiveLabelUpdateTime.GetMTime())
+      || PropertyTimeStampIsNewer(node, renderer, "labelset.contour.width", localStorage->m_LastActiveLabelUpdateTime.GetMTime())
+    )
+  {
+    this->GenerateActiveLabelOutline(renderer);
+  }
+}
+
+void mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs)
+{
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+  mitk::DataNode* node = this->GetDataNode();
+  auto* segmentation = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  assert(segmentation && segmentation->IsInitialized());
+
+  segmentation->Update();
+
+  const auto numberOfLayers = segmentation->GetNumberOfLayers();
+
+  if (numberOfLayers != localStorage->m_NumberOfLayers)
+  {
+    if (numberOfLayers > localStorage->m_NumberOfLayers)
+    {
+      for (unsigned int lidx = localStorage->m_NumberOfLayers; lidx < numberOfLayers; ++lidx)
+      {
+        localStorage->m_GroupImageIDs.push_back(nullptr);
+        localStorage->m_ReslicedImageVector.push_back(vtkSmartPointer<vtkImageData>::New());
+        localStorage->m_ReslicerVector.push_back(mitk::ExtractSliceFilter::New());
+        localStorage->m_LayerTextureVector.push_back(vtkSmartPointer<vtkNeverTranslucentTexture>::New());
+        localStorage->m_LayerMapperVector.push_back(vtkSmartPointer<vtkPolyDataMapper>::New());
+        localStorage->m_LayerActorVector.push_back(vtkSmartPointer<vtkActor>::New());
+        localStorage->m_LayerImageMapToColors.push_back(vtkSmartPointer<vtkImageMapToColors>::New());
+
+        // do not repeat the texture (the image)
+        localStorage->m_LayerTextureVector[lidx]->RepeatOff();
+        // set corresponding mappers for the actors
+        localStorage->m_LayerActorVector[lidx]->SetMapper(localStorage->m_LayerMapperVector[lidx]);
+      }
+    }
+    else
+    {
+      localStorage->m_GroupImageIDs.resize(numberOfLayers);
+      localStorage->m_ReslicedImageVector.resize(numberOfLayers);
+      localStorage->m_ReslicerVector.resize(numberOfLayers);
+      localStorage->m_LayerTextureVector.resize(numberOfLayers);
+      localStorage->m_LayerMapperVector.resize(numberOfLayers);
+      localStorage->m_LayerActorVector.resize(numberOfLayers);
+      localStorage->m_LayerImageMapToColors.resize(numberOfLayers);
+    }
+    localStorage->m_NumberOfLayers = numberOfLayers;
+
+    localStorage->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
+
+    for (unsigned int lidx = 0; lidx < numberOfLayers; ++lidx)
+    {
+      localStorage->m_Actors->AddPart(localStorage->m_LayerActorVector[lidx]);
+    }
+    localStorage->m_Actors->AddPart(localStorage->m_OutlineShadowActor);
+    localStorage->m_Actors->AddPart(localStorage->m_OutlineActor);
+  }
+
+  for (const auto groupID : outdatedGroupIDs)
+  {
+    const auto groupImage = segmentation->GetGroupImage(groupID);
+    localStorage->m_GroupImageIDs[groupID] = groupImage;
+
+    localStorage->m_ReslicerVector[groupID]->SetInput(groupImage);
+    localStorage->m_ReslicerVector[groupID]->SetWorldGeometry(localStorage->m_WorldPlane);
+    localStorage->m_ReslicerVector[groupID]->SetTimeStep(this->GetTimestep());
 
     // set the transformation of the image to adapt reslice axis
-    localStorage->m_ReslicerVector[lidx]->SetResliceTransformByGeometry(
-      layerImage->GetTimeGeometry()->GetGeometryForTimeStep(this->GetTimestep()));
+    localStorage->m_ReslicerVector[groupID]->SetResliceTransformByGeometry(
+      groupImage->GetTimeGeometry()->GetGeometryForTimeStep(this->GetTimestep()));
 
     // is the geometry of the slice based on the image image or the worldgeometry?
     bool inPlaneResampleExtentByGeometry = false;
     node->GetBoolProperty("in plane resample extent by geometry", inPlaneResampleExtentByGeometry, renderer);
-    localStorage->m_ReslicerVector[lidx]->SetInPlaneResampleExtentByGeometry(inPlaneResampleExtentByGeometry);
-    localStorage->m_ReslicerVector[lidx]->SetInterpolationMode(ExtractSliceFilter::RESLICE_NEAREST);
-    localStorage->m_ReslicerVector[lidx]->SetVtkOutputRequest(true);
+    localStorage->m_ReslicerVector[groupID]->SetInPlaneResampleExtentByGeometry(inPlaneResampleExtentByGeometry);
+    localStorage->m_ReslicerVector[groupID]->SetInterpolationMode(ExtractSliceFilter::RESLICE_NEAREST);
+    localStorage->m_ReslicerVector[groupID]->SetVtkOutputRequest(true);
 
     // this is needed when thick mode was enabled before. These variables have to be reset to default values
-    localStorage->m_ReslicerVector[lidx]->SetOutputDimensionality(2);
-    localStorage->m_ReslicerVector[lidx]->SetOutputSpacingZDirection(1.0);
-    localStorage->m_ReslicerVector[lidx]->SetOutputExtentZDirection(0, 0);
+    localStorage->m_ReslicerVector[groupID]->SetOutputDimensionality(2);
+    localStorage->m_ReslicerVector[groupID]->SetOutputSpacingZDirection(1.0);
+    localStorage->m_ReslicerVector[groupID]->SetOutputExtentZDirection(0, 0);
 
     // Bounds information for reslicing (only required if reference geometry is present)
     // this used for generating a vtkPLaneSource with the right size
@@ -176,103 +361,67 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     sliceBounds[4] = 0.0;
     sliceBounds[5] = 0.0;
 
-    localStorage->m_ReslicerVector[lidx]->GetClippedPlaneBounds(sliceBounds);
+    localStorage->m_ReslicerVector[groupID]->GetClippedPlaneBounds(sliceBounds);
 
     // setup the textured plane
     this->GeneratePlane(renderer, sliceBounds);
 
     // get the spacing of the slice
-    localStorage->m_mmPerPixel = localStorage->m_ReslicerVector[lidx]->GetOutputSpacing();
-    localStorage->m_ReslicerVector[lidx]->Modified();
+    localStorage->m_mmPerPixel = localStorage->m_ReslicerVector[groupID]->GetOutputSpacing();
+    localStorage->m_ReslicerVector[groupID]->Modified();
     // start the pipeline with updating the largest possible, needed if the geometry of the image has changed
-    localStorage->m_ReslicerVector[lidx]->UpdateLargestPossibleRegion();
-    localStorage->m_ReslicedImageVector[lidx] = localStorage->m_ReslicerVector[lidx]->GetVtkOutput();
-
-    const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(worldGeometry);
-
-    double textureClippingBounds[6];
-    for (auto &textureClippingBound : textureClippingBounds)
-    {
-      textureClippingBound = 0.0;
-    }
-
-    // Calculate the actual bounds of the transformed plane clipped by the
-    // dataset bounding box; this is required for drawing the texture at the
-    // correct position during 3D mapping.
-    mitk::PlaneClipping::CalculateClippedPlaneBounds(layerImage->GetGeometry(), planeGeometry, textureClippingBounds);
-
-    textureClippingBounds[0] = static_cast<int>(textureClippingBounds[0] / localStorage->m_mmPerPixel[0] + 0.5);
-    textureClippingBounds[1] = static_cast<int>(textureClippingBounds[1] / localStorage->m_mmPerPixel[0] + 0.5);
-    textureClippingBounds[2] = static_cast<int>(textureClippingBounds[2] / localStorage->m_mmPerPixel[1] + 0.5);
-    textureClippingBounds[3] = static_cast<int>(textureClippingBounds[3] / localStorage->m_mmPerPixel[1] + 0.5);
-
-    // clipping bounds for cutting the imageLayer
-    localStorage->m_LevelWindowFilterVector[lidx]->SetClippingBounds(textureClippingBounds);
-
-    localStorage->m_LevelWindowFilterVector[lidx]->SetLookupTable(
-      image->GetLookupTable()->GetVtkLookupTable());
-
-    // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
-    localStorage->m_LayerTextureVector[lidx]->SetColorModeToDirectScalars();
-
-    // connect the imageLayer with the levelwindow filter
-    localStorage->m_LevelWindowFilterVector[lidx]->SetInputData(localStorage->m_ReslicedImageVector[lidx]);
-    // connect the texture with the output of the levelwindow filter
-
-    // check for texture interpolation property
-    bool textureInterpolation = false;
-    node->GetBoolProperty("texture interpolation", textureInterpolation, renderer);
-
-    // set the interpolation modus according to the property
-    localStorage->m_LayerTextureVector[lidx]->SetInterpolate(textureInterpolation);
-
-    localStorage->m_LayerTextureVector[lidx]->SetInputConnection(
-      localStorage->m_LevelWindowFilterVector[lidx]->GetOutputPort());
-
-    this->TransformActor(renderer);
-
-    // set the plane as input for the mapper
-    localStorage->m_LayerMapperVector[lidx]->SetInputConnection(localStorage->m_Plane->GetOutputPort());
-
-    // set the texture for the actor
-    localStorage->m_LayerActorVector[lidx]->SetTexture(localStorage->m_LayerTextureVector[lidx]);
-    localStorage->m_LayerActorVector[lidx]->GetProperty()->SetOpacity(opacity);
+    localStorage->m_ReslicerVector[groupID]->UpdateLargestPossibleRegion();
+    localStorage->m_ReslicedImageVector[groupID] = localStorage->m_ReslicerVector[groupID]->GetVtkOutput();
   }
-
-  mitk::Label* activeLabel = image->GetActiveLabel();
-  if (nullptr != activeLabel)
-  {
-    bool contourActive = false;
-    node->GetBoolProperty("labelset.contour.active", contourActive, renderer);
-    if (contourActive && activeLabel->GetVisible()) //contour rendering
-    {
-      //generate contours/outlines
-      localStorage->m_OutlinePolyData =
-        this->CreateOutlinePolyData(renderer, localStorage->m_ReslicedImageVector[activeLayer], activeLabel->GetValue());
-      localStorage->m_OutlineActor->SetVisibility(true);
-      localStorage->m_OutlineShadowActor->SetVisibility(true);
-      const mitk::Color& color = activeLabel->GetColor();
-      localStorage->m_OutlineActor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
-      localStorage->m_OutlineShadowActor->GetProperty()->SetColor(0, 0, 0);
-
-      float contourWidth(2.0);
-      node->GetFloatProperty("labelset.contour.width", contourWidth, renderer);
-      localStorage->m_OutlineActor->GetProperty()->SetLineWidth(contourWidth);
-      localStorage->m_OutlineShadowActor->GetProperty()->SetLineWidth(contourWidth * 1.5);
-
-      localStorage->m_OutlineActor->GetProperty()->SetOpacity(opacity);
-      localStorage->m_OutlineShadowActor->GetProperty()->SetOpacity(opacity);
-
-      localStorage->m_OutlineMapper->SetInputData(localStorage->m_OutlinePolyData);
-      return;
-    }
-  }
-  localStorage->m_OutlineActor->SetVisibility(false);
-  localStorage->m_OutlineShadowActor->SetVisibility(false);
+  localStorage->m_LastDataUpdateTime.Modified();
 }
 
+void mitk::LabelSetImageVtkMapper2D::GenerateActiveLabelOutline(mitk::BaseRenderer* renderer)
+{
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+  mitk::DataNode* node = this->GetDataNode();
+  auto* image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+
+  int activeLayer = image->GetActiveLayer();
+
+  float opacity = 1.0f;
+  node->GetOpacity(opacity, renderer, "opacity");
+
+  mitk::Label* activeLabel = image->GetActiveLabel();
+  bool contourActive = false;
+  node->GetBoolProperty("labelset.contour.active", contourActive, renderer);
+  if (nullptr != activeLabel && contourActive && activeLabel->GetVisible())
+  {
+    //generate contours/outlines
+    localStorage->m_OutlinePolyData =
+      this->CreateOutlinePolyData(renderer, localStorage->m_ReslicedImageVector[activeLayer], activeLabel->GetValue());
+    localStorage->m_OutlineActor->SetVisibility(true);
+    localStorage->m_OutlineShadowActor->SetVisibility(true);
+    const mitk::Color& color = activeLabel->GetColor();
+    localStorage->m_OutlineActor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
+    localStorage->m_OutlineShadowActor->GetProperty()->SetColor(0, 0, 0);
+
+    float contourWidth(2.0);
+    node->GetFloatProperty("labelset.contour.width", contourWidth, renderer);
+    localStorage->m_OutlineActor->GetProperty()->SetLineWidth(contourWidth);
+    localStorage->m_OutlineShadowActor->GetProperty()->SetLineWidth(contourWidth * 1.5);
+
+    localStorage->m_OutlineActor->GetProperty()->SetOpacity(opacity);
+    localStorage->m_OutlineShadowActor->GetProperty()->SetOpacity(opacity);
+
+    localStorage->m_OutlineMapper->SetInputData(localStorage->m_OutlinePolyData);
+  }
+  else
+  {
+    localStorage->m_OutlineActor->SetVisibility(false);
+    localStorage->m_OutlineShadowActor->SetVisibility(false);
+  }
+  localStorage->m_LastActiveLabelUpdateTime.Modified();
+}
+
+
 bool mitk::LabelSetImageVtkMapper2D::RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry,
-                                                                      SlicedGeometry3D *imageGeometry)
+  const BaseGeometry *imageGeometry) const
 {
   // if either one of the two geometries is nullptr we return true
   // for safety reasons
@@ -460,31 +609,6 @@ vtkSmartPointer<vtkPolyData> mitk::LabelSetImageVtkMapper2D::CreateOutlinePolyDa
   return polyData;
 }
 
-void mitk::LabelSetImageVtkMapper2D::ApplyColor(mitk::BaseRenderer *renderer, const mitk::Color &color)
-{
-  LocalStorage *localStorage = this->GetLocalStorage(renderer);
-  localStorage->m_OutlineActor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
-  localStorage->m_OutlineShadowActor->GetProperty()->SetColor(0, 0, 0);
-}
-
-void mitk::LabelSetImageVtkMapper2D::ApplyOpacity(mitk::BaseRenderer *renderer, int layer)
-{
-  LocalStorage *localStorage = this->GetLocalStorage(renderer);
-  float opacity = 1.0f;
-  this->GetDataNode()->GetOpacity(opacity, renderer, "opacity");
-  localStorage->m_LayerActorVector[layer]->GetProperty()->SetOpacity(opacity);
-  localStorage->m_OutlineActor->GetProperty()->SetOpacity(opacity);
-  localStorage->m_OutlineShadowActor->GetProperty()->SetOpacity(opacity);
-}
-
-void mitk::LabelSetImageVtkMapper2D::ApplyLookuptable(mitk::BaseRenderer *renderer, int layer)
-{
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-  auto *input = dynamic_cast<mitk::LabelSetImage *>(this->GetDataNode()->GetData());
-  localStorage->m_LevelWindowFilterVector[layer]->SetLookupTable(
-    input->GetLookupTable()->GetVtkLookupTable());
-}
-
 void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 {
   bool visible = true;
@@ -515,13 +639,18 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 
   // check if something important has changed and we need to re-render
 
-  if ((localStorage->m_LastDataUpdateTime < image->GetMTime()) ||
+  if (localStorage->m_LabelLookupTable.IsNull() ||
+      (localStorage->m_LabelLookupTable->GetMTime() < image->GetLookupTable()->GetMTime()) ||
+      (localStorage->m_LastDataUpdateTime < image->GetMTime()) ||
       (localStorage->m_LastDataUpdateTime < image->GetPipelineMTime()) ||
       (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
-      (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()))
+      (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
+      (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
+      (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
+      (localStorage->m_LastPropertyUpdateTime < image->GetPropertyList()->GetMTime()))
   {
     this->GenerateDataForRenderer(renderer);
-    localStorage->m_LastDataUpdateTime.Modified();
+    localStorage->m_LastPropertyUpdateTime.Modified();
   }
   else if ((localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
            (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
@@ -575,7 +704,7 @@ void mitk::LabelSetImageVtkMapper2D::TransformActor(mitk::BaseRenderer *renderer
   vtkSmartPointer<vtkMatrix4x4> matrix = localStorage->m_ReslicerVector[0]->GetResliceAxes(); // same for all layers
   trans->SetMatrix(matrix);
 
-  for (int lidx = 0; lidx < localStorage->m_NumberOfLayers; ++lidx)
+  for (unsigned int lidx = 0; lidx < localStorage->m_NumberOfLayers; ++lidx)
   {
     // transform the plane/contour (the actual actor) to the corresponding view (axial, coronal or sagittal)
     localStorage->m_LayerActorVector[lidx]->SetUserTransform(trans);
@@ -601,16 +730,6 @@ void mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node,
   node->SetProperty("opacity", FloatProperty::New(1.0f), renderer);
   node->SetProperty("binary", BoolProperty::New(false), renderer);
 
-  mitk::RenderingModeProperty::Pointer renderingModeProperty =
-    mitk::RenderingModeProperty::New(RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-  node->SetProperty("Image Rendering.Mode", renderingModeProperty, renderer);
-
-  mitk::LevelWindow levelwindow(32767.5, 65535);
-  mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New(levelwindow);
-
-  levWinProp->SetLevelWindow(levelwindow);
-  node->SetProperty("levelwindow", levWinProp, renderer);
-
   node->SetProperty("labelset.contour.active", BoolProperty::New(true), renderer);
   node->SetProperty("labelset.contour.width", FloatProperty::New(2.0), renderer);
 
@@ -632,8 +751,10 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
   m_OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_OutlineShadowActor = vtkSmartPointer<vtkActor>::New();
 
+  m_HasValidContent = false;
   m_NumberOfLayers = 0;
   m_mmPerPixel = nullptr;
+  m_LastTimeStep = 0;
 
   m_OutlineActor->SetMapper(m_OutlineMapper);
   m_OutlineShadowActor->SetMapper(m_OutlineMapper);

@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 
 #include <mitkDataStorage.h>
-#include <mitkSurface.h>
+#include <QmitkAbstractNodeSelectionWidget.h>
 
 #include <QWidget>
 
@@ -28,6 +28,7 @@ namespace Ui
 namespace mitk
 {
   class Image;
+  class DataStorage;
 }
 
 /*!
@@ -50,10 +51,13 @@ public:
   /** @brief Default destructor. */
   ~QmitkImageMaskingWidget() override;
 
-private slots:
+private:
 
-  /** @brief This slot is called if the selection in the workbench is changed. */
-  void OnSelectionChanged(unsigned int index, const mitk::DataNode* selection);
+  /** @brief This slot is called if the image selection changed.*/
+  void OnImageSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/);
+
+  /** @brief This slot is called if the segmentation selection changed.*/
+  void OnSegSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/);
 
   /** @brief This slot is called if user activates the button to mask an image. */
   void OnMaskImagePressed();
@@ -61,24 +65,18 @@ private slots:
   /** @brief This slot is called if the user toggles the "Custom" radio button. */
   void OnCustomValueButtonToggled(bool checked);
 
-private:
-
-  /** @brief Check if selections is valid. */
-  void SelectionControl( unsigned int index, const mitk::DataNode* selection);
-
-  /** @brief Enable buttons if data selection is valid. */
-  void EnableButtons(bool enable = true);
+  /** @brief Configure the widgets according to the internal state. */
+  void ConfigureWidgets();
+  void EnableButtons(bool enable);
 
   /** @brief Mask an image with a given binary mask. Note that the input image and the mask image must be of the same size. */
   itk::SmartPointer<mitk::Image> MaskImage(itk::SmartPointer<mitk::Image> referenceImage, itk::SmartPointer<mitk::Image> maskImage );
-
-  /** @brief Convert a surface into an binary image. */
-  itk::SmartPointer<mitk::Image> ConvertSurfaceToImage( itk::SmartPointer<mitk::Image> image, mitk::Surface::Pointer surface );
 
   /** @brief Adds a new data object to the DataStorage.*/
   void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, itk::SmartPointer<mitk::Image> segmentation,
                         const std::string& name, mitk::DataNode::Pointer parent = nullptr);
 
+  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   Ui::QmitkImageMaskingWidgetControls* m_Controls;
 };
 

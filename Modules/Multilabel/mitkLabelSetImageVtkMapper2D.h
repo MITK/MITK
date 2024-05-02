@@ -35,8 +35,8 @@ class vtkImageReslice;
 class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
-class vtkMitkLevelWindowFilter;
 class vtkNeverTranslucentTexture;
+class vtkImageMapToColors;
 
 namespace mitk
 {
@@ -87,9 +87,16 @@ namespace mitk
     public:
       vtkSmartPointer<vtkPropAssembly> m_Actors;
 
+      /** Vector containing the pointer of the currently used group images.
+       * IMPORTANT: This member must not be used to access any data.
+       * Its purpose is to allow checking if the order of the groups has changed
+       * in order to adapt the pipe line accordingly*/
+      std::vector<const Image*> m_GroupImageIDs;
+
       std::vector<vtkSmartPointer<vtkActor>> m_LayerActorVector;
       std::vector<vtkSmartPointer<vtkPolyDataMapper>> m_LayerMapperVector;
       std::vector<vtkSmartPointer<vtkImageData>> m_ReslicedImageVector;
+      std::vector<vtkSmartPointer<vtkImageMapToColors>> m_LayerImageMapToColors;
       std::vector<vtkSmartPointer<vtkNeverTranslucentTexture>> m_LayerTextureVector;
 
       vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
@@ -107,22 +114,27 @@ namespace mitk
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastDataUpdateTime;
-
       /** \brief Timestamp of last update of a property. */
       itk::TimeStamp m_LastPropertyUpdateTime;
+      /** \brief Timestamp of last update of a property. */
+      itk::TimeStamp m_LastActiveLabelUpdateTime;
 
       /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
       mitk::ScalarType *m_mmPerPixel;
 
-      int m_NumberOfLayers;
+      /** look up table for label colors. */
+      mitk::LookupTable::Pointer m_LabelLookupTable;
 
-      /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
-      // vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;
-      std::vector<vtkSmartPointer<vtkMitkLevelWindowFilter>> m_LevelWindowFilterVector;
+      mitk::PlaneGeometry::Pointer m_WorldPlane;
+      bool m_HasValidContent;
+
+      mitk::TimeStepType m_LastTimeStep;
+
+      unsigned int m_NumberOfLayers;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
-      /** \brief Default deconstructor of the local storage. */
+      /** \brief Default destructor of the local storage. */
       ~LocalStorage() override;
     };
 
@@ -190,38 +202,18 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
+    void GenerateImageSlice(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs);
+
+    void GenerateActiveLabelOutline(mitk::BaseRenderer* renderer);
+
+    /** \brief Generates the look up table that should be used.
+      */
+    void GenerateLookupTable(mitk::BaseRenderer* renderer);
+
     /** \brief This method uses the vtkCamera clipping range and the layer property
       * to calcualte the depth of the object (e.g. image or contour). The depth is used
       * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer *renderer);
-
-    /** \brief This method applies (or modifies) the lookuptable for all types of images.
-     * \warning To use the lookup table, the property 'Lookup Table' must be set and a 'Image Rendering.Mode'
-     * which uses the lookup table must be set.
-  */
-    void ApplyLookuptable(mitk::BaseRenderer *renderer, int layer);
-
-    /** \brief This method applies a color transfer function.
-     * Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous
-     * images (e.g. float)
-     * \warning To use the color transfer function, the property 'Image Rendering.Transfer Function' must be set and a
-     * 'Image Rendering.Mode' which uses the color transfer function must be set.
-  */
-    void ApplyColorTransferFunction(mitk::BaseRenderer *renderer);
-
-    /**
-     * @brief ApplyLevelWindow Apply the level window for the given renderer.
-     * \warning To use the level window, the property 'LevelWindow' must be set and a 'Image Rendering.Mode' which uses
-     * the level window must be set.
-     * @param renderer Level window for which renderer?
-     */
-    void ApplyLevelWindow(mitk::BaseRenderer *renderer);
-
-    /** \brief Set the color of the image/polydata */
-    void ApplyColor(mitk::BaseRenderer *renderer, const mitk::Color &color);
-
-    /** \brief Set the opacity of the actor. */
-    void ApplyOpacity(mitk::BaseRenderer *renderer, int layer);
 
     /**
       * \brief Calculates whether the given rendering geometry intersects the
@@ -233,7 +225,7 @@ namespace mitk
       * sign (all positive or all negative) there is no intersection.
       * If the distances have different sign, there is an intersection.
       **/
-    bool RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry, SlicedGeometry3D *imageGeometry);
+    bool RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry, const BaseGeometry* imageGeometry) const;
   };
 
 } // namespace mitk

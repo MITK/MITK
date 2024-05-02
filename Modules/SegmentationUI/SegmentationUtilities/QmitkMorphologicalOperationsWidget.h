@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkMorphologicalOperations.h>
 #include <mitkRenderingManager.h>
 
+#include <QmitkAbstractNodeSelectionWidget.h>
+
 #include <QWidget>
 
 namespace Ui
@@ -47,15 +49,23 @@ public slots:
   void OnDilatationButtonClicked();
   void OnErosionButtonClicked();
   void OnFillHolesButtonClicked();
-  void OnSelectionChanged(unsigned int index, const mitk::DataNode* selection);
+  void OnSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
   void OnRadioButtonsClicked();
 
 protected:
-  void EnableButtons(bool enable);
+  void ConfigureButtons();
+
+  using MorphFunctionType = void(mitk::Image::Pointer& image, int factor,
+    mitk::MorphologicalOperations::StructuralElementType structuralElement);
+  void Processing(std::function<MorphFunctionType> morphFunction, const std::string& opsName) const;
 
 private:
+  mitk::Image::Pointer GetSelectedLabelMask() const;
+  void SaveResultLabelMask(const mitk::Image* resultMask, const std::string& labelName) const;
+
+  mitk::MorphologicalOperations::StructuralElementType CreateStructerElement_UI() const;
+
   Ui::QmitkMorphologicalOperationsWidgetControls* m_Controls;
-  mitk::MorphologicalOperations::StructuralElementType CreateStructerElement_UI();
 };
 
 #endif

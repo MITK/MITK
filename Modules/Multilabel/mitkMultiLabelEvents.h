@@ -20,8 +20,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#define mitkMultiLabelEventMacroDeclaration(classname, super, IDType)         \
-  /** \class classname */                                  \
+#define mitkMultiLabelEventMacroDeclaration(classname, super, IDType) \
   class MITKMULTILABEL_EXPORT classname : public super     \
   {                                                        \
   public:                                                  \

@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkPadImageFilter.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
 #include <mitkDICOMQIPropertyHelper.h>
+#include <mitkNodePredicateGeometry.h>
 
 #include <itkLabelGeometryImageFilter.h>
 #include <itkCommand.h>
@@ -138,7 +139,7 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
 
   auto newActiveIndex = activeIndex;
   auto newActiveIndexBeforeDeletion = activeIndex;
-  //determine new active group index (afte the group will be removed);
+  //determine new active group index (after the group will be removed);
   if (indexToDelete < activeIndex)
   { //lower the index because position in m_LayerContainer etc has changed
     newActiveIndex = activeIndex-1;
@@ -167,19 +168,22 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
 
   auto relevantLabels = m_GroupToLabelMap[indexToDelete];
 
-  // remove labels of group
-  for (auto labelValue : relevantLabels)
   {
-    auto label = m_LabelMap[labelValue];
-    this->ReleaseLabel(label);
-    m_LabelToGroupMap.erase(labelValue);
-    m_LabelMap.erase(labelValue);
-    this->InvokeEvent(LabelRemovedEvent(labelValue));
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+    // remove labels of group
+    for (auto labelValue : relevantLabels)
+    {
+      auto label = m_LabelMap[labelValue];
+      this->ReleaseLabel(label);
+      m_LabelToGroupMap.erase(labelValue);
+      m_LabelMap.erase(labelValue);
+      this->InvokeEvent(LabelRemovedEvent(labelValue));
+    }
+    // remove the group entries in the maps and the image.
+    m_Groups.erase(m_Groups.begin() + indexToDelete);
+    m_GroupToLabelMap.erase(m_GroupToLabelMap.begin() + indexToDelete);
+    m_LayerContainer.erase(m_LayerContainer.begin() + indexToDelete);
   }
-  // remove the group entries in the maps and the image.
-  m_Groups.erase(m_Groups.begin() + indexToDelete);
-  m_GroupToLabelMap.erase(m_GroupToLabelMap.begin() + indexToDelete);
-  m_LayerContainer.erase(m_LayerContainer.begin() + indexToDelete);
 
   //update old indexes in m_GroupToLabelMap to new layer indexes
   for (auto& element : m_LabelToGroupMap)
@@ -260,9 +264,25 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(ConstLabelVect
   return this->AddLayer(newImage, labels);
 }
 
-mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, ConstLabelVector labels)
+mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(mitk::Image* layerImage, ConstLabelVector labels)
 {
   GroupIndexType newGroupID = m_Groups.size();
+
+  if (nullptr == layerImage)
+    mitkThrow() << "Cannot add group. Passed group image is nullptr.";
+
+  bool equalGeometries = Equal(
+    *(this->GetTimeGeometry()),
+    *(layerImage->GetTimeGeometry()),
+    NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION,
+    NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION,
+    false);
+
+  if (!equalGeometries)
+    mitkThrow() << "Cannot add group. Passed group image has not the same geometry like segmentation.";
+
+  if (layerImage->GetPixelType() != MakePixelType<LabelValueType, LabelValueType, 1>())
+    mitkThrow() << "Cannot add group. Passed group image has incorrect pixel type. Only LabelValueType is supported. Invalid pixel type: "<< layerImage->GetPixelType().GetTypeAsString();
 
   // push a new working image for the new layer
   m_LayerContainer.push_back(layerImage);
@@ -298,12 +318,16 @@ void mitk::LabelSetImage::ReplaceGroupLabels(const GroupIndexType groupID, const
   }
 
   //remove old group labels
-  auto oldLabels = this->m_GroupToLabelMap[groupID];
-  for (auto labelID : oldLabels)
+  LabelValueVectorType oldLabels;
   {
-    this->RemoveLabelFromMap(labelID);
-    this->InvokeEvent(LabelRemovedEvent(labelID));
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+    oldLabels = this->m_GroupToLabelMap[groupID];
+    for (auto labelID : oldLabels)
+    {
+      this->RemoveLabelFromMap(labelID);
+      this->InvokeEvent(LabelRemovedEvent(labelID));
 
+    }
   }
   this->InvokeEvent(LabelsChangedEvent(oldLabels));
   this->InvokeEvent(GroupModifiedEvent(groupID));
@@ -327,11 +351,49 @@ mitk::Image* mitk::LabelSetImage::GetGroupImage(GroupIndexType groupID)
   return groupID == this->GetActiveLayer() ? this : m_LayerContainer[groupID];
 }
 
+
 const mitk::Image* mitk::LabelSetImage::GetGroupImage(GroupIndexType groupID) const
 {
   if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
 
-  return groupID == this->GetActiveLayer() ? this : m_LayerContainer[groupID].GetPointer();
+  return groupID == this->GetActiveLayer() ? this : m_LayerContainer.at(groupID).GetPointer();
+}
+
+const mitk::Image* mitk::LabelSetImage::GetGroupImageWorkaround(GroupIndexType groupID) const
+{
+  if (!this->ExistGroup(groupID))
+    mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
+
+  if (groupID == this->GetActiveLayer() && this->GetMTime()> m_LayerContainer[groupID]->GetMTime())
+  { //we have to transfer the content first into the group image
+    if (4 == this->GetDimension())
+    {
+      AccessFixedDimensionByItk_n(this, ImageToLayerContainerProcessing, 4, (groupID));
+    }
+    else
+    {
+      AccessByItk_1(this, ImageToLayerContainerProcessing, groupID);
+    }
+  }
+
+  return m_LayerContainer[groupID].GetPointer();
+}
+
+const std::string& mitk::LabelSetImage::GetGroupName(GroupIndexType groupID) const
+{
+  if (!this->ExistGroup(groupID))
+    mitkThrow() << "Error, cannot return group name. Group ID is invalid. Invalid ID: " << groupID;
+
+  return m_Groups[groupID];
+}
+
+void mitk::LabelSetImage::SetGroupName(GroupIndexType groupID, const std::string& name)
+{
+  if (!this->ExistGroup(groupID))
+    mitkThrow() << "Error, cannot set group name. Group ID is invalid. Invalid ID: " << groupID;
+
+  m_Groups[groupID] = name;
+  this->InvokeEvent(GroupModifiedEvent(groupID));
 }
 
 void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
@@ -455,18 +517,22 @@ void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, const std::vector<Pi
 
 void mitk::LabelSetImage::RemoveLabel(LabelValueType pixelValue)
 {
-  if (m_LabelMap.find(pixelValue) == m_LabelMap.end()) return;
-
-  auto groupID = this->GetGroupIndexOfLabel(pixelValue);
-
-  //first erase the pixel content (also triggers a LabelModified event)
-  this->EraseLabel(pixelValue);
-  this->RemoveLabelFromMap(pixelValue);
-
-
-  if (m_ActiveLabelValue == pixelValue)
+  GroupIndexType groupID = 0;
   {
-    this->SetActiveLabel(0);
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+    if (m_LabelMap.find(pixelValue) == m_LabelMap.end()) return;
+
+    groupID = this->GetGroupIndexOfLabel(pixelValue);
+
+    //first erase the pixel content (also triggers a LabelModified event)
+    this->EraseLabel(pixelValue);
+    this->RemoveLabelFromMap(pixelValue);
+
+
+    if (m_ActiveLabelValue == pixelValue)
+    {
+      this->SetActiveLabel(0);
+    }
   }
 
   this->InvokeEvent(LabelRemovedEvent(pixelValue));
@@ -541,37 +607,62 @@ mitk::LabelSetImage::LabelValueType mitk::LabelSetImage::GetUnusedLabelValue() c
 
 mitk::Label* mitk::LabelSetImage::AddLabel(mitk::Label* label, GroupIndexType groupID, bool addAsClone, bool correctLabelValue)
 {
-  unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
-  if (m_LayerContainer.size() >= max_size)
-    return nullptr;
+  if (nullptr == label) mitkThrow() << "Invalid use of AddLabel. label is not valid.";
 
-  mitk::Label::Pointer newLabel = addAsClone ? label->Clone() : Label::Pointer(label);
+  mitk::Label::Pointer newLabel = label;
 
-  auto pixelValue = newLabel->GetValue();
-  auto usedValues = this->GetUsedLabelValues();
-  auto finding = std::find(usedValues.begin(), usedValues.end(), pixelValue);
-
-  if (!usedValues.empty() && usedValues.end() != finding)
   {
-    if (correctLabelValue)
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+
+    unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
+    if (m_LayerContainer.size() >= max_size)
+      return nullptr;
+
+    if (addAsClone) newLabel = label->Clone();
+
+    auto pixelValue = newLabel->GetValue();
+    auto usedValues = this->GetUsedLabelValues();
+    auto finding = std::find(usedValues.begin(), usedValues.end(), pixelValue);
+
+    if (!usedValues.empty() && usedValues.end() != finding)
     {
-      pixelValue = this->GetUnusedLabelValue();
-      newLabel->SetValue(pixelValue);
+      if (correctLabelValue)
+      {
+        pixelValue = this->GetUnusedLabelValue();
+        newLabel->SetValue(pixelValue);
+      }
+      else
+      {
+        mitkThrow() << "Cannot add label due to conflicting label value that already exists in the MultiLabelSegmentation. Conflicting label value: " << pixelValue;
+      }
     }
-    else
-    {
-      mitkThrow() << "Cannot add label due to conflicting label value that already exists in the MultiLabelSegmentation. Conflicting label value: " << pixelValue;
-    }
+
+    // add DICOM information of the label
+    DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(newLabel);
+
+    this->AddLabelToMap(pixelValue, newLabel, groupID);
+    this->RegisterLabel(newLabel);
   }
-
-  // add DICOM information of the label
-  DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(newLabel);
-
-  this->AddLabelToMap(pixelValue, newLabel, groupID);
-  this->RegisterLabel(newLabel);
 
   this->InvokeEvent(LabelAddedEvent(newLabel->GetValue()));
   m_ActiveLabelValue = newLabel->GetValue();
+  this->Modified();
+
+  return newLabel;
+}
+
+mitk::Label* mitk::LabelSetImage::AddLabelWithContent(Label* label, const Image* labelContent, GroupIndexType groupID, LabelValueType contentLabelValue, bool addAsClone, bool correctLabelValue)
+{
+  if (nullptr == labelContent) mitkThrow() << "Invalid use of AddLabel. labelContent is not valid.";
+  if (!Equal(*(this->GetTimeGeometry()), *(labelContent->GetTimeGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+    mitkThrow() << "Invalid use of AddLabel. labelContent has not the same geometry like the segmentation.";
+
+  auto newLabel = this->AddLabel(label, groupID, addAsClone, correctLabelValue);
+
+  mitk::TransferLabelContent(labelContent, this->GetGroupImage(groupID), this->GetConstLabelsByValue(this->GetLabelValuesByGroup(groupID)),
+    mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, { {contentLabelValue, newLabel->GetValue()}},
+    mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
   this->Modified();
 
   return newLabel;
@@ -587,6 +678,8 @@ mitk::Label* mitk::LabelSetImage::AddLabel(const std::string& name, const mitk::
 
 void mitk::LabelSetImage::RenameLabel(LabelValueType pixelValue, const std::string& name, const mitk::Color& color)
 {
+  std::shared_lock<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+
   mitk::Label* label = GetLabel(pixelValue);
   if (nullptr == label) mitkThrow() << "Cannot rename label.Unknown label value provided. Unknown label value:" << pixelValue;
 
@@ -684,33 +777,6 @@ void mitk::LabelSetImage::MaskStamp(mitk::Image *mask, bool forceOverwrite)
   {
     mitkThrow() << "Could not stamp the provided mask on the selected label.";
   }
-}
-
-mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index)
-{
-  if (!this->ExistLabel(index)) mitkThrow() << "Error, cannot return label mask. Label ID is invalid. Invalid ID: " << index;
-
-  auto mask = mitk::Image::New();
-
-  // mask->Initialize(this) does not work here if this label set image has a single slice,
-  // since the mask would be automatically flattened to a 2-d image, whereas we expect the
-  // original dimension of this label set image. Hence, initialize the mask more explicitly:
-  mask->Initialize(this->GetPixelType(), this->GetDimension(), this->GetDimensions());
-  mask->SetTimeGeometry(this->GetTimeGeometry()->Clone());
-
-  ClearImageBuffer(mask);
-
-  const auto groupID = this->GetGroupIndexOfLabel(index);
-
-  auto destinationLabel = this->GetLabel(index)->Clone();
-  destinationLabel->SetValue(1);
-
-  TransferLabelContent(this->GetGroupImage(groupID), mask.GetPointer(),
-    {destinationLabel},
-    LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false,
-    { { index, destinationLabel->GetValue()}}, MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
-
-  return mask;
 }
 
 void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
@@ -898,7 +964,7 @@ void mitk::LabelSetImage::LayerContainerToImageProcessing(itk::Image<TPixel, VIm
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::LabelSetImage::ImageToLayerContainerProcessing(itk::Image<TPixel, VImageDimension> *source,
+void mitk::LabelSetImage::ImageToLayerContainerProcessing(const itk::Image<TPixel, VImageDimension> *source,
                                                           unsigned int layer) const
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
@@ -921,6 +987,8 @@ void mitk::LabelSetImage::ImageToLayerContainerProcessing(itk::Image<TPixel, VIm
     ++sourceIter;
     ++targetIter;
   }
+
+  m_LayerContainer[layer]->Modified();
 }
 
 template <typename ImageType>
@@ -980,17 +1048,19 @@ void mitk::LabelSetImage::AddLabelToMap(LabelValueType labelValue, mitk::Label* 
 
 void mitk::LabelSetImage::RegisterLabel(mitk::Label* label)
 {
+  if (nullptr == label) mitkThrow() << "Invalid call of RegisterLabel with a nullptr.";
+
   UpdateLookupTable(label->GetValue());
 
   auto command = itk::MemberCommand<LabelSetImage>::New();
   command->SetCallbackFunction(this, &LabelSetImage::OnLabelModified);
-  label->AddObserver(itk::ModifiedEvent(), command);
+  m_LabelModEventGuardMap.emplace(label->GetValue(), ITKEventObserverGuard(label, itk::ModifiedEvent(), command));
 }
 
 void mitk::LabelSetImage::ReleaseLabel(Label* label)
 {
   if (nullptr == label) mitkThrow() << "Invalid call of ReleaseLabel with a nullptr.";
-  label->RemoveAllObservers();
+  m_LabelModEventGuardMap.erase(label->GetValue());
 }
 
 void mitk::LabelSetImage::ApplyToLabels(const LabelValueVectorType& values, std::function<void(Label*)>&& lambda)
@@ -1140,7 +1210,7 @@ const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelVal
   return m_GroupToLabelMap[index];
 }
 
-const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelValuesByName(GroupIndexType index, std::string_view name) const
+const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelValuesByName(GroupIndexType index, const std::string_view name) const
 {
   LabelValueVectorType result;
 
@@ -1171,23 +1241,38 @@ std::vector<std::string> mitk::LabelSetImage::GetLabelClassNamesByGroup(GroupInd
 
 void mitk::LabelSetImage::SetAllLabelsVisible(bool visible)
 {
-  auto setVisibility = [visible](Label* l) { l->SetVisible(visible); };
+  auto setVisibility = [visible,this](Label* l)
+    {
+      l->SetVisible(visible);
+      this->UpdateLookupTable(l->GetValue());
+    };
 
   this->ApplyToLabels(this->GetAllLabelValues(), setVisibility);
+  this->m_LookupTable->Modified();
 }
 
 void mitk::LabelSetImage::SetAllLabelsVisibleByGroup(GroupIndexType group, bool visible)
 {
-  auto setVisibility = [visible](Label* l) { l->SetVisible(visible); };
+  auto setVisibility = [visible, this](Label* l)
+    {
+      l->SetVisible(visible);
+      this->UpdateLookupTable(l->GetValue());
+    };
 
   this->ApplyToLabels(this->GetLabelValuesByGroup(group), setVisibility);
+  this->m_LookupTable->Modified();
 }
 
-void mitk::LabelSetImage::SetAllLabelsVisibleByName(GroupIndexType group, std::string_view name, bool visible)
+void mitk::LabelSetImage::SetAllLabelsVisibleByName(GroupIndexType group, const std::string_view name, bool visible)
 {
-  auto setVisibility = [visible](Label* l) { l->SetVisible(visible); };
+  auto setVisibility = [visible, this](Label* l)
+    {
+      l->SetVisible(visible);
+      this->UpdateLookupTable(l->GetValue());
+    };
 
   this->ApplyToLabels(this->GetLabelValuesByName(group, name), setVisibility);
+  this->m_LookupTable->Modified();
 }
 
 void mitk::LabelSetImage::SetAllLabelsLocked(bool locked)
@@ -1204,7 +1289,7 @@ void mitk::LabelSetImage::SetAllLabelsLockedByGroup(GroupIndexType group, bool l
   this->ApplyToLabels(this->GetLabelValuesByGroup(group), setLock);
 }
 
-void mitk::LabelSetImage::SetAllLabelsLockedByName(GroupIndexType group, std::string_view name, bool locked)
+void mitk::LabelSetImage::SetAllLabelsLockedByName(GroupIndexType group, const std::string_view name, bool locked)
 {
   auto setLock = [locked](Label* l) { l->SetLocked(locked); };
 
@@ -1533,9 +1618,33 @@ void mitk::TransferLabelContentAtTimeStep(
   {
     mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; sourceImage does not have the requested time step: " << timeStep;
   }
+
   if (nullptr == destinationImageAtTimeStep)
   {
     mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; destinationImage does not have the requested time step: " << timeStep;
+  }
+
+  if (!Equal(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+  {
+    if (IsSubGeometry(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+    {
+      //we have to pad the source image
+      //because ImageToImageFilters always check for origin matching even if
+      //the requested output region is fitting :(
+      auto padFilter = mitk::PadImageFilter::New();
+      padFilter->SetInput(0, sourceImageAtTimeStep);
+      padFilter->SetInput(1, destinationImageAtTimeStep);
+      padFilter->SetPadConstant(Label::UNLABELED_VALUE);
+      padFilter->SetBinaryFilter(false);
+
+      padFilter->Update();
+
+      sourceImageAtTimeStep = padFilter->GetOutput();
+    }
+    else
+    {
+      mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; source image has neither the same geometry than destination image nor has the source image a sub geometry.";
+    }
   }
 
   auto destLabelMap = ConvertLabelVectorToMap(destinationLabels);

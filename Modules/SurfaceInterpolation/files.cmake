@@ -3,7 +3,6 @@ set(CPP_FILES
   mitkCreateDistanceImageFromSurfaceFilter.cpp
   mitkImageToPointCloudFilter.cpp
   mitkPlaneProposer.cpp
-  mitkPointCloudScoringFilter.cpp
   mitkReduceContourSetFilter.cpp
   mitkSurfaceInterpolationController.cpp
 )

@@ -88,6 +88,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   {
     m_Controls.pythonEnvComboBox->insertItem(0, lastSelectedPyEnv);
   }
+  m_Controls.fastBox->setChecked(m_Settings.value("TotalSeg/LastFast").toBool());
   const QString storageDir = m_Installer.GetVirtualEnvPath();
   m_IsInstalled = this->IsTotalSegmentatorInstalled(storageDir);
   if (m_IsInstalled)
@@ -159,13 +160,13 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
     this->WriteErrorMessage("<b>ERROR: </b>Couldn't find compatible Python.");
     return;
   }
-  // check if python 3.12 and ask for confirmation
-  if (version.startsWith("3.12") &&
+  // check if python 3.13 and ask for confirmation
+  if (version.startsWith("3.13") &&
       QMessageBox::No == QMessageBox::question(
                           nullptr,
                           "Installing TotalSegmentator",
                           QString("WARNING: This is an unsupported version of Python that may not work. "
-                                  "We recommend using a supported Python version between 3.9 and 3.11.\n\n"
+                                  "We recommend using a supported Python version between 3.9 and 3.12.\n\n"
                                   "Continue anyway?"),
                           QMessageBox::Yes | QMessageBox::No,
                           QMessageBox::No))
@@ -213,9 +214,9 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     tool->SetFast(isFast);
     tool->SetSubTask(subTask.toStdString());
     this->WriteStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
+    m_FirstPreviewComputation = false;
     tool->UpdatePreview();
     m_Controls.previewButton->setEnabled(true);
-    m_FirstPreviewComputation = false;
   }
   catch (const std::exception &e)
   {
@@ -225,6 +226,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     this->ShowErrorMessage(errorMsg.str());
     this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
     m_Controls.previewButton->setEnabled(true);
+    m_FirstPreviewComputation = true;
     return;
   }
   catch (...)
@@ -232,6 +234,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     std::string errorMsg = "Unkown error occured while generation TotalSegmentator segmentation.";
     this->ShowErrorMessage(errorMsg);
     m_Controls.previewButton->setEnabled(true);
+    m_FirstPreviewComputation = true;
     return;
   }
   this->SetLabelSetPreview(tool->GetPreviewSegmentation());
@@ -246,6 +249,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
       m_Settings.setValue("TotalSeg/LastCustomPythonPath", pythonPathTextItem);
     }
   }
+  m_Settings.setValue("TotalSeg/LastFast", m_Controls.fastBox->isChecked());
 }
 
 void QmitkTotalSegmentatorToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)

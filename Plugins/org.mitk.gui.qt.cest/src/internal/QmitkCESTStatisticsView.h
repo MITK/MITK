@@ -20,8 +20,9 @@ found in the LICENSE file.
 #include <QmitkSliceNavigationListener.h>
 
 #include "ui_QmitkCESTStatisticsViewControls.h"
-#include <QmitkImageStatisticsCalculationJob.h>
+#include <QmitkImageStatisticsCalculationRunnable.h>
 
+#include <mitkPlanarFigure.h>
 #include <mitkPointSet.h>
 
 #include <mitkIRenderWindowPartListener.h>
@@ -109,7 +110,7 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
     void CopyTimesteps(itk::Image<TPixel, VImageDimension>* image);
 
     Ui::QmitkCESTStatisticsViewControls m_Controls;
-    QmitkImageStatisticsCalculationJob* m_CalculatorJob;
+    QmitkImageStatisticsCalculationRunnable* m_CalculatorJob;
     QmitkPlotWidget::DataVector m_zSpectrum;
     mitk::Image::Pointer m_ZImage;
     mitk::Image::Pointer m_MaskImage;

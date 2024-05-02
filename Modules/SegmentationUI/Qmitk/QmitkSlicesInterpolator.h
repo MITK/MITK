@@ -20,9 +20,6 @@ found in the LICENSE file.
 #include "mitkToolManager.h"
 #include <MitkSegmentationUIExports.h>
 
-#include "mitkFeatureBasedEdgeDetectionFilter.h"
-#include "mitkPointCloudScoringFilter.h"
-
 #include <QWidget>
 #include <map>
 
@@ -284,9 +281,6 @@ private:
 
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
-
-  mitk::FeatureBasedEdgeDetectionFilter::Pointer m_EdgeDetector;
-  mitk::PointCloudScoringFilter::Pointer m_PointScorer;
 
   mitk::ToolManager::Pointer m_ToolManager;
   bool m_Initialized;

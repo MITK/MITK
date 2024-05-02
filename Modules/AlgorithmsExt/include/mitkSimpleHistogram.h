@@ -52,13 +52,10 @@ namespace mitk
     SimpleImageHistogram()
     {
       valid = false;
-      histogram = nullptr;
     }
 
     ~SimpleImageHistogram()
     {
-      if (histogram)
-        delete histogram;
     }
 
     /** @return Returns if the current histogram is valid, false if not. */
@@ -75,33 +72,15 @@ namespace mitk
     typedef unsigned long CountType;
 
   protected:
-    CountType *histogram;
+    HistogramType::ConstPointer histogram;
 
     bool valid;
-
-    int first;
-    int last;
-    int min;
-    int max;
-    CountType highest;
+    unsigned int nBins = 256;
     double invLogHighest;
 
   public:
-    double GetMin() const override
-    {
-      if (!valid)
-        return 0;
-
-      return min;
-    }
-
-    double GetMax() const override
-    {
-      if (!valid)
-        return 1;
-
-      return max;
-    }
+    double GetMin() const override;
+    double GetMax() const override;
 
     /** @brief Creates a new histogram out the source which must be an image. Method does nothing if the image is
      * invalid, nullptr, etc.. */

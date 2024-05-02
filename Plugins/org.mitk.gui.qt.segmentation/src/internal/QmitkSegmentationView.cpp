@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkWorkbenchUtil.h>
 #include <mitkIPreferences.h>
+#include <mitkMultiLabelPredicateHelper.h>
 
 // Qmitk
 #include <QmitkRenderWindow.h>
@@ -85,28 +86,9 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_DefaultLabelNaming(true)
   , m_SelectionChangeIsAlreadyBeingHandled(false)
 {
-  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
-  auto isDti = mitk::NodePredicateDataType::New("TensorImage");
-  auto isOdf = mitk::NodePredicateDataType::New("OdfImage");
-  auto isSegment = mitk::NodePredicateDataType::New("Segment");
+  m_SegmentationPredicate = mitk::GetMultiLabelSegmentationPredicate();
 
-  auto validImages = mitk::NodePredicateOr::New();
-  validImages->AddPredicate(mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isSegment)));
-  validImages->AddPredicate(isDwi);
-  validImages->AddPredicate(isDti);
-  validImages->AddPredicate(isOdf);
-
-  m_SegmentationPredicate = mitk::NodePredicateAnd::New();
-  m_SegmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
-
-  m_ReferencePredicate = mitk::NodePredicateAnd::New();
-  m_ReferencePredicate->AddPredicate(validImages);
-  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(m_SegmentationPredicate));
-  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+  m_ReferencePredicate = mitk::GetSegmentationReferenceImagePredicate();
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
@@ -206,9 +188,7 @@ void QmitkSegmentationView::OnAnySelectionChanged()
     else
     {
       // With a reference image, only allow segmentations that fit the geometry of the reference image to be selected.
-      m_Controls->workingNodeSelector->SetNodePredicate(mitk::NodePredicateAnd::New(
-        mitk::NodePredicateSubGeometry::New(m_ReferenceNode->GetData()->GetGeometry()),
-        m_SegmentationPredicate.GetPointer()));
+      m_Controls->workingNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_ReferenceNode->GetData()->GetGeometry()));
 
       m_SelectionChangeIsAlreadyBeingHandled = false;
 
@@ -366,6 +346,7 @@ void QmitkSegmentationView::OnLabelToggleShortcutActivated()
   }
 
   workingImage->SetActiveLabel(*it);
+  m_Controls->multiLabelWidget->SetSelectedLabel(*it);
   this->WaitCursorOff();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -558,7 +539,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // *------------------------
    QShortcut* visibilityShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_H), parent);
    connect(visibilityShortcut, &QShortcut::activated, this, &Self::OnVisibilityShortcutActivated);
-   QShortcut* labelToggleShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), parent);
+   QShortcut* labelToggleShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_N), parent);
    connect(labelToggleShortcut, &QShortcut::activated, this, &Self::OnLabelToggleShortcutActivated);
 
    // *------------------------
@@ -588,7 +569,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_ToolManager->SetDataStorage(*(this->GetDataStorage()));
    m_ToolManager->InitializeTools();
 
-   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything'");
+   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything', 'MedSAM'");
    QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut TotalSegmentator");
 
 #ifdef __linux__
@@ -1048,7 +1029,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     if (numberOfLabels > 0)
       m_Controls->slicesInterpolator->setEnabled(true);
 
-    m_Controls->multiLabelWidget->SetMultiLabelSegmentation(dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData()));
+    m_Controls->multiLabelWidget->SetMultiLabelNode(workingNode);
 
     if (!m_Controls->multiLabelWidget->GetSelectedLabels().empty())
     {
@@ -1057,7 +1038,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
   }
   else
   {
-    m_Controls->multiLabelWidget->SetMultiLabelSegmentation(nullptr);
+    m_Controls->multiLabelWidget->SetMultiLabelNode(nullptr);
   }
 
   toolSelectionBoxesEnabled &= numberOfLabels > 0;

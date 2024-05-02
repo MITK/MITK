@@ -19,12 +19,14 @@ found in the LICENSE file.
 #include <mitkImageStatisticsHolder.h>
 #include <mitkMaskImageFilter.h>
 #include <mitkProgressBar.h>
-#include <mitkSurfaceToImageFilter.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateDimension.h>
 #include <mitkNodePredicateGeometry.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkMultiLabelPredicateHelper.h>
+#include <mitkLabelSetImageConverter.h>
 
 #include <QMessageBox>
 
@@ -32,121 +34,94 @@ found in the LICENSE file.
 
 namespace
 {
-  bool IsSurface(const mitk::DataNode* dataNode)
+  mitk::NodePredicateBase::Pointer GetInputPredicate()
   {
-    if (nullptr != dataNode)
-    {
-      if (nullptr != dynamic_cast<const mitk::Surface*>(dataNode->GetData()))
-        return true;
-    }
+    auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+    auto isNotSeg = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
 
-    return false;
+    auto isValidInput = mitk::NodePredicateAnd::New(isNotSeg, isImage);
+    isValidInput->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+    isValidInput->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+    return isValidInput.GetPointer();
   }
 }
 
-static const char* const HelpText = "Select an image and a segmentation or surface";
-
 QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::DataStorage* dataStorage, QWidget* parent)
-  : QWidget(parent)
+  : QWidget(parent), m_DataStorage(dataStorage)
 {
   m_Controls = new Ui::QmitkImageMaskingWidgetControls;
   m_Controls->setupUi(this);
 
-  m_Controls->dataSelectionWidget->SetDataStorage(dataStorage);
-  m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImagePredicate);
-  m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SegmentationOrSurfacePredicate);
-  m_Controls->dataSelectionWidget->SetHelpText(HelpText);
+  m_Controls->imageNodeSelector->SetDataStorage(dataStorage);
+  m_Controls->imageNodeSelector->SetNodePredicate(GetInputPredicate());
+  m_Controls->imageNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->imageNodeSelector->SetInvalidInfo(QStringLiteral("Please select an image for masking"));
+  m_Controls->imageNodeSelector->SetPopUpTitel(QStringLiteral("Select image"));
+  m_Controls->imageNodeSelector->SetPopUpHint(QStringLiteral("Select an image that you want to mask."));
 
-  // T28795: Disable 2-d reference images since they do not work yet (segmentations are at least 3-d images with a single slice)
-  m_Controls->dataSelectionWidget->SetPredicate(0, mitk::NodePredicateAnd::New(
-    mitk::NodePredicateNot::New(mitk::NodePredicateDimension::New(2)),
-    m_Controls->dataSelectionWidget->GetPredicate(0)));
+  m_Controls->segNodeSelector->SetDataStorage(dataStorage);
+  m_Controls->segNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
+  m_Controls->segNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->segNodeSelector->SetInvalidInfo(QStringLiteral("Please select a segmentation and its label"));
+  m_Controls->segNodeSelector->SetPopUpTitel(QStringLiteral("Select segmentation"));
+  m_Controls->segNodeSelector->SetPopUpHint(QStringLiteral("Select the segmentation that should be used for masking.\nThe segmentation must have the same geometry as the image that should be masked."));
 
-  this->EnableButtons(false);
+  this->ConfigureWidgets();
 
-  connect(m_Controls->btnMaskImage, SIGNAL(clicked()), this, SLOT(OnMaskImagePressed()));
-  connect(m_Controls->rbnCustom, SIGNAL(toggled(bool)), this, SLOT(OnCustomValueButtonToggled(bool)));
-  connect(m_Controls->dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
-    this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
+  connect(m_Controls->imageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkImageMaskingWidget::OnImageSelectionChanged);
+  connect(m_Controls->segNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkImageMaskingWidget::OnSegSelectionChanged);
 
-  if( m_Controls->dataSelectionWidget->GetSelection(0).IsNotNull() &&
-    m_Controls->dataSelectionWidget->GetSelection(1).IsNotNull() )
-  {
-    this->OnSelectionChanged(0, m_Controls->dataSelectionWidget->GetSelection(0));
-  }
+  connect(m_Controls->btnMaskImage, &QPushButton::clicked, this, &QmitkImageMaskingWidget::OnMaskImagePressed);
+  connect(m_Controls->rbnCustom, &QRadioButton::toggled, this, &QmitkImageMaskingWidget::OnCustomValueButtonToggled);
+
+  m_Controls->imageNodeSelector->SetAutoSelectNewNodes(true);
+  m_Controls->segNodeSelector->SetAutoSelectNewNodes(true);
 }
 
 QmitkImageMaskingWidget::~QmitkImageMaskingWidget()
 {
+  m_Controls->labelInspector->SetMultiLabelNode(nullptr);
 }
 
-void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode *selection)
+void QmitkImageMaskingWidget::OnImageSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/)
 {
-  auto *dataSelectionWidget = m_Controls->dataSelectionWidget;
-  auto node0 = dataSelectionWidget->GetSelection(0);
-
-  if (index == 0)
+  auto imageNode = m_Controls->imageNodeSelector->GetSelectedNode();
+  const mitk::BaseGeometry* refGeometry = nullptr;
+  const mitk::BaseData* inputImage = (nullptr != imageNode) ? imageNode->GetData() : nullptr;
+  if (nullptr != inputImage)
   {
-    dataSelectionWidget->SetPredicate(1, QmitkDataSelectionWidget::SegmentationOrSurfacePredicate);
-
-    if (node0.IsNotNull())
-    {
-      dataSelectionWidget->SetPredicate(1, mitk::NodePredicateAnd::New(
-        mitk::NodePredicateGeometry::New(node0->GetData()->GetGeometry()),
-        dataSelectionWidget->GetPredicate(1)));
-    }
+    refGeometry = inputImage->GetGeometry();
   }
 
-  auto node1 = dataSelectionWidget->GetSelection(1);
-
-  if (node0.IsNull() || node1.IsNull())
-  {
-    dataSelectionWidget->SetHelpText(HelpText);
-    this->EnableButtons(false);
-  }
-  else
-  {
-    this->SelectionControl(index, selection);
-  }
+  m_Controls->segNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(refGeometry));
+  this->ConfigureWidgets();
 }
 
-void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::DataNode* selection)
+void QmitkImageMaskingWidget::OnSegSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/)
 {
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(index);
-
-  //if Image-Masking is enabled, check if image-dimension of reference and binary image is identical
-  if( !IsSurface(dataSelectionWidget->GetSelection(1)) )
+  auto node = m_Controls->segNodeSelector->GetSelectedNode();
+  m_Controls->labelInspector->SetMultiLabelNode(node);
+  if (node.IsNotNull())
   {
-    if( dataSelectionWidget->GetSelection(0) == dataSelectionWidget->GetSelection(1) )
+    auto labelValues = m_Controls->labelInspector->GetMultiLabelSegmentation()->GetAllLabelValues();
+    if (!labelValues.empty())
     {
-      dataSelectionWidget->SetHelpText("Select two different images above");
-      this->EnableButtons(false);
-      return;
-    }
-
-    else if( node.IsNotNull() && selection )
-    {
-      mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(0)->GetData() );
-      mitk::Image::Pointer maskImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(1)->GetData() );
-
-      if (maskImage.IsNull())
-      {
-        dataSelectionWidget->SetHelpText("Different image sizes cannot be masked");
-        this->EnableButtons(false);
-        return;
-      }
-    }
-
-    else
-    {
-      dataSelectionWidget->SetHelpText(HelpText);
-      return;
+      m_Controls->labelInspector->SetSelectedLabel(labelValues.front());
     }
   }
+  this->ConfigureWidgets();
+}
 
-  dataSelectionWidget->SetHelpText("");
-  this->EnableButtons();
+void QmitkImageMaskingWidget::ConfigureWidgets()
+{
+  auto iNode = m_Controls->imageNodeSelector->GetSelectedNode();
+  auto sNode = m_Controls->segNodeSelector->GetSelectedNode();
+
+  bool enable = iNode.IsNotNull() && sNode.IsNotNull() && !m_Controls->labelInspector->GetSelectedLabels().empty();
+
+  this->EnableButtons(enable);
 }
 
 void QmitkImageMaskingWidget::EnableButtons(bool enable)
@@ -174,86 +149,34 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
   mitk::ProgressBar::GetInstance()->Progress();
 
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
-
   //create result image, get mask node and reference image
   mitk::Image::Pointer resultImage(nullptr);
-  mitk::DataNode::Pointer maskingNode = dataSelectionWidget->GetSelection(1);
-  mitk::Image::Pointer referenceImage = static_cast<mitk::Image*>(dataSelectionWidget->GetSelection(0)->GetData());
+  mitk::LabelSetImage::Pointer segmentation = m_Controls->labelInspector->GetMultiLabelSegmentation();
+  mitk::Image::Pointer referenceImage = static_cast<mitk::Image*>(m_Controls->imageNodeSelector->GetSelectedNode()->GetData());
 
-  if(referenceImage.IsNull() || maskingNode.IsNull() )
-  {
-    MITK_ERROR << "Selection does not contain an image";
-    QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain an image", QMessageBox::Ok );
-    m_Controls->btnMaskImage->setEnabled(true);
-    return;
-  }
+  mitk::ProgressBar::GetInstance()->Progress();
 
-  //Do Image-Masking
-  if (!IsSurface(maskingNode))
-  {
-    mitk::ProgressBar::GetInstance()->Progress();
-
-    mitk::Image::Pointer maskImage = dynamic_cast<mitk::Image*> ( maskingNode->GetData() );
-
-    if(maskImage.IsNull() )
-    {
-      MITK_ERROR << "Selection does not contain a segmentation";
-      QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain a segmentation", QMessageBox::Ok );
-      this->EnableButtons();
-      return;
-    }
-
-    resultImage = this->MaskImage(referenceImage, maskImage);
-  }
-
-  //Do Surface-Masking
-  else
-  {
-    mitk::ProgressBar::GetInstance()->Progress();
-
-    //1. convert surface to image
-    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*> ( maskingNode->GetData() );
-
-    //TODO Get 3D Surface of current time step
-
-    if(surface.IsNull())
-    {
-      MITK_ERROR << "Selection does not contain a surface";
-      QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain a surface", QMessageBox::Ok );
-      this->EnableButtons();
-      return;
-    }
-
-    mitk::Image::Pointer maskImage = this->ConvertSurfaceToImage( referenceImage, surface );
-
-    //2. mask reference image with mask image
-    if(maskImage.IsNotNull() &&
-       referenceImage->GetLargestPossibleRegion().GetSize() == maskImage->GetLargestPossibleRegion().GetSize() )
-    {
-      resultImage = this->MaskImage( referenceImage, maskImage );
-    }
-  }
+  auto labelImage = mitk::CreateLabelMask(segmentation, m_Controls->labelInspector->GetSelectedLabels().front(), true);
+  resultImage = this->MaskImage(referenceImage, labelImage);
 
   mitk::ProgressBar::GetInstance()->Progress();
 
   if( resultImage.IsNull() )
   {
     MITK_ERROR << "Masking failed";
-    QMessageBox::information( this, "Image and Surface Masking", "Masking failed. For more information please see logging window.", QMessageBox::Ok );
-    this->EnableButtons();
+    QMessageBox::information( this, "Image Masking", "Masking failed. For more information please see logging window.", QMessageBox::Ok );
+    this->EnableButtons(true);
     mitk::ProgressBar::GetInstance()->Progress(4);
     return;
   }
 
   //Add result to data storage
-  this->AddToDataStorage(
-    dataSelectionWidget->GetDataStorage(),
+  this->AddToDataStorage(m_DataStorage.Lock(),
     resultImage,
-    dataSelectionWidget->GetSelection(0)->GetName() + "_" + dataSelectionWidget->GetSelection(1)->GetName(),
-    dataSelectionWidget->GetSelection(0));
+    m_Controls->imageNodeSelector->GetSelectedNode()->GetName() + "_" + m_Controls->segNodeSelector->GetSelectedNode()->GetName(),
+    m_Controls->imageNodeSelector->GetSelectedNode());
 
-  this->EnableButtons();
+  this->EnableButtons(true);
 
   mitk::ProgressBar::GetInstance()->Progress();
 }
@@ -337,32 +260,6 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
   }
 
   return maskFilter->GetOutput();
-}
-
-mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface )
-{
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
-  mitk::ProgressBar::GetInstance()->Progress();
-
-  mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
-  surfaceToImageFilter->MakeOutputBinaryOn();
-  surfaceToImageFilter->SetInput(surface);
-  surfaceToImageFilter->SetImage(image);
-  try
-  {
-    surfaceToImageFilter->Update();
-  }
-  catch(itk::ExceptionObject& excpt)
-  {
-    MITK_ERROR << excpt.GetDescription();
-    return nullptr;
-  }
-
-  mitk::ProgressBar::GetInstance()->Progress();
-  mitk::Image::Pointer resultImage = mitk::Image::New();
-  resultImage = surfaceToImageFilter->GetOutput();
-
-  return resultImage;
 }
 
 void QmitkImageMaskingWidget::AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent )

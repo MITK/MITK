@@ -41,6 +41,7 @@ mitk::TotalSegmentatorTool::~TotalSegmentatorTool()
 mitk::TotalSegmentatorTool::TotalSegmentatorTool() : SegWithPreviewTool(true) // prevents auto-compute across all timesteps
 {
   this->IsTimePointChangeAwareOff();
+  this->RequestDeactivationConfirmationOn();
 }
 
 void mitk::TotalSegmentatorTool::Activated()

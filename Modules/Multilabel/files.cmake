@@ -11,9 +11,11 @@ set(CPP_FILES
   mitkMultilabelObjectFactory.cpp
   mitkMultiLabelIOHelper.cpp
   mitkMultiLabelEvents.cpp
+  mitkMultiLabelPredicateHelper.cpp
   mitkDICOMSegmentationPropertyHelper.cpp
   mitkDICOMSegmentationConstants.cpp
   mitkSegmentationTaskList.cpp
+  mitkMultiLabelSegmentationVtkMapper3D.cpp
 )
 
 set(RESOURCE_FILES

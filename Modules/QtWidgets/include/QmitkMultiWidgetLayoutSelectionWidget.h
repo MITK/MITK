@@ -15,12 +15,17 @@ found in the LICENSE file.
 
 #include "MitkQtWidgetsExports.h"
 
-#include "ui_QmitkMultiWidgetLayoutSelectionWidget.h"
+#include <QmitkAutomatedLayoutWidget.h>
 
 #include <nlohmann/json.hpp>
 
 // qt
 #include "QWidget"
+
+namespace Ui
+{
+  class QmitkMultiWidgetLayoutSelectionWidget;
+}
 
 /**
 * @brief
@@ -34,10 +39,12 @@ class MITKQTWIDGETS_EXPORT QmitkMultiWidgetLayoutSelectionWidget : public QWidge
 public:
 
   QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent = nullptr);
+  void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);
+  void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);
 
   // needs to be connected via Qt::DirectConnection (usually default), to ensure the stream pointers validity
   void SaveLayout(std::ostream* outStream);
@@ -48,6 +55,7 @@ private Q_SLOTS:
 
   void OnTableItemSelectionChanged();
   void OnSetLayoutButtonClicked();
+  void OnDataBasedLayoutButtonClicked();
   void OnSaveLayoutButtonClicked();
   void OnLoadLayoutButtonClicked();
   void OnLayoutPresetSelected(int index);
@@ -57,8 +65,9 @@ private:
   void Init();
 
 
-  Ui::QmitkMultiWidgetLayoutSelectionWidget ui;
+  Ui::QmitkMultiWidgetLayoutSelectionWidget* ui;
   std::map<int, nlohmann::json> m_PresetMap;
+  QmitkAutomatedLayoutWidget* m_AutomatedDataLayoutWidget;
 
 };
 

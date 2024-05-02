@@ -30,22 +30,15 @@ namespace mitk
 class MITKIMAGESTATISTICS_EXPORT MaskGenerator: public itk::Object
 {
 public:
-    /** Standard Self typedef */
-    typedef MaskGenerator                       Self;
-    typedef itk::Object                         Superclass;
-    typedef itk::SmartPointer< Self >           Pointer;
-    typedef itk::SmartPointer< const Self >     ConstPointer;
+    mitkClassMacroItkParent(MaskGenerator, itk::Object);
 
-    /** Method for creation through the object factory. */
-    itkTypeMacro(MaskGenerator, itk::Object);
-
-    //~MaskGenerator();
-
+    virtual unsigned int GetNumberOfMasks() const = 0;
     /**
-     * @brief GetMask must be overridden by derived classes.
-     * @return mitk::Image::Pointer of generated mask
+     * @brief GetMask returns the requested (multi) label mask.
+     * @param maskID Parameter indicating which mask should be returned.
+     * @return mitk::Image::Pointer of generated mask requested
      */
-    virtual mitk::Image::ConstPointer GetMask() = 0;
+    mitk::Image::ConstPointer GetMask(unsigned int maskID);
 
     /**
      * @brief GetReferenceImage per default returns the inputImage (as set by SetInputImage). If no input image is set it will return a nullptr.
@@ -55,15 +48,22 @@ public:
     /**
      * @brief SetInputImage is used to set the input image to the mask generator. Some subclasses require an input image, others don't. See the documentation of the specific Mask Generator for more information.
      */
-    void SetInputImage(mitk::Image::ConstPointer inputImg);
-
-    virtual void SetTimeStep(unsigned int timeStep);
+    itkSetConstObjectMacro(InputImage, mitk::Image);
+    itkSetMacro(TimePoint, TimePointType);
 
 protected:
     MaskGenerator();
 
-    unsigned int m_TimeStep;
-    mitk::Image::ConstPointer m_inputImage;
+    /**
+     * @brief DoGetMask must be overridden by derived classes.
+     * @param maskID Parameter indicating which mask should be returned.
+     * @return mitk::Image::Pointer of generated mask requested
+     */
+    virtual mitk::Image::ConstPointer DoGetMask(unsigned int maskID) = 0;
+
+
+    TimePointType m_TimePoint;
+    mitk::Image::ConstPointer m_InputImage;
 
 private:
 

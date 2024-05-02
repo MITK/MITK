@@ -72,7 +72,7 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 {
   m_Controls.setupUi(parent);
   m_Controls.widget_intensityProfile->SetTheme(GetColorTheme());
-  m_Controls.groupBox_histogram->setVisible(true);
+  m_Controls.groupBox_histogram->setVisible(false);
   m_Controls.groupBox_intensityProfile->setVisible(false);
   m_Controls.label_currentlyComputingStatistics->setVisible(false);
   m_Controls.sliderWidget_histogram->setPrefix("Time: ");
@@ -94,7 +94,7 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_Controls.imageNodesSelector->SetSelectionIsOptional(false);
   m_Controls.imageNodesSelector->SetInvalidInfo(QStringLiteral("Please select images for statistics"));
   m_Controls.imageNodesSelector->SetPopUpTitel(QStringLiteral("Select input images"));
-  m_Controls.roiNodesSelector->SetPopUpHint(QStringLiteral("You may select multiple images for the statistics computation. But all selected images must have the same geometry."));
+  m_Controls.imageNodesSelector->SetPopUpHint(QStringLiteral("You may select multiple images for the statistics computation. But all selected images must have the same geometry."));
 
   m_Controls.roiNodesSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.roiNodesSelector->SetNodePredicate(this->GenerateROIPredicate());
@@ -219,30 +219,37 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
       {
         auto statistics = dynamic_cast<const mitk::ImageStatisticsContainer*>(statisticsNode->GetData());
 
-        if (statistics)
+        if (statistics && !statistics->IsWIP())
         {
-          const auto timeStep = imageNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(m_TimePointChangeListener.GetCurrentSelectedTimePoint());
-
-          if (statistics->TimeStepExists(timeStep))
+          //currently only supports rois with one label due to histogram widget limitations.
+          auto labelValues = statistics->GetExistingLabelValues();
+          if (labelValues.size() == 1)
           {
-            std::stringstream label;
-            label << imageNode->GetName();
-            if (imageNode->GetData()->GetTimeSteps() > 1)
-            {
-              label << "[" << timeStep << "]";
-            }
+            auto labelValue = labelValues.empty() ? mitk::ImageStatisticsContainer::NO_MASK_LABEL_VALUE : labelValues.front();
 
-            if (roiNode)
-            {
-              label << " with " << roiNode->GetName();
-            }
+            const auto timeStep = imageNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(m_TimePointChangeListener.GetCurrentSelectedTimePoint());
 
-            //Hardcoded labels are currently needed because the current histogram widget (and ChartWidget)
-            //do not allow correct removal or sound update/insertion of several charts.
-            //only thing that works for now is always to update/overwrite the same data label
-            //This is a quick fix for T28223 and T28221
-            m_Controls.widget_histogram->SetHistogram(statistics->GetHistogramForTimeStep(timeStep), "histogram");
-            m_Controls.groupBox_histogram->setVisible(true);
+            if (statistics->StatisticsExist(labelValue, timeStep))
+            {
+              std::stringstream label;
+              label << imageNode->GetName();
+              if (imageNode->GetData()->GetTimeSteps() > 1)
+              {
+                label << "[" << timeStep << "]";
+              }
+
+              if (roiNode)
+              {
+                label << " with " << roiNode->GetName();
+              }
+
+              //Hardcoded labels are currently needed because the current histogram widget (and ChartWidget)
+              //do not allow correct removal or sound update/insertion of several charts.
+              //only thing that works for now is always to update/overwrite the same data label
+              //This is a quick fix for T28223 and T28221
+              m_Controls.widget_histogram->SetHistogram(statistics->GetHistogram(labelValue, timeStep), "histogram");
+              m_Controls.groupBox_histogram->setVisible(true);
+            }
           }
         }
       }

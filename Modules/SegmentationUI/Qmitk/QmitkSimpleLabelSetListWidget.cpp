@@ -109,7 +109,8 @@ void QmitkSimpleLabelSetListWidget::OnLayerChanged()
 
 void QmitkSimpleLabelSetListWidget::OnLabelChanged(mitk::LabelSetImage::LabelValueType lv)
 {
-  if (!this->m_Emmiting && m_LabelSetImage->GetGroupIndexOfLabel(lv)==m_LabelSetImage->GetActiveLayer())
+  if (!this->m_Emmiting
+    && (!m_LabelSetImage->ExistLabel(lv) || m_LabelSetImage->GetGroupIndexOfLabel(lv)==m_LabelSetImage->GetActiveLayer()))
   {
     this->ResetList();
 

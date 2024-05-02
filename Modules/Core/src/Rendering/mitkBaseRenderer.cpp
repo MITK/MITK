@@ -367,7 +367,7 @@ mitk::TimeStepType mitk::BaseRenderer::GetTimeStep(const mitk::BaseData* data) c
 {
   if ((data == nullptr) || (data->IsInitialized() == false))
   {
-    return -1;
+    return TIMESTEP_INVALID;
   }
   return data->GetTimeGeometry()->TimePointToTimeStep(GetTime());
 }

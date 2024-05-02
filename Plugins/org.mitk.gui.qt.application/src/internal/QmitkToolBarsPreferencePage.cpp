@@ -21,9 +21,6 @@ found in the LICENSE file.
 
 #include <berryPlatformUI.h>
 
-#include <QMainWindow>
-#include <QToolBar>
-
 namespace
 {
   mitk::IPreferences* GetPreferences()
@@ -32,69 +29,27 @@ namespace
     return prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
   }
 
-  // Get views as multimap with categories as keys.
-  //
-  // Exclude views without category and categories that contain a literal '.', e.g.
-  // "org.blueberry.ui" or "org.mitk.views.general", as they typically do not have
-  // a corresponding tool bar.
-  std::multimap<QString, berry::IViewDescriptor::Pointer> GetViews()
-  {
-    std::multimap<QString, berry::IViewDescriptor::Pointer> result;
-
-    const auto workbench = berry::PlatformUI::GetWorkbench();
-    const auto viewRegistry = workbench->GetViewRegistry();
-    const auto views = viewRegistry->GetViews();
-
-    for (auto view : views)
-    {
-      QString category;
-
-      if (auto categoryPath = view->GetCategoryPath(); !categoryPath.isEmpty())
-        category = categoryPath.back();
-
-      if (!category.isEmpty() && !category.contains('.'))
-        result.emplace(category, view);
-    }
-
-    return result;
-  }
-
-  // Get all toolbars of all (typically one) Workbench windows.
-  std::vector<QToolBar*> GetToolBars()
-  {
-    std::vector<QToolBar*> result;
-
-    const auto* workbench = berry::PlatformUI::GetWorkbench();
-    auto workbenchWindows = workbench->GetWorkbenchWindows();
-
-    for (auto workbenchWindow : workbenchWindows)
-    {
-      if (auto shell = workbenchWindow->GetShell(); shell.IsNotNull())
-      {
-        if (const auto* mainWindow = qobject_cast<QMainWindow*>(shell->GetControl()); mainWindow != nullptr)
-        {
-          for (auto child : mainWindow->children())
-          {
-            if (auto toolBar = qobject_cast<QToolBar*>(child); toolBar != nullptr)
-              result.push_back(toolBar);
-          }
-        }
-      }
-    }
-
-    return result;
-  }
-
-  // Find a toolbar by object name and apply visibility.
-  bool ApplyVisibility(const std::vector<QToolBar*>& toolBars, const QString& name, bool isVisible)
+  // Find a toolbar by object name and apply preferences.
+  bool ApplyPreferences(const QList<QToolBar*>& toolBars, const QString& name, bool isVisible, bool showCategory)
   {
     auto it = std::find_if(toolBars.cbegin(), toolBars.cend(), [&name](const QToolBar* toolBar) {
       return toolBar->objectName() == name;
-      });
+    });
 
     if (it != toolBars.cend())
     {
-      (*it)->setVisible(isVisible);
+      auto toolBar = *it;
+      toolBar->setVisible(isVisible);
+
+      for (auto action : toolBar->actions())
+      {
+        if (action->objectName() == "category")
+        {
+          action->setVisible(showCategory);
+          break;
+        }
+      }
+
       return true;
     }
 
@@ -122,22 +77,24 @@ void QmitkToolBarsPreferencePage::CreateQtControl(QWidget* parent)
 
   m_Ui->setupUi(m_Control);
 
-  const auto views = GetViews();
+  const auto views = berry::PlatformUI::GetWorkbench()->GetViewRegistry()->GetViewsByCategory();
 
-  for (auto category = views.cbegin(), end = views.cend(); category != end; category = views.upper_bound(category->first))
+  for(const auto& category : views.uniqueKeys())
   {
     auto categoryItem = new QTreeWidgetItem;
-    categoryItem->setText(0, category->first);
+    categoryItem->setText(0, category);
     categoryItem->setCheckState(0, Qt::Checked);
 
-    const auto range = views.equal_range(category->first);
+    auto [viewIter, end] = views.equal_range(category);
 
-    for (auto view = range.first; view != range.second; ++view)
+    while (viewIter != end)
     {
       auto viewItem = new QTreeWidgetItem;
-      viewItem->setText(0, view->second->GetLabel());
+      viewItem->setText(0, (*viewIter)->GetLabel());
+      viewItem->setIcon(0, (*viewIter)->GetImageDescriptor());
 
       categoryItem->addChild(viewItem);
+      ++viewIter;
     }
 
     m_Ui->treeWidget->addTopLevelItem(categoryItem);
@@ -154,7 +111,11 @@ QWidget* QmitkToolBarsPreferencePage::GetQtControl() const
 bool QmitkToolBarsPreferencePage::PerformOk()
 {
   auto prefs = GetPreferences();
-  const auto toolBars = GetToolBars();
+  bool showCategories = m_Ui->showCategoriesCheckBox->isChecked();
+
+  prefs->PutBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, showCategories);
+
+  const auto toolBars = berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows().first()->GetToolBars();
 
   for (int i = 0, count = m_Ui->treeWidget->topLevelItemCount(); i < count; ++i)
   {
@@ -164,7 +125,7 @@ bool QmitkToolBarsPreferencePage::PerformOk()
 
     prefs->PutBool(category.toStdString(), isVisible);
 
-    if (!ApplyVisibility(toolBars, category, isVisible))
+    if (!ApplyPreferences(toolBars, category, isVisible, showCategories))
       MITK_WARN << "Could not find tool bar for category \"" << category << "\" to set its visibility!";
   }
 
@@ -178,6 +139,8 @@ void QmitkToolBarsPreferencePage::PerformCancel()
 void QmitkToolBarsPreferencePage::Update()
 {
   const auto prefs = GetPreferences();
+
+  m_Ui->showCategoriesCheckBox->setChecked(prefs->GetBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, true));
 
   for (int i = 0, count = m_Ui->treeWidget->topLevelItemCount(); i < count; ++i)
   {

@@ -580,6 +580,7 @@ void mitk::LabelSetImage::EraseLabel(LabelValueType pixelValue)
     {
       AccessByItk_1(groupImage, EraseLabelProcessing, pixelValue);
     }
+    groupImage->Modified();
   }
   catch (const itk::ExceptionObject& e)
   {

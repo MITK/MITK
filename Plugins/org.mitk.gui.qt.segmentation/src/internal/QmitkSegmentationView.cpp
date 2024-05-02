@@ -500,17 +500,17 @@ void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType /*la
   }
 }
 
-void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rename) const
+void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const
 {
   auto segmentation = this->GetCurrentSegmentation();
 
   if (rename)
   {
-    QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::RenameLabel);
+    canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::RenameLabel);
     return;
   }
 
-  QmitkNewSegmentationDialog::DoRenameLabel(label, nullptr, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
+  canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, nullptr, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
 }
 
 mitk::LabelSetImage* QmitkSegmentationView::GetCurrentSegmentation() const

@@ -129,7 +129,8 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
   for (auto labelValue : selectedLabels)
   {
     auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(labelValue);
-    emit LabelRenameRequested(currentLabel, true);
+    bool canceled = false;
+    emit LabelRenameRequested(currentLabel, true, canceled);
   }
 }
 
@@ -463,9 +464,9 @@ void QmitkMultiLabelManager::OnGoToLabel(mitk::LabelSetImage::LabelValueType lab
   emit GoToLabel(label, position);
 }
 
-void QmitkMultiLabelManager::OnLabelRenameRequested(mitk::Label* label, bool rename) const
+void QmitkMultiLabelManager::OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const
 {
-  emit LabelRenameRequested(label, rename);
+  emit LabelRenameRequested(label, rename, canceled);
 }
 
 void QmitkMultiLabelManager::WaitCursorOn()

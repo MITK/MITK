@@ -462,8 +462,11 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::LabelSetI
 {
   auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(m_Segmentation);
 
+  bool canceled = false;
   if (!m_DefaultLabelNaming)
-    emit LabelRenameRequested(newLabel, false);
+    emit LabelRenameRequested(newLabel, false, canceled);
+
+  if (canceled) return nullptr;
 
   m_ModelManipulationOngoing = true;
   m_Segmentation->AddLabel(newLabel, containingGroup, false);
@@ -1099,6 +1102,7 @@ void QmitkMultiLabelInspector::OnClearLabels(bool /*value*/)
     if (m_SegmentationNode.IsNotNull())
     {
       m_SegmentationNode->Modified();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -1219,6 +1223,7 @@ void QmitkMultiLabelInspector::OnAddLabelInstance()
   if (m_SegmentationNode.IsNotNull())
   {
     m_SegmentationNode->Modified();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -1252,7 +1257,10 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
   auto relevantLabelValues = this->GetCurrentlyAffactedLabelInstances();
   auto currentLabel = this->GetCurrentLabel();
 
-  emit LabelRenameRequested(currentLabel, true);
+  bool canceled = false;
+  emit LabelRenameRequested(currentLabel, true, canceled);
+
+  if (canceled) return;
 
   for (auto value : relevantLabelValues)
   {

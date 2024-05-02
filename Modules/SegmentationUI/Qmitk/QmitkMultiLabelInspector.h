@@ -118,8 +118,9 @@ Q_SIGNALS:
   * The instance for which a new name is requested is passed with the signal.
   * @param label Pointer to the instance that needs a (new) name.
   * @param rename Indicates if it is a renaming or naming of a new label.
+  * @param [out] canceled Indicating if the request was canceled by the used.
   */
-  void LabelRenameRequested(mitk::Label* label, bool rename) const;
+  void LabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const;
 
   /** @brief Signal that is emitted, if the model was updated (e.g. by a delete or add operation).*/
   void ModelUpdated() const;

@@ -688,6 +688,8 @@ void mitk::LabelSetImage::RenameLabel(LabelValueType pixelValue, const std::stri
   label->SetColor(color);
 
   this->UpdateLookupTable(pixelValue);
+  m_LookupTable->Modified();
+
   // change DICOM information of the label
   DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 }
@@ -1052,6 +1054,7 @@ void mitk::LabelSetImage::RegisterLabel(mitk::Label* label)
   if (nullptr == label) mitkThrow() << "Invalid call of RegisterLabel with a nullptr.";
 
   UpdateLookupTable(label->GetValue());
+  m_LookupTable->Modified();
 
   auto command = itk::MemberCommand<LabelSetImage>::New();
   command->SetCallbackFunction(this, &LabelSetImage::OnLabelModified);

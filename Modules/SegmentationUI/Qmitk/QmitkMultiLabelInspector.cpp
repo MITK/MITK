@@ -1273,6 +1273,7 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
       label->SetName(currentLabel->GetName());
       label->SetColor(currentLabel->GetColor());
       m_Segmentation->UpdateLookupTable(label->GetValue());
+      m_Segmentation->GetLookupTable()->Modified();
       mitk::DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 
       // this is needed as workaround for (T27307). It circumvents the fact that modifications
@@ -1359,6 +1360,7 @@ void QmitkMultiLabelInspector::OnSetOnlyActiveLabelVisible(bool /*value*/)
     currentLabel->SetVisible(true);
     m_Segmentation->UpdateLookupTable(selectedValue);
   }
+  m_Segmentation->GetLookupTable()->Modified();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   this->PrepareGoToLabel(selectedLabelValues.front());

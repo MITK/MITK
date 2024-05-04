@@ -97,6 +97,7 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::ActualizePreviewLabelVisibility()
         label->SetVisible(isVisible);
         preview->UpdateLookupTable(label->GetValue());
       }
+      preview->GetLookupTable()->Modified();
     }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

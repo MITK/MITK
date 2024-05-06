@@ -1627,7 +1627,7 @@ void mitk::TransferLabelContentAtTimeStep(
 
   if (!Equal(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
   {
-    if (IsSubGeometry(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+    if (IsSubGeometry(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, true))
     {
       //we have to pad the source image
       //because ImageToImageFilters always check for origin matching even if

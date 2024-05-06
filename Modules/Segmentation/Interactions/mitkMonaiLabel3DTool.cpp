@@ -48,14 +48,14 @@ const char *mitk::MonaiLabel3DTool::GetName() const
   return "MONAI Label 3D";
 }
 
-void mitk::MonaiLabel3DTool::WriteImage(const Image *inputAtTimeStep, const std::string &inputImagePath)
+void mitk::MonaiLabel3DTool::WriteImage(const Image *inputAtTimeStep, const std::string &inputImagePath) const
 {
   IOUtil::Save(inputAtTimeStep, inputImagePath);
 }
 
 void mitk::MonaiLabel3DTool::WriteBackResults(LabelSetImage *previewImage,
                                               LabelSetImage *segResults,
-                                              TimeStepType timeStep)
+                                              TimeStepType timeStep) const
 {
   mitk::ImageReadAccessor newMitkImgAcc(segResults);
   previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
@@ -97,7 +97,7 @@ void mitk::MonaiLabel3DTool::OnAddNegativePoint(StateMachineAction *, Interactio
 }
 
 std::stringstream mitk::MonaiLabel3DTool::GetPointsAsListString(const mitk::BaseGeometry *baseGeometry,
-                                                                const PointSet::Pointer pointSet)
+                                                                const PointSet::Pointer pointSet) const
 {
   MITK_INFO << "No.of points: " << pointSet->GetSize();
   std::stringstream pointsAndLabels;

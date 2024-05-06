@@ -41,11 +41,11 @@ namespace mitk
     const char **GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
     void Activated() override;
-    void OnAddPositivePoint(StateMachineAction *, InteractionEvent *) override;
-    void OnAddNegativePoint(StateMachineAction *, InteractionEvent *) override;
-    std::stringstream GetPointsAsListString(const mitk::BaseGeometry *, const PointSet::Pointer) override;
-    void WriteImage(const Image *, const std::string &) override;
-    void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) override;
+    void OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
+    void OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
+    std::stringstream GetPointsAsListString(const mitk::BaseGeometry *baseGeometry, const PointSet::Pointer pointSet) const override;
+    void WriteImage(const Image *inputAtTimeStep, const std::string &inputImagePath) const override;
+    void WriteBackResults(LabelSetImage *previewImage, LabelSetImage *segResults, TimeStepType timeStep) const override;
 
   protected:
     MonaiLabel3DTool() = default;

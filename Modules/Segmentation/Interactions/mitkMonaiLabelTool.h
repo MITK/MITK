@@ -111,13 +111,13 @@ namespace mitk
      * @brief Writes image to disk as the tool desires.
      * Default implementation does nothing.
      */
-    virtual void WriteImage(const Image*, const std::string&);
+    virtual void WriteImage(const Image*, const std::string&) const;
 
     /**
      * @brief Method does the GET Rest call to fetch MonaiLabel
      * server metadata including all models' info.
      */
-    void GetOverallInfo(const std::string&, const int&);
+    void GetOverallInfo(const std::string &hostName, const int &port);
 
     /**
      * @brief Holds all parameters of the server to serve the UI
@@ -210,12 +210,13 @@ namespace mitk
      * @brief Get the Points from given pointset as csv string.
      * 
      */
-    virtual std::stringstream GetPointsAsListString(const mitk::BaseGeometry*, const PointSet::Pointer) = 0;
+    virtual std::stringstream GetPointsAsListString(const mitk::BaseGeometry *baseGeometry,
+                                                    const PointSet::Pointer pointSet) const = 0;
 
     /**
      * @brief Writes back segmentation results in 3D or 2D shape to preview LabelSetImage.
      */
-    virtual void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) = 0;
+    virtual void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) const = 0;
 
     PointSet::Pointer m_PointSetPositive;
     PointSet::Pointer m_PointSetNegative;

@@ -159,7 +159,7 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
       {
         supportedLabels << QString::fromStdString(label.first);
       }
-      m_Controls.labelListLabel->setText(supportedLabels.join(QChar(',') + QChar::Space));
+      m_Controls.labelListLabel->setText(supportedLabels.join(QStringLiteral(", ")));
       break;
     }
   }
@@ -216,7 +216,7 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   {
     return;
   }
-  std::string selectedModel = m_Controls.modelBox->currentText().toStdString();
+  auto selectedModel = m_Controls.modelBox->currentText().toStdString();
   for (const auto &modelObject : tool->m_InfoParameters->models)
   {
     if (modelObject.name == selectedModel)

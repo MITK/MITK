@@ -63,12 +63,12 @@ protected:
   /**
    * @brief Function to listen to tool class status emitters.
    */
-  void StatusMessageListener(const bool);
+  void StatusMessageListener(const bool status);
 
   /**
    * @brief Function to listen to Preference changes
    */
-  void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &);
+  void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &event);
 
   /**
    * @brief Helper function to write MONAI model info in to model combo box

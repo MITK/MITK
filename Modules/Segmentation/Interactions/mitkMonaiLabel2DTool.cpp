@@ -61,8 +61,7 @@ void mitk::MonaiLabel2DTool::OnAddPositivePoint(StateMachineAction *, Interactio
     {
       this->ClearSeeds();
       this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
-      this->ResetPreviewContentAtTimeStep(
-        RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimeStep());
+      this->ResetPreviewContent();
     }
     if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
     {
@@ -101,7 +100,7 @@ void mitk::MonaiLabel2DTool::OnAddNegativePoint(StateMachineAction *, Interactio
   }
 }
 
-void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, const std::string &inputImagePath)
+void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, const std::string &inputImagePath) const
 {
   auto extendedImage = Image::New();
   std::array<unsigned int, 3> dim = {inputAtTimeStep->GetDimension(0), inputAtTimeStep->GetDimension(1), 1};
@@ -115,7 +114,7 @@ void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, const std:
 }
 
 std::stringstream mitk::MonaiLabel2DTool::GetPointsAsListString(const mitk::BaseGeometry *baseGeometry,
-                                                                const PointSet::Pointer pointSet)
+                                                                const PointSet::Pointer pointSet) const
 {
   std::stringstream pointsAndLabels;
   pointsAndLabels << "[";
@@ -143,7 +142,7 @@ std::stringstream mitk::MonaiLabel2DTool::GetPointsAsListString(const mitk::Base
 
 void mitk::MonaiLabel2DTool::WriteBackResults(LabelSetImage *previewImage,
                                               LabelSetImage *segResults,
-                                              TimeStepType timeStep)
+                                              TimeStepType timeStep) const
 {
   mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), segResults, timeStep, false);
 }

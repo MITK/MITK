@@ -136,8 +136,7 @@ bool mitk::MonaiLabelTool::IsMonaiServerOn(const std::string &hostName, const in
 {
   httplib::SSLClient cli(hostName, port);
   cli.enable_server_certificate_verification(false);
-  while (cli.is_socket_open())
-    ;
+  while (cli.is_socket_open());
   return cli.Get("/info/");
 }
 
@@ -177,7 +176,7 @@ namespace mitk
       appData.models.push_back(modelInfo);
     }
   }
-} // namespace mitk
+}
 
 namespace
 {
@@ -476,7 +475,6 @@ std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetInteractiveSegmentati
 std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetScribbleSegmentationModels(int dim) const
 {
   std::vector<mitk::MonaiModelInfo> scribbleModels;
-  bool checkDims = dim > -1;
   if (nullptr != m_InfoParameters)
   {
     for (mitk::MonaiModelInfo &model : m_InfoParameters->models)
@@ -509,7 +507,7 @@ mitk::MonaiModelInfo mitk::MonaiLabelTool::GetModelInfoFromName(const std::strin
   return retVal;
 }
 
-void mitk::MonaiLabelTool::WriteImage(const Image*, const std::string&) {}
+void mitk::MonaiLabelTool::WriteImage(const Image*, const std::string&) const {}
 
 std::pair<std::string, std::string> mitk::MonaiLabelTool::CreateTempDirs(const std::string &filePattern) const
 {

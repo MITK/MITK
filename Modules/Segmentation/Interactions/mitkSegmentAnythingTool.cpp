@@ -119,7 +119,7 @@ void mitk::SegmentAnythingTool::InitSAMPythonProcess()
   }
   this->ClearPicks();
   m_PythonService = std::make_unique<mitk::SegmentAnythingPythonService>(
-    this->GetPythonPath(), this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId());
+    this->GetPythonPath(), this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId(), this->GetBackend());
   m_PythonService->StartAsyncProcess();
 }
 
@@ -160,6 +160,7 @@ void mitk::SegmentAnythingTool::OnAddPositivePoint(StateMachineAction *, Interac
   {
     m_IsGenerateEmbeddings = true;
     this->ClearSeeds();
+    this->ResetPreviewContent();
     this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
   }
   if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
@@ -223,11 +224,7 @@ void mitk::SegmentAnythingTool::ClearSeeds()
 
 void mitk::SegmentAnythingTool::ConfirmCleanUp() 
 {
-  auto previewImage = this->GetPreviewSegmentation();
-  for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
-  {
-    this->ResetPreviewContentAtTimeStep(timeStep);
-  }
+  this->ResetPreviewContent();
   this->ClearSeeds();
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -271,7 +268,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                 LabelSetImage *previewImage,
                                                 TimeStepType timeStep)
 {
-  if (nullptr != previewImage && m_PointSetPositive.IsNotNull() && ::IsImageAtTimeStepValid(inputAtTimeStep))
+  if (nullptr != previewImage && ::IsImageAtTimeStepValid(inputAtTimeStep))
   {
     if (this->HasPicks() && nullptr != m_PythonService)
     {
@@ -281,7 +278,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
       m_ProgressCommand->SetProgress(20);
       try
       {
-        std::stringstream csvStream;
+        std::string csvString;
         this->EmitSAMStatusMessageEvent("Prompting Segment Anything Model...");
         m_ProgressCommand->SetProgress(50);
         if (inputAtTimeStep->GetPixelType().GetNumberOfComponents() < 2)
@@ -291,15 +288,15 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
           AccessByItk_n(inputAtTimeStep, ITKWindowing, // apply level window filter
                         (filteredImage, levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound()));
           m_PythonService->TransferImageToProcess(filteredImage, uniquePlaneID);
-          csvStream = this->GetPointsAsCSVString(filteredImage->GetGeometry());
+          csvString = this->GetPointsAsCSVString(filteredImage->GetGeometry());
         }
         else
         {
           m_PythonService->TransferImageToProcess(inputAtTimeStep, uniquePlaneID);
-          csvStream = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
+          csvString = this->GetPointsAsCSVString(inputAtTimeStep->GetGeometry());
         }
         m_ProgressCommand->SetProgress(100);
-        m_PythonService->TransferPointsToProcess(csvStream);
+        m_PythonService->TransferPointsToProcess(csvString);
         m_ProgressCommand->SetProgress(150);
         std::this_thread::sleep_for(100ms);
         mitk::LabelSetImage::Pointer outputBuffer = m_PythonService->RetrieveImageFromProcess(this->GetTimeOutLimit());
@@ -323,7 +320,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
   }
 }
 
-std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane(const mitk::LevelWindow &levelWindow)
+std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane(const mitk::LevelWindow &levelWindow) const
 {
   mitk::Vector3D normal = this->GetWorkingPlaneGeometry()->GetNormal();
   mitk::Point3D center = this->GetWorkingPlaneGeometry()->GetCenter();
@@ -340,7 +337,7 @@ std::string mitk::SegmentAnythingTool::GetHashForCurrentPlane(const mitk::LevelW
   return std::to_string(hashVal);
 }
 
-std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry)
+std::string mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry) const
 {
   MITK_INFO << "No.of points: " << m_PointSetPositive->GetSize();
   std::stringstream pointsAndLabels;
@@ -371,11 +368,11 @@ std::stringstream mitk::SegmentAnythingTool::GetPointsAsCSVString(const mitk::Ba
       ++pointSetItNeg;
     }
   }
-  return pointsAndLabels;
+  return pointsAndLabels.str();
 }
 
 std::vector<std::pair<mitk::Point2D, std::string>> mitk::SegmentAnythingTool::GetPointsAsVector(
-  const mitk::BaseGeometry *baseGeometry)
+  const mitk::BaseGeometry *baseGeometry) const
 {
   std::vector<std::pair<mitk::Point2D, std::string>> clickVec;
   clickVec.reserve(m_PointSetPositive->GetSize() + m_PointSetNegative->GetSize());

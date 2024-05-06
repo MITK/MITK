@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <QString>
 
 #include "QmitkAbstractView.h"
-
 #include "itkCommand.h"
 
 #include "ui_GenericDataFittingViewControls.h"
@@ -105,8 +104,10 @@ protected:
 
   void InitModelComboBox() const;
 
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& selectedNodes) override;
+  void OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
+
+  void OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
+
 
   // Variables
 
@@ -144,8 +145,8 @@ private:
   /**Returns the current set name of the fit (either default name or use defined name).*/
   std::string GetFitName() const;
 
-  mitk::NodePredicateBase::Pointer m_IsNotABinaryImagePredicate;
-  mitk::NodePredicateBase::Pointer m_IsBinaryImagePredicate;
+  mitk::NodePredicateBase::Pointer m_isValidTimeSeriesImagePredicate;
+
 };
 
 #endif

@@ -85,6 +85,9 @@ namespace mitk
     /// \brief Check if the event happened on the current plane.
     virtual bool OnCheckPlane(const InteractionEvent* interactionEvent);
 
+    /// \brief Checks if the event happened with enough distances to the last control points (to avoid unintended/accidental drawing)
+    virtual bool OnCheckDistanceToControlPoint(const InteractionEvent* interactionEvent);
+
     /// \brief Finish contour interaction.
     virtual void FinishTool() = 0;
 

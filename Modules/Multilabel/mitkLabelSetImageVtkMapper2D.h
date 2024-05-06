@@ -128,6 +128,8 @@ namespace mitk
       mitk::PlaneGeometry::Pointer m_WorldPlane;
       bool m_HasValidContent;
 
+      mitk::TimeStepType m_LastTimeStep;
+
       unsigned int m_NumberOfLayers;
 
       /** \brief Default constructor of the local storage. */

@@ -346,6 +346,7 @@ void QmitkSegmentationView::OnLabelToggleShortcutActivated()
   }
 
   workingImage->SetActiveLabel(*it);
+  m_Controls->multiLabelWidget->SetSelectedLabel(*it);
   this->WaitCursorOff();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -499,17 +500,17 @@ void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType /*la
   }
 }
 
-void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rename) const
+void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const
 {
   auto segmentation = this->GetCurrentSegmentation();
 
   if (rename)
   {
-    QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::RenameLabel);
+    canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::RenameLabel);
     return;
   }
 
-  QmitkNewSegmentationDialog::DoRenameLabel(label, nullptr, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
+  canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, nullptr, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
 }
 
 mitk::LabelSetImage* QmitkSegmentationView::GetCurrentSegmentation() const
@@ -538,7 +539,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // *------------------------
    QShortcut* visibilityShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_H), parent);
    connect(visibilityShortcut, &QShortcut::activated, this, &Self::OnVisibilityShortcutActivated);
-   QShortcut* labelToggleShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), parent);
+   QShortcut* labelToggleShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_N), parent);
    connect(labelToggleShortcut, &QShortcut::activated, this, &Self::OnLabelToggleShortcutActivated);
 
    // *------------------------
@@ -568,7 +569,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_ToolManager->SetDataStorage(*(this->GetDataStorage()));
    m_ToolManager->InitializeTools();
 
-   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything' 'MONAI Label 2D'");
+   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything' 'MedSAM' 'MONAI Label 2D'");
    QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut TotalSegmentator 'MONAI Label 3D'");
 
 #ifdef __linux__

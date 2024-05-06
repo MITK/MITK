@@ -28,6 +28,7 @@ set(MITK_MODULES
   ImageStatistics
   ContourModel
   SurfaceInterpolation
+  BoundingShape
   Segmentation
   QtWidgets
   QtWidgetsExt
@@ -46,7 +47,6 @@ set(MITK_MODULES
   RTUI
   IOExt
   XNAT
-  BoundingShape
   RenderWindowManagerUI
   CEST
   BasicImageProcessing

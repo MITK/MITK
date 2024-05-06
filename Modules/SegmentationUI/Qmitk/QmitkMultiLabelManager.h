@@ -76,9 +76,9 @@ Q_SIGNALS:
    *
    * The instance for which a new name is requested is passed with the signal.
    * @param label Pointer to the instance that needs a (new) name.
-   * @param rename Indicates if it is a renaming or naming of a new label.
-   */
-  void LabelRenameRequested(mitk::Label* label, bool rename) const;
+  * @param [out] canceled Indicating if the request was canceled by the used.
+  */
+  void LabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const;
 
 public Q_SLOTS:
 
@@ -148,7 +148,7 @@ private Q_SLOTS:
   void OnLoadPreset();
 
   void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position) const;
-  void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
+  void OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const;
   void OnModelUpdated();
   void OnSegmentationChanged();
 

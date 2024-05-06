@@ -34,7 +34,8 @@ class QmitkTotalSegmentatorToolInstaller : public QmitkSetupVirtualEnvUtil
 public:
   const QString VENV_NAME = ".totalsegmentator_v2";
   const QString TOTALSEGMENTATOR_VERSION = "2.0.5";
-  const std::vector<QString> PACKAGES = {QString("Totalsegmentator==") + TOTALSEGMENTATOR_VERSION};
+  const std::vector<QString> PACKAGES = {QString("Totalsegmentator==") + TOTALSEGMENTATOR_VERSION,
+                                         QString("setuptools")}; /* just in case */
   const QString STORAGE_DIR;
   inline QmitkTotalSegmentatorToolInstaller(
     const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() 

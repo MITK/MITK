@@ -251,6 +251,7 @@ void mitk::SegWithPreviewTool::ResetPreviewContentAtTimeStep(unsigned int timeSt
   if (nullptr != previewImage)
   {
     AccessByItk(previewImage, ClearBufferProcessing);
+    previewImage->Modified();
   }
 }
 

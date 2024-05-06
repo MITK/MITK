@@ -36,9 +36,9 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* da
   m_Controls->segNodeSelector->SetDataStorage(dataStorage);
   m_Controls->segNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls->segNodeSelector->SetSelectionIsOptional(false);
-  m_Controls->segNodeSelector->SetInvalidInfo(QStringLiteral("Please select segmentation for extraction."));
+  m_Controls->segNodeSelector->SetInvalidInfo(QStringLiteral("Please select segmentation for boolean operations."));
   m_Controls->segNodeSelector->SetPopUpTitel(QStringLiteral("Select segmentation"));
-  m_Controls->segNodeSelector->SetPopUpHint(QStringLiteral("Select the segmentation that should be used as source for extraction."));
+  m_Controls->segNodeSelector->SetPopUpHint(QStringLiteral("Select the segmentation that should be used as source for boolean operations."));
 
   m_Controls->labelInspector->SetMultiSelectionMode(true);
 

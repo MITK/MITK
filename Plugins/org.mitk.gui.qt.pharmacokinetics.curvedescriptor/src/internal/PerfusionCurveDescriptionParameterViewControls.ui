@@ -30,11 +30,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="lableSelectedImage">
-       <property name="text">
-        <string>No Series Selected!</string>
-       </property>
-      </widget>
+      <widget class="QmitkSingleNodeSelectionWidget" name="timeSeriesNodeSelector" native="true"/>
      </item>
     </layout>
    </item>
@@ -80,6 +76,14 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

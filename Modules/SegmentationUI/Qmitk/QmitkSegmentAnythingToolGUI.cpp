@@ -188,6 +188,7 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     tool->SetModelType(modelType.toStdString());
     tool->SetTimeOutLimit(m_Preferences->GetInt("sam timeout", 300));
     tool->SetCheckpointPath(m_Preferences->Get("sam parent path", ""));
+    tool->SetBackend("SAM");
     this->WriteStatusMessage(
       QString("<b>STATUS: </b><i>Initializing Segment Anything Model...</i>"));
     tool->SAMStatusMessageEvent += mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI,const std::string&>(
@@ -274,7 +275,9 @@ bool QmitkSegmentAnythingToolGUI::IsSAMInstalled(const QString &pythonPath)
       (!isPythonExists) ? QFile::exists(fullPath + QDir::separator() + QString("python3")) : isPythonExists;
   }
 #endif
-  isSamExists = QFile::exists(fullPath + QDir::separator() + QString("run_inference_daemon.py"));
+  isSamExists = QFile::exists(fullPath + QDir::separator() + QString("run_inference_daemon.py"))
+                && QFile::exists(fullPath + QDir::separator() + QString("sam_runner.py"))
+                && QFile::exists(fullPath + QDir::separator() + QString("medsam_runner.py"));
   bool isExists = isSamExists && isPythonExists;
   return isExists;
 }

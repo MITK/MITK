@@ -101,8 +101,11 @@ protected:
 
   void InitModelComboBox() const;
 
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& selectedNodes) override;
+  void OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
+
+  void OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
+
+
 
 
   /*! @brief The view's UI controls */
@@ -160,8 +163,7 @@ private:
   std::vector<double> AIFinputGrid;
   std::vector<double> AIFinputFunction;
 
-  mitk::NodePredicateBase::Pointer m_IsNoMaskImagePredicate;
-  mitk::NodePredicateBase::Pointer m_IsMaskPredicate;
+  mitk::NodePredicateBase::Pointer m_isValidTimeSeriesImagePredicate;
 
 };
 

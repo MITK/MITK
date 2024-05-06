@@ -462,8 +462,11 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::LabelSetI
 {
   auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(m_Segmentation);
 
+  bool canceled = false;
   if (!m_DefaultLabelNaming)
-    emit LabelRenameRequested(newLabel, false);
+    emit LabelRenameRequested(newLabel, false, canceled);
+
+  if (canceled) return nullptr;
 
   m_ModelManipulationOngoing = true;
   m_Segmentation->AddLabel(newLabel, containingGroup, false);
@@ -756,15 +759,16 @@ void QmitkMultiLabelInspector::RemoveGroup()
   if (selectedLabel == nullptr)
     return;
 
-  const auto group = m_Segmentation->GetGroupIndexOfLabel(selectedLabel->GetValue());
+  const auto groupID = m_Segmentation->GetGroupIndexOfLabel(selectedLabel->GetValue());
+  auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
 
-  auto question = QStringLiteral("Do you really want to delete group %1 including all of its labels?").arg(group);
-  auto answer = QMessageBox::question(this, QStringLiteral("Delete group %1").arg(group), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+  auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
+  auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
   if (answer != QMessageBox::Yes)
     return;
 
-  this->RemoveGroupInternal(group);
+  this->RemoveGroupInternal(groupID);
 }
 
 void QmitkMultiLabelInspector::OnDeleteGroup()
@@ -781,9 +785,9 @@ void QmitkMultiLabelInspector::OnDeleteGroup()
   if (groupIDVariant.isValid())
   {
     auto groupID = groupIDVariant.value<mitk::LabelSetImage::GroupIndexType>();
-
-    auto question = QStringLiteral("Do you really want to delete group %1 including all of its labels?").arg(groupID);
-    auto answer = QMessageBox::question(this, QString("Delete group %1").arg(groupID), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
+    auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
+    auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
     if (answer != QMessageBox::Yes)
       return;
@@ -1098,6 +1102,7 @@ void QmitkMultiLabelInspector::OnClearLabels(bool /*value*/)
     if (m_SegmentationNode.IsNotNull())
     {
       m_SegmentationNode->Modified();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -1218,6 +1223,7 @@ void QmitkMultiLabelInspector::OnAddLabelInstance()
   if (m_SegmentationNode.IsNotNull())
   {
     m_SegmentationNode->Modified();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -1251,7 +1257,10 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
   auto relevantLabelValues = this->GetCurrentlyAffactedLabelInstances();
   auto currentLabel = this->GetCurrentLabel();
 
-  emit LabelRenameRequested(currentLabel, true);
+  bool canceled = false;
+  emit LabelRenameRequested(currentLabel, true, canceled);
+
+  if (canceled) return;
 
   for (auto value : relevantLabelValues)
   {

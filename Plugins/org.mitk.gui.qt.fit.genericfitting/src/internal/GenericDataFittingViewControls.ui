@@ -32,11 +32,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="timeserieslabel">
-         <property name="text">
-          <string>No series selected.</string>
-         </property>
-        </widget>
+        <widget class="QmitkSingleNodeSelectionWidget" name="timeSeriesNodeSelector" native="true"/>
        </item>
       </layout>
      </item>
@@ -50,11 +46,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="masklabel">
-         <property name="text">
-          <string>No mask selected.</string>
-         </property>
-        </widget>
+        <widget class="QmitkSingleNodeSelectionWidget" name="maskNodeSelector" native="true"/>
        </item>
       </layout>
      </item>
@@ -268,7 +260,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>158</width>
+           <width>528</width>
            <height>232</height>
           </rect>
          </property>
@@ -386,6 +378,12 @@
    <class>QmitkInitialValuesManagerWidget</class>
    <extends>QWidget</extends>
    <header>QmitkInitialValuesManagerWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

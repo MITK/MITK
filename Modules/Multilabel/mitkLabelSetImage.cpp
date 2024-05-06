@@ -379,6 +379,23 @@ const mitk::Image* mitk::LabelSetImage::GetGroupImageWorkaround(GroupIndexType g
   return m_LayerContainer[groupID].GetPointer();
 }
 
+const std::string& mitk::LabelSetImage::GetGroupName(GroupIndexType groupID) const
+{
+  if (!this->ExistGroup(groupID))
+    mitkThrow() << "Error, cannot return group name. Group ID is invalid. Invalid ID: " << groupID;
+
+  return m_Groups[groupID];
+}
+
+void mitk::LabelSetImage::SetGroupName(GroupIndexType groupID, const std::string& name)
+{
+  if (!this->ExistGroup(groupID))
+    mitkThrow() << "Error, cannot set group name. Group ID is invalid. Invalid ID: " << groupID;
+
+  m_Groups[groupID] = name;
+  this->InvokeEvent(GroupModifiedEvent(groupID));
+}
+
 void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
 {
   try
@@ -563,6 +580,7 @@ void mitk::LabelSetImage::EraseLabel(LabelValueType pixelValue)
     {
       AccessByItk_1(groupImage, EraseLabelProcessing, pixelValue);
     }
+    groupImage->Modified();
   }
   catch (const itk::ExceptionObject& e)
   {

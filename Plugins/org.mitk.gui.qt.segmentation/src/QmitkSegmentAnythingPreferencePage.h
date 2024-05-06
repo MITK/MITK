@@ -33,7 +33,7 @@ class QmitkSAMInstaller : public QmitkSetupVirtualEnvUtil
 public:
   const QString VENV_NAME = ".sam";
   const QString SAM_VERSION = "1.0"; // currently, unused
-  const std::vector<QString> PACKAGES = {QString("git+https://github.com/MIC-DKFZ/agent-sam.git@v0.1")};
+  const std::vector<QString> PACKAGES = {QString("git+https://github.com/MIC-DKFZ/agent-sam.git@v0.2")};
   const QString STORAGE_DIR;
   inline QmitkSAMInstaller(
     const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +

@@ -22,6 +22,8 @@ found in the LICENSE file.
 #include <mitkPointSetShapeProperty.h>
 #include <mitkProperties.h>
 #include <mitkToolManager.h>
+#include <itkIntensityWindowingImageFilter.h>
+#include "mitkImageAccessByItk.h"
 
 mitk::MonaiLabelTool::MonaiLabelTool() : SegWithPreviewTool(true, "PressMoveReleaseAndPointSetting")
 {
@@ -273,7 +275,38 @@ namespace
       }
     }
   }
-} // namespace
+
+  template <typename TPixel, unsigned int VImageDimension>
+  void ITKWindowing(const itk::Image<TPixel, VImageDimension> *inputImage,
+                    mitk::Image *mitkImage, mitk::ScalarType min, mitk::ScalarType max)
+  {
+    typedef itk::Image<TPixel, VImageDimension> ImageType;
+    typedef itk::IntensityWindowingImageFilter<ImageType, ImageType> IntensityFilterType;
+    typename IntensityFilterType::Pointer filter = IntensityFilterType::New();
+    filter->SetInput(inputImage);
+    filter->SetWindowMinimum(min);
+    filter->SetWindowMaximum(max);
+    filter->SetOutputMinimum(min);
+    filter->SetOutputMaximum(max);
+    filter->Update();
+
+    mitkImage->SetImportVolume(
+      (void *)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), 0, 0, mitk::Image::ManageMemory);
+    filter->GetOutput()->GetPixelContainer()->ContainerManageMemoryOff();
+  }
+}
+
+mitk::Image::Pointer mitk::MonaiLabelTool::ApplyLevelWindowEffect(const Image *inputAtTimeStep) const
+{
+  mitk::LevelWindow levelWindow;
+  this->GetToolManager()->GetReferenceData(0)->GetLevelWindow(levelWindow);
+  auto filteredImage = mitk::Image::New();
+  filteredImage->Initialize(inputAtTimeStep);
+  AccessByItk_n(inputAtTimeStep,
+                ::ITKWindowing, // apply level window filter
+                (filteredImage, levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound()));
+  return filteredImage;
+}
 
 void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                            const Image * /*oldSegAtTimeStep*/,
@@ -296,7 +329,8 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
 
   try
   {
-    this->WriteImage(inputAtTimeStep, inputImagePath);
+    mitk::Image::Pointer filteredImage = this->ApplyLevelWindowEffect(inputAtTimeStep);
+    this->WriteImage(filteredImage, inputImagePath);
     this->PostInferRequest(hostName, port, inputImagePath, outputImagePath, inputAtTimeStep->GetGeometry());
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     auto outputBuffer = mitk::LabelSetImage::New();

@@ -234,6 +234,12 @@ namespace mitk
      * @brief Checks if MonaiLabel server is alive.
      */
     bool IsMonaiServerOn(const std::string &hostName, const int &port) const;
+     
+    /**
+     * @brief Applies level window filter on the input image. Current Level window bounds 
+     * are captured from the tool manager.
+     */
+    mitk::Image::Pointer ApplyLevelWindowEffect(const Image *inputAtTimeStep) const;
     
     std::string m_TempDir;
     std::string m_ModelName;

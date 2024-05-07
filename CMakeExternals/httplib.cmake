@@ -22,9 +22,15 @@ if(MITK_USE_${proj})
       )
     endif()
 
+    if(OPENSSL_VERSION VERSION_GREATER_EQUAL 3)
+      set(GIT_TAG 5c00bbf36ba8ff47b4fb97712fc38cb2884e5b98) # v0.15.3
+    else()
+      set(GIT_TAG cbca63f091ef1147ff57e90eb1ee5e558aa05d2c) # v0.14.3
+    endif()
+
     ExternalProject_Add(${proj}
       GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
-      GIT_TAG 5c00bbf36ba8ff47b4fb97712fc38cb2884e5b98 # v0.15.3
+      GIT_TAG ${GIT_TAG}
       CMAKE_ARGS ${ep_common_args}
       CMAKE_CACHE_ARGS ${cmake_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS ${ep_common_cache_default_args}

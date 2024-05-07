@@ -68,7 +68,7 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
 
   QString welcomeText;
-  welcomeText = "<b>STATUS: </b><i>Welcome to Segment Anything tool. You're in luck: " +
+  welcomeText = "<b>STATUS: </b><i>Welcome to Segment Anything tool. " +
                   QString::number(m_GpuLoader.GetGPUCount()) + " GPU(s) were detected.</i>";
   
   connect(m_Controls.activateButton, SIGNAL(clicked()), this, SLOT(OnActivateBtnClicked()));

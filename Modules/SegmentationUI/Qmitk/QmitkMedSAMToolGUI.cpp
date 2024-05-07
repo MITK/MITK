@@ -97,7 +97,7 @@ void QmitkMedSAMToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
 
   QString welcomeText;
-  welcomeText = "<b>STATUS: </b><i>Welcome to MedSAM tool. You're in luck: " +
+  welcomeText = "<b>STATUS: </b><i>Welcome to MedSAM tool. " +
                   QString::number(m_GpuLoader.GetGPUCount()) + " GPU(s) were detected.</i>";
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));

@@ -12,13 +12,11 @@ found in the LICENSE file.
 #ifndef mitkMonaiLabelTool_h
 #define mitkMonaiLabelTool_h
 
-#define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "mitkSegWithPreviewTool.h"
 #include <MitkSegmentationExports.h>
 #include <memory>
 #include <unordered_map>
 #include <set>
-#include <httplib.h>
 #include <nlohmann/json.hpp>
 #include <mitkPointSet.h>
 #include <mitkInteractionPositionEvent.h>

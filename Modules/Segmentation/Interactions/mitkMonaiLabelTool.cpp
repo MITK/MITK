@@ -12,6 +12,9 @@ found in the LICENSE file.
 
 #include "mitkMonaiLabelTool.h"
 
+#ifndef CPPHTTPLIB_OPENSSL_SUPPORT
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#endif
 #include <filesystem>
 #include <httplib.h>
 #include <mitkIOUtil.h>

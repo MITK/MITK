@@ -136,6 +136,7 @@ void QmitkGrowCutToolGUI::OnPreviewBtnClicked()
     this->SetLabelSetPreview(tool->GetPreviewSegmentation());
     tool->IsTimePointChangeAwareOn();
     this->ActualizePreviewLabelVisibility();
+    this->EnableWidgets(true);
   }
 }
 

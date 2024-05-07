@@ -78,6 +78,8 @@
 Press SHIFT+Left-click for positive seeds.
 Press SHIFT+Right-click for negative seeds.
 Press DEL to remove last seed.
+
+Use level window slider to adjust image contrast.
         </string>
        </property>
       </widget>
@@ -151,19 +153,6 @@ Press DEL to remove last seed.
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>ctkComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">ctkComboBox.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ctkCollapsibleGroupBox</class>
-   <extends>QWidget</extends>
-   <header>ctkCollapsibleGroupBox.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

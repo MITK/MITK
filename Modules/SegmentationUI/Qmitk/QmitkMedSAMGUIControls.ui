@@ -76,7 +76,8 @@
        <property name="text">
         <string>
 Press SHIFT+Left-click and drag for RoI on the render windows.
-        </string>
+Use level window slider to adjust image contrast.
+</string>
        </property>
       </widget>
      </item>

@@ -93,6 +93,8 @@ QmitkSegmentationView::QmitkSegmentationView()
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
+  m_RenderWindowPart = this->GetRenderWindowPart();
+
   if (nullptr != m_Controls)
   {
     // deactivate all tools

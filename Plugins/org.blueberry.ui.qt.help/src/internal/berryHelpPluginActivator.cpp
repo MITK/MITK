@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include "berryHelpEditorInput.h"
 #include "berryHelpEditorInputFactory.h"
 #include "berryHelpPerspective.h"
+#include "berryHelpWebView.h"
 
 #include "berryQHelpEngineConfiguration.h"
 #include "berryQHelpEngineWrapper.h"
@@ -29,6 +30,145 @@ found in the LICENSE file.
 
 #include <QDir>
 #include <QDateTime>
+#include <QTimer>
+#include <QWebEngineProfile>
+#include <QWebEngineUrlRequestJob>
+#include <QWebEngineUrlSchemeHandler>
+
+namespace
+{
+  class HelpDeviceReply final : public QIODevice
+  {
+  public:
+    HelpDeviceReply(const QUrl& request, const QByteArray& fileData);
+    ~HelpDeviceReply() override;
+
+    qint64 bytesAvailable() const override;
+    void close() override;
+
+  private:
+    qint64 readData(char* data, qint64 maxlen) override;
+    qint64 writeData(const char* data, qint64 maxlen) override;
+
+    QByteArray m_Data;
+    const qint64 m_OrigLen;
+  };
+
+  HelpDeviceReply::HelpDeviceReply(const QUrl&, const QByteArray& fileData)
+    : m_Data(fileData),
+    m_OrigLen(fileData.length())
+  {
+    this->setOpenMode(QIODevice::ReadOnly);
+
+    QTimer::singleShot(0, this, &QIODevice::readyRead);
+    QTimer::singleShot(0, this, &QIODevice::readChannelFinished);
+  }
+
+  HelpDeviceReply::~HelpDeviceReply()
+  {
+  }
+
+  qint64 HelpDeviceReply::bytesAvailable() const
+  {
+    return m_Data.length() + QIODevice::bytesAvailable();
+  }
+
+  void HelpDeviceReply::close()
+  {
+    QIODevice::close();
+    this->deleteLater();
+  }
+
+  qint64 HelpDeviceReply::readData(char* data, qint64 maxlen)
+  {
+    qint64 len = qMin(qint64(m_Data.length()), maxlen);
+
+    if (len)
+    {
+      memcpy(data, m_Data.constData(), len);
+      m_Data.remove(0, len);
+    }
+
+    return len;
+  }
+
+  qint64 HelpDeviceReply::writeData(const char*, qint64)
+  {
+    return 0;
+  }
+
+
+  class HelpUrlSchemeHandler final : public QWebEngineUrlSchemeHandler
+  {
+  public:
+    explicit HelpUrlSchemeHandler(QObject* parent = nullptr);
+    ~HelpUrlSchemeHandler() override;
+
+    void requestStarted(QWebEngineUrlRequestJob* job) override;
+  };
+
+  HelpUrlSchemeHandler::HelpUrlSchemeHandler(QObject* parent)
+    : QWebEngineUrlSchemeHandler(parent)
+  {
+  }
+
+  HelpUrlSchemeHandler::~HelpUrlSchemeHandler()
+  {
+  }
+
+  enum class ResolveUrlResult
+  {
+    Error,
+    Redirect,
+    Data
+  };
+
+  ResolveUrlResult ResolveUrl(const QUrl& url, QUrl& redirectedUrl, QByteArray& data)
+  {
+    auto& helpEngine = berry::HelpPluginActivator::getInstance()->getQHelpEngine();
+
+    const auto targetUrl = helpEngine.findFile(url);
+
+    if (!targetUrl.isValid())
+      return ResolveUrlResult::Error;
+
+    if (targetUrl != url)
+    {
+      redirectedUrl = targetUrl;
+      return ResolveUrlResult::Redirect;
+    }
+
+    data = helpEngine.fileData(targetUrl);
+    return ResolveUrlResult::Data;
+  }
+
+
+  void HelpUrlSchemeHandler::requestStarted(QWebEngineUrlRequestJob* job)
+  {
+    QUrl url = job->requestUrl();
+    QUrl redirectedUrl;
+    QByteArray data;
+
+    switch (ResolveUrl(url, redirectedUrl, data))
+    {
+    case ResolveUrlResult::Data:
+      job->reply(
+        berry::HelpWebView::mimeFromUrl(url).toLatin1(),
+        new HelpDeviceReply(url, data));
+      break;
+
+    case ResolveUrlResult::Redirect:
+      job->redirect(redirectedUrl);
+      break;
+
+    case ResolveUrlResult::Error:
+      job->reply(
+        QByteArrayLiteral("text/html"),
+        new HelpDeviceReply(url, berry::HelpWebView::m_PageNotFoundMessage.arg(url.toString()).toUtf8()));
+      break;
+    }
+  }
+}
 
 namespace berry {
 
@@ -64,9 +204,16 @@ private:
 HelpPluginActivator* HelpPluginActivator::instance = nullptr;
 
 HelpPluginActivator::HelpPluginActivator()
-  : pluginListener(nullptr)
+  : pluginListener(nullptr),
+    helpSchemeHandler(const_cast<QWebEngineUrlSchemeHandler*>(QWebEngineProfile::defaultProfile()->urlSchemeHandler("qthelp")))
 {
   this->instance = this;
+
+  if (helpSchemeHandler == nullptr)
+  {
+    helpSchemeHandler = new HelpUrlSchemeHandler(this);
+    QWebEngineProfile::defaultProfile()->installUrlSchemeHandler("qthelp", helpSchemeHandler);
+  }
 }
 
 HelpPluginActivator::~HelpPluginActivator()

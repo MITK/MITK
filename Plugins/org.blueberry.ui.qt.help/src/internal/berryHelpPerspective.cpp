@@ -30,8 +30,8 @@ void HelpPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 
   berry::IFolderLayout::Pointer leftFolder =
       layout->CreateFolder("lefttop", berry::IPageLayout::TOP, 0.65f, "org.blueberry.views.helpsearch");
-  leftFolder->AddView("org.blueberry.views.helpcontents");
   leftFolder->AddView("org.blueberry.views.helpindex");
+  leftFolder->AddView("org.blueberry.views.helpcontents");
 
   // Make every help related view unclosable
   IViewLayout::Pointer lo = layout->GetViewLayout("org.blueberry.views.helpsearch");

@@ -204,8 +204,8 @@ private:
 HelpPluginActivator* HelpPluginActivator::instance = nullptr;
 
 HelpPluginActivator::HelpPluginActivator()
-  : pluginListener(nullptr),
-    helpSchemeHandler(const_cast<QWebEngineUrlSchemeHandler*>(QWebEngineProfile::defaultProfile()->urlSchemeHandler("qthelp")))
+  : helpSchemeHandler(const_cast<QWebEngineUrlSchemeHandler*>(QWebEngineProfile::defaultProfile()->urlSchemeHandler("qthelp"))),
+    pluginListener(nullptr)
 {
   this->instance = this;
 

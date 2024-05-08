@@ -192,8 +192,7 @@ namespace mitk
      * @brief Convert 3D world coordinates to 2D indices.
      * 
      * @param baseGeometry Base Geometry of image
-     * @param mitk::Point3D 3D world coordinates
-     * @return mitk::Point2D 
+     * @param point3d 3D world coordinates
      */
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry *baseGeometry, const mitk::Point3D &point3d);
 

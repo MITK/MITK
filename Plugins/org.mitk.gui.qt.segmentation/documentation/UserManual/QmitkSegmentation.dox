@@ -484,8 +484,4 @@ For segmentation of 3D+t images, some tools give you the option to choose betwee
 In general, segmentation is applied on the time frame that is selected when execution is performed.
 If you alter the time frame, the segmentation preview is adapted.
 
-\section org_mitk_views_segmentationtechnicaldetail Technical information for developers
-
-For technical specifications see \subpage QmitkSegmentationTechnicalPage and for information on the extensions of the tools system \subpage toolextensions.
-
 */

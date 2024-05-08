@@ -46,20 +46,6 @@ if(NOT US_IS_EMBEDDED AND NOT US_NO_DOCUMENTATION)
       set(US_DOXYGEN_HTML_OUTPUT "html")
     endif()
 
-    # Compile a command line tool which transforms comments in CMake scripts into
-    # Doxygen parseable C code.
-    set(CMakeDoxygenFilter_EXECUTABLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CMakeDoxygenFilter${CMAKE_EXECUTABLE_SUFFIX}")
-    try_compile(_result_var
-                "${CMAKE_CURRENT_BINARY_DIR}"
-                "${CMAKE_CURRENT_SOURCE_DIR}/CMakeDoxygenFilter.cpp"
-                OUTPUT_VARIABLE _compile_output
-                COPY_FILE ${CMakeDoxygenFilter_EXECUTABLE}
-               )
-
-    if(NOT _result_var)
-      message(FATAL_ERROR "error: Faild to compile ${CMAKE_CURRENT_SOURCE_DIR}/CMakeDoxygenFilter.cpp (result: ${result_var})\n${_compile_output}")
-    endif()
-
     configure_file(doxygen.conf.in
                    ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
 

@@ -45,10 +45,6 @@ endif()
 # Doxygen HTML output folder
 set(MITK_DOXYGEN_QCH_FILE "${MITK_BINARY_DIR}/MITK-${MITK_REVISION_ID}.qch")
 
-# Compile a doxygen input filter for processing CMake scripts
-include(mitkFunctionCMakeDoxygenFilterCompile)
-mitkFunctionCMakeDoxygenFilterCompile(NAMESPACE "CMake")
-
 # Configure some doxygen options
 if(NOT MITK_DOXYGEN_INTERNAL_DOCS)
   set(MITK_DOXYGEN_INTERNAL_DOCS "NO")

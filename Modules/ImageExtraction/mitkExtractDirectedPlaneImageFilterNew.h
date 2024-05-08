@@ -34,9 +34,6 @@ namespace mitk
     \ingroup Process
     \ingroup Reliver
 
-    There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
-    QmitkSegmentationTechnicalPage
-
     This class takes an 3D or 4D mitk::Image as input and extracts a slice from it. If you work with a 4D image as input
     you have to specify the
     desired timestep at which the slice shall be extracted, otherwise the lowest given timestep is selected by default.

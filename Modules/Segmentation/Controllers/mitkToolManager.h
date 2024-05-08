@@ -40,8 +40,6 @@ namespace mitk
     \ingroup Interaction
     \ingroup ToolManagerEtAl
 
-    There is a separate page describing the general design of QmitkSegmentationView: \ref QmitkSegmentationTechnicalPage
-
     This class creates and manages several instances of mitk::Tool.
 
     \li ToolManager creates instances of mitk::Tool by asking the itk::ObjectFactory to list all known implementations

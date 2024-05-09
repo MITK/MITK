@@ -33,8 +33,6 @@ namespace mitk
 
     Finds the outer contour of a shape in 2D (possibly including single patches) and sets all
     the pixels inside to the background pixel value (erasing a segmentation).
-    If clicked on the background, the outer contour might contain the whole image and thus
-    fill the whole image with the background pixel value.
 
     \warning Only to be instantiated by mitk::ToolManager.
   */

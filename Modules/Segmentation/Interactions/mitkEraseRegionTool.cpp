@@ -52,12 +52,6 @@ const char *mitk::EraseRegionTool::GetName() const
   return "Erase";
 }
 
-template <typename TPixel, unsigned int VImageDimension>
-void DoFillImage(itk::Image<TPixel, VImageDimension>* image)
-{
-  image->FillBuffer(1);
-};
-
 mitk::Image::Pointer mitk::EraseRegionTool::GenerateFillImage(const Image* workingSlice, Point3D seedPoint, mitk::Label::PixelType& seedLabelValue) const
 {
   itk::Index<2> seedIndex;
@@ -69,9 +63,8 @@ mitk::Image::Pointer mitk::EraseRegionTool::GenerateFillImage(const Image* worki
   Image::Pointer fillImage;
 
   if ( seedLabelValue == LabelSetImage::UNLABELED_VALUE)
-  { //clicked on background remove everything which is not locked.
-    fillImage = workingSlice->Clone();
-    AccessByItk(fillImage, DoFillImage);
+  {
+    return nullptr;
   }
   else
   {

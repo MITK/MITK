@@ -246,8 +246,7 @@ Left-click inside a region/segmentation to flood fill all connected pixels that 
 \subsection org_mitk_views_segmentationerasetool Erase tool
 \imageMacro{QmitkSegmentation_IMGIconErase.png,"Erase tool",3.79}
 
-This tool removes a connected part of pixels that form a segmentation.
-You may use it to remove single segmented regions (left-click on specific segmentation) or to clear a whole slice at once (left-click at the non-labeled background).
+This tool removes a connected part of pixels that form a segmentation. You may use it to remove single segmented regions by left-click on specific segmentation region.
 This tool will only work and regions of unlocked labels or on regions of the active label.
 
 \subsection org_mitk_views_segmentationclosetool Close tool

@@ -153,7 +153,10 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
       requestObject->model = modelObject;
       requestObject->hostName = tool->m_InfoParameters->hostName;
       requestObject->port = tool->m_InfoParameters->port;
-      tool->m_RequestParameters = std::move(requestObject);
+      if (modelObject.IsInteractive()) // set only if interactive model
+      {
+        tool->m_RequestParameters = std::move(requestObject);
+      }
       QStringList supportedLabels;
       for (const auto &label : modelObject.labels)
       {
@@ -197,6 +200,8 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
     }
     catch (const mitk::Exception &e)
     {
+      m_Controls.appBox->clear();
+      m_Controls.modelBox->clear();
       MITK_ERROR << e.GetDescription();
       this->WriteErrorMessage(e.GetDescription());
     }
@@ -216,6 +221,7 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   {
     return;
   }
+  tool->ClearPicks(); // clear any interactive segmentation from before
   auto selectedModel = m_Controls.modelBox->currentText().toStdString();
   for (const auto &modelObject : tool->m_InfoParameters->models)
   {

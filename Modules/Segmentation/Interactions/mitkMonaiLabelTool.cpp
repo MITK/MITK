@@ -313,6 +313,12 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                            LabelSetImage *previewImage,
                                            TimeStepType timeStep)
 {
+  if (nullptr == m_RequestParameters || (m_RequestParameters->model.IsInteractive() && !this->HasPicks()))
+  {
+    this->ResetPreviewContentAtTimeStep(timeStep);
+    RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+    return;
+  }
   const std::string &hostName = m_RequestParameters->hostName;
   const int port = m_RequestParameters->port;
   if (!IsMonaiServerOn(hostName, port))
@@ -323,7 +329,7 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
   {
     this->SetTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
   }
-
+  
   std::string inputImagePath, outputImagePath;
   std::tie(inputImagePath, outputImagePath) = this->CreateTempDirs(m_TEMPLATE_FILENAME);
 
@@ -332,7 +338,7 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
     mitk::Image::Pointer filteredImage = this->ApplyLevelWindowEffect(inputAtTimeStep);
     this->WriteImage(filteredImage, inputImagePath);
     this->PostInferRequest(hostName, port, inputImagePath, outputImagePath, inputAtTimeStep->GetGeometry());
-    Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
+    auto outputImage = IOUtil::Load<Image>(outputImagePath);
     auto outputBuffer = mitk::LabelSetImage::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
     std::map<std::string, mitk::Label::PixelType> labelMap; // empty map

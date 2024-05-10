@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkWeakPointer.h>
 #include <mitkLabelSetImage.h>
 #include <mitkDataNode.h>
+#include <mitkLabelHighlightGuard.h>
 
 #include <QWidget>
 #include <QItemSelectionModel>
@@ -257,6 +258,9 @@ protected:
   void RemoveGroupInternal(const mitk::LabelSetImage::GroupIndexType& groupID);
   void DeleteLabelInternal(const LabelValueVectorType& labelValues);
 
+  void keyPressEvent(QKeyEvent* event) override;
+  void keyReleaseEvent(QKeyEvent* event) override;
+
 private Q_SLOTS:
   /** @brief Transform a labels selection into a data node list and emit the 'CurrentSelectionChanged'-signal.
   *
@@ -329,6 +333,7 @@ private:
   mitk::DataNode::Pointer m_SegmentationNode;
   unsigned long m_SegmentationNodeDataMTime;
   mitk::ITKEventObserverGuard m_SegmentationObserver;
+  mitk::LabelHighlightGuard m_LabelHighlightGuard;
 };
 
 #endif

@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 #include <mitkProperties.h>
 #include <mitkVectorProperty.h>
+#include <mitkLabelHighlightGuard.h>
 
 // MITK Rendering
 
@@ -77,12 +78,13 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
 
   const auto labelValues = image->GetAllLabelValues();
 
-  std::string propertyName = "org.mitk.multilabel.labels.highlighted";
+  mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(LabelHighlightGuard::PROPERTY_NAME_LABELS_HIGHLIGHTED()));
 
-  mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(propertyName));
   if (nullptr != prop)
   {
     const auto highlightedLabelValues = prop->GetValue();
+    mitk::BoolProperty::Pointer boolProp = dynamic_cast<mitk::BoolProperty*>(node->GetNonConstProperty(LabelHighlightGuard::PROPERTY_NAME_HIGHLIGHT_INVISIBLE()));
+    bool higlightInvisible = boolProp.IsNull() ? false : boolProp->GetValue();
 
     if (!highlightedLabelValues.empty())
     {
@@ -98,16 +100,9 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
         }
         else
         {
-          if (rgba[3] != 0)
-          { //if highlighted values are visible set them to opaque to pop out
+          if (higlightInvisible || rgba[3] != 0)
+          {
             rgba[3] = 1.;
-          }
-          else
-          { //if highlighted values are invisible the opacity is increased a bit
-            //to give a visual hint that the are highlighted but also invisible.
-            //e.g. needed to see a difference if you change the visibility of
-            //a highlighted label in the MultiLabelInspector
-            rgba[3] = 0.2;
           }
         }
         lookUpTable->SetTableValue(value, rgba);
@@ -168,6 +163,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   bool isLookupModified = localStorage->m_LabelLookupTable.IsNull() ||
     (localStorage->m_LabelLookupTable->GetMTime() < image->GetLookupTable()->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.labels.highlighted", localStorage->m_LabelLookupTable->GetMTime()) ||
+    PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.highlight_invisible", localStorage->m_LabelLookupTable->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime());
 
   auto outdatedGroups = GetOutdatedGroups(localStorage, image);

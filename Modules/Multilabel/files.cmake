@@ -1,5 +1,6 @@
 set(CPP_FILES
   mitkLabel.cpp
+  mitkLabelHighlightGuard.cpp
   mitkLabelSetImage.cpp
   mitkLabelSetImageConverter.cpp
   mitkLabelSetImageSource.cpp

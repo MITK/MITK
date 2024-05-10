@@ -97,6 +97,14 @@ Renaming of labels and label instances can be found in their content menu as sho
 
 \imageMacro{"QmitkSegmentation_LockColorVisibility.png","Unlocking\, changing color of\, and hiding label instances",10}
 
+\section org_mitk_views_segmentationlabelhighlighting Label highlighting
+
+Especially if you have segmentations with many label instances or the label names are not telling, it can be nontrivial to identify the label instance in the label inspector of the segmentation view. To mitigate this problem MITK uses label highlighting in the render windows. As long as you hover with the mouse cursor over a group, label or label instance, the respective label instances will be highlighted in the render windows. Highlighted labels will visually pop out by being shown with full opacity (no transparency) while the opacity of all non-highlighted labels of the same segmentation will be reduced to 30% of the current opacity value (they become very transparent).
+
+By default, label instances that are set to be invisible are not shown while highlighted. By pressing the shift key, one can enforce also invisible label instances to be shown while highlighting.
+
+Remark: the highlighting is supported in all views that use the label inspector (e.g. also the segmentation utilities).
+
 \section org_mitk_views_segmentationcontextmenus Context menus
 
 Actions for organization of groups, labels, and label instances (as well as other operations) can be also found in their right-click context menus.

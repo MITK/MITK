@@ -84,7 +84,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateLookupTable(mitk::BaseRenderer* ren
   {
     const auto highlightedLabelValues = prop->GetValue();
     mitk::BoolProperty::Pointer boolProp = dynamic_cast<mitk::BoolProperty*>(node->GetNonConstProperty(LabelHighlightGuard::PROPERTY_NAME_HIGHLIGHT_INVISIBLE()));
-    bool higlightInvisible = boolProp.IsNull() ? false : higlightInvisible = boolProp->GetValue();
+    bool higlightInvisible = boolProp.IsNull() ? false : boolProp->GetValue();
 
     if (!highlightedLabelValues.empty())
     {

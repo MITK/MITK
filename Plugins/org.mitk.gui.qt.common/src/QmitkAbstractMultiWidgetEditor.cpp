@@ -250,3 +250,8 @@ void QmitkAbstractMultiWidgetEditor::OnLayoutSet(int row, int column)
      multiWidget->SetInteractionScheme(scheme);
    }
  }
+
+ QmitkMultiWidgetDecorationManager* QmitkAbstractMultiWidgetEditor::GetDecorationManager() const
+ {
+   return m_Impl->m_MultiWidgetDecorationManager.get();
+ }

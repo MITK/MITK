@@ -29,6 +29,7 @@ found in the LICENSE file.
 
 class QmitkAbstractMultiWidget;
 class QmitkLevelWindowWidget;
+class QmitkMultiWidgetDecorationManager;
 
 class MITK_QT_COMMON QmitkAbstractMultiWidgetEditor : public QmitkAbstractRenderEditor, public berry::IPartListener
 {
@@ -128,6 +129,9 @@ public Q_SLOTS:
   virtual void OnLayoutSet(int row, int column);
   virtual void OnSynchronize(bool synchronized);
   virtual void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
+
+protected:
+  QmitkMultiWidgetDecorationManager* GetDecorationManager() const;
 
 private:
 

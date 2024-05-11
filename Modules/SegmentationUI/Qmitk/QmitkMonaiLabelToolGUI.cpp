@@ -31,21 +31,18 @@ namespace
 const QString QmitkMonaiLabelToolGUI::CONFIRM_QUESTION_TEXT =
   "Data will be sent to the processing server devoid of any patient information. Are you sure you want continue?";
 
-const QStringList QmitkMonaiLabelToolGUI::WHITELISTED_MODELS = {
-  "deepgrow_2d",
-  "deepgrow_3d",
-  "deepedit_seg",
-  "localization_vertebra",
-  "segmentation",
-  "segmentation_spleen",
-  "segmentation_vertebra",
-  "deepgrow_pipeline",
-  "vertebra_pipeline"
-};
-const QStringList QmitkMonaiLabelToolGUI::BLACKLISTED_MODELS = {
-  "deepedit",
-  "localization_spine",
-};
+const QMap<QString, QString> QmitkMonaiLabelToolGUI::WHITELISTED_MODELS = {{"deepgrow_2d", "Radiology"},
+                                                                           {"deepgrow_3d", "Radiology"},
+                                                                           {"deepedit_seg", "Radiology"},
+                                                                           {"localization_vertebra", "Radiology"},
+                                                                           {"segmentation", "Radiology"},
+                                                                           {"segmentation_spleen", "Radiology"},
+                                                                           {"segmentation_vertebra", "Radiology"},
+                                                                           {"deepgrow_pipeline", "Radiology"},
+                                                                           {"vertebra_pipeline", "Radiology"}};
+
+const QMap<QString, QString> QmitkMonaiLabelToolGUI::BLACKLISTED_MODELS = {{"deepedit", "Radiology"},
+                                                                           {"localization_spine", "Radiology"}};
 
 QmitkMonaiLabelToolGUI::QmitkMonaiLabelToolGUI(int dimension)
   : QmitkMultiLabelSegWithPreviewToolGUIBase(),
@@ -268,18 +265,18 @@ void QmitkMonaiLabelToolGUI::PopulateUI(bool allowAllModels)
   m_Controls.appBox->clear();
   if (nullptr != tool->m_InfoParameters)
   {
-    auto response = tool->m_InfoParameters->name;
+    QString appName = QString::fromStdString(tool->m_InfoParameters->name);
     auto autoModels = tool->GetAutoSegmentationModels(m_Dimension);
     auto interactiveModels = tool->GetInteractiveSegmentationModels(m_Dimension);
     autoModels.insert(autoModels.end(), interactiveModels.begin(), interactiveModels.end());
-    this->WriteStatusMessage(QString::fromStdString(response));
-    m_Controls.appBox->addItem(QString::fromStdString(response));
-    this->PopulateModelBox(autoModels, allowAllModels);
+    this->WriteStatusMessage(appName);
+    m_Controls.appBox->addItem(appName);
+    this->PopulateModelBox(appName, autoModels, allowAllModels);
     m_Controls.modelBox->setCurrentIndex(-1);
   }
 }
 
-void QmitkMonaiLabelToolGUI::PopulateModelBox(std::vector<mitk::MonaiModelInfo> models, bool allowAllModels)
+void QmitkMonaiLabelToolGUI::PopulateModelBox(QString appName, std::vector<mitk::MonaiModelInfo> models, bool allowAllModels)
 {
   m_Controls.modelBox->clear();
   for (const auto &model : models)
@@ -287,10 +284,12 @@ void QmitkMonaiLabelToolGUI::PopulateModelBox(std::vector<mitk::MonaiModelInfo> 
     QString modelName = QString::fromStdString(model.name);
     if (allowAllModels)
     {
-      if (!BLACKLISTED_MODELS.contains(modelName))
+      if (BLACKLISTED_MODELS.contains(modelName))
       {
-        m_Controls.modelBox->addItem(modelName);
+        if (appName.contains(BLACKLISTED_MODELS[modelName]))
+          continue;
       }
+      m_Controls.modelBox->addItem(modelName);
     }
     else
     {

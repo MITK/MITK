@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <mitkIPreferences.h>
 #include <mitkMonaiLabelTool.h>
+#include <QMap>
 
 class MITKSEGMENTATIONUI_EXPORT QmitkMonaiLabelToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {
@@ -73,7 +74,7 @@ protected:
   /**
    * @brief Helper function to write MONAI model info in to model combo box
    */
-  void PopulateModelBox(std::vector<mitk::MonaiModelInfo> models, bool allowAllModels);
+  void PopulateModelBox(QString appName, std::vector<mitk::MonaiModelInfo> models, bool allowAllModels);
 
   /**
    * @brief Helper function to populate required server metadata into UI
@@ -87,8 +88,8 @@ private:
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
   int m_Dimension;
   static const QString CONFIRM_QUESTION_TEXT;
-  static const QStringList WHITELISTED_MODELS;
-  static const QStringList BLACKLISTED_MODELS;
+  static const QMap<QString, QString> WHITELISTED_MODELS;
+  static const QMap<QString, QString> BLACKLISTED_MODELS;
 };
 
 #endif

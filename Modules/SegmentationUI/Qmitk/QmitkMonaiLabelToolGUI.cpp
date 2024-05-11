@@ -263,6 +263,7 @@ void QmitkMonaiLabelToolGUI::PopulateUI(bool allowAllModels)
     return;
   }
   m_Controls.appBox->clear();
+  m_Controls.labelListLabel->clear();
   if (nullptr != tool->m_InfoParameters)
   {
     QString appName = QString::fromStdString(tool->m_InfoParameters->name);

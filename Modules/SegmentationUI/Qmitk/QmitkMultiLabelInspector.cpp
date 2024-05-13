@@ -1216,6 +1216,7 @@ void QmitkMultiLabelInspector::OnClearLabel(bool /*value*/)
     if (m_SegmentationNode.IsNotNull())
     {
       m_SegmentationNode->Modified();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }

@@ -117,6 +117,11 @@ bool ViewDescriptor::IsRestorable() const
   return str.isNull() ? true : str.compare("true", Qt::CaseInsensitive) == 0;
 }
 
+bool ViewDescriptor::IsInternal() const
+{
+  return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_INTERNAL).compare("true", Qt::CaseInsensitive) == 0;
+}
+
 Object* ViewDescriptor::GetAdapter(const QString& adapter) const
 {
   if (adapter == qobject_interface_iid<IConfigurationElement*>())
@@ -193,7 +198,7 @@ void ViewDescriptor::LoadFromExtension()
   if (!category.isEmpty())
   {
     // Parse the path tokens and store them
-    foreach (QString pathElement, category.split('/', QString::SkipEmptyParts))
+    foreach (QString pathElement, category.split('/', Qt::SkipEmptyParts))
     {
       if (!pathElement.trimmed().isEmpty())
       {

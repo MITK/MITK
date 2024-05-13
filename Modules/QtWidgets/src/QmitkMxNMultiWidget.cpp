@@ -385,6 +385,27 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   return renderWindowWidget;
 }
 
+QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::GetWindowFromIndex(size_t index)
+{
+  if (index >= GetRenderWindowWidgets().size())
+  {
+    return nullptr;
+  }
+
+  auto renderWindowName = this->GetNameFromIndex(index);
+  auto renderWindowWidgets = GetRenderWindowWidgets();
+  auto it = renderWindowWidgets.find(renderWindowName);
+  if (it != renderWindowWidgets.end())
+  {
+    return it->second;
+  }
+  else
+  {
+    MITK_ERROR << "Could not find render window " << renderWindowName.toStdString() << ", although it should be there.";
+    return nullptr;
+  }
+}
+
 void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
 {
   if ((*jsonData).is_null())
@@ -520,26 +541,8 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
         viewPlane = mitk::AnatomicalPlane::Sagittal;
       }
 
-      QmitkAbstractMultiWidget::RenderWindowWidgetPointer window = nullptr;
-      QString renderWindowName;
-      QmitkAbstractMultiWidget::RenderWindowWidgetMap::iterator it;
-
       // repurpose existing render windows as far as they already exist
-      if (*windowCounter < GetRenderWindowWidgets().size())
-      {
-        renderWindowName = this->GetNameFromIndex(*windowCounter);
-        auto renderWindowWidgets = GetRenderWindowWidgets();
-        it = renderWindowWidgets.find(renderWindowName);
-        if (it != renderWindowWidgets.end())
-        {
-          window = it->second;
-        }
-        else
-        {
-          MITK_ERROR << "Could not find render window " << renderWindowName.toStdString() << ", although it should be there.";
-        }
-      }
-
+      auto window = GetWindowFromIndex(*windowCounter);
       if (window == nullptr)
       {
         window = CreateRenderWindowWidget();
@@ -561,6 +564,53 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
 
   return split;
 
+}
+
+void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)
+{
+  auto vSplit = new QSplitter(Qt::Vertical);
+
+  unsigned int windowCounter = 0;
+  for (auto node : nodes)
+  {
+    auto hSplit = new QSplitter(Qt::Horizontal);
+    for (auto viewPlane : { mitk::AnatomicalPlane::Axial, mitk::AnatomicalPlane::Coronal, mitk::AnatomicalPlane::Sagittal })
+    {
+      // repurpose existing render windows as far as they already exist
+      auto window = GetWindowFromIndex(windowCounter++);
+      if (window == nullptr)
+      {
+        window = CreateRenderWindowWidget();
+      }
+
+      auto utilityWidget = window->GetUtilityWidget();
+      utilityWidget->ToggleSynchronization(false);
+      utilityWidget->SetDataSelection(QList({ node }));
+      window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
+      window->GetSliceNavigationController()->Update();
+      auto baseRenderer = mitk::BaseRenderer::GetInstance(window->GetRenderWindow()->GetVtkRenderWindow());
+      mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), node->GetData()->GetTimeGeometry());
+      hSplit->addWidget(window.get());
+      window->show();
+    }
+    auto sizes = QList<int>({1, 1, 1});
+    hSplit->setSizes(sizes);
+    vSplit->addWidget(hSplit);
+  }
+
+  delete this->layout();
+  auto hBoxLayout = new QHBoxLayout(this);
+  this->setLayout(hBoxLayout);
+  hBoxLayout->addWidget(vSplit);
+  emit UpdateUtilityWidgetViewPlanes();
+
+  while (GetNumberOfRenderWindowWidgets() > windowCounter)
+  {
+    RemoveRenderWindowWidget();
+  }
+
+  EnableCrosshair();
+  emit LayoutChanged();
 }
 
 void QmitkMxNMultiWidget::SetInitialSelection()

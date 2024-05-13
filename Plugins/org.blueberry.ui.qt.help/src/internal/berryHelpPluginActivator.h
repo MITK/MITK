@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <berryIWindowListener.h>
 
 class QHelpEngine;
+class QWebEngineUrlSchemeHandler;
 
 namespace berry {
 
@@ -71,6 +72,7 @@ private:
   QScopedPointer<QHelpEngineWrapper, QScopedPointerDeleteLater > helpEngine;
   QScopedPointer<QHelpEngineConfiguration> helpEngineConfiguration;
   QScopedPointer<HelpContextHandler> helpContextHandler;
+  QWebEngineUrlSchemeHandler* helpSchemeHandler;
 
   QCHPluginListener* pluginListener;
   QScopedPointer<IWindowListener> wndListener;

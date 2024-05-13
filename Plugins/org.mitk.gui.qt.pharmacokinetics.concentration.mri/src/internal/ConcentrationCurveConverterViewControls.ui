@@ -139,7 +139,7 @@
           <enum>QLayout::SetDefaultConstraint</enum>
          </property>
          <item>
-          <layout class="QVBoxLayout" name="concentrationOptionsLayout" stretch="0,0,0,0,0">
+          <layout class="QVBoxLayout" name="concentrationOptionsLayout" stretch="0,0,0,0">
            <property name="spacing">
             <number>4</number>
            </property>
@@ -161,13 +161,6 @@
             <widget class="QRadioButton" name="radioButtonUsingT1viaVFA">
              <property name="text">
               <string>Variable Flip Angle</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButtonTurboFlash">
-             <property name="text">
-              <string>TurboFLASH Sequence</string>
              </property>
             </widget>
            </item>
@@ -271,58 +264,6 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBoxTurboFlash">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="title">
-              <string>Turbo FLASH Parameters:</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="0" column="1">
-               <widget class="QDoubleSpinBox" name="AifRecoverytime"/>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="lable_TRec">
-                <property name="text">
-                 <string>Recovery Time [s]:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_T10">
-                <property name="text">
-                 <string>Relaxation Time [s]:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QDoubleSpinBox" name="relaxivity"/>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_25">
-                <property name="text">
-                 <string>AIF Recovery Time [s]:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QDoubleSpinBox" name="relaxationtime"/>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label__alpha">
-                <property name="text">
-                 <string>Relaxivity [ ]:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QDoubleSpinBox" name="recoverytime"/>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
             <widget class="QGroupBox" name="groupBox_baselineRangeSelection">
              <property name="title">
               <string>Baseline Range Selection:</string>
@@ -357,13 +298,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="btnConvertToConcentration">
-     <property name="text">
-      <string>Convert To Concentration</string>
-     </property>
     </widget>
    </item>
    <item>
@@ -444,6 +378,13 @@
        <widget class="QSpinBox" name="spinBox_baselineEndTimeStepT2"/>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnConvertToConcentration">
+     <property name="text">
+      <string>Convert To Concentration</string>
+     </property>
     </widget>
    </item>
    <item>

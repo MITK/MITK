@@ -13,11 +13,15 @@ found in the LICENSE file.
 #include "QmitkCtkPythonShell.h"
 
 #include <ctkAbstractPythonManager.h>
+#ifdef snprintf
+#undef snprintf
+#endif
+
+#include <mitkIPythonService.h>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
 #include <QUrl>
-#include "mitkIPythonService.h"
 #include <usModuleContext.h>
 #include <usServiceReference.h>
 #include <usGetModuleContext.h>

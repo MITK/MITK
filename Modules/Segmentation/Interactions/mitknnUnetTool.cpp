@@ -103,8 +103,7 @@ void mitk::nnUNetTool::UpdatePrepare()
 {
   Superclass::UpdatePrepare();
   auto preview = this->GetPreviewSegmentation();
-  auto labelset = preview->GetLabelSet(preview->GetActiveLayer());
-  labelset->RemoveAllLabels();
+  preview->RemoveLabels(preview->GetLabelValuesByGroup(preview->GetActiveLayer()));
 }
 
 namespace

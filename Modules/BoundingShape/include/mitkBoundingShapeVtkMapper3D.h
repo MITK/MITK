@@ -14,12 +14,7 @@ found in the LICENSE file.
 #define mitkBoundingShapeVtkMapper3D_h
 
 #include <MitkBoundingShapeExports.h>
-
 #include <mitkVtkMapper.h>
-
-#include <vtkPropAssembly.h>
-#include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
 
 namespace mitk
 {

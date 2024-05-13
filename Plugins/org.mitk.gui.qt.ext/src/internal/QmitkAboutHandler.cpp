@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 berry::Object::Pointer QmitkAboutHandler::Execute(const berry::SmartPointer<const berry::ExecutionEvent>& /*event*/)
 {
-  auto   aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), nullptr);
+  auto   aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), {});
   aboutDialog->open();
   return berry::Object::Pointer();
 }

@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include "QmitkAboutHandler.h"
 #include "QmitkAppInstancesPreferencePage.h"
-#include "QmitkExternalProgramsPreferencePage.h"
+#include "QmitkStartupPreferencePage.h"
 
 #include "QmitkModuleView.h"
 
@@ -36,6 +36,7 @@ found in the LICENSE file.
 
 #include <Poco/Util/OptionProcessor.h>
 
+#include <QApplication>
 #include <QProcess>
 #include <QMainWindow>
 
@@ -53,7 +54,7 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAboutHandler, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAppInstancesPreferencePage, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkExternalProgramsPreferencePage, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkStartupPreferencePage, context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkModuleView, context)
 

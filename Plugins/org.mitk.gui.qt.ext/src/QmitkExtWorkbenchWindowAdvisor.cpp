@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <QStatusBar>
 #include <QString>
 #include <QFile>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QSettings>
 
@@ -57,6 +57,7 @@ found in the LICENSE file.
 #include <QmitkOpenDicomEditorAction.h>
 #include <QmitkOpenMxNMultiWidgetEditorAction.h>
 #include <QmitkOpenStdMultiWidgetEditorAction.h>
+#include <QmitkApplicationConstants.h>
 
 #include <itkConfigure.h>
 #include <mitkVersion.h>
@@ -80,6 +81,7 @@ found in the LICENSE file.
 #include <QMouseEvent>
 #include <QLabel>
 #include <QmitkAboutDialog.h>
+#include <QmitkStartupDialog.h>
 
 QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack =
   new QmitkExtWorkbenchWindowAdvisorHack();
@@ -87,6 +89,70 @@ QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack
 QString QmitkExtWorkbenchWindowAdvisor::QT_SETTINGS_FILENAME = "QtSettings.ini";
 
 static bool USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS = false;
+
+namespace
+{
+  void ExecuteStartupDialog()
+  {
+    QmitkStartupDialog startupDialog;
+
+    if (startupDialog.SkipDialog())
+      return;
+
+    try
+    {
+      if (startupDialog.exec() != QDialog::Accepted)
+        return;
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << e.GetDescription();
+      return;
+    }
+
+    // Create two lists: one for all categories and one subset for visible categories.
+
+    QStringList allCategories = berry::PlatformUI::GetWorkbench()->GetViewRegistry()->GetViewsByCategory().uniqueKeys();
+    QStringList visibleCategories;
+
+    if (startupDialog.UsePreset())
+    {
+      visibleCategories = startupDialog.GetPresetCategories();
+
+      if (visibleCategories.isEmpty()) // "Custom" preset
+      {
+        // Early-out and show the "Tool Bars" preference page instead.
+        QmitkExtWorkbenchWindowAdvisorHack::undohack->onEditPreferences("org.mitk.ToolBarsPreferencePage");
+        return;
+      }
+    }
+    else
+    {
+      visibleCategories = allCategories;
+    }
+
+    // Now set the visibility preferences for all categories and apply them instantly.
+
+    auto prefsService = mitk::CoreServices::GetPreferencesService();
+    auto prefs = prefsService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
+    const auto toolBars = berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows().first()->GetToolBars();
+
+    for (const auto& category : allCategories)
+    {
+      bool isVisible = visibleCategories.contains(category);
+      prefs->PutBool(category.toStdString(), isVisible);
+
+      auto toolBarIter = std::find_if(toolBars.cbegin(), toolBars.cend(), [&category](const QToolBar* toolBar) {
+        return toolBar->objectName() == category;
+      });
+
+      if (toolBarIter != toolBars.cend())
+        (*toolBarIter)->setVisible(isVisible);
+    }
+
+    prefs->Flush();
+  }
+}
 
 class PartListenerForTitle: public berry::IPartListener
 {
@@ -639,15 +705,19 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     // another bad hack to get an edit/undo menu...
     QMenu* editMenu = menuBar->addMenu("&Edit");
-    undoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-undo.svg"),
+    undoAction = editMenu->addAction(
+      berry::QtStyleManager::ThemeIcon(basePath + "edit-undo.svg"),
       "&Undo",
-      QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
-      QKeySequence("CTRL+Z"));
+      QKeySequence("CTRL+Z"),
+      QmitkExtWorkbenchWindowAdvisorHack::undohack,
+      SLOT(onUndo()));
     undoAction->setToolTip("Undo the last action (not supported by all modules)");
-    redoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-redo.svg"),
+    redoAction = editMenu->addAction(
+      berry::QtStyleManager::ThemeIcon(basePath + "edit-redo.svg"),
       "&Redo",
-      QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
-      QKeySequence("CTRL+Y"));
+      QKeySequence("CTRL+Y"),
+      QmitkExtWorkbenchWindowAdvisorHack::undohack,
+      SLOT(onRedo()));
     redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
     // ==== Window Menu ==========================
@@ -674,9 +744,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       closePerspAction = windowMenu->addAction("&Close Perspective", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
 
     windowMenu->addSeparator();
-    windowMenu->addAction("&Preferences...",
-      QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()),
-      QKeySequence("CTRL+P"));
+    windowMenu->addAction("&Preferences...", QKeySequence("CTRL+P"),
+      QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()));
 
     // fill perspective menu
     berry::IPerspectiveRegistry* perspRegistry =
@@ -715,7 +784,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     if (showViewMenuItem)
     {
-      for (auto viewAction : qAsConst(viewActions))
+      for (auto viewAction : std::as_const(viewActions))
       {
         viewMenu->addAction(viewAction);
       }
@@ -725,7 +794,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     QMenu* helpMenu = menuBar->addMenu("&Help");
     helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
     helpMenu->addAction("&Open Help Perspective", this, SLOT(onHelpOpenHelpPerspective()));
-    helpMenu->addAction("&Context Help",this, SLOT(onHelp()),  QKeySequence("F1"));
+    helpMenu->addAction("&Context Help", QKeySequence("F1"), this, SLOT(onHelp()));
     helpMenu->addAction("&About",this, SLOT(onAbout()));
     // =====================================================
   }
@@ -847,8 +916,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   if (showViewToolbar)
   {
     auto* prefService = mitk::CoreServices::GetPreferencesService();
-    auto* stylePrefs = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
-    bool showCategoryNames = stylePrefs->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true);
+    auto* toolBarsPrefs = prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
+    bool showCategories = toolBarsPrefs->GetBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, true);
 
     // Order view descriptors by category
 
@@ -873,16 +942,21 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       if (!viewDescriptorsInCurrentCategory.isEmpty())
       {
         auto toolbar = new QToolBar;
-        toolbar->setObjectName(category + " View Toolbar");
+        toolbar->setObjectName(category);
         mainWindow->addToolBar(toolbar);
 
-        if (showCategoryNames && !category.isEmpty())
+        toolbar->setVisible(toolBarsPrefs->GetBool(category.toStdString(), true));
+
+        if (!category.isEmpty())
         {
           auto categoryButton = new QToolButton;
           categoryButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
           categoryButton->setText(category);
           categoryButton->setStyleSheet("background: transparent; margin: 0; padding: 0;");
-          toolbar->addWidget(categoryButton);
+
+          auto action = toolbar->addWidget(categoryButton);
+          action->setObjectName("category");
+          action->setVisible(showCategories);
 
           connect(categoryButton, &QToolButton::clicked, [toolbar]()
           {
@@ -890,8 +964,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
             {
               if (QStringLiteral("qt_toolbar_ext_button") == widget->objectName() && widget->isVisible())
               {
-                QMouseEvent pressEvent(QEvent::MouseButtonPress, QPointF(0.0f, 0.0f), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-                QMouseEvent releaseEvent(QEvent::MouseButtonRelease, QPointF(0.0f, 0.0f), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QMouseEvent pressEvent(QEvent::MouseButtonPress, QPointF(0.0f, 0.0f), QCursor::pos(), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QMouseEvent releaseEvent(QEvent::MouseButtonRelease, QPointF(0.0f, 0.0f), QCursor::pos(), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
                 QApplication::sendEvent(widget, &pressEvent);
                 QApplication::sendEvent(widget, &releaseEvent);
               }
@@ -899,11 +973,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
           });
         }
 
-        for (const auto &viewDescriptor : qAsConst(viewDescriptorsInCurrentCategory))
+        for (const auto &viewDescriptor : std::as_const(viewDescriptorsInCurrentCategory))
         {
           auto viewAction = new berry::QtShowViewAction(window, viewDescriptor);
           toolbar->addAction(viewAction);
         }
+
+
       }
     }
   }
@@ -985,6 +1061,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
   {
     configurer->GetWindow()->GetWorkbench()->GetIntroManager()->ShowIntro(GetWindowConfigurer()->GetWindow(), false);
   }
+
+  ExecuteStartupDialog();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onIntro()
@@ -1108,9 +1186,13 @@ void QmitkExtWorkbenchWindowAdvisorHack::onViewNavigator()
   SafeHandleNavigatorView("org.mitk.views.viewnavigator");
 }
 
-void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()
+void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences(const QString& selectedPage)
 {
   QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
+
+  if (!selectedPage.isEmpty())
+    _PreferencesDialog.SetSelectedPage(selectedPage);
+
   _PreferencesDialog.exec();
 }
 
@@ -1138,29 +1220,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onNewWindow()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 {
-  bool hasIntro =
-    berry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro();
-  if (!hasIntro)
-  {
-    QRegExp reg("(.*)<title>(\\n)*");
-    QRegExp reg2("(\\n)*</title>(.*)");
-    QFile file(":/org.mitk.gui.qt.ext/index.html");
-    file.open(QIODevice::ReadOnly | QIODevice::Text); //text file only for reading
-
-    QString text = QString(file.readAll());
-
-    file.close();
-
-    QString title = text;
-    title.replace(reg, "");
-    title.replace(reg2, "");
-
-    std::cout << title.toStdString() << std::endl;
-
-    QMessageBox::information(nullptr, title,
-      text, "Close");
-  }
-  else
+  if (berry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro())
   {
     berry::PlatformUI::GetWorkbench()->GetIntroManager()->ShowIntro(
       berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow(), false);
@@ -1223,7 +1283,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onHelpOpenHelpPerspective()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onAbout()
 {
-  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(),nullptr);
+  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), {});
   aboutDialog->open();
 }
 
@@ -1428,8 +1488,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowClose()
   berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow = static_cast<QMainWindow*> (window->GetShell()->GetControl());
 
-  QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
-  settings.setValue("ToolbarPosition", mainWindow->saveState());
+  auto fileName = this->GetQSettingsFile();
+
+  if (!fileName.isEmpty())
+  {
+    QSettings settings(fileName, QSettings::IniFormat);
+    settings.setValue("ToolbarPosition", mainWindow->saveState());
+  }
 }
 
 QString QmitkExtWorkbenchWindowAdvisor::GetQSettingsFile() const

@@ -13,9 +13,13 @@ found in the LICENSE file.
 #define mitkPythonService_h
 
 #include <ctkAbstractPythonManager.h>
-#include "mitkIPythonService.h"
+#ifdef snprintf
+#undef snprintf
+#endif
+
+#include <mitkIPythonService.h>
+#include <mitkSurface.h>
 #include <itkLightObject.h>
-#include "mitkSurface.h"
 
 namespace mitk
 {
@@ -68,15 +72,6 @@ namespace mitk
       /// \see IPythonService::CopyItkImageFromPython()
       mitk::Image::Pointer CopySimpleItkImageFromPython( const std::string& varName ) override;
       ///
-      /// \see IPythonService::IsOpenCvPythonWrappingAvailable()
-      bool IsOpenCvPythonWrappingAvailable() override;
-      ///
-      /// \see IPythonService::CopyToPythonAsCvImage()
-      bool CopyToPythonAsCvImage( mitk::Image* image, const std::string& varName ) override;
-      ///
-      /// \see IPythonService::CopyCvImageFromPython()
-      mitk::Image::Pointer CopyCvImageFromPython( const std::string& varName ) override;
-      ///
       /// \see IPythonService::IsVtkPythonWrappingAvailable()
       bool IsVtkPythonWrappingAvailable() override;
       ///
@@ -99,7 +94,6 @@ namespace mitk
       QList<PythonCommandObserver*> m_Observer;
       ctkAbstractPythonManager m_PythonManager;
       bool m_ItkWrappingAvailable;
-      bool m_OpenCVWrappingAvailable;
       bool m_VtkWrappingAvailable;
       bool m_ErrorOccured;
   };

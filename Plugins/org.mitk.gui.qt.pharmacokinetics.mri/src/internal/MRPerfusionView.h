@@ -118,7 +118,9 @@ protected:
   /*! Helper method that generates a node for the passed concentration image.*/
   mitk::DataNode::Pointer GenerateConcentrationNode(mitk::Image* image, const std::string& nodeName) const;
 
-  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
+  void OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
+
+  void OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 
   /*! @brief The view's UI controls */
   Ui::MRPerfusionViewControls m_Controls;
@@ -140,7 +142,6 @@ protected:
   mitk::SimpleBarrierConstraintChecker::Pointer m_modelConstraints;
 
 private:
-  bool IsTurboFlashSequenceFlag() const;
 
   bool m_FittingInProgress;
 

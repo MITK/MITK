@@ -1,4 +1,4 @@
-  <statemachine name="LiveWireTool">
+  <statemachine name="EditableContourTool">
     <state name="Start" ID="1" startstate="true">
       <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="PressedState" >
         <action name="InitObject" ID="5" />
@@ -25,6 +25,7 @@
       <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" target="Drawing" >
         <action name="Drawing"/>
         <condition name="InsideCorrectPlane"/>
+        <condition name="EnoughDistanceToControlPoint"/>
       </transition>
       <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="Active" >
         <action name="MovePoint" ID="92" />

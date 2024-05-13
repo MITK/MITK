@@ -2383,7 +2383,7 @@ void WorkbenchPage::OpenPerspectiveExtras()
   QString extras = ""; //PrefUtil.getAPIPreferenceStore().getString(
   //    IWorkbenchPreferenceConstants.PERSPECTIVE_BAR_EXTRAS);
   QList<IPerspectiveDescriptor::Pointer> descs;
-  foreach (QString id, extras.split(", ", QString::SkipEmptyParts))
+  foreach (QString id, extras.split(", ", Qt::SkipEmptyParts))
   {
     if (id.trimmed().isEmpty()) continue;
     IPerspectiveDescriptor::Pointer desc =

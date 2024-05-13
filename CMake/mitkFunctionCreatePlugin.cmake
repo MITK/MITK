@@ -36,7 +36,6 @@ function(mitk_create_plugin)
   set(arg_options
     TEST_PLUGIN # Mark this plug-in as a testing plug-in
     NO_INSTALL  # Don't install this plug-in
-    NO_QHP_TRANSFORM
     WARNINGS_NO_ERRORS
   )
 
@@ -161,12 +160,7 @@ function(mitk_create_plugin)
     endif()
     #message("PLUGIN_DOXYGEN_TAGFILES: ${PLUGIN_DOXYGEN_TAGFILES}")
 
-    if(_PLUGIN_NO_QHP_TRANSFORM)
-      set(_use_qhp_xsl 0)
-    else()
-      set(_use_qhp_xsl 1)
-    endif()
-    _FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP(PLUGIN_GENERATED_QCH_FILES ${_use_qhp_xsl})
+    _FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP(PLUGIN_GENERATED_QCH_FILES)
     list(APPEND _PLUGIN_CACHED_RESOURCE_FILES ${PLUGIN_GENERATED_QCH_FILES})
   endif()
 
@@ -310,7 +304,7 @@ function(mitk_create_plugin)
 endfunction()
 
 
-function(_FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP qch_file use_xsl)
+function(_FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP qch_file)
 
   set(_manifest_path "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
   if(NOT EXISTS ${_manifest_path})
@@ -324,25 +318,16 @@ function(_FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP qch_file use_xsl)
                  ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf
                  )
 
-  set(_qhp_xsl_file "${MITK_SOURCE_DIR}/Documentation/qhp_toc.xsl")
   set(_generated_qhp_file "${PLUGIN_DOXYGEN_OUTPUT_DIR}/html/index.qhp")
-  set(_transformed_qhp_file "${PLUGIN_DOXYGEN_OUTPUT_DIR}/html/${PLUGIN_TARGET}.qhp")
   set(${qch_file} "${CMAKE_CURRENT_BINARY_DIR}/resources/${PLUGIN_TARGET}.qch")
-
-  set(_xsl_command )
-  if(use_xsl)
-    set(_xsl_command COMMAND ${QT_XMLPATTERNS_EXECUTABLE} ${_qhp_xsl_file} ${_generated_qhp_file} -output ${_transformed_qhp_file})
-  endif()
 
   file(GLOB _file_dependencies "${PLUGIN_DOXYGEN_INPUT_DIR}/*")
 
   add_custom_command(OUTPUT ${${qch_file}}
                      # Generate a Qt help project (index.qhp) with doxygen
                      COMMAND ${DOXYGEN_EXECUTABLE} ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf
-                     # Use a XSL transformation to get rid of the top-level entry
-                     ${_xsl_command}
                      # Generate the final Qt compressed help file (.qch)
-                     COMMAND ${QT_HELPGENERATOR_EXECUTABLE} ${_transformed_qhp_file} -o ${${qch_file}}
+                     COMMAND ${QT_HELPGENERATOR_EXECUTABLE} ${_generated_qhp_file} -o ${${qch_file}}
                      DEPENDS ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf ${_file_dependencies}
                      )
 
@@ -350,8 +335,4 @@ function(_FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP qch_file use_xsl)
 
   set(${qch_file} ${${qch_file}} PARENT_SCOPE)
 
-endfunction()
-
-function(MACRO_CREATE_MITK_CTK_PLUGIN)
-  message(SEND_ERROR "The function MACRO_CREATE_MITK_CTK_PLUGIN was renamed to mitk_create_plugin in MITK 2015.05.")
 endfunction()

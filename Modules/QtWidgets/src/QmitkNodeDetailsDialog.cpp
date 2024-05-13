@@ -10,132 +10,101 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkNodeDetailsDialog.h"
+#include <QmitkNodeDetailsDialog.h>
 
-#include "QmitkDataStorageComboBox.h"
+#include <QKeyEvent>
 
 #include <sstream>
 
-#include <QGridLayout>
-#include <QTextBrowser>
-#include <QPushButton>
-#include <QLineEdit>
-#include <QEvent>
-#include <QKeyEvent>
+#include <ui_QmitkNodeDetailsDialog.h>
 
-QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::Pointer>& nodes, QWidget* parent /*= nullptr*/, Qt::WindowFlags flags /*= nullptr */)
-  : QDialog(parent, flags)
+QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::Pointer>& nodes, QWidget* parent, Qt::WindowFlags flags)
+  : QDialog(parent, flags),
+    m_Ui(new Ui::QmitkNodeDetailsDialog)
 {
   QList<mitk::DataNode::ConstPointer> constNodes;
 
   for (auto& node : nodes)
-  {
     constNodes.append(node.GetPointer());
-  }
 
-  InitWidgets(constNodes);
+  this->InitWidgets(constNodes);
 }
 
-QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::ConstPointer>& nodes, QWidget* parent /*= nullptr*/, Qt::WindowFlags flags /*= nullptr */)
-  : QDialog(parent, flags)
+QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::ConstPointer>& nodes, QWidget* parent, Qt::WindowFlags flags)
+  : QDialog(parent, flags),
+    m_Ui(new Ui::QmitkNodeDetailsDialog)
 {
-  InitWidgets(nodes);
+  this->InitWidgets(nodes);
+}
+
+QmitkNodeDetailsDialog::~QmitkNodeDetailsDialog()
+{
+  disconnect(m_Ui->dataStorageComboBox, &QmitkDataStorageComboBox::OnSelectionChanged, this, &QmitkNodeDetailsDialog::OnSelectionChanged);
+  delete m_Ui;
 }
 
 void QmitkNodeDetailsDialog::InitWidgets(const QList<mitk::DataNode::ConstPointer>& nodes)
 {
-  auto parentLayout = new QGridLayout;
-  auto dataStorageComboBox = new QmitkDataStorageComboBox(this, true);
-  m_KeyWord = new QLineEdit;
-  m_KeyWord->installEventFilter(this);
-  m_SearchButton = new QPushButton("Search (F3)", this);
-  m_SearchButton->installEventFilter(this);
-  m_TextBrowser = new QTextBrowser(this);
-  QPushButton* cancelButton = new QPushButton("Cancel", this);
+  m_Ui->setupUi(this);
 
-  setMinimumSize(512, 512);
-  setLayout(parentLayout);
-  setSizeGripEnabled(true);
-  setModal(true);
+  m_Ui->dataStorageComboBox->SetAutoSelectNewItems(true);
 
-  parentLayout->addWidget(dataStorageComboBox, 0, 0, 1, 2);
-  parentLayout->addWidget(m_KeyWord, 1, 0);
-  parentLayout->addWidget(m_SearchButton, 1, 1);
-  parentLayout->addWidget(m_TextBrowser, 2, 0, 1, 2);
-  parentLayout->addWidget(cancelButton, 3, 0, 1, 2);
+  m_Ui->keywordLineEdit->installEventFilter(this);
+  m_Ui->searchButton->installEventFilter(this);
 
-  connect(dataStorageComboBox, &QmitkDataStorageComboBox::OnSelectionChanged, this, &QmitkNodeDetailsDialog::OnSelectionChanged);
+  connect(m_Ui->dataStorageComboBox, &QmitkDataStorageComboBox::OnSelectionChanged, this, &QmitkNodeDetailsDialog::OnSelectionChanged);
 
   for (auto& node : nodes)
-  {
-    dataStorageComboBox->AddNode(node);
-  }
+    m_Ui->dataStorageComboBox->AddNode(node);
 
-  connect(m_KeyWord, &QLineEdit::textChanged, this, &QmitkNodeDetailsDialog::KeyWordTextChanged);
-  connect(m_SearchButton, &QPushButton::clicked, this, &QmitkNodeDetailsDialog::OnSearchButtonClicked);
-  connect(cancelButton, &QPushButton::clicked, this, &QmitkNodeDetailsDialog::OnCancelButtonClicked);
-
-  cancelButton->setDefault(true);
+  connect(m_Ui->keywordLineEdit, &QLineEdit::textChanged, this, &QmitkNodeDetailsDialog::KeywordTextChanged);
+  connect(m_Ui->searchButton, &QPushButton::clicked, this, &QmitkNodeDetailsDialog::OnSearchButtonClicked);
 };
 
 void QmitkNodeDetailsDialog::OnSelectionChanged(const mitk::DataNode* node)
 {
   if (nullptr == node)
-  {
     return;
-  }
 
-  std::ostringstream s;
-  itk::Indent i(2);
-  mitk::BaseData* baseData = node->GetData();
+  std::ostringstream stream;
+  auto baseData = node->GetData();
+
   if (nullptr != baseData)
-  {
-    baseData->Print(s, i);
-  }
+    baseData->Print(stream, 2);
 
-  m_TextBrowser->setPlainText(QString::fromStdString(s.str()));
+  m_Ui->textBrowser->setPlainText(QString::fromStdString(stream.str()));
 }
 
-void QmitkNodeDetailsDialog::OnSearchButtonClicked(bool /*checked*/ /*= false */)
+void QmitkNodeDetailsDialog::OnSearchButtonClicked()
 {
-  QString keyWord = m_KeyWord->text();
-  QString text = m_TextBrowser->toPlainText();
+  auto keyword = m_Ui->keywordLineEdit->text();
+  auto text = m_Ui->textBrowser->toPlainText();
 
-  if (keyWord.isEmpty() || text.isEmpty())
-  {
+  if (keyword.isEmpty() || text.isEmpty())
     return;
-  }
 
-  m_TextBrowser->find(keyWord);
-  m_SearchButton->setText("Search Next(F3)");
-}
-
-void QmitkNodeDetailsDialog::OnCancelButtonClicked(bool /*checked*/ /*= false */)
-{
-  done(0);
+  m_Ui->textBrowser->find(keyword);
 }
 
 bool QmitkNodeDetailsDialog::eventFilter(QObject* obj, QEvent* event)
 {
   if (event->type() == QEvent::KeyPress)
   {
-    QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+    auto keyEvent = static_cast<QKeyEvent*>(event);
+
     if (keyEvent->key() == Qt::Key_F3 || keyEvent->key() == Qt::Key_Return)
     {
-      // trigger deletion of selected node(s)
-      OnSearchButtonClicked(true);
-      // return true: this means the delete key event is not send to the table
+      this->OnSearchButtonClicked();
       return true;
     }
   }
-  // standard event processing
+
   return QObject::eventFilter(obj, event);
 }
 
-void QmitkNodeDetailsDialog::KeyWordTextChanged(const QString& /*text*/)
+void QmitkNodeDetailsDialog::KeywordTextChanged(const QString&)
 {
-  QTextCursor textCursor = m_TextBrowser->textCursor();
-  textCursor.setPosition(0);
-  m_TextBrowser->setTextCursor(textCursor);
-  m_SearchButton->setText("Search (F3)");
+  auto cursor = m_Ui->textBrowser->textCursor();
+  cursor.setPosition(0);
+  m_Ui->textBrowser->setTextCursor(cursor);
 }

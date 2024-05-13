@@ -508,7 +508,7 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
 
   // Retrieve view layout info stored in the page layout.
   QHash<QString, ViewLayoutRec::Pointer> layoutInfo = layout->GetIDtoViewLayoutRecMap();
-  mapIDtoViewLayoutRec.unite(layoutInfo);
+  mapIDtoViewLayoutRec.insert(layoutInfo);
 
   //TODO Perspective action sets
   // Create action sets.

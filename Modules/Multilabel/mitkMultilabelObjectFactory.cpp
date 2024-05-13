@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkLabelSetImageVtkMapper2D.h>
+#include <mitkMultiLabelSegmentationVtkMapper3D.h>
 #include <mitkPropertyFilter.h>
 
 mitk::MultilabelObjectFactory::MultilabelObjectFactory() : CoreObjectFactoryBase()
@@ -51,6 +52,14 @@ mitk::Mapper::Pointer mitk::MultilabelObjectFactory::CreateMapper(mitk::DataNode
       newMapper->SetDataNode(node);
     }
   }
+  else if (id == mitk::BaseRenderer::Standard3D)
+  {
+    if ((dynamic_cast<mitk::LabelSetImage*>(data) != nullptr))
+    {
+      newMapper = mitk::MultiLabelSegmentationVtkMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+  }
   return newMapper;
 }
 
@@ -65,6 +74,7 @@ void mitk::MultilabelObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   if (dynamic_cast<LabelSetImage *>(node->GetData()) != nullptr)
   {
     mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(node);
+    mitk::MultiLabelSegmentationVtkMapper3D::SetDefaultProperties(node);
 
     auto propertyFilters = CoreServices::GetPropertyFilters();
 

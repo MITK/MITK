@@ -38,7 +38,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, publ
   Q_OBJECT
 
 public:
-  QmitkTransferFunctionWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkTransferFunctionWidget(QWidget *parent = nullptr, Qt::WindowFlags f = {});
   ~QmitkTransferFunctionWidget() override;
 
   void SetDataNode(mitk::DataNode *node, mitk::TimeStepType timestep = 0, const mitk::BaseRenderer *renderer = nullptr);
@@ -63,15 +63,16 @@ public slots:
 
   void OnUpdateCanvas();
   void UpdateRanges();
+  void UpdateStepSize();
   void OnResetSlider();
 
-  void OnSpanChanged(int lower, int upper);
+  void OnSpanChanged(double lower, double upper);
 
 protected:
   mitk::TransferFunctionProperty::Pointer tfpToChange;
 
-  int m_RangeSliderMin;
-  int m_RangeSliderMax;
+  double m_RangeSliderMin;
+  double m_RangeSliderMax;
 
   mitk::SimpleHistogramCache histogramCache;
 };

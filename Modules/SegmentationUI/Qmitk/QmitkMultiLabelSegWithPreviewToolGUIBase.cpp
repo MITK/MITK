@@ -87,16 +87,17 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::ActualizePreviewLabelVisibility()
     auto preview = tool->GetPreviewSegmentation();
     if (nullptr != preview)
     {
-      auto labelSet = preview->GetActiveLabelSet();
+      auto labels = preview->GetLabelsByValue(preview->GetLabelValuesByGroup(preview->GetActiveLayer()));
       auto selectedLabels = tool->GetSelectedLabels();
 
-      for (auto labelIter = labelSet->IteratorBegin(); labelIter != labelSet->IteratorEnd(); ++labelIter)
+      for (auto label : labels)
       {
         bool isVisible = tool->GetLabelTransferScope() == mitk::SegWithPreviewTool::LabelTransferScope::AllLabels
-          || (std::find(selectedLabels.begin(), selectedLabels.end(), labelIter->second->GetValue()) != selectedLabels.end());
-        labelIter->second->SetVisible(isVisible);
-        labelSet->UpdateLookupTable(labelIter->second->GetValue());
+          || (std::find(selectedLabels.begin(), selectedLabels.end(), label->GetValue()) != selectedLabels.end());
+        label->SetVisible(isVisible);
+        preview->UpdateLookupTable(label->GetValue());
       }
+      preview->GetLookupTable()->Modified();
     }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

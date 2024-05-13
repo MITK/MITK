@@ -231,7 +231,7 @@ long RegistryStrategy::GetExtendedTimestamp(const QSharedPointer<ctkPlugin>& plu
   QFileInfo pluginInfo(QUrl(plugin->getLocation()).toLocalFile());
   if (pluginInfo.exists())
   {
-    return ctk::msecsTo(QDateTime::fromTime_t(0), pluginInfo.lastModified()) + plugin->getPluginId();
+    return ctk::msecsTo(QDateTime::fromSecsSinceEpoch(0), pluginInfo.lastModified()) + plugin->getPluginId();
     //return pluginManifest.openConnection().getLastModified() + bundle.getBundleId();
   }
   else

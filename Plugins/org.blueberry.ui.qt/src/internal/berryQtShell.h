@@ -27,7 +27,7 @@ class QtShell : public Shell
 
 public:
 
-  QtShell(QWidget* parent = nullptr, Qt::WindowFlags flags = nullptr);
+  QtShell(QWidget* parent = nullptr, Qt::WindowFlags flags = {});
 
   ~QtShell() override;
 

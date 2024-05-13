@@ -249,7 +249,7 @@ void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
       const auto activeValue = this->GetActiveLabelValueOfPreview();
       this->SetSelectedLabels({activeValue});
 
-      AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry(), activeValue, mitk::LabelSetImage::UnlabeledValue, emptyTimeStep));
+      AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry(), activeValue, mitk::LabelSetImage::UNLABELED_VALUE, emptyTimeStep));
     }
     if (emptyTimeStep)
     {

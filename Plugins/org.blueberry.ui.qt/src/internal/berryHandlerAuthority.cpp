@@ -433,10 +433,10 @@ void HandlerAuthority::CopyVariable(IEvaluationContext* context,
 void HandlerAuthority::ProcessChangedCommands()
 {
   // If tracing, then track how long it takes to process the activations.
-  QTime startTime;
+  QElapsedTimer timer;
   if (DEBUG_PERFORMANCE)
   {
-    startTime.start();
+    timer.start();
   }
 
   MultiStatus::Pointer conflicts(
@@ -472,11 +472,11 @@ void HandlerAuthority::ProcessChangedCommands()
   // If tracing performance, then print the results.
   if (DEBUG_PERFORMANCE)
   {
-    const int elapsedTime = startTime.elapsed();
+    const int elapsedTime = timer.elapsed();
     const int size = changedCommandIds.size();
     if (size > 0)
     {
-      CommandTracing::PrintTrace(TRACING_COMPONENT, QString::number(size) + " command ids changed in " + elapsedTime + "ms");
+      CommandTracing::PrintTrace(TRACING_COMPONENT, QString("%1 command ids changed in %2 ms").arg(size).arg(elapsedTime));
     }
   }
 }

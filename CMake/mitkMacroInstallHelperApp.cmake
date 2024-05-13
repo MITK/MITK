@@ -57,7 +57,7 @@ macro(MITK_INSTALL_HELPER_APP)
     #--------------------------------------------------------------------------------
     # install a qt.conf file
     # this inserts some cmake code into the install script to write the file
-    if(MITK_USE_Qt5)
+    if(MITK_USE_Qt6)
       set(_qt_conf_plugin_install_prefix .)
       if(APPLE)
         set(_qt_conf_plugin_install_prefix ./MacOS)

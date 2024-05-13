@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include "mitkResliceMethodProperty.h"
 
 // qt
+#include <QActionGroup>
 #include <QHBoxLayout>
 #include <QPainter>
 #include <QSize>

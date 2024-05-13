@@ -177,7 +177,7 @@ protected:
    * <b>Important</b>: When referring to this preferences, e.g. in a PreferencePage: The ID
    * for this preferences object is "/<VIEW-ID>", e.g. "/org.mitk.views.datamanager"
    */
-  mitk::IPreferences* GetPreferences() const;
+  virtual mitk::IPreferences* GetPreferences() const;
 
   /**
    * Returns a reference to the currently active DataStorage.

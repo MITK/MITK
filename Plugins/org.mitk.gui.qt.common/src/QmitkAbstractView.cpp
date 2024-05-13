@@ -210,7 +210,7 @@ void QmitkAbstractView::CreatePartControl(QWidget* parent)
   // add the scroll area to the real parent (the view tabbar)
   QWidget* parentQWidget = static_cast<QWidget*>(parent);
   auto   parentLayout = new QVBoxLayout(parentQWidget);
-  parentLayout->setMargin(0);
+  parentLayout->setContentsMargins({});
   parentLayout->setSpacing(0);
   parentLayout->addWidget(scrollArea);
 
@@ -463,8 +463,12 @@ void QmitkAbstractView::OnNullSelection(berry::IWorkbenchPart::Pointer /*part*/)
 
 QList<mitk::DataNode::Pointer> QmitkAbstractViewPrivate::DataNodeSelectionToQList(mitk::DataNodeSelection::ConstPointer currentSelection) const
 {
-  if (currentSelection.IsNull()) return QList<mitk::DataNode::Pointer>();
-  return QList<mitk::DataNode::Pointer>::fromStdList(currentSelection->GetSelectedDataNodes());
+  if (currentSelection.IsNull())
+    return QList<mitk::DataNode::Pointer>();
+
+  auto nodes = currentSelection->GetSelectedDataNodes();
+
+  return QList<mitk::DataNode::Pointer>(nodes.begin(), nodes.end());
 }
 
 void QmitkAbstractView::NodeAdded( const mitk::DataNode*  /*node*/ )

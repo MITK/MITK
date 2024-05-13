@@ -7,12 +7,9 @@ set(CPP_FILES
   Algorithms/mitkDiffImageApplier.cpp
   Algorithms/mitkDiffSliceOperation.cpp
   Algorithms/mitkDiffSliceOperationApplier.cpp
-  Algorithms/mitkFeatureBasedEdgeDetectionFilter.cpp
   Algorithms/mitkGrowCutSegmentationFilter.cpp
   Algorithms/mitkImageLiveWireContourModelFilter.cpp
   Algorithms/mitkImageToContourFilter.cpp
-  #Algorithms/mitkImageToContourModelFilter.cpp
-  Algorithms/mitkImageToLiveWireContourFilter.cpp
   Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkOtsuSegmentationFilter.cpp
   Algorithms/mitkSegmentationHelper.cpp
@@ -62,6 +59,7 @@ set(CPP_FILES
   Interactions/mitkSegmentAnythingProcessExecutor.cpp
   Interactions/mitkTotalSegmentatorTool.cpp
   Interactions/mitkSegmentAnythingTool.cpp
+  Interactions/mitkMedSAMTool.cpp
   Interactions/mitkSegmentAnythingPythonService.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
@@ -70,7 +68,6 @@ set(CPP_FILES
   SegmentationUtilities/BooleanOperations/mitkBooleanOperation.cpp
   SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp
 #Added from ML
-  Controllers/mitkSliceBasedInterpolationController.cpp
   Algorithms/mitkSurfaceStampImageFilter.cpp
 )
 

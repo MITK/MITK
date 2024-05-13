@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "ui_QmitkSegmentationViewControls.h"
 
 #include <QmitkAbstractView.h>
+#include <mitkITKEventObserverGuard.h>
 #include <mitkIRenderWindowPartListener.h>
 
 /**
@@ -75,7 +76,7 @@ private Q_SLOTS:
   void OnCurrentLabelSelectionChanged(QmitkMultiLabelManager::LabelValueVectorType labels);
 
   void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&);
-  void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
+  void OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const;
 
   void OnLabelAdded(mitk::LabelSetImage::LabelValueType labelValue);
   void OnLabelRemoved(mitk::LabelSetImage::LabelValueType labelValue);
@@ -159,8 +160,8 @@ private:
   NodeTagMapType m_ReferenceDataObserverTags;
   unsigned int m_RenderingManagerObserverTag;
 
-  mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
-  mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
+  mitk::NodePredicateBase::Pointer m_ReferencePredicate;
+  mitk::NodePredicateBase::Pointer m_SegmentationPredicate;
 
   bool m_DrawOutline;
   bool m_SelectionMode;
@@ -170,6 +171,10 @@ private:
   bool m_DefaultLabelNaming;
 
   bool m_SelectionChangeIsAlreadyBeingHandled;
+
+  mitk::ITKEventObserverGuard m_LabelAddedObserver;
+  mitk::ITKEventObserverGuard m_LabelRemovedObserver;
+  mitk::ITKEventObserverGuard m_GroupRemovedObserver;
 };
 
 #endif

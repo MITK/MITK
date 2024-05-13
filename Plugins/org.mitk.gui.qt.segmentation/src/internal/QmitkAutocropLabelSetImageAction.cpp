@@ -33,7 +33,7 @@ namespace
     auto timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(labelSetImage);
 
-    const auto background = mitk::LabelSetImage::UnlabeledValue;
+    const auto background = mitk::LabelSetImage::UNLABELED_VALUE;
     const auto numLayers = labelSetImage->GetNumberOfLayers();
     const auto numTimeSteps = labelSetImage->GetTimeSteps();
 
@@ -182,7 +182,8 @@ namespace
     for (std::remove_const_t<decltype(numLayers)> layer = 0; layer < numLayers; ++layer)
     {
       labelSetImage->SetActiveLayer(layer);
-      croppedLabelSetImage->AddLayer();
+      auto groupID = croppedLabelSetImage->AddLayer();
+      croppedLabelSetImage->SetActiveLayer(groupID);
 
       for (std::remove_const_t<decltype(numTimeSteps)> timeStep = 0; timeStep < numTimeSteps; ++timeStep)
       {
@@ -221,7 +222,7 @@ namespace
         }
 
         croppedLabelSetImage->SetImportVolume(croppedVolume, timeStep, 0, mitk::Image::ReferenceMemory);
-        croppedLabelSetImage->AddLabelSetToLayer(layer, labelSetImage->GetLabelSet(layer));
+        croppedLabelSetImage->ReplaceGroupLabels(layer, labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(layer)));
       }
     }
 

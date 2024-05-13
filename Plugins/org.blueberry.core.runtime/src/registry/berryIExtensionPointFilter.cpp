@@ -14,8 +14,8 @@ found in the LICENSE file.
 
 namespace berry {
 
-IExtensionPointFilter::IExtensionPointFilter(const IExtensionPointFilter::Concept* concept)
-  : m_Self(concept)
+IExtensionPointFilter::IExtensionPointFilter(const IExtensionPointFilter::Concept* c)
+  : m_Self(c)
 {
 }
 

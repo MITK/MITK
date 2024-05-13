@@ -15,39 +15,33 @@ found in the LICENSE file.
 
 #include <MitkImageStatisticsExports.h>
 #include <mitkMaskGenerator.h>
-#include <mitkImage.h>
 #include <mitkLabelSetImage.h>
 
 
 namespace mitk
 {
 /**
- * @brief The MultiLabelMaskGenerator class NOT IMPLEMENTED YET!
+ * @brief Class that allows to generate masks (for statistic computation) out of multi label segmentations
  */
 class MITKIMAGESTATISTICS_EXPORT MultiLabelMaskGenerator: public MaskGenerator
 {
 public:
-   /* void setLabelSetImage(mitk::LabelSetImage::Pointer labelSetImage);
+  /** Standard Self typedef */
+  mitkClassMacro(MultiLabelMaskGenerator, MaskGenerator);
+  itkNewMacro(Self);
 
-    void addLabel(LabelSetImage::PixelType, std::vector<mitk::Image::Pointer>::size_type layer=0);
-    void removeLabel(LabelSetImage::PixelType, std::vector<mitk::Image::Pointer>::size_type layer=0);
+  unsigned int GetNumberOfMasks() const override;
 
-    void addLabels(std::pair<std::vector<mitk::Image::Pointer>::size_type, std::vector<unsigned int>> labelsToAdd);
-    void removeLabels(std::pair<std::vector<mitk::Image::Pointer>::size_type, std::vector<unsigned int>> labelsToAdd);
-
-    void addLabels(std::vector<LabelSetImage::PixelType> labels, std::vector<mitk::Image::Pointer>::size_type layer=0);
-    void removeLabels(std::vector<LabelSetImage::PixelType> labels, std::vector<mitk::Image::Pointer>::size_type layer=0);
-
-    void removeLayer(std::vector<mitk::Image::Pointer>::size_type layer);
-
-    mitk::Image::Pointer GetMask();
+  itkSetConstObjectMacro(MultiLabelSegmentation, LabelSetImage);
 
 protected:
+  MultiLabelMaskGenerator() = default;
+  ~MultiLabelMaskGenerator() = default;
+
+  Image::ConstPointer DoGetMask(unsigned int maskID) override;
 
 private:
-    mitk::LabelSetImage::Pointer m_LabelSetImage;
-    std::vector<std::vector<LabelSetImage::PixelType>> m_selectedLabels;*/
-
+    mitk::LabelSetImage::ConstPointer m_MultiLabelSegmentation;
 };
 
 }

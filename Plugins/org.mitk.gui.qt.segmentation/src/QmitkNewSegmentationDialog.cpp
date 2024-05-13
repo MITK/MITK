@@ -90,7 +90,7 @@ namespace
       QColor color;
 
       if (obj.contains("color"))
-        color.setNamedColor(QString::fromStdString(obj["color"]));
+        color = QColor::fromString(QString::fromStdString(obj["color"]));
 
       auto it = std::find_if(begin(parsedSuggestions), end(parsedSuggestions), [&name](const auto& suggestion) {
         return name == suggestion.first;
@@ -157,21 +157,16 @@ namespace
   // Get names of all labels in all layers of a LabelSetImage.
   QStringList GetExistingLabelNames(mitk::LabelSetImage* labelSetImage)
   {
+    auto names = labelSetImage->GetLabelClassNames();
     QStringList existingLabelNames;
-    existingLabelNames.reserve(labelSetImage->GetTotalNumberOfLabels());
+    existingLabelNames.reserve(names.size());
 
-    const auto numLayers = labelSetImage->GetNumberOfLayers();
-    for (std::remove_const_t<decltype(numLayers)> layerIndex = 0; layerIndex < numLayers; ++layerIndex)
+    for (auto name : names)
     {
-      const auto* labelSet = labelSetImage->GetLabelSet(layerIndex);
+      auto qtName = QString::fromStdString(name);
 
-      for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
-      {
-        auto name = QString::fromStdString(labelIter->second->GetName());
-
-        if (!name.isEmpty()) // Potential duplicates do not matter for our purpose
-          existingLabelNames.push_back(name);
-      }
+      if (!qtName.isEmpty()) // Potential duplicates do not matter for our purpose
+        existingLabelNames.push_back(qtName);
     }
 
     return existingLabelNames;
@@ -372,9 +367,8 @@ bool QmitkNewSegmentationDialog::DoRenameLabel(mitk::Label* label, mitk::LabelSe
     mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label is null.";
 
   const auto labelValue = label->GetValue();
-  mitk::LabelSetImage::GroupIndexType groupIndex;
 
-  if (nullptr != segmentation && !segmentation->IsLabelInGroup(labelValue, groupIndex))
+  if (nullptr != segmentation && !segmentation->ExistLabel(labelValue))
     mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label value does not exist in segmentation.";
 
   QmitkNewSegmentationDialog dialog(parent, segmentation, mode);
@@ -392,9 +386,7 @@ bool QmitkNewSegmentationDialog::DoRenameLabel(mitk::Label* label, mitk::LabelSe
 
   if (nullptr != segmentation)
   {
-    auto group = segmentation->GetLabelSet(groupIndex);
-    group->RenameLabel(labelValue, name.toStdString(), dialog.GetColor());
-    group->UpdateLookupTable(labelValue);
+    segmentation->RenameLabel(labelValue, name.toStdString(), dialog.GetColor());
   }
   else
   {

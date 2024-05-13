@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "mitkVtkRepresentationProperty.h"
 #include <mitkCoreObjectFactory.h>
 #include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageConverter.h>
 #include <vtkPolyDataNormals.h>
 
 namespace mitk
@@ -98,42 +99,34 @@ namespace mitk
 
     if (nullptr != labelSetImage)
     {
-      auto numberOfLayers = labelSetImage->GetNumberOfLayers();
+      const auto labels = labelSetImage->GetLabels();
 
-      for (decltype(numberOfLayers) layerIndex = 0; layerIndex < numberOfLayers; ++layerIndex)
+      for (auto label : labels)
       {
-        auto labelSet = labelSetImage->GetLabelSet(layerIndex);
+        auto labelImage = CreateLabelMask(labelSetImage, label->GetValue());
 
-        for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
+        if (labelImage.IsNull())
+          continue;
+
+        auto labelSurface = this->ConvertBinaryImageToSurface(labelImage);
+
+        if (labelSurface.IsNull())
+          continue;
+
+        auto* polyData = labelSurface->GetVtkPolyData();
+
+        if (smooth && (polyData->GetNumberOfPoints() < 1 || polyData->GetNumberOfCells() < 1))
         {
-          if (0 == labelIter->first)
-            continue; // Do not process background label
-
-          auto labelImage = labelSetImage->CreateLabelMask(labelIter->first, false, layerIndex);
-
-          if (labelImage.IsNull())
-            continue;
-
-          auto labelSurface = this->ConvertBinaryImageToSurface(labelImage);
-
-          if (labelSurface.IsNull())
-            continue;
-
-          auto* polyData = labelSurface->GetVtkPolyData();
-
-          if (smooth && (polyData->GetNumberOfPoints() < 1 || polyData->GetNumberOfCells() < 1))
-          {
-            MITK_WARN << "Label \"" << labelIter->second->GetName() << "\" didn't produce any smoothed surface data (try again without smoothing).";
-            continue;
-          }
-
-          auto node = DataNode::New();
-          node->SetData(labelSurface);
-          node->SetColor(labelIter->second->GetColor());
-          node->SetName(labelIter->second->GetName());
-
-          m_SurfaceNodes.push_back(node);
+          MITK_WARN << "Label \"" << label->GetName() << "\" didn't produce any smoothed surface data (try again without smoothing).";
+          continue;
         }
+
+        auto node = DataNode::New();
+        node->SetData(labelSurface);
+        node->SetColor(label->GetColor());
+        node->SetName(label->GetName());
+
+        m_SurfaceNodes.push_back(node);
       }
     }
     else

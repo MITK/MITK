@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkWorkbenchUtil.h>
 #include <mitkIPreferences.h>
+#include <mitkMultiLabelPredicateHelper.h>
 
 // Qmitk
 #include <QmitkRenderWindow.h>
@@ -85,32 +86,15 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_DefaultLabelNaming(true)
   , m_SelectionChangeIsAlreadyBeingHandled(false)
 {
-  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
-  auto isDti = mitk::NodePredicateDataType::New("TensorImage");
-  auto isOdf = mitk::NodePredicateDataType::New("OdfImage");
-  auto isSegment = mitk::NodePredicateDataType::New("Segment");
+  m_SegmentationPredicate = mitk::GetMultiLabelSegmentationPredicate();
 
-  auto validImages = mitk::NodePredicateOr::New();
-  validImages->AddPredicate(mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isSegment)));
-  validImages->AddPredicate(isDwi);
-  validImages->AddPredicate(isDti);
-  validImages->AddPredicate(isOdf);
-
-  m_SegmentationPredicate = mitk::NodePredicateAnd::New();
-  m_SegmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
-
-  m_ReferencePredicate = mitk::NodePredicateAnd::New();
-  m_ReferencePredicate->AddPredicate(validImages);
-  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(m_SegmentationPredicate));
-  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+  m_ReferencePredicate = mitk::GetSegmentationReferenceImagePredicate();
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
+  m_RenderWindowPart = this->GetRenderWindowPart();
+
   if (nullptr != m_Controls)
   {
     // deactivate all tools
@@ -206,9 +190,7 @@ void QmitkSegmentationView::OnAnySelectionChanged()
     else
     {
       // With a reference image, only allow segmentations that fit the geometry of the reference image to be selected.
-      m_Controls->workingNodeSelector->SetNodePredicate(mitk::NodePredicateAnd::New(
-        mitk::NodePredicateSubGeometry::New(m_ReferenceNode->GetData()->GetGeometry()),
-        m_SegmentationPredicate.GetPointer()));
+      m_Controls->workingNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_ReferenceNode->GetData()->GetGeometry()));
 
       m_SelectionChangeIsAlreadyBeingHandled = false;
 
@@ -299,22 +281,31 @@ void QmitkSegmentationView::AddObserversToWorkingImage()
 
   if (workingImage != nullptr)
   {
-    workingImage->AddLabelAddedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelAdded));
-    workingImage->AddLabelRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelRemoved));
-    workingImage->AddGroupRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::GroupIndexType>(this, &Self::OnGroupRemoved));
+    auto& widget = *this;
+    m_LabelAddedObserver.Reset(workingImage, mitk::LabelAddedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelAdded(labelEvent->GetLabelValue());
+      });
+    m_LabelRemovedObserver.Reset(workingImage, mitk::LabelRemovedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+        widget.OnLabelRemoved(labelEvent->GetLabelValue());
+      });
+
+    m_GroupRemovedObserver.Reset(workingImage, mitk::GroupRemovedEvent(), [&widget](const itk::EventObject& event)
+      {
+        auto groupEvent = dynamic_cast<const mitk::AnyGroupEvent*>(&event);
+        widget.OnGroupRemoved(groupEvent->GetGroupID());
+      });
   }
 }
 
 void QmitkSegmentationView::RemoveObserversFromWorkingImage()
 {
-  auto* workingImage = this->GetWorkingImage();
-
-  if (workingImage != nullptr)
-  {
-    workingImage->RemoveLabelAddedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelAdded));
-    workingImage->RemoveLabelRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::LabelValueType>(this, &Self::OnLabelRemoved));
-    workingImage->RemoveGroupRemovedListener(mitk::MessageDelegate1<Self, mitk::LabelSetImage::GroupIndexType>(this, &Self::OnGroupRemoved));
-  }
+  m_LabelAddedObserver.Reset();
+  m_LabelRemovedObserver.Reset();
+  m_GroupRemovedObserver.Reset();
 }
 
 void QmitkSegmentationView::OnVisibilityShortcutActivated()
@@ -345,8 +336,19 @@ void QmitkSegmentationView::OnLabelToggleShortcutActivated()
   }
 
   this->WaitCursorOn();
-  workingImage->GetActiveLabelSet()->SetNextActiveLabel();
-  workingImage->Modified();
+  auto labels = workingImage->GetLabelValuesByGroup(workingImage->GetActiveLayer());
+  auto it = std::find(labels.begin(), labels.end(), workingImage->GetActiveLabel()->GetValue());
+
+  if (it != labels.end())
+    ++it;
+
+  if (it == labels.end())
+  {
+    it = labels.begin();
+  }
+
+  workingImage->SetActiveLabel(*it);
+  m_Controls->multiLabelWidget->SetSelectedLabel(*it);
   this->WaitCursorOff();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -417,7 +419,7 @@ void QmitkSegmentationView::OnNewSegmentation()
     if (!m_DefaultLabelNaming)
       QmitkNewSegmentationDialog::DoRenameLabel(newLabel, nullptr, m_Parent);
 
-    newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
+    newLabelSetImage->AddLabel(newLabel, newLabelSetImage->GetActiveLayer());
   }
 
   if (!this->GetDataStorage()->Exists(newSegmentationNode))
@@ -484,12 +486,12 @@ void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManage
   auto segmentation = this->GetCurrentSegmentation();
 
   const auto labelValue = labels.front();
-  const auto groupID = segmentation->GetGroupIndexOfLabel(labelValue);
-  if (groupID != segmentation->GetActiveLayer()) segmentation->SetActiveLayer(groupID);
-  if (labelValue != segmentation->GetActiveLabelSet()->GetActiveLabel()->GetValue()) segmentation->GetActiveLabelSet()->SetActiveLabel(labelValue);
-
-  segmentation->Modified();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if (nullptr == segmentation->GetActiveLabel() || labelValue != segmentation->GetActiveLabel()->GetValue())
+  {
+    segmentation->SetActiveLabel(labelValue);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  m_Controls->slicesInterpolator->SetActiveLabelValue(labelValue);
 }
 
 void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType /*label*/, const mitk::Point3D& pos)
@@ -500,17 +502,17 @@ void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType /*la
   }
 }
 
-void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rename) const
+void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const
 {
   auto segmentation = this->GetCurrentSegmentation();
 
   if (rename)
   {
-    QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::RenameLabel);
+    canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::RenameLabel);
     return;
   }
 
-  QmitkNewSegmentationDialog::DoRenameLabel(label, nullptr, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
+  canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, nullptr, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
 }
 
 mitk::LabelSetImage* QmitkSegmentationView::GetCurrentSegmentation() const
@@ -539,7 +541,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // *------------------------
    QShortcut* visibilityShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_H), parent);
    connect(visibilityShortcut, &QShortcut::activated, this, &Self::OnVisibilityShortcutActivated);
-   QShortcut* labelToggleShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), parent);
+   QShortcut* labelToggleShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_N), parent);
    connect(labelToggleShortcut, &QShortcut::activated, this, &Self::OnLabelToggleShortcutActivated);
 
    // *------------------------
@@ -569,7 +571,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_ToolManager->SetDataStorage(*(this->GetDataStorage()));
    m_ToolManager->InitializeTools();
 
-   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything'");
+   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything', 'MedSAM'");
    QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut TotalSegmentator");
 
 #ifdef __linux__
@@ -784,7 +786,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   context->ungetService(ppmRef);
   service = nullptr;
 
-  mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+  auto image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
   mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
 }
 
@@ -1029,11 +1031,16 @@ void QmitkSegmentationView::ValidateSelectionInput()
     if (numberOfLabels > 0)
       m_Controls->slicesInterpolator->setEnabled(true);
 
-    m_Controls->multiLabelWidget->SetMultiLabelSegmentation(dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData()));
+    m_Controls->multiLabelWidget->SetMultiLabelNode(workingNode);
+
+    if (!m_Controls->multiLabelWidget->GetSelectedLabels().empty())
+    {
+      m_Controls->slicesInterpolator->SetActiveLabelValue(m_Controls->multiLabelWidget->GetSelectedLabels().front());
+    }
   }
   else
   {
-    m_Controls->multiLabelWidget->SetMultiLabelSegmentation(nullptr);
+    m_Controls->multiLabelWidget->SetMultiLabelNode(nullptr);
   }
 
   toolSelectionBoxesEnabled &= numberOfLabels > 0;

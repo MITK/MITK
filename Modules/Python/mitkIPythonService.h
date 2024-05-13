@@ -13,11 +13,13 @@ found in the LICENSE file.
 #define mitkIPythonService_h
 
 // mitk
+#include <mitkImage.h>
+#include <mitkSurface.h>
 #include <MitkPythonExports.h>
-#include "mitkImage.h"
+
 //for microservices
 #include <mitkServiceInterface.h>
-#include "mitkSurface.h"
+
 #include <vector>
 
 
@@ -113,24 +115,11 @@ namespace mitk
         virtual mitk::Image::Pointer CopySimpleItkImageFromPython( const std::string& varName ) = 0;
 
         ///
-        /// \return true, if OpenCv wrapping is available, false otherwise
-        virtual bool IsOpenCvPythonWrappingAvailable() = 0;
-        ///
-        /// \see CopyToPythonAsItkImage()
-        virtual bool CopyToPythonAsCvImage( mitk::Image* image, const std::string& varName ) = 0;
-        ///
-        /// \see CopyCvImageFromPython()
-        virtual mitk::Image::Pointer CopyCvImageFromPython( const std::string& varName ) = 0;
-
-        ///
         /// \return true, if vtk wrapping is available, false otherwise
         virtual bool IsVtkPythonWrappingAvailable() = 0;
         ///
         /// \see CopyToPythonAsItkImage()
         virtual bool CopyToPythonAsVtkPolyData( mitk::Surface* surface, const std::string& varName ) = 0;
-        ///
-        /// \see CopyCvImageFromPython()
-        virtual mitk::Surface::Pointer CopyVtkPolyDataFromPython( const std::string& varName ) = 0;
 
         /// \return the ctk abstract python manager instance
         virtual ctkAbstractPythonManager* GetPythonManager() = 0;

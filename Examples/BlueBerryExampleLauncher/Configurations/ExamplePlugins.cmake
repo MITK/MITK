@@ -4,7 +4,6 @@ set(REQUIRED_PLUGINS
   org.mitk.gui.qt.datamanager
   org.mitk.gui.qt.stdmultiwidgeteditor
   org.mitk.example.gui.imaging
-  org.mitk.example.gui.opencv
 )
 
 set(DESCRIPTION

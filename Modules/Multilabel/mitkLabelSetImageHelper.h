@@ -60,10 +60,21 @@ namespace mitk
      *
      * @param labelSetImage   The label set image that the new label is added to
      * @param namePrefix      The prefix of the label name that is prepended by a sequential number
+     * @param hideIDIfUnique Indicates if the ID suffix should be added if the label name prefix would be already unique.
+     * true: only add if not unique; false: add always.
      *
      * @return                The new label.
      */
-    MITKMULTILABEL_EXPORT mitk::Label::Pointer CreateNewLabel(const LabelSetImage* labelSetImage, const std::string& namePrefix = "Label");
+    MITKMULTILABEL_EXPORT Label::Pointer CreateNewLabel(const LabelSetImage* labelSetImage, const std::string& namePrefix = "Label", bool hideIDIfUnique = false);
+
+    using GroupIDToLabelValueMapType = std::map<mitk::LabelSetImage::GroupIndexType, LabelSetImage::LabelValueVectorType>;
+    MITKMULTILABEL_EXPORT GroupIDToLabelValueMapType SplitLabelValuesByGroup(const LabelSetImage* labelSetImage, const LabelSetImage::LabelValueVectorType& labelValues);
+
+    using LabelClassNameToLabelValueMapType = std::map<std::string, LabelSetImage::LabelValueVectorType>;
+    MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassNamwe(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID);
+    MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassNamwe(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID, const LabelSetImage::LabelValueVectorType& labelValues);
+
+    MITKMULTILABEL_EXPORT std::string CreateDisplayGroupName(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID);
 
   } // namespace LabelSetImageHelper
 } // namespace mitk

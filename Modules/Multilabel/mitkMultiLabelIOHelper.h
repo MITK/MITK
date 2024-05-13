@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkMultiLabelIOHelper_h
 #define mitkMultiLabelIOHelper_h
 
-#include <mitkLabelSet.h>
+#include <mitkLabel.h>
 
 #include <itkSmartPointer.h>
 #include <nlohmann/json.hpp>
@@ -82,7 +82,7 @@ namespace mitk
      * @param label the mitk::Label from which the xml element will be created
      * @return the created XML element
      */
-    static tinyxml2::XMLElement *GetLabelAsXMLElement(tinyxml2::XMLDocument &doc, Label *label);
+    static tinyxml2::XMLElement *GetLabelAsXMLElement(tinyxml2::XMLDocument &doc, const Label *label);
 
     /**
      * @brief Since a mitk::Label is basically a mitk::PropertyList this function coverts the label's properties into
@@ -113,7 +113,7 @@ namespace mitk
 
     static nlohmann::json SerializeMultLabelGroupsToJSON(const mitk::LabelSetImage* inputImage);
 
-    static std::vector<LabelSet::Pointer> DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets);
+    static std::vector<LabelVector> DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets);
 
     static nlohmann::json SerializeLabelToJSON(const Label* label);
 

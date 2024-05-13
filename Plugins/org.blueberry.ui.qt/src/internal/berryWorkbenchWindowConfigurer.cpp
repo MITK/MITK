@@ -60,7 +60,7 @@ IToolBarManager* WorkbenchWindowConfigurer::WindowActionBarConfigurer::GetToolBa
 }
 
 WorkbenchWindowConfigurer::WorkbenchWindowConfigurer(const WorkbenchWindow::Pointer& window)
- : shellStyle(nullptr)
+ : shellStyle({})
  , showPerspectiveBar(false)
  , showStatusLine(true)
  , showToolBar(true)
@@ -191,7 +191,7 @@ void WorkbenchWindowConfigurer::AddEditorAreaTransfer(const QStringList& transfe
   if (transfers.isEmpty()) return;
 
   int oldSize = transferTypes.size();
-  transferTypes.unite(QSet<QString>::fromList(transfers));
+  transferTypes.unite(QSet<QString>(transfers.begin(), transfers.end()));
 
   if (transferTypes.size() == oldSize) return;
 
@@ -200,7 +200,7 @@ void WorkbenchWindowConfigurer::AddEditorAreaTransfer(const QStringList& transfe
   {
     QtDnDControlWidget* dropTarget =
         static_cast<QtDnDControlWidget*>(page->GetEditorPresentation()->GetLayoutPart().Cast<EditorSashContainer>()->GetParent());
-    dropTarget->SetTransferTypes(transferTypes.toList());
+    dropTarget->SetTransferTypes(transferTypes.values());
   }
 }
 
@@ -220,7 +220,7 @@ void WorkbenchWindowConfigurer::ConfigureEditorAreaDropListener(IDropTargetListe
 
 QStringList WorkbenchWindowConfigurer::GetTransfers() const
 {
-  return transferTypes.toList();
+  return transferTypes.values();
 }
 
 IDropTargetListener* WorkbenchWindowConfigurer::GetDropTargetListener() const

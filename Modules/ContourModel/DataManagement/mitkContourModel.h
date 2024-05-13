@@ -317,7 +317,7 @@ namespace mitk
 
     @return true = vertex found;  false = no vertex found
     */
-    bool SelectControlVertexAt(Point3D &point, float eps, TimeStepType timestep = 0);
+    bool SelectControlVertexAt(const Point3D &point, float eps, TimeStepType timestep = 0);
 
     /** \brief Mark a vertex at a given position in 3D space.
 
@@ -327,7 +327,7 @@ namespace mitk
 
     @return true = vertex found;  false = no vertex found
     */
-    bool SelectVertexAt(Point3D &point, float eps, TimeStepType timestep = 0);
+    bool SelectVertexAt(const Point3D &point, float eps, TimeStepType timestep = 0);
 
     /*
         \pararm point - query point in 3D space

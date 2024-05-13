@@ -7,7 +7,7 @@
 #!     [PACKAGE package] [COMPONENTS comp1...]
 #!     [DEPENDS dep1...]
 #!     [DOC docstring]
-#!     [NO_CACHE] [ADVANCED] [NO_PACKAGE]
+#!     [NO_CACHE] [ADVANCED] [NO_PACKAGE] [PREPEND]
 #!   )
 #!
 #! The function creates a MITK_USE_<name> internal cache variable if the
@@ -25,6 +25,11 @@
 #! specified, these are passed to the find_package() call. If the
 #! NO_PACKAGE option is given, the find_package() call is suppressed.
 #!
+#! The PREPEND argument will prepend the external project to the global
+#! list of external projects instead of appending it. Using PREPEND in MITK
+#! extensions enables their external projects to influence the external
+#! projects of MITK.
+#!
 #! For each registered external project there must exist a file called
 #! CMakeExternals/<name>.cmake which defines the build process for
 #! the external project.
@@ -35,11 +40,17 @@
 #! declared in the CMakeExternals/<name>.cmake file.
 #!
 function(mitkFunctionAddExternalProject)
-  cmake_parse_arguments(EP "ON;OFF;NO_CACHE;ADVANCED;NO_PACKAGE" "NAME;DOC;PACKAGE" "DEPENDS;COMPONENTS" ${ARGN})
+  cmake_parse_arguments(EP "ON;OFF;NO_CACHE;ADVANCED;NO_PACKAGE;PREPEND" "NAME;DOC;PACKAGE" "DEPENDS;COMPONENTS" ${ARGN})
   if(NOT EP_NAME)
     message(SEND_ERROR "The NAME argument is missing.")
   endif()
-  set_property(GLOBAL APPEND PROPERTY MITK_EXTERNAL_PROJECTS ${EP_NAME})
+  if(EP_PREPEND)
+    get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
+    list(PREPEND external_projects ${EP_NAME})
+    set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS ${external_projects})
+  else()
+    set_property(GLOBAL APPEND PROPERTY MITK_EXTERNAL_PROJECTS ${EP_NAME})
+  endif()
   if(NOT EP_DOC)
     set(EP_DOC "Use ${EP_NAME}")
   endif()

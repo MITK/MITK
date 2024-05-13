@@ -85,7 +85,7 @@ bool QtDragManager::eventFilter(QObject* o, QEvent* e)
   if (e->type() == QEvent::MouseMove)
   {
     QMouseEvent* me = (QMouseEvent *) e;
-    this->Move(me->globalPos());
+    this->Move(me->globalPosition().toPoint());
     return true;
   }
   else if (e->type() == QEvent::MouseButtonRelease)
@@ -175,9 +175,8 @@ QtTracker::QtTracker() :
   rubberBand = new QRubberBand(QRubberBand::Rectangle);
   QPalette rubberPalette(rubberBand->palette());
   //rubberPalette.setColor(QPalette::Button, QColor(Qt::darkRed));
-  rubberPalette.setBrush(QPalette::Foreground, QBrush(Qt::darkRed));
+  rubberPalette.setBrush(QPalette::WindowText, QBrush(Qt::darkRed));
   rubberPalette.setBrush(QPalette::Window, QBrush(Qt::darkRed));
-  rubberPalette.setBrush(QPalette::Background, QBrush(Qt::darkRed));
   rubberPalette.setBrush(QPalette::Base, QBrush(Qt::darkRed));
   rubberPalette.setBrush(QPalette::Text, QBrush(Qt::darkRed));
   rubberBand->setPalette(rubberPalette);

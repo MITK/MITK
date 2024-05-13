@@ -97,6 +97,14 @@ Renaming of labels and label instances can be found in their content menu as sho
 
 \imageMacro{"QmitkSegmentation_LockColorVisibility.png","Unlocking\, changing color of\, and hiding label instances",10}
 
+\section org_mitk_views_segmentationlabelhighlighting Label highlighting
+
+Especially if you have segmentations with many label instances or the label names are not telling, it can be nontrivial to identify the label instance in the label inspector of the segmentation view. To mitigate this problem MITK uses label highlighting in the render windows. As long as you hover with the mouse cursor over a group, label or label instance, the respective label instances will be highlighted in the render windows. Highlighted labels will visually pop out by being shown with full opacity (no transparency) while the opacity of all non-highlighted labels of the same segmentation will be reduced to 30% of the current opacity value (they become very transparent).
+
+By default, label instances that are set to be invisible are not shown while highlighted. By pressing the shift key, one can enforce also invisible label instances to be shown while highlighting.
+
+Remark: the highlighting is supported in all views that use the label inspector (e.g. also the segmentation utilities).
+
 \section org_mitk_views_segmentationcontextmenus Context menus
 
 Actions for organization of groups, labels, and label instances (as well as other operations) can be also found in their right-click context menus.
@@ -238,8 +246,7 @@ Left-click inside a region/segmentation to flood fill all connected pixels that 
 \subsection org_mitk_views_segmentationerasetool Erase tool
 \imageMacro{QmitkSegmentation_IMGIconErase.png,"Erase tool",3.79}
 
-This tool removes a connected part of pixels that form a segmentation.
-You may use it to remove single segmented regions (left-click on specific segmentation) or to clear a whole slice at once (left-click at the non-labeled background).
+This tool removes a connected part of pixels that form a segmentation. You may use it to remove single segmented regions by left-click on specific segmentation region.
 This tool will only work and regions of unlocked labels or on regions of the active label.
 
 \subsection org_mitk_views_segmentationclosetool Close tool
@@ -271,7 +278,7 @@ For a detailed explanation of what this algorithm is able to, please refer to ht
 Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow setting impacts the segmentation. However, any applied color maps are ignored.
 
 \subsubsection org_mitk_views_segmentationSegmentAnythingWorkflow Workflow:
-    -# Install Segment Anything: Goto Preferences (Cntl+P) > Segment Anything and click "Install Segment Anything" to install Segment Anything (version: 1.0). 
+    -# Install Segment Anything: Goto Preferences (Ctrl+P) > Segment Anything and click "Install Segment Anything with MedSAM" to install Segment Anything (version: 1.0). 
     The installation process implicitly creates a python virtual environment using the Python located in "System Python" in an MITK mainitained directory. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
     Once installed, the "Install Segment Anything" button is grayed out.
     \imageMacro{QmitkSegmentation_SAMTool_Preferences.png,"Segment Anything Preferences",10.00}
@@ -285,6 +292,30 @@ Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow sett
     -# Click "Initialize Segment Anything" to start the tool backend. This will invoke downloading of the selected model type from the internet. This might take a while. It is a one time job, though.
     -# Once the tool is initialized, Press SHIFT+Left Click on any of the 3 render windows to start click guided segmentation on that slice.
     -# Press SHIFT+Right Click for negative clicks to adjust the preview mask on the render window.
+
+\subsection org_mitk_views_segmentationMedSAM MedSAM Tool
+
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"MedSAM tool",10.00}
+
+\imageMacro{QmitkSegmentation_MedSAMTool.png,"MedSAM tool",10.00}
+
+The MedSAM (Segment Anything in Medical Images) tool is a specialization of the the Segment Anything (SAM) tool. A new foundation model in the back end is dedicated to universal medical image segmentation.
+Just like the Segment Anything tool, the MedSAM tool requires that you have Python 3 installed and available on your machine. Note: On Debian/Ubuntu systems, you need to install the git, python3-pip, and python3-venv packages using the following command: `sudo apt install git python3-pip python3-venv`. 
+For best experience, your machine should be ideally equipped with a CUDA-enabled GPU. 
+Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow setting impacts the segmentation. However, any applied color maps are ignored.
+
+\subsubsection org_mitk_views_segmentationMedSAMWorkflow Workflow
+    -# Install MedSAM: Goto Preferences (Ctrl+P) > Segment Anything and click "Install Segment Anything with MedSAM" to install Segment Anything (version: 1.0) & MedSAM tool backends together. 
+    The installation process implicitly creates a python virtual environment using the Python located in "System Python" in a directory maintained by MITK. Make sure you have a working internet connection, which might take a while. It is a one-time job, though.
+    Once installed, the "Install Segment Anything with MedSAM" button is grayed out. For details, refer to the Segment Anything tool workflow.
+
+    -# Goto Segmentation View > 2D tools > MedSAM.
+    -# Click "Initialize MedSAM" to start the tool. This will start downloading the model weights from the internet first, if not done before. This might take a while. It is a one-time job, though.
+    -# Once the tool is initialized, press Shift+Left Click on any of the render windows to create a bounding box for that image slice.
+    -# Click on the anchor points of the bounding box to adjust the region of interest.
+    -# Click on Preview to generate segmentation from MedSAM model.
+
+Note: For a detailed explanation of what this algorithm is able to, please refer to https://www.nature.com/articles/s41467-024-44824-z
 
 \subsection org_mitk_views_segmentationMonaiLabel2D MONAI Label 2D Tool
 
@@ -431,7 +462,7 @@ directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv 
 \imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator Settings",5}
 
 \subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow:
-    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 2.0.2) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 2.0.5) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
     Once installed, the "Install TotalSegmentator" button is grayed out.
     -# If Python is not found by MITK goto "Install Options" & select the "System Python Path" drop-down to see if MITK has automatically detected other Python environments.
     Click on a fitting Python installation for TotalSegmentator to use or click "Select" in the dropdown to choose an unlisted installation of Python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".
@@ -485,9 +516,5 @@ For segmentation of 3D+t images, some tools give you the option to choose betwee
 
 In general, segmentation is applied on the time frame that is selected when execution is performed.
 If you alter the time frame, the segmentation preview is adapted.
-
-\section org_mitk_views_segmentationtechnicaldetail Technical information for developers
-
-For technical specifications see \subpage QmitkSegmentationTechnicalPage and for information on the extensions of the tools system \subpage toolextensions.
 
 */

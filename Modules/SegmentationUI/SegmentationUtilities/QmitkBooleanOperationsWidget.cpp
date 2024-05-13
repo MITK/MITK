@@ -16,51 +16,11 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkRenderingManager.h>
-#include <mitkTimeNavigationController.h>
+#include <mitkMultiLabelPredicateHelper.h>
+#include <mitkBooleanOperation.h>
+#include <mitkProgressBar.h>
+#include <mitkLabelSetImageHelper.h>
 
-#include <QMessageBox>
-
-#include <cassert>
-
-static const char* const HelpText = "Select two different segmentations above";
-
-namespace
-{
-  static std::string GetPrefix(mitk::BooleanOperation::Type type)
-  {
-    switch (type)
-    {
-      case mitk::BooleanOperation::Difference:
-        return "DifferenceFrom_";
-
-      case mitk::BooleanOperation::Intersection:
-        return "IntersectionWith_";
-
-      case mitk::BooleanOperation::Union:
-        return "UnionWith_";
-
-      default:
-        assert(false && "Unknown boolean operation type");
-        return "UNKNOWN_BOOLEAN_OPERATION_WITH_";
-    }
-  }
-
-  static void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent = nullptr)
-  {
-    if (dataStorage.IsNull())
-    {
-      std::string exception = "Cannot add result to the data storage. Data storage invalid.";
-      MITK_ERROR << "Boolean operation failed: " << exception;
-      QMessageBox::information(nullptr, "Boolean operation failed", QString::fromStdString(exception));
-    }
-
-    auto dataNode = mitk::DataNode::New();
-    dataNode->SetName(name);
-    dataNode->SetData(segmentation);
-
-    dataStorage->Add(dataNode, parent);
-  }
-}
 
 QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
   : QWidget(parent)
@@ -68,90 +28,232 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* da
   m_Controls = new Ui::QmitkBooleanOperationsWidgetControls;
   m_Controls->setupUi(this);
 
-  m_Controls->dataSelectionWidget->SetDataStorage(dataStorage);
-  m_Controls->dataSelectionWidget->AddDataSelection("<img width=16 height=16 src=\":/Qmitk/BooleanLabelA_32x32.png\"/>", "Select 1st segmentation", "Select 1st segmentation", "", QmitkDataSelectionWidget::SegmentationPredicate);
-  m_Controls->dataSelectionWidget->AddDataSelection("<img width=16 height=16 src=\":/Qmitk/BooleanLabelB_32x32.png\"/>", "Select 2nd segmentation", "Select 2nd segmentation", "", QmitkDataSelectionWidget::SegmentationPredicate);
+  m_Controls->label1st->setText("<img width=16 height=16 src=\":/Qmitk/BooleanLabelA_32x32.png\"/>");
+  m_Controls->label1st->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+  m_Controls->label2nd->setText("<img width=16 height=16 src=\":/Qmitk/BooleanLabelB_32x32.png\"/>");
+  m_Controls->label2nd->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
-  m_Controls->dataSelectionWidget->SetHelpText(HelpText);
+  m_Controls->segNodeSelector->SetDataStorage(dataStorage);
+  m_Controls->segNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
+  m_Controls->segNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->segNodeSelector->SetInvalidInfo(QStringLiteral("Please select segmentation for boolean operations."));
+  m_Controls->segNodeSelector->SetPopUpTitel(QStringLiteral("Select segmentation"));
+  m_Controls->segNodeSelector->SetPopUpHint(QStringLiteral("Select the segmentation that should be used as source for boolean operations."));
 
-  connect(m_Controls->dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)), this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
-  connect(m_Controls->differenceButton, SIGNAL(clicked()), this, SLOT(OnDifferenceButtonClicked()));
-  connect(m_Controls->intersectionButton, SIGNAL(clicked()), this, SLOT(OnIntersectionButtonClicked()));
-  connect(m_Controls->unionButton, SIGNAL(clicked()), this, SLOT(OnUnionButtonClicked()));
+  m_Controls->labelInspector->SetMultiSelectionMode(true);
+
+  connect(m_Controls->segNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkBooleanOperationsWidget::OnSegSelectionChanged);
+
+  connect(m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged,
+    this, &QmitkBooleanOperationsWidget::OnLabelSelectionChanged);
+
+  connect(m_Controls->differenceButton, &QToolButton::clicked, this, &QmitkBooleanOperationsWidget::OnDifferenceButtonClicked);
+  connect(m_Controls->intersectionButton, &QToolButton::clicked, this, &QmitkBooleanOperationsWidget::OnIntersectionButtonClicked);
+  connect(m_Controls->unionButton, &QToolButton::clicked, this, &QmitkBooleanOperationsWidget::OnUnionButtonClicked);
+
+  m_Controls->segNodeSelector->SetAutoSelectNewNodes(true);
+  this->ConfigureWidgets();
 }
 
 QmitkBooleanOperationsWidget::~QmitkBooleanOperationsWidget()
 {
+  m_Controls->labelInspector->SetMultiLabelNode(nullptr);
 }
 
-void QmitkBooleanOperationsWidget::OnSelectionChanged(unsigned int, const mitk::DataNode*)
+void QmitkBooleanOperationsWidget::OnSegSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/)
 {
-  auto dataSelectionWidget = m_Controls->dataSelectionWidget;
+  auto node = m_Controls->segNodeSelector->GetSelectedNode();
+  m_Controls->labelInspector->SetMultiLabelNode(node);
 
-  auto nodeA = dataSelectionWidget->GetSelection(0);
-  auto nodeB = dataSelectionWidget->GetSelection(1);
+  this->ConfigureWidgets();
+}
 
-  if (nodeA.IsNotNull() && nodeB.IsNotNull() && nodeA != nodeB)
+void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::LabelSetImage::LabelValueVectorType /*labels*/)
+{
+  this->ConfigureWidgets();
+}
+
+namespace
+{
+  std::string GenerateLabelHTML(const mitk::Label* label)
   {
-    dataSelectionWidget->SetHelpText("");
-    this->EnableButtons();
+    std::stringstream stream;
+    auto color = label->GetColor();
+    stream << "<span style='color: #" << std::hex << std::setfill('0')
+      << std::setw(2) << static_cast<int>(color.GetRed()*255)
+      << std::setw(2) << static_cast<int>(color.GetGreen()*255)
+      << std::setw(2) << static_cast<int>(color.GetBlue()*255)
+      << "; font-size: 20px '>&#x25A0;</span>" << std::dec;
+
+    stream << "<font class=\"normal\"> " << label->GetName()<< "</font>";
+    return stream.str();
+  }
+}
+void QmitkBooleanOperationsWidget::ConfigureWidgets()
+{
+  auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
+  auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
+
+  auto styleSheet = qApp->styleSheet();
+
+  m_Controls->line1stLabel->document()->setDefaultStyleSheet(styleSheet);
+  m_Controls->lineOtherLabels->document()->setDefaultStyleSheet(styleSheet);
+
+  if (selectedLabelValues.empty())
+  {
+    m_Controls->line1stLabel->setHtml(QStringLiteral("<font class=\"warning\">Select 1st label to proceed.</font>"));
   }
   else
   {
-    dataSelectionWidget->SetHelpText(HelpText);
-    this->EnableButtons(false);
+    auto label = seg->GetLabel(selectedLabelValues.front());
+    m_Controls->line1stLabel->setText(QString::fromStdString(GenerateLabelHTML(label)));
   }
-}
 
-void QmitkBooleanOperationsWidget::EnableButtons(bool enable)
-{
-  m_Controls->differenceButton->setEnabled(enable);
-  m_Controls->intersectionButton->setEnabled(enable);
-  m_Controls->unionButton->setEnabled(enable);
+  if (selectedLabelValues.size() < 2)
+  {
+    m_Controls->lineOtherLabels->setHtml(QStringLiteral("<font class=\"warning\">Select secondary label(s) to proceed.</font>"));
+  }
+  else
+  {
+    std::stringstream stream;
+    for (auto iter = selectedLabelValues.cbegin() + 1; iter != selectedLabelValues.cend(); ++iter)
+    {
+      auto label = seg->GetLabel(*iter);
+      if (stream.rdbuf()->in_avail() != 0) stream << "; ";
+      stream << GenerateLabelHTML(label);
+    }
+
+    m_Controls->lineOtherLabels->setText(QString::fromStdString(stream.str()));
+  }
+
+  m_Controls->differenceButton->setEnabled(selectedLabelValues.size()>1);
+  m_Controls->intersectionButton->setEnabled(selectedLabelValues.size() > 1);
+  m_Controls->unionButton->setEnabled(selectedLabelValues.size() > 1);
 }
 
 void QmitkBooleanOperationsWidget::OnDifferenceButtonClicked()
 {
-  this->DoBooleanOperation(mitk::BooleanOperation::Difference);
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+  mitk::ProgressBar::GetInstance()->Reset();
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(110);
+  unsigned int currentProgress = 0;
+
+  auto progressCallback = [&currentProgress](float filterProgress)
+    {
+      auto delta = (filterProgress * 100) - currentProgress;
+      if (delta > 0)
+      {
+        currentProgress += delta;
+        mitk::ProgressBar::GetInstance()->Progress(delta);
+      }
+    };
+
+  auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
+  auto minuend = selectedLabelValues.front();
+  auto subtrahends = mitk::LabelSetImage::LabelValueVectorType(selectedLabelValues.begin() + 1, selectedLabelValues.end());
+
+  auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
+
+  auto resultMask = mitk::BooleanOperation::GenerateDifference(seg, minuend, subtrahends, progressCallback);
+
+  std::stringstream name;
+  name << "Difference " << seg->GetLabel(minuend)->GetName() << " -";
+  for (auto label : subtrahends)
+  {
+    name << " " << seg->GetLabel(label)->GetName();
+  }
+
+  this->SaveResultLabelMask(resultMask, name.str());
+
+  mitk::ProgressBar::GetInstance()->Reset();
+  QApplication::restoreOverrideCursor();
 }
 
 void QmitkBooleanOperationsWidget::OnIntersectionButtonClicked()
 {
-  this->DoBooleanOperation(mitk::BooleanOperation::Intersection);
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+  mitk::ProgressBar::GetInstance()->Reset();
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(110);
+  unsigned int currentProgress = 0;
+
+  auto progressCallback = [&currentProgress](float filterProgress)
+    {
+      auto delta = (filterProgress * 100) - currentProgress;
+      if (delta > 0)
+      {
+        currentProgress += delta;
+        mitk::ProgressBar::GetInstance()->Progress(delta);
+      }
+    };
+
+  auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
+
+  auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
+
+  auto resultMask = mitk::BooleanOperation::GenerateIntersection(seg, selectedLabelValues, progressCallback);
+
+  std::stringstream name;
+  name << "Intersection";
+  for (auto label : selectedLabelValues)
+  {
+    name << " " << seg->GetLabel(label)->GetName();
+  }
+  this->SaveResultLabelMask(resultMask, name.str());
+
+  mitk::ProgressBar::GetInstance()->Reset();
+  QApplication::restoreOverrideCursor();
 }
 
 void QmitkBooleanOperationsWidget::OnUnionButtonClicked()
 {
-  this->DoBooleanOperation(mitk::BooleanOperation::Union);
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+  mitk::ProgressBar::GetInstance()->Reset();
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(110);
+  unsigned int currentProgress = 0;
+
+  auto progressCallback = [&currentProgress](float filterProgress)
+    {
+      auto delta = (filterProgress * 100) - currentProgress;
+      if (delta > 0)
+      {
+        currentProgress += delta;
+        mitk::ProgressBar::GetInstance()->Progress(delta);
+      }
+    };
+
+  auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
+
+  auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
+
+  auto resultMask = mitk::BooleanOperation::GenerateUnion(seg, selectedLabelValues, progressCallback);
+
+  std::stringstream name;
+  name << "Union";
+  for (auto label : selectedLabelValues)
+  {
+    name << " " << seg->GetLabel(label)->GetName();
+  }
+
+  this->SaveResultLabelMask(resultMask, name.str());
+
+  mitk::ProgressBar::GetInstance()->Reset();
+  QApplication::restoreOverrideCursor();
 }
 
-void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Type type)
+void QmitkBooleanOperationsWidget::SaveResultLabelMask(const mitk::Image* resultMask, const std::string& labelName) const
 {
-  const auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
-  assert(timeNavigationController != nullptr);
+  auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
+  if (seg == nullptr) mitkThrow() << "Widget is in invalid state. Processing was triggered with no segmentation selected.";
 
-  mitk::Image::Pointer segmentationA = dynamic_cast<mitk::Image*>(m_Controls->dataSelectionWidget->GetSelection(0)->GetData());
-  mitk::Image::Pointer segmentationB = dynamic_cast<mitk::Image*>(m_Controls->dataSelectionWidget->GetSelection(1)->GetData());
-  mitk::Image::Pointer result;
+  auto labels = m_Controls->labelInspector->GetSelectedLabels();
+  if (labels.empty()) mitkThrow() << "Widget is in invalid state. Processing was triggered with no label selected.";
 
-  try
-  {
-    mitk::BooleanOperation booleanOperation(type, segmentationA, segmentationB, timeNavigationController->GetSelectedTimePoint());
-    result = booleanOperation.GetResult();
+  auto groupID = seg->AddLayer();
+  auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(seg, labelName, true);
+  seg->AddLabelWithContent(newLabel, resultMask, groupID, 1);
 
-    assert(result.IsNotNull());
-
-    auto dataSelectionWidget = m_Controls->dataSelectionWidget;
-
-    AddToDataStorage(
-      dataSelectionWidget->GetDataStorage(),
-      result,
-      GetPrefix(type) + dataSelectionWidget->GetSelection(1)->GetName(),
-      dataSelectionWidget->GetSelection(0));
-  }
-  catch (const mitk::Exception& exception)
-  {
-    MITK_ERROR << "Boolean operation failed: " << exception.GetDescription();
-    QMessageBox::information(nullptr, "Boolean operation failed", exception.GetDescription());
-  }
+  m_Controls->labelInspector->GetMultiLabelSegmentation()->Modified();
+  m_Controls->labelInspector->GetMultiLabelNode()->Modified();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

@@ -19,5 +19,4 @@ const std::string QtPreferences::QT_STYLE_NAME = "stylename";
 const std::string QtPreferences::QT_STYLE_SEARCHPATHS = "searchpaths";
 const std::string QtPreferences::QT_FONT_NAME = "fontname";
 const std::string QtPreferences::QT_FONT_SIZE = "fontsize";
-const std::string QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES = "show_toolbar_category_names";
 }

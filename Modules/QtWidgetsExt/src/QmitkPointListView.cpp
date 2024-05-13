@@ -222,7 +222,7 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
       (int)(m_PointListModel->GetPointSet()->GetTimeSteps()) == 1)
     return;
 
-  int whe = event->delta();
+  int whe = event->angleDelta().y();
   mitk::PointSet::Pointer ps = dynamic_cast<mitk::PointSet *>(m_PointListModel->GetPointSet());
   unsigned int numberOfTS = ps->GetTimeSteps();
 

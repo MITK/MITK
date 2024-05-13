@@ -84,7 +84,7 @@ QList<IExtension::Pointer> RegistryReader::OrderExtensions(
   // more than one extension for an extension point is
   // dependent in the order listed in the XML file.
   QList<IExtension::Pointer> sortedExtension(extensions);
-  qStableSort(sortedExtension.begin(), sortedExtension.end(),
+  std::stable_sort(sortedExtension.begin(), sortedExtension.end(),
               CompareExtensionsByContributor);
   return sortedExtension;
 }

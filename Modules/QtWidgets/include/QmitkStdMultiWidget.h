@@ -28,7 +28,7 @@ class MITKQTWIDGETS_EXPORT QmitkStdMultiWidget : public QmitkAbstractMultiWidget
 public:
   QmitkStdMultiWidget(
     QWidget *parent = nullptr,
-    Qt::WindowFlags f = nullptr,
+    Qt::WindowFlags f = {},
     const QString &name = "stdmulti");
 
   ~QmitkStdMultiWidget() override;

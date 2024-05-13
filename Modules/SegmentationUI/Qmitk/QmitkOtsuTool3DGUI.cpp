@@ -115,13 +115,24 @@ void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
 
       tool->UpdatePreview();
     }
+    catch (const std::exception& e)
+    {
+      this->setCursor(Qt::ArrowCursor);
+      QMessageBox* messageBox =
+        new QMessageBox(QMessageBox::Critical,
+          nullptr,
+          e.what());
+      messageBox->exec();
+      delete messageBox;
+      return;
+    }
     catch (...)
     {
       this->setCursor(Qt::ArrowCursor);
       QMessageBox *messageBox =
         new QMessageBox(QMessageBox::Critical,
                         nullptr,
-                        "itkOtsuFilter error: image dimension must be in {2, 3} and no RGB images can be handled.");
+                        "Unkown error while computing Otsu preview.");
       messageBox->exec();
       delete messageBox;
       return;

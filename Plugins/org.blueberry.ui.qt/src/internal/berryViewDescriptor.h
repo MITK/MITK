@@ -113,6 +113,8 @@ public:
    */
   bool IsRestorable() const override;
 
+  bool IsInternal() const override;
+
   bool operator==(const Object*) const override;
 
   /**

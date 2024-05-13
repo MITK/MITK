@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkMeasurementView.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
 #include <QClipboard>
 #include <QGridLayout>
@@ -112,7 +113,9 @@ struct QmitkMeasurementViewData
       m_Layout(nullptr),
       m_Radius(nullptr),
       m_Thickness(nullptr),
-      m_FixedParameterBox(nullptr)
+      m_FixedParameterBox(nullptr),
+      m_DrawLabel(nullptr),
+      m_HintLabel(nullptr)
   {
   }
 
@@ -154,6 +157,8 @@ struct QmitkMeasurementViewData
   ctkDoubleSpinBox* m_Radius;
   ctkDoubleSpinBox* m_Thickness;
   QGroupBox* m_FixedParameterBox;
+  QLabel* m_DrawLabel;
+  QLabel* m_HintLabel;
 };
 
 const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
@@ -278,13 +283,26 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_CopyToClipboard = new QPushButton(tr("Copy to Clipboard"));
 
   d->m_SelectedImageLabel = new QLabel("Selected Image");
+
+  d->m_DrawLabel = new QLabel("Place points to draw the measurement...");
+  d->m_DrawLabel->setTextFormat(Qt::PlainText);
+  d->m_DrawLabel->setWordWrap(true);
+  d->m_DrawLabel->hide();
+
+  d->m_HintLabel = new QLabel(R"(<font color="red"><b>Hint:</b></font> Double-click to place the last point and end interaction.)");
+  d->m_HintLabel->setTextFormat(Qt::RichText);
+  d->m_HintLabel->setWordWrap(true);
+  d->m_HintLabel->hide();
+
   d->m_Layout = new QGridLayout;
   d->m_Layout->addWidget(d->m_SelectedImageLabel, 0, 0);
   d->m_Layout->addWidget(d->m_SingleNodeSelectionWidget, 0, 1, 1, 1);
   d->m_Layout->addWidget(d->m_DrawActionsToolBar, 1, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_FixedParameterBox, 2, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_SelectedPlanarFiguresText, 3, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_CopyToClipboard, 4, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_DrawLabel, 2, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_HintLabel, 3, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_FixedParameterBox, 4, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_SelectedPlanarFiguresText, 5, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_CopyToClipboard, 6, 0, 1, 2);
 
   d->m_Parent->setLayout(d->m_Layout);
 
@@ -483,6 +501,9 @@ void QmitkMeasurementView::PlanarFigureInitialized()
   d->m_DrawPolygon->setChecked(false);
   d->m_DrawBezierCurve->setChecked(false);
   d->m_DrawSubdivisionPolygon->setChecked(false);
+
+  d->m_DrawLabel->hide();
+  d->m_HintLabel->hide();
 }
 
 void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
@@ -631,6 +652,8 @@ void QmitkMeasurementView::OnDrawPathTriggered(bool)
 
   node->SetProperty("ClosedPlanarPolygon", mitk::BoolProperty::New(false));
   node->SetProperty("planarfigure.isextendable", mitk::BoolProperty::New(true));
+
+  d->m_HintLabel->show();
 }
 
 void QmitkMeasurementView::OnDrawAngleTriggered(bool)
@@ -673,6 +696,8 @@ void QmitkMeasurementView::OnDrawBezierCurveTriggered(bool)
   this->AddFigureToDataStorage(
     mitk::PlanarBezierCurve::New(),
     QString("BezierCurve%1").arg(++d->m_BezierCurveCounter));
+
+  d->m_HintLabel->show();
 }
 
 void QmitkMeasurementView::OnDrawSubdivisionPolygonTriggered(bool)
@@ -680,6 +705,8 @@ void QmitkMeasurementView::OnDrawSubdivisionPolygonTriggered(bool)
   this->AddFigureToDataStorage(
     mitk::PlanarSubdivisionPolygon::New(),
     QString("SubdivisionPolygon%1").arg(++d->m_SubdivisionPolygonCounter));
+
+  d->m_HintLabel->show();
 }
 
 void QmitkMeasurementView::OnDrawRectangleTriggered(bool)
@@ -699,6 +726,8 @@ void QmitkMeasurementView::OnDrawPolygonTriggered(bool)
     QString("Polygon%1").arg(++d->m_PolygonCounter));
 
   node->SetProperty("planarfigure.isextendable", mitk::BoolProperty::New(true));
+
+  d->m_HintLabel->show();
 }
 
 void QmitkMeasurementView::OnCopyToClipboard(bool)
@@ -732,6 +761,7 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::Plana
 
   d->m_DrawActionsToolBar->setEnabled(false);
   d->m_UnintializedPlanarFigure = true;
+  d->m_DrawLabel->show();
 
   return newNode;
 }

@@ -718,7 +718,7 @@ void QmitkMatchPointFrameCorrection::UpdateAlgorithmSelection(berry::ISelection:
       // only the first selection is of interest, the rest will be skipped.
       this->m_SelectedAlgorithmInfo = infoVector[0];
     }
+    this->OnSelectedAlgorithmChanged();
   }
 
-  this->OnSelectedAlgorithmChanged();
 };

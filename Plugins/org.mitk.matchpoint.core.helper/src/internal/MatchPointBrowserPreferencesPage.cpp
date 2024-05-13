@@ -149,10 +149,10 @@ void MatchPointBrowserPreferencesPage::Update()
   m_LoadFromAutoLoadPathDir->setChecked(prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_AUTO_LOAD_DIR, false));
 
   QString paths = QString::fromStdString(prefs->Get(MatchPointBrowserConstants::MDAR_DIRECTORIES_NODE_NAME, ""));
-  QStringList directoryList = paths.split(";", QString::SkipEmptyParts);
+  QStringList directoryList = paths.split(";", Qt::SkipEmptyParts);
   m_AlgDirectories->setDirectories(directoryList);
 
   QString files = QString::fromStdString(prefs->Get(MatchPointBrowserConstants::MDAR_FILES_NODE_NAME, ""));
-  QStringList fileList = files.split(";", QString::SkipEmptyParts);
+  QStringList fileList = files.split(";", Qt::SkipEmptyParts);
   m_AlgFiles->setFiles(fileList);
 }

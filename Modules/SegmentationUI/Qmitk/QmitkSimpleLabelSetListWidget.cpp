@@ -34,11 +34,8 @@ QmitkSimpleLabelSetListWidget::~QmitkSimpleLabelSetListWidget()
 {
   if (m_LabelSetImage.IsNotNull())
   {
-    m_LabelSetImage->BeforeChangeLayerEvent -= mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
-      this, &QmitkSimpleLabelSetListWidget::OnLooseLabelSetConnection);
     m_LabelSetImage->AfterChangeLayerEvent -= mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
-      this, &QmitkSimpleLabelSetListWidget::OnEstablishLabelSetConnection);
-    OnLooseLabelSetConnection();
+      this, &QmitkSimpleLabelSetListWidget::OnLayerChanged);
   }
 }
 
@@ -51,12 +48,7 @@ QmitkSimpleLabelSetListWidget::LabelVectorType QmitkSimpleLabelSetListWidget::Se
   for (it = selectedItems.begin(); it != selectedItems.end(); ++it)
   {
     auto labelValue = (*it)->data(Qt::UserRole).toUInt();
-
-
-    auto activeLayerID = m_LabelSetImage->GetActiveLayer();
-    auto labelSet = m_LabelSetImage->GetLabelSet(activeLayerID);
-    
-    result.push_back(labelSet->GetLabel(labelValue));
+    result.push_back(m_LabelSetImage->GetLabel(labelValue));
   }
 
   return result;
@@ -71,65 +63,39 @@ void QmitkSimpleLabelSetListWidget::SetLabelSetImage(const mitk::LabelSetImage* 
 {
   if (image != m_LabelSetImage)
   {
-    if (m_LabelSetImage.IsNotNull())
-    {
-      m_LabelSetImage->BeforeChangeLayerEvent -= mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
-        this, &QmitkSimpleLabelSetListWidget::OnLooseLabelSetConnection);
-      m_LabelSetImage->AfterChangeLayerEvent -= mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
-        this, &QmitkSimpleLabelSetListWidget::OnLayerChanged);
-      this->OnLooseLabelSetConnection();
-    }
+    m_LabelAddedObserver.Reset();
+    m_LabelModifiedObserver.Reset();
+    m_LabelRemovedObserver.Reset();
 
     m_LabelSetImage = image;
 
     if (m_LabelSetImage.IsNotNull())
     {
-      m_LabelSetImage->BeforeChangeLayerEvent += mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
-        this, &QmitkSimpleLabelSetListWidget::OnLooseLabelSetConnection);
+      auto& widget = *this;
+      m_LabelAddedObserver.Reset(m_LabelSetImage, mitk::LabelAddedEvent(), [&widget](const itk::EventObject& event)
+        {
+          auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+          widget.OnLabelChanged(labelEvent->GetLabelValue());
+        });
+      m_LabelModifiedObserver.Reset(m_LabelSetImage, mitk::LabelModifiedEvent(), [&widget](const itk::EventObject& event)
+        {
+          auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+          widget.OnLabelChanged(labelEvent->GetLabelValue());
+        });
+      m_LabelRemovedObserver.Reset(m_LabelSetImage, mitk::LabelRemovedEvent(), [&widget](const itk::EventObject& event)
+        {
+          auto labelEvent = dynamic_cast<const mitk::AnyLabelEvent*>(&event);
+          widget.OnLabelChanged(labelEvent->GetLabelValue());
+        });
+
       m_LabelSetImage->AfterChangeLayerEvent += mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
         this, &QmitkSimpleLabelSetListWidget::OnLayerChanged);
-      this->OnLayerChanged();
     }
   }
 }
 
-void QmitkSimpleLabelSetListWidget::OnLooseLabelSetConnection()
-{
-  if (m_LabelSetImage.IsNull())
-    return;
-
-  auto activeLayerID = m_LabelSetImage->GetActiveLayer();
-  auto labelSet = m_LabelSetImage->GetLabelSet(activeLayerID);
-
-  // Reset LabelSetWidget Events
-  labelSet->AddLabelEvent -= mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-    this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
-  labelSet->RemoveLabelEvent -= mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-    this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
-  labelSet->ModifyLabelEvent -= mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-    this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
-}
-
-void QmitkSimpleLabelSetListWidget::OnEstablishLabelSetConnection()
-{
-  if (m_LabelSetImage.IsNull())
-    return;
-
-  auto activeLayerID = m_LabelSetImage->GetActiveLayer();
-  auto labelSet = m_LabelSetImage->GetLabelSet(activeLayerID);
-
-  // Reset LabelSetWidget Events
-  labelSet->AddLabelEvent += mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-    this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
-  labelSet->RemoveLabelEvent += mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-    this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
-  labelSet->ModifyLabelEvent += mitk::MessageDelegate1<QmitkSimpleLabelSetListWidget, mitk::LabelSetImage::LabelValueType>(
-    this, &QmitkSimpleLabelSetListWidget::OnLabelChanged);
-}
-
 void QmitkSimpleLabelSetListWidget::OnLayerChanged()
 {
-  this->OnEstablishLabelSetConnection();
   if (!this->m_Emmiting)
   {
     this->ResetList();
@@ -141,9 +107,10 @@ void QmitkSimpleLabelSetListWidget::OnLayerChanged()
   }
 }
 
-void QmitkSimpleLabelSetListWidget::OnLabelChanged(mitk::LabelSetImage::LabelValueType /*lv*/)
+void QmitkSimpleLabelSetListWidget::OnLabelChanged(mitk::LabelSetImage::LabelValueType lv)
 {
-  if (!this->m_Emmiting)
+  if (!this->m_Emmiting
+    && (!m_LabelSetImage->ExistLabel(lv) || m_LabelSetImage->GetGroupIndexOfLabel(lv)==m_LabelSetImage->GetActiveLayer()))
   {
     this->ResetList();
 
@@ -169,18 +136,17 @@ void QmitkSimpleLabelSetListWidget::ResetList()
   m_LabelList->clear();
   
   auto activeLayerID = m_LabelSetImage->GetActiveLayer();
-  auto labelSet = m_LabelSetImage->GetLabelSet(activeLayerID);
+  auto labels = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(activeLayerID));
 
-  auto iter = labelSet->IteratorConstBegin();
-  for (; iter != labelSet->IteratorConstEnd(); ++iter)
+  for (auto& label : labels)
   {
-    auto color = iter->second->GetColor();
+    auto color = label->GetColor();
     QPixmap pixmap(10, 10);
     pixmap.fill(QColor(color[0] * 255, color[1] * 255, color[2] * 255));
     QIcon icon(pixmap);
 
-    QListWidgetItem* item = new QListWidgetItem(icon, QString::fromStdString(iter->second->GetName()));
-    item->setData(Qt::UserRole, QVariant(iter->second->GetValue()));
+    QListWidgetItem* item = new QListWidgetItem(icon, QString::fromStdString(label->GetName()));
+    item->setData(Qt::UserRole, QVariant(label->GetValue()));
     m_LabelList->addItem(item);
   }
 }

@@ -101,7 +101,7 @@ void mitk::LiveWireTool2D::OnTimePointChanged()
 
 mitk::Point3D mitk::LiveWireTool2D::PrepareInitContour(const mitk::Point3D& clickedPoint)
 {
-  // Set current slice as input for ImageToLiveWireContourFilter
+  // Set current slice as input for ImageToLiveWireContourModelFilter
   m_LiveWireFilter = ImageLiveWireContourModelFilter::New();
   m_LiveWireFilter->SetUseCostFunction(true);
   m_LiveWireFilter->SetInput(m_ReferenceDataSlice);

@@ -26,6 +26,8 @@ found in the LICENSE file.
 namespace mitk
 {
 /**
+     * @warning Until T30375 is not clarified the class should be deemed deprecated/erroneous and should not
+     * be used
      * @brief The HotspotMaskGenerator class is used when a hotspot has to be found in an image. A hotspot is
      * the region of the image where the mean intensity is maximal (=brightest spot). It is usually used in PET scans.
      * The identification of the hotspot is done as follows: First a cubic (or circular, if image is 2d)
@@ -47,60 +49,36 @@ namespace mitk
         itkNewMacro(Self); /** Runtime information support. */
         itkTypeMacro(HotspotMaskGenerator, MaskGenerator);
 
-        /**
-        @brief Set the input image. Required for this class
-         */
-        void SetInputImage(mitk::Image::Pointer inputImage);
+        unsigned int GetNumberOfMasks() const override;
 
         /**
         @brief Set a mask (can be nullptr if no mask is desired)
          */
-        void SetMask(MaskGenerator::Pointer mask);
+        itkSetObjectMacro(Mask, MaskGenerator);
 
         /**
         @brief Set the radius of the hotspot (in MM)
          */
-        void SetHotspotRadiusInMM(double radiusInMillimeter);
-
-        const double& GetHotspotRadiusinMM() const;
+        itkGetConstMacro(HotspotRadiusInMM, double);
+        itkSetMacro(HotspotRadiusInMM, double);
 
         /**
         @brief Define whether the hotspot must be completely inside the image. Default is true
          */
-        void SetHotspotMustBeCompletelyInsideImage(bool hotspotCompletelyInsideImage);
-
-        bool GetHotspotMustBeCompletelyInsideImage() const;
+        itkGetConstMacro(HotspotMustBeCompletelyInsideImage, bool);
+        itkSetMacro(HotspotMustBeCompletelyInsideImage, bool);
 
         /**
         @brief If a maskGenerator is set, this detemines which mask value is used
          */
-        void SetLabel(unsigned short label);
-
-        /**
-        @brief Computes and returns the hotspot mask. The hotspot mask has the same size as the input image. The hopspot has value 1, the remaining pixels are set to 0
-         */
-        mitk::Image::ConstPointer GetMask() override;
-
-        /**
-        @brief Returns the image index where the hotspot is located
-         */
-        vnl_vector<int> GetHotspotIndex();
-
-        /**
-        @brief Returns the index where the convolution image is minimal (darkest spot in image)
-         */
-        vnl_vector<int> GetConvolutionImageMinIndex();
-
-        /**
-         * @brief SetTimeStep is used to set the time step for which the mask is to be generated
-         * @param timeStep
-         */
-        void SetTimeStep(unsigned int timeStep) override;
+        itkSetMacro(Label, unsigned short);
 
     protected:
         HotspotMaskGenerator();
 
         ~HotspotMaskGenerator() override;
+
+        Image::ConstPointer DoGetMask(unsigned int) override;
 
         class ImageExtrema
         {
@@ -147,7 +125,7 @@ namespace mitk
         /** \brief */
         template <typename TPixel, unsigned int VImageDimension>
         void
-          CalculateHotspotMask(itk::Image<TPixel, VImageDimension>* inputImage,
+          CalculateHotspotMask(const itk::Image<TPixel, VImageDimension>* inputImage,
                                const itk::Image<unsigned short, VImageDimension>* maskImage,
                                unsigned int label);
 
@@ -165,10 +143,9 @@ namespace mitk
 
         MaskGenerator::Pointer m_Mask;
         mitk::Image::Pointer m_InternalMask;
-        mitk::Image::Pointer m_internalImage;
         itk::Image<unsigned short, 2>::ConstPointer m_internalMask2D;
         itk::Image<unsigned short, 3>::ConstPointer m_internalMask3D;
-        double m_HotspotRadiusinMM;
+        double m_HotspotRadiusInMM;
         bool m_HotspotMustBeCompletelyInsideImage;
         unsigned short m_Label;
         vnl_vector<int> m_ConvolutionImageMinIndex, m_ConvolutionImageMaxIndex;

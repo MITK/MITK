@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include <QToolBar>
 #include <QHelpEngine>
 #include <QVBoxLayout>
+#include <QWebEngineFindTextResult>
 
 namespace berry {
 
@@ -296,7 +297,7 @@ void HelpEditor::findInWebPage(const QString &ttf, bool forward)
   if (m_FindWidget->caseSensitive())
     options |= QWebEnginePage::FindCaseSensitively;
 
-  m_WebEngineView->findText(ttf, options, [this](bool found) { m_FindWidget->setPalette(found); });
+  m_WebEngineView->findText(ttf, options, [this](const QWebEngineFindTextResult& result) { m_FindWidget->setPalette(result.numberOfMatches() != 0); });
 }
 
 void HelpEditor::enableShortcuts()

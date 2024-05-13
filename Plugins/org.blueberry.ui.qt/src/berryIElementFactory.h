@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <org_blueberry_ui_qt_Export.h>
 
 #include <berrySmartPointer.h>
+#include <QtPlugin>
 
 namespace berry {
 

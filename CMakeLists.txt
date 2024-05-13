@@ -41,7 +41,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2023.04.99)
+  project(MITK VERSION 2023.12.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -206,7 +206,6 @@ endforeach()
 # MITK superbuild
 
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 option(MITK_USE_OpenMP "Use OpenMP" OFF)
 option(MITK_USE_Python3 "Use Python 3" OFF)
 
@@ -245,23 +244,40 @@ mitkFunctionFindWhitelists(MITK)
 # -----------------------------------------
 # Qt version related variables
 
-option(MITK_USE_Qt5 "Use Qt 5 library" ON)
+option(MITK_USE_Qt6 "Use Qt 6 library" ON)
 
-if(MITK_USE_Qt5)
-  if(WIN32)
-    set(MITK_QT5_MINIMUM_VERSION 5.12.9)
-  else()
-    set(MITK_QT5_MINIMUM_VERSION 5.12)
-  endif()
-  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets Xml XmlPatterns WebEngineWidgets UiTools Help LinguistTools)
+if(MITK_USE_Qt6)
+  set(MITK_QT6_MINIMUM_VERSION 6.6)
+  set(MITK_QT6_COMPONENTS
+    Concurrent
+    Core
+    Core5Compat
+    CoreTools
+    Designer
+    DesignerComponentsPrivate
+    Gui
+    Help
+    LinguistTools
+    Network
+    OpenGL
+    OpenGLWidgets
+    Qml
+    Sql
+    StateMachine
+    Svg
+    ToolsTools
+    UiTools
+    WebEngineCore
+    WebEngineWidgets
+    Widgets
+    Xml
+  )
   if(APPLE)
-    list(APPEND MITK_QT5_COMPONENTS DBus)
-  elseif(UNIX)
-    list(APPEND MITK_QT5_COMPONENTS X11Extras)
+    list(APPEND MITK_QT6_COMPONENTS DBus)
   endif()
 
   # Hint at default install locations of Qt
-  if(NOT Qt5_DIR)
+  if(NOT Qt6_DIR)
     if(MSVC)
       set(_dir_candidates "C:/Qt")
 
@@ -277,9 +293,7 @@ if(MITK_USE_Qt5)
 
       if(_compilers MATCHES "[0-9]+")
         if (CMAKE_MATCH_0 EQUAL 2022)
-          list(APPEND _compilers "msvc2019" "msvc2017") # Binary compatible
-        elseif (CMAKE_MATCH_0 EQUAL 2019)
-          list(APPEND _compilers "msvc2017") # Binary compatible
+          list(APPEND _compilers "msvc2019") # Binary compatible
         endif()
       endif()
     else()
@@ -300,32 +314,48 @@ if(MITK_USE_Qt5)
       set(_compilers ${_compilers64})
     endif()
 
+    if(APPLE)
+      list(APPEND _compilers macos)
+    endif()
+
     foreach(_dir_candidate ${_dir_candidates})
       get_filename_component(_dir_candidate ${_dir_candidate} REALPATH)
       foreach(_compiler ${_compilers})
-        set(_glob_expression "${_dir_candidate}/5.*/${_compiler}")
+        set(_glob_expression "${_dir_candidate}/6.*/${_compiler}")
         file(GLOB _hints ${_glob_expression})
         list(SORT _hints)
-        list(APPEND MITK_QT5_HINTS ${_hints})
+        list(APPEND MITK_QT6_HINTS ${_hints})
       endforeach()
     endforeach()
   endif()
 
-  find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED HINTS ${MITK_QT5_HINTS})
+  find_package(Qt6 ${MITK_QT6_MINIMUM_VERSION} COMPONENTS ${MITK_QT6_COMPONENTS} REQUIRED HINTS ${MITK_QT6_HINTS})
+
+  get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake LOCATION)
+  get_target_property(QT_HELPGENERATOR_EXECUTABLE Qt6::qhelpgenerator LOCATION)
+endif()
+
+if(Qt6_DIR)
+  list(APPEND CMAKE_PREFIX_PATH "${Qt6_DIR}/../../..")
+  list(REMOVE_DUPLICATES CMAKE_PREFIX_PATH)
 endif()
 
 # -----------------------------------------
 # Custom dependency logic
 
-if(WIN32 AND Qt5_DIR)
-  set(_dir_candidate "${Qt5_DIR}/../../../../../Tools/OpenSSL/Win_x64")
+if(WIN32 AND Qt6_DIR)
+  set(_dir_candidate "${Qt6_DIR}/../../../../../Tools/OpenSSLv3/Win_x64")
   get_filename_component(_dir_candidate ${_dir_candidate} ABSOLUTE)
   if(EXISTS "${_dir_candidate}")
     set(OPENSSL_ROOT_DIR "${_dir_candidate}")
   endif()
 endif()
 
-find_package(OpenSSL)
+find_package(OpenSSL 3)
+
+if(NOT OpenSSL_FOUND)
+  find_package(OpenSSL 1.1.1)
+endif()
 
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
 
@@ -365,11 +395,13 @@ endif()
 if(MITK_USE_Python3)
   set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
 
-  if(APPLE AND CMAKE_FRAMEWORK_PATH AND CMAKE_FRAMEWORK_PATH MATCHES "python3\\.?([0-9]+)")
-    find_package(Python3 3.${CMAKE_MATCH_1} EXACT REQUIRED COMPONENTS Interpreter Development NumPy)
+  if(APPLE)
+    set(python3_mininum_version 3.11)
   else()
-    find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
+    set(python3_mininum_version 3.8)
   endif()
+
+  find_package(Python3 ${python3_mininum_version} REQUIRED COMPONENTS Interpreter Development NumPy)
 
   if(WIN32)
     string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")
@@ -530,9 +562,6 @@ include(mitkMacroInstall)
 include(mitkMacroInstallHelperApp)
 include(mitkMacroInstallTargets)
 include(mitkMacroMultiplexPicType)
-
-# Deprecated
-include(mitkMacroCreateCTKPlugin)
 
 #-----------------------------------------------------------------------------
 # Global CMake variables
@@ -882,14 +911,6 @@ if(MITK_USE_DCMQI)
   find_package(DCMQI REQUIRED)
 endif()
 
-if(MITK_USE_OpenIGTLink)
-  link_directories(${OpenIGTLink_LIBRARY_DIRS})
-endif()
-
-if(MITK_USE_OpenCL)
-  find_package(OpenCL REQUIRED)
-endif()
-
 if(MITK_USE_OpenMP)
   find_package(OpenMP REQUIRED COMPONENTS CXX)
 else()
@@ -913,49 +934,7 @@ else()
 endif()
 
 # Qt support
-if(MITK_USE_Qt5)
-  find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
-  get_target_property(_qmake_exec Qt5::qmake LOCATION)
-  execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS
-    RESULT_VARIABLE _result
-     OUTPUT_VARIABLE QT_BINARY_DIR
-    ERROR_VARIABLE _error
-  )
-  string(STRIP "${QT_BINARY_DIR}" QT_BINARY_DIR)
-  if(_result OR NOT EXISTS "${QT_BINARY_DIR}")
-    message(FATAL_ERROR "Could not determine Qt binary directory: ${_result} ${QT_BINARY_DIR} ${_error}")
-  endif()
-
-  find_program(QT_HELPGENERATOR_EXECUTABLE
-    NAMES qhelpgenerator qhelpgenerator-qt5 qhelpgenerator5
-    PATHS ${QT_BINARY_DIR}
-    NO_DEFAULT_PATH
-  )
-
-  find_program(QT_COLLECTIONGENERATOR_EXECUTABLE
-    NAMES qcollectiongenerator qcollectiongenerator-qt5 qcollectiongenerator5
-    PATHS ${QT_BINARY_DIR}
-    NO_DEFAULT_PATH
-  )
-
-  find_program(QT_ASSISTANT_EXECUTABLE
-    NAMES assistant assistant-qt5 assistant5
-    PATHS ${QT_BINARY_DIR}
-    NO_DEFAULT_PATH
-  )
-
-  find_program(QT_XMLPATTERNS_EXECUTABLE
-    NAMES xmlpatterns
-    PATHS ${QT_BINARY_DIR}
-    NO_DEFAULT_PATH
-  )
-
-  mark_as_advanced(QT_HELPGENERATOR_EXECUTABLE
-                   QT_COLLECTIONGENERATOR_EXECUTABLE
-                   QT_ASSISTANT_EXECUTABLE
-                   QT_XMLPATTERNS_EXECUTABLE
-                  )
-
+if(MITK_USE_Qt6)
   if(MITK_USE_BLUEBERRY)
     option(BLUEBERRY_USE_QT_HELP "Enable support for integrating plugin documentation into Qt Help" ${DOXYGEN_FOUND})
     mark_as_advanced(BLUEBERRY_USE_QT_HELP)
@@ -977,13 +956,8 @@ if(MITK_USE_Qt5)
         set(_force_blueberry_use_qt_help_to_off 1)
       endif()
 
-      if(NOT MITK_USE_Qt5)
-        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because MITK_USE_Qt5 is OFF.")
-        set(_force_blueberry_use_qt_help_to_off 1)
-      endif()
-
-      if(NOT QT_XMLPATTERNS_EXECUTABLE)
-        message("You have enabled Qt Help support, but QT_XMLPATTERNS_EXECUTABLE is empty")
+      if(NOT MITK_USE_Qt6)
+        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because MITK_USE_Qt6 is OFF.")
         set(_force_blueberry_use_qt_help_to_off 1)
       endif()
 
@@ -1179,13 +1153,30 @@ endif()
 
 set(MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS)
 set(MITK_DOXYGEN_ADDITIONAL_IMAGE_PATHS)
+set(MITK_DOXYGEN_ADDITIONAL_EXAMPLE_PATHS)
 
 foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})
   set(MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS "${MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS} \"${MITK_EXTENSION_DIR}\"")
   set(MITK_DOXYGEN_ADDITIONAL_IMAGE_PATHS "${MITK_DOXYGEN_ADDITIONAL_IMAGE_PATHS} \"${MITK_EXTENSION_DIR}\"")
+  # MITK_DOXYGEN_ADDITIONAL_EXAMPLE_PATHS should be modified by MITK extensions as needed
 endforeach()
 
 if(DOXYGEN_FOUND)
+  foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})
+    set(MITK_DOCUMENTATION_EXTENSION_DIR "${MITK_EXTENSION_DIR}/Documentation")
+    file(GLOB MITK_DOCUMENTATION_EXTENSION_FILES CONFIGURE_DEPENDS "${MITK_DOCUMENTATION_EXTENSION_DIR}/*.cmake")
+    foreach(doc_file ${MITK_DOCUMENTATION_EXTENSION_FILES})
+      include("${doc_file}")
+    endforeach()
+  endforeach()
+
+  # Transform list of example paths into space-separated string of quoted paths
+  unset(example_paths)
+  foreach(example_path ${MITK_DOXYGEN_ADDITIONAL_EXAMPLE_PATHS})
+    set(example_paths "${example_paths} \"${example_path}\"")
+  endforeach()
+  set(MITK_DOXYGEN_ADDITIONAL_EXAMPLE_PATHS "${example_paths}")
+
   add_subdirectory(Documentation)
 endif()
 

@@ -34,7 +34,7 @@ SmartPointer<ISourceProvider> SourceProviderService::GetSourceProvider(const QSt
 
 QList<SmartPointer<ISourceProvider> > SourceProviderService::GetSourceProviders() const
 {
-  return sourceProviders.toList();
+  return sourceProviders.values();
 }
 
 void SourceProviderService::RegisterProvider(const SmartPointer<ISourceProvider>& sourceProvider)

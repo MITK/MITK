@@ -15,10 +15,12 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 #include <mitkWeakPointer.h>
+#include <mitkLabelSetImage.h>
+#include <mitkDataNode.h>
+#include <mitkLabelHighlightGuard.h>
 
 #include <QWidget>
 #include <QItemSelectionModel>
-#include <QmitkMultiLabelTreeModel.h>
 
 class QmitkMultiLabelTreeModel;
 class QStyledItemDelegate;
@@ -117,11 +119,15 @@ Q_SIGNALS:
   * The instance for which a new name is requested is passed with the signal.
   * @param label Pointer to the instance that needs a (new) name.
   * @param rename Indicates if it is a renaming or naming of a new label.
+  * @param [out] canceled Indicating if the request was canceled by the used.
   */
-  void LabelRenameRequested(mitk::Label* label, bool rename) const;
+  void LabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const;
 
   /** @brief Signal that is emitted, if the model was updated (e.g. by a delete or add operation).*/
   void ModelUpdated() const;
+
+  /** @brief Signal is emitted, if the segmentation is changed that is observed by the inspector.*/
+  void SegmentationChanged() const;
 
 public Q_SLOTS:
 
@@ -141,8 +147,27 @@ public Q_SLOTS:
   void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
 
   /** @brief Sets the segmentation that will be used and monitored by the widget.
+  * @param segmentation      A pointer to the segmentation to set.
+  * @remark You cannot set the segmentation directly if a segmentation node is
+  * also set. Reset the node (nullptr) if you want to change to direct segmentation
+  * setting.
+  * @pre Segmentation node is nullptr.
   */
   void SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation);
+  mitk::LabelSetImage* GetMultiLabelSegmentation() const;
+
+  /**
+  * @brief Sets the segmentation node that will be used /monitored by the widget.
+  *
+  * @param node A pointer to the segmentation node.
+  * @remark If not set some features (e.g. highlighting in render windows) of the inspectors
+  * are not active.
+  * @remark Currently it is also needed to circumvent the fact that
+  * modification of data does not directly trigger modification of the
+  * node (see T27307).
+  */
+  void SetMultiLabelNode(mitk::DataNode* node);
+  mitk::DataNode* GetMultiLabelNode() const;
 
   void SetMultiSelectionMode(bool multiMode);
 
@@ -204,6 +229,8 @@ public Q_SLOTS:
 protected:
   void Initialize();
   void OnModelReset();
+  void OnDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,
+    const QList<int>& roles = QList<int>());
 
   QmitkMultiLabelTreeModel* m_Model;
   mitk::LabelSetImage::Pointer m_Segmentation;
@@ -230,6 +257,9 @@ protected:
 
   void RemoveGroupInternal(const mitk::LabelSetImage::GroupIndexType& groupID);
   void DeleteLabelInternal(const LabelValueVectorType& labelValues);
+
+  void keyPressEvent(QKeyEvent* event) override;
+  void keyReleaseEvent(QKeyEvent* event) override;
 
 private Q_SLOTS:
   /** @brief Transform a labels selection into a data node list and emit the 'CurrentSelectionChanged'-signal.
@@ -271,6 +301,9 @@ private Q_SLOTS:
 
   void PrepareGoToLabel(LabelValueType labelID) const;
 
+  void OnEntered(const QModelIndex& index);
+  void OnMouseLeave();
+
   QWidgetAction* CreateOpacityAction();
 
 private:
@@ -295,6 +328,12 @@ private:
   bool m_DefaultLabelNaming = true;
 
   bool m_ModelManipulationOngoing = false;
+
+  bool m_AboutToShowContextMenu = false;
+  mitk::DataNode::Pointer m_SegmentationNode;
+  unsigned long m_SegmentationNodeDataMTime;
+  mitk::ITKEventObserverGuard m_SegmentationObserver;
+  mitk::LabelHighlightGuard m_LabelHighlightGuard;
 };
 
 #endif

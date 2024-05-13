@@ -228,7 +228,7 @@ int main(int argc, char* argv[])
       // - For "multilabel" output, use the next available label value instead.
 
       const auto labelValue = labelSetImage.IsNotNull()
-        ? static_cast<mitk::Label::PixelType>(labelSetImage->GetTotalNumberOfLabels() + 1)
+        ? labelSetImage->GetUnusedLabelValue()
         : 1;
 
       auto filter = mitk::ContourModelSetToImageFilter::New();
@@ -276,7 +276,7 @@ int main(int argc, char* argv[])
         if (format == OutputFormat::Multilabel)
           MITK_INFO << "Creating label: " << label->GetName() << " [" << labelValue << ']';
 
-        labelSetImage->GetActiveLabelSet()->AddLabel(label, false);
+        labelSetImage->AddLabel(label, labelSetImage->GetActiveLayer(), false, false);
 
         if (format == OutputFormat::Label)
         {

@@ -476,22 +476,26 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
   Label::PixelType activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
   if (!m_FillMode)
   {
-    activePixelValue = LabelSetImage::UnlabeledValue;
+    activePixelValue = LabelSetImage::UNLABELED_VALUE;
   }
 
   //as paintbrush tools should always allow to manipulate active label
   //(that is what the user expects/knows when using tools so far:
   //the active label can always be changed even if locked)
-  //we realize that by cloning the relevant label set and changing the lock state
+  //we realize that by cloning the relevant label and changing the lock state
   //this fillLabelSet is used for the transfer.
-  auto fillLabelSet = workingImage->GetActiveLabelSet()->Clone();
-  auto activeLabelClone = fillLabelSet->GetLabel(workingImage->GetActiveLabel(workingImage->GetActiveLayer())->GetValue());
+  auto destinationLabels = workingImage->GetConstLabelsByValue(workingImage->GetLabelValuesByGroup(workingImage->GetActiveLayer()));
+  auto activeLabelClone = workingImage->GetActiveLabel()->Clone();
   if (nullptr != activeLabelClone)
   {
     activeLabelClone->SetLocked(false);
+    auto activeIter = std::find(destinationLabels.begin(), destinationLabels.end(), workingImage->GetActiveLabel());
+    if (activeIter == destinationLabels.end()) mitkThrow() << "Application is in an invalid state. Active label is not contained in the labelset, but its group was requested.";
+    *activeIter = activeLabelClone;
   }
 
-  TransferLabelContentAtTimeStep(m_PaintingSlice, m_WorkingSlice, fillLabelSet, 0, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false, { {m_InternalFillValue, activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
+
+  TransferLabelContentAtTimeStep(m_PaintingSlice, m_WorkingSlice, destinationLabels, 0, LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false, { {m_InternalFillValue, activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
 
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 

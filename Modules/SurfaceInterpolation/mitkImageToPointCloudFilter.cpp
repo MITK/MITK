@@ -89,7 +89,7 @@ void mitk::ImageToPointCloudFilter::StdDeviations(itk::Image<TPixel, VImageDimen
   mitk::ImageStatisticsCalculator::Pointer statCalc =
                                          mitk::ImageStatisticsCalculator::New();
   statCalc->SetInputImage(edgeImage.GetPointer());
-  auto stats = statCalc->GetStatistics()->GetStatisticsForTimeStep(0);
+  auto stats = statCalc->GetStatistics()->GetStatistics(ImageStatisticsContainer::NO_MASK_LABEL_VALUE, 0);
   auto mean = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEAN());
   auto stdDev = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
 

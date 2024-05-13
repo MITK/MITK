@@ -159,7 +159,7 @@ bool HelpSearchView::eventFilter(QObject* o, QEvent *e)
     {
       bool controlPressed = me->modifiers() & Qt::ControlModifier;
       if((me->button() == Qt::LeftButton && controlPressed)
-         || (me->button() == Qt::MidButton))
+         || (me->button() == Qt::MiddleButton))
       {
         IEditorInput::Pointer input(new HelpEditorInput(link));
         this->GetSite()->GetPage()->OpenEditor(input, HelpEditor::EDITOR_ID);

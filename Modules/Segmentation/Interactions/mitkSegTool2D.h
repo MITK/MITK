@@ -72,16 +72,16 @@ namespace mitk
                                             int &affectedSlice);
 
     /**
-     * @brief Updates the surface interpolation by extracting the contour form the given slice.
-     * @param slice the slice from which the contour should be extracted
+     * @brief Updates the surface interpolations by extracting the contour form the given slice for all labels
+     * that have a surface contour information stored for the given plane at the given timestep.
      * @param workingImage the segmentation image
+     * @param timeStep the time step for wich the surface interpolation information should be updated.
      * @param plane the plane in which the slice lies
      * @param detectIntersection if true the slice is eroded before contour extraction. If the slice is empty after the
-     * erosion it is most
-     *        likely an intersecting contour an will not be added to the SurfaceInterpolationController
+     * erosion it is most likely an intersecting contour an will not be added to the SurfaceInterpolationController
      */
-    static void UpdateSurfaceInterpolation(const Image *slice,
-                                           const Image *workingImage,
+    static void UpdateAllSurfaceInterpolations(const LabelSetImage* workingImage,
+                                           TimeStepType timeStep,
                                            const PlaneGeometry *plane,
                                            bool detectIntersection);
 
@@ -175,16 +175,15 @@ namespace mitk
      * @param sliceInfos vector of slice information instances from which the contours should be extracted
      * @param workingImage the segmentation image
      * @param detectIntersection if true the slice is eroded before contour extraction. If the slice is empty after the
-     * @param activeLayerID The layer ID of the active label.
      * @param activeLabelValue The label value of the active label.
+     * @param silent Indicates if the modification event of the SurfaceInterpolationController should be triggered.
      * erosion it is most
      *        likely an intersecting contour an will not be added to the SurfaceInterpolationController
      */
     static void UpdateSurfaceInterpolation(const std::vector<SliceInformation>& sliceInfos,
       const Image* workingImage,
       bool detectIntersection,
-      unsigned int activeLayerID,
-      mitk::Label::PixelType activeLabelValue);
+      mitk::Label::PixelType activeLabelValue, bool silent = false);
 
 
     /**
@@ -236,20 +235,6 @@ namespace mitk
      * @pre workingNode must point to a valid instance and contain an image instance as data.*/
     static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true);
 
-    /** Writes the provided source slice into the target slice with the given pixel value.
-     * If passed workingImage is a LabelSetImage the label set rules will be applied when
-     * writing all non zero source pixels into the target slice (e.g. locked lables will not be touched)
-     * with the given paintingPixelValue.
-     * @param targetSlice Pointer to the slice that should be filled with the content of the sourceSlice.
-     * @param sourceSlice Pointer to the slice that is the source/preview every pixel will be (tried to be) transfered .
-     * @param workingImage Will be used to check if LabeSetImageRules have to be applied and the label set state.
-     * @param paintingPixelValue Value that will be used to paint onto target slice.
-     * @pre targetSlice must point to a valid instance.
-     * @pre sourceSlice must point to a valid instance.
-     * @pre workingImage must point to a valid instance.*/
-    static void WritePreviewOnWorkingImage(
-      Image *targetSlice, const Image *sourceSlice, const Image *workingImage, int paintingPixelValue);
-
     /** Writes a provided slice into the passed working image. The content of working image that is covered
     * by the slice will be completly overwritten. If asked for it also generates the needed
     * undo/redo steps.
@@ -285,7 +270,7 @@ namespace mitk
      * is set to be time point change aware, OnTimePointChanged() will be called.*/
     void OnTimePointChangedInternal();
 
-    static void  RemoveContourFromInterpolator(const SliceInformation& sliceInfo);
+    static void  RemoveContourFromInterpolator(const SliceInformation& sliceInfo, LabelSetImage::LabelValueType labelValue);
 
     // The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string m_Contourmarkername;

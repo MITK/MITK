@@ -77,7 +77,7 @@ void QmitkStoreSCPLauncher::OnReadyProcessOutput()
     QString out(m_StoreSCP->readAllStandardOutput());
     QStringList allDataList,importList;
 
-    allDataList = out.split("\n",QString::SkipEmptyParts);
+    allDataList = out.split("\n",Qt::SkipEmptyParts);
     QStringListIterator it(allDataList);
 
     while(it.hasNext())

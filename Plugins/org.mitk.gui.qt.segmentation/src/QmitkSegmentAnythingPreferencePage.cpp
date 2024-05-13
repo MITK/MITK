@@ -46,6 +46,8 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
 {
   m_Control = new QWidget(parent);
   m_Ui->setupUi(m_Control);
+
+  m_Ui->samModelTipLabel->hide();
 #ifndef _WIN32
   m_Ui->sysPythonComboBox->addItem("/usr/bin");
 #endif
@@ -66,14 +68,14 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
   QString welcomeText;
   if (isInstalled)
   {
-    m_PythonPath = GetExactPythonPath(storageDir);
+    m_PythonPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(storageDir).first;
     m_Installer.SetVirtualEnvPath(m_PythonPath);
-    welcomeText += " Segment Anything tool is already found installed.";
+    welcomeText += " Segment Anything tool & MedSAM is already found installed.";
     m_Ui->installSAMButton->setEnabled(false);
   }
   else
   {
-    welcomeText += " Segment Anything tool not installed. Please click on \"Install SAM\" above. \
+    welcomeText += " Segment Anything tool & MedSAM not installed. Please click on \"Install SAM with MedSAM\" above. \
       The installation will create a new virtual environment using the System Python selected above.";
     m_Ui->installSAMButton->setEnabled(true);
   }
@@ -124,9 +126,9 @@ void QmitkSegmentAnythingPreferencePage::Update()
   }
 }
 
-QString QmitkSegmentAnythingPreferencePage::OnSystemPythonChanged(const QString &pyEnv)
+std::pair<QString, QString> QmitkSegmentAnythingPreferencePage::OnSystemPythonChanged(const QString &pyEnv)
 {
-  QString pyPath;
+  std::pair<QString, QString> pyPath;
   if (pyEnv == QString("Select..."))
   {
     QString path = QFileDialog::getExistingDirectory(m_Ui->sysPythonComboBox->parentWidget(), "Python Path", "dir");
@@ -142,7 +144,7 @@ QString QmitkSegmentAnythingPreferencePage::OnSystemPythonChanged(const QString 
   else
   {
     QString uiPyPath = this->GetPythonPathFromUI(pyEnv);
-    pyPath = this->GetExactPythonPath(uiPyPath);
+    pyPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(uiPyPath);
   }
   return pyPath;
 }
@@ -155,34 +157,6 @@ QString QmitkSegmentAnythingPreferencePage::GetPythonPathFromUI(const QString &p
     fullPath = fullPath.mid(fullPath.indexOf(")") + 2);
   }
   return fullPath.simplified();
-}
-
-QString QmitkSegmentAnythingPreferencePage::GetExactPythonPath(const QString &pyEnv) const
-{
-  QString fullPath = pyEnv;
-  bool isPythonExists = false;
-#ifdef _WIN32
-  isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
-  if (!isPythonExists &&
-      !(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
-  {
-    fullPath += QDir::separator() + QString("Scripts");
-    isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
-  }
-#else
-  isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python3"));
-  if (!isPythonExists &&
-      !(fullPath.endsWith("bin", Qt::CaseInsensitive) || fullPath.endsWith("bin/", Qt::CaseInsensitive)))
-  {
-    fullPath += QDir::separator() + QString("bin");
-    isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python3"));
-  }
-#endif
-  if (!isPythonExists)
-  {
-    fullPath.clear();
-  }
-  return fullPath;
 }
 
 void QmitkSegmentAnythingPreferencePage::AutoParsePythonPaths()
@@ -251,35 +225,49 @@ int QmitkSegmentAnythingPreferencePage::FetchSelectedGPUFromUI() const
   }
   else
   {
-    QString gpuId = gpuInfo.split(":", QString::SplitBehavior::SkipEmptyParts).first();
+    QString gpuId = gpuInfo.split(":", Qt::SkipEmptyParts).first();
     return static_cast<int>(gpuId.toInt());
   }
 }
 
 void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
 {
-  QString systemPython = OnSystemPythonChanged(m_Ui->sysPythonComboBox->currentText());
-  if (!systemPython.isEmpty())
+  this->OnClearInstall(); // Clear any installation before
+  const auto [path, version] = OnSystemPythonChanged(m_Ui->sysPythonComboBox->currentText());
+  if (path.isEmpty())
   {
-    this->WriteStatusMessage("<b>STATUS: </b>Installing SAM...");
-    m_Ui->installSAMButton->setEnabled(false);
-    m_Installer.SetSystemPythonPath(systemPython);
-    bool isInstalled = false;
-    bool isFinished = m_Installer.SetupVirtualEnv(m_Installer.VENV_NAME);
-    if (isFinished)
-    {
-      isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(m_Installer.GetVirtualEnvPath());
-    }
-    if (isInstalled)
-    {
-      m_PythonPath = this->GetExactPythonPath(m_Installer.GetVirtualEnvPath());
-      this->WriteStatusMessage("<b>STATUS: </b>Successfully installed SAM.");
-    }
-    else
-    {
-      this->WriteErrorMessage("<b>ERROR: </b>Couldn't install SAM.");
-      m_Ui->installSAMButton->setEnabled(true);
-    }
+    this->WriteErrorMessage("<b>ERROR: </b>Couldn't find compatible Python.");
+    return;
+  }
+  //check if python 3.12 and ask for confirmation
+  if (version.startsWith("3.13") &&
+       QMessageBox::No == QMessageBox::question(nullptr,
+                            "Installing Segment Anything",
+                            QString("WARNING: This is an unsupported version of Python that may not work. "
+                                    "We recommend using a supported Python version between 3.9 and 3.12.\n\n"
+                                    "Continue anyway?"),
+                            QMessageBox::Yes | QMessageBox::No,
+                            QMessageBox::No))
+  {
+    return;
+  }
+  this->WriteStatusMessage("<b>STATUS: </b>Installing SAM & MedSAM...");
+  m_Ui->installSAMButton->setEnabled(false);
+  m_Installer.SetSystemPythonPath(path);
+  bool isInstalled = false;
+  if (m_Installer.SetupVirtualEnv(m_Installer.VENV_NAME))
+  {
+    isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(m_Installer.GetVirtualEnvPath());
+  }
+  if (isInstalled)
+  {
+    m_PythonPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(m_Installer.GetVirtualEnvPath()).first;
+    this->WriteStatusMessage("<b>STATUS: </b>Successfully installed SAM & MedSAM.");
+  }
+  else
+  {
+    this->WriteErrorMessage("<b>ERROR: </b>Couldn't install SAM & MedSAM.");
+    m_Ui->installSAMButton->setEnabled(true);
   }
 }
 

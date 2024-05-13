@@ -22,8 +22,6 @@ found in the LICENSE file.
 
 #include <berryIEditorSite.h>
 
-class QWebEngineUrlSchemeHandler;
-
 namespace berry {
 
 class QHelpEngineWrapper;
@@ -96,7 +94,6 @@ private:
 
   bool m_LoadFinished;
   QHelpEngineWrapper& m_HelpEngine;
-  QWebEngineUrlSchemeHandler* m_HelpSchemeHandler;
 };
 
 }

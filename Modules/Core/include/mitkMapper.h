@@ -141,7 +141,7 @@ namespace mitk
     static void SetDefaultProperties(DataNode *node, BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief Returns the current time step as calculated from the renderer */
-    int GetTimestep() const { return m_TimeStep; }
+    TimeStepType GetTimestep() const { return m_TimeStep; }
     /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
      * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
      * ProgressEvent on BaseRenderer. */
@@ -176,7 +176,7 @@ namespace mitk
     * for use in subclasses.
     * The current timestep can be accessed via the GetTimestep() method.
     */
-    int m_TimeStep;
+    TimeStepType m_TimeStep;
 
     /** \brief copy constructor */
     Mapper(const Mapper &);

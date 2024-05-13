@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkException.h>
 #include <mitkTestNotRunException.h>
 #include <mitkTestingMacros.h>
+#include <mitkUIDGenerator.h>
 
 // VTK Testing to compare the rendered image pixel-wise against a reference screen shot
 #include "vtkTesting.h"

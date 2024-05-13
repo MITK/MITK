@@ -12,7 +12,6 @@ Optional properties of a segmentation task include a task name and description a
 The complete set of properties is specified further below in the file format specification.
 
 MITK Segmentation Task Lists must be considered experimental at the moment and are prone to change without any prior warning.
-They are currently supported only in the MITK FlowBench application where a dedicated widget for task navigation and management appears if an MITK Segmentation Task List has been opened.
 
 ## File format
 

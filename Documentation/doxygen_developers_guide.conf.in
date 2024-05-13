@@ -281,7 +281,7 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
                          "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\"" \
                          "minimumCMakeVersion=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION@" \
-                         "minimumQt5Version=@MITK_QT5_MINIMUM_VERSION@" \
+                         "minimumQt6Version=@MITK_QT6_MINIMUM_VERSION@" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
                          "developersguidemainpage{1}=\mainpage" \
                          "usersguidemainpage{1}=\page \1" \
@@ -1072,7 +1072,7 @@ INPUT_FILTER           =
 # need to set EXTENSION_MAPPING for the extension otherwise the files are not
 # properly processed by doxygen.
 
-FILTER_PATTERNS        = *.cmake=@CMakeDoxygenFilter_EXECUTABLE@
+FILTER_PATTERNS        =
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using
 # INPUT_FILTER) will also be used to filter the input files that are used for

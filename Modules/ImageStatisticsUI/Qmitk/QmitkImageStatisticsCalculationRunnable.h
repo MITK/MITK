@@ -13,9 +13,7 @@ found in the LICENSE file.
 #define QmitkImageStatisticsCalculationRunnable_h
 
 //mitk headers
-#include "mitkImage.h"
-#include "mitkPlanarFigure.h"
-#include "mitkImageStatisticsContainer.h"
+#include <mitkImageStatisticsContainer.h>
 
 #include "QmitkDataGenerationJobBase.h"
 
@@ -48,14 +46,13 @@ public:
 
   /*!
   /brief Initializes the object with necessary data. */
-  void Initialize(const mitk::Image* image, const mitk::Image* binaryImage, const mitk::PlanarFigure* planarFig);
+  void Initialize(const mitk::Image* image, const mitk::BaseData* mask);
   /*!
   /brief returns the calculated image statistics. */
   mitk::ImageStatisticsContainer* GetStatisticsData() const;
 
   const mitk::Image* GetStatisticsImage() const;
-  const mitk::Image* GetMaskImage() const;
-  const mitk::PlanarFigure* GetPlanarFigure() const;
+  const mitk::BaseData* GetMaskData() const;
 
   /*!
   /brief Set flag to ignore zero valued voxels */
@@ -77,8 +74,7 @@ protected:
 
 private:
   mitk::Image::ConstPointer m_StatisticsImage;                         ///< member variable holds the input image for which the statistics need to be calculated.
-  mitk::Image::ConstPointer m_BinaryMask;                              ///< member variable holds the binary mask image for segmentation image statistics calculation.
-  mitk::PlanarFigure::ConstPointer m_PlanarFigureMask;                 ///< member variable holds the planar figure for segmentation image statistics calculation.
+  mitk::BaseData::ConstPointer m_MaskData;                             ///< member variable holds the data that should be used as mask statistics calculation.
   mitk::ImageStatisticsContainer::Pointer m_StatisticsContainer;
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
   unsigned int m_HistogramNBins;                                      ///< member variable holds the bin size for histogram resolution.

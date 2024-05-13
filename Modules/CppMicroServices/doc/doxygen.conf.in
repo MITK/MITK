@@ -909,10 +909,6 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = "@PROJECT_SOURCE_DIR@" \
-                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionAddResources.cmake" \
-                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionEmbedResources.cmake" \
-                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateModuleInit.cmake" \
-                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionGetResourceSource.cmake" \
                          "@PROJECT_BINARY_DIR@/include/usGlobalConfig.h" \
                          "@PROJECT_BINARY_DIR@/core/include"
 
@@ -1077,7 +1073,7 @@ INPUT_FILTER           =
 # need to set EXTENSION_MAPPING for the extension otherwise the files are not
 # properly processed by doxygen.
 
-FILTER_PATTERNS        = *.cmake=@CMakeDoxygenFilter_EXECUTABLE@
+FILTER_PATTERNS        =
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using
 # INPUT_FILTER) will also be used to filter the input files that are used for

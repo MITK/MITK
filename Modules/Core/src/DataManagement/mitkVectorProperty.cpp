@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkVectorProperty.h"
+#include <nlohmann/json.hpp>
 
 namespace mitk
 {
@@ -79,6 +80,20 @@ namespace mitk
   const typename VectorProperty<DATATYPE>::VectorType &VectorProperty<DATATYPE>::GetValue() const
   {
     return m_PropertyContent;
+  }
+
+  template <typename DATATYPE>
+  bool VectorProperty<DATATYPE>::ToJSON(nlohmann::json& j) const
+  {
+    j = this->GetValue();
+    return true;
+  }
+
+  template <typename DATATYPE>
+  bool VectorProperty<DATATYPE>::FromJSON(const nlohmann::json& j)
+  {
+    this->SetValue(j.get<VectorType>());
+    return true;
   }
 
   // Explicit instantiation for defined types.

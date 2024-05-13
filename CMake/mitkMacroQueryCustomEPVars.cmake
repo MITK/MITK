@@ -2,6 +2,7 @@
     project variables for a specific external project (${proj}). ]]
 
 macro(mitk_query_custom_ep_vars)
+  set(${proj}_CUSTOM_DEPENDENCIES "")
   set(${proj}_CUSTOM_CMAKE_ARGS "")
   set(${proj}_CUSTOM_CMAKE_CACHE_ARGS "")
   set(${proj}_CUSTOM_CMAKE_CACHE_DEFAULT_ARGS "")
@@ -10,15 +11,21 @@ macro(mitk_query_custom_ep_vars)
     set(MITK_CMAKE_EXTERNALS_CUSTOM_DIR "${MITK_EXTENSION_DIR}/CMakeExternals/Customization")
     if(EXISTS "${MITK_CMAKE_EXTERNALS_CUSTOM_DIR}/${proj}.cmake")
       include("${MITK_CMAKE_EXTERNALS_CUSTOM_DIR}/${proj}.cmake")
+      list(APPEND ${proj}_CUSTOM_DEPENDENCIES ${CUSTOM_DEPENDENCIES})
       list(APPEND ${proj}_CUSTOM_CMAKE_ARGS ${CUSTOM_CMAKE_ARGS})
       list(APPEND ${proj}_CUSTOM_CMAKE_CACHE_ARGS ${CUSTOM_CMAKE_CACHE_ARGS})
       list(APPEND ${proj}_CUSTOM_CMAKE_CACHE_DEFAULT_ARGS ${CUSTOM_CMAKE_CACHE_DEFAULT_ARGS})
     endif()
   endforeach()
 
+  list(REMOVE_DUPLICATES ${proj}_CUSTOM_DEPENDENCIES)
   list(REMOVE_DUPLICATES ${proj}_CUSTOM_CMAKE_ARGS)
   list(REMOVE_DUPLICATES ${proj}_CUSTOM_CMAKE_CACHE_ARGS)
   list(REMOVE_DUPLICATES ${proj}_CUSTOM_CMAKE_CACHE_DEFAULT_ARGS)
+
+  if(${proj}_CUSTOM_DEPENDENCIES)
+    message(STATUS "Custom ${proj} dependencies: ${${proj}_CUSTOM_DEPENDENCIES}")
+  endif()
 
   if(${proj}_CUSTOM_CMAKE_ARGS)
     message(STATUS "Custom ${proj} CMake args: ${${proj}_CUSTOM_CMAKE_ARGS}")

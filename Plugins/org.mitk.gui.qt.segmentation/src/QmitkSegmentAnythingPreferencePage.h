@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QmitkSetupVirtualEnvUtil.h>
 #include <QStandardPaths>
 #include <ui_QmitkSegmentAnythingPreferencePage.h>
+#include <QDir>
 
 class QWidget;
 
@@ -32,7 +33,7 @@ class QmitkSAMInstaller : public QmitkSetupVirtualEnvUtil
 public:
   const QString VENV_NAME = ".sam";
   const QString SAM_VERSION = "1.0"; // currently, unused
-  const std::vector<QString> PACKAGES = {QString("git+https://github.com/MIC-DKFZ/agent-sam.git@v0.1")};
+  const std::vector<QString> PACKAGES = {QString("git+https://github.com/MIC-DKFZ/agent-sam.git@v0.2")};
   const QString STORAGE_DIR;
   inline QmitkSAMInstaller(
     const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
@@ -61,7 +62,7 @@ public:
 private slots:
   void OnInstallBtnClicked();
   void OnClearInstall();
-  QString OnSystemPythonChanged(const QString&);
+  std::pair<QString, QString> OnSystemPythonChanged(const QString &);
 
 protected:
   /**
@@ -77,13 +78,6 @@ protected:
    * @return QString
    */
   QString GetPythonPathFromUI(const QString &) const;
-
-  /**
-   * @brief Get the Exact Python Path for any OS
-   * from the virtual environment path.
-   * @return QString
-   */
-  QString GetExactPythonPath(const QString &) const;
 
   /**
    * @brief Adds GPU information to the gpu combo box.

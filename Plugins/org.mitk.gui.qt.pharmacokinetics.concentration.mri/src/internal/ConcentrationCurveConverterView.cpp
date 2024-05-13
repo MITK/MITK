@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include "ConcentrationCurveConverterView.h"
 #include "mitkConcentrationCurveGenerator.h"
 #include "mitkNodePredicateDataType.h"
-#include "mitkConvertToConcentrationTurboFlashFunctor.h"
 #include "mitkConvertToConcentrationAbsoluteFunctor.h"
 #include "mitkConvertToConcentrationRelativeFunctor.h"
 #include "itkBinaryFunctorImageFilter.h"
@@ -84,7 +83,6 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.groupBox_T2->hide();
     m_Controls.groupBox3D->hide();
     m_Controls.groupBox4D->hide();
-    m_Controls.groupBoxTurboFlash->hide();
     m_Controls.groupConcentration->hide();
     m_Controls.groupBox_baselineRangeSelection->hide();
     m_Controls.groupBox_BaselineRangeSelectionT2->hide();
@@ -99,7 +97,6 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
   //Concentration
     m_Controls.groupConcentration->hide();
     m_Controls.groupBoxEnhancement->hide();
-    m_Controls.groupBoxTurboFlash->hide();
     m_Controls.groupBox_T1MapviaVFA->hide();
 
     m_Controls.spinBox_baselineStartTimeStep->setValue(0);
@@ -115,12 +112,6 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.spinBox_baselineStartTimeStepT2->setMinimum(0);
 
 
-    connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash, SLOT(setVisible(bool)));
-    connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
-    connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
-    connect(m_Controls.relaxationtime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
-    connect(m_Controls.recoverytime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
-    connect(m_Controls.relaxivity, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
 
     connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnNodeSelectionChanged);
     connect(m_Controls.image3DNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnNodeSelectionChanged);
@@ -174,7 +165,7 @@ void ConcentrationCurveConverterView::OnSettingChanged()
       if(m_Controls.radioButton4D->isChecked())
       {
           m_Controls.groupConcentration->setVisible(true);
-          if (m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked() || m_Controls.radioButtonTurboFlash->isChecked())
+          if (m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked())
           m_Controls.groupBox_baselineRangeSelection->setVisible(true);
           ok = m_selectedImage.IsNotNull() && CheckSettings();
       }
@@ -204,15 +195,7 @@ bool ConcentrationCurveConverterView::CheckSettings() const
 
   if (m_Controls.radioButton_T1->isChecked())
   {
-    if (this->m_Controls.radioButtonTurboFlash->isChecked())
-    {
-      ok = ok && (m_Controls.recoverytime->value() > 0);
-      ok = ok && (m_Controls.relaxationtime->value() > 0);
-      ok = ok && (m_Controls.relaxivity->value() > 0);
-      ok = ok && (m_Controls.AifRecoverytime->value() > 0);
-      ok = ok && CheckBaselineSelectionSettings();
-    }
-    else if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
+    if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
       || this->m_Controls.radioButton_relativeEnchancement->isChecked())
     {
       ok = ok && (m_Controls.factorSpinBox->value() > 0);
@@ -302,26 +285,7 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert3DConcentrationImag
 
     mitk::Image::Pointer outputImage;
 
-    if(this->m_Controls.radioButtonTurboFlash->isChecked())
-    {
-        typedef mitk::ConvertToConcentrationTurboFlashFunctor <double, double, double> ConversionFunctorTurboFlashType;
-        typedef itk::BinaryFunctorImageFilter<InputImageType,InputImageType, ConvertedImageType, ConversionFunctorTurboFlashType> FilterTurboFlashType;
-
-        ConversionFunctorTurboFlashType ConversionTurboFlashFunctor;
-        ConversionTurboFlashFunctor.initialize(m_Controls.relaxationtime->value(), m_Controls.relaxivity->value(), m_Controls.recoverytime->value());
-
-        FilterTurboFlashType::Pointer ConversionTurboFlashFilter = FilterTurboFlashType::New();
-
-        ConversionTurboFlashFilter->SetFunctor(ConversionTurboFlashFunctor);
-        ConversionTurboFlashFilter->SetInput1(itkInputImage);
-        ConversionTurboFlashFilter->SetInput2(itkBaselineImage);
-
-        ConversionTurboFlashFilter->Update();
-        outputImage = mitk::ImportItkImage(ConversionTurboFlashFilter->GetOutput())->Clone();
-
-
-    }
-    else if(this->m_Controls.radioButton_absoluteEnhancement->isChecked())
+    if(this->m_Controls.radioButton_absoluteEnhancement->isChecked())
     {
         typedef mitk::ConvertToConcentrationAbsoluteFunctor <double, double, double> ConversionFunctorAbsoluteType;
         typedef itk::BinaryFunctorImageFilter<InputImageType,InputImageType, ConvertedImageType, ConversionFunctorAbsoluteType> FilterAbsoluteType;
@@ -394,7 +358,6 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
     mitk::ConcentrationCurveGenerator::New();
   concentrationGen->SetDynamicImage(inputImage);
 
-  concentrationGen->SetisTurboFlashSequence(m_Controls.radioButtonTurboFlash->isChecked());
   concentrationGen->SetAbsoluteSignalEnhancement(m_Controls.radioButton_absoluteEnhancement->isChecked());
   concentrationGen->SetRelativeSignalEnhancement(m_Controls.radioButton_relativeEnchancement->isChecked());
   concentrationGen->SetUsingT1Map(m_Controls.radioButtonUsingT1viaVFA->isChecked());
@@ -403,15 +366,7 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
 
   concentrationGen->SetisT2weightedImage(false);
 
-  if (m_Controls.radioButtonTurboFlash->isChecked())
-  {
-    concentrationGen->SetRecoveryTime(m_Controls.recoverytime->value());
-    concentrationGen->SetRelaxationTime(m_Controls.relaxationtime->value());
-    concentrationGen->SetRelaxivity(m_Controls.relaxivity->value());
-    concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
-    concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
-  }
-  else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
+  if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
   {
     concentrationGen->SetRepetitionTime(m_Controls.TRSpinBox->value());
     concentrationGen->SetRelaxivity(m_Controls.RelaxivitySpinBox->value());
@@ -445,7 +400,6 @@ mitk::Image::Pointer ConcentrationCurveConverterView::ConvertT2ConcentrationImga
       mitk::ConcentrationCurveGenerator::New();
     concentrationGen->SetDynamicImage(inputImage);
 
-    concentrationGen->SetisTurboFlashSequence(false);
     concentrationGen->SetAbsoluteSignalEnhancement(false);
     concentrationGen->SetRelativeSignalEnhancement(false);
 

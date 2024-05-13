@@ -1,0 +1,12 @@
+{
+  "name": "Classic",
+  "info": "Display commonly used plugins, filtering out those that are less relevant to the majority of users.",
+  "categories": [
+    "Data",
+    "General",
+    "Help",
+    "Quantification",
+    "Registration",
+    "Segmentation"
+  ]
+}

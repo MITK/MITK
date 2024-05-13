@@ -15,6 +15,11 @@ found in the LICENSE file.s
 #include "mitkLog.h"
 #include <QStandardPaths>
 #include <itkCommand.h>
+#include <regex>
+#include <QDir>
+#include <QApplication>
+#include <QProcess>
+#include <QStringDecoder>
 
 QmitkSetupVirtualEnvUtil::QmitkSetupVirtualEnvUtil()
 {
@@ -115,10 +120,10 @@ void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir,
   args.push_back("-m");
   args.push_back("pip");
   args.push_back("install");
-  args.push_back("light-the-torch");
+  args.push_back("light-the-torch==0.7.5");
   spExec->Execute(workingDir, "python", args);
-  PipInstall("torch==2.0.0", workingDir, callback, "ltt");
-  PipInstall("torchvision==0.15.0", workingDir, callback, "ltt");
+  PipInstall("torch>=2.0.0", workingDir, callback, "ltt");
+  PipInstall("torchvision>=0.15.0", workingDir, callback, "ltt");
 }
 
 void QmitkSetupVirtualEnvUtil::InstallPytorch()
@@ -180,4 +185,54 @@ bool QmitkSetupVirtualEnvUtil::IsPythonPath(const QString &pythonPath)
     QFile::exists(fullPath + QDir::separator() + QString("python3"));
 #endif
   return isExists;
+}
+
+std::pair<QString, QString> QmitkSetupVirtualEnvUtil::GetExactPythonPath(const QString &pyEnv)
+{
+  QString fullPath = pyEnv;
+  bool pythonDoesExist = false;
+  bool isSupportedVersion = false;
+#ifdef _WIN32
+  const std::string PYTHON_EXE = "python.exe";
+  // check if python exist in given folder.
+  pythonDoesExist = QFile::exists(fullPath + QDir::separator() + QString::fromStdString(PYTHON_EXE));
+  if (!pythonDoesExist && // check if in Scripts already, if not go there
+      !(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
+  {
+    fullPath += QDir::separator() + QString("Scripts");
+    pythonDoesExist = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
+  }
+#else
+  const std::string PYTHON_EXE = "python3";
+  pythonDoesExist = QFile::exists(fullPath + QDir::separator() + QString::fromStdString(PYTHON_EXE));
+  if (!pythonDoesExist &&
+      !(fullPath.endsWith("bin", Qt::CaseInsensitive) || fullPath.endsWith("bin/", Qt::CaseInsensitive)))
+  {
+    fullPath += QDir::separator() + QString("bin");
+    pythonDoesExist = QFile::exists(fullPath + QDir::separator() + QString("python3"));
+  }
+#endif
+  std::pair<QString, QString> pythonPath;
+  if (pythonDoesExist)
+  {
+    std::regex sanitizer(R"(3\.(\d+))");
+    QProcess pyProcess;
+    pyProcess.start(fullPath + QDir::separator() + QString::fromStdString(PYTHON_EXE),
+                          QStringList() << "--version",
+                          QProcess::ReadOnly);
+    if (pyProcess.waitForFinished())
+    {
+      auto pyVersionCaptured = QString(QStringDecoder(QStringDecoder::Utf8)(pyProcess.readAllStandardOutput())).toStdString();
+      std::smatch match; // Expecting "Python 3.xx.xx" or "Python 3.xx"
+      if (std::regex_search(pyVersionCaptured, match, sanitizer) && !match.empty())
+      {
+        std::string pyVersionNumber = match[0];
+        int pySubVersion = std::stoi(match[1]);
+        isSupportedVersion = (pySubVersion > 8) ? (pySubVersion < 13) : false;
+        pythonPath.second = QString::fromStdString(pyVersionNumber);
+      }
+    }
+  }
+  pythonPath.first = pythonDoesExist &&isSupportedVersion ? fullPath : "";
+  return pythonPath;
 }

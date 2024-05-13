@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper2D.h>
 #include <vtkPropAssembly.h>
 #include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
+#include <vtkCubeSource.h>
 
 namespace mitk
 {
@@ -46,7 +46,7 @@ namespace mitk
       vtkSmartPointer<vtkCutter> m_Cutter;
       vtkSmartPointer<vtkPlane> m_CuttingPlane;
       unsigned int m_LastSliceNumber;
-      std::vector<vtkSmartPointer<vtkSphereSource>> m_Handles;
+      std::vector<vtkSmartPointer<vtkCubeSource>> m_Handles;
       vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
       double m_ZoomFactor;
 

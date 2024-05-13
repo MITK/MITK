@@ -114,9 +114,9 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex &index, int role) con
       mitk::Color col = colorProp->GetColor();
       QColor qcol((int)(col.GetRed() * 255), (int)(col.GetGreen() * 255), (int)(col.GetBlue() * 255));
       if (role == Qt::DisplayRole)
-        data.setValue<QColor>(qcol);
+        data.setValue(qcol);
       else if (role == Qt::EditRole)
-        data.setValue<QColor>(qcol);
+        data.setValue(qcol);
     }
 
     else if (mitk::BoolProperty *boolProp = dynamic_cast<mitk::BoolProperty *>(baseProp))
@@ -160,14 +160,14 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex &index, int role) con
         {
           values << QString::fromStdString(it->second);
         }
-        data.setValue<QStringList>(values);
+        data.setValue(values);
       }
     }
 
     else
     {
       if (role == Qt::DisplayRole)
-        data.setValue<QString>(QString::fromStdString(m_SelectedProperties[index.row()].second->GetValueAsString()));
+        data.setValue(QString::fromStdString(m_SelectedProperties[index.row()].second->GetValueAsString()));
     }
   }
 

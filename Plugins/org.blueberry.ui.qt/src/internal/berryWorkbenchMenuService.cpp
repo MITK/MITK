@@ -267,7 +267,7 @@ void WorkbenchMenuService::RemoveSourceProvider(const SmartPointer<ISourceProvid
 
 void WorkbenchMenuService::UpdateManagers()
 {
-  QList<IContributionManager*> managers = managersAwaitingUpdates.toList();
+  QList<IContributionManager*> managers = managersAwaitingUpdates.values();
   managersAwaitingUpdates.clear();
   foreach (IContributionManager* mgr, managers)
   {

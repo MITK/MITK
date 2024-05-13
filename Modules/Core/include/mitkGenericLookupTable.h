@@ -23,8 +23,13 @@ found in the LICENSE file.
 #include "mitkNumericTypes.h"
 #include <MitkCoreExports.h>
 
+#include <nlohmann/json.hpp>
+
 namespace mitk
 {
+  template <typename T> class GenericLookupTable;
+  template <typename T> void from_json(const nlohmann::json&, GenericLookupTable<T>&);
+
   /**
    * @brief Template class for generating lookup-tables
    *
@@ -83,9 +88,24 @@ namespace mitk
       }
     }
 
+    friend void from_json<>(const nlohmann::json&, GenericLookupTable<T>&);
+
   protected:
     LookupTableType m_LookupTable;
   };
+
+  template <typename T>
+  void to_json(nlohmann::json& j, const GenericLookupTable<T>& t)
+  {
+    j = t.GetLookupTable();
+  }
+
+  template <typename T>
+  void from_json(const nlohmann::json& j, GenericLookupTable<T>& t)
+  {
+    j.get_to(t.m_LookupTable);
+  }
+
 } // namespace mitk
 
 /**

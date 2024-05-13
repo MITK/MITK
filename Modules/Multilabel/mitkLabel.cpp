@@ -67,7 +67,7 @@ mitk::Label::Label(PixelType value, const std::string& name) : Label()
 }
 
 mitk::Label::Label(const Label &other) : PropertyList(other)
-// copyconstructer of property List handles the coping action
+// copy constructor of property List handles the coping action
 {
   auto *map = this->GetMap();
   auto it = map->begin();
@@ -158,6 +158,11 @@ std::string mitk::Label::GetName() const
   std::string name;
   GetStringProperty("name", name);
   return name;
+}
+
+std::string mitk::Label::GetTrackingID() const
+{
+  return std::to_string(this->GetValue());
 }
 
 void mitk::Label::SetValue(PixelType pixelValue)

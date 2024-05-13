@@ -119,7 +119,7 @@ namespace mitk
     node->SetData(m_Result);
     node->SetName(name);
 
-    mitk::Color color = image->GetLabel(m_RequestedLabel, image->GetActiveLayer())->GetColor();
+    mitk::Color color = image->GetLabel(m_RequestedLabel)->GetColor();
     node->SetColor(color);
 
     this->InsertBelowGroupNode(node);

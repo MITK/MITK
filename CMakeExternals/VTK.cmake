@@ -8,7 +8,9 @@ if(DEFINED VTK_DIR AND NOT EXISTS ${VTK_DIR})
 endif()
 
 set(proj VTK)
-set(proj_DEPENDENCIES )
+mitk_query_custom_ep_vars()
+
+set(proj_DEPENDENCIES ${${proj}_CUSTOM_DEPENDENCIES})
 set(VTK_DEPENDS ${proj})
 
 if(NOT DEFINED VTK_DIR)
@@ -23,6 +25,13 @@ if(NOT DEFINED VTK_DIR)
     list(APPEND additional_cmake_args
       -DVTK_MODULE_USE_EXTERNAL_VTK_freetype:BOOL=ON
       )
+
+    if(NOT APPLE)
+      if(DEFINED OpenGL_GL_PREFERENCE)
+        list(APPEND additional_cmake_args "-DOpenGL_GL_PREFERENCE:STRING=${OpenGL_GL_PREFERENCE}")
+      endif()
+    endif()
+
   endif()
 
   # Optionally enable memory leak checks for any objects derived from vtkObject. This
@@ -33,10 +42,9 @@ if(NOT DEFINED VTK_DIR)
     -DVTK_DEBUG_LEAKS:BOOL=${MITK_VTK_DEBUG_LEAKS}
     )
 
-  if(MITK_USE_Qt5)
+  if(MITK_USE_Qt6)
     list(APPEND additional_cmake_args
       -DVTK_GROUP_ENABLE_Qt:STRING=YES
-      -DQt5_DIR:PATH=${Qt5_DIR}
       )
   endif()
 
@@ -46,18 +54,16 @@ if(NOT DEFINED VTK_DIR)
       )
   endif()
 
-  mitk_query_custom_ep_vars()
-
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    GIT_REPOSITORY https://github.com/Kitware/VTK.git
-    GIT_TAG v9.2.6
+    GIT_REPOSITORY https://github.com/MITK/VTK.git
+    GIT_TAG ef49b4f7b240ec62b4a7014fe97858be54fe9157 # v9.3.0-patched
     GIT_SUBMODULES ""
     CMAKE_GENERATOR ${gen}
     CMAKE_GENERATOR_PLATFORM ${gen_platform}
     CMAKE_ARGS
       ${ep_common_args}
-      -DOpenGL_GL_PREFERENCE:STRING=LEGACY
+      "-DQt6_DIR:PATH=${Qt6_DIR}"
       -DVTK_ENABLE_WRAPPING:BOOL=OFF
       -DVTK_LEGACY_REMOVE:BOOL=ON
       -DVTK_MODULE_ENABLE_VTK_TestingRendering:STRING=YES
@@ -66,7 +72,8 @@ if(NOT DEFINED VTK_DIR)
       -DVTK_MODULE_ENABLE_VTK_GUISupportQtQuick:STRING=NO
       -DVTK_MODULE_ENABLE_VTK_IOIOSS:STRING=NO # See T29633
       -DVTK_MODULE_ENABLE_VTK_ioss:STRING=NO   # See T29633
-      -DVTK_QT_VERSION:STRING=5
+      -DVTK_REPORT_OPENGL_ERRORS:BOOL=OFF
+      -DVTK_QT_VERSION:STRING=6
       ${additional_cmake_args}
       ${${proj}_CUSTOM_CMAKE_ARGS}
     CMAKE_CACHE_ARGS

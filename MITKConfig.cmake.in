@@ -125,12 +125,12 @@ list(APPEND CMAKE_PREFIX_PATH "@MITK_EXTERNAL_PROJECT_PREFIX@")
 # -----------------------------------------
 # Qt variables and dependencies
 
-set(MITK_USE_Qt5 @MITK_USE_Qt5@)
+set(MITK_USE_Qt6 @MITK_USE_Qt6@)
 
-if(MITK_USE_Qt5)
-  set(MITK_QT5_MINIMUM_VERSION @MITK_QT5_MINIMUM_VERSION@)
-  set(MITK_QT5_COMPONENTS @MITK_QT5_COMPONENTS@)
-  mitkMacroFindDependency(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS})
+if(MITK_USE_Qt6)
+  set(MITK_QT6_MINIMUM_VERSION @MITK_QT6_MINIMUM_VERSION@)
+  set(MITK_QT6_COMPONENTS @MITK_QT6_COMPONENTS@)
+  mitkMacroFindDependency(Qt6 ${MITK_QT6_MINIMUM_VERSION} COMPONENTS ${MITK_QT6_COMPONENTS})
 endif()
 
 # -----------------------------------------
@@ -204,13 +204,6 @@ if(MITK_USE_Boost)
 endif()
 
 # -----------------------------------------
-# Special handling for OpenIGTLink
-
-if(MITK_USE_OpenIGTLink)
-  link_directories(${OpenIGTLink_LIBRARY_DIRS})
-endif()
-
-# -----------------------------------------
 # Internal project dependencies
 
 set(CppMicroServices_DIR "@CppMicroServices_DIR@")
@@ -243,52 +236,6 @@ set(BLUEBERRY_QTPLUGIN_PATH "@BLUEBERRY_QTPLUGIN_PATH@")
 
 set(QT_HELPGENERATOR_EXECUTABLE "@QT_HELPGENERATOR_EXECUTABLE@")
 set(QT_COLLECTIONGENERATOR_EXECUTABLE "@QT_COLLECTIONGENERATOR_EXECUTABLE@")
-set(QT_ASSISTANT_EXECUTABLE "@QT_ASSISTANT_EXECUTABLE@")
-set(QT_XMLPATTERNS_EXECUTABLE "@QT_XMLPATTERNS_EXECUTABLE@")
-
-
-#-----------------------------------------------------------------------------
-# MITK sub-project variables
-#-----------------------------------------------------------------------------
-
-# External SDK directories
-set(MITK_PMD_SDK_DIR @MITK_PMD_SDK_DIR@)
-
-# MITK ToF use variables
-
-set(MITK_TOF_PMDCAMCUBE_AVAILABLE @MITK_USE_TOF_PMDCAMCUBE@)
-if(MITK_TOF_PMDCAMCUBE_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
-  option(MITK_USE_TOF_PMDCAMCUBE "Enable support for PMD Cam Cube" @MITK_USE_TOF_PMDCAMCUBE@)
-  mark_as_advanced(MITK_USE_TOF_PMDCAMCUBE)
-endif()
-
-set(MITK_TOF_PMDCAMBOARD_AVAILABLE @MITK_USE_TOF_PMDCAMBOARD@)
-if(MITK_TOF_PMDCAMBOARD_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
-  option(MITK_USE_TOF_PMDCAMBOARD "Enable support for PMD Cam Board" @MITK_USE_TOF_PMDCAMBOARD@)
-  mark_as_advanced(MITK_USE_TOF_PMDCAMBOARD)
-endif()
-
-set(MITK_TOF_PMDO3_AVAILABLE @MITK_USE_TOF_PMDO3@)
-if(MITK_TOF_PMDO3_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
-  option(MITK_USE_TOF_PMDO3 "Enable support for PMD =3" @MITK_USE_TOF_PMDO3@)
-  mark_as_advanced(MITK_USE_TOF_PMDO3)
-endif()
-
-set(MITK_TOF_KINECT_AVAILABLE @MITK_USE_TOF_KINECT@)
-if(MITK_TOF_KINECT_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
-  option(MITK_USE_TOF_KINECT "Enable support for Kinect" @MITK_USE_TOF_KINECT@)
-  mark_as_advanced(MITK_USE_TOF_KINECT)
-endif()
-
-set(MITK_TOF_MESASR4000_AVAILABLE @MITK_USE_TOF_MESASR4000@)
-if(MITK_TOF_MESASR4000_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
-  option(MITK_USE_TOF_MESASR4000 "Enable support for MESA SR4000" @MITK_USE_TOF_MESASR4000@)
-  mark_as_advanced(MITK_USE_TOF_MESASR4000)
-endif()
-
-if(MITK_USE_IGT)
-  #include("${MITK_DIR}/mitkIGTConfig.cmake")
-endif()
 
 #-----------------------------------------------------------------------------
 # Import MITK targets and set custom properties
@@ -303,12 +250,3 @@ endif()
 
 # Set properties on exported targets
 @MITK_EXPORTED_TARGET_PROPERTIES@
-
-#-----------------------------------------------------------------------------
-# Install rules
-#-----------------------------------------------------------------------------
-
-# Install rules for ToF libraries loaded at runtime
-if(EXISTS "@MITK_BINARY_DIR@/mitkToFHardwareInstallRules.cmake")
-  include("@MITK_BINARY_DIR@/mitkToFHardwareInstallRules.cmake")
-endif()

@@ -56,6 +56,7 @@ bool mitk::SegmentAnythingProcessExecutor::Execute(const std::string &executionP
       {
         std::string data(rawOutput, outputLength);
         this->InvokeEvent(ExternalProcessStdErrEvent(data));
+        m_Stop = true;
       }
     }
     timer = m_Timeout; //re-assigning timeout since itksysProcess calls will tamper with input timeout argument.

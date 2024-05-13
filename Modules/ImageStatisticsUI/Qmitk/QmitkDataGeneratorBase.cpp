@@ -271,5 +271,7 @@ bool QmitkDataGeneratorBase::DoGenerate() const
     emit GenerationFinished();
   }
 
+  if (everythingValid) m_GenerationTime.Modified();
+
   return everythingValid;
 }

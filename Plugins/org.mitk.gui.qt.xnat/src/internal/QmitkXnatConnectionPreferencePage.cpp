@@ -80,8 +80,8 @@ void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
   const QIntValidator *portV = new QIntValidator(0, 65535, parent);
   m_Controls.inXnatPort->setValidator(portV);
 
-  const QRegExp hostRx("^(https?)://[^ /](\\S)+$");
-  const QRegExpValidator *hostV = new QRegExpValidator(hostRx, parent);
+  const QRegularExpression hostRx("^(https?)://[^ /](\\S)+$");
+  const QRegularExpressionValidator *hostV = new QRegularExpressionValidator(hostRx, parent);
   m_Controls.inXnatHostAddress->setValidator(hostV);
 
   connect(m_Controls.xnatTestConnectionButton, SIGNAL(clicked()), this, SLOT(TestConnection()));

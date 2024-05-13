@@ -123,7 +123,7 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
 {
   if (nullptr == m_MenuWidget)
   {
-    m_MenuWidget = new QmitkRenderWindowMenu(this, nullptr, m_Renderer);
+    m_MenuWidget = new QmitkRenderWindowMenu(this, {}, m_Renderer);
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
   }
 
@@ -182,6 +182,17 @@ bool QmitkRenderWindow::event(QEvent* e)
   bool updateStatusBar = false;
   switch (e->type())
   {
+    case QEvent::TouchBegin:
+      // Starting with Qt 6, using the touchpad on a MacBook for example results in mouse move events with the
+      // left mouse button pressed. Hence, hovering over the 3-d render window will already result in rotating the
+      // scene. In theory, this can be prevented by either disabling the WA_AcceptTouchEvents attribute for this widget
+      // or by globally disabling the AA_SynthesizeMouseForUnhandledTouchEvents attribute for the whole application.
+      // Yet, here we are as a last resort, acknowleding touch events just to reject them.
+      return false;
+
+    case QEvent::TouchCancel:
+      return true;
+
     case QEvent::MouseMove:
     {
       auto me = static_cast<QMouseEvent *>(e);
@@ -248,7 +259,7 @@ bool QmitkRenderWindow::event(QEvent* e)
   return QVTKOpenGLNativeWidget::event(e);
 }
 
-void QmitkRenderWindow::enterEvent(QEvent *e)
+void QmitkRenderWindow::enterEvent(QEnterEvent *e)
 {
   auto* baseRenderer = mitk::BaseRenderer::GetInstance(this->GetVtkRenderWindow());
   this->ShowOverlayMessage(!baseRenderer->GetReferenceGeometryAligned());
@@ -290,7 +301,8 @@ void QmitkRenderWindow::dropEvent(QDropEvent *event)
   QList<mitk::DataNode *> dataNodeList = QmitkMimeTypes::ToDataNodePtrList(event->mimeData());
   if (!dataNodeList.empty())
   {
-    emit NodesDropped(this, dataNodeList.toVector().toStdVector());
+    std::vector dataNodes(dataNodeList.begin(), dataNodeList.end());
+    emit NodesDropped(this, dataNodes);
   }
 }
 
@@ -308,9 +320,10 @@ mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent *me) const
 {
   mitk::Point2D point;
   const auto scale = this->devicePixelRatioF();
-  point[0] = me->x()*scale;
+  const auto position = me->position();
+  point[0] = position.x()*scale;
   // We need to convert the y component, as the display and vtk have other definitions for the y direction
-  point[1] = m_Renderer->GetSizeY() - me->y()*scale;
+  point[1] = m_Renderer->GetSizeY() - position.y()*scale;
   return point;
 }
 
@@ -318,9 +331,10 @@ mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent *we) const
 {
   mitk::Point2D point;
   const auto scale = this->devicePixelRatioF();
-  point[0] = we->x()*scale;
+  const auto position = we->position();
+  point[0] = position.x()*scale;
   // We need to convert the y component, as the display and vtk have other definitions for the y direction
-  point[1] = m_Renderer->GetSizeY() - we->y()*scale;
+  point[1] = m_Renderer->GetSizeY() - position.y()*scale;
   return point;
 }
 
@@ -335,7 +349,7 @@ mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetEventButton(QMouseEve
   case Qt::RightButton:
     eventButton = mitk::InteractionEvent::RightMouseButton;
     break;
-  case Qt::MidButton:
+  case Qt::MiddleButton:
     eventButton = mitk::InteractionEvent::MiddleMouseButton;
     break;
   default:
@@ -357,7 +371,7 @@ mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetButtonState(QMouseEve
   {
     buttonState = buttonState | mitk::InteractionEvent::RightMouseButton;
   }
-  if (me->buttons() & Qt::MidButton)
+  if (me->buttons() & Qt::MiddleButton)
   {
     buttonState = buttonState | mitk::InteractionEvent::MiddleMouseButton;
   }
@@ -395,7 +409,7 @@ mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetButtonState(QWheelEve
   {
     buttonState = buttonState | mitk::InteractionEvent::RightMouseButton;
   }
-  if (we->buttons() & Qt::MidButton)
+  if (we->buttons() & Qt::MiddleButton)
   {
     buttonState = buttonState | mitk::InteractionEvent::MiddleMouseButton;
   }
@@ -502,7 +516,7 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
 
 int QmitkRenderWindow::GetDelta(QWheelEvent *we) const
 {
-  return we->delta();
+  return we->angleDelta().y();
 }
 
 void QmitkRenderWindow::UpdateStatusBar(mitk::Point2D pointerPositionOnScreen)

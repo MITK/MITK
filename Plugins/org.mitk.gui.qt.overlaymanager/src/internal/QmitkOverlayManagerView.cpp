@@ -420,7 +420,7 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
     m_Controls.newButton->setEnabled(true);
   }
 
-  if (!m_ProxyModel->filterRegExp().isEmpty())
+  if (!m_ProxyModel->filterRegularExpression().pattern().isEmpty())
     m_Controls.m_PropertyTree->expandAll();
 }
 

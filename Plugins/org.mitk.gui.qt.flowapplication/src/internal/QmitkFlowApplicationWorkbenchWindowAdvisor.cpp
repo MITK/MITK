@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <QStatusBar>
 #include <QString>
 #include <QFile>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QSettings>
 
@@ -51,6 +51,7 @@ found in the LICENSE file.
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
+#include <QmitkApplicationConstants.h>
 #include "QmitkExtFileSaveProjectAction.h"
 
 #include <itkConfigure.h>
@@ -598,8 +599,8 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   if (showViewToolbar)
   {
     auto* prefService = mitk::CoreServices::GetPreferencesService();
-    auto* stylePrefs = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
-    bool showCategoryNames = stylePrefs->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true);
+    auto* toolBarsPrefs = prefService->GetSystemPreferences()->Node(QmitkApplicationConstants::TOOL_BARS_PREFERENCES);
+    bool showCategories = toolBarsPrefs->GetBool(QmitkApplicationConstants::TOOL_BARS_SHOW_CATEGORIES, true);
 
     // Order view descriptors by category
 
@@ -634,16 +635,21 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
       if (!relevantViewDescriptors.isEmpty())
       {
         auto toolbar = new QToolBar;
-        toolbar->setObjectName(category + " View Toolbar");
+        toolbar->setObjectName(category);
         mainWindow->addToolBar(toolbar);
 
-        if (showCategoryNames && !category.isEmpty())
+        toolbar->setVisible(toolBarsPrefs->GetBool(category.toStdString(), true));
+
+        if (!category.isEmpty())
         {
           auto categoryButton = new QToolButton;
           categoryButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
           categoryButton->setText(category);
           categoryButton->setStyleSheet("background: transparent; margin: 0; padding: 0;");
-          toolbar->addWidget(categoryButton);
+
+          auto action = toolbar->addWidget(categoryButton);
+          action->setObjectName("category");
+          action->setVisible(showCategories);
 
           connect(categoryButton, &QToolButton::clicked, [toolbar]()
           {
@@ -933,8 +939,13 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowClose()
   berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow = static_cast<QMainWindow*> (window->GetShell()->GetControl());
 
-  QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
-  settings.setValue("ToolbarPosition", mainWindow->saveState());
+  auto fileName = this->GetQSettingsFile();
+
+  if (!fileName.isEmpty())
+  {
+    QSettings settings(fileName, QSettings::IniFormat);
+    settings.setValue("ToolbarPosition", mainWindow->saveState());
+  }
 }
 
 QString QmitkFlowApplicationWorkbenchWindowAdvisor::GetQSettingsFile() const
@@ -1067,8 +1078,8 @@ void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onIntro()
     berry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro();
   if (!hasIntro)
   {
-    QRegExp reg("(.*)<title>(\\n)*");
-    QRegExp reg2("(\\n)*</title>(.*)");
+    QRegularExpression reg("(.*)<title>(\\n)*");
+    QRegularExpression reg2("(\\n)*</title>(.*)");
     QFile file(":/org.mitk.gui.qt.ext/index.html");
     file.open(QIODevice::ReadOnly | QIODevice::Text); //text file only for reading
 
@@ -1148,6 +1159,6 @@ void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onHelpOpenHelpPerspective()
 
 void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onAbout()
 {
-  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), nullptr);
+  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow());
   aboutDialog->open();
 }

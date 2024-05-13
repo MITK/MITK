@@ -21,16 +21,12 @@ found in the LICENSE file.
 #include <berryIWorkbenchPage.h>
 
 #include <QCoreApplication>
-#include <QTimer>
 #include <QStringBuilder>
 #include <QTemporaryFile>
 #include <QDesktopServices>
 #include <QWheelEvent>
 
 #include <QWebEngineSettings>
-#include <QWebEngineUrlSchemeHandler>
-#include <QWebEngineUrlRequestJob>
-#include <QWebEngineProfile>
 
 namespace berry {
 
@@ -70,138 +66,6 @@ struct ExtensionMap {
     { "about:blank", nullptr },
     { nullptr, nullptr }
 };
-
-class HelpDeviceReply final : public QIODevice
-{
-public:
-  HelpDeviceReply(const QUrl& request, const QByteArray& fileData);
-  ~HelpDeviceReply() override;
-
-  qint64 bytesAvailable() const override;
-  void close() override;
-
-private:
-  qint64 readData(char* data, qint64 maxlen) override;
-  qint64 writeData(const char* data, qint64 maxlen) override;
-
-  QByteArray m_Data;
-  const qint64 m_OrigLen;
-};
-
-HelpDeviceReply::HelpDeviceReply(const QUrl&, const QByteArray& fileData)
-  : m_Data(fileData),
-    m_OrigLen(fileData.length())
-{
-  this->setOpenMode(QIODevice::ReadOnly);
-
-  QTimer::singleShot(0, this, &QIODevice::readyRead);
-  QTimer::singleShot(0, this, &QIODevice::readChannelFinished);
-}
-
-HelpDeviceReply::~HelpDeviceReply()
-{
-}
-
-qint64 HelpDeviceReply::bytesAvailable() const
-{
-  return m_Data.length() + QIODevice::bytesAvailable();
-}
-
-void HelpDeviceReply::close()
-{
-  QIODevice::close();
-  this->deleteLater();
-}
-
-qint64 HelpDeviceReply::readData(char* data, qint64 maxlen)
-{
-  qint64 len = qMin(qint64(m_Data.length()), maxlen);
-
-  if (len)
-  {
-    memcpy(data, m_Data.constData(), len);
-    m_Data.remove(0, len);
-  }
-
-  return len;
-}
-
-qint64 HelpDeviceReply::writeData(const char*, qint64)
-{
-  return 0;
-}
-
-
-class HelpUrlSchemeHandler final : public QWebEngineUrlSchemeHandler
-{
-public:
-  explicit HelpUrlSchemeHandler(QObject* parent = nullptr);
-  ~HelpUrlSchemeHandler() override;
-
-  void requestStarted(QWebEngineUrlRequestJob* job) override;
-};
-
-HelpUrlSchemeHandler::HelpUrlSchemeHandler(QObject* parent)
-  : QWebEngineUrlSchemeHandler(parent)
-{
-}
-
-HelpUrlSchemeHandler::~HelpUrlSchemeHandler()
-{
-}
-
-enum class ResolveUrlResult
-{
-  Error,
-  Redirect,
-  Data
-};
-
-ResolveUrlResult ResolveUrl(const QUrl& url, QUrl& redirectedUrl, QByteArray& data)
-{
-  auto& helpEngine = HelpPluginActivator::getInstance()->getQHelpEngine();
-
-  const auto targetUrl = helpEngine.findFile(url);
-
-  if (!targetUrl.isValid())
-    return ResolveUrlResult::Error;
-
-  if (targetUrl != url)
-  {
-    redirectedUrl = targetUrl;
-    return ResolveUrlResult::Redirect;
-  }
-
-  data = helpEngine.fileData(targetUrl);
-  return ResolveUrlResult::Data;
-}
-
-
-void HelpUrlSchemeHandler::requestStarted(QWebEngineUrlRequestJob* job)
-{
-  QUrl url = job->requestUrl();
-  QUrl redirectedUrl;
-  QByteArray data;
-
-  switch (ResolveUrl(url, redirectedUrl, data))
-  {
-  case ResolveUrlResult::Data:
-    job->reply(
-      HelpWebView::mimeFromUrl(url).toLatin1(),
-      new HelpDeviceReply(url, data));
-    break;
-
-  case ResolveUrlResult::Redirect:
-    job->redirect(redirectedUrl);
-    break;
-
-  case ResolveUrlResult::Error:
-    job->reply(
-      QByteArrayLiteral("text/html"),
-      new HelpDeviceReply(url, HelpWebView::m_PageNotFoundMessage.arg(url.toString()).toUtf8()));
-    break;
-  }
-}
 
 const QString HelpWebView::m_PageNotFoundMessage =
     QCoreApplication::translate("org.blueberry.ui.qt.help", "<title>Context Help</title><div "
@@ -245,11 +109,8 @@ bool HelpPage::acceptNavigationRequest(const QUrl& url, NavigationType, bool)
 HelpWebView::HelpWebView(IEditorSite::Pointer, QWidget *parent, qreal zoom)
   : QWebEngineView(parent),
     m_LoadFinished(false),
-    m_HelpEngine(HelpPluginActivator::getInstance()->getQHelpEngine()),
-    m_HelpSchemeHandler(new HelpUrlSchemeHandler(this))
+    m_HelpEngine(HelpPluginActivator::getInstance()->getQHelpEngine())
 {
-  QWebEngineProfile::defaultProfile()->installUrlSchemeHandler("qthelp", m_HelpSchemeHandler);
-
   auto helpPage = new HelpPage(this);
   this->setPage(helpPage);
 
@@ -282,7 +143,7 @@ HelpWebView::~HelpWebView()
 
 QFont HelpWebView::viewerFont() const
 {
-  QWebEngineSettings *webSettings = QWebEngineSettings::globalSettings();
+  QWebEngineSettings* webSettings = settings();
   return QFont(webSettings->fontFamily(QWebEngineSettings::StandardFont),
                webSettings->fontSize(QWebEngineSettings::DefaultFontSize));
 }
@@ -346,7 +207,7 @@ void HelpWebView::wheelEvent(QWheelEvent *e)
   if (e->modifiers()& Qt::ControlModifier)
   {
     e->accept();
-    e->delta() > 0 ? scaleUp() : scaleDown();
+    e->angleDelta().y() > 0 ? scaleUp() : scaleDown();
   }
   else
   {

@@ -117,7 +117,7 @@ void QmitkImageCropperView::OnImageSelectionChanged(QList<mitk::DataNode::Pointe
       QMessageBox::warning(nullptr,
         tr("Invalid image selected"),
         tr("ImageCropper only works with 3 or more dimensions."),
-        QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+        QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
       SetDefaultGUI();
       return;
     }
@@ -237,7 +237,7 @@ void QmitkImageCropperView::OnCreateNewBoundingBox()
     return;
   }
 
-  QString name = QString::fromStdString(imageNode->GetName() + " Bounding Shape");
+  QString name = QString::fromStdString(imageNode->GetName() + " Bounding Box");
 
   auto boundingShape = this->GetDataStorage()->GetNode(mitk::NodePredicateFunction::New([&name](const mitk::DataNode *node)
   {
@@ -259,10 +259,8 @@ void QmitkImageCropperView::OnCreateNewBoundingBox()
   auto boundingBoxNode = mitk::DataNode::New();
   boundingBoxNode->SetData(boundingBox);
   boundingBoxNode->SetProperty("name", mitk::StringProperty::New(name.toStdString()));
-  boundingBoxNode->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
-  boundingBoxNode->SetProperty("opacity", mitk::FloatProperty::New(0.6));
   boundingBoxNode->SetProperty("layer", mitk::IntProperty::New(99));
-  boundingBoxNode->AddProperty("handle size factor", mitk::DoubleProperty::New(1.0 / 40.0));
+  boundingBoxNode->AddProperty("Bounding Shape.Handle Size Factor", mitk::DoubleProperty::New(0.02));
   boundingBoxNode->SetBoolProperty("pickable", true);
 
   if (!this->GetDataStorage()->Exists(boundingBoxNode))
@@ -341,8 +339,8 @@ void QmitkImageCropperView::ProcessImage(bool mask)
   }
   const auto timeStep = imageNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
-  auto image = dynamic_cast<mitk::Image*>(imageNode->GetData());
-  auto boundingBox = dynamic_cast<mitk::GeometryData*>(boundingBoxNode->GetData());
+  const auto image = dynamic_cast<mitk::Image*>(imageNode->GetData());
+  const auto boundingBox = dynamic_cast<mitk::GeometryData*>(boundingBoxNode->GetData());
   if (nullptr != image && nullptr != boundingBox)
   {
     // Check if initial node name is already in box name
@@ -379,7 +377,7 @@ void QmitkImageCropperView::ProcessImage(bool mask)
     cutter->SetCurrentTimeStep(timeStep);
 
     // TODO: Add support for MultiLayer (right now only Mulitlabel support)
-    auto labelsetImageInput = dynamic_cast<mitk::LabelSetImage*>(image);
+    const auto labelsetImageInput = dynamic_cast<mitk::LabelSetImage*>(image);
     if (nullptr != labelsetImageInput)
     {
       cutter->SetInput(labelsetImageInput);
@@ -392,7 +390,7 @@ void QmitkImageCropperView::ProcessImage(bool mask)
       {
         std::string message = std::string("The Cropping filter could not process because of: \n ") + e.GetDescription();
         QMessageBox::warning(nullptr, tr("Cropping not possible!"), tr(message.c_str()),
-          QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+          QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
         return;
       }
 
@@ -401,7 +399,7 @@ void QmitkImageCropperView::ProcessImage(bool mask)
 
       for (unsigned int i = 0; i < labelsetImageInput->GetNumberOfLayers(); i++)
       {
-        labelSetImage->AddLabelSetToLayer(i, labelsetImageInput->GetLabelSet(i));
+        labelSetImage->ReplaceGroupLabels(i, labelsetImageInput->GetConstLabelsByValue(labelsetImageInput->GetLabelValuesByGroup(i)));
       }
 
       croppedImageNode->SetData(labelSetImage);
@@ -440,7 +438,7 @@ void QmitkImageCropperView::ProcessImage(bool mask)
       {
         std::string message = std::string("The Cropping filter could not process because of: \n ") + e.GetDescription();
         QMessageBox::warning(nullptr, tr("Cropping not possible!"), tr(message.c_str()),
-          QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+          QMessageBox::Ok | QMessageBox::NoButton, QMessageBox::NoButton);
         return;
       }
 

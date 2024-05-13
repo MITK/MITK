@@ -98,6 +98,8 @@ namespace berry {
 
   const QString WorkbenchRegistryConstants::ATT_IMAGE_STYLE = "imageStyle"; //$NON-NLS-1$
 
+  const QString WorkbenchRegistryConstants::ATT_INTERNAL = "internal"; //$NON-NLS-1$
+
   const QString WorkbenchRegistryConstants::ATT_IS_EDITABLE = "isEditable"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::ATT_KEY = "key"; //$NON-NLS-1$

@@ -1,4 +1,5 @@
 set(enabled_modules
+  Log
   Core
   CppMicroServices
   DICOM
@@ -50,5 +51,4 @@ org.mitk.gui.qt.imagenavigator
 org.mitk.gui.qt.properties
 org.mitk.gui.qt.segmentation
 org.mitk.gui.qt.stdmultiwidgeteditor
-org.mitk.planarfigure
 )

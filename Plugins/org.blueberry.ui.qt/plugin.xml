@@ -392,7 +392,8 @@
             class="berry::ViewIntroAdapterPart"
             category="org.blueberry.ui"
             name="Welcome"
-            id="org.blueberry.ui.internal.introview"/>
+            id="org.blueberry.ui.internal.introview"
+            internal="true"/>
       <stickyView
             location="RIGHT"
             id="org.blueberry.ui.internal.introview"/>

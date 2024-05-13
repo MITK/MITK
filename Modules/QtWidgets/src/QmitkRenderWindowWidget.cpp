@@ -74,6 +74,17 @@ void QmitkRenderWindowWidget::AddUtilityWidget(QWidget* utilityWidget)
   m_Layout->insertWidget(0, utilityWidget);
 }
 
+QmitkRenderWindowUtilityWidget* QmitkRenderWindowWidget::GetUtilityWidget()
+{
+  auto layoutItem = m_Layout->itemAt(0)->widget();
+  auto utilityWidget = dynamic_cast<QmitkRenderWindowUtilityWidget*>(layoutItem);
+  if (utilityWidget != nullptr)
+  {
+    return utilityWidget;
+  }
+  return nullptr;
+}
+
 void QmitkRenderWindowWidget::SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower)
 {
   vtkRenderer* vtkRenderer = m_RenderWindow->GetRenderer()->GetVtkRenderer();
@@ -180,7 +191,7 @@ void QmitkRenderWindowWidget::DisableCrosshair()
 void QmitkRenderWindowWidget::InitializeGUI()
 {
   m_Layout = new QVBoxLayout(this);
-  m_Layout->setMargin(0);
+  m_Layout->setContentsMargins({});
   setLayout(m_Layout);
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setContentsMargins(0, 0, 0, 0);

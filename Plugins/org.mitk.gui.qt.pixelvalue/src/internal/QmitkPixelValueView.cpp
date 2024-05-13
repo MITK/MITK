@@ -12,7 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkPixelValueView.h"
 
+#include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateNot.h>
 #include <mitkImage.h>
 #include <mitkCompositePixelValueToString.h>
 #include <mitkPixelTypeMultiplex.h>
@@ -77,8 +79,14 @@ void QmitkPixelValueView::Update()
   const auto position = m_SliceNavigationListener.GetCurrentSelectedPosition();
   const auto timePoint = m_SliceNavigationListener.GetCurrentSelectedTimePoint();
   
-  auto isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto nodes = GetDataStorage()->GetSubset(isImageData);
+  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+  auto isSegmentation = mitk::NodePredicateDataType::New("LabelSetImage");
+
+  auto predicate = mitk::NodePredicateAnd::New();
+  predicate->AddPredicate(mitk::NodePredicateNot::New(isSegmentation));
+  predicate->AddPredicate(isImage);
+
+  auto nodes = GetDataStorage()->GetSubset(predicate);
 
   if (nodes.IsNull())
   {

@@ -106,8 +106,11 @@ void QmitkBooleanOperationsWidget::ConfigureWidgets()
   }
   else
   {
-    auto label = seg->GetLabel(selectedLabelValues.front());
-    m_Controls->line1stLabel->setText(QString::fromStdString(GenerateLabelHTML(label)));
+    mitk::Label::ConstPointer label = seg->GetLabel(selectedLabelValues.front());
+    if (label.IsNotNull())
+      m_Controls->line1stLabel->setText(QString::fromStdString(GenerateLabelHTML(label)));
+    else
+      m_Controls->line1stLabel->setText(QString("Unknown label ID ")+QString::number(selectedLabelValues.front()));
   }
 
   if (selectedLabelValues.size() < 2)
@@ -117,11 +120,14 @@ void QmitkBooleanOperationsWidget::ConfigureWidgets()
   else
   {
     std::stringstream stream;
-    for (auto iter = selectedLabelValues.cbegin() + 1; iter != selectedLabelValues.cend(); ++iter)
+    for (const auto& labelValue : selectedLabelValues)
     {
-      auto label = seg->GetLabel(*iter);
+      mitk::Label::ConstPointer label = seg->GetLabel(labelValue);
       if (stream.rdbuf()->in_avail() != 0) stream << "; ";
-      stream << GenerateLabelHTML(label);
+      if (label.IsNotNull())
+        stream << GenerateLabelHTML(label);
+      else
+        stream << "Unknown label ID " << labelValue;
     }
 
     m_Controls->lineOtherLabels->setText(QString::fromStdString(stream.str()));

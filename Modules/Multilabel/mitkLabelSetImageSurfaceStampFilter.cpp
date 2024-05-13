@@ -59,7 +59,7 @@ void mitk::LabelSetImageSurfaceStampFilter::ItkImageProcessing(itk::Image<TPixel
                                                                mitk::Image::Pointer resultImage)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  mitk::LabelSetImage::Pointer LabelSetInputImage = dynamic_cast<LabelSetImage *>(GetInput());
+  const mitk::LabelSetImage* labelSetInputImage = dynamic_cast<LabelSetImage *>(GetInput());
   try
   {
     typename ImageType::Pointer itkResultImage = ImageType::New();
@@ -74,16 +74,17 @@ void mitk::LabelSetImageSurfaceStampFilter::ItkImageProcessing(itk::Image<TPixel
     TargetIteratorType targetIter(itkImage, itkImage->GetLargestPossibleRegion());
     targetIter.GoToBegin();
 
-    int activeLabel = LabelSetInputImage->GetActiveLabel()->GetValue();
+    int activeLabel = labelSetInputImage->GetActiveLabel()->GetValue();
 
     while (!sourceIter.IsAtEnd())
     {
       auto sourceValue = static_cast<int>(sourceIter.Get());
       auto targetValue = static_cast<int>(targetIter.Get());
+      auto label = labelSetInputImage->GetLabel(targetValue);
 
       if ((sourceValue != LabelSetImage::UNLABELED_VALUE) &&
           (m_ForceOverwrite ||
-           !LabelSetInputImage->GetLabel(targetValue)->GetLocked())) // skip unlabled pixels and locked labels
+           label.IsNull() || !label->GetLocked())) // skip unlabeled source pixels and locked target labels
       {
         targetIter.Set(activeLabel);
       }

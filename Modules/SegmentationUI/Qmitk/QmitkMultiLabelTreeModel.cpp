@@ -904,7 +904,7 @@ void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
 {
   GroupIndexType groupIndex = m_Segmentation->GetGroupIndexOfLabel(labelValue);
   auto label = m_Segmentation->GetLabel(labelValue);
-  if (nullptr == label) mitkThrow() << "Invalid internal state. Segmentation signaled the addition of an label that does not exist in the segmentation. Invalid label value:" << labelValue;
+  if (label.IsNull()) mitkThrow() << "Invalid internal state. Segmentation signaled the addition of a label that does not exist in the segmentation. Invalid label value:" << labelValue;
   if (labelValue == mitk::LabelSetImage::UNLABELED_VALUE) return;
 
   auto groupItem = GetGroupItem(groupIndex, this->m_RootItem.get());

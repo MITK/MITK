@@ -681,8 +681,8 @@ void mitk::LabelSetImage::RenameLabel(LabelValueType pixelValue, const std::stri
 {
   std::shared_lock<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
 
-  mitk::Label* label = GetLabel(pixelValue);
-  if (nullptr == label) mitkThrow() << "Cannot rename label.Unknown label value provided. Unknown label value:" << pixelValue;
+  auto label = GetLabel(pixelValue);
+  if (label.IsNull()) mitkThrow() << "Cannot rename label. Unknown label value provided. Unknown label value:" << pixelValue;
 
   label->SetName(name);
   label->SetColor(color);
@@ -730,15 +730,18 @@ void mitk::LabelSetImage::SetLookupTable(mitk::LookupTable* lut)
 
 void mitk::LabelSetImage::UpdateLookupTable(PixelType pixelValue)
 {
-  const mitk::Color& color = this->GetLabel(pixelValue)->GetColor();
+  auto label = this->GetLabel(pixelValue);
+  if (label.IsNull()) mitkThrow() << "Cannot update lookup table. Unknown label value provided. Unknown label value:" << pixelValue;
+
+  const mitk::Color& color = label->GetColor();
 
   double rgba[4];
   m_LookupTable->GetTableValue(static_cast<int>(pixelValue), rgba);
   rgba[0] = color.GetRed();
   rgba[1] = color.GetGreen();
   rgba[2] = color.GetBlue();
-  if (GetLabel(pixelValue)->GetVisible())
-    rgba[3] = GetLabel(pixelValue)->GetOpacity();
+  if (label->GetVisible())
+    rgba[3] = label->GetOpacity();
   else
     rgba[3] = 0.0;
   m_LookupTable->SetTableValue(static_cast<int>(pixelValue), rgba);
@@ -936,9 +939,13 @@ void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType *itkImage, L
   pos[1] = centroid[1];
   pos[2] = centroid[2];
 
-  this->GetLabel(pixelValue)->SetCenterOfMassIndex(pos);
-  this->GetSlicedGeometry()->IndexToWorld(pos, pos);
-  this->GetLabel(pixelValue)->SetCenterOfMassCoordinates(pos);
+  auto label = this->GetLabel(pixelValue);
+  if (label.IsNotNull())
+  {
+    label->SetCenterOfMassIndex(pos);
+    this->GetSlicedGeometry()->IndexToWorld(pos, pos);
+    label->SetCenterOfMassCoordinates(pos);
+  }
 }
 
 template <typename TPixel, unsigned int VImageDimension>
@@ -1123,7 +1130,7 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::GetGroupIndexOfLabel(La
 }
 
 
-const mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value) const
+mitk::Label::ConstPointer mitk::LabelSetImage::GetLabel(LabelValueType value) const
 {
   auto finding = m_LabelMap.find(value);
   if (m_LabelMap.end() != finding)
@@ -1133,7 +1140,7 @@ const mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value) const
   return nullptr;
 };
 
-mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value)
+mitk::Label::Pointer mitk::LabelSetImage::GetLabel(LabelValueType value)
 {
   auto finding = m_LabelMap.find(value);
   if (m_LabelMap.end() != finding)
@@ -1179,9 +1186,9 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabelsByValue
   LabelVectorType result;
   for (const auto& labelValue : labelValues)
   {
-    auto* label = this->GetLabel(labelValue);
+    Label::Pointer label = this->GetLabel(labelValue);
 
-    if (label != nullptr)
+    if (label.IsNotNull())
     {
       result.emplace_back(label);
     }
@@ -1195,9 +1202,9 @@ const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetConstLab
   ConstLabelVectorType result;
   for (const auto& labelValue : labelValues)
   {
-    const auto* label = this->GetLabel(labelValue);
+    Label::ConstPointer label = this->GetLabel(labelValue);
 
-    if (label != nullptr)
+    if (label.IsNotNull())
     {
       result.emplace_back(label);
     }

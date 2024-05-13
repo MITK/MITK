@@ -995,7 +995,7 @@ QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
     for (auto value : relevantLabelValues)
     {
       auto label = this->m_Segmentation->GetLabel(value);
-      if (nullptr == label)
+      if (label.IsNull())
         mitkThrow() << "Invalid state. Internal model returned a label value that does not exist in segmentation. Invalid value:" << value;
       relevantLabels.emplace_back(label);
     }
@@ -1087,6 +1087,13 @@ void QmitkMultiLabelInspector::OnDeleteAffectedLabel()
 
   auto affectedLabels = GetCurrentlyAffactedLabelInstances();
   auto currentLabel = m_Segmentation->GetLabel(affectedLabels.front());
+
+  if (currentLabel.IsNull())
+  {
+    MITK_WARN << "Ignore operation. Try to delete non-existing label. Invalid ID: " << affectedLabels.front();
+    return;
+  }
+
   QString question = "Do you really want to delete all instances of label \"" + QString::fromStdString(currentLabel->GetName()) + "\"?";
 
   QMessageBox::StandardButton answerButton =
@@ -1268,7 +1275,7 @@ void QmitkMultiLabelInspector::SetLockOfAffectedLabels(bool locked) const
     for (auto value : relevantLabelValues)
     {
       auto label = this->m_Segmentation->GetLabel(value);
-      if (nullptr == label)
+      if (label.IsNull())
         mitkThrow() << "Invalid state. Internal model returned a label value that does not exist in segmentation. Invalid value:" << value;
       label->SetLocked(locked);
     }
@@ -1295,7 +1302,7 @@ void QmitkMultiLabelInspector::SetVisibilityOfAffectedLabels(bool visible) const
     for (auto value : relevantLabelValues)
     {
       auto label = this->m_Segmentation->GetLabel(value);
-      if (nullptr == label)
+      if (label.IsNull())
         mitkThrow() << "Invalid state. Internal model returned a label value that does not exist in segmentation. Invalid value:" << value;
       label->SetVisible(visible);
       m_Segmentation->UpdateLookupTable(label->GetValue());
@@ -1359,9 +1366,13 @@ void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) 
 {
   this->WaitCursorOn();
   m_Segmentation->UpdateCenterOfMass(labelID);
-  const auto currentLabel = m_Segmentation->GetLabel(labelID);
-  const mitk::Point3D& pos = currentLabel->GetCenterOfMassCoordinates();
   this->WaitCursorOff();
+
+  const auto currentLabel = m_Segmentation->GetLabel(labelID);
+  if (currentLabel.IsNull())
+    return;
+
+  const mitk::Point3D& pos = currentLabel->GetCenterOfMassCoordinates();
 
   if (pos.GetVnlVector().max_value() > 0.0)
   {

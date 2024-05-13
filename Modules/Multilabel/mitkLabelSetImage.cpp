@@ -682,7 +682,7 @@ void mitk::LabelSetImage::RenameLabel(LabelValueType pixelValue, const std::stri
   std::shared_lock<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
 
   auto label = GetLabel(pixelValue);
-  if (label.IsNull()) mitkThrow() << "Cannot rename label.Unknown label value provided. Unknown label value:" << pixelValue;
+  if (label.IsNull()) mitkThrow() << "Cannot rename label. Unknown label value provided. Unknown label value:" << pixelValue;
 
   label->SetName(name);
   label->SetColor(color);
@@ -731,7 +731,7 @@ void mitk::LabelSetImage::SetLookupTable(mitk::LookupTable* lut)
 void mitk::LabelSetImage::UpdateLookupTable(PixelType pixelValue)
 {
   auto label = this->GetLabel(pixelValue);
-  if (label.IsNull()) mitkThrow() << "Cannot update lookup table.Unknown label value provided. Unknown label value:" << pixelValue;
+  if (label.IsNull()) mitkThrow() << "Cannot update lookup table. Unknown label value provided. Unknown label value:" << pixelValue;
 
   const mitk::Color& color = label->GetColor();
 

@@ -1090,7 +1090,7 @@ void QmitkMultiLabelInspector::OnDeleteAffectedLabel()
 
   if (currentLabel.IsNull())
   {
-    MITK_WARN << "Ignore operation. Try to delete in-existing label. Invalid ID: " << affectedLabels.front();
+    MITK_WARN << "Ignore operation. Try to delete non-existing label. Invalid ID: " << affectedLabels.front();
     return;
   }
 

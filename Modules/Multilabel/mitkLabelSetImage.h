@@ -207,10 +207,15 @@ namespace mitk
     /**
      * @brief Returns the mitk::Label with the given value.
      * @param value the pixel value of the label
-     * @return the label instance if defined in the segmentation, otherwise nullptr.
+     * @return smart pointer to the label instance if defined in the segmentation, otherwise nullptr.
+     * @remark The label is returned as smart pointer, because the MultiLabelSegmentation instance
+     * gives no guarantee how long the label instance will be a valid label of the segmentation.
+     * If you hold the label instance for a longer time, you must expect that it is not valid anymore
+     * (Either because the label id was removed or the label instance was replaced). It is valid as long
+     * it points to the same label instance like a recent GetLabel() call.
      */
-    const mitk::Label* GetLabel(LabelValueType value) const;
-    mitk::Label* GetLabel(LabelValueType value);
+    mitk::Label::ConstPointer GetLabel(LabelValueType value) const;
+    mitk::Label::Pointer GetLabel(LabelValueType value);
 
     /** Returns a vector with pointers to all labels currently defined in the MultiLabelSegmentation
     instance.*/

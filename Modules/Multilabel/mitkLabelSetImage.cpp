@@ -1123,7 +1123,7 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::GetGroupIndexOfLabel(La
 }
 
 
-const mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value) const
+mitk::Label::ConstPointer mitk::LabelSetImage::GetLabel(LabelValueType value) const
 {
   auto finding = m_LabelMap.find(value);
   if (m_LabelMap.end() != finding)
@@ -1133,7 +1133,7 @@ const mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value) const
   return nullptr;
 };
 
-mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value)
+mitk::Label::Pointer mitk::LabelSetImage::GetLabel(LabelValueType value)
 {
   auto finding = m_LabelMap.find(value);
   if (m_LabelMap.end() != finding)

@@ -150,7 +150,7 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.btnFullPlot, SIGNAL(clicked(bool)), this, SLOT(OnFullPlotClicked(bool)));
 
   this->EnsureBookmarkPointSet();
-  m_Controls.inspectionPositionWidget->SetPositionBookmarkNode(m_PositionBookmarksNode.Lock());
+  m_Controls.inspectionPositionWidget->SetPositionBookmarkNode(m_PositionBookmarksNode);
 
 
 
@@ -507,7 +507,9 @@ void ModelFitInspectorView::OnSliceChanged()
 
 void ModelFitInspectorView::OnPositionBookmarksChanged()
 {
-    m_Controls.inspectionPositionWidget->GetPositionBookmarks()->Modified();
+    m_PositionBookmarks = dynamic_cast<mitk::PointSet*>(m_PositionBookmarksNode->GetData());
+    m_PositionBookmarks->Modified();
+
     if (RefreshPlotData())
     {
       RenderPlot();
@@ -624,7 +626,8 @@ bool ModelFitInspectorView::RefreshPlotData()
       changed = true;
     }
 
-    auto bookmarks = m_Controls.inspectionPositionWidget->GetPositionBookmarks();
+    auto bookmarks = m_PositionBookmarks;
+
       if (m_currentFitTime > m_lastRefreshTime || bookmarks->GetMTime() > m_lastRefreshTime)
       {
         m_PlotCurves.positionalPlots.clear();
@@ -703,7 +706,7 @@ void ModelFitInspectorView::RenderFitInfo()
         m_Controls.fitParametersWidget->setVisible(true);
     m_Controls.fitParametersWidget->setFits({ m_currentFit });
 
-    m_Controls.fitParametersWidget->setPositionBookmarks(m_Controls.inspectionPositionWidget->GetPositionBookmarks());
+    m_Controls.fitParametersWidget->setPositionBookmarks(m_PositionBookmarks);
     m_Controls.fitParametersWidget->setCurrentPosition(m_currentSelectedPosition);
     }
 
@@ -893,7 +896,7 @@ void ModelFitInspectorView::RenderPlot()
 
 void ModelFitInspectorView::EnsureBookmarkPointSet()
 {
-  if (m_PositionBookmarks.IsExpired() || m_PositionBookmarksNode.IsExpired())
+  if (m_PositionBookmarks.IsNull()|| m_PositionBookmarksNode.IsNull())
   {
     const char* nodeName = "org.mitk.gui.qt.fit.inspector.positions";
     mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode(nodeName);

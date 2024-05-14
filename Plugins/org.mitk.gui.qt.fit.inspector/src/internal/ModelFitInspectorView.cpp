@@ -91,6 +91,7 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
   m_Controls.inputNodeSelector->SetPopUpTitel(QString("Choose 3D+t input data that should be viewed!"));
   m_Controls.inputNodeSelector->SetSelectionIsOptional(false);
   m_Controls.inputNodeSelector->SetSelectOnlyVisibleNodes(true);
+  m_Controls.groupSettings->setVisible(false);
 
   auto predicate = mitk::NodePredicateFunction::New([](const mitk::DataNode *node) {
     bool isModelFitNode = node->GetData() && node->GetData()->GetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str()).IsNotNull();
@@ -149,7 +150,10 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.btnFullPlot, SIGNAL(clicked(bool)), this, SLOT(OnFullPlotClicked(bool)));
 
   this->EnsureBookmarkPointSet();
-  m_Controls.inspectionPositionWidget->SetPositionBookmarkNode(m_PositionBookmarksNode.Lock());
+  m_Controls.inspectionPositionWidget->SetPositionBookmarkNode(m_PositionBookmarksNode);
+
+
+
 
   connect(m_Controls.inspectionPositionWidget, SIGNAL(PositionBookmarksChanged()), this, SLOT(OnPositionBookmarksChanged()));
 
@@ -503,6 +507,9 @@ void ModelFitInspectorView::OnSliceChanged()
 
 void ModelFitInspectorView::OnPositionBookmarksChanged()
 {
+    m_PositionBookmarks = dynamic_cast<mitk::PointSet*>(m_PositionBookmarksNode->GetData());
+    m_PositionBookmarks->Modified();
+
     if (RefreshPlotData())
     {
       RenderPlot();
@@ -609,7 +616,7 @@ bool ModelFitInspectorView::RefreshPlotData()
     {
       if (m_validSelectedPosition)
       {
-        m_PlotCurves.currentPositionPlots = RefreshPlotDataCurveCollection(m_currentSelectedPosition,input,m_currentFit, timeGrid, m_currentModelParameterizer);
+        m_PlotCurves.currentPositionPlots = RefreshPlotDataCurveCollection(m_currentSelectedPosition, input, m_currentFit, timeGrid, m_currentModelParameterizer);
       }
       else
       {
@@ -619,27 +626,26 @@ bool ModelFitInspectorView::RefreshPlotData()
       changed = true;
     }
 
-    auto bookmarks = m_PositionBookmarks.Lock();
-    if (bookmarks.IsNotNull())
-    {
+    auto bookmarks = m_PositionBookmarks;
+
       if (m_currentFitTime > m_lastRefreshTime || bookmarks->GetMTime() > m_lastRefreshTime)
       {
         m_PlotCurves.positionalPlots.clear();
-
-        auto endIter = bookmarks->End();
-        for (auto iter = bookmarks->Begin(); iter != endIter; iter++)
+        if (!bookmarks->IsEmpty())
         {
-          auto collection = RefreshPlotDataCurveCollection(iter.Value(), input, m_currentFit, timeGrid, m_currentModelParameterizer);
-          m_PlotCurves.positionalPlots.emplace(iter.Index(), std::make_pair(iter.Value(), collection));
+          auto endIter = bookmarks->End();
+          for (auto iter = bookmarks->Begin(); iter != endIter; iter++)
+          {
+            auto collection = RefreshPlotDataCurveCollection(iter.Value(), input, m_currentFit, timeGrid, m_currentModelParameterizer);
+            m_PlotCurves.positionalPlots.emplace(iter.Index(), std::make_pair(iter.Value(), collection));
+          }
         }
-
+        else
+        {
+          m_PlotCurves.positionalPlots.clear();
+        }
         changed = true;
       }
-    }
-    else
-    {
-      m_PlotCurves.positionalPlots.clear();
-    }
 
     // input data curve
     if (m_currentFitTime > m_lastRefreshTime)
@@ -656,9 +662,9 @@ bool ModelFitInspectorView::RefreshPlotData()
 
     m_lastRefreshTime.Modified();
   }
-
   return changed;
 }
+
 
 void ModelFitInspectorView::RenderFitInfo()
 {
@@ -685,7 +691,6 @@ void ModelFitInspectorView::RenderFitInfo()
     std::stringstream infoOutput;
 
   m_Controls.fitParametersWidget->setVisible(false);
-    m_Controls.groupSettings->setVisible(false);
 
     if (m_currentFit.IsNull())
     {
@@ -701,20 +706,16 @@ void ModelFitInspectorView::RenderFitInfo()
         m_Controls.fitParametersWidget->setVisible(true);
     m_Controls.fitParametersWidget->setFits({ m_currentFit });
 
-    m_Controls.fitParametersWidget->setPositionBookmarks(m_PositionBookmarks.Lock());
+    m_Controls.fitParametersWidget->setPositionBookmarks(m_PositionBookmarks);
     m_Controls.fitParametersWidget->setCurrentPosition(m_currentSelectedPosition);
     }
 
     // configure data table
     m_Controls.tableInputData->clearContents();
 
-    if (m_currentFit.IsNull())
+    if (m_currentFit.IsNotNull())
     {
-        infoOutput << "No fit selected. Only raw image data is plotted.";
-    }
-    else
-    {
-        m_Controls.groupSettings->setVisible(true);
+        m_Controls.groupSettings->setVisible(false);
         m_Controls.tableInputData->setRowCount(m_PlotCurves.staticPlots->size());
 
         unsigned int rowIndex = 0;
@@ -732,13 +733,16 @@ void ModelFitInspectorView::RenderFitInfo()
             {
                 //Use HSV schema of QColor to calculate a different color depending on the
                 //number of already existing free iso lines.
-                dataColor.setHsv(((rowIndex + 1) * 85) % 360, 255, 255);
+                dataColor.setHsv(((rowIndex + 1) * 85) % 360, 255, 150);
             }
 
             QTableWidgetItem* newItem = new QTableWidgetItem(QString::fromStdString(pos->first));
             m_Controls.tableInputData->setItem(rowIndex, 0, newItem);
             newItem = new QTableWidgetItem();
             newItem->setBackground(dataColor);
+
+
+
             m_Controls.tableInputData->setItem(rowIndex, 1, newItem);
         }
     }
@@ -892,7 +896,7 @@ void ModelFitInspectorView::RenderPlot()
 
 void ModelFitInspectorView::EnsureBookmarkPointSet()
 {
-  if (m_PositionBookmarks.IsExpired() || m_PositionBookmarksNode.IsExpired())
+  if (m_PositionBookmarks.IsNull()|| m_PositionBookmarksNode.IsNull())
   {
     const char* nodeName = "org.mitk.gui.qt.fit.inspector.positions";
     mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode(nodeName);
@@ -914,5 +918,8 @@ void ModelFitInspectorView::EnsureBookmarkPointSet()
     }
 
     m_PositionBookmarks = pointSet;
+
+
   }
+
 }

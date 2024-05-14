@@ -160,6 +160,12 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
     this->WriteErrorMessage("<b>ERROR: </b>Couldn't find compatible Python.");
     return;
   }
+  if (!QmitkSetupVirtualEnvUtil::IsVenvInstalled(path))
+  {
+    this->WriteErrorMessage("venv module not found in the selected python to create a new virtual " 
+                            "environment. Please select another compatibile python");
+    return;
+  }
   // check if python 3.13 and ask for confirmation
   if (version.startsWith("3.13") &&
       QMessageBox::No == QMessageBox::question(
@@ -450,6 +456,10 @@ void QmitkTotalSegmentatorToolGUI::OnClearInstall()
 bool QmitkTotalSegmentatorToolInstaller::SetupVirtualEnv(const QString& venvName)
 {
   if (GetSystemPythonPath().isEmpty())
+  {
+    return false;
+  }
+  if (!QmitkSetupVirtualEnvUtil::IsVenvInstalled(GetSystemPythonPath()))
   {
     return false;
   }

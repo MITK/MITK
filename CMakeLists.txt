@@ -233,7 +233,7 @@ foreach(MITK_EXTENSION_DIR ${MITK_ABSOLUTE_EXTENSION_DIRS})
   list(REMOVE_DUPLICATES _buildConfigs)
 endforeach()
 
-set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
+set(MITK_BUILD_CONFIGURATION "WorkbenchRelease" CACHE STRING "Use pre-defined MITK configurations")
 set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
 
 mitkFunctionEnableBuildConfiguration()

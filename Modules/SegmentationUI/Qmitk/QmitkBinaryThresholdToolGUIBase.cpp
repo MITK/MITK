@@ -15,10 +15,13 @@ found in the LICENSE file.
 #include "mitkBinaryThresholdBaseTool.h"
 #include "mitkBinaryThresholdTool.h"
 
+#include <ctkDoubleSpinBox.h>
+
 #include <qlabel.h>
 #include <qlayout.h>
 #include <qslider.h>
 #include <QApplication>
+#include <QSpinBox>
 
 QmitkBinaryThresholdToolGUIBase::QmitkBinaryThresholdToolGUIBase(bool ulMode) : QmitkSegWithPreviewToolGUIBase(false), m_ULMode(ulMode)
 {
@@ -156,6 +159,8 @@ void QmitkBinaryThresholdToolGUIBase::InitializeUI(QBoxLayout* mainLayout)
       m_ThresholdRange, SIGNAL(valuesChanged(double, double)), this, SLOT(OnThresholdRangeChanged(double, double)));
     layout->addWidget(m_ThresholdRange);
     m_ThresholdRange->setSingleStep(0.01);
+    m_ThresholdRange->minimumSpinBox()->spinBox()->setKeyboardTracking(false);
+    m_ThresholdRange->maximumSpinBox()->spinBox()->setKeyboardTracking(false);
   }
   else
   {
@@ -164,6 +169,7 @@ void QmitkBinaryThresholdToolGUIBase::InitializeUI(QBoxLayout* mainLayout)
       m_ThresholdSlider, SIGNAL(valueChanged(double)), this, SLOT(OnThresholdSliderChanged(double)));
     layout->addWidget(m_ThresholdSlider);
     m_ThresholdSlider->setSingleStep(0.01);
+    m_ThresholdSlider->spinBox()->spinBox()->setKeyboardTracking(false);
   }
 
   mainLayout->addLayout(layout);

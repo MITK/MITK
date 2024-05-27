@@ -95,7 +95,7 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
         #[[ Assume Visual Studio 2019. ]]
         set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}2)
 
-      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 40)
+      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 50)
 
         #[[ Assume Visual Studio 2022. ]]
         set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}3)

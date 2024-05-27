@@ -142,14 +142,14 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
     this->DisplayWidgets(true);
   }
   auto selectedModel = m_Controls.modelBox->currentText().toStdString();
-  for (const auto &modelObject : tool->m_InfoParameters->models)
+  for (const auto &modelObject : tool->GetInfoParameters()->models)
   {
     if (modelObject.name == selectedModel)
     {
       auto requestObject = std::make_unique<mitk::MonaiLabelRequest>();
       requestObject->model = modelObject;
-      requestObject->hostName = tool->m_InfoParameters->hostName;
-      requestObject->port = tool->m_InfoParameters->port;
+      requestObject->hostName = tool->GetInfoParameters()->hostName;
+      requestObject->port = tool->GetInfoParameters()->port;
       if (modelObject.IsInteractive()) // set only if interactive model
       {
         tool->m_RequestParameters = std::move(requestObject);
@@ -182,7 +182,6 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
   {
     return;
   }
-  tool->m_InfoParameters.reset();
   QString urlString = m_Controls.urlBox->text();
   QUrl url(urlString);
   if (url.isValid() && !url.isLocalFile() && !url.hasFragment() && !url.hasQuery()) // sanity check
@@ -191,7 +190,7 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
     int port = url.port();
     try
     {
-      tool->GetOverallInfo(hostName, port);
+      tool->FetchOverallInfo(hostName, port);
       bool allowAllModels = m_Preferences->GetBool("monailabel allow all models", false);
       this->PopulateUI(allowAllModels);
     }
@@ -220,14 +219,14 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   }
   tool->ClearPicks(); // clear any interactive segmentation from before
   auto selectedModel = m_Controls.modelBox->currentText().toStdString();
-  for (const auto &modelObject : tool->m_InfoParameters->models)
+  for (const auto &modelObject : tool->GetInfoParameters()->models)
   {
     if (modelObject.name == selectedModel)
     {
       auto requestObject = std::make_unique<mitk::MonaiLabelRequest>();
       requestObject->model = modelObject;
-      requestObject->hostName = tool->m_InfoParameters->hostName;
-      requestObject->port = tool->m_InfoParameters->port;
+      requestObject->hostName = tool->GetInfoParameters()->hostName;
+      requestObject->port = tool->GetInfoParameters()->port;
       tool->m_RequestParameters = std::move(requestObject);
       break;
     }
@@ -264,9 +263,9 @@ void QmitkMonaiLabelToolGUI::PopulateUI(bool allowAllModels)
   }
   m_Controls.appBox->clear();
   m_Controls.labelListLabel->clear();
-  if (nullptr != tool->m_InfoParameters)
+  if (nullptr != tool->GetInfoParameters())
   {
-    QString appName = QString::fromStdString(tool->m_InfoParameters->name);
+    QString appName = QString::fromStdString(tool->GetInfoParameters()->name);
     auto autoModels = tool->GetAutoSegmentationModels(m_Dimension);
     auto interactiveModels = tool->GetInteractiveSegmentationModels(m_Dimension);
     autoModels.insert(autoModels.end(), interactiveModels.begin(), interactiveModels.end());
@@ -285,10 +284,9 @@ void QmitkMonaiLabelToolGUI::PopulateModelBox(QString appName, std::vector<mitk:
     QString modelName = QString::fromStdString(model.name);
     if (allowAllModels)
     {
-      if (BLACKLISTED_MODELS.contains(modelName))
+      if (BLACKLISTED_MODELS.contains(modelName) && appName.contains(BLACKLISTED_MODELS[modelName]))
       {
-        if (appName.contains(BLACKLISTED_MODELS[modelName]))
-          continue;
+        continue;
       }
       m_Controls.modelBox->addItem(modelName);
     }

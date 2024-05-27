@@ -51,6 +51,11 @@ namespace mitk
     {
       return ("deepgrow" == type || "deepedit" == type);
     }
+    
+    inline bool Is2D() const 
+    { 
+      return dimension == 2; 
+    }
   };
 
   /**
@@ -106,23 +111,11 @@ namespace mitk
     void UpdatePrepare() override;
 
     /**
-     * @brief Writes image to disk as the tool desires.
-     * Default implementation does nothing.
-     */
-    virtual void WriteImage(const Image*, const std::string&) const;
-
-    /**
      * @brief Method does the GET Rest call to fetch MonaiLabel
      * server metadata including all models' info.
      */
-    void GetOverallInfo(const std::string &hostName, const int &port);
+    void FetchOverallInfo(const std::string &hostName, const int &port);
 
-    /**
-     * @brief Holds all parameters of the server to serve the UI
-     * 
-     */
-    std::unique_ptr<MonaiAppMetadata> m_InfoParameters;
-    
     /**
      * @brief Variable to set selected model's and other data needed
      * for the POST call.
@@ -133,26 +126,20 @@ namespace mitk
      * @brief Get the Auto Segmentation Models info for the given 
      * dimension.
      */
-    std::vector<MonaiModelInfo> GetAutoSegmentationModels(int dim = -1) const;
+    const std::vector<MonaiModelInfo> GetAutoSegmentationModels(const int dim = -1) const;
 
     /**
      * @brief Get the Interactive Segmentation Models info for the given 
      * dimension.
      */
-    std::vector<MonaiModelInfo> GetInteractiveSegmentationModels(int dim = -1) const;
+    const std::vector<MonaiModelInfo> GetInteractiveSegmentationModels(const int dim = -1) const;
 
     /**
      * @brief Get the Scribble Segmentation Models info for the given 
      * dimension. 
      */
-    std::vector<MonaiModelInfo> GetScribbleSegmentationModels(int dim = -1) const;
+    const std::vector<MonaiModelInfo> GetScribbleSegmentationModels(const int dim = -1) const;
 
-    /**
-     * @brief Function to prepare the Rest request and does the POST call.
-     * Writes the POST responses back to disk.
-     */
-    void PostInferRequest(const std::string &hostName, const int &port, const std::string &filePath, const std::string &outFile, 
-                          const mitk::BaseGeometry *baseGeometry);
     /**
      * @brief Helper function to get full model info object from model name. 
      */
@@ -164,6 +151,8 @@ namespace mitk
     itkGetConstMacro(URL, std::string);
     itkSetMacro(TempDir, std::string);
     itkGetConstMacro(TempDir, std::string);
+    const MonaiAppMetadata *GetInfoParameters() const;
+
 
     /**
      * @brief  Clears all picks and updates the preview.
@@ -184,15 +173,21 @@ namespace mitk
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
     void ConnectActionsAndFunctions() override;
 
+    /**
+     * @brief Writes image to disk as the tool desires.
+     * Default implementation does nothing.
+     */
+    virtual void WriteImage(const Image *, const std::string &) const = 0;
+
     /*
      * @brief Add positive seed point action of StateMachine pattern. 
      */
-    virtual void OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
+    virtual void OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /*
      * @brief Add negative seed point action of StateMachine pattern
      */
-    virtual void OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
+    virtual void OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /*
      * @brief Delete action of StateMachine pattern
@@ -208,8 +203,8 @@ namespace mitk
      * @brief Get the Points from given pointset as csv string.
      * 
      */
-    virtual std::stringstream GetPointsAsListString(const mitk::BaseGeometry *baseGeometry,
-                                                    const PointSet::Pointer pointSet) const = 0;
+    virtual std::string ConvertPointsAsListString(const mitk::BaseGeometry *baseGeometry,
+                                                  const PointSet::Pointer pointSet) const;
 
     /**
      * @brief Writes back segmentation results in 3D or 2D shape to preview LabelSetImage.
@@ -223,6 +218,12 @@ namespace mitk
     int m_PointSetCount = 0;
 
   private:
+
+    /**
+     * @brief Holds all parameters of the server to serve the UI
+     *
+     */
+    std::unique_ptr<MonaiAppMetadata> m_InfoParameters;
 
     /**
      * @brief Helper function to create temp directory for writing/reading images
@@ -240,6 +241,13 @@ namespace mitk
      * are captured from the tool manager.
      */
     mitk::Image::Pointer ApplyLevelWindowEffect(const Image *inputAtTimeStep) const;
+
+    /**
+     * @brief Function to prepare the Rest request and does the POST call.
+     * Writes the POST responses back to disk.
+     */
+    void PostInferRequest(const std::string &hostName, const int &port, const std::string &filePath, const std::string &outFile,
+                          const mitk::BaseGeometry *baseGeometry);
     
     std::string m_TempDir;
     std::string m_ModelName;

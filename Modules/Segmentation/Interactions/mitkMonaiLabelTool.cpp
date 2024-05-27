@@ -90,6 +90,56 @@ void mitk::MonaiLabelTool::UpdatePrepare()
   preview->RemoveLabels(preview->GetAllLabelValues());
 }
 
+void mitk::MonaiLabelTool::OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent)
+{
+  if (m_RequestParameters->model.IsInteractive())
+  {
+    if (m_RequestParameters->model.Is2D() && ((nullptr == this->GetWorkingPlaneGeometry()) ||
+        !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
+                     *(this->GetWorkingPlaneGeometry()))))
+    {
+      this->ClearSeeds();
+      this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
+      this->ResetPreviewContent();
+    }
+    if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
+    {
+      const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+      if (positionEvent != nullptr)
+      {
+        m_PointSetPositive->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
+        ++m_PointSetCount;
+        this->UpdatePreview();
+      }
+    }
+  }
+}
+
+void mitk::MonaiLabelTool::OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent)
+{
+  if ("deepgrow" != m_RequestParameters->model.type)
+  {
+    return;
+  }
+  if (m_RequestParameters->model.Is2D() && (m_PointSetPositive->GetSize() == 0 ||
+      nullptr == this->GetWorkingPlaneGeometry() ||
+      !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
+                   *(this->GetWorkingPlaneGeometry()))))
+  {
+    return;
+  }
+  if (!this->IsUpdating() && m_PointSetNegative.IsNotNull())
+  {
+    const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+    if (positionEvent != nullptr)
+    {
+      m_PointSetNegative->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
+      m_PointSetCount++;
+      this->UpdatePreview();
+    }
+  }
+}
+
 void mitk::MonaiLabelTool::OnDelete(StateMachineAction *, InteractionEvent *)
 {
   if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
@@ -365,8 +415,9 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
   }
 }
 
-void mitk::MonaiLabelTool::GetOverallInfo(const std::string &hostName, const int &port)
+void mitk::MonaiLabelTool::FetchOverallInfo(const std::string &hostName, const int &port)
 {
+  m_InfoParameters.reset();
   if (!IsMonaiServerOn(hostName, port))
   {
     Tool::ErrorMessage.Send(m_SERVER_503_ERROR_TEXT);
@@ -419,12 +470,12 @@ void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
   httplib::MultipartFormDataItems items;
   if (m_RequestParameters->model.IsInteractive())
   {
-    std::stringstream foreground = this->GetPointsAsListString(baseGeometry, m_PointSetPositive);
-    std::stringstream background = this->GetPointsAsListString(baseGeometry, m_PointSetNegative);
+    std::string foreground = this->ConvertPointsAsListString(baseGeometry, m_PointSetPositive);
+    std::string background = this->ConvertPointsAsListString(baseGeometry, m_PointSetNegative);
     std::stringstream paramString;
     paramString << "{" 
-                << "\"foreground\":" << foreground.str() 
-                << ",\"background\":" << background.str()
+                << "\"foreground\":" << foreground 
+                << ",\"background\":" << background
                 << "}";
     MITK_DEBUG << paramString.str();
     items.push_back({"params", paramString.str(), "", ""});
@@ -481,7 +532,7 @@ void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
   }
 }
 
-std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetAutoSegmentationModels(int dim) const
+const std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetAutoSegmentationModels(const int dim) const
 {
   std::vector<mitk::MonaiModelInfo> autoModels;
   if (nullptr != m_InfoParameters)
@@ -498,7 +549,7 @@ std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetAutoSegmentationModel
   return autoModels;
 }
 
-std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetInteractiveSegmentationModels(int dim) const
+const std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetInteractiveSegmentationModels(const int dim) const
 {
   std::vector<mitk::MonaiModelInfo> interactiveModels;
   if (nullptr != m_InfoParameters)
@@ -515,7 +566,7 @@ std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetInteractiveSegmentati
   return interactiveModels;
 }
 
-std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetScribbleSegmentationModels(int dim) const
+const std::vector<mitk::MonaiModelInfo> mitk::MonaiLabelTool::GetScribbleSegmentationModels(const int dim) const
 {
   std::vector<mitk::MonaiModelInfo> scribbleModels;
   if (nullptr != m_InfoParameters)
@@ -550,8 +601,6 @@ mitk::MonaiModelInfo mitk::MonaiLabelTool::GetModelInfoFromName(const std::strin
   return retVal;
 }
 
-void mitk::MonaiLabelTool::WriteImage(const Image*, const std::string&) const {}
-
 std::pair<std::string, std::string> mitk::MonaiLabelTool::CreateTempDirs(const std::string &filePattern) const
 {
   std::string inDir, outDir, inputImagePath, outputImagePath;
@@ -565,4 +614,47 @@ std::pair<std::string, std::string> mitk::MonaiLabelTool::CreateTempDirs(const s
   outDir = IOUtil::CreateTemporaryDirectory("monai-out-XXXXXX", this->GetTempDir());
   outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
   return std::make_pair(inputImagePath, outputImagePath);
+}
+
+std::string mitk::MonaiLabelTool::ConvertPointsAsListString(const mitk::BaseGeometry *baseGeometry,
+                                                              const PointSet::Pointer pointSet) const
+{
+  bool is3DMode = nullptr == this->GetWorkingPlaneGeometry();
+  MITK_INFO << "No.of points: " << pointSet->GetSize() << " 3DMode: " << is3DMode;
+  std::stringstream pointsAndLabels;
+  pointsAndLabels << "[";
+  mitk::PointSet::PointsConstIterator pointSetIter = pointSet->Begin();
+  const char COMMA = ',';
+  while (pointSetIter != pointSet->End())
+  {
+    mitk::Point3D point3d = pointSetIter.Value();
+    if (baseGeometry->IsInside(point3d))
+    {
+      mitk::Point3D index3D;
+      baseGeometry->WorldToIndex(point3d, index3D);
+      pointsAndLabels << "[";
+      pointsAndLabels << static_cast<int>(index3D[0]) << COMMA << static_cast<int>(index3D[1]) << COMMA;
+      if (is3DMode)
+      {
+        pointsAndLabels << static_cast<int>(index3D[2]);
+      }
+      else
+      {
+        pointsAndLabels << 0; 
+      }
+      pointsAndLabels << "],";
+    }
+    ++pointSetIter;
+  }
+  if (pointsAndLabels.tellp() > 1)
+  {
+    pointsAndLabels.seekp(-1, pointsAndLabels.end); // remove last added comma character
+  }
+  pointsAndLabels << "]";
+  return pointsAndLabels.str();
+}
+
+const mitk::MonaiAppMetadata *mitk::MonaiLabelTool::GetInfoParameters() const
+{
+  return m_InfoParameters.get();
 }

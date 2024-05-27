@@ -51,55 +51,6 @@ const char *mitk::MonaiLabel2DTool::GetName() const
   return "MONAI Label 2D";
 }
 
-void mitk::MonaiLabel2DTool::OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent)
-{
-  if (m_RequestParameters->model.IsInteractive())
-  {
-    if ((nullptr == this->GetWorkingPlaneGeometry()) ||
-        !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
-                     *(this->GetWorkingPlaneGeometry())))
-    {
-      this->ClearSeeds();
-      this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
-      this->ResetPreviewContent();
-    }
-    if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
-    {
-      const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-      if (positionEvent != nullptr)
-      {
-        m_PointSetPositive->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
-        ++m_PointSetCount;
-        this->UpdatePreview();
-      }
-    }
-  }
-}
-
-void mitk::MonaiLabel2DTool::OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent)
-{
-  if ("deepgrow" != m_RequestParameters->model.type)
-  {
-    return;
-  }
-  if (m_PointSetPositive->GetSize() == 0 || nullptr == this->GetWorkingPlaneGeometry() ||
-      !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
-                   *(this->GetWorkingPlaneGeometry())))
-  {
-    return;
-  }
-  if (!this->IsUpdating() && m_PointSetNegative.IsNotNull())
-  {
-    const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-    if (positionEvent != nullptr)
-    {
-      m_PointSetNegative->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
-      m_PointSetCount++;
-      this->UpdatePreview();
-    }
-  }
-}
-
 void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, const std::string &inputImagePath) const
 {
   auto extendedImage = Image::New();
@@ -111,33 +62,6 @@ void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, const std:
   extendedImage->SetVolume(readAccessor.GetData());
 
   IOUtil::Save(extendedImage.GetPointer(), inputImagePath);
-}
-
-std::stringstream mitk::MonaiLabel2DTool::GetPointsAsListString(const mitk::BaseGeometry *baseGeometry,
-                                                                const PointSet::Pointer pointSet) const
-{
-  std::stringstream pointsAndLabels;
-  pointsAndLabels << "[";
-  auto pointSetIter = pointSet->Begin();
-  const char COMMA = ',';
-  while (pointSetIter != pointSet->End())
-  {
-    auto point3d = pointSetIter.Value();
-    if (baseGeometry->IsInside(point3d))
-    {
-      Point3D index3D;
-      baseGeometry->WorldToIndex(point3d, index3D);
-      pointsAndLabels << "[";
-      pointsAndLabels << static_cast<int>(index3D[0]) << COMMA << static_cast<int>(index3D[1]) << COMMA << 0 << "],";
-    }
-    ++pointSetIter;
-  }
-  if (pointsAndLabels.tellp() > 1)
-  {
-    pointsAndLabels.seekp(-1, pointsAndLabels.end); // remove last added comma character
-  }
-  pointsAndLabels << "]";
-  return pointsAndLabels;
 }
 
 void mitk::MonaiLabel2DTool::WriteBackResults(LabelSetImage *previewImage,

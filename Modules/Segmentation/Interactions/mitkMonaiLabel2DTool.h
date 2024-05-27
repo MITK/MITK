@@ -43,10 +43,6 @@ namespace mitk
 
     void Activated() override;
     void WriteImage(const Image *inputAtTimeStep, const std::string &inputImagePath) const override;
-    std::stringstream GetPointsAsListString(const mitk::BaseGeometry *baseGeometry,
-                                            const PointSet::Pointer pointSet) const override;
-    void OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
-    void OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
     void WriteBackResults(LabelSetImage *previewImage, LabelSetImage *segResults, TimeStepType timeStep) const override;
 
   protected:

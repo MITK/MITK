@@ -133,7 +133,7 @@ void QmitkSetupVirtualEnvUtil::InstallPytorch()
 
 bool QmitkSetupVirtualEnvUtil::IsVenvInstalled(const QString &pythonPath)
 {
-  bool isVenvExist = false;
+  bool isVenvInstalled = false;
   QProcess pyProcess;
 #ifdef _WIN32
   const QString PYTHON_EXE = "python.exe";
@@ -145,9 +145,9 @@ bool QmitkSetupVirtualEnvUtil::IsVenvInstalled(const QString &pythonPath)
   if (pyProcess.waitForFinished())
   {
     auto venvCaptured = QString(QStringDecoder(QStringDecoder::Utf8)(pyProcess.readAllStandardError()));
-    isVenvExist = venvCaptured.startsWith(QString("usage")); // if venv found, shows correct usage instructions
+    isVenvInstalled = venvCaptured.startsWith(QString("usage")); // if venv found, shows correct usage instructions
   }
-  return isVenvExist;
+  return isVenvInstalled;
 }
 
 void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library,

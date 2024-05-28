@@ -241,8 +241,8 @@ void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
   }
   if (!QmitkSetupVirtualEnvUtil::IsVenvInstalled(path))
   {
-    this->WriteErrorMessage("venv module not found in the selected python to create a new virtual " 
-                            "environment. Please select another compatibile python");
+    this->WriteErrorMessage("venv module not found for the selected python to create a new virtual " 
+                            "environment. Please install venv or select another compatibile python");
     return;
   }
   //check if python 3.12 and ask for confirmation

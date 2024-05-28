@@ -177,6 +177,12 @@ public:
   bool IsPythonPath(const QString &pythonPath);
 
   /**
+   * @brief Checks if venv module is available for the python.
+   * 
+   */
+  static bool IsVenvInstalled(const QString &pythonPath);
+
+  /**
    * @brief Function can be used as callback to simply print out all the process execution output
    * parsed out from itk::EventObject.
    * 

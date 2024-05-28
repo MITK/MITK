@@ -239,6 +239,12 @@ void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
     this->WriteErrorMessage("<b>ERROR: </b>Couldn't find compatible Python.");
     return;
   }
+  if (!QmitkSetupVirtualEnvUtil::IsVenvInstalled(path))
+  {
+    this->WriteErrorMessage("venv module not found for the selected python to create a new virtual " 
+                            "environment. Please install venv or select another compatibile python");
+    return;
+  }
   //check if python 3.12 and ask for confirmation
   if (version.startsWith("3.13") &&
        QMessageBox::No == QMessageBox::question(nullptr,
@@ -310,6 +316,10 @@ QString QmitkSAMInstaller::GetVirtualEnvPath()
 bool QmitkSAMInstaller::SetupVirtualEnv(const QString &venvName)
 {
   if (GetSystemPythonPath().isEmpty())
+  {
+    return false;
+  }
+  if (!QmitkSetupVirtualEnvUtil::IsVenvInstalled(GetSystemPythonPath()))
   {
     return false;
   }

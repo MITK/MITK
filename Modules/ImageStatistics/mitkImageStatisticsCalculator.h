@@ -31,7 +31,7 @@ namespace mitk
 
         /** Method for creation through the object factory. */
         itkNewMacro(Self); /** Runtime information support. */
-        itkTypeMacro(ImageStatisticsCalculator_v2, itk::Object);
+        itkTypeMacro(ImageStatisticsCalculator, itk::Object);
 
         typedef double statisticsValueType;
         typedef std::map<std::string, statisticsValueType> statisticsMapType;

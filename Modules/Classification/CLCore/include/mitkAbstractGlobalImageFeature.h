@@ -26,7 +26,7 @@ found in the LICENSE file.
 // STD Includes
 
 // Eigen
-#include <Eigen/Dense>
+#include <itkeigen/Eigen/Dense>
 
 // MITK includes
 #include <mitkConfigurationHolder.h>

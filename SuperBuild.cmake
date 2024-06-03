@@ -365,12 +365,6 @@ if(CMAKE_FRAMEWORK_PATH)
   )
 endif()
 
-if(Eigen_INCLUDE_DIR)
-    list(APPEND mitk_optional_cache_args
-      -DEigen_INCLUDE_DIR:PATH=${Eigen_INCLUDE_DIR}
-    )
-endif()
-
 # Optional pass through of Doxygen
 if(DOXYGEN_EXECUTABLE)
   list(APPEND mitk_optional_cache_args

@@ -23,9 +23,9 @@ if(MITK_USE_${proj})
     endif()
 
     if(OPENSSL_VERSION VERSION_GREATER_EQUAL 3)
-      set(GIT_TAG 5c00bbf36ba8ff47b4fb97712fc38cb2884e5b98) # v0.15.3
+      set(GIT_TAG 5c00bbf36ba8ff47b4fb97712fc38cb2884e5b98) # v0.15.3 cpp-httplib
     else()
-      set(GIT_TAG cbca63f091ef1147ff57e90eb1ee5e558aa05d2c) # v0.14.3
+      set(GIT_TAG cbca63f091ef1147ff57e90eb1ee5e558aa05d2c) # v0.14.3 cpp-httplib fallback version with OPENSSLv1 support
     endif()
 
     ExternalProject_Add(${proj}

@@ -23,7 +23,7 @@ found in the LICENSE file.
 
 #include "itkImageBase.h"
 
-#include <Eigen/Dense>
+#include <itkeigen/Eigen/Dense>
 
 namespace mitk
 {

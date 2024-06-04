@@ -51,7 +51,7 @@ namespace mitk
     }
 
     ~Exception() throw() override {}
-    itkTypeMacro(ClassName, SuperClassName);
+    itkTypeMacro(Exception, itk::ExceptionObject);
 
     /** \brief Adds rethrow data to this exception. */
     void AddRethrowData(const char *file, unsigned int lineNumber, const char *message);

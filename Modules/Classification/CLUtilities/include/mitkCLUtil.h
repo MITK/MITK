@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkCLUtil_h
 #define mitkCLUtil_h
 
-#include <Eigen/Dense>
+#include <itkeigen/Eigen/Dense>
 #include <MitkCLUtilitiesExports.h>
 #include <itkImageRegionIterator.h>
 

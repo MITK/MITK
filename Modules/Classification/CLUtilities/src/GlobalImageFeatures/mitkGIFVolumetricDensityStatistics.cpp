@@ -40,7 +40,7 @@ found in the LICENSE file.
 #include <vnl/vnl_math.h>
 
 // Eigen
-#include <Eigen/Dense>
+#include <itkeigen/Eigen/Dense>
 
 struct GIFVolumetricDensityStatisticsParameters
 {

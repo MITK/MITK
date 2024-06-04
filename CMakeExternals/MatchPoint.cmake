@@ -29,7 +29,7 @@ if(MITK_USE_MatchPoint)
     else()
       set(download_step
           GIT_REPOSITORY https://github.com/MIC-DKFZ/MatchPoint.git
-          GIT_TAG a45efdf9
+          GIT_TAG 56957430a6a1665707bcbcec36ca9dc0248e7fc7 # 04/06/2024
          )
     endif()
 

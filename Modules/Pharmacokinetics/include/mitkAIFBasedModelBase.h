@@ -39,7 +39,7 @@ namespace mitk
 
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(PhysiologciModelBase, AIFBasedModelBase);
+    itkTypeMacro(AIFBasedModelBase, ModelBase);
 
 
     static const std::string NAME_STATIC_PARAMETER_AIF;

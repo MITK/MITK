@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <mitkBaseData.h>
 
 // Eigen
-#include <Eigen/Dense>
+#include <itkeigen/Eigen/Dense>
 
 // STD Includes
 

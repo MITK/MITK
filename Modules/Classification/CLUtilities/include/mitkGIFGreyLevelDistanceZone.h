@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkBaseData.h>
 #include <MitkCLUtilitiesExports.h>
 
-#include <Eigen/src/Core/Array.h>
+#include <itkeigen/Eigen/src/Core/Array.h>
 
 namespace mitk
 {

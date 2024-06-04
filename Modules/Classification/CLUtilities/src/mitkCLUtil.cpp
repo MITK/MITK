@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 
 
-#include <Eigen/Dense>
+#include <itkeigen/Eigen/Dense>
 #include <itkImage.h>
 
 // itk includes

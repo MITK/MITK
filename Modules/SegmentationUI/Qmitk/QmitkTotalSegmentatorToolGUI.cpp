@@ -211,7 +211,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     }
     bool isFast = m_Controls.fastBox->isChecked();
     QString subTask = m_Controls.subtaskComboBox->currentText();
-    if (subTask != VALID_TASKS[0])
+    if (subTask != VALID_TASKS[0] && subTask != VALID_TASKS[1])
     {
       isFast = true;
     }

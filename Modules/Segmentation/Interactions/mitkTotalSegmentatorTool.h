@@ -136,6 +136,7 @@ namespace mitk
     bool m_Fast = true;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
     const std::string DEFAULT_TOTAL_TASK = "total";
+    const std::string DEFAULT_TOTAL_TASK_MRI = "total_mr";
     const std::unordered_map<std::string, std::vector<std::string>> SUBTASKS_MAP =
     {
       {"body", { "body.nii.gz", "body_trunc.nii.gz", "body_extremities.nii.gz", "skin.nii.gz"}},

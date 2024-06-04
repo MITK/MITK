@@ -33,7 +33,7 @@ class QmitkTotalSegmentatorToolInstaller : public QmitkSetupVirtualEnvUtil
 {
 public:
   const QString VENV_NAME = ".totalsegmentator_v2";
-  const QString TOTALSEGMENTATOR_VERSION = "2.0.5";
+  const QString TOTALSEGMENTATOR_VERSION = "2.2.1";
   const std::vector<QString> PACKAGES = {QString("Totalsegmentator==") + TOTALSEGMENTATOR_VERSION,
                                          QString("setuptools")}; /* just in case */
   const QString STORAGE_DIR;
@@ -170,6 +170,7 @@ protected:
     "python environment or install TotalSegmentator.";
   const QStringList VALID_TASKS = {
     "total",
+    "total_mr",
     "cerebral_bleed",
     "hip_implant",
     "coronary_arteries",

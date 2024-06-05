@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include "mitkLevelWindowProperty.h"
 #include "mitkImageWriteAccessor.h"
 
-int mitk::PaintbrushTool::m_Size = 1;
+int mitk::PaintbrushTool::m_Size = 10;
 
 mitk::PaintbrushTool::PaintbrushTool(bool startWithFillMode)
   : FeedbackContourTool("PressMoveReleaseWithCTRLInversionAllMouseMoves"),

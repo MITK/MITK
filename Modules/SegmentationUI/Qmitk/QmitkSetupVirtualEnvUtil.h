@@ -183,6 +183,12 @@ public:
   static bool IsVenvInstalled(const QString &pythonPath);
 
   /**
+   * @brief Returns version of the pip installed package
+   *
+   */
+  static QString GetPipPackageVersion(const QString &pythonPath, const QString &packageName);
+
+  /**
    * @brief Function can be used as callback to simply print out all the process execution output
    * parsed out from itk::EventObject.
    * 

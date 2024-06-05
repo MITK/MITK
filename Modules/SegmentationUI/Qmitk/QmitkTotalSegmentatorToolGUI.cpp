@@ -304,6 +304,11 @@ bool QmitkTotalSegmentatorToolGUI::IsTotalSegmentatorInstalled(const QString &py
   }
   isExists = QFile::exists(fullPath + QDir::separator() + QString("TotalSegmentator")) && isPythonExists;
 #endif
+  if (isExists && m_Installer.TOTALSEGMENTATOR_VERSION !=
+      QmitkSetupVirtualEnvUtil::GetPipPackageVersion(fullPath, "TotalSegmentator"))
+  {
+    isExists = false;
+  }
   return isExists;
 }
 

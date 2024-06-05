@@ -255,3 +255,28 @@ std::pair<QString, QString> QmitkSetupVirtualEnvUtil::GetExactPythonPath(const Q
   pythonPath.first = pythonDoesExist &&isSupportedVersion ? fullPath : "";
   return pythonPath;
 }
+
+QString QmitkSetupVirtualEnvUtil::GetPipPackageVersion(const QString &pythonPath, const QString &packageName)
+{
+#ifdef _WIN32
+  const QString PIP_EXE = "pip.exe";
+#else
+  const QString PIP_EXE = "pip3";
+#endif
+  QString version;
+  QProcess pipProcess;
+  pipProcess.start(pythonPath + QDir::separator() + PIP_EXE, QStringList() << "show" << packageName, QProcess::ReadOnly);
+  if (pipProcess.waitForFinished())
+  {
+    while (pipProcess.canReadLine())
+    {
+      QString line = pipProcess.readLine();
+      if (line.startsWith("Version"))
+      {
+        version = (line.split(":")[1]).trimmed();
+        break;
+      }
+    }
+  }
+  return version;
+}

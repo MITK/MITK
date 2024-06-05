@@ -211,7 +211,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     }
     bool isFast = m_Controls.fastBox->isChecked();
     QString subTask = m_Controls.subtaskComboBox->currentText();
-    if (subTask != VALID_TASKS[0])
+    if (subTask != VALID_TASKS[0] && subTask != VALID_TASKS[1])
     {
       isFast = true;
     }
@@ -304,6 +304,11 @@ bool QmitkTotalSegmentatorToolGUI::IsTotalSegmentatorInstalled(const QString &py
   }
   isExists = QFile::exists(fullPath + QDir::separator() + QString("TotalSegmentator")) && isPythonExists;
 #endif
+  if (isExists && m_Installer.TOTALSEGMENTATOR_VERSION !=
+      QmitkSetupVirtualEnvUtil::GetPipPackageVersion(fullPath, "TotalSegmentator"))
+  {
+    isExists = false;
+  }
   return isExists;
 }
 

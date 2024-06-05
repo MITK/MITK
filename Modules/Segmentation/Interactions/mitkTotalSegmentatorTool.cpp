@@ -119,7 +119,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   m_ProgressCommand->SetProgress(50);
 
   outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
-  const bool isSubTask = (this->GetSubTask() != DEFAULT_TOTAL_TASK);
+  const bool isSubTask = (this->GetSubTask() != DEFAULT_TOTAL_TASK) && (this->GetSubTask() != DEFAULT_TOTAL_TASK_MRI);
   if (isSubTask)
   {
     outputImagePath = outDir;
@@ -136,7 +136,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   else
   {
     this->run_totalsegmentator(
-      spExec, inputImagePath, outputImagePath, this->GetFast(), !isSubTask, this->GetGpuId(), DEFAULT_TOTAL_TASK);
+      spExec, inputImagePath, outputImagePath, this->GetFast(), !isSubTask, this->GetGpuId(), this->GetSubTask());
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     outputBuffer = mitk::LabelSetImage::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
@@ -157,7 +157,7 @@ void mitk::TotalSegmentatorTool::UpdatePrepare()
   {
     this->ParseLabelMapTotalDefault();
   }
-  const bool isSubTask = (this->GetSubTask() != DEFAULT_TOTAL_TASK);
+  const bool isSubTask = (this->GetSubTask() != DEFAULT_TOTAL_TASK) && (this->GetSubTask() != DEFAULT_TOTAL_TASK_MRI);
   if (isSubTask)
   {
     std::vector<std::string> files = SUBTASKS_MAP.at(this->GetSubTask());
@@ -233,7 +233,12 @@ void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor* spExec,
   args.push_back("-o");
   args.push_back(outputImagePath);
 
-  if (subTask != DEFAULT_TOTAL_TASK)
+  if (subTask == DEFAULT_TOTAL_TASK_MRI)
+  {
+    args.push_back("--task");
+    args.push_back(subTask);
+  }
+  else if (subTask != DEFAULT_TOTAL_TASK)
   {
     args.push_back("-ta");
     args.push_back(subTask);
@@ -273,6 +278,11 @@ void mitk::TotalSegmentatorTool::ParseLabelMapTotalDefault()
 {
   if (!this->GetLabelMapPath().empty())
   {
+    int start_line = 0, end_line = 0;
+    if (this->GetSubTask() == DEFAULT_TOTAL_TASK)
+      start_line = 111, end_line = 229;
+    else if (this->GetSubTask() == DEFAULT_TOTAL_TASK_MRI)
+      start_line = 231, end_line = 288;
     std::regex sanitizer(R"([^A-Za-z0-9_])");
     std::fstream newfile;
     newfile.open(this->GetLabelMapPath(), ios::in);
@@ -283,7 +293,7 @@ void mitk::TotalSegmentatorTool::ParseLabelMapTotalDefault()
       std::string temp;
       while (std::getline(newfile, temp))
       {
-        if (line > 111 && line < 229)
+        if (line > start_line && line < end_line)
         {
           buffer << temp;
         }

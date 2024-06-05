@@ -14,7 +14,7 @@ mitkVector.h has been split up into several, more atomic files, namely:
 -# mitkNumericConstants.h : contains basic constants like mitk::ScalarType or mitk::eps
 -# mitkArray.h : copy itk::FixedArrays (like itk::Point and itk::Vector) from and to types which implement the [] operator (array-types), like e.g. Plain Old Datatypes (POD)
 -# mitkPoint.h : the mitk::Point class. This is basically the itk::Point with the added ToArray and Fill members to conveniently copy from and to array-types. In MITK, a point is considered a fixed geometric location and thus cannot be summed or multiplied.
--# mitkVector.h : the mitk::Vector class. This is an itk::Vector, but with the possiblity to implicitly convert to vnl_vector and vnl_vector_fixed. In MITK, vectors denote directions and can be summed or multiplied with scalars.
+-# mitkVector.h : the mitk::Vector class. This is an itk::Vector, but with the possibility to implicitly convert to vnl_vector and vnl_vector_fixed. In MITK, vectors denote directions and can be summed or multiplied with scalars.
 -# mitkMatrix.h : the mitk::Matrix class. This is an itk::Matrix with the added ToArray and Fill members to conveniently copy from and to array-types.
 -# mitkQuaternion.h : a typedef to vnl_quaternion.
 -# mitkAffineTransform3D.h : a typedef to itk::ScalableAffineTransform<ScalarType, 3>

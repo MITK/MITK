@@ -457,7 +457,7 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
         pJob->m_spRegNode->SetData(mitk::GenerateIdentityRegistration3D().GetPointer());
         pJob->m_spRegNode->SetName("Auto_Generated_Identity_Transform");
         m_Controls.m_teLog->append(
-          QStringLiteral("<font color='gray'><i>No registration selected. Preforming mapping with identity transform</i></font>"));
+          QStringLiteral("<font color='gray'><i>No registration selected. Performing mapping with identity transform</i></font>"));
     }
 
     if (!doGeometryRefinement)

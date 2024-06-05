@@ -35,7 +35,7 @@
 	<ul>
 		<li> Layout button: Choose a layout from presets or select a custom number of available window views and their layout in a grid
 		<li> Synchronization button: Enable or disable synchronized interaction across the window views
-		<li> Interaction mode button: Switch between the MITK interaction mouse mode and the PACS interation mouse mode
+		<li> Interaction mode button: Switch between the MITK interaction mouse mode and the PACS interaction mouse mode
 	</ul>
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Layout MxN display layout
@@ -142,7 +142,7 @@
 	It can either be moved using the mouse or by using the appropriate mouse interaction (see above, e.g. mouse wheel scroling).
 
 \subsubsection org_mitk_editors_mxnmultiwidget_View_Direction View direction
-	Each window view "is looking in" one of the three avaiable view directions, namely "Axial", "Sagittal" or "Coronal".
+	Each window view "is looking in" one of the three available view directions, namely "Axial", "Sagittal" or "Coronal".
 	You can change the view direction by switching to another anatomical plane in the view direction drop down menu.
 	Changing the view direction will reset the camera to its default for the new view direction, meaning default zoom and
 	centered camera position.

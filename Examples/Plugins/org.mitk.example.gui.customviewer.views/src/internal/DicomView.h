@@ -50,7 +50,7 @@ public:
   /**
    * Creates the view control widgets provided by the QmitkDicomExternalDataWidget class.
    * Widgets associated with unused functionality are being removed and DICOM import and data
-   * storage transfer funcionality being connected to the appropriate slots.
+   * storage transfer functionality being connected to the appropriate slots.
    */
   void CreateQtPartControl(QWidget *parent) override;
 

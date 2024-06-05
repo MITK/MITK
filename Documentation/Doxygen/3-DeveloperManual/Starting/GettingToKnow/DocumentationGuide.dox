@@ -11,7 +11,7 @@ Also, of course you need to have doxygen installed to generate documentation.
 
 \section DocumentationGuideCode Documenting the source code
 
-MITK is a substantial project and encompasses many different source files by many different developers over quite a considerable timeframe. Many of them have written excellent code which can do a lot of things and is very helpful to people who might apply it in wholly unlooked for ways to completely different problems. To facilitate this sharing and reusing of ressources one first and foremost has to know what kind of ressources are already available.
+MITK is a substantial project and encompasses many different source files by many different developers over quite a considerable timeframe. Many of them have written excellent code which can do a lot of things and is very helpful to people who might apply it in wholly unlooked for ways to completely different problems. To facilitate this sharing and reusing of resources one first and foremost has to know what kind of resources are already available.
 
 Few people write code in the intention for it to be difficult to be used by others, but unfortunately what might seem a very efficient and easily understandable piece of code to the author might be nigh unreadable for someone else. Very often it does not in fact matter whether the code itself is understandable, as long as it one can get the information what a function is supposed to do. While comments in the source file help a lot to gain this knowledge in can get quite tedious go through every file looking for the right tool.
 

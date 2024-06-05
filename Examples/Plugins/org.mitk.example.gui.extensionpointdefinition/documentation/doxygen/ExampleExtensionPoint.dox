@@ -18,7 +18,7 @@
   These created push buttons are connected to the ChangeText method that alters the input text (in the way the extension defines) and outputs the changed text in another text field.
   \snippet MinimalView.cpp Use extended functionality to alter input text
 
-  The plugin can now be extened by extensions provided by other plugins.
+  The plugin can now be extended by extensions provided by other plugins.
 
   View complete source files:
   \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointdefinition/src/internal/ChangeTextDescriptor.cpp,ChangeTextDescriptor.cpp}

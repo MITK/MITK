@@ -399,7 +399,7 @@ void ExtensionsParser::logStatus(const QXmlParseException& ex)
     msg = QString("Parsing error: \"%1\"").arg(ex.message());
   else
     msg = QString("Parsing error in \"%1\" [line %2, column %3]: \"%4\".").arg(name)
-        .arg(ex.lineNumber()).arg(ex.columnumber()).arg(ex.message());
+        .arg(ex.lineNumber()).arg(ex.columnNumber()).arg(ex.message());
   IStatus::Pointer status(new Status(IStatus::WARNING_TYPE, RegistryMessages::OWNER_NAME,
                                      PARSE_PROBLEM, msg, BERRY_STATUS_LOC));
   error(status);

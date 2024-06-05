@@ -51,7 +51,7 @@ private Q_SLOTS:
 
   /**
    * @brief Simple slot function that changes the selection of the radio buttons according to the passed string.
-   * @param selectStr QString that contains the name of the slected list element
+   * @param selectStr QString that contains the name of the selected list element
    */
   void ToggleRadioMethod(QString selectStr);
 

@@ -57,12 +57,12 @@ private:
   QHash<QString, QAction *> perspIdToActionMap;
 
   /**
-   * Neccessary to prevent initial tab switching.
+   * Necessary to prevent initial tab switching.
    */
   bool tabChanged;
 
   /**
-   * Listener for perspective changes. Neccessary for consistent tab activation.
+   * Listener for perspective changes. Necessary for consistent tab activation.
    */
   friend struct QtPerspectiveSwitcherTabBarListener;
 };

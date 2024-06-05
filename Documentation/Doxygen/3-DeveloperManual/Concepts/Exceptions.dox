@@ -34,7 +34,7 @@ class myExampleClass
  
   /**  Documentation
    *  @brief This method does [...]
-   *  @throws mitk::Exception This exception is thrown, when the following error occures: [...]
+   *  @throws mitk::Exception This exception is thrown, when the following error occurs: [...]
    */
 
   void MyExampleMethod()
@@ -42,7 +42,7 @@ class myExampleClass
     //here comes your code
     
     //here happens an exception
-    mitkThrow() << "An exception occured because [...], method can't continue.";
+    mitkThrow() << "An exception occurred because [...], method can't continue.";
     }
   }
 \endverbatim
@@ -66,11 +66,11 @@ catch (const mitk::Exception& e)
   }
 \endverbatim
 
-Please do not use "catch (...)" because normally your class can't garantee to handle all exceptions in a proper way without differentiating them.
+Please do not use "catch (...)" because normally your class can't guarantee to handle all exceptions in a proper way without differentiating them.
 
 \section SpecializedExceptionHandling Defining and Using more Specialized Exceptions
 
-The basic MITK exception concept was kept very simple and should suffice in many cases. But you can also use more specialized exceptions, if needed. Nevertheless all MITK exceptions should be subclasses of mitk::exception. You can define your own exception classes by simply implementing new classes which derive from mitk::exception. Thus, you can catch your exception seperately when needed. The mitkExceptionClassMacro helps to keep implementing new exception classes as simple as possible, like shown in the following code example.
+The basic MITK exception concept was kept very simple and should suffice in many cases. But you can also use more specialized exceptions, if needed. Nevertheless all MITK exceptions should be subclasses of mitk::exception. You can define your own exception classes by simply implementing new classes which derive from mitk::exception. Thus, you can catch your exception separately when needed. The mitkExceptionClassMacro helps to keep implementing new exception classes as simple as possible, like shown in the following code example.
 
 \verbatim
 #include <mitkCommon.h>
@@ -82,7 +82,7 @@ class mitk::MySpecializedException : public mitk::Exception
   };
 \endverbatim
 
-To throw your specialized exception you should use the corresponing macro, which is shown in the next code snippet.
+To throw your specialized exception you should use the corresponding macro, which is shown in the next code snippet.
 
 \verbatim
 mitkThrowException(mitk::MySpecializedException) << "this is error info"; 

@@ -22,7 +22,7 @@ namespace berry {
 struct IConfigurationElement;
 
 /**
- * A proxy for a parameter value converter that has been defined in the regisry.
+ * A proxy for a parameter value converter that has been defined in the registry.
  * This delays the class loading until the converter is really asked to do
  * string/object conversions.
  */

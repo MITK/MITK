@@ -36,7 +36,7 @@ found in the LICENSE file.
 /*!
 \brief View for motion artefact correction of images.
 
-The view utalizes MatchPoint registration algorithms and the mitk::TimeFramesRegistrationHelper and implemnts the GUI
+The view utalizes MatchPoint registration algorithms and the mitk::TimeFramesRegistrationHelper and implements the GUI
 business logic to make frame correction aka motion artefact correction on 3D+t images.
 
 */

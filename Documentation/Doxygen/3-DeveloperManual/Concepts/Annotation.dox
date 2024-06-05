@@ -24,14 +24,14 @@ It also manages the respective Layouters which are used to manage the placement 
 
 The mitk::Annotation is an abstract class that can manage property lists like the mitk::DataNode and provides the interfaces to the methods
 AddToBaseRenderer, AddToRenderer, RemoveFromBaseRenderer RemoveFromRenderer and Update. The subclasses of the mitk::Annotation have to implement these methods
-in order to provide the functionallity of an Annotation. There are already a few implementations of mitk::Annotation which are using VTK as a rendering
+in order to provide the functionality of an Annotation. There are already a few implementations of mitk::Annotation which are using VTK as a rendering
 framework to display the Annotations. In order to show an Annotation, it has to be registered as a MicroService.
 
 \subsection AnnotationPage_AnnotationRendererSubsection AbstractAnnotationRenderer
 
 The AbstractAnnotationRenderer is the base class for all types of AnnotationRenderers, which are used for the management of multiple annotations in a specific BaseRenderer.
-For each BaseRenderer, an AnnotationRenderer is registerered as a MicroService, using the type and the renderer name as a unique identifier. This way it is possible to keep the Annotations for a specific BaseRenderer
-even if this renderer is temporarilly not existent (e.g. when a RenderWindow was closed).
+For each BaseRenderer, an AnnotationRenderer is registered as a MicroService, using the type and the renderer name as a unique identifier. This way it is possible to keep the Annotations for a specific BaseRenderer
+even if this renderer is temporarily not existent (e.g. when a RenderWindow was closed).
 
 Implementations of the AbstractAnnotationRenderer are using the us::ServiceTracker in order to manage all registered Annotations and to listen to the events which are thrown if a new Annotation is registered,
 if an Annotation was unregistered or if it was modified.

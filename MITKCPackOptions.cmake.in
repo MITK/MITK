@@ -3,7 +3,7 @@ if(CPACK_GENERATOR MATCHES "NSIS")
 
   # set the package header icon for MUI
   set(CPACK_PACKAGE_ICON "@MITK_SOURCE_DIR@\\mitk.bmp")
-  # set the install/unistall icon used for the installer itself
+  # set the install/uninstall icon used for the installer itself
   # There is a bug in NSIS that does not handle full unix paths properly. 
   set(CPACK_NSIS_MUI_ICON "@MITK_SOURCE_DIR@\\mitk.ico")
   set(CPACK_NSIS_MUI_UNIICON "@MITK_SOURCE_DIR@\\mitk.ico")

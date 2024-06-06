@@ -36,7 +36,7 @@ protected slots:
   void OnModelChanged(const QString &);
 
 protected:
-  QmitkMonaiLabelToolGUI(int);
+  QmitkMonaiLabelToolGUI(int dimension);
   ~QmitkMonaiLabelToolGUI();
 
   void ConnectNewTool(mitk::SegWithPreviewTool *newTool) override;
@@ -87,9 +87,6 @@ private:
   bool m_FirstPreviewComputation = true;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
   int m_Dimension;
-  static const QString CONFIRM_QUESTION_TEXT;
-  static const QMap<QString, QString> WHITELISTED_MODELS;
-  static const QMap<QString, QString> BLACKLISTED_MODELS;
 };
 
 #endif

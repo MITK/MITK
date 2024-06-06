@@ -26,23 +26,27 @@ namespace
     auto *preferencesService = mitk::CoreServices::GetPreferencesService();
     return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   }
+
+  const static QString CONFIRM_QUESTION_TEXT =
+    "Data will be sent to the processing server devoid of any patient information. Are you sure you want continue?";
+
+  /* Pretested models in MITK and corresponding app */
+  const static QMap<QString, QString> WHITELISTED_MODELS = {
+    {"deepgrow_2d", "Radiology"},
+    {"deepgrow_3d", "Radiology"},
+    {"deepedit_seg", "Radiology"},
+    {"localization_vertebra", "Radiology"},
+    {"segmentation", "Radiology"},
+    {"segmentation_spleen", "Radiology"},
+    {"segmentation_vertebra", "Radiology"},
+    {"deepgrow_pipeline", "Radiology"},
+    {"vertebra_pipeline", "Radiology"}};
+
+  /* Strictly unsupported models in MITK and corresponding app */
+  const static QMap<QString, QString> BLACKLISTED_MODELS = {
+    {"deepedit", "Radiology"},            // interaction type not yet supported
+    {"localization_spine", "Radiology"}}; // Metadata discrepancy with label names
 }
-
-const QString QmitkMonaiLabelToolGUI::CONFIRM_QUESTION_TEXT =
-  "Data will be sent to the processing server devoid of any patient information. Are you sure you want continue?";
-
-const QMap<QString, QString> QmitkMonaiLabelToolGUI::WHITELISTED_MODELS = {{"deepgrow_2d", "Radiology"},
-                                                                           {"deepgrow_3d", "Radiology"},
-                                                                           {"deepedit_seg", "Radiology"},
-                                                                           {"localization_vertebra", "Radiology"},
-                                                                           {"segmentation", "Radiology"},
-                                                                           {"segmentation_spleen", "Radiology"},
-                                                                           {"segmentation_vertebra", "Radiology"},
-                                                                           {"deepgrow_pipeline", "Radiology"},
-                                                                           {"vertebra_pipeline", "Radiology"}};
-
-const QMap<QString, QString> QmitkMonaiLabelToolGUI::BLACKLISTED_MODELS = {{"deepedit", "Radiology"},
-                                                                           {"localization_spine", "Radiology"}};
 
 QmitkMonaiLabelToolGUI::QmitkMonaiLabelToolGUI(int dimension)
   : QmitkMultiLabelSegWithPreviewToolGUIBase(),
@@ -171,7 +175,7 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
 {
   m_Controls.previewButton->setEnabled(false);
   m_Controls.labelListLabel->clear();
-  auto reply = QMessageBox::question(this, "Confirm", CONFIRM_QUESTION_TEXT, QMessageBox::Yes | QMessageBox::No);
+  auto reply = QMessageBox::question(this, "Confirm", ::CONFIRM_QUESTION_TEXT, QMessageBox::Yes | QMessageBox::No);
   if (reply == QMessageBox::No)
   {
     MITK_INFO << "Didn't went ahead with Monai Label inferencing";
@@ -284,7 +288,7 @@ void QmitkMonaiLabelToolGUI::PopulateModelBox(QString appName, std::vector<mitk:
     QString modelName = QString::fromStdString(model.name);
     if (allowAllModels)
     {
-      if (BLACKLISTED_MODELS.contains(modelName) && appName.contains(BLACKLISTED_MODELS[modelName]))
+      if (::BLACKLISTED_MODELS.contains(modelName) && appName.contains(::BLACKLISTED_MODELS[modelName]))
       {
         continue;
       }
@@ -292,7 +296,7 @@ void QmitkMonaiLabelToolGUI::PopulateModelBox(QString appName, std::vector<mitk:
     }
     else
     {
-      if (WHITELISTED_MODELS.contains(modelName))
+      if (::WHITELISTED_MODELS.contains(modelName))
       {
         m_Controls.modelBox->addItem(modelName);
       }

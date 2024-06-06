@@ -57,6 +57,10 @@ void mitk::MonaiLabel3DTool::WriteBackResults(LabelSetImage *previewImage,
                                               LabelSetImage *segResults,
                                               TimeStepType timeStep) const
 {
+  if (segResults->GetTimeGeometry()->CountTimeSteps() > 1)
+  {
+    mitkThrow() << "Invalid time geometry found while writing back segmentation";
+  }
   mitk::ImageReadAccessor newMitkImgAcc(segResults);
   previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
 }

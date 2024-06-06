@@ -620,7 +620,7 @@ std::string mitk::MonaiLabelTool::ConvertPointsAsListString(const mitk::BaseGeom
                                                               const PointSet::Pointer pointSet) const
 {
   bool is3DMode = nullptr == this->GetWorkingPlaneGeometry();
-  MITK_INFO << "No.of points: " << pointSet->GetSize() << " 3DMode: " << is3DMode;
+  MITK_INFO << "No.of points: " << pointSet->GetSize();
   std::stringstream pointsAndLabels;
   pointsAndLabels << "[";
   mitk::PointSet::PointsConstIterator pointSetIter = pointSet->Begin();

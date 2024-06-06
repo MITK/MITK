@@ -70,7 +70,8 @@ void mitk::MonaiLabel2DTool::WriteBackResults(LabelSetImage *previewImage,
  {
   if (segResults->GetTimeGeometry()->CountTimeSteps() > 1)
   {
-    mitkThrow() << "Invalid time geometry found while writing back segmentation";
+    mitkThrow() << "Invalid time geometry found while writing back segmentation. "
+                   " Expected static segmentation output from model.";
   }
   mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), segResults, timeStep, false);
  }

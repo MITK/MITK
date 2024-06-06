@@ -50,9 +50,9 @@ namespace mitk
     explicit classname(const std::string &output) : Superclass(output) {}                                              \
     ~classname() override {}                                                                                           \
                                                                                                                        \
-    virtual const char *GetEventName() const { return #classname; }                                                    \
-    virtual bool CheckEvent(const ::itk::EventObject *e) const { return dynamic_cast<const Self *>(e); }               \
-    virtual ::itk::EventObject *MakeObject() const { return new Self(this->GetOutput()); }                             \
+    virtual const char *GetEventName() const override { return #classname; }                                                    \
+    virtual bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }               \
+    virtual ::itk::EventObject *MakeObject() const override { return new Self(this->GetOutput()); }                             \
   };
 
   mitkProcessExecutorEventMacro(ExternalProcessStdOutEvent);

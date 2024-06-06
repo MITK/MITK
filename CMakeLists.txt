@@ -361,9 +361,9 @@ option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
 
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
 
-if(MITK_USE_cpprestsdk)
+if(MITK_USE_cpprestsdk OR MITK_USE_httplib)
   if(NOT OpenSSL_FOUND)
-    set(openssl_message "Could not find OpenSSL (dependency of C++ REST SDK).\n")
+    set(openssl_message "Could not find OpenSSL (dependency of C++ REST SDK and cpp-httplib).\n")
     if(UNIX)
       if(APPLE)
         set(openssl_message "${openssl_message}Please install it using your favorite package management "
@@ -374,7 +374,7 @@ if(MITK_USE_cpprestsdk)
     else()
       set(openssl_message "${openssl_message}Please either install Win32 OpenSSL:\n"
                           "  https://slproweb.com/products/Win32OpenSSL.html\n"
-                          "Or use the Qt Maintenance tool to install:\n"
+                          "Or use the Qt Maintenance tool to install (recommended):\n"
                           "  Developer and Designer Tools > OpenSSL Toolkit > OpenSSL 64-bit binaries\n")
     endif()
     set(openssl_message "${openssl_message}If it still cannot be found, you can hint CMake to find OpenSSL by "

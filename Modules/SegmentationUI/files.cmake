@@ -40,6 +40,9 @@ set(CPP_FILES
   Qmitk/QmitkFindSegmentationTaskDialog.cpp
   Qmitk/QmitkSegmentAnythingToolGUI.cpp
   Qmitk/QmitkMedSAMToolGUI.cpp
+  Qmitk/QmitkMonaiLabelToolGUI.cpp
+  Qmitk/QmitkMonaiLabel2DToolGUI.cpp
+  Qmitk/QmitkMonaiLabel3DToolGUI.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.cpp
@@ -92,6 +95,9 @@ set(MOC_H_FILES
   Qmitk/QmitkFindSegmentationTaskDialog.h
   Qmitk/QmitkSegmentAnythingToolGUI.h
   Qmitk/QmitkMedSAMToolGUI.h
+  Qmitk/QmitkMonaiLabelToolGUI.h
+  Qmitk/QmitkMonaiLabel2DToolGUI.h
+  Qmitk/QmitkMonaiLabel3DToolGUI.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.h
@@ -114,6 +120,7 @@ set(UI_FILES
   Qmitk/QmitkFindSegmentationTaskDialog.ui
   Qmitk/QmitkSegmentAnythingGUIControls.ui
   Qmitk/QmitkMedSAMGUIControls.ui
+  Qmitk/QmitkMonaiLabelToolGUIControls.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
   SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui

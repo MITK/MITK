@@ -46,7 +46,9 @@ bool mitk::MitkROIIOMimeTypes::MitkROIMimeType::AppliesTo(const std::string& pat
   if ("MITK ROI" != json.value("FileFormat", ""))
     return false;
 
-  if (1 != json.value<int>("Version", 0))
+  auto version = json.value<int>("Version", 0);
+
+  if (version < 1 || version > 2)
     return false;
 
   return true;

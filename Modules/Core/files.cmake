@@ -55,6 +55,7 @@ set(CPP_FILES
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkLayerController.cpp
 
+  DataManagement/mitkAffineTransform3D.cpp
   DataManagement/mitkAnatomicalStructureColorPresets.cpp
   DataManagement/mitkArbitraryTimeGeometry.cpp
   DataManagement/mitkAbstractTransformGeometry.cpp

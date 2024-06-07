@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <vtkCubeSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkSmartPointer.h>
+#include <vtkTransformPolyDataFilter.h>
 
 mitk::ROIMapper3D::LocalStorage::LocalStorage()
 {
@@ -67,27 +68,24 @@ void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
   if (dataNode->IsVisible(renderer))
   {
     const auto* geometry = data->GetGeometry();
-    const auto halfSpacing = geometry->GetSpacing() * 0.5f;
 
     for (const auto& [id, roi] : *data)
     {
       if (!roi.HasTimeStep(t))
         continue;
 
-      Point3D min;
-      geometry->IndexToWorld(roi.GetMin(t), min);
-      min -= halfSpacing;
-
-      Point3D max;
-      geometry->IndexToWorld(roi.GetMax(t), max);
-      max += halfSpacing;
+      Point3D min = roi.GetMin(t);
+      Point3D max = roi.GetMax(t);
 
       auto cube = vtkSmartPointer<vtkCubeSource>::New();
       cube->SetBounds(min[0], max[0], min[1], max[1], min[2], max[2]);
-      cube->Update();
+
+      auto transform = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+      transform->SetTransform(geometry->GetVtkTransform());
+      transform->SetInputConnection(cube->GetOutputPort());
 
       auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-      mapper->SetInputConnection(cube->GetOutputPort());
+      mapper->SetInputConnection(transform->GetOutputPort());
 
       auto actor = vtkSmartPointer<vtkActor>::New();
       actor->SetMapper(mapper);

@@ -164,7 +164,7 @@ void mitk::CovarianceMatrixCalculator::ComputeCovarianceMatrices()
   d->m_Input = nullptr;
 }
 
-// Get a list with the id's of all surrounding conected vertices
+// Get a list with the id's of all surrounding connected vertices
 // to the current vertex at the given index in the polydata
 vtkIdList *GetNeighboursOfPoint(unsigned int index, vtkPolyData *polydata)
 {
@@ -188,7 +188,7 @@ vtkIdList *GetNeighboursOfPoint(unsigned int index, vtkPolyData *polydata)
   return result;
 }
 
-// Computes a primary component analysis of the surounding vertices
+// Computes a primary component analysis of the surrounding vertices
 // of the verex at the current index.
 vtkIdList *CalculatePCAonPointNeighboursForNormalVector(int index,
                                                         double normal[3],
@@ -254,7 +254,7 @@ vtkIdList *CalculatePCAonPointNeighboursForNormalVector(int index,
   }
 
   // copy upper triangle to lower triangle,
-  // we got a symetric matrix
+  // we got a symmetric matrix
   mat[0][1] = mat[1][0];
   mat[0][2] = mat[2][0];
   mat[1][2] = mat[2][1];

@@ -38,9 +38,9 @@ void mitk::cl::GlobalImageFeaturesParameter::AddParameter(mitkCommandLineParser 
   // Optional Parameter
   parser.addArgument("xml-output", "x", mitkCommandLineParser::File, "XML result file", "Path where the results should be stored as XML result file. ", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("logfile",    "log",         mitkCommandLineParser::File, "Text Logfile", "Path to the location of the target log file. ", us::Any(), true, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("save-image", "save-image",  mitkCommandLineParser::File, "Output Image", "If spezified, the image that is used for the analysis is saved to this location.", us::Any(), true, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("save-mask", "save-mask",    mitkCommandLineParser::File, "Output Image", "If spezified, the mask that is used for the analysis is saved to this location. ", us::Any(), true, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("save-image-screenshots", "save-screenshot", mitkCommandLineParser::File, "Output Image", "If spezified,  a screenshot of each slice is saved. Specify an EXISTING folder with prefix (for example ~/demo/ or ~/demo/image-", us::Any(), true, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("save-image", "save-image",  mitkCommandLineParser::File, "Output Image", "If specified, the image that is used for the analysis is saved to this location.", us::Any(), true, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("save-mask", "save-mask",    mitkCommandLineParser::File, "Output Image", "If specified, the mask that is used for the analysis is saved to this location. ", us::Any(), true, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("save-image-screenshots", "save-screenshot", mitkCommandLineParser::File, "Output Image", "If specified,  a screenshot of each slice is saved. Specify an EXISTING folder with prefix (for example ~/demo/ or ~/demo/image-", us::Any(), true, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("header",            "head",    mitkCommandLineParser::Bool, "Add Header (Labels) to output", "", us::Any());
   parser.addArgument("first-line-header", "fl-head", mitkCommandLineParser::Bool, "Add Header (Labels) to first line of output", "", us::Any());

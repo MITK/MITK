@@ -56,7 +56,7 @@ namespace mitk
    */
   void MITKLOG_EXPORT DisableBackends(LogBackendBase::OutputType type);
 
-  /** \brief Check wether the output of this backend is enabled.
+  /** \brief Check whether the output of this backend is enabled.
    */
   bool MITKLOG_EXPORT IsBackendEnabled(LogBackendBase::OutputType type);
 
@@ -138,7 +138,7 @@ namespace mitk
 
     /** \brief Sets the category of this PseudoLogStream object.
      *
-     * If there is already a category it is appended, seperated by a dot.
+     * If there is already a category it is appended, separated by a dot.
      */
     PseudoLogStream& operator()(const std::string& category)
     {

@@ -116,7 +116,7 @@ run()
   }
   catch (...)
   {
-    emit Error(QString("Unkown error when processing the data."));
+    emit Error(QString("Unknown error when processing the data."));
   }
 
   emit Finished();

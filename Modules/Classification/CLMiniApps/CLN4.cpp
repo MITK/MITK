@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("number-of-controllpoints") > 0)
   {
     int variable = us::any_cast<int>(parsedArgs["maximum-iterations"]);
-    MITK_INFO << "Number of controll points: " << variable;
+    MITK_INFO << "Number of control points: " << variable;
     filter->SetNumberOfControlPoints(variable);
   }
   if (parsedArgs.count("number-of-fitting-levels") > 0)

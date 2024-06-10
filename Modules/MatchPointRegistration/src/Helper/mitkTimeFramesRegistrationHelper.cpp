@@ -75,7 +75,7 @@ mitk::TimeFramesRegistrationHelper::Generate()
 
       m_Progress += progressDelta;
       this->InvokeEvent(::mitk::FrameRegistrationEvent(nullptr,
-                        "Registred frame #" +::map::core::convert::toStr(i)));
+                        "Registered frame #" +::map::core::convert::toStr(i)));
 
       mappedFrame = DoFrameMapping(movingFrame, reg, targetFrame);
 
@@ -221,7 +221,7 @@ mitk::TimeFramesRegistrationHelper::CheckValidInputs() const
     if (*pos >= m_4DImage->GetTimeSteps())
     {
       mitkThrow() <<
-                  "Cannot register image. Ignore list containes at least one inexistant frame. Invalid frame index: "
+                  "Cannot register image. Ignore list contains at least one inexistant frame. Invalid frame index: "
                   << *pos;
     }
   }

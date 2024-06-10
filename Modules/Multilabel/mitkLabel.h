@@ -92,7 +92,7 @@ namespace mitk
   using ConstLabelVector = std::vector<Label::ConstPointer>;
 
   /**
-  * @brief Equal A function comparing two labels for beeing equal in data
+  * @brief Equal A function comparing two labels for being equal in data
   *
   * @ingroup MITKTestingAPI
   *

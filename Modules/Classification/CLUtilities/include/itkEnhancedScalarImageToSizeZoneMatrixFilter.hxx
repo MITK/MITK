@@ -306,7 +306,7 @@ EnhancedScalarImageToSizeZoneMatrixFilter<TImageType, THistogramFrequencyContain
 
   //MITK_WARN << "Components relabeled.";
 
-  //Get the stats of the componentes
+  //Get the stats of the components
   typedef itk::LabelStatisticsImageFilter< FloatImageType, OutputImageType> LabelStatisticsImageFilterType;
   typename LabelStatisticsImageFilterType::Pointer labelStatisticsImageFilter =
       LabelStatisticsImageFilterType::New();

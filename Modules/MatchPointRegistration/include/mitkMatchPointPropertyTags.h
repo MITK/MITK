@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /**UID of the algorithm that was used to determin a registration.*/
+  /**UID of the algorithm that was used to determine a registration.*/
   const char* const Prop_RegAlgUsed = "matchpoint.Registration.Algorithm.UID";
   /**UID(s) of the data object(s) used as target for determining the registration.*/
   const char* const Prop_RegAlgTargetData = "matchpoint.Registration.Algorithm.UsedData.target";

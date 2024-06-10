@@ -213,7 +213,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       m_Impl->HandlePropertyList[5].SetPosition(pointBack);
     }
 
-    // caculate face normals
+    // calculate face normals
     double cubeFaceNormal0[3], cubeFaceNormal1[3], cubeFaceNormal2[3];
     double a[3], b[3];
     a[0] = (cornerPoints[5][0] - cornerPoints[6][0]);

@@ -61,7 +61,7 @@ namespace mitk
     itkGetMacro(UseWholeInputRegion, bool);
 
     /**
-    * @brief Sets and Gets the current timestep for images with 4 dimensons
+    * @brief Sets and Gets the current timestep for images with 4 dimensions
     */
     itkSetMacro(CurrentTimeStep, ScalarType);
     itkGetMacro(CurrentTimeStep, ScalarType);

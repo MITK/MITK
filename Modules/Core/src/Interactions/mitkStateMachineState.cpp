@@ -78,7 +78,7 @@ std::string mitk::StateMachineState::GetName() const
 }
 
 //##Documentation
-//## Post-processing step, when builing StateMachine from XML.
+//## Post-processing step, when building StateMachine from XML.
 //## Parse all transitions and find the State that matches the String-Name.
 
 bool mitk::StateMachineState::ConnectTransitions(StateMap *allStates)

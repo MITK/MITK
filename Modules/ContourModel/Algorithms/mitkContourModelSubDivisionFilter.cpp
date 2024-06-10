@@ -190,7 +190,7 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
     }
     else
     {
-      // filter not executeable - set input to output
+      // filter not executable - set input to output
       contour = input;
     }
   }

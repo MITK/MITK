@@ -157,7 +157,7 @@ void  mitk::AbstractGlobalImageFeature::AddQuantifierArguments(mitkCommandLinePa
 {
   std::string name = GetOptionPrefix();
 
-  parser.addArgument(name + "::minimum", name + "::min", mitkCommandLineParser::Float, "Minium Intensity for Quantification", "Defines the minimum Intensity used for Quantification", us::Any());
+  parser.addArgument(name + "::minimum", name + "::min", mitkCommandLineParser::Float, "Minimum Intensity for Quantification", "Defines the minimum Intensity used for Quantification", us::Any());
   parser.addArgument(name + "::maximum", name + "::max", mitkCommandLineParser::Float, "Maximum Intensity for Quantification", "Defines the maximum Intensity used for Quantification", us::Any());
   parser.addArgument(name + "::bins", name + "::bins", mitkCommandLineParser::Int, "Number of Bins", "Define the number of bins that is used ", us::Any());
   parser.addArgument(name + "::binsize", name + "::binsize", mitkCommandLineParser::Float, "Binsize", "Define the size of the used bins", us::Any());
@@ -262,7 +262,7 @@ void  mitk::AbstractGlobalImageFeature::InitializeQuantifier(const Image* image,
     m_Quantifier->InitializeByBinsizeAndBins(GetMinimumIntensity(), GetBins(), GetBinsize());
   else if (GetUseMinimumIntensity() && GetUseMaximumIntensity() && GetUseBins())
     m_Quantifier->InitializeByMinimumMaximum(GetMinimumIntensity(), GetMaximumIntensity(), GetBins());
-  // Intialize from Image and Binsize
+  // Initialize from Image and Binsize
   else if (GetUseBinsize() && GetIgnoreMask() && GetUseMinimumIntensity())
     m_Quantifier->InitializeByImageAndBinsizeAndMinimum(image, GetMinimumIntensity(), GetBinsize());
   else if (GetUseBinsize() && GetIgnoreMask() && GetUseMaximumIntensity())
@@ -276,14 +276,14 @@ void  mitk::AbstractGlobalImageFeature::InitializeQuantifier(const Image* image,
     m_Quantifier->InitializeByImageRegionAndBinsizeAndMaximum(image, mask, GetMaximumIntensity(), GetBinsize());
   else if (GetUseBinsize())
     m_Quantifier->InitializeByImageRegionAndBinsize(image, mask, GetBinsize());
-  // Intialize from Image and Bins
+  // Initialize from Image and Bins
   else if (GetUseBins() && GetIgnoreMask() && GetUseMinimumIntensity())
     m_Quantifier->InitializeByImageAndMinimum(image, GetMinimumIntensity(), GetBins());
   else if (GetUseBins() && GetIgnoreMask() && GetUseMaximumIntensity())
     m_Quantifier->InitializeByImageAndMaximum(image, GetMaximumIntensity(), GetBins());
   else if (GetUseBins())
     m_Quantifier->InitializeByImage(image, GetBins());
-  // Intialize from Image, Mask and Bins
+  // Initialize from Image, Mask and Bins
   else if (GetUseBins() && GetUseMinimumIntensity())
     m_Quantifier->InitializeByImageRegionAndMinimum(image, mask, GetMinimumIntensity(), GetBins());
   else if (GetUseBins() && GetUseMaximumIntensity())
@@ -329,7 +329,7 @@ std::string mitk::AbstractGlobalImageFeature::QuantifierParameterString() const
     ss << "Min-" << GetMinimumIntensity() << "_Bins-" << GetBins() << "_BS-" << GetBinsize();
   else if (GetUseMinimumIntensity() && GetUseMaximumIntensity() && GetUseBins())
     ss << "Min-" << GetMinimumIntensity() << "_Max-" << GetMaximumIntensity() << "_Bins-" << GetBins();
-  // Intialize from Image and Binsize
+  // Initialize from Image and Binsize
   else if (GetUseBinsize() && GetIgnoreMask() && GetUseMinimumIntensity())
     ss << "Min-" << GetMinimumIntensity() << "_BS-" << GetBinsize() << "_FullImage";
   else if (GetUseBinsize() && GetIgnoreMask() && GetUseMaximumIntensity())
@@ -343,14 +343,14 @@ std::string mitk::AbstractGlobalImageFeature::QuantifierParameterString() const
     ss << "Max-" << GetMaximumIntensity() << "_BS-" << GetBinsize();
   else if (GetUseBinsize())
     ss << "BS-" << GetBinsize();
-  // Intialize from Image and Bins
+  // Initialize from Image and Bins
   else if (GetUseBins() && GetIgnoreMask() && GetUseMinimumIntensity())
     ss << "Min-" << GetMinimumIntensity() << "_Bins-" << GetBins() << "_FullImage";
   else if (GetUseBins() && GetIgnoreMask() && GetUseMaximumIntensity())
     ss << "Max-" << GetMaximumIntensity() << "_Bins-" << GetBins() << "_FullImage";
   else if (GetUseBins())
     ss << "Bins-" << GetBins() << "_FullImage";
-  // Intialize from Image, Mask and Bins
+  // Initialize from Image, Mask and Bins
   else if (GetUseBins() && GetUseMinimumIntensity())
     ss << "Min-" << GetMinimumIntensity() << "_Bins-" << GetBins();
   else if (GetUseBins() && GetUseMaximumIntensity())

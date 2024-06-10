@@ -106,10 +106,10 @@ namespace mitk
     void CalculateCentroid(int t = 0);
 
     /*! working with an SVD algorithm form matrix dataM.
-     * ITK suplies the vnl_svd to solve an plan fit eigentvector problem
+     * ITK supplies the vnl_svd to solve an plan fit eigentvector problem
      * points are processed in the SVD matrix. The normal vector is the
      * singular vector of dataM corresponding to its smalest singular value.
-     * The mehtod uses VNL library from ITK and at least the mehtod nullvector()
+     * The method uses VNL library from ITK and at least the method nullvector()
      * to extract the normalvector.
      */
     void ProcessPointSet(int t = 0);
@@ -131,7 +131,7 @@ namespace mitk
     /*! the calculatet center point of all points in the point set.*/
     std::vector<mitk::Point3D> m_Centroids;
 
-    /* the normal vector to descrie a plane gemoetry.*/
+    /* the normal vector to describe a plane geometry.*/
     std::vector<mitk::Vector3D> m_PlaneVectors;
   };
 } // namespace mitk

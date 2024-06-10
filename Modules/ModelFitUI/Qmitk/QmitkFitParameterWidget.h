@@ -70,7 +70,7 @@ protected:
 
 };
 
-/** Helper function to sanatize strings before used in a csv export
+/** Helper function to sanitize strings before used in a csv export
  Moved to header in order to be reusabel for other ModelFitUI widgets.*/
 std::string SanatizeString(std::string str);
 

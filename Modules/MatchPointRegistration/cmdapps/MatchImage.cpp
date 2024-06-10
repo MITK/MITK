@@ -59,7 +59,7 @@ void SetupParser(mitkCommandLineParser& parser)
   parser.addArgument(
     "moving", "m",
     mitkCommandLineParser::File,
-    "Moving image files", "Path to the data that should be registred into the target space.",
+    "Moving image files", "Path to the data that should be registered into the target space.",
     us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
     "target", "t",
@@ -129,13 +129,13 @@ map::deployment::RegistrationAlgorithmBasePointer loadAlgorithm(const Settings& 
       "Cannot open deployed registration algorithm file.");
   }
 
-  std::cout << "... libary opened..." << std::endl;
+  std::cout << "... library opened..." << std::endl;
 
   std::cout << "Algorithm information: " << std::endl;
   spHandle->getAlgorithmUID().Print(std::cout, 2);
   std::cout << std::endl;
 
-  //Now load the algorthm from DLL
+  //Now load the algorithm from DLL
   spAlgorithmBase = map::deployment::getRegistrationAlgorithm(spHandle);
 
 
@@ -426,7 +426,7 @@ int main(int argc, char* argv[])
       movingImage = mitk::SelectImageByTimeStep(movingImage, 0)->Clone(); //we have to clone because SelectImageByTimeStep 
                                                                           //only generates as new view of the data and we
                                                                           //are overwriting the only smartpointer to the source.
-      std::cout << "Moving image has multiple time steps. Use first time step for registartion." << std::endl;
+      std::cout << "Moving image has multiple time steps. Use first time step for registration." << std::endl;
     }
 
     std::cout << "Load target data..." << std::endl;
@@ -443,7 +443,7 @@ int main(int argc, char* argv[])
       targetImage = mitk::SelectImageByTimeStep(targetImage, 0)->Clone(); //we have to clone because SelectImageByTimeStep 
                                                                           //only generates as new view of the data and we
                                                                           //are overwriting the only smartpointer to the source.
-      std::cout << "Target image has multiple time steps. Use first time step for registartion." << std::endl;
+      std::cout << "Target image has multiple time steps. Use first time step for registration." << std::endl;
     }
 
     std::cout << "Start registration...." << std::endl;

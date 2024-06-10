@@ -213,7 +213,7 @@ namespace itk
       }
     }
 
-    // Free memory regulary
+    // Free memory regularly
     regionInputIterators = inputItrVector.begin();
     while ( regionInputIterators != regionInputItEnd )
     {

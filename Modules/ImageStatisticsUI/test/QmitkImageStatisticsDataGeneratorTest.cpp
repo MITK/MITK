@@ -380,10 +380,10 @@ public:
     generator.SetImageNodes(imageNodes);
     m_TestApp->processEvents();
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 1, generator.m_DataGenerationStartedEmited);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 1, generator.m_GenerationFinishedEmited);
-    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", generator.m_JobErrorEmited_error.empty());
-    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 1 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 1, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but input does not really change.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but input does not really change.", 1 == generator.m_NewDataAvailable.size());
 
     QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType roiNodes{ m_MaskImageNode };
 
@@ -446,10 +446,10 @@ public:
     generator.SetHistogramNBins(5);
     m_TestApp->processEvents();
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 4, generator.m_DataGenerationStartedEmited);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 4, generator.m_GenerationFinishedEmited);
-    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", generator.m_JobErrorEmited_error.empty());
-    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 4 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 4, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 4, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but input does not really change.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but input does not really change.", 4 == generator.m_NewDataAvailable.size());
 
     generator.SetIgnoreZeroValueVoxel(false);
     m_TestApp->exec();
@@ -463,10 +463,10 @@ public:
     generator.SetIgnoreZeroValueVoxel(false);
     m_TestApp->processEvents();
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 5, generator.m_DataGenerationStartedEmited);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 5, generator.m_GenerationFinishedEmited);
-    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", generator.m_JobErrorEmited_error.empty());
-    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 5 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 5, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but input does not really change.", 5, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but input does not really change.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but input does not really change.", 5 == generator.m_NewDataAvailable.size());
   }
 
   void DataStorageModificationTest()
@@ -517,19 +517,19 @@ public:
     m_DataStorage->Add(mitk::DataNode::New());
     m_TestApp->processEvents();
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3, generator.m_DataGenerationStartedEmited);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3, generator.m_GenerationFinishedEmited);
-    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", generator.m_JobErrorEmited_error.empty());
-    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3 == generator.m_NewDataAvailable.size());
 
     m_Image2->Modified();
     m_ImageNode2->Modified();
     m_TestApp->processEvents();
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3, generator.m_DataGenerationStartedEmited);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3, generator.m_GenerationFinishedEmited);
-    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", generator.m_JobErrorEmited_error.empty());
-    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggered, but only irrelevant node was added.", 3 == generator.m_NewDataAvailable.size());
   }
 
 };

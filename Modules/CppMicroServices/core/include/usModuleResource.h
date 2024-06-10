@@ -44,7 +44,7 @@ class ModuleResourceContainer;
  * was embedded into this module's shared library. \c %ModuleResource objects can be obtained
  * be calling Module#GetResource or Module#FindResources.
  *
- * Example code for retreiving a resource object and reading its contents:
+ * Example code for retrieving a resource object and reading its contents:
  * \snippet uServices-resources/main.cpp 1
  *
  * %ModuleResource objects have value semantics and copies are very inexpensive.

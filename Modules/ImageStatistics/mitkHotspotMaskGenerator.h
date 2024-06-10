@@ -69,7 +69,7 @@ namespace mitk
         itkSetMacro(HotspotMustBeCompletelyInsideImage, bool);
 
         /**
-        @brief If a maskGenerator is set, this detemines which mask value is used
+        @brief If a maskGenerator is set, this determines which mask value is used
          */
         itkSetMacro(Label, unsigned short);
 
@@ -133,7 +133,7 @@ namespace mitk
         template <typename TPixel, unsigned int VImageDimension  >
         ImageExtrema CalculateExtremaWorld( const itk::Image<TPixel, VImageDimension>* inputImage,
                                                         const itk::Image<unsigned short, VImageDimension>* maskImage,
-                                                        double neccessaryDistanceToImageBorderInMM,
+                                                        double necessaryDistanceToImageBorderInMM,
                                                         unsigned int label);
 
         bool IsUpdateRequired() const;

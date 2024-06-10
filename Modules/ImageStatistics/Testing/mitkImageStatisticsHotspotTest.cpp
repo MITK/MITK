@@ -203,7 +203,7 @@ struct mitkImageStatisticsHotspotTestClass
 
   Reads XML file given in first commandline parameter in order
   to construct a Parameters structure. The XML file should be
-  structurs as the following example, i.e. we describe the
+  structured as the following example, i.e. we describe the
   three test aspects of Parameters in four different tags,
   with all the details described as tag attributes. */
 
@@ -514,12 +514,12 @@ struct mitkImageStatisticsHotspotTestClass
       hotspotMaskGen->SetHotspotRadiusInMM(testParameters.m_HotspotRadiusInMM);
       if(testParameters.m_EntireHotspotInImage == 1)
       {
-        MITK_INFO << "Hotspot must be completly inside image";
+        MITK_INFO << "Hotspot must be completely inside image";
         hotspotMaskGen->SetHotspotMustBeCompletelyInsideImage(true);
       }
       else
       {
-        MITK_INFO << "Hotspot must not be completly inside image";
+        MITK_INFO << "Hotspot must not be completely inside image";
         hotspotMaskGen->SetHotspotMustBeCompletelyInsideImage(false);
       }
 
@@ -533,12 +533,12 @@ struct mitkImageStatisticsHotspotTestClass
       hotspotMaskGen->SetHotspotRadiusInMM(testParameters.m_HotspotRadiusInMM);
       if(testParameters.m_EntireHotspotInImage == 1)
       {
-        MITK_INFO << "Hotspot must be completly inside image";
+        MITK_INFO << "Hotspot must be completely inside image";
         hotspotMaskGen->SetHotspotMustBeCompletelyInsideImage(true);
       }
       else
       {
-        MITK_INFO << "Hotspot must not be completly inside image";
+        MITK_INFO << "Hotspot must not be completely inside image";
         hotspotMaskGen->SetHotspotMustBeCompletelyInsideImage(false);
       }
       MITK_DEBUG << "Masking is set to hotspot only";
@@ -599,7 +599,7 @@ struct mitkImageStatisticsHotspotTestClass
 
     // TODO we do not test minimum/maximum positions within the peak/hotspot region, because
     //      these positions are not unique, i.e. there are multiple valid minima/maxima positions.
-    //      One solution would be to modify the test cases in order to achive clear positions.
+    //      One solution would be to modify the test cases in order to achieve clear positions.
     //      The BETTER/CORRECT solution would be to change the singular position into a set of positions / a region
   }
 };

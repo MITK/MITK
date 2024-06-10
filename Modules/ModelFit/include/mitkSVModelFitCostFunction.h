@@ -23,7 +23,7 @@ found in the LICENSE file.
 namespace mitk
 {
 
-/** Base class for all model fit cost function that return a singel cost value*/
+/** Base class for all model fit cost function that return a single cost value*/
 class MITKMODELFIT_EXPORT SVModelFitCostFunction : public itk::SingleValuedCostFunction, public ModelFitCostFunctionInterface
 {
 public:

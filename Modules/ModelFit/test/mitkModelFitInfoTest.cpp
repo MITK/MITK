@@ -385,7 +385,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing if GetNodesOfFit works correctly for Fit2",
       mitk::modelFit::GetNodesOfFit("Fit2", m_Storage)->Size() == 1);
 
-    CPPUNIT_ASSERT_MESSAGE("Testing if GetNodesOfFit works correctly for unkown fits.",
+    CPPUNIT_ASSERT_MESSAGE("Testing if GetNodesOfFit works correctly for unknown fits.",
       mitk::modelFit::GetNodesOfFit("unkown_fit", m_Storage)->Size() == 0);
 
     CPPUNIT_ASSERT_MESSAGE("Testing if GetNodesOfFit works correctly for illegal calls.",

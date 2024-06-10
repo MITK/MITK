@@ -93,7 +93,7 @@ namespace mitk
     /**Constraint checker. If set it will be used by the optimization strategies to add additional constraints to the
      given cost function. */
     ConstraintCheckerBase::ConstPointer m_ConstraintChecker;
-    /**If set to true and an constraint checker is set. The cost function will allways fail if the penalty of the
+    /**If set to true and an constraint checker is set. The cost function will always fail if the penalty of the
      checker reaches the threshold. In this case no function evaluation will be done-*/
     bool m_ActivateFailureThreshold;
   };

@@ -35,7 +35,7 @@ namespace mitk
     static PropertyKeyPath READER_MIME_CATEGORY();
     //Path to the property containing the input location if loaded by file used to read the data
     static PropertyKeyPath READER_INPUTLOCATION();
-    //Path to the properties containing the reader optins used to read the data
+    //Path to the properties containing the reader options used to read the data
     static PropertyKeyPath READER_OPTION_ROOT();
     static PropertyKeyPath READER_OPTIONS_ANY();
   };

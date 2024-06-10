@@ -29,7 +29,7 @@ int ObliquePlaneTestVolumeSize = 128;
 
 static void OverwriteObliquePlaneTest(mitk::Image *workingImage, mitk::Image *refImg)
 {
-  /*==============TEST WITHOUT MITK CONVERTION=============================*/
+  /*==============TEST WITHOUT MITK CONVERSION=============================*/
 
   /* ============= setup plane ============*/
   auto sliceindex = (int)(ObliquePlaneTestVolumeSize / 2); // rand() % 32;
@@ -102,9 +102,9 @@ static void OverwriteObliquePlaneTest(mitk::Image *workingImage, mitk::Image *re
     }
   }
 stop:
-  MITK_TEST_CONDITION(areSame, "comparing images (no mitk convertion) [oblique]");
+  MITK_TEST_CONDITION(areSame, "comparing images (no mitk conversion) [oblique]");
 
-  /*==============TEST WITH MITK CONVERTION=============================*/
+  /*==============TEST WITH MITK CONVERSION=============================*/
 
   /* ============= extract slice ============*/
   mitk::ExtractSliceFilter::Pointer slicer2 = mitk::ExtractSliceFilter::New();
@@ -148,9 +148,9 @@ stop:
     }
   }
 stop2:
-  MITK_TEST_CONDITION(areSame, "comparing images (with mitk convertion) [oblique]");
+  MITK_TEST_CONDITION(areSame, "comparing images (with mitk conversion) [oblique]");
 
-  /*==============TEST EDIT WITHOUT MITK CONVERTION=============================*/
+  /*==============TEST EDIT WITHOUT MITK CONVERSION=============================*/
 
   /* ============= edit slice ============*/
   int idX = std::abs(ObliquePlaneTestVolumeSize - 59);
@@ -202,7 +202,7 @@ stop2:
     }
   }
 stop3:
-  MITK_TEST_CONDITION(x == idX && y == z, "overwrited the right index [oblique]");
+  MITK_TEST_CONDITION(x == idX && y == z, "overwrote the right index [oblique]");
 }
 
 /*================ #BEGIN test main ================*/

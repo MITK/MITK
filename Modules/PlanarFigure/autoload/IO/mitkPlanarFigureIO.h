@@ -50,7 +50,7 @@ namespace mitk
     /**
     * @brief Reads a number of mitk::PlanarFigures from the file system
     * @return a vector of mitk::PlanarFigures
-    * @throws throws an mitk::Exception if an error ocurrs during parsing the nrrd header
+    * @throws throws an mitk::Exception if an error occurs during parsing the nrrd header
     */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 

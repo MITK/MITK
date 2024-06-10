@@ -189,7 +189,7 @@ public:
         mitk::ChartExampleTestHelper helper;
         helper.qmitkChartWidget.Clear();
         //int size = helper.qmitkChartWidget.ReturnSizeOfMemory();
-        //CPPUNIT_ASSERT_MESSAGE("Data storage was not cleared completly!", size == 0);
+        //CPPUNIT_ASSERT_MESSAGE("Data storage was not cleared completely!", size == 0);
     }
 };
 

@@ -80,7 +80,7 @@ void mitk::ClippingPlaneInteractor3D::SelectObject(StateMachineAction *, Interac
 
   node->SetColor(1.0, 0.0, 0.0);
 
-  // Colorize surface / wireframe dependend on distance from picked point
+  // Colorize surface / wireframe dependent on distance from picked point
   this->ColorizeSurface(interactionEvent->GetSender(), 0.0);
 
   RenderingManager::GetInstance()->RequestUpdateAll();

@@ -28,7 +28,7 @@ namespace mitk
     The tool always assumes that unconfirmed contours are always defined for the
     current time point. So the time step in which the contours will be stored as
     segmentations will be determined when the contours got confirmed. Then they
-    will be transfered to the slices of the currently selected time step.
+    will be transferred to the slices of the currently selected time step.
     Changing the time point/time step while tool is active will updated the working
     slice the live wire filter. So the behavior of the active live wire contour is
     always WYSIWYG (What you see is what you get).

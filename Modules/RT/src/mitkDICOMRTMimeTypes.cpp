@@ -58,8 +58,8 @@ bool DICOMRTMimeTypes::RTDoseMimeType::AppliesTo(const std::string &path) const
 
   // fix for bug 18572
   // Currently this function is called for writing as well as reading, in that case
-  // the image information can of course not be parsed or further identifyed.
-  //so as a work arround we just return the current canRead if the file does not exist.
+  // the image information can of course not be parsed or further identified.
+  //so as a work around we just return the current canRead if the file does not exist.
   if (!itksys::SystemTools::FileExists(path.c_str()))
   {
     return canRead;
@@ -130,8 +130,8 @@ bool DICOMRTMimeTypes::RTStructMimeType::AppliesTo(const std::string &path) cons
 
   // fix for bug 18572
   // Currently this function is called for writing as well as reading, in that case
-  // the image information can of course not be parsed or further identifyed.
-  //so as a work arround we just return the current canRead if the file does not exist.
+  // the image information can of course not be parsed or further identified.
+  //so as a work around we just return the current canRead if the file does not exist.
   if (!itksys::SystemTools::FileExists(path.c_str()))
   {
     return canRead;
@@ -171,8 +171,8 @@ bool DICOMRTMimeTypes::RTPlanMimeType::AppliesTo(const std::string &path) const
 
   // fix for bug 18572
   // Currently this function is called for writing as well as reading, in that case
-  // the image information can of course not be parsed or further identifyed.
-  //so as a work arround we just return the current canRead if the file does not exist.
+  // the image information can of course not be parsed or further identified.
+  //so as a work around we just return the current canRead if the file does not exist.
   if (!itksys::SystemTools::FileExists(path.c_str()))
   {
     return canRead;

@@ -93,7 +93,7 @@ public:
    *
    * \remarks Calling this method will have no effect if support for
    * auto-loading has not been configured into the CppMicroServices library of it
-   * it has been disabled by defining the US_DISABLE_AUTOLOADING envrionment variable.
+   * it has been disabled by defining the US_DISABLE_AUTOLOADING environment variable.
    */
   static void SetAutoLoadingEnabled(bool enable);
 

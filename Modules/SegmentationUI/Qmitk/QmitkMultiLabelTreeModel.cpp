@@ -338,7 +338,7 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
           auto label = item->GetLabel();
 
           if (nullptr == label)
-            mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is refering to a label that does not exist.";
+            mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is referring to a label that does not exist.";
 
           QString name = QString::fromStdString(label->GetName());
 
@@ -353,7 +353,7 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
           auto label = item->GetLabel();
 
           if (nullptr == label)
-            mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is refering to a label that does not exist.";
+            mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is referring to a label that does not exist.";
 
           return QVariant(QString::fromStdString(label->GetName()) + QString(" [%1]").arg(item->GetLabelValue()));
         }
@@ -957,6 +957,7 @@ void QmitkMultiLabelTreeModel::OnLabelModified(LabelValueType labelValue)
 
   if (nullptr == instanceItem)
   {
+    mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel received a LabelModified signal for a label that is not represented in the model. Invalid label: " << labelValue;
     mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel received a LabelModified signal for a label that is not represented in the model. Invalid label: " << labelValue;
   }
 

@@ -24,7 +24,7 @@ found in the LICENSE file.
 /*!
 \class QmitkFitParameterModel
 Model that can be used to display the parameter values of ModelFitInfo instances for different world coordinate positions.
-If more then one ModelFitInfo instance is given the model will use a tree hirarchy. The first level are the fits,
+If more then one ModelFitInfo instance is given the model will use a tree hierarchy. The first level are the fits,
 the seconds level are the parameter of the fit.
 */
 class MITKMODELFITUI_EXPORT QmitkFitParameterModel : public QAbstractTableModel

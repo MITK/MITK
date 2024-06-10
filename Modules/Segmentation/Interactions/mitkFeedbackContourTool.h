@@ -109,10 +109,10 @@ namespace mitk
     ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry *sliceGeometry,
                                                         const ContourModel *contourIn2D);
 
-    /** Helper methods that checks all precondition and if they are fullfilled does the following:
+    /** Helper methods that checks all precondition and if they are fulfilled does the following:
      * 1. Gets the contour of the time point specified by positionEvent.
      * 2. Gets the affacted working slice of the time point specified by positionEvent.
-     * 3. projects the contour onto the working slice and then fills it with the passed paintingPixelValue (adjusted by the current active lable value)
+     * 3. projects the contour onto the working slice and then fills it with the passed paintingPixelValue (adjusted by the current active label value)
      * to the slice.
      * 4. writes the slice back into the working image using SegTool2D::WriteBackSegmentationResult().*/
     void WriteBackFeedbackContourAsSegmentationResult(const InteractionPositionEvent* positionEvent, int paintingPixelValue, bool setInvisibleAfterSuccess = true);

@@ -120,7 +120,7 @@ void QmitkPopupColorChooser::closeEvent(QCloseEvent *e)
   if (!m_popupParent)
     return;
 
-  // remember that we (as a popup) might recieve the mouse release
+  // remember that we (as a popup) might receive the mouse release
   // event instead of the popupParent. This is due to the fact that
   // the popupParent popped us up in its mousePressEvent handler. To
   // avoid the button remaining in pressed state we simply send a

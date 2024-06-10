@@ -47,7 +47,7 @@ namespace mitk
     /**
      * @brief Reads a DICOM parametric map from the file system
      * @return an mitk::Image
-     * @throws an mitk::Exception if an error ocurrs
+     * @throws an mitk::Exception if an error occurs
      */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 

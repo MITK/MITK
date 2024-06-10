@@ -85,7 +85,7 @@ namespace mitk
     static tinyxml2::XMLElement *GetLabelAsXMLElement(tinyxml2::XMLDocument &doc, const Label *label);
 
     /**
-     * @brief Since a mitk::Label is basically a mitk::PropertyList this function coverts the label's properties into
+     * @brief Since a mitk::Label is basically a mitk::PropertyList this function converts the label's properties into
      * XML
      * @param doc
      * @param key the property's key which will be used in the XML element
@@ -95,7 +95,7 @@ namespace mitk
     static tinyxml2::XMLElement *PropertyToXMLElement(tinyxml2::XMLDocument& doc, const std::string &key, const BaseProperty *property);
 
     /**
-     * @brief Since a mitk::Label is basically a mitk::PropertyList this function coverts a XML element into a property
+     * @brief Since a mitk::Label is basically a mitk::PropertyList this function converts an XML element into a property
      * @param key the property's key
      * @param prop the mitk::BaseProperty that will be created
      * @param elem the XML elem from which the property will be created

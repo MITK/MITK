@@ -56,7 +56,7 @@ void mitk::MITKRegistrationWrapperMapperBase::GenerateDataForRenderer( mitk::Bas
 
     RegWrapperLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-    //check if updates occured in the node or on the display
+    //check if updates occurred in the node or on the display
     bool outdatedRendererGeometry = RendererGeometryIsOutdated(renderer,localStorage->m_LastUpdateTime);
 
     if ( (localStorage->m_LastUpdateTime < node->GetMTime())

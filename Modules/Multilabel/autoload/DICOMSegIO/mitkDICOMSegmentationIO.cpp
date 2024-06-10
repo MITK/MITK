@@ -31,7 +31,8 @@ found in the LICENSE file.
 #include <itkThresholdImageFilter.h>
 
 // dcmqi
-#include <dcmqi/ImageSEGConverter.h>
+#include <dcmqi/Itk2DicomConverter.h>
+#include <dcmqi/Dicom2ItkConverter.h>
 
 // us
 #include <usGetModuleContext.h>
@@ -212,7 +213,7 @@ namespace mitk
           rawVecDataset.push_back(dcmDataSet.get());
 
         // Convert itk segmentation images to dicom image
-        std::unique_ptr<dcmqi::ImageSEGConverter> converter = std::make_unique<dcmqi::ImageSEGConverter>();
+        auto converter = std::make_unique<dcmqi::Itk2DicomConverter>();
         std::unique_ptr<DcmDataset> result(converter->itkimage2dcmSegmentation(rawVecDataset, segmentations, tmpMetaInfoFile, false));
 
         // Write dicom file
@@ -287,13 +288,23 @@ namespace mitk
 
       //=============================== dcmqi part ====================================
       // Read the DICOM SEG images (segItkImages) and DICOM tags (metaInfo)
-      std::unique_ptr<dcmqi::ImageSEGConverter> converter = std::make_unique<dcmqi::ImageSEGConverter>();
-      pair<map<unsigned, itkInternalImageType::Pointer>, string> dcmqiOutput =
-        converter->dcmSegmentation2itkimage(dataSet);
+      auto converter = std::make_unique<dcmqi::Dicom2ItkConverter>();
+      std::string metaInfoString;
+      auto convert_condition = converter->dcmSegmentation2itkimage(dataSet, metaInfoString, false);
 
-      map<unsigned, itkInternalImageType::Pointer> segItkImages = dcmqiOutput.first;
+      std::vector<itkInternalImageType::Pointer> segItkImages;
 
-      dcmqi::JSONSegmentationMetaInformationHandler metaInfo(dcmqiOutput.second.c_str());
+      if (convert_condition.good())
+      {
+        auto image = converter->begin();
+        while (image.IsNotNull())
+        {
+          segItkImages.emplace_back(image);
+          image = converter->next();
+        }
+      }
+
+      dcmqi::JSONSegmentationMetaInformationHandler metaInfo(metaInfoString.c_str());
       metaInfo.read();
 
       MITK_INFO << "Input " << metaInfo.getJSONOutputAsString();
@@ -304,12 +315,12 @@ namespace mitk
         metaInfo.segmentsAttributesMappingList.begin();
 
       // For each itk image add a layer to the LabelSetImage output
-      for (auto &element : segItkImages)
+      for (auto &segItkImage : segItkImages)
       {
         // Get the labeled image and cast it to mitkImage
         typedef itk::CastImageFilter<itkInternalImageType, itkInputImageType> castItkImageFilterType;
         castItkImageFilterType::Pointer castFilter = castItkImageFilterType::New();
-        castFilter->SetInput(element.second);
+        castFilter->SetInput(segItkImage);
         castFilter->Update();
 
         Image::Pointer layerImage;
@@ -319,7 +330,7 @@ namespace mitk
         itkInternalImageType::ValueType segValue = 1;
         typedef itk::ImageRegionIterator<const itkInternalImageType> IteratorType;
         // Iterate over the image to find the pixel value of the label
-        IteratorType iter(element.second, element.second->GetLargestPossibleRegion());
+        IteratorType iter(segItkImage, segItkImage->GetLargestPossibleRegion());
         iter.GoToBegin();
         while (!iter.IsAtEnd())
         {
@@ -483,12 +494,17 @@ namespace mitk
 
     auto labelSet = image->GetConstLabelsByValue(image->GetLabelValuesByGroup(layer));
 
+    unsigned int segmentNumber = 0;
+
     for (const auto& label : labelSet)
     {
+      segmentNumber++;
       if (label != nullptr)
       {
-        TemporoSpatialStringProperty *segmentNumberProp = dynamic_cast<mitk::TemporoSpatialStringProperty *>(label->GetProperty(
-          mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_NUMBER_PATH()).c_str()));
+        //Deactivated. Currently contains LabelID, but that is not valid. See T30157. Must be reworked/removed in conjunction with
+        // T30157
+        //TemporoSpatialStringProperty *segmentNumberProp = dynamic_cast<mitk::TemporoSpatialStringProperty *>(label->GetProperty(
+        //  mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_NUMBER_PATH()).c_str()));
 
         TemporoSpatialStringProperty *segmentLabelProp = dynamic_cast<mitk::TemporoSpatialStringProperty *>(label->GetProperty(
           mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_LABEL_PATH()).c_str()));
@@ -523,17 +539,8 @@ namespace mitk
         TemporoSpatialStringProperty *segmentModifierCodeMeaningProp = dynamic_cast<mitk::TemporoSpatialStringProperty *>(label->GetProperty(
           mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_MEANING_PATH()).c_str()));
 
-        dcmqi::SegmentAttributes *segmentAttribute = nullptr;
+        auto segmentAttribute = handler.createOrGetSegment(segmentNumber, label->GetValue());
 
-        if (segmentNumberProp->GetValue() == "")
-        {
-          MITK_ERROR << "Something went wrong with the label ID.";
-        }
-        else
-        {
-          int labelId = std::stoi(segmentNumberProp->GetValue());
-          segmentAttribute = handler.createAndGetNewSegment(labelId);
-        }
         if (segmentAttribute != nullptr)
         {
           segmentAttribute->setSegmentLabel(segmentLabelProp->GetValueAsString());

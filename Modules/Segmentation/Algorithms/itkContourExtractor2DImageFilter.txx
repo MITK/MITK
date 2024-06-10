@@ -232,7 +232,7 @@ namespace itk
       progress.CompletedPixel();
     } // iteration
 
-    // Now create the outputs paths from the dequeues we've been using.
+    // Now create the outputs paths from the deques we've been using.
     this->FillOutputs();
     m_Contours.clear();
     m_ContourStarts.clear();

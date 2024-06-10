@@ -111,7 +111,7 @@ namespace mitk
     HotspotMaskGenerator::ImageExtrema
       HotspotMaskGenerator::CalculateExtremaWorld( const itk::Image<TPixel, VImageDimension>* inputImage,
                                                     const itk::Image<unsigned short, VImageDimension>* maskImage,
-                                                    double neccessaryDistanceToImageBorderInMM,
+                                                    double necessaryDistanceToImageBorderInMM,
                                                     unsigned int label )
     {
       typedef itk::Image< TPixel, VImageDimension > ImageType;
@@ -129,7 +129,7 @@ namespace mitk
 
       typename ImageType::RegionType allowedExtremaRegion = inputImage->GetLargestPossibleRegion();
 
-      bool keepDistanceToImageBorders( neccessaryDistanceToImageBorderInMM > 0 );
+      bool keepDistanceToImageBorders( necessaryDistanceToImageBorderInMM > 0 );
       if (keepDistanceToImageBorders)
       {
         itk::IndexValueType distanceInPixels[VImageDimension];
@@ -139,7 +139,7 @@ namespace mitk
           // the radius. To get the amount of indices we divide the radius by spacing and add 0.5 because voxels are center based:
           // For example with a radius of 2.2 and a spacing of 1 two indices are enough because 2.2 / 1 + 0.5 = 2.7 => 2.
           // But with a radius of 2.7 we need 3 indices because 2.7 / 1 + 0.5 = 3.2 => 3
-          distanceInPixels[dimension] = int( neccessaryDistanceToImageBorderInMM / spacing[dimension] + 0.5);
+          distanceInPixels[dimension] = int( necessaryDistanceToImageBorderInMM / spacing[dimension] + 0.5);
         }
 
         allowedExtremaRegion.ShrinkByRadius(distanceInPixels);

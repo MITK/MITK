@@ -113,7 +113,7 @@ namespace mitk
     /**
     \brief Fills the paintingPixelValue into every pixel of resultImage as indicated by filledImage.
     If a LableSet image is specified it also by incorporating the rules of LabelSet images when filling the content.
-    \param filledImage Pointer to the image content that should be checked to decided if a pixel in resultImage should
+    \param filledImage Pointer to the image content that should be checked to decide if a pixel in resultImage should
     be filled with paintingPixelValue or not.
     \param resultImage Pointer to the image content that should be overwritten guided by the content of filledImage.
     \param image Pointer to an mitk image that allows to define the LabelSet image which states steer the filling process.

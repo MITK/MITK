@@ -65,7 +65,7 @@ protected:
 
   /**This method is used to control/set the enabled state of the tool UI
     widgets. It is e.g. used if the busy state is changed (see BusyStateChanged).
-    Override the default implmentation, e.g. if a tool adds his own UI elements
+    Override the default implementation, e.g. if a tool adds his own UI elements
     (normally by overriding InitializeUI()) and wants to control how the widgets
     are enabled/disabled.*/
   virtual void EnableWidgets(bool enabled);

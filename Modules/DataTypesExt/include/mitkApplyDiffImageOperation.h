@@ -27,7 +27,7 @@ namespace mitk
    This works only for images with 1 channel (gray scale images, no color images).
 
    ApplyDiffImageOperation of course refers to an image (a segmentation usually).
-   The refered image is observed for itk::DeleteEvent, because there is no SmartPointer
+   The referred image is observed for itk::DeleteEvent, because there is no SmartPointer
    used to keep the image alive -- the purpose of this class is undo and the undo
    stack should not keep things alive forever.
 

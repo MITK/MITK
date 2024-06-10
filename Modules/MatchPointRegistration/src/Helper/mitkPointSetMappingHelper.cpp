@@ -132,7 +132,7 @@ found in the LICENSE file.
   }
   if (!registration->GetRegistration())
   {
-    mitkThrow() << "Cannot map point set. Passed registration wrapper containes no registration.";
+    mitkThrow() << "Cannot map point set. Passed registration wrapper contains no registration.";
   }
   if (!input)
   {

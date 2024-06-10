@@ -174,7 +174,7 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 
       Takes as input a number of images, which are all equally oriented and spatially sorted along their normal direction.
 
-      Internally used by GetSeries. Returns two lists: the first one contins slices of equal inter-slice spacing.
+      Internally used by GetSeries. Returns two lists: the first one contains slices of equal inter-slice spacing.
       The second list contains remaining files, which need to be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption again.
 
       Relevant code that is matched here is in

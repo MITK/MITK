@@ -350,7 +350,7 @@ static void TestEmptyContour()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
-  MITK_TEST_CONDITION(contour->IteratorBegin() == contour->IteratorEnd(), "test iterator of emtpy contour");
+  MITK_TEST_CONDITION(contour->IteratorBegin() == contour->IteratorEnd(), "test iterator of empty contour");
 
   MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 0, "test numberof vertices of empty contour");
 }

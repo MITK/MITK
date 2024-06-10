@@ -395,7 +395,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
     maxValue = min2ndValue + minDelta;
   }
 
-  // now we can assume more than three distict scalar values
+  // now we can assume more than three distinct scalar values
   else
   {
     ScalarType innerRange = max2ndValue - min2ndValue;

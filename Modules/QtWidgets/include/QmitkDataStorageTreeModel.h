@@ -107,11 +107,11 @@ public:
   //# SETTER
 public:
   ///
-  /// Sets the DataStorage. The whole model will be resetted.
+  /// Sets the DataStorage. The whole model will be reset.
   ///
   void SetDataStorage(mitk::DataStorage *_DataStorage);
   ///
-  /// Notify that the DataStorage was deleted. The whole model will be resetted.
+  /// Notify that the DataStorage was deleted. The whole model will be reset.
   ///
   void SetDataStorageDeleted();
   ///
@@ -125,7 +125,7 @@ public:
   ///
   virtual void RemoveNode(const mitk::DataNode *node);
   ///
-  /// Sets a node to modfified. Called by the DataStorage
+  /// Sets a node to modified. Called by the DataStorage
   ///
   virtual void SetNodeModified(const mitk::DataNode *node);
 

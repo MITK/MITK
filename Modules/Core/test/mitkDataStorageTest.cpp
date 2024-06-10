@@ -135,7 +135,7 @@ int mitkDataStorageTest(int argc, char *argv[])
   try
   {
     sds = mitk::StandaloneDataStorage::New();
-    MITK_TEST_CONDITION_REQUIRED(sds.IsNotNull(), "Testing Instatiation");
+    MITK_TEST_CONDITION_REQUIRED(sds.IsNotNull(), "Testing Instantiation");
   }
   catch (...)
   {

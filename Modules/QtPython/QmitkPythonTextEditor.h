@@ -20,7 +20,7 @@ found in the LICENSE file.
 struct QmitkPythonTextEditorData;
 
 ///
-/// this is a python text editor with syntax highlightning
+/// this is a python text editor with syntax highlighting
 class MITKQTPYTHON_EXPORT QmitkPythonTextEditor : public QWidget
 {
   Q_OBJECT

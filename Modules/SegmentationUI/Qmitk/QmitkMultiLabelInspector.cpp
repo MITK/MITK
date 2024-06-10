@@ -87,7 +87,7 @@ void QmitkMultiLabelInspector::Initialize()
 
   m_LastValidSelectedLabels = {};
 
-  //in singel selection mode, if at least one label exist select the first label of the mode.
+  //in single selection mode, if at least one label exist select the first label of the mode.
   if (m_Segmentation.IsNotNull() && !this->GetMultiSelectionMode() && m_Segmentation->GetTotalNumberOfLabels() > 0)
   {
     auto firstIndex = m_Model->FirstLabelInstanceIndex(QModelIndex());

@@ -198,7 +198,7 @@ data(const QModelIndex& index, int role) const
         }
         else if (role == Qt::ToolTipRole)
         {
-          result = QVariant("type of the inital value.");
+          result = QVariant("type of the initial value.");
         }
         break;
 

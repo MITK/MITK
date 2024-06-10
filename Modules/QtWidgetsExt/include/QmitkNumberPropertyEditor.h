@@ -66,8 +66,8 @@ protected:
   const int m_DataType;
 
   short m_DecimalPlaces;            // how many decimal places are shown
-  double m_FactorPropertyToSpinbox; // internal conversion factor. neccessary because spinbox ranges work only with ints
-  double m_FactorSpinboxToDisplay;  // internal conversion factor. neccessary because spinbox ranges work only with ints
+  double m_FactorPropertyToSpinbox; // internal conversion factor. necessary because spinbox ranges work only with ints
+  double m_FactorSpinboxToDisplay;  // internal conversion factor. necessary because spinbox ranges work only with ints
   bool m_ShowPercents;              // whether values are given in percent (0.5 -> 50%)
 
 protected slots:

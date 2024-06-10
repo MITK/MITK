@@ -342,7 +342,7 @@ namespace mitk
     @remark This method should remove all properties that are set for a specific relation by Connect_datalayer(...).
     If the relationUID is not part of the source, nothing will be changed. Disconnect() ensures that source is a valid
     pointer if called.
-    @remark Disconnect() ensures that sourece is valid and only invokes if instance exists.*/
+    @remark Disconnect() ensures that source is valid and only invokes if instance exists.*/
     virtual void Disconnect_datalayer(IPropertyOwner *source, const RelationUIDType & relationUID) const = 0;
 
     /** Returns if the passed rule ID is supported/relevant for the rule. Either because it is the very ID of the rule (default implementation) or because

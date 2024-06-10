@@ -525,7 +525,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
 
   Vector3D spacing = geo2D->GetSpacing();
 
-  // If you find a way to simplyfy the following, feel free to change!
+  // If you find a way to simplify the following, feel free to change!
   b->SetElement(0, 0, b->GetElement(0, 0) / spacing[0]);
   b->SetElement(1, 0, b->GetElement(1, 0) / spacing[0]);
   b->SetElement(2, 0, b->GetElement(2, 0) / spacing[0]);

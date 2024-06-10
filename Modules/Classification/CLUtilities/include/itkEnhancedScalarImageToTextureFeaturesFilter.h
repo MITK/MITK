@@ -49,7 +49,7 @@ namespace itk
     * masked region), averaged across several spatial directions so that they are
     * invariant to rotation.
     *
-    * By default, texure features are computed for each spatial
+    * By default, texture features are computed for each spatial
     * direction and then averaged afterward, so it is possible to access the standard
     * deviations of the texture features. These values give a clue as to texture
     * anisotropy. However, doing this is much more work, because it involved computing
@@ -99,7 +99,7 @@ namespace itk
     * Haralick, R.M. 1979. Statistical and Structural Approaches to Texture.
     * Proceedings of the IEEE, 67:786-804.
     *
-    * R.W. Conners and C.A. Harlow. A Theoretical Comaprison of Texture Algorithms.
+    * R.W. Conners and C.A. Harlow. A Theoretical Comparison of Texture Algorithms.
     * IEEE Transactions on Pattern Analysis and Machine Intelligence,  2:204-222, 1980.
     *
     * R.W. Conners, M.M. Trivedi, and C.A. Harlow. Segmentation of a High-Resolution

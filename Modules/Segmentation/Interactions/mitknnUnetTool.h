@@ -176,13 +176,13 @@ namespace mitk
     ~nnUNetTool();
 
     /**
-     * @brief Overriden method from the tool manager to execute the segmentation
+     * @brief Overridden method from the tool manager to execute the segmentation
      * Implementation:
      * 1. Saves the inputAtTimeStep in a temporary directory.
      * 2. Copies other modalities, renames and saves in the temporary directory, if required.
      * 3. Sets RESULTS_FOLDER and CUDA_VISIBLE_DEVICES variables in the environment.
      * 3. Iterates through the parameter queue (m_ParamQ) and executes "nnUNet_predict" command with the parameters
-     * 4. Expects an output image to be saved in the temporary directory by the python proces. Loads it as
+     * 4. Expects an output image to be saved in the temporary directory by the python process. Loads it as
      *    LabelSetImage and sets to previewImage.
      *
      * @param inputAtTimeStep

@@ -38,7 +38,7 @@ namespace mitk
    * based on it's direct neighbours and saves them into a CovarianceMatrixList.
    * The Class implements the CM_PCA method presented by
    * L. Maier-Hein et al. in "Convergent Iterative Closest-Point Algorithm
-   * to Accomodate Anisotropic and Inhomogenous Localization Error.",
+   * to Accommodate Anisotropic and Inhomogenous Localization Error.",
    * IEEE T Pattern Anal 34 (8), 1520-1532, 2012. The algorithm needs
    * a clean Surface with non manifold edges and no duplicated vertices. To
    * ensure a clean Surface representation use vtkCleanPolyData.

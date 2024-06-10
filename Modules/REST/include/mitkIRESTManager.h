@@ -49,7 +49,7 @@ namespace mitk
     /**
      * @brief Executes a HTTP request in the mitkRESTClient class
      *
-     * @throw mitk::Exception if RequestType is not suported
+     * @throw mitk::Exception if RequestType is not supported
      * @param uri defines the URI the request is send to
      * @param type the RequestType of the HTTP request (optional)
      * @param headers the headers for the request (optional)

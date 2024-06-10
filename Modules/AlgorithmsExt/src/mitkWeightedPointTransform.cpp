@@ -109,7 +109,7 @@ double ComputeWeightedFRE(vtkPoints *X,
 #pragma omp parallel for
   for (int i = 0; i < static_cast<int>(WeightMatrices.size()); ++i)
   {
-    // convert to itk data types (nessecary since itk 4 migration)
+    // convert to itk data types (necessary since itk 4 migration)
     itk::Vector<double, 3> converted_MovingPoint;
     double point[3];
     X->GetPoint(i, point);
@@ -300,7 +300,7 @@ void mitk::WeightedPointTransform::WeightedPointRegister(vtkPoints *X,
     //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     // PROBLEM:  no square matrix but the backslash operator in matlab does solve the system anyway. How to convert this
     // to C++?
-    //          good descriptons to the "backslash"-operator (in german):
+    //          good descriptions to the "backslash"-operator (in german):
     //          http://www.tm-mathe.de/Themen/html/matlab__zauberstab__backslash-.html
     //                                                                    http://www.tm-mathe.de/Themen/html/matlab__matrix-division__vorsi.html#HoheMatrixA
     //

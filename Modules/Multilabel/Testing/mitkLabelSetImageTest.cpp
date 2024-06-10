@@ -270,7 +270,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - active label is wrong",
                            m_LabelSetImage->GetActiveLabel()->GetValue() == value2);
 
-    CPPUNIT_ASSERT_MESSAGE("Active Label was not correctly retreived with const getter",
+    CPPUNIT_ASSERT_MESSAGE("Active Label was not correctly retrieved with const getter",
       const_cast<const mitk::LabelSetImage*>(m_LabelSetImage.GetPointer())->GetActiveLabel()->GetValue() == value2);
 
   }

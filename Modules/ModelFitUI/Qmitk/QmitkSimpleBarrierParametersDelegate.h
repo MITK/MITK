@@ -25,7 +25,7 @@ found in the LICENSE file.
 a barrier constraint. The delegate assumes the following: 1) if the data is requested with the
 edit role, it gets a string list of all possible options. 2) if the data is requested with the
 display role it gets only a list of all currently selected options.
-If the data is transfered back to the model it contains all selected parameter names in a string list.*/
+If the data is transferred back to the model it contains all selected parameter names in a string list.*/
 class MITKMODELFITUI_EXPORT QmitkSimpleBarrierParametersDelegate : public QStyledItemDelegate
 {
   Q_OBJECT

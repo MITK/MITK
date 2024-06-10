@@ -73,12 +73,12 @@ namespace mitk
     ~TotalSegmentatorTool();
 
     /**
-     * @brief Overriden method from the tool manager to execute the segmentation
+     * @brief Overridden method from the tool manager to execute the segmentation
      * Implementation:
      * 1. Creates temp directory, if not done already.
      * 2. Parses Label names from map_to_binary.py for using later on.
      * 3. Calls "run_totalsegmentator" method.
-     * 4. Expects an output image to be saved in the temporary directory by the python proces. Loads it as
+     * 4. Expects an output image to be saved in the temporary directory by the python process. Loads it as
      *    LabelSetImage and sets to previewImage.
      *
      * @param inputAtTimeStep

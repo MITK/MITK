@@ -22,7 +22,7 @@ namespace mitk
   /**
   * \brief Calculates the Run Length based features.
   *
-  * Grey Level Run Length based features are calcualted using the Run-Length-Matrix and were originally
+  * Grey Level Run Length based features are calculated using the Run-Length-Matrix and were originally
   * defined by Galloway (1975). The basic idea behind this feature is to measure the length of
   * lines with similar intensity in an image. This allows to asses line-based structures in an image.
   * For this, the Run-Length-Matrix  created that gives the number of lines \f$ m_{x,l} \f$ with the intensity \f$ x \f$ and
@@ -34,7 +34,7 @@ namespace mitk
   * quantification of the image can be controlled using the general binning parameters as defined
   * in AbstractGlobalImageFeature.
   *
-  * By default, the calculation is based on a 26 neighourhood for 3D and a 8 neighbourhood in 2D. It is further
+  * By default, the calculation is based on a 26 neighbourhood for 3D and a 8 neighbourhood in 2D. It is further
   * possible to exclude directions from the calculation, e.g. calculating the feature in 2D, even if a
   * 3D image is passed. This is controlled by  determine the
   * dimensionality of the neighbourhood using direction-related commands as described in AbstractGlobalImageFeature.
@@ -45,7 +45,7 @@ namespace mitk
   * The features are calculated based on a mask. It is assumed that the mask is
   * of the same type as the input image. All voxels with a value greater 0.5 are treated as masked.
   *
-  * Several values are definied for the definition of the features. \f$ N_v \f$ is the number of masked voxels,
+  * Several values are defined for the definition of the features. \f$ N_v \f$ is the number of masked voxels,
   * \f$N_s \f$ is the number of different lines, \f$ m_{x,\cdot} = \sum_l m{x,l} \f$ is the number of all lines
   * with a given intensity value, and likewise \f$ m_{\cdot, l} = \sum_x m{x,l} \f$ is the number of all lines
   * with a given length. There are two options how to make this feature orientation-invariant. Either calculating a

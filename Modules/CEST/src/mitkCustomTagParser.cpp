@@ -128,12 +128,12 @@ mitk::CustomTagParser::CustomTagParser(std::string relevantFile) : m_ClosestInte
 
 std::string mitk::CustomTagParser::ExtractRevision(std::string sequenceFileName)
 {
-  //all rules are case insesitive. Thus we convert everything to lower case
+  //all rules are case insensitive. Thus we convert everything to lower case
   //in order to check everything only once.
   std::string cestPrefix = "cest";
   std::string cestPrefix2 = "_cest";
   std::string cestPrefix3 = "\\cest"; //this version covers the fact that the strings extracted
-                                      //from the SIEMENS tag has an additional prefix that is seperated by backslash.
+                                      //from the SIEMENS tag has an additional prefix that is separated by backslash.
   std::string revisionPrefix = "_rev";
   std::transform(sequenceFileName.begin(), sequenceFileName.end(), sequenceFileName.begin(), ::tolower);
 

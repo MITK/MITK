@@ -359,7 +359,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
           fileName += "." + suffix;
           stdFileName = fileName.toLocal8Bit().constData();
           // We changed the file name (added a suffix) so ask in case
-          // the file aready exists.
+          // the file already exists.
           fileInfo = QFileInfo(fileName);
           if (fileInfo.exists())
           {
@@ -442,7 +442,7 @@ struct QmitkIOUtil::SaveFilter::Impl
 {
   Impl(const mitk::IOUtil::SaveInfo &saveInfo) : m_SaveInfo(saveInfo)
   {
-    // Add an artifical filter for "All"
+    // Add an artificial filter for "All"
     m_MimeTypes.push_back(ALL_MIMETYPE());
     m_FilterStrings.push_back("All (*.*)");
 

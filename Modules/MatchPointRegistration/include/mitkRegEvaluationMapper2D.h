@@ -205,7 +205,7 @@ protected:
   void PrepareBlend( mitk::DataNode* datanode, LocalStorage * localStorage );
 
   /** \brief This method uses the vtkCamera clipping range and the layer property
-    * to calcualte the depth of the object (e.g. image or contour). The depth is used
+    * to calculate the depth of the object (e.g. image or contour). The depth is used
     * to keep the correct order for the final VTK rendering.*/
   float CalculateLayerDepth(mitk::BaseRenderer* renderer);
 

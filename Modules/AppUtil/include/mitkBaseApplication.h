@@ -172,7 +172,7 @@ namespace mitk
     bool getSafeMode() const;
 
     /**
-     * Set a list of library names or absoulte file paths
+     * Set a list of library names or absolute file paths
      * which should be loaded at application start-up. The name
      * and file path may contain a library version appended at the
      * end and separated by a '$' charactger.

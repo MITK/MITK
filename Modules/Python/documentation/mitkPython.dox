@@ -26,7 +26,7 @@ The user can also specify it's own runtime by modifying the variables added by t
 FindPythonLib.cmake script. <strong>Note:</strong> A Python runtime with numpy is needed to use the MITK Python wrapping.
 When using this options all additional libraries installed in the python runtime will be available within the MITK-Python console.
 
-\section python_sec3 Suported Data Types
+\section python_sec3 Supported Data Types
 The following data types in MITK are supported in the MITK Python Wrapping:
 <ul>
   <li> Image

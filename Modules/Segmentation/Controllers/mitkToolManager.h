@@ -46,7 +46,7 @@ namespace mitk
     of mitk::Tool.
         As a result, one has to implement both a subclass of mitk::Tool and a matching subclass of
     itk::ObjectFactoryBase that is registered
-        to the top-level itk::ObjectFactory. For an example, see mitkContourToolFactory.h. (this limitiation of
+        to the top-level itk::ObjectFactory. For an example, see mitkContourToolFactory.h. (this limitation of
     one-class-one-factory is due
         to the implementation of itk::ObjectFactory).
         In MITK, the right place to register the factories to itk::ObjectFactory is the mitk::QMCoreObjectFactory or
@@ -68,7 +68,7 @@ namespace mitk
     ask for the active Tool using
           GetActiveTool or GetActiveToolID (where nullptr or -1 indicate that NO tool is active at the moment).
 
-    Design descisions:
+    Design decisions:
 
     \li Not a singleton, because there could be two functionalities using tools, each one with different
     reference/working data.
@@ -116,7 +116,7 @@ namespace mitk
     /**
       \param id The tool to activate. Provide -1 for disabling any tools.
       Counting starts with 0.
-      Registeres a listner for NodeRemoved event at DataStorage (see mitk::ToolManager::OnNodeRemoved).
+      Registers a listener for NodeRemoved event at DataStorage (see mitk::ToolManager::OnNodeRemoved).
     */
     bool ActivateTool(int id);
 

@@ -190,7 +190,7 @@ void mitk::ExtractImageFilter::GenerateInputRequestedRegion()
 }
 
 /*
- * Generate the information decribing the output data. The default
+ * Generate the information describing the output data. The default
  * implementation of this method will copy information from the input to the
  * output. A filter may override this method if its output will have different
  * information than its input. For instance, a filter that shrinks an image will

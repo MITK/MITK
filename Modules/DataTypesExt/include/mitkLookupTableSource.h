@@ -54,7 +54,7 @@ namespace mitk
 
     /**
      * This is a default implementation to make sure we have something.
-     * Once all the subclasses of ProcessObject provide an appopriate
+     * Once all the subclasses of ProcessObject provide an appropriate
      * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
      * virtual.
      */
@@ -67,9 +67,9 @@ namespace mitk
     void GenerateInputRequestedRegion() override;
 
     /**
-     * Replacement of the SetOutput method. I think it is not yet correcly
+     * Replacement of the SetOutput method. I think it is not yet correctly
      * implemented, so you should better not use it.
-     * @todo provide a more usefule implementation
+     * @todo provide a more useful implementation
      * @param output the intended output of the lookup table source.
      */
     virtual void GraftOutput(OutputType *output);

@@ -79,6 +79,7 @@ public slots:
 
 protected slots:
   /** Used by QmitkDataGenerationJobBase to signal the generator that an error occurred. */
+  /** Used by QmitkDataGenerationJobBase to signal the generator that an error occurred. */
   void OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob) const;
   /** Used by QmitkDataGenerationJobBase to signal and communicate the results of there computation. */
   void OnFinalResultsAvailable(JobResultMapType results, const QmitkDataGenerationJobBase *job) const;
@@ -113,6 +114,7 @@ protected:
 
   /** This method must be implemented by derived to indicate if a changed node is relevant and therefore if an update must be triggered.*/
   virtual bool ChangedNodeIsRelevant(const mitk::DataNode* changedNode) const = 0;
+  /** This method must be implemented by derived classes to return the pairs of images and ROIs
   /** This method must be implemented by derived classes to return the pairs of images and ROIs
   (ROI may be null if no ROI is needed) for which data are needed.*/
   virtual InputPairVectorType GetAllImageROICombinations() const = 0;

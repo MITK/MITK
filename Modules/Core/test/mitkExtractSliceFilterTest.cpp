@@ -371,7 +371,7 @@ public:
   }
 
   /*
-   * random a voxel. define plane through this voxel. reslice at the plane. compare the pixel vaues of the voxel
+   * random a voxel. define plane through this voxel. reslice at the plane. compare the pixel values of the voxel
    * in the volume with the pixel value in the resliced image.
    * there are some indice shifting problems which causes the test to fail for oblique planes. seems like the chosen
    * worldcoordinate is not corresponding to the index in the 2D image. and so the pixel values are not the same as

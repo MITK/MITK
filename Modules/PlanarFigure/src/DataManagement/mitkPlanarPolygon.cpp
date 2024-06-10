@@ -134,7 +134,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
     area /= 2.0;
   }
 
-  // set area if appropiate (i.e. closed and not intersected)
+  // set area if appropriate (i.e. closed and not intersected)
   if (this->IsClosed() && !intersection)
   {
     SetQuantity(FEATURE_ID_AREA, fabs(area));

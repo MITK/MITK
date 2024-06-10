@@ -40,7 +40,7 @@ class MITKDICOM_EXPORT DICOMSortCriterion : public itk::LightObject
 
     mitkClassMacroItkParent( DICOMSortCriterion, itk::LightObject );
 
-    /// \brief Tags used for comparison (includes seconary criteria).
+    /// \brief Tags used for comparison (includes secondary criteria).
     DICOMTagList GetAllTagsOfInterest() const;
     /// \brief Tags used for comparison.
     virtual DICOMTagList GetTagsOfInterest() const = 0;
@@ -49,7 +49,7 @@ class MITKDICOM_EXPORT DICOMSortCriterion : public itk::LightObject
     virtual bool IsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const = 0;
 
     /// \brief Calculate a distance between two datasets.
-    /// This ansers the question of consecutive datasets.
+    /// This answers the question of consecutive datasets.
     virtual double NumericDistance(const mitk::DICOMDatasetAccess* from, const mitk::DICOMDatasetAccess* to) const = 0;
 
     /// \brief The fallback criterion.

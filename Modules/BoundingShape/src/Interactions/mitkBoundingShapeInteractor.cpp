@@ -338,7 +338,7 @@ void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, Intera
 
 void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction *, InteractionEvent *)
 {
-  this->DisableOriginalInteraction(); // disable crosshair interaction and scolling if user is hovering over the object
+  this->DisableOriginalInteraction(); // disable crosshair interaction and scrolling if user is hovering over the object
   DataNode::Pointer node = this->GetDataNode();
 
   if (node.IsNull())
@@ -358,7 +358,7 @@ void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction *, Interacti
 
 void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction *, InteractionEvent *)
 {
-  this->EnableOriginalInteraction(); // enable crosshair interaction and scolling if user is hovering over the object
+  this->EnableOriginalInteraction(); // enable crosshair interaction and scrolling if user is hovering over the object
 
   DataNode::Pointer node = this->GetDataNode();
 
@@ -417,7 +417,7 @@ void mitk::BoundingShapeInteractor::TranslateObject(StateMachineAction *, Intera
   interactionMove[2] = std::round((currentPickedPoint[2] - m_Impl->LastPickedWorldPoint[2]) / spacing[2]) * spacing[2];
 
   if ((interactionMove[0] + interactionMove[1] + interactionMove[2]) !=
-      0.0) // only update current position if a movement occured
+      0.0) // only update current position if a movement occurred
   {
     m_Impl->LastPickedWorldPoint = currentPickedPoint;
 

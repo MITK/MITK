@@ -35,7 +35,7 @@ int mitkBoundingObjectCutterTest(int /*argc*/, char * /*argv*/ [])
   // mitk::PixelType pt(mitk::MakeScalarPixelType<int>() );
   // unsigned int dim[]={100,100,20};
 
-  // MITK_TEST_OUTPUT(<< "Creating Image as imput for cutting: ");
+  // MITK_TEST_OUTPUT(<< "Creating Image as input for cutting: ");
   // image=mitk::Image::New();
   // image->Initialize(mitk::MakeScalarPixelType<int>(), 3, dim);
   // mitk::ImageReadAccessor imgAcc(image);

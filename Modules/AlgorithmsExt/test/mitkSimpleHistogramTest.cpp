@@ -20,7 +20,7 @@ int mitkSimpleHistogramTest(int /*argc*/, char * /*argv*/ [])
 
   auto myTestSimpleImageHistogram = new mitk::SimpleImageHistogram();
 
-  MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram != nullptr, "Testing instanciation.");
+  MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram != nullptr, "Testing instantiation.");
   MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram->GetMax() == 1, "Testing GetMax().");
   MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram->GetMin() == 0, "Testing GetMin().");
   MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram->GetRelativeBin(1.0, 5.0) == 0, "Testing GetRelativeBin().");

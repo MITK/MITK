@@ -55,7 +55,7 @@ namespace mitk
     //## For separation of the separate operations
     //## If the ObjectEventId of two OperationEvents is equal,
     //## then they share one Object and will be undone in all cases of Undo(true and false).
-    //## they shal not be separated, because they were produced to realize one object-change.
+    //## they shall not be separated, because they were produced to realize one object-change.
     //## for example: OE_statechange and OE_addlastpoint
     static int GetCurrObjectEventId();
 

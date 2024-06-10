@@ -116,7 +116,7 @@ void QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow *renderWindow, boo
     if ((*it).renWin == renderWindow)
     {
       mitk::VtkLayerController *layerController = mitk::VtkLayerController::GetInstance((*it).renWin);
-      // unregister video backround renderer from renderwindow
+      // unregister video background renderer from renderwindow
       if (layerController)
         layerController->RemoveRenderer((*it).videoRenderer);
 
@@ -223,7 +223,7 @@ void QmitkVideoBackground::UpdateVideo()
 
 void QmitkVideoBackground::Modified()
 {
-  // ensures registration of video backrounds in each renderwindow
+  // ensures registration of video backgrounds in each renderwindow
   for (auto it = m_renderWindowVectorInfo.begin(); it != m_renderWindowVectorInfo.end(); it++)
   {
     (*it).videoImport->Update();

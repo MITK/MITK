@@ -89,7 +89,7 @@ namespace mitk
     /** \brief The char arrays in this vector are displayed at the corresponding coordinates.*/
     std::vector<std::string> m_LabelVector;
 
-    /** \brief values in this array set a priority to each label. Higher priority labels are not covert by labels with
+    /** \brief values in this array set a priority to each label. Higher priority labels are not convert by labels with
      * lower priority.*/
     std::vector<int> m_PriorityVector;
 

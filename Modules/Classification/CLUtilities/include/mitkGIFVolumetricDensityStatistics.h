@@ -34,7 +34,7 @@ namespace mitk
     * directly from the mask. The following features are then defined:
     * - <b>Morphological Density::Volume density axis-aligned bounding box</b>: The axis-aligned bounding
     * box is defined as the minimum axis aligned box in 3D space that encloses all masked voxels.
-    * It is calculated by using the maximum spacial extension of the mask. Based on the volume of  the
+    * It is calculated by using the maximum spatial extension of the mask. Based on the volume of  the
     * bounding box, \f$ V_{aabb} \f$, the feature is defined as:
     * \f[ \textup{Volume density axis-aligned bounding box}= \frac{V}{V_{aabb}} \f]
     * - <b>Morphological Density::Surface density axis-aligned bounding box</b>: As for the previous
@@ -51,14 +51,14 @@ namespace mitk
     * bounding box \f$ A_{ombb} \f$:
     * \f[ \textup{Surface density axis-aligned bounding box}= \frac{A}{A_{ombb}} \f]
     * - <b>Morphological Density::Volume density approx. enclosing ellipsoid</b>: Using a Principal Component Analysis (PCA)
-    * of the spacial coordinates gives the three main axis of the mask. They correspond to the length of
+    * of the spatial coordinates gives the three main axis of the mask. They correspond to the length of
     * a eclipse enclosing the mask. The length of the axis of the eclipse are given by the eigenvalues of the
     * decomposition: \f$ a = 2 \sqrt{\lambda_1} \f$, \f$ b = 2 \sqrt{\lambda_2} \f$, and \f$ c = 2 \sqrt{\lambda_3} \f$
     * with \f$\lambda_x\f$ being the sorted eigenvalues (higher number indicates larger values). The volume
     * of the enclosing eclipse can be estimated by \f$ V_{aee} = 4 \pi a b c \f$:
     * \f[ \textup{Volume density approx. enclosing ellipsoid}= \frac{V}{V_{aee}} \f]
     * - <b>Morphological Density::Surface density approx. enclosing ellipsoid</b>: As for the previous
-    * feature, the surface of the enclosing ellipsoid is used. To simplify the calulation of it, an approximation (20 iterations)
+    * feature, the surface of the enclosing ellipsoid is used. To simplify the calculation of it, an approximation (20 iterations)
     * for the surface is used (\f$ \alpha = \sqrt{1-\frac{b^2}{a^2}} \f$, \f$ \beta = \sqrt{1-\frac{c^2}{a^2}} \f$):
     * \f[ A_{aee} = 2 \pi a b \frac{\alpha^2 + \beta^2}{\alpha \beta} \sum_v^\infty \frac{(a \beta)^v}{1-a v^2} \f]
     * \f[ \textup{Surface density approx. enclosing ellipsoid}= \frac{A}{A_{aee}} \f]
@@ -70,7 +70,7 @@ namespace mitk
     * defined as \f$ V_{mvee} = 4 \pi a b c \f$ and the feature given by:
     * \f[ \textup{Volume density approx. minimum volume enclosing ellipsoid}= \frac{V}{V_{mvee}} \f]
     * - <b>Morphological Density::Surface density approx. minimum volume enclosing ellipsoid</b>: As for the previous
-    * feature, the surface of the minimum volume enclosing ellipsoid is used. To simplify the calulation of it,
+    * feature, the surface of the minimum volume enclosing ellipsoid is used. To simplify the calculation of it,
     * an approximation with 20 iterations instead of infinite iterations is used for the calculation of the
     * the surface (\f$ \alpha = \sqrt{1-\frac{b^2}{a^2}} \f$, \f$ \beta = \sqrt{1-\frac{c^2}{a^2}} \f$):
     * \f[ A_{mvee} = 2 \pi a b \frac{\alpha^2 + \beta^2}{\alpha \beta} \sum_v^\infty \frac{(a \beta)^v}{1-a v^2} \f]
@@ -89,13 +89,13 @@ namespace mitk
     * number of masked voxels \f$ N_v \f$ and the intensity of each voxel \f$ x_i \f$:
     * \f[ \textup{Volume integrated intensity}= V \frac{1}{N_v} \sum x_i \f]
     * - <b>Morphological Density::Volume Moran's I index</b>: Moran's I index is an measure for
-    * the spacial autocorrelation. It is defined using the inverse spacial distance between two voxels \f$i, j \f$ \f$w_{ij} \f$,
+    * the spatial autocorrelation. It is defined using the inverse spatial distance between two voxels \f$i, j \f$ \f$w_{ij} \f$,
     * the number of masked voxels \f$ N_v \f$, the intensity of each voxel \f$ x_i \f$,
     * and the mean intensity of all masked voxels \f$ \mu = \frac{1}{N_v} sum x_i \f$:
     * \f[ \textup{Volume Moran's I index}= \frac{N_v}{\sum_i \sum_j w_{ij}} \frac{\sum_i \sum_j (x_i - \mu) (x_j -\mu)}{\sum_i (x_i - \mu)^2 } \enspace \enspace {; i \neq j} \f]
     * - <b>Morphological Density::Volume Geary's C measure</b>: Geary's C meansure is similar to Moran's I index.
-    * However, it is more sensitive to grey level differences and spacial autocorrelation:
-    * the spacial autocorrelation. It is defined using the inverse spacial distance between two voxels \f$i, j \f$ \f$w_{ij} \f$,
+    * However, it is more sensitive to grey level differences and spatial autocorrelation:
+    * the spatial autocorrelation. It is defined using the inverse spatial distance between two voxels \f$i, j \f$ \f$w_{ij} \f$,
     * the number of masked voxels \f$ N_v \f$, the intensity of each voxel \f$ x_i \f$,
     * and the mean intensity of all masked voxels \f$ \mu = \frac{1}{N_v} sum x_i \f$:
     * \f[ \textup{Volume Geary's C measure}= \frac{N_v - 1}{2 \sum_i \sum_j w_{ij}} \frac{ \sum_i \sum_j w_{ij} (x_i - x_j)^2 }{\sum_i (x_i - \mu)^2 } \enspace \enspace {; i \neq j} \f]

@@ -26,10 +26,10 @@ namespace mitk
     * \brief Calculates first order statistics of the given image.
     *
     * The first order statistics for the intensity distribution within a given Region of Interest (ROI)
-    * is caluclated. The ROI is defined using a mask.
+    * is calculated. The ROI is defined using a mask.
     *
     * The features are calculated on a quantified image. If the bin-size is too big, the obtained values
-    * can be errornous and missleading. It is therefore important to use enough bins. The binned approach is
+    * can be erroneous and misleading. It is therefore important to use enough bins. The binned approach is
     * used in order to avoid floating-point related errors.
     *
     * This feature calculator is activated by the option <b>-first-order</b> or <b>-fo</b>.
@@ -58,10 +58,10 @@ namespace mitk
     * - <b>First Order::Skewness</b>:
     * \f[ \textup{Skewness} = \frac{\frac{1}{N_v} \sum \left( x_i - \mu \right)^3}{\sigma^3} \f]
     * - <b>First Order::Kurtosis</b>: The kurtosis is a measurement of the peakness of the given
-    * distirbution:
+    * distribution:
     * \f[ \textup{Kurtosis} = \frac{\frac{1}{N_v} \sum \left( x_i - \mu \right)^4}{\sigma^4} \f]
     * - <b>First Order::Excess Kurtosis</b>: The kurtosis is a measurement of the peakness of the given
-    * distirbution. The excess kurtosis is similar to the kurtosis, but is corrected by a fisher correction,
+    * distribution. The excess kurtosis is similar to the kurtosis, but is corrected by a fisher correction,
     * ensuring that a gaussian distribution has an excess kurtosis of 0.
     * \f[ \textup{Excess Kurtosis} = \frac{\frac{1}{N_v} \sum \left( x_i - \mu \right)^4}{\sigma^4} - 3 \f]
     * - <b>First Order::Median</b>: The median is defined as the median of the all intensities in the ROI.
@@ -90,7 +90,7 @@ namespace mitk
     * and minimum intensity in the ROI.
     * - <b>First Order::Interquartile Range</b>: The difference between the 75% and 25% quantile.
     * - <b>First Order::Mean Absolute Deviation</b>: The mean absolute deviation gives the mean distance of each
-    * voxel intensity to the overal mean intensity and is a measure of the dispersion of the intensity form the
+    * voxel intensity to the overall mean intensity and is a measure of the dispersion of the intensity form the
     * mean value:
     * \f[ \textup{Mean Absolute Deviation} = \frac{1}{N_v} \sum \left \| x_i - \mu \right \| \f]
     * - <b>First Order::Robust Mean</b>: The mean intensity within the ROI for all voxels between the 10% and 90% quantile:
@@ -102,7 +102,7 @@ namespace mitk
     * instead of the mean to measure the center of the distribution.
     * - <b>First Order::Coefficient Of Variation</b>: Measures the dispersion of the intensity distribution:
     * \f[ \textup{Coefficient Of Variation} = \frac{sigma}{\mu} \f]
-    * - <b>First Order::Quantile Coefficient Of Dispersion</b>: A robust alternative to teh coefficient of variance:
+    * - <b>First Order::Quantile Coefficient Of Dispersion</b>: A robust alternative to the coefficient of variance:
     * \f[ \textup{Quantile Coefficient Of Dispersion} = \frac{P_{75\%} - P_{25\%} }{P_{75\%} + P_{25\%}} \f]
     * - <b>First Order::Energy</b>: The intensity energy:
     * \f[ \textup{Energy} = \sum x_i ^2 \f]

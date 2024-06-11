@@ -31,7 +31,9 @@ found in the LICENSE file.
 #include <itkThresholdImageFilter.h>
 
 // dcmqi
-#include <dcmqi/ImageSEGConverter.h>
+#include <dcmqi/Itk2DicomConverter.h>
+#include <dcmqi/Dicom2ItkConverter.h>
+#include <dcmtk/dcmdata/dcdeftag.h>
 
 // us
 #include <usGetModuleContext.h>
@@ -122,7 +124,7 @@ namespace mitk
 
     // Get DICOM information from referenced image
     vector<std::unique_ptr<DcmDataset>> dcmDatasetsSourceImage;
-    std::unique_ptr<DcmFileFormat> readFileFormat(new DcmFileFormat());
+    std::unique_ptr<DcmFileFormat> readFileFormat = std::make_unique<DcmFileFormat>();
     try
     {
       // TODO: Generate dcmdataset witk DICOM tags from property list; ATM the source are the filepaths from the
@@ -212,8 +214,16 @@ namespace mitk
           rawVecDataset.push_back(dcmDataSet.get());
 
         // Convert itk segmentation images to dicom image
-        std::unique_ptr<dcmqi::ImageSEGConverter> converter = std::make_unique<dcmqi::ImageSEGConverter>();
+        auto converter = std::make_unique<dcmqi::Itk2DicomConverter>();
         std::unique_ptr<DcmDataset> result(converter->itkimage2dcmSegmentation(rawVecDataset, segmentations, tmpMetaInfoFile, false));
+
+        //We store only one group, thus we can specify the SegmentsOverlap Tag (0062,0013)
+        // as NO
+        auto condition = result->putAndInsertString(DCM_SegmentsOverlap, "NO");
+        if (condition.bad())
+        {
+          MITK_DEBUG << "unable to set SegmentOverlap tag.";
+        }
 
         // Write dicom file
         DcmFileFormat dcmFileFormat(result.get());
@@ -285,15 +295,36 @@ namespace mitk
       if (dataSet == nullptr)
         mitkThrow() << "Can't read data from input file!";
 
+      //Get the value of SegmentsOverlap Tag (0062,0013) for this dataset
+      OFString overlapValue;
+      bool assumeOverlappingSegments = true;
+      status = dataSet->findAndGetOFString(DCM_SegmentsOverlap, overlapValue);
+      if (status.good())
+      {
+        assumeOverlappingSegments = "NO" != overlapValue     //DCM allows only NO, YES and UNDEFINED
+                                    && "no" != overlapValue  //never the less we add lower and mixed case
+                                    && "No" != overlapValue; //version to be more robust with non-compliant DCM files
+      }
+
       //=============================== dcmqi part ====================================
       // Read the DICOM SEG images (segItkImages) and DICOM tags (metaInfo)
-      std::unique_ptr<dcmqi::ImageSEGConverter> converter = std::make_unique<dcmqi::ImageSEGConverter>();
-      pair<map<unsigned, itkInternalImageType::Pointer>, string> dcmqiOutput =
-        converter->dcmSegmentation2itkimage(dataSet);
+      auto converter = std::make_unique<dcmqi::Dicom2ItkConverter>();
+      std::string metaInfoString;
+      auto convert_condition = converter->dcmSegmentation2itkimage(dataSet, metaInfoString, false);
 
-      map<unsigned, itkInternalImageType::Pointer> segItkImages = dcmqiOutput.first;
+      std::vector<itkInternalImageType::Pointer> segItkImages;
 
-      dcmqi::JSONSegmentationMetaInformationHandler metaInfo(dcmqiOutput.second.c_str());
+      if (convert_condition.good())
+      {
+        auto image = converter->begin();
+        while (image.IsNotNull())
+        {
+          segItkImages.emplace_back(image);
+          image = converter->next();
+        }
+      }
+
+      dcmqi::JSONSegmentationMetaInformationHandler metaInfo(metaInfoString.c_str());
       metaInfo.read();
 
       MITK_INFO << "Input " << metaInfo.getJSONOutputAsString();
@@ -304,22 +335,22 @@ namespace mitk
         metaInfo.segmentsAttributesMappingList.begin();
 
       // For each itk image add a layer to the LabelSetImage output
-      for (auto &element : segItkImages)
+      for (auto &segItkImage : segItkImages)
       {
         // Get the labeled image and cast it to mitkImage
         typedef itk::CastImageFilter<itkInternalImageType, itkInputImageType> castItkImageFilterType;
         castItkImageFilterType::Pointer castFilter = castItkImageFilterType::New();
-        castFilter->SetInput(element.second);
+        castFilter->SetInput(segItkImage);
         castFilter->Update();
 
-        Image::Pointer layerImage;
-        CastToMitkImage(castFilter->GetOutput(), layerImage);
+        Image::Pointer segmentImage;
+        CastToMitkImage(castFilter->GetOutput(), segmentImage);
 
         // Get pixel value of the label
         itkInternalImageType::ValueType segValue = 1;
         typedef itk::ImageRegionIterator<const itkInternalImageType> IteratorType;
         // Iterate over the image to find the pixel value of the label
-        IteratorType iter(element.second, element.second->GetLargestPossibleRegion());
+        IteratorType iter(segItkImage, segItkImage->GetLargestPossibleRegion());
         iter.GoToBegin();
         while (!iter.IsAtEnd())
         {
@@ -336,23 +367,26 @@ namespace mitk
         map<unsigned, dcmqi::SegmentAttributes *>::const_iterator segmentMapIter = (*segmentIter).begin();
         dcmqi::SegmentAttributes *segmentAttribute = (*segmentMapIter).second;
 
-        OFString labelName;
+        OFString labelName = segmentAttribute->getSegmentLabel();
 
-        if (segmentAttribute->getSegmentedPropertyTypeCodeSequence() != nullptr)
+        if (labelName.empty())
         {
-          segmentAttribute->getSegmentedPropertyTypeCodeSequence()->getCodeMeaning(labelName);
-          if (segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence() != nullptr)
+          if (segmentAttribute->getSegmentedPropertyTypeCodeSequence() != nullptr)
           {
-            OFString modifier;
-            segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence()->getCodeMeaning(modifier);
-            labelName.append(" (").append(modifier).append(")");
+            segmentAttribute->getSegmentedPropertyTypeCodeSequence()->getCodeMeaning(labelName);
+            if (segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence() != nullptr)
+            {
+              OFString modifier;
+              segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence()->getCodeMeaning(modifier);
+              labelName.append(" (").append(modifier).append(")");
+            }
           }
-        }
-        else
-        {
-          labelName = std::to_string(segmentAttribute->getLabelID()).c_str();
-          if (labelName.empty())
-            labelName = "Unnamed";
+          else
+          {
+            labelName = std::to_string(segmentAttribute->getLabelID()).c_str();
+            if (labelName.empty())
+              labelName = "Unnamed";
+          }
         }
 
         float tmp[3] = { 0.0, 0.0, 0.0 };
@@ -363,13 +397,13 @@ namespace mitk
           tmp[2] = segmentAttribute->getRecommendedDisplayRGBValue()[2] / 255.0;
         }
 
-        Label *newLabel = nullptr;
+        Label::Pointer newLabel = nullptr;
         // If labelSetImage do not exists (first image)
         if (labelSetImage.IsNull())
         {
           // Initialize the labelSetImage with the read image
           labelSetImage = LabelSetImage::New();
-          labelSetImage->InitializeByLabeledImage(layerImage);
+          labelSetImage->InitializeByLabeledImage(segmentImage);
           // Already a label was generated, so set the information to this
           newLabel = labelSetImage->GetActiveLabel();
           newLabel->SetName(labelName.c_str());
@@ -378,15 +412,30 @@ namespace mitk
         }
         else
         {
-          // Add a new layer to the labelSetImage. Background label is set automatically
-          labelSetImage->AddLayer(layerImage);
+          LabelSetImage::GroupIndexType groupID = 0;
+          if (assumeOverlappingSegments)
+          {
+            // Add a new group because we have to expect every label to be overlapping
+            // the label content is directly transfered here.
+            groupID = labelSetImage->AddLayer(segmentImage);
+          }
 
-          // Add new label
-          newLabel = new Label;
+          // Add the new label
+          newLabel = Label::New();
           newLabel->SetName(labelName.c_str());
           newLabel->SetColor(Color(tmp));
           newLabel->SetValue(segValue);
-          labelSetImage->AddLabel(newLabel, labelSetImage->GetActiveLayer());
+          labelSetImage->AddLabel(newLabel, groupID, true, true);
+
+          if (!assumeOverlappingSegments)
+          {
+            //if we know the labels are non overlapping we can put everything in one image
+            //the label content has to be transfered, as no new group was added.
+            mitk::TransferLabelContent(segmentImage, labelSetImage->GetGroupImage(groupID),
+              labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(groupID)),
+              mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, {{segValue,newLabel->GetValue()}});
+          }
+
         }
 
         // Add some more label properties
@@ -483,12 +532,17 @@ namespace mitk
 
     auto labelSet = image->GetConstLabelsByValue(image->GetLabelValuesByGroup(layer));
 
+    unsigned int segmentNumber = 0;
+
     for (const auto& label : labelSet)
     {
+      ++segmentNumber;
       if (label != nullptr)
       {
-        TemporoSpatialStringProperty *segmentNumberProp = dynamic_cast<mitk::TemporoSpatialStringProperty *>(label->GetProperty(
-          mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_NUMBER_PATH()).c_str()));
+        //Deactivated. Currently contains LabelID, but that is not valid. See T30157. Must be reworked/removed in conjunction with
+        // T30157
+        //TemporoSpatialStringProperty *segmentNumberProp = dynamic_cast<mitk::TemporoSpatialStringProperty *>(label->GetProperty(
+        //  mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_NUMBER_PATH()).c_str()));
 
         TemporoSpatialStringProperty *segmentLabelProp = dynamic_cast<mitk::TemporoSpatialStringProperty *>(label->GetProperty(
           mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_LABEL_PATH()).c_str()));
@@ -523,17 +577,8 @@ namespace mitk
         TemporoSpatialStringProperty *segmentModifierCodeMeaningProp = dynamic_cast<mitk::TemporoSpatialStringProperty *>(label->GetProperty(
           mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_MEANING_PATH()).c_str()));
 
-        dcmqi::SegmentAttributes *segmentAttribute = nullptr;
+        auto segmentAttribute = handler.createOrGetSegment(segmentNumber, label->GetValue());
 
-        if (segmentNumberProp->GetValue() == "")
-        {
-          MITK_ERROR << "Something went wrong with the label ID.";
-        }
-        else
-        {
-          int labelId = std::stoi(segmentNumberProp->GetValue());
-          segmentAttribute = handler.createAndGetNewSegment(labelId);
-        }
         if (segmentAttribute != nullptr)
         {
           segmentAttribute->setSegmentLabel(segmentLabelProp->GetValueAsString());

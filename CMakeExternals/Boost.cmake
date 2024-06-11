@@ -63,8 +63,8 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
           or use another option in the future, we do not forget to remove our
           copy of the FindBoost module again. ]]
 
-  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_85_0.tar.gz")
-  set(md5 53aeccc3167909ee770e34469f8dd592)
+  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_85_0_patched.tar.gz")
+  set(md5 8f7c3012a5b64d9b0b07b20cde12d989)
 
   if(MITK_USE_Boost_LIBRARIES)
 

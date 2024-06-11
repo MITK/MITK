@@ -347,23 +347,26 @@ namespace mitk
         map<unsigned, dcmqi::SegmentAttributes *>::const_iterator segmentMapIter = (*segmentIter).begin();
         dcmqi::SegmentAttributes *segmentAttribute = (*segmentMapIter).second;
 
-        OFString labelName;
+        OFString labelName = segmentAttribute->getSegmentLabel();
 
-        if (segmentAttribute->getSegmentedPropertyTypeCodeSequence() != nullptr)
+        if (labelName.empty())
         {
-          segmentAttribute->getSegmentedPropertyTypeCodeSequence()->getCodeMeaning(labelName);
-          if (segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence() != nullptr)
+          if (segmentAttribute->getSegmentedPropertyTypeCodeSequence() != nullptr)
           {
-            OFString modifier;
-            segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence()->getCodeMeaning(modifier);
-            labelName.append(" (").append(modifier).append(")");
+            segmentAttribute->getSegmentedPropertyTypeCodeSequence()->getCodeMeaning(labelName);
+            if (segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence() != nullptr)
+            {
+              OFString modifier;
+              segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence()->getCodeMeaning(modifier);
+              labelName.append(" (").append(modifier).append(")");
+            }
           }
-        }
-        else
-        {
-          labelName = std::to_string(segmentAttribute->getLabelID()).c_str();
-          if (labelName.empty())
-            labelName = "Unnamed";
+          else
+          {
+            labelName = std::to_string(segmentAttribute->getLabelID()).c_str();
+            if (labelName.empty())
+              labelName = "Unnamed";
+          }
         }
 
         float tmp[3] = { 0.0, 0.0, 0.0 };

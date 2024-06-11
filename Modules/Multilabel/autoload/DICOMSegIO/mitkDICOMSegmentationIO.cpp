@@ -301,7 +301,9 @@ namespace mitk
       status = dataSet->findAndGetOFString(DCM_SegmentsOverlap, overlapValue);
       if (status.good())
       {
-        assumeOverlappingSegments = "NO" != overlapValue;
+        assumeOverlappingSegments = "NO" != overlapValue     //DCM allows only NO, YES and UNDEFINED
+                                    && "no" != overlapValue  //never the less we add lower and mixed case
+                                    && "No" != overlapValue; //version to be more robust with non-compliant DCM files
       }
 
       //=============================== dcmqi part ====================================
@@ -534,7 +536,7 @@ namespace mitk
 
     for (const auto& label : labelSet)
     {
-      segmentNumber++;
+      ++segmentNumber;
       if (label != nullptr)
       {
         //Deactivated. Currently contains LabelID, but that is not valid. See T30157. Must be reworked/removed in conjunction with

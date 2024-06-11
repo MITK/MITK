@@ -33,6 +33,7 @@ found in the LICENSE file.
 // dcmqi
 #include <dcmqi/Itk2DicomConverter.h>
 #include <dcmqi/Dicom2ItkConverter.h>
+#include <dcmtk/dcmdata/dcdeftag.h>
 
 // us
 #include <usGetModuleContext.h>
@@ -123,7 +124,7 @@ namespace mitk
 
     // Get DICOM information from referenced image
     vector<std::unique_ptr<DcmDataset>> dcmDatasetsSourceImage;
-    std::unique_ptr<DcmFileFormat> readFileFormat(new DcmFileFormat());
+    std::unique_ptr<DcmFileFormat> readFileFormat = std::make_unique<DcmFileFormat>();
     try
     {
       // TODO: Generate dcmdataset witk DICOM tags from property list; ATM the source are the filepaths from the
@@ -216,6 +217,14 @@ namespace mitk
         auto converter = std::make_unique<dcmqi::Itk2DicomConverter>();
         std::unique_ptr<DcmDataset> result(converter->itkimage2dcmSegmentation(rawVecDataset, segmentations, tmpMetaInfoFile, false));
 
+        //We store only one group, thus we can specify the SegmentsOverlap Tag (0062,0013)
+        // as NO
+        auto condition = result->putAndInsertString(DCM_SegmentsOverlap, "NO");
+        if (condition.bad())
+        {
+          MITK_DEBUG << "unable to set SegmentOverlap tag.";
+        }
+
         // Write dicom file
         DcmFileFormat dcmFileFormat(result.get());
 
@@ -286,6 +295,15 @@ namespace mitk
       if (dataSet == nullptr)
         mitkThrow() << "Can't read data from input file!";
 
+      //Get the value of SegmentsOverlap Tag (0062,0013) for this dataset
+      OFString overlapValue;
+      bool assumeOverlappingSegments = true;
+      status = dataSet->findAndGetOFString(DCM_SegmentsOverlap, overlapValue);
+      if (status.good())
+      {
+        assumeOverlappingSegments = "NO" != overlapValue;
+      }
+
       //=============================== dcmqi part ====================================
       // Read the DICOM SEG images (segItkImages) and DICOM tags (metaInfo)
       auto converter = std::make_unique<dcmqi::Dicom2ItkConverter>();
@@ -323,8 +341,8 @@ namespace mitk
         castFilter->SetInput(segItkImage);
         castFilter->Update();
 
-        Image::Pointer layerImage;
-        CastToMitkImage(castFilter->GetOutput(), layerImage);
+        Image::Pointer segmentImage;
+        CastToMitkImage(castFilter->GetOutput(), segmentImage);
 
         // Get pixel value of the label
         itkInternalImageType::ValueType segValue = 1;
@@ -377,13 +395,13 @@ namespace mitk
           tmp[2] = segmentAttribute->getRecommendedDisplayRGBValue()[2] / 255.0;
         }
 
-        Label *newLabel = nullptr;
+        Label::Pointer newLabel = nullptr;
         // If labelSetImage do not exists (first image)
         if (labelSetImage.IsNull())
         {
           // Initialize the labelSetImage with the read image
           labelSetImage = LabelSetImage::New();
-          labelSetImage->InitializeByLabeledImage(layerImage);
+          labelSetImage->InitializeByLabeledImage(segmentImage);
           // Already a label was generated, so set the information to this
           newLabel = labelSetImage->GetActiveLabel();
           newLabel->SetName(labelName.c_str());
@@ -392,15 +410,30 @@ namespace mitk
         }
         else
         {
-          // Add a new group to the labelSetImage.
-          auto newGroupID = labelSetImage->AddLayer(layerImage);
+          LabelSetImage::GroupIndexType groupID = 0;
+          if (assumeOverlappingSegments)
+          {
+            // Add a new group because we have to expect every label to be overlapping
+            // the label content is directly transfered here.
+            groupID = labelSetImage->AddLayer(segmentImage);
+          }
 
-          // Add new label
-          newLabel = new Label;
+          // Add the new label
+          newLabel = Label::New();
           newLabel->SetName(labelName.c_str());
           newLabel->SetColor(Color(tmp));
           newLabel->SetValue(segValue);
-          labelSetImage->AddLabel(newLabel, newGroupID);
+          labelSetImage->AddLabel(newLabel, groupID, true, true);
+
+          if (!assumeOverlappingSegments)
+          {
+            //if we know the labels are non overlapping we can put everything in one image
+            //the label content has to be transfered, as no new group was added.
+            mitk::TransferLabelContent(segmentImage, labelSetImage->GetGroupImage(groupID),
+              labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(groupID)),
+              mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, {{segValue,newLabel->GetValue()}});
+          }
+
         }
 
         // Add some more label properties

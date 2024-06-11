@@ -389,15 +389,15 @@ namespace mitk
         }
         else
         {
-          // Add a new layer to the labelSetImage. Background label is set automatically
-          labelSetImage->AddLayer(layerImage);
+          // Add a new group to the labelSetImage.
+          auto newGroupID = labelSetImage->AddLayer(layerImage);
 
           // Add new label
           newLabel = new Label;
           newLabel->SetName(labelName.c_str());
           newLabel->SetColor(Color(tmp));
           newLabel->SetValue(segValue);
-          labelSetImage->AddLabel(newLabel, labelSetImage->GetActiveLayer());
+          labelSetImage->AddLabel(newLabel, newGroupID);
         }
 
         // Add some more label properties

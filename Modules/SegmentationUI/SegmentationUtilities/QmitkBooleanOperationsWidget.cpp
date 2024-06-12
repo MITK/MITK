@@ -76,7 +76,7 @@ void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::LabelSetImage::
 
 namespace
 {
-  std::string GenerateLabelHTML(const mitk::Label* label)
+  std::string GenerateLabelHTML(const mitk::Label* label, const mitk::LabelSetImage* segmentation)
   {
     std::stringstream stream;
     auto color = label->GetColor();
@@ -86,7 +86,12 @@ namespace
       << std::setw(2) << static_cast<int>(color.GetBlue()*255)
       << "; font-size: 20px '>&#x25A0;</span>" << std::dec;
 
-    stream << "<font class=\"normal\"> " << label->GetName()<< "</font>";
+    stream << "<font class=\"normal\"> " << label->GetName();
+    if (segmentation->GetLabelValuesByName(segmentation->GetGroupIndexOfLabel(label->GetValue()), label->GetName()).size() > 1)
+    {
+      stream << " [" << label->GetValue() << "]";
+    }
+    stream << "</font>";
     return stream.str();
   }
 }
@@ -108,7 +113,7 @@ void QmitkBooleanOperationsWidget::ConfigureWidgets()
   {
     mitk::Label::ConstPointer label = seg->GetLabel(selectedLabelValues.front());
     if (label.IsNotNull())
-      m_Controls->line1stLabel->setText(QString::fromStdString(GenerateLabelHTML(label)));
+      m_Controls->line1stLabel->setText(QString::fromStdString(GenerateLabelHTML(label,seg)));
     else
       m_Controls->line1stLabel->setText(QString("Unknown label ID ")+QString::number(selectedLabelValues.front()));
   }
@@ -127,7 +132,7 @@ void QmitkBooleanOperationsWidget::ConfigureWidgets()
       mitk::Label::ConstPointer label = seg->GetLabel(labelValue);
       if (stream.rdbuf()->in_avail() != 0) stream << "; ";
       if (label.IsNotNull())
-        stream << GenerateLabelHTML(label);
+        stream << GenerateLabelHTML(label,seg);
       else
         stream << "Unknown label ID " << labelValue;
     }

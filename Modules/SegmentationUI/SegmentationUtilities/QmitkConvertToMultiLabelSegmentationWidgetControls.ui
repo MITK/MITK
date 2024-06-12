@@ -51,7 +51,7 @@
            <string>If activated, the conversion will generate separate multi label segmentations for each input instead of joining all inputs in one multi label segmentation.</string>
           </property>
           <property name="text">
-           <string>Convert inputs separatly</string>
+           <string>Convert inputs separately</string>
           </property>
          </widget>
         </item>

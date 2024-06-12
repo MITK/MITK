@@ -142,7 +142,7 @@ hr { height: 1px; border-width: 0; }
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>Subtracts first segmentation from the second one</string>
+        <string>Subtracts second segmentation from the first one</string>
        </property>
        <property name="text">
         <string>Difference</string>
@@ -183,7 +183,7 @@ hr { height: 1px; border-width: 0; }
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>Keeps just the overlapping areas of two the segmentations</string>
+        <string>Keeps just the overlapping areas of the two segmentations</string>
        </property>
        <property name="text">
         <string>Intersection</string>

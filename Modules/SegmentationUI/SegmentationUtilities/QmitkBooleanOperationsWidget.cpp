@@ -113,14 +113,16 @@ void QmitkBooleanOperationsWidget::ConfigureWidgets()
       m_Controls->line1stLabel->setText(QString("Unknown label ID ")+QString::number(selectedLabelValues.front()));
   }
 
-  if (selectedLabelValues.size() < 2)
+  decltype(selectedLabelValues) otherLabelValues(selectedLabelValues.begin() + 1, selectedLabelValues.end());
+
+  if (otherLabelValues.empty())
   {
     m_Controls->lineOtherLabels->setHtml(QStringLiteral("<font class=\"warning\">Select secondary label(s) to proceed.</font>"));
   }
   else
   {
     std::stringstream stream;
-    for (const auto& labelValue : selectedLabelValues)
+    for (const auto& labelValue : otherLabelValues)
     {
       mitk::Label::ConstPointer label = seg->GetLabel(labelValue);
       if (stream.rdbuf()->in_avail() != 0) stream << "; ";

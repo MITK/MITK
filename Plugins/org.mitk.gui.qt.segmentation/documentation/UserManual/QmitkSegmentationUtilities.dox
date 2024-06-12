@@ -25,7 +25,7 @@ All postprocessing operations provide one or more selection widgets, which allow
 
 \section org_mitk_views_segmentationUtilitiesBooleanOperations Boolean operations
 
-Boolean operations allows to perform the following fundamental operations on two segmentations:
+Boolean operations allows to perform the following fundamental operations on two or more segmentations:
 
 <ul>
 	<li> <b>Difference:</b> Subtracts the second segmentation from the first segmentation.
@@ -53,7 +53,7 @@ If the custom pixel value is out of the valid bounds of the pixel type, it is op
 \section org_mitk_views_segmentationUtilitiesMorphologicalOperations Morphological operations
 
 Morphological operations are applied to a single segmentation image. Based on a given structuring element the underlying segmentation will be modified.
-The plugin provides a <b>ball</b> and a <b>cross</b> as structuring elements. The follow operations are available:
+The plugin provides a <b>ball</b> and a <b>cross</b> as structuring elements. The following operations are available:
 
 <ul>
 	<li> <b>Dilation:</b> Each labeled pixel within the segmentation will be dilated based on the selected structuring element.
@@ -67,7 +67,7 @@ The plugin provides a <b>ball</b> and a <b>cross</b> as structuring elements. Th
 
 \section org_mitk_views_segmentationUtilitiesConvertToSegmentation Convert to Segmentation
 
-Convert to segmentation allows to convert one or multiple input data into a multi-label segmentation. The supported input data types are surfaces, contour models and images. Surfaces and contour models will be converted into a new label (with the same color then the respective input data). Input images will be analyzed for their pixel content. Each pixel value (different to 0; which marks unlabeled pixels) will be associated with the new label.
+Convert to segmentation allows to convert one or multiple input data into a multi-label segmentation. The supported input data types are surfaces, contour models and images. Surfaces and contour models will be converted into a new label (with the same color as the respective input data). Input images will be analyzed for their pixel content. Each pixel value (different to 0; which marks unlabeled pixels) will be associated with the new label.
 The conversion can have the following outputs:
 <ul>
 	<li> <b>Convert to new segmentation:</b> The inputs will be converted and integrated in a new segmentation. The geometry of the output segmentation is determined by the largest geometry of the input images. If no images are selected as input, one has to specify an image or segmentation as reference. If sub mode "Convert inputs separately" is selected, each input will be converted into its own multi-label segmentation output.
@@ -80,20 +80,20 @@ For the output the following grouping modes can be selected (if the output is no
 	<li> <b>New group per input:</b> Each input will be added as a new group to the multi-label segmentation.
 </ul>
 
-<b>Remark on label values:</b> when converting inputs into a multi-labels segmentation the conversion process tries to keep the label value the same like the original value. In cases of surfaces or contour models it would be 1. In case of images it would be the respective pixel value. In cases of the label value collision (the label value is already used in the segmentation) a new value will be assigned to resolve the conflict. Therefore it is only guaranteed that values are kept, if you convert only one input into a new or empty segmentation.
+<b>Remark on label values:</b> when converting inputs into a multi-label segmentation, the conversion process tries to keep the label value the same like the original value. In cases of surfaces or contour models it would be 1. In case of images it would be the respective pixel value. In cases of the label value collision (the label value is already used in the segmentation) a new value will be assigned to resolve the conflict. Therefore it is only guaranteed that values are kept, if you convert only one input into a new or empty segmentation.
 
-<b>Remark unsupported geometries:</b> if you select images as input, these images have to have either the same geometry or must be a sub geometry. If an reference is defined or you want to add them to an existing segmentation, the imports images also have to have the same geometry like the target or be a sub geometry of it. 
+<b>Remark unsupported geometries:</b> if you select images as input, these images have to have either the same geometry or must be a sub geometry. If a reference is defined or you want to add them to an existing segmentation, the input images also have to have the same geometry like the target or be a sub geometry of it.
 
 
 \section org_mitk_views_segmentationUtilitiesExtractFromSegmentation Extract from Segmentation
 
-Extract from segmentation allows to extract the content of a multi-label segmentation (either all labeled or a selection of labels) in various ways and stores it as simple images in the data storage.
+Extract from segmentation allows to extract the content of a multi-label segmentation (either all labels or a selection of labels) in various ways and stores it as simple images in the data storage.
 
 The following output options are available (at least one must be selected):
 <ul>
-	<li> <b>label class map(s):</b> This generates an image where each pixel value (different from 0, which indicates unlabeled pixels) indicates a label class. Label class comprises all label instances that have the same label name. One can also see that has the semantic segmentation result. This mode will generate an output for each group indicated by the selected labels (or all groups).
-	<li> <b>Label instance map(s):</b> This generates an image where each pixel value (different from 0, which indicates unlabeled pixels) indicates a label instance. The used pixel values are equivalent to the label value of each instance. This mode will generate an output for each group indicated by the selected labels (or all groups).
-	<li> <b>Label instance mask(s):</b> This generates an image for one label instance where each pixel value (different from 0, which indicates unlabeled pixels) indicates the label instance. The used pixel value is equivalent to the label value of the label instance.
+	<li> <b>Label class map(s):</b> This generates an image where each pixel value (different from 0, which indicates unlabeled pixels) indicates a label class. Label classes comprise of all label instances that have the same label name. One can also see this as the semantic segmentation result. This mode will generate an output for each group indicated by the selected labels (or all groups).
+	<li> <b>Label instance map(s):</b> This generates an image where each pixel value (different from 0, which indicates unlabeled pixels) indicates a label instance. The used pixel values are equivalent to the label value of each instance. This mode will generate an output for each group indicated by the selected labels (or all groups). If the segmentation contains only labels with one / no instance(s), the result will be the same as from "Label class map(s)".
+	<li> <b>Label instance mask(s):</b> This generates an image for each selected / all label instance(s), where each pixel value (different from 0, which indicates unlabeled pixels) indicates the label instance. The used pixel value is equivalent to the label value of the label instance.
 </ul>
 
 **/

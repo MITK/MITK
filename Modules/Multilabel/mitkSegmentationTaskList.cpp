@@ -105,7 +105,11 @@ fs::path mitk::SegmentationTaskList::GetInputLocation() const
   this->GetPropertyList()->GetStringProperty("MITK.IO.reader.inputlocation", inputLocation);
 
   return !inputLocation.empty()
+#ifdef MITK_HAS_FILESYSTEM
     ? fs::path(inputLocation).lexically_normal()
+#else
+    ? fs::path(inputLocation)
+#endif
     : fs::path();
 }
 
@@ -119,7 +123,11 @@ fs::path mitk::SegmentationTaskList::GetAbsolutePath(const fs::path& path) const
   if (path.empty())
     return path;
 
+#ifdef MITK_HAS_FILESYSTEM
   auto normalizedPath = path.lexically_normal();
+#else
+  auto normalizedPath = path;
+#endif
 
   return !normalizedPath.is_absolute()
     ? this->GetBasePath() / normalizedPath

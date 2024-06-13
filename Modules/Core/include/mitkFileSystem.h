@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define mitkFileSystem_h
 
 #if __has_include(<filesystem>)
+  #define MITK_HAS_FILESYSTEM
   #include <filesystem>
   namespace fs = std::filesystem;
 #elif __has_include(<experimental/filesystem>)

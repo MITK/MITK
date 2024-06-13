@@ -8,22 +8,13 @@ list(APPEND enabled_modules
   CoreCmdApps
   DataTypesExt
   DICOMPM
-  DICOMPMIO
   DICOMQI
   DICOM
-  DICOMImageIO
   RT
-  DICOMRTIO
-  DICOMSegIO
   ModelFit
-  ModelFitIOServices
-  ModelFitModelsServices
   Multilabel
-  MultilabelIO
   LegacyGL
   SceneSerialization
   SceneSerializationBase
   ROI
-  ROIIO
 )
-

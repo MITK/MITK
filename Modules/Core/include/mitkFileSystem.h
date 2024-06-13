@@ -10,24 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkXMLPreferencesStorage_h
-#define mitkXMLPreferencesStorage_h
+#ifndef mitkFileSystem_h
+#define mitkFileSystem_h
 
-#include <mitkIPreferencesStorage.h>
-
-namespace mitk
-{
-  /**
-   * \brief See IPreferencesStorage.
-   */
-  class XMLPreferencesStorage : public IPreferencesStorage
-  {
-  public:
-    explicit XMLPreferencesStorage(const fs::path& filename);
-    ~XMLPreferencesStorage() override;
-
-    void Flush() override;
-  };
-}
+#if __has_include(<filesystem>)
+  #define MITK_HAS_FILESYSTEM
+  #include <filesystem>
+  namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+  #include <experimental/filesystem>
+  namespace fs = std::experimental::filesystem;
+#endif
 
 #endif

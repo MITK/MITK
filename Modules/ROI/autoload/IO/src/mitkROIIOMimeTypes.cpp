@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <mitkROIIOMimeTypes.h>
 #include <mitkIOMimeTypes.h>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <fstream>
 
 #include <nlohmann/json.hpp>
@@ -30,7 +30,7 @@ bool mitk::MitkROIIOMimeTypes::MitkROIMimeType::AppliesTo(const std::string& pat
 {
   bool result = CustomMimeType::AppliesTo(path);
 
-  if (!std::filesystem::exists(path)) // T18572
+  if (!fs::exists(path)) // T18572
     return result;
 
   std::ifstream file(path);

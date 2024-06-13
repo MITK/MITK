@@ -114,6 +114,7 @@ mitk::LabelSetImage::~LabelSetImage()
 {
   for (auto [value, label] : m_LabelMap)
   {
+    (void)value; // Prevent unused variable error in older compilers
     this->ReleaseLabel(label);
   }
   m_LabelMap.clear();
@@ -233,6 +234,7 @@ const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetAllLabel
 
   for (auto [value, label] : m_LabelMap)
   {
+    (void)label; // Prevent unused variable error in older compilers
     result.emplace_back(value);
   }
   return result;
@@ -244,6 +246,7 @@ mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValue
 
   for (auto [value, label] : m_LabelMap)
   {
+    (void)label; // Prevent unused variable error in older compilers
     result.emplace_back(value);
   }
 
@@ -1166,6 +1169,7 @@ const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabels()
   ConstLabelVectorType result;
   for (auto [value, label] : m_LabelMap)
   {
+    (void)value; // Prevent unused variable error in older compilers
     result.emplace_back(label);
   }
   return result;
@@ -1176,6 +1180,7 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabels()
   LabelVectorType result;
   for (auto [value, label] : m_LabelMap)
   {
+    (void)value; // Prevent unused variable error in older compilers
     result.emplace_back(label);
   }
   return result;

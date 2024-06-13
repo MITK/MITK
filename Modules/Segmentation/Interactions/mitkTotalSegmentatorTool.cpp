@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkImageReadAccessor.h>
 
 #include <algorithm>
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <itksys/SystemTools.hxx>
 #include <regex>
 
@@ -35,7 +35,7 @@ namespace mitk
 
 mitk::TotalSegmentatorTool::~TotalSegmentatorTool()
 {
-  std::filesystem::remove_all(this->GetMitkTempDir());
+  fs::remove_all(this->GetMitkTempDir());
 }
 
 mitk::TotalSegmentatorTool::TotalSegmentatorTool() : SegWithPreviewTool(true) // prevents auto-compute across all timesteps
@@ -335,13 +335,13 @@ void mitk::TotalSegmentatorTool::MapLabelsToSegmentation(const mitk::LabelSetIma
 std::string mitk::TotalSegmentatorTool::GetLabelMapPath()
 {
   std::string pythonFileName;
-  std::filesystem::path pathToLabelMap(this->GetPythonPath());
+  fs::path pathToLabelMap(this->GetPythonPath());
   pathToLabelMap = pathToLabelMap.parent_path();
 #ifdef _WIN32
   pythonFileName = pathToLabelMap.string() + "/Lib/site-packages/totalsegmentator/map_to_binary.py";
 #else
   pathToLabelMap.append("lib");
-  for (auto const &dir_entry : std::filesystem::directory_iterator{pathToLabelMap})
+  for (auto const &dir_entry : fs::directory_iterator{pathToLabelMap})
   {
     if (dir_entry.is_directory())
     {

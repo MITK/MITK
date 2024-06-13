@@ -36,7 +36,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QShortcut>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 
 namespace
 {
@@ -45,7 +45,7 @@ namespace
     return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
   }
 
-  std::filesystem::path GetInputLocation(const mitk::BaseData* data)
+  fs::path GetInputLocation(const mitk::BaseData* data)
   {
     std::string result;
 
@@ -316,19 +316,19 @@ void QmitkSegmentationTaskListWidget::ResetFileSystemWatcher()
     {
       auto resultPath = m_TaskList->GetAbsolutePath(task.GetResult()).remove_filename();
 
-      if (!std::filesystem::exists(resultPath))
+      if (!fs::exists(resultPath))
       {
         try
         {
-          std::filesystem::create_directories(resultPath);
+          fs::create_directories(resultPath);
         }
-        catch (const std::filesystem::filesystem_error& e)
+        catch (const fs::filesystem_error& e)
         {
           MITK_ERROR << e.what();
         }
       }
 
-      if (std::filesystem::exists(resultPath))
+      if (fs::exists(resultPath))
         m_FileSystemWatcher->addPath(QString::fromStdString(resultPath.string()));
     }
   }
@@ -703,11 +703,11 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetResult(current));
     const auto interimPath = m_TaskList->GetInterimPath(path);
 
-    if (std::filesystem::exists(path))
+    if (fs::exists(path))
     {
       segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
     }
-    else if (std::filesystem::exists(interimPath))
+    else if (fs::exists(interimPath))
     {
       segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(interimPath.string());
     }
@@ -920,7 +920,7 @@ bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges(const QString& altern
     switch (reply)
     {
     case QMessageBox::Save:
-      this->SaveActiveTask(!std::filesystem::exists(m_TaskList->GetResult(active)));
+      this->SaveActiveTask(!fs::exists(m_TaskList->GetResult(active)));
       break;
 
     case QMessageBox::Discard:

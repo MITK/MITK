@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 #include <MitkMultilabelExports.h>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <optional>
 
 namespace mitk
@@ -40,12 +40,12 @@ namespace mitk
 
       mitkSegmentationTaskValueMacro(std::string, Name)
       mitkSegmentationTaskValueMacro(std::string, Description)
-      mitkSegmentationTaskValueMacro(std::filesystem::path, Image)
-      mitkSegmentationTaskValueMacro(std::filesystem::path, Segmentation)
+      mitkSegmentationTaskValueMacro(fs::path, Image)
+      mitkSegmentationTaskValueMacro(fs::path, Segmentation)
       mitkSegmentationTaskValueMacro(std::string, LabelName)
-      mitkSegmentationTaskValueMacro(std::filesystem::path, LabelNameSuggestions)
-      mitkSegmentationTaskValueMacro(std::filesystem::path, Preset)
-      mitkSegmentationTaskValueMacro(std::filesystem::path, Result)
+      mitkSegmentationTaskValueMacro(fs::path, LabelNameSuggestions)
+      mitkSegmentationTaskValueMacro(fs::path, Preset)
+      mitkSegmentationTaskValueMacro(fs::path, Result)
       mitkSegmentationTaskValueMacro(bool, Dynamic)
 
     private:
@@ -58,12 +58,12 @@ namespace mitk
 
     mitkSegmentationTaskListValueMacro(std::string, Name)
     mitkSegmentationTaskListValueMacro(std::string, Description)
-    mitkSegmentationTaskListValueMacro(std::filesystem::path, Image)
-    mitkSegmentationTaskListValueMacro(std::filesystem::path, Segmentation)
+    mitkSegmentationTaskListValueMacro(fs::path, Image)
+    mitkSegmentationTaskListValueMacro(fs::path, Segmentation)
     mitkSegmentationTaskListValueMacro(std::string, LabelName)
-    mitkSegmentationTaskListValueMacro(std::filesystem::path, LabelNameSuggestions)
-    mitkSegmentationTaskListValueMacro(std::filesystem::path, Preset)
-    mitkSegmentationTaskListValueMacro(std::filesystem::path, Result)
+    mitkSegmentationTaskListValueMacro(fs::path, LabelNameSuggestions)
+    mitkSegmentationTaskListValueMacro(fs::path, Preset)
+    mitkSegmentationTaskListValueMacro(fs::path, Result)
     mitkSegmentationTaskListValueMacro(bool, Dynamic)
 
     size_t GetNumberOfTasks() const;
@@ -77,10 +77,10 @@ namespace mitk
     bool IsDone() const;
     bool IsDone(size_t index) const;
 
-    std::filesystem::path GetInputLocation() const;
-    std::filesystem::path GetBasePath() const;
-    std::filesystem::path GetAbsolutePath(const std::filesystem::path& path) const;
-    std::filesystem::path GetInterimPath(const std::filesystem::path& path) const;
+    fs::path GetInputLocation() const;
+    fs::path GetBasePath() const;
+    fs::path GetAbsolutePath(const fs::path& path) const;
+    fs::path GetInterimPath(const fs::path& path) const;
 
     void SaveTask(size_t index, const BaseData* segmentation, bool saveAsInterimResult = false);
 

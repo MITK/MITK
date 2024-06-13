@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 #include <chrono>
 #include <thread>
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <itkImageFileWriter.h>
 #include "mitkImageAccessByItk.h"
 #include <mitkLocaleSwitch.h>
@@ -54,7 +54,7 @@ mitk::SegmentAnythingPythonService::~SegmentAnythingPythonService()
     this->StopAsyncProcess();
   }
   CurrentStatus = Status::OFF;
-  std::filesystem::remove_all(this->GetMitkTempDir());
+  fs::remove_all(this->GetMitkTempDir());
  }
 
 void mitk::SegmentAnythingPythonService::onPythonProcessEvent(itk::Object*, const itk::EventObject &e, void*)
@@ -214,7 +214,7 @@ mitk::LabelSetImage::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFr
 {
   std::string outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + m_CurrentUId + ".nrrd";
   auto start = sys_clock::now();
-  while (!std::filesystem::exists(outputImagePath))
+  while (!fs::exists(outputImagePath))
   {
     this->CheckStatus();
     std::this_thread::sleep_for(100ms);

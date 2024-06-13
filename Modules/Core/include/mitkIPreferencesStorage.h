@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <MitkCoreExports.h>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <memory>
 
 namespace mitk
@@ -36,7 +36,7 @@ namespace mitk
      *
      * If the file does not yet exist, create an empty preferences storage.
      */
-    explicit IPreferencesStorage(const std::filesystem::path& filename);
+    explicit IPreferencesStorage(const fs::path& filename);
 
     /**
      * \brief Destructor. Write preferences to disk for the last time.
@@ -58,7 +58,7 @@ namespace mitk
     /**
      * \brief Get the filename of the preferences storage.
      */
-    virtual std::filesystem::path GetFilename() const;
+    virtual fs::path GetFilename() const;
 
     /**
      * \brief Write the in-memory preferences to disk.
@@ -68,7 +68,7 @@ namespace mitk
     virtual void Flush() = 0;
 
   protected:
-    std::filesystem::path m_Filename;
+    fs::path m_Filename;
     std::unique_ptr<IPreferences> m_Root;
   };
 }

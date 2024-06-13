@@ -15,7 +15,7 @@ found in the LICENSE file.
 #ifndef CPPHTTPLIB_OPENSSL_SUPPORT
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #endif
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <httplib.h>
 #include <mitkIOUtil.h>
 #include <mitkLabelSetImageHelper.h>
@@ -33,7 +33,7 @@ mitk::MonaiLabelTool::MonaiLabelTool() : SegWithPreviewTool(true, "PressMoveRele
 
 mitk::MonaiLabelTool::~MonaiLabelTool()
 {
-  std::filesystem::remove_all(this->GetTempDir());
+  fs::remove_all(this->GetTempDir());
 }
 
 void mitk::MonaiLabelTool::ConnectActionsAndFunctions()

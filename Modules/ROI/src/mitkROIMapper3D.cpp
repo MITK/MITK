@@ -71,6 +71,8 @@ void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
 
     for (const auto& [id, roi] : *data)
     {
+      (void)id; // Prevent unused variable error in older compilers
+
       if (!roi.HasTimeStep(t))
         continue;
 

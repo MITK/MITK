@@ -21,5 +21,7 @@ list(APPEND enabled_modules
   LegacyGL
   SceneSerialization
   SceneSerializationBase
+  ROI
+  ROIIO
 )
 

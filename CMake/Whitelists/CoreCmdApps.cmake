@@ -16,6 +16,8 @@ list(APPEND enabled_modules
   DICOMRTIO
   DICOMSegIO
   ModelFit
+  ModelFitIOServices
+  ModelFitModelsServices
   Multilabel
   MultilabelIO
   LegacyGL

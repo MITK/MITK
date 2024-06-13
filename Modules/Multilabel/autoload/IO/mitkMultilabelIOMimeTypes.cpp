@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkMultilabelIOMimeTypes.h"
 #include <mitkIOMimeTypes.h>
 #include <mitkLog.h>
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <fstream>
 
 #include <nlohmann/json.hpp>
@@ -33,7 +33,7 @@ bool mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType::AppliesT
 {
   bool result = CustomMimeType::AppliesTo(path);
 
-  if (!std::filesystem::exists(path)) // T18572
+  if (!fs::exists(path)) // T18572
     return result;
 
   std::ifstream file(path);
@@ -82,7 +82,7 @@ bool mitk::MitkMultilabelIOMimeTypes::LegacyLabelSetMimeType::AppliesTo(const st
 {
   bool canRead = CustomMimeType::AppliesTo(path);
 
-  if (!std::filesystem::exists(path)) // T18572
+  if (!fs::exists(path)) // T18572
     return canRead;
 
   if (!canRead)

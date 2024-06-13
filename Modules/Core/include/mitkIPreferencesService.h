@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkServiceInterface.h>
 #include <MitkCoreExports.h>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 
 namespace mitk
 {
@@ -51,7 +51,7 @@ namespace mitk
      *
      * \sa IPreferencesStorage
      */
-    virtual void InitializeStorage(const std::filesystem::path& filename) = 0;
+    virtual void InitializeStorage(const fs::path& filename) = 0;
 
     /**
      * \brief For internal use only.

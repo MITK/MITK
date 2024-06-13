@@ -96,25 +96,25 @@ bool mitk::SegmentationTaskList::IsDone() const
 
 bool mitk::SegmentationTaskList::IsDone(size_t index) const
 {
-  return std::filesystem::exists(this->GetAbsolutePath(m_Tasks.at(index).GetResult()));
+  return fs::exists(this->GetAbsolutePath(m_Tasks.at(index).GetResult()));
 }
 
-std::filesystem::path mitk::SegmentationTaskList::GetInputLocation() const
+fs::path mitk::SegmentationTaskList::GetInputLocation() const
 {
   std::string inputLocation;
   this->GetPropertyList()->GetStringProperty("MITK.IO.reader.inputlocation", inputLocation);
 
   return !inputLocation.empty()
-    ? std::filesystem::path(inputLocation).lexically_normal()
-    : std::filesystem::path();
+    ? fs::path(inputLocation).lexically_normal()
+    : fs::path();
 }
 
-std::filesystem::path mitk::SegmentationTaskList::GetBasePath() const
+fs::path mitk::SegmentationTaskList::GetBasePath() const
 {
   return this->GetInputLocation().remove_filename();
 }
 
-std::filesystem::path mitk::SegmentationTaskList::GetAbsolutePath(const std::filesystem::path& path) const
+fs::path mitk::SegmentationTaskList::GetAbsolutePath(const fs::path& path) const
 {
   if (path.empty())
     return path;
@@ -126,7 +126,7 @@ std::filesystem::path mitk::SegmentationTaskList::GetAbsolutePath(const std::fil
     : normalizedPath;
 }
 
-std::filesystem::path mitk::SegmentationTaskList::GetInterimPath(const std::filesystem::path& path) const
+fs::path mitk::SegmentationTaskList::GetInterimPath(const fs::path& path) const
 {
   if (path.empty() || !path.has_filename())
     return path;
@@ -143,17 +143,17 @@ void mitk::SegmentationTaskList::SaveTask(size_t index, const BaseData* segmenta
   auto path = this->GetAbsolutePath(this->GetResult(index));
   auto interimPath = this->GetInterimPath(path);
 
-  if (std::filesystem::exists(path))
+  if (fs::exists(path))
     saveAsInterimResult = false;
 
   IOUtil::Save(segmentation, saveAsInterimResult
     ? interimPath.string()
     : path.string());
 
-  if (!saveAsInterimResult && std::filesystem::exists(interimPath))
+  if (!saveAsInterimResult && fs::exists(interimPath))
   {
     std::error_code ec;
-    std::filesystem::remove(interimPath, ec);
+    fs::remove(interimPath, ec);
   }
 }
 

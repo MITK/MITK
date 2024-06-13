@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include <mitkROI.h>
 #include <mitkROIIOMimeTypes.h>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <fstream>
 
 namespace
@@ -135,7 +135,7 @@ std::vector<mitk::BaseData::Pointer> mitk::ROIIO::DoRead()
   {
     auto filename = this->GetInputLocation();
 
-    if (filename.empty() || !std::filesystem::exists(filename))
+    if (filename.empty() || !fs::exists(filename))
       mitkThrow() << "Invalid or nonexistent filename: \"" << filename << "\"!";
 
     fileStream.open(filename);

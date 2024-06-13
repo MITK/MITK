@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkVideoRecorder_h
 #define mitkVideoRecorder_h
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <memory>
 #include <string>
 
@@ -58,11 +58,11 @@ namespace mitk
     VideoRecorder(const VideoRecorder&) = delete;
     VideoRecorder& operator=(const VideoRecorder&) = delete;
 
-    std::filesystem::path GetFFmpegPath() const;
-    void SetFFmpegPath(const std::filesystem::path& path);
+    fs::path GetFFmpegPath() const;
+    void SetFFmpegPath(const fs::path& path);
 
-    std::filesystem::path GetOutputPath() const;
-    void SetOutputPath(const std::filesystem::path& path);
+    fs::path GetOutputPath() const;
+    void SetOutputPath(const fs::path& path);
 
     OutputFormat GetOutputFormat() const;
     void SetOutputFormat(OutputFormat format);

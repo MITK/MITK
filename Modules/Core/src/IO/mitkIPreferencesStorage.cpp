@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <mitkIPreferencesStorage.h>
 
-mitk::IPreferencesStorage::IPreferencesStorage(const std::filesystem::path& filename)
+mitk::IPreferencesStorage::IPreferencesStorage(const fs::path& filename)
   : m_Filename(filename)
 {
 }
@@ -31,7 +31,7 @@ const mitk::IPreferences* mitk::IPreferencesStorage::GetRoot() const
   return m_Root.get();
 }
 
-std::filesystem::path mitk::IPreferencesStorage::GetFilename() const
+fs::path mitk::IPreferencesStorage::GetFilename() const
 {
   return m_Filename;
 }

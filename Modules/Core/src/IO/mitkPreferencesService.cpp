@@ -25,7 +25,7 @@ mitk::PreferencesService::~PreferencesService()
     m_Storage->Flush();
 }
 
-void mitk::PreferencesService::InitializeStorage(const std::filesystem::path& filename)
+void mitk::PreferencesService::InitializeStorage(const fs::path& filename)
 {
   if (m_Storage)
     mitkThrow() << "The preferences service must be initialized only once to guarantee valid preferences pointers during its lifetime.";
@@ -36,7 +36,7 @@ void mitk::PreferencesService::InitializeStorage(const std::filesystem::path& fi
 void mitk::PreferencesService::UninitializeStorage(bool removeFile)
 {
   if (m_Storage && removeFile)
-    std::filesystem::remove(m_Storage->GetFilename());
+    fs::remove(m_Storage->GetFilename());
 
   m_Storage.reset(nullptr);
 }

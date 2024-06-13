@@ -77,10 +77,10 @@ namespace
   }
 }
 
-mitk::XMLPreferencesStorage::XMLPreferencesStorage(const std::filesystem::path& filename)
+mitk::XMLPreferencesStorage::XMLPreferencesStorage(const fs::path& filename)
   : IPreferencesStorage(filename)
 {
-  if (std::filesystem::exists(filename))
+  if (fs::exists(filename))
   {
     tinyxml2::XMLDocument xmlDocument;
 
@@ -98,7 +98,7 @@ mitk::XMLPreferencesStorage::XMLPreferencesStorage(const std::filesystem::path& 
   {
     try
     {
-      std::filesystem::create_directories(filename.parent_path());
+      fs::create_directories(filename.parent_path());
     }
     catch (const std::exception& e)
     {

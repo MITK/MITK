@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <fstream>
 
 namespace mitk
@@ -116,7 +116,7 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskListIO::DoRead()
   {
     auto filename = this->GetInputLocation();
 
-    if (filename.empty() || !std::filesystem::exists(filename))
+    if (filename.empty() || !fs::exists(filename))
       mitkThrow() << "Invalid or nonexistent filename: \"" << filename << "\"!";
 
     fileStream.open(filename);
@@ -172,7 +172,7 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskListIO::DoRead()
       if (!segmentationTaskList->HasImage(i))
         mitkThrow() << "Task " << i << " must contain \"Image\"!";
 
-      std::filesystem::path imagePath(segmentationTaskList->GetImage(i));
+      fs::path imagePath(segmentationTaskList->GetImage(i));
 
       if (imagePath.is_relative())
       {
@@ -188,10 +188,10 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskListIO::DoRead()
         if (properties != nullptr)
           properties->GetStringProperty("MITK.IO.reader.inputlocation", inputLocation);
 
-        imagePath = std::filesystem::path(inputLocation).remove_filename() / imagePath;
+        imagePath = fs::path(inputLocation).remove_filename() / imagePath;
       }
 
-      if (!std::filesystem::exists(imagePath))
+      if (!fs::exists(imagePath))
         mitkThrow() << "Referenced image \"" << imagePath << "\" in task " << i << " does not exist!";
 
       if (!segmentationTaskList->HasResult(i))

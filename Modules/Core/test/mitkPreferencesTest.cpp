@@ -39,7 +39,7 @@ public:
   void setUp() override
   {
     const auto filename = mitk::IOUtil::CreateTemporaryFile("prefs_XXXXXX.xml");
-    std::filesystem::remove(filename); // We need a temporary filename, not an actual file
+    fs::remove(filename); // We need a temporary filename, not an actual file
 
     auto* preferencesService = mitk::CoreServices::GetPreferencesService();
     preferencesService->InitializeStorage(filename);

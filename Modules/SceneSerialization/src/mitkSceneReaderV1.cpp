@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <mitkRenderingModeProperty.h>
 #include <tinyxml2.h>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <map>
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
@@ -77,12 +77,12 @@ namespace
       geometry->SetStepDuration(value);
   }
 
-  mitk::PropertyList::Pointer DeserializeProperties(const tinyxml2::XMLElement *propertiesElement, const std::filesystem::path& basePath)
+  mitk::PropertyList::Pointer DeserializeProperties(const tinyxml2::XMLElement *propertiesElement, const fs::path& basePath)
   {
     if (propertiesElement == nullptr)
       return nullptr;
 
-    std::filesystem::path path(propertiesElement->Attribute("file"));
+    fs::path path(propertiesElement->Attribute("file"));
 
     if (path.empty())
       return nullptr;

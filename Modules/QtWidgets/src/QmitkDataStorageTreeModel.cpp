@@ -476,7 +476,7 @@ bool QmitkDataStorageTreeModel::DicomPropertiesExists(const mitk::DataNode &node
     }
   }
 
-  /** Code coveres the deprecated property naming for backwards compatibility */
+  /** Code covers the deprecated property naming for backwards compatibility */
   if (patientsName_deprecated != nullptr && studyDescription_deprecated != nullptr && seriesDescription_deprecated != nullptr)
   {
     if ((!patientsName_deprecated->GetValueAsString().empty()) &&

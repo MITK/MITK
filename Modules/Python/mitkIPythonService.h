@@ -61,7 +61,7 @@ namespace mitk
         /// \see IPythonService::Execute()
         static const int SINGLE_LINE_COMMAND = 0;
         ///
-        /// Constant representing a command in which the commands are seperated by new lines, i.e. "\\n"
+        /// Constant representing a command in which the commands are separated by new lines, i.e. "\\n"
         /// \see IPythonService::Execute()
         static const int MULTI_LINE_COMMAND = 1;
         ///
@@ -106,7 +106,7 @@ namespace mitk
         virtual bool IsSimpleItkPythonWrappingAvailable() = 0;
         ///
         /// copies an mitk image as itk image into the python interpreter process
-        /// the image will be available as "varName" in python if everythin worked
+        /// the image will be available as "varName" in python if everything worked
         /// \return true if image was copied, else false
         virtual bool CopyToPythonAsSimpleItkImage( mitk::Image* image, const std::string& varName ) = 0;
         ///

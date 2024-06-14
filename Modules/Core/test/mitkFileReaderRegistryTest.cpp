@@ -119,7 +119,7 @@ int mitkFileReaderRegistryTest(int /*argc*/, char * /*argv*/ [])
   // DummyReader2 awesomeTestDR("application/dummy", "test", 100);
 
   // returned = readerRegistry->GetReader("test");
-  // MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyReader2*>(returned), "Testing correct priorized retrieval of
+  // MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyReader2*>(returned), "Testing correct prioritized retrieval of
   // FileReader: Best reader");
 
   // Now to give those readers some options, then we will try again
@@ -169,7 +169,7 @@ int mitkFileReaderRegistryTest(int /*argc*/, char * /*argv*/ [])
   //  returnedList = readerRegistry->GetReaders("test", optionsFilter);
   //  MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 2, "Testing correct return of two readers when two matching
   //  reader was found, asking for all compatibles");
-  //  MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyReader2*>(returnedList.front()), "Testing correct priorization of
+  //  MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyReader2*>(returnedList.front()), "Testing correct prioritization of
   //  returned Readers with options 1/2");
 
   //  optionsFilter.clear();

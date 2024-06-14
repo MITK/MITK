@@ -71,9 +71,6 @@ public slots:
 protected:
   mitk::TransferFunctionProperty::Pointer tfpToChange;
 
-  double m_RangeSliderMin;
-  double m_RangeSliderMax;
-
   mitk::SimpleHistogramCache histogramCache;
 };
 

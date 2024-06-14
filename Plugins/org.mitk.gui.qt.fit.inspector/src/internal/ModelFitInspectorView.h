@@ -162,8 +162,8 @@ protected:
   /** @brief currently selected node for the visualization logic*/
   mitk::DataNode::ConstPointer m_currentSelectedNode;
 
-  mitk::WeakPointer<mitk::DataNode> m_PositionBookmarksNode;
-  mitk::WeakPointer<mitk::PointSet> m_PositionBookmarks;
+  mitk::DataNode::Pointer m_PositionBookmarksNode;
+  mitk::PointSet::Pointer m_PositionBookmarks;
 
   /** @brief	Number of interpolation steps between two x values */
   static const unsigned int INTERPOLATION_STEPS;

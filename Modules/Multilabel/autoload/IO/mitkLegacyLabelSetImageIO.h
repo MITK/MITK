@@ -42,7 +42,7 @@ namespace mitk
     /**
     * @brief Reads a number of mitk::LabelSetImages from the file system
     * @return a vector of mitk::LabelSetImages
-    * @throws throws an mitk::Exception if an error ocurrs during parsing the nrrd header
+    * @throws throws an mitk::Exception if an error occurs during parsing the nrrd header
     */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 

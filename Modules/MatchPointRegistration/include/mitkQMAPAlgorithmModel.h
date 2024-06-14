@@ -28,7 +28,7 @@ namespace mitk
 /*!
   \class QMAPAlgorithmModel
   Helper class that implements a model to handle the MetaProperty interface of a MatchPoint algorithm
-  in contect of the QT view-model-concept. A algorithm can be set as data source for the model.
+  in context of the QT view-model-concept. A algorithm can be set as data source for the model.
   The model retrieves all information through the MetaPropertyInterface. Changes in the view will
   be propagated by the model into the algorithm.
   \remarks The model only keep a simple pointer to the MetaPropertyInterface of the algorithm.

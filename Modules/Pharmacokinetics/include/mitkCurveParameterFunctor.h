@@ -48,13 +48,13 @@ namespace mitk
 
     ParameterNamesType GetDescriptionParameterNames() const;
 
-    /**@warning Teh function is currently not thread safe.
+    /**@warning The function is currently not thread safe.
      @todo reimplement with shareable lock to allow other class methods to be used parallel but lock this one exclusively.*/
     void ResetDescriptionParameters();
-    /**@warning Teh function is currently not thread safe.
+    /**@warning The function is currently not thread safe.
     @todo reimplement with shareable lock to allow other class methods to be used parallel but lock this one exclusively.*/
     void RegisterDescriptionParameter(const ParameterNameType& parameterName, CurveDescriptionParameterBase* parameterFunction);
-    /**@warning Teh function is currently not thread safe.
+    /**@warning The function is currently not thread safe.
     @todo reimplement with shareable lock to allow other class methods to be used parallel but lock this one exclusively.*/
     const CurveDescriptionParameterBase* GetDescriptionParameterFunction(const ParameterNameType& parameterName) const;
 

@@ -46,7 +46,7 @@ void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
   this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
   this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/SegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
   this->AddUtilityWidget(m_ConvertToSegWidget, QIcon(":/SegmentationUtilities/SurfaceToImage_48x48.png"), "Convert to Segmentation");
-  this->AddUtilityWidget(m_ExtractFromSegWidget, QIcon(":/SegmentationUtilities/SurfaceToImage_48x48.png"), "Extract from Segmentation");
+  this->AddUtilityWidget(m_ExtractFromSegWidget, QIcon(":/SegmentationUtilities/Extract_48x48.png"), "Extract from Segmentation");
 }
 
 void QmitkSegmentationUtilitiesView::AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text)

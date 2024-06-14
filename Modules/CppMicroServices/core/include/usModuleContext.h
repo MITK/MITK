@@ -692,7 +692,7 @@ public:
    * are notified when a service has a lifecycle state change.
    *
    * <p>
-   * You must take care to remove registered listeners befor the <code>receiver</code>
+   * You must take care to remove registered listeners before the <code>receiver</code>
    * object is destroyed. However, the Micro Services framework takes care
    * of removing all listeners registered by this context module's classes
    * after the module is unloaded.

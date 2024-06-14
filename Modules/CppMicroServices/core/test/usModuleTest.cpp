@@ -148,7 +148,7 @@ void frame018a(ModuleContext* mc)
   {
     mc->GetService(ServiceReferenceU());
     US_DEBUG << "Got service object, expected std::invalid_argument exception";
-    US_TEST_FAILED_MSG(<< "Got service object, excpected std::invalid_argument exception")
+    US_TEST_FAILED_MSG(<< "Got service object, expected std::invalid_argument exception")
   }
   catch (const std::invalid_argument& )
   {}

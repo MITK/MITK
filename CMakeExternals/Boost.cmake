@@ -23,7 +23,7 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
   set(install_cmd "")
 
   set(Boost_ROOT ${ep_prefix})
-  set(Boost_DIR "${Boost_ROOT}/lib/cmake/Boost-1.82.0")
+  set(Boost_DIR "${Boost_ROOT}/lib/cmake/Boost-1.85.0")
 
   if(WIN32)
     set(BOOST_LIBRARYDIR "${Boost_ROOT}/lib")
@@ -63,8 +63,8 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
           or use another option in the future, we do not forget to remove our
           copy of the FindBoost module again. ]]
 
-  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_82_0.tar.gz")
-  set(md5 f7050f554a65f6a42ece221eaeec1660)
+  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_85_0_patched.tar.gz")
+  set(md5 8f7c3012a5b64d9b0b07b20cde12d989)
 
   if(MITK_USE_Boost_LIBRARIES)
 
@@ -95,7 +95,7 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
         #[[ Assume Visual Studio 2019. ]]
         set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}2)
 
-      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 40)
+      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 50)
 
         #[[ Assume Visual Studio 2022. ]]
         set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}3)

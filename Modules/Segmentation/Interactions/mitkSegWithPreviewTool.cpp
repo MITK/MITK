@@ -319,6 +319,7 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
         activeLabel->SetColor(previewColor);
         newPreviewImage->UpdateLookupTable(activeLabel->GetValue());
       }
+      newPreviewImage->GetLookupTable()->Modified();
       activeLabel->SetVisible(true);
     }
     else

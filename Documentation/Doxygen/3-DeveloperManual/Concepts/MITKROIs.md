@@ -152,3 +152,39 @@ Further hints:
   - Time time step indices "t" are mandatory. The ROI is only present at time steps 0 and 2.
   - The ROI is red (fallback) at time step 0 and green at time step 2.
   - Its extents are larger at time step 0 than at time step 2.
+
+### New features in version 2
+
+In version 2 of the file format, geometries can be optionally defined by a linear transformation instead of origin and spacing.
+Such a transformation is written as 4x4 matrix in the form of a contiguous array of 16 elements.
+For example, the following two geometries are identical:
+
+~~~{.json}
+"Geometry": {
+  "Origin": [10, 20, 30],
+  "Spacing": [1, 2, 3],
+  "Size": [100, 100, 100]
+}
+~~~
+
+~~~{.json}
+"Geometry": {
+  "Transform": [
+     1,  0,  0,  0,
+     0,  2,  0,  0,
+     0,  0,  3,  0,
+    10, 20, 30,  1
+  ],
+  "Size": [100, 100, 100]
+}
+~~~
+
+The latter format is more powerful as it is able to express rotated geometries.
+
+Further hints:
+
+  - The upper left 3x3 matrix is a rotation matrix.
+  - The column vectors of the rotation matrix represent the three space directions.
+  - The norms of the space directions are equivalent to the spacing values.
+  - The rightmost column vector is always `[0, 0, 0, 1]`.
+  - The bottom row vector corresonds to the origin (with 1 as fourth element).

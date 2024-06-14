@@ -22,7 +22,7 @@ namespace mitk
   /**
   * \brief Calculates the local intensity features
   *
-  * This class can be used to calcualte the local intensity. The local intensity is defined as the
+  * This class can be used to calculate the local intensity. The local intensity is defined as the
   * mean intensity in a cube with the volume \f$ 1 \textup{cm}^3\f$ which correspond to a radius
   * of approximate 0.62 cm.
   *

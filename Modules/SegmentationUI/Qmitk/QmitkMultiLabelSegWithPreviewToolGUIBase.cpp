@@ -97,6 +97,7 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::ActualizePreviewLabelVisibility()
         label->SetVisible(isVisible);
         preview->UpdateLookupTable(label->GetValue());
       }
+      preview->GetLookupTable()->Modified();
     }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -145,5 +146,18 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::SetLabelSetPreview(const mitk::La
   if (nullptr != m_LabelSelectionList)
   {
     m_LabelSelectionList->SetLabelSetImage(preview);
+  }
+}
+
+void QmitkMultiLabelSegWithPreviewToolGUIBase::DisplayTransferWidgets(bool enabled)
+{
+  if (nullptr != m_RadioTransferAll)
+  {
+    m_RadioTransferAll->setVisible(enabled);
+  }
+
+  if (nullptr != m_RadioTransferSelected)
+  {
+    m_RadioTransferSelected->setVisible(enabled);
   }
 }

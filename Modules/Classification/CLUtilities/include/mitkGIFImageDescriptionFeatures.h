@@ -28,7 +28,7 @@ namespace mitk
    * This feature calculator is activated by the option "<b>-image-diagnostic</b>" or "<b>-id</b>".
    * There are no parameters to further define the behavior of this feature calculator.
    *
-   * The paramters for this image are calculated from two images, a mask and an intenstiy
+   * The parameters for this image are calculated from two images, a mask and an intenstiy
    * image. It is assumed that the mask is
    * of the type of an unsigned short image and all voxels with an value larger or equal
    * to one are treated as masked. (Standard MITK mask)

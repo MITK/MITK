@@ -44,8 +44,6 @@ struct QmitkStdMultiWidgetEditor::Impl final
 
   QmitkInteractionSchemeToolBar* m_InteractionSchemeToolBar;
   QmitkLevelWindowWidget* m_LevelWindowWidget;
-
-  std::unique_ptr<QmitkMultiWidgetDecorationManager> m_MultiWidgetDecorationManager;
 };
 
 QmitkStdMultiWidgetEditor::Impl::Impl()
@@ -249,8 +247,6 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
   layout->addWidget(m_Impl->m_LevelWindowWidget);
 
-  m_Impl->m_MultiWidgetDecorationManager = std::make_unique<QmitkMultiWidgetDecorationManager>(multiWidget);
-
   GetSite()->GetPage()->AddPartListener(this);
 
   InitializePreferences(preferences);
@@ -267,7 +263,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
 
   // change and apply decoration preferences
   GetPreferenceDecorations(preferences);
-  m_Impl->m_MultiWidgetDecorationManager->DecorationPreferencesChanged(preferences);
+  this->GetDecorationManager()->DecorationPreferencesChanged(preferences);
 
   QmitkAbstractMultiWidget::RenderWindowWidgetMap renderWindowWidgets = multiWidget->GetRenderWindowWidgets();
   int i = 0;

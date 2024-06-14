@@ -104,6 +104,7 @@ namespace mitk
      * This is needed since the contour points we reduced before they are used to interpolate the surface.
      *
      * @param minSpacing Parameter to set
+     * @param minSpacing Parameter to set
      */
     void SetMinSpacing(double minSpacing);
 
@@ -158,6 +159,7 @@ namespace mitk
 
     /**
      * @brief Triggered with the "Reinit Interpolation" action. The contours are used to repopulate the
+     * @brief Triggered with the "Reinit Interpolation" action. The contours are used to repopulate the
      *        surfaceInterpolator data structures so that interpolation can be performed after reloading data.
      */
     void CompleteReinitialization(const std::vector<ContourPositionInformation>& newCPIs);
@@ -209,6 +211,7 @@ namespace mitk
     void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
 
     /**
+     * @brief Function that removes contours of a particular label when the "Remove Label" event is triggered in the labelSetImage.
      * @brief Function that removes contours of a particular label when the "Remove Label" event is triggered in the labelSetImage.
      *
      */

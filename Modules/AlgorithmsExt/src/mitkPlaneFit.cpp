@@ -153,7 +153,7 @@ void mitk::PlaneFit::ProcessPointSet(int t)
     dataM[i][2] = p3d[2] - m_Centroids[t][2];
   }
   // process the SVD (singular value decomposition) from ITK
-  // the vector will be orderd   descending
+  // the vector will be ordered descending
   vnl_svd<mitk::ScalarType> svd(dataM, 0.0);
 
   // calculate the SVD of A

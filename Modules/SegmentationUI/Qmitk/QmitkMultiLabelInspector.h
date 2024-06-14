@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkWeakPointer.h>
 #include <mitkLabelSetImage.h>
 #include <mitkDataNode.h>
+#include <mitkLabelHighlightGuard.h>
 
 #include <QWidget>
 #include <QItemSelectionModel>
@@ -32,7 +33,7 @@ namespace Ui
 
 /*
 * @brief This is an inspector that offers a tree view on the labels and groups of a MultiLabelSegmentation instance.
-* It also allows some manipulation operations an the labels/groups accordin to the UI/selection state.
+* It also allows some manipulation operations an the labels/groups according to the UI/selection state.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelInspector : public QWidget
 {
@@ -47,7 +48,7 @@ public:
   bool GetAllowVisibilityModification() const;
   bool GetAllowLockModification() const;
   bool GetAllowLabelModification() const;
-  /** Indicates if the inspector is currently modifiying the model/segmentation.
+  /** Indicates if the inspector is currently modifying the model/segmentation.
    Thus as long as the manipulation is ongoing, one should assume the model to be in an invalid state.*/
   bool GetModelManipulationOngoing() const;
 
@@ -118,8 +119,9 @@ Q_SIGNALS:
   * The instance for which a new name is requested is passed with the signal.
   * @param label Pointer to the instance that needs a (new) name.
   * @param rename Indicates if it is a renaming or naming of a new label.
+  * @param [out] canceled Indicating if the request was canceled by the used.
   */
-  void LabelRenameRequested(mitk::Label* label, bool rename) const;
+  void LabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const;
 
   /** @brief Signal that is emitted, if the model was updated (e.g. by a delete or add operation).*/
   void ModelUpdated() const;
@@ -256,6 +258,9 @@ protected:
   void RemoveGroupInternal(const mitk::LabelSetImage::GroupIndexType& groupID);
   void DeleteLabelInternal(const LabelValueVectorType& labelValues);
 
+  void keyPressEvent(QKeyEvent* event) override;
+  void keyReleaseEvent(QKeyEvent* event) override;
+
 private Q_SLOTS:
   /** @brief Transform a labels selection into a data node list and emit the 'CurrentSelectionChanged'-signal.
   *
@@ -306,9 +311,9 @@ private:
   bool m_ShowLock = true;
   bool m_ShowOther = false;
 
-  /** @brief Indicates if the context menu allows changes in visiblity.
+  /** @brief Indicates if the context menu allows changes in visibility.
   *
-  * Visiblity includes also color
+  * Visibility includes also color
   */
   bool m_AllowVisibilityModification = true;
 
@@ -328,6 +333,7 @@ private:
   mitk::DataNode::Pointer m_SegmentationNode;
   unsigned long m_SegmentationNodeDataMTime;
   mitk::ITKEventObserverGuard m_SegmentationObserver;
+  mitk::LabelHighlightGuard m_LabelHighlightGuard;
 };
 
 #endif

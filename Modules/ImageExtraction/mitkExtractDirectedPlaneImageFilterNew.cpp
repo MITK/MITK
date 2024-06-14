@@ -132,7 +132,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction(const itk::Ima
   extentInMM[0] = m_CurrentWorldPlaneGeometry->GetExtentInMM(0);
   extentInMM[1] = m_CurrentWorldPlaneGeometry->GetExtentInMM(1);
 
-  // The maximum extent is the lenght of the diagonal of the considered plane
+  // The maximum extent is the length of the diagonal of the considered plane
   double maxExtent = sqrt(extentInMM[0] * extentInMM[0] + extentInMM[1] * extentInMM[1]);
   unsigned int xTranlation = (maxExtent - extentInMM[0]);
   unsigned int yTranlation = (maxExtent - extentInMM[1]);

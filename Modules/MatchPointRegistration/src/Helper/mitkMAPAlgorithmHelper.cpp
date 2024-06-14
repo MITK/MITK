@@ -302,7 +302,7 @@ namespace mitk
     {
       //just set directly and you are done
 
-      /**@todo the duplication work arround is needed due to a insufficuence
+      /**@todo the duplication work around is needed due to a insufficuence
        in the AccessTwoImagesFixedDimensionByItk macro. The macro always cast
        the passed image into non const (even if tha image was passed as const).
        This behavior enforces the unnecessary use of an writeaccessor, which as a consequence

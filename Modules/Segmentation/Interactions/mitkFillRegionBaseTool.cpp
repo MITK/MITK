@@ -48,7 +48,6 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
   seedLabel = oldSegImage->GetPixel(seedIndex);
 
   typename OutputImageType::Pointer itkResultImage;
-  filledRegionImage = nullptr;
 
   try
   {
@@ -72,7 +71,7 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
   {
     return;
   }
-  mitk::CastToMitkImage(itkResultImage, filledRegionImage);
+  filledRegionImage->SetChannel(itkResultImage->GetBufferPointer());
 }
 
 void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -138,8 +137,8 @@ mitk::Image::Pointer mitk::FillRegionBaseTool::GenerateFillImage(const Image* wo
   itk::Index<2> seedIndex;
   workingSlice->GetGeometry()->WorldToIndex(seedPoint, seedIndex);
 
-  Image::Pointer fillImage;
-
+  auto fillImage = Image::New();
+  fillImage->Initialize(workingSlice);
   AccessFixedDimensionByItk_n(workingSlice, DoITKRegionGrowing, 2, (fillImage, seedIndex, seedLabelValue));
 
   return fillImage;

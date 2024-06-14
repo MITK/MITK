@@ -75,7 +75,7 @@ A label, as we used the term before, is already a single instance of itself but 
 
 If a label consists of multiple label instances, they each show their own distinct pixel value in square brackets as a clue for distinction and identification.
 
-It is important to understand that this number is not a separate, consequtive index for each label.
+It is important to understand that this number is not a separate, consecutive index for each label.
 It is just the plain pixel value of the label instance, which is unique across all label instances of the whole segmentation.
 
 \imageMacro{"QmitkSegmentation_LabelInstances.png","Label instances",10}
@@ -97,6 +97,14 @@ Renaming of labels and label instances can be found in their content menu as sho
 
 \imageMacro{"QmitkSegmentation_LockColorVisibility.png","Unlocking\, changing color of\, and hiding label instances",10}
 
+\section org_mitk_views_segmentationlabelhighlighting Label highlighting
+
+Especially if you have segmentations with many label instances or the label names are not telling, it can be nontrivial to identify the label instance in the label inspector of the segmentation view. To mitigate this problem MITK uses label highlighting in the render windows. As long as you hover with the mouse cursor over a group, label or label instance, the respective label instances will be highlighted in the render windows. Highlighted labels will visually pop out by being shown with full opacity (no transparency) while the opacity of all non-highlighted labels of the same segmentation will be reduced to 30% of the current opacity value (they become very transparent).
+
+By default, label instances that are set to be invisible are not shown while highlighted. By pressing the shift key, one can enforce also invisible label instances to be shown while highlighting.
+
+Remark: the highlighting is supported in all views that use the label inspector (e.g. also the segmentation utilities).
+
 \section org_mitk_views_segmentationcontextmenus Context menus
 
 Actions for organization of groups, labels, and label instances (as well as other operations) can be also found in their right-click context menus.
@@ -110,7 +118,7 @@ Note that renaming a label instance will make a separate label out of it, since 
 
 <b>Clear content</b> only clears the pixels of a label instance but won't delete the actual label instance.
 
-Groups can be <b>locked</b> and <b>unlocked</b> as a whole from their context menu, while label instances can be directly locked and unlocked outside the context menu as decribed further below.
+Groups can be <b>locked</b> and <b>unlocked</b> as a whole from their context menu, while label instances can be directly locked and unlocked outside the context menu as described further below.
 
 \section org_mitk_views_segmentationlabelsuggestions Label name and color suggestions
 
@@ -238,8 +246,7 @@ Left-click inside a region/segmentation to flood fill all connected pixels that 
 \subsection org_mitk_views_segmentationerasetool Erase tool
 \imageMacro{QmitkSegmentation_IMGIconErase.png,"Erase tool",3.79}
 
-This tool removes a connected part of pixels that form a segmentation.
-You may use it to remove single segmented regions (left-click on specific segmentation) or to clear a whole slice at once (left-click at the non-labeled background).
+This tool removes a connected part of pixels that form a segmentation. You may use it to remove single segmented regions by left-click on specific segmentation region.
 This tool will only work and regions of unlocked labels or on regions of the active label.
 
 \subsection org_mitk_views_segmentationclosetool Close tool
@@ -309,6 +316,11 @@ Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow sett
     -# Click on Preview to generate segmentation from MedSAM model.
 
 Note: For a detailed explanation of what this algorithm is able to, please refer to https://www.nature.com/articles/s41467-024-44824-z
+
+\subsection org_mitk_views_segmentationMonaiLabel2D MONAI Label 2D Tool
+
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"MONAILabel2D tool",10.00}
+Read more about the tool here at \subpage org_mitk_views_segmentationMonaiLabel3D
 
 \subsection org_mitk_views_segmentationinterpolation 2D and 3D Interpolation
 
@@ -461,6 +473,27 @@ directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv 
     -# Use "Advanced" > "GPU Id" combobox to change the preferred GPU for inferencing. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
     -# In case you want to use your own virtual environment containing TotalSegmentator, goto "Install Options" & check "Use Custom Installation" checkbox. Then, select the environment of your choice by using "Custom Env. Path".
 
+\subsection org_mitk_views_segmentationMonaiLabel3D MONAI Label 3D Tool
+
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"MONAILabel3D tool",10.00}
+
+\imageMacro{QmitkSegmentation_MonaiLabelTool.png,"MONAI Label tool",10.00}
+
+MONAI Label is a server-client system that facilitates interactive medical image annotation by using AI. MONAI Label typically hosts different "Apps", e.g. Radiology or Pathology. Each App hosts a set of pretrained models on pertaining datasets.
+MITK is tested for the Radiology app and only supports auto and click-based "deepgrow" models. For internal reasons, MITK doesn't support "deepedit" and "localization_spine" models specifically.
+The tool requires that you have a URL to a (self-) hosted MONAI Label server. 
+For a detailed explanation of what MONAI Label is capable of, please refer to https://docs.monai.io/projects/label/en/latest/. <br>
+Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow setting impacts the segmentation. However, any applied color maps are ignored.
+
+\subsubsection org_mitk_views_segmentationSegmentAnythingWorkflow Workflow:
+    -# Enter your URL in the "MONAI Server URL" box and press the refresh button next to it. This connects MITK to the MONAI Label server and fetches exposed metadata.
+    -# Select the Radiology app e.g. from the "Available Apps" combobox. This will load all supported model names in the "Models" combo box below it.
+    -# From the "Models" box select the model you want to use. Immediately, all supported classes of the model on which the model was trained will be shown below it.
+    -# If an interactive model is selected e.g. "deepgrow_3d", Press and hold SHIFT and left click on any of the 3 render windows to start click guided segmentation.
+    Press SHIFT+Right click for negative clicks to adjust the preview mask on the render window.
+    -# If an auto-segmentation model is selected e.g. "deepedit_seg", simply click "Preview" for generating masks.
+
+
 \section org_mitk_views_segmentationpostprocessing Additional things you can do with segmentations
 
 Segmentations are never an end in themselves. Consequently, the segmentation view adds a couple of "post-processing" actions, accessible through the context-menu of the data manager.
@@ -483,9 +516,5 @@ For segmentation of 3D+t images, some tools give you the option to choose betwee
 
 In general, segmentation is applied on the time frame that is selected when execution is performed.
 If you alter the time frame, the segmentation preview is adapted.
-
-\section org_mitk_views_segmentationtechnicaldetail Technical information for developers
-
-For technical specifications see \subpage QmitkSegmentationTechnicalPage and for information on the extensions of the tools system \subpage toolextensions.
 
 */

@@ -93,6 +93,8 @@ QmitkSegmentationView::QmitkSegmentationView()
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
+  m_RenderWindowPart = this->GetRenderWindowPart();
+
   if (nullptr != m_Controls)
   {
     // deactivate all tools
@@ -500,17 +502,17 @@ void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType /*la
   }
 }
 
-void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rename) const
+void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const
 {
   auto segmentation = this->GetCurrentSegmentation();
 
   if (rename)
   {
-    QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::RenameLabel);
+    canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::RenameLabel);
     return;
   }
 
-  QmitkNewSegmentationDialog::DoRenameLabel(label, nullptr, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
+  canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, nullptr, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
 }
 
 mitk::LabelSetImage* QmitkSegmentationView::GetCurrentSegmentation() const
@@ -569,8 +571,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_ToolManager->SetDataStorage(*(this->GetDataStorage()));
    m_ToolManager->InitializeTools();
 
-   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything', 'MedSAM'");
-   QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut TotalSegmentator");
+   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything' 'MedSAM' 'MONAI Label 2D'");
+   QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut TotalSegmentator 'MONAI Label 3D'");
 
 #ifdef __linux__
    segTools3D.append(" nnUNet"); // plugin not enabled for MacOS / Windows

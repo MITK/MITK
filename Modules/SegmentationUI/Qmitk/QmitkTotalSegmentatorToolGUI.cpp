@@ -160,6 +160,12 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
     this->WriteErrorMessage("<b>ERROR: </b>Couldn't find compatible Python.");
     return;
   }
+  if (!QmitkSetupVirtualEnvUtil::IsVenvInstalled(path))
+  {
+    this->WriteErrorMessage("venv module not found for the selected python to create a new virtual " 
+                            "environment. Please install venv or select another compatibile python");
+    return;
+  }
   // check if python 3.13 and ask for confirmation
   if (version.startsWith("3.13") &&
       QMessageBox::No == QMessageBox::question(
@@ -205,7 +211,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     }
     bool isFast = m_Controls.fastBox->isChecked();
     QString subTask = m_Controls.subtaskComboBox->currentText();
-    if (subTask != VALID_TASKS[0])
+    if (subTask != VALID_TASKS[0] && subTask != VALID_TASKS[1])
     {
       isFast = true;
     }
@@ -231,7 +237,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   }
   catch (...)
   {
-    std::string errorMsg = "Unkown error occured while generation TotalSegmentator segmentation.";
+    std::string errorMsg = "Unknown error occurred while generation TotalSegmentator segmentation.";
     this->ShowErrorMessage(errorMsg);
     m_Controls.previewButton->setEnabled(true);
     m_FirstPreviewComputation = true;
@@ -298,6 +304,11 @@ bool QmitkTotalSegmentatorToolGUI::IsTotalSegmentatorInstalled(const QString &py
   }
   isExists = QFile::exists(fullPath + QDir::separator() + QString("TotalSegmentator")) && isPythonExists;
 #endif
+  if (isExists && m_Installer.TOTALSEGMENTATOR_VERSION !=
+      QmitkSetupVirtualEnvUtil::GetPipPackageVersion(fullPath, "TotalSegmentator"))
+  {
+    isExists = false;
+  }
   return isExists;
 }
 
@@ -330,7 +341,7 @@ void QmitkTotalSegmentatorToolGUI::AutoParsePythonPaths()
     {
       subIt.next();
       QString envName = subIt.fileName();
-      if (!envName.startsWith('.')) // Filter out irrelevent hidden folders, if any.
+      if (!envName.startsWith('.')) // Filter out irrelevant hidden folders, if any.
       {
         m_Controls.pythonEnvComboBox->addItem("(" + envName + "): " + subIt.filePath());
       }
@@ -450,6 +461,10 @@ void QmitkTotalSegmentatorToolGUI::OnClearInstall()
 bool QmitkTotalSegmentatorToolInstaller::SetupVirtualEnv(const QString& venvName)
 {
   if (GetSystemPythonPath().isEmpty())
+  {
+    return false;
+  }
+  if (!QmitkSetupVirtualEnvUtil::IsVenvInstalled(GetSystemPythonPath()))
   {
     return false;
   }

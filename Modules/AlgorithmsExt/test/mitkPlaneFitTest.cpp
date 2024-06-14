@@ -27,7 +27,7 @@ int mitkPlaneFitTest(int, char *[])
 
   mitk::Point3D Point;
 
-  // first without any point, then incrementally add points within thre points there will be a plane geometry
+  // first without any point, then incrementally add points within the points there will be a plane geometry
   std::cout << "Start PlaneFitTest " << std::endl;
   for (int position = 0; position < 6; position++)
   {

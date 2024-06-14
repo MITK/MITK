@@ -34,14 +34,14 @@ public:
     mitk::ManualPlacementAnnotationRenderer *ap1_test1 = mitk::ManualPlacementAnnotationRenderer::GetAnnotationRenderer("test1");
     CPPUNIT_ASSERT_MESSAGE("Testing availability of ManualPlacementAnnotationRenderer service", ap1_test1);
     mitk::ManualPlacementAnnotationRenderer *ap2_test1 = mitk::ManualPlacementAnnotationRenderer::GetAnnotationRenderer("test1");
-    CPPUNIT_ASSERT_MESSAGE("Testing if ManualPlacementAnnotationRenderer of same kind stays avaliable", ap1_test1 == ap2_test1);
+    CPPUNIT_ASSERT_MESSAGE("Testing if ManualPlacementAnnotationRenderer of same kind stays available", ap1_test1 == ap2_test1);
     mitk::ManualPlacementAnnotationRenderer *ap1_test2 = mitk::ManualPlacementAnnotationRenderer::GetAnnotationRenderer("test2");
     CPPUNIT_ASSERT_MESSAGE("Testing if new instance can be created by using different ID", ap1_test2 != ap1_test1);
 
     mitk::LayoutAnnotationRenderer *ol1_test1 = mitk::LayoutAnnotationRenderer::GetAnnotationRenderer("test1");
     CPPUNIT_ASSERT_MESSAGE("Testing availability of LayoutAnnotationRenderer service", ol1_test1);
     mitk::LayoutAnnotationRenderer *ol2_test1 = mitk::LayoutAnnotationRenderer::GetAnnotationRenderer("test1");
-    CPPUNIT_ASSERT_MESSAGE("Testing if LayoutAnnotationRenderer of same kind stays avaliable", ol2_test1 == ol1_test1);
+    CPPUNIT_ASSERT_MESSAGE("Testing if LayoutAnnotationRenderer of same kind stays available", ol2_test1 == ol1_test1);
     mitk::LayoutAnnotationRenderer *ol1_test2 = mitk::LayoutAnnotationRenderer::GetAnnotationRenderer("test2");
     CPPUNIT_ASSERT_MESSAGE("Testing if new instance can be created by using different ID", ol1_test2 != ol1_test1);
 

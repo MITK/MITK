@@ -15,7 +15,7 @@ found in the LICENSE file.
 *
 * The more detailed description is needed for some more elaborate description. Here you can describe
 * anything anyone might ever want to know about your class. Of especial interest might be to mention
-* what it can be used for or what its main purpose is. If you want you can even use pictures (you migth want
+* what it can be used for or what its main purpose is. If you want you can even use pictures (you might want
 * take a look at the doxygen documentation for that).
 */
 class DocumentationExample
@@ -42,7 +42,7 @@ public:
   * @param number The position of the char to be cast. This should never be below 0 and not above the length of the char
   * array.
   * @param name A constant character pointer.
-  * @return The char value of the charakter at position number casted to int
+  * @return The char value of the character at position number casted to int
   */
   int ExampleCastCharToInt(int number, const char *name);
 

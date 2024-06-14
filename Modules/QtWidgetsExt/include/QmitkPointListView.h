@@ -81,7 +81,7 @@ public:
 
 signals:
 
-  void SignalPointSelectionChanged(); ///< this signal is emmitted, if the selection of a point in the pointset is changed
+  void SignalPointSelectionChanged(); ///< this signal is emitted, if the selection of a point in the pointset is changed
   void SignalTimeStepChanged(int);
 
 protected slots:

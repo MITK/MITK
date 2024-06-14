@@ -34,7 +34,7 @@ namespace mitk
   //! BaseGeometry. The Gizmo will automatically update itself to all modifications to the
   //! followed base geometry. Interactive modifications to the geometry can thus be easily visualized.
   //!
-  //! The gizmo is definded by
+  //! The gizmo is defined by
   //! - a center
   //! - three axes for x, y, and z
   //! - a radius
@@ -134,7 +134,7 @@ namespace mitk
     //! \param storage The DataStorage where a node holding the gizmo
     //!                shall be added to (ignored when nullptr)
     //!
-    //! \return DataNode::Pointer containing the node used for vizualization of our gizmo
+    //! \return DataNode::Pointer containing the node used for visualization of our gizmo
     static DataNode::Pointer AddGizmoToNode(DataNode *node, DataStorage *storage);
 
     //! Convenience removal of gizmo from given node
@@ -146,7 +146,7 @@ namespace mitk
     //! Make sure to pass the same parameters here that you provided to a
     //! previous call to AddGizmoToNode.
     //!
-    //! \return DataNode::Pointer containing the node used for vizualization of our gizmo
+    //! \return DataNode::Pointer containing the node used for visualization of our gizmo
     static bool RemoveGizmoFromNode(DataNode *node, DataStorage *storage);
 
     //! \return whether given node in given storage has a gizmo attached.

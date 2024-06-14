@@ -76,6 +76,7 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   prefs->Put("label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
   prefs->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
   prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
+  prefs->PutBool("monailabel allow all models", m_Ui->allowAllModelsCheckBox->isChecked());
   return true;
 }
 
@@ -137,6 +138,8 @@ void QmitkSegmentationPreferencePage::Update()
 
   m_Ui->replaceStandardSuggestionsCheckBox->setChecked(prefs->GetBool("replace standard suggestions", true));
   m_Ui->suggestOnceCheckBox->setChecked(prefs->GetBool("suggest once", true));
+
+  m_Ui->allowAllModelsCheckBox->setChecked(prefs->GetBool("monailabel allow all models", true));
 }
 
 void QmitkSegmentationPreferencePage::OnLabelSetPresetButtonClicked()

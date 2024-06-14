@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <itkDOMNodeXMLReader.h>
 #include <itkImage.h>
 
-// Commandline:(for exmaple) mitkMultiGaussianTest C:/temp/output C:/temp/inputFile.xml
+// Commandline:(for example) mitkMultiGaussianTest C:/temp/output C:/temp/inputFile.xml
 //
 //For Example: inputFile.xml
 //<testcase>
@@ -58,7 +58,7 @@ bool IsInOtherROI(int,
 
 int mitkMultiGaussianTest(int argc, char* argv[])
 {
-  // Read the parmaeter from a .xml File.
+  // Read the parameter from an .xml File.
   // In the inputFile.xml we find the characteristics of the Gaussian and the ROI's. Hier we can have more then one ROI -> we find the hot spot for each of the ROI's; we can set the entire HotSpot to be in the image or just its midpoint, but not necessary the whole HotSpot.
 
     const unsigned int                                                   Dimension = 3;

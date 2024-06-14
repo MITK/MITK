@@ -127,6 +127,8 @@ std::vector<mitk::TimeStepType> mitk::ROI::Element::GetTimeSteps() const
 
   for (const auto& [t, min] : m_Min)
   {
+    (void)min; // Prevent unused variable error in older compilers
+
     if (m_Max.count(t) != 0)
       result.push_back(t);
   }

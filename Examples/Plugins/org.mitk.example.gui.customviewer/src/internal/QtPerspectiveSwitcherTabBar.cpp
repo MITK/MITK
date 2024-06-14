@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <berryIWorkbenchPage.h>
 
 /**
- * \brief A Listener class for perspective changes. Neccessary for consistent tab activation
+ * \brief A Listener class for perspective changes. Necessary for consistent tab activation
  * in QtPerspectiveSwitcherTabBar instances.
  */
 // //! [SwitchPerspectiveListener]

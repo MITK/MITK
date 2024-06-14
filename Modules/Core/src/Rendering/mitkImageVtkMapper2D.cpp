@@ -323,7 +323,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
     localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetVtkOutput();
   }
 
-  // Bounds information for reslicing (only reuqired if reference geometry
+  // Bounds information for reslicing (only required if reference geometry
   // is present)
   // this used for generating a vtkPLaneSource with the right size
   double sliceBounds[6];

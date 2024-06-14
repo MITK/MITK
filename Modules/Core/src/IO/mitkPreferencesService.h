@@ -34,7 +34,7 @@ namespace mitk
     PreferencesService();
     ~PreferencesService() override;
 
-    void InitializeStorage(const std::filesystem::path& filename) override;
+    void InitializeStorage(const fs::path& filename) override;
     void UninitializeStorage(bool removeFile) override;
     IPreferences* GetSystemPreferences() override;
 

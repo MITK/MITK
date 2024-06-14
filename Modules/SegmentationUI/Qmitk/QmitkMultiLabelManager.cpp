@@ -129,7 +129,10 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
   for (auto labelValue : selectedLabels)
   {
     auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(labelValue);
-    emit LabelRenameRequested(currentLabel, true);
+    if (currentLabel.IsNull())
+      continue;
+    bool canceled = false;
+    emit LabelRenameRequested(currentLabel, true, canceled);
   }
 }
 
@@ -280,10 +283,14 @@ void QmitkMultiLabelManager::OnCreateCroppedMask(bool)
 
   mitk::Image::Pointer maskImage;
   auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(this->GetSelectedLabels().front());
-  auto pixelValue = currentLabel->GetValue();
   try
   {
     this->WaitCursorOn();
+
+    if (currentLabel.IsNull())
+      mitkThrow() << "Invalid state context menu action was triggered with an invalid label id. Label id: " << this->GetSelectedLabels().front();
+
+    auto pixelValue = currentLabel->GetValue();
 
     mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
     cropFilter->SetInput(mitk::CreateLabelMask(this->GetMultiLabelSegmentation(),pixelValue));
@@ -329,11 +336,15 @@ void QmitkMultiLabelManager::OnCreateMask(bool /*triggered*/)
   mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
 
   auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(this->GetSelectedLabels().front());
-  auto pixelValue = currentLabel->GetValue();
   mitk::Image::Pointer maskImage;
   try
   {
     this->WaitCursorOn();
+
+    if (currentLabel.IsNull())
+      mitkThrow() << "Invalid state context menu action was triggered with an invalid label id. Label id: " << this->GetSelectedLabels().front();
+    auto pixelValue = currentLabel->GetValue();
+
     maskImage = mitk::CreateLabelMask(GetMultiLabelSegmentation(),pixelValue);
     this->WaitCursorOff();
   }
@@ -371,31 +382,35 @@ void QmitkMultiLabelManager::OnCreateSmoothedSurface(bool /*triggered*/)
   mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
 
   auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(this->GetSelectedLabels().front());
-  auto pixelValue = currentLabel->GetValue();
-
-  mitk::LabelSetImageToSurfaceThreadedFilter::Pointer surfaceFilter = mitk::LabelSetImageToSurfaceThreadedFilter::New();
-
-  itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer successCommand =
-    itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
-  successCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
-  surfaceFilter->AddObserver(mitk::ResultAvailable(), successCommand);
-
-  itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer errorCommand =
-    itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
-  errorCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
-  surfaceFilter->AddObserver(mitk::ProcessingError(), errorCommand);
-
-  mitk::DataNode::Pointer groupNode = this->GetMultiLabelNode();
-  surfaceFilter->SetPointerParameter("Group node", groupNode);
-  surfaceFilter->SetPointerParameter("Input", this->GetMultiLabelSegmentation());
-  surfaceFilter->SetParameter("RequestedLabel", pixelValue);
-  surfaceFilter->SetParameter("Smooth", true);
-  surfaceFilter->SetDataStorage(*m_DataStorage);
-
-  mitk::StatusBar::GetInstance()->DisplayText("Surface creation is running in background...");
 
   try
   {
+    if (currentLabel.IsNull())
+      mitkThrow() << "Invalid state context menu action was triggered with an invalid label id. Label id: " << this->GetSelectedLabels().front();
+
+    auto pixelValue = currentLabel->GetValue();
+
+    mitk::LabelSetImageToSurfaceThreadedFilter::Pointer surfaceFilter = mitk::LabelSetImageToSurfaceThreadedFilter::New();
+
+    itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer successCommand =
+      itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
+    successCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
+    surfaceFilter->AddObserver(mitk::ResultAvailable(), successCommand);
+
+    itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer errorCommand =
+      itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
+    errorCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
+    surfaceFilter->AddObserver(mitk::ProcessingError(), errorCommand);
+
+    mitk::DataNode::Pointer groupNode = this->GetMultiLabelNode();
+    surfaceFilter->SetPointerParameter("Group node", groupNode);
+    surfaceFilter->SetPointerParameter("Input", this->GetMultiLabelSegmentation());
+    surfaceFilter->SetParameter("RequestedLabel", pixelValue);
+    surfaceFilter->SetParameter("Smooth", true);
+    surfaceFilter->SetDataStorage(*m_DataStorage);
+
+    mitk::StatusBar::GetInstance()->DisplayText("Surface creation is running in background...");
+
     surfaceFilter->StartAlgorithm();
   }
   catch (mitk::Exception &e)
@@ -412,31 +427,35 @@ void QmitkMultiLabelManager::OnCreateDetailedSurface(bool /*triggered*/)
   mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
 
   auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(this->GetSelectedLabels().front());
-  auto pixelValue = currentLabel->GetValue();
-
-  mitk::LabelSetImageToSurfaceThreadedFilter::Pointer surfaceFilter = mitk::LabelSetImageToSurfaceThreadedFilter::New();
-
-  itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer successCommand =
-    itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
-  successCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
-  surfaceFilter->AddObserver(mitk::ResultAvailable(), successCommand);
-
-  itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer errorCommand =
-    itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
-  errorCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
-  surfaceFilter->AddObserver(mitk::ProcessingError(), errorCommand);
-
-  mitk::DataNode::Pointer groupNode = this->GetMultiLabelNode();
-  surfaceFilter->SetPointerParameter("Group node", groupNode);
-  surfaceFilter->SetPointerParameter("Input", this->GetMultiLabelSegmentation());
-  surfaceFilter->SetParameter("RequestedLabel", pixelValue);
-  surfaceFilter->SetParameter("Smooth", false);
-  surfaceFilter->SetDataStorage(*m_DataStorage);
-
-  mitk::StatusBar::GetInstance()->DisplayText("Surface creation is running in background...");
 
   try
   {
+    if (currentLabel.IsNull())
+      mitkThrow() << "Invalid state context menu action was triggered with an invalid label id. Label id: " << this->GetSelectedLabels().front();
+
+    auto pixelValue = currentLabel->GetValue();
+
+    mitk::LabelSetImageToSurfaceThreadedFilter::Pointer surfaceFilter = mitk::LabelSetImageToSurfaceThreadedFilter::New();
+
+    itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer successCommand =
+      itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
+    successCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
+    surfaceFilter->AddObserver(mitk::ResultAvailable(), successCommand);
+
+    itk::SimpleMemberCommand<QmitkMultiLabelManager>::Pointer errorCommand =
+      itk::SimpleMemberCommand<QmitkMultiLabelManager>::New();
+    errorCommand->SetCallbackFunction(this, &QmitkMultiLabelManager::OnThreadedCalculationDone);
+    surfaceFilter->AddObserver(mitk::ProcessingError(), errorCommand);
+
+    mitk::DataNode::Pointer groupNode = this->GetMultiLabelNode();
+    surfaceFilter->SetPointerParameter("Group node", groupNode);
+    surfaceFilter->SetPointerParameter("Input", this->GetMultiLabelSegmentation());
+    surfaceFilter->SetParameter("RequestedLabel", pixelValue);
+    surfaceFilter->SetParameter("Smooth", false);
+    surfaceFilter->SetDataStorage(*m_DataStorage);
+
+    mitk::StatusBar::GetInstance()->DisplayText("Surface creation is running in background...");
+
     surfaceFilter->StartAlgorithm();
   }
   catch (mitk::Exception &e)
@@ -463,9 +482,9 @@ void QmitkMultiLabelManager::OnGoToLabel(mitk::LabelSetImage::LabelValueType lab
   emit GoToLabel(label, position);
 }
 
-void QmitkMultiLabelManager::OnLabelRenameRequested(mitk::Label* label, bool rename) const
+void QmitkMultiLabelManager::OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const
 {
-  emit LabelRenameRequested(label, rename);
+  emit LabelRenameRequested(label, rename, canceled);
 }
 
 void QmitkMultiLabelManager::WaitCursorOn()

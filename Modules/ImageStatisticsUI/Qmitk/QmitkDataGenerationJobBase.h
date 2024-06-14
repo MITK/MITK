@@ -44,7 +44,7 @@ public:
   void run() final;
 
   /*!
-  /brief Returns a flag the indicates if the job computation was successfull.*/
+  /brief Returns a flag the indicates if the job computation was successful.*/
   bool GetComputationSuccessFlag() const;
 
   std::string GetLastErrorMessage() const;

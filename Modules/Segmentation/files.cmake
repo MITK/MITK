@@ -57,6 +57,9 @@ set(CPP_FILES
   Interactions/mitknnUnetTool.cpp
   Interactions/mitkProcessExecutor.cpp
   Interactions/mitkSegmentAnythingProcessExecutor.cpp
+  Interactions/mitkMonaiLabelTool.cpp
+  Interactions/mitkMonaiLabel2DTool.cpp
+  Interactions/mitkMonaiLabel3DTool.cpp
   Interactions/mitkTotalSegmentatorTool.cpp
   Interactions/mitkSegmentAnythingTool.cpp
   Interactions/mitkMedSAMTool.cpp

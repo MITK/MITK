@@ -90,13 +90,13 @@ namespace
     ~RecordingSession()
     {
       std::error_code errorCode;
-      std::filesystem::remove_all(m_FrameDir, errorCode);
+      fs::remove_all(m_FrameDir, errorCode);
     }
 
     RecordingSession(const RecordingSession&) = delete;
     RecordingSession& operator=(const RecordingSession&) = delete;
 
-    std::filesystem::path GetFrameDir() const
+    fs::path GetFrameDir() const
     {
       return m_FrameDir;
     }
@@ -116,7 +116,7 @@ namespace
     }
 
   private:
-    std::filesystem::path m_FrameDir;
+    fs::path m_FrameDir;
     unsigned int m_NumberOfFrames;
     vtkNew<vtkWindowToImageFilter> m_WindowToImageFilter;
     vtkNew<vtkImageResize> m_ImageResize;
@@ -139,7 +139,7 @@ namespace mitk
     Impl(const Impl&) = delete;
     Impl& operator=(const Impl&) = delete;
 
-    std::filesystem::path GetFFmpegPath() const
+    fs::path GetFFmpegPath() const
     {
       if (m_FFmpegPath)
         return m_FFmpegPath.value();
@@ -154,20 +154,20 @@ namespace mitk
           return ffmpegPath;
       }
 
-      return std::filesystem::path();
+      return fs::path();
     }
 
-    void SetFFmpegPath(const std::filesystem::path& path)
+    void SetFFmpegPath(const fs::path& path)
     {
       m_FFmpegPath = path;
     }
 
-    std::filesystem::path GetOutputPath() const
+    fs::path GetOutputPath() const
     {
       return m_OutputPath;
     }
 
-    void SetOutputPath(const std::filesystem::path& path)
+    void SetOutputPath(const fs::path& path)
     {
       m_OutputPath = path;
     }
@@ -325,8 +325,8 @@ namespace mitk
     }
 
   private:
-    std::optional<std::filesystem::path> m_FFmpegPath;
-    std::filesystem::path m_OutputPath;
+    std::optional<fs::path> m_FFmpegPath;
+    fs::path m_OutputPath;
     std::optional<OutputFormat> m_OutputFormat;
     std::string m_RenderWindowName;
     unsigned int m_FrameRate;
@@ -343,22 +343,22 @@ mitk::VideoRecorder::~VideoRecorder()
 {
 }
 
-std::filesystem::path mitk::VideoRecorder::GetFFmpegPath() const
+fs::path mitk::VideoRecorder::GetFFmpegPath() const
 {
   return m_Impl->GetFFmpegPath();
 }
 
-void mitk::VideoRecorder::SetFFmpegPath(const std::filesystem::path& path)
+void mitk::VideoRecorder::SetFFmpegPath(const fs::path& path)
 {
   m_Impl->SetFFmpegPath(path);
 }
 
-std::filesystem::path mitk::VideoRecorder::GetOutputPath() const
+fs::path mitk::VideoRecorder::GetOutputPath() const
 {
   return m_Impl->GetOutputPath();
 }
 
-void mitk::VideoRecorder::SetOutputPath(const std::filesystem::path& path)
+void mitk::VideoRecorder::SetOutputPath(const fs::path& path)
 {
   m_Impl->SetOutputPath(path);
 }

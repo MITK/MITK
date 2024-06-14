@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleResource.h>
-#include <filesystem>
+#include <mitkFileSystem.h>
 
 namespace mitk
 {
@@ -28,7 +28,7 @@ namespace mitk
 
 mitk::nnUNetTool::~nnUNetTool()
 {
-  std::filesystem::remove_all(this->GetMitkTempDir());
+  fs::remove_all(this->GetMitkTempDir());
 }
 
 void mitk::nnUNetTool::Activated()

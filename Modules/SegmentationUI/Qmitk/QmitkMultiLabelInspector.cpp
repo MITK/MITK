@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
-#include <mitkVectorProperty.h>
 
 // Qmitk
 #include <QmitkMultiLabelTreeModel.h>
@@ -29,42 +28,10 @@ found in the LICENSE file.
 #include <QLabel>
 #include <QWidgetAction>
 #include <QMessageBox>
+#include <QKeyEvent>
 
 #include <ui_QmitkMultiLabelInspectorControls.h>
 
-namespace
-{
-  void ActivateLabelHighlights(mitk::DataNode* node, const mitk::LabelSetImage::LabelValueVectorType highlightedValues)
-  {
-    const std::string propertyName = "org.mitk.multilabel.labels.highlighted";
-
-    mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(propertyName));
-    if (nullptr == prop)
-    {
-      prop = mitk::IntVectorProperty::New();
-      node->SetProperty(propertyName, prop);
-    }
-
-    mitk::IntVectorProperty::VectorType intValues(highlightedValues.begin(), highlightedValues.end());
-    prop->SetValue(intValues);
-    prop->Modified(); //see T30386; needed because VectorProperty::SetValue does currently trigger no modified
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-
-  void DeactivateLabelHighlights(mitk::DataNode* node)
-  {
-    std::string propertyName = "org.mitk.multilabel.labels.highlighted";
-
-    mitk::IntVectorProperty::Pointer prop = dynamic_cast<mitk::IntVectorProperty*>(node->GetNonConstProperty(propertyName));
-    if (nullptr != prop)
-    {
-      prop->SetValue({});
-      prop->Modified(); //see T30386; needed because VectorProperty::SetValue does currently trigger no modified
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
-}
 
 QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/)
   : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelInspector), m_SegmentationNodeDataMTime(0)
@@ -120,7 +87,7 @@ void QmitkMultiLabelInspector::Initialize()
 
   m_LastValidSelectedLabels = {};
 
-  //in singel selection mode, if at least one label exist select the first label of the mode.
+  //in single selection mode, if at least one label exist select the first label of the mode.
   if (m_Segmentation.IsNotNull() && !this->GetMultiSelectionMode() && m_Segmentation->GetTotalNumberOfLabels() > 0)
   {
     auto firstIndex = m_Model->FirstLabelInstanceIndex(QModelIndex());
@@ -204,6 +171,7 @@ void QmitkMultiLabelInspector::SetMultiLabelNode(mitk::DataNode* node)
   {
     m_SegmentationObserver.Reset();
     m_SegmentationNode = node;
+    m_LabelHighlightGuard.SetSegmentationNode(m_SegmentationNode);
     m_SegmentationNodeDataMTime = 0;
 
     if (m_SegmentationNode.IsNotNull())
@@ -462,8 +430,11 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::LabelSetI
 {
   auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(m_Segmentation);
 
+  bool canceled = false;
   if (!m_DefaultLabelNaming)
-    emit LabelRenameRequested(newLabel, false);
+    emit LabelRenameRequested(newLabel, false, canceled);
+
+  if (canceled) return nullptr;
 
   m_ModelManipulationOngoing = true;
   m_Segmentation->AddLabel(newLabel, containingGroup, false);
@@ -1024,7 +995,7 @@ QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
     for (auto value : relevantLabelValues)
     {
       auto label = this->m_Segmentation->GetLabel(value);
-      if (nullptr == label)
+      if (label.IsNull())
         mitkThrow() << "Invalid state. Internal model returned a label value that does not exist in segmentation. Invalid value:" << value;
       relevantLabels.emplace_back(label);
     }
@@ -1037,7 +1008,7 @@ QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
     auto opacity = relevantLabels.front()->GetOpacity();
     opacitySlider->setValue(static_cast<int>(opacity * 100));
     auto segmentation = m_Segmentation;
-    auto node = m_SegmentationNode;
+    auto guard = &m_LabelHighlightGuard;
 
     auto onChangeLambda = [segmentation, relevantLabels](const int value)
       {
@@ -1052,15 +1023,15 @@ QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
       };
     QObject::connect(opacitySlider, &QSlider::valueChanged, this, onChangeLambda);
 
-    auto onPressedLambda = [node]()
+    auto onPressedLambda = [guard]()
       {
-        DeactivateLabelHighlights(node);
+        guard->SetHighlightedLabels({});
       };
     QObject::connect(opacitySlider, &QSlider::sliderPressed, this, onPressedLambda);
 
-    auto onReleasedLambda = [node, relevantLabelValues]()
+    auto onReleasedLambda = [relevantLabelValues, guard]()
       {
-        ActivateLabelHighlights(node, relevantLabelValues);
+        guard->SetHighlightedLabels(relevantLabelValues);
       };
     QObject::connect(opacitySlider, &QSlider::sliderReleased, this, onReleasedLambda);
 
@@ -1099,6 +1070,7 @@ void QmitkMultiLabelInspector::OnClearLabels(bool /*value*/)
     if (m_SegmentationNode.IsNotNull())
     {
       m_SegmentationNode->Modified();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -1115,6 +1087,13 @@ void QmitkMultiLabelInspector::OnDeleteAffectedLabel()
 
   auto affectedLabels = GetCurrentlyAffactedLabelInstances();
   auto currentLabel = m_Segmentation->GetLabel(affectedLabels.front());
+
+  if (currentLabel.IsNull())
+  {
+    MITK_WARN << "Ignore operation. Try to delete non-existing label. Invalid ID: " << affectedLabels.front();
+    return;
+  }
+
   QString question = "Do you really want to delete all instances of label \"" + QString::fromStdString(currentLabel->GetName()) + "\"?";
 
   QMessageBox::StandardButton answerButton =
@@ -1219,6 +1198,7 @@ void QmitkMultiLabelInspector::OnAddLabelInstance()
   if (m_SegmentationNode.IsNotNull())
   {
     m_SegmentationNode->Modified();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -1243,6 +1223,7 @@ void QmitkMultiLabelInspector::OnClearLabel(bool /*value*/)
     if (m_SegmentationNode.IsNotNull())
     {
       m_SegmentationNode->Modified();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -1252,7 +1233,10 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
   auto relevantLabelValues = this->GetCurrentlyAffactedLabelInstances();
   auto currentLabel = this->GetCurrentLabel();
 
-  emit LabelRenameRequested(currentLabel, true);
+  bool canceled = false;
+  emit LabelRenameRequested(currentLabel, true, canceled);
+
+  if (canceled) return;
 
   for (auto value : relevantLabelValues)
   {
@@ -1265,6 +1249,7 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
       label->SetName(currentLabel->GetName());
       label->SetColor(currentLabel->GetColor());
       m_Segmentation->UpdateLookupTable(label->GetValue());
+      m_Segmentation->GetLookupTable()->Modified();
       mitk::DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 
       // this is needed as workaround for (T27307). It circumvents the fact that modifications
@@ -1290,7 +1275,7 @@ void QmitkMultiLabelInspector::SetLockOfAffectedLabels(bool locked) const
     for (auto value : relevantLabelValues)
     {
       auto label = this->m_Segmentation->GetLabel(value);
-      if (nullptr == label)
+      if (label.IsNull())
         mitkThrow() << "Invalid state. Internal model returned a label value that does not exist in segmentation. Invalid value:" << value;
       label->SetLocked(locked);
     }
@@ -1317,7 +1302,7 @@ void QmitkMultiLabelInspector::SetVisibilityOfAffectedLabels(bool visible) const
     for (auto value : relevantLabelValues)
     {
       auto label = this->m_Segmentation->GetLabel(value);
-      if (nullptr == label)
+      if (label.IsNull())
         mitkThrow() << "Invalid state. Internal model returned a label value that does not exist in segmentation. Invalid value:" << value;
       label->SetVisible(visible);
       m_Segmentation->UpdateLookupTable(label->GetValue());
@@ -1351,6 +1336,7 @@ void QmitkMultiLabelInspector::OnSetOnlyActiveLabelVisible(bool /*value*/)
     currentLabel->SetVisible(true);
     m_Segmentation->UpdateLookupTable(selectedValue);
   }
+  m_Segmentation->GetLookupTable()->Modified();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   this->PrepareGoToLabel(selectedLabelValues.front());
@@ -1380,9 +1366,13 @@ void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) 
 {
   this->WaitCursorOn();
   m_Segmentation->UpdateCenterOfMass(labelID);
-  const auto currentLabel = m_Segmentation->GetLabel(labelID);
-  const mitk::Point3D& pos = currentLabel->GetCenterOfMassCoordinates();
   this->WaitCursorOff();
+
+  const auto currentLabel = m_Segmentation->GetLabel(labelID);
+  if (currentLabel.IsNull())
+    return;
+
+  const mitk::Point3D& pos = currentLabel->GetCenterOfMassCoordinates();
 
   if (pos.GetVnlVector().max_value() > 0.0)
   {
@@ -1398,7 +1388,7 @@ void QmitkMultiLabelInspector::OnEntered(const QModelIndex& index)
 
     auto highlightedValues = m_Model->GetLabelsInSubTree(index);
 
-    ActivateLabelHighlights(m_SegmentationNode, highlightedValues);
+    m_LabelHighlightGuard.SetHighlightedLabels(highlightedValues);
   }
   m_AboutToShowContextMenu = false;
 }
@@ -1407,10 +1397,30 @@ void QmitkMultiLabelInspector::OnMouseLeave()
 {
   if (m_SegmentationNode.IsNotNull() && !m_AboutToShowContextMenu)
   {
-    DeactivateLabelHighlights(m_SegmentationNode);
+    m_LabelHighlightGuard.SetHighlightedLabels({});
   }
   else
   {
     m_AboutToShowContextMenu = false;
   }
+}
+
+void QmitkMultiLabelInspector::keyPressEvent(QKeyEvent* event)
+{
+  if (event->key() == Qt::Key_Shift)
+  {
+    m_LabelHighlightGuard.SetHighlightInvisibleLabels(true);
+  }
+
+  QWidget::keyPressEvent(event);
+}
+
+void QmitkMultiLabelInspector::keyReleaseEvent(QKeyEvent* event)
+{
+  if (event->key() == Qt::Key_Shift)
+  {
+    m_LabelHighlightGuard.SetHighlightInvisibleLabels(false);
+  }
+
+  QWidget::keyPressEvent(event);
 }

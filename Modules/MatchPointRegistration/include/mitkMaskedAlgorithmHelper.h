@@ -74,7 +74,7 @@ namespace mitk
     template<unsigned int VImageDimension>
     typename itk::SpatialObject<VImageDimension>::Pointer ConvertMaskSO(const itk::Image<MaskPixelType, VImageDimension>* mask) const;
 
-    /**Helper member that containes the result of the last call of DoConvertMask().*/
+    /**Helper member that contains the result of the last call of DoConvertMask().*/
     itk::DataObject::Pointer m_convertResult;
 
     map::algorithm::RegistrationAlgorithmBase::Pointer m_AlgorithmBase;

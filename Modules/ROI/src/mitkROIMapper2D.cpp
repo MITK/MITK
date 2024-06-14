@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataPlaneCutter.h>
 #include <vtkPropAssembly.h>
+#include <vtkTransformPolyDataFilter.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -110,7 +111,6 @@ void mitk::ROIMapper2D::GenerateDataForRenderer(BaseRenderer* renderer)
   if (dataNode->IsVisible(renderer))
   {
     const auto* geometry = data->GetGeometry(t);
-    const auto halfSpacing = geometry->GetSpacing() * 0.5f;
 
     auto plane = vtkSmartPointer<vtkPlane>::New();
     plane->SetOrigin(planeGeometry->GetOrigin().data());
@@ -118,22 +118,23 @@ void mitk::ROIMapper2D::GenerateDataForRenderer(BaseRenderer* renderer)
 
     for (const auto& [id, roi] : *data)
     {
+      (void)id; // Prevent unused variable error in older compilers
+
       if (!roi.HasTimeStep(t))
         continue;
 
-      Point3D min;
-      geometry->IndexToWorld(roi.GetMin(t), min);
-      min -= halfSpacing;
-
-      Point3D max;
-      geometry->IndexToWorld(roi.GetMax(t), max);
-      max += halfSpacing;
+      Point3D min = roi.GetMin(t);
+      Point3D max = roi.GetMax(t);
 
       auto cube = vtkSmartPointer<vtkCubeSource>::New();
       cube->SetBounds(min[0], max[0], min[1], max[1], min[2], max[2]);
 
+      auto transform = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+      transform->SetTransform(geometry->GetVtkTransform());
+      transform->SetInputConnection(cube->GetOutputPort());
+
       auto cutter = vtkSmartPointer<vtkPolyDataPlaneCutter>::New();
-      cutter->SetInputConnection(cube->GetOutputPort());
+      cutter->SetInputConnection(transform->GetOutputPort());
       cutter->SetPlane(plane);
       cutter->Update();
 

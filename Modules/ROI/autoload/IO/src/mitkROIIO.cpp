@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include <mitkROI.h>
 #include <mitkROIIOMimeTypes.h>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 #include <fstream>
 
 namespace
@@ -27,8 +27,8 @@ namespace
 
     auto version = json["Version"].get<int>();
 
-    if (1 != version)
-      mitkThrow() << "Unknown file format version (expected version 1)!";
+    if (version < 1 || version > 2)
+      mitkThrow() << "Unknown file format version (expected version 1 or 2)!";
 
     return version;
   }
@@ -51,7 +51,7 @@ namespace
     geometry->SetBounds(bounds);
   }
 
-  mitk::TimeGeometry::Pointer ReadGeometry(const nlohmann::json& jGeometry)
+  mitk::TimeGeometry::Pointer ReadGeometry(const nlohmann::json& jGeometry, int version)
   {
     auto geometry = mitk::Geometry3D::New();
     geometry->ImageGeometryOn();
@@ -59,11 +59,35 @@ namespace
     if (!jGeometry.is_object())
       mitkThrow() << "Geometry is expected to be a JSON object.";
 
+    bool hasTransform = false;
+
+    if (jGeometry.contains("Transform"))
+    {
+      if (version < 2)
+        mitkThrow() << "Transforms are not supported in MITK ROI file format version 1.";
+
+      auto transform = mitk::AffineTransform3D::New();
+      mitk::FromJSON(jGeometry["Transform"], transform);
+      geometry->SetIndexToWorldTransform(transform);
+
+      hasTransform = true;
+    }
+
     if (jGeometry.contains("Origin"))
+    {
+      if (hasTransform)
+        mitkThrow() << "Origin is already defined by Transform.";
+
       geometry->SetOrigin(jGeometry["Origin"].get<mitk::Point3D>());
+    }
 
     if (jGeometry.contains("Spacing"))
+    {
+      if (hasTransform)
+        mitkThrow() << "Spacing is already defined by Transform.";
+
       geometry->SetSpacing(jGeometry["Spacing"].get<mitk::Vector3D>());
+    }
 
     if (jGeometry.contains("Size"))
       SetSize(geometry, jGeometry["Size"].get<mitk::Vector3D>());
@@ -82,11 +106,10 @@ namespace
   {
     auto geometry = timeGeometry->GetGeometryForTimeStep(0);
 
-    nlohmann::json result = {
-      { "Origin", geometry->GetOrigin() },
-      { "Spacing", geometry->GetSpacing() },
-      { "Size", GetSize(geometry) }
-    };
+    nlohmann::json result;
+
+    mitk::ToJSON(result["Transform"], geometry->GetIndexToWorldTransform());
+    result["Size"] = GetSize(geometry);
 
     auto timeSteps = timeGeometry->CountTimeSteps();
 
@@ -112,7 +135,7 @@ std::vector<mitk::BaseData::Pointer> mitk::ROIIO::DoRead()
   {
     auto filename = this->GetInputLocation();
 
-    if (filename.empty() || !std::filesystem::exists(filename))
+    if (filename.empty() || !fs::exists(filename))
       mitkThrow() << "Invalid or nonexistent filename: \"" << filename << "\"!";
 
     fileStream.open(filename);
@@ -129,9 +152,9 @@ std::vector<mitk::BaseData::Pointer> mitk::ROIIO::DoRead()
   {
     auto j = nlohmann::json::parse(*stream);
 
-    CheckFileFormat(j);
+    auto version = CheckFileFormat(j);
 
-    auto geometry = ReadGeometry(j["Geometry"]);
+    auto geometry = ReadGeometry(j["Geometry"], version);
     result->SetTimeGeometry(geometry);
 
     if (j.contains("Name"))
@@ -184,7 +207,7 @@ void mitk::ROIIO::Write()
 
   nlohmann::ordered_json j = {
     { "FileFormat", "MITK ROI" },
-    { "Version", 1 }
+    { "Version", 2 }
   };
 
   if (auto name = input->GetProperty("name"); name.IsNotNull())

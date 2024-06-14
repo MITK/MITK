@@ -27,7 +27,7 @@ namespace mitk
   * an array of the corresponding TimeGrid
   * within the mask over time. No conversion is performed, so  conversion from signal to concentration has to be performed in advanced
   * and the resulting image is fed into the Generator.
-  * The generator checks wether both image and mask  are set and passes them to the itkMaskedNaryStatisticsImageFilter and the mitkExtractTimeGrid, to
+  * The generator checks whether both image and mask  are set and passes them to the itkMaskedNaryStatisticsImageFilter and the mitkExtractTimeGrid, to
   * calculate the mean of every time slice within the ROI and extract the corresponding time grid from the date set.
   */
   class MITKPHARMACOKINETICS_EXPORT AterialInputFunctionGenerator : public itk::Object

@@ -92,7 +92,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendJSONRequest(
     case RequestType::Put:
 
       if (nullptr == content)
-        MITK_WARN << "Content for put is empty, this will empty the ressource";
+        MITK_WARN << "Content for put is empty, this will empty the resource";
 
       answer = client->Put(uri, content);
       break;
@@ -153,10 +153,10 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
   for (auto it = m_Observers.begin(); it != m_Observers.end();)
   {
     mitk::IRESTObserver *obsMap = it->second;
-    // Check wether observer is at this place in map
+    // Check whether observer is at this place in map
     if (observer == obsMap)
     {
-      // Check wether it is the right uri to be deleted
+      // Check whether it is the right uri to be deleted
       if (uri.is_empty() || uri.path() == it->first.second)
       {
         int port = it->first.first;
@@ -214,7 +214,7 @@ void mitk::RESTManager::RequestForATakenPort(const web::uri &uri, IRESTObserver 
     }
     else
     {
-      MITK_ERROR << "Threre is already a observer handeling this data";
+      MITK_ERROR << "There is already an observer handling this data";
     }
   }
   // Error, since another server can't be added under this port

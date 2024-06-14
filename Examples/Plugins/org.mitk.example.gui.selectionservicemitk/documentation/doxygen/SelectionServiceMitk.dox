@@ -9,7 +9,7 @@
   This example is an alternative for the Qt selection service described in the previous example. The
   selection service is based on MITK data nodes. Again the selection service is used to connect the
   selection of QListWidgetItems of the SelectionView with the radio buttons from the ListenerView and the
-  funtionality is the same.
+  functionality is the same.
 
   This time the SelectionView does not inherit from berry::QtViewPart but from QmitkAbstractView. QmitkAbstractView provides
   a virtual method called GetDataNodeSelectionModel() with which the

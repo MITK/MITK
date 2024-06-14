@@ -81,7 +81,7 @@ public:
   virtual QList<QAction *> GetActions() const;
   ///
   /// Get all actions for this descriptor class that can be executed on multiple nodes
-  /// (no priot knowledge abpout the node is required)
+  /// (no prior knowledge about the node is required)
   ///
   virtual QList<QAction *> GetBatchActions() const;
 

@@ -187,7 +187,7 @@ namespace mitk
     /**
      * @brief Checks if a label belongs in a certain spatial group
      * @param value the label value
-     * @param groupIndex Index of the spacial group which should be checked for the label
+     * @param groupIndex Index of the spatial group which should be checked for the label
      * @return true if the label exists otherwise false
      */
     bool ExistLabel(LabelValueType value, GroupIndexType groupIndex) const;
@@ -207,10 +207,15 @@ namespace mitk
     /**
      * @brief Returns the mitk::Label with the given value.
      * @param value the pixel value of the label
-     * @return the label instance if defined in the segmentation, otherwise nullptr.
+     * @return smart pointer to the label instance if defined in the segmentation, otherwise nullptr.
+     * @remark The label is returned as smart pointer, because the MultiLabelSegmentation instance
+     * gives no guarantee how long the label instance will be a valid label of the segmentation.
+     * If you hold the label instance for a longer time, you must expect that it is not valid anymore
+     * (Either because the label id was removed or the label instance was replaced). It is valid as long
+     * it points to the same label instance like a recent GetLabel() call.
      */
-    const mitk::Label* GetLabel(LabelValueType value) const;
-    mitk::Label* GetLabel(LabelValueType value);
+    mitk::Label::ConstPointer GetLabel(LabelValueType value) const;
+    mitk::Label::Pointer GetLabel(LabelValueType value);
 
     /** Returns a vector with pointers to all labels currently defined in the MultiLabelSegmentation
     instance.*/
@@ -551,7 +556,7 @@ namespace mitk
   };
 
   /**
-  * @brief Equal A function comparing two label set images for beeing equal in meta- and imagedata
+  * @brief Equal A function comparing two label set images for being equal in meta- and imagedata
   *
   * @ingroup MITKTestingAPI
   *
@@ -626,7 +631,7 @@ namespace mitk
   @param destinationImage Pointer to the LabelSetImage which active layer should be used as destination for the transfer.
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
-  The order in which the labels will be transfered is the same order of elements in the labelMapping.
+  The order in which the labels will be transferred is the same order of elements in the labelMapping.
   If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transferring), keep in mind that
   for the MergeStyle and OverwriteStyle only the destination label (second element) is relevant (e.g. what should be
   altered with MergeStyle Replace).
@@ -669,7 +674,7 @@ namespace mitk
   @param destinationBackgroundLocked Value indicating the lock state of the background in the destination image.
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
-  The order in which the labels will be transfered is the same order of elements in the labelMapping.
+  The order in which the labels will be transferred is the same order of elements in the labelMapping.
   If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transferring), keep in mind that
   for the MergeStyle and OverwriteStyle only the destination label (second element) is relevant (e.g. what should be
   altered with MergeStyle Replace).

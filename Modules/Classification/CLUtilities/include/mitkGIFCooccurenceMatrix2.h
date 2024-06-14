@@ -17,20 +17,20 @@ found in the LICENSE file.
 #include <mitkBaseData.h>
 #include <MitkCLUtilitiesExports.h>
 
-#include <Eigen/src/Core/Array.h>
+#include <itkeigen/Eigen/src/Core/Array.h>
 
 namespace mitk
 {
 
   /**
-  * \brief Calculates features based on the co-occurence matrix.
+  * \brief Calculates features based on the co-occurrence matrix.
   *
-  * The co-occurence matrix describes the relations between voxels in a specific direction. The elements \f$m_{i,k} \f$ of the
+  * The co-occurrence matrix describes the relations between voxels in a specific direction. The elements \f$m_{i,k} \f$ of the
   * matrix count how often a voxel with the intensity \f$i \f$ has a neighbour in a certain direction with the intensity \f$ k \f$.
   * The direction for each matrix is given by a directed vector \f$ \overrightarrow{d} \f$.
   *
   * It is important to calculate the matrices for all possible directions in order to obtain a rotation invariant feature.
-  * For the 3D case, this means that there are 26 possible directions. Using the symmetrical properties of the co-occurence
+  * For the 3D case, this means that there are 26 possible directions. Using the symmetrical properties of the co-occurrence
   * matrix, it is then possible to calculate the features in all directions looking at 13 different directions.
   *
   * The standard length of the vector is 1, e.g. looking at direct neighbours. It is possible to look at more
@@ -41,7 +41,7 @@ namespace mitk
   * There are two possible ways of combining the information obtained from the multiple directions. The first option
   * is to calculate a common matrix for all directions and then use this matrix to calculate the describing features.
   * The second method is to calculate a matrix for each direction, obtain the features and then report the mean and
-  * standard value of these features. Both mehtods are calcuated by this filters and reported, distinguisehd by either
+  * standard value of these features. Both methods are calculated by this filters and reported, distinguisehd by either
   * an "Overall" if a single matrix is used, a "Mean" for the mean Value, or an "Std.Dev." for the standard deviation.
   *
   * The connected areas are based on the binned image, the binning parameters can be set via the default
@@ -61,8 +61,8 @@ namespace mitk
   * intensity pair (i,k) \f$ p_{i,k} = \frac{m_{i,k}}{\sum_i \sum_k m_{i,k}} \f$.
   *
   * In addition, the marginal sum \f$ p_{i,\cdot} = p_{\cdot,k=i} = \sum_k p_{i,k} \f$, which is
-  * identical for both axis due to the symetrical nature of the matrix. Furthermore, the diagonal and
-  * cross diagnoal features are used:
+  * identical for both axis due to the symmetrical nature of the matrix. Furthermore, the diagonal and
+  * cross diagonal features are used:
   * \f[ p_{i-k}(l) = \sum_i \sum_k p_{i,k} \delta(l - \| i -k \| ) \enspace \enspace l = 0, \dots, N_g -1  \f]
   * \f[ p_{i+k}(l) = \sum_i \sum_k p_{i,k} \delta(l - ( i + k ) ) \enspace \enspace l = 2, \dots, 2 N_g \f]
   * Here, \f$ \delta(x) \f$ is the dirac function, which is one for \f$x=0 \f$ and zero otherwise.

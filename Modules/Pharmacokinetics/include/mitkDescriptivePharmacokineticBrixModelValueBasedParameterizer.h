@@ -30,7 +30,7 @@ namespace mitk
     typedef itk::SmartPointer< Self >                            Pointer;
     typedef itk::SmartPointer< const Self >                      ConstPointer;
 
-    itkTypeMacro(ConcreteModelParameterizerBase, ModelParameterizerBase);
+    itkTypeMacro(DescriptivePharmacokineticBrixModelValueBasedParameterizer, ConcreteModelParameterizerBase);
     itkNewMacro(Self);
 
     typedef Superclass::ModelBaseType ModelBaseType;

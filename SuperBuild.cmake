@@ -365,12 +365,6 @@ if(CMAKE_FRAMEWORK_PATH)
   )
 endif()
 
-if(Eigen_INCLUDE_DIR)
-    list(APPEND mitk_optional_cache_args
-      -DEigen_INCLUDE_DIR:PATH=${Eigen_INCLUDE_DIR}
-    )
-endif()
-
 # Optional pass through of Doxygen
 if(DOXYGEN_EXECUTABLE)
   list(APPEND mitk_optional_cache_args
@@ -395,6 +389,7 @@ ExternalProject_Add(${proj}
     # --------------- Build options ----------------
     -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+    "-DCMAKE_CONFIGURATION_TYPES:STRING=${CMAKE_CONFIGURATION_TYPES}"
     "-DCMAKE_PREFIX_PATH:PATH=${ep_prefix};${CMAKE_PREFIX_PATH}"
     "-DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}"
     "-DCMAKE_INCLUDE_PATH:PATH=${CMAKE_INCLUDE_PATH}"

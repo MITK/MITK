@@ -24,7 +24,7 @@ namespace mitk
 {
   /**
    * \brief Controls the time-related properties of the time stepper, according to the
-   *        given input world time geomtry.
+   *        given input world time geometry.
    *
    * A TimeNavigationController takes a TimeGeometry as input world time geometry
    * and sets the properties of the associated stepper (BaseController).
@@ -42,7 +42,7 @@ namespace mitk
    * // Initialize the time navigation controller.
    * timeCtrl = mitk::TimeNavigationController::New();
    *
-   * // Set the required input world time geomtry (a TimeGeometry::ConstPointer).
+   * // Set the required input world time geometry (a TimeGeometry::ConstPointer).
    * timeCtrl->SetInputWorldTimeGeometry(geometry.GetPointer());
    *
    * // Set the time-related properties and send the information to the connected renderer(s).
@@ -85,7 +85,7 @@ namespace mitk
 
     /**
      * \brief Do the actual time-related properties extraction
-              and send the currently selected time step to the connecte
+              and send the currently selected time step to the connected
               observers (renderers).
      */
     virtual void Update();

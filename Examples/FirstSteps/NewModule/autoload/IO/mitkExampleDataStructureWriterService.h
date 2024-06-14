@@ -19,7 +19,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * Writes example data strucutres to a file
+  * Writes example data structures to a file
   * @ingroup Process
   */
   class ExampleDataStructureWriterService : public mitk::AbstractFileWriter

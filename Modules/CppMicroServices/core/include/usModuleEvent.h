@@ -126,7 +126,7 @@ public:
   Module* GetModule() const;
 
   /**
-   * Returns the type of lifecyle event. The type values are:
+   * Returns the type of lifecycle event. The type values are:
    * <ul>
    * <li>{@link #LOADING}
    * <li>{@link #LOADED}

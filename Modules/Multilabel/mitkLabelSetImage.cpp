@@ -103,7 +103,7 @@ void mitk::LabelSetImage::Initialize(const mitk::Image *other)
   // Transfer some general DICOM properties from the source image to derived image (e.g. Patient information,...)
   DICOMQIPropertyHelper::DeriveDICOMSourceProperties(other, this);
 
-  // Add a inital LabelSet ans corresponding image data to the stack
+  // Add an initial LabelSet and corresponding image data to the stack
   if (this->GetNumberOfLayers() == 0)
   {
     AddLayer();
@@ -114,6 +114,7 @@ mitk::LabelSetImage::~LabelSetImage()
 {
   for (auto [value, label] : m_LabelMap)
   {
+    (void)value; // Prevent unused variable error in older compilers
     this->ReleaseLabel(label);
   }
   m_LabelMap.clear();
@@ -233,6 +234,7 @@ const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetAllLabel
 
   for (auto [value, label] : m_LabelMap)
   {
+    (void)label; // Prevent unused variable error in older compilers
     result.emplace_back(value);
   }
   return result;
@@ -244,6 +246,7 @@ mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValue
 
   for (auto [value, label] : m_LabelMap)
   {
+    (void)label; // Prevent unused variable error in older compilers
     result.emplace_back(value);
   }
 
@@ -580,6 +583,7 @@ void mitk::LabelSetImage::EraseLabel(LabelValueType pixelValue)
     {
       AccessByItk_1(groupImage, EraseLabelProcessing, pixelValue);
     }
+    groupImage->Modified();
   }
   catch (const itk::ExceptionObject& e)
   {
@@ -680,13 +684,15 @@ void mitk::LabelSetImage::RenameLabel(LabelValueType pixelValue, const std::stri
 {
   std::shared_lock<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
 
-  mitk::Label* label = GetLabel(pixelValue);
-  if (nullptr == label) mitkThrow() << "Cannot rename label.Unknown label value provided. Unknown label value:" << pixelValue;
+  auto label = GetLabel(pixelValue);
+  if (label.IsNull()) mitkThrow() << "Cannot rename label. Unknown label value provided. Unknown label value:" << pixelValue;
 
   label->SetName(name);
   label->SetColor(color);
 
   this->UpdateLookupTable(pixelValue);
+  m_LookupTable->Modified();
+
   // change DICOM information of the label
   DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 }
@@ -727,15 +733,18 @@ void mitk::LabelSetImage::SetLookupTable(mitk::LookupTable* lut)
 
 void mitk::LabelSetImage::UpdateLookupTable(PixelType pixelValue)
 {
-  const mitk::Color& color = this->GetLabel(pixelValue)->GetColor();
+  auto label = this->GetLabel(pixelValue);
+  if (label.IsNull()) mitkThrow() << "Cannot update lookup table. Unknown label value provided. Unknown label value:" << pixelValue;
+
+  const mitk::Color& color = label->GetColor();
 
   double rgba[4];
   m_LookupTable->GetTableValue(static_cast<int>(pixelValue), rgba);
   rgba[0] = color.GetRed();
   rgba[1] = color.GetGreen();
   rgba[2] = color.GetBlue();
-  if (GetLabel(pixelValue)->GetVisible())
-    rgba[3] = GetLabel(pixelValue)->GetOpacity();
+  if (label->GetVisible())
+    rgba[3] = label->GetOpacity();
   else
     rgba[3] = 0.0;
   m_LookupTable->SetTableValue(static_cast<int>(pixelValue), rgba);
@@ -933,9 +942,13 @@ void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType *itkImage, L
   pos[1] = centroid[1];
   pos[2] = centroid[2];
 
-  this->GetLabel(pixelValue)->SetCenterOfMassIndex(pos);
-  this->GetSlicedGeometry()->IndexToWorld(pos, pos);
-  this->GetLabel(pixelValue)->SetCenterOfMassCoordinates(pos);
+  auto label = this->GetLabel(pixelValue);
+  if (label.IsNotNull())
+  {
+    label->SetCenterOfMassIndex(pos);
+    this->GetSlicedGeometry()->IndexToWorld(pos, pos);
+    label->SetCenterOfMassCoordinates(pos);
+  }
 }
 
 template <typename TPixel, unsigned int VImageDimension>
@@ -1051,6 +1064,7 @@ void mitk::LabelSetImage::RegisterLabel(mitk::Label* label)
   if (nullptr == label) mitkThrow() << "Invalid call of RegisterLabel with a nullptr.";
 
   UpdateLookupTable(label->GetValue());
+  m_LookupTable->Modified();
 
   auto command = itk::MemberCommand<LabelSetImage>::New();
   command->SetCallbackFunction(this, &LabelSetImage::OnLabelModified);
@@ -1119,7 +1133,7 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::GetGroupIndexOfLabel(La
 }
 
 
-const mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value) const
+mitk::Label::ConstPointer mitk::LabelSetImage::GetLabel(LabelValueType value) const
 {
   auto finding = m_LabelMap.find(value);
   if (m_LabelMap.end() != finding)
@@ -1129,7 +1143,7 @@ const mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value) const
   return nullptr;
 };
 
-mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value)
+mitk::Label::Pointer mitk::LabelSetImage::GetLabel(LabelValueType value)
 {
   auto finding = m_LabelMap.find(value);
   if (m_LabelMap.end() != finding)
@@ -1155,6 +1169,7 @@ const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabels()
   ConstLabelVectorType result;
   for (auto [value, label] : m_LabelMap)
   {
+    (void)value; // Prevent unused variable error in older compilers
     result.emplace_back(label);
   }
   return result;
@@ -1165,6 +1180,7 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabels()
   LabelVectorType result;
   for (auto [value, label] : m_LabelMap)
   {
+    (void)value; // Prevent unused variable error in older compilers
     result.emplace_back(label);
   }
   return result;
@@ -1175,9 +1191,9 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabelsByValue
   LabelVectorType result;
   for (const auto& labelValue : labelValues)
   {
-    auto* label = this->GetLabel(labelValue);
+    Label::Pointer label = this->GetLabel(labelValue);
 
-    if (label != nullptr)
+    if (label.IsNotNull())
     {
       result.emplace_back(label);
     }
@@ -1191,9 +1207,9 @@ const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetConstLab
   ConstLabelVectorType result;
   for (const auto& labelValue : labelValues)
   {
-    const auto* label = this->GetLabel(labelValue);
+    Label::ConstPointer label = this->GetLabel(labelValue);
 
-    if (label != nullptr)
+    if (label.IsNotNull())
     {
       result.emplace_back(label);
     }
@@ -1626,7 +1642,7 @@ void mitk::TransferLabelContentAtTimeStep(
 
   if (!Equal(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
   {
-    if (IsSubGeometry(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+    if (IsSubGeometry(*(sourceImageAtTimeStep->GetGeometry()), *(destinationImageAtTimeStep->GetGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, true))
     {
       //we have to pad the source image
       //because ImageToImageFilters always check for origin matching even if

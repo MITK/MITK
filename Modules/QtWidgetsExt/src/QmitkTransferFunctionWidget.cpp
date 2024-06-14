@@ -129,15 +129,15 @@ void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode *node, mitk::TimeSt
         h = histogramCache[data];
       }
 
-      m_RangeSliderMin = h->GetMin();
-      m_RangeSliderMax = h->GetMax();
+      auto rangeSliderMin = h->GetMin();
+      auto rangeSliderMax = h->GetMax();
       UpdateStepSize();
 
       m_RangeSlider->blockSignals(true);
-      m_RangeSlider->setMinimum(m_RangeSliderMin);
-      m_RangeSlider->setMaximum(m_RangeSliderMax);
-      m_RangeSlider->setMinimumValue(m_RangeSliderMin);
-      m_RangeSlider->setMaximumValue(m_RangeSliderMax);
+      m_RangeSlider->setMinimum(rangeSliderMin);
+      m_RangeSlider->setMaximum(rangeSliderMax);
+      m_RangeSlider->setMinimumValue(rangeSliderMin);
+      m_RangeSlider->setMaximumValue(rangeSliderMax);
       m_RangeSlider->blockSignals(false);
 
       m_ScalarOpacityFunctionCanvas->SetHistogram(h);
@@ -244,7 +244,7 @@ void QmitkTransferFunctionWidget::UpdateRanges()
 
 void QmitkTransferFunctionWidget::UpdateStepSize()
 {
-  double step = (m_RangeSliderMax - m_RangeSliderMin) / 1000.;
+  double step = (m_RangeSlider->maximum() - m_RangeSlider->minimum()) / 1000.;
   m_RangeSlider->setSingleStep(step);
 }
 
@@ -260,8 +260,8 @@ void QmitkTransferFunctionWidget::OnSpanChanged(double, double)
 void QmitkTransferFunctionWidget::OnResetSlider()
 {
   m_RangeSlider->blockSignals(true);
-  m_RangeSlider->setMaximumValue(m_RangeSliderMax);
-  m_RangeSlider->setMinimumValue(m_RangeSliderMin);
+  m_RangeSlider->setMaximumValue(m_RangeSlider->maximum());
+  m_RangeSlider->setMinimumValue(m_RangeSlider->minimum());
   m_RangeSlider->blockSignals(false);
 
   UpdateRanges();

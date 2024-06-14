@@ -21,7 +21,7 @@ namespace mitk
 {
 
   /**
-  * \brief Calculates features based on the co-occurence matrix.
+  * \brief Calculates features based on the co-occurrence matrix.
   *
   * The Curvature is a measure for the bending of a surface and is therefore a measure for the description of the
   * surface of an segmentation.

@@ -131,6 +131,25 @@ void QmitkSetupVirtualEnvUtil::InstallPytorch()
   this->InstallPytorch(GetPythonPath().toStdString(), &PrintProcessEvent);
 }
 
+bool QmitkSetupVirtualEnvUtil::IsVenvInstalled(const QString &pythonPath)
+{
+  bool isVenvInstalled = false;
+  QProcess pyProcess;
+#ifdef _WIN32
+  const QString PYTHON_EXE = "python.exe";
+#else
+  const QString PYTHON_EXE = "python3";
+#endif
+  pyProcess.start(pythonPath + QDir::separator() + PYTHON_EXE,
+                  QStringList() << "-m" << "venv", QProcess::ReadOnly); //insuffient args to provoke stderr out
+  if (pyProcess.waitForFinished())
+  {
+    auto venvCaptured = QString(QStringDecoder(QStringDecoder::Utf8)(pyProcess.readAllStandardError()));
+    isVenvInstalled = venvCaptured.startsWith(QString("usage")); // if venv found, shows correct usage instructions
+  }
+  return isVenvInstalled;
+}
+
 void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library,
                                           const std::string &workingDir,
                                           void (*callback)(itk::Object *, const itk::EventObject &, void *),
@@ -235,4 +254,29 @@ std::pair<QString, QString> QmitkSetupVirtualEnvUtil::GetExactPythonPath(const Q
   }
   pythonPath.first = pythonDoesExist &&isSupportedVersion ? fullPath : "";
   return pythonPath;
+}
+
+QString QmitkSetupVirtualEnvUtil::GetPipPackageVersion(const QString &pythonPath, const QString &packageName)
+{
+#ifdef _WIN32
+  const QString PIP_EXE = "pip.exe";
+#else
+  const QString PIP_EXE = "pip3";
+#endif
+  QString version;
+  QProcess pipProcess;
+  pipProcess.start(pythonPath + QDir::separator() + PIP_EXE, QStringList() << "show" << packageName, QProcess::ReadOnly);
+  if (pipProcess.waitForFinished())
+  {
+    while (pipProcess.canReadLine())
+    {
+      QString line = pipProcess.readLine();
+      if (line.startsWith("Version"))
+      {
+        version = (line.split(":")[1]).trimmed();
+        break;
+      }
+    }
+  }
+  return version;
 }

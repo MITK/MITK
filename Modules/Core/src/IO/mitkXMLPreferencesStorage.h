@@ -23,7 +23,7 @@ namespace mitk
   class XMLPreferencesStorage : public IPreferencesStorage
   {
   public:
-    explicit XMLPreferencesStorage(const std::filesystem::path& filename);
+    explicit XMLPreferencesStorage(const fs::path& filename);
     ~XMLPreferencesStorage() override;
 
     void Flush() override;

@@ -3,7 +3,6 @@ mitkFunctionAddExternalProject(NAME DCMTK ON DOC "EXPERIMENTAL, superbuild only:
 mitkFunctionAddExternalProject(NAME tinyxml2 ON ADVANCED)
 mitkFunctionAddExternalProject(NAME GDCM ON ADVANCED)
 mitkFunctionAddExternalProject(NAME Boost ON NO_CACHE)
-mitkFunctionAddExternalProject(NAME Eigen ON DEPENDS Boost ADVANCED DOC "Use the Eigen library")
 mitkFunctionAddExternalProject(NAME ANN ON ADVANCED DOC "Use Approximate Nearest Neighbor Library")
 mitkFunctionAddExternalProject(NAME CppUnit ON ADVANCED DOC "Use CppUnit for unit tests")
 mitkFunctionAddExternalProject(NAME HDF5 ON ADVANCED)
@@ -17,6 +16,7 @@ mitkFunctionAddExternalProject(NAME CTK ON DEPENDS Qt6 DCMTK DOC "Use CTK in MIT
 mitkFunctionAddExternalProject(NAME DCMQI ON DEPENDS DCMTK ITK DOC "Use dcmqi in MITK")
 mitkFunctionAddExternalProject(NAME MatchPoint OFF ADVANCED DEPENDS Boost ITK DOC "Use the MatchPoint translation image registration library")
 mitkFunctionAddExternalProject(NAME nlohmann_json ON ADVANCED)
+mitkFunctionAddExternalProject(NAME httplib ON DEPENDS ZLIB)
 
 if(MITK_USE_Qt6)
  mitkFunctionAddExternalProject(NAME Qt6Qwt6 ON ADVANCED DEPENDS Qt6)

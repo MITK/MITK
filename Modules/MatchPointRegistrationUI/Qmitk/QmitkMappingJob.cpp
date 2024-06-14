@@ -154,7 +154,7 @@ void QmitkMappingJob::run()
     }
     catch (...)
     {
-      emit Error(QString("Unkown error when mapping data."));
+      emit Error(QString("Unknown error when mapping data."));
     }
   }
 };

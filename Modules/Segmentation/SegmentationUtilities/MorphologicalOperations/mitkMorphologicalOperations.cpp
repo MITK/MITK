@@ -46,7 +46,7 @@ void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer &image,
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessByItk_3(img3D, itkClosing, img3D, factor, structuralElement);
+      AccessFixedDimensionByItk_3(img3D, itkClosing, 3, img3D, factor, structuralElement);
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -54,7 +54,7 @@ void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer &image,
   }
   else
   {
-    AccessByItk_3(image, itkClosing, image, factor, structuralElement);
+    AccessFixedDimensionByItk_3(image, itkClosing, 3, image, factor, structuralElement);
   }
 
   MITK_INFO << "Finished Closing";
@@ -83,7 +83,7 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer &image,
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessByItk_3(img3D, itkErode, img3D, factor, structuralElement);
+      AccessFixedDimensionByItk_3(img3D, itkErode, 3, img3D, factor, structuralElement);
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -91,7 +91,7 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer &image,
   }
   else
   {
-    AccessByItk_3(image, itkErode, image, factor, structuralElement);
+    AccessFixedDimensionByItk_3(image, itkErode, 3, image, factor, structuralElement);
   }
 
   MITK_INFO << "Finished Erode";
@@ -120,7 +120,7 @@ void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer &image,
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessByItk_3(img3D, itkDilate, img3D, factor, structuralElement);
+      AccessFixedDimensionByItk_3(img3D, itkDilate, 3, img3D, factor, structuralElement);
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -128,7 +128,7 @@ void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer &image,
   }
   else
   {
-    AccessByItk_3(image, itkDilate, image, factor, structuralElement);
+    AccessFixedDimensionByItk_3(image, itkDilate, 3, image, factor, structuralElement);
   }
 
   MITK_INFO << "Finished Dilate";
@@ -157,7 +157,7 @@ void mitk::MorphologicalOperations::Opening(mitk::Image::Pointer &image,
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessByItk_3(img3D, itkOpening, img3D, factor, structuralElement);
+      AccessFixedDimensionByItk_3(img3D, itkOpening, 3, img3D, factor, structuralElement);
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -165,7 +165,7 @@ void mitk::MorphologicalOperations::Opening(mitk::Image::Pointer &image,
   }
   else
   {
-    AccessByItk_3(image, itkOpening, image, factor, structuralElement);
+    AccessFixedDimensionByItk_3(image, itkOpening, 3, image, factor, structuralElement);
   }
 
   MITK_INFO << "Finished Opening";
@@ -192,7 +192,7 @@ void mitk::MorphologicalOperations::FillHoles(mitk::Image::Pointer &image)
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessByItk_1(img3D, itkFillHoles, img3D);
+      AccessFixedDimensionByItk_1(img3D, itkFillHoles, 3, img3D);
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -200,7 +200,7 @@ void mitk::MorphologicalOperations::FillHoles(mitk::Image::Pointer &image)
   }
   else
   {
-    AccessByItk_1(image, itkFillHoles, image);
+    AccessFixedDimensionByItk_1(image, itkFillHoles, 3, image);
   }
 
   MITK_INFO << "Finished FillHole";
@@ -382,8 +382,12 @@ void mitk::MorphologicalOperations::itkFillHoles(itk::Image<TPixel, VDimension> 
 template <class TStructuringElement>
 TStructuringElement  mitk::MorphologicalOperations::CreateStructuringElement(StructuralElementType structuralElementFlag, int factor)
 {
+  using SizeType = typename TStructuringElement::SizeType;
+  static_assert(SizeType::Dimension == 3);
+
   TStructuringElement strElem;
-  typename TStructuringElement::SizeType size;
+  SizeType size;
+
   size.Fill(0);
   switch (structuralElementFlag)
   {

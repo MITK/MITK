@@ -76,7 +76,7 @@ private Q_SLOTS:
   void OnCurrentLabelSelectionChanged(QmitkMultiLabelManager::LabelValueVectorType labels);
 
   void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&);
-  void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
+  void OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const;
 
   void OnLabelAdded(mitk::LabelSetImage::LabelValueType labelValue);
   void OnLabelRemoved(mitk::LabelSetImage::LabelValueType labelValue);

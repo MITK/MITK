@@ -311,11 +311,7 @@ void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName, QStrin
   auto* renderer = renderWindowPart->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer();
 
   if (nullptr != renderer)
-  {
-    renderWindowPart->EnableDecorations(false);
     this->TakeScreenshot(renderer, this->m_Controls->m_MagFactor->text().toFloat(), fileName, filter);
-    renderWindowPart->EnableDecorations(true);
-  }
 }
 
 vtkCamera* QmitkScreenshotMaker::GetCam()

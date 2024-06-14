@@ -34,11 +34,11 @@ found in the LICENSE file.
 // void SetStoreVectorOrder(bool) // Optional (default=false), Stores in which order the pixels were checked. Necessary
 // for GetVectorOrderImage
 // void AddEndIndex(const IndexType & EndIndex) //Optional. By calling this function you can add several endpoints! The
-// algorithm will look for several shortest Pathes. From Start to all Endpoints.
+// algorithm will look for several shortest Paths. From Start to all Endpoints.
 //
 /// GET FUNCTIONS
 // std::vector< itk::Index<3> > GetVectorPath(); // returns the shortest path as vector
-// std::vector< std::vector< itk::Index<3> > GetMultipleVectorPathe(); // returns a vector of shortest Pathes (which are
+// std::vector< std::vector< itk::Index<3> > GetMultipleVectorPathe(); // returns a vector of shortest Paths (which are
 // vectors of points)
 // GetDistanceImage // Returns the distance image
 // GetVectorOrderIMage // Returns the Vector Order image

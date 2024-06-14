@@ -32,7 +32,7 @@ public:
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self); /** Runtime information support. */
-    itkTypeMacro(BinaryImageMaskGenerator, MaskGenerator);
+    itkTypeMacro(ImageMaskGenerator, MaskGenerator);
 
     unsigned int GetNumberOfMasks() const override;
 

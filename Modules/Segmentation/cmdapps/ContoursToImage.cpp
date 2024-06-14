@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 
 enum class OutputFormat
 {
@@ -67,14 +67,14 @@ std::string GetSafeName(const mitk::IPropertyProvider* propertyProvider)
   return name;
 }
 
-void CreateParentDirectories(const std::filesystem::path& path)
+void CreateParentDirectories(const fs::path& path)
 {
   if (path.has_parent_path())
   {
     auto parentPath = path.parent_path();
 
-    if (!std::filesystem::exists(parentPath))
-      std::filesystem::create_directories(parentPath);
+    if (!fs::exists(parentPath))
+      fs::create_directories(parentPath);
   }
 }
 
@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
 
     MITK_INFO << "Found " << inputs.size() << " input contour set(s)";
 
-    std::filesystem::path outputPath(outputFilename);
+    fs::path outputPath(outputFilename);
     CreateParentDirectories(outputPath);
 
     mitk::LabelSetImage::Pointer labelSetImage; // Only used for "multilabel" output

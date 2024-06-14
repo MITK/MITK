@@ -14,7 +14,7 @@ To use the geometry classes in the right way you have to understand the three di
 
 \subsection GeometryOverviewPage_WorldCoord
 
-- World coordinates are describing the actual spacial position of all MITK objects regarding a global coordinate system, normally specified by the imaging modality
+- World coordinates are describing the actual spatial position of all MITK objects regarding a global coordinate system, normally specified by the imaging modality
 - World coordinates are represented by  mitk::Point3D objects.
 - The geometry defines the offset, orientation, and scale of the considered data objects in reference to the world coordinate systems.
 - World coordinates are always measured in mm
@@ -32,7 +32,7 @@ To use the geometry classes in the right way you have to understand the three di
 
 \subsubsection GeometryOverviewPage_CenterCoord_ContIdx Continuous index coordinates
 
-- Dividing world coordinates through the pixel spacing and simultanously taking the offset into account leads to continuous index coordinates inside your dataobject. So continuous coordinates can be float values!
+- Dividing world coordinates through the pixel spacing and simultaneously taking the offset into account leads to continuous index coordinates inside your dataobject. So continuous coordinates can be float values!
 - Continuous index coordinates are represented by  mitk::Point3D objects.
 - They can be obtained by calling mitk::BaseGeometry::WorldToIndex(), where &pt_mm is a point in worldcoordinates.\n
 
@@ -46,21 +46,21 @@ To use the geometry classes in the right way you have to understand the three di
 
 \section GeometryOverviewPage_PointsAndVector Difference between Points and Vectors
 
-Like ITK, MITK differenciate between points and vectors.
+Like ITK, MITK differentiate between points and vectors.
 A point defines a position in a coordinate system while a vector is the distance between two points.
 Therefore points and vectors behave different if a coordinate transformation is applied.
-An offest in a coordinate transformation will affect a transformed point but not a vector.
+An offset in a coordinate transformation will affect a transformed point but not a vector.
 
 An Example:
 
-If two systems are given, which differ by a offset of (1,0,0). The point A(2,2,2) in system one will correspont to point A'(3,2,2) in the second system.
+If two systems are given, which differ by a offset of (1,0,0). The point A(2,2,2) in system one will correspond to point A'(3,2,2) in the second system.
 But a vector a(2,2,2) will correspond to the vector a'(2,2,2).
 
 \section GeometryOverviewPage_Concept The Geometry Concept
 
 As the superclass of all MITK geometries mitk::BaseGeometry holds:
 
-- a spacial bounding box which is axes-parallel in index coordinates (often discrete indices of pixels), to be accessed by BaseGeometry::GetBoundingBox()
+- a spatial bounding box which is axes-parallel in index coordinates (often discrete indices of pixels), to be accessed by BaseGeometry::GetBoundingBox()
 - a time related bounding box which holds the temporal validity of the considered data object in milliseconds (start and end time), to be accessed by BaseGeometry::GetTimeBounds(). The default for 3D geometries is minus infinity to plus infinity, meaning the object is always displayed independent of displayed time in MITK.
 - position information in form of a Euclidean transform in respect to world coordinates (i.e. a linear transformation matrix and offset) to convert (discrete or continuous) index coordinates to world coordinates and vice versa, to be accessed by mitk::BaseGeometry::GetIndexToWorldTransform(). See also: \ref GeometryOverviewPage_Introduction "Introduction to Geometries"
 - Many other properties (e.g. origin, extent, ...) which can be found in the mitk::BaseGeometry "class documentation"
@@ -71,7 +71,7 @@ This mitk::TimeGeometry holds one or more mitk::BaseGeometry objects which descr
 There is the possibility of using different implementations of the abstract mitk::TimeGeometry class which may differ in how the time steps are saved and the times are calculated.
 
 There are two ways to represent a time, either by a mitk::TimePointType or a mitk::TimeStepType.
-The first is similar to the continous index coordinates and defines a Time Point in milliseconds from timepoint zero.
+The first is similar to the continuous index coordinates and defines a Time Point in milliseconds from timepoint zero.
 The second type is similar to index coordinates.
 These are discrete values which specify the number of the current time step going from 0 to GetNumberOfTimeSteps().
 The conversion between a time point and a time step is done by calling the method mitk::TimeGeometry::TimeStepToTimePoint() or mitk::TimeGeometry::TimePointToTimeStep().
@@ -145,7 +145,7 @@ If you experience displaced contours, figures or other stuff, it is an indicator
 An image has a mitk::TimeGeometry, which contains one or more mitk::SlicedGeometry3D instances (one for each time step), all of which contain one or more instances of (sub-classes of) mitk::PlaneGeometry.
 
 As a reminder: Geometry instances referring to images need a slightly different definition of corners, see mitk::BaseGeometry::SetImageGeometry.
-This is usualy automatically called by Image.
+This is usually automatically called by Image.
 
 \section GeometryOverviewPage_Connection Connection between MITK, ITK and VTK Geometries
 

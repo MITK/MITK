@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkBaseData.h>
 #include <MitkCLUtilitiesExports.h>
 
-#include <Eigen/src/Core/Array.h>
+#include <itkeigen/Eigen/src/Core/Array.h>
 
 namespace mitk
 {
@@ -31,7 +31,7 @@ namespace mitk
   * around each feature is calculated and the number of voxels within the neighbourhood that
   * are greater than the center voxel plus \f$ \alpha \f$ is counted. This is called the
   * number of dependence voxels. The matrix gives the
-  * number of voxels with an intesity \f$ x \f$ and \f$ d \f$ dependence neighbourhood voxels.
+  * number of voxels with an intensity \f$ x \f$ and \f$ d \f$ dependence neighbourhood voxels.
   *
   * The image is quantified prior to the calculation of the features. This reduces the number of
   * available intensity values. Instead of using the pure intensity value, the features are
@@ -39,7 +39,7 @@ namespace mitk
   * quantification of the image can be controlled using the general binning parameters as defined
   * in AbstractGlobalImageFeature.
   *
-  * By default, the calculation is based on a 26 neighourhood for 3D and a 8 neighbourhood in 2D. It is further
+  * By default, the calculation is based on a 26 neighbourhood for 3D and a 8 neighbourhood in 2D. It is further
   * possible to exclude directions from the calculation, e.g. calculating the feature in 2D, even if a
   * 3D image is passed. This is controlled by  determine the
   * dimensionality of the neighbourhood using direction-related commands as described in AbstractGlobalImageFeature.
@@ -54,7 +54,7 @@ namespace mitk
   * The features are calculated based on a mask. It is assumed that the mask is
   * a unsigned short image. All voxels with a value greater 0 are treated as masked.
   *
-  * Several values are definied for the definition of the features. \f$ N_v \f$ is the number of masked voxels,
+  * Several values are defined for the definition of the features. \f$ N_v \f$ is the number of masked voxels,
   * \f$N_s \f$ is the number of neighbourhoods, \f$ m_{x,\cdot} = \sum_d m{x,d} \f$ is the number of neighbourhoods
   * with a given intensity value, and likewise \f$ m_{\cdot, d} = \sum_x m{x,d} \f$ is the number of neighbourhoods
   * with a given number of dependence features:

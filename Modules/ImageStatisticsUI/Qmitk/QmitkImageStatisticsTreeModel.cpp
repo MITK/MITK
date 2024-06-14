@@ -337,24 +337,38 @@ void AddLabelTreeItems(const mitk::ImageStatisticsContainer* statistic, const mi
       //currently we only show statistics of the labeled pixel if a mask is provided
       QString labelLabel = QStringLiteral("unnamed label");
       const auto multiLabelSeg = dynamic_cast<mitk::LabelSetImage*>(maskNode->GetData());
-      const mitk::Label* labelInstance = nullptr;
+      mitk::Label::ConstPointer labelInstance;
       if (nullptr != multiLabelSeg)
       {
         labelInstance = multiLabelSeg->GetLabel(labelValue);
-        labelLabel = QString::fromStdString(labelInstance->GetName() + " [" + labelInstance->GetTrackingID() + "]");
+        if (labelInstance.IsNotNull())
+        {
+          labelLabel = QString::fromStdString(labelInstance->GetName() + " [" + labelInstance->GetTrackingID() + "]");
+        }
+        else
+        {
+          labelLabel = QString("Unknown label ID ") + QString::number(labelValue);
+        }
       }
       QmitkImageStatisticsTreeItem* labelItem = nullptr;
 
-      if (statistic->GetTimeSteps() == 1)
+      if (labelInstance.IsNotNull())
       {
-        // add statistical values directly in this hierarchy level
-        auto statisticsObject = statistic->GetStatistics(labelValue, 0);
-        labelItem = new QmitkImageStatisticsTreeItem(statisticsObject, statisticNames, labelLabel, isWIP, parentItem, imageNode, maskNode, labelInstance);
+        if (statistic->GetTimeSteps() == 1)
+        {
+          // add statistical values directly in this hierarchy level
+          auto statisticsObject = statistic->GetStatistics(labelValue, 0);
+          labelItem = new QmitkImageStatisticsTreeItem(statisticsObject, statisticNames, labelLabel, isWIP, parentItem, imageNode, maskNode, labelInstance);
+        }
+        else
+        {
+          labelItem = new QmitkImageStatisticsTreeItem(statisticNames, labelLabel, isWIP, false, parentItem, imageNode, maskNode, labelInstance);
+          AddTimeStepTreeItems(statistic, imageNode, maskNode, labelValue, statisticNames, isWIP, labelItem, hasMultipleTimesteps);
+        }
       }
       else
       {
-        labelItem = new QmitkImageStatisticsTreeItem(statisticNames, labelLabel, isWIP, false, parentItem, imageNode, maskNode, labelInstance);
-        AddTimeStepTreeItems(statistic, imageNode, maskNode, labelValue, statisticNames, isWIP, labelItem, hasMultipleTimesteps);
+        labelItem = new QmitkImageStatisticsTreeItem(statisticNames, labelLabel, isWIP, true, parentItem, imageNode, maskNode);
       }
 
       parentItem->appendChild(labelItem);

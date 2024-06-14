@@ -19,7 +19,7 @@ module specific `SPELLCHECKSERVICE_EXPORT` macro.
 
 In the following source code, the module needs to create a complete list of all
 dictionary services; this is somewhat tricky and must be done carefully if done
-manually via service event listners. Our module makes use of the `ServiceTracker`
+manually via service event listeners. Our module makes use of the `ServiceTracker`
 and `ServiceTrackerCustomizer` classes to robustly react to service events related
 to dictionary services. The module activator of our module now additionally implements
 the `ServiceTrackerCustomizer` class to be automatically notified of arriving, departing,

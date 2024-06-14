@@ -36,9 +36,9 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* da
   m_Controls->segNodeSelector->SetDataStorage(dataStorage);
   m_Controls->segNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls->segNodeSelector->SetSelectionIsOptional(false);
-  m_Controls->segNodeSelector->SetInvalidInfo(QStringLiteral("Please select segmentation for extraction."));
+  m_Controls->segNodeSelector->SetInvalidInfo(QStringLiteral("Please select segmentation for boolean operations."));
   m_Controls->segNodeSelector->SetPopUpTitel(QStringLiteral("Select segmentation"));
-  m_Controls->segNodeSelector->SetPopUpHint(QStringLiteral("Select the segmentation that should be used as source for extraction."));
+  m_Controls->segNodeSelector->SetPopUpHint(QStringLiteral("Select the segmentation that should be used as source for boolean operations."));
 
   m_Controls->labelInspector->SetMultiSelectionMode(true);
 
@@ -76,7 +76,7 @@ void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::LabelSetImage::
 
 namespace
 {
-  std::string GenerateLabelHTML(const mitk::Label* label)
+  std::string GenerateLabelHTML(const mitk::Label* label, const mitk::LabelSetImage* segmentation)
   {
     std::stringstream stream;
     auto color = label->GetColor();
@@ -86,7 +86,12 @@ namespace
       << std::setw(2) << static_cast<int>(color.GetBlue()*255)
       << "; font-size: 20px '>&#x25A0;</span>" << std::dec;
 
-    stream << "<font class=\"normal\"> " << label->GetName()<< "</font>";
+    stream << "<font class=\"normal\"> " << label->GetName();
+    if (segmentation->GetLabelValuesByName(segmentation->GetGroupIndexOfLabel(label->GetValue()), label->GetName()).size() > 1)
+    {
+      stream << " [" << label->GetValue() << "]";
+    }
+    stream << "</font>";
     return stream.str();
   }
 }
@@ -106,8 +111,11 @@ void QmitkBooleanOperationsWidget::ConfigureWidgets()
   }
   else
   {
-    auto label = seg->GetLabel(selectedLabelValues.front());
-    m_Controls->line1stLabel->setText(QString::fromStdString(GenerateLabelHTML(label)));
+    mitk::Label::ConstPointer label = seg->GetLabel(selectedLabelValues.front());
+    if (label.IsNotNull())
+      m_Controls->line1stLabel->setText(QString::fromStdString(GenerateLabelHTML(label,seg)));
+    else
+      m_Controls->line1stLabel->setText(QString("Unknown label ID ")+QString::number(selectedLabelValues.front()));
   }
 
   if (selectedLabelValues.size() < 2)
@@ -116,12 +124,17 @@ void QmitkBooleanOperationsWidget::ConfigureWidgets()
   }
   else
   {
+    decltype(selectedLabelValues) otherLabelValues(selectedLabelValues.begin() + 1, selectedLabelValues.end());
+
     std::stringstream stream;
-    for (auto iter = selectedLabelValues.cbegin() + 1; iter != selectedLabelValues.cend(); ++iter)
+    for (const auto& labelValue : otherLabelValues)
     {
-      auto label = seg->GetLabel(*iter);
+      mitk::Label::ConstPointer label = seg->GetLabel(labelValue);
       if (stream.rdbuf()->in_avail() != 0) stream << "; ";
-      stream << GenerateLabelHTML(label);
+      if (label.IsNotNull())
+        stream << GenerateLabelHTML(label,seg);
+      else
+        stream << "Unknown label ID " << labelValue;
     }
 
     m_Controls->lineOtherLabels->setText(QString::fromStdString(stream.str()));

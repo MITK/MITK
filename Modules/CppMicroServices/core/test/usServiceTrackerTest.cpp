@@ -155,7 +155,7 @@ void TestServiceTracker()
   US_TEST_CONDITION_REQUIRED(servref != nullptr, "Test if registered service of id us::TestModuleSService0");
 
   ServiceReference<ServiceControlInterface> servCtrlRef = mc->GetServiceReference<ServiceControlInterface>();
-  US_TEST_CONDITION_REQUIRED(servCtrlRef != nullptr, "Test if constrol service was registered");
+  US_TEST_CONDITION_REQUIRED(servCtrlRef != nullptr, "Test if control service was registered");
 
   ServiceControlInterface* serviceController = mc->GetService(servCtrlRef);
   US_TEST_CONDITION_REQUIRED(serviceController != nullptr, "Test valid service controller");
@@ -248,7 +248,7 @@ void TestServiceTracker()
   //     from the servicetracker, which should yield a null object
   serviceController->ServiceControl(1, "unregister", 7);
   InterfaceMap o2 = st1->GetService(h1);
-  US_TEST_CONDITION_REQUIRED(o2.empty(), "Checkt that service is null");
+  US_TEST_CONDITION_REQUIRED(o2.empty(), "Check that service is null");
 
   // 16. Get all service objects this tracker tracks, it should be 2
   std::vector<InterfaceMap> ts1 = st1->GetServices();

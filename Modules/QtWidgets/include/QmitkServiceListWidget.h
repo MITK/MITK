@@ -172,7 +172,7 @@ public:
   /**
   *\brief This Function listens to ServiceRegistry changes and updates the list of services accordingly.
   *
-  * The user of this widget does not need to call this method, it is instead used to recieve events from the module
+  * The user of this widget does not need to call this method, it is instead used to receive events from the module
   *registry.
   */
   void OnServiceEvent(const us::ServiceEvent event);

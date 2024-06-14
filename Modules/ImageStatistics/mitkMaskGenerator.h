@@ -24,7 +24,7 @@ namespace mitk
 /**
 * \class MaskGenerator
 * \brief Base Class for all Mask Generators. Mask generators are classes that provide functionality for the
-* creation of binary (or unsigned short) masks that can be applied to an image. See dervied classes for more
+* creation of binary (or unsigned short) masks that can be applied to an image. See derived classes for more
 * information.
 */
 class MITKIMAGESTATISTICS_EXPORT MaskGenerator: public itk::Object

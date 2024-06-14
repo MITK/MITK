@@ -149,7 +149,7 @@ namespace mitk
     const PolyLineType GetPolyLine(unsigned int index);
 
     /** \brief Returns the polyline representing the planar figure
-     * (for rendering, measurments, etc.). */
+     * (for rendering, measurements, etc.). */
     const PolyLineType GetPolyLine(unsigned int index) const;
 
     /** \brief Returns the polyline that should be drawn the same size at every scale
@@ -323,7 +323,7 @@ namespace mitk
     std::vector<PolyLineType> m_HelperPolyLines;
     BoolContainerType::Pointer m_HelperPolyLinesToBePainted;
 
-    // this point is used to store the coordiantes an additional 'ControlPoint' that is rendered
+    // this point is used to store the coordinates an additional 'ControlPoint' that is rendered
     // when the mouse cursor is above the figure (and not a control-point) and when the
     // property 'planarfigure.isextendable' is set to true
     Point2D m_PreviewControlPoint;

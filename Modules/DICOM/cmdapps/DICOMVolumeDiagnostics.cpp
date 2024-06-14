@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkDICOMFilesHelper.h>
 #include <mitkDICOMFileReaderSelector.h>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 
 #include <nlohmann/json.hpp>
 
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-      bool pathIsDirectory = std::filesystem::is_directory(inputFilename);
+      bool pathIsDirectory = fs::is_directory(inputFilename);
 
       if (!pathIsDirectory && onlyOwnSeries)
       {
@@ -140,8 +140,8 @@ int main(int argc, char* argv[])
             const auto frameList = reader->GetOutput(outputIndex).GetImageFrameList();
             auto finding = std::find_if(frameList.begin(), frameList.end(), [&](const mitk::DICOMImageFrameInfo::Pointer& frame)
               {
-                std::filesystem::path framePath(frame->Filename);
-                std::filesystem::path inputPath(inputFilename);
+                fs::path framePath(frame->Filename);
+                fs::path inputPath(inputFilename);
                 return framePath == inputPath;
               });
             isRelevantOutput = finding != frameList.end();

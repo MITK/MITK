@@ -33,7 +33,7 @@ class QmitkTotalSegmentatorToolInstaller : public QmitkSetupVirtualEnvUtil
 {
 public:
   const QString VENV_NAME = ".totalsegmentator_v2";
-  const QString TOTALSEGMENTATOR_VERSION = "2.0.5";
+  const QString TOTALSEGMENTATOR_VERSION = "2.2.1";
   const std::vector<QString> PACKAGES = {QString("Totalsegmentator==") + TOTALSEGMENTATOR_VERSION,
                                          QString("setuptools")}; /* just in case */
   const QString STORAGE_DIR;
@@ -104,7 +104,7 @@ protected:
   void EnableAll(bool);
 
   /**
-   * @brief Searches and parses paths of python virtual enviroments
+   * @brief Searches and parses paths of python virtual environments
    * from predefined lookout locations
    */
   void AutoParsePythonPaths();
@@ -133,7 +133,7 @@ protected:
 
   /**
    * @brief Adds GPU information to the gpu combo box.
-   * In case, there aren't any GPUs avaialble, the combo box will be
+   * In case, there aren't any GPUs available, the combo box will be
    * rendered editable.
    */
   void SetGPUInfo();
@@ -170,6 +170,7 @@ protected:
     "python environment or install TotalSegmentator.";
   const QStringList VALID_TASKS = {
     "total",
+    "total_mr",
     "cerebral_bleed",
     "hip_implant",
     "coronary_arteries",

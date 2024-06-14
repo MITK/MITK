@@ -68,16 +68,9 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
 
   QString welcomeText;
-  if (m_GpuLoader.GetGPUCount() != 0)
-  {
-    welcomeText = "<b>STATUS: </b><i>Welcome to Segment Anything tool. You're in luck: " +
+  welcomeText = "<b>STATUS: </b><i>Welcome to Segment Anything tool. " +
                   QString::number(m_GpuLoader.GetGPUCount()) + " GPU(s) were detected.</i>";
-  }
-  else
-  {
-    welcomeText = "<b>STATUS: </b><i>Welcome to Segment Anything tool. Sorry, " +
-                  QString::number(m_GpuLoader.GetGPUCount()) + " GPUs were detected.</i>";
-  }
+  
   connect(m_Controls.activateButton, SIGNAL(clicked()), this, SLOT(OnActivateBtnClicked()));
   connect(m_Controls.resetButton, SIGNAL(clicked()), this, SLOT(OnResetPicksClicked()));
 

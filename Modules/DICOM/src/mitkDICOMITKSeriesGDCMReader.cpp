@@ -38,6 +38,7 @@ mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPl
 mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( const DICOMITKSeriesGDCMReader& other )
 : DICOMFileReader( other )
 , m_FixTiltByShearing( other.m_FixTiltByShearing)
+, m_SimpleVolumeReading( other.m_SimpleVolumeReading)
 , m_SortingResultInProgress( other.m_SortingResultInProgress )
 , m_Sorter( other.m_Sorter )
 , m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
@@ -61,6 +62,7 @@ mitk::DICOMITKSeriesGDCMReader& mitk::DICOMITKSeriesGDCMReader::
   {
     DICOMFileReader::operator                =( other );
     this->m_FixTiltByShearing                = other.m_FixTiltByShearing;
+    this->m_SimpleVolumeReading              = other.m_SimpleVolumeReading;
     this->m_SortingResultInProgress          = other.m_SortingResultInProgress;
     this->m_Sorter                           = other.m_Sorter; // TODO should clone the list items
     this->m_EquiDistantBlocksSorter          = other.m_EquiDistantBlocksSorter->Clone();

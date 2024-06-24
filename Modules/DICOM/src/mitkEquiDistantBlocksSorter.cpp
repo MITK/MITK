@@ -336,8 +336,6 @@ mitk::EquiDistantBlocksSorter
   const DICOMDatasetList& datasets,
   bool groupImagesWithGantryTilt)
 {
-  // result.first = files that fit ITK's assumption
-  // result.second = files that do not fit, should be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption() again
   SliceGroupingAnalysisResult result;
 
   const DICOMTag tagImagePositionPatient = DICOMTag(0x0020,0x0032); // Image Position (Patient)

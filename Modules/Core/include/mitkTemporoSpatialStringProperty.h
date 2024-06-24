@@ -130,6 +130,15 @@ namespace mitk
     MITKCORE_EXPORT mitk::BaseProperty::Pointer deserializeJSONToTemporoSpatialStringProperty(const std::string &value);
   }
 
+  /** Helper function that extracts the information of a time step out of a TemporoSpatialStringProperty
+  * and returns a TemporoSpatialStringProperty that only contains that time step.
+  * @param tsProperty The source property from which the values should be extracted.
+  * @param ts The time point that should be extracted.
+  * @pre tsProperty must point to a valid instance.
+  * @pre ts must indicate a time step that exists in tsProperty.
+  * @result Returns a TemporoSpatialStringProperty instance that only contains the values of the indicated time step. In the result the time step is always time step 0.*/
+  TemporoSpatialStringProperty::Pointer MITKCORE_EXPORT ExtractTimeStepFromTemporoSpatialStringProperty(const TemporoSpatialStringProperty* tsProperty, TimeStepType ts);
+
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

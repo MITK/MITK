@@ -15,9 +15,9 @@ https://www.cs.umd.edu/~mount/ANN/
 
 https://www.boost.org/
 
-\par C++ REST SDK
+\par cpp-httplib
 
-https://github.com/Microsoft/cpprestsdk/
+https://github.com/yhirose/cpp-httplib
 
 \par CppUnit
 

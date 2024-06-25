@@ -55,8 +55,5 @@ set(MITK_MODULES
   Pharmacokinetics
   PharmacokineticsUI
   DICOMPM
-  REST
-  RESTService
-  DICOMweb
   ROI
 )

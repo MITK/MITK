@@ -103,9 +103,9 @@ mitk::ThreeDnTDICOMSeriesReader
 
     // get block characteristics of first block
     const unsigned int currentBlockNumberOfSlices = firstBlock.size();
-    const std::string currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient ).value;
-    const std::string currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient ).value;
-    const auto currentBlockSeriesInstanceUID = firstBlock.back()->GetTagValueAsString(tagSeriesInstaceUID).value;
+    const auto currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient );
+    const auto currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient );
+    const auto currentBlockSeriesInstanceUID = firstBlock.back()->GetTagValueAsString(tagSeriesInstaceUID);
 
     remainingBlocks.erase( remainingBlocks.begin() );
 
@@ -118,16 +118,21 @@ mitk::ThreeDnTDICOMSeriesReader
       const DICOMDatasetAccessingImageFrameList otherBlock = *otherBlockIter;
 
       const unsigned int otherBlockNumberOfSlices = otherBlock.size();
-      const std::string otherBlockFirstOrigin = otherBlock.front()->GetTagValueAsString( tagImagePositionPatient ).value;
-      const std::string otherBlockLastOrigin  =  otherBlock.back()->GetTagValueAsString( tagImagePositionPatient ).value;
-      const auto otherBlockSeriesInstanceUID = otherBlock.back()->GetTagValueAsString(tagSeriesInstaceUID).value;
+      const auto otherBlockFirstOrigin = otherBlock.front()->GetTagValueAsString( tagImagePositionPatient );
+      const auto otherBlockLastOrigin  =  otherBlock.back()->GetTagValueAsString( tagImagePositionPatient );
+      const auto otherBlockSeriesInstanceUID = otherBlock.back()->GetTagValueAsString(tagSeriesInstaceUID);
 
       // add matching blocks to current3DnTBlock
       // keep other blocks for later
-      if (   otherBlockNumberOfSlices == currentBlockNumberOfSlices
-          && (!m_OnlyCondenseSameSeries || otherBlockSeriesInstanceUID == currentBlockSeriesInstanceUID)
-          && otherBlockFirstOrigin == currentBlockFirstOrigin
-          && otherBlockLastOrigin == currentBlockLastOrigin
+      if (   otherBlockNumberOfSlices == currentBlockNumberOfSlices //only consider condensing blocks that have same slice count
+          && currentBlockFirstOrigin.isValid && currentBlockLastOrigin.isValid //only consider condensing blocks that have valid origins
+          && otherBlockFirstOrigin.isValid && otherBlockLastOrigin.isValid //only consider condensing blocks that have valid origins
+          && (!m_OnlyCondenseSameSeries
+              || ( currentBlockSeriesInstanceUID.isValid
+                   && otherBlockSeriesInstanceUID.isValid
+                   && otherBlockSeriesInstanceUID.value == currentBlockSeriesInstanceUID.value))
+          && otherBlockFirstOrigin.value == currentBlockFirstOrigin.value
+          && otherBlockLastOrigin.value == currentBlockLastOrigin.value
           )
       { // matching block
         ++current3DnTBlockNumberOfTimeSteps;

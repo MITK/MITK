@@ -339,7 +339,7 @@ mitk::DICOMTagBasedSorter
     {
       processedTagValue = rawTagValue.value;
     }
-    groupID << processedTagValue;
+    groupID << "#" << processedTagValue;
   }
   // shorten ID?
   return groupID.str();
@@ -360,7 +360,7 @@ mitk::DICOMTagBasedSorter
     DICOMDatasetAccess* dataset = *dsIter;
     assert(dataset);
 
-    std::string groupID = this->BuildGroupID( dataset );
+    const std::string groupID = this->BuildGroupID( dataset );
     MITK_DEBUG << "Group ID for for " << dataset->GetFilenameIfAvailable() << ": " << groupID;
     listForGroupID[groupID].push_back(dataset);
   }

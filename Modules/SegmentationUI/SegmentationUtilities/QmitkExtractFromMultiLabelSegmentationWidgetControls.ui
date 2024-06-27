@@ -14,7 +14,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Segmentation;</string>
+      <string>Segmentation:</string>
      </property>
     </widget>
    </item>

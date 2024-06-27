@@ -14,7 +14,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Inputs;</string>
+      <string>Inputs:</string>
      </property>
     </widget>
    </item>

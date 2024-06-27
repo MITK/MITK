@@ -74,6 +74,38 @@ mitk::ThreeDnTDICOMSeriesReader
   return m_Group3DandT;
 }
 
+/** Helper function to make the code in mitk::ThreeDnTDICOMSeriesReader
+::Condense3DBlocks(SortingBlockList& resultOf3DGrouping) more readable.*/
+bool BlockShouldBeCondensed(bool onlyCondenseSameSeries, unsigned int currentBlockNumberOfSlices, unsigned int otherBlockNumberOfSlices,
+  const mitk::DICOMDatasetFinding& currentBlockFirstOrigin, const mitk::DICOMDatasetFinding& currentBlockLastOrigin,
+  const mitk::DICOMDatasetFinding& otherBlockFirstOrigin, const mitk::DICOMDatasetFinding& otherBlockLastOrigin,
+  const mitk::DICOMDatasetFinding& currentBlockSeriesInstanceUID, const mitk::DICOMDatasetFinding& otherBlockSeriesInstanceUID)
+{
+  if (otherBlockNumberOfSlices != currentBlockNumberOfSlices)
+    return false; //don't condense blocks that have unequal slice count
+
+  if (!otherBlockFirstOrigin.isValid || !otherBlockLastOrigin.isValid)
+    return false; //don't condense blocks that have invalid origins
+
+  if (!currentBlockFirstOrigin.isValid || !currentBlockLastOrigin.isValid)
+    return false; //don't condense blocks that have invalid origins
+
+  const bool sameSeries = otherBlockSeriesInstanceUID.isValid
+    && currentBlockSeriesInstanceUID.isValid
+    && otherBlockSeriesInstanceUID.value == currentBlockSeriesInstanceUID.value;
+
+  if (onlyCondenseSameSeries && !sameSeries)
+    return false; //don't condense blocks if it is only allowed to condense same series and series are not defined or not equal.
+
+  if (otherBlockFirstOrigin.value != currentBlockFirstOrigin.value)
+    return false; //don't condense blocks that have unequal first origins
+
+  if (otherBlockLastOrigin.value != currentBlockLastOrigin.value)
+    return false; //don't condense blocks that have unequal last origins
+
+  return true;
+}
+
 mitk::DICOMITKSeriesGDCMReader::SortingBlockList
 mitk::ThreeDnTDICOMSeriesReader
 ::Condense3DBlocks(SortingBlockList& resultOf3DGrouping)
@@ -124,16 +156,10 @@ mitk::ThreeDnTDICOMSeriesReader
 
       // add matching blocks to current3DnTBlock
       // keep other blocks for later
-      if (   otherBlockNumberOfSlices == currentBlockNumberOfSlices //only consider condensing blocks that have same slice count
-          && currentBlockFirstOrigin.isValid && currentBlockLastOrigin.isValid //only consider condensing blocks that have valid origins
-          && otherBlockFirstOrigin.isValid && otherBlockLastOrigin.isValid //only consider condensing blocks that have valid origins
-          && (!m_OnlyCondenseSameSeries
-              || ( currentBlockSeriesInstanceUID.isValid
-                   && otherBlockSeriesInstanceUID.isValid
-                   && otherBlockSeriesInstanceUID.value == currentBlockSeriesInstanceUID.value))
-          && otherBlockFirstOrigin.value == currentBlockFirstOrigin.value
-          && otherBlockLastOrigin.value == currentBlockLastOrigin.value
-          )
+      if ( BlockShouldBeCondensed(m_OnlyCondenseSameSeries, currentBlockNumberOfSlices, otherBlockNumberOfSlices,
+        currentBlockFirstOrigin, currentBlockLastOrigin,
+        otherBlockFirstOrigin, otherBlockLastOrigin,
+        currentBlockSeriesInstanceUID, otherBlockSeriesInstanceUID))
       { // matching block
         ++current3DnTBlockNumberOfTimeSteps;
         current3DnTBlock.insert( current3DnTBlock.end(), otherBlock.begin(), otherBlock.end() ); // append

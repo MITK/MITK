@@ -361,8 +361,8 @@ option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
 
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
 
-if((MITK_USE_cpprestsdk OR MITK_USE_httplib) AND NOT OpenSSL_FOUND)
-  set(openssl_message "Could not find OpenSSL (dependency of C++ REST SDK and cpp-httplib).\n")
+if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
+  set(openssl_message "Could not find OpenSSL (dependency of cpp-httplib).\n")
   if(UNIX)
     if(APPLE)
       set(openssl_message "${openssl_message}Please install it using your favorite package management "
@@ -381,17 +381,6 @@ if((MITK_USE_cpprestsdk OR MITK_USE_httplib) AND NOT OpenSSL_FOUND)
                       "OpenSSL installation. Make sure to clear variables of partly found "
                       "versions of OpenSSL before, or they will be mixed up.")
   message(FATAL_ERROR ${openssl_message})
-endif()
-
-if(MITK_USE_cpprestsdk)
-  list(APPEND MITK_USE_Boost_LIBRARIES date_time regex system)
-
-  if(UNIX)
-    list(APPEND MITK_USE_Boost_LIBRARIES atomic chrono filesystem random thread)
-  endif()
-
-  list(REMOVE_DUPLICATES MITK_USE_Boost_LIBRARIES)
-  set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "A semi-colon separated list of required Boost libraries" FORCE)
 endif()
 
 if(MITK_USE_Python3)

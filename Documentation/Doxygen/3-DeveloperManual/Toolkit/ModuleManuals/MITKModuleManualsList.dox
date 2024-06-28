@@ -12,7 +12,6 @@ The modules are shared libraries that provide functionality that can be used by 
   <li> \ref ChartModule
   <li> \ref LegacyGLModule
   <li> \ref mitkPython_Overview
-  <li> \ref RESTModule
 </ul>
 
 \subpage MITKModuleManualsListPageAdditionalInformation Additional Information on Certain Modules

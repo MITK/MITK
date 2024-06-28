@@ -31,10 +31,10 @@ std::string outFileNamePattern;
 
 void setupParser(mitkCommandLineParser& parser)
 {
-    // set general information about your MiniApp
+    // set general information
     parser.setCategory("Dynamic Data Analysis Tools");
     parser.setTitle("Split 4D to 3D Image");
-    parser.setDescription("MiniApp that allows to split an image into the images per time point. Time resolved properties will be also split.");
+    parser.setDescription("CLI app that allows to split an image into the images per time point. Time resolved properties will be also split.");
     parser.setContributor("DKFZ MIC");
     //! [create parser]
 
@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
 
       if (image->GetTimeGeometry()->CountTimeSteps() == 1)
       {
-        std::cout << "Input contains only one time steps; will be passed through" << std::endl;
+        std::cout << "Input contains only one time step; will be passed through" << std::endl;
         saveResultImage(image, outFileNamePattern, 0);
       }
       else

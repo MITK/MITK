@@ -28,6 +28,8 @@ class mitkTemporoSpatialStringPropertyTestSuite : public mitk::TestFixture
   MITK_TEST(serializeTemporoSpatialStringPropertyToJSON);
   MITK_TEST(deserializeJSONToTemporoSpatialStringProperty);
 
+  MITK_TEST(ExtractTimeStepFromTemporoSpatialStringProperty);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -239,6 +241,32 @@ public:
     CPPUNIT_ASSERT(tsProp->GetValue(0, 2) == "1");
     CPPUNIT_ASSERT(tsProp->GetValue(1, 2) == "1");
     CPPUNIT_ASSERT(*tsProp == *refCondensibleProp);
+  }
+
+  void ExtractTimeStepFromTemporoSpatialStringProperty()
+  {
+    CPPUNIT_ASSERT_THROW(mitk::ExtractTimeStepFromTemporoSpatialStringProperty(nullptr, 0), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("Test for accessing invalid time step failed.", mitk::ExtractTimeStepFromTemporoSpatialStringProperty(refProp, 4), mitk::Exception);
+
+    auto result = mitk::ExtractTimeStepFromTemporoSpatialStringProperty(refProp, 0);
+
+    CPPUNIT_ASSERT(result->GetAvailableTimeSteps().size() == 1);
+    CPPUNIT_ASSERT(result->GetAvailableSlices(0).size() == 1);
+    CPPUNIT_ASSERT(result->GetValue(0, 0) == "v_0_0");
+
+    result = mitk::ExtractTimeStepFromTemporoSpatialStringProperty(refProp, 3);
+
+    CPPUNIT_ASSERT(result->GetAvailableTimeSteps().size() == 1);
+    CPPUNIT_ASSERT(result->GetAvailableSlices(0).size() == 2);
+    CPPUNIT_ASSERT(result->GetValue(0, 0) == "v_3_0");
+    CPPUNIT_ASSERT(result->GetValue(0, 2) == "v_3_2");
+
+    result = mitk::ExtractTimeStepFromTemporoSpatialStringProperty(refProp, 6);
+
+    CPPUNIT_ASSERT(result->GetAvailableTimeSteps().size() == 1);
+    CPPUNIT_ASSERT(result->GetAvailableSlices(0).size() == 1);
+    CPPUNIT_ASSERT(result->GetValue(0, 1) == "v_6_1");
+
   }
 };
 

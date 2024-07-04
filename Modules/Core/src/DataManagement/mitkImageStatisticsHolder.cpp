@@ -108,7 +108,6 @@ void mitk::_ComputeExtremaInItkImage(const ItkImageType *itkImage, mitk::ImageSt
     return;
 
   itk::ImageRegionConstIterator<ItkImageType> it(itkImage, region);
-  typedef typename ItkImageType::PixelType TPixel;
   ScalarType value = 0;
 
   if (statisticsHolder == nullptr || !statisticsHolder->IsValidTimeStep(t))

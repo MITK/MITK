@@ -109,7 +109,7 @@ void mitk::_ComputeExtremaInItkImage(const ItkImageType *itkImage, mitk::ImageSt
 
   itk::ImageRegionConstIterator<ItkImageType> it(itkImage, region);
   typedef typename ItkImageType::PixelType TPixel;
-  TPixel value = 0;
+  ScalarType value = 0;
 
   if (statisticsHolder == nullptr || !statisticsHolder->IsValidTimeStep(t))
     return;
@@ -121,9 +121,15 @@ void mitk::_ComputeExtremaInItkImage(const ItkImageType *itkImage, mitk::ImageSt
   statisticsHolder->m_Scalar2ndMax[t] = statisticsHolder->m_ScalarMax[t] =
     itk::NumericTraits<ScalarType>::NonpositiveMin();
 
+  bool foundValidValue = false;
+
   while (!it.IsAtEnd())
   {
     value = it.Get();
+
+    if (!foundValidValue && !std::isnan(value))
+      foundValidValue = true;
+
 #ifdef BOUNDINGOBJECT_IGNORE
     if (value > -32765)
     {
@@ -164,6 +170,12 @@ void mitk::_ComputeExtremaInItkImage(const ItkImageType *itkImage, mitk::ImageSt
 #endif
 
     ++it;
+  }
+
+  if (!foundValidValue)
+  {
+    statisticsHolder->m_ScalarMax[t] = 0;
+    statisticsHolder->m_ScalarMin[t] = 0;
   }
 
   //// guard for wrong 2dMin/Max on single constant value images

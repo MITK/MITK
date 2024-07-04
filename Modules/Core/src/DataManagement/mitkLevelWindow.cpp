@@ -307,6 +307,26 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
       maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute();
       min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
       max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
+
+      if (minValue == maxValue)
+      {
+        // Same result, also look at data at other time steps if present...
+        auto maxT = image->GetDimension(3);
+
+        if (maxT > 1)
+        {
+          for (TimeStepType t = 1; t < maxT; ++t)
+          {
+            minValue = image->GetStatistics()->GetScalarValueMin(t, selectedComponent);
+            maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(t);
+            min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(t);
+            max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(t);
+
+            if (minValue != maxValue)
+              break; // We found a time step with valid data
+          }
+        }
+      }
     }
   }
   else

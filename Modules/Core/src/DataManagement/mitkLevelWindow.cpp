@@ -311,11 +311,11 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
       if (minValue == maxValue)
       {
         // Same result, also look at data at other time steps if present...
-        auto maxT = image->GetDimension(3);
+        auto numTimeSteps = image->GetDimension(3);
 
-        if (maxT > 1)
+        if (numTimeSteps > 1)
         {
-          for (TimeStepType t = 1; t < maxT; ++t)
+          for (TimeStepType t = 1; t < numTimeSteps; ++t)
           {
             minValue = image->GetStatistics()->GetScalarValueMin(t, selectedComponent);
             maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(t);

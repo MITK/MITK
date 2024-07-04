@@ -37,7 +37,7 @@ namespace mitk
   void ClearImageBuffer(mitk::Image* image)
   {
     if (image->GetDimension() == 4)
-    { //remark: this extra branch was added, because LabelSetImage instances can be
+    { //remark: this extra branch was added, because MultiLabelSegmentation instances can be
       //dynamic (4D), but AccessByItk by support only supports 2D and 3D.
       //The option to change the CMake default dimensions for AccessByItk was
       //dropped (for details see discussion in T28756)
@@ -50,10 +50,10 @@ namespace mitk
   }
 }
 
-const mitk::LabelSetImage::LabelValueType mitk::LabelSetImage::UNLABELED_VALUE = 0;
+const mitk::MultiLabelSegmentation::LabelValueType mitk::MultiLabelSegmentation::UNLABELED_VALUE = 0;
 
-mitk::LabelSetImage::LabelSetImage()
-  : mitk::Image(), m_ActiveLabelValue(0), m_UnlabeledLabelLock(false), m_ActiveLayer(0), m_activeLayerInvalid(false)
+mitk::MultiLabelSegmentation::MultiLabelSegmentation()
+  : mitk::SlicedData(), m_ActiveLabelValue(0), m_UnlabeledLabelLock(false), m_ActiveLayer(0), m_activeLayerInvalid(false)
 {
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
@@ -62,8 +62,8 @@ mitk::LabelSetImage::LabelSetImage()
   DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
 }
 
-mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
-  : Image(other),
+mitk::MultiLabelSegmentation::MultiLabelSegmentation(const mitk::MultiLabelSegmentation &other)
+  : SlicedData(other),
     m_ActiveLabelValue(other.m_ActiveLabelValue),
     m_LookupTable(other.m_LookupTable->Clone()),
     m_UnlabeledLabelLock(other.m_UnlabeledLabelLock),
@@ -82,9 +82,9 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
   DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
 }
 
-void mitk::LabelSetImage::Initialize(const mitk::Image *other)
+void mitk::MultiLabelSegmentation::Initialize(const mitk::Image *other)
 {
-  mitk::PixelType pixelType(mitk::MakeScalarPixelType<LabelSetImage::PixelType>());
+  mitk::PixelType pixelType(mitk::MakeScalarPixelType<MultiLabelSegmentation::PixelType>());
   if (other->GetDimension() == 2)
   {
     const unsigned int dimensions[] = {other->GetDimension(0), other->GetDimension(1), 1};
@@ -111,7 +111,7 @@ void mitk::LabelSetImage::Initialize(const mitk::Image *other)
   }
 }
 
-mitk::LabelSetImage::~LabelSetImage()
+mitk::MultiLabelSegmentation::~MultiLabelSegmentation()
 {
   for (auto [value, label] : m_LabelMap)
   {
@@ -121,19 +121,19 @@ mitk::LabelSetImage::~LabelSetImage()
   m_LabelMap.clear();
 }
 
-unsigned int mitk::LabelSetImage::GetActiveLayer() const
+unsigned int mitk::MultiLabelSegmentation::GetActiveLayer() const
 {
   if (m_LayerContainer.size() == 0) mitkThrow() << "Cannot return active layer index. No layer is available.";
 
   return m_ActiveLayer;
 }
 
-unsigned int mitk::LabelSetImage::GetNumberOfLayers() const
+unsigned int mitk::MultiLabelSegmentation::GetNumberOfLayers() const
 {
   return m_LayerContainer.size();
 }
 
-void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
+void mitk::MultiLabelSegmentation::RemoveGroup(GroupIndexType indexToDelete)
 {
   if (!this->ExistGroup(indexToDelete)) mitkThrow() << "Cannot remove group. Group does not exist. Invalid group index: "<<indexToDelete;
 
@@ -201,7 +201,7 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
   this->Modified();
 }
 
-mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::ExtractLabelValuesFromLabelVector(const LabelVectorType& labels)
+mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::ExtractLabelValuesFromLabelVector(const LabelVectorType& labels)
 {
   LabelValueVectorType result;
 
@@ -212,7 +212,7 @@ mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::ExtractLabelValue
   return result;
 }
 
-mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::ExtractLabelValuesFromLabelVector(const ConstLabelVectorType& labels)
+mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::ExtractLabelValuesFromLabelVector(const ConstLabelVectorType& labels)
 {
   LabelValueVectorType result;
 
@@ -223,13 +223,13 @@ mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::ExtractLabelValue
   return result;
 }
 
-mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::ConvertLabelVectorConst(const LabelVectorType& labels)
+mitk::MultiLabelSegmentation::ConstLabelVectorType mitk::MultiLabelSegmentation::ConvertLabelVectorConst(const LabelVectorType& labels)
 {
   ConstLabelVectorType result(labels.begin(), labels.end());
   return result;
 };
 
-const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetAllLabelValues() const
+const mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::GetAllLabelValues() const
 {
   LabelValueVectorType result;
 
@@ -241,7 +241,7 @@ const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetAllLabel
   return result;
 }
 
-mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValues() const
+mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::GetUsedLabelValues() const
 {
   LabelValueVectorType result = { UNLABELED_VALUE };
 
@@ -254,7 +254,7 @@ mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValue
   return result;
 }
 
-mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(ConstLabelVector labels)
+mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddLayer(ConstLabelVector labels)
 {
   mitk::Image::Pointer newImage = mitk::Image::New();
   newImage->Initialize(this->GetPixelType(),
@@ -268,7 +268,7 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(ConstLabelVect
   return this->AddLayer(newImage, labels);
 }
 
-mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(mitk::Image* layerImage, ConstLabelVector labels)
+mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddLayer(mitk::Image* layerImage, ConstLabelVector labels)
 {
   GroupIndexType newGroupID = m_Groups.size();
 
@@ -314,7 +314,7 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::AddLayer(mitk::Image* l
   return newGroupID;
 }
 
-void mitk::LabelSetImage::ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& labelSet)
+void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& labelSet)
 {
   if (m_LayerContainer.size() <= groupID)
   {
@@ -343,12 +343,12 @@ void mitk::LabelSetImage::ReplaceGroupLabels(const GroupIndexType groupID, const
   }
 }
 
-void mitk::LabelSetImage::ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& labelSet)
+void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& labelSet)
 {
   return ReplaceGroupLabels(groupID, ConvertLabelVectorConst(labelSet));
 }
 
-mitk::Image* mitk::LabelSetImage::GetGroupImage(GroupIndexType groupID)
+mitk::Image* mitk::MultiLabelSegmentation::GetGroupImage(GroupIndexType groupID)
 {
   if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
 
@@ -356,14 +356,14 @@ mitk::Image* mitk::LabelSetImage::GetGroupImage(GroupIndexType groupID)
 }
 
 
-const mitk::Image* mitk::LabelSetImage::GetGroupImage(GroupIndexType groupID) const
+const mitk::Image* mitk::MultiLabelSegmentation::GetGroupImage(GroupIndexType groupID) const
 {
   if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
 
   return groupID == this->GetActiveLayer() ? this : m_LayerContainer.at(groupID).GetPointer();
 }
 
-const mitk::Image* mitk::LabelSetImage::GetGroupImageWorkaround(GroupIndexType groupID) const
+const mitk::Image* mitk::MultiLabelSegmentation::GetGroupImageWorkaround(GroupIndexType groupID) const
 {
   if (!this->ExistGroup(groupID))
     mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
@@ -383,7 +383,7 @@ const mitk::Image* mitk::LabelSetImage::GetGroupImageWorkaround(GroupIndexType g
   return m_LayerContainer[groupID].GetPointer();
 }
 
-const std::string& mitk::LabelSetImage::GetGroupName(GroupIndexType groupID) const
+const std::string& mitk::MultiLabelSegmentation::GetGroupName(GroupIndexType groupID) const
 {
   if (!this->ExistGroup(groupID))
     mitkThrow() << "Error, cannot return group name. Group ID is invalid. Invalid ID: " << groupID;
@@ -391,7 +391,7 @@ const std::string& mitk::LabelSetImage::GetGroupName(GroupIndexType groupID) con
   return m_Groups[groupID];
 }
 
-void mitk::LabelSetImage::SetGroupName(GroupIndexType groupID, const std::string& name)
+void mitk::MultiLabelSegmentation::SetGroupName(GroupIndexType groupID, const std::string& name)
 {
   if (!this->ExistGroup(groupID))
     mitkThrow() << "Error, cannot set group name. Group ID is invalid. Invalid ID: " << groupID;
@@ -400,7 +400,7 @@ void mitk::LabelSetImage::SetGroupName(GroupIndexType groupID, const std::string
   this->InvokeEvent(GroupModifiedEvent(groupID));
 }
 
-void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
+void mitk::MultiLabelSegmentation::SetActiveLayer(unsigned int layer)
 {
   try
   {
@@ -454,7 +454,7 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
   this->Modified();
 }
 
-void mitk::LabelSetImage::SetActiveLabel(LabelValueType label)
+void mitk::MultiLabelSegmentation::SetActiveLabel(LabelValueType label)
 {
   m_ActiveLabelValue = label;
 
@@ -466,7 +466,7 @@ void mitk::LabelSetImage::SetActiveLabel(LabelValueType label)
   Modified();
 }
 
-void mitk::LabelSetImage::ClearBuffer()
+void mitk::MultiLabelSegmentation::ClearBuffer()
 {
   try
   {
@@ -479,7 +479,7 @@ void mitk::LabelSetImage::ClearBuffer()
   }
 }
 
-void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, PixelType sourcePixelValue)
+void mitk::MultiLabelSegmentation::MergeLabel(PixelType pixelValue, PixelType sourcePixelValue)
 {
   try
   {
@@ -496,7 +496,7 @@ void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, PixelType sourcePixel
   Modified();
 }
 
-void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, const std::vector<PixelType>& vectorOfSourcePixelValues)
+void mitk::MultiLabelSegmentation::MergeLabels(PixelType pixelValue, const std::vector<PixelType>& vectorOfSourcePixelValues)
 {
   try
   {
@@ -519,7 +519,7 @@ void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, const std::vector<Pi
   Modified();
 }
 
-void mitk::LabelSetImage::RemoveLabel(LabelValueType pixelValue)
+void mitk::MultiLabelSegmentation::RemoveLabel(LabelValueType pixelValue)
 {
   GroupIndexType groupID = 0;
   {
@@ -544,7 +544,7 @@ void mitk::LabelSetImage::RemoveLabel(LabelValueType pixelValue)
   this->InvokeEvent(GroupModifiedEvent(groupID));
 }
 
-void mitk::LabelSetImage::RemoveLabelFromMap(LabelValueType pixelValue)
+void mitk::MultiLabelSegmentation::RemoveLabelFromMap(LabelValueType pixelValue)
 {
   if (m_LabelMap.find(pixelValue) == m_LabelMap.end()) mitkThrow()<<"Invalid state of instance. RemoveLabelFromMap was called for unknown label id. invalid label id: "<<pixelValue;
 
@@ -559,7 +559,7 @@ void mitk::LabelSetImage::RemoveLabelFromMap(LabelValueType pixelValue)
   m_GroupToLabelMap[groupID] = labelsInGroup;
 }
 
-void mitk::LabelSetImage::RemoveLabels(const LabelValueVectorType& vectorOfLabelPixelValues)
+void mitk::MultiLabelSegmentation::RemoveLabels(const LabelValueVectorType& vectorOfLabelPixelValues)
 {
   for (const auto labelValue : vectorOfLabelPixelValues)
   {
@@ -568,7 +568,7 @@ void mitk::LabelSetImage::RemoveLabels(const LabelValueVectorType& vectorOfLabel
   this->InvokeEvent(LabelsChangedEvent(vectorOfLabelPixelValues));
 }
 
-void mitk::LabelSetImage::EraseLabel(LabelValueType pixelValue)
+void mitk::MultiLabelSegmentation::EraseLabel(LabelValueType pixelValue)
 {
   try
   {
@@ -596,7 +596,7 @@ void mitk::LabelSetImage::EraseLabel(LabelValueType pixelValue)
   Modified();
 }
 
-void mitk::LabelSetImage::EraseLabels(const LabelValueVectorType& labelValues)
+void mitk::MultiLabelSegmentation::EraseLabels(const LabelValueVectorType& labelValues)
 {
   for (auto labelValue : labelValues)
   {
@@ -604,13 +604,13 @@ void mitk::LabelSetImage::EraseLabels(const LabelValueVectorType& labelValues)
   }
 }
 
-mitk::LabelSetImage::LabelValueType mitk::LabelSetImage::GetUnusedLabelValue() const
+mitk::MultiLabelSegmentation::LabelValueType mitk::MultiLabelSegmentation::GetUnusedLabelValue() const
 {
   auto usedValues = this->GetUsedLabelValues();
   return usedValues.back() + 1;
 }
 
-mitk::Label* mitk::LabelSetImage::AddLabel(mitk::Label* label, GroupIndexType groupID, bool addAsClone, bool correctLabelValue)
+mitk::Label* mitk::MultiLabelSegmentation::AddLabel(mitk::Label* label, GroupIndexType groupID, bool addAsClone, bool correctLabelValue)
 {
   if (nullptr == label) mitkThrow() << "Invalid use of AddLabel. label is not valid.";
 
@@ -656,7 +656,7 @@ mitk::Label* mitk::LabelSetImage::AddLabel(mitk::Label* label, GroupIndexType gr
   return newLabel;
 }
 
-mitk::Label* mitk::LabelSetImage::AddLabelWithContent(Label* label, const Image* labelContent, GroupIndexType groupID, LabelValueType contentLabelValue, bool addAsClone, bool correctLabelValue)
+mitk::Label* mitk::MultiLabelSegmentation::AddLabelWithContent(Label* label, const Image* labelContent, GroupIndexType groupID, LabelValueType contentLabelValue, bool addAsClone, bool correctLabelValue)
 {
   if (nullptr == labelContent) mitkThrow() << "Invalid use of AddLabel. labelContent is not valid.";
   if (!Equal(*(this->GetTimeGeometry()), *(labelContent->GetTimeGeometry()), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
@@ -665,7 +665,7 @@ mitk::Label* mitk::LabelSetImage::AddLabelWithContent(Label* label, const Image*
   auto newLabel = this->AddLabel(label, groupID, addAsClone, correctLabelValue);
 
   mitk::TransferLabelContent(labelContent, this->GetGroupImage(groupID), this->GetConstLabelsByValue(this->GetLabelValuesByGroup(groupID)),
-    mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, { {contentLabelValue, newLabel->GetValue()}},
+    mitk::MultiLabelSegmentation::UNLABELED_VALUE, mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, { {contentLabelValue, newLabel->GetValue()}},
     mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
   this->Modified();
@@ -673,7 +673,7 @@ mitk::Label* mitk::LabelSetImage::AddLabelWithContent(Label* label, const Image*
   return newLabel;
 }
 
-mitk::Label* mitk::LabelSetImage::AddLabel(const std::string& name, const mitk::Color& color, GroupIndexType groupID)
+mitk::Label* mitk::MultiLabelSegmentation::AddLabel(const std::string& name, const mitk::Color& color, GroupIndexType groupID)
 {
   mitk::Label::Pointer newLabel = mitk::Label::New();
   newLabel->SetName(name);
@@ -681,7 +681,7 @@ mitk::Label* mitk::LabelSetImage::AddLabel(const std::string& name, const mitk::
   return AddLabel(newLabel,groupID,false);
 }
 
-void mitk::LabelSetImage::RenameLabel(LabelValueType pixelValue, const std::string& name, const mitk::Color& color)
+void mitk::MultiLabelSegmentation::RenameLabel(LabelValueType pixelValue, const std::string& name, const mitk::Color& color)
 {
   std::shared_lock<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
 
@@ -698,7 +698,7 @@ void mitk::LabelSetImage::RenameLabel(LabelValueType pixelValue, const std::stri
   DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 }
 
-mitk::Label *mitk::LabelSetImage::GetActiveLabel()
+mitk::Label *mitk::MultiLabelSegmentation::GetActiveLabel()
 {
   if (m_ActiveLabelValue == UNLABELED_VALUE) return nullptr;
 
@@ -706,7 +706,7 @@ mitk::Label *mitk::LabelSetImage::GetActiveLabel()
   return finding == m_LabelMap.end() ? nullptr : finding->second;
 }
 
-const mitk::Label* mitk::LabelSetImage::GetActiveLabel() const
+const mitk::Label* mitk::MultiLabelSegmentation::GetActiveLabel() const
 {
   if (m_ActiveLabelValue == UNLABELED_VALUE) return nullptr;
 
@@ -714,7 +714,7 @@ const mitk::Label* mitk::LabelSetImage::GetActiveLabel() const
   return finding == m_LabelMap.end() ? nullptr : finding->second;
 }
 
-void mitk::LabelSetImage::UpdateCenterOfMass(PixelType pixelValue)
+void mitk::MultiLabelSegmentation::UpdateCenterOfMass(PixelType pixelValue)
 {
   if (4 == this->GetDimension())
   {
@@ -726,7 +726,7 @@ void mitk::LabelSetImage::UpdateCenterOfMass(PixelType pixelValue)
   }
 }
 
-bool mitk::LabelSetImage::IsEmpty(PixelType pixelValue, TimeStepType t) const
+void mitk::MultiLabelSegmentation::SetLookupTable(mitk::LookupTable* lut)
 {
   Image::ConstPointer image = this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue));
   image = SelectImageByTimeStep(image, t);
@@ -748,7 +748,7 @@ bool mitk::LabelSetImage::IsEmpty(PixelType pixelValue, TimeStepType t) const
   return true;
 }
 
-bool mitk::LabelSetImage::IsEmpty(const Label* label, TimeStepType t) const
+bool mitk::MultiLabelSegmentation::IsEmpty(const Label* label, TimeStepType t) const
 {
   if (label == nullptr)
     mitkThrow() << "Cannot check if label is empty. Label is null.";
@@ -756,13 +756,13 @@ bool mitk::LabelSetImage::IsEmpty(const Label* label, TimeStepType t) const
   return this->IsEmpty(label->GetValue(), t);
 }
 
-void mitk::LabelSetImage::SetLookupTable(mitk::LookupTable* lut)
+void mitk::MultiLabelSegmentation::SetLookupTable(mitk::LookupTable* lut)
 {
   m_LookupTable = lut;
   this->Modified();
 }
 
-void mitk::LabelSetImage::UpdateLookupTable(PixelType pixelValue)
+void mitk::MultiLabelSegmentation::UpdateLookupTable(PixelType pixelValue)
 {
   auto label = this->GetLabel(pixelValue);
   if (label.IsNull()) mitkThrow() << "Cannot update lookup table. Unknown label value provided. Unknown label value:" << pixelValue;
@@ -781,18 +781,18 @@ void mitk::LabelSetImage::UpdateLookupTable(PixelType pixelValue)
   m_LookupTable->SetTableValue(static_cast<int>(pixelValue), rgba);
 }
 
-unsigned int mitk::LabelSetImage::GetNumberOfLabels(unsigned int layer) const
+unsigned int mitk::MultiLabelSegmentation::GetNumberOfLabels(unsigned int layer) const
 {
   if (layer >= m_Groups.size()) mitkThrow() << "Cannot get number of labels in group. Group is unknown. Invalid index:" << layer;
   return m_GroupToLabelMap[layer].size();
 }
 
-unsigned int mitk::LabelSetImage::GetTotalNumberOfLabels() const
+unsigned int mitk::MultiLabelSegmentation::GetTotalNumberOfLabels() const
 {
   return m_LabelMap.size();
 }
 
-void mitk::LabelSetImage::MaskStamp(mitk::Image *mask, bool forceOverwrite)
+void mitk::MultiLabelSegmentation::MaskStamp(mitk::Image *mask, bool forceOverwrite)
 {
   try
   {
@@ -819,7 +819,7 @@ void mitk::LabelSetImage::MaskStamp(mitk::Image *mask, bool forceOverwrite)
   }
 }
 
-void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
+void mitk::MultiLabelSegmentation::InitializeByLabeledImage(mitk::Image::Pointer image)
 {
   if (image.IsNull() || image->IsEmpty() || !image->IsInitialized())
     mitkThrow() << "Invalid labeled image.";
@@ -828,7 +828,7 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
   {
     this->Initialize(image);
 
-    unsigned int byteSize = sizeof(LabelSetImage::PixelType);
+    unsigned int byteSize = sizeof(MultiLabelSegmentation::PixelType);
     for (unsigned int dim = 0; dim < image->GetDimension(); ++dim)
     {
       byteSize *= image->GetDimension(dim);
@@ -865,11 +865,11 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
   this->Modified();
 }
 
-template <typename LabelSetImageType, typename ImageType>
-void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType *labelSetImage, ImageType *image)
+template <typename MultiLabelSegmentationType, typename ImageType>
+void mitk::MultiLabelSegmentation::InitializeByLabeledImageProcessing(MultiLabelSegmentationType *labelSetImage, ImageType *image)
 {
   typedef itk::ImageRegionConstIteratorWithIndex<ImageType> SourceIteratorType;
-  typedef itk::ImageRegionIterator<LabelSetImageType> TargetIteratorType;
+  typedef itk::ImageRegionIterator<MultiLabelSegmentationType> TargetIteratorType;
 
   TargetIteratorType targetIter(labelSetImage, labelSetImage->GetRequestedRegion());
   targetIter.GoToBegin();
@@ -889,7 +889,7 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType *
 
     targetIter.Set(sourceValue);
 
-    if (LabelSetImage::UNLABELED_VALUE!=sourceValue && !this->ExistLabel(sourceValue))
+    if (MultiLabelSegmentation::UNLABELED_VALUE!=sourceValue && !this->ExistLabel(sourceValue))
     {
       if (this->GetTotalNumberOfLabels() >= mitk::Label::MAX_LABEL_VALUE)
       {
@@ -922,7 +922,7 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType *
 }
 
 template <typename ImageType>
-void mitk::LabelSetImage::MaskStampProcessing(ImageType *itkImage, mitk::Image *mask, bool forceOverwrite)
+void mitk::MultiLabelSegmentation::MaskStampProcessing(ImageType *itkImage, mitk::Image *mask, bool forceOverwrite)
 {
   typename ImageType::Pointer itkMask;
   mitk::CastToItkImage(mask, itkMask);
@@ -956,7 +956,7 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType *itkImage, mitk::Image *
 }
 
 template <typename ImageType>
-void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType *itkImage, LabelValueType pixelValue)
+void mitk::MultiLabelSegmentation::CalculateCenterOfMassProcessing(ImageType *itkImage, LabelValueType pixelValue)
 {
   if (ImageType::GetImageDimension() != 3)
   {
@@ -983,7 +983,7 @@ void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType *itkImage, L
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::LabelSetImage::LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension> *target,
+void mitk::MultiLabelSegmentation::LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension> *target,
                                                           unsigned int layer)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
@@ -1008,7 +1008,7 @@ void mitk::LabelSetImage::LayerContainerToImageProcessing(itk::Image<TPixel, VIm
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::LabelSetImage::ImageToLayerContainerProcessing(const itk::Image<TPixel, VImageDimension> *source,
+void mitk::MultiLabelSegmentation::ImageToLayerContainerProcessing(const itk::Image<TPixel, VImageDimension> *source,
                                                           unsigned int layer) const
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
@@ -1036,7 +1036,7 @@ void mitk::LabelSetImage::ImageToLayerContainerProcessing(const itk::Image<TPixe
 }
 
 template <typename ImageType>
-void mitk::LabelSetImage::EraseLabelProcessing(ImageType *itkImage, PixelType pixelValue)
+void mitk::MultiLabelSegmentation::EraseLabelProcessing(ImageType *itkImage, PixelType pixelValue)
 {
   typedef itk::ImageRegionIterator<ImageType> IteratorType;
 
@@ -1056,7 +1056,7 @@ void mitk::LabelSetImage::EraseLabelProcessing(ImageType *itkImage, PixelType pi
 }
 
 template <typename ImageType>
-void mitk::LabelSetImage::MergeLabelProcessing(ImageType *itkImage, PixelType pixelValue, PixelType index)
+void mitk::MultiLabelSegmentation::MergeLabelProcessing(ImageType *itkImage, PixelType pixelValue, PixelType index)
 {
   typedef itk::ImageRegionIterator<ImageType> IteratorType;
 
@@ -1073,7 +1073,7 @@ void mitk::LabelSetImage::MergeLabelProcessing(ImageType *itkImage, PixelType pi
   }
 }
 
-void mitk::LabelSetImage::AddLabelToMap(LabelValueType labelValue, mitk::Label* label, GroupIndexType groupID)
+void mitk::MultiLabelSegmentation::AddLabelToMap(LabelValueType labelValue, mitk::Label* label, GroupIndexType groupID)
 {
   if (m_LabelMap.find(labelValue)!=m_LabelMap.end())
     mitkThrow() << "Segmentation is in an invalid state: Label value collision. A label was added with a LabelValue already in use. LabelValue: " << labelValue;
@@ -1090,39 +1090,39 @@ void mitk::LabelSetImage::AddLabelToMap(LabelValueType labelValue, mitk::Label* 
   }
 }
 
-void mitk::LabelSetImage::RegisterLabel(mitk::Label* label)
+void mitk::MultiLabelSegmentation::RegisterLabel(mitk::Label* label)
 {
   if (nullptr == label) mitkThrow() << "Invalid call of RegisterLabel with a nullptr.";
 
   UpdateLookupTable(label->GetValue());
   m_LookupTable->Modified();
 
-  auto command = itk::MemberCommand<LabelSetImage>::New();
-  command->SetCallbackFunction(this, &LabelSetImage::OnLabelModified);
+  auto command = itk::MemberCommand<MultiLabelSegmentation>::New();
+  command->SetCallbackFunction(this, &MultiLabelSegmentation::OnLabelModified);
   m_LabelModEventGuardMap.emplace(label->GetValue(), ITKEventObserverGuard(label, itk::ModifiedEvent(), command));
 }
 
-void mitk::LabelSetImage::ReleaseLabel(Label* label)
+void mitk::MultiLabelSegmentation::ReleaseLabel(Label* label)
 {
   if (nullptr == label) mitkThrow() << "Invalid call of ReleaseLabel with a nullptr.";
   m_LabelModEventGuardMap.erase(label->GetValue());
 }
 
-void mitk::LabelSetImage::ApplyToLabels(const LabelValueVectorType& values, std::function<void(Label*)>&& lambda)
+void mitk::MultiLabelSegmentation::ApplyToLabels(const LabelValueVectorType& values, std::function<void(Label*)>&& lambda)
 {
   auto labels = this->GetLabelsByValue(values);
   std::for_each(labels.begin(), labels.end(), lambda);
   this->InvokeEvent(LabelsChangedEvent(values));
 }
 
-void mitk::LabelSetImage::VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const
+void mitk::MultiLabelSegmentation::VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const
 {
   auto labels = this->GetConstLabelsByValue(values);
   std::for_each(labels.begin(), labels.end(), lambda);
 }
 
 
-void mitk::LabelSetImage::OnLabelModified(const Object* sender, const itk::EventObject&)
+void mitk::MultiLabelSegmentation::OnLabelModified(const Object* sender, const itk::EventObject&)
 {
   auto label = dynamic_cast<const Label*>(sender);
   if (nullptr == label)
@@ -1132,13 +1132,13 @@ void mitk::LabelSetImage::OnLabelModified(const Object* sender, const itk::Event
   this->InvokeEvent(LabelModifiedEvent(label->GetValue()));
 }
 
-bool mitk::LabelSetImage::ExistLabel(LabelValueType value) const
+bool mitk::MultiLabelSegmentation::ExistLabel(LabelValueType value) const
 {
   auto finding = m_LabelMap.find(value);
   return m_LabelMap.end() != finding;
 }
 
-bool mitk::LabelSetImage::ExistLabel(LabelValueType value, GroupIndexType groupIndex) const
+bool mitk::MultiLabelSegmentation::ExistLabel(LabelValueType value, GroupIndexType groupIndex) const
 {
   auto finding = m_LabelToGroupMap.find(value);
   if (m_LabelToGroupMap.end() != finding)
@@ -1148,12 +1148,12 @@ bool mitk::LabelSetImage::ExistLabel(LabelValueType value, GroupIndexType groupI
   return false;
 }
 
-bool mitk::LabelSetImage::ExistGroup(GroupIndexType index) const
+bool mitk::MultiLabelSegmentation::ExistGroup(GroupIndexType index) const
 {
   return index < m_LayerContainer.size();
 }
 
-mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::GetGroupIndexOfLabel(LabelValueType value) const
+mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::GetGroupIndexOfLabel(LabelValueType value) const
 {
   auto finding = m_LabelToGroupMap.find(value);
   if (m_LabelToGroupMap.end() == finding)
@@ -1164,7 +1164,7 @@ mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::GetGroupIndexOfLabel(La
 }
 
 
-mitk::Label::ConstPointer mitk::LabelSetImage::GetLabel(LabelValueType value) const
+mitk::Label::ConstPointer mitk::MultiLabelSegmentation::GetLabel(LabelValueType value) const
 {
   auto finding = m_LabelMap.find(value);
   if (m_LabelMap.end() != finding)
@@ -1174,7 +1174,7 @@ mitk::Label::ConstPointer mitk::LabelSetImage::GetLabel(LabelValueType value) co
   return nullptr;
 };
 
-mitk::Label::Pointer mitk::LabelSetImage::GetLabel(LabelValueType value)
+mitk::Label::Pointer mitk::MultiLabelSegmentation::GetLabel(LabelValueType value)
 {
   auto finding = m_LabelMap.find(value);
   if (m_LabelMap.end() != finding)
@@ -1184,7 +1184,7 @@ mitk::Label::Pointer mitk::LabelSetImage::GetLabel(LabelValueType value)
   return nullptr;
 };
 
-bool mitk::LabelSetImage::IsLabelLocked(LabelValueType value) const
+bool mitk::MultiLabelSegmentation::IsLabelLocked(LabelValueType value) const
 {
   if (value == UNLABELED_VALUE)
   {
@@ -1195,7 +1195,7 @@ bool mitk::LabelSetImage::IsLabelLocked(LabelValueType value) const
   return label->GetLocked();
 }
 
-const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabels() const
+const mitk::MultiLabelSegmentation::ConstLabelVectorType mitk::MultiLabelSegmentation::GetLabels() const
 {
   ConstLabelVectorType result;
   for (auto [value, label] : m_LabelMap)
@@ -1206,7 +1206,7 @@ const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabels()
   return result;
 }
 
-const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabels()
+const mitk::MultiLabelSegmentation::LabelVectorType mitk::MultiLabelSegmentation::GetLabels()
 {
   LabelVectorType result;
   for (auto [value, label] : m_LabelMap)
@@ -1217,7 +1217,7 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabels()
   return result;
 }
 
-const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing)
+const mitk::MultiLabelSegmentation::LabelVectorType mitk::MultiLabelSegmentation::GetLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing)
 {
   LabelVectorType result;
   for (const auto& labelValue : labelValues)
@@ -1233,7 +1233,7 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabelsByValue
   return result;
 }
 
-const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetConstLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing) const
+const mitk::MultiLabelSegmentation::ConstLabelVectorType mitk::MultiLabelSegmentation::GetConstLabelsByValue(const LabelValueVectorType& labelValues, bool ignoreMissing) const
 {
   ConstLabelVectorType result;
   for (const auto& labelValue : labelValues)
@@ -1249,7 +1249,7 @@ const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetConstLab
   return result;
 }
 
-const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelValuesByGroup(GroupIndexType index) const
+const mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::GetLabelValuesByGroup(GroupIndexType index) const
 {
   if (!this->ExistGroup(index))
     mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
@@ -1257,7 +1257,7 @@ const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelVal
   return m_GroupToLabelMap[index];
 }
 
-const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelValuesByName(GroupIndexType index, const std::string_view name) const
+const mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::GetLabelValuesByName(GroupIndexType index, const std::string_view name) const
 {
   LabelValueVectorType result;
 
@@ -1268,7 +1268,7 @@ const mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetLabelVal
   return result;
 }
 
-std::vector<std::string> mitk::LabelSetImage::GetLabelClassNames() const
+std::vector<std::string> mitk::MultiLabelSegmentation::GetLabelClassNames() const
 {
   std::set<std::string> names;
   auto searchName = [&names](const Label* l) { names.emplace(l->GetName()); };
@@ -1277,7 +1277,7 @@ std::vector<std::string> mitk::LabelSetImage::GetLabelClassNames() const
   return std::vector<std::string>(names.begin(), names.end());
 }
 
-std::vector<std::string> mitk::LabelSetImage::GetLabelClassNamesByGroup(GroupIndexType index) const
+std::vector<std::string> mitk::MultiLabelSegmentation::GetLabelClassNamesByGroup(GroupIndexType index) const
 {
   std::set<std::string> names;
   auto searchName = [&names](const Label* l) { names.emplace(l->GetName()); };
@@ -1286,7 +1286,7 @@ std::vector<std::string> mitk::LabelSetImage::GetLabelClassNamesByGroup(GroupInd
   return std::vector<std::string>(names.begin(), names.end());
 }
 
-void mitk::LabelSetImage::SetAllLabelsVisible(bool visible)
+void mitk::MultiLabelSegmentation::SetAllLabelsVisible(bool visible)
 {
   auto setVisibility = [visible,this](Label* l)
     {
@@ -1298,7 +1298,7 @@ void mitk::LabelSetImage::SetAllLabelsVisible(bool visible)
   this->m_LookupTable->Modified();
 }
 
-void mitk::LabelSetImage::SetAllLabelsVisibleByGroup(GroupIndexType group, bool visible)
+void mitk::MultiLabelSegmentation::SetAllLabelsVisibleByGroup(GroupIndexType group, bool visible)
 {
   auto setVisibility = [visible, this](Label* l)
     {
@@ -1310,7 +1310,7 @@ void mitk::LabelSetImage::SetAllLabelsVisibleByGroup(GroupIndexType group, bool 
   this->m_LookupTable->Modified();
 }
 
-void mitk::LabelSetImage::SetAllLabelsVisibleByName(GroupIndexType group, const std::string_view name, bool visible)
+void mitk::MultiLabelSegmentation::SetAllLabelsVisibleByName(GroupIndexType group, const std::string_view name, bool visible)
 {
   auto setVisibility = [visible, this](Label* l)
     {
@@ -1322,37 +1322,37 @@ void mitk::LabelSetImage::SetAllLabelsVisibleByName(GroupIndexType group, const 
   this->m_LookupTable->Modified();
 }
 
-void mitk::LabelSetImage::SetAllLabelsLocked(bool locked)
+void mitk::MultiLabelSegmentation::SetAllLabelsLocked(bool locked)
 {
   auto setLock = [locked](Label* l) { l->SetLocked(locked); };
 
   this->ApplyToLabels(this->GetAllLabelValues(), setLock);
 }
 
-void mitk::LabelSetImage::SetAllLabelsLockedByGroup(GroupIndexType group, bool locked)
+void mitk::MultiLabelSegmentation::SetAllLabelsLockedByGroup(GroupIndexType group, bool locked)
 {
   auto setLock = [locked](Label* l) { l->SetLocked(locked); };
 
   this->ApplyToLabels(this->GetLabelValuesByGroup(group), setLock);
 }
 
-void mitk::LabelSetImage::SetAllLabelsLockedByName(GroupIndexType group, const std::string_view name, bool locked)
+void mitk::MultiLabelSegmentation::SetAllLabelsLockedByName(GroupIndexType group, const std::string_view name, bool locked)
 {
   auto setLock = [locked](Label* l) { l->SetLocked(locked); };
 
   this->ApplyToLabels(this->GetLabelValuesByName(group, name), setLock);
 }
 
-bool mitk::Equal(const mitk::LabelSetImage &leftHandSide,
-                 const mitk::LabelSetImage &rightHandSide,
+bool mitk::Equal(const mitk::MultiLabelSegmentation &leftHandSide,
+                 const mitk::MultiLabelSegmentation &rightHandSide,
                  ScalarType eps,
                  bool verbose)
 {
   bool returnValue = true;
 
-  /* LabelSetImage members */
+  /* MultiLabelSegmentation members */
 
-  MITK_INFO(verbose) << "--- LabelSetImage Equal ---";
+  MITK_INFO(verbose) << "--- MultiLabelSegmentation Equal ---";
 
   // m_LookupTable;
   const mitk::LookupTable* lhsLUT = leftHandSide.GetLookupTable();
@@ -1452,8 +1452,8 @@ bool mitk::Equal(const mitk::LabelSetImage &leftHandSide,
   return returnValue;
 }
 
-bool mitk::Equal(const mitk::LabelSetImage::ConstLabelVectorType& leftHandSide,
-  const mitk::LabelSetImage::ConstLabelVectorType& rightHandSide, ScalarType eps, bool verbose)
+bool mitk::Equal(const mitk::MultiLabelSegmentation::ConstLabelVectorType& leftHandSide,
+  const mitk::MultiLabelSegmentation::ConstLabelVectorType& rightHandSide, ScalarType eps, bool verbose)
 {
   bool returnValue = true;
 
@@ -1503,7 +1503,7 @@ bool mitk::Equal(const mitk::LabelSetImage::LabelValueVectorType& leftHandSide,
 
 /**Helper function to convert a vector of labels into a label map
  * @pre every label in the vector has a unique value.*/
-using ConstLabelMapType = std::map<mitk::LabelSetImage::LabelValueType, mitk::Label::ConstPointer>;
+using ConstLabelMapType = std::map<mitk::MultiLabelSegmentation::LabelValueType, mitk::Label::ConstPointer>;
 ConstLabelMapType ConvertLabelVectorToMap(const mitk::ConstLabelVector& labelV)
 {
   ConstLabelMapType result;
@@ -1715,7 +1715,7 @@ void mitk::TransferLabelContentAtTimeStep(
   auto destLabelMap = ConvertLabelVectorToMap(destinationLabels);
   for (const auto& [sourceLabel, newDestinationLabel] : labelMapping)
   {
-    if (LabelSetImage::UNLABELED_VALUE!=newDestinationLabel && destLabelMap.end() == destLabelMap.find(newDestinationLabel))
+    if (MultiLabelSegmentation::UNLABELED_VALUE!=newDestinationLabel && destLabelMap.end() == destLabelMap.find(newDestinationLabel))
     {
       mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep. Defined destination label does not exist in destinationImage. newDestinationLabel: " << newDestinationLabel;
     }
@@ -1753,7 +1753,7 @@ void mitk::TransferLabelContent(
 }
 
 void mitk::TransferLabelContentAtTimeStep(
-  const LabelSetImage* sourceImage, LabelSetImage* destinationImage, const TimeStepType timeStep,
+  const MultiLabelSegmentation* sourceImage, MultiLabelSegmentation* destinationImage, const TimeStepType timeStep,
   LabelValueMappingVector labelMapping,
   MultiLabelSegmentation::MergeStyle mergeStyle, MultiLabelSegmentation::OverwriteStyle overwriteStlye)
 {
@@ -1766,18 +1766,18 @@ void mitk::TransferLabelContentAtTimeStep(
 
   for (const auto& mappingElement : labelMapping)
   {
-    if (LabelSetImage::UNLABELED_VALUE != mappingElement.first && !sourceImage->ExistLabel(mappingElement.first, sourceImage->GetActiveLayer()))
+    if (MultiLabelSegmentation::UNLABELED_VALUE != mappingElement.first && !sourceImage->ExistLabel(mappingElement.first, sourceImage->GetActiveLayer()))
     {
       mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep. Defined source label does not exist in sourceImage. SourceLabel: " << mappingElement.first;
     }
   }
 
-  TransferLabelContentAtTimeStep(sourceImage, destinationImage, destinationLabels, timeStep, LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, destinationImage->GetUnlabeledLabelLock(),
+  TransferLabelContentAtTimeStep(sourceImage, destinationImage, destinationLabels, timeStep, MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, destinationImage->GetUnlabeledLabelLock(),
     labelMapping, mergeStyle, overwriteStlye);
 }
 
 void mitk::TransferLabelContent(
-  const LabelSetImage* sourceImage, LabelSetImage* destinationImage,
+  const MultiLabelSegmentation* sourceImage, MultiLabelSegmentation* destinationImage,
   LabelValueMappingVector labelMapping,
   MultiLabelSegmentation::MergeStyle mergeStyle, MultiLabelSegmentation::OverwriteStyle overwriteStlye)
 {

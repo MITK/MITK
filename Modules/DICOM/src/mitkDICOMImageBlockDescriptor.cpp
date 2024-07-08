@@ -487,6 +487,11 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_GDCM()), StringProperty::New(gdcm::Version::GetVersion()));
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_DCMTK()), StringProperty::New(PACKAGE_VERSION));
 
+  if (m_SplitReason.IsNotNull() && m_SplitReason->ReasonExists())
+  {
+    mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()), StringProperty::New(DICOMSplitReason::SerializeToJSON(m_SplitReason)));
+  }
+
   // get all found additional tags of interest
 
   for (const auto &tag : m_FoundAdditionalTags)

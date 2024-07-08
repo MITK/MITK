@@ -287,6 +287,7 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
   AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_3D_plus_t(), image, result);
   AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_DCMTK(), image, result);
   AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_GDCM(), image, result);
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON(), image, result);
 
   ResetUserLocale();
 
@@ -485,6 +486,11 @@ mitk::TestDICOMLoading::CompareImageInformationDumps( const std::string& referen
         MITK_DEBUG << refKey << ": '" << gdcm::Version::GetVersion() << "' == '" << testValue << "' ? " << (thisTestResult ? "YES" : "NO");
       }
       else if (refKey == mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_FILES()))
+      {
+        bool thisTestResult = CompareJSON(refValue, testValue);
+        testResult &= thisTestResult;
+      }
+      else if (refKey == mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()))
       {
         bool thisTestResult = CompareJSON(refValue, testValue);
         testResult &= thisTestResult;

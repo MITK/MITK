@@ -23,6 +23,7 @@ found in the LICENSE file.
 mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor()
 : m_ReaderImplementationLevel( SOPClassUnknown )
 , m_PropertyList( PropertyList::New() )
+, m_SplitReason(DICOMSplitReason::New())
 , m_TagCache( nullptr )
 , m_PropertiesOutOfDate( true )
 {
@@ -40,6 +41,7 @@ mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor( const DICOMImageBloc
 , m_ReaderImplementationLevel( other.m_ReaderImplementationLevel )
 , m_TiltInformation( other.m_TiltInformation )
 , m_PropertyList( other.m_PropertyList->Clone() )
+, m_SplitReason( other.m_SplitReason->Clone() )
 , m_TagCache( other.m_TagCache )
 , m_PropertiesOutOfDate( other.m_PropertiesOutOfDate )
 , m_AdditionalTagMap(other.m_AdditionalTagMap)
@@ -70,6 +72,11 @@ mitk::DICOMImageBlockDescriptor& mitk::DICOMImageBlockDescriptor::
     if ( other.m_PropertyList )
     {
       m_PropertyList = other.m_PropertyList->Clone();
+    }
+
+    if (other.m_SplitReason)
+    {
+      m_SplitReason = other.m_SplitReason->Clone();
     }
 
     if ( other.m_MitkImage )
@@ -366,6 +373,21 @@ std::string mitk::DICOMImageBlockDescriptor::GetPropertyAsString( const std::str
   {
     return std::string( "" );
   }
+}
+
+const mitk::DICOMSplitReason* mitk::DICOMImageBlockDescriptor::GetSplitReason() const
+{
+  return m_SplitReason;
+}
+
+mitk::DICOMSplitReason* mitk::DICOMImageBlockDescriptor::GetSplitReason()
+{
+  return m_SplitReason;
+}
+
+void mitk::DICOMImageBlockDescriptor::SetSplitReason(DICOMSplitReason* reason)
+{
+  m_SplitReason = reason;
 }
 
 void mitk::DICOMImageBlockDescriptor::SetFlag( const std::string& key, bool value )

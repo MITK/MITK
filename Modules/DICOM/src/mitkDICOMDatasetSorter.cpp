@@ -68,6 +68,7 @@ mitk::DICOMDatasetSorter
 ::ClearOutputs()
 {
   m_Outputs.clear();
+  m_SplitReasons.clear();
 }
 
 void
@@ -75,20 +76,25 @@ mitk::DICOMDatasetSorter
 ::SetNumberOfOutputs(unsigned int numberOfOutputs)
 {
   m_Outputs.resize(numberOfOutputs);
+  m_SplitReasons.resize(numberOfOutputs);
 }
 
 void
 mitk::DICOMDatasetSorter
-::SetOutput(unsigned int index, const DICOMDatasetList& output)
+::SetOutput(unsigned int index, const DICOMDatasetList& output, const DICOMSplitReason* splitReason)
 {
   if (index < m_Outputs.size())
   {
     m_Outputs[index] = output;
+    if (nullptr == splitReason)
+      m_SplitReasons[index] = DICOMSplitReason::New();
+    else
+      m_SplitReasons[index] = splitReason->Clone();
   }
   else
   {
     std::stringstream ss;
-    ss << "Index " << index << " out of range (" << m_Outputs.size() << " indices reserved)";
+    ss << "Cannot get output. Index " << index << " out of range (" << m_Outputs.size() << " indices reserved)";
     throw std::invalid_argument( ss.str() );
   }
 }
@@ -111,7 +117,21 @@ mitk::DICOMDatasetSorter
   else
   {
     std::stringstream ss;
-    ss << "Index " << index << " out of range (" << m_Outputs.size() << " indices reserved)";
+    ss << "Cannot get output. Index " << index << " out of range (" << m_Outputs.size() << " indices reserved)";
     throw std::invalid_argument( ss.str() );
   }
+}
+
+const mitk::DICOMSplitReason*
+mitk::DICOMDatasetSorter
+::GetSplitReason(unsigned int index) const
+{
+  if (index >= m_Outputs.size())
+  {
+    std::stringstream ss;
+    ss << "Cannot get split reason. Index " << index << " out of range (" << m_Outputs.size() << " indices reserved)";
+    throw std::invalid_argument(ss.str());
+  }
+
+  return m_SplitReasons[index];
 }

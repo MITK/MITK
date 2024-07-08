@@ -288,7 +288,7 @@ class MITKDICOM_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     void InternalPrintConfiguration(std::ostream& os) const override;
 
     /// \brief Return active C locale
-  static std::string GetActiveLocale();
+    static std::string GetActiveLocale();
     /**
       \brief Remember current locale on stack, activate "C" locale.
       "C" locale is required for correct parsing of numbers by itk::ImageSeriesReader
@@ -310,7 +310,8 @@ class MITKDICOM_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other);
     DICOMITKSeriesGDCMReader& operator=(const DICOMITKSeriesGDCMReader& other);
 
-    typedef std::vector<DICOMDatasetAccessingImageFrameList> SortingBlockList;
+    using SortingBlockListItemType = std::pair<DICOMDatasetAccessingImageFrameList, DICOMSplitReason::Pointer>;
+    using SortingBlockList = std::vector<SortingBlockListItemType> ;
     /**
       \brief "Hook" for sub-classes, see \ref DICOMITKSeriesGDCMReader_Condensing
       \return REMAINING blocks
@@ -321,7 +322,7 @@ class MITKDICOM_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     void SetTagCache( const DICOMTagCache::Pointer& ) override;
 
     /// \brief Sorting step as described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy
-  static SortingBlockList InternalExecuteSortingStep(
+    static SortingBlockList InternalExecuteSortingStep(
         unsigned int sortingStepIndex,
         const DICOMDatasetSorter::Pointer& sorter,
         const SortingBlockList& input);
@@ -332,7 +333,7 @@ class MITKDICOM_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     virtual bool LoadMitkImageForImageBlockDescriptor(DICOMImageBlockDescriptor& block) const;
 
     /// \brief Describe this reader's confidence for given SOP class UID
-  static ReaderImplementationLevel GetReaderImplementationLevel(const std::string sopClassUID);
+    static ReaderImplementationLevel GetReaderImplementationLevel(const std::string sopClassUID);
   private:
 
     /// \brief Creates the required sorting steps described in \ref DICOMITKSeriesGDCMReader_ForcedConfiguration

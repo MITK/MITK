@@ -254,7 +254,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
   }
 
   m_SortingResultInProgress.clear();
-  m_SortingResultInProgress.push_back(m_TagCache->GetFrameInfoList());
+  m_SortingResultInProgress.push_back(std::make_pair(m_TagCache->GetFrameInfoList(), DICOMSplitReason::New()));
 
   // sort and split blocks as configured
 
@@ -294,7 +294,9 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
   for ( auto blockIter = m_SortingResultInProgress.cbegin(); blockIter != m_SortingResultInProgress.cend();
         ++o, ++blockIter )
   {
-    const DICOMDatasetAccessingImageFrameList& gdcmFrameInfoList = *blockIter;
+    const auto& gdcmFrameInfoList = blockIter->first;
+    auto& splitReason = blockIter->second;
+
     assert( !gdcmFrameInfoList.empty() );
 
     // reverse frames if necessary
@@ -318,6 +320,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
     block.SetTagLookupTableToPropertyFunctor( GetTagLookupTableToPropertyFunctor() );
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
+    block.SetSplitReason(splitReason);
 
     block.SetReaderImplementationLevel( this->GetReaderImplementationLevel( block.GetSOPClassUID() ) );
 
@@ -356,7 +359,8 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
 #endif
     ++blockIter )
   {
-    const DICOMDatasetAccessingImageFrameList& gdcmInfoFrameList = *blockIter;
+    const auto& gdcmInfoFrameList = blockIter->first;
+    const auto& inputSplitReason = blockIter->second;
     const DICOMDatasetList datasetList               = ConvertToDICOMDatasetList( gdcmInfoFrameList );
 
 #if defined( MBILOG_ENABLE_DEBUG )
@@ -383,7 +387,8 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
       }
 
       DICOMDatasetAccessingImageFrameList sortedGdcmInfoFrameList = ConvertToDICOMDatasetAccessingImageFrameList( blockResult );
-      nextStepSorting.push_back( sortedGdcmInfoFrameList );
+
+      nextStepSorting.push_back( std::make_pair(sortedGdcmInfoFrameList, inputSplitReason->ExtendReason(sorter->GetSplitReason(b))) );
     }
   }
 

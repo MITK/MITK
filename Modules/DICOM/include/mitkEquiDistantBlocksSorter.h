@@ -47,6 +47,12 @@ namespace mitk
  To support a legacy behavior of a former loader (DicomSeriesReader), this default can
  be restricted to a constant number of millimeters by calling SetToleratedOriginOffset(mm).
 
+ REMARK: The EquiDistantBlocksSorter assumes that the order of the provided input
+ is sorted by image position like it is preferred by the reader and does not sort
+ it again. This assumption can lead to splittings even for complete volumes if
+ the input is not sorted by image position can (Reason: gaps will be detected
+ because the next slice will not have the assumed distance and will be sorted out.)
+
  Detailed implementation in AnalyzeFileForITKImageSeriesReaderSpacingAssumption().
 
 */
@@ -115,7 +121,7 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
         /**
           \brief Grouping result, all same origin-to-origin distance w/o gaps.
          */
-        DICOMDatasetList GetBlockDatasets();
+        const DICOMDatasetList& GetBlockDatasets() const;
 
         void SetFirstFilenameOfBlock(const std::string& filename);
         std::string GetFirstFilenameOfBlock() const;
@@ -125,7 +131,10 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
         /**
           \brief Remaining files, which could not be grouped.
          */
-        DICOMDatasetList GetUnsortedDatasets();
+        const DICOMDatasetList& GetUnsortedDatasets() const;
+
+        const DICOMSplitReason* GetSplitReason() const;
+        DICOMSplitReason* GetSplitReason();
 
         /**
           \brief Whether or not the grouped result contain a gantry tilt.
@@ -164,6 +173,8 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
         DICOMDatasetList m_GroupedFiles;
         DICOMDatasetList m_UnsortedFiles;
 
+        DICOMSplitReason::Pointer m_SplitReason;
+
         GantryTiltInformation m_TiltInfo;
         std::string m_FirstFilenameOfBlock;
         std::string m_LastFilenameOfBlock;
@@ -180,7 +191,7 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
       Relevant code that is matched here is in
       itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
      */
-    SliceGroupingAnalysisResult
+    std::shared_ptr<SliceGroupingAnalysisResult>
     AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const DICOMDatasetList& files, bool groupsOfSimilarImages);
 
     /**
@@ -197,7 +208,7 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 
     bool m_AcceptTilt;
 
-    typedef std::vector<SliceGroupingAnalysisResult> ResultsList;
+    typedef std::vector<std::shared_ptr<SliceGroupingAnalysisResult> > ResultsList;
     ResultsList m_SliceGroupingResults;
 
     double m_ToleratedOriginOffset;

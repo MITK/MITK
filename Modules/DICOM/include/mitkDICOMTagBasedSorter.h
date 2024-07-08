@@ -169,20 +169,24 @@ class MITKDICOM_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
     */
     std::string BuildGroupID( DICOMDatasetAccess* dataset );
 
-    typedef std::map<std::string, DICOMDatasetList> GroupIDToListType;
+    using GroupIDToListType = std::map<std::string, DICOMDatasetList>;
+
+    using SplitReasonListType = std::map<std::string, DICOMSplitReason::Pointer>;
 
     /**
       \brief Implements the "distiguishing tags".
       To sort datasets into different groups, a long string will be built for each dataset. The string concatenates all tags and their respective values.
       Datasets that match in all values will end up with the same string.
+      @param splitReasons Reference to the split reasons vector. It will be also updated by the method to reflect the reasons for the returned groups.
     */
-    GroupIDToListType SplitInputGroups();
+    GroupIDToListType SplitInputGroups(SplitReasonListType& splitReasons);
 
     /**
       \brief Implements the sorting step.
       Relatively simple implementation thanks to std::sort and a parameterization via DICOMSortCriterion.
+      @param splitReasons Reference to the split reasons vector. It will be also updated by the method to reflect the reasons for the returned groups.
     */
-    GroupIDToListType& SortGroups(GroupIDToListType& groups);
+    GroupIDToListType& SortGroups(GroupIDToListType& groups, SplitReasonListType& splitReasons);
 
     DICOMTagList m_DistinguishingTags;
     typedef std::map<const DICOMTag, TagValueProcessor*>  TagValueProcessorMap;

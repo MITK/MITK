@@ -32,10 +32,10 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file:", "Input File",us::Any(),false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("reader", "r", mitkCommandLineParser::String, "Reader Name", "Reader Name", us::Any());
-  parser.addArgument("list-readers", "lr", mitkCommandLineParser::Bool, "Reader Name", "Reader Name", us::Any());
+  parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file:", "Input path that should be loaded.",us::Any(),false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output path where the result should be stored. If the input generates multiple outputs the index will be added for all but the first output (before the extension; starting with 0).", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("reader", "r", mitkCommandLineParser::String, "Reader Name", "Can be set to enforce a certain reader to be used for loading the input.", us::Any());
+  parser.addArgument("list-readers", "lr", mitkCommandLineParser::Bool, "Reader Name", "If set the call will print all available reader names.", us::Any());
 
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

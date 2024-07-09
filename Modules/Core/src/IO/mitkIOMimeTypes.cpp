@@ -38,6 +38,7 @@ namespace mitk
     this->SetComment("DICOM");
   }
 
+
   bool IOMimeTypes::BaseDicomMimeType::AppliesTo(const std::string &path) const
   {
     // check whether directory or file
@@ -46,37 +47,51 @@ namespace mitk
 
     std::string filepath = path;
 
+    itk::GDCMImageIO::Pointer gdcmIO = itk::GDCMImageIO::New();
+
     if (pathIsDirectory)
     {
       itksys::Directory input;
       input.Load(path.c_str());
 
-      std::vector<std::string> files;
+      bool dcmFound = false;
       for (unsigned long idx = 0; idx<input.GetNumberOfFiles(); idx++)
       {
         auto filename = Utf8Util::Local8BitToUtf8(input.GetFile(idx));
 
-        if (!itksys::SystemTools::FileIsDirectory(filename) && this->MatchesExtension(filename))
+        std::string fullpath = path + "/" + filename;
+
+        if (!itksys::SystemTools::FileIsDirectory(fullpath))
         {
-          std::string fullpath = path + "/" + std::string(input.GetFile(idx));
-          files.push_back(fullpath.c_str());
+
+          gdcmIO->SetFileName(fullpath);
+          try
+          {
+            gdcmIO->ReadImageInformation();
+            dcmFound = true;
+            filepath = fullpath;
+            break;
+          }
+          catch (const itk::ExceptionObject& /*err*/)
+          {
+          }
         }
       }
-      if (!files.empty())
-      {
-        filepath = files.front();
+      if (!dcmFound) return false;
+    }
+    else
+    {
+      // Ask the GDCM ImageIO class directly
+      gdcmIO->SetFileName(filepath);
+      try {
+        gdcmIO->ReadImageInformation();
+      }
+      catch (const itk::ExceptionObject& /*err*/) {
+        return false;
       }
     }
 
-    // Ask the GDCM ImageIO class directly
-    itk::GDCMImageIO::Pointer gdcmIO = itk::GDCMImageIO::New();
-    gdcmIO->SetFileName(filepath);
-    try {
-      gdcmIO->ReadImageInformation();
-    }
-    catch (const itk::ExceptionObject & /*err*/) {
-      return false;
-    }
+    //If we reached that point, there is at least one file (stored under filepath) that is a DICOM
 
     //DICOMRT modalities have specific reader, don't read with normal DICOM readers
     std::string modality;

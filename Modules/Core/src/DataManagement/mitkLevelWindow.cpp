@@ -311,7 +311,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
       if (minValue == maxValue)
       {
         // Same result, also look at data at other time steps if present...
-        auto numTimeSteps = image->GetDimension(3);
+        auto numTimeSteps = image->GetTimeGeometry()->CountTimeSteps();
 
         if (numTimeSteps > 1)
         {

@@ -75,7 +75,7 @@ std::string mitk::DICOMSplitReason::TypeToString(const DICOMSplitReason::ReasonT
   case DICOMSplitReason::ReasonType::GantryTiltDifference:
     return "gantry_tilt_difference";
   case DICOMSplitReason::ReasonType::ImagePostionMissing:
-    return "gantry_tilt_difference";
+    return "image_position_missing";
   case DICOMSplitReason::ReasonType::OverlappingSlices:
     return "overlapping_slices";
   case DICOMSplitReason::ReasonType::SliceDistanceInconsistency:
@@ -84,6 +84,8 @@ std::string mitk::DICOMSplitReason::TypeToString(const DICOMSplitReason::ReasonT
     return "value_sort_distance";
   case DICOMSplitReason::ReasonType::ValueSplitDifference:
     return "value_split_difference";
+  case DICOMSplitReason::ReasonType::MissingSlices:
+    return "missing_slices";
   }
   return "unknown";
 }

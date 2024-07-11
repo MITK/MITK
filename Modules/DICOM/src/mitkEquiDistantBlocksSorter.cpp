@@ -396,7 +396,9 @@ mitk::EquiDistantBlocksSorter
         DICOMDatasetList remainingFiles;
         remainingFiles.insert( remainingFiles.end(), dsIter+1, datasets.end() );
         result->AddFilesToUnsortedBlock( remainingFiles );
-        result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::ImagePostionMissing);
+        if (!remainingFiles.empty())
+          //if there are remaining files add a split reason
+          result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::ImagePostionMissing);
         fileFitsIntoPattern = false;
         break; // no files anymore
       }
@@ -532,13 +534,25 @@ mitk::EquiDistantBlocksSorter
             missingSlicesCount = currentMissCount;
           }
 
-          result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::SliceDistanceInconsistency, "missing slices: " + std::to_string(missingSlicesCount));
+          result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::SliceDistanceInconsistency, std::to_string(fromLastToThisOriginDistance));
+
+          if (missingSlicesCount==0)
+            result->GetSplitReason()->RemoveReason(DICOMSplitReason::ReasonType::MissingSlices);
+          else if (missingSlicesCount < 0)
+            result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::OverlappingSlices);
+          else if (!result->GetSplitReason()->ReasonExists(DICOMSplitReason::ReasonType::OverlappingSlices))
+            //If the missing slice count is positive, but no overlapping was flagged, add the missing slice reason.
+            //We only do it if overlapping was not flagged, to avoid false positives, that could be triggered by slices
+            //of the overlapping volume.
+            result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::MissingSlices, std::to_string(missingSlicesCount));
+
           fileFitsIntoPattern = false;
         }
         else
         {
           result->AddFileToSortedBlock( *dsIter ); // this file is good for current block
           result->GetSplitReason()->RemoveReason(DICOMSplitReason::ReasonType::SliceDistanceInconsistency);
+          result->GetSplitReason()->RemoveReason(DICOMSplitReason::ReasonType::MissingSlices);
           fileFitsIntoPattern = true;
           missingSlicesCount = 0;
         }

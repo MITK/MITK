@@ -36,8 +36,14 @@ namespace mitk
       ImagePostionMissing = 4, //*< split because image position tag was missing in one of the compared files
       OverlappingSlices = 8,  //*< split because at least two input files are overlapping in world coordinate space
       GantryTiltDifference = 16, //*< split because the gantry tilts of at least two input files were different
-      SliceDistanceInconsistency = 32 //*< split because the distance between slices were inconsistent.
-                                        // This can either be evoked by volumes with heterogeneous z spacing or by missing slices.
+      SliceDistanceInconsistency = 32, //*< split because the distance between slices were inconsistent.
+                                       // This can either be evoked by volumes with heterogeneous z spacing or by missing slices.
+                                       // Details for this reason will contain the detected slice distance inconsistency
+      MissingSlices = 33 //*< Indicates that is a split was done due to missing slices. (It is a sub class of SliceDistanceInconsistency
+                         // as all SliceDistanceInconsistency with a positive distance inconsistency greater then one times the slice
+                         // thickness are deemed also missing slices as split reason. This sub class was introduced to make it easier
+                         // for parsing applications to react on this important split reason.
+                         // Details for this reason will contain the assumed/detected number of missing slices
     };
 
     void AddReason(ReasonType type, std::string_view detail = "");

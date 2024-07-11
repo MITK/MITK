@@ -1,5 +1,6 @@
 MITK_CREATE_MODULE_TESTS()
-
+###############################################################
+# Test group 1
 # verify minimum expectations:
 #   files are recognized as DICOM
 #   loading files results in a given number of images
@@ -9,10 +10,19 @@ mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_MRImage mitkDICOMTestingSanit
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_SCImage mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-sc.dcm)
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_NoImagePositionPatient mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-sc-no2032.dcm)
 
+###############################################################
+# Test group 2
 # verifies that the loader can also be used to just scan for tags and provide them in mitk::Properties (parameter preLoadedVolume)
 mitkAddCustomModuleTest(mitkDICOMPreloadedVolumeTest_Slice mitkDICOMPreloadedVolumeTest ${MITK_DATA_DIR}/spacing-ok-ct.dcm)
 
+###############################################################
+# Test group 3
+# verifies that the construction of the volumes (splitting, sorting, etc. of slices are done as expected) for different configurations
 set(VERIFY_DUMP_CMD  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/VerifyDICOMMitkImageDump)
+
+# Alternative definition of VERIFY_DUMP_CMD
+# Comment in to use the DumpDICOMMitkImage app to use the tests to produce new reference dumps
+#set(VERIFY_DUMP_CMD  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DumpDICOMMitkImage)
 
 set(CT_ABDOMEN_DIR ${MITK_DATA_DIR}/TinyCTAbdomen_DICOMReader)
 set(MR_HEART_DIR ${MITK_DATA_DIR}/3D+t-Heart)
@@ -26,7 +36,7 @@ set(TESTS_DIR Tests)
 set(INPUT_LISTNAME input)
 set(EXPECTED_DUMP expected.dump)
 
-function(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LISTNAME EXPECTED_DUMP)
+function(AddDicomTestsFromDataRepository CURRENT_DATASET_NAME CURRENT_DATASET_DIR TESTS_DIR INPUT_LISTNAME EXPECTED_DUMP)
 
   # find all test input lists
   file(GLOB_RECURSE allInputs ${CURRENT_DATASET_DIR}/${TESTS_DIR}/*/${INPUT_LISTNAME})
@@ -43,7 +53,7 @@ function(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LIS
     string(REGEX REPLACE ".*${TESTS_DIR}/([^/]+)/.*" "\\1" input ${input})
     set(inputfilelist "${CURRENT_DATASET_DIR}/${TESTS_DIR}/${input}/${INPUT_LISTNAME}")
     set(expecteddump "${CURRENT_DATASET_DIR}/${TESTS_DIR}/${input}/${EXPECTED_DUMP}")
-    set(test_name "DICOM_Load_${input}")
+    set(test_name "DICOM_Load_${CURRENT_DATASET_NAME}_${input}")
 
     #message(STATUS "DICOM loading test case '${input}'")
     expectFileExists(${inputfilelist})
@@ -75,13 +85,15 @@ function(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LIS
 endfunction(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LISTNAME EXPECTED_DUMP)
 
 
-AddDicomTestsFromDataRepository(${CT_ABDOMEN_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
-AddDicomTestsFromDataRepository(${CT_TILT_HEAD_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
-AddDicomTestsFromDataRepository(${CT_TILT_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
-AddDicomTestsFromDataRepository(${MR_HEART_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
+AddDicomTestsFromDataRepository(TinyCTAbdomen_DICOMReader ${CT_ABDOMEN_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
+AddDicomTestsFromDataRepository(TiltHead ${CT_TILT_HEAD_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
+AddDicomTestsFromDataRepository(TiltedData ${CT_TILT_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
+AddDicomTestsFromDataRepository(3D+t-Heart ${MR_HEART_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
 
-AddDicomTestsFromDataRepository(${SOP_CLASSES_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
+AddDicomTestsFromDataRepository(DICOMReader ${SOP_CLASSES_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
 
+###############################################################
+# Test group 4
 # use one more realistic series for testing property lists
 file(GLOB_RECURSE abdomenImages ${CT_ABDOMEN_DIR}/14?) # this is just one small volume
 mitkAddCustomModuleTest(mitkDICOMPreloadedVolumeTest_Abdomen mitkDICOMPreloadedVolumeTest ${abdomenImages})

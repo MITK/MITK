@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "mitkLevelWindowProperty.h"
 #include "mitkPropertyKeyPath.h"
 #include "mitkDICOMIOMetaInformationPropertyConstants.h"
+#include "mitkIOMetaInformationPropertyConstants.h"
 #include <gdcmUIDs.h>
 #include <vector>
 #include <gdcmVersion.h>

@@ -165,6 +165,9 @@ mitk::ThreeDnTDICOMSeriesReader
       { // matching block
         ++current3DnTBlockNumberOfTimeSteps;
         current3DnTBlock.insert( current3DnTBlock.end(), otherBlock.begin(), otherBlock.end() ); // append
+        //also merge split reasons
+        currentSplitReason = currentSplitReason->ExtendReason(otherBlockIter->second);
+
         // remove this block from remainingBlocks
         otherBlockIter = remainingBlocks.erase(otherBlockIter); // make sure iterator otherBlockIter is valid afterwards
       }

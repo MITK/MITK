@@ -171,7 +171,7 @@ class MITKDICOM_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
 
     using GroupIDToListType = std::map<std::string, DICOMDatasetList>;
 
-    using SplitReasonListType = std::map<std::string, DICOMSplitReason::Pointer>;
+    using SplitReasonListType = std::map<std::string, IOVolumeSplitReason::Pointer>;
 
     /**
       \brief Implements the "distiguishing tags".

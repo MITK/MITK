@@ -65,9 +65,4 @@ namespace mitk
     return PropertyKeyPath({ "MITK", "IO", "reader", "DICOM", "configuration" });
   }
 
-  PropertyKeyPath DICOMIOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()
-  {
-    return PropertyKeyPath({ "MITK", "IO", "reader", "VolumeSplitReason" });
-  }
-
 }

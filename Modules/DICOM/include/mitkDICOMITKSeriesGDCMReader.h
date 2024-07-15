@@ -310,7 +310,7 @@ class MITKDICOM_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other);
     DICOMITKSeriesGDCMReader& operator=(const DICOMITKSeriesGDCMReader& other);
 
-    using SortingBlockListItemType = std::pair<DICOMDatasetAccessingImageFrameList, DICOMSplitReason::Pointer>;
+    using SortingBlockListItemType = std::pair<DICOMDatasetAccessingImageFrameList, IOVolumeSplitReason::Pointer>;
     using SortingBlockList = std::vector<SortingBlockListItemType> ;
     /**
       \brief "Hook" for sub-classes, see \ref DICOMITKSeriesGDCMReader_Condensing

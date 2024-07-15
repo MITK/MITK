@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
             outputInfo["frames_per_timesteps"] = output.GetNumberOfFramesPerTimeStep();
             if (output.GetSplitReason()!=nullptr && output.GetSplitReason()->ReasonExists())
             {
-              outputInfo["volume_split_reason"] = mitk::DICOMSplitReason::SerializeToJSON(output.GetSplitReason());
+              outputInfo["volume_split_reason"] = mitk::IOVolumeSplitReason::SerializeToJSON(output.GetSplitReason());
             }
             outputInfos.push_back(outputInfo);
           }

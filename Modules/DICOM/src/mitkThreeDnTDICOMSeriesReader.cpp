@@ -223,7 +223,7 @@ mitk::ThreeDnTDICOMSeriesReader
     {
       //if we have condensed everything into just on 3DnT block, we can remove the overlap reason,
       //because no real overlap is existent any more.
-      block.GetSplitReason()->RemoveReason(DICOMSplitReason::ReasonType::OverlappingSlices);
+      block.GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
     }
 
     block.SetFlag("3D+t", true);

@@ -45,8 +45,6 @@ namespace mitk
     static PropertyKeyPath READER_GDCM();
     //Path to the property containing the version of DCMTK used to read the data
     static PropertyKeyPath READER_DCMTK();
-    //Path to the property containing split reason information for the read volume
-    static PropertyKeyPath VOLUME_SPLIT_REASON();
   };
 }
 

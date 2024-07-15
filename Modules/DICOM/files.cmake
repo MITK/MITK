@@ -15,7 +15,6 @@ set(CPP_FILES
   mitkDICOMIOHelper.cpp
   mitkDICOMGenericImageFrameInfo.cpp
   mitkDICOMDatasetAccessingImageFrameInfo.cpp
-  mitkDICOMSplitReason.cpp
   mitkDICOMSortCriterion.cpp
   mitkDICOMSortByTag.cpp
   mitkITKDICOMSeriesReaderHelper.cpp

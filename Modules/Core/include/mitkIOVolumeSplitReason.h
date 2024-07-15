@@ -10,23 +10,23 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkDICOMSplitReason_h
-#define mitkDICOMSplitReason_h
+#ifndef mitkIOVolumeSplitReason_h
+#define mitkIOVolumeSplitReason_h
 
 #include "itkLightObject.h"
 #include "mitkCommon.h"
 
-#include "MitkDICOMExports.h"
+#include "MitkCoreExports.h"
 
 namespace mitk
 {
 
-  class MITKDICOM_EXPORT DICOMSplitReason : public itk::LightObject
+  class MITKCORE_EXPORT IOVolumeSplitReason : public itk::LightObject
   {
   public:
-    mitkClassMacroItkParent(DICOMSplitReason, itk::LightObject);
-    itkFactorylessNewMacro(DICOMSplitReason);
-    itkCloneMacro(DICOMSplitReason);
+    mitkClassMacroItkParent(IOVolumeSplitReason, itk::LightObject);
+    itkFactorylessNewMacro(IOVolumeSplitReason);
+    itkCloneMacro(IOVolumeSplitReason);
 
     enum class ReasonType
     {
@@ -55,18 +55,18 @@ namespace mitk
 
     Pointer ExtendReason(const Self* otherReason) const;
 
-    static std::string SerializeToJSON(const DICOMSplitReason*);
-    static std::string TypeToString(const DICOMSplitReason::ReasonType& reasonType);
+    static std::string SerializeToJSON(const IOVolumeSplitReason*);
+    static std::string TypeToString(const IOVolumeSplitReason::ReasonType& reasonType);
 
   protected:
-    mitkCloneMacro(DICOMSplitReason);
+    mitkCloneMacro(IOVolumeSplitReason);
 
-    DICOMSplitReason();
-    ~DICOMSplitReason() override;
-    DICOMSplitReason(const DICOMSplitReason& other);
+    IOVolumeSplitReason();
+    ~IOVolumeSplitReason() override;
+    IOVolumeSplitReason(const IOVolumeSplitReason& other);
 
   private:
-    DICOMSplitReason& operator=(const DICOMSplitReason& other);
+    IOVolumeSplitReason& operator=(const IOVolumeSplitReason& other);
 
     using ReasonMapType = std::map<ReasonType, std::string>;
     ReasonMapType m_ReasonMap;

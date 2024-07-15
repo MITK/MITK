@@ -254,7 +254,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
   }
 
   m_SortingResultInProgress.clear();
-  m_SortingResultInProgress.push_back(std::make_pair(m_TagCache->GetFrameInfoList(), DICOMSplitReason::New()));
+  m_SortingResultInProgress.push_back(std::make_pair(m_TagCache->GetFrameInfoList(), IOVolumeSplitReason::New()));
 
   // sort and split blocks as configured
 

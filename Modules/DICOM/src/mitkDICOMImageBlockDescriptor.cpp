@@ -23,7 +23,7 @@ found in the LICENSE file.
 mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor()
 : m_ReaderImplementationLevel( SOPClassUnknown )
 , m_PropertyList( PropertyList::New() )
-, m_SplitReason(DICOMSplitReason::New())
+, m_SplitReason(IOVolumeSplitReason::New())
 , m_TagCache( nullptr )
 , m_PropertiesOutOfDate( true )
 {
@@ -375,17 +375,17 @@ std::string mitk::DICOMImageBlockDescriptor::GetPropertyAsString( const std::str
   }
 }
 
-const mitk::DICOMSplitReason* mitk::DICOMImageBlockDescriptor::GetSplitReason() const
+const mitk::IOVolumeSplitReason* mitk::DICOMImageBlockDescriptor::GetSplitReason() const
 {
   return m_SplitReason;
 }
 
-mitk::DICOMSplitReason* mitk::DICOMImageBlockDescriptor::GetSplitReason()
+mitk::IOVolumeSplitReason* mitk::DICOMImageBlockDescriptor::GetSplitReason()
 {
   return m_SplitReason;
 }
 
-void mitk::DICOMImageBlockDescriptor::SetSplitReason(DICOMSplitReason* reason)
+void mitk::DICOMImageBlockDescriptor::SetSplitReason(IOVolumeSplitReason* reason)
 {
   m_SplitReason = reason;
 }
@@ -489,7 +489,7 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
 
   if (m_SplitReason.IsNotNull() && m_SplitReason->ReasonExists())
   {
-    mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()), StringProperty::New(DICOMSplitReason::SerializeToJSON(m_SplitReason)));
+    mitkImage->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()), StringProperty::New(IOVolumeSplitReason::SerializeToJSON(m_SplitReason)));
   }
 
   // get all found additional tags of interest

@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include "mitkDICOMImageFrameInfo.h"
 #include "mitkDICOMTag.h"
 #include "mitkDICOMTagCache.h"
-#include "mitkDICOMSplitReason.h"
+#include "mitkIOVolumeSplitReason.h"
 
 #include "mitkImage.h"
 #include "mitkProperties.h"
@@ -111,11 +111,11 @@ namespace mitk
     std::string GetPropertyAsString(const std::string&) const;
 
     /** Returns the pointer to the split reason of this block descriptor.*/
-    const DICOMSplitReason* GetSplitReason() const;
+    const IOVolumeSplitReason* GetSplitReason() const;
     /** Returns the pointer to the split reason of this block descriptor.*/
-    DICOMSplitReason* GetSplitReason();
+    IOVolumeSplitReason* GetSplitReason();
     /** Sets the split reason for the block descriptor.*/
-    void SetSplitReason(DICOMSplitReason* reason);
+    void SetSplitReason(IOVolumeSplitReason* reason);
 
     /// Convenience function around SetProperty()
     void SetFlag(const std::string& key, bool value);
@@ -230,7 +230,7 @@ namespace mitk
 
     PropertyList::Pointer m_PropertyList;
 
-    DICOMSplitReason::Pointer m_SplitReason;
+    IOVolumeSplitReason::Pointer m_SplitReason;
 
     WeakPointer<DICOMTagCache> m_TagCache;
 

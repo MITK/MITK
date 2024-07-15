@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "mitkEquiDistantBlocksSorter.h"
 
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
-::SliceGroupingAnalysisResult() : m_SplitReason(DICOMSplitReason::New())
+::SliceGroupingAnalysisResult() : m_SplitReason(IOVolumeSplitReason::New())
 {
 }
 
@@ -33,13 +33,13 @@ mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
   return m_UnsortedFiles;
 }
 
-const mitk::DICOMSplitReason*
+const mitk::IOVolumeSplitReason*
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult::GetSplitReason() const
 {
   return m_SplitReason;
 }
 
-mitk::DICOMSplitReason*
+mitk::IOVolumeSplitReason*
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult::GetSplitReason()
 {
   return m_SplitReason;
@@ -274,10 +274,10 @@ mitk::EquiDistantBlocksSorter
 
     remainingInput = regularBlock->GetUnsortedDatasets();
 
-    if (remainingInput.empty() && !m_SliceGroupingResults.empty() && m_SliceGroupingResults.back()->GetSplitReason()->ReasonExists(DICOMSplitReason::ReasonType::OverlappingSlices))
+    if (remainingInput.empty() && !m_SliceGroupingResults.empty() && m_SliceGroupingResults.back()->GetSplitReason()->ReasonExists(IOVolumeSplitReason::ReasonType::OverlappingSlices))
     {
       //if all inputs are processed and there is already a preceding grouping result that has overlapping as split reason, add also overlapping as split reason for the current block
-      regularBlock->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::OverlappingSlices);
+      regularBlock->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
     }
 
     m_SliceGroupingResults.push_back( regularBlock );
@@ -398,7 +398,7 @@ mitk::EquiDistantBlocksSorter
         result->AddFilesToUnsortedBlock( remainingFiles );
         if (!remainingFiles.empty())
           //if there are remaining files add a split reason
-          result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::ImagePostionMissing);
+          result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::ImagePostionMissing);
         fileFitsIntoPattern = false;
         break; // no files anymore
       }
@@ -424,7 +424,7 @@ mitk::EquiDistantBlocksSorter
     {
       MITK_DEBUG << "    ==> Sort away " << *dsIter << " for separate time step"; // we already have one occupying this position
       result->AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
-      result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::OverlappingSlices);
+      result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
       fileFitsIntoPattern = false;
     }
     else
@@ -488,7 +488,7 @@ mitk::EquiDistantBlocksSorter
           else // caller does not want tilt compensation OR shearing is more complicated than tilt
           {
             result->AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
-            result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::GantryTiltDifference);
+            result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::GantryTiltDifference);
             fileFitsIntoPattern = false;
           }
         }
@@ -534,25 +534,25 @@ mitk::EquiDistantBlocksSorter
             missingSlicesCount = currentMissCount;
           }
 
-          result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::SliceDistanceInconsistency, std::to_string(fromLastToThisOriginDistance));
+          result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::SliceDistanceInconsistency, std::to_string(fromLastToThisOriginDistance));
 
           if (missingSlicesCount==0)
-            result->GetSplitReason()->RemoveReason(DICOMSplitReason::ReasonType::MissingSlices);
+            result->GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::MissingSlices);
           else if (missingSlicesCount < 0)
-            result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::OverlappingSlices);
-          else if (!result->GetSplitReason()->ReasonExists(DICOMSplitReason::ReasonType::OverlappingSlices))
+            result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
+          else if (!result->GetSplitReason()->ReasonExists(IOVolumeSplitReason::ReasonType::OverlappingSlices))
             //If the missing slice count is positive, but no overlapping was flagged, add the missing slice reason.
             //We only do it if overlapping was not flagged, to avoid false positives, that could be triggered by slices
             //of the overlapping volume.
-            result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::MissingSlices, std::to_string(missingSlicesCount));
+            result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::MissingSlices, std::to_string(missingSlicesCount));
 
           fileFitsIntoPattern = false;
         }
         else
         {
           result->AddFileToSortedBlock( *dsIter ); // this file is good for current block
-          result->GetSplitReason()->RemoveReason(DICOMSplitReason::ReasonType::SliceDistanceInconsistency);
-          result->GetSplitReason()->RemoveReason(DICOMSplitReason::ReasonType::MissingSlices);
+          result->GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::SliceDistanceInconsistency);
+          result->GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::MissingSlices);
           fileFitsIntoPattern = true;
           missingSlicesCount = 0;
         }
@@ -585,7 +585,7 @@ mitk::EquiDistantBlocksSorter
     if ( result->GetBlockDatasets().size() == 2 && !m_AcceptTwoSlicesGroups )
     {
       result->UndoPrematureGrouping();
-      result->GetSplitReason()->AddReason(DICOMSplitReason::ReasonType::GantryTiltDifference);
+      result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::GantryTiltDifference);
     }
   }
 

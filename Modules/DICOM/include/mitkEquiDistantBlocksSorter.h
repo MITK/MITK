@@ -133,8 +133,8 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
          */
         const DICOMDatasetList& GetUnsortedDatasets() const;
 
-        const DICOMSplitReason* GetSplitReason() const;
-        DICOMSplitReason* GetSplitReason();
+        const IOVolumeSplitReason* GetSplitReason() const;
+        IOVolumeSplitReason* GetSplitReason();
 
         /**
           \brief Whether or not the grouped result contain a gantry tilt.
@@ -173,7 +173,7 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
         DICOMDatasetList m_GroupedFiles;
         DICOMDatasetList m_UnsortedFiles;
 
-        DICOMSplitReason::Pointer m_SplitReason;
+        IOVolumeSplitReason::Pointer m_SplitReason;
 
         GantryTiltInformation m_TiltInfo;
         std::string m_FirstFilenameOfBlock;

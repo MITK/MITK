@@ -84,7 +84,6 @@ namespace mitk {
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_IMPLEMENTATION_LEVEL_STRING());
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION());
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION_STRING());
-    AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON());
 
     //We have to handle ManualSelectingDICOMSeriesReader different then the other
     //readers. Reason: The reader uses DICOMFileReaderSelector in its constructor.

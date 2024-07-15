@@ -81,13 +81,13 @@ mitk::DICOMDatasetSorter
 
 void
 mitk::DICOMDatasetSorter
-::SetOutput(unsigned int index, const DICOMDatasetList& output, const DICOMSplitReason* splitReason)
+::SetOutput(unsigned int index, const DICOMDatasetList& output, const IOVolumeSplitReason* splitReason)
 {
   if (index < m_Outputs.size())
   {
     m_Outputs[index] = output;
     if (nullptr == splitReason)
-      m_SplitReasons[index] = DICOMSplitReason::New();
+      m_SplitReasons[index] = IOVolumeSplitReason::New();
     else
       m_SplitReasons[index] = splitReason->Clone();
   }
@@ -122,7 +122,7 @@ mitk::DICOMDatasetSorter
   }
 }
 
-const mitk::DICOMSplitReason*
+const mitk::IOVolumeSplitReason*
 mitk::DICOMDatasetSorter
 ::GetSplitReason(unsigned int index) const
 {

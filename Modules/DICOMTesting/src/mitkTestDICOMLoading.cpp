@@ -13,6 +13,7 @@ found in the LICENSE file.
 
 #include "mitkTestDICOMLoading.h"
 #include "mitkDICOMIOMetaInformationPropertyConstants.h"
+#include "mitkIOMetaInformationPropertyConstants.h"
 #include "mitkDICOMProperty.h"
 #include "mitkArbitraryTimeGeometry.h"
 
@@ -287,7 +288,7 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
   AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_3D_plus_t(), image, result);
   AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_DCMTK(), image, result);
   AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_GDCM(), image, result);
-  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON(), image, result);
+  AddPropertyToDump(mitk::IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON(), image, result);
 
   ResetUserLocale();
 
@@ -490,7 +491,7 @@ mitk::TestDICOMLoading::CompareImageInformationDumps( const std::string& referen
         bool thisTestResult = CompareJSON(refValue, testValue);
         testResult &= thisTestResult;
       }
-      else if (refKey == mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()))
+      else if (refKey == mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()))
       {
         bool thisTestResult = CompareJSON(refValue, testValue);
         testResult &= thisTestResult;

@@ -10,31 +10,31 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMSplitReason.h"
+#include "mitkIOVolumeSplitReason.h"
 
 #include <nlohmann/json.hpp>
 
-void mitk::DICOMSplitReason::AddReason(ReasonType type, std::string_view detail)
+void mitk::IOVolumeSplitReason::AddReason(ReasonType type, std::string_view detail)
 {
   m_ReasonMap.insert(std::make_pair(type, detail));
 }
 
-void mitk::DICOMSplitReason::RemoveReason(ReasonType type)
+void mitk::IOVolumeSplitReason::RemoveReason(ReasonType type)
 {
   m_ReasonMap.erase(type);
 }
 
-bool mitk::DICOMSplitReason::ReasonExists() const
+bool mitk::IOVolumeSplitReason::ReasonExists() const
 {
   return !m_ReasonMap.empty();
 }
 
-bool mitk::DICOMSplitReason::ReasonExists(ReasonType type) const
+bool mitk::IOVolumeSplitReason::ReasonExists(ReasonType type) const
 {
   return m_ReasonMap.cend() != m_ReasonMap.find(type);
 }
 
-std::string mitk::DICOMSplitReason::GetReasonDetails(ReasonType type) const
+std::string mitk::IOVolumeSplitReason::GetReasonDetails(ReasonType type) const
 {
   auto finding = m_ReasonMap.find(type);
   if (m_ReasonMap.cend() == finding)
@@ -43,7 +43,7 @@ std::string mitk::DICOMSplitReason::GetReasonDetails(ReasonType type) const
   return finding->second;
 };
 
-mitk::DICOMSplitReason::Pointer mitk::DICOMSplitReason::ExtendReason(const Self* otherReason) const
+mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::ExtendReason(const Self* otherReason) const
 {
   if (nullptr == otherReason)
     mitkThrow() << "Cannot extend reason. Pass other reason is in valid.";
@@ -55,42 +55,42 @@ mitk::DICOMSplitReason::Pointer mitk::DICOMSplitReason::ExtendReason(const Self*
   return result;
 }
 
-mitk::DICOMSplitReason::DICOMSplitReason(): itk::LightObject()
+mitk::IOVolumeSplitReason::IOVolumeSplitReason(): itk::LightObject()
 {
 }
 
-mitk::DICOMSplitReason::~DICOMSplitReason()
+mitk::IOVolumeSplitReason::~IOVolumeSplitReason()
 {
 }
 
-mitk::DICOMSplitReason::DICOMSplitReason(const DICOMSplitReason& other)
+mitk::IOVolumeSplitReason::IOVolumeSplitReason(const IOVolumeSplitReason& other)
 {
   m_ReasonMap = other.m_ReasonMap;
 }
 
-std::string mitk::DICOMSplitReason::TypeToString(const DICOMSplitReason::ReasonType& reasonType)
+std::string mitk::IOVolumeSplitReason::TypeToString(const IOVolumeSplitReason::ReasonType& reasonType)
 {
   switch (reasonType)
   {
-  case DICOMSplitReason::ReasonType::GantryTiltDifference:
+  case IOVolumeSplitReason::ReasonType::GantryTiltDifference:
     return "gantry_tilt_difference";
-  case DICOMSplitReason::ReasonType::ImagePostionMissing:
+  case IOVolumeSplitReason::ReasonType::ImagePostionMissing:
     return "image_position_missing";
-  case DICOMSplitReason::ReasonType::OverlappingSlices:
+  case IOVolumeSplitReason::ReasonType::OverlappingSlices:
     return "overlapping_slices";
-  case DICOMSplitReason::ReasonType::SliceDistanceInconsistency:
+  case IOVolumeSplitReason::ReasonType::SliceDistanceInconsistency:
     return "slice_distance_inconsistency";
-  case DICOMSplitReason::ReasonType::ValueSortDistance:
+  case IOVolumeSplitReason::ReasonType::ValueSortDistance:
     return "value_sort_distance";
-  case DICOMSplitReason::ReasonType::ValueSplitDifference:
+  case IOVolumeSplitReason::ReasonType::ValueSplitDifference:
     return "value_split_difference";
-  case DICOMSplitReason::ReasonType::MissingSlices:
+  case IOVolumeSplitReason::ReasonType::MissingSlices:
     return "missing_slices";
   }
   return "unknown";
 }
 
-std::string mitk::DICOMSplitReason::SerializeToJSON(const DICOMSplitReason* reason)
+std::string mitk::IOVolumeSplitReason::SerializeToJSON(const IOVolumeSplitReason* reason)
 {
   if (nullptr == reason)
     mitkThrow() << "Cannot extend reason. Pass other reason is in valid.";

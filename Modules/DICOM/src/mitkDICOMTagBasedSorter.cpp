@@ -374,14 +374,14 @@ mitk::DICOMTagBasedSorter
   if (listForGroupID.size() == 1)
   {
     //no split -> no reason
-    splitReasons[listForGroupID.begin()->first] = DICOMSplitReason::New();
+    splitReasons[listForGroupID.begin()->first] = IOVolumeSplitReason::New();
   }
   else
   {
     for (auto& [key, value] : listForGroupID)
     {
-      auto reason = DICOMSplitReason::New();
-      reason->AddReason(DICOMSplitReason::ReasonType::ValueSplitDifference);
+      auto reason = IOVolumeSplitReason::New();
+      reason->AddReason(IOVolumeSplitReason::ReasonType::ValueSplitDifference);
       splitReasons[key] = reason;
     }
   }
@@ -543,7 +543,7 @@ mitk::DICOMTagBasedSorter
           {
             auto dsReason = splitReasons[gIter->first]->Clone();
             if (splitted)
-              dsReason->AddReason(DICOMSplitReason::ReasonType::ValueSortDistance);
+              dsReason->AddReason(IOVolumeSplitReason::ReasonType::ValueSortDistance);
             consecutiveReasons[groupKeyStr] = dsReason;
           }
 

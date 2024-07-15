@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include "mitkCommon.h"
 
 #include "mitkDICOMDatasetAccess.h"
-#include "mitkDICOMSplitReason.h"
+#include "mitkIOVolumeSplitReason.h"
 
 namespace mitk
 {
@@ -64,7 +64,7 @@ class MITKDICOM_EXPORT DICOMDatasetSorter : public itk::LightObject
     /// \brief Output of the sorting process.
     DICOMDatasetList& GetOutput(unsigned int index);
 
-    const DICOMSplitReason* GetSplitReason(unsigned int index) const;
+    const IOVolumeSplitReason* GetSplitReason(unsigned int index) const;
 
     /// \brief Print configuration details into stream.
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const = 0;
@@ -81,13 +81,13 @@ class MITKDICOM_EXPORT DICOMDatasetSorter : public itk::LightObject
 
     void ClearOutputs();
     void SetNumberOfOutputs(unsigned int numberOfOutputs);
-    void SetOutput(unsigned int index, const DICOMDatasetList& output, const DICOMSplitReason* splitReason = nullptr);
+    void SetOutput(unsigned int index, const DICOMDatasetList& output, const IOVolumeSplitReason* splitReason = nullptr);
 
   private:
 
     DICOMDatasetList m_Input;
     std::vector< DICOMDatasetList > m_Outputs;
-    std::vector< DICOMSplitReason::Pointer > m_SplitReasons;
+    std::vector< IOVolumeSplitReason::Pointer > m_SplitReasons;
 };
 
 }

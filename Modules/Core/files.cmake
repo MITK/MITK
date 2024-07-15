@@ -248,6 +248,7 @@ set(CPP_FILES
   IO/mitkIOConstants.cpp
   IO/mitkIOMimeTypes.cpp
   IO/mitkIOUtil.cpp
+  IO/mitkIOVolumeSplitReason.cpp
   IO/mitkItkImageIO.cpp
   IO/mitkItkLoggingAdapter.cpp
   IO/mitkLegacyFileReaderService.cpp

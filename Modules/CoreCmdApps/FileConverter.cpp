@@ -18,7 +18,10 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 
 #include "mitkPreferenceListReaderOptionsFunctor.h"
+#include "mitkIOMetaInformationPropertyConstants.h"
+#include "mitkIOVolumeSplitReason.h"
 
+#include "mitkPropertyKeyPath.h"
 
 int main(int argc, char* argv[])
 {
@@ -101,6 +104,8 @@ int main(int argc, char* argv[])
   auto nodes = mitk::IOUtil::Load(inputFilename, &functor);
 
   unsigned count = 0;
+  int missingSlicesDetected = 0;
+
   for (auto node : nodes)
   {
     std::string writeName = path + filename + extension;
@@ -110,6 +115,37 @@ int main(int argc, char* argv[])
     }
     mitk::IOUtil::Save(node, writeName);
     ++count;
+
+    try
+    {
+      auto splitReasonProperty = node->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()).c_str());
+      if (splitReasonProperty.IsNotNull())
+      {
+        auto reasonStr = splitReasonProperty->GetValueAsString();
+        auto reason = mitk::IOVolumeSplitReason::DeserializeFromJSON(reasonStr);
+        if (reason.IsNotNull() && reason->ReasonExists(mitk::IOVolumeSplitReason::ReasonType::MissingSlices))
+        {
+          missingSlicesDetected += std::stoi(reason->GetReasonDetails(mitk::IOVolumeSplitReason::ReasonType::MissingSlices));
+        }
+      }
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << "Error while checking for existing split reasons in volume #" << count << "." << std::endl;
+      std::cerr << "Error details:" << e.what() << std::endl;
+    }
+    catch (...)
+    {
+      std::cerr << "Unknown error while checking for existing split reasons in volume #" << count << "." << std::endl;
+    }
+  }
+
+  if (missingSlicesDetected>0)
+  {
+    std::cout << std::endl;
+    std::cout << "!!! WARNING MISSING SLICES !!!" << std::endl;
+    std::cout << "Details: Reader indicated volume splitting due to missing slices. Converted data might be invalid/incomplete." << std::endl;
+    std::cout << "Estimated number of missing slices: " << missingSlicesDetected << std::endl;
   }
 
   return EXIT_SUCCESS;

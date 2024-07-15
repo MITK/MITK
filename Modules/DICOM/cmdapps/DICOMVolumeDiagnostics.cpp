@@ -57,6 +57,8 @@ int main(int argc, char* argv[])
 
   try
   {
+    int missingSlicesDetected = 0;
+
     auto inputFilename = us::any_cast<std::string>(args["input"]);
     auto outputFilename = args.count("output")==0 ? std::string() : us::any_cast<std::string>(args["output"]);
     bool onlyOwnSeries = args.count("only-own-series");
@@ -164,6 +166,23 @@ int main(int argc, char* argv[])
             if (output.GetSplitReason()!=nullptr && output.GetSplitReason()->ReasonExists())
             {
               outputInfo["volume_split_reason"] = mitk::IOVolumeSplitReason::SerializeToJSON(output.GetSplitReason());
+
+              try
+              {
+                if (output.GetSplitReason()->ReasonExists(mitk::IOVolumeSplitReason::ReasonType::MissingSlices))
+                {
+                  missingSlicesDetected += std::stoi(output.GetSplitReason()->GetReasonDetails(mitk::IOVolumeSplitReason::ReasonType::MissingSlices));
+                }
+              }
+              catch (const std::exception& e)
+              {
+                std::cerr << "Error while checking for missing slices split reasons in volume #" << relevantOutputCount << "." << std::endl;
+                std::cerr << "Error details:" << e.what() << std::endl;
+              }
+              catch (...)
+              {
+                std::cerr << "Unknown error while checking for missing slices split reasons in volume #" << relevantOutputCount << "." << std::endl;
+              }
             }
             outputInfos.push_back(outputInfo);
           }
@@ -174,6 +193,14 @@ int main(int argc, char* argv[])
     }
     std::cout << "\n### DIAGNOSTICS REPORT ###\n" << std::endl;
     std::cout << std::setw(2) << diagnosticsResult << std::endl;
+
+    if (missingSlicesDetected > 0)
+    {
+      std::cout << std::endl;
+      std::cout << "!!! WARNING MISSING SLICES !!!" << std::endl;
+      std::cout << "Details: Reader indicated volume splitting due to missing slices. Converted data might be invalid/incomplete." << std::endl;
+      std::cout << "Estimated number of missing slices: " << missingSlicesDetected << std::endl;
+    }
 
     if (!outputFilename.empty())
     {

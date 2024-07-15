@@ -883,7 +883,7 @@ void ModelFitInspectorView::RenderPlot()
   }
 
   // Draw current pos curve
-  this->RenderPlotCurve(m_PlotCurves.currentPositionPlots, QColor(Qt::red), QColor(Qt::black), "");
+  this->RenderPlotCurve(m_PlotCurves.currentPositionPlots, QColor(Qt::red), QColor(Qt::gray), "");
 
   QwtLegend* legend = new QwtLegend();
   legend->setFrameShape(QFrame::Box);

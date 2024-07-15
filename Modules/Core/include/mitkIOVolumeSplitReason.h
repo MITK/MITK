@@ -56,7 +56,10 @@ namespace mitk
     Pointer ExtendReason(const Self* otherReason) const;
 
     static std::string SerializeToJSON(const IOVolumeSplitReason*);
+    static Pointer DeserializeFromJSON(const std::string& reasonStr);
+
     static std::string TypeToString(const IOVolumeSplitReason::ReasonType& reasonType);
+    static IOVolumeSplitReason::ReasonType StringToType(const std::string& reasonStr);
 
   protected:
     mitkCloneMacro(IOVolumeSplitReason);

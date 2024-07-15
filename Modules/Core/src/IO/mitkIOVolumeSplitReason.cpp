@@ -90,6 +90,26 @@ std::string mitk::IOVolumeSplitReason::TypeToString(const IOVolumeSplitReason::R
   return "unknown";
 }
 
+mitk::IOVolumeSplitReason::ReasonType mitk::IOVolumeSplitReason::StringToType(const std::string& reasonStr)
+{
+  if (reasonStr == "gantry_tilt_difference")
+    return IOVolumeSplitReason::ReasonType::GantryTiltDifference;
+  else if (reasonStr == "image_position_missing")
+    return IOVolumeSplitReason::ReasonType::ImagePostionMissing;
+  else if (reasonStr == "overlapping_slices")
+    return IOVolumeSplitReason::ReasonType::OverlappingSlices;
+  else if (reasonStr == "slice_distance_inconsistency")
+    return IOVolumeSplitReason::ReasonType::SliceDistanceInconsistency;
+  else if (reasonStr == "value_sort_distance")
+    return IOVolumeSplitReason::ReasonType::ValueSortDistance;
+  else if (reasonStr == "value_split_difference")
+    return IOVolumeSplitReason::ReasonType::ValueSplitDifference;
+  else if (reasonStr == "missing_slices")
+    return IOVolumeSplitReason::ReasonType::MissingSlices;
+
+  return IOVolumeSplitReason::ReasonType::Unkown;
+}
+
 std::string mitk::IOVolumeSplitReason::SerializeToJSON(const IOVolumeSplitReason* reason)
 {
   if (nullptr == reason)
@@ -102,9 +122,39 @@ std::string mitk::IOVolumeSplitReason::SerializeToJSON(const IOVolumeSplitReason
     auto details = nlohmann::json::array();
 
     details.push_back(TypeToString(type));
-    details.push_back(detail);
+    if (!detail.empty())
+    {
+      details.push_back(detail);
+    }
     data.push_back(details);
   }
 
   return data.dump();
+}
+
+mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::DeserializeFromJSON(const std::string& reasonStr)
+{
+  if (reasonStr.empty())
+    return nullptr;
+
+  auto reason = IOVolumeSplitReason::New();
+
+  auto data = nlohmann::json::parse(reasonStr);
+
+  for (const auto& jItem : data)
+  {
+    if (!jItem.empty())
+    {
+      ReasonType reasonType = StringToType(jItem.at(0).get<std::string>());
+
+      std::string detail;
+      if (jItem.size() > 1)
+      {
+        detail = jItem.at(1).get<std::string>();
+      }
+      reason->AddReason(reasonType, detail);
+    }
+  }
+
+  return reason;
 }

@@ -181,12 +181,12 @@ mitk::ThreeDnTDICOMSeriesReader
     // ... and we either call it 3D o 3D+t
     if (current3DnTBlockNumberOfTimeSteps > 1)
     {
-      true3DnTBlocks.push_back(std::make_pair(current3DnTBlock,currentSplitReason));
+      true3DnTBlocks.emplace_back(current3DnTBlock,currentSplitReason);
       true3DnTBlocksTimeStepCount.push_back(current3DnTBlockNumberOfTimeSteps);
     }
     else
     {
-      non3DnTBlocks.push_back(std::make_pair(current3DnTBlock, currentSplitReason));
+      non3DnTBlocks.emplace_back(current3DnTBlock, currentSplitReason);
     }
   }
 

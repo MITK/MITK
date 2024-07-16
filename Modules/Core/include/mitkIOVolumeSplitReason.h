@@ -30,35 +30,41 @@ namespace mitk
 
     enum class ReasonType
     {
-      Unkown = 0,
-      ValueSplitDifference = 2, //*< split due to different values in splitting relevant dicom tags
-      ValueSortDistance = 3, //*< split due value distance of sort criterion to large for relevant dicom tag(s)
-      ImagePostionMissing = 4, //*< split because image position tag was missing in one of the compared files
-      OverlappingSlices = 8,  //*< split because at least two input files are overlapping in world coordinate space
-      GantryTiltDifference = 16, //*< split because the gantry tilts of at least two input files were different
-      SliceDistanceInconsistency = 32, //*< split because the distance between slices were inconsistent.
-                                       // This can either be evoked by volumes with heterogeneous z spacing or by missing slices.
-                                       // Details for this reason will contain the detected slice distance inconsistency
-      MissingSlices = 33 //*< Indicates that is a split was done due to missing slices. (It is a sub class of SliceDistanceInconsistency
-                         // as all SliceDistanceInconsistency with a positive distance inconsistency greater then one times the slice
-                         // thickness are deemed also missing slices as split reason. This sub class was introduced to make it easier
-                         // for parsing applications to react on this important split reason.
-                         // Details for this reason will contain the assumed/detected number of missing slices
+      Unknown = 0,
+      ValueSplitDifference, //*< split due to different values in splitting relevant dicom tags
+      ValueSortDistance, //*< split due value distance of sort criterion too large for relevant dicom tag(s)
+      ImagePostionMissing, //*< split because image position tag was missing in one of the compared files
+      OverlappingSlices,  //*< split because at least two input files are overlapping in world coordinate space
+      GantryTiltDifference, //*< split because the gantry tilts of at least two input files were different
+      SliceDistanceInconsistency, //*< split because the distance between slices were inconsistent.
+                                  // This can either be evoked by volumes with heterogeneous z spacing or by missing slices.
+                                  // Details for this reason will contain the detected slice distance inconsistency
+      MissingSlices //*< Indicates that is a split was done due to missing slices. (It is a sub class of SliceDistanceInconsistency
+                    // as all SliceDistanceInconsistency with a positive distance inconsistency greater then one times the slice
+                    // thickness are deemed also missing slices as split reason. This sub class was introduced to make it easier
+                    // for parsing applications to react on this important split reason.
+                    // Details for this reason will contain the assumed/detected number of missing slices
     };
 
-    void AddReason(ReasonType type, std::string_view detail = "");
+    void AddReason(ReasonType type, const std::string& detail = "");
     void RemoveReason(ReasonType type);
 
-    bool ReasonExists() const;
-    bool ReasonExists(ReasonType type) const;
+    bool HasReasons() const;
+    bool HasReason(ReasonType type) const;
     std::string GetReasonDetails(ReasonType type) const;
 
+    /** This methods generates a clone of this instances and extends the clone by the reason types and details
+      provided by another IOVolumeSplitReason instance.
+      @remark If the other instance contains a reason type that is already existing it will be ignored.
+      Therefor only new types and details will be added to the extension.
+      @pre otherReason must point to a valid instance.
+      @return Pointer to the cloned and extended instance.*/
     Pointer ExtendReason(const Self* otherReason) const;
 
-    static std::string SerializeToJSON(const IOVolumeSplitReason*);
-    static Pointer DeserializeFromJSON(const std::string& reasonStr);
+    static std::string ToJSON(const IOVolumeSplitReason*);
+    static Pointer FromJSON(const std::string& reasonStr);
 
-    static std::string TypeToString(const IOVolumeSplitReason::ReasonType& reasonType);
+    static std::string TypeToString(ReasonType reasonType);
     static IOVolumeSplitReason::ReasonType StringToType(const std::string& reasonStr);
 
   protected:
@@ -67,9 +73,7 @@ namespace mitk
     IOVolumeSplitReason();
     ~IOVolumeSplitReason() override;
     IOVolumeSplitReason(const IOVolumeSplitReason& other);
-
-  private:
-    IOVolumeSplitReason& operator=(const IOVolumeSplitReason& other);
+    IOVolumeSplitReason& operator=(const IOVolumeSplitReason& other) = delete;
 
     using ReasonMapType = std::map<ReasonType, std::string>;
     ReasonMapType m_ReasonMap;

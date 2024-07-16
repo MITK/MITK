@@ -163,13 +163,13 @@ int main(int argc, char* argv[])
             outputInfo["files"] = outputFiles;
             outputInfo["timesteps"] = output.GetNumberOfTimeSteps();
             outputInfo["frames_per_timesteps"] = output.GetNumberOfFramesPerTimeStep();
-            if (output.GetSplitReason()!=nullptr && output.GetSplitReason()->ReasonExists())
+            if (output.GetSplitReason()!=nullptr && output.GetSplitReason()->HasReasons())
             {
-              outputInfo["volume_split_reason"] = mitk::IOVolumeSplitReason::SerializeToJSON(output.GetSplitReason());
+              outputInfo["volume_split_reason"] = mitk::IOVolumeSplitReason::ToJSON(output.GetSplitReason());
 
               try
               {
-                if (output.GetSplitReason()->ReasonExists(mitk::IOVolumeSplitReason::ReasonType::MissingSlices))
+                if (output.GetSplitReason()->HasReason(mitk::IOVolumeSplitReason::ReasonType::MissingSlices))
                 {
                   missingSlicesDetected += std::stoi(output.GetSplitReason()->GetReasonDetails(mitk::IOVolumeSplitReason::ReasonType::MissingSlices));
                 }
@@ -197,9 +197,9 @@ int main(int argc, char* argv[])
     if (missingSlicesDetected > 0)
     {
       std::cout << std::endl;
-      std::cout << "!!! WARNING MISSING SLICES !!!" << std::endl;
-      std::cout << "Details: Reader indicated volume splitting due to missing slices. Converted data might be invalid/incomplete." << std::endl;
-      std::cout << "Estimated number of missing slices: " << missingSlicesDetected << std::endl;
+      std::cout << "\n!!! WARNING: MISSING SLICES !!!\n"
+        "Details: Reader indicated volume splitting due to missing slices. Converted data might be invalid/incomplete.\n"
+        "Estimated number of missing slices: " << missingSlicesDetected << std::endl;
     }
 
     if (!outputFilename.empty())

@@ -86,10 +86,7 @@ mitk::DICOMDatasetSorter
   if (index < m_Outputs.size())
   {
     m_Outputs[index] = output;
-    if (nullptr == splitReason)
-      m_SplitReasons[index] = IOVolumeSplitReason::New();
-    else
-      m_SplitReasons[index] = splitReason->Clone();
+    m_SplitReasons[index] = (nullptr == splitReason) ? IOVolumeSplitReason::New() : splitReason->Clone();
   }
   else
   {

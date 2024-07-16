@@ -37,8 +37,8 @@ int main(int argc, char* argv[])
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file:", "Input path that should be loaded.",us::Any(),false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output path where the result should be stored. If the input generates multiple outputs the index will be added for all but the first output (before the extension; starting with 0).", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("reader", "r", mitkCommandLineParser::String, "Reader Name", "Can be set to enforce a certain reader to be used for loading the input.", us::Any());
-  parser.addArgument("list-readers", "lr", mitkCommandLineParser::Bool, "Reader Name", "If set the call will print all available reader names.", us::Any());
+  parser.addArgument("reader", "r", mitkCommandLineParser::String, "Reader Name", "Enforce a certain reader to be used for loading the input.", us::Any());
+  parser.addArgument("list-readers", "lr", mitkCommandLineParser::Bool, "List reader names", "Print names of all available readers.", us::Any());
 
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -122,8 +122,8 @@ int main(int argc, char* argv[])
       if (splitReasonProperty.IsNotNull())
       {
         auto reasonStr = splitReasonProperty->GetValueAsString();
-        auto reason = mitk::IOVolumeSplitReason::DeserializeFromJSON(reasonStr);
-        if (reason.IsNotNull() && reason->ReasonExists(mitk::IOVolumeSplitReason::ReasonType::MissingSlices))
+        auto reason = mitk::IOVolumeSplitReason::FromJSON(reasonStr);
+        if (reason.IsNotNull() && reason->HasReason(mitk::IOVolumeSplitReason::ReasonType::MissingSlices))
         {
           missingSlicesDetected += std::stoi(reason->GetReasonDetails(mitk::IOVolumeSplitReason::ReasonType::MissingSlices));
         }
@@ -140,12 +140,12 @@ int main(int argc, char* argv[])
     }
   }
 
-  if (missingSlicesDetected>0)
+  if (missingSlicesDetected > 0)
   {
     std::cout << std::endl;
-    std::cout << "!!! WARNING MISSING SLICES !!!" << std::endl;
-    std::cout << "Details: Reader indicated volume splitting due to missing slices. Converted data might be invalid/incomplete." << std::endl;
-    std::cout << "Estimated number of missing slices: " << missingSlicesDetected << std::endl;
+    std::cout << "\n!!! WARNING: MISSING SLICES !!!\n"
+                 "Details: Reader indicated volume splitting due to missing slices. Converted data might be invalid/incomplete.\n"
+                 "Estimated number of missing slices: " << missingSlicesDetected << std::endl;
   }
 
   return EXIT_SUCCESS;

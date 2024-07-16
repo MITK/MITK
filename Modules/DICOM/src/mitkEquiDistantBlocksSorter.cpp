@@ -274,7 +274,7 @@ mitk::EquiDistantBlocksSorter
 
     remainingInput = regularBlock->GetUnsortedDatasets();
 
-    if (remainingInput.empty() && !m_SliceGroupingResults.empty() && m_SliceGroupingResults.back()->GetSplitReason()->ReasonExists(IOVolumeSplitReason::ReasonType::OverlappingSlices))
+    if (remainingInput.empty() && !m_SliceGroupingResults.empty() && m_SliceGroupingResults.back()->GetSplitReason()->HasReason(IOVolumeSplitReason::ReasonType::OverlappingSlices))
     {
       //if all inputs are processed and there is already a preceding grouping result that has overlapping as split reason, add also overlapping as split reason for the current block
       regularBlock->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
@@ -536,15 +536,21 @@ mitk::EquiDistantBlocksSorter
 
           result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::SliceDistanceInconsistency, std::to_string(fromLastToThisOriginDistance));
 
-          if (missingSlicesCount==0)
+          if (missingSlicesCount == 0)
+          {
             result->GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::MissingSlices);
+          }
           else if (missingSlicesCount < 0)
+          {
             result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
-          else if (!result->GetSplitReason()->ReasonExists(IOVolumeSplitReason::ReasonType::OverlappingSlices))
+          }
+          else if (!result->GetSplitReason()->HasReason(IOVolumeSplitReason::ReasonType::OverlappingSlices))
+          {
             //If the missing slice count is positive, but no overlapping was flagged, add the missing slice reason.
             //We only do it if overlapping was not flagged, to avoid false positives, that could be triggered by slices
             //of the overlapping volume.
             result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::MissingSlices, std::to_string(missingSlicesCount));
+          }
 
           fileFitsIntoPattern = false;
         }

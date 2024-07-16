@@ -50,8 +50,8 @@ namespace mitk
  REMARK: The EquiDistantBlocksSorter assumes that the order of the provided input
  is sorted by image position like it is preferred by the reader and does not sort
  it again. This assumption can lead to splittings even for complete volumes if
- the input is not sorted by image position can (Reason: gaps will be detected
- because the next slice will not have the assumed distance and will be sorted out.)
+ the input is not sorted by image position. The reason is that gaps are detected
+ because the next slice does not have the assumed distance and will be sorted out.
 
  Detailed implementation in AnalyzeFileForITKImageSeriesReaderSpacingAssumption().
 

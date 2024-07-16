@@ -254,7 +254,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
   }
 
   m_SortingResultInProgress.clear();
-  m_SortingResultInProgress.push_back(std::make_pair(m_TagCache->GetFrameInfoList(), IOVolumeSplitReason::New()));
+  m_SortingResultInProgress.emplace_back(m_TagCache->GetFrameInfoList(), IOVolumeSplitReason::New());
 
   // sort and split blocks as configured
 
@@ -388,7 +388,7 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
 
       DICOMDatasetAccessingImageFrameList sortedGdcmInfoFrameList = ConvertToDICOMDatasetAccessingImageFrameList( blockResult );
 
-      nextStepSorting.push_back( std::make_pair(sortedGdcmInfoFrameList, inputSplitReason->ExtendReason(sorter->GetSplitReason(b))) );
+      nextStepSorting.emplace_back(sortedGdcmInfoFrameList, inputSplitReason->ExtendReason(sorter->GetSplitReason(b)) );
     }
   }
 

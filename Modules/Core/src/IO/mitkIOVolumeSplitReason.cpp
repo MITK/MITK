@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIOVolumeSplitReason.h"
+#include <mitkIOVolumeSplitReason.h>
 
 #include <nlohmann/json.hpp>
 
-void mitk::IOVolumeSplitReason::AddReason(ReasonType type, std::string_view detail)
+void mitk::IOVolumeSplitReason::AddReason(ReasonType type, const std::string& detail)
 {
-  m_ReasonMap.insert(std::make_pair(type, detail));
+  m_ReasonMap[type] = detail;
 }
 
 void mitk::IOVolumeSplitReason::RemoveReason(ReasonType type)
@@ -24,12 +24,12 @@ void mitk::IOVolumeSplitReason::RemoveReason(ReasonType type)
   m_ReasonMap.erase(type);
 }
 
-bool mitk::IOVolumeSplitReason::ReasonExists() const
+bool mitk::IOVolumeSplitReason::HasReasons() const
 {
   return !m_ReasonMap.empty();
 }
 
-bool mitk::IOVolumeSplitReason::ReasonExists(ReasonType type) const
+bool mitk::IOVolumeSplitReason::HasReason(ReasonType type) const
 {
   return m_ReasonMap.cend() != m_ReasonMap.find(type);
 }
@@ -46,7 +46,7 @@ std::string mitk::IOVolumeSplitReason::GetReasonDetails(ReasonType type) const
 mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::ExtendReason(const Self* otherReason) const
 {
   if (nullptr == otherReason)
-    mitkThrow() << "Cannot extend reason. Pass other reason is in valid.";
+    mitkThrow() << "Cannot extend reason. Passed other reason is in valid.";
 
   Pointer result = this->Clone();
 
@@ -63,57 +63,56 @@ mitk::IOVolumeSplitReason::~IOVolumeSplitReason()
 {
 }
 
-mitk::IOVolumeSplitReason::IOVolumeSplitReason(const IOVolumeSplitReason& other)
+mitk::IOVolumeSplitReason::IOVolumeSplitReason(const IOVolumeSplitReason& other) : m_ReasonMap(other.m_ReasonMap)
 {
-  m_ReasonMap = other.m_ReasonMap;
 }
 
-std::string mitk::IOVolumeSplitReason::TypeToString(const IOVolumeSplitReason::ReasonType& reasonType)
+std::string mitk::IOVolumeSplitReason::TypeToString(ReasonType reasonType)
 {
   switch (reasonType)
   {
-  case IOVolumeSplitReason::ReasonType::GantryTiltDifference:
+  case ReasonType::GantryTiltDifference:
     return "gantry_tilt_difference";
-  case IOVolumeSplitReason::ReasonType::ImagePostionMissing:
+  case ReasonType::ImagePostionMissing:
     return "image_position_missing";
-  case IOVolumeSplitReason::ReasonType::OverlappingSlices:
+  case ReasonType::OverlappingSlices:
     return "overlapping_slices";
-  case IOVolumeSplitReason::ReasonType::SliceDistanceInconsistency:
+  case ReasonType::SliceDistanceInconsistency:
     return "slice_distance_inconsistency";
-  case IOVolumeSplitReason::ReasonType::ValueSortDistance:
+  case ReasonType::ValueSortDistance:
     return "value_sort_distance";
-  case IOVolumeSplitReason::ReasonType::ValueSplitDifference:
+  case ReasonType::ValueSplitDifference:
     return "value_split_difference";
-  case IOVolumeSplitReason::ReasonType::MissingSlices:
+  case ReasonType::MissingSlices:
     return "missing_slices";
+  default: return "unknown";
   }
-  return "unknown";
 }
 
 mitk::IOVolumeSplitReason::ReasonType mitk::IOVolumeSplitReason::StringToType(const std::string& reasonStr)
 {
   if (reasonStr == "gantry_tilt_difference")
-    return IOVolumeSplitReason::ReasonType::GantryTiltDifference;
+    return ReasonType::GantryTiltDifference;
   else if (reasonStr == "image_position_missing")
-    return IOVolumeSplitReason::ReasonType::ImagePostionMissing;
+    return ReasonType::ImagePostionMissing;
   else if (reasonStr == "overlapping_slices")
-    return IOVolumeSplitReason::ReasonType::OverlappingSlices;
+    return ReasonType::OverlappingSlices;
   else if (reasonStr == "slice_distance_inconsistency")
-    return IOVolumeSplitReason::ReasonType::SliceDistanceInconsistency;
+    return ReasonType::SliceDistanceInconsistency;
   else if (reasonStr == "value_sort_distance")
-    return IOVolumeSplitReason::ReasonType::ValueSortDistance;
+    return ReasonType::ValueSortDistance;
   else if (reasonStr == "value_split_difference")
-    return IOVolumeSplitReason::ReasonType::ValueSplitDifference;
+    return ReasonType::ValueSplitDifference;
   else if (reasonStr == "missing_slices")
-    return IOVolumeSplitReason::ReasonType::MissingSlices;
+    return ReasonType::MissingSlices;
 
-  return IOVolumeSplitReason::ReasonType::Unkown;
+  return ReasonType::Unknown;
 }
 
-std::string mitk::IOVolumeSplitReason::SerializeToJSON(const IOVolumeSplitReason* reason)
+std::string mitk::IOVolumeSplitReason::ToJSON(const IOVolumeSplitReason* reason)
 {
   if (nullptr == reason)
-    mitkThrow() << "Cannot extend reason. Pass other reason is in valid.";
+    mitkThrow() << "Cannot extend reason. Passed other reason is in valid.";
 
   auto data = nlohmann::json::array();
 
@@ -132,7 +131,7 @@ std::string mitk::IOVolumeSplitReason::SerializeToJSON(const IOVolumeSplitReason
   return data.dump();
 }
 
-mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::DeserializeFromJSON(const std::string& reasonStr)
+mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::FromJSON(const std::string& reasonStr)
 {
   if (reasonStr.empty())
     return nullptr;

@@ -254,8 +254,6 @@ mitk::EquiDistantBlocksSorter
 {
   DICOMDatasetList remainingInput = GetInput(); // copy
 
-  typedef std::list<DICOMDatasetList> OutputListType;
-
   m_SliceGroupingResults.clear();
 
   while (!remainingInput.empty()) // repeat until all files are grouped somehow

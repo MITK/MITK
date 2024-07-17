@@ -580,8 +580,6 @@ mitk::DICOMTagBasedSorter
     GroupIDToListType sortedResultBlocks;
     SplitReasonListType sortedResultsReasons;
 
-    unsigned int groupKeyValue(0);
-
     for (auto& [key, group] : consecutiveGroups)
     {
       auto findSliceIterator = std::find(firstSlices.begin(), firstSlices.end(), group.front());

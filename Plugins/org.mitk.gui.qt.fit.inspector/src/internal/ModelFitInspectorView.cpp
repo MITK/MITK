@@ -742,7 +742,6 @@ void ModelFitInspectorView::RenderFitInfo()
             newItem->setBackground(dataColor);
 
 
-
             m_Controls.tableInputData->setItem(rowIndex, 1, newItem);
         }
     }
@@ -750,8 +749,9 @@ void ModelFitInspectorView::RenderFitInfo()
     m_Controls.lInfo->setText(QString::fromStdString(infoOutput.str()));
 }
 
-void ModelFitInspectorView::RenderPlotCurve(const mitk::PlotDataCurveCollection* curveCollection, const QColor& sampleColor, const QColor& signalColor, const std::string& posString)
+void ModelFitInspectorView::RenderPlotCurve(const mitk::PlotDataCurveCollection* curveCollection, const QColor& sampleColor, const QColor& signalColor, const std::string& posString, const QColor&legendTextColor)
 {
+
   auto sampleCurve = mitk::ModelFitPlotData::GetSamplePlot(curveCollection);
   if (sampleCurve)
   {
@@ -771,6 +771,11 @@ void ModelFitInspectorView::RenderPlotCurve(const mitk::PlotDataCurveCollection*
       GetPlot()->itemList(QwtPlotItem::Rtti_PlotCurve).back());
     measurementCurve->setLegendAttribute(QwtPlotCurve::LegendShowSymbol);
     measurementCurve->setLegendIconSize(QSize(8, 8));
+
+    QwtText legendText = measurementCurve->title();
+    legendText.setColor(legendTextColor);
+    measurementCurve->setTitle(legendText);
+
   }
 
   //draw model curve
@@ -793,6 +798,10 @@ void ModelFitInspectorView::RenderPlotCurve(const mitk::PlotDataCurveCollection*
     QwtPlotCurve* fitCurve = dynamic_cast<QwtPlotCurve*>(m_Controls.widgetPlot->GetPlot()->
       itemList(QwtPlotItem::Rtti_PlotCurve).back());
     fitCurve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
+    QwtText legendText = fitCurve->title();
+    legendText.setColor(legendTextColor);
+    fitCurve->setTitle(legendText);
+
   }
 
 }
@@ -804,6 +813,7 @@ void ModelFitInspectorView::RenderPlot()
   std::string xAxis = DEFAULT_X_AXIS;
   std::string yAxis = "Intensity";
   std::string plotTitle = "Raw data plot: no data";
+  QColor legendTextColor = Qt::gray;
 
   if (m_currentSelectedNode.IsNotNull())
   {
@@ -839,7 +849,6 @@ void ModelFitInspectorView::RenderPlot()
        pos != m_PlotCurves.staticPlots->end(); ++pos)
   {
     QColor dataColor;
-
     unsigned int curveId = m_Controls.widgetPlot->InsertCurve(pos->first.c_str());
     m_Controls.widgetPlot->SetCurveData(curveId, pos->second->GetValues());
 
@@ -871,6 +880,9 @@ void ModelFitInspectorView::RenderPlot()
                                      GetPlot()->itemList(QwtPlotItem::Rtti_PlotCurve).back());
     measurementCurve->setLegendAttribute(QwtPlotCurve::LegendShowSymbol);
     measurementCurve->setLegendIconSize(QSize(8, 8));
+    QwtText legendText = measurementCurve->title();
+    legendText.setColor(legendTextColor);
+    measurementCurve->setTitle(legendText);
   }
 
   // Draw positional curves
@@ -879,17 +891,17 @@ void ModelFitInspectorView::RenderPlot()
     QColor dataColor;
     dataColor.setHsv((++colorIndex * 85) % 360, 255, 150);
 
-    this->RenderPlotCurve(posIter.second.second, dataColor, dataColor, " @ "+mitk::ModelFitPlotData::GetPositionalCollectionName(posIter));
+    this->RenderPlotCurve(posIter.second.second, dataColor, dataColor, " @ "+mitk::ModelFitPlotData::GetPositionalCollectionName(posIter), legendTextColor);
   }
 
   // Draw current pos curve
-  this->RenderPlotCurve(m_PlotCurves.currentPositionPlots, QColor(Qt::red), QColor(Qt::black), "");
-
+  this->RenderPlotCurve(m_PlotCurves.currentPositionPlots, QColor(Qt::red), QColor(Qt::gray), "", legendTextColor);
   QwtLegend* legend = new QwtLegend();
   legend->setFrameShape(QFrame::Box);
   legend->setFrameShadow(QFrame::Sunken);
   legend->setLineWidth(1);
   m_Controls.widgetPlot->SetLegend(legend, QwtPlot::BottomLegend);
+
 
   m_Controls.widgetPlot->Replot();
 }

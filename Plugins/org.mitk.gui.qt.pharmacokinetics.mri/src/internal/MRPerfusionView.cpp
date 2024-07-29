@@ -101,7 +101,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
   m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
-  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
   m_Controls.maskNodeSelector->SetNodePredicate(this->m_IsMaskPredicate);
   m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
@@ -141,7 +140,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
   m_Controls.AIFMaskNodeSelector->setVisible(true);
   m_Controls.AIFMaskNodeSelector->setEnabled(true);
-  m_Controls.AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
   m_Controls.AIFImageNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.AIFImageNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
   m_Controls.AIFImageNodeSelector->setEnabled(false);
@@ -230,6 +228,10 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.PDWImageNodeSelector->setEnabled(false);
 
   connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.PDWImageNodeSelector, SLOT(setEnabled(bool)));
+
+  // Should be done last, if everything else is configured because it triggers the autoselection of data.
+  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
+  m_Controls.AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
 
   UpdateGUIControls();
 }

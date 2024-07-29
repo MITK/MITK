@@ -118,12 +118,11 @@ public:
     return true;
   }
 
-  static bool CheckReason(const std::string& reasonStr, const std::string& reasonStr2)
+  static bool CheckReason(const std::string& refStr, const nlohmann::json& j)
   {
-    auto json1 = nlohmann::json::parse(reasonStr);
-    auto json2 = nlohmann::json::parse(reasonStr2);
+    auto refJ = nlohmann::json::parse(refStr);
 
-    return json2 == json1;
+    return refJ == j;
   }
 
 
@@ -149,7 +148,7 @@ public:
     CPPUNIT_ASSERT(CheckReason("[[\"image_position_missing\"],[\"missing_slices\",\"2\"]]", serializedReason2));
     CPPUNIT_ASSERT(CheckReason("[]", serializedReasonEmpty));
 
-    auto newReason = mitk::IOVolumeSplitReason::FromJSON(m_ReasonStr);
+    auto newReason = mitk::IOVolumeSplitReason::FromJSON(nlohmann::json::parse(m_ReasonStr));
     CPPUNIT_ASSERT(!newReason->HasReason(mitk::IOVolumeSplitReason::ReasonType::GantryTiltDifference));
     CPPUNIT_ASSERT(!newReason->HasReason(mitk::IOVolumeSplitReason::ReasonType::ImagePostionMissing));
     CPPUNIT_ASSERT(newReason->HasReason(mitk::IOVolumeSplitReason::ReasonType::MissingSlices));

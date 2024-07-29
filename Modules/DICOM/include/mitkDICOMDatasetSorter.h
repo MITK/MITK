@@ -64,7 +64,7 @@ class MITKDICOM_EXPORT DICOMDatasetSorter : public itk::LightObject
     /// \brief Output of the sorting process.
     DICOMDatasetList& GetOutput(unsigned int index);
 
-    const IOVolumeSplitReason* GetSplitReason(unsigned int index) const;
+    IOVolumeSplitReason::ConstPointer GetSplitReason(unsigned int index) const;
 
     /// \brief Print configuration details into stream.
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const = 0;
@@ -81,7 +81,7 @@ class MITKDICOM_EXPORT DICOMDatasetSorter : public itk::LightObject
 
     void ClearOutputs();
     void SetNumberOfOutputs(unsigned int numberOfOutputs);
-    void SetOutput(unsigned int index, const DICOMDatasetList& output, const IOVolumeSplitReason* splitReason = nullptr);
+    void SetOutput(unsigned int index, const DICOMDatasetList& output, IOVolumeSplitReason::ConstPointer splitReason = nullptr);
 
   private:
 

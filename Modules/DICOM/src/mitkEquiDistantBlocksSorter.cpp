@@ -33,13 +33,13 @@ mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
   return m_UnsortedFiles;
 }
 
-const mitk::IOVolumeSplitReason*
+mitk::IOVolumeSplitReason::ConstPointer
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult::GetSplitReason() const
 {
   return m_SplitReason;
 }
 
-mitk::IOVolumeSplitReason*
+mitk::IOVolumeSplitReason::Pointer
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult::GetSplitReason()
 {
   return m_SplitReason;

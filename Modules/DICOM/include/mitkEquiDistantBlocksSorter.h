@@ -133,8 +133,8 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
          */
         const DICOMDatasetList& GetUnsortedDatasets() const;
 
-        const IOVolumeSplitReason* GetSplitReason() const;
-        IOVolumeSplitReason* GetSplitReason();
+        IOVolumeSplitReason::ConstPointer GetSplitReason() const;
+        IOVolumeSplitReason::Pointer GetSplitReason();
 
         /**
           \brief Whether or not the grouped result contain a gantry tilt.

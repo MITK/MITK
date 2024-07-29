@@ -13,20 +13,21 @@ found in the LICENSE file.
 #ifndef mitkIOVolumeSplitReason_h
 #define mitkIOVolumeSplitReason_h
 
-#include "itkLightObject.h"
-#include "mitkCommon.h"
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <mitkCommon.h>
 
 #include "MitkCoreExports.h"
 
 namespace mitk
 {
 
-  class MITKCORE_EXPORT IOVolumeSplitReason : public itk::LightObject
+  class MITKCORE_EXPORT IOVolumeSplitReason
   {
   public:
-    mitkClassMacroItkParent(IOVolumeSplitReason, itk::LightObject);
-    itkFactorylessNewMacro(IOVolumeSplitReason);
-    itkCloneMacro(IOVolumeSplitReason);
+    using Self = IOVolumeSplitReason;
+    using Pointer = std::shared_ptr<IOVolumeSplitReason>;
+    using ConstPointer = std::shared_ptr<const IOVolumeSplitReason>;
 
     enum class ReasonType
     {
@@ -59,25 +60,45 @@ namespace mitk
       Therefor only new types and details will be added to the extension.
       @pre otherReason must point to a valid instance.
       @return Pointer to the cloned and extended instance.*/
-    Pointer ExtendReason(const Self* otherReason) const;
+    Pointer ExtendReason(ConstPointer otherReason) const;
 
-    static std::string ToJSON(const IOVolumeSplitReason*);
-    static Pointer FromJSON(const std::string& reasonStr);
+    static nlohmann::json ToJSON(ConstPointer);
+    static Pointer FromJSON(const nlohmann::json& j);
 
     static std::string TypeToString(ReasonType reasonType);
     static IOVolumeSplitReason::ReasonType StringToType(const std::string& reasonStr);
 
+    Pointer Clone() const;
+    static Pointer New();
+
   protected:
-    mitkCloneMacro(IOVolumeSplitReason);
-
-    IOVolumeSplitReason();
-    ~IOVolumeSplitReason() override;
-    IOVolumeSplitReason(const IOVolumeSplitReason& other);
-    IOVolumeSplitReason& operator=(const IOVolumeSplitReason& other) = delete;
-
     using ReasonMapType = std::map<ReasonType, std::string>;
     ReasonMapType m_ReasonMap;
   };
+
+  template<typename BasicJsonType>
+  inline void to_json(BasicJsonType& j, const IOVolumeSplitReason::ReasonType& e)
+  {
+    static_assert(std::is_enum<IOVolumeSplitReason::ReasonType>::value,
+                  "IOVolumeSplitReason::ReasonType"
+                  " must be an enum!");
+    j = IOVolumeSplitReason::TypeToString(e);
+  }
+
+  template<typename BasicJsonType>
+  inline void from_json(const BasicJsonType& j, IOVolumeSplitReason::ReasonType& e)
+  {
+    static_assert(std::is_enum<IOVolumeSplitReason::ReasonType>::value,
+                  "IOVolumeSplitReason::ReasonType"
+                  " must be an enum!");
+    e = IOVolumeSplitReason::StringToType(j.template get<std::string>());
+  }
+
+
+  MITKCORE_EXPORT void to_json(nlohmann::json& j, IOVolumeSplitReason::ConstPointer reason);
+  MITKCORE_EXPORT void to_json(nlohmann::json& j, IOVolumeSplitReason::Pointer reason);
+
+  MITKCORE_EXPORT void from_json(const nlohmann::json& j, IOVolumeSplitReason& reason);
 
 }
 

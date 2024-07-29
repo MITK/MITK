@@ -111,11 +111,11 @@ namespace mitk
     std::string GetPropertyAsString(const std::string&) const;
 
     /** Returns the pointer to the split reason of this block descriptor.*/
-    const IOVolumeSplitReason* GetSplitReason() const;
+    IOVolumeSplitReason::ConstPointer GetSplitReason() const;
     /** Returns the pointer to the split reason of this block descriptor.*/
-    IOVolumeSplitReason* GetSplitReason();
+    IOVolumeSplitReason::Pointer GetSplitReason();
     /** Sets the split reason for the block descriptor.*/
-    void SetSplitReason(IOVolumeSplitReason* reason);
+    void SetSplitReason(IOVolumeSplitReason::Pointer reason);
 
     /// Convenience function around SetProperty()
     void SetFlag(const std::string& key, bool value);

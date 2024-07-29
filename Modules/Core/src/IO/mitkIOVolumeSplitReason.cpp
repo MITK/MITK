@@ -43,7 +43,7 @@ std::string mitk::IOVolumeSplitReason::GetReasonDetails(ReasonType type) const
   return finding->second;
 };
 
-mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::ExtendReason(const Self* otherReason) const
+mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::ExtendReason(ConstPointer otherReason) const
 {
   if (nullptr == otherReason)
     mitkThrow() << "Cannot extend reason. Passed other reason is in valid.";
@@ -53,18 +53,6 @@ mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::ExtendReason(const
   result->m_ReasonMap.insert(otherReason->m_ReasonMap.cbegin(), otherReason->m_ReasonMap.cend());
 
   return result;
-}
-
-mitk::IOVolumeSplitReason::IOVolumeSplitReason(): itk::LightObject()
-{
-}
-
-mitk::IOVolumeSplitReason::~IOVolumeSplitReason()
-{
-}
-
-mitk::IOVolumeSplitReason::IOVolumeSplitReason(const IOVolumeSplitReason& other) : m_ReasonMap(other.m_ReasonMap)
-{
 }
 
 std::string mitk::IOVolumeSplitReason::TypeToString(ReasonType reasonType)
@@ -109,7 +97,18 @@ mitk::IOVolumeSplitReason::ReasonType mitk::IOVolumeSplitReason::StringToType(co
   return ReasonType::Unknown;
 }
 
-std::string mitk::IOVolumeSplitReason::ToJSON(const IOVolumeSplitReason* reason)
+mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::Clone() const
+{
+  return std::make_shared<Self>(*this);
+}
+
+mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::New()
+{
+  return std::make_shared<IOVolumeSplitReason>();
+}
+
+
+nlohmann::json mitk::IOVolumeSplitReason::ToJSON(ConstPointer reason)
 {
   if (nullptr == reason)
     mitkThrow() << "Cannot extend reason. Passed other reason is in valid.";
@@ -120,7 +119,7 @@ std::string mitk::IOVolumeSplitReason::ToJSON(const IOVolumeSplitReason* reason)
   {
     auto details = nlohmann::json::array();
 
-    details.push_back(TypeToString(type));
+    details.push_back(type);
     if (!detail.empty())
     {
       details.push_back(detail);
@@ -128,23 +127,18 @@ std::string mitk::IOVolumeSplitReason::ToJSON(const IOVolumeSplitReason* reason)
     data.push_back(details);
   }
 
-  return data.dump();
+  return data;
 }
 
-mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::FromJSON(const std::string& reasonStr)
+mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::FromJSON(const nlohmann::json& j)
 {
-  if (reasonStr.empty())
-    return nullptr;
+  auto reason = std::make_shared<IOVolumeSplitReason>();
 
-  auto reason = IOVolumeSplitReason::New();
-
-  auto data = nlohmann::json::parse(reasonStr);
-
-  for (const auto& jItem : data)
+  for (const auto& jItem : j)
   {
     if (!jItem.empty())
     {
-      ReasonType reasonType = StringToType(jItem.at(0).get<std::string>());
+      ReasonType reasonType = jItem.at(0).get<ReasonType>();
 
       std::string detail;
       if (jItem.size() > 1)
@@ -156,4 +150,20 @@ mitk::IOVolumeSplitReason::Pointer mitk::IOVolumeSplitReason::FromJSON(const std
   }
 
   return reason;
+}
+
+
+void mitk::to_json(nlohmann::json& j, IOVolumeSplitReason::ConstPointer reason)
+{
+  j = IOVolumeSplitReason::ToJSON(reason);
+}
+
+void mitk::to_json(nlohmann::json& j, IOVolumeSplitReason::Pointer reason)
+{
+  j = IOVolumeSplitReason::ToJSON(reason);
+}
+
+void mitk::from_json(const nlohmann::json& j, IOVolumeSplitReason& e)
+{
+  e = *IOVolumeSplitReason::FromJSON(j);
 }

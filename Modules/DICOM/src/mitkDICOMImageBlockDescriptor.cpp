@@ -376,17 +376,17 @@ std::string mitk::DICOMImageBlockDescriptor::GetPropertyAsString( const std::str
   }
 }
 
-const mitk::IOVolumeSplitReason* mitk::DICOMImageBlockDescriptor::GetSplitReason() const
+mitk::IOVolumeSplitReason::ConstPointer mitk::DICOMImageBlockDescriptor::GetSplitReason() const
 {
   return m_SplitReason;
 }
 
-mitk::IOVolumeSplitReason* mitk::DICOMImageBlockDescriptor::GetSplitReason()
+mitk::IOVolumeSplitReason::Pointer mitk::DICOMImageBlockDescriptor::GetSplitReason()
 {
   return m_SplitReason;
 }
 
-void mitk::DICOMImageBlockDescriptor::SetSplitReason(IOVolumeSplitReason* reason)
+void mitk::DICOMImageBlockDescriptor::SetSplitReason(IOVolumeSplitReason::Pointer reason)
 {
   m_SplitReason = reason;
 }
@@ -488,9 +488,9 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_GDCM()), StringProperty::New(gdcm::Version::GetVersion()));
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_DCMTK()), StringProperty::New(PACKAGE_VERSION));
 
-  if (m_SplitReason.IsNotNull() && m_SplitReason->HasReasons())
+  if (nullptr != m_SplitReason && m_SplitReason->HasReasons())
   {
-    mitkImage->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()), StringProperty::New(IOVolumeSplitReason::ToJSON(m_SplitReason)));
+    mitkImage->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()), StringProperty::New(IOVolumeSplitReason::ToJSON(m_SplitReason).dump()));
   }
 
   // get all found additional tags of interest

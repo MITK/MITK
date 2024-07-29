@@ -81,7 +81,7 @@ mitk::DICOMDatasetSorter
 
 void
 mitk::DICOMDatasetSorter
-::SetOutput(unsigned int index, const DICOMDatasetList& output, const IOVolumeSplitReason* splitReason)
+::SetOutput(unsigned int index, const DICOMDatasetList& output, IOVolumeSplitReason::ConstPointer splitReason)
 {
   if (index < m_Outputs.size())
   {
@@ -119,7 +119,7 @@ mitk::DICOMDatasetSorter
   }
 }
 
-const mitk::IOVolumeSplitReason*
+mitk::IOVolumeSplitReason::ConstPointer
 mitk::DICOMDatasetSorter
 ::GetSplitReason(unsigned int index) const
 {

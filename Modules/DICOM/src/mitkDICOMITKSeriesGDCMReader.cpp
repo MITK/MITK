@@ -359,8 +359,7 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
 #endif
     ++blockIter )
   {
-    const auto& gdcmInfoFrameList = blockIter->first;
-    const auto& inputSplitReason = blockIter->second;
+    const auto& [gdcmInfoFrameList, inputSplitReason] = *blockIter;
     const DICOMDatasetList datasetList               = ConvertToDICOMDatasetList( gdcmInfoFrameList );
 
 #if defined( MBILOG_ENABLE_DEBUG )

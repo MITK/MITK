@@ -82,7 +82,6 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
   m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
   m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
-  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
   m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
@@ -131,6 +130,9 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
           SLOT(setEnabled(bool)));
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager,
           SLOT(setVisible(bool)));
+
+  // Should be done last, if everything else is configured because it triggers the autoselection of data.
+  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
   UpdateGUIControls();
 }

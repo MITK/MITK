@@ -13,7 +13,6 @@ if(BUILD_ModelFitMiniApps OR MITK_BUILD_ALL_APPS)
     set( miniapps
     GenericFitting^^
     PixelDump^^
-    Fuse3Dto4DImage^^
     Split4Dto3DImages^^
     )
 

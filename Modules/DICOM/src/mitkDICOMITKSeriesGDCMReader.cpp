@@ -38,6 +38,7 @@ mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPl
 mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( const DICOMITKSeriesGDCMReader& other )
 : DICOMFileReader( other )
 , m_FixTiltByShearing( other.m_FixTiltByShearing)
+, m_SimpleVolumeReading( other.m_SimpleVolumeReading)
 , m_SortingResultInProgress( other.m_SortingResultInProgress )
 , m_Sorter( other.m_Sorter )
 , m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
@@ -61,6 +62,7 @@ mitk::DICOMITKSeriesGDCMReader& mitk::DICOMITKSeriesGDCMReader::
   {
     DICOMFileReader::operator                =( other );
     this->m_FixTiltByShearing                = other.m_FixTiltByShearing;
+    this->m_SimpleVolumeReading              = other.m_SimpleVolumeReading;
     this->m_SortingResultInProgress          = other.m_SortingResultInProgress;
     this->m_Sorter                           = other.m_Sorter; // TODO should clone the list items
     this->m_EquiDistantBlocksSorter          = other.m_EquiDistantBlocksSorter->Clone();
@@ -252,7 +254,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
   }
 
   m_SortingResultInProgress.clear();
-  m_SortingResultInProgress.push_back(m_TagCache->GetFrameInfoList());
+  m_SortingResultInProgress.emplace_back(m_TagCache->GetFrameInfoList(), IOVolumeSplitReason::New());
 
   // sort and split blocks as configured
 
@@ -292,7 +294,9 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
   for ( auto blockIter = m_SortingResultInProgress.cbegin(); blockIter != m_SortingResultInProgress.cend();
         ++o, ++blockIter )
   {
-    const DICOMDatasetAccessingImageFrameList& gdcmFrameInfoList = *blockIter;
+    const auto& gdcmFrameInfoList = blockIter->first;
+    auto& splitReason = blockIter->second;
+
     assert( !gdcmFrameInfoList.empty() );
 
     // reverse frames if necessary
@@ -316,6 +320,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
     block.SetTagLookupTableToPropertyFunctor( GetTagLookupTableToPropertyFunctor() );
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
+    block.SetSplitReason(splitReason);
 
     block.SetReaderImplementationLevel( this->GetReaderImplementationLevel( block.GetSOPClassUID() ) );
 
@@ -354,7 +359,7 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
 #endif
     ++blockIter )
   {
-    const DICOMDatasetAccessingImageFrameList& gdcmInfoFrameList = *blockIter;
+    const auto& [gdcmInfoFrameList, inputSplitReason] = *blockIter;
     const DICOMDatasetList datasetList               = ConvertToDICOMDatasetList( gdcmInfoFrameList );
 
 #if defined( MBILOG_ENABLE_DEBUG )
@@ -381,7 +386,8 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
       }
 
       DICOMDatasetAccessingImageFrameList sortedGdcmInfoFrameList = ConvertToDICOMDatasetAccessingImageFrameList( blockResult );
-      nextStepSorting.push_back( sortedGdcmInfoFrameList );
+
+      nextStepSorting.emplace_back(sortedGdcmInfoFrameList, inputSplitReason->ExtendReason(sorter->GetSplitReason(b)) );
     }
   }
 

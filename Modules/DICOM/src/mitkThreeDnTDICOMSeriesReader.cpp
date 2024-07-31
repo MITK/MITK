@@ -129,8 +129,10 @@ mitk::ThreeDnTDICOMSeriesReader
   while (!remainingBlocks.empty())
   {
     // new block to fill up
-    const DICOMDatasetAccessingImageFrameList& firstBlock = remainingBlocks.front();
+    const DICOMDatasetAccessingImageFrameList& firstBlock = remainingBlocks.front().first;
     DICOMDatasetAccessingImageFrameList current3DnTBlock = firstBlock;
+    auto currentSplitReason = remainingBlocks.front().second;
+
     int current3DnTBlockNumberOfTimeSteps = 1;
 
     // get block characteristics of first block
@@ -147,7 +149,7 @@ mitk::ThreeDnTDICOMSeriesReader
          /*++otherBlockIter*/) // <-- inside loop
     {
       // get block characteristics from first block
-      const DICOMDatasetAccessingImageFrameList otherBlock = *otherBlockIter;
+      const DICOMDatasetAccessingImageFrameList otherBlock = otherBlockIter->first;
 
       const unsigned int otherBlockNumberOfSlices = otherBlock.size();
       const auto otherBlockFirstOrigin = otherBlock.front()->GetTagValueAsString( tagImagePositionPatient );
@@ -163,6 +165,9 @@ mitk::ThreeDnTDICOMSeriesReader
       { // matching block
         ++current3DnTBlockNumberOfTimeSteps;
         current3DnTBlock.insert( current3DnTBlock.end(), otherBlock.begin(), otherBlock.end() ); // append
+        //also merge split reasons
+        currentSplitReason = currentSplitReason->ExtendReason(otherBlockIter->second);
+
         // remove this block from remainingBlocks
         otherBlockIter = remainingBlocks.erase(otherBlockIter); // make sure iterator otherBlockIter is valid afterwards
       }
@@ -176,12 +181,12 @@ mitk::ThreeDnTDICOMSeriesReader
     // ... and we either call it 3D o 3D+t
     if (current3DnTBlockNumberOfTimeSteps > 1)
     {
-      true3DnTBlocks.push_back(current3DnTBlock);
+      true3DnTBlocks.emplace_back(current3DnTBlock,currentSplitReason);
       true3DnTBlocksTimeStepCount.push_back(current3DnTBlockNumberOfTimeSteps);
     }
     else
     {
-      non3DnTBlocks.push_back(current3DnTBlock);
+      non3DnTBlocks.emplace_back(current3DnTBlock, currentSplitReason);
     }
   }
 
@@ -194,7 +199,7 @@ mitk::ThreeDnTDICOMSeriesReader
        ++o, ++blockIter)
   {
     // bad copy&paste code from DICOMITKSeriesGDCMReader, should be handled in a better way
-    DICOMDatasetAccessingImageFrameList gdcmFrameInfoList = *blockIter;
+    const auto& gdcmFrameInfoList = blockIter->first;
     assert(!gdcmFrameInfoList.empty());
 
     // reverse frames if necessary
@@ -215,6 +220,14 @@ mitk::ThreeDnTDICOMSeriesReader
     block.SetTagLookupTableToPropertyFunctor(GetTagLookupTableToPropertyFunctor());
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
+    block.SetSplitReason(blockIter->second->Clone());
+
+    if (true3DnTBlocks.size() == 1 && non3DnTBlocks.empty())
+    {
+      //if we have condensed everything into just on 3DnT block, we can remove the overlap reason,
+      //because no real overlap is existent any more.
+      block.GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
+    }
 
     block.SetFlag("3D+t", true);
     block.SetIntProperty("timesteps", true3DnTBlocksTimeStepCount[o]);

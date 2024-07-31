@@ -49,4 +49,9 @@ namespace mitk
   {
     return READER_OPTION_ROOT().AddAnyElement();
   }
+
+  PropertyKeyPath IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()
+  {
+    return PropertyKeyPath({ "MITK", "IO", "reader", "VolumeSplitReason" });
+  }
 }

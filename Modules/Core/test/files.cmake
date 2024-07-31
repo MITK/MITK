@@ -122,6 +122,7 @@ set(MODULE_TESTS
   mitkSourceImageRelationRuleTest.cpp
   mitkTemporalJoinImagesFilterTest.cpp
   mitkPreferencesTest.cpp
+  mitkIOVolumeSplitReasonTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS

@@ -64,4 +64,5 @@ namespace mitk
   {
     return PropertyKeyPath({ "MITK", "IO", "reader", "DICOM", "configuration" });
   }
+
 }

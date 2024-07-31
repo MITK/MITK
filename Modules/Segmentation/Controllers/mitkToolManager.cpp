@@ -211,7 +211,19 @@ bool mitk::ToolManager::ActivateTool(int id)
       if (nullptr != toolManager.second->m_ActiveTool)
       {
         toolManager.second->m_ActiveTool->Deactivated();
-        toolManager.second->m_ActiveToolRegistration.Unregister();
+
+        try
+        {
+          toolManager.second->m_ActiveToolRegistration.Unregister();
+        }
+        catch (const std::logic_error&)
+        {
+          // In rare conditions it may happen that this code is called twice for the same tool leading to an attempt to
+          // unregister an already unregistered tool. We just want to make sure that the tool is unregistered, hence we
+          // can safely ignore the attempt/exception as the outcome is the same.
+
+          MITK_DEBUG << "Detected an attempt to unregister an already unregistered segmentation tool.";
+        }
 
         // The active tool of *this* ToolManager is handled below this loop
         if (this != toolManager.second)

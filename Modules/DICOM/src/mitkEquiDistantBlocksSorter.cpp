@@ -366,6 +366,7 @@ mitk::EquiDistantBlocksSorter
   lastDifferentOrigin.Fill(0.0f);
 
   bool lastOriginInitialized(false);
+  int missingSlicesCount = 0;
 
   MITK_DEBUG << "--------------------------------------------------------------------------------";
   MITK_DEBUG << "Analyzing " << datasets.size() << " files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << groupImagesWithGantryTilt << ")";
@@ -411,8 +412,6 @@ mitk::EquiDistantBlocksSorter
 
     bool ignoredConversionError(-42); // hard to get here, no graceful way to react
     thisOrigin = DICOMStringToPoint3D( thisOriginString, ignoredConversionError );
-
-    int missingSlicesCount = 0;
 
     MITK_DEBUG << "  " << fileIndex << " " << (*dsIter)->GetFilenameIfAvailable()
                        << " at "
@@ -529,20 +528,20 @@ mitk::EquiDistantBlocksSorter
           auto currentMissCount = static_cast<int>(std::round((fromLastToThisOriginDistance / fromFirstToSecondOriginDistance)-1));
           if (missingSlicesCount == 0 || missingSlicesCount > currentMissCount)
           {
+            if (missingSlicesCount != 0 && currentMissCount == 0)
+            {
+              result->GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::MissingSlices);
+            }
+
             missingSlicesCount = currentMissCount;
+            result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::SliceDistanceInconsistency, std::to_string(fromLastToThisOriginDistance));
           }
 
-          result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::SliceDistanceInconsistency, std::to_string(fromLastToThisOriginDistance));
-
-          if (missingSlicesCount == 0)
-          {
-            result->GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::MissingSlices);
-          }
-          else if (missingSlicesCount < 0)
+          if (missingSlicesCount < 0)
           {
             result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
           }
-          else if (!result->GetSplitReason()->HasReason(IOVolumeSplitReason::ReasonType::OverlappingSlices))
+          else if (missingSlicesCount > 0 && !result->GetSplitReason()->HasReason(IOVolumeSplitReason::ReasonType::OverlappingSlices))
           {
             //If the missing slice count is positive, but no overlapping was flagged, add the missing slice reason.
             //We only do it if overlapping was not flagged, to avoid false positives, that could be triggered by slices

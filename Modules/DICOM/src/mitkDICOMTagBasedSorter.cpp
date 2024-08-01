@@ -380,6 +380,7 @@ mitk::DICOMTagBasedSorter
   {
     for (auto& [key, value] : listForGroupID)
     {
+      (void)value; // Prevent unused variable error in older compilers
       auto reason = IOVolumeSplitReason::New();
       reason->AddReason(IOVolumeSplitReason::ReasonType::ValueSplitDifference);
       splitReasons[key] = reason;

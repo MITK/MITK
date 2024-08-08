@@ -1,0 +1,29 @@
+set(H_FILES
+  include/mitkCheckboxesQuestion.h
+  include/mitkDropdownQuestion.h
+  include/mitkForm.h
+  include/mitkIQuestionFactory.h
+  include/mitkLinearScaleQuestion.h
+  include/mitkMultipleChoiceQuestion.h
+  include/mitkParagraphQuestion.h
+  include/mitkQuestion.h
+  include/mitkQuestionWithOptions.h
+  include/mitkShortAnswerQuestion.h
+  include/mitkTextQuestion.h
+)
+
+set(CPP_FILES
+  mitkCheckboxesQuestion.cpp
+  mitkDropdownQuestion.cpp
+  mitkForm.cpp
+  mitkIQuestionFactory.cpp
+  mitkLinearScaleQuestion.cpp
+  mitkModuleActivator.cpp
+  mitkMultipleChoiceQuestion.cpp
+  mitkParagraphQuestion.cpp
+  mitkQuestion.cpp
+  mitkQuestionFactory.cpp
+  mitkQuestionWithOptions.cpp
+  mitkShortAnswerQuestion.cpp
+  mitkTextQuestion.cpp
+)

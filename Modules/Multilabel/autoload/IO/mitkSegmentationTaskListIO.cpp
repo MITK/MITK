@@ -152,11 +152,14 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskListIO::DoRead()
 
   auto segmentationTaskList = SegmentationTaskList::New();
 
-  if (json.contains("Name"))
-    segmentationTaskList->SetProperty("name", StringProperty::New(json["Name"].get<std::string>()));
-
   try
   {
+    if (json.contains("Name"))
+      segmentationTaskList->SetProperty("name", StringProperty::New(json["Name"].get<std::string>()));
+
+    if (json.contains("Form"))
+      segmentationTaskList->SetForm(json["Form"].get<std::string>());
+
     if (json.contains("Defaults"))
     {
       segmentationTaskList->SetDefaults(json["Defaults"].get<SegmentationTaskList::Task>());
@@ -245,6 +248,9 @@ void mitk::SegmentationTaskListIO::Write()
     { "Version", 1 },
     { "Name", segmentationTaskList->GetProperty("name")->GetValueAsString() }
   };
+
+  if (segmentationTaskList->HasForm())
+    json["Form"] = segmentationTaskList->GetForm().string();
 
   nlohmann::json defaults = segmentationTaskList->GetDefaults();
 

@@ -32,8 +32,8 @@ For details, please read the [Supported Platforms][platforms] page.
 [![Windows][windows-build-status]][cdash]
 [![Ubuntu 20.04][ubuntu-20.04-build-status]][cdash]
 [![Ubuntu 22.04][ubuntu-22.04-build-status]][cdash]
-[![macOS 10.15 Catalina][macos-10.15-build-status]][cdash]
-[![macOS 11 Big Sur][macos-11-build-status]][cdash]
+[![macOS 12 Monterey][macos-12-build-status]][cdash]
+[![macOS 13 Ventura][macos-13-build-status]][cdash]
 
 We highly recommend to use the stable **master** branch instead. It is updated 1-2 times per month accompanied by curated [changelogs][changelog] and [snapshot installers][snapshot-installers].
 
@@ -106,5 +106,5 @@ Useful links
 [windows-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FWindows&subject=Windows
 [ubuntu-22.04-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FUbuntu+22.04&subject=Ubuntu+22.04
 [ubuntu-20.04-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FUbuntu+20.04&subject=Ubuntu+20.04
-[macOS-10.15-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Catalina&subject=macOS+10.15+Catalina
-[macOS-11-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Big+Sur&subject=macOS+11+Big+Sur
+[macOS-12-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Monterey&subject=macOS+12+Monterey
+[macOS-13-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Ventura&subject=macOS+13+Ventura

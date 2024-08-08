@@ -59,12 +59,12 @@ class MITKDICOM_EXPORT ClassicDICOMSeriesReader : public ThreeDnTDICOMSeriesRead
   public:
 
     mitkClassMacro( ClassicDICOMSeriesReader, DICOMITKSeriesGDCMReader );
-    mitkCloneMacro( ClassicDICOMSeriesReader );
     itkNewMacro( ClassicDICOMSeriesReader );
 
     bool operator==(const DICOMFileReader& other) const override;
 
   protected:
+    mitkCloneMacro(ClassicDICOMSeriesReader);
 
     ClassicDICOMSeriesReader();
     ~ClassicDICOMSeriesReader() override;

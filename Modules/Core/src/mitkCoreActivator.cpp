@@ -286,6 +286,7 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_MIME_NAME());
   AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_VERSION());
   AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_OPTIONS_ANY());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON());
 
   AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIDestinationUIDPropertyKeyPath());
   AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIRelationUIDPropertyKeyPath());

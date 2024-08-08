@@ -74,6 +74,38 @@ mitk::ThreeDnTDICOMSeriesReader
   return m_Group3DandT;
 }
 
+/** Helper function to make the code in mitk::ThreeDnTDICOMSeriesReader
+::Condense3DBlocks(SortingBlockList& resultOf3DGrouping) more readable.*/
+bool BlockShouldBeCondensed(bool onlyCondenseSameSeries, unsigned int currentBlockNumberOfSlices, unsigned int otherBlockNumberOfSlices,
+  const mitk::DICOMDatasetFinding& currentBlockFirstOrigin, const mitk::DICOMDatasetFinding& currentBlockLastOrigin,
+  const mitk::DICOMDatasetFinding& otherBlockFirstOrigin, const mitk::DICOMDatasetFinding& otherBlockLastOrigin,
+  const mitk::DICOMDatasetFinding& currentBlockSeriesInstanceUID, const mitk::DICOMDatasetFinding& otherBlockSeriesInstanceUID)
+{
+  if (otherBlockNumberOfSlices != currentBlockNumberOfSlices)
+    return false; //don't condense blocks that have unequal slice count
+
+  if (!otherBlockFirstOrigin.isValid || !otherBlockLastOrigin.isValid)
+    return false; //don't condense blocks that have invalid origins
+
+  if (!currentBlockFirstOrigin.isValid || !currentBlockLastOrigin.isValid)
+    return false; //don't condense blocks that have invalid origins
+
+  const bool sameSeries = otherBlockSeriesInstanceUID.isValid
+    && currentBlockSeriesInstanceUID.isValid
+    && otherBlockSeriesInstanceUID.value == currentBlockSeriesInstanceUID.value;
+
+  if (onlyCondenseSameSeries && !sameSeries)
+    return false; //don't condense blocks if it is only allowed to condense same series and series are not defined or not equal.
+
+  if (otherBlockFirstOrigin.value != currentBlockFirstOrigin.value)
+    return false; //don't condense blocks that have unequal first origins
+
+  if (otherBlockLastOrigin.value != currentBlockLastOrigin.value)
+    return false; //don't condense blocks that have unequal last origins
+
+  return true;
+}
+
 mitk::DICOMITKSeriesGDCMReader::SortingBlockList
 mitk::ThreeDnTDICOMSeriesReader
 ::Condense3DBlocks(SortingBlockList& resultOf3DGrouping)
@@ -97,15 +129,17 @@ mitk::ThreeDnTDICOMSeriesReader
   while (!remainingBlocks.empty())
   {
     // new block to fill up
-    const DICOMDatasetAccessingImageFrameList& firstBlock = remainingBlocks.front();
+    const DICOMDatasetAccessingImageFrameList& firstBlock = remainingBlocks.front().first;
     DICOMDatasetAccessingImageFrameList current3DnTBlock = firstBlock;
+    auto currentSplitReason = remainingBlocks.front().second;
+
     int current3DnTBlockNumberOfTimeSteps = 1;
 
     // get block characteristics of first block
     const unsigned int currentBlockNumberOfSlices = firstBlock.size();
-    const std::string currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient ).value;
-    const std::string currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient ).value;
-    const auto currentBlockSeriesInstanceUID = firstBlock.back()->GetTagValueAsString(tagSeriesInstaceUID).value;
+    const auto currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient );
+    const auto currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient );
+    const auto currentBlockSeriesInstanceUID = firstBlock.back()->GetTagValueAsString(tagSeriesInstaceUID);
 
     remainingBlocks.erase( remainingBlocks.begin() );
 
@@ -115,23 +149,25 @@ mitk::ThreeDnTDICOMSeriesReader
          /*++otherBlockIter*/) // <-- inside loop
     {
       // get block characteristics from first block
-      const DICOMDatasetAccessingImageFrameList otherBlock = *otherBlockIter;
+      const DICOMDatasetAccessingImageFrameList otherBlock = otherBlockIter->first;
 
       const unsigned int otherBlockNumberOfSlices = otherBlock.size();
-      const std::string otherBlockFirstOrigin = otherBlock.front()->GetTagValueAsString( tagImagePositionPatient ).value;
-      const std::string otherBlockLastOrigin  =  otherBlock.back()->GetTagValueAsString( tagImagePositionPatient ).value;
-      const auto otherBlockSeriesInstanceUID = otherBlock.back()->GetTagValueAsString(tagSeriesInstaceUID).value;
+      const auto otherBlockFirstOrigin = otherBlock.front()->GetTagValueAsString( tagImagePositionPatient );
+      const auto otherBlockLastOrigin  =  otherBlock.back()->GetTagValueAsString( tagImagePositionPatient );
+      const auto otherBlockSeriesInstanceUID = otherBlock.back()->GetTagValueAsString(tagSeriesInstaceUID);
 
       // add matching blocks to current3DnTBlock
       // keep other blocks for later
-      if (   otherBlockNumberOfSlices == currentBlockNumberOfSlices
-          && (!m_OnlyCondenseSameSeries || otherBlockSeriesInstanceUID == currentBlockSeriesInstanceUID)
-          && otherBlockFirstOrigin == currentBlockFirstOrigin
-          && otherBlockLastOrigin == currentBlockLastOrigin
-          )
+      if ( BlockShouldBeCondensed(m_OnlyCondenseSameSeries, currentBlockNumberOfSlices, otherBlockNumberOfSlices,
+        currentBlockFirstOrigin, currentBlockLastOrigin,
+        otherBlockFirstOrigin, otherBlockLastOrigin,
+        currentBlockSeriesInstanceUID, otherBlockSeriesInstanceUID))
       { // matching block
         ++current3DnTBlockNumberOfTimeSteps;
         current3DnTBlock.insert( current3DnTBlock.end(), otherBlock.begin(), otherBlock.end() ); // append
+        //also merge split reasons
+        currentSplitReason = currentSplitReason->ExtendReason(otherBlockIter->second);
+
         // remove this block from remainingBlocks
         otherBlockIter = remainingBlocks.erase(otherBlockIter); // make sure iterator otherBlockIter is valid afterwards
       }
@@ -145,12 +181,12 @@ mitk::ThreeDnTDICOMSeriesReader
     // ... and we either call it 3D o 3D+t
     if (current3DnTBlockNumberOfTimeSteps > 1)
     {
-      true3DnTBlocks.push_back(current3DnTBlock);
+      true3DnTBlocks.emplace_back(current3DnTBlock,currentSplitReason);
       true3DnTBlocksTimeStepCount.push_back(current3DnTBlockNumberOfTimeSteps);
     }
     else
     {
-      non3DnTBlocks.push_back(current3DnTBlock);
+      non3DnTBlocks.emplace_back(current3DnTBlock, currentSplitReason);
     }
   }
 
@@ -163,7 +199,7 @@ mitk::ThreeDnTDICOMSeriesReader
        ++o, ++blockIter)
   {
     // bad copy&paste code from DICOMITKSeriesGDCMReader, should be handled in a better way
-    DICOMDatasetAccessingImageFrameList gdcmFrameInfoList = *blockIter;
+    const auto& gdcmFrameInfoList = blockIter->first;
     assert(!gdcmFrameInfoList.empty());
 
     // reverse frames if necessary
@@ -184,6 +220,14 @@ mitk::ThreeDnTDICOMSeriesReader
     block.SetTagLookupTableToPropertyFunctor(GetTagLookupTableToPropertyFunctor());
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
+    block.SetSplitReason(blockIter->second->Clone());
+
+    if (true3DnTBlocks.size() == 1 && non3DnTBlocks.empty())
+    {
+      //if we have condensed everything into just on 3DnT block, we can remove the overlap reason,
+      //because no real overlap is existent any more.
+      block.GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
+    }
 
     block.SetFlag("3D+t", true);
     block.SetIntProperty("timesteps", true3DnTBlocksTimeStepCount[o]);

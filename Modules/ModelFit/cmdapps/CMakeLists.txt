@@ -11,9 +11,8 @@ if(BUILD_ModelFitMiniApps OR MITK_BUILD_ALL_APPS)
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
     set( miniapps
-    GenericFittingMiniApp^^
-    PixelDumpMiniApp^^
-    Fuse3Dto4DImageMiniApp^^
+    GenericFitting^^
+    PixelDump^^
     )
 
     foreach(miniapp ${miniapps})

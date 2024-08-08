@@ -35,6 +35,13 @@ public:
   const QString VENV_NAME = ".totalsegmentator_v2";
   const QString TOTALSEGMENTATOR_VERSION = "2.2.1";
   const std::vector<QString> PACKAGES = {QString("Totalsegmentator==") + TOTALSEGMENTATOR_VERSION,
+                                         QString("numpy<2"),
+                                         QString("SimpleITK<=2.3.1"),
+                                         QString("p-tqdm<=1.4.0"),
+                                         QString("xvfbwrapper<=0.2.9"),
+                                         QString("rt_utils<=1.2.7"),
+                                         QString("dicom2nifti<=2.4.11"),
+                                         QString("pyarrow<=16.1.0"),
                                          QString("setuptools")}; /* just in case */
   const QString STORAGE_DIR;
   inline QmitkTotalSegmentatorToolInstaller(

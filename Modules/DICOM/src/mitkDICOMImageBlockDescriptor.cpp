@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "mitkLevelWindowProperty.h"
 #include "mitkPropertyKeyPath.h"
 #include "mitkDICOMIOMetaInformationPropertyConstants.h"
+#include "mitkIOMetaInformationPropertyConstants.h"
 #include <gdcmUIDs.h>
 #include <vector>
 #include <gdcmVersion.h>
@@ -23,6 +24,7 @@ found in the LICENSE file.
 mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor()
 : m_ReaderImplementationLevel( SOPClassUnknown )
 , m_PropertyList( PropertyList::New() )
+, m_SplitReason(IOVolumeSplitReason::New())
 , m_TagCache( nullptr )
 , m_PropertiesOutOfDate( true )
 {
@@ -40,6 +42,7 @@ mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor( const DICOMImageBloc
 , m_ReaderImplementationLevel( other.m_ReaderImplementationLevel )
 , m_TiltInformation( other.m_TiltInformation )
 , m_PropertyList( other.m_PropertyList->Clone() )
+, m_SplitReason( other.m_SplitReason->Clone() )
 , m_TagCache( other.m_TagCache )
 , m_PropertiesOutOfDate( other.m_PropertiesOutOfDate )
 , m_AdditionalTagMap(other.m_AdditionalTagMap)
@@ -70,6 +73,11 @@ mitk::DICOMImageBlockDescriptor& mitk::DICOMImageBlockDescriptor::
     if ( other.m_PropertyList )
     {
       m_PropertyList = other.m_PropertyList->Clone();
+    }
+
+    if (other.m_SplitReason)
+    {
+      m_SplitReason = other.m_SplitReason->Clone();
     }
 
     if ( other.m_MitkImage )
@@ -368,6 +376,21 @@ std::string mitk::DICOMImageBlockDescriptor::GetPropertyAsString( const std::str
   }
 }
 
+mitk::IOVolumeSplitReason::ConstPointer mitk::DICOMImageBlockDescriptor::GetSplitReason() const
+{
+  return m_SplitReason;
+}
+
+mitk::IOVolumeSplitReason::Pointer mitk::DICOMImageBlockDescriptor::GetSplitReason()
+{
+  return m_SplitReason;
+}
+
+void mitk::DICOMImageBlockDescriptor::SetSplitReason(IOVolumeSplitReason::Pointer reason)
+{
+  m_SplitReason = reason;
+}
+
 void mitk::DICOMImageBlockDescriptor::SetFlag( const std::string& key, bool value )
 {
   m_PropertyList->ReplaceProperty( key, BoolProperty::New( value ) );
@@ -464,6 +487,11 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_3D_plus_t()), BoolProperty::New(this->GetFlag("3D+t", false)));
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_GDCM()), StringProperty::New(gdcm::Version::GetVersion()));
   mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_DCMTK()), StringProperty::New(PACKAGE_VERSION));
+
+  if (nullptr != m_SplitReason && m_SplitReason->HasReasons())
+  {
+    mitkImage->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()), StringProperty::New(IOVolumeSplitReason::ToJSON(m_SplitReason).dump()));
+  }
 
   // get all found additional tags of interest
 

@@ -15,22 +15,34 @@ found in the LICENSE file.
 #include "mitkEquiDistantBlocksSorter.h"
 
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
-::SliceGroupingAnalysisResult()
+::SliceGroupingAnalysisResult() : m_SplitReason(IOVolumeSplitReason::New())
 {
 }
 
-mitk::DICOMDatasetList
+const mitk::DICOMDatasetList&
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
-::GetBlockDatasets()
+::GetBlockDatasets() const
 {
   return m_GroupedFiles;
 }
 
-mitk::DICOMDatasetList
+const mitk::DICOMDatasetList&
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
-::GetUnsortedDatasets()
+::GetUnsortedDatasets() const
 {
   return m_UnsortedFiles;
+}
+
+mitk::IOVolumeSplitReason::ConstPointer
+mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult::GetSplitReason() const
+{
+  return m_SplitReason;
+}
+
+mitk::IOVolumeSplitReason::Pointer
+mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult::GetSplitReason()
+{
+  return m_SplitReason;
 }
 
 bool
@@ -242,14 +254,11 @@ mitk::EquiDistantBlocksSorter
 {
   DICOMDatasetList remainingInput = GetInput(); // copy
 
-  typedef std::list<DICOMDatasetList> OutputListType;
-  OutputListType outputs;
-
   m_SliceGroupingResults.clear();
 
   while (!remainingInput.empty()) // repeat until all files are grouped somehow
   {
-    SliceGroupingAnalysisResult regularBlock = this->AnalyzeFileForITKImageSeriesReaderSpacingAssumption( remainingInput, m_AcceptTilt );
+    auto regularBlock = this->AnalyzeFileForITKImageSeriesReaderSpacingAssumption( remainingInput, m_AcceptTilt );
 
 #ifdef MBILOG_ENABLE_DEBUG
     DICOMDatasetList inBlock = regularBlock.GetBlockDatasets();
@@ -261,20 +270,26 @@ mitk::EquiDistantBlocksSorter
       MITK_DEBUG << " OUT  " << (*diter)->GetFilenameIfAvailable();
 #endif // MBILOG_ENABLE_DEBUG
 
-    outputs.push_back( regularBlock.GetBlockDatasets() );
+    remainingInput = regularBlock->GetUnsortedDatasets();
+
+    if (remainingInput.empty() && !m_SliceGroupingResults.empty() && m_SliceGroupingResults.back()->GetSplitReason()->HasReason(IOVolumeSplitReason::ReasonType::OverlappingSlices))
+    {
+      //if all inputs are processed and there is already a preceding grouping result that has overlapping as split reason, add also overlapping as split reason for the current block
+      regularBlock->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
+    }
+
     m_SliceGroupingResults.push_back( regularBlock );
-    remainingInput = regularBlock.GetUnsortedDatasets();
   }
 
-  unsigned int numberOfOutputs = outputs.size();
+  unsigned int numberOfOutputs = m_SliceGroupingResults.size();
   this->SetNumberOfOutputs(numberOfOutputs);
 
   unsigned int outputIndex(0);
-  for (auto oIter = outputs.cbegin();
-       oIter != outputs.cend();
+  for (auto oIter = m_SliceGroupingResults.cbegin();
+       oIter != m_SliceGroupingResults.cend();
        ++outputIndex, ++oIter)
   {
-    this->SetOutput(outputIndex, *oIter);
+    this->SetOutput(outputIndex, (*oIter)->GetBlockDatasets(), (*oIter)->GetSplitReason());
   }
 }
 
@@ -330,15 +345,13 @@ mitk::EquiDistantBlocksSorter
   return s ?  std::string(s) : std::string();
 }
 
-mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
+std::shared_ptr<mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult>
 mitk::EquiDistantBlocksSorter
 ::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   const DICOMDatasetList& datasets,
   bool groupImagesWithGantryTilt)
 {
-  // result.first = files that fit ITK's assumption
-  // result.second = files that do not fit, should be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption() again
-  SliceGroupingAnalysisResult result;
+  auto result = std::make_shared<SliceGroupingAnalysisResult>();
 
   const DICOMTag tagImagePositionPatient = DICOMTag(0x0020,0x0032); // Image Position (Patient)
   const DICOMTag    tagImageOrientation = DICOMTag(0x0020, 0x0037); // Image Orientation
@@ -353,6 +366,7 @@ mitk::EquiDistantBlocksSorter
   lastDifferentOrigin.Fill(0.0f);
 
   bool lastOriginInitialized(false);
+  int missingSlicesCount = 0;
 
   MITK_DEBUG << "--------------------------------------------------------------------------------";
   MITK_DEBUG << "Analyzing " << datasets.size() << " files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << groupImagesWithGantryTilt << ")";
@@ -373,22 +387,24 @@ mitk::EquiDistantBlocksSorter
       // with standard DICOM files this can happen to: CR, DX, SC
       MITK_DEBUG << "    ==> Sort away " << *dsIter << " for later analysis (no position information)"; // we already have one occupying this position
 
-      if ( result.GetBlockDatasets().empty() ) // nothing WITH position information yet
+      if ( result->GetBlockDatasets().empty() ) // nothing WITH position information yet
       {
         // ==> this is a group of its own, stop processing, come back later
-        result.AddFileToSortedBlock( *dsIter );
+        result->AddFileToSortedBlock( *dsIter );
 
         DICOMDatasetList remainingFiles;
         remainingFiles.insert( remainingFiles.end(), dsIter+1, datasets.end() );
-        result.AddFilesToUnsortedBlock( remainingFiles );
-
+        result->AddFilesToUnsortedBlock( remainingFiles );
+        if (!remainingFiles.empty())
+          //if there are remaining files add a split reason
+          result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::ImagePostionMissing);
         fileFitsIntoPattern = false;
         break; // no files anymore
       }
       else
       {
         // ==> this does not match, consider later
-        result.AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
+        result->AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
         fileFitsIntoPattern = false;
         continue; // next file
       }
@@ -404,7 +420,8 @@ mitk::EquiDistantBlocksSorter
     if ( lastOriginInitialized && (thisOrigin == lastOrigin) )
     {
       MITK_DEBUG << "    ==> Sort away " << *dsIter << " for separate time step"; // we already have one occupying this position
-      result.AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
+      result->AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
+      result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
       fileFitsIntoPattern = false;
     }
     else
@@ -450,7 +467,7 @@ mitk::EquiDistantBlocksSorter
 
           // at this point we have TWO slices analyzed! if they are the only two files, we still split, because there is no third to verify our tilting assumption.
           // later with a third being available, we must check if the initial tilting vector is still valid. if yes, continue.
-          // if NO, we need to split the already sorted part (result.first) and the currently analyzed file (*dsIter)
+          // if NO, we need to split the already sorted part (result->first) and the currently analyzed file (*dsIter)
 
           // tell apart gantry tilt from overall skewedness
           // sort out irregularly sheared slices, that IS NOT tilting
@@ -459,21 +476,22 @@ mitk::EquiDistantBlocksSorter
           {
             assert(!datasets.empty());
 
-            result.FlagGantryTilt(tiltInfo);
-            result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
-            result.SetFirstFilenameOfBlock( datasets.front()->GetFilenameIfAvailable() );
-            result.SetLastFilenameOfBlock( datasets.back()->GetFilenameIfAvailable() );
+            result->FlagGantryTilt(tiltInfo);
+            result->AddFileToSortedBlock( *dsIter ); // this file is good for current block
+            result->SetFirstFilenameOfBlock( datasets.front()->GetFilenameIfAvailable() );
+            result->SetLastFilenameOfBlock( datasets.back()->GetFilenameIfAvailable() );
             fileFitsIntoPattern = true;
           }
           else // caller does not want tilt compensation OR shearing is more complicated than tilt
           {
-            result.AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
+            result->AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
+            result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::GantryTiltDifference);
             fileFitsIntoPattern = false;
           }
         }
         else // not sheared
         {
-          result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
+          result->AddFileToSortedBlock( *dsIter ); // this file is good for current block
           fileFitsIntoPattern = true;
         }
       }
@@ -502,18 +520,49 @@ mitk::EquiDistantBlocksSorter
           // are returned as group 1, the remaining files (including the faulty one) are group 2
 
           /* Optimistic approach: check if any of the remaining slices fits in */
-          result.AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
+          result->AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
+
+          const auto fromLastToThisOriginDistance = (lastDifferentOrigin - thisOrigin).GetNorm();
+          const auto fromFirstToSecondOriginDistance = fromFirstToSecondOrigin.GetNorm();
+
+          auto currentMissCount = static_cast<int>(std::round((fromLastToThisOriginDistance / fromFirstToSecondOriginDistance)-1));
+          if (missingSlicesCount == 0 || missingSlicesCount > currentMissCount)
+          {
+            if (missingSlicesCount != 0 && currentMissCount == 0)
+            {
+              result->GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::MissingSlices);
+            }
+
+            missingSlicesCount = currentMissCount;
+            result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::SliceDistanceInconsistency, std::to_string(fromLastToThisOriginDistance));
+          }
+
+          if (missingSlicesCount < 0)
+          {
+            result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::OverlappingSlices);
+          }
+          else if (missingSlicesCount > 0 && !result->GetSplitReason()->HasReason(IOVolumeSplitReason::ReasonType::OverlappingSlices))
+          {
+            //If the missing slice count is positive, but no overlapping was flagged, add the missing slice reason.
+            //We only do it if overlapping was not flagged, to avoid false positives, that could be triggered by slices
+            //of the overlapping volume.
+            result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::MissingSlices, std::to_string(missingSlicesCount));
+          }
+
           fileFitsIntoPattern = false;
         }
         else
         {
-          result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
+          result->AddFileToSortedBlock( *dsIter ); // this file is good for current block
+          result->GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::SliceDistanceInconsistency);
+          result->GetSplitReason()->RemoveReason(IOVolumeSplitReason::ReasonType::MissingSlices);
           fileFitsIntoPattern = true;
+          missingSlicesCount = 0;
         }
       }
       else // this should be the very first slice
       {
-        result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
+        result->AddFileToSortedBlock( *dsIter ); // this file is good for current block
         fileFitsIntoPattern = true;
       }
     }
@@ -528,7 +577,7 @@ mitk::EquiDistantBlocksSorter
     lastOriginInitialized = true;
   }
 
-  if ( result.ContainsGantryTilt() )
+  if ( result->ContainsGantryTilt() )
   {
     // check here how many files were grouped.
     // IF it was only two files AND we assume tiltedness (e.g. save "distance")
@@ -536,20 +585,21 @@ mitk::EquiDistantBlocksSorter
     // we don't have any reason to assume they belong together
 
     // Above behavior can be configured via m_AcceptTwoSlicesGroups, the default being "do accept"
-    if ( result.GetBlockDatasets().size() == 2 && !m_AcceptTwoSlicesGroups )
+    if ( result->GetBlockDatasets().size() == 2 && !m_AcceptTwoSlicesGroups )
     {
-      result.UndoPrematureGrouping();
+      result->UndoPrematureGrouping();
+      result->GetSplitReason()->AddReason(IOVolumeSplitReason::ReasonType::GantryTiltDifference);
     }
   }
 
   // update tilt info to get maximum precision
   // earlier, tilt was only calculated from first and second slice.
   // now that we know the whole range, we can re-calculate using the very first and last slice
-  if ( result.ContainsGantryTilt() && result.GetBlockDatasets().size() > 1 )
+  if ( result->ContainsGantryTilt() && result->GetBlockDatasets().size() > 1 )
   {
     try
     {
-      DICOMDatasetList datasets = result.GetBlockDatasets();
+      DICOMDatasetList datasets = result->GetBlockDatasets();
       DICOMDatasetAccess* firstDataset = datasets.front();
       DICOMDatasetAccess* lastDataset = datasets.back();
       unsigned int numberOfSlicesApart = datasets.size() - 1;
@@ -558,7 +608,7 @@ mitk::EquiDistantBlocksSorter
       std::string firstOriginString = firstDataset->GetTagValueAsString( tagImagePositionPatient ).value;
       std::string lastOriginString = lastDataset->GetTagValueAsString( tagImagePositionPatient ).value;
 
-      result.FlagGantryTilt( GantryTiltInformation::MakeFromTagValues( firstOriginString, lastOriginString, orientationString, numberOfSlicesApart ));
+      result->FlagGantryTilt( GantryTiltInformation::MakeFromTagValues( firstOriginString, lastOriginString, orientationString, numberOfSlicesApart ));
     }
     catch (...)
     {

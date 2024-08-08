@@ -177,7 +177,7 @@ CheckCastAndSetProp(const nlohmann::json& value)
   }
   catch (...)
   {
-    MITK_ERROR << "Unkown error. Cannot convert value \"" << value << "\" into type: " << typeid(TValueType).name();
+    MITK_ERROR << "Unknown error. Cannot convert value \"" << value << "\" into type: " << typeid(TValueType).name();
   }
 
   return prop;
@@ -209,7 +209,7 @@ CheckCastAndSetItkArrayProp(const nlohmann::json& valueSequence)
   }
   catch (...)
   {
-    MITK_ERROR << "Unkown error. Cannot convert value \"" << valueSequence << "\" into type: " << typeid(ArrayType).name();
+    MITK_ERROR << "Unknown error. Cannot convert value \"" << valueSequence << "\" into type: " << typeid(ArrayType).name();
   }
 
   return prop;
@@ -406,7 +406,7 @@ int main(int argc, char* argv[])
             {
               knownPropsNameString << knownProp->getName() << "; ";
             }
-            mitkThrow() << "Cannot parametrize algorithm. A parameter is unkown to algorithm. Unkown passed parameter: \"" << key << "\". Known parameters: " << knownPropsNameString.str();
+            mitkThrow() << "Cannot parametrize algorithm. A parameter is unkown to algorithm. Unknown passed parameter: \"" << key << "\". Known parameters: " << knownPropsNameString.str();
           }
         }
       }

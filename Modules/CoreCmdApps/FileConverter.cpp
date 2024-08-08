@@ -18,7 +18,10 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 
 #include "mitkPreferenceListReaderOptionsFunctor.h"
+#include "mitkIOMetaInformationPropertyConstants.h"
+#include "mitkIOVolumeSplitReason.h"
 
+#include "mitkPropertyKeyPath.h"
 
 int main(int argc, char* argv[])
 {
@@ -32,10 +35,10 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file:", "Input File",us::Any(),false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("reader", "r", mitkCommandLineParser::String, "Reader Name", "Reader Name", us::Any());
-  parser.addArgument("list-readers", "lr", mitkCommandLineParser::Bool, "Reader Name", "Reader Name", us::Any());
+  parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file:", "Input path that should be loaded.",us::Any(),false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output path where the result should be stored. If the input generates multiple outputs the index will be added for all but the first output (before the extension; starting with 0).", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("reader", "r", mitkCommandLineParser::String, "Reader Name", "Enforce a certain reader to be used for loading the input.", us::Any());
+  parser.addArgument("list-readers", "lr", mitkCommandLineParser::Bool, "List reader names", "Print names of all available readers.", us::Any());
 
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -101,6 +104,8 @@ int main(int argc, char* argv[])
   auto nodes = mitk::IOUtil::Load(inputFilename, &functor);
 
   unsigned count = 0;
+  int missingSlicesDetected = 0;
+
   for (auto node : nodes)
   {
     std::string writeName = path + filename + extension;
@@ -110,6 +115,37 @@ int main(int argc, char* argv[])
     }
     mitk::IOUtil::Save(node, writeName);
     ++count;
+
+    try
+    {
+      auto splitReasonProperty = node->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()).c_str());
+      if (splitReasonProperty.IsNotNull())
+      {
+        auto reasonStr = splitReasonProperty->GetValueAsString();
+        auto reason = mitk::IOVolumeSplitReason::FromJSON(reasonStr);
+        if (nullptr != reason && reason->HasReason(mitk::IOVolumeSplitReason::ReasonType::MissingSlices))
+        {
+          missingSlicesDetected += std::stoi(reason->GetReasonDetails(mitk::IOVolumeSplitReason::ReasonType::MissingSlices));
+        }
+      }
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << "Error while checking for existing split reasons in volume #" << count << "." << std::endl;
+      std::cerr << "Error details:" << e.what() << std::endl;
+    }
+    catch (...)
+    {
+      std::cerr << "Unknown error while checking for existing split reasons in volume #" << count << "." << std::endl;
+    }
+  }
+
+  if (missingSlicesDetected > 0)
+  {
+    std::cout << std::endl;
+    std::cout << "\n!!! WARNING: MISSING SLICES !!!\n"
+                 "Details: Reader indicated volume splitting due to missing slices. Converted data might be invalid/incomplete.\n"
+                 "Estimated number of missing slices: " << missingSlicesDetected << std::endl;
   }
 
   return EXIT_SUCCESS;

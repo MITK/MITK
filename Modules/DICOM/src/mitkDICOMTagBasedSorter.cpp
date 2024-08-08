@@ -300,10 +300,13 @@ void
 mitk::DICOMTagBasedSorter
 ::Sort()
 {
+  SplitReasonListType splitReasons;
+
   // 1. split
-  // 2. sort each group
-  GroupIDToListType groups = this->SplitInputGroups();
-  GroupIDToListType& sortedGroups = this->SortGroups( groups );
+  GroupIDToListType groups = this->SplitInputGroups(splitReasons);
+
+  // 2. sort each group (can also lead to a split due to distance)
+  GroupIDToListType& sortedGroups = this->SortGroups( groups, splitReasons);
 
   // 3. define output
   this->SetNumberOfOutputs(sortedGroups.size());
@@ -312,7 +315,7 @@ mitk::DICOMTagBasedSorter
        groupIter != sortedGroups.cend();
        ++outputIndex, ++groupIter)
   {
-    this->SetOutput(outputIndex, groupIter->second);
+    this->SetOutput(outputIndex, groupIter->second, splitReasons[groupIter->first]);
   }
 }
 
@@ -339,7 +342,7 @@ mitk::DICOMTagBasedSorter
     {
       processedTagValue = rawTagValue.value;
     }
-    groupID << processedTagValue;
+    groupID << "#" << processedTagValue;
   }
   // shorten ID?
   return groupID.str();
@@ -347,7 +350,7 @@ mitk::DICOMTagBasedSorter
 
 mitk::DICOMTagBasedSorter::GroupIDToListType
 mitk::DICOMTagBasedSorter
-::SplitInputGroups()
+::SplitInputGroups(SplitReasonListType& splitReasons)
 {
   DICOMDatasetList input = GetInput(); // copy
 
@@ -360,19 +363,36 @@ mitk::DICOMTagBasedSorter
     DICOMDatasetAccess* dataset = *dsIter;
     assert(dataset);
 
-    std::string groupID = this->BuildGroupID( dataset );
+    const std::string groupID = this->BuildGroupID( dataset );
     MITK_DEBUG << "Group ID for for " << dataset->GetFilenameIfAvailable() << ": " << groupID;
     listForGroupID[groupID].push_back(dataset);
   }
 
   MITK_DEBUG << "After tag based splitting: " << listForGroupID.size() << " groups";
 
+  splitReasons.clear();
+  if (listForGroupID.size() == 1)
+  {
+    //no split -> no reason
+    splitReasons[listForGroupID.begin()->first] = IOVolumeSplitReason::New();
+  }
+  else
+  {
+    for (auto& [key, value] : listForGroupID)
+    {
+      (void)value; // Prevent unused variable error in older compilers
+      auto reason = IOVolumeSplitReason::New();
+      reason->AddReason(IOVolumeSplitReason::ReasonType::ValueSplitDifference);
+      splitReasons[key] = reason;
+    }
+  }
+
   return listForGroupID;
 }
 
 mitk::DICOMTagBasedSorter::GroupIDToListType&
 mitk::DICOMTagBasedSorter
-::SortGroups(GroupIDToListType& groups)
+::SortGroups(GroupIDToListType& groups, SplitReasonListType& splitReasons)
 {
   if (m_SortCriterion.IsNotNull())
   {
@@ -436,6 +456,7 @@ mitk::DICOMTagBasedSorter
     }
 
     GroupIDToListType consecutiveGroups;
+    SplitReasonListType consecutiveReasons;
     if (m_StrictSorting)
     {
       // Step 2: create new groups by enforcing consecutive order within each group
@@ -446,8 +467,10 @@ mitk::DICOMTagBasedSorter
       {
         std::stringstream groupKey;
         groupKey << std::setfill('0') << std::setw(6) << groupIndex++;
+        std::string groupKeyStr = groupKey.str();
 
         DICOMDatasetList& dsList = gIter->second;
+
         DICOMDatasetAccess* previousDS(nullptr);
         unsigned int dsIndex(0);
         double constantDistance(0.0);
@@ -456,6 +479,7 @@ mitk::DICOMTagBasedSorter
              dataset != dsList.cend();
              ++dsIndex, ++dataset)
         {
+          bool splitted = false;
           if (dsIndex >0) // ignore the first dataset, we cannot check any distances yet..
           {
             // for the second and every following dataset:
@@ -477,6 +501,8 @@ mitk::DICOMTagBasedSorter
                 groupKey.str(std::string());
                 groupKey.clear();
                 groupKey << std::setfill('0') << std::setw(6) << groupIndex++;
+                groupKeyStr = groupKey.str();
+                splitted = true;
               }
             }
             else
@@ -501,6 +527,8 @@ mitk::DICOMTagBasedSorter
                   groupKey.str(std::string());
                   groupKey.clear();
                   groupKey << std::setfill('0') << std::setw(6) << groupIndex++;
+                  groupKeyStr = groupKey.str();
+                  splitted = true;
                 }
               }
 
@@ -510,7 +538,16 @@ mitk::DICOMTagBasedSorter
               constantDistanceInitialized = true;
             }
           }
-          consecutiveGroups[groupKey.str()].push_back(*dataset);
+          consecutiveGroups[groupKeyStr].push_back(*dataset);
+
+          if (consecutiveReasons.find(groupKeyStr) == consecutiveReasons.end())
+          {
+            auto dsReason = splitReasons[gIter->first]->Clone();
+            if (splitted)
+              dsReason->AddReason(IOVolumeSplitReason::ReasonType::ValueSortDistance);
+            consecutiveReasons[groupKeyStr] = dsReason;
+          }
+
           previousDS = *dataset;
         }
       }
@@ -542,25 +579,21 @@ mitk::DICOMTagBasedSorter
     std::sort( firstSlices.begin(), firstSlices.end(), ParameterizedDatasetSort( m_SortCriterion ) );
 
     GroupIDToListType sortedResultBlocks;
-    unsigned int groupKeyValue(0);
-    for (auto firstSlice = firstSlices.cbegin();
-         firstSlice != firstSlices.cend();
-         ++firstSlice)
+    SplitReasonListType sortedResultsReasons;
+
+    for (auto& [key, group] : consecutiveGroups)
     {
-      for (auto gIter = consecutiveGroups.cbegin();
-           gIter != consecutiveGroups.cend();
-           ++groupKeyValue, ++gIter)
-      {
-        if (gIter->second.front() == *firstSlice)
-        {
-          std::stringstream groupKey;
-          groupKey << std::setfill('0') << std::setw(6) << groupKeyValue; // try more than 999,999 groups and you are doomed (your application already is)
-          sortedResultBlocks[groupKey.str()] = gIter->second;
-        }
-      }
+      auto findSliceIterator = std::find(firstSlices.begin(), firstSlices.end(), group.front());
+
+      std::stringstream groupKey;
+      groupKey << std::setfill('0') << std::setw(6) << std::distance(firstSlices.begin(),findSliceIterator); // try more than 999,999 groups and you are doomed (your application already is)
+      const auto groupKeyStr = groupKey.str();
+      sortedResultBlocks[groupKeyStr] = group;
+      sortedResultsReasons[groupKeyStr] = consecutiveReasons[key];
     }
 
     groups = sortedResultBlocks;
+    splitReasons = sortedResultsReasons;
   }
 
 #ifdef MBILOG_ENABLE_DEBUG

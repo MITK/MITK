@@ -188,7 +188,7 @@ protected:
   bool RefreshPlotData();
 
   void RenderPlot();
-  void RenderPlotCurve(const mitk::PlotDataCurveCollection* curveCollection, const QColor& sampleColor, const QColor& signalColor, const std::string& posString);
+  void RenderPlotCurve(const mitk::PlotDataCurveCollection* curveCollection, const QColor& sampleColor, const QColor& signalColor, const std::string& posString, const QColor& legendTextColor);
 
   void RenderFitInfo();
 

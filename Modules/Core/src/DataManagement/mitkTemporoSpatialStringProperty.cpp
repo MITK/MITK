@@ -423,3 +423,22 @@ mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializ
 
   return prop.GetPointer();
 }
+
+mitk::TemporoSpatialStringProperty::Pointer mitk::ExtractTimeStepFromTemporoSpatialStringProperty(const TemporoSpatialStringProperty* tsProperty, TimeStepType ts)
+{
+  if (nullptr == tsProperty)
+    mitkThrow() << "Cannot extract time step. Passed TemporoSpatialStringProperty pointer is invalid.";
+
+  if (!tsProperty->HasValueByTimeStep(ts))
+    mitkThrow() << "Cannot extract time step. TemporoSpatialStringProperty does not contain values for that passed time step. Invalid time step: " << ts;
+
+  auto slices = tsProperty->GetAvailableSlices(ts);
+
+  auto result = mitk::TemporoSpatialStringProperty::New();
+
+  for (const auto& slice : slices)
+  {
+    result->SetValue(0, slice, tsProperty->GetValue(ts, slice));
+  }
+  return result;
+}

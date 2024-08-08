@@ -5,6 +5,7 @@ set(MITK_MODULES
   Log
   Core
   Forms
+  FormsUI
   CommandLine
   CoreCmdApps
   AppUtil

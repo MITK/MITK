@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkCheckboxesQuestion_h
 #define mitkCheckboxesQuestion_h
 
-#include <mitkQuestionWithOptions.h>
+#include <mitkQuestionWithOtherOption.h>
 
 namespace mitk::Forms
 {
-  class MITKFORMS_EXPORT CheckboxesQuestion : public QuestionWithOptions
+  class MITKFORMS_EXPORT CheckboxesQuestion : public QuestionWithOtherOption
   {
   public:
     ~CheckboxesQuestion() override;
@@ -30,10 +30,9 @@ namespace mitk::Forms
 
     using QuestionWithOptions::AddResponse;
     using QuestionWithOptions::RemoveResponse;
-    using QuestionWithOptions::EnableOtherOption;
-    using QuestionWithOptions::HasOtherOption;
-    using QuestionWithOptions::AddOtherResponse;
-    using QuestionWithOptions::RemoveOtherResponse;
+
+    using QuestionWithOtherOption::AddOtherResponse;
+    using QuestionWithOtherOption::RemoveOtherResponse;
   };
 
   MITKFORMS_EXPORT void from_json(const nlohmann::ordered_json& j, CheckboxesQuestion& q);

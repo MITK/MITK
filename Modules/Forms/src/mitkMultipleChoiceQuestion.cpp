@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkMultipleChoiceQuestion.h>
-#include <nlohmann/json.hpp>
 
 using namespace mitk::Forms;
 using namespace nlohmann;
@@ -40,16 +39,10 @@ void MultipleChoiceQuestion::ToJSON(nlohmann::ordered_json& j) const
 
 void mitk::Forms::from_json(const ordered_json& j, MultipleChoiceQuestion& q)
 {
-  from_json(j, static_cast<QuestionWithOptions&>(q));
-
-  if (j.contains("Other") && j["Other"] == true)
-    q.EnableOtherOption();
+  from_json(j, static_cast<QuestionWithOtherOption&>(q));
 }
 
 void mitk::Forms::to_json(ordered_json& j, const MultipleChoiceQuestion& q)
 {
-  to_json(j, static_cast<const QuestionWithOptions&>(q));
-
-  if (q.HasOtherOption())
-    j["Other"] = true;
+  to_json(j, static_cast<const QuestionWithOtherOption&>(q));
 }

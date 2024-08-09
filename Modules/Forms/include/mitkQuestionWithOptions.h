@@ -31,26 +31,15 @@ namespace mitk::Forms
     void AddOption(const std::string& option);
     std::vector<std::string> GetOptions() const;
 
-    bool HasOtherOption() const;
-
   protected:
     void AddResponse(size_t i);
     void RemoveResponse(size_t i);
 
-    void SetResponse(size_t i);
-
-    void EnableOtherOption();
-
-    void AddOtherResponse(const std::string& response);
-    void RemoveOtherResponse();
-
-    void SetOtherResponse(const std::string& response);
+    virtual void SetResponse(size_t i);
 
   private:
     std::vector<std::string> m_Options;
     std::vector<size_t> m_Responses;
-    bool m_EnableOtherOption = false;
-    std::optional<std::string> m_OtherResponse;
   };
 
   MITKFORMS_EXPORT void from_json(const nlohmann::ordered_json& j, QuestionWithOptions& q);

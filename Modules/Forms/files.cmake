@@ -8,6 +8,7 @@ set(H_FILES
   include/mitkParagraphQuestion.h
   include/mitkQuestion.h
   include/mitkQuestionWithOptions.h
+  include/mitkQuestionWithOtherOption.h
   include/mitkShortAnswerQuestion.h
   include/mitkTextQuestion.h
 )
@@ -24,6 +25,7 @@ set(CPP_FILES
   mitkQuestion.cpp
   mitkQuestionFactory.cpp
   mitkQuestionWithOptions.cpp
+  mitkQuestionWithOtherOption.cpp
   mitkShortAnswerQuestion.cpp
   mitkTextQuestion.cpp
 )

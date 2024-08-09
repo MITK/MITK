@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkMultipleChoiceQuestion_h
 #define mitkMultipleChoiceQuestion_h
 
-#include <mitkQuestionWithOptions.h>
+#include <mitkQuestionWithOtherOption.h>
 
 namespace mitk::Forms
 {
-  class MITKFORMS_EXPORT MultipleChoiceQuestion : public QuestionWithOptions
+  class MITKFORMS_EXPORT MultipleChoiceQuestion : public QuestionWithOtherOption
   {
   public:
     ~MultipleChoiceQuestion() override;
@@ -29,9 +29,7 @@ namespace mitk::Forms
     void ToJSON(nlohmann::ordered_json& j) const override;
 
     using QuestionWithOptions::SetResponse;
-    using QuestionWithOptions::EnableOtherOption;
-    using QuestionWithOptions::HasOtherOption;
-    using QuestionWithOptions::SetOtherResponse;
+    using QuestionWithOtherOption::SetOtherResponse;
   };
 
   MITKFORMS_EXPORT void from_json(const nlohmann::ordered_json& j, MultipleChoiceQuestion& q);

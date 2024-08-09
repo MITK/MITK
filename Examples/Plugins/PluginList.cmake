@@ -14,4 +14,5 @@ set(MITK_EXAMPLE_PLUGINS
   org.mitk.example.gui.regiongrowing:ON
   org.mitk.example.gui.pcaexample:ON
   org.mitk.example.gui.imaging:ON
+  org.mitk.example.gui.icpregistration:ON
 )

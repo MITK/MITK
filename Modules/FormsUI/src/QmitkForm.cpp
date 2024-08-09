@@ -298,13 +298,16 @@ void QmitkForm::OnSubmitButtonClicked()
         }
         catch (const mitk::Exception& e)
         {
-          int buttonId = QMessageBox::critical(this,
-            "Submit form",
-            e.GetDescription(),
-            "Retry", // Id: 2
-            "Ignore"); // Id: 3
+          QMessageBox messageBox;
+          messageBox.setWindowTitle("Submit form");
+          messageBox.setIcon(QMessageBox::Warning);
+          messageBox.setText(e.GetDescription());
+          auto retryButton = messageBox.addButton("Retry", QMessageBox::NoRole);
+          messageBox.addButton("Ignore", QMessageBox::YesRole);
 
-          if (buttonId == 2)
+          messageBox.exec();
+
+          if (messageBox.clickedButton() == retryButton)
             retry = true;
         }
       } while (retry);
@@ -317,13 +320,16 @@ void QmitkForm::OnSubmitButtonClicked()
 
 void QmitkForm::OnClearButtonClicked()
 {
-  int buttonId = QMessageBox::question(this,
-    "Clear form?",
-    "This will remove your answers from all\nquestions and cannot be undone.",
-    "Cancel", // Id: 2
-    "Clear form"); // Id: 3
+  QMessageBox messageBox;
+  messageBox.setWindowTitle("Clear form?");
+  messageBox.setIcon(QMessageBox::Question);
+  messageBox.setText("This will remove your answers from all\nquestions and cannot be undone.");
+  messageBox.addButton("Cancel", QMessageBox::NoRole);
+  auto clearFormButton = messageBox.addButton("Clear form", QMessageBox::YesRole);
 
-  if (buttonId == 3)
+  messageBox.exec();
+
+  if (messageBox.clickedButton() == clearFormButton)
     this->Reset();
 }
 

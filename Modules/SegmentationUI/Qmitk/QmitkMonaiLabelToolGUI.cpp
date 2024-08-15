@@ -197,6 +197,8 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
       tool->FetchOverallInfo(hostName, port);
       bool allowAllModels = m_Preferences->GetBool("monailabel allow all models", false);
       this->PopulateUI(allowAllModels);
+      auto timeout_sec = std::make_unsigned_t<int>(m_Preferences->GetInt("monailabel timeout", 180));
+      tool->SetTimeout(timeout_sec);
     }
     catch (const mitk::Exception &e)
     {
@@ -331,5 +333,11 @@ void QmitkMonaiLabelToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::
   {
     bool allowAllModels = m_Preferences->GetBool("monailabel allow all models", false);
     this->PopulateUI(allowAllModels);
+    auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
+    if (nullptr != tool)
+    {
+      auto timeout_sec = std::make_unsigned_t<int>(m_Preferences->GetInt("monailabel timeout", 180));
+      tool->SetTimeout(timeout_sec);
+    }
   }
 }

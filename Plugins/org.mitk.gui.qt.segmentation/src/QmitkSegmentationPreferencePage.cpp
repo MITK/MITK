@@ -77,6 +77,7 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   prefs->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
   prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
   prefs->PutBool("monailabel allow all models", m_Ui->allowAllModelsCheckBox->isChecked());
+  prefs->PutInt("monailabel timeout", std::stoi(m_Ui->monaiTimeoutEdit->text().toStdString()));
   return true;
 }
 
@@ -140,6 +141,8 @@ void QmitkSegmentationPreferencePage::Update()
   m_Ui->suggestOnceCheckBox->setChecked(prefs->GetBool("suggest once", true));
 
   m_Ui->allowAllModelsCheckBox->setChecked(prefs->GetBool("monailabel allow all models", true));
+  m_Ui->monaiTimeoutEdit->setText(QString::number(prefs->GetInt("monailabel timeout", 180)));
+
 }
 
 void QmitkSegmentationPreferencePage::OnLabelSetPresetButtonClicked()

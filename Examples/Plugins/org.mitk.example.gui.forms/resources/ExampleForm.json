@@ -4,7 +4,7 @@
   "Sections": [
     {
       "Title": "Example Form",
-      "Description": "This form was deserialized from a JSSON file. Feel free to complete and submit it, resp. save its responses to a new or existing comma-separated value file.",
+      "Description": "This form was deserialized from a JSON file. Feel free to complete and submit it, resp. save its responses to a new or existing comma-separated value file.",
       "Questions": [
         {
           "Text": "Is this is a multiple choice question?",

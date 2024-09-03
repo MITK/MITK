@@ -346,7 +346,7 @@ bool mitk::ITKDICOMSeriesReaderHelper::ExtractDateTimeBoundsAndTriggerOfTimeStep
 };
 
 bool mitk::ITKDICOMSeriesReaderHelper::ExtractTimeBoundsOfTimeStep(
-  const StringContainer& filenamesOfTimeStep, TimeBounds& bounds, const OFDateTime& baselineDateTime )
+  const StringContainer& filenamesOfTimeStep, TimeBounds& bounds, const OFDateTime& baselineDateTime, bool& usedTriggerBounds )
 {
   DateTimeBounds aqDTBounds;
   TimeBounds triggerBounds;
@@ -355,10 +355,15 @@ bool mitk::ITKDICOMSeriesReaderHelper::ExtractTimeBoundsOfTimeStep(
 
   mitk::ScalarType lowerBound = ComputeMiliSecDuration( baselineDateTime, aqDTBounds[0] );
   mitk::ScalarType upperBound = ComputeMiliSecDuration( baselineDateTime, aqDTBounds[1] );
-  if ( lowerBound < mitk::eps || upperBound < mitk::eps )
+  if ( lowerBound < mitk::eps || upperBound < mitk::eps || usedTriggerBounds)
   {
     lowerBound = triggerBounds[0];
     upperBound = triggerBounds[1];
+    usedTriggerBounds = true;
+  }
+  else
+  {
+    usedTriggerBounds = false;
   }
 
   bounds[0] = lowerBound;
@@ -386,6 +391,8 @@ mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
   TimeBounds bounds( 0.0 );
   result.push_back( bounds );
 
+  //start with not using trigger time. Will be changed by ExtractTimeBoundsOfTimeStep if needed.
+  bool usedTriggerTime = false;
 
   // iterate over the remaining timesteps
   for ( ++pos;
@@ -396,15 +403,17 @@ mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
     TimeBounds dateTimeBounds;
 
     // extract the timebounds relative to the baseline
-    if ( ExtractTimeBoundsOfTimeStep( *pos, dateTimeBounds, baseLine ) )
+    if ( ExtractTimeBoundsOfTimeStep( *pos, dateTimeBounds, baseLine, usedTriggerTime) )
     {
-
       bounds[0] = dateTimeBounds[0];
       bounds[1] = dateTimeBounds[1];
     }
 
     result.push_back( bounds );
   }
+
+  if (usedTriggerTime)
+    MITK_DEBUG << "Used trigger time to extract time bounds of passed files";
 
   return result;
 };

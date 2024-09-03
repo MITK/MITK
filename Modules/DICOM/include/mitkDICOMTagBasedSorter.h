@@ -184,6 +184,7 @@ class MITKDICOM_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
     /**
       \brief Implements the sorting step.
       Relatively simple implementation thanks to std::sort and a parameterization via DICOMSortCriterion.
+      @param groups Argument that contains the groups that should be sorted.
       @param splitReasons Reference to the split reasons vector. It will be also updated by the method to reflect the reasons for the returned groups.
     */
     GroupIDToListType& SortGroups(GroupIDToListType& groups, SplitReasonListType& splitReasons);

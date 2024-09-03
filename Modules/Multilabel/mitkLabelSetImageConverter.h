@@ -49,6 +49,7 @@ namespace mitk
   * @pre labelValue must exist in segmentation.*/
   MITKMULTILABEL_EXPORT Image::Pointer CreateLabelMask(const LabelSetImage* segmentation, LabelSetImage::LabelValueType labelValue, bool createBinaryMap = true);
 
+  using IDToLabelClassNameMapType = std::map<LabelSetImage::LabelValueType, std::string>;
   /** Function creates a map of all label classes in a specified group.
   * @param segmentation Pointer to the segmentation that is the source for the map.
   * @param groupID the group that should be used.
@@ -58,8 +59,8 @@ namespace mitk
   * the pixel value of each found class in the map.
   * @pre segmentation must point to a valid instance.
   * @pre groupID must exist in segmentation.*/
-  using IDToLabelClassNameMapType = std::map<LabelSetImage::LabelValueType, std::string>;
   MITKMULTILABEL_EXPORT std::pair<Image::Pointer, IDToLabelClassNameMapType> CreateLabelClassMap(const LabelSetImage* segmentation, LabelSetImage::GroupIndexType groupID, const LabelSetImage::LabelValueVectorType& selectedLabels);
+
   /** Function creates a map of all label classes in a specified group.
   * @overload
   * This version always uses all labels of a group.

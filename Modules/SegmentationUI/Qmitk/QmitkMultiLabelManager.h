@@ -72,10 +72,11 @@ Q_SIGNALS:
   void GoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& point) const;
 
   /** @brief Signal that is emitted, if a label should be (re)named and default
-   * label naming is deactivated.
-   *
-   * The instance for which a new name is requested is passed with the signal.
-   * @param label Pointer to the instance that needs a (new) name.
+  * label naming is deactivated.
+  *
+  * The instance for which a new name is requested is passed with the signal.
+  * @param label Pointer to the instance that needs a (new) name.
+  * @param [in] rename Indicating if the signal was triggered for naming or renaming a label.
   * @param [out] canceled Indicating if the request was canceled by the used.
   */
   void LabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const;

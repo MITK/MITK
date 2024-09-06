@@ -19,6 +19,12 @@ found in the LICENSE file.
 
 namespace mitk::Forms
 {
+  /** \brief A Question whose possible responses are represented by a discrete linear scale.
+   *
+   * The question can have a single response, which is one of the numbers within the allowed
+   * range. The range must start with 0 or 1 and end with any number between 2 and 10 (1 to 5
+   * by default).
+   */
   class MITKFORMS_EXPORT LinearScaleQuestion : public Question
   {
   public:
@@ -40,6 +46,14 @@ namespace mitk::Forms
     void SetResponse(int response);
 
     std::pair<int, int> GetRange() const;
+
+    /** \brief Set the allowed range of numbers for a valid response.
+     *
+     * A valid range must start with 0 or 1 and end with any number between 2 and 10 (1 to 5
+     * by default).
+     *
+     * \exception Exception Invalid range.
+     */
     void SetRange(const std::pair<int, int>& range);
 
     std::pair<std::string, std::string> GetRangeLabels() const;

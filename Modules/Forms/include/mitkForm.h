@@ -26,6 +26,12 @@ namespace mitk::Forms
 {
   class Question;
 
+  /** A form consisting of questions possibly divided into multiple sections/pages.
+   *
+   * A form always has at least a single section, which is also used to define the form's general
+   * title and description. Helper methods like SetTitle() or SetDescription() can be used to
+   * conveniently set these properties of the first section.
+   */
   class MITKFORMS_EXPORT Form
   {
   public:

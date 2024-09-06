@@ -17,6 +17,12 @@ found in the LICENSE file.
 
 namespace mitk::Forms
 {
+  /** \brief A Question whose possible responses are represented by radio buttons.
+   *
+   * The question can have a single response, which can optionally be free text.
+   *
+   * \sa CheckboxesQuestion, DropdownQuestion
+   */
   class MITKFORMS_EXPORT MultipleChoiceQuestion : public QuestionWithOtherOption
   {
   public:

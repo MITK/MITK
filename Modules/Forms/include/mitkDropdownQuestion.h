@@ -17,6 +17,12 @@ found in the LICENSE file.
 
 namespace mitk::Forms
 {
+  /** \brief A Question whose possible responses are represented by a combo box.
+   *
+   * The question can have a single response.
+   *
+   * \sa MultipleChoiceQuestion, CheckboxesQuestion
+   */
   class MITKFORMS_EXPORT DropdownQuestion : public QuestionWithOptions
   {
   public:

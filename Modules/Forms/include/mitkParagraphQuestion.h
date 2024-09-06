@@ -17,6 +17,10 @@ found in the LICENSE file.
 
 namespace mitk::Forms
 {
+  /** \brief A Question whose possible response is free text.
+   *
+   * \sa ShortAnswerQuestion
+   */
   class MITKFORMS_EXPORT ParagraphQuestion : public TextQuestion
   {
   public:

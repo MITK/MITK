@@ -155,7 +155,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::PreprocessContourPoints()
     return;
   }
 
-  // First of all we have to extract the nomals and the surface points.
+  // First of all we have to extract the normals and the surface points.
   // Duplicated points can be eliminated
 
   vtkSmartPointer<vtkPolyData> polyData;
@@ -275,7 +275,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
   {
     for (unsigned int j = 0; j < numberOfCenters; j++)
     {
-      // Calculate the RBF value. Currently using Phi(r) = r with r is the euclidian distance between two points
+      // Calculate the RBF value. Currently using Phi(r) = r with r is the euclidean distance between two points
       p1 = m_Centers.at(i);
       p2 = m_Centers.at(j);
       p1 = p1 - p2;
@@ -445,7 +445,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateOutputInformation()
 void mitk::CreateDistanceImageFromSurfaceFilter::PrintEquationSystem()
 {
   std::stringstream out;
-  out << "Nummber of rows: " << m_SolutionMatrix.rows() << " ****** Number of columns: " << m_SolutionMatrix.cols()
+  out << "Number of rows: " << m_SolutionMatrix.rows() << " ****** Number of columns: " << m_SolutionMatrix.cols()
       << endl;
   out << "[ ";
   for (int i = 0; i < m_SolutionMatrix.rows(); i++)

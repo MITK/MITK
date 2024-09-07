@@ -36,7 +36,7 @@ how to remove obsolete data from the storage, the base class takes care of the o
 and orchestrates the whole checking and generation workflow.
 In all the generation/orchestration process the data storage, passed to the generator, 1) serves as place where the final
 results are stored and searched and 2) it resembles the state of the generation process with these final results and WIP
-place holder nodes that indicate planed or currently processed generation steps.
+place holder nodes that indicate planned or currently processed generation steps.
 */
 class MITKIMAGESTATISTICSUI_EXPORT QmitkDataGeneratorBase : public QObject
 {

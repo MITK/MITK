@@ -167,7 +167,7 @@ public:
   };
 
   /*! Helper function that maps a mitk point (of arbitrary dimension) from target space to moving space
-  @remarks The operation might faile, if the moving and target dimension of the registration
+  @remarks The operation might fail, if the moving and target dimension of the registration
   is not equal to the dimensionalities of the passed points.
   @pre valid registration instance must be set.
   @param inPoint pointer to a TargetPointType

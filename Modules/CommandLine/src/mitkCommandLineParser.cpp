@@ -577,7 +577,7 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
       {
         if (this->Internal->Debug)
         {
-          std::cout << "  Proccessing StringList ...";
+          std::cout << "  Processing StringList ...";
         }
         int j = 1;
         while (j + i < arguments.size())

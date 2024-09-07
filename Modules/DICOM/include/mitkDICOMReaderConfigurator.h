@@ -70,7 +70,7 @@ namespace mitk
   and afterwards the images within each group are sorted by means of DICOMSortCriterion, which
   most commonly mentions a tag.
 
-  Tag element and group are interpreted as the exadecimal numbers
+  Tag element and group are interpreted as the hexadecimal numbers
   found all around the DICOM standard. The numbers can be prepended by a "0x" if this is preferred
   by the programmer (but they are taken as hexadecimal in all cases).
 

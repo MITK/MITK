@@ -59,7 +59,7 @@ namespace mitk
 
   /** Base event class for all events that are about a label in a MultiLabel class.
   *
-  * It has a member that indicates the label id the event is refering to.
+  * It has a member that indicates the label id the event is referring to.
   * Use the ANY_LABEL value if you want to define an rvent (e.g. for adding an observer)
   * that reacts to every label and not just to a special one.
   */
@@ -87,7 +87,7 @@ namespace mitk
 
   /** Event class that is used to indicated if a label is added in a MultiLabel class.
   *
-  * It has a member that indicates the label id the event is refering to.
+  * It has a member that indicates the label id the event is referring to.
   * Use the ANY_LABEL value if you want to define an rvent (e.g. for adding an observer)
   * that reacts to every label and not just to a special one.
   */
@@ -95,7 +95,7 @@ namespace mitk
 
   /** Event class that is used to indicated if a label is modified in a MultiLabel class.
   *
-  * It has a member that indicates the label id the event is refering to.
+  * It has a member that indicates the label id the event is referring to.
   * Use the ANY_LABEL value if you want to define an rvent (e.g. for adding an observer)
   * that reacts to every label and not just to a special one.
   */
@@ -103,7 +103,7 @@ namespace mitk
 
   /** Event class that is used to indicated if a label is removed in a MultiLabel class.
   *
-  * It has a member that indicates the label id the event is refering to.
+  * It has a member that indicates the label id the event is referring to.
   * Use the ANY_LABEL value if you want to define an rvent (e.g. for adding an observer)
   * that reacts to every label and not just to a special one.
   */
@@ -115,7 +115,7 @@ namespace mitk
   * the modification of the MultiLableImage instance is finished. So e.g. even if 4 labels are
   * changed by a merge operation, this event will only be sent once (compared to LabelRemoved
   * or LabelModified).
-  * It has a member that indicates the label ids the event is refering to.
+  * It has a member that indicates the label ids the event is referring to.
   */
   class MITKMULTILABEL_EXPORT LabelsChangedEvent : public itk::ModifiedEvent
   {
@@ -140,7 +140,7 @@ namespace mitk
 
   /** Base event class for all events that are about a group in a MultiLabel class.
   *
-  * It has a member that indicates the group id the event is refering to.
+  * It has a member that indicates the group id the event is referring to.
   * Use the ANY_GROUP value if you want to define an event (e.g. for adding an observer)
   * that reacts to every group and not just to a special one.
   */
@@ -169,7 +169,7 @@ namespace mitk
 
   /** Event class that is used to indicated if a group is added in a MultiLabel class.
   *
-  * It has a member that indicates the group id the event is refering to.
+  * It has a member that indicates the group id the event is referring to.
   * Use the ANY_GROUP value if you want to define an rvent (e.g. for adding an observer)
   * that reacts to every group and not just to a special one.
   */
@@ -177,7 +177,7 @@ namespace mitk
 
   /** Event class that is used to indicated if a group is modified in a MultiLabel class.
   *
-  * It has a member that indicates the group id the event is refering to.
+  * It has a member that indicates the group id the event is referring to.
   * Use the ANY_GROUP value if you want to define an rvent (e.g. for adding an observer)
   * that reacts to every group and not just to a special one.
   */
@@ -185,7 +185,7 @@ namespace mitk
 
   /** Event class that is used to indicated if a group is removed in a MultiLabel class.
   *
-  * It has a member that indicates the group id the event is refering to.
+  * It has a member that indicates the group id the event is referring to.
   * Use the ANY_GROUP value if you want to define an rvent (e.g. for adding an observer)
   * that reacts to every group and not just to a special one.
   */

@@ -138,7 +138,7 @@ public:
     // New DataNode and new interactor, this should result in additional Interactor in the Dispatcher.
     m_Ei2->SetDataNode(m_Dn);
 
-    CPPUNIT_ASSERT_MESSAGE("06 Exprected number of registered Interactors is 2",
+    CPPUNIT_ASSERT_MESSAGE("06 Expected number of registered Interactors is 2",
                        m_Renderer->GetDispatcher()->GetNumberOfInteractors() == 2);
   }
 

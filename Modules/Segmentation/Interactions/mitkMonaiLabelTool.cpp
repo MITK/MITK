@@ -446,7 +446,7 @@ void mitk::MonaiLabelTool::FetchOverallInfo(const std::string &hostName, const i
   }
   else
   {
-    Tool::ErrorMessage.Send(httplib::to_string(response.error()) + " error occured.");
+    Tool::ErrorMessage.Send(httplib::to_string(response.error()) + " error occurred.");
   }
 }
 
@@ -486,7 +486,7 @@ void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
   }
   items.push_back({"file", buffer_lf_img.str(), "post_from_mitk.nii.gz", "application/octet-stream"});
   httplib::SSLClient cli(hostName, port);
-  cli.set_read_timeout(60);                      // arbitary 1 minute time-out to avoid corner cases.
+  cli.set_read_timeout(60);                      // arbitrary 1 minute time-out to avoid corner cases.
   cli.enable_server_certificate_verification(false);
   if (auto response = cli.Post(postPath, items))
   {
@@ -526,8 +526,8 @@ void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
     else
     {
       auto err = response.error();
-      MITK_ERROR << "An HTTP POST error: " << httplib::to_string(err) << " occured.";
-      mitkThrow() << "An HTTP POST error: " << httplib::to_string(err) << " occured.";
+      MITK_ERROR << "An HTTP POST error: " << httplib::to_string(err) << " occurred.";
+      mitkThrow() << "An HTTP POST error: " << httplib::to_string(err) << " occurred.";
     }
   }
 }

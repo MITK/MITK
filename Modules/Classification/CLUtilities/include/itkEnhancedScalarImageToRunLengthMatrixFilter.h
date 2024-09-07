@@ -41,7 +41,7 @@ namespace itk
   {
     /** \class EnhancedScalarImageToRunLengthMatrixFilter
     *  \brief This class computes a run length matrix (histogram) from
-    *  a given image and a mask image if provided. Run length matrces are
+    *  a given image and a mask image if provided. Run length matrices are
     *  used for image texture description.
     *
     * This filters creates a grey-level run length matrix from a N-D scalar

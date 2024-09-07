@@ -191,7 +191,7 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
 
   //Remark: the ImageTimeSelector is just needed to extract a timestep/channel of
   //the image in order to get the image dimension (time dimension and channel dimension
-  //stripped away). Therfore it is OK to always use time step 0 and channel 0
+  //stripped away). Therefore it is OK to always use time step 0 and channel 0
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
   timeSelector->SetInput(workingImage);
   timeSelector->SetTimeNr(0);
@@ -219,17 +219,17 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
 
       //Remark we cannot just errode the clone of sliceInfo.slice, because Erode currently only
       //works on pixel value 1. But we need to erode active label. Therefore we use TransferLabelContent
-      //as workarround.
-      //If MorphologicalOperations::Erode is supports user defined pixel values, the workarround
+      //as workaround.
+      //If MorphologicalOperations::Erode is supports user defined pixel values, the workaround
       //can be removed.
-      //Workarround starts
+      //Workaround starts
       mitk::Image::Pointer slice2 = Image::New();
       slice2->Initialize(sliceInfo.slice);
       AccessByItk(slice2, ClearBufferProcessing);
       LabelSetImage::LabelValueType erodeValue = 1;
       auto label = Label::New(erodeValue, "");
       TransferLabelContent(sliceInfo.slice, slice2, { label }, LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false, { {activeLabelValue, erodeValue} });
-      //Workarround ends
+      //Workaround ends
 
       mitk::MorphologicalOperations::Erode(slice2, 2, mitk::MorphologicalOperations::Ball);
       contourExtractor->SetInput(slice2);

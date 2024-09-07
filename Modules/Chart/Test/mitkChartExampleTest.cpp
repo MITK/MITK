@@ -185,7 +185,7 @@ public:
     {
         MITK_INFO << "=== ClearData";
 
-        // Claering data
+        // Clearing data
         mitk::ChartExampleTestHelper helper;
         helper.qmitkChartWidget.Clear();
         //int size = helper.qmitkChartWidget.ReturnSizeOfMemory();

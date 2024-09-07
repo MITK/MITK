@@ -118,9 +118,9 @@ namespace mitk
     static std::string GetTempPath();
 
     /**
-    * Returns the Directory Seperator for the current OS.
+    * Returns the Directory Separator for the current OS.
     *
-    * @return the Directory Seperator for the current OS, i.e. "\\" for Windows and "/" otherwise.
+    * @return the Directory Separator for the current OS, i.e. "\\" for Windows and "/" otherwise.
     */
     static char GetDirectorySeparator();
 

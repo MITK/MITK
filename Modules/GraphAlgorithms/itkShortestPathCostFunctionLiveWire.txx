@@ -267,7 +267,7 @@ namespace itk
     }
     costs = w1 * laplacianCost + w2 * gradientCost + w3 * gradientDirectionCost;
 
-    // scale by euclidian distance
+    // scale by euclidean distance
     double costScale;
     if (p1[0] == p2[0] || p1[1] == p2[1])
     {
@@ -338,7 +338,7 @@ namespace itk
 
       // m_EdgeImage = zeroCrossingImageFilter->GetOutput();
 
-      // cast image to float to apply canny edge dection filter
+      // cast image to float to apply canny edge detection filter
       /*typedef itk::CastImageFilter< TInputImageType, FloatImageType > CastFilterType;
       CastFilterType::Pointer castFilter = CastFilterType::New();
       castFilter->SetInput(this->m_Image);*/
@@ -364,7 +364,7 @@ namespace itk
       m_EdgeImage = cannyEdgeDetectionfilter->GetOutput();
 
       // set minCosts
-      m_MinCosts = 0.0; // The lower, the more thouroughly! 0 = dijkstra. If estimate costs are lower than actual costs
+      m_MinCosts = 0.0; // The lower, the more thoroughly! 0 = dijkstra. If estimate costs are lower than actual costs
                       // everything is fine. If estimation is higher than actual costs, you might not get the shortest
                       // but a different path.
 

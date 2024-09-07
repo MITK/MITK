@@ -203,8 +203,8 @@ signals:
   /**
   *\brief Emitted when a Service matching the filter changes it's properties,
   *
-  * and the new properties make it fall trough the filter. This effectively means that
-  * the widget will not track the service anymore. Usually, the Service should still be useable though
+  * and the new properties make it fall through the filter. This effectively means that
+  * the widget will not track the service anymore. Usually, the Service should still be usable though
   */
   void ServiceModifiedEndMatch(us::ServiceReferenceU);
 
@@ -245,7 +245,7 @@ protected:
   void InitPrivate(const std::string &namingProperty, const std::string &filter);
 
   /**
-  * \brief Contains a list of currently active services and their entires in the list. This is wiped with every
+  * \brief Contains a list of currently active services and their entries in the list. This is wiped with every
   * ServiceRegistryEvent.
   */
   std::vector<ServiceListLink> m_ListContent;

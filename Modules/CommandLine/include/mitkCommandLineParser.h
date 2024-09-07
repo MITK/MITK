@@ -233,7 +233,7 @@ public:
  * <code>errorString()</code> can be used the get the last error description.
  *
  * @param argument The previously added long or short argument name.
- * @param expression A regular expression which the arugment parameters must match.
+ * @param expression A regular expression which the argument parameters must match.
  * @param exactMatchFailedMessage An error message explaining why the parameter did
  *        not match.
  *

@@ -154,7 +154,7 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection &select
   // update selection of all points in pointset: select the one(s) that are selected in the view, deselect all others
   QModelIndexList selectedIndexes = selected.indexes();
 
-  // only call setSelectInfo on a point set with 'selected = true' if you deselcted the other entries
+  // only call setSelectInfo on a point set with 'selected = true' if you deselected the other entries
   int indexToSelect = -1;
 
   for (mitk::PointSet::PointsContainer::Iterator it =

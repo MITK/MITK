@@ -26,7 +26,7 @@ namespace mitk
   * it. It is based on the intensity-volume histogram (IVH) which describes the relation between the
   * grey level index i (and the corresponding intensity \f$x_i\f$) and the volume fraction \f$f\f$ that
   * with an intensity that is equal or greater than \f$x_i\f$. This feature is original proposed in
-  * El Naqa et al. Exploring feature-based approaches in PET images for prediciting cancer treatment outcomes.
+  * El Naqa et al. Exploring feature-based approaches in PET images for predicting cancer treatment outcomes.
   * Pattern recognition 2009.
   *
   * This feature calculator is activated by the option "<b>-intensity-volume-histogram</b>" or "<b>-ivoh</b>".

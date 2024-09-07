@@ -187,7 +187,7 @@ bool QmitkRenderWindow::event(QEvent* e)
       // left mouse button pressed. Hence, hovering over the 3-d render window will already result in rotating the
       // scene. In theory, this can be prevented by either disabling the WA_AcceptTouchEvents attribute for this widget
       // or by globally disabling the AA_SynthesizeMouseForUnhandledTouchEvents attribute for the whole application.
-      // Yet, here we are as a last resort, acknowleding touch events just to reject them.
+      // Yet, here we are as a last resort, acknowledging touch events just to reject them.
       return false;
 
     case QEvent::TouchCancel:

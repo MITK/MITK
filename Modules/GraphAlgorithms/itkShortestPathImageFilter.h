@@ -28,7 +28,7 @@ found in the LICENSE file.
 // void SetActivateTimeOut(bool) // Optional (default=false), for debug issues: after 30s algorithms terminates. You can
 // have a look at the VectorOrderImage to see how far it came
 // void SetMakeOutputImage(bool) // Optional (default=true), Generate an outputimage of the path. You can also get the
-// path directoy with GetVectorPath()
+// path directory with GetVectorPath()
 // void SetCalcAllDistances(bool) // Optional (default=false), Calculate Distances over the whole image. CAREFUL,
 // algorithm time extends a lot. Necessary for GetDistanceImage
 // void SetStoreVectorOrder(bool) // Optional (default=false), Stores in which order the pixels were checked. Necessary
@@ -44,7 +44,7 @@ found in the LICENSE file.
 // GetVectorOrderIMage // Returns the Vector Order image
 //
 // EXAMPLE USE
-// pleae see qmitkmitralvalvesegmentation4dtee bundle
+// please see qmitkmitralvalvesegmentation4dtee bundle
 
 namespace itk
 {

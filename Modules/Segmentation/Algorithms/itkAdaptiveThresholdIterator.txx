@@ -274,7 +274,7 @@ namespace itk
   template <class TImage, class TFunction>
   void AdaptiveThresholdIterator<TImage, TFunction>::CheckSeedPointValue()
   {
-    // checks, if the value, that has been averaged over the N-27 neighborhood aorund the seedpoint is still inside
+    // checks, if the value, that has been averaged over the N-27 neighborhood around the seedpoint is still inside
     // the thresholds-ranges. if not, the actual value of the seedpoint (not averaged) is used
     if (m_SeedPointValue < m_MinTH || m_SeedPointValue > m_MaxTH)
     {

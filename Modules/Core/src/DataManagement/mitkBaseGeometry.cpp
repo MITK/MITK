@@ -269,7 +269,7 @@ mitk::Point3D mitk::BaseGeometry::GetCenter() const
   Point3D c = m_BoundingBox->GetCenter();
   if (m_ImageGeometry)
   {
-    // Get Center returns the middel of min and max pixel index. In corner based images, this is the right position.
+    // Get Center returns the middle of min and max pixel index. In corner based images, this is the right position.
     // In center based images (imageGeometry == true), the index needs to be shifted back.
     c[0] -= 0.5;
     c[1] -= 0.5;

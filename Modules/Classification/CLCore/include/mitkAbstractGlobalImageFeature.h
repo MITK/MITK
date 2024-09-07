@@ -55,7 +55,7 @@ namespace mitk
     bool operator ==(const FeatureID& rh) const;
   };
 
-  /**Helper that takes a pass templateID clones it and populates it with the also passed informations before returning it.
+  /**Helper that takes a pass templateID clones it and populates it with the also passed information before returning it.
    * @param templateID reference ID that should be cloned.
    * @param name Name of the feature.*/
   MITKCLCORE_EXPORT FeatureID CreateFeatureID(FeatureID templateID, std::string name);

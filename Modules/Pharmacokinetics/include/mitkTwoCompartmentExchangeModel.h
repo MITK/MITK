@@ -20,7 +20,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /** @class TwoCompartmentExchangeModel
-   * @brief Implementation of the analystical model function of the Physiological Pharmacokinetic Brix model, using an Aterial Input Function
+   * @brief Implementation of the analytical model function of the Physiological Pharmacokinetic Brix model, using an Aterial Input Function
    * The Model calculates the Concentration-Time-Curve as a convolution of the Aterial Input funciton CA(t) and a tissue specific
    * residue function R(t). The Residue funktion consists of two parts: The Residue funktion Qp(t) of the Blood Plasma p and the residue funktion Qi(t) of the
    * interstitial volume I.

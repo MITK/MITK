@@ -73,7 +73,7 @@ void mitk::cl::GlobalImageFeaturesParameter::ParseFileLocations(std::map<std::st
 {
 
   //
-  // Read input and output file informations
+  // Read input and output file information
   //
   imagePath = parsedArgs["image"].ToString();
   maskPath = parsedArgs["mask"].ToString();
@@ -103,7 +103,7 @@ void mitk::cl::GlobalImageFeaturesParameter::ParseAdditionalOutputs(std::map<std
 {
 
   //
-  // Read input and output file informations
+  // Read input and output file information
   //
   useLogfile = false;
   if (parsedArgs.count("logfile"))

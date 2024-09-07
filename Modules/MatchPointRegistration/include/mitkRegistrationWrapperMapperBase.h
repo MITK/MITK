@@ -46,7 +46,7 @@ public:
     virtual bool GetGeometryDescription(mitk::BaseRenderer *renderer, mitk::BaseGeometry::ConstPointer& gridDesc, unsigned int& gridFrequ) const = 0;
     virtual bool RendererGeometryIsOutdated(mitk::BaseRenderer *renderer, const itk::TimeStamp& time) const = 0;
 
-    /**Internal class to store all informations and helper needed by a mapper to provide the render data for a
+    /**Internal class to store all information and helper needed by a mapper to provide the render data for a
      certain renderer.*/
     class MITKMATCHPOINTREGISTRATION_EXPORT RegWrapperLocalStorage : public mitk::Mapper::BaseLocalStorage
     {

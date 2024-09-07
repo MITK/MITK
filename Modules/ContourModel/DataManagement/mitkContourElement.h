@@ -21,7 +21,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /** \brief Represents a contour in 3D space.
-  A ContourElement is consisting of linked vertices implicitely defining the contour.
+  A ContourElement is consisting of linked vertices implicitly defining the contour.
   They are stored in a double ended queue making it possible to add vertices at front and
   end of the contour and to iterate in both directions.
   To mark a vertex as a special one it can be set as a control point.

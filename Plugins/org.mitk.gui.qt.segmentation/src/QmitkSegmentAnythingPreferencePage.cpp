@@ -187,7 +187,7 @@ void QmitkSegmentAnythingPreferencePage::AutoParsePythonPaths()
     {
       subIt.next();
       QString envName = subIt.fileName();
-      if (!envName.startsWith('.')) // Filter out irrelevent hidden folders, if any.
+      if (!envName.startsWith('.')) // Filter out irrelevant hidden folders, if any.
       {
         m_Ui->sysPythonComboBox->addItem("(" + envName + "): " + subIt.filePath());
       }
@@ -242,7 +242,7 @@ void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
   if (!QmitkSetupVirtualEnvUtil::IsVenvInstalled(path))
   {
     this->WriteErrorMessage("venv module not found for the selected python to create a new virtual " 
-                            "environment. Please install venv or select another compatibile python");
+                            "environment. Please install venv or select another compatible python");
     return;
   }
   //check if python 3.12 and ask for confirmation

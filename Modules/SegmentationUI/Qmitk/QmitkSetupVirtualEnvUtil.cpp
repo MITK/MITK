@@ -141,7 +141,7 @@ bool QmitkSetupVirtualEnvUtil::IsVenvInstalled(const QString &pythonPath)
   const QString PYTHON_EXE = "python3";
 #endif
   pyProcess.start(pythonPath + QDir::separator() + PYTHON_EXE,
-                  QStringList() << "-m" << "venv", QProcess::ReadOnly); //insuffient args to provoke stderr out
+                  QStringList() << "-m" << "venv", QProcess::ReadOnly); //insufficient args to provoke stderr out
   if (pyProcess.waitForFinished())
   {
     auto venvCaptured = QString(QStringDecoder(QStringDecoder::Utf8)(pyProcess.readAllStandardError()));

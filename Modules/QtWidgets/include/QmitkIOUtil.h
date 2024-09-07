@@ -91,7 +91,7 @@ public:
    * user input is required (e.g. ambiguous mime-types or reader options).
    *
    * If the provided DataStorage is not nullptr, some files will be added to it automatically,
-   * dependeing on the IFileReader used.
+   * depending on the IFileReader used.
    *
    * @param paths
    * @param parent

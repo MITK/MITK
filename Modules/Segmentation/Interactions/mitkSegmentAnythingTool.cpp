@@ -252,7 +252,7 @@ void mitk::SegmentAnythingTool::ITKWindowing(const itk::Image<TPixel, VImageDime
 namespace
 {
   // Checks if the image has valid size across each dimension. The check is
-  // critical for 2D images since 2D image are not valid in Saggital and Coronal views.
+  // critical for 2D images since 2D image are not valid in Sagittal and Coronal views.
   bool IsImageAtTimeStepValid(const mitk::Image *inputAtTimeStep)
   {
     int total = 0;

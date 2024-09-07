@@ -118,7 +118,7 @@ void mitk::SplineVtkMapper3D::ApplyAllProperties(BaseRenderer *renderer, vtkActo
   rgba[1] = temprgba[1];
   rgba[2] = temprgba[2];
   rgba[3] = temprgba[3];
-  // finaly set the color inside the actor
+  // finally set the color inside the actor
   m_SplinesActor->GetProperty()->SetColor(rgba);
 
   float lineWidth;

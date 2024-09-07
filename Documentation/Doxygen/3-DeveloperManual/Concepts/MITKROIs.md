@@ -17,7 +17,7 @@ A few of these properties are used by MITK to define the appearance of a rendere
 
   - "color" (mitk::ColorProperty): Color/RGB triplet of the rendered ROI (default: white \[1.0, 1.0, 1.0\])
   - "opacity" (mitk::FloatProperty): Opacity of the rendered ROI (default: 100% \[1.0\])
-  - "lineWidth" (mitk::FloatProperty): Line width of the egdes of the rendered ROI (default: 1px \[1.0\])
+  - "lineWidth" (mitk::FloatProperty): Line width of the edges of the rendered ROI (default: 1px \[1.0\])
 
 ROIs can be optionally time-resolved and define both coordinates and properties per time step, allowing for a dynamic appearance, position, and size over time.
 
@@ -187,4 +187,4 @@ Further hints:
   - The column vectors of the rotation matrix represent the three space directions.
   - The norms of the space directions are equivalent to the spacing values.
   - The rightmost column vector is always `[0, 0, 0, 1]`.
-  - The bottom row vector corresonds to the origin (with 1 as fourth element).
+  - The bottom row vector corresponds to the origin (with 1 as fourth element).

@@ -333,7 +333,7 @@ public:
   {
     QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
-    //remove label instance from label with multiple instances (middel)
+    //remove label instance from label with multiple instances (middle)
     m_Segmentation->RemoveLabel(5);
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0 }, { QString("Group 1"), QVariant(), QVariant(), QVariant() }));

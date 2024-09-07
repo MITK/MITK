@@ -41,7 +41,7 @@ void SelectionViewMitk::CreateQtPartControl(QWidget *parent)
   QListWidgetItem *listItemDataNode1 = new QListWidgetItem(QString::fromStdString(dataNode1->GetName()));
   QListWidgetItem *listItemDataNode2 = new QListWidgetItem(QString::fromStdString(dataNode2->GetName()));
 
-  // set the data of created QListWidgetItems two the informations of the data nodes
+  // set the data of created QListWidgetItems too the information of the data nodes
   listItemDataNode1->setData(QmitkDataNodeRole, QVariant::fromValue(dataNode1));
   listItemDataNode2->setData(QmitkDataNodeRole, QVariant::fromValue(dataNode2));
 

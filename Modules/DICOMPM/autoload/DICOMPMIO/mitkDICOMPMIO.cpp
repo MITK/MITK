@@ -88,7 +88,7 @@ namespace mitk
 
     try
     {
-      // Generate dcmdataset witk DICOM tags from property list; ATM the source are the filepaths from the
+      // Generate dcmdataset with DICOM tags from property list; ATM the source are the filepaths from the
       // property list
       mitk::StringLookupTableProperty::Pointer filesProp =
         dynamic_cast<mitk::StringLookupTableProperty *>(PMinput->GetProperty("referenceFiles").GetPointer());

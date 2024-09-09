@@ -151,6 +151,9 @@ namespace mitk
     itkGetConstMacro(URL, std::string);
     itkSetMacro(TempDir, std::string);
     itkGetConstMacro(TempDir, std::string);
+    itkSetMacro(Timeout, unsigned int);
+    itkGetConstMacro(Timeout, unsigned int);
+
     const MonaiAppMetadata *GetInfoParameters() const;
 
 
@@ -253,6 +256,7 @@ namespace mitk
     std::string m_ModelName;
     std::string m_URL;
     nlohmann::json m_ResultMetadata;
+    unsigned int m_Timeout = 60; //seconds
     const std::set<std::string> m_AUTO_SEG_TYPE_NAME = {"segmentation"};
     const std::set<std::string> m_SCRIBBLE_SEG_TYPE_NAME = {"scribbles"};
     const std::set<std::string> m_INTERACTIVE_SEG_TYPE_NAME = {"deepgrow"}; // deepedit not supported yet 

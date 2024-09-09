@@ -92,32 +92,34 @@ void mitk::MonaiLabelTool::UpdatePrepare()
 
 void mitk::MonaiLabelTool::OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  if (m_RequestParameters->model.IsInteractive())
+  if (nullptr == m_RequestParameters || !m_RequestParameters->model.IsInteractive())
   {
-    if (m_RequestParameters->model.Is2D() && ((nullptr == this->GetWorkingPlaneGeometry()) ||
-        !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
-                     *(this->GetWorkingPlaneGeometry()))))
+    return;
+  }
+
+  if (m_RequestParameters->model.Is2D() && ((nullptr == this->GetWorkingPlaneGeometry()) ||
+      !mitk::Equal(*(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()),
+                    *(this->GetWorkingPlaneGeometry()))))
+  {
+    this->ClearSeeds();
+    this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
+    this->ResetPreviewContent();
+  }
+  if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
+  {
+    const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+    if (positionEvent != nullptr)
     {
-      this->ClearSeeds();
-      this->SetWorkingPlaneGeometry(interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone());
-      this->ResetPreviewContent();
-    }
-    if (!this->IsUpdating() && m_PointSetPositive.IsNotNull())
-    {
-      const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-      if (positionEvent != nullptr)
-      {
-        m_PointSetPositive->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
-        ++m_PointSetCount;
-        this->UpdatePreview();
-      }
+      m_PointSetPositive->InsertPoint(m_PointSetCount, positionEvent->GetPositionInWorld());
+      ++m_PointSetCount;
+      this->UpdatePreview();
     }
   }
 }
 
 void mitk::MonaiLabelTool::OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  if ("deepgrow" != m_RequestParameters->model.type)
+  if (nullptr == m_RequestParameters || "deepgrow" != m_RequestParameters->model.type)
   {
     return;
   }
@@ -486,7 +488,7 @@ void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
   }
   items.push_back({"file", buffer_lf_img.str(), "post_from_mitk.nii.gz", "application/octet-stream"});
   httplib::SSLClient cli(hostName, port);
-  cli.set_read_timeout(60);                      // arbitary 1 minute time-out to avoid corner cases.
+  cli.set_read_timeout(m_Timeout);
   cli.enable_server_certificate_verification(false);
   if (auto response = cli.Post(postPath, items))
   {

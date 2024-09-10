@@ -147,6 +147,26 @@ void Form::AddQuestion(Question* question)
   m_Sections[0].AddQuestion(question);
 }
 
+std::vector<Form::Section>::const_iterator Form::begin() const
+{
+  return m_Sections.begin();
+}
+
+std::vector<Form::Section>::const_iterator Form::end() const
+{
+  return m_Sections.end();
+}
+
+std::vector<Form::Section>::iterator Form::begin()
+{
+  return m_Sections.begin();
+}
+
+std::vector<Form::Section>::iterator Form::end()
+{
+  return m_Sections.end();
+}
+
 void Form::Submit(const fs::path& csvPath) const
 {
   std::ofstream csvFile;

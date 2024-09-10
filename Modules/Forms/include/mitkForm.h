@@ -80,6 +80,11 @@ namespace mitk::Forms
     std::vector<Question*> GetQuestions() const;
     void AddQuestion(Question* question);
 
+    std::vector<Section>::const_iterator begin() const;
+    std::vector<Section>::const_iterator end() const;
+
+    std::vector<Section>::iterator begin();
+    std::vector<Section>::iterator end();
     void Submit(const fs::path& csvPath) const;
 
   private:

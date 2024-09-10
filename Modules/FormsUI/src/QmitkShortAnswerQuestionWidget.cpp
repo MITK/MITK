@@ -21,9 +21,9 @@ using Self = QmitkShortAnswerQuestionWidget;
 
 QmitkShortAnswerQuestionWidget::QmitkShortAnswerQuestionWidget(QWidget* parent)
   : QmitkQuestionWidget(parent),
-  m_Question(nullptr),
-  m_Layout(new QVBoxLayout),
-  m_LineEdit(new QLineEdit)
+    m_Question(nullptr),
+    m_Layout(new QVBoxLayout),
+    m_LineEdit(new QLineEdit)
 {
   m_LineEdit->setPlaceholderText("Your answer");
   m_Layout->addWidget(m_LineEdit);

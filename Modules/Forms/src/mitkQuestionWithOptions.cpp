@@ -18,9 +18,11 @@ using namespace nlohmann;
 
 QuestionWithOptions::~QuestionWithOptions() = default;
 
-void QuestionWithOptions::AddOption(const std::string& option)
+size_t QuestionWithOptions::AddOption(const std::string& option)
 {
+  auto i = m_Options.size();
   m_Options.push_back(option);
+  return i;
 }
 
 std::vector<std::string> QuestionWithOptions::GetOptions() const

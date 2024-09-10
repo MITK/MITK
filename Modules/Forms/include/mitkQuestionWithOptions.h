@@ -28,7 +28,7 @@ namespace mitk::Forms
 
     bool IsComplete() const override;
 
-    void AddOption(const std::string& option);
+    size_t AddOption(const std::string& option);
     std::vector<std::string> GetOptions() const;
 
   protected:

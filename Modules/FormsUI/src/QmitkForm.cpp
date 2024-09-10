@@ -294,7 +294,7 @@ void QmitkForm::OnSubmitButtonClicked()
 
         try
         {
-          m_Form.Submit(m_ResponsesPath);
+          mitk::Forms::SubmitToCSV(m_Form, m_ResponsesPath);
         }
         catch (const mitk::Exception& e)
         {

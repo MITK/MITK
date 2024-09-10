@@ -85,11 +85,12 @@ namespace mitk::Forms
 
     std::vector<Section>::iterator begin();
     std::vector<Section>::iterator end();
-    void Submit(const fs::path& csvPath) const;
 
   private:
     std::vector<Section> m_Sections;
   };
+
+  MITKFORMS_EXPORT void SubmitToCSV(const Form& form, const fs::path& csvPath);
 
   MITKFORMS_EXPORT void from_json(const nlohmann::ordered_json& j, Form& f);
   MITKFORMS_EXPORT void to_json(nlohmann::ordered_json& j, const Form& f);

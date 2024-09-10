@@ -167,7 +167,7 @@ std::vector<Form::Section>::iterator Form::end()
   return m_Sections.end();
 }
 
-void Form::Submit(const fs::path& csvPath) const
+void mitk::Forms::SubmitToCSV(const Form& form, const fs::path& csvPath)
 {
   std::ofstream csvFile;
 
@@ -187,7 +187,7 @@ void Form::Submit(const fs::path& csvPath) const
 
     csvFile << "\"Timestamp\"";
 
-    for (const auto& section : m_Sections)
+    for (const auto& section : form)
     {
       for (const auto* question : section.GetQuestions())
       {
@@ -200,7 +200,7 @@ void Form::Submit(const fs::path& csvPath) const
 
   csvFile << '"' << GetCurrentISO8601DateTime() << '"';
 
-  for (const auto& section : m_Sections)
+  for (const auto& section : form)
   {
     for (const auto* question : section.GetQuestions())
     {

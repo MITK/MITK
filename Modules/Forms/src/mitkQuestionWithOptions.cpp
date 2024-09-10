@@ -32,13 +32,12 @@ std::vector<std::string> QuestionWithOptions::GetOptions() const
 
 void QuestionWithOptions::AddResponse(size_t i)
 {
-  if (std::find(m_Responses.begin(), m_Responses.end(), i) == m_Responses.end())
-    m_Responses.insert(std::lower_bound(m_Responses.begin(), m_Responses.end(), i), i);
+  m_Responses.insert(i);
 }
 
 void QuestionWithOptions::RemoveResponse(size_t i)
 {
-  m_Responses.erase(std::remove(m_Responses.begin(), m_Responses.end(), i));
+  m_Responses.erase(i);
 }
 
 void QuestionWithOptions::SetResponse(size_t i)

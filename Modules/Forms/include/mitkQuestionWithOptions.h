@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <mitkQuestion.h>
 #include <optional>
+#include <set>
 
 namespace mitk::Forms
 {
@@ -39,7 +40,7 @@ namespace mitk::Forms
 
   private:
     std::vector<std::string> m_Options;
-    std::vector<size_t> m_Responses;
+    std::set<size_t> m_Responses;
   };
 
   MITKFORMS_EXPORT void from_json(const nlohmann::ordered_json& j, QuestionWithOptions& q);

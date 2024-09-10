@@ -44,6 +44,10 @@ QWidget:disabled {
   color: #656565;
 }
 
+QFrame[frameShape="1"] {
+  border: 1px solid #434346;
+}
+
 QStackedWidget {
   background-color: transparent;
 }
@@ -57,8 +61,11 @@ QAbstractButton:pressed, QAbstractButton:checked {
 }
 
 QPushButton {
-  border: 1px solid #3f3f46;
   padding: 4px 8px;
+}
+
+QPushButton[flat="false"] {
+  border: 1px solid #3f3f46;
 }
 
 QPushButton:pressed {

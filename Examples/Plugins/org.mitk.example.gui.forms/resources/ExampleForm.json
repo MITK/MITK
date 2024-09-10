@@ -1,0 +1,67 @@
+{
+  "FileFormat": "MITK Form",
+  "Version": 1,
+  "Sections": [
+    {
+      "Title": "Example Form",
+      "Description": "This form was deserialized from a JSON file. Feel free to complete and submit it, resp. save its responses to a new or existing comma-separated value file.",
+      "Questions": [
+        {
+          "Text": "Is this is a multiple choice question?",
+          "Required": true,
+          "Type": "Multiple choice",
+          "Options": [
+            "Yes, it is.",
+            "No, it isn't. Wait... it actually is."
+          ],
+          "Other": true
+        },
+        {
+          "Text": "Is this a checkboxes question?",
+          "Type": "Checkboxes",
+          "Options": [
+            "Yes, it is.",
+            "It is indeed.",
+            "Yep, I'm sure."
+          ],
+          "Other": true
+        },
+        {
+          "Text": "Do you agree that this is a linear scale question?",
+          "Required": true,
+          "Type": "Linear scale",
+          "Range": [
+            1,
+            4
+          ],
+          "Labels": [
+            "Agree",
+            "Agree even more"
+          ]
+        },
+        {
+          "Text": "Is this a short-answer question?",
+          "Type": "Short answer"
+        }
+      ]
+    },
+    {
+      "Title": "Second section",
+      "Description": "Welcome to the second and last section of this form.",
+      "Questions": [
+        {
+          "Text": "Is this a dropdown question?",
+          "Type": "Drop-down",
+          "Options": [
+            "Yes, it is.",
+            "I'm not sure (yes)."
+          ]
+        },
+        {
+          "Text": "Is this a paragraph question?",
+          "Type": "Paragraph"
+        }
+      ]
+    }
+  ]
+}

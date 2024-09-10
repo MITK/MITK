@@ -74,6 +74,10 @@ namespace mitk
     const Task& GetDefaults() const;
     void SetDefaults(const Task& defaults);
 
+    bool HasForm() const;
+    std::filesystem::path GetForm() const;
+    void SetForm(const std::filesystem::path& form);
+
     bool IsDone() const;
     bool IsDone(size_t index) const;
 
@@ -105,6 +109,7 @@ namespace mitk
   private:
     Task m_Defaults;
     std::vector<Task> m_Tasks;
+    std::optional<std::filesystem::path> m_Form;
   };
 }
 

@@ -1,0 +1,40 @@
+set(H_FILES
+  include/mitkIQuestionWidgetFactory.h
+  include/QmitkCheckboxesQuestionWidget.h
+  include/QmitkDropdownQuestionWidget.h
+  include/QmitkForm.h
+  include/QmitkLinearScaleQuestionWidget.h
+  include/QmitkMultipleChoiceQuestionWidget.h
+  include/QmitkParagraphQuestionWidget.h
+  include/QmitkQuestionWidget.h
+  include/QmitkShortAnswerQuestionWidget.h
+)
+
+set(MOC_H_FILES
+  include/QmitkCheckboxesQuestionWidget.h
+  include/QmitkDropdownQuestionWidget.h
+  include/QmitkLinearScaleQuestionWidget.h
+  include/QmitkForm.h
+  include/QmitkMultipleChoiceQuestionWidget.h
+  include/QmitkParagraphQuestionWidget.h
+  include/QmitkQuestionWidget.h
+  include/QmitkShortAnswerQuestionWidget.h
+)
+
+set(UI_FILES
+  src/QmitkForm.ui
+)
+
+set(CPP_FILES
+  mitkIQuestionWidgetFactory.cpp
+  mitkModuleActivator.cpp
+  mitkQuestionWidgetFactory.cpp
+  QmitkCheckboxesQuestionWidget.cpp
+  QmitkDropdownQuestionWidget.cpp
+  QmitkForm.cpp
+  QmitkLinearScaleQuestionWidget.cpp
+  QmitkMultipleChoiceQuestionWidget.cpp
+  QmitkParagraphQuestionWidget.cpp
+  QmitkQuestionWidget.cpp
+  QmitkShortAnswerQuestionWidget.cpp
+)

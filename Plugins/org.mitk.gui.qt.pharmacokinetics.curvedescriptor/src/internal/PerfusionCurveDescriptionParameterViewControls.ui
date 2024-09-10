@@ -68,7 +68,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QTextEdit" name="infoBox"/>
+       <widget class="QTextEdit" name="infoBox">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

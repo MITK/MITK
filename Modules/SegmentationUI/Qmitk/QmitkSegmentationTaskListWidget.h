@@ -65,6 +65,7 @@ private:
   void UpdateLoadButton();
   void UpdateNavigationButtons();
   void UpdateDetailsLabel();
+  void UpdateFormWidget();
   void UpdateStoreAndAcceptButtons();
   void OnLoadButtonClicked();
   mitk::DataNode* GetImageDataNode(size_t index) const;

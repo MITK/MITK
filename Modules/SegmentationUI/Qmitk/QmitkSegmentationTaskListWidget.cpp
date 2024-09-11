@@ -97,7 +97,7 @@ namespace
 
 /* This constructor has three objectives:
  *   1. Do widget initialization that cannot be done in the .ui file
- *   2. Connect signals and slots
+ *   2. Connect signals and slots (including shortcuts)
  *   3. Explicitly trigger a reset to a valid initial widget state
  */
 QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent)
@@ -488,6 +488,7 @@ void QmitkSegmentationTaskListWidget::OnCurrentTaskChanged()
   this->UpdateLoadButton();
   this->UpdateNavigationButtons();
   this->UpdateDetailsLabel();
+  this->UpdateFormWidget();
   this->UpdateStoreAndAcceptButtons();
 }
 
@@ -578,6 +579,19 @@ void QmitkSegmentationTaskListWidget::UpdateDetailsLabel()
     details += QString("<p>%1</p>").arg(stringList.join(QStringLiteral("<br>")));
 
   m_Ui->detailsLabel->setText(details);
+}
+
+void QmitkSegmentationTaskListWidget::UpdateFormWidget()
+{
+  const auto current = m_CurrentTaskIndex.value();
+
+  if (!m_CurrentTaskIndex.has_value() || !m_TaskList->HasForm(current))
+  {
+    m_Ui->formWidget->hide();
+    return;
+  }
+
+  // TODO
 }
 
 void QmitkSegmentationTaskListWidget::UpdateStoreAndAcceptButtons()

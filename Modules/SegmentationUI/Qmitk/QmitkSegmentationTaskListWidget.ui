@@ -141,14 +141,14 @@
       </item>
       <item>
        <widget class="QLabel" name="detailsLabel">
-        <property name="text">
-         <string/>
-        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
@@ -163,6 +163,9 @@
          <bool>true</bool>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="QmitkForm" name="formWidget" native="true"/>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -251,6 +254,12 @@
    <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>
    <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkForm</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkForm.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

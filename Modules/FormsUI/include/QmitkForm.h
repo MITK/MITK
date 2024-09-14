@@ -39,6 +39,9 @@ public:
   fs::path GetResponsesPath() const;
   void SetResponsesPath(const fs::path& csvPath);
 
+signals:
+  void Submit();
+
 private:
   void CreateQuestionWidgets();
   bool ValidateCurrentSection();

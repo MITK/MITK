@@ -303,6 +303,8 @@ void QmitkForm::OnSubmitButtonClicked()
 {
   if (this->ValidateCurrentSection())
   {
+    emit Submit();
+
     if (m_ResponsesPath.empty())
     {
       m_ResponsesPath = QFileDialog::getSaveFileName(this,

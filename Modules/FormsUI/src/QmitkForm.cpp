@@ -163,7 +163,7 @@ void QmitkForm::Update()
 
 void QmitkForm::UpdateFormHeader()
 {
-  if (m_HasBeenSubmitted)
+  if (m_HasBeenSubmitted || m_Ui->sectionWidget->currentIndex() == -1)
   {
     m_Ui->formHeaderFrame->hide();
     return;
@@ -202,7 +202,7 @@ void QmitkForm::UpdateFormHeader()
 
 void QmitkForm::UpdateSubmittedHeader()
 {
-  if (m_HasBeenSubmitted)
+  if (m_HasBeenSubmitted && m_Ui->sectionWidget->currentIndex() != -1)
   {
     bool showTitle = !m_Form->GetTitle().empty();
 
@@ -221,7 +221,7 @@ void QmitkForm::UpdateSubmittedHeader()
 
 void QmitkForm::UpdateSectionHeader()
 {
-  if (m_HasBeenSubmitted)
+  if (m_HasBeenSubmitted || m_Ui->sectionWidget->currentIndex() == -1)
   {
     m_Ui->sectionHeaderFrame->hide();
     return;
@@ -255,7 +255,7 @@ void QmitkForm::UpdateSectionHeader()
 
 void QmitkForm::UpdateQuestionWidgets()
 {
-  if (m_HasBeenSubmitted)
+  if (m_HasBeenSubmitted || m_Ui->sectionWidget->currentIndex() == -1)
   {
     m_Ui->sectionWidget->hide();
     return;
@@ -282,10 +282,10 @@ void QmitkForm::UpdateFormButtons()
 {
   int sectionIndex = m_Ui->sectionWidget->currentIndex();
 
-  m_Ui->backButton->setVisible(!m_HasBeenSubmitted && sectionIndex != 0);
+  m_Ui->backButton->setVisible(!m_HasBeenSubmitted && sectionIndex > 0);
   m_Ui->nextButton->setVisible(!m_HasBeenSubmitted && sectionIndex < m_Ui->sectionWidget->count() - 1);
-  m_Ui->submitButton->setVisible(!m_HasBeenSubmitted && sectionIndex == m_Ui->sectionWidget->count() - 1);
-  m_Ui->clearButton->setVisible(!m_HasBeenSubmitted);
+  m_Ui->submitButton->setVisible(!m_HasBeenSubmitted && sectionIndex != -1 && sectionIndex == m_Ui->sectionWidget->count() - 1);
+  m_Ui->clearButton->setVisible(!m_HasBeenSubmitted && sectionIndex != -1);
 }
 
 void QmitkForm::OnBackButtonClicked()

@@ -147,6 +147,27 @@ void Form::AddQuestion(Question* question)
   m_Sections[0].AddQuestion(question);
 }
 
+void Form::AddSupplement(const std::string& key)
+{
+  if (m_Supplements.find(key) == m_Supplements.end())
+    m_Supplements[key] = "";
+}
+
+bool Form::SetSupplement(const std::string& key, const std::string& value)
+{
+  if (m_Supplements.find(key) == m_Supplements.end())
+    return false;
+
+  m_Supplements[key] = value;
+
+  return true;
+}
+
+const std::map<std::string, std::string>& Form::GetSupplements() const
+{
+  return m_Supplements;
+}
+
 std::vector<Form::Section>::const_iterator Form::begin() const
 {
   return m_Sections.begin();
@@ -187,6 +208,9 @@ void mitk::Forms::SubmitToCSV(const Form& form, const fs::path& csvPath)
 
     csvFile << "\"Timestamp\"";
 
+    for (const auto& [key, value] : form.GetSupplements())
+      csvFile << ",\"" << key << '"';
+
     for (const auto& section : form)
     {
       for (const auto* question : section.GetQuestions())
@@ -199,6 +223,9 @@ void mitk::Forms::SubmitToCSV(const Form& form, const fs::path& csvPath)
   }
 
   csvFile << '"' << GetCurrentISO8601DateTime() << '"';
+
+  for (const auto& [key, value] : form.GetSupplements())
+    csvFile << ",\"" << value << '"';
 
   for (const auto& section : form)
   {

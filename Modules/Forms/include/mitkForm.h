@@ -18,6 +18,7 @@ found in the LICENSE file.
 
 #include <memory>
 #include <string>
+#include <map>
 #include <vector>
 
 #include <nlohmann/json_fwd.hpp>
@@ -80,6 +81,30 @@ namespace mitk::Forms
     std::vector<Question*> GetQuestions() const;
     void AddQuestion(Question* question);
 
+    /** \brief Add extra data that is submitted together with the responses.
+     *
+     * Supplements are a rudimentary and delicate feature to add extra
+     * data to submissions, i.e., extra columns for CSV submissions.
+     *
+     * Supplements are key-value pairs supposed to be completely set up before
+     * the first submission. Afterwards, do not add any new supplements.
+     * Values of existing supplements can be safely modified, though.
+     *
+     * \note Do not add new supplements after the first submission.
+     * \note Submissions do not clear any supplements or their values.
+     */
+    void AddSupplement(const std::string& key);
+
+    /** \brief Set the value of a certain existing supplement.
+     *
+     * \return \c true if the supplement exists, \c false otherwise.
+     *
+     * \sa AddSupplement()
+     */
+    bool SetSupplement(const std::string& key, const std::string& value);
+
+    const std::map<std::string, std::string>& GetSupplements() const;
+
     std::vector<Section>::const_iterator begin() const;
     std::vector<Section>::const_iterator end() const;
 
@@ -88,6 +113,7 @@ namespace mitk::Forms
 
   private:
     std::vector<Section> m_Sections;
+    std::map<std::string, std::string> m_Supplements;
   };
 
   MITKFORMS_EXPORT void SubmitToCSV(const Form& form, const fs::path& csvPath);

@@ -71,7 +71,7 @@ older revision for the checkout or get a stable tar ball from
 To clone MITK's current Git repository do:
 
 \code
-git clone https://phabricator.mitk.org/source/mitk.git MITK
+git clone https://git.dkfz.de/mic/mitk.git MITK
 \endcode
 
 \section BuildInstructions_Build_With_CMake Build MITK with CMake

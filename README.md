@@ -51,7 +51,7 @@ The MITK source code and binaries for the *MitkWorkbench* application are releas
 
 The official MITK source code is available in the [MITK Git repository][git_repo]. The Git clone command is
 
-    git clone https://git.dkfz.de/mic/mitk.git MITK
+    git clone https://github.com/MITK/MITK.git
 
 Active development takes place in the MITK develop branch and its usage is advised for advanced users only.
 
@@ -65,7 +65,7 @@ Build instructions
 
 MITK uses [CMake][cmake] to configure a build tree. The following is a crash course about cloning, configuring, and building MITK on a Linux/Unix system:
 
-    git clone https://git.dkfz.de/mic/mitk.git MITK
+    git clone https://github.com/MITK/MITK.git
     mkdir MITK-build
     cd MITK-build
     cmake ../MITK
@@ -93,7 +93,7 @@ Useful links
 [license]: https://github.com/MITK/MITK/blob/master/LICENSE
 [release-cycle]: https://www.mitk.org/MitkReleaseCycle
 [download]: https://www.mitk.org/Download
-[git_repo]: https://git.dkfz.de/mic/mitk
+[git_repo]: https://github.com/MITK/MITK
 [contribute]: https://www.mitk.org/How_to_contribute
 [cmake]: https://www.cmake.org
 [build]: https://docs.mitk.org/nightly/BuildInstructionsPage.html

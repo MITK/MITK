@@ -22,7 +22,7 @@ namespace
 {
   QString CreateRevisionLabelText()
   {
-    auto revisionText = QString(<html><head/><body><p>"Revision: %1").arg(MITK_REVISION);
+    auto revisionText = QString("<html><head/><body><p>Revision: %1").arg(MITK_REVISION);
     QString mitkRevisionDescription(MITK_REVISION_DESC);
 
     if (!mitkRevisionDescription.isEmpty())

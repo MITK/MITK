@@ -128,20 +128,23 @@ void QtStyleManager::AddDefaultFonts()
 {
   m_customFontNames.append(QString("<<system>>"));
 
-  m_customFontNames.append(QString("Fira Sans"));
-  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/FiraSans/FiraSans.ttf");
+  this->AddFontFamily("Atkinson Hyperlegible");
+  this->AddFontFamily("Fira Sans");
+  this->AddFontFamily("Open Sans");
+  this->AddFontFamily("Roboto");
+}
 
-  m_customFontNames.append(QString("Light Fira Sans"));
-  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/LightFiraSans/LightFiraSans.ttf");
+void QtStyleManager::AddFontFamily(const QString& fontFamily)
+{
+  QString fontFamilyWithoutSpace = fontFamily;
+  fontFamilyWithoutSpace.remove(QChar(' '));
 
-  m_customFontNames.append(QString("Roboto"));
-  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/Roboto/Roboto.ttf");
+  auto basePath = QString(":/org.blueberry.ui.qt/fonts/%1/%1-").arg(fontFamilyWithoutSpace);
 
-  m_customFontNames.push_back(QString("Open Sans"));
-  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/OpenSans/OpenSans-Regular.ttf");
+  for (const auto& variant : { "Bold", "BoldItalic", "Italic", "Regular" })
+    QFontDatabase::addApplicationFont(QString("%1%2.ttf").arg(basePath).arg(variant));
 
-  m_customFontNames.push_back(QString("xkcd"));
-  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/xkcd/xkcd.ttf");
+  m_customFontNames.push_back(fontFamily);
 }
 
 void QtStyleManager::ClearStyles()

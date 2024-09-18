@@ -68,6 +68,7 @@ private:
 
   void AddDefaultStyle();
   void AddDefaultFonts();
+  void AddFontFamily(const QString& fontFamily);
   void ClearStyles();
   void ReadPreferences();
 

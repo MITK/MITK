@@ -382,6 +382,11 @@ QMenu::separator {
   background-color: #3e3e40;
 }
 
+QMenuBar::item
+{
+  background-color: #2d2d30;
+}
+
 QMenuBar::item:selected {
   background-color: #3e3e40;
 }

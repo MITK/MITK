@@ -773,13 +773,14 @@ void mitk::SegTool2D::InteractiveSegmentationBugMessage(const std::string &messa
              << std::endl
              << "  " << std::endl
              << " Please file a BUG REPORT: " << std::endl
-             << " https://phabricator.mitk.org/" << std::endl
+             << " https://github.com/MITK/MITK/issues" << std::endl
              << " Contain the following information:" << std::endl
              << "  - What image were you working on?" << std::endl
              << "  - Which region of the image?" << std::endl
              << "  - Which tool did you use?" << std::endl
              << "  - What did you do?" << std::endl
              << "  - What happened (not)? What did you expect?" << std::endl;
+
 }
 
 bool mitk::SegTool2D::IsPositionEventInsideImageRegion(mitk::InteractionPositionEvent* positionEvent,

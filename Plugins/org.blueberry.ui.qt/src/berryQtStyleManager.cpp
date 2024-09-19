@@ -148,7 +148,7 @@ void QtStyleManager::AddFontFamily(const QString& fontFamily)
 
   auto basePath = QString(":/org.blueberry.ui.qt/fonts/%1/%1-").arg(fontFamilyWithoutSpace);
 
-  for (const auto& variant : { "Bold", "BoldItalic", "Italic", "Regular" })
+  for (auto variant : { "Bold", "BoldItalic", "Italic", "Regular" })
     QFontDatabase::addApplicationFont(QString("%1%2.ttf").arg(basePath).arg(variant));
 
   m_customFontNames.push_back(fontFamily);
@@ -397,8 +397,8 @@ void QtStyleManager::UpdateWorkbenchStyleSheet() const
   }
 
   auto sheet = QString("* {\n  font-family: \"%1\";\n  font-size: %2pt;\n}\n\n%3")
-    .arg(m_currentFont)
-    .arg(m_currentFontSize)
+    .arg(fontFamily)
+    .arg(fontSize)
     .arg(currentStyle->stylesheet);
 
   qApp->setStyleSheet(sheet);

@@ -53,7 +53,7 @@ public:
   void GetFonts(QStringList& fontNames) const override;
 
   void SetFont(const QString& fontName) override;
-  void SetFontSize(const int fontSize) override;
+  void SetFontSize(int fontSize) override;
   void UpdateWorkbenchFont() override;
 
   Style GetDefaultStyle() const override;

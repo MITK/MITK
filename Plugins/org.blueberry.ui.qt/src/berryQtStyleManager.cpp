@@ -362,7 +362,7 @@ void QtStyleManager::SetFont(const QString& fontName)
   m_currentFont = fontName;
 }
 
-void QtStyleManager::SetFontSize(const int fontSize)
+void QtStyleManager::SetFontSize(int fontSize)
 {
   m_currentFontSize = fontSize;
 }

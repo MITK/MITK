@@ -349,7 +349,7 @@ void QtStyleManager::SetStyle(const QString& fileName)
 
   ReadStyleData(style);
 
-  qApp->setStyleSheet(currentStyle->stylesheet);
+  this->UpdateWorkbenchStyleSheet();
 
   try
   {
@@ -380,19 +380,28 @@ void QtStyleManager::SetFontSize(int fontSize)
 
 void QtStyleManager::UpdateWorkbenchFont()
 {
-  if( m_currentFont == QString( "<<system>>" ) || m_currentFont.isEmpty() )
-  {
-    qApp->setFont(QFontDatabase::systemFont(QFontDatabase::GeneralFont));
-  }
-  else
-  {
-    QFont font;
-    font.setFamily(m_currentFont);
-    font.setPointSize(m_currentFontSize);
-    qApp->setFont(font);
-  }
-  qApp->setStyleSheet(currentStyle->stylesheet);
+  this->UpdateWorkbenchStyleSheet();
   PlatformUI::GetWorkbench()->UpdateTheme();
+}
+
+void QtStyleManager::UpdateWorkbenchStyleSheet() const
+{
+  auto fontFamily = m_currentFont;
+  auto fontSize = m_currentFontSize;
+
+  if (fontFamily == "<<system>>" || fontFamily.isEmpty())
+  {
+    auto systemFont = QFontDatabase::systemFont(QFontDatabase::GeneralFont);
+    fontFamily = systemFont.family();
+    fontSize = systemFont.pointSize();
+  }
+
+  auto sheet = QString("* {\n  font-family: \"%1\";\n  font-size: %2pt;\n}\n\n%3")
+    .arg(m_currentFont)
+    .arg(m_currentFontSize)
+    .arg(currentStyle->stylesheet);
+
+  qApp->setStyleSheet(sheet);
 }
 
 QtStyleManager::Style QtStyleManager::GetDefaultStyle() const

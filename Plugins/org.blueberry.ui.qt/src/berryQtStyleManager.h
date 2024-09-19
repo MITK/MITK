@@ -72,6 +72,7 @@ private:
   void AddDefaultStyle();
   void AddDefaultFonts();
   void AddFontFamily(const QString& fontFamily);
+  void UpdateWorkbenchStyleSheet() const;
   void ClearStyles();
   void ReadPreferences();
 

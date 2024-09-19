@@ -29,6 +29,9 @@ class BERRY_UI_QT QtStyleManager : public QObject, public IQtStyleManager
   Q_INTERFACES(berry::IQtStyleManager)
 
 public:
+  static const QString DEFAULT_FONT;
+  static const int DEFAULT_FONT_SIZE;
+
   static QIcon ThemeIcon(const QByteArray &originalSVG);
   static QIcon ThemeIcon(const QString &resourcePath);
 

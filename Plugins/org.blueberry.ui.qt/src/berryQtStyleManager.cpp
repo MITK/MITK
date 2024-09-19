@@ -46,6 +46,9 @@ namespace
 
 namespace berry
 {
+const QString QtStyleManager::DEFAULT_FONT = QStringLiteral("Roboto");
+const int QtStyleManager::DEFAULT_FONT_SIZE = 10;
+
 QIcon QtStyleManager::ThemeIcon(const QByteArray &originalSVG)
 {
   auto styleSheet = qApp->styleSheet();
@@ -82,6 +85,8 @@ QIcon QtStyleManager::ThemeIcon(const QString &resourcePath)
 }
 
 QtStyleManager::QtStyleManager()
+  : m_currentFont(DEFAULT_FONT),
+    m_currentFontSize(DEFAULT_FONT_SIZE)
 {
   AddDefaultStyle();
   AddDefaultFonts();
@@ -361,17 +366,21 @@ void QtStyleManager::SetStyle(const QString& fileName)
 
 void QtStyleManager::SetFont(const QString& fontName)
 {
-  m_currentFont = fontName;
+  m_currentFont = fontName.isEmpty()
+    ? DEFAULT_FONT
+    : fontName;
 }
 
 void QtStyleManager::SetFontSize(int fontSize)
 {
-  m_currentFontSize = fontSize;
+  m_currentFontSize = fontSize <= 0
+    ? DEFAULT_FONT_SIZE
+    : fontSize;
 }
 
 void QtStyleManager::UpdateWorkbenchFont()
 {
-  if( m_currentFont == QString( "<<system>>" ) ||  m_currentFont == QString( "" ))
+  if( m_currentFont == QString( "<<system>>" ) || m_currentFont.isEmpty() )
   {
     qApp->setFont(QFontDatabase::systemFont(QFontDatabase::GeneralFont));
   }

@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include "berryWorkbenchPlugin.h"
 #include <berryQtPreferences.h>
+#include <berryQtStyleManager.h>
 
 #include <QFileDialog>
 #include <QDirIterator>
@@ -223,7 +224,7 @@ bool QtStylePreferencePage::PerformOk()
 
   prefs->Put(berry::QtPreferences::QT_STYLE_SEARCHPATHS, paths.toStdString());
   prefs->Put(berry::QtPreferences::QT_FONT_NAME, controls.m_FontComboBox->currentText().toStdString());
-  prefs->Put(berry::QtPreferences::QT_FONT_SIZE, std::to_string(controls.m_FontSizeSpinBox->value()));
+  prefs->PutInt(berry::QtPreferences::QT_FONT_SIZE, controls.m_FontSizeSpinBox->value());
 
   return true;
 }
@@ -252,10 +253,10 @@ void QtStylePreferencePage::Update()
   oldStyle = styleManager->GetStyle();
   FillStyleCombo(oldStyle);
 
-  auto fontName = QString::fromStdString(prefs->Get(berry::QtPreferences::QT_FONT_NAME, "Open Sans"));
+  auto fontName = QString::fromStdString(prefs->Get(QtPreferences::QT_FONT_NAME, QtStyleManager::DEFAULT_FONT.toStdString()));
   styleManager->SetFont(fontName);
 
-  auto fontSize = std::stoi(prefs->Get(berry::QtPreferences::QT_FONT_SIZE, "9"));
+  auto fontSize = prefs->GetInt(QtPreferences::QT_FONT_SIZE, QtStyleManager::DEFAULT_FONT_SIZE);
   styleManager->SetFontSize(fontSize);
   controls.m_FontSizeSpinBox->setValue(fontSize);
   styleManager->UpdateWorkbenchFont();

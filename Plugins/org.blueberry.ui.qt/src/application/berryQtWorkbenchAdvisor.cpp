@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "berryWorkbenchPlugin.h"
 #include <berryIQtStyleManager.h>
 #include <berryQtPreferences.h>
+#include <berryQtStyleManager.h>
 
 #include <QApplication>
 #include <QString>
@@ -36,8 +37,8 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
 
   auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences()->Node(QtPreferences::QT_STYLES_NODE);
   auto styleName = QString::fromStdString(prefs->Get(QtPreferences::QT_STYLE_NAME, ""));
-  auto fontName = QString::fromStdString(prefs->Get(QtPreferences::QT_FONT_NAME, "Open Sans"));
-  auto fontSize = QString::fromStdString(prefs->Get(QtPreferences::QT_FONT_SIZE, "9"));
+  auto fontName = QString::fromStdString(prefs->Get(QtPreferences::QT_FONT_NAME, QtStyleManager::DEFAULT_FONT.toStdString()));
+  auto fontSize = prefs->GetInt(QtPreferences::QT_FONT_SIZE, QtStyleManager::DEFAULT_FONT_SIZE);
 
   ctkServiceReference serviceRef = WorkbenchPlugin::GetDefault()->GetPluginContext()->getServiceReference<IQtStyleManager>();
   if (serviceRef)
@@ -45,7 +46,7 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
     IQtStyleManager* styleManager = WorkbenchPlugin::GetDefault()->GetPluginContext()->getService<IQtStyleManager>(serviceRef);
     styleManager->SetStyle(styleName);
     styleManager->SetFont(fontName);
-    styleManager->SetFontSize(fontSize.toInt());
+    styleManager->SetFontSize(fontSize);
     styleManager->UpdateWorkbenchFont();
   }
 

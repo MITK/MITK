@@ -31,19 +31,21 @@ found in the LICENSE file.
 
 #include <mitkIPreferences.h>
 
-namespace berry
+namespace
 {
+  QString ParseColor(const QString& subject, const QString& pattern, const QString& fallback)
+  {
+    QRegularExpression re(pattern, QRegularExpression::CaseInsensitiveOption);
+    auto match = re.match(subject);
 
-static QString ParseColor(const QString &subject, const QString &pattern, const QString &fallback)
-{
-  QRegularExpression re(pattern, QRegularExpression::CaseInsensitiveOption);
-  auto match = re.match(subject);
-
-  return match.hasMatch()
-    ? match.captured(1)
-    : fallback;
+    return match.hasMatch()
+      ? match.captured(1)
+      : fallback;
+  }
 }
 
+namespace berry
+{
 QIcon QtStyleManager::ThemeIcon(const QByteArray &originalSVG)
 {
   auto styleSheet = qApp->styleSheet();

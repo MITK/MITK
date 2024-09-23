@@ -57,6 +57,7 @@ A PR can be merged once
 * the automatic tests for the PR are successful.
 * it has been accepted by an MITK developer.
 
+PRs are merged by MITK developers and cannot be merged by external contributors on their own.
 
 ### Decision-Making Process
 

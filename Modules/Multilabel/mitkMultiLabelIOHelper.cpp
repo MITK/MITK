@@ -332,28 +332,59 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
       jlabels.emplace_back(SerializeLabelToJSON(label));
     }
     jgroup["labels"] = jlabels;
+    const auto& name = inputImage->GetGroupName(i);
+    if (!name.empty())
+    {
+      jgroup["name"] = name;
+    }
     result.emplace_back(jgroup);
   }
   return result;
 };
 
-std::vector<mitk::LabelVector> mitk::MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets)
+template<typename TValueType> bool GetValueFromJson(const nlohmann::json& labelJson, const std::string& key, TValueType& value)
 {
-  std::vector<LabelVector> result;
-
-  for (const auto& jlabelset : listOfLabelSets)
+  if (labelJson.find(key) != labelJson.end())
   {
-    LabelVector labelSet;
-    if (jlabelset.find("labels") != jlabelset.end())
+    try
     {
-      auto jlabels = jlabelset["labels"];
+      value = labelJson[key].get<TValueType>();
+      return true;
+    }
+    catch (...)
+    {
+      MITK_ERROR << "Unable to read label information from json. Value has wrong type. Failed key: " << key << "; invalid value: " << labelJson[key].dump();
+      throw;
+    }
+  }
+  return false;
+}
+
+std::vector<mitk::MultiLabelIOHelper::LabelGroupMetaData> mitk::MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelGroups)
+{
+  std::vector<LabelGroupMetaData> result;
+
+  for (const auto& jLabelGroup : listOfLabelGroups)
+  {
+    LabelVector labels;
+    std::string name;
+
+    if (jLabelGroup.find("labels") != jLabelGroup.end())
+    {
+      auto jlabels = jLabelGroup["labels"];
 
       for (const auto& jlabel : jlabels)
       {
-        labelSet.push_back(DeserializeLabelFromJSON(jlabel));
+        labels.push_back(DeserializeLabelFromJSON(jlabel));
       }
     }
-    result.emplace_back(labelSet);
+
+    if (jLabelGroup.find("name") != jLabelGroup.end())
+    {
+      GetValueFromJson(jLabelGroup, "name", name);
+    }
+
+    result.emplace_back(name,labels);
   }
 
   return result;
@@ -381,24 +412,6 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelToJSON(const Label* label
   j["visible"] = label->GetVisible();
   return j;
 };
-
-template<typename TValueType> bool GetValueFromJson(const nlohmann::json& labelJson, const std::string& key, TValueType& value)
-{
-  if (labelJson.find(key) != labelJson.end())
-  {
-    try
-    {
-      value = labelJson[key].get<TValueType>();
-      return true;
-    }
-    catch (...)
-    {
-      MITK_ERROR << "Unable to read label information from json. Value has wrong type. Failed key: " << key << "; invalid value: " << labelJson[key].dump();
-      throw;
-    }
-  }
-  return false;
-}
 
 mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nlohmann::json& labelJson)
 {

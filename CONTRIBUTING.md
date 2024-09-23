@@ -49,6 +49,7 @@ Please follow our [Style Guide][MITK_styleguide_page] if you contribute code to 
 ### Continuous Integration of PRs
 
 Our Continuous Integration system is triggered every time a PR is created or updated in the repository and will check for issues such as failing unit tests, code quality violations, or integration problems. The results are displayed on the PR page, indicating whether the code passes or fails the tests.
+Additionally, nightly tests are conducted, and you will be informed if something in your contributed code is not working.
 
 ### How to Merge a PR ?
 
@@ -56,9 +57,6 @@ A PR can be merged once
 * the automatic tests for the PR are successful.
 * it has been accepted by an MITK developer.
 
-### Nightly Tests
-
-Nightly tests are conducted, and you will be informed if something in your contributed code is not working.
 
 ### Decision-Making Process
 

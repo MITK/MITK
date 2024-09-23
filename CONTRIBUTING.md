@@ -6,7 +6,6 @@ There are many ways to contribute:
 * Use [GitHub Issues][MITK_issues_page] to submit a feature request, report a bug, or participate in discussions on existing issues. You can find more details in the section [How to File an MITK issue](#how-to-file-an-mitk-issue).
 
 * Submit a [Pull Request][MITK_pr_page] if you want to actively contribute to the MITK code repository. Please review the guidelines on [How to Submit a Pull Request (PR)](#how-to-submit-a-pr) for more details.
-* Ask a question on the [MITK Mailinglist](https://www.mitk.org/wiki/MITK_Mailinglist). While we prefer issues and pull requests for communication, you are welcome to use the mailing list if you feel more comfortable with it.
 
 # Code of Conduct
 

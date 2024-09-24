@@ -22,6 +22,18 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  void to_json(nlohmann::json& json, const SegmentationTaskList::Task::Form& form)
+  {
+    json["Path"] = form.Path;
+    json["Result"] = form.Result;
+  }
+
+  void from_json(const nlohmann::json& json, SegmentationTaskList::Task::Form& form)
+  {
+    form.Path = json["Path"].get<std::string>();
+    form.Result = json["Result"].get<std::string>();
+  }
+
   void to_json(nlohmann::json& json, const SegmentationTaskList::Task& task)
   {
     if (task.HasName())
@@ -105,7 +117,7 @@ namespace mitk
     iter = json.find("Form");
 
     if (iter != json.end())
-      task.SetForm(json["Form"].get<std::string>());
+      task.SetForm(json["Form"].get<SegmentationTaskList::Task::Form>());
   }
 }
 

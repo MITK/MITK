@@ -607,9 +607,11 @@ void QmitkSegmentationTaskListWidget::UpdateFormWidget()
     return;
   }
 
+  auto form = m_TaskList->GetForm(current);
+
   try
   {
-    const auto formPath = m_TaskList->GetAbsolutePath(m_TaskList->GetForm(current));
+    const auto formPath = m_TaskList->GetAbsolutePath(form.Path);
     m_Form = nlohmann::json::parse(ReadFileAsString(QString::fromStdString(formPath.string())).toStdString());
   }
   catch (const mitk::Exception& e)
@@ -621,7 +623,8 @@ void QmitkSegmentationTaskListWidget::UpdateFormWidget()
   m_Form.AddSupplement("Task");
   m_Ui->formWidget->SetForm(&m_Form);
 
-  // TODO: Set path for responses
+  const auto responsesPath = m_TaskList->GetAbsolutePath(form.Result);
+  m_Ui->formWidget->SetResponsesPath(responsesPath);
 
   m_Ui->formWidget->show();
 }

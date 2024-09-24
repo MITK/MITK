@@ -7,6 +7,7 @@ set(H_FILES
   include/QmitkMultipleChoiceQuestionWidget.h
   include/QmitkParagraphQuestionWidget.h
   include/QmitkQuestionWidget.h
+  include/QmitkScreenshotQuestionWidget.h
   include/QmitkShortAnswerQuestionWidget.h
 )
 
@@ -18,6 +19,7 @@ set(MOC_H_FILES
   include/QmitkMultipleChoiceQuestionWidget.h
   include/QmitkParagraphQuestionWidget.h
   include/QmitkQuestionWidget.h
+  include/QmitkScreenshotQuestionWidget.h
   include/QmitkShortAnswerQuestionWidget.h
 )
 
@@ -36,5 +38,6 @@ set(CPP_FILES
   QmitkMultipleChoiceQuestionWidget.cpp
   QmitkParagraphQuestionWidget.cpp
   QmitkQuestionWidget.cpp
+  QmitkScreenshotQuestionWidget.cpp
   QmitkShortAnswerQuestionWidget.cpp
 )

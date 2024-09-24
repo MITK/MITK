@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QmitkLinearScaleQuestionWidget.h>
 #include <QmitkMultipleChoiceQuestionWidget.h>
 #include <QmitkParagraphQuestionWidget.h>
+#include <QmitkScreenshotQuestionWidget.h>
 #include <QmitkShortAnswerQuestionWidget.h>
 
 #include <usModuleContext.h>
@@ -40,6 +41,7 @@ void ModuleActivator::Load(us::ModuleContext* context)
   this->RegisterQuestionWidget<LinearScaleQuestion, QmitkLinearScaleQuestionWidget>();
   this->RegisterQuestionWidget<MultipleChoiceQuestion, QmitkMultipleChoiceQuestionWidget>();
   this->RegisterQuestionWidget<ParagraphQuestion, QmitkParagraphQuestionWidget>();
+  this->RegisterQuestionWidget<ScreenshotQuestion, QmitkScreenshotQuestionWidget>();
   this->RegisterQuestionWidget<ShortAnswerQuestion, QmitkShortAnswerQuestionWidget>();
 }
 

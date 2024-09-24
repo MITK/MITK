@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkLinearScaleQuestion.h>
 #include <mitkMultipleChoiceQuestion.h>
 #include <mitkParagraphQuestion.h>
+#include <mitkScreenshotQuestion.h>
 #include <mitkShortAnswerQuestion.h>
 
 #include <usModuleContext.h>
@@ -40,6 +41,7 @@ void ModuleActivator::Load(us::ModuleContext* context)
   this->RegisterQuestion<LinearScaleQuestion>();
   this->RegisterQuestion<MultipleChoiceQuestion>();
   this->RegisterQuestion<ParagraphQuestion>();
+  this->RegisterQuestion<ScreenshotQuestion>();
   this->RegisterQuestion<ShortAnswerQuestion>();
 }
 

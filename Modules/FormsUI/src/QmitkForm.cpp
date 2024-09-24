@@ -174,7 +174,7 @@ void QmitkForm::UpdateFormHeader()
   m_Ui->formTitleLabel->setVisible(showTitle);
 
   if (showTitle)
-    m_Ui->formTitleLabel->setText(QString::fromStdString(m_Form->GetTitle()));
+    m_Ui->formTitleLabel->setText(QString("<h2>%1</h2>").arg(QString::fromStdString(m_Form->GetTitle())));
 
   int sectionIndex = m_Ui->sectionWidget->currentIndex();
   bool showDescription = sectionIndex == 0 && !m_Form->GetDescription().empty();
@@ -209,7 +209,7 @@ void QmitkForm::UpdateSubmittedHeader()
     m_Ui->submittedTitleLabel->setVisible(showTitle);
 
     if (showTitle)
-      m_Ui->submittedTitleLabel->setText(QString::fromStdString(m_Form->GetTitle()));
+      m_Ui->submittedTitleLabel->setText(QString("<h2>%1</h2>").arg(QString::fromStdString(m_Form->GetTitle())));
 
     m_Ui->submittedFrame->show();
   }

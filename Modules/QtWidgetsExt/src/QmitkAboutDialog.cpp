@@ -22,7 +22,7 @@ namespace
 {
   QString CreateRevisionLabelText()
   {
-    auto revisionText = QString("<html><head/><body><p>Revision: <a href=\"https://phabricator.mitk.org/rMITK%1\"><span style=\"text-decoration: underline; color:#5555ff;\">%1</span></a>").arg(MITK_REVISION);
+    auto revisionText = QString("<html><head/><body><p>Revision: <a href=\"https://github.com/MITK/MITK/commit/%1\"><span style=\"text-decoration: underline; color:#5555ff;\">%1</span></a>").arg(MITK_REVISION);
     QString mitkRevisionDescription(MITK_REVISION_DESC);
 
     if (!mitkRevisionDescription.isEmpty())

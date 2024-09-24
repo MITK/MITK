@@ -492,6 +492,8 @@ Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow sett
     -# If an interactive model is selected e.g. "deepgrow_3d", Press and hold SHIFT and left click on any of the 3 render windows to start click guided segmentation.
     Press SHIFT+Right click for negative clicks to adjust the preview mask on the render window.
     -# If an auto-segmentation model is selected e.g. "deepedit_seg", simply click "Preview" for generating masks.
+    -# If you see that segmentation preview is not shown on the Workbench (ending up showing error) yet, your MONAI Label server terminal shows successful completion of the inference request then go to Preferences (Ctrl+P) > Segmentation
+    and change the MONAI Label time out value (in seconds).
 
 
 \section org_mitk_views_segmentationpostprocessing Additional things you can do with segmentations

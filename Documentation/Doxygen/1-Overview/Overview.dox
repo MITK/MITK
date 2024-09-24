@@ -60,7 +60,6 @@ MITK is available as free open-source software under a [BSD-style license][licen
  - [Homepage][mitk]
  - [Download][download]
  - [Mailing List][mailinglist]
- - [Bug Tracker][bugs]
 
 
 [logo]: https://raw.githubusercontent.com/MITK/MITK/master/mitk.png
@@ -76,12 +75,10 @@ MITK is available as free open-source software under a [BSD-style license][licen
 [license]: https://raw.githubusercontent.com/MITK/MITK/master/LICENSE
 [release-cycle]: https://www.mitk.org/wiki/MITK_Release_Cycle
 [download]: https://www.mitk.org/wiki/Downloads
-[diffusion]: https://phabricator.mitk.org/source/mitk/
 [contribute]: https://www.mitk.org/wiki/How_to_contribute
 [cmake]: https://cmake.org/
 [build]: https://docs.mitk.org/nightly/BuildInstructionsPage.html
 [mailinglist]: https://www.mitk.org/wiki/MITK_Mailinglist
-[bugs]: https://phabricator.mitk.org/maniphest/
 
 
 

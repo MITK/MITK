@@ -88,7 +88,7 @@ set(MITK_BUILD_OPTIONS
 )
 
 set(MITK_REPOSITORY
-  "https://phabricator.mitk.org/source/mitk.git"
+  "https://git.dkfz.de/mic/mitk.git"
 )
 
 # Branch name, tag, or commit hash
@@ -100,10 +100,7 @@ set(MITK_BRANCH
 # Three list items per MITK extension: <name> <URL> <branch>
 set(MITK_EXTENSIONS
 # "MITK-ProjectTemplate"
-#   "https://phabricator.mitk.org/source/mitk-projecttemplate.git"
-#   "master"
-# "MITK Diffusion"
-#   "https://phabricator.mitk.org/source/mitk-diffusion.git"
+#   "https://git.dkfz.de/mic/mitk-projecttemplate.git"
 #   "master"
 )
 

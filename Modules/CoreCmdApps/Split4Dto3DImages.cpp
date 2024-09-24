@@ -85,8 +85,11 @@ void transferMetaProperties(const mitk::Image* sourceImage, mitk::Image* destina
     }
     else
     {
-      auto extractedProp = ExtractTimeStepFromTemporoSpatialStringProperty(tsProperty, ts);
-      destinationImage->SetProperty(name, extractedProp);
+      if (tsProperty->HasValueByTimeStep(ts))
+      {
+        auto extractedProp = ExtractTimeStepFromTemporoSpatialStringProperty(tsProperty, ts);
+        destinationImage->SetProperty(name, extractedProp);
+      }
     }
   }
 }

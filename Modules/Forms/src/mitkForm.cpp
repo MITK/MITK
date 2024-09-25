@@ -234,7 +234,25 @@ void mitk::Forms::SubmitToCSV(const Form& form, const fs::path& csvPath)
       csvFile << ",\"";
       bool isFirstResponse = true;
 
-      for (const auto& response : question->GetResponsesAsStrings())
+      std::vector<std::string> responses;
+
+      if (question->HasFileResponses())
+      {
+        auto paths = question->SubmitFileResponses(csvPath.parent_path());
+
+        for (const auto& path : paths)
+        {
+          auto posixPath = path.string();
+          std::replace(posixPath.begin(), posixPath.end(), '\\', '/');
+          responses.push_back(posixPath);
+        }
+      }
+      else
+      {
+        responses = question->GetResponsesAsStrings();
+      }
+
+      for (const auto& response : responses)
       {
         if (!isFirstResponse)
           csvFile << ';';

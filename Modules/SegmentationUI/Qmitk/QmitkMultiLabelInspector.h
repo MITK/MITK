@@ -283,6 +283,7 @@ private Q_SLOTS:
   void OnClearLabels(bool);
   void OnMergeLabels(bool);
 
+  void OnRenameGroup();
   void OnRenameLabel(bool);
   void OnClearLabel(bool);
 

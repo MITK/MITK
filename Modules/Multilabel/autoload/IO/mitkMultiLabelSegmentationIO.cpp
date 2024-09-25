@@ -167,17 +167,18 @@ namespace mitk
     //get label set definitions
     auto jsonStr = MultiLabelIOHelper::GetStringByKey(dictionary, MULTILABEL_SEGMENTATION_LABELS_INFO_KEY);
     nlohmann::json jlabelsets = nlohmann::json::parse(jsonStr);
-    auto labelsets = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(jlabelsets);
+    auto labelGroups = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(jlabelsets);
 
-    if (labelsets.size() != output->GetNumberOfLayers())
+    if (labelGroups.size() != output->GetNumberOfLayers())
     {
-      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfLayers() << "; found labelsets: " << labelsets.size();
+      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfLayers() << "; found label groups: " << labelGroups.size();
     }
 
     LabelSetImage::GroupIndexType id = 0;
-    for (auto labelset : labelsets)
+    for (auto [name, labels] : labelGroups)
     {
-      output->ReplaceGroupLabels(id, labelset);
+      output->ReplaceGroupLabels(id, labels);
+      if (!name.empty()) output->SetGroupName(id, name);
       id++;
     }
 

@@ -13,6 +13,7 @@ found in the LICENSE file.
 #ifndef mitkQuestion_h
 #define mitkQuestion_h
 
+#include <mitkFileSystem.h>
 #include <MitkFormsExports.h>
 
 #include <string>
@@ -60,6 +61,26 @@ namespace mitk::Forms
      * \sa IsComplete()
      */
     virtual std::string GetRequiredText() const;
+
+    /** \brief Query whether the responses given to this question are file paths.
+     *
+     * Always returns \c false - override this method only if necessary. Typically used during
+     * submission to determine if files should be attached.
+     *
+     * \sa SubmitFileResponses()
+     */
+    virtual bool HasFileResponses() const;
+
+    /** \brief Attach response files to submission.
+     *
+     * This method is supposed to be called during submission only if HasFileResponses() returns
+     * \c true. The given base path should then be used to copy any files. The returned paths
+     * should be relative to the base path and are used for submission instead of the return
+     * value of GetResponsesAsStrings().
+     *
+     * \sa HasFileResponses()
+     */
+    virtual std::vector<fs::path> SubmitFileResponses(const fs::path& basePath) const;
 
     /** \name Pure virtual functions
      *

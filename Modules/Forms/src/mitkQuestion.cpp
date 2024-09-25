@@ -48,6 +48,16 @@ std::string Question::GetRequiredText() const
   return "This is a required question";
 }
 
+bool Question::HasFileResponses() const
+{
+  return false;
+}
+
+std::vector<fs::path> Question::SubmitFileResponses(const fs::path& basePath) const
+{
+  return {};
+}
+
 void mitk::Forms::from_json(const ordered_json& j, Question& q)
 {
   if (j.contains("Text"))

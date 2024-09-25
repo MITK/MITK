@@ -65,6 +65,9 @@ bool ScreenshotQuestion::HasFileResponses() const
 
 std::vector<fs::path> ScreenshotQuestion::SubmitFileResponses(const fs::path& basePath) const
 {
+  if (m_Responses.empty())
+    return {};
+
   fs::path destinationPath = "screenshots";
   fs::create_directories(basePath/destinationPath);
 

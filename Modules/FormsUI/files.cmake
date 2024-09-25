@@ -14,17 +14,19 @@ set(H_FILES
 set(MOC_H_FILES
   include/QmitkCheckboxesQuestionWidget.h
   include/QmitkDropdownQuestionWidget.h
-  include/QmitkLinearScaleQuestionWidget.h
   include/QmitkForm.h
+  include/QmitkLinearScaleQuestionWidget.h
   include/QmitkMultipleChoiceQuestionWidget.h
   include/QmitkParagraphQuestionWidget.h
   include/QmitkQuestionWidget.h
   include/QmitkScreenshotQuestionWidget.h
   include/QmitkShortAnswerQuestionWidget.h
+  src/QmitkScreenshotWidget.h
 )
 
 set(UI_FILES
   src/QmitkForm.ui
+  src/QmitkScreenshotWidget.ui
 )
 
 set(CPP_FILES
@@ -39,5 +41,6 @@ set(CPP_FILES
   QmitkParagraphQuestionWidget.cpp
   QmitkQuestionWidget.cpp
   QmitkScreenshotQuestionWidget.cpp
+  QmitkScreenshotWidget.cpp
   QmitkShortAnswerQuestionWidget.cpp
 )

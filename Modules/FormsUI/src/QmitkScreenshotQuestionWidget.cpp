@@ -11,6 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QmitkScreenshotQuestionWidget.h>
+#include "QmitkScreenshotWidget.h"
+
 #include <mitkBaseRenderer.h>
 #include <mitkExceptionMacro.h>
 
@@ -150,4 +152,20 @@ void QmitkScreenshotQuestionWidget::OnPopupMenuTriggered(const QString& action)
   renderWindow->SetDoubleBuffer(doubleBuffer);
 
   m_Question->AddScreenshot(fileName);
+  this->AddScreenshotWidget(file.fileName());
+}
+
+void QmitkScreenshotQuestionWidget::AddScreenshotWidget(const QString& screenshotFileName)
+{
+  auto screenshotWidget = new QmitkScreenshotWidget(screenshotFileName);
+  connect(screenshotWidget, &QmitkScreenshotWidget::Remove, this, &Self::OnRemoveScreenshot);
+  m_Layout->insertWidget(m_Layout->indexOf(m_TakeScreenshotButton), screenshotWidget);
+}
+
+void QmitkScreenshotQuestionWidget::OnRemoveScreenshot(QmitkScreenshotWidget* sender)
+{
+  m_Layout->removeWidget(sender);
+  sender->deleteLater();
+
+  m_Question->RemoveScreenshot(sender->GetScreenshotPath().toStdString());
 }

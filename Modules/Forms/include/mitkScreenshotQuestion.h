@@ -36,6 +36,9 @@ namespace mitk::Forms
 
     bool IsComplete() const override;
 
+    bool HasFileResponses() const override;
+    std::vector<fs::path> SubmitFileResponses(const fs::path& basePath) const override;
+
     void AddScreenshot(const fs::path& path);
     void RemoveScreenshot(const fs::path& path);
 

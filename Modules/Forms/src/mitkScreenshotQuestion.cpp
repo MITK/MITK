@@ -58,6 +58,27 @@ bool ScreenshotQuestion::IsComplete() const
   return !m_Responses.empty();
 }
 
+bool ScreenshotQuestion::HasFileResponses() const
+{
+  return true;
+}
+
+std::vector<fs::path> ScreenshotQuestion::SubmitFileResponses(const fs::path& basePath) const
+{
+  fs::path destinationPath = "screenshots";
+  fs::create_directories(basePath/destinationPath);
+
+  std::vector<fs::path> result;
+
+  for (const auto& sourcePath : m_Responses)
+  {
+    fs::copy_file(sourcePath, basePath/destinationPath/sourcePath.filename(), fs::copy_options::update_existing);
+    result.push_back(destinationPath/sourcePath.filename());
+  }
+
+  return result;
+}
+
 void ScreenshotQuestion::AddScreenshot(const fs::path& path)
 {
   if (fs::exists(path))

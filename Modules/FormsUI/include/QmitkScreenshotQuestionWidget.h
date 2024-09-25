@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include <QmitkQuestionWidget.h>
 #include <mitkScreenshotQuestion.h>
 
+class QmitkScreenshotWidget;
+
 class QMenu;
 class QPushButton;
 
@@ -35,6 +37,8 @@ public:
 private:
   void OnTakeScreenshotButtonClicked();
   void OnPopupMenuTriggered(const QString& action);
+  void AddScreenshotWidget(const QString& screenshotFileName);
+  void OnRemoveScreenshot(QmitkScreenshotWidget* sender);
 
   mitk::Forms::ScreenshotQuestion* m_Question;
 

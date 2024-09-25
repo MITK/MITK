@@ -183,7 +183,12 @@ protected:
     "coronary_arteries",
     "body",
     "lung_vessels",
-    "pleural_pericard_effusion"
+    "pleural_pericard_effusion",
+    "head_glands_cavities",
+    "head_muscles",
+    "headneck_bones_vessels",  
+    "headneck_muscles",                   
+    "liver_vessels"
   };
   QmitkTotalSegmentatorToolInstaller m_Installer;
 };

@@ -129,6 +129,8 @@ void QmitkScreenshotQuestionWidget::OnTakeScreenshotButtonClicked()
 
 void QmitkScreenshotQuestionWidget::OnPopupMenuTriggered(const QString& action)
 {
+  // Create a uniquely named temporary file for storing the screenshot
+
   QTemporaryFile file(QString("%1/screenshot_XXXXXX.png").arg(QDir::tempPath()));
   file.setAutoRemove(false);
 
@@ -137,6 +139,8 @@ void QmitkScreenshotQuestionWidget::OnPopupMenuTriggered(const QString& action)
 
   fs::path fileName = file.fileName().toStdString();
 
+  // Get the renderer resp. render window matching the triggered action (e.g. "Axial")
+
   auto renderer = GetRenderer(action);
 
   if (renderer == nullptr)
@@ -144,12 +148,16 @@ void QmitkScreenshotQuestionWidget::OnPopupMenuTriggered(const QString& action)
 
   auto renderWindow = renderer->GetRenderWindow();
 
+  // Temporarily disable double buffering while taking the screenshot so it is not a frame behind
+
   bool doubleBuffer = renderWindow->GetDoubleBuffer();
   renderWindow->DoubleBufferOff();
 
   TakeScreenshot(renderer->GetVtkRenderer(), fileName);
 
   renderWindow->SetDoubleBuffer(doubleBuffer);
+
+  // Add the screenshot to both the question and its widget
 
   m_Question->AddScreenshot(fileName);
   this->AddScreenshotWidget(file.fileName());

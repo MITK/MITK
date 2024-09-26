@@ -65,7 +65,7 @@ namespace mitk::Forms
     /** \brief Query whether the responses given to this question are file paths.
      *
      * Always returns \c false - override this method only if necessary. Typically used during
-     * submission to determine if files should be attached.
+     * submission to determine if any files should be attached.
      *
      * \sa SubmitFileResponses()
      */

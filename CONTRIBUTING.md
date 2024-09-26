@@ -15,7 +15,7 @@ Please note that we have a [Code of Conduct][CODE_OF_CONDUCT_path] that you shou
 
 Follow the general instructions on [How to Create a GitHub Issue][github_issues_page].
 
-Please use the MITK public issue template. Be aware that before submitting a PR, you need to create an issue describing the bug or feature and reference the issue number in the PR description.
+Please prefer one of the provided issue template when creating a new issue. Be aware that before submitting a PR, we kindly ask you to create an issue describing the bug or feature request and reference the issue number in the PR description.
 
 # Pull Requests (PR) and Related Topics
 

@@ -53,7 +53,7 @@ bool Question::HasFileResponses() const
   return false;
 }
 
-std::vector<fs::path> Question::SubmitFileResponses(const fs::path& basePath) const
+std::vector<fs::path> Question::SubmitFileResponses(const fs::path& /*basePath*/) const
 {
   return {};
 }

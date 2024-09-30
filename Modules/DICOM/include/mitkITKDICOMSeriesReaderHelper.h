@@ -87,12 +87,20 @@ class ITKDICOMSeriesReaderHelper
     typename ImageType::Pointer
     FixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo );
 
-    template <typename PixelType>
+    template <typename PixelType, unsigned int TDim>
     Image::Pointer
     LoadDICOMByITK( const StringContainer& filenames,
                     bool correctTilt,
                     const GantryTiltInformation& tiltInfo,
                     itk::GDCMImageIO::Pointer& io);
+
+    template<unsigned int TDim>
+    mitk::Image::Pointer
+    LoadByTypeDispatch(const StringContainer& filenames,
+        bool correctTilt,
+        const GantryTiltInformation& tiltInfo,
+        itk::GDCMImageIO::Pointer& io);
+
 
     template <typename PixelType>
     Image::Pointer

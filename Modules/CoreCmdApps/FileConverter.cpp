@@ -122,7 +122,8 @@ int main(int argc, char* argv[])
       if (splitReasonProperty.IsNotNull())
       {
         auto reasonStr = splitReasonProperty->GetValueAsString();
-        auto reason = mitk::IOVolumeSplitReason::FromJSON(reasonStr);
+        auto json = nlohmann::json::parse(reasonStr);
+        auto reason = mitk::IOVolumeSplitReason::FromJSON(json);
         if (nullptr != reason && reason->HasReason(mitk::IOVolumeSplitReason::ReasonType::MissingSlices))
         {
           missingSlicesDetected += std::stoi(reason->GetReasonDetails(mitk::IOVolumeSplitReason::ReasonType::MissingSlices));

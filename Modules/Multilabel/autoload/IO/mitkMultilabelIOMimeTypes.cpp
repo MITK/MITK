@@ -49,7 +49,7 @@ bool mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType::AppliesT
   if ("MITK Segmentation Task List" != json.value("FileFormat", ""))
     return false;
 
-  if (1 != json.value<int>("Version", 0))
+  if (auto version = json.value<int>("Version", 0); version < 1 || version > 2)
     return false;
 
   return true;

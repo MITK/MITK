@@ -77,7 +77,7 @@ void QmitkParagraphQuestionWidget::AdjustHeight()
   int documentHeight = static_cast<int>(m_TextEdit->document()->documentLayout()->documentSize().height());
   int totalHeight = contentsMargins.top() + documentHeight + contentsMargins.bottom();
 
-  m_TextEdit->setFixedHeight(totalHeight);
+  m_TextEdit->setFixedHeight(std::max(totalHeight, 50));
 }
 
 void QmitkParagraphQuestionWidget::OnTextChanged()

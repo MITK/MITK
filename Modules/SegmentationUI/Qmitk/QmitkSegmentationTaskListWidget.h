@@ -13,6 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkSegmentationTaskListWidget_h
 #define QmitkSegmentationTaskListWidget_h
 
+#include <mitkForm.h>
 #include <mitkSegmentationTaskList.h>
 
 #include <MitkSegmentationUIExports.h>
@@ -65,6 +66,8 @@ private:
   void UpdateLoadButton();
   void UpdateNavigationButtons();
   void UpdateDetailsLabel();
+  void UpdateFormWidget();
+  void OnFormSubmission();
   void UpdateStoreAndAcceptButtons();
   void OnLoadButtonClicked();
   mitk::DataNode* GetImageDataNode(size_t index) const;
@@ -91,6 +94,7 @@ private:
   QFileSystemWatcher* m_FileSystemWatcher;
   mitk::DataStorage* m_DataStorage;
   mitk::SegmentationTaskList::Pointer m_TaskList;
+  mitk::Forms::Form m_Form;
   mitk::DataNode::Pointer m_TaskListNode;
   std::optional<size_t> m_CurrentTaskIndex;
   std::optional<size_t> m_ActiveTaskIndex;

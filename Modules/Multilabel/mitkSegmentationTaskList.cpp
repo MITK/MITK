@@ -83,25 +83,6 @@ void mitk::SegmentationTaskList::SetDefaults(const Task& defaults)
     subtask.SetDefaults(&m_Defaults);
 }
 
-bool mitk::SegmentationTaskList::HasForm() const
-{
-  return m_Form.has_value();
-}
-
-std::filesystem::path mitk::SegmentationTaskList::GetForm() const
-{
-  return m_Form.value_or(std::filesystem::path());
-}
-
-void mitk::SegmentationTaskList::SetForm(const std::filesystem::path& form)
-{
-  if (this->GetForm() != form)
-  {
-    m_Form = form;
-    this->Modified();
-  }
-}
-
 bool mitk::SegmentationTaskList::IsDone() const
 {
   for (size_t i = 0; i < m_Tasks.size(); ++i)

@@ -33,6 +33,12 @@ namespace mitk
     class MITKMULTILABEL_EXPORT Task
     {
     public:
+      struct MITKMULTILABEL_EXPORT Form
+      {
+        fs::path Path;
+        fs::path Result;
+      };
+
       Task();
       ~Task();
 
@@ -47,6 +53,7 @@ namespace mitk
       mitkSegmentationTaskValueMacro(fs::path, Preset)
       mitkSegmentationTaskValueMacro(fs::path, Result)
       mitkSegmentationTaskValueMacro(bool, Dynamic)
+      mitkSegmentationTaskValueMacro(Form, Form)
 
     private:
       const Task* m_Defaults;
@@ -65,6 +72,7 @@ namespace mitk
     mitkSegmentationTaskListValueMacro(fs::path, Preset)
     mitkSegmentationTaskListValueMacro(fs::path, Result)
     mitkSegmentationTaskListValueMacro(bool, Dynamic)
+    mitkSegmentationTaskListValueMacro(Task::Form, Form)
 
     size_t GetNumberOfTasks() const;
     size_t AddTask(const Task& subtask);
@@ -73,10 +81,6 @@ namespace mitk
 
     const Task& GetDefaults() const;
     void SetDefaults(const Task& defaults);
-
-    bool HasForm() const;
-    std::filesystem::path GetForm() const;
-    void SetForm(const std::filesystem::path& form);
 
     bool IsDone() const;
     bool IsDone(size_t index) const;
@@ -109,7 +113,6 @@ namespace mitk
   private:
     Task m_Defaults;
     std::vector<Task> m_Tasks;
-    std::optional<std::filesystem::path> m_Form;
   };
 }
 

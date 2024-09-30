@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 
 #include <mitkDICOMQIPropertyHelper.h>
+#include <mitkFileSystem.h>
 #include <mitkIOUtil.h>
 #include <mitkMultiLabelIOHelper.h>
 #include <mitkLabelSetImageHelper.h>
@@ -32,11 +33,13 @@ found in the LICENSE file.
 
 #include <ui_QmitkSegmentationTaskListWidget.h>
 
+#include <QFile>
 #include <QFileSystemWatcher>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QTextStream>
 
-#include <mitkFileSystem.h>
+#include <nlohmann/json.hpp>
 
 namespace
 {
@@ -93,11 +96,22 @@ namespace
 
     return subset;
   }
+
+  QString ReadFileAsString(const QString& path)
+  {
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+      mitkThrow() << "Could not open file \"" << path.toStdString() << "\"!";
+
+    QTextStream stream(&file);
+    return stream.readAll();
+  }
 }
 
 /* This constructor has three objectives:
  *   1. Do widget initialization that cannot be done in the .ui file
- *   2. Connect signals and slots
+ *   2. Connect signals and slots (including shortcuts)
  *   3. Explicitly trigger a reset to a valid initial widget state
  */
 QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent)
@@ -125,6 +139,8 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
   connect(m_Ui->loadButton, &QPushButton::clicked, this, &Self::OnLoadButtonClicked);
   connect(m_Ui->storeButton, &QPushButton::clicked, this, &Self::OnStoreButtonClicked);
   connect(m_Ui->acceptButton, &QPushButton::clicked, this, &Self::OnAcceptButtonClicked);
+
+  connect(m_Ui->formWidget, &QmitkForm::Submit, this, &Self::OnFormSubmission);
 
   connect(m_FileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Self::OnResultDirectoryChanged);
 
@@ -488,6 +504,7 @@ void QmitkSegmentationTaskListWidget::OnCurrentTaskChanged()
   this->UpdateLoadButton();
   this->UpdateNavigationButtons();
   this->UpdateDetailsLabel();
+  this->UpdateFormWidget();
   this->UpdateStoreAndAcceptButtons();
 }
 
@@ -578,6 +595,43 @@ void QmitkSegmentationTaskListWidget::UpdateDetailsLabel()
     details += QString("<p>%1</p>").arg(stringList.join(QStringLiteral("<br>")));
 
   m_Ui->detailsLabel->setText(details);
+}
+
+void QmitkSegmentationTaskListWidget::UpdateFormWidget()
+{
+  const auto current = m_CurrentTaskIndex.value();
+
+  if (!ActiveTaskIsShown() || !m_TaskList->HasForm(current))
+  {
+    m_Ui->formWidget->hide();
+    return;
+  }
+
+  auto form = m_TaskList->GetForm(current);
+
+  try
+  {
+    const auto formPath = m_TaskList->GetAbsolutePath(form.Path);
+    m_Form = nlohmann::json::parse(ReadFileAsString(QString::fromStdString(formPath.string())).toStdString());
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_ERROR << e.GetDescription();
+    return;
+  }
+
+  m_Form.AddSupplement("Task");
+  m_Ui->formWidget->SetForm(&m_Form);
+
+  const auto responsesPath = m_TaskList->GetAbsolutePath(form.Result);
+  m_Ui->formWidget->SetResponsesPath(responsesPath);
+
+  m_Ui->formWidget->show();
+}
+
+void QmitkSegmentationTaskListWidget::OnFormSubmission()
+{
+  m_Form.SetSupplement("Task", m_TaskList->GetName(m_CurrentTaskIndex.value()));
 }
 
 void QmitkSegmentationTaskListWidget::UpdateStoreAndAcceptButtons()

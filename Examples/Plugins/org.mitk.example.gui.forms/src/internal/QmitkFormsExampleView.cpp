@@ -47,7 +47,7 @@ QmitkFormsExampleView::~QmitkFormsExampleView()
 void QmitkFormsExampleView::CreateQtPartControl(QWidget* parent)
 {
   auto layout = new QVBoxLayout(parent);
-  layout->addWidget(new QmitkForm(m_Form));
+  layout->addWidget(new QmitkForm(&m_Form));
   layout->addStretch();
 }
 

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <QmitkForm.h>
 #include <ui_QmitkForm.h>
 
-#include <mitkException.h>
+#include <mitkExceptionMacro.h>
 #include <mitkIQuestionWidgetFactory.h>
 #include <mitkQuestion.h>
 
@@ -24,11 +24,11 @@ found in the LICENSE file.
 using namespace mitk::Forms;
 using Self = QmitkForm;
 
-QmitkForm::QmitkForm(Form& form, QWidget* parent)
+QmitkForm::QmitkForm(QWidget* parent)
   : QWidget(parent),
-  m_Ui(new Ui::QmitkForm),
-  m_Form(form),
-  m_HasBeenSubmitted(false)
+    m_Ui(new Ui::QmitkForm),
+    m_Form(nullptr),
+    m_HasBeenSubmitted(false)
 {
   this->setStyleSheet(
     "QFrame[frameShape=\"1\"] { border-radius: 6px; }"
@@ -36,9 +36,6 @@ QmitkForm::QmitkForm(Form& form, QWidget* parent)
   );
 
   m_Ui->setupUi(this);
-
-  this->CreateQuestionWidgets();
-  this->Update();
 
   connect(m_Ui->sectionWidget, &QStackedWidget::currentChanged, this, [this](int) { this->Update(); });
 
@@ -49,8 +46,31 @@ QmitkForm::QmitkForm(Form& form, QWidget* parent)
   connect(m_Ui->submitAnotherButton, &QPushButton::clicked, this, &Self::OnSubmitAnotherButtonClicked);
 }
 
+QmitkForm::QmitkForm(Form* form, QWidget* parent)
+  : QmitkForm(parent)
+{
+  this->SetForm(form);
+}
+
 QmitkForm::~QmitkForm()
 {
+}
+
+mitk::Forms::Form* QmitkForm::GetForm() const
+{
+  return m_Form;
+}
+
+void QmitkForm::SetForm(mitk::Forms::Form* form)
+{
+  if (form == nullptr)
+    mitkThrow() << "Parameter \"form\" must point to a valid form!";
+
+  m_Form = form;
+
+  this->CreateQuestionWidgets();
+  this->Reset();
+  this->Update();
 }
 
 fs::path QmitkForm::GetResponsesPath() const
@@ -65,11 +85,18 @@ void QmitkForm::SetResponsesPath(const fs::path& csvPath)
 
 void QmitkForm::CreateQuestionWidgets()
 {
-  const int numberOfSections = m_Form.GetNumberOfSections();
+  while (m_Ui->sectionWidget->count() > 0)
+  {
+    auto sectionWidget = m_Ui->sectionWidget->widget(0);
+    m_Ui->sectionWidget->removeWidget(sectionWidget);
+    sectionWidget->deleteLater();
+  }
+
+  const int numberOfSections = m_Form->GetNumberOfSections();
 
   for (int sectionIndex = 0; sectionIndex < numberOfSections; ++sectionIndex)
   {
-    const auto& section = m_Form.GetSection(sectionIndex);
+    const auto& section = m_Form->GetSection(sectionIndex);
     auto questions = section.GetQuestions();
 
     auto sectionWidget = new QWidget;
@@ -136,30 +163,30 @@ void QmitkForm::Update()
 
 void QmitkForm::UpdateFormHeader()
 {
-  if (m_HasBeenSubmitted)
+  if (m_HasBeenSubmitted || m_Ui->sectionWidget->currentIndex() == -1)
   {
     m_Ui->formHeaderFrame->hide();
     return;
   }
 
-  bool showTitle = !m_Form.GetTitle().empty();
+  bool showTitle = !m_Form->GetTitle().empty();
 
   m_Ui->formTitleLabel->setVisible(showTitle);
 
   if (showTitle)
-    m_Ui->formTitleLabel->setText(QString::fromStdString(m_Form.GetTitle()));
+    m_Ui->formTitleLabel->setText(QString("<h2>%1</h2>").arg(QString::fromStdString(m_Form->GetTitle())));
 
   int sectionIndex = m_Ui->sectionWidget->currentIndex();
-  bool showDescription = sectionIndex == 0 && !m_Form.GetDescription().empty();
+  bool showDescription = sectionIndex == 0 && !m_Form->GetDescription().empty();
 
   m_Ui->formDescriptionLabel->setVisible(showDescription);
 
   if (showDescription)
-    m_Ui->formDescriptionLabel->setText(QString::fromStdString(m_Form.GetDescription()));
+    m_Ui->formDescriptionLabel->setText(QString::fromStdString(m_Form->GetDescription()));
 
   bool hasRequiredQuestion = false;
 
-  for (auto question : m_Form.GetSection(sectionIndex).GetQuestions())
+  for (auto question : m_Form->GetSection(sectionIndex).GetQuestions())
   {
     if (question->IsRequired())
     {
@@ -175,14 +202,14 @@ void QmitkForm::UpdateFormHeader()
 
 void QmitkForm::UpdateSubmittedHeader()
 {
-  if (m_HasBeenSubmitted)
+  if (m_HasBeenSubmitted && m_Ui->sectionWidget->currentIndex() != -1)
   {
-    bool showTitle = !m_Form.GetTitle().empty();
+    bool showTitle = !m_Form->GetTitle().empty();
 
     m_Ui->submittedTitleLabel->setVisible(showTitle);
 
     if (showTitle)
-      m_Ui->submittedTitleLabel->setText(QString::fromStdString(m_Form.GetTitle()));
+      m_Ui->submittedTitleLabel->setText(QString("<h2>%1</h2>").arg(QString::fromStdString(m_Form->GetTitle())));
 
     m_Ui->submittedFrame->show();
   }
@@ -194,7 +221,7 @@ void QmitkForm::UpdateSubmittedHeader()
 
 void QmitkForm::UpdateSectionHeader()
 {
-  if (m_HasBeenSubmitted)
+  if (m_HasBeenSubmitted || m_Ui->sectionWidget->currentIndex() == -1)
   {
     m_Ui->sectionHeaderFrame->hide();
     return;
@@ -208,7 +235,7 @@ void QmitkForm::UpdateSectionHeader()
     return;
   }
 
-  const auto& section = m_Form.GetSection(sectionIndex);
+  const auto& section = m_Form->GetSection(sectionIndex);
   bool showTitle = !section.GetTitle().empty();
 
   m_Ui->sectionTitleLabel->setVisible(showTitle);
@@ -228,7 +255,7 @@ void QmitkForm::UpdateSectionHeader()
 
 void QmitkForm::UpdateQuestionWidgets()
 {
-  if (m_HasBeenSubmitted)
+  if (m_HasBeenSubmitted || m_Ui->sectionWidget->currentIndex() == -1)
   {
     m_Ui->sectionWidget->hide();
     return;
@@ -255,10 +282,10 @@ void QmitkForm::UpdateFormButtons()
 {
   int sectionIndex = m_Ui->sectionWidget->currentIndex();
 
-  m_Ui->backButton->setVisible(!m_HasBeenSubmitted && sectionIndex != 0);
+  m_Ui->backButton->setVisible(!m_HasBeenSubmitted && sectionIndex > 0);
   m_Ui->nextButton->setVisible(!m_HasBeenSubmitted && sectionIndex < m_Ui->sectionWidget->count() - 1);
-  m_Ui->submitButton->setVisible(!m_HasBeenSubmitted && sectionIndex == m_Ui->sectionWidget->count() - 1);
-  m_Ui->clearButton->setVisible(!m_HasBeenSubmitted);
+  m_Ui->submitButton->setVisible(!m_HasBeenSubmitted && sectionIndex != -1 && sectionIndex == m_Ui->sectionWidget->count() - 1);
+  m_Ui->clearButton->setVisible(!m_HasBeenSubmitted && sectionIndex != -1);
 }
 
 void QmitkForm::OnBackButtonClicked()
@@ -276,6 +303,8 @@ void QmitkForm::OnSubmitButtonClicked()
 {
   if (this->ValidateCurrentSection())
   {
+    emit Submit();
+
     if (m_ResponsesPath.empty())
     {
       m_ResponsesPath = QFileDialog::getSaveFileName(this,
@@ -294,7 +323,7 @@ void QmitkForm::OnSubmitButtonClicked()
 
         try
         {
-          mitk::Forms::SubmitToCSV(m_Form, m_ResponsesPath);
+          mitk::Forms::SubmitToCSV(*m_Form, m_ResponsesPath);
         }
         catch (const mitk::Exception& e)
         {

@@ -29,11 +29,18 @@ class MITKFORMSUI_EXPORT QmitkForm : public QWidget
   Q_OBJECT
 
 public:
-  explicit QmitkForm(mitk::Forms::Form& form, QWidget* parent = nullptr);
+  explicit QmitkForm(QWidget* parent = nullptr);
+  explicit QmitkForm(mitk::Forms::Form* form, QWidget* parent = nullptr);
   ~QmitkForm() override;
+
+  mitk::Forms::Form* GetForm() const;
+  void SetForm(mitk::Forms::Form* form);
 
   fs::path GetResponsesPath() const;
   void SetResponsesPath(const fs::path& csvPath);
+
+signals:
+  void Submit();
 
 private:
   void CreateQuestionWidgets();
@@ -54,7 +61,7 @@ private:
   void OnSubmitAnotherButtonClicked();
 
   Ui::QmitkForm* m_Ui;
-  mitk::Forms::Form& m_Form;
+  mitk::Forms::Form* m_Form;
   fs::path m_ResponsesPath;
   bool m_HasBeenSubmitted;
 };

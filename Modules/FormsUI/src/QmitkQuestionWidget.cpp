@@ -55,7 +55,7 @@ void QmitkQuestionWidget::SetQuestion(mitk::Forms::Question* question)
     text.append("<span style=\"color: red;\">*</span>");
   }
 
-  m_QuestionLabel->setText(text);
+  m_QuestionLabel->setText(QString("<h4>%1</h4>").arg(text));
   m_RequiredLabel->setText(QString("<span style=\"color: red;\">%1</span>").arg(QString::fromStdString(question->GetRequiredText())));
 }
 

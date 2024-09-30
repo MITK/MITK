@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define mitkQuestionWithOptions_h
 
 #include <mitkQuestion.h>
-#include <optional>
 #include <set>
 
 namespace mitk::Forms

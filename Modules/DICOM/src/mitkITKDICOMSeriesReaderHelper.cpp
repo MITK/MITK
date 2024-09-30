@@ -122,7 +122,7 @@ mitk::Image::Pointer mitk::ITKDICOMSeriesReaderHelper::Load( const StringContain
       {
         if (filenames.size() > 1)
         {
-          MITK_ERROR << "Invalid application logic Was called to load multiple DICOM files into one image volume, but at least one DICOM file indicate that it is 2D";
+          MITK_ERROR << "Invalid application logic was called to load multiple DICOM files into one image volume, but at least one DICOM file indicated that it is 2D.";
           return nullptr;
         }
 

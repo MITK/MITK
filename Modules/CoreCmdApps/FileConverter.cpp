@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
         errMsg += "No reader available for '" + loadInfo.m_Path + "'\n";
       }
       MITK_ERROR << errMsg;
-      return 0;
+      return EXIT_SUCCESS;
     }
 
     std::cout << "Available Readers: "<<std::endl << "------------------------" << std::endl;
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
     {
       std::cout  << " : " << reader.GetDescription() << std::endl;
     }
-    return 0;
+    return EXIT_SUCCESS;
   }
 
   mitk::PreferenceListReaderOptionsFunctor::ListType emptyList = {};
@@ -101,24 +101,55 @@ int main(int argc, char* argv[])
     path = path + mitk::IOUtil::GetDirectorySeparator();
   }
 
-  auto nodes = mitk::IOUtil::Load(inputFilename, &functor);
-
   unsigned count = 0;
   int missingSlicesDetected = 0;
+  std::vector<mitk::BaseData::Pointer> dataObjs;
+  bool ioErrorOccured = false;
 
-  for (auto node : nodes)
+  try
+  {
+    dataObjs = mitk::IOUtil::Load(inputFilename, &functor);
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << "\nError(s) occurred while input was loaded. Not all data objects are loaded successfully.\n";
+    std::cerr << "Error messages:\n";
+    std::cerr << e.what() << std::endl;
+    ioErrorOccured = true;
+  }
+
+  std::cout << "Number of loaded data objects: " << dataObjs.size() << "\n\n" << std::endl;
+
+  ioErrorOccured = ioErrorOccured || dataObjs.empty(); //we assume that loading operation that not result in at
+                                                       //least one obj is indicating an error.
+
+  for (auto dataObj : dataObjs)
   {
     std::string writeName = path + filename + extension;
     if (count > 0)
     {
       writeName = path + filename + "_" + std::to_string(count) + extension;
     }
-    mitk::IOUtil::Save(node, writeName);
+
+    std::cout << "Write data object #"<<count<<" to: "<<writeName << std::endl;
+    try
+    {
+      mitk::IOUtil::Save(dataObj, writeName);
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << "Error occurred while saving the data object.\n";
+      std::cerr << "Data object type: " << dataObj->GetNameOfClass() << "\n";
+      std::cerr << "Error messages:\n";
+      std::cerr << e.what() << std::endl << std::endl;
+      ioErrorOccured = true;
+    }
+
     ++count;
 
     try
     {
-      auto splitReasonProperty = node->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()).c_str());
+      auto splitReasonProperty = dataObj->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::VOLUME_SPLIT_REASON()).c_str());
       if (splitReasonProperty.IsNotNull())
       {
         auto reasonStr = splitReasonProperty->GetValueAsString();
@@ -149,5 +180,6 @@ int main(int argc, char* argv[])
                  "Estimated number of missing slices: " << missingSlicesDetected << std::endl;
   }
 
+  if (ioErrorOccured) return EXIT_FAILURE;
   return EXIT_SUCCESS;
 }

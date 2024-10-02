@@ -153,14 +153,21 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::DoRead()
             const mitk::DICOMImageBlockDescriptor& desc = reader->GetOutput(i);
             mitk::BaseData::Pointer data = desc.GetMitkImage().GetPointer();
 
-            std::string nodeName = GenerateNameFromDICOMProperties(&desc);
+            if (data.IsNotNull())
+            {
+              std::string nodeName = GenerateNameFromDICOMProperties(&desc);
 
-            StringProperty::Pointer nameProp = StringProperty::New(nodeName);
-            data->SetProperty("name", nameProp);
+              StringProperty::Pointer nameProp = StringProperty::New(nodeName);
+              data->SetProperty("name", nameProp);
 
-            data->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_CONFIGURATION()), StringProperty::New(reader->GetConfigurationLabel()));
+              data->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_CONFIGURATION()), StringProperty::New(reader->GetConfigurationLabel()));
 
-            result.push_back(data);
+              result.push_back(data);
+            }
+            else
+            {
+              MITK_ERROR << "Errpr occured when loading a DICOM image block. The invalid block contained at least the following file: " << desc.GetImageFrameList().front()->Filename;
+            }
           }
       }
   }

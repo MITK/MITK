@@ -71,7 +71,7 @@ private:
 
   void AddDefaultStyle();
   void AddDefaultFonts();
-  void AddFontFamily(const QString& fontFamily);
+  void AddFontFamilies();
   void UpdateWorkbenchStyleSheet() const;
   void ClearStyles();
   void ReadPreferences();

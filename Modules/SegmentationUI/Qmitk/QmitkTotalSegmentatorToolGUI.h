@@ -33,7 +33,7 @@ class QmitkTotalSegmentatorToolInstaller : public QmitkSetupVirtualEnvUtil
 {
 public:
   const QString VENV_NAME = ".totalsegmentator_v2";
-  const QString TOTALSEGMENTATOR_VERSION = "2.2.1";
+  const QString TOTALSEGMENTATOR_VERSION = "2.4.0";
   const std::vector<QString> PACKAGES = {QString("Totalsegmentator==") + TOTALSEGMENTATOR_VERSION,
                                          QString("numpy<2"),
                                          QString("SimpleITK<=2.3.1"),

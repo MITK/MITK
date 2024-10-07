@@ -23,6 +23,8 @@ found in the LICENSE file.
 
 #include <usModuleContext.h>
 
+#include <QApplication>
+
 using namespace mitk::Forms::UI;
 
 ModuleActivator::ModuleActivator()
@@ -35,6 +37,9 @@ ModuleActivator::~ModuleActivator() = default;
 void ModuleActivator::Load(us::ModuleContext* context)
 {
   context->RegisterService<IQuestionWidgetFactory>(m_QuestionWidgetFactory.get());
+
+  if (qGuiApp == nullptr)
+    return; // We cannot register QWidgets without a QApplication
 
   this->RegisterQuestionWidget<CheckboxesQuestion, QmitkCheckboxesQuestionWidget>();
   this->RegisterQuestionWidget<DropdownQuestion, QmitkDropdownQuestionWidget>();

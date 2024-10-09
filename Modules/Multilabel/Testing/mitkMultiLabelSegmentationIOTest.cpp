@@ -106,7 +106,7 @@ public:
 
   void TestReadEmptyMultiLabelSegmentation_withNoMetaInformation_butContent()
   {
-    CPPUNIT_ASSERT_THROW_MESSAGE("Loading empty segmentation with invalid pixel content did not faile.",
+    CPPUNIT_ASSERT_THROW_MESSAGE("Loading empty segmentation with invalid pixel content did not fail.",
       mitk::IOUtil::Load(GetTestDataFilePath("Multilabel/EmptyMultiLabelSegmentation_no_labels_meta_but_pixel_content.nrrd")),
       mitk::Exception);
   }

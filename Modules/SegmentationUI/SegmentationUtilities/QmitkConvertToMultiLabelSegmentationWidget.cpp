@@ -36,6 +36,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImageConverter.h>
 
 #include <QmitkNodeSelectionDialog.h>
+#include <QMessageBox>
 
 namespace
 {
@@ -462,8 +463,21 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   //check for label collision and fix if needed
   mitk::LabelSetImage::LabelValueVectorType usedLabelValues = outputSeg->GetAllLabelValues();
   std::map<const mitk::DataNode*, mitk::LabelValueMappingVector> labelsMappingMap;
-  CheckForLabelCollision(imageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
-  CheckForLabelCollision(nonimageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
+
+  try
+  {
+    CheckForLabelCollision(imageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
+    CheckForLabelCollision(nonimageNodes, foundLabelsMap, usedLabelValues, labelsMappingMap);
+  }
+  catch (const mitk::Exception& e)
+  {
+    QMessageBox::warning(nullptr, "Conversion error", "Cannot convert selected data into segmentations due to unresolved label collisions. "
+      "The inputs contain at least one equal label value that could not be resolved by remapping as not enough unused destination label values are available.\n\n"
+      "One can often mitigate this problem by checking the \"Convert inputs separately\" option." );
+    mitk::ProgressBar::GetInstance()->Reset();
+    QApplication::restoreOverrideCursor();
+    return;
+  }
 
   //Ensure that we have the first layer to add
   mitk::LabelSetImage::GroupIndexType currentGroupIndex = 0;

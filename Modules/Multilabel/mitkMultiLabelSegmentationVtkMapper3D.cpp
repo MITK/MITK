@@ -243,10 +243,25 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRe
 
     localStorage->m_NumberOfGroups = numberOfGroups;
 
+    //Compute normalized orientation matrix of image to ensure that the volume is shown
+    //at the right spot (same geometry like image)
+    const auto geometry = image->GetGeometry();
+    auto spacing = geometry->GetSpacing();
+    auto orientationMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
+    orientationMatrix->DeepCopy(geometry->GetVtkMatrix());
+    //normalize orientationMatrix
+    for (int i = 0; i < 3; ++i)
+    {
+      orientationMatrix->SetElement(i, 0, orientationMatrix->GetElement(i, 0) / spacing[0]);
+      orientationMatrix->SetElement(i, 1, orientationMatrix->GetElement(i, 1) / spacing[1]);
+      orientationMatrix->SetElement(i, 2, orientationMatrix->GetElement(i, 2) / spacing[2]);
+    }
+
     localStorage->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
 
     for (unsigned int groupID = 0; groupID < numberOfGroups; ++groupID)
     {
+      localStorage->m_LayerVolumes[groupID]->SetUserMatrix(orientationMatrix);
       localStorage->m_Actors->AddPart(localStorage->m_LayerVolumes[groupID]);
     }
   }
@@ -272,10 +287,6 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRe
     localStorage->m_LayerVolumes[groupID]->GetProperty()->SetInterpolationTypeToNearest();
 
     localStorage->m_LayerVolumes[groupID]->SetMapper(localStorage->m_LayerVolumeMappers[groupID]);
-
-    //Ensure that the volume is shown at the right spot (same geometry like image)
-    auto origin = groupImage->GetGeometry()->GetOrigin();  // get the origin of the image
-    localStorage->m_LayerVolumes[groupID]->SetPosition(origin.GetDataPointer());
   }
   localStorage->m_LastDataUpdateTime.Modified();
   return true;

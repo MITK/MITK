@@ -70,7 +70,6 @@ void QmitkForm::SetForm(mitk::Forms::Form* form)
 
   this->CreateQuestionWidgets();
   this->Reset();
-  this->Update();
 }
 
 fs::path QmitkForm::GetResponsesPath() const
@@ -150,6 +149,8 @@ void QmitkForm::Reset()
 
   m_HasBeenSubmitted = false;
   m_Ui->sectionWidget->setCurrentIndex(0);
+
+  this->Update();
 }
 
 void QmitkForm::Update()

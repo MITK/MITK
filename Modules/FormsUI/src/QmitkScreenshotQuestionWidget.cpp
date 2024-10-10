@@ -116,6 +116,9 @@ void QmitkScreenshotQuestionWidget::SetQuestion(Question* question)
 
 void QmitkScreenshotQuestionWidget::Reset()
 {
+  for (auto screenshotWidget : m_Layout->parentWidget()->findChildren<QmitkScreenshotWidget*>())
+    this->OnRemoveScreenshot(screenshotWidget);
+
   if (m_Question)
     m_Question->ClearResponses();
 

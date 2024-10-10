@@ -262,8 +262,8 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRe
     //if a label was removed. There must be a cleaner way to do it. Exchanging the whole mapper
     //is a ugly workaround for now.
     localStorage->m_LayerVolumeMappers[groupID] = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-
     localStorage->m_LayerVolumeMappers[groupID]->SetInputData(localStorage->m_LayerImages[groupID]);
+
 
     localStorage->m_LayerVolumes[groupID]->GetProperty()->ShadeOn();
     localStorage->m_LayerVolumes[groupID]->GetProperty()->SetDiffuse(1.0);
@@ -272,6 +272,10 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRe
     localStorage->m_LayerVolumes[groupID]->GetProperty()->SetInterpolationTypeToNearest();
 
     localStorage->m_LayerVolumes[groupID]->SetMapper(localStorage->m_LayerVolumeMappers[groupID]);
+
+    //Ensure that the volume is shown at the right spot (same geometry like image)
+    auto origin = groupImage->GetGeometry()->GetOrigin();  // get the origin of the image
+    localStorage->m_LayerVolumes[groupID]->SetPosition(origin.GetDataPointer());
   }
   localStorage->m_LastDataUpdateTime.Modified();
   return true;

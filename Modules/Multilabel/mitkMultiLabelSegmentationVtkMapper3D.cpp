@@ -280,7 +280,7 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRe
 void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *renderer)
 {
   bool visible = true;
-  bool has3Dvisualize = true;
+  bool has3Dvisualize = false;
   const DataNode *node = this->GetDataNode();
   node->GetVisibility(visible, renderer, "visible");
   node->GetBoolProperty("multilabel.3D.visualize", has3Dvisualize, renderer);

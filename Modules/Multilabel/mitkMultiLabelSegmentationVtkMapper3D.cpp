@@ -171,9 +171,14 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   bool isGeometryModified = (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
     (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime());
 
-  if (isGeometryModified)
+  // check if visibility has been switched on since last update
+  bool visibilityChanged =
+    PropertyTimeStampIsNewer(node, renderer, "visible", localStorage->m_LastDataUpdateTime) ||
+    PropertyTimeStampIsNewer(node, renderer, "multilabel.3D.visualize", localStorage->m_LastDataUpdateTime);
+
+  if (isGeometryModified || visibilityChanged)
   {
-    //if geometry is outdated all groups need regeneration
+    //if geometry is outdated or visibility changed all groups need regeneration
     outdatedGroups.resize(image->GetNumberOfLayers());
     std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
   }
@@ -260,10 +265,13 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRe
     localStorage->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
 
     for (unsigned int groupID = 0; groupID < numberOfGroups; ++groupID)
-    {
       localStorage->m_LayerVolumes[groupID]->SetUserMatrix(orientationMatrix);
+  }
+
+  if (localStorage->m_Actors->GetParts()->GetNumberOfItems() == 0)
+  {
+    for (unsigned int groupID = 0; groupID < numberOfGroups; ++groupID)
       localStorage->m_Actors->AddPart(localStorage->m_LayerVolumes[groupID]);
-    }
   }
 
   for (const auto groupID : outdatedGroupIDs)
@@ -294,13 +302,21 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRe
 
 void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *renderer)
 {
+  auto localStorage = m_LSH.GetLocalStorage(renderer);
+  const auto* node = this->GetDataNode();
+
   bool visible = true;
-  bool has3Dvisualize = false;
-  const DataNode *node = this->GetDataNode();
   node->GetVisibility(visible, renderer, "visible");
+
+  bool has3Dvisualize = false;
   node->GetBoolProperty("multilabel.3D.visualize", has3Dvisualize, renderer);
+
   if (!visible || !has3Dvisualize)
+  {
+    // Nothing to see. Clear the actor. We regenerate its contents later if necessary.
+    localStorage->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
     return;
+  }
 
   auto *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
 
@@ -319,7 +335,6 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
   }
 
   image->UpdateOutputInformation();
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   // check if something important has changed and we need to re-render
 

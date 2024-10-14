@@ -54,8 +54,6 @@ mitk::Label::Label() : PropertyList()
     SetName("noName!");
   if (GetProperty("value") == nullptr)
     SetValue(0);
-  if (GetProperty("layer") == nullptr)
-    SetLayer(0);
 
   DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(this);
 }
@@ -183,25 +181,6 @@ mitk::Label::PixelType mitk::Label::GetValue() const
   assert(property);
   pixelValue = property->GetValue();
   return pixelValue;
-}
-
-void mitk::Label::SetLayer(unsigned int layer)
-{
-  mitk::UIntProperty *property = dynamic_cast<mitk::UIntProperty *>(GetProperty("layer"));
-  if (property != nullptr)
-    // Update Property
-    property->SetValue(layer);
-  else
-    // Create new Property
-    SetProperty("layer", mitk::UIntProperty::New(layer));
-}
-
-unsigned int mitk::Label::GetLayer() const
-{
-  unsigned int layer;
-  mitk::UIntProperty *prop = dynamic_cast<mitk::UIntProperty *>(GetProperty("layer"));
-  layer = prop->GetValue();
-  return layer;
 }
 
 const mitk::Color &mitk::Label::GetColor() const

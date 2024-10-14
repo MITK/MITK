@@ -68,9 +68,6 @@ namespace mitk
     void SetValue(PixelType pixelValue);
     PixelType GetValue() const;
 
-    void SetLayer(unsigned int layer);
-    unsigned int GetLayer() const;
-
     void SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
 
     using itk::Object::Modified;

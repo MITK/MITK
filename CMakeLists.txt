@@ -156,6 +156,31 @@ if(WIN32)
 endif()
 
 #-----------------------------------------------------------------------------
+# Switch on parallel builds in Visual Studio
+#-----------------------------------------------------------------------------
+
+# Since Visual Studio 2019 v16.9 a new Multi-ToolTask scheduler is available,
+# which schedules and limits tasks both within (was /MP) and across targets (-m).
+# Make sure to add the -m option in build scripts when using MSBuild or CMake
+# to build everything:
+#
+#   msbuild -m
+#
+#   resp.
+#
+#   cmake --build <path> -- -m
+
+if(MSVC)
+  if(NOT CMAKE_VS_GLOBALS MATCHES "(^|;)UseMultiToolTask=")
+    list(APPEND CMAKE_VS_GLOBALS UseMultiToolTask=true)
+  endif()
+
+  if(NOT CMAKE_VS_GLOBALS MATCHES "(^|;)EnforceProcessCountAcrossBuilds=")
+    list(APPEND CMAKE_VS_GLOBALS EnforceProcessCountAcrossBuilds=true)
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Additional MITK Options (also shown during superbuild)
 #-----------------------------------------------------------------------------
 

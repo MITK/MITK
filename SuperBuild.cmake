@@ -115,11 +115,9 @@ set(gen_platform ${CMAKE_GENERATOR_PLATFORM})
 # Use this value where semi-colons are needed in ep_add args:
 set(sep "^^")
 
-##
-
 if(MSVC_VERSION)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj /MP")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif()
 
 # This is a workaround for passing linker flags
@@ -186,6 +184,7 @@ set(ep_common_args
 if(MSVC_VERSION)
   list(APPEND ep_common_args
     -DCMAKE_DEBUG_POSTFIX:STRING=d
+    "-DCMAKE_VS_GLOBALS:STRING=UseMultiToolTask=true${sep}EnforceProcessCountAcrossBuilds=true"
   )
 
   set(DCMTK_CMAKE_DEBUG_POSTFIX d)

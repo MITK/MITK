@@ -170,7 +170,7 @@ endif()
 #
 #   cmake --build <path> -- -m
 
-if(MSVC)
+if(MSVC_VERSION VERSION_GREATER_EQUAL 1928)
   if(NOT CMAKE_VS_GLOBALS MATCHES "(^|;)UseMultiToolTask=")
     list(APPEND CMAKE_VS_GLOBALS UseMultiToolTask=true)
   endif()

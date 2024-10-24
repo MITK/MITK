@@ -33,7 +33,7 @@ class QmitkTotalSegmentatorToolInstaller : public QmitkSetupVirtualEnvUtil
 {
 public:
   const QString VENV_NAME = ".totalsegmentator_v2";
-  const QString TOTALSEGMENTATOR_VERSION = "2.2.1";
+  const QString TOTALSEGMENTATOR_VERSION = "2.4.0";
   const std::vector<QString> PACKAGES = {QString("Totalsegmentator==") + TOTALSEGMENTATOR_VERSION,
                                          QString("numpy<2"),
                                          QString("SimpleITK<=2.3.1"),
@@ -183,7 +183,12 @@ protected:
     "coronary_arteries",
     "body",
     "lung_vessels",
-    "pleural_pericard_effusion"
+    "pleural_pericard_effusion",
+    "head_glands_cavities",
+    "head_muscles",
+    "headneck_bones_vessels",  
+    "headneck_muscles",                   
+    "liver_vessels"
   };
   QmitkTotalSegmentatorToolInstaller m_Installer;
 };

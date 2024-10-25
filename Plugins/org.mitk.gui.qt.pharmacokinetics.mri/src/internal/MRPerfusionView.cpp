@@ -263,11 +263,11 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.groupDescBrix->setVisible(isDescBrixFactory);
   if (isDescBrixFactory)
   {
-    m_Controls.toolboxConfiguration->setItemEnabled(2, false);
+    m_Controls.toolboxConfiguration->setItemEnabled(0, false);
   }
   else
   {
-    m_Controls.toolboxConfiguration->setItemEnabled(2, true);
+    m_Controls.toolboxConfiguration->setItemEnabled(0, true);
   }
   m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory );
   m_Controls.AIFImageNodeSelector->setVisible(!m_Controls.radioAIFFile->isChecked());

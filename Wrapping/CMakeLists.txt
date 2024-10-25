@@ -13,8 +13,8 @@ if(MITK_WRAP_PYTHON_ENABLED)
 
   # A general packaging target, not built by default, to build packages for each
   # language. This should depend on all language specific targets.
-  # add_custom_target(dist ${CMAKE_COMMAND} -E echo "Finished generating wrapped packages for distribution...")
-  # set_property(TARGET dist PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Wrapping")
+  add_custom_target(dist ${CMAKE_COMMAND} -E echo "Finished generating wrapped packages for distribution...")
+  set_property(TARGET dist PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Wrapping")
 
   add_subdirectory(Python)
   add_subdirectory(test)

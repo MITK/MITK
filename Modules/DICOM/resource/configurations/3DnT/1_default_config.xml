@@ -1,0 +1,30 @@
+<?xml version="1.0" standalone="no"?>
+<DICOMFileReader
+    class="ThreeDnTDICOMSeriesReader"
+    version="2"
+    label="Default Multi Purpose 3D+t config"
+    description="Generic multi-purpose 3D+t config. Sort by Image Position (Patient), Acquisition Number, Acquisition Date, Acquisition Time, Trigger Time and SOPInstanceUID"
+    group3DnT="true"
+    onlyCondenseSameSeries="false"
+    fixTiltByShearing="true"
+    acceptTwoSlicesGroups="true"
+    toleratedOriginErrorIsAbsolute="true"
+    toleratedOriginError="0.005">
+    decimalPlacesForOrientation="5"
+    <DICOMDatasetSorter
+        class="DICOMTagBasedSorter"
+        strictSorting="false"
+        expectDistanceOne="false">
+         <Distinguishing>
+             <Tag name="SeriesInstanceUID" group="0020," element="000e"/>
+         </Distinguishing>
+        <Sorting>
+            <ImagePositionPatient/>
+            <Tag name="AcquisitionNumber" group="0x0020," element="0x0012"/>
+            <Tag name="AcquisitionDate" group="0x0008," element="0x0022"/>
+            <Tag name="AcquisitionTime" group="0x0008," element="0x0032"/>
+            <Tag name="TriggerTime" group="0x0018," element="0x1060"/>
+            <Tag name="SOPInstanceUID" group="0x0008," element="0x0018"/>
+        </Sorting>
+    </DICOMDatasetSorter>
+</DICOMFileReader>

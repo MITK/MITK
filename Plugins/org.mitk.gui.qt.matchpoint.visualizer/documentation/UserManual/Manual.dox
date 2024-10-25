@@ -8,7 +8,7 @@
 \section MAP_VIS_Introduction Introduction
 This view is in development to offer the user a way to visualize MatchPoint registrations (so the transformation/deformation field they represent) in a MITK scene.
 Currently, a simple grid visualization and glyph visualization is implemented.\n
-\remark <b>This is an experimental version and work in progress.</b> So please excuse errors or usage issues and report them at https://phabricator.mitk.org.
+\remark <b>This is an experimental version and work in progress.</b>
 
 \section MAP_VIS_Usage Usage
 \imageMacro{map_view_visualizer_example.png, "Example screenshot showing the main elements of the view used to visualize a registration.", 14}

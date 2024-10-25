@@ -485,13 +485,15 @@ The tool requires that you have a URL to a (self-) hosted MONAI Label server.
 For a detailed explanation of what MONAI Label is capable of, please refer to https://docs.monai.io/projects/label/en/latest/. <br>
 Any adjustments to the \subpage org_mitk_editors_stdmultiwidget_Levelwindow setting impacts the segmentation. However, any applied color maps are ignored.
 
-\subsubsection org_mitk_views_segmentationSegmentAnythingWorkflow Workflow:
+\subsubsection org_mitk_views_segmentationMonaiLabelWorkflow Workflow:
     -# Enter your URL in the "MONAI Server URL" box and press the refresh button next to it. This connects MITK to the MONAI Label server and fetches exposed metadata.
     -# Select the Radiology app e.g. from the "Available Apps" combobox. This will load all supported model names in the "Models" combo box below it.
     -# From the "Models" box select the model you want to use. Immediately, all supported classes of the model on which the model was trained will be shown below it.
     -# If an interactive model is selected e.g. "deepgrow_3d", Press and hold SHIFT and left click on any of the 3 render windows to start click guided segmentation.
     Press SHIFT+Right click for negative clicks to adjust the preview mask on the render window.
     -# If an auto-segmentation model is selected e.g. "deepedit_seg", simply click "Preview" for generating masks.
+    -# If you see that segmentation preview is not shown on the Workbench (ending up showing error) yet, your MONAI Label server terminal shows successful completion of the inference request then go to Preferences (Ctrl+P) > Segmentation
+    and change the MONAI Label time out value (in seconds).
 
 
 \section org_mitk_views_segmentationpostprocessing Additional things you can do with segmentations

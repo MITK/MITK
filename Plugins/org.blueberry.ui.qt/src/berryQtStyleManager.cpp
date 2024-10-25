@@ -31,18 +31,23 @@ found in the LICENSE file.
 
 #include <mitkIPreferences.h>
 
+namespace
+{
+  QString ParseColor(const QString& subject, const QString& pattern, const QString& fallback)
+  {
+    QRegularExpression re(pattern, QRegularExpression::CaseInsensitiveOption);
+    auto match = re.match(subject);
+
+    return match.hasMatch()
+      ? match.captured(1)
+      : fallback;
+  }
+}
+
 namespace berry
 {
-
-static QString ParseColor(const QString &subject, const QString &pattern, const QString &fallback)
-{
-  QRegularExpression re(pattern, QRegularExpression::CaseInsensitiveOption);
-  auto match = re.match(subject);
-
-  return match.hasMatch()
-    ? match.captured(1)
-    : fallback;
-}
+const QString QtStyleManager::DEFAULT_FONT = QStringLiteral("Roboto");
+const int QtStyleManager::DEFAULT_FONT_SIZE = 10;
 
 QIcon QtStyleManager::ThemeIcon(const QByteArray &originalSVG)
 {
@@ -80,6 +85,8 @@ QIcon QtStyleManager::ThemeIcon(const QString &resourcePath)
 }
 
 QtStyleManager::QtStyleManager()
+  : m_currentFont(DEFAULT_FONT),
+    m_currentFontSize(DEFAULT_FONT_SIZE)
 {
   AddDefaultStyle();
   AddDefaultFonts();
@@ -127,21 +134,26 @@ void QtStyleManager::AddDefaultStyle()
 void QtStyleManager::AddDefaultFonts()
 {
   m_customFontNames.append(QString("<<system>>"));
+  this->AddFontFamilies();
+}
 
-  m_customFontNames.append(QString("Fira Sans"));
-  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/FiraSans/FiraSans.ttf");
+void QtStyleManager::AddFontFamilies()
+{
+  QDirIterator fontFamilyIt(":/org.blueberry.ui.qt/fonts", QDir::Dirs);
 
-  m_customFontNames.append(QString("Light Fira Sans"));
-  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/LightFiraSans/LightFiraSans.ttf");
+  while (fontFamilyIt.hasNext())
+  {
+    fontFamilyIt.next();
+    QDirIterator fontIt(fontFamilyIt.filePath(), { "*.ttf" });
 
-  m_customFontNames.append(QString("Roboto"));
-  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/Roboto/Roboto.ttf");
+    while (fontIt.hasNext())
+    {
+      fontIt.next();
+      QFontDatabase::addApplicationFont(fontIt.filePath());
+    }
 
-  m_customFontNames.push_back(QString("Open Sans"));
-  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/OpenSans/OpenSans-Regular.ttf");
-
-  m_customFontNames.push_back(QString("xkcd"));
-  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/xkcd/xkcd.ttf");
+    m_customFontNames.push_back(fontFamilyIt.fileName());
+  }
 }
 
 void QtStyleManager::ClearStyles()
@@ -339,7 +351,7 @@ void QtStyleManager::SetStyle(const QString& fileName)
 
   ReadStyleData(style);
 
-  qApp->setStyleSheet(currentStyle->stylesheet);
+  this->UpdateWorkbenchStyleSheet();
 
   try
   {
@@ -356,29 +368,42 @@ void QtStyleManager::SetStyle(const QString& fileName)
 
 void QtStyleManager::SetFont(const QString& fontName)
 {
-  m_currentFont = fontName;
+  m_currentFont = fontName.isEmpty()
+    ? DEFAULT_FONT
+    : fontName;
 }
 
-void QtStyleManager::SetFontSize(const int fontSize)
+void QtStyleManager::SetFontSize(int fontSize)
 {
-  m_currentFontSize = fontSize;
+  m_currentFontSize = fontSize <= 0
+    ? DEFAULT_FONT_SIZE
+    : fontSize;
 }
 
 void QtStyleManager::UpdateWorkbenchFont()
 {
-  if( m_currentFont == QString( "<<system>>" ) ||  m_currentFont == QString( "" ))
-  {
-    qApp->setFont(QFontDatabase::systemFont(QFontDatabase::GeneralFont));
-  }
-  else
-  {
-    QFont font;
-    font.setFamily(m_currentFont);
-    font.setPointSize(m_currentFontSize);
-    qApp->setFont(font);
-  }
-  qApp->setStyleSheet(currentStyle->stylesheet);
+  this->UpdateWorkbenchStyleSheet();
   PlatformUI::GetWorkbench()->UpdateTheme();
+}
+
+void QtStyleManager::UpdateWorkbenchStyleSheet() const
+{
+  auto fontFamily = m_currentFont;
+  auto fontSize = m_currentFontSize;
+
+  if (fontFamily == "<<system>>" || fontFamily.isEmpty())
+  {
+    auto systemFont = QFontDatabase::systemFont(QFontDatabase::GeneralFont);
+    fontFamily = systemFont.family();
+    fontSize = systemFont.pointSize();
+  }
+
+  auto sheet = QString("* {\n  font-family: \"%1\";\n  font-size: %2pt;\n}\n\n%3")
+    .arg(fontFamily)
+    .arg(fontSize)
+    .arg(currentStyle->stylesheet);
+
+  qApp->setStyleSheet(sheet);
 }
 
 QtStyleManager::Style QtStyleManager::GetDefaultStyle() const

@@ -29,6 +29,9 @@ class BERRY_UI_QT QtStyleManager : public QObject, public IQtStyleManager
   Q_INTERFACES(berry::IQtStyleManager)
 
 public:
+  static const QString DEFAULT_FONT;
+  static const int DEFAULT_FONT_SIZE;
+
   static QIcon ThemeIcon(const QByteArray &originalSVG);
   static QIcon ThemeIcon(const QString &resourcePath);
 
@@ -53,7 +56,7 @@ public:
   void GetFonts(QStringList& fontNames) const override;
 
   void SetFont(const QString& fontName) override;
-  void SetFontSize(const int fontSize) override;
+  void SetFontSize(int fontSize) override;
   void UpdateWorkbenchFont() override;
 
   Style GetDefaultStyle() const override;
@@ -68,6 +71,8 @@ private:
 
   void AddDefaultStyle();
   void AddDefaultFonts();
+  void AddFontFamilies();
+  void UpdateWorkbenchStyleSheet() const;
   void ClearStyles();
   void ReadPreferences();
 

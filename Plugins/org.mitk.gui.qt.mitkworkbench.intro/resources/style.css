@@ -6,7 +6,8 @@ body {
   background-color: #202021;
   color: #f1f1f1;
   padding: 16px;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Roboto", "Open Sans", sans-serif;
+  line-height: 1.25;
 }
 
 .content {

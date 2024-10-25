@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.example.forms"
+          name="Forms Example"
+          category="Examples"
+          icon="resources/FormsIcon.svg"
+          class="QmitkFormsExampleView" />
+  </extension>
+</plugin>

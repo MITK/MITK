@@ -384,7 +384,7 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
   {
     if (item->m_ItemType == QmitkMultiLabelSegTreeItem::ItemType::Group)
     {
-      return QVariant(QString("Group %1").arg(item->GetGroupID()));
+      return QVariant(QString("Group id: %1").arg(item->GetGroupID()));
     }
     else
     {
@@ -493,6 +493,16 @@ bool QmitkMultiLabelTreeModel::setData(const QModelIndex& index, const QVariant&
 
       }
       return true;
+    }
+    else //name column
+    {
+      if (item->m_ItemType == QmitkMultiLabelSegTreeItem::ItemType::Group)
+      {
+        auto groupID = item->GetGroupID();
+        m_Segmentation->SetGroupName(groupID, value.toString().toStdString());
+        m_Segmentation->Modified();
+        return true;
+      }
     }
   }
   return false;
@@ -706,7 +716,7 @@ Qt::ItemFlags QmitkMultiLabelTreeModel::flags(const QModelIndex &index) const
       return Qt::ItemIsEnabled;
     }
   }
-  else
+  else //name column
   {
     if (item->HandleAsInstance())
     {
@@ -1024,9 +1034,17 @@ void QmitkMultiLabelTreeModel::OnGroupAdded(GroupIndexType groupIndex)
   }
 }
 
-void QmitkMultiLabelTreeModel::OnGroupModified(GroupIndexType /*groupIndex*/)
+void QmitkMultiLabelTreeModel::OnGroupModified(GroupIndexType groupIndex)
 {
-  //currently not needed
+  if (m_ShowGroups)
+  {
+    if (m_Segmentation->ExistGroup(groupIndex))
+    {
+      auto groupItem = GetGroupItem(groupIndex, m_RootItem.get());
+      auto modelIndex = GetIndexByItem(groupItem, this);
+      emit dataChanged(modelIndex, modelIndex);
+    }
+  }
 }
 
 void QmitkMultiLabelTreeModel::OnGroupRemoved(GroupIndexType groupIndex)

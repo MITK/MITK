@@ -18,7 +18,7 @@ function build_mitk {
 
     echo "MITK_GIT_TAG: ${MITK_GIT_TAG}"
 
-    git clone https://phabricator.mitk.org/source/mitk.git ${SRC_DIR} &&
+    git clone https://github.com/MITK/MITK.git ${SRC_DIR} &&
     (cd ${SRC_DIR}  && git checkout ${MITK_GIT_TAG}  ) &&
     rm -rf ${BLD_DIR} &&
     mkdir -p ${BLD_DIR} && cd ${BLD_DIR} &&

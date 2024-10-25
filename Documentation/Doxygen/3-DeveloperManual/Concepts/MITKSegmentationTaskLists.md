@@ -8,7 +8,7 @@ MITK Segmentation Task Lists are a JSON-based file format defining a list of seg
 Segmentation tasks consist at least of a path to a reference image and a unique result path.
 The result path specifies where the final segmentation of the task is expected to be located once it is done.
 
-Optional properties of a segmentation task include a task name and description as well as various degrees of start conditions for the segmentation like a label name, a list of suggested names and colors for new labels, a label set preset, or even a pre-segmentation to begin with.
+Optional properties of a segmentation task include a task name and description as well as various presettings for the segmentation like a label name, a list of suggested names and colors for new labels, a label set preset, or even a pre-segmentation to begin with.
 The complete set of properties is specified further below in the file format specification.
 
 MITK Segmentation Task Lists must be considered experimental at the moment and are prone to change without any prior warning.
@@ -71,6 +71,31 @@ Instead, the root object may contain an optional `Defaults` object that is ident
 There is one exception, though: A `Defaults` object must not contain a `Result` file path, since result files of tasks must be distinct by definition.
 As the name indicates, default properties can still be overridden by individual tasks if they are specified explicitly.
 
+### Label name suggestions
+
+The `LabelNameSuggestions` property of segmentation tasks is supposed to reference a JSON file that consists of an array of objects with a mandatory `name` property and an optional `color` property.
+For example:
+
+~~~{.json}
+[
+  {
+    "name": "Abdomen",
+    "color": "red"
+  },
+  {
+    "name": "Lung",
+    "color": "#00ff00"
+  },
+  {
+    "name": "Heart"
+  },
+  {
+    "name": "Aortic Valve",
+    "color": "CornflowerBlue"
+  }
+]
+~~~
+
 ### Example
 
 The following example is a complete showcase of the properties and features listed above.
@@ -118,27 +143,75 @@ For simplicity, we chose to define tasks around organs for this example and name
 }
 ~~~
 
-## Label name suggestions
+### Version 2 and MITK Forms
 
-The `LabelNameSuggestions` property of segmentation tasks is supposed to reference a JSON file that consists of an array of objects with a mandatory `name` property and an optional `color` property.
-For example:
+Version 2 of the MITK Segmentation Task List file format adds support for MITK Forms.
+An MITK Form is a feedback/survey form just like a Google Form for example.
+A task object (including the `Defaults` object) can now reference an MITK Forms file to show the form together with a loaded task.
+A user can then submit their responses per task into a common CSV response file.
+It is highly recommended to set the `Name` of a task as it is used in the response file to identify the corresponding task.
+
+In the following example, each task displays a common form for feedback purposes:
 
 ~~~{.json}
-[
-  {
-    "name": "Abdomen",
-    "color": "red"
+{
+  "FileFormat": "MITK Segmentation Task List",
+  "Version": 2,
+  "Name": "Example Segmentation Task List with MITK Forms",
+  "Defaults": {
+    "Form": {
+      "Path": "forms/feedback.json",
+      "Result": "results/feedback.csv"
+    }
   },
-  {
-    "name": "Lung",
-    "color": "#00ff00"
-  },
-  {
-    "name": "Heart"
-  },
-  {
-    "name": "Aortic Valve",
-    "color": "CornflowerBlue"
-  }
-]
+  "Tasks": [
+    {
+      "Name": "Case 01",
+      "Image": "images/01.nrrd",
+      "Result": "results/01.nrrd"
+    },
+    {
+      "Name": "Case 02",
+      "Image": "images/02.nrrd",
+      "Result": "results/02.nrrd"
+    }
+  ]
+}
 ~~~
+
+The MITK Forms file defines a form asking for any trouble and the possibility to attach screenshots:
+
+~~~{.json}
+{
+  "FileFormat": "MITK Form",
+  "Version": 1,
+  "Sections": [
+    {
+      "Title": "Feedback",
+      "Description": "Please fill out this feedback form for all cases.",
+      "Questions": [
+        {
+          "Text": "Did you have any trouble with this case?",
+          "Required": true,
+          "Type": "Multiple choice",
+          "Options": [
+            "Yes",
+            "No"
+          ]
+        },
+        {
+          "Text": "Optionally take screenshots if you want to illustrate something:",
+          "Type": "Screenshot"
+        }
+      ]
+    }
+  ]
+}
+~~~
+
+The submitted CSV responses might look like the following table:
+
+"Timestamp"            | "Task"    | "Did you have any trouble with this case?" | "Optionally take screenshots if you want to illustrate something:"
+---------------------- | --------- | ------------------------------------------ | ------------------------------------------------------------------
+"2024-09-26T09:15:35Z" | "Case 01" | "Yes"                                      | "screenshots/screenshot_ZDeCZI.png"
+"2024-09-26T09:23:58Z" | "Case 02" | "No"                                       | ""

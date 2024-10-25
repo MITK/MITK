@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/FormsExample">
+    <file>FormsIcon.svg</file>
+    <file>ExampleForm.json</file>
+  </qresource>
+</RCC>

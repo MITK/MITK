@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 #include "dcmtk/ofstd/ofdatime.h"
 
-template <typename PixelType>
+template <typename PixelType, unsigned int TDim>
 mitk::Image::Pointer
 mitk::ITKDICOMSeriesReaderHelper
 ::LoadDICOMByITK(
@@ -32,7 +32,7 @@ mitk::ITKDICOMSeriesReaderHelper
   /******** Normal Case, 3D (also for GDCM < 2 usable) ***************/
   mitk::Image::Pointer image = mitk::Image::New();
 
-  typedef itk::Image<PixelType, 3> ImageType;
+  typedef itk::Image<PixelType, TDim> ImageType;
   typedef itk::ImageSeriesReader<ImageType> ReaderType;
 
   io = itk::GDCMImageIO::New();

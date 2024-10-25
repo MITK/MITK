@@ -30,6 +30,8 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QKeyEvent>
 
+#include <QInputDialog>
+
 #include <ui_QmitkMultiLabelInspectorControls.h>
 
 
@@ -742,7 +744,7 @@ void QmitkMultiLabelInspector::RemoveGroup()
 void QmitkMultiLabelInspector::OnDeleteGroup()
 {
   if (!m_AllowLabelModification)
-    mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of RemoveLabel.";
+    mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of RemoveGroupInternal.";
 
   if (m_Segmentation.IsNull())
     return;
@@ -796,6 +798,10 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")), "&Add label", this);
       QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabel);
       menu->addAction(addInstanceAction);
+
+      QAction* renameAction = new QAction("Rename group", this);
+      QObject::connect(renameAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnRenameGroup);
+      menu->addAction(renameAction);
 
       if (m_Segmentation->GetNumberOfLayers() > 1)
       {
@@ -1224,6 +1230,40 @@ void QmitkMultiLabelInspector::OnClearLabel(bool /*value*/)
     {
       m_SegmentationNode->Modified();
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
+}
+
+void QmitkMultiLabelInspector::OnRenameGroup()
+{
+  if (!m_AllowLabelModification)
+    mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of RenameGroup.";
+
+  if (m_Segmentation.IsNull())
+    return;
+
+  auto currentIndex = this->m_Controls->view->currentIndex();
+  auto groupIDVariant = currentIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::GroupIDRole);
+
+  if (groupIDVariant.isValid())
+  {
+    auto groupID = groupIDVariant.value<mitk::LabelSetImage::GroupIndexType>();
+
+    bool dlgOK;
+    auto groupName = m_Segmentation->GetGroupName(groupID);
+    auto newName = QInputDialog::getText(this, "Change name of the group", "Group name:", QLineEdit::Normal, QString::fromStdString(groupName), &dlgOK);
+    if (dlgOK)
+    {
+      m_Segmentation->SetGroupName(groupID, newName.toStdString());
+      // this is needed as workaround for (T27307). It circumvents the fact that modifications
+      // of data (here the segmentation) does not directly trigger the modification of the
+      // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
+      // listens to the datastorage for modification would not get notified.
+      if (m_SegmentationNode.IsNotNull())
+      {
+        m_SegmentationNode->Modified();
+      }
+
     }
   }
 }

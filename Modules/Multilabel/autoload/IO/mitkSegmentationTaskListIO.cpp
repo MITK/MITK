@@ -22,6 +22,18 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  void to_json(nlohmann::json& json, const SegmentationTaskList::Task::Form& form)
+  {
+    json["Path"] = form.Path;
+    json["Result"] = form.Result;
+  }
+
+  void from_json(const nlohmann::json& json, SegmentationTaskList::Task::Form& form)
+  {
+    form.Path = json["Path"].get<std::string>();
+    form.Result = json["Result"].get<std::string>();
+  }
+
   void to_json(nlohmann::json& json, const SegmentationTaskList::Task& task)
   {
     if (task.HasName())
@@ -50,6 +62,9 @@ namespace mitk
 
     if (task.HasDynamic())
       json["Dynamic"] = task.GetDynamic();
+
+    if (task.HasForm())
+      json["Form"] = task.GetForm();
   }
 
   void from_json(const nlohmann::json& json, SegmentationTaskList::Task& task)
@@ -98,6 +113,11 @@ namespace mitk
 
     if (iter != json.end())
       task.SetDynamic(json["Dynamic"].get<bool>());
+
+    iter = json.find("Form");
+
+    if (iter != json.end())
+      task.SetForm(json["Form"].get<SegmentationTaskList::Task::Form>());
   }
 }
 
@@ -144,19 +164,19 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskListIO::DoRead()
   if ("MITK Segmentation Task List" != json.value("FileFormat", ""))
     mitkThrow() << "Unknown file format (expected \"MITK Segmentation Task List\")!";
 
-  if (1 != json.value<int>("Version", 0))
-    mitkThrow() << "Unknown file format version (expected \"1\")!";
+  if (auto version = json.value<int>("Version", 0); version < 1 || version > 2)
+    mitkThrow() << "Unknown file format version (expected \"1\" or \"2\")!";
 
   if (!json.contains("Tasks") || !json["Tasks"].is_array())
     mitkThrow() << "Tasks array not found!";
 
   auto segmentationTaskList = SegmentationTaskList::New();
 
-  if (json.contains("Name"))
-    segmentationTaskList->SetProperty("name", StringProperty::New(json["Name"].get<std::string>()));
-
   try
   {
+    if (json.contains("Name"))
+      segmentationTaskList->SetProperty("name", StringProperty::New(json["Name"].get<std::string>()));
+
     if (json.contains("Defaults"))
     {
       segmentationTaskList->SetDefaults(json["Defaults"].get<SegmentationTaskList::Task>());
@@ -240,9 +260,23 @@ void mitk::SegmentationTaskListIO::Write()
   if (!stream->good())
     mitkThrow() << "Stream for writing is not good!";
 
+  auto hasForm = segmentationTaskList->GetDefaults().HasForm();
+
+  if (!hasForm)
+  {
+    for (const auto& task : *segmentationTaskList)
+    {
+      if (task.HasForm())
+      {
+        hasForm = true;
+        break;
+      }
+    }
+  }
+
   nlohmann::ordered_json json = {
     { "FileFormat", "MITK Segmentation Task List" },
-    { "Version", 1 },
+    { "Version", hasForm ? 2 : 1},
     { "Name", segmentationTaskList->GetProperty("name")->GetValueAsString() }
   };
 

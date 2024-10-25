@@ -104,7 +104,6 @@ namespace mitk
      * This is needed since the contour points we reduced before they are used to interpolate the surface.
      *
      * @param minSpacing Parameter to set
-     * @param minSpacing Parameter to set
      */
     void SetMinSpacing(double minSpacing);
 

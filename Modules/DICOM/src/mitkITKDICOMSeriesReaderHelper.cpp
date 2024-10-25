@@ -37,15 +37,64 @@ const mitk::DICOMTag mitk::ITKDICOMSeriesReaderHelper::AcquisitionDateTag = mitk
 const mitk::DICOMTag mitk::ITKDICOMSeriesReaderHelper::AcquisitionTimeTag = mitk::DICOMTag( 0x0008, 0x0032 );
 const mitk::DICOMTag mitk::ITKDICOMSeriesReaderHelper::TriggerTimeTag = mitk::DICOMTag( 0x0018, 0x1060 );
 
-#define switch3DCase( IOType, T ) \
+#define switchTypeCase(Dim, IOType, T) \
   case IOType:                    \
-    return LoadDICOMByITK<T>( filenames, correctTilt, tiltInfo, io );
+    return LoadDICOMByITK<T, Dim>( filenames, correctTilt, tiltInfo, io );
 
 bool mitk::ITKDICOMSeriesReaderHelper::CanHandleFile( const std::string& filename )
 {
   MITK_DEBUG << "ITKDICOMSeriesReaderHelper::CanHandleFile " << filename;
   itk::GDCMImageIO::Pointer tester = itk::GDCMImageIO::New();
   return tester->CanReadFile( filename.c_str() );
+}
+
+template<unsigned int TDim>
+mitk::Image::Pointer
+mitk::ITKDICOMSeriesReaderHelper::LoadByTypeDispatch(const StringContainer& filenames,
+  bool correctTilt,
+  const GantryTiltInformation& tiltInfo,
+  itk::GDCMImageIO::Pointer& io)
+{
+  if (io->GetPixelType() == itk::IOPixelEnum::SCALAR)
+  {
+    switch (io->GetComponentType())
+    {
+      switchTypeCase( TDim, itk::IOComponentEnum::UCHAR, unsigned char)
+      switchTypeCase( TDim, itk::IOComponentEnum::CHAR, char)
+      switchTypeCase( TDim, itk::IOComponentEnum::USHORT, unsigned short)
+      switchTypeCase( TDim, itk::IOComponentEnum::SHORT, short)
+      switchTypeCase( TDim, itk::IOComponentEnum::UINT, unsigned int)
+      switchTypeCase( TDim, itk::IOComponentEnum::INT, int)
+      switchTypeCase( TDim, itk::IOComponentEnum::ULONG, long unsigned int)
+      switchTypeCase( TDim, itk::IOComponentEnum::LONG, long int)
+      switchTypeCase( TDim, itk::IOComponentEnum::FLOAT, float)
+      switchTypeCase( TDim, itk::IOComponentEnum::DOUBLE, double)
+      default: MITK_ERROR
+        << "Found unsupported DICOM scalar pixel type: (enum value) "
+        << io->GetComponentType();
+    }
+  }
+  else if (io->GetPixelType() == itk::IOPixelEnum::RGB)
+  {
+    switch (io->GetComponentType())
+    {
+      switchTypeCase( TDim, itk::IOComponentEnum::UCHAR, itk::RGBPixel<unsigned char>)
+      switchTypeCase( TDim, 
+       itk::IOComponentEnum::CHAR, itk::RGBPixel<char>) switchTypeCase( TDim, itk::IOComponentEnum::USHORT,
+          itk::RGBPixel<unsigned short>)
+        switchTypeCase( TDim, itk::IOComponentEnum::SHORT, itk::RGBPixel<short>) switchTypeCase( TDim, 
+          itk::IOComponentEnum::UINT, itk::RGBPixel<unsigned int>) switchTypeCase( TDim, itk::IOComponentEnum::INT, itk::RGBPixel<int>)
+        switchTypeCase( TDim, itk::IOComponentEnum::ULONG, itk::RGBPixel<long unsigned int>)
+        switchTypeCase( TDim, itk::IOComponentEnum::LONG, itk::RGBPixel<long int>) switchTypeCase( TDim, 
+          itk::IOComponentEnum::FLOAT, itk::RGBPixel<float>) switchTypeCase( TDim, itk::IOComponentEnum::DOUBLE,
+            itk::RGBPixel<double>) default
+    : MITK_ERROR
+        << "Found unsupported DICOM scalar pixel type: (enum value) "
+        << io->GetComponentType();
+    }
+  }
+  MITK_ERROR << "Unsupported DICOM pixel type";
+  return nullptr;
 }
 
 mitk::Image::Pointer mitk::ITKDICOMSeriesReaderHelper::Load( const StringContainer& filenames,
@@ -69,41 +118,20 @@ mitk::Image::Pointer mitk::ITKDICOMSeriesReaderHelper::Load( const StringContain
       io->SetFileName( filenames.front().c_str() );
       io->ReadImageInformation();
 
-      if ( io->GetPixelType() == itk::IOPixelEnum::SCALAR )
+      if(io->GetNumberOfDimensions()==2 || io->GetSpacing(2)==0.)
       {
-        switch ( io->GetComponentType() )
+        if (filenames.size() > 1)
         {
-          switch3DCase(itk::IOComponentEnum::UCHAR, unsigned char) switch3DCase(itk::IOComponentEnum::CHAR, char) switch3DCase(
-            itk::IOComponentEnum::USHORT, unsigned short) switch3DCase(itk::IOComponentEnum::SHORT, short)
-              switch3DCase(itk::IOComponentEnum::UINT, unsigned int) switch3DCase(itk::IOComponentEnum::INT, int) switch3DCase(
-                itk::IOComponentEnum::ULONG, long unsigned int) switch3DCase(itk::IOComponentEnum::LONG, long int)
-                switch3DCase(itk::IOComponentEnum::FLOAT, float) switch3DCase(itk::IOComponentEnum::DOUBLE, double) default
-            : MITK_ERROR
-              << "Found unsupported DICOM scalar pixel type: (enum value) "
-              << io->GetComponentType();
+          MITK_ERROR << "Invalid application logic was called to load multiple DICOM files into one image volume, but at least one DICOM file indicated that it is 2D.";
+          return nullptr;
         }
-      }
-      else if ( io->GetPixelType() == itk::IOPixelEnum::RGB )
-      {
-        switch ( io->GetComponentType() )
-        {
-          switch3DCase(itk::IOComponentEnum::UCHAR, itk::RGBPixel<unsigned char>) switch3DCase(
-            itk::IOComponentEnum::CHAR, itk::RGBPixel<char>) switch3DCase(itk::IOComponentEnum::USHORT,
-                                                               itk::RGBPixel<unsigned short>)
-              switch3DCase(itk::IOComponentEnum::SHORT, itk::RGBPixel<short>) switch3DCase(
-                itk::IOComponentEnum::UINT, itk::RGBPixel<unsigned int>) switch3DCase(itk::IOComponentEnum::INT, itk::RGBPixel<int>)
-                switch3DCase(itk::IOComponentEnum::ULONG, itk::RGBPixel<long unsigned int>)
-                  switch3DCase(itk::IOComponentEnum::LONG, itk::RGBPixel<long int>) switch3DCase(
-                    itk::IOComponentEnum::FLOAT, itk::RGBPixel<float>) switch3DCase(itk::IOComponentEnum::DOUBLE,
-                                                                         itk::RGBPixel<double>) default
-            : MITK_ERROR
-              << "Found unsupported DICOM scalar pixel type: (enum value) "
-              << io->GetComponentType();
-        }
-      }
 
-      MITK_ERROR << "Unsupported DICOM pixel type";
-      return nullptr;
+        return LoadByTypeDispatch<2>(filenames, correctTilt, tiltInfo, io);
+      }
+      else
+      {
+        return LoadByTypeDispatch<3>(filenames, correctTilt, tiltInfo, io);
+      }
     }
   }
   catch ( const itk::MemoryAllocationError& e )
@@ -346,7 +374,7 @@ bool mitk::ITKDICOMSeriesReaderHelper::ExtractDateTimeBoundsAndTriggerOfTimeStep
 };
 
 bool mitk::ITKDICOMSeriesReaderHelper::ExtractTimeBoundsOfTimeStep(
-  const StringContainer& filenamesOfTimeStep, TimeBounds& bounds, const OFDateTime& baselineDateTime )
+  const StringContainer& filenamesOfTimeStep, TimeBounds& bounds, const OFDateTime& baselineDateTime, bool& usedTriggerBounds )
 {
   DateTimeBounds aqDTBounds;
   TimeBounds triggerBounds;
@@ -355,10 +383,15 @@ bool mitk::ITKDICOMSeriesReaderHelper::ExtractTimeBoundsOfTimeStep(
 
   mitk::ScalarType lowerBound = ComputeMiliSecDuration( baselineDateTime, aqDTBounds[0] );
   mitk::ScalarType upperBound = ComputeMiliSecDuration( baselineDateTime, aqDTBounds[1] );
-  if ( lowerBound < mitk::eps || upperBound < mitk::eps )
+  if ( lowerBound < mitk::eps || upperBound < mitk::eps || usedTriggerBounds)
   {
     lowerBound = triggerBounds[0];
     upperBound = triggerBounds[1];
+    usedTriggerBounds = true;
+  }
+  else
+  {
+    usedTriggerBounds = false;
   }
 
   bounds[0] = lowerBound;
@@ -386,6 +419,8 @@ mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
   TimeBounds bounds( 0.0 );
   result.push_back( bounds );
 
+  //start with not using trigger time. Will be changed by ExtractTimeBoundsOfTimeStep if needed.
+  bool usedTriggerTime = false;
 
   // iterate over the remaining timesteps
   for ( ++pos;
@@ -396,15 +431,17 @@ mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
     TimeBounds dateTimeBounds;
 
     // extract the timebounds relative to the baseline
-    if ( ExtractTimeBoundsOfTimeStep( *pos, dateTimeBounds, baseLine ) )
+    if ( ExtractTimeBoundsOfTimeStep( *pos, dateTimeBounds, baseLine, usedTriggerTime) )
     {
-
       bounds[0] = dateTimeBounds[0];
       bounds[1] = dateTimeBounds[1];
     }
 
     result.push_back( bounds );
   }
+
+  if (usedTriggerTime)
+    MITK_DEBUG << "Used trigger time to extract time bounds of passed files";
 
   return result;
 };

@@ -10,7 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QApplication>
 #include <QColor>
 #include "QmitkMultiLabelTreeModel.h"
 
@@ -33,10 +32,7 @@ class QmitkMultiLabelTreeModelTestSuite : public mitk::TestFixture
 
   mitk::LabelSetImage::Pointer m_Segmentation;
 
-  QCoreApplication* m_TestApp;
-
 public:
-
   mitk::LabelSetImage::Pointer GenerateSegmentation()
   {
     // Create a new labelset image
@@ -99,15 +95,10 @@ public:
     m_Segmentation = GenerateSegmentation();
 
     PopulateSegmentation(m_Segmentation);
-
-    int argc = 0;
-    char** argv = nullptr;
-    m_TestApp = new QCoreApplication(argc, argv);
   }
 
   void tearDown() override
   {
-    delete m_TestApp;
   }
 
   QModelIndex GetIndex(const QmitkMultiLabelTreeModel& model, const std::vector<int>& rows, int column = 0) const

@@ -20,7 +20,7 @@
       <string/>
      </property>
      <property name="textFormat">
-      <enum>Qt::RichText</enum>
+      <enum>Qt::TextFormat::RichText</enum>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -64,7 +64,7 @@
          <number>0</number>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
         <property name="format">
          <string/>
@@ -85,7 +85,7 @@
            <string>Previous subtask</string>
           </property>
           <property name="arrowType">
-           <enum>Qt::LeftArrow</enum>
+           <enum>Qt::ArrowType::LeftArrow</enum>
           </property>
          </widget>
         </item>
@@ -133,7 +133,7 @@
            <string>Next subtask</string>
           </property>
           <property name="arrowType">
-           <enum>Qt::RightArrow</enum>
+           <enum>Qt::ArrowType::RightArrow</enum>
           </property>
          </widget>
         </item>
@@ -141,20 +141,20 @@
       </item>
       <item>
        <widget class="QLabel" name="detailsLabel">
-        <property name="text">
-         <string/>
-        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="text">
+         <string/>
+        </property>
         <property name="textFormat">
-         <enum>Qt::RichText</enum>
+         <enum>Qt::TextFormat::RichText</enum>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -216,9 +216,12 @@
        </layout>
       </item>
       <item>
+       <widget class="QmitkForm" name="formWidget" native="true"/>
+      </item>
+      <item>
        <spacer name="verticalSpacer_2">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -234,7 +237,7 @@
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Orientation::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -251,6 +254,12 @@
    <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>
    <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkForm</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkForm.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

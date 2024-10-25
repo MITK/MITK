@@ -88,10 +88,54 @@
     <file>darkstyle-tab.qss</file>
     <file>darkstyle-activetab.qss</file>
 
-    <file>fonts/FiraSans/FiraSans.ttf</file>
-    <file>fonts/LightFiraSans/LightFiraSans.ttf</file>
-    <file>fonts/Roboto/Roboto.ttf</file>
-    <file>fonts/OpenSans/OpenSans-Regular.ttf</file>
-    <file>fonts/xkcd/xkcd.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-Black.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-BlackItalic.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-Bold.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-BoldItalic.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-ExtraBold.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-ExtraBoldItalic.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-ExtraLight.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-ExtraLightItalic.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-Italic.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-Light.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-LightItalic.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-Medium.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-MediumItalic.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-Regular.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-SemiBold.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-SemiBoldItalic.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-Thin.ttf</file>
+    <file>fonts/Fira Sans/FiraSans-ThinItalic.ttf</file>
+
+    <file>fonts/Roboto/Roboto-Black.ttf</file>
+    <file>fonts/Roboto/Roboto-BlackItalic.ttf</file>
+    <file>fonts/Roboto/Roboto-Bold.ttf</file>
+    <file>fonts/Roboto/Roboto-BoldItalic.ttf</file>
+    <file>fonts/Roboto/Roboto-Italic.ttf</file>
+    <file>fonts/Roboto/Roboto-Light.ttf</file>
+    <file>fonts/Roboto/Roboto-LightItalic.ttf</file>
+    <file>fonts/Roboto/Roboto-Medium.ttf</file>
+    <file>fonts/Roboto/Roboto-MediumItalic.ttf</file>
+    <file>fonts/Roboto/Roboto-Regular.ttf</file>
+    <file>fonts/Roboto/Roboto-Thin.ttf</file>
+    <file>fonts/Roboto/Roboto-ThinItalic.ttf</file>
+
+    <file>fonts/Open Sans/OpenSans-Bold.ttf</file>
+    <file>fonts/Open Sans/OpenSans-BoldItalic.ttf</file>
+    <file>fonts/Open Sans/OpenSans-ExtraBold.ttf</file>
+    <file>fonts/Open Sans/OpenSans-ExtraBoldItalic.ttf</file>
+    <file>fonts/Open Sans/OpenSans-Italic.ttf</file>
+    <file>fonts/Open Sans/OpenSans-Light.ttf</file>
+    <file>fonts/Open Sans/OpenSans-LightItalic.ttf</file>
+    <file>fonts/Open Sans/OpenSans-Medium.ttf</file>
+    <file>fonts/Open Sans/OpenSans-MediumItalic.ttf</file>
+    <file>fonts/Open Sans/OpenSans-Regular.ttf</file>
+    <file>fonts/Open Sans/OpenSans-SemiBold.ttf</file>
+    <file>fonts/Open Sans/OpenSans-SemiBoldItalic.ttf</file>
+
+    <file>fonts/Atkinson Hyperlegible/AtkinsonHyperlegible-Bold.ttf</file>
+    <file>fonts/Atkinson Hyperlegible/AtkinsonHyperlegible-BoldItalic.ttf</file>
+    <file>fonts/Atkinson Hyperlegible/AtkinsonHyperlegible-Italic.ttf</file>
+    <file>fonts/Atkinson Hyperlegible/AtkinsonHyperlegible-Regular.ttf</file>
   </qresource>
 </RCC>

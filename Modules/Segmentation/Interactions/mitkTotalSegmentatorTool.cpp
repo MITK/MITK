@@ -176,7 +176,7 @@ mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(s
                                                                                const unsigned int *dimensions,
                                                                                mitk::BaseGeometry *geometry)
 {
-  Label::PixelType labelId = 1;
+  Label::PixelType labelId = 0;
   auto aggloLabelImage = mitk::LabelSetImage::New();
   auto initImage = mitk::Image::New();
   initImage->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dimensions);
@@ -187,6 +187,16 @@ mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(s
 
   for (auto const &outputImagePath : filePaths)
   {
+    labelId++;
+    Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
+    auto source = mitk::LabelSetImage::New();
+    source->InitializeByLabeledImage(outputImage);
+    source->SetGeometry(geometry);
+    if (source->GetTotalNumberOfLabels() == 0)
+    {
+      MITK_DEBUG << "No label found for " << outputImagePath;
+      continue;
+    }
     double rgba[4];
     aggloLabelImage->GetLookupTable()->GetTableValue(labelId, rgba);
     mitk::Color color;
@@ -201,14 +211,7 @@ mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(s
     label->SetOpacity(rgba[3]);
 
     aggloLabelImage->AddLabel(label, layerIndex, false, false);
-
-    Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
-    auto source = mitk::LabelSetImage::New();
-    source->InitializeByLabeledImage(outputImage);
-    source->SetGeometry(geometry);
-
     mitk::TransferLabelContent(source, aggloLabelImage, aggloLabelImage->GetConstLabelsByValue(aggloLabelImage->GetLabelValuesByGroup(layerIndex)), 0, 0, false, {{1, labelId}});
-    labelId++;
   }
   return aggloLabelImage;
 }

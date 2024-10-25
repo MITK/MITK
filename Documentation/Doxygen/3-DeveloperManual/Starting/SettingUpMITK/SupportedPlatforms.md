@@ -44,8 +44,9 @@ as well as in the current master branch.
 | ----------------------------------- | --------------------------------------------------
 | Microsoft Windows 11                | Visual Studio 2022
 | Microsoft Windows 10                | Visual Studio 2019
-| Apple macOS Ventura 13              | Default Apple Clang version
-| Apple macOS Monterey 12             | Default Apple Clang version
+| Linux Ubuntu 24.04                  | Default GCC version
+| Apple macOS 13 Ventura              | Default Apple Clang version
+| Apple macOS 12 Monterey             | Default Apple Clang version
 
 All platforms not listed above are not officially supported by the MITK team. However, we will happily accept
 contributions to improve support for other platforms as long as we have the hardware and capacity for maintenance.

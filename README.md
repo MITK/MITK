@@ -32,8 +32,8 @@ For details, please read the [Supported Platforms][platforms] page.
 [![Windows][windows-build-status]][cdash]
 [![Ubuntu 20.04][ubuntu-20.04-build-status]][cdash]
 [![Ubuntu 22.04][ubuntu-22.04-build-status]][cdash]
-[![macOS 10.15 Catalina][macos-10.15-build-status]][cdash]
-[![macOS 11 Big Sur][macos-11-build-status]][cdash]
+[![macOS 12 Monterey][macos-12-build-status]][cdash]
+[![macOS 13 Ventura][macos-13-build-status]][cdash]
 
 We highly recommend to use the stable **master** branch instead. It is updated 1-2 times per month accompanied by curated [changelogs][changelog] and [snapshot installers][snapshot-installers].
 
@@ -49,9 +49,9 @@ Download
 
 The MITK source code and binaries for the *MitkWorkbench* application are released regularly according to the [MITK release cycle][release-cycle]. See the [Download][download] page for a list of releases.
 
-The official MITK source code is available in the [MITK Git repository][phab_repo]. The Git clone command is
+The official MITK source code is available in the [MITK Git repository][git_repo]. The Git clone command is
 
-    git clone https://phabricator.mitk.org/source/mitk.git MITK
+    git clone https://github.com/MITK/MITK.git
 
 Active development takes place in the MITK develop branch and its usage is advised for advanced users only.
 
@@ -65,7 +65,7 @@ Build instructions
 
 MITK uses [CMake][cmake] to configure a build tree. The following is a crash course about cloning, configuring, and building MITK on a Linux/Unix system:
 
-    git clone https://phabricator.mitk.org/source/mitk.git MITK
+    git clone https://github.com/MITK/MITK.git
     mkdir MITK-build
     cd MITK-build
     cmake ../MITK
@@ -79,7 +79,6 @@ Useful links
  - [Homepage][mitk]
  - [Download][download]
  - [Mailing list][mailinglist]
- - [Issue tracker][bugs]
 
 [logo]: https://github.com/MITK/MITK/raw/master/mitk.png
 [mitk]: https://www.mitk.org
@@ -94,17 +93,16 @@ Useful links
 [license]: https://github.com/MITK/MITK/blob/master/LICENSE
 [release-cycle]: https://www.mitk.org/MitkReleaseCycle
 [download]: https://www.mitk.org/Download
-[phab_repo]: https://phabricator.mitk.org/source/mitk/
+[git_repo]: https://github.com/MITK/MITK
 [contribute]: https://www.mitk.org/How_to_contribute
 [cmake]: https://www.cmake.org
 [build]: https://docs.mitk.org/nightly/BuildInstructionsPage.html
 [mailinglist]: https://www.mitk.org/Mailinglist
-[bugs]: https://phabricator.mitk.org/maniphest/
 [cdash]: https://cdash.mitk.org/index.php?project=MITK
 [changelog]: https://phabricator.mitk.org/w/mitk/changelog/
 [snapshot-installers]: https://www.mitk.org/download/ci/snapshots/
 [windows-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FWindows&subject=Windows
 [ubuntu-22.04-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FUbuntu+22.04&subject=Ubuntu+22.04
 [ubuntu-20.04-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FUbuntu+20.04&subject=Ubuntu+20.04
-[macOS-10.15-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Catalina&subject=macOS+10.15+Catalina
-[macOS-11-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Big+Sur&subject=macOS+11+Big+Sur
+[macOS-12-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Monterey&subject=macOS+12+Monterey
+[macOS-13-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Ventura&subject=macOS+13+Ventura

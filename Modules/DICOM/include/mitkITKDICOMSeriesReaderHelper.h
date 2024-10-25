@@ -60,11 +60,15 @@ class ITKDICOMSeriesReaderHelper
 
     /* Determine the time bounds in ms respective to the baselineDateTime for the passed
     files. Additionally it regards the trigger time tag if set and acquisition date time
-    carries not enough information.*/
+    carries not enough information.
+    @param [in, out] usedTriggerBounds Variable used to communicate if preceding time bounds extractions
+    used the trigger time (true). If true is passed to the method, it will use always trigger time
+    to extract the next bounds. Default is false. After the method call is returning the variable indicates
+    the last call used trigger time or not to extract the time bounds.*/
     static bool ExtractTimeBoundsOfTimeStep(const StringContainer& filenamesOfTimeStep,
                                                  TimeBounds& bounds,
-                                                 const OFDateTime& baselineDateTime );
-
+                                                 const OFDateTime& baselineDateTime,
+                                                 bool& usedTriggerBounds);
 
     /** Returns the list of time bounds of all passed time step containers.
      (sa ExtractTimeBoundsOfTimeStep and ExtractDateTimeBoundsOfTimeStep).
@@ -74,7 +78,7 @@ class ITKDICOMSeriesReaderHelper
      @remark The function regards acquisition date time tags and trigger time tags.*/
     static TimeBoundsList ExtractTimeBoundsOfTimeSteps (const StringContainerList& filenamesOfTimeSteps);
 
-    /** Helper function that generates  a time geometry using the template and the passed boundslist
+    /** Helper function that generates  a time geometry using the template and the passed bounds list
         (which indicates the number of time steps).
     */
     static TimeGeometry::Pointer GenerateTimeGeometry(const BaseGeometry* templateGeometry, const TimeBoundsList& boundsList);
@@ -83,12 +87,20 @@ class ITKDICOMSeriesReaderHelper
     typename ImageType::Pointer
     FixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo );
 
-    template <typename PixelType>
+    template <typename PixelType, unsigned int TDim>
     Image::Pointer
     LoadDICOMByITK( const StringContainer& filenames,
                     bool correctTilt,
                     const GantryTiltInformation& tiltInfo,
                     itk::GDCMImageIO::Pointer& io);
+
+    template<unsigned int TDim>
+    mitk::Image::Pointer
+    LoadByTypeDispatch(const StringContainer& filenames,
+        bool correctTilt,
+        const GantryTiltInformation& tiltInfo,
+        itk::GDCMImageIO::Pointer& io);
+
 
     template <typename PixelType>
     Image::Pointer

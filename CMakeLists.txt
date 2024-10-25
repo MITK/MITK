@@ -387,9 +387,9 @@ if(MITK_USE_Python3)
   set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
 
   if(APPLE)
-    set(python3_mininum_version 3.11)
+    set(python3_mininum_version 3.12)
   else()
-    set(python3_mininum_version 3.8)
+    set(python3_mininum_version 3.9)
   endif()
 
   find_package(Python3 ${python3_mininum_version} REQUIRED COMPONENTS Interpreter Development NumPy)
@@ -399,6 +399,7 @@ if(MITK_USE_Python3)
     string(REPLACE "\\" "/" Python3_STDLIB "${Python3_STDLIB}")
     string(REPLACE "\\" "/" Python3_SITELIB "${Python3_SITELIB}")
   endif()
+  link_directories(${Python3_LIBRARY_DIRS})
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
@@ -1060,6 +1061,22 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER
 #-----------------------------------------------------------------------------
 
 add_subdirectory(Utilities)
+
+set(MITK_WRAP_PYTHON_ENABLED OFF)
+if(MITK_USE_SWIG AND MITK_USE_Python3)
+  find_package(SWIG 4.2.0 COMPONENTS python)
+
+  if(SWIG_FOUND)
+    option(MITK_WRAP_PYTHON "" ON)
+
+    if(MITK_WRAP_PYTHON)
+      set(MITK_WRAP_PYTHON_ENABLED ON)
+    endif()
+  else()
+   message(SEND_ERROR "SWIG not found!")
+  endif()
+endif()
+
 
 add_subdirectory(Modules)
 

@@ -30,6 +30,7 @@ Using unknown versions of pip, setuptools and/or wheel packages/" )
     WORKING_DIRECTORY ${MITK_Python_BINARY_DIR}
     DEPENDS ${SWIG_MODULE_pyMITK_REAL_NAME}
     COMMENT "Creating Python binary distribution" )
+  set_property(TARGET dist.Python PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Wrapping")
 
   if( MITK_PYTHON_USE_VIRTUALENV )
     add_dependencies( dist.Python PythonVirtualEnv)

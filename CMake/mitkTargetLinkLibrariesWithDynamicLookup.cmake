@@ -574,7 +574,7 @@ function(mitk_target_link_libraries_with_dynamic_lookup target)
 
   set(links "${link_items}" "${link_libs}")
   if(links)
-    target_link_libraries(${target} "${links}")
+    target_link_libraries(${target} optimized "${links}")
   endif()
 endfunction()
 

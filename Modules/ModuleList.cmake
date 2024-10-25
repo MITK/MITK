@@ -43,7 +43,6 @@ set(MITK_MODULES
   DICOMUI
   Remeshing
   Python
-  QtPython
   Persistence
   RT
   RTUI

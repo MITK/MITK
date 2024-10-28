@@ -1,3 +1,7 @@
+set(H_FILES
+  DataManagement/mitkSegmentationTaskListMacros.h
+)
+
 set(CPP_FILES
   Algorithms/mitkCalculateSegmentationVolume.cpp
   Algorithms/mitkContourModelSetToImageFilter.cpp
@@ -17,61 +21,61 @@ set(CPP_FILES
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp
+  Algorithms/mitkSurfaceStampImageFilter.cpp
   Algorithms/mitkVtkImageOverwrite.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
-  Controllers/mitkToolManager.cpp
   Controllers/mitkSegmentationModuleActivator.cpp
+  Controllers/mitkToolManager.cpp
   Controllers/mitkToolManagerProvider.cpp
   DataManagement/mitkContour.cpp
   DataManagement/mitkContourSet.cpp
   DataManagement/mitkExtrudedContour.cpp
+  DataManagement/mitkSegmentationTaskList.cpp
   Interactions/mitkAddContourTool.cpp
   Interactions/mitkAutoCropTool.cpp
-  Interactions/mitkSegWithPreviewTool.cpp
   Interactions/mitkBinaryThresholdBaseTool.cpp
   Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkBinaryThresholdULTool.cpp
   Interactions/mitkCloseRegionTool.cpp
   Interactions/mitkContourModelInteractor.cpp
   Interactions/mitkContourModelLiveWireInteractor.cpp
-  Interactions/mitkEditableContourTool.cpp
-  Interactions/mitkLiveWireTool2D.cpp
-  Interactions/mitkLassoTool.cpp
   Interactions/mitkContourTool.cpp
   Interactions/mitkDrawPaintbrushTool.cpp
+  Interactions/mitkEditableContourTool.cpp
   Interactions/mitkErasePaintbrushTool.cpp
   Interactions/mitkEraseRegionTool.cpp
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionBaseTool.cpp
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkGrowCutTool.cpp
+  Interactions/mitkLassoTool.cpp
+  Interactions/mitkLiveWireTool2D.cpp
+  Interactions/mitkMedSAMTool.cpp
+  Interactions/mitkMonaiLabel2DTool.cpp
+  Interactions/mitkMonaiLabel3DTool.cpp
+  Interactions/mitkMonaiLabelTool.cpp
+  Interactions/mitknnUnetTool.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
+  Interactions/mitkPickingTool.cpp
+  Interactions/mitkProcessExecutor.cpp
   Interactions/mitkRegionGrowingTool.cpp
+  Interactions/mitkSegmentAnythingProcessExecutor.cpp
+  Interactions/mitkSegmentAnythingPythonService.cpp
+  Interactions/mitkSegmentAnythingTool.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSegTool2D.cpp
+  Interactions/mitkSegWithPreviewTool.cpp
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
-  Interactions/mitkPickingTool.cpp
-  Interactions/mitknnUnetTool.cpp
-  Interactions/mitkProcessExecutor.cpp
-  Interactions/mitkSegmentAnythingProcessExecutor.cpp
-  Interactions/mitkMonaiLabelTool.cpp
-  Interactions/mitkMonaiLabel2DTool.cpp
-  Interactions/mitkMonaiLabel3DTool.cpp
   Interactions/mitkTotalSegmentatorTool.cpp
-  Interactions/mitkSegmentAnythingTool.cpp
-  Interactions/mitkMedSAMTool.cpp
-  Interactions/mitkSegmentAnythingPythonService.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp
   Rendering/mitkContourVtkMapper3D.cpp
   SegmentationUtilities/BooleanOperations/mitkBooleanOperation.cpp
   SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp
-#Added from ML
-  Algorithms/mitkSurfaceStampImageFilter.cpp
 )
 
 set(RESOURCE_FILES
@@ -85,11 +89,11 @@ set(RESOURCE_FILES
   Erase_Cursor.svg
   Fill.svg
   Fill_Cursor.svg
+  GrowCut.svg
+  Lasso.svg
+  Lasso_Cursor.svg
   LiveWire.svg
   LiveWire_Cursor.svg
-  Lasso.svg
-  GrowCut.svg
-  Lasso_Cursor.svg
   Otsu.svg
   Paint.svg
   Paint_Cursor.svg
@@ -103,10 +107,12 @@ set(RESOURCE_FILES
   Wipe.svg
   Wipe_Cursor.svg
 
+  Interactions/ContourModelModificationConfig.xml
+  Interactions/ContourModelModificationInteractor.xml
   Interactions/dummy.xml
   Interactions/EditableContourTool.xml
-  Interactions/PickingTool.xml
   Interactions/MouseReleaseOnly.xml
+  Interactions/PickingTool.xml
   Interactions/PressMoveRelease.xml
   Interactions/PressMoveReleaseAndPointSetting.xml
   Interactions/PressMoveReleaseWithCTRLInversion.xml
@@ -114,7 +120,4 @@ set(RESOURCE_FILES
   Interactions/SegmentationConfig.xml
   Interactions/SegmentationInteraction.xml
   Interactions/SegmentationToolsConfig.xml
-
-  Interactions/ContourModelModificationConfig.xml
-  Interactions/ContourModelModificationInteractor.xml
 )

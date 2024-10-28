@@ -13,13 +13,9 @@ found in the LICENSE file.
 #ifndef QmitkPythonView_h
 #define QmitkPythonView_h
 
-/// Qmitk
+#include "mitkPythonContext.h"
+#include "ui_QmitkPythonViewControls.h"
 #include <QmitkAbstractView.h>
-
-///
-/// d pointer forward declaration
-///
-struct QmitkPythonViewData;
 
 ///
 /// \brief New python view (CONSOLE)
@@ -29,32 +25,25 @@ class QmitkPythonView : public QmitkAbstractView
   Q_OBJECT
 
 public:
+  static const std::string VIEW_ID;
 
-  static const std::string VIEW_ID; // = "org.mitk.extapp.defaultperspective"
-  ///
-  /// \brief Standard ctor.
-  ///
   QmitkPythonView();
-
-  ///
-  /// \brief Standard dtor.
-  ///
-  ~QmitkPythonView() override;
+  ~QmitkPythonView() = default;
 
 protected:
-
-  ///
-  /// \brief Create the view here.
-  ///
-  void CreateQtPartControl(QWidget* parent) override;
-
-  ///
-  /// focus on load image
-  ///
+  void CreateQtPartControl(QWidget *parent) override;
   void SetFocus() override;
 
+protected slots:
+
+  void OnExecuteBtnClicked();
+  void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  void OnSitePackageSelected(const QString &sitePackagesFolder);
+
 private:
-  QmitkPythonViewData* d;
+  Ui::QmitkPythonViewControls *m_Controls;
+  mitk::NodePredicateBase::Pointer m_ReferencePredicate;
+  mitk::PythonContext::Pointer m_PythonContext;
 };
 
 #endif

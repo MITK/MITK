@@ -12,23 +12,24 @@ found in the LICENSE file.
 #ifndef mitkPluginActivator_h
 #define mitkPluginActivator_h
 
+#include "mitkPythonService.h"
 #include <ctkPluginActivator.h>
 
-namespace mitk {
-
-class PluginActivator :
-  public QObject, public ctkPluginActivator
+namespace mitk
 {
-  Q_OBJECT
-  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_python")
-  Q_INTERFACES(ctkPluginActivator)
 
-public:
-  void start(ctkPluginContext* context) override;
-  void stop(ctkPluginContext* context) override;
+  class PluginActivator : public QObject, public ctkPluginActivator
+  {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_python")
+    Q_INTERFACES(ctkPluginActivator)
 
-  static QString m_XmlFilePath;
-}; // PluginActivator
+  public:
+    void start(ctkPluginContext *context) override;
+    void stop(ctkPluginContext *context) override;
+
+    static QString m_XmlFilePath;
+  }; // PluginActivator
 
 }
 

@@ -1,6 +1,6 @@
 SET(CPP_FILES
-  mitkIPythonService.cpp
+  mitkPythonContext.cpp
 )
 SET(H_FILES
-  mitkIPythonService.h
+  mitkPythonContext.h
 )

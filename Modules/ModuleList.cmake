@@ -58,4 +58,5 @@ set(MITK_MODULES
   PharmacokineticsUI
   DICOMPM
   ROI
+  PET
 )

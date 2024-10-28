@@ -692,7 +692,7 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
 // -------------------------------------------------------------------------
 map<string, us::Any> mitkCommandLineParser::parseArguments(int argc, char **argv, bool *ok)
 {
-  std::cout << "Running Command Line Utility *" << Title << "* (v " << MITK_VERSION_STRING <<")" << std::endl;
+  std::cout << "Running Command Line Utility *" << Title << "* (" << MITK_REVISION_DESC << ')' << std::endl;
   StringContainerType arguments;
 
   // Create a StringContainerType of arguments
@@ -846,7 +846,7 @@ string mitkCommandLineParser::helpText() const
   string text;
   vector<CommandLineParserArgumentDescription *> deprecatedArgs;
 
-  text = "Command Line Utility *" + Title + "* (v "+MITK_VERSION_STRING+") in Category *" + Category + "*\n";
+  text = "Command Line Utility *" + Title + "* (" + MITK_REVISION_DESC + ") in Category *" + Category + "*\n";
   text += Description + "\n";
   text += Contributor + "\n\n";
   text += "Use --xml to generate an XML description parsable as a CTK Command Line Module Plugin.\n";

@@ -196,7 +196,7 @@ namespace mitk
      */
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry *baseGeometry, const mitk::Point3D &point3d);
 
-    std::unique_ptr<SegmentAnythingPythonService> m_PythonService;
+    SegmentAnythingPythonService::Pointer m_PythonService;
 
   private:
     std::string m_MitkTempDir;

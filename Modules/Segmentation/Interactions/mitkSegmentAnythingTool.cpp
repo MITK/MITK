@@ -100,7 +100,7 @@ void mitk::SegmentAnythingTool::Deactivated()
   m_PointSetNodeNegative = nullptr;
   m_PointSetPositive = nullptr;
   m_PointSetNegative = nullptr;
-  m_PythonService.reset();
+  m_PythonService = nullptr; // KILLs python process if already running
   Superclass::Deactivated();
 }
 
@@ -113,12 +113,9 @@ void mitk::SegmentAnythingTool::ConnectActionsAndFunctions()
 
 void mitk::SegmentAnythingTool::InitSAMPythonProcess()
 {
-  if (nullptr != m_PythonService)
-  {
-    m_PythonService.reset();
-  }
+  m_PythonService = nullptr; // KILLs python process if already running
   this->ClearPicks();
-  m_PythonService = std::make_unique<mitk::SegmentAnythingPythonService>(
+  m_PythonService = mitk::SegmentAnythingPythonService::New(
     this->GetPythonPath(), this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId(), this->GetBackend());
   m_PythonService->StartAsyncProcess();
 }

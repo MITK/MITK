@@ -404,8 +404,9 @@ namespace mitk
           // Initialize the labelSetImage with the read image
           labelSetImage = LabelSetImage::New();
           labelSetImage->InitializeByLabeledImage(segmentImage);
-          // Already a label was generated, so set the information to this
-          newLabel = labelSetImage->GetActiveLabel();
+          // Check if the segment image contained labeled pixels. At this point it either contains no (when no labeled pixels where in the image)
+          // or one label (as DCMSeg segments only represent one labels). So either generate a new label or used the only existing one.
+          newLabel = labelSetImage->GetTotalNumberOfLabels() > 0 ? labelSetImage->GetLabels().front() : Label::New();
           newLabel->SetName(labelName.c_str());
           newLabel->SetColor(Color(tmp));
           newLabel->SetValue(segValue);

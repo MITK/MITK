@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkPluginActivator_h
 #define mitkPluginActivator_h
 
-#include "mitkPythonService.h"
+#include "mitkPythonContext.h"
 #include <ctkPluginActivator.h>
 
 namespace mitk

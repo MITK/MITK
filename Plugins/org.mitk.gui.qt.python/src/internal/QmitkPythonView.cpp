@@ -21,6 +21,7 @@ QmitkPythonView::QmitkPythonView() : m_Controls(nullptr)
 {
   m_ReferencePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
   m_PythonContext = mitk::PythonContext::New();
+  m_PythonContext->Activate();
 }
 
 void QmitkPythonView::CreateQtPartControl(QWidget *parent)
@@ -49,6 +50,11 @@ void QmitkPythonView::CreateQtPartControl(QWidget *parent)
           SIGNAL(directoryChanged(const QString &)),
           this,
           SLOT(OnSitePackageSelected(const QString &)));
+  connect(m_Controls->venvDeleteButton, SIGNAL(clicked()), this, SLOT(OnExecuteBtnClicked()));
+  
+  QString pythonCommand = "pyMITK.SayHi()\n";
+  m_Controls->pythonConsole->setPlainText(pythonCommand);
+  this->OnExecuteBtnClicked();
 }
 
 void QmitkPythonView::SetFocus()
@@ -88,6 +94,10 @@ void QmitkPythonView::OnSitePackageSelected(const QString & /*sitePackagesFolder
 {
   const QString sitePackageFolder = m_Controls->venvSelectionButton->directory();
   m_Controls->venvSelectionButton->setText(sitePackageFolder);
-  std::string pyCommand = "sys.path.append('" + sitePackageFolder.toStdString() + "')\n";
-  m_PythonContext->ExecuteString(pyCommand);
+  m_PythonContext->SetVirtualEnvironmentPath(sitePackageFolder.toStdString());
+}
+
+void QmitkPythonView::OnSitePackageDeleted()
+{
+  m_PythonContext->ClearVirtualEnvironmentPath();
 }

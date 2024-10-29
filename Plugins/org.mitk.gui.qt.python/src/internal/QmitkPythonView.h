@@ -37,6 +37,7 @@ protected:
 protected slots:
 
   void OnExecuteBtnClicked();
+  void OnSitePackageDeleted();
   void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void OnSitePackageSelected(const QString &sitePackagesFolder);
 

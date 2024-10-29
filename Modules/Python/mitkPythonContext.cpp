@@ -46,31 +46,32 @@ mitk::PythonContext::PythonContext()
   {
     Py_Initialize();
   }
+  PyGILState_Ensure();
+}
 
+void mitk::PythonContext::Activate()
+{
   PyGILState_Ensure();
   std::string programPath = mitk::IOUtil::GetProgramPath();
   std::replace(programPath.begin(), programPath.end(), '\\', '/');
   programPath.append("/");
   MITK_INFO << programPath;
+  MITK_INFO << "EP_DLL_DIR " << std::string(EP_DLL_DIR);
   std::string pythonCommand;
-
   // execute a string which imports packages that are needed and sets paths to directories
-  pythonCommand.append("import SimpleITK as sitk\n");
-  // pythonCommand.append("import SimpleITK._SimpleITK as _SimpleITK\n");
   pythonCommand.append("import numpy\n");
-  pythonCommand.append("import site, sys, io\n");
+  pythonCommand.append("import os, site, sys, io\n");
   pythonCommand.append("import os\n");
   pythonCommand.append("sys.path.append('" + programPath + "')\n");
-  pythonCommand.append("import pyMITK\n");
-  pythonCommand.append("print(pyMITK.SayHi(), flush=True)\n");
   //   pythonCommand.append("sys.path.append('" + std::string(BIN_DIR) + "')\n");
   //   pythonCommand.append("sys.path.append('" +std::string(EXTERNAL_DIST_PACKAGES) + "')\n");
   //   pythonCommand.append("\nsite.addsitedir('"+std::string(EXTERNAL_SITE_PACKAGES)+"')\n");
   // in python 3.8 onwards, the path system variable is not longer used to find dlls
   // that's why the dlls that are needed for swig wrapping need to be searched manually
-  // std::string searchForDll = "if sys.version_info[1] > 7:\n"
-  //                           "  os.add_dll_directory('"+std::string(EP_DLL_DIR)+"')\n";
-  // pythonCommand.append(searchForDll);
+  std::string searchForDll = "os.add_dll_directory('"+std::string(EP_DLL_DIR)+"')\n";
+  pythonCommand.append(searchForDll);
+  pythonCommand.append("import SimpleITK as sitk\n");
+  pythonCommand.append("import pyMITK\n");
   if (PyRun_SimpleString(pythonCommand.c_str()) == -1)
   {
     MITK_ERROR << "Something went wrong in setting the path in Python";
@@ -94,7 +95,10 @@ mitk::PythonContext::~PythonContext()
 const char *mitk::PythonContext::ExecuteString(const std::string &pyCommands)
 {
   PyGILState_Ensure();
-  PyRun_SimpleString(pyCommands.c_str());
+  if (PyRun_SimpleString(pyCommands.c_str()) == -1)
+  {
+    MITK_ERROR << "Something went wrong in Python";
+  }
   return this->GetStdOut();
 }
 
@@ -190,4 +194,31 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData)
   //     "numpy_image[:]=0."
   // );
   m_ThreadState = PyEval_SaveThread();
+}
+
+void mitk::PythonContext::SetVirtualEnvironmentPath(const std::string& absolutePath)
+{
+  PyGILState_Ensure();
+  m_CurrentVenvEnvPath.clear();
+  std::string pythonCommand;
+  pythonCommand.append("import sys\n"); // TODO: delete other imports are reimport
+  pythonCommand.append("sys.path.insert(0, '" + absolutePath + "')\n");
+  if (PyRun_SimpleString(pythonCommand.c_str()) == -1)
+  {
+    MITK_ERROR << "Something went wrong in setting the path in Python";
+  }
+  m_CurrentVenvEnvPath = absolutePath;
+}
+
+void mitk::PythonContext::ClearVirtualEnvironmentPath()
+{
+  PyGILState_Ensure();
+  std::string pythonCommand;
+  pythonCommand.append("import sys\n");
+  pythonCommand.append("sys.path.remove('" + m_CurrentVenvEnvPath + "')\n");
+  if (PyRun_SimpleString(pythonCommand.c_str()) == -1)
+  {
+    MITK_ERROR << "Something went wrong in clearing the path in Python";
+  }
+  m_CurrentVenvEnvPath.clear();
 }

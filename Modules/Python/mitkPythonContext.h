@@ -36,14 +36,16 @@ namespace mitk
     
     PythonContext();
     ~PythonContext();
-    void Activate(); // deactivate
+    void Activate();
     mitk::Image::Pointer LoadImageFromPython(const std::string &filePath);
     void TransferBaseDataToPython(mitk::BaseData *mitkImage);
     const char *ExecuteString(const std::string &pyCommands);
     const char *GetStdOut();
-    void SetVenvPath(std::string &); // site-package
+    void SetVirtualEnvironmentPath(const std::string &absolutePath); // site-package
+    void ClearVirtualEnvironmentPath();
 
   private:
+    std::string m_CurrentVenvEnvPath;
     PyThreadState *m_ThreadState;
     PyObject *m_GlobalDictionary;
     PyObject *m_LocalDictionary;

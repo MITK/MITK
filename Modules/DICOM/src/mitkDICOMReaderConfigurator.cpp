@@ -68,7 +68,7 @@ std::string mitk::DICOMReaderConfigurator
   {
     us::ModuleResourceStream stream(resource);
 
-    // read all into string s
+    // read everything from stream into string
     std::string xmlDescription;
 
     stream.seekg(0, std::ios::end);

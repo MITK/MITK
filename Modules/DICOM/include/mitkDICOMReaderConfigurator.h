@@ -103,7 +103,7 @@ class MITKDICOM_EXPORT DICOMReaderConfigurator : public itk::LightObject
     /** Helper function that returns a config string for a DICOMReader that is compiled into
     a module resource of the MitkDICOM module.
     @param resourcePath Path of the resource in the module MitkDICOM.
-    @result Returns the config as string. If is passed resourcePath connot be resolved, an
+    @result Returns the config as string. If the passed resourcePath cannot be resolved, an
     empty string will be returned.*/
     static std::string GetConfigStringFromModuleResource(const std::string& resourcePath);
 

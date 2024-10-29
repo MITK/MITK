@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkSegmentationTaskListIO.h"
-#include "mitkMultilabelIOMimeTypes.h"
+#include "mitkSegmentationIOMimeTypes.h"
 
 #include <mitkSegmentationTaskList.h>
 
@@ -122,7 +122,7 @@ namespace mitk
 }
 
 mitk::SegmentationTaskListIO::SegmentationTaskListIO()
-  : AbstractFileIO(SegmentationTaskList::GetStaticNameOfClass(), MitkMultilabelIOMimeTypes::SEGMENTATIONTASKLIST_MIMETYPE(), "MITK Segmentation Task List")
+  : AbstractFileIO(SegmentationTaskList::GetStaticNameOfClass(), MitkSegmentationIOMimeTypes::SEGMENTATIONTASKLIST_MIMETYPE(), "MITK Segmentation Task List")
 {
   this->RegisterService();
 }

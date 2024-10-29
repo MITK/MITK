@@ -33,6 +33,7 @@ set(enabled_modules
   SceneSerialization
   SceneSerializationBase
   Segmentation
+  SegmentationIO
   SegmentationUI
   SurfaceInterpolation
 )

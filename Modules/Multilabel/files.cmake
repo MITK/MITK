@@ -1,24 +1,19 @@
 set(CPP_FILES
+  mitkDICOMSegmentationConstants.cpp
+  mitkDICOMSegmentationPropertyHelper.cpp
   mitkLabel.cpp
   mitkLabelHighlightGuard.cpp
   mitkLabelSetImage.cpp
   mitkLabelSetImageConverter.cpp
-  mitkLabelSetImageSource.cpp
   mitkLabelSetImageHelper.cpp
+  mitkLabelSetImageSource.cpp
   mitkLabelSetImageSurfaceStampFilter.cpp
   mitkLabelSetImageToSurfaceFilter.cpp
   mitkLabelSetImageToSurfaceThreadedFilter.cpp
   mitkLabelSetImageVtkMapper2D.cpp
-  mitkMultilabelObjectFactory.cpp
-  mitkMultiLabelIOHelper.cpp
   mitkMultiLabelEvents.cpp
+  mitkMultiLabelIOHelper.cpp
+  mitkMultilabelObjectFactory.cpp
   mitkMultiLabelPredicateHelper.cpp
-  mitkDICOMSegmentationPropertyHelper.cpp
-  mitkDICOMSegmentationConstants.cpp
-  mitkSegmentationTaskList.cpp
   mitkMultiLabelSegmentationVtkMapper3D.cpp
-)
-
-set(RESOURCE_FILES
-
 )

@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateFunction.h>
 #include <mitkRenderingManager.h>
+#include <mitkSceneIO.h>
 #include <mitkSegmentationHelper.h>
 #include <mitkToolManagerProvider.h>
 
@@ -106,6 +107,31 @@ namespace
 
     QTextStream stream(&file);
     return stream.readAll();
+  }
+
+  void TransferDataNodes(const mitk::DataStorage* srcStorage, const mitk::DataStorage::SetOfObjects* srcNodes,
+                         mitk::DataStorage* destStorage, mitk::DataNode* destRoot)
+  {
+    for (auto it = srcNodes->Begin(); it != srcNodes->End(); ++it)
+    {
+      destStorage->Add(it->Value(), destRoot);
+
+      auto childNodes = srcStorage->GetDerivations(it->Value());
+
+      if (!childNodes->empty())
+        TransferDataNodes(srcStorage, childNodes, destStorage, it->Value());
+    }
+  }
+
+  void TransferDataStorage(const mitk::DataStorage* srcStorage, mitk::DataStorage* destStorage, mitk::DataNode* destRoot)
+  {
+    auto isRootNode = mitk::NodePredicateFunction::New([srcStorage](const mitk::DataNode* node) {
+      return srcStorage->GetSources(node)->empty();
+    });
+
+    auto rootNodes = srcStorage->GetSubset(isRootNode);
+
+    TransferDataNodes(srcStorage, rootNodes, destStorage, destRoot);
   }
 }
 
@@ -731,35 +757,70 @@ void QmitkSegmentationTaskListWidget::LoadNextUnfinishedTask()
   }
 }
 
-/* Load/activate the currently displayed task. The task must specify
- * an image. The segmentation is either created from scratch with an optional
+/* Load/activate the currently displayed task. The task must specify an image
+ * or a scene. The segmentation is either created from scratch with an optional
  * name for the first label, possibly based on a label set preset specified by
  * the task, or loaded as specified by the task. If a result file does
  * exist, it is chosen as segmentation instead.
  */
 void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode)
 {
-  this->UnloadTasks(imageNode);
-
   const auto current = m_CurrentTaskIndex.value();
 
   mitk::Image::Pointer image;
   mitk::LabelSetImage::Pointer segmentation;
+  mitk::DataStorage::Pointer scene;
+
+  // If the task has a scene, unload everything from before and load the scene.
+  // If the task has an image instead, unload everything but the previous image
+  // if it is the same image an can be reused. Otherwise load the new image.
+
+  if (m_TaskList->HasScene(current))
+  {
+    this->UnloadTasks();
+
+    try
+    {
+      const auto scenePath = m_TaskList->GetAbsolutePath(m_TaskList->GetScene(current).Path);
+      auto sceneIO = mitk::SceneIO::New();
+      scene = sceneIO->LoadScene(scenePath.string());
+    }
+    catch (const mitk::Exception&)
+    {
+      return;
+    }
+  }
+  else
+  {
+    this->UnloadTasks(imageNode);
+
+    if (imageNode.IsNull())
+    {
+      try
+      {
+        const auto imagePath = m_TaskList->GetAbsolutePath(m_TaskList->GetImage(current));
+        image = mitk::IOUtil::Load<mitk::Image>(imagePath.string());
+      }
+      catch (const mitk::Exception&)
+      {
+        return;
+      }
+    }
+  }
+
+  // If the task already has a result segmentation, load it instead of any other
+  // given segmentation. Otherwise, if the task already has an interim result
+  // segmentation, load it instead of any other given segmentation. Otherwise,
+  // load a given segmentation if any.
 
   try
   {
-    if (imageNode.IsNull())
-    {
-      const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetImage(current));
-      image = mitk::IOUtil::Load<mitk::Image>(path.string());
-    }
+    const auto resultPath = m_TaskList->GetAbsolutePath(m_TaskList->GetResult(current));
+    const auto interimPath = m_TaskList->GetInterimPath(resultPath);
 
-    const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetResult(current));
-    const auto interimPath = m_TaskList->GetInterimPath(path);
-
-    if (fs::exists(path))
+    if (fs::exists(resultPath))
     {
-      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
+      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(resultPath.string());
     }
     else if (fs::exists(interimPath))
     {
@@ -767,13 +828,59 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     }
     else if (m_TaskList->HasSegmentation(current))
     {
-      const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetSegmentation(current));
-      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
+      const auto segmentationPath = m_TaskList->GetAbsolutePath(m_TaskList->GetSegmentation(current));
+      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(segmentationPath.string());
     }
   }
   catch (const mitk::Exception&)
   {
     return;
+  }
+
+  // If the task has a scene and a segmentation was loaded already above,
+  // replace the scene's segmentation if any. Otherwise, if no segmentation
+  // was loaded so far, check if the scene provides a segmentation.
+
+  mitk::DataNode::Pointer segmentationNode;
+
+  if (scene.IsNotNull())
+  {
+    const auto imageNodeName = m_TaskList->GetScene(current).Image;
+    imageNode = scene->GetNamedNode(imageNodeName);
+
+    if (imageNode.IsNull())
+    {
+      MITK_ERROR << "Could not find image node \"" << imageNodeName
+                 << "\" in scene " << m_TaskList->GetScene(current).Path << "!";
+      return;
+    }
+
+    // TODO: Check if imageNode contains valid image
+
+    const auto segmentationNodeName = m_TaskList->GetScene(current).Segmentation;
+
+    if (!segmentationNodeName.empty())
+    {
+      segmentationNode = scene->GetNamedNode(segmentationNodeName);
+
+      if (segmentationNode == nullptr)
+      {
+        MITK_ERROR << "Could not find segmentation node \"" << segmentationNodeName
+                   << "\" in scene " << m_TaskList->GetScene(current).Path << "!";
+        return;
+      }
+
+      if (segmentation.IsNotNull())
+      {
+        segmentationNode->SetData(segmentation);
+      }
+      else
+      {
+        segmentation = static_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
+
+        // TODO: Check if segmentationNode contains valid segmentation
+      }
+    }
   }
 
   if (imageNode.IsNull())
@@ -814,7 +921,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       }
     }
 
-    auto segmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(imageNode, templateImage, name);
+    segmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(imageNode, templateImage, name);
     segmentation = static_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
 
     if (m_TaskList->HasPreset(current))
@@ -832,15 +939,32 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       segmentation->AddLabel(label, segmentation->GetActiveLayer());
     }
 
-    m_DataStorage->Add(segmentationNode, imageNode);
+    if (scene.IsNull())
+    {
+      m_DataStorage->Add(segmentationNode, imageNode);
+    }
+    else
+    {
+      scene->Add(segmentationNode, imageNode);
+    }
+  }
+  else if (scene.IsNotNull())
+  {
+    segmentationNode->SetName(name);
   }
   else
   {
-    auto segmentationNode = mitk::DataNode::New();
+    segmentationNode = mitk::DataNode::New();
     segmentationNode->SetName(name);
     segmentationNode->SetData(segmentation);
 
     m_DataStorage->Add(segmentationNode, imageNode);
+  }
+
+  if (scene.IsNotNull())
+  {
+    TransferDataStorage(scene, m_DataStorage, m_TaskListNode);
+    // TODO: Set image and segmentation in Segmentation view, reinit segmentation.
   }
 
   // Workaround for T29431. Remove when T26953 is fixed.

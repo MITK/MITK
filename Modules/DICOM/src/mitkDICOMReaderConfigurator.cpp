@@ -15,6 +15,11 @@ found in the LICENSE file.
 #include "mitkDICOMSortByTag.h"
 #include "mitkSortByImagePositionPatient.h"
 
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
+
 #include <tinyxml2.h>
 
 mitk::DICOMReaderConfigurator
@@ -51,6 +56,32 @@ mitk::DICOMReaderConfigurator
   doc.Parse(xmlContents.c_str());
 
   return this->CreateFromXMLDocument( doc );
+}
+
+std::string mitk::DICOMReaderConfigurator
+::GetConfigStringFromModuleResource(const std::string& resourcePath)
+{
+  if (nullptr == us::GetModuleContext()) return "";
+
+  us::ModuleResource resource = us::GetModuleContext()->GetModule()->GetResource(resourcePath);
+  if (resource.IsValid())
+  {
+    us::ModuleResourceStream stream(resource);
+
+    // read everything from stream into string
+    std::string xmlDescription;
+
+    stream.seekg(0, std::ios::end);
+    xmlDescription.reserve(stream.tellg());
+    stream.seekg(0, std::ios::beg);
+
+    xmlDescription.assign((std::istreambuf_iterator<char>(stream)),
+      std::istreambuf_iterator<char>());
+
+    return xmlDescription;
+  }
+
+  return "";
 }
 
 mitk::DICOMFileReader::Pointer

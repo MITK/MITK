@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkBaseData.h>
 #include <mitkSegmentationTaskListMacros.h>
 
-#include <MitkMultilabelExports.h>
+#include <MitkSegmentationExports.h>
 
 #include <mitkFileSystem.h>
 #include <optional>
@@ -27,13 +27,13 @@ namespace mitk
    *
    * See \ref MITKSegmentationTaskListsPage for more information.
    */
-  class MITKMULTILABEL_EXPORT SegmentationTaskList : public BaseData
+  class MITKSEGMENTATION_EXPORT SegmentationTaskList : public BaseData
   {
   public:
-    class MITKMULTILABEL_EXPORT Task
+    class MITKSEGMENTATION_EXPORT Task
     {
     public:
-      struct MITKMULTILABEL_EXPORT Form
+      struct MITKSEGMENTATION_EXPORT Form
       {
         fs::path Path;
         fs::path Result;

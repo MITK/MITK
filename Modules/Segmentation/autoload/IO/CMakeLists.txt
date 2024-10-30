@@ -1,0 +1,12 @@
+mitk_create_module(SegmentationIO
+  AUTOLOAD_WITH
+    MitkCore
+  DEPENDS
+    PUBLIC
+      MitkSegmentation
+      MitkSceneSerialization
+  TARGET_DEPENDS
+    PRIVATE
+      ITKIONRRD
+      nlohmann_json::nlohmann_json
+)

@@ -98,6 +98,8 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.groupConcentration->hide();
     m_Controls.groupBoxEnhancement->hide();
     m_Controls.groupBox_T1MapviaVFA->hide();
+    m_Controls.factorSpinBox->setValue(1.0);
+    m_Controls.T2FactorSpinBox->setValue(1.0);
 
     m_Controls.spinBox_baselineStartTimeStep->setValue(0);
     m_Controls.spinBox_baselineEndTimeStep->setValue(0);

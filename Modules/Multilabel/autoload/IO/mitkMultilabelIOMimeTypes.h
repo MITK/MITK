@@ -20,18 +20,6 @@ namespace mitk
 {
   namespace MitkMultilabelIOMimeTypes
   {
-    class MITKMULTILABELIO_EXPORT MitkSegmentationTaskListMimeType : public CustomMimeType
-    {
-    public:
-      MitkSegmentationTaskListMimeType();
-
-      bool AppliesTo(const std::string& path) const override;
-      MitkSegmentationTaskListMimeType* Clone() const override;
-    };
-
-    MITKMULTILABELIO_EXPORT MitkSegmentationTaskListMimeType SEGMENTATIONTASKLIST_MIMETYPE();
-    MITKMULTILABELIO_EXPORT std::string SEGMENTATIONTASKLIST_MIMETYPE_NAME();
-
     class MITKMULTILABELIO_EXPORT LegacyLabelSetMimeType : public CustomMimeType
     {
     public:

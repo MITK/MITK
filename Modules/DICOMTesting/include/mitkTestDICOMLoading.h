@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkTestDICOMLoading_h
 #define mitkTestDICOMLoading_h
 
-#include "mitkClassicDICOMSeriesReader.h"
+#include "mitkDICOMFileReader.h"
 #include "mitkPropertyKeyPath.h"
 
 #include "MitkDICOMTestingExports.h"
@@ -57,7 +57,7 @@ class MITKDICOMTESTING_EXPORT TestDICOMLoading
 
     typedef std::map<std::string,std::string> KeyValueMap;
 
-    ClassicDICOMSeriesReader::Pointer
+    DICOMFileReader::Pointer
     BuildDICOMReader();
 
     void SetDefaultLocale();

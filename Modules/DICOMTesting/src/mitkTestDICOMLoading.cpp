@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "mitkIOMetaInformationPropertyConstants.h"
 #include "mitkDICOMProperty.h"
 #include "mitkArbitraryTimeGeometry.h"
+#include "mitkDICOMReaderConfigurator.h"
 
 #include <stack>
 
@@ -74,7 +75,7 @@ mitk::TestDICOMLoading
 
   ImageList result;
 
-  ClassicDICOMSeriesReader::Pointer reader = this->BuildDICOMReader();
+  DICOMFileReader::Pointer reader = this->BuildDICOMReader();
   reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
   reader->SetInputFiles( files );
   reader->AnalyzeInputFiles();
@@ -91,12 +92,20 @@ mitk::TestDICOMLoading
   return result;
 }
 
-mitk::ClassicDICOMSeriesReader::Pointer
+mitk::DICOMFileReader::Pointer
 mitk::TestDICOMLoading
 ::BuildDICOMReader()
 {
-  ClassicDICOMSeriesReader::Pointer reader = ClassicDICOMSeriesReader::New();
-  reader->SetFixTiltByShearing(true);
+  DICOMFileReader::Pointer reader;
+
+  std::string xmlDescription = DICOMReaderConfigurator::GetConfigStringFromModuleResource("configurations/3DnT/1_default_config.xml");
+
+  if (!xmlDescription.empty())
+  {
+    DICOMReaderConfigurator::Pointer configurator = DICOMReaderConfigurator::New();
+    reader = configurator->CreateFromUTF8ConfigString(xmlDescription);
+  }
+
   return reader;
 }
 
@@ -126,7 +135,7 @@ mitk::Image::Pointer
 mitk::TestDICOMLoading
 ::DecorateVerifyCachedImage( const StringList& files, mitk::Image::Pointer cachedImage )
 {
-  ClassicDICOMSeriesReader::Pointer reader = this->BuildDICOMReader();
+  auto reader = this->BuildDICOMReader();
   reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
   reader->SetInputFiles( files );
   reader->AnalyzeInputFiles(); // This just creates a "tag cache and a nice DICOMImageBlockDescriptor.

@@ -194,6 +194,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.groupBoxEnhancement->hide();
   m_Controls.radioButtonNoConversion->setChecked(true);
   m_Controls.groupBox_T1MapviaVFA->hide();
+  m_Controls.factorSpinBox->setValue(1.0);
 
   m_Controls.spinBox_baselineStartTimeStep->setValue(0);
   m_Controls.spinBox_baselineEndTimeStep->setValue(0);
@@ -262,11 +263,11 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.groupDescBrix->setVisible(isDescBrixFactory);
   if (isDescBrixFactory)
   {
-    m_Controls.toolboxConfiguration->setItemEnabled(2, false);
+    m_Controls.toolboxConfiguration->setItemEnabled(0, false);
   }
   else
   {
-    m_Controls.toolboxConfiguration->setItemEnabled(2, true);
+    m_Controls.toolboxConfiguration->setItemEnabled(0, true);
   }
   m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory );
   m_Controls.AIFImageNodeSelector->setVisible(!m_Controls.radioAIFFile->isChecked());

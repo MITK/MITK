@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include <mitkBaseApplication.h>
 #include <mitkBaseRendererHelper.h>
 #include <mitkCameraController.h>
+#include <mitkCoreServices.h>
+#include <mitkINodeSelectionService.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkMultiLabelIOHelper.h>
@@ -115,6 +117,10 @@ QmitkSegmentationView::~QmitkSegmentationView()
       (*dataIter).first->GetProperty("visible")->RemoveObserver((*dataIter).second);
     }
     m_ReferenceDataObserverTags.clear();
+
+    auto nodeSelectionService = mitk::CoreServices::GetNodeSelectionService();
+    nodeSelectionService->RemoveListener(VIEW_ID + "/referenceNode", m_Controls->referenceNodeSelector);
+    nodeSelectionService->RemoveListener(VIEW_ID + "/workingNode", m_Controls->workingNodeSelector);
 
     mitk::RenderingManager::GetInstance()->RemoveObserver(m_RenderingManagerObserverTag);
 
@@ -563,6 +569,10 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
            this, &Self::OnReferenceSelectionChanged);
    connect(m_Controls->workingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
            this, &Self::OnSegmentationSelectionChanged);
+
+   auto nodeSelectionService = mitk::CoreServices::GetNodeSelectionService();
+   nodeSelectionService->AddListener(VIEW_ID + "/referenceNode", m_Controls->referenceNodeSelector);
+   nodeSelectionService->AddListener(VIEW_ID + "/workingNode", m_Controls->workingNodeSelector);
 
    // *------------------------
    // * TOOLMANAGER

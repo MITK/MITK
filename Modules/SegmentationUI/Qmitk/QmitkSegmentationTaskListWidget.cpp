@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkSegmentationTaskListWidget.h"
 
 #include <mitkCoreServices.h>
+#include <mitkINodeSelectionService.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
@@ -970,7 +971,12 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
   if (scene.IsNotNull())
   {
     TransferDataStorage(scene, m_DataStorage, m_TaskListNode);
-    // TODO: Set image and segmentation in Segmentation view, reinit segmentation.
+
+    auto nodeSelectionService = mitk::CoreServices::GetNodeSelectionService();
+    nodeSelectionService->SendSelection("org.mitk.views.segmentation/referenceNode", { imageNode });
+    nodeSelectionService->SendSelection("org.mitk.views.segmentation/workingNode", { segmentationNode });
+
+    mitk::RenderingManager::GetInstance()->InitializeViews(segmentation->GetTimeGeometry());
   }
 
   // Workaround for T29431. Remove when T26953 is fixed.

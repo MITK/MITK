@@ -625,6 +625,12 @@ void QmitkSegmentationTaskListWidget::UpdateDetailsLabel()
 
 void QmitkSegmentationTaskListWidget::UpdateFormWidget()
 {
+  if (!m_CurrentTaskIndex.has_value())
+  {
+    m_Ui->formWidget->hide();
+    return;
+  }
+
   const auto current = m_CurrentTaskIndex.value();
 
   if (!ActiveTaskIsShown() || !m_TaskList->HasForm(current))

@@ -28,6 +28,7 @@ found in the LICENSE file.
 namespace mitk
 {
   struct IMimeTypeProvider;
+  class INodeSelectionService;
   class IPropertyAliases;
   class IPropertyDescriptions;
   class IPropertyDeserialization;
@@ -58,6 +59,13 @@ namespace mitk
   class MITKCORE_EXPORT CoreServices
   {
   public:
+
+    /**
+     * @brief Get an INodeSelectionsService instance.
+     * @param context The module context of the module getting the service.
+     * @return A non-nullptr INodeSelectionsService instance.
+     */
+    static INodeSelectionService* GetNodeSelectionService(us::ModuleContext* context = us::GetModuleContext());
 
     /**
      * @brief Get an IPropertyAliases instance.

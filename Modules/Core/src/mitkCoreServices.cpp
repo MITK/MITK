@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitkCoreServices.h"
 
 #include <mitkIMimeTypeProvider.h>
+#include <mitkINodeSelectionService.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyDeserialization.h>
@@ -63,6 +64,11 @@ namespace mitk
     }
 
     return coreService;
+  }
+
+  INodeSelectionService* CoreServices::GetNodeSelectionService(us::ModuleContext* context)
+  {
+    return GetCoreService<INodeSelectionService>(context);
   }
 
   IPropertyAliases *CoreServices::GetPropertyAliases(us::ModuleContext *context)

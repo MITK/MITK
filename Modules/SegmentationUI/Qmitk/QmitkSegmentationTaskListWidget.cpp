@@ -110,17 +110,36 @@ namespace
     return stream.readAll();
   }
 
+  std::map<int, mitk::DataNode*> SortNodesByLayer(const mitk::DataStorage::SetOfObjects* nodes)
+  {
+    std::map<int, mitk::DataNode*> sortedNodes;
+
+    for (auto it = nodes->Begin(); it != nodes->End(); ++it)
+    {
+      int layer = 0;
+      it->Value()->GetIntProperty("layer", layer);
+
+      // TODO: Is it a valid assumption at this point that every node has a
+      // layer property and that all of them are unique?
+      sortedNodes[layer] = it->Value();
+    }
+
+    return sortedNodes;
+  }
+
   void TransferDataNodes(const mitk::DataStorage* srcStorage, const mitk::DataStorage::SetOfObjects* srcNodes,
                          mitk::DataStorage* destStorage, mitk::DataNode* destRoot)
   {
-    for (auto it = srcNodes->Begin(); it != srcNodes->End(); ++it)
-    {
-      destStorage->Add(it->Value(), destRoot);
+    const auto sortedSrcNodes = SortNodesByLayer(srcNodes);
 
-      auto childNodes = srcStorage->GetDerivations(it->Value());
+    for (auto [layer, srcNode] : sortedSrcNodes)
+    {
+      destStorage->Add(srcNode, destRoot);
+
+      auto childNodes = srcStorage->GetDerivations(srcNode);
 
       if (!childNodes->empty())
-        TransferDataNodes(srcStorage, childNodes, destStorage, it->Value());
+        TransferDataNodes(srcStorage, childNodes, destStorage, srcNode);
     }
   }
 

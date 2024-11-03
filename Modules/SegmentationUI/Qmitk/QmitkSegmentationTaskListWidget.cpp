@@ -113,15 +113,21 @@ namespace
   std::map<int, mitk::DataNode*> SortNodesByLayer(const mitk::DataStorage::SetOfObjects* nodes)
   {
     std::map<int, mitk::DataNode*> sortedNodes;
+    int noLayerIndex = -1;
 
     for (auto it = nodes->Begin(); it != nodes->End(); ++it)
     {
       int layer = 0;
-      it->Value()->GetIntProperty("layer", layer);
+      bool hasLayer = it->Value()->GetIntProperty("layer", layer);
 
-      // TODO: Is it a valid assumption at this point that every node has a
-      // layer property and that all of them are unique?
-      sortedNodes[layer] = it->Value();
+      if (hasLayer)
+      {
+        sortedNodes[layer] = it->Value();
+      }
+      else
+      {
+        sortedNodes[noLayerIndex--] = it->Value();
+      }
     }
 
     return sortedNodes;
@@ -799,7 +805,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
 
   // If the task has a scene, unload everything from before and load the scene.
   // If the task has an image instead, unload everything but the previous image
-  // if it is the same image an can be reused. Otherwise load the new image.
+  // if it is the same image and can be reused. Otherwise load the new image.
 
   if (m_TaskList->HasScene(current))
   {

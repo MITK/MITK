@@ -817,8 +817,10 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       auto sceneIO = mitk::SceneIO::New();
       scene = sceneIO->LoadScene(scenePath.string());
     }
-    catch (const mitk::Exception&)
+    catch (const mitk::Exception& e)
     {
+      QMessageBox::critical(this, "Error on loading scene", e.GetDescription());
+      MITK_ERROR << e.GetDescription();
       return;
     }
   }
@@ -833,8 +835,10 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
         const auto imagePath = m_TaskList->GetAbsolutePath(m_TaskList->GetImage(current));
         image = mitk::IOUtil::Load<mitk::Image>(imagePath.string());
       }
-      catch (const mitk::Exception&)
+      catch (const mitk::Exception& e)
       {
+        QMessageBox::critical(this, "Error on loading image", e.GetDescription());
+        MITK_ERROR << e.GetDescription();
         return;
       }
     }
@@ -882,12 +886,14 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
 
     if (imageNode.IsNull())
     {
-      MITK_ERROR << "Could not find image node \"" << imageNodeName
-                 << "\" in scene " << m_TaskList->GetScene(current).Path << "!";
+      auto errorMessage = QString("Could not find image node \"%1\" in scene %2!")
+        .arg(QString::fromStdString(imageNodeName))
+        .arg(QString::fromStdString(m_TaskList->GetScene(current).Path.string()));
+
+      QMessageBox::critical(this, "Error on loading scene", errorMessage);
+      MITK_ERROR << errorMessage.toStdString();
       return;
     }
-
-    // TODO: Check if imageNode contains valid image
 
     const auto segmentationNodeName = m_TaskList->GetScene(current).Segmentation;
 
@@ -897,8 +903,12 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
 
       if (segmentationNode == nullptr)
       {
-        MITK_ERROR << "Could not find segmentation node \"" << segmentationNodeName
-                   << "\" in scene " << m_TaskList->GetScene(current).Path << "!";
+        auto errorMessage = QString("Could not find segmentation node \"%1\" in scene %2!")
+          .arg(QString::fromStdString(segmentationNodeName))
+          .arg(QString::fromStdString(m_TaskList->GetScene(current).Path.string()));
+
+        QMessageBox::critical(this, "Error on loading scene", errorMessage);
+        MITK_ERROR << errorMessage.toStdString();
         return;
       }
 
@@ -908,9 +918,17 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       }
       else
       {
-        segmentation = static_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
+        segmentation = dynamic_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
 
-        // TODO: Check if segmentationNode contains valid segmentation
+        if (segmentation.IsNull())
+        {
+          auto errorMessage = QString("Data node \"%1\" is not a valid segmentation!")
+            .arg(QString::fromStdString(segmentationNodeName));
+
+          QMessageBox::critical(this, "Error on loading scene", errorMessage);
+          MITK_ERROR << errorMessage.toStdString();
+          return;
+        }
       }
     }
   }
@@ -926,7 +944,17 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
   }
   else
   {
-    image = static_cast<mitk::Image*>(imageNode->GetData());
+    image = dynamic_cast<mitk::Image*>(imageNode->GetData());
+
+    if (image.IsNull())
+    {
+      auto errorMessage = QString("Data node \"%1\" is not a valid image!")
+        .arg(QString::fromStdString(imageNode->GetName()));
+
+      QMessageBox::critical(this, "Error on loading scene", errorMessage);
+      MITK_ERROR << errorMessage.toStdString();
+      return;
+    }
   }
 
   auto name = "Task " + std::to_string(current + 1);

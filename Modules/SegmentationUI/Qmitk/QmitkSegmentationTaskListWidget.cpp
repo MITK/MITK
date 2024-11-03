@@ -282,11 +282,25 @@ void QmitkSegmentationTaskListWidget::CheckDataStorage(const mitk::DataNode* rem
         isChildOfTaskListNode,
         isHelperObject));
 
-      if (!GetSubset(m_DataStorage, isUndesiredNode, removedNode)->empty())
+      auto unreleatedData = GetSubset(m_DataStorage, isUndesiredNode, removedNode);
+
+      if (!unreleatedData->empty())
       {
         warning = QStringLiteral(
           "<h3>Unrelated data found</h3><p>Unload everything but a single segmentation task "
-          "list to use this plugin.</p>");
+          "list to use this plugin.</p><p>Unreleated data:<ul>");
+
+        for (auto node : *unreleatedData)
+        {
+          warning += "<li>" + node->GetName();
+
+          if (auto data = node->GetData(); data != nullptr)
+            warning += QString(" (%1)").arg(data->GetNameOfClass());
+
+          warning += "</li>";
+        }
+
+        warning += "</ul></p>";
       }
     }
   }
@@ -404,7 +418,9 @@ void QmitkSegmentationTaskListWidget::ResetFileSystemWatcher()
 
 void QmitkSegmentationTaskListWidget::OnResultDirectoryChanged(const QString&)
 {
-  // TODO: If a segmentation was modified ("Unsaved changes"), saved ("Done"), and then the file is deleted, the status should be "Unsaved changes" instead of "Not done".
+  // TODO: If a segmentation was modified ("Unsaved changes"), saved ("Done"),
+  // and then the file is deleted, the status should be "Unsaved changes"
+  // instead of "Not done".
   this->UpdateProgressBar();
   this->UpdateDetailsLabel();
 }
@@ -443,9 +459,9 @@ void QmitkSegmentationTaskListWidget::OnTaskListChanged(mitk::SegmentationTaskLi
   if (numTasks > 1)
     m_Ui->nextButton->setEnabled(true);
 
-  // TODO: This line should be enough but it is happening too early even before
-  // the RenderingManager has any registered render windows, resulting in mismatching
-  // renderer and data geometries.
+  // TODO: The line below should be enough but it is happening too early
+  // even before the RenderingManager has any registered render windows,
+  // resulting in mismatching renderer and data geometries.
   // this->LoadNextUnfinishedTask();
 }
 
@@ -868,8 +884,10 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(segmentationPath.string());
     }
   }
-  catch (const mitk::Exception&)
+  catch (const mitk::Exception& e)
   {
+    QMessageBox::critical(this, "Error on loading segmentation", e.GetDescription());
+    MITK_ERROR << e.GetDescription();
     return;
   }
 

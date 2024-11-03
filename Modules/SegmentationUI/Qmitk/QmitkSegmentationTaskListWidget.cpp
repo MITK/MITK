@@ -171,6 +171,8 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
     m_Ui(new Ui::QmitkSegmentationTaskListWidget),
     m_FileSystemWatcher(new QFileSystemWatcher(this)),
     m_DataStorage(nullptr),
+    m_ImageNode(nullptr),
+    m_SegmentationNode(nullptr),
     m_UnsavedChanges(false)
 {
   m_Ui->setupUi(this);
@@ -462,6 +464,7 @@ void QmitkSegmentationTaskListWidget::OnTaskListChanged(mitk::SegmentationTaskLi
   // TODO: The line below should be enough but it is happening too early
   // even before the RenderingManager has any registered render windows,
   // resulting in mismatching renderer and data geometries.
+
   // this->LoadNextUnfinishedTask();
 }
 
@@ -736,33 +739,21 @@ void QmitkSegmentationTaskListWidget::OnLoadButtonClicked()
  */
 mitk::DataNode* QmitkSegmentationTaskListWidget::GetImageDataNode(size_t index) const
 {
+  if (!m_TaskList->HasImage(index))
+    return nullptr;
+
   const auto imagePath = m_TaskList->GetAbsolutePath(m_TaskList->GetImage(index));
 
-  auto imageNodes = m_DataStorage->GetDerivations(m_TaskListNode, mitk::NodePredicateFunction::New([imagePath](const mitk::DataNode* node) {
+  auto lambda = [imagePath](const mitk::DataNode* node) {
     return imagePath == GetInputLocation(node->GetData());
-  }));
+  };
+
+  auto predicate = mitk::NodePredicateFunction::New(lambda);
+  auto imageNodes = m_DataStorage->GetDerivations(m_TaskListNode, predicate);
 
   return !imageNodes->empty()
     ? imageNodes->front()
     : nullptr;
-}
-
-/* If present, return the segmentation data node for the task with the
- * specified index. Otherwise, return nullptr.
- */
-mitk::DataNode* QmitkSegmentationTaskListWidget::GetSegmentationDataNode(size_t index) const
-{
-  const auto* imageNode = this->GetImageDataNode(index);
-
-  if (imageNode != nullptr)
-  {
-    auto segmentations = m_DataStorage->GetDerivations(imageNode, mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-
-    if (!segmentations->empty())
-      return segmentations->front();
-  }
-
-  return nullptr;
 }
 
 /* Unload all task data nodes but spare the passed image data node.
@@ -771,17 +762,26 @@ void QmitkSegmentationTaskListWidget::UnloadTasks(const mitk::DataNode* skip)
 {
   this->UnsubscribeFromActiveSegmentation();
 
+  m_ImageNode = nullptr;
+  m_SegmentationNode = nullptr;
+
   if (m_TaskListNode.IsNotNull())
   {
-    auto imageNodes = m_DataStorage->GetDerivations(m_TaskListNode, mitk::TNodePredicateDataType<mitk::Image>::New());
+    auto notSkip = mitk::NodePredicateFunction::New([skip](const mitk::DataNode* node) {
+      return skip != node;
+    });
 
-    for (auto imageNode : *imageNodes)
-    {
-      m_DataStorage->Remove(m_DataStorage->GetDerivations(imageNode, nullptr, false));
+    auto taskNodes = m_DataStorage->GetDerivations(m_TaskListNode, notSkip, false);
 
-      if (imageNode != skip)
-        m_DataStorage->Remove(imageNode);
-    }
+    m_DataStorage->Remove(taskNodes);
+
+    // Removal is done in a random order instead of traveling upwards from
+    // child nodes to parent nodes. This may result in temporary orphan nodes
+    // hierarchically existing outside of the segmentation task list parent
+    // node. To prevent the detection of unrelated data, which would put this
+    // widget into a warning mode, do a final data storage check after
+    // everything was removed.
+    this->CheckDataStorage();
   }
 
   this->SetActiveTaskIndex(std::nullopt);
@@ -1073,6 +1073,8 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     }
   }
 
+  m_ImageNode = imageNode;
+  m_SegmentationNode = segmentationNode;
   m_UnsavedChanges = false;
 
   this->SetActiveTaskIndex(current);
@@ -1083,19 +1085,14 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
 
 void QmitkSegmentationTaskListWidget::SubscribeToActiveSegmentation()
 {
-  if (m_ActiveTaskIndex.has_value())
+  if (m_ActiveTaskIndex.has_value() && m_SegmentationNode != nullptr)
   {
-    auto segmentationNode = this->GetSegmentationDataNode(m_ActiveTaskIndex.value());
+    auto segmentation = static_cast<mitk::LabelSetImage*>(m_SegmentationNode->GetData());
 
-    if (segmentationNode != nullptr)
-    {
-      auto segmentation = static_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
+    auto command = itk::SimpleMemberCommand<QmitkSegmentationTaskListWidget>::New();
+    command->SetCallbackFunction(this, &QmitkSegmentationTaskListWidget::OnSegmentationModified);
 
-      auto command = itk::SimpleMemberCommand<QmitkSegmentationTaskListWidget>::New();
-      command->SetCallbackFunction(this, &QmitkSegmentationTaskListWidget::OnSegmentationModified);
-
-      m_SegmentationModifiedObserverTag = segmentation->AddObserver(itk::ModifiedEvent(), command);
-    }
+    m_SegmentationModifiedObserverTag = segmentation->AddObserver(itk::ModifiedEvent(), command);
   }
 }
 
@@ -1103,11 +1100,9 @@ void QmitkSegmentationTaskListWidget::UnsubscribeFromActiveSegmentation()
 {
   if (m_ActiveTaskIndex.has_value() && m_SegmentationModifiedObserverTag.has_value())
   {
-    auto segmentationNode = this->GetSegmentationDataNode(m_ActiveTaskIndex.value());
-
-    if (segmentationNode != nullptr)
+    if (m_SegmentationNode != nullptr)
     {
-      auto segmentation = static_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
+      auto segmentation = static_cast<mitk::LabelSetImage*>(m_SegmentationNode->GetData());
       segmentation->RemoveObserver(m_SegmentationModifiedObserverTag.value());
     }
 
@@ -1196,7 +1191,7 @@ bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges(const QString& altern
   return true;
 }
 
-void QmitkSegmentationTaskListWidget::SaveActiveTask(bool saveAsIntermediateResult)
+void QmitkSegmentationTaskListWidget::SaveActiveTask(bool saveAsInterimResult)
 {
   if (!m_ActiveTaskIndex.has_value())
     return;
@@ -1206,7 +1201,7 @@ void QmitkSegmentationTaskListWidget::SaveActiveTask(bool saveAsIntermediateResu
   try
   {
     const auto active = m_ActiveTaskIndex.value();
-    m_TaskList->SaveTask(active, this->GetSegmentationDataNode(active)->GetData(), saveAsIntermediateResult);
+    m_TaskList->SaveTask(active, m_SegmentationNode->GetData(), saveAsInterimResult);
     this->OnUnsavedChangesSaved();
   }
   catch (const mitk::Exception& e)

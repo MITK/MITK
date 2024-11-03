@@ -44,7 +44,7 @@ public:
 
   bool ActiveTaskIsShown() const;
   void LoadNextUnfinishedTask();
-  void SaveActiveTask(bool saveAsIntermediateResult = false);
+  void SaveActiveTask(bool saveAsInterimResult = false);
   bool OnPreShutdown();
 
 signals:
@@ -79,7 +79,6 @@ private:
   void SetActiveTaskIndex(const std::optional<size_t>& index);
   void SetCurrentTaskIndex(const std::optional<size_t>& index);
   bool HandleUnsavedChanges(const QString& alternativeTitle = QString());
-  mitk::DataNode* GetSegmentationDataNode(size_t index) const;
   void OnUnsavedChangesSaved();
   void OnPreviousTaskShortcutActivated();
   void OnNextTaskShortcutActivated();
@@ -96,6 +95,8 @@ private:
   mitk::SegmentationTaskList::Pointer m_TaskList;
   mitk::Forms::Form m_Form;
   mitk::DataNode::Pointer m_TaskListNode;
+  mitk::DataNode* m_ImageNode;
+  mitk::DataNode* m_SegmentationNode;
   std::optional<size_t> m_CurrentTaskIndex;
   std::optional<size_t> m_ActiveTaskIndex;
   std::optional<unsigned long> m_SegmentationModifiedObserverTag;

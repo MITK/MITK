@@ -65,4 +65,5 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.flowapplication:OFF
   org.mitk.gui.qt.flow.segmentation:OFF
   org.mitk.gui.qt.pixelvalue:ON
+  org.mitk.gui.qt.pet.suvcalculation:OFF
 )

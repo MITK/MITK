@@ -65,6 +65,18 @@ namespace mitk
     virtual bool RemoveListener(const std::string& context, const INodeSelectionListener* listener) = 0;
 
     /**
+     * \brief Remove a listener from selections of all selection contexts.
+     *
+     * \param listener A pointer to an already added listener.
+     *
+     * \return \c true if the listener was actually found, or \c false
+     *         otherwise.
+     *
+     * \sa AddListener()
+     */
+    virtual bool RemoveListener(const INodeSelectionListener* listener) = 0;
+
+    /**
      * \brief Send a selection to all listeners of a certain selection context.
      *
      * \param context A non-empty, arbitrary and unique string that both

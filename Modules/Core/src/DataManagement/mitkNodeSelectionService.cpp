@@ -26,6 +26,8 @@ bool mitk::NodeSelectionService::AddListener(const std::string& context, INodeSe
   if (context.empty() || listener == nullptr)
     return false;
 
+  std::scoped_lock lock(m_Mutex);
+
   auto range = m_Listeners.equal_range(context);
 
   auto it = std::find_if(range.first, range.second, [listener](const auto& pair) {
@@ -43,6 +45,8 @@ bool mitk::NodeSelectionService::RemoveListener(const std::string& context, cons
   if (context.empty() || listener == nullptr)
     return false;
 
+  std::scoped_lock lock(m_Mutex);
+
   auto range = m_Listeners.equal_range(context);
 
   auto it = std::find_if(range.first, range.second, [listener](const auto& pair) {
@@ -58,10 +62,37 @@ bool mitk::NodeSelectionService::RemoveListener(const std::string& context, cons
   return false;
 }
 
+bool mitk::NodeSelectionService::RemoveListener(const INodeSelectionListener* listener)
+{
+  if (listener == nullptr)
+    return false;
+
+  std::scoped_lock lock(m_Mutex);
+
+  bool foundListener = false;
+
+  for (auto it = m_Listeners.begin(); it != m_Listeners.end(); )
+  {
+    if (it->second == listener)
+    {
+      it = m_Listeners.erase(it);
+      foundListener = true;
+    }
+    else
+    {
+      ++it;
+    }
+  }
+
+  return foundListener;
+}
+
 bool mitk::NodeSelectionService::SendSelection(const std::string& context, const std::vector<mitk::DataNode::Pointer>& selection) const
 {
   if (context.empty())
     return false;
+
+  std::scoped_lock lock(m_Mutex);
 
   auto range = m_Listeners.equal_range(context);
 

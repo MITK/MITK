@@ -5,7 +5,7 @@
 ## Overview
 
 MITK Segmentation Task Lists are a JSON-based file format defining a list of segmentation tasks.
-Segmentation tasks consist at least of a path to a reference image (or MITK scene in version 3 and later) and a unique result path.
+Segmentation tasks consist at least of a path to a reference image (or MITK scene in version 3 or later of the MITK Segmentation Task List file format) and a unique result path.
 The result path specifies where the final segmentation of the task is expected to be located once it is done.
 
 Optional properties of a segmentation task include a task name and description as well as various presettings for the segmentation like a label name, a list of suggested names and colors for new labels, a label set preset, or even a pre-segmentation to begin with.
@@ -222,7 +222,7 @@ The submitted CSV responses might look like the following table:
 
 ### Version 3 and MITK Scenes
 
-Version 3 of the MITK Segmentation Task List file format adds support for MITK Scenes (\*.mitk files), allowing arbitrary input data in addition to an image.
+Version 3 of the MITK Segmentation Task List file format adds support for MITK Scenes (\*.mitk or \*.mitksceneindex files), allowing arbitrary input data in addition to an image.
 
 A task object (including the `Defaults` object) can now reference an MITK Scene file instead of an image.
 It is mutually exclusive to the `Image` field of a task (you cannot have both in a task).
@@ -242,6 +242,8 @@ For example, it is invalid to specify an `Image` in the `Defaults` object while 
 - `Path` (*file path*): Mandatory path to the MITK scene file.
 - `Image` (*string*): Mandatory name of an image data node in the MITK scene file that is used as reference image for the segmentation.
 - `Segmentation` (*string*): Optional name of a segmentation data node in the MITK scene file that is used as pre-segmentation.
+
+Make sure to use unique data node names for `Image` and `Segmentation` in an MITK scene as otherwise it may result in undefined behavior.
 
 Contrary to `Image`, if a `Scene` has a `Segmentation` (*string*), it still can be overridden by the `Segmentation` (*file path*) of a `Task`.
 

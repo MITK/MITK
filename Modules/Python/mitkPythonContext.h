@@ -9,10 +9,11 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef mitkPythonService_h
-#define mitkPythonService_h
+#ifndef mitkPythonContext_h
+#define mitkPythonContext_h
 #define PY_SSIZE_T_CLEAN
 
+#include "mitkIPythonService.h"
 #include <itkLightObject.h>
 #include <mitkImage.h>
 #ifdef _DEBUG
@@ -28,7 +29,7 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  class MITKPYTHON_EXPORT PythonContext : public itk::LightObject
+  class MITKPYTHON_EXPORT PythonContext : public itk::LightObject, public mitk::IPythonService
   {
   public:
     mitkClassMacroItkParent(PythonContext, itk::LightObject);
@@ -36,13 +37,13 @@ namespace mitk
     
     PythonContext();
     ~PythonContext();
-    void Activate();
-    mitk::Image::Pointer LoadImageFromPython(const std::string &filePath);
-    void TransferBaseDataToPython(mitk::BaseData *mitkImage);
-    const char *ExecuteString(const std::string &pyCommands);
-    const char *GetStdOut();
-    void SetVirtualEnvironmentPath(const std::string &absolutePath); // site-package
-    void ClearVirtualEnvironmentPath();
+    void Activate() override;
+    mitk::Image::Pointer LoadImageFromPython(const std::string &filePath) override;
+    void TransferBaseDataToPython(mitk::BaseData *mitkImage) override;
+    std::string ExecuteString(const std::string &pyCommands) override;
+    const char *GetStdOut() override;
+    void SetVirtualEnvironmentPath(const std::string &absolutePath) override; // site-package
+    void ClearVirtualEnvironmentPath() override;
 
   private:
     std::string m_CurrentVenvEnvPath;

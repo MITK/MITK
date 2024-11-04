@@ -1,0 +1,59 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+#ifndef mitkPythonActivator_h
+#define mitkPythonActivator_h
+
+// Microservices
+#include <usModuleActivator.h>
+#include "usModuleContext.h"
+#include "mitkPythonContext.h"
+#include "mitkIPythonService.h"
+#include <usServiceRegistration.h>
+
+namespace mitk
+{
+    class PythonActivator : public us::ModuleActivator
+    {
+    public:
+
+        void Load(us::ModuleContext* context) override
+        {
+          MITK_DEBUG << "PythonActivator::Load";
+          // Registering PythonService as MicroService
+          m_PythonService = itk::SmartPointer<mitk::PythonContext>(new PythonContext());
+
+          us::ServiceProperties _PythonServiceProps;
+          _PythonServiceProps["Name"] = std::string("PythonService");
+          _PythonServiceProps["service.ranking"] = int(0);
+
+          m_PythonServiceRegistration = context->RegisterService<mitk::IPythonService>(m_PythonService.GetPointer(), _PythonServiceProps);
+        }
+
+        void Unload(us::ModuleContext*) override
+        {
+          MITK_DEBUG("PythonActivator") << "PythonActivator::Unload";
+          MITK_DEBUG("PythonActivator") << "m_PythonService GetReferenceCount " << m_PythonService->GetReferenceCount();
+          m_PythonServiceRegistration.Unregister();
+          m_PythonService->Delete();
+          MITK_DEBUG("PythonActivator") << "m_PythonService GetReferenceCount " << m_PythonService->GetReferenceCount();
+        }
+
+        ~PythonActivator() override{}
+
+    private:
+        itk::SmartPointer<mitk::PythonContext> m_PythonService;
+        us::ServiceRegistration<PythonContext> m_PythonServiceRegistration;
+    };
+}
+
+US_EXPORT_MODULE_ACTIVATOR(mitk::PythonActivator)
+#endif

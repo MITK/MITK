@@ -66,9 +66,9 @@ void QmitkPythonView::OnExecuteBtnClicked()
 {
   QString text = m_Controls->pythonConsole->toPlainText();
   std::string pyCommand = text.toStdString();
-  const char *result = m_PythonContext->ExecuteString(pyCommand);
+  std::string result = m_PythonContext->ExecuteString(pyCommand);
   m_Controls->pythonOutput->clear();
-  m_Controls->pythonOutput->setText(QString::fromUtf8(result));
+  m_Controls->pythonOutput->setText(QString::fromStdString(result));
 }
 
 void QmitkPythonView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)

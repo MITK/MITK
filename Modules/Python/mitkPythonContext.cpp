@@ -59,9 +59,7 @@ void mitk::PythonContext::Activate()
   MITK_INFO << "EP_DLL_DIR " << std::string(EP_DLL_DIR);
   std::string pythonCommand;
   // execute a string which imports packages that are needed and sets paths to directories
-  pythonCommand.append("import numpy\n");
   pythonCommand.append("import os, site, sys, io\n");
-  pythonCommand.append("import os\n");
   pythonCommand.append("sys.path.append('" + programPath + "')\n");
   //   pythonCommand.append("sys.path.append('" + std::string(BIN_DIR) + "')\n");
   //   pythonCommand.append("sys.path.append('" +std::string(EXTERNAL_DIST_PACKAGES) + "')\n");
@@ -70,6 +68,7 @@ void mitk::PythonContext::Activate()
   // that's why the dlls that are needed for swig wrapping need to be searched manually
   std::string searchForDll = "os.add_dll_directory('"+std::string(EP_DLL_DIR)+"')\n";
   pythonCommand.append(searchForDll);
+  pythonCommand.append("import numpy\n");
   pythonCommand.append("import SimpleITK as sitk\n");
   pythonCommand.append("import pyMITK\n");
   if (PyRun_SimpleString(pythonCommand.c_str()) == -1)
@@ -92,14 +91,14 @@ mitk::PythonContext::~PythonContext()
   }
 }
 
-const char *mitk::PythonContext::ExecuteString(const std::string &pyCommands)
+std::string mitk::PythonContext::ExecuteString(const std::string &pyCommands)
 {
   PyGILState_Ensure();
   if (PyRun_SimpleString(pyCommands.c_str()) == -1)
   {
     MITK_ERROR << "Something went wrong in Python";
   }
-  return this->GetStdOut();
+  return std::string(this->GetStdOut());
 }
 
 const char *mitk::PythonContext::GetStdOut()
@@ -107,30 +106,17 @@ const char *mitk::PythonContext::GetStdOut()
   PyGILState_Ensure();
   PyObject *main_module = PyImport_AddModule("__main__");
   PyObject *capture_output = PyObject_GetAttrString(main_module, "_mitk_stdout");
-  PyObject *output_string = PyObject_CallMethod(capture_output, "getvalue", nullptr);
-  const char *result = PyUnicode_AsUTF8(output_string);
-  Py_DECREF(output_string);
-  Py_DECREF(capture_output);
+  PyObject *output_val = PyObject_CallMethod(capture_output, "getvalue", nullptr);
+  const char *result = PyUnicode_AsUTF8(output_val);
   return result;
 }
 
-mitk::Image::Pointer mitk::PythonContext::LoadImageFromPython(const std::string &filePath)
+mitk::Image::Pointer mitk::PythonContext::LoadImageFromPython(const std::string &varName)
 {
   PyGILState_Ensure();
-  mitk::Image *mitkImage;
-  std::string convertToMITKImage = "_mitk_image_list = pyMITK.IOUtil.imread('" + filePath +"')\n"
-                                   "_mitk_image = image_list[0]\n";
-  // after executing this, the desired mitk image is available in the Python context with the variable name _mitk_image
-  if (PyRun_SimpleString(convertToMITKImage.c_str()) == -1)
-  {
-    MITK_ERROR << "Something went wrong in Python";
-  }
-  PyGILState_Ensure();
-  // get dictionary with variables from main context
   PyObject *main = PyImport_AddModule("__main__");
   PyObject *globals = PyModule_GetDict(main);
-  // get mitk_image from Python context
-  PyObject *pyImage = PyDict_GetItemString(globals, "_mitk_image");
+  PyObject *pyImage = PyDict_GetItemString(globals, varName.c_str());
   if (pyImage == NULL)
   {
     mitkThrow() << "Could not get image from Python";
@@ -148,7 +134,7 @@ mitk::Image::Pointer mitk::PythonContext::LoadImageFromPython(const std::string 
     mitkThrow() << "Could not cast image to C++ type";
   }
   // cast C++ void pointer to mitk::Image::Pointer
-  mitkImage = reinterpret_cast<mitk::Image *>(voidImage);
+  mitk::Image *mitkImage = reinterpret_cast<mitk::Image *>(voidImage);
   MITK_INFO << "C++ received image has dimension: " << mitkImage->GetDimension();
   m_ThreadState = PyEval_SaveThread();
   return mitkImage;

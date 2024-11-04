@@ -831,7 +831,19 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     {
       const auto scenePath = m_TaskList->GetAbsolutePath(m_TaskList->GetScene(current).Path);
       auto sceneIO = mitk::SceneIO::New();
-      scene = sceneIO->LoadScene(scenePath.string());
+
+      if (scenePath.extension() == ".mitk")
+      {
+        scene = sceneIO->LoadScene(scenePath.string());
+      }
+      else if (scenePath.extension() == ".mitksceneindex")
+      {
+        scene = sceneIO->LoadSceneUnzipped(scenePath.string());
+      }
+      else
+      {
+        mitkThrow() << "Expected a .mitk or .mitksceneindex file:\n" << scenePath.string();
+      }
     }
     catch (const mitk::Exception& e)
     {

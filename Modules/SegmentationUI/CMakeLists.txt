@@ -1,7 +1,19 @@
-MITK_CREATE_MODULE (
-  INCLUDE_DIRS Qmitk SegmentationUtilities
-  DEPENDS MitkSegmentation MitkQtWidgetsExt MitkFormsUI
-  PACKAGE_DEPENDS PRIVATE CTK|CTKWidgets Qt6|Concurrent nlohmann_json
+mitk_create_module(
+  INCLUDE_DIRS
+    Qmitk
+    SegmentationUtilities
+  DEPENDS
+    MitkFormsUI
+    MitkQtWidgetsExt
+    MitkSceneSerialization
+    MitkSegmentation
+  TARGET_DEPENDS
+    PRIVATE
+      Qt6::Concurrent
+      nlohmann_json::nlohmann_json
+  PACKAGE_DEPENDS
+    PRIVATE
+      CTK|CTKWidgets
 )
 
 if(BUILD_TESTING)

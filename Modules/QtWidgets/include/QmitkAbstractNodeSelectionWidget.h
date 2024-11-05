@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <MitkQtWidgetsExports.h>
 
 #include <mitkDataStorage.h>
+#include <mitkINodeSelectionListener.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
 
@@ -27,7 +28,7 @@ class QmitkAbstractDataStorageModel;
 * \class QmitkAbstractNodeSelectionWidget
 * \brief Abstract base class for the selection of data from a data storage.
 */
-class MITKQTWIDGETS_EXPORT QmitkAbstractNodeSelectionWidget : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkAbstractNodeSelectionWidget : public QWidget, public mitk::INodeSelectionListener
 {
   Q_OBJECT
 
@@ -70,6 +71,8 @@ public:
   /** Convenience method that returns the selected nodes as ConstNodeStdVector.
    This is a type also often used in the  mitk code base.*/
   ConstNodeStdVector GetSelectedNodesStdVector() const;
+
+  void OnSelectionReceived(const std::string& context, const std::vector<mitk::DataNode::Pointer>& selection) override;
 
 Q_SIGNALS:
   /**

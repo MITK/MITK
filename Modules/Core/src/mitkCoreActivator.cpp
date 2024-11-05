@@ -237,6 +237,10 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
 
   // m_RenderingManager = mitk::RenderingManager::New();
   // context->RegisterService<mitk::RenderingManager>(renderingManager.GetPointer());
+
+  m_NodeSelectionService.reset(new mitk::NodeSelectionService);
+  context->RegisterService<mitk::INodeSelectionService>(m_NodeSelectionService.get());
+
   m_PlanePositionManager.reset(new mitk::PlanePositionManagerService);
   context->RegisterService<mitk::PlanePositionManagerService>(m_PlanePositionManager.get());
 

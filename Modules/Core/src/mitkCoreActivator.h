@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkIFileWriter.h>
 
 #include <mitkMimeTypeProvider.h>
+#include <mitkNodeSelectionService.h>
 #include <mitkPlanePositionManager.h>
 #include <mitkPropertyAliases.h>
 #include <mitkPropertyDescriptions.h>
@@ -57,6 +58,7 @@ private:
   void RegisterLegacyWriter();
 
   // mitk::RenderingManager::Pointer m_RenderingManager;
+  std::unique_ptr<mitk::NodeSelectionService> m_NodeSelectionService;
   std::unique_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
   std::unique_ptr<mitk::PropertyAliases> m_PropertyAliases;
   std::unique_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;

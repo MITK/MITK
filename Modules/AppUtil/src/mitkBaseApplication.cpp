@@ -104,7 +104,7 @@ namespace
     // Manage Qt options as array of pairs, consisting of argument name and argument value requirement.
     // Qt command-line options: https://doc.qt.io/qt-6/qguiapplication.html#supported-command-line-options
 
-    std::array<std::pair<std::string, bool>, 12> qtOptions {{
+    std::array<std::pair<std::string, bool>, 13> qtOptions {{
       { "platform", true },
       { "platformpluginpath", true },
       { "platformtheme", true },
@@ -116,7 +116,8 @@ namespace
       { "reverse", false },
       { "session", true },
       { "display", true },
-      { "geometry", true }
+      { "geometry", true },
+      { "style", true }
     }};
 
     for (const auto& qtOption : qtOptions)

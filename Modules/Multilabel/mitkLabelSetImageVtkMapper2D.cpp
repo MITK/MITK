@@ -21,6 +21,10 @@ found in the LICENSE file.
 #include <mitkVectorProperty.h>
 #include <mitkLabelHighlightGuard.h>
 
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
 // MITK Rendering
 #include "vtkNeverTranslucentTexture.h"
 
@@ -45,6 +49,22 @@ namespace
       return prop->GetTimeStamp() > refMT;
     }
     return false;
+  }
+
+  mitk::IPreferences* GetPreferences()
+  {
+    auto preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
+  }
+
+  float GetOpacityFactor()
+  {
+    auto preferences = GetPreferences();
+
+    if (preferences != nullptr)
+      return preferences->GetFloat("opacity factor", 1.0f);
+
+    return 1.0f;
   }
 }
 
@@ -223,6 +243,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
+  opacity *= GetOpacityFactor();
 
   if (isLookupModified)
   {
@@ -382,6 +403,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateActiveLabelOutline(mitk::BaseRender
 
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
+  opacity *= GetOpacityFactor();
 
   mitk::Label* activeLabel = image->GetActiveLabel();
   bool contourActive = false;

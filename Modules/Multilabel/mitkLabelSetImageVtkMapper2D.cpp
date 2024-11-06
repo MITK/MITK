@@ -56,24 +56,26 @@ namespace
     auto preferencesService = mitk::CoreServices::GetPreferencesService();
     return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   }
-
-  float GetOpacityFactor()
-  {
-    auto preferences = GetPreferences();
-
-    if (preferences != nullptr)
-      return preferences->GetFloat("opacity factor", 1.0f);
-
-    return 1.0f;
-  }
 }
 
 mitk::LabelSetImageVtkMapper2D::LabelSetImageVtkMapper2D()
+  : m_Preferences(nullptr)
 {
 }
 
 mitk::LabelSetImageVtkMapper2D::~LabelSetImageVtkMapper2D()
 {
+}
+
+float mitk::LabelSetImageVtkMapper2D::GetOpacityFactor()
+{
+  if (m_Preferences == nullptr)
+    m_Preferences = GetPreferences();
+
+  if (m_Preferences != nullptr)
+    return m_Preferences->GetFloat("opacity factor", 1.0f);
+
+  return 1.0f;
 }
 
 vtkProp *mitk::LabelSetImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
@@ -243,7 +245,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
-  opacity *= GetOpacityFactor();
+  opacity *= this->GetOpacityFactor();
 
   if (isLookupModified)
   {
@@ -403,7 +405,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateActiveLabelOutline(mitk::BaseRender
 
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
-  opacity *= GetOpacityFactor();
+  opacity *= this->GetOpacityFactor();
 
   mitk::Label* activeLabel = image->GetActiveLabel();
   bool contourActive = false;

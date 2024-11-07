@@ -70,6 +70,10 @@ bool QmitkSegmentationPreferencePage::PerformOk()
 
   prefs->PutBool("compact view", m_Ui->compactViewCheckBox->isChecked());
   prefs->PutBool("draw outline", m_Ui->outlineRadioButton->isChecked());
+
+  const auto opacityFactor = static_cast<float>(m_Ui->opacityFactorSlider->value()) / m_Ui->opacityFactorSlider->maximum();
+  prefs->PutFloat("opacity factor", opacityFactor);
+
   prefs->PutBool("selection mode", m_Ui->selectionModeCheckBox->isChecked());
   prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
   prefs->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
@@ -78,6 +82,7 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
   prefs->PutBool("monailabel allow all models", m_Ui->allowAllModelsCheckBox->isChecked());
   prefs->PutInt("monailabel timeout", std::stoi(m_Ui->monaiTimeoutEdit->text().toStdString()));
+
   return true;
 }
 
@@ -99,6 +104,9 @@ void QmitkSegmentationPreferencePage::Update()
   {
     m_Ui->overlayRadioButton->setChecked(true);
   }
+
+  const auto opacityFactor = static_cast<int>(prefs->GetFloat("opacity factor", 1.0f) * m_Ui->opacityFactorSlider->maximum());
+  m_Ui->opacityFactorSlider->setValue(opacityFactor);
 
   m_Ui->selectionModeCheckBox->setChecked(prefs->GetBool("selection mode", false));
 

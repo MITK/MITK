@@ -3,5 +3,16 @@
 
 \imageMacro{PixelValueIcon.png,"Icon of the Pixel Value Plugin.",2.00}
 
-This is the pixel value plugin. It shows the value of the selected pixel in images.
+The pixel value plugin displays the value of the currently selected pixel.
+To avoid ambiguity, is also shows the name of the image of which the pixel value is sourced.
+
+The raw coordinates of the sourced pixel can be optionally displayed.
+These coordinates are shown both as indices into the in-memory image array and as absolute
+world coordinates in millimeters (mm).
+
+Note that the in-memory representation or indexing order may differfrom that of the image file on disk.
+For example, some image readers always use a left-posterior-superior order for the in-memory layout.
+
+Coordinates can be easily copied to the clipboard in comma-separated format.
+
 */

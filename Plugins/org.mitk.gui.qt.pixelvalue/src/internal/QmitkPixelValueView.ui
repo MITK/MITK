@@ -61,44 +61,54 @@
       <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="1">
-       <widget class="QLabel" name="spaceXLabel">
-        <property name="text">
-         <string>left</string>
+      <item row="0" column="4">
+       <widget class="QToolButton" name="copyIndexCoordButton">
+        <property name="toolTip">
+         <string>Copy into clipboard</string>
         </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="spaceYLabel">
-        <property name="text">
-         <string>posterior</string>
-        </property>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="worldXLineEdit">
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="spaceZLabel">
-        <property name="text">
-         <string>superior</string>
+      <item row="1" column="4">
+       <widget class="QToolButton" name="copyWorldCoordButton">
+        <property name="toolTip">
+         <string>Copy into clipboard</string>
         </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="0" column="0">
        <widget class="QLabel" name="indexCoordLabel">
         <property name="text">
          <string>Index</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="indexZLineEdit">
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
        <widget class="QLineEdit" name="indexXLineEdit">
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -108,7 +118,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
+      <item row="0" column="2">
        <widget class="QLineEdit" name="indexYLineEdit">
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -119,53 +129,6 @@
        </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QLineEdit" name="indexZLineEdit">
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
-       <widget class="QToolButton" name="copyIndexCoordButton">
-        <property name="toolTip">
-         <string>Copy into clipboard</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="worldCoordLabel">
-        <property name="text">
-         <string>World (mm)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="worldXLineEdit">
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QLineEdit" name="worldYLineEdit">
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3">
        <widget class="QLineEdit" name="worldZLineEdit">
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -175,13 +138,20 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="4">
-       <widget class="QToolButton" name="copyWorldCoordButton">
-        <property name="toolTip">
-         <string>Copy into clipboard</string>
-        </property>
+      <item row="1" column="0">
+       <widget class="QLabel" name="worldCoordLabel">
         <property name="text">
-         <string/>
+         <string>World (mm)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="worldYLineEdit">
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

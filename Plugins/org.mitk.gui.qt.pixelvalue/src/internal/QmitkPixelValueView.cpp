@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkPixelValueView.h"
+#include <QmitkStyleManager.h>
 
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
@@ -20,7 +21,79 @@ found in the LICENSE file.
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkImagePixelReadAccessor.h>
 
+#include <QClipboard>
+
 #include <ui_QmitkPixelValueView.h>
+
+#include <regex>
+
+namespace
+{
+  void CopyCoordsToClipboard(const QLineEdit* x, const QLineEdit* y, const QLineEdit* z)
+  {
+    auto text = QStringList() << x->text() << y->text();
+
+    if (const auto zText = z->text(); !zText.isEmpty())
+      text << zText;
+
+    QApplication::clipboard()->setText(text.join(", "));
+  }
+
+  bool ParseSpace(const std::string& space, std::array<std::string, 3>& result)
+  {
+    if (space == "left-posterior-superior") // Fast path as it is by far the most common
+    {
+      result[0] = "left";
+      result[1] = "posterior";
+      result[2] = "superior";
+      return true;
+    }
+
+    if (space.size() == 3) // Example: "RAS"
+    {
+      static const std::unordered_map<char, std::string> dict = {
+        { 'A', "anterior" },
+        { 'L', "left" },
+        { 'R', "right" },
+        { 'S', "superior" }
+      };
+
+      std::array<std::string, 3> labels;
+
+      for (size_t i = 0; i < 3; ++i)
+      {
+        const auto key = static_cast<char>(::toupper(space[i]));
+        auto it = dict.find(key);
+
+        if (it == dict.end())
+          return false;
+
+        labels[i] = it->second;
+      }
+
+      result = labels;
+
+      return true;
+    }
+
+    static const std::regex pattern(R"((\w+)-(\w+)-(\w+))");
+    std::smatch match;
+
+    if (std::regex_match(space, match, pattern)) // Example: "right-anterior-superior"
+    {
+      for (size_t i = 0; i < 3; ++i)
+      {
+        auto label = match[1 + i].str();
+        result[i].resize(label.size());
+        std::transform(label.begin(), label.end(), result[i].begin(), ::tolower);
+      }
+
+      return true;
+    }
+
+    return false;
+  }
+}
 
 const std::string QmitkPixelValueView::VIEW_ID = "org.mitk.views.pixelvalue";
 
@@ -36,6 +109,18 @@ QmitkPixelValueView::~QmitkPixelValueView()
 void QmitkPixelValueView::CreateQtPartControl(QWidget* parent)
 {
   m_Ui->setupUi(parent);
+
+  auto clipboardIcon = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/clipboard.svg"));
+  m_Ui->copyIndexCoordButton->setIcon(clipboardIcon);
+  m_Ui->copyWorldCoordButton->setIcon(clipboardIcon);
+
+  connect(m_Ui->copyIndexCoordButton, &QToolButton::clicked, [this]() {
+    CopyCoordsToClipboard(m_Ui->indexXLineEdit, m_Ui->indexYLineEdit, m_Ui->indexZLineEdit);
+  });
+
+  connect(m_Ui->copyWorldCoordButton, &QToolButton::clicked, [this]() {
+    CopyCoordsToClipboard(m_Ui->worldXLineEdit, m_Ui->worldYLineEdit, m_Ui->worldZLineEdit);
+  });
 
   this->m_SliceNavigationListener.RenderWindowPartActivated(this->GetRenderWindowPart());
   connect(&m_SliceNavigationListener, &QmitkSliceNavigationListener::SelectedPositionChanged, this, &QmitkPixelValueView::OnSelectedPositionChanged);
@@ -146,42 +231,43 @@ void QmitkPixelValueView::Update()
     if (pixelType == itk::IOPixelEnum::RGB || pixelType == itk::IOPixelEnum::RGBA)
     {
       m_Ui->pixelValueLineEdit->setText(QString::fromStdString(mitk::ConvertCompositePixelValueToString(image, index)));
-      return;
     }
-
-    if (pixelType == itk::IOPixelEnum::DIFFUSIONTENSOR3D || pixelType == itk::IOPixelEnum::SYMMETRICSECONDRANKTENSOR)
+    else if (pixelType == itk::IOPixelEnum::DIFFUSIONTENSOR3D || pixelType == itk::IOPixelEnum::SYMMETRICSECONDRANKTENSOR)
     {
       m_Ui->pixelValueLineEdit->setText(QStringLiteral("See ODF Details view."));
-      return;
-    }
-
-    mitk::ScalarType pixelValue = 0.0;
-
-    mitkPixelTypeMultiplex5(
-      mitk::FastSinglePixelAccess,
-      image->GetChannelDescriptor().GetPixelType(),
-      image,
-      image->GetVolumeData(image->GetTimeGeometry()->TimePointToTimeStep(timePoint)),
-      index,
-      pixelValue,
-      component);
-
-    std::ostringstream stream;
-    stream.imbue(std::locale::classic());
-    stream.precision(2);
-
-    if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
-    {
-      stream << std::scientific;
     }
     else
     {
-      stream << std::fixed;
+      mitk::ScalarType pixelValue = 0.0;
+
+      mitkPixelTypeMultiplex5(
+        mitk::FastSinglePixelAccess,
+        image->GetChannelDescriptor().GetPixelType(),
+        image,
+        image->GetVolumeData(image->GetTimeGeometry()->TimePointToTimeStep(timePoint)),
+        index,
+        pixelValue,
+        component);
+
+      std::ostringstream stream;
+      stream.imbue(std::locale::classic());
+      stream.precision(2);
+
+      if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
+      {
+        stream << std::scientific;
+      }
+      else
+      {
+        stream << std::fixed;
+      }
+
+      stream << pixelValue;
+
+      m_Ui->pixelValueLineEdit->setText(QString::fromStdString(stream.str()));
     }
 
-    stream << pixelValue;
-
-    m_Ui->pixelValueLineEdit->setText(QString::fromStdString(stream.str()));
+    this->UpdateCoords(image, index, position);
   }
   else
   {
@@ -189,10 +275,100 @@ void QmitkPixelValueView::Update()
   }
 }
 
+void QmitkPixelValueView::UpdateCoords(const mitk::Image* image, const itk::Index<3>& index, const mitk::Point3D& position)
+{
+  this->UpdateLabels(image);
+
+  const auto dimension = image->GetDimension();
+
+  this->UpdateIndexCoord(index, dimension);
+  this->UpdateWorldCoord(position, dimension);
+}
+
+void QmitkPixelValueView::UpdateLabels(const mitk::BaseData* image)
+{
+  if (std::string space; image->GetPropertyList()->GetStringProperty("NRRD.space", space))
+  {
+    std::array<std::string, 3> labels;
+
+    if (ParseSpace(space, labels))
+    {
+      m_Ui->spaceXLabel->setText(QString::fromStdString(labels[0]));
+      m_Ui->spaceYLabel->setText(QString::fromStdString(labels[1]));
+      m_Ui->spaceZLabel->setText(QString::fromStdString(labels[2]));
+
+      this->ShowLabels();
+      return;
+    }
+  }
+
+  this->ShowLabels(false);
+}
+
+void QmitkPixelValueView::UpdateIndexCoord(const itk::Index<3>& index, unsigned int dimension)
+{
+  m_Ui->indexXLineEdit->setText(QString::number(index[0]));
+  m_Ui->indexYLineEdit->setText(QString::number(index[1]));
+
+  if (dimension > 2)
+  {
+    m_Ui->indexZLineEdit->setText(QString::number(index[2]));
+  }
+  else
+  {
+    m_Ui->indexZLineEdit->clear();
+  }
+
+  m_Ui->copyIndexCoordButton->setEnabled(true);
+}
+
+void QmitkPixelValueView::UpdateWorldCoord(const mitk::Point3D& position, unsigned int dimension)
+{
+  m_Ui->worldXLineEdit->setText(QString::number(position[0], 'f', 2));
+  m_Ui->worldYLineEdit->setText(QString::number(position[1], 'f', 2));
+
+  if (dimension > 2)
+  {
+    m_Ui->worldZLineEdit->setText(QString::number(position[2], 'f', 2));
+  }
+  else
+  {
+    m_Ui->worldZLineEdit->clear();
+  }
+
+  m_Ui->copyWorldCoordButton->setEnabled(true);
+}
+
 void QmitkPixelValueView::Clear()
 {
   m_Ui->imageNameLineEdit->clear();
   m_Ui->pixelValueLineEdit->clear();
+
+  this->ClearCoords();
+}
+
+void QmitkPixelValueView::ClearCoords()
+{
+  this->ShowLabels(false);
+
+  m_Ui->indexXLineEdit->clear();
+  m_Ui->indexYLineEdit->clear();
+  m_Ui->indexZLineEdit->clear();
+
+  m_Ui->copyIndexCoordButton->setEnabled(false);
+
+  m_Ui->worldXLineEdit->clear();
+  m_Ui->worldYLineEdit->clear();
+  m_Ui->worldZLineEdit->clear();
+
+  m_Ui->copyWorldCoordButton->setEnabled(false);
+}
+
+void QmitkPixelValueView::ShowLabels(bool show)
+{
+  m_Ui->spaceXLabel->setVisible(show);
+  m_Ui->spaceYLabel->setVisible(show);
+  m_Ui->spaceZLabel->setVisible(show);
 }
 
 void QmitkPixelValueView::SetFocus()

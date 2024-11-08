@@ -229,10 +229,6 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
   int crosshairGapSize = preferences->GetInt("crosshair gap size", 32);
   multiWidget->SetCrosshairGap(crosshairGapSize);
 
-  // zooming and panning preferences
-  bool constrainedZooming = preferences->GetBool("Use constrained zooming and panning", true);
-  mitk::RenderingManager::GetInstance()->SetConstrainedPanningZooming(constrainedZooming);
-
   bool PACSInteractionScheme = preferences->GetBool("PACS like mouse interaction", false);
   OnInteractionSchemeChanged(PACSInteractionScheme ?
     mitk::InteractionSchemeSwitcher::PACSStandard :

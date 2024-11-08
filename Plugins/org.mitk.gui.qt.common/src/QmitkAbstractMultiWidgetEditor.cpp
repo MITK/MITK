@@ -19,31 +19,65 @@ found in the LICENSE file.
 // mitk gui qt common plugin
 #include "QmitkMultiWidgetDecorationManager.h"
 
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
 // berry
 #include <berryIWorkbenchPartConstants.h>
+
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    mitk::CoreServicePointer<mitk::IPreferencesService> prefsService(mitk::CoreServices::GetPreferencesService());
+    return prefsService->GetSystemPreferences()->Node("org.mitk.editors");
+  }
+}
 
 const QString QmitkAbstractMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.abstractmultiwidget";
 
 struct QmitkAbstractMultiWidgetEditor::Impl final
 {
   Impl();
-  ~Impl() = default;
+  ~Impl();
+
+  void OnPreferencesChanged(const mitk::IPreferences* preferences);
 
   QmitkAbstractMultiWidget* m_MultiWidget;
-
   std::unique_ptr<QmitkMultiWidgetDecorationManager> m_MultiWidgetDecorationManager;
 };
 
 QmitkAbstractMultiWidgetEditor::Impl::Impl()
   : m_MultiWidget(nullptr)
 {
-  // nothing here
+  auto prefs = ::GetPreferences();
+
+  if (prefs != nullptr)
+    prefs->OnChanged.AddListener(mitk::MessageDelegate1<Impl, const mitk::IPreferences*>(this, &Impl::OnPreferencesChanged));
+}
+
+QmitkAbstractMultiWidgetEditor::Impl::~Impl()
+{
+  auto prefs = ::GetPreferences();
+
+  if (prefs != nullptr)
+    prefs->OnChanged.RemoveListener(mitk::MessageDelegate1<Impl, const mitk::IPreferences*>(this, &Impl::OnPreferencesChanged));
+}
+
+void QmitkAbstractMultiWidgetEditor::Impl::OnPreferencesChanged(const mitk::IPreferences* preferences)
+{
+  auto renderingManager = mitk::RenderingManager::GetInstance();
+
+  const bool constrain = preferences->GetBool("Use constrained zooming and panning", true);
+  renderingManager->SetConstrainedPanningZooming(constrain);
+
+  renderingManager->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 }
 
 QmitkAbstractMultiWidgetEditor::QmitkAbstractMultiWidgetEditor()
   : m_Impl(std::make_unique<Impl>())
 {
-  // nothing here
 }
 
 QmitkAbstractMultiWidgetEditor::~QmitkAbstractMultiWidgetEditor() {}

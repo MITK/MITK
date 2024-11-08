@@ -11,43 +11,64 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkEditorsPreferencePage.h"
+#include <ui_QmitkEditorsPreferencePage.h>
 
-#include <QVBoxLayout>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
-QmitkEditorsPreferencePage::QmitkEditorsPreferencePage()
-: m_MainControl(nullptr)
+namespace
 {
-
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node("org.mitk.editors");
+  }
 }
 
-void QmitkEditorsPreferencePage::Init(berry::IWorkbench::Pointer )
+QmitkEditorsPreferencePage::QmitkEditorsPreferencePage()
+  : m_Control(nullptr),
+    m_Ui(new Ui::QmitkEditorsPreferencePage)
+{
+}
+
+QmitkEditorsPreferencePage::~QmitkEditorsPreferencePage() = default;
+
+void QmitkEditorsPreferencePage::Init(berry::IWorkbench::Pointer)
 {
 }
 
 void QmitkEditorsPreferencePage::CreateQtControl(QWidget* parent)
 {
-  //empty page
-  m_MainControl = new QWidget(parent);
-  auto  layout = new QVBoxLayout;
-  m_MainControl->setLayout(layout);
+  m_Control = new QWidget(parent);
+  m_Ui->setupUi(m_Control);
+
   this->Update();
 }
 
 QWidget* QmitkEditorsPreferencePage::GetQtControl() const
 {
-  return m_MainControl;
+  return m_Control;
 }
 
 bool QmitkEditorsPreferencePage::PerformOk()
 {
+  auto prefs = GetPreferences();
+
+  const bool constrainZoomingAndPanning = m_Ui->m_ConstrainZoomingAndPanningCheckBox->isChecked();
+  prefs->PutBool("Use constrained zooming and panning", constrainZoomingAndPanning);
+
   return true;
 }
 
 void QmitkEditorsPreferencePage::PerformCancel()
 {
-
 }
 
 void QmitkEditorsPreferencePage::Update()
 {
+  auto prefs = GetPreferences();
+
+  const bool constrainZoomingAndPanning = prefs->GetBool("Use constrained zooming and panning", true);
+  m_Ui->m_ConstrainZoomingAndPanningCheckBox->setChecked(constrainZoomingAndPanning);
 }

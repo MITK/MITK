@@ -519,7 +519,7 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QRadioButton" name="radioButton_StartParameters">
+           <widget class="QCheckBox" name="checkBox_StartParameters">
             <property name="text">
              <string>Enter Fit Starting Parameters</string>
             </property>

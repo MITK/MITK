@@ -226,6 +226,10 @@ void QmitkPixelValueView::UpdateCoords(const mitk::Image* image, const itk::Inde
 
   this->UpdateIndexCoord(index, dimension);
   this->UpdateWorldCoord(position, dimension);
+
+  const auto geometry = image->GetTimeGeometry();
+
+  this->UpdateTimeStep(geometry);
 }
 
 void QmitkPixelValueView::UpdateIndexCoord(const itk::Index<3>& index, unsigned int dimension)
@@ -262,6 +266,30 @@ void QmitkPixelValueView::UpdateWorldCoord(const mitk::Point3D& position, unsign
   m_Ui->copyWorldCoordButton->setEnabled(true);
 }
 
+void QmitkPixelValueView::UpdateTimeStep(const mitk::TimeGeometry* geometry)
+{
+  const auto* renderingManager = mitk::RenderingManager::GetInstance();
+  const auto* timeNavController = renderingManager->GetTimeNavigationController();
+  const auto timePoint = timeNavController->GetSelectedTimePoint();
+
+  if (geometry->CountTimeSteps() <= 1 || !geometry->IsValidTimePoint(timePoint))
+  {
+    this->ShowTimeStep(false);
+    return;
+  }
+
+  const auto timeStep = geometry->TimePointToTimeStep(timePoint);
+  m_Ui->timeStepLineEdit->setText(QString::number(timeStep));
+
+  this->ShowTimeStep(true);
+}
+
+void QmitkPixelValueView::ShowTimeStep(bool show)
+{
+  m_Ui->timeStepLabel->setVisible(show);
+  m_Ui->timeStepLineEdit->setVisible(show);
+}
+
 void QmitkPixelValueView::Clear()
 {
   m_Ui->imageNameLineEdit->clear();
@@ -283,8 +311,13 @@ void QmitkPixelValueView::ClearCoords()
   m_Ui->worldZLineEdit->clear();
 
   m_Ui->copyWorldCoordButton->setEnabled(false);
+
+  m_Ui->timeStepLineEdit->clear();
+
+  this->ShowTimeStep(false);
 }
 
 void QmitkPixelValueView::SetFocus()
 {
+  m_Ui->pixelValueLineEdit->setFocus();
 }

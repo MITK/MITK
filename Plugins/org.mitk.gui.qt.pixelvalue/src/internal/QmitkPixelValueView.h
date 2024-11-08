@@ -21,6 +21,7 @@ namespace mitk
 {
   class BaseData;
   class Image;
+  class TimeGeometry;
 }
 
 namespace Ui
@@ -58,11 +59,10 @@ private:
 
   void Update();
   void UpdateCoords(const mitk::Image* image, const itk::Index<3>& index, const mitk::Point3D& position);
-  void UpdateLabels(const mitk::BaseData* image);
   void UpdateIndexCoord(const itk::Index<3>& index, unsigned int dimension = 3);
   void UpdateWorldCoord(const mitk::Point3D& position, unsigned int dimension = 3);
-
-  void ShowLabels(bool show = true);
+  void UpdateTimeStep(const mitk::TimeGeometry* geometry);
+  void ShowTimeStep(bool show);
 
   QmitkSliceNavigationListener m_SliceNavigationListener;
   Ui::QmitkPixelValueView* m_Ui;

@@ -38,61 +38,6 @@ namespace
 
     QApplication::clipboard()->setText(text.join(", "));
   }
-
-  bool ParseSpace(const std::string& space, std::array<std::string, 3>& result)
-  {
-    if (space == "left-posterior-superior") // Fast path as it is by far the most common
-    {
-      result[0] = "left";
-      result[1] = "posterior";
-      result[2] = "superior";
-      return true;
-    }
-
-    if (space.size() == 3) // Example: "RAS"
-    {
-      static const std::unordered_map<char, std::string> dict = {
-        { 'A', "anterior" },
-        { 'L', "left" },
-        { 'R', "right" },
-        { 'S', "superior" }
-      };
-
-      std::array<std::string, 3> labels;
-
-      for (size_t i = 0; i < 3; ++i)
-      {
-        const auto key = static_cast<char>(::toupper(space[i]));
-        auto it = dict.find(key);
-
-        if (it == dict.end())
-          return false;
-
-        labels[i] = it->second;
-      }
-
-      result = labels;
-
-      return true;
-    }
-
-    static const std::regex pattern(R"((\w+)-(\w+)-(\w+))");
-    std::smatch match;
-
-    if (std::regex_match(space, match, pattern)) // Example: "right-anterior-superior"
-    {
-      for (size_t i = 0; i < 3; ++i)
-      {
-        auto label = match[1 + i].str();
-        result[i].resize(label.size());
-        std::transform(label.begin(), label.end(), result[i].begin(), ::tolower);
-      }
-
-      return true;
-    }
-
-    return false;
-  }
 }
 
 const std::string QmitkPixelValueView::VIEW_ID = "org.mitk.views.pixelvalue";
@@ -277,32 +222,14 @@ void QmitkPixelValueView::Update()
 
 void QmitkPixelValueView::UpdateCoords(const mitk::Image* image, const itk::Index<3>& index, const mitk::Point3D& position)
 {
-  this->UpdateLabels(image);
-
   const auto dimension = image->GetDimension();
 
   this->UpdateIndexCoord(index, dimension);
   this->UpdateWorldCoord(position, dimension);
-}
 
-void QmitkPixelValueView::UpdateLabels(const mitk::BaseData* image)
-{
-  if (std::string space; image->GetPropertyList()->GetStringProperty("NRRD.space", space))
-  {
-    std::array<std::string, 3> labels;
+  const auto geometry = image->GetTimeGeometry();
 
-    if (ParseSpace(space, labels))
-    {
-      m_Ui->spaceXLabel->setText(QString::fromStdString(labels[0]));
-      m_Ui->spaceYLabel->setText(QString::fromStdString(labels[1]));
-      m_Ui->spaceZLabel->setText(QString::fromStdString(labels[2]));
-
-      this->ShowLabels();
-      return;
-    }
-  }
-
-  this->ShowLabels(false);
+  this->UpdateTimeStep(geometry);
 }
 
 void QmitkPixelValueView::UpdateIndexCoord(const itk::Index<3>& index, unsigned int dimension)
@@ -339,6 +266,30 @@ void QmitkPixelValueView::UpdateWorldCoord(const mitk::Point3D& position, unsign
   m_Ui->copyWorldCoordButton->setEnabled(true);
 }
 
+void QmitkPixelValueView::UpdateTimeStep(const mitk::TimeGeometry* geometry)
+{
+  const auto* renderingManager = mitk::RenderingManager::GetInstance();
+  const auto* timeNavController = renderingManager->GetTimeNavigationController();
+  const auto timePoint = timeNavController->GetSelectedTimePoint();
+
+  if (geometry->CountTimeSteps() <= 1 || !geometry->IsValidTimePoint(timePoint))
+  {
+    this->ShowTimeStep(false);
+    return;
+  }
+
+  const auto timeStep = geometry->TimePointToTimeStep(timePoint);
+  m_Ui->timeStepLineEdit->setText(QString::number(timeStep));
+
+  this->ShowTimeStep(true);
+}
+
+void QmitkPixelValueView::ShowTimeStep(bool show)
+{
+  m_Ui->timeStepLabel->setVisible(show);
+  m_Ui->timeStepLineEdit->setVisible(show);
+}
+
 void QmitkPixelValueView::Clear()
 {
   m_Ui->imageNameLineEdit->clear();
@@ -349,8 +300,6 @@ void QmitkPixelValueView::Clear()
 
 void QmitkPixelValueView::ClearCoords()
 {
-  this->ShowLabels(false);
-
   m_Ui->indexXLineEdit->clear();
   m_Ui->indexYLineEdit->clear();
   m_Ui->indexZLineEdit->clear();
@@ -362,15 +311,13 @@ void QmitkPixelValueView::ClearCoords()
   m_Ui->worldZLineEdit->clear();
 
   m_Ui->copyWorldCoordButton->setEnabled(false);
-}
 
-void QmitkPixelValueView::ShowLabels(bool show)
-{
-  m_Ui->spaceXLabel->setVisible(show);
-  m_Ui->spaceYLabel->setVisible(show);
-  m_Ui->spaceZLabel->setVisible(show);
+  m_Ui->timeStepLineEdit->clear();
+
+  this->ShowTimeStep(false);
 }
 
 void QmitkPixelValueView::SetFocus()
 {
+  m_Ui->pixelValueLineEdit->setFocus();
 }

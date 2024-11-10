@@ -175,9 +175,8 @@ void QmitkImageNavigatorView::SetBorderColors()
   if (m_RenderWindowPart == nullptr)
     return;
 
-  this->SetBorderColor(m_RenderWindowPart->GetQmitkRenderWindow("axial"));
-  this->SetBorderColor(m_RenderWindowPart->GetQmitkRenderWindow("sagittal"));
-  this->SetBorderColor(m_RenderWindowPart->GetQmitkRenderWindow("coronal"));
+  for (size_t i = 0; i < 3; ++i)
+    this->SetBorderColor(m_RenderWindowPart->GetQmitkRenderWindow(m_AxisUi[i].RenderWindowId));
 }
 
 QString QmitkImageNavigatorView::GetDecorationColorOfGeometry(QmitkRenderWindow* renderWindow)
@@ -235,9 +234,9 @@ void QmitkImageNavigatorView::OnRefetch()
 
   auto activeRenderWindow = m_RenderWindowPart->GetActiveQmitkRenderWindow();
   auto sliceNavController = activeRenderWindow->GetSliceNavigationController();
-  mitk::TimeGeometry::ConstPointer timeGeometry = sliceNavController->GetInputWorldTimeGeometry();
+  auto timeGeometry = sliceNavController->GetInputWorldTimeGeometry();
 
-  if (timeGeometry.IsNull())
+  if (timeGeometry == nullptr)
     return;
 
   const auto* timeNavController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
@@ -300,8 +299,7 @@ void QmitkImageNavigatorView::OnRefetch()
         /// See bug T22122. This check can be resolved after T22122 got fixed.
         if (rendererGeometry != nullptr)
         {
-          int dominantAxis =
-            itk::Function::Max3(invMatrix[0][axis], invMatrix[1][axis], invMatrix[2][axis]);
+          int dominantAxis = itk::Function::Max3(invMatrix[0][axis], invMatrix[1][axis], invMatrix[2][axis]);
 
           bool referenceGeometryAxisInverted = invMatrix[dominantAxis][axis] < 0;
           bool rendererZAxisInverted = rendererGeometry->GetAxisVector(2)[axis] < 0;

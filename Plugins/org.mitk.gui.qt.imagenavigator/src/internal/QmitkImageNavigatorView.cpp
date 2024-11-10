@@ -11,27 +11,26 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkImageNavigatorView.h"
+#include <ui_QmitkImageNavigatorView.h>
 
-#include <itkSpatialOrientationAdapter.h>
-
-#include <QmitkStepperAdapter.h>
 #include <QmitkRenderWindow.h>
+#include <QmitkStepperAdapter.h>
 
+#include <mitkPlaneGeometry.h>
 #include <mitkTimeGeometry.h>
 #include <mitkTimeNavigationController.h>
 
 #include <berryConstants.h>
-#include <mitkPlaneGeometry.h>
+
+#include <itkSpatialOrientationAdapter.h>
 
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 
 QmitkImageNavigatorView::QmitkImageNavigatorView()
-  : m_AxialStepperAdapter(nullptr)
-  , m_SagittalStepperAdapter(nullptr)
-  , m_CoronalStepperAdapter(nullptr)
-  , m_TimeStepperAdapter(nullptr)
-  , m_Parent(nullptr)
-  , m_IRenderWindowPart(nullptr)
+  : m_Ui(new Ui::QmitkImageNavigatorView),
+    m_TimeStepperAdapter(nullptr),
+    m_RenderWindowPart(nullptr),
+    m_Parent(nullptr)
 {
 }
 
@@ -41,153 +40,111 @@ QmitkImageNavigatorView::~QmitkImageNavigatorView()
 
 void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
 {
-  // create GUI widgets
+  using Self = QmitkImageNavigatorView;
+
   m_Parent = parent;
-  m_Controls.setupUi(parent);
+  m_Ui->setupUi(parent);
 
-  connect(m_Controls.m_XWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
-  connect(m_Controls.m_YWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
-  connect(m_Controls.m_ZWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
+  m_AxisUi = {{
+    { "coronal", m_Ui->xWorldCoordSpinBox, m_Ui->coronalLabel, m_Ui->coronalSliceNavWidget, nullptr },
+    { "sagittal", m_Ui->yWorldCoordSpinBox, m_Ui->sagittalLabel, m_Ui->sagittalSliceNavWidget, nullptr },
+    { "axial", m_Ui->zWorldCoordSpinBox, m_Ui->axialLabel, m_Ui->axialSliceNavWidget, nullptr }
+  }};
 
-  m_Parent->setEnabled(false);
+  for (const auto& axisControls : m_AxisUi)
+    connect(axisControls.SpinBox, &QDoubleSpinBox::valueChanged, this, &Self::OnCoordValueChanged);
 
-  mitk::IRenderWindowPart* renderPart = this->GetRenderWindowPart();
-  this->RenderWindowPartActivated(renderPart);
+  parent->setEnabled(false);
 
-  auto* timeController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+  this->RenderWindowPartActivated(this->GetRenderWindowPart());
+
+  auto timeController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
 
   if (m_TimeStepperAdapter)
-  {
     m_TimeStepperAdapter->deleteLater();
-  }
 
-  m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls.m_TimeSliceNavigationWidget,
-                                                 timeController->GetStepper());
-  m_Controls.m_TimeSliceNavigationWidget->setEnabled(true);
-  m_Controls.m_TimeLabel->setEnabled(true);
-  connect(m_TimeStepperAdapter, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+  m_TimeStepperAdapter = new QmitkStepperAdapter(m_Ui->timeSliceNavWidget, timeController->GetStepper());
+
+  m_Ui->timeSliceNavWidget->setEnabled(true);
+  m_Ui->timeLabel->setEnabled(true);
+
+  connect(m_TimeStepperAdapter, &QmitkStepperAdapter::Refetch, this, &Self::OnRefetch);
 }
 
-void QmitkImageNavigatorView::SetFocus ()
+void QmitkImageNavigatorView::SetFocus()
 {
-  m_Controls.m_XWorldCoordinateSpinBox->setFocus();
+  m_Ui->xWorldCoordSpinBox->setFocus();
 }
 
 void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  if (this->m_IRenderWindowPart != renderWindowPart)
+  if (m_RenderWindowPart != renderWindowPart)
   {
-    this->m_IRenderWindowPart = renderWindowPart;
-    this->m_Parent->setEnabled(true);
+    m_RenderWindowPart = renderWindowPart;
+    m_Parent->setEnabled(true);
 
-    QmitkRenderWindow* renderWindow = renderWindowPart->GetQmitkRenderWindow("axial");
-    if (renderWindow)
+    for (size_t i = 0; i < 3; ++i)
     {
-      if (m_AxialStepperAdapter)
-        m_AxialStepperAdapter->deleteLater();
+      auto renderWindow = renderWindowPart->GetQmitkRenderWindow(m_AxisUi[i].RenderWindowId);
+      const bool hasRenderWindow = renderWindow != nullptr;
 
-      m_AxialStepperAdapter = new QmitkStepperAdapter(m_Controls.m_AxialSliceNavigationWidget,
-                                                      renderWindow->GetSliceNavigationController()->GetStepper());
-      m_Controls.m_AxialSliceNavigationWidget->setEnabled(true);
-      m_Controls.m_AxialLabel->setEnabled(true);
-      m_Controls.m_ZWorldCoordinateSpinBox->setEnabled(true);
-      connect(m_AxialStepperAdapter, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
-    }
-    else
-    {
-      m_Controls.m_AxialSliceNavigationWidget->setEnabled(false);
-      m_Controls.m_AxialLabel->setEnabled(false);
-      m_Controls.m_ZWorldCoordinateSpinBox->setEnabled(false);
-    }
+      if (hasRenderWindow)
+      {
+        if (m_AxisUi[i].StepperAdapter != nullptr)
+          m_AxisUi[i].StepperAdapter->deleteLater();
 
-    renderWindow = renderWindowPart->GetQmitkRenderWindow("sagittal");
-    if (renderWindow)
-    {
-      if (m_SagittalStepperAdapter)
-        m_SagittalStepperAdapter->deleteLater();
-      m_SagittalStepperAdapter = new QmitkStepperAdapter(m_Controls.m_SagittalSliceNavigationWidget,
-                                                         renderWindow->GetSliceNavigationController()->GetStepper());
-      m_Controls.m_SagittalSliceNavigationWidget->setEnabled(true);
-      m_Controls.m_SagittalLabel->setEnabled(true);
-      m_Controls.m_YWorldCoordinateSpinBox->setEnabled(true);
-      connect(m_SagittalStepperAdapter, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
-    }
-    else
-    {
-      m_Controls.m_SagittalSliceNavigationWidget->setEnabled(false);
-      m_Controls.m_SagittalLabel->setEnabled(false);
-      m_Controls.m_YWorldCoordinateSpinBox->setEnabled(false);
-    }
+        m_AxisUi[i].StepperAdapter = new QmitkStepperAdapter(
+          m_AxisUi[i].SliceNavWidget, renderWindow->GetSliceNavigationController()->GetStepper());
 
-    renderWindow = renderWindowPart->GetQmitkRenderWindow("coronal");
-    if (renderWindow)
-    {
-      if (m_CoronalStepperAdapter)
-        m_CoronalStepperAdapter->deleteLater();
-      m_CoronalStepperAdapter = new QmitkStepperAdapter(m_Controls.m_CoronalSliceNavigationWidget,
-                                                        renderWindow->GetSliceNavigationController()->GetStepper());
-      m_Controls.m_CoronalSliceNavigationWidget->setEnabled(true);
-      m_Controls.m_CoronalLabel->setEnabled(true);
-      m_Controls.m_XWorldCoordinateSpinBox->setEnabled(true);
-      connect(m_CoronalStepperAdapter, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
-    }
-    else
-    {
-      m_Controls.m_CoronalSliceNavigationWidget->setEnabled(false);
-      m_Controls.m_CoronalLabel->setEnabled(false);
-      m_Controls.m_XWorldCoordinateSpinBox->setEnabled(false);
+        connect(m_AxisUi[i].StepperAdapter, &QmitkStepperAdapter::Refetch, this, &QmitkImageNavigatorView::OnRefetch);
+      }
+
+      m_AxisUi[i].SliceNavWidget->setEnabled(hasRenderWindow);
+      m_AxisUi[i].Label->setEnabled(hasRenderWindow);
+      m_AxisUi[i].SpinBox->setEnabled(hasRenderWindow);
     }
 
     this->OnRefetch();
   }
 }
 
-void QmitkImageNavigatorView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
+void QmitkImageNavigatorView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
-  m_IRenderWindowPart = nullptr;
+  m_RenderWindowPart = nullptr;
   m_Parent->setEnabled(false);
 }
 
 int QmitkImageNavigatorView::GetSizeFlags(bool width)
 {
-  if(!width)
-  {
-    return berry::Constants::MIN | berry::Constants::MAX | berry::Constants::FILL;
-  }
-  else
-  {
-    return 0;
-  }
+  return !width
+    ? berry::Constants::MIN | berry::Constants::MAX | berry::Constants::FILL
+    : 0;
 }
 
-int QmitkImageNavigatorView::ComputePreferredSize(bool width, int /*availableParallel*/, int /*availablePerpendicular*/, int preferredResult)
+int QmitkImageNavigatorView::ComputePreferredSize(bool width, int, int, int preferredResult)
 {
-  if(width==false)
-  {
-    return 200;
-  }
-  else
-  {
-    return preferredResult;
-  }
+  return width
+    ? preferredResult
+    : 200;
 }
 
-int QmitkImageNavigatorView::GetClosestAxisIndex(mitk::Vector3D normal)
+int QmitkImageNavigatorView::GetClosestAxisIndex(const mitk::Vector3D& normal)
 {
   // cos(theta) = normal . axis
   // cos(theta) = (a, b, c) . (d, e, f)
   // cos(theta) = (a, b, c) . (1, 0, 0) = a
   // cos(theta) = (a, b, c) . (0, 1, 0) = b
   // cos(theta) = (a, b, c) . (0, 0, 1) = c
-  double absCosThetaWithAxis[3];
 
-  for (int i = 0; i < 3; i++)
-  {
-    absCosThetaWithAxis[i] = fabs(normal[i]);
-  }
+  std::array<double, 3> absCosThetaWithAxis;
+
+  for (int i = 0; i < 3; ++i)
+    absCosThetaWithAxis[i] = std::fabs(normal[i]);
+
   int largestIndex = 0;
   double largestValue = absCosThetaWithAxis[0];
-  for (int i = 1; i < 3; i++)
+
+  for (int i = 1; i < 3; ++i)
   {
     if (absCosThetaWithAxis[i] > largestValue)
     {
@@ -195,211 +152,159 @@ int QmitkImageNavigatorView::GetClosestAxisIndex(mitk::Vector3D normal)
       largestIndex = i;
     }
   }
+
   return largestIndex;
+}
+
+void QmitkImageNavigatorView::SetBorderColor(QmitkRenderWindow* renderWindow)
+{
+  if (renderWindow == nullptr)
+    return;
+
+  if (auto planeGeometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry(); planeGeometry != nullptr)
+  {
+    int axis = this->GetClosestAxisIndex(planeGeometry->GetNormal());
+    const auto hexColor = this->GetDecorationColorOfGeometry(renderWindow);
+
+    this->SetBorderColor(axis, hexColor);
+  }
 }
 
 void QmitkImageNavigatorView::SetBorderColors()
 {
-  if (m_IRenderWindowPart)
-  {
-    QString decoColor;
+  if (m_RenderWindowPart == nullptr)
+    return;
 
-    QmitkRenderWindow* renderWindow = m_IRenderWindowPart->GetQmitkRenderWindow("axial");
-    if (renderWindow)
-    {
-      decoColor = GetDecorationColorOfGeometry(renderWindow);
-      mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-      if (geometry.IsNotNull())
-      {
-        mitk::Vector3D normal = geometry->GetNormal();
-        int axis = this->GetClosestAxisIndex(normal);
-        this->SetBorderColor(axis, decoColor);
-      }
-    }
-
-    renderWindow = m_IRenderWindowPart->GetQmitkRenderWindow("sagittal");
-    if (renderWindow)
-    {
-      decoColor = GetDecorationColorOfGeometry(renderWindow);
-      mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-      if (geometry.IsNotNull())
-      {
-        mitk::Vector3D normal = geometry->GetNormal();
-        int axis = this->GetClosestAxisIndex(normal);
-        this->SetBorderColor(axis, decoColor);
-      }
-    }
-
-    renderWindow = m_IRenderWindowPart->GetQmitkRenderWindow("coronal");
-    if (renderWindow)
-    {
-      decoColor = GetDecorationColorOfGeometry(renderWindow);
-      mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-      if (geometry.IsNotNull())
-      {
-        mitk::Vector3D normal = geometry->GetNormal();
-        int axis = this->GetClosestAxisIndex(normal);
-        this->SetBorderColor(axis, decoColor);
-      }
-    }
-  }
+  this->SetBorderColor(m_RenderWindowPart->GetQmitkRenderWindow("axial"));
+  this->SetBorderColor(m_RenderWindowPart->GetQmitkRenderWindow("sagittal"));
+  this->SetBorderColor(m_RenderWindowPart->GetQmitkRenderWindow("coronal"));
 }
 
 QString QmitkImageNavigatorView::GetDecorationColorOfGeometry(QmitkRenderWindow* renderWindow)
 {
-  QColor color;
-  float rgb[3] = {1.0f, 1.0f, 1.0f};
-  float rgbMax = 255.0f;
-  mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow())->GetCurrentWorldPlaneGeometryNode()->GetColor(rgb);
-  color.setRed(static_cast<int>(rgb[0]*rgbMax + 0.5));
-  color.setGreen(static_cast<int>(rgb[1]*rgbMax + 0.5));
-  color.setBlue(static_cast<int>(rgb[2]*rgbMax + 0.5));
-  QString colorAsString = QString(color.name());
-  return colorAsString;
+  std::array<float, 3> rgb = { 1.0f, 1.0f, 1.0f };
+  const float RGB_MAX = 255.0f;
+
+  auto baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow());
+  baseRenderer->GetCurrentWorldPlaneGeometryNode()->GetColor(rgb.data());
+
+  QColor color(
+    static_cast<int>(rgb[0] * RGB_MAX + 0.5f),
+    static_cast<int>(rgb[1] * RGB_MAX + 0.5f),
+    static_cast<int>(rgb[2] * RGB_MAX + 0.5f));
+
+  return color.name();
 }
 
-void QmitkImageNavigatorView::SetBorderColor(int axis, QString colorAsStyleSheetString)
+void QmitkImageNavigatorView::SetBorderColor(int axis, const QString& hexColor)
 {
-  if (axis == 0)
-  {
-    this->SetBorderColor(m_Controls.m_XWorldCoordinateSpinBox, colorAsStyleSheetString);
-  }
-  else if (axis == 1)
-  {
-    this->SetBorderColor(m_Controls.m_YWorldCoordinateSpinBox, colorAsStyleSheetString);
-  }
-  else if (axis == 2)
-  {
-    this->SetBorderColor(m_Controls.m_ZWorldCoordinateSpinBox, colorAsStyleSheetString);
-  }
+  if (axis >= 0 && axis < 3)
+    this->SetBorderColor(m_AxisUi[axis].SpinBox, hexColor);
 }
 
-void QmitkImageNavigatorView::SetBorderColor(QDoubleSpinBox *spinBox, QString colorAsStyleSheetString)
+void QmitkImageNavigatorView::SetBorderColor(QDoubleSpinBox* spinBox, const QString& hexColor)
 {
-  assert(spinBox);
-  spinBox->setStyleSheet(QString("border: 2px solid ") + colorAsStyleSheetString + ";");
+  if (spinBox != nullptr)
+    spinBox->setStyleSheet(QString("border: 2px solid ") + hexColor + ";");
 }
 
-void QmitkImageNavigatorView::OnMillimetreCoordinateValueChanged()
+void QmitkImageNavigatorView::OnCoordValueChanged()
 {
-  if (m_IRenderWindowPart)
+  if (m_RenderWindowPart != nullptr)
   {
-    mitk::TimeGeometry::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+    auto activeRenderWindow = m_RenderWindowPart->GetActiveQmitkRenderWindow();
+    auto sliceNavController = activeRenderWindow->GetSliceNavigationController();
+    mitk::TimeGeometry::ConstPointer geometry = sliceNavController->GetInputWorldTimeGeometry();
 
     if (geometry.IsNotNull())
     {
       mitk::Point3D positionInWorldCoordinates;
-      positionInWorldCoordinates[0] = m_Controls.m_XWorldCoordinateSpinBox->value();
-      positionInWorldCoordinates[1] = m_Controls.m_YWorldCoordinateSpinBox->value();
-      positionInWorldCoordinates[2] = m_Controls.m_ZWorldCoordinateSpinBox->value();
 
-      m_IRenderWindowPart->SetSelectedPosition(positionInWorldCoordinates);
+      for (size_t i = 0; i < 3; ++i)
+        positionInWorldCoordinates[i] = m_AxisUi[i].SpinBox->value();
+
+      m_RenderWindowPart->SetSelectedPosition(positionInWorldCoordinates);
     }
   }
 }
 
 void QmitkImageNavigatorView::OnRefetch()
 {
-  if (nullptr == m_IRenderWindowPart)
-  {
+  if (m_RenderWindowPart == nullptr)
     return;
-  }
 
-  mitk::TimeGeometry::ConstPointer timeGeometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+  auto activeRenderWindow = m_RenderWindowPart->GetActiveQmitkRenderWindow();
+  auto sliceNavController = activeRenderWindow->GetSliceNavigationController();
+  mitk::TimeGeometry::ConstPointer timeGeometry = sliceNavController->GetInputWorldTimeGeometry();
 
   if (timeGeometry.IsNull())
-  {
     return;
-  }
 
-  const auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
-  this->SetVisibilityOfTimeSlider(timeNavigationController->GetStepper()->GetSteps());
-  const mitk::TimeStepType timeStep = timeNavigationController->GetSelectedTimeStep();
-  mitk::BaseGeometry::Pointer geometry = timeGeometry->GetGeometryForTimeStep(timeStep);
+  const auto* timeNavController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+
+  this->SetVisibilityOfTimeSlider(timeNavController->GetStepper()->GetSteps());
+
+  const auto timeStep = timeNavController->GetSelectedTimeStep();
+  auto geometry = timeGeometry->GetGeometryForTimeStep(timeStep);
+
   if (geometry.IsNotNull())
   {
-    mitk::BoundingBox::BoundsArrayType bounds = geometry->GetBounds();
+    auto bounds = geometry->GetBounds();
 
-    mitk::Point3D cornerPoint1InIndexCoordinates;
-    cornerPoint1InIndexCoordinates[0] = bounds[0];
-    cornerPoint1InIndexCoordinates[1] = bounds[2];
-    cornerPoint1InIndexCoordinates[2] = bounds[4];
-
-    mitk::Point3D cornerPoint2InIndexCoordinates;
-    cornerPoint2InIndexCoordinates[0] = bounds[1];
-    cornerPoint2InIndexCoordinates[1] = bounds[3];
-    cornerPoint2InIndexCoordinates[2] = bounds[5];
+    auto indexCornerPts = std::make_pair(
+      mitk::Point3D(bounds[0], bounds[2], bounds[4]),
+      mitk::Point3D(bounds[1], bounds[3], bounds[5])
+    );
 
     if (!geometry->GetImageGeometry())
     {
-      cornerPoint1InIndexCoordinates[0] += 0.5;
-      cornerPoint1InIndexCoordinates[1] += 0.5;
-      cornerPoint1InIndexCoordinates[2] += 0.5;
-      cornerPoint2InIndexCoordinates[0] -= 0.5;
-      cornerPoint2InIndexCoordinates[1] -= 0.5;
-      cornerPoint2InIndexCoordinates[2] -= 0.5;
+      indexCornerPts.first += mitk::Vector3D(0.5);
+      indexCornerPts.second -= mitk::Vector3D(0.5);
     }
 
-    mitk::Point3D crossPositionInWorldCoordinates = m_IRenderWindowPart->GetSelectedPosition();
+    std::pair<mitk::Point3D, mitk::Point3D> worldCornerPts;
+    geometry->IndexToWorld(indexCornerPts.first, worldCornerPts.first);
+    geometry->IndexToWorld(indexCornerPts.second, worldCornerPts.second);
 
-    mitk::Point3D cornerPoint1InWorldCoordinates;
-    mitk::Point3D cornerPoint2InWorldCoordinates;
+    auto worldCrossPos = m_RenderWindowPart->GetSelectedPosition();
 
-    geometry->IndexToWorld(cornerPoint1InIndexCoordinates, cornerPoint1InWorldCoordinates);
-    geometry->IndexToWorld(cornerPoint2InIndexCoordinates, cornerPoint2InWorldCoordinates);
-
-    m_Controls.m_XWorldCoordinateSpinBox->blockSignals(true);
-    m_Controls.m_YWorldCoordinateSpinBox->blockSignals(true);
-    m_Controls.m_ZWorldCoordinateSpinBox->blockSignals(true);
-
-    m_Controls.m_XWorldCoordinateSpinBox->setMinimum(
-      std::min(cornerPoint1InWorldCoordinates[0], cornerPoint2InWorldCoordinates[0]));
-    m_Controls.m_YWorldCoordinateSpinBox->setMinimum(
-      std::min(cornerPoint1InWorldCoordinates[1], cornerPoint2InWorldCoordinates[1]));
-    m_Controls.m_ZWorldCoordinateSpinBox->setMinimum(
-      std::min(cornerPoint1InWorldCoordinates[2], cornerPoint2InWorldCoordinates[2]));
-    m_Controls.m_XWorldCoordinateSpinBox->setMaximum(
-      std::max(cornerPoint1InWorldCoordinates[0], cornerPoint2InWorldCoordinates[0]));
-    m_Controls.m_YWorldCoordinateSpinBox->setMaximum(
-      std::max(cornerPoint1InWorldCoordinates[1], cornerPoint2InWorldCoordinates[1]));
-    m_Controls.m_ZWorldCoordinateSpinBox->setMaximum(
-      std::max(cornerPoint1InWorldCoordinates[2], cornerPoint2InWorldCoordinates[2]));
-
-    m_Controls.m_XWorldCoordinateSpinBox->setValue(crossPositionInWorldCoordinates[0]);
-    m_Controls.m_YWorldCoordinateSpinBox->setValue(crossPositionInWorldCoordinates[1]);
-    m_Controls.m_ZWorldCoordinateSpinBox->setValue(crossPositionInWorldCoordinates[2]);
-
-    m_Controls.m_XWorldCoordinateSpinBox->blockSignals(false);
-    m_Controls.m_YWorldCoordinateSpinBox->blockSignals(false);
-    m_Controls.m_ZWorldCoordinateSpinBox->blockSignals(false);
+    for (size_t i = 0; i < 3; ++i)
+    {
+      m_AxisUi[i].SpinBox->blockSignals(true);
+      m_AxisUi[i].SpinBox->setMinimum(std::min(worldCornerPts.first[i], worldCornerPts.second[i]));
+      m_AxisUi[i].SpinBox->setMaximum(std::max(worldCornerPts.first[i], worldCornerPts.second[i]));
+      m_AxisUi[i].SpinBox->setValue(worldCrossPos[i]);
+      m_AxisUi[i].SpinBox->blockSignals(false);
+    }
 
     /// Calculating 'inverse direction' property.
 
-    mitk::AffineTransform3D::MatrixType matrix = geometry->GetIndexToWorldTransform()->GetMatrix();
+    auto matrix = geometry->GetIndexToWorldTransform()->GetMatrix();
     matrix.GetVnlMatrix().normalize_columns();
-    mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
 
-    for (int worldAxis = 0; worldAxis < 3; ++worldAxis)
+    auto invMatrix = matrix.GetInverse();
+
+    for (int axis = 0; axis < 3; ++axis)
     {
-      QmitkRenderWindow *renderWindow = worldAxis == 0 ? m_IRenderWindowPart->GetQmitkRenderWindow("sagittal") :
-                                        worldAxis == 1 ? m_IRenderWindowPart->GetQmitkRenderWindow("coronal") :
-                                                         m_IRenderWindowPart->GetQmitkRenderWindow("axial");
+      auto renderWindow = axis == 0 ? m_RenderWindowPart->GetQmitkRenderWindow("sagittal") :
+                          axis == 1 ? m_RenderWindowPart->GetQmitkRenderWindow("coronal") :
+                                      m_RenderWindowPart->GetQmitkRenderWindow("axial");
 
-      if (renderWindow)
+      if (renderWindow != nullptr)
       {
-        const mitk::BaseGeometry* rendererGeometry = renderWindow->GetRenderer()->GetCurrentWorldGeometry();
+        auto rendererGeometry = renderWindow->GetRenderer()->GetCurrentWorldGeometry();
 
         /// Because of some problems with the current way of event signalling,
         /// 'Modified' events are sent out from the stepper while the renderer
         /// does not have a geometry yet. Therefore, we do a nullptr check here.
         /// See bug T22122. This check can be resolved after T22122 got fixed.
-        if (rendererGeometry)
+        if (rendererGeometry != nullptr)
         {
           int dominantAxis =
-            itk::Function::Max3(inverseMatrix[0][worldAxis], inverseMatrix[1][worldAxis], inverseMatrix[2][worldAxis]);
+            itk::Function::Max3(invMatrix[0][axis], invMatrix[1][axis], invMatrix[2][axis]);
 
-          bool referenceGeometryAxisInverted = inverseMatrix[dominantAxis][worldAxis] < 0;
-          bool rendererZAxisInverted = rendererGeometry->GetAxisVector(2)[worldAxis] < 0;
+          bool referenceGeometryAxisInverted = invMatrix[dominantAxis][axis] < 0;
+          bool rendererZAxisInverted = rendererGeometry->GetAxisVector(2)[axis] < 0;
 
           /// `referenceGeometryAxisInverted` tells if the direction of the corresponding axis
           /// of the reference geometry is flipped compared to the 'world direction' or not.
@@ -430,10 +335,10 @@ void QmitkImageNavigatorView::OnRefetch()
 
           bool inverseDirection = referenceGeometryAxisInverted != rendererZAxisInverted;
 
-          QmitkSliceNavigationWidget* sliceNavigationWidget =
-            worldAxis == 0 ? m_Controls.m_SagittalSliceNavigationWidget :
-            worldAxis == 1 ? m_Controls.m_CoronalSliceNavigationWidget :
-                             m_Controls.m_AxialSliceNavigationWidget;
+          auto sliceNavigationWidget =
+            axis == 0 ? m_Ui->sagittalSliceNavWidget :
+            axis == 1 ? m_Ui->coronalSliceNavWidget :
+                        m_Ui->axialSliceNavWidget;
 
           sliceNavigationWidget->SetInverseDirection(inverseDirection);
 
@@ -450,6 +355,8 @@ void QmitkImageNavigatorView::OnRefetch()
 
 void QmitkImageNavigatorView::SetVisibilityOfTimeSlider(std::size_t timeSteps)
 {
-  m_Controls.m_TimeSliceNavigationWidget->setVisible(timeSteps > 1);
-  m_Controls.m_TimeLabel->setVisible(timeSteps > 1);
+  bool isVisible = timeSteps > 1;
+
+  m_Ui->timeSliceNavWidget->setVisible(isVisible);
+  m_Ui->timeLabel->setVisible(isVisible);
 }

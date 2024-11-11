@@ -70,7 +70,7 @@ set(MOC_H_FILES
 
 set(UI_FILES
   src/QmitkPreferencesDialog.ui
-
+  src/internal/QmitkEditorsPreferencePage.ui
   src/internal/QmitkToolBarsPreferencePage.ui
 )
 

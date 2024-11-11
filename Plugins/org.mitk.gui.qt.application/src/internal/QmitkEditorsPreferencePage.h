@@ -14,9 +14,13 @@ found in the LICENSE file.
 #ifndef QmitkEditorsPreferencePage_h
 #define QmitkEditorsPreferencePage_h
 
-#include "berryIQtPreferencePage.h"
+#include <berryIQtPreferencePage.h>
+#include <QScopedPointer>
 
-class QWidget;
+namespace Ui
+{
+  class QmitkEditorsPreferencePage;
+}
 
 class QmitkEditorsPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -24,46 +28,19 @@ class QmitkEditorsPreferencePage : public QObject, public berry::IQtPreferencePa
   Q_INTERFACES(berry::IPreferencePage)
 
 public:
-
-  /**
-  * Default constructor
-  */
   QmitkEditorsPreferencePage();
+  ~QmitkEditorsPreferencePage() override;
 
-  /**
-  * @see berry::IPreferencePage::Init(berry::IWorkbench::Pointer workbench)
-  */
   void Init(berry::IWorkbench::Pointer workbench) override;
-
-  /**
-  * @see berry::IPreferencePage::CreateQtControl(void* parent)
-  */
   void CreateQtControl(QWidget* widget) override;
-
-  /**
-  * @see berry::IPreferencePage::CreateQtControl()
-  */
   QWidget* GetQtControl() const override;
-
-  /**
-  * @see berry::IPreferencePage::PerformOk()
-  */
   bool PerformOk() override;
-
-  /**
-  * @see berry::IPreferencePage::PerformCancel()
-  */
   void PerformCancel() override;
-
-   /**
-  * @see berry::IPreferencePage::Update()
-  */
   void Update() override;
 
-protected:
-
-  QWidget* m_MainControl;
-
+private:
+  QWidget* m_Control;
+  QScopedPointer<Ui::QmitkEditorsPreferencePage> m_Ui;
 };
 
 #endif

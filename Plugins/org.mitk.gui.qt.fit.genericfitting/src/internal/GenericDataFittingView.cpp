@@ -227,7 +227,7 @@ void GenericDataFittingView::OnModellSet(int index)
     }
 
     m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
-      m_selectedModelFactory->GetDefaultInitialParameterization());
+      m_selectedModelFactory->GetDefaultInitialParameterization(), m_selectedModelFactory->GetParameterUnits() );
 
     m_Controls.constraintManager->setChecker(this->m_modelConstraints,
       this->m_selectedModelFactory->GetParameterNames());
@@ -248,6 +248,7 @@ void GenericDataFittingView::PrepareFitConfiguration()
   if (m_selectedModelFactory)
   {
     mitk::ModelBase::ParameterNamesType paramNames = m_selectedModelFactory->GetParameterNames();
+    mitk::ModelBase::ParamterUnitMapType paramUnits = m_selectedModelFactory->GetParameterUnits();
     unsigned int nrOfPools = this->m_Controls.nrOfParams->value();
 
     //init values
@@ -258,12 +259,13 @@ void GenericDataFittingView::PrepareFitConfiguration()
 
       auto parameterizer = m_selectedModelFactory->CreateParameterizer(fitInfo);
       paramNames = parameterizer->GetParameterNames();
+      paramUnits = parameterizer->GetParameterUnits();
 
-      m_Controls.initialValuesManager->setInitialValues(paramNames, parameterizer->GetDefaultInitialParameterization());
+      m_Controls.initialValuesManager->setInitialValues(paramNames, parameterizer->GetDefaultInitialParameterization(), paramUnits);
     }
     else
     {
-      m_Controls.initialValuesManager->setInitialValues(paramNames, this->m_selectedModelFactory->GetDefaultInitialParameterization());
+      m_Controls.initialValuesManager->setInitialValues(paramNames, this->m_selectedModelFactory->GetDefaultInitialParameterization(), paramUnits);
     }
 
     //constraints

@@ -241,7 +241,7 @@ void PETDynamicView::OnModellSet(int index)
                                (m_selectedModelFactory->CreateDefaultConstraints().GetPointer());
 
     m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
-        m_selectedModelFactory->GetDefaultInitialParameterization());
+        m_selectedModelFactory->GetDefaultInitialParameterization(), m_selectedModelFactory->GetParameterUnits());
 
     if (this->m_modelConstraints.IsNull())
     {

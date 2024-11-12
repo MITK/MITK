@@ -23,6 +23,7 @@ mitk_create_module(
       GrowCut
       ITKLabelMap
       ITKMathematicalMorphology
+      OpenMP::OpenMP_CXX
       VTK::ImagingGeneral
 )
 

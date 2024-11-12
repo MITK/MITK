@@ -189,8 +189,11 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="toolTip">
+      <string>Common time step of all images (see the Pixel Value plugin for specific image time steps).</string>
+     </property>
      <property name="text">
-      <string>Time</string>
+      <string>Time step</string>
      </property>
     </widget>
    </item>

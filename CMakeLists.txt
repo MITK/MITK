@@ -207,7 +207,7 @@ endforeach()
 
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_OpenMP "Use OpenMP" OFF)
-option(MITK_USE_Python3 "Use Python 3" OFF)
+option(MITK_USE_Python3 "Use Python 3" ON)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -1064,7 +1064,7 @@ add_subdirectory(Utilities)
 
 set(MITK_WRAP_PYTHON_ENABLED OFF)
 if(MITK_USE_SWIG AND MITK_USE_Python3)
-  find_package(SWIG 4.2.0 COMPONENTS python)
+  find_package(SWIG 4.3.0 COMPONENTS python)
 
   if(SWIG_FOUND)
     option(MITK_WRAP_PYTHON "" ON)

@@ -6,7 +6,7 @@ if(MITK_USE_SWIG)
     message(FATAL_ERROR "SWIG_DIR variable is defined but corresponds to non-existing directory")
   endif()
 
-  set(SWIG_TARGET_VERSION 4.2.0)
+  set(SWIG_TARGET_VERSION 4.3.0)
   set(proj SWIG)
   if(WIN32)
     set(proj_DEPENDENCIES)

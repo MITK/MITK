@@ -98,7 +98,15 @@ namespace mitk
       {
         this->SetElement(var, vnlVectorFixed[var]);
       }
-    };
+    }
+
+    template <typename... Args,
+              typename = std::enable_if_t<(sizeof...(Args) == NVectorDimension)>>
+    explicit Vector(Args... args)
+    {
+      size_t i = 0;
+      ((this->GetDataPointer()[i++] = static_cast<TCoordRep>(args)), ...);
+    }
 
     /**
      * Copies the elements from array array to this.

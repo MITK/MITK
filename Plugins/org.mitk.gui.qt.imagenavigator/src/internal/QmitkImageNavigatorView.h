@@ -74,7 +74,7 @@ private:
   void OnRefetch();
 
   void SetBorderColors();
-  void SetBorderColor(QDoubleSpinBox *spinBox, const QString& hexColor);
+  void SetBorderColor(QDoubleSpinBox* spinBox, const QString& hexColor);
   void SetBorderColor(int axis, const QString& hexColor);
   void SetBorderColor(QmitkRenderWindow* renderWindow);
 

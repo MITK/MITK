@@ -418,9 +418,9 @@ void mitk::SegTool2D::PushCursor(us::ModuleResource cursorResource)
   }
 }
 
-void mitk::SegTool2D::PopCursor()
+void mitk::SegTool2D::PopCursor(bool popFirstCursor)
 {
-  if (m_NumPushedCursors > 0)
+  if ((popFirstCursor && m_NumPushedCursors > 0) || m_NumPushedCursors > 1)
   {
     ApplicationCursor::GetInstance()->PopCursor();
     --m_NumPushedCursors;
@@ -430,7 +430,7 @@ void mitk::SegTool2D::PopCursor()
 void mitk::SegTool2D::PopAllCursors()
 {
   while (m_NumPushedCursors > 0)
-    this->PopCursor();
+    this->PopCursor(true);
 }
 
 void mitk::SegTool2D::Activated()

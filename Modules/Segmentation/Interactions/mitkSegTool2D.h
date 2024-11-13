@@ -268,7 +268,7 @@ namespace mitk
 
     void PushCursor();
     void PushCursor(us::ModuleResource cursorResource);
-    void PopCursor();
+    void PopCursor(bool popFirstCursor = false);
     void PopAllCursors();
 
   private:

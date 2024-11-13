@@ -56,3 +56,19 @@ const char *mitk::ErasePaintbrushTool::GetName() const
 {
   return "Wipe";
 }
+
+void mitk::ErasePaintbrushTool::OnInvertLogic(StateMachineAction* action, InteractionEvent* event)
+{
+  Superclass::OnInvertLogic(action, event);
+
+  if (m_FillMode)
+  {
+    auto module = us::GetModuleContext()->GetModule();
+    auto cursorResource = module->GetResource("Paint_Cursor.svg");
+    this->PushCursor(cursorResource);
+  }
+  else
+  {
+    this->PopCursor();
+  }
+}

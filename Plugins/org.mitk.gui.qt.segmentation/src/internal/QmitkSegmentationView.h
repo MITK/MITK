@@ -130,10 +130,6 @@ private:
 
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  void ResetMouseCursor();
-
-  void SetMouseCursor(const us::ModuleResource&, int hotspotX, int hotspotY);
-
   void UpdateGUI();
 
   void ValidateSelectionInput();

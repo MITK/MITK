@@ -42,91 +42,20 @@ mitk::GenericParamModel::GenericParamModel(): m_FunctionString(""), m_NumberOfPa
 mitk::GenericParamModel::ParameterNamesType
 mitk::GenericParamModel::GetParameterNames() const
 {
-  ParameterNamesType result;
-  result.push_back("a");
-
-  if (m_NumberOfParameters > 1)
-  {
-    result.push_back("b");
-  }
-  if (m_NumberOfParameters > 2)
-  {
-    result.push_back("c");
-  }
-  if (m_NumberOfParameters > 3)
-  {
-    result.push_back("d");
-  }
-  if (m_NumberOfParameters > 4)
-  {
-    result.push_back("e");
-  }
-  if (m_NumberOfParameters > 5)
-  {
-    result.push_back("f");
-  }
-  if (m_NumberOfParameters > 6)
-  {
-    result.push_back("g");
-  }
-  if (m_NumberOfParameters > 7)
-  {
-    result.push_back("h");
-  }
-  if (m_NumberOfParameters > 8)
-  {
-    result.push_back("i");
-  }
-  if (m_NumberOfParameters > 9)
-  {
-    result.push_back("j");
-  }
-
-  return result;
+  ParameterNamesType parameterNames = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
+  if (parameterNames.size()<m_NumberOfParameters) mitkThrow() << "Invalid internal state. Number of parameters is larger then predefined names count."
+  parameterNames.resize(m_NumberOfParameters);
+  return parameterNames;
 };
 
 mitk::GenericParamModel::ParamterUnitMapType mitk::GenericParamModel::GetParameterUnits() const
 {
   ParamterUnitMapType result;
-  result.insert(std::make_pair("a", "[unit of a]"));
-
-  if (m_NumberOfParameters > 1)
+  std::vectorstd::string parameterNames = this->GetParameterNames();
+  for (int i = 0; i < parameterNames.size(); ++i) 
   {
-    result.insert(std::make_pair("b", "[unit of b]"));
+    result.insert(std::make_pair(parameterNames[i], "[unit of " + parameterNames[i] + "]"));
   }
-  if (m_NumberOfParameters > 2)
-  {
-    result.insert(std::make_pair("c", "[unit of c]"));
-  }
-  if (m_NumberOfParameters > 3)
-  {
-    result.insert(std::make_pair("d", "[unit of d]"));
-  }
-  if (m_NumberOfParameters > 4)
-  {
-    result.insert(std::make_pair("e", "[unit of e]"));
-  }
-  if (m_NumberOfParameters > 5)
-  {
-    result.insert(std::make_pair("f", "[unit of f]"));
-  }
-  if (m_NumberOfParameters > 6)
-  {
-    result.insert(std::make_pair("g", "[unit of g]"));
-  }
-  if (m_NumberOfParameters > 7)
-  {
-    result.insert(std::make_pair("h", "[unit of h]"));
-  }
-  if (m_NumberOfParameters > 8)
-  {
-    result.insert(std::make_pair("i", "[unit of i]"));
-  }
-  if (m_NumberOfParameters > 9)
-  {
-    result.insert(std::make_pair("j", "[unit of j]"));
-  }
-
   return result;
 }
 

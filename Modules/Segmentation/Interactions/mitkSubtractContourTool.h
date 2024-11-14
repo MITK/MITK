@@ -59,6 +59,8 @@ namespace mitk
   protected:
     SubtractContourTool(); // purposely hidden
     ~SubtractContourTool() override;
+
+    void OnInvertLogic(StateMachineAction* action, InteractionEvent* event) override;
   };
 
 } // namespace

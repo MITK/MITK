@@ -56,3 +56,19 @@ const char *mitk::AddContourTool::GetName() const
 {
   return "Add";
 }
+
+void mitk::AddContourTool::OnInvertLogic(StateMachineAction* action, InteractionEvent* event)
+{
+  Superclass::OnInvertLogic(action, event);
+
+  if (m_PaintingPixelValue == 0)
+  {
+    auto module = us::GetModuleContext()->GetModule();
+    auto cursorResource = module->GetResource("Subtract_Cursor.svg");
+    this->PushCursor(cursorResource);
+  }
+  else
+  {
+    this->PopCursor();
+  }
+}

@@ -55,6 +55,8 @@ namespace mitk
   protected:
     DrawPaintbrushTool(); // purposely hidden
     ~DrawPaintbrushTool() override;
+
+    void OnInvertLogic(StateMachineAction* action, InteractionEvent* event) override;
   };
 
 } // namespace

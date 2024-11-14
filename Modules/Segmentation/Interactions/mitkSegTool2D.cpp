@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitkSegTool2D.h"
 #include "mitkToolManager.h"
 
+#include <mitkApplicationCursor.h>
 #include "mitkBaseRenderer.h"
 #include "mitkDataStorage.h"
 #include "mitkPlaneGeometry.h"
@@ -24,6 +25,8 @@ found in the LICENSE file.
 #include "mitkPlanarCircle.h"
 
 #include "usGetModuleContext.h"
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 // Includes for 3DSurfaceInterpolation
 #include "mitkImageTimeSelector.h"
@@ -400,6 +403,36 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PlaneGeome
   }
 }
 
+void mitk::SegTool2D::PushCursor()
+{
+  this->PushCursor(this->GetCursorIconResource());
+}
+
+void mitk::SegTool2D::PushCursor(us::ModuleResource cursorResource)
+{
+  if (cursorResource.IsValid())
+  {
+    us::ModuleResourceStream cursor(cursorResource, std::ios::binary);
+    ApplicationCursor::GetInstance()->PushCursor(cursor, 0, 0);
+    ++m_NumPushedCursors;
+  }
+}
+
+void mitk::SegTool2D::PopCursor(bool popFirstCursor)
+{
+  if ((popFirstCursor && m_NumPushedCursors > 0) || m_NumPushedCursors > 1)
+  {
+    ApplicationCursor::GetInstance()->PopCursor();
+    --m_NumPushedCursors;
+  }
+}
+
+void mitk::SegTool2D::PopAllCursors()
+{
+  while (m_NumPushedCursors > 0)
+    this->PopCursor(true);
+}
+
 void mitk::SegTool2D::Activated()
 {
   Superclass::Activated();
@@ -408,10 +441,14 @@ void mitk::SegTool2D::Activated()
     mitk::MessageDelegate<mitk::SegTool2D>(this, &mitk::SegTool2D::OnTimePointChangedInternal);
 
   m_LastTimePointTriggered = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+  this->PushCursor();
 }
 
 void mitk::SegTool2D::Deactivated()
 {
+  this->PopAllCursors();
+
   this->GetToolManager()->SelectedTimePointChanged -=
     mitk::MessageDelegate<mitk::SegTool2D>(this, &mitk::SegTool2D::OnTimePointChangedInternal);
   Superclass::Deactivated();

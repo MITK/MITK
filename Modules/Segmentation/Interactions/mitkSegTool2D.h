@@ -26,6 +26,8 @@ found in the LICENSE file.
 
 #include <mitkDiffSliceOperation.h>
 
+#include <usModuleResource.h>
+
 namespace mitk
 {
   class BaseRenderer;
@@ -264,6 +266,11 @@ namespace mitk
 
     itkGetMacro(LastTimePointTriggered, TimePointType);
 
+    void PushCursor();
+    void PushCursor(us::ModuleResource cursorResource);
+    void PopCursor(bool popFirstCursor = false);
+    void PopAllCursors();
+
   private:
     /** Internal method that gets triggered as soon as the tool manager indicates a
      * time point change. If the time point has changed since last time and tool
@@ -281,6 +288,8 @@ namespace mitk
     bool m_IsTimePointChangeAware = true;
 
     TimePointType m_LastTimePointTriggered = 0.;
+
+    unsigned int m_NumPushedCursors = 0;
   };
 
 } // namespace

@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <berryIWorkbenchPage.h>
 
 // mitk
-#include <mitkApplicationCursor.h>
 #include <mitkBaseApplication.h>
 #include <mitkBaseRendererHelper.h>
 #include <mitkCameraController.h>
@@ -454,7 +453,6 @@ std::string QmitkSegmentationView::GetDefaultLabelSetPreset() const
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)
 {
-  this->ResetMouseCursor();
   mitk::StatusBar::GetInstance()->DisplayText("");
 
   if (id >= 0)
@@ -463,9 +461,6 @@ void QmitkSegmentationView::OnManualTool2DSelected(int id)
     text += m_ToolManager->GetToolById(id)->GetName();
     text += "\"";
     mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
-
-    us::ModuleResource resource = m_ToolManager->GetToolById(id)->GetCursorIconResource();
-    this->SetMouseCursor(resource, 0, 0);
   }
 }
 
@@ -938,31 +933,6 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
   {
     this->OnContourMarkerSelected(nodes.at(0));
     return;
-  }
-}
-
-void QmitkSegmentationView::ResetMouseCursor()
-{
-  if (m_MouseCursorSet)
-  {
-    mitk::ApplicationCursor::GetInstance()->PopCursor();
-    m_MouseCursorSet = false;
-  }
-}
-
-void QmitkSegmentationView::SetMouseCursor(const us::ModuleResource& resource, int hotspotX, int hotspotY)
-{
-  // Remove previously set mouse cursor
-  if (m_MouseCursorSet)
-  {
-    this->ResetMouseCursor();
-  }
-
-  if (resource)
-  {
-    us::ModuleResourceStream cursor(resource, std::ios::binary);
-    mitk::ApplicationCursor::GetInstance()->PushCursor(cursor, hotspotX, hotspotY);
-    m_MouseCursorSet = true;
   }
 }
 

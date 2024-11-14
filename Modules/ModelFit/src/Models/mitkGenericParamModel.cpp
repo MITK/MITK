@@ -85,6 +85,51 @@ mitk::GenericParamModel::GetParameterNames() const
   return result;
 };
 
+mitk::GenericParamModel::ParamterUnitMapType mitk::GenericParamModel::GetParameterUnits() const
+{
+  ParamterUnitMapType result;
+  result.insert(std::make_pair("a", "[unit of a]"));
+
+  if (m_NumberOfParameters > 1)
+  {
+    result.insert(std::make_pair("b", "[unit of b]"));
+  }
+  if (m_NumberOfParameters > 2)
+  {
+    result.insert(std::make_pair("c", "[unit of c]"));
+  }
+  if (m_NumberOfParameters > 3)
+  {
+    result.insert(std::make_pair("d", "[unit of d]"));
+  }
+  if (m_NumberOfParameters > 4)
+  {
+    result.insert(std::make_pair("e", "[unit of e]"));
+  }
+  if (m_NumberOfParameters > 5)
+  {
+    result.insert(std::make_pair("f", "[unit of f]"));
+  }
+  if (m_NumberOfParameters > 6)
+  {
+    result.insert(std::make_pair("g", "[unit of g]"));
+  }
+  if (m_NumberOfParameters > 7)
+  {
+    result.insert(std::make_pair("h", "[unit of h]"));
+  }
+  if (m_NumberOfParameters > 8)
+  {
+    result.insert(std::make_pair("i", "[unit of i]"));
+  }
+  if (m_NumberOfParameters > 9)
+  {
+    result.insert(std::make_pair("j", "[unit of j]"));
+  }
+
+  return result;
+}
+
 mitk::GenericParamModel::ParametersSizeType
 mitk::GenericParamModel::GetNumberOfParameters() const
 {

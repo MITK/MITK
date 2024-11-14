@@ -243,7 +243,7 @@ data(const QModelIndex& index, int role) const
       if (role == Qt::DisplayRole || role == Qt::EditRole)
       {
         const auto& finding = m_ParameterUnits.find(m_ParameterNames[index.row()]);
-        if (finding != m_ParameterUnits.end() && !finding->second.empty())
+        if (finding != m_ParameterUnits.end())
         {
           result = QVariant(QString::fromStdString(finding->second));
         }

@@ -15,11 +15,10 @@ found in the LICENSE file.
 
 #include <org_mitk_gui_qt_application_Export.h>
 
-#include "QmitkAbstractDataNodeAction.h"
-
-// qt
-#include <QSlider>
+#include <QmitkAbstractDataNodeAction.h>
 #include <QWidgetAction>
+
+class QSlider;
 
 class MITK_QT_APP QmitkDataNodeOpacityAction : public QWidgetAction, public QmitkAbstractDataNodeAction
 {
@@ -30,19 +29,17 @@ public:
   QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  void InitializeWithDataNode(const mitk::DataNode* dataNode) override;
-
-private Q_SLOTS:
-
-  void OnOpacityChanged(int);
-  void OnActionChanged();
-
-protected:
+private:
 
   void InitializeAction() override;
+  void InitializeWithDataNode(const mitk::DataNode* node) override;
 
-  QSlider* m_OpacitySlider;
+  void OnOpacityChanged(int value);
 
+  std::optional<float> GetOpacity(mitk::DataNode* node);
+  std::vector<mitk::DataNode*> GetSelectedOpacityNodes();
+
+  QSlider* m_Slider;
 };
 
 #endif

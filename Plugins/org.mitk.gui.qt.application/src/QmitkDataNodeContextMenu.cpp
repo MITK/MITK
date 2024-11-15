@@ -147,7 +147,7 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ShowDetailsAction));
 
   m_OpacityAction = new QmitkDataNodeOpacityAction(m_Parent, workbenchPartSite);
-  m_UnknownDataNodeDescriptor->AddAction(m_OpacityAction, false);
+  m_UnknownDataNodeDescriptor->AddAction(m_OpacityAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_OpacityAction));
 
   m_ColorAction = new QmitkDataNodeColorAction(m_Parent, workbenchPartSite);

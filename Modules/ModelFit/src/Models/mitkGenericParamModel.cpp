@@ -52,7 +52,7 @@ mitk::GenericParamModel::ParamterUnitMapType mitk::GenericParamModel::GetParamet
 {
   ParamterUnitMapType result;
   ParameterNamesType parameterNames = this->GetParameterNames();
-  for (int i = 0; i < parameterNames.size(); ++i)
+  for (ParameterNamesType::size_type i = 0; i < parameterNames.size(); ++i)
   {
     result.insert(std::make_pair(parameterNames[i], "[unit of " + parameterNames[i] + "]"));
   }

@@ -2,6 +2,9 @@ set(SRC_CPP_FILES
   QmitkSegmentationPreferencePage.cpp
   QmitkNewSegmentationDialog.cpp
   QmitkSegmentAnythingPreferencePage.cpp
+  QmitkTotalSegmentatorPreferencePage.cpp
+  QmitkToolInstallDialog.cpp
+  QmitkTotalSegmentatorToolInstaller.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -23,6 +26,8 @@ set(INTERNAL_CPP_FILES
 set(UI_FILES
   src/QmitkSegmentationPreferencePageControls.ui
   src/QmitkSegmentAnythingPreferencePage.ui
+  src/QmitkTotalSegmentatorPreferencePage.ui
+  src/QmitkToolInstallDialog.ui
   src/QmitkNewSegmentationDialog.ui
   src/internal/QmitkSegmentationViewControls.ui
   src/internal/QmitkSegmentationUtilitiesViewControls.ui
@@ -32,6 +37,9 @@ set(UI_FILES
 set(MOC_H_FILES
   src/QmitkSegmentationPreferencePage.h
   src/QmitkSegmentAnythingPreferencePage.h
+  src/QmitkToolInstallDialog.h
+  src/QmitkTotalSegmentatorToolInstaller.h
+  src/QmitkTotalSegmentatorPreferencePage.h
   src/QmitkNewSegmentationDialog.h
   src/internal/mitkPluginActivator.h
   src/internal/QmitkSegmentationView.h

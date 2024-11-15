@@ -221,7 +221,7 @@ void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor* spExec,
                                                       const std::string &outputImagePath,
                                                       bool isFast,
                                                       bool isMultiLabel,
-                                                      unsigned int gpuId,
+                                                      int gpuId,
                                                       const std::string &subTask)
 {
   ProcessExecutor::ArgumentListType args;
@@ -256,6 +256,9 @@ void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor* spExec,
   {
     args.push_back("--fast");
   }
+
+  args.push_back("-d");
+  args.push_back((gpuId < 0) ? "cpu" : "gpu");
 
   try
   {

@@ -54,8 +54,8 @@ namespace mitk
     itkSetMacro(PythonPath, std::string);
     itkGetConstMacro(PythonPath, std::string);
 
-    itkSetMacro(GpuId, unsigned int);
-    itkGetConstMacro(GpuId, unsigned int);
+    itkSetMacro(GpuId, int);
+    itkGetConstMacro(GpuId, int);
 
     itkSetMacro(Fast, bool);
     itkGetConstMacro(Fast, bool);
@@ -95,7 +95,7 @@ namespace mitk
      * @brief Runs Totalsegmentator python process with desired arguments
      * 
      */
-    void run_totalsegmentator(ProcessExecutor*, const std::string&, const std::string&, bool, bool, unsigned int, const std::string&);
+    void run_totalsegmentator(ProcessExecutor*, const std::string&, const std::string&, bool, bool, int, const std::string&);
 
     /**
      * @brief Applies the m_LabelMapTotal lookup table on the output segmentation LabelSetImage.
@@ -131,7 +131,7 @@ namespace mitk
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_SubTask = "total";
-    unsigned int m_GpuId = 0;
+    int m_GpuId = 0;
     std::map<mitk::Label::PixelType, std::string> m_LabelMapTotal;
     bool m_Fast = true;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";

@@ -21,6 +21,11 @@ mitk_create_module(
       src/Interactions
       src/IO
       src/Rendering
+  PCH
+    mitkNumericTypes.h
+    mitkPropertyList.h
+    mitkBaseData.h
+    mitkBaseRenderer.h
   DEPENDS
     PUBLIC
       MitkLog

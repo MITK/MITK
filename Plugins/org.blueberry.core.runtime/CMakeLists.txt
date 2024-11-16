@@ -7,6 +7,9 @@ mitk_create_plugin(
     src/application
     src/dynamichelpers
     src/registry
+  PCH
+    berryObject.h
+    berryWeakPointer.h
   MODULE_DEPENDS PUBLIC MitkCore
   PACKAGE_DEPENDS
     PUBLIC Poco|Foundation+Util+XML

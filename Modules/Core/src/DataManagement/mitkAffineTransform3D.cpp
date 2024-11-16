@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkAffineTransform3D.h>
+#include <nlohmann/json.hpp>
 
 void mitk::ToJSON(nlohmann::json& j, AffineTransform3D::ConstPointer transform)
 {

@@ -35,6 +35,7 @@ found in the LICENSE file.
 
 // MITK includes
 #include "mitkCommandLineParser.h"
+#include "mitkVersion.h"
 
 using namespace std;
 
@@ -691,7 +692,7 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
 // -------------------------------------------------------------------------
 map<string, us::Any> mitkCommandLineParser::parseArguments(int argc, char **argv, bool *ok)
 {
-  std::cout << "Running Command Line Utility *" << Title << "*" << std::endl;
+  std::cout << "Running Command Line Utility *" << Title << "* (" << MITK_REVISION_DESC << ')' << std::endl;
   StringContainerType arguments;
 
   // Create a StringContainerType of arguments
@@ -845,7 +846,7 @@ string mitkCommandLineParser::helpText() const
   string text;
   vector<CommandLineParserArgumentDescription *> deprecatedArgs;
 
-  text = "Command Line Utility *" + Title + "* in Category *" + Category + "*\n";
+  text = "Command Line Utility *" + Title + "* (" + MITK_REVISION_DESC + ") in Category *" + Category + "*\n";
   text += Description + "\n";
   text += Contributor + "\n\n";
   text += "Use --xml to generate an XML description parsable as a CTK Command Line Module Plugin.\n";

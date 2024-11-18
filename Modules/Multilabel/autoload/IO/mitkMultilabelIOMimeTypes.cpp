@@ -11,64 +11,15 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkMultilabelIOMimeTypes.h"
+
+#include <mitkFileSystem.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkLog.h>
-#include <mitkFileSystem.h>
+
 #include <fstream>
 
-#include <nlohmann/json.hpp>
-
 #include <itkNrrdImageIO.h>
-#include "itkMetaDataObject.h"
-
-mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType::MitkSegmentationTaskListMimeType()
-  : CustomMimeType(SEGMENTATIONTASKLIST_MIMETYPE_NAME())
-{
-  this->AddExtension("json");
-  this->SetCategory("MITK Segmentation Task List");
-  this->SetComment("MITK Segmentation Task List");
-}
-
-bool mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType::AppliesTo(const std::string& path) const
-{
-  bool result = CustomMimeType::AppliesTo(path);
-
-  if (!fs::exists(path)) // T18572
-    return result;
-
-  std::ifstream file(path);
-
-  if (!file.is_open())
-    return false;
-
-  auto json = nlohmann::json::parse(file, nullptr, false);
-
-  if (json.is_discarded() || !json.is_object())
-    return false;
-
-  if ("MITK Segmentation Task List" != json.value("FileFormat", ""))
-    return false;
-
-  if (auto version = json.value<int>("Version", 0); version < 1 || version > 2)
-    return false;
-
-  return true;
-}
-
-mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType* mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType::Clone() const
-{
-  return new MitkSegmentationTaskListMimeType(*this);
-}
-
-mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType mitk::MitkMultilabelIOMimeTypes::SEGMENTATIONTASKLIST_MIMETYPE()
-{
-  return MitkSegmentationTaskListMimeType();
-}
-
-std::string mitk::MitkMultilabelIOMimeTypes::SEGMENTATIONTASKLIST_MIMETYPE_NAME()
-{
-  return IOMimeTypes::DEFAULT_BASE_NAME() + ".segmentationtasklist";
-}
+#include <itkMetaDataObject.h>
 
 mitk::MitkMultilabelIOMimeTypes::LegacyLabelSetMimeType::LegacyLabelSetMimeType()
   : CustomMimeType(LEGACYLABELSET_MIMETYPE_NAME())
@@ -140,7 +91,6 @@ std::string mitk::MitkMultilabelIOMimeTypes::LEGACYLABELSET_MIMETYPE_NAME()
 std::vector<mitk::CustomMimeType*> mitk::MitkMultilabelIOMimeTypes::Get()
 {
   std::vector<CustomMimeType*> mimeTypes;
-  mimeTypes.push_back(SEGMENTATIONTASKLIST_MIMETYPE().Clone());
   mimeTypes.push_back(LEGACYLABELSET_MIMETYPE().Clone());
   return mimeTypes;
 }

@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitkMinMaxImageFilterWithIndex.h>
 #include <mitkMinMaxLabelmageFilterWithIndex.h>
 #include <mitkitkMaskImageFilter.h>
+#include <mitkNodePredicateGeometry.h>
 
 namespace mitk
 {
@@ -178,8 +179,8 @@ namespace mitk
 
     typename ImageStatisticsFilterType::Pointer statisticsFilter = ImageStatisticsFilterType::New();
     statisticsFilter->SetInput(image);
-    statisticsFilter->SetCoordinateTolerance(0.001);
-    statisticsFilter->SetDirectionTolerance(0.001);
+    statisticsFilter->SetCoordinateTolerance(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION);
+    statisticsFilter->SetDirectionTolerance(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION);
 
     // TODO: this is single threaded. Implement our own image filter that does this multi threaded
     //        typename itk::MinimumMaximumImageCalculator<ImageType>::Pointer imgMinMaxFilter =
@@ -361,6 +362,8 @@ namespace mitk
     typename MinMaxLabelFilterType::Pointer minMaxFilter = MinMaxLabelFilterType::New();
     minMaxFilter->SetInput(adaptedImage);
     minMaxFilter->SetLabelInput(maskImage);
+    minMaxFilter->SetCoordinateTolerance(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION);
+    minMaxFilter->SetDirectionTolerance(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION);
     minMaxFilter->UpdateLargestPossibleRegion();
 
     // set histogram parameters for each label individually (min/max may be different for each label)
@@ -393,8 +396,8 @@ namespace mitk
     }
 
     typename ImageStatisticsFilterType::Pointer imageStatisticsFilter = ImageStatisticsFilterType::New();
-    imageStatisticsFilter->SetDirectionTolerance(0.001);
-    imageStatisticsFilter->SetCoordinateTolerance(0.001);
+    imageStatisticsFilter->SetCoordinateTolerance(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION);
+    imageStatisticsFilter->SetDirectionTolerance(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION);
     imageStatisticsFilter->SetInput(adaptedImage);
     imageStatisticsFilter->SetLabelInput(maskImage);
     imageStatisticsFilter->SetHistogramParameters(nBins, minVals, maxVals);

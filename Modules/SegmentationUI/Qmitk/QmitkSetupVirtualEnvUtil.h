@@ -25,6 +25,8 @@ found in the LICENSE file.s
 class MITKSEGMENTATIONUI_EXPORT QmitkSetupVirtualEnvUtil
 {
 public:
+  using CallbackType = void (*)(itk::Object *, const itk::EventObject &, void *);
+
   QmitkSetupVirtualEnvUtil(const QString& baseDir);
   QmitkSetupVirtualEnvUtil();
 
@@ -54,7 +56,7 @@ public:
    */
   void PipInstall(const std::string &library,
                   const std::string &workingDir,
-                  void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                  CallbackType callback,
                   const std::string &command = "pip3");
 
   /**
@@ -64,8 +66,7 @@ public:
    * @param callback 
    * @param command 
    */
-  void PipInstall(const std::string &library,
-                  void (*callback)(itk::Object *, const itk::EventObject &, void *),
+  void PipInstall(const std::string &library, CallbackType callback,
                   const std::string &command = "pip3");
 
 
@@ -80,7 +81,7 @@ public:
    */
   void ExecutePython(const std::string &args,
                      const std::string &pythonPath,
-                     void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                     CallbackType callback,
                      const std::string &command = "python");
 
   /**
@@ -91,8 +92,7 @@ public:
    * @param callback 
    * @param command 
    */
-  void ExecutePython(const std::string &args,
-                     void (*callback)(itk::Object *, const itk::EventObject &, void *),
+  void ExecutePython(const std::string &args, CallbackType callback,
                      const std::string &command = "python");
 
   /**
@@ -103,13 +103,20 @@ public:
    * @param workingDir 
    * @param callback 
    */
-  void InstallPytorch(const std::string &workingDir, void (*callback)(itk::Object *, const itk::EventObject &, void *));
+  void InstallPytorch(const std::string &workingDir, CallbackType callback);
 
   /**
    * @brief Overloaded function to install pytorch using light-the-torch package, correctly 
    * identifying cuda version.
    */
   void InstallPytorch();
+
+  /**
+   * @brief Overloaded function to install pytorch using light-the-torch package, correctly
+   * identifying cuda version.
+   */
+  void InstallPytorch(CallbackType callback);
+
 
   /**
    * @brief Get the Base Dir object

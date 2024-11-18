@@ -196,7 +196,7 @@
       <item>
        <widget class="QToolBox" name="toolBox">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="groupStartParameter">
          <property name="geometry">
@@ -204,7 +204,7 @@
            <x>0</x>
            <y>0</y>
            <width>715</width>
-           <height>185</height>
+           <height>166</height>
           </rect>
          </property>
          <property name="toolTip">
@@ -218,9 +218,9 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QRadioButton" name="radioButton_StartParameters">
+           <widget class="QCheckBox" name="checkBox_StartParameters">
             <property name="text">
-             <string>Enter parameter starting values manually:</string>
+             <string>Enter Fit Starting Parameters</string>
             </property>
            </widget>
           </item>
@@ -234,8 +234,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>715</width>
-           <height>185</height>
+           <width>171</width>
+           <height>34</height>
           </rect>
          </property>
          <attribute name="label">

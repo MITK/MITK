@@ -210,9 +210,15 @@ public:
     /** Run-time type information (and related methods). */
     itkTypeMacro(FixedNiftiImageIO, Superclass)
 
-      bool SupportsDimension(unsigned long dim) override
+  bool SupportsDimension(unsigned long dim) override
   {
     return dim > 1 && dim < 5;
+  }
+
+protected:
+  FixedNiftiImageIO()
+  {
+    this->SetSFORM_Permissive(true);
   }
 };
 
@@ -237,6 +243,10 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
 
   // m_RenderingManager = mitk::RenderingManager::New();
   // context->RegisterService<mitk::RenderingManager>(renderingManager.GetPointer());
+
+  m_NodeSelectionService.reset(new mitk::NodeSelectionService);
+  context->RegisterService<mitk::INodeSelectionService>(m_NodeSelectionService.get());
+
   m_PlanePositionManager.reset(new mitk::PlanePositionManagerService);
   context->RegisterService<mitk::PlanePositionManagerService>(m_PlanePositionManager.get());
 

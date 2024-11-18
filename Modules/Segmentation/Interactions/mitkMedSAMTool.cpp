@@ -44,7 +44,7 @@ void mitk::MedSAMTool::Deactivated()
   SegWithPreviewTool::Deactivated();
   GetDataStorage()->Remove(m_BoundingBoxNode);
   m_BoundingBoxNode = nullptr;
-  m_PythonService.reset();
+  m_PythonService = nullptr;
 }
 
 void mitk::MedSAMTool::ConnectActionsAndFunctions() 

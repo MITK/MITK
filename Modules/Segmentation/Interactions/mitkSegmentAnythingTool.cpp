@@ -71,7 +71,7 @@ void mitk::SegmentAnythingTool::Activated()
   m_PointSetNodePositive->SetColor(0.0, 1.0, 0.0);
   m_PointSetNodePositive->SetVisibility(true);
   m_PointSetNodePositive->SetProperty("Pointset.2D.shape",
-                              mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
+                              mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CROSS));
   m_PointSetNodePositive->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
   this->GetDataStorage()->Add(m_PointSetNodePositive, this->GetToolManager()->GetWorkingData(0));
 
@@ -83,7 +83,7 @@ void mitk::SegmentAnythingTool::Activated()
   m_PointSetNodeNegative->SetColor(1.0, 0.0, 0.0);
   m_PointSetNodeNegative->SetVisibility(true);
   m_PointSetNodeNegative->SetProperty("Pointset.2D.shape",
-                                      mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
+                              mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CROSS));
   m_PointSetNodeNegative->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
   this->GetDataStorage()->Add(m_PointSetNodeNegative, this->GetToolManager()->GetWorkingData(0));
 
@@ -100,7 +100,7 @@ void mitk::SegmentAnythingTool::Deactivated()
   m_PointSetNodeNegative = nullptr;
   m_PointSetPositive = nullptr;
   m_PointSetNegative = nullptr;
-  m_PythonService.reset();
+  m_PythonService = nullptr; // KILLs python process if already running
   Superclass::Deactivated();
 }
 
@@ -113,12 +113,9 @@ void mitk::SegmentAnythingTool::ConnectActionsAndFunctions()
 
 void mitk::SegmentAnythingTool::InitSAMPythonProcess()
 {
-  if (nullptr != m_PythonService)
-  {
-    m_PythonService.reset();
-  }
+  m_PythonService = nullptr; // KILLs python process if already running
   this->ClearPicks();
-  m_PythonService = std::make_unique<mitk::SegmentAnythingPythonService>(
+  m_PythonService = mitk::SegmentAnythingPythonService::New(
     this->GetPythonPath(), this->GetModelType(), this->GetCheckpointPath(), this->GetGpuId(), this->GetBackend());
   m_PythonService->StartAsyncProcess();
 }

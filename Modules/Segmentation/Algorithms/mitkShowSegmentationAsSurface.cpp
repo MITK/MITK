@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageConverter.h>
 #include <vtkPolyDataNormals.h>
+#include <omp.h>
 
 namespace mitk
 {
@@ -101,9 +102,16 @@ namespace mitk
     {
       const auto labels = labelSetImage->GetLabels();
 
-      for (auto label : labels)
+      int numLabels = static_cast<int>(labels.size());
+      m_SurfaceNodes.reserve(numLabels);
+
+      omp_lock_t lock;
+      omp_init_lock(&lock);
+
+      #pragma omp parallel for
+      for (int i = 0; i < numLabels; ++i)
       {
-        auto labelImage = CreateLabelMask(labelSetImage, label->GetValue());
+        auto labelImage = CreateLabelMask(labelSetImage, labels[i]->GetValue());
 
         if (labelImage.IsNull())
           continue;
@@ -117,17 +125,21 @@ namespace mitk
 
         if (smooth && (polyData->GetNumberOfPoints() < 1 || polyData->GetNumberOfCells() < 1))
         {
-          MITK_WARN << "Label \"" << label->GetName() << "\" didn't produce any smoothed surface data (try again without smoothing).";
+          MITK_WARN << "Label \"" << labels[i]->GetName() << "\" didn't produce any smoothed surface data (try again without smoothing).";
           continue;
         }
 
         auto node = DataNode::New();
         node->SetData(labelSurface);
-        node->SetColor(label->GetColor());
-        node->SetName(label->GetName());
+        node->SetColor(labels[i]->GetColor());
+        node->SetName(labels[i]->GetName());
 
+        omp_set_lock(&lock);
         m_SurfaceNodes.push_back(node);
+        omp_unset_lock(&lock);
       }
+
+      omp_destroy_lock(&lock);
     }
     else
     {

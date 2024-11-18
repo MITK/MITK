@@ -40,6 +40,7 @@ class vtkImageMapToColors;
 
 namespace mitk
 {
+  class IPreferences;
 
   /** \brief Mapper to resample and display 2D slices of a 3D labelset image.
    *
@@ -226,6 +227,10 @@ namespace mitk
       * If the distances have different sign, there is an intersection.
       **/
     bool RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry, const BaseGeometry* imageGeometry) const;
+
+  private:
+    float GetOpacityFactor();
+    IPreferences* m_Preferences;
   };
 
 } // namespace mitk

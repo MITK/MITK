@@ -14,9 +14,12 @@ found in the LICENSE file.
 #define mitkSegmentationTaskListIO_h
 
 #include <mitkAbstractFileIO.h>
+#include <mitkFileSystem.h>
 
 namespace mitk
 {
+  class SegmentationTaskList;
+
   class SegmentationTaskListIO : public AbstractFileIO
   {
   public:
@@ -27,6 +30,9 @@ namespace mitk
 
   protected:
     std::vector<BaseData::Pointer> DoRead() override;
+
+    int GetMinimumRequiredVersion(const SegmentationTaskList* segmentationTaskList) const;
+    fs::path ResolvePath(const fs::path& path) const;
 
   private:
     SegmentationTaskListIO* IOClone() const override;

@@ -31,6 +31,7 @@ QmitkInitialValuesManagerWidget::QmitkInitialValuesManagerWidget(QWidget*)
   m_TypeDelegate = new QmitkInitialValuesTypeDelegate(this);
   m_ValuesDelegate = new QmitkInitialValuesDelegate(this);
 
+
   this->m_Controls.initialsView->setModel(m_InternalModel);
 
   this->m_Controls.initialsView->setItemDelegateForColumn(1, m_TypeDelegate);
@@ -54,9 +55,11 @@ QmitkInitialValuesManagerWidget::~QmitkInitialValuesManagerWidget()
 
 void QmitkInitialValuesManagerWidget::setInitialValues(const
     mitk::ModelTraitsInterface::ParameterNamesType& names,
-    const mitk::ModelTraitsInterface::ParametersType values)
+    const mitk::ModelTraitsInterface::ParametersType values,
+    const mitk::ModelTraitsInterface::ParamterUnitMapType units
+  )
 {
-  this->m_InternalModel->setInitialValues(names, values);
+  this->m_InternalModel->setInitialValues(names, values, units);
 }
 
 void QmitkInitialValuesManagerWidget::setInitialValues(const

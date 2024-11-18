@@ -42,24 +42,24 @@ public:
   static const QString EDITOR_ID;
 
   QmitkAbstractMultiWidgetEditor();
-  virtual ~QmitkAbstractMultiWidgetEditor() override;
+  ~QmitkAbstractMultiWidgetEditor() override;
 
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  virtual QmitkRenderWindow* GetActiveQmitkRenderWindow() const override;
+  QmitkRenderWindow* GetActiveQmitkRenderWindow() const override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  virtual QHash<QString, QmitkRenderWindow*> GetQmitkRenderWindows() const override;
+  QHash<QString, QmitkRenderWindow*> GetQmitkRenderWindows() const override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  virtual QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const override;
+  QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  virtual QmitkRenderWindow* GetQmitkRenderWindow(const mitk::AnatomicalPlane& orientation) const override;
+  QmitkRenderWindow* GetQmitkRenderWindow(const mitk::AnatomicalPlane& orientation) const override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
@@ -75,23 +75,23 @@ public:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  virtual mitk::Point3D GetSelectedPosition(const QString& id = QString()) const override;
+  mitk::Point3D GetSelectedPosition(const QString& id = QString()) const override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  virtual void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString()) override;
+  void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString()) override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  virtual void EnableDecorations(bool enable, const QStringList& decorations = QStringList()) override;
+  void EnableDecorations(bool enable, const QStringList& decorations = QStringList()) override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  virtual bool IsDecorationEnabled(const QString& decoration) const override;
+  bool IsDecorationEnabled(const QString& decoration) const override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  virtual QStringList GetDecorations() const override;
+  QStringList GetDecorations() const override;
   /**
   * @brief Retrieve a QmitkRenderWindow by its index.
   */
@@ -134,7 +134,6 @@ protected:
   QmitkMultiWidgetDecorationManager* GetDecorationManager() const;
 
 private:
-
   struct Impl;
   std::unique_ptr<Impl> m_Impl;
 

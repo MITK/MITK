@@ -11,13 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkSegmentationTaskListIO.h"
-#include "mitkMultilabelIOMimeTypes.h"
+#include "mitkSegmentationIOMimeTypes.h"
 
 #include <mitkSegmentationTaskList.h>
 
 #include <nlohmann/json.hpp>
 
-#include <mitkFileSystem.h>
 #include <fstream>
 
 namespace mitk
@@ -32,6 +31,26 @@ namespace mitk
   {
     form.Path = json["Path"].get<std::string>();
     form.Result = json["Result"].get<std::string>();
+  }
+
+  void to_json(nlohmann::json& json, const SegmentationTaskList::Task::Scene& scene)
+  {
+    json["Path"] = scene.Path;
+    json["Image"] = scene.Image;
+
+    if (!scene.Segmentation.empty())
+      json["Segmentation"] = scene.Segmentation;
+  }
+
+  void from_json(const nlohmann::json& json, SegmentationTaskList::Task::Scene& scene)
+  {
+    scene.Path = json["Path"].get<std::string>();
+    scene.Image = json["Image"].get<std::string>();
+
+    auto iter = json.find("Segmentation");
+
+    if (iter != json.end())
+      scene.Segmentation = json["Segmentation"].get<std::string>();
   }
 
   void to_json(nlohmann::json& json, const SegmentationTaskList::Task& task)
@@ -65,6 +84,9 @@ namespace mitk
 
     if (task.HasForm())
       json["Form"] = task.GetForm();
+
+    if (task.HasScene())
+      json["Scene"] = task.GetScene();
   }
 
   void from_json(const nlohmann::json& json, SegmentationTaskList::Task& task)
@@ -118,11 +140,16 @@ namespace mitk
 
     if (iter != json.end())
       task.SetForm(json["Form"].get<SegmentationTaskList::Task::Form>());
+
+    iter = json.find("Scene");
+
+    if (iter != json.end())
+      task.SetScene(json["Scene"].get<SegmentationTaskList::Task::Scene>());
   }
 }
 
 mitk::SegmentationTaskListIO::SegmentationTaskListIO()
-  : AbstractFileIO(SegmentationTaskList::GetStaticNameOfClass(), MitkMultilabelIOMimeTypes::SEGMENTATIONTASKLIST_MIMETYPE(), "MITK Segmentation Task List")
+  : AbstractFileIO(SegmentationTaskList::GetStaticNameOfClass(), MitkSegmentationIOMimeTypes::SEGMENTATIONTASKLIST_MIMETYPE(), "MITK Segmentation Task List")
 {
   this->RegisterService();
 }
@@ -164,8 +191,10 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskListIO::DoRead()
   if ("MITK Segmentation Task List" != json.value("FileFormat", ""))
     mitkThrow() << "Unknown file format (expected \"MITK Segmentation Task List\")!";
 
-  if (auto version = json.value<int>("Version", 0); version < 1 || version > 2)
-    mitkThrow() << "Unknown file format version (expected \"1\" or \"2\")!";
+  int version;
+
+  if (version = json.value<int>("Version", 0); version < 1 || version > 3)
+    mitkThrow() << "Unknown file format version (expected \"1\", \"2\", or \"3\")!";
 
   if (!json.contains("Tasks") || !json["Tasks"].is_array())
     mitkThrow() << "Tasks array not found!";
@@ -190,29 +219,39 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskListIO::DoRead()
       auto i = segmentationTaskList->AddTask(task.get<SegmentationTaskList::Task>());
 
       if (!segmentationTaskList->HasImage(i))
-        mitkThrow() << "Task " << i << " must contain \"Image\"!";
-
-      fs::path imagePath(segmentationTaskList->GetImage(i));
-
-      if (imagePath.is_relative())
       {
-        auto inputLocation = this->GetInputLocation();
+        if (version < 3)
+          mitkThrow() << "Task " << i << " must contain \"Image\"!";
 
-        /* If we have access to properties, we are reading from an MITK scene
-         * file. In this case, paths are still relative to the original input
-         * location, which is preserved in the properties.
-         */
+        if (!segmentationTaskList->HasScene(i))
+          mitkThrow() << "Task " << i << " must contain either \"Image\" or \"Scene\"!";
+      }
+      else
+      {
+        auto imagePath = this->ResolvePath(segmentationTaskList->GetImage(i));
 
-        const auto* properties = this->GetProperties();
+        if (!fs::exists(imagePath))
+          mitkThrow() << "Referenced image \"" << imagePath << "\" in task " << i << " does not exist!";
 
-        if (properties != nullptr)
-          properties->GetStringProperty("MITK.IO.reader.inputlocation", inputLocation);
-
-        imagePath = fs::path(inputLocation).remove_filename() / imagePath;
+        if (version >= 3 && segmentationTaskList->HasScene(i))
+          mitkThrow() << "Task " << i << " must not contain both \"Image\" and \"Scene\"!";
       }
 
-      if (!fs::exists(imagePath))
-        mitkThrow() << "Referenced image \"" << imagePath << "\" in task " << i << " does not exist!";
+      if (segmentationTaskList->HasScene(i))
+      {
+        auto scenePath = this->ResolvePath(segmentationTaskList->GetScene(i).Path);
+
+        if (!fs::exists(scenePath))
+          mitkThrow() << "Scene \"" << scenePath << "\" in task " << i << " does not exist!";
+      }
+
+      if (segmentationTaskList->HasForm(i))
+      {
+        auto formPath = this->ResolvePath(segmentationTaskList->GetForm(i).Path);
+
+        if (!fs::exists(formPath))
+          mitkThrow() << "Form \"" << formPath << "\" in task " << i << " does not exist!";
+      }
 
       if (!segmentationTaskList->HasResult(i))
         mitkThrow() << "Task " << i << " must contain \"Result\"!";
@@ -260,23 +299,9 @@ void mitk::SegmentationTaskListIO::Write()
   if (!stream->good())
     mitkThrow() << "Stream for writing is not good!";
 
-  auto hasForm = segmentationTaskList->GetDefaults().HasForm();
-
-  if (!hasForm)
-  {
-    for (const auto& task : *segmentationTaskList)
-    {
-      if (task.HasForm())
-      {
-        hasForm = true;
-        break;
-      }
-    }
-  }
-
   nlohmann::ordered_json json = {
     { "FileFormat", "MITK Segmentation Task List" },
-    { "Version", hasForm ? 2 : 1},
+    { "Version", this->GetMinimumRequiredVersion(segmentationTaskList) },
     { "Name", segmentationTaskList->GetProperty("name")->GetValueAsString() }
   };
 
@@ -293,6 +318,69 @@ void mitk::SegmentationTaskListIO::Write()
   json["Tasks"] = tasks;
 
   *stream << std::setw(2) << json << std::endl;
+}
+
+int mitk::SegmentationTaskListIO::GetMinimumRequiredVersion(const SegmentationTaskList* segmentationTaskList) const
+{
+  auto hasScene = segmentationTaskList->GetDefaults().HasScene();
+
+  if (!hasScene)
+  {
+    for (const auto& task : *segmentationTaskList)
+    {
+      if (task.HasScene())
+      {
+        hasScene = true;
+        break;
+      }
+    }
+  }
+
+  if (hasScene)
+    return 3;
+
+  auto hasForm = segmentationTaskList->GetDefaults().HasForm();
+
+  if (!hasForm)
+  {
+    for (const auto& task : *segmentationTaskList)
+    {
+      if (task.HasForm())
+      {
+        hasForm = true;
+        break;
+      }
+    }
+  }
+
+  if (hasForm)
+    return 2;
+
+  return 1;
+}
+
+fs::path mitk::SegmentationTaskListIO::ResolvePath(const fs::path& path) const
+{
+  if (path.is_relative())
+  {
+    auto inputLocation = this->GetInputLocation();
+
+    /* If we have access to properties, we are reading from an MITK scene
+     * file. In this case, paths are still relative to the original input
+     * location, which is preserved in the properties.
+     */
+
+    const auto* properties = this->GetProperties();
+
+    if (properties != nullptr)
+      properties->GetStringProperty("MITK.IO.reader.inputlocation", inputLocation);
+
+    return fs::path(inputLocation).remove_filename() / path;
+  }
+  else
+  {
+    return path;
+  }
 }
 
 mitk::SegmentationTaskListIO* mitk::SegmentationTaskListIO::IOClone() const

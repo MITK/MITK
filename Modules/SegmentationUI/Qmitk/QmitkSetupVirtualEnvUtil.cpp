@@ -109,8 +109,7 @@ void QmitkSetupVirtualEnvUtil::PrintProcessEvent(itk::Object * /*pCaller*/, cons
   }
 }
 
-void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir,
-                                              void (*callback)(itk::Object *, const itk::EventObject &, void *))
+void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir, CallbackType callback)
 {
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
@@ -129,6 +128,11 @@ void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir,
 void QmitkSetupVirtualEnvUtil::InstallPytorch()
 {
   this->InstallPytorch(GetPythonPath().toStdString(), &PrintProcessEvent);
+}
+
+void QmitkSetupVirtualEnvUtil::InstallPytorch(CallbackType callback)
+{
+  this->InstallPytorch(GetPythonPath().toStdString(), callback);
 }
 
 bool QmitkSetupVirtualEnvUtil::IsVenvInstalled(const QString &pythonPath)
@@ -152,7 +156,7 @@ bool QmitkSetupVirtualEnvUtil::IsVenvInstalled(const QString &pythonPath)
 
 void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library,
                                           const std::string &workingDir,
-                                          void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                                          CallbackType callback,
                                           const std::string &command)
 {
   mitk::ProcessExecutor::ArgumentListType args;
@@ -165,8 +169,7 @@ void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library,
   spExec->Execute(workingDir, command, args);
 }
 
-void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library,
-  void (*callback)(itk::Object*, const itk::EventObject&, void*),
+void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library, CallbackType callback,
   const std::string& command)
 {
   this->PipInstall(library, this->GetPipPath().toStdString(), callback, command);
@@ -174,7 +177,7 @@ void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library,
 
 void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &pythonCode,
                                              const std::string &workingDir,
-                                             void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                                             CallbackType callback,
                                              const std::string &command)
 {
   mitk::ProcessExecutor::ArgumentListType args;
@@ -187,8 +190,7 @@ void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &pythonCode,
   spExec->Execute(workingDir, command, args);
 }
 
-void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &args,
-                                             void (*callback)(itk::Object *, const itk::EventObject &, void *),
+void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &args, CallbackType callback,
                                              const std::string &command)
 {
   this->ExecutePython(args, this->GetPythonPath().toStdString(), callback, command);

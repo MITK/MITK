@@ -60,6 +60,9 @@ QmitkSegmentAnythingToolGUI::~QmitkSegmentAnythingToolGUI()
     tool->SAMStatusMessageEvent -= mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI, const std::string&>(
       this, &QmitkSegmentAnythingToolGUI::StatusMessageListener);
   }
+  m_Preferences->OnPropertyChanged -=
+    mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI, const mitk::IPreferences::ChangeEvent &>(
+      this, &QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent);
 }
 
 void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)

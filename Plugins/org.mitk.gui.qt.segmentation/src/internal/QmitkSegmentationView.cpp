@@ -17,10 +17,11 @@ found in the LICENSE file.
 #include <berryIWorkbenchPage.h>
 
 // mitk
-#include <mitkApplicationCursor.h>
 #include <mitkBaseApplication.h>
 #include <mitkBaseRendererHelper.h>
 #include <mitkCameraController.h>
+#include <mitkCoreServices.h>
+#include <mitkINodeSelectionService.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkMultiLabelIOHelper.h>
@@ -115,6 +116,10 @@ QmitkSegmentationView::~QmitkSegmentationView()
       (*dataIter).first->GetProperty("visible")->RemoveObserver((*dataIter).second);
     }
     m_ReferenceDataObserverTags.clear();
+
+    auto nodeSelectionService = mitk::CoreServices::GetNodeSelectionService();
+    nodeSelectionService->RemoveListener(VIEW_ID + "/referenceNode", m_Controls->referenceNodeSelector);
+    nodeSelectionService->RemoveListener(VIEW_ID + "/workingNode", m_Controls->workingNodeSelector);
 
     mitk::RenderingManager::GetInstance()->RemoveObserver(m_RenderingManagerObserverTag);
 
@@ -448,7 +453,6 @@ std::string QmitkSegmentationView::GetDefaultLabelSetPreset() const
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)
 {
-  this->ResetMouseCursor();
   mitk::StatusBar::GetInstance()->DisplayText("");
 
   if (id >= 0)
@@ -457,9 +461,6 @@ void QmitkSegmentationView::OnManualTool2DSelected(int id)
     text += m_ToolManager->GetToolById(id)->GetName();
     text += "\"";
     mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
-
-    us::ModuleResource resource = m_ToolManager->GetToolById(id)->GetCursorIconResource();
-    this->SetMouseCursor(resource, 0, 0);
   }
 }
 
@@ -563,6 +564,10 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
            this, &Self::OnReferenceSelectionChanged);
    connect(m_Controls->workingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
            this, &Self::OnSegmentationSelectionChanged);
+
+   auto nodeSelectionService = mitk::CoreServices::GetNodeSelectionService();
+   nodeSelectionService->AddListener(VIEW_ID + "/referenceNode", m_Controls->referenceNodeSelector);
+   nodeSelectionService->AddListener(VIEW_ID + "/workingNode", m_Controls->workingNodeSelector);
 
    // *------------------------
    // * TOOLMANAGER
@@ -928,31 +933,6 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
   {
     this->OnContourMarkerSelected(nodes.at(0));
     return;
-  }
-}
-
-void QmitkSegmentationView::ResetMouseCursor()
-{
-  if (m_MouseCursorSet)
-  {
-    mitk::ApplicationCursor::GetInstance()->PopCursor();
-    m_MouseCursorSet = false;
-  }
-}
-
-void QmitkSegmentationView::SetMouseCursor(const us::ModuleResource& resource, int hotspotX, int hotspotY)
-{
-  // Remove previously set mouse cursor
-  if (m_MouseCursorSet)
-  {
-    this->ResetMouseCursor();
-  }
-
-  if (resource)
-  {
-    us::ModuleResourceStream cursor(resource, std::ios::binary);
-    mitk::ApplicationCursor::GetInstance()->PushCursor(cursor, hotspotX, hotspotY);
-    m_MouseCursorSet = true;
   }
 }
 

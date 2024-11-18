@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkBaseData.h>
 #include <mitkSegmentationTaskListMacros.h>
 
-#include <MitkMultilabelExports.h>
+#include <MitkSegmentationExports.h>
 
 #include <mitkFileSystem.h>
 #include <optional>
@@ -27,16 +27,23 @@ namespace mitk
    *
    * See \ref MITKSegmentationTaskListsPage for more information.
    */
-  class MITKMULTILABEL_EXPORT SegmentationTaskList : public BaseData
+  class MITKSEGMENTATION_EXPORT SegmentationTaskList : public BaseData
   {
   public:
-    class MITKMULTILABEL_EXPORT Task
+    class MITKSEGMENTATION_EXPORT Task
     {
     public:
-      struct MITKMULTILABEL_EXPORT Form
+      struct MITKSEGMENTATION_EXPORT Form
       {
         fs::path Path;
         fs::path Result;
+      };
+
+      struct MITKSEGMENTATION_EXPORT Scene
+      {
+        fs::path Path;
+        std::string Image;
+        std::string Segmentation;
       };
 
       Task();
@@ -54,6 +61,7 @@ namespace mitk
       mitkSegmentationTaskValueMacro(fs::path, Result)
       mitkSegmentationTaskValueMacro(bool, Dynamic)
       mitkSegmentationTaskValueMacro(Form, Form)
+      mitkSegmentationTaskValueMacro(Scene, Scene)
 
     private:
       const Task* m_Defaults;
@@ -73,6 +81,7 @@ namespace mitk
     mitkSegmentationTaskListValueMacro(fs::path, Result)
     mitkSegmentationTaskListValueMacro(bool, Dynamic)
     mitkSegmentationTaskListValueMacro(Task::Form, Form)
+    mitkSegmentationTaskListValueMacro(Task::Scene, Scene)
 
     size_t GetNumberOfTasks() const;
     size_t AddTask(const Task& subtask);

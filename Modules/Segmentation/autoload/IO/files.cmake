@@ -1,0 +1,9 @@
+set(CPP_FILES
+  mitkSegmentationIOActivator.cpp
+  mitkSegmentationIOMimeTypes.cpp
+  mitkSegmentationIOMimeTypes.h
+  mitkSegmentationTaskListIO.cpp
+  mitkSegmentationTaskListIO.h
+  mitkSegmentationTaskListSerializer.cpp
+  mitkSegmentationTaskListSerializer.h
+)

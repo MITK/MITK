@@ -359,7 +359,7 @@ namespace mitk
     void SetRenderWindowFocus(vtkRenderWindow *focusWindow);
     itkGetMacro(FocusedRenderWindow, vtkRenderWindow *);
 
-    itkSetMacro(ConstrainedPanningZooming, bool);
+    void SetConstrainedPanningZooming(bool constrain);
     itkGetConstMacro(ConstrainedPanningZooming, bool);
 
     void SetAntiAliasing(AntiAliasing antiAliasing);

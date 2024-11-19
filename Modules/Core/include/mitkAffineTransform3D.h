@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <mitkNumericConstants.h>
 #include <itkScalableAffineTransform.h>
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <MitkCoreExports.h>
 
 namespace mitk

@@ -191,6 +191,7 @@ option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
 option(MITK_FAST_TESTING "Disable long-running tests like packaging" OFF)
 option(MITK_XVFB_TESTING "Execute test drivers through xvfb-run" OFF)
+option(MITK_PCH "Enable precompiled headers" ON)
 
 option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
@@ -199,6 +200,7 @@ mark_as_advanced(
   MITK_XVFB_TESTING
   MITK_FAST_TESTING
   MITK_BUILD_ALL_APPS
+  MITK_PCH
 )
 
 #-----------------------------------------------------------------------------

@@ -109,11 +109,11 @@ namespace mitk
 
     //##Documentation
     //## \brief Get the count of voxels with the smallest scalar value in the dataset
-    mitk::ScalarType GetCountOfMinValuedVoxels(int t = 0, unsigned int component = 0);
+    virtual mitk::ScalarType GetCountOfMinValuedVoxels(int t = 0, unsigned int component = 0);
 
     //##Documentation
     //## \brief Get the count of voxels with the largest scalar value in the dataset
-    mitk::ScalarType GetCountOfMaxValuedVoxels(int t = 0, unsigned int component = 0);
+    virtual mitk::ScalarType GetCountOfMaxValuedVoxels(int t = 0, unsigned int component = 0);
 
     //##Documentation
     //## \brief Get the count of voxels with the largest scalar value in the dataset

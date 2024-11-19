@@ -87,6 +87,11 @@ void mitk::BinaryThresholdBaseTool::InitiateToolByInput()
     {
       isFloatImage = true;
     }
+    else
+    {
+      m_LowerThreshold = std::round(m_LowerThreshold);
+      m_UpperThreshold = std::round(m_UpperThreshold);
+    }
 
     IntervalBordersChanged.Send(m_SensibleMinimumThreshold, m_SensibleMaximumThreshold, isFloatImage);
     ThresholdingValuesChanged.Send(m_LowerThreshold, m_UpperThreshold);

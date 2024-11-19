@@ -94,10 +94,11 @@ void QmitkMxNMultiWidgetEditorPreferencePage::Update()
 
 void QmitkMxNMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()
 {
-  auto* prefs = GetPreferences();
-
+  auto prefs = GetPreferences();
   prefs->Clear();
-  Update();
+
+  this->Update();
+  this->PerformOk();
 }
 
 void QmitkMxNMultiWidgetEditorPreferencePage::ChangeColormap(int i)

@@ -50,10 +50,15 @@ for all supported platforms</a>.
 
 We highly recommend to install Qt to the default location of the installer as it will allow MITK to automatically find Qt without any further action needed.
 
-Make sure to also select the following <b>required components</b>:
+Make sure to also explicitly select the following <b>required components</b>:
   - Qt 5 Compatibility Module
   - Qt State Machines
-  - Qt WebEngine
+  - Qt WebEngine (see note below)
+  - Qt WebChannel (Qt v6.8 and later)
+  - Qt Positioning (Qt v6.8 and later)
+
+Starting with Qt 6.8, Qt WebEngine is not listed under "Additional Libraries" anymore.
+It is located under "Extensions > Qt WebEngine > Qt <version>".
 
 On Windows, the Qt installer offers a welcome and straight forward way to install <b>OpenSSL</b>.
 You find it under the Tools node.

@@ -91,6 +91,8 @@ void QmitkSimpleLabelSetListWidget::SetLabelSetImage(const mitk::LabelSetImage* 
       m_LabelSetImage->AfterChangeLayerEvent += mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
         this, &QmitkSimpleLabelSetListWidget::OnLayerChanged);
     }
+
+    this->ResetList();
   }
 }
 

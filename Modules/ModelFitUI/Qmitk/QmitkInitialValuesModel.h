@@ -38,7 +38,8 @@ public:
   /** Sets the names and the values of the initial parameter set for the model.
    @param names List of all possible parameter names. It is assumed that the
    index of the list equals the parameter index in the respective fitting model and its parameter values.
-   @param values Default values to start with.*/
+   @param values Default values to start with.
+   @param units*/
   void setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names,
                         const mitk::ModelTraitsInterface::ParametersType values,
                         const mitk::ModelTraitsInterface::ParamterUnitMapType units);

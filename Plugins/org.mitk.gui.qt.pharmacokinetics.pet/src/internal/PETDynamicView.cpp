@@ -249,7 +249,7 @@ void PETDynamicView::OnModellSet(int index)
     }
 
     m_Controls.constraintManager->setChecker(this->m_modelConstraints,
-        this->m_selectedModelFactory->GetParameterNames());
+        this->m_selectedModelFactory->GetParameterNames(), this->m_selectedModelFactory->GetParameterUnits());
   }
 
   m_Controls.checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());

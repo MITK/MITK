@@ -15,11 +15,12 @@ found in the LICENSE file.
 
 #include "QmitkSimpleBarrierModel.h"
 
-const int NUMBER_OF_CONSTRAINT_ASPECTS = 4;
+const int NUMBER_OF_CONSTRAINT_ASPECTS = 5;
 const int INDEX_CONSTRAINT_PARAMS = 0;
 const int INDEX_CONSTRAINT_TYPE = 1;
 const int INDEX_CONSTRAINT_THRESHOLD = 2;
 const int INDEX_CONSTRAINT_WIDTH = 3;
+const int INDEX_CONSTRAINT_PARAM_UNITS = 4;
 
 QmitkSimpleBarrierModel::
 QmitkSimpleBarrierModel(QObject* parent) :
@@ -31,7 +32,8 @@ QmitkSimpleBarrierModel(QObject* parent) :
 void
 QmitkSimpleBarrierModel::
 setChecker(mitk::SimpleBarrierConstraintChecker* pChecker,
-           const mitk::ModelTraitsInterface::ParameterNamesType& names)
+           const mitk::ModelTraitsInterface::ParameterNamesType& names,
+           const mitk::ModelTraitsInterface::ParamterUnitMapType units)
 {
   if (pChecker != m_Checker)
   {
@@ -48,6 +50,7 @@ setChecker(mitk::SimpleBarrierConstraintChecker* pChecker,
 
     m_ParameterNames = names;
     m_modified = false;
+    m_ParameterUnits = units;
 
     emit endResetModel();
   }
@@ -180,6 +183,31 @@ data(const QModelIndex& index, int role) const
         }
 
         break;
+
+      case INDEX_CONSTRAINT_PARAM_UNITS:
+        if (role == Qt::DisplayRole || role == Qt::EditRole)
+        {
+          QStringList units;
+
+          for (mitk::SimpleBarrierConstraintChecker::ParameterIndexVectorType::const_iterator pos =
+            constraint.parameters.begin(); pos != constraint.parameters.end(); ++pos)
+          {
+            const auto& finding = m_ParameterUnits.find(this->m_ParameterNames[*pos]);
+            if (finding != m_ParameterUnits.end())
+            {
+              units.append(QString::fromStdString(finding->second));
+            }
+          }
+          result = QVariant(units);
+        }
+
+        else if (role == Qt::ToolTipRole)
+        {
+          result = QVariant("Parameters that are relevant for this constraint. If more then one parameter is specified, it is the sum of all parameters.");
+        }
+
+        break;
+
     }
   }
 
@@ -194,12 +222,15 @@ flags(const QModelIndex& index) const
 
   if (static_cast<unsigned int>(index.row()) < m_Checker->GetNumberOfConstraints())
   {
-    if (index.column() < NUMBER_OF_CONSTRAINT_ASPECTS && index.column() >= 0)
+    if (index.column() < NUMBER_OF_CONSTRAINT_ASPECTS - 1 && index.column() >= 0)
     {
       flags |= Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
     }
+    else
+    {
+      flags |= Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    }
   }
-
   return flags;
 }
 
@@ -225,6 +256,10 @@ headerData(int section, Qt::Orientation orientation, int role) const
     else if (section == INDEX_CONSTRAINT_WIDTH)
     {
       return QVariant("Width");
+    }
+    else if (section == INDEX_CONSTRAINT_PARAM_UNITS)
+    {
+      return QVariant("Unit");
     }
   }
 
@@ -280,6 +315,7 @@ setData(const QModelIndex& index, const QVariant& value, int role)
         constraint.width = value.toDouble();
         emit dataChanged(index, index);
         break;
+
     }
 
     emit beginResetModel();

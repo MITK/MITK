@@ -47,7 +47,8 @@ public Q_SLOTS:
    @param names List of all possible parameter names. It is assumed that the
    index of the list equals the parameter index in the respective fitting model.*/
   void setChecker(mitk::SimpleBarrierConstraintChecker* pChecker,
-                  const mitk::ModelTraitsInterface::ParameterNamesType& names);
+                  const mitk::ModelTraitsInterface::ParameterNamesType& names,
+                  const mitk::ModelTraitsInterface::ParamterUnitMapType& units);
 
 protected Q_SLOTS:
   void OnShowContextMenuIsoSet(const QPoint& pos);
@@ -63,6 +64,8 @@ protected:
 
   mitk::SimpleBarrierConstraintChecker::Pointer m_Checker;
   mitk::ModelTraitsInterface::ParameterNamesType m_ParameterNames;
+  mitk::ModelTraitsInterface::ParamterUnitMapType m_ParameterUnits;
+
 
   QmitkSimpleBarrierModel* m_InternalModel;
   QmitkSimpleBarrierTypeDelegate* m_TypeDelegate;

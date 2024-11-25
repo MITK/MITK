@@ -44,6 +44,8 @@ public:
    */
   void reject() override;
 
+  void FinishInstallation(const QString& status);
+
 private:
   static QPlainTextEdit *s_ConsoleOutput;
 

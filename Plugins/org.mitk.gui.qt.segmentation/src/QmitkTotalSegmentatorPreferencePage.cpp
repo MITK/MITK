@@ -181,24 +181,24 @@ void QmitkTotalSegmentatorPreferencePage::OnInstallButtonClicked()
     qApp->processEvents();
     QThread::msleep(100);
   }
+
   QString installPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(m_Installer.GetVirtualEnvPath()).first;
+
   if (future.result() && this->IsTotalSegmentatorInstalled(installPath))
   {
     this->WriteStatusMessage("<b>STATUS: </b>Successfully installed TotalSegmentator.");
-    installDialog->m_Ui->statusLabel->setText("TotalSegmentator was succesfully installed");
+    installDialog->FinishInstallation("TotalSegmentator was succesfully installed");
     m_IsInstalled = true;
     m_Installer.SetVirtualEnvPath(installPath);
   }
   else
   {
     this->WriteErrorMessage("<b>ERROR: </b>Couldn't install TotalSegmentator.");
-    installDialog->m_Ui->statusLabel->setText("Couldn't install TotalSegmentator");
+    installDialog->FinishInstallation("Couldn't install TotalSegmentator");
     m_Ui->installTotalButton->setDisabled(false);
     this->WriteStatusMessage("<b>ERROR: </b>Couldn't install TotalSegmentator.");
   }
-  installDialog->m_IsInstalling = false;
-  installDialog->m_Ui->progressBar->setVisible(false);
-  installDialog->m_Ui->closePushButton->setEnabled(true);
+
   this->UpdateStatusLabel();
 }
 

@@ -39,6 +39,15 @@ QmitkToolInstallDialog::~QmitkToolInstallDialog()
   s_ConsoleOutput = nullptr;
 }
 
+void QmitkToolInstallDialog::FinishInstallation(const QString& status)
+{
+  m_IsInstalling = false;
+
+  m_Ui->statusLabel->setText(status);
+  m_Ui->progressBar->setVisible(false);
+  m_Ui->closePushButton->setEnabled(true);
+}
+
 void QmitkToolInstallDialog::closeEvent(QCloseEvent* event)
 {
   if (m_IsInstalling)

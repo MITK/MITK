@@ -120,6 +120,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
 
   outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
   const bool isSubTask = (this->GetSubTask() != DEFAULT_TOTAL_TASK) && (this->GetSubTask() != DEFAULT_TOTAL_TASK_MRI);
+  std::map<mitk::Label::PixelType, std::string> targetLabelMap;
   if (isSubTask)
   {
     outputImagePath = outDir;
@@ -127,10 +128,15 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
       spExec, inputImagePath, outputImagePath, !isSubTask, !isSubTask, this->GetGpuId(), this->GetSubTask());
     // Construct Label Id map
     std::vector<std::string> files = SUBTASKS_MAP.at(this->GetSubTask());
+    mitk::Label::PixelType labelId = 1;
     // Agglomerate individual mask files into one multi-label image.
     std::for_each(files.begin(),
                   files.end(),
-                  [&](std::string &fileName) { fileName = (outDir + IOUtil::GetDirectorySeparator() + fileName); });
+                  [&](std::string &fileName) { 
+                    std::string labelName = fileName.substr(0, fileName.find('.'));
+                    targetLabelMap[labelId] = labelName;
+                    labelId++;
+                    fileName = (outDir + IOUtil::GetDirectorySeparator() + fileName); });
     outputBuffer = AgglomerateLabelFiles(files, inputAtTimeStep->GetDimensions(), inputAtTimeStep->GetGeometry());
   }
   else
@@ -141,10 +147,11 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     outputBuffer = mitk::LabelSetImage::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
     outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
-  }
+    targetLabelMap = (this->GetSubTask() == DEFAULT_TOTAL_TASK) ? m_LabelMapTotal : m_LabelMapTotalMR;
+  } 
   m_ProgressCommand->SetProgress(180);
   mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
-  this->MapLabelsToSegmentation(outputBuffer, previewImage, m_LabelMapTotal);
+  this->MapLabelsToSegmentation(outputBuffer, previewImage, targetLabelMap);
   previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
 }
 
@@ -153,23 +160,7 @@ void mitk::TotalSegmentatorTool::UpdatePrepare()
   Superclass::UpdatePrepare();
   auto preview = this->GetPreviewSegmentation();
   preview->RemoveLabels(preview->GetAllLabelValues());
-  if (m_LabelMapTotal.empty())
-  {
-    this->ParseLabelMapTotalDefault();
-  }
-  const bool isSubTask = (this->GetSubTask() != DEFAULT_TOTAL_TASK) && (this->GetSubTask() != DEFAULT_TOTAL_TASK_MRI);
-  if (isSubTask)
-  {
-    std::vector<std::string> files = SUBTASKS_MAP.at(this->GetSubTask());
-    m_LabelMapTotal.clear();
-    mitk::Label::PixelType labelId = 1;
-    for (auto const &file : files)
-    {
-      std::string labelName = file.substr(0, file.find('.'));
-      m_LabelMapTotal[labelId] = labelName;
-      labelId++;
-    }
-  }
+  this->ParseLabelMapTotalDefault();
 }
 
 mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(std::vector<std::string> &filePaths,
@@ -285,10 +276,21 @@ void mitk::TotalSegmentatorTool::ParseLabelMapTotalDefault()
   if (!this->GetLabelMapPath().empty())
   {
     int start_line = 0, end_line = 0;
-    if (this->GetSubTask() == DEFAULT_TOTAL_TASK)
+    std::map<mitk::Label::PixelType, std::string> *targetMap;
+    if (this->GetSubTask() == DEFAULT_TOTAL_TASK && m_LabelMapTotal.empty())
+    {
       start_line = 111, end_line = 229;
-    else if (this->GetSubTask() == DEFAULT_TOTAL_TASK_MRI)
+      targetMap = &m_LabelMapTotal;
+    }
+    else if (this->GetSubTask() == DEFAULT_TOTAL_TASK_MRI && m_LabelMapTotalMR.empty())
+    {
       start_line = 231, end_line = 288;
+      targetMap = &m_LabelMapTotalMR;
+    }
+    else
+    {
+      return; // don't parse anything
+    }
     std::regex sanitizer(R"([^A-Za-z0-9_])");
     std::fstream newfile;
     newfile.open(this->GetLabelMapPath(), ios::in);
@@ -310,7 +312,7 @@ void mitk::TotalSegmentatorTool::ParseLabelMapTotalDefault()
     while (std::getline(std::getline(buffer, key, ':'), val, ','))
     {
       std::string sanitized = std::regex_replace(val, sanitizer, "");
-      m_LabelMapTotal[std::stoi(key)] = sanitized;
+      (*targetMap)[std::stoi(key)] = sanitized;
     }
   }
 }

@@ -21,7 +21,7 @@ const QString QmitkTotalSegmentatorToolInstaller::VENV_NAME = ".totalsegmentator
 const QString QmitkTotalSegmentatorToolInstaller::TOTALSEGMENTATOR_VERSION = "2.4.0";
 const std::vector<QString> QmitkTotalSegmentatorToolInstaller::PACKAGES = {
     "Totalsegmentator==" + TOTALSEGMENTATOR_VERSION,
-    "numpy<2",
+    "acvl_utils==0.2",
     "SimpleITK<=2.3.1",
     "p-tqdm<=1.4.0",
     "xvfbwrapper<=0.2.9",

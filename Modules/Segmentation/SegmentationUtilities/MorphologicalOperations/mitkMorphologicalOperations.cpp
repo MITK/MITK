@@ -398,14 +398,14 @@ TStructuringElement  mitk::MorphologicalOperations::CreateStructuringElement(Str
     break;
   case Ball_Coronal:
   case Cross_Coronal:
-    if (typename TStructuringElement::NeighborhoodDimension == 2)
+    if (TStructuringElement::NeighborhoodDimension == 2)
       mitkThrow() << "Cannot construct coronal structuring element on a 2D image for morphological operation";
     size.SetElement(0, factor);
     size.SetElement(2, factor);
     break;
   case Ball_Sagittal:
   case Cross_Sagittal:
-    if (typename TStructuringElement::NeighborhoodDimension == 2)
+    if (TStructuringElement::NeighborhoodDimension == 2)
       mitkThrow() << "Cannot construct sagittal structuring element on a 2D image for morphological operation";
     size.SetElement(1, factor);
     size.SetElement(2, factor);

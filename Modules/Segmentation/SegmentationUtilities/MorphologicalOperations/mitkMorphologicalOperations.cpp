@@ -83,7 +83,7 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer &image,
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessFixedDimensionByItk_3(img3D, itkErode, 3, img3D, factor, structuralElement);
+      AccessByItk_n(img3D, itkErode, (img3D, factor, structuralElement));
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -91,7 +91,7 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer &image,
   }
   else
   {
-    AccessFixedDimensionByItk_3(image, itkErode, 3, image, factor, structuralElement);
+    AccessByItk_n(image, itkErode, (image, factor, structuralElement));
   }
 
   MITK_INFO << "Finished Erode";
@@ -383,7 +383,7 @@ template <class TStructuringElement>
 TStructuringElement  mitk::MorphologicalOperations::CreateStructuringElement(StructuralElementType structuralElementFlag, int factor)
 {
   using SizeType = typename TStructuringElement::SizeType;
-  static_assert(SizeType::Dimension == 3);
+//  static_assert(SizeType::Dimension == 3);
 
   TStructuringElement strElem;
   SizeType size;
@@ -398,11 +398,15 @@ TStructuringElement  mitk::MorphologicalOperations::CreateStructuringElement(Str
     break;
   case Ball_Coronal:
   case Cross_Coronal:
+    if (typename TStructuringElement::NeighborhoodDimension == 2)
+      mitkThrow() << "Cannot construct coronal structuring element on a 2D image for morphological operation";
     size.SetElement(0, factor);
     size.SetElement(2, factor);
     break;
   case Ball_Sagittal:
   case Cross_Sagittal:
+    if (typename TStructuringElement::NeighborhoodDimension == 2)
+      mitkThrow() << "Cannot construct sagittal structuring element on a 2D image for morphological operation";
     size.SetElement(1, factor);
     size.SetElement(2, factor);
     break;

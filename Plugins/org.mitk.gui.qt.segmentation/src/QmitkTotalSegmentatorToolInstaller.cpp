@@ -91,24 +91,23 @@ bool QmitkTotalSegmentatorToolInstaller::SetupVirtualEnv(const QString &venvName
 
 void QmitkTotalSegmentatorToolInstaller::PrintProcessEvent(itk::Object *, const itk::EventObject &e, void *)
 {
+  static QMutex mutex;
   std::string eventOut;
-  const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
-  if (pEvent)
+
+  if (const auto* pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent*>(&e); pEvent != nullptr)
   {
     eventOut = pEvent->GetOutput();
   }
-  const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
-  if (pErrEvent)
+  else if (const auto* pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent*>(&e); pErrEvent != nullptr)
   {
     eventOut = pErrEvent->GetOutput();
   }
-  static QMutex mutex;
+
   mutex.lock();
-  QMetaObject::invokeMethod(QmitkToolInstallDialog::m_ConsoleOut,
-                            "append",
-                            Qt::QueuedConnection,
-                            Q_ARG(QString, QString::fromStdString(eventOut))
-                            );
+
+  auto consoleOutput = QmitkToolInstallDialog::GetConsoleOutput();
+  QMetaObject::invokeMethod(consoleOutput, "appendHtml", Q_ARG(QString, QString::fromStdString(eventOut)));
+
   mutex.unlock();
 }
 

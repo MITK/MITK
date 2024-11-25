@@ -266,12 +266,8 @@ namespace mitk
       // time-related regards, though.
 
       auto fixedOutputGeometry = this->GetInput()->GetTimeGeometry()->Clone();
-      auto outputGeometry = output->GetTimeGeometry();
-      const auto numberOfTimeSteps = outputGeometry->CountTimeSteps();
 
-      for (TimeStepType t = 0; t < numberOfTimeSteps; ++t)
-        fixedOutputGeometry->SetTimeStepGeometry(outputGeometry->GetGeometryForTimeStep(t), t);
-
+      fixedOutputGeometry->ReplaceTimeStepGeometries(output->GetGeometry());
       fixedOutputGeometry->UpdateBoundingBox();
 
       output->SetTimeGeometry(fixedOutputGeometry);

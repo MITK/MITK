@@ -461,10 +461,18 @@ void QmitkImageCropperView::ProcessImage(bool mask)
       }
       else // original image will be overwritten by the result image and the bounding box of the result is adjusted
       {
+        auto name = imageNode->GetName();
+
         mitk::LevelWindow levelWindow;
         imageNode->GetLevelWindow(levelWindow);
+
         imageNode->SetData(cutter->GetOutput());
+
+        if (imageNode->GetName().empty()) // Name of original node was only set in base data properties
+          imageNode->SetName(name);
+
         imageNode->SetLevelWindow(levelWindow);
+
         // Adjust coordinate system by doing a reinit on
         auto tempDataStorage = mitk::DataStorage::SetOfObjects::New();
         tempDataStorage->InsertElement(0, imageNode);

@@ -103,7 +103,8 @@ endif()
 mitk_use_modules(TARGET ${_APP_NAME} MODULES MitkAppUtil)
 
 set_target_properties(${_APP_NAME} PROPERTIES
-                      COMPILE_FLAGS "${_app_compile_flags}")
+                      COMPILE_FLAGS "${_app_compile_flags}"
+                      VS_DEBUGGER_COMMAND_ARGUMENTS "-style windowsvista")
 
 target_link_libraries(${_APP_NAME} PRIVATE org_blueberry_core_runtime ${_APP_LINK_LIBRARIES})
 if(WIN32)

@@ -13,15 +13,11 @@ found in the LICENSE file.
 #ifndef QmitkDicomDirectoryListener_h
 #define QmitkDicomDirectoryListener_h
 
-#include<QObject>
-#include<QString>
-#include<QHash>
-#include <QStringList>
-#include <QFileSystemWatcher>
 #include <QDir>
+#include <QHash>
+#include <QObject>
 
-
-#include<QTimer>
+class QFileSystemWatcher;
 
 /**
 * \brief QmitkDicomDirectoryListener class listens on a given directory for incomng files.
@@ -88,16 +84,6 @@ public slots:
     void OnDicomNetworkError(const QString&);
 
 protected:
-
-    /**
-    * \brief creates directory if it's not already existing.
-    */
-    void CreateListenerDirectory(const QDir& directory);
-
-    /**
-    * \brief Composes the filename and initializes m_LastRetrievedFile with it.
-    */
-    void SetFilesToImport();
 
     /**
     * \brief removes files from listener directory.

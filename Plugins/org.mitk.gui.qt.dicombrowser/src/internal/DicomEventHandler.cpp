@@ -10,52 +10,31 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPluginActivator.h"
 #include "DicomEventHandler.h"
-#include <service/event/ctkEventConstants.h>
-#include <ctkDictionary.h>
-#include <mitkLog.h>
-#include <mitkDataNode.h>
-#include <mitkIDataStorageService.h>
-#include <service/event/ctkEventAdmin.h>
-#include <ctkServiceReference.h>
-#include <mitkRenderingManager.h>
-#include <QVector>
-#include "mitkImage.h"
+#include "mitkPluginActivator.h"
+
+#include <mitkBaseDICOMReaderService.h>
 #include <mitkContourModelSet.h>
-#include <mitkFileReaderRegistry.h>
-#include <mitkDICOMRTMimeTypes.h>
-
-#include <mitkDICOMFileReaderSelector.h>
-#include <mitkDICOMDCMTKTagScanner.h>
-#include <mitkDICOMEnums.h>
-#include <mitkDICOMTagsOfInterestHelper.h>
-#include <mitkDICOMProperty.h>
-#include <mitkPropertyNameHelper.h>
-#include "mitkBaseDICOMReaderService.h"
-
-#include <mitkRTConstants.h>
-#include <mitkIsoDoseLevelCollections.h>
-#include <mitkIsoDoseLevelSetProperty.h>
-#include <mitkIsoDoseLevelVectorProperty.h>
-#include <mitkDoseImageVtkMapper2D.h>
-#include <mitkRTUIConstants.h>
-#include <mitkIsoLevelsGenerator.h>
-#include <mitkDoseNodeHelper.h>
-
-#include <vtkSmartPointer.h>
-#include <vtkMath.h>
-#include <mitkTransferFunction.h>
-#include <mitkTransferFunctionProperty.h>
-#include <mitkRenderingModeProperty.h>
-#include <mitkLocaleSwitch.h>
-#include <mitkIOUtil.h>
-
 #include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
+#include <mitkDICOMEnums.h>
+#include <mitkDICOMRTMimeTypes.h>
+#include <mitkDoseNodeHelper.h>
+#include <mitkFileReaderRegistry.h>
+#include <mitkIDataStorageService.h>
+#include <mitkImage.h>
+#include <mitkIOUtil.h>
 #include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIsoLevelsGenerator.h>
+#include <mitkMimeType.h>
+#include <mitkPropertyNameHelper.h>
+#include <mitkRenderingManager.h>
+#include <mitkRTUIConstants.h>
 
 #include <ImporterUtil.h>
+
+#include <service/event/ctkEventAdmin.h>
+#include <service/event/ctkEventConstants.h>
 
 namespace
 {
@@ -249,8 +228,8 @@ void DicomEventHandler::SubscribeSlots()
     ctkEventAdmin* eventAdmin = mitk::PluginActivator::getContext()->getService<ctkEventAdmin>(ref);
     ctkDictionary properties;
     properties[ctkEventConstants::EVENT_TOPIC] = "org/mitk/gui/qt/dicom/ADD";
-    eventAdmin->subscribeSlot(this, SLOT(OnSignalAddSeriesToDataManager(ctkEvent)), properties);
+    eventAdmin->subscribeSlot(this, SLOT(OnSignalAddSeriesToDataManager(const ctkEvent&)), properties);
     properties[ctkEventConstants::EVENT_TOPIC] = "org/mitk/gui/qt/dicom/DELETED";
-    eventAdmin->subscribeSlot(this, SLOT(OnSignalRemoveSeriesFromStorage(ctkEvent)), properties);
+    eventAdmin->subscribeSlot(this, SLOT(OnSignalRemoveSeriesFromStorage(const ctkEvent&)), properties);
   }
 }

@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <iostream>
-#include <qlayout.h>
+#include <QVBoxLayout>
 
 #include <qwt_interval_symbol.h>
 #include <qwt_point_data.h>

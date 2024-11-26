@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 // Qmitk
 #include "PCAExample.h"
+#include <ui_PCAExampleControls.h>
 
 // Qt
 #include <QMessageBox>
@@ -28,34 +29,34 @@ const std::string PCAExample::VIEW_ID = "org.mitk.views.pcaexample";
 
 void PCAExample::SetFocus()
 {
-  m_Controls.buttonPerformImageProcessing->setFocus();
+  m_Controls->buttonPerformImageProcessing->setFocus();
 }
 
 void PCAExample::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi(parent);
-  connect(m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(BtnPerfomPCAClicked()));
+  m_Controls->setupUi(parent);
+  connect(m_Controls->buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(BtnPerfomPCAClicked()));
 
   //initialize point set widget and point set node
   mitk::DataNode::Pointer PointSetNode = mitk::DataNode::New();
   PointSetNode->SetName("PCA Example Pointset");
   mitk::PointSet::Pointer newPtSet = mitk::PointSet::New();
   PointSetNode->SetData(newPtSet);
-  m_Controls.m_pointSetWidget->SetPointSetNode(PointSetNode);
+  m_Controls->m_pointSetWidget->SetPointSetNode(PointSetNode);
   this->GetDataStorage()->Add(PointSetNode);
 }
 
 PCAExample::PCAExample()
+  : m_Controls(new Ui::PCAExampleControls)
 {
-
 }
 
 PCAExample::~PCAExample()
 {
   //clean up
-  mitk::DataNode::Pointer ptSetNode = m_Controls.m_pointSetWidget->GetPointSetNode();
-  m_Controls.m_pointSetWidget->SetPointSetNode(nullptr);
+  mitk::DataNode::Pointer ptSetNode = m_Controls->m_pointSetWidget->GetPointSetNode();
+  m_Controls->m_pointSetWidget->SetPointSetNode(nullptr);
   this->GetDataStorage()->Remove(ptSetNode);
   this->GetDataStorage()->Remove(m_Axis1Node);
   this->GetDataStorage()->Remove(m_Axis2Node);
@@ -70,7 +71,7 @@ void PCAExample::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
   {
     if (node.IsNotNull() && dynamic_cast<mitk::Image *>(node->GetData()))
     {
-      m_Controls.buttonPerformImageProcessing->setEnabled(true);
+      m_Controls->buttonPerformImageProcessing->setEnabled(true);
       return;
     }
   }
@@ -82,12 +83,12 @@ void PCAExample::BtnPerfomPCAClicked()
 	std::vector<mitk::Vector3D> eigenVectors;
 	std::vector<double> eigenValues;
 	mitk::Vector3D mean;
-	bool success = comutePCA(m_Controls.m_pointSetWidget->GetPointSet(), eigenVectors, eigenValues, mean);
+	bool success = computePCA(m_Controls->m_pointSetWidget->GetPointSet(), eigenVectors, eigenValues, mean);
 	this->showEigenvectors(eigenVectors, eigenValues, mean);
 	MITK_INFO << "PCA: " << success;
 }
 
-bool PCAExample::comutePCA(mitk::PointSet::Pointer input, std::vector<mitk::Vector3D> &eigenVectors, std::vector<double> &eigenValues, mitk::Vector3D &pointsMean)
+bool PCAExample::computePCA(mitk::PointSet::Pointer input, std::vector<mitk::Vector3D> &eigenVectors, std::vector<double> &eigenValues, mitk::Vector3D &pointsMean)
 {
 //Step 1: Construct data matrix
 vnl_matrix<double> dataMatrix(3, input->GetSize(), 0.0);

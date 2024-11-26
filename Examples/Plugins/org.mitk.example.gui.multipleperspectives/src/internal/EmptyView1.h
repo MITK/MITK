@@ -16,8 +16,10 @@ found in the LICENSE file.
 // berry includes
 #include <berryQtViewPart.h>
 
-// ui includes
-#include "ui_EmptyView1Controls.h"
+namespace Ui
+{
+  class EmptyView1Controls;
+}
 
 class EmptyView1 : public berry::QtViewPart
 {
@@ -36,7 +38,7 @@ protected:
   void SetFocus() override;
 
 private:
-  Ui::EmptyView1Controls m_Controls;
+  Ui::EmptyView1Controls *m_Controls;
 
   QWidget *m_Parent;
 };

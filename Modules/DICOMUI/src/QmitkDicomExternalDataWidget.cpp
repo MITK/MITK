@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 // Qmitk
 #include "QmitkDicomExternalDataWidget.h"
+#include <ui_QmitkDicomExternalDataWidgetControls.h>
 #include <mitkLog.h>
 
 // CTK
@@ -26,7 +27,9 @@ found in the LICENSE file.
 const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomExternalDataWidget";
 
 QmitkDicomExternalDataWidget::QmitkDicomExternalDataWidget(QWidget *parent)
-  : QWidget(parent), m_ProgressDialog(nullptr), m_Controls(nullptr)
+  : QWidget(parent),
+    m_ProgressDialog(nullptr),
+    m_Controls(new Ui::QmitkDicomExternalDataWidgetControls)
 {
   Initialize();
   CreateQtPartControl(this);
@@ -38,45 +41,40 @@ QmitkDicomExternalDataWidget::~QmitkDicomExternalDataWidget()
 
 void QmitkDicomExternalDataWidget::CreateQtPartControl(QWidget *parent)
 {
-  // build up qt Widget, unless already done
-  if (!m_Controls)
-  {
-    // create GUI widgets from the Qt Designer's .ui file
-    m_Controls = new Ui::QmitkDicomExternalDataWidgetControls;
-    m_Controls->setupUi(parent);
-    m_Controls->viewExternalDataButton->setVisible(true);
-    m_Controls->ctkDICOMBrowser->setTableOrientation(Qt::Vertical);
-    m_Controls->ctkDICOMBrowser->setDICOMDatabase(m_ExternalDatabase);
+  // create GUI widgets from the Qt Designer's .ui file
+  m_Controls->setupUi(parent);
+  m_Controls->viewExternalDataButton->setVisible(true);
+  m_Controls->ctkDICOMBrowser->setTableOrientation(Qt::Vertical);
+  m_Controls->ctkDICOMBrowser->setDICOMDatabase(m_ExternalDatabase);
 
-    SetupImportDialog();
+  SetupImportDialog();
 
-    // connect buttons
-    connect(m_Controls->downloadButton, SIGNAL(clicked()), this, SLOT(OnDownloadButtonClicked()));
-    connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()), this, SLOT(OnViewButtonClicked()));
-    connect(m_Controls->directoryButton, SIGNAL(clicked()), m_ImportDialog, SLOT(show()));
+  // connect buttons
+  connect(m_Controls->downloadButton, SIGNAL(clicked()), this, SLOT(OnDownloadButtonClicked()));
+  connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()), this, SLOT(OnViewButtonClicked()));
+  connect(m_Controls->directoryButton, SIGNAL(clicked()), m_ImportDialog, SLOT(show()));
 
-    connect(m_Controls->ctkDICOMBrowser,
-            SIGNAL(seriesSelectionChanged(const QStringList &)),
-            this,
-            SLOT(OnSeriesSelectionChanged(const QStringList &)));
-    connect(
-      m_Controls->ctkDICOMBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex &)), this, SLOT(OnViewButtonClicked()));
+  connect(m_Controls->ctkDICOMBrowser,
+          SIGNAL(seriesSelectionChanged(const QStringList &)),
+          this,
+          SLOT(OnSeriesSelectionChanged(const QStringList &)));
+  connect(
+    m_Controls->ctkDICOMBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex &)), this, SLOT(OnViewButtonClicked()));
 
-    connect(m_ImportDialog, SIGNAL(fileSelected(QString)), this, SLOT(OnStartDicomImport(QString)));
+  connect(m_ImportDialog, SIGNAL(fileSelected(QString)), this, SLOT(OnStartDicomImport(QString)));
 
-    connect(m_ExternalIndexer,
-      SIGNAL(progressStep(QString)),
-      this,
-      SLOT(OnProgressStep(const QString&)));
-    connect(m_ExternalIndexer,
-            SIGNAL(progressDetail(QString)),
-            this,
-            SLOT(OnProgressDetail(const QString &)));
-    connect(m_ExternalIndexer, SIGNAL(progress(int)), this, SLOT(OnProgress(int)));
-    // actually the progress dialog closes if the maximum value is reached, BUT
-    // the following line is needed since the external indexer wont reach maximum value (100 % progress)
-    connect(m_ExternalIndexer, SIGNAL(indexingComplete(int, int, int, int)), this, SLOT(OnIndexingComplete(int, int, int, int)));
-  }
+  connect(m_ExternalIndexer,
+    SIGNAL(progressStep(QString)),
+    this,
+    SLOT(OnProgressStep(const QString&)));
+  connect(m_ExternalIndexer,
+          SIGNAL(progressDetail(QString)),
+          this,
+          SLOT(OnProgressDetail(const QString &)));
+  connect(m_ExternalIndexer, SIGNAL(progress(int)), this, SLOT(OnProgress(int)));
+  // actually the progress dialog closes if the maximum value is reached, BUT
+  // the following line is needed since the external indexer wont reach maximum value (100 % progress)
+  connect(m_ExternalIndexer, SIGNAL(indexingComplete(int, int, int, int)), this, SLOT(OnIndexingComplete(int, int, int, int)));
 }
 
 void QmitkDicomExternalDataWidget::OnProgressStep(const QString& step)

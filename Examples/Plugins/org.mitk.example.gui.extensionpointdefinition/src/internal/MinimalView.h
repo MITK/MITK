@@ -17,9 +17,12 @@ found in the LICENSE file.
 
 #include "ChangeTextRegistry.h"
 
-#include "ui_MinimalViewControls.h"
-
 #include <QSignalMapper>
+
+namespace Ui
+{
+  class MinimalViewControls;
+}
 
 class MinimalView : public berry::QtViewPart
 {
@@ -40,7 +43,7 @@ private Q_SLOTS:
   void ChangeText(const QString &id);
 
 private:
-  Ui::MinimalViewControls m_Controls;
+  Ui::MinimalViewControls *m_Controls;
 
   QWidget *m_Parent;
   QSignalMapper m_SignalMapper;

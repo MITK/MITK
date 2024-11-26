@@ -16,7 +16,10 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <berryQtViewPart.h>
 
-#include "ui_QmitkDicomViewControls.h"
+namespace Ui
+{
+  class QmitkDicomViewControls;
+}
 
 /**
  * \brief A view class suited for the DicomPerspective within the custom viewer plug-in.
@@ -66,7 +69,7 @@ protected Q_SLOTS:
 protected:
   void SetFocus() override;
 
-  Ui::QmitkDicomViewControls m_Controls;
+  Ui::QmitkDicomViewControls *m_Controls;
 
   QWidget *m_Parent;
 };

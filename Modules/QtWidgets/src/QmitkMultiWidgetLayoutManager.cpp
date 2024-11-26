@@ -17,9 +17,8 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>
 
-// qt
 #include <QHBoxLayout>
-#include <qsplitter.h>
+#include <QSplitter>
 
 QmitkMultiWidgetLayoutManager::QmitkMultiWidgetLayoutManager(QmitkAbstractMultiWidget* multiwidget)
   : QObject(multiwidget)

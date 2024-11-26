@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include "mitkMessage.h"
 
-#include <qlayout.h>
+#include <QGridLayout>
 
 QmitkSimpleLabelSetListWidget::QmitkSimpleLabelSetListWidget(QWidget* parent) : QWidget(parent), m_LabelList(nullptr), m_Emmiting(false)
 {

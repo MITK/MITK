@@ -12,11 +12,11 @@ found in the LICENSE file.
 
 #include "QmitkPaintbrushToolGUI.h"
 
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qpainter.h>
-#include <qpushbutton.h>
-#include <qslider.h>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QPainter>
+#include <QPushButton>
+#include <QSlider>
 
 QmitkPaintbrushToolGUI::QmitkPaintbrushToolGUI() : QmitkToolGUI(), m_Slider(nullptr)
 {

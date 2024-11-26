@@ -12,10 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkSegWithPreviewToolGUIBase.h"
 
-#include <qcheckbox.h>
-#include <qpushbutton.h>
-#include <qboxlayout.h>
-#include <qlabel.h>
+#include <QCheckBox>
+#include <QPushButton>
+#include <QVBoxLayout>
 #include <QApplication>
 
 bool DefaultEnableConfirmSegBtnFunction(bool enabled)

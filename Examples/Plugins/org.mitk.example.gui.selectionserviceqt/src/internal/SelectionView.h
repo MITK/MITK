@@ -17,8 +17,10 @@ found in the LICENSE file.
 #include <berryQtSelectionProvider.h>
 #include <berryQtViewPart.h>
 
-// ui includes
-#include "ui_SelectionViewControls.h"
+namespace Ui
+{
+  class SelectionViewControls;
+}
 
 /**
  * \ingroup org_mitk_example_gui_selectionserviceqt
@@ -48,7 +50,7 @@ protected:
   void SetFocus() override;
 
 private:
-  Ui::SelectionViewControls m_Controls;
+  Ui::SelectionViewControls *m_Controls;
 
   QWidget *m_Parent;
 };

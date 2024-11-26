@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <qlayout.h>
-#include <qpushbutton.h>
+#include <QVBoxLayout>
+#include <QPushButton>
 
 #include "QmitkPlotDialog.h"
 

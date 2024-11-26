@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "mitkRenderingManager.h"
 
 //needed for qApp
-#include <qcoreapplication.h>
+#include <QCoreApplication>
 
 QmitkConvertToMultiLabelSegmentationAction::QmitkConvertToMultiLabelSegmentationAction()
 {

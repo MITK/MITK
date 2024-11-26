@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 // Qmitk
 #include "QmitkDicomLocalStorageWidget.h"
+#include <ui_QmitkDicomLocalStorageWidgetControls.h>
 
 // Qt
 #include <QLabel>
@@ -24,7 +25,9 @@ found in the LICENSE file.
 const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomLocalStorageWidget";
 
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
-  : QWidget(parent), m_LocalIndexer(new ctkDICOMIndexer(parent)), m_Controls(nullptr)
+  : QWidget(parent),
+    m_LocalIndexer(new ctkDICOMIndexer(parent)),
+    m_Controls(new Ui::QmitkDicomLocalStorageWidgetControls)
 {
   CreateQtPartControl(this);
 }
@@ -36,29 +39,25 @@ QmitkDicomLocalStorageWidget::~QmitkDicomLocalStorageWidget()
 
 void QmitkDicomLocalStorageWidget::CreateQtPartControl(QWidget *parent)
 {
-  if (!m_Controls)
-  {
-    m_Controls = new Ui::QmitkDicomLocalStorageWidgetControls;
-    m_Controls->setupUi(parent);
+  m_Controls->setupUi(parent);
 
-    connect(m_Controls->deleteButton, SIGNAL(clicked()), this, SLOT(OnDeleteButtonClicked()));
-    connect(m_Controls->viewInternalDataButton, SIGNAL(clicked()), this, SLOT(OnViewButtonClicked()));
+  connect(m_Controls->deleteButton, SIGNAL(clicked()), this, SLOT(OnDeleteButtonClicked()));
+  connect(m_Controls->viewInternalDataButton, SIGNAL(clicked()), this, SLOT(OnViewButtonClicked()));
 
-    connect(m_Controls->ctkDicomBrowser,
-            SIGNAL(seriesSelectionChanged(const QStringList &)),
-            this,
-            SLOT(OnSeriesSelectionChanged(const QStringList &)));
-    connect(m_Controls->ctkDicomBrowser,
-            SIGNAL(seriesSelectionChanged(const QStringList &)),
-            this,
-            SLOT(OnSeriesSelectionChanged(const QStringList &)));
-    connect(
-      m_Controls->ctkDicomBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex &)), this, SLOT(OnViewButtonClicked()));
+  connect(m_Controls->ctkDicomBrowser,
+          SIGNAL(seriesSelectionChanged(const QStringList &)),
+          this,
+          SLOT(OnSeriesSelectionChanged(const QStringList &)));
+  connect(m_Controls->ctkDicomBrowser,
+          SIGNAL(seriesSelectionChanged(const QStringList &)),
+          this,
+          SLOT(OnSeriesSelectionChanged(const QStringList &)));
+  connect(
+    m_Controls->ctkDicomBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex &)), this, SLOT(OnViewButtonClicked()));
 
-    connect(m_LocalIndexer, SIGNAL(indexingComplete(int, int, int, int)), this, SIGNAL(SignalFinishedImport()));
+  connect(m_LocalIndexer, SIGNAL(indexingComplete(int, int, int, int)), this, SIGNAL(SignalFinishedImport()));
 
-    m_Controls->ctkDicomBrowser->setTableOrientation(Qt::Vertical);
-  }
+  m_Controls->ctkDicomBrowser->setTableOrientation(Qt::Vertical);
 }
 
 void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QString &dicomData)

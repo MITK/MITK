@@ -16,6 +16,7 @@ found in the LICENSE file.
 
 // Qmitk
 #include "QmitkRegionGrowingView.h"
+#include <ui_QmitkRegionGrowingViewControls.h>
 
 //! [cpp-includes]
 // Qmitk
@@ -38,25 +39,27 @@ found in the LICENSE file.
 
 const std::string QmitkRegionGrowingView::VIEW_ID = "org.mitk.views.example.regiongrowing";
 
-QmitkRegionGrowingView::QmitkRegionGrowingView() : m_PointListWidget(nullptr)
+QmitkRegionGrowingView::QmitkRegionGrowingView()
+  : m_Controls(new Ui::QmitkRegionGrowingViewControls),
+    m_PointListWidget(nullptr)
 {
 }
 
 void QmitkRegionGrowingView::SetFocus()
 {
-  m_Controls.buttonPerformImageProcessing->setFocus();
+  m_Controls->buttonPerformImageProcessing->setFocus();
 }
 
 void QmitkRegionGrowingView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi(parent);
-  connect(m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()));
+  m_Controls->setupUi(parent);
+  connect(m_Controls->buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()));
 
   //! [cpp-createqtpartcontrol]
   // create a QmitkPointListWidget and add it to the widget created from .ui file
   m_PointListWidget = new QmitkPointListWidget();
-  m_Controls.verticalLayout->addWidget(m_PointListWidget, 1);
+  m_Controls->verticalLayout->addWidget(m_PointListWidget, 1);
 
   // retrieve a possibly existing IRenderWindowPart
   if (mitk::IRenderWindowPart *renderWindowPart = GetRenderWindowPart())
@@ -89,14 +92,14 @@ void QmitkRegionGrowingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
   {
     if (node.IsNotNull() && dynamic_cast<mitk::Image *>(node->GetData()))
     {
-      m_Controls.labelWarning->setVisible(false);
-      m_Controls.buttonPerformImageProcessing->setEnabled(true);
+      m_Controls->labelWarning->setVisible(false);
+      m_Controls->buttonPerformImageProcessing->setEnabled(true);
       return;
     }
   }
 
-  m_Controls.labelWarning->setVisible(true);
-  m_Controls.buttonPerformImageProcessing->setEnabled(false);
+  m_Controls->labelWarning->setVisible(true);
+  m_Controls->buttonPerformImageProcessing->setEnabled(false);
 }
 
 void QmitkRegionGrowingView::RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart)

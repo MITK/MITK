@@ -16,7 +16,11 @@ found in the LICENSE file.
 #include "QmitkAbstractView.h"
 #include "mitkColorSequenceRainbow.h"
 #include "mitkDataStorage.h"
-#include "ui_QmitkIsoSurfaceControls.h"
+
+namespace Ui
+{
+  class QmitkIsoSurfaceControls;
+}
 
 /**
  * \brief IsoSurface

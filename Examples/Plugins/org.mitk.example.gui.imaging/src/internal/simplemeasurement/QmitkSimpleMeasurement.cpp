@@ -11,8 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkSimpleMeasurement.h"
-
-#include "ui_QmitkSimpleMeasurementControls.h"
+#include <ui_QmitkSimpleMeasurementControls.h>
 
 #include <mitkIDataStorageService.h>
 #include <mitkPointSet.h>

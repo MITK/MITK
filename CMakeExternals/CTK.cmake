@@ -34,7 +34,7 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/MITK/CTK.git
-      GIT_TAG 807fff11483d56f205c9306be821ec5532ceb4c8 # branch: qt-6
+      GIT_TAG 4838dbe17f92a932f44efced63a4f0b957946dc2 # branch: qt-6
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

@@ -31,15 +31,15 @@
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Maximum virtual slice thickness (TS):</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
+     <item>
       <widget class="QSpinBox" name="m_MaxTSSpinBox">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum virtual slice thickness allowed in the render windows.&lt;/p&gt;&lt;p&gt;It is the maximum number of slices that can be set to be integrated in a maximum intensity projection (MIP) in the respective render window.&lt;/p&gt;&lt;p&gt;It can be used to limit the TS slider to appropriated range for the use cases at hand. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -55,15 +55,15 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
-      <spacer name="verticalSpacer_2">
+     <item>
+      <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Vertical</enum>
+        <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>20</width>
-         <height>40</height>
+         <width>40</width>
+         <height>20</height>
         </size>
        </property>
       </spacer>
@@ -72,6 +72,9 @@
    </item>
    <item>
     <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>

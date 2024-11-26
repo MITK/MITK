@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkCopyToClipBoardDialog.h"
 
-#include <qlayout.h>
-#include <qtextedit.h>
+#include <QVBoxLayout>
+#include <QTextEdit>
 
 QmitkCopyToClipBoardDialog::QmitkCopyToClipBoardDialog(const QString &text, QWidget *parent, const char * /*name*/)
   : QDialog(parent)

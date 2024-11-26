@@ -15,8 +15,8 @@ found in the LICENSE file.
 #include "mitkProgressBar.h"
 #include "mitkRenderingManager.h"
 
-#include <qapplication.h>
-#include <qprogressbar.h>
+#include <QApplication>
+#include <QProgressBar>
 
 /**
  * Reset the progress bar. The progress bar "rewinds" and shows no progress.

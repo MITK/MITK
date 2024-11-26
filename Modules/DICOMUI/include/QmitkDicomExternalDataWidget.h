@@ -13,7 +13,6 @@ found in the LICENSE file.
 #ifndef QmitkDicomExternalDataWidget_h
 #define QmitkDicomExternalDataWidget_h
 
-#include "ui_QmitkDicomExternalDataWidgetControls.h"
 #include <MitkDICOMUIExports.h>
 
 // include QT
@@ -28,6 +27,11 @@ found in the LICENSE file.
 class ctkFileDialog;
 class ctkDICOMDatabase;
 class ctkDICOMIndexer;
+
+namespace Ui
+{
+  class QmitkDicomExternalDataWidgetControls;
+}
 
 /**
 * \brief QmitkDicomExternalDataWidget is a QWidget providing functionality for dicom import.
@@ -54,18 +58,6 @@ public:
   * \brief QmitkDicomExternalDataWidget destructor.
   */
   ~QmitkDicomExternalDataWidget() override;
-
-  /**
-  * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomExternalDataWidgetControls.h.
-  *
-  * \param parent is a pointer to the parent widget
-  */
-  virtual void CreateQtPartControl(QWidget *parent);
-
-  /**
-  * \brief Initializes the widget. This method has to be called before widget can start.
-  */
-  void Initialize();
 
 signals:
 
@@ -98,6 +90,18 @@ protected slots:
   void OnIndexingComplete(int, int, int, int);
 
 protected:
+  /**
+  * \brief Initializes the widget. This method has to be called before widget can start.
+  */
+  void Initialize();
+  
+  /**
+  * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomExternalDataWidgetControls.h.
+  *
+  * \param parent is a pointer to the parent widget
+  */
+  void CreateQtPartControl(QWidget *parent);
+
   /// \brief Get the list of filepath from current selected index in TreeView. All file paths referring to the index
   /// will be returned.
   QStringList GetFileNamesFromIndex();

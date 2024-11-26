@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkImageStatisticsWidget.h"
+#include <ui_QmitkImageStatisticsWidget.h>
 
 #include "QmitkStatisticsModelToStringConverter.h"
 #include "QmitkImageStatisticsTreeModel.h"
@@ -20,19 +21,19 @@ found in the LICENSE file.
 
 QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent) : QWidget(parent)
 {
-  m_Controls.setupUi(this);
+  m_Controls->setupUi(this);
   m_imageStatisticsModel = new QmitkImageStatisticsTreeModel(parent);
   CreateConnections();
   m_ProxyModel = new QSortFilterProxyModel(this);
-  m_Controls.treeViewStatistics->setEnabled(false);
-  m_Controls.treeViewStatistics->setModel(m_ProxyModel);
+  m_Controls->treeViewStatistics->setEnabled(false);
+  m_Controls->treeViewStatistics->setModel(m_ProxyModel);
   m_ProxyModel->setSourceModel(m_imageStatisticsModel);
   connect(m_imageStatisticsModel, &QmitkImageStatisticsTreeModel::dataAvailable, this, &QmitkImageStatisticsWidget::OnDataAvailable);
   connect(m_imageStatisticsModel,
           &QmitkImageStatisticsTreeModel::modelChanged,
-          m_Controls.treeViewStatistics,
+          m_Controls->treeViewStatistics,
           &QTreeView::expandAll);
-  connect(m_Controls.checkBoxIgnoreZeroValuedVoxel, &QCheckBox::stateChanged,
+  connect(m_Controls->checkBoxIgnoreZeroValuedVoxel, &QCheckBox::stateChanged,
       this, &QmitkImageStatisticsWidget::IgnoreZeroValuedVoxelStateChanged);
 }
 
@@ -54,9 +55,9 @@ void QmitkImageStatisticsWidget::SetMaskNodes(const std::vector<mitk::DataNode::
 void QmitkImageStatisticsWidget::Reset()
 {
   m_imageStatisticsModel->Clear();
-  m_Controls.treeViewStatistics->setEnabled(false);
-  m_Controls.buttonCopyImageStatisticsToClipboard->setEnabled(false);
-  m_Controls.checkBoxIgnoreZeroValuedVoxel->setEnabled(false);
+  m_Controls->treeViewStatistics->setEnabled(false);
+  m_Controls->buttonCopyImageStatisticsToClipboard->setEnabled(false);
+  m_Controls->checkBoxIgnoreZeroValuedVoxel->setEnabled(false);
 }
 
 
@@ -82,14 +83,14 @@ unsigned int QmitkImageStatisticsWidget::GetHistogramNBins() const
 
 void QmitkImageStatisticsWidget::CreateConnections()
 {
-	connect(m_Controls.buttonCopyImageStatisticsToClipboard, &QPushButton::clicked, this, &QmitkImageStatisticsWidget::OnClipboardButtonClicked);
+	connect(m_Controls->buttonCopyImageStatisticsToClipboard, &QPushButton::clicked, this, &QmitkImageStatisticsWidget::OnClipboardButtonClicked);
 }
 
 void QmitkImageStatisticsWidget::OnDataAvailable()
 {
-  m_Controls.buttonCopyImageStatisticsToClipboard->setEnabled(true);
-  m_Controls.treeViewStatistics->setEnabled(true);
-  m_Controls.checkBoxIgnoreZeroValuedVoxel->setEnabled(true);
+  m_Controls->buttonCopyImageStatisticsToClipboard->setEnabled(true);
+  m_Controls->treeViewStatistics->setEnabled(true);
+  m_Controls->checkBoxIgnoreZeroValuedVoxel->setEnabled(true);
 }
 
 void QmitkImageStatisticsWidget::OnClipboardButtonClicked()
@@ -97,7 +98,7 @@ void QmitkImageStatisticsWidget::OnClipboardButtonClicked()
   QmitkStatisticsModelToStringConverter converter;
   converter.SetColumnDelimiter('\t');
   converter.SetModel(m_imageStatisticsModel);
-  converter.SetRootIndex(m_Controls.treeViewStatistics->rootIndex());
+  converter.SetRootIndex(m_Controls->treeViewStatistics->rootIndex());
   converter.SetIncludeHeaderData(true);
 
   QString clipboardAsString = converter.GetString();

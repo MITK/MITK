@@ -18,7 +18,12 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_PCAExampleControls.h"
+#include <mitkPointSet.h>
+
+namespace Ui
+{
+  class PCAExampleControls;
+}
 
 /**
   \brief PCAExample
@@ -62,7 +67,7 @@ protected:
    *                           pointset 3 eigenvalues and -vectors will be computed.
    *  @param[out] pointsMean   Returns the mean/center of the pointset
    */
-  bool comutePCA(mitk::PointSet::Pointer input, std::vector<mitk::Vector3D> &eigenVectors, std::vector<double> &eigenValues, mitk::Vector3D &pointsMean);
+  bool computePCA(mitk::PointSet::Pointer input, std::vector<mitk::Vector3D> &eigenVectors, std::vector<double> &eigenValues, mitk::Vector3D &pointsMean);
 
   /** Adds mitk data nodes for all eigenvectors to visualize them in the multi widget. */
   void showEigenvectors(std::vector<mitk::Vector3D> eigenVectors, std::vector<double> eigenValues, mitk::Vector3D center);
@@ -71,7 +76,7 @@ protected:
   mitk::DataNode::Pointer m_Axis2Node;
   mitk::DataNode::Pointer m_Axis3Node;
 
-  Ui::PCAExampleControls m_Controls;
+  Ui::PCAExampleControls *m_Controls;
 };
 
 #endif // PCAExample_h

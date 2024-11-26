@@ -12,9 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkApplicationCursor.h"
 
-#include <qapplication.h>
-#include <qcursor.h>
-#include <qpixmap.h>
+#include <QApplication>
+#include <QCursor>
+#include <QPixmap>
 
 #include <iostream>
 

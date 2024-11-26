@@ -12,7 +12,6 @@ found in the LICENSE file.
 #ifndef QmitkDicomLocalStorageWidget_h
 #define QmitkDicomLocalStorageWidget_h
 
-#include "ui_QmitkDicomLocalStorageWidgetControls.h"
 #include <MitkDICOMUIExports.h>
 
 // include QT
@@ -27,6 +26,11 @@ class QLabel;
 
 class ctkDICOMDatabase;
 class ctkDICOMIndexer;
+
+namespace Ui
+{
+  class QmitkDicomLocalStorageWidgetControls;
+}
 
 /**
 * \brief QmitkDicomLocalStorageWidget is a QWidget providing functionality for dicom storage and import.
@@ -53,13 +57,6 @@ public:
    * \brief QmitkDicomExternalDataWidget destructor.
    */
   ~QmitkDicomLocalStorageWidget() override;
-
-  /**
-   * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomExternalDataWidgetControls.h.
-   *
-   * \param parent is a pointer to the parent widget
-   */
-  virtual void CreateQtPartControl(QWidget *parent);
 
   /**
    * \brief SetDatabaseDirectory sets database directory.
@@ -99,6 +96,13 @@ public slots:
   void OnSeriesSelectionChanged(const QStringList &);
 
 protected:
+  /**
+   * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomExternalDataWidgetControls.h.
+   *
+   * \param parent is a pointer to the parent widget
+   */
+  void CreateQtPartControl(QWidget *parent);
+
   void SetDatabase(QString databaseFile);
 
   bool DeletePatients();

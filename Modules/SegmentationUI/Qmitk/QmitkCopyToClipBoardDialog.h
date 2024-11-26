@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 #include <mitkCommon.h>
-#include <qdialog.h>
+#include <QDialog>
 /**
   \brief Displays read-only QTextEdit.
 

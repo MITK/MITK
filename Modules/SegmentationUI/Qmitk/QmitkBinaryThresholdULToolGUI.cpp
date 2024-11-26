@@ -12,12 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkBinaryThresholdULToolGUI.h"
 
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qpushbutton.h>
-#include <qslider.h>
-#include <QApplication>
-
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkBinaryThresholdULToolGUI, "")
 
 QmitkBinaryThresholdULToolGUI::QmitkBinaryThresholdULToolGUI() : QmitkBinaryThresholdToolGUIBase(true)

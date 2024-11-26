@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
 #include "QmitkScreenshotMaker.h"
-//#include "QmitkMovieMakerControls.h"
+#include <ui_QmitkScreenshotMakerControls.h>
+
 #include "QmitkStepperAdapter.h"
 
 #include "mitkVtkPropRenderer.h"
@@ -23,17 +23,6 @@ found in the LICENSE file.
 
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
-
-#include <QAction>
-#include <QFileDialog>
-#include <QTimer>
-#include <QDateTime>
-#include <QSpinBox>
-#include <QComboBox>
-#include <QColor>
-#include <QColorDialog>
-
-#include <QApplication>
 
 #include "vtkImageWriter.h"
 #include "vtkJPEGWriter.h"
@@ -49,13 +38,15 @@ found in the LICENSE file.
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include "vtkRenderWindowInteractor.h"
-#include <qradiobutton.h>
 
 #include "mitkSliceNavigationController.h"
 #include "mitkPlanarFigure.h"
 #include <mitkWorkbenchUtil.h>
 #include <mitkImage.h>
 #include <itksys/SystemTools.hxx>
+
+#include <QColorDialog>
+#include <QFileDialog>
 
 QmitkScreenshotMaker::QmitkScreenshotMaker(QObject *parent, const char * /*name*/)
   : QmitkAbstractView(),

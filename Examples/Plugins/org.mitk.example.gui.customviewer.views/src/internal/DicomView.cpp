@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "DicomView.h"
+#include <ui_QmitkDicomViewControls.h>
 
 #include "org_mitk_example_gui_customviewer_views_Activator.h"
 
@@ -26,7 +27,9 @@ found in the LICENSE file.
 
 const std::string DicomView::VIEW_ID = "org.mitk.customviewer.views.dicomview";
 
-DicomView::DicomView() : m_Parent(nullptr)
+DicomView::DicomView()
+  : m_Controls(new Ui::QmitkDicomViewControls),
+    m_Parent(nullptr)
 {
 }
 
@@ -39,14 +42,14 @@ void DicomView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets
   m_Parent = parent;
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   // remove unused widgets
   QPushButton *downloadButton = parent->findChild<QPushButton *>("downloadButton");
   downloadButton->setVisible(false);
 
-  connect(m_Controls.importButton, SIGNAL(clicked()), m_Controls.widget, SLOT(OnFolderCDImport()));
-  connect(m_Controls.widget,
+  connect(m_Controls->importButton, SIGNAL(clicked()), m_Controls->widget, SLOT(OnFolderCDImport()));
+  connect(m_Controls->widget,
           SIGNAL(SignalDicomToDataManager(const QHash<QString, QVariant> &)),
           this,
           SLOT(AddDataNodeFromDICOM(const QHash<QString, QVariant> &)));

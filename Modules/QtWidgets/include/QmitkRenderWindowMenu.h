@@ -41,6 +41,8 @@ found in the LICENSE file.
  * with the full-screen button.
  * The popup Widget can be deactivated with ActivateMenuWidget(false) in
  * QmitkRenderWindow.
+ * \remark the max TS can be configured using the preference "max TS" at
+ *  the "org.mitk.editors" preference node.
  *
  * \sa QmitkRenderWindow
  *

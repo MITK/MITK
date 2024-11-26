@@ -42,7 +42,7 @@
      <item row="0" column="1">
       <widget class="QSpinBox" name="m_MaxTSSpinBox">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum virtual slice thickness allowed in the render windows.&lt;/p&gt;&lt;p&gt;It is the maximum number of slices that can be set to be integrated in a maximum intensity projection (MIP) in the respective render window.&lt;/p&gt;&lt;p&gt;It can be used to limit the TS slider to appropriated range for the use cases at hand. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum virtual slice thickness allowed in the render windows.&lt;/p&gt;&lt;p&gt;It is the maximum number of slices that can be set to be integrated in a maximum intensity projection (MIP) in the respective render window.&lt;/p&gt;&lt;p&gt;It can be used to limit the TS slider to an appropriate range for the use cases at hand. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="minimum">
         <number>1</number>

@@ -121,6 +121,7 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
   m_Controls.btnAIFFile->setVisible(false);
   m_Controls.aifFilePath->setEnabled(false);
   m_Controls.aifFilePath->setVisible(false);
+  m_Controls.aifFilePath->setText("Please select AIF file.");
   m_Controls.radioAIFImage->setChecked(true);
   m_Controls.AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.AIFMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
@@ -903,9 +904,16 @@ void PETDynamicView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& a
 void PETDynamicView::LoadAIFfromFile()
 {
   QFileDialog dialog;
-  dialog.setNameFilter(tr("Images (*.csv"));
+  dialog.setFileMode(QFileDialog::ExistingFile);
+  QStringList filters;
+  dialog.setNameFilter(tr("CSV and Text Files (*.csv *.txt)"));
 
   QString fileName = dialog.getOpenFileName();
+
+  if (fileName.isEmpty())
+  {
+    return;
+  }
 
   m_Controls.aifFilePath->setText(fileName);
 
@@ -920,8 +928,8 @@ void PETDynamicView::LoadAIFfromFile()
   if (!in1.is_open())
   {
     this->m_Controls.infoBox->append(QString("Could not open AIF File!"));
+    return;
   }
-
 
   std::vector< std::string > vec1;
   std::string line1;
@@ -931,9 +939,15 @@ void PETDynamicView::LoadAIFfromFile()
     Tokenizer tok(line1);
     vec1.assign(tok.begin(), tok.end());
 
+    if (vec1.size() < 2)
+    {
+      this->m_Controls.infoBox->append(QString("Invalid content in AIF File: %1").arg(QString::fromStdString(line1)));
+      continue;
+    }
+
     this->AIFinputGrid.push_back(convertToDouble(vec1[0]));
     this->AIFinputFunction.push_back(convertToDouble(vec1[1]));
-
   }
+  in1.close();
 
 }

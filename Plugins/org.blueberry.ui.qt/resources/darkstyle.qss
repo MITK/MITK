@@ -106,6 +106,14 @@ QToolBox::tab:selected {
   border: 1px solid #1c97ea;
 }
 
+QTextEdit[readOnly="true"] {
+  background-color: #1b1b1c;
+}
+
+QPlainTextEdit[readOnly="true"] {
+  background-color: #1b1b1c;
+}
+
 QAbstractItemView {
   alternate-background-color: #1b1b1c;
   background-color: #252526;

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef DicomEventHandler_h
-#define DicomEventHandler_h
+#ifndef QmitkDicomEventHandler_h
+#define QmitkDicomEventHandler_h
 
 #include <QObject>
 #include <service/event/ctkEvent.h>
@@ -19,7 +19,7 @@ found in the LICENSE file.
 /**
 * \brief DicomEventHandler is a class for handling dicom events between dicom plugin and datamanager.
 */
-class DicomEventHandler : public QObject
+class QmitkDicomEventHandler : public QObject
 {
   Q_OBJECT
 
@@ -27,12 +27,12 @@ public:
   /**
   * \brief DicomEventHandler constructor.
   */
-  DicomEventHandler();
+  QmitkDicomEventHandler();
 
   /**
   * \brief DicomEventHandler destructor.
   */
-  ~DicomEventHandler() override;
+  ~QmitkDicomEventHandler() override;
 
   /**
   * \brief Subscribes slots in this class.

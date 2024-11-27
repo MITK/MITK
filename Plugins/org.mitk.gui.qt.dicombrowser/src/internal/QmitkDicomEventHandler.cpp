@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "DicomEventHandler.h"
+#include "QmitkDicomEventHandler.h"
 #include "mitkPluginActivator.h"
 
 #include <mitkBaseDICOMReaderService.h>
@@ -51,15 +51,15 @@ namespace
   }
 }
 
-DicomEventHandler::DicomEventHandler()
+QmitkDicomEventHandler::QmitkDicomEventHandler()
 {
 }
 
-DicomEventHandler::~DicomEventHandler()
+QmitkDicomEventHandler::~QmitkDicomEventHandler()
 {
 }
 
-void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
+void QmitkDicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 {
   QStringList listOfFilesForSeries;
   listOfFilesForSeries = ctkEvent.getProperty("FilesForSeries").toStringList();
@@ -109,8 +109,8 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
                 mitk::ConfigureNodeAsDoseNode(doseImageNode, mitk::GenerateIsoLevels_Virtuos(), referenceDose, showColorWashGlobal);
 
-                ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-                mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+                ctkServiceReference serviceReference = mitk::PluginActivator::GetContext()->getServiceReference<mitk::IDataStorageService>();
+                mitk::IDataStorageService* storageService = mitk::PluginActivator::GetContext()->getService<mitk::IDataStorageService>(serviceReference);
                 mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
                 dataStorage->Add(doseImageNode);
@@ -131,8 +131,8 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
           else {
               std::vector<mitk::DataNode::Pointer> modelVector;
 
-              ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-              mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+              ctkServiceReference serviceReference = mitk::PluginActivator::GetContext()->getServiceReference<mitk::IDataStorageService>();
+              mitk::IDataStorageService* storageService = mitk::PluginActivator::GetContext()->getService<mitk::IDataStorageService>(serviceReference);
               mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
               for (const auto& aStruct : readerOutput){
@@ -163,8 +163,8 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
               planImageNode->SetData(planDummyImage);
               planImageNode->SetName("RTPlan");
 
-              ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-              mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+              ctkServiceReference serviceReference = mitk::PluginActivator::GetContext()->getServiceReference<mitk::IDataStorageService>();
+              mitk::IDataStorageService* storageService = mitk::PluginActivator::GetContext()->getService<mitk::IDataStorageService>(serviceReference);
               mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
               dataStorage->Add(planImageNode);
@@ -182,8 +182,8 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       }
 
       //Get Reference for default data storage.
-      ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-      mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+      ctkServiceReference serviceReference = mitk::PluginActivator::GetContext()->getServiceReference<mitk::IDataStorageService>();
+      mitk::IDataStorageService* storageService = mitk::PluginActivator::GetContext()->getService<mitk::IDataStorageService>(serviceReference);
       mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
       std::vector<mitk::BaseData::Pointer> baseDatas = mitk::IOUtil::Load(seriesToLoad.front());
@@ -216,16 +216,16 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
   }
 }
 
-void DicomEventHandler::OnSignalRemoveSeriesFromStorage(const ctkEvent& /*ctkEvent*/)
+void QmitkDicomEventHandler::OnSignalRemoveSeriesFromStorage(const ctkEvent& /*ctkEvent*/)
 {
 }
 
-void DicomEventHandler::SubscribeSlots()
+void QmitkDicomEventHandler::SubscribeSlots()
 {
-  ctkServiceReference ref = mitk::PluginActivator::getContext()->getServiceReference<ctkEventAdmin>();
+  ctkServiceReference ref = mitk::PluginActivator::GetContext()->getServiceReference<ctkEventAdmin>();
   if (ref)
   {
-    ctkEventAdmin* eventAdmin = mitk::PluginActivator::getContext()->getService<ctkEventAdmin>(ref);
+    ctkEventAdmin* eventAdmin = mitk::PluginActivator::GetContext()->getService<ctkEventAdmin>(ref);
     ctkDictionary properties;
     properties[ctkEventConstants::EVENT_TOPIC] = "org/mitk/gui/qt/dicom/ADD";
     eventAdmin->subscribeSlot(this, SLOT(OnSignalAddSeriesToDataManager(const ctkEvent&)), properties);

@@ -20,17 +20,12 @@ found in the LICENSE file.
 
 class QmitkDicomDataEventPublisher;
 class QmitkDicomDirectoryListener;
+class QmitkDicomEventHandler;
 class QmitkStoreSCPLauncher;
-class DicomEventHandler;
-
-namespace mitk
-{
-  class IPreferences;
-}
 
 namespace Ui
 {
-  class QmitkDicomBrowserControls;
+  class QmitkDicomBrowser;
 }
 
 class ctkFileDialog;
@@ -71,8 +66,6 @@ public:
   void DoSaveAs() override {}
   bool IsDirty() const override { return false; }
   bool IsSaveAsAllowed() const override { return false; }
-
-  void OnPreferencesChanged(const mitk::IPreferences* prefs);
 
 signals:
   /**
@@ -119,17 +112,14 @@ protected:
   */
   void CreateQtPartControl(QWidget *parent) override;
 
-  /// \brief SetPluginDirectory Sets plugin directory.
-  void SetPluginDirectory();
-
   Events::Types GetPartEventTypes() const override;
 
-  Ui::QmitkDicomBrowserControls* m_Controls;
+  Ui::QmitkDicomBrowser* m_Ui;
   ctkFileDialog* m_ImportDialog;
   QmitkDicomDirectoryListener* m_DicomDirectoryListener;
   QmitkStoreSCPLauncherBuilder m_Builder;
   QmitkStoreSCPLauncher* m_StoreSCPLauncher;
-  DicomEventHandler* m_Handler;
+  QmitkDicomEventHandler* m_Handler;
   QmitkDicomDataEventPublisher* m_Publisher;
   QString m_PluginDirectory;
   QString m_TempDirectory;

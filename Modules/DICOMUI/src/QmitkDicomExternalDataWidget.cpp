@@ -43,23 +43,23 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls->setupUi(parent);
-  m_Controls->viewExternalDataButton->setVisible(true);
-  m_Controls->ctkDICOMBrowser->setTableOrientation(Qt::Vertical);
-  m_Controls->ctkDICOMBrowser->setDICOMDatabase(m_ExternalDatabase);
+  m_Controls->viewButton->setVisible(true);
+  m_Controls->tableManager->setTableOrientation(Qt::Vertical);
+  m_Controls->tableManager->setDICOMDatabase(m_ExternalDatabase);
 
   SetupImportDialog();
 
   // connect buttons
-  connect(m_Controls->downloadButton, SIGNAL(clicked()), this, SLOT(OnDownloadButtonClicked()));
-  connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()), this, SLOT(OnViewButtonClicked()));
-  connect(m_Controls->directoryButton, SIGNAL(clicked()), m_ImportDialog, SLOT(show()));
+  connect(m_Controls->addToLocalStorageButton, SIGNAL(clicked()), this, SLOT(OnDownloadButtonClicked()));
+  connect(m_Controls->viewButton, SIGNAL(clicked()), this, SLOT(OnViewButtonClicked()));
+  connect(m_Controls->scanDirectoryButton, SIGNAL(clicked()), m_ImportDialog, SLOT(show()));
 
-  connect(m_Controls->ctkDICOMBrowser,
+  connect(m_Controls->tableManager,
           SIGNAL(seriesSelectionChanged(const QStringList &)),
           this,
           SLOT(OnSeriesSelectionChanged(const QStringList &)));
   connect(
-    m_Controls->ctkDICOMBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex &)), this, SLOT(OnViewButtonClicked()));
+    m_Controls->tableManager, SIGNAL(seriesDoubleClicked(const QModelIndex &)), this, SLOT(OnViewButtonClicked()));
 
   connect(m_ImportDialog, SIGNAL(fileSelected(QString)), this, SLOT(OnStartDicomImport(QString)));
 
@@ -149,7 +149,7 @@ void QmitkDicomExternalDataWidget::OnDownloadButtonClicked()
 
 void QmitkDicomExternalDataWidget::OnViewButtonClicked()
 {
-  QStringList uids = m_Controls->ctkDICOMBrowser->currentSeriesSelection();
+  QStringList uids = m_Controls->tableManager->currentSeriesSelection();
   QString uid;
   foreach (uid, uids)
   {
@@ -170,7 +170,7 @@ QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()
   QStringList filePaths;
 
   QString uid;
-  QStringList seriesUIDs = m_Controls->ctkDICOMBrowser->currentSeriesSelection();
+  QStringList seriesUIDs = m_Controls->tableManager->currentSeriesSelection();
   foreach (uid, seriesUIDs)
   {
     filePaths.append(m_ExternalDatabase->filesForSeries(uid));
@@ -178,7 +178,7 @@ QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()
   if (!filePaths.empty())
     return filePaths;
 
-  QStringList studyUIDs = m_Controls->ctkDICOMBrowser->currentStudiesSelection();
+  QStringList studyUIDs = m_Controls->tableManager->currentStudiesSelection();
 
   foreach (uid, studyUIDs)
   {
@@ -191,7 +191,7 @@ QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()
   if (!filePaths.empty())
     return filePaths;
 
-  QStringList patientsUIDs = m_Controls->ctkDICOMBrowser->currentPatientsSelection();
+  QStringList patientsUIDs = m_Controls->tableManager->currentPatientsSelection();
 
   foreach (uid, patientsUIDs)
   {
@@ -221,7 +221,7 @@ void QmitkDicomExternalDataWidget::OnStartDicomImport(const QString &directory)
 
 void QmitkDicomExternalDataWidget::OnSeriesSelectionChanged(const QStringList &s)
 {
-  m_Controls->viewExternalDataButton->setEnabled((s.size() != 0));
+  m_Controls->viewButton->setEnabled((s.size() != 0));
 }
 
 void QmitkDicomExternalDataWidget::SetupImportDialog()

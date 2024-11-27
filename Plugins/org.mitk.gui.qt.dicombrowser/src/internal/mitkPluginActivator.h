@@ -15,24 +15,23 @@ found in the LICENSE file.
 
 #include <ctkPluginActivator.h>
 
-namespace mitk {
-
-class PluginActivator :
-  public QObject, public ctkPluginActivator
+namespace mitk
 {
-  Q_OBJECT
-  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_dicombrowser")
-  Q_INTERFACES(ctkPluginActivator)
+  class PluginActivator : public QObject, public ctkPluginActivator
+  {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_dicombrowser")
+    Q_INTERFACES(ctkPluginActivator)
 
-public:
+  public:
+    static ctkPluginContext* GetContext();
 
-  void start(ctkPluginContext* context) override;
-  void stop(ctkPluginContext* context) override;
-  static ctkPluginContext* getContext();
-private:
-    static ctkPluginContext* pluginContext;
-}; // PluginActivator
+    void start(ctkPluginContext* context) override;
+    void stop(ctkPluginContext* context) override;
 
+  private:
+    static ctkPluginContext* s_Context;
+  };
 }
 
 #endif

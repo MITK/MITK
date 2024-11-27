@@ -27,7 +27,15 @@ endif()
 cmake_policy(SET CMP0091 OLD)
 
 if(POLICY CMP0135)
-  cmake_policy(SET CMP0135 NEW) # https://cmake.org/cmake/help/v3.24/policy/CMP0135.html
+  # https://cmake.org/cmake/help/v3.24/policy/CMP0135.html
+  # Set timestamps of extracted ExternalProject_Add() downloads to time of extraction.
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
+if(POLICY CMP0167)
+  # https://cmake.org/cmake/help/v3.30/policy/CMP0167.html
+  # The FindBoost module is removed.
+  cmake_policy(SET CMP0167 OLD)
 endif()
 
 #-----------------------------------------------------------------------------

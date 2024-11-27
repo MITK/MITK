@@ -109,6 +109,9 @@ void mitk::SegmentAnythingTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("ShiftSecondaryButtonPressed", OnAddNegativePoint);
   CONNECT_FUNCTION("ShiftPrimaryButtonPressed", OnAddPositivePoint);
   CONNECT_FUNCTION("DeletePoint", OnDelete);
+  CONNECT_FUNCTION("Move", OnMove);
+  CONNECT_FUNCTION("Release", OnRelease);
+  CONNECT_FUNCTION("PrimaryButtonPressed", OnPrimaryButtonPressed);
 }
 
 void mitk::SegmentAnythingTool::InitSAMPythonProcess()
@@ -417,3 +420,7 @@ void mitk::SegmentAnythingTool::EmitSAMStatusMessageEvent(const std::string& sta
 {
   SAMStatusMessageEvent.Send(status);
 }
+
+void mitk::SegmentAnythingTool::OnMove(mitk::StateMachineAction *, mitk::InteractionEvent *){};
+void mitk::SegmentAnythingTool::OnRelease(mitk::StateMachineAction *, mitk::InteractionEvent *){};
+void mitk::SegmentAnythingTool::OnPrimaryButtonPressed(mitk::StateMachineAction *, mitk::InteractionEvent *){};

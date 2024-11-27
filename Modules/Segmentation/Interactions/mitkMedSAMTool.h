@@ -61,6 +61,10 @@ namespace mitk
      */
     void OnDelete(StateMachineAction *, InteractionEvent *);
 
+    virtual void OnMove(StateMachineAction *, InteractionEvent *);
+    virtual void OnRelease(StateMachineAction *, InteractionEvent *);
+    virtual void OnPrimaryButtonPressed(StateMachineAction *, InteractionEvent *);
+
   protected:
     MedSAMTool() = default;
     ~MedSAMTool() = default;

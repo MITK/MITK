@@ -19,7 +19,9 @@ found in the LICENSE file.
 #include <QSortFilterProxyModel>
 #include <QClipboard>
 
-QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent) : QWidget(parent)
+QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent)
+  : QWidget(parent),
+    m_Controls(new Ui::QmitkImageStatisticsControls)
 {
   m_Controls->setupUi(this);
   m_imageStatisticsModel = new QmitkImageStatisticsTreeModel(parent);

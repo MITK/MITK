@@ -314,7 +314,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
     else
     {
       setCursor(Qt::ArrowCursor);
-      this->setToolTip("Left click and mouse move to adjust the slider");
+      this->setToolTip("Left click and move mouse to adjust the slider.");
       m_Resize = false;
       m_Bottom = false;
     }

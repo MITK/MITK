@@ -1290,7 +1290,9 @@ void MRPerfusionView::LoadAIFfromFile()
     if (vec1.size() < 2)
     {
       this->m_Controls.infoBox->append(QString("Invalid content in AIF File: %1").arg(QString::fromStdString(line1)));
-      continue;
+      this->AIFinputGrid.clear();
+      this->AIFinputFunction.clear();
+      return;
     }
 
     this->AIFinputGrid.push_back(convertToDouble(vec1[0]));

@@ -127,6 +127,10 @@ namespace mitk
      */
     virtual void OnDelete(StateMachineAction*, InteractionEvent*);
 
+    void OnMove(StateMachineAction*, InteractionEvent*);
+    void OnRelease(StateMachineAction*, InteractionEvent*);
+    void OnPrimaryButtonPressed(StateMachineAction *, InteractionEvent *);
+
     /*
      * @brief Clear all seed points and call UpdatePreview to reset the segmentation Preview
      */

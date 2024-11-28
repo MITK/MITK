@@ -51,6 +51,9 @@ void mitk::MedSAMTool::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION("ShiftPrimaryButtonPressed", OnRenderWindowClicked);
   CONNECT_FUNCTION("DeletePoint", OnDelete);
+  CONNECT_FUNCTION("Move", OnMove);
+  CONNECT_FUNCTION("Release", OnRelease);
+  CONNECT_FUNCTION("PrimaryButtonPressed", OnPrimaryButtonPressed);
 }
 
 void mitk::MedSAMTool::OnRenderWindowClicked(StateMachineAction *, InteractionEvent *interactionEvent) 
@@ -145,3 +148,7 @@ std::string mitk::MedSAMTool::GetPointsAsCSVString(const mitk::BaseGeometry *bas
                   << abs(static_cast<int>(p2D_max[0])) << SPACE << abs(static_cast<int>(p2D_max[1]));
   return pointsAndLabels.str();
 }
+
+void mitk::MedSAMTool::OnMove(mitk::StateMachineAction *, mitk::InteractionEvent *){};
+void mitk::MedSAMTool::OnRelease(mitk::StateMachineAction *, mitk::InteractionEvent *){};
+void mitk::MedSAMTool::OnPrimaryButtonPressed(mitk::StateMachineAction *, mitk::InteractionEvent *){};

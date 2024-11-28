@@ -116,11 +116,11 @@ protected:
 
   Ui::QmitkDicomBrowser* m_Ui;
   ctkFileDialog* m_ImportDialog;
-  QmitkDicomDirectoryListener* m_DicomDirectoryListener;
+  std::unique_ptr<QmitkDicomDirectoryListener> m_DicomDirectoryListener;
   QmitkStoreSCPLauncherBuilder m_Builder;
-  QmitkStoreSCPLauncher* m_StoreSCPLauncher;
-  QmitkDicomEventHandler* m_Handler;
-  QmitkDicomDataEventPublisher* m_Publisher;
+  std::unique_ptr<QmitkStoreSCPLauncher> m_StoreSCPLauncher;
+  std::unique_ptr<QmitkDicomEventHandler> m_Handler;
+  std::unique_ptr<QmitkDicomDataEventPublisher> m_Publisher;
   QString m_PluginDirectory;
   QString m_TempDirectory;
   QString m_DatabaseDirectory;

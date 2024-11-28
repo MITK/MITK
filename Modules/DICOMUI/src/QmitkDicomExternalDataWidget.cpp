@@ -10,19 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-// Qmitk
 #include "QmitkDicomExternalDataWidget.h"
 #include <ui_QmitkDicomExternalDataWidgetControls.h>
+
 #include <mitkLog.h>
 
-// CTK
 #include <ctkDICOMIndexer.h>
 #include <ctkFileDialog.h>
 
-// Qt
-#include <QCheckBox>
 #include <QMessageBox>
-#include <QTemporaryFile>
+#include <QProgressDialog>
+
+using Self = QmitkDicomExternalDataWidget;
 
 const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomExternalDataWidget";
 
@@ -31,8 +30,8 @@ QmitkDicomExternalDataWidget::QmitkDicomExternalDataWidget(QWidget *parent)
     m_ProgressDialog(nullptr),
     m_Controls(new Ui::QmitkDicomExternalDataWidgetControls)
 {
-  Initialize();
-  CreateQtPartControl(this);
+  this->Initialize();
+  this->CreateQtPartControl(this);
 }
 
 QmitkDicomExternalDataWidget::~QmitkDicomExternalDataWidget()
@@ -47,34 +46,39 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl(QWidget *parent)
   m_Controls->tableManager->setTableOrientation(Qt::Vertical);
   m_Controls->tableManager->setDICOMDatabase(m_ExternalDatabase);
 
-  SetupImportDialog();
+  this->SetupImportDialog();
 
-  // connect buttons
-  connect(m_Controls->addToLocalStorageButton, SIGNAL(clicked()), this, SLOT(OnDownloadButtonClicked()));
-  connect(m_Controls->viewButton, SIGNAL(clicked()), this, SLOT(OnViewButtonClicked()));
-  connect(m_Controls->scanDirectoryButton, SIGNAL(clicked()), m_ImportDialog, SLOT(show()));
+  connect(m_Controls->addToLocalStorageButton, &QPushButton::clicked,
+          this, &Self::OnDownloadButtonClicked);
 
-  connect(m_Controls->tableManager,
-          SIGNAL(seriesSelectionChanged(const QStringList &)),
-          this,
-          SLOT(OnSeriesSelectionChanged(const QStringList &)));
-  connect(
-    m_Controls->tableManager, SIGNAL(seriesDoubleClicked(const QModelIndex &)), this, SLOT(OnViewButtonClicked()));
+  connect(m_Controls->viewButton, &QPushButton::clicked,
+          this, &Self::OnViewButtonClicked);
 
-  connect(m_ImportDialog, SIGNAL(fileSelected(QString)), this, SLOT(OnStartDicomImport(QString)));
+  connect(m_Controls->scanDirectoryButton, &QPushButton::clicked,
+          m_ImportDialog, &ctkFileDialog::show);
 
-  connect(m_ExternalIndexer,
-    SIGNAL(progressStep(QString)),
-    this,
-    SLOT(OnProgressStep(const QString&)));
-  connect(m_ExternalIndexer,
-          SIGNAL(progressDetail(QString)),
-          this,
-          SLOT(OnProgressDetail(const QString &)));
-  connect(m_ExternalIndexer, SIGNAL(progress(int)), this, SLOT(OnProgress(int)));
+  connect(m_Controls->tableManager, qOverload<const QStringList&>(&ctkDICOMTableManager::seriesSelectionChanged),
+          this, &Self::OnSeriesSelectionChanged);
+
+  connect(m_Controls->tableManager, &ctkDICOMTableManager::seriesDoubleClicked,
+          this, &Self::OnViewButtonClicked);
+
+  connect(m_ImportDialog, &ctkFileDialog::fileSelected,
+          this, &Self::OnStartDicomImport);
+
+  connect(m_ExternalIndexer, &ctkDICOMIndexer::progressStep,
+          this, &Self::OnProgressStep);
+
+  connect(m_ExternalIndexer, &ctkDICOMIndexer::progressDetail,
+          this, &Self::OnProgressDetail);
+
+  connect(m_ExternalIndexer, &ctkDICOMIndexer::progress,
+          this, &Self::OnProgress);
+
   // actually the progress dialog closes if the maximum value is reached, BUT
-  // the following line is needed since the external indexer wont reach maximum value (100 % progress)
-  connect(m_ExternalIndexer, SIGNAL(indexingComplete(int, int, int, int)), this, SLOT(OnIndexingComplete(int, int, int, int)));
+  // the following line is needed since the external indexer won't reach maximum value (100 % progress)
+  connect(m_ExternalIndexer, &ctkDICOMIndexer::indexingComplete,
+          this, &Self::OnIndexingComplete);
 }
 
 void QmitkDicomExternalDataWidget::OnProgressStep(const QString& step)
@@ -91,7 +95,7 @@ void QmitkDicomExternalDataWidget::OnProgressDetail(const QString& detail)
   if (m_ProgressDialog == nullptr)
     this->SetupProgressDialog();
 
-  m_ProgressDialog->setLabelText(m_ProgressStep+"\n"+detail);
+  m_ProgressDialog->setLabelText(m_ProgressStep + '\n' + detail);
 }
 
 void QmitkDicomExternalDataWidget::OnProgress(int value)
@@ -136,76 +140,78 @@ void QmitkDicomExternalDataWidget::Initialize()
 
 void QmitkDicomExternalDataWidget::OnDownloadButtonClicked()
 {
-  QStringList filesToDownload = GetFileNamesFromIndex();
-  if (filesToDownload.size() == 0)
+  auto filesToDownload = GetFileNamesFromIndex();
+
+  if (filesToDownload.size() != 0)
+  {
+    emit SignalStartDicomImport(GetFileNamesFromIndex());
+  }
+  else
   {
     QMessageBox info;
     info.setText("You have to select an entry in the DICOM browser for import.");
     info.exec();
-    return;
   }
-  emit SignalStartDicomImport(GetFileNamesFromIndex());
 }
 
 void QmitkDicomExternalDataWidget::OnViewButtonClicked()
 {
-  QStringList uids = m_Controls->tableManager->currentSeriesSelection();
-  QString uid;
-  foreach (uid, uids)
+  for (const auto& uid : m_Controls->tableManager->currentSeriesSelection())
   {
-    QStringList filesForSeries = m_ExternalDatabase->filesForSeries(uid);
+    auto filesForSeries = m_ExternalDatabase->filesForSeries(uid);
+
     QHash<QString, QVariant> eventProperty;
     eventProperty.insert("FilesForSeries", filesForSeries);
+
     if (!filesForSeries.isEmpty())
     {
-      QString modality = m_ExternalDatabase->fileValue(filesForSeries.at(0), "0008,0060");
+      auto modality = m_ExternalDatabase->fileValue(filesForSeries.at(0), "0008,0060");
       eventProperty.insert("Modality", modality);
     }
+
     emit SignalDicomToDataManager(eventProperty);
   }
 }
 
 QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()
 {
+  auto seriesUIDs = m_Controls->tableManager->currentSeriesSelection();
   QStringList filePaths;
 
-  QString uid;
-  QStringList seriesUIDs = m_Controls->tableManager->currentSeriesSelection();
-  foreach (uid, seriesUIDs)
-  {
-    filePaths.append(m_ExternalDatabase->filesForSeries(uid));
-  }
+  for (const auto& seriesUID : seriesUIDs)
+    filePaths.append(m_ExternalDatabase->filesForSeries(seriesUID));
+
   if (!filePaths.empty())
     return filePaths;
 
-  QStringList studyUIDs = m_Controls->tableManager->currentStudiesSelection();
+  auto studyUIDs = m_Controls->tableManager->currentStudiesSelection();
 
-  foreach (uid, studyUIDs)
+  for (const auto& studyUID : studyUIDs)
   {
-    seriesUIDs = m_ExternalDatabase->seriesForStudy(uid);
-    foreach (uid, seriesUIDs)
-    {
-      filePaths.append(m_ExternalDatabase->filesForSeries(uid));
-    }
+    seriesUIDs = m_ExternalDatabase->seriesForStudy(studyUID);
+
+    for (const auto& seriesUID : seriesUIDs)
+      filePaths.append(m_ExternalDatabase->filesForSeries(seriesUID));
   }
+
   if (!filePaths.empty())
     return filePaths;
 
   QStringList patientsUIDs = m_Controls->tableManager->currentPatientsSelection();
 
-  foreach (uid, patientsUIDs)
+  for (const auto& patientUID : patientsUIDs)
   {
-    studyUIDs = m_ExternalDatabase->studiesForPatient(uid);
+    studyUIDs = m_ExternalDatabase->studiesForPatient(patientUID);
 
-    foreach (uid, studyUIDs)
+    for (const auto& studyUID : studyUIDs)
     {
-      seriesUIDs = m_ExternalDatabase->seriesForStudy(uid);
-      foreach (uid, seriesUIDs)
-      {
-        filePaths.append(m_ExternalDatabase->filesForSeries(uid));
-      }
+      seriesUIDs = m_ExternalDatabase->seriesForStudy(studyUID);
+
+      for (const auto& seriesUID : seriesUIDs)
+        filePaths.append(m_ExternalDatabase->filesForSeries(seriesUID));
     }
   }
+
   return filePaths;
 }
 
@@ -243,11 +249,12 @@ void QmitkDicomExternalDataWidget::SetupProgressDialog()
   if (m_ProgressDialog != nullptr)
     return;
 
-  m_ProgressDialog = new QProgressDialog("Initialization ...", "Cancel", 0, 100, this);
+  m_ProgressDialog = new QProgressDialog("Initialization...", "Cancel", 0, 100, this);
   m_ProgressDialog->setAttribute(Qt::WA_DeleteOnClose);
   m_ProgressDialog->setWindowTitle("DICOM Import");
   m_ProgressDialog->setWindowModality(Qt::WindowModal);
   m_ProgressDialog->setMinimumDuration(0);
 
-  connect(m_ProgressDialog, SIGNAL(canceled()), m_ExternalIndexer, SLOT(cancel()));
+  connect(m_ProgressDialog, &QProgressDialog::canceled,
+          m_ExternalIndexer, &ctkDICOMIndexer::cancel);
 }

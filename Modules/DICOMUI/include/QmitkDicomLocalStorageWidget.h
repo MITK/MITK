@@ -63,7 +63,7 @@ public:
    *
    * \param newDatabaseDirectory contains path to new database directory.
    */
-  void SetDatabaseDirectory(QString newDatabaseDirectory);
+  void SetDatabaseDirectory(const QString& newDatabaseDirectory);
 
 signals:
 
@@ -74,7 +74,7 @@ signals:
    * @brief emitted when view button is clicked.
    * @param _t1 containing dicom UIDs properties.
    */
-  void SignalDicomToDataManager(QHash<QString, QVariant> _t1);
+  void SignalDicomToDataManager(const QHash<QString, QVariant>& _t1);
 
   /// \brief emitted if cancel button is pressed.
   void SignalCancelImport();
@@ -103,7 +103,7 @@ protected:
    */
   void CreateQtPartControl(QWidget *parent);
 
-  void SetDatabase(QString databaseFile);
+  void SetDatabase(const QString& databaseFile);
 
   bool DeletePatients();
   bool DeleteStudies();

@@ -13,37 +13,33 @@ found in the LICENSE file.
 #ifndef QmitkDicomDataEventPublisher_h
 #define QmitkDicomDataEventPublisher_h
 
-#include <ctkPluginContext.h>
 #include <QObject>
+
+#include <ctkDictionary.h>
+
+class ctkPluginContext;
 
 /**
 * \brief QmitkDicomDataEventPublisher is a class for publishing ctkEvents.
 */
 class QmitkDicomDataEventPublisher : public QObject
 {
-    Q_OBJECT
-    public:
+  Q_OBJECT
 
-        /**
-        * \brief QmitkDicomDataEventPublisher constructor.
-        */
-        QmitkDicomDataEventPublisher();
+public:
 
-        /**
-        * \brief QmitkDicomDataEventPublisher destructor.
-        */
-        ~QmitkDicomDataEventPublisher() override;
+  QmitkDicomDataEventPublisher();
+  ~QmitkDicomDataEventPublisher() override;
 
-        /// @brief sets the event admin from given plugin context
-        void PublishSignals(ctkPluginContext* context);
+  /// @brief sets the event admin from given plugin context
+  void PublishSignals(ctkPluginContext* context);
 
-        void AddSeriesToDataManagerEvent(const ctkDictionary& properties);
+  void AddSeriesToDataManagerEvent(const ctkDictionary& properties);
+  void RemoveSeriesFromStorageEvent(const ctkDictionary& properties);
 
-        void RemoveSeriesFromStorageEvent(const ctkDictionary& properties);
-
-    signals:
-        void SignalAddSeriesToDataManager(const ctkDictionary&);
-
-        void SignalRemoveSeriesFromStorage(const ctkDictionary&);
+signals:
+  void SignalAddSeriesToDataManager(const ctkDictionary&);
+  void SignalRemoveSeriesFromStorage(const ctkDictionary&);
 };
+
 #endif

@@ -27,19 +27,14 @@ const QString QmitkDicomBrowser::TEMP_DICOM_FOLDER_SUFFIX = "TmpDicomFolder";
 QmitkDicomBrowser::QmitkDicomBrowser()
   : m_Ui(new Ui::QmitkDicomBrowser),
     m_ImportDialog(nullptr),
-    m_DicomDirectoryListener(new QmitkDicomDirectoryListener()),
-    m_StoreSCPLauncher(new QmitkStoreSCPLauncher(&m_Builder)),
-    m_Handler(nullptr),
-    m_Publisher(new QmitkDicomDataEventPublisher())
+    m_DicomDirectoryListener(std::make_unique<QmitkDicomDirectoryListener>()),
+    m_StoreSCPLauncher(std::make_unique<QmitkStoreSCPLauncher>(&m_Builder)),
+    m_Publisher(std::make_unique<QmitkDicomDataEventPublisher>())
 {
 }
 
 QmitkDicomBrowser::~QmitkDicomBrowser()
 {
-  delete m_DicomDirectoryListener;
-  delete m_StoreSCPLauncher;
-  delete m_Handler;
-  delete m_Publisher;
 }
 
 void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent )
@@ -117,14 +112,14 @@ void QmitkDicomBrowser::StartDicomDirectoryListener()
   m_DicomDirectoryListener->SetDicomListenerDirectory(m_TempDirectory);
   m_DicomDirectoryListener->SetDicomFolderSuffix(TEMP_DICOM_FOLDER_SUFFIX);
 
-  connect(m_DicomDirectoryListener, &QmitkDicomDirectoryListener::SignalStartDicomImport,
+  connect(m_DicomDirectoryListener.get(), &QmitkDicomDirectoryListener::SignalStartDicomImport,
           m_Ui->internalDataWidget, qOverload<const QStringList&>(&QmitkDicomLocalStorageWidget::OnStartDicomImport),
           Qt::DirectConnection);
 }
 
 void QmitkDicomBrowser::TestHandler()
 {
-  m_Handler = new QmitkDicomEventHandler();
+  m_Handler = std::make_unique<QmitkDicomEventHandler>();
   m_Handler->SubscribeSlots();
 }
 
@@ -145,19 +140,19 @@ void QmitkDicomBrowser::StartStoreSCP()
   auto storagePort = m_Ui->queryRetrieveWidget->getServerParameters()["StoragePort"].toString();
   auto storageAET = m_Ui->queryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
   m_Builder.AddPort(storagePort)->AddAETitle(storageAET)->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(m_TempDirectory);
-  m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&m_Builder);
+  m_StoreSCPLauncher = std::make_unique<QmitkStoreSCPLauncher>(&m_Builder);
 
-  connect(m_StoreSCPLauncher, &QmitkStoreSCPLauncher::SignalStatusOfStoreSCP,
+  connect(m_StoreSCPLauncher.get(), &QmitkStoreSCPLauncher::SignalStatusOfStoreSCP,
           this, &Self::OnStoreSCPStatusChanged);
 
-  connect(m_StoreSCPLauncher, &QmitkStoreSCPLauncher::SignalStartImport,
+  connect(m_StoreSCPLauncher.get(), &QmitkStoreSCPLauncher::SignalStartImport,
           m_Ui->internalDataWidget, qOverload<const QStringList&>(&QmitkDicomLocalStorageWidget::OnStartDicomImport));
 
-  connect(m_StoreSCPLauncher, &QmitkStoreSCPLauncher::SignalStoreSCPError,
-          m_DicomDirectoryListener, &QmitkDicomDirectoryListener::OnDicomNetworkError,
+  connect(m_StoreSCPLauncher.get(), &QmitkStoreSCPLauncher::SignalStoreSCPError,
+          m_DicomDirectoryListener.get(), &QmitkDicomDirectoryListener::OnDicomNetworkError,
           Qt::DirectConnection);
 
-  connect(m_StoreSCPLauncher, &QmitkStoreSCPLauncher::SignalStoreSCPError,
+  connect(m_StoreSCPLauncher.get(), &QmitkStoreSCPLauncher::SignalStoreSCPError,
           this, &Self::OnDicomNetworkError,
           Qt::DirectConnection);
 
@@ -176,8 +171,7 @@ void QmitkDicomBrowser::OnDicomNetworkError(const QString& status)
 
 void QmitkDicomBrowser::StopStoreSCP()
 {
-  delete m_StoreSCPLauncher;
-  m_StoreSCPLauncher = nullptr;
+  m_StoreSCPLauncher.reset();
 }
 
 void QmitkDicomBrowser::CreateTemporaryDirectory()

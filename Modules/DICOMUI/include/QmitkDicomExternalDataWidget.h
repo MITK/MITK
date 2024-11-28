@@ -14,19 +14,13 @@ found in the LICENSE file.
 #define QmitkDicomExternalDataWidget_h
 
 #include <MitkDICOMUIExports.h>
-
-// include QT
-#include <QHash>
-#include <QLabel>
-#include <QProgressDialog>
-#include <QString>
-#include <QStringList>
-#include <QVariant>
 #include <QWidget>
 
 class ctkFileDialog;
 class ctkDICOMDatabase;
 class ctkDICOMIndexer;
+
+class QProgressDialog;
 
 namespace Ui
 {
@@ -65,7 +59,7 @@ signals:
   void SignalStartDicomImport(const QStringList &);
 
   /// @brief emitted when view button is clicked.
-  void SignalDicomToDataManager(QHash<QString, QVariant>);
+  void SignalDicomToDataManager(const QHash<QString, QVariant>&);
 
 public slots:
 

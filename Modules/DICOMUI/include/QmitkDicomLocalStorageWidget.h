@@ -44,8 +44,6 @@ class MITKDICOMUI_EXPORT QmitkDicomLocalStorageWidget : public QWidget
   Q_OBJECT
 
 public:
-  static const std::string Widget_ID;
-
   /**
    * \brief QmitkDicomLocalStorageWidget(QWidget *parent) constructor.
    *
@@ -111,6 +109,7 @@ protected:
 
   ctkDICOMDatabase *m_LocalDatabase;
   ctkDICOMIndexer *m_LocalIndexer;
+  std::unique_ptr<ctkDICOMIndexer> m_LocalIndexer;
   Ui::QmitkDicomLocalStorageWidgetControls *m_Controls;
 };
 

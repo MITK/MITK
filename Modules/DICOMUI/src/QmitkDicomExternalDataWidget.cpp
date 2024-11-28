@@ -23,8 +23,6 @@ found in the LICENSE file.
 
 using Self = QmitkDicomExternalDataWidget;
 
-const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomExternalDataWidget";
-
 QmitkDicomExternalDataWidget::QmitkDicomExternalDataWidget(QWidget *parent)
   : QWidget(parent),
     m_ProgressDialog(nullptr),

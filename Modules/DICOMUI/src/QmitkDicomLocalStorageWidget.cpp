@@ -19,11 +19,9 @@ found in the LICENSE file.
 
 using Self = QmitkDicomLocalStorageWidget;
 
-const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomLocalStorageWidget";
-
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
   : QWidget(parent),
-    m_LocalIndexer(new ctkDICOMIndexer(parent)),
+    m_LocalIndexer(std::make_unique<ctkDICOMIndexer>(parent)),
     m_Controls(new Ui::QmitkDicomLocalStorageWidgetControls)
 {
   this->CreateQtPartControl(this);
@@ -50,7 +48,7 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->tableManager, &ctkDICOMTableManager::seriesDoubleClicked,
           this, &Self::OnViewButtonClicked);
 
-  connect(m_LocalIndexer, &ctkDICOMIndexer::indexingComplete,
+  connect(m_LocalIndexer.get(), &ctkDICOMIndexer::indexingComplete,
           this, &Self::SignalFinishedImport);
 
   m_Controls->tableManager->setTableOrientation(Qt::Vertical);

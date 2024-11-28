@@ -39,8 +39,6 @@ class MITKDICOMUI_EXPORT QmitkDicomExternalDataWidget : public QWidget
   Q_OBJECT
 
 public:
-  static const std::string Widget_ID;
-
   /**
   * \brief QmitkDicomExternalDataWidget(QWidget *parent) constructor.
   *

@@ -57,7 +57,7 @@ public:
   void mouseDoubleClickEvent(QMouseEvent *mouseEvent) override;
   void PaintHistogram(QPainter &p);
 
-  virtual int GetNearHandle(int x, int y, unsigned int maxSquaredDistance = 32) = 0;
+  virtual int GetNearHandle(int x, int y, unsigned int maxSquaredDistance = 100) = 0;
   virtual int AddFunctionPoint(double x, double val) = 0;
   virtual void RemoveFunctionPoint(double x) = 0;
   virtual void MoveFunctionPoint(int index, std::pair<double, double> pos) = 0;

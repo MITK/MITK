@@ -1299,7 +1299,7 @@ void MRPerfusionView::LoadAIFfromFile()
     this->AIFinputFunction.push_back(convertToDouble(vec1[1]));
   }
   in1.close();
-
+  this->m_Controls.infoBox->append(QString("AIF File successfully loaded!"));
 }
 
 void MRPerfusionView::PrepareConcentrationImage()

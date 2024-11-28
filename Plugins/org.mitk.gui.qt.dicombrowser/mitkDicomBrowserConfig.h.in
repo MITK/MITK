@@ -1,6 +1,0 @@
-#ifndef mitkDicomBrowserConfig_h
-#define mitkDicomBrowserConfig_h
-
-#define DCMTK_STORESCP "@DCMTK_STORESCP@"
-
-#endif

@@ -144,6 +144,7 @@ namespace
 
 QmitkDicomEventHandler::QmitkDicomEventHandler()
 {
+  this->SubscribeSlots();
 }
 
 QmitkDicomEventHandler::~QmitkDicomEventHandler()

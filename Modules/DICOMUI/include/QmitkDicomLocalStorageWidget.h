@@ -61,7 +61,7 @@ public:
    *
    * \param newDatabaseDirectory contains path to new database directory.
    */
-  void SetDatabaseDirectory(const QString& newDatabaseDirectory);
+  QSharedPointer<ctkDICOMDatabase> SetDatabaseDirectory(const QString& newDatabaseDirectory);
 
 signals:
 
@@ -107,8 +107,7 @@ protected:
   bool DeleteStudies();
   bool DeleteSeries();
 
-  ctkDICOMDatabase *m_LocalDatabase;
-  ctkDICOMIndexer *m_LocalIndexer;
+  QSharedPointer<ctkDICOMDatabase> m_LocalDatabase;
   std::unique_ptr<ctkDICOMIndexer> m_LocalIndexer;
   Ui::QmitkDicomLocalStorageWidgetControls *m_Controls;
 };

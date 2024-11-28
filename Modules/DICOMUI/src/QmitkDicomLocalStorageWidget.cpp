@@ -29,7 +29,6 @@ QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
 
 QmitkDicomLocalStorageWidget::~QmitkDicomLocalStorageWidget()
 {
-  m_LocalDatabase->closeDatabase();
 }
 
 void QmitkDicomLocalStorageWidget::CreateQtPartControl(QWidget *parent)
@@ -176,23 +175,25 @@ void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
   }
 }
 
-void QmitkDicomLocalStorageWidget::SetDatabaseDirectory(const QString& newDatatbaseDirectory)
+QSharedPointer<ctkDICOMDatabase> QmitkDicomLocalStorageWidget::SetDatabaseDirectory(const QString& newDatatbaseDirectory)
 {
   QDir databaseDirecory(newDatatbaseDirectory);
+
   if (!databaseDirecory.exists())
-  {
     databaseDirecory.mkpath(databaseDirecory.absolutePath());
-  }
-  QString newDatatbaseFile = databaseDirecory.absolutePath() + QString("/ctkDICOM.sql");
-  this->SetDatabase(newDatatbaseFile);
+
+  const auto newDatabaseFile = databaseDirecory.absolutePath() + QString("/ctkDICOM.sql");
+  this->SetDatabase(newDatabaseFile);
+
+  return m_LocalDatabase;
 }
 
 void QmitkDicomLocalStorageWidget::SetDatabase(const QString& databaseFile)
 {
-  m_LocalDatabase = new ctkDICOMDatabase(databaseFile);
-  m_LocalDatabase->setParent(this);
-  m_Controls->tableManager->setDICOMDatabase(m_LocalDatabase);
-  m_LocalIndexer->setDatabase(m_LocalDatabase);
+  m_LocalDatabase = QSharedPointer<ctkDICOMDatabase>::create(databaseFile);
+
+  m_Controls->tableManager->setDICOMDatabase(m_LocalDatabase.get());
+  m_LocalIndexer->setDatabase(m_LocalDatabase.get());
 }
 
 void QmitkDicomLocalStorageWidget::OnSeriesSelectionChanged(const QStringList &s)

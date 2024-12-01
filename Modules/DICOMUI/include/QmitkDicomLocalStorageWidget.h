@@ -9,107 +9,83 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
+
 #ifndef QmitkDicomLocalStorageWidget_h
 #define QmitkDicomLocalStorageWidget_h
 
 #include <MitkDICOMUIExports.h>
-
-// include QT
-#include <QHash>
-#include <QString>
-#include <QStringList>
-#include <QVariant>
 #include <QWidget>
-
-class QProgressDialog;
-class QLabel;
 
 class ctkDICOMDatabase;
 class ctkDICOMIndexer;
 
 namespace Ui
 {
-  class QmitkDicomLocalStorageWidgetControls;
+  class QmitkDicomLocalStorageWidget;
 }
 
 /**
-* \brief QmitkDicomLocalStorageWidget is a QWidget providing functionality for dicom storage and import.
-*
-* \ingroup Functionalities
-*/
+ * \brief Wrapper widget for a ctkDICOMTableManager and a few extra buttons for
+ *        managing the local storage DICOM database.
+ */
 class MITKDICOMUI_EXPORT QmitkDicomLocalStorageWidget : public QWidget
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
 public:
-  /**
-   * \brief QmitkDicomLocalStorageWidget(QWidget *parent) constructor.
-   *
-   * \param parent is a pointer to the parent widget
-   */
-  QmitkDicomLocalStorageWidget(QWidget *parent);
-
-  /**
-   * \brief QmitkDicomExternalDataWidget destructor.
-   */
+  explicit QmitkDicomLocalStorageWidget(QWidget* parent = nullptr);
   ~QmitkDicomLocalStorageWidget() override;
 
   /**
-   * \brief SetDatabaseDirectory sets database directory.
+   * \brief Set the directory for the local storage DICOM database.
    *
-   * \param newDatabaseDirectory contains path to new database directory.
+   * It is necessary to set the directory for the local storage
+   * DICOM database to fully initialize this widget.
+   *
+   * The returned database pointer should be passed to the
+   * ctkDICOMQueryRetrieveWidget as retrieve database.
+   *
+   * \param databaseDirectory Path to a directory used for storing
+   *        the local storage DICOM database.
+   *
+   * \return A shared pointer to the DICOM database of the wrapped
+   *         ctkDICOMTableManager.
    */
-  QSharedPointer<ctkDICOMDatabase> SetDatabaseDirectory(const QString& newDatabaseDirectory);
+  QSharedPointer<ctkDICOMDatabase> SetDatabaseDirectory(const QString& databaseDirectory);
 
 signals:
-
-  /// @brief emitted when import into database is finished.
-  void SignalFinishedImport();
+  /**
+   * \brief Emitted when the indexing of newly added DICOM data is complete.
+   */
+  void IndexingComplete();
 
   /**
-   * @brief emitted when view button is clicked.
-   * @param _t1 containing dicom UIDs properties.
+   * \brief Emitted when the View button is clicked.
+   *
+   * \param series A vector of pairs containing the first file of each series
+                   and optionally its modality (DICOM tag (0008,0060)).
    */
-  void SignalDicomToDataManager(const QHash<QString, QVariant>& _t1);
-
-  /// \brief emitted if cancel button is pressed.
-  void SignalCancelImport();
+  void ViewSeries(const std::vector<std::pair<std::string, std::optional<std::string>>>& series);
 
 public slots:
-  /// @brief Called when view button was clicked.
-  void OnViewButtonClicked();
-
-  /// @brief   Called delete button was clicked.
-  void OnDeleteButtonClicked();
-
-  /// @brief   Called when adding a dicom directory. Starts a thread adding the directory.
-  void OnStartDicomImport(const QString &dicomData);
-
-  /// @brief   Called when adding a list of dicom files. Starts a thread adding the dicom files.
-  void OnStartDicomImport(const QStringList &dicomData);
-
-  /// @brief Called when the selection in the series table has changed
-  void OnSeriesSelectionChanged(const QStringList &);
-
-protected:
   /**
-   * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomExternalDataWidgetControls.h.
-   *
-   * \param parent is a pointer to the parent widget
+   * \brief Starts a thread adding the given DICOM files.
    */
-  void CreateQtPartControl(QWidget *parent);
+  void OnImport(const QStringList &files);
 
-  void SetDatabase(const QString& databaseFile);
+private slots:
+  void OnViewButtonClicked();
+  void OnDeleteButtonClicked();
+  void OnSeriesSelectionChanged(const QStringList&);
 
+private:
   bool DeletePatients();
   bool DeleteStudies();
   bool DeleteSeries();
 
   QSharedPointer<ctkDICOMDatabase> m_LocalDatabase;
   std::unique_ptr<ctkDICOMIndexer> m_LocalIndexer;
-  Ui::QmitkDicomLocalStorageWidgetControls *m_Controls;
+  Ui::QmitkDicomLocalStorageWidget *m_Ui;
 };
 
 #endif

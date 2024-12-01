@@ -4,8 +4,6 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkDicomBrowser.cpp
-  QmitkDicomDataEventPublisher.cpp
-  QmitkDicomEventHandler.cpp
 )
 
 set(UI_FILES
@@ -15,8 +13,6 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkDicomBrowser.h
-  src/internal/QmitkDicomDataEventPublisher.h
-  src/internal/QmitkDicomEventHandler.h
 )
 
 set(CACHED_RESOURCE_FILES

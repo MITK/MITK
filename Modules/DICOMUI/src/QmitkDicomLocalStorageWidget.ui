@@ -1,58 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkDicomExternalDataWidgetControls</class>
- <widget class="QWidget" name="QmitkDicomExternalDataWidgetControls">
+ <class>QmitkDicomLocalStorageWidget</class>
+ <widget class="QWidget" name="QmitkDicomLocalStorageWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
-    <height>375</height>
+    <width>434</width>
+    <height>284</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="scanDirectoryButton">
-       <property name="text">
-        <string>Scan directory</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../../Plugins/org.mitk.gui.qt.dicombrowser/resources/dicom.qrc">
-         <normaloff>:/org.mitk.gui.qt.dicombrowser/folder_32.png</normaloff>:/org.mitk.gui.qt.dicombrowser/folder_32.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="addToLocalStorageButton">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="text">
-        <string>Add to local storage</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../../Plugins/org.mitk.gui.qt.dicombrowser/resources/dicom.qrc">
-         <normaloff>:/org.mitk.gui.qt.dicombrowser/import_32.png</normaloff>:/org.mitk.gui.qt.dicombrowser/import_32.png</iconset>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QPushButton" name="viewButton">
        <property name="enabled">
@@ -65,11 +28,19 @@
         <iconset resource="../../../Plugins/org.mitk.gui.qt.dicombrowser/resources/dicom.qrc">
          <normaloff>:/org.mitk.gui.qt.dicombrowser/viewIcon.png</normaloff>:/org.mitk.gui.qt.dicombrowser/viewIcon.png</iconset>
        </property>
-       <property name="iconSize">
-        <size>
-         <width>16</width>
-         <height>20</height>
-        </size>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="deleteButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Delete</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Plugins/org.mitk.gui.qt.datamanager/resources/datamanager.qrc">
+         <normaloff>:/org.mitk.gui.qt.datamanager/Remove_48.png</normaloff>:/org.mitk.gui.qt.datamanager/Remove_48.png</iconset>
        </property>
       </widget>
      </item>
@@ -109,6 +80,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../../Plugins/org.mitk.gui.qt.datamanager/resources/datamanager.qrc"/>
   <include location="../../../Plugins/org.mitk.gui.qt.dicombrowser/resources/dicom.qrc"/>
  </resources>
  <connections/>

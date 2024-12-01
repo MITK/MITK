@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>809</width>
-    <height>628</height>
+    <width>660</width>
+    <height>390</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -48,8 +48,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>807</width>
-        <height>626</height>
+        <width>658</width>
+        <height>388</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -88,13 +88,7 @@
            <height>32</height>
           </size>
          </property>
-         <widget class="QWidget" name="localStoragePage">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QmitkDicomLocalStorageWidget" name="localStorageWidget">
           <attribute name="icon">
            <iconset resource="../../resources/dicom.qrc">
             <normaloff>:/org.mitk.gui.qt.dicombrowser/drive-harddisk_32.png</normaloff>:/org.mitk.gui.qt.dicombrowser/drive-harddisk_32.png</iconset>
@@ -102,60 +96,17 @@
           <attribute name="title">
            <string>Local Storage</string>
           </attribute>
-          <attribute name="toolTip">
-           <string>Manage your local DICOM imports</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <widget class="QmitkDicomLocalStorageWidget" name="internalDataWidget" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-          </layout>
          </widget>
-         <widget class="QWidget" name="importPage">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QmitkDicomImportWidget" name="importWidget">
           <attribute name="icon">
            <iconset resource="../../resources/dicom.qrc">
-            <normaloff>:/org.mitk.gui.qt.dicombrowser/import_32.png</normaloff>
-            <selectedon>:/org.mitk.gui.qt.dicombrowser/import_32.png</selectedon>:/org.mitk.gui.qt.dicombrowser/import_32.png</iconset>
+            <normaloff>:/org.mitk.gui.qt.dicombrowser/import_32.png</normaloff>:/org.mitk.gui.qt.dicombrowser/import_32.png</iconset>
           </attribute>
           <attribute name="title">
            <string>Import</string>
           </attribute>
-          <attribute name="toolTip">
-           <string>Import DICOM data from any hard drive</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_9">
-           <item>
-            <widget class="QmitkDicomExternalDataWidget" name="externalDataWidget" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-          </layout>
          </widget>
-         <widget class="QWidget" name="queryRetrievePage">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="ctkDICOMQueryRetrieveWidget" name="queryRetrieveWidget">
           <attribute name="icon">
            <iconset resource="../../resources/dicom.qrc">
             <normaloff>:/org.mitk.gui.qt.dicombrowser/network-workgroup_32.png</normaloff>:/org.mitk.gui.qt.dicombrowser/network-workgroup_32.png</iconset>
@@ -163,37 +114,6 @@
           <attribute name="title">
            <string>Query/Retrieve</string>
           </attribute>
-          <attribute name="toolTip">
-           <string>Query and retrieve DICOM data from a server</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_12">
-           <item>
-            <widget class="QLabel" name="warningLabel">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgb(255, 0, 0);</string>
-             </property>
-             <property name="text">
-              <string>Warning: This is an experimental feature!</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="ctkDICOMQueryRetrieveWidget" name="queryRetrieveWidget" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-          </layout>
          </widget>
         </widget>
        </item>
@@ -231,9 +151,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QmitkDicomExternalDataWidget</class>
+   <class>QmitkDicomImportWidget</class>
    <extends>QWidget</extends>
-   <header location="global">QmitkDicomExternalDataWidget.h</header>
+   <header location="global">QmitkDicomImportWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

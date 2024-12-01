@@ -11,58 +11,47 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkDicomLocalStorageWidget.h"
-#include <ui_QmitkDicomLocalStorageWidgetControls.h>
+#include <ui_QmitkDicomLocalStorageWidget.h>
 
 #include <QMessageBox>
 
 #include <ctkDICOMIndexer.h>
 
-using Self = QmitkDicomLocalStorageWidget;
-
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
   : QWidget(parent),
     m_LocalIndexer(std::make_unique<ctkDICOMIndexer>(parent)),
-    m_Controls(new Ui::QmitkDicomLocalStorageWidgetControls)
+    m_Ui(new Ui::QmitkDicomLocalStorageWidget)
 {
-  this->CreateQtPartControl(this);
+  using Self = QmitkDicomLocalStorageWidget;
+
+  m_Ui->setupUi(this);
+
+  connect(m_Ui->deleteButton, &QPushButton::clicked,
+    this, &Self::OnDeleteButtonClicked);
+
+  connect(m_Ui->viewButton, &QPushButton::clicked,
+    this, &Self::OnViewButtonClicked);
+
+  connect(m_Ui->tableManager, &ctkDICOMTableManager::seriesDoubleClicked,
+    this, &Self::OnViewButtonClicked);
+
+  connect(m_Ui->tableManager, qOverload<const QStringList&>(&ctkDICOMTableManager::seriesSelectionChanged),
+    this, &Self::OnSeriesSelectionChanged);
+
+  connect(m_LocalIndexer.get(), &ctkDICOMIndexer::indexingComplete,
+    this, &Self::IndexingComplete);
+
+  m_Ui->tableManager->setTableOrientation(Qt::Vertical);
 }
 
 QmitkDicomLocalStorageWidget::~QmitkDicomLocalStorageWidget()
 {
 }
 
-void QmitkDicomLocalStorageWidget::CreateQtPartControl(QWidget *parent)
-{
-  m_Controls->setupUi(parent);
-
-  connect(m_Controls->deleteButton, &QPushButton::clicked,
-          this, &Self::OnDeleteButtonClicked);
-
-  connect(m_Controls->viewButton, &QPushButton::clicked,
-          this, &Self::OnViewButtonClicked);
-
-  connect(m_Controls->tableManager, qOverload<const QStringList&>(&ctkDICOMTableManager::seriesSelectionChanged),
-          this, &Self::OnSeriesSelectionChanged);
-
-  connect(m_Controls->tableManager, &ctkDICOMTableManager::seriesDoubleClicked,
-          this, &Self::OnViewButtonClicked);
-
-  connect(m_LocalIndexer.get(), &ctkDICOMIndexer::indexingComplete,
-          this, &Self::SignalFinishedImport);
-
-  m_Controls->tableManager->setTableOrientation(Qt::Vertical);
-}
-
-void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QString &dicomData)
+void QmitkDicomLocalStorageWidget::OnImport(const QStringList& files)
 {
   if (m_LocalDatabase->isOpen())
-    m_LocalIndexer->addDirectory(dicomData);
-}
-
-void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QStringList &dicomData)
-{
-  if (m_LocalDatabase->isOpen())
-    m_LocalIndexer->addListOfFiles(dicomData);
+    m_LocalIndexer->addListOfFiles(files);
 }
 
 void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
@@ -70,12 +59,12 @@ void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
   if (!this->DeletePatients() && !this->DeleteStudies())
     this->DeleteSeries();
 
-  m_Controls->tableManager->updateTableViews();
+  m_Ui->tableManager->updateTableViews();
 }
 
 bool QmitkDicomLocalStorageWidget::DeletePatients()
 {
-  const auto selectedPatientUIDs = m_Controls->tableManager->currentPatientsSelection();
+  const auto selectedPatientUIDs = m_Ui->tableManager->currentPatientsSelection();
 
   if (selectedPatientUIDs.empty())
     return false;
@@ -91,7 +80,7 @@ bool QmitkDicomLocalStorageWidget::DeletePatients()
     seriesUIDs << m_LocalDatabase->seriesForStudy(studyUID);
 
   auto answer = QMessageBox::question(nullptr,
-    "Delete Patients",
+    "Delete patients",
     QString("Do you really want to delete %1 %2, containing %3 series in %4 %5?")
       .arg(selectedPatientUIDs.size())
       .arg(selectedPatientUIDs.size() != 1 ? "patients" : "patient")
@@ -110,7 +99,7 @@ bool QmitkDicomLocalStorageWidget::DeletePatients()
 
 bool QmitkDicomLocalStorageWidget::DeleteStudies()
 {
-  const auto selectedStudyUIDs = m_Controls->tableManager->currentStudiesSelection();
+  const auto selectedStudyUIDs = m_Ui->tableManager->currentStudiesSelection();
 
   if (selectedStudyUIDs.empty())
     return false;
@@ -121,7 +110,7 @@ bool QmitkDicomLocalStorageWidget::DeleteStudies()
     seriesUIDs << m_LocalDatabase->seriesForStudy(studyUID);
 
   auto answer = QMessageBox::question(nullptr,
-    "Delete Studies",
+    "Delete studies",
     QString("Do you really want to delete %1 %2, containing %3 series?")
       .arg(selectedStudyUIDs.size())
       .arg(selectedStudyUIDs.size() != 1 ? "studies" : "study")
@@ -138,13 +127,13 @@ bool QmitkDicomLocalStorageWidget::DeleteStudies()
 
 bool QmitkDicomLocalStorageWidget::DeleteSeries()
 {
-  const auto selectedSeriesUIDs = m_Controls->tableManager->currentSeriesSelection();
+  const auto selectedSeriesUIDs = m_Ui->tableManager->currentSeriesSelection();
 
   if (selectedSeriesUIDs.empty())
     return false;
 
   auto answer = QMessageBox::question(nullptr,
-    "Delete Series",
+    "Delete series",
     QString("Do you really want to delete %1 series?").arg(selectedSeriesUIDs.size()));
 
   if (answer == QMessageBox::Yes)
@@ -158,21 +147,33 @@ bool QmitkDicomLocalStorageWidget::DeleteSeries()
 
 void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
 {
-  for (const auto& uid : m_Controls->tableManager->currentSeriesSelection())
+  std::vector<std::pair<std::string, std::optional<std::string>>> series;
+
+  for (const auto& seriesUID : m_Ui->tableManager->currentSeriesSelection())
   {
-    const auto filesForSeries = m_LocalDatabase->filesForSeries(uid);
+    const auto filesForSeries = m_LocalDatabase->filesForSeries(seriesUID);
 
-    QHash<QString, QVariant> eventProperty;
-    eventProperty.insert("FilesForSeries", filesForSeries);
+    if (filesForSeries.empty())
+      continue;
 
-    if (!filesForSeries.isEmpty())
-    {
-      const auto modality = m_LocalDatabase->fileValue(filesForSeries.at(0), "0008,0060");
-      eventProperty.insert("Modality", modality);
-    }
+    std::pair<std::string, std::optional<std::string>> seriesElem;
+    seriesElem.first = filesForSeries[0].toStdString();
 
-    emit SignalDicomToDataManager(eventProperty);
+    const auto modality = m_LocalDatabase->fileValue(filesForSeries[0], "0008,0060").toUpper();
+
+    if (!modality.isEmpty())
+      seriesElem.second = modality.toStdString();
+
+    series.push_back(seriesElem);
   }
+
+  if (!series.empty())
+    emit ViewSeries(series);
+}
+
+void QmitkDicomLocalStorageWidget::OnSeriesSelectionChanged(const QStringList& selection)
+{
+  m_Ui->viewButton->setEnabled(!selection.empty());
 }
 
 QSharedPointer<ctkDICOMDatabase> QmitkDicomLocalStorageWidget::SetDatabaseDirectory(const QString& newDatatbaseDirectory)
@@ -182,21 +183,10 @@ QSharedPointer<ctkDICOMDatabase> QmitkDicomLocalStorageWidget::SetDatabaseDirect
   if (!databaseDirecory.exists())
     databaseDirecory.mkpath(databaseDirecory.absolutePath());
 
-  const auto newDatabaseFile = databaseDirecory.absolutePath() + QString("/ctkDICOM.sql");
-  this->SetDatabase(newDatabaseFile);
+  const auto databaseFile = databaseDirecory.absolutePath() + QString("/ctkDICOM.sql");
+  m_LocalDatabase = QSharedPointer<ctkDICOMDatabase>::create(databaseFile);
+  m_Ui->tableManager->setDICOMDatabase(m_LocalDatabase.get());
+  m_LocalIndexer->setDatabase(m_LocalDatabase.get());
 
   return m_LocalDatabase;
-}
-
-void QmitkDicomLocalStorageWidget::SetDatabase(const QString& databaseFile)
-{
-  m_LocalDatabase = QSharedPointer<ctkDICOMDatabase>::create(databaseFile);
-
-  m_Controls->tableManager->setDICOMDatabase(m_LocalDatabase.get());
-  m_LocalIndexer->setDatabase(m_LocalDatabase.get());
-}
-
-void QmitkDicomLocalStorageWidget::OnSeriesSelectionChanged(const QStringList &s)
-{
-  m_Controls->viewButton->setEnabled((s.size() != 0));
 }

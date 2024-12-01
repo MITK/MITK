@@ -20,45 +20,21 @@ found in the LICENSE file.
 
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QTemporaryFile>
 
-namespace
-{
-  bool OpenDatabase(ctkDICOMDatabase* database)
-  {
-    QTemporaryFile tempDatabaseFile;
-
-    if (!tempDatabaseFile.open())
-      return false;
-
-    tempDatabaseFile.setAutoRemove(false);
-
-    return database->openDatabase(tempDatabaseFile.fileName());
-  }
-}
+using Self = QmitkDicomImportWidget;
 
 QmitkDicomImportWidget::QmitkDicomImportWidget(QWidget *parent)
   : QWidget(parent),
-    m_ImportDatabase(new ctkDICOMDatabase(this)),
-    m_ImportIndexer(new ctkDICOMIndexer(this)),
+    m_DatabaseFile(nullptr),
+    m_Database(nullptr),
+    m_Indexer(nullptr),
     m_ImportDialog(new ctkFileDialog(this)),
     m_ProgressDialog(nullptr),
     m_Ui(new Ui::QmitkDicomImportWidget)
 {
-  using Self = QmitkDicomImportWidget;
-
   m_Ui->setupUi(this);
   m_Ui->tableManager->setTableOrientation(Qt::Vertical);
-
-  if (!OpenDatabase(m_ImportDatabase))
-  {
-    const auto message = "Database error: " + m_ImportDatabase->lastError();
-    MITK_ERROR << message.toStdString();
-    QMessageBox::critical(nullptr, "DICOM Import", message);
-    this->setEnabled(false);
-    return;
-  }
-
-  m_Ui->tableManager->setDICOMDatabase(m_ImportDatabase);
 
   m_ImportDialog->setFileMode(QFileDialog::Directory);
   m_ImportDialog->setLabelText(QFileDialog::Accept, "Import");
@@ -82,24 +58,11 @@ QmitkDicomImportWidget::QmitkDicomImportWidget(QWidget *parent)
 
   connect(m_ImportDialog, &ctkFileDialog::fileSelected,
     this, &Self::OnImport);
-
-  connect(m_ImportIndexer, &ctkDICOMIndexer::progressStep,
-    this, &Self::OnProgressStep);
-
-  connect(m_ImportIndexer, &ctkDICOMIndexer::progressDetail,
-    this, &Self::OnProgressDetail);
-
-  connect(m_ImportIndexer, &ctkDICOMIndexer::progress,
-    this, &Self::OnProgress);
-
-  // The progress dialog closes if the maximum value is reached, but the following
-  // line is necessary as the indexer does not reach the maximum value.
-  connect(m_ImportIndexer, &ctkDICOMIndexer::indexingComplete,
-    this, &Self::OnIndexingComplete);
 }
 
 QmitkDicomImportWidget::~QmitkDicomImportWidget()
 {
+  this->CloseDatabase();
 }
 
 void QmitkDicomImportWidget::OnProgressStep(const QString& step)
@@ -150,7 +113,7 @@ void QmitkDicomImportWidget::OnViewButtonClicked()
 
   for (const auto& seriesUID : m_Ui->tableManager->currentSeriesSelection())
   {
-    const auto filesForSeries = m_ImportDatabase->filesForSeries(seriesUID);
+    const auto filesForSeries = m_Database->filesForSeries(seriesUID);
 
     if (filesForSeries.empty())
       continue;
@@ -158,7 +121,7 @@ void QmitkDicomImportWidget::OnViewButtonClicked()
     std::pair<std::string, std::optional<std::string>> seriesElem;
     seriesElem.first = filesForSeries[0].toStdString();
 
-    const auto modality = m_ImportDatabase->fileValue(filesForSeries[0], "0008,0060").toUpper();
+    const auto modality = m_Database->fileValue(filesForSeries[0], "0008,0060").toUpper();
 
     if (!modality.isEmpty())
       seriesElem.second = modality.toStdString();
@@ -176,7 +139,7 @@ QStringList QmitkDicomImportWidget::GetFileNamesFromSelection()
   QStringList filePaths;
 
   for (const auto& seriesUID : seriesUIDs)
-    filePaths.append(m_ImportDatabase->filesForSeries(seriesUID));
+    filePaths.append(m_Database->filesForSeries(seriesUID));
 
   if (!filePaths.empty())
     return filePaths;
@@ -185,10 +148,10 @@ QStringList QmitkDicomImportWidget::GetFileNamesFromSelection()
 
   for (const auto& studyUID : studyUIDs)
   {
-    seriesUIDs = m_ImportDatabase->seriesForStudy(studyUID);
+    seriesUIDs = m_Database->seriesForStudy(studyUID);
 
     for (const auto& seriesUID : seriesUIDs)
-      filePaths.append(m_ImportDatabase->filesForSeries(seriesUID));
+      filePaths.append(m_Database->filesForSeries(seriesUID));
   }
 
   if (!filePaths.empty())
@@ -198,18 +161,85 @@ QStringList QmitkDicomImportWidget::GetFileNamesFromSelection()
 
   for (const auto& patientUID : patientsUIDs)
   {
-    studyUIDs = m_ImportDatabase->studiesForPatient(patientUID);
+    studyUIDs = m_Database->studiesForPatient(patientUID);
 
     for (const auto& studyUID : studyUIDs)
     {
-      seriesUIDs = m_ImportDatabase->seriesForStudy(studyUID);
+      seriesUIDs = m_Database->seriesForStudy(studyUID);
 
       for (const auto& seriesUID : seriesUIDs)
-        filePaths.append(m_ImportDatabase->filesForSeries(seriesUID));
+        filePaths.append(m_Database->filesForSeries(seriesUID));
     }
   }
 
   return filePaths;
+}
+
+bool QmitkDicomImportWidget::OpenDatabase()
+{
+  this->CloseDatabase();
+
+  m_DatabaseFile = new QTemporaryFile(QDir::tempPath() + "/mitk_dicom_import_XXXXXX.sqlite", this);
+
+  if (!m_DatabaseFile->open())
+    return false;
+
+  m_Database = new ctkDICOMDatabase(this);
+
+  if (!m_Database->openDatabase(m_DatabaseFile->fileName()))
+  {
+    const auto message = "Database error: " + m_Database->lastError();
+    MITK_ERROR << message.toStdString();
+    QMessageBox::critical(nullptr, "DICOM Import", message);
+    return false;
+  }
+
+  m_Ui->tableManager->setDICOMDatabase(m_Database);
+
+  m_Indexer = new ctkDICOMIndexer(this);
+  m_Indexer->setDatabase(m_Database);
+
+  connect(m_Indexer, &ctkDICOMIndexer::progressStep,
+    this, &Self::OnProgressStep);
+
+  connect(m_Indexer, &ctkDICOMIndexer::progressDetail,
+    this, &Self::OnProgressDetail);
+
+  connect(m_Indexer, &ctkDICOMIndexer::progress,
+    this, &Self::OnProgress);
+
+  connect(m_Indexer, &ctkDICOMIndexer::indexingComplete,
+    this, &Self::OnIndexingComplete);
+
+  return true;
+}
+
+void QmitkDicomImportWidget::CloseDatabase()
+{
+  if (m_Indexer != nullptr)
+  {
+    m_Indexer->setDatabase(nullptr);
+    m_Indexer->deleteLater();
+    m_Indexer = nullptr;
+  }
+
+  m_Ui->tableManager->setDICOMDatabase(nullptr);
+
+  if (m_Database != nullptr)
+  {
+    if (m_Database->isOpen())
+      m_Database->closeDatabase();
+
+    m_Database->deleteLater();
+    m_Database = nullptr;
+  }
+
+  if (m_DatabaseFile != nullptr && m_DatabaseFile->isOpen())
+  {
+    m_DatabaseFile->close();
+    m_DatabaseFile->deleteLater();
+    m_DatabaseFile = nullptr;
+  }
 }
 
 void QmitkDicomImportWidget::OnImport(const QString &directory)
@@ -217,7 +247,8 @@ void QmitkDicomImportWidget::OnImport(const QString &directory)
   m_ImportDialog->close();
   m_ImportDialog->setDirectory(directory);
 
-  m_ImportIndexer->addDirectory(m_ImportDatabase, directory);
+  if (this->OpenDatabase())
+    m_Indexer->addDirectory(m_Database, directory);
 }
 
 void QmitkDicomImportWidget::OnSeriesSelectionChanged(const QStringList &selection)
@@ -237,5 +268,5 @@ void QmitkDicomImportWidget::SetupProgressDialog()
   m_ProgressDialog->setMinimumDuration(0);
 
   connect(m_ProgressDialog, &QProgressDialog::canceled,
-          m_ImportIndexer, &ctkDICOMIndexer::cancel);
+          m_Indexer, &ctkDICOMIndexer::cancel);
 }

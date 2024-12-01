@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitkDicomImportWidget_h
 
 #include <MitkDICOMUIExports.h>
+
 #include <QWidget>
 
 class ctkFileDialog;
@@ -21,6 +22,7 @@ class ctkDICOMDatabase;
 class ctkDICOMIndexer;
 
 class QProgressDialog;
+class QTemporaryFile;
 
 namespace Ui
 {
@@ -70,10 +72,13 @@ private:
   QStringList GetFileNamesFromSelection();
   void SetupProgressDialog();
 
-  ctkDICOMDatabase* m_ImportDatabase;
-  ctkDICOMIndexer* m_ImportIndexer;
-  ctkFileDialog* m_ImportDialog;
+  bool OpenDatabase();
+  void CloseDatabase();
 
+  QTemporaryFile* m_DatabaseFile;
+  ctkDICOMDatabase* m_Database;
+  ctkDICOMIndexer* m_Indexer;
+  ctkFileDialog* m_ImportDialog;
   QProgressDialog* m_ProgressDialog;
   QString m_ProgressStep;
 

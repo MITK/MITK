@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkDicomLocalStorageWidget.h"
+#include <QmitkDicomLocalStorageWidget.h>
 #include <ui_QmitkDicomLocalStorageWidget.h>
 
 #include <QMessageBox>

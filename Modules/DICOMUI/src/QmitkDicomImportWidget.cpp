@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkDicomImportWidget.h"
+#include <QmitkDicomImportWidget.h>
 #include <ui_QmitkDicomImportWidget.h>
 
 #include <mitkLog.h>
@@ -236,9 +236,14 @@ void QmitkDicomImportWidget::CloseDatabase()
 
   if (m_DatabaseFile != nullptr && m_DatabaseFile->isOpen())
   {
+    QFile tagCacheFile(QFileInfo(m_DatabaseFile->fileName()).absolutePath() + "/ctkDICOMTagCache.sql");
+
     m_DatabaseFile->close();
     m_DatabaseFile->deleteLater();
     m_DatabaseFile = nullptr;
+
+    if (tagCacheFile.exists())
+      tagCacheFile.remove();
   }
 }
 

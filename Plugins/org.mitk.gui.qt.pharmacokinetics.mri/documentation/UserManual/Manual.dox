@@ -125,7 +125,7 @@ You can find a detailed description in the documentation of the concentration cu
 The proportionality factor k is dependent on many different factors and is usually not known.
 However, it does not need to be known as long as k is tissue independent.
 When fitting an AIF-based pharmacokinetic model based on the standard tracer-kinetic theory of linear and stationary systems,
-which is e.g. true for the standard Tofts model, k scales out because it is the same for blood and tissue.
+which is e.g. true for the standard Tofts model, k cancels out because it is the same for blood and tissue.
 Therefore, you can for example just set k = 1.0 (which is also set as default value). \n
 \n
 

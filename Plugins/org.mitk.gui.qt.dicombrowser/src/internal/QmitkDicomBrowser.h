@@ -33,7 +33,7 @@ public:
 
   enum Tabs
   {
-    LocalStorage = 1,
+    LocalStorage,
     Import,
     QueryRetrieve
   };

@@ -190,6 +190,10 @@ void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent)
 
   connect(m_Ui->localStorageWidget, &QmitkDicomLocalStorageWidget::ViewSeries,
           this, &Self::OnViewSeries);
+
+  m_Ui->tabWidget->setCurrentIndex(database->seriesCount() > 0
+    ? Tabs::LocalStorage
+    : Tabs::Import);
 }
 
 void QmitkDicomBrowser::OnIndexingComplete()

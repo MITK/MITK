@@ -111,6 +111,7 @@ Make sure that the "Concentration" node is toggled off. \n
 The level-window might be set such that the map is not visible. When the map is open in the standard display,
 right-click on the slider and select "Use optimized level-window".
 Afterwards you can fine-tune the level-window by left-click on the slider and moving the mouse up/down or left/right.\n
+Other nodes in the data manager could potentially be displayed if not deselected. To make sure that only the paramenter maps are visible, right click on the parameter map and select "Show only selected nodes".\n
 \n
 
 - <b>Why are my K^trans values much higher than literature values?</b>\n

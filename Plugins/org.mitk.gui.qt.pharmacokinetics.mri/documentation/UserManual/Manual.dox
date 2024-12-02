@@ -116,7 +116,7 @@ Other nodes in the data manager could potentially be displayed if not deselected
 
 - <b>Why are my K^trans values much higher than literature values?</b>\n
 In MITK, K^trans values are reported in units of ml/min/100ml (which can be e.g. seen by right clicking on the map,
-selecting "Show details" and scrolling to the field "modelfit.parameter.unit".). Literature values are sometimes reported in units of \min, which will be smaller by a factor of 100.\n
+selecting "Show details" and scrolling to the field "modelfit.parameter.unit".). Literature values are sometimes reported in units of min<sup>-1</sup>, which will be smaller by a factor of 100.\n
 \n
 
 - <b>What are the exact formulas for relative and absolute signal conversion and how should I set the factor k?</b>\n

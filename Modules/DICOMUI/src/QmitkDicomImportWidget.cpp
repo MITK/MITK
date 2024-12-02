@@ -50,8 +50,16 @@ QmitkDicomImportWidget::QmitkDicomImportWidget(QWidget *parent)
   connect(m_Ui->scanDirectoryButton, &QPushButton::clicked,
     m_ImportDialog, &ctkFileDialog::show);
 
+  auto onAnySelectionChanged = [this](const QStringList&) { this->OnAnySelectionChanged(); };
+
+  connect(m_Ui->tableManager, qOverload<const QStringList&>(&ctkDICOMTableManager::patientsSelectionChanged),
+    onAnySelectionChanged);
+
+  connect(m_Ui->tableManager, qOverload<const QStringList&>(&ctkDICOMTableManager::studiesSelectionChanged),
+    onAnySelectionChanged);
+
   connect(m_Ui->tableManager, qOverload<const QStringList&>(&ctkDICOMTableManager::seriesSelectionChanged),
-    this, &Self::OnSeriesSelectionChanged);
+    onAnySelectionChanged);
 
   connect(m_Ui->tableManager, &ctkDICOMTableManager::seriesDoubleClicked,
     this, &Self::OnViewButtonClicked);
@@ -256,9 +264,24 @@ void QmitkDicomImportWidget::OnImport(const QString &directory)
     m_Indexer->addDirectory(m_Database, directory);
 }
 
-void QmitkDicomImportWidget::OnSeriesSelectionChanged(const QStringList &selection)
+void QmitkDicomImportWidget::OnAnySelectionChanged()
 {
-  m_Ui->viewButton->setEnabled(!selection.empty());
+  const auto seriesSelection = m_Ui->tableManager->currentSeriesSelection();
+
+  m_Ui->viewButton->setEnabled(!seriesSelection.empty());
+  m_Ui->addToLocalStorageButton->setEnabled(!seriesSelection.empty());
+
+  if (seriesSelection.empty())
+  {
+    m_Ui->addToLocalStorageButton->setEnabled(
+      !m_Ui->tableManager->currentPatientsSelection().empty() ||
+      !m_Ui->tableManager->currentStudiesSelection().empty());
+  }
+}
+
+void QmitkDicomImportWidget::showEvent(QShowEvent*)
+{
+  this->OnAnySelectionChanged();
 }
 
 void QmitkDicomImportWidget::SetupProgressDialog()

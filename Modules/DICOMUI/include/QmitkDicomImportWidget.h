@@ -65,10 +65,12 @@ private slots:
   void OnProgress(int value);
   void OnProgressDetail(const QString& detail);
   void OnProgressStep(const QString& step);
-  void OnSeriesSelectionChanged(const QStringList& selection);
+  void OnAnySelectionChanged();
   void OnViewButtonClicked();
 
 private:
+  void showEvent(QShowEvent* event) override;
+
   QStringList GetFileNamesFromSelection();
   void SetupProgressDialog();
 

@@ -76,9 +76,11 @@ public slots:
 private slots:
   void OnViewButtonClicked();
   void OnDeleteButtonClicked();
-  void OnSeriesSelectionChanged(const QStringList&);
+  void OnAnySelectionChanged();
 
 private:
+  void showEvent(QShowEvent* event) override;
+
   bool DeletePatients();
   bool DeleteStudies();
   bool DeleteSeries();

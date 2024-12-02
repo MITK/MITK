@@ -30,7 +30,7 @@
      <item>
       <widget class="QPushButton" name="addToLocalStorageButton">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="text">
         <string>Add to local storage</string>

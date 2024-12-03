@@ -165,6 +165,15 @@ QmitkDicomBrowser::QmitkDicomBrowser()
 
 QmitkDicomBrowser::~QmitkDicomBrowser()
 {
+  // The ctkDICOMQueryRetrieveWidget creates an in-memory database for query results.
+  // However, a ctkDICOMTagCache.sql buddy file is still created on disk in the
+  // working directory. Until it is fixed in CTK, we manually remove the temporary
+  // file.
+
+  QFile queryTagCacheFile(QDir().currentPath() + "/ctkDICOMTagCache.sql");
+
+  if (queryTagCacheFile.exists())
+    queryTagCacheFile.remove();
 }
 
 void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent)

@@ -121,7 +121,7 @@ selecting "Show details" and scrolling to the field "modelfit.parameter.unit".).
 
 - <b>What are the exact formulas for relative and absolute signal conversion and how should I set the factor k?</b>\n
 You can find a detailed description in the documentation of the concentration curve converter view. Either by
- opening the view in the workbench and pressing F1 or here: \ref org_mitk_views_pharmacokinetics_concentration_mri.\n
+ opening the view in the workbench and pressing F1 or here: \ref org_mitk_views_pharmacokinetics_concentration_mri. \n
 The proportionality factor k is dependent on many different factors and is usually not known.
 However, it does not need to be known as long as k is tissue independent.
 When fitting an AIF-based pharmacokinetic model based on the standard tracer-kinetic theory of linear and stationary systems,

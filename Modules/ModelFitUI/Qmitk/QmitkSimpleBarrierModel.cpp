@@ -281,6 +281,8 @@ setData(const QModelIndex& index, const QVariant& value, int role)
     mitk::SimpleBarrierConstraintChecker::Constraint constraint = m_Checker->GetConstraint(
           static_cast<unsigned int>(index.row()));
 
+    bool changed = false;
+
     switch (index.column())
     {
       case 0:
@@ -296,37 +298,35 @@ setData(const QModelIndex& index, const QVariant& value, int role)
             constraint.parameters.push_back(pos);
           }
         }
-
-        emit dataChanged(index, index);
+        changed = true;
         break;
       }
 
       case 1:
         constraint.upperBarrier = value.toInt() == 1;
-        emit dataChanged(index, index);
+        changed = true;
         break;
 
       case 2:
         constraint.barrier = value.toDouble();
-        emit dataChanged(index, index);
+        changed = true;
         break;
 
       case 3:
         constraint.width = value.toDouble();
-        emit dataChanged(index, index);
+        changed = true;
         break;
 
     }
 
-    emit beginResetModel();
+    if (changed)
+    {
+      m_Checker->GetConstraint(static_cast<unsigned int>(index.row())) = constraint;
+      emit dataChanged(index, index);
+      m_modified = true;
+    }
 
-    m_Checker->GetConstraint(static_cast<unsigned int>(index.row())) = constraint;
-
-    m_modified = true;
-
-    emit endResetModel();
-
-    return true;
+    return changed;
   }
 
   return false;

@@ -21,6 +21,7 @@ found in the LICENSE file.
 
 #include "mitkModelTraitsInterface.h"
 #include "mitkInitialParameterizationDelegateBase.h"
+#include "mitkNodePredicateBase.h"
 
 /*forward declarations*/
 class QmitkInitialValuesModel;
@@ -76,6 +77,8 @@ protected:
   QmitkInitialValuesDelegate* m_ValuesDelegate;
 
   Ui::QmitkInitialValuesManagerWidget m_Controls;
+
+  mitk::NodePredicateBase::Pointer m_NoHiddenOrHelperPredicate;
 
 protected Q_SLOTS:
   void OnModelReset();

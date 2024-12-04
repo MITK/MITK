@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkLabelSetImageHelper.h>
 
+#include <mitkDataStorage.h>
 #include <mitkLabelSetImage.h>
 #include <mitkExceptionMacro.h>
 #include <mitkProperties.h>
@@ -55,13 +56,28 @@ mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateEmptySegmentationNode(c
 
 
 mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateNewSegmentationNode(const DataNode* referenceNode,
-  const Image* initialSegmentationImage, const std::string& segmentationName)
+  const Image* initialSegmentationImage, const std::string& segmentationName, const DataStorage* dataStorage)
 {
   std::string newSegmentationName = segmentationName;
   if (newSegmentationName.empty())
   {
     newSegmentationName = referenceNode->GetName();
-    newSegmentationName.append("-labels");
+
+    if (!newSegmentationName.empty())
+      newSegmentationName.append("-");
+
+    newSegmentationName.append("labels");
+  }
+
+  if (dataStorage != nullptr && dataStorage->GetNamedNode(newSegmentationName) != nullptr)
+  {
+    int id = 2;
+    std::string suffix = "-" + std::to_string(id);
+
+    while (dataStorage->GetNamedNode(newSegmentationName + suffix) != nullptr)
+      suffix = "-" + std::to_string(++id);
+
+    newSegmentationName.append(suffix);
   }
 
   if (nullptr == initialSegmentationImage)

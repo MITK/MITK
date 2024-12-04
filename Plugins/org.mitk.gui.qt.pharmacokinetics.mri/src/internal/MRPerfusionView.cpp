@@ -325,7 +325,7 @@ void MRPerfusionView::OnModellSet(int index)
     }
 
     m_Controls.constraintManager->setChecker(this->m_modelConstraints,
-        this->m_selectedModelFactory->GetParameterNames());
+        this->m_selectedModelFactory->GetParameterNames(), this->m_selectedModelFactory->GetParameterUnits());
 
   }
 

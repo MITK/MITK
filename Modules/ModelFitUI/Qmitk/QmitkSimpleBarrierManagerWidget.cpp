@@ -28,6 +28,7 @@ QmitkSimpleBarrierManagerWidget::QmitkSimpleBarrierManagerWidget(QWidget*): m_In
   this->m_Controls.constraintsView->setModel(m_InternalModel);
   this->m_Controls.constraintsView->setItemDelegateForColumn(0, m_ParametersDelegate);
   this->m_Controls.constraintsView->setItemDelegateForColumn(1, m_TypeDelegate);
+  this->m_Controls.constraintsView->setItemDelegateForColumn(4, m_ParametersDelegate);
   this->m_Controls.constraintsView->setContextMenuPolicy(Qt::CustomContextMenu);
 
   connect(this->m_Controls.btnAdd, SIGNAL(clicked(bool)), this, SLOT(OnAddConstraint(bool)));
@@ -46,11 +47,12 @@ QmitkSimpleBarrierManagerWidget::~QmitkSimpleBarrierManagerWidget()
 }
 
 void QmitkSimpleBarrierManagerWidget::setChecker(mitk::SimpleBarrierConstraintChecker* pChecker,
-    const mitk::ModelTraitsInterface::ParameterNamesType& names)
+    const mitk::ModelTraitsInterface::ParameterNamesType& names, const mitk::ModelTraitsInterface::ParamterUnitMapType& units)
 {
   this->m_Checker = pChecker;
   this->m_ParameterNames = names;
-  this->m_InternalModel->setChecker(m_Checker, names);
+  this->m_ParameterUnits = units;
+  this->m_InternalModel->setChecker(m_Checker, names, units);
   update();
 }
 

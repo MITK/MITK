@@ -135,7 +135,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset()
   }
 }
 
-void QmitkTransferFunctionGeneratorWidget::OnPreset(int mode)
+void QmitkTransferFunctionGeneratorWidget::OnPreset(int /*mode*/)
 {
   m_InfoPreset->clear();
 }

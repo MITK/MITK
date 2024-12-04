@@ -397,7 +397,7 @@ void QmitkSegmentationView::OnNewSegmentation()
   try
   {
     this->WaitCursorOn();
-    newSegmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(m_ReferenceNode, segTemplateImage);
+    newSegmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(m_ReferenceNode, segTemplateImage, "", this->GetDataStorage());
     this->WaitCursorOff();
   }
   catch (mitk::Exception& e)

@@ -86,7 +86,9 @@ void mitk::ConcentrationCurveGenerator::Convert()
 
     this->m_ConvertedImage = tempImage;
 
-    // This is a workaround to make the (DICOM) properties of the dynamic source image available when using the derived concentration image.
+    // This is a workaround to make the (DICOM) properties of the dynamic source image available when
+    // using the derived concentration image. As soon as issue #513 is fixed properly it should
+    // be possible to remove the following line.
     this->m_ConvertedImage->SetPropertyList(this->m_DynamicImage->GetPropertyList()->Clone());
 }
 

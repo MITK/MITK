@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+#include <mitkIOMimeTypes.h>
 
 #include "QmitkIOUtil.h"
 
@@ -133,6 +134,33 @@ namespace mitk {
 #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
     int lastCrtReportType = _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
 #endif
+
+    if (fileNames.size() > 1)
+    {
+      auto dicomMimeType = mitk::IOMimeTypes::DICOM_MIMETYPE();
+      bool isDICOM = false;
+      //Save guard for avoiding unintended DICOM stack loading
+      for (const auto& file : fileNames)
+      {
+        isDICOM = dicomMimeType.AppliesTo(file.toStdString());
+        if (isDICOM)
+          break;
+      }
+      if (isDICOM)
+      {
+        // Static function to show a message box
+        if (QMessageBox::Cancel == QMessageBox::warning(
+          QApplication::activeWindow(),
+          "Confirm multiple DICOM series loading",
+          "You have selected multiple DICOM files for loading.\nPlease mark that it is sufficient to only "
+          "select one DICOM file and MITK automatically loads all files of the same DICOM series.\n"
+          "Only select multiple DICOM files if they belong to different DICOM series, otherwise it will "
+          "result in loading the same volume multiple times.\n\n"
+          "Hint: If you want to load all DICOM series in a directory, just select the directory. MITK will "
+          "do the rest for you.", QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel))
+          return;
+      }
+    }
 
     // Do the actual work of loading the data into the data storage
     DataStorage::SetOfObjects::Pointer data;

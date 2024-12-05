@@ -35,8 +35,18 @@ QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidg
   m_Controls.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls.tableView->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_Controls.tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   m_Controls.tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+  auto header = m_Controls.tableView->horizontalHeader();
+  header->setSectionResizeMode(0, QHeaderView::Stretch);
+
+  const int columnCount = m_StorageModel->columnCount();
+
+  for (int column = 1; column < columnCount; ++column)
+  {
+    header->setSectionResizeMode(column, QHeaderView::Fixed);
+    header->resizeSection(column, 0); // As small as possible yet big enough for icons.
+  }
 
   this->SetUpConnections();
   this->Initialize();

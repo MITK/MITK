@@ -151,12 +151,13 @@ namespace mitk {
         if (QMessageBox::Cancel == QMessageBox::warning(
           QApplication::activeWindow(),
           "Confirm multiple DICOM series loading",
-          "You have selected multiple DICOM files for loading.\nPlease mark that it is sufficient to only "
-          "select one DICOM file and MITK automatically loads all files of the same DICOM series.\n"
-          "Only select multiple DICOM files if they belong to different DICOM series, otherwise it will "
-          "result in loading the same volume multiple times.\n\n"
-          "Hint: If you want to load all DICOM series in a directory, just select the directory. MITK will "
-          "do the rest for you.", QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel))
+          "<p>You have selected multiple DICOM files to load.</p>"
+          "<p>Please note that you only need to select a single DICOM file. MITK will automatically load all files "
+          "that belong to the same DICOM series.</p>"
+          "<p>Select multiple DICOM files only if they belong to different series. Otherwise, the <b>same volume will "
+          "be loaded multiple times</b>.</p>"
+          "<p>Hint: To load all DICOM series in a folder, simply select the folder. MITK will handle the rest for you.</p>"
+          "<p>Do you want to continue?</p>", QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel))
           return;
       }
     }

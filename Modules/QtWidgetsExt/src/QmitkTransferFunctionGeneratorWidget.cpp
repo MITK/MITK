@@ -88,7 +88,10 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset()
   mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
 
   presetFileName = QFileDialog::getSaveFileName(
-    this, "Choose a filename to save the transfer function", presetFileName, "Transferfunction (*.xml)");
+    this, "Choose a filename to save the transfer function", "TransferFunctionPreset", "Transferfunction (*.xml)");
+
+  if (presetFileName.isEmpty())
+    return;
 
   if (!presetFileName.endsWith(".xml"))
     presetFileName.append(".xml");

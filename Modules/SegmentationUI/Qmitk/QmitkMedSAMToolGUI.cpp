@@ -93,7 +93,10 @@ void QmitkMedSAMToolGUI::ShowErrorMessage(const std::string &message, QMessageBo
 
 void QmitkMedSAMToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
-  m_Controls.setupUi(this);
+  auto wrapperWidget = new QWidget(this);
+  mainLayout->addWidget(wrapperWidget);
+  m_Controls.setupUi(wrapperWidget);
+
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
 
   QString welcomeText;
@@ -123,7 +126,7 @@ void QmitkMedSAMToolGUI::InitializeUI(QBoxLayout *mainLayout)
   this->WriteStatusMessage(welcomeText);
   this->ShowProgressBar(false);
   m_Controls.samProgressBar->setMaximum(0);
-  mainLayout->addLayout(m_Controls.verticalLayout);
+
   Superclass::InitializeUI(mainLayout);
 }
 

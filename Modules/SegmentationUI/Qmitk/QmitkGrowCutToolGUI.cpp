@@ -42,7 +42,9 @@ void QmitkGrowCutToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 
 void QmitkGrowCutToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
-  m_Controls.setupUi(this);
+  auto wrapperWidget = new QWidget(this);
+  mainLayout->addWidget(wrapperWidget);
+  m_Controls.setupUi(wrapperWidget);
 
   this->OnAdvancedSettingsButtonToggled(false);
 
@@ -60,8 +62,6 @@ void QmitkGrowCutToolGUI::InitializeUI(QBoxLayout *mainLayout)
   auto previewAvailable = isPreviewAvailable();
   m_Controls.m_previewButton->setEnabled(previewAvailable);
   m_Controls.m_warningLabel->setVisible(!previewAvailable);
-
-  mainLayout->addLayout(m_Controls.verticalLayout);
 
   connect(m_Controls.m_previewButton, &QPushButton::clicked, this, &QmitkGrowCutToolGUI::OnPreviewBtnClicked);
   connect(m_Controls.m_advancedSettingsButton,

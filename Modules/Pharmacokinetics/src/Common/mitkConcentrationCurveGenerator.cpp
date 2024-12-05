@@ -86,6 +86,8 @@ void mitk::ConcentrationCurveGenerator::Convert()
 
     this->m_ConvertedImage = tempImage;
 
+    // This is a workaround to make the (DICOM) properties of the dynamic source image available when using the derived concentration image.
+    this->m_ConvertedImage->SetPropertyList(this->m_DynamicImage->GetPropertyList()->Clone());
 }
 
 void mitk::ConcentrationCurveGenerator::PrepareBaselineImage()

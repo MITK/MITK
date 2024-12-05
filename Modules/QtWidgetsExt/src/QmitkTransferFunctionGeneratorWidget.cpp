@@ -54,7 +54,7 @@ QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidg
     connect(m_LoadPreset, SIGNAL(clicked()), this, SLOT(OnLoadPreset()));
   }
 
-  presetFileName = ".";
+  presetFileName = "TransferFunctionPreset";
 }
 
 int QmitkTransferFunctionGeneratorWidget::AddPreset(const QString &presetName)
@@ -89,6 +89,9 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset()
 
   presetFileName = QFileDialog::getSaveFileName(
     this, "Choose a filename to save the transfer function", presetFileName, "Transferfunction (*.xml)");
+
+  if (presetFileName.isEmpty())
+    return;
 
   if (!presetFileName.endsWith(".xml"))
     presetFileName.append(".xml");

@@ -128,21 +128,16 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset()
     QString text = metrics.elidedText(presetFileName, Qt::ElideMiddle, m_InfoPreset->width());
     m_InfoPreset->setText(QString("loaded ") + text);
 
+    m_TransferFunctionComboBox->setCurrentIndex(-1);
+
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     emit SignalUpdateCanvas();
   }
 }
 
-void QmitkTransferFunctionGeneratorWidget::OnPreset(int mode)
+void QmitkTransferFunctionGeneratorWidget::OnPreset(int /*mode*/)
 {
-  // first item is only information
-  if (--mode == -1)
-    return;
-
-  m_InfoPreset->setText(QString("selected ") + m_TransferFunctionComboBox->currentText());
-
-  // revert to first item
-  m_TransferFunctionComboBox->setCurrentIndex(0);
+  m_InfoPreset->clear();
 }
 
 static double transformationGlocke(double x)

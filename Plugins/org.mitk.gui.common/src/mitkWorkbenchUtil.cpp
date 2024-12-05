@@ -148,7 +148,6 @@ namespace mitk {
       }
       if (isDICOM)
       {
-        // Static function to show a message box
         if (QMessageBox::Cancel == QMessageBox::warning(
           QApplication::activeWindow(),
           "Confirm multiple DICOM series loading",

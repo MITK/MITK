@@ -602,7 +602,8 @@ namespace mitk
 #endif
 
     // Prevent conflicts between native OpenGL applications and QWebEngine
-    QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
+    if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND"))
+      QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
     // If parameters have been set before, we have to store them to hand them
     // through to the application

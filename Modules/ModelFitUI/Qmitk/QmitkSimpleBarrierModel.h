@@ -38,7 +38,8 @@ public:
   /** Sets the data handled by the model and resets the modified flag
    @param pChecker Pointer to the checker instance that should be managed.
    @param names List of all possible parameter names. It is assumed that the
-   index of the list equals the parameter index in the respective fitting model.*/
+   index of the list equals the parameter index in the respective fitting model.
+   @param units*/
   void setChecker(mitk::SimpleBarrierConstraintChecker* pChecker,
                   const mitk::ModelTraitsInterface::ParameterNamesType& names,
                   const mitk::ModelTraitsInterface::ParamterUnitMapType units);

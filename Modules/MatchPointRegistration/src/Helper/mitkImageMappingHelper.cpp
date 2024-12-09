@@ -329,7 +329,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 mitk::ImageMappingHelper::ResultImageType::Pointer
   mitk::ImageMappingHelper::map(const InputImageType* input, const MITKRegistrationType* registration,
   bool throwOnOutOfInputAreaError, const double& paddingValue, const ResultImageGeometryType* resultGeometry,
-  bool throwOnMappingError, const double& errorValue, mitk::ImageMappingInterpolator::Type)
+  bool throwOnMappingError, const double& errorValue, mitk::ImageMappingInterpolator::Type interpolatorType)
 {
   if (!registration)
   {
@@ -344,7 +344,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
     mitkThrow() << "Cannot map image. Passed image pointer is nullptr.";
   }
 
-  ResultImageType::Pointer result = map(input, registration->GetRegistration(), throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue);
+  ResultImageType::Pointer result = map(input, registration->GetRegistration(), throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType);
   return result;
 }
 

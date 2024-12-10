@@ -69,7 +69,11 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
     this->ShowErrorMessage("Error occurred while loading preferences.");
     return;
   }
-  m_Controls.setupUi(this);
+
+  auto wrapperWidget = new QWidget(this);
+  mainLayout->addWidget(wrapperWidget);
+  m_Controls.setupUi(wrapperWidget);
+
   this->EnableAll(false);
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   m_Controls.subtaskComboBox->addItems(VALID_TASKS);
@@ -92,7 +96,6 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg"));
   m_Controls.previewButton->setIcon(arrowIcon);
 
-  mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
 }
 

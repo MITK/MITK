@@ -7,6 +7,8 @@ mitk_create_module(
     Rendering
     SegmentationUtilities/BooleanOperations
     SegmentationUtilities/MorphologicalOperations
+  PCH
+    mitkTool.h
   DEPENDS
     MitkAlgorithmsExt
     MitkBoundingShape

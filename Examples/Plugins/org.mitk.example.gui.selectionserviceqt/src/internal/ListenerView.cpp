@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "ListenerView.h"
+#include <ui_ListenerViewControls.h>
 
 // berry includes
 #include <berryISelectionService.h>
@@ -26,6 +27,7 @@ const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview";
 
 ListenerView::ListenerView()
   : m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged)),
+    m_Controls(new Ui::ListenerViewControls),
     m_Parent(nullptr)
 {
 }
@@ -41,7 +43,7 @@ void ListenerView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets
   m_Parent = parent;
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   // register selection listener
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener.data());
@@ -53,9 +55,9 @@ void ListenerView::ToggleRadioMethod(QString selectStr)
 {
   // change the radio button state according to the name of the selected element
   if (selectStr == "Selection 1")
-    m_Controls.radioButton->toggle();
+    m_Controls->radioButton->toggle();
   else if (selectStr == "Selection 2")
-    m_Controls.radioButton_2->toggle();
+    m_Controls->radioButton_2->toggle();
 }
 
 void ListenerView::SetFocus()

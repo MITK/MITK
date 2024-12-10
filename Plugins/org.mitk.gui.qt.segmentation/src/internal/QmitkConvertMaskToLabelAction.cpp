@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "mitkToolManagerProvider.h"
 
 //needed for qApp
-#include <qcoreapplication.h>
+#include <QCoreApplication>
 
 QmitkConvertMaskToLabelAction::QmitkConvertMaskToLabelAction()
 {

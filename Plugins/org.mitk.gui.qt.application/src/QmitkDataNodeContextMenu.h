@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include "QmitkDataNodeReinitAction.h"
 #include "QmitkDataNodeResetGeometryAction.h"
 #include "QmitkDataNodeRemoveAction.h"
+#include "QmitkDataNodeRenameAction.h"
 #include "QmitkDataNodeShowSelectedNodesAction.h"
 #include "QmitkDataNodeToggleVisibilityAction.h"
 #include "QmitkDataNodeShowDetailsAction.h"
@@ -122,6 +123,7 @@ private:
   QmitkDataNodeReinitAction* m_ReinitAction;
   QmitkDataNodeResetGeometryAction* m_ResetGeometryAction;
   QmitkDataNodeRemoveAction* m_RemoveAction;
+  QmitkDataNodeRenameAction* m_RenameAction;
   QmitkDataNodeShowSelectedNodesAction* m_ShowSelectedNodesAction;
   QmitkDataNodeToggleVisibilityAction* m_ToggleVisibilityAction;
   QmitkDataNodeShowDetailsAction* m_ShowDetailsAction;

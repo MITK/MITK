@@ -229,10 +229,11 @@ void QmitkStdMultiWidgetEditorPreferencePage::AnnotationTextChanged(QString text
 
 void QmitkStdMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()
 {
-  auto* prefs = GetPreferences();
-
+  auto prefs = GetPreferences();
   prefs->Clear();
+
   this->Update();
+  this->PerformOk();
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::OnWidgetComboBoxChanged(int i)

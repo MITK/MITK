@@ -133,6 +133,7 @@ namespace mitk
     std::string m_SubTask = "total";
     int m_GpuId = 0;
     std::map<mitk::Label::PixelType, std::string> m_LabelMapTotal;
+    std::map<mitk::Label::PixelType, std::string> m_LabelMapTotalMR;
     bool m_Fast = true;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
     const std::string DEFAULT_TOTAL_TASK = "total";

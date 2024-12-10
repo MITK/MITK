@@ -19,7 +19,10 @@ found in the LICENSE file.
 #include "vtkRenderWindow.h"
 #include <string>
 
-#include "ui_QmitkViewInitializationViewControls.h"
+namespace Ui
+{
+  class QmitkViewInitializationViewControls;
+}
 
 class QmitkViewInitializationView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {

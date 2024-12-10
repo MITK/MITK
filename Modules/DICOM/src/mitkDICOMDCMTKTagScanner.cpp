@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include "mitkDICOMDCMTKTagScanner.h"
 #include "mitkDICOMGenericImageFrameInfo.h"
 
+#include <mitkFileSystem.h>
+
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <dcmtk/dcmdata/dcpath.h>
 
@@ -111,6 +113,9 @@ void mitk::DICOMDCMTKTagScanner::Scan()
 
     for (const auto& fileName : this->m_InputFilenames)
     {
+      if (fs::is_directory(fileName))
+        continue;
+
       DcmFileFormat dfile;
       OFCondition cond = dfile.loadFile(fileName.c_str());
       if (cond.bad())

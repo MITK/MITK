@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "MitkQtWidgetsExports.h"
 #include "mitkStepper.h"
-#include "qobject.h"
+#include <QObject>
 
 
 //##Documentation

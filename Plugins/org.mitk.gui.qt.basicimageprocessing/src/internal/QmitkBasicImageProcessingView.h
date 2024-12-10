@@ -13,13 +13,16 @@ found in the LICENSE file.
 #ifndef QmitkBasicImageProcessingView_h
 #define QmitkBasicImageProcessingView_h
 
-#include <ui_QmitkBasicImageProcessingViewControls.h>
-
 #include <org_mitk_gui_qt_basicimageprocessing_Export.h>
 
 #include <mitkNodePredicateAnd.h>
 #include <QmitkStepperAdapter.h>
 #include <QmitkAbstractView.h>
+
+namespace Ui
+{
+  class QmitkBasicImageProcessingViewControls;
+}
 
 /*!
 \brief This module allows to use some basic image processing filters for preprocessing, image enhancement and testing purposes

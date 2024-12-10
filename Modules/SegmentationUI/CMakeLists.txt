@@ -2,6 +2,9 @@ mitk_create_module(
   INCLUDE_DIRS
     Qmitk
     SegmentationUtilities
+  PCH
+    mitkDataNode.h
+    QmitkSegWithPreviewToolGUIBase.h
   DEPENDS
     MitkFormsUI
     MitkQtWidgetsExt

@@ -11,13 +11,16 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkIntensityProfileVisualizationWidget.h"
+#include <ui_QmitkIntensityProfileVisualizationWidget.h>
 
 #include <QClipboard>
 
-QmitkIntensityProfileVisualizationWidget::QmitkIntensityProfileVisualizationWidget(QWidget* parent) : QWidget(parent)
+QmitkIntensityProfileVisualizationWidget::QmitkIntensityProfileVisualizationWidget(QWidget* parent)
+	: QWidget(parent),
+	  m_Controls(new Ui::QmitkIntensityProfileControls)
 {
-	m_Controls.setupUi(this);
-  m_Controls.checkBoxShowSubchart->setChecked(false);
+	m_Controls->setupUi(this);
+  m_Controls->checkBoxShowSubchart->setChecked(false);
 	CreateConnections();
 }
 
@@ -32,18 +35,18 @@ void QmitkIntensityProfileVisualizationWidget::SetIntensityProfile(mitk::Intensi
 	if (m_IntensityProfileList.empty())
 		return;
 
-	m_Controls.chartWidget->AddData1D(m_IntensityProfileList, dataLabel);
-	m_Controls.chartWidget->SetChartType(dataLabel, QmitkChartWidget::ChartType::line);
-	m_Controls.chartWidget->SetXAxisLabel("Distance");
-	m_Controls.chartWidget->SetYAxisLabel("Intensity");
-  m_Controls.chartWidget->SetShowLegend(false);
-  m_Controls.chartWidget->Show(m_Controls.checkBoxShowSubchart->isChecked());
+	m_Controls->chartWidget->AddData1D(m_IntensityProfileList, dataLabel);
+	m_Controls->chartWidget->SetChartType(dataLabel, QmitkChartWidget::ChartType::line);
+	m_Controls->chartWidget->SetXAxisLabel("Distance");
+	m_Controls->chartWidget->SetYAxisLabel("Intensity");
+  m_Controls->chartWidget->SetShowLegend(false);
+  m_Controls->chartWidget->Show(m_Controls->checkBoxShowSubchart->isChecked());
 	SetGUIElementsEnabled(true);
 }
 
 void QmitkIntensityProfileVisualizationWidget::Reset()
 {
-  m_Controls.chartWidget->Clear();
+  m_Controls->chartWidget->Clear();
 	SetGUIElementsEnabled(false);
 	m_IntensityProfileList.clear();
 }
@@ -55,19 +58,19 @@ void QmitkIntensityProfileVisualizationWidget::SetTheme(QmitkChartWidget::ColorT
 
 void QmitkIntensityProfileVisualizationWidget::CreateConnections()
 {
-	connect(m_Controls.checkBoxShowSubchart, &QCheckBox::clicked, this, &QmitkIntensityProfileVisualizationWidget::OnShowSubchartCheckBoxChanged);
-	connect(m_Controls.buttonCopyToClipboard, &QPushButton::clicked, this, &QmitkIntensityProfileVisualizationWidget::OnClipboardButtonClicked);
-  connect(m_Controls.chartWidget, &QmitkChartWidget::PageSuccessfullyLoaded, this, &QmitkIntensityProfileVisualizationWidget::OnPageSuccessfullyLoaded);
+	connect(m_Controls->checkBoxShowSubchart, &QCheckBox::clicked, this, &QmitkIntensityProfileVisualizationWidget::OnShowSubchartCheckBoxChanged);
+	connect(m_Controls->buttonCopyToClipboard, &QPushButton::clicked, this, &QmitkIntensityProfileVisualizationWidget::OnClipboardButtonClicked);
+  connect(m_Controls->chartWidget, &QmitkChartWidget::PageSuccessfullyLoaded, this, &QmitkIntensityProfileVisualizationWidget::OnPageSuccessfullyLoaded);
 }
 
 void QmitkIntensityProfileVisualizationWidget::SetGUIElementsEnabled(bool enabled)
 {
 	this->setEnabled(enabled);
-	m_Controls.groupBoxIntensityProfile->setEnabled(enabled);
-	m_Controls.groupBoxPlot->setEnabled(enabled);
-	m_Controls.buttonCopyToClipboard->setEnabled(enabled);
-	m_Controls.checkBoxShowSubchart->setEnabled(enabled);
-	m_Controls.chartWidget->setEnabled(enabled);
+	m_Controls->groupBoxIntensityProfile->setEnabled(enabled);
+	m_Controls->groupBoxPlot->setEnabled(enabled);
+	m_Controls->buttonCopyToClipboard->setEnabled(enabled);
+	m_Controls->checkBoxShowSubchart->setEnabled(enabled);
+	m_Controls->chartWidget->setEnabled(enabled);
 }
 
 std::vector<double> QmitkIntensityProfileVisualizationWidget::ConvertIntensityProfileToVector(mitk::IntensityProfile::ConstPointer intensityProfile) const
@@ -104,10 +107,10 @@ void QmitkIntensityProfileVisualizationWidget::OnClipboardButtonClicked()
 
 void QmitkIntensityProfileVisualizationWidget::OnShowSubchartCheckBoxChanged()
 {
-	m_Controls.chartWidget->Show(m_Controls.checkBoxShowSubchart->isChecked());
+	m_Controls->chartWidget->Show(m_Controls->checkBoxShowSubchart->isChecked());
 }
 
 void QmitkIntensityProfileVisualizationWidget::OnPageSuccessfullyLoaded()
 {
-  m_Controls.chartWidget->SetTheme(m_ChartStyle);
+  m_Controls->chartWidget->SetTheme(m_ChartStyle);
 }

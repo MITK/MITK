@@ -13,7 +13,6 @@ found in the LICENSE file.
 #ifndef STEP6_H
 #define STEP6_H
 
-//#include <qmainwindow.h>
 #include <QWidget>
 #include <mitkImage.h>
 #include <mitkPointSet.h>

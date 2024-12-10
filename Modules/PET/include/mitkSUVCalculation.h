@@ -26,7 +26,7 @@ namespace mitk
       @param injectedActivity Activity injected in [Bq]
       @param bodyweight Weight of the subject in [kg]
       @param decayTime Time between injection and measurement in [s]
-      @param halflife Halflife of the used nuclide in [s]*/
+      @param halfLife Halflife of the used nuclide in [s]*/
   double MITKPET_EXPORT computeSUVbwScaleFactor(double injectedActivity, double bodyweight, double decayTime, double halfLife);
 
    /**Computes the SUV body weighted for the passed value.
@@ -34,7 +34,7 @@ namespace mitk
    @param injectedActivity Activity injected in [Bq]
    @param bodyweight Weight of the subject in [kg]
    @param decayTime Time between injection and measurement in [s]
-   @param halflife Halflife of the used nuclide in [s]*/
+   @param halfLife Halflife of the used nuclide in [s]*/
   double MITKPET_EXPORT computeSUVbw(double value, double injectedActivity, double bodyweight, double decayTime, double halfLife);
 };
 

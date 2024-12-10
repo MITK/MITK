@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "MitkQtWidgetsExtExports.h"
 #include "mitkCommon.h"
-#include <qwidget.h>
+#include <QWidget>
 #include <qwt_legend.h>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>

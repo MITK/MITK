@@ -106,6 +106,7 @@ private:
   QmitkTotalSegmentatorToolInstaller m_Installer;
   QmitkGPULoader m_DeviceLoader;
   static const QString WARNING_TOTALSEG_NOT_FOUND;
+  static const QString WARNING_PYTHON_NOT_FOUND;
   mitk::IPreferences *m_Preferences;
 
 protected slots:
@@ -118,7 +119,7 @@ protected slots:
   /**
    * @brief Qt Slot
    */
-  std::pair<QString, QString> OnSystemPythonChanged(const QString &pyEnv);
+  void OnSystemPythonChanged(const QString &pyEnv);
 
   /**
    * @brief Qt Slot

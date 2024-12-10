@@ -55,7 +55,6 @@ void PerfusionCurveDescriptionParameterView::CreateQtPartControl(QWidget* parent
   m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
   m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
-  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
   connect(m_Controls.timeSeriesNodeSelector,
     &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
@@ -65,6 +64,8 @@ void PerfusionCurveDescriptionParameterView::CreateQtPartControl(QWidget* parent
   connect(m_Controls.btnCalculateParameters, SIGNAL(clicked()), this,
           SLOT(OnCalculateParametersButtonClicked()));
 
+  // Should be done last, if everything else is configured because it triggers the autoselection of data.
+  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
   InitParameterList();
 }

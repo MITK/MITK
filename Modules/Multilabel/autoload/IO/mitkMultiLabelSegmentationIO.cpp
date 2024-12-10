@@ -38,7 +38,7 @@ namespace mitk
   const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_KEY = "modality";
   const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_VALUE = "org.mitk.multilabel.segmentation";
   const constexpr char* const MULTILABEL_SEGMENTATION_VERSION_KEY = "org.mitk.multilabel.segmentation.version";
-  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 1;
+  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 2;
   const constexpr char* const MULTILABEL_SEGMENTATION_LABELS_INFO_KEY = "org.mitk.multilabel.segmentation.labelgroups";
   const constexpr char* const MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY = "org.mitk.multilabel.segmentation.unlabeledlabellock";
 

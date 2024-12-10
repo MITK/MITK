@@ -140,7 +140,6 @@ namespace mitk
 	    // convert from unique to raw pointer
 	    vector<DcmDataset*> rawVecDataset;
 	    for ( const auto& dcmDataSet : dcmDatasetsSourceImage ) { rawVecDataset.push_back( dcmDataSet.get() ); }
-
 	    std::unique_ptr<dcmqi::ParaMapConverter> PMconverter(new dcmqi::ParaMapConverter());
 	    std::unique_ptr<DcmDataset> PMresult (PMconverter->itkimage2paramap(itkParamapImage, rawVecDataset, tmpMetaInfoFile));
 	    // Write dicom file
@@ -170,6 +169,7 @@ namespace mitk
 	  std::string modelName;
 	  PMimage->GetPropertyList()->GetStringProperty(ModelFitConstants::MODEL_NAME_PROPERTY_NAME().c_str(), modelName);
 
+
     mitk::ParamapPresetsParser* pmPresets = mitk::ParamapPresetsParser::New();
       // Here the mitkParamapPresets.xml file containing the Coding Schmeme Designator and Code Value are parsed and the relevant values extracted
 	  pmPresets->LoadPreset();
@@ -178,16 +178,17 @@ namespace mitk
 
 	  // Pass codes to Paramap Converter
 	  PMhandler.setDerivedPixelContrast("TCS");
+
 	  PMhandler.setFrameLaterality("U");
 	  PMhandler.setQuantityValueCode(pmType_parameterName.codeValue, pmType_parameterName.codeScheme, parameterName);
 	  PMhandler.setMeasurementMethodCode(pmType_modelName.codeValue, pmType_modelName.codeScheme, modelName);
-	  PMhandler.setMeasurementUnitsCode("/min", "UCUM", "/m");
+    PMhandler.setMeasurementUnitsCode("-", "UCUM", "-");
 	  PMhandler.setSeriesNumber("1");
 	  PMhandler.setInstanceNumber("1");
 	  PMhandler.setDerivationCode("129104", "DCM", "Perfusion image analysis");
 	  PMhandler.setRealWorldValueSlope("1");
-
 	  return PMhandler.getJSONOutputAsString();
+
   }
 
 

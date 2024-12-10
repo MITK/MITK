@@ -38,7 +38,6 @@ set(MOC_H_FILES
   src/QmitkSegmentationPreferencePage.h
   src/QmitkSegmentAnythingPreferencePage.h
   src/QmitkToolInstallDialog.h
-  src/QmitkTotalSegmentatorToolInstaller.h
   src/QmitkTotalSegmentatorPreferencePage.h
   src/QmitkNewSegmentationDialog.h
   src/internal/mitkPluginActivator.h

@@ -230,7 +230,7 @@ void GenericDataFittingView::OnModellSet(int index)
       m_selectedModelFactory->GetDefaultInitialParameterization(), m_selectedModelFactory->GetParameterUnits() );
 
     m_Controls.constraintManager->setChecker(this->m_modelConstraints,
-      this->m_selectedModelFactory->GetParameterNames());
+      this->m_selectedModelFactory->GetParameterNames(), this->m_selectedModelFactory->GetParameterUnits());
 
   }
 
@@ -277,7 +277,7 @@ void GenericDataFittingView::PrepareFitConfiguration()
       this->m_modelConstraints = mitk::SimpleBarrierConstraintChecker::New();
     }
 
-    m_Controls.constraintManager->setChecker(this->m_modelConstraints, paramNames);
+    m_Controls.constraintManager->setChecker(this->m_modelConstraints, paramNames, paramUnits);
   }
 };
 

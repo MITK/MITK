@@ -380,7 +380,7 @@ void QmitkSegmentationView::OnNewSegmentation()
   if (referenceImage->GetDimension() <= 1)
   {
     QMessageBox::information(
-      m_Parent, "New segmentation", "Segmentation is currently not supported for 2D images");
+      m_Parent, "New segmentation", "Segmentation is not supported for 1-dimensional images.");
     return;
   }
 
@@ -397,7 +397,7 @@ void QmitkSegmentationView::OnNewSegmentation()
   try
   {
     this->WaitCursorOn();
-    newSegmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(m_ReferenceNode, segTemplateImage);
+    newSegmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(m_ReferenceNode, segTemplateImage, "", this->GetDataStorage());
     this->WaitCursorOff();
   }
   catch (mitk::Exception& e)

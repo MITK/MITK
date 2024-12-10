@@ -16,8 +16,6 @@ found in the LICENSE file.
 #include "mitkToolManagerProvider.h"
 #include <mitkSurface.h>
 
-//needed for qApp
-#include <qcoreapplication.h>
 #include <QApplication>
 
 QmitkConvertSurfaceToLabelAction::QmitkConvertSurfaceToLabelAction()

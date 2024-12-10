@@ -324,10 +324,6 @@ setData(const QModelIndex& index, const QVariant& value, int role)
 
   if (Qt::EditRole == role)
   {
-    emit dataChanged(index, index);
-
-    emit beginResetModel();
-
     bool result = false;
     if (index.column() == 1)
     {
@@ -364,7 +360,10 @@ setData(const QModelIndex& index, const QVariant& value, int role)
       }
     }
 
-    emit endResetModel();
+    if (result)
+    {
+      emit dataChanged(index, index, { role }); // Notify the view about the updated data
+    }
 
     return result;
   }

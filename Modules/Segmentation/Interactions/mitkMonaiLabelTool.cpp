@@ -41,6 +41,9 @@ void mitk::MonaiLabelTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("ShiftSecondaryButtonPressed", OnAddNegativePoint);
   CONNECT_FUNCTION("ShiftPrimaryButtonPressed", OnAddPositivePoint);
   CONNECT_FUNCTION("DeletePoint", OnDelete);
+  CONNECT_FUNCTION("Move", OnMove);
+  CONNECT_FUNCTION("Release", OnRelease);
+  CONNECT_FUNCTION("PrimaryButtonPressed", OnPrimaryButtonPressed);
 }
 
 void mitk::MonaiLabelTool::Activated()
@@ -660,3 +663,7 @@ const mitk::MonaiAppMetadata *mitk::MonaiLabelTool::GetInfoParameters() const
 {
   return m_InfoParameters.get();
 }
+
+void mitk::MonaiLabelTool::OnMove(mitk::StateMachineAction *, mitk::InteractionEvent *){};
+void mitk::MonaiLabelTool::OnRelease(mitk::StateMachineAction *, mitk::InteractionEvent *){};
+void mitk::MonaiLabelTool::OnPrimaryButtonPressed(mitk::StateMachineAction *, mitk::InteractionEvent *){};

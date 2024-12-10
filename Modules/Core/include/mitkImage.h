@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include "mitkImageAccessorBase.h"
 #include "mitkImageDataItem.h"
 #include "mitkImageDescriptor.h"
-#include "mitkImageVtkAccessor.h"
+#include "mitkImageVtkWriteAccessor.h"
 #include "mitkLevelWindow.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkSlicedData.h"
@@ -71,7 +71,6 @@ namespace mitk
     friend class SubImageSelector;
 
     friend class ImageAccessorBase;
-    friend class ImageVtkAccessor;
     friend class ImageVtkReadAccessor;
     friend class ImageVtkWriteAccessor;
     friend class ImageReadAccessor;

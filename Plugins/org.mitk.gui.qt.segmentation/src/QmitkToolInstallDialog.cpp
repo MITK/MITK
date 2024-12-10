@@ -11,36 +11,53 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkToolInstallDialog.h"
+#include <ui_QmitkToolInstallDialog.h>
+
+#include <QCloseEvent>
 #include <QMessageBox>
 
-QTextEdit *QmitkToolInstallDialog::m_ConsoleOut = nullptr;
+QPlainTextEdit* QmitkToolInstallDialog::s_ConsoleOutput = nullptr;
 
-QmitkToolInstallDialog::QmitkToolInstallDialog(QWidget *parent)
-  : QDialog(parent), m_IsInstalling(true), m_Ui(new Ui::QmitkToolInstallDialog)
+QObject* QmitkToolInstallDialog::GetConsoleOutput()
 {
-  m_Ui->setupUi(this);
-  this->setModal(true);
-  this->setWindowTitle("TotalSegmentator Installer");
-  m_Ui->closePushButton->setEnabled(false);
-  m_ConsoleOut = new QTextEdit(this);
-  m_ConsoleOut->setReadOnly(true);
-  m_ConsoleOut->setMinimumHeight(50);
-  m_Ui->gridLayout->addWidget(m_ConsoleOut, 1, 0, 1, 2);
-  connect(m_Ui->closePushButton, &QPushButton::clicked, [this]() { this->close(); });
+  return s_ConsoleOutput;
 }
 
-void QmitkToolInstallDialog::closeEvent(QCloseEvent *event)
+QmitkToolInstallDialog::QmitkToolInstallDialog(QWidget* parent)
+  : QDialog(parent),
+    m_IsInstalling(true),
+    m_Ui(new Ui::QmitkToolInstallDialog)
+{
+  m_Ui->setupUi(this);
+  s_ConsoleOutput = m_Ui->consoleOutput;
+
+  connect(m_Ui->closePushButton, &QPushButton::clicked, this, &QmitkToolInstallDialog::close);
+}
+
+QmitkToolInstallDialog::~QmitkToolInstallDialog()
+{
+  s_ConsoleOutput = nullptr;
+}
+
+void QmitkToolInstallDialog::FinishInstallation(const QString& status)
+{
+  m_IsInstalling = false;
+
+  m_Ui->statusLabel->setText(status);
+  m_Ui->progressBar->setVisible(false);
+  m_Ui->closePushButton->setEnabled(true);
+}
+
+void QmitkToolInstallDialog::closeEvent(QCloseEvent* event)
 {
   if (m_IsInstalling)
   {
-    if (QMessageBox::No ==
-        QMessageBox::question(nullptr,
-                              "Cancel Installation",
-                              QString("<p><b>WARNING:</b> Closing the installation process can cause undefined behaviour. "
-                                      "Only close it, if you <i>really</i> have to.</p>"
-                                      "<p>Close anyway?</p>"),
-                              QMessageBox::Yes | QMessageBox::No,
-                              QMessageBox::No))
+    const QString title = "Cancel installation";
+    const QString message = "<p><b>WARNING:</b> Closing the installation process can cause undefined behaviour. "
+                            "Only close it, if you <i>really</i> have to.</p>"
+                            "<p>Close anyway?</p>";
+
+    if (QMessageBox::No == QMessageBox::question(this, title, message))
     {
       event->ignore();
     }
@@ -49,4 +66,8 @@ void QmitkToolInstallDialog::closeEvent(QCloseEvent *event)
       m_IsInstalling = false;
     }
   }
+}
+
+void QmitkToolInstallDialog::reject()
+{
 }

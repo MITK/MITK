@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <itkConstantPadImageFilter.h>
 
 //needed for qApp
-#include <qcoreapplication.h>
+#include <QCoreApplication>
 
 QmitkAutocropAction::QmitkAutocropAction()
 {

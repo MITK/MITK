@@ -11,10 +11,13 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "EmptyView2.h"
+#include <ui_EmptyView2Controls.h>
 
 const std::string EmptyView2::VIEW_ID = "org.mitk.views.emptyview2";
 
-EmptyView2::EmptyView2() : m_Parent(nullptr)
+EmptyView2::EmptyView2()
+  : m_Controls(new Ui::EmptyView2Controls),
+    m_Parent(nullptr)
 {
 }
 
@@ -26,7 +29,7 @@ void EmptyView2::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets
   m_Parent = parent;
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   m_Parent->setEnabled(true);
 }

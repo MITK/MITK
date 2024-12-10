@@ -65,7 +65,6 @@ void DoITKRegionClosing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
   seedLabel = oldSegImage->GetPixel(seedIndex);
 
   typename OutputImageType::Pointer itkResultImage;
-  filledRegionImage = nullptr;
 
   try
   {
@@ -92,7 +91,7 @@ void DoITKRegionClosing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
   {
     return;
   }
-  mitk::CastToMitkImage(itkResultImage, filledRegionImage);
+  filledRegionImage->SetChannel(itkResultImage->GetBufferPointer());
 }
 
 mitk::Image::Pointer mitk::CloseRegionTool::GenerateFillImage(const Image* workingSlice, Point3D seedPoint, mitk::Label::PixelType& seedLabelValue) const
@@ -100,7 +99,8 @@ mitk::Image::Pointer mitk::CloseRegionTool::GenerateFillImage(const Image* worki
   itk::Index<2> seedIndex;
   workingSlice->GetGeometry()->WorldToIndex(seedPoint, seedIndex);
 
-  Image::Pointer fillImage;
+  auto fillImage = Image::New();
+  fillImage->Initialize(workingSlice);
 
   AccessFixedDimensionByItk_n(workingSlice, DoITKRegionClosing, 2, (fillImage, seedIndex, seedLabelValue));
 

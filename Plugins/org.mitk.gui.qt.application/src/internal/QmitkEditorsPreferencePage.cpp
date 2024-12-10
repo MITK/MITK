@@ -58,6 +58,7 @@ bool QmitkEditorsPreferencePage::PerformOk()
   const bool constrainZoomingAndPanning = m_Ui->m_ConstrainZoomingAndPanningCheckBox->isChecked();
   prefs->PutBool("Use constrained zooming and panning", constrainZoomingAndPanning);
 
+  prefs->PutInt("max TS", m_Ui->m_MaxTSSpinBox->value());
   return true;
 }
 
@@ -71,4 +72,7 @@ void QmitkEditorsPreferencePage::Update()
 
   const bool constrainZoomingAndPanning = prefs->GetBool("Use constrained zooming and panning", true);
   m_Ui->m_ConstrainZoomingAndPanningCheckBox->setChecked(constrainZoomingAndPanning);
+
+  const auto maxTS = prefs->GetInt("max TS", 50);
+  m_Ui->m_MaxTSSpinBox->setValue(maxTS);
 }

@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "SelectionViewMitk.h"
+#include <ui_SelectionViewMitkControls.h>
 
 // qmitk Includes
 #include <QmitkCustomVariants.h>
@@ -18,7 +19,9 @@ found in the LICENSE file.
 
 const std::string SelectionViewMitk::VIEW_ID = "org.mitk.views.selectionviewmitk";
 
-SelectionViewMitk::SelectionViewMitk() : m_Parent(nullptr)
+SelectionViewMitk::SelectionViewMitk()
+  : m_Controls(new Ui::SelectionViewMitkControls),
+    m_Parent(nullptr)
 {
 }
 
@@ -26,7 +29,7 @@ void SelectionViewMitk::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets
   m_Parent = parent;
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   //! [MITK Selection Provider data nodes]
   // create two data nodes and change there default name
@@ -46,15 +49,15 @@ void SelectionViewMitk::CreateQtPartControl(QWidget *parent)
   listItemDataNode2->setData(QmitkDataNodeRole, QVariant::fromValue(dataNode2));
 
   // add the items to the QListWidget of the view
-  m_Controls.m_SelectionList->addItem(listItemDataNode1);
-  m_Controls.m_SelectionList->addItem(listItemDataNode2);
+  m_Controls->m_SelectionList->addItem(listItemDataNode1);
+  m_Controls->m_SelectionList->addItem(listItemDataNode2);
   //! [MITK Selection Provider listwidgetitems]
 
   // set selection mode to single selection
-  m_Controls.m_SelectionList->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_Controls->m_SelectionList->setSelectionMode(QAbstractItemView::SingleSelection);
 
   // pre-select the first item of the list
-  m_Controls.m_SelectionList->setCurrentRow(0);
+  m_Controls->m_SelectionList->setCurrentRow(0);
 
   m_Parent->setEnabled(true);
 }
@@ -67,6 +70,6 @@ void SelectionViewMitk::SetFocus()
 QItemSelectionModel *SelectionViewMitk::GetDataNodeSelectionModel() const
 {
   // return the selection model of the QListWidget
-  return m_Controls.m_SelectionList->selectionModel();
+  return m_Controls->m_SelectionList->selectionModel();
 }
 //! [MITK Selection Provider method implementation]

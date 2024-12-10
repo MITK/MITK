@@ -26,7 +26,7 @@ public:
   QmitkPiecewiseFunctionCanvas(QWidget *parent = nullptr, Qt::WindowFlags f = {});
   void paintEvent(QPaintEvent *e) override;
   void SetTitle(const QString &title);
-  int GetNearHandle(int x, int y, unsigned int maxSquaredDistance = 32) override;
+  int GetNearHandle(int x, int y, unsigned int maxSquaredDistance = 100) override;
 
   void SetPiecewiseFunction(vtkPiecewiseFunction *piecewiseFunction)
   {

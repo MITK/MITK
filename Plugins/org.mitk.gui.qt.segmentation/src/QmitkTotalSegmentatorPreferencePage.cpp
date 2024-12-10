@@ -35,6 +35,9 @@ void QmitkTotalSegmentatorPreferencePage::Init(berry::IWorkbench::Pointer) {}
 const QString QmitkTotalSegmentatorPreferencePage::WARNING_TOTALSEG_NOT_FOUND =
   "TotalSegmentator is not detected in the selected python environment. Please select a valid "
   "python environment or install TotalSegmentator.";
+const QString QmitkTotalSegmentatorPreferencePage::WARNING_PYTHON_NOT_FOUND =
+  "Python is not detected in the selected path. "
+  "Please select a path with a valid python install.";
 
 QmitkTotalSegmentatorPreferencePage::QmitkTotalSegmentatorPreferencePage()
   : m_Ui(new Ui::QmitkTotalSegmentatorPreferencePage), m_Control(nullptr){}
@@ -181,24 +184,24 @@ void QmitkTotalSegmentatorPreferencePage::OnInstallButtonClicked()
     qApp->processEvents();
     QThread::msleep(100);
   }
+
   QString installPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(m_Installer.GetVirtualEnvPath()).first;
+
   if (future.result() && this->IsTotalSegmentatorInstalled(installPath))
   {
     this->WriteStatusMessage("<b>STATUS: </b>Successfully installed TotalSegmentator.");
-    installDialog->m_Ui->statusLabel->setText("TotalSegmentator was succesfully installed");
+    installDialog->FinishInstallation("TotalSegmentator was succesfully installed");
     m_IsInstalled = true;
     m_Installer.SetVirtualEnvPath(installPath);
   }
   else
   {
     this->WriteErrorMessage("<b>ERROR: </b>Couldn't install TotalSegmentator.");
-    installDialog->m_Ui->statusLabel->setText("Couldn't install TotalSegmentator");
+    installDialog->FinishInstallation("Couldn't install TotalSegmentator");
     m_Ui->installTotalButton->setDisabled(false);
     this->WriteStatusMessage("<b>ERROR: </b>Couldn't install TotalSegmentator.");
   }
-  installDialog->m_IsInstalling = false;
-  installDialog->m_Ui->progressBar->setVisible(false);
-  installDialog->m_Ui->closePushButton->setEnabled(true);
+
   this->UpdateStatusLabel();
 }
 
@@ -240,44 +243,41 @@ void QmitkTotalSegmentatorPreferencePage::OnPythonPathChanged(const QString &pyE
   if (pyEnv == QString("Select..."))
   {
     QString path = QFileDialog::getExistingDirectory(m_Ui->customEnvComboBox->parentWidget(), "Python Path", "dir");
-    if (!path.isEmpty())
+    if (this->IsTotalSegmentatorInstalled(this->GetPythonPathFromUI(path)))
     {
-      this->OnPythonPathChanged(path); // recall same function for new path validation
       m_Ui->customEnvComboBox->insertItem(0, path);
       m_Ui->customEnvComboBox->setCurrentIndex(0);
     }
-  }
-  else if (this->IsTotalSegmentatorInstalled(this->GetPythonPathFromUI(pyEnv)))
-  {
-    QString uiPyPath = this->GetPythonPathFromUI(pyEnv);
-  }
-  else
-  {
-    this->ShowErrorMessage(WARNING_TOTALSEG_NOT_FOUND);
+    else
+    {
+      this->ShowErrorMessage(WARNING_TOTALSEG_NOT_FOUND);
+    }
   }
   this->UpdateStatusLabel();
 }
 
-std::pair<QString, QString> QmitkTotalSegmentatorPreferencePage::OnSystemPythonChanged(const QString &pyEnv)
+void QmitkTotalSegmentatorPreferencePage::OnSystemPythonChanged(const QString &pyEnv)
 {
-  std::pair<QString, QString> pyPath;
   if (pyEnv == QString("Select..."))
   {
     QString path = QFileDialog::getExistingDirectory(m_Ui->sysPythonComboBox->parentWidget(), "Python Path", "dir");
-    if (!path.isEmpty())
+    std::pair<QString, QString> pyPath;
+    pyPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(this->GetPythonPathFromUI(path));
+    if (!pyPath.first.isEmpty())
     {
-      this->OnSystemPythonChanged(path);// recall same function for new path validation
+      m_SysPythonPath = pyPath.first;
       m_Ui->sysPythonComboBox->insertItem(0, path);
       m_Ui->sysPythonComboBox->setCurrentIndex(0);
+    }
+    else
+    {
+      this->ShowErrorMessage(WARNING_PYTHON_NOT_FOUND);
     }
   }
   else
   {
-    QString uiPyPath = this->GetPythonPathFromUI(pyEnv);
-    pyPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(uiPyPath);
-    m_SysPythonPath = pyPath.first;
+    m_SysPythonPath = pyEnv;
   }
-  return pyPath;
 }
 
 void QmitkTotalSegmentatorPreferencePage::UpdateStatusLabel()
@@ -312,7 +312,7 @@ void QmitkTotalSegmentatorPreferencePage::UpdateStatusLabel()
   } 
   else
   {
-    text += "Your in luck. " + QString::number(m_DeviceLoader.GetGPUCount()) + " GPU(s) were found";
+    text += QString::number(m_DeviceLoader.GetGPUCount()) + " GPU(s) were found";
   }
   m_Ui->statusLabel->setText(text);
 }

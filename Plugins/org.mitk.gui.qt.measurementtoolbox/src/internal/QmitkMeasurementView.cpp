@@ -740,7 +740,6 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::Plana
   auto newNode = mitk::DataNode::New();
   newNode->SetName(name.toStdString());
   newNode->SetData(figure);
-  newNode->SetSelected(true);
 
   if (d->m_SelectedImageNode.IsNotNull())
   {
@@ -753,6 +752,8 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::Plana
 
   for (auto &node : d->m_CurrentSelection)
     node->SetSelected(false);
+
+  newNode->SetSelected(true);
 
   d->m_CurrentSelection.clear();
   d->m_CurrentSelection.push_back(newNode);

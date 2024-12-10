@@ -13,8 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkHistogram_h
 #define QmitkHistogram_h
 
-#include <qcolor.h>
-#include <qglobal.h>
+#include <QColor>
 
 #include <qwt_plot_item.h>
 #include <qwt_series_data.h>

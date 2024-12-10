@@ -12,28 +12,25 @@ found in the LICENSE file.
 
 #include "mitkPluginActivator.h"
 #include "QmitkDicomBrowser.h"
-#include "QmitkDicomPreferencePage.h"
+
 #include <usModuleInitialization.h>
 
 US_INITIALIZE_MODULE
 
-namespace mitk {
-ctkPluginContext* PluginActivator::pluginContext = nullptr;
+ctkPluginContext* mitk::PluginActivator::s_Context = nullptr;
 
-void PluginActivator::start(ctkPluginContext* context)
+ctkPluginContext* mitk::PluginActivator::GetContext()
+{
+  return s_Context;
+}
+
+void mitk::PluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDicomBrowser, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDicomPreferencePage, context)
-  pluginContext = context;
+  s_Context = context;
 }
 
-void PluginActivator::stop(ctkPluginContext* context)
+void mitk::PluginActivator::stop(ctkPluginContext*)
 {
-  Q_UNUSED(context)
-  pluginContext = nullptr;
-}
-ctkPluginContext* PluginActivator::getContext()
-{
-    return pluginContext;
-}
+  s_Context = nullptr;
 }

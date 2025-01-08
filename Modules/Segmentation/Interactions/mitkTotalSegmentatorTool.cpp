@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usModuleResource.h>
 #include <usServiceReference.h>
+#include <omp.h>
 
 namespace mitk
 {
@@ -167,7 +168,6 @@ mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(s
                                                                                const unsigned int *dimensions,
                                                                                mitk::BaseGeometry *geometry)
 {
-  Label::PixelType labelId = 0;
   auto aggloLabelImage = mitk::LabelSetImage::New();
   auto initImage = mitk::Image::New();
   initImage->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dimensions);
@@ -176,9 +176,10 @@ mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(s
   const auto layerIndex = aggloLabelImage->AddLayer();
   aggloLabelImage->SetActiveLayer(layerIndex);
 
-  for (auto const &outputImagePath : filePaths)
+  #pragma omp parallel for
+  for(Label::PixelType labelId = 1; labelId <= static_cast<Label::PixelType>(filePaths.size()); ++labelId)
   {
-    labelId++;
+    auto const &outputImagePath = filePaths[labelId-1];
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     auto source = mitk::LabelSetImage::New();
     source->InitializeByLabeledImage(outputImage);
@@ -200,9 +201,11 @@ mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(s
     label->SetValue(labelId);
     label->SetColor(color);
     label->SetOpacity(rgba[3]);
-
-    aggloLabelImage->AddLabel(label, layerIndex, false, false);
-    mitk::TransferLabelContent(source, aggloLabelImage, aggloLabelImage->GetConstLabelsByValue(aggloLabelImage->GetLabelValuesByGroup(layerIndex)), 0, 0, false, {{1, labelId}});
+    #pragma omp critical
+    {
+      aggloLabelImage->AddLabel(label, layerIndex, false, false);
+      mitk::TransferLabelContent(source, aggloLabelImage, aggloLabelImage->GetConstLabelsByValue(aggloLabelImage->GetLabelValuesByGroup(layerIndex)), 0, 0, false, {{1, labelId}});
+    }
   }
   return aggloLabelImage;
 }

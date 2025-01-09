@@ -175,9 +175,10 @@ mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(s
   aggloLabelImage->SetGeometry(geometry);
   const auto layerIndex = aggloLabelImage->AddLayer();
   aggloLabelImage->SetActiveLayer(layerIndex);
+  int numFiles = static_cast<int>(filePaths.size());
 
   #pragma omp parallel for
-  for(Label::PixelType labelId = 1; labelId <= static_cast<Label::PixelType>(filePaths.size()); ++labelId)
+  for (int labelId = 1; labelId <= numFiles; ++labelId)
   {
     auto const &outputImagePath = filePaths[labelId-1];
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);

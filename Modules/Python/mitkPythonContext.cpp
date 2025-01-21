@@ -30,7 +30,12 @@ found in the LICENSE file.
 #include <boost/algorithm/string.hpp>
 #include <swigpyrun.h>
 
-mitk::PythonContext::PythonContext()
+namespace 
+{
+  int refCount = 0;
+}
+
+mitk::PythonContext::PythonContext() : m_ThreadState(nullptr)
 {
 // for Linux, libpython needs to be opened before initializing the Python Interpreter to enable imports
 #ifndef WIN32
@@ -46,12 +51,12 @@ mitk::PythonContext::PythonContext()
   {
     Py_Initialize();
   }
-  PyGILState_Ensure();
 }
 
 void mitk::PythonContext::Activate()
 {
-  PyGILState_Ensure();
+  PyGILState_STATE state = PyGILState_Ensure();
+  ::refCount++;
   std::string programPath = mitk::IOUtil::GetProgramPath();
   std::replace(programPath.begin(), programPath.end(), '\\', '/');
   programPath.append("/");
@@ -69,51 +74,105 @@ void mitk::PythonContext::Activate()
   std::string searchForDll = "os.add_dll_directory('"+std::string(EP_DLL_DIR)+"')\n";
   pythonCommand.append(searchForDll);
   pythonCommand.append("import numpy\n");
-  pythonCommand.append("import SimpleITK as sitk\n");
+  //pythonCommand.append("import SimpleITK as sitk\n");
   pythonCommand.append("import pyMITK\n");
   if (PyRun_SimpleString(pythonCommand.c_str()) == -1)
   {
     MITK_ERROR << "Something went wrong in setting the path in Python";
   }
   PyRun_SimpleString("_mitk_stdout = io.StringIO()\n"
-                     "sys.stdout = _mitk_stdout\n");
+                     "_mitk_stderr = io.StringIO\n"
+                     "sys.stdout = sys.stderr = _mitk_stdout\n");
+  //m_GlobalDictionary = PyDict_New();
   PyObject *main = PyImport_AddModule("__main__");
   m_GlobalDictionary = PyModule_GetDict(main);
   m_LocalDictionary = m_GlobalDictionary;
-  m_ThreadState = PyEval_SaveThread();
+
+  //m_ThreadState = PyEval_SaveThread();
+  PyGILState_Release(state);
 }
 
 mitk::PythonContext::~PythonContext()
 {
-  if (Py_IsInitialized())
+  ::refCount--;
+  //MITK_INFO << "m_GlobalDictionary: " << m_GlobalDictionary->ob_refcnt;
+  //Py_XDECREF(m_GlobalDictionary);
+  if (Py_IsInitialized() && ::refCount < 1)
   {
     Py_Finalize();
   }
+  //MITK_INFO << "m_GlobalDictionary: " << m_GlobalDictionary->ob_refcnt;
 }
+
+std::string mitk::PythonContext::ExecuteFile(const std::string &filePath)
+{
+  PyGILState_STATE state = PyGILState_Ensure();
+  int commandType = Py_file_input;
+  PyObject *executionResult;
+  try
+  {
+    FILE *file = fopen(filePath.c_str(), "rb");
+    executionResult = PyRun_File(file, "script.py", commandType, m_GlobalDictionary, m_LocalDictionary);
+  }
+  catch (const mitk::Exception &)
+  {
+    PyErr_Print();
+    m_ThreadState = PyEval_SaveThread();
+    throw;
+  }
+  Py_XDECREF(executionResult);
+  PyGILState_Release(state);
+  return std::string(this->GetStdOut());
+}
+
 
 std::string mitk::PythonContext::ExecuteString(const std::string &pyCommands)
 {
-  PyGILState_Ensure();
+  PyGILState_STATE state = PyGILState_Ensure();
   if (PyRun_SimpleString(pyCommands.c_str()) == -1)
   {
     MITK_ERROR << "Something went wrong in Python";
   }
+  /* int commandType = Py_file_input;
+  PyObject *executionResult;
+  try
+  {
+    executionResult = PyRun_String(pyCommands.c_str(), commandType, m_GlobalDictionary, m_LocalDictionary);
+  }
+  catch (const mitk::Exception &)
+  {
+   PyErr_Print();
+   //m_ThreadState = PyEval_SaveThread();
+   throw;
+  }
+  Py_XDECREF(executionResult);*/
+  PyGILState_Release(state);
   return std::string(this->GetStdOut());
 }
 
 const char *mitk::PythonContext::GetStdOut()
 {
-  PyGILState_Ensure();
+  PyGILState_STATE state = PyGILState_Ensure();
   PyObject *main_module = PyImport_AddModule("__main__");
+  if (!main_module)
+  {
+    PyErr_Print();
+    main_module = PyImport_AddModule("__main__");
+  }
   PyObject *capture_output = PyObject_GetAttrString(main_module, "_mitk_stdout");
   PyObject *output_val = PyObject_CallMethod(capture_output, "getvalue", nullptr);
-  const char *result = PyUnicode_AsUTF8(output_val);
+  const char *result = PyUnicode_AsUTF8(output_val); 
+  /* Py_XDECREF(capture_output);
+  Py_XDECREF(output_val);
+  Py_XDECREF(main_module);*/
+  PyGILState_Release(state);
   return result;
 }
 
 mitk::Image::Pointer mitk::PythonContext::LoadImageFromPython(const std::string &varName)
 {
-  PyGILState_Ensure();
+  MITK_INFO << "LoadImageFromPython";
+  PyGILState_STATE state = PyGILState_Ensure();
   PyObject *main = PyImport_AddModule("__main__");
   PyObject *globals = PyModule_GetDict(main);
   PyObject *pyImage = PyDict_GetItemString(globals, varName.c_str());
@@ -136,19 +195,24 @@ mitk::Image::Pointer mitk::PythonContext::LoadImageFromPython(const std::string 
   // cast C++ void pointer to mitk::Image::Pointer
   mitk::Image *mitkImage = reinterpret_cast<mitk::Image *>(voidImage);
   MITK_INFO << "C++ received image has dimension: " << mitkImage->GetDimension();
-  m_ThreadState = PyEval_SaveThread();
+  PyGILState_Release(state);
   return mitkImage;
 }
 
-void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData)
+void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData, const std::string &varName)
 {
-  PyGILState_Ensure();
-  PyRun_SimpleString("_mitk_image = None");
-  PyRun_SimpleString("def _receive(image_from_cxx):\n"
-                     "    print ('receive called with %s', image_from_cxx)\n"
-                     "    print('Python transferred image has dimension', image_from_cxx.GetDimension())\n"
-                     "    global _mitk_image\n"
-                     "    _mitk_image = image_from_cxx\n");
+  MITK_INFO << "TransferBaseDataToPython";
+  PyGILState_STATE state = PyGILState_Ensure();
+  std::string pythonCommand;
+  pythonCommand.append(varName);
+  pythonCommand.append(" = None\n");
+  pythonCommand.append("def _receive(image_from_cxx):\n"
+                       "    print ('receive called with %s', image_from_cxx)\n"
+                       "    print('Python transferred image has dimension', image_from_cxx.GetDimension())\n"
+                       "    global " + varName + "\n"
+                       "    " + varName + " = image_from_cxx\n");
+  //PyRun_SimpleString(pythonCommand.c_str());
+  this->ExecuteString(pythonCommand.c_str());
   int owned = 0;
   swig_type_info *pTypeInfo = nullptr;
   if (dynamic_cast<mitk::Image *>(mitkBaseData))
@@ -172,19 +236,22 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData)
   {
     std::cout << "Something went wrong setting the image in Python\n";
   }
-  PyGILState_Ensure();
   PyRun_SimpleString("print('The MITK image is available via variable _mitk_image')");
   // PyRun_SimpleString(
   //     "numpy_image = _mitk_image.GetAsNumpy()\n"
   //     "print('numpy image shape',numpy_image.shape)\n"
   //     "numpy_image[:]=0."
   // );
-  m_ThreadState = PyEval_SaveThread();
+  //m_ThreadState = PyEval_SaveThread();
+  /* Py_XDECREF(receive);
+  Py_XDECREF(result);
+  Py_XDECREF(main);*/
+  PyGILState_Release(state);
 }
 
 void mitk::PythonContext::SetVirtualEnvironmentPath(const std::string& absolutePath)
 {
-  PyGILState_Ensure();
+  PyGILState_STATE state = PyGILState_Ensure();
   m_CurrentVenvEnvPath.clear();
   std::string pythonCommand;
   pythonCommand.append("import sys\n"); // TODO: delete other imports are reimport
@@ -194,11 +261,12 @@ void mitk::PythonContext::SetVirtualEnvironmentPath(const std::string& absoluteP
     MITK_ERROR << "Something went wrong in setting the path in Python";
   }
   m_CurrentVenvEnvPath = absolutePath;
+  PyGILState_Release(state);
 }
 
 void mitk::PythonContext::ClearVirtualEnvironmentPath()
 {
-  PyGILState_Ensure();
+  PyGILState_STATE state = PyGILState_Ensure();
   std::string pythonCommand;
   pythonCommand.append("import sys\n");
   pythonCommand.append("sys.path.remove('" + m_CurrentVenvEnvPath + "')\n");
@@ -207,4 +275,5 @@ void mitk::PythonContext::ClearVirtualEnvironmentPath()
     MITK_ERROR << "Something went wrong in clearing the path in Python";
   }
   m_CurrentVenvEnvPath.clear();
+  PyGILState_Release(state);
 }

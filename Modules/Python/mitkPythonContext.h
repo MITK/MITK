@@ -39,8 +39,9 @@ namespace mitk
     ~PythonContext();
     void Activate() override;
     mitk::Image::Pointer LoadImageFromPython(const std::string &filePath) override;
-    void TransferBaseDataToPython(mitk::BaseData *mitkImage) override;
+    void TransferBaseDataToPython(mitk::BaseData *mitkImage, const std::string &varName = "_mitk_image") override;
     std::string ExecuteString(const std::string &pyCommands) override;
+    std::string ExecuteFile(const std::string &filePath);
     const char *GetStdOut() override;
     void SetVirtualEnvironmentPath(const std::string &absolutePath) override; // site-package
     void ClearVirtualEnvironmentPath() override;

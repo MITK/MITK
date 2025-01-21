@@ -33,7 +33,7 @@ namespace mitk
   public:
     virtual void Activate()=0;
     virtual mitk::Image::Pointer LoadImageFromPython(const std::string &filePath)=0;
-    virtual void TransferBaseDataToPython(mitk::BaseData *mitkImage)=0;
+    virtual void TransferBaseDataToPython(mitk::BaseData *mitkImage, const std::string &varName = "_mitk_image") = 0;
     virtual std::string ExecuteString(const std::string &pyCommands)=0;
     virtual const char *GetStdOut()=0;
     virtual void SetVirtualEnvironmentPath(const std::string &absolutePath)=0; // site-package

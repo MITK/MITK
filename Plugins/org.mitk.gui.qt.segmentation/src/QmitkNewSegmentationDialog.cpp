@@ -208,7 +208,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::La
 
   connect(this, &QDialog::finished, this, &QmitkNewSegmentationDialog::OnFinished);
   connect(m_Ui->colorButton, &QToolButton::clicked, this, &QmitkNewSegmentationDialog::OnColorButtonClicked);
-  connect(m_Ui->nameLineEdit, &QLineEdit::textChanged, this, &QmitkNewSegmentationDialog::OnTextChanged);
+  connect(m_Ui->nameLineEdit, &QLineEdit::textEdited, this, &QmitkNewSegmentationDialog::OnTextEdited);
   connect(m_Ui->nameList, &QListWidget::itemSelectionChanged, this, &QmitkNewSegmentationDialog::OnSuggestionSelected);
   connect(m_Ui->nameList, &QListWidget::itemDoubleClicked, this, &QmitkNewSegmentationDialog::OnAccept);
   connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QmitkNewSegmentationDialog::OnAccept);
@@ -323,12 +323,19 @@ void QmitkNewSegmentationDialog::OnAccept()
   this->accept();
 }
 
-void QmitkNewSegmentationDialog::OnTextChanged(const QString& text)
+void QmitkNewSegmentationDialog::OnTextEdited(const QString& text)
 {
-  auto finding = m_Ui->nameList->findItems(text, Qt::MatchFlag::MatchExactly);
+  const int numberOfItems = m_Ui->nameList->count();
 
-  if (!finding.isEmpty())
-    m_Ui->nameList->setCurrentItem(finding.first());
+  for (int row = 0; row < numberOfItems; ++row)
+  {
+    auto item = m_Ui->nameList->item(row);
+    bool match = item->text().contains(text, Qt::CaseInsensitive);
+    item->setHidden(!match);
+
+    if (match && item->text().compare(text, Qt::CaseInsensitive) == 0)
+      m_Ui->nameList->setCurrentItem(item);
+  }
 }
 
 void QmitkNewSegmentationDialog::OnColorButtonClicked()
@@ -350,7 +357,6 @@ void QmitkNewSegmentationDialog::OnSuggestionSelected()
     return;
 
   auto row = m_Ui->nameList->selectionModel()->selectedIndexes().first().row();
-
   m_Ui->nameLineEdit->setText(m_Suggestions[row].first);
   auto color = m_Suggestions[row].second;
 

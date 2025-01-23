@@ -186,16 +186,16 @@ mitk::LabelSetImageHelper::SplitLabelValuesByGroup(const LabelSetImage* labelSet
 }
 
 mitk::LabelSetImageHelper::LabelClassNameToLabelValueMapType
-mitk::LabelSetImageHelper::SplitLabelValuesByClassNamwe(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID)
+mitk::LabelSetImageHelper::SplitLabelValuesByClassName(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID)
 {
   if (nullptr == labelSetImage)
     mitkThrow() << "Cannot split label values. Invalid LabelSetImage pointer passed";
 
-  return SplitLabelValuesByClassNamwe(labelSetImage, groupID, labelSetImage->GetLabelValuesByGroup(groupID));
+  return SplitLabelValuesByClassName(labelSetImage, groupID, labelSetImage->GetLabelValuesByGroup(groupID));
 }
 
 mitk::LabelSetImageHelper::LabelClassNameToLabelValueMapType
-mitk::LabelSetImageHelper::SplitLabelValuesByClassNamwe(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID, const LabelSetImage::LabelValueVectorType& labelValues)
+mitk::LabelSetImageHelper::SplitLabelValuesByClassName(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID, const LabelSetImage::LabelValueVectorType& labelValues)
 {
   if (nullptr == labelSetImage)
     mitkThrow() << "Cannot split label values. Invalid LabelSetImage pointer passed";

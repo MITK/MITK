@@ -71,7 +71,7 @@ private:
   void OnFinished(int result);
   void OnSuggestionSelected();
   void OnColorButtonClicked();
-  void OnTextChanged(const QString& text);
+  void OnTextEdited(const QString& text);
 
   void SetSuggestions(const SuggestionsType& suggestions, bool replaceStandardSuggestions = false);
   void UpdateColorButtonBackground();

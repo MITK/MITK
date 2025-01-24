@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkDICOMSegmentationPropertyHelper.h>
 
 // Qmitk
+#include <QmitkCopyLabelToGroupDialog.h>
 #include <QmitkMultiLabelTreeModel.h>
 #include <QmitkLabelColorItemDelegate.h>
 #include <QmitkLabelToggleItemDelegate.h>
@@ -964,6 +965,10 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
         menu->addAction(clearAction);
       }
 
+      auto copyLabelToGroupAction = new QAction("&Copy to group...", this);
+      QObject::connect(copyLabelToGroupAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnCopyToGroup);
+      menu->addAction(copyLabelToGroupAction);
+
       if (m_AllowVisibilityModification)
       {
         if (m_AllowLabelModification) menu->addSeparator();
@@ -984,6 +989,19 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
   QObject::connect(menu, &QMenu::aboutToHide, this, &QmitkMultiLabelInspector::OnMouseLeave);
   m_AboutToShowContextMenu = true;
   menu->popup(QCursor::pos());
+}
+
+void QmitkMultiLabelInspector::OnCopyToGroup()
+{
+  auto selectedLabels = this->GetSelectedLabels();
+
+  if (selectedLabels.empty())
+    return;
+
+  QmitkCopyLabelToGroupDialog dialog(m_Segmentation, m_Segmentation->GetLabel(selectedLabels.front()));
+
+  if (dialog.exec() == QDialog::Accepted)
+    this->SetSelectedLabel(dialog.GetDestinationLabel()->GetValue());
 }
 
 QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()

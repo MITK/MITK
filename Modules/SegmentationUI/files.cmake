@@ -5,6 +5,7 @@ set(CPP_FILES
   Qmitk/QmitkBinaryThresholdToolGUI.cpp
   Qmitk/QmitkBinaryThresholdULToolGUI.cpp
   Qmitk/QmitkConfirmSegmentationDialog.cpp
+  Qmitk/QmitkCopyLabelToGroupDialog.cpp
   Qmitk/QmitkCopyToClipBoardDialog.cpp
   Qmitk/QmitkDrawPaintbrushToolGUI.cpp
   Qmitk/QmitkErasePaintbrushToolGUI.cpp
@@ -60,6 +61,7 @@ set(MOC_H_FILES
   Qmitk/QmitkBinaryThresholdToolGUI.h
   Qmitk/QmitkBinaryThresholdULToolGUI.h
   Qmitk/QmitkConfirmSegmentationDialog.h
+  Qmitk/QmitkCopyLabelToGroupDialog.h
   Qmitk/QmitkCopyToClipBoardDialog.h
   Qmitk/QmitkDrawPaintbrushToolGUI.h
   Qmitk/QmitkErasePaintbrushToolGUI.h
@@ -107,6 +109,7 @@ set(MOC_H_FILES
 
 set(UI_FILES
   Qmitk/QmitkConfirmSegmentationDialog.ui
+  Qmitk/QmitkCopyLabelToGroupDialog.ui
   Qmitk/QmitkGrowCutToolWidgetControls.ui
   Qmitk/QmitkOtsuToolWidgetControls.ui
   Qmitk/QmitkSurfaceStampWidgetGUIControls.ui

@@ -355,7 +355,7 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
           if (nullptr == label)
             mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is referring to a label that does not exist.";
 
-          return QVariant(QString::fromStdString(label->GetName()) + QString(" [%1]").arg(item->GetLabelValue()));
+          return QVariant(QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, label)));
         }
       }
     }

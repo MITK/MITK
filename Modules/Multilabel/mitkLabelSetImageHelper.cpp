@@ -224,3 +224,18 @@ std::string mitk::LabelSetImageHelper::CreateDisplayGroupName(const LabelSetImag
 
   return groupName;
 }
+
+std::string mitk::LabelSetImageHelper::CreateDisplayLabelName(const LabelSetImage* labelSetImage, const Label* label)
+{
+  const auto groupID = labelSetImage->GetGroupIndexOfLabel(label->GetValue());
+
+  auto labelName = label->GetName();
+
+  if (labelName.empty())
+    labelName = "Unnamed";
+
+  if (labelSetImage->GetLabelValuesByName(groupID, label->GetName()).size() > 1)
+    labelName += " [" + label->GetTrackingID() + ']';
+
+  return labelName;
+}

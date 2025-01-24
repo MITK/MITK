@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include "mitkProportionalTimeGeometry.h"
 #include "mitkStatisticsToImageRelationRule.h"
 #include "mitkStatisticsToMaskRelationRule.h"
+#include <mitkLabelSetImageHelper.h>
 
 #include "QmitkStyleManager.h"
 
@@ -343,7 +344,7 @@ void AddLabelTreeItems(const mitk::ImageStatisticsContainer* statistic, const mi
         labelInstance = multiLabelSeg->GetLabel(labelValue);
         if (labelInstance.IsNotNull())
         {
-          labelLabel = QString::fromStdString(labelInstance->GetName() + " [" + labelInstance->GetTrackingID() + "]");
+          labelLabel = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayLabelName(multiLabelSeg, labelInstance));
         }
         else
         {

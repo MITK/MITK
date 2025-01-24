@@ -13,30 +13,18 @@ found in the LICENSE file.
 #include "QmitkCopyLabelToGroupDialog.h"
 #include <ui_QmitkCopyLabelToGroupDialog.h>
 
-#include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageHelper.h>
 
 namespace
 {
-  QString GetDisplayedLabelName(mitk::LabelSetImage* segmentation, mitk::Label* label)
+  QString GetDisplayedLabelName(const mitk::LabelSetImage* segmentation, const mitk::Label* label)
   {
-    const auto group = segmentation->GetGroupIndexOfLabel(label->GetValue());
-
-    QString name = QString::fromStdString(label->GetName());
-
-    if (segmentation->GetLabelValuesByName(group, label->GetName()).size() > 1)
-      name += QString(" [%1]").arg(label->GetValue());
-
-    return name;
+    return QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayLabelName(segmentation, label));
   }
 
-  QString GetDisplayedGroupName(mitk::LabelSetImage* segmentation, mitk::LabelSetImage::GroupIndexType group)
+  QString GetDisplayedGroupName(const mitk::LabelSetImage* segmentation, mitk::LabelSetImage::GroupIndexType group)
   {
-    auto name = QString::fromStdString(segmentation->GetGroupName(group));
-
-    if (!name.isEmpty())
-      return name;
-
-    return QString("Group %1").arg(group + 1);
+    return QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(segmentation, group));
   }
 }
 

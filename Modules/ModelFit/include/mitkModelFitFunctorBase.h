@@ -91,7 +91,7 @@ namespace mitk
 
     ~ModelFitFunctorBase() override;
 
-    /**Internal Method called by Compute to get the final criterion values thar dove the fit.
+    /**Internal Method called by Compute to get the final criterion values that dove the fit.
      must be implemented be concrete functor classes.*/
     virtual OutputPixelArrayType GetCriteria(const ModelBase* model, const ParametersType& parameters,
         const SignalType& sample) const = 0;

@@ -37,7 +37,7 @@ namespace mitk
    * a plane to the provided point cloud or by using the centroid of three clusters
    *
    * If less than three clusters are provided, least squares is chosen automatically.
-   * If the centroid method is chosed either the three biggest clusters are chosen by
+   * If the centroid method is chosen either the three biggest clusters are chosen by
    * default. If the users sets PlaneProposer::SetUseDistances(true) the three clusters
    * with the biggerst mean distance of all points are chosen. The latter requires the
    * distances to be set as PointData scalar to the underlying VTK object.
@@ -49,7 +49,7 @@ namespace mitk
   {
   public:
     /**
-     * @brief Encapsulates the geometrical information needed to descripe a PlaneInfo
+     * @brief Encapsulates the geometrical information needed to describe a PlaneInfo
      *
      * normal = the normal of the plane
      * x,y = the axes of the PlaneInfo

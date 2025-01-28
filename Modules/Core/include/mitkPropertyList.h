@@ -229,7 +229,7 @@ namespace mitk
     /**
      * @brief Serialize the property list to JSON.
      *
-     * @note Properties of a certain type can only be deseralized again if their type has been
+     * @note Properties of a certain type can only be deserialized again if their type has been
      * registered via the IPropertyDeserialization core service.
      *
      * @sa CoreServices
@@ -240,7 +240,7 @@ namespace mitk
     /**
      * @brief Deserialize the property list from JSON.
      *
-     * @note Properties of a certain type can only be deseralized again if their type has been
+     * @note Properties of a certain type can only be deserialized again if their type has been
      * registered via the IPropertyDeserialization core service.
      *
      * @sa CoreServices

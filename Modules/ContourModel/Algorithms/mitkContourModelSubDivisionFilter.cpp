@@ -81,7 +81,7 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
         auto first = contour->IteratorBegin();
         auto last = contour->IteratorEnd() - 1;
 
-        // tempory contour to store result of a subdivision iteration
+        // temporary contour to store result of a subdivision iteration
         mitk::ContourModel::Pointer tempContour = mitk::ContourModel::New();
 
         // insert subpoints

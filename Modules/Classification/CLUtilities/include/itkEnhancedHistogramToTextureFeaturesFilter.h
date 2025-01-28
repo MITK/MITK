@@ -72,7 +72,7 @@ namespace itk
     * features 1, 2, 4, 5, 6, and 7. There is some correlation between the various
     * features, so using all of them at the same time is not necessarialy a good idea.
     *
-    * NOTA BENE: The input histogram will be forcably normalized!
+    * NOTA BENE: The input histogram will be forcibly normalized!
     * This algorithm takes three passes through the input
     * histogram if the histogram was already normalized, and four if not.
     *

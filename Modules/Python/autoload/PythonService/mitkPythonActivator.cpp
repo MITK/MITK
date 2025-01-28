@@ -12,7 +12,6 @@ found in the LICENSE file.
 #ifndef mitkPythonActivator_h
 #define mitkPythonActivator_h
 
-// Microservices
 #include <usModuleActivator.h>
 #include "usModuleContext.h"
 #include "mitkPythonContext.h"
@@ -27,31 +26,22 @@ namespace mitk
 
         void Load(us::ModuleContext* context) override
         {
-          MITK_DEBUG << "PythonActivator::Load";
+          MITK_INFO << "PythonActivator::Load";
           // Registering PythonService as MicroService
-          m_PythonService = itk::SmartPointer<mitk::PythonContext>(new PythonContext());
-
+          m_PythonService = std::make_unique<mitk::IPythonService>();
           us::ServiceProperties _PythonServiceProps;
           _PythonServiceProps["Name"] = std::string("PythonService");
           _PythonServiceProps["service.ranking"] = int(0);
-
-          m_PythonServiceRegistration = context->RegisterService<mitk::IPythonService>(m_PythonService.GetPointer(), _PythonServiceProps);
+          m_PythonServiceRegistration = context->RegisterService<mitk::IPythonService>(m_PythonService.get(), _PythonServiceProps);
         }
 
-        void Unload(us::ModuleContext*) override
-        {
-          MITK_DEBUG("PythonActivator") << "PythonActivator::Unload";
-          MITK_DEBUG("PythonActivator") << "m_PythonService GetReferenceCount " << m_PythonService->GetReferenceCount();
-          m_PythonServiceRegistration.Unregister();
-          m_PythonService->Delete();
-          MITK_DEBUG("PythonActivator") << "m_PythonService GetReferenceCount " << m_PythonService->GetReferenceCount();
-        }
+        void Unload(us::ModuleContext*) override {}
 
         ~PythonActivator() override{}
 
     private:
-        itk::SmartPointer<mitk::PythonContext> m_PythonService;
-        us::ServiceRegistration<PythonContext> m_PythonServiceRegistration;
+      std::unique_ptr<mitk::IPythonService> m_PythonService;
+      us::ServiceRegistration<mitk::IPythonService> m_PythonServiceRegistration;
     };
 }
 

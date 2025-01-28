@@ -19,8 +19,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkIOUtil.h>
-
-
+#include <mitkPythonContext.h>
 
 
 class mitkPythonTestSuite : public mitk::TestFixture
@@ -32,10 +31,7 @@ class mitkPythonTestSuite : public mitk::TestFixture
 
 public:
 
-  void setUp()
-  { 
-    mitk::IPythonService::ForceLoadModule(); 
-  }
+  void setUp(){}
 
   void TestEvaluateOperationWithResult()
   {
@@ -45,10 +41,14 @@ public:
     auto m_PythonServiceRefs = context->GetServiceReferences<mitk::IPythonService>(filter);
     if (!m_PythonServiceRefs.empty())
     {
-      mitk::IPythonService *m_PythonService =
-        dynamic_cast<mitk::IPythonService *>(context->GetService<mitk::IPythonService>(m_PythonServiceRefs.front()));
-      m_PythonService->Activate();
-      result = m_PythonService->ExecuteString("print(5+5)\n");
+      auto pythonContext = mitk::PythonContext::New();
+      pythonContext->Activate();
+      std::string pythonCommand;
+      pythonCommand.append("_mitk_stdout = io.StringIO()\n");
+      pythonCommand.append("sys.stdout = sys.stderr = _mitk_stdout\n");
+      pythonContext->ExecuteString(pythonCommand);
+      result = pythonContext->ExecuteString("print(5+5)\n");
+      CPPUNIT_ASSERT_MESSAGE("Result should be 10", result == "10\n");
     }
     else
     {
@@ -59,19 +59,15 @@ public:
   void TestCopyImageToAndBackPython()
   {
     std::string result = "";
-    us::ModuleContext *context = us::GetModuleContext();
-    std::string filter = "(Name=PythonService)";
-    auto m_PythonServiceRefs = context->GetServiceReferences<mitk::IPythonService>(filter);
-    if (!m_PythonServiceRefs.empty())
+    auto m_PythonContext = mitk::PythonContext::New();
+    if (m_PythonContext.IsNotNull())
     {
-      mitk::IPythonService *m_PythonService =
-        dynamic_cast<mitk::IPythonService *>(context->GetService<mitk::IPythonService>(m_PythonServiceRefs.front()));
-      m_PythonService->Activate();
+      m_PythonContext->Activate();
       mitk::Image::Pointer image_in = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
       mitk::Image::Pointer image_out;
       try
       {
-        m_PythonService->TransferBaseDataToPython(image_in.GetPointer());
+        m_PythonContext->TransferBaseDataToPython(image_in.GetPointer());
       }
       catch (const mitk::Exception &e)
       {
@@ -80,7 +76,7 @@ public:
       }
       try
       {
-        image_out = m_PythonService->LoadImageFromPython("_mitk_image");
+        image_out = m_PythonContext->LoadImageFromPython("_mitk_image");
       }
       catch (const mitk::Exception &e)
       {

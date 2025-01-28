@@ -11,15 +11,35 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkIPythonService.h"
+#include <Python.h>
+#ifndef WIN32
+#include <dlfcn.h>
+#include "PythonPath.h"
+#endif
+#include <boost/algorithm/string.hpp>
+
+mitk::IPythonService::IPythonService()
+{ 
+  // for Linux, libpython needs to be opened before initializing the Python Interpreter to enable imports
+#ifndef WIN32
+  std::vector<std::string> pythonIncludeVector;
+  // get libpython file to open (taken from "Python3_INCLUDE_DIR" variable from CMake to dynamically do it for different
+  // python versions)
+  boost::split(pythonIncludeVector, PYTHON_INCLUDE, boost::is_any_of("/"));
+  std::string libPython = "lib" + pythonIncludeVector[pythonIncludeVector.size() - 1] + ".so";
+  dlopen(libPython.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+#endif
+  if (!Py_IsInitialized())
+  {
+    Py_Initialize();
+  }
+}
 
 mitk::IPythonService::~IPythonService()
 {
-}
-
-std::string mitk::IPythonService::ForceLoadModule()
-{
-  std::string ret = "Load python module";
-  MITK_DEBUG << ret;
-  return ret;
+  if (Py_IsInitialized())
+  {
+    Py_Finalize();
+  }
 }
 

@@ -29,7 +29,7 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  class MITKPYTHON_EXPORT PythonContext : public itk::LightObject, public mitk::IPythonService
+  class MITKPYTHON_EXPORT PythonContext : public itk::LightObject
   {
   public:
     mitkClassMacroItkParent(PythonContext, itk::LightObject);
@@ -37,14 +37,14 @@ namespace mitk
     
     PythonContext();
     ~PythonContext();
-    void Activate() override;
-    mitk::Image::Pointer LoadImageFromPython(const std::string &filePath) override;
-    void TransferBaseDataToPython(mitk::BaseData *mitkImage, const std::string &varName = "_mitk_image") override;
-    std::string ExecuteString(const std::string &pyCommands) override;
+    void Activate();
+    mitk::Image::Pointer LoadImageFromPython(const std::string &filePath) ;
+    void TransferBaseDataToPython(mitk::BaseData *mitkImage, const std::string &varName = "_mitk_image");
+    std::string ExecuteString(const std::string &pyCommands);
     std::string ExecuteFile(const std::string &filePath);
-    const char *GetStdOut() override;
-    void SetVirtualEnvironmentPath(const std::string &absolutePath) override; // site-package
-    void ClearVirtualEnvironmentPath() override;
+    const char *GetStdOut();
+    void SetVirtualEnvironmentPath(const std::string &absolutePath); // site-package
+    void ClearVirtualEnvironmentPath();
 
   private:
     std::string m_CurrentVenvEnvPath;

@@ -455,23 +455,28 @@ Remark: The tool assumes that you have a Python3 environment with nnU-Net v1 (pi
 
 \imageMacro{QmitkSegmentation_nnUnetTool.png,"TotalSegmentator tool",10.00}
 
+\imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator  tool",5}
+
 This tool provides a GUI to the deep learning-based segmentation algorithm called the TotalSegmentator (v2). With this tool, you can get a segmentation mask predicted for 117 classes in CT images, loaded in MITK. 
 For a detailed explanation on tasks and supported classes etc., please refer to https://github.com/wasserth/TotalSegmentator <br>
 The tool assumes that you have Python >= 3.9 installed and available on your machine. We recommend to install TotalSegmentator via MITK. The "Install TotalSegmentator" action implicitly creates a python virtual environment in an MITK mainitained
 directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv package using the following command:  `apt install python3-venv`. For best results, your machine should be ideally equipped with a CUDA-enabled GPU. 
-\imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator Settings",5}
 
 \subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow:
-    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 2.0.5) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
-    Once installed, the "Install TotalSegmentator" button is grayed out.
-    -# If Python is not found by MITK goto "Install Options" & select the "System Python Path" drop-down to see if MITK has automatically detected other Python environments.
-    Click on a fitting Python installation for TotalSegmentator to use or click "Select" in the dropdown to choose an unlisted installation of Python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".
-    No need to navigate all the way into "../usr/bin/python3", for example.
+    -# Install TotalSegmentator: Goto Preferences (Ctrl+P) > TotalSegmentator and click "Install TotalSegmentator" to install TotalSegmentator (version: 2.4.0) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    \imageMacro{QmitkSegmentation_TotalSegmentatorTool_Preferences.png,"TotalSegmentator Preferences",10.00}
+    -# A new dialog window will open up, showing a detailed log. When the donwload is done, the "Close" button will be enabled and you may close the window.
+    -# Note: If Python is not listed by MITK in "System Python Path", click "Select..." in the dropdown to choose an unlisted installation of Python and try downloading again. 
+    Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".
+    No need to navigate all the way into "../usr/bin/python3", for example. 
+    -# Once installed, the "Install TotalSegmentator" button is grayed out.
+    -# In case you want to use your own virtual environment containing TotalSegmentator check the "Use Custom Installation" checkbox. Then, select the environment of your choice by using "Custom Env. Path" > "Select...".
+    -# Select the preferred device for inferencing in the "Device" combobox. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
+    -# Click "OK" to save the preference settings.
+    -# Goto Segmentation View > 3D tools > TotalSegmentator.
     -# Select a specific subtask in the "Tasks" drop-downs. The default is "total" for non-specific total segmentation.
     -# Click on "Run TotalSegmentator" for a preview.
-    -# In the "Advanced" section, you can also activate other options like "Fast" for faster runtime and less memory requirements. Use "Fast" if you only have a CPU for inferencing.
-    -# Use "Advanced" > "GPU Id" combobox to change the preferred GPU for inferencing. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
-    -# In case you want to use your own virtual environment containing TotalSegmentator, goto "Install Options" & check "Use Custom Installation" checkbox. Then, select the environment of your choice by using "Custom Env. Path".
+    -# You can also activate other options like "Fast" for faster runtime and less memory requirements. Use "Fast" if you only have a CPU for inferencing.
 
 \subsection org_mitk_views_segmentationMonaiLabel3D MONAI Label 3D Tool
 

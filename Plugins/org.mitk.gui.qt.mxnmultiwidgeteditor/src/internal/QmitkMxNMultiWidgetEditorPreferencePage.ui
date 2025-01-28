@@ -15,53 +15,42 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="3">
-    <widget class="QCheckBox" name="m_EnableFlexibleZooming">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If activated, zooming and panning is limited to a certain space around each image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
+    <widget class="QCheckBox" name="m_ShowLevelWindowWidget">
      <property name="layoutDirection">
-      <enum>Qt::LeftToRight</enum>
+      <enum>Qt::LayoutDirection::LeftToRight</enum>
      </property>
      <property name="text">
-      <string>Use constraint zooming and panning</string>
+      <string>Show level/window widget</string>
      </property>
      <property name="checked">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="3">
-    <widget class="Line" name="lineBottom">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="m_CrosshairGapSizeLabel">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The gap in the middle of the crosshair in pixels.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   <item row="1" column="0" colspan="3">
+    <widget class="QCheckBox" name="m_PACSLikeMouseMode">
+     <property name="layoutDirection">
+      <enum>Qt::LayoutDirection::LeftToRight</enum>
      </property>
      <property name="text">
-      <string>Crosshair gap size</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="m_ColormapLabel">
-     <property name="text">
-      <string>Colormap</string>
+      <string>Use PACS like mouse interaction (select left mouse button action)</string>
      </property>
     </widget>
    </item>
    <item row="7" column="0">
-    <widget class="QPushButton" name="m_ResetButton">
-     <property name="text">
-      <string>Reset preferences</string>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
      </property>
-    </widget>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
-   <item row="5" column="0">
+   <item row="4" column="0">
     <widget class="QCheckBox" name="m_IndividualDecorations">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -74,37 +63,7 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
-    <widget class="QSpinBox" name="m_CrosshairGapSize">
-     <property name="value">
-      <number>32</number>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="3">
-    <widget class="QCheckBox" name="m_ShowLevelWindowWidget">
-     <property name="layoutDirection">
-      <enum>Qt::LeftToRight</enum>
-     </property>
-     <property name="text">
-      <string>Show level/window widget</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QCheckBox" name="m_PACSLikeMouseMode">
-     <property name="layoutDirection">
-      <enum>Qt::LeftToRight</enum>
-     </property>
-     <property name="text">
-      <string>Use PACS like mouse interaction (select left mouse button action)</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1" colspan="2">
+   <item row="3" column="1" colspan="2">
     <widget class="QComboBox" name="m_ColormapComboBox">
      <item>
       <property name="text">
@@ -113,18 +72,43 @@
      </item>
     </widget>
    </item>
-   <item row="8" column="0">
-    <spacer name="verticalSpacer">
+   <item row="2" column="0" colspan="3">
+    <widget class="Line" name="lineBottom">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="m_ColormapLabel">
+     <property name="text">
+      <string>Colormap</string>
      </property>
-    </spacer>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QPushButton" name="m_ResetButton">
+     <property name="text">
+      <string>Reset preferences</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QSpinBox" name="m_CrosshairGapSize">
+     <property name="value">
+      <number>32</number>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="m_CrosshairGapSizeLabel">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The gap in the middle of the crosshair in pixels.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Crosshair gap size</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

@@ -122,6 +122,10 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
   m_UnknownDataNodeDescriptor->AddAction(m_ResetGeometryAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ResetGeometryAction));
 
+  m_RenameAction = new QmitkDataNodeRenameAction(m_Parent, workbenchPartSite);
+  m_UnknownDataNodeDescriptor->AddAction(m_RenameAction, true);
+  m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_RenameAction));
+
   QAction* saveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.datamanager/Save_48.png"), workbenchPartSite->GetWorkbenchWindow());
   m_UnknownDataNodeDescriptor->AddAction(saveAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, saveAction));
@@ -147,7 +151,7 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ShowDetailsAction));
 
   m_OpacityAction = new QmitkDataNodeOpacityAction(m_Parent, workbenchPartSite);
-  m_UnknownDataNodeDescriptor->AddAction(m_OpacityAction, false);
+  m_UnknownDataNodeDescriptor->AddAction(m_OpacityAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_OpacityAction));
 
   m_ColorAction = new QmitkDataNodeColorAction(m_Parent, workbenchPartSite);

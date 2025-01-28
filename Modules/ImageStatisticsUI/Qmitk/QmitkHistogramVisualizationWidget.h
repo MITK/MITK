@@ -13,10 +13,16 @@ found in the LICENSE file.
 #define QmitkHistogramVisualizationWidget_h
 
 #include <MitkImageStatisticsUIExports.h>
-#include <ui_QmitkHistogramVisualizationWidget.h>
 
 // itk
 #include <itkHistogram.h>
+
+#include <QmitkChartWidget.h>
+
+namespace Ui
+{
+  class QmitkHistogramVisualizationControls;
+}
 
 /**
  * \brief Widget for displaying Histograms.
@@ -68,7 +74,7 @@ private:
 	void OnMinValueSpinBoxValueChanged();
 
 private:
-  Ui::QmitkHistogramVisualizationControls m_Controls;
+  Ui::QmitkHistogramVisualizationControls *m_Controls;
   const unsigned int m_DefaultNBins = 100;
   const unsigned int m_MinNBins = 10;
   const unsigned int m_MaxNBins = 10000;

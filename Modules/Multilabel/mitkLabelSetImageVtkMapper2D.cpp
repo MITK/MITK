@@ -21,6 +21,10 @@ found in the LICENSE file.
 #include <mitkVectorProperty.h>
 #include <mitkLabelHighlightGuard.h>
 
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
 // MITK Rendering
 #include "vtkNeverTranslucentTexture.h"
 
@@ -46,14 +50,32 @@ namespace
     }
     return false;
   }
+
+  mitk::IPreferences* GetPreferences()
+  {
+    auto preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
+  }
 }
 
 mitk::LabelSetImageVtkMapper2D::LabelSetImageVtkMapper2D()
+  : m_Preferences(nullptr)
 {
 }
 
 mitk::LabelSetImageVtkMapper2D::~LabelSetImageVtkMapper2D()
 {
+}
+
+float mitk::LabelSetImageVtkMapper2D::GetOpacityFactor()
+{
+  if (m_Preferences == nullptr)
+    m_Preferences = GetPreferences();
+
+  if (m_Preferences != nullptr)
+    return m_Preferences->GetFloat("opacity factor", 1.0f);
+
+  return 1.0f;
 }
 
 vtkProp *mitk::LabelSetImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
@@ -223,6 +245,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
+  opacity *= this->GetOpacityFactor();
 
   if (isLookupModified)
   {
@@ -382,6 +405,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateActiveLabelOutline(mitk::BaseRender
 
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
+  opacity *= this->GetOpacityFactor();
 
   mitk::Label* activeLabel = image->GetActiveLabel();
   bool contourActive = false;

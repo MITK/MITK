@@ -1,11 +1,34 @@
 mitk_create_module(
-  INCLUDE_DIRS Algorithms Controllers DataManagement Interactions Rendering SegmentationUtilities/BooleanOperations SegmentationUtilities/MorphologicalOperations
-  DEPENDS MitkAlgorithmsExt MitkSurfaceInterpolation MitkGraphAlgorithms MitkContourModel MitkMultilabel MitkBoundingShape
-  PACKAGE_DEPENDS
-    PUBLIC ITK|QuadEdgeMesh+RegionGrowing httplib 
-    PRIVATE ITK|LabelMap+MathematicalMorphology VTK|ImagingGeneral
-  TARGET_DEPENDS PRIVATE GrowCut
+  INCLUDE_DIRS
+    Algorithms
+    Controllers
+    DataManagement
+    Interactions
+    Rendering
+    SegmentationUtilities/BooleanOperations
+    SegmentationUtilities/MorphologicalOperations
+  PCH
+    mitkTool.h
+  DEPENDS
+    MitkAlgorithmsExt
+    MitkBoundingShape
+    MitkContourModel
+    MitkGraphAlgorithms
+    MitkMultilabel
+    MitkSurfaceInterpolation
+  TARGET_DEPENDS
+    PUBLIC
+      httplib::httplib
+      ITKQuadEdgeMesh
+      ITKRegionGrowing
+    PRIVATE
+      GrowCut
+      ITKLabelMap
+      ITKMathematicalMorphology
+      OpenMP::OpenMP_CXX
+      VTK::ImagingGeneral
 )
 
+add_subdirectory(autoload/IO)
 add_subdirectory(cmdapps)
 add_subdirectory(Testing)

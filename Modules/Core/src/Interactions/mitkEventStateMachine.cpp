@@ -152,12 +152,12 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent *event, DataNode *dat
       }
       catch (const std::exception &e)
       {
-        MITK_ERROR << "Unhandled excaption caught in ExecuteAction(): " << e.what();
+        MITK_ERROR << "Unhandled exception caught in ExecuteAction(): " << e.what();
         return false;
       }
       catch (...)
       {
-        MITK_ERROR << "Unhandled excaption caught in ExecuteAction()";
+        MITK_ERROR << "Unhandled exception caught in ExecuteAction()";
         return false;
       }
     }

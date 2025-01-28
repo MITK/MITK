@@ -20,9 +20,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /**
-   *
-   */
+  class DataStorage;
+
   namespace LabelSetImageHelper
   {
     /**
@@ -45,11 +44,13 @@ namespace mitk
      *                                  is derived.
      * @param initialSegmentationImage  The segmentation image that is used to initialize the label set image.
      * @param segmentationName          An optional name for the new segmentation node.
+     * @param dataStorage               The data storage of the reference node (if given, used to generate a unique node name).
      *
      * @return                          The new segmentation node as a data node pointer.
      */
     MITKMULTILABEL_EXPORT mitk::DataNode::Pointer CreateNewSegmentationNode(const DataNode* referenceNode,
-      const Image* initialSegmentationImage = nullptr, const std::string& segmentationName = std::string());
+      const Image* initialSegmentationImage = nullptr, const std::string& segmentationName = std::string(),
+      const DataStorage* dataStorage = nullptr);
 
     /**
      * @brief This function creates and returns a new label. The label is automatically assigned an
@@ -71,10 +72,11 @@ namespace mitk
     MITKMULTILABEL_EXPORT GroupIDToLabelValueMapType SplitLabelValuesByGroup(const LabelSetImage* labelSetImage, const LabelSetImage::LabelValueVectorType& labelValues);
 
     using LabelClassNameToLabelValueMapType = std::map<std::string, LabelSetImage::LabelValueVectorType>;
-    MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassNamwe(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID);
-    MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassNamwe(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID, const LabelSetImage::LabelValueVectorType& labelValues);
+    MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassName(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID);
+    MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassName(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID, const LabelSetImage::LabelValueVectorType& labelValues);
 
     MITKMULTILABEL_EXPORT std::string CreateDisplayGroupName(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID);
+    MITKMULTILABEL_EXPORT std::string CreateDisplayLabelName(const LabelSetImage* labelSetImage, const Label* label);
 
   } // namespace LabelSetImageHelper
 } // namespace mitk

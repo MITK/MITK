@@ -22,7 +22,7 @@ set(VERIFY_DUMP_CMD  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/VerifyDICOMMitkImageDump)
 
 # Alternative definition of VERIFY_DUMP_CMD
 # Comment in to use the DumpDICOMMitkImage app to use the tests to produce new reference dumps
-#set(VERIFY_DUMP_CMD  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DumpDICOMMitkImage)
+# set(VERIFY_DUMP_CMD  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DumpDICOMMitkImage)
 
 set(CT_ABDOMEN_DIR ${MITK_DATA_DIR}/TinyCTAbdomen_DICOMReader)
 set(MR_HEART_DIR ${MITK_DATA_DIR}/3D+t-Heart)

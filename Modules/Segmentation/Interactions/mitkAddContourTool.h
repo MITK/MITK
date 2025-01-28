@@ -58,6 +58,8 @@ namespace mitk
   protected:
     AddContourTool(); // purposely hidden
     ~AddContourTool() override;
+
+    void OnInvertLogic(StateMachineAction* action, InteractionEvent* event) override;
   };
 
 } // namespace

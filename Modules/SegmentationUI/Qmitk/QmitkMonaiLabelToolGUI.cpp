@@ -82,8 +82,9 @@ void QmitkMonaiLabelToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 
 void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
-  m_Controls.setupUi(this);
-  mainLayout->addLayout(m_Controls.verticalLayout);
+  auto wrapperWidget = new QWidget(this);
+  mainLayout->addWidget(wrapperWidget);
+  m_Controls.setupUi(wrapperWidget);
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   connect(m_Controls.fetchUrl, SIGNAL(clicked()), this, SLOT(OnFetchBtnClicked()));

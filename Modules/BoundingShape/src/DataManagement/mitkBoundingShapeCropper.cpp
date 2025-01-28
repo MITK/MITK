@@ -258,6 +258,21 @@ namespace mitk
     output->Initialize(mitk::PixelType(GetOutputPixelType()), dimension, dimensions);
     delete[] dimensions;
 
+    if (dimension > 3)
+    {
+      // The image is cropped for all time steps. The geometry of the initialized output image
+      // is a ProportionalTimeGeometry with default values for first time point and time step
+      // duration. The output geometry should be identical to the input geometry in any
+      // time-related regards, though.
+
+      auto fixedOutputGeometry = this->GetInput()->GetTimeGeometry()->Clone();
+
+      fixedOutputGeometry->ReplaceTimeStepGeometries(output->GetGeometry());
+      fixedOutputGeometry->UpdateBoundingBox();
+
+      output->SetTimeGeometry(fixedOutputGeometry);
+    }
+
     // Apply transform of the input image to the new generated output image
     mitk::BoundingShapeCropper::RegionType outputRegion = output->GetRequestedRegion();
 

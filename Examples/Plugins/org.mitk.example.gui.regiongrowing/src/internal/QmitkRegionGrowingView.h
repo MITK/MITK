@@ -17,8 +17,6 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_QmitkRegionGrowingViewControls.h"
-
 //! [includes]
 #include "mitkIRenderWindowPartListener.h"
 #include "mitkPointSet.h"
@@ -26,6 +24,11 @@ found in the LICENSE file.
 
 class QmitkPointListWidget;
 //! [includes]
+
+namespace Ui
+{
+  class QmitkRegionGrowingViewControls;
+}
 
 /**
   \brief QmitkRegionGrowingView
@@ -64,7 +67,7 @@ protected:
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
   //! [render-window-part-listener]
 
-  Ui::QmitkRegionGrowingViewControls m_Controls;
+  Ui::QmitkRegionGrowingViewControls *m_Controls;
 
 private:
   //! [itkimageprocessing]

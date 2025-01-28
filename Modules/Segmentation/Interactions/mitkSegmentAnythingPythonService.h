@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkLabelSetImage.h>
 #include <itkImage.h>
+#include <mitkCommon.h>
 
 namespace mitk
 {
@@ -37,6 +38,7 @@ namespace mitk
       KILLED,
       CUDAError
     };
+    mitkClassMacroItkParent(SegmentAnythingPythonService, itk::Object);
 
     /**
      * @brief Construct a new Segment Anything Python Service object. Specify working directory,
@@ -59,7 +61,7 @@ namespace mitk
     
     itkSetMacro(MitkTempDir, std::string);
     itkGetConstMacro(MitkTempDir, std::string);
-
+    mitkNewMacro5Param(SegmentAnythingPythonService, std::string, std::string, std::string, unsigned int, std::string);
     /**
      * @brief Static function to print out everything from itk::EventObject.
      * Used as callback in mitk::ProcessExecutor object.

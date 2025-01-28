@@ -19,7 +19,9 @@ found in the LICENSE file.
 namespace mitk
 {
   /** \brief Encapsulates several morphological operations that can be performed on segmentations.
-    */
+   * The Operations do also support 2D images; but 2D images will not work with coronal or sagittal
+   * structuring elements, as the expect a 3rd dimension.
+   */
   class MITKSEGMENTATION_EXPORT MorphologicalOperations
   {
   public:

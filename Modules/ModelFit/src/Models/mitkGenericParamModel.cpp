@@ -42,48 +42,22 @@ mitk::GenericParamModel::GenericParamModel(): m_FunctionString(""), m_NumberOfPa
 mitk::GenericParamModel::ParameterNamesType
 mitk::GenericParamModel::GetParameterNames() const
 {
-  ParameterNamesType result;
-  result.push_back("a");
-
-  if (m_NumberOfParameters > 1)
-  {
-    result.push_back("b");
-  }
-  if (m_NumberOfParameters > 2)
-  {
-    result.push_back("c");
-  }
-  if (m_NumberOfParameters > 3)
-  {
-    result.push_back("d");
-  }
-  if (m_NumberOfParameters > 4)
-  {
-    result.push_back("e");
-  }
-  if (m_NumberOfParameters > 5)
-  {
-    result.push_back("f");
-  }
-  if (m_NumberOfParameters > 6)
-  {
-    result.push_back("g");
-  }
-  if (m_NumberOfParameters > 7)
-  {
-    result.push_back("h");
-  }
-  if (m_NumberOfParameters > 8)
-  {
-    result.push_back("i");
-  }
-  if (m_NumberOfParameters > 9)
-  {
-    result.push_back("j");
-  }
-
-  return result;
+  ParameterNamesType parameterNames = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
+  if (parameterNames.size() < m_NumberOfParameters) mitkThrow() << "Invalid internal state. Number of parameters is larger then predefined names count.";
+  parameterNames.resize(m_NumberOfParameters);
+  return parameterNames;
 };
+
+mitk::GenericParamModel::ParamterUnitMapType mitk::GenericParamModel::GetParameterUnits() const
+{
+  ParamterUnitMapType result;
+  ParameterNamesType parameterNames = this->GetParameterNames();
+  for (ParameterNamesType::size_type i = 0; i < parameterNames.size(); ++i)
+  {
+    result.insert(std::make_pair(parameterNames[i], "[unit of " + parameterNames[i] + "]"));
+  }
+  return result;
+}
 
 mitk::GenericParamModel::ParametersSizeType
 mitk::GenericParamModel::GetNumberOfParameters() const

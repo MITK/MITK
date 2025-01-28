@@ -17,9 +17,6 @@ found in the LICENSE file.
 #include "mitkBinaryThresholdTool.h"
 #include <MitkSegmentationUIExports.h>
 
-#include "ctkSliderWidget.h"
-#include <qcheckbox.h>
-
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::BinaryThresholdTool.

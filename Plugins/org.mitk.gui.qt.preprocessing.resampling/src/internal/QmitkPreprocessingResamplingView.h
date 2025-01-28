@@ -15,11 +15,15 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 #include <org_mitk_gui_qt_preprocessing_resampling_Export.h>
-#include "ui_QmitkPreprocessingResamplingViewControls.h"
 
 #include "QmitkStepperAdapter.h"
 
 #include <mitkDataStorageSelection.h>
+
+namespace Ui
+{
+  class QmitkPreprocessingResamplingViewControls;
+}
 
 /*!
 \brief This module allows to use some basic image processing filters for preprocessing, image enhancement and testing purposes

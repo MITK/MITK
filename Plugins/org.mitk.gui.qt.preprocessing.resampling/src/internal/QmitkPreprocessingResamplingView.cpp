@@ -11,15 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkPreprocessingResamplingView.h"
+#include <ui_QmitkPreprocessingResamplingViewControls.h>
 
 // QT includes (GUI)
-#include <qlabel.h>
-#include <qspinbox.h>
-#include <qpushbutton.h>
-#include <qcheckbox.h>
-#include <qgroupbox.h>
-#include <qradiobutton.h>
-#include <qmessagebox.h>
+#include <QMessageBox>
 
 // Berry includes (selection service)
 #include <berryISelectionService.h>

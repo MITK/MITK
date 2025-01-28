@@ -1,0 +1,38 @@
+/**
+\page org_mitk_petSUVCalculation The PET SUV Calculation View
+
+\image html petsuv.png "Icon of PET SUV Calculation View"
+
+\li \ref PETSUV_Introduction
+\li \ref PETSUV_Contact
+\li \ref PETSUV_Usage
+
+\section PETSUV_Introduction Introduction
+This view offers the user a way to calculate SUV maps out of PET images. the generated SUV maps become child nodes
+of the selected PET image and can then be visualized or analysed like any other image.\n
+@remark Currently the view works only with PET images loaded from DICOM files because special DICOM tags are needed
+to correctly compute the SUV map.
+
+\section PETSUV_Usage Usage
+To generate a SUV map do the following:
+-# Set the time to measurement.
+-# Specify the injected activity for the data set.
+-# Specify the body weight of the person and the unit (kg or g).
+-# Selected the tracer isotope. Currently the following isotopes are supported:
+	- 11C
+	- 15O
+	- 18F
+	- 68Ga
+-# Selected the PET image.
+-# Press the "Calculate SUV" button.
+
+The SUV map will be added as child node to the selected PET image.
+
+\image html usage_suv.png "GUI of the PET SUV view."
+
+\section PETSUV_Contact Contact information
+This plug-in is being developed by Charlotte Debus (E210 - Translational Radiooncology)
+at the DKFZ (German Cancer Research Center).
+If you have any questions, need support,
+find a bug or have a feature request, feel free to contact c.debus@dkfz.de.
+*/

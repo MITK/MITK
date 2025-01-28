@@ -26,14 +26,10 @@ found in the LICENSE file.
 #include "vtkRenderWindow.h"
 #include "mitkVtkPropRenderer.h"
 
-#include "ui_QmitkScreenshotMakerControls.h"
-//#include "../MovieMakerDll.h"
-
-//class QmitkMovieMakerControls;
-class QmitkStepperAdapter;
-class vtkCamera;
-class QTimer;
-class QTime;
+namespace Ui
+{
+  class QmitkScreenshotMakerControls;
+}
 
 /**
  * \brief View for creating movies (AVIs)

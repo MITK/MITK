@@ -115,11 +115,14 @@ set(gen_platform ${CMAKE_GENERATOR_PLATFORM})
 # Use this value where semi-colons are needed in ep_add args:
 set(sep "^^")
 
-##
+if(MSVC)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 
-if(MSVC_VERSION)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj /MP")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
+  if(MSVC_VERSION VERSION_LESS 1928)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  endif()
 endif()
 
 # This is a workaround for passing linker flags
@@ -183,12 +186,18 @@ set(ep_common_args
   -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
 )
 
-if(MSVC_VERSION)
+if(MSVC)
   list(APPEND ep_common_args
     -DCMAKE_DEBUG_POSTFIX:STRING=d
   )
 
   set(DCMTK_CMAKE_DEBUG_POSTFIX d)
+
+  if(MSVC_VERSION VERSION_GREATER_EQUAL 1928)
+    list(APPEND ep_common_args
+      "-DCMAKE_VS_GLOBALS:STRING=UseMultiToolTask=true${sep}EnforceProcessCountAcrossBuilds=true"
+    )
+  endif()
 endif()
 
 set(ep_common_cache_args
@@ -389,6 +398,8 @@ ExternalProject_Add(${proj}
     # --------------- Build options ----------------
     -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+    -DMITK_BUILD_CONFIGURATION:STRING=${MITK_BUILD_CONFIGURATION}
+    -DMITK_XVFB_TESTING_COMMAND:STRING=${MITK_XVFB_TESTING_COMMAND}
     "-DCMAKE_CONFIGURATION_TYPES:STRING=${CMAKE_CONFIGURATION_TYPES}"
     "-DCMAKE_PREFIX_PATH:PATH=${ep_prefix};${CMAKE_PREFIX_PATH}"
     "-DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}"
@@ -422,10 +433,9 @@ ExternalProject_Add(${proj}
     ${mitk_superbuild_boolean_args}
     ${mitk_optional_cache_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF
-    -DMITK_BUILD_CONFIGURATION:STRING=${MITK_BUILD_CONFIGURATION}
+    -DMITK_PCH:BOOL=${MITK_PCH}
     -DMITK_FAST_TESTING:BOOL=${MITK_FAST_TESTING}
     -DMITK_XVFB_TESTING:BOOL=${MITK_XVFB_TESTING}
-    -DMITK_XVFB_TESTING_COMMAND:STRING=${MITK_XVFB_TESTING_COMMAND}
     -DCTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
     # ----------------- Miscellaneous ---------------
     -DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}

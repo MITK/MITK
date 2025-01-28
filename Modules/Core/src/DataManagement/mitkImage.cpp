@@ -15,7 +15,6 @@ found in the LICENSE file.
 #include "mitkCompareImageDataFilter.h"
 #include "mitkImageStatisticsHolder.h"
 #include "mitkImageVtkReadAccessor.h"
-#include "mitkImageVtkWriteAccessor.h"
 #include "mitkPixelTypeMultiplex.h"
 #include <mitkProportionalTimeGeometry.h>
 

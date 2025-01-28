@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <qpainter.h>
+#include <QPainter>
 #include <qwt_painter.h>
 #include <qwt_plot.h>
 #include <qwt_scale_map.h>

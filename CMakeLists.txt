@@ -27,7 +27,15 @@ endif()
 cmake_policy(SET CMP0091 OLD)
 
 if(POLICY CMP0135)
-  cmake_policy(SET CMP0135 NEW) # https://cmake.org/cmake/help/v3.24/policy/CMP0135.html
+  # https://cmake.org/cmake/help/v3.24/policy/CMP0135.html
+  # Set timestamps of extracted ExternalProject_Add() downloads to time of extraction.
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
+if(POLICY CMP0167)
+  # https://cmake.org/cmake/help/v3.30/policy/CMP0167.html
+  # The FindBoost module is removed.
+  cmake_policy(SET CMP0167 OLD)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -41,7 +49,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2024.06.99)
+  project(MITK VERSION 2024.12.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -156,6 +164,31 @@ if(WIN32)
 endif()
 
 #-----------------------------------------------------------------------------
+# Switch on parallel builds in Visual Studio
+#-----------------------------------------------------------------------------
+
+# Since Visual Studio 2019 v16.9 a new Multi-ToolTask scheduler is available,
+# which schedules and limits tasks both within (was /MP) and across targets (-m).
+# Make sure to add the -m option in build scripts when using MSBuild or CMake
+# to build everything:
+#
+#   msbuild -m
+#
+#   resp.
+#
+#   cmake --build <path> -- -m
+
+if(MSVC_VERSION VERSION_GREATER_EQUAL 1928)
+  if(NOT CMAKE_VS_GLOBALS MATCHES "(^|;)UseMultiToolTask=")
+    list(APPEND CMAKE_VS_GLOBALS UseMultiToolTask=true)
+  endif()
+
+  if(NOT CMAKE_VS_GLOBALS MATCHES "(^|;)EnforceProcessCountAcrossBuilds=")
+    list(APPEND CMAKE_VS_GLOBALS EnforceProcessCountAcrossBuilds=true)
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Additional MITK Options (also shown during superbuild)
 #-----------------------------------------------------------------------------
 
@@ -166,6 +199,7 @@ option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
 option(MITK_FAST_TESTING "Disable long-running tests like packaging" OFF)
 option(MITK_XVFB_TESTING "Execute test drivers through xvfb-run" OFF)
+option(MITK_PCH "Enable precompiled headers" ON)
 
 option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
@@ -174,6 +208,7 @@ mark_as_advanced(
   MITK_XVFB_TESTING
   MITK_FAST_TESTING
   MITK_BUILD_ALL_APPS
+  MITK_PCH
 )
 
 #-----------------------------------------------------------------------------

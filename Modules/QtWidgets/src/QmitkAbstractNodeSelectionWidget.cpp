@@ -159,6 +159,13 @@ void QmitkAbstractNodeSelectionWidget::HandleChangeOfInternalSelection(NodeList 
   }
 }
 
+void QmitkAbstractNodeSelectionWidget::OnSelectionReceived(
+  const std::string& /*context*/,
+  const std::vector<mitk::DataNode::Pointer>& selection)
+{
+  this->SetCurrentSelection(NodeList(selection.begin(), selection.end()));
+}
+
 void QmitkAbstractNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
 {
   if (!m_RecursionGuard)

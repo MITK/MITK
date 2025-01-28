@@ -10,184 +10,292 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-// Qmitk
 #include "QmitkDicomBrowser.h"
+#include <ui_QmitkDicomBrowser.h>
 
 #include "mitkPluginActivator.h"
-#include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
 
-#include "berryIQtPreferencePage.h"
+#include <mitkBaseDICOMReaderService.h>
+#include <mitkContourModelSet.h>
+#include <mitkCoreServices.h>
+#include <mitkDICOMRTMimeTypes.h>
+#include <mitkDoseNodeHelper.h>
+#include <mitkFileReaderRegistry.h>
+#include <mitkIDataStorageService.h>
+#include <mitkIOUtil.h>
+#include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIsoLevelsGenerator.h>
+#include <mitkMimeType.h>
+#include <mitkPropertyNameHelper.h>
+#include <mitkRenderingManager.h>
+#include <mitkRTUIConstants.h>
+
+#include <QMessageBox>
+
+namespace
+{
+  void GenerateNodeName(mitk::DataNode* node)
+  {
+    if (auto nameProperty = node->GetData()->GetProperty("name"); nameProperty.IsNotNull())
+    {
+      // If data has a name property set by reader, use this name.
+      node->SetName(nameProperty->GetValueAsString());
+    }
+    else
+    {
+      // If the reader didn't specify a name, generate one.
+      node->SetName(mitk::GenerateNameFromDICOMProperties(node));
+    }
+  }
+
+  std::vector<mitk::BaseData::Pointer> Read(const std::string& filename, const mitk::CustomMimeType& mimeType)
+  {
+    mitk::FileReaderRegistry readerRegistry;
+    mitk::IFileReader* reader = nullptr;
+
+    try
+    {
+      reader = readerRegistry.GetReaders(mitk::MimeType(mimeType, -1, -1)).at(0);
+    }
+    catch (const std::out_of_range&)
+    {
+      const std::string message = "Cannot find " + mimeType.GetCategory() + "( " + mimeType.GetComment() + ") file reader.";
+      MITK_ERROR << message;
+      QMessageBox::critical(nullptr, "View DICOM series", QString::fromStdString(message));
+      return {};
+    }
+
+    reader->SetInput(filename);
+    return reader->Read();
+  }
+
+  bool AddRTDoseToDataStorage(const std::string& filename, mitk::DataStorage* dataStorage)
+  {
+    auto readerOutput = Read(filename, mitk::DICOMRTMimeTypes::DICOMRT_DOSE_MIMETYPE());
+
+    if (!readerOutput.empty())
+    {
+      mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(readerOutput.front().GetPointer());
+
+      auto doseImageNode = mitk::DataNode::New();
+      doseImageNode->SetData(doseImage);
+      doseImageNode->SetName("RTDose");
+
+      if (doseImage.IsNotNull())
+      {
+        std::string sopUID;
+
+        if (mitk::GetBackwardsCompatibleDICOMProperty(0x0008, 0x0016, "dicomseriesreader.SOPClassUID", doseImage->GetPropertyList(), sopUID))
+          doseImageNode->SetName(sopUID);
+
+        auto prefService = mitk::CoreServices::GetPreferencesService();
+        auto prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
+
+        if (prefNode == nullptr)
+          mitkThrow() << "Error in preference interface. Cannot find preset node with name \"" << prefNode << '"';
+
+        double referenceDose = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID, mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
+        bool showColorWashGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID, true);
+
+        mitk::ConfigureNodeAsDoseNode(doseImageNode, mitk::GenerateIsoLevels_Virtuos(), referenceDose, showColorWashGlobal);
+
+        dataStorage->Add(doseImageNode);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool AddRTStructToDataStorage(const std::string& filename, mitk::DataStorage* dataStorage)
+  {
+    auto readerOutput = Read(filename, mitk::DICOMRTMimeTypes::DICOMRT_STRUCT_MIMETYPE());
+
+    if (readerOutput.empty())
+    {
+      MITK_ERROR << "No structure sets were created";
+    }
+    else
+    {
+      for (const auto& aStruct : readerOutput)
+      {
+        mitk::ContourModelSet::Pointer countourModelSet = dynamic_cast<mitk::ContourModelSet*>(aStruct.GetPointer());
+
+        auto structNode = mitk::DataNode::New();
+        structNode->SetData(countourModelSet);
+        structNode->SetProperty("name", aStruct->GetProperty("name"));
+        structNode->SetProperty("color", aStruct->GetProperty("contour.color"));
+        structNode->SetProperty("contour.color", aStruct->GetProperty("contour.color"));
+        structNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+
+        dataStorage->Add(structNode);
+      }
+
+      return true;
+    }
+
+    return false;
+  }
+
+  void AddRTPlanToDataStorage(const std::string& filename, mitk::DataStorage* dataStorage)
+  {
+    auto readerOutput = Read(filename, mitk::DICOMRTMimeTypes::DICOMRT_PLAN_MIMETYPE());
+
+    if (!readerOutput.empty())
+    {
+      // There is no image, only the properties are of interest.
+      mitk::Image::Pointer planDummyImage = dynamic_cast<mitk::Image*>(readerOutput.front().GetPointer());
+
+      auto planImageNode = mitk::DataNode::New();
+      planImageNode->SetData(planDummyImage);
+      planImageNode->SetName("RTPlan");
+
+      dataStorage->Add(planImageNode);
+    }
+  }
+}
 
 const std::string QmitkDicomBrowser::EDITOR_ID = "org.mitk.editors.dicombrowser";
-const QString QmitkDicomBrowser::TEMP_DICOM_FOLDER_SUFFIX="TmpDicomFolder";
-
 
 QmitkDicomBrowser::QmitkDicomBrowser()
-: m_DicomDirectoryListener(new QmitkDicomDirectoryListener())
-, m_StoreSCPLauncher(new QmitkStoreSCPLauncher(&m_Builder))
-, m_Publisher(new QmitkDicomDataEventPublisher())
+  : m_Ui(new Ui::QmitkDicomBrowser)
 {
 }
 
 QmitkDicomBrowser::~QmitkDicomBrowser()
 {
-    delete m_DicomDirectoryListener;
-    delete m_StoreSCPLauncher;
-    delete m_Handler;
-    delete m_Publisher;
+  // The ctkDICOMQueryRetrieveWidget creates an in-memory database for query results.
+  // However, a ctkDICOMTagCache.sql buddy file is still created on disk in the
+  // working directory. Until it is fixed in CTK, we manually remove the temporary
+  // file.
+
+  QFile queryTagCacheFile(QDir().currentPath() + "/ctkDICOMTagCache.sql");
+
+  if (queryTagCacheFile.exists())
+    queryTagCacheFile.remove();
 }
 
-void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent )
+void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent)
 {
-    m_Controls.setupUi( parent );
-    m_Controls.StoreSCPStatusLabel->setTextFormat(Qt::RichText);
-    m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicombrowser/network-offline_16.png'>");
+  using Self = QmitkDicomBrowser;
 
+  m_Ui->setupUi(parent);
 
-    TestHandler();
+  auto databaseDir = mitk::PluginActivator::GetContext()->getDataFile("").absolutePath().append("/database");
+  auto database = m_Ui->localStorageWidget->SetDatabaseDirectory(databaseDir);
 
-    OnPreferencesChanged(nullptr);
-    CreateTemporaryDirectory();
-    StartDicomDirectoryListener();
+  m_Ui->queryRetrieveWidget->setRetrieveDatabase(database);
+  m_Ui->queryRetrieveWidget->useProgressDialog(true);
 
-    m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(true);
+  connect(m_Ui->importWidget, &QmitkDicomImportWidget::Import,
+          m_Ui->localStorageWidget, &QmitkDicomLocalStorageWidget::OnImport);
 
-    connect(m_Controls.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabChanged(int)));
+  connect(m_Ui->importWidget, &QmitkDicomImportWidget::ViewSeries,
+          this, &Self::OnViewSeries);
 
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalStartDicomImport(const QStringList&)),
-            m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)));
+  connect(m_Ui->localStorageWidget, &QmitkDicomLocalStorageWidget::IndexingComplete,
+          this, &Self::OnIndexingComplete);
 
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalDicomToDataManager(const QHash<QString,QVariant>&)),
-            this,SLOT(OnViewButtonAddToDataManager(const QHash<QString,QVariant>&)));
+  connect(m_Ui->localStorageWidget, &QmitkDicomLocalStorageWidget::ViewSeries,
+          this, &Self::OnViewSeries);
 
-    connect(m_Controls.internalDataWidget,SIGNAL(SignalFinishedImport()),this, SLOT(OnDicomImportFinished()));
-    connect(m_Controls.internalDataWidget,SIGNAL(SignalDicomToDataManager(const QHash<QString,QVariant>&)),
-            this,SLOT(OnViewButtonAddToDataManager(const QHash<QString,QVariant>&)));
+  m_Ui->tabWidget->setCurrentIndex(database->seriesCount() > 0
+    ? Tabs::LocalStorage
+    : Tabs::Import);
 }
 
+void QmitkDicomBrowser::OnIndexingComplete()
+{
+  m_Ui->tabWidget->setCurrentIndex(Tabs::LocalStorage);
+}
+
+void QmitkDicomBrowser::OnViewSeries(const std::vector<std::pair<std::string, std::optional<std::string>>>& series)
+{
+  auto serviceRef = mitk::PluginActivator::GetContext()->getServiceReference<mitk::IDataStorageService>();
+  auto storageService = mitk::PluginActivator::GetContext()->getService<mitk::IDataStorageService>(serviceRef);
+  auto dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+
+  bool reinit = false;
+
+  for (const auto& [filename, modality] : series)
+  {
+    if (modality.has_value())
+    {
+      if (modality == "RTDOSE")
+      {
+        reinit |= AddRTDoseToDataStorage(filename, dataStorage);
+        continue;
+      }
+      else if (modality == "RTSTRUCT")
+      {
+        reinit |= AddRTStructToDataStorage(filename, dataStorage);
+        continue;
+      }
+      else if (modality == "RTPLAN")
+      {
+        AddRTPlanToDataStorage(filename, dataStorage);
+        continue;
+      }
+    }
+
+    std::vector<mitk::BaseData::Pointer> baseDatas;
+
+    try
+    {
+      baseDatas = mitk::IOUtil::Load(filename);
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << e.GetDescription();
+      QMessageBox::critical(nullptr, "View DICOM series", e.GetDescription());
+    }
+
+    for (const auto& data : baseDatas)
+    {
+      auto node = mitk::DataNode::New();
+      node->SetData(data);
+
+      GenerateNodeName(node);
+
+      dataStorage->Add(node);
+      reinit = true;
+    }
+
+    if (reinit)
+      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
+  }
+}
 
 void QmitkDicomBrowser::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
 {
-    this->SetSite(site);
-    this->SetInput(input);
+  this->SetSite(site);
+  this->SetInput(input);
 }
 
 void QmitkDicomBrowser::SetFocus()
 {
 }
 
+void QmitkDicomBrowser::DoSave()
+{
+}
+
+void QmitkDicomBrowser::DoSaveAs()
+{
+}
+
+bool QmitkDicomBrowser::IsDirty() const
+{
+  return false;
+}
+
+bool QmitkDicomBrowser::IsSaveAsAllowed() const
+{
+  return false;
+}
+
 berry::IPartListener::Events::Types QmitkDicomBrowser::GetPartEventTypes() const
 {
-    return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
-}
-
-void QmitkDicomBrowser::OnTabChanged(int page)
-{
-  if (page == 2)//Query/Retrieve is selected
-  {
-    QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
-    QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
-     if(!((m_Builder.GetAETitle()->compare(storageAET,Qt::CaseSensitive)==0)&&
-         (m_Builder.GetPort()->compare(storagePort,Qt::CaseSensitive)==0)))
-     {
-         StopStoreSCP();
-         StartStoreSCP();
-     }
-  }
-}
-
-void QmitkDicomBrowser::OnDicomImportFinished()
-{
-  m_Controls.tabWidget->setCurrentIndex(0);
-}
-
-void QmitkDicomBrowser::StartDicomDirectoryListener()
-{
-  m_DicomDirectoryListener->SetDicomListenerDirectory(m_TempDirectory);
-  m_DicomDirectoryListener->SetDicomFolderSuffix(TEMP_DICOM_FOLDER_SUFFIX);
-  connect(m_DicomDirectoryListener, SIGNAL(SignalStartDicomImport(const QStringList&)), m_Controls.internalDataWidget, SLOT(OnStartDicomImport(const QStringList&)), Qt::DirectConnection);
-}
-
-
-void QmitkDicomBrowser::TestHandler()
-{
-    m_Handler = new DicomEventHandler();
-    m_Handler->SubscribeSlots();
-}
-
-void QmitkDicomBrowser::OnViewButtonAddToDataManager(QHash<QString, QVariant> eventProperties)
-{
-    ctkDictionary properties;
-//    properties["PatientName"] = eventProperties["PatientName"];
-//    properties["StudyUID"] = eventProperties["StudyUID"];
-//    properties["StudyName"] = eventProperties["StudyName"];
-//    properties["SeriesUID"] = eventProperties["SeriesUID"];
-//    properties["SeriesName"] = eventProperties["SeriesName"];
-    properties["FilesForSeries"] = eventProperties["FilesForSeries"];
-    if(eventProperties.contains("Modality"))
-    {
-      properties["Modality"] = eventProperties["Modality"];
-    }
-
-    m_Publisher->PublishSignals(mitk::PluginActivator::getContext());
-    m_Publisher->AddSeriesToDataManagerEvent(properties);
-}
-
-
-void QmitkDicomBrowser::StartStoreSCP()
-{
-    QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
-    QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
-    m_Builder.AddPort(storagePort)->AddAETitle(storageAET)->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(m_TempDirectory);
-    m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&m_Builder);
-    connect(m_StoreSCPLauncher, SIGNAL(SignalStatusOfStoreSCP(const QString&)), this, SLOT(OnStoreSCPStatusChanged(const QString&)));
-    connect(m_StoreSCPLauncher ,SIGNAL(SignalStartImport(const QStringList&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)));
-    connect(m_StoreSCPLauncher ,SIGNAL(SignalStoreSCPError(const QString&)),m_DicomDirectoryListener,SLOT(OnDicomNetworkError(const QString&)),Qt::DirectConnection);
-    connect(m_StoreSCPLauncher ,SIGNAL(SignalStoreSCPError(const QString&)),this,SLOT(OnDicomNetworkError(const QString&)),Qt::DirectConnection);
-    m_StoreSCPLauncher->StartStoreSCP();
-}
-
-void QmitkDicomBrowser::OnStoreSCPStatusChanged(const QString& status)
-{
-    m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicombrowser/network-idle_16.png'> "+status);
-}
-
-void QmitkDicomBrowser::OnDicomNetworkError(const QString& status)
-{
-    m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicombrowser/network-error_16.png'> "+status);
-}
-
-void QmitkDicomBrowser::StopStoreSCP()
-{
-    delete m_StoreSCPLauncher;
-}
-
-void QmitkDicomBrowser::SetPluginDirectory()
-{
-     m_PluginDirectory = mitk::PluginActivator::getContext()->getDataFile("").absolutePath();
-     m_PluginDirectory.append("/database");
-}
-
-void QmitkDicomBrowser::CreateTemporaryDirectory()
-{
-  QDir tmp;
-  QString tmpPath = QDir::tempPath();
-  m_TempDirectory.clear();
-  m_TempDirectory.append(tmpPath);
-  m_TempDirectory.append(QString("/"));
-  m_TempDirectory.append(TEMP_DICOM_FOLDER_SUFFIX);
-  m_TempDirectory.append(QString("."));
-  m_TempDirectory.append(QTime::currentTime().toString("hhmmsszzz"));
-  m_TempDirectory.append(QString::number(QCoreApplication::applicationPid()));
-  tmp.mkdir(QDir::toNativeSeparators( m_TempDirectory ));
-}
-
-void QmitkDicomBrowser::OnPreferencesChanged(const mitk::IPreferences*)
-{
-  SetPluginDirectory();
-  auto* prefService = mitk::CoreServices::GetPreferencesService();
-  m_DatabaseDirectory = QString::fromStdString(prefService->GetSystemPreferences()->Node("/org.mitk.views.dicomreader")->Get("default dicom path", m_PluginDirectory.toStdString()));
-  m_Controls.internalDataWidget->SetDatabaseDirectory(m_DatabaseDirectory);
+  return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
 }

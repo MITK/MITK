@@ -30,7 +30,7 @@ https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4101.h
   <preset name="Adiabatic Tissue Homogeneity (ATH) Model">
     <type code_value="126346" coding_scheme="DCM" code_name="Adiabatic Tissue Homogeneity (ATH) Model"/>
   </preset>
-  <preset name="Two Compartment Exchange (2CX) Model">
+  <preset name="Two Compartment Exchange Model">
     <type code_value="126347" coding_scheme="DCM" code_name="Two Compartment Exchange (2CX) Model"/>
   </preset>
 <!--
@@ -99,19 +99,19 @@ https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4105.h
 Tracer Kinetic Model Parameters
 https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4107.html
 -->
-  <preset name="KTrans">
+  <preset name="K^trans">
     <type code_value="126312" coding_scheme="DCM" code_name="KTrans"/>
   </preset>
-  <preset name="kep">
+  <preset name="k_{e->p}">
     <type code_value="126313" coding_scheme="DCM" code_name="kep"/>
   </preset>
-  <preset name="ve">
+  <preset name="v_e">
     <type code_value="126314" coding_scheme="DCM" code_name="ve"/>
   </preset>
   <preset name="tau_m">
     <type code_value="126330" coding_scheme="DCM" code_name="tau_m"/>
   </preset>
-  <preset name="vp">
+  <preset name="v_p">
     <type code_value="126331" coding_scheme="DCM" code_name="vp"/>
   </preset>
 <!--

@@ -35,12 +35,14 @@ public:
   QmitkInitialValuesModel(QObject* parent = nullptr);
   ~QmitkInitialValuesModel() override {};
 
-  /** Sets the names and the values of the initial parameter set for the model.
+  /** Sets the names, values and units of the initial parameter set for the model.
    @param names List of all possible parameter names. It is assumed that the
    index of the list equals the parameter index in the respective fitting model and its parameter values.
-   @param values Default values to start with.*/
+   @param values Default values to start with.
+   @param units Units of the initial parameters.*/
   void setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names,
-                        const mitk::ModelTraitsInterface::ParametersType values);
+                        const mitk::ModelTraitsInterface::ParametersType values,
+                        const mitk::ModelTraitsInterface::ParamterUnitMapType units);
   /**@overload
    Convenience method that sets the default initial values always to zero.*/
   void setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names);
@@ -66,6 +68,7 @@ public:
    * Use getInitialParametrizationDelegate() to get everything at once.*/
   mitk::ModelTraitsInterface::ParametersType getInitialValues() const;
 
+
   Qt::ItemFlags flags(const QModelIndex& index) const override;
   QVariant data(const QModelIndex& index, int role) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
@@ -81,6 +84,7 @@ private:
 
   mitk::ModelTraitsInterface::ParametersType m_Values;
   mitk::ModelTraitsInterface::ParameterNamesType m_ParameterNames;
+  mitk::ModelTraitsInterface::ParamterUnitMapType m_ParameterUnits;
 
   typedef std::map<mitk::ModelTraitsInterface::ParametersType::size_type, mitk::DataNode::ConstPointer> ImageMapType;
   ImageMapType m_ParameterImageMap;

@@ -54,8 +54,8 @@ namespace mitk
     itkSetMacro(PythonPath, std::string);
     itkGetConstMacro(PythonPath, std::string);
 
-    itkSetMacro(GpuId, unsigned int);
-    itkGetConstMacro(GpuId, unsigned int);
+    itkSetMacro(GpuId, int);
+    itkGetConstMacro(GpuId, int);
 
     itkSetMacro(Fast, bool);
     itkGetConstMacro(Fast, bool);
@@ -95,7 +95,7 @@ namespace mitk
      * @brief Runs Totalsegmentator python process with desired arguments
      * 
      */
-    void run_totalsegmentator(ProcessExecutor*, const std::string&, const std::string&, bool, bool, unsigned int, const std::string&);
+    void run_totalsegmentator(ProcessExecutor*, const std::string&, const std::string&, bool, bool, int, const std::string&);
 
     /**
      * @brief Applies the m_LabelMapTotal lookup table on the output segmentation LabelSetImage.
@@ -131,8 +131,9 @@ namespace mitk
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_SubTask = "total";
-    unsigned int m_GpuId = 0;
+    int m_GpuId = 0;
     std::map<mitk::Label::PixelType, std::string> m_LabelMapTotal;
+    std::map<mitk::Label::PixelType, std::string> m_LabelMapTotalMR;
     bool m_Fast = true;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
     const std::string DEFAULT_TOTAL_TASK = "total";
@@ -144,7 +145,12 @@ namespace mitk
       {"cerebral_bleed", {"intracerebral_hemorrhage.nii.gz"}},
       {"coronary_arteries", {"coronary_arteries.nii.gz"}},
       {"lung_vessels", {"lung_vessels.nii.gz", "lung_trachea_bronchia.nii.gz"}},
-      {"pleural_pericard_effusion", {"pleural_effusion.nii.gz", "pericardial_effusion.nii.gz"}}
+      {"pleural_pericard_effusion", {"pleural_effusion.nii.gz", "pericardial_effusion.nii.gz"}},
+      {"head_glands_cavities", {"eye_left.nii.gz", "eye_right.nii.gz", "eye_lens_left.nii.gz", "eye_lens_right.nii.gz", "optic_nerve_left.nii.gz", "optic_nerve_right.nii.gz", "parotid_gland_left.nii.gz", "parotid_gland_right.nii.gz", "submandibular_gland_right.nii.gz", "submandibular_gland_left.nii.gz", "nasopharynx.nii.gz", "oropharynx.nii.gz", "hypopharynx.nii.gz", "nasal_cavity_right.nii.gz", "nasal_cavity_left.nii.gz", "auditory_canal_right.nii.gz", "auditory_canal_left.nii.gz", "soft_palate.nii.gz", "hard_palate.nii.gz" }},
+      {"head_muscles", {"masseter_right.nii.gz", "masseter_left.nii.gz", "temporalis_right.nii.gz", "temporalis_left.nii.gz", "lateral_pterygoid_right.nii.gz", "lateral_pterygoid_left.nii.gz", "medial_pterygoid_right.nii.gz", "medial_pterygoid_left.nii.gz", "tongue.nii.gz", "digastric_right.nii.gz", "digastric_left.nii.gz"}},
+      {"headneck_bones_vessels", {"larynx_air.nii.gz" , "thyroid_cartilage.nii.gz" , "hyoid.nii.gz" , "cricoid_cartilage.nii.gz", "zygomatic_arch_right.nii.gz", "zygomatic_arch_left.nii.gz", "styloid_process_right.nii.gz", "styloid_process_left.nii.gz", "internal_carotid_artery_right.nii.gz", "internal_carotid_artery_left.nii.gz", "internal_jugular_vein_right.nii.gz", "internal_jugular_vein_left.nii.gz"}},
+      {"headneck_muscles", {"sternocleidomastoid_right.nii.gz", "sternocleidomastoid_left.nii.gz", "superior_pharyngeal_constrictor.nii.gz", "middle_pharyngeal_constrictor.nii.gz", "inferior_pharyngeal_constrictor.nii.gz", "trapezius_right.nii.gz", "trapezius_left.nii.gz", "platysma_right.nii.gz", "platysma_left.nii.gz", "levator_scapulae_right.nii.gz", "levator_scapulae_left.nii.gz", "anterior_scalene_right.nii.gz", "anterior_scalene_left.nii.gz", "middle_scalene_right.nii.gz", "middle_scalene_left.nii.gz", "posterior_scalene_right.nii.gz", "posterior_scalene_left.nii.gz", "sterno_thyroid_right.nii.gz", "sterno_thyroid_left.nii.gz", "thyrohyoid_right.nii.gz", "thyrohyoid_left.nii.gz", "prevertebral_right.nii.gz", "prevertebral_left.nii.gz"}},
+      {"liver_vessels", {"liver_vessels.nii.gz" , "liver_tumor.nii.gz"}}
     };  
   }; // class
 } // namespace

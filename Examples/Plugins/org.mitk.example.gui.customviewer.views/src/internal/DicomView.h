@@ -16,7 +16,10 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <berryQtViewPart.h>
 
-#include "ui_QmitkDicomViewControls.h"
+namespace Ui
+{
+  class QmitkDicomViewControls;
+}
 
 /**
  * \brief A view class suited for the DicomPerspective within the custom viewer plug-in.
@@ -57,16 +60,14 @@ public:
 protected Q_SLOTS:
 
   /**
-   * Loads the DICOM series specified by the given string parameter and adds the resulting data
-   * node to the data storage. Subsequently switches to the ViewerPerspective for further
-   * data examination.
+   * Loads the given DICOM series.
    */
-  void AddDataNodeFromDICOM(QHash<QString, QVariant> eventProperties);
+  void OnViewSeries(const std::vector<std::pair<std::string, std::optional<std::string>>>& series);
 
 protected:
   void SetFocus() override;
 
-  Ui::QmitkDicomViewControls m_Controls;
+  Ui::QmitkDicomViewControls *m_Controls;
 
   QWidget *m_Parent;
 };

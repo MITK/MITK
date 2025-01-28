@@ -29,18 +29,21 @@ QmitkInitialValuesModel(QObject* parent) :
 void
 QmitkInitialValuesModel::
 setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names,
-                 const mitk::ModelTraitsInterface::ParametersType values)
+                 const mitk::ModelTraitsInterface::ParametersType values,
+                 const mitk::ModelTraitsInterface::ParamterUnitMapType units
+  )
 {
-  if (names.size() != values.size())
+  if (names.size() != values.size() || names.size() != units.size())
   {
     mitkThrow() <<
-                "Error. Cannot set initial value model. Passed parameter names vector and default values vector have different size.";
+                "Error. Cannot set initial value model. Passed parameter names vector and default values vector or units vector have different size.";
   }
 
   emit beginResetModel();
 
   this->m_ParameterNames = names;
   this->m_Values = values;
+  this->m_ParameterUnits = units;
 
   this->m_modified = false;
 
@@ -52,10 +55,14 @@ QmitkInitialValuesModel::
 setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names)
 {
   mitk::ModelTraitsInterface::ParametersType values;
+  mitk::ModelTraitsInterface::ParamterUnitMapType units;
   values.set_size(names.size());
   values.fill(0.0);
+  for (const auto& name : names) {
+    m_ParameterUnits[name] = "";
+  }
 
-  setInitialValues(names, values);
+  setInitialValues(names, values, units);
 };
 
 void
@@ -136,7 +143,7 @@ columnCount(const QModelIndex& parent) const
     return 0;
   }
 
-  return 3;
+  return 4;
 }
 
 int
@@ -168,70 +175,89 @@ data(const QModelIndex& index, int role) const
   {
     switch (index.column())
     {
-      case 0:
-        if (role == Qt::DisplayRole || role == Qt::EditRole)
-        {
-          result = QVariant(QString::fromStdString(m_ParameterNames[index.row()]));
-        }
-        else if (role == Qt::ToolTipRole)
-        {
-          result = QVariant("Name of the parameter.");
-        }
+    case 0:
+      if (role == Qt::DisplayRole || role == Qt::EditRole)
+      {
+        result = QVariant(QString::fromStdString(m_ParameterNames[index.row()]));
+      }
+      else if (role == Qt::ToolTipRole)
+      {
+        result = QVariant("Name of the parameter.");
+      }
 
-        break;
+      break;
 
-      case 1:
-        if (role == Qt::DisplayRole)
-        {
-          if (valueType(index) == 1)
-          { //image type
-            result = QVariant("image");
+    case 1:
+      if (role == Qt::DisplayRole)
+      {
+        if (valueType(index) == 1)
+        { //image type
+          result = QVariant("image");
+        }
+        else
+        { //simple scalar
+          result = QVariant("scalar");
+        }
+      }
+      else if (role == Qt::EditRole)
+      {
+        result = QVariant(valueType(index));
+      }
+      else if (role == Qt::ToolTipRole)
+      {
+        result = QVariant("type of the initial value.");
+      }
+      break;
+
+    case 2:
+      if (role == Qt::DisplayRole || role == Qt::EditRole)
+      {
+        const auto& finding = m_ParameterImageMap.find(index.row());
+        if (finding != m_ParameterImageMap.end())
+        { //image type -> return the name
+          if (finding->second.IsNotNull())
+          {
+            result = QVariant(finding->second->GetName().c_str());
           }
           else
-          { //simple scalar
-            result = QVariant("scalar");
+          {
+            result = QVariant("Invalid. Select image.");
           }
         }
-        else if (role == Qt::EditRole)
-        {
-          result = QVariant(valueType(index));
+        else
+        { //simple scalar
+          result = QVariant(m_Values(index.row()));
         }
-        else if (role == Qt::ToolTipRole)
-        {
-          result = QVariant("type of the initial value.");
-        }
-        break;
+      }
+      else if (role == Qt::UserRole)
+      {
+        result = QVariant(valueType(index));
+      }
+      else if (role == Qt::ToolTipRole)
+      {
+        result = QVariant("Initial values for the parameter.");
+      }
+      break;
 
-      case 2:
-        if (role == Qt::DisplayRole || role == Qt::EditRole)
+    case 3:
+      if (role == Qt::DisplayRole || role == Qt::EditRole)
+      {
+        const auto& finding = m_ParameterUnits.find(m_ParameterNames[index.row()]);
+        if (finding != m_ParameterUnits.end())
         {
-          const auto& finding = m_ParameterImageMap.find(index.row());
-          if (finding != m_ParameterImageMap.end())
-          { //image type -> return the name
-            if (finding->second.IsNotNull())
-            {
-              result = QVariant(finding->second->GetName().c_str());
-            }
-            else
-            {
-              result = QVariant("Invalid. Select image.");
-            }
-          }
-          else
-          { //simple scalar
-            result = QVariant(m_Values(index.row()));
-          }
+          result = QVariant(QString::fromStdString(finding->second));
         }
-        else if (role == Qt::UserRole)
+        else
         {
-          result = QVariant(valueType(index));
+          result = QVariant("No valid unit found.");
         }
-        else if (role == Qt::ToolTipRole)
-        {
-          result = QVariant("Initial values for the parameter.");
-        }
+      }
+      else if (role == Qt::ToolTipRole)
+      {
+        result = QVariant("Unit of the parameter.");
+      }
 
-        break;
+      break;
     }
   }
 
@@ -246,7 +272,7 @@ flags(const QModelIndex& index) const
 
   if (index.row() < static_cast<int>(m_Values.size()))
   {
-    if (index.column() > 0)
+    if (index.column() > 0 && index.column() < 3)
     {
       flags |= Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
     }
@@ -278,6 +304,10 @@ headerData(int section, Qt::Orientation orientation, int role) const
     {
       return QVariant("Value");
     }
+    else if (section == 3)
+    {
+      return QVariant("Unit");
+    }
   }
 
   return QVariant();
@@ -294,10 +324,6 @@ setData(const QModelIndex& index, const QVariant& value, int role)
 
   if (Qt::EditRole == role)
   {
-    emit dataChanged(index, index);
-
-    emit beginResetModel();
-
     bool result = false;
     if (index.column() == 1)
     {
@@ -334,7 +360,10 @@ setData(const QModelIndex& index, const QVariant& value, int role)
       }
     }
 
-    emit endResetModel();
+    if (result)
+    {
+      emit dataChanged(index, index, { role }); // Notify the view about the updated data
+    }
 
     return result;
   }

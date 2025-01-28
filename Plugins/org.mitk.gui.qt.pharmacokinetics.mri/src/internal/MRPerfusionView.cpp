@@ -135,6 +135,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.btnAIFFile->setVisible(false);
   m_Controls.aifFilePath->setEnabled(false);
   m_Controls.aifFilePath->setVisible(false);
+  m_Controls.aifFilePath->setText("Please select AIF file.");
   m_Controls.radioAIFImage->setChecked(true);
   m_Controls.AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
@@ -180,12 +181,12 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.initialValuesManager->setEnabled(false);
   m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
 
-  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
 
 
-  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)), m_Controls.initialValuesManager, SLOT(setEnabled(bool)));
+  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)), m_Controls.initialValuesManager, SLOT(setEnabled(bool)));
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager, SLOT(setEnabled(bool)));
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager, SLOT(setVisible(bool)));
 
@@ -194,6 +195,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.groupBoxEnhancement->hide();
   m_Controls.radioButtonNoConversion->setChecked(true);
   m_Controls.groupBox_T1MapviaVFA->hide();
+  m_Controls.factorSpinBox->setValue(1.0);
 
   m_Controls.spinBox_baselineStartTimeStep->setValue(0);
   m_Controls.spinBox_baselineEndTimeStep->setValue(0);
@@ -262,11 +264,11 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.groupDescBrix->setVisible(isDescBrixFactory);
   if (isDescBrixFactory)
   {
-    m_Controls.toolboxConfiguration->setItemEnabled(2, false);
+    m_Controls.toolboxConfiguration->setItemEnabled(0, false);
   }
   else
   {
-    m_Controls.toolboxConfiguration->setItemEnabled(2, true);
+    m_Controls.toolboxConfiguration->setItemEnabled(0, true);
   }
   m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory );
   m_Controls.AIFImageNodeSelector->setVisible(!m_Controls.radioAIFFile->isChecked());
@@ -315,7 +317,7 @@ void MRPerfusionView::OnModellSet(int index)
                                (m_selectedModelFactory->CreateDefaultConstraints().GetPointer());
 
     m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
-        m_selectedModelFactory->GetDefaultInitialParameterization());
+        m_selectedModelFactory->GetDefaultInitialParameterization(), m_selectedModelFactory->GetParameterUnits());
 
     if (this->m_modelConstraints.IsNull())
     {
@@ -323,7 +325,7 @@ void MRPerfusionView::OnModellSet(int index)
     }
 
     m_Controls.constraintManager->setChecker(this->m_modelConstraints,
-        this->m_selectedModelFactory->GetParameterNames());
+        this->m_selectedModelFactory->GetParameterNames(), this->m_selectedModelFactory->GetParameterUnits());
 
   }
 
@@ -605,7 +607,7 @@ bool MRPerfusionView::CheckModelSettings() const
       ok = false;
     }
 
-    if (this->m_Controls.radioButton_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
+    if (this->m_Controls.checkBox_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
     {
       std::string warning = "Warning. Invalid start parameters. At least one parameter as an invalid image setting as source.";
       MITK_ERROR << warning;
@@ -630,7 +632,7 @@ bool MRPerfusionView::CheckBaselineSelectionSettings() const
 void MRPerfusionView::ConfigureInitialParametersOfParameterizer(mitk::ModelParameterizerBase*
     parameterizer) const
 {
-  if (m_Controls.radioButton_StartParameters->isChecked())
+  if (m_Controls.checkBox_StartParameters->isChecked())
   {
     //use user defined initial parameters
     mitk::InitialParameterizationDelegateBase::Pointer paramDelegate = m_Controls.initialValuesManager->getInitialParametrizationDelegate();
@@ -1250,9 +1252,16 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
 void MRPerfusionView::LoadAIFfromFile()
 {
   QFileDialog dialog;
-  dialog.setNameFilter(tr("Images (*.csv"));
+  dialog.setFileMode(QFileDialog::ExistingFile);
+  QStringList filters;
+  dialog.setNameFilter(tr("CSV and Text Files (*.csv *.txt)"));
 
   QString fileName = dialog.getOpenFileName();
+
+  if (fileName.isEmpty())
+  {
+    return;
+  }
 
   m_Controls.aifFilePath->setText(fileName);
 
@@ -1267,8 +1276,8 @@ void MRPerfusionView::LoadAIFfromFile()
   if (!in1.is_open())
   {
     this->m_Controls.infoBox->append(QString("Could not open AIF File!"));
+    return;
   }
-
 
   std::vector< std::string > vec1;
   std::string line1;
@@ -1278,9 +1287,19 @@ void MRPerfusionView::LoadAIFfromFile()
     Tokenizer tok(line1);
     vec1.assign(tok.begin(), tok.end());
 
+    if (vec1.size() < 2)
+    {
+      this->m_Controls.infoBox->append(QString("Invalid content in AIF File: %1").arg(QString::fromStdString(line1)));
+      this->AIFinputGrid.clear();
+      this->AIFinputFunction.clear();
+      return;
+    }
+
     this->AIFinputGrid.push_back(convertToDouble(vec1[0]));
     this->AIFinputFunction.push_back(convertToDouble(vec1[1]));
   }
+  in1.close();
+  this->m_Controls.infoBox->append(QString("AIF File successfully loaded!"));
 }
 
 void MRPerfusionView::PrepareConcentrationImage()

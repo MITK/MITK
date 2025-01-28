@@ -29,7 +29,6 @@ found in the LICENSE file.
 #include <mitkNodePredicateOr.h>
 #include "mitkVigraRandomForestClassifier.h"
 #include "mitkCLUtil.h"
-#include "qboxlayout.h"
 #include <mitkIOUtil.h>
 
 #include "Eigen/Dense"

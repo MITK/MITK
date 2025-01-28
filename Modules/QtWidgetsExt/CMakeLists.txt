@@ -1,4 +1,7 @@
 MITK_CREATE_MODULE(
+  PCH
+    mitkProperties.h
+    qwidget.h
   DEPENDS MitkAlgorithmsExt MitkQtWidgets PRIVATE MitkSceneSerializationBase
   PACKAGE_DEPENDS
     PUBLIC Qt6Qwt6 CTK|CTKWidgets

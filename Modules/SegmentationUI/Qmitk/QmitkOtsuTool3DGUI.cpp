@@ -44,8 +44,9 @@ void QmitkOtsuTool3DGUI::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
 
 void QmitkOtsuTool3DGUI::InitializeUI(QBoxLayout* mainLayout)
 {
-  m_Controls.setupUi(this);
-  mainLayout->addLayout(m_Controls.verticalLayout);
+  auto wrapperWidget = new QWidget(this);
+  mainLayout->addWidget(wrapperWidget);
+  m_Controls.setupUi(wrapperWidget);
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   connect(m_Controls.m_Spinbox, SIGNAL(valueChanged(int)), this, SLOT(OnRegionSpinboxChanged(int)));

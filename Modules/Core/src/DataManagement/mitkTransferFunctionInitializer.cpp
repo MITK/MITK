@@ -12,8 +12,7 @@ found in the LICENSE file.
 
 #include "mitkTransferFunctionInitializer.h"
 
-static const char *presetNames[] = {"choose an internal transferfunction preset",
-                                    "CT Generic",
+static const char *presetNames[] = {"CT Generic",
                                     "CT Black & White",
                                     "CT Thorax large",
                                     "CT Thorax small",

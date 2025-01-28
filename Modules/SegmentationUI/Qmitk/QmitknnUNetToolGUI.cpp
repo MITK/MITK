@@ -70,7 +70,10 @@ void QmitknnUNetToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 
 void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
-  m_Controls.setupUi(this);
+  auto wrapperWidget = new QWidget(this);
+  mainLayout->addWidget(wrapperWidget);
+  m_Controls.setupUi(wrapperWidget);
+
 #ifndef _WIN32
   m_Controls.pythonEnvComboBox->addItem("/usr/bin");
 #endif
@@ -136,7 +139,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
     WriteErrorMessage(QString("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
                               " GPUs were detected.</i>"));
   }
-  mainLayout->addLayout(m_Controls.verticalLayout);
+
   Superclass::InitializeUI(mainLayout);
   m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount(); // Must do. Row count is correct only here.
   this->DisableEverything();

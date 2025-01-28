@@ -32,6 +32,7 @@ void mitk::MonaiLabel2DTool::Activated()
 {
   Superclass::Activated();
   this->SetLabelTransferScope(LabelTransferScope::AllLabels);
+  this->KeepActiveAfterAcceptOn();
 }
 
 const char **mitk::MonaiLabel2DTool::GetXPM() const

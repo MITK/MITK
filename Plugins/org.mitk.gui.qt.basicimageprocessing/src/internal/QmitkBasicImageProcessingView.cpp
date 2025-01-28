@@ -11,15 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkBasicImageProcessingView.h"
+#include <ui_QmitkBasicImageProcessingViewControls.h>
 
 // QT includes (GUI)
-#include <qlabel.h>
-#include <qspinbox.h>
-#include <qpushbutton.h>
-#include <qcheckbox.h>
-#include <qgroupbox.h>
-#include <qradiobutton.h>
-#include <qmessagebox.h>
+#include <QMessageBox>
 
 // MITK includes (general)
 #include <mitkNodePredicateDataType.h>

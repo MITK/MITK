@@ -17,10 +17,8 @@ found in the LICENSE file.
 
 #include <ctkDoubleSpinBox.h>
 
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qslider.h>
-#include <QApplication>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QSpinBox>
 
 QmitkBinaryThresholdToolGUIBase::QmitkBinaryThresholdToolGUIBase(bool ulMode) : QmitkSegWithPreviewToolGUIBase(false), m_ULMode(ulMode)
@@ -144,10 +142,7 @@ void QmitkBinaryThresholdToolGUIBase::ConnectNewTool(mitk::SegWithPreviewTool* n
 
 void QmitkBinaryThresholdToolGUIBase::InitializeUI(QBoxLayout* mainLayout)
 {
-  QLabel* label = new QLabel("Threshold :", this);
-  QFont f = label->font();
-  f.setBold(false);
-  label->setFont(f);
+  QLabel* label = new QLabel("Threshold:", this);
   mainLayout->addWidget(label);
 
   QBoxLayout* layout = new QHBoxLayout();

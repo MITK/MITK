@@ -25,7 +25,6 @@ found in the LICENSE file.
 // Qt
 #include <QMessageBox>
 #include <QThreadPool>
-#include <qclipboard.h>
 
 // qwt
 #include <qwt_scale_engine.h>

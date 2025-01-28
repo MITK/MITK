@@ -92,7 +92,6 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
   m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
   m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
-  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
   m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
@@ -121,12 +120,12 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
   m_Controls.btnAIFFile->setVisible(false);
   m_Controls.aifFilePath->setEnabled(false);
   m_Controls.aifFilePath->setVisible(false);
+  m_Controls.aifFilePath->setText("Please select AIF file.");
   m_Controls.radioAIFImage->setChecked(true);
   m_Controls.AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.AIFMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
   m_Controls.AIFMaskNodeSelector->setVisible(true);
   m_Controls.AIFMaskNodeSelector->setEnabled(true);
-  m_Controls.AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
   m_Controls.AIFImageNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.AIFImageNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
   m_Controls.AIFImageNodeSelector->setEnabled(false);
@@ -159,14 +158,14 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
   m_Controls.initialValuesManager->setEnabled(false);
   m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
 
-  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)), this,
+  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)), this,
           SLOT(UpdateGUIControls()));
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), this,
           SLOT(UpdateGUIControls()));
   connect(m_Controls.initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
 
 
-  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)),
+  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)),
           m_Controls.initialValuesManager,
           SLOT(setEnabled(bool)));
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager,
@@ -174,6 +173,9 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager,
           SLOT(setVisible(bool)));
 
+  // Should be done last, if everything else is configured because it triggers the autoselection of data.
+  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
+  m_Controls.AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
 
   UpdateGUIControls();
 
@@ -241,7 +243,7 @@ void PETDynamicView::OnModellSet(int index)
                                (m_selectedModelFactory->CreateDefaultConstraints().GetPointer());
 
     m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
-        m_selectedModelFactory->GetDefaultInitialParameterization());
+        m_selectedModelFactory->GetDefaultInitialParameterization(), m_selectedModelFactory->GetParameterUnits());
 
     if (this->m_modelConstraints.IsNull())
     {
@@ -249,7 +251,7 @@ void PETDynamicView::OnModellSet(int index)
     }
 
     m_Controls.constraintManager->setChecker(this->m_modelConstraints,
-        this->m_selectedModelFactory->GetParameterNames());
+        this->m_selectedModelFactory->GetParameterNames(), this->m_selectedModelFactory->GetParameterUnits());
   }
 
   m_Controls.checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
@@ -509,7 +511,7 @@ bool PETDynamicView::CheckModelSettings() const
       ok = false;
     }
 
-    if (this->m_Controls.radioButton_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
+    if (this->m_Controls.checkBox_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
     {
       std::string warning = "Warning. Invalid start parameters. At least one parameter as an invalid image setting as source.";
       MITK_ERROR << warning;
@@ -529,7 +531,7 @@ bool PETDynamicView::CheckModelSettings() const
 void PETDynamicView::ConfigureInitialParametersOfParameterizer(mitk::ModelParameterizerBase*
     parameterizer) const
 {
-  if (m_Controls.radioButton_StartParameters->isChecked())
+  if (m_Controls.checkBox_StartParameters->isChecked())
   {
     //use user defined initial parameters
     mitk::InitialParameterizationDelegateBase::Pointer paramDelegate = m_Controls.initialValuesManager->getInitialParametrizationDelegate();
@@ -903,9 +905,16 @@ void PETDynamicView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& a
 void PETDynamicView::LoadAIFfromFile()
 {
   QFileDialog dialog;
-  dialog.setNameFilter(tr("Images (*.csv"));
+  dialog.setFileMode(QFileDialog::ExistingFile);
+  QStringList filters;
+  dialog.setNameFilter(tr("CSV and Text Files (*.csv *.txt)"));
 
   QString fileName = dialog.getOpenFileName();
+
+  if (fileName.isEmpty())
+  {
+    return;
+  }
 
   m_Controls.aifFilePath->setText(fileName);
 
@@ -920,8 +929,8 @@ void PETDynamicView::LoadAIFfromFile()
   if (!in1.is_open())
   {
     this->m_Controls.infoBox->append(QString("Could not open AIF File!"));
+    return;
   }
-
 
   std::vector< std::string > vec1;
   std::string line1;
@@ -931,9 +940,18 @@ void PETDynamicView::LoadAIFfromFile()
     Tokenizer tok(line1);
     vec1.assign(tok.begin(), tok.end());
 
+    if (vec1.size() < 2)
+    {
+      this->m_Controls.infoBox->append(QString("Invalid content in AIF File: %1").arg(QString::fromStdString(line1)));
+      this->AIFinputGrid.clear();
+      this->AIFinputFunction.clear();
+      return;
+    }
+
     this->AIFinputGrid.push_back(convertToDouble(vec1[0]));
     this->AIFinputFunction.push_back(convertToDouble(vec1[1]));
-
   }
+  in1.close();
+  this->m_Controls.infoBox->append(QString("AIF File successfully loaded!"));
 
 }

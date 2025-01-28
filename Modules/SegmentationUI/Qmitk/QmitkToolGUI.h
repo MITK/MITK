@@ -14,10 +14,11 @@ found in the LICENSE file.
 #define QmitkToolGUI_h
 
 #include <MitkSegmentationUIExports.h>
-#include <qwidget.h>
 
 #include "mitkCommon.h"
 #include "mitkTool.h"
+
+#include <QWidget>
 
 /**
   \brief Base class for GUIs belonging to mitk::Tool classes.

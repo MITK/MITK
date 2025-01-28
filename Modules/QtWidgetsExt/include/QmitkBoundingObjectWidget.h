@@ -22,7 +22,7 @@ found in the LICENSE file.
 #include <mitkBoundingObjectGroup.h>
 #include <mitkDataNode.h>
 #include <mitkDataStorage.h>
-#include <qwidget.h>
+#include <QWidget>
 
 class MITKQTWIDGETSEXT_EXPORT QmitkBoundingObjectWidget : public QWidget
 {

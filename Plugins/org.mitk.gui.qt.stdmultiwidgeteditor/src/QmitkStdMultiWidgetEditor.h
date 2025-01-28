@@ -39,37 +39,37 @@ public:
   static const QString EDITOR_ID;
 
   QmitkStdMultiWidgetEditor();
-  virtual ~QmitkStdMultiWidgetEditor() override;
+  ~QmitkStdMultiWidgetEditor() override;
 
-  virtual QmitkLevelWindowWidget* GetLevelWindowWidget() const override;
+  QmitkLevelWindowWidget* GetLevelWindowWidget() const override;
   /**
   * @brief Overridden from mitk::ILinkedRenderWindowPart
   */
-  virtual void EnableSlicingPlanes(bool enable) override;
+  void EnableSlicingPlanes(bool enable) override;
   /**
   * @brief Overridden from mitk::ILinkedRenderWindowPart
   */
-  virtual bool IsSlicingPlanesEnabled() const override;
+  bool IsSlicingPlanesEnabled() const override;
   /**
   * @brief Overridden from berry::IPartListener
   */
-  virtual berry::IPartListener::Events::Types GetPartEventTypes() const override;
+  berry::IPartListener::Events::Types GetPartEventTypes() const override;
   /**
   * @brief Overridden from berry::IPartListener
   */
-  virtual void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
   /**
   * @brief Overridden from berry::IPartListener
   */
-  virtual void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+  void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
   /**
   * @brief Overridden from berry::IPartListener
   */
-  virtual void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+  void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef) override;
   /**
   * @brief Overridden from berry::IPartListener
   */
-  virtual void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+  void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
   void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme) override;
 
@@ -79,15 +79,16 @@ private:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor
   */
-  virtual void SetFocus() override;
+  void SetFocus() override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor
   */
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void CreateQtPartControl(QWidget* parent) override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor
   */
-  virtual void OnPreferencesChanged(const mitk::IPreferences* preferences) override;
+  void OnPreferencesChanged(const mitk::IPreferences* preferences) override;
+
   /**
   * @brief InitializePreferences Internal helper method to set default preferences.
   * This method is used to show the current preferences in the first call of

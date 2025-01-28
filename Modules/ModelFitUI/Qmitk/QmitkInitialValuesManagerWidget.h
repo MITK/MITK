@@ -21,6 +21,7 @@ found in the LICENSE file.
 
 #include "mitkModelTraitsInterface.h"
 #include "mitkInitialParameterizationDelegateBase.h"
+#include "mitkNodePredicateBase.h"
 
 /*forward declarations*/
 class QmitkInitialValuesModel;
@@ -60,7 +61,8 @@ public Q_SLOTS:
    index of the list equals the parameter index in the respective fitting model and its parameter values.
    @param values Default values to start with.*/
   void setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names,
-                        const mitk::ModelTraitsInterface::ParametersType values);
+                        const mitk::ModelTraitsInterface::ParametersType values,
+                        const mitk::ModelTraitsInterface::ParamterUnitMapType units);
   void setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names);
 
   void setDataStorage(mitk::DataStorage* storage);
@@ -75,6 +77,8 @@ protected:
   QmitkInitialValuesDelegate* m_ValuesDelegate;
 
   Ui::QmitkInitialValuesManagerWidget m_Controls;
+
+  mitk::NodePredicateBase::Pointer m_NoHiddenOrHelperPredicate;
 
 protected Q_SLOTS:
   void OnModelReset();

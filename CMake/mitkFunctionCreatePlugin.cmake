@@ -46,7 +46,8 @@ function(mitk_create_plugin)
 
   # multiple value arguments
   set(arg_multiple
-    EXPORTED_INCLUDE_SUFFIXES # (optional) additional public include directories
+    EXPORTED_INCLUDE_SUFFIXES # (optional) additional public include
+    PCH                       # list of header files for precompiled header
     MODULE_DEPENDS            # (optional)
     PACKAGE_DEPENDS
     TARGET_DEPENDS
@@ -201,6 +202,12 @@ function(mitk_create_plugin)
     MODULES ${_PLUGIN_MODULE_DEPENDS}
     PACKAGES ${_PLUGIN_PACKAGE_DEPENDS}
   )
+
+  if(MITK_PCH AND _PLUGIN_PCH)
+    list(TRANSFORM _PLUGIN_PCH PREPEND "<")
+    list(TRANSFORM _PLUGIN_PCH APPEND ">")
+    target_precompile_headers(${PLUGIN_TARGET} PRIVATE ${_PLUGIN_PCH})
+  endif()
 
   if(_PLUGIN_TARGET_DEPENDS)
     target_link_libraries(${PLUGIN_TARGET} ${_PLUGIN_TARGET_DEPENDS})

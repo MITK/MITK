@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include "QmitkPythonView.h"
 
 #include "mitkNodePredicateDataType.h"
+#include "mitkLabelSetImage.h"
+#include "mitkLabelSetImageHelper.h"
 #include <QList>
 
 const std::string QmitkPythonView::VIEW_ID = "org.mitk.views.python";
@@ -22,6 +24,11 @@ QmitkPythonView::QmitkPythonView() : m_Controls(nullptr)
   m_ReferencePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
   m_PythonContext = mitk::PythonContext::New();
   m_PythonContext->Activate();
+  m_PythonContext->ExecuteString("a=10");
+  std::string pythonCommand;
+  pythonCommand.append("_mitk_stdout = io.StringIO()\n");
+  pythonCommand.append("sys.stdout = sys.stderr = _mitk_stdout\n");
+  m_PythonContext->ExecuteString(pythonCommand);
 }
 
 void QmitkPythonView::CreateQtPartControl(QWidget *parent)
@@ -88,6 +95,14 @@ void QmitkPythonView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> n
   const char *result = m_PythonContext->GetStdOut();
   m_Controls->pythonOutput->clear();
   m_Controls->pythonOutput->setText(QString::fromUtf8(result));
+  
+  auto previewSegmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(node, image, "py-labels");
+  if (mitk::DataStorage *ds = this->GetDataStorage())
+  {
+    if (!ds->Exists(previewSegmentationNode))
+      ds->Add(previewSegmentationNode, node);
+  }
+  m_PythonContext->TransferBaseDataToPython(previewSegmentationNode->GetData(), "_seg_image");
 }
 
 void QmitkPythonView::OnSitePackageSelected(const QString & /*sitePackagesFolder*/)

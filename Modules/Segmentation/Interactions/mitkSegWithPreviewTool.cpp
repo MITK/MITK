@@ -451,7 +451,7 @@ void mitk::SegWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage,
       auto resultSlice =
         SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), destinationImage, timeStep)->Clone();
       auto destLSImage = dynamic_cast<LabelSetImage *>(destinationImage);
-      //We need to transfer explictly to a copy of the current working image to ensure that labelMapping is done and things
+      //We need to transfer explicitly to a copy of the current working image to ensure that labelMapping is done and things
       //like merge style, overwrite style and locks are regarded.
       TransferLabelContentAtTimeStep(sourceSlice,
                                      resultSlice,

@@ -2,7 +2,7 @@
   \defgroup org_mitk_example_gui_extensionpointdefinition org.mitk.example.gui.extensionpointdefinition
   \ingroup MITKExamplePlugins
 
-  \brief A minimal applictaion that defines an extension point and collects extensions.
+  \brief A minimal application that defines an extension point and collects extensions.
 */
 
 /**

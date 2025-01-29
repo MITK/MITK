@@ -20,7 +20,7 @@ found in the LICENSE file.
 namespace itk
 {
   /** \brief Cost function for LiveWire purposes.
-  Specific features are considered to calculate cummulative
+  Specific features are considered to calculate cumulative
   costs of a link between two pixels. These are:
 
   - Gradient Magnitude

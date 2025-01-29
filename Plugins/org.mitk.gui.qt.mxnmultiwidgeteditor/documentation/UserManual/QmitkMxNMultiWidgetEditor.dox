@@ -139,7 +139,7 @@
 	Displayed data is typically 3D data but each window view shows a 2D slice of the 3D volume. The direction in which the
 	3D volume is sliced is defined by the "view direction" (or "anatomical plane").
 	To define at which position in the view direction the 3D volume should be sliced, the slice selection slider can be used.
-	It can either be moved using the mouse or by using the appropriate mouse interaction (see above, e.g. mouse wheel scroling).
+	It can either be moved using the mouse or by using the appropriate mouse interaction (see above, e.g. mouse wheel scrolling).
 
 \subsubsection org_mitk_editors_mxnmultiwidget_View_Direction View direction
 	Each window view "is looking in" one of the three available view directions, namely "Axial", "Sagittal" or "Coronal".

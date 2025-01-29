@@ -260,7 +260,7 @@ window.onload = function()
  * Inits the height of the chart element to 90% of the full window height.
  */
 function initHeight() {
-  var size = window.innerHeight-(window.innerHeight/100*5); //subtract 10% of height to hide vertical scrool bar
+  var size = window.innerHeight-(window.innerHeight/100*5); //subtract 10% of height to hide vertical scroll bar
   let chart = document.getElementById("chart");
   chart.style.height = `${size}px`;
 }

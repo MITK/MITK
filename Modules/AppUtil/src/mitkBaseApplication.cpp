@@ -593,7 +593,7 @@ namespace mitk
     {
       // If not set explicitly otherwise, prefer xcb as platform on Linux, as we had issues
       // with wayland in combination with VTK and GLEW. Note that the shell scripts for
-      // excutables in our installers also set the platform to xcb.
+      // executables in our installers also set the platform to xcb.
       if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
         qputenv("QT_QPA_PLATFORM", "xcb");
     }
@@ -603,7 +603,11 @@ namespace mitk
 
     // Prevent conflicts between native OpenGL applications and QWebEngine
     if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND"))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
       QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+#else
+      QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
+#endif
 
     // If parameters have been set before, we have to store them to hand them
     // through to the application

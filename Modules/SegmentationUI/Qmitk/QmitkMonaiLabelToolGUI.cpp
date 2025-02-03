@@ -254,7 +254,7 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   }
   catch (...)
   {
-    std::string errorMsg = "Unkown error occured while generation MONAI Label segmentation.";
+    std::string errorMsg = "Unknown error occurred while generating MONAI Label segmentation.";
     this->ShowErrorMessage(errorMsg);
     m_Controls.previewButton->setEnabled(true);
     return;

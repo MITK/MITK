@@ -223,6 +223,13 @@ public Q_SLOTS:
   * @pre AllowLabeModification must be set to true.*/
   void RemoveGroup();
 
+  /** @brief Copies a label to another group.
+   *
+   * The destination label will have a different label value than the source label since all
+   * label values of a LabelSetImage must be unique.
+   */
+  void OnCopyToGroup();
+
   void SetVisibilityOfAffectedLabels(bool visible) const;
   void SetLockOfAffectedLabels(bool visible) const;
 

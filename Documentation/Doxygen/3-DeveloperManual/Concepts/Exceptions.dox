@@ -47,7 +47,7 @@ class myExampleClass
   }
 \endverbatim
 
-In general, exceptions emit no logging messages by default because they are intended to be catched by overlying classes. This classes should then decide what to do, e.g. to log an error message or handle the exception in another way. See the logging documentation for more details on error logging.
+In general, exceptions emit no logging messages by default because they are intended to be caught by overlying classes. This classes should then decide what to do, e.g. to log an error message or handle the exception in another way. See the logging documentation for more details on error logging.
 
 \subsection Catch Catching exceptions
 

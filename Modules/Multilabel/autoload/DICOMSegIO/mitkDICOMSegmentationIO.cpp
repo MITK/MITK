@@ -153,7 +153,7 @@ namespace mitk
     }
     catch (const std::exception &e)
     {
-      MITK_ERROR << "An error occurred while getting the dicom informations: " << e.what() << endl;
+      MITK_ERROR << "An error occurred while getting the dicom information: " << e.what() << endl;
       return;
     }
 
@@ -417,7 +417,7 @@ namespace mitk
           if (assumeOverlappingSegments)
           {
             // Add a new group because we have to expect every label to be overlapping
-            // the label content is directly transfered here.
+            // the label content is directly transferred here.
             groupID = labelSetImage->AddLayer(segmentImage);
           }
 
@@ -431,7 +431,7 @@ namespace mitk
           if (!assumeOverlappingSegments)
           {
             //if we know the labels are non overlapping we can put everything in one image
-            //the label content has to be transfered, as no new group was added.
+            //the label content has to be transferred, as no new group was added.
             mitk::TransferLabelContent(segmentImage, labelSetImage->GetGroupImage(groupID),
               labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(groupID)),
               mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, {{segValue,newLabel->GetValue()}});

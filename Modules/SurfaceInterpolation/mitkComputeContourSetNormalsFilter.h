@@ -31,7 +31,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  \brief Filter to compute the normales for contours based on vtkPolygons
+  \brief Filter to compute the normals for contours based on vtkPolygons
 
 
 

@@ -391,7 +391,7 @@ std::pair<mitk::Image::Pointer, mitk::IDToLabelClassNameMapType> mitk::CreateLab
     relevantDetectLamba);
 
   // construct class mapping
-  auto classToValueMap = LabelSetImageHelper::SplitLabelValuesByClassNamwe(segmentation, groupID, relevantGroupValues);
+  auto classToValueMap = LabelSetImageHelper::SplitLabelValuesByClassName(segmentation, groupID, relevantGroupValues);
 
   ConstLabelVector destLabels;
   LabelValueMappingVector transferMapping;

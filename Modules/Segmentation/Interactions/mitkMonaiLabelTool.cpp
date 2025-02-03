@@ -451,7 +451,7 @@ void mitk::MonaiLabelTool::FetchOverallInfo(const std::string &hostName, const i
   }
   else
   {
-    Tool::ErrorMessage.Send(httplib::to_string(response.error()) + " error occured.");
+    Tool::ErrorMessage.Send(httplib::to_string(response.error()) + " error occurred.");
   }
 }
 
@@ -531,8 +531,8 @@ void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
     else
     {
       auto err = response.error();
-      MITK_ERROR << "An HTTP POST error: " << httplib::to_string(err) << " occured.";
-      mitkThrow() << "An HTTP POST error: " << httplib::to_string(err) << " occured.";
+      MITK_ERROR << "An HTTP POST error: " << httplib::to_string(err) << " occurred.";
+      mitkThrow() << "An HTTP POST error: " << httplib::to_string(err) << " occurred.";
     }
   }
 }

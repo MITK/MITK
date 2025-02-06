@@ -22,7 +22,7 @@ QmitkPaintbrushToolGUI::QmitkPaintbrushToolGUI() : QmitkToolGUI(), m_Slider(null
 {
   // create the visible widgets
   QBoxLayout *layout = new QHBoxLayout(this);
-  this->setContentsMargins(0, 0, 0, 0);
+  layout->setContentsMargins(0, 0, 0, 0);
 
   QLabel *label = new QLabel("Size ", this);
   QFont f = label->font();

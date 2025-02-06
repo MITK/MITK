@@ -48,6 +48,7 @@ void QmitkSegWithPreviewToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
   {
     // create the visible widgets
     m_MainLayout = new QVBoxLayout(this);
+    m_MainLayout->setContentsMargins(0, 0, 0, 0);
     m_ConfirmSegBtn = new QPushButton("Confirm Segmentation", this);
     connect(m_ConfirmSegBtn, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()));
 

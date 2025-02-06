@@ -9,6 +9,7 @@
 
 %naturalvar; // All non-primitive types will use const reference typemaps
 %include "numpy.i"
+%nothread mitk::Image::GetAsNumpy;
 
 %constant int ComponentTypeUInt8 = TypeDefinitions::ComponentTypeUInt8;
 %constant int ComponentTypeInt8 = TypeDefinitions::ComponentTypeInt8;
@@ -282,7 +283,7 @@ MITK_CLASS_SWIG_MACRO(mitk, Image)
         }
         std::reverse(size.begin(), size.end());
         PyObject* result = PyArray_SimpleNewFromData(dim, size.data(), 
-                MakePixelTypeFromTypeID((int)self->GetPixelType().GetComponentType()),
+                MakePixelTypeFromTypeID(static_cast<int>(self->GetPixelType().GetComponentType())),
                 const_cast<void*>(mitkBufferPtr));
         //PyArray_ENABLEFLAGS((PyArrayObject*)result, NPY_ARRAY_OWNDATA);
         return result;

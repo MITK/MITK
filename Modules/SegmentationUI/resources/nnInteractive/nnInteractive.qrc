@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="/nnInteractive" >
+    <file alias="box">box.svg</file>
+    <file alias="lasso">lasso.svg</file>
+    <file alias="negative">negative.svg</file>
+    <file alias="point">point.svg</file>
+    <file alias="positive">positive.svg</file>
+    <file alias="reset">reset.svg</file>
+    <file alias="scribble">scribble.svg</file>
+  </qresource>
+</RCC>

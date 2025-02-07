@@ -37,7 +37,7 @@ namespace mitk
 
   bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
   {
-    LabelSetImage::Pointer image;
+    MultiLabelSegmentation::Pointer image;
     this->GetPointerParameter("Input", image);
 
     //  ProcessObserver::Pointer obsv;
@@ -109,7 +109,7 @@ namespace mitk
 
   void LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateSuccessful()
   {
-    LabelSetImage::Pointer image;
+    MultiLabelSegmentation::Pointer image;
     this->GetPointerParameter("Input", image);
 
     std::string name = this->GetGroupNode()->GetName();

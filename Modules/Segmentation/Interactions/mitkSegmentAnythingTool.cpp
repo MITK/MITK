@@ -265,7 +265,7 @@ namespace
 
 void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                 const Image * /*oldSegAtTimeStep*/,
-                                                LabelSetImage *previewImage,
+                                                MultiLabelSegmentation *previewImage,
                                                 TimeStepType timeStep)
 {
   if (nullptr != previewImage && ::IsImageAtTimeStepValid(inputAtTimeStep))
@@ -299,7 +299,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
         m_PythonService->TransferPointsToProcess(csvString);
         m_ProgressCommand->SetProgress(150);
         std::this_thread::sleep_for(100ms);
-        mitk::LabelSetImage::Pointer outputBuffer = m_PythonService->RetrieveImageFromProcess(this->GetTimeOutLimit());
+        mitk::MultiLabelSegmentation::Pointer outputBuffer = m_PythonService->RetrieveImageFromProcess(this->GetTimeOutLimit());
         m_ProgressCommand->SetProgress(180);
         mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputBuffer.GetPointer(), timeStep, false);
         this->SetSelectedLabels({MASK_VALUE});

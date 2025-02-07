@@ -152,7 +152,7 @@ namespace mitk
 
   NodePredicateBase::ConstPointer MITKRegistrationHelper::MaskNodePredicate()
   {
-    auto isLabelSetImage = mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
+    auto isLabelSetImage = mitk::TNodePredicateDataType<mitk::MultiLabelSegmentation>::New();
     auto hasBinaryProperty = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
     auto isLegacyMask = mitk::NodePredicateAnd::New(ImageNodePredicate(), hasBinaryProperty);
 

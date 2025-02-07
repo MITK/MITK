@@ -115,7 +115,7 @@ bool SetLabelColor(const mitk::IPropertyProvider* propertyProvider, mitk::Label*
   return false;
 }
 
-void CopyImageToActiveLayerImage(const mitk::Image* image, mitk::LabelSetImage* labelSetImage)
+void CopyImageToActiveLayerImage(const mitk::Image* image, mitk::MultiLabelSegmentation* labelSetImage)
 {
   mitk::ImageReadAccessor readAccessor(image);
   mitk::ImageWriteAccessor writeAccessor(labelSetImage);
@@ -202,7 +202,7 @@ int main(int argc, char* argv[])
     fs::path outputPath(outputFilename);
     CreateParentDirectories(outputPath);
 
-    mitk::LabelSetImage::Pointer labelSetImage; // Only used for "multilabel" output
+    mitk::MultiLabelSegmentation::Pointer labelSetImage; // Only used for "multilabel" output
     unsigned int nonameCounter = 0; // Helper variable to generate placeholder names for nameless contour sets
 
     for (auto input : inputs)
@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
       {
         if (labelSetImage.IsNull())
         {
-          labelSetImage = mitk::LabelSetImage::New();
+          labelSetImage = mitk::MultiLabelSegmentation::New();
           labelSetImage->Initialize(image);
 
           CopyImageToActiveLayerImage(image, labelSetImage);

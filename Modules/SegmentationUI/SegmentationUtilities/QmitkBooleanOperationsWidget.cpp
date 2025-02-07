@@ -76,7 +76,7 @@ void QmitkBooleanOperationsWidget::OnSegSelectionChanged(QmitkAbstractNodeSelect
   this->ConfigureWidgets();
 }
 
-void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::LabelSetImage::LabelValueVectorType /*labels*/)
+void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::MultiLabelSegmentation::LabelValueVectorType /*labels*/)
 {
   this->ConfigureWidgets();
 }
@@ -128,7 +128,7 @@ void QmitkBooleanOperationsWidget::OnDifferenceButtonClicked()
 
   auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
   auto minuend = selectedLabelValues.front();
-  auto subtrahends = mitk::LabelSetImage::LabelValueVectorType(selectedLabelValues.begin() + 1, selectedLabelValues.end());
+  auto subtrahends = mitk::MultiLabelSegmentation::LabelValueVectorType(selectedLabelValues.begin() + 1, selectedLabelValues.end());
 
   auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
 

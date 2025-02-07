@@ -29,9 +29,9 @@ class mitkMultiLabelSegmentationIOTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  mitk::LabelSetImage::ConstLabelVectorType m_labelSet1;
-  mitk::LabelSetImage::ConstLabelVectorType m_labelSet2;
-  mitk::LabelSetImage::ConstLabelVectorType m_labelSet2_adapted;
+  mitk::MultiLabelSegmentation::ConstLabelVectorType m_labelSet1;
+  mitk::MultiLabelSegmentation::ConstLabelVectorType m_labelSet2;
+  mitk::MultiLabelSegmentation::ConstLabelVectorType m_labelSet2_adapted;
 
 public:
   mitk::Label::Pointer GenerateLabel(mitk::Label::PixelType value, const std::string& name, float r, float g, float b) const
@@ -76,7 +76,7 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Error reading empty MultiLabel segmentation", testImages.size()==1);
 
-    auto lsimage1 = dynamic_cast<mitk::LabelSetImage*>(testImages[0].GetPointer());
+    auto lsimage1 = dynamic_cast<mitk::MultiLabelSegmentation*>(testImages[0].GetPointer());
 
     CPPUNIT_ASSERT_MESSAGE("Number of layers is not correct", lsimage1->GetNumberOfLayers() == 1);
     CPPUNIT_ASSERT_MESSAGE("Number of labels is not correct", lsimage1->GetTotalNumberOfLabels() == 0);
@@ -88,7 +88,7 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Error reading empty MultiLabel segmentation", testImages.size() == 1);
 
-    auto lsimage1 = dynamic_cast<mitk::LabelSetImage*>(testImages[0].GetPointer());
+    auto lsimage1 = dynamic_cast<mitk::MultiLabelSegmentation*>(testImages[0].GetPointer());
 
     CPPUNIT_ASSERT_MESSAGE("Number of layers is not correct", lsimage1->GetNumberOfLayers() == 1);
     CPPUNIT_ASSERT_MESSAGE("Number of labels is not correct", lsimage1->GetTotalNumberOfLabels() == 0);
@@ -98,7 +98,7 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Error reading empty MultiLabel segmentation", testImages.size() == 1);
 
-    lsimage1 = dynamic_cast<mitk::LabelSetImage*>(testImages[0].GetPointer());
+    lsimage1 = dynamic_cast<mitk::MultiLabelSegmentation*>(testImages[0].GetPointer());
 
     CPPUNIT_ASSERT_MESSAGE("Number of layers is not correct", lsimage1->GetNumberOfLayers() == 1);
     CPPUNIT_ASSERT_MESSAGE("Number of labels is not correct", lsimage1->GetTotalNumberOfLabels() == 0);

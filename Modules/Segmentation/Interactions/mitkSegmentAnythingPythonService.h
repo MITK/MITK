@@ -108,9 +108,9 @@ namespace mitk
      * @brief Waits for output nifity file from the daemon to appear and 
      * reads it as a mitk::Image
      * 
-     * @return LabelSetImage::Pointer 
+     * @return MultiLabelSegmentation::Pointer 
      */
-    LabelSetImage::Pointer RetrieveImageFromProcess(long timeOut= -1) const;
+    MultiLabelSegmentation::Pointer RetrieveImageFromProcess(long timeOut= -1) const;
 
     static Status CurrentStatus;
 

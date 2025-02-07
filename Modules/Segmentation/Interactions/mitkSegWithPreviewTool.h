@@ -135,12 +135,12 @@ namespace mitk
      * @return a mitk::DataNode which contains a segmentation image
      */
     virtual DataNode* GetTargetSegmentationNode() const;
-    LabelSetImage* GetTargetSegmentation() const;
+    MultiLabelSegmentation* GetTargetSegmentation() const;
 
     /** Returns the image that contains the preview of the current segmentation.
      * Returns null if the node is not set or does not contain an image.*/
-    LabelSetImage* GetPreviewSegmentation();
-    const LabelSetImage* GetPreviewSegmentation() const;
+    MultiLabelSegmentation* GetPreviewSegmentation();
+    const MultiLabelSegmentation* GetPreviewSegmentation() const;
     DataNode* GetPreviewSegmentationNode();
 
   protected:
@@ -197,11 +197,11 @@ namespace mitk
     virtual void PreparePreviewToResultTransfer(const LabelMappingType& labelMapping);
 
     static void TransferLabelInformation(const LabelMappingType& labelMapping,
-      const mitk::LabelSetImage* source, mitk::LabelSetImage* target);
+      const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target);
 
-    /**Helper function that can be used to move the content of an LabelSetImage (the pixels of the active source layer and the labels).
-     This is e.g. helpful if you generate an LabelSetImage content in DoUpdatePreview and you want to transfer it into the preview image.*/
-    static void TransferLabelSetImageContent(const LabelSetImage* source, LabelSetImage* target, TimeStepType timeStep);
+    /**Helper function that can be used to move the content of an MultiLabelSegmentation (the pixels of the active source layer and the labels).
+     This is e.g. helpful if you generate an MultiLabelSegmentation content in DoUpdatePreview and you want to transfer it into the preview image.*/
+    static void TransferLabelSetImageContent(const MultiLabelSegmentation* source, MultiLabelSegmentation* target, TimeStepType timeStep);
 
     /** This function does the real work. Here the preview for a given
      * input image should be computed and stored in the also passed
@@ -209,7 +209,7 @@ namespace mitk
      * It also provides the current/old segmentation at the time point,
      * which can be used, if the preview depends on the the segmentation so far.
      */
-    virtual void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) = 0;
+    virtual void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) = 0;
 
     /** Returns the input that should be used for any segmentation/preview or tool update.
      * It is either the data of ReferenceDataNode itself or a part of it defined by a ROI mask
@@ -238,7 +238,7 @@ namespace mitk
 
     TimePointType GetLastTimePointOfUpdate() const;
 
-    LabelSetImage::LabelValueType GetActiveLabelValueOfPreview() const;
+    MultiLabelSegmentation::LabelValueType GetActiveLabelValueOfPreview() const;
 
     itkGetConstMacro(UserDefinedActiveLabel, Label::PixelType);
 

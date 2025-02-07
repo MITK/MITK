@@ -54,11 +54,11 @@
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Autocrop" icon="" class="QmitkAutocropAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Convert to Label" icon="" class="QmitkConvertMaskToLabelAction" />
-    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
-    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
-    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Autocrop" icon="" class="QmitkAutocropLabelSetImageAction" />
-    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Save LabelSet Preset" icon="" class="QmitkSaveMultiLabelPresetAction" />
-    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Load LabelSet Preset" icon="" class="QmitkLoadMultiLabelPresetAction" />
+    <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Autocrop" icon="" class="QmitkAutocropLabelSetImageAction" />
+    <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Save LabelSet Preset" icon="" class="QmitkSaveMultiLabelPresetAction" />
+    <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Load LabelSet Preset" icon="" class="QmitkLoadMultiLabelPresetAction" />
     <contextMenuAction nodeDescriptorName="Surface" label="Convert to Label" icon="" class="QmitkConvertSurfaceToLabelAction" />
   </extension>
 

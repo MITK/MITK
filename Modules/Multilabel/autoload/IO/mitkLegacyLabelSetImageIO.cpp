@@ -80,9 +80,9 @@ namespace mitk
       return Unsupported;
   }
 
-  std::vector<mitk::LabelSetImage::LabelVectorType> ExtractLabelSetsFromMetaData(const itk::MetaDataDictionary& dictionary)
+  std::vector<mitk::MultiLabelSegmentation::LabelVectorType> ExtractLabelSetsFromMetaData(const itk::MetaDataDictionary& dictionary)
   {
-    std::vector<mitk::LabelSetImage::LabelVectorType> result;
+    std::vector<mitk::MultiLabelSegmentation::LabelVectorType> result;
 
     // get labels and add them as properties to the image
     char keybuffer[256];
@@ -96,7 +96,7 @@ namespace mitk
       sprintf(keybuffer, "layer_%03u", layerIdx);
       int numberOfLabels = MultiLabelIOHelper::GetIntByKey(dictionary, keybuffer);
 
-      mitk::LabelSetImage::LabelVectorType labelSet;
+      mitk::MultiLabelSegmentation::LabelVectorType labelSet;
 
       for (int labelIdx = 0; labelIdx < numberOfLabels; labelIdx++)
       {
@@ -107,11 +107,11 @@ namespace mitk
 
         auto* labelElem = doc.FirstChildElement("Label");
         if (labelElem == nullptr)
-          mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage IO";
+          mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage legacy IO";
 
         label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem);
 
-        if (label->GetValue() != mitk::LabelSetImage::UNLABELED_VALUE)
+        if (label->GetValue() != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
         {
           labelSet.push_back(label);
         }
@@ -177,13 +177,13 @@ namespace mitk
     }
     else
     { //Avoid label id collision.
-      LabelSetImage::LabelValueType maxValue = LabelSetImage::UNLABELED_VALUE;
+      MultiLabelSegmentation::LabelValueType maxValue = MultiLabelSegmentation::UNLABELED_VALUE;
       auto imageIterator = groupImages.begin();
-      std::vector<mitk::LabelSetImage::LabelVectorType> adaptedLabelSets;
+      std::vector<mitk::MultiLabelSegmentation::LabelVectorType> adaptedLabelSets;
 
       for (auto labelset : labelsets)
       {
-        const auto setValues = LabelSetImage::ExtractLabelValuesFromLabelVector(labelset);
+        const auto setValues = MultiLabelSegmentation::ExtractLabelValuesFromLabelVector(labelset);
 
         //generate mapping table;
         std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping;
@@ -191,18 +191,18 @@ namespace mitk
         { //have to use reverse loop because TransferLabelContent (used to adapt content in the same image; see below)
           //would potentially corrupt otherwise the content due to "value collision between old values still present
           //and already adapted values. By going from highest value to lowest, we avoid that.
-          if (LabelSetImage::UNLABELED_VALUE != *vIter)
+          if (MultiLabelSegmentation::UNLABELED_VALUE != *vIter)
             labelMapping.push_back({*vIter, *vIter + maxValue});
         }
 
-        if (LabelSetImage::UNLABELED_VALUE != maxValue)
+        if (MultiLabelSegmentation::UNLABELED_VALUE != maxValue)
         {
           //adapt labelset
-          auto mappedLabelSet = GenerateLabelSetWithMappedValues(LabelSetImage::ConvertLabelVectorConst(labelset), labelMapping);
+          auto mappedLabelSet = GenerateLabelSetWithMappedValues(MultiLabelSegmentation::ConvertLabelVectorConst(labelset), labelMapping);
           adaptedLabelSets.emplace_back(mappedLabelSet);
 
           //adapt image (it is an inplace operation. the image instance stays the same.
-          TransferLabelContent(*imageIterator, *imageIterator, LabelSetImage::ConvertLabelVectorConst(mappedLabelSet), LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE,
+          TransferLabelContent(*imageIterator, *imageIterator, MultiLabelSegmentation::ConvertLabelVectorConst(mappedLabelSet), MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE,
             false, labelMapping, MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
         }
         else
@@ -221,7 +221,7 @@ namespace mitk
 
       auto output = ConvertImageVectorToLabelSetImage(groupImages, rawimage->GetTimeGeometry());
 
-      LabelSetImage::GroupIndexType id = 0;
+      MultiLabelSegmentation::GroupIndexType id = 0;
       for (auto labelset : adaptedLabelSets)
       {
         output->ReplaceGroupLabels(id, labelset);

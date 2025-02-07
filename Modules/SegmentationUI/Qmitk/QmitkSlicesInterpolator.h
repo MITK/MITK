@@ -97,7 +97,7 @@ public:
    */
   mitk::DataStorage *GetDataStorage();
 
-  void SetActiveLabelValue(mitk::LabelSetImage::LabelValueType labelValue);
+  void SetActiveLabelValue(mitk::MultiLabelSegmentation::LabelValueType labelValue);
 
   /**
     Just public because it is called by itk::Commands. You should not need to call this.

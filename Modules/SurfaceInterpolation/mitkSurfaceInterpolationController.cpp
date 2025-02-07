@@ -34,15 +34,15 @@ struct CPICache
 };
 
 typedef std::map<mitk::TimeStepType, CPICache> CPITimeStepMap;
-typedef std::map<mitk::LabelSetImage::LabelValueType, CPITimeStepMap> CPITimeStepLabelMap;
+typedef std::map<mitk::MultiLabelSegmentation::LabelValueType, CPITimeStepMap> CPITimeStepLabelMap;
 
-typedef std::map<const mitk::LabelSetImage*, CPITimeStepLabelMap> CPITimeStepLabelSegMap;
+typedef std::map<const mitk::MultiLabelSegmentation*, CPITimeStepLabelMap> CPITimeStepLabelSegMap;
 
 CPITimeStepLabelSegMap cpiMap;
 std::shared_mutex cpiMutex;
 
-std::map<mitk::LabelSetImage*, unsigned long> segmentationObserverTags;
-std::map<mitk::LabelSetImage*, unsigned long> labelRemovedObserverTags;
+std::map<mitk::MultiLabelSegmentation*, unsigned long> segmentationObserverTags;
+std::map<mitk::MultiLabelSegmentation*, unsigned long> labelRemovedObserverTags;
 
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   : m_DistanceImageVolume(50000),
@@ -92,7 +92,7 @@ void mitk::SurfaceInterpolationController::AddNewContours(const std::vector<Cont
 }
 
 
-mitk::DataNode* GetSegmentationImageNodeInternal(mitk::DataStorage* ds, const mitk::LabelSetImage* seg)
+mitk::DataNode* GetSegmentationImageNodeInternal(mitk::DataStorage* ds, const mitk::MultiLabelSegmentation* seg)
 {
   if (nullptr == ds) return nullptr;
   if (nullptr == seg) return nullptr;
@@ -123,7 +123,7 @@ mitk::DataNode* mitk::SurfaceInterpolationController::GetSegmentationImageNode()
   return GetSegmentationImageNodeInternal(this->m_DataStorage, selectedSegmentation);
 }
 
-mitk::DataStorage::SetOfObjects::ConstPointer mitk::SurfaceInterpolationController::GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep) const
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::SurfaceInterpolationController::GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep) const
 {
   DataStorage::SetOfObjects::Pointer relevantNodes = DataStorage::SetOfObjects::New();
 
@@ -146,7 +146,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::SurfaceInterpolationControll
   return relevantNodes;
 }
 
-mitk::DataStorage::SetOfObjects::ConstPointer mitk::SurfaceInterpolationController::GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, LabelSetImage::LabelValueType labelValue) const
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::SurfaceInterpolationController::GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, MultiLabelSegmentation::LabelValueType labelValue) const
 {
   auto isContourPlaneGeometry = NodePredicateProperty::New("isContourPlaneGeometry", mitk::BoolProperty::New(true));
   auto isCorrectLabel = NodePredicateProperty::New("labelID", mitk::UShortProperty::New(labelValue));
@@ -367,7 +367,7 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
   return removedIt;
 }
 
-void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolation(ReduceContourSetFilter* reduceFilter, const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep)
+void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolation(ReduceContourSetFilter* reduceFilter, const MultiLabelSegmentation* segmentationImage, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep)
 {
   const auto& currentImageContours = cpiMap.at(segmentationImage);
 
@@ -400,7 +400,7 @@ void mitk::SurfaceInterpolationController::AddActiveLabelContoursForInterpolatio
   }
 }
 
-bool CPICacheIsOutdated(const mitk::LabelSetImage* segmentationImage, mitk::LabelSetImage::LabelValueType labelValue, mitk::TimeStepType timeStep)
+bool CPICacheIsOutdated(const mitk::MultiLabelSegmentation* segmentationImage, mitk::MultiLabelSegmentation::LabelValueType labelValue, mitk::TimeStepType timeStep)
 {
   const auto& currentImageContours = cpiMap.at(segmentationImage);
 
@@ -422,7 +422,7 @@ bool CPICacheIsOutdated(const mitk::LabelSetImage* segmentationImage, mitk::Labe
   return result;
 }
 
-void SetCPICacheSurface(mitk::Surface* surface, const mitk::LabelSetImage* segmentationImage, mitk::LabelSetImage::LabelValueType labelValue, mitk::TimeStepType timeStep)
+void SetCPICacheSurface(mitk::Surface* surface, const mitk::MultiLabelSegmentation* segmentationImage, mitk::MultiLabelSegmentation::LabelValueType labelValue, mitk::TimeStepType timeStep)
 {
   const auto& currentImageContours = cpiMap.at(segmentationImage);
 
@@ -443,7 +443,7 @@ void SetCPICacheSurface(mitk::Surface* surface, const mitk::LabelSetImage* segme
   cpiMap[segmentationImage][labelValue][timeStep].cachedSurface = surface;
 }
 
-void mitk::SurfaceInterpolationController::Interpolate(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep)
+void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentation* segmentationImage, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep)
 {
   if (nullptr == segmentationImage)
   {
@@ -569,7 +569,7 @@ void mitk::SurfaceInterpolationController::Interpolate(const LabelSetImage* segm
   SetCPICacheSurface(interpolationResult, segmentationImage, labelValue, timeStep);
 }
 
-mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationResult(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep)
+mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationResult(const MultiLabelSegmentation* segmentationImage, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep)
 {
   if (nullptr == segmentationImage)
   {
@@ -622,7 +622,7 @@ void mitk::SurfaceInterpolationController::SetDistanceImageVolume(unsigned int d
   m_DistanceImageVolume = distImgVolume;
 }
 
-mitk::LabelSetImage* mitk::SurfaceInterpolationController::GetCurrentSegmentation()
+mitk::MultiLabelSegmentation* mitk::SurfaceInterpolationController::GetCurrentSegmentation()
 {
   return m_SelectedSegmentation.Lock();
 }
@@ -639,7 +639,7 @@ void mitk::SurfaceInterpolationController::GetImageBase(itk::Image<TPixel, VImag
   result->Graft(input);
 }
 
-void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::LabelSetImage* currentSegmentationImage)
+void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::MultiLabelSegmentation* currentSegmentationImage)
 {
   auto selectedSegmentation = m_SelectedSegmentation.Lock();
 
@@ -673,7 +673,7 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
   }
 }
 
-void mitk::SurfaceInterpolationController::RemoveInterpolationSession(const mitk::LabelSetImage* segmentationImage)
+void mitk::SurfaceInterpolationController::RemoveInterpolationSession(const mitk::MultiLabelSegmentation* segmentationImage)
 {
   if (nullptr != segmentationImage)
   {
@@ -697,20 +697,20 @@ void mitk::SurfaceInterpolationController::RemoveInterpolationSession(const mitk
   }
 }
 
-void mitk::SurfaceInterpolationController::RemoveObserversInternal(const mitk::LabelSetImage* segmentationImage)
+void mitk::SurfaceInterpolationController::RemoveObserversInternal(const mitk::MultiLabelSegmentation* segmentationImage)
 {
-  auto pos = segmentationObserverTags.find(const_cast<mitk::LabelSetImage*>(segmentationImage));
+  auto pos = segmentationObserverTags.find(const_cast<mitk::MultiLabelSegmentation*>(segmentationImage));
   if (pos != segmentationObserverTags.end())
   {
     pos->first->RemoveObserver((*pos).second);
-    segmentationObserverTags.erase(const_cast<mitk::LabelSetImage*>(segmentationImage));
+    segmentationObserverTags.erase(const_cast<mitk::MultiLabelSegmentation*>(segmentationImage));
   }
 
-  auto pos2 = labelRemovedObserverTags.find(const_cast<mitk::LabelSetImage*>(segmentationImage));
+  auto pos2 = labelRemovedObserverTags.find(const_cast<mitk::MultiLabelSegmentation*>(segmentationImage));
   if (pos2 != labelRemovedObserverTags.end())
   {
     pos2->first->RemoveObserver((*pos2).second);
-    labelRemovedObserverTags.erase(const_cast<mitk::LabelSetImage*>(segmentationImage));
+    labelRemovedObserverTags.erase(const_cast<mitk::MultiLabelSegmentation*>(segmentationImage));
   }
 }
 
@@ -722,7 +722,7 @@ void mitk::SurfaceInterpolationController::RemoveAllInterpolationSessions()
   }
 }
 
-void mitk::SurfaceInterpolationController::RemoveContours(const LabelSetImage* segmentationImage,
+void mitk::SurfaceInterpolationController::RemoveContours(const MultiLabelSegmentation* segmentationImage,
   mitk::Label::PixelType label,
   TimeStepType timeStep)
 {
@@ -756,7 +756,7 @@ void mitk::SurfaceInterpolationController::RemoveContours(const LabelSetImage* s
   }
 }
 
-void mitk::SurfaceInterpolationController::RemoveContours(const LabelSetImage* segmentationImage,
+void mitk::SurfaceInterpolationController::RemoveContours(const MultiLabelSegmentation* segmentationImage,
   mitk::Label::PixelType label)
 {
   if (nullptr == segmentationImage)
@@ -785,7 +785,7 @@ void mitk::SurfaceInterpolationController::RemoveContours(const LabelSetImage* s
 void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Object *caller,
                                                                  const itk::EventObject & /*event*/)
 {
-  auto tempImage = dynamic_cast<mitk::LabelSetImage *>(const_cast<itk::Object *>(caller));
+  auto tempImage = dynamic_cast<mitk::MultiLabelSegmentation *>(const_cast<itk::Object *>(caller));
   if (tempImage)
   {
     this->RemoveInterpolationSession(tempImage);
@@ -794,7 +794,7 @@ void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Obje
 
 void mitk::SurfaceInterpolationController::OnRemoveLabel(const itk::Object* caller, const itk::EventObject& event)
 {
-  auto sendingSegmentation = dynamic_cast<const LabelSetImage*>(caller);
+  auto sendingSegmentation = dynamic_cast<const MultiLabelSegmentation*>(caller);
 
   auto removeEvent = dynamic_cast<const mitk::LabelRemovedEvent*>(&event);
 
@@ -804,7 +804,7 @@ void mitk::SurfaceInterpolationController::OnRemoveLabel(const itk::Object* call
   }
 }
 
-mitk::SurfaceInterpolationController::CPIVector* mitk::SurfaceInterpolationController::GetContours(LabelSetImage::LabelValueType labelValue, TimeStepType timeStep)
+mitk::SurfaceInterpolationController::CPIVector* mitk::SurfaceInterpolationController::GetContours(MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep)
 {
   auto selectedSegmentation = m_SelectedSegmentation.Lock();
 
@@ -828,11 +828,11 @@ mitk::SurfaceInterpolationController::CPIVector* mitk::SurfaceInterpolationContr
   return nullptr;
 }
 
-std::vector<mitk::LabelSetImage::LabelValueType> mitk::SurfaceInterpolationController::GetAffectedLabels(const LabelSetImage* seg, TimeStepType timeStep, const PlaneGeometry* plane) const
+std::vector<mitk::MultiLabelSegmentation::LabelValueType> mitk::SurfaceInterpolationController::GetAffectedLabels(const MultiLabelSegmentation* seg, TimeStepType timeStep, const PlaneGeometry* plane) const
 {
   std::lock_guard<std::shared_mutex> guard(cpiMutex);
 
-  std::vector<mitk::LabelSetImage::LabelValueType> result;
+  std::vector<mitk::MultiLabelSegmentation::LabelValueType> result;
 
   auto finding = cpiMap.find(seg);
   if (finding == cpiMap.end()) return result;

@@ -43,7 +43,7 @@ namespace mitk
   mitk::NodePredicateBase::Pointer GetImageStatisticsMaskPredicate()
   {
     auto isImage = mitk::NodePredicateDataType::New("Image");
-    auto isLabelSetImage = mitk::NodePredicateDataType::New("LabelSetImage");
+    auto isLabelSetImage = mitk::NodePredicateDataType::New("MultiLabelSegmentation");
     auto hasBinaryProperty = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
     auto isBinaryImage = mitk::NodePredicateAnd::New(isImage, hasBinaryProperty);
     auto isNoHelperObjectPredicate = GetNoHelperObjectPredicate();

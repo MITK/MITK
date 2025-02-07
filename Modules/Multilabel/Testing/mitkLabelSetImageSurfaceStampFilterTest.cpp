@@ -29,7 +29,7 @@ class mitkLabelSetImageSurfaceStampFilterTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  mitk::LabelSetImage::Pointer m_LabelSetImage;
+  mitk::MultiLabelSegmentation::Pointer m_LabelSetImage;
   mitk::Surface::Pointer m_Surface;
 
 public:
@@ -37,7 +37,7 @@ public:
   {
     mitk::Image::Pointer regularImage =
       mitk::ImageGenerator::GenerateRandomImage<int>(50, 50, 50, 1, 1, 1, 1, 0.3, 0.2);
-    m_LabelSetImage = dynamic_cast<mitk::LabelSetImage *>(
+    m_LabelSetImage = dynamic_cast<mitk::MultiLabelSegmentation *>(
       mitk::IOUtil::Load(GetTestDataFilePath("Multilabel/EmptyMultiLabelSegmentation.nrrd"))[0].GetPointer());
     mitk::Label::Pointer label1 = mitk::Label::New();
     label1->SetName("Label1");
@@ -54,7 +54,7 @@ public:
 
   void tearDown() override
   {
-    // Delete LabelSetImage
+    // Delete MultiLabelSegmentation
     m_LabelSetImage = nullptr;
   }
 
@@ -65,13 +65,13 @@ public:
     filter->SetForceOverwrite(true);
     filter->SetInput(m_LabelSetImage);
     filter->Update();
-    mitk::LabelSetImage::Pointer result = dynamic_cast<mitk::LabelSetImage *>(
-      m_LabelSetImage.GetPointer()); // dynamic_cast<mitk::LabelSetImage*>(filter->GetOutput());
+    mitk::MultiLabelSegmentation::Pointer result = dynamic_cast<mitk::MultiLabelSegmentation *>(
+      m_LabelSetImage.GetPointer()); // dynamic_cast<mitk::MultiLabelSegmentation*>(filter->GetOutput());
     // result->DisconnectPipeline();
-    // mitk::LabelSetImage::Pointer result
-    // =dynamic_cast<mitk::LabelSetImage*>(m_LabelSetImage->Clone().GetPointer());//dynamic_cast<mitk::LabelSetImage*>(filter->GetOutput());
+    // mitk::MultiLabelSegmentation::Pointer result
+    // =dynamic_cast<mitk::MultiLabelSegmentation*>(m_LabelSetImage->Clone().GetPointer());//dynamic_cast<mitk::MultiLabelSegmentation*>(filter->GetOutput());
 
-    mitk::LabelSetImage::Pointer expectedResult = dynamic_cast<mitk::LabelSetImage *>(
+    mitk::MultiLabelSegmentation::Pointer expectedResult = dynamic_cast<mitk::MultiLabelSegmentation *>(
       mitk::IOUtil::Load(GetTestDataFilePath("Multilabel/StampResultBasedOnEmptyML.nrrd"))[0].GetPointer());
 
     MITK_ASSERT_EQUAL(result, expectedResult, "Result after stamping should be equal to the saved version");

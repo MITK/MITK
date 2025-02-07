@@ -52,8 +52,8 @@ public:
    Thus as long as the manipulation is ongoing, one should assume the model to be in an invalid state.*/
   bool GetModelManipulationOngoing() const;
 
-  using LabelValueType = mitk::LabelSetImage::LabelValueType;
-  using LabelValueVectorType = mitk::LabelSetImage::LabelValueVectorType;
+  using LabelValueType = mitk::MultiLabelSegmentation::LabelValueType;
+  using LabelValueVectorType = mitk::MultiLabelSegmentation::LabelValueVectorType;
 
   /**
   * @brief Retrieve the currently selected labels (equals the last CurrentSelectionChanged values).
@@ -144,7 +144,7 @@ public Q_SLOTS:
   * @remark Using this method to select labels will not trigger the CurrentSelectionChanged signal. Observers
   * should regard that to avoid signal loops.
   */
-  void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
+  void SetSelectedLabel(mitk::MultiLabelSegmentation::LabelValueType selectedLabel);
 
   /** @brief Sets the segmentation that will be used and monitored by the widget.
   * @param segmentation      A pointer to the segmentation to set.
@@ -153,8 +153,8 @@ public Q_SLOTS:
   * setting.
   * @pre Segmentation node is nullptr.
   */
-  void SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation);
-  mitk::LabelSetImage* GetMultiLabelSegmentation() const;
+  void SetMultiLabelSegmentation(mitk::MultiLabelSegmentation* segmentation);
+  mitk::MultiLabelSegmentation* GetMultiLabelSegmentation() const;
 
   /**
   * @brief Sets the segmentation node that will be used /monitored by the widget.
@@ -226,7 +226,7 @@ public Q_SLOTS:
   /** @brief Copies a label to another group.
    *
    * The destination label will have a different label value than the source label since all
-   * label values of a LabelSetImage must be unique.
+   * label values of a MultiLabelSegmentation must be unique.
    */
   void OnCopyToGroup();
 
@@ -240,7 +240,7 @@ protected:
     const QList<int>& roles = QList<int>());
 
   QmitkMultiLabelTreeModel* m_Model;
-  mitk::LabelSetImage::Pointer m_Segmentation;
+  mitk::MultiLabelSegmentation::Pointer m_Segmentation;
 
   LabelValueVectorType m_LastValidSelectedLabels;
   QStyledItemDelegate* m_LockItemDelegate;
@@ -256,13 +256,13 @@ protected:
   */
   mitk::Label* GetFirstSelectedLabelObject() const;
 
-  mitk::Label* AddNewLabelInternal(const mitk::LabelSetImage::GroupIndexType& containingGroup);
+  mitk::Label* AddNewLabelInternal(const mitk::MultiLabelSegmentation::GroupIndexType& containingGroup);
 
   /**@brief Adds an instance of the same label/class like the passed label value
   */
   mitk::Label* AddNewLabelInstanceInternal(mitk::Label* templateLabel);
 
-  void RemoveGroupInternal(const mitk::LabelSetImage::GroupIndexType& groupID);
+  void RemoveGroupInternal(const mitk::MultiLabelSegmentation::GroupIndexType& groupID);
   void DeleteLabelInternal(const LabelValueVectorType& labelValues);
 
   void keyPressEvent(QKeyEvent* event) override;

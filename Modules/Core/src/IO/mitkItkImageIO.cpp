@@ -757,7 +757,7 @@ namespace mitk
     //and the new MultiLabelSegmentation class is in place, as
     //segmentations won't be confused with simple images anymore.
     std::string className = this->GetInput()->GetNameOfClass();
-    if (className == "LabelSetImage")
+    if (className == "MultiLabelSegmentation")
     {
       // We cannot write a null object, DUH!
       return IFileWriter::Unsupported;

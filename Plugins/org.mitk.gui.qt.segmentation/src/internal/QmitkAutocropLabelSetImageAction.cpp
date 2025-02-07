@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 namespace
 {
-  // Iterate over all layers, time steps, and dimensions of a LabelSetImage to
+  // Iterate over all layers, time steps, and dimensions of a MultiLabelSegmentation to
   // determine the overall minimum and maximum indices of labeled pixels.
   //
   // Returns false if the input image is empty, minIndex and maxIndex contain
@@ -27,13 +27,13 @@ namespace
   //
   // Throws an mitk::Exception if read access was denied.
   //
-  bool DetermineMinimumAndMaximumIndicesOfNonBackgroundPixels(mitk::LabelSetImage::Pointer labelSetImage, itk::Index<3>& minIndex, itk::Index<3>& maxIndex)
+  bool DetermineMinimumAndMaximumIndicesOfNonBackgroundPixels(mitk::MultiLabelSegmentation::Pointer labelSetImage, itk::Index<3>& minIndex, itk::Index<3>& maxIndex)
   {
     // We need a time selector to handle 3d+t images. It is not used for 3d images, though.
     auto timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(labelSetImage);
 
-    const auto background = mitk::LabelSetImage::UNLABELED_VALUE;
+    const auto background = mitk::MultiLabelSegmentation::UNLABELED_VALUE;
     const auto numLayers = labelSetImage->GetNumberOfLayers();
     const auto numTimeSteps = labelSetImage->GetTimeSteps();
 
@@ -68,7 +68,7 @@ namespace
           image = labelSetImage;
         }
 
-        mitk::ImagePixelReadAccessor<mitk::LabelSetImage::PixelType, 3> pixelReader(image);
+        mitk::ImagePixelReadAccessor<mitk::MultiLabelSegmentation::PixelType, 3> pixelReader(image);
         bool imageIsEmpty = true;
 
         for (index[2] = 0; index[2] < dim[2]; ++index[2])
@@ -127,14 +127,14 @@ namespace
     return !labelSetImageIsEmpty;
   }
 
-  // Crop a LabelSetImage. Labels in the cropped LabelSetImage will still have
+  // Crop a MultiLabelSegmentation. Labels in the cropped MultiLabelSegmentation will still have
   // their original properties like names and colors.
   //
-  // Returns a cropped LabelSetImage.
+  // Returns a cropped MultiLabelSegmentation.
   //
   // Throws an mitk::Exception if read access was denied.
   //
-  mitk::LabelSetImage::Pointer Crop(mitk::LabelSetImage::Pointer labelSetImage, const itk::Index<3>& minIndex, const itk::Index<3>& maxIndex)
+  mitk::MultiLabelSegmentation::Pointer Crop(mitk::MultiLabelSegmentation::Pointer labelSetImage, const itk::Index<3>& minIndex, const itk::Index<3>& maxIndex)
   {
     // We need a time selector to handle 3d+t images. It is not used for 3d images, though.
     auto timeSelector = mitk::ImageTimeSelector::New();
@@ -174,8 +174,8 @@ namespace
       geometry->SetBounds(croppedBounds);
     }
 
-    auto croppedLabelSetImage = mitk::LabelSetImage::New();
-    croppedLabelSetImage->Initialize(mitk::MakeScalarPixelType<mitk::LabelSetImage::PixelType>(), *croppedTimeGeometry);
+    auto croppedLabelSetImage = mitk::MultiLabelSegmentation::New();
+    croppedLabelSetImage->Initialize(mitk::MakeScalarPixelType<mitk::MultiLabelSegmentation::PixelType>(), *croppedTimeGeometry);
 
     // Create cropped image volumes for all time steps in all layers
 
@@ -200,8 +200,8 @@ namespace
           image = labelSetImage;
         }
 
-        mitk::ImagePixelReadAccessor<mitk::LabelSetImage::PixelType, 3> pixelReader(image);
-        auto* croppedVolume = new mitk::LabelSetImage::PixelType[numPixels];
+        mitk::ImagePixelReadAccessor<mitk::MultiLabelSegmentation::PixelType, 3> pixelReader(image);
+        auto* croppedVolume = new mitk::MultiLabelSegmentation::PixelType[numPixels];
         itk::Index<3> croppedIndex;
         itk::Index<3> index;
 
@@ -242,7 +242,7 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
 {
   for (const auto& dataNode : selectedNodes)
   {
-    mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(dataNode->GetData());
+    mitk::MultiLabelSegmentation::Pointer labelSetImage = dynamic_cast<mitk::MultiLabelSegmentation*>(dataNode->GetData());
 
     if (labelSetImage.IsNull())
       continue;
@@ -250,7 +250,7 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
     // Backup currently active layer as we need to restore it later
     auto activeLayer = labelSetImage->GetActiveLayer();
 
-    mitk::LabelSetImage::Pointer croppedLabelSetImage;
+    mitk::MultiLabelSegmentation::Pointer croppedLabelSetImage;
     itk::Index<3> minIndex;
     itk::Index<3> maxIndex;
 
@@ -272,13 +272,13 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
       return;
     }
 
-    // Restore the originally active layer in the cropped LabelSetImage
+    // Restore the originally active layer in the cropped MultiLabelSegmentation
     croppedLabelSetImage->SetActiveLayer(activeLayer);
 
-    // Override the original LabelSetImage with the cropped LabelSetImage
+    // Override the original MultiLabelSegmentation with the cropped MultiLabelSegmentation
     dataNode->SetData(croppedLabelSetImage);
 
-    // If we cropped a single LabelSetImage, reinit the views to give a visible feedback to the user
+    // If we cropped a single MultiLabelSegmentation, reinit the views to give a visible feedback to the user
     if (1 == selectedNodes.size())
       mitk::RenderingManager::GetInstance()->InitializeViews(croppedLabelSetImage->GetTimeGeometry());
   }

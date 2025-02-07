@@ -23,7 +23,7 @@ found in the LICENSE file.
 * @pre segmentation must be a valid pointer.
 * @param segmentation pointer to the segmentation that serves as template for the preset.
 */
-void MITKSEGMENTATIONUI_EXPORT QmitkSaveMultiLabelPreset(const mitk::LabelSetImage* segmentation);
+void MITKSEGMENTATIONUI_EXPORT QmitkSaveMultiLabelPreset(const mitk::MultiLabelSegmentation* segmentation);
 
 /**@brief Helper function to loads a label preset and imposes it on all passed segmentations.
 *
@@ -31,6 +31,6 @@ void MITKSEGMENTATIONUI_EXPORT QmitkSaveMultiLabelPreset(const mitk::LabelSetIma
 * @param segmentations vector of pointers to the segmentations that should be modified according to the preset.
 * Invalid segmentations (nullptr) will be ignored.
 */
-void MITKSEGMENTATIONUI_EXPORT QmitkLoadMultiLabelPreset(const std::vector<mitk::LabelSetImage::Pointer>& segmentations);
+void MITKSEGMENTATIONUI_EXPORT QmitkLoadMultiLabelPreset(const std::vector<mitk::MultiLabelSegmentation::Pointer>& segmentations);
 
 #endif

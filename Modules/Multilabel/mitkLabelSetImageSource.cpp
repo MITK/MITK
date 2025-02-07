@@ -16,8 +16,8 @@ found in the LICENSE file.
 mitk::LabelSetImageSource::LabelSetImageSource()
 {
   // Create the output. We use static_cast<> here because we know the default
-  // output must be of type LabelSetImage
-  mitk::LabelSetImage::Pointer output = static_cast<mitk::LabelSetImage *>(this->MakeOutput(0).GetPointer());
+  // output must be of type MultiLabelSegmentation
+  mitk::MultiLabelSegmentation::Pointer output = static_cast<mitk::MultiLabelSegmentation *>(this->MakeOutput(0).GetPointer());
 
   Superclass::SetNumberOfRequiredOutputs(1);
   Superclass::SetNthOutput(0, output.GetPointer());

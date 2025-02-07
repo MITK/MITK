@@ -53,8 +53,8 @@ void mitk::MonaiLabel3DTool::WriteImage(const Image *inputAtTimeStep, const std:
   IOUtil::Save(inputAtTimeStep, inputImagePath);
 }
 
-void mitk::MonaiLabel3DTool::WriteBackResults(LabelSetImage *previewImage,
-                                              LabelSetImage *segResults,
+void mitk::MonaiLabel3DTool::WriteBackResults(MultiLabelSegmentation *previewImage,
+                                              MultiLabelSegmentation *segResults,
                                               TimeStepType timeStep) const
 {
   if (segResults->GetTimeGeometry()->CountTimeSteps() > 1)

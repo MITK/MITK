@@ -148,7 +148,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice(const Image *image,
   return true;
 }
 
-void mitk::SegTool2D::UpdateAllSurfaceInterpolations(const LabelSetImage *workingImage,
+void mitk::SegTool2D::UpdateAllSurfaceInterpolations(const MultiLabelSegmentation *workingImage,
                                                  TimeStepType timeStep,
                                                  const PlaneGeometry *plane,
                                                  bool detectIntersection)
@@ -168,7 +168,7 @@ void mitk::SegTool2D::UpdateAllSurfaceInterpolations(const LabelSetImage *workin
   if(!affectedLabels.empty()) mitk::SurfaceInterpolationController::GetInstance()->Modified();
 }
 
-void  mitk::SegTool2D::RemoveContourFromInterpolator(const SliceInformation& sliceInfo, LabelSetImage::LabelValueType labelValue)
+void  mitk::SegTool2D::RemoveContourFromInterpolator(const SliceInformation& sliceInfo, MultiLabelSegmentation::LabelValueType labelValue)
 {
   mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo;
   contourInfo.LabelValue = labelValue;
@@ -229,9 +229,9 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
       mitk::Image::Pointer slice2 = Image::New();
       slice2->Initialize(sliceInfo.slice);
       AccessByItk(slice2, ClearBufferProcessing);
-      LabelSetImage::LabelValueType erodeValue = 1;
+      MultiLabelSegmentation::LabelValueType erodeValue = 1;
       auto label = Label::New(erodeValue, "");
-      TransferLabelContent(sliceInfo.slice, slice2, { label }, LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false, { {activeLabelValue, erodeValue} });
+      TransferLabelContent(sliceInfo.slice, slice2, { label }, MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, { {activeLabelValue, erodeValue} });
       //Workaround ends
 
       mitk::MorphologicalOperations::Erode(slice2, 2, mitk::MorphologicalOperations::Ball);
@@ -604,7 +604,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
   mitk::Label::PixelType activeLabelValue = 0;
 
   try{
-    auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    auto labelSetImage = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData());
     activeLabelValue = labelSetImage->GetActiveLabel()->GetValue();
   }
   catch(...)

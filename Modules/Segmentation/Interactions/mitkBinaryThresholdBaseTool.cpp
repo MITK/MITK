@@ -98,7 +98,7 @@ void mitk::BinaryThresholdBaseTool::InitiateToolByInput()
   }
 }
 
-void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, MultiLabelSegmentation* previewImage, TimeStepType timeStep)
 {
   if (nullptr != inputAtTimeStep && nullptr != previewImage)
   {
@@ -108,7 +108,7 @@ void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep
 
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::BinaryThresholdBaseTool::ITKThresholding(const itk::Image<TPixel, VImageDimension>* inputImage,
-                                                    LabelSetImage *segmentation,
+                                                    MultiLabelSegmentation *segmentation,
                                                     unsigned int timeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;

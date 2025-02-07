@@ -267,7 +267,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 
   ResultImageType::Pointer result;
 
-  auto inputLabelSetImage = dynamic_cast<const LabelSetImage*>(input);
+  auto inputLabelSetImage = dynamic_cast<const MultiLabelSegmentation*>(input);
 
   if (nullptr == inputLabelSetImage)
   {
@@ -287,7 +287,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
   }
   else
   {
-    auto resultLabelSetImage = LabelSetImage::New();
+    auto resultLabelSetImage = MultiLabelSegmentation::New();
 
     auto mappedTimeGeometry = CreateResultTimeGeometry(input, resultGeometry);
 
@@ -297,7 +297,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
     resultLabelSetImage->Initialize(resultTemplate);
 
     auto cloneInput = inputLabelSetImage->Clone();
-    //We need to clone the LabelSetImage due to its illposed design. It is state full
+    //We need to clone the MultiLabelSegmentation due to its illposed design. It is state full
     //and we have to iterate through all layers as active layers to ensure the content
     //was really stored (directly working with the layer images does not work with the
     //active layer). The clone wastes resources but is the easiest and safest way to

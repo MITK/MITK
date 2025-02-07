@@ -17,18 +17,18 @@ found in the LICENSE file.
 
 namespace
 {
-  QString GetDisplayedLabelName(const mitk::LabelSetImage* segmentation, const mitk::Label* label)
+  QString GetDisplayedLabelName(const mitk::MultiLabelSegmentation* segmentation, const mitk::Label* label)
   {
     return QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayLabelName(segmentation, label));
   }
 
-  QString GetDisplayedGroupName(const mitk::LabelSetImage* segmentation, mitk::LabelSetImage::GroupIndexType group)
+  QString GetDisplayedGroupName(const mitk::MultiLabelSegmentation* segmentation, mitk::MultiLabelSegmentation::GroupIndexType group)
   {
     return QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(segmentation, group));
   }
 }
 
-QmitkCopyLabelToGroupDialog::QmitkCopyLabelToGroupDialog(mitk::LabelSetImage* segmentation, mitk::Label* label, QWidget* parent)
+QmitkCopyLabelToGroupDialog::QmitkCopyLabelToGroupDialog(mitk::MultiLabelSegmentation* segmentation, mitk::Label* label, QWidget* parent)
   : QDialog(parent),
     m_Ui(new Ui::QmitkCopyLabelToGroupDialog),
     m_Segmentation(segmentation),
@@ -65,8 +65,8 @@ void QmitkCopyLabelToGroupDialog::accept()
     m_Segmentation->GetGroupImage(m_Segmentation->GetGroupIndexOfLabel(m_SourceLabel->GetValue())),
     m_Segmentation->GetGroupImage(destinationGroup),
     m_Segmentation->GetConstLabelsByValue(m_Segmentation->GetLabelValuesByGroup(destinationGroup)),
-    mitk::LabelSetImage::UNLABELED_VALUE,
-    mitk::LabelSetImage::UNLABELED_VALUE,
+    mitk::MultiLabelSegmentation::UNLABELED_VALUE,
+    mitk::MultiLabelSegmentation::UNLABELED_VALUE,
     false,
     {{ m_SourceLabel->GetValue(), m_DestinationLabel->GetValue() }},
     mitk::MultiLabelSegmentation::MergeStyle::Replace,

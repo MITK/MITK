@@ -101,7 +101,7 @@ void FitGeneratorDemoView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*s
     {
       m_selectedMaskNode = dataNodes[1];
 
-      mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
+      mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("MultiLabelSegmentation");
       mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
       mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
       mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);

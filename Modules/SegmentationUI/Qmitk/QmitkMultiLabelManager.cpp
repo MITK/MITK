@@ -166,13 +166,13 @@ void QmitkMultiLabelManager::SetSelectedLabels(const LabelValueVectorType& selec
   UpdateControls();
 }
 
-void QmitkMultiLabelManager::SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel)
+void QmitkMultiLabelManager::SetSelectedLabel(mitk::MultiLabelSegmentation::LabelValueType selectedLabel)
 {
   this->m_Controls->labelInspector->SetSelectedLabel(selectedLabel);
   UpdateControls();
 }
 
-void QmitkMultiLabelManager::SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation)
+void QmitkMultiLabelManager::SetMultiLabelSegmentation(mitk::MultiLabelSegmentation* segmentation)
 {
   this->m_Controls->labelInspector->SetMultiLabelSegmentation(segmentation);
 
@@ -180,7 +180,7 @@ void QmitkMultiLabelManager::SetMultiLabelSegmentation(mitk::LabelSetImage* segm
   // which is triggered by the inspector when setting the segmentation or node 
 }
 
-mitk::LabelSetImage* QmitkMultiLabelManager::GetMultiLabelSegmentation() const
+mitk::MultiLabelSegmentation* QmitkMultiLabelManager::GetMultiLabelSegmentation() const
 {
   return this->m_Controls->labelInspector->GetMultiLabelSegmentation();
 }
@@ -477,7 +477,7 @@ void QmitkMultiLabelManager::OnLoadPreset()
   QmitkLoadMultiLabelPreset({ this->GetMultiLabelSegmentation() });
 }
 
-void QmitkMultiLabelManager::OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position) const
+void QmitkMultiLabelManager::OnGoToLabel(mitk::MultiLabelSegmentation::LabelValueType label, const mitk::Point3D& position) const
 {
   emit GoToLabel(label, position);
 }
@@ -556,13 +556,13 @@ void QmitkMultiLabelManager::RemoveSegmentationObserver()
   m_GroupRemovedObserver.Reset();
 }
 
-void QmitkMultiLabelManager::OnLabelEvent(mitk::LabelSetImage::LabelValueType /*labelValue*/)
+void QmitkMultiLabelManager::OnLabelEvent(mitk::MultiLabelSegmentation::LabelValueType /*labelValue*/)
 {
   if (!m_Controls->labelInspector->GetModelManipulationOngoing())
     this->UpdateControls();
 }
 
-void QmitkMultiLabelManager::OnGroupEvent(mitk::LabelSetImage::GroupIndexType /*groupIndex*/)
+void QmitkMultiLabelManager::OnGroupEvent(mitk::MultiLabelSegmentation::GroupIndexType /*groupIndex*/)
 {
   if (!m_Controls->labelInspector->GetModelManipulationOngoing())
     this->UpdateControls();

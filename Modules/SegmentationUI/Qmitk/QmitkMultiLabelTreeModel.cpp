@@ -156,7 +156,7 @@ public:
     return nullptr;
   };
 
-  mitk::LabelSetImage::LabelValueType GetLabelValue() const
+  mitk::MultiLabelSegmentation::LabelValueType GetLabelValue() const
   {
     auto label = this->GetLabel();
 
@@ -169,14 +169,14 @@ public:
   };
 
   /** returns a vector containing all label values of referenced by this item or its child items.*/
-  std::vector< mitk::LabelSetImage::LabelValueType> GetLabelsInSubTree() const
+  std::vector< mitk::MultiLabelSegmentation::LabelValueType> GetLabelsInSubTree() const
   {
     if (this->m_ItemType == ItemType::Instance)
     {
       return { this->GetLabelValue() };
     }
 
-    std::vector< mitk::LabelSetImage::LabelValueType> result;
+    std::vector< mitk::MultiLabelSegmentation::LabelValueType> result;
     for (const auto child : this->m_childItems)
     {
       auto childresult = child->GetLabelsInSubTree();
@@ -528,7 +528,7 @@ QModelIndex QmitkMultiLabelTreeModel::index(int row, int column, const QModelInd
 
 QModelIndex QmitkMultiLabelTreeModel::indexOfLabel(mitk::Label::PixelType labelValue) const
 {
-  if (labelValue == mitk::LabelSetImage::UNLABELED_VALUE) return QModelIndex();
+  if (labelValue == mitk::MultiLabelSegmentation::UNLABELED_VALUE) return QModelIndex();
   auto relevantItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
   if (nullptr == relevantItem)
@@ -544,7 +544,7 @@ QModelIndex QmitkMultiLabelTreeModel::indexOfLabel(mitk::Label::PixelType labelV
   return GetIndexByItem(relevantItem, this);
 }
 
-QModelIndex QmitkMultiLabelTreeModel::indexOfGroup(mitk::LabelSetImage::GroupIndexType groupIndex) const
+QModelIndex QmitkMultiLabelTreeModel::indexOfGroup(mitk::MultiLabelSegmentation::GroupIndexType groupIndex) const
 {
   auto relevantItem = GetGroupItem(groupIndex, this->m_RootItem.get());
 
@@ -756,13 +756,13 @@ QVariant QmitkMultiLabelTreeModel::headerData(int section, Qt::Orientation orien
   return QVariant();
 }
 
-const mitk::LabelSetImage* QmitkMultiLabelTreeModel::GetSegmentation() const
+const mitk::MultiLabelSegmentation* QmitkMultiLabelTreeModel::GetSegmentation() const
 {
   return m_Segmentation;
 }
 
 
-void QmitkMultiLabelTreeModel::SetSegmentation(mitk::LabelSetImage* segmentation)
+void QmitkMultiLabelTreeModel::SetSegmentation(mitk::MultiLabelSegmentation* segmentation)
 {
   if (m_Segmentation != segmentation)
   {
@@ -820,7 +820,7 @@ void QmitkMultiLabelTreeModel::GenerateInternalGroupTree(unsigned int groupID, Q
 
   for (auto& label : labels)
   {
-    if (label->GetValue()== mitk::LabelSetImage::UNLABELED_VALUE) continue;
+    if (label->GetValue()== mitk::MultiLabelSegmentation::UNLABELED_VALUE) continue;
 
     bool newItemCreated = false;
     AddLabelToGroupTree(label, groupItem, newItemCreated);
@@ -916,7 +916,7 @@ void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
   GroupIndexType groupIndex = m_Segmentation->GetGroupIndexOfLabel(labelValue);
   auto label = m_Segmentation->GetLabel(labelValue);
   if (label.IsNull()) mitkThrow() << "Invalid internal state. Segmentation signaled the addition of a label that does not exist in the segmentation. Invalid label value:" << labelValue;
-  if (labelValue == mitk::LabelSetImage::UNLABELED_VALUE) return;
+  if (labelValue == mitk::MultiLabelSegmentation::UNLABELED_VALUE) return;
 
   auto groupItem = GetGroupItem(groupIndex, this->m_RootItem.get());
 
@@ -962,7 +962,7 @@ void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
 
 void QmitkMultiLabelTreeModel::OnLabelModified(LabelValueType labelValue)
 {
-  if (labelValue == mitk::LabelSetImage::UNLABELED_VALUE) return;
+  if (labelValue == mitk::MultiLabelSegmentation::UNLABELED_VALUE) return;
 
   auto instanceItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
@@ -989,7 +989,7 @@ void QmitkMultiLabelTreeModel::OnLabelModified(LabelValueType labelValue)
 
 void QmitkMultiLabelTreeModel::OnLabelRemoved(LabelValueType labelValue)
 {
-  if (labelValue == mitk::LabelSetImage::UNLABELED_VALUE) return;
+  if (labelValue == mitk::MultiLabelSegmentation::UNLABELED_VALUE) return;
   auto instanceItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
   if (nullptr == instanceItem)

@@ -552,8 +552,6 @@ namespace mitk
      */
     unsigned int GetTotalNumberOfLabels() const;
 
-    void MaskStamp(mitk::Image *mask, bool forceOverwrite);
-
     void SetActiveLayer(unsigned int layer);
     void SetActiveLabel(LabelValueType label);
 
@@ -595,9 +593,6 @@ namespace mitk
 
     template <typename ImageType>
     void EraseLabelProcessing(ImageType *input, PixelType index);
-
-    template <typename ImageType>
-    void MaskStampProcessing(ImageType *input, mitk::Image *mask, bool forceOverwrite);
 
     template <typename MultiLabelSegmentationType, typename ImageType>
     void InitializeByLabeledImageProcessing(MultiLabelSegmentationType *input, const ImageType *other);

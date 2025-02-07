@@ -34,6 +34,9 @@
         <property name="text">
          <string>Initialize</string>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -77,9 +80,6 @@
         <property name="checked">
          <bool>true</bool>
         </property>
-        <property name="autoExclusive">
-         <bool>true</bool>
-        </property>
        </widget>
       </item>
       <item>
@@ -96,9 +96,6 @@
         </property>
         <property name="checked">
          <bool>false</bool>
-        </property>
-        <property name="autoExclusive">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -132,9 +129,6 @@
         <property name="checkable">
          <bool>true</bool>
         </property>
-        <property name="autoExclusive">
-         <bool>true</bool>
-        </property>
        </widget>
       </item>
       <item>
@@ -153,9 +147,6 @@
          </size>
         </property>
         <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="autoExclusive">
          <bool>true</bool>
         </property>
        </widget>
@@ -178,9 +169,6 @@
         <property name="checkable">
          <bool>true</bool>
         </property>
-        <property name="autoExclusive">
-         <bool>true</bool>
-        </property>
        </widget>
       </item>
       <item>
@@ -199,9 +187,6 @@
          </size>
         </property>
         <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="autoExclusive">
          <bool>true</bool>
         </property>
        </widget>

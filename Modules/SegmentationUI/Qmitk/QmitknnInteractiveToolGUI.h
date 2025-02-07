@@ -14,6 +14,10 @@ found in the LICENSE file.
 #define QmitknnInteractiveToolGUI_h
 
 #include "QmitkSegWithPreviewToolGUIBase.h"
+#include <mitknnInteractiveTool.h>
+
+class QButtonGroup;
+class QPushButton;
 
 namespace Ui
 {
@@ -33,9 +37,25 @@ protected:
   ~QmitknnInteractiveToolGUI() override;
 
   void InitializeUI(QBoxLayout* mainLayout) override;
+  void ThemeIcons();
+  void InitializePromptType();
+  void InitializeToolButtons();
+
+  void OnInitializeButtonToggled(bool checked);
+
+  void OnPromptTypeChanged();
+
+  void OnPointToolToggled(bool checked);
+  void OnBoxToolToggled(bool checked);
+  void OnScribbleToolToggled(bool checked);
+  void OnLassoToolToggled(bool checked);
+
+  void SwitchOffOtherTools(QPushButton* toolButton);
 
 private:
   Ui::QmitknnInteractiveToolGUI* m_Ui;
+  QButtonGroup* m_PromptTypeButtonGroup;
+  mitk::nnInteractiveTool::PromptType m_PromptType;
 };
 
 #endif

@@ -20,6 +20,12 @@ namespace mitk
   class nnInteractiveTool : public SegWithPreviewTool
   {
   public:
+    enum PromptType
+    {
+      Positive,
+      Negative
+    };
+
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool);
     itkFactorylessNewMacro(Self);
 

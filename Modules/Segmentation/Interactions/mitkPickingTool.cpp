@@ -239,7 +239,7 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
 
 }
 
-void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep)
 {
   if (nullptr != oldSegAtTimeStep && nullptr != previewImage && m_PointSet.IsNotNull())
   {
@@ -249,7 +249,7 @@ void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
       const auto activeValue = this->GetActiveLabelValueOfPreview();
       this->SetSelectedLabels({activeValue});
 
-      AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry(), activeValue, mitk::LabelSetImage::UNLABELED_VALUE, emptyTimeStep));
+      AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry(), activeValue, mitk::MultiLabelSegmentation::UNLABELED_VALUE, emptyTimeStep));
     }
     if (emptyTimeStep)
     {

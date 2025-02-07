@@ -21,7 +21,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** \brief Converts an binary image to a LabelSetImage. The amount of labels equals the connected components.
+  /** \brief Converts an binary image to a MultiLabelSegmentation. The amount of labels equals the connected components.
    */
   class MITKMODELFIT_EXPORT BinaryImageToLabelSetImageFilter : public ImageToImageFilter
   {

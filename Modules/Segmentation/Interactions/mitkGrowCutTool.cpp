@@ -77,7 +77,7 @@ bool mitk::GrowCutTool::SeedImageIsValid()
   }
 
   auto *workingDataLabelSetImage =
-    dynamic_cast<mitk::LabelSetImage *>(this->GetToolManager()->GetWorkingData(0)->GetData());
+    dynamic_cast<mitk::MultiLabelSegmentation *>(this->GetToolManager()->GetWorkingData(0)->GetData());
 
   if (nullptr == workingDataLabelSetImage)
   {
@@ -96,7 +96,7 @@ bool mitk::GrowCutTool::SeedImageIsValid()
 
 void mitk::GrowCutTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                         const Image * oldSegAtTimeStep,
-                                        LabelSetImage *previewImage,
+                                        MultiLabelSegmentation *previewImage,
                                         TimeStepType timeStep)
 {
   if (nullptr != inputAtTimeStep &&

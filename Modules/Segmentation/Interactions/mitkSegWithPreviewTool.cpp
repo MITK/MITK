@@ -85,7 +85,7 @@ bool mitk::SegWithPreviewTool::CanHandle(const BaseData* referenceData, const Ba
   if (referenceImage == nullptr)
     return false;
 
-  auto* labelSet = dynamic_cast<const LabelSetImage*>(workingData);
+  auto* labelSet = dynamic_cast<const MultiLabelSegmentation*>(workingData);
   if (labelSet != nullptr)
     return true;
 
@@ -194,24 +194,24 @@ void  mitk::SegWithPreviewTool::InitiateToolByInput()
   //implement in derived classes to change behavior
 }
 
-mitk::LabelSetImage* mitk::SegWithPreviewTool::GetPreviewSegmentation()
+mitk::MultiLabelSegmentation* mitk::SegWithPreviewTool::GetPreviewSegmentation()
 {
   if (m_PreviewSegmentationNode.IsNull())
   {
     return nullptr;
   }
 
-  return dynamic_cast<LabelSetImage*>(m_PreviewSegmentationNode->GetData());
+  return dynamic_cast<MultiLabelSegmentation*>(m_PreviewSegmentationNode->GetData());
 }
 
-const mitk::LabelSetImage* mitk::SegWithPreviewTool::GetPreviewSegmentation() const
+const mitk::MultiLabelSegmentation* mitk::SegWithPreviewTool::GetPreviewSegmentation() const
 {
   if (m_PreviewSegmentationNode.IsNull())
   {
     return nullptr;
   }
 
-  return dynamic_cast<LabelSetImage*>(m_PreviewSegmentationNode->GetData());
+  return dynamic_cast<MultiLabelSegmentation*>(m_PreviewSegmentationNode->GetData());
 }
 
 mitk::DataNode* mitk::SegWithPreviewTool::GetPreviewSegmentationNode()
@@ -261,8 +261,8 @@ void mitk::SegWithPreviewTool::ResetPreviewContent()
   if (nullptr != previewImage)
   {
     auto castedPreviewImage =
-      dynamic_cast<LabelSetImage*>(previewImage);
-    if (nullptr == castedPreviewImage) mitkThrow() << "Application is on wrong state / invalid tool implementation. Preview image should always be of type LabelSetImage now.";
+      dynamic_cast<MultiLabelSegmentation*>(previewImage);
+    if (nullptr == castedPreviewImage) mitkThrow() << "Application is on wrong state / invalid tool implementation. Preview image should always be of type MultiLabelSegmentation now.";
     castedPreviewImage->ClearBuffer();
   }
 }
@@ -282,8 +282,8 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
   const auto image = this->GetSegmentationInput();
   if (nullptr != image)
   {
-    LabelSetImage::ConstPointer workingImage =
-      dynamic_cast<const LabelSetImage *>(this->GetToolManager()->GetWorkingData(0)->GetData());
+    MultiLabelSegmentation::ConstPointer workingImage =
+      dynamic_cast<const MultiLabelSegmentation *>(this->GetToolManager()->GetWorkingData(0)->GetData());
 
     if (workingImage.IsNotNull())
     {
@@ -367,7 +367,7 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
 
 mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMapping() const
 {
-  LabelSetImage::LabelValueType offset = 0;
+  MultiLabelSegmentation::LabelValueType offset = 0;
   
   if (LabelTransferMode::AddLabel == m_LabelTransferMode && LabelTransferScope::ActiveLabel!=m_LabelTransferScope)
   {
@@ -450,7 +450,7 @@ void mitk::SegWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage,
       auto sourceSlice = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), sourceImage, timeStep);
       auto resultSlice =
         SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), destinationImage, timeStep)->Clone();
-      auto destLSImage = dynamic_cast<LabelSetImage *>(destinationImage);
+      auto destLSImage = dynamic_cast<MultiLabelSegmentation *>(destinationImage);
       //We need to transfer explicitly to a copy of the current working image to ensure that labelMapping is done and things
       //like merge style, overwrite style and locks are regarded.
       TransferLabelContentAtTimeStep(sourceSlice,
@@ -468,8 +468,8 @@ void mitk::SegWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage,
     }
     else
     { //take care of the full segmentation volume
-      auto sourceLSImage = dynamic_cast<const LabelSetImage*>(sourceImage);
-      auto destLSImage = dynamic_cast<LabelSetImage*>(destinationImage);
+      auto sourceLSImage = dynamic_cast<const MultiLabelSegmentation*>(sourceImage);
+      auto destLSImage = dynamic_cast<MultiLabelSegmentation*>(destinationImage);
 
       TransferLabelContentAtTimeStep(sourceLSImage, destLSImage, timeStep, labelMapping, m_MergeStyle, m_OverwriteStyle);
     }
@@ -586,7 +586,7 @@ bool mitk::SegWithPreviewTool::EnsureUpToDateUserDefinedActiveLabel()
   bool labelChanged = true;
 
   const auto workingImage = dynamic_cast<const Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
-  if (const auto& labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage))
+  if (const auto& labelSetImage = dynamic_cast<const MultiLabelSegmentation*>(workingImage))
   {
     // this is a fix for T28131 / T28986, which should be refactored if T28524 is being worked on
     auto newLabel = labelSetImage->GetActiveLabel()->GetValue();
@@ -722,12 +722,12 @@ void mitk::SegWithPreviewTool::ConfirmCleanUp()
 }
 
 void mitk::SegWithPreviewTool::TransferLabelInformation(const LabelMappingType& labelMapping,
-  const mitk::LabelSetImage* source, mitk::LabelSetImage* target)
+  const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target)
 {
   for (const auto& [sourceLabel, targetLabel] : labelMapping)
   {
-    if (LabelSetImage::UNLABELED_VALUE != sourceLabel &&
-        LabelSetImage::UNLABELED_VALUE != targetLabel &&
+    if (MultiLabelSegmentation::UNLABELED_VALUE != sourceLabel &&
+        MultiLabelSegmentation::UNLABELED_VALUE != targetLabel &&
         !target->ExistLabel(targetLabel, target->GetActiveLayer()))
     {
       if (!source->ExistLabel(sourceLabel, source->GetActiveLayer()))
@@ -748,7 +748,7 @@ void mitk::SegWithPreviewTool::PreparePreviewToResultTransfer(const LabelMapping
 
   if (resultSegmentationNode.IsNotNull())
   {
-    auto resultSegmentation = dynamic_cast<LabelSetImage*>(resultSegmentationNode->GetData());
+    auto resultSegmentation = dynamic_cast<MultiLabelSegmentation*>(resultSegmentationNode->GetData());
 
     if (nullptr == resultSegmentation)
     {
@@ -765,7 +765,7 @@ mitk::TimePointType mitk::SegWithPreviewTool::GetLastTimePointOfUpdate() const
   return m_LastTimePointOfUpdate;
 }
 
-mitk::LabelSetImage::LabelValueType mitk::SegWithPreviewTool::GetActiveLabelValueOfPreview() const
+mitk::MultiLabelSegmentation::LabelValueType mitk::SegWithPreviewTool::GetActiveLabelValueOfPreview() const
 {
   const auto previewImage = this->GetPreviewSegmentation();
   const auto activeLabel = previewImage->GetActiveLabel();
@@ -821,17 +821,17 @@ mitk::DataNode* mitk::SegWithPreviewTool::GetTargetSegmentationNode() const
   return this->GetToolManager()->GetWorkingData(0);
 }
 
-mitk::LabelSetImage* mitk::SegWithPreviewTool::GetTargetSegmentation() const
+mitk::MultiLabelSegmentation* mitk::SegWithPreviewTool::GetTargetSegmentation() const
 {
   auto node = this->GetTargetSegmentationNode();
 
   if (nullptr == node)
     return nullptr;
 
-  return dynamic_cast<LabelSetImage*>(node->GetData());
+  return dynamic_cast<MultiLabelSegmentation*>(node->GetData());
 }
 
-void mitk::SegWithPreviewTool::TransferLabelSetImageContent(const LabelSetImage* source, LabelSetImage* target, TimeStepType timeStep)
+void mitk::SegWithPreviewTool::TransferLabelSetImageContent(const MultiLabelSegmentation* source, MultiLabelSegmentation* target, TimeStepType timeStep)
 {
   mitk::ImageReadAccessor newMitkImgAcc(source);
 

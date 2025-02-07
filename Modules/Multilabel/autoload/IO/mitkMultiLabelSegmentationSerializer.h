@@ -18,7 +18,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  \brief Serializes mitk::LabelSetImage for mitk::SceneIO
+  \brief Serializes mitk::MultiLabelSegmentation for mitk::SceneIO
   */
   class LabelSetImageSerializer : public BaseDataSerializer
   {

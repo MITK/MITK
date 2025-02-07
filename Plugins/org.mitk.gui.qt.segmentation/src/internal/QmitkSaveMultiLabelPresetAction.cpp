@@ -22,7 +22,7 @@ void QmitkSaveMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &
     if (node.IsNull())
       continue;
 
-    mitk::LabelSetImage::Pointer image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+    mitk::MultiLabelSegmentation::Pointer image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
 
     if (image.IsNull())
       continue;

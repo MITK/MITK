@@ -30,13 +30,13 @@ class QmitkMultiLabelTreeModelTestSuite : public mitk::TestFixture
 
   CPPUNIT_TEST_SUITE_END();
 
-  mitk::LabelSetImage::Pointer m_Segmentation;
+  mitk::MultiLabelSegmentation::Pointer m_Segmentation;
 
 public:
-  mitk::LabelSetImage::Pointer GenerateSegmentation()
+  mitk::MultiLabelSegmentation::Pointer GenerateSegmentation()
   {
     // Create a new labelset image
-    auto seg = mitk::LabelSetImage::New();
+    auto seg = mitk::MultiLabelSegmentation::New();
     mitk::Image::Pointer regularImage = mitk::Image::New();
     unsigned int dimensions[3] = { 5, 5, 5 };
     regularImage->Initialize(mitk::MakeScalarPixelType<char>(), 3, dimensions);
@@ -73,7 +73,7 @@ public:
   *  - Label B
   *   - Instance 9 (6)
   */
-  void PopulateSegmentation(mitk::LabelSetImage* seg)
+  void PopulateSegmentation(mitk::MultiLabelSegmentation* seg)
   {
     seg->SetActiveLayer(0);
 

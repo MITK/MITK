@@ -257,27 +257,27 @@ void QmitkSegmentationView::OnAnySelectionChanged()
   this->UpdateGUI();
 }
 
-void QmitkSegmentationView::OnLabelAdded(mitk::LabelSetImage::LabelValueType)
+void QmitkSegmentationView::OnLabelAdded(mitk::MultiLabelSegmentation::LabelValueType)
 {
   this->ValidateSelectionInput();
 }
 
-void QmitkSegmentationView::OnLabelRemoved(mitk::LabelSetImage::LabelValueType)
+void QmitkSegmentationView::OnLabelRemoved(mitk::MultiLabelSegmentation::LabelValueType)
 {
   this->ValidateSelectionInput();
 }
 
-void QmitkSegmentationView::OnGroupRemoved(mitk::LabelSetImage::GroupIndexType)
+void QmitkSegmentationView::OnGroupRemoved(mitk::MultiLabelSegmentation::GroupIndexType)
 {
   this->ValidateSelectionInput();
 }
 
-mitk::LabelSetImage* QmitkSegmentationView::GetWorkingImage()
+mitk::MultiLabelSegmentation* QmitkSegmentationView::GetWorkingImage()
 {
   if (m_WorkingNode.IsNull())
     return nullptr;
 
-  return dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  return dynamic_cast<mitk::MultiLabelSegmentation*>(m_WorkingNode->GetData());
 }
 
 void QmitkSegmentationView::AddObserversToWorkingImage()
@@ -334,7 +334,7 @@ void QmitkSegmentationView::OnLabelToggleShortcutActivated()
     return;
   }
 
-  auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  auto workingImage = dynamic_cast<mitk::MultiLabelSegmentation*>(m_WorkingNode->GetData());
   if (nullptr == workingImage)
   {
     return;
@@ -408,7 +408,7 @@ void QmitkSegmentationView::OnNewSegmentation()
     return;
   }
 
-  auto newLabelSetImage = dynamic_cast<mitk::LabelSetImage*>(newSegmentationNode->GetData());
+  auto newLabelSetImage = dynamic_cast<mitk::MultiLabelSegmentation*>(newSegmentationNode->GetData());
   if (nullptr == newLabelSetImage)
   {
     // something went wrong
@@ -495,7 +495,7 @@ void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManage
   m_Controls->slicesInterpolator->SetActiveLabelValue(labelValue);
 }
 
-void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType /*label*/, const mitk::Point3D& pos)
+void QmitkSegmentationView::OnGoToLabel(mitk::MultiLabelSegmentation::LabelValueType /*label*/, const mitk::Point3D& pos)
 {
   if (m_RenderWindowPart)
   {
@@ -516,12 +516,12 @@ void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rena
   canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, nullptr, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
 }
 
-mitk::LabelSetImage* QmitkSegmentationView::GetCurrentSegmentation() const
+mitk::MultiLabelSegmentation* QmitkSegmentationView::GetCurrentSegmentation() const
 {
   auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
   if (workingNode.IsNull()) mitkThrow() << "Segmentation view is in an invalid state. Working node is null, but a label selection change has been triggered.";
 
-  auto segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  auto segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData());
   if (nullptr == segmentation) mitkThrow() << "Segmentation view is in an invalid state. Working node contains no segmentation, but a label selection change has been triggered.";
 
   return segmentation;
@@ -791,7 +791,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   context->ungetService(ppmRef);
   service = nullptr;
 
-  auto image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  auto image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
   mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
 }
 
@@ -823,7 +823,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     return;
   }
 
-  auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  auto labelSetImage = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
   if (nullptr == labelSetImage)
   {
     return;
@@ -1005,7 +1005,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     m_Controls->toolSelectionBox2D->setEnabled(true);
     m_Controls->toolSelectionBox3D->setEnabled(true);
 
-    auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+    auto labelSetImage = dynamic_cast<mitk::MultiLabelSegmentation *>(workingNode->GetData());
     numberOfLabels = labelSetImage->GetTotalNumberOfLabels();
 
     if (numberOfLabels > 0)

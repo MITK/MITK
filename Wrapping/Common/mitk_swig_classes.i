@@ -70,7 +70,7 @@ SWIG_ADD_NONOBJECT_CLASS(Vector4D, mitkVector.h, mitk)
 SWIG_ADD_MITK_CLASS(BaseData, mitkBaseData.h, mitk)
 SWIG_ADD_MITK_CLASS(SlicedData, mitkSlicedData.h, mitk)
 SWIG_ADD_MITK_CLASS(Image, mitkImage.h, mitk)
-SWIG_ADD_MITK_CLASS(LabelSetImage, mitkLabelSetImage.h, mitk)
+SWIG_ADD_MITK_CLASS(MultiLabelSegmentation, mitkLabelSetImage.h, mitk)
 SWIG_ADD_MITK_CLASS(PointSet, mitkPointSet.h, mitk)
 %{
 using mitk::Message;

@@ -111,7 +111,7 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   auto node = m_Controls->segNodeSelector->GetSelectedNodes().front();
 
-  auto seg = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  auto seg = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
 
   auto selectedLabelValues = seg->GetAllLabelValues();
   if (m_Controls->checkExtractSelected->isChecked())

@@ -25,7 +25,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  void DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(LabelSetImage* dicomSegImage)
+  void DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(MultiLabelSegmentation* dicomSegImage)
   {
     PropertyList::Pointer propertyList = dicomSegImage->GetPropertyList();
 

@@ -44,7 +44,7 @@ QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()
     mitk::NodePredicateProperty::New("helper object"));
 
   m_SegmentationPredicate = mitk::NodePredicateAnd::New(
-    mitk::TNodePredicateDataType<mitk::LabelSetImage>::New(),
+    mitk::TNodePredicateDataType<mitk::MultiLabelSegmentation>::New(),
     notHelperObject);
 
   m_SegmentationTaskListPredicate = mitk::NodePredicateAnd::New(
@@ -119,7 +119,7 @@ void QmitkSegmentationFlowControlView::UpdateControls()
 
 void QmitkSegmentationFlowControlView::NodeAdded(const mitk::DataNode* node)
 {
-  if (dynamic_cast<const mitk::LabelSetImage*>(node->GetData()) != nullptr)
+  if (dynamic_cast<const mitk::MultiLabelSegmentation*>(node->GetData()) != nullptr)
     this->UpdateControls();
 
   if (m_Controls->segmentationTaskListWidget->isVisible())
@@ -128,13 +128,13 @@ void QmitkSegmentationFlowControlView::NodeAdded(const mitk::DataNode* node)
 
 void QmitkSegmentationFlowControlView::NodeChanged(const mitk::DataNode* node)
 {
-  if (dynamic_cast<const mitk::LabelSetImage*>(node->GetData()) != nullptr)
+  if (dynamic_cast<const mitk::MultiLabelSegmentation*>(node->GetData()) != nullptr)
     this->UpdateControls();
 }
 
 void QmitkSegmentationFlowControlView::NodeRemoved(const mitk::DataNode* node)
 {
-  if (dynamic_cast<const mitk::LabelSetImage*>(node->GetData()) != nullptr)
+  if (dynamic_cast<const mitk::MultiLabelSegmentation*>(node->GetData()) != nullptr)
     this->UpdateControls();
 
   if (m_Controls->segmentationTaskListWidget->isVisible())

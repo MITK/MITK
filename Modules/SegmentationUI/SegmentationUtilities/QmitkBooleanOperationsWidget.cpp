@@ -69,14 +69,14 @@ void QmitkBooleanOperationsWidget::OnSegSelectionChanged(QmitkAbstractNodeSelect
   this->ConfigureWidgets();
 }
 
-void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::LabelSetImage::LabelValueVectorType /*labels*/)
+void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::MultiLabelSegmentation::LabelValueVectorType /*labels*/)
 {
   this->ConfigureWidgets();
 }
 
 namespace
 {
-  std::string GenerateLabelHTML(const mitk::Label* label, const mitk::LabelSetImage* segmentation)
+  std::string GenerateLabelHTML(const mitk::Label* label, const mitk::MultiLabelSegmentation* segmentation)
   {
     std::stringstream stream;
     auto color = label->GetColor();
@@ -89,7 +89,7 @@ namespace
     stream << "<font class=\"normal\"> " << label->GetName();
     if (segmentation->GetLabelValuesByName(segmentation->GetGroupIndexOfLabel(label->GetValue()), label->GetName()).size() > 1)
     {
-      stream << " [" << label->GetValue() << "]";
+      stream << " [" << label->GetTrackingID() << "]";
     }
     stream << "</font>";
     return stream.str();
@@ -164,7 +164,7 @@ void QmitkBooleanOperationsWidget::OnDifferenceButtonClicked()
 
   auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
   auto minuend = selectedLabelValues.front();
-  auto subtrahends = mitk::LabelSetImage::LabelValueVectorType(selectedLabelValues.begin() + 1, selectedLabelValues.end());
+  auto subtrahends = mitk::MultiLabelSegmentation::LabelValueVectorType(selectedLabelValues.begin() + 1, selectedLabelValues.end());
 
   auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
 

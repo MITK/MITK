@@ -225,7 +225,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(const Image *ori
 
   // actually create a new empty segmentation
   PixelType pixelType(mitk::MakeScalarPixelType<DefaultSegmentationDataType>());
-  LabelSetImage::Pointer segmentation = LabelSetImage::New();
+  MultiLabelSegmentation::Pointer segmentation = MultiLabelSegmentation::New();
 
   if (original->GetDimension() == 2)
   {

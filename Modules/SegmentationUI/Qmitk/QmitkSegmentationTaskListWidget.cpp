@@ -816,7 +816,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
   const auto current = m_CurrentTaskIndex.value();
 
   mitk::Image::Pointer image;
-  mitk::LabelSetImage::Pointer segmentation;
+  mitk::MultiLabelSegmentation::Pointer segmentation;
   mitk::DataStorage::Pointer scene;
 
   // If the task has a scene, unload everything from before and load the scene.
@@ -884,16 +884,16 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
 
     if (fs::exists(resultPath))
     {
-      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(resultPath.string());
+      segmentation = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(resultPath.string());
     }
     else if (fs::exists(interimPath))
     {
-      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(interimPath.string());
+      segmentation = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(interimPath.string());
     }
     else if (m_TaskList->HasSegmentation(current))
     {
       const auto segmentationPath = m_TaskList->GetAbsolutePath(m_TaskList->GetSegmentation(current));
-      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(segmentationPath.string());
+      segmentation = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(segmentationPath.string());
     }
   }
   catch (const mitk::Exception& e)
@@ -948,7 +948,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       }
       else
       {
-        segmentation = dynamic_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
+        segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(segmentationNode->GetData());
 
         if (segmentation.IsNull())
         {
@@ -1012,7 +1012,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     }
 
     segmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(imageNode, templateImage, name);
-    segmentation = static_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
+    segmentation = static_cast<mitk::MultiLabelSegmentation*>(segmentationNode->GetData());
 
     if (m_TaskList->HasPreset(current))
     {
@@ -1099,7 +1099,7 @@ void QmitkSegmentationTaskListWidget::SubscribeToActiveSegmentation()
 {
   if (m_ActiveTaskIndex.has_value() && m_SegmentationNode != nullptr)
   {
-    auto segmentation = static_cast<mitk::LabelSetImage*>(m_SegmentationNode->GetData());
+    auto segmentation = static_cast<mitk::MultiLabelSegmentation*>(m_SegmentationNode->GetData());
 
     auto command = itk::SimpleMemberCommand<QmitkSegmentationTaskListWidget>::New();
     command->SetCallbackFunction(this, &QmitkSegmentationTaskListWidget::OnSegmentationModified);
@@ -1114,7 +1114,7 @@ void QmitkSegmentationTaskListWidget::UnsubscribeFromActiveSegmentation()
   {
     if (m_SegmentationNode != nullptr)
     {
-      auto segmentation = static_cast<mitk::LabelSetImage*>(m_SegmentationNode->GetData());
+      auto segmentation = static_cast<mitk::MultiLabelSegmentation*>(m_SegmentationNode->GetData());
       segmentation->RemoveObserver(m_SegmentationModifiedObserverTag.value());
     }
 

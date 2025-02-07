@@ -18,11 +18,11 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class LabelSetImage;
+  class MultiLabelSegmentation;
 
   //##Documentation
   //## @brief Superclass of all classes generating labelset images (instances
-  //## of class LabelSetImage) as output.
+  //## of class MultiLabelSegmentation) as output.
   //##
   //## @ingroup Process
   class MITKMULTILABEL_EXPORT LabelSetImageSource : public ImageSource
@@ -31,7 +31,7 @@ namespace mitk
     mitkClassMacro(LabelSetImageSource, ImageSource);
     itkNewMacro(Self);
 
-    typedef LabelSetImage OutputType;
+    typedef MultiLabelSegmentation OutputType;
     typedef itk::DataObject::Pointer DataObjectPointer;
 
     mitkBaseDataSourceGetOutputDeclarations

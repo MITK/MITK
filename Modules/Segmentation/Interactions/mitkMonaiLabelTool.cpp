@@ -290,10 +290,10 @@ namespace
   }
 
   /**
-   * @brief Applies the give std::map lookup table on the preview segmentation LabelSetImage.
+   * @brief Applies the give std::map lookup table on the preview segmentation MultiLabelSegmentation.
    */
-  void MapLabelsToSegmentation(const mitk::LabelSetImage *source,
-                               mitk::LabelSetImage *dest,
+  void MapLabelsToSegmentation(const mitk::MultiLabelSegmentation *source,
+                               mitk::MultiLabelSegmentation *dest,
                                const std::map<std::string, mitk::Label::PixelType> &labelMap)
   {
     if (labelMap.empty())
@@ -365,7 +365,7 @@ mitk::Image::Pointer mitk::MonaiLabelTool::ApplyLevelWindowEffect(const Image *i
 
 void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                            const Image * /*oldSegAtTimeStep*/,
-                                           LabelSetImage *previewImage,
+                                           MultiLabelSegmentation *previewImage,
                                            TimeStepType timeStep)
 {
   if (nullptr == m_RequestParameters || (m_RequestParameters->model.IsInteractive() && !this->HasPicks()))
@@ -394,7 +394,7 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
     this->WriteImage(filteredImage, inputImagePath);
     this->PostInferRequest(hostName, port, inputImagePath, outputImagePath, inputAtTimeStep->GetGeometry());
     auto outputImage = IOUtil::Load<Image>(outputImagePath);
-    auto outputBuffer = mitk::LabelSetImage::New();
+    auto outputBuffer = mitk::MultiLabelSegmentation::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
     std::map<std::string, mitk::Label::PixelType> labelMap; // empty map
     if (m_RequestParameters->model.IsInteractive())

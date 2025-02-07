@@ -38,7 +38,7 @@ void QmitkConvertToMultiLabelSegmentationAction::Run( const QList<mitk::DataNode
         continue;
       }
 
-      mitk::LabelSetImage::Pointer lsImage = mitk::LabelSetImage::New();
+      mitk::MultiLabelSegmentation::Pointer lsImage = mitk::MultiLabelSegmentation::New();
       try
       {
         lsImage->InitializeByLabeledImage(referenceImage);

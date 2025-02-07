@@ -32,7 +32,7 @@ public:
 
   unsigned int GetNumberOfMasks() const override;
 
-  itkSetConstObjectMacro(MultiLabelSegmentation, LabelSetImage);
+  itkSetConstObjectMacro(MultiLabelSegmentation, MultiLabelSegmentation);
 
 protected:
   MultiLabelMaskGenerator() = default;
@@ -41,7 +41,7 @@ protected:
   Image::ConstPointer DoGetMask(unsigned int maskID) override;
 
 private:
-    mitk::LabelSetImage::ConstPointer m_MultiLabelSegmentation;
+    mitk::MultiLabelSegmentation::ConstPointer m_MultiLabelSegmentation;
 };
 
 }

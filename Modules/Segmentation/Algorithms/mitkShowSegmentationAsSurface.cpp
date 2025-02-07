@@ -96,7 +96,7 @@ namespace mitk
               << applyMedian << " median kernel " << medianKernelSize << " mesh reduction " << decimateMesh
               << " reductionRate " << reductionRate;
 
-    auto labelSetImage = dynamic_cast<LabelSetImage *>(image.GetPointer());
+    auto labelSetImage = dynamic_cast<MultiLabelSegmentation *>(image.GetPointer());
 
     if (nullptr != labelSetImage)
     {

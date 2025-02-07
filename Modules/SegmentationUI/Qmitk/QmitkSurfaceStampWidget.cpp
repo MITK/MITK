@@ -79,7 +79,7 @@ void QmitkSurfaceStampWidget::OnStamp()
     return;
   }
 
-  mitk::LabelSetImage *workingImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+  mitk::MultiLabelSegmentation *workingImage = dynamic_cast<mitk::MultiLabelSegmentation *>(workingNode->GetData());
 
   if (!workingImage)
   {

@@ -55,7 +55,7 @@ namespace mitk
     ~OtsuTool3D() = default;
 
     void UpdatePrepare() override;
-    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) override;
 
     unsigned int m_NumberOfBins = 128;
     unsigned int m_NumberOfRegions = 2;

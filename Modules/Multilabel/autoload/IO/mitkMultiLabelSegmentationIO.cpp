@@ -43,7 +43,7 @@ namespace mitk
   const constexpr char* const MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY = "org.mitk.multilabel.segmentation.unlabeledlabellock";
 
   MultiLabelSegmentationIO::MultiLabelSegmentationIO()
-    : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Multilabel Segmentation")
+    : AbstractFileIO(MultiLabelSegmentation::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Multilabel Segmentation")
   {
     this->InitializeDefaultMetaDataKeys();
     AbstractFileWriter::SetRanking(10);
@@ -55,7 +55,7 @@ namespace mitk
   {
     if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
       return Unsupported;
-    const auto *input = static_cast<const LabelSetImage *>(this->GetInput());
+    const auto *input = static_cast<const MultiLabelSegmentation *>(this->GetInput());
     if (input)
       return Supported;
     else
@@ -66,7 +66,7 @@ namespace mitk
   {
     ValidateOutputLocation();
 
-    auto input = dynamic_cast<const LabelSetImage *>(this->GetInput());
+    auto input = dynamic_cast<const MultiLabelSegmentation *>(this->GetInput());
 
     mitk::LocaleSwitch localeSwitch("C");
 
@@ -183,7 +183,7 @@ namespace mitk
       mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfLayers() << "; found label groups: " << labelGroups.size();
     }
 
-    LabelSetImage::GroupIndexType id = 0;
+    MultiLabelSegmentation::GroupIndexType id = 0;
     for (auto [name, labels] : labelGroups)
     {
       output->ReplaceGroupLabels(id, labels);

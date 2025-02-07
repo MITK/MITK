@@ -110,7 +110,7 @@ void QmitkPixelValueView::Update()
   const auto timePoint = m_SliceNavigationListener.GetCurrentSelectedTimePoint();
   
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto isSegmentation = mitk::NodePredicateDataType::New("LabelSetImage");
+  auto isSegmentation = mitk::NodePredicateDataType::New("MultiLabelSegmentation");
 
   auto predicate = mitk::NodePredicateAnd::New();
   predicate->AddPredicate(mitk::NodePredicateNot::New(isSegmentation));

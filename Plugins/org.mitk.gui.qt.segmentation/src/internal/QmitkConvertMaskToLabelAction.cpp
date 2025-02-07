@@ -37,7 +37,7 @@ void QmitkConvertMaskToLabelAction::Run( const QList<mitk::DataNode::Pointer> &s
     return;
   }
 
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
+  mitk::MultiLabelSegmentation* workingImage = dynamic_cast<mitk::MultiLabelSegmentation*>( workingNode->GetData() );
   assert(workingImage);
 
   foreach ( mitk::DataNode::Pointer maskNode, selectedNodes )

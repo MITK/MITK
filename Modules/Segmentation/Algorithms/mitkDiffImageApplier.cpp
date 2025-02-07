@@ -161,7 +161,7 @@ void mitk::DiffImageApplier::ExecuteOperation(Operation *operation)
         image3D = timeSelector->GetOutput();
       }
 
-      auto labelSetImage = dynamic_cast<mitk::LabelSetImage* >(m_Image.GetPointer());
+      auto labelSetImage = dynamic_cast<mitk::MultiLabelSegmentation* >(m_Image.GetPointer());
 
       // this will do a long long if/else to find out both pixel types
       TransferLabelContentAtTimeStep(

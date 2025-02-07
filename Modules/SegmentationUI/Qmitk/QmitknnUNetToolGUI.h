@@ -33,7 +33,7 @@ found in the LICENSE file.
 class nnUNetCache
 {
 public:
-  mitk::LabelSetImage::ConstPointer m_SegCache;
+  mitk::MultiLabelSegmentation::ConstPointer m_SegCache;
   static size_t GetUniqueHash(std::vector<mitk::ModelParams> &requestQ)
   {
     size_t hashCode = 0;
@@ -239,7 +239,7 @@ private:
    * @brief Inserts the hash and segmentation into cache and
    * updates count on UI.
    */
-  void AddToCache(size_t&, mitk::LabelSetImage::ConstPointer);
+  void AddToCache(size_t&, mitk::MultiLabelSegmentation::ConstPointer);
 
   /**
    * @brief Checks all the entries of the ctkCheckableComboBox ui widget.

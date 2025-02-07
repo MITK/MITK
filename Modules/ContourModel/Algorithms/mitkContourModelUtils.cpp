@@ -222,7 +222,7 @@ void mitk::ContourModelUtils::FillContourInSlice(
 void mitk::ContourModelUtils::FillSliceInSlice(
   vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, const Image* image, int paintingPixelValue, double fillForegroundThreshold)
 {
-  auto labelImage = dynamic_cast<const LabelSetImage *>(image);
+  auto labelImage = dynamic_cast<const MultiLabelSegmentation *>(image);
   const auto numberOfPoints = filledImage->GetNumberOfPoints();
 
   if (nullptr == labelImage)
@@ -235,7 +235,7 @@ void mitk::ContourModelUtils::FillSliceInSlice(
   }
   else
   {
-    if (paintingPixelValue != LabelSetImage::UNLABELED_VALUE)
+    if (paintingPixelValue != MultiLabelSegmentation::UNLABELED_VALUE)
     {
       for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
       {
@@ -281,7 +281,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(c
 
 int mitk::ContourModelUtils::GetActivePixelValue(const Image* workingImage)
 {
-  auto labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage);
+  auto labelSetImage = dynamic_cast<const MultiLabelSegmentation*>(workingImage);
   int activePixelValue = 1;
   if (nullptr != labelSetImage)
   {

@@ -1679,19 +1679,41 @@ void mitk::TransferLabelContentAtTimeStep(
   {
     mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; sourceImage must not be null.";
   }
-
-  auto destinationLabels = destinationImage->GetConstLabelsByValue(destinationImage->GetLabelValuesByGroup(destinationImage->GetActiveLayer()));
-
-  for (const auto& mappingElement : labelMapping)
+  if (nullptr == destinationImage)
   {
-    if (MultiLabelSegmentation::UNLABELED_VALUE != mappingElement.first && !sourceImage->ExistLabel(mappingElement.first, sourceImage->GetActiveLayer()))
-    {
-      mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep. Defined source label does not exist in sourceImage. SourceLabel: " << mappingElement.first;
-    }
+    mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; destinationImage must not be null.";
   }
 
-  TransferLabelContentAtTimeStep(sourceImage, destinationImage, destinationLabels, timeStep, MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, destinationImage->GetUnlabeledLabelLock(),
-    labelMapping, mergeStyle, overwriteStlye);
+  //split all label mappings by source group id
+  using GroupToLabelValueMappingMap = std::map <MultiLabelSegmentation::GroupIndexType, LabelValueMappingVector >;
+  GroupToLabelValueMappingMap sourceGroupMappings;
+  for (const auto& mappingElement : labelMapping)
+  {
+    const auto groupID = sourceImage->GetGroupIndexOfLabel(mappingElement.first);
+    sourceGroupMappings[groupID].push_back(mappingElement);
+  }
+
+  //start transfer by iterating over relevant source groups
+  for (const auto& [sourceGroupID, grouplabelMapping] : sourceGroupMappings)
+  {
+    const auto sourceGroupImage = sourceImage->GetGroupImage(sourceGroupID);
+
+    //split all label mappings by destination group id
+    GroupToLabelValueMappingMap destGroupMappings;
+    for (const auto& mappingElement : grouplabelMapping)
+    {
+      const auto groupID = destinationImage->GetGroupIndexOfLabel(mappingElement.second);
+      destGroupMappings[groupID].push_back(mappingElement);
+    }
+
+    for (const auto& [destGroupID, relevantLabelMapping] : destGroupMappings)
+    {
+      const auto destGroupImage = sourceImage->GetGroupImage(destGroupID);
+      auto destinationLabels = destinationImage->GetConstLabelsByValue(destinationImage->GetLabelValuesByGroup(destGroupID));
+      TransferLabelContentAtTimeStep(sourceGroupImage, destGroupImage, destinationLabels, timeStep, MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, destinationImage->GetUnlabeledLabelLock(),
+        relevantLabelMapping, mergeStyle, overwriteStlye);
+    }
+  }
 }
 
 void mitk::TransferLabelContent(

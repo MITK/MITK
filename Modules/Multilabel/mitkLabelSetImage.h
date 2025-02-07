@@ -57,15 +57,6 @@ namespace mitk
     */
     Message<> AfterChangeLayerEvent;
 
-    ///////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-    // FUTURE MultiLabelSegmentation:
-    // Section that already contains declarations used in the new class.
-    // So this part of the interface will stay after refactoring towards
-    // the new MultiLabelSegmentation class (see T28524). This section was introduced
-    // because some of the planned features are already urgently needed.
-    ///////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
     mitkClassMacro(MultiLabelSegmentation, SlicedData);
     itkNewMacro(Self);
 
@@ -92,6 +83,26 @@ namespace mitk
       RegardLocks, //Locked labels in the same spatial group will not be overwritten/changed.
       IgnoreLocks //Label locks in the same spatial group will be ignored, so these labels might be changed.
     };
+
+    /**
+      * @brief Check whether slice @a s at time @a t in channel @a n is set
+      */
+    bool IsSliceSet(int s = 0, int t = 0, int n = 0) const override;
+
+    /**
+      * @brief Check whether volume at time @a t in channel @a n is set
+      */
+    bool IsVolumeSet(int t = 0, int n = 0) const override;
+
+    /**
+      * @brief Check whether the channel @a n is set
+      */
+    bool IsChannelSet(int n = 0) const override;
+
+    /**
+      * @brief Get dimension of the MultiLabelSegmentation instance.
+      */
+    unsigned int GetDimension() const;
 
     /** \brief Adds a label instance to a group of the multi label image.
     * @remark By default, if the pixel value of the label is already used in the image, the label
@@ -377,25 +388,16 @@ namespace mitk
     void UpdateLookupTable(PixelType pixelValue);
 
     /**
-      * initialize new (or re-initialize) image information by a BaseGeometry
-      *
-      * \param type
-      * \param geometry
-      * \param channels
-      * @param tDim defines the number of time steps for which the Image should be initialized
-      */
-    void Initialize(const mitk::BaseGeometry* geometry,
-      TimeStepType tDim = 1, bool resetLabels = true);
-
-    /**
-    * \brief Initialize new (or re-initialize) image information by a TimeGeometry
+    * @brief Initialize new (or re-initialize) the segmentation based on the properties
+    * and geometric information of a passed image. The pixel content will be reseted.
     *
-    * \param type
-    * \param geometry
-    * \param channels
-    * \param tDim override time dimension if the value is bigger than 0 (Default -1)
+    * @param templateImage Template for the initialization
+    * @param resetLabels Indicate if the labels should be reseted on initialization.
+    * True (default): all label and group informations will be removed. False: label
+    * information and groups are kept, but all pixel information will be erased
+    * (cf EraseLabel(...)).
     */
-    void Initialize(const mitk::TimeGeometry* geometry, bool resetLabels = true);
+    void Initialize(const mitk::Image* templateImage, bool resetLabels = true);
 
     /** @brief Initialize a new mitk::MultiLabelSegmentation by a given image.
      * For all distinct pixel values of the parameter image new labels will
@@ -404,6 +406,12 @@ namespace mitk
      * @param image the image which is used for initialization
      */
     void InitializeByLabeledImage(const mitk::Image* image);
+
+    /**
+     * @brief clears all label pixel content form the indicated group.
+     * @per groupID must point to a valid group.
+     */
+    void ClearGroupImage(GroupIndexType groupID);
 
     protected:
 
@@ -428,6 +436,11 @@ namespace mitk
       LabelValueType m_ActiveLabelValue;
 
     private:
+
+      /** Generates a new group image that fits to the geometry of the current instance.
+       @remark The pixel values are not initialized. E.g. use clear Image buffer for that.*/
+      Image::Pointer GenerateNewGroupImage() const;
+
       using LabelMapType = std::map<LabelValueType, Label::Pointer>;
       /** Dictionary that holds all known labels (label value is the key).*/
       LabelMapType m_LabelMap;
@@ -455,6 +468,11 @@ namespace mitk
 
       /** Mutex used to secure manipulations of the internal state of label and group maps.*/
       std::shared_mutex m_LabelNGroupMapsMutex;
+
+      /** This variable stores the dimensions of the multi label segmentation, in order to make it available even
+      when no group image is available.*/
+      using GroupImageDimensionVectorType = std::vector<unsigned int>;
+      GroupImageDimensionVectorType m_GroupImageDimensions;
 
     public:
 
@@ -564,7 +582,7 @@ namespace mitk
     void MaskStampProcessing(ImageType *input, mitk::Image *mask, bool forceOverwrite);
 
     template <typename MultiLabelSegmentationType, typename ImageType>
-    void InitializeByLabeledImageProcessing(MultiLabelSegmentationType *input, ImageType *other);
+    void InitializeByLabeledImageProcessing(MultiLabelSegmentationType *input, const ImageType *other);
 
     /** helper needed for ensuring unique values.
       returns a sorted list of all labels (including the value for Unlabeled pixels..*/

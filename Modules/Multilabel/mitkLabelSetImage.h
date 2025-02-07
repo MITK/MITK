@@ -206,6 +206,40 @@ namespace mitk
      */
     void RemoveGroup(GroupIndexType group);
 
+    /**
+     * @brief Merges the content of a source label into the target label.
+     *
+     * @param targetLabelValue The value of the label that should be the merged label.
+     * @param sourceLabelValue The value of the label that should be merged into the specified one
+     * @param overwriteStyle Controls if the merge operation should regard the label locks in the
+     * group of the target label.
+     * @pre targetLabelValue must exist.
+     * @pre sourceLabelValue must exist.
+     * @remark the group that is modified by the operation is defined by the targetLabelValue. So you
+     * can do mergings across groups. This will result in copying the source contents. If you want to
+     * remove the content of the source labels that must be done explicitly by calling EraseLabel(s) (if
+     * you just want to remove the pixel content) or RemoveLabel(s) (if you want remove the label
+     * completely)
+     */
+    void MergeLabel(LabelValueType targetLabelValue, LabelValueType sourceLabelValue,
+      OverwriteStyle overwriteStyle = OverwriteStyle::RegardLocks);
+
+    /**
+     * @brief Merges the content of a source labels into the target label.
+     *
+     * @param targetLabelValue The value of the label that should be the merged label.
+     * @param sourceLabelValues The values of the labels that should be merged into the target label
+     * with merge style "Merge".
+     * @param overwriteStyle Controls if/how the merge operation should regard the label locks in the
+     * group of the target label.
+     * @pre targetLabelValue must exist.
+     * @pre sourceLabelValues must exist.
+     * @remark If a spatial group is empty after the operation, it might be removed. The removal of an spatial group
+     * might invalidate any other spatial group index (due to new sorting/ordering).
+     */
+    void MergeLabels(LabelValueType targetLabelValue, const LabelValueVectorType& sourceLabelValues,
+      OverwriteStyle overwriteStyle = OverwriteStyle::RegardLocks);
+
     /** \brief  Returns true if the value exists in the MultiLabelSegmentation instance*/
     bool ExistLabel(LabelValueType value) const;
 
@@ -495,26 +529,6 @@ namespace mitk
     bool IsEmpty(PixelType pixelValue, TimeStepType t = 0) const;
 
     /**
-      * \brief removes all pixel content form the active layer.*/
-    void ClearBuffer();
-
-    /**
-     * @brief Merges the mitk::Label with a given target value with the active label
-     *
-     * @param pixelValue          the value of the label that should be the new merged label
-     * @param sourcePixelValue    the value of the label that should be merged into the specified one
-     */
-    void MergeLabel(PixelType pixelValue, PixelType sourcePixelValue);
-
-    /**
-     * @brief Merges a list of mitk::Labels with the mitk::Label that has a specific value
-     *
-     * @param pixelValue                  the value of the label that should be the new merged label
-     * @param vectorOfSourcePixelValues   the list of label values that should be merge into the specified one
-     */
-    void MergeLabels(PixelType pixelValue, const std::vector<PixelType>& vectorOfSourcePixelValues);
-
-    /**
      * @brief Gets the ID of the currently active layer
      * @return the ID of the active layer
      * @pre at least on group must exist.
@@ -581,9 +595,6 @@ namespace mitk
 
     template <typename ImageType>
     void EraseLabelProcessing(ImageType *input, PixelType index);
-
-    template <typename ImageType>
-    void MergeLabelProcessing(ImageType *input, PixelType pixelValue, PixelType index);
 
     template <typename ImageType>
     void MaskStampProcessing(ImageType *input, mitk::Image *mask, bool forceOverwrite);

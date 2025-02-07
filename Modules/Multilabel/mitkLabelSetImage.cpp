@@ -861,40 +861,6 @@ void mitk::MultiLabelSegmentation::InitializeByLabeledImageProcessing(MultiLabel
 }
 
 template <typename ImageType>
-void mitk::MultiLabelSegmentation::MaskStampProcessing(ImageType *itkImage, mitk::Image *mask, bool forceOverwrite)
-{
-  typename ImageType::Pointer itkMask;
-  mitk::CastToItkImage(mask, itkMask);
-
-  typedef itk::ImageRegionConstIterator<ImageType> SourceIteratorType;
-  typedef itk::ImageRegionIterator<ImageType> TargetIteratorType;
-
-  SourceIteratorType sourceIter(itkMask, itkMask->GetLargestPossibleRegion());
-  sourceIter.GoToBegin();
-
-  TargetIteratorType targetIter(itkImage, itkImage->GetLargestPossibleRegion());
-  targetIter.GoToBegin();
-
-  const auto activeLabel = this->GetActiveLabel()->GetValue();
-
-  while (!sourceIter.IsAtEnd())
-  {
-    PixelType sourceValue = sourceIter.Get();
-    PixelType targetValue = targetIter.Get();
-
-    if ((sourceValue != UNLABELED_VALUE) &&
-        (forceOverwrite || !this->IsLabelLocked(targetValue))) // skip unlabeled pixels and locked labels
-    {
-      targetIter.Set(activeLabel);
-    }
-    ++sourceIter;
-    ++targetIter;
-  }
-
-  this->Modified();
-}
-
-template <typename ImageType>
 void mitk::MultiLabelSegmentation::CalculateCenterOfMassProcessing(ImageType *itkImage, LabelValueType pixelValue)
 {
   if (ImageType::GetImageDimension() != 3)

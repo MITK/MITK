@@ -15,6 +15,9 @@ found in the LICENSE file.
 
 #include "mitkSegWithPreviewTool.h"
 
+#include <mitkDataNode.h>
+#include <mitkPointSet.h>
+
 namespace mitk
 {
   class nnInteractiveTool : public SegWithPreviewTool
@@ -33,11 +36,20 @@ namespace mitk
     const char** GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
 
+    void Activated() override;
+    void Deactivated() override;
+
   protected:
     nnInteractiveTool();
     ~nnInteractiveTool() override;
 
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
+
+  private:
+    PointSet::Pointer m_PositivePoints;
+    DataNode::Pointer m_PositivePointsNode;
+    PointSet::Pointer m_NegativePoints;
+    DataNode::Pointer m_NegativePointsNode;
   };
 }
 

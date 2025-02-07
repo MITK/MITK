@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <mitkDICOMSegmentationPropertyHelper.h>
 #include <mitkDICOMQIPropertyHelper.h>
 #include <mitkNodePredicateGeometry.h>
-
+#include <mitkLabelSetImageHelper.h>
 #include <itkLabelGeometryImageFilter.h>
 #include <itkCommand.h>
 #include <itkBinaryFunctorImageFilter.h>
@@ -459,41 +459,69 @@ void mitk::MultiLabelSegmentation::ClearGroupImage(GroupIndexType groupID)
   }
 }
 
-void mitk::MultiLabelSegmentation::MergeLabel(PixelType pixelValue, PixelType sourcePixelValue)
+void mitk::MultiLabelSegmentation::MergeLabel(LabelValueType targetLabelValue, LabelValueType sourceLabelValue, OverwriteStyle overwriteStyle)
 {
-  try
-  {
-    AccessByItk_2(this, MergeLabelProcessing, pixelValue, sourcePixelValue);
-  }
-  catch (itk::ExceptionObject &e)
-  {
-    mitkThrow() << e.GetDescription();
-  }
-  this->SetActiveLabel(pixelValue);
-  this->InvokeEvent(LabelModifiedEvent(sourcePixelValue));
-  this->InvokeEvent(LabelModifiedEvent(pixelValue));
-  this->InvokeEvent(LabelsChangedEvent({ sourcePixelValue, pixelValue }));
-  Modified();
+  if (!this->ExistLabel(sourceLabelValue)) mitkThrow() << "Cannot merge label. Source label value ("<<sourceLabelValue<<") does not exist.";
+  if (!this->ExistLabel(targetLabelValue)) mitkThrow() << "Cannot merge label. Target label value (" << targetLabelValue << ") does not exist.";
+
+  this->MergeLabels(targetLabelValue, { sourceLabelValue }, overwriteStyle);
 }
 
-void mitk::MultiLabelSegmentation::MergeLabels(PixelType pixelValue, const std::vector<PixelType>& vectorOfSourcePixelValues)
+void mitk::MultiLabelSegmentation::MergeLabels(LabelValueType targetLabelValue, const LabelValueVectorType& sourceLabelValues,
+  OverwriteStyle overwriteStyle)
 {
-  try
+  for (const auto& value : sourceLabelValues)
   {
-    for (unsigned int idx = 0; idx < vectorOfSourcePixelValues.size(); idx++)
+    if (!this->ExistLabel(value)) mitkThrow() << "Cannot merge label. Source label value (" << value << ") does not exist.";
+  }
+
+  if (!this->ExistLabel(targetLabelValue)) mitkThrow() << "Cannot merge label. Target label value (" << targetLabelValue << ") does not exist.";
+
+  auto targetGroupID = this->GetGroupIndexOfLabel(targetLabelValue);
+  auto sourceGroupMapping = LabelSetImageHelper::SplitLabelValuesByGroup(this, sourceLabelValues);
+
+  ////////////////////////////////////////
+  //prepare label information for transfer
+  auto targetGroupLabelValues = this->GetLabelValuesByGroup(targetGroupID);
+
+  //remove all source labels, if they are in labels, because we want to ensure that these are not locked for the transfer
+  auto isSourceValueCheckLambda = [&](LabelValueType x)
+    { return std::find(sourceLabelValues.begin(), sourceLabelValues.end(), x) != sourceLabelValues.end(); };
+  targetGroupLabelValues.erase(std::remove_if(targetGroupLabelValues.begin(), targetGroupLabelValues.end(), isSourceValueCheckLambda),
+    targetGroupLabelValues.end());
+
+  auto labels = this->GetConstLabelsByValue(targetGroupLabelValues);
+  for (const auto value : sourceLabelValues)
+  {
+    auto unlockedSourceLabel = this->GetLabel(value)->Clone();
+    unlockedSourceLabel->SetLocked(false);
+    labels.push_back(unlockedSourceLabel);
+  }
+
+  ////////////////////////////////////////////////////////////////////
+  //iterate through all relevant source groups and merge there content
+  for (const auto& [sourceGroupID, relevantSourceLabelValues] : sourceGroupMapping)
+  {
+    LabelValueMappingVector mapping;
+    for (const auto value : relevantSourceLabelValues)
     {
-      AccessByItk_2(this, MergeLabelProcessing, pixelValue, vectorOfSourcePixelValues[idx]);
-      this->InvokeEvent(LabelModifiedEvent(vectorOfSourcePixelValues[idx]));
+      mapping.emplace_back(value, targetLabelValue);
     }
+
+    //do the merge as a transfer operation
+    mitk::TransferLabelContent(this->GetGroupImage(sourceGroupID), this->GetGroupImage(targetGroupID), labels,
+      mitk::MultiLabelSegmentation::UNLABELED_VALUE, mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, mapping,
+      MergeStyle::Merge, overwriteStyle);
   }
-  catch (itk::ExceptionObject &e)
+
+  this->InvokeEvent(LabelModifiedEvent(targetLabelValue));
+  for (const auto value : sourceLabelValues)
   {
-    mitkThrow() << e.GetDescription();
+    this->InvokeEvent(LabelModifiedEvent(value));
   }
-  this->SetActiveLabel(pixelValue);
-  this->InvokeEvent(LabelModifiedEvent(pixelValue));
-  auto modifiedValues = vectorOfSourcePixelValues;
-  modifiedValues.push_back(pixelValue);
+
+  auto modifiedValues = sourceLabelValues;
+  modifiedValues.push_back(targetLabelValue);
   this->InvokeEvent(LabelsChangedEvent(modifiedValues));
 
   Modified();
@@ -961,24 +989,6 @@ void mitk::MultiLabelSegmentation::EraseLabelProcessing(ImageType *itkImage, Pix
     if (value == pixelValue)
     {
       iter.Set(0);
-    }
-    ++iter;
-  }
-}
-
-template <typename ImageType>
-void mitk::MultiLabelSegmentation::MergeLabelProcessing(ImageType *itkImage, PixelType pixelValue, PixelType index)
-{
-  typedef itk::ImageRegionIterator<ImageType> IteratorType;
-
-  IteratorType iter(itkImage, itkImage->GetLargestPossibleRegion());
-  iter.GoToBegin();
-
-  while (!iter.IsAtEnd())
-  {
-    if (iter.Get() == index)
-    {
-      iter.Set(pixelValue);
     }
     ++iter;
   }

@@ -427,6 +427,10 @@ void mitk::PointSetDataInteractor::DataNodeChanged()
     }
     // load config file parameter: maximal number of points
     mitk::PropertyList::Pointer properties = GetAttributes();
+
+    if (properties.IsNull())
+      return;
+
     std::string strNumber;
     if (properties->GetStringProperty("MaxPoints", strNumber))
     {

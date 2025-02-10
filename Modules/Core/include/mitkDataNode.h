@@ -90,6 +90,12 @@ namespace mitk
      */
     BaseData *GetData() const;
 
+    template <typename T>
+    T* GetDataAs() const
+    {
+      return dynamic_cast<T*>(this->GetData());
+    }
+
     /**
      * \brief Get the transformation applied prior to displaying the data as
      * a vtkTransform

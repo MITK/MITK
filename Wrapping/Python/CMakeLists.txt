@@ -24,23 +24,8 @@ mark_as_advanced(
 
 set(libraries
   MitkCore
-  #MitkCLCore
-  #MitkCLUtilities
   ITKCommon
-  #MitkSegmentation
-  #MitkMultilabel
-  #MitkDICOM
-  #MitkDICOMImageIO
-  #MitkRT
 )
-
-if(MITK_USE_MatchPoint)
-  list(APPEND libraries
-     MitkMatchPointRegistration
-  )
-endif()
-
-
 
 mitkSwigPrepareFiles(pyMITK MITKWRAP.i ${libraries})
 

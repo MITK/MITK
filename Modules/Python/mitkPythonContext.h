@@ -13,16 +13,12 @@ found in the LICENSE file.
 #define mitkPythonContext_h
 #define PY_SSIZE_T_CLEAN
 
-#include "mitkIPythonService.h"
 #include <itkLightObject.h>
 #include <mitkImage.h>
-#ifdef _DEBUG
-#undef _DEBUG
-#include <Python.h>
-#define _DEBUG
-#else
-#include <Python.h>
-#endif
+#pragma push_macro("slots")
+#undef slots
+#include "Python.h"
+#pragma pop_macro("slots")
 #include <MitkPythonExports.h>
 #include "mitkCommon.h"
 

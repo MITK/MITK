@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 #ifndef mitkIPythonService_h
 #define mitkIPythonService_h
-#define PY_SSIZE_T_CLEAN
 
 #include <mitkServiceInterface.h>
 #include <MitkPythonExports.h>

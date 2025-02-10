@@ -40,6 +40,9 @@ namespace mitk
     void Deactivated() override;
 
     DataNode* GetPointSetNode(PromptType promptType) const;
+    void BlockLMBDisplayInteraction();
+    void UnblockLMBDisplayInteraction();
+
   protected:
     nnInteractiveTool();
     ~nnInteractiveTool() override;
@@ -47,6 +50,8 @@ namespace mitk
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 
   private:
+    std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
+
     PointSet::Pointer m_PositivePoints;
     DataNode::Pointer m_PositivePointsNode;
     PointSet::Pointer m_NegativePoints;

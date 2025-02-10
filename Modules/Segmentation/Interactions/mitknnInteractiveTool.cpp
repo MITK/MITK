@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitknnInteractiveTool.h"
 
+#include <mitkDisplayActionEventBroadcast.h>
 #include <mitkPointSetShapeProperty.h>
 #include <mitkToolManager.h>
 
@@ -112,4 +113,38 @@ void mitk::nnInteractiveTool::Deactivated()
   m_PositivePoints = nullptr;
 
   Superclass::Deactivated();
+}
+
+void mitk::nnInteractiveTool::BlockLMBDisplayInteraction()
+{
+  if (!m_EventConfigBackup.empty())
+    return;
+
+  for (const auto& eventObserverReference : us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>())
+  {
+    auto eventObserver = us::GetModuleContext()->GetService(eventObserverReference);
+    auto eventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(eventObserver);
+
+    if (eventBroadcast != nullptr)
+    {
+      m_EventConfigBackup.emplace_back(eventObserverReference, eventBroadcast->GetEventConfig());
+      eventBroadcast->AddEventConfig("DisplayConfigBlockLMB.xml");
+    }
+  }
+}
+
+void mitk::nnInteractiveTool::UnblockLMBDisplayInteraction()
+{
+  for (const auto& [eventObserverReference, eventConfig] : m_EventConfigBackup)
+  {
+    if (eventObserverReference)
+    {
+      auto eventObserver = us::GetModuleContext()->GetService<InteractionEventObserver>(eventObserverReference);
+
+      if (eventObserver)
+        static_cast<DisplayActionEventBroadcast*>(eventObserver)->SetEventConfig(eventConfig);
+    }
+  }
+
+  m_EventConfigBackup.clear();
 }

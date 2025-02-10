@@ -31,8 +31,9 @@ namespace
     node->SetColor(r, g, b);
     node->SetColor(r, g, b, nullptr, "selectedcolor");
     node->SetProperty("Pointset.2D.shape", mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
-    node->SetProperty("Pointset.2D.resolution", mitk::IntProperty::New(64));
-    node->SetProperty("point line width", mitk::IntProperty::New(2));
+    node->SetIntProperty("point line width", 2);
+    node->SetIntProperty("Pointset.2D.resolution", 64);
+    node->SetFloatProperty("Pointset.2D.distance to plane", 0.1f);
     node->SetBoolProperty("Pointset.2D.keep shape when selected", true);
     node->SetBoolProperty("Pointset.2D.selected.show contour", true);
     node->SetBoolProperty("Pointset.2D.fill shape", true);

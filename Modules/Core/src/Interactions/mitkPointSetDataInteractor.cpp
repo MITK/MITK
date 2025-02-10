@@ -147,12 +147,20 @@ void mitk::PointSetDataInteractor::SelectPoint(StateMachineAction *, Interaction
   }
 }
 
-mitk::PointSetDataInteractor::PointSetDataInteractor() : m_MaxNumberOfPoints(0), m_SelectionAccuracy(3.5)
+mitk::PointSetDataInteractor::PointSetDataInteractor()
+  : m_MaxNumberOfPoints(0),
+    m_SelectionAccuracy(3.5),
+    m_IsMovementEnabled(true)
 {
 }
 
 mitk::PointSetDataInteractor::~PointSetDataInteractor()
 {
+}
+
+void mitk::PointSetDataInteractor::EnableMovement(bool enabled)
+{
+  m_IsMovementEnabled = enabled;
 }
 
 void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -220,6 +228,9 @@ void mitk::PointSetDataInteractor::IsClosedContour(StateMachineAction *, Interac
 
 void mitk::PointSetDataInteractor::MovePoint(StateMachineAction *stateMachineAction, InteractionEvent *interactionEvent)
 {
+  if (!m_IsMovementEnabled)
+    return;
+
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
@@ -406,6 +417,9 @@ void mitk::PointSetDataInteractor::DataNodeChanged()
 
 void mitk::PointSetDataInteractor::InitMove(StateMachineAction *, InteractionEvent *interactionEvent)
 {
+  if (!m_IsMovementEnabled)
+    return;
+
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
 
   if (positionEvent == nullptr)
@@ -424,6 +438,9 @@ void mitk::PointSetDataInteractor::InitMove(StateMachineAction *, InteractionEve
 
 void mitk::PointSetDataInteractor::FinishMove(StateMachineAction *, InteractionEvent *interactionEvent)
 {
+  if (!m_IsMovementEnabled)
+    return;
+
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
 

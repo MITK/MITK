@@ -167,6 +167,8 @@ namespace mitk
      */
     virtual void Abort(StateMachineAction *, InteractionEvent *);
 
+    virtual void KeyDelete(StateMachineAction *, InteractionEvent *);
+
     /** \brief to calculate a direction vector from last point and actual
      * point
      */

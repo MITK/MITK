@@ -37,6 +37,7 @@ void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("movePoint", MovePoint);
   CONNECT_FUNCTION("finishMovement", FinishMove);
   CONNECT_FUNCTION("removePoint", RemovePoint);
+  CONNECT_FUNCTION("keyDelete", KeyDelete);
 }
 
 void mitk::PointSetDataInteractor::AddPoint(StateMachineAction *stateMachineAction, InteractionEvent *interactionEvent)
@@ -386,6 +387,25 @@ void mitk::PointSetDataInteractor::Abort(StateMachineAction *, InteractionEvent 
 {
   InternalEvent::Pointer event = InternalEvent::New(nullptr, this, IntDeactivateMe);
   interactionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
+}
+
+void mitk::PointSetDataInteractor::KeyDelete(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  auto renderer = interactionEvent->GetSender();
+  auto t = renderer->GetTimeStep(m_PointSet);
+  auto id = m_PointSet->SearchSelectedPoint(t);
+
+  if (id == -1)
+    return;
+
+  auto point = m_PointSet->GetPoint(id, t);
+  Point2D displayPoint;
+  renderer->WorldToDisplay(point, displayPoint);
+
+  auto event = InteractionPositionEvent::New(nullptr, displayPoint);
+  event->SetSender(renderer);
+
+  this->RemovePoint(nullptr, event.GetPointer());
 }
 
 /*

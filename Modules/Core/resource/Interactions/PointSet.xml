@@ -10,6 +10,9 @@
         <transition event_class="InteractionKeyEvent" event_variant="Abort" target="start">
           <action name="abort"/>
         </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="KeyDelete" target="start">
+          <action name="keyDelete"/>
+        </transition>
     </state>
     <state name="selected">
         <transition event_class="MouseMoveEvent" event_variant="CheckSelected" target="start">
@@ -21,6 +24,9 @@
         </transition>
         <transition event_class="MousePressEvent" event_variant="StartMove" target="MovementInitalized">
             <action name="initMove"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="KeyDelete" target="selected">
+            <action name="keyDelete"/>
         </transition>
     </state>
     <state name="MovementInitalized">

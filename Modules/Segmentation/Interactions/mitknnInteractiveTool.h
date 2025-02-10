@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class nnInteractiveTool : public SegWithPreviewTool
+  class MITKSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
   {
   public:
     enum PromptType
@@ -39,6 +39,7 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
 
+    DataNode* GetPointSetNode(PromptType promptType) const;
   protected:
     nnInteractiveTool();
     ~nnInteractiveTool() override;

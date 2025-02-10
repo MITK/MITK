@@ -47,6 +47,14 @@ mitk::nnInteractiveTool::~nnInteractiveTool()
 {
 }
 
+mitk::DataNode* mitk::nnInteractiveTool::GetPointSetNode(PromptType promptType) const
+{
+  if (promptType == PromptType::Positive)
+    return m_PositivePointsNode;
+
+  return m_NegativePointsNode;
+}
+
 void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
 {
 }

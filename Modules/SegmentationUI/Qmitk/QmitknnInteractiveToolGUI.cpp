@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include "QmitknnInteractiveToolGUI.h"
 #include <ui_QmitknnInteractiveToolGUI.h>
 
+#include <mitkPointSetDataInteractor.h>
+
 #include <QmitkStyleManager.h>
 
 #include <QBoxLayout>
@@ -20,13 +22,11 @@ found in the LICENSE file.
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
 
-using Self = QmitknnInteractiveToolGUI;
-
 QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
   : QmitkSegWithPreviewToolGUIBase(false),
     m_Ui(new Ui::QmitknnInteractiveToolGUI),
     m_PromptTypeButtonGroup(new QButtonGroup(this)),
-    m_PromptType(mitk::nnInteractiveTool::PromptType::Positive)
+    m_PromptType(mitk::nnInteractiveTool::Positive)
 {
 }
 
@@ -64,14 +64,14 @@ void QmitknnInteractiveToolGUI::ThemeIcons()
 void QmitknnInteractiveToolGUI::InitializePromptType()
 {
   m_PromptType = m_Ui->positiveButton->isChecked()
-    ? mitk::nnInteractiveTool::PromptType::Positive
-    : mitk::nnInteractiveTool::PromptType::Negative;
+    ? mitk::nnInteractiveTool::Positive
+    : mitk::nnInteractiveTool::Negative;
 
   m_PromptTypeButtonGroup->addButton(m_Ui->positiveButton);
-  m_PromptTypeButtonGroup->setId(m_Ui->positiveButton, mitk::nnInteractiveTool::PromptType::Positive);
+  m_PromptTypeButtonGroup->setId(m_Ui->positiveButton, mitk::nnInteractiveTool::Positive);
 
   m_PromptTypeButtonGroup->addButton(m_Ui->negativeButton);
-  m_PromptTypeButtonGroup->setId(m_Ui->negativeButton, mitk::nnInteractiveTool::PromptType::Negative);
+  m_PromptTypeButtonGroup->setId(m_Ui->negativeButton, mitk::nnInteractiveTool::Negative);
 
   auto idClicked = [this](int id)
   {
@@ -104,6 +104,11 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
 
 void QmitknnInteractiveToolGUI::OnPromptTypeChanged()
 {
+  if (m_Ui->pointButton->isChecked())
+  {
+    this->OnPointToolToggled(false);
+    this->OnPointToolToggled(true);
+  }
 }
 
 void QmitknnInteractiveToolGUI::OnPointToolToggled(bool checked)
@@ -111,9 +116,32 @@ void QmitknnInteractiveToolGUI::OnPointToolToggled(bool checked)
   if (checked)
   {
     this->SwitchOffOtherTools(m_Ui->pointButton);
+
+    auto node = this->GetTool()->GetPointSetNode(m_PromptType);
+
+    if (node->GetDataInteractor().IsNull())
+    {
+      auto interactor = mitk::PointSetDataInteractor::New();
+      interactor->LoadStateMachine("PointSet.xml");
+      interactor->SetEventConfig("PointSetConfigLMB.xml");
+      interactor->EnableMovement(false);
+      interactor->SetDataNode(node);
+    }
+
+    this->GetTool()->BlockLMBDisplayInteraction();
   }
   else
   {
+    for (auto promptType : { mitk::nnInteractiveTool::Positive, mitk::nnInteractiveTool::Negative })
+    {
+      auto node = this->GetTool()->GetPointSetNode(promptType);
+      node->SetDataInteractor(nullptr);
+      node->GetDataAs<mitk::PointSet>()->ClearSelection();
+    }
+
+    this->GetTool()->UnblockLMBDisplayInteraction();
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -157,4 +185,9 @@ void QmitknnInteractiveToolGUI::SwitchOffOtherTools(QPushButton* toolButton)
     if (otherToolButton != toolButton)
       otherToolButton->setChecked(false);
   }
+}
+
+mitk::nnInteractiveTool* QmitknnInteractiveToolGUI::GetTool()
+{
+  return this->GetConnectedToolAs<mitk::nnInteractiveTool>();
 }

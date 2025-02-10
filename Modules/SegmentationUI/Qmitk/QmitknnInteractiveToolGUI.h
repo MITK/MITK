@@ -53,6 +53,8 @@ protected:
   void SwitchOffOtherTools(QPushButton* toolButton);
 
 private:
+  mitk::nnInteractiveTool* GetTool();
+
   Ui::QmitknnInteractiveToolGUI* m_Ui;
   QButtonGroup* m_PromptTypeButtonGroup;
   mitk::nnInteractiveTool::PromptType m_PromptType;

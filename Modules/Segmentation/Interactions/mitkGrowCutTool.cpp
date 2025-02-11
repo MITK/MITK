@@ -128,7 +128,6 @@ void mitk::GrowCutTool::DoUpdatePreview(const Image *inputAtTimeStep,
 
       auto growCutResultImage = growCutFilter->GetOutput();
 
-      mitk::ImageReadAccessor newMitkImgAcc(growCutResultImage);
-      previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
+      previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), growCutResultImage, timeStep);
   }
 }

@@ -150,7 +150,7 @@ public:
   {
     // LabelSet image should always has the pixel type mitk::Label::PixelType
     CPPUNIT_ASSERT_MESSAGE("MultiLabelSegmentation has wrong pixel type",
-                           m_LabelSetImage->GetPixelType() == mitk::MakeScalarPixelType<mitk::Label::PixelType>());
+                           m_LabelSetImage->GetGroupImage(0)->GetPixelType() == mitk::MakeScalarPixelType<mitk::Label::PixelType>());
 
     mitk::Image::Pointer regularImage = mitk::Image::New();
     unsigned int dimensions[3] = { 96, 128, 52 };
@@ -539,8 +539,8 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels(0) == 5);
     // 2ndMin because of unlabeled pixels = 0
-    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValue2ndMin() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 7);
 
     CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
                            m_LabelSetImage->ExistLabel(3) == true);
@@ -556,9 +556,9 @@ public:
     // Values within the image are 0, 1, 3, 5, 6, 7 - New Min / Max value should be 5 / 6
     // 2ndMin because of unlabeled pixels = 0
     CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 were not removed from the image",
-                           m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 5);
+                           m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValue2ndMin() == 5);
     CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not removed from the image",
-                           m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
+                           m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 6);
   }
 
   void TestEraseLabels()
@@ -572,8 +572,8 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels(0) == 5);
     // 2ndMin because of unlabeled pixels = 0
-    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValue2ndMin() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 7);
 
     CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
       m_LabelSetImage->ExistLabel(3) == true);
@@ -589,9 +589,9 @@ public:
     // Values within the image are 0, 1, 3, 5, 6, 7 - New Min / Max value should be 5 / 6
     // 2ndMin because of unlabeled pixels = 0
     CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 were not erased from the image",
-      m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 5);
+      m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValue2ndMin() == 5);
     CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not erased from the image",
-      m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
+      m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 6);
   }
 
   void TestMergeLabels()
@@ -605,20 +605,20 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels(0) == 5);
     // 2ndMin because of unlabeled pixels = 0
-    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValue2ndMin() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 7);
 
     CPPUNIT_ASSERT_MESSAGE("Label with ID 6 does not exist after initialization",
       m_LabelSetImage->ExistLabel(6) == true);
 
     // Merge label 7 with label 6. Result should be that label 7 is not present anymore.
     m_LabelSetImage->MergeLabel(6, 7);
-    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not removed from the image", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
+    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not removed from the image", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 6);
 
     // Count all pixels with value 6 = 507
     // Count all pixels with value 7 = 823
     // Check if merged label has 507 + 823 = 1330 pixels
-    CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 1330);
+    CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetCountOfMaxValuedVoxels() == 1330);
 
     CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
       m_LabelSetImage->ExistLabel(3) == true);
@@ -629,13 +629,13 @@ public:
     std::vector<mitk::Label::PixelType> vectorOfSourcePixelValues{ 5, 6 };
     m_LabelSetImage->MergeLabels(3, vectorOfSourcePixelValues);
     // Values within the image are 0, 1, 3, 5, 6, 7 - New Max value should be 3
-    CPPUNIT_ASSERT_MESSAGE("Labels with value 5 and 6 were not removed from the image", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 3);
+    CPPUNIT_ASSERT_MESSAGE("Labels with value 5 and 6 were not removed from the image", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 3);
 
     // Count all pixels with value 3 = 1893
     // Count all pixels with value 5 = 2143
     // Count all pixels with value 6 = 1330
     // Check if merged label has 1893 + 2143 + 1330 = 5366 pixels
-    CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 5366);
+    CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetCountOfMaxValuedVoxels() == 5366);
   }
 
   void TestCreateLabelMask()

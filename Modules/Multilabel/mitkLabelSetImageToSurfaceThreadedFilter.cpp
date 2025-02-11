@@ -70,8 +70,9 @@ namespace mitk
       MITK_WARN << "\"RequestedLabel\" parameter was not set: will use the default value (" << m_RequestedLabel << ").";
     }
 
+    auto groupImage = image->GetGroupImage(image->GetGroupIndexOfLabel(m_RequestedLabel));
     mitk::LabelSetImageToSurfaceFilter::Pointer filter = mitk::LabelSetImageToSurfaceFilter::New();
-    filter->SetInput(image);
+    filter->SetInput(groupImage);
     //  filter->SetObserver(obsv);
     filter->SetGenerateAllLabels(false);
     filter->SetRequestedLabel(m_RequestedLabel);

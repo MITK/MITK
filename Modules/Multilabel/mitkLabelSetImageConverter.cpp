@@ -53,7 +53,7 @@ static void ConvertLabelSetImageToImage(const itk::Image<TPixel, VDimension> *,
   }
   else
   {
-    auto layerImage = mitk::ImageToItkImage<TPixel, VDimension>(labelSetImage);
+    auto layerImage = mitk::ImageToItkImage<TPixel, VDimension>(labelSetImage->GetGroupImage(0));
 
     auto duplicator = DuplicatorType::New();
     duplicator->SetInputImage(layerImage);
@@ -73,7 +73,7 @@ mitk::Image::Pointer mitk::ConvertLabelSetImageToImage(MultiLabelSegmentation::C
   {
     if (labelSetImage->GetDimension() == 4)
     {
-      AccessFixedDimensionByItk_n(labelSetImage, ::ConvertLabelSetImageToImage, 4, (labelSetImage, image));
+      ::ConvertLabelSetImageToImage<MultiLabelSegmentation::PixelType, 4>(nullptr, labelSetImage, image);
     }
     else
     {
@@ -337,17 +337,18 @@ mitk::Image::Pointer mitk::CreateLabelMask(const MultiLabelSegmentation* segment
   // mask->Initialize(segmentation) does not work here if this label set image has a single slice,
   // since the mask would be automatically flattened to a 2-d image, whereas we expect the
   // original dimension of this label set image. Hence, initialize the mask more explicitly:
-  mask->Initialize(segmentation->GetPixelType(), segmentation->GetDimension(), segmentation->GetDimensions());
+  mask->Initialize(mitk::MakeScalarPixelType<MultiLabelSegmentation::PixelType>(), segmentation->GetDimension(), segmentation->GetDimensions().data());
   mask->SetTimeGeometry(segmentation->GetTimeGeometry()->Clone());
 
   ClearImageBuffer(mask);
 
-  const auto groupID = segmentation->GetGroupIndexOfLabel(labelValue);
-
   auto destinationLabel = segmentation->GetLabel(labelValue)->Clone();
   if (createBinaryMap) destinationLabel->SetValue(1);
 
-  TransferLabelContent(segmentation->GetGroupImage(groupID),
+  const auto groupID = segmentation->GetGroupIndexOfLabel(labelValue);
+  const auto groupImage = segmentation->GetGroupImage(groupID);
+
+  TransferLabelContent(groupImage,
     mask.GetPointer(),
     { destinationLabel },
     MultiLabelSegmentation::UNLABELED_VALUE,
@@ -369,7 +370,7 @@ std::pair<mitk::Image::Pointer, mitk::IDToLabelClassNameMapType> mitk::CreateLab
   // map->Initialize(segmentation) does not work here if this label set image has a single slice,
   // since the map would be automatically flattened to a 2-d image, whereas we expect the
   // original dimension of this label set image. Hence, initialize the map more explicitly:
-  map->Initialize(segmentation->GetPixelType(), segmentation->GetDimension(), segmentation->GetDimensions());
+  map->Initialize(mitk::MakeScalarPixelType<MultiLabelSegmentation::PixelType>(), segmentation->GetDimension(), segmentation->GetDimensions().data());
   map->SetTimeGeometry(segmentation->GetTimeGeometry()->Clone());
 
   ClearImageBuffer(map);

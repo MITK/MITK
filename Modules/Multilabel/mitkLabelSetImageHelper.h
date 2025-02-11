@@ -41,7 +41,7 @@ namespace mitk
      * (e.g. link the segmentation node with its parent node).
      *
      * @param referenceNode             The reference node from which the name of the new segmentation node
-     *                                  is derived.
+     *                                  is derived. If passed pointer is null, the name "unknown" will be used.
      * @param initialSegmentationImage  The segmentation image that is used to initialize the label set image.
      * @param segmentationName          An optional name for the new segmentation node.
      * @param dataStorage               The data storage of the reference node (if given, used to generate a unique node name).

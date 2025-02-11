@@ -61,7 +61,7 @@ mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateNewSegmentationNode(con
   std::string newSegmentationName = segmentationName;
   if (newSegmentationName.empty())
   {
-    newSegmentationName = referenceNode->GetName();
+    newSegmentationName = (nullptr!= referenceNode)? referenceNode->GetName() : "unkown";
 
     if (!newSegmentationName.empty())
       newSegmentationName.append("-");

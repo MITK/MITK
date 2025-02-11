@@ -103,6 +103,12 @@ namespace mitk
       * @brief Get dimension of the MultiLabelSegmentation instance.
       */
     unsigned int GetDimension() const;
+    using GroupImageDimensionVectorType = std::vector<unsigned int>;
+    /**
+      * @brief Returns a vector of that contains the size (in pixel) for all dimensions of the
+      * MultiLabelSegmentation instance. It is simelar to mitk::Image::GetDimensions.
+      */
+    const GroupImageDimensionVectorType& GetDimensions() const;
 
     /** \brief Adds a label instance to a group of the multi label image.
     * @remark By default, if the pixel value of the label is already used in the image, the label
@@ -404,6 +410,23 @@ namespace mitk
      *@pre groupID must reference an existing group.*/
     const mitk::Image* GetGroupImage(GroupIndexType groupID) const;
 
+    /** Updates a group image by copying a given source image content.
+    * @remark the pixel content of the sourceImage will be simply copied. It won't
+    * be checked if the source only contains valid label values for the group.
+    * This must be ensured by the callee of the function. If only some labels should be
+    * transfered/updated, TransferLabelContent(...) is a better option.
+    * @pre sourceImage must point to a valid image
+    * @pre groupID must indicate an existing group
+    * @pre sourceImage and this instance must have the same time geometry.
+    */
+    void UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep = 0);
+
+    /**
+     * @brief clears all label pixel content form the indicated group.
+     * @per groupID must point to a valid group.
+     */
+    void ClearGroupImage(GroupIndexType groupID);
+
     /** Returns the name of the indicated group. String may be empty if no name was defined.
      * Remark: The name neither is guaranteed to be defined nor that it is unique. Use the index
      * to uniquely refer to a group.
@@ -440,12 +463,6 @@ namespace mitk
      * @param image the image which is used for initialization
      */
     void InitializeByLabeledImage(const mitk::Image* image);
-
-    /**
-     * @brief clears all label pixel content form the indicated group.
-     * @per groupID must point to a valid group.
-     */
-    void ClearGroupImage(GroupIndexType groupID);
 
     protected:
 
@@ -505,7 +522,6 @@ namespace mitk
 
       /** This variable stores the dimensions of the multi label segmentation, in order to make it available even
       when no group image is available.*/
-      using GroupImageDimensionVectorType = std::vector<unsigned int>;
       GroupImageDimensionVectorType m_GroupImageDimensions;
 
     public:

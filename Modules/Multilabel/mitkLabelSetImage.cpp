@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkDICOMQIPropertyHelper.h>
 #include <mitkNodePredicateGeometry.h>
 #include <mitkLabelSetImageHelper.h>
+#include <mitkImageTimeSelector.h>
 #include <itkLabelGeometryImageFilter.h>
 #include <itkCommand.h>
 #include <itkBinaryFunctorImageFilter.h>
@@ -81,6 +82,11 @@ bool mitk::MultiLabelSegmentation::IsChannelSet(int n) const
 unsigned int mitk::MultiLabelSegmentation::GetDimension() const
 {
   return m_GroupImageDimensions.size();
+};
+
+const mitk::MultiLabelSegmentation::GroupImageDimensionVectorType& mitk::MultiLabelSegmentation::GetDimensions() const
+{
+  return m_GroupImageDimensions;
 };
 
 mitk::MultiLabelSegmentation::MultiLabelSegmentation()
@@ -408,6 +414,22 @@ const mitk::Image* mitk::MultiLabelSegmentation::GetGroupImage(GroupIndexType gr
 
   return m_LayerContainer.at(groupID).GetPointer();
 }
+
+void mitk::MultiLabelSegmentation::UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep)
+{
+  if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot update group image. Group ID is invalid. Invalid ID: " << groupID;
+  if (nullptr == sourceImage) mitkThrow() << "Error, cannot update group image. Passed sourceImage is invalid.";
+  if (this->GetTimeSteps()<=timestep) mitkThrow() << "Error, cannot update group image. Assigned time step is not valid for segmentation. Invalid time step: " << timestep;
+  if (sourceImage->GetTimeSteps() <= sourceTimestep) mitkThrow() << "Error, cannot update group image. Requested time step of source image is not valid. Invalid source time step: " << sourceTimestep;
+
+  if (mitk::Equal(*(m_LayerContainer[groupID]->GetGeometry(timestep)), *(sourceImage->GetGeometry(sourceTimestep)), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+    mitkThrow() << "Error, cannot update group image. Passed sourceImage has not the same geometry then the MultiLabelSegmentationInstance.";
+
+  auto imageTimeStep = SelectImageByTimeStep(sourceImage, sourceTimestep);
+  mitk::ImageReadAccessor sourceImageAcc(imageTimeStep);
+  m_LayerContainer[groupID]->SetVolume(sourceImageAcc.GetData(), timestep);
+}
+
 
 const std::string& mitk::MultiLabelSegmentation::GetGroupName(GroupIndexType groupID) const
 {
@@ -1659,7 +1681,7 @@ void mitk::TransferLabelContentAtTimeStep(
 
     for (const auto& [destGroupID, relevantLabelMapping] : destGroupMappings)
     {
-      const auto destGroupImage = sourceImage->GetGroupImage(destGroupID);
+      auto destGroupImage = destinationImage->GetGroupImage(destGroupID);
       auto destinationLabels = destinationImage->GetConstLabelsByValue(destinationImage->GetLabelValuesByGroup(destGroupID));
       TransferLabelContentAtTimeStep(sourceGroupImage, destGroupImage, destinationLabels, timeStep, MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, destinationImage->GetUnlabeledLabelLock(),
         relevantLabelMapping, mergeStyle, overwriteStlye);

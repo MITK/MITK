@@ -27,8 +27,11 @@ namespace mitk
 
 namespace
 {
-  void SetCommonPointsetProperties(mitk::DataNode* node, float r, float g, float b)
+  mitk::DataNode::Pointer CreatePointSetNode(const std::string& name, float r, float g, float b)
   {
+    auto node = mitk::DataNode::New();
+    node->SetData(mitk::PointSet::New());
+    node->SetName(name);
     node->SetColor(r, g, b);
     node->SetColor(r, g, b, nullptr, "selectedcolor");
     node->SetProperty("Pointset.2D.shape", mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
@@ -39,6 +42,7 @@ namespace
     node->SetBoolProperty("Pointset.2D.selected.show contour", true);
     node->SetBoolProperty("Pointset.2D.fill shape", true);
     node->SetBoolProperty("helper object", true);
+    return node;
   }
 }
 
@@ -199,22 +203,10 @@ void mitk::nnInteractiveTool::Activated()
 {
   Superclass::Activated();
 
-  auto positivePoints = PointSet::New();
-  m_PositivePointsNode = DataNode::New();
-
-  SetCommonPointsetProperties(m_PositivePointsNode, 0.125f, 0.5f, 0.125f);
-  m_PositivePointsNode->SetName("nnInteractive positive points");
-  m_PositivePointsNode->SetData(positivePoints);
-
+  m_PositivePointsNode = CreatePointSetNode(std::string(this->GetName()).append(" positive points"), 0.125f, 0.5f, 0.125f);
   this->GetDataStorage()->Add(m_PositivePointsNode, this->GetToolManager()->GetReferenceData(0));
 
-  auto negativePoints = PointSet::New();
-  m_NegativePointsNode = DataNode::New();
-
-  SetCommonPointsetProperties(m_NegativePointsNode, 0.625f, 0.125f, 0.125f);
-  m_NegativePointsNode->SetName("nnInteractive negative points");
-  m_NegativePointsNode->SetData(negativePoints);
-
+  m_NegativePointsNode = CreatePointSetNode(std::string(this->GetName()).append(" negative points"), 0.625f, 0.125f, 0.125f);
   this->GetDataStorage()->Add(m_NegativePointsNode, this->GetToolManager()->GetReferenceData(0));
 }
 

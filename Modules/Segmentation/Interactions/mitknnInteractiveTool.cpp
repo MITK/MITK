@@ -125,8 +125,6 @@ void mitk::nnInteractiveTool::DisableInteraction()
       auto node = this->GetPointSetNode(m_PromptType);
       node->SetDataInteractor(nullptr);
       node->GetDataAs<PointSet>()->ClearSelection();
-
-      RenderingManager::GetInstance()->RequestUpdateAll();
       break;
     }
 
@@ -143,7 +141,16 @@ void mitk::nnInteractiveTool::DisableInteraction()
       break;
   }
 
+  RenderingManager::GetInstance()->RequestUpdateAll();
   m_ActiveTool.reset();
+}
+
+void mitk::nnInteractiveTool::ResetInteractions()
+{
+  for (auto promptType : { PromptType::Positive, PromptType::Negative })
+    this->GetPointSetNode(promptType)->GetDataAs<PointSet>()->Clear();
+
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::nnInteractiveTool::BlockLMBDisplayInteraction()

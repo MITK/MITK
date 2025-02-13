@@ -43,6 +43,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   this->ThemeIcons();
 
   connect(m_Ui->initializeButton, &QPushButton::toggled, this, &Self::OnInitializeButtonToggled);
+  connect(m_Ui->resetButton, &QPushButton::clicked, [this]() { this->GetTool()->ResetInteractions(); });
 
   this->InitializePromptType();
   this->InitializeToolButtons();

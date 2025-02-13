@@ -53,6 +53,7 @@ namespace mitk
 
     void EnableInteraction(Tool tool, PromptType promptType);
     void DisableInteraction();
+    void ResetInteractions();
 
   protected:
     nnInteractiveTool();

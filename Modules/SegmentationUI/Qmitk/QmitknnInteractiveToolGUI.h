@@ -43,17 +43,9 @@ protected:
   void ThemeIcons();
   void InitializePromptType();
   void InitializeToolButtons();
-
   void OnInitializeButtonToggled(bool checked);
-
   void OnPromptTypeChanged();
-
   void OnToolToggled(Tool tool, bool checked);
-  void OnPointToolToggled(bool checked);
-  void OnBoxToolToggled(bool checked);
-  void OnScribbleToolToggled(bool checked);
-  void OnLassoToolToggled(bool checked);
-
   void UncheckOtherToolButtons(QPushButton* toolButton);
 
 private:

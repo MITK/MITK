@@ -238,18 +238,17 @@ void doMapTimesteps(const mitk::ImageMappingHelper::InputImageType* input, mitk:
   }
 }
 
-mitk::TimeGeometry::Pointer CreateResultTimeGeometry(const mitk::ImageMappingHelper::InputImageType* input, const mitk::ImageMappingHelper::ResultImageGeometryType* resultGeometry)
-{
-  mitk::TimeGeometry::ConstPointer timeGeometry = input->GetTimeGeometry();
-  mitk::TimeGeometry::Pointer mappedTimeGeometry = timeGeometry->Clone();
 
-  for (unsigned int i = 0; i < input->GetTimeSteps(); ++i)
-  {
-    mitk::ImageMappingHelper::ResultImageGeometryType::Pointer mappedGeometry = resultGeometry->Clone();
-    mappedTimeGeometry->SetTimeStepGeometry(mappedGeometry, i);
-  }
+mitk::TimeGeometry::Pointer mitk::ImageMappingHelper::CreateResultTimeGeometry(const BaseData* input, const mitk::ImageMappingHelper::ResultImageGeometryType* resultGeometry)
+{
+  const auto timeGeometry = input->GetTimeGeometry();
+  auto mappedTimeGeometry = timeGeometry->Clone();
+
+  mappedTimeGeometry->ReplaceTimeStepGeometries(resultGeometry);
+
   return mappedTimeGeometry;
 }
+
 
 mitk::ImageMappingHelper::ResultImageType::Pointer
   mitk::ImageMappingHelper::map(const InputImageType* input, const RegistrationType* registration,
@@ -267,60 +266,18 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 
   ResultImageType::Pointer result;
 
-  auto inputLabelSetImage = dynamic_cast<const MultiLabelSegmentation*>(input);
-
-  if (nullptr == inputLabelSetImage)
-  {
-    if (input->GetTimeSteps() == 1)
-    { //map the image and done
-      AccessByItk_n(input, doMITKMap, (result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
-    }
-    else
-    { //map every time step and compose
-
-      auto mappedTimeGeometry = CreateResultTimeGeometry(input, resultGeometry);
-      result = mitk::Image::New();
-      result->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
-
-      doMapTimesteps(input, result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType);
-    }
+  if (input->GetTimeSteps() == 1)
+  { //map the image and done
+    AccessByItk_n(input, doMITKMap, (result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
   }
   else
-  {
-    auto resultLabelSetImage = MultiLabelSegmentation::New();
+  { //map every time step and compose
 
     auto mappedTimeGeometry = CreateResultTimeGeometry(input, resultGeometry);
+    result = mitk::Image::New();
+    result->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
 
-    auto resultTemplate = mitk::Image::New();
-    resultTemplate->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
-
-    resultLabelSetImage->Initialize(resultTemplate);
-
-    auto cloneInput = inputLabelSetImage->Clone();
-    //We need to clone the MultiLabelSegmentation due to its illposed design. It is state full
-    //and we have to iterate through all layers as active layers to ensure the content
-    //was really stored (directly working with the layer images does not work with the
-    //active layer). The clone wastes resources but is the easiest and safest way to
-    //ensure 1) correct mapping 2) avoid race conditions with other parts of the
-    //application because we would change the state of the input.
-    //This whole code block should be reworked as soon as T28525 is done.
-
-    for (unsigned int layerID = 0; layerID < inputLabelSetImage->GetNumberOfLayers(); ++layerID)
-    {
-      if (resultLabelSetImage->GetNumberOfLayers() <= layerID)
-      {
-        resultLabelSetImage->AddLayer();
-      }
-      resultLabelSetImage->ReplaceGroupLabels(layerID, inputLabelSetImage->GetConstLabelsByValue(inputLabelSetImage->GetLabelValuesByGroup(layerID)));
-      cloneInput->SetActiveLayer(layerID);
-      resultLabelSetImage->SetActiveLayer(layerID);
-
-      doMapTimesteps(cloneInput, resultLabelSetImage, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, mitk::ImageMappingInterpolator::Linear);
-    }
-
-    resultLabelSetImage->SetActiveLayer(inputLabelSetImage->GetActiveLayer());
-    resultLabelSetImage->SetActiveLabel(inputLabelSetImage->GetActiveLabel()->GetValue());
-    result = resultLabelSetImage;
+    doMapTimesteps(input, result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType);
   }
 
   return result;

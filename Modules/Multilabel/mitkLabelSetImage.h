@@ -453,8 +453,12 @@ namespace mitk
     * True (default): all label and group informations will be removed. False: label
     * information and groups are kept, but all pixel information will be erased
     * (cf EraseLabel(...)).
+    * @param ensure1stGroup Indicates if the initialization guarantees that the first
+    * group always exists afterwards (true) or if after initialization no group will be
+    * added even if no group is defined (false; e.g if labels are reseted or instance has
+    * no groups so far)
     */
-    void Initialize(const mitk::Image* templateImage, bool resetLabels = true);
+    void Initialize(const mitk::Image* templateImage, bool resetLabels = true, bool ensure1stGroup = true);
 
     /** @brief Initialize a new mitk::MultiLabelSegmentation by a given image.
      * For all distinct pixel values of the parameter image new labels will

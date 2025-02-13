@@ -11,6 +11,7 @@ set(CPP_FILES
   Helper/mitkMaskedAlgorithmHelper.cpp
   Helper/mitkRegistrationHelper.cpp
   Helper/mitkImageMappingHelper.cpp
+  Helper/mitkMultiLabelSegmentationMappingHelper.cpp
   Helper/mitkImageStitchingHelper.cpp
   Helper/mitkPointSetMappingHelper.cpp
   Helper/mitkResultNodeGenerationHelper.cpp

@@ -137,7 +137,7 @@ mitk::Image::Pointer mitk::MultiLabelSegmentation::GenerateNewGroupImage() const
   return groupImage;
 }
 
-void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage, bool resetLabels)
+void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage, bool resetLabels, bool ensure1stGroup)
 {
   auto originalGeometry = templateImage->GetTimeGeometry()->Clone();
   this->SetTimeGeometry(originalGeometry);
@@ -163,7 +163,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage,
   DICOMQIPropertyHelper::DeriveDICOMSourceProperties(templateImage, this);
 
   // Add an initial LabelSet and corresponding image data to the stack
-  if (this->GetNumberOfLayers() == 0)
+  if (ensure1stGroup && this->GetNumberOfLayers() == 0)
   {
     AddLayer();
   }

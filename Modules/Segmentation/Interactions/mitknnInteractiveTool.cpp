@@ -76,7 +76,7 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
 
   switch (tool)
   {
-    case Point:
+    case Tool::Point:
     {
       auto node = this->GetPointSetNode(promptType);
 
@@ -92,13 +92,13 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
       break;
     }
 
-    case Box:
+    case Tool::Box:
       break;
 
-    case Scribble:
+    case Tool::Scribble:
       break;
 
-    case Lasso:
+    case Tool::Lasso:
       break;
 
     default:
@@ -120,7 +120,7 @@ void mitk::nnInteractiveTool::DisableInteraction()
 
   switch (m_ActiveTool.value())
   {
-    case Point:
+    case Tool::Point:
     {
       auto node = this->GetPointSetNode(m_PromptType);
       node->SetDataInteractor(nullptr);
@@ -130,13 +130,13 @@ void mitk::nnInteractiveTool::DisableInteraction()
       break;
     }
 
-    case Box:
+    case Tool::Box:
       break;
 
-    case Scribble:
+    case Tool::Scribble:
       break;
 
-    case Lasso:
+    case Tool::Lasso:
       break;
 
     default:

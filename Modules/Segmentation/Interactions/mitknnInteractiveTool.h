@@ -25,7 +25,7 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
   {
   public:
-    enum Tool
+    enum class Tool
     {
       Point,
       Box,
@@ -33,7 +33,7 @@ namespace mitk
       Lasso
     };
 
-    enum PromptType
+    enum class PromptType
     {
       Positive,
       Negative

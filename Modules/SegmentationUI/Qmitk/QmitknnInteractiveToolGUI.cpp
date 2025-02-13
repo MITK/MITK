@@ -68,21 +68,19 @@ void QmitknnInteractiveToolGUI::InitializePromptType()
     : PromptType::Negative;
 
   m_PromptTypeButtonGroup->addButton(m_Ui->positiveButton);
-  m_PromptTypeButtonGroup->setId(m_Ui->positiveButton, PromptType::Positive);
+  m_PromptTypeButtonGroup->setId(m_Ui->positiveButton, static_cast<int>(PromptType::Positive));
 
   m_PromptTypeButtonGroup->addButton(m_Ui->negativeButton);
-  m_PromptTypeButtonGroup->setId(m_Ui->negativeButton, PromptType::Negative);
+  m_PromptTypeButtonGroup->setId(m_Ui->negativeButton, static_cast<int>(PromptType::Negative));
 
-  auto idClicked = [this](int id)
+  connect(m_PromptTypeButtonGroup, &QButtonGroup::idClicked, [this](int id)
   {
-    if (id != m_PromptType)
+    if (id != static_cast<int>(m_PromptType))
     {
       m_PromptType = static_cast<PromptType>(id);
       this->OnPromptTypeChanged();
     }
-  };
-
-  connect(m_PromptTypeButtonGroup, &QButtonGroup::idClicked, idClicked);
+  });
 }
 
 void QmitknnInteractiveToolGUI::InitializeToolButtons()

@@ -26,7 +26,7 @@ QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
   : QmitkSegWithPreviewToolGUIBase(false),
     m_Ui(new Ui::QmitknnInteractiveToolGUI),
     m_PromptTypeButtonGroup(new QButtonGroup(this)),
-    m_PromptType(mitk::nnInteractiveTool::Positive)
+    m_PromptType(PromptType::Positive)
 {
 }
 
@@ -64,20 +64,20 @@ void QmitknnInteractiveToolGUI::ThemeIcons()
 void QmitknnInteractiveToolGUI::InitializePromptType()
 {
   m_PromptType = m_Ui->positiveButton->isChecked()
-    ? mitk::nnInteractiveTool::Positive
-    : mitk::nnInteractiveTool::Negative;
+    ? PromptType::Positive
+    : PromptType::Negative;
 
   m_PromptTypeButtonGroup->addButton(m_Ui->positiveButton);
-  m_PromptTypeButtonGroup->setId(m_Ui->positiveButton, mitk::nnInteractiveTool::Positive);
+  m_PromptTypeButtonGroup->setId(m_Ui->positiveButton, PromptType::Positive);
 
   m_PromptTypeButtonGroup->addButton(m_Ui->negativeButton);
-  m_PromptTypeButtonGroup->setId(m_Ui->negativeButton, mitk::nnInteractiveTool::Negative);
+  m_PromptTypeButtonGroup->setId(m_Ui->negativeButton, PromptType::Negative);
 
   auto idClicked = [this](int id)
   {
     if (id != m_PromptType)
     {
-      m_PromptType = static_cast<mitk::nnInteractiveTool::PromptType>(id);
+      m_PromptType = static_cast<PromptType>(id);
       this->OnPromptTypeChanged();
     }
   };
@@ -87,10 +87,13 @@ void QmitknnInteractiveToolGUI::InitializePromptType()
 
 void QmitknnInteractiveToolGUI::InitializeToolButtons()
 {
-  connect(m_Ui->pointButton, &QPushButton::toggled, this, &Self::OnPointToolToggled);
-  connect(m_Ui->boxButton, &QPushButton::toggled, this, &Self::OnBoxToolToggled);
-  connect(m_Ui->scribbleButton, &QPushButton::toggled, this, &Self::OnScribbleToolToggled);
-  connect(m_Ui->lassoButton, &QPushButton::toggled, this, &Self::OnLassoToolToggled);
+  m_ToolButtons[Tool::Point] = m_Ui->pointButton;
+  m_ToolButtons[Tool::Box] = m_Ui->boxButton;
+  m_ToolButtons[Tool::Scribble] = m_Ui->scribbleButton;
+  m_ToolButtons[Tool::Lasso] = m_Ui->lassoButton;
+
+  for (const auto& [tool, button] : m_ToolButtons)
+    connect(button, &QPushButton::toggled, [this, tool](bool checked) { this->OnToolToggled(tool, checked); });
 }
 
 void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
@@ -104,86 +107,35 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
 
 void QmitknnInteractiveToolGUI::OnPromptTypeChanged()
 {
-  if (m_Ui->pointButton->isChecked())
+  for (auto tool : this->GetTool()->GetTools())
   {
-    this->OnPointToolToggled(false);
-    this->OnPointToolToggled(true);
-  }
-}
-
-void QmitknnInteractiveToolGUI::OnPointToolToggled(bool checked)
-{
-  if (checked)
-  {
-    this->SwitchOffOtherTools(m_Ui->pointButton);
-
-    auto node = this->GetTool()->GetPointSetNode(m_PromptType);
-
-    if (node->GetDataInteractor().IsNull())
+    if (m_ToolButtons[tool]->isChecked())
     {
-      auto interactor = mitk::PointSetDataInteractor::New();
-      interactor->LoadStateMachine("PointSet.xml");
-      interactor->SetEventConfig("PointSetConfigLMB.xml");
-      interactor->EnableMovement(false);
-      interactor->SetDataNode(node);
+      this->GetTool()->EnableInteraction(tool, m_PromptType);
+      break;
     }
-
-    this->GetTool()->BlockLMBDisplayInteraction();
-  }
-  else
-  {
-    for (auto promptType : { mitk::nnInteractiveTool::Positive, mitk::nnInteractiveTool::Negative })
-    {
-      auto node = this->GetTool()->GetPointSetNode(promptType);
-      node->SetDataInteractor(nullptr);
-      node->GetDataAs<mitk::PointSet>()->ClearSelection();
-    }
-
-    this->GetTool()->UnblockLMBDisplayInteraction();
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
-void QmitknnInteractiveToolGUI::OnBoxToolToggled(bool checked)
+void QmitknnInteractiveToolGUI::OnToolToggled(Tool tool, bool checked)
 {
   if (checked)
   {
-    this->SwitchOffOtherTools(m_Ui->boxButton);
+    this->UncheckOtherToolButtons(m_ToolButtons[tool]);
+    this->GetTool()->EnableInteraction(tool, m_PromptType);
   }
   else
   {
+    this->GetTool()->DisableInteraction();
   }
 }
 
-void QmitknnInteractiveToolGUI::OnScribbleToolToggled(bool checked)
+void QmitknnInteractiveToolGUI::UncheckOtherToolButtons(QPushButton* toolButton)
 {
-  if (checked)
+  for (const auto& [tool, button] : m_ToolButtons)
   {
-    this->SwitchOffOtherTools(m_Ui->scribbleButton);
-  }
-  else
-  {
-  }
-}
-
-void QmitknnInteractiveToolGUI::OnLassoToolToggled(bool checked)
-{
-  if (checked)
-  {
-    this->SwitchOffOtherTools(m_Ui->lassoButton);
-  }
-  else
-  {
-  }
-}
-
-void QmitknnInteractiveToolGUI::SwitchOffOtherTools(QPushButton* toolButton)
-{
-  for (auto otherToolButton : m_Ui->interactionToolsGroupBox->findChildren<QPushButton*>())
-  {
-    if (otherToolButton != toolButton)
-      otherToolButton->setChecked(false);
+    if (button != toolButton)
+      button->setChecked(false);
   }
 }
 

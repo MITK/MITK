@@ -15,14 +15,24 @@ found in the LICENSE file.
 
 #include "mitkSegWithPreviewTool.h"
 
-#include <mitkDataNode.h>
-#include <mitkPointSet.h>
+#include <array>
+#include <optional>
+#include <utility>
+#include <vector>
 
 namespace mitk
 {
   class MITKSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
   {
   public:
+    enum Tool
+    {
+      Point,
+      Box,
+      Scribble,
+      Lasso
+    };
+
     enum PromptType
     {
       Positive,
@@ -39,9 +49,10 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
 
-    DataNode* GetPointSetNode(PromptType promptType) const;
-    void BlockLMBDisplayInteraction();
-    void UnblockLMBDisplayInteraction();
+    const std::array<Tool, 4>& GetTools() const;
+
+    void EnableInteraction(Tool tool, PromptType promptType);
+    void DisableInteraction();
 
   protected:
     nnInteractiveTool();
@@ -49,12 +60,18 @@ namespace mitk
 
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 
+    void BlockLMBDisplayInteraction();
+    void UnblockLMBDisplayInteraction();
+    DataNode* GetPointSetNode(PromptType promptType) const;
+
   private:
+    PromptType m_PromptType;
+    std::array<Tool, 4> m_Tools;
+    std::optional<Tool> m_ActiveTool;
+
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
 
-    PointSet::Pointer m_PositivePoints;
     DataNode::Pointer m_PositivePointsNode;
-    PointSet::Pointer m_NegativePoints;
     DataNode::Pointer m_NegativePointsNode;
   };
 }

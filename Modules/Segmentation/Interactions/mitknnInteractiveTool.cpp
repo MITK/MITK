@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitknnInteractiveTool.h"
 
 #include <mitkDisplayActionEventBroadcast.h>
+#include <mitkPointSetDataInteractor.h>
 #include <mitkPointSetShapeProperty.h>
 #include <mitkToolManager.h>
 
@@ -42,6 +43,12 @@ namespace
 }
 
 mitk::nnInteractiveTool::nnInteractiveTool()
+  : m_PromptType(PromptType::Positive),
+    m_Tools {
+      Tool::Point,
+      Tool::Box,
+      Tool::Scribble,
+      Tool::Lasso }
 {
 }
 
@@ -49,71 +56,94 @@ mitk::nnInteractiveTool::~nnInteractiveTool()
 {
 }
 
-mitk::DataNode* mitk::nnInteractiveTool::GetPointSetNode(PromptType promptType) const
+const std::array<mitk::nnInteractiveTool::Tool, 4>& mitk::nnInteractiveTool::GetTools() const
 {
-  if (promptType == PromptType::Positive)
-    return m_PositivePointsNode;
-
-  return m_NegativePointsNode;
+  return m_Tools;
 }
 
-void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType)
 {
+  if (m_ActiveTool.has_value())
+  {
+    if (m_ActiveTool == tool)
+    {
+      if (m_PromptType == promptType)
+        return;
+    }
+
+    this->DisableInteraction();
+  }
+
+  switch (tool)
+  {
+    case Point:
+    {
+      auto node = this->GetPointSetNode(promptType);
+
+      if (node->GetDataInteractor().IsNull())
+      {
+        auto interactor = mitk::PointSetDataInteractor::New();
+        interactor->LoadStateMachine("PointSet.xml");
+        interactor->SetEventConfig("PointSetConfigLMB.xml");
+        interactor->EnableMovement(false);
+        interactor->SetDataNode(node);
+      }
+
+      break;
+    }
+
+    case Box:
+      break;
+
+    case Scribble:
+      break;
+
+    case Lasso:
+      break;
+
+    default:
+      break;
+  }
+
+  m_ActiveTool = tool;
+  m_PromptType = promptType;
+
+  this->BlockLMBDisplayInteraction();
 }
 
-const char* mitk::nnInteractiveTool::GetName() const
+void mitk::nnInteractiveTool::DisableInteraction()
 {
-  return "nnInteractive";
-}
+  if (!m_ActiveTool.has_value())
+    return;
 
-const char** mitk::nnInteractiveTool::GetXPM() const
-{
-  return nullptr;
-}
+  this->UnblockLMBDisplayInteraction();
 
-us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
-{
-  auto module = us::GetModuleContext()->GetModule();
-  auto resource = module->GetResource("AI.svg");
-  return resource;
-}
+  switch (m_ActiveTool.value())
+  {
+    case Point:
+    {
+      auto node = this->GetPointSetNode(m_PromptType);
+      node->SetDataInteractor(nullptr);
+      node->GetDataAs<PointSet>()->ClearSelection();
 
-void mitk::nnInteractiveTool::Activated()
-{
-  Superclass::Activated();
+      RenderingManager::GetInstance()->RequestUpdateAll();
+      break;
+    }
 
-  m_PositivePoints = PointSet::New();
-  m_PositivePointsNode = DataNode::New();
+    case Box:
+      break;
 
-  SetCommonPointsetProperties(m_PositivePointsNode, 0.125f, 0.5f, 0.125f);
-  m_PositivePointsNode->SetName("nnInteractive positive points");
-  m_PositivePointsNode->SetData(m_PositivePoints);
+    case Scribble:
+      break;
 
-  this->GetDataStorage()->Add(m_PositivePointsNode, this->GetToolManager()->GetReferenceData(0));
+    case Lasso:
+      break;
 
-  m_NegativePoints = PointSet::New();
-  m_NegativePointsNode = DataNode::New();
+    default:
+      break;
+  }
 
-  SetCommonPointsetProperties(m_NegativePointsNode, 0.625f, 0.125f, 0.125f);
-  m_NegativePointsNode->SetName("nnInteractive negative points");
-  m_NegativePointsNode->SetData(m_NegativePoints);
-
-  this->GetDataStorage()->Add(m_NegativePointsNode, this->GetToolManager()->GetReferenceData(0));
-}
-
-void mitk::nnInteractiveTool::Deactivated()
-{
-  this->GetDataStorage()->Remove(m_NegativePointsNode);
-
-  m_NegativePointsNode = nullptr;
-  m_NegativePoints = nullptr;
-
-  this->GetDataStorage()->Remove(m_PositivePointsNode);
-
-  m_PositivePointsNode = nullptr;
-  m_PositivePoints = nullptr;
-
-  Superclass::Deactivated();
+  m_ActiveTool.reset();
 }
 
 void mitk::nnInteractiveTool::BlockLMBDisplayInteraction()
@@ -148,4 +178,67 @@ void mitk::nnInteractiveTool::UnblockLMBDisplayInteraction()
   }
 
   m_EventConfigBackup.clear();
+}
+
+mitk::DataNode* mitk::nnInteractiveTool::GetPointSetNode(PromptType promptType) const
+{
+  if (promptType == PromptType::Positive)
+    return m_PositivePointsNode;
+
+  return m_NegativePointsNode;
+}
+
+void mitk::nnInteractiveTool::Activated()
+{
+  Superclass::Activated();
+
+  auto positivePoints = PointSet::New();
+  m_PositivePointsNode = DataNode::New();
+
+  SetCommonPointsetProperties(m_PositivePointsNode, 0.125f, 0.5f, 0.125f);
+  m_PositivePointsNode->SetName("nnInteractive positive points");
+  m_PositivePointsNode->SetData(positivePoints);
+
+  this->GetDataStorage()->Add(m_PositivePointsNode, this->GetToolManager()->GetReferenceData(0));
+
+  auto negativePoints = PointSet::New();
+  m_NegativePointsNode = DataNode::New();
+
+  SetCommonPointsetProperties(m_NegativePointsNode, 0.625f, 0.125f, 0.125f);
+  m_NegativePointsNode->SetName("nnInteractive negative points");
+  m_NegativePointsNode->SetData(negativePoints);
+
+  this->GetDataStorage()->Add(m_NegativePointsNode, this->GetToolManager()->GetReferenceData(0));
+}
+
+void mitk::nnInteractiveTool::Deactivated()
+{
+  this->GetDataStorage()->Remove(m_NegativePointsNode);
+  m_NegativePointsNode = nullptr;
+
+  this->GetDataStorage()->Remove(m_PositivePointsNode);
+  m_PositivePointsNode = nullptr;
+
+  Superclass::Deactivated();
+}
+
+void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
+{
+}
+
+const char* mitk::nnInteractiveTool::GetName() const
+{
+  return "nnInteractive";
+}
+
+const char** mitk::nnInteractiveTool::GetXPM() const
+{
+  return nullptr;
+}
+
+us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
+{
+  auto module = us::GetModuleContext()->GetModule();
+  auto resource = module->GetResource("AI.svg");
+  return resource;
 }

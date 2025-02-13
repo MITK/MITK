@@ -33,6 +33,9 @@ public:
   itkFactorylessNewMacro(Self);
 
 protected:
+  using Tool = mitk::nnInteractiveTool::Tool;
+  using PromptType = mitk::nnInteractiveTool::PromptType;
+
   QmitknnInteractiveToolGUI();
   ~QmitknnInteractiveToolGUI() override;
 
@@ -45,19 +48,21 @@ protected:
 
   void OnPromptTypeChanged();
 
+  void OnToolToggled(Tool tool, bool checked);
   void OnPointToolToggled(bool checked);
   void OnBoxToolToggled(bool checked);
   void OnScribbleToolToggled(bool checked);
   void OnLassoToolToggled(bool checked);
 
-  void SwitchOffOtherTools(QPushButton* toolButton);
+  void UncheckOtherToolButtons(QPushButton* toolButton);
 
 private:
   mitk::nnInteractiveTool* GetTool();
 
   Ui::QmitknnInteractiveToolGUI* m_Ui;
   QButtonGroup* m_PromptTypeButtonGroup;
-  mitk::nnInteractiveTool::PromptType m_PromptType;
+  PromptType m_PromptType;
+  std::unordered_map<Tool, QPushButton*> m_ToolButtons;
 };
 
 #endif

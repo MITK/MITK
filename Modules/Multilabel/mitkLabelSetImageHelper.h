@@ -75,6 +75,9 @@ namespace mitk
     MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassName(const MultiLabelSegmentation* labelSetImage, MultiLabelSegmentation::GroupIndexType groupID);
     MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassName(const MultiLabelSegmentation* labelSetImage, MultiLabelSegmentation::GroupIndexType groupID, const MultiLabelSegmentation::LabelValueVectorType& labelValues);
 
+    using SourceToTargetGroupIDToLabelValueMappingMapType = std::map<MultiLabelSegmentation::GroupIndexType, std::map<MultiLabelSegmentation::GroupIndexType, LabelValueMappingVector> >;
+    MITKMULTILABEL_EXPORT SourceToTargetGroupIDToLabelValueMappingMapType SplitLabelValueMappingBySourceAndTargetGroup(const MultiLabelSegmentation* sourceSeg, const MultiLabelSegmentation* targetSeg, const LabelValueMappingVector& labelMapping);
+
     MITKMULTILABEL_EXPORT std::string CreateDisplayGroupName(const MultiLabelSegmentation* labelSetImage, MultiLabelSegmentation::GroupIndexType groupID);
 
     /** Helper that creates the human readable display name for a label. If label segmentation image is not null, the function will also check

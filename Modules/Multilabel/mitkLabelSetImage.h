@@ -422,10 +422,27 @@ namespace mitk
     void UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep = 0);
 
     /**
-     * @brief clears all label pixel content form the indicated group.
+     * @brief clears all label pixel content from the indicated group.
      * @per groupID must point to a valid group.
      */
     void ClearGroupImage(GroupIndexType groupID);
+    /**
+     * @brief clears all label pixel content from the indicated group.
+     * @per groupID must point to a valid group.
+     * @per timestep must be a valid.
+     */
+     void ClearGroupImage(GroupIndexType groupID, TimeStepType timestep);
+
+    /**
+     * @brief clears all label pixel content of all groups.
+     * @per groupID must point to a valid group.
+     */
+    void ClearGroupImages();
+    /**
+     * @brief clears all label pixel content of all groups in one time step.
+     * @per timestep must be a valid.
+     */
+    void ClearGroupImages(TimeStepType timestep);
 
     /** Returns the name of the indicated group. String may be empty if no name was defined.
      * Remark: The name neither is guaranteed to be defined nor that it is unique. Use the index

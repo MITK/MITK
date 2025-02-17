@@ -473,13 +473,85 @@ void mitk::MultiLabelSegmentation::ClearGroupImage(GroupIndexType groupID)
 
   try
   {
-    ClearImageBuffer(this->GetGroupImage(groupID));
-    this->Modified();
+    auto groupImage = this->GetGroupImage(groupID);
+    ClearImageBuffer(groupImage);
+    groupImage->Modified();
+    this->InvokeEvent(LabelsChangedEvent(this->GetLabelValuesByGroup(groupID)));
+    this->InvokeEvent(GroupModifiedEvent(groupID));
   }
   catch (itk::ExceptionObject &e)
   {
     mitkThrow() << e.GetDescription();
   }
+  this->Modified();
+}
+
+void mitk::MultiLabelSegmentation::ClearGroupImage(GroupIndexType groupID, TimeStepType timestep)
+{
+  if (!this->ExistGroup(groupID))
+    mitkThrow() << "Error, cannot clear group image. Group ID is invalid. Invalid ID: " << groupID;
+
+  if (!this->GetTimeSteps()<=timestep)
+    mitkThrow() << "Error, cannot clear group image time step. Time step is invalid. Invalid time step: " << timestep;
+
+  try
+  {
+    auto groupImage = this->GetGroupImage(groupID);
+    auto tsImage = SelectImageByTimeStep(groupImage, timestep);
+    ClearImageBuffer(tsImage);
+    groupImage->Modified();
+    this->InvokeEvent(LabelsChangedEvent(this->GetLabelValuesByGroup(groupID)));
+    this->InvokeEvent(GroupModifiedEvent(groupID));
+  }
+  catch (itk::ExceptionObject& e)
+  {
+    mitkThrow() << e.GetDescription();
+  }
+  this->Modified();
+}
+
+void mitk::MultiLabelSegmentation::ClearGroupImages()
+{
+  for (GroupIndexType groupID = 0; groupID < m_LayerContainer.size(); ++groupID)
+  {
+    try
+    {
+      auto groupImage = this->GetGroupImage(groupID);
+      ClearImageBuffer(groupImage);
+      groupImage->Modified();
+      this->InvokeEvent(LabelsChangedEvent(this->GetLabelValuesByGroup(groupID)));
+      this->InvokeEvent(GroupModifiedEvent(groupID));
+    }
+    catch (itk::ExceptionObject& e)
+    {
+      mitkThrow() << e.GetDescription();
+    }
+  }
+  this->Modified();
+}
+
+void mitk::MultiLabelSegmentation::ClearGroupImages(TimeStepType timestep)
+{
+  if (!this->GetTimeSteps() <= timestep)
+    mitkThrow() << "Error, cannot clear group image time step. Time step is invalid. Invalid time step: " << timestep;
+
+  for (GroupIndexType groupID = 0; groupID < m_LayerContainer.size(); ++groupID)
+  {
+    try
+    {
+      auto groupImage = this->GetGroupImage(groupID);
+      auto tsImage = SelectImageByTimeStep(groupImage, timestep);
+      ClearImageBuffer(tsImage);
+      groupImage->Modified();
+      this->InvokeEvent(LabelsChangedEvent(this->GetLabelValuesByGroup(groupID)));
+      this->InvokeEvent(GroupModifiedEvent(groupID));
+    }
+    catch (itk::ExceptionObject& e)
+    {
+      mitkThrow() << e.GetDescription();
+    }
+  }
+  this->Modified();
 }
 
 void mitk::MultiLabelSegmentation::MergeLabel(LabelValueType targetLabelValue, LabelValueType sourceLabelValue, OverwriteStyle overwriteStyle)

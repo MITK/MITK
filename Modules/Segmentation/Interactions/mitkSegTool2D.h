@@ -151,7 +151,7 @@ namespace mitk
      * @brief returns the segmentation node that should be modified by the tool.
      */
     DataNode* GetWorkingDataNode() const;
-    Image* GetWorkingData() const;
+    MultiLabelSegmentation* GetWorkingData() const;
 
     DataNode* GetReferenceDataNode() const;
     Image* GetReferenceData() const;

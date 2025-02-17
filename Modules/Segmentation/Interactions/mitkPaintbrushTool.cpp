@@ -470,14 +470,14 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
 void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  // When mouse is released write segmentationresult back into image
+  // When mouse is released write segmentation result back into image
   auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
     return;
 
   DataNode* workingNode(this->GetToolManager()->GetWorkingData(0));
-  auto workingImage = dynamic_cast<MultiLabelSegmentation*>(workingNode->GetData());
-  Label::PixelType activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
+  auto workingSeg = dynamic_cast<MultiLabelSegmentation*>(workingNode->GetData());
+  Label::PixelType activePixelValue = workingSeg->GetActiveLabel()->GetValue();
   if (!m_FillMode)
   {
     activePixelValue = MultiLabelSegmentation::UNLABELED_VALUE;
@@ -488,12 +488,12 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
   //the active label can always be changed even if locked)
   //we realize that by cloning the relevant label and changing the lock state
   //this fillLabelSet is used for the transfer.
-  auto destinationLabels = workingImage->GetConstLabelsByValue(workingImage->GetLabelValuesByGroup(workingImage->GetActiveLayer()));
-  auto activeLabelClone = workingImage->GetActiveLabel()->Clone();
+  auto destinationLabels = workingSeg->GetConstLabelsByValue(workingSeg->GetLabelValuesByGroup(workingSeg->GetActiveLayer()));
+  auto activeLabelClone = workingSeg->GetActiveLabel()->Clone();
   if (nullptr != activeLabelClone)
   {
     activeLabelClone->SetLocked(false);
-    auto activeIter = std::find(destinationLabels.begin(), destinationLabels.end(), workingImage->GetActiveLabel());
+    auto activeIter = std::find(destinationLabels.begin(), destinationLabels.end(), workingSeg->GetActiveLabel());
     if (activeIter == destinationLabels.end()) mitkThrow() << "Application is in an invalid state. Active label is not contained in the labelset, but its group was requested.";
     *activeIter = activeLabelClone;
   }

@@ -53,32 +53,33 @@ void mitk::EditableContourTool::Deactivated()
 void mitk::EditableContourTool::ConfirmSegmentation(bool resetStatMachine)
 {
   auto referenceImage = this->GetReferenceData();
-  auto workingImage = this->GetWorkingData();
+  auto workingSeg = this->GetWorkingData();
 
-  if (nullptr != referenceImage && nullptr != workingImage)
+  if (nullptr != referenceImage && nullptr != workingSeg)
   {
     std::vector<SliceInformation> sliceInfos;
 
     const auto currentTimePoint =
       mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-    TimeStepType workingImageTimeStep = workingImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
+    TimeStepType workingImageTimeStep = workingSeg->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
 
     auto contour = this->GetContour();
     if (nullptr == contour || contour->IsEmpty())
       return;
 
+    const auto groupImage = workingSeg->GetGroupImage(workingSeg->GetActiveLayer());
     auto workingSlice =
-      this->GetAffectedImageSliceAs2DImage(m_PlaneGeometry, workingImage, workingImageTimeStep)->Clone();
+      this->GetAffectedImageSliceAs2DImage(m_PlaneGeometry, groupImage, workingImageTimeStep)->Clone();
     sliceInfos.emplace_back(workingSlice, m_PlaneGeometry, workingImageTimeStep);
 
     auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contour);
-    int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
+    int activePixelValue = workingSeg->GetActiveLabel()->GetValue();
     if (!m_AddMode)
     {
       activePixelValue = 0;
     }
 
-    ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, workingImage, activePixelValue);
+    ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, groupImage, activePixelValue);
 
     this->WriteBackSegmentationResults(sliceInfos);
   }

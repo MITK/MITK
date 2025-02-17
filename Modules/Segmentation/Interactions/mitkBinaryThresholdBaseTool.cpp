@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkBinaryThresholdBaseTool.h"
 
 #include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
+#include "mitkITKImageImport.h"
 #include "mitkImageStatisticsHolder.h"
 #include "mitkLabelSetImage.h"
 #include <itkBinaryThresholdImageFilter.h>
@@ -126,5 +126,7 @@ void mitk::BinaryThresholdBaseTool::ITKThresholding(const itk::Image<TPixel, VIm
   filter->SetOutsideValue(0);
   filter->Update();
 
-  segmentation->SetVolume((void *)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
+  auto outputImage = ImportItkImage(filter->GetOutput());
+
+  segmentation->UpdateGroupImage(segmentation->GetGroupIndexOfLabel(activeValue), outputImage, timeStep);
 }

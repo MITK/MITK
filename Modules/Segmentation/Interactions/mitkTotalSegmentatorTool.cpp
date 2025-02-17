@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <mitkIOUtil.h>
 #include <mitkImageReadAccessor.h>
+#include <mitkLabelSetImageHelper.h>
 
 #include <algorithm>
 #include <mitkFileSystem.h>
@@ -151,9 +152,8 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     targetLabelMap = (this->GetSubTask() == DEFAULT_TOTAL_TASK) ? m_LabelMapTotal : m_LabelMapTotalMR;
   } 
   m_ProgressCommand->SetProgress(180);
-  mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
   this->MapLabelsToSegmentation(outputBuffer, previewImage, targetLabelMap);
-  previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
+  previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), outputBuffer->GetGroupImage(outputBuffer->GetActiveLayer()), timeStep);
 }
 
 void mitk::TotalSegmentatorTool::UpdatePrepare()
@@ -182,30 +182,11 @@ mitk::MultiLabelSegmentation::Pointer mitk::TotalSegmentatorTool::AgglomerateLab
   {
     auto const &outputImagePath = filePaths[labelId-1];
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
-    auto source = mitk::MultiLabelSegmentation::New();
-    source->InitializeByLabeledImage(outputImage);
-    source->SetGeometry(geometry);
-    if (source->GetTotalNumberOfLabels() == 0)
-    {
-      MITK_DEBUG << "No label found for " << outputImagePath;
-      continue;
-    }
-    double rgba[4];
-    aggloLabelImage->GetLookupTable()->GetTableValue(labelId, rgba);
-    mitk::Color color;
-    color.SetRed(rgba[0]);
-    color.SetGreen(rgba[1]);
-    color.SetBlue(rgba[2]);
+    auto label = LabelSetImageHelper::CreateNewLabel(aggloLabelImage, "object");
 
-    auto label = mitk::Label::New();
-    label->SetName("object-" + std::to_string(labelId));
-    label->SetValue(labelId);
-    label->SetColor(color);
-    label->SetOpacity(rgba[3]);
     #pragma omp critical
     {
-      aggloLabelImage->AddLabel(label, layerIndex, false, false);
-      mitk::TransferLabelContent(source, aggloLabelImage, aggloLabelImage->GetConstLabelsByValue(aggloLabelImage->GetLabelValuesByGroup(layerIndex)), 0, 0, false, {{1, labelId}});
+      aggloLabelImage->AddLabelWithContent(label, outputImage, layerIndex, 1, false);
     }
   }
   return aggloLabelImage;

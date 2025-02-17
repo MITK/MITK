@@ -153,7 +153,7 @@ void mitk::PickingTool::ClearSeeds()
 
 template <typename TPixel, unsigned int VImageDimension>
 void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
-  mitk::Image* segmentation,
+  mitk::MultiLabelSegmentation* segmentation,
   const mitk::PointSet* seedPoints,
   unsigned int timeStep, const mitk::BaseGeometry* inputGeometry, const mitk::Label::PixelType outputValue,
   const mitk::Label::PixelType backgroundValue,
@@ -233,7 +233,8 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
 
   if (itkResultImage.IsNotNull())
   {
-    segmentation->SetVolume((void*)(itkResultImage->GetPixelContainer()->GetBufferPointer()),timeStep);
+    auto outputImage = mitk::ImportItkImage(itkResultImage);
+    segmentation->UpdateGroupImage(segmentation->GetGroupIndexOfLabel(outputValue), outputImage, timeStep);
   }
   emptyTimeStep = itkResultImage.IsNull();
 

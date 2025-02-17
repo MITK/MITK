@@ -83,13 +83,13 @@ void mitk::FeedbackContourTool::InitializeFeedbackContour(bool isClosed)
   m_FeedbackContour = ContourModel::New();
   m_FeedbackContour->SetClosed(isClosed);
 
-  auto workingImage = this->GetWorkingData();
+  auto workingSeg = this->GetWorkingData();
 
-  if (nullptr != workingImage)
+  if (nullptr != workingSeg)
   {
-    m_FeedbackContour->Expand(workingImage->GetTimeSteps());
+    m_FeedbackContour->Expand(workingSeg->GetTimeSteps());
 
-    auto contourTimeGeometry = workingImage->GetTimeGeometry()->Clone();
+    auto contourTimeGeometry = workingSeg->GetTimeGeometry()->Clone();
     contourTimeGeometry->ReplaceTimeStepGeometries(m_FeedbackContour->GetGeometry());
     m_FeedbackContour->SetTimeGeometry(contourTimeGeometry);
 
@@ -214,10 +214,10 @@ void mitk::FeedbackContourTool::WriteBackFeedbackContourAsSegmentationResult(con
   if (!positionEvent)
     return;
 
-  auto workingImage = this->GetWorkingData();
+  auto workingSeg = this->GetWorkingData();
   const auto planeGeometry((positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
 
-  if (!workingImage || !planeGeometry)
+  if (!workingSeg || !planeGeometry)
     return;
 
   const auto* abstractTransformGeometry(
@@ -242,10 +242,10 @@ void mitk::FeedbackContourTool::WriteBackFeedbackContourAsSegmentationResult(con
   if (projectedContour.IsNull())
     return;
 
-  auto activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
-
+  auto activePixelValue = workingSeg->GetActiveLabel()->GetValue();
+  const auto groupImage = workingSeg->GetGroupImage(workingSeg->GetActiveLayer());
   mitk::ContourModelUtils::FillContourInSlice(
-    projectedContour, contourTimeStep, slice, workingImage, paintingPixelValue * activePixelValue);
+    projectedContour, contourTimeStep, slice, groupImage, paintingPixelValue * activePixelValue);
 
   this->WriteBackSegmentationResult(positionEvent, slice);
 

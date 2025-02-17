@@ -265,10 +265,10 @@ namespace
 
 void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                 const Image * /*oldSegAtTimeStep*/,
-                                                MultiLabelSegmentation *previewImage,
+                                                MultiLabelSegmentation *previewSeg,
                                                 TimeStepType timeStep)
 {
-  if (nullptr != previewImage && ::IsImageAtTimeStepValid(inputAtTimeStep))
+  if (nullptr != previewSeg && ::IsImageAtTimeStepValid(inputAtTimeStep))
   {
     if (this->HasPicks() && nullptr != m_PythonService)
     {
@@ -301,7 +301,8 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
         std::this_thread::sleep_for(100ms);
         mitk::MultiLabelSegmentation::Pointer outputBuffer = m_PythonService->RetrieveImageFromProcess(this->GetTimeOutLimit());
         m_ProgressCommand->SetProgress(180);
-        mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), outputBuffer.GetPointer(), timeStep, false);
+        mitk::SegTool2D::WriteSliceToVolume(previewSeg->GetGroupImage(previewSeg->GetActiveLayer()),
+          this->GetWorkingPlaneGeometry(), outputBuffer->GetGroupImage(outputBuffer->GetActiveLayer()), timeStep, false);
         this->SetSelectedLabels({MASK_VALUE});
         this->EmitSAMStatusMessageEvent("Successfully generated segmentation.");
       }

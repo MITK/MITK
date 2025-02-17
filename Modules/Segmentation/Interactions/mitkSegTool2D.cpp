@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include "mitkPlaneGeometry.h"
 #include <mitkTimeNavigationController.h>
 #include "mitkImageAccessByItk.h"
+#include "mitkNodePredicateProperty.h"
+#include "mitkLabelSetImageHelper.h"
 
 // Include of the new ImageExtractor
 #include "mitkMorphologicalOperations.h"
@@ -148,21 +150,26 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice(const Image *image,
   return true;
 }
 
-void mitk::SegTool2D::UpdateAllSurfaceInterpolations(const MultiLabelSegmentation *workingImage,
+void mitk::SegTool2D::UpdateAllSurfaceInterpolations(const MultiLabelSegmentation *workingSeg,
                                                  TimeStepType timeStep,
                                                  const PlaneGeometry *plane,
                                                  bool detectIntersection)
 {
-  if (nullptr == workingImage) mitkThrow() << "Cannot update surface interpolation. Invalid working image passed.";
+  if (nullptr == workingSeg) mitkThrow() << "Cannot update surface interpolation. Invalid working image passed.";
   if (nullptr == plane) mitkThrow() << "Cannot update surface interpolation. Invalid plane passed.";
 
-  auto affectedLabels = mitk::SurfaceInterpolationController::GetInstance()->GetAffectedLabels(workingImage, timeStep, plane);
-  for (auto affectedLabel : affectedLabels)
+  auto affectedLabels = mitk::SurfaceInterpolationController::GetInstance()->GetAffectedLabels(workingSeg, timeStep, plane);
+  auto affectedGroupLabelMapping = LabelSetImageHelper::SplitLabelValuesByGroup(workingSeg, affectedLabels);
+
+  for (const auto& [groupID, relevantLabels] : affectedGroupLabelMapping)
   {
-    auto groupID = workingImage->GetGroupIndexOfLabel(affectedLabel);
-    auto slice = GetAffectedImageSliceAs2DImage(plane, workingImage->GetGroupImage(groupID), timeStep);
-    std::vector<SliceInformation> slices = { SliceInformation(slice, plane, timeStep) };
-    Self::UpdateSurfaceInterpolation(slices, workingImage, detectIntersection, affectedLabel, true);
+    const auto groupImage = workingSeg->GetGroupImage(groupID);
+    auto slice = GetAffectedImageSliceAs2DImage(plane, groupImage, timeStep);
+    for (auto relevantLabel : relevantLabels)
+    {
+      std::vector<SliceInformation> slices = { SliceInformation(slice, plane, timeStep) };
+      Self::UpdateSurfaceInterpolation(slices, groupImage, detectIntersection, relevantLabel, true);
+    }
   }
 
   if(!affectedLabels.empty()) mitk::SurfaceInterpolationController::GetInstance()->Modified();
@@ -481,12 +488,12 @@ mitk::DataNode* mitk::SegTool2D::GetWorkingDataNode() const
   return nullptr;
 }
 
-mitk::Image* mitk::SegTool2D::GetWorkingData() const
+mitk::MultiLabelSegmentation* mitk::SegTool2D::GetWorkingData() const
 {
   auto node = this->GetWorkingDataNode();
   if (nullptr != node)
   {
-    return dynamic_cast<Image*>(node->GetData());
+    return dynamic_cast<MultiLabelSegmentation*>(node->GetData());
   }
   return nullptr;
 }

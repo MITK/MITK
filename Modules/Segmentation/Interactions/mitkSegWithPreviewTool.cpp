@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
 #include "mitkLabelSetImage.h"
+#include "mitkLabelSetImageHelper.h"
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"
 #include "mitkNodePredicateGeometry.h"
@@ -239,19 +240,12 @@ const mitk::Image* mitk::SegWithPreviewTool::GetReferenceData() const
   return dynamic_cast<const Image*>(m_ReferenceDataNode->GetData());
 }
 
-template <typename ImageType>
-void ClearBufferProcessing(ImageType* itkImage)
-{
-  itkImage->FillBuffer(0);
-}
-
 void mitk::SegWithPreviewTool::ResetPreviewContentAtTimeStep(unsigned int timeStep)
 {
-  auto previewImage = GetImageByTimeStep(this->GetPreviewSegmentation(), timeStep);
+  auto previewImage = this->GetPreviewSegmentation();
   if (nullptr != previewImage)
   {
-    AccessByItk(previewImage, ClearBufferProcessing);
-    previewImage->Modified();
+    previewImage->ClearGroupImages(timeStep);
   }
 }
 
@@ -260,10 +254,7 @@ void mitk::SegWithPreviewTool::ResetPreviewContent()
   auto previewImage = this->GetPreviewSegmentation();
   if (nullptr != previewImage)
   {
-    auto castedPreviewImage =
-      dynamic_cast<MultiLabelSegmentation*>(previewImage);
-    if (nullptr == castedPreviewImage) mitkThrow() << "Application is on wrong state / invalid tool implementation. Preview image should always be of type MultiLabelSegmentation now.";
-    castedPreviewImage->ClearBuffer();
+    previewImage->ClearGroupImages();
   }
 }
 
@@ -290,7 +281,7 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
       auto newPreviewImage = workingImage->Clone();
       if (this->GetResetsToEmptyPreview())
       {
-        newPreviewImage->ClearBuffer();
+        newPreviewImage->ClearGroupImages();
       }
 
       if (newPreviewImage.IsNull())
@@ -324,30 +315,7 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
     }
     else
     {
-      Image::ConstPointer workingImageBin = dynamic_cast<const Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
-      if (workingImageBin.IsNotNull())
-      {
-        Image::Pointer newPreviewImage;
-        if (this->GetResetsToEmptyPreview())
-        {
-          newPreviewImage = Image::New();
-          newPreviewImage->Initialize(workingImageBin);
-        }
-        else
-        {
-          auto newPreviewImage = workingImageBin->Clone();
-        }
-        if (newPreviewImage.IsNull())
-        {
-          MITK_ERROR << "Cannot create preview helper objects. Unable to clone working image";
-          return;
-        }
-        m_PreviewSegmentationNode->SetData(newPreviewImage);
-      }
-      else
-      {
-        mitkThrow() << "Tool is an invalid state. Cannot setup preview node. Working data is an unsupported class and should have not been accepted by CanHandle().";
-      }
+      mitkThrow() << "Tool is an invalid state. Cannot setup preview node. Working data is an unsupported class and should have not been accepted by CanHandle().";
     }
 
     m_PreviewSegmentationNode->SetColor(previewColor);
@@ -427,49 +395,50 @@ mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMap
   return labelMapping;
 }
 
-void mitk::SegWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep, const LabelMappingType& labelMapping)
+void mitk::SegWithPreviewTool::TransferSegmentationsAtTimeStep(const MultiLabelSegmentation* sourceSeg, MultiLabelSegmentation* destinationSeg, const TimeStepType timeStep, const LabelMappingType& labelMapping)
 {
   try
   {
-    Image::ConstPointer sourceImageAtTimeStep = this->GetImageByTimeStep(sourceImage, timeStep);
-
-    if (sourceImageAtTimeStep->GetPixelType() != destinationImage->GetPixelType())
+    if (!Equal(*(sourceSeg->GetGeometry(timeStep)), *(destinationSeg->GetGeometry(timeStep)), NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, false))
     {
-      mitkThrow() << "Cannot transfer images. Tool is in an invalid state, source image and destination image do not have the same pixel type. "
-        << "Source pixel type: " << sourceImage->GetPixelType().GetTypeAsString()
-        << "; destination pixel type: " << destinationImage->GetPixelType().GetTypeAsString();
-    }
-
-    if (!Equal(*(sourceImage->GetGeometry(timeStep)), *(destinationImage->GetGeometry(timeStep)), NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, false))
-    {
-      mitkThrow() << "Cannot transfer images. Tool is in an invalid state, source image and destination image do not have the same geometry.";
+      mitkThrow() << "Cannot transfer segmentations. Tool is in an invalid state, source and destination segmentations do not have the same geometry.";
     }
 
     if (nullptr != this->GetWorkingPlaneGeometry())
     {
-      auto sourceSlice = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), sourceImage, timeStep);
-      auto resultSlice =
-        SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), destinationImage, timeStep)->Clone();
-      auto destLSImage = dynamic_cast<MultiLabelSegmentation *>(destinationImage);
-      //We need to transfer explicitly to a copy of the current working image to ensure that labelMapping is done and things
-      //like merge style, overwrite style and locks are regarded.
-      TransferLabelContentAtTimeStep(sourceSlice,
-                                     resultSlice,
-                                     destLSImage->GetConstLabelsByValue(destLSImage->GetLabelValuesByGroup(destLSImage->GetActiveLayer())),
-                                     timeStep,
-                                     0,
-                                     0,
-                                     destLSImage->GetUnlabeledLabelLock(),
-                                     labelMapping,
-                                     m_MergeStyle,
-                                     m_OverwriteStyle);
-      //We use WriteBackSegmentationResult to ensure undo/redo is supported also by derived tools of this class.
-      SegTool2D::WriteBackSegmentationResult(this->GetTargetSegmentationNode(), m_WorkingPlaneGeometry, resultSlice, timeStep);
+      //split all label mappings by source group id
+      auto groupLabelValueMappingSplits = LabelSetImageHelper::SplitLabelValueMappingBySourceAndTargetGroup(sourceSeg, destinationSeg, labelMapping);
+
+      for (const auto& [sourceGroupID, destGroupLabelMapping] : groupLabelValueMappingSplits)
+      {
+        auto sourceSlice = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), sourceSeg->GetGroupImage(sourceGroupID), timeStep);
+
+        for (const auto& [destGroupID, relevantLabelMapping] : destGroupLabelMapping)
+        {
+          auto resultSlice =
+            SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), destinationSeg->GetGroupImage(destGroupID), timeStep)->Clone();
+
+          //We need to transfer explicitly to a copy of the current working image to ensure that labelMapping is done and things
+          //like merge style, overwrite style and locks are regarded.
+          TransferLabelContentAtTimeStep(sourceSlice,
+            resultSlice,
+            destinationSeg->GetConstLabelsByValue(destinationSeg->GetLabelValuesByGroup(destGroupID)),
+            timeStep,
+            0,
+            0,
+            destinationSeg->GetUnlabeledLabelLock(),
+            labelMapping,
+            m_MergeStyle,
+            m_OverwriteStyle);
+          //We use WriteBackSegmentationResult to ensure undo/redo is supported also by derived tools of this class.
+          SegTool2D::WriteBackSegmentationResult(this->GetTargetSegmentationNode(), m_WorkingPlaneGeometry, resultSlice, timeStep);
+        }
+      }
     }
     else
     { //take care of the full segmentation volume
-      auto sourceLSImage = dynamic_cast<const MultiLabelSegmentation*>(sourceImage);
-      auto destLSImage = dynamic_cast<MultiLabelSegmentation*>(destinationImage);
+      auto sourceLSImage = dynamic_cast<const MultiLabelSegmentation*>(sourceSeg);
+      auto destLSImage = dynamic_cast<MultiLabelSegmentation*>(destinationSeg);
 
       TransferLabelContentAtTimeStep(sourceLSImage, destLSImage, timeStep, labelMapping, m_MergeStyle, m_OverwriteStyle);
     }
@@ -492,7 +461,12 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
     if (resultSegmentationNode.IsNotNull())
     {
       const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-      auto resultSegmentation = dynamic_cast<Image*>(resultSegmentationNode->GetData());
+      auto resultSegmentation = dynamic_cast<MultiLabelSegmentation*>(resultSegmentationNode->GetData());
+      if (nullptr == resultSegmentation)
+      {
+        mitkThrow() << "Cannot confirm/transfer segmentation. Internal tool state is invalid."
+          << " target segmentation node does not contain a MultiLabelSegmentation instance.";
+      }
 
       // REMARK: the following code in this scope assumes that previewImage and resultSegmentation
       // are clones of the working referenceImage (segmentation provided to the tool). Therefore they have
@@ -509,13 +483,13 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
       {
         for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
         {
-          this->TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep, labelMapping);
+          this->TransferSegmentationsAtTimeStep(previewImage, resultSegmentation, timeStep, labelMapping);
         }
       }
       else
       {
         const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-        this->TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep, labelMapping);
+        this->TransferSegmentationsAtTimeStep(previewImage, resultSegmentation, timeStep, labelMapping);
       }
 
       // since we are maybe working on a smaller referenceImage, pad it to the size of the original referenceImage
@@ -724,6 +698,15 @@ void mitk::SegWithPreviewTool::ConfirmCleanUp()
 void mitk::SegWithPreviewTool::TransferLabelInformation(const LabelMappingType& labelMapping,
   const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target)
 {
+  if (nullptr == source)
+  {
+    mitkThrow() << "Cannot transfer label information. Passed source segmentation pointer points to NULL.";
+  }
+  if (nullptr == target)
+  {
+    mitkThrow() << "Cannot transfer label information. Passed target segmentation pointer points to NULL.";
+  }
+
   for (const auto& [sourceLabel, targetLabel] : labelMapping)
   {
     if (MultiLabelSegmentation::UNLABELED_VALUE != sourceLabel &&
@@ -829,21 +812,6 @@ mitk::MultiLabelSegmentation* mitk::SegWithPreviewTool::GetTargetSegmentation() 
     return nullptr;
 
   return dynamic_cast<MultiLabelSegmentation*>(node->GetData());
-}
-
-void mitk::SegWithPreviewTool::TransferLabelSetImageContent(const MultiLabelSegmentation* source, MultiLabelSegmentation* target, TimeStepType timeStep)
-{
-  mitk::ImageReadAccessor newMitkImgAcc(source);
-
-  LabelMappingType labelMapping;
-  const auto labelValues = source->GetLabelValuesByGroup(source->GetActiveLayer());
-  for (const auto& labelValue : labelValues)
-  {
-    labelMapping.push_back({ labelValue,labelValue });
-  }
-  TransferLabelInformation(labelMapping, source, target);
-
-  target->SetVolume(newMitkImgAcc.GetData(), timeStep);
 }
 
 bool mitk::SegWithPreviewTool::ConfirmBeforeDeactivation()

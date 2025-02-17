@@ -196,12 +196,11 @@ namespace mitk
     */
     virtual void PreparePreviewToResultTransfer(const LabelMappingType& labelMapping);
 
+    /**Helper function that can be used to copy the label information (not the pixel content) from one segmentation to another.
+     @param LabelMapping indicates the labels which information should be copied from source. In the mapping one can also define of the
+     label should get a new label value in the target segmentation.*/
     static void TransferLabelInformation(const LabelMappingType& labelMapping,
       const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target);
-
-    /**Helper function that can be used to move the content of an MultiLabelSegmentation (the pixels of the active source layer and the labels).
-     This is e.g. helpful if you generate an MultiLabelSegmentation content in DoUpdatePreview and you want to transfer it into the preview image.*/
-    static void TransferLabelSetImageContent(const MultiLabelSegmentation* source, MultiLabelSegmentation* target, TimeStepType timeStep);
 
     /** This function does the real work. Here the preview for a given
      * input image should be computed and stored in the also passed
@@ -248,7 +247,7 @@ namespace mitk
     bool ConfirmBeforeDeactivation() override;
 
   private:
-    void TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep, const LabelMappingType& labelMapping);
+    void TransferSegmentationsAtTimeStep(const MultiLabelSegmentation* sourceSeg, MultiLabelSegmentation* destinationSeg, const TimeStepType timeStep, const LabelMappingType& labelMapping);
 
     void CreateResultSegmentationFromPreview();
 

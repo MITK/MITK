@@ -216,6 +216,35 @@ mitk::LabelSetImageHelper::SplitLabelValuesByClassName(const MultiLabelSegmentat
   return result;
 }
 
+mitk::LabelSetImageHelper::SourceToTargetGroupIDToLabelValueMappingMapType
+mitk::LabelSetImageHelper::SplitLabelValueMappingBySourceAndTargetGroup(const MultiLabelSegmentation* sourceSeg, const MultiLabelSegmentation* targetSeg, const LabelValueMappingVector& labelMapping)
+{
+  SourceToTargetGroupIDToLabelValueMappingMapType result;
+
+  if (nullptr == sourceSeg)
+  {
+    mitkThrow() << "Invalid call of SplitLabelValueMappingBySourceAndTargetGroup; sourceSeg must not be null.";
+  }
+  if (nullptr == targetSeg)
+  {
+    mitkThrow() << "Invalid call of SplitLabelValueMappingBySourceAndTargetGroup; targetSeg must not be null.";
+  }
+
+  //split all label mappings by source group id
+  using GroupToLabelValueMappingMap = std::map <MultiLabelSegmentation::GroupIndexType, LabelValueMappingVector >;
+  GroupToLabelValueMappingMap sourceGroupMappings;
+  for (const auto& [sourceLabelValue, targetLabelValue] : labelMapping)
+  {
+    const auto sourceGroupID = sourceSeg->GetGroupIndexOfLabel(sourceLabelValue);
+    const auto targetGroupID = targetSeg->GetGroupIndexOfLabel(targetLabelValue);
+
+    result[sourceGroupID][targetGroupID].emplace_back(sourceLabelValue, targetLabelValue);
+  }
+
+  return result;
+}
+
+
 std::string mitk::LabelSetImageHelper::CreateDisplayGroupName(const MultiLabelSegmentation* labelSetImage, MultiLabelSegmentation::GroupIndexType groupID)
 {
   const auto groupName = labelSetImage->GetGroupName(groupID);

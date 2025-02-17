@@ -1730,28 +1730,14 @@ void mitk::TransferLabelContentAtTimeStep(
   }
 
   //split all label mappings by source group id
-  using GroupToLabelValueMappingMap = std::map <MultiLabelSegmentation::GroupIndexType, LabelValueMappingVector >;
-  GroupToLabelValueMappingMap sourceGroupMappings;
-  for (const auto& mappingElement : labelMapping)
-  {
-    const auto groupID = sourceImage->GetGroupIndexOfLabel(mappingElement.first);
-    sourceGroupMappings[groupID].push_back(mappingElement);
-  }
+  auto groupLabelValueMappingSplits = LabelSetImageHelper::SplitLabelValueMappingBySourceAndTargetGroup(sourceImage, destinationImage, labelMapping);
 
   //start transfer by iterating over relevant source groups
-  for (const auto& [sourceGroupID, grouplabelMapping] : sourceGroupMappings)
+  for (const auto& [sourceGroupID, destGroupLabelMapping] : groupLabelValueMappingSplits)
   {
     const auto sourceGroupImage = sourceImage->GetGroupImage(sourceGroupID);
 
-    //split all label mappings by destination group id
-    GroupToLabelValueMappingMap destGroupMappings;
-    for (const auto& mappingElement : grouplabelMapping)
-    {
-      const auto groupID = destinationImage->GetGroupIndexOfLabel(mappingElement.second);
-      destGroupMappings[groupID].push_back(mappingElement);
-    }
-
-    for (const auto& [destGroupID, relevantLabelMapping] : destGroupMappings)
+    for (const auto& [destGroupID, relevantLabelMapping] : destGroupLabelMapping)
     {
       auto destGroupImage = destinationImage->GetGroupImage(destGroupID);
       auto destinationLabels = destinationImage->GetConstLabelsByValue(destinationImage->GetLabelValuesByGroup(destGroupID));

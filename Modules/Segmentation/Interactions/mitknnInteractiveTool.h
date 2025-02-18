@@ -39,6 +39,12 @@ namespace mitk
       Negative
     };
 
+    enum class Intensity
+    {
+      Vibrant,
+      Muted
+    };
+
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool);
     itkFactorylessNewMacro(Self);
 
@@ -56,6 +62,8 @@ namespace mitk
     void ResetInteractions();
 
   protected:
+    static Color GetColor(PromptType promptType, Intensity intensity);
+
     nnInteractiveTool();
     ~nnInteractiveTool() override;
 
@@ -63,17 +71,30 @@ namespace mitk
 
     void BlockLMBDisplayInteraction();
     void UnblockLMBDisplayInteraction();
+
     DataNode* GetPointSetNode(PromptType promptType) const;
+    std::vector<DataNode::Pointer>& GetBoxNodes(PromptType promptType);
+
+    std::string CreateNodeName(const std::string& name, PromptType promptType) const;
 
   private:
-    PromptType m_PromptType;
-    std::array<Tool, 4> m_Tools;
-    std::optional<Tool> m_ActiveTool;
+    void AddNewBoxNode(PromptType promptType);
+    void RemoveNewBoxNode();
+    void OnBoxPlaced();
 
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
 
+    PromptType m_PromptType;
+
+    std::array<Tool, 4> m_Tools;
+    std::optional<Tool> m_ActiveTool;
+
     DataNode::Pointer m_PositivePointsNode;
     DataNode::Pointer m_NegativePointsNode;
+
+    std::vector<DataNode::Pointer> m_PositiveBoxNodes;
+    std::vector<DataNode::Pointer> m_NegativeBoxNodes;
+    std::pair<DataNode::Pointer, unsigned long> m_NewBoxNode;
   };
 }
 

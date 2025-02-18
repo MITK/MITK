@@ -39,12 +39,6 @@ namespace mitk
       Negative
     };
 
-    enum class Intensity
-    {
-      Vibrant,
-      Muted
-    };
-
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool);
     itkFactorylessNewMacro(Self);
 
@@ -62,7 +56,13 @@ namespace mitk
     void ResetInteractions();
 
   protected:
-    static Color GetColor(PromptType promptType, Intensity intensity);
+    enum class Intensity
+    {
+      Vibrant,
+      Muted
+    };
+
+    static const Color& GetColor(PromptType promptType, Intensity intensity);
 
     nnInteractiveTool();
     ~nnInteractiveTool() override;

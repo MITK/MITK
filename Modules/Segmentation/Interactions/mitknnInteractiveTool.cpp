@@ -55,7 +55,7 @@ namespace
   }
 }
 
-mitk::Color mitk::nnInteractiveTool::GetColor(PromptType promptType, Intensity intensity)
+const mitk::Color& mitk::nnInteractiveTool::GetColor(PromptType promptType, Intensity intensity)
 {
   static auto vibrantPositiveColor = MakeColor(0.0f, 0.694f, 0.047f);
   static auto mutedPositiveColor = MakeColor(0.0f, 0.472f, 0.027f);
@@ -129,6 +129,7 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
       break;
 
     case Tool::Scribble:
+
       break;
 
     case Tool::Lasso:

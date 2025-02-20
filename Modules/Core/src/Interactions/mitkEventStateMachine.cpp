@@ -281,13 +281,13 @@ mitk::StateMachineTransition *mitk::EventStateMachine::GetExecutableTransition(m
         }
         catch (const std::exception &e)
         {
-          MITK_ERROR << "Unhandled excaption caught in CheckCondition(): " << e.what();
+          MITK_ERROR << "Unhandled exception caught in CheckCondition(): " << e.what();
           currentConditionFulfilled = false;
           break;
         }
         catch (...)
         {
-          MITK_ERROR << "Unhandled excaption caught in CheckCondition()";
+          MITK_ERROR << "Unhandled exception caught in CheckCondition()";
           currentConditionFulfilled = false;
           break;
         }

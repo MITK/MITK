@@ -55,6 +55,7 @@ void mitk::ClippingPlaneInteractor3D::ConnectActionsAndFunctions()
 
 void mitk::ClippingPlaneInteractor3D::DataNodeChanged()
 {
+  Superclass::DataNodeChanged();
 }
 
 bool mitk::ClippingPlaneInteractor3D::CheckOverObject(const InteractionEvent *interactionEvent)

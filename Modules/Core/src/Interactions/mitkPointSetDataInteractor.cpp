@@ -437,6 +437,8 @@ void mitk::PointSetDataInteractor::DataNodeChanged()
       m_MaxNumberOfPoints = atoi(strNumber.c_str());
     }
   }
+
+  Superclass::DataNodeChanged();
 }
 
 void mitk::PointSetDataInteractor::InitMove(StateMachineAction *, InteractionEvent *interactionEvent)

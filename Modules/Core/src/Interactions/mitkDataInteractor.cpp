@@ -111,4 +111,5 @@ void mitk::DataInteractor::NotifyResultReady()
 
 void mitk::DataInteractor::DataNodeChanged()
 {
+  this->ResetToStartState();
 }

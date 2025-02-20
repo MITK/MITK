@@ -59,6 +59,7 @@ void mitk::AffineImageCropperInteractor::ConnectActionsAndFunctions()
 
 void mitk::AffineImageCropperInteractor::DataNodeChanged()
 {
+  Superclass::DataNodeChanged();
 }
 
 bool mitk::AffineImageCropperInteractor::CheckOverObject(const InteractionEvent *interactionEvent)

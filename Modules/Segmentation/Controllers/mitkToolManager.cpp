@@ -32,7 +32,6 @@ mitk::ToolManager::ToolManager(DataStorage *storage)
 {
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools
                                     // are registered) - bug 1029
-  this->InitializeTools();
 }
 
 void mitk::ToolManager::EnsureTimeObservation()

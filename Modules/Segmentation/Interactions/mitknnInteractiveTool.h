@@ -22,6 +22,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class PlanarFigureInteractor;
+  class PointSetDataInteractor;
   class MITKSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
   {
   public:
@@ -39,8 +41,8 @@ namespace mitk
       Negative
     };
 
-    mitkClassMacro(nnInteractiveTool, SegWithPreviewTool);
-    itkFactorylessNewMacro(Self);
+    mitkClassMacro(nnInteractiveTool, SegWithPreviewTool)
+    itkFactorylessNewMacro(Self)
 
     const char* GetName() const override;
     const char** GetXPM() const override;
@@ -91,10 +93,13 @@ namespace mitk
 
     DataNode::Pointer m_PositivePointsNode;
     DataNode::Pointer m_NegativePointsNode;
+    itk::SmartPointer<PointSetDataInteractor> m_PointSetInteractor;
 
     std::vector<DataNode::Pointer> m_PositiveBoxNodes;
     std::vector<DataNode::Pointer> m_NegativeBoxNodes;
     std::pair<DataNode::Pointer, unsigned long> m_NewBoxNode;
+    itk::SmartPointer<PlanarFigureInteractor> m_PlanarFigureInteractor;
+
   };
 }
 

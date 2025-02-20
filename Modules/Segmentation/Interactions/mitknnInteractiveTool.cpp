@@ -110,22 +110,15 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
   {
     case Tool::Point:
     {
-      auto node = this->GetPointSetNode(promptType);
-
-      if (node->GetDataInteractor().IsNull())
-      {
-        auto interactor = mitk::PointSetDataInteractor::New();
-        interactor->LoadStateMachine("PointSet.xml");
-        interactor->SetEventConfig("PointSetConfigLMB.xml");
-        interactor->EnableMovement(false);
-        interactor->SetDataNode(node);
-      }
-
+      m_PointSetInteractor->SetDataNode(this->GetPointSetNode(promptType));
+      m_PointSetInteractor->EnableInteraction(true);
+      this->BlockLMBDisplayInteraction();
       break;
     }
 
     case Tool::Box:
       this->AddNewBoxNode(promptType);
+      this->BlockLMBDisplayInteraction();
       break;
 
     case Tool::Scribble:
@@ -141,61 +134,6 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
 
   m_ActiveTool = tool;
   m_PromptType = promptType;
-
-  this->BlockLMBDisplayInteraction();
-}
-
-void mitk::nnInteractiveTool::AddNewBoxNode(PromptType promptType)
-{
-  if (m_NewBoxNode.first.IsNotNull())
-    return;
-
-  auto node = DataNode::New();
-  node->SetName(this->CreateNodeName("box", promptType));
-  node->SetData(PlanarRectangle::New());
-  node->SetColor(this->GetColor(promptType, Intensity::Vibrant));
-  node->SetBoolProperty("planarfigure.drawname", false);
-  node->SetBoolProperty("planarfigure.drawshadow", false);
-  node->SetBoolProperty("planarfigure.fill", true);
-  node->SetBoolProperty("helper object", true);
-
-  auto interactor = mitk::PlanarFigureInteractor::New();
-  auto module = us::ModuleRegistry::GetModule("MitkPlanarFigure");
-  interactor->LoadStateMachine("PlanarFigureInteraction.xml", module);
-  interactor->SetEventConfig("PlanarFigureConfig.xml", module);
-  interactor->SetDataNode(node);
-
-  auto command = itk::SimpleMemberCommand<Self>::New();
-  command->SetCallbackFunction(this, &Self::OnBoxPlaced);
-  auto tag = node->GetData()->AddObserver(EndPlacementPlanarFigureEvent(), command);
-
-  this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
-
-  m_NewBoxNode = std::make_pair(node, tag);
-}
-
-void mitk::nnInteractiveTool::RemoveNewBoxNode()
-{
-  if (m_NewBoxNode.first.IsNotNull())
-  {
-    this->GetDataStorage()->Remove(m_NewBoxNode.first);
-    m_NewBoxNode.first = nullptr;
-  }
-}
-
-void mitk::nnInteractiveTool::OnBoxPlaced()
-{
-  auto& [boxNode, tag] = m_NewBoxNode;
-
-  boxNode->GetData()->RemoveObserver(tag);
-  boxNode->SetDataInteractor(nullptr);
-
-  boxNode->SetColor(this->GetColor(m_PromptType, Intensity::Muted));
-
-  this->GetBoxNodes(m_PromptType).push_back(boxNode);
-  boxNode = nullptr;
-
-  this->AddNewBoxNode(m_PromptType);
 }
 
 void mitk::nnInteractiveTool::DisableInteraction()
@@ -209,9 +147,9 @@ void mitk::nnInteractiveTool::DisableInteraction()
   {
     case Tool::Point:
     {
-      auto node = this->GetPointSetNode(m_PromptType);
-      node->SetDataInteractor(nullptr);
-      node->GetDataAs<PointSet>()->ClearSelection();
+      m_PointSetInteractor->EnableInteraction(false);
+      m_PointSetInteractor->SetDataNode(nullptr);
+      this->GetPointSetNode(m_PromptType)->GetDataAs<PointSet>()->ClearSelection();
       break;
     }
 
@@ -302,6 +240,57 @@ std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetBoxNodes(Promp
   return m_NegativeBoxNodes;
 }
 
+void mitk::nnInteractiveTool::AddNewBoxNode(PromptType promptType)
+{
+  if (m_NewBoxNode.first.IsNotNull())
+    return;
+
+  auto node = DataNode::New();
+  node->SetName(this->CreateNodeName("box", promptType));
+  node->SetData(PlanarRectangle::New());
+  node->SetColor(this->GetColor(promptType, Intensity::Vibrant));
+  node->SetBoolProperty("planarfigure.drawname", false);
+  node->SetBoolProperty("planarfigure.drawshadow", false);
+  node->SetBoolProperty("planarfigure.fill", true);
+  node->SetBoolProperty("helper object", true);
+
+  m_PlanarFigureInteractor->SetDataNode(node);
+  m_PlanarFigureInteractor->EnableInteraction(true);
+
+  auto command = itk::SimpleMemberCommand<Self>::New();
+  command->SetCallbackFunction(this, &Self::OnBoxPlaced);
+  auto tag = node->GetData()->AddObserver(EndPlacementPlanarFigureEvent(), command);
+
+  this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
+
+  m_NewBoxNode = std::make_pair(node, tag);
+}
+
+void mitk::nnInteractiveTool::OnBoxPlaced()
+{
+  auto& [boxNode, tag] = m_NewBoxNode;
+
+  boxNode->GetData()->RemoveObserver(tag);
+  boxNode->SetColor(this->GetColor(m_PromptType, Intensity::Muted));
+
+  this->GetBoxNodes(m_PromptType).push_back(boxNode);
+  boxNode = nullptr;
+
+  this->AddNewBoxNode(m_PromptType);
+}
+
+void mitk::nnInteractiveTool::RemoveNewBoxNode()
+{
+  m_PlanarFigureInteractor->EnableInteraction(false);
+  m_PlanarFigureInteractor->SetDataNode(nullptr);
+
+  if (m_NewBoxNode.first.IsNotNull())
+  {
+    this->GetDataStorage()->Remove(m_NewBoxNode.first);
+    m_NewBoxNode.first = nullptr;
+  }
+}
+
 std::string mitk::nnInteractiveTool::CreateNodeName(const std::string& name, PromptType promptType) const
 {
   std::stringstream stream;
@@ -322,11 +311,27 @@ void mitk::nnInteractiveTool::Activated()
   nodeName = this->CreateNodeName("points", promptType);
   m_NegativePointsNode = CreatePointSetNode(nodeName, this->GetColor(promptType, Intensity::Muted));
   this->GetDataStorage()->Add(m_NegativePointsNode, this->GetToolManager()->GetReferenceData(0));
+
+  m_PointSetInteractor = mitk::PointSetDataInteractor::New();
+  m_PointSetInteractor->LoadStateMachine("PointSet.xml");
+  m_PointSetInteractor->SetEventConfig("PointSetConfigLMB.xml");
+  m_PointSetInteractor->EnableInteraction(false);
+  m_PointSetInteractor->EnableMovement(false);
+
+  m_PlanarFigureInteractor = mitk::PlanarFigureInteractor::New();
+  auto module = us::ModuleRegistry::GetModule("MitkPlanarFigure");
+  m_PlanarFigureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", module);
+  m_PlanarFigureInteractor->SetEventConfig("PlanarFigureConfig.xml", module);
+  m_PlanarFigureInteractor->EnableInteraction(false);
 }
 
 void mitk::nnInteractiveTool::Deactivated()
 {
+  this->DisableInteraction();
   this->ResetInteractions();
+
+  m_PlanarFigureInteractor = nullptr;
+  m_PointSetInteractor = nullptr;
 
   this->GetDataStorage()->Remove(m_NegativePointsNode);
   m_NegativePointsNode = nullptr;

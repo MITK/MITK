@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitknnInteractiveTool.h"
 
 #include <mitkDisplayActionEventBroadcast.h>
+#include <mitkScribbleTool.h>
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkPlanarRectangle.h>
 #include <mitkPointSetDataInteractor.h>
@@ -80,12 +81,37 @@ mitk::nnInteractiveTool::nnInteractiveTool()
       Tool::Point,
       Tool::Box,
       Tool::Scribble,
-      Tool::Lasso }
+      Tool::Lasso },
+    m_ScribbleTool(ScribbleTool::New())
 {
 }
 
 mitk::nnInteractiveTool::~nnInteractiveTool()
 {
+}
+
+void mitk::nnInteractiveTool::SetToolManager(ToolManager* toolManager)
+{
+  Superclass::SetToolManager(toolManager);
+
+  m_ToolManager = ToolManager::New(toolManager->GetDataStorage());
+
+  m_ScribbleTool->InitializeStateMachine();
+  m_ScribbleTool->SetToolManager(m_ToolManager);
+}
+
+void mitk::nnInteractiveTool::Notify(InteractionEvent* interactionEvent, bool isHandled)
+{
+  if (!isHandled)
+  {
+    if (m_ScribbleTool->IsEnabled())
+    {
+      m_ScribbleTool->HandleEvent(interactionEvent, nullptr);
+      return;
+    }
+  }
+
+  return Superclass::Notify(interactionEvent, isHandled);
 }
 
 const std::array<mitk::nnInteractiveTool::Tool, 4>& mitk::nnInteractiveTool::GetTools() const
@@ -122,7 +148,9 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
       break;
 
     case Tool::Scribble:
-
+      m_ToolManager->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
+      m_ToolManager->SetWorkingData(this->GetToolManager()->GetWorkingData(0));
+      m_ScribbleTool->Activate();
       break;
 
     case Tool::Lasso:
@@ -158,6 +186,7 @@ void mitk::nnInteractiveTool::DisableInteraction()
       break;
 
     case Tool::Scribble:
+      m_ScribbleTool->Deactivate();
       break;
 
     case Tool::Lasso:

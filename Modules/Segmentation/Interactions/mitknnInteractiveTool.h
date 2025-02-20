@@ -24,6 +24,9 @@ namespace mitk
 {
   class PlanarFigureInteractor;
   class PointSetDataInteractor;
+  class ScribbleTool;
+  class ToolManager;
+
   class MITKSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
   {
   public:
@@ -69,7 +72,9 @@ namespace mitk
     nnInteractiveTool();
     ~nnInteractiveTool() override;
 
+    void SetToolManager(ToolManager* toolManager) override;
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
+    void Notify(InteractionEvent* interactionEvent, bool isHandled) override;
 
     void BlockLMBDisplayInteraction();
     void UnblockLMBDisplayInteraction();
@@ -100,6 +105,8 @@ namespace mitk
     std::pair<DataNode::Pointer, unsigned long> m_NewBoxNode;
     itk::SmartPointer<PlanarFigureInteractor> m_PlanarFigureInteractor;
 
+    itk::SmartPointer<ToolManager> m_ToolManager;
+    itk::SmartPointer<ScribbleTool> m_ScribbleTool;
   };
 }
 

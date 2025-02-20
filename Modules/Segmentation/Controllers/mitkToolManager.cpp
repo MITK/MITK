@@ -120,6 +120,9 @@ void mitk::ToolManager::InitializeTools()
   {
     if (auto *tool = dynamic_cast<Tool *>(iter->GetPointer()))
     {
+      if (!tool->IsEligibleForAutoInit())
+        continue;
+
       tool->InitializeStateMachine();
       tool->SetToolManager(this); // important to call right after instantiation
       tool->ErrorMessage += MessageDelegate1<mitk::ToolManager, std::string>(this, &ToolManager::OnToolErrorMessage);

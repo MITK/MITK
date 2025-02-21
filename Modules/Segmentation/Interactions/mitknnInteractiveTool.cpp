@@ -125,7 +125,7 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
       this->AddScribbleNode();
       this->SetActiveScribbleLabel(promptType);
       m_ToolManager->SetWorkingData(m_ScribbleNode);
-      m_ScribbleTool->Activate();
+      m_ScribbleTool->Activate(this->GetColor(promptType, Intensity::Vibrant));
       break;
 
     case Tool::Lasso:

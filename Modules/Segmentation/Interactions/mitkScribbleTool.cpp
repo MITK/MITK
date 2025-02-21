@@ -43,11 +43,13 @@ bool mitk::ScribbleTool::IsEligibleForAutoInit() const
   return false;
 }
 
-void mitk::ScribbleTool::Activate()
+void mitk::ScribbleTool::Activate(const Color& color)
 {
   this->SetEnable3DInterpolation(false);
   this->Activated();
   this->Enable();
+
+  this->SetFeedbackContourColor(color);
 }
 
 void mitk::ScribbleTool::Deactivate()

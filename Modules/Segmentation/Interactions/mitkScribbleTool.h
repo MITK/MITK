@@ -30,7 +30,7 @@ namespace mitk
     const char* GetName() const override;
     bool IsEligibleForAutoInit() const override;
 
-    void Activate();
+    void Activate(const Color& color);
     void Deactivate();
 
   protected:

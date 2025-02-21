@@ -256,6 +256,8 @@ void mitk::nnInteractiveTool::AddNewBoxNode(PromptType promptType)
   node->SetColor(this->GetColor(promptType, Intensity::Vibrant));
   node->SetBoolProperty("planarfigure.drawname", false);
   node->SetBoolProperty("planarfigure.drawshadow", false);
+  node->SetBoolProperty("planarfigure.drawcontrolpoints", false);
+  node->SetBoolProperty("planarfigure.hidecontrolpointsduringinteraction", true);
   node->SetBoolProperty("planarfigure.fill", true);
   node->SetBoolProperty("helper object", true);
 

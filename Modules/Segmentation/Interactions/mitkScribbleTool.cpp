@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 mitk::ScribbleTool::ScribbleTool()
 {
+  this->DisableContourMarkers();
   this->Disable();
 }
 
@@ -43,6 +44,7 @@ bool mitk::ScribbleTool::IsEligibleForAutoInit() const
 
 void mitk::ScribbleTool::Activate()
 {
+  this->SetEnable3DInterpolation(false);
   this->Activated();
   this->Enable();
 }
@@ -51,6 +53,7 @@ void mitk::ScribbleTool::Deactivate()
 {
   this->Disable();
   this->Deactivated();
+  this->SetEnable3DInterpolation(true);
 }
 
 void mitk::ScribbleTool::OnInvertLogic(StateMachineAction*, InteractionEvent*)

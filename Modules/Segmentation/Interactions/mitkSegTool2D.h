@@ -254,6 +254,7 @@ namespace mitk
       PlanarFigure's Geometry
     */
     int AddContourmarker(const PlaneGeometry* planeGeometry, unsigned int sliceIndex);
+    void DisableContourMarkers();
 
     void InteractiveSegmentationBugMessage(const std::string &message) const;
 
@@ -281,7 +282,7 @@ namespace mitk
 
     // The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string m_Contourmarkername;
-
+    bool m_EnableContourMarkers = true;
     bool m_ShowMarkerNodes = false;
     static bool m_SurfaceInterpolationEnabled;
 

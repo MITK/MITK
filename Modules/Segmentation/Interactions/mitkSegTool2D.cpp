@@ -729,9 +729,14 @@ void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
   m_SurfaceInterpolationEnabled = enabled;
 }
 
+void mitk::SegTool2D::DisableContourMarkers()
+{
+  m_EnableContourMarkers = false;
+}
+
 int mitk::SegTool2D::AddContourmarker(const PlaneGeometry* planeGeometry, unsigned int sliceIndex)
 {
-  if (planeGeometry == nullptr)
+  if (!m_EnableContourMarkers || planeGeometry == nullptr)
     return -1;
 
   us::ServiceReference<PlanePositionManagerService> serviceRef =

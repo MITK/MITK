@@ -15,6 +15,7 @@ found in the LICENSE file.
 mitk::ScribbleTool::ScribbleTool()
 {
   this->DisableContourMarkers();
+  this->SetSize(3);
   this->Disable();
 }
 

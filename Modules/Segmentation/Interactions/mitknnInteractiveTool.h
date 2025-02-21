@@ -95,6 +95,11 @@ namespace mitk
     std::vector<DataNode::Pointer>& GetBoxNodes(PromptType promptType);
     void RemoveNewBoxNode();
 
+    void AddScribbleNode();
+    void AddScribbleLabel(PromptType promptType);
+    void SetActiveScribbleLabel(PromptType promptType);
+    void RemoveScribbleNode();
+
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
 
     PromptType m_PromptType;
@@ -112,7 +117,10 @@ namespace mitk
     itk::SmartPointer<PlanarFigureInteractor> m_PlanarFigureInteractor;
 
     itk::SmartPointer<ToolManager> m_ToolManager;
+
     itk::SmartPointer<ScribbleTool> m_ScribbleTool;
+    DataNode::Pointer m_ScribbleNode;
+    std::unordered_map<PromptType, Label::PixelType> m_ScribbleLabels;
   };
 }
 

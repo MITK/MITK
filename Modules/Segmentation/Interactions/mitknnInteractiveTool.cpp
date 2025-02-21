@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitknnInteractiveTool.h"
 
 #include <mitkDisplayActionEventBroadcast.h>
+#include <mitkLabelSetImageHelper.h>
 #include <mitkScribbleTool.h>
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkPlanarRectangle.h>
@@ -121,7 +122,9 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
       break;
 
     case Tool::Scribble:
-      m_ToolManager->SetWorkingData(this->GetToolManager()->GetWorkingData(0));
+      this->AddScribbleNode();
+      this->SetActiveScribbleLabel(promptType);
+      m_ToolManager->SetWorkingData(m_ScribbleNode);
       m_ScribbleTool->Activate();
       break;
 
@@ -174,6 +177,7 @@ void mitk::nnInteractiveTool::DisableInteraction()
 
 void mitk::nnInteractiveTool::ResetInteractions()
 {
+  this->RemoveScribbleNode();
   this->RemoveNewBoxNode();
 
   for (auto promptType : { PromptType::Positive, PromptType::Negative })
@@ -290,6 +294,51 @@ void mitk::nnInteractiveTool::RemoveNewBoxNode()
     this->GetDataStorage()->Remove(m_NewBoxNode.first);
     m_NewBoxNode.first = nullptr;
   }
+}
+
+void mitk::nnInteractiveTool::AddScribbleNode()
+{
+  if (m_ScribbleNode.IsNotNull())
+    return;
+
+  auto referenceNode = this->GetToolManager()->GetReferenceData(0);
+  std::string name = this->CreateNodeName("scribble");
+
+  m_ScribbleNode = LabelSetImageHelper::CreateNewSegmentationNode(nullptr, referenceNode->GetDataAs<Image>(), name);
+  m_ScribbleNode->SetBoolProperty("helper object", true);
+
+  for (auto promptType : { PromptType::Positive, PromptType::Negative })
+    this->AddScribbleLabel(promptType);
+
+  this->GetDataStorage()->Add(m_ScribbleNode, referenceNode);
+}
+
+void mitk::nnInteractiveTool::AddScribbleLabel(PromptType promptType)
+{
+  auto name = this->GetPromptTypeString(promptType);
+  const auto& color = this->GetColor(promptType, Intensity::Muted);
+
+  auto label = m_ScribbleNode->GetDataAs<LabelSetImage>()->AddLabel(name, color, 0);
+  label->SetLocked(false);
+
+  m_ScribbleLabels[promptType] = label->GetValue();
+}
+
+void mitk::nnInteractiveTool::SetActiveScribbleLabel(PromptType promptType)
+{
+  m_ScribbleNode->GetDataAs<LabelSetImage>()->SetActiveLabel(m_ScribbleLabels[promptType]);
+  m_ScribbleNode->SetBoolProperty("labelset.contour.active", false);
+}
+
+void mitk::nnInteractiveTool::RemoveScribbleNode()
+{
+  if (m_ScribbleNode.IsNull())
+    return;
+
+  this->GetDataStorage()->Remove(m_ScribbleNode);
+  m_ScribbleNode = nullptr;
+
+  m_ScribbleLabels.clear();
 }
 
 std::string mitk::nnInteractiveTool::CreateNodeName(const std::string& name, std::optional<PromptType> promptType) const

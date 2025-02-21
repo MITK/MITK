@@ -254,6 +254,7 @@ void mitk::nnInteractiveTool::AddNewBoxNode(PromptType promptType)
   node->SetName(this->CreateNodeName("box", promptType));
   node->SetData(PlanarRectangle::New());
   node->SetColor(this->GetColor(promptType, Intensity::Vibrant));
+  node->SetFloatProperty("planarfigure.line.width", 3.0f);
   node->SetBoolProperty("planarfigure.drawname", false);
   node->SetBoolProperty("planarfigure.drawshadow", false);
   node->SetBoolProperty("planarfigure.drawcontrolpoints", false);

@@ -50,6 +50,9 @@ void mitk::ScribbleTool::Activate(const Color& color)
   this->Enable();
 
   this->SetFeedbackContourColor(color);
+
+  m_PaintingNode->SetColor(color);
+  m_PaintingNode->SetBoolProperty("outline binary", false);
 }
 
 void mitk::ScribbleTool::Deactivate()

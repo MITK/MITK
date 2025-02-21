@@ -43,7 +43,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   this->ThemeIcons();
 
   connect(m_Ui->initializeButton, &QPushButton::toggled, this, &Self::OnInitializeButtonToggled);
-  connect(m_Ui->resetButton, &QPushButton::clicked, [this]() { this->GetTool()->ResetInteractions(); });
+  connect(m_Ui->resetButton, &QPushButton::clicked, this, &Self::OnResetInteractionsButtonClicked);
 
   this->InitializePromptType();
   this->InitializeToolButtons();
@@ -102,6 +102,14 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   m_Ui->resetButton->setEnabled(checked);
   m_Ui->promptTypeGroupBox->setEnabled(checked);
   m_Ui->interactionToolsGroupBox->setEnabled(checked);
+}
+
+void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()
+{
+  for (const auto& [tool, button] : m_ToolButtons)
+    button->setChecked(false);
+
+  this->GetTool()->ResetInteractions();
 }
 
 void QmitknnInteractiveToolGUI::OnPromptTypeChanged()

@@ -44,6 +44,7 @@ protected:
   void InitializePromptType();
   void InitializeToolButtons();
   void OnInitializeButtonToggled(bool checked);
+  void OnResetInteractionsButtonClicked();
   void OnPromptTypeChanged();
   void OnToolToggled(Tool tool, bool checked);
   void UncheckOtherToolButtons(QPushButton* toolButton);

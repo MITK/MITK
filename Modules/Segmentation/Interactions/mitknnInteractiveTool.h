@@ -60,6 +60,8 @@ namespace mitk
     void DisableInteraction();
     void ResetInteractions();
 
+    std::string GetPromptTypeString(PromptType promptType) const;
+
   protected:
     enum class Intensity
     {
@@ -79,15 +81,19 @@ namespace mitk
     void BlockLMBDisplayInteraction();
     void UnblockLMBDisplayInteraction();
 
-    DataNode* GetPointSetNode(PromptType promptType) const;
-    std::vector<DataNode::Pointer>& GetBoxNodes(PromptType promptType);
-
-    std::string CreateNodeName(const std::string& name, PromptType promptType) const;
+    std::string CreateNodeName(const std::string& name, std::optional<PromptType> promptType = {}) const;
 
   private:
+    void CreatePointSetInteractor();
+    void CreatePlanarFigureInteractor();
+
+    DataNode::Pointer CreatePointSetNode(PromptType promptType) const;
+    DataNode* GetPointSetNode(PromptType promptType) const;
+
     void AddNewBoxNode(PromptType promptType);
-    void RemoveNewBoxNode();
     void OnBoxPlaced();
+    std::vector<DataNode::Pointer>& GetBoxNodes(PromptType promptType);
+    void RemoveNewBoxNode();
 
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
 

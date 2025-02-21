@@ -28,34 +28,6 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive");
 }
 
-namespace
-{
-  mitk::DataNode::Pointer CreatePointSetNode(const std::string& name, const mitk::Color& color)
-  {
-    auto node = mitk::DataNode::New();
-    node->SetData(mitk::PointSet::New());
-    node->SetName(name);
-    node->SetColor(color);
-    node->SetColor(color, nullptr, "selectedcolor");
-    node->SetProperty("Pointset.2D.shape", mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
-    node->SetIntProperty("point line width", 2);
-    node->SetIntProperty("Pointset.2D.resolution", 64);
-    node->SetFloatProperty("Pointset.2D.distance to plane", 0.1f);
-    node->SetBoolProperty("Pointset.2D.keep shape when selected", true);
-    node->SetBoolProperty("Pointset.2D.selected.show contour", true);
-    node->SetBoolProperty("Pointset.2D.fill shape", true);
-    node->SetBoolProperty("helper object", true);
-    return node;
-  }
-
-  mitk::Color MakeColor(float r, float g, float b)
-  {
-    mitk::Color color;
-    color.Set(r, g, b);
-    return color;
-  }
-}
-
 const mitk::Color& mitk::nnInteractiveTool::GetColor(PromptType promptType, Intensity intensity)
 {
   static auto vibrantPositiveColor = MakeColor(0.0f, 0.694f, 0.047f);
@@ -95,6 +67,7 @@ void mitk::nnInteractiveTool::SetToolManager(ToolManager* toolManager)
   Superclass::SetToolManager(toolManager);
 
   m_ToolManager = ToolManager::New(toolManager->GetDataStorage());
+  m_ToolManager->SetReferenceData(toolManager->GetReferenceData(0));
 
   m_ScribbleTool->InitializeStateMachine();
   m_ScribbleTool->SetToolManager(m_ToolManager);
@@ -148,7 +121,6 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
       break;
 
     case Tool::Scribble:
-      m_ToolManager->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
       m_ToolManager->SetWorkingData(this->GetToolManager()->GetWorkingData(0));
       m_ScribbleTool->Activate();
       break;
@@ -208,12 +180,12 @@ void mitk::nnInteractiveTool::ResetInteractions()
   {
     this->GetPointSetNode(promptType)->GetDataAs<PointSet>()->Clear();
 
-    auto boxNodes = this->GetBoxNodes(promptType);
+    auto nodes = this->GetBoxNodes(promptType);
 
-    for (const auto& boxNode : boxNodes)
-      this->GetDataStorage()->Remove(boxNode);
+    for (const auto& node : nodes)
+      this->GetDataStorage()->Remove(node);
 
-    boxNodes.clear();
+    nodes.clear();
   }
 
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -297,13 +269,13 @@ void mitk::nnInteractiveTool::AddNewBoxNode(PromptType promptType)
 
 void mitk::nnInteractiveTool::OnBoxPlaced()
 {
-  auto& [boxNode, tag] = m_NewBoxNode;
+  auto& [node, tag] = m_NewBoxNode;
 
-  boxNode->GetData()->RemoveObserver(tag);
-  boxNode->SetColor(this->GetColor(m_PromptType, Intensity::Muted));
+  node->GetData()->RemoveObserver(tag);
+  node->SetColor(this->GetColor(m_PromptType, Intensity::Muted));
 
-  this->GetBoxNodes(m_PromptType).push_back(boxNode);
-  boxNode = nullptr;
+  this->GetBoxNodes(m_PromptType).push_back(node);
+  node = nullptr;
 
   this->AddNewBoxNode(m_PromptType);
 }
@@ -320,38 +292,80 @@ void mitk::nnInteractiveTool::RemoveNewBoxNode()
   }
 }
 
-std::string mitk::nnInteractiveTool::CreateNodeName(const std::string& name, PromptType promptType) const
+std::string mitk::nnInteractiveTool::CreateNodeName(const std::string& name, std::optional<PromptType> promptType) const
 {
   std::stringstream stream;
-  stream << this->GetName() << ' ' << (promptType == PromptType::Positive ? "positive" : "negative") << ' ' << name;
+  stream << this->GetName();
+
+  if (promptType.has_value())
+    stream << ' ' << this->GetPromptTypeString(promptType.value());
+
+  stream << ' ' << name;
+
   return stream.str();
+}
+
+std::string mitk::nnInteractiveTool::GetPromptTypeString(PromptType promptType) const
+{
+  if (promptType == PromptType::Positive)
+    return "positive";
+
+  return "negative";
+}
+
+mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType promptType) const
+{
+  auto name = this->CreateNodeName("points", promptType);
+  const auto& color = this->GetColor(promptType, Intensity::Muted);
+
+  auto node = mitk::DataNode::New();
+  node->SetData(mitk::PointSet::New());
+  node->SetName(name);
+  node->SetColor(color);
+  node->SetColor(color, nullptr, "selectedcolor");
+  node->SetProperty("Pointset.2D.shape", mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
+  node->SetIntProperty("point line width", 2);
+  node->SetIntProperty("Pointset.2D.resolution", 64);
+  node->SetFloatProperty("point 2D size", 10.0f);
+  node->SetFloatProperty("Pointset.2D.distance to plane", 0.1f);
+  node->SetBoolProperty("Pointset.2D.keep shape when selected", true);
+  node->SetBoolProperty("Pointset.2D.selected.show contour", true);
+  node->SetBoolProperty("Pointset.2D.fill shape", true);
+  node->SetBoolProperty("helper object", true);
+
+  this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
+
+  return node;
+}
+
+void mitk::nnInteractiveTool::CreatePointSetInteractor()
+{
+  m_PointSetInteractor = mitk::PointSetDataInteractor::New();
+  m_PointSetInteractor->LoadStateMachine("PointSet.xml");
+  m_PointSetInteractor->SetEventConfig("PointSetConfigLMB.xml");
+  m_PointSetInteractor->EnableInteraction(false);
+  m_PointSetInteractor->EnableMovement(false);
+}
+
+void mitk::nnInteractiveTool::CreatePlanarFigureInteractor()
+{
+  auto module = us::ModuleRegistry::GetModule("MitkPlanarFigure");
+
+  m_PlanarFigureInteractor = mitk::PlanarFigureInteractor::New();
+  m_PlanarFigureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", module);
+  m_PlanarFigureInteractor->SetEventConfig("PlanarFigureConfig.xml", module);
+  m_PlanarFigureInteractor->EnableInteraction(false);
 }
 
 void mitk::nnInteractiveTool::Activated()
 {
   Superclass::Activated();
 
-  auto promptType = PromptType::Positive;
-  auto nodeName = this->CreateNodeName("points", promptType);
-  m_PositivePointsNode = CreatePointSetNode(nodeName, this->GetColor(promptType, Intensity::Muted));
-  this->GetDataStorage()->Add(m_PositivePointsNode, this->GetToolManager()->GetReferenceData(0));
+  m_PositivePointsNode = this->CreatePointSetNode(PromptType::Positive);
+  m_NegativePointsNode = this->CreatePointSetNode(PromptType::Negative);
 
-  promptType = PromptType::Negative;
-  nodeName = this->CreateNodeName("points", promptType);
-  m_NegativePointsNode = CreatePointSetNode(nodeName, this->GetColor(promptType, Intensity::Muted));
-  this->GetDataStorage()->Add(m_NegativePointsNode, this->GetToolManager()->GetReferenceData(0));
-
-  m_PointSetInteractor = mitk::PointSetDataInteractor::New();
-  m_PointSetInteractor->LoadStateMachine("PointSet.xml");
-  m_PointSetInteractor->SetEventConfig("PointSetConfigLMB.xml");
-  m_PointSetInteractor->EnableInteraction(false);
-  m_PointSetInteractor->EnableMovement(false);
-
-  m_PlanarFigureInteractor = mitk::PlanarFigureInteractor::New();
-  auto module = us::ModuleRegistry::GetModule("MitkPlanarFigure");
-  m_PlanarFigureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", module);
-  m_PlanarFigureInteractor->SetEventConfig("PlanarFigureConfig.xml", module);
-  m_PlanarFigureInteractor->EnableInteraction(false);
+  this->CreatePointSetInteractor();
+  this->CreatePlanarFigureInteractor();
 }
 
 void mitk::nnInteractiveTool::Deactivated()

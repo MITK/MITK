@@ -86,6 +86,7 @@ namespace mitk
   private:
     void CreatePointInteractor();
     void CreateBoxInteractor();
+    void CreateLassoInteractor();
 
     DataNode::Pointer CreatePointSetNode(PromptType promptType) const;
     DataNode* GetPointSetNode(PromptType promptType) const;
@@ -99,6 +100,11 @@ namespace mitk
     void AddScribbleLabel(PromptType promptType);
     void SetActiveScribbleLabel(PromptType promptType);
     void RemoveScribbleNode();
+
+    void AddNewLassoNode(PromptType promptType);
+    void OnLassoPlaced();
+    std::vector<DataNode::Pointer>& GetLassoNodes(PromptType promptType);
+    void RemoveNewLassoNode();
 
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
 
@@ -121,6 +127,11 @@ namespace mitk
     itk::SmartPointer<ScribbleTool> m_ScribbleTool;
     DataNode::Pointer m_ScribbleNode;
     std::unordered_map<PromptType, Label::PixelType> m_ScribbleLabels;
+
+    std::vector<DataNode::Pointer> m_PositiveLassoNodes;
+    std::vector<DataNode::Pointer> m_NegativeLassoNodes;
+    std::pair<DataNode::Pointer, unsigned long> m_NewLassoNode;
+    itk::SmartPointer<PlanarFigureInteractor> m_LassoInteractor;
   };
 }
 

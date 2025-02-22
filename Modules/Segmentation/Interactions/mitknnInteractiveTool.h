@@ -84,8 +84,8 @@ namespace mitk
     std::string CreateNodeName(const std::string& name, std::optional<PromptType> promptType = {}) const;
 
   private:
-    void CreatePointSetInteractor();
-    void CreatePlanarFigureInteractor();
+    void CreatePointInteractor();
+    void CreateBoxInteractor();
 
     DataNode::Pointer CreatePointSetNode(PromptType promptType) const;
     DataNode* GetPointSetNode(PromptType promptType) const;
@@ -109,12 +109,12 @@ namespace mitk
 
     DataNode::Pointer m_PositivePointsNode;
     DataNode::Pointer m_NegativePointsNode;
-    itk::SmartPointer<PointSetDataInteractor> m_PointSetInteractor;
+    itk::SmartPointer<PointSetDataInteractor> m_PointInteractor;
 
     std::vector<DataNode::Pointer> m_PositiveBoxNodes;
     std::vector<DataNode::Pointer> m_NegativeBoxNodes;
     std::pair<DataNode::Pointer, unsigned long> m_NewBoxNode;
-    itk::SmartPointer<PlanarFigureInteractor> m_PlanarFigureInteractor;
+    itk::SmartPointer<PlanarFigureInteractor> m_BoxInteractor;
 
     itk::SmartPointer<ToolManager> m_ToolManager;
 

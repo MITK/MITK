@@ -110,8 +110,8 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
   {
     case Tool::Point:
     {
-      m_PointSetInteractor->SetDataNode(this->GetPointSetNode(promptType));
-      m_PointSetInteractor->EnableInteraction(true);
+      m_PointInteractor->SetDataNode(this->GetPointSetNode(promptType));
+      m_PointInteractor->EnableInteraction(true);
       this->BlockLMBDisplayInteraction();
       break;
     }
@@ -150,8 +150,8 @@ void mitk::nnInteractiveTool::DisableInteraction()
   {
     case Tool::Point:
     {
-      m_PointSetInteractor->EnableInteraction(false);
-      m_PointSetInteractor->SetDataNode(nullptr);
+      m_PointInteractor->EnableInteraction(false);
+      m_PointInteractor->SetDataNode(nullptr);
       this->GetPointSetNode(m_PromptType)->GetDataAs<PointSet>()->ClearSelection();
       break;
     }
@@ -262,8 +262,8 @@ void mitk::nnInteractiveTool::AddNewBoxNode(PromptType promptType)
   node->SetBoolProperty("planarfigure.fill", true);
   node->SetBoolProperty("helper object", true);
 
-  m_PlanarFigureInteractor->SetDataNode(node);
-  m_PlanarFigureInteractor->EnableInteraction(true);
+  m_BoxInteractor->SetDataNode(node);
+  m_BoxInteractor->EnableInteraction(true);
 
   auto command = itk::SimpleMemberCommand<Self>::New();
   command->SetCallbackFunction(this, &Self::OnBoxPlaced);
@@ -289,8 +289,8 @@ void mitk::nnInteractiveTool::OnBoxPlaced()
 
 void mitk::nnInteractiveTool::RemoveNewBoxNode()
 {
-  m_PlanarFigureInteractor->EnableInteraction(false);
-  m_PlanarFigureInteractor->SetDataNode(nullptr);
+  m_BoxInteractor->EnableInteraction(false);
+  m_BoxInteractor->SetDataNode(nullptr);
 
   if (m_NewBoxNode.first.IsNotNull())
   {
@@ -390,23 +390,23 @@ mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType p
   return node;
 }
 
-void mitk::nnInteractiveTool::CreatePointSetInteractor()
+void mitk::nnInteractiveTool::CreatePointInteractor()
 {
-  m_PointSetInteractor = mitk::PointSetDataInteractor::New();
-  m_PointSetInteractor->LoadStateMachine("PointSet.xml");
-  m_PointSetInteractor->SetEventConfig("PointSetConfigLMB.xml");
-  m_PointSetInteractor->EnableInteraction(false);
-  m_PointSetInteractor->EnableMovement(false);
+  m_PointInteractor = mitk::PointSetDataInteractor::New();
+  m_PointInteractor->LoadStateMachine("PointSet.xml");
+  m_PointInteractor->SetEventConfig("PointSetConfigLMB.xml");
+  m_PointInteractor->EnableInteraction(false);
+  m_PointInteractor->EnableMovement(false);
 }
 
-void mitk::nnInteractiveTool::CreatePlanarFigureInteractor()
+void mitk::nnInteractiveTool::CreateBoxInteractor()
 {
   auto module = us::ModuleRegistry::GetModule("MitkPlanarFigure");
 
-  m_PlanarFigureInteractor = mitk::PlanarFigureInteractor::New();
-  m_PlanarFigureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", module);
-  m_PlanarFigureInteractor->SetEventConfig("PlanarFigureConfig.xml", module);
-  m_PlanarFigureInteractor->EnableInteraction(false);
+  m_BoxInteractor = mitk::PlanarFigureInteractor::New();
+  m_BoxInteractor->LoadStateMachine("PlanarFigureInteraction.xml", module);
+  m_BoxInteractor->SetEventConfig("PlanarFigureConfig.xml", module);
+  m_BoxInteractor->EnableInteraction(false);
 }
 
 void mitk::nnInteractiveTool::Activated()
@@ -416,8 +416,8 @@ void mitk::nnInteractiveTool::Activated()
   m_PositivePointsNode = this->CreatePointSetNode(PromptType::Positive);
   m_NegativePointsNode = this->CreatePointSetNode(PromptType::Negative);
 
-  this->CreatePointSetInteractor();
-  this->CreatePlanarFigureInteractor();
+  this->CreatePointInteractor();
+  this->CreateBoxInteractor();
 }
 
 void mitk::nnInteractiveTool::Deactivated()
@@ -425,8 +425,8 @@ void mitk::nnInteractiveTool::Deactivated()
   this->DisableInteraction();
   this->ResetInteractions();
 
-  m_PlanarFigureInteractor = nullptr;
-  m_PointSetInteractor = nullptr;
+  m_BoxInteractor = nullptr;
+  m_PointInteractor = nullptr;
 
   this->GetDataStorage()->Remove(m_NegativePointsNode);
   m_NegativePointsNode = nullptr;

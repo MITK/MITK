@@ -320,7 +320,8 @@ mitk::StateMachineTransition *mitk::EventStateMachine::GetExecutableTransition(m
 
 void mitk::EventStateMachine::ResetToStartState()
 {
-  m_CurrentState = m_StateMachineContainer->GetStartState();
+  if (m_StateMachineContainer != nullptr)
+    m_CurrentState = m_StateMachineContainer->GetStartState();
 }
 
 void mitk::EventStateMachine::SetMouseCursor(const char *xpm[], int hotspotX, int hotspotY)

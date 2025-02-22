@@ -67,6 +67,8 @@ namespace mitk
     /** \brief Sets the minimal distance between two control points. */
     void SetMinimumPointDistance(ScalarType minimumDistance);
 
+    void EnableContinuousPointsMode();
+
   protected:
     PlanarFigureInteractor();
     ~PlanarFigureInteractor() override;
@@ -97,6 +99,8 @@ namespace mitk
     bool CheckFigureIsDeletable(const InteractionEvent *interactionEvent);
 
     bool CheckFigureIsEditable(const InteractionEvent *interactionEvent);
+
+    bool CheckContinuousPointsMode(const InteractionEvent* interactionEvent);
 
     ////////  Actions ////////
 
@@ -192,6 +196,8 @@ namespace mitk
 
     /** \brief True if the mouse is currently hovering over the image. */
     bool m_IsHovering;
+
+    bool m_ContinuousPointsMode = false;
   };
 }
 

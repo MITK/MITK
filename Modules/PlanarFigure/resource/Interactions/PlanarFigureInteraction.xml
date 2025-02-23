@@ -17,6 +17,7 @@
 
     <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="FigurePlacedByDrag" >
       <condition name="figure_is_on_current_slice" />
+      <condition name="point_is_valid" />
       <action name="move_current_point" ID="90" />
     </transition>
 

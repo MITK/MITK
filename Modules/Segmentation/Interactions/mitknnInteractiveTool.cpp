@@ -22,12 +22,68 @@ found in the LICENSE file.
 #include <mitkPointSetShapeProperty.h>
 #include <mitkToolManager.h>
 
+#include <vtkCellArray.h>
+#include <vtkDecimatePolylineFilter.h>
+#include <vtkNew.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
 
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive");
+}
+
+namespace
+{
+  void DecimateNumberOfPoints(mitk::PlanarPolygon* polygon, int decimationThreshold, float decimationFactor)
+  {
+    vtkIdType numPoints = polygon->GetNumberOfControlPoints();
+
+    if (numPoints < decimationThreshold)
+      return;
+
+    vtkNew<vtkPoints> points;
+    vtkNew<vtkCellArray> lines;
+    auto lineIndices = std::unique_ptr<vtkIdType[]>(new vtkIdType[numPoints + 1]);
+
+    for (vtkIdType i = 0; i < numPoints; ++i)
+    {
+      points->InsertPoint(i, polygon->GetWorldControlPoint(i).data());
+      lineIndices[i] = i;
+    }
+
+    lineIndices[numPoints] = 0;
+    lines->InsertNextCell(numPoints + 1, lineIndices.get());
+
+    vtkNew<vtkPolyData> polyData;
+    polyData->SetPoints(points);
+    polyData->SetLines(lines);
+
+    auto decimate = vtkSmartPointer<vtkDecimatePolylineFilter>::New();
+    decimate->SetInputData(polyData);
+    decimate->SetTargetReduction(decimationFactor);
+    decimate->Update();
+
+    auto output = decimate->GetOutput();
+    auto newNumPoints = output->GetNumberOfPoints();
+
+    for (vtkIdType i = newNumPoints; i < numPoints; ++i)
+      polygon->RemoveLastControlPoint();
+
+    auto geometry = polygon->GetPlaneGeometry();
+    mitk::Point3D point3d;
+    mitk::Point2D point2d;
+
+    for (vtkIdType i = 0; i < newNumPoints; ++i)
+    {
+      point3d = output->GetPoint(i);
+      geometry->Map(point3d, point2d);
+      polygon->SetControlPoint(i, point2d);
+    }
+  }
 }
 
 const mitk::Color& mitk::nnInteractiveTool::GetColor(PromptType promptType, Intensity intensity)
@@ -400,7 +456,12 @@ void mitk::nnInteractiveTool::OnLassoPlaced()
 {
   auto& [node, tag] = m_NewLassoNode;
 
-  node->GetData()->RemoveObserver(tag);
+  auto lasso = node->GetDataAs<PlanarPolygon>();
+  lasso->RemoveObserver(tag);
+
+  DecimateNumberOfPoints(lasso, 50, 0.5);
+
+  node->SetBoolProperty("planarfigure.fill", true);
   node->SetSelected(false);
 
   this->GetLassoNodes(m_PromptType).push_back(node);

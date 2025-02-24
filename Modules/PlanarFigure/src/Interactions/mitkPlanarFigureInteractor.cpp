@@ -937,14 +937,12 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(const InteractionPosition
 
   // Iterate over all polylines of planar figure, and check if
   // any one is close to the current display position
-  typedef mitk::PlanarFigure::PolyLineType VertexContainerType;
-
   Point2D polyLinePoint;
   Point2D firstPolyLinePoint;
   Point2D previousPolyLinePoint;
   for (unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop)
   {
-    const VertexContainerType polyLine = planarFigure->GetPolyLine(loop);
+    const auto& polyLine = planarFigure->GetPolyLine(loop);
 
     bool firstPoint(true);
     for (auto it = polyLine.begin(); it != polyLine.end(); ++it)

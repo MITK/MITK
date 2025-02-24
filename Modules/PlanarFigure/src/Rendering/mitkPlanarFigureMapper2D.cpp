@@ -194,7 +194,7 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
   this->m_Context->GetDevice()->End();
 }
 
-void mitk::PlanarFigureMapper2D::PaintPolyLine(const mitk::PlanarFigure::PolyLineType vertices,
+void mitk::PlanarFigureMapper2D::PaintPolyLine(const PlanarFigure::PolyLineType& vertices,
                                                bool closed,
                                                Point2D &anchorPoint,
                                                const PlaneGeometry *planarFigurePlaneGeometry,
@@ -256,7 +256,7 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(mitk::PlanarFigure *figure,
   const auto numberOfPolyLines = figure->GetPolyLinesSize();
   for (auto loop = 0; loop < numberOfPolyLines; ++loop)
   {
-    const auto polyline = figure->GetPolyLine(loop);
+    const auto& polyline = figure->GetPolyLine(loop);
 
     this->PaintPolyLine(
       polyline, figure->IsClosed(), anchorPoint, planarFigurePlaneGeometry, rendererPlaneGeometry, renderer);

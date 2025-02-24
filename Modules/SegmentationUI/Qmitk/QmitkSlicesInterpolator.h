@@ -305,7 +305,7 @@ private:
   mitk::DataNode::Pointer m_FeedbackNode;
   mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
 
-  mitk::Image *m_Segmentation;
+  mitk::MultiLabelSegmentation *m_Segmentation;
 
   mitk::SliceNavigationController *m_LastSNC;
   unsigned int m_LastSliceIndex;

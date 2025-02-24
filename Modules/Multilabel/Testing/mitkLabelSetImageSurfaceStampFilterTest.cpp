@@ -63,7 +63,7 @@ public:
     mitk::LabelSetImageSurfaceStampFilter::Pointer filter = mitk::LabelSetImageSurfaceStampFilter::New();
     filter->SetSurface(m_Surface);
     filter->SetForceOverwrite(true);
-    filter->SetInput(m_LabelSetImage);
+    filter->SetInput(m_LabelSetImage->GetGroupImage(0));
     filter->Update();
     mitk::MultiLabelSegmentation::Pointer result = dynamic_cast<mitk::MultiLabelSegmentation *>(
       m_LabelSetImage.GetPointer()); // dynamic_cast<mitk::MultiLabelSegmentation*>(filter->GetOutput());

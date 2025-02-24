@@ -27,20 +27,16 @@ namespace
   //
   // Throws an mitk::Exception if read access was denied.
   //
-  bool DetermineMinimumAndMaximumIndicesOfNonBackgroundPixels(mitk::MultiLabelSegmentation::Pointer labelSetImage, itk::Index<3>& minIndex, itk::Index<3>& maxIndex)
+  bool DetermineMinimumAndMaximumIndicesOfNonBackgroundPixels(const mitk::MultiLabelSegmentation* labelSetImage, itk::Index<3>& minIndex, itk::Index<3>& maxIndex)
   {
-    // We need a time selector to handle 3d+t images. It is not used for 3d images, though.
-    auto timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(labelSetImage);
-
     const auto background = mitk::MultiLabelSegmentation::UNLABELED_VALUE;
     const auto numLayers = labelSetImage->GetNumberOfLayers();
     const auto numTimeSteps = labelSetImage->GetTimeSteps();
 
     const itk::Index<3> dim = {
-      labelSetImage->GetDimension(0),
-      labelSetImage->GetDimension(1),
-      labelSetImage->GetDimension(2)
+      labelSetImage->GetDimensions()[0],
+      labelSetImage->GetDimensions()[1],
+      labelSetImage->GetDimensions()[2]
     };
 
     maxIndex = { 0, 0, 0 };
@@ -51,23 +47,9 @@ namespace
 
     for (std::remove_const_t<decltype(numLayers)> layer = 0; layer < numLayers; ++layer)
     {
-      labelSetImage->SetActiveLayer(layer);
-
       for (std::remove_const_t<decltype(numTimeSteps)> timeStep = 0; timeStep < numTimeSteps; ++timeStep)
       {
-        const mitk::Image* image = nullptr;
-
-        if (numTimeSteps > 1)
-        {
-          timeSelector->SetTimeNr(timeStep);
-          timeSelector->Update();
-          image = timeSelector->GetOutput();
-        }
-        else
-        {
-          image = labelSetImage;
-        }
-
+        const mitk::Image* image = mitk::SelectImageByTimeStep(labelSetImage->GetGroupImage(layer), timeStep);
         mitk::ImagePixelReadAccessor<mitk::MultiLabelSegmentation::PixelType, 3> pixelReader(image);
         bool imageIsEmpty = true;
 
@@ -136,10 +118,6 @@ namespace
   //
   mitk::MultiLabelSegmentation::Pointer Crop(mitk::MultiLabelSegmentation::Pointer labelSetImage, const itk::Index<3>& minIndex, const itk::Index<3>& maxIndex)
   {
-    // We need a time selector to handle 3d+t images. It is not used for 3d images, though.
-    auto timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(labelSetImage);
-
     const auto numLayers = labelSetImage->GetNumberOfLayers();
     const auto numTimeSteps = labelSetImage->GetTimeSteps();
 
@@ -175,7 +153,7 @@ namespace
     }
 
     auto croppedLabelSetImage = mitk::MultiLabelSegmentation::New();
-    croppedLabelSetImage->Initialize(mitk::MakeScalarPixelType<mitk::MultiLabelSegmentation::PixelType>(), *croppedTimeGeometry);
+    croppedLabelSetImage->Initialize(croppedTimeGeometry);
 
     // Create cropped image volumes for all time steps in all layers
 
@@ -187,18 +165,7 @@ namespace
 
       for (std::remove_const_t<decltype(numTimeSteps)> timeStep = 0; timeStep < numTimeSteps; ++timeStep)
       {
-        const mitk::Image* image = nullptr;
-
-        if (numTimeSteps > 1)
-        {
-          timeSelector->SetTimeNr(timeStep);
-          timeSelector->Update();
-          image = timeSelector->GetOutput();
-        }
-        else
-        {
-          image = labelSetImage;
-        }
+        const mitk::Image* image = mitk::SelectImageByTimeStep(labelSetImage->GetGroupImage(layer), timeStep);
 
         mitk::ImagePixelReadAccessor<mitk::MultiLabelSegmentation::PixelType, 3> pixelReader(image);
         auto* croppedVolume = new mitk::MultiLabelSegmentation::PixelType[numPixels];
@@ -221,9 +188,9 @@ namespace
           }
         }
 
-        croppedLabelSetImage->SetImportVolume(croppedVolume, timeStep, 0, mitk::Image::ReferenceMemory);
-        croppedLabelSetImage->ReplaceGroupLabels(layer, labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(layer)));
+        croppedLabelSetImage->GetGroupImage(groupID)->SetImportVolume(croppedVolume, timeStep, 0, mitk::Image::ReferenceMemory);
       }
+      croppedLabelSetImage->ReplaceGroupLabels(layer, labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(layer)));
     }
 
     return croppedLabelSetImage;

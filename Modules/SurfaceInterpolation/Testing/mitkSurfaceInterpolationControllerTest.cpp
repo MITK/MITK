@@ -495,10 +495,10 @@ public:
   bool AssertImagesEqual4D(mitk::MultiLabelSegmentation *img1, mitk::MultiLabelSegmentation *img2)
   {
     auto selector1 = mitk::ImageTimeSelector::New();
-    selector1->SetInput(img1);
+    selector1->SetInput(img1->GetGroupImage(0));
     selector1->SetChannelNr(0);
     auto selector2 = mitk::ImageTimeSelector::New();
-    selector2->SetInput(img2);
+    selector2->SetInput(img2->GetGroupImage(0));
     selector2->SetChannelNr(0);
 
     int numTs1 = img1->GetTimeSteps();

@@ -31,6 +31,9 @@ found in the LICENSE file.
 #include "mitkToolManager.h"
 #include "mitkUndoController.h"
 
+#include <mitkNodePredicateProperty.h>
+
+
 #include <mitkExtractSliceFilter.h>
 #include <mitkPlanarCircle.h>
 #include <mitkImageReadAccessor.h>

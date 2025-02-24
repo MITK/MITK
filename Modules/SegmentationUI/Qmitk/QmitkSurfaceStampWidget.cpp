@@ -16,6 +16,10 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkSurface.h>
 #include <mitkToolManagerProvider.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 
 #include <QMessageBox>
 

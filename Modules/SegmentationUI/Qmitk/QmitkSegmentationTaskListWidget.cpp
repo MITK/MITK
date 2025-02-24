@@ -24,6 +24,9 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateFunction.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkSceneIO.h>
 #include <mitkSegmentationHelper.h>

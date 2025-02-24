@@ -15,6 +15,11 @@ found in the LICENSE file.
 #include "mitkProcessExecutor.h"
 #include "mitknnUnetTool.h"
 #include <mitkTimeNavigationController.h>
+
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+
 #include <QApplication>
 #include <QDir>
 #include <QDirIterator>

@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkPlanarRectangle.h>
 #include <mitkPointSetDataInteractor.h>
 #include <mitkPointSetShapeProperty.h>
+#include <mitkSegmentationHelper.h>
 #include <mitkToolManager.h>
 
 #include <vtkCellArray.h>
@@ -375,9 +376,11 @@ void mitk::nnInteractiveTool::AddScribbleNode()
     return;
 
   auto referenceNode = this->GetToolManager()->GetReferenceData(0);
+  auto referenceImage = referenceNode->GetDataAs<Image>();
+  auto templateImage = SegmentationHelper::GetStaticSegmentationTemplate(referenceImage);
   std::string name = this->CreateNodeName("scribble");
 
-  m_ScribbleNode = LabelSetImageHelper::CreateNewSegmentationNode(nullptr, referenceNode->GetDataAs<Image>(), name);
+  m_ScribbleNode = LabelSetImageHelper::CreateNewSegmentationNode(nullptr, templateImage, name);
   m_ScribbleNode->SetBoolProperty("helper object", true);
 
   for (auto promptType : { PromptType::Positive, PromptType::Negative })
@@ -508,8 +511,12 @@ mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType p
   auto name = this->CreateNodeName("points", promptType);
   const auto& color = this->GetColor(promptType, Intensity::Muted);
 
+  auto pointSet = PointSet::New();
+  auto geometry = static_cast<ProportionalTimeGeometry*>(pointSet->GetTimeGeometry());
+  geometry->SetStepDuration(std::numeric_limits<TimePointType>::max());
+
   auto node = DataNode::New();
-  node->SetData(PointSet::New());
+  node->SetData(pointSet);
   node->SetName(name);
   node->SetColor(color);
   node->SetColor(color, nullptr, "selectedcolor");

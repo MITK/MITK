@@ -25,7 +25,6 @@ set(CPP_FILES
   Qmitk/QmitknnUNetWorker.cpp
   Qmitk/QmitknnUNetGPU.cpp
   Qmitk/QmitkSurfaceStampWidget.cpp
-  Qmitk/QmitkMaskStampWidget.cpp
   Qmitk/QmitkStaticDynamicSegmentationDialog.cpp
   Qmitk/QmitkSimpleLabelSetListWidget.cpp
   Qmitk/QmitkSegmentationTaskListWidget.cpp
@@ -86,7 +85,6 @@ set(MOC_H_FILES
   Qmitk/QmitknnUNetWorker.h
   Qmitk/QmitknnUNetEnsembleLayout.h
   Qmitk/QmitkSurfaceStampWidget.h
-  Qmitk/QmitkMaskStampWidget.h
   Qmitk/QmitkStaticDynamicSegmentationDialog.h
   Qmitk/QmitkSimpleLabelSetListWidget.h
   Qmitk/QmitkSegmentationTaskListWidget.h
@@ -121,7 +119,6 @@ set(UI_FILES
   Qmitk/QmitkGrowCutToolWidgetControls.ui
   Qmitk/QmitkOtsuToolWidgetControls.ui
   Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
-  Qmitk/QmitkMaskStampWidgetGUIControls.ui
   Qmitk/QmitknnUNetToolGUIControls.ui
   Qmitk/QmitkEditableContourToolGUIControls.ui
   Qmitk/QmitkSegmentationTaskListWidget.ui

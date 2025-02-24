@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkMultiLabelIOHelper.h>
 #include <mitkManualPlacementAnnotationRenderer.h>
 #include <mitkNodePredicateSubGeometry.h>
+#include <mitkNodePredicateProperty.h>
 #include <mitkSegmentationObjectFactory.h>
 #include <mitkSegTool2D.h>
 #include <mitkStatusBar.h>

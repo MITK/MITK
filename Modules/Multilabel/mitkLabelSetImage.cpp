@@ -140,6 +140,8 @@ mitk::Image::Pointer mitk::MultiLabelSegmentation::GenerateNewGroupImage() const
 
 void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage, bool resetLabels, bool ensure1stGroup)
 {
+  if (nullptr == templateImage) mitkThrow() << "Cannot initialize multi label segementation instance. Passed template image is a nullptr.";
+
   auto originalGeometry = templateImage->GetTimeGeometry()->Clone();
   this->SetTimeGeometry(originalGeometry);
   m_GroupImageDimensions = GroupImageDimensionVectorType(templateImage->GetDimensions(), templateImage->GetDimensions() + templateImage->GetDimension());
@@ -169,6 +171,59 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage,
     AddLayer();
   }
 }
+
+void mitk::MultiLabelSegmentation::Initialize(const mitk::TimeGeometry* geometry, bool resetLabels, bool ensure1stGroup)
+{
+  if (nullptr == geometry) mitkThrow() << "Cannot initialize multi label segementation instance. Passed time geometry is a nullptr.";
+
+  auto clonedGeometry = geometry->Clone();
+
+  m_GroupImageDimensions.clear();
+  m_GroupImageDimensions.push_back(clonedGeometry->GetGeometryForTimeStep(0)->GetExtent(0) + 0.5);
+  m_GroupImageDimensions.push_back(clonedGeometry->GetGeometryForTimeStep(0)->GetExtent(1) + 0.5);
+  auto zDim = clonedGeometry->GetGeometryForTimeStep(0)->GetExtent(2) + 0.5;
+  if (zDim > 1)
+      m_GroupImageDimensions.push_back(zDim);
+  if (clonedGeometry->CountTimeSteps() > 1)
+    m_GroupImageDimensions.push_back(clonedGeometry->CountTimeSteps());
+
+  // make sure the image geometry flag is properly set for all time steps
+  for (TimeStepType step = 0; step < clonedGeometry->CountTimeSteps(); ++step)
+  {
+    if (!clonedGeometry->GetGeometryCloneForTimeStep(step)->GetImageGeometry())
+    {
+      MITK_WARN("Image.3DnT.Initialize") << " Attempt to initialize an image with a non-image geometry. "
+        "Re-interpretting the initialization geometry for timestep "
+        << step << " as image geometry, the original geometry remains unchanged.";
+      clonedGeometry->GetGeometryForTimeStep(step)->ImageGeometryOn();
+    }
+  }
+
+  this->SetTimeGeometry(clonedGeometry);
+
+  if (resetLabels)
+  {
+    while (this->GetNumberOfLayers() > 0)
+    {
+      this->RemoveGroup(0);
+    }
+  }
+  else
+  {
+    for (auto& imagePtr : m_LayerContainer)
+    {
+      imagePtr = this->GenerateNewGroupImage();
+      ClearImageBuffer(imagePtr);
+    }
+  }
+
+  // Add an initial LabelSet and corresponding image data to the stack
+  if (ensure1stGroup && this->GetNumberOfLayers() == 0)
+  {
+    AddLayer();
+  }
+}
+
 
 mitk::MultiLabelSegmentation::~MultiLabelSegmentation()
 {

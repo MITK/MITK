@@ -503,7 +503,7 @@ void mitk::SurfaceInterpolationController::Interpolate(const MultiLabelSegmentat
   //  Set reference image for interpolation surface filter
   itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-  timeSelector->SetInput(segmentationImage);
+  timeSelector->SetInput(segmentationImage->GetGroupImage(segmentationImage->GetGroupIndexOfLabel(labelValue)));
   timeSelector->SetTimeNr(timeStep);
   timeSelector->SetChannelNr(0);
   timeSelector->Update();

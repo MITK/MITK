@@ -528,7 +528,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
   if (m_ToolManager->GetWorkingData(0) != nullptr)
   {
-    m_Segmentation = dynamic_cast<mitk::Image *>(m_ToolManager->GetWorkingData(0)->GetData());
+    m_Segmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(m_ToolManager->GetWorkingData(0)->GetData());
     m_BtnReinit3DInterpolation->setEnabled(true);
   }
   else
@@ -677,7 +677,7 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
     return;
   }
 
-  m_Segmentation = dynamic_cast<mitk::Image*>(node->GetData());
+  m_Segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
   if (nullptr == m_Segmentation)
   {
     return;
@@ -697,7 +697,7 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
   int clickedSliceIndex = -1;
 
   // calculate real slice position, i.e. slice of the image
-  mitk::SegTool2D::DetermineAffectedImageSlice(m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex);
+  mitk::SegTool2D::DetermineAffectedImageSlice(m_Segmentation->GetGroupImage(m_Segmentation->GetActiveLayer()), plane, clickedSliceDimension, clickedSliceIndex);
 
   mitk::Image::Pointer interpolation =
     m_Interpolator->Interpolate(clickedSliceDimension, clickedSliceIndex, plane, timeStep);
@@ -1041,7 +1041,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
   TransferLabelContentAtTimeStep(
     interpolatedSegmentation,
-    labelSetImage,
+    labelSetImage->GetGroupImage(labelSetImage->GetActiveLayer()),
     labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(labelSetImage->GetActiveLayer())),
     timeStep,
     0,
@@ -1446,7 +1446,7 @@ void QmitkSlicesInterpolator::CheckSupportedImageDimension()
 {
   if (m_ToolManager->GetWorkingData(0))
   {
-    m_Segmentation = dynamic_cast<mitk::Image *>(m_ToolManager->GetWorkingData(0)->GetData());
+    m_Segmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(m_ToolManager->GetWorkingData(0)->GetData());
 
     if (m_3DInterpolationEnabled && m_Segmentation && ((m_Segmentation->GetDimension() != 3) || (m_Segmentation->GetDimension() != 4)) )
     {

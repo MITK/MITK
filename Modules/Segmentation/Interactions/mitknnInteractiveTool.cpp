@@ -508,12 +508,12 @@ mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType p
   auto name = this->CreateNodeName("points", promptType);
   const auto& color = this->GetColor(promptType, Intensity::Muted);
 
-  auto node = mitk::DataNode::New();
-  node->SetData(mitk::PointSet::New());
+  auto node = DataNode::New();
+  node->SetData(PointSet::New());
   node->SetName(name);
   node->SetColor(color);
   node->SetColor(color, nullptr, "selectedcolor");
-  node->SetProperty("Pointset.2D.shape", mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::CIRCLE));
+  node->SetProperty("Pointset.2D.shape", PointSetShapeProperty::New(PointSetShapeProperty::CIRCLE));
   node->SetIntProperty("point line width", 2);
   node->SetIntProperty("Pointset.2D.resolution", 64);
   node->SetFloatProperty("point 2D size", 10.0f);
@@ -530,7 +530,7 @@ mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType p
 
 void mitk::nnInteractiveTool::CreatePointInteractor()
 {
-  m_PointInteractor = mitk::PointSetDataInteractor::New();
+  m_PointInteractor = PointSetDataInteractor::New();
   m_PointInteractor->LoadStateMachine("PointSet.xml");
   m_PointInteractor->SetEventConfig("PointSetConfigLMB.xml");
   m_PointInteractor->EnableInteraction(false);
@@ -541,7 +541,7 @@ void mitk::nnInteractiveTool::CreateBoxInteractor()
 {
   auto module = us::ModuleRegistry::GetModule("MitkPlanarFigure");
 
-  m_BoxInteractor = mitk::PlanarFigureInteractor::New();
+  m_BoxInteractor = PlanarFigureInteractor::New();
   m_BoxInteractor->LoadStateMachine("PlanarFigureInteraction.xml", module);
   m_BoxInteractor->SetEventConfig("PlanarFigureConfig.xml", module);
   m_BoxInteractor->EnableInteraction(false);
@@ -551,7 +551,7 @@ void mitk::nnInteractiveTool::CreateLassoInteractor()
 {
   auto module = us::ModuleRegistry::GetModule("MitkPlanarFigure");
 
-  m_LassoInteractor = mitk::PlanarFigureInteractor::New();
+  m_LassoInteractor = PlanarFigureInteractor::New();
   m_LassoInteractor->LoadStateMachine("PlanarFigureInteraction.xml", module);
   m_LassoInteractor->SetEventConfig("PlanarFigureConfig.xml", module);
   m_LassoInteractor->EnableContinuousPointsMode();

@@ -38,6 +38,7 @@ namespace mitk
 mitk::Tool::Tool(const char *type, const us::Module *interactorModule)
   : m_EventConfig(""),
     m_ToolManager(nullptr),
+    m_InteractorType(type),
     m_DisplayInteractionConfigs(),
     m_InteractorModule(interactorModule)
 {

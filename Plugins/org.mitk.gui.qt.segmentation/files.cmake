@@ -18,7 +18,6 @@ set(INTERNAL_CPP_FILES
   QmitkLoadMultiLabelPresetAction.cpp
   QmitkSaveMultiLabelPresetAction.cpp
   QmitkConvertSurfaceToLabelAction.cpp
-  QmitkConvertMaskToLabelAction.cpp
   QmitkConvertToMultiLabelSegmentationAction.cpp
   QmitkCreateMultiLabelSegmentationAction.cpp
 )
@@ -50,7 +49,6 @@ set(MOC_H_FILES
   src/internal/QmitkLoadMultiLabelPresetAction.h
   src/internal/QmitkSaveMultiLabelPresetAction.h
   src/internal/QmitkConvertSurfaceToLabelAction.h
-  src/internal/QmitkConvertMaskToLabelAction.h
   src/internal/QmitkConvertToMultiLabelSegmentationAction.h
   src/internal/QmitkCreateMultiLabelSegmentationAction.h
 )

@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <mitkLabelSetImageToSurfaceThreadedFilter.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkRenderingManager.h>
-#include <mitkShowSegmentationAsSurface.h>
 #include <mitkStatusBar.h>
 #include <mitkToolManagerProvider.h>
 

@@ -93,6 +93,7 @@ namespace mitk
 
     void AddNewBoxNode(PromptType promptType);
     void OnBoxPlaced();
+    const std::vector<DataNode::Pointer>& GetBoxNodes(PromptType promptType) const;
     std::vector<DataNode::Pointer>& GetBoxNodes(PromptType promptType);
     void RemoveNewBoxNode();
 
@@ -103,6 +104,7 @@ namespace mitk
 
     void AddNewLassoNode(PromptType promptType);
     void OnLassoPlaced();
+    const std::vector<DataNode::Pointer>& GetLassoNodes(PromptType promptType) const;
     std::vector<DataNode::Pointer>& GetLassoNodes(PromptType promptType);
     void RemoveNewLassoNode();
 

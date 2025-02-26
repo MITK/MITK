@@ -246,7 +246,7 @@ void mitk::nnInteractiveTool::ResetInteractions()
   {
     this->GetPointSetNode(promptType)->GetDataAs<PointSet>()->Clear();
 
-    auto nodes = this->GetBoxNodes(promptType);
+    auto& nodes = this->GetBoxNodes(promptType);
 
     for (const auto& node : nodes)
       this->GetDataStorage()->Remove(node);
@@ -304,6 +304,14 @@ mitk::DataNode* mitk::nnInteractiveTool::GetPointSetNode(PromptType promptType) 
     return m_PositivePointsNode;
 
   return m_NegativePointsNode;
+}
+
+const std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetBoxNodes(PromptType promptType) const
+{
+  if (promptType == PromptType::Positive)
+    return m_PositiveBoxNodes;
+
+  return m_NegativeBoxNodes;
 }
 
 std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetBoxNodes(PromptType promptType)
@@ -415,6 +423,14 @@ void mitk::nnInteractiveTool::RemoveScribbleNode()
   m_ScribbleNode = nullptr;
 
   m_ScribbleLabels.clear();
+}
+
+const std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetLassoNodes(PromptType promptType) const
+{
+  if (promptType == PromptType::Positive)
+    return m_PositiveLassoNodes;
+
+  return m_NegativeLassoNodes;
 }
 
 std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetLassoNodes(PromptType promptType)

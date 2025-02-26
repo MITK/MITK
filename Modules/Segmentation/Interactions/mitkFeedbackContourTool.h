@@ -119,19 +119,6 @@ namespace mitk
      * 4. writes the slice back into the working image using SegTool2D::WriteBackSegmentationResult().*/
     void WriteBackFeedbackContourAsSegmentationResult(const InteractionPositionEvent* positionEvent, int paintingPixelValue, bool setInvisibleAfterSuccess = true);
 
-    /**
-      \brief Fill a contour in a 2D slice with a specified pixel value.
-    */
-    void FillContourInSlice(ContourModel *projectedContour, Image *sliceImage, int paintingPixelValue = 1);
-
-    /**
-      \brief Fill a contour in a 2D slice with a specified pixel value at a given time step.
-    */
-    void FillContourInSlice(ContourModel *projectedContour,
-                            unsigned int timeStep,
-                            Image *sliceImage,
-                            int paintingPixelValue = 1);
-
   private:
     ContourModel::Pointer m_FeedbackContour;
     DataNode::Pointer m_FeedbackContourNode;

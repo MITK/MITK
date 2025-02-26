@@ -264,19 +264,3 @@ void mitk::FeedbackContourTool::WriteBackFeedbackContourAsSegmentationResult(con
     this->SetFeedbackContourVisible(false);
   }
 }
-
-
-void mitk::FeedbackContourTool::FillContourInSlice(ContourModel *projectedContour,
-                                                   Image *sliceImage,
-                                                   int paintingPixelValue)
-{
-  this->FillContourInSlice(projectedContour, 0, sliceImage, paintingPixelValue);
-}
-
-void mitk::FeedbackContourTool::FillContourInSlice(ContourModel *projectedContour,
-                                                   unsigned int timeStep,
-                                                   Image *sliceImage,
-                                                   int paintingPixelValue)
-{
-  mitk::ContourModelUtils::FillContourInSlice(projectedContour, timeStep, sliceImage, sliceImage, paintingPixelValue);
-}

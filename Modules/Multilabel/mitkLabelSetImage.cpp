@@ -91,7 +91,7 @@ const mitk::MultiLabelSegmentation::GroupImageDimensionVectorType& mitk::MultiLa
 };
 
 mitk::MultiLabelSegmentation::MultiLabelSegmentation()
-  : mitk::SlicedData(), m_ActiveLabelValue(0), m_UnlabeledLabelLock(false), m_ActiveLayer(0), m_activeLayerInvalid(false)
+  : mitk::SlicedData(), m_ActiveLabelValue(0), m_UnlabeledLabelLock(false), m_ActiveLayer(0)
 {
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
@@ -106,7 +106,6 @@ mitk::MultiLabelSegmentation::MultiLabelSegmentation(const mitk::MultiLabelSegme
     m_LookupTable(other.m_LookupTable->Clone()),
     m_UnlabeledLabelLock(other.m_UnlabeledLabelLock),
     m_ActiveLayer(other.GetActiveLayer()),
-    m_activeLayerInvalid(false),
     m_GroupImageDimensions(other.m_GroupImageDimensions)
 {
   GroupIndexType i = 0;
@@ -272,14 +271,6 @@ void mitk::MultiLabelSegmentation::RemoveGroup(GroupIndexType indexToDelete)
       newActiveIndex = indexToDelete+1 < GetNumberOfLayers() ? indexToDelete : GetNumberOfLayers() - 2;
       newActiveIndexBeforeDeletion = indexToDelete + 1 < GetNumberOfLayers() ? indexToDelete+1 : indexToDelete -1;
     }
-  }
-
-  if (activeIndex == indexToDelete)
-  {
-    // we are deleting the active layer, it should not be copied back into the vector
-    m_activeLayerInvalid = true;
-    //copy the image content of the upcoming new active layer; 
-    SetActiveLayer(newActiveIndexBeforeDeletion);
   }
 
   auto relevantLabels = m_GroupToLabelMap[indexToDelete];
@@ -478,7 +469,7 @@ void mitk::MultiLabelSegmentation::UpdateGroupImage(GroupIndexType groupID, cons
   if (this->GetTimeSteps()<=timestep) mitkThrow() << "Error, cannot update group image. Assigned time step is not valid for segmentation. Invalid time step: " << timestep;
   if (sourceImage->GetTimeSteps() <= sourceTimestep) mitkThrow() << "Error, cannot update group image. Requested time step of source image is not valid. Invalid source time step: " << sourceTimestep;
 
-  if (mitk::Equal(*(m_LayerContainer[groupID]->GetGeometry(timestep)), *(sourceImage->GetGeometry(sourceTimestep)), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+  if (!mitk::Equal(*(m_LayerContainer[groupID]->GetGeometry(timestep)), *(sourceImage->GetGeometry(sourceTimestep)), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
     mitkThrow() << "Error, cannot update group image. Passed sourceImage has not the same geometry then the MultiLabelSegmentationInstance.";
 
   auto imageTimeStep = SelectImageByTimeStep(sourceImage, sourceTimestep);
@@ -506,7 +497,11 @@ void mitk::MultiLabelSegmentation::SetGroupName(GroupIndexType groupID, const st
 
 void mitk::MultiLabelSegmentation::SetActiveLayer(unsigned int layer)
 {
-// deprecated and will be removed
+  if (layer != GetActiveLayer() && (layer < this->GetNumberOfLayers()))
+  {
+    m_ActiveLayer = layer;
+    this->Modified();
+  }
 }
 
 void mitk::MultiLabelSegmentation::SetActiveLabel(LabelValueType label)
@@ -1038,6 +1033,18 @@ void mitk::MultiLabelSegmentation::InitializeByLabeledImageProcessing(MultiLabel
     ++sourceIter;
     ++targetIter;
   }
+}
+
+itk::ModifiedTimeType mitk::MultiLabelSegmentation::GetMTime() const
+{
+  itk::ModifiedTimeType result = Superclass::GetMTime();
+
+  for (const auto& groupImage : m_LayerContainer)
+  {
+    result = std::max(result, groupImage->GetMTime());
+  }
+
+  return result;
 }
 
 template <typename ImageType>

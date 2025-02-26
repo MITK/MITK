@@ -501,6 +501,9 @@ namespace mitk
      */
     void InitializeByLabeledImage(const mitk::Image* image);
 
+    /** Override default version. It will return the highest MTime of all group images and self.*/
+    itk::ModifiedTimeType GetMTime() const override;
+
     protected:
 
       void OnLabelModified(const Object* sender, const itk::EventObject&);
@@ -657,7 +660,6 @@ namespace mitk
     std::vector<Image::Pointer> m_LayerContainer;
 
     int m_ActiveLayer;
-    bool m_activeLayerInvalid;
   };
 
   /**

@@ -341,7 +341,8 @@ void QmitkImageCropperView::ProcessImage(bool mask)
 
   const auto image = dynamic_cast<mitk::Image*>(imageNode->GetData());
   const auto boundingBox = dynamic_cast<mitk::GeometryData*>(boundingBoxNode->GetData());
-  if (nullptr != image && nullptr != boundingBox)
+  const auto segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(imageNode->GetData());
+  if ( (nullptr != image || nullptr != segmentation) && nullptr != boundingBox)
   {
     // Check if initial node name is already in box name
     std::string imagePrefix = "";
@@ -377,10 +378,9 @@ void QmitkImageCropperView::ProcessImage(bool mask)
     cutter->SetCurrentTimeStep(timeStep);
 
     // TODO: Add support for MultiLayer (right now only Mulitlabel support)
-    const auto labelsetImageInput = dynamic_cast<mitk::MultiLabelSegmentation*>(image);
-    if (nullptr != labelsetImageInput)
+    if (nullptr != segmentation)
     {
-      cutter->SetInput(labelsetImageInput);
+      cutter->SetInput(segmentation->GetGroupImage(0));
       // do the actual cutting
       try
       {
@@ -397,9 +397,9 @@ void QmitkImageCropperView::ProcessImage(bool mask)
       auto labelSetImage = mitk::MultiLabelSegmentation::New();
       labelSetImage->InitializeByLabeledImage(cutter->GetOutput());
 
-      for (unsigned int i = 0; i < labelsetImageInput->GetNumberOfLayers(); i++)
+      for (unsigned int i = 0; i < segmentation->GetNumberOfLayers(); i++)
       {
-        labelSetImage->ReplaceGroupLabels(i, labelsetImageInput->GetConstLabelsByValue(labelsetImageInput->GetLabelValuesByGroup(i)));
+        labelSetImage->ReplaceGroupLabels(i, segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(i)));
       }
 
       croppedImageNode->SetData(labelSetImage);

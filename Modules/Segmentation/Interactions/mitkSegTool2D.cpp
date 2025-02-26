@@ -343,19 +343,13 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionPositionEvent *positionEvent) const
 {
-  const auto workingNode = this->GetWorkingDataNode();
-  if (!workingNode)
+  const auto workingData = this->GetWorkingData();
+  if (!workingData)
   {
     return nullptr;
   }
 
-  const auto *workingImage = dynamic_cast<Image *>(workingNode->GetData());
-  if (!workingImage)
-  {
-    return nullptr;
-  }
-
-  return GetAffectedImageSliceAs2DImage(positionEvent, workingImage);
+  return GetAffectedImageSliceAs2DImage(positionEvent, workingData->GetGroupImage(workingData->GetActiveLayer()));
 }
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const InteractionPositionEvent *positionEvent) const
@@ -366,7 +360,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const Interactio
     return nullptr;
   }
 
-  auto *referenceImage = dynamic_cast<Image *>(referenceNode->GetData());
+  auto *referenceImage = this->GetReferenceData();
   if (!referenceImage)
   {
     return nullptr;
@@ -392,7 +386,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PlaneGeome
     return nullptr;
   }
 
-  auto* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());
+  auto* referenceImage = this->GetReferenceData();
   if (!referenceImage)
   {
     return nullptr;
@@ -529,9 +523,13 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const InteractionPositionEvent
 
   if (planeGeometry && segmentationResult && !abstractTransformGeometry)
   {
-    const auto workingNode = this->GetWorkingDataNode();
-    auto *image = dynamic_cast<Image *>(workingNode->GetData());
-    const auto timeStep = positionEvent->GetSender()->GetTimeStep(image);
+    auto* segmentation = this->GetWorkingData();
+    if (nullptr == segmentation)
+    {
+      mitkThrow() << "Cannot process WriteBackSegmentationResult. Working data node is not set or does not contain a MultiLabelSegmentation instance.";
+    }
+
+    const auto timeStep = positionEvent->GetSender()->GetTimeStep(segmentation);
     this->WriteBackSegmentationResult(planeGeometry, segmentationResult, timeStep);
   }
 }
@@ -606,23 +604,17 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
     mitkThrow() << "Cannot write slice to working node. Working node is invalid.";
   }
 
-  auto image = dynamic_cast<Image*>(workingNode->GetData());
-
-  mitk::Label::PixelType activeLabelValue = 0;
-
-  try{
-    auto labelSetImage = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData());
-    activeLabelValue = labelSetImage->GetActiveLabel()->GetValue();
-  }
-  catch(...)
+  auto segmentation = dynamic_cast<MultiLabelSegmentation*>(workingNode->GetData());
+  if (nullptr == segmentation)
   {
-    mitkThrow() << "Working node does not contain  labelSetImage.";
+    mitkThrow() << "Working node does not contain labelSetImage.";
   }
 
-
+  const auto activeLabelValue = segmentation->GetActiveLabel()->GetValue();
+  auto image = segmentation->GetGroupImage(segmentation->GetGroupIndexOfLabel(activeLabelValue));
   if (nullptr == image)
   {
-    mitkThrow() << "Cannot write slice to working node. Working node does not contain an image.";
+    mitkThrow() << "Cannot write slice to working node. Segmentation/tool are in an invalid/inconsistent state.";
   }
 
   for (const auto& sliceInfo : sliceList)

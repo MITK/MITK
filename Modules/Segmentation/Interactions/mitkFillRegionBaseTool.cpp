@@ -80,7 +80,7 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
   if (nullptr == positionEvent)
     return;
 
-  auto labelSetImage = dynamic_cast<const MultiLabelSegmentation*>(this->GetWorkingData());
+  auto labelSetImage = this->GetWorkingData();
   if (nullptr == labelSetImage)
   {
     return;

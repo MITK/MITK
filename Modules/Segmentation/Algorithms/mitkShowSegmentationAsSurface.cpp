@@ -60,8 +60,10 @@ namespace mitk
     {
       Image::Pointer image;
       GetPointerParameter("Input", image);
+      MultiLabelSegmentation::Pointer labelSetImage;
+      GetPointerParameter("Input", labelSetImage);
 
-      return image.IsNotNull() && GetGroupNode();
+      return (labelSetImage.IsNotNull() || image.IsNotNull()) && GetGroupNode();
     }
     catch (std::invalid_argument &)
     {
@@ -71,9 +73,6 @@ namespace mitk
 
   bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   {
-    Image::Pointer image;
-    GetPointerParameter("Input", image);
-
     bool smooth(true);
     GetParameter("Smooth", smooth);
 
@@ -96,7 +95,8 @@ namespace mitk
               << applyMedian << " median kernel " << medianKernelSize << " mesh reduction " << decimateMesh
               << " reductionRate " << reductionRate;
 
-    auto labelSetImage = dynamic_cast<MultiLabelSegmentation *>(image.GetPointer());
+    MultiLabelSegmentation::Pointer labelSetImage;
+    GetPointerParameter("Input", labelSetImage);
 
     if (nullptr != labelSetImage)
     {
@@ -143,6 +143,8 @@ namespace mitk
     }
     else
     {
+      Image::Pointer image;
+      GetPointerParameter("Input", image);
       auto surface = this->ConvertBinaryImageToSurface(image);
 
       if (surface.IsNotNull())

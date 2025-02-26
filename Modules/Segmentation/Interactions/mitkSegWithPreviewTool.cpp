@@ -87,16 +87,10 @@ bool mitk::SegWithPreviewTool::CanHandle(const BaseData* referenceData, const Ba
     return false;
 
   auto* labelSet = dynamic_cast<const MultiLabelSegmentation*>(workingData);
-  if (labelSet != nullptr)
-    return true;
-
-  auto* workingImage = dynamic_cast<const Image*>(workingData);
-  if (workingImage == nullptr)
+  if (labelSet == nullptr)
     return false;
 
-  // If the working image is a normal image and not a label set image
-  // it must have the same pixel type as a label set.
-  return MakeScalarPixelType< DefaultSegmentationDataType >() == workingImage->GetPixelType();
+  return true;
 }
 
 void mitk::SegWithPreviewTool::Activated()
@@ -437,10 +431,7 @@ void mitk::SegWithPreviewTool::TransferSegmentationsAtTimeStep(const MultiLabelS
     }
     else
     { //take care of the full segmentation volume
-      auto sourceLSImage = dynamic_cast<const MultiLabelSegmentation*>(sourceSeg);
-      auto destLSImage = dynamic_cast<MultiLabelSegmentation*>(destinationSeg);
-
-      TransferLabelContentAtTimeStep(sourceLSImage, destLSImage, timeStep, labelMapping, m_MergeStyle, m_OverwriteStyle);
+      TransferLabelContentAtTimeStep(sourceSeg, destinationSeg, timeStep, labelMapping, m_MergeStyle, m_OverwriteStyle);
     }
   }
   catch (mitk::Exception& e)
@@ -559,18 +550,17 @@ bool mitk::SegWithPreviewTool::EnsureUpToDateUserDefinedActiveLabel()
 {
   bool labelChanged = true;
 
-  const auto workingImage = dynamic_cast<const Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
-  if (const auto& labelSetImage = dynamic_cast<const MultiLabelSegmentation*>(workingImage))
+  const auto workingImage = dynamic_cast<const MultiLabelSegmentation*>(this->GetToolManager()->GetWorkingData(0)->GetData());
+  if (nullptr != workingImage)
   {
     // this is a fix for T28131 / T28986, which should be refactored if T28524 is being worked on
-    auto newLabel = labelSetImage->GetActiveLabel()->GetValue();
+    auto newLabel = workingImage->GetActiveLabel()->GetValue();
     labelChanged = newLabel != m_UserDefinedActiveLabel;
     m_UserDefinedActiveLabel = newLabel;
   }
   else
   {
-    m_UserDefinedActiveLabel = 1;
-    labelChanged = false;
+    mitkThrow() << "Cannot transfer EnsureUpToDateUserDefinedActiveLabel. Tool manager is in an invalid state, working data is null or no MultiLabelSegmentation instance.";
   }
   return labelChanged;
 }
@@ -713,7 +703,7 @@ void mitk::SegWithPreviewTool::TransferLabelInformation(const LabelMappingType& 
         MultiLabelSegmentation::UNLABELED_VALUE != targetLabel &&
         !target->ExistLabel(targetLabel, target->GetActiveLayer()))
     {
-      if (!source->ExistLabel(sourceLabel, source->GetActiveLayer()))
+      if (!source->ExistLabel(sourceLabel))
       {
         mitkThrow() << "Cannot prepare segmentation for preview transfer. Preview seems invalid as label is missing. Missing label: " << sourceLabel;
       }

@@ -471,8 +471,7 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
   if (!positionEvent)
     return;
 
-  DataNode* workingNode(this->GetToolManager()->GetWorkingData(0));
-  auto workingSeg = dynamic_cast<MultiLabelSegmentation*>(workingNode->GetData());
+  auto workingSeg = this->GetWorkingData();
   Label::PixelType activePixelValue = workingSeg->GetActiveLabel()->GetValue();
   if (!m_FillMode)
   {
@@ -579,19 +578,13 @@ void mitk::PaintbrushTool::ResetWorkingSlice(const InteractionPositionEvent* eve
   m_PaintingSlice = nullptr;
   m_PaintingNode->SetData(nullptr);
 
-  DataNode* workingNode = this->GetToolManager()->GetWorkingData(0);
-  if (nullptr == workingNode)
+  auto segmentation = this->GetWorkingData();
+  if (nullptr == segmentation)
   {
     return;
   }
 
-  Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
-  if (nullptr == image)
-  {
-    return;
-  }
-
-  m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
+  m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, segmentation->GetGroupImage(segmentation->GetActiveLayer()))->Clone();
 
   m_PaintingSlice = Image::New();
   m_PaintingSlice->Initialize(m_WorkingSlice);

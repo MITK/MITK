@@ -508,25 +508,20 @@ std::string mitk::nnInteractiveTool::GetPromptTypeString(PromptType promptType) 
 
 mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType promptType) const
 {
-  auto name = this->CreateNodeName("points", promptType);
-  const auto& color = this->GetColor(promptType, Intensity::Muted);
-
   auto pointSet = PointSet::New();
   auto geometry = static_cast<ProportionalTimeGeometry*>(pointSet->GetTimeGeometry());
   geometry->SetStepDuration(std::numeric_limits<TimePointType>::max());
 
   auto node = DataNode::New();
   node->SetData(pointSet);
-  node->SetName(name);
-  node->SetColor(color);
-  node->SetColor(color, nullptr, "selectedcolor");
+  node->SetName(this->CreateNodeName("points", promptType));
+  node->SetColor(this->GetColor(promptType, Intensity::Muted));
+  node->SetColor(this->GetColor(promptType, Intensity::Vibrant), nullptr, "selectedcolor");
   node->SetProperty("Pointset.2D.shape", PointSetShapeProperty::New(PointSetShapeProperty::CIRCLE));
-  node->SetIntProperty("point line width", 2);
   node->SetIntProperty("Pointset.2D.resolution", 64);
   node->SetFloatProperty("point 2D size", 10.0f);
   node->SetFloatProperty("Pointset.2D.distance to plane", 0.1f);
   node->SetBoolProperty("Pointset.2D.keep shape when selected", true);
-  node->SetBoolProperty("Pointset.2D.selected.show contour", true);
   node->SetBoolProperty("Pointset.2D.fill shape", true);
   node->SetBoolProperty("helper object", true);
 
@@ -542,6 +537,7 @@ void mitk::nnInteractiveTool::CreatePointInteractor()
   m_PointInteractor->SetEventConfig("PointSetConfigLMB.xml");
   m_PointInteractor->EnableInteraction(false);
   m_PointInteractor->EnableMovement(false);
+  m_PointInteractor->EnableRemoval(false);
 }
 
 void mitk::nnInteractiveTool::CreateBoxInteractor()

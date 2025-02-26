@@ -151,7 +151,8 @@ void mitk::PointSetDataInteractor::SelectPoint(StateMachineAction *, Interaction
 mitk::PointSetDataInteractor::PointSetDataInteractor()
   : m_MaxNumberOfPoints(0),
     m_SelectionAccuracy(3.5),
-    m_IsMovementEnabled(true)
+    m_IsMovementEnabled(true),
+    m_IsRemovalEnabled(true)
 {
 }
 
@@ -164,8 +165,16 @@ void mitk::PointSetDataInteractor::EnableMovement(bool enabled)
   m_IsMovementEnabled = enabled;
 }
 
+void mitk::PointSetDataInteractor::EnableRemoval(bool enabled)
+{
+  m_IsRemovalEnabled = enabled;
+}
+
 void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
+  if (!m_IsRemovalEnabled)
+    return;
+
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
 

@@ -81,6 +81,7 @@ namespace mitk
     void SetMaxPoints(unsigned int maxNumber = 0);
 
     void EnableMovement(bool enabled = true);
+    void EnableRemoval(bool enabled = true);
 
   protected:
     PointSetDataInteractor();
@@ -182,6 +183,7 @@ namespace mitk
     int m_MaxNumberOfPoints;   // maximum of allowed number of points
     float m_SelectionAccuracy; // accuracy that's needed to select a point
     bool m_IsMovementEnabled;
+    bool m_IsRemovalEnabled;
 
     // FUNCTIONS
     void UnselectAll(unsigned int timeStep, ScalarType timeInMs);

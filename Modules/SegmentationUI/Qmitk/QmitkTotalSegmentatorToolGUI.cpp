@@ -11,8 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkTotalSegmentatorToolGUI.h"
-#include "mitkProcessExecutor.h"
-#include "mitkTotalSegmentatorTool.h"
+#include <ui_QmitkTotalSegmentatorGUIControls.h>
+
+#include <mitkProcessExecutor.h>
+#include <mitkTotalSegmentatorTool.h>
 #include <QApplication>
 #include <QIcon>
 #include <QmitkStyleManager.h>
@@ -32,7 +34,9 @@ namespace
 } // namespace
 
 QmitkTotalSegmentatorToolGUI::QmitkTotalSegmentatorToolGUI()
-  : QmitkMultiLabelSegWithPreviewToolGUIBase(), m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
+  : QmitkMultiLabelSegWithPreviewToolGUIBase(),
+    m_Controls(new Ui::QmitkTotalSegmentatorToolGUIControls),
+    m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
 {
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   { return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false; };
@@ -72,14 +76,14 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
   auto wrapperWidget = new QWidget(this);
   mainLayout->addWidget(wrapperWidget);
-  m_Controls.setupUi(wrapperWidget);
+  m_Controls->setupUi(wrapperWidget);
 
   this->EnableAll(false);
-  m_Controls.statusLabel->setTextFormat(Qt::RichText);
-  m_Controls.subtaskComboBox->addItems(VALID_TASKS);
+  m_Controls->statusLabel->setTextFormat(Qt::RichText);
+  m_Controls->subtaskComboBox->addItems(VALID_TASKS);
   QString welcomeText = "<b>STATUS: </b><i>Welcome to the TotalSegmentator tool.</i>";
-  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
-  m_Controls.fastBox->setChecked(true);
+  connect(m_Controls->previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
+  m_Controls->fastBox->setChecked(true);
   bool isAvailable = !(m_Preferences->Get("TotalSeg/totalSegPath", "").empty());
   if (isAvailable)
   {
@@ -94,15 +98,15 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   this->WriteStatusMessage(welcomeText);
   QIcon arrowIcon =
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg"));
-  m_Controls.previewButton->setIcon(arrowIcon);
+  m_Controls->previewButton->setIcon(arrowIcon);
 
   Superclass::InitializeUI(mainLayout);
 }
 
 void QmitkTotalSegmentatorToolGUI::EnableAll(bool isEnable)
 {
-  m_Controls.previewButton->setEnabled(isEnable);
-  m_Controls.subtaskComboBox->setEnabled(isEnable);
+  m_Controls->previewButton->setEnabled(isEnable);
+  m_Controls->subtaskComboBox->setEnabled(isEnable);
 }
 
 void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
@@ -119,10 +123,10 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   }
   try
   {
-    m_Controls.previewButton->setEnabled(false);
+    m_Controls->previewButton->setEnabled(false);
     qApp->processEvents();
-    bool isFast = m_Controls.fastBox->isChecked();
-    QString subTask = m_Controls.subtaskComboBox->currentText();
+    bool isFast = m_Controls->fastBox->isChecked();
+    QString subTask = m_Controls->subtaskComboBox->currentText();
     if (subTask != VALID_TASKS[0] && subTask != VALID_TASKS[1])
     {
       isFast = true;
@@ -135,7 +139,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     this->WriteStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
     m_FirstPreviewComputation = false;
     tool->UpdatePreview();
-    m_Controls.previewButton->setEnabled(true);
+    m_Controls->previewButton->setEnabled(true);
   }
   catch (const std::exception &e)
   {
@@ -144,7 +148,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
              << e.what();
     this->ShowErrorMessage(errorMsg.str());
     this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
-    m_Controls.previewButton->setEnabled(true);
+    m_Controls->previewButton->setEnabled(true);
     m_FirstPreviewComputation = true;
     return;
   }
@@ -152,7 +156,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   {
     std::string errorMsg = "Unknown error occurred while generation TotalSegmentator segmentation.";
     this->ShowErrorMessage(errorMsg);
-    m_Controls.previewButton->setEnabled(true);
+    m_Controls->previewButton->setEnabled(true);
     m_FirstPreviewComputation = true;
     return;
   }
@@ -172,15 +176,15 @@ void QmitkTotalSegmentatorToolGUI::ShowErrorMessage(const std::string &message, 
 
 void QmitkTotalSegmentatorToolGUI::WriteStatusMessage(const QString &message)
 {
-  m_Controls.statusLabel->setText(message);
-  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: white");
+  m_Controls->statusLabel->setText(message);
+  m_Controls->statusLabel->setStyleSheet("font-weight: bold; color: white");
   qApp->processEvents();
 }
 
 void QmitkTotalSegmentatorToolGUI::WriteErrorMessage(const QString &message)
 {
-  m_Controls.statusLabel->setText(message);
-  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: red");
+  m_Controls->statusLabel->setText(message);
+  m_Controls->statusLabel->setStyleSheet("font-weight: bold; color: red");
   qApp->processEvents();
 }
 

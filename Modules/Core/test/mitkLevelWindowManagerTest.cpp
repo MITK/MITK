@@ -263,7 +263,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
 
-    // The top level node will alsways be used as a fall back node
+    // The top level node will always be used as a fall back node
     // if no specific mode is selected.
     m_DataNode3->SetBoolProperty("imageForLevelWindow", false);
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));

@@ -90,7 +90,7 @@ public Q_SLOTS:
   *   An outgoing selection can then at most contain the filtered nodes.
   *   If false, the incoming non-visible selection will be stored and later added to the outgoing selection,
   *   to include the original selection that could not be modified.
-  *   The part of the original selection, that is non-visible are the nodes, that do not fullfill the predicate.
+  *   The part of the original selection, that is non-visible are the nodes, that do not fulfill the predicate.
   *
   * @par selectOnlyVisibleNodes   The bool value to define the selection modus.
   */

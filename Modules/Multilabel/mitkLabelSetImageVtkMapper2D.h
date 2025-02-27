@@ -159,7 +159,7 @@ namespace mitk
       */
     void TransformActor(mitk::BaseRenderer *renderer);
 
-    /** \brief Generates a plane according to the size of the resliced image in milimeters.
+    /** \brief Generates a plane according to the size of the resliced image in millimeters.
       *
       * In VTK a vtkPlaneSource is defined through three points. The origin and two
       * points defining the axes of the plane (see VTK documentation). The origin is

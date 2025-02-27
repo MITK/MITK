@@ -593,7 +593,7 @@ namespace mitk
     {
       // If not set explicitly otherwise, prefer xcb as platform on Linux, as we had issues
       // with wayland in combination with VTK and GLEW. Note that the shell scripts for
-      // excutables in our installers also set the platform to xcb.
+      // executables in our installers also set the platform to xcb.
       if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
         qputenv("QT_QPA_PLATFORM", "xcb");
     }

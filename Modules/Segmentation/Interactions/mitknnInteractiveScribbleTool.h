@@ -37,6 +37,7 @@ namespace mitk
     nnInteractiveScribbleTool();
     ~nnInteractiveScribbleTool() override;
 
+    int GetFillValue() const override;
     void OnInvertLogic(StateMachineAction*, InteractionEvent*) override;
   };
 }

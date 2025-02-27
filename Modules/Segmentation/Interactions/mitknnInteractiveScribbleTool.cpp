@@ -62,6 +62,11 @@ void mitk::nnInteractiveScribbleTool::Deactivate()
   this->SetEnable3DInterpolation(true);
 }
 
+int mitk::nnInteractiveScribbleTool::GetFillValue() const
+{
+  return 1;
+}
+
 void mitk::nnInteractiveScribbleTool::OnInvertLogic(StateMachineAction*, InteractionEvent*)
 {
 }

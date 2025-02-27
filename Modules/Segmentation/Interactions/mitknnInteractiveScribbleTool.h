@@ -17,6 +17,26 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class MITKSEGMENTATION_EXPORT ScribbleEvent : public itk::AnyEvent
+  {
+  public:
+    using Self = ScribbleEvent;
+    using Superclass = itk::AnyEvent;
+
+    explicit ScribbleEvent(Image* mask = nullptr);
+    ScribbleEvent(const Self& other);
+    ~ScribbleEvent() override;
+
+    const char* GetEventName() const override;
+    bool CheckEvent(const itk::EventObject* event) const override;
+    itk::EventObject* MakeObject() const override;
+
+    Image* GetMask() const;
+
+  private:
+    Image::Pointer m_Mask;
+  };
+
   class MITKSEGMENTATION_EXPORT nnInteractiveScribbleTool : public DrawPaintbrushTool
   {
   public:
@@ -38,6 +58,7 @@ namespace mitk
     ~nnInteractiveScribbleTool() override;
 
     int GetFillValue() const override;
+    void OnMouseReleased(StateMachineAction*, InteractionEvent*) override;
     void OnInvertLogic(StateMachineAction*, InteractionEvent*) override;
   };
 }

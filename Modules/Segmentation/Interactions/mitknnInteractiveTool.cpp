@@ -63,9 +63,13 @@ mitk::nnInteractiveTool::nnInteractiveTool()
     m_ScribbleTool(nnInteractiveScribbleTool::New()),
     m_LassoTool(nnInteractiveLassoTool::New())
 {
-  auto command = itk::MemberCommand<Self>::New();
-  command->SetCallbackFunction(this, &Self::OnLassoClosed);
-  m_LassoTool->AddObserver(ContourClosedEvent(), command);
+  auto scribbleCommand = itk::MemberCommand<Self>::New();
+  scribbleCommand->SetCallbackFunction(this, &Self::OnScribbleEvent);
+  m_ScribbleTool->AddObserver(ScribbleEvent(), scribbleCommand);
+
+  auto lassoClosedCommand = itk::MemberCommand<Self>::New();
+  lassoClosedCommand->SetCallbackFunction(this, &Self::OnLassoEvent);
+  m_LassoTool->AddObserver(LassoEvent(), lassoClosedCommand);
 }
 
 mitk::nnInteractiveTool::~nnInteractiveTool()
@@ -77,7 +81,6 @@ void mitk::nnInteractiveTool::SetToolManager(ToolManager* toolManager)
   Superclass::SetToolManager(toolManager);
 
   m_ToolManager = ToolManager::New(toolManager->GetDataStorage());
-  m_ToolManager->SetReferenceData(toolManager->GetReferenceData(0));
 
   m_ScribbleTool->InitializeStateMachine();
   m_ScribbleTool->SetToolManager(m_ToolManager);
@@ -141,12 +144,14 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
     case Tool::Scribble:
       this->AddScribbleNode();
       this->SetActiveScribbleLabel(promptType);
+      m_ToolManager->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
       m_ToolManager->SetWorkingData(m_ScribbleNode);
       m_ScribbleTool->Activate(this->GetColor(promptType, Intensity::Vibrant));
       break;
 
     case Tool::Lasso:
       this->AddLassoMaskNode(promptType);
+      m_ToolManager->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
       m_ToolManager->SetWorkingData(m_LassoMaskNode);
       m_LassoTool->Activate(this->GetColor(promptType, Intensity::Vibrant));
       break;
@@ -259,6 +264,41 @@ void mitk::nnInteractiveTool::UnblockLMBDisplayInteraction()
   m_EventConfigBackup.clear();
 }
 
+mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType promptType)
+{
+  auto pointSet = PointSet::New();
+  auto geometry = static_cast<ProportionalTimeGeometry*>(pointSet->GetTimeGeometry());
+  geometry->SetStepDuration(std::numeric_limits<TimePointType>::max());
+
+  auto pointCommand = itk::SimpleMemberCommand<Self>::New();
+  pointCommand->SetCallbackFunction(this, &Self::OnPointEvent);
+  pointSet->AddObserver(PointSetAddEvent(), pointCommand);
+
+  auto node = DataNode::New();
+  node->SetData(pointSet);
+  node->SetName(this->CreateNodeName("points", promptType));
+  node->SetColor(this->GetColor(promptType, Intensity::Muted));
+  node->SetColor(this->GetColor(promptType, Intensity::Vibrant), nullptr, "selectedcolor");
+  node->SetProperty("Pointset.2D.shape", PointSetShapeProperty::New(PointSetShapeProperty::CIRCLE));
+  node->SetIntProperty("Pointset.2D.resolution", 64);
+  node->SetFloatProperty("point 2D size", 10.0f);
+  node->SetFloatProperty("Pointset.2D.distance to plane", 0.1f);
+  node->SetBoolProperty("Pointset.2D.keep shape when selected", true);
+  node->SetBoolProperty("Pointset.2D.fill shape", true);
+  node->SetBoolProperty("helper object", true);
+
+  this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
+
+  return node;
+}
+
+void mitk::nnInteractiveTool::OnPointEvent()
+{
+  const auto* pointSet = this->GetPointSetNode(m_PromptType)->GetDataAs<PointSet>();
+  const auto point = pointSet->GetPoint(pointSet->GetSize() - 1);
+  this->AddPointInteraction(point);
+}
+
 mitk::DataNode* mitk::nnInteractiveTool::GetPointSetNode(PromptType promptType) const
 {
   if (promptType == PromptType::Positive)
@@ -322,8 +362,11 @@ void mitk::nnInteractiveTool::OnBoxPlaced()
   node->SetSelected(false);
 
   this->GetBoxNodes(m_PromptType).push_back(node);
-  node = nullptr;
 
+  const auto* box = node->GetDataAs<PlanarRectangle>();
+  this->AddBoxInteraction(box);
+
+  node = nullptr;
   this->AddNewBoxNode(m_PromptType);
 }
 
@@ -375,6 +418,12 @@ void mitk::nnInteractiveTool::SetActiveScribbleLabel(PromptType promptType)
   m_ScribbleNode->SetBoolProperty("labelset.contour.active", false);
 }
 
+void mitk::nnInteractiveTool::OnScribbleEvent(itk::Object* caller, const itk::EventObject& event)
+{
+  auto mask = static_cast<const ScribbleEvent*>(&event)->GetMask();
+  this->AddScribbleInteraction(mask);
+}
+
 void mitk::nnInteractiveTool::RemoveScribbleNode()
 {
   if (m_ScribbleNode.IsNull())
@@ -407,10 +456,10 @@ void mitk::nnInteractiveTool::AddLassoMaskNode(PromptType promptType)
   this->GetDataStorage()->Add(m_LassoMaskNode, referenceNode);
 }
 
-void mitk::nnInteractiveTool::OnLassoClosed(itk::Object* caller, const itk::EventObject& event)
+void mitk::nnInteractiveTool::OnLassoEvent(itk::Object* caller, const itk::EventObject& event)
 {
   auto node = DataNode::New();
-  node->SetData(static_cast<const ContourClosedEvent*>(&event)->GetContour());
+  node->SetData(static_cast<const LassoEvent*>(&event)->GetContour());
   node->SetName(this->CreateNodeName("lasso", m_PromptType));
   node->SetColor(this->GetColor(m_PromptType, Intensity::Muted), nullptr, "contour.color");
   node->SetFloatProperty("contour.width", 3.0f);
@@ -418,6 +467,9 @@ void mitk::nnInteractiveTool::OnLassoClosed(itk::Object* caller, const itk::Even
 
   this->GetLassoNodes(m_PromptType).push_back(node);
   this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
+
+  const auto* mask = m_LassoMaskNode->GetDataAs<LabelSetImage>()->GetGroupImage(0);
+  this->AddLassoInteraction(mask);
 }
 
 const std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetLassoNodes(PromptType promptType) const
@@ -445,6 +497,55 @@ void mitk::nnInteractiveTool::RemoveLassoMaskNode()
   m_LassoMaskNode = nullptr;
 }
 
+void mitk::nnInteractiveTool::AddPointInteraction(const Point3D& point)
+{
+  MITK_INFO << "AddPointInteraction()";
+
+  const bool prompt = m_PromptType == PromptType::Positive;
+
+  MITK_INFO << "  " << point << ", " << prompt;
+}
+
+void mitk::nnInteractiveTool::AddBoxInteraction(const PlanarRectangle* box)
+{
+  MITK_INFO << "AddBoxInteraction()";
+
+  const bool prompt = m_PromptType == PromptType::Positive;
+
+  const auto p0 = box->GetWorldControlPoint(0);
+  const auto p2 = box->GetWorldControlPoint(2);
+
+  itk::FixedArray<itk::FixedArray<ScalarType, 2>, 3> bbox;
+
+  for (int i = 0; i < 3; ++i)
+  {
+    bbox[i][0] = std::min(p0[i], p2[i]);
+    bbox[i][1] = std::max(p0[i], p2[i]);
+  }
+
+  MITK_INFO << "  " << bbox << ", " << prompt;
+}
+
+void mitk::nnInteractiveTool::AddScribbleInteraction(const Image* mask)
+{
+  MITK_INFO << "AddScribbleInteraction() [" << this->GetPromptTypeString(m_PromptType) << ']';
+
+  const bool prompt = m_PromptType == PromptType::Positive;
+  const auto size = itk::MakeSize<unsigned int>(mask->GetDimension(0), mask->GetDimension(1), mask->GetDimension(2));
+
+  MITK_INFO << "  Image" << mask->GetPixelType().GetTypeAsString() << ", " << size << ", " << prompt;
+}
+
+void mitk::nnInteractiveTool::AddLassoInteraction(const Image* mask)
+{
+  MITK_INFO << "AddLassoInteraction()";
+
+  const bool prompt = m_PromptType == PromptType::Positive;
+  const auto size = itk::MakeSize<unsigned int>(mask->GetDimension(0), mask->GetDimension(1), mask->GetDimension(2));
+
+  MITK_INFO << "  Image" << mask->GetPixelType().GetTypeAsString() << ", " << size << ", " << prompt;
+}
+
 std::string mitk::nnInteractiveTool::CreateNodeName(const std::string& name, std::optional<PromptType> promptType) const
 {
   std::stringstream stream;
@@ -464,30 +565,6 @@ std::string mitk::nnInteractiveTool::GetPromptTypeString(PromptType promptType) 
     return "positive";
 
   return "negative";
-}
-
-mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType promptType) const
-{
-  auto pointSet = PointSet::New();
-  auto geometry = static_cast<ProportionalTimeGeometry*>(pointSet->GetTimeGeometry());
-  geometry->SetStepDuration(std::numeric_limits<TimePointType>::max());
-
-  auto node = DataNode::New();
-  node->SetData(pointSet);
-  node->SetName(this->CreateNodeName("points", promptType));
-  node->SetColor(this->GetColor(promptType, Intensity::Muted));
-  node->SetColor(this->GetColor(promptType, Intensity::Vibrant), nullptr, "selectedcolor");
-  node->SetProperty("Pointset.2D.shape", PointSetShapeProperty::New(PointSetShapeProperty::CIRCLE));
-  node->SetIntProperty("Pointset.2D.resolution", 64);
-  node->SetFloatProperty("point 2D size", 10.0f);
-  node->SetFloatProperty("Pointset.2D.distance to plane", 0.1f);
-  node->SetBoolProperty("Pointset.2D.keep shape when selected", true);
-  node->SetBoolProperty("Pointset.2D.fill shape", true);
-  node->SetBoolProperty("helper object", true);
-
-  this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
-
-  return node;
 }
 
 void mitk::nnInteractiveTool::CreatePointInteractor()

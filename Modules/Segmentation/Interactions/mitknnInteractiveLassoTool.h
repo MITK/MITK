@@ -17,15 +17,15 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class MITKSEGMENTATION_EXPORT ContourClosedEvent : public itk::AnyEvent
+  class MITKSEGMENTATION_EXPORT LassoEvent : public itk::AnyEvent
   {
   public:
-    using Self = ContourClosedEvent;
+    using Self = LassoEvent;
     using Superclass = itk::AnyEvent;
 
-    explicit ContourClosedEvent(ContourModel* contour = nullptr);
-    ContourClosedEvent(const Self& other);
-    ~ContourClosedEvent() override;
+    explicit LassoEvent(ContourModel* contour = nullptr);
+    LassoEvent(const Self& other);
+    ~LassoEvent() override;
 
     const char* GetEventName() const override;
     bool CheckEvent(const itk::EventObject* event) const override;

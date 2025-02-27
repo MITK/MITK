@@ -12,35 +12,35 @@ found in the LICENSE file.
 
 #include <mitknnInteractiveLassoTool.h>
 
-mitk::ContourClosedEvent::ContourClosedEvent(ContourModel* contour)
+mitk::LassoEvent::LassoEvent(ContourModel* contour)
   : m_Contour(contour)
 {
 }
 
-mitk::ContourClosedEvent::ContourClosedEvent(const Self& other)
+mitk::LassoEvent::LassoEvent(const Self& other)
   : Superclass(other),
     m_Contour(other.m_Contour)
 {
 }
 
-mitk::ContourClosedEvent::~ContourClosedEvent() = default;
+mitk::LassoEvent::~LassoEvent() = default;
 
-const char* mitk::ContourClosedEvent::GetEventName() const
+const char* mitk::LassoEvent::GetEventName() const
 {
-  return "ContourClosedEvent";
+  return "LassoEvent";
 }
 
-bool mitk::ContourClosedEvent::CheckEvent(const itk::EventObject* event) const
+bool mitk::LassoEvent::CheckEvent(const itk::EventObject* event) const
 {
   return dynamic_cast<const Self*>(event) != nullptr;
 }
 
-itk::EventObject* mitk::ContourClosedEvent::MakeObject() const
+itk::EventObject* mitk::LassoEvent::MakeObject() const
 {
   return new Self(*this);
 }
 
-mitk::ContourModel* mitk::ContourClosedEvent::GetContour() const
+mitk::ContourModel* mitk::LassoEvent::GetContour() const
 {
   return m_Contour;
 }
@@ -100,7 +100,7 @@ void mitk::nnInteractiveLassoTool::OnMouseReleased(StateMachineAction* action, I
     return;
 
   Superclass::OnMouseReleased(action, event);
-  this->InvokeEvent(ContourClosedEvent(contour));
+  this->InvokeEvent(LassoEvent(contour));
   this->GetWorkingDataNode()->GetDataAs<LabelSetImage>()->ClearBuffer();
 }
 

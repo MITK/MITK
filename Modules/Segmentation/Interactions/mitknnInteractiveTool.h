@@ -22,10 +22,10 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class ContourClosedEvent;
   class nnInteractiveLassoTool;
   class nnInteractiveScribbleTool;
   class PlanarFigureInteractor;
+  class PlanarRectangle;
   class PointSetDataInteractor;
   class ToolManager;
 
@@ -89,7 +89,8 @@ namespace mitk
     void CreatePointInteractor();
     void CreateBoxInteractor();
 
-    DataNode::Pointer CreatePointSetNode(PromptType promptType) const;
+    DataNode::Pointer CreatePointSetNode(PromptType promptType);
+    void OnPointEvent();
     DataNode* GetPointSetNode(PromptType promptType) const;
 
     void AddNewBoxNode(PromptType promptType);
@@ -101,13 +102,19 @@ namespace mitk
     void AddScribbleNode();
     void AddScribbleLabel(PromptType promptType);
     void SetActiveScribbleLabel(PromptType promptType);
+    void OnScribbleEvent(itk::Object* caller, const itk::EventObject& event);
     void RemoveScribbleNode();
 
     void AddLassoMaskNode(PromptType promptType);
-    void OnLassoClosed(itk::Object* caller, const itk::EventObject& event);
+    void OnLassoEvent(itk::Object* caller, const itk::EventObject& event);
     const std::vector<DataNode::Pointer>& GetLassoNodes(PromptType promptType) const;
     std::vector<DataNode::Pointer>& GetLassoNodes(PromptType promptType);
     void RemoveLassoMaskNode();
+
+    void AddPointInteraction(const Point3D& point);
+    void AddBoxInteraction(const PlanarRectangle* box);
+    void AddScribbleInteraction(const Image* mask);
+    void AddLassoInteraction(const Image* mask);
 
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
 

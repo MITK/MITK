@@ -88,7 +88,7 @@ namespace mitk
     void OnToolManagerWorkingDataModified();
 
     bool m_FillMode;
-    static int m_Size;
+    int m_Size;
 
     ContourModel::Pointer m_MasterContour;
 

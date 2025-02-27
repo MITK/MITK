@@ -20,11 +20,10 @@ found in the LICENSE file.
 #include "mitkLevelWindowProperty.h"
 #include "mitkImageWriteAccessor.h"
 
-int mitk::PaintbrushTool::m_Size = 10;
-
 mitk::PaintbrushTool::PaintbrushTool(bool startWithFillMode)
   : FeedbackContourTool("PressMoveReleaseWithCTRLInversionAllMouseMoves"),
-  m_FillMode(startWithFillMode),
+    m_FillMode(startWithFillMode),
+    m_Size(10),
     m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
 {
   m_MasterContour = ContourModel::New();

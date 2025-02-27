@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <mitknnInteractiveLassoTool.h>
 
-mitk::ContourClosedEvent::ContourClosedEvent(const ContourModel* contour)
+mitk::ContourClosedEvent::ContourClosedEvent(ContourModel* contour)
   : m_Contour(contour)
 {
 }
@@ -40,7 +40,7 @@ itk::EventObject* mitk::ContourClosedEvent::MakeObject() const
   return new Self(*this);
 }
 
-const mitk::ContourModel* mitk::ContourClosedEvent::GetContour() const
+mitk::ContourModel* mitk::ContourClosedEvent::GetContour() const
 {
   return m_Contour;
 }
@@ -94,8 +94,14 @@ void mitk::nnInteractiveLassoTool::Deactivate()
 
 void mitk::nnInteractiveLassoTool::OnMouseReleased(StateMachineAction* action, InteractionEvent* event)
 {
-  this->InvokeEvent(ContourClosedEvent(this->GetFeedbackContour()));
+  auto contour = this->GetFeedbackContour()->Clone();
+
+  if (contour->GetNumberOfVertices() < 3)
+    return;
+
   Superclass::OnMouseReleased(action, event);
+  this->InvokeEvent(ContourClosedEvent(contour));
+  this->GetWorkingDataNode()->GetDataAs<LabelSetImage>()->ClearBuffer();
 }
 
 void mitk::nnInteractiveLassoTool::OnInvertLogic(StateMachineAction*, InteractionEvent*)

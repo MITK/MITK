@@ -398,6 +398,7 @@ void mitk::nnInteractiveTool::AddLassoMaskNode(PromptType promptType)
 
   m_LassoMaskNode = LabelSetImageHelper::CreateNewSegmentationNode(nullptr, templateImage, name);
   m_LassoMaskNode->SetBoolProperty("helper object", true);
+  m_LassoMaskNode->SetVisibility(false);
 
   auto labelName = this->GetPromptTypeString(promptType);
   const auto& color = this->GetColor(promptType, Intensity::Vibrant);
@@ -408,10 +409,8 @@ void mitk::nnInteractiveTool::AddLassoMaskNode(PromptType promptType)
 
 void mitk::nnInteractiveTool::OnLassoClosed(itk::Object* caller, const itk::EventObject& event)
 {
-  auto contour = static_cast<const ContourClosedEvent*>(&event)->GetContour()->Clone();
-
   auto node = DataNode::New();
-  node->SetData(contour);
+  node->SetData(static_cast<const ContourClosedEvent*>(&event)->GetContour());
   node->SetName(this->CreateNodeName("lasso", m_PromptType));
   node->SetColor(this->GetColor(m_PromptType, Intensity::Muted), nullptr, "contour.color");
   node->SetFloatProperty("contour.width", 3.0f);

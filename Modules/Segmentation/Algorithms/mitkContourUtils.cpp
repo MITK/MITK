@@ -65,5 +65,5 @@ void mitk::ContourUtils::FillContourInSlice(Contour *projectedContour, Image *sl
     contour->AddVertex(it.Value());
     it++;
   }
-  mitk::ContourModelUtils::FillContourInSlice(contour, sliceImage, sliceImage, paintingPixelValue);
+  mitk::ContourModelUtils::FillContourInSlice(contour, 0, sliceImage, paintingPixelValue);
 }

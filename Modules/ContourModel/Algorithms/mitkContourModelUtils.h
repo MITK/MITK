@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <mitkContourModel.h>
 #include <mitkImage.h>
+#include <mitkLabelSetImage.h>
+
 #include <vtkSmartPointer.h>
 
 #include <MitkContourModelExports.h>
@@ -51,20 +53,6 @@ namespace mitk
 
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value.
-    This version always uses the contour of time step 0 and fills the image.
-    \deprecated This function is deprecated. Use FillContourInSlice2() (in
-    conjunction e.g. with TransferLabelContent()) instead.
-    \pre sliceImage points to a valid instance
-    \pre projectedContour points to a valid instance
-    */
-    //[[deprecated]]
-    DEPRECATED(static void FillContourInSlice(const ContourModel *projectedContour,
-                                   Image *sliceImage,
-                                   const Image* workingImage,
-                                   int paintingPixelValue = 1));
-
-    /**
-    \brief Fill a contour in a 2D slice with a specified pixel value.
     This overloaded version uses the contour at the passed contourTimeStep
     to fill the passed image slice.
     \deprecated This function is deprecated. Use FillContourInSlice2() (in
@@ -73,11 +61,10 @@ namespace mitk
     \pre projectedContour points to a valid instance
     */
     //[[deprecated]]
-    DEPRECATED(static void FillContourInSlice(const ContourModel *projectedContour,
-                                   TimeStepType contourTimeStep,
-                                   Image *sliceImage,
-                                   const Image* workingImage,
-                                   int paintingPixelValue = 1));
+    DEPRECATED(static void FillContourInSlice(const ContourModel* projectedContour,
+      TimeStepType contourTimeStep,
+      Image* sliceImage,
+      int paintingPixelValue = 1));
 
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value.
@@ -127,7 +114,6 @@ namespace mitk
     [[deprecated]]
     static void FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage,
                                  vtkSmartPointer<vtkImageData> resultImage,
-                                 const Image* image,
                                  int paintingPixelValue,
                                  double fillForegroundThreshold = 1.0);
 

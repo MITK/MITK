@@ -119,6 +119,9 @@ namespace mitk
      * 4. writes the slice back into the working image using SegTool2D::WriteBackSegmentationResult().*/
     void WriteBackFeedbackContourAsSegmentationResult(const InteractionPositionEvent* positionEvent, int paintingPixelValue, bool setInvisibleAfterSuccess = true);
 
+    mitk::Image::Pointer GenerateSliceWithContourUpdate(const MultiLabelSegmentation* seg, const PlaneGeometry* sliceGeometry,
+      const ContourModel* contour, MultiLabelSegmentation::LabelValueType labelValue, TimePointType timePoint);
+
   private:
     ContourModel::Pointer m_FeedbackContour;
     DataNode::Pointer m_FeedbackContourNode;

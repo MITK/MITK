@@ -219,6 +219,50 @@ mitk::ContourModel::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DS
   return mitk::ContourModelUtils::BackProjectContourFrom2DSlice(sliceGeometry, contourIn2D);
 }
 
+mitk::Image::Pointer mitk::FeedbackContourTool::GenerateSliceWithContourUpdate(const MultiLabelSegmentation* workingSeg, const PlaneGeometry* sliceGeometry,
+  const ContourModel* contour, MultiLabelSegmentation::LabelValueType labelValue, TimePointType timePoint)
+{
+
+  if (!workingSeg || !sliceGeometry)
+    return nullptr;
+
+  const auto* abstractTransformGeometry(
+    dynamic_cast<const AbstractTransformGeometry*>(sliceGeometry));
+  if (nullptr != abstractTransformGeometry)
+  {
+    MITK_ERROR << "GenerateSliceWithContourUpdate does not support non planar geometries." << std::endl;
+    return nullptr;
+  }
+
+  const auto groupIndex = workingSeg->GetGroupIndexOfLabel(labelValue);
+  const auto groupImage = workingSeg->GetGroupImage(groupIndex);
+  auto resultSlice = this->GetAffectedImageSliceAs2DImageByTimePoint(sliceGeometry, groupImage, timePoint)->Clone();
+
+  if (resultSlice.IsNull())
+  {
+    MITK_ERROR << "Unable to extract slice." << std::endl;
+    return nullptr;
+  }
+
+  ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice(
+    resultSlice, contour);
+
+  if (projectedContour.IsNull())
+    return nullptr;
+
+  auto contourTimeStep = contour->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+
+  Image::Pointer adaptedSlice = resultSlice->Clone();
+
+  ContourModelUtils::FillContourInSlice2(projectedContour, contourTimeStep, adaptedSlice, labelValue);
+  TransferLabelContentAtTimeStep(adaptedSlice.GetPointer(), resultSlice.GetPointer(),
+    workingSeg->GetConstLabelsByValue(workingSeg->GetLabelValuesByGroup(groupIndex)),
+    0, MultiLabelSegmentation::UNLABELED_VALUE,MultiLabelSegmentation::UNLABELED_VALUE,
+    false, {{labelValue, labelValue}});
+
+  return resultSlice;
+}
+
 void mitk::FeedbackContourTool::WriteBackFeedbackContourAsSegmentationResult(const InteractionPositionEvent* positionEvent, int paintingPixelValue, bool setInvisibleAfterSuccess)
 {
   if (!positionEvent)
@@ -230,32 +274,18 @@ void mitk::FeedbackContourTool::WriteBackFeedbackContourAsSegmentationResult(con
   if (!workingSeg || !planeGeometry)
     return;
 
-  const auto* abstractTransformGeometry(
-    dynamic_cast<const AbstractTransformGeometry*>(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
-  if (nullptr != abstractTransformGeometry)
-    return;
+  const auto feedbackContour = FeedbackContourTool::GetFeedbackContour();
+  auto contourTimePoint = positionEvent->GetSender()->GetTime();
 
-  Image::Pointer slice = FeedbackContourTool::GetAffectedWorkingSlice(positionEvent);
+  auto activePixelValue = workingSeg->GetActiveLabel()->GetValue();
+
+  auto slice = this->GenerateSliceWithContourUpdate(workingSeg, planeGeometry, feedbackContour, paintingPixelValue * activePixelValue, contourTimePoint);
 
   if (slice.IsNull())
   {
-    MITK_ERROR << "Unable to extract slice." << std::endl;
+    MITK_ERROR << "Unable to update slice." << std::endl;
     return;
   }
-
-  const auto feedbackContour = FeedbackContourTool::GetFeedbackContour();
-  auto contourTimeStep = positionEvent->GetSender()->GetTimeStep(feedbackContour);
-
-  ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice(
-    slice, feedbackContour);
-
-  if (projectedContour.IsNull())
-    return;
-
-  auto activePixelValue = workingSeg->GetActiveLabel()->GetValue();
-  const auto groupImage = workingSeg->GetGroupImage(workingSeg->GetActiveLayer());
-  mitk::ContourModelUtils::FillContourInSlice(
-    projectedContour, contourTimeStep, slice, groupImage, paintingPixelValue * activePixelValue);
 
   this->WriteBackSegmentationResult(positionEvent, slice);
 

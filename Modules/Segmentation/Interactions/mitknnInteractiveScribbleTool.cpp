@@ -10,40 +10,40 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <mitkScribbleTool.h>
+#include <mitknnInteractiveScribbleTool.h>
 
-mitk::ScribbleTool::ScribbleTool()
+mitk::nnInteractiveScribbleTool::nnInteractiveScribbleTool()
 {
   this->DisableContourMarkers();
   this->SetSize(3);
   this->Disable();
 }
 
-mitk::ScribbleTool::~ScribbleTool()
+mitk::nnInteractiveScribbleTool::~nnInteractiveScribbleTool()
 {
 }
 
-us::ModuleResource mitk::ScribbleTool::GetCursorIconResource() const
-{
-  return us::ModuleResource();
-}
-
-us::ModuleResource mitk::ScribbleTool::GetIconResource() const
+us::ModuleResource mitk::nnInteractiveScribbleTool::GetCursorIconResource() const
 {
   return us::ModuleResource();
 }
 
-const char* mitk::ScribbleTool::GetName() const
+us::ModuleResource mitk::nnInteractiveScribbleTool::GetIconResource() const
+{
+  return us::ModuleResource();
+}
+
+const char* mitk::nnInteractiveScribbleTool::GetName() const
 {
   return "Scribble";
 }
 
-bool mitk::ScribbleTool::IsEligibleForAutoInit() const
+bool mitk::nnInteractiveScribbleTool::IsEligibleForAutoInit() const
 {
   return false;
 }
 
-void mitk::ScribbleTool::Activate(const Color& color)
+void mitk::nnInteractiveScribbleTool::Activate(const Color& color)
 {
   this->SetEnable3DInterpolation(false);
   this->Activated();
@@ -55,13 +55,13 @@ void mitk::ScribbleTool::Activate(const Color& color)
   m_PaintingNode->SetBoolProperty("outline binary", false);
 }
 
-void mitk::ScribbleTool::Deactivate()
+void mitk::nnInteractiveScribbleTool::Deactivate()
 {
   this->Disable();
   this->Deactivated();
   this->SetEnable3DInterpolation(true);
 }
 
-void mitk::ScribbleTool::OnInvertLogic(StateMachineAction*, InteractionEvent*)
+void mitk::nnInteractiveScribbleTool::OnInvertLogic(StateMachineAction*, InteractionEvent*)
 {
 }

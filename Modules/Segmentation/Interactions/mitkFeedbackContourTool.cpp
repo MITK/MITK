@@ -59,6 +59,11 @@ void mitk::FeedbackContourTool::SetFeedbackContourColorDefault()
   this->SetFeedbackContourColor(0.0, 1.0, 0.0);
 }
 
+void mitk::FeedbackContourTool::SetFeedbackContourWidth(float width)
+{
+  m_FeedbackContourNode->SetFloatProperty("contour.width", width);
+}
+
 void mitk::FeedbackContourTool::Deactivated()
 {
   Superclass::Deactivated();

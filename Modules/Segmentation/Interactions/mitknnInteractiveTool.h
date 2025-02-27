@@ -22,9 +22,11 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class ContourClosedEvent;
+  class nnInteractiveLassoTool;
+  class nnInteractiveScribbleTool;
   class PlanarFigureInteractor;
   class PointSetDataInteractor;
-  class ScribbleTool;
   class ToolManager;
 
   class MITKSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
@@ -86,7 +88,6 @@ namespace mitk
   private:
     void CreatePointInteractor();
     void CreateBoxInteractor();
-    void CreateLassoInteractor();
 
     DataNode::Pointer CreatePointSetNode(PromptType promptType) const;
     DataNode* GetPointSetNode(PromptType promptType) const;
@@ -102,11 +103,11 @@ namespace mitk
     void SetActiveScribbleLabel(PromptType promptType);
     void RemoveScribbleNode();
 
-    void AddNewLassoNode(PromptType promptType);
-    void OnLassoPlaced();
+    void AddLassoMaskNode(PromptType promptType);
+    void OnLassoClosed(itk::Object* caller, const itk::EventObject& event);
     const std::vector<DataNode::Pointer>& GetLassoNodes(PromptType promptType) const;
     std::vector<DataNode::Pointer>& GetLassoNodes(PromptType promptType);
-    void RemoveNewLassoNode();
+    void RemoveLassoMaskNode();
 
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
 
@@ -126,14 +127,14 @@ namespace mitk
 
     itk::SmartPointer<ToolManager> m_ToolManager;
 
-    itk::SmartPointer<ScribbleTool> m_ScribbleTool;
+    itk::SmartPointer<nnInteractiveScribbleTool> m_ScribbleTool;
     DataNode::Pointer m_ScribbleNode;
     std::unordered_map<PromptType, Label::PixelType> m_ScribbleLabels;
 
+    itk::SmartPointer<nnInteractiveLassoTool> m_LassoTool;
     std::vector<DataNode::Pointer> m_PositiveLassoNodes;
     std::vector<DataNode::Pointer> m_NegativeLassoNodes;
-    std::pair<DataNode::Pointer, unsigned long> m_NewLassoNode;
-    itk::SmartPointer<PlanarFigureInteractor> m_LassoInteractor;
+    DataNode::Pointer m_LassoMaskNode;
   };
 }
 

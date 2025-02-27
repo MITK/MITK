@@ -60,7 +60,8 @@ set(CPP_FILES
   Interactions/mitkPickingTool.cpp
   Interactions/mitkProcessExecutor.cpp
   Interactions/mitkRegionGrowingTool.cpp
-  Interactions/mitkScribbleTool.cpp
+  Interactions/mitknnInteractiveLassoTool.cpp
+  Interactions/mitknnInteractiveScribbleTool.cpp
   Interactions/mitkSegmentAnythingProcessExecutor.cpp
   Interactions/mitkSegmentAnythingPythonService.cpp
   Interactions/mitkSegmentAnythingTool.cpp

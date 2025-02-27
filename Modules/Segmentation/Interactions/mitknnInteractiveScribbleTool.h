@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkScribbleTool_h
-#define mitkScribbleTool_h
+#ifndef mitknnInteractiveScribbleTool_h
+#define mitknnInteractiveScribbleTool_h
 
 #include <mitkDrawPaintbrushTool.h>
 
 namespace mitk
 {
-  class ScribbleTool : public DrawPaintbrushTool
+  class MITKSEGMENTATION_EXPORT nnInteractiveScribbleTool : public DrawPaintbrushTool
   {
   public:
-    mitkClassMacro(ScribbleTool, DrawPaintbrushTool)
+    mitkClassMacro(nnInteractiveScribbleTool, DrawPaintbrushTool)
     itkFactorylessNewMacro(Self)
 
     using Superclass::SetToolManager;
@@ -34,8 +34,8 @@ namespace mitk
     void Deactivate();
 
   protected:
-    ScribbleTool();
-    ~ScribbleTool() override;
+    nnInteractiveScribbleTool();
+    ~nnInteractiveScribbleTool() override;
 
     void OnInvertLogic(StateMachineAction*, InteractionEvent*) override;
   };

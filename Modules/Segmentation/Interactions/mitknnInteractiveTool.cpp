@@ -14,7 +14,8 @@ found in the LICENSE file.
 
 #include <mitkDisplayActionEventBroadcast.h>
 #include <mitkLabelSetImageHelper.h>
-#include <mitkScribbleTool.h>
+#include <mitknnInteractiveLassoTool.h>
+#include <mitknnInteractiveScribbleTool.h>
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarRectangle.h>
@@ -23,11 +24,7 @@ found in the LICENSE file.
 #include <mitkSegmentationHelper.h>
 #include <mitkToolManager.h>
 
-#include <vtkCellArray.h>
-#include <vtkDecimatePolylineFilter.h>
-#include <vtkNew.h>
-#include <vtkPoints.h>
-#include <vtkPolyData.h>
+#include <itkEventObject.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
@@ -35,56 +32,6 @@ found in the LICENSE file.
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive");
-}
-
-namespace
-{
-  void DecimateNumberOfPoints(mitk::PlanarPolygon* polygon, int decimationThreshold, float decimationFactor)
-  {
-    vtkIdType numPoints = polygon->GetNumberOfControlPoints();
-
-    if (numPoints < decimationThreshold)
-      return;
-
-    vtkNew<vtkPoints> points;
-    vtkNew<vtkCellArray> lines;
-    auto lineIndices = std::unique_ptr<vtkIdType[]>(new vtkIdType[numPoints + 1]);
-
-    for (vtkIdType i = 0; i < numPoints; ++i)
-    {
-      points->InsertPoint(i, polygon->GetWorldControlPoint(i).data());
-      lineIndices[i] = i;
-    }
-
-    lineIndices[numPoints] = 0;
-    lines->InsertNextCell(numPoints + 1, lineIndices.get());
-
-    vtkNew<vtkPolyData> polyData;
-    polyData->SetPoints(points);
-    polyData->SetLines(lines);
-
-    auto decimate = vtkSmartPointer<vtkDecimatePolylineFilter>::New();
-    decimate->SetInputData(polyData);
-    decimate->SetTargetReduction(decimationFactor);
-    decimate->Update();
-
-    auto output = decimate->GetOutput();
-    auto newNumPoints = output->GetNumberOfPoints();
-
-    for (vtkIdType i = newNumPoints; i < numPoints; ++i)
-      polygon->RemoveLastControlPoint();
-
-    auto geometry = polygon->GetPlaneGeometry();
-    mitk::Point3D point3d;
-    mitk::Point2D point2d;
-
-    for (vtkIdType i = 0; i < newNumPoints; ++i)
-    {
-      point3d = output->GetPoint(i);
-      geometry->Map(point3d, point2d);
-      polygon->SetControlPoint(i, point2d);
-    }
-  }
 }
 
 const mitk::Color& mitk::nnInteractiveTool::GetColor(PromptType promptType, Intensity intensity)
@@ -113,8 +60,12 @@ mitk::nnInteractiveTool::nnInteractiveTool()
       Tool::Box,
       Tool::Scribble,
       Tool::Lasso },
-    m_ScribbleTool(ScribbleTool::New())
+    m_ScribbleTool(nnInteractiveScribbleTool::New()),
+    m_LassoTool(nnInteractiveLassoTool::New())
 {
+  auto command = itk::MemberCommand<Self>::New();
+  command->SetCallbackFunction(this, &Self::OnLassoClosed);
+  m_LassoTool->AddObserver(ContourClosedEvent(), command);
 }
 
 mitk::nnInteractiveTool::~nnInteractiveTool()
@@ -130,6 +81,9 @@ void mitk::nnInteractiveTool::SetToolManager(ToolManager* toolManager)
 
   m_ScribbleTool->InitializeStateMachine();
   m_ScribbleTool->SetToolManager(m_ToolManager);
+
+  m_LassoTool->InitializeStateMachine();
+  m_LassoTool->SetToolManager(m_ToolManager);
 }
 
 void mitk::nnInteractiveTool::Notify(InteractionEvent* interactionEvent, bool isHandled)
@@ -139,6 +93,11 @@ void mitk::nnInteractiveTool::Notify(InteractionEvent* interactionEvent, bool is
     if (m_ScribbleTool->IsEnabled())
     {
       m_ScribbleTool->HandleEvent(interactionEvent, nullptr);
+      return;
+    }
+    else if (m_LassoTool->IsEnabled())
+    {
+      m_LassoTool->HandleEvent(interactionEvent, nullptr);
       return;
     }
   }
@@ -187,8 +146,9 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
       break;
 
     case Tool::Lasso:
-      this->AddNewLassoNode(promptType);
-      this->BlockLMBDisplayInteraction();
+      this->AddLassoMaskNode(promptType);
+      m_ToolManager->SetWorkingData(m_LassoMaskNode);
+      m_LassoTool->Activate(this->GetColor(promptType, Intensity::Vibrant));
       break;
 
     default:
@@ -225,7 +185,8 @@ void mitk::nnInteractiveTool::DisableInteraction()
       break;
 
     case Tool::Lasso:
-      this->RemoveNewLassoNode();
+      m_LassoTool->Deactivate();
+      this->RemoveLassoMaskNode();
       break;
 
     default:
@@ -238,7 +199,7 @@ void mitk::nnInteractiveTool::DisableInteraction()
 
 void mitk::nnInteractiveTool::ResetInteractions()
 {
-  this->RemoveNewLassoNode();
+  this->RemoveLassoMaskNode();
   this->RemoveScribbleNode();
   this->RemoveNewBoxNode();
 
@@ -425,6 +386,41 @@ void mitk::nnInteractiveTool::RemoveScribbleNode()
   m_ScribbleLabels.clear();
 }
 
+void mitk::nnInteractiveTool::AddLassoMaskNode(PromptType promptType)
+{
+  if (m_LassoMaskNode.IsNotNull())
+    return;
+
+  auto referenceNode = this->GetToolManager()->GetReferenceData(0);
+  auto referenceImage = referenceNode->GetDataAs<Image>();
+  auto templateImage = SegmentationHelper::GetStaticSegmentationTemplate(referenceImage);
+  std::string name = this->CreateNodeName("lasso mask", promptType);
+
+  m_LassoMaskNode = LabelSetImageHelper::CreateNewSegmentationNode(nullptr, templateImage, name);
+  m_LassoMaskNode->SetBoolProperty("helper object", true);
+
+  auto labelName = this->GetPromptTypeString(promptType);
+  const auto& color = this->GetColor(promptType, Intensity::Vibrant);
+  auto label = m_LassoMaskNode->GetDataAs<LabelSetImage>()->AddLabel(name, color, 0);
+
+  this->GetDataStorage()->Add(m_LassoMaskNode, referenceNode);
+}
+
+void mitk::nnInteractiveTool::OnLassoClosed(itk::Object* caller, const itk::EventObject& event)
+{
+  auto contour = static_cast<const ContourClosedEvent*>(&event)->GetContour()->Clone();
+
+  auto node = DataNode::New();
+  node->SetData(contour);
+  node->SetName(this->CreateNodeName("lasso", m_PromptType));
+  node->SetColor(this->GetColor(m_PromptType, Intensity::Muted), nullptr, "contour.color");
+  node->SetFloatProperty("contour.width", 3.0f);
+  node->SetBoolProperty("helper object", true);
+
+  this->GetLassoNodes(m_PromptType).push_back(node);
+  this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
+}
+
 const std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetLassoNodes(PromptType promptType) const
 {
   if (promptType == PromptType::Positive)
@@ -441,64 +437,13 @@ std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetLassoNodes(Pro
   return m_NegativeLassoNodes;
 }
 
-void mitk::nnInteractiveTool::AddNewLassoNode(PromptType promptType)
+void mitk::nnInteractiveTool::RemoveLassoMaskNode()
 {
-  if (m_NewLassoNode.first.IsNotNull())
+  if (m_LassoMaskNode.IsNull())
     return;
 
-  auto node = DataNode::New();
-  node->SetName(this->CreateNodeName("lasso", promptType));
-  node->SetData(PlanarPolygon::New());
-  node->SetColor(this->GetColor(promptType, Intensity::Muted));
-  node->SetColor(this->GetColor(promptType, Intensity::Vibrant), nullptr, "planarfigure.selected.line.color");
-  node->SetSelected(true);
-  node->SetFloatProperty("planarfigure.line.width", 3.0f);
-  node->SetBoolProperty("planarfigure.drawname", false);
-  node->SetBoolProperty("planarfigure.drawshadow", false);
-  node->SetBoolProperty("planarfigure.drawcontrolpoints", false);
-  node->SetBoolProperty("planarfigure.hidecontrolpointsduringinteraction", true);
-  node->SetBoolProperty("helper object", true);
-
-  m_LassoInteractor->SetDataNode(node);
-  m_LassoInteractor->EnableInteraction(true);
-
-  auto command = itk::SimpleMemberCommand<Self>::New();
-  command->SetCallbackFunction(this, &Self::OnLassoPlaced);
-  auto tag = node->GetData()->AddObserver(EndPlacementPlanarFigureEvent(), command);
-
-  this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
-
-  m_NewLassoNode = std::make_pair(node, tag);
-}
-
-void mitk::nnInteractiveTool::OnLassoPlaced()
-{
-  auto& [node, tag] = m_NewLassoNode;
-
-  auto lasso = node->GetDataAs<PlanarPolygon>();
-  lasso->RemoveObserver(tag);
-
-  DecimateNumberOfPoints(lasso, 50, 0.5);
-
-  node->SetBoolProperty("planarfigure.fill", true);
-  node->SetSelected(false);
-
-  this->GetLassoNodes(m_PromptType).push_back(node);
-  node = nullptr;
-
-  this->AddNewLassoNode(m_PromptType);
-}
-
-void mitk::nnInteractiveTool::RemoveNewLassoNode()
-{
-  m_LassoInteractor->EnableInteraction(false);
-  m_LassoInteractor->SetDataNode(nullptr);
-
-  if (m_NewLassoNode.first.IsNotNull())
-  {
-    this->GetDataStorage()->Remove(m_NewLassoNode.first);
-    m_NewLassoNode.first = nullptr;
-  }
+  this->GetDataStorage()->Remove(m_LassoMaskNode);
+  m_LassoMaskNode = nullptr;
 }
 
 std::string mitk::nnInteractiveTool::CreateNodeName(const std::string& name, std::optional<PromptType> promptType) const
@@ -566,18 +511,6 @@ void mitk::nnInteractiveTool::CreateBoxInteractor()
   m_BoxInteractor->EnableInteraction(false);
 }
 
-void mitk::nnInteractiveTool::CreateLassoInteractor()
-{
-  auto module = us::ModuleRegistry::GetModule("MitkPlanarFigure");
-
-  m_LassoInteractor = PlanarFigureInteractor::New();
-  m_LassoInteractor->LoadStateMachine("PlanarFigureInteraction.xml", module);
-  m_LassoInteractor->SetEventConfig("PlanarFigureConfig.xml", module);
-  m_LassoInteractor->EnableContinuousPointsMode();
-  m_LassoInteractor->SetMinimumPointDistance(10.0);
-  m_LassoInteractor->EnableInteraction(false);
-}
-
 void mitk::nnInteractiveTool::Activated()
 {
   Superclass::Activated();
@@ -587,7 +520,6 @@ void mitk::nnInteractiveTool::Activated()
 
   this->CreatePointInteractor();
   this->CreateBoxInteractor();
-  this->CreateLassoInteractor();
 }
 
 void mitk::nnInteractiveTool::Deactivated()
@@ -595,7 +527,6 @@ void mitk::nnInteractiveTool::Deactivated()
   this->DisableInteraction();
   this->ResetInteractions();
 
-  m_LassoInteractor = nullptr;
   m_BoxInteractor = nullptr;
   m_PointInteractor = nullptr;
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>176</width>
-    <height>344</height>
+    <width>300</width>
+    <height>408</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -45,7 +45,7 @@
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Reset interactions</string>
+         <string>Reset Interactions</string>
         </property>
         <property name="icon">
          <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
@@ -62,7 +62,7 @@
       <bool>false</bool>
      </property>
      <property name="title">
-      <string>Prompt type</string>
+      <string>Prompt Type</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -108,7 +108,7 @@
       <bool>false</bool>
      </property>
      <property name="title">
-      <string>Interaction tools</string>
+      <string>Interaction Tools</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
@@ -187,6 +187,33 @@
          </size>
         </property>
         <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="maskButton">
+        <property name="text">
+         <string>Initialize with Mask</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+          <normaloff>:/nnInteractive/mask</normaloff>:/nnInteractive/mask</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="autoZoomCheckBox">
+        <property name="text">
+         <string>Auto-zoom</string>
+        </property>
+        <property name="checked">
          <bool>true</bool>
         </property>
        </widget>

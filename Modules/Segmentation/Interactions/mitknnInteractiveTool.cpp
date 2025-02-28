@@ -54,7 +54,8 @@ const mitk::Color& mitk::nnInteractiveTool::GetColor(PromptType promptType, Inte
 }
 
 mitk::nnInteractiveTool::nnInteractiveTool()
-  : m_PromptType(PromptType::Positive),
+  : m_AutoZoom(true),
+    m_PromptType(PromptType::Positive),
     m_Tools {
       Tool::Point,
       Tool::Box,
@@ -70,6 +71,16 @@ mitk::nnInteractiveTool::nnInteractiveTool()
   auto lassoClosedCommand = itk::MemberCommand<Self>::New();
   lassoClosedCommand->SetCallbackFunction(this, &Self::OnLassoEvent);
   m_LassoTool->AddObserver(LassoEvent(), lassoClosedCommand);
+}
+
+bool mitk::nnInteractiveTool::GetAutoZoom() const
+{
+  return m_AutoZoom;
+}
+
+void mitk::nnInteractiveTool::SetAutoZoom(bool autoZoom)
+{
+  m_AutoZoom = autoZoom;
 }
 
 mitk::nnInteractiveTool::~nnInteractiveTool()
@@ -544,6 +555,15 @@ void mitk::nnInteractiveTool::AddLassoInteraction(const Image* mask)
   const auto size = itk::MakeSize<unsigned int>(mask->GetDimension(0), mask->GetDimension(1), mask->GetDimension(2));
 
   MITK_INFO << "  Image" << mask->GetPixelType().GetTypeAsString() << ", " << size << ", " << prompt;
+}
+
+void mitk::nnInteractiveTool::AddInitialSegInteraction(const Image* mask)
+{
+  MITK_INFO << "AddInitialSegInteraction()";
+
+  const auto size = itk::MakeSize<unsigned int>(mask->GetDimension(0), mask->GetDimension(1), mask->GetDimension(2));
+
+  MITK_INFO << "  Image" << mask->GetPixelType().GetTypeAsString();
 }
 
 std::string mitk::nnInteractiveTool::CreateNodeName(const std::string& name, std::optional<PromptType> promptType) const

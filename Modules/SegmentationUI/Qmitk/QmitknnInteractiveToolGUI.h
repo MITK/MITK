@@ -45,8 +45,10 @@ protected:
   void InitializeToolButtons();
   void OnInitializeButtonToggled(bool checked);
   void OnResetInteractionsButtonClicked();
+  void OnAutoZoomCheckBoxToggled(bool checked);
   void OnPromptTypeChanged();
   void OnToolToggled(Tool tool, bool checked);
+  void OnMaskButtonClicked();
   void UncheckOtherToolButtons(QPushButton* toolButton);
 
 private:

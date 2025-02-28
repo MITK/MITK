@@ -13,14 +13,48 @@ found in the LICENSE file.
 #include "QmitknnInteractiveToolGUI.h"
 #include <ui_QmitknnInteractiveToolGUI.h>
 
-#include <mitkPointSetDataInteractor.h>
+#include <mitkLabelSetImageConverter.h>
+#include <mitkToolManagerProvider.h>
 
 #include <QmitkStyleManager.h>
 
 #include <QBoxLayout>
 #include <QButtonGroup>
+#include <QMessageBox>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
+
+namespace
+{
+  void SetIcon(QAbstractButton* button, const char* icon)
+  {
+    button->setIcon(QmitkStyleManager::ThemeIcon(QString(":/nnInteractive/%1").arg(icon)));
+  }
+
+  bool ConfirmInitializationWithMask(const mitk::Label* label)
+  {
+    QColor color(
+      static_cast<int>(label->GetColor().GetRed() * 255),
+      static_cast<int>(label->GetColor().GetGreen() * 255),
+      static_cast<int>(label->GetColor().GetBlue() * 255));
+
+    auto name = QString::fromStdString(label->GetName());
+
+    QString title = "nnInteractive - Initialize with Mask";
+
+    auto message = QString(
+      "<div style='line-height: 1.25'>"
+        "<p>Do you want to <b>reset all interactions</b> and start a new "
+        "session based on the existing content of the selected label?</p>"
+        "<p>Selected label: <span style='color: %1'>&#9609;</span> %2</p>"
+      "</div>")
+      .arg(color.name())
+      .arg(name);
+
+    auto button = QMessageBox::question(nullptr, title, message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    return button == QMessageBox::Yes;
+  }
+}
 
 QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
   : QmitkSegWithPreviewToolGUIBase(false),
@@ -48,18 +82,27 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   this->InitializePromptType();
   this->InitializeToolButtons();
 
+  m_Ui->autoZoomCheckBox->setChecked(this->GetTool()->GetAutoZoom());
+  connect(m_Ui->autoZoomCheckBox, &QCheckBox::toggled, this, &Self::OnAutoZoomCheckBoxToggled);
+
   Superclass::InitializeUI(mainLayout);
 }
 
 void QmitknnInteractiveToolGUI::ThemeIcons()
 {
-  m_Ui->resetButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/nnInteractive/reset")));
-  m_Ui->positiveButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/nnInteractive/positive")));
-  m_Ui->negativeButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/nnInteractive/negative")));
-  m_Ui->pointButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/nnInteractive/point")));
-  m_Ui->boxButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/nnInteractive/box")));
-  m_Ui->scribbleButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/nnInteractive/scribble")));
-  m_Ui->lassoButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/nnInteractive/lasso")));
+  SetIcon(m_Ui->resetButton, "reset");
+  SetIcon(m_Ui->positiveButton, "positive");
+  SetIcon(m_Ui->negativeButton, "negative");
+  SetIcon(m_Ui->pointButton, "point");
+  SetIcon(m_Ui->boxButton, "box");
+  SetIcon(m_Ui->scribbleButton, "scribble");
+  SetIcon(m_Ui->lassoButton, "lasso");
+  SetIcon(m_Ui->maskButton, "mask");
+}
+
+void QmitknnInteractiveToolGUI::OnAutoZoomCheckBoxToggled(bool checked)
+{
+  this->GetTool()->SetAutoZoom(checked);
 }
 
 void QmitknnInteractiveToolGUI::InitializePromptType()
@@ -93,6 +136,8 @@ void QmitknnInteractiveToolGUI::InitializeToolButtons()
 
   for (const auto& [tool, button] : m_ToolButtons)
     connect(button, &QPushButton::toggled, [this, tool](bool checked) { this->OnToolToggled(tool, checked); });
+
+  connect(m_Ui->maskButton, &QPushButton::clicked, this, &Self::OnMaskButtonClicked);
 }
 
 void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
@@ -149,4 +194,48 @@ void QmitknnInteractiveToolGUI::UncheckOtherToolButtons(QPushButton* toolButton)
 mitk::nnInteractiveTool* QmitknnInteractiveToolGUI::GetTool()
 {
   return this->GetConnectedToolAs<mitk::nnInteractiveTool>();
+}
+
+void QmitknnInteractiveToolGUI::OnMaskButtonClicked()
+{
+  auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+
+  if (toolManager == nullptr)
+  {
+    MITK_ERROR << "Could not retrieve tool manager from tool manager provider!";
+    return;
+  }
+
+  const auto* segmentationNode = toolManager->GetWorkingData(0);
+
+  if (segmentationNode == nullptr)
+  {
+    MITK_ERROR << "Could not retrieve working data from tool manager!";
+    return;
+  }
+
+  const auto* segmentation = segmentationNode->GetDataAs<mitk::LabelSetImage>();
+  auto activeLabel = segmentation->GetActiveLabel();
+
+  if (activeLabel == nullptr)
+  {
+    MITK_ERROR << "Could not retrieve active label from working data!";
+    return;
+  }
+
+  // TODO: Check if label is empty
+
+  if (!ConfirmInitializationWithMask(activeLabel))
+    return;
+
+  auto mask = mitk::CreateLabelMask(segmentation, activeLabel->GetValue());
+
+  if (mask.IsNull())
+  {
+    MITK_ERROR << "Could not create label mask!";
+    return;
+  }
+
+  this->OnResetInteractionsButtonClicked();
+  this->GetTool()->AddInitialSegInteraction(mask);
 }

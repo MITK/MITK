@@ -62,6 +62,11 @@ namespace mitk
     void DisableInteraction();
     void ResetInteractions();
 
+    void AddInitialSegInteraction(const Image* mask);
+
+    bool GetAutoZoom() const;
+    void SetAutoZoom(bool autoZoom);
+
     std::string GetPromptTypeString(PromptType promptType) const;
 
   protected:
@@ -117,6 +122,8 @@ namespace mitk
     void AddLassoInteraction(const Image* mask);
 
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
+
+    bool m_AutoZoom;
 
     PromptType m_PromptType;
 

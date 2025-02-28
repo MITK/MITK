@@ -25,8 +25,7 @@ namespace mitk
   mitk::NodePredicateBase::Pointer MITKIMAGESTATISTICS_EXPORT GetImageStatisticsImagePredicate();
   /**
   @brief Gets a predicate for the ImageStatistics plugin input mask
-  @details Predicate: ((DataType:Image && Property:binary) || DataType:MultiLabelSegmentation) && !(Property:helper object)
-  */
+  @details Predicate: see GetMultiLabelSegmentationPredicate()  */
   mitk::NodePredicateBase::Pointer MITKIMAGESTATISTICS_EXPORT GetImageStatisticsMaskPredicate();
   /**
   @brief Gets a predicate for the ImageStatistics plugin planar figure

@@ -655,3 +655,11 @@ us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
   auto resource = module->GetResource("AI.svg");
   return resource;
 }
+
+void mitk::nnInteractiveTool::InitializeBackend()
+{
+  m_OutputBuffer = mitk::LabelSetImage::New();
+  std::string modelName = "nnInteractive_v0.0";
+  m_PythonContext = mitk::PythonContext::New();
+  m_PythonContext->Activate();
+}

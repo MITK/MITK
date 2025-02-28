@@ -14,6 +14,7 @@ mitk_create_module(
     MitkBoundingShape
     MitkContourModel
     MitkGraphAlgorithms
+    MitkPython
     MitkMultilabel
     MitkSurfaceInterpolation
   TARGET_DEPENDS

@@ -12,14 +12,6 @@ found in the LICENSE file.
 
 #include "mitkPythonContext.h"
 #include <mitkIOUtil.h>
-#ifdef _DEBUG
-#undef _DEBUG
-#include <Python.h>
-#define _DEBUG
-#else
-#include <Python.h>
-#endif
-
 #include "PythonPath.h"
 #include <mitkExceptionMacro.h>
 #include <swigpyrun.h>
@@ -45,18 +37,8 @@ void mitk::PythonContext::Activate()
   MITK_INFO << programPath;
   MITK_INFO << "EP_DLL_DIR " << std::string(EP_DLL_DIR);
   std::string pythonCommand;
-  // execute a string which imports packages that are needed and sets paths to directories
   pythonCommand.append("import os, sys, io\n");
   pythonCommand.append("sys.path.append('" + programPath + "')\n");
-  //   pythonCommand.append("sys.path.append('" + std::string(BIN_DIR) + "')\n");
-  //   pythonCommand.append("sys.path.append('" +std::string(EXTERNAL_DIST_PACKAGES) + "')\n");
-  //   pythonCommand.append("\nsite.addsitedir('"+std::string(EXTERNAL_SITE_PACKAGES)+"')\n");
-  // in python 3.8 onwards, the path system variable is not longer used to find dlls
-  // that's why the dlls that are needed for swig wrapping need to be searched manually
-#ifdef WIN32
-  std::string searchForDll = "os.add_dll_directory('" + std::string(EP_DLL_DIR) + "')\n";
-  pythonCommand.append(searchForDll);
-#endif
   pythonCommand.append("import numpy\n");
   pythonCommand.append("import SimpleITK as sitk\n");
   pythonCommand.append("import pyMITK\n");
@@ -204,12 +186,6 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData,
   {
     MITK_ERROR << "Something went wrong setting the image in Python\n";
   }
-  //PyRun_SimpleString("print('The MITK image is available via variable _mitk_image')");
-  // PyRun_SimpleString(
-  //     "numpy_image = _mitk_image.GetAsNumpy()\n"
-  //     "print('numpy image shape',numpy_image.shape)\n"
-  //     "numpy_image[:]=0."
-  // );
   //m_ThreadState = PyEval_SaveThread();
   Py_XDECREF(result);
   PyGILState_Release(state);
@@ -220,8 +196,8 @@ void mitk::PythonContext::SetVirtualEnvironmentPath(const std::string& absoluteP
   PyGILState_STATE state = PyGILState_Ensure();
   m_CurrentVenvEnvPath.clear();
   std::string pythonCommand;
-  pythonCommand.append("import sys\n"); // TODO: delete other imports are reimport
-  pythonCommand.append("sys.path.insert(0, '" + absolutePath + "')\n");
+  pythonCommand.append("import site\n"); // TODO: delete other imports are reimport
+  pythonCommand.append("site.addsitedir('" + absolutePath + "')\n");
   this->ExecuteString(pythonCommand);
   m_CurrentVenvEnvPath = absolutePath;
   PyGILState_Release(state);
@@ -230,10 +206,14 @@ void mitk::PythonContext::SetVirtualEnvironmentPath(const std::string& absoluteP
 void mitk::PythonContext::ClearVirtualEnvironmentPath()
 {
   PyGILState_STATE state = PyGILState_Ensure();
-  std::string pythonCommand;
-  pythonCommand.append("import sys\n");
-  pythonCommand.append("sys.path.remove('" + m_CurrentVenvEnvPath + "')\n");
-  this->ExecuteString(pythonCommand);
-  m_CurrentVenvEnvPath.clear();
+  if (!m_CurrentVenvEnvPath.empty())
+  {
+    std::string pythonCommand;
+    pythonCommand.append("import sys\n");
+    pythonCommand.append("print(sys.path)\n");
+    pythonCommand.append("sys.path.remove('" + m_CurrentVenvEnvPath + "')\n");
+    this->ExecuteString(pythonCommand);
+    m_CurrentVenvEnvPath.clear();
+  }
   PyGILState_Release(state);
 }

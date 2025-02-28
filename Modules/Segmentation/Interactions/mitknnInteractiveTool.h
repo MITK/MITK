@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitknnInteractiveTool_h
 
 #include "mitkSegWithPreviewTool.h"
-
+#include "mitkPythonContext.h"
 #include <array>
 #include <optional>
 #include <utility>
@@ -55,7 +55,7 @@ namespace mitk
 
     void Activated() override;
     void Deactivated() override;
-
+    void InitializeBackend();
     const std::array<Tool, 4>& GetTools() const;
 
     void EnableInteraction(Tool tool, PromptType promptType);
@@ -149,6 +149,8 @@ namespace mitk
     std::vector<DataNode::Pointer> m_PositiveLassoNodes;
     std::vector<DataNode::Pointer> m_NegativeLassoNodes;
     DataNode::Pointer m_LassoMaskNode;
+    mitk::LabelSetImage::Pointer m_OutputBuffer;
+    mitk::PythonContext::Pointer m_PythonContext;
   };
 }
 

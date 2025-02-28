@@ -37,6 +37,13 @@ namespace mitk
    */
   typedef itk::RGBPixel<float> Color;
 
+  inline Color MakeColor(float r, float g, float b)
+  {
+    Color color;
+    color.Set(r, g, b);
+    return color;
+  }
+
   /**
    * @brief The ColorProperty class RGB color property
    * @ingroup DataManagement

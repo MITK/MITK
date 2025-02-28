@@ -195,7 +195,7 @@ private:
 static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPlanarFigure(BaseGeometry* imageGeometry, PlanarFigure* planarFigure)
 {
   itk::PolyLineParametricPath<3>::Pointer path = itk::PolyLineParametricPath<3>::New();
-  const PlanarFigure::PolyLineType polyLine = planarFigure->GetPolyLine(0);
+  const auto& polyLine = planarFigure->GetPolyLine(0);
 
   std::for_each(polyLine.begin(), polyLine.end(),
     AddPolyLineElementToPath(planarFigure->GetPlaneGeometry(), imageGeometry, path));

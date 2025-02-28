@@ -60,6 +60,8 @@ set(CPP_FILES
   Interactions/mitkPickingTool.cpp
   Interactions/mitkProcessExecutor.cpp
   Interactions/mitkRegionGrowingTool.cpp
+  Interactions/mitknnInteractiveLassoTool.cpp
+  Interactions/mitknnInteractiveScribbleTool.cpp
   Interactions/mitkSegmentAnythingProcessExecutor.cpp
   Interactions/mitkSegmentAnythingPythonService.cpp
   Interactions/mitkSegmentAnythingTool.cpp
@@ -70,6 +72,7 @@ set(CPP_FILES
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
   Interactions/mitkTotalSegmentatorTool.cpp
+  Interactions/mitknnInteractiveTool.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp

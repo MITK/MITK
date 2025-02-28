@@ -37,6 +37,7 @@ void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("movePoint", MovePoint);
   CONNECT_FUNCTION("finishMovement", FinishMove);
   CONNECT_FUNCTION("removePoint", RemovePoint);
+  CONNECT_FUNCTION("keyDelete", KeyDelete);
 }
 
 void mitk::PointSetDataInteractor::AddPoint(StateMachineAction *stateMachineAction, InteractionEvent *interactionEvent)
@@ -147,7 +148,11 @@ void mitk::PointSetDataInteractor::SelectPoint(StateMachineAction *, Interaction
   }
 }
 
-mitk::PointSetDataInteractor::PointSetDataInteractor() : m_MaxNumberOfPoints(0), m_SelectionAccuracy(3.5)
+mitk::PointSetDataInteractor::PointSetDataInteractor()
+  : m_MaxNumberOfPoints(0),
+    m_SelectionAccuracy(3.5),
+    m_IsMovementEnabled(true),
+    m_IsRemovalEnabled(true)
 {
 }
 
@@ -155,8 +160,21 @@ mitk::PointSetDataInteractor::~PointSetDataInteractor()
 {
 }
 
+void mitk::PointSetDataInteractor::EnableMovement(bool enabled)
+{
+  m_IsMovementEnabled = enabled;
+}
+
+void mitk::PointSetDataInteractor::EnableRemoval(bool enabled)
+{
+  m_IsRemovalEnabled = enabled;
+}
+
 void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
+  if (!m_IsRemovalEnabled)
+    return;
+
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
 
@@ -220,6 +238,9 @@ void mitk::PointSetDataInteractor::IsClosedContour(StateMachineAction *, Interac
 
 void mitk::PointSetDataInteractor::MovePoint(StateMachineAction *stateMachineAction, InteractionEvent *interactionEvent)
 {
+  if (!m_IsMovementEnabled)
+    return;
+
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
@@ -377,6 +398,25 @@ void mitk::PointSetDataInteractor::Abort(StateMachineAction *, InteractionEvent 
   interactionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
 }
 
+void mitk::PointSetDataInteractor::KeyDelete(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  auto renderer = interactionEvent->GetSender();
+  auto t = renderer->GetTimeStep(m_PointSet);
+  auto id = m_PointSet->SearchSelectedPoint(t);
+
+  if (id == -1)
+    return;
+
+  auto point = m_PointSet->GetPoint(id, t);
+  Point2D displayPoint;
+  renderer->WorldToDisplay(point, displayPoint);
+
+  auto event = InteractionPositionEvent::New(nullptr, displayPoint);
+  event->SetSender(renderer);
+
+  this->RemovePoint(nullptr, event.GetPointer());
+}
+
 /*
  * Check whether the DataNode contains a pointset, if not create one and add it.
  */
@@ -396,16 +436,25 @@ void mitk::PointSetDataInteractor::DataNodeChanged()
     }
     // load config file parameter: maximal number of points
     mitk::PropertyList::Pointer properties = GetAttributes();
+
+    if (properties.IsNull())
+      return;
+
     std::string strNumber;
     if (properties->GetStringProperty("MaxPoints", strNumber))
     {
       m_MaxNumberOfPoints = atoi(strNumber.c_str());
     }
   }
+
+  Superclass::DataNodeChanged();
 }
 
 void mitk::PointSetDataInteractor::InitMove(StateMachineAction *, InteractionEvent *interactionEvent)
 {
+  if (!m_IsMovementEnabled)
+    return;
+
   auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
 
   if (positionEvent == nullptr)
@@ -424,6 +473,9 @@ void mitk::PointSetDataInteractor::InitMove(StateMachineAction *, InteractionEve
 
 void mitk::PointSetDataInteractor::FinishMove(StateMachineAction *, InteractionEvent *interactionEvent)
 {
+  if (!m_IsMovementEnabled)
+    return;
+
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
 

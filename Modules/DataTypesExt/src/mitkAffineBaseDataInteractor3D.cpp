@@ -304,6 +304,7 @@ void mitk::AffineBaseDataInteractor3D::DataNodeChanged()
     newInputNode->SetColor(0.0, 0.0, 1.0);
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  Superclass::DataNodeChanged();
 }
 
 void mitk::AffineBaseDataInteractor3D::SetDataNode(DataNode *node)

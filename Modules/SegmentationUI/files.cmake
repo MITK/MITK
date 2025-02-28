@@ -44,6 +44,7 @@ set(CPP_FILES
   Qmitk/QmitkMonaiLabelToolGUI.cpp
   Qmitk/QmitkMonaiLabel2DToolGUI.cpp
   Qmitk/QmitkMonaiLabel3DToolGUI.cpp
+  Qmitk/QmitknnInteractiveToolGUI.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.cpp
@@ -100,6 +101,7 @@ set(MOC_H_FILES
   Qmitk/QmitkMonaiLabelToolGUI.h
   Qmitk/QmitkMonaiLabel2DToolGUI.h
   Qmitk/QmitkMonaiLabel3DToolGUI.h
+  Qmitk/QmitknnInteractiveToolGUI.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.h
@@ -124,6 +126,7 @@ set(UI_FILES
   Qmitk/QmitkSegmentAnythingGUIControls.ui
   Qmitk/QmitkMedSAMGUIControls.ui
   Qmitk/QmitkMonaiLabelToolGUIControls.ui
+  Qmitk/QmitknnInteractiveToolGUI.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
   SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui
@@ -132,5 +135,6 @@ set(UI_FILES
 )
 
 set(QRC_FILES
+  resources/nnInteractive/nnInteractive.qrc
   resources/SegmentationUI.qrc
 )

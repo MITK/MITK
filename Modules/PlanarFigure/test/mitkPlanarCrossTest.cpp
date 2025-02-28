@@ -44,7 +44,7 @@ public:
     planarCross->AddControlPoint(p2);
 
     // Test if helper polyline is generated
-    const mitk::PlanarFigure::PolyLineType helperPolyLine = planarCross->GetHelperPolyLine(0, 1.0, 100);
+    const auto& helperPolyLine = planarCross->GetHelperPolyLine(0, 1.0, 100);
     MITK_TEST_CONDITION(planarCross->GetHelperPolyLinesSize() == 1,
                         "Number of helper polylines after placing 3 points");
 
@@ -83,8 +83,8 @@ public:
                         "Helper line no longer to be painted after placement of all 4 points");
 
     // Test for number of polylines
-    const mitk::PlanarFigure::PolyLineType polyLine0 = planarCross->GetPolyLine(0);
-    const mitk::PlanarFigure::PolyLineType polyLine1 = planarCross->GetPolyLine(1);
+    const auto& polyLine0 = planarCross->GetPolyLine(0);
+    const auto& polyLine1 = planarCross->GetPolyLine(1);
     MITK_TEST_CONDITION(planarCross->GetPolyLinesSize() == 2, "Number of polylines after placement");
 
     auto iter0 = polyLine0.begin();
@@ -144,7 +144,7 @@ public:
     MITK_TEST_CONDITION(!planarCross->IsClosed(), "Is PlanarFigure closed?");
 
     // Test for number of polylines
-    const mitk::PlanarFigure::PolyLineType polyLine0 = planarCross->GetPolyLine(0);
+    const auto& polyLine0 = planarCross->GetPolyLine(0);
     auto iter = polyLine0.begin();
     MITK_TEST_CONDITION(planarCross->GetPolyLinesSize() == 1, "Number of polylines after placement");
 

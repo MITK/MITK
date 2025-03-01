@@ -121,6 +121,9 @@ namespace mitk
     void AddScribbleInteraction(const Image* mask);
     void AddLassoInteraction(const Image* mask);
 
+    std::pair<std::string, bool> GetPointAsListString(const mitk::BaseGeometry *baseGeometry) const;
+    std::pair<std::string, bool> GetBBoxAsListString(const mitk::BaseGeometry *baseGeometry) const;
+
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
 
     bool m_AutoZoom;
@@ -151,6 +154,7 @@ namespace mitk
     DataNode::Pointer m_LassoMaskNode;
     mitk::LabelSetImage::Pointer m_OutputBuffer;
     mitk::PythonContext::Pointer m_PythonContext;
+    const Label::PixelType MASK_VALUE = 1;
   };
 }
 

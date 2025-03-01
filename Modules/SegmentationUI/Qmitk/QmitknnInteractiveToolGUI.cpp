@@ -147,6 +147,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   m_Ui->resetButton->setEnabled(checked);
   m_Ui->promptTypeGroupBox->setEnabled(checked);
   m_Ui->interactionToolsGroupBox->setEnabled(checked);
+  this->GetTool()->InitializeBackend();
 }
 
 void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()

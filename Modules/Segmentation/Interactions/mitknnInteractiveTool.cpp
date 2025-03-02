@@ -713,9 +713,8 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
         {
           std::pair<std::string, bool> pointInteraction = this->GetPointAsListString(inputAtTimeStep->GetGeometry());
           MITK_INFO << "Point: " << pointInteraction.first;
-          m_ProgressCommand->SetProgress(50);
-          pyCommand.append("coordinate_list = " + pointInteraction.first + "\n");
-          pyCommand.append("session.add_point_interaction(coordinate_list, include_interaction = ");
+          pyCommand = "coordinate_list = " + pointInteraction.first + "\n"
+                      "session.add_point_interaction(coordinate_list, include_interaction = ";
           includeInteraction = pointInteraction.second;
           break;
         }
@@ -723,19 +722,19 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
         {
           std::pair<std::string, bool> bboxInteraction = GetBBoxAsListString(inputAtTimeStep->GetGeometry());
           MITK_INFO << "bboxInteraction: " << bboxInteraction.first;
-          pyCommand.append("bbox_list = " + bboxInteraction.first + "\n");
-          pyCommand.append("session.add_bbox_interaction(bbox_list, include_interaction = ");
+          pyCommand = "bbox_list = " + bboxInteraction.first + "\n"
+                      "session.add_bbox_interaction(bbox_list, include_interaction = ";
           includeInteraction = bboxInteraction.second;
           break;
         }
-
         case Tool::Scribble:
         {
           auto* scribbleMask = m_ScribbleNode->GetDataAs<mitk::Image>();
           m_PythonContext->TransferBaseDataToPython(scribbleMask, "_mitk_scribble_mask");
           includeInteraction = m_PromptType == PromptType::Positive;
           pyCommand = "scribble_npy = _mitk_scribble_mask.GetAsNumpy()\n"
-                      "session.add_scribble_interaction(scribble_npy.astype(numpy.uint8), include_interaction = ";
+                      "session.add_scribble_interaction(scribble_npy.astype(numpy.uint8),"
+                      "include_interaction = ";
           break;
         }
         case Tool::Lasso:
@@ -744,12 +743,15 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
           m_PythonContext->TransferBaseDataToPython(lassoMask, "_mitk_lasso_mask");
           includeInteraction = m_PromptType == PromptType::Positive;
           pyCommand = "lassoMask = _mitk_lasso_mask.GetAsNumpy()\n"
-                      "session.add_scribble_interaction(lassoMask.astype(numpy.uint8), include_interaction = ";
+                      "session.add_scribble_interaction(lassoMask.astype(numpy.uint8),"
+                      "include_interaction = ";
           break;
         }
         default:
+          mitkThrow() << "Unsupported interaction type.";
           break;
       }
+      m_ProgressCommand->SetProgress(50);
 
       if (includeInteraction)
       {
@@ -759,6 +761,17 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
       {
         pyCommand.append("False)\n");
       }
+
+      pyCommand.append("session.set_do_prediction_propagation");
+      if (m_AutoZoom)
+      {
+        pyCommand.append("(True)\n"); // Auto-zoom
+      }
+      else
+      {
+        pyCommand.append("(False)\n"); // Auto-zoom
+      }
+
       m_PythonContext->ExecuteString(pyCommand);
       m_ProgressCommand->SetProgress(150);
       auto end = std::chrono::system_clock::now();

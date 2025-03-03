@@ -822,8 +822,9 @@ us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
 
 void mitk::nnInteractiveTool::InitializeBackend()
 {
+  m_IsSessionReady = false;
   m_OutputBuffer = mitk::LabelSetImage::New();
-  std::string modelName = "nnInteractive_v0.0";
+  std::string modelName = "nnInteractive_v1.0";
   auto start = std::chrono::system_clock::now();
   m_PythonContext = mitk::PythonContext::New();
   m_PythonContext->Activate();
@@ -838,7 +839,7 @@ void mitk::nnInteractiveTool::InitializeBackend()
                           "repo_id = 'kraemer/nnInteractive'\n"
                           "download_path = snapshot_download(repo_id = repo_id, allow_patterns = ['" +
                           modelName + "/*'], force_download = False)\n"
-                          "checkpoint_path = Path(download_path).joinpath('" + modelName + "')\n"
+                          "checkpoint_path = Path(download_path).joinpath('" + modelName + "')\n" //hardcode model checkpoint path to pack together
                           "print(f'Using Model " + modelName + " at:{checkpoint_path}')\n";
   m_PythonContext->ExecuteString(pycommand);
   pycommand.clear();
@@ -885,4 +886,10 @@ void mitk::nnInteractiveTool::InitializeBackend()
   auto end = std::chrono::system_clock::now();
   auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
   MITK_INFO << "nnInteractive init elapsed: " << elapsed.count();
+  m_IsSessionReady = true;
+}
+
+bool mitk::nnInteractiveTool::IsSessionReady() const 
+{
+  return m_IsSessionReady;
 }

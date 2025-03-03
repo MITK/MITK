@@ -68,6 +68,7 @@ namespace mitk
     void SetAutoZoom(bool autoZoom);
 
     std::string GetPromptTypeString(PromptType promptType) const;
+    bool IsSessionReady() const;
 
   protected:
     enum class Intensity
@@ -129,6 +130,7 @@ namespace mitk
     bool m_AutoZoom;
     mitk::Image* m_MaskImage;
     PromptType m_PromptType;
+    bool m_IsSessionReady;
 
     std::array<Tool, 4> m_Tools;
     std::optional<Tool> m_ActiveTool;

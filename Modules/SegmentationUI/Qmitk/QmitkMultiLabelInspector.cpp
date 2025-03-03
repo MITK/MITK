@@ -1430,11 +1430,11 @@ void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) 
   if (currentLabel.IsNull())
     return;
 
-  const mitk::Point3D& pos = currentLabel->GetCenterOfMassCoordinates();
+  const auto pos = currentLabel->GetCenterOfMassIndex();
 
   if (pos.GetVnlVector().max_value() > 0.0)
   {
-    emit GoToLabel(currentLabel->GetValue(), pos);
+    emit GoToLabel(currentLabel->GetValue(), currentLabel->GetCenterOfMassCoordinates());
   }
 }
 

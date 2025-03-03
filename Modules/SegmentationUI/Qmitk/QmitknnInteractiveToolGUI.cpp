@@ -31,7 +31,7 @@ namespace
     button->setIcon(QmitkStyleManager::ThemeIcon(QString(":/nnInteractive/%1").arg(icon)));
   }
 
-  bool ConfirmInitializationWithMask(const mitk::Label* label)
+  QString GetLabelAsString(const mitk::Label* label)
   {
     QColor color(
       static_cast<int>(label->GetColor().GetRed() * 255),
@@ -40,16 +40,45 @@ namespace
 
     auto name = QString::fromStdString(label->GetName());
 
+    return QString("<span style='color: %1'>&#9609;</span> %2")
+      .arg(color.name())
+      .arg(name);
+  }
+
+  bool IsLabelEmpty(mitk::LabelSetImage* segmentation, mitk::Label* label)
+  {
+    segmentation->UpdateCenterOfMass(label->GetValue());
+    const auto point = label->GetCenterOfMassIndex();
+
+    if (std::max({ point[0], point[1], point[2] }) >= mitk::eps)
+      return false;
+
+    QString title = "nnInteractive - Initialize with Mask";
+
+    auto message = QString(
+      "<div style='line-height: 1.25'>"
+        "<p>The selected label cannot be used as a mask to start a new "
+        "session because it is empty.</p>"
+        "<p>Selected label: %1</p>"
+      "</div>")
+      .arg(GetLabelAsString(label));
+
+    QMessageBox::information(nullptr, title, message, QMessageBox::Ok);
+
+    return true;
+  }
+
+  bool ConfirmInitializationWithMask(const mitk::Label* label)
+  {
     QString title = "nnInteractive - Initialize with Mask";
 
     auto message = QString(
       "<div style='line-height: 1.25'>"
         "<p>Do you want to <b>reset all interactions</b> and start a new "
         "session based on the existing content of the selected label?</p>"
-        "<p>Selected label: <span style='color: %1'>&#9609;</span> %2</p>"
+        "<p>Selected label: %1</p>"
       "</div>")
-      .arg(color.name())
-      .arg(name);
+      .arg(GetLabelAsString(label));
 
     auto button = QMessageBox::question(nullptr, title, message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     return button == QMessageBox::Yes;
@@ -219,7 +248,7 @@ void QmitknnInteractiveToolGUI::OnMaskButtonClicked()
     return;
   }
 
-  const auto* segmentation = segmentationNode->GetDataAs<mitk::LabelSetImage>();
+  auto segmentation = segmentationNode->GetDataAs<mitk::LabelSetImage>();
   auto activeLabel = segmentation->GetActiveLabel();
 
   if (activeLabel == nullptr)
@@ -228,7 +257,8 @@ void QmitknnInteractiveToolGUI::OnMaskButtonClicked()
     return;
   }
 
-  // TODO: Check if label is empty
+  if (IsLabelEmpty(segmentation, activeLabel))
+    return;
 
   if (!ConfirmInitializationWithMask(activeLabel))
     return;

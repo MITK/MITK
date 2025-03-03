@@ -62,7 +62,7 @@ namespace mitk
     void DisableInteraction();
     void ResetInteractions();
 
-    void AddInitialSegInteraction(const Image* mask);
+    void AddInitialSegInteraction(/*const*/ Image *mask);
 
     bool GetAutoZoom() const;
     void SetAutoZoom(bool autoZoom);
@@ -127,7 +127,7 @@ namespace mitk
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
 
     bool m_AutoZoom;
-
+    mitk::Image* m_MaskImage;
     PromptType m_PromptType;
 
     std::array<Tool, 4> m_Tools;

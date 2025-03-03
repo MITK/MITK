@@ -217,3 +217,13 @@ void mitk::PythonContext::ClearVirtualEnvironmentPath()
   }
   PyGILState_Release(state);
 }
+
+bool mitk::PythonContext::IsVariableExists(const std::string &varName)
+{
+  PyObject *pyVar = PyDict_GetItemString(m_LocalDictionary, varName.c_str());
+  if (pyVar == NULL && !(pyVar = PyDict_GetItemString(m_GlobalDictionary, varName.c_str())))
+  {
+    return false;
+  }
+  return true;
+}

@@ -71,6 +71,7 @@ mitk::nnInteractiveTool::nnInteractiveTool()
   auto lassoClosedCommand = itk::MemberCommand<Self>::New();
   lassoClosedCommand->SetCallbackFunction(this, &Self::OnLassoEvent);
   m_LassoTool->AddObserver(LassoEvent(), lassoClosedCommand);
+  this->KeepActiveAfterAcceptOn();
 }
 
 bool mitk::nnInteractiveTool::GetAutoZoom() const
@@ -237,9 +238,9 @@ void mitk::nnInteractiveTool::ResetInteractions()
 
     nodes.clear();
   }
-  RenderingManager::GetInstance()->RequestUpdateAll();
-  
-  if (m_PythonContext.IsNotNull())
+  this->ResetPreviewContent();
+
+  if (m_PythonContext.IsNotNull() && m_PythonContext->IsVariableExists("session"))
   {
     std::string pyCommand = "if session:\n"
                             "   session.reset_interactions()\n";
@@ -311,7 +312,6 @@ mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType p
 
 void mitk::nnInteractiveTool::OnPointEvent()
 {
-  MITK_INFO << "OnPointEvent...";
   this->UpdatePreview();
   /* const auto *pointSet = this->GetPointSetNode(m_PromptType)->GetDataAs<PointSet>();
   const auto point = pointSet->GetPoint(pointSet->GetSize() - 1);
@@ -344,7 +344,6 @@ std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetBoxNodes(Promp
 
 void mitk::nnInteractiveTool::AddNewBoxNode(PromptType promptType)
 {
-  MITK_INFO << "AddNewBoxNode";
   if (m_NewBoxNode.first.IsNotNull())
     return;
 
@@ -568,13 +567,14 @@ void mitk::nnInteractiveTool::AddLassoInteraction(const Image* mask)
   MITK_INFO << "  Image" << mask->GetPixelType().GetTypeAsString() << ", " << size << ", " << prompt;
 }
 
-void mitk::nnInteractiveTool::AddInitialSegInteraction(const Image* mask)
+void mitk::nnInteractiveTool::AddInitialSegInteraction(/*const*/ Image *mask)
 {
   MITK_INFO << "AddInitialSegInteraction()";
-
-  const auto size = itk::MakeSize<unsigned int>(mask->GetDimension(0), mask->GetDimension(1), mask->GetDimension(2));
-
-  MITK_INFO << "  Image" << mask->GetPixelType().GetTypeAsString();
+  m_MaskImage = mask;
+  /*const auto size = itk::MakeSize<unsigned int>(mask->GetDimension(0), mask->GetDimension(1), mask->GetDimension(2));
+  MITK_INFO << "  Image" << mask->GetPixelType().GetTypeAsString();*/
+  m_ActiveTool.reset();
+  this->UpdatePreview();
 }
 
 std::string mitk::nnInteractiveTool::CreateNodeName(const std::string& name, std::optional<PromptType> promptType) const
@@ -665,7 +665,6 @@ std::pair<std::string, bool> mitk::nnInteractiveTool::GetPointAsListString(const
   return std::make_pair(pointsAndLabels.str(), includeInteraction);
 }
 
-
 std::pair<std::string, bool> mitk::nnInteractiveTool::GetBBoxAsListString(const mitk::BaseGeometry* baseGeometry) const
 {
   bool includeInteraction = m_PromptType == PromptType::Positive;
@@ -697,95 +696,109 @@ std::pair<std::string, bool> mitk::nnInteractiveTool::GetBBoxAsListString(const 
   return std::make_pair(bboxPoints.str(), includeInteraction);
 }
 
-void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
+                                              const Image * /* oldSegAtTimeStep*/,
+                                              LabelSetImage *previewImage,
+                                              TimeStepType timeStep)
 {
-  if (nullptr != previewImage && m_ActiveTool.has_value() && m_PythonContext.IsNotNull())
+  if (nullptr != previewImage && m_PythonContext.IsNotNull())
   {
+    this->SetSelectedLabels({MASK_VALUE});
     m_ProgressCommand->SetProgress(20);
-    try
+    if (m_ActiveTool.has_value())
     {
-      std::string pyCommand;
-      bool includeInteraction = true;
-      auto start = std::chrono::system_clock::now();
-      switch (m_ActiveTool.value())
+      try
       {
-        case Tool::Point:
+        std::string pyCommand;
+        bool includeInteraction = m_PromptType == PromptType::Positive;
+        auto start = std::chrono::system_clock::now();
+        switch (m_ActiveTool.value())
         {
-          std::pair<std::string, bool> pointInteraction = this->GetPointAsListString(inputAtTimeStep->GetGeometry());
-          MITK_INFO << "Point: " << pointInteraction.first;
-          pyCommand = "coordinate_list = " + pointInteraction.first + "\n"
-                      "session.add_point_interaction(coordinate_list, include_interaction = ";
-          includeInteraction = pointInteraction.second;
-          break;
+          case Tool::Point:
+          {
+            std::pair<std::string, bool> pointInteraction = this->GetPointAsListString(inputAtTimeStep->GetGeometry());
+            MITK_INFO << "Point: " << pointInteraction.first;
+            pyCommand = "coordinate_list = " + pointInteraction.first + "\n"
+                        "session.add_point_interaction(coordinate_list, include_interaction = ";
+            includeInteraction = pointInteraction.second;
+            break;
+          }
+          case Tool::Box:
+          {
+            std::pair<std::string, bool> bboxInteraction = GetBBoxAsListString(inputAtTimeStep->GetGeometry());
+            MITK_INFO << "bboxInteraction: " << bboxInteraction.first;
+            pyCommand = "bbox_list = " + bboxInteraction.first +"\n"
+                        "session.add_bbox_interaction(bbox_list, include_interaction = ";
+            includeInteraction = bboxInteraction.second;
+            break;
+          }
+          case Tool::Scribble:
+          {
+            auto *scribbleMask = m_ScribbleNode->GetDataAs<mitk::Image>();
+            m_PythonContext->TransferBaseDataToPython(scribbleMask, "_mitk_scribble_mask");
+            pyCommand = "scribble_npy = _mitk_scribble_mask.GetAsNumpy()\n"
+                        "session.add_scribble_interaction(scribble_npy.astype(numpy.uint8),"
+                        "include_interaction = ";
+            break;
+          }
+          case Tool::Lasso:
+          {
+            auto *lassoMask = m_LassoMaskNode->GetDataAs<mitk::Image>();
+            m_PythonContext->TransferBaseDataToPython(lassoMask, "_mitk_lasso_mask");
+            pyCommand = "lassoMask = _mitk_lasso_mask.GetAsNumpy()\n"
+                        "session.add_scribble_interaction(lassoMask.astype(numpy.uint8),"
+                        "include_interaction = ";
+            break;
+          }
+          default:
+            mitkThrow() << "Unsupported interaction type.";
+            break;
         }
-        case Tool::Box:
-        {
-          std::pair<std::string, bool> bboxInteraction = GetBBoxAsListString(inputAtTimeStep->GetGeometry());
-          MITK_INFO << "bboxInteraction: " << bboxInteraction.first;
-          pyCommand = "bbox_list = " + bboxInteraction.first + "\n"
-                      "session.add_bbox_interaction(bbox_list, include_interaction = ";
-          includeInteraction = bboxInteraction.second;
-          break;
-        }
-        case Tool::Scribble:
-        {
-          auto* scribbleMask = m_ScribbleNode->GetDataAs<mitk::Image>();
-          m_PythonContext->TransferBaseDataToPython(scribbleMask, "_mitk_scribble_mask");
-          includeInteraction = m_PromptType == PromptType::Positive;
-          pyCommand = "scribble_npy = _mitk_scribble_mask.GetAsNumpy()\n"
-                      "session.add_scribble_interaction(scribble_npy.astype(numpy.uint8),"
-                      "include_interaction = ";
-          break;
-        }
-        case Tool::Lasso:
-        {
-          auto *lassoMask = m_LassoMaskNode->GetDataAs<mitk::Image>();
-          m_PythonContext->TransferBaseDataToPython(lassoMask, "_mitk_lasso_mask");
-          includeInteraction = m_PromptType == PromptType::Positive;
-          pyCommand = "lassoMask = _mitk_lasso_mask.GetAsNumpy()\n"
-                      "session.add_scribble_interaction(lassoMask.astype(numpy.uint8),"
-                      "include_interaction = ";
-          break;
-        }
-        default:
-          mitkThrow() << "Unsupported interaction type.";
-          break;
-      }
-      m_ProgressCommand->SetProgress(50);
+        m_ProgressCommand->SetProgress(50);
 
-      if (includeInteraction)
-      {
-        pyCommand.append("True)\n");
-      }
-      else
-      {
-        pyCommand.append("False)\n");
-      }
+        if (includeInteraction)
+        {
+          pyCommand.append("True)\n");
+        }
+        else
+        {
+          pyCommand.append("False)\n");
+        }
 
-      pyCommand.append("session.set_do_prediction_propagation");
-      if (m_AutoZoom)
-      {
-        pyCommand.append("(True)\n"); // Auto-zoom
-      }
-      else
-      {
-        pyCommand.append("(False)\n"); // Auto-zoom
-      }
+        pyCommand.append("session.set_do_prediction_propagation");
+        if (m_AutoZoom)
+        {
+          pyCommand.append("(True)\n"); // Auto-zoom
+        }
+        else
+        {
+          pyCommand.append("(False)\n"); // Auto-zoom
+        }
 
+        m_PythonContext->ExecuteString(pyCommand);
+        m_ProgressCommand->SetProgress(150);
+        auto end = std::chrono::system_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        MITK_INFO << "nnInter tool inference elapsed: " << elapsed.count();
+
+        m_ProgressCommand->SetProgress(180);
+        mitk::ImageReadAccessor newMitkImgAcc(m_OutputBuffer.GetPointer());
+        previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
+      }
+      catch (const mitk::Exception &e)
+      {
+        mitkThrow() << e.GetDescription();
+      }
+    }
+    else if(nullptr != m_MaskImage) // From mask
+    {
+      m_PythonContext->TransferBaseDataToPython(m_MaskImage, "_mitk_pre_mask");
+      std::string pyCommand = "pre_mask_npy = _mitk_pre_mask.GetAsNumpy()\n"
+                              "session.add_initial_seg_interaction(pre_mask_npy.astype(numpy.uint8))\n"
+                              "session._predict()\n";
       m_PythonContext->ExecuteString(pyCommand);
-      m_ProgressCommand->SetProgress(150);
-      auto end = std::chrono::system_clock::now();
-      auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-      MITK_INFO << "nnInter tool inference elapsed: " << elapsed.count();
-
-      m_ProgressCommand->SetProgress(180);
       mitk::ImageReadAccessor newMitkImgAcc(m_OutputBuffer.GetPointer());
       previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
-      this->SetSelectedLabels({MASK_VALUE});
-    }
-    catch (const mitk::Exception &e)
-    {
-      mitkThrow() << e.GetDescription();
     }
   }
 }

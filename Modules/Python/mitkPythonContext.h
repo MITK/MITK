@@ -34,7 +34,8 @@ namespace mitk
     PythonContext();
     ~PythonContext();
     void Activate();
-    mitk::Image::Pointer LoadImageFromPython(const std::string &filePath) ;
+    bool IsVariableExists(const std::string &varName);
+    mitk::Image::Pointer LoadImageFromPython(const std::string &filePath);
     void TransferBaseDataToPython(mitk::BaseData *mitkImage, const std::string &varName = "_mitk_image");
     std::string ExecuteString(const std::string &pyCommands);
     std::string ExecuteFile(const std::string &filePath);

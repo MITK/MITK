@@ -176,11 +176,37 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   m_Ui->resetButton->setEnabled(checked);
   m_Ui->promptTypeGroupBox->setEnabled(checked);
   m_Ui->interactionToolsGroupBox->setEnabled(checked);
-  this->GetTool()->InitializeBackend(); //check if success e.g. SAM tool
-  while (!this->GetTool()->IsSessionReady())
+ 
+  QMessageBox messageBox(QMessageBox::Information,
+                           "nnInteractive",
+                           "nnInteractive tool is being initialized.\nThis might take a few seconds...",
+                           QMessageBox::NoButton, nullptr);
+  messageBox.show();
+  qApp->processEvents();
+  try
   {
-    // Progress
+    if (this->GetTool()->IsSessionReady())
+    {
+      this->GetTool()->ResetInteractions();
+    }
+    else
+    {
+      this->GetTool()->InitializeBackend();
+    }
   }
+  catch (mitk::Exception& e)
+  {
+    messageBox.close();
+    std::stringstream errorMsg;
+    errorMsg << "Error while initializing nnInteractive. Reason: " << e.GetDescription();
+    QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, errorMsg.str().c_str());
+    messageBox->setTextFormat(Qt::PlainText);
+    messageBox->setAttribute(Qt::WA_DeleteOnClose, true);
+    messageBox->setModal(true);
+    MITK_WARN << errorMsg.str();
+    messageBox->exec();
+  }
+  messageBox.close();
 }
 
 void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()

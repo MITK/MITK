@@ -62,7 +62,8 @@ mitk::nnInteractiveTool::nnInteractiveTool()
       Tool::Scribble,
       Tool::Lasso },
     m_ScribbleTool(nnInteractiveScribbleTool::New()),
-    m_LassoTool(nnInteractiveLassoTool::New())
+    m_LassoTool(nnInteractiveLassoTool::New()),
+    m_IsSessionReady(false)
 {
   auto scribbleCommand = itk::MemberCommand<Self>::New();
   scribbleCommand->SetCallbackFunction(this, &Self::OnScribbleEvent);
@@ -703,7 +704,6 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
 {
   if (nullptr != previewImage && m_PythonContext.IsNotNull())
   {
-    this->SetSelectedLabels({MASK_VALUE});
     m_ProgressCommand->SetProgress(20);
     if (m_ActiveTool.has_value())
     {
@@ -784,6 +784,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
         m_ProgressCommand->SetProgress(180);
         mitk::ImageReadAccessor newMitkImgAcc(m_OutputBuffer.GetPointer());
         previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
+        this->SetSelectedLabels({MASK_VALUE});
       }
       catch (const mitk::Exception &e)
       {
@@ -832,16 +833,24 @@ void mitk::nnInteractiveTool::InitializeBackend()
   std::string pycommand = "import torch\n"
                           "import nnInteractive\n"
                           "from pathlib import Path\n"
-                          "from huggingface_hub import login, snapshot_download\n"
                           "from nnunetv2.utilities.find_class_by_name import recursive_find_python_class\n"
                           "from batchgenerators.utilities.file_and_folder_operations import join, load_json\n"
+                          "from huggingface_hub import login, snapshot_download\n"
                           "login(token = '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')\n" // Private token
                           "repo_id = 'kraemer/nnInteractive'\n"
                           "download_path = snapshot_download(repo_id = repo_id, allow_patterns = ['" +
                           modelName + "/*'], force_download = False)\n"
+                          //"download_path = os.getcwd()\n"
                           "checkpoint_path = Path(download_path).joinpath('" + modelName + "')\n" //hardcode model checkpoint path to pack together
                           "print(f'Using Model " + modelName + " at:{checkpoint_path}')\n";
-  m_PythonContext->ExecuteString(pycommand);
+  try
+  {
+    m_PythonContext->ExecuteString(pycommand);
+  }
+  catch (mitk::Exception &e)
+  {
+    mitkThrow() << e.GetDescription();
+  }
   pycommand.clear();
   pycommand = "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
               "   inference_class = load_json(Path(checkpoint_path).joinpath('inference_session_class.json'))\n"
@@ -851,7 +860,14 @@ void mitk::nnInteractiveTool::InitializeBackend()
               "   inference_class = 'nnInteractiveInferenceSessionV3'\n"
               "inference_class = recursive_find_python_class(join(nnInteractive.__path__[0], 'inference'),"
               "inference_class, 'nnInteractive.inference')\n";
-  m_PythonContext->ExecuteString(pycommand);
+  try
+  {
+    m_PythonContext->ExecuteString(pycommand);
+  }
+  catch (mitk::Exception &e)
+  {
+    mitkThrow() << e.GetDescription();
+  }
   pycommand.clear();
   pycommand = "session = inference_class("
               "device = torch.device('cuda:0'),"
@@ -860,9 +876,16 @@ void mitk::nnInteractiveTool::InitializeBackend()
               "verbose = True,"
               "use_background_preprocessing = False,"
               "do_prediction_propagation = True)\n"
-              "session.initialize_from_trained_model_folder(checkpoint_path, 0, 'checkpoint_final.pth')\n";
-  m_PythonContext->ExecuteString(pycommand);
-
+              "session.initialize_from_trained_model_folder(checkpoint_path, 0, 'checkpoint_final.pth')\n ";
+  try
+  {
+    m_PythonContext->ExecuteString(pycommand);
+  }
+  catch (mitk::Exception& e)
+  {
+    mitkThrow() << e.GetDescription();
+  }
+ 
   auto *inputImage = dynamic_cast<Image *>(this->GetToolManager()->GetReferenceData(0)->GetData());
   const TimePointType timePoint =
     RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();

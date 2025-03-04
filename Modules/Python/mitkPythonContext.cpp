@@ -101,10 +101,40 @@ std::string mitk::PythonContext::ExecuteString(const std::string &pyCommands)
   }
   else
   {
-    PyErr_Print();
-    mitkThrow() << "An error occured while running the Python code";
+    //PyErr_Print();
+    Py_XDECREF(executionResult);
+    PyObject *pException = PyErr_GetRaisedException();
+    PyObject *pTraceback = PyImport_ImportModule("traceback");
+    PyObject *pFormatExceptionMethod = PyObject_GetAttrString(pTraceback, "format_exception");
+    std::string errorMessage;
+    if (NULL != pException)
+    {
+      PyObject *pExceptionType = PyObject_Type(pException);
+      PyObject *pExceptionTypeTb = PyException_GetTraceback(pException);
+      PyObject *pExceptionList =
+        PyObject_CallFunctionObjArgs(pFormatExceptionMethod, pExceptionType, pException, pExceptionTypeTb, NULL);
+      std::string result;
+      if (pExceptionList && PyList_Check(pExceptionList))
+      {
+        PyObject *pExceptionText = PyUnicode_Join(PyUnicode_FromString(""), pExceptionList);
+        result = pExceptionText ? PyUnicode_AsUTF8(pExceptionText) : "UnknownError Caught.";
+        Py_XDECREF(pExceptionText);
+      }
+      else
+      {
+        result = "Failed to format exception";
+      }
+      Py_XDECREF(pExceptionList);
+      Py_XDECREF(pExceptionTypeTb);
+      Py_XDECREF(pExceptionType);
+      Py_XDECREF(pException);
+      mitkThrow() << "An error occured while running the Python code: " << result;   
+    }
+    else
+    {
+      MITK_INFO << "No exeception found.";
+    }
   }
-  Py_XDECREF(executionResult);
   PyGILState_Release(state);
   return std::string(this->GetStdOut());
 }

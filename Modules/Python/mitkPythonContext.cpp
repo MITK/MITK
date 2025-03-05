@@ -128,6 +128,7 @@ std::string mitk::PythonContext::ExecuteString(const std::string &pyCommands)
       Py_XDECREF(pExceptionTypeTb);
       Py_XDECREF(pExceptionType);
       Py_XDECREF(pException);
+      Py_XDECREF(executionResult);
       mitkThrow() << "An error occured while running the Python code: " << result;   
     }
     else
@@ -135,6 +136,7 @@ std::string mitk::PythonContext::ExecuteString(const std::string &pyCommands)
       MITK_INFO << "No exeception found.";
     }
   }
+  Py_XDECREF(executionResult);
   PyGILState_Release(state);
   return std::string(this->GetStdOut());
 }

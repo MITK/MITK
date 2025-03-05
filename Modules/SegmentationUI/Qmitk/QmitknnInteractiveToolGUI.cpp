@@ -179,20 +179,13 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
  
   QMessageBox messageBox(QMessageBox::Information,
                            "nnInteractive",
-                           "nnInteractive tool is being initialized.\nThis might take a few seconds...",
+                           "nnInteractive tool is being initialized.\nThis may take a while. Please wait....",
                            QMessageBox::NoButton, nullptr);
   messageBox.show();
   qApp->processEvents();
   try
   {
-    if (this->GetTool()->IsSessionReady())
-    {
-      this->GetTool()->ResetInteractions();
-    }
-    else
-    {
-      this->GetTool()->InitializeBackend();
-    }
+    this->GetTool()->InitializeBackend();
   }
   catch (mitk::Exception& e)
   {

@@ -63,7 +63,8 @@ mitk::nnInteractiveTool::nnInteractiveTool()
       Tool::Lasso },
     m_ScribbleTool(nnInteractiveScribbleTool::New()),
     m_LassoTool(nnInteractiveLassoTool::New()),
-    m_IsSessionReady(false)
+    m_IsSessionReady(false),
+    m_LastSetTimePoint(std::numeric_limits<double>::lowest())
 {
   auto scribbleCommand = itk::MemberCommand<Self>::New();
   scribbleCommand->SetCallbackFunction(this, &Self::OnScribbleEvent);
@@ -72,6 +73,9 @@ mitk::nnInteractiveTool::nnInteractiveTool()
   auto lassoClosedCommand = itk::MemberCommand<Self>::New();
   lassoClosedCommand->SetCallbackFunction(this, &Self::OnLassoEvent);
   m_LassoTool->AddObserver(LassoEvent(), lassoClosedCommand);
+  
+  this->ResetsToEmptyPreviewOn();
+  this->IsTimePointChangeAwareOff();
   this->KeepActiveAfterAcceptOn();
 }
 
@@ -85,8 +89,18 @@ void mitk::nnInteractiveTool::SetAutoZoom(bool autoZoom)
   m_AutoZoom = autoZoom;
 }
 
-mitk::nnInteractiveTool::~nnInteractiveTool()
+mitk::nnInteractiveTool::~nnInteractiveTool(){}
+
+void mitk::nnInteractiveTool::CleanUpSession()
 {
+  if (m_PythonContext.IsNotNull() && m_PythonContext->IsVariableExists("session"))
+  {
+    std::string pyCommand = "del session.network\n"
+                            "session._reset_session()\n"
+                            "del session\n"
+                            "torch.cuda.empty_cache()\n";
+    m_PythonContext->ExecuteString(pyCommand);
+  }
 }
 
 void mitk::nnInteractiveTool::SetToolManager(ToolManager* toolManager)
@@ -311,12 +325,26 @@ mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType p
   return node;
 }
 
+bool mitk::nnInteractiveTool::IsNewTimePoint()
+{
+  const TimePointType currentTimePoint =
+    RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  MITK_INFO << "currentTimePoint: " << currentTimePoint;
+  MITK_INFO << "m_LastSetTimePoint: " << m_LastSetTimePoint;
+  if (m_LastSetTimePoint != currentTimePoint)
+  {
+    return true;
+  }
+  return false;
+}
+
 void mitk::nnInteractiveTool::OnPointEvent()
 {
+  if (this->IsNewTimePoint())
+  {//set current 3D image vol into the nnInter session
+    this->SetImageInSession();
+  }
   this->UpdatePreview();
-  /* const auto *pointSet = this->GetPointSetNode(m_PromptType)->GetDataAs<PointSet>();
-  const auto point = pointSet->GetPoint(pointSet->GetSize() - 1);
-  this->AddPointInteraction(point);*/
 }
 
 mitk::DataNode* mitk::nnInteractiveTool::GetPointSetNode(PromptType promptType) const
@@ -382,9 +410,11 @@ void mitk::nnInteractiveTool::OnBoxPlaced()
   node->SetSelected(false);
 
   this->GetBoxNodes(m_PromptType).push_back(node);
-  /*
-  const auto* box = node->GetDataAs<PlanarRectangle>();
-  this->AddBoxInteraction(box);*/
+
+  if (this->IsNewTimePoint())
+  {//set current 3D image vol into the nnInter session
+    this->SetImageInSession();
+  }
   this->UpdatePreview();
   node = nullptr;
   this->AddNewBoxNode(m_PromptType);
@@ -440,8 +470,10 @@ void mitk::nnInteractiveTool::SetActiveScribbleLabel(PromptType promptType)
 
 void mitk::nnInteractiveTool::OnScribbleEvent(itk::Object* caller, const itk::EventObject& event)
 {
-  //auto mask = static_cast<const ScribbleEvent*>(&event)->GetMask(); 
-  //this->AddScribbleInteraction(mask);
+  if (this->IsNewTimePoint())
+  {//set current 3D image vol into the nnInter session
+    this->SetImageInSession();
+  }
   this->UpdatePreview();
 }
 
@@ -489,8 +521,10 @@ void mitk::nnInteractiveTool::OnLassoEvent(itk::Object* caller, const itk::Event
   this->GetLassoNodes(m_PromptType).push_back(node);
   this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
 
-  //const auto* mask = m_LassoMaskNode->GetDataAs<LabelSetImage>()->GetGroupImage(0);
-  //this->AddLassoInteraction(mask);
+  if (this->IsNewTimePoint())
+  {//set current 3D image vol into the nnInter session
+    this->SetImageInSession();
+  }
   this->UpdatePreview();
 }
 
@@ -572,9 +606,11 @@ void mitk::nnInteractiveTool::AddInitialSegInteraction(/*const*/ Image *mask)
 {
   MITK_INFO << "AddInitialSegInteraction()";
   m_MaskImage = mask;
-  /*const auto size = itk::MakeSize<unsigned int>(mask->GetDimension(0), mask->GetDimension(1), mask->GetDimension(2));
-  MITK_INFO << "  Image" << mask->GetPixelType().GetTypeAsString();*/
   m_ActiveTool.reset();
+  if (this->IsNewTimePoint())
+  { // set current 3D image vol into the nnInter session
+    this->SetImageInSession();
+  }
   this->UpdatePreview();
 }
 
@@ -644,6 +680,10 @@ void mitk::nnInteractiveTool::Deactivated()
   this->GetDataStorage()->Remove(m_PositivePointsNode);
   m_PositivePointsNode = nullptr;
 
+  this->CleanUpSession();
+  this->IsSessionReadyOff();
+  m_PythonContext = nullptr;
+  m_LastSetTimePoint = std::numeric_limits<double>::lowest();
   Superclass::Deactivated();
 }
 
@@ -821,9 +861,45 @@ us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
   return resource;
 }
 
+void mitk::nnInteractiveTool::SetImageInSession()
+{
+  if (m_PythonContext.IsNull())
+  {
+    mitkThrow() << "Error: Python context was not activated.";
+  }
+  MITK_INFO << "in SetImageInSession......";
+  auto *inputImage = dynamic_cast<Image *>(this->GetToolManager()->GetReferenceData(0)->GetData());
+  const TimePointType timePoint =
+    RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  mitk::Image::ConstPointer inputVolAtTimeStep = this->GetImageByTimePoint(inputImage, timePoint);
+  mitk::Image *inputAtTimeStep = const_cast<mitk::Image *>(inputVolAtTimeStep.GetPointer());
+  m_OutputBuffer->Initialize(inputAtTimeStep);
+  m_PythonContext->TransferBaseDataToPython(inputAtTimeStep);
+  m_PythonContext->TransferBaseDataToPython(m_OutputBuffer.GetPointer(), "_mitk_seg_image");
+  mitk::Vector3D spacing = inputAtTimeStep->GetGeometry()->GetSpacing();
+  std::string pycommand = "image_npy = _mitk_image.GetAsNumpy()\n"
+                          "print('numpy image shape',image_npy.shape)\n"
+                          "spacing = [" +
+                          std::to_string(spacing[2]) + "," + std::to_string(spacing[1]) + "," + std::to_string(spacing[0]) +
+                          "]\n"
+                          "target_buffer_numpy = _mitk_seg_image.GetAsNumpy()\n"
+                          "target_buffer = torch.from_numpy(target_buffer_numpy)\n"
+                          "session.set_image(image_npy[None], {'spacing' : spacing})\n"
+                          "session.set_target_buffer(target_buffer)\n";
+  try
+  {
+    m_PythonContext->ExecuteString(pycommand);
+  }
+  catch (mitk::Exception &e)
+  {
+    mitkThrow() << e.GetDescription();
+  }
+  m_LastSetTimePoint = timePoint;
+}
+
 void mitk::nnInteractiveTool::InitializeBackend()
 {
-  m_IsSessionReady = false;
+  this->IsSessionReadyOff();
   m_OutputBuffer = mitk::LabelSetImage::New();
   std::string modelName = "nnInteractive_v1.0";
   auto start = std::chrono::system_clock::now();
@@ -885,13 +961,14 @@ void mitk::nnInteractiveTool::InitializeBackend()
   {
     mitkThrow() << e.GetDescription();
   }
+
+  this->SetImageInSession();
  
-  auto *inputImage = dynamic_cast<Image *>(this->GetToolManager()->GetReferenceData(0)->GetData());
+  /*auto *inputImage = dynamic_cast<Image *>(this->GetToolManager()->GetReferenceData(0)->GetData());
   const TimePointType timePoint =
     RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  auto inputTimeStep = inputImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-  mitk::Image *inputAtTimeStep = this->GetImageByTimeStep(inputImage, inputTimeStep).GetPointer();
-
+  mitk::Image::ConstPointer inputVolAtTimeStep = this->GetImageByTimePoint(inputImage, timePoint);
+  mitk::Image* inputAtTimeStep = const_cast<mitk::Image*>(inputVolAtTimeStep.GetPointer());
   m_OutputBuffer->Initialize(inputAtTimeStep);
   m_PythonContext->TransferBaseDataToPython(inputAtTimeStep);
   m_PythonContext->TransferBaseDataToPython(m_OutputBuffer.GetPointer(), "_mitk_seg_image");
@@ -905,14 +982,10 @@ void mitk::nnInteractiveTool::InitializeBackend()
               "target_buffer = torch.from_numpy(target_buffer_numpy)\n"
               "session.set_image(image_npy[None], {'spacing' : spacing})\n"
               "session.set_target_buffer(target_buffer)\n";
-  m_PythonContext->ExecuteString(pycommand);
+  m_PythonContext->ExecuteString(pycommand);*/
   auto end = std::chrono::system_clock::now();
   auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
   MITK_INFO << "nnInteractive init elapsed: " << elapsed.count();
-  m_IsSessionReady = true;
+  this->IsSessionReadyOn();
 }
 
-bool mitk::nnInteractiveTool::IsSessionReady() const 
-{
-  return m_IsSessionReady;
-}

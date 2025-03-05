@@ -68,7 +68,10 @@ namespace mitk
     void SetAutoZoom(bool autoZoom);
 
     std::string GetPromptTypeString(PromptType promptType) const;
-    bool IsSessionReady() const;
+
+    itkSetMacro(IsSessionReady, bool);
+    itkGetConstMacro(IsSessionReady, bool);
+    itkBooleanMacro(IsSessionReady);
 
   protected:
     enum class Intensity
@@ -94,6 +97,9 @@ namespace mitk
   private:
     void CreatePointInteractor();
     void CreateBoxInteractor();
+    void CleanUpSession();
+    void SetImageInSession();
+    bool IsNewTimePoint();
 
     DataNode::Pointer CreatePointSetNode(PromptType promptType);
     void OnPointEvent();
@@ -131,6 +137,7 @@ namespace mitk
     mitk::Image* m_MaskImage;
     PromptType m_PromptType;
     bool m_IsSessionReady;
+    TimePointType m_LastSetTimePoint;
 
     std::array<Tool, 4> m_Tools;
     std::optional<Tool> m_ActiveTool;

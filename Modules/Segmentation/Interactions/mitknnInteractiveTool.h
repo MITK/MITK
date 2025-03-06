@@ -73,6 +73,8 @@ namespace mitk
     itkGetConstMacro(IsSessionReady, bool);
     itkBooleanMacro(IsSessionReady);
 
+    mitk::Message1<const bool> nnInterStatusMessageEvent;
+
   protected:
     enum class Intensity
     {
@@ -88,6 +90,7 @@ namespace mitk
     void SetToolManager(ToolManager* toolManager) override;
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
     void Notify(InteractionEvent* interactionEvent, bool isHandled) override;
+    void ConfirmCleanUp() override;
 
     void BlockLMBDisplayInteraction();
     void UnblockLMBDisplayInteraction();

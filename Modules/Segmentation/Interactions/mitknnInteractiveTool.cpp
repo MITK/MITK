@@ -95,8 +95,8 @@ void mitk::nnInteractiveTool::CleanUpSession()
 {
   if (m_PythonContext.IsNotNull() && m_PythonContext->IsVariableExists("session"))
   {
-    std::string pyCommand = "del session.network\n"
-                            "session._reset_session()\n"
+    std::string pyCommand = "session._reset_session()\n"
+                            "del session.network\n"
                             "del session\n"
                             "torch.cuda.empty_cache()\n";
     m_PythonContext->ExecuteString(pyCommand);
@@ -314,7 +314,7 @@ mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType p
   node->SetColor(this->GetColor(promptType, Intensity::Vibrant), nullptr, "selectedcolor");
   node->SetProperty("Pointset.2D.shape", PointSetShapeProperty::New(PointSetShapeProperty::CIRCLE));
   node->SetIntProperty("Pointset.2D.resolution", 64);
-  node->SetFloatProperty("point 2D size", 10.0f);
+  //node->SetFloatProperty("point 2D size", 10.0f);
   node->SetFloatProperty("Pointset.2D.distance to plane", 0.1f);
   node->SetBoolProperty("Pointset.2D.keep shape when selected", true);
   node->SetBoolProperty("Pointset.2D.fill shape", true);
@@ -329,8 +329,6 @@ bool mitk::nnInteractiveTool::IsNewTimePoint()
 {
   const TimePointType currentTimePoint =
     RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  MITK_INFO << "currentTimePoint: " << currentTimePoint;
-  MITK_INFO << "m_LastSetTimePoint: " << m_LastSetTimePoint;
   if (m_LastSetTimePoint != currentTimePoint)
   {
     return true;
@@ -745,6 +743,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
   if (nullptr != previewImage && m_PythonContext.IsNotNull())
   {
     m_ProgressCommand->SetProgress(20);
+    this->SetSelectedLabels({MASK_VALUE});
     if (m_ActiveTool.has_value())
     {
       try
@@ -824,7 +823,6 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
         m_ProgressCommand->SetProgress(180);
         mitk::ImageReadAccessor newMitkImgAcc(m_OutputBuffer.GetPointer());
         previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
-        this->SetSelectedLabels({MASK_VALUE});
       }
       catch (const mitk::Exception &e)
       {
@@ -964,28 +962,15 @@ void mitk::nnInteractiveTool::InitializeBackend()
 
   this->SetImageInSession();
  
-  /*auto *inputImage = dynamic_cast<Image *>(this->GetToolManager()->GetReferenceData(0)->GetData());
-  const TimePointType timePoint =
-    RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  mitk::Image::ConstPointer inputVolAtTimeStep = this->GetImageByTimePoint(inputImage, timePoint);
-  mitk::Image* inputAtTimeStep = const_cast<mitk::Image*>(inputVolAtTimeStep.GetPointer());
-  m_OutputBuffer->Initialize(inputAtTimeStep);
-  m_PythonContext->TransferBaseDataToPython(inputAtTimeStep);
-  m_PythonContext->TransferBaseDataToPython(m_OutputBuffer.GetPointer(), "_mitk_seg_image");
-  mitk::Vector3D spacing = inputAtTimeStep->GetGeometry()->GetSpacing();
-  pycommand.clear();
-  pycommand = "image_npy = _mitk_image.GetAsNumpy()\n"
-              "print('numpy image shape',image_npy.shape)\n"
-              "spacing = [" +
-              std::to_string(spacing[2]) + "," + std::to_string(spacing[1]) + "," + std::to_string(spacing[0]) + "]\n"
-              "target_buffer_numpy = _mitk_seg_image.GetAsNumpy()\n"
-              "target_buffer = torch.from_numpy(target_buffer_numpy)\n"
-              "session.set_image(image_npy[None], {'spacing' : spacing})\n"
-              "session.set_target_buffer(target_buffer)\n";
-  m_PythonContext->ExecuteString(pycommand);*/
   auto end = std::chrono::system_clock::now();
   auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
   MITK_INFO << "nnInteractive init elapsed: " << elapsed.count();
   this->IsSessionReadyOn();
 }
 
+void mitk::nnInteractiveTool::ConfirmCleanUp()
+{
+  m_ActiveTool.reset();
+  nnInterStatusMessageEvent.Send(true);
+  RenderingManager::GetInstance()->RequestUpdateAll();
+}

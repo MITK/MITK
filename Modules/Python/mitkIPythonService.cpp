@@ -36,11 +36,5 @@ mitk::IPythonService::IPythonService()
   }
 }
 
-mitk::IPythonService::~IPythonService()
-{
-  if (Py_IsInitialized())
-  {
-    Py_Finalize();
-  }
-}
+mitk::IPythonService::~IPythonService() {}
 

@@ -110,6 +110,7 @@ Q_SIGNALS:
   void Moved();
   void UpdateUtilityWidgetViewPlanes();
   void LayoutChanged();
+  void SynchGroupAdded(const int index);
 
 private:
 
@@ -118,13 +119,13 @@ private:
 
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer GetWindowFromIndex(size_t index);
-  void SetInitialSelection();
-  void ToggleSynchronization(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
+  void AddSynchronizationGroup();
+  void SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const int index);
 
   static nlohmann::json BuildJSONFromLayout(const QSplitter* splitter);
   QSplitter* BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);
 
-  std::unique_ptr<QmitkSynchronizedWidgetConnector> m_SynchronizedWidgetConnector;
+  std::vector<std::unique_ptr<QmitkSynchronizedWidgetConnector>> m_SynchronizedWidgetConnectors;
 
   bool m_CrosshairVisibility;
 

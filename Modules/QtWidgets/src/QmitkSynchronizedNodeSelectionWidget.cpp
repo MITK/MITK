@@ -24,6 +24,7 @@ found in the LICENSE file.
 
 QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidget* parent)
   : QmitkAbstractNodeSelectionWidget(parent)
+  , m_SynchGroupIndex(-1)
 {
   m_Controls.setupUi(this);
 
@@ -54,12 +55,8 @@ QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidg
 
 QmitkSynchronizedNodeSelectionWidget::~QmitkSynchronizedNodeSelectionWidget()
 {
-  bool isSynchronized = this->IsSynchronized();
-  if (isSynchronized)
-  {
-    emit DeregisterSynchronization();
-    return;
-  }
+
+  emit DeregisterSynchronization();
 
   auto baseRenderer = m_BaseRenderer.Lock();
   if (baseRenderer.IsNull())
@@ -73,8 +70,7 @@ QmitkSynchronizedNodeSelectionWidget::~QmitkSynchronizedNodeSelectionWidget()
     return;
   }
 
-  // If the model is not synchronized,
-  // we know that renderer-specific properties exist for all nodes.
+  // We know that renderer-specific properties exist for all nodes.
   // These properties need to be removed from the nodes.
   auto allNodes = dataStorage->GetAll();
   for (auto& node : *allNodes)
@@ -99,6 +95,7 @@ void QmitkSynchronizedNodeSelectionWidget::SetBaseRenderer(mitk::BaseRenderer* b
 
   auto oldBaseRenderer = m_BaseRenderer.Lock();
   m_BaseRenderer = baseRenderer;
+  m_StorageModel->SetCurrentRenderer(baseRenderer);
 
   auto dataStorage = m_DataStorage.Lock();
   if (dataStorage.IsNull())
@@ -106,30 +103,18 @@ void QmitkSynchronizedNodeSelectionWidget::SetBaseRenderer(mitk::BaseRenderer* b
     return;
   }
 
-  bool isSynchronized = this->IsSynchronized();
-  if (isSynchronized)
+  // We know that renderer-specific properties exist for all nodes.
+  // These properties need to be removed from the nodes and
+  // we need to transfer their values to new renderer-specific properties.
+  auto allNodes = dataStorage->GetAll();
+  for (auto& node : *allNodes)
   {
-    // If the model is synchronized,
-    // all nodes use global / default properties.
-    // No renderer-specific property lists should exist
-    // so there is no need to transfer any property values.
-  }
-  else
-  {
-    // If the model is not synchronized,
-    // we know that renderer-specific properties exist for all nodes.
-    // These properties need to be removed from the nodes and
-    // we need to transfer their values to new renderer-specific properties.
-    auto allNodes = dataStorage->GetAll();
-    for (auto& node : *allNodes)
-    {
-      // Set the relevant renderer-specific properties for the node using the new base renderer.
-      // By transferring the values from the old property list,
-      // the same property-state is kept when switching to another base renderer.
-      mitk::RenderWindowLayerUtilities::TransferRenderWindowProperties(node, baseRenderer, oldBaseRenderer);
-      // Delete the relevant renderer-specific properties for the node using the old base renderer.
-      mitk::RenderWindowLayerUtilities::DeleteRenderWindowProperties(node, oldBaseRenderer);
-    }
+    // Set the relevant renderer-specific properties for the node using the new base renderer.
+    // By transferring the values from the old property list,
+    // the same property-state is kept when switching to another base renderer.
+    mitk::RenderWindowLayerUtilities::TransferRenderWindowProperties(node, baseRenderer, oldBaseRenderer);
+    // Delete the relevant renderer-specific properties for the node using the old base renderer.
+    mitk::RenderWindowLayerUtilities::DeleteRenderWindowProperties(node, oldBaseRenderer);
   }
 
   this->Initialize();
@@ -149,102 +134,6 @@ void QmitkSynchronizedNodeSelectionWidget::SetSelectAll(bool selectAll)
 bool QmitkSynchronizedNodeSelectionWidget::GetSelectAll() const
 {
   return m_Controls.selectionModeCheckBox->isChecked();
-}
-
-void QmitkSynchronizedNodeSelectionWidget::SetSynchronized(bool synchronize)
-{
-  if (synchronize == this->IsSynchronized())
-  {
-    // no need to do something
-    return;
-  }
-
-  auto baseRenderer = m_BaseRenderer.Lock();
-  if (baseRenderer.IsNull())
-  {
-    return;
-  }
-
-  auto dataStorage = m_DataStorage.Lock();
-  if (dataStorage.IsNull())
-  {
-    return;
-  }
-
-  if (synchronize)
-  {
-    // set the base renderer of the model to nullptr, such that global properties are used
-    m_StorageModel->SetCurrentRenderer(nullptr);
-
-    // If the model is synchronized,
-    // we know that the model was not synchronized before.
-    // That means that all nodes use renderer-specific properties,
-    // but now all nodes need global properties.
-    // Thus we need to remove the renderer-specific properties of all nodes of the
-    // datastorage.
-    auto allNodes = dataStorage->GetAll();
-    for (auto& node : *allNodes)
-    {
-      // For helper / hidden nodes:
-      // If the node predicate does not match, do not remove the renderer-specific property
-      // This is relevant for the crosshair data nodes, which are only visible inside their
-      // corresponding render window.
-      if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
-      {
-        // Delete the relevant renderer-specific properties for the node using the current base renderer.
-        mitk::RenderWindowLayerUtilities::DeleteRenderWindowProperties(node, baseRenderer);
-      }
-    }
-  }
-  else
-  {
-    // set the base renderer of the model to current base renderer, such that renderer-specific properties are used
-    m_StorageModel->SetCurrentRenderer(baseRenderer);
-
-    // If the model is not synchronized anymore,
-    // we know that the model was synchronized before.
-    // That means that all nodes use global / default properties,
-    // but now all nodes need renderer-specific properties.
-    // Thus we need to modify the renderer-specific properties of all nodes of the
-    // datastorage:
-    //  - hide those nodes, which are not part of the newly selected nodes.
-    //  - keep the property values of those nodes, which are part of the new selection AND
-    //    have been selected before
-    auto currentNodeSelection = this->GetCurrentInternalSelection();
-    auto allNodes = dataStorage->GetAll();
-    for (auto& node : *allNodes)
-    {
-      // check if the node is part of the current selection
-      auto finding = std::find(std::begin(currentNodeSelection), std::end(currentNodeSelection), node);
-      if (finding != std::end(currentNodeSelection)) // node found / part of the current selection
-      {
-        // Set the relevant renderer-specific properties for the node using the current base renderer.
-        // By transferring the values from the global / default property list,
-        // the same property-state is kept when switching to non-synchronized mode.
-        mitk::RenderWindowLayerUtilities::TransferRenderWindowProperties(node, baseRenderer, nullptr);
-      }
-      else
-      {
-        // If the node is not part of the selection, unset the relevant renderer-specific properties.
-        // This will unset the "visible" and "layer" property for the renderer-specific property list and
-        // hide the node for this renderer.
-        // ATTENTION: This is required, since the synchronized property needs to be overwritten
-        //            to make sure that the visibility is correctly set for the specific base renderer.
-        this->DeselectNode(node);
-      }
-    }
-  }
-
-  // Since the synchronization might lead to a different node order depending on the layer properties, the render window
-  // needs to be updated.
-  // Explicitly request an update since a renderer-specific property change does not mark the node as modified.
-  // see https://phabricator.mitk.org/T22322
-  mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
-}
-
-bool QmitkSynchronizedNodeSelectionWidget::IsSynchronized() const
-{
-  return m_StorageModel->GetCurrentRenderer().IsNull();
 }
 
 void QmitkSynchronizedNodeSelectionWidget::OnSelectionModeChanged(bool selectAll)
@@ -269,8 +158,11 @@ void QmitkSynchronizedNodeSelectionWidget::OnEditSelection()
   m_Controls.changeSelectionButton->setChecked(true);
   if (dialog->exec())
   {
-    m_Controls.selectionModeCheckBox->setChecked(false);
-    emit SelectionModeChanged(false);
+    if (m_Controls.selectionModeCheckBox->isChecked())
+    {
+      m_Controls.selectionModeCheckBox->setChecked(false);
+      emit SelectionModeChanged(false);
+    }
 
     auto selectedNodes = dialog->GetSelectedNodes();
     this->HandleChangeOfInternalSelection(selectedNodes);
@@ -359,9 +251,6 @@ void QmitkSynchronizedNodeSelectionWidget::Initialize()
   m_Controls.changeSelectionButton->setEnabled(true);
 
   m_Controls.selectionModeCheckBox->setChecked(true);
-
-  // set the base renderer of the model to nullptr, such that global properties are used (synchronized mode)
-  m_StorageModel->SetCurrentRenderer(nullptr);
 }
 
 void QmitkSynchronizedNodeSelectionWidget::UpdateInfo()
@@ -387,14 +276,49 @@ void QmitkSynchronizedNodeSelectionWidget::ReviseSelectionChanged(const NodeList
     return;
   }
 
-  bool isSynchronized = this->IsSynchronized();
-  if (isSynchronized)
+  // Since the model is synchronized to a group, all nodes need renderer-specific properties.
+  // Thus we need to modify the renderer-specific properties of the selection:
+  //  - a) set the renderer-specific properties of those nodes, which are part of the new selection AND
+  //       have not been selected before (see 'SelectNode')
+  //  - b) show those nodes, which are part of the new selection AND have not been
+  //       selected before
+  //  - c) keep the property values of those nodes, which are part of the new selection AND
+  //       have been selected before
+  //  - d) hide those nodes, which are part of the old selection AND
+  //       have not been newly selected
+  //  - e) set the renderer-specific properties of those nodes, which are part of the old selection AND
+  //       have not been newly selected, to denote which nodes are selected
+  for (auto& node : newInternalSelection)
   {
-    this->ReviseSynchronizedSelectionChanged(oldInternalSelection, newInternalSelection);
+    // check if the node is part of the old selection
+    auto finding = std::find(std::begin(oldInternalSelection), std::end(oldInternalSelection), node);
+    if (finding == std::end(oldInternalSelection)) // node not found
+    {
+      // If the node is part of the new selection and was not already part of the old selection,
+      // set the relevant renderer-specific properties.
+      // This will set the "visible" and "layer" property for the renderer-specific property list
+      // such that the global / default property list values are overwritten
+      mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(node, baseRenderer); // item a)
+      // Explicitly set the visibility to true for selected nodes to show them in the render window.
+      node->SetVisibility(true, baseRenderer); // item b)
+    }
+    // else: item c): node that was already selected before does not need to be modified
   }
-  else
+
+  for (auto& node : oldInternalSelection)
   {
-    this->ReviseDesynchronizedSelectionChanged(oldInternalSelection, newInternalSelection);
+    // check if the node is part of the new selection
+    auto finding = std::find(std::begin(newInternalSelection), std::end(newInternalSelection), node);
+    if (finding == std::end(newInternalSelection)) // node not found
+    {
+      // If the node is not part of the new selection, unset the relevant renderer-specific properties.
+      // This will unset the "visible" and "layer" property for the renderer-specific property list and
+      // hide the node for this renderer.
+      // ATTENTION: This is required, since the synchronized global property needs to be overwritten
+      //            to make sure that the visibility is correctly set for the specific base renderer.
+      this->DeselectNode(node); // item d) and e)
+    }
+    // else: item c): node that was already selected before does not need to be modified
   }
 
   // Since a new selection might have a different rendering tree the render windows
@@ -407,11 +331,6 @@ void QmitkSynchronizedNodeSelectionWidget::ReviseSelectionChanged(const NodeList
 void QmitkSynchronizedNodeSelectionWidget::OnInternalSelectionChanged()
 {
   m_StorageModel->SetCurrentSelection(this->GetCurrentInternalSelection());
-}
-
-bool QmitkSynchronizedNodeSelectionWidget::AllowEmissionOfSelection(const NodeList& /*emissionCandidates*/) const
-{
-  return this->IsSynchronized();
 }
 
 void QmitkSynchronizedNodeSelectionWidget::OnNodeAddedToStorage(const mitk::DataNode* node)
@@ -459,22 +378,7 @@ void QmitkSynchronizedNodeSelectionWidget::OnNodeAddedToStorage(const mitk::Data
   }
   else
   {
-    // If the widget is in "local-selection" state (selectionModeCheckBox unchecked),
-    // the new incoming node needs to be hid.
-    // Here it depends on the synchronization-state which properties need
-    // to be modified.
-    if (this->IsSynchronized())
-    {
-      // If the node will not be part of the new selection, hide the node.
-      const_cast<mitk::DataNode*>(node)->SetVisibility(false);
-    }
-    else
-    {
-      // If the widget is not synchronized, all nodes use renderer-specific properties.
-      // Thus we need to modify the renderer-specific properties of the node:
-      //  - hide the node, which is not part of the selection
-      this->DeselectNode(const_cast<mitk::DataNode*>(node));
-    }
+    this->DeselectNode(const_cast<mitk::DataNode*>(node));
   }
 }
 
@@ -513,98 +417,6 @@ void QmitkSynchronizedNodeSelectionWidget::OnNodeModified(const itk::Object* cal
   }
 }
 
-void QmitkSynchronizedNodeSelectionWidget::ReviseSynchronizedSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection)
-{
-  // If the model is synchronized, all nodes use global / default properties.
-  // Thus we need to modify the global properties of the selection:
-  //  - a) show those nodes, which are part of the new selection AND have not been
-  //       selected before
-  //  - b) keep the property values of those nodes, which are part of the new selection AND
-  //       have been selected before
-  //  - c) hide those nodes, which are part of the old selection AND
-  //       have not been newly selected
-  for (auto& node : newInternalSelection)
-  {
-    // check if the node is part of the old selection
-    auto finding = std::find(std::begin(oldInternalSelection), std::end(oldInternalSelection), node);
-    if (finding == std::end(oldInternalSelection)) // node not found
-    {
-      // If the node is part of the new selection and was not already part of the old selection,
-      // set the relevant renderer-specific properties.
-      // This will set the "visible" property for the global / default property list
-      // and show the node for this renderer.
-      node->SetVisibility(true); // item a)
-    }
-    // else: item b): node that was already selected before does not need to be modified
-  }
-
-  for (auto& node : oldInternalSelection)
-  {
-    // check if the node is part of the new selection
-    auto finding = std::find(std::begin(newInternalSelection), std::end(newInternalSelection), node);
-    if (finding == std::end(newInternalSelection)) // node not found
-    {
-      // If the node is not part of the new selection, hide the node.
-      node->SetVisibility(false); // item c)
-    }
-    // else: item b): node that was already selected before does not need to be modified
-  }
-}
-
-void QmitkSynchronizedNodeSelectionWidget::ReviseDesynchronizedSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection)
-{
-  auto baseRenderer = m_BaseRenderer.Lock();
-  if (baseRenderer.IsNull())
-  {
-    return;
-  }
-
-  // If the model is not synchronized, all nodes need renderer-specific properties.
-  // Thus we need to modify the renderer-specific properties of the selection:
-  //  - a) set the renderer-specific properties of those nodes, which are part of the new selection AND
-  //       have not been selected before (see 'SelectNode')
-  //  - b) show those nodes, which are part of the new selection AND have not been
-  //       selected before
-  //  - c) keep the property values of those nodes, which are part of the new selection AND
-  //       have been selected before
-  //  - d) hide those nodes, which are part of the old selection AND
-  //       have not been newly selected
-  //  - e) set the renderer-specific properties of those nodes, which are part of the old selection AND
-  //       have not been newly selected, to denote which nodes are selected
-  for (auto& node : newInternalSelection)
-  {
-    // check if the node is part of the old selection
-    auto finding = std::find(std::begin(oldInternalSelection), std::end(oldInternalSelection), node);
-    if (finding == std::end(oldInternalSelection)) // node not found
-    {
-      // If the node is part of the new selection and was not already part of the old selection,
-      // set the relevant renderer-specific properties.
-      // This will set the "visible" and "layer" property for the renderer-specific property list
-      // such that the global / default property list values are overwritten
-      mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(node, baseRenderer); // item a)
-      // Explicitly set the visibility to true for selected nodes to show them in the render window.
-      node->SetVisibility(true, baseRenderer); // item b)
-    }
-    // else: item c): node that was already selected before does not need to be modified
-  }
-
-  for (auto& node : oldInternalSelection)
-  {
-    // check if the node is part of the new selection
-    auto finding = std::find(std::begin(newInternalSelection), std::end(newInternalSelection), node);
-    if (finding == std::end(newInternalSelection)) // node not found
-    {
-      // If the node is not part of the new selection, unset the relevant renderer-specific properties.
-      // This will unset the "visible" and "layer" property for the renderer-specific property list and
-      // hide the node for this renderer.
-      // ATTENTION: This is required, since the synchronized global property needs to be overwritten
-      //            to make sure that the visibility is correctly set for the specific base renderer.
-      this->DeselectNode(node); // item d) and e)
-    }
-    // else: item c): node that was already selected before does not need to be modified
-  }
-}
-
 void QmitkSynchronizedNodeSelectionWidget::ReinitNode(const mitk::DataNode* dataNode)
 {
   auto baseRenderer = m_BaseRenderer.Lock();
@@ -637,16 +449,11 @@ void QmitkSynchronizedNodeSelectionWidget::RemoveFromInternalSelection(mitk::Dat
     return;
   }
 
-  if (this->IsSynchronized())
+  if (m_Controls.selectionModeCheckBox->isChecked())
   {
-    // If the model is synchronized, all nodes use global / default properties.
-    // Thus we need to modify the global property of the node.
-    // Explicitly set the visibility to false for unselected nodes to hide them in the render window.
-    dataNode->SetVisibility(false);
+    m_Controls.selectionModeCheckBox->setChecked(false);
+    emit SelectionModeChanged(false);
   }
-
-  m_Controls.selectionModeCheckBox->setChecked(false);
-  emit SelectionModeChanged(false);
 
   this->RemoveNodeFromSelection(dataNode);
 }
@@ -715,4 +522,26 @@ void QmitkSynchronizedNodeSelectionWidget::SelectAll()
   }
 
   this->HandleChangeOfInternalSelection(currentSelection);
+}
+
+void QmitkSynchronizedNodeSelectionWidget::SetSynchGroup(const int index)
+{
+  auto baseRenderer = m_BaseRenderer.Lock();
+  if (baseRenderer.IsNull())
+  {
+    return;
+  }
+
+  m_SynchGroupIndex = index;
+
+  // Since the synchronization might lead to a different node order depending on the layer properties, the render window
+  // needs to be updated.
+  // Explicitly request an update since a renderer-specific property change does not mark the node as modified.
+  // see https://phabricator.mitk.org/T22322
+  mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+}
+
+int QmitkSynchronizedNodeSelectionWidget::GetSynchGroup() const
+{
+  return m_SynchGroupIndex;
 }

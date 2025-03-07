@@ -55,8 +55,8 @@ public:
   void SetSelectAll(bool selectAll);
   bool GetSelectAll() const;
   void SelectAll();
-  void SetSynchronized(bool synchronize);
-  bool IsSynchronized() const;
+  void SetSynchGroup(const int index);
+  int GetSynchGroup() const;
 
 Q_SIGNALS:
 
@@ -82,14 +82,11 @@ protected:
   void OnNodePredicateChanged() override;
   void ReviseSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection) override;
   void OnInternalSelectionChanged() override;
-  bool AllowEmissionOfSelection(const NodeList& emissionCandidates) const override;
   void OnNodeAddedToStorage(const mitk::DataNode* node) override;
   void OnNodeModified(const itk::Object* caller, const itk::EventObject& event) override;
 
 private:
 
-  void ReviseSynchronizedSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection);
-  void ReviseDesynchronizedSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection);
   void ReinitNode(const mitk::DataNode* dataNode);
   void RemoveFromInternalSelection(mitk::DataNode* dataNode);
   bool IsParentNodeSelected(const mitk::DataNode* dataNode) const;
@@ -99,6 +96,7 @@ private:
   mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
 
   std::unique_ptr<QmitkRenderWindowDataNodeTableModel> m_StorageModel;
+  int m_SynchGroupIndex;
 
 };
 

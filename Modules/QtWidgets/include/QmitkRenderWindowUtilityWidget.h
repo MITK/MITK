@@ -49,16 +49,19 @@ public:
 
   ~QmitkRenderWindowUtilityWidget() override;
 
-  void ToggleSynchronization(bool synchronized);
+  void OnSynchGroupSelectionChanged(int index);
 
   void SetGeometry(const itk::EventObject& event);
+  QmitkSynchronizedNodeSelectionWidget* GetNodeSelectionWidget() const;
 
 public Q_SLOTS:
   void UpdateViewPlaneSelection();
+  void OnSynchGroupAdded(const int index);
 
 Q_SIGNALS:
 
   void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
+  void SetSynchGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, int index);
   void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
 
 private:
@@ -66,6 +69,7 @@ private:
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
   QPushButton* m_SynchPushButton;
+  QComboBox* m_SynchGroupSelector;
   QmitkSliceNavigationWidget* m_SliceNavigationWidget;
   QmitkStepperAdapter* m_StepperAdapter;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;

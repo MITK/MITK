@@ -35,7 +35,6 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          const QString& multiWidgetName/* = "mxn"*/)
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
-  , m_SynchronizedWidgetConnector(std::make_unique<QmitkSynchronizedWidgetConnector>())
   , m_CrosshairVisibility(false)
 {
 }
@@ -46,6 +45,8 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 
 void QmitkMxNMultiWidget::InitializeMultiWidget()
 {
+
+  AddSynchronizationGroup();
   SetLayout(1, 1);
   SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
   auto displayActionEventHandler = GetDisplayActionEventHandler();
@@ -53,8 +54,6 @@ void QmitkMxNMultiWidget::InitializeMultiWidget()
   {
     displayActionEventHandler->InitActions();
   }
-
-  this->SetInitialSelection();
 }
 
 void QmitkMxNMultiWidget::Synchronize(bool synchronized)
@@ -367,14 +366,15 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   QmitkRenderWindowUtilityWidget* utilityWidget = new QmitkRenderWindowUtilityWidget(this, renderWindow, GetDataStorage());
   renderWindowWidget->AddUtilityWidget(utilityWidget);
 
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SynchronizationToggled,
-    this, &QmitkMxNMultiWidget::ToggleSynchronization);
   connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,
     utilityWidget, &QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection);
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SetSynchGroup, this, &QmitkMxNMultiWidget::SetSynchronizationGroup);
+  connect(this, &QmitkMxNMultiWidget::SynchGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSynchGroupAdded);
 
   // needs to be done after 'QmitkRenderWindowUtilityWidget::ToggleSynchronization' has been connected
   // initially synchronize the node selection widget
-  utilityWidget->ToggleSynchronization(true);
+  SetSynchronizationGroup(utilityWidget->GetNodeSelectionWidget(), 0);
+
 
   auto layoutManager = GetMultiWidgetLayoutManager();
   connect(renderWindow, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
@@ -584,7 +584,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
       }
 
       auto utilityWidget = window->GetUtilityWidget();
-      utilityWidget->ToggleSynchronization(false);
+      //utilityWidget->ToggleSynchronization(false);
       utilityWidget->SetDataSelection(QList({ node }));
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();
@@ -614,7 +614,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   emit LayoutChanged();
 }
 
-void QmitkMxNMultiWidget::SetInitialSelection()
+void QmitkMxNMultiWidget::AddSynchronizationGroup()
 {
   auto dataStorage = this->GetDataStorage();
   if (nullptr == dataStorage)
@@ -632,20 +632,32 @@ void QmitkMxNMultiWidget::SetInitialSelection()
     currentSelection.append(node);
   }
 
-  m_SynchronizedWidgetConnector->ChangeSelection(currentSelection);
+  m_SynchronizedWidgetConnectors.push_back(std::make_unique<QmitkSynchronizedWidgetConnector>());
+  m_SynchronizedWidgetConnectors.back()->ChangeSelection(currentSelection);
+
+  emit SynchGroupAdded(m_SynchronizedWidgetConnectors.size() - 1);
 }
 
-void QmitkMxNMultiWidget::ToggleSynchronization(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget)
+void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const int index)
 {
-  bool synchronized = synchronizedWidget->IsSynchronized();
+  if (index > m_SynchronizedWidgetConnectors.size())
+  {
+    MITK_ERROR << "Mismatch in number of SynchronizedWidgetConnectors. Trying to add index " << index << ", but currently there are only " << m_SynchronizedWidgetConnectors.size();
+  }
+  if (index == m_SynchronizedWidgetConnectors.size())
+  {
+    this->AddSynchronizationGroup();
+  }
 
-  if (synchronized)
-  {
-    m_SynchronizedWidgetConnector->ConnectWidget(synchronizedWidget);
-    m_SynchronizedWidgetConnector->SynchronizeWidget(synchronizedWidget);
-  }
-  else
-  {
-    m_SynchronizedWidgetConnector->DisconnectWidget(synchronizedWidget);
-  }
+  auto old_index = synchronizedWidget->GetSynchGroup();
+  if (old_index == index)
+    return;
+  synchronizedWidget->SetSynchGroup(index);
+
+  // For the initial setting of the synchronization, nothing old is there to disconnect
+  if (old_index != -1)
+    m_SynchronizedWidgetConnectors.at(old_index)->DisconnectWidget(synchronizedWidget);
+
+  m_SynchronizedWidgetConnectors.at(index)->ConnectWidget(synchronizedWidget);
+  m_SynchronizedWidgetConnectors.at(index)->SynchronizeWidget(synchronizedWidget);
 }

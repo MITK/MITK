@@ -61,19 +61,12 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   dataMenu->addAction(dataAction);
   layout->addWidget(menuBar);
 
-  m_SynchPushButton = new QPushButton(this);
-  auto* synchIcon = new QIcon();
-  auto synchronizeSvg = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/lock.svg"));
-  auto desynchronizeSvg = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/unlock.svg"));
-  synchIcon->addPixmap(synchronizeSvg.pixmap(64), QIcon::Normal, QIcon::On);
-  synchIcon->addPixmap(desynchronizeSvg.pixmap(64), QIcon::Normal, QIcon::Off);
-  m_SynchPushButton->setIcon(*synchIcon);
-  m_SynchPushButton->setToolTip("Synchronize / desynchronize data management");
-  m_SynchPushButton->setCheckable(true);
-  m_SynchPushButton->setChecked(true);
-  connect(m_SynchPushButton, &QPushButton::clicked,
-    this, &QmitkRenderWindowUtilityWidget::ToggleSynchronization);
-  layout->addWidget(m_SynchPushButton);
+  m_SynchGroupSelector = new QComboBox(this);
+  m_SynchGroupSelector->addItem("Global");
+  m_SynchGroupSelector->addItem("New Group");
+  connect(m_SynchGroupSelector, &QComboBox::currentIndexChanged,
+    this, &QmitkRenderWindowUtilityWidget::OnSynchGroupSelectionChanged);
+  layout->addWidget(m_SynchGroupSelector);
 
   auto* sliceNavigationController = m_BaseRenderer->GetSliceNavigationController();
   m_SliceNavigationWidget = new QmitkSliceNavigationWidget(this);
@@ -103,14 +96,16 @@ QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
 {
 }
 
-void QmitkRenderWindowUtilityWidget::ToggleSynchronization(bool synchronized)
+void QmitkRenderWindowUtilityWidget::OnSynchGroupSelectionChanged(int index)
 {
-  if (m_SynchPushButton->isChecked() != synchronized)
+  if (index == m_SynchGroupSelector->count() - 1)
   {
-    m_SynchPushButton->setChecked(synchronized);
+    m_SynchGroupSelector->blockSignals(true);
+    m_SynchGroupSelector->insertItem(index, QString("Group %1").arg(index));
+    m_SynchGroupSelector->setCurrentIndex(index);
+    m_SynchGroupSelector->blockSignals(false);
   }
-  m_NodeSelectionWidget->SetSynchronized(synchronized);
-  emit SynchronizationToggled(m_NodeSelectionWidget);
+  emit SetSynchGroup(m_NodeSelectionWidget, index);
 }
 
 void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)
@@ -186,5 +181,20 @@ void QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection()
     break;
   default:
     break;
+  }
+}
+
+QmitkSynchronizedNodeSelectionWidget* QmitkRenderWindowUtilityWidget::GetNodeSelectionWidget() const
+{
+  return m_NodeSelectionWidget;
+}
+
+void QmitkRenderWindowUtilityWidget::OnSynchGroupAdded(const int index)
+{
+  if (index == m_SynchGroupSelector->count() - 1)
+  {
+    m_SynchGroupSelector->blockSignals(true);
+    m_SynchGroupSelector->insertItem(index, QString("Group %1").arg(index));
+    m_SynchGroupSelector->blockSignals(false);
   }
 }

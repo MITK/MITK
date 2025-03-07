@@ -24,6 +24,11 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  struct PyObjectDeleter
+  {
+    void operator()(PyObject *obj) const { Py_XDECREF(obj); }
+  };
+  using PyObjectPtr = std::unique_ptr<PyObject, PyObjectDeleter>;
 
   class MITKPYTHON_EXPORT PythonContext : public itk::LightObject
   {
@@ -39,6 +44,7 @@ namespace mitk
     void TransferBaseDataToPython(mitk::BaseData *mitkImage, const std::string &varName = "_mitk_image");
     std::string ExecuteString(const std::string &pyCommands);
     std::string ExecuteFile(const std::string &filePath);
+    std::string GetPythonExceptionTraceback();
     const char *GetStdOut();
     void SetVirtualEnvironmentPath(const std::string &absolutePath); // site-package
     void ClearVirtualEnvironmentPath();
@@ -46,8 +52,8 @@ namespace mitk
   private:
     std::string m_CurrentVenvEnvPath;
     PyThreadState *m_ThreadState;
-    PyObject *m_GlobalDictionary;
-    PyObject *m_LocalDictionary;
+    PyObjectPtr m_GlobalDictionary;
+    PyObjectPtr m_LocalDictionary;
   };
 } // namespace mitk
 #endif

@@ -95,7 +95,7 @@ QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
 
 QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
 {
-  this->GetTool()->nnInterStatusMessageEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const bool>(
+  this->GetTool()->nnInterConfirmMessageEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const bool>(
     this, &QmitknnInteractiveToolGUI::StatusMessageListener);
 }
 
@@ -116,7 +116,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   m_Ui->autoZoomCheckBox->setChecked(this->GetTool()->GetAutoZoom());
   connect(m_Ui->autoZoomCheckBox, &QCheckBox::toggled, this, &Self::OnAutoZoomCheckBoxToggled);
 
-  this->GetTool()->nnInterStatusMessageEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const bool>(
+  this->GetTool()->nnInterConfirmMessageEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const bool>(
     this, &QmitknnInteractiveToolGUI::StatusMessageListener);
 
   Superclass::InitializeUI(mainLayout);

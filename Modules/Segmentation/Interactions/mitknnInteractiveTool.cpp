@@ -970,7 +970,6 @@ void mitk::nnInteractiveTool::InitializeBackend()
 
 void mitk::nnInteractiveTool::ConfirmCleanUp()
 {
-  m_ActiveTool.reset();
-  nnInterStatusMessageEvent.Send(true);
+  nnInterConfirmMessageEvent.Send(true);
   RenderingManager::GetInstance()->RequestUpdateAll();
 }

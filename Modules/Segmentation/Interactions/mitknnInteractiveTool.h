@@ -73,7 +73,7 @@ namespace mitk
     itkGetConstMacro(IsSessionReady, bool);
     itkBooleanMacro(IsSessionReady);
 
-    mitk::Message1<const bool> nnInterStatusMessageEvent;
+    mitk::Message1<const bool> nnInterConfirmMessageEvent;
 
   protected:
     enum class Intensity

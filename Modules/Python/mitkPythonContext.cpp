@@ -105,10 +105,9 @@ const char *mitk::PythonContext::GetStdOut()
   PyObject *capture_output = PyDict_GetItemString(m_LocalDictionary.get(), "_mitk_stdout");
   if (capture_output != NULL)
   {
-    PyObject *output_val = PyObject_CallMethod(capture_output, "getvalue", nullptr);
-    _mitk_stdout = PyUnicode_AsUTF8(output_val);
+    PyObjectPtr output_val(PyObject_CallMethod(capture_output, "getvalue", nullptr));
+    _mitk_stdout = PyUnicode_AsUTF8(output_val.get());
     MITK_INFO << "_mitk_stdout: " << _mitk_stdout;
-    Py_XDECREF(output_val);
   }
   else
   {
@@ -121,17 +120,16 @@ const char *mitk::PythonContext::GetStdOut()
 mitk::Image::Pointer mitk::PythonContext::LoadImageFromPython(const std::string &varName)
 {
   PyGILState_STATE state = PyGILState_Ensure();
-  PyObject *pyVar = PyDict_GetItemString(m_LocalDictionary.get(), varName.c_str());
-  if (pyVar == NULL && !(pyVar = PyDict_GetItemString(m_GlobalDictionary.get(), varName.c_str())))
+  PyObject *pyImage = PyDict_GetItemString(m_LocalDictionary.get(), varName.c_str());
+  if (pyImage == NULL && !(pyImage = PyDict_GetItemString(m_GlobalDictionary.get(), varName.c_str())))
   {
     mitkThrow() << "Could not get image from Python";
   }
-  PyObjectPtr pyImage(pyVar);
   int res = 0; // status variable to check if result is OK
   void *voidImage;
   swig_type_info *pTypeInfo = nullptr;
   pTypeInfo = SWIG_TypeQuery("_p_mitk__Image");
-  res = SWIG_ConvertPtr(pyImage.get(), &voidImage, pTypeInfo, 0); // get image from Python as void pointer
+  res = SWIG_ConvertPtr(pyImage, &voidImage, pTypeInfo, 0); // get image from Python as void pointer
   if (!SWIG_IsOK(res))
   {
     mitkThrow() << "Could not cast image to C++ type";

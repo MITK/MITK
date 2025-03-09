@@ -162,13 +162,13 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData,
   {
     MITK_INFO << "Object is of unsupported type";
   }
-  PyObjectPtr pInstance(SWIG_NewPointerObj(reinterpret_cast<void *>(mitkBaseData), pTypeInfo, owned));
+  PyObject *pInstance = SWIG_NewPointerObj(reinterpret_cast<void *>(mitkBaseData), pTypeInfo, owned);
   if (nullptr == pInstance)
   {
     MITK_ERROR << "Something went wrong creating the Python instance of the image\n";
   }
-  PyObjectPtr receive(PyDict_GetItemString(m_LocalDictionary.get(), "_receive"));
-  PyObjectPtr result(PyObject_CallFunctionObjArgs(receive.get(), pInstance.get(), NULL));
+  PyObject *receive = PyDict_GetItemString(m_LocalDictionary.get(), "_receive");
+  PyObjectPtr result(PyObject_CallFunctionObjArgs(receive, pInstance, NULL));
   if (nullptr == result)
   {
     MITK_ERROR << "Something went wrong setting the image in Python\n";

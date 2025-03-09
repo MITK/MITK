@@ -64,7 +64,8 @@ mitk::nnInteractiveTool::nnInteractiveTool()
     m_ScribbleTool(nnInteractiveScribbleTool::New()),
     m_LassoTool(nnInteractiveLassoTool::New()),
     m_IsSessionReady(false),
-    m_LastSetTimePoint(std::numeric_limits<double>::lowest())
+    m_LastSetTimePoint(std::numeric_limits<double>::lowest()),
+    SegWithPreviewTool(true) // prevents auto-compute across all timesteps
 {
   auto scribbleCommand = itk::MemberCommand<Self>::New();
   scribbleCommand->SetCallbackFunction(this, &Self::OnScribbleEvent);
@@ -271,6 +272,7 @@ void mitk::nnInteractiveTool::ResetInteractions()
                             "   session.reset_interactions()\n";
     m_PythonContext->ExecuteString(pyCommand);
   }
+  this->PopAllCursors();
 }
 
 void mitk::nnInteractiveTool::BlockLMBDisplayInteraction()

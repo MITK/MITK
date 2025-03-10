@@ -44,7 +44,8 @@ public:
   QmitkRenderWindowUtilityWidget(
     QWidget* parent = nullptr,
     QmitkRenderWindow* renderWindow = nullptr,
-    mitk::DataStorage* dataStorage = nullptr
+    mitk::DataStorage* dataStorage = nullptr,
+    const int nSynchGroups = 1
   );
 
   ~QmitkRenderWindowUtilityWidget() override;

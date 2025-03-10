@@ -30,7 +30,8 @@ found in the LICENSE file.
 QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QWidget* parent/* = nullptr */,
   QmitkRenderWindow* renderWindow/* = nullptr */,
-  mitk::DataStorage* dataStorage/* = nullptr */)
+  mitk::DataStorage* dataStorage/* = nullptr */,
+  const int nSynchGroups/* = 1 */)
   : m_NodeSelectionWidget(nullptr)
   , m_SliceNavigationWidget(nullptr)
   , m_StepperAdapter(nullptr)
@@ -63,6 +64,8 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
 
   m_SynchGroupSelector = new QComboBox(this);
   m_SynchGroupSelector->addItem("Global");
+  for (int i=1; i<nSynchGroups; ++i)
+    m_SynchGroupSelector->insertItem(i, QString("Group %1").arg(i));
   m_SynchGroupSelector->addItem("New Group");
   connect(m_SynchGroupSelector, &QComboBox::currentIndexChanged,
     this, &QmitkRenderWindowUtilityWidget::OnSynchGroupSelectionChanged);

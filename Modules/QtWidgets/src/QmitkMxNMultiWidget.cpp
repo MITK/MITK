@@ -363,7 +363,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
 
-  QmitkRenderWindowUtilityWidget* utilityWidget = new QmitkRenderWindowUtilityWidget(this, renderWindow, GetDataStorage());
+  QmitkRenderWindowUtilityWidget* utilityWidget = new QmitkRenderWindowUtilityWidget(this, renderWindow, GetDataStorage(), m_SynchronizedWidgetConnectors.size());
   renderWindowWidget->AddUtilityWidget(utilityWidget);
 
   connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,

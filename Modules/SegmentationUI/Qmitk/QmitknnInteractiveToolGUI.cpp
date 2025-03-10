@@ -83,6 +83,18 @@ namespace
     auto button = QMessageBox::question(nullptr, title, message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     return button == QMessageBox::Yes;
   }
+
+  QCursor LoadToolCursor(mitk::nnInteractiveTool::Tool tool, mitk::nnInteractiveTool::PromptType promptType)
+  {
+    auto fileName = QString(":/nnInteractive/%1_cursor_%2")
+      .arg(QString::fromStdString(mitk::nnInteractiveTool::GetToolString(tool)))
+      .arg(QString::fromStdString(mitk::nnInteractiveTool::GetPromptTypeString(promptType)));
+
+    QPixmap pixmap;
+    pixmap.load(fileName);
+
+    return QCursor(pixmap, 0, 0);
+  }
 }
 
 QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
@@ -95,6 +107,8 @@ QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
 
 QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
 {
+  this->UncheckOtherToolButtons(nullptr); // Ensure override cursor restoration.
+
   this->GetTool()->nnInterConfirmMessageEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const bool>(
     this, &QmitknnInteractiveToolGUI::StatusMessageListener);
 }
@@ -227,8 +241,7 @@ void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()
     button->setChecked(false);
 
   this->GetTool()->ResetInteractions();
-  m_Ui->positiveButton->setChecked(true);
-  m_Ui->negativeButton->setChecked(false);
+  m_Ui->positiveButton->click();
 }
 
 void QmitknnInteractiveToolGUI::OnPromptTypeChanged()
@@ -238,6 +251,7 @@ void QmitknnInteractiveToolGUI::OnPromptTypeChanged()
     if (m_ToolButtons[tool]->isChecked())
     {
       this->GetTool()->EnableInteraction(tool, m_PromptType);
+      QApplication::changeOverrideCursor(LoadToolCursor(tool, m_PromptType));
       break;
     }
   }
@@ -249,9 +263,11 @@ void QmitknnInteractiveToolGUI::OnToolToggled(Tool tool, bool checked)
   {
     this->UncheckOtherToolButtons(m_ToolButtons[tool]);
     this->GetTool()->EnableInteraction(tool, m_PromptType);
+    QApplication::setOverrideCursor(LoadToolCursor(tool, m_PromptType));
   }
   else
   {
+    QApplication::restoreOverrideCursor();
     this->GetTool()->DisableInteraction();
   }
 }

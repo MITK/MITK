@@ -34,6 +34,32 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive");
 }
 
+std::string mitk::nnInteractiveTool::GetToolString(Tool tool)
+{
+  switch (tool)
+  {
+    case Tool::Box:
+      return "box";
+
+    case Tool::Lasso:
+      return "lasso";
+
+    case Tool::Point:
+      return "point";
+
+    default:
+      return "scribble";
+  }
+}
+
+std::string mitk::nnInteractiveTool::GetPromptTypeString(PromptType promptType)
+{
+  if (promptType == PromptType::Positive)
+    return "positive";
+
+  return "negative";
+}
+
 const mitk::Color& mitk::nnInteractiveTool::GetColor(PromptType promptType, Intensity intensity)
 {
   static auto vibrantPositiveColor = MakeColor(0.0f, 0.694f, 0.047f);
@@ -624,14 +650,6 @@ std::string mitk::nnInteractiveTool::CreateNodeName(const std::string& name, std
   stream << ' ' << name;
 
   return stream.str();
-}
-
-std::string mitk::nnInteractiveTool::GetPromptTypeString(PromptType promptType) const
-{
-  if (promptType == PromptType::Positive)
-    return "positive";
-
-  return "negative";
 }
 
 void mitk::nnInteractiveTool::CreatePointInteractor()

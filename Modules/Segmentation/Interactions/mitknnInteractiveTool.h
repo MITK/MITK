@@ -46,6 +46,9 @@ namespace mitk
       Negative
     };
 
+    static std::string GetToolString(Tool tool);
+    static std::string GetPromptTypeString(PromptType promptType);
+
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool)
     itkFactorylessNewMacro(Self)
 
@@ -66,8 +69,6 @@ namespace mitk
 
     bool GetAutoZoom() const;
     void SetAutoZoom(bool autoZoom);
-
-    std::string GetPromptTypeString(PromptType promptType) const;
 
     itkSetMacro(IsSessionReady, bool);
     itkGetConstMacro(IsSessionReady, bool);

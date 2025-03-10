@@ -305,7 +305,8 @@ bool mitk::nnInteractiveTool::HasInteractions() const
     if (!this->GetLassoNodes(promptType).empty())
       return true;
 
-    // TODO: Check for scribble interactions.
+    if (m_ScribbleNode.IsNotNull() && !m_ScribbleNode->GetDataAs<LabelSetImage>()->IsEmpty(m_ScribbleLabels.at(promptType)))
+      return true;
   }
 
   return false;

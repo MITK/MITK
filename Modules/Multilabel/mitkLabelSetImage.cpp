@@ -750,7 +750,7 @@ bool mitk::LabelSetImage::IsEmpty(PixelType pixelValue, TimeStepType t) const
 
   for (size_t i = 0; i < numPixels; ++i)
   {
-    if (pixels[i] != UNLABELED_VALUE)
+    if (pixels[i] == pixelValue)
       return false;
   }
 

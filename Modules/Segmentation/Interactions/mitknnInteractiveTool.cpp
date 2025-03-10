@@ -292,6 +292,25 @@ void mitk::nnInteractiveTool::ResetInteractions()
   this->UpdatePreview();
 }
 
+bool mitk::nnInteractiveTool::HasInteractions() const
+{
+  for (auto promptType : { PromptType::Positive, PromptType::Negative })
+  {
+    if (this->GetPointSetNode(promptType)->GetDataAs<PointSet>()->GetSize() != 0)
+      return true;
+
+    if (!this->GetBoxNodes(promptType).empty())
+      return true;
+
+    if (!this->GetLassoNodes(promptType).empty())
+      return true;
+
+    // TODO: Check for scribble interactions.
+  }
+
+  return false;
+}
+
 void mitk::nnInteractiveTool::BlockLMBDisplayInteraction()
 {
   if (!m_EventConfigBackup.empty())

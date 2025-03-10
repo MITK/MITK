@@ -64,6 +64,7 @@ namespace mitk
     void EnableInteraction(Tool tool, PromptType promptType);
     void DisableInteraction();
     void ResetInteractions();
+    bool HasInteractions() const;
 
     void AddInitialSegInteraction(/*const*/ Image *mask);
 

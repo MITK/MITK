@@ -28,8 +28,6 @@ found in the LICENSE file.
 #include "mitkPadImageFilter.h"
 #include "mitkNodePredicateGeometry.h"
 #include "mitkSegTool2D.h"
-#include <mitkApplicationCursor.h>
-#include <usModuleResourceStream.h>
 
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
@@ -851,34 +849,4 @@ void mitk::SegWithPreviewTool::TransferLabelSetImageContent(const LabelSetImage*
 bool mitk::SegWithPreviewTool::ConfirmBeforeDeactivation()
 {
   return m_IsPreviewGenerated && m_RequestDeactivationConfirmation;
-}
-
-void mitk::SegWithPreviewTool::PushCursor()
-{
-  this->PushCursor(this->GetCursorIconResource());
-}
-
-void mitk::SegWithPreviewTool::PushCursor(us::ModuleResource cursorResource)
-{
-  if (cursorResource.IsValid())
-  {
-    us::ModuleResourceStream cursor(cursorResource, std::ios::binary);
-    ApplicationCursor::GetInstance()->PushCursor(cursor, 0, 0);
-    ++m_NumPushedCursors;
-  }
-}
-
-void mitk::SegWithPreviewTool::PopCursor(bool popFirstCursor)
-{
-  if ((popFirstCursor && m_NumPushedCursors > 0) || m_NumPushedCursors > 1)
-  {
-    ApplicationCursor::GetInstance()->PopCursor();
-    --m_NumPushedCursors;
-  }
-}
-
-void mitk::SegWithPreviewTool::PopAllCursors()
-{
-  while (m_NumPushedCursors > 0)
-    this->PopCursor(true);
 }

@@ -247,11 +247,6 @@ namespace mitk
 
     bool ConfirmBeforeDeactivation() override;
 
-    void PushCursor();
-    void PushCursor(us::ModuleResource cursorResource);
-    void PopCursor(bool popFirstCursor = false);
-    void PopAllCursors();
-
   private:
     void TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep, const LabelMappingType& labelMapping);
 
@@ -337,8 +332,6 @@ namespace mitk
      * Call RequestDeactivationConfirmationOn() in the tool class to avail this feature.
      */
     bool m_RequestDeactivationConfirmation = false;
-
-    unsigned int m_NumPushedCursors = 0;
   };
 
 } // namespace

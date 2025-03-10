@@ -22,7 +22,11 @@ bool DefaultEnableConfirmSegBtnFunction(bool enabled)
   return enabled;
 }
 
-QmitkSegWithPreviewToolGUIBase::QmitkSegWithPreviewToolGUIBase(bool mode2D) : QmitkToolGUI(), m_EnableConfirmSegBtnFnc(DefaultEnableConfirmSegBtnFunction), m_Mode2D(mode2D)
+QmitkSegWithPreviewToolGUIBase::QmitkSegWithPreviewToolGUIBase(bool mode2D, bool enableTimeSteps)
+  : QmitkToolGUI(),
+    m_EnableConfirmSegBtnFnc(DefaultEnableConfirmSegBtnFunction),
+    m_Mode2D(mode2D),
+    m_EnableAllTimeSteps(enableTimeSteps)
 {
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 }
@@ -163,6 +167,7 @@ void QmitkSegWithPreviewToolGUIBase::EnableWidgets(bool enabled)
     }
     if (nullptr != m_CheckProcessAll)
     {
+      enabled = m_EnableAllTimeSteps && enabled;
       m_CheckProcessAll->setEnabled(enabled);
     }
   }

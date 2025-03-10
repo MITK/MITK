@@ -44,7 +44,7 @@ protected slots:
   void OnAcceptPreview();
 
 protected:
-  QmitkSegWithPreviewToolGUIBase(bool mode2D);
+  QmitkSegWithPreviewToolGUIBase(bool mode2D, bool enableTimeSteps = true);
   ~QmitkSegWithPreviewToolGUIBase() override;
 
   virtual void DisconnectOldTool(mitk::SegWithPreviewTool* oldTool);
@@ -88,6 +88,7 @@ private:
 
   /**Indicates if the tool is in 2D or 3D mode.*/
   bool m_Mode2D;
+  bool m_EnableAllTimeSteps;
 
   mitk::SegWithPreviewTool::Pointer m_Tool;
 };

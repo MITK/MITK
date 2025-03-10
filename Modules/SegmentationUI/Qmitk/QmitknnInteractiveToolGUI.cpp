@@ -98,7 +98,7 @@ namespace
 }
 
 QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
-  : QmitkSegWithPreviewToolGUIBase(false),
+  : QmitkSegWithPreviewToolGUIBase(false, false),
     m_Ui(new Ui::QmitknnInteractiveToolGUI),
     m_PromptTypeButtonGroup(new QButtonGroup(this)),
     m_PromptType(PromptType::Positive)

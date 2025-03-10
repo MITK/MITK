@@ -153,8 +153,6 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
 
     this->DisableInteraction();
   }
-  this->PopAllCursors();
-  auto module = us::GetModuleContext()->GetModule();
 
   switch (tool)
   {
@@ -172,27 +170,19 @@ void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType
       break;
 
     case Tool::Scribble:
-    {
       this->AddScribbleNode();
       this->SetActiveScribbleLabel(promptType);
       m_ToolManager->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
       m_ToolManager->SetWorkingData(m_ScribbleNode);
       m_ScribbleTool->Activate(this->GetColor(promptType, Intensity::Vibrant));
-      auto cursorResource = module->GetResource("Paint_Cursor.svg");
-      this->PushCursor(cursorResource);
       break;
-    }
 
     case Tool::Lasso:
-    {
       this->AddLassoMaskNode(promptType);
       m_ToolManager->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
       m_ToolManager->SetWorkingData(m_LassoMaskNode);
       m_LassoTool->Activate(this->GetColor(promptType, Intensity::Vibrant));
-      auto cursorResource = module->GetResource("Lasso_Cursor.svg");
-      this->PushCursor(cursorResource);
       break;
-    }
 
     default:
       break;
@@ -614,6 +604,7 @@ void mitk::nnInteractiveTool::AddLassoInteraction(const Image* mask)
 
 void mitk::nnInteractiveTool::AddInitialSegInteraction(/*const*/ Image *mask)
 {
+  MITK_INFO << "AddInitialSegInteraction()";
   m_MaskImage = mask;
   m_ActiveTool.reset();
   if (this->IsNewTimePoint())
@@ -876,6 +867,7 @@ void mitk::nnInteractiveTool::SetImageInSession()
   {
     mitkThrow() << "Error: Python context was not activated.";
   }
+  MITK_INFO << "in SetImageInSession......";
   auto *inputImage = dynamic_cast<Image *>(this->GetToolManager()->GetReferenceData(0)->GetData());
   const TimePointType timePoint =
     RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();

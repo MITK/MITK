@@ -281,7 +281,6 @@ void mitk::nnInteractiveTool::ResetInteractions()
 
     nodes.clear();
   }
-  this->ResetPreviewContent();
 
   if (m_PythonContext.IsNotNull() && m_PythonContext->IsVariableExists("session"))
   {
@@ -289,6 +288,8 @@ void mitk::nnInteractiveTool::ResetInteractions()
                             "   session.reset_interactions()\n";
     m_PythonContext->ExecuteString(pyCommand);
   }
+  m_ActiveTool.reset();
+  this->UpdatePreview();
 }
 
 void mitk::nnInteractiveTool::BlockLMBDisplayInteraction()
@@ -858,6 +859,10 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
       m_PythonContext->ExecuteString(pyCommand);
       mitk::ImageReadAccessor newMitkImgAcc(m_OutputBuffer.GetPointer());
       previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
+    }
+    else
+    {
+      this->ResetPreviewContentAtTimeStep(timeStep);
     }
   }
 }

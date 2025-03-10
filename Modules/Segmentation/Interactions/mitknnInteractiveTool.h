@@ -74,6 +74,9 @@ namespace mitk
     itkGetConstMacro(IsSessionReady, bool);
     itkBooleanMacro(IsSessionReady);
 
+    itkSetMacro(ActiveTool, std::optional<Tool>);
+    itkGetConstMacro(ActiveTool, std::optional<Tool>);
+
     mitk::Message1<const bool> nnInterConfirmMessageEvent;
 
   protected:

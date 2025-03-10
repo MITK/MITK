@@ -103,6 +103,10 @@ QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
     m_PromptTypeButtonGroup(new QButtonGroup(this)),
     m_PromptType(PromptType::Positive)
 {
+  m_EnableConfirmSegBtnFnc = [this](bool enabled)
+  {
+    return (enabled && (this->GetTool()->GetActiveTool().has_value()));
+  };
 }
 
 QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()

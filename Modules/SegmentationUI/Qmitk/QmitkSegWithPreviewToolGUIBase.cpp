@@ -126,7 +126,7 @@ void QmitkSegWithPreviewToolGUIBase::ConnectNewTool(mitk::SegWithPreviewTool* ne
   newTool->CurrentlyBusy +=
     mitk::MessageDelegate1<QmitkSegWithPreviewToolGUIBase, bool>(this, &QmitkSegWithPreviewToolGUIBase::BusyStateChanged);
 
-  m_CheckProcessAll->setVisible(newTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
+  m_CheckProcessAll->setVisible(m_EnableAllTimeSteps && (newTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1));
 
   this->EnableWidgets(true);
 }
@@ -167,7 +167,6 @@ void QmitkSegWithPreviewToolGUIBase::EnableWidgets(bool enabled)
     }
     if (nullptr != m_CheckProcessAll)
     {
-      enabled = m_EnableAllTimeSteps && enabled;
       m_CheckProcessAll->setEnabled(enabled);
     }
   }

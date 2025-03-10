@@ -47,10 +47,10 @@ namespace
 
   bool IsLabelEmpty(mitk::LabelSetImage* segmentation, mitk::Label* label)
   {
-    segmentation->UpdateCenterOfMass(label->GetValue());
-    const auto point = label->GetCenterOfMassIndex();
+    const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    const auto timeStep = segmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
-    if (std::max({ point[0], point[1], point[2] }) >= mitk::eps)
+    if (!segmentation->IsEmpty(label, timeStep))
       return false;
 
     QString title = "nnInteractive - Initialize with Mask";
@@ -199,20 +199,6 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   m_Ui->resetButton->setEnabled(checked);
   m_Ui->promptTypeGroupBox->setEnabled(checked);
   m_Ui->interactionToolsGroupBox->setEnabled(checked);
-
-  bool enableMaskButton = false;
-
-  if (auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(); toolManager != nullptr)
-  {
-    if (const auto* segmentationNode = toolManager->GetWorkingData(0); segmentationNode != nullptr)
-    {
-      auto segmentation = segmentationNode->GetDataAs<mitk::LabelSetImage>();
-      enableMaskButton = segmentation->GetDimension() == 3;
-    }
-  }
-
-  m_Ui->maskButton->setEnabled(enableMaskButton);
-
  
   QMessageBox messageBox(QMessageBox::Information,
                            "nnInteractive",

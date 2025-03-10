@@ -51,6 +51,7 @@ public:
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
   void SetBaseRenderer(mitk::BaseRenderer* baseRenderer);
+  void SetStorageModel(QmitkRenderWindowDataNodeTableModel* storageModel);
 
   void SetSelectAll(bool selectAll);
   bool GetSelectAll() const;
@@ -95,7 +96,7 @@ private:
   Ui::QmitkSynchronizedNodeSelectionWidget m_Controls;
   mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
 
-  std::unique_ptr<QmitkRenderWindowDataNodeTableModel> m_StorageModel;
+  QmitkRenderWindowDataNodeTableModel* m_StorageModel;
   int m_SynchGroupIndex;
 
 };

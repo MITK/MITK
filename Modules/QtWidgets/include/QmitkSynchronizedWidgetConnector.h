@@ -63,7 +63,7 @@ public:
   *
   * @param nodeSelectionWidget    The synchronized node selection widget to be connected / synchronized.
   */
-  void ConnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget);
+  void ConnectWidget(QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget);
   /*
   * @brief This function disconnects the different signals and slot of this instance and the given
   *        given node selection widget, such that changes to the current list of nodes
@@ -71,7 +71,7 @@ public:
   *
   * @param nodeSelectionWidget    The synchronized node selection widget to be disconnected / desynchronized.
   */
-  void DisconnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget);
+  void DisconnectWidget(QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget);
   /*
   * @brief This function sets the current selection and the selection mode of the given node selection widget
   *        to the values of this instance. The required values are stored in this class internally.
@@ -152,6 +152,7 @@ public Q_SLOTS:
 private:
 
   NodeList m_InternalSelection;
+  std::unique_ptr<QmitkRenderWindowDataNodeTableModel> m_StorageModel;
   bool m_SelectAll;
   unsigned int m_ConnectionCounter;
 

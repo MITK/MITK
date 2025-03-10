@@ -25,29 +25,16 @@ found in the LICENSE file.
 QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidget* parent)
   : QmitkAbstractNodeSelectionWidget(parent)
   , m_SynchGroupIndex(-1)
+  , m_StorageModel(nullptr)
 {
   m_Controls.setupUi(this);
 
-  m_StorageModel = std::make_unique<QmitkRenderWindowDataNodeTableModel>(this);
-
-  m_Controls.tableView->setModel(m_StorageModel.get());
   m_Controls.tableView->horizontalHeader()->setVisible(false);
   m_Controls.tableView->verticalHeader()->setVisible(false);
   m_Controls.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls.tableView->setContextMenuPolicy(Qt::CustomContextMenu);
   m_Controls.tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
-  auto header = m_Controls.tableView->horizontalHeader();
-  header->setSectionResizeMode(0, QHeaderView::Stretch);
-
-  const int columnCount = m_StorageModel->columnCount();
-
-  for (int column = 1; column < columnCount; ++column)
-  {
-    header->setSectionResizeMode(column, QHeaderView::Fixed);
-    header->resizeSection(column, 0); // As small as possible yet big enough for icons.
-  }
 
   this->SetUpConnections();
   this->Initialize();
@@ -95,7 +82,11 @@ void QmitkSynchronizedNodeSelectionWidget::SetBaseRenderer(mitk::BaseRenderer* b
 
   auto oldBaseRenderer = m_BaseRenderer.Lock();
   m_BaseRenderer = baseRenderer;
-  m_StorageModel->SetCurrentRenderer(baseRenderer);
+  if (m_StorageModel != nullptr)
+  {
+    m_StorageModel->RemoveRenderer(oldBaseRenderer);
+    m_StorageModel->AddRenderer(baseRenderer);
+  }
 
   auto dataStorage = m_DataStorage.Lock();
   if (dataStorage.IsNull())
@@ -175,7 +166,7 @@ void QmitkSynchronizedNodeSelectionWidget::OnEditSelection()
 
 void QmitkSynchronizedNodeSelectionWidget::OnTableClicked(const QModelIndex& index)
 {
-  if (!index.isValid() || m_StorageModel.get() != index.model())
+  if (!index.isValid() || m_StorageModel != index.model())
   {
     return;
   }
@@ -228,10 +219,13 @@ void QmitkSynchronizedNodeSelectionWidget::SetSelection(const NodeList& newSelec
 
 void QmitkSynchronizedNodeSelectionWidget::Initialize()
 {
+  if (m_StorageModel == nullptr)
+    return;
+
   auto baseRenderer = m_BaseRenderer.Lock();
   auto dataStorage = m_DataStorage.Lock();
   m_StorageModel->SetDataStorage(dataStorage);
-  m_StorageModel->SetCurrentRenderer(baseRenderer);
+  m_StorageModel->AddRenderer(baseRenderer);
 
   if (baseRenderer.IsNull() || dataStorage.IsNull())
   {
@@ -544,4 +538,27 @@ void QmitkSynchronizedNodeSelectionWidget::SetSynchGroup(const int index)
 int QmitkSynchronizedNodeSelectionWidget::GetSynchGroup() const
 {
   return m_SynchGroupIndex;
+}
+
+void QmitkSynchronizedNodeSelectionWidget::SetStorageModel(QmitkRenderWindowDataNodeTableModel* storageModel)
+{
+  m_StorageModel = storageModel;
+
+  m_Controls.tableView->setModel(storageModel);
+
+  auto header = m_Controls.tableView->horizontalHeader();
+  header->setSectionResizeMode(0, QHeaderView::Stretch);
+  const int columnCount = m_StorageModel->columnCount();
+  for (int column = 1; column < columnCount; ++column)
+  {
+    header->setSectionResizeMode(column, QHeaderView::Fixed);
+    header->resizeSection(column, 0); // As small as possible yet big enough for icons.
+  }
+
+  if (m_BaseRenderer != nullptr)
+  {
+    m_StorageModel->AddRenderer(m_BaseRenderer.Lock());
+  }
+
+  this->Initialize();
 }

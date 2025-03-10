@@ -85,60 +85,59 @@ bool mitk::RenderWindowLayerController::MoveNodeToPosition(DataNode* dataNode, i
 
   // get the layer stack of the current renderer
   RenderWindowLayerUtilities::LayerStack stackedLayers = RenderWindowLayerUtilities::GetLayerStack(m_DataStorage, renderer);
-  if (!stackedLayers.empty())
+  if (stackedLayers.empty())
+    // do not work with empty layer stack
+    return false;
+
+  // get the current layer value of the given data node
+  int currentLayer;
+  bool wasFound = dataNode->GetIntProperty("layer", currentLayer, renderer);
+  if (!wasFound || currentLayer == newLayer)
+    // data node has no layer information or is already at the specified position
+    return false;
+
+  // move the given data node to the specified layer
+  dataNode->SetIntProperty("layer", newLayer, renderer);
+
+  int upperBound;
+  int lowerBound;
+  int step;
+  if (currentLayer < newLayer)
   {
-    // get the current layer value of the given data node
-    int currentLayer;
-    bool wasFound = dataNode->GetIntProperty("layer", currentLayer, renderer);
-    if (wasFound && currentLayer != newLayer)
-    {
-      // move the given data node to the specified layer
-      dataNode->SetIntProperty("layer", newLayer, renderer);
-
-      int upperBound;
-      int lowerBound;
-      int step;
-      if (currentLayer < newLayer)
-      {
-        // move node up
-        upperBound = newLayer + 1;
-        lowerBound = currentLayer + 1;
-        step = -1; // move all other nodes one step down
-      }
-      else
-      {
-        upperBound = currentLayer;
-        lowerBound = newLayer;
-        step = 1; // move all other nodes one step up
-      }
-
-      // move all other data nodes between the upper and the lower bound
-      for (auto& layer : stackedLayers)
-      {
-        if (layer.second != dataNode && layer.first < upperBound && layer.first >= lowerBound)
-        {
-          layer.second->SetIntProperty("layer", layer.first + step, renderer);
-        }
-        // else: current data node is the selected data node or
-        // was previously already above the selected data node or
-        // was previously already below the new layer position
-      }
-      dataNode->Modified();
-      if (nullptr == renderer)
-      {
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      }
-      else
-      {
-        mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
-      }
-
-      return true;
-    }
-    // else: data node has no layer information or is already at the specified position
+    // move node up
+    upperBound = newLayer + 1;
+    lowerBound = currentLayer + 1;
+    step = -1; // move all other nodes one step down
   }
-  // else: do not work with empty layer stack
-  return false;
+  else
+  {
+    upperBound = currentLayer;
+    lowerBound = newLayer;
+    step = 1; // move all other nodes one step up
+  }
+
+  // move all other data nodes between the upper and the lower bound
+  for (auto& layer : stackedLayers)
+  {
+    if (layer.second != dataNode && layer.first < upperBound && layer.first >= lowerBound)
+    {
+      layer.second->SetIntProperty("layer", layer.first + step, renderer);
+    }
+    // else: current data node is the selected data node or
+    // was previously already above the selected data node or
+    // was previously already below the new layer position
+  }
+  dataNode->Modified();
+  if (nullptr == renderer)
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+  }
+
+  return true;
 }
 
 bool mitk::RenderWindowLayerController::MoveNodeToFront(DataNode* dataNode, const BaseRenderer* renderer /*= nullptr*/)

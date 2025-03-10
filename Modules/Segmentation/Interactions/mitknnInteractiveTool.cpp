@@ -81,6 +81,7 @@ const mitk::Color& mitk::nnInteractiveTool::GetColor(PromptType promptType, Inte
 
 mitk::nnInteractiveTool::nnInteractiveTool()
   : m_AutoZoom(true),
+    m_MaskImage(nullptr),
     m_PromptType(PromptType::Positive),
     m_Tools {
       Tool::Point,

@@ -181,6 +181,20 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   m_Ui->resetButton->setEnabled(checked);
   m_Ui->promptTypeGroupBox->setEnabled(checked);
   m_Ui->interactionToolsGroupBox->setEnabled(checked);
+
+  bool enableMaskButton = false;
+
+  if (auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(); toolManager != nullptr)
+  {
+    if (const auto* segmentationNode = toolManager->GetWorkingData(0); segmentationNode != nullptr)
+    {
+      auto segmentation = segmentationNode->GetDataAs<mitk::LabelSetImage>();
+      enableMaskButton = segmentation->GetDimension() == 3;
+    }
+  }
+
+  m_Ui->maskButton->setEnabled(enableMaskButton);
+
  
   QMessageBox messageBox(QMessageBox::Information,
                            "nnInteractive",

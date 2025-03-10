@@ -432,6 +432,11 @@ namespace mitk
       * \brief  */
       void UpdateCenterOfMass(PixelType pixelValue);
 
+    /** \brief Checks if a label is empty at a given time step (does not caintain any pixels).
+      */
+    bool IsEmpty(const Label* label, TimeStepType t = 0) const;
+    bool IsEmpty(PixelType pixelValue, TimeStepType t = 0) const;
+
     /**
      * @brief Initialize an empty mitk::LabelSetImage using the information
      *        of an mitk::Image

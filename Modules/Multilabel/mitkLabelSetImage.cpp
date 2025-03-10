@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
+#include <mitkImagePixelReadAccessor.h>
 #include <mitkImagePixelWriteAccessor.h>
 #include <mitkPadImageFilter.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
@@ -723,6 +724,45 @@ void mitk::LabelSetImage::UpdateCenterOfMass(PixelType pixelValue)
   {
     AccessByItk_1(this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue)), CalculateCenterOfMassProcessing, pixelValue);
   }
+}
+
+bool mitk::LabelSetImage::IsEmpty(PixelType pixelValue, TimeStepType t) const
+{
+  Image::ConstPointer image = this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue));
+
+  if (image->GetDimension() == 4)
+  {
+    auto timeSelector = mitk::ImageTimeSelector::New();
+    timeSelector->SetInput(image);
+    timeSelector->SetTimeNr(t);
+    timeSelector->Update();
+
+    image = timeSelector->GetOutput();
+  }
+
+  size_t numPixels = 1;
+
+  for (int i = 0; i < 3; ++i)
+    numPixels *= static_cast<size_t>(image->GetDimension(i));
+
+  ImagePixelReadAccessor<PixelType, 3> accessor(image);
+  auto pixels = accessor.GetData();
+
+  for (size_t i = 0; i < numPixels; ++i)
+  {
+    if (pixels[i] != UNLABELED_VALUE)
+      return false;
+  }
+
+  return true;
+}
+
+bool mitk::LabelSetImage::IsEmpty(const Label* label, TimeStepType t) const
+{
+  if (label == nullptr)
+    mitkThrow() << "Cannot check if label is empty. Label is null.";
+
+  return this->IsEmpty(label->GetValue(), t);
 }
 
 void mitk::LabelSetImage::SetLookupTable(mitk::LookupTable* lut)

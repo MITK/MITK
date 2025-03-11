@@ -91,7 +91,7 @@ mitk::nnInteractiveTool::nnInteractiveTool()
     m_ScribbleTool(nnInteractiveScribbleTool::New()),
     m_LassoTool(nnInteractiveLassoTool::New()),
     m_IsSessionReady(false),
-    m_LastSetTimePoint(std::numeric_limits<double>::lowest()),
+    m_LastSetTimeStep(std::numeric_limits<std::size_t>::infinity()),
     SegWithPreviewTool(true) // prevents auto-compute across all timesteps
 {
   auto scribbleCommand = itk::MemberCommand<Self>::New();
@@ -107,6 +107,17 @@ mitk::nnInteractiveTool::nnInteractiveTool()
   this->KeepActiveAfterAcceptOn();
 }
 
+void mitk::nnInteractiveTool::OnTimePointChangedListner()
+{
+  auto *inputImage = dynamic_cast<Image *>(this->GetToolManager()->GetReferenceData(0)->GetData());
+  const TimePointType currentTimePoint = this->GetToolManager()->GetCurrentTimePoint();
+  const auto timeStep = inputImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
+  if (m_LastSetTimeStep != currentTimePoint)
+  {
+    m_IsSessionReady = !this->HasInteractions();
+  }
+}
+
 bool mitk::nnInteractiveTool::GetAutoZoom() const
 {
   return m_AutoZoom;
@@ -117,7 +128,7 @@ void mitk::nnInteractiveTool::SetAutoZoom(bool autoZoom)
   m_AutoZoom = autoZoom;
 }
 
-mitk::nnInteractiveTool::~nnInteractiveTool(){}
+mitk::nnInteractiveTool::~nnInteractiveTool() {}
 
 void mitk::nnInteractiveTool::CleanUpSession()
 {
@@ -257,6 +268,37 @@ void mitk::nnInteractiveTool::DisableInteraction()
   m_ActiveTool.reset();
 }
 
+void mitk::nnInteractiveTool::RemoveInteraction()
+{
+  if (!m_ActiveTool.has_value())
+    return;
+
+  this->UnblockLMBDisplayInteraction();
+
+  switch (m_ActiveTool.value())
+  {
+    case Tool::Point:
+      this->GetPointSetNode(m_PromptType)->GetDataAs<PointSet>()->RemovePointAtEnd(0);
+      break;
+
+    case Tool::Box:
+      this->GetDataStorage()->Remove(m_NewBoxNode.first);
+      break;
+
+    case Tool::Scribble:
+      this->GetDataStorage()->Remove(m_ScribbleNode);
+      break;
+
+    case Tool::Lasso:
+      this->GetDataStorage()->Remove(this->GetLassoNodes(m_PromptType).back());
+      break;
+
+    default:
+      break;
+  }
+  RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void mitk::nnInteractiveTool::ResetInteractions()
 {
   this->RemoveLassoMaskNode();
@@ -374,24 +416,9 @@ mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType p
   return node;
 }
 
-bool mitk::nnInteractiveTool::IsNewTimePoint()
-{
-  const TimePointType currentTimePoint =
-    RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  if (m_LastSetTimePoint != currentTimePoint)
-  {
-    return true;
-  }
-  return false;
-}
-
 void mitk::nnInteractiveTool::OnPointEvent()
 {
-  if (this->IsNewTimePoint())
-  {//set current 3D image vol into the nnInter session
-    this->SetImageInSession();
-  }
-  this->UpdatePreview();
+  nnInterInteractionMessageEvent.Send(true);
 }
 
 mitk::DataNode* mitk::nnInteractiveTool::GetPointSetNode(PromptType promptType) const
@@ -452,17 +479,10 @@ void mitk::nnInteractiveTool::AddNewBoxNode(PromptType promptType)
 void mitk::nnInteractiveTool::OnBoxPlaced()
 {
   auto& [node, tag] = m_NewBoxNode;
-
   node->GetData()->RemoveObserver(tag);
   node->SetSelected(false);
-
   this->GetBoxNodes(m_PromptType).push_back(node);
-
-  if (this->IsNewTimePoint())
-  {//set current 3D image vol into the nnInter session
-    this->SetImageInSession();
-  }
-  this->UpdatePreview();
+  nnInterInteractionMessageEvent.Send(true);
   node = nullptr;
   this->AddNewBoxNode(m_PromptType);
 }
@@ -517,11 +537,7 @@ void mitk::nnInteractiveTool::SetActiveScribbleLabel(PromptType promptType)
 
 void mitk::nnInteractiveTool::OnScribbleEvent(itk::Object* caller, const itk::EventObject& event)
 {
-  if (this->IsNewTimePoint())
-  {//set current 3D image vol into the nnInter session
-    this->SetImageInSession();
-  }
-  this->UpdatePreview();
+  nnInterInteractionMessageEvent.Send(true);
 }
 
 void mitk::nnInteractiveTool::RemoveScribbleNode()
@@ -568,11 +584,7 @@ void mitk::nnInteractiveTool::OnLassoEvent(itk::Object* caller, const itk::Event
   this->GetLassoNodes(m_PromptType).push_back(node);
   this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
 
-  if (this->IsNewTimePoint())
-  {//set current 3D image vol into the nnInter session
-    this->SetImageInSession();
-  }
-  this->UpdatePreview();
+  nnInterInteractionMessageEvent.Send(true);
 }
 
 const std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetLassoNodes(PromptType promptType) const
@@ -651,14 +663,9 @@ void mitk::nnInteractiveTool::AddLassoInteraction(const Image* mask)
 
 void mitk::nnInteractiveTool::AddInitialSegInteraction(/*const*/ Image *mask)
 {
-  MITK_INFO << "AddInitialSegInteraction()";
   m_MaskImage = mask;
   m_ActiveTool.reset();
-  if (this->IsNewTimePoint())
-  { // set current 3D image vol into the nnInter session
-    this->SetImageInSession();
-  }
-  this->UpdatePreview();
+  nnInterInteractionMessageEvent.Send(true);
 }
 
 std::string mitk::nnInteractiveTool::CreateNodeName(const std::string& name, std::optional<PromptType> promptType) const
@@ -703,6 +710,8 @@ void mitk::nnInteractiveTool::Activated()
 
   this->CreatePointInteractor();
   this->CreateBoxInteractor();
+  this->GetToolManager()->SelectedTimePointChanged +=
+    MessageDelegate<nnInteractiveTool>(this, &nnInteractiveTool::OnTimePointChangedListner);
 }
 
 void mitk::nnInteractiveTool::Deactivated()
@@ -722,7 +731,10 @@ void mitk::nnInteractiveTool::Deactivated()
   this->CleanUpSession();
   this->IsSessionReadyOff();
   m_PythonContext = nullptr;
-  m_LastSetTimePoint = std::numeric_limits<double>::lowest();
+  m_LastSetTimeStep = std::numeric_limits<std::size_t>::infinity();
+  this->GetToolManager()->SelectedTimePointChanged -=
+    MessageDelegate<nnInteractiveTool>(this, &nnInteractiveTool::OnTimePointChangedListner);
+
   Superclass::Deactivated();
 }
 
@@ -883,6 +895,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
     else
     {
       this->ResetPreviewContentAtTimeStep(timeStep);
+      RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -910,11 +923,11 @@ void mitk::nnInteractiveTool::SetImageInSession()
   {
     mitkThrow() << "Error: Python context was not activated.";
   }
-  MITK_INFO << "in SetImageInSession......";
   auto *inputImage = dynamic_cast<Image *>(this->GetToolManager()->GetReferenceData(0)->GetData());
-  const TimePointType timePoint =
-    RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  mitk::Image::ConstPointer inputVolAtTimeStep = this->GetImageByTimePoint(inputImage, timePoint);
+  const TimePointType timePoint = this->GetToolManager()->GetCurrentTimePoint();
+  const auto timeStep = inputImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+  
+  mitk::Image::ConstPointer inputVolAtTimeStep = this->GetImageByTimeStep(inputImage, timeStep);
   mitk::Image *inputAtTimeStep = const_cast<mitk::Image *>(inputVolAtTimeStep.GetPointer());
   m_OutputBuffer->Initialize(inputAtTimeStep);
   m_PythonContext->TransferBaseDataToPython(inputAtTimeStep);
@@ -937,7 +950,7 @@ void mitk::nnInteractiveTool::SetImageInSession()
   {
     mitkThrow() << e.GetDescription();
   }
-  m_LastSetTimePoint = timePoint;
+  m_LastSetTimeStep = timeStep;
 }
 
 void mitk::nnInteractiveTool::InitializeBackend()

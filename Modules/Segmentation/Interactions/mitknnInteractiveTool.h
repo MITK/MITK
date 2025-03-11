@@ -64,7 +64,9 @@ namespace mitk
     void EnableInteraction(Tool tool, PromptType promptType);
     void DisableInteraction();
     void ResetInteractions();
+    void RemoveInteraction();
     bool HasInteractions() const;
+    void SetImageInSession();
 
     void AddInitialSegInteraction(/*const*/ Image *mask);
 
@@ -79,6 +81,7 @@ namespace mitk
     itkGetConstMacro(ActiveTool, std::optional<Tool>);
 
     mitk::Message1<const bool> nnInterConfirmMessageEvent;
+    mitk::Message1<const bool> nnInterInteractionMessageEvent;
 
   protected:
     enum class Intensity
@@ -106,8 +109,7 @@ namespace mitk
     void CreatePointInteractor();
     void CreateBoxInteractor();
     void CleanUpSession();
-    void SetImageInSession();
-    bool IsNewTimePoint();
+    void OnTimePointChangedListner();
 
     DataNode::Pointer CreatePointSetNode(PromptType promptType);
     void OnPointEvent();
@@ -145,7 +147,7 @@ namespace mitk
     mitk::Image* m_MaskImage;
     PromptType m_PromptType;
     bool m_IsSessionReady;
-    TimePointType m_LastSetTimePoint;
+    TimeStepType m_LastSetTimeStep;
 
     std::array<Tool, 4> m_Tools;
     std::optional<Tool> m_ActiveTool;

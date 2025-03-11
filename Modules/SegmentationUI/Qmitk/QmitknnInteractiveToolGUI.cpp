@@ -115,6 +115,8 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
 
   this->GetTool()->nnInterConfirmMessageEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const bool>(
     this, &QmitknnInteractiveToolGUI::StatusMessageListener);
+  this->GetTool()->nnInterInteractionMessageEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const bool>(
+    this, &QmitknnInteractiveToolGUI::InteractionListener);
 }
 
 void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
@@ -136,6 +138,8 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
 
   this->GetTool()->nnInterConfirmMessageEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const bool>(
     this, &QmitknnInteractiveToolGUI::StatusMessageListener);
+  this->GetTool()->nnInterInteractionMessageEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const bool>(
+    this, &QmitknnInteractiveToolGUI::InteractionListener);
 
   Superclass::InitializeUI(mainLayout);
 }
@@ -326,5 +330,22 @@ void QmitknnInteractiveToolGUI::StatusMessageListener(const bool isConfirmed)
   if (isConfirmed)
   {
     this->OnResetInteractionsButtonClicked();
+  }
+}
+
+void QmitknnInteractiveToolGUI::InteractionListener(const bool isInteracted)
+{
+  if (isInteracted)
+  {
+    if (!this->GetTool()->GetIsSessionReady() && QMessageBox::No == QMessageBox::question(nullptr,
+      "nnInteractive",
+      "You have interacted before in another time step(s). Do you want to continue?",
+      QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
+    {
+      this->GetTool()->RemoveInteraction();
+      return;
+    }
+    this->GetTool()->SetImageInSession();
+    this->GetTool()->UpdatePreview();
   }
 }

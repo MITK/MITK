@@ -50,7 +50,8 @@ protected:
   void OnToolToggled(Tool tool, bool checked);
   void OnMaskButtonClicked();
   void UncheckOtherToolButtons(QPushButton* toolButton);
-  void StatusMessageListener(const bool);
+  void StatusMessageListener(const bool isConfirmed);
+  void InteractionListener(const bool isInteracted);
 
 private:
   mitk::nnInteractiveTool* GetTool();

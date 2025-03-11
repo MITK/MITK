@@ -64,24 +64,18 @@ namespace mitk
     void EnableInteraction(Tool tool, PromptType promptType);
     void DisableInteraction();
     void ResetInteractions();
-    void RemoveInteraction();
     bool HasInteractions() const;
     void SetImageInSession();
 
-    void AddInitialSegInteraction(/*const*/ Image *mask);
+    void AddInitialSegInteraction(Image* mask);
 
     bool GetAutoZoom() const;
     void SetAutoZoom(bool autoZoom);
 
-    itkSetMacro(IsSessionReady, bool);
-    itkGetConstMacro(IsSessionReady, bool);
-    itkBooleanMacro(IsSessionReady);
+    bool IsSessionReady() const;
+    bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
-    itkSetMacro(ActiveTool, std::optional<Tool>);
-    itkGetConstMacro(ActiveTool, std::optional<Tool>);
-
-    mitk::Message1<const bool> nnInterConfirmMessageEvent;
-    mitk::Message1<const bool> nnInterInteractionMessageEvent;
+    mitk::Message1<bool> nnInterConfirmMessageEvent;
 
   protected:
     enum class Intensity
@@ -108,8 +102,6 @@ namespace mitk
   private:
     void CreatePointInteractor();
     void CreateBoxInteractor();
-    void CleanUpSession();
-    void OnTimePointChangedListner();
 
     DataNode::Pointer CreatePointSetNode(PromptType promptType);
     void OnPointEvent();
@@ -138,16 +130,16 @@ namespace mitk
     void AddScribbleInteraction(const Image* mask);
     void AddLassoInteraction(const Image* mask);
 
+    void CleanUpSession();
+    void SetSessionReady(bool isReady);
+
     std::pair<std::string, bool> GetPointAsListString(const mitk::BaseGeometry *baseGeometry) const;
     std::pair<std::string, bool> GetBBoxAsListString(const mitk::BaseGeometry *baseGeometry) const;
 
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
 
     bool m_AutoZoom;
-    mitk::Image* m_MaskImage;
     PromptType m_PromptType;
-    bool m_IsSessionReady;
-    TimeStepType m_LastSetTimeStep;
 
     std::array<Tool, 4> m_Tools;
     std::optional<Tool> m_ActiveTool;
@@ -171,9 +163,12 @@ namespace mitk
     std::vector<DataNode::Pointer> m_PositiveLassoNodes;
     std::vector<DataNode::Pointer> m_NegativeLassoNodes;
     DataNode::Pointer m_LassoMaskNode;
+
+    mitk::Image::Pointer m_MaskImage;
+
     mitk::LabelSetImage::Pointer m_OutputBuffer;
     mitk::PythonContext::Pointer m_PythonContext;
-    const Label::PixelType MASK_VALUE = 1;
+    bool m_IsSessionReady;
   };
 }
 

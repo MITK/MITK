@@ -46,6 +46,12 @@ namespace mitk
       Negative
     };
 
+    enum class Backend
+    {
+      CUDA,
+      CPU
+    };
+
     static std::string GetToolString(Tool tool);
     static std::string GetPromptTypeString(PromptType promptType);
 
@@ -71,6 +77,11 @@ namespace mitk
 
     bool GetAutoZoom() const;
     void SetAutoZoom(bool autoZoom);
+
+    bool GetAutoRefine() const;
+    void SetAutoRefine(bool autoRefine);
+
+    std::optional<Backend> GetBackend() const;
 
     bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
@@ -137,6 +148,7 @@ namespace mitk
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
 
     bool m_AutoZoom;
+    bool m_AutoRefine;
     PromptType m_PromptType;
 
     std::array<Tool, 4> m_Tools;
@@ -166,6 +178,8 @@ namespace mitk
 
     mitk::LabelSetImage::Pointer m_OutputBuffer;
     mitk::PythonContext::Pointer m_PythonContext;
+
+    std::optional<Backend> m_Backend;
   };
 }
 

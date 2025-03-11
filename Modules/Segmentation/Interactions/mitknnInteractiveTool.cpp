@@ -34,6 +34,21 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive");
 }
 
+namespace
+{
+  bool IsCUDAAvailable(mitk::PythonContext* context)
+  {
+    const std::string pyCommands =
+      "import torch\n"
+      "if torch.cuda.is_available():\n"
+      "  cuda_is_available = True\n";
+
+    context->ExecuteString(pyCommands);
+
+    return context->IsVariableExists("cuda_is_available");
+  }
+}
+
 std::string mitk::nnInteractiveTool::GetToolString(Tool tool)
 {
   switch (tool)
@@ -81,6 +96,7 @@ const mitk::Color& mitk::nnInteractiveTool::GetColor(PromptType promptType, Inte
 
 mitk::nnInteractiveTool::nnInteractiveTool()
   : m_AutoZoom(true),
+    m_AutoRefine(false),
     m_PromptType(PromptType::Positive),
     m_Tools {
       Tool::Point,
@@ -100,6 +116,10 @@ mitk::nnInteractiveTool::nnInteractiveTool()
 
   this->ResetsToEmptyPreviewOn();
   this->KeepActiveAfterAcceptOn();
+}
+
+mitk::nnInteractiveTool::~nnInteractiveTool()
+{
 }
 
 bool mitk::nnInteractiveTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
@@ -123,7 +143,15 @@ void mitk::nnInteractiveTool::SetAutoZoom(bool autoZoom)
   m_AutoZoom = autoZoom;
 }
 
-mitk::nnInteractiveTool::~nnInteractiveTool() {}
+bool mitk::nnInteractiveTool::GetAutoRefine() const
+{
+  return m_AutoRefine;
+}
+
+void mitk::nnInteractiveTool::SetAutoRefine(bool autoRefine)
+{
+  m_AutoRefine = autoRefine;
+}
 
 void mitk::nnInteractiveTool::CleanUpSession()
 {
@@ -819,7 +847,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
           pyCommand.append("False)\n");
         }
 
-        pyCommand.append("session.set_do_prediction_propagation");
+        pyCommand.append("session.set_do_autozoom");
         if (m_AutoZoom)
         {
           pyCommand.append("(True)\n"); // Auto-zoom
@@ -848,8 +876,9 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
     {
       m_PythonContext->TransferBaseDataToPython(m_MaskImage, "_mitk_pre_mask");
       std::string pyCommand = "pre_mask_npy = _mitk_pre_mask.GetAsNumpy()\n"
-                              "session.add_initial_seg_interaction(pre_mask_npy.astype(numpy.uint8))\n"
-                              "session._predict()\n";
+                              "session.add_initial_seg_interaction(pre_mask_npy.astype(numpy.uint8), run_prediction=";
+      pyCommand += m_AutoRefine ? "True" : "False";
+      pyCommand += ")\n";
       m_PythonContext->ExecuteString(pyCommand);
       m_MaskImage = nullptr;
       mitk::ImageReadAccessor newMitkImgAcc(m_OutputBuffer.GetPointer());
@@ -923,6 +952,13 @@ void mitk::nnInteractiveTool::InitializeBackend()
   m_PythonContext = mitk::PythonContext::New();
   m_PythonContext->Activate();
   m_PythonContext->SetVirtualEnvironmentPath("C:/DKFZ/nnInteractive_work/.venv/Lib/site-packages");
+
+  m_Backend.reset();
+
+  std::string device = IsCUDAAvailable(m_PythonContext)
+    ? "cuda:0"
+    : "cpu";
+
   std::string pycommand = "import torch\n"
                           "import nnInteractive\n"
                           "from pathlib import Path\n"
@@ -963,13 +999,13 @@ void mitk::nnInteractiveTool::InitializeBackend()
   }
   pycommand.clear();
   pycommand = "session = inference_class("
-              "device = torch.device('cuda:0'),"
+              "device = torch.device('" + device + "'),"
               "use_torch_compile = False,"
               "torch_n_threads = 16,"
-              "verbose = True,"
-              "use_background_preprocessing = False,"
-              "do_prediction_propagation = True)\n"
-              "session.initialize_from_trained_model_folder(checkpoint_path, 0, 'checkpoint_final.pth')\n ";
+              "verbose = False,"
+              "do_autozoom = True,"
+              "use_pinned_memory = True)\n"
+              "session.initialize_from_trained_model_folder(checkpoint_path)\n ";
   try
   {
     m_PythonContext->ExecuteString(pycommand);
@@ -984,6 +1020,15 @@ void mitk::nnInteractiveTool::InitializeBackend()
   auto end = std::chrono::system_clock::now();
   auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
   MITK_INFO << "nnInteractive init elapsed: " << elapsed.count();
+
+  m_Backend = device != "cpu"
+    ? Backend::CUDA
+    : Backend::CPU;
+}
+
+std::optional<mitk::nnInteractiveTool::Backend> mitk::nnInteractiveTool::GetBackend() const
+{
+  return m_Backend;
 }
 
 void mitk::nnInteractiveTool::ConfirmCleanUp()

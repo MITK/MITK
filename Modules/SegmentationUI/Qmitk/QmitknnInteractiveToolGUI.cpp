@@ -137,6 +137,9 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   this->InitializePromptType();
   this->InitializeToolButtons();
 
+  m_Ui->autoRefineCheckBox->setChecked(this->GetTool()->GetAutoRefine());
+  connect(m_Ui->autoRefineCheckBox, &QCheckBox::toggled, this, &Self::OnAutoRefineCheckBoxToggled);
+
   m_Ui->autoZoomCheckBox->setChecked(this->GetTool()->GetAutoZoom());
   connect(m_Ui->autoZoomCheckBox, &QCheckBox::toggled, this, &Self::OnAutoZoomCheckBoxToggled);
 
@@ -156,6 +159,11 @@ void QmitknnInteractiveToolGUI::ThemeIcons()
   SetIcon(m_Ui->scribbleButton, "scribble");
   SetIcon(m_Ui->lassoButton, "lasso");
   SetIcon(m_Ui->maskButton, "mask");
+}
+
+void QmitknnInteractiveToolGUI::OnAutoRefineCheckBoxToggled(bool checked)
+{
+  this->GetTool()->SetAutoRefine(checked);
 }
 
 void QmitknnInteractiveToolGUI::OnAutoZoomCheckBoxToggled(bool checked)
@@ -235,6 +243,24 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
     messageBox->exec();
   }
   messageBox.close();
+
+  auto backend = this->GetTool()->GetBackend();
+
+  if (!backend.has_value())
+    return;
+
+  if (backend == mitk::nnInteractiveTool::Backend::CUDA)
+    return;
+
+  message = QString(
+    "<div style='line-height: 1.25'>"
+      "<p><strong>Warning:</strong> The CUDA backend is unavailable. Falling back to the CPU backend, which is "
+      "<em>significantly (!)</em> slower.</p>"
+      "<p>For a smooth experience and quick response times, a compatible NVIDIA GPU with up-to-date drivers "
+      "is highly recommended.</p>"
+    "</div>");
+
+  QMessageBox::warning(nullptr, title, message);
 }
 
 void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()

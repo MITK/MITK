@@ -45,6 +45,7 @@ protected:
   void InitializeToolButtons();
   void OnInitializeButtonToggled(bool checked);
   void OnResetInteractionsButtonClicked();
+  void OnAutoRefineCheckBoxToggled(bool checked);
   void OnAutoZoomCheckBoxToggled(bool checked);
   void OnPromptTypeChanged();
   void OnToolToggled(Tool tool, bool checked);

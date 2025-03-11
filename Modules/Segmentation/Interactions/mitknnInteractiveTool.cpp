@@ -293,6 +293,8 @@ void mitk::nnInteractiveTool::DisableInteraction()
 
 void mitk::nnInteractiveTool::ResetInteractions()
 {
+  m_MaskImage = nullptr;
+
   this->RemoveLassoMaskNode();
   this->RemoveScribbleNode();
   this->RemoveNewBoxNode();
@@ -343,6 +345,9 @@ bool mitk::nnInteractiveTool::HasInteractions() const
       return true;
 
     if (m_ScribbleNode.IsNotNull() && !m_ScribbleNode->GetDataAs<LabelSetImage>()->IsEmpty(m_ScribbleLabels.at(promptType)))
+      return true;
+
+    if (m_MaskImage.IsNotNull())
       return true;
   }
 
@@ -880,7 +885,6 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
       pyCommand += m_AutoRefine ? "True" : "False";
       pyCommand += ")\n";
       m_PythonContext->ExecuteString(pyCommand);
-      m_MaskImage = nullptr;
       mitk::ImageReadAccessor newMitkImgAcc(m_OutputBuffer.GetPointer());
       previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
     }

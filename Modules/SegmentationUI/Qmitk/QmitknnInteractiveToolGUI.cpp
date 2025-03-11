@@ -223,7 +223,8 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
       "instead. Please be patient.</small></p>"
     "</div>");
  
-  QMessageBox messageBox(QMessageBox::Information, title, message, QMessageBox::NoButton, nullptr);
+  QMessageBox messageBox(QMessageBox::Information, title, message);
+  messageBox.setStandardButtons(QMessageBox::NoButton);
   messageBox.show();
   qApp->processEvents();
   try
@@ -232,7 +233,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   }
   catch (const mitk::Exception& e)
   {
-    messageBox.close();
+    messageBox.accept();
     std::stringstream errorMsg;
     errorMsg << "Error while initializing nnInteractive. Reason: " << e.GetDescription();
     QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, errorMsg.str().c_str());
@@ -242,7 +243,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
     MITK_WARN << errorMsg.str();
     messageBox->exec();
   }
-  messageBox.close();
+  messageBox.accept();
 
   auto backend = this->GetTool()->GetBackend();
 

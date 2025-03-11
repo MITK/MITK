@@ -205,18 +205,24 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   m_Ui->resetButton->setEnabled(checked);
   m_Ui->promptTypeGroupBox->setEnabled(checked);
   m_Ui->interactionToolsGroupBox->setEnabled(checked);
+
+  QString title = "nnInteractive";
+
+  auto message = QString(
+    "<div style='line-height: 1.25'>"
+      "<p>Initializing, please wait a few seconds...</p>"
+      "<p><small><em>Note:</em> The first initialization after downloading MITK may take a minute "
+      "instead. Please be patient.</small></p>"
+    "</div>");
  
-  QMessageBox messageBox(QMessageBox::Information,
-                           "nnInteractive",
-                           "nnInteractive tool is being initialized.\nThis may take a while. Please wait....",
-                           QMessageBox::NoButton, nullptr);
+  QMessageBox messageBox(QMessageBox::Information, title, message, QMessageBox::NoButton, nullptr);
   messageBox.show();
   qApp->processEvents();
   try
   {
     this->GetTool()->InitializeBackend();
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::Exception& e)
   {
     messageBox.close();
     std::stringstream errorMsg;

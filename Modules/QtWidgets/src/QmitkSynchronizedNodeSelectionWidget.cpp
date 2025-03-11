@@ -542,6 +542,9 @@ int QmitkSynchronizedNodeSelectionWidget::GetSynchGroup() const
 
 void QmitkSynchronizedNodeSelectionWidget::SetStorageModel(QmitkRenderWindowDataNodeTableModel* storageModel)
 {
+  if (m_StorageModel == storageModel)
+    return;
+
   m_StorageModel = storageModel;
 
   m_Controls.tableView->setModel(storageModel);
@@ -560,5 +563,6 @@ void QmitkSynchronizedNodeSelectionWidget::SetStorageModel(QmitkRenderWindowData
     m_StorageModel->AddRenderer(m_BaseRenderer.Lock());
   }
 
+  this->HandleChangeOfInternalSelection(m_StorageModel->GetCurrentSelection());
   this->Initialize();
 }

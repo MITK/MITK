@@ -50,6 +50,7 @@ public:
 
   ~QmitkRenderWindowUtilityWidget() override;
 
+  void SetSynchGroup(const int index);
   void OnSynchGroupSelectionChanged(int index);
 
   void SetGeometry(const itk::EventObject& event);
@@ -62,7 +63,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 
   void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
-  void SetSynchGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, int index);
+  void SynchGroupChanged(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, int index);
   void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
 
 private:

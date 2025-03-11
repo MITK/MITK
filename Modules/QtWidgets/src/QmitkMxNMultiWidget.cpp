@@ -368,7 +368,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,
     utilityWidget, &QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection);
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SetSynchGroup, this, &QmitkMxNMultiWidget::SetSynchronizationGroup);
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SynchGroupChanged, this, &QmitkMxNMultiWidget::SetSynchronizationGroup);
   connect(this, &QmitkMxNMultiWidget::SynchGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSynchGroupAdded);
 
   // needs to be done after 'QmitkRenderWindowUtilityWidget::ToggleSynchronization' has been connected
@@ -571,8 +571,10 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   auto vSplit = new QSplitter(Qt::Vertical);
 
   unsigned int windowCounter = 0;
+  unsigned int rowCounter = 0;
   for (auto node : nodes)
   {
+    rowCounter++;
     auto hSplit = new QSplitter(Qt::Horizontal);
     for (auto viewPlane : { mitk::AnatomicalPlane::Axial, mitk::AnatomicalPlane::Coronal, mitk::AnatomicalPlane::Sagittal })
     {
@@ -584,7 +586,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
       }
 
       auto utilityWidget = window->GetUtilityWidget();
-      //utilityWidget->ToggleSynchronization(false);
+      utilityWidget->SetSynchGroup(rowCounter);
       utilityWidget->SetDataSelection(QList({ node }));
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();

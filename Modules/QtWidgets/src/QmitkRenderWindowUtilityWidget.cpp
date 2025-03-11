@@ -99,6 +99,11 @@ QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
 {
 }
 
+void QmitkRenderWindowUtilityWidget::SetSynchGroup(const int index)
+{
+  m_SynchGroupSelector->setCurrentIndex(index);
+}
+
 void QmitkRenderWindowUtilityWidget::OnSynchGroupSelectionChanged(int index)
 {
   if (index == m_SynchGroupSelector->count() - 1)
@@ -108,7 +113,7 @@ void QmitkRenderWindowUtilityWidget::OnSynchGroupSelectionChanged(int index)
     m_SynchGroupSelector->setCurrentIndex(index);
     m_SynchGroupSelector->blockSignals(false);
   }
-  emit SetSynchGroup(m_NodeSelectionWidget, index);
+  emit SynchGroupChanged(m_NodeSelectionWidget, index);
 }
 
 void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)

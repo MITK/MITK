@@ -554,8 +554,7 @@ void QmitkSynchronizedNodeSelectionWidget::SetStorageModel(QmitkRenderWindowData
   const int columnCount = m_StorageModel->columnCount();
   for (int column = 1; column < columnCount; ++column)
   {
-    header->setSectionResizeMode(column, QHeaderView::Fixed);
-    header->resizeSection(column, 0); // As small as possible yet big enough for icons.
+    header->setSectionResizeMode(column, QHeaderView::ResizeToContents);
   }
 
   if (m_BaseRenderer != nullptr)

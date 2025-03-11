@@ -88,8 +88,7 @@ mitk::nnInteractiveTool::nnInteractiveTool()
       Tool::Scribble,
       Tool::Lasso },
     m_ScribbleTool(nnInteractiveScribbleTool::New()),
-    m_LassoTool(nnInteractiveLassoTool::New()),
-    m_IsSessionReady(false)
+    m_LassoTool(nnInteractiveLassoTool::New())
 {
   auto scribbleCommand = itk::MemberCommand<Self>::New();
   scribbleCommand->SetCallbackFunction(this, &Self::OnScribbleEvent);
@@ -136,8 +135,6 @@ void mitk::nnInteractiveTool::CleanUpSession()
                             "torch.cuda.empty_cache()\n";
     m_PythonContext->ExecuteString(pyCommand);
   }
-
-  this->SetSessionReady(false);
 }
 
 void mitk::nnInteractiveTool::SetToolManager(ToolManager* toolManager)
@@ -671,16 +668,6 @@ void mitk::nnInteractiveTool::CreateBoxInteractor()
   m_BoxInteractor->EnableInteraction(false);
 }
 
-bool mitk::nnInteractiveTool::IsSessionReady() const
-{
-  return m_IsSessionReady;
-}
-
-void mitk::nnInteractiveTool::SetSessionReady(bool isReady)
-{
-  m_IsSessionReady = isReady;
-}
-
 void mitk::nnInteractiveTool::Activated()
 {
   Superclass::Activated();
@@ -768,7 +755,6 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                               LabelSetImage *previewImage,
                                               TimeStepType timeStep)
 {
-  MITK_INFO << "=========================== DoUpdatePreview()";
   if (nullptr != previewImage && m_PythonContext.IsNotNull())
   {
     m_ProgressCommand->SetProgress(20);
@@ -931,8 +917,6 @@ void mitk::nnInteractiveTool::SetImageInSession()
 
 void mitk::nnInteractiveTool::InitializeBackend()
 {
-  this->SetSessionReady(false);
-
   m_OutputBuffer = mitk::LabelSetImage::New();
   std::string modelName = "nnInteractive_v1.0";
   auto start = std::chrono::system_clock::now();
@@ -1000,8 +984,6 @@ void mitk::nnInteractiveTool::InitializeBackend()
   auto end = std::chrono::system_clock::now();
   auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
   MITK_INFO << "nnInteractive init elapsed: " << elapsed.count();
-
-  this->SetSessionReady(true);
 }
 
 void mitk::nnInteractiveTool::ConfirmCleanUp()

@@ -72,7 +72,6 @@ namespace mitk
     bool GetAutoZoom() const;
     void SetAutoZoom(bool autoZoom);
 
-    bool IsSessionReady() const;
     bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
     mitk::Message1<bool> nnInterConfirmMessageEvent;
@@ -131,7 +130,6 @@ namespace mitk
     void AddLassoInteraction(const Image* mask);
 
     void CleanUpSession();
-    void SetSessionReady(bool isReady);
 
     std::pair<std::string, bool> GetPointAsListString(const mitk::BaseGeometry *baseGeometry) const;
     std::pair<std::string, bool> GetBBoxAsListString(const mitk::BaseGeometry *baseGeometry) const;
@@ -168,7 +166,6 @@ namespace mitk
 
     mitk::LabelSetImage::Pointer m_OutputBuffer;
     mitk::PythonContext::Pointer m_PythonContext;
-    bool m_IsSessionReady;
   };
 }
 

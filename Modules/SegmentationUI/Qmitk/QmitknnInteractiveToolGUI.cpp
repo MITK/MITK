@@ -210,10 +210,6 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
 {
   m_Ui->initializeButton->setEnabled(!checked);
 
-  m_Ui->resetButton->setEnabled(checked);
-  m_Ui->promptTypeGroupBox->setEnabled(checked);
-  m_Ui->interactionToolsGroupBox->setEnabled(checked);
-
   QString title = "nnInteractive";
 
   auto message = QString(
@@ -235,15 +231,21 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   {
     messageBox.accept();
     std::stringstream errorMsg;
-    errorMsg << "Error while initializing nnInteractive. Reason: " << e.GetDescription();
-    QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, errorMsg.str().c_str());
-    messageBox->setTextFormat(Qt::PlainText);
-    messageBox->setAttribute(Qt::WA_DeleteOnClose, true);
-    messageBox->setModal(true);
+    errorMsg << "Error while initializing nnInteractive.\n\nReason: " << e.GetDescription();
+    QMessageBox *errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr, errorMsg.str().c_str());
+    errorMsgBox->setTextFormat(Qt::PlainText);
+    errorMsgBox->setAttribute(Qt::WA_DeleteOnClose, true);
+    errorMsgBox->setModal(true);
     MITK_WARN << errorMsg.str();
-    messageBox->exec();
+    errorMsgBox->exec();
+    m_Ui->initializeButton->setEnabled(true);
+    return;
   }
   messageBox.accept();
+
+  m_Ui->resetButton->setEnabled(checked);
+  m_Ui->promptTypeGroupBox->setEnabled(checked);
+  m_Ui->interactionToolsGroupBox->setEnabled(checked);
 
   auto backend = this->GetTool()->GetBackend();
 

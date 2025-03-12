@@ -63,8 +63,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   layout->addWidget(menuBar);
 
   m_SynchGroupSelector = new QComboBox(this);
-  m_SynchGroupSelector->addItem("Global");
-  for (int i=1; i<nSynchGroups; ++i)
+  for (int i=0; i<nSynchGroups; ++i)
     m_SynchGroupSelector->insertItem(i, QString("Group %1").arg(i));
   m_SynchGroupSelector->addItem("New Group");
   connect(m_SynchGroupSelector, &QComboBox::currentIndexChanged,

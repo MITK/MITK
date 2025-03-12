@@ -136,6 +136,11 @@ mitk::Image::Pointer mitk::MultiLabelSegmentation::GenerateNewGroupImage() const
   return groupImage;
 }
 
+void mitk::MultiLabelSegmentation::Initialize()
+{
+  this->Initialize(this->GetTimeGeometry(), true, false);
+}
+
 void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage, bool resetLabels, bool ensure1stGroup)
 {
   if (nullptr == templateImage) mitkThrow() << "Cannot initialize multi label segementation instance. Passed template image is a nullptr.";

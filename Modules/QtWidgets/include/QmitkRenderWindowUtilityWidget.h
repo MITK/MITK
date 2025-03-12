@@ -51,6 +51,7 @@ public:
   ~QmitkRenderWindowUtilityWidget() override;
 
   void SetSynchGroup(const int index);
+  int GetSynchGroup() const;
   void OnSynchGroupSelectionChanged(int index);
 
   void SetGeometry(const itk::EventObject& event);

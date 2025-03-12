@@ -419,9 +419,9 @@ void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
   try
   {
     auto version = jsonData->at("version").get<std::string>();
-    if (version != "1.0")
+    if (version != "1.1")
     {
-      QMessageBox::warning(this, "Load layout", "Unknown layout version, could not load");
+      QMessageBox::warning(this, "Load layout", "Unknown/Outdated layout version, could not load");
       return;
     }
 
@@ -468,7 +468,7 @@ void QmitkMxNMultiWidget::SaveLayout(std::ostream* outStream)
   }
 
   auto layoutJSON = BuildJSONFromLayout(splitter);
-  layoutJSON["version"] = "1.0";
+  layoutJSON["version"] = "1.1";
   layoutJSON["name"] = "Custom Layout";
 
   *outStream << std::setw(4) << layoutJSON << std::endl;
@@ -497,6 +497,7 @@ nlohmann::json QmitkMxNMultiWidget::BuildJSONFromLayout(const QSplitter* splitte
     {
       widgetJSON["isWindow"] = true;
       widgetJSON["viewDirection"] = widgetWindow->GetSliceNavigationController()->GetViewDirectionAsString();
+      widgetJSON["synchGroup"] = widgetWindow->GetUtilityWidget()->GetSynchGroup();
     }
     widgetJSON["size"] = sizes[i];
     content.push_back(widgetJSON);
@@ -541,6 +542,8 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
         viewPlane = mitk::AnatomicalPlane::Sagittal;
       }
 
+      const int synchGroup = object["synchGroup"].get<const int>();
+
       // repurpose existing render windows as far as they already exist
       auto window = GetWindowFromIndex(*windowCounter);
       if (window == nullptr)
@@ -548,6 +551,7 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
         window = CreateRenderWindowWidget();
       }
 
+      window->GetUtilityWidget()->SetSynchGroup(synchGroup);
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();
       split->addWidget(window.get());

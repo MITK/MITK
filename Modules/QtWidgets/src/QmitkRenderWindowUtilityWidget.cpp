@@ -104,6 +104,11 @@ void QmitkRenderWindowUtilityWidget::SetSynchGroup(const int index)
   m_SynchGroupSelector->setCurrentIndex(index);
 }
 
+int QmitkRenderWindowUtilityWidget::GetSynchGroup() const
+{
+  return m_SynchGroupSelector->currentIndex();
+}
+
 void QmitkRenderWindowUtilityWidget::OnSynchGroupSelectionChanged(int index)
 {
   if (index == m_SynchGroupSelector->count() - 1)

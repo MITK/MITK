@@ -105,8 +105,8 @@ mitk::MultiLabelSegmentation::MultiLabelSegmentation(const mitk::MultiLabelSegme
     m_ActiveLabelValue(other.m_ActiveLabelValue),
     m_LookupTable(other.m_LookupTable->Clone()),
     m_UnlabeledLabelLock(other.m_UnlabeledLabelLock),
-    m_ActiveLayer(other.GetActiveLayer()),
-    m_GroupImageDimensions(other.m_GroupImageDimensions)
+    m_GroupImageDimensions(other.m_GroupImageDimensions),
+    m_ActiveLayer(other.GetActiveLayer())
 {
   GroupIndexType i = 0;
   for (auto groupImage : other.m_LayerContainer)
@@ -253,7 +253,6 @@ void mitk::MultiLabelSegmentation::RemoveGroup(GroupIndexType indexToDelete)
   const auto activeIndex = GetActiveLayer();
 
   auto newActiveIndex = activeIndex;
-  auto newActiveIndexBeforeDeletion = activeIndex;
   //determine new active group index (after the group will be removed);
   if (indexToDelete < activeIndex)
   { //lower the index because position in m_LayerContainer etc has changed
@@ -269,7 +268,6 @@ void mitk::MultiLabelSegmentation::RemoveGroup(GroupIndexType indexToDelete)
     {
       //we have to add/subtract one more because we have not removed the layer yet, thus the group count is to 1 high.
       newActiveIndex = indexToDelete+1 < GetNumberOfLayers() ? indexToDelete : GetNumberOfLayers() - 2;
-      newActiveIndexBeforeDeletion = indexToDelete + 1 < GetNumberOfLayers() ? indexToDelete+1 : indexToDelete -1;
     }
   }
 
@@ -541,7 +539,7 @@ void mitk::MultiLabelSegmentation::ClearGroupImage(GroupIndexType groupID, TimeS
   if (!this->ExistGroup(groupID))
     mitkThrow() << "Error, cannot clear group image. Group ID is invalid. Invalid ID: " << groupID;
 
-  if (!this->GetTimeSteps()<=timestep)
+  if (!(this->GetTimeSteps()<=timestep))
     mitkThrow() << "Error, cannot clear group image time step. Time step is invalid. Invalid time step: " << timestep;
 
   try
@@ -582,7 +580,7 @@ void mitk::MultiLabelSegmentation::ClearGroupImages()
 
 void mitk::MultiLabelSegmentation::ClearGroupImages(TimeStepType timestep)
 {
-  if (!this->GetTimeSteps() <= timestep)
+  if (!(this->GetTimeSteps() <= timestep))
     mitkThrow() << "Error, cannot clear group image time step. Time step is invalid. Invalid time step: " << timestep;
 
   for (GroupIndexType groupID = 0; groupID < m_LayerContainer.size(); ++groupID)

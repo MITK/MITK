@@ -461,6 +461,10 @@ namespace mitk
     */
     void UpdateLookupTable(PixelType pixelValue);
 
+    /** Initializes the instance by completely resetting it and releasing all group images. The geometric information is
+    kept.*/
+    void Initialize() override;
+
     /**
     * @brief Initialize new (or re-initialize) the segmentation based on the properties
     * and geometric information of a passed image. The pixel content will be reseted.

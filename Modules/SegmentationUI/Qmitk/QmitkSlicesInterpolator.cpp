@@ -790,9 +790,15 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     return;
   }
 
+  if (!segmentationImage->ExistLabel(m_CurrentActiveLabelValue))
+  {
+    MITK_ERROR << "OnAcceptInterpolationClicked triggered with no valid label selected. Currently selected invalid label: " << m_CurrentActiveLabelValue;
+    return;
+  }
+
   const auto timeStep = segmentationImage->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
 
-  auto interpolatedSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, segmentationImage, timeStep)->Clone();
+  auto interpolatedSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, segmentationImage->GetGroupImage(segmentationImage->GetGroupIndexOfLabel(m_CurrentActiveLabelValue)), timeStep)->Clone();
   auto activeValue = segmentationImage->GetActiveLabel()->GetValue();
   mitk::TransferLabelContentAtTimeStep(
     interpolatedPreview,
@@ -819,43 +825,32 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
    */
   if (m_Segmentation)
   {
-    mitk::Image::Pointer segmentation3D = m_Segmentation;
-    unsigned int timeStep = 0;
-
-    if (4 == m_Segmentation->GetDimension())
+    if (!m_Segmentation->ExistLabel(m_CurrentActiveLabelValue))
     {
-      const auto* geometry = m_Segmentation->GetTimeGeometry();
-
-      if (!geometry->IsValidTimePoint(m_TimePoint))
-      {
-        MITK_WARN << "Cannot accept all interpolations. Time point selected by passed SliceNavigationController is not "
-                     "within the time bounds of segmentation. Time point: "
-                  << m_TimePoint;
-        return;
-      }
-
-      mitk::Image::Pointer activeLabelImage;
-      try
-      {
-        auto labelSetImage = dynamic_cast<mitk::MultiLabelSegmentation *>(m_Segmentation);
-        activeLabelImage = mitk::CreateLabelMask(labelSetImage, labelSetImage->GetActiveLabel()->GetValue());
-      }
-      catch (const std::exception& e)
-      {
-        MITK_ERROR << e.what() << " | NO LABELSETIMAGE IN WORKING NODE\n";
-      }
-
-      m_Interpolator->SetSegmentationVolume(activeLabelImage);
-
-      timeStep = geometry->TimePointToTimeStep(m_TimePoint);
-
-      auto timeSelector = mitk::ImageTimeSelector::New();
-      timeSelector->SetInput(m_Segmentation);
-      timeSelector->SetTimeNr(timeStep);
-      timeSelector->Update();
-
-      segmentation3D = timeSelector->GetOutput();
+      MITK_ERROR << "AcceptAllInterpolations triggered with no valid label selected. Currently selected invalid label: " << m_CurrentActiveLabelValue;
+      return;
     }
+    if (!m_Segmentation->GetTimeGeometry()->IsValidTimePoint(m_TimePoint))
+    {
+      MITK_WARN << "Cannot accept all interpolations. Time point selected by passed SliceNavigationController is not "
+        "within the time bounds of segmentation. Time point: "
+        << m_TimePoint;
+      return;
+    }
+
+    mitk::Image::Pointer activeLabelImage;
+    try
+    {
+      activeLabelImage = mitk::CreateLabelMask(m_Segmentation, m_CurrentActiveLabelValue);
+    }
+    catch (const std::exception& e)
+    {
+      MITK_ERROR << e.what() << " | NO LABELSETIMAGE IN WORKING NODE\n";
+    }
+    m_Interpolator->SetSegmentationVolume(activeLabelImage);
+
+    const auto relevantGroupImage = m_Segmentation->GetGroupImage(m_Segmentation->GetGroupIndexOfLabel(m_CurrentActiveLabelValue));
+    const auto segmentation3D = mitk::SelectImageByTimePoint(relevantGroupImage, m_TimePoint);
 
     // Create an empty diff image for the undo operation
     auto diffImage = mitk::Image::New();
@@ -868,10 +863,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       // Set all pixels to zero
       auto pixelType = mitk::MakeScalarPixelType<mitk::Tool::DefaultSegmentationDataType>();
 
-      // For legacy purpose support former pixel type of segmentations (before multilabel)
-      if (itk::IOComponentEnum::UCHAR == m_Segmentation->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType())
-        pixelType = mitk::MakeScalarPixelType<unsigned char>();
-
       memset(accessor.GetData(), 0, pixelType.GetSize() * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2));
     }
 
@@ -881,9 +872,9 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     int sliceDimension = -1;
     int sliceIndex = -1;
 
-    mitk::SegTool2D::DetermineAffectedImageSlice(m_Segmentation, planeGeometry, sliceDimension, sliceIndex);
+    mitk::SegTool2D::DetermineAffectedImageSlice(segmentation3D, planeGeometry, sliceDimension, sliceIndex);
 
-    const auto numSlices = m_Segmentation->GetDimension(sliceDimension);
+    const auto numSlices = m_Segmentation->GetDimensions()[sliceDimension];
     mitk::ProgressBar::GetInstance()->AddStepsToDo(numSlices);
 
     std::atomic_uint totalChangedSlices;
@@ -900,6 +891,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     std::vector<std::thread> threads;
     threads.reserve(numThreads);
+
+    auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
 
     // This lambda will be executed by the threads
     auto interpolate = [=, &interpolator = m_Interpolator, &totalChangedSlices](unsigned int threadIndex)
@@ -958,21 +951,30 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     //  Do and Undo Operations
     if (totalChangedSlices > 0)
     {
-      // Create do/undo operations
-      auto* doOp = new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
+      /////////////////////////////////////////////////////////////
+      //Commented out code that does not work due to changes in #536.
+      //This break functionality, but code has to be completly to be rworked
+      //anyways will be done directly after #536 in #81
+      //choose to just defunc code for now to avoid making the code review
+      //of #536 even more complex
 
-      auto* undoOp = new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
-      undoOp->SetFactor(-1.0);
+      //// Create do/undo operations
+      //auto* doOp = new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
 
-      auto comment = "Confirm all interpolations (" + std::to_string(totalChangedSlices) + ")";
-      auto* undoStackItem = new mitk::OperationEvent(mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment);
+      //auto* undoOp = new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
+      //undoOp->SetFactor(-1.0);
 
-      mitk::OperationEvent::IncCurrGroupEventId();
-      mitk::OperationEvent::IncCurrObjectEventId();
-      mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
-      mitk::DiffImageApplier::GetInstanceForUndo()->SetDestinationLabel(newDestinationLabel);
-      // Apply the changes to the original image
-      mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation(doOp);
+      //auto comment = "Confirm all interpolations (" + std::to_string(totalChangedSlices) + ")";
+      //auto* undoStackItem = new mitk::OperationEvent(mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment);
+
+      //mitk::OperationEvent::IncCurrGroupEventId();
+      //mitk::OperationEvent::IncCurrObjectEventId();
+      //mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
+      //mitk::DiffImageApplier::GetInstanceForUndo()->SetDestinationLabel(newDestinationLabel);
+      //// Apply the changes to the original image
+      //mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation(doOp);
+
+      /////////////////////////////////////////////////////////////
     }
     m_FeedbackNode->SetData(nullptr);
   }

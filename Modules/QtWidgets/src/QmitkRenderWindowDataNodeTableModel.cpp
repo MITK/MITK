@@ -40,6 +40,9 @@ QmitkRenderWindowDataNodeTableModel::QmitkRenderWindowDataNodeTableModel(QObject
 
 void QmitkRenderWindowDataNodeTableModel::UpdateModelData()
 {
+  if (m_BaseRenderers.size() == 0)
+    return;
+
   // The node properties are the same for all connected renderers, so we just take the first one
   auto baseRenderer = m_BaseRenderers.at(0).Lock();
 

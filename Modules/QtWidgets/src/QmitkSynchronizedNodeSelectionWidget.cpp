@@ -545,6 +545,9 @@ void QmitkSynchronizedNodeSelectionWidget::SetStorageModel(QmitkRenderWindowData
   if (m_StorageModel == storageModel)
     return;
 
+  if (m_StorageModel != nullptr)
+    m_StorageModel->RemoveRenderer(m_BaseRenderer.Lock());
+
   m_StorageModel = storageModel;
 
   m_Controls.tableView->setModel(storageModel);

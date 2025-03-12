@@ -65,7 +65,8 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_SynchGroupSelector = new QComboBox(this);
   for (int i=0; i<nSynchGroups; ++i)
     m_SynchGroupSelector->insertItem(i, QString("Group %1").arg(i));
-  m_SynchGroupSelector->addItem("New Group");
+  m_SynchGroupSelector->addItem("New");
+  m_SynchGroupSelector->setMinimumContentsLength(8);
   connect(m_SynchGroupSelector, &QComboBox::currentIndexChanged,
     this, &QmitkRenderWindowUtilityWidget::OnSynchGroupSelectionChanged);
   layout->addWidget(m_SynchGroupSelector);
@@ -84,7 +85,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_ViewDirectionSelector = new QComboBox(this);
   QStringList viewDirections{ "axial", "coronal", "sagittal"};
   m_ViewDirectionSelector->insertItems(0, viewDirections);
-  m_ViewDirectionSelector->setMinimumContentsLength(12);
+  m_ViewDirectionSelector->setMinimumContentsLength(7);
   connect(m_ViewDirectionSelector, &QComboBox::currentTextChanged, this, &QmitkRenderWindowUtilityWidget::ChangeViewDirection);
   UpdateViewPlaneSelection();
 

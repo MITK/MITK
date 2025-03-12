@@ -151,6 +151,7 @@ namespace
 
       geometry->SetBounds(croppedBounds);
     }
+    croppedTimeGeometry->UpdateBoundingBox();
 
     auto croppedLabelSetImage = mitk::MultiLabelSegmentation::New();
     croppedLabelSetImage->Initialize(croppedTimeGeometry);
@@ -232,9 +233,9 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
 
       croppedLabelSetImage = Crop(labelSetImage, minIndex, maxIndex);
     }
-    catch (const mitk::Exception&)
+    catch (const mitk::Exception& e)
     {
-      MITK_ERROR << "Autocrop was aborted: Image read access to \"" << dataNode->GetName() << "\" was denied.";
+      MITK_ERROR << "Autocrop was aborted: Image read access to \"" << dataNode->GetName() << "\" was denied. Details: "<< e.what();
       labelSetImage->SetActiveLayer(activeLayer); // Restore the originally active layer
       return;
     }

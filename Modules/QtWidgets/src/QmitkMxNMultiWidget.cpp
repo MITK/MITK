@@ -646,7 +646,7 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup()
 
 void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const int index)
 {
-  while (index >= static_cast<const int>(m_SynchronizedWidgetConnectors.size()))
+  while (index >= static_cast<int>(m_SynchronizedWidgetConnectors.size()))
   {
     this->AddSynchronizationGroup();
   }

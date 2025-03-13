@@ -646,11 +646,7 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup()
 
 void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const int index)
 {
-  if (index > m_SynchronizedWidgetConnectors.size())
-  {
-    MITK_ERROR << "Mismatch in number of SynchronizedWidgetConnectors. Trying to add index " << index << ", but currently there are only " << m_SynchronizedWidgetConnectors.size();
-  }
-  if (index == m_SynchronizedWidgetConnectors.size())
+  while (index >= static_cast<const int>(m_SynchronizedWidgetConnectors.size()))
   {
     this->AddSynchronizationGroup();
   }

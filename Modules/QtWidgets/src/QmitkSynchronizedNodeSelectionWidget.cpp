@@ -24,8 +24,8 @@ found in the LICENSE file.
 
 QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidget* parent)
   : QmitkAbstractNodeSelectionWidget(parent)
-  , m_SynchGroupIndex(-1)
   , m_StorageModel(nullptr)
+  , m_SynchGroupIndex(-1)
 {
   m_Controls.setupUi(this);
 

@@ -946,8 +946,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     m_Interpolator->DisableSliceImageCache();
 
-    const mitk::Label::PixelType newDestinationLabel = dynamic_cast<mitk::MultiLabelSegmentation *>(m_Segmentation)->GetActiveLabel()->GetValue();
-
     //  Do and Undo Operations
     if (totalChangedSlices > 0)
     {
@@ -970,6 +968,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       //mitk::OperationEvent::IncCurrGroupEventId();
       //mitk::OperationEvent::IncCurrObjectEventId();
       //mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
+      //const auto newDestinationLabel = dynamic_cast<mitk::MultiLabelSegmentation*>(m_Segmentation)->GetActiveLabel()->GetValue();
       //mitk::DiffImageApplier::GetInstanceForUndo()->SetDestinationLabel(newDestinationLabel);
       //// Apply the changes to the original image
       //mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation(doOp);

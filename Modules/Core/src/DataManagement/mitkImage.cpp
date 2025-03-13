@@ -1271,6 +1271,21 @@ bool mitk::Image::IsRotated() const
   return ret;
 }
 
+mitk::ImageDimensionVectorType mitk::DeterminImageDimensionsFromTimeGeometry(const TimeGeometry* timeGeometry)
+{
+  ImageDimensionVectorType result;
+  result.push_back(static_cast<unsigned int>(timeGeometry->GetGeometryForTimeStep(0)->GetExtent(0) + 0.5));
+  result.push_back(static_cast<unsigned int>(timeGeometry->GetGeometryForTimeStep(0)->GetExtent(1) + 0.5));
+
+  auto dim3 = static_cast<unsigned int>(timeGeometry->GetGeometryForTimeStep(0)->GetExtent(2) + 0.5);
+  auto dim4 = timeGeometry->CountTimeSteps();
+  if (dim3 > 1 || dim4 > 1)
+    result.push_back(dim3);
+  if (dim4 > 1)
+    result.push_back(dim4);
+
+  return result;
+}
 
 bool mitk::Equal(const mitk::Image &leftHandSide, const mitk::Image &rightHandSide, ScalarType eps, bool verbose)
 {

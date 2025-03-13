@@ -125,7 +125,9 @@ mitk::Image::Pointer mitk::MultiLabelSegmentation::GenerateNewGroupImage() const
   auto groupImage = Image::New();
 
   mitk::PixelType pixelType(mitk::MakeScalarPixelType<MultiLabelSegmentation::PixelType>());
-  if (m_GroupImageDimensions.size() == 2)
+
+  auto geometryDimensions = DeterminImageDimensionsFromTimeGeometry(this->GetTimeGeometry());
+  if (geometryDimensions.size() == 2)
   {
     const unsigned int dimensions[] = { m_GroupImageDimensions[0], m_GroupImageDimensions[1], 1 };
     groupImage->Initialize(pixelType, 3, dimensions);
@@ -134,6 +136,7 @@ mitk::Image::Pointer mitk::MultiLabelSegmentation::GenerateNewGroupImage() const
   {
     groupImage->Initialize(pixelType, *(this->GetTimeGeometry()));
   }
+  groupImage->GetTimeGeometry()->UpdateBoundingBox();
   return groupImage;
 }
 
@@ -147,6 +150,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage,
   if (nullptr == templateImage) mitkThrow() << "Cannot initialize multi label segementation instance. Passed template image is a nullptr.";
 
   auto originalGeometry = templateImage->GetTimeGeometry()->Clone();
+  originalGeometry->UpdateBoundingBox();
   this->SetTimeGeometry(originalGeometry);
   m_GroupImageDimensions = GroupImageDimensionVectorType(templateImage->GetDimensions(), templateImage->GetDimensions() + templateImage->GetDimension());
 
@@ -202,7 +206,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::TimeGeometry* geometry
       clonedGeometry->GetGeometryForTimeStep(step)->ImageGeometryOn();
     }
   }
-
+  clonedGeometry->UpdateBoundingBox();
   this->SetTimeGeometry(clonedGeometry);
 
   if (resetLabels)
@@ -1465,21 +1469,6 @@ bool mitk::Equal(const mitk::MultiLabelSegmentation &leftHandSide,
   {
     MITK_INFO(verbose) << "Active layer not equal.";
     return false;
-  }
-
-  if (4 == leftHandSide.GetDimension())
-  {
-    MITK_INFO(verbose) << "Can not compare image data for 4D images - skipping check.";
-  }
-  else
-  {
-    // working image data
-    returnValue = mitk::Equal((const mitk::Image &)leftHandSide, (const mitk::Image &)rightHandSide, eps, verbose);
-    if (!returnValue)
-    {
-      MITK_INFO(verbose) << "Working image data not equal.";
-      return false;
-    }
   }
 
   if (leftHandSide.GetTotalNumberOfLabels() != rightHandSide.GetTotalNumberOfLabels())

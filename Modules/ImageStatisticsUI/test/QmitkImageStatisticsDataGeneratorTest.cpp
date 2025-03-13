@@ -87,7 +87,7 @@ class QmitkImageStatisticsDataGeneratorTestSuite : public mitk::TestFixture
   mitk::DataNode::Pointer m_PFNode;
   mitk::Image::Pointer m_Image1;
   mitk::Image::Pointer m_Image2;
-  mitk::Image::Pointer m_Mask;
+  mitk::MultiLabelSegmentation::Pointer m_Mask;
   mitk::PlanarFigure::Pointer m_PF;
 
   QCoreApplication* m_TestApp;
@@ -115,7 +115,7 @@ public:
     m_MaskImageNode = mitk::DataNode::New();
     m_MaskImageNode->SetName("Mask");
     auto pic3DCroppedBinMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D_croppedBinMask.nrrd");
-    m_Mask = mitk::IOUtil::Load<mitk::Image>(pic3DCroppedBinMaskFile);
+    m_Mask = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(pic3DCroppedBinMaskFile);
     CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", m_Mask.IsNotNull());
     m_MaskImageNode->SetData(m_Mask);
     m_DataStorage->Add(m_MaskImageNode);

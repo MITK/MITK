@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkImageMaskGenerator.h>
+#include <mitkMultiLabelMaskGenerator.h>
 #include <mitkImageStatisticsConstants.h>
 
 /**
@@ -88,14 +89,9 @@ private:
   mitk::Image::ConstPointer m_TestImage;
 
   mitk::Image::ConstPointer m_Pic3DCroppedImage;
-  mitk::Image::Pointer m_Pic3DCroppedBinMask;
-  mitk::Image::Pointer m_Pic3DCroppedMultilabelMask;
   mitk::PlanarFigure::Pointer m_Pic3DCroppedPlanarFigure;
 
   mitk::Image::ConstPointer m_US4DCroppedImage;
-  mitk::Image::Pointer m_US4DCroppedBinMask;
-  mitk::Image::Pointer m_US4DCroppedMultilabelMask;
-  mitk::Image::Pointer m_US4DCropped3DBinMask;
   mitk::PlanarFigure::Pointer m_US4DCroppedPlanarFigure;
 
   mitk::PlaneGeometry::Pointer m_Geometry;
@@ -579,8 +575,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
   CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D_cropped", m_Pic3DCroppedImage.IsNotNull());
 
   std::string Pic3DCroppedBinMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D_croppedBinMask.nrrd");
-  m_Pic3DCroppedBinMask = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedBinMaskFile);
-  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", m_Pic3DCroppedBinMask.IsNotNull());
+  auto pic3DCroppedBinMask = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(Pic3DCroppedBinMaskFile);
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", pic3DCroppedBinMask.IsNotNull());
   //calculated ground truth via script
   mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.0765697398089618;
   mitk::ImageStatisticsContainer::RealType expected_MPP = -nan("");
@@ -605,7 +601,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
   expected_maxIndex[2] = 1;
 
   mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
-  imgMaskGen->SetImageMask(m_Pic3DCroppedBinMask);
+  imgMaskGen->SetImageMask(pic3DCroppedBinMask->GetGroupImage(0));
   imgMaskGen->SetInputImage(m_Pic3DCroppedImage);
   imgMaskGen->SetTimePoint(m_Pic3DCroppedImage->GetTimeGeometry()->TimeStepToTimePoint(0));
 
@@ -638,8 +634,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
   CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D_cropped", m_Pic3DCroppedImage.IsNotNull());
 
   std::string Pic3DCroppedMultilabelMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D_croppedMultilabelMask.nrrd");
-  m_Pic3DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedMultilabelMaskFile);
-  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D multi-label mask", m_Pic3DCroppedMultilabelMask.IsNotNull());
+  auto pic3DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(Pic3DCroppedMultilabelMaskFile);
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D multi-label mask", pic3DCroppedMultilabelMask.IsNotNull());
   //calculated ground truth via script
   mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.5;
   mitk::ImageStatisticsContainer::RealType expected_MPP = -nan("");
@@ -663,13 +659,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
   expected_maxIndex[1] = 0;
   expected_maxIndex[2] = 1;
 
-  mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
-  imgMaskGen->SetImageMask(m_Pic3DCroppedMultilabelMask);
-  imgMaskGen->SetInputImage(m_Pic3DCroppedImage);
-  imgMaskGen->SetTimePoint(m_Pic3DCroppedImage->GetTimeGeometry()->TimeStepToTimePoint(0));
+  mitk::MultiLabelMaskGenerator::Pointer mlMaskGen = mitk::MultiLabelMaskGenerator::New();
+  mlMaskGen->SetMultiLabelSegmentation(pic3DCroppedMultilabelMask);
+  mlMaskGen->SetInputImage(m_Pic3DCroppedImage);
+  mlMaskGen->SetTimePoint(m_Pic3DCroppedImage->GetTimeGeometry()->TimeStepToTimePoint(0));
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr));
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, mlMaskGen.GetPointer(), nullptr));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatistics(2, 0);
 
   VerifyStatistics(statisticsObjectTimestep0,
@@ -805,8 +801,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
   CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
 
   std::string US4DCroppedBinMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_croppedBinMask.nrrd");
-  m_US4DCroppedBinMask = mitk::IOUtil::Load<mitk::Image>(US4DCroppedBinMaskFile);
-  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D binary mask", m_US4DCroppedBinMask.IsNotNull());
+  auto us4DCroppedBinMask = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(US4DCroppedBinMaskFile);
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D binary mask", us4DCroppedBinMask.IsNotNull());
   //calculated ground truth via script
   mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.5863739712889191;
   mitk::ImageStatisticsContainer::RealType expected_MPP = 166.75;
@@ -832,7 +828,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 
   mitk::ImageMaskGenerator::Pointer imgMask1 = mitk::ImageMaskGenerator::New();
   imgMask1->SetInputImage(m_US4DCroppedImage);
-  imgMask1->SetImageMask(m_US4DCroppedBinMask);
+  imgMask1->SetImageMask(us4DCroppedBinMask->GetGroupImage(0));
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer=mitk::ImageStatisticsContainer::New();
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr));
@@ -863,8 +859,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
   CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
 
   std::string US4DCroppedMultilabelMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_croppedMultilabelMask.nrrd");
-  m_US4DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::Image>(US4DCroppedMultilabelMaskFile);
-  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D multi-label mask", m_US4DCroppedMultilabelMask.IsNotNull());
+  auto us4DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(US4DCroppedMultilabelMaskFile);
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D multi-label mask", us4DCroppedMultilabelMask.IsNotNull());
   //calculated ground truth via script
   mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.0432484564918287;
   mitk::ImageStatisticsContainer::RealType expected_MPP = 159.75;
@@ -888,12 +884,12 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
   expected_maxIndex[1] = 0;
   expected_maxIndex[2] = 1;
 
-  mitk::ImageMaskGenerator::Pointer imgMask1 = mitk::ImageMaskGenerator::New();
-  imgMask1->SetInputImage(m_US4DCroppedImage);
-  imgMask1->SetImageMask(m_US4DCroppedMultilabelMask);
+  mitk::MultiLabelMaskGenerator::Pointer mlMask = mitk::MultiLabelMaskGenerator::New();
+  mlMask->SetInputImage(m_US4DCroppedImage);
+  mlMask->SetMultiLabelSegmentation(us4DCroppedMultilabelMask);
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer;
-  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr));
+  CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, mlMask.GetPointer(), nullptr));
   auto statisticsObjectTimestep1 = statisticsContainer->GetStatistics(1, 1);
 
   VerifyStatistics(statisticsObjectTimestep1,
@@ -993,8 +989,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCropped3DMask()
   CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
 
   std::string US4DCropped3DBinMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped3DBinMask.nrrd");
-  m_US4DCropped3DBinMask = mitk::IOUtil::Load<mitk::Image>(US4DCropped3DBinMaskFile);
-  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", m_US4DCropped3DBinMask.IsNotNull());
+  auto us4DCropped3DBinMask = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(US4DCropped3DBinMaskFile);
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", us4DCropped3DBinMask.IsNotNull());
   //calculated ground truth via script
   mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1;
   mitk::ImageStatisticsContainer::RealType expected_MPP = 198;
@@ -1020,7 +1016,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCropped3DMask()
 
   mitk::ImageMaskGenerator::Pointer imgMask1 = mitk::ImageMaskGenerator::New();
   imgMask1->SetInputImage(m_US4DCroppedImage);
-  imgMask1->SetImageMask(m_US4DCropped3DBinMask);
+  imgMask1->SetImageMask(us4DCropped3DBinMask->GetGroupImage(0));
 
   mitk::ImageStatisticsContainer::Pointer statisticsContainer = mitk::ImageStatisticsContainer::New();
   CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr));

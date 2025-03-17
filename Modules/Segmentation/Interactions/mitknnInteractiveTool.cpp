@@ -964,13 +964,12 @@ void mitk::nnInteractiveTool::InitializeBackend()
                           "from pathlib import Path\n"
                           "from nnunetv2.utilities.find_class_by_name import recursive_find_python_class\n"
                           "from batchgenerators.utilities.file_and_folder_operations import join, load_json\n"
-                          "from huggingface_hub import login, snapshot_download\n"
-                          "login(token = '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')\n" // Private token
-                          "repo_id = 'kraemer/nnInteractive'\n"
+                          "from huggingface_hub import snapshot_download\n"
+                          "repo_id = 'nnInteractive/nnInteractive'\n"
                           "download_path = snapshot_download(repo_id = repo_id, allow_patterns = ['" +
                           modelName + "/*'], force_download = False)\n"
                           //"download_path = os.getcwd()\n"
-                          "checkpoint_path = Path(download_path).joinpath('" + modelName + "')\n" //hardcode model checkpoint path to pack together
+                          "checkpoint_path = Path(download_path).joinpath('" + modelName + "')\n"
                           "print(f'Using Model " + modelName + " at:{checkpoint_path}')\n";
   try
   {
@@ -983,10 +982,10 @@ void mitk::nnInteractiveTool::InitializeBackend()
   pycommand.clear();
   pycommand = "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
               "   inference_class = load_json(Path(checkpoint_path).joinpath('inference_session_class.json'))\n"
-              "if isinstance (inference_class, dict):\n"
-              "   inference_class = inference_class['inference_class']\n"
+              "   if isinstance (inference_class, dict):\n"
+              "       inference_class = inference_class['inference_class']\n"
               "else:\n"
-              "   inference_class = 'nnInteractiveInferenceSessionV3'\n"
+              "   inference_class = 'nnInteractiveInferenceSession'\n"
               "inference_class = recursive_find_python_class(join(nnInteractive.__path__[0], 'inference'),"
               "inference_class, 'nnInteractive.inference')\n";
   try
@@ -1001,11 +1000,10 @@ void mitk::nnInteractiveTool::InitializeBackend()
   pycommand = "session = inference_class("
               "device = torch.device('" + device + "'),"
               "use_torch_compile = False,"
-              "torch_n_threads = 16,"
+              "torch_n_threads = os.cpu_count(),"
               "verbose = False,"
-              "do_autozoom = True,"
-              "use_pinned_memory = True)\n"
-              "session.initialize_from_trained_model_folder(checkpoint_path)\n ";
+              "do_autozoom = True)\n"
+              "session.initialize_from_trained_model_folder(checkpoint_path)\n";
   try
   {
     m_PythonContext->ExecuteString(pycommand);

@@ -20,17 +20,17 @@ namespace mitk
   /**
   \brief Serializes mitk::MultiLabelSegmentation for mitk::SceneIO
   */
-  class LabelSetImageSerializer : public BaseDataSerializer
+  class MultiLabelSegmentationSerializer : public BaseDataSerializer
   {
   public:
-    mitkClassMacro(LabelSetImageSerializer, BaseDataSerializer);
+    mitkClassMacro(MultiLabelSegmentationSerializer, BaseDataSerializer);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
     std::string Serialize() override;
 
   protected:
-    LabelSetImageSerializer();
-    ~LabelSetImageSerializer() override;
+    MultiLabelSegmentationSerializer();
+    ~MultiLabelSegmentationSerializer() override;
   };
 } // namespace
 

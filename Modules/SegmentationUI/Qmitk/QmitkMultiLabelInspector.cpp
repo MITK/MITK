@@ -226,20 +226,9 @@ void QmitkMultiLabelInspector::OnDataChanged(const QModelIndex& topLeft, const Q
     m_Controls->view->expand(topLeft);
 }
 
-bool EqualLabelSelections(const QmitkMultiLabelInspector::LabelValueVectorType& selection1, const QmitkMultiLabelInspector::LabelValueVectorType& selection2)
-{
-  if (selection1.size() == selection2.size())
-  {
-    // lambda to compare node pointer inside both lists
-    return std::is_permutation(selection1.begin(), selection1.end(), selection2.begin());
-  }
-
-  return false;
-}
-
 void QmitkMultiLabelInspector::SetSelectedLabels(const LabelValueVectorType& selectedLabels)
 {
-  if (EqualLabelSelections(this->GetSelectedLabels(), selectedLabels))
+  if (mitk::Equal(this->GetSelectedLabels(), selectedLabels))
   {
     return;
   }

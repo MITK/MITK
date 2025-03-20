@@ -23,7 +23,7 @@ namespace mitk
   {
   public:
     IPythonService();      
-    ~IPythonService();
+    ~IPythonService() = default;
   };
 }
 MITK_DECLARE_SERVICE_INTERFACE(mitk::IPythonService, "org.mitk.services.IPythonService")

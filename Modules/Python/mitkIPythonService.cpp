@@ -35,6 +35,3 @@ mitk::IPythonService::IPythonService()
     Py_Initialize();
   }
 }
-
-mitk::IPythonService::~IPythonService() {}
-

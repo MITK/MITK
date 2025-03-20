@@ -1452,6 +1452,24 @@ bool mitk::Equal(const mitk::LabelSetImage::ConstLabelVectorType& leftHandSide,
   return returnValue;
 }
 
+bool mitk::Equal(const mitk::LabelSetImage::LabelValueVectorType& leftHandSide,
+  const mitk::LabelSetImage::LabelValueVectorType& rightHandSide,
+  bool orderIsRelevant)
+{
+  if (orderIsRelevant)
+  {
+    return leftHandSide == rightHandSide;
+  }
+  if (leftHandSide.size() == rightHandSide.size())
+  {
+    // lambda to compare node pointer inside both lists
+    return std::is_permutation(leftHandSide.begin(), leftHandSide.end(), rightHandSide.begin());
+  }
+
+  return false;
+}
+
+
 /**Helper function to convert a vector of labels into a label map
  * @pre every label in the vector has a unique value.*/
 using ConstLabelMapType = std::map<mitk::LabelSetImage::LabelValueType, mitk::Label::ConstPointer>;

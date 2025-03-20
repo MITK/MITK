@@ -596,6 +596,25 @@ namespace mitk
     ScalarType eps,
     bool verbose);
 
+  /**
+  * @brief Equal A function comparing two vectors of label values for being equal in data
+  *
+  * @ingroup MITKTestingAPI
+  *
+  * Following aspects are tested for equality:
+  *  - Label values in vector
+  *
+  * @param rightHandSide An vector of label values to be compared
+  * @param leftHandSide An vector of label values to be compared
+  * @param orderIsRelevant Indicating if only the presence of the same values
+  * in the vectors are relevant or also their ordering.Tolerance for comparison.
+  * @return true, if all subsequent comparisons are true, false otherwise
+  */
+  MITKMULTILABEL_EXPORT bool Equal(const mitk::LabelSetImage::LabelValueVectorType& leftHandSide,
+    const mitk::LabelSetImage::LabelValueVectorType& rightHandSide,
+    bool orderIsRelevant = false);
+
+
 
   /** temporary namespace that is used until the new class MultiLabelSegmentation is
     introduced. It allows to already introduce/use some upcoming definitions, while

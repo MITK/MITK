@@ -278,7 +278,8 @@ QmitkMultiLabelTreeModel::QmitkMultiLabelTreeModel(QObject *parent) : QAbstractI
 
 QmitkMultiLabelTreeModel ::~QmitkMultiLabelTreeModel()
 {
-  this->SetSegmentation(nullptr);
+  this->m_Segmentation = nullptr;
+  this->AddObserver(); //removes current observers
 };
 
 int QmitkMultiLabelTreeModel::columnCount(const QModelIndex& /*parent*/) const

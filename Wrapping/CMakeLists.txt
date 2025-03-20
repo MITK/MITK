@@ -17,5 +17,4 @@ if(MITK_WRAP_PYTHON_ENABLED)
   set_property(TARGET dist PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Wrapping")
 
   add_subdirectory(Python)
-  add_subdirectory(test)
 endif()

@@ -719,102 +719,14 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_ROIBased(mitk::modelFit::Mode
 
   //Parametrize fit generator
   fitGenerator->SetModelParameterizer(modelParameterizer);
-  fitGenerator->SetMask(m_selectedMask);
+  fitGenerator->SetMask(maskAt1stTS);
   fitGenerator->SetFitFunctor(fitFunctor);
   fitGenerator->SetSignal(roiSignal);
   fitGenerator->SetTimeGrid(mitk::ExtractTimeGrid(m_selectedImage));
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = this->m_selectedMask->GetUID();
-
-  //Create model info
-  modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), this->GetFitName(), roiUID);
-  mitk::ScalarListLookupTable::ValueType infoSignal;
-
-  for (mitk::MaskedDynamicImageStatisticsGenerator::ResultType::const_iterator pos =
-         roiSignal.begin(); pos != roiSignal.end(); ++pos)
-  {
-    infoSignal.push_back(*pos);
-  }
-
-  modelFitInfo->inputData.SetTableValue("ROI", infoSignal);
-}
-
-template <typename TParameterizer>
-void MRPerfusionView::GenerateLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
-    modelFitInfo, mitk::ParameterFitImageGeneratorBase::Pointer& generator)
-{
-  mitk::PixelBasedParameterFitImageGenerator::Pointer fitGenerator =
-    mitk::PixelBasedParameterFitImageGenerator::New();
-
-  typename TParameterizer::Pointer modelParameterizer = TParameterizer::New();
-
-  this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
-
-  //Specify fitting strategy and criterion parameters
-  mitk::ModelFitFunctorBase::Pointer fitFunctor = CreateDefaultFitFunctor(modelParameterizer);
-
-  //Parametrize fit generator
-  fitGenerator->SetModelParameterizer(modelParameterizer);
-  std::string roiUID = "";
-
-  if (m_selectedMask.IsNotNull())
-  {
-    fitGenerator->SetMask(m_selectedMask);
-    roiUID = this->m_selectedMask->GetUID();
-  }
-
-  fitGenerator->SetDynamicImage(m_selectedImage);
-  fitGenerator->SetFitFunctor(fitFunctor);
-
-  generator = fitGenerator.GetPointer();
-
-  //Create model info
-  modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), this->GetFitName(), roiUID);
-}
-
-template <typename TParameterizer>
-void MRPerfusionView::GenerateLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
-    modelFitInfo, mitk::ParameterFitImageGeneratorBase::Pointer& generator)
-{
-  if (m_selectedMask.IsNull())
-  {
-    return;
-  }
-
-  mitk::ROIBasedParameterFitImageGenerator::Pointer fitGenerator =
-    mitk::ROIBasedParameterFitImageGenerator::New();
-
-  typename TParameterizer::Pointer modelParameterizer = TParameterizer::New();
-
-  //Compute ROI signal
-  mitk::MaskedDynamicImageStatisticsGenerator::Pointer signalGenerator =
-    mitk::MaskedDynamicImageStatisticsGenerator::New();
-  signalGenerator->SetMask(m_selectedMask);
-  signalGenerator->SetDynamicImage(m_selectedImage);
-  signalGenerator->Generate();
-
-  mitk::MaskedDynamicImageStatisticsGenerator::ResultType roiSignal = signalGenerator->GetMean();
-
-  //Model configuration (static parameters) can be done now
-  this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
-
-  //Specify fitting strategy and criterion parameters
-  mitk::ModelFitFunctorBase::Pointer fitFunctor = CreateDefaultFitFunctor(modelParameterizer);
-
-  //Parametrize fit generator
-  fitGenerator->SetModelParameterizer(modelParameterizer);
-  fitGenerator->SetMask(m_selectedMask);
-  fitGenerator->SetFitFunctor(fitFunctor);
-  fitGenerator->SetSignal(roiSignal);
-  fitGenerator->SetTimeGrid(mitk::ExtractTimeGrid(m_selectedImage));
-
-  generator = fitGenerator.GetPointer();
-
-  std::string roiUID = this->m_selectedMask->GetUID();
+  std::string roiUID = m_Controls.maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,

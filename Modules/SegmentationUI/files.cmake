@@ -36,6 +36,8 @@ set(CPP_FILES
   Qmitk/QmitkMultiLabelTreeModel.cpp
   Qmitk/QmitkMultiLabelTreeView.cpp
   Qmitk/QmitkMultiLabelPresetHelper.cpp
+  Qmitk/QmitkMultiLabelSelectionLabel.cpp
+  Qmitk/QmitkMultiLabelSelectionWidget.cpp
   Qmitk/QmitkLabelColorItemDelegate.cpp
   Qmitk/QmitkLabelToggleItemDelegate.cpp
   Qmitk/QmitkFindSegmentationTaskDialog.cpp
@@ -90,6 +92,8 @@ set(MOC_H_FILES
   Qmitk/QmitkSetupVirtualEnvUtil.h
   Qmitk/QmitkMultiLabelInspector.h
   Qmitk/QmitkMultiLabelManager.h
+  Qmitk/QmitkMultiLabelSelectionLabel.h
+  Qmitk/QmitkMultiLabelSelectionWidget.h
   Qmitk/QmitkMultiLabelTreeModel.h
   Qmitk/QmitkMultiLabelTreeView.h
   Qmitk/QmitkLabelColorItemDelegate.h
@@ -120,6 +124,8 @@ set(UI_FILES
   Qmitk/QmitkTotalSegmentatorGUIControls.ui
   Qmitk/QmitkMultiLabelInspectorControls.ui
   Qmitk/QmitkMultiLabelManagerControls.ui
+  Qmitk/QmitkMultiLabelSelectionLabel.ui
+  Qmitk/QmitkMultiLabelSelectionWidget.ui
   Qmitk/QmitkFindSegmentationTaskDialog.ui
   Qmitk/QmitkSegmentAnythingGUIControls.ui
   Qmitk/QmitkMedSAMGUIControls.ui

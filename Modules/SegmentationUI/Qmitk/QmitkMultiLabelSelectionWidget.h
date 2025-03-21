@@ -23,7 +23,6 @@ found in the LICENSE file.
 
 class QmitkMultiLabelInspectorPopup;
 class QmitkMultiLabelInspector;
-class QTimer;
 
 namespace Ui
 {
@@ -31,7 +30,7 @@ namespace Ui
 }
 
 /*
-* @brief This is a selection widget that allows to select on or multiple labels of a multi label segmentation..
+* @brief This is a selection widget that allows to select one or multiple labels of a multi label segmentation..
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelSelectionWidget : public QWidget
 {
@@ -122,19 +121,12 @@ public Q_SLOTS:
   void SetEmptyInfo(QString info);
 
 protected:
-  void Initialize();
-
-  bool eventFilter(QObject* watched, QEvent* event) override;
-  void enterEvent(QEnterEvent* event) override;
-  void leaveEvent(QEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
 
 private slots:
   void ShowPopup();
   void HidePopup();
   void OnSelectionFinished();
-  void CheckMousePosition();
-  void OnPopupLabelsChanged(const LabelValueVectorType& selectedLabels);
 
 private:
   void PositionPopup();
@@ -142,9 +134,6 @@ private:
   std::unique_ptr<Ui::QmitkMultiLabelSelectionWidget> m_Controls;
   std::unique_ptr<QmitkMultiLabelInspectorPopup> m_Popup;
 
-  std::unique_ptr <QTimer> m_HoverTimer;
-  std::unique_ptr <QTimer> m_CheckMousePositionTimer;
-  bool m_PopupVisible;
 };
 
 /**
@@ -167,9 +156,6 @@ signals:
    * @brief Signal emitted when selection is finished
    */
   void SelectionFinished();
-
-protected:
-  void leaveEvent(QEvent* event) override;
 
 private slots:
   void OnPopupLabelsChanged(const LabelValueVectorType& selectedLabels);

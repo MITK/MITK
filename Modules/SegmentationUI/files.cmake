@@ -36,6 +36,7 @@ set(CPP_FILES
   Qmitk/QmitkMultiLabelTreeModel.cpp
   Qmitk/QmitkMultiLabelTreeView.cpp
   Qmitk/QmitkMultiLabelPresetHelper.cpp
+  Qmitk/QmitkMultiLabelSelectionButton.cpp
   Qmitk/QmitkMultiLabelSelectionLabel.cpp
   Qmitk/QmitkMultiLabelSelectionWidget.cpp
   Qmitk/QmitkLabelColorItemDelegate.cpp
@@ -94,6 +95,7 @@ set(MOC_H_FILES
   Qmitk/QmitkMultiLabelManager.h
   Qmitk/QmitkMultiLabelSelectionLabel.h
   Qmitk/QmitkMultiLabelSelectionWidget.h
+  Qmitk/QmitkMultiLabelSelectionButton.h
   Qmitk/QmitkMultiLabelTreeModel.h
   Qmitk/QmitkMultiLabelTreeView.h
   Qmitk/QmitkLabelColorItemDelegate.h

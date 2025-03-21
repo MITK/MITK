@@ -24,7 +24,9 @@ found in the LICENSE file.
 
 
 QmitkMultiLabelSelectionLabel::QmitkMultiLabelSelectionLabel(QWidget* parent/* = nullptr*/)
-  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelSelectionLabel), m_SegmentationNodeDataMTime(0)
+  : QWidget(parent),
+  m_Controls(new Ui::QmitkMultiLabelSelectionLabel),
+  m_SegmentationNodeDataMTime(0)
 {
   m_Controls->setupUi(this);
   m_LabelHighlightGuard.SetHighlightInvisibleLabels(true);

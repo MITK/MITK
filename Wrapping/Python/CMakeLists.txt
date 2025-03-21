@@ -48,26 +48,3 @@ set_target_properties(pyMITK PROPERTIES
 
 execute_process(COMMAND ${SWIG_EXECUTABLE} -python -external-runtime)
 
-if(DEFINED SKBUILD)
-  #message("SKBuild exists")
-  install(
-    FILES
-      ${CMAKE_CURRENT_BINARY_DIR}/pyMITK.py
-      ${CMAKE_CURRENT_SOURCE_DIR}/Packaging/__init__.py
-      #${MITK_DOC_FILES}
-    DESTINATION pyMITK
-    COMPONENT Runtime
-  )
-  install(
-    TARGETS
-      ${SWIG_MODULE_pyMITK_REAL_NAME}
-    RUNTIME
-      DESTINATION pyMITK
-    LIBRARY
-      DESTINATION pyMITK
-    COMPONENT Runtime
-  )
-else()
-  #message("SKBuild missing")
-  include(LegacyPackaging.cmake)
-endif()

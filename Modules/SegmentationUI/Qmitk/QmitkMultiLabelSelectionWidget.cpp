@@ -132,7 +132,6 @@ void QmitkMultiLabelSelectionWidget::SetMultiLabelSegmentation(mitk::LabelSetIma
 {
   m_Controls->labelSelection->SetMultiLabelSegmentation(segmentation);
   m_Popup->GetInspector()->SetMultiLabelSegmentation(segmentation);
-  this->Initialize();
 }
 
 mitk::LabelSetImage* QmitkMultiLabelSelectionWidget::GetMultiLabelSegmentation() const

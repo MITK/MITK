@@ -194,7 +194,7 @@ QmitkMultiLabelSelectionButton::LabelValueVectorType QmitkMultiLabelSelectionBut
   return m_LastValidSelectedLabels;
 }
 
-void QmitkMultiLabelSelectionButton::enterEvent(QEnterEvent* event)
+void QmitkMultiLabelSelectionButton::enterEvent(QEnterEvent* /*event*/)
 {
   if (m_SegmentationNode.IsNotNull() && m_HighlightingActivated)
   {
@@ -202,7 +202,7 @@ void QmitkMultiLabelSelectionButton::enterEvent(QEnterEvent* event)
   }
 }
 
-void QmitkMultiLabelSelectionButton::leaveEvent(QEvent* event)
+void QmitkMultiLabelSelectionButton::leaveEvent(QEvent* /*event*/)
 {
   if (m_SegmentationNode.IsNotNull())
   {

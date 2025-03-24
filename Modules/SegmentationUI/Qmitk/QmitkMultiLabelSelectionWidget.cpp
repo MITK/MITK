@@ -211,7 +211,7 @@ QmitkMultiLabelInspector* QmitkMultiLabelInspectorPopup::GetInspector() const
   return m_Inspector.get();
 }
 
-void QmitkMultiLabelInspectorPopup::OnPopupLabelsChanged(const LabelValueVectorType& selectedLabels)
+void QmitkMultiLabelInspectorPopup::OnPopupLabelsChanged(const LabelValueVectorType& /*selectedLabels*/)
 {
   if (!m_Inspector->GetMultiSelectionMode())
   { //if we only do single selection, we can emit finish as soon as the selection is changed.

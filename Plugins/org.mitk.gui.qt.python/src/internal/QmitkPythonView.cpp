@@ -24,7 +24,6 @@ QmitkPythonView::QmitkPythonView() : m_Controls(nullptr)
   m_ReferencePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
   m_PythonContext = mitk::PythonContext::New();
   m_PythonContext->Activate();
-  m_PythonContext->ExecuteString("a=10");
   std::string pythonCommand;
   pythonCommand.append("_mitk_stdout = io.StringIO()\n");
   pythonCommand.append("sys.stdout = sys.stderr = _mitk_stdout\n");
@@ -57,7 +56,7 @@ void QmitkPythonView::CreateQtPartControl(QWidget *parent)
           SIGNAL(directoryChanged(const QString &)),
           this,
           SLOT(OnSitePackageSelected(const QString &)));
-  connect(m_Controls->venvDeleteButton, SIGNAL(clicked()), this, SLOT(OnExecuteBtnClicked()));
+  connect(m_Controls->venvDeleteButton, SIGNAL(clicked()), this, SLOT(OnSitePackageDeleted()));
   
   QString pythonCommand = "pyMITK.SayHi()\n";
   m_Controls->pythonConsole->setPlainText(pythonCommand);
@@ -92,17 +91,10 @@ void QmitkPythonView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> n
     return;
   }
   m_PythonContext->TransferBaseDataToPython(image);
-  const char *result = m_PythonContext->GetStdOut();
+  std::string result = m_PythonContext->GetStdOut();
   m_Controls->pythonOutput->clear();
-  m_Controls->pythonOutput->setText(QString::fromUtf8(result));
-  
-  auto previewSegmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(node, image, "py-labels");
-  if (mitk::DataStorage *ds = this->GetDataStorage())
-  {
-    if (!ds->Exists(previewSegmentationNode))
-      ds->Add(previewSegmentationNode, node);
-  }
-  m_PythonContext->TransferBaseDataToPython(previewSegmentationNode->GetData(), "_seg_image");
+  m_Controls->pythonOutput->setText(QString::fromStdString(result));
+
 }
 
 void QmitkPythonView::OnSitePackageSelected(const QString & /*sitePackagesFolder*/)

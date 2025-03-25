@@ -193,10 +193,11 @@ bool mitk::PythonContext::IsVariableExists(const std::string &varName)
 
 std::string mitk::PythonContext::GetPythonExceptionTraceback()
 {
+  std::string errorMessage;
+#if PY_MINOR_VERSION >= 12
   PyObjectPtr pException(PyErr_GetRaisedException());
   PyObjectPtr pTraceback(PyImport_ImportModule("traceback"));
   PyObjectPtr pFormatExceptionMethod(PyObject_GetAttrString(pTraceback.get(), "format_exception"));
-  std::string errorMessage;
   if (nullptr != pException)
   {
     PyObjectPtr pExceptionType(PyObject_Type(pException.get()));
@@ -213,5 +214,6 @@ std::string mitk::PythonContext::GetPythonExceptionTraceback()
       errorMessage = "Failed to format exception";
     }
   }
+#endif
   return errorMessage;
 }

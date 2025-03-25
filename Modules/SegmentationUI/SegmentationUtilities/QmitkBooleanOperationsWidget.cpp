@@ -84,7 +84,6 @@ void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::LabelSetImage::
 void QmitkBooleanOperationsWidget::ConfigureWidgets()
 {
   auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
-  auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
 
   if (selectedLabelValues.empty())
   {

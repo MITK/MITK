@@ -27,7 +27,8 @@ if(MITK_USE_SWIG)
 
       # swig.exe available as pre-built binary on Windows:
       ExternalProject_Add(${proj}
-        URL https://netcologne.dl.sourceforge.net/project/swig/swigwin/swigwin-4.3.0/swigwin-4.3.0.zip
+        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swigwin-${SWIG_TARGET_VERSION}.zip
+        URL_MD5 591f99627c27d9865a70d1aff23a60cf
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
@@ -45,7 +46,8 @@ if(MITK_USE_SWIG)
 
       ExternalProject_add(${proj}
         LIST_SEPARATOR ${sep}
-        URL https://deac-riga.dl.sourceforge.net/project/swig/swig/swig-4.3.0/swig-4.3.0.tar.gz
+        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swig-${SWIG_TARGET_VERSION}.tar.gz
+        URL_MD5 6a0555a2063c78447c5912136f013c43
         # Switching to Git would require additional prerequisites:
         #   - autotools-dev
         #   - automake

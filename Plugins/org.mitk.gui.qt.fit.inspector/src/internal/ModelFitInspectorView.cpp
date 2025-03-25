@@ -152,9 +152,6 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
   this->EnsureBookmarkPointSet();
   m_Controls.inspectionPositionWidget->SetPositionBookmarkNode(m_PositionBookmarksNode);
 
-
-
-
   connect(m_Controls.inspectionPositionWidget, SIGNAL(PositionBookmarksChanged()), this, SLOT(OnPositionBookmarksChanged()));
 
   // For some reason this needs to be called to set the plot widget's minimum width to an
@@ -164,6 +161,12 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
   m_Controls.widgetPlot->GetPlot()->updateAxes();
 
   m_Controls.cmbFit->clear();
+
+  m_ErrorOverlay = new QmitkSimpleTextOverlayWidget(m_Controls.widgetPlot);
+  m_ErrorOverlay->setVisible(false);
+  m_ErrorOverlay->setOpacity(180);
+  m_ErrorOverlay->SetOverlayText(QStringLiteral());
+
 
   mitk::IRenderWindowPart* renderWindowPart = GetRenderWindowPart();
   RenderWindowPartActivated(renderWindowPart);
@@ -381,9 +384,18 @@ void ModelFitInspectorView::OnInputChanged(const QList<mitk::DataNode::Pointer>&
       m_selectedNodeTime.Modified();
       OnFitSelectionChanged(0);
       RefreshPlotData();
-      m_Controls.plotDataWidget->SetPlotData(&(this->m_PlotCurves));
+      m_ErrorOverlay->setVisible(m_RefreshPlotDataErrorOccured);
+      if (m_RefreshPlotDataErrorOccured)
+      {
+        m_ErrorOverlay->SetOverlayText(m_LastRefreshPlotDataErrorString);
+      }
+      else
+      {
+        RenderPlot();
+        m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
+      }
+
       m_Controls.fitParametersWidget->setFits(QmitkFitParameterModel::FitVectorType());
-      RenderPlot();
     }
   }
 
@@ -498,8 +510,16 @@ void ModelFitInspectorView::OnSliceChanged()
 
     if (RefreshPlotData())
     {
-      RenderPlot();
-      m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
+      m_ErrorOverlay->setVisible(m_RefreshPlotDataErrorOccured);
+      if (m_RefreshPlotDataErrorOccured)
+      {
+        m_ErrorOverlay->SetOverlayText(m_LastRefreshPlotDataErrorString);
+      }
+      else
+      {
+        RenderPlot();
+        m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
+      }
       RenderFitInfo();
     }
   }
@@ -512,8 +532,16 @@ void ModelFitInspectorView::OnPositionBookmarksChanged()
 
     if (RefreshPlotData())
     {
-      RenderPlot();
-      m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
+      m_ErrorOverlay->setVisible(m_RefreshPlotDataErrorOccured);
+      if (m_RefreshPlotDataErrorOccured)
+      {
+        m_ErrorOverlay->SetOverlayText(m_LastRefreshPlotDataErrorString);
+      }
+      else
+      {
+        RenderPlot();
+        m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
+      }
       RenderFitInfo();
     }
 }
@@ -597,36 +625,40 @@ mitk::PlotDataCurveCollection::Pointer ModelFitInspectorView::RefreshPlotDataCur
 bool ModelFitInspectorView::RefreshPlotData()
 {
   bool changed = false;
+  m_RefreshPlotDataErrorOccured = false;
+  m_LastRefreshPlotDataErrorString.clear();
 
-  if (m_currentSelectedNode.IsNull())
+  try
   {
-    this->m_PlotCurves = mitk::ModelFitPlotData();
-
-    changed = m_selectedNodeTime > m_lastRefreshTime;
-    m_lastRefreshTime.Modified();
-  }
-  else
-  {
-    assert(GetRenderWindowPart() != NULL);
-
-    const mitk::Image* input = GetCurrentInputImage();
-    const mitk::ModelBase::TimeGridType timeGrid = GetCurrentTimeGrid();
-
-    if (m_currentFitTime > m_lastRefreshTime || m_currentPositionTime > m_lastRefreshTime)
+    if (m_currentSelectedNode.IsNull())
     {
-      if (m_validSelectedPosition)
-      {
-        m_PlotCurves.currentPositionPlots = RefreshPlotDataCurveCollection(m_currentSelectedPosition, input, m_currentFit, timeGrid, m_currentModelParameterizer);
-      }
-      else
-      {
-        m_PlotCurves.currentPositionPlots = mitk::PlotDataCurveCollection::New();
-      }
+      this->m_PlotCurves = mitk::ModelFitPlotData();
 
-      changed = true;
+      changed = m_selectedNodeTime > m_lastRefreshTime;
+      m_lastRefreshTime.Modified();
     }
+    else
+    {
+      assert(GetRenderWindowPart() != NULL);
 
-    auto bookmarks = m_PositionBookmarks;
+      const mitk::Image* input = GetCurrentInputImage();
+      const mitk::ModelBase::TimeGridType timeGrid = GetCurrentTimeGrid();
+
+      if (m_currentFitTime > m_lastRefreshTime || m_currentPositionTime > m_lastRefreshTime)
+      {
+        if (m_validSelectedPosition)
+        {
+          m_PlotCurves.currentPositionPlots = RefreshPlotDataCurveCollection(m_currentSelectedPosition, input, m_currentFit, timeGrid, m_currentModelParameterizer);
+        }
+        else
+        {
+          m_PlotCurves.currentPositionPlots = mitk::PlotDataCurveCollection::New();
+        }
+
+        changed = true;
+      }
+
+      auto bookmarks = m_PositionBookmarks;
 
       if (m_currentFitTime > m_lastRefreshTime || bookmarks->GetMTime() > m_lastRefreshTime)
       {
@@ -647,21 +679,33 @@ bool ModelFitInspectorView::RefreshPlotData()
         changed = true;
       }
 
-    // input data curve
-    if (m_currentFitTime > m_lastRefreshTime)
-    {
-      m_PlotCurves.staticPlots->clear();
-
-      if (m_currentFit.IsNotNull())
+      // input data curve
+      if (m_currentFitTime > m_lastRefreshTime)
       {
-        m_PlotCurves.staticPlots = GenerateAdditionalModelFitPlotData(m_currentSelectedPosition, m_currentFit, timeGrid);
+        m_PlotCurves.staticPlots->clear();
+
+        if (m_currentFit.IsNotNull())
+        {
+          m_PlotCurves.staticPlots = GenerateAdditionalModelFitPlotData(m_currentSelectedPosition, m_currentFit, timeGrid);
+        }
+
+        changed = true;
       }
 
-      changed = true;
+      m_lastRefreshTime.Modified();
     }
-
-    m_lastRefreshTime.Modified();
   }
+  catch (const std::exception& e)
+  {
+    changed = true;
+    this->m_PlotCurves = mitk::ModelFitPlotData();
+    m_lastRefreshTime.Modified();
+    m_RefreshPlotDataErrorOccured = true;
+    m_LastRefreshPlotDataErrorString = QStringLiteral("<font class=\"warning\"><p style=\"text-align:center\">Error while refreshing plots.</p>Details: ")
+      + QString::fromStdString(e.what())
+      + QStringLiteral("</center></font>");
+  }
+
   return changed;
 }
 

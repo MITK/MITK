@@ -121,11 +121,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnImageNodeSelectionChanged);
   connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnMaskNodeSelectionChanged);
-
-  connect(m_Controls.AIFMaskNodeSelector,
-    &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
-    this,
-    &MRPerfusionView::UpdateGUIControls);
+  connect(m_Controls.AIFMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnAIFMaskNodeSelectionChanged);
 
   connect(m_Controls.AIFImageNodeSelector,
     &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
@@ -157,6 +153,8 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskLabelSelector, SLOT(setVisible(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskLabelSelector, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.labelAIFMask, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setEnabled(bool)));
@@ -168,9 +166,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.btnAIFFile, SIGNAL(clicked()), this, SLOT(LoadAIFfromFile()));
-
-  connect(m_Controls.AIFMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnAIFMaskNodeSelectionChanged);
-
 
   //Brix setting
   m_Controls.groupDescBrix->hide();
@@ -276,7 +271,6 @@ void MRPerfusionView::UpdateGUIControls()
     m_Controls.toolboxConfiguration->setItemEnabled(0, true);
   }
   m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory );
-  m_Controls.AIFImageNodeSelector->setVisible(!m_Controls.radioAIFFile->isChecked());
   m_Controls.AIFImageNodeSelector->setVisible(m_Controls.radioAIFImage->isChecked() && m_Controls.checkDedicatedAIFImage->isChecked());
 
   m_Controls.groupBox_FitConfiguration->setVisible(m_selectedModelFactory);

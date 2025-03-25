@@ -12,83 +12,50 @@ found in the LICENSE file.
 
 #include "mitkPythonContext.h"
 #include <mitkIOUtil.h>
-#ifdef _DEBUG
-#undef _DEBUG
-#include <Python.h>
-#define _DEBUG
-#else
-#include <Python.h>
-#endif
-
-#include "PythonPath.h"
 #include <mitkExceptionMacro.h>
 #include <swigpyrun.h>
 
-namespace 
-{
-  int refCount = 0;
-}
-
 mitk::PythonContext::PythonContext()
-  : m_ThreadState(nullptr), m_GlobalDictionary(PyDict_New()), m_LocalDictionary(PyDict_New())
-{
-  ::refCount++;
-}
+  : m_GlobalDictionary(PyDict_New()), m_LocalDictionary(PyDict_New()) {}
 
 void mitk::PythonContext::Activate()
 {
-  PyGILState_STATE state = PyGILState_Ensure();
-  MITK_INFO << "python activate: " << ::refCount;
   std::string programPath = mitk::IOUtil::GetProgramPath();
   std::replace(programPath.begin(), programPath.end(), '\\', '/');
   programPath.append("/");
-  MITK_INFO << programPath;
-  MITK_INFO << "EP_DLL_DIR " << std::string(EP_DLL_DIR);
+  MITK_INFO << "Program path: " <<  programPath;
   std::string pythonCommand;
-  // execute a string which imports packages that are needed and sets paths to directories
   pythonCommand.append("import os, sys, io\n");
   pythonCommand.append("sys.path.append('" + programPath + "')\n");
-  //   pythonCommand.append("sys.path.append('" + std::string(BIN_DIR) + "')\n");
-  //   pythonCommand.append("sys.path.append('" +std::string(EXTERNAL_DIST_PACKAGES) + "')\n");
-  //   pythonCommand.append("\nsite.addsitedir('"+std::string(EXTERNAL_SITE_PACKAGES)+"')\n");
-  // in python 3.8 onwards, the path system variable is not longer used to find dlls
-  // that's why the dlls that are needed for swig wrapping need to be searched manually
-#ifdef WIN32
-  std::string searchForDll = "os.add_dll_directory('" + std::string(EP_DLL_DIR) + "')\n";
-  pythonCommand.append(searchForDll);
-#endif
   pythonCommand.append("import numpy\n");
   pythonCommand.append("import SimpleITK as sitk\n");
   pythonCommand.append("import pyMITK\n");
   this->ExecuteString(pythonCommand);
-  //m_ThreadState = PyEval_SaveThread();
-  PyGILState_Release(state);
 }
 
 mitk::PythonContext::~PythonContext()
 {
-  ::refCount--;
-  Py_XDECREF(m_GlobalDictionary);
-  Py_XDECREF(m_LocalDictionary);
+  PyDict_Clear(m_LocalDictionary.get());
+  PyDict_Clear(m_GlobalDictionary.get());
 }
 
 std::string mitk::PythonContext::ExecuteFile(const std::string &filePath)
 {
   PyGILState_STATE state = PyGILState_Ensure();
   int commandType = Py_file_input;
-  PyObject *executionResult;
-  try
+  FILE *file = fopen(filePath.c_str(), "rb");
+  if (NULL == file)
   {
-    FILE *file = fopen(filePath.c_str(), "rb");
-    executionResult = PyRun_File(file, "script.py", commandType, m_GlobalDictionary, m_LocalDictionary);
+    mitkThrow() << "An error occured while reading python file.";
   }
-  catch (const mitk::Exception &)
+  PyObjectPtr executionResult(
+    PyRun_File(file, "script.py", commandType, m_GlobalDictionary.get(), m_LocalDictionary.get()));
+  if (!executionResult)
   {
-    PyErr_Print();
-    //m_ThreadState = PyEval_SaveThread();
-    throw;
+    // PyErr_Print(); prints stacktrace on console 
+    std::string traceback = this->GetPythonExceptionTraceback();
+    mitkThrow() << "An error occured while running the Python code. " << traceback;
   }
-  Py_XDECREF(executionResult);
   PyGILState_Release(state);
   return std::string(this->GetStdOut());
 }
@@ -97,62 +64,42 @@ std::string mitk::PythonContext::ExecuteString(const std::string &pyCommands)
 {
   PyGILState_STATE state = PyGILState_Ensure();
   int commandType = Py_file_input;
-  PyObject *executionResult = PyRun_String(pyCommands.c_str(), commandType, m_GlobalDictionary, m_LocalDictionary);
-
-  MITK_INFO << "Working on the following keys:";
-  PyObject *key;
-  PyObject *keys = PyDict_Keys(m_GlobalDictionary);
-  for (int i = 0; i < PyList_Size(keys); i++)
+  PyObjectPtr executionResult(
+    PyRun_String(pyCommands.c_str(), commandType, m_GlobalDictionary.get(), m_LocalDictionary.get()));
+  if (!executionResult)
   {
-    key = PyList_GetItem(keys, i);
-    MITK_INFO << " Key :" << PyUnicode_AsUTF8(key);
-    // Py_DECREF(key);
+    //PyErr_Print();  prints stacktrace on console 
+    std::string traceback = this->GetPythonExceptionTraceback();
+    mitkThrow() << "An error occured while running the Python code. " << traceback;
   }
-  MITK_INFO << "----";
-  // Py_DECREF(keys);
-  if (executionResult)
-  {
-    PyObject *objectsRepresentation = PyObject_Repr(executionResult);
-    const char *resultChar = PyUnicode_AsUTF8(objectsRepresentation);
-    MITK_INFO << "executionResult: " << std::string(resultChar);
-    //m_ThreadState = PyEval_SaveThread();
-  }
-  else
-  {
-    PyErr_Print();
-    mitkThrow() << "An error occured while running the Python code";
-  }
-  Py_XDECREF(executionResult);
   PyGILState_Release(state);
-  return std::string(this->GetStdOut());
+  return this->GetStdOut();
 }
 
-const char *mitk::PythonContext::GetStdOut()
+std::string mitk::PythonContext::GetStdOut(const std::string &varName)
 {
   PyGILState_STATE state = PyGILState_Ensure();
-  const char *result = "nothing";
-  PyObject *capture_output = PyDict_GetItemString(m_LocalDictionary, "_mitk_stdout");
-  if (capture_output != NULL)
+  std::string _mitk_stdout;
+  PyObject *capture_output = PyDict_GetItemString(m_LocalDictionary.get(), varName.c_str());
+  if (capture_output)
   {
-    PyObject *output_val = PyObject_CallMethod(capture_output, "getvalue", nullptr);
-    result = PyUnicode_AsUTF8(output_val);
-    MITK_INFO << "result: " << result;
-    Py_XDECREF(output_val);
+    PyObjectPtr output_val(PyObject_CallMethod(capture_output, "getvalue", nullptr));
+    _mitk_stdout = PyUnicode_AsUTF8(output_val.get());
+    MITK_INFO << varName << " : " << _mitk_stdout;
   }
   else
   {
     PyErr_Print();
   }
   PyGILState_Release(state);
-  return result;
+  return _mitk_stdout;
 }
 
-mitk::Image::Pointer mitk::PythonContext::LoadImageFromPython(const std::string &varName)
+mitk::Image* mitk::PythonContext::LoadImageFromPython(const std::string &varName)
 {
   PyGILState_STATE state = PyGILState_Ensure();
-  PyObject *pyImage = PyDict_GetItemString(m_LocalDictionary, varName.c_str());
-  if (pyImage == NULL &&
-    !(pyImage = PyDict_GetItemString(m_GlobalDictionary, varName.c_str())))
+  PyObject *pyImage = PyDict_GetItemString(m_LocalDictionary.get(), varName.c_str());
+  if (pyImage == NULL && !(pyImage = PyDict_GetItemString(m_GlobalDictionary.get(), varName.c_str())))
   {
     mitkThrow() << "Could not get image from Python";
   }
@@ -194,46 +141,77 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData,
     MITK_INFO << "Object is of unsupported type";
   }
   PyObject *pInstance = SWIG_NewPointerObj(reinterpret_cast<void *>(mitkBaseData), pTypeInfo, owned);
-  if (pInstance == NULL)
+  if (nullptr == pInstance)
   {
     MITK_ERROR << "Something went wrong creating the Python instance of the image\n";
   }
-  PyObject *receive = PyDict_GetItemString(m_LocalDictionary, "_receive");
-  PyObject *result = PyObject_CallFunctionObjArgs(receive, pInstance, NULL);
-  if (result == NULL)
+  PyObject *receive = PyDict_GetItemString(m_LocalDictionary.get(), "_receive");
+  PyObjectPtr result(PyObject_CallFunctionObjArgs(receive, pInstance, NULL));
+  if (nullptr == result)
   {
     MITK_ERROR << "Something went wrong setting the image in Python\n";
   }
-  //PyRun_SimpleString("print('The MITK image is available via variable _mitk_image')");
-  // PyRun_SimpleString(
-  //     "numpy_image = _mitk_image.GetAsNumpy()\n"
-  //     "print('numpy image shape',numpy_image.shape)\n"
-  //     "numpy_image[:]=0."
-  // );
-  //m_ThreadState = PyEval_SaveThread();
-  Py_XDECREF(result);
   PyGILState_Release(state);
 }
 
 void mitk::PythonContext::SetVirtualEnvironmentPath(const std::string& absolutePath)
 {
-  PyGILState_STATE state = PyGILState_Ensure();
-  m_CurrentVenvEnvPath.clear();
+  m_CurrentUserSite.clear();
   std::string pythonCommand;
-  pythonCommand.append("import sys\n"); // TODO: delete other imports are reimport
-  pythonCommand.append("sys.path.insert(0, '" + absolutePath + "')\n");
+  pythonCommand.append("import site\n");
+  pythonCommand.append("site.addsitedir('" + absolutePath + "')\n");
   this->ExecuteString(pythonCommand);
-  m_CurrentVenvEnvPath = absolutePath;
-  PyGILState_Release(state);
+  m_CurrentUserSite = absolutePath;
 }
 
 void mitk::PythonContext::ClearVirtualEnvironmentPath()
 {
-  PyGILState_STATE state = PyGILState_Ensure();
-  std::string pythonCommand;
-  pythonCommand.append("import sys\n");
-  pythonCommand.append("sys.path.remove('" + m_CurrentVenvEnvPath + "')\n");
-  this->ExecuteString(pythonCommand);
-  m_CurrentVenvEnvPath.clear();
-  PyGILState_Release(state);
+  if (!m_CurrentUserSite.empty())
+  {
+    std::string pythonCommand;
+    pythonCommand.append("from pathlib import Path\n");
+    pythonCommand.append("_venv_path = Path('" + m_CurrentUserSite + "')\n");
+    pythonCommand.append("sys_paths = list(sys.path)\n");
+    pythonCommand.append("root_path = str(_venv_path.parent.parent)\n");
+    pythonCommand.append("for _path in sys_paths:\n");
+    pythonCommand.append("  if _path.startswith(root_path):\n");
+    pythonCommand.append("    sys.path.remove(_path)\n");
+    this->ExecuteString(pythonCommand);
+    m_CurrentUserSite.clear();
+  }
+}
+
+bool mitk::PythonContext::IsVariableExists(const std::string &varName)
+{
+  PyObject *pyVar = PyDict_GetItemString(m_LocalDictionary.get(), varName.c_str());
+  if (pyVar == NULL && !(pyVar = PyDict_GetItemString(m_GlobalDictionary.get(), varName.c_str())))
+  {
+    return false;
+  }
+  return true;
+}
+
+std::string mitk::PythonContext::GetPythonExceptionTraceback()
+{
+  PyObjectPtr pException(PyErr_GetRaisedException());
+  PyObjectPtr pTraceback(PyImport_ImportModule("traceback"));
+  PyObjectPtr pFormatExceptionMethod(PyObject_GetAttrString(pTraceback.get(), "format_exception"));
+  std::string errorMessage;
+  if (nullptr != pException)
+  {
+    PyObjectPtr pExceptionType(PyObject_Type(pException.get()));
+    PyObjectPtr pExceptionTypeTb(PyException_GetTraceback(pException.get()));
+    PyObjectPtr pExceptionList(PyObject_CallFunctionObjArgs(
+      pFormatExceptionMethod.get(), pExceptionType.get(), pException.get(), pExceptionTypeTb.get(), NULL));
+    if (pExceptionList && PyList_Check(pExceptionList.get()))
+    {
+      PyObjectPtr pExceptionText(PyUnicode_Join(PyUnicode_FromString(""), pExceptionList.get()));
+      errorMessage = pExceptionText ? PyUnicode_AsUTF8(pExceptionText.get()) : "UnknownError Caught.";
+    }
+    else
+    {
+      errorMessage = "Failed to format exception";
+    }
+  }
+  return errorMessage;
 }

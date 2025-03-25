@@ -24,6 +24,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  struct PyObjectDeleter
+  {
+    void operator()(PyObject *obj) const { Py_XDECREF(obj); }
+  };
+  using PyObjectPtr = std::unique_ptr<PyObject, PyObjectDeleter>;
+
 
   class MITKPYTHON_EXPORT PythonContext : public itk::LightObject
   {
@@ -33,20 +39,73 @@ namespace mitk
     
     PythonContext();
     ~PythonContext();
+
+    /**
+     * @brief Imports essential python packages: numpy, os, sys, io
+     * SimpleITK and pyMITK. Also adds current bin folder to path.
+     */
     void Activate();
-    mitk::Image::Pointer LoadImageFromPython(const std::string &filePath) ;
+
+    /**
+     * @brief Check if given variable exists in the current context defined by 
+     * `globals` (m_GlobalDictionary) & `locals` (m_LocalDictionary) namespaces.
+     */
+    bool IsVariableExists(const std::string &varName);
+
+    /**
+     * @brief Provides view into mitk::Image type object in Python
+     * as mitk::Image* pointer in MITK.
+     */
+    mitk::Image* LoadImageFromPython(const std::string &varName);
+
+    /**
+     * @brief Creates view of mitk::BaseData pointer in MITK into corresponding SWIG proxy
+     * type object in Python.
+     */
     void TransferBaseDataToPython(mitk::BaseData *mitkImage, const std::string &varName = "_mitk_image");
+
+    /**
+     * @brief Executes the given python syntax in the current context defined by 
+     * `globals` (m_GlobalDictionary) & `locals` (m_LocalDictionary) namespaces.
+     */
     std::string ExecuteString(const std::string &pyCommands);
+
+    /**
+     * @brief Executes the given python file in the current context defined by 
+     * `globals` (m_GlobalDictionary) & `locals` (m_LocalDictionary)
+     */
     std::string ExecuteFile(const std::string &filePath);
-    const char *GetStdOut();
+
+    /**
+     * @brief Returns any exception stacktrace occured in python as string back
+     * to MITK.
+     */
+    std::string GetPythonExceptionTraceback();
+
+    /**
+     * @brief Returns value from the given string stream object.
+     * See: https://docs.python.org/3/library/io.html#io.StringIO.getvalue
+     */
+    std::string GetStdOut(const std::string &varName = "_mitk_stdout");
+
+    /**
+     * @brief Sets user-site from a (e.g virtual environment site-packages) directory.
+     * The packages and .pth files inside the site is added to `sys.path` by using 
+     * `site.addsitedir` call.
+     * See: https://docs.python.org/3/library/site.html#site.addsitedir
+     */
     void SetVirtualEnvironmentPath(const std::string &absolutePath); // site-package
+
+     /**
+     * @brief Removes the current VirtualEnvironment site-package path from `sys.path`.
+     * However, it won't remove packages specified via .pth paths in the user site, if any. 
+     */
     void ClearVirtualEnvironmentPath();
 
   private:
-    std::string m_CurrentVenvEnvPath;
-    PyThreadState *m_ThreadState;
-    PyObject *m_GlobalDictionary;
-    PyObject *m_LocalDictionary;
+    std::string m_CurrentUserSite;
+    PyObjectPtr m_GlobalDictionary;
+    PyObjectPtr m_LocalDictionary;
   };
 } // namespace mitk
 #endif

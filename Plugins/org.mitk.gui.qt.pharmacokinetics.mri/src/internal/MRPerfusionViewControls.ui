@@ -39,14 +39,17 @@
      </property>
      <item>
       <layout class="QGridLayout" name="gridLayout_6">
-       <item row="3" column="0">
-        <widget class="QLabel" name="maskLabel">
-         <property name="text">
-          <string>Selected Mask:</string>
+       <item row="0" column="2">
+        <widget class="QmitkSingleNodeSelectionWidget" name="timeSeriesNodeSelector" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="3" column="2">
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <property name="spacing">
           <number>0</number>
@@ -92,13 +95,10 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QmitkSingleNodeSelectionWidget" name="timeSeriesNodeSelector" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>40</height>
-          </size>
+       <item row="3" column="0">
+        <widget class="QLabel" name="maskLabel">
+         <property name="text">
+          <string>Selected Mask:</string>
          </property>
         </widget>
        </item>
@@ -189,13 +189,36 @@
     </layout>
    </item>
    <item>
-    <widget class="QComboBox" name="comboModel">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <property name="text">
-       <string>Select pharmacokinetic model...</string>
-      </property>
+      <widget class="QLabel" name="label_3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Model:</string>
+       </property>
+      </widget>
      </item>
-    </widget>
+     <item>
+      <widget class="QComboBox" name="comboModel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <item>
+        <property name="text">
+         <string>Select pharmacokinetic model...</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QGroupBox" name="groupAIF">
@@ -260,30 +283,30 @@
             </property>
            </widget>
           </item>
-         <item>
-          <widget class="QmitkMultiLabelSelectionWidget" name="AIFMaskLabelSelector" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>25</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>25</height>
-            </size>
-           </property>
-          </widget>
-         </item>		  
+          <item>
+           <widget class="QmitkMultiLabelSelectionWidget" name="AIFMaskLabelSelector" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>25</height>
+             </size>
+            </property>
+           </widget>
+          </item>
          </layout>
-        </item>		
+        </item>
        </layout>
       </item>
       <item>
@@ -390,6 +413,18 @@
            <width>591</width>
            <height>362</height>
           </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
          </property>
          <attribute name="label">
           <string>Conversion: Signal to Concentration</string>
@@ -569,7 +604,7 @@
            <x>0</x>
            <y>0</y>
            <width>591</width>
-           <height>73</height>
+           <height>69</height>
           </rect>
          </property>
          <attribute name="label">
@@ -579,7 +614,10 @@
           <item>
            <widget class="QCheckBox" name="checkBox_StartParameters">
             <property name="text">
-             <string>Enter Fit Starting Parameters</string>
+             <string>Use User defined Fit Starting Parameters</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -611,7 +649,10 @@
           <item>
            <widget class="QCheckBox" name="checkBox_Constraints">
             <property name="text">
-             <string>Enter Constraints for Fit Parameters</string>
+             <string>Use Constraints for Fit Parameters</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -716,6 +757,7 @@
    <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>
    <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QmitkSimpleBarrierManagerWidget</class>

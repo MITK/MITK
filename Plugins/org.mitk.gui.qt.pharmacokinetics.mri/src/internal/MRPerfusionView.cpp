@@ -175,8 +175,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   //Model fit configuration
   m_Controls.groupBox_FitConfiguration->hide();
 
-  m_Controls.checkBox_Constraints->setEnabled(false);
-  m_Controls.constraintManager->setEnabled(false);
   m_Controls.initialValuesManager->setEnabled(false);
   m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
 

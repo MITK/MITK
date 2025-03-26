@@ -44,3 +44,5 @@ set_target_properties(pyMITK PROPERTIES
 
 execute_process(COMMAND ${SWIG_EXECUTABLE} -python -external-runtime)
 
+file(COPY ${CMAKE_BINARY_DIR}/bin/pyMITK.py 
+    DESTINATION ${CMAKE_BINARY_DIR}/bin/Release/)

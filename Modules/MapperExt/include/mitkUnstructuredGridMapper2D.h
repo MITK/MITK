@@ -49,7 +49,7 @@ namespace mitk
     itkCloneMacro(Self);
 
       /**
-       * Renders a cut through a pointset by cutting trough the n-cells,
+       * Renders a cut through a pointset by cutting through the n-cells,
        * producing (n-1)-cells.
        * @param renderer the render to render in.
        */

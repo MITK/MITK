@@ -358,7 +358,7 @@ bool mitk::ReduceContourSetFilter::CheckForIntersection(
   /* vtkIdType numberOfIntersections, vtkIdType* intersectionPoints,*/ unsigned int currentInputIndex)
 {
   /*
-  If we check the current cell for intersections then we have to consider three possibilies:
+  If we check the current cell for intersections then we have to consider three possibilities:
   1. There is another cell among all the other input surfaces which intersects the current polygon:
   - That means we have to save the intersection points because these points should not be eliminated
   2. There current polygon exists just because of an intersection of another polygon with the current plane defined by
@@ -477,7 +477,7 @@ bool mitk::ReduceContourSetFilter::CheckForIntersection(
         return false;
       }
 
-      // Because we are considering the plane defined by the acual input polygon only one iteration is sufficient
+      // Because we are considering the plane defined by the actual input polygon only one iteration is sufficient
       // We do not need to consider each cell of the plane
       break;
     } // for (to traverse through all cells of actualInputPolyData)

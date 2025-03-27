@@ -137,7 +137,7 @@ namespace mitk
     void ClearSeeds();
 
     /**
-     * @brief Overriden method from the tool manager to execute the segmentation
+     * @brief Overridden method from the tool manager to execute the segmentation
      * Implementation:
      * 1. Creates Hash for input image from current plane geometry.
      * 2. Transfers image pointer to python service along with the hash code.

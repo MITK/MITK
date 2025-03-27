@@ -237,7 +237,7 @@ void QmitkMedSAMToolGUI::OnActivateBtnClicked()
   }
   catch (...)
   {
-    std::string errorMsg = "Unkown error occured while generation MedSAM segmentation.";
+    std::string errorMsg = "Unknown error occurred while generating MedSAM segmentation.";
     this->ShowErrorMessage(errorMsg);
     this->EnableAll(true);
     return;

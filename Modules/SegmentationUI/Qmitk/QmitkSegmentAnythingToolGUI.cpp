@@ -213,7 +213,7 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
   }
   catch (...)
   {
-    std::string errorMsg = "Unkown error occured while generation Segment Anything segmentation.";
+    std::string errorMsg = "Unkown error occurred while generation Segment Anything segmentation.";
     this->ShowErrorMessage(errorMsg);
     this->EnableAll(true);
     return;

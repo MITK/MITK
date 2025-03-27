@@ -304,7 +304,7 @@ namespace mitk
 
       /**@todo the duplication work around is needed due to a insufficuence
        in the AccessTwoImagesFixedDimensionByItk macro. The macro always cast
-       the passed image into non const (even if tha image was passed as const).
+       the passed image into non const (even if that image was passed as const).
        This behavior enforces the unnecessary use of an writeaccessor, which as a consequence
        will lead to redundant access exceptions as long as the algorithm exists;
        e.g. in the typical scenario with the MatchPoint Plugins*/

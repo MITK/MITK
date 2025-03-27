@@ -292,7 +292,7 @@ namespace mitk
                             mitk::ContourElement::VertexType *previousVertex = nullptr,
                             mitk::ContourElement::VertexType *nextVertex = nullptr);
 
-    /**Overloaded version that returns additional information (start and end vertix of the line
+    /**Overloaded version that returns additional information (start and end vertex of the line
     closest to the passed point and the closest point on the contour).
     @remark segmentStart, segmentStop and closestContourPoint are only valid if the function returns true.
     */
@@ -340,13 +340,13 @@ namespace mitk
 
     /** \brief Remove a vertex at given index within the container.
 
-    @return true = the vertex was successfuly removed;  false = wrong index.
+    @return true = the vertex was successfully removed;  false = wrong index.
     */
     bool RemoveVertexAt(int index, TimeStepType timestep = 0);
 
     /** \brief Remove a vertex at given timestep within the container.
 
-    @return true = the vertex was successfuly removed.
+    @return true = the vertex was successfully removed.
     */
     bool RemoveVertex(const VertexType *vertex, TimeStepType timestep = 0);
 
@@ -356,7 +356,7 @@ namespace mitk
     Note that possibly no vertex at this position and eps is stored inside
     the contour.
 
-    @return true = the vertex was successfuly removed;  false = no vertex found.
+    @return true = the vertex was successfully removed;  false = no vertex found.
     */
     bool RemoveVertexAt(Point3D &point, float eps, TimeStepType timestep = 0);
 

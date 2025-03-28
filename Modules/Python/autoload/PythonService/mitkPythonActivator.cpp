@@ -26,7 +26,6 @@ namespace mitk
 
         void Load(us::ModuleContext* context) override
         {
-          MITK_INFO << "PythonActivator::Load";
           // Registering PythonService as MicroService
           m_PythonService = std::make_unique<mitk::IPythonService>();
           us::ServiceProperties _PythonServiceProps;

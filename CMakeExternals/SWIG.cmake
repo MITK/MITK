@@ -68,7 +68,7 @@ if(MITK_USE_SWIG)
       ExternalProject_Get_Property(${proj} install_dir)
       set(SWIG_DIR ${install_dir}/share/swig/${SWIG_TARGET_VERSION})
       set(SWIG_EXECUTABLE ${install_dir}/bin/swig)
-
+      message(PCRE_DIR = "${PCRE_DIR}")
     endif()
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")

@@ -44,5 +44,12 @@ set_target_properties(pyMITK PROPERTIES
 
 execute_process(COMMAND ${SWIG_EXECUTABLE} -python -external-runtime)
 
-file(COPY ${CMAKE_BINARY_DIR}/bin/pyMITK.py 
-    DESTINATION ${CMAKE_BINARY_DIR}/bin/Release/)
+if(WIN32)
+    add_custom_command(
+        TARGET pyMITK POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_BINARY_DIR}/bin/pyMITK.py"
+            "${CMAKE_BINARY_DIR}/bin/Release/pyMITK.py"
+        COMMENT "Copying pyMITK.py to Release directory"
+    )
+endif()

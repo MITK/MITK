@@ -27,11 +27,12 @@ namespace mitk
         void Load(us::ModuleContext* context) override
         {
           // Registering PythonService as MicroService
-          m_PythonService = std::make_unique<mitk::IPythonService>();
+          /*m_PythonService = std::make_unique<mitk::IPythonService>();
           us::ServiceProperties _PythonServiceProps;
           _PythonServiceProps["Name"] = std::string("PythonService");
           _PythonServiceProps["service.ranking"] = int(0);
           m_PythonServiceRegistration = context->RegisterService<mitk::IPythonService>(m_PythonService.get(), _PythonServiceProps);
+          */
         }
 
         void Unload(us::ModuleContext*) override {}

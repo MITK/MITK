@@ -21,19 +21,24 @@ found in the LICENSE file.
 class mitkPythonTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPythonTestSuite);
-  MITK_TEST(TestPythonContextExclusivity);
   MITK_TEST(TestEvaluateOperationWithResult);
   MITK_TEST(TestCopyImageToAndBackPython);
+  MITK_TEST(TestPythonContextExclusivity);
   CPPUNIT_TEST_SUITE_END();
 
 public:
 
-  void setUp(){}
+  void setUp() { MITK_INFO << " setip--------0"; }
 
   void TestEvaluateOperationWithResult()
   {
+    MITK_INFO << "TestEvaluateOperationWithResult";
     auto pythonContext = mitk::PythonContext::New();
+    MITK_INFO << "pythonContext ready";
+
     pythonContext->Activate();
+    MITK_INFO << "pythonContext activated";
+
     std::string pythonCommand;
     pythonCommand.append("_mitk_stdout = io.StringIO()\n");
     pythonCommand.append("sys.stdout = sys.stderr = _mitk_stdout\n");

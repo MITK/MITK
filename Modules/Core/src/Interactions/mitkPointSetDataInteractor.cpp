@@ -56,6 +56,12 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction *stateMachineActi
   {
     mitk::Point3D itkPoint = positionEvent->GetPositionInWorld();
 
+    if (m_Bounds.IsNotNull())
+    {
+      if (!m_Bounds->IsInside(itkPoint))
+        return; // Disallow adding new points outside of the required bounds.
+    }
+
     this->UnselectAll(timeStep, timeInMs);
 
     int lastPosition = 0;
@@ -170,6 +176,13 @@ void mitk::PointSetDataInteractor::EnableRemoval(bool enabled)
   m_IsRemovalEnabled = enabled;
 }
 
+void mitk::PointSetDataInteractor::SetBounds(BaseGeometry* geometry)
+{
+  m_Bounds = geometry != nullptr
+    ? geometry->Clone()
+    : nullptr;
+}
+
 void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   if (!m_IsRemovalEnabled)
@@ -247,8 +260,6 @@ void mitk::PointSetDataInteractor::MovePoint(StateMachineAction *stateMachineAct
   if (positionEvent != nullptr)
   {
     IsClosedContour(stateMachineAction, interactionEvent);
-    mitk::Point3D newPoint, resultPoint;
-    newPoint = positionEvent->GetPositionInWorld();
 
     // search the elements in the list that are selected then calculate the
     // vector, because only with the vector we can move several elements in
@@ -257,6 +268,7 @@ void mitk::PointSetDataInteractor::MovePoint(StateMachineAction *stateMachineAct
     // then move all selected and set the lastPoint = newPoint.
     // then add all vectors to a summeryVector (to be able to calculate the
     // startpoint for undoOperation)
+    auto newPoint = positionEvent->GetPositionInWorld();
     mitk::Vector3D dirVector = newPoint - m_LastPoint;
 
     // sum up all Movement for Undo in FinishMovement
@@ -270,12 +282,20 @@ void mitk::PointSetDataInteractor::MovePoint(StateMachineAction *stateMachineAct
       int position = it->Index();
       if (m_PointSet->GetSelectInfo(position, timeStep)) // if selected
       {
-        PointSet::PointType pt = m_PointSet->GetPoint(position, timeStep);
-        mitk::Point3D sumVec;
-        sumVec[0] = pt[0];
-        sumVec[1] = pt[1];
-        sumVec[2] = pt[2];
-        resultPoint = sumVec + dirVector;
+        auto pt = m_PointSet->GetPoint(position, timeStep);
+        auto resultPoint = pt + dirVector;
+
+        if (m_Bounds.IsNotNull() && !m_Bounds->IsInside(resultPoint))
+        {
+          auto origin = m_Bounds->GetOrigin();
+
+          if (m_Bounds->GetImageGeometry())
+            origin -= m_Bounds->GetSpacing() * 0.5;
+
+          for (int i = 0; i < 3; ++i)
+            resultPoint[i] = std::max(origin[i], std::min(resultPoint[i], origin[i] + m_Bounds->GetExtentInMM(i)));
+        }
+
         auto *doOp = new mitk::PointOperation(OpMOVE, timeInMs, resultPoint, position);
         // execute the Operation
         // here no undo is stored, because the movement-steps aren't interesting.
@@ -460,7 +480,7 @@ void mitk::PointSetDataInteractor::InitMove(StateMachineAction *, InteractionEve
   if (positionEvent == nullptr)
     return;
 
-  // start of the Movement is stored to calculate the undoKoordinate
+  // start of the movement is stored to calculate the undo coordinate
   // in FinishMovement
   m_LastPoint = positionEvent->GetPositionInWorld();
 
@@ -502,17 +522,13 @@ void mitk::PointSetDataInteractor::FinishMove(StateMachineAction *, InteractionE
       if (m_PointSet->GetSelectInfo(position, timeStep)) // if selected
       {
         PointSet::PointType pt = m_PointSet->GetPoint(position, timeStep);
-        Point3D itkPoint;
-        itkPoint[0] = pt[0];
-        itkPoint[1] = pt[1];
-        itkPoint[2] = pt[2];
-        auto *doOp = new mitk::PointOperation(OpMOVE, timeInMs, itkPoint, position);
+        auto *doOp = new mitk::PointOperation(OpMOVE, timeInMs, pt, position);
 
         if (m_UndoEnabled) //&& (posEvent->GetType() == mitk::Type_MouseButtonRelease)
         {
           // set the undo-operation, so the final position is undo-able
           // calculate the old Position from the already moved position - m_SumVec
-          mitk::Point3D undoPoint = (itkPoint - m_SumVec);
+          mitk::Point3D undoPoint = (pt - m_SumVec);
           auto *undoOp = new mitk::PointOperation(OpMOVE, timeInMs, undoPoint, position);
           OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Move point");
           OperationEvent::IncCurrObjectEventId();

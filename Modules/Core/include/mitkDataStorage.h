@@ -189,6 +189,20 @@ namespace mitk
     }
 
     //##Documentation
+    //## @brief Get a unique node name by potentially appending an increasing number, starting from 2.
+    //##
+    //## Fills gaps between existing numbers to maintain a compact sequence. If a source node
+    //## is provided, the uniqueness check is restricted to its derived nodes rather than
+    //## all nodes.
+    //##
+    //## @param name The base name to make unique
+    //## @param sourceNode The node whose derived nodes define the search space
+    //## @param onlyDirectDerivations Only consider direct derivations in search space
+    //## @return A unique name derived from the given base name
+    //##
+    std::string GetUniqueName(const std::string& name, const DataNode* sourceNode = nullptr, bool onlyDirectDerivations = true) const;
+
+    //##Documentation
     //## @brief Returns a list of used grouptags
     //##
     const DataNode::GroupTagList GetGroupTags() const;

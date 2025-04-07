@@ -139,7 +139,7 @@ namespace mitk
     //##Documentation
     //## @brief Convenience method to get the first node with a given name
     //##
-    DataNode *GetNamedNode(const std::string name) const { return this->GetNamedNode(name.c_str()); }
+    DataNode *GetNamedNode(const std::string& name) const { return this->GetNamedNode(name.c_str()); }
     //##Documentation
     //## @brief Convenience method to get the first node with a given name that is derived from sourceNode
     //##
@@ -165,7 +165,7 @@ namespace mitk
     //## @brief Convenience method to get the first data object of a given data type with a given name
     //##
     template <class DataType>
-    DataType *GetNamedObject(const std::string name) const
+    DataType *GetNamedObject(const std::string& name) const
     {
       return this->GetNamedObject<DataType>(name.c_str());
     }

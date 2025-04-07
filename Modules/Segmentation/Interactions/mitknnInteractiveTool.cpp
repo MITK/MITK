@@ -10,889 +10,98 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitknnInteractiveTool.h"
+#include <mitknnInteractiveTool.h>
 
-#include <mitkDisplayActionEventBroadcast.h>
-#include <mitkLabelSetImageHelper.h>
-#include <mitknnInteractiveLassoTool.h>
-#include <mitknnInteractiveScribbleTool.h>
-#include <mitkPlanarFigureInteractor.h>
-#include <mitkPlanarPolygon.h>
-#include <mitkPlanarRectangle.h>
-#include <mitkPointSetDataInteractor.h>
-#include <mitkPointSetShapeProperty.h>
-#include <mitkSegmentationHelper.h>
-#include <mitkToolManager.h>
 #include <mitkImageReadAccessor.h>
-#include <itkEventObject.h>
+#include <mitknnInteractiveBoxInteractor.h>
+#include <mitknnInteractiveLassoInteractor.h>
+#include <mitknnInteractivePointInteractor.h>
+#include <mitknnInteractiveScribbleInteractor.h>
+#include <mitkPlanarFigure.h>
+#include <mitkPythonContext.h>
+#include <mitkToolManager.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
 
+using namespace mitk::nnInteractive;
+
 namespace mitk
 {
-  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive");
-}
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive")
 
-namespace
-{
-  bool IsCUDAAvailable(mitk::PythonContext* context)
+  class nnInteractiveTool::Impl
   {
-    const std::string pyCommands =
-      "import torch\n"
-      "if torch.cuda.is_available():\n"
-      "  cuda_is_available = True\n";
+  public:
+    Impl()
+      : TargetBuffer(LabelSetImage::New()),
+        PromptType(PromptType::Positive),
+        AutoZoom(true),
+        AutoRefine(false)
+    {
+      this->Interactors[InteractionType::Point] = std::make_unique<PointInteractor>();
+      this->Interactors[InteractionType::Box] = std::make_unique<BoxInteractor>();
+      this->Interactors[InteractionType::Scribble] = std::make_unique<ScribbleInteractor>();
+      this->Interactors[InteractionType::Lasso] = std::make_unique<LassoInteractor>();
+    }
 
-    context->ExecuteString(pyCommands);
+    ~Impl()
+    {
+    }
 
-    return context->IsVariableExists("cuda_is_available");
-  }
-}
+    Interactor* GetEnabledInteractor() const
+    {
+      for (auto& [interactionType, interactor] : this->Interactors)
+      {
+        if (interactor->IsEnabled())
+          return interactor.get();
+      }
 
-std::string mitk::nnInteractiveTool::GetToolString(Tool tool)
-{
-  switch (tool)
-  {
-    case Tool::Box:
-      return "box";
+      return nullptr;
+    }
 
-    case Tool::Lasso:
-      return "lasso";
+    // Methods that execute Python code are defined at the bottom of this file.
+    bool IsCUDAAvailable() const;
+    void SetAutoZoom() const;
+    void AddPointInteraction(const Point3D& point, const Image* inputAtTimeStep) const;
+    void AddBoxInteraction(const PlanarFigure* box, const Image* inputAtTimeStep) const;
+    void AddScribbleInteraction(const Image* mask) const;
+    void AddLassoInteraction(const Image* mask) const;
+    void AddInitialSegInteraction(LabelSetImage* previewImage, TimeStepType timeStep) const;
+    void ResetInteractions() const;
 
-    case Tool::Point:
-      return "point";
-
-    default:
-      return "scribble";
-  }
-}
-
-std::string mitk::nnInteractiveTool::GetPromptTypeString(PromptType promptType)
-{
-  if (promptType == PromptType::Positive)
-    return "positive";
-
-  return "negative";
-}
-
-const mitk::Color& mitk::nnInteractiveTool::GetColor(PromptType promptType, Intensity intensity)
-{
-  static auto vibrantPositiveColor = MakeColor(0.0f, 0.694f, 0.047f);
-  static auto mutedPositiveColor = MakeColor(0.0f, 0.472f, 0.027f);
-  static auto vibrantNegativeColor = MakeColor(0.827f, 0.027f, 0.0f);
-  static auto mutedNegativeColor = MakeColor(0.561f, 0.02f, 0.0f);
-
-  if (promptType == PromptType::Positive)
-  {
-    return intensity == Intensity::Vibrant
-      ? vibrantPositiveColor
-      : mutedPositiveColor;
-  }
-
-  return intensity == Intensity::Vibrant
-    ? vibrantNegativeColor
-    : mutedNegativeColor;
+    PythonContext::Pointer PythonContext;
+    LabelSetImage::Pointer TargetBuffer;
+    std::optional<Backend> Backend;
+    ToolManager::Pointer ToolManager;
+    nnInteractive::PromptType PromptType;
+    InteractorMap Interactors;
+    Image::Pointer InitialSeg;
+    bool AutoZoom;
+    bool AutoRefine;
+  };
 }
 
 mitk::nnInteractiveTool::nnInteractiveTool()
-  : m_AutoZoom(true),
-    m_AutoRefine(false),
-    m_PromptType(PromptType::Positive),
-    m_Tools {
-      Tool::Point,
-      Tool::Box,
-      Tool::Scribble,
-      Tool::Lasso },
-    m_ScribbleTool(nnInteractiveScribbleTool::New()),
-    m_LassoTool(nnInteractiveLassoTool::New())
+  : m_Impl(std::make_unique<Impl>())
 {
-  auto scribbleCommand = itk::MemberCommand<Self>::New();
-  scribbleCommand->SetCallbackFunction(this, &Self::OnScribbleEvent);
-  m_ScribbleTool->AddObserver(ScribbleEvent(), scribbleCommand);
-
-  auto lassoClosedCommand = itk::MemberCommand<Self>::New();
-  lassoClosedCommand->SetCallbackFunction(this, &Self::OnLassoEvent);
-  m_LassoTool->AddObserver(LassoEvent(), lassoClosedCommand);
-
-  this->ResetsToEmptyPreviewOn();
   this->KeepActiveAfterAcceptOn();
+  this->ResetsToEmptyPreviewOn();
+  this->SetSelectedLabels({1});
+
+  for (const auto& [interactionType, interactor] : m_Impl->Interactors)
+  {
+    interactor->UpdatePreviewEvent += MessageDelegate1<nnInteractiveTool, bool>(
+      this, &nnInteractiveTool::UpdatePreview);
+  }
 }
 
 mitk::nnInteractiveTool::~nnInteractiveTool()
 {
-}
-
-bool mitk::nnInteractiveTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
-{
-  if (!Superclass::CanHandle(referenceData, workingData))
-    return false;
-
-  if (static_cast<const Image*>(referenceData)->GetDimension() > 3)
-    return false;
-
-  return true;
-}
-
-bool mitk::nnInteractiveTool::GetAutoZoom() const
-{
-  return m_AutoZoom;
-}
-
-void mitk::nnInteractiveTool::SetAutoZoom(bool autoZoom)
-{
-  m_AutoZoom = autoZoom;
-}
-
-bool mitk::nnInteractiveTool::GetAutoRefine() const
-{
-  return m_AutoRefine;
-}
-
-void mitk::nnInteractiveTool::SetAutoRefine(bool autoRefine)
-{
-  m_AutoRefine = autoRefine;
-}
-
-void mitk::nnInteractiveTool::CleanUpSession()
-{
-  if (m_PythonContext.IsNotNull() && m_PythonContext->IsVariableExists("session"))
+  for (const auto& [interactionType, interactor] : m_Impl->Interactors)
   {
-    std::string pyCommand = "session._reset_session()\n"
-                            "del session.network\n"
-                            "del session\n"
-                            "torch.cuda.empty_cache()\n";
-    m_PythonContext->ExecuteString(pyCommand);
-  }
-}
-
-void mitk::nnInteractiveTool::SetToolManager(ToolManager* toolManager)
-{
-  Superclass::SetToolManager(toolManager);
-
-  m_ToolManager = ToolManager::New(toolManager->GetDataStorage());
-
-  m_ScribbleTool->InitializeStateMachine();
-  m_ScribbleTool->SetToolManager(m_ToolManager);
-
-  m_LassoTool->InitializeStateMachine();
-  m_LassoTool->SetToolManager(m_ToolManager);
-}
-
-void mitk::nnInteractiveTool::Notify(InteractionEvent* interactionEvent, bool isHandled)
-{
-  if (!isHandled)
-  {
-    if (m_ScribbleTool->IsEnabled())
-    {
-      m_ScribbleTool->HandleEvent(interactionEvent, nullptr);
-      return;
-    }
-    else if (m_LassoTool->IsEnabled())
-    {
-      m_LassoTool->HandleEvent(interactionEvent, nullptr);
-      return;
-    }
-  }
-
-  return Superclass::Notify(interactionEvent, isHandled);
-}
-
-const std::array<mitk::nnInteractiveTool::Tool, 4>& mitk::nnInteractiveTool::GetTools() const
-{
-  return m_Tools;
-}
-
-void mitk::nnInteractiveTool::EnableInteraction(Tool tool, PromptType promptType)
-{
-  if (m_ActiveTool.has_value())
-  {
-    if (m_ActiveTool == tool)
-    {
-      if (m_PromptType == promptType)
-        return;
-    }
-
-    this->DisableInteraction();
-  }
-
-  switch (tool)
-  {
-    case Tool::Point:
-    {
-      m_PointInteractor->SetDataNode(this->GetPointSetNode(promptType));
-      m_PointInteractor->EnableInteraction(true);
-      this->BlockLMBDisplayInteraction();
-      break;
-    }
-
-    case Tool::Box:
-      this->AddNewBoxNode(promptType);
-      this->BlockLMBDisplayInteraction();
-      break;
-
-    case Tool::Scribble:
-      this->AddScribbleNode();
-      this->SetActiveScribbleLabel(promptType);
-      m_ToolManager->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
-      m_ToolManager->SetWorkingData(m_ScribbleNode);
-      m_ScribbleTool->Activate(this->GetColor(promptType, Intensity::Vibrant));
-      break;
-
-    case Tool::Lasso:
-      this->AddLassoMaskNode(promptType);
-      m_ToolManager->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
-      m_ToolManager->SetWorkingData(m_LassoMaskNode);
-      m_LassoTool->Activate(this->GetColor(promptType, Intensity::Vibrant));
-      break;
-
-    default:
-      break;
-  }
-
-  m_ActiveTool = tool;
-  m_PromptType = promptType;
-}
-
-void mitk::nnInteractiveTool::DisableInteraction()
-{
-  if (!m_ActiveTool.has_value())
-    return;
-
-  this->UnblockLMBDisplayInteraction();
-
-  switch (m_ActiveTool.value())
-  {
-    case Tool::Point:
-    {
-      m_PointInteractor->EnableInteraction(false);
-      m_PointInteractor->SetDataNode(nullptr);
-      this->GetPointSetNode(m_PromptType)->GetDataAs<PointSet>()->ClearSelection();
-      break;
-    }
-
-    case Tool::Box:
-      this->RemoveNewBoxNode();
-      break;
-
-    case Tool::Scribble:
-      m_ScribbleTool->Deactivate();
-      break;
-
-    case Tool::Lasso:
-      m_LassoTool->Deactivate();
-      this->RemoveLassoMaskNode();
-      break;
-
-    default:
-      break;
-  }
-
-  RenderingManager::GetInstance()->RequestUpdateAll();
-  m_ActiveTool.reset();
-}
-
-void mitk::nnInteractiveTool::ResetInteractions()
-{
-  m_MaskImage = nullptr;
-
-  this->RemoveLassoMaskNode();
-  this->RemoveScribbleNode();
-  this->RemoveNewBoxNode();
-
-  for (auto promptType : { PromptType::Positive, PromptType::Negative })
-  {
-    this->GetPointSetNode(promptType)->GetDataAs<PointSet>()->Clear();
-
-    auto& nodes = this->GetBoxNodes(promptType);
-
-    for (const auto& node : nodes)
-      this->GetDataStorage()->Remove(node);
-
-    nodes.clear();
-
-    nodes = this->GetLassoNodes(promptType);
-
-    for (const auto& node : nodes)
-      this->GetDataStorage()->Remove(node);
-
-    nodes.clear();
-  }
-
-  if (m_PythonContext.IsNotNull() && m_PythonContext->IsVariableExists("session"))
-  {
-    std::string pyCommand = "if session:\n"
-                            "   session.reset_interactions()\n";
-    m_PythonContext->ExecuteString(pyCommand);
-  }
-  m_ActiveTool.reset();
-  this->UpdatePreview();
-}
-
-bool mitk::nnInteractiveTool::HasInteractions() const
-{
-  for (auto promptType : { PromptType::Positive, PromptType::Negative })
-  {
-    if (const auto* pointSetNode = this->GetPointSetNode(promptType); pointSetNode != nullptr)
-    {
-      if (pointSetNode->GetDataAs<PointSet>()->GetSize() != 0)
-        return true;
-    }
-
-    if (!this->GetBoxNodes(promptType).empty())
-      return true;
-
-    if (!this->GetLassoNodes(promptType).empty())
-      return true;
-
-    if (m_ScribbleNode.IsNotNull() && !m_ScribbleNode->GetDataAs<LabelSetImage>()->IsEmpty(m_ScribbleLabels.at(promptType)))
-      return true;
-
-    if (m_MaskImage.IsNotNull())
-      return true;
-  }
-
-  return false;
-}
-
-void mitk::nnInteractiveTool::BlockLMBDisplayInteraction()
-{
-  if (!m_EventConfigBackup.empty())
-    return;
-
-  for (const auto& eventObserverReference : us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>())
-  {
-    auto eventObserver = us::GetModuleContext()->GetService(eventObserverReference);
-    auto eventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(eventObserver);
-
-    if (eventBroadcast != nullptr)
-    {
-      m_EventConfigBackup.emplace_back(eventObserverReference, eventBroadcast->GetEventConfig());
-      eventBroadcast->AddEventConfig("DisplayConfigBlockLMB.xml");
-    }
-  }
-}
-
-void mitk::nnInteractiveTool::UnblockLMBDisplayInteraction()
-{
-  for (const auto& [eventObserverReference, eventConfig] : m_EventConfigBackup)
-  {
-    if (eventObserverReference)
-    {
-      auto eventObserver = us::GetModuleContext()->GetService<InteractionEventObserver>(eventObserverReference);
-
-      if (eventObserver)
-        static_cast<DisplayActionEventBroadcast*>(eventObserver)->SetEventConfig(eventConfig);
-    }
-  }
-
-  m_EventConfigBackup.clear();
-}
-
-mitk::DataNode::Pointer mitk::nnInteractiveTool::CreatePointSetNode(PromptType promptType)
-{
-  auto pointSet = PointSet::New();
-  auto geometry = static_cast<ProportionalTimeGeometry*>(pointSet->GetTimeGeometry());
-  geometry->SetStepDuration(std::numeric_limits<TimePointType>::max());
-
-  auto pointCommand = itk::SimpleMemberCommand<Self>::New();
-  pointCommand->SetCallbackFunction(this, &Self::OnPointEvent);
-  pointSet->AddObserver(PointSetAddEvent(), pointCommand);
-
-  auto node = DataNode::New();
-  node->SetData(pointSet);
-  node->SetName(this->CreateNodeName("points", promptType));
-  node->SetColor(this->GetColor(promptType, Intensity::Muted));
-  node->SetColor(this->GetColor(promptType, Intensity::Vibrant), nullptr, "selectedcolor");
-  node->SetProperty("Pointset.2D.shape", PointSetShapeProperty::New(PointSetShapeProperty::CIRCLE));
-  node->SetIntProperty("Pointset.2D.resolution", 64);
-  node->SetFloatProperty("point 2D size", 5.0f);
-  node->SetFloatProperty("Pointset.2D.distance to plane", 0.1f);
-  node->SetBoolProperty("Pointset.2D.keep shape when selected", true);
-  node->SetBoolProperty("Pointset.2D.fill shape", true);
-  node->SetBoolProperty("helper object", true);
-
-  this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
-
-  return node;
-}
-
-void mitk::nnInteractiveTool::OnPointEvent()
-{
-  this->UpdatePreview();
-}
-
-mitk::DataNode* mitk::nnInteractiveTool::GetPointSetNode(PromptType promptType) const
-{
-  if (promptType == PromptType::Positive)
-    return m_PositivePointsNode;
-
-  return m_NegativePointsNode;
-}
-
-const std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetBoxNodes(PromptType promptType) const
-{
-  if (promptType == PromptType::Positive)
-    return m_PositiveBoxNodes;
-
-  return m_NegativeBoxNodes;
-}
-
-std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetBoxNodes(PromptType promptType)
-{
-  if (promptType == PromptType::Positive)
-    return m_PositiveBoxNodes;
-
-  return m_NegativeBoxNodes;
-}
-
-void mitk::nnInteractiveTool::AddNewBoxNode(PromptType promptType)
-{
-  if (m_NewBoxNode.first.IsNotNull())
-    return;
-
-  auto node = DataNode::New();
-  node->SetName(this->CreateNodeName("box", promptType));
-  node->SetData(PlanarRectangle::New());
-  node->SetColor(this->GetColor(promptType, Intensity::Muted));
-  node->SetColor(this->GetColor(promptType, Intensity::Vibrant), nullptr, "planarfigure.selected.line.color");
-  node->SetSelected(true);
-  node->SetFloatProperty("planarfigure.line.width", 3.0f);
-  node->SetBoolProperty("planarfigure.drawname", false);
-  node->SetBoolProperty("planarfigure.drawshadow", false);
-  node->SetBoolProperty("planarfigure.drawcontrolpoints", false);
-  node->SetBoolProperty("planarfigure.hidecontrolpointsduringinteraction", true);
-  node->SetBoolProperty("planarfigure.fill", true);
-  node->SetBoolProperty("helper object", true);
-
-  m_BoxInteractor->SetDataNode(node);
-  m_BoxInteractor->EnableInteraction(true);
-
-  auto command = itk::SimpleMemberCommand<Self>::New();
-  command->SetCallbackFunction(this, &Self::OnBoxPlaced);
-  auto tag = node->GetData()->AddObserver(EndPlacementPlanarFigureEvent(), command);
-
-  this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
-
-  m_NewBoxNode = std::make_pair(node, tag);
-}
-
-void mitk::nnInteractiveTool::OnBoxPlaced()
-{
-  auto& [node, tag] = m_NewBoxNode;
-  node->GetData()->RemoveObserver(tag);
-  node->SetSelected(false);
-  this->GetBoxNodes(m_PromptType).push_back(node);
-  node = nullptr;
-
-  this->UpdatePreview();
-  this->AddNewBoxNode(m_PromptType);
-}
-
-void mitk::nnInteractiveTool::RemoveNewBoxNode()
-{
-  m_BoxInteractor->EnableInteraction(false);
-  m_BoxInteractor->SetDataNode(nullptr);
-
-  if (m_NewBoxNode.first.IsNotNull())
-  {
-    this->GetDataStorage()->Remove(m_NewBoxNode.first);
-    m_NewBoxNode.first = nullptr;
-  }
-}
-
-void mitk::nnInteractiveTool::AddScribbleNode()
-{
-  if (m_ScribbleNode.IsNotNull())
-    return;
-
-  auto referenceNode = this->GetToolManager()->GetReferenceData(0);
-  auto referenceImage = referenceNode->GetDataAs<Image>();
-  auto templateImage = SegmentationHelper::GetStaticSegmentationTemplate(referenceImage);
-  std::string name = this->CreateNodeName("scribble");
-
-  m_ScribbleNode = LabelSetImageHelper::CreateNewSegmentationNode(nullptr, templateImage, name);
-  m_ScribbleNode->SetBoolProperty("helper object", true);
-
-  for (auto promptType : { PromptType::Positive, PromptType::Negative })
-    this->AddScribbleLabel(promptType);
-
-  this->GetDataStorage()->Add(m_ScribbleNode, referenceNode);
-}
-
-void mitk::nnInteractiveTool::AddScribbleLabel(PromptType promptType)
-{
-  auto name = this->GetPromptTypeString(promptType);
-  const auto& color = this->GetColor(promptType, Intensity::Muted);
-
-  auto label = m_ScribbleNode->GetDataAs<LabelSetImage>()->AddLabel(name, color, 0);
-  label->SetLocked(false);
-
-  m_ScribbleLabels[promptType] = label->GetValue();
-}
-
-void mitk::nnInteractiveTool::SetActiveScribbleLabel(PromptType promptType)
-{
-  m_ScribbleNode->GetDataAs<LabelSetImage>()->SetActiveLabel(m_ScribbleLabels[promptType]);
-  m_ScribbleNode->SetBoolProperty("labelset.contour.active", false);
-}
-
-void mitk::nnInteractiveTool::OnScribbleEvent(itk::Object*, const itk::EventObject&)
-{
-  this->UpdatePreview();
-}
-
-void mitk::nnInteractiveTool::RemoveScribbleNode()
-{
-  if (m_ScribbleNode.IsNull())
-    return;
-
-  this->GetDataStorage()->Remove(m_ScribbleNode);
-  m_ScribbleNode = nullptr;
-
-  m_ScribbleLabels.clear();
-}
-
-void mitk::nnInteractiveTool::AddLassoMaskNode(PromptType promptType)
-{
-  if (m_LassoMaskNode.IsNotNull())
-    return;
-
-  auto referenceNode = this->GetToolManager()->GetReferenceData(0);
-  auto referenceImage = referenceNode->GetDataAs<Image>();
-  auto templateImage = SegmentationHelper::GetStaticSegmentationTemplate(referenceImage);
-  std::string name = this->CreateNodeName("lasso mask", promptType);
-
-  m_LassoMaskNode = LabelSetImageHelper::CreateNewSegmentationNode(nullptr, templateImage, name);
-  m_LassoMaskNode->SetBoolProperty("helper object", true);
-  m_LassoMaskNode->SetVisibility(false);
-
-  auto labelName = this->GetPromptTypeString(promptType);
-  const auto& color = this->GetColor(promptType, Intensity::Vibrant);
-  auto label = m_LassoMaskNode->GetDataAs<LabelSetImage>()->AddLabel(name, color, 0);
-
-  this->GetDataStorage()->Add(m_LassoMaskNode, referenceNode);
-}
-
-void mitk::nnInteractiveTool::OnLassoEvent(itk::Object*, const itk::EventObject& event)
-{
-  auto node = DataNode::New();
-  node->SetData(static_cast<const LassoEvent*>(&event)->GetContour());
-  node->SetName(this->CreateNodeName("lasso", m_PromptType));
-  node->SetColor(this->GetColor(m_PromptType, Intensity::Muted), nullptr, "contour.color");
-  node->SetFloatProperty("contour.width", 3.0f);
-  node->SetBoolProperty("helper object", true);
-
-  this->GetLassoNodes(m_PromptType).push_back(node);
-  this->GetDataStorage()->Add(node, this->GetToolManager()->GetReferenceData(0));
-
-  this->UpdatePreview();
-}
-
-const std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetLassoNodes(PromptType promptType) const
-{
-  if (promptType == PromptType::Positive)
-    return m_PositiveLassoNodes;
-
-  return m_NegativeLassoNodes;
-}
-
-std::vector<mitk::DataNode::Pointer>& mitk::nnInteractiveTool::GetLassoNodes(PromptType promptType)
-{
-  if (promptType == PromptType::Positive)
-    return m_PositiveLassoNodes;
-
-  return m_NegativeLassoNodes;
-}
-
-void mitk::nnInteractiveTool::RemoveLassoMaskNode()
-{
-  if (m_LassoMaskNode.IsNull())
-    return;
-
-  this->GetDataStorage()->Remove(m_LassoMaskNode);
-  m_LassoMaskNode = nullptr;
-}
-
-void mitk::nnInteractiveTool::AddPointInteraction(const Point3D& point) // remove --ashis
-{
-  MITK_INFO << "AddPointInteraction()";
-
-  const bool prompt = m_PromptType == PromptType::Positive;
-
-  MITK_INFO << "  " << point << ", " << prompt;
-}
-
-void mitk::nnInteractiveTool::AddBoxInteraction(const PlanarRectangle* box)
-{
-  MITK_INFO << "AddBoxInteraction()";
-
-  const bool prompt = m_PromptType == PromptType::Positive;
-
-  const auto p0 = box->GetWorldControlPoint(0);
-  const auto p2 = box->GetWorldControlPoint(2);
-
-  itk::FixedArray<itk::FixedArray<ScalarType, 2>, 3> bbox;
-
-  for (int i = 0; i < 3; ++i)
-  {
-    bbox[i][0] = std::min(p0[i], p2[i]);
-    bbox[i][1] = std::max(p0[i], p2[i]);
-  }
-
-  MITK_INFO << "  " << bbox << ", " << prompt;
-}
-
-void mitk::nnInteractiveTool::AddScribbleInteraction(const Image* mask)
-{
-  MITK_INFO << "AddScribbleInteraction() [" << this->GetPromptTypeString(m_PromptType) << ']';
-
-  const bool prompt = m_PromptType == PromptType::Positive;
-  const auto size = itk::MakeSize<unsigned int>(mask->GetDimension(0), mask->GetDimension(1), mask->GetDimension(2));
-
-  MITK_INFO << "  Image" << mask->GetPixelType().GetTypeAsString() << ", " << size << ", " << prompt;
-}
-
-void mitk::nnInteractiveTool::AddLassoInteraction(const Image* mask)
-{
-  MITK_INFO << "AddLassoInteraction()";
-
-  const bool prompt = m_PromptType == PromptType::Positive;
-  const auto size = itk::MakeSize<unsigned int>(mask->GetDimension(0), mask->GetDimension(1), mask->GetDimension(2));
-
-  MITK_INFO << "  Image" << mask->GetPixelType().GetTypeAsString() << ", " << size << ", " << prompt;
-}
-
-void mitk::nnInteractiveTool::AddInitialSegInteraction(Image* mask)
-{
-  m_MaskImage = mask;
-  this->UpdatePreview();
-}
-
-std::string mitk::nnInteractiveTool::CreateNodeName(const std::string& name, std::optional<PromptType> promptType) const
-{
-  std::stringstream stream;
-  stream << this->GetName();
-
-  if (promptType.has_value())
-    stream << ' ' << this->GetPromptTypeString(promptType.value());
-
-  stream << ' ' << name;
-
-  return stream.str();
-}
-
-void mitk::nnInteractiveTool::CreatePointInteractor()
-{
-  m_PointInteractor = PointSetDataInteractor::New();
-  m_PointInteractor->LoadStateMachine("PointSet.xml");
-  m_PointInteractor->SetEventConfig("PointSetConfigLMB.xml");
-  m_PointInteractor->EnableInteraction(false);
-  m_PointInteractor->EnableMovement(false);
-  m_PointInteractor->EnableRemoval(false);
-}
-
-void mitk::nnInteractiveTool::CreateBoxInteractor()
-{
-  auto module = us::ModuleRegistry::GetModule("MitkPlanarFigure");
-
-  m_BoxInteractor = PlanarFigureInteractor::New();
-  m_BoxInteractor->LoadStateMachine("PlanarFigureInteraction.xml", module);
-  m_BoxInteractor->SetEventConfig("PlanarFigureConfig.xml", module);
-  m_BoxInteractor->EnableInteraction(false);
-}
-
-void mitk::nnInteractiveTool::Activated()
-{
-  Superclass::Activated();
-
-  m_PositivePointsNode = this->CreatePointSetNode(PromptType::Positive);
-  m_NegativePointsNode = this->CreatePointSetNode(PromptType::Negative);
-
-  this->CreatePointInteractor();
-  this->CreateBoxInteractor();
-}
-
-void mitk::nnInteractiveTool::Deactivated()
-{
-  this->DisableInteraction();
-  this->ResetInteractions();
-
-  m_BoxInteractor = nullptr;
-  m_PointInteractor = nullptr;
-
-  this->GetDataStorage()->Remove(m_NegativePointsNode);
-  m_NegativePointsNode = nullptr;
-
-  this->GetDataStorage()->Remove(m_PositivePointsNode);
-  m_PositivePointsNode = nullptr;
-
-  this->CleanUpSession();
-
-  m_PythonContext = nullptr;
-
-  Superclass::Deactivated();
-}
-
-std::pair<std::string, bool> mitk::nnInteractiveTool::GetPointAsListString(const mitk::BaseGeometry *baseGeometry) const
-{
-  const auto *pointSet = this->GetPointSetNode(m_PromptType)->GetDataAs<PointSet>();
-  const auto point3d = pointSet->GetPoint(pointSet->GetSize() - 1);
-  bool includeInteraction = m_PromptType == PromptType::Positive;
-  std::stringstream pointsAndLabels;
-  pointsAndLabels << "[";
-  const char COMMA = ',';
-  if (baseGeometry->IsInside(point3d))
-  {
-    mitk::Point3D index3D;
-    baseGeometry->WorldToIndex(point3d, index3D);
-    pointsAndLabels << static_cast<int>(index3D[2]) << COMMA << static_cast<int>(index3D[1]) << COMMA;
-    pointsAndLabels << static_cast<int>(index3D[0]);
-  }
-  pointsAndLabels << "]";
-  return std::make_pair(pointsAndLabels.str(), includeInteraction);
-}
-
-std::pair<std::string, bool> mitk::nnInteractiveTool::GetBBoxAsListString(const mitk::BaseGeometry* baseGeometry) const
-{
-  bool includeInteraction = m_PromptType == PromptType::Positive;
-  const mitk::DataNode::Pointer node = this->GetBoxNodes(m_PromptType).back();
-  const auto *box = node->GetDataAs<PlanarRectangle>();
-  mitk::Point3D p0 = box->GetWorldControlPoint(0);
-  mitk::Point3D p2 = box->GetWorldControlPoint(2);
-  const char COMMA = ',';
-  std::stringstream bboxPoints;
-  bboxPoints << "[";
-  if (baseGeometry->IsInside(p0) && baseGeometry->IsInside(p2))
-  {
-    mitk::Point3D index0, index2;
-    baseGeometry->WorldToIndex(p0, index0);
-    baseGeometry->WorldToIndex(p2, index2);
-    for(int i = 2; i >= 0; --i)
-    {
-      bboxPoints << "[";
-      bboxPoints << std::min(index0[i], index2[i]) << COMMA;
-      bboxPoints << std::max(index0[i], index2[i]);
-      bboxPoints << "],";
-    }
-    if (bboxPoints.tellp() > 1)
-    {
-      bboxPoints.seekp(-1, bboxPoints.end); // remove last added comma character
-    }
-  }
-  bboxPoints << "]";
-  return std::make_pair(bboxPoints.str(), includeInteraction);
-}
-
-void mitk::nnInteractiveTool::DoUpdatePreview(const Image *inputAtTimeStep,
-                                              const Image * /* oldSegAtTimeStep*/,
-                                              LabelSetImage *previewImage,
-                                              TimeStepType timeStep)
-{
-  if (nullptr != previewImage && m_PythonContext.IsNotNull())
-  {
-    m_ProgressCommand->SetProgress(20);
-    this->SetSelectedLabels({1});
-    if (m_ActiveTool.has_value())
-    {
-      try
-      {
-        std::string pyCommand;
-        bool includeInteraction = m_PromptType == PromptType::Positive;
-        auto start = std::chrono::system_clock::now();
-        switch (m_ActiveTool.value())
-        {
-          case Tool::Point:
-          {
-            std::pair<std::string, bool> pointInteraction = this->GetPointAsListString(inputAtTimeStep->GetGeometry());
-            MITK_INFO << "Point: " << pointInteraction.first;
-            pyCommand = "coordinate_list = " + pointInteraction.first + "\n"
-                        "session.add_point_interaction(coordinate_list, include_interaction = ";
-            includeInteraction = pointInteraction.second;
-            break;
-          }
-          case Tool::Box:
-          {
-            std::pair<std::string, bool> bboxInteraction = GetBBoxAsListString(inputAtTimeStep->GetGeometry());
-            MITK_INFO << "bboxInteraction: " << bboxInteraction.first;
-            pyCommand = "bbox_list = " + bboxInteraction.first +"\n"
-                        "session.add_bbox_interaction(bbox_list, include_interaction = ";
-            includeInteraction = bboxInteraction.second;
-            break;
-          }
-          case Tool::Scribble:
-          {
-            auto *scribbleMask = m_ScribbleNode->GetDataAs<mitk::Image>();
-            m_PythonContext->TransferBaseDataToPython(scribbleMask, "_mitk_scribble_mask");
-            pyCommand = "scribble_npy = _mitk_scribble_mask.GetAsNumpy()\n"
-                        "session.add_scribble_interaction(scribble_npy.astype(numpy.uint8),"
-                        "include_interaction = ";
-            break;
-          }
-          case Tool::Lasso:
-          {
-            auto *lassoMask = m_LassoMaskNode->GetDataAs<mitk::Image>();
-            m_PythonContext->TransferBaseDataToPython(lassoMask, "_mitk_lasso_mask");
-            pyCommand = "lassoMask = _mitk_lasso_mask.GetAsNumpy()\n"
-                        "session.add_scribble_interaction(lassoMask.astype(numpy.uint8),"
-                        "include_interaction = ";
-            break;
-          }
-          default:
-            mitkThrow() << "Unsupported interaction type.";
-            break;
-        }
-        m_ProgressCommand->SetProgress(50);
-
-        if (includeInteraction)
-        {
-          pyCommand.append("True)\n");
-        }
-        else
-        {
-          pyCommand.append("False)\n");
-        }
-
-        pyCommand.append("session.set_do_autozoom");
-        if (m_AutoZoom)
-        {
-          pyCommand.append("(True)\n"); // Auto-zoom
-        }
-        else
-        {
-          pyCommand.append("(False)\n"); // Auto-zoom
-        }
-
-        m_PythonContext->ExecuteString(pyCommand);
-        m_ProgressCommand->SetProgress(150);
-        auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        MITK_INFO << "nnInter tool inference elapsed: " << elapsed.count();
-
-        m_ProgressCommand->SetProgress(180);
-        mitk::ImageReadAccessor newMitkImgAcc(m_OutputBuffer.GetPointer());
-        previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
-      }
-      catch (const mitk::Exception &e)
-      {
-        mitkThrow() << e.GetDescription();
-      }
-    }
-    else if(m_MaskImage.IsNotNull()) // From mask
-    {
-      m_PythonContext->TransferBaseDataToPython(m_MaskImage, "_mitk_pre_mask");
-      std::string pyCommand = "pre_mask_npy = _mitk_pre_mask.GetAsNumpy()\n"
-                              "session.add_initial_seg_interaction(pre_mask_npy.astype(numpy.uint8), run_prediction=";
-      pyCommand += m_AutoRefine ? "True" : "False";
-      pyCommand += ")\n";
-      m_PythonContext->ExecuteString(pyCommand);
-      mitk::ImageReadAccessor newMitkImgAcc(m_OutputBuffer.GetPointer());
-      previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
-    }
-    else
-    {
-      this->ResetPreviewContentAtTimeStep(timeStep);
-      RenderingManager::GetInstance()->RequestUpdateAll();
-    }
+    interactor->UpdatePreviewEvent -= MessageDelegate1<nnInteractiveTool, bool>(
+      this, &nnInteractiveTool::UpdatePreview);
   }
 }
 
@@ -913,128 +122,467 @@ us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
   return resource;
 }
 
-void mitk::nnInteractiveTool::SetImageInSession()
+bool mitk::nnInteractiveTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
 {
-  if (m_PythonContext.IsNull())
+  if (!Superclass::CanHandle(referenceData, workingData))
+    return false;
+
+  if (static_cast<const Image*>(referenceData)->GetDimension() > 3)
+    return false;
+
+  return true;
+}
+
+void mitk::nnInteractiveTool::Deactivated()
+{
+  this->DisableInteractor();
+  this->ResetInteractions();
+
+  this->EndSession();
+
+  Superclass::Deactivated();
+}
+
+const mitk::nnInteractiveTool::InteractorMap& mitk::nnInteractiveTool::GetInteractors() const
+{
+  return m_Impl->Interactors;
+}
+
+const Interactor* mitk::nnInteractiveTool::GetInteractor(InteractionType interactionType) const
+{
+  return m_Impl->Interactors.at(interactionType).get();
+}
+
+void mitk::nnInteractiveTool::EnableInteractor(InteractionType nextInteractionType, PromptType promptType)
+{
+  // Disable any other interactor if enabled.
+  for (const auto& [interactionType, interactor] : m_Impl->Interactors)
   {
-    mitkThrow() << "Error: Python context was not activated.";
+    if (interactionType != nextInteractionType && interactor->IsEnabled())
+    {
+      this->DisableInteractor(interactionType);
+      break;
+    }
   }
-  auto *inputImage = dynamic_cast<Image *>(this->GetToolManager()->GetReferenceData(0)->GetData());
-  const TimePointType timePoint = this->GetToolManager()->GetCurrentTimePoint();
-  const auto timeStep = inputImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-  
-  mitk::Image::ConstPointer inputVolAtTimeStep = this->GetImageByTimeStep(inputImage, timeStep);
-  mitk::Image *inputAtTimeStep = const_cast<mitk::Image *>(inputVolAtTimeStep.GetPointer());
-  m_OutputBuffer->Initialize(inputAtTimeStep);
-  m_PythonContext->TransferBaseDataToPython(inputAtTimeStep);
-  m_PythonContext->TransferBaseDataToPython(m_OutputBuffer.GetPointer(), "_mitk_seg_image");
-  mitk::Vector3D spacing = inputAtTimeStep->GetGeometry()->GetSpacing();
-  std::string pycommand = "image_npy = _mitk_image.GetAsNumpy()\n"
-                          "print('numpy image shape',image_npy.shape)\n"
-                          "spacing = [" +
-                          std::to_string(spacing[2]) + "," + std::to_string(spacing[1]) + "," + std::to_string(spacing[0]) +
-                          "]\n"
-                          "target_buffer_numpy = _mitk_seg_image.GetAsNumpy()\n"
-                          "target_buffer = torch.from_numpy(target_buffer_numpy)\n"
-                          "session.set_image(image_npy[None], {'spacing' : spacing})\n"
-                          "session.set_target_buffer(target_buffer)\n";
-  try
+
+  // Set reference image through our own tool manager for interactors.
+  m_Impl->ToolManager->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
+
+  // Enable the requested interactor for the given prompt type.
+  m_Impl->Interactors[nextInteractionType]->Enable(promptType);
+  m_Impl->PromptType = promptType;
+}
+
+void mitk::nnInteractiveTool::DisableInteractor(std::optional<InteractionType> interactionType)
+{
+  if (interactionType.has_value())
   {
-    m_PythonContext->ExecuteString(pycommand);
+    // Disable a specific interactor.
+    m_Impl->Interactors[interactionType.value()]->Disable();
   }
-  catch (mitk::Exception &e)
+  else
   {
-    mitkThrow() << e.GetDescription();
+    // Disable the currently enabled interator, if any.
+    for (auto& [interactionType, interactor] : m_Impl->Interactors)
+    {
+      if (interactor->IsEnabled())
+      {
+        interactor->Disable();
+        break;
+      }
+    }
+  }
+
+  m_Impl->ToolManager->SetReferenceData(nullptr);
+}
+
+void mitk::nnInteractiveTool::ResetInteractions()
+{
+  for (auto& [interactionType, interactor] : m_Impl->Interactors)
+    interactor->Reset();
+
+  m_Impl->InitialSeg = nullptr;
+
+  if (this->IsSessionRunning())
+    m_Impl->ResetInteractions();
+
+  this->UpdatePreview();
+}
+
+bool mitk::nnInteractiveTool::HasInteractions() const
+{
+  // Check if any interactor has interactions.
+  for (const auto& [interactionType, interactor] : m_Impl->Interactors)
+  {
+    if (interactor->HasInteractions())
+      return true;
+  }
+
+  // Check if the initialization segmentation has been set.
+  return m_Impl->InitialSeg.IsNotNull();
+}
+
+bool mitk::nnInteractiveTool::GetAutoZoom() const
+{
+  return m_Impl->AutoZoom;
+}
+
+void mitk::nnInteractiveTool::SetAutoZoom(bool autoZoom)
+{
+  m_Impl->AutoZoom = autoZoom;
+
+  if (this->IsSessionRunning())
+    m_Impl->SetAutoZoom();
+}
+
+bool mitk::nnInteractiveTool::GetAutoRefine() const
+{
+  return m_Impl->AutoRefine;
+}
+
+void mitk::nnInteractiveTool::SetAutoRefine(bool autoRefine)
+{
+  m_Impl->AutoRefine = autoRefine;
+}
+
+std::optional<Backend> mitk::nnInteractiveTool::GetBackend() const
+{
+  return m_Impl->Backend;
+}
+
+void mitk::nnInteractiveTool::SetToolManager(ToolManager* toolManager)
+{
+  Superclass::SetToolManager(toolManager);
+
+  m_Impl->ToolManager = ToolManager::New(toolManager->GetDataStorage());
+
+  for (auto& [interactionType, interactor] : m_Impl->Interactors)
+    interactor->SetToolManager(m_Impl->ToolManager);
+}
+
+void mitk::nnInteractiveTool::InitializeSessionWithMask(Image* mask)
+{
+  if (mask == nullptr)
+    return;
+
+  m_Impl->InitialSeg = mask;
+  this->UpdatePreview();
+}
+
+void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
+{
+  // This method assumes it is only called when an interaction has occurred or
+  // when a session should be (re)initialized with a label mask. Otherwise,
+  // calling this method will reset any existing preview content.
+
+  if (previewImage == nullptr || m_Impl->PythonContext.IsNull())
+    return;
+
+  const auto* interactor = m_Impl->GetEnabledInteractor();
+
+  if (interactor != nullptr)
+  {
+    switch (interactor->GetType())
+    {
+      case InteractionType::Point:
+      {
+        auto point = static_cast<const PointInteractor*>(interactor)->GetLastPoint();
+        m_Impl->AddPointInteraction(point.value(), inputAtTimeStep);
+        break;
+      }
+      case InteractionType::Box:
+      {
+        auto box = static_cast<const BoxInteractor*>(interactor)->GetLastBox();
+        m_Impl->AddBoxInteraction(box, inputAtTimeStep);
+        break;
+      }
+      case InteractionType::Scribble:
+      {
+        auto mask = static_cast<const ScribbleInteractor*>(interactor)->GetLastScribbleMask();
+        m_Impl->AddScribbleInteraction(mask);
+        break;
+      }
+      case InteractionType::Lasso:
+      {
+        auto mask = static_cast<const LassoInteractor*>(interactor)->GetLastLassoMask();
+        m_Impl->AddLassoInteraction(mask);
+        break;
+      }
+      default:
+        MITK_ERROR << "Cannot update preview because of unknown interaction type!";
+        return;
+    }
+
+    ImageReadAccessor readAccessor(m_Impl->TargetBuffer.GetPointer());
+    previewImage->SetVolume(readAccessor.GetData(), timeStep);
+  }
+  else if (m_Impl->InitialSeg.IsNotNull())
+  {
+    m_Impl->AddInitialSegInteraction(previewImage, timeStep);
+  }
+  else
+  {
+    this->ResetPreviewContentAtTimeStep(timeStep);
   }
 }
 
-void mitk::nnInteractiveTool::InitializeBackend()
+void mitk::nnInteractiveTool::Notify(InteractionEvent* event, bool isHandled)
 {
-  m_OutputBuffer = mitk::LabelSetImage::New();
-  std::string modelName = "nnInteractive_v1.0";
-  auto start = std::chrono::system_clock::now();
-  m_PythonContext = mitk::PythonContext::New();
-  m_PythonContext->Activate();
-  m_PythonContext->SetVirtualEnvironmentPath("C:/DKFZ/nnInteractive_work/.venv/Lib/site-packages");
-
-  m_Backend.reset();
-
-  std::string device = IsCUDAAvailable(m_PythonContext)
-    ? "cuda:0"
-    : "cpu";
-
-  std::string pycommand = "import torch\n"
-                          "import nnInteractive\n"
-                          "from pathlib import Path\n"
-                          "from nnunetv2.utilities.find_class_by_name import recursive_find_python_class\n"
-                          "from batchgenerators.utilities.file_and_folder_operations import join, load_json\n"
-                          "from huggingface_hub import snapshot_download\n"
-                          "repo_id = 'nnInteractive/nnInteractive'\n"
-                          "download_path = snapshot_download(repo_id = repo_id, allow_patterns = ['" +
-                          modelName + "/*'], force_download = False)\n"
-                          //"download_path = os.getcwd()\n"
-                          "checkpoint_path = Path(download_path).joinpath('" + modelName + "')\n"
-                          "print(f'Using Model " + modelName + " at:{checkpoint_path}')\n";
-  try
+  // If the event is not yet handled, forward it to the currently enabled
+  // interactor, if any.
+  if (!isHandled)
   {
-    m_PythonContext->ExecuteString(pycommand);
-  }
-  catch (mitk::Exception &e)
-  {
-    mitkThrow() << e.GetDescription();
-  }
-  pycommand.clear();
-  pycommand = "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
-              "   inference_class = load_json(Path(checkpoint_path).joinpath('inference_session_class.json'))\n"
-              "   if isinstance (inference_class, dict):\n"
-              "       inference_class = inference_class['inference_class']\n"
-              "else:\n"
-              "   inference_class = 'nnInteractiveInferenceSession'\n"
-              "inference_class = recursive_find_python_class(join(nnInteractive.__path__[0], 'inference'),"
-              "inference_class, 'nnInteractive.inference')\n";
-  try
-  {
-    m_PythonContext->ExecuteString(pycommand);
-  }
-  catch (mitk::Exception &e)
-  {
-    mitkThrow() << e.GetDescription();
-  }
-  pycommand.clear();
-  pycommand = "session = inference_class("
-              "device = torch.device('" + device + "'),"
-              "use_torch_compile = False,"
-              "torch_n_threads = os.cpu_count(),"
-              "verbose = False,"
-              "do_autozoom = True)\n"
-              "session.initialize_from_trained_model_folder(checkpoint_path)\n";
-  try
-  {
-    m_PythonContext->ExecuteString(pycommand);
-  }
-  catch (mitk::Exception& e)
-  {
-    mitkThrow() << e.GetDescription();
+    for (auto& [interactionType, interactor] : m_Impl->Interactors)
+    {
+      if (interactor->IsEnabled())
+      {
+        interactor->HandleEvent(event);
+        return;
+      }
+    }
   }
 
-  this->SetImageInSession();
- 
-  auto end = std::chrono::system_clock::now();
-  auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-  MITK_INFO << "nnInteractive init elapsed: " << elapsed.count();
-
-  m_Backend = device != "cpu"
-    ? Backend::CUDA
-    : Backend::CPU;
-}
-
-std::optional<mitk::nnInteractiveTool::Backend> mitk::nnInteractiveTool::GetBackend() const
-{
-  return m_Backend;
+  Superclass::Notify(event, isHandled);
 }
 
 void mitk::nnInteractiveTool::ConfirmCleanUp()
 {
-  nnInterConfirmMessageEvent.Send(true);
-  RenderingManager::GetInstance()->RequestUpdateAll();
+  this->ConfirmCleanUpEvent.Send(true);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Functions and methods that execute Python code
+////////////////////////////////////////////////////////////////////////////////
+
+void mitk::nnInteractiveTool::StartSession()
+{
+  constexpr auto VENV_PATH = "D:/miniforge3/envs/nnInteractive/Lib/site-packages";
+  constexpr auto MODEL = "nnInteractive_v1.0";
+
+  if (this->IsSessionRunning())
+    this->EndSession();
+
+  m_Impl->PythonContext = PythonContext::New();
+  m_Impl->PythonContext->Activate();
+  m_Impl->PythonContext->SetVirtualEnvironmentPath(VENV_PATH);
+
+  std::ostringstream pyCommands; pyCommands
+    << "import torch\n"
+    << "import nnInteractive\n"
+    << "from pathlib import Path\n"
+    << "from nnunetv2.utilities.find_class_by_name import recursive_find_python_class\n"
+    << "from batchgenerators.utilities.file_and_folder_operations import join, load_json\n"
+    << "from huggingface_hub import snapshot_download\n"
+    << "repo_id = 'nnInteractive/nnInteractive'\n"
+    << "download_path = snapshot_download(\n"
+    << "    repo_id = repo_id,\n"
+    << "    allow_patterns = ['" << MODEL << "'],\n"
+    << "    force_download = False\n"
+    << ")\n"
+    << "checkpoint_path = Path(download_path).joinpath('" << MODEL << "')\n";
+
+  m_Impl->PythonContext->ExecuteString(pyCommands.str());
+
+  pyCommands.clear(); pyCommands
+    << "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
+    << "    inference_class = load_json(\n"
+    << "        Path(checkpoint_path).joinpath('inference_session_class.json'))\n"
+    << "    if isinstance (inference_class, dict):\n"
+    << "        inference_class = inference_class['inference_class']\n"
+    << "else:\n"
+    << "    inference_class = 'nnInteractiveInferenceSession'\n"
+    << "inference_class = recursive_find_python_class(\n"
+    << "    join(nnInteractive.__path__[0], 'inference'),\n"
+    << "    inference_class,\n"
+    << "    'nnInteractive.inference'\n"
+    << ")\n";
+
+  m_Impl->PythonContext->ExecuteString(pyCommands.str());
+
+  m_Impl->Backend.reset();
+
+  bool isCUDAAvailable = m_Impl->IsCUDAAvailable();
+  const std::string torchDevice = isCUDAAvailable
+    ? "cuda:0"
+    : "cpu";
+
+  pyCommands.clear(); pyCommands
+    << "session = inference_class(\n"
+    << "    device=torch.device('" << torchDevice << "'),\n"
+    << "    use_torch_compile=False,\n"
+    << "    torch_n_threads=os.cpu_count(),\n"
+    << "    verbose=False,\n"
+    << "    do_autozoom=" << m_Impl->AutoZoom << '\n'
+    << ")\n"
+    << "session.initialize_from_trained_model_folder(checkpoint_path)\n";
+
+  m_Impl->PythonContext->ExecuteString(pyCommands.str());
+
+  m_Impl->Backend = isCUDAAvailable
+    ? Backend::CUDA
+    : Backend::CPU;
+
+  auto image = this->GetToolManager()->GetReferenceData(0)->GetDataAs<Image>();
+  
+  const auto timePoint = this->GetToolManager()->GetCurrentTimePoint();
+  const auto timeStep = image->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+  
+  auto imageAtTimeStep = this->GetImageByTimeStep(image, timeStep);
+  const auto spacing = imageAtTimeStep->GetGeometry()->GetSpacing();
+
+  m_Impl->TargetBuffer->Initialize(imageAtTimeStep);
+
+  m_Impl->PythonContext->TransferBaseDataToPython(imageAtTimeStep, "mitk_image");
+  m_Impl->PythonContext->TransferBaseDataToPython(m_Impl->TargetBuffer.GetPointer(), "mitk_target_buffer");
+
+  pyCommands.clear(); pyCommands
+    << "image = mitk_image.GetAsNumpy()\n"
+    << "spacing = [\n"
+      << std::to_string(spacing[2]) << ", "
+      << std::to_string(spacing[1]) << ", "
+      << std::to_string(spacing[0]) << "]\n"
+    << "target_buffer = mitk_target_buffer.GetAsNumpy()\n"
+    << "torch_target_buffer = torch.from_numpy(target_buffer)\n"
+    << "session.set_image(image[None], {'spacing': spacing})\n"
+    << "session.set_target_buffer(torch_target_buffer)\n";
+
+  m_Impl->PythonContext->ExecuteString(pyCommands.str());
+}
+
+void mitk::nnInteractiveTool::EndSession()
+{
+  if (!this->IsSessionRunning())
+    return;
+
+  std::ostringstream pyCommands; pyCommands
+    << "session._reset_session()\n"
+    << "del session.network\n"
+    << "del session\n";
+
+  if (m_Impl->Backend == Backend::CUDA)
+    pyCommands << "torch.cuda.empty_cache()\n";
+
+  m_Impl->PythonContext->ExecuteString(pyCommands.str());
+  m_Impl->PythonContext = nullptr;
+}
+
+bool mitk::nnInteractiveTool::IsSessionRunning() const
+{
+  if (m_Impl->PythonContext.IsNull())
+    return false;
+  
+  return m_Impl->PythonContext->IsVariableExists("session");
+}
+
+bool mitk::nnInteractiveTool::Impl::IsCUDAAvailable() const
+{
+  std::ostringstream pyCommands; pyCommands
+    << "import torch\n"
+    << "if torch.cuda.is_available():\n"
+    << "    cuda_is_available = True\n";
+
+  this->PythonContext->ExecuteString(pyCommands.str());
+
+  return this->PythonContext->IsVariableExists("cuda_is_available");
+}
+
+void mitk::nnInteractiveTool::Impl::SetAutoZoom() const
+{
+  std::ostringstream pyCommands; pyCommands
+    << "session.set_do_autozoom(" << (this->AutoZoom ? "True" : "False") << ")\n";
+
+  this->PythonContext->ExecuteString(pyCommands.str());
+}
+
+void mitk::nnInteractiveTool::Impl::AddPointInteraction(const Point3D& point, const Image* inputAtTimeStep) const
+{
+  itk::Index<3> index;
+  inputAtTimeStep->GetGeometry()->WorldToIndex(point, index);
+
+  std::ostringstream pyCommands; pyCommands
+    << "session.add_point_interaction(\n"
+    << "    [" << index[2] << ", " << index[1] << ", " << index[0] << "],\n"
+    << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
+    << ")\n";
+
+  this->PythonContext->ExecuteString(pyCommands.str());
+}
+
+void mitk::nnInteractiveTool::Impl::AddBoxInteraction(const PlanarFigure* box, const Image* inputAtTimeStep) const
+{
+  const auto* geometry = inputAtTimeStep->GetGeometry();
+
+  std::array<itk::Index<3>, 2> indices;
+  geometry->WorldToIndex(box->GetWorldControlPoint(0), indices[0]);
+  geometry->WorldToIndex(box->GetWorldControlPoint(2), indices[1]);
+
+  std::ostringstream pyCommands; pyCommands
+    << "session.add_bbox_interaction(\n"
+    << "    [\n";
+
+  for (int i = 2; i >= 0; --i)
+  {
+    pyCommands
+      << "        ["
+      << std::min(indices[0][i], indices[1][i]) << ", "
+      << std::max(indices[0][i], indices[1][i])
+      << "],\n";
+  }
+
+  pyCommands
+    << "    ],\n"
+    << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
+    << ")\n";
+
+  this->PythonContext->ExecuteString(pyCommands.str());
+}
+
+void mitk::nnInteractiveTool::Impl::AddScribbleInteraction(const Image* mask) const
+{
+  this->PythonContext->TransferBaseDataToPython(const_cast<Image*>(mask), "mitk_scribble_mask");
+
+  std::ostringstream pyCommands; pyCommands
+    << "scribble_mask = mitk_scribble_mask.GetAsNumpy()\n"
+    << "session.add_scribble_interaction(\n"
+    << "    scribble_mask.astype(numpy.uint8),\n"
+    << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
+    << ")\n";
+
+  this->PythonContext->ExecuteString(pyCommands.str());
+}
+
+void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask) const
+{
+  this->PythonContext->TransferBaseDataToPython(const_cast<Image*>(mask), "mitk_lasso_mask");
+
+  std::ostringstream pyCommands; pyCommands
+    << "lasso_mask = mitk_lasso_mask.GetAsNumpy()\n"
+    << "session.add_lasso_interaction(\n"
+    << "    lasso_mask.astype(numpy.uint8),\n"
+    << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
+    << ")\n";
+
+  this->PythonContext->ExecuteString(pyCommands.str());
+}
+
+void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(LabelSetImage* previewImage, TimeStepType timeStep) const
+{
+  this->PythonContext->TransferBaseDataToPython(this->InitialSeg, "mitk_initial_seg");
+
+  std::ostringstream pyCommands; pyCommands
+    << "initial_seg = mitk_initial_seg.GetAsNumpy()\n"
+    << "session.add_initial_seg_interaction(\n"
+    << "    initial_seg.astype(numpy.uint8),\n"
+    << "    run_prediction=" << (this->AutoRefine ? "True" : "False") << '\n'
+    << ")\n";
+
+  this->PythonContext->ExecuteString(pyCommands.str());
+
+  ImageReadAccessor readAccessor(this->TargetBuffer.GetPointer());
+  previewImage->SetVolume(readAccessor.GetData(), timeStep);
+}
+
+void mitk::nnInteractiveTool::Impl::ResetInteractions() const
+{
+  this->PythonContext->ExecuteString("session.reset_interactions()\n");
 }

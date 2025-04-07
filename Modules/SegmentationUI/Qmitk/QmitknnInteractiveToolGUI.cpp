@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <ui_QmitknnInteractiveToolGUI.h>
 
 #include <mitkLabelSetImageConverter.h>
+#include <mitknnInteractiveInteractor.h>
 #include <mitkToolManagerProvider.h>
 
 #include <QmitkStyleManager.h>
@@ -31,6 +32,13 @@ namespace
     button->setIcon(QmitkStyleManager::ThemeIcon(QString(":/nnInteractive/%1").arg(icon)));
   }
 
+  QCursor CreateCursor(const std::string& svg)
+  {
+    QPixmap pixmap;
+    pixmap.loadFromData(QByteArray(svg.data(), svg.size()));
+    return QCursor(pixmap, 0, 0);
+  }
+
   QString GetLabelAsString(const mitk::Label* label)
   {
     QColor color(
@@ -45,12 +53,19 @@ namespace
       .arg(name);
   }
 
-  bool IsLabelEmpty(mitk::LabelSetImage* segmentation, mitk::Label* label)
+  mitk::TimeStepType GetCurrentTimeStep(const mitk::BaseData* data)
   {
-    const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-    const auto timeStep = segmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+    const auto* renderingManager = mitk::RenderingManager::GetInstance();
+    const auto* timeNavigationController = renderingManager->GetTimeNavigationController();
+    const auto timePoint = timeNavigationController->GetSelectedTimePoint();
+    const auto geometry = data->GetTimeGeometry();
 
-    if (!segmentation->IsEmpty(label, timeStep))
+    return geometry->TimePointToTimeStep(timePoint);
+  }
+
+  bool IsLabelEmpty(const mitk::LabelSetImage* segmentation, const mitk::Label* label)
+  {
+    if (!segmentation->IsEmpty(label, GetCurrentTimeStep(segmentation)))
       return false;
 
     QString title = "nnInteractive - Initialize with Mask";
@@ -83,18 +98,6 @@ namespace
     auto button = QMessageBox::question(nullptr, title, message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     return button == QMessageBox::Yes;
   }
-
-  QCursor LoadToolCursor(mitk::nnInteractiveTool::Tool tool, mitk::nnInteractiveTool::PromptType promptType)
-  {
-    auto fileName = QString(":/nnInteractive/%1_cursor_%2")
-      .arg(QString::fromStdString(mitk::nnInteractiveTool::GetToolString(tool)))
-      .arg(QString::fromStdString(mitk::nnInteractiveTool::GetPromptTypeString(promptType)));
-
-    QPixmap pixmap;
-    pixmap.load(fileName);
-
-    return QCursor(pixmap, 0, 0);
-  }
 }
 
 QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
@@ -117,10 +120,10 @@ QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
 
 QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
 {
-  this->UncheckOtherToolButtons(nullptr); // Ensure override cursor restoration.
+  this->UncheckOtherInteractorButtons(nullptr); // Ensure override cursor restoration.
 
-  this->GetTool()->nnInterConfirmMessageEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
-    this, &QmitknnInteractiveToolGUI::StatusMessageListener);
+  this->GetTool()->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
+    this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
 }
 
 void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
@@ -129,13 +132,16 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   mainLayout->addWidget(wrapperWidget);
   m_Ui->setupUi(wrapperWidget);
 
-  this->ThemeIcons();
+  SetIcon(m_Ui->resetButton, "Reset");
+  SetIcon(m_Ui->positiveButton, "Positive");
+  SetIcon(m_Ui->negativeButton, "Negative");
+  SetIcon(m_Ui->maskButton, "Mask");
 
   connect(m_Ui->initializeButton, &QPushButton::toggled, this, &Self::OnInitializeButtonToggled);
   connect(m_Ui->resetButton, &QPushButton::clicked, this, &Self::OnResetInteractionsButtonClicked);
 
   this->InitializePromptType();
-  this->InitializeToolButtons();
+  this->InitializeInteractorButtons();
 
   m_Ui->autoRefineCheckBox->setChecked(this->GetTool()->GetAutoRefine());
   connect(m_Ui->autoRefineCheckBox, &QCheckBox::toggled, this, &Self::OnAutoRefineCheckBoxToggled);
@@ -143,22 +149,10 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   m_Ui->autoZoomCheckBox->setChecked(this->GetTool()->GetAutoZoom());
   connect(m_Ui->autoZoomCheckBox, &QCheckBox::toggled, this, &Self::OnAutoZoomCheckBoxToggled);
 
-  this->GetTool()->nnInterConfirmMessageEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
-    this, &QmitknnInteractiveToolGUI::StatusMessageListener);
+  this->GetTool()->ConfirmCleanUpEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
+    this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
 
   Superclass::InitializeUI(mainLayout);
-}
-
-void QmitknnInteractiveToolGUI::ThemeIcons()
-{
-  SetIcon(m_Ui->resetButton, "reset");
-  SetIcon(m_Ui->positiveButton, "positive");
-  SetIcon(m_Ui->negativeButton, "negative");
-  SetIcon(m_Ui->pointButton, "point");
-  SetIcon(m_Ui->boxButton, "box");
-  SetIcon(m_Ui->scribbleButton, "scribble");
-  SetIcon(m_Ui->lassoButton, "lasso");
-  SetIcon(m_Ui->maskButton, "mask");
 }
 
 void QmitknnInteractiveToolGUI::OnAutoRefineCheckBoxToggled(bool checked)
@@ -183,8 +177,7 @@ void QmitknnInteractiveToolGUI::InitializePromptType()
   m_PromptTypeButtonGroup->addButton(m_Ui->negativeButton);
   m_PromptTypeButtonGroup->setId(m_Ui->negativeButton, static_cast<int>(PromptType::Negative));
 
-  connect(m_PromptTypeButtonGroup, &QButtonGroup::idClicked, [this](int id)
-  {
+  connect(m_PromptTypeButtonGroup, &QButtonGroup::idClicked, [this](int id) {
     if (id != static_cast<int>(m_PromptType))
     {
       m_PromptType = static_cast<PromptType>(id);
@@ -193,15 +186,25 @@ void QmitknnInteractiveToolGUI::InitializePromptType()
   });
 }
 
-void QmitknnInteractiveToolGUI::InitializeToolButtons()
+void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
 {
-  m_ToolButtons[Tool::Point] = m_Ui->pointButton;
-  m_ToolButtons[Tool::Box] = m_Ui->boxButton;
-  m_ToolButtons[Tool::Scribble] = m_Ui->scribbleButton;
-  m_ToolButtons[Tool::Lasso] = m_Ui->lassoButton;
+  m_InteractorButtons[InteractionType::Point] = m_Ui->pointButton;
+  m_InteractorButtons[InteractionType::Box] = m_Ui->boxButton;
+  m_InteractorButtons[InteractionType::Scribble] = m_Ui->scribbleButton;
+  m_InteractorButtons[InteractionType::Lasso] = m_Ui->lassoButton;
 
-  for (const auto& [tool, button] : m_ToolButtons)
-    connect(button, &QPushButton::toggled, [this, tool](bool checked) { this->OnToolToggled(tool, checked); });
+  for (const auto& [tool, button] : m_InteractorButtons)
+  {
+    auto interactor = this->GetTool()->GetInteractor(tool);
+    auto icon = interactor->GetIcon();
+
+    if (!icon.empty())
+      button->setIcon(QmitkStyleManager::ThemeIcon(QByteArray(icon.data(), icon.size())));
+
+    connect(button, &QPushButton::toggled, [this, tool](bool checked) {
+      this->OnInteractorToggled(tool, checked);
+    });
+  }
 
   connect(m_Ui->maskButton, &QPushButton::clicked, this, &Self::OnMaskButtonClicked);
 }
@@ -223,24 +226,33 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   messageBox.setStandardButtons(QMessageBox::NoButton);
   messageBox.show();
   qApp->processEvents();
+
   try
   {
-    this->GetTool()->InitializeBackend();
+    this->GetTool()->StartSession();
   }
   catch (const mitk::Exception& e)
   {
     messageBox.accept();
-    std::stringstream errorMsg;
-    errorMsg << "Error while initializing nnInteractive.\n\nReason: " << e.GetDescription();
-    QMessageBox *errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr, errorMsg.str().c_str());
-    errorMsgBox->setTextFormat(Qt::PlainText);
+
+    message = QString(
+      "<div style='line-height: 1.25'>"
+        "<p>Error while initializing nnInteractive.</p>"
+        "<p>Reason: %1</p>"
+      "</div>")
+      .arg(QString::fromLocal8Bit(e.GetDescription()));
+
+    MITK_ERROR << message.toStdString();
+    auto errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr, message);
+    errorMsgBox->setTextInteractionFlags(Qt::TextSelectableByMouse);
     errorMsgBox->setAttribute(Qt::WA_DeleteOnClose, true);
     errorMsgBox->setModal(true);
-    MITK_WARN << errorMsg.str();
     errorMsgBox->exec();
+
     m_Ui->initializeButton->setEnabled(true);
     return;
   }
+
   messageBox.accept();
 
   m_Ui->resetButton->setEnabled(checked);
@@ -252,7 +264,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   if (!backend.has_value())
     return;
 
-  if (backend == mitk::nnInteractiveTool::Backend::CUDA)
+  if (backend == mitk::nnInteractive::Backend::CUDA)
     return;
 
   message = QString(
@@ -268,46 +280,59 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
 
 void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()
 {
-  for (const auto& [tool, button] : m_ToolButtons)
+  // Uncheck any interactor button.
+  for (const auto& [interactor, button] : m_InteractorButtons)
     button->setChecked(false);
 
+  // Reset any interactions.
   this->GetTool()->ResetInteractions();
+
+  // Switch to positive prompt type.
   m_Ui->positiveButton->click();
 }
 
 void QmitknnInteractiveToolGUI::OnPromptTypeChanged()
 {
-  for (auto tool : this->GetTool()->GetTools())
+  for (const auto& [interactionType, interactor] : this->GetTool()->GetInteractors())
   {
-    if (m_ToolButtons[tool]->isChecked())
+    if (m_InteractorButtons[interactionType]->isChecked())
     {
-      this->GetTool()->EnableInteraction(tool, m_PromptType);
-      QApplication::changeOverrideCursor(LoadToolCursor(tool, m_PromptType));
+      // If any interactor is already enabled, reenable it with the new prompt type.
+      this->GetTool()->EnableInteractor(interactionType, m_PromptType);
+
+      // Update the interactor cursor to reflect the changed prompt type.
+      auto svg = this->GetTool()->GetInteractor(interactionType)->GetCursor(m_PromptType);
+      QApplication::changeOverrideCursor(CreateCursor(svg));
       break;
     }
   }
 }
 
-void QmitknnInteractiveToolGUI::OnToolToggled(Tool tool, bool checked)
+void QmitknnInteractiveToolGUI::OnInteractorToggled(InteractionType interactionType, bool checked)
 {
   if (checked)
   {
-    this->UncheckOtherToolButtons(m_ToolButtons[tool]);
-    this->GetTool()->EnableInteraction(tool, m_PromptType);
-    QApplication::setOverrideCursor(LoadToolCursor(tool, m_PromptType));
+    // Ensure that only a single interactor is enabled at any time.
+    this->UncheckOtherInteractorButtons(m_InteractorButtons[interactionType]);
+    this->GetTool()->EnableInteractor(interactionType, m_PromptType);
+
+    // Set the cursor to the interactor's cursor.
+    auto svg = this->GetTool()->GetInteractor(interactionType)->GetCursor(m_PromptType);
+    QApplication::setOverrideCursor(CreateCursor(svg));
   }
   else
   {
+    // Disable the currently enabled interactor and restore the cursor.
     QApplication::restoreOverrideCursor();
-    this->GetTool()->DisableInteraction();
+    this->GetTool()->DisableInteractor(interactionType);
   }
 }
 
-void QmitknnInteractiveToolGUI::UncheckOtherToolButtons(QPushButton* toolButton)
+void QmitknnInteractiveToolGUI::UncheckOtherInteractorButtons(QPushButton* interactorButton)
 {
-  for (const auto& [tool, button] : m_ToolButtons)
+  for (const auto& [interactor, button] : m_InteractorButtons)
   {
-    if (button != toolButton)
+    if (button != interactorButton)
       button->setChecked(false);
   }
 }
@@ -320,52 +345,34 @@ mitk::nnInteractiveTool* QmitknnInteractiveToolGUI::GetTool()
 void QmitknnInteractiveToolGUI::OnMaskButtonClicked()
 {
   auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-
-  if (toolManager == nullptr)
-  {
-    MITK_ERROR << "Could not retrieve tool manager from tool manager provider!";
-    return;
-  }
-
-  const auto* segmentationNode = toolManager->GetWorkingData(0);
-
-  if (segmentationNode == nullptr)
-  {
-    MITK_ERROR << "Could not retrieve working data from tool manager!";
-    return;
-  }
-
-  auto segmentation = segmentationNode->GetDataAs<mitk::LabelSetImage>();
+  const auto* segmentation = toolManager->GetWorkingData(0)->GetDataAs<mitk::LabelSetImage>();
   auto activeLabel = segmentation->GetActiveLabel();
 
   if (activeLabel == nullptr)
   {
-    MITK_ERROR << "Could not retrieve active label from working data!";
+    MITK_ERROR << "Could not retrieve active label from segmentation!";
     return;
   }
 
+  // Check if the label is empty and notify the user if so.
   if (IsLabelEmpty(segmentation, activeLabel))
     return;
 
+  // Ask the user for confirmation, as this will reset all previous interactions
+  // (if any) and display the selected label to ensure the user is aware of the
+  // source label for the mask.
   if (!ConfirmInitializationWithMask(activeLabel))
     return;
 
   auto mask = mitk::CreateLabelMask(segmentation, activeLabel->GetValue());
 
-  if (mask.IsNull())
-  {
-    MITK_ERROR << "Could not create label mask!";
-    return;
-  }
-
+  // Reset interactions and initialize a new session with a mask/label.
   this->OnResetInteractionsButtonClicked();
-  this->GetTool()->AddInitialSegInteraction(mask);
+  this->GetTool()->InitializeSessionWithMask(mask);
 }
 
-void QmitknnInteractiveToolGUI::StatusMessageListener(bool isConfirmed)
+void QmitknnInteractiveToolGUI::OnConfirmCleanUp(bool isConfirmed)
 {
   if (isConfirmed)
-  {
     this->OnResetInteractionsButtonClicked();
-  }
 }

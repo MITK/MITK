@@ -60,8 +60,6 @@ set(CPP_FILES
   Interactions/mitkPickingTool.cpp
   Interactions/mitkProcessExecutor.cpp
   Interactions/mitkRegionGrowingTool.cpp
-  Interactions/mitknnInteractiveLassoTool.cpp
-  Interactions/mitknnInteractiveScribbleTool.cpp
   Interactions/mitkSegmentAnythingProcessExecutor.cpp
   Interactions/mitkSegmentAnythingPythonService.cpp
   Interactions/mitkSegmentAnythingTool.cpp
@@ -72,6 +70,8 @@ set(CPP_FILES
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
   Interactions/mitkTotalSegmentatorTool.cpp
+  Interactions/mitknnInteractiveEnums.cpp
+  Interactions/mitknnInteractiveInteractor.cpp
   Interactions/mitknnInteractiveTool.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
@@ -124,3 +124,22 @@ set(RESOURCE_FILES
   Interactions/SegmentationInteraction.xml
   Interactions/SegmentationToolsConfig.xml
 )
+
+set(NNINTERACTIVE_INTERACTION_TYPES
+  Point
+  Box
+  Scribble
+  Lasso
+)
+
+foreach(interaction_type IN LISTS NNINTERACTIVE_INTERACTION_TYPES)
+  list(APPEND CPP_FILES
+    Interactions/mitknnInteractive${interaction_type}Interactor.cpp
+  )
+
+  list(APPEND RESOURCE_FILES
+    nnInteractive/${interaction_type}.svg
+    nnInteractive/Positive${interaction_type}Cursor.svg
+    nnInteractive/Negative${interaction_type}Cursor.svg
+  )
+endforeach()

@@ -33,33 +33,33 @@ public:
   itkFactorylessNewMacro(Self);
 
 protected:
-  using Tool = mitk::nnInteractiveTool::Tool;
-  using PromptType = mitk::nnInteractiveTool::PromptType;
+  using InteractionType = mitk::nnInteractive::InteractionType;
+  using PromptType = mitk::nnInteractive::PromptType;
 
   QmitknnInteractiveToolGUI();
   ~QmitknnInteractiveToolGUI() override;
 
   void InitializeUI(QBoxLayout* mainLayout) override;
-  void ThemeIcons();
   void InitializePromptType();
-  void InitializeToolButtons();
+  void InitializeInteractorButtons();
+
   void OnInitializeButtonToggled(bool checked);
   void OnResetInteractionsButtonClicked();
   void OnAutoRefineCheckBoxToggled(bool checked);
   void OnAutoZoomCheckBoxToggled(bool checked);
   void OnPromptTypeChanged();
-  void OnToolToggled(Tool tool, bool checked);
+  void OnInteractorToggled(mitk::nnInteractive::InteractionType interactionType, bool checked);
   void OnMaskButtonClicked();
-  void UncheckOtherToolButtons(QPushButton* toolButton);
-  void StatusMessageListener(bool isConfirmed);
+  void OnConfirmCleanUp(bool isConfirmed);
+
+  mitk::nnInteractiveTool* GetTool();
+  void UncheckOtherInteractorButtons(QPushButton* interactorButton);
 
 private:
-  mitk::nnInteractiveTool* GetTool();
-
   Ui::QmitknnInteractiveToolGUI* m_Ui;
   QButtonGroup* m_PromptTypeButtonGroup;
   PromptType m_PromptType;
-  std::unordered_map<Tool, QPushButton*> m_ToolButtons;
+  std::unordered_map<InteractionType, QPushButton*> m_InteractorButtons;
 };
 
 #endif

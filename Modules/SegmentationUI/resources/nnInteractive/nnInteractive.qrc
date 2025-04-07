@@ -1,21 +1,8 @@
 <RCC>
   <qresource prefix="/nnInteractive" >
-    <file alias="box">box.svg</file>
-    <file alias="lasso">lasso.svg</file>
-    <file alias="mask">mask.svg</file>
-    <file alias="negative">negative.svg</file>
-    <file alias="point">point.svg</file>
-    <file alias="positive">positive.svg</file>
-    <file alias="reset">reset.svg</file>
-    <file alias="scribble">scribble.svg</file>
-
-    <file alias="box_cursor_positive">box_cursor_positive.svg</file>
-    <file alias="box_cursor_negative">box_cursor_negative.svg</file>
-    <file alias="lasso_cursor_positive">lasso_cursor_positive.svg</file>
-    <file alias="lasso_cursor_negative">lasso_cursor_negative.svg</file>
-    <file alias="point_cursor_positive">point_cursor_positive.svg</file>
-    <file alias="point_cursor_negative">point_cursor_negative.svg</file>
-    <file alias="scribble_cursor_positive">scribble_cursor_positive.svg</file>
-    <file alias="scribble_cursor_negative">scribble_cursor_negative.svg</file>
+    <file alias="Mask">Mask.svg</file>
+    <file alias="Negative">Negative.svg</file>
+    <file alias="Positive">Positive.svg</file>
+    <file alias="Reset">Reset.svg</file>
   </qresource>
 </RCC>

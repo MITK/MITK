@@ -66,7 +66,7 @@ void mitk::BaseGeometry::SetVtkMatrixDeepCopy(vtkTransform *vtktransform)
   m_GeometryTransform->SetVtkMatrixDeepCopy(vtktransform);
 }
 
-const mitk::Point3D mitk::BaseGeometry::GetOrigin() const
+mitk::Point3D mitk::BaseGeometry::GetOrigin() const
 {
   return m_GeometryTransform->GetOrigin();
 }
@@ -82,7 +82,7 @@ void mitk::BaseGeometry::SetOrigin(const Point3D &origin)
   }
 }
 
-const mitk::Vector3D mitk::BaseGeometry::GetSpacing() const
+mitk::Vector3D mitk::BaseGeometry::GetSpacing() const
 {
   return m_GeometryTransform->GetSpacing();
 }

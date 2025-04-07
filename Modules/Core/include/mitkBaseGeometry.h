@@ -108,7 +108,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Get the origin, e.g. the upper-left corner of the plane
-    const Point3D GetOrigin() const;
+    Point3D GetOrigin() const;
 
     //##Documentation
     //## @brief Set the origin, i.e. the upper-left corner of the plane
@@ -118,7 +118,7 @@ namespace mitk
     //##Documentation
     //## @brief Get the spacing (size of a pixel).
     //##
-    const mitk::Vector3D GetSpacing() const;
+    mitk::Vector3D GetSpacing() const;
 
     //##Documentation
     //## @brief Set the spacing (m_Spacing).

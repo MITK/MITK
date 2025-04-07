@@ -378,7 +378,7 @@ endif()
 # -----------------------------------------
 # Custom dependency logic
 
-if(WIN32 AND Qt6_DIR)
+if(WIN32 AND Qt6_DIR AND NOT OPENSSL_ROOT_DIR)
   set(_dir_candidate "${Qt6_DIR}/../../../../../Tools/OpenSSLv3/Win_x64")
   get_filename_component(_dir_candidate ${_dir_candidate} ABSOLUTE)
   if(EXISTS "${_dir_candidate}")

@@ -92,9 +92,9 @@ void QmitkPythonView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> n
     return;
   }
   m_PythonContext->TransferBaseDataToPython(image);
-  const char *result = m_PythonContext->GetStdOut();
+  auto stdOut = m_PythonContext->GetStdOut();
   m_Controls->pythonOutput->clear();
-  m_Controls->pythonOutput->setText(QString::fromUtf8(result));
+  m_Controls->pythonOutput->setText(QString::fromStdString(stdOut));
   
   auto previewSegmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(node, image, "py-labels");
   if (mitk::DataStorage *ds = this->GetDataStorage())

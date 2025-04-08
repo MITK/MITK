@@ -187,9 +187,9 @@ namespace mitk::nnInteractive
 
       // Add a single label based on the current prompt type.
       const auto promptType = m_Owner->GetCurrentPromptType();
-      std::string labelName(GetPromptTypeAsString(promptType));
+      const auto& labelName = GetPromptTypeAsString(promptType);
       const auto& color = GetColor(promptType, ColorIntensity::Vibrant);
-      auto label = this->MaskNode->GetDataAs<LabelSetImage>()->AddLabel(labelName, color, 0);
+      this->MaskNode->GetDataAs<LabelSetImage>()->AddLabel(labelName, color, 0);
 
       m_Owner->GetDataStorage()->Add(this->MaskNode, referenceNode);
     }

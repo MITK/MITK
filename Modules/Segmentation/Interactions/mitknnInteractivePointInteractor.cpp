@@ -23,8 +23,8 @@ namespace mitk::nnInteractive
   {
   public:
     explicit Impl(PointInteractor* owner)
-      : m_Owner(owner),
-        Interactor(PointSetDataInteractor::New())
+      : Interactor(PointSetDataInteractor::New()),
+        m_Owner(owner)
     {
       this->Interactor->LoadStateMachine("PointSet.xml");
 

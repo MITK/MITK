@@ -44,7 +44,7 @@ public:
     planarCross->AddControlPoint(p2);
 
     // Test if helper polyline is generated
-    const auto& helperPolyLine = planarCross->GetHelperPolyLine(0, 1.0, 100);
+    /*const auto& helperPolyLine =*/ planarCross->GetHelperPolyLine(0, 1.0, 100);
     MITK_TEST_CONDITION(planarCross->GetHelperPolyLinesSize() == 1,
                         "Number of helper polylines after placing 3 points");
 

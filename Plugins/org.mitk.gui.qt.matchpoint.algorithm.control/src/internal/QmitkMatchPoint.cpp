@@ -31,6 +31,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDimension.h>
+#include <mitkMultiLabelPredicateHelper.h>
 
 // Qmitk
 #include "QmitkMatchPoint.h"
@@ -467,7 +468,6 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
 {
   auto isImage = mitk::MITKRegistrationHelper::ImageNodePredicate();
   auto isPointSet = mitk::MITKRegistrationHelper::PointSetNodePredicate();
-  auto isMask = mitk::MITKRegistrationHelper::MaskNodePredicate();
   mitk::NodePredicateBase::Pointer dimensionPredicate = mitk::NodePredicateOr::New(mitk::NodePredicateDimension::New(3), mitk::NodePredicateDimension::New(4)).GetPointer();
 
 
@@ -525,8 +525,6 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
     m_Controls.movingNodeSelector->SetNodePredicate(nodePredicate);
     m_Controls.targetNodeSelector->SetNodePredicate(nodePredicate);
 
-    nodePredicate = mitk::NodePredicateAnd::New(isMask, dimensionPredicate);
-
     m_Controls.movingMaskNodeSelector->SetEmptyInfo("Select moving mask. (optional)");
     m_Controls.movingMaskNodeSelector->SetPopUpTitel("Select moving mask");
     m_Controls.movingMaskNodeSelector->SetPopUpHint("Select a segmentation that serves as moving mask for the registration.");
@@ -534,7 +532,12 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
     m_Controls.targetMaskNodeSelector->SetPopUpTitel("Select target mask");
     m_Controls.targetMaskNodeSelector->SetPopUpHint("Select a segmentation that serves as target mask for the registration.");
 
+    mitk::BaseGeometry::Pointer movingGeometry = m_Controls.movingNodeSelector->GetSelectedNode().IsNotNull() ? m_Controls.movingNodeSelector->GetSelectedNode()->GetData()->GetGeometry() : nullptr;
+    nodePredicate = mitk::NodePredicateAnd::New(mitk::GetMultiLabelSegmentationPredicate(movingGeometry), dimensionPredicate);
     m_Controls.movingMaskNodeSelector->SetNodePredicate(nodePredicate);
+
+    mitk::BaseGeometry::Pointer targetGeometry = m_Controls.targetNodeSelector->GetSelectedNode().IsNotNull() ? m_Controls.targetNodeSelector->GetSelectedNode()->GetData()->GetGeometry() : nullptr;
+    nodePredicate = mitk::NodePredicateAnd::New(mitk::GetMultiLabelSegmentationPredicate(movingGeometry), dimensionPredicate);
     m_Controls.targetMaskNodeSelector->SetNodePredicate(nodePredicate);
   }
 

@@ -29,7 +29,7 @@ namespace
 {
   void SetIcon(QAbstractButton* button, const char* icon)
   {
-    button->setIcon(QmitkStyleManager::ThemeIcon(QString(":/Qmitk/nnInteractive/%1.svg").arg(icon)));
+    button->setIcon(QmitkStyleManager::ThemeIcon(QString(":/nnInteractive/%1").arg(icon)));
   }
 
   QCursor CreateCursor(const std::string& svg)

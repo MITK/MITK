@@ -48,8 +48,8 @@
          <string>Reset Interactions</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/nnInteractive/Reset.svg</normaloff>:/Qmitk/nnInteractive/Reset.svg</iconset>
+         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+          <normaloff>:/nnInteractive/Reset</normaloff>:/nnInteractive/Reset</iconset>
         </property>
        </widget>
       </item>
@@ -71,8 +71,8 @@
          <string>Positive</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/nnInteractive/Positive.svg</normaloff>:/Qmitk/nnInteractive/Positive.svg</iconset>
+         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+          <normaloff>:/nnInteractive/Positive</normaloff>:/nnInteractive/Positive</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -88,8 +88,8 @@
          <string>Negative</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/nnInteractive/Negative.svg</normaloff>:/Qmitk/nnInteractive/Negative.svg</iconset>
+         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+          <normaloff>:/nnInteractive/Negative</normaloff>:/nnInteractive/Negative</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -181,8 +181,8 @@
          <string>Initialize with Mask</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/nnInteractive/Mask.svg</normaloff>:/Qmitk/nnInteractive/Mask.svg</iconset>
+         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+          <normaloff>:/nnInteractive/Mask</normaloff>:/nnInteractive/Mask</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -215,7 +215,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../resources/SegmentationUI.qrc"/>
+  <include location="../resources/nnInteractive/nnInteractive.qrc"/>
  </resources>
  <connections/>
 </ui>

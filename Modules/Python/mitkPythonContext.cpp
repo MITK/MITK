@@ -193,16 +193,27 @@ bool mitk::PythonContext::IsVariableExists(const std::string &varName)
 
 std::string mitk::PythonContext::GetPythonExceptionTraceback()
 {
-  PyObjectPtr pException(PyErr_GetRaisedException());
-  PyObjectPtr pTraceback(PyImport_ImportModule("traceback"));
-  PyObjectPtr pFormatExceptionMethod(PyObject_GetAttrString(pTraceback.get(), "format_exception"));
   std::string errorMessage;
+#if PY_MINOR_VERSION >= 12
+  PyObjectPtr pException(PyErr_GetRaisedException());
+  PyObjectPtr pTracebackMod(PyImport_ImportModule("traceback"));
+  PyObjectPtr pFormatExceptionMethod(PyObject_GetAttrString(pTracebackMod.get(), "format_exception"));
   if (nullptr != pException)
   {
     PyObjectPtr pExceptionType(PyObject_Type(pException.get()));
     PyObjectPtr pExceptionTypeTb(PyException_GetTraceback(pException.get()));
     PyObjectPtr pExceptionList(PyObject_CallFunctionObjArgs(
       pFormatExceptionMethod.get(), pExceptionType.get(), pException.get(), pExceptionTypeTb.get(), NULL));
+#else
+  PyObject* ptype, * pvalue, * ptraceback;
+  PyErr_Fetch(&ptype, &pvalue, &ptraceback); // Deprecated since python 3.12
+  PyObjectPtr pTracebackMod(PyImport_ImportModule("traceback"));
+  PyObjectPtr pFormatExceptionMethod(PyObject_GetAttrString(pTracebackMod.get(), "format_exception"));
+  if (NULL != ptype)
+  {
+    PyObjectPtr pExceptionList(
+      PyObject_CallFunctionObjArgs(pFormatExceptionMethod.get(), ptype, pvalue, ptraceback, NULL));
+#endif
     if (pExceptionList && PyList_Check(pExceptionList.get()))
     {
       PyObjectPtr pExceptionText(PyUnicode_Join(PyUnicode_FromString(""), pExceptionList.get()));

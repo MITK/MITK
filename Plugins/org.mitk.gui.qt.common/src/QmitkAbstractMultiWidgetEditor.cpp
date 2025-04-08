@@ -75,7 +75,7 @@ QmitkAbstractMultiWidgetEditor::Impl::~Impl()
     prefs->OnChanged.RemoveListener(mitk::MessageDelegate1<Impl, const mitk::IPreferences*>(this, &Impl::OnPreferencesChanged));
 }
 
-void QmitkAbstractMultiWidgetEditor::Impl::OnPreferencesChanged(const mitk::IPreferences* preferences)
+void QmitkAbstractMultiWidgetEditor::Impl::OnPreferencesChanged(const mitk::IPreferences* /*preferences*/)
 {
   ApplyConstrainedPanningZooming();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);

@@ -187,7 +187,7 @@ namespace mitk::nnInteractive
      *
      * \see HandleEvent(), Tool::HandleEvent()
      */
-    virtual void OnHandleEvent(InteractionEvent* event) {};
+    virtual void OnHandleEvent(InteractionEvent* /*event*/) {};
 
     /** \brief Called when the interactor is enabled.
      *

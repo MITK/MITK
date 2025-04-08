@@ -60,6 +60,41 @@ namespace mitk
       return nullptr;
     }
 
+    std::optional<Backend>& GetBackend()
+    {
+      return m_Backend;
+    }
+
+    void SetBackend(Backend backend)
+    {
+      m_Backend = backend;
+    }
+
+    void ResetBackend()
+    {
+      m_Backend.reset();
+    }
+
+    ToolManager* GetToolManager() const
+    {
+      return m_ToolManager;
+    }
+
+    void SetToolManager(ToolManager* toolManager)
+    {
+      m_ToolManager = toolManager;
+    }
+
+    PythonContext* GetPythonContext() const
+    {
+      return m_PythonContext;
+    }
+
+    void SetPythonContext(PythonContext* pythonContext)
+    {
+      m_PythonContext = pythonContext;
+    }
+
     // Methods that execute Python code are defined at the bottom of this file.
     bool IsCUDAAvailable() const;
     void SetAutoZoom() const;
@@ -70,15 +105,17 @@ namespace mitk
     void AddInitialSegInteraction(LabelSetImage* previewImage, TimeStepType timeStep) const;
     void ResetInteractions() const;
 
-    PythonContext::Pointer PythonContext;
     LabelSetImage::Pointer TargetBuffer;
-    std::optional<Backend> Backend;
-    ToolManager::Pointer ToolManager;
     nnInteractive::PromptType PromptType;
     InteractorMap Interactors;
     Image::Pointer InitialSeg;
     bool AutoZoom;
     bool AutoRefine;
+
+  private:
+    std::optional<Backend> m_Backend;
+    PythonContext::Pointer m_PythonContext;
+    ToolManager::Pointer m_ToolManager;
   };
 }
 
@@ -166,7 +203,7 @@ void mitk::nnInteractiveTool::EnableInteractor(InteractionType nextInteractionTy
   }
 
   // Set reference image through our own tool manager for interactors.
-  m_Impl->ToolManager->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
+  m_Impl->GetToolManager()->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
 
   // Enable the requested interactor for the given prompt type.
   m_Impl->Interactors[nextInteractionType]->Enable(promptType);
@@ -193,7 +230,7 @@ void mitk::nnInteractiveTool::DisableInteractor(std::optional<InteractionType> i
     }
   }
 
-  m_Impl->ToolManager->SetReferenceData(nullptr);
+  m_Impl->GetToolManager()->SetReferenceData(nullptr);
 }
 
 void mitk::nnInteractiveTool::ResetInteractions()
@@ -247,17 +284,18 @@ void mitk::nnInteractiveTool::SetAutoRefine(bool autoRefine)
 
 std::optional<Backend> mitk::nnInteractiveTool::GetBackend() const
 {
-  return m_Impl->Backend;
+  return m_Impl->GetBackend();
 }
 
 void mitk::nnInteractiveTool::SetToolManager(ToolManager* toolManager)
 {
   Superclass::SetToolManager(toolManager);
 
-  m_Impl->ToolManager = ToolManager::New(toolManager->GetDataStorage());
+  auto ownToolManager = ToolManager::New(toolManager->GetDataStorage());
+  m_Impl->SetToolManager(ownToolManager);
 
   for (auto& [interactionType, interactor] : m_Impl->Interactors)
-    interactor->SetToolManager(m_Impl->ToolManager);
+    interactor->SetToolManager(ownToolManager);
 }
 
 void mitk::nnInteractiveTool::InitializeSessionWithMask(Image* mask)
@@ -269,13 +307,13 @@ void mitk::nnInteractiveTool::InitializeSessionWithMask(Image* mask)
   this->UpdatePreview();
 }
 
-void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType timeStep)
 {
   // This method assumes it is only called when an interaction has occurred or
   // when a session should be (re)initialized with a label mask. Otherwise,
   // calling this method will reset any existing preview content.
 
-  if (previewImage == nullptr || m_Impl->PythonContext.IsNull())
+  if (previewImage == nullptr || m_Impl->GetPythonContext() == nullptr)
     return;
 
   const auto* interactor = m_Impl->GetEnabledInteractor();
@@ -362,9 +400,11 @@ void mitk::nnInteractiveTool::StartSession()
   if (this->IsSessionRunning())
     this->EndSession();
 
-  m_Impl->PythonContext = PythonContext::New();
-  m_Impl->PythonContext->Activate();
-  m_Impl->PythonContext->SetVirtualEnvironmentPath(VENV_PATH);
+  auto pythonContext = PythonContext::New();
+  m_Impl->SetPythonContext(pythonContext);
+
+  pythonContext->Activate();
+  pythonContext->SetVirtualEnvironmentPath(VENV_PATH);
 
   std::ostringstream pyCommands; pyCommands
     << "import torch\n"
@@ -381,7 +421,7 @@ void mitk::nnInteractiveTool::StartSession()
     << ")\n"
     << "checkpoint_path = Path(download_path).joinpath('" << MODEL << "')\n";
 
-  m_Impl->PythonContext->ExecuteString(pyCommands.str());
+  pythonContext->ExecuteString(pyCommands.str());
 
   pyCommands.clear(); pyCommands
     << "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
@@ -397,9 +437,9 @@ void mitk::nnInteractiveTool::StartSession()
     << "    'nnInteractive.inference'\n"
     << ")\n";
 
-  m_Impl->PythonContext->ExecuteString(pyCommands.str());
+  pythonContext->ExecuteString(pyCommands.str());
 
-  m_Impl->Backend.reset();
+  m_Impl->ResetBackend();
 
   bool isCUDAAvailable = m_Impl->IsCUDAAvailable();
   const std::string torchDevice = isCUDAAvailable
@@ -416,11 +456,11 @@ void mitk::nnInteractiveTool::StartSession()
     << ")\n"
     << "session.initialize_from_trained_model_folder(checkpoint_path)\n";
 
-  m_Impl->PythonContext->ExecuteString(pyCommands.str());
+  pythonContext->ExecuteString(pyCommands.str());
 
-  m_Impl->Backend = isCUDAAvailable
+  m_Impl->SetBackend(isCUDAAvailable
     ? Backend::CUDA
-    : Backend::CPU;
+    : Backend::CPU);
 
   auto image = this->GetToolManager()->GetReferenceData(0)->GetDataAs<Image>();
   
@@ -432,8 +472,8 @@ void mitk::nnInteractiveTool::StartSession()
 
   m_Impl->TargetBuffer->Initialize(imageAtTimeStep);
 
-  m_Impl->PythonContext->TransferBaseDataToPython(imageAtTimeStep, "mitk_image");
-  m_Impl->PythonContext->TransferBaseDataToPython(m_Impl->TargetBuffer.GetPointer(), "mitk_target_buffer");
+  pythonContext->TransferBaseDataToPython(imageAtTimeStep, "mitk_image");
+  pythonContext->TransferBaseDataToPython(m_Impl->TargetBuffer.GetPointer(), "mitk_target_buffer");
 
   pyCommands.clear(); pyCommands
     << "image = mitk_image.GetAsNumpy()\n"
@@ -446,7 +486,7 @@ void mitk::nnInteractiveTool::StartSession()
     << "session.set_image(image[None], {'spacing': spacing})\n"
     << "session.set_target_buffer(torch_target_buffer)\n";
 
-  m_Impl->PythonContext->ExecuteString(pyCommands.str());
+  pythonContext->ExecuteString(pyCommands.str());
 }
 
 void mitk::nnInteractiveTool::EndSession()
@@ -459,19 +499,21 @@ void mitk::nnInteractiveTool::EndSession()
     << "del session.network\n"
     << "del session\n";
 
-  if (m_Impl->Backend == Backend::CUDA)
+  if (m_Impl->GetBackend() == Backend::CUDA)
     pyCommands << "torch.cuda.empty_cache()\n";
 
-  m_Impl->PythonContext->ExecuteString(pyCommands.str());
-  m_Impl->PythonContext = nullptr;
+  m_Impl->GetPythonContext()->ExecuteString(pyCommands.str());
+  m_Impl->SetPythonContext(nullptr);
 }
 
 bool mitk::nnInteractiveTool::IsSessionRunning() const
 {
-  if (m_Impl->PythonContext.IsNull())
+  auto pythonContext = m_Impl->GetPythonContext();
+
+  if (pythonContext == nullptr)
     return false;
   
-  return m_Impl->PythonContext->IsVariableExists("session");
+  return pythonContext->IsVariableExists("session");
 }
 
 bool mitk::nnInteractiveTool::Impl::IsCUDAAvailable() const
@@ -481,9 +523,9 @@ bool mitk::nnInteractiveTool::Impl::IsCUDAAvailable() const
     << "if torch.cuda.is_available():\n"
     << "    cuda_is_available = True\n";
 
-  this->PythonContext->ExecuteString(pyCommands.str());
+  m_PythonContext->ExecuteString(pyCommands.str());
 
-  return this->PythonContext->IsVariableExists("cuda_is_available");
+  return m_PythonContext->IsVariableExists("cuda_is_available");
 }
 
 void mitk::nnInteractiveTool::Impl::SetAutoZoom() const
@@ -491,7 +533,7 @@ void mitk::nnInteractiveTool::Impl::SetAutoZoom() const
   std::ostringstream pyCommands; pyCommands
     << "session.set_do_autozoom(" << (this->AutoZoom ? "True" : "False") << ")\n";
 
-  this->PythonContext->ExecuteString(pyCommands.str());
+  m_PythonContext->ExecuteString(pyCommands.str());
 }
 
 void mitk::nnInteractiveTool::Impl::AddPointInteraction(const Point3D& point, const Image* inputAtTimeStep) const
@@ -505,7 +547,7 @@ void mitk::nnInteractiveTool::Impl::AddPointInteraction(const Point3D& point, co
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
     << ")\n";
 
-  this->PythonContext->ExecuteString(pyCommands.str());
+  m_PythonContext->ExecuteString(pyCommands.str());
 }
 
 void mitk::nnInteractiveTool::Impl::AddBoxInteraction(const PlanarFigure* box, const Image* inputAtTimeStep) const
@@ -534,12 +576,12 @@ void mitk::nnInteractiveTool::Impl::AddBoxInteraction(const PlanarFigure* box, c
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
     << ")\n";
 
-  this->PythonContext->ExecuteString(pyCommands.str());
+  m_PythonContext->ExecuteString(pyCommands.str());
 }
 
 void mitk::nnInteractiveTool::Impl::AddScribbleInteraction(const Image* mask) const
 {
-  this->PythonContext->TransferBaseDataToPython(const_cast<Image*>(mask), "mitk_scribble_mask");
+  m_PythonContext->TransferBaseDataToPython(const_cast<Image*>(mask), "mitk_scribble_mask");
 
   std::ostringstream pyCommands; pyCommands
     << "scribble_mask = mitk_scribble_mask.GetAsNumpy()\n"
@@ -548,12 +590,12 @@ void mitk::nnInteractiveTool::Impl::AddScribbleInteraction(const Image* mask) co
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
     << ")\n";
 
-  this->PythonContext->ExecuteString(pyCommands.str());
+  m_PythonContext->ExecuteString(pyCommands.str());
 }
 
 void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask) const
 {
-  this->PythonContext->TransferBaseDataToPython(const_cast<Image*>(mask), "mitk_lasso_mask");
+  m_PythonContext->TransferBaseDataToPython(const_cast<Image*>(mask), "mitk_lasso_mask");
 
   std::ostringstream pyCommands; pyCommands
     << "lasso_mask = mitk_lasso_mask.GetAsNumpy()\n"
@@ -562,12 +604,12 @@ void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask) const
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
     << ")\n";
 
-  this->PythonContext->ExecuteString(pyCommands.str());
+  m_PythonContext->ExecuteString(pyCommands.str());
 }
 
 void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(LabelSetImage* previewImage, TimeStepType timeStep) const
 {
-  this->PythonContext->TransferBaseDataToPython(this->InitialSeg, "mitk_initial_seg");
+  m_PythonContext->TransferBaseDataToPython(this->InitialSeg, "mitk_initial_seg");
 
   std::ostringstream pyCommands; pyCommands
     << "initial_seg = mitk_initial_seg.GetAsNumpy()\n"
@@ -576,7 +618,7 @@ void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(LabelSetImage* prev
     << "    run_prediction=" << (this->AutoRefine ? "True" : "False") << '\n'
     << ")\n";
 
-  this->PythonContext->ExecuteString(pyCommands.str());
+  m_PythonContext->ExecuteString(pyCommands.str());
 
   ImageReadAccessor readAccessor(this->TargetBuffer.GetPointer());
   previewImage->SetVolume(readAccessor.GetData(), timeStep);
@@ -584,5 +626,5 @@ void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(LabelSetImage* prev
 
 void mitk::nnInteractiveTool::Impl::ResetInteractions() const
 {
-  this->PythonContext->ExecuteString("session.reset_interactions()\n");
+  m_PythonContext->ExecuteString("session.reset_interactions()\n");
 }

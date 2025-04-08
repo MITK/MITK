@@ -85,14 +85,24 @@ namespace mitk::nnInteractive
       m_EventConfigBackup.clear();
     }
 
+    ToolManager* GetToolManager() const
+    {
+      return m_ToolManager;
+    }
+
+    void SetToolManager(ToolManager* toolManager)
+    {
+      m_ToolManager = toolManager;
+    }
+
     InteractionType Type;
     InteractionMode Mode;
     PromptType CurrentPromptType;
     bool IsEnabled;
-    ToolManager::Pointer ToolManager;
 
   private:
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
+    ToolManager::Pointer m_ToolManager;
   };
 }
 
@@ -107,10 +117,10 @@ mitk::nnInteractive::Interactor::~Interactor()
 
 void mitk::nnInteractive::Interactor::SetToolManager(ToolManager* toolManager)
 {
-  if (m_Impl->ToolManager == toolManager)
+  if (m_Impl->GetToolManager() == toolManager)
     return;
 
-  m_Impl->ToolManager = toolManager;
+  m_Impl->SetToolManager(toolManager);
 
   this->OnSetToolManager();
 }
@@ -187,15 +197,17 @@ mitk::nnInteractive::InteractionType mitk::nnInteractive::Interactor::GetType() 
 
 mitk::ToolManager* mitk::nnInteractive::Interactor::GetToolManager() const
 {
-  return m_Impl->ToolManager;
+  return m_Impl->GetToolManager();
 }
 
 mitk::DataStorage* mitk::nnInteractive::Interactor::GetDataStorage() const
 {
-  if (m_Impl->ToolManager == nullptr)
+  const auto* toolManager = m_Impl->GetToolManager();
+
+  if (toolManager == nullptr)
     return nullptr;
 
-  return m_Impl->ToolManager->GetDataStorage();
+  return toolManager->GetDataStorage();
 }
 
 mitk::nnInteractive::PromptType mitk::nnInteractive::Interactor::GetCurrentPromptType() const

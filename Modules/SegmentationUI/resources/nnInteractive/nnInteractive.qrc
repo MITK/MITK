@@ -1,8 +1,0 @@
-<RCC>
-  <qresource prefix="/nnInteractive" >
-    <file alias="Mask">Mask.svg</file>
-    <file alias="Negative">Negative.svg</file>
-    <file alias="Positive">Positive.svg</file>
-    <file alias="Reset">Reset.svg</file>
-  </qresource>
-</RCC>

@@ -135,6 +135,5 @@ set(UI_FILES
 )
 
 set(QRC_FILES
-  resources/nnInteractive/nnInteractive.qrc
   resources/SegmentationUI.qrc
 )

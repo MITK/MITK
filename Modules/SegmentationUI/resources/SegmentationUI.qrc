@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="/Qmitk" >
+    <file>nnInteractive/Mask.svg</file>
+    <file>nnInteractive/Negative.svg</file>
+    <file>nnInteractive/Positive.svg</file>
+    <file>nnInteractive/Reset.svg</file>
     <file>BooleanDifference_48x48.png</file>
     <file>BooleanIntersection_48x48.png</file>
     <file>BooleanUnion_48x48.png</file>

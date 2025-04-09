@@ -37,7 +37,6 @@ found in the LICENSE file.
 #include <cstdlib>
 
 #include <mitkPropertyObserver.h>
-#include <vtk_glew.h>
 
 const mitk::PointSet *mitk::PointSetVtkMapper3D::GetInput()
 {

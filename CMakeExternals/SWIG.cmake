@@ -8,11 +8,7 @@ if(MITK_USE_SWIG)
 
   set(SWIG_TARGET_VERSION 4.3.0)
   set(proj SWIG)
-  if(WIN32)
-    set(proj_DEPENDENCIES)
-  else()
-    set(proj_DEPENDENCIES PCRE)
-  endif()
+  set(proj_DEPENDENCIES)
   set(SWIG_DEPENDS ${proj})
 
   if(NOT SWIG_DIR)

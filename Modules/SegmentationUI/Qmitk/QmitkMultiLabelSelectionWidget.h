@@ -30,7 +30,7 @@ namespace Ui
 }
 
 /*
-* @brief This is a selection widget that allows to select one or multiple labels of a multi label segmentation..
+* @brief This is a selection widget that allows to select one or multiple labels of a multi label segmentation.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelSelectionWidget : public QWidget
 {

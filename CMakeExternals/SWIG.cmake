@@ -76,6 +76,13 @@ if(MITK_USE_SWIG)
         OUTPUT_VARIABLE SWIG_DIR
         OUTPUT_STRIP_TRAILING_WHITESPACE
       )
+
+      ExternalProject_Add(${proj}
+        DOWNLOAD_COMMAND ""
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
+      )
     endif()
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")

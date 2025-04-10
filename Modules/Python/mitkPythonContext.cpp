@@ -16,7 +16,15 @@ found in the LICENSE file.
 #include <swigpyrun.h>
 
 mitk::PythonContext::PythonContext()
-  : m_GlobalDictionary(PyDict_New()), m_LocalDictionary(PyDict_New()) {}
+{
+  if (!Py_IsInitialized())
+  {
+    Py_Initialize();
+  }
+
+  m_GlobalDictionary.reset(PyDict_New());
+  m_LocalDictionary.reset(PyDict_New());
+}
 
 void mitk::PythonContext::Activate()
 {

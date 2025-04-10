@@ -30,8 +30,8 @@ mitk::IPythonService::IPythonService()
   std::string libPython = "lib" + pythonIncludeVector[pythonIncludeVector.size() - 1] + ".so";
   dlopen(libPython.c_str(), RTLD_LAZY | RTLD_GLOBAL);
 #endif
-  if (!Py_IsInitialized())
+  /*if (!Py_IsInitialized())
   {
     Py_Initialize();
-  }
+  }*/
 }

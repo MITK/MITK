@@ -57,7 +57,7 @@ if(NOT DEFINED VTK_DIR)
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
     GIT_REPOSITORY https://github.com/Kitware/VTK.git
-    GIT_TAG 13acb1a5dd0ad7f7635f2511f44e599733643d06 # v9.4.2
+    GIT_TAG 40ef44cb1bda31f1dca400452125fcf43f9b0626 # 2025-04-09
     GIT_SUBMODULES ""
     CMAKE_GENERATOR ${gen}
     CMAKE_GENERATOR_PLATFORM ${gen_platform}

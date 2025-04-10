@@ -66,6 +66,7 @@ public Q_SLOTS:
   * should regard that to avoid signal loops.
   */
   void SetSelectedLabels(const LabelValueVectorType& selectedLabels);
+
   /**
   * @brief The passed label will be used as new selection in the widget
   * @param selectedLabel Value of the selected label.

@@ -27,7 +27,7 @@ namespace Ui
 }
 
 /*
-* @brief This is a widget that behaves like a QLabel widgets and displays the selected labels of
+* @brief This is a widget that behaves like a QLabel widget and displays the selected labels of
 * a segmentation with name and color.
 * It also allows label highlighting in render windows if the node is set and
 * mouse hovers over the widget.

@@ -42,7 +42,7 @@ namespace mitk::nnInteractive
     void OnDisable() override;
     void OnReset() override;
 
-    struct Impl;
+    class Impl;
     std::unique_ptr<Impl> m_Impl;
   };
 }

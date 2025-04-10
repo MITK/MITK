@@ -193,16 +193,22 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
   m_InteractorButtons[InteractionType::Scribble] = m_Ui->scribbleButton;
   m_InteractorButtons[InteractionType::Lasso] = m_Ui->lassoButton;
 
-  for (const auto& [tool, button] : m_InteractorButtons)
+  for (const auto& interactorButton : m_InteractorButtons)
   {
-    auto interactor = this->GetTool()->GetInteractor(tool);
+    // We cannot use a structured binding in this for loop because
+    // interactionType is captured by the lambda below. Capturing structured
+    // bindings is a C++20 feature and currently we are bound to C++17.
+    auto interactionType = interactorButton.first;
+    auto button = interactorButton.second;
+
+    auto interactor = this->GetTool()->GetInteractor(interactionType);
     auto icon = interactor->GetIcon();
 
     if (!icon.empty())
       button->setIcon(QmitkStyleManager::ThemeIcon(QByteArray(icon.data(), icon.size())));
 
-    connect(button, &QPushButton::toggled, [this, tool](bool checked) {
-      this->OnInteractorToggled(tool, checked);
+    connect(button, &QPushButton::toggled, [this, interactionType](bool checked) {
+      this->OnInteractorToggled(interactionType, checked);
     });
   }
 

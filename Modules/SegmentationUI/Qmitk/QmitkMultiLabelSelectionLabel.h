@@ -104,7 +104,7 @@ public Q_SLOTS:
 
 protected:
   void Initialize();
-  void UpdateWidget(const LabelValueVectorType& selectedLabels);
+  void UpdateWidget();
 
   mitk::LabelSetImage::Pointer m_Segmentation;
 

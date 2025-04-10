@@ -55,7 +55,7 @@ QmitkMultiLabelSelectionWidget::~QmitkMultiLabelSelectionWidget()
 void QmitkMultiLabelSelectionWidget::resizeEvent(QResizeEvent* event)
 {
   QWidget::resizeEvent(event);
-  if (!m_Popup->isVisible())
+  if (m_Popup->isVisible())
   {
     this->PositionPopup();
   }

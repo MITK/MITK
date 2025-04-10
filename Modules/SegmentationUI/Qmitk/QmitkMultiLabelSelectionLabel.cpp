@@ -43,7 +43,7 @@ void QmitkMultiLabelSelectionLabel::Initialize()
   auto styleSheet = qApp->styleSheet();
   m_Controls->labelText->document()->setDefaultStyleSheet(styleSheet);
 
-  this->UpdateWidget(m_LastValidSelectedLabels);
+  this->UpdateWidget();
 }
 
 void QmitkMultiLabelSelectionLabel::SetHighlightingActivated(bool visibilityMod)
@@ -115,7 +115,7 @@ void QmitkMultiLabelSelectionLabel::SetEmptyInfo(QString info)
     return;
 
   m_EmptyInfo = info;
-  this->UpdateWidget(m_LastValidSelectedLabels);
+  this->UpdateWidget();
 }
 
 QString QmitkMultiLabelSelectionLabel::GetEmptyInfo() const
@@ -130,20 +130,20 @@ void QmitkMultiLabelSelectionLabel::SetSelectedLabels(const LabelValueVectorType
     return;
   }
 
-  this->UpdateWidget(selectedLabels);
   m_LastValidSelectedLabels = selectedLabels;
+  this->UpdateWidget();
 }
 
-void QmitkMultiLabelSelectionLabel::UpdateWidget(const LabelValueVectorType& selectedLabels)
+void QmitkMultiLabelSelectionLabel::UpdateWidget()
 {
-  if (selectedLabels.empty())
+  if (m_LastValidSelectedLabels.empty())
   {
     m_Controls->labelText->setHtml(m_EmptyInfo);
   }
   else
   {
     std::stringstream stream;
-    for (const auto& labelValue : selectedLabels)
+    for (const auto& labelValue : m_LastValidSelectedLabels)
     {
       mitk::Label::ConstPointer label = this->GetMultiLabelSegmentation()->GetLabel(labelValue);
       if (stream.rdbuf()->in_avail() != 0) stream << "; ";

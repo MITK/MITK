@@ -27,7 +27,8 @@ if(MITK_USE_SWIG)
 
       # swig.exe available as pre-built binary on Windows:
       ExternalProject_Add(${proj}
-        URL https://netcologne.dl.sourceforge.net/project/swig/swigwin/swigwin-4.3.0/swigwin-4.3.0.zip
+        URL https://www.mitk.org/download/thirdparty/swigwin-4.3.0.zip
+        URL_MD5 591f99627c27d9865a70d1aff23a60cf
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
@@ -36,8 +37,7 @@ if(MITK_USE_SWIG)
       ExternalProject_Get_Property(${proj} source_dir)
       set(SWIG_DIR ${source_dir})
       set(SWIG_EXECUTABLE ${source_dir}/swig.exe)
-
-    else()
+    elseif(NOT APPLE)
       # swig uses bison find it by cmake and pass it down
       find_package(BISON)
       set(BISON_FLAGS "" CACHE STRING "Flags used by bison")
@@ -45,12 +45,8 @@ if(MITK_USE_SWIG)
 
       ExternalProject_add(${proj}
         LIST_SEPARATOR ${sep}
-        URL https://deac-riga.dl.sourceforge.net/project/swig/swig/swig-4.3.0/swig-4.3.0.tar.gz
-        # Switching to Git would require additional prerequisites:
-        #   - autotools-dev
-        #   - automake
-        # GIT_REPOSITORY https://github.com/swig/swig.git
-        # GIT_TAG v${SWIG_TARGET_VERSION}
+        URL https://www.mitk.org/download/thirdparty/swig-4.3.0.tar.gz
+        URL_MD5 6a0555a2063c78447c5912136f013c43
         INSTALL_DIR ${ep_prefix}/src/${proj}-install
         CONFIGURE_COMMAND <SOURCE_DIR>/./configure
                           CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
@@ -66,7 +62,20 @@ if(MITK_USE_SWIG)
       ExternalProject_Get_Property(${proj} install_dir)
       set(SWIG_DIR ${install_dir}/share/swig/${SWIG_TARGET_VERSION})
       set(SWIG_EXECUTABLE ${install_dir}/bin/swig)
+    else()
+      find_program(SWIG_EXECUTABLE
+        NAMES swig
+        PATHS
+          "/opt/homebrew/bin"
+          "/usr/local/bin"
+        REQUIRED
+      )
 
+      execute_process(
+        COMMAND ${SWIG_EXECUTABLE} -swiglib
+        OUTPUT_VARIABLE SWIG_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
     endif()
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")

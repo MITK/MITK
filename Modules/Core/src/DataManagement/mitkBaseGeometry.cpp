@@ -419,6 +419,24 @@ bool mitk::BaseGeometry::IsIndexInside(const mitk::Point3D &index) const
   return inside;
 }
 
+mitk::Point3D mitk::BaseGeometry::ClampPoint(const Point3D& point) const
+{
+  if (this->IsInside(point))
+    return point;
+
+  auto origin = this->GetOrigin();
+
+  if (this->GetImageGeometry())
+    origin -= this->GetSpacing() * 0.5;
+
+  Point3D clampedPoint;
+
+  for (int i = 0; i < 3; ++i)
+    clampedPoint[i] = std::max(origin[i], std::min(point[i], origin[i] + this->GetExtentInMM(i)));
+
+  return clampedPoint;
+}
+
 void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
 {
   mitk::Vector3D tempIn, tempOut;

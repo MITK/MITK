@@ -501,6 +501,19 @@ namespace mitk
       return IsIndexInside(pt_index);
     }
 
+    //##Documentation
+    //## @brief Clamps a point to lie within the geometry's bounds.
+    //##
+    //## If the given point lies outside the geometry's bounds, it is projected
+    //## onto the nearest point inside the box. If the point is already inside,
+    //## it is returned unchanged.
+    //##
+    //## @param point The point to clamp.
+    //## @return The clamped point, guaranteed to lie within the geometry's bounds.
+    //##
+    //## @see ClampPoint(Point3D&) for a version that clamps a point in-place.
+    Point3D ClampPoint(const Point3D& point) const;
+
     // ********************************* Image Geometry ********************************
     //##Documentation
     //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to

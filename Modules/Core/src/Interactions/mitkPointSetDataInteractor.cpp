@@ -285,16 +285,8 @@ void mitk::PointSetDataInteractor::MovePoint(StateMachineAction *stateMachineAct
         auto pt = m_PointSet->GetPoint(position, timeStep);
         auto resultPoint = pt + dirVector;
 
-        if (m_Bounds.IsNotNull() && !m_Bounds->IsInside(resultPoint))
-        {
-          auto origin = m_Bounds->GetOrigin();
-
-          if (m_Bounds->GetImageGeometry())
-            origin -= m_Bounds->GetSpacing() * 0.5;
-
-          for (int i = 0; i < 3; ++i)
-            resultPoint[i] = std::max(origin[i], std::min(resultPoint[i], origin[i] + m_Bounds->GetExtentInMM(i)));
-        }
+        if (m_Bounds.IsNotNull())
+          resultPoint = m_Bounds->ClampPoint(resultPoint);
 
         auto *doOp = new mitk::PointOperation(OpMOVE, timeInMs, resultPoint, position);
         // execute the Operation

@@ -39,8 +39,6 @@ mitk::ContourModel::ContourModel(const ContourModel &other)
 
   for (const auto& element : other.m_ContourSeries)
     m_ContourSeries.push_back(element->Clone());
-
-  m_SelectedVertex = nullptr;
 }
 
 mitk::ContourModel::~ContourModel()

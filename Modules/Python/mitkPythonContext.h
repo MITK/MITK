@@ -50,7 +50,7 @@ namespace mitk
      * @brief Check if given variable exists in the current context defined by 
      * `globals` (m_GlobalDictionary) & `locals` (m_LocalDictionary) namespaces.
      */
-    bool IsVariableExists(const std::string &varName);
+    bool HasVariable(const std::string &varName);
 
     /**
      * @brief Provides view into mitk::Image type object in Python

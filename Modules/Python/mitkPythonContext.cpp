@@ -189,7 +189,7 @@ void mitk::PythonContext::ClearVirtualEnvironmentPath()
   }
 }
 
-bool mitk::PythonContext::IsVariableExists(const std::string &varName)
+bool mitk::PythonContext::HasVariable(const std::string &varName)
 {
   PyObject *pyVar = PyDict_GetItemString(m_LocalDictionary.get(), varName.c_str());
   if (pyVar == NULL && !(pyVar = PyDict_GetItemString(m_GlobalDictionary.get(), varName.c_str())))

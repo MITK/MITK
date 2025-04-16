@@ -93,16 +93,16 @@ public:
         MITK_ERROR << e.GetDescription();
         CPPUNIT_FAIL("Error in executing commands in python");
       }
-      bool isVarExists = pythonContext_1->IsVariableExists("test_var_context_1");
+      bool isVarExists = pythonContext_1->HasVariable("test_var_context_1");
       CPPUNIT_ASSERT_MESSAGE("test_var_context_1 should be found in context 1", isVarExists);
 
-      isVarExists = pythonContext_1->IsVariableExists("test_var_context_2");
+      isVarExists = pythonContext_1->HasVariable("test_var_context_2");
       CPPUNIT_ASSERT_MESSAGE("test_var_context_2 should not be found in context 1", !isVarExists);
 
-      isVarExists = pythonContext_2->IsVariableExists("test_var_context_2");
+      isVarExists = pythonContext_2->HasVariable("test_var_context_2");
       CPPUNIT_ASSERT_MESSAGE("test_var_context_2 should be found in context 2", isVarExists);
 
-      isVarExists = pythonContext_2->IsVariableExists("test_var_context_1");
+      isVarExists = pythonContext_2->HasVariable("test_var_context_1");
       CPPUNIT_ASSERT_MESSAGE("test_var_context_1 should not be found in context 2", !isVarExists);
     }
     else

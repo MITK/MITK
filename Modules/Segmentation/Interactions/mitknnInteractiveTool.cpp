@@ -513,7 +513,7 @@ bool mitk::nnInteractiveTool::IsSessionRunning() const
   if (pythonContext == nullptr)
     return false;
   
-  return pythonContext->IsVariableExists("session");
+  return pythonContext->HasVariable("session");
 }
 
 bool mitk::nnInteractiveTool::Impl::IsCUDAAvailable() const
@@ -525,7 +525,7 @@ bool mitk::nnInteractiveTool::Impl::IsCUDAAvailable() const
 
   m_PythonContext->ExecuteString(pyCommands.str());
 
-  return m_PythonContext->IsVariableExists("cuda_is_available");
+  return m_PythonContext->HasVariable("cuda_is_available");
 }
 
 void mitk::nnInteractiveTool::Impl::SetAutoZoom() const

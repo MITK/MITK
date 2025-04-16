@@ -729,16 +729,7 @@ void mitk::LabelSetImage::UpdateCenterOfMass(PixelType pixelValue)
 bool mitk::LabelSetImage::IsEmpty(PixelType pixelValue, TimeStepType t) const
 {
   Image::ConstPointer image = this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue));
-
-  if (image->GetDimension() == 4)
-  {
-    auto timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(image);
-    timeSelector->SetTimeNr(t);
-    timeSelector->Update();
-
-    image = timeSelector->GetOutput();
-  }
+  image = SelectImageByTimeStep(image, t);
 
   size_t numPixels = 1;
 

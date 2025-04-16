@@ -18,8 +18,6 @@ found in the LICENSE file.
 
 #include <usModuleRegistry.h>
 
-#include <optional>
-
 namespace mitk::nnInteractive
 {
   class BoxInteractor::Impl
@@ -54,7 +52,7 @@ namespace mitk::nnInteractive
       // next box node.
       auto command = itk::SimpleMemberCommand<Impl>::New();
       command->SetCallbackFunction(this, &Impl::OnEndPlacementPlanarFigureEvent);
-      const auto tag = box->AddObserver(EndPlacementPlanarFigureEvent(), command);
+      ITKEventObserverGuard observer(box, EndPlacementPlanarFigureEvent(), command);
 
       const auto promptType = m_Owner->GetCurrentPromptType();
 
@@ -78,7 +76,7 @@ namespace mitk::nnInteractive
       // storing the next box data node as a persistent class member and
       // adding it to the data storage.
       m_NextBoxNode = node;
-      m_EndPlacementObserverTag = tag;
+      m_EndPlacementObserver = std::move(observer);
 
       m_Owner->GetDataStorage()->Add(node, m_Owner->GetToolManager()->GetReferenceData(0));
 
@@ -106,11 +104,7 @@ namespace mitk::nnInteractive
         m_Owner->GetDataStorage()->Remove(m_NextBoxNode);
 
       // Unsubscribe from the EndPlacementPlanarFigureEvent.
-      if (m_EndPlacementObserverTag.has_value())
-      {
-        m_NextBoxNode->RemoveObserver(m_EndPlacementObserverTag.value());
-        m_EndPlacementObserverTag.reset();
-      }
+      m_EndPlacementObserver.Reset();
 
       // Release the reference to the next box.
       m_NextBoxNode = nullptr;
@@ -170,7 +164,7 @@ namespace mitk::nnInteractive
     BoxInteractor* m_Owner;
     PlanarFigureInteractor::Pointer m_Interactor;
     DataNode::Pointer m_NextBoxNode;
-    std::optional<unsigned long> m_EndPlacementObserverTag;
+    ITKEventObserverGuard m_EndPlacementObserver;
   };
 }
 

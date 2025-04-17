@@ -47,6 +47,8 @@ namespace
   mitk::IPreferences* GetPreferences()
   {
     auto preferencesService = mitk::CoreServices::GetPreferencesService();
+    if (preferencesService->GetSystemPreferences() == nullptr)
+      return nullptr;
     return preferencesService->GetSystemPreferences()->Node("org.mitk.editors");
   }
 }

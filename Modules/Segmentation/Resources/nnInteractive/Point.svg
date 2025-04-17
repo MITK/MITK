@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="48"
+   height="48"
+   viewBox="0 0 12.7 12.7"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="point.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="4.1798822"
+     inkscape:cx="59.571058"
+     inkscape:cy="34.331111"
+     inkscape:window-width="1350"
+     inkscape:window-height="1237"
+     inkscape:window-x="281"
+     inkscape:window-y="27"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g1"
+       transform="translate(-0.21008983,0.04131738)">
+      <circle
+         style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1;stroke-linejoin:round"
+         id="path1"
+         cx="3.3002715"
+         cy="4.6878104"
+         r="0.79374999" />
+      <ellipse
+         style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:0.999997;stroke-linejoin:round"
+         id="path1-1"
+         cx="1.8809524"
+         cy="8.5605526"
+         rx="0.79374999"
+         ry="0.79375005" />
+      <circle
+         style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1;stroke-linejoin:round"
+         id="path1-1-4"
+         cx="7.0860119"
+         cy="11.239227"
+         r="0.79374999" />
+      <circle
+         style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1;stroke-linejoin:round"
+         id="path1-0"
+         cx="8.4158134"
+         cy="1.3781379"
+         r="0.79374999" />
+      <circle
+         style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1;stroke-linejoin:round"
+         id="path1-1-8"
+         cx="7.3098083"
+         cy="6.7503157"
+         r="0.79374999" />
+      <circle
+         style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1;stroke-linejoin:round"
+         id="path1-1-4-2"
+         cx="11.239227"
+         cy="5.2439947"
+         r="0.79374999" />
+    </g>
+  </g>
+</svg>

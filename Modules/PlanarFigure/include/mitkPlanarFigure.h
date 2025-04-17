@@ -146,15 +146,15 @@ namespace mitk
 
     /** \brief Returns the polyline representing the planar figure
      * (for rendering, measurements, etc.). */
-    const PolyLineType GetPolyLine(unsigned int index);
+    PolyLineType& GetPolyLine(unsigned int index);
 
     /** \brief Returns the polyline representing the planar figure
      * (for rendering, measurements, etc.). */
-    const PolyLineType GetPolyLine(unsigned int index) const;
+    const PolyLineType& GetPolyLine(unsigned int index) const;
 
     /** \brief Returns the polyline that should be drawn the same size at every scale
      * (for text, angles, etc.). */
-    const PolyLineType GetHelperPolyLine(unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight);
+    const PolyLineType& GetHelperPolyLine(unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight);
 
     /** \brief Sets the position of the PreviewControlPoint. Automatically sets it visible.*/
     void SetPreviewControlPoint(const Point2D &point);

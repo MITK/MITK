@@ -567,6 +567,18 @@ int mitk::PointSet::SearchSelectedPoint(int t) const
   return -1;
 }
 
+void mitk::PointSet::ClearSelection()
+{
+  for (auto pointSet : m_PointSetSeries)
+  {
+    const auto end = pointSet->GetPointData()->End();
+    for (auto it = pointSet->GetPointData()->Begin(); it != end; ++it)
+    {
+      it.Value().selected = false;
+    }
+  }
+}
+
 void mitk::PointSet::ExecuteOperation(Operation *operation)
 {
   int timeStep = -1;

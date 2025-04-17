@@ -60,7 +60,7 @@ public:
     MITK_TEST_CONDITION(planarPolygon->IsClosed(), "planar polygon should be closed after function call, right?");
 
     // Test for number of polylines
-    const mitk::PlanarFigure::PolyLineType polyLine0 = planarPolygon->GetPolyLine(0);
+    const auto& polyLine0 = planarPolygon->GetPolyLine(0);
     auto iter = polyLine0.begin();
     MITK_TEST_CONDITION(planarPolygon->GetPolyLinesSize() == 1, "Number of polylines after placement");
 

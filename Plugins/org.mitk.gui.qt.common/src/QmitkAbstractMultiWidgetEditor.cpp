@@ -33,6 +33,13 @@ namespace
     mitk::CoreServicePointer<mitk::IPreferencesService> prefsService(mitk::CoreServices::GetPreferencesService());
     return prefsService->GetSystemPreferences()->Node("org.mitk.editors");
   }
+
+  void ApplyConstrainedPanningZooming()
+  {
+    const auto* prefs = ::GetPreferences();
+    const bool constrain = prefs->GetBool("Use constrained zooming and panning", true);
+    mitk::RenderingManager::GetInstance()->SetConstrainedPanningZooming(constrain);
+  }
 }
 
 const QString QmitkAbstractMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.abstractmultiwidget";
@@ -54,7 +61,10 @@ QmitkAbstractMultiWidgetEditor::Impl::Impl()
   auto prefs = ::GetPreferences();
 
   if (prefs != nullptr)
+  {
     prefs->OnChanged.AddListener(mitk::MessageDelegate1<Impl, const mitk::IPreferences*>(this, &Impl::OnPreferencesChanged));
+    ApplyConstrainedPanningZooming();
+  }
 }
 
 QmitkAbstractMultiWidgetEditor::Impl::~Impl()
@@ -65,14 +75,10 @@ QmitkAbstractMultiWidgetEditor::Impl::~Impl()
     prefs->OnChanged.RemoveListener(mitk::MessageDelegate1<Impl, const mitk::IPreferences*>(this, &Impl::OnPreferencesChanged));
 }
 
-void QmitkAbstractMultiWidgetEditor::Impl::OnPreferencesChanged(const mitk::IPreferences* preferences)
+void QmitkAbstractMultiWidgetEditor::Impl::OnPreferencesChanged(const mitk::IPreferences* /*preferences*/)
 {
-  auto renderingManager = mitk::RenderingManager::GetInstance();
-
-  const bool constrain = preferences->GetBool("Use constrained zooming and panning", true);
-  renderingManager->SetConstrainedPanningZooming(constrain);
-
-  renderingManager->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+  ApplyConstrainedPanningZooming();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 }
 
 QmitkAbstractMultiWidgetEditor::QmitkAbstractMultiWidgetEditor()

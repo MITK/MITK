@@ -41,7 +41,7 @@ public:
     MITK_TEST_CONDITION(PlanarArrow->GetNumberOfControlPoints() == 2, "Number of control points after placement");
 
     // Test for number of polylines
-    const mitk::PlanarFigure::PolyLineType polyLine0 = PlanarArrow->GetPolyLine(0);
+    const auto& polyLine0 = PlanarArrow->GetPolyLine(0);
     auto iter = polyLine0.begin();
     MITK_TEST_CONDITION(PlanarArrow->GetPolyLinesSize() == 1, "Number of polylines after placement");
 
@@ -104,7 +104,7 @@ int mitkPlanarArrowTest(int /* argc */, char * /*argv*/ [])
 
   for (unsigned int i = 0; i < clonedArrow->GetPolyLinesSize(); ++i)
   {
-    mitk::PlanarFigure::PolyLineType polyLine = clonedArrow->GetPolyLine(i);
+    const auto& polyLine = clonedArrow->GetPolyLine(i);
     for (unsigned int j = 0; j < polyLine.size(); ++j)
     {
       identical &= polyLine.at(j) == PlanarArrow->GetPolyLine(i).at(j);

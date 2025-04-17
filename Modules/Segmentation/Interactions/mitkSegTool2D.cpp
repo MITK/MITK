@@ -578,7 +578,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
       ->GetPlaneGeometry(0));
   const unsigned int slicePosition = m_LastEventSender->GetSliceNavigationController()->GetStepper()->GetPos();
 
-  mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume);
+  mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume, m_UndoEnabled);
 
 
   /* A cleaner solution would be to add a contour marker for each slice info. It currently
@@ -587,7 +587,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
   this->AddContourmarker(plane3, slicePosition);
 }
 
-void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume)
+void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume, bool allowUndo)
 {
   if (sliceList.empty())
   {
@@ -622,7 +622,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
   {
     if (writeSliceToVolume && nullptr != sliceInfo.plane && sliceInfo.slice.IsNotNull())
     {
-      SegTool2D::WriteSliceToVolume(image, sliceInfo, true);
+      SegTool2D::WriteSliceToVolume(image, sliceInfo, allowUndo);
     }
   }
 
@@ -729,9 +729,14 @@ void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
   m_SurfaceInterpolationEnabled = enabled;
 }
 
+void mitk::SegTool2D::DisableContourMarkers()
+{
+  m_EnableContourMarkers = false;
+}
+
 int mitk::SegTool2D::AddContourmarker(const PlaneGeometry* planeGeometry, unsigned int sliceIndex)
 {
-  if (planeGeometry == nullptr)
+  if (!m_EnableContourMarkers || planeGeometry == nullptr)
     return -1;
 
   us::ServiceReference<PlanePositionManagerService> serviceRef =

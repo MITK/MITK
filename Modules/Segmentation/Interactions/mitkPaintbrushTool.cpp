@@ -20,11 +20,10 @@ found in the LICENSE file.
 #include "mitkLevelWindowProperty.h"
 #include "mitkImageWriteAccessor.h"
 
-int mitk::PaintbrushTool::m_Size = 10;
-
 mitk::PaintbrushTool::PaintbrushTool(bool startWithFillMode)
   : FeedbackContourTool("PressMoveReleaseWithCTRLInversionAllMouseMoves"),
-  m_FillMode(startWithFillMode),
+    m_FillMode(startWithFillMode),
+    m_Size(10),
     m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
 {
   m_MasterContour = ContourModel::New();
@@ -45,6 +44,11 @@ void mitk::PaintbrushTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("InvertLogic", OnInvertLogic);
 }
 
+int mitk::PaintbrushTool::GetFillValue() const
+{
+  return 255;
+}
+
 void mitk::PaintbrushTool::Activated()
 {
   Superclass::Activated();
@@ -54,7 +58,7 @@ void mitk::PaintbrushTool::Activated()
     mitk::MessageDelegate<mitk::PaintbrushTool>(this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified);
 
   m_PaintingNode = DataNode::New();
-  m_PaintingNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(0, m_InternalFillValue)));
+  m_PaintingNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(0, this->GetFillValue())));
   m_PaintingNode->SetProperty("binary", mitk::BoolProperty::New(true));
 
   m_PaintingNode->SetProperty("outline binary", mitk::BoolProperty::New(true));
@@ -383,7 +387,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
   if (leftMouseButtonPressed)
   {
-    ContourModelUtils::FillContourInSlice2(contour, m_PaintingSlice, m_InternalFillValue);
+    ContourModelUtils::FillContourInSlice2(contour, m_PaintingSlice, this->GetFillValue());
 
     const double dist = indexCoordinates.EuclideanDistanceTo(m_LastPosition);
     const double radius = static_cast<double>(m_Size) / 2.0;
@@ -435,7 +439,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
       gapContour->AddVertex(vertex);
 
-      ContourModelUtils::FillContourInSlice2(gapContour, m_PaintingSlice, m_InternalFillValue);
+      ContourModelUtils::FillContourInSlice2(gapContour, m_PaintingSlice, this->GetFillValue());
     }
   }
   else
@@ -495,7 +499,7 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
   }
 
 
-  TransferLabelContentAtTimeStep(m_PaintingSlice, m_WorkingSlice, destinationLabels, 0, LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false, { {m_InternalFillValue, activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
+  TransferLabelContentAtTimeStep(m_PaintingSlice, m_WorkingSlice, destinationLabels, 0, LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false, { {this->GetFillValue(), activePixelValue}}, mitk::MultiLabelSegmentation::MergeStyle::Merge);
 
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 

@@ -571,8 +571,19 @@ function(mitk_target_link_libraries_with_dynamic_lookup target)
     set_target_properties(${target}
                           PROPERTIES LINK_FLAGS "${link_props}")
   endif()
-
   set(links "${link_items}" "${link_libs}")
+
+  list(LENGTH links list_length)
+  if(list_length GREATER 1)
+    list(FIND links "optimized" optimized)
+    if(NOT optimized EQUAL -1)
+      math(EXPR optimized "${optimized}+1")
+      if(optimized LESS list_length)
+        list(GET links ${optimized} links)
+      endif()
+    endif()
+  endif()
+  
   if(links)
     target_link_libraries(${target} "${links}")
   endif()

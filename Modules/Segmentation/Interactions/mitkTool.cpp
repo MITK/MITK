@@ -71,6 +71,11 @@ bool mitk::Tool::CanHandle(const BaseData* referenceData, const BaseData* /*work
   return true;
 }
 
+bool mitk::Tool::IsEligibleForAutoInit() const
+{
+  return true;
+}
+
 void mitk::Tool::InitializeStateMachine()
 {
   if (m_InteractorType.empty())

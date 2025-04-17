@@ -5,7 +5,7 @@ The following third-party libraries can be used with MITK by default and can, in
 
 \par ACVD
 
-https://www.creatis.insa-lyon.fr/~valette/public/project/acvd/
+https://github.com/valette/ACVD
 
 \par ANN
 
@@ -53,11 +53,7 @@ https://github.com/lz4/lz4
 
 \par MatchPoint
 
-https://www.dkfz.de/en/sidt/projects/MatchPoint/info.html
-
-\par PCRE
-
-https://www.pcre.org/
+https://github.com/MIC-DKFZ/MatchPoint
 
 \par POCO
 

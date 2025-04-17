@@ -44,7 +44,13 @@ protected slots:
   void OnAcceptPreview();
 
 protected:
-  QmitkSegWithPreviewToolGUIBase(bool mode2D, bool enableTimeSteps = true);
+  /**
+   * \param mode2D Indicates if the tool is in 2D or 3D mode.
+   * \param enableProcessingOfAllTimeSteps If enabled, a checkbox is shown to
+   *        confirm a preview for all time steps of a dynamic segmentation at
+   *        once (default).
+   */
+  QmitkSegWithPreviewToolGUIBase(bool mode2D, bool enableProcessingOfAllTimeSteps = true);
   ~QmitkSegWithPreviewToolGUIBase() override;
 
   virtual void DisconnectOldTool(mitk::SegWithPreviewTool* oldTool);
@@ -88,7 +94,7 @@ private:
 
   /**Indicates if the tool is in 2D or 3D mode.*/
   bool m_Mode2D;
-  bool m_EnableAllTimeSteps;
+  bool m_EnableProcessingOfAllTimeSteps;
 
   mitk::SegWithPreviewTool::Pointer m_Tool;
 };

@@ -30,8 +30,13 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* da
 
   m_Controls->label1st->setText("<img width=16 height=16 src=\":/Qmitk/BooleanLabelA_32x32.png\"/>");
   m_Controls->label1st->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+  m_Controls->line1stLabel->SetEmptyInfo(QStringLiteral("<font class=\"warning\">Select 1st label to proceed.</font>"));
+  m_Controls->line1stLabel->SetHighlightingActivated(true);
+
   m_Controls->label2nd->setText("<img width=16 height=16 src=\":/Qmitk/BooleanLabelB_32x32.png\"/>");
   m_Controls->label2nd->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+  m_Controls->lineOtherLabels->SetEmptyInfo(QStringLiteral("<font class=\"warning\">Select secondary label(s) to proceed.</font>"));
+  m_Controls->lineOtherLabels->SetHighlightingActivated(true);
 
   m_Controls->segNodeSelector->SetDataStorage(dataStorage);
   m_Controls->segNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
@@ -65,6 +70,8 @@ void QmitkBooleanOperationsWidget::OnSegSelectionChanged(QmitkAbstractNodeSelect
 {
   auto node = m_Controls->segNodeSelector->GetSelectedNode();
   m_Controls->labelInspector->SetMultiLabelNode(node);
+  m_Controls->line1stLabel->SetMultiLabelNode(node);
+  m_Controls->lineOtherLabels->SetMultiLabelNode(node);
 
   this->ConfigureWidgets();
 }
@@ -74,70 +81,27 @@ void QmitkBooleanOperationsWidget::OnLabelSelectionChanged(mitk::LabelSetImage::
   this->ConfigureWidgets();
 }
 
-namespace
-{
-  std::string GenerateLabelHTML(const mitk::Label* label, const mitk::LabelSetImage* segmentation)
-  {
-    std::stringstream stream;
-    auto color = label->GetColor();
-    stream << "<span style='color: #" << std::hex << std::setfill('0')
-      << std::setw(2) << static_cast<int>(color.GetRed()*255)
-      << std::setw(2) << static_cast<int>(color.GetGreen()*255)
-      << std::setw(2) << static_cast<int>(color.GetBlue()*255)
-      << "; font-size: 20px '>&#x25A0;</span>" << std::dec;
-
-    stream << "<font class=\"normal\"> " << label->GetName();
-    if (segmentation->GetLabelValuesByName(segmentation->GetGroupIndexOfLabel(label->GetValue()), label->GetName()).size() > 1)
-    {
-      stream << " [" << label->GetValue() << "]";
-    }
-    stream << "</font>";
-    return stream.str();
-  }
-}
 void QmitkBooleanOperationsWidget::ConfigureWidgets()
 {
   auto selectedLabelValues = m_Controls->labelInspector->GetSelectedLabels();
-  auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
-
-  auto styleSheet = qApp->styleSheet();
-
-  m_Controls->line1stLabel->document()->setDefaultStyleSheet(styleSheet);
-  m_Controls->lineOtherLabels->document()->setDefaultStyleSheet(styleSheet);
 
   if (selectedLabelValues.empty())
   {
-    m_Controls->line1stLabel->setHtml(QStringLiteral("<font class=\"warning\">Select 1st label to proceed.</font>"));
+    m_Controls->line1stLabel->SetSelectedLabels({});
   }
   else
   {
-    mitk::Label::ConstPointer label = seg->GetLabel(selectedLabelValues.front());
-    if (label.IsNotNull())
-      m_Controls->line1stLabel->setText(QString::fromStdString(GenerateLabelHTML(label,seg)));
-    else
-      m_Controls->line1stLabel->setText(QString("Unknown label ID ")+QString::number(selectedLabelValues.front()));
+    m_Controls->line1stLabel->SetSelectedLabel(selectedLabelValues.front());
   }
 
   if (selectedLabelValues.size() < 2)
   {
-    m_Controls->lineOtherLabels->setHtml(QStringLiteral("<font class=\"warning\">Select secondary label(s) to proceed.</font>"));
+    m_Controls->lineOtherLabels->SetSelectedLabels({});
   }
   else
   {
     decltype(selectedLabelValues) otherLabelValues(selectedLabelValues.begin() + 1, selectedLabelValues.end());
-
-    std::stringstream stream;
-    for (const auto& labelValue : otherLabelValues)
-    {
-      mitk::Label::ConstPointer label = seg->GetLabel(labelValue);
-      if (stream.rdbuf()->in_avail() != 0) stream << "; ";
-      if (label.IsNotNull())
-        stream << GenerateLabelHTML(label,seg);
-      else
-        stream << "Unknown label ID " << labelValue;
-    }
-
-    m_Controls->lineOtherLabels->setText(QString::fromStdString(stream.str()));
+    m_Controls->lineOtherLabels->SetSelectedLabels(otherLabelValues);
   }
 
   m_Controls->differenceButton->setEnabled(selectedLabelValues.size()>1);

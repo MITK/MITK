@@ -76,8 +76,16 @@ namespace mitk
     MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassName(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID, const LabelSetImage::LabelValueVectorType& labelValues);
 
     MITKMULTILABEL_EXPORT std::string CreateDisplayGroupName(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID);
+
+    /** Helper that creates the human readable display name for a label. If label segmentation image is not null, the function will also check
+    * if the label is the only label with its name in the segmentation. If not, the tracking ID will be added in square brackets to the display
+    * name.
+    */
     MITKMULTILABEL_EXPORT std::string CreateDisplayLabelName(const LabelSetImage* labelSetImage, const Label* label);
 
+    /** Helper that creates a HTML string that contains the display name and a square glyph with the color of the label.
+    */
+    MITKMULTILABEL_EXPORT std::string CreateHTMLLabelName(const Label* label, const LabelSetImage* segmentation = nullptr);
   } // namespace LabelSetImageHelper
 } // namespace mitk
 

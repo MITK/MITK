@@ -227,15 +227,29 @@ std::string mitk::LabelSetImageHelper::CreateDisplayGroupName(const LabelSetImag
 
 std::string mitk::LabelSetImageHelper::CreateDisplayLabelName(const LabelSetImage* labelSetImage, const Label* label)
 {
-  const auto groupID = labelSetImage->GetGroupIndexOfLabel(label->GetValue());
-
   auto labelName = label->GetName();
 
   if (labelName.empty())
     labelName = "Unnamed";
 
-  if (labelSetImage->GetLabelValuesByName(groupID, label->GetName()).size() > 1)
+  if (nullptr != labelSetImage &&
+      labelSetImage->GetLabelValuesByName(labelSetImage->GetGroupIndexOfLabel(label->GetValue()), label->GetName()).size() > 1)
     labelName += " [" + label->GetTrackingID() + ']';
 
   return labelName;
+}
+
+std::string mitk::LabelSetImageHelper::CreateHTMLLabelName(const mitk::Label* label, const mitk::LabelSetImage* segmentation)
+{
+  std::stringstream stream;
+  auto color = label->GetColor();
+  stream << "<span style='color: #" << std::hex << std::setfill('0')
+    << std::setw(2) << static_cast<int>(color.GetRed() * 255)
+    << std::setw(2) << static_cast<int>(color.GetGreen() * 255)
+    << std::setw(2) << static_cast<int>(color.GetBlue() * 255)
+    << "; font-size: 20px '>&#x25A0;</span>" << std::dec;
+
+  stream << "<font class=\"normal\"> " << CreateDisplayLabelName(segmentation, label);
+  stream << "</font>";
+  return stream.str();
 }

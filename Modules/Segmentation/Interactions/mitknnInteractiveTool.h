@@ -66,7 +66,7 @@ namespace mitk
     ~nnInteractiveTool() override;
 
     void SetToolManager(ToolManager* toolManager) override;
-    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) override;
     void Notify(InteractionEvent* event, bool isHandled) override;
     void ConfirmCleanUp() override;
 

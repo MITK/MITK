@@ -19,7 +19,7 @@ namespace mitk::nnInteractive
 {
   /** \brief %nnInteractive interactor for freehand brushstrokes.
    *
-   * Scribbles are managed as labels of a common LabelSetImage, organized
+   * Scribbles are managed as labels of a common MultiLabelSegmentation, organized
    * by PromptType.
    *
    * Interaction is handled through the DrawPaintbrushTool.

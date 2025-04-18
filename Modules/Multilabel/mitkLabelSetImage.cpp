@@ -886,7 +886,7 @@ void mitk::MultiLabelSegmentation::UpdateCenterOfMass(PixelType pixelValue)
   }
 }
 
-void mitk::MultiLabelSegmentation::SetLookupTable(mitk::LookupTable* lut)
+bool mitk::MultiLabelSegmentation::IsEmpty(PixelType pixelValue, TimeStepType t) const
 {
   Image::ConstPointer image = this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue));
   image = SelectImageByTimeStep(image, t);
@@ -1549,8 +1549,8 @@ bool mitk::Equal(const mitk::MultiLabelSegmentation::ConstLabelVectorType& leftH
   return returnValue;
 }
 
-bool mitk::Equal(const mitk::LabelSetImage::LabelValueVectorType& leftHandSide,
-  const mitk::LabelSetImage::LabelValueVectorType& rightHandSide,
+bool mitk::Equal(const mitk::MultiLabelSegmentation::LabelValueVectorType& leftHandSide,
+  const mitk::MultiLabelSegmentation::LabelValueVectorType& rightHandSide,
   bool orderIsRelevant)
 {
   if (orderIsRelevant)

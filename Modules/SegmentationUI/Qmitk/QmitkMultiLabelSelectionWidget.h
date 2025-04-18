@@ -43,7 +43,7 @@ public:
   bool GetMultiSelectionMode() const;
 
   bool GetHighlightingActivated() const;
-  mitk::LabelSetImage* GetMultiLabelSegmentation() const;
+  mitk::MultiLabelSegmentation* GetMultiLabelSegmentation() const;
   mitk::DataNode* GetMultiLabelNode() const;
   QString GetEmptyInfo() const;
 
@@ -54,8 +54,8 @@ public:
   */
   mitk::Image::Pointer CreateSelectedLabelMask() const;
 
-  using LabelValueType = mitk::LabelSetImage::LabelValueType;
-  using LabelValueVectorType = mitk::LabelSetImage::LabelValueVectorType;
+  using LabelValueType = mitk::MultiLabelSegmentation::LabelValueType;
+  using LabelValueVectorType = mitk::MultiLabelSegmentation::LabelValueVectorType;
 
   /**
   * @brief Retrieve the currently selected labels (equals the last CurrentSelectionChanged values).
@@ -88,7 +88,7 @@ public Q_SLOTS:
   * @remark Using this method to select labels will not trigger the CurrentSelectionChanged signal. Observers
   * should regard that to avoid signal loops.
   */
-  void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
+  void SetSelectedLabel(mitk::MultiLabelSegmentation::LabelValueType selectedLabel);
 
   /** @brief Sets the segmentation that will be used and monitored by the widget.
   * @param segmentation      A pointer to the segmentation to set.
@@ -97,7 +97,7 @@ public Q_SLOTS:
   * setting.
   * @pre Segmentation node is nullptr.
   */
-  void SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation);
+  void SetMultiLabelSegmentation(mitk::MultiLabelSegmentation* segmentation);
 
   /**
   * @brief Sets the segmentation node that will be used /monitored by the widget.

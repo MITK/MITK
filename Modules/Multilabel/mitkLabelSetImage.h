@@ -583,7 +583,7 @@ namespace mitk
 
     using BaseData::IsEmpty;
 
-    /** \brief Checks if a label is empty at a given time step (does not caintain any pixels).
+    /** \brief Checks if a label is empty at a given time step (does not contain any pixels).
       */
     bool IsEmpty(const Label* label, TimeStepType t = 0) const;
     bool IsEmpty(PixelType pixelValue, TimeStepType t = 0) const;
@@ -721,8 +721,8 @@ namespace mitk
   * in the vectors are relevant or also their ordering.Tolerance for comparison.
   * @return true, if all subsequent comparisons are true, false otherwise
   */
-  MITKMULTILABEL_EXPORT bool Equal(const mitk::LabelSetImage::LabelValueVectorType& leftHandSide,
-    const mitk::LabelSetImage::LabelValueVectorType& rightHandSide,
+  MITKMULTILABEL_EXPORT bool Equal(const mitk::MultiLabelSegmentation::LabelValueVectorType& leftHandSide,
+    const mitk::MultiLabelSegmentation::LabelValueVectorType& rightHandSide,
     bool orderIsRelevant = false);
 
 

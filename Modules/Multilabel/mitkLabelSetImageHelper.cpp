@@ -268,7 +268,7 @@ std::string mitk::LabelSetImageHelper::CreateDisplayLabelName(const MultiLabelSe
   return labelName;
 }
 
-std::string mitk::LabelSetImageHelper::CreateHTMLLabelName(const mitk::Label* label, const mitk::LabelSetImage* segmentation)
+std::string mitk::LabelSetImageHelper::CreateHTMLLabelName(const mitk::Label* label, const mitk::MultiLabelSegmentation* segmentation)
 {
   std::stringstream stream;
   auto color = label->GetColor();

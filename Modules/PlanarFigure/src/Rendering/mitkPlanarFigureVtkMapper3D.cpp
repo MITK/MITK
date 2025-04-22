@@ -93,8 +93,6 @@ void mitk::PlanarFigureVtkMapper3D::ApplyPlanarFigureProperties(BaseRenderer *re
 
 void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *renderer)
 {
-  typedef PlanarFigure::PolyLineType PolyLine;
-
   const DataNode *node = this->GetDataNode();
 
   if (node == nullptr)
@@ -140,7 +138,7 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *render
 
     for (size_t i = 0; i < numPolyLines; ++i)
     {
-      const PolyLine polyLine = planarFigure->GetPolyLine(i);
+      const auto& polyLine = planarFigure->GetPolyLine(i);
       const vtkIdType numPoints = polyLine.size();
 
       vtkSmartPointer<vtkPolygon> polygon = vtkSmartPointer<vtkPolygon>::New();

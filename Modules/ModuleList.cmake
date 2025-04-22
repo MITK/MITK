@@ -31,6 +31,7 @@ set(MITK_MODULES
   ContourModel
   SurfaceInterpolation
   BoundingShape
+  Python
   Segmentation
   QtWidgets
   QtWidgetsExt
@@ -42,8 +43,6 @@ set(MITK_MODULES
   QtOverlays
   DICOMUI
   Remeshing
-  Python
-  QtPython
   Persistence
   RT
   RTUI

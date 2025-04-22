@@ -85,7 +85,9 @@ namespace mitk
 
     /// Provide values from 0.0 (black) to 1.0 (full color)
     void SetFeedbackContourColor(float r, float g, float b);
+    void SetFeedbackContourColor(const Color& color);
     void SetFeedbackContourColorDefault();
+    void SetFeedbackContourWidth(float width);
 
     void Deactivated() override;
 

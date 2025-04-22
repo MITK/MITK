@@ -17,9 +17,13 @@ found in the LICENSE file.
 #include "mitkGroupTagProperty.h"
 #include "mitkImage.h"
 #include "mitkNodePredicateBase.h"
+#include "mitkNodePredicateFunction.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkProperties.h"
 #include "mitkArbitraryTimeGeometry.h"
+
+#include <regex>
+#include <set>
 
 mitk::DataStorage::DataStorage() : itk::Object(), m_BlockNodeModifiedEvents(false)
 {
@@ -98,6 +102,64 @@ mitk::DataNode *mitk::DataStorage::GetNamedDerivedNode(const char *name,
     return rs->GetElement(0);
   else
     return nullptr;
+}
+
+std::string mitk::DataStorage::GetUniqueName(const std::string& baseName, const DataNode* sourceNode, bool onlyDirectDerivations) const
+{
+  if (sourceNode == nullptr)
+  {
+    if (this->GetNamedNode(baseName) == nullptr)
+      return baseName;
+  }
+  else
+  {
+    if (this->GetNamedDerivedNode(baseName.c_str(), sourceNode, onlyDirectDerivations))
+      return baseName;
+  }
+
+  const std::regex numberPattern("\\s(\\d+)$");
+  std::set<int> takenNumbers;
+
+  auto condition = mitk::NodePredicateFunction::New([&](const mitk::DataNode *node) {
+    const auto name = node->GetName();
+
+    if (name.rfind(baseName, 0) == 0)
+    {
+      std::string remainingName = name.substr(baseName.length());
+      std::smatch match;
+
+      if (std::regex_match(remainingName, match, numberPattern))
+      {
+        takenNumbers.insert(std::stoi(match[1].str()));
+        return true;
+      }
+    }
+
+    return false;
+  });
+
+  auto nodes = sourceNode != nullptr
+    ? this->GetDerivations(sourceNode, condition, onlyDirectDerivations)
+    : this->GetSubset(condition);
+
+  if (nodes->empty())
+    return baseName + " 2";
+
+  int nextNumber = 2;
+
+  for (int takenNumber : takenNumbers)
+  {
+    if (takenNumber == nextNumber)
+    {
+      ++nextNumber;
+    }
+    else if (takenNumber > nextNumber)
+    {
+      break;
+    }
+  }
+
+  return baseName + ' ' + std::to_string(nextNumber);
 }
 
 void mitk::DataStorage::PrintSelf(std::ostream &os, itk::Indent indent) const

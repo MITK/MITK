@@ -260,9 +260,8 @@ mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint(unsigned int index) const
   itkExceptionMacro(<< "GetWorldControlPoint(): Invalid plane geometry or index!");
 }
 
-const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetPolyLine(unsigned int index)
+mitk::PlanarFigure::PolyLineType& mitk::PlanarFigure::GetPolyLine(unsigned int index)
 {
-  mitk::PlanarFigure::PolyLineType polyLine;
   if (index > m_PolyLines.size() || !m_PolyLineUpToDate)
   {
     this->GeneratePolyLine();
@@ -272,7 +271,7 @@ const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetPolyLine(unsigned 
   return m_PolyLines.at(index);
 }
 
-const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetPolyLine(unsigned int index) const
+const mitk::PlanarFigure::PolyLineType& mitk::PlanarFigure::GetPolyLine(unsigned int index) const
 {
   return m_PolyLines.at(index);
 }
@@ -286,11 +285,10 @@ void mitk::PlanarFigure::ClearPolyLines()
   m_PolyLineUpToDate = false;
 }
 
-const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine(unsigned int index,
-                                                                             double mmPerDisplayUnit,
-                                                                             unsigned int displayHeight)
+const mitk::PlanarFigure::PolyLineType& mitk::PlanarFigure::GetHelperPolyLine(unsigned int index,
+                                                                              double mmPerDisplayUnit,
+                                                                              unsigned int displayHeight)
 {
-  mitk::PlanarFigure::PolyLineType helperPolyLine;
   if (index < m_HelperPolyLines.size())
   {
     // m_HelperLinesUpToDate does not cover changes in zoom-level, so we have to check previous values of the
@@ -304,11 +302,9 @@ const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine(uns
       m_DisplaySize.first = mmPerDisplayUnit;
       m_DisplaySize.second = displayHeight;
     }
-
-    helperPolyLine = m_HelperPolyLines.at(index);
   }
 
-  return helperPolyLine;
+  return m_HelperPolyLines.at(index);
 }
 
 void mitk::PlanarFigure::ClearHelperPolyLines()

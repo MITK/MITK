@@ -149,6 +149,7 @@ namespace mitk
       // scales
       vtkSmartPointer<vtkFloatArray> m_UnselectedScales;
       vtkSmartPointer<vtkFloatArray> m_SelectedScales;
+      vtkSmartPointer<vtkFloatArray> m_SelectedContourScales;
 
       // distances
       vtkSmartPointer<vtkFloatArray> m_DistancesBetweenPoints;
@@ -159,19 +160,23 @@ namespace mitk
       // glyph source (provides different shapes for the points)
       vtkSmartPointer<vtkGlyphSource2D> m_UnselectedGlyphSource2D;
       vtkSmartPointer<vtkGlyphSource2D> m_SelectedGlyphSource2D;
+      vtkSmartPointer<vtkGlyphSource2D> m_SelectedContourGlyphSource2D;
 
       // glyph
       vtkSmartPointer<vtkGlyph3D> m_UnselectedGlyph3D;
       vtkSmartPointer<vtkGlyph3D> m_SelectedGlyph3D;
+      vtkSmartPointer<vtkGlyph3D> m_SelectedContourGlyph3D;
 
       // polydata
       vtkSmartPointer<vtkPolyData> m_VtkUnselectedPointListPolyData;
       vtkSmartPointer<vtkPolyData> m_VtkSelectedPointListPolyData;
+      vtkSmartPointer<vtkPolyData> m_VtkSelectedContourPointListPolyData;
       vtkSmartPointer<vtkPolyData> m_VtkContourPolyData;
 
       // actor
       vtkSmartPointer<vtkActor> m_UnselectedActor;
       vtkSmartPointer<vtkActor> m_SelectedActor;
+      vtkSmartPointer<vtkActor> m_SelectedContourActor;
       vtkSmartPointer<vtkActor> m_ContourActor;
       vtkSmartPointer<vtkTextActor> m_VtkTextActor;
 
@@ -182,6 +187,7 @@ namespace mitk
       // mappers
       vtkSmartPointer<vtkPolyDataMapper> m_VtkUnselectedPolyDataMapper;
       vtkSmartPointer<vtkPolyDataMapper> m_VtkSelectedPolyDataMapper;
+      vtkSmartPointer<vtkPolyDataMapper> m_VtkSelectedContourPolyDataMapper;
       vtkSmartPointer<vtkPolyDataMapper> m_VtkContourPolyDataMapper;
 
       // propassembly
@@ -232,6 +238,9 @@ namespace mitk
     bool m_FillShape;             // "Pointset.2D.fill shape" property
     float m_DistanceToPlane;      // "Pointset.2D.distance to plane" property
     bool m_FixedSizeOnScreen;     // "Pointset.2D.fixed size on screen" property
+    int m_Resolution;             // "Pointset.2D.resolution" property
+    bool m_KeepShapeWhenSelected; // "Pointset.2D.keep shape when selected" property
+    bool m_ShowSelectedContour;   // "Pointset.2D.selected.show contour" property
   };
 
 } // namespace mitk

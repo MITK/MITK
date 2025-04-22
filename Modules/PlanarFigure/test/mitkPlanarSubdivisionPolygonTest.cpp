@@ -68,7 +68,7 @@ public:
     MITK_TEST_CONDITION(planarSubdivisionPolygon->IsClosed(), "Test if property 'closed' is set by default");
 
     // Test for number of polylines
-    const mitk::PlanarFigure::PolyLineType polyLine0 = planarSubdivisionPolygon->GetPolyLine(0);
+    const auto& polyLine0 = planarSubdivisionPolygon->GetPolyLine(0);
     auto iter = polyLine0.begin();
     MITK_TEST_CONDITION(planarSubdivisionPolygon->GetPolyLinesSize() == 1, "Number of polylines after placement");
 

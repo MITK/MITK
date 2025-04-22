@@ -234,8 +234,9 @@ namespace mitk
      * empty, the function call does nothing.
      * @param writeSliceToVolume If set to false the write operation (WriteSliceToVolume will be skipped)
      * and only the surface interpolation will be updated.
+     * @param allowUndo Indicates if undo/redo operations should be registered for the write operation
      * @pre workingNode must point to a valid instance and contain an image instance as data.*/
-    static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true);
+    static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true, bool allowUndo = true);
 
     /** Writes a provided slice into the passed working image. The content of working image that is covered
     * by the slice will be completely overwritten. If asked for it also generates the needed
@@ -254,6 +255,7 @@ namespace mitk
       PlanarFigure's Geometry
     */
     int AddContourmarker(const PlaneGeometry* planeGeometry, unsigned int sliceIndex);
+    void DisableContourMarkers();
 
     void InteractiveSegmentationBugMessage(const std::string &message) const;
 
@@ -281,7 +283,7 @@ namespace mitk
 
     // The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string m_Contourmarkername;
-
+    bool m_EnableContourMarkers = true;
     bool m_ShowMarkerNodes = false;
     static bool m_SurfaceInterpolationEnabled;
 

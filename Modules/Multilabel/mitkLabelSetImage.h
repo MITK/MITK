@@ -432,6 +432,13 @@ namespace mitk
       * \brief  */
       void UpdateCenterOfMass(PixelType pixelValue);
 
+    using BaseData::IsEmpty;
+
+    /** \brief Checks if a label is empty at a given time step (does not caintain any pixels).
+      */
+    bool IsEmpty(const Label* label, TimeStepType t = 0) const;
+    bool IsEmpty(PixelType pixelValue, TimeStepType t = 0) const;
+
     /**
      * @brief Initialize an empty mitk::LabelSetImage using the information
      *        of an mitk::Image
@@ -595,6 +602,25 @@ namespace mitk
     const mitk::LabelSetImage::ConstLabelVectorType& rightHandSide,
     ScalarType eps,
     bool verbose);
+
+  /**
+  * @brief Equal A function comparing two vectors of label values for being equal in data
+  *
+  * @ingroup MITKTestingAPI
+  *
+  * Following aspects are tested for equality:
+  *  - Label values in vector
+  *
+  * @param rightHandSide A vector of label values to be compared
+  * @param leftHandSide A vector of label values to be compared
+  * @param orderIsRelevant Indicating if only the presence of the same values
+  * in the vectors are relevant or also their ordering.Tolerance for comparison.
+  * @return true, if all subsequent comparisons are true, false otherwise
+  */
+  MITKMULTILABEL_EXPORT bool Equal(const mitk::LabelSetImage::LabelValueVectorType& leftHandSide,
+    const mitk::LabelSetImage::LabelValueVectorType& rightHandSide,
+    bool orderIsRelevant = false);
+
 
 
   /** temporary namespace that is used until the new class MultiLabelSegmentation is

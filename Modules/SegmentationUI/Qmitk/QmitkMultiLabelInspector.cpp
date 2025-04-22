@@ -226,20 +226,9 @@ void QmitkMultiLabelInspector::OnDataChanged(const QModelIndex& topLeft, const Q
     m_Controls->view->expand(topLeft);
 }
 
-bool EqualLabelSelections(const QmitkMultiLabelInspector::LabelValueVectorType& selection1, const QmitkMultiLabelInspector::LabelValueVectorType& selection2)
-{
-  if (selection1.size() == selection2.size())
-  {
-    // lambda to compare node pointer inside both lists
-    return std::is_permutation(selection1.begin(), selection1.end(), selection2.begin());
-  }
-
-  return false;
-}
-
 void QmitkMultiLabelInspector::SetSelectedLabels(const LabelValueVectorType& selectedLabels)
 {
-  if (EqualLabelSelections(this->GetSelectedLabels(), selectedLabels))
+  if (mitk::Equal(this->GetSelectedLabels(), selectedLabels))
   {
     return;
   }
@@ -1430,11 +1419,11 @@ void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) 
   if (currentLabel.IsNull())
     return;
 
-  const mitk::Point3D& pos = currentLabel->GetCenterOfMassCoordinates();
+  const auto pos = currentLabel->GetCenterOfMassIndex();
 
   if (pos.GetVnlVector().max_value() > 0.0)
   {
-    emit GoToLabel(currentLabel->GetValue(), pos);
+    emit GoToLabel(currentLabel->GetValue(), currentLabel->GetCenterOfMassCoordinates());
   }
 }
 

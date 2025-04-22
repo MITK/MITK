@@ -36,6 +36,9 @@ set(CPP_FILES
   Qmitk/QmitkMultiLabelTreeModel.cpp
   Qmitk/QmitkMultiLabelTreeView.cpp
   Qmitk/QmitkMultiLabelPresetHelper.cpp
+  Qmitk/QmitkMultiLabelSelectionButton.cpp
+  Qmitk/QmitkMultiLabelSelectionLabel.cpp
+  Qmitk/QmitkMultiLabelSelectionWidget.cpp
   Qmitk/QmitkLabelColorItemDelegate.cpp
   Qmitk/QmitkLabelToggleItemDelegate.cpp
   Qmitk/QmitkFindSegmentationTaskDialog.cpp
@@ -44,6 +47,7 @@ set(CPP_FILES
   Qmitk/QmitkMonaiLabelToolGUI.cpp
   Qmitk/QmitkMonaiLabel2DToolGUI.cpp
   Qmitk/QmitkMonaiLabel3DToolGUI.cpp
+  Qmitk/QmitknnInteractiveToolGUI.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.cpp
@@ -90,6 +94,9 @@ set(MOC_H_FILES
   Qmitk/QmitkSetupVirtualEnvUtil.h
   Qmitk/QmitkMultiLabelInspector.h
   Qmitk/QmitkMultiLabelManager.h
+  Qmitk/QmitkMultiLabelSelectionLabel.h
+  Qmitk/QmitkMultiLabelSelectionWidget.h
+  Qmitk/QmitkMultiLabelSelectionButton.h
   Qmitk/QmitkMultiLabelTreeModel.h
   Qmitk/QmitkMultiLabelTreeView.h
   Qmitk/QmitkLabelColorItemDelegate.h
@@ -100,6 +107,7 @@ set(MOC_H_FILES
   Qmitk/QmitkMonaiLabelToolGUI.h
   Qmitk/QmitkMonaiLabel2DToolGUI.h
   Qmitk/QmitkMonaiLabel3DToolGUI.h
+  Qmitk/QmitknnInteractiveToolGUI.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.h
@@ -120,10 +128,13 @@ set(UI_FILES
   Qmitk/QmitkTotalSegmentatorGUIControls.ui
   Qmitk/QmitkMultiLabelInspectorControls.ui
   Qmitk/QmitkMultiLabelManagerControls.ui
+  Qmitk/QmitkMultiLabelSelectionLabel.ui
+  Qmitk/QmitkMultiLabelSelectionWidget.ui
   Qmitk/QmitkFindSegmentationTaskDialog.ui
   Qmitk/QmitkSegmentAnythingGUIControls.ui
   Qmitk/QmitkMedSAMGUIControls.ui
   Qmitk/QmitkMonaiLabelToolGUIControls.ui
+  Qmitk/QmitknnInteractiveToolGUI.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
   SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui
@@ -132,5 +143,6 @@ set(UI_FILES
 )
 
 set(QRC_FILES
+  resources/nnInteractive/nnInteractive.qrc
   resources/SegmentationUI.qrc
 )

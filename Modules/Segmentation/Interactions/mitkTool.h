@@ -154,6 +154,14 @@ namespace mitk
     */
     virtual const char *GetGroup() const;
 
+    /**
+    \brief Returns whether this tool is eligible for auto-initialization by ToolManager.
+
+    Overload this method and return \c false to hide this tool from any ToolManager that does not explicitly
+    initialize this tool.
+    */
+    virtual bool IsEligibleForAutoInit() const;
+
     virtual void InitializeStateMachine();
 
     /**

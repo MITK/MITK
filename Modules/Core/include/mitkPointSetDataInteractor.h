@@ -80,6 +80,15 @@ namespace mitk
      */
     void SetMaxPoints(unsigned int maxNumber = 0);
 
+    void EnableMovement(bool enabled = true);
+    void EnableRemoval(bool enabled = true);
+
+    /**
+     * @brief Sets the boundaries within which points can be placed.
+     * @param geometry The geometry defining the allowed region.
+     */
+    void SetBounds(BaseGeometry* geometry);
+
   protected:
     PointSetDataInteractor();
     ~PointSetDataInteractor() override;
@@ -165,6 +174,8 @@ namespace mitk
      */
     virtual void Abort(StateMachineAction *, InteractionEvent *);
 
+    virtual void KeyDelete(StateMachineAction *, InteractionEvent *);
+
     /** \brief to calculate a direction vector from last point and actual
      * point
      */
@@ -177,6 +188,9 @@ namespace mitk
     PointSet::Pointer m_PointSet;
     int m_MaxNumberOfPoints;   // maximum of allowed number of points
     float m_SelectionAccuracy; // accuracy that's needed to select a point
+    bool m_IsMovementEnabled;
+    bool m_IsRemovalEnabled;
+    mitk::BaseGeometry::Pointer m_Bounds;
 
     // FUNCTIONS
     void UnselectAll(unsigned int timeStep, ScalarType timeInMs);

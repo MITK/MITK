@@ -65,6 +65,8 @@ namespace mitk
     void UpdateFeedbackColor();
     virtual void OnInvertLogic(StateMachineAction *, InteractionEvent *);
 
+    virtual int GetFillValue() const;
+
     /**
      * \todo This is a possible place where to introduce
      *       different types of pens
@@ -86,13 +88,11 @@ namespace mitk
     void OnToolManagerWorkingDataModified();
 
     bool m_FillMode;
-    static int m_Size;
+    int m_Size;
 
     ContourModel::Pointer m_MasterContour;
 
     int m_LastContourSize;
-
-    const int m_InternalFillValue = 255;
 
     Image::Pointer m_WorkingSlice;
     Image::Pointer m_PaintingSlice;

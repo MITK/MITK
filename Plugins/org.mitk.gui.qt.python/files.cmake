@@ -11,6 +11,10 @@ set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
 )
 
+set(UI_FILES
+  src/internal/QmitkPythonViewControls.ui
+)
+
 set(CPP_FILES )
 
 set(CACHED_RESOURCE_FILES

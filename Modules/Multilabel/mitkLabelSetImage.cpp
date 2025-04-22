@@ -548,7 +548,7 @@ void mitk::MultiLabelSegmentation::ClearGroupImage(GroupIndexType groupID, TimeS
   if (!this->ExistGroup(groupID))
     mitkThrow() << "Error, cannot clear group image. Group ID is invalid. Invalid ID: " << groupID;
 
-  if (!(this->GetTimeSteps()<=timestep))
+  if (timestep >= this->GetTimeSteps())
     mitkThrow() << "Error, cannot clear group image time step. Time step is invalid. Invalid time step: " << timestep;
 
   try
@@ -589,7 +589,7 @@ void mitk::MultiLabelSegmentation::ClearGroupImages()
 
 void mitk::MultiLabelSegmentation::ClearGroupImages(TimeStepType timestep)
 {
-  if (!(this->GetTimeSteps() <= timestep))
+  if (timestep >= this->GetTimeSteps())
     mitkThrow() << "Error, cannot clear group image time step. Time step is invalid. Invalid time step: " << timestep;
 
   for (GroupIndexType groupID = 0; groupID < m_LayerContainer.size(); ++groupID)

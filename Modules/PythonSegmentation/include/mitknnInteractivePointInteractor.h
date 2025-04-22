@@ -10,34 +10,34 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitknnInteractiveLassoInteractor_h
-#define mitknnInteractiveLassoInteractor_h
+#ifndef mitknnInteractivePointInteractor_h
+#define mitknnInteractivePointInteractor_h
 
 #include <mitknnInteractiveInteractor.h>
+#include <mitkPoint.h>
+
+#include <optional>
 
 namespace mitk::nnInteractive
 {
-  /** \brief %nnInteractive interactor for drawing contours.
+  /** \brief %nnInteractive interactor for placing individual points.
    *
-   * Contours are managed as a list of ContourModel data nodes, organized
-   * by PromptType. The most recently drawn contour is also available as a
-   * binary image mask.
+   * Points are managed in up to two PointSet data nodes, separated by
+   * prompt type.
    *
-   * Interaction is handled through the AddContourTool.
+   * Interaction is handled through the PointSetDataInteractor.
    */
-  class MITKSEGMENTATION_EXPORT LassoInteractor : public Interactor
+  class MITKPYTHONSEGMENTATION_EXPORT PointInteractor : public Interactor
   {
   public:
-    LassoInteractor();
-    ~LassoInteractor() override;
+    PointInteractor();
+    ~PointInteractor() override;
 
     bool HasInteractions() const override;
 
-    const Image* GetLastLassoMask() const;
+    std::optional<Point3D> GetLastPoint() const;
 
   private:
-    void OnSetToolManager() override;
-    void OnHandleEvent(InteractionEvent* event) override;
     void OnEnable() override;
     void OnDisable() override;
     void OnReset() override;

@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitknnInteractiveEnums_h
 
 #include <mitkColorProperty.h>
-#include <MitkSegmentationExports.h>
+#include <MitkPythonSegmentationExports.h>
 
 namespace mitk::nnInteractive
 {
@@ -41,11 +41,11 @@ namespace mitk::nnInteractive
 
   /** \brief Converts an InteractionType to a corresponding string representation.
    */
-  MITKSEGMENTATION_EXPORT const std::string& GetInteractionTypeAsString(InteractionType interactionType);
+  MITKPYTHONSEGMENTATION_EXPORT const std::string& GetInteractionTypeAsString(InteractionType interactionType);
 
   /** \brief Returns all possible interaction types.
    */
-  MITKSEGMENTATION_EXPORT const std::array<InteractionType, 4>& GetAllInteractionTypes();
+  MITKPYTHONSEGMENTATION_EXPORT const std::array<InteractionType, 4>& GetAllInteractionTypes();
 
   /** \brief Specifies the interaction modes for interactors.
    *
@@ -77,11 +77,11 @@ namespace mitk::nnInteractive
 
   /** \brief Converts a PromptType to a corresponding string representation.
    */
-  MITKSEGMENTATION_EXPORT const std::string& GetPromptTypeAsString(PromptType promptType);
+  MITKPYTHONSEGMENTATION_EXPORT const std::string& GetPromptTypeAsString(PromptType promptType);
 
   /** \brief Returns all possible prompt types.
    */
-  MITKSEGMENTATION_EXPORT const std::array<PromptType, 2>& GetAllPromptTypes();
+  MITKPYTHONSEGMENTATION_EXPORT const std::array<PromptType, 2>& GetAllPromptTypes();
 
   /** \brief Specifies the computation backends available for %nnInteractive.
    *
@@ -101,11 +101,11 @@ namespace mitk::nnInteractive
 
   /** \brief Converts a Backend type to a corresponding string representation.
    */
-  MITKSEGMENTATION_EXPORT const std::string& GetBackendAsString(Backend backend);
+  MITKPYTHONSEGMENTATION_EXPORT const std::string& GetBackendAsString(Backend backend);
 
   /** \brief Returns all possible backend types.
    */
-  MITKSEGMENTATION_EXPORT const std::array<Backend, 2>& GetAllBackends();
+  MITKPYTHONSEGMENTATION_EXPORT const std::array<Backend, 2>& GetAllBackends();
 
   /** \brief Specifies the intensity of the colors used in an interaction.
    *
@@ -122,7 +122,7 @@ namespace mitk::nnInteractive
    * Use this function for color lookup to ensure a coherent color scheme across
    * different interactors.
    */
-  MITKSEGMENTATION_EXPORT const Color& GetColor(PromptType promptType, ColorIntensity colorIntensity);
+  MITKPYTHONSEGMENTATION_EXPORT const Color& GetColor(PromptType promptType, ColorIntensity colorIntensity);
 }
 
 #endif

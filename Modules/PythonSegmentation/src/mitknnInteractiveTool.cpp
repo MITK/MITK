@@ -28,7 +28,7 @@ using namespace mitk::nnInteractive;
 
 namespace mitk
 {
-  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive")
+  MITK_TOOL_MACRO(MITKPYTHONSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive")
 
   class nnInteractiveTool::Impl
   {
@@ -154,9 +154,9 @@ const char** mitk::nnInteractiveTool::GetXPM() const
 
 us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
 {
-  auto module = us::GetModuleContext()->GetModule();
-  auto resource = module->GetResource("AI.svg");
-  return resource;
+  auto segmentationModule = us::GetModuleContext()->GetModule("MitkSegmentation");
+  auto iconResource = segmentationModule->GetResource("AI.svg");
+  return iconResource;
 }
 
 bool mitk::nnInteractiveTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const

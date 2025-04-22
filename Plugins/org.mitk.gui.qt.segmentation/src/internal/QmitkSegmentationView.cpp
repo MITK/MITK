@@ -57,6 +57,12 @@ found in the LICENSE file.
 
 #include <regex>
 
+#include <mitkSegmentationPluginConfig.h>
+
+#if MITK_HAS_PYTHON
+  #include <mitkPythonSegmentationUI.h>
+#endif
+
 namespace
 {
   QList<QmitkRenderWindow*> Get2DWindows(const QList<QmitkRenderWindow*> allWindows)
@@ -88,6 +94,10 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_DefaultLabelNaming(true)
   , m_SelectionChangeIsAlreadyBeingHandled(false)
 {
+#if MITK_HAS_PYTHON
+  mitk::PythonSegmentationUI::EnforceLinkage();
+#endif
+
   m_SegmentationPredicate = mitk::GetMultiLabelSegmentationPredicate();
 
   m_ReferencePredicate = mitk::GetSegmentationReferenceImagePredicate();

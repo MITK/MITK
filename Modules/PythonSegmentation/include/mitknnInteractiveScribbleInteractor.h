@@ -15,6 +15,11 @@ found in the LICENSE file.
 
 #include <mitknnInteractiveInteractor.h>
 
+namespace mitk
+{
+  class Image;
+}
+
 namespace mitk::nnInteractive
 {
   /** \brief %nnInteractive interactor for freehand brushstrokes.
@@ -24,7 +29,7 @@ namespace mitk::nnInteractive
    *
    * Interaction is handled through the DrawPaintbrushTool.
    */
-  class MITKSEGMENTATION_EXPORT ScribbleInteractor : public Interactor
+  class MITKPYTHONSEGMENTATION_EXPORT ScribbleInteractor : public Interactor
   {
   public:
     ScribbleInteractor();

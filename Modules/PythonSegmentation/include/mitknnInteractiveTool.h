@@ -25,7 +25,7 @@ namespace mitk::nnInteractive
 
 namespace mitk
 {
-  class MITKSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
+  class MITKPYTHONSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
   {
   public:
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool)

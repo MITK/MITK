@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <QButtonGroup>
 #include <QMessageBox>
 
-MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
+MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
 
 namespace
 {

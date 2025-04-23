@@ -570,9 +570,10 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
   const auto inputImage = this->GetSegmentationInput();
   auto previewImage = this->GetPreviewSegmentation();
   int progress_steps = 200;
-
-  const auto workingImage = dynamic_cast<const Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
   this->EnsureUpToDateUserDefinedActiveLabel();
+
+  const auto workingSegmentation = this->GetTargetSegmentation();
+  const auto workingImage = workingSegmentation->GetGroupImage(workingSegmentation->GetActiveLayer());
 
   this->CurrentlyBusy.Send(true);
   m_IsUpdating = true;

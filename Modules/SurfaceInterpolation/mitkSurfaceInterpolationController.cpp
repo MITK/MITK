@@ -317,9 +317,14 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
 
     const auto currentTimeStep = contourInfo.TimeStep;
     const auto currentLabel = contourInfo.LabelValue;
-    auto& cpiCache = cpiMap.at(selectedSegmentation).at(currentLabel).at(currentTimeStep);
+    const auto findingSeg = cpiMap.find(selectedSegmentation);
+    if (findingSeg == cpiMap.end()) return false;
+    const auto findingLabel = findingSeg->second.find(currentLabel);
+    if (findingLabel == findingSeg->second.end()) return false;
+    const auto findingTS = findingLabel->second.find(currentTimeStep);
+    if (findingTS == findingLabel->second.end()) return false;
+    auto& cpiCache = findingTS->second;
     auto it = cpiCache.cpis.begin();
-
 
     while (it != cpiCache.cpis.end())
     {

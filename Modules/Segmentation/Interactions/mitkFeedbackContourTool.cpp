@@ -220,7 +220,7 @@ mitk::ContourModel::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DS
 }
 
 mitk::Image::Pointer mitk::FeedbackContourTool::GenerateSliceWithContourUpdate(const MultiLabelSegmentation* workingSeg, const PlaneGeometry* sliceGeometry,
-  const ContourModel* contour, MultiLabelSegmentation::LabelValueType labelValue, TimePointType timePoint)
+  const ContourModel* contour, MultiLabelSegmentation::LabelValueType labelValue, TimePointType timePoint, bool addMode)
 {
 
   if (!workingSeg || !sliceGeometry)
@@ -238,6 +238,8 @@ mitk::Image::Pointer mitk::FeedbackContourTool::GenerateSliceWithContourUpdate(c
   const auto groupImage = workingSeg->GetGroupImage(groupIndex);
   auto resultSlice = this->GetAffectedImageSliceAs2DImageByTimePoint(sliceGeometry, groupImage, timePoint)->Clone();
 
+  const auto activeLabelValue = addMode ? labelValue : MultiLabelSegmentation::UNLABELED_VALUE;
+
   if (resultSlice.IsNull())
   {
     MITK_ERROR << "Unable to extract slice." << std::endl;
@@ -254,7 +256,7 @@ mitk::Image::Pointer mitk::FeedbackContourTool::GenerateSliceWithContourUpdate(c
 
   Image::Pointer adaptedSlice = resultSlice->Clone();
 
-  ContourModelUtils::FillContourInSlice2(projectedContour, contourTimeStep, adaptedSlice, labelValue);
+  ContourModelUtils::FillContourInSlice2(projectedContour, contourTimeStep, adaptedSlice, activeLabelValue);
   TransferLabelContentAtTimeStep(adaptedSlice.GetPointer(), resultSlice.GetPointer(),
     workingSeg->GetConstLabelsByValue(workingSeg->GetLabelValuesByGroup(groupIndex)),
     0, MultiLabelSegmentation::UNLABELED_VALUE,MultiLabelSegmentation::UNLABELED_VALUE,
@@ -263,7 +265,7 @@ mitk::Image::Pointer mitk::FeedbackContourTool::GenerateSliceWithContourUpdate(c
   return resultSlice;
 }
 
-void mitk::FeedbackContourTool::WriteBackFeedbackContourAsSegmentationResult(const InteractionPositionEvent* positionEvent, int paintingPixelValue, bool setInvisibleAfterSuccess)
+void mitk::FeedbackContourTool::WriteBackFeedbackContourAsSegmentationResult(const InteractionPositionEvent* positionEvent, MultiLabelSegmentation::LabelValueType labelValue, bool addMode, bool setInvisibleAfterSuccess)
 {
   if (!positionEvent)
     return;
@@ -277,9 +279,7 @@ void mitk::FeedbackContourTool::WriteBackFeedbackContourAsSegmentationResult(con
   const auto feedbackContour = FeedbackContourTool::GetFeedbackContour();
   auto contourTimePoint = positionEvent->GetSender()->GetTime();
 
-  auto activePixelValue = workingSeg->GetActiveLabel()->GetValue();
-
-  auto slice = this->GenerateSliceWithContourUpdate(workingSeg, planeGeometry, feedbackContour, paintingPixelValue * activePixelValue, contourTimePoint);
+  auto slice = this->GenerateSliceWithContourUpdate(workingSeg, planeGeometry, feedbackContour, labelValue, contourTimePoint, addMode);
 
   if (slice.IsNull())
   {

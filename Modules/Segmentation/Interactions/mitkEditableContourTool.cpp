@@ -67,13 +67,7 @@ void mitk::EditableContourTool::ConfirmSegmentation(bool resetStatMachine)
     if (nullptr == contour || contour->IsEmpty())
       return;
 
-    auto activePixelValue = workingSeg->GetActiveLabel()->GetValue();
-    if (!m_AddMode)
-    {
-      activePixelValue = 0;
-    }
-
-    auto slice = this->GenerateSliceWithContourUpdate(workingSeg, m_PlaneGeometry, contour, activePixelValue, currentTimePoint);
+    auto slice = this->GenerateSliceWithContourUpdate(workingSeg, m_PlaneGeometry, contour, workingSeg->GetActiveLabel()->GetValue(), currentTimePoint, m_AddMode);
     sliceInfos.emplace_back(slice, m_PlaneGeometry, workingImageTimeStep);
 
     this->WriteBackSegmentationResults(sliceInfos);

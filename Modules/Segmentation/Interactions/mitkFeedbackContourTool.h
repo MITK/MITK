@@ -116,11 +116,23 @@ namespace mitk
      * 2. Gets the affacted working slice of the time point specified by positionEvent.
      * 3. projects the contour onto the working slice and then fills it with the passed paintingPixelValue (adjusted by the current active label value)
      * to the slice.
-     * 4. writes the slice back into the working image using SegTool2D::WriteBackSegmentationResult().*/
-    void WriteBackFeedbackContourAsSegmentationResult(const InteractionPositionEvent* positionEvent, int paintingPixelValue, bool setInvisibleAfterSuccess = true);
+     * 4. writes the slice back into the working image using SegTool2D::WriteBackSegmentationResult().
+     * @param labelValue The value of the label that should be updated.
+     * @param setInvisibleAfterSuccess Indicates if the feedback contour should be set invisible after the update of the seg result.
+     * @param addMode If false is passed the content of the contour will be set to background (thus label will be erased).
+     * if set to true, the label will be added to the slice in the provided contour.*/
+    void WriteBackFeedbackContourAsSegmentationResult(const InteractionPositionEvent* positionEvent, MultiLabelSegmentation::LabelValueType labelValue, bool addMode, bool setInvisibleAfterSuccess = true);
 
+    /** Helper methods that generates an updated slice image.
+     * @param seg Pointer to the segmentation that should be the template for the updated slice (slice will be extracted from the segmentation.
+     * @param sliceGeoemtry Pointer to the slice geometry that defines the slice that should be extracted and updated.
+     * @param contour Pointer to the contour that should be updated in the slice.
+     * @param labelValue The value of the label that should be updated.
+     * @param timePoint The time point that should be used for slice extraction and update.
+     * @param addMode If false is passed the content of the contour will be set to background (thus label will be erased).
+     * if set to true, the label will be added to the slice in the provided contour.*/
     mitk::Image::Pointer GenerateSliceWithContourUpdate(const MultiLabelSegmentation* seg, const PlaneGeometry* sliceGeometry,
-      const ContourModel* contour, MultiLabelSegmentation::LabelValueType labelValue, TimePointType timePoint);
+      const ContourModel* contour, MultiLabelSegmentation::LabelValueType labelValue, TimePointType timePoint, bool addMode);
 
   private:
     ContourModel::Pointer m_FeedbackContour;

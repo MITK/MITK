@@ -61,7 +61,6 @@ mitk::Image::Pointer mask;
 mitk::Image::Pointer aifImage;
 mitk::Image::Pointer aifMask;
 
-bool useConstraints(true);
 bool verbose(false);
 bool roibased(false);
 bool preview(false);
@@ -216,10 +215,7 @@ mitk::ModelFitFunctorBase::Pointer createDefaultFitFunctor(
         mitk::NormalizedSumOfSquaredDifferencesFitCostFunction::New();
     fitFunctor->RegisterEvaluationParameter("Chi^2", chi2);
 
-    if (useConstraints)
-    {
-      fitFunctor->SetConstraintChecker(modelFactory->CreateDefaultConstraints().GetPointer());
-    }
+    fitFunctor->SetConstraintChecker(modelFactory->CreateDefaultConstraints().GetPointer());
 
     mitk::ModelBase::Pointer refModel = parameterizer->GenerateParameterizedModel();
 

@@ -384,16 +384,7 @@ void ModelFitInspectorView::OnInputChanged(const QList<mitk::DataNode::Pointer>&
       m_selectedNodeTime.Modified();
       OnFitSelectionChanged(0);
       RefreshPlotData();
-      m_ErrorOverlay->setVisible(m_RefreshPlotDataErrorOccured);
-      if (m_RefreshPlotDataErrorOccured)
-      {
-        m_ErrorOverlay->SetOverlayText(m_LastRefreshPlotDataErrorString);
-      }
-      else
-      {
-        RenderPlot();
-        m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
-      }
+      RenderPlot();
 
       m_Controls.fitParametersWidget->setFits(QmitkFitParameterModel::FitVectorType());
     }
@@ -510,16 +501,7 @@ void ModelFitInspectorView::OnSliceChanged()
 
     if (RefreshPlotData())
     {
-      m_ErrorOverlay->setVisible(m_RefreshPlotDataErrorOccured);
-      if (m_RefreshPlotDataErrorOccured)
-      {
-        m_ErrorOverlay->SetOverlayText(m_LastRefreshPlotDataErrorString);
-      }
-      else
-      {
-        RenderPlot();
-        m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
-      }
+      RenderPlot();
       RenderFitInfo();
     }
   }
@@ -532,16 +514,7 @@ void ModelFitInspectorView::OnPositionBookmarksChanged()
 
     if (RefreshPlotData())
     {
-      m_ErrorOverlay->setVisible(m_RefreshPlotDataErrorOccured);
-      if (m_RefreshPlotDataErrorOccured)
-      {
-        m_ErrorOverlay->SetOverlayText(m_LastRefreshPlotDataErrorString);
-      }
-      else
-      {
-        RenderPlot();
-        m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
-      }
+      RenderPlot();
       RenderFitInfo();
     }
 }
@@ -852,102 +825,111 @@ void ModelFitInspectorView::RenderPlotCurve(const mitk::PlotDataCurveCollection*
 
 void ModelFitInspectorView::RenderPlot()
 {
-  m_Controls.widgetPlot->Clear();
-
-  std::string xAxis = DEFAULT_X_AXIS;
-  std::string yAxis = "Intensity";
-  std::string plotTitle = "Raw data plot: no data";
-  QColor legendTextColor = Qt::gray;
-
-  if (m_currentSelectedNode.IsNotNull())
+  m_ErrorOverlay->setVisible(m_RefreshPlotDataErrorOccured);
+  if (m_RefreshPlotDataErrorOccured)
   {
-    plotTitle = "Raw data plot: " + m_currentSelectedNode->GetName();
+    m_ErrorOverlay->SetOverlayText(m_LastRefreshPlotDataErrorString);
   }
-
-  if (m_currentFit.IsNotNull())
+  else
   {
-    plotTitle = m_currentFit->modelName.c_str();
-    xAxis = m_currentFit->xAxisName;
+    m_Controls.widgetPlot->Clear();
 
-    if (!m_currentFit->xAxisUnit.empty())
+    std::string xAxis = DEFAULT_X_AXIS;
+    std::string yAxis = "Intensity";
+    std::string plotTitle = "Raw data plot: no data";
+    QColor legendTextColor = Qt::gray;
+
+    if (m_currentSelectedNode.IsNotNull())
     {
-      xAxis += " [" + m_currentFit->xAxisUnit + "]";
+      plotTitle = "Raw data plot: " + m_currentSelectedNode->GetName();
     }
 
-    yAxis = m_currentFit->yAxisName;
-
-    if (!m_currentFit->yAxisUnit.empty())
+    if (m_currentFit.IsNotNull())
     {
-      yAxis += " [" + m_currentFit->yAxisUnit + "]";
+      plotTitle = m_currentFit->modelName.c_str();
+      xAxis = m_currentFit->xAxisName;
+
+      if (!m_currentFit->xAxisUnit.empty())
+      {
+        xAxis += " [" + m_currentFit->xAxisUnit + "]";
+      }
+
+      yAxis = m_currentFit->yAxisName;
+
+      if (!m_currentFit->yAxisUnit.empty())
+      {
+        yAxis += " [" + m_currentFit->yAxisUnit + "]";
+      }
     }
-  }
 
-  m_Controls.widgetPlot->SetAxisTitle(QwtPlot::xBottom, xAxis.c_str());
-  m_Controls.widgetPlot->SetAxisTitle(QwtPlot::yLeft, yAxis.c_str());
-  m_Controls.widgetPlot->SetPlotTitle(plotTitle.c_str());
+    m_Controls.widgetPlot->SetAxisTitle(QwtPlot::xBottom, xAxis.c_str());
+    m_Controls.widgetPlot->SetAxisTitle(QwtPlot::yLeft, yAxis.c_str());
+    m_Controls.widgetPlot->SetPlotTitle(plotTitle.c_str());
 
-  // Draw static curves
-  unsigned int colorIndex = 0;
+    // Draw static curves
+    unsigned int colorIndex = 0;
 
-  for (mitk::PlotDataCurveCollection::const_iterator pos = m_PlotCurves.staticPlots->begin();
-       pos != m_PlotCurves.staticPlots->end(); ++pos)
-  {
-    QColor dataColor;
-    unsigned int curveId = m_Controls.widgetPlot->InsertCurve(pos->first.c_str());
-    m_Controls.widgetPlot->SetCurveData(curveId, pos->second->GetValues());
-
-    if (pos->first == "ROI")
+    for (mitk::PlotDataCurveCollection::const_iterator pos = m_PlotCurves.staticPlots->begin();
+         pos != m_PlotCurves.staticPlots->end(); ++pos)
     {
-      dataColor = QColor(0, 190, 0);
-      QPen pen;
-      pen.setColor(dataColor);
-      pen.setStyle(Qt::SolidLine);
-      m_Controls.widgetPlot->SetCurvePen(curveId, pen);
+      QColor dataColor;
+      unsigned int curveId = m_Controls.widgetPlot->InsertCurve(pos->first.c_str());
+      m_Controls.widgetPlot->SetCurveData(curveId, pos->second->GetValues());
+
+      if (pos->first == "ROI")
+      {
+        dataColor = QColor(0, 190, 0);
+        QPen pen;
+        pen.setColor(dataColor);
+        pen.setStyle(Qt::SolidLine);
+        m_Controls.widgetPlot->SetCurvePen(curveId, pen);
+      }
+      else
+      {
+        //Use HSV schema of QColor to calculate a different color depending on the
+        //number of already existing curves.
+        dataColor.setHsv((++colorIndex * 85) % 360, 255, 150);
+        m_Controls.widgetPlot->SetCurvePen(curveId, QPen(Qt::NoPen));
+      }
+
+      // QwtSymbol needs to passed as a real pointer from MITK v2013.09.0 on
+      // (QwtPlotCurve deletes it on destruction and assignment).
+      QwtSymbol* dataSymbol = new QwtSymbol(QwtSymbol::Triangle, dataColor, dataColor,
+                                            QSize(8, 8));
+      m_Controls.widgetPlot->SetCurveSymbol(curveId, dataSymbol);
+
+      // Again, there is no way to set a curve's legend attributes via QmitkPlotWidget so this
+      // gets unnecessarily complicated.
+      QwtPlotCurve* measurementCurve = dynamic_cast<QwtPlotCurve*>(m_Controls.widgetPlot->
+                                       GetPlot()->itemList(QwtPlotItem::Rtti_PlotCurve).back());
+      measurementCurve->setLegendAttribute(QwtPlotCurve::LegendShowSymbol);
+      measurementCurve->setLegendIconSize(QSize(8, 8));
+      QwtText legendText = measurementCurve->title();
+      legendText.setColor(legendTextColor);
+      measurementCurve->setTitle(legendText);
     }
-    else
+
+    // Draw positional curves
+    for (const auto& posIter : this->m_PlotCurves.positionalPlots)
     {
-      //Use HSV schema of QColor to calculate a different color depending on the
-      //number of already existing curves.
+      QColor dataColor;
       dataColor.setHsv((++colorIndex * 85) % 360, 255, 150);
-      m_Controls.widgetPlot->SetCurvePen(curveId, QPen(Qt::NoPen));
+
+      this->RenderPlotCurve(posIter.second.second, dataColor, dataColor, " @ "+mitk::ModelFitPlotData::GetPositionalCollectionName(posIter), legendTextColor);
     }
 
-    // QwtSymbol needs to passed as a real pointer from MITK v2013.09.0 on
-    // (QwtPlotCurve deletes it on destruction and assignment).
-    QwtSymbol* dataSymbol = new QwtSymbol(QwtSymbol::Triangle, dataColor, dataColor,
-                                          QSize(8, 8));
-    m_Controls.widgetPlot->SetCurveSymbol(curveId, dataSymbol);
+    // Draw current pos curve
+    this->RenderPlotCurve(m_PlotCurves.currentPositionPlots, QColor(Qt::red), QColor(Qt::gray), "", legendTextColor);
+    QwtLegend* legend = new QwtLegend();
+    legend->setFrameShape(QFrame::Box);
+    legend->setFrameShadow(QFrame::Sunken);
+    legend->setLineWidth(1);
+    m_Controls.widgetPlot->SetLegend(legend, QwtPlot::BottomLegend);
 
-    // Again, there is no way to set a curve's legend attributes via QmitkPlotWidget so this
-    // gets unnecessarily complicated.
-    QwtPlotCurve* measurementCurve = dynamic_cast<QwtPlotCurve*>(m_Controls.widgetPlot->
-                                     GetPlot()->itemList(QwtPlotItem::Rtti_PlotCurve).back());
-    measurementCurve->setLegendAttribute(QwtPlotCurve::LegendShowSymbol);
-    measurementCurve->setLegendIconSize(QSize(8, 8));
-    QwtText legendText = measurementCurve->title();
-    legendText.setColor(legendTextColor);
-    measurementCurve->setTitle(legendText);
+
+    m_Controls.widgetPlot->Replot();
+    m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
   }
-
-  // Draw positional curves
-  for (const auto& posIter : this->m_PlotCurves.positionalPlots)
-  {
-    QColor dataColor;
-    dataColor.setHsv((++colorIndex * 85) % 360, 255, 150);
-
-    this->RenderPlotCurve(posIter.second.second, dataColor, dataColor, " @ "+mitk::ModelFitPlotData::GetPositionalCollectionName(posIter), legendTextColor);
-  }
-
-  // Draw current pos curve
-  this->RenderPlotCurve(m_PlotCurves.currentPositionPlots, QColor(Qt::red), QColor(Qt::gray), "", legendTextColor);
-  QwtLegend* legend = new QwtLegend();
-  legend->setFrameShape(QFrame::Box);
-  legend->setFrameShadow(QFrame::Sunken);
-  legend->setLineWidth(1);
-  m_Controls.widgetPlot->SetLegend(legend, QwtPlot::BottomLegend);
-
-
-  m_Controls.widgetPlot->Replot();
 }
 
 void ModelFitInspectorView::EnsureBookmarkPointSet()

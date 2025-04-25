@@ -99,12 +99,12 @@ QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
 {
 }
 
-void QmitkRenderWindowUtilityWidget::SetSynchGroup(const int index)
+void QmitkRenderWindowUtilityWidget::SetSynchGroup(const GroupSyncIndexType index)
 {
   m_SynchGroupSelector->setCurrentIndex(index);
 }
 
-int QmitkRenderWindowUtilityWidget::GetSynchGroup() const
+QmitkRenderWindowUtilityWidget::GroupSyncIndexType QmitkRenderWindowUtilityWidget::GetSynchGroup() const
 {
   return m_SynchGroupSelector->currentIndex();
 }
@@ -202,7 +202,7 @@ QmitkSynchronizedNodeSelectionWidget* QmitkRenderWindowUtilityWidget::GetNodeSel
   return m_NodeSelectionWidget;
 }
 
-void QmitkRenderWindowUtilityWidget::OnSynchGroupAdded(const int index)
+void QmitkRenderWindowUtilityWidget::OnSynchGroupAdded(const GroupSyncIndexType index)
 {
   if (index == m_SynchGroupSelector->count() - 1)
   {

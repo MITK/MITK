@@ -542,7 +542,7 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
         viewPlane = mitk::AnatomicalPlane::Sagittal;
       }
 
-      const int synchGroup = object["synchGroup"].get<const int>();
+      const GroupSyncIndexType synchGroup = object["synchGroup"].get<const GroupSyncIndexType>();
 
       // repurpose existing render windows as far as they already exist
       auto window = GetWindowFromIndex(*windowCounter);
@@ -644,9 +644,9 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup()
   emit SynchGroupAdded(m_SynchronizedWidgetConnectors.size() - 1);
 }
 
-void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const int index)
+void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index)
 {
-  while (index >= static_cast<int>(m_SynchronizedWidgetConnectors.size()))
+  while (index >= static_cast<GroupSyncIndexType>(m_SynchronizedWidgetConnectors.size()))
   {
     this->AddSynchronizationGroup();
   }

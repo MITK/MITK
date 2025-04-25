@@ -94,6 +94,8 @@ public:
   void EnableCrosshair();
   void DisableCrosshair();
 
+  using GroupSyncIndexType = int;
+
 public Q_SLOTS:
 
   // mouse events
@@ -110,7 +112,7 @@ Q_SIGNALS:
   void Moved();
   void UpdateUtilityWidgetViewPlanes();
   void LayoutChanged();
-  void SynchGroupAdded(const int index);
+  void SynchGroupAdded(const GroupSyncIndexType index);
 
 private:
 
@@ -120,7 +122,7 @@ private:
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer GetWindowFromIndex(size_t index);
   void AddSynchronizationGroup();
-  void SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const int index);
+  void SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index);
 
   static nlohmann::json BuildJSONFromLayout(const QSplitter* splitter);
   QSplitter* BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);

@@ -518,7 +518,7 @@ void QmitkSynchronizedNodeSelectionWidget::SelectAll()
   this->HandleChangeOfInternalSelection(currentSelection);
 }
 
-void QmitkSynchronizedNodeSelectionWidget::SetSynchGroup(const int index)
+void QmitkSynchronizedNodeSelectionWidget::SetSynchGroup(const GroupSyncIndexType index)
 {
   auto baseRenderer = m_BaseRenderer.Lock();
   if (baseRenderer.IsNull())
@@ -535,7 +535,7 @@ void QmitkSynchronizedNodeSelectionWidget::SetSynchGroup(const int index)
   mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
 }
 
-int QmitkSynchronizedNodeSelectionWidget::GetSynchGroup() const
+QmitkSynchronizedNodeSelectionWidget::GroupSyncIndexType QmitkSynchronizedNodeSelectionWidget::GetSynchGroup() const
 {
   return m_SynchGroupIndex;
 }

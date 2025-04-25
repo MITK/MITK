@@ -548,7 +548,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   // ... of widget 1
   mitk::BaseRenderer* renderer1 = mitk::BaseRenderer::GetInstance(GetRenderWindow1()->renderWindow());
   m_PlaneNode1 = renderer1->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode1->SetProperty("visible", mitk::BoolProperty::New(true));
+  m_PlaneNode1->SetProperty("visible", mitk::BoolProperty::New(false));
   m_PlaneNode1->SetProperty("name", mitk::StringProperty::New(std::string(renderer1->GetName()) + ".plane"));
   m_PlaneNode1->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode1->SetProperty("helper object", mitk::BoolProperty::New(true));
@@ -558,7 +558,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   // ... of widget 2
   mitk::BaseRenderer* renderer2 = mitk::BaseRenderer::GetInstance(GetRenderWindow2()->renderWindow());
   m_PlaneNode2 = renderer2->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode2->SetProperty("visible", mitk::BoolProperty::New(true));
+  m_PlaneNode2->SetProperty("visible", mitk::BoolProperty::New(false));
   m_PlaneNode2->SetProperty("name", mitk::StringProperty::New(std::string(renderer2->GetName()) + ".plane"));
   m_PlaneNode2->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode2->SetProperty("helper object", mitk::BoolProperty::New(true));
@@ -568,7 +568,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   // ... of widget 3
   mitk::BaseRenderer *renderer3 = mitk::BaseRenderer::GetInstance(GetRenderWindow3()->renderWindow());
   m_PlaneNode3 = renderer3->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode3->SetProperty("visible", mitk::BoolProperty::New(true));
+  m_PlaneNode3->SetProperty("visible", mitk::BoolProperty::New(false));
   m_PlaneNode3->SetProperty("name", mitk::StringProperty::New(std::string(renderer3->GetName()) + ".plane"));
   m_PlaneNode3->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode3->SetProperty("helper object", mitk::BoolProperty::New(true));
@@ -578,6 +578,15 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   m_ParentNodeForGeometryPlanes = mitk::DataNode::New();
   m_ParentNodeForGeometryPlanes->SetProperty("name", mitk::StringProperty::New("Widgets"));
   m_ParentNodeForGeometryPlanes->SetProperty("helper object", mitk::BoolProperty::New(true));
+
+  mitk::BaseRenderer* renderer4 = mitk::BaseRenderer::GetInstance(GetRenderWindow4()->renderWindow());
+  for (auto&& renderer : { renderer1, renderer2, renderer3, renderer4 })
+  {
+    for (auto&& planeNode : { m_PlaneNode1, m_PlaneNode2, m_PlaneNode3 })
+    {
+      planeNode->SetBoolProperty("visible", true, renderer);
+    }
+  }
 }
 
 void QmitkStdMultiWidget::EnsureDisplayContainsPoint(mitk::BaseRenderer *renderer, const mitk::Point3D &p)

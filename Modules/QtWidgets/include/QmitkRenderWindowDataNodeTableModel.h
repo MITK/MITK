@@ -42,8 +42,8 @@ public:
   void UpdateModelData();
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
-  void AddRenderer(mitk::BaseRenderer* baseRenderer);
-  void RemoveRenderer(mitk::BaseRenderer* baseRenderer);
+  void SetCurrentRenderer(mitk::BaseRenderer* baseRenderer);
+  mitk::BaseRenderer::Pointer GetCurrentRenderer() const;
 
   using NodeList = QList<mitk::DataNode::Pointer>;
   void SetCurrentSelection(NodeList selectedNodes);
@@ -75,7 +75,7 @@ Q_SIGNALS:
 private:
 
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
-  std::vector<mitk::WeakPointer<mitk::BaseRenderer>> m_BaseRenderers;
+  mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
   NodeList m_CurrentSelection;
 
   QIcon m_VisibleIcon;

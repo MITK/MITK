@@ -40,11 +40,7 @@ QmitkRenderWindowDataNodeTableModel::QmitkRenderWindowDataNodeTableModel(QObject
 
 void QmitkRenderWindowDataNodeTableModel::UpdateModelData()
 {
-  if (m_BaseRenderers.size() == 0)
-    return;
-
-  // The node properties are the same for all connected renderers, so we just take the first one
-  auto baseRenderer = m_BaseRenderers.at(0).Lock();
+  auto baseRenderer = m_BaseRenderer.Lock();
 
   auto greaterThan = [&baseRenderer](const mitk::DataNode* dataNodeLeft, const mitk::DataNode* dataNodeRight)
   {
@@ -75,31 +71,23 @@ void QmitkRenderWindowDataNodeTableModel::SetDataStorage(mitk::DataStorage* data
   m_RenderWindowLayerController->SetDataStorage(dataStorage);
 }
 
-void QmitkRenderWindowDataNodeTableModel::AddRenderer(mitk::BaseRenderer* baseRenderer)
+void QmitkRenderWindowDataNodeTableModel::SetCurrentRenderer(mitk::BaseRenderer* baseRenderer)
 {
-  if (baseRenderer == nullptr)
-    return;
-
-  auto it = std::find(m_BaseRenderers.begin(), m_BaseRenderers.end(), baseRenderer);
-  if (it != m_BaseRenderers.end())
+  if (m_BaseRenderer == baseRenderer)
   {
-    // base renderer is already added
+    // resetting the same base renderer does nothing
     return;
   }
 
-  m_BaseRenderers.push_back(baseRenderer);
+  m_BaseRenderer = baseRenderer;
 
   // update the model, since a new base renderer could have set the relevant node-properties differently
   this->UpdateModelData();
 }
 
-void QmitkRenderWindowDataNodeTableModel::RemoveRenderer(mitk::BaseRenderer* baseRenderer)
+mitk::BaseRenderer::Pointer QmitkRenderWindowDataNodeTableModel::GetCurrentRenderer() const
 {
-  auto it = std::find(m_BaseRenderers.begin(), m_BaseRenderers.end(), baseRenderer);
-  if (it != m_BaseRenderers.end())
-  {
-    m_BaseRenderers.erase(it);
-  }
+  return m_BaseRenderer.Lock();
 }
 
 void QmitkRenderWindowDataNodeTableModel::SetCurrentSelection(NodeList selectedNodes)
@@ -227,8 +215,7 @@ QVariant QmitkRenderWindowDataNodeTableModel::data(const QModelIndex& index, int
   {
     if (role == Qt::DecorationRole)
     {
-      // The node properties are the same for all connected renderers, so we just take the first one
-      auto baseRenderer = m_BaseRenderers.at(0).Lock();
+      auto baseRenderer = m_BaseRenderer.Lock();
       bool visibility = false;
       dataNode->GetVisibility(visibility, baseRenderer);
 
@@ -237,8 +224,7 @@ QVariant QmitkRenderWindowDataNodeTableModel::data(const QModelIndex& index, int
 
     if (role == Qt::EditRole)
     {
-      // The node properties are the same for all connected renderers, so we just take the first one
-      auto baseRenderer = m_BaseRenderers.at(0).Lock();
+      auto baseRenderer = m_BaseRenderer.Lock();
       bool visibility = false;
       dataNode->GetVisibility(visibility, baseRenderer);
 
@@ -293,18 +279,15 @@ bool QmitkRenderWindowDataNodeTableModel::setData(const QModelIndex& index, cons
   {
     if (role == Qt::EditRole)
     {
-      for (auto baseRendererWeakPointer : m_BaseRenderers)
+      auto baseRenderer = m_BaseRenderer.Lock();
+      bool visibility = value.toBool();
+      dataNode->SetVisibility(visibility, baseRenderer);
+      
+      if (baseRenderer.IsNotNull())
       {
-        auto baseRenderer = baseRendererWeakPointer.Lock();
-        bool visibility = value.toBool();
-        dataNode->SetVisibility(visibility, baseRenderer);
-
-        if (baseRenderer.IsNotNull())
-        {
-          // Explicitly request an update since a renderer-specific property change does not mark the node as modified.
-          // see https://phabricator.mitk.org/T22322
-          mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
-        }
+        // Explicitly request an update since a renderer-specific property change does not mark the node as modified.
+        // see https://phabricator.mitk.org/T22322
+        mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
       }
 
       emit dataChanged(index, index);
@@ -366,30 +349,18 @@ bool QmitkRenderWindowDataNodeTableModel::dropMimeData(const QMimeData* data, Qt
 
   if (parent.isValid())
   {
-    auto targetNode = this->data(parent, QmitkDataNodeRawPointerRole).value<mitk::DataNode*>();
-
-    auto movedNodes = QmitkMimeTypes::ToDataNodePtrList(data);
-
-    // In the table model, each column has its own entry. To avoid duplicate moving, filter out unique nodes.
-    QSet<mitk::DataNode*> uniqueMovedNodes;
-    for (const auto& dataNode : std::as_const(movedNodes))
+    auto baseRenderer = m_BaseRenderer.Lock();
+    int layer = -1;
+    auto dataNode = this->data(parent, QmitkDataNodeRawPointerRole).value<mitk::DataNode*>();
+    if (nullptr != dataNode)
     {
-      uniqueMovedNodes.insert(dataNode);
+      dataNode->GetIntProperty("layer", layer, baseRenderer);
     }
 
-    for (auto baseRendererWeakPointer : m_BaseRenderers)
+    auto dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
+    for (const auto& dataNode : std::as_const(dataNodeList))
     {
-      auto baseRenderer = baseRendererWeakPointer.Lock();
-      int layer = -1;
-      if (nullptr != targetNode)
-      {
-        targetNode->GetIntProperty("layer", layer, baseRenderer);
-      }
-
-      for (const auto& dataNode : std::as_const(uniqueMovedNodes))
-      {
-        m_RenderWindowLayerController->MoveNodeToPosition(dataNode, layer, baseRenderer);
-      }
+      m_RenderWindowLayerController->MoveNodeToPosition(dataNode, layer, baseRenderer);
     }
 
     this->UpdateModelData();

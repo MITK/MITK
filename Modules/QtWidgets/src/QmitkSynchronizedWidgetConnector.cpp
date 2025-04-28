@@ -33,10 +33,10 @@ QmitkSynchronizedWidgetConnector::QmitkSynchronizedWidgetConnector()
   : m_SelectAll(true)
   , m_ConnectionCounter(0)
 {
-  m_StorageModel = std::make_unique<QmitkRenderWindowDataNodeTableModel>(this);
+
 }
 
-void QmitkSynchronizedWidgetConnector::ConnectWidget(QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget)
+void QmitkSynchronizedWidgetConnector::ConnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget)
 {
   connect(nodeSelectionWidget, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkSynchronizedWidgetConnector::ChangeSelection);
@@ -53,12 +53,10 @@ void QmitkSynchronizedWidgetConnector::ConnectWidget(QmitkSynchronizedNodeSelect
   connect(nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::DeregisterSynchronization,
     this, &QmitkSynchronizedWidgetConnector::DeregisterWidget);
 
-  nodeSelectionWidget->SetStorageModel(m_StorageModel.get());
-
   m_ConnectionCounter++;
 }
 
-void QmitkSynchronizedWidgetConnector::DisconnectWidget(QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget)
+void QmitkSynchronizedWidgetConnector::DisconnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget)
 {
   disconnect(nodeSelectionWidget, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkSynchronizedWidgetConnector::ChangeSelection);

@@ -271,7 +271,7 @@ void mitk::FeedbackContourTool::WriteBackFeedbackContourAsSegmentationResult(con
     return;
 
   auto workingSeg = this->GetWorkingData();
-  const auto planeGeometry((positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
+  const auto planeGeometry = positionEvent->GetSender()->GetCurrentWorldPlaneGeometry();
 
   if (!workingSeg || !planeGeometry)
     return;

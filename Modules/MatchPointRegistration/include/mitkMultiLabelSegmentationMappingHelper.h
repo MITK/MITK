@@ -36,11 +36,9 @@ namespace mitk
      * @param input Image that should be mapped.
      * @param registration Pointer to the registration instance that should be used for mapping
      * @param throwOnOutOfInputAreaError Indicates if mapping should fail with an exception (true), if the input image does not cover the whole requested region to be mapped into the result image.
-     * @param paddingValue Indicates the value that should be used if an out of input error occurs (and throwOnOutOfInputAreaError is false).
      * @param resultGeometry Pointer to the Geometry object that specifies the grid of the result image. If not defined the geometry of the input image will be used.
      * @param throwOnMappingError Indicates if mapping should fail with an exception (true), if the registration does not cover/support the whole requested region for mapping into the result image.
      * @param errorValue Indicates the value that should be used if an mapping error occurs (and throwOnMappingError is false).
-     * @param interpolatorType Indicates the type of interpolation strategy that should be used.
      * @pre input must be valid
      * @pre registration must be valid
      * @pre Dimensionality of the registration must match with the input image must be valid
@@ -56,11 +54,9 @@ namespace mitk
      * @param input Image that should be mapped.
      * @param registration Pointer to the registration instance that should be used for mapping
      * @param throwOnOutOfInputAreaError Indicates if mapping should fail with an exception (true), if the input image does not cover the whole requested region to be mapped into the result image.
-     * @param paddingValue Indicates the value that should be used if an out of input error occurs (and throwOnOutOfInputAreaError is false).
      * @param resultGeometry Pointer to the Geometry object that specifies the grid of the result image. If not defined the geometry of the input image will be used.
      * @param throwOnMappingError Indicates if mapping should fail with an exception (true), if the registration does not cover/support the whole requested region for mapping into the result image.
      * @param errorValue Indicates the value that should be used if an mapping error occurs (and throwOnMappingError is false).
-     * @param interpolatorType Indicates the type of interpolation strategy that should be used.
      * @pre input must be valid
      * @pre registration must be valid
      * @pre Dimensionality of the registration must match with the input image must be valid

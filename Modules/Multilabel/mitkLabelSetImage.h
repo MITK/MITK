@@ -423,24 +423,24 @@ namespace mitk
 
     /**
      * @brief clears all label pixel content from the indicated group.
-     * @per groupID must point to a valid group.
+     * @pre groupID must point to a valid group.
      */
     void ClearGroupImage(GroupIndexType groupID);
     /**
      * @brief clears all label pixel content from the indicated group.
-     * @per groupID must point to a valid group.
-     * @per timestep must be a valid.
+     * @pre groupID must point to a valid group.
+     * @pre timestep must be a valid.
      */
      void ClearGroupImage(GroupIndexType groupID, TimeStepType timestep);
 
     /**
      * @brief clears all label pixel content of all groups.
-     * @per groupID must point to a valid group.
+     * @pre groupID must point to a valid group.
      */
     void ClearGroupImages();
     /**
      * @brief clears all label pixel content of all groups in one time step.
-     * @per timestep must be a valid.
+     * @pre timestep must be a valid.
      */
     void ClearGroupImages(TimeStepType timestep);
 

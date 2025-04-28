@@ -213,7 +213,7 @@ int main(int argc, char* argv[])
     std::cout << "Load input data..." << std::endl;
     auto loadedInputs = mitk::IOUtil::Load(settings.inFileName);
 
-    if (loadedInputs.size()==0)
+    if (loadedInputs.empty())
     {
       MITK_ERROR << "Cannot load input.";
       return EXIT_FAILURE;

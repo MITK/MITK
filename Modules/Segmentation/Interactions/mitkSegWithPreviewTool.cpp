@@ -722,7 +722,7 @@ void mitk::SegWithPreviewTool::PreparePreviewToResultTransfer(const LabelMapping
 
   if (resultSegmentationNode.IsNotNull())
   {
-    auto resultSegmentation = dynamic_cast<MultiLabelSegmentation*>(resultSegmentationNode->GetData());
+    auto resultSegmentation = resultSegmentationNode->GetDataAs<MultiLabelSegmentation>();
 
     if (nullptr == resultSegmentation)
     {
@@ -802,7 +802,7 @@ mitk::MultiLabelSegmentation* mitk::SegWithPreviewTool::GetTargetSegmentation() 
   if (nullptr == node)
     return nullptr;
 
-  return dynamic_cast<MultiLabelSegmentation*>(node->GetData());
+  return node->GetDataAs<MultiLabelSegmentation>();
 }
 
 bool mitk::SegWithPreviewTool::ConfirmBeforeDeactivation()

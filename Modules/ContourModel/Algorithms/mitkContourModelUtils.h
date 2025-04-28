@@ -103,7 +103,6 @@ namespace mitk
     \param filledImage Pointer to the image content that should be checked to decide if a pixel in resultImage should
     be filled with paintingPixelValue or not.
     \param resultImage Pointer to the image content that should be overwritten guided by the content of filledImage.
-    \param image Pointer to an mitk image that allows to define the LabelSet image which states steer the filling process.
     If an LabelSet instance is passed its states (e.g. locked labels etc...) will be used. If nullptr or an normal image
     is passed, then simply any pixel position indicated by filledImage will be overwritten.
     \param paintingPixelValue the pixelvalue/label that should be used in the result image when filling.

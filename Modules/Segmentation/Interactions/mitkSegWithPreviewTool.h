@@ -197,8 +197,10 @@ namespace mitk
     virtual void PreparePreviewToResultTransfer(const LabelMappingType& labelMapping);
 
     /**Helper function that can be used to copy the label information (not the pixel content) from one segmentation to another.
-     @param LabelMapping indicates the labels which information should be copied from source. In the mapping one can also define of the
-     label should get a new label value in the target segmentation.*/
+     @param labelMapping indicates the labels which information should be copied from source. In the mapping one can also define of the
+     label should get a new label value in the target segmentation.
+     @param source
+     @param target*/
     static void TransferLabelInformation(const LabelMappingType& labelMapping,
       const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target);
 

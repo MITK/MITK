@@ -638,10 +638,11 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup()
     currentSelection.append(node);
   }
 
-  m_SynchronizedWidgetConnectors.push_back(std::make_unique<QmitkSynchronizedWidgetConnector>());
-  m_SynchronizedWidgetConnectors.back()->ChangeSelection(currentSelection);
+  GroupSyncIndexType newIndex = m_SynchronizedWidgetConnectors.size();
+  m_SynchronizedWidgetConnectors[newIndex] = std::make_unique<QmitkSynchronizedWidgetConnector>();
+  m_SynchronizedWidgetConnectors[newIndex]->ChangeSelection(currentSelection);
 
-  emit SynchGroupAdded(m_SynchronizedWidgetConnectors.size() - 1);
+  emit SynchGroupAdded(newIndex);
 }
 
 void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index)
@@ -658,8 +659,8 @@ void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelection
 
   // For the initial setting of the synchronization, nothing old is there to disconnect
   if (old_index != -1)
-    m_SynchronizedWidgetConnectors.at(old_index)->DisconnectWidget(synchronizedWidget);
+    m_SynchronizedWidgetConnectors[old_index]->DisconnectWidget(synchronizedWidget);
 
-  m_SynchronizedWidgetConnectors.at(index)->ConnectWidget(synchronizedWidget);
-  m_SynchronizedWidgetConnectors.at(index)->SynchronizeWidget(synchronizedWidget);
+  m_SynchronizedWidgetConnectors[index]->ConnectWidget(synchronizedWidget);
+  m_SynchronizedWidgetConnectors[index]->SynchronizeWidget(synchronizedWidget);
 }

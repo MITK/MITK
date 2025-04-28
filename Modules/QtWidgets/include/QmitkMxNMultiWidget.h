@@ -127,7 +127,7 @@ private:
   static nlohmann::json BuildJSONFromLayout(const QSplitter* splitter);
   QSplitter* BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);
 
-  std::vector<std::unique_ptr<QmitkSynchronizedWidgetConnector>> m_SynchronizedWidgetConnectors;
+  std::map < GroupSyncIndexType, std::unique_ptr<QmitkSynchronizedWidgetConnector> > m_SynchronizedWidgetConnectors;
 
   bool m_CrosshairVisibility;
 

@@ -21,12 +21,11 @@ const QString QmitkTotalSegmentatorToolInstaller::VENV_NAME = ".totalsegmentator
 const QString QmitkTotalSegmentatorToolInstaller::TOTALSEGMENTATOR_VERSION = "2.8.0";
 const std::vector<QString> QmitkTotalSegmentatorToolInstaller::PACKAGES = {
     "Totalsegmentator==" + TOTALSEGMENTATOR_VERSION,
-    "SimpleITK<=2.3.1",
-    "p-tqdm<=1.4.0",
-    "xvfbwrapper<=0.2.9",
-    "rt_utils<=1.2.7",
-    "dicom2nifti<=2.4.11",
-    "pyarrow<=16.1.0",
+    "nnunetv2<=2.6.0",
+    "SimpleITK<=2.4.1",
+    "xvfbwrapper<=0.2.10",
+    "dicom2nifti<=2.6.0",
+    "pyarrow<=20.0.0",
     "setuptools"};/* just in case*/
 const QString QmitkTotalSegmentatorToolInstaller::STORAGE_DIR =
   QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +

@@ -833,7 +833,7 @@ QmitkMultiLabelSegTreeItem* QmitkMultiLabelTreeModel::GenerateInternalTree()
 
   if (m_Segmentation.IsNotNull())
   {
-    for (unsigned int groupID = 0; groupID < m_Segmentation->GetNumberOfLayers(); ++groupID)
+    for (unsigned int groupID = 0; groupID < m_Segmentation->GetNumberOfGroups(); ++groupID)
     {
       auto groupItem = new QmitkMultiLabelSegTreeItem(QmitkMultiLabelSegTreeItem::ItemType::Group, rootItem);
       rootItem->AppendChild(groupItem);

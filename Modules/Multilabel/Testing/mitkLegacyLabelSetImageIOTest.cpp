@@ -101,7 +101,7 @@ public:
 
     auto lsimage1 = dynamic_cast<mitk::MultiLabelSegmentation*>(testImages[0].GetPointer());
 
-    CPPUNIT_ASSERT_MESSAGE("Number of layers is not correct", lsimage1->GetNumberOfLayers() == 2);
+    CPPUNIT_ASSERT_MESSAGE("Number of layers is not correct", lsimage1->GetNumberOfGroups() == 2);
 
     auto loadedLabels = lsimage1->GetConstLabelsByValue(lsimage1->GetLabelValuesByGroup(0));
     CPPUNIT_ASSERT_MESSAGE("Error layer 0 is not equal", mitk::Equal(m_labelSet1, loadedLabels, mitk::eps, true));
@@ -122,8 +122,8 @@ public:
     auto lsimage1 = dynamic_cast<mitk::MultiLabelSegmentation*>(testImages[0].GetPointer());
     auto lsimage2 = dynamic_cast<mitk::MultiLabelSegmentation*>(testImages[1].GetPointer());
 
-    CPPUNIT_ASSERT_MESSAGE("Number of layers in image 1 isnot correct", lsimage1->GetNumberOfLayers() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Number of layers in image 2 is not correct", lsimage2->GetNumberOfLayers() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Number of layers in image 1 isnot correct", lsimage1->GetNumberOfGroups() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Number of layers in image 2 is not correct", lsimage2->GetNumberOfGroups() == 1);
 
     auto loadedLabels = lsimage1->GetConstLabelsByValue(lsimage1->GetLabelValuesByGroup(0));
     CPPUNIT_ASSERT_MESSAGE("Error layer 0 is not equal", mitk::Equal(m_labelSet1, loadedLabels, mitk::eps, true));

@@ -397,7 +397,7 @@ void QmitkImageCropperView::ProcessImage(bool mask)
       auto labelSetImage = mitk::MultiLabelSegmentation::New();
       labelSetImage->InitializeByLabeledImage(cutter->GetOutput());
 
-      for (unsigned int i = 0; i < segmentation->GetNumberOfLayers(); i++)
+      for (unsigned int i = 0; i < segmentation->GetNumberOfGroups(); i++)
       {
         labelSetImage->ReplaceGroupLabels(i, segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(i)));
       }

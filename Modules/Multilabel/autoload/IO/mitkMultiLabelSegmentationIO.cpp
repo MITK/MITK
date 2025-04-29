@@ -169,7 +169,7 @@ namespace mitk
     nlohmann::json jlabelsets = nlohmann::json::parse(jsonStr);
     auto labelGroups = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(jlabelsets);
 
-    if (labelGroups.empty() && output->GetNumberOfLayers()==1)
+    if (labelGroups.empty() && output->GetNumberOfGroups()==1)
     {
       if (output->GetTotalNumberOfLabels() > 0)
       {
@@ -178,9 +178,9 @@ namespace mitk
 
       MITK_INFO << "Segmentation contains only one layer and has no label information. Assuming empty label.";
     }
-    else if (labelGroups.size() != output->GetNumberOfLayers())
+    else if (labelGroups.size() != output->GetNumberOfGroups())
     {
-      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfLayers() << "; found label groups: " << labelGroups.size();
+      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfGroups() << "; found label groups: " << labelGroups.size();
     }
 
     MultiLabelSegmentation::GroupIndexType id = 0;

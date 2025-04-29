@@ -139,7 +139,7 @@ namespace
 {
   std::vector<mitk::MultiLabelSegmentation::GroupIndexType> GetOutdatedGroups(const mitk::LabelSetImageVtkMapper2D::LocalStorage* ls, const mitk::MultiLabelSegmentation* seg)
   {
-    const auto nrOfGroups = seg->GetNumberOfLayers();
+    const auto nrOfGroups = seg->GetNumberOfGroups();
     std::vector<mitk::MultiLabelSegmentation::GroupIndexType> result;
 
     for (mitk::MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < nrOfGroups; ++groupID)
@@ -227,7 +227,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   {
     //if geometry is outdated or we have valid content again
     // -> all groups need regeneration
-    outdatedGroups.resize(segmentation->GetNumberOfLayers());
+    outdatedGroups.resize(segmentation->GetNumberOfGroups());
     std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
   }
   else
@@ -250,7 +250,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   if (isLookupModified)
   {
     //if lookup table is modified all groups need a new color mapping
-    outdatedGroups.resize(segmentation->GetNumberOfLayers());
+    outdatedGroups.resize(segmentation->GetNumberOfGroups());
     std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
   }
 
@@ -301,7 +301,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* rend
 
   segmentation->Update();
 
-  const auto numberOfLayers = segmentation->GetNumberOfLayers();
+  const auto numberOfLayers = segmentation->GetNumberOfGroups();
 
   if (numberOfLayers != localStorage->m_NumberOfLayers)
   {

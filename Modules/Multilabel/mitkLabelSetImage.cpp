@@ -156,7 +156,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage,
 
   if (resetLabels)
   {
-    while (this->GetNumberOfLayers() > 0)
+    while (this->GetNumberOfGroups() > 0)
     {
       this->RemoveGroup(0);
     }
@@ -174,7 +174,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage,
   DICOMQIPropertyHelper::DeriveDICOMSourceProperties(templateImage, this);
 
   // Add an initial LabelSet and corresponding image data to the stack
-  if (ensure1stGroup && this->GetNumberOfLayers() == 0)
+  if (ensure1stGroup && this->GetNumberOfGroups() == 0)
   {
     AddLayer();
   }
@@ -211,7 +211,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::TimeGeometry* geometry
 
   if (resetLabels)
   {
-    while (this->GetNumberOfLayers() > 0)
+    while (this->GetNumberOfGroups() > 0)
     {
       this->RemoveGroup(0);
     }
@@ -226,7 +226,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::TimeGeometry* geometry
   }
 
   // Add an initial LabelSet and corresponding image data to the stack
-  if (ensure1stGroup && this->GetNumberOfLayers() == 0)
+  if (ensure1stGroup && this->GetNumberOfGroups() == 0)
   {
     AddLayer();
   }
@@ -246,11 +246,12 @@ mitk::MultiLabelSegmentation::~MultiLabelSegmentation()
 unsigned int mitk::MultiLabelSegmentation::GetActiveLayer() const
 {
   if (m_LayerContainer.size() == 0) mitkThrow() << "Cannot return active layer index. No layer is available.";
+  if (m_ActiveLabelValue == UNLABELED_VALUE) return 0;
 
-  return m_ActiveLayer;
+  return this->GetGroupIndexOfLabel(m_ActiveLabelValue);
 }
 
-unsigned int mitk::MultiLabelSegmentation::GetNumberOfLayers() const
+unsigned int mitk::MultiLabelSegmentation::GetNumberOfGroups() const
 {
   return m_LayerContainer.size();
 }
@@ -269,14 +270,14 @@ void mitk::MultiLabelSegmentation::RemoveGroup(GroupIndexType indexToDelete)
   }
   else if (indexToDelete == activeIndex)
   {
-    if (this->GetNumberOfLayers() == 1)
+    if (this->GetNumberOfGroups() == 1)
     { //last layer is about to be deleted
       newActiveIndex = 0;
     }
     else
     {
       //we have to add/subtract one more because we have not removed the layer yet, thus the group count is to 1 high.
-      newActiveIndex = indexToDelete+1 < GetNumberOfLayers() ? indexToDelete : GetNumberOfLayers() - 2;
+      newActiveIndex = indexToDelete+1 < GetNumberOfGroups() ? indexToDelete : GetNumberOfGroups() - 2;
     }
   }
 
@@ -1448,7 +1449,7 @@ bool mitk::Equal(const mitk::MultiLabelSegmentation &leftHandSide,
   }
 
   // number layers
-  returnValue = leftHandSide.GetNumberOfLayers() == rightHandSide.GetNumberOfLayers();
+  returnValue = leftHandSide.GetNumberOfGroups() == rightHandSide.GetNumberOfGroups();
   if (!returnValue)
   {
     MITK_INFO(verbose) << "Number of layers not equal.";
@@ -1477,7 +1478,7 @@ bool mitk::Equal(const mitk::MultiLabelSegmentation &leftHandSide,
     return false;
   }
 
-  for (unsigned int layerIndex = 0; layerIndex < leftHandSide.GetNumberOfLayers(); layerIndex++)
+  for (unsigned int layerIndex = 0; layerIndex < leftHandSide.GetNumberOfGroups(); layerIndex++)
   {
     if (4 == leftHandSide.GetDimension())
     {

@@ -615,7 +615,7 @@ namespace mitk
     void SetActiveLayer(unsigned int layer);
     void SetActiveLabel(LabelValueType label);
 
-    unsigned int GetNumberOfLayers() const;
+    unsigned int GetNumberOfGroups() const;
 
     /**
      * \brief Adds a new layer to the MultiLabelSegmentation. The new layer will be set as the active one.

@@ -286,7 +286,7 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
 
       m_PreviewSegmentationNode->SetData(newPreviewImage);
 
-      if (newPreviewImage->GetNumberOfLayers() == 0)
+      if (newPreviewImage->GetNumberOfGroups() == 0)
       {
         newPreviewImage->AddLayer();
         newPreviewImage->SetActiveLayer(0);

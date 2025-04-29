@@ -35,7 +35,7 @@ QmitkCopyLabelToGroupDialog::QmitkCopyLabelToGroupDialog(mitk::MultiLabelSegment
     m_SourceLabel(label),
     m_DestinationLabel(nullptr)
 {
-  const auto numberOfGroups = segmentation->GetNumberOfLayers();
+  const auto numberOfGroups = segmentation->GetNumberOfGroups();
   const auto sourceGroup = segmentation->GetGroupIndexOfLabel(m_SourceLabel->GetValue());
 
   m_Ui->setupUi(this);

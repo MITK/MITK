@@ -40,7 +40,7 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
   const mitk::Image* image = nullptr;
 
   const mitk::MultiLabelSegmentation* segmentation = dynamic_cast<const mitk::MultiLabelSegmentation*>(dataNode->GetData());
-  if (nullptr != segmentation && segmentation->GetNumberOfLayers()>0)
+  if (nullptr != segmentation && segmentation->GetNumberOfGroups()>0)
   {
     image = segmentation->GetGroupImage(0);
   }

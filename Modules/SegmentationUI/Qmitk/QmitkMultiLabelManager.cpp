@@ -264,7 +264,7 @@ void QmitkMultiLabelManager::UpdateControls()
   m_Controls->btnAddInstance->setEnabled(hasWorkingData && labels.size()==1);
   m_Controls->btnAddLabel->setEnabled(hasWorkingData);
   m_Controls->btnLoadPreset->setEnabled(hasWorkingData);
-  m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && !labels.empty() && this->GetMultiLabelSegmentation()->GetNumberOfLayers()>1);
+  m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && !labels.empty() && this->GetMultiLabelSegmentation()->GetNumberOfGroups()>1);
   m_Controls->btnRemoveLabel->setEnabled(hasWorkingData && !labels.empty());
   m_Controls->btnRemoveInstance->setEnabled(hasWorkingData && !labels.empty() && hasMultipleInstances);
   m_Controls->btnSavePreset->setEnabled(hasWorkingData);

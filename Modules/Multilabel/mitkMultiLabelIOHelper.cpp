@@ -42,10 +42,10 @@ bool mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(const std::string &preset
   xmlDocument.InsertEndChild(xmlDocument.NewDeclaration());
 
   auto *rootElement = xmlDocument.NewElement("LabelSetImagePreset");
-  rootElement->SetAttribute("layers", inputImage->GetNumberOfLayers());
+  rootElement->SetAttribute("layers", inputImage->GetNumberOfGroups());
   xmlDocument.InsertEndChild(rootElement);
 
-  for (unsigned int layerIndex = 0; layerIndex < inputImage->GetNumberOfLayers(); layerIndex++)
+  for (unsigned int layerIndex = 0; layerIndex < inputImage->GetNumberOfGroups(); layerIndex++)
   {
     auto *layerElement = xmlDocument.NewElement("Layer");
     layerElement->SetAttribute("index", layerIndex);
@@ -322,7 +322,7 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
 
   nlohmann::json result;
 
-  for (MultiLabelSegmentation::GroupIndexType i = 0; i < inputImage->GetNumberOfLayers(); i++)
+  for (MultiLabelSegmentation::GroupIndexType i = 0; i < inputImage->GetNumberOfGroups(); i++)
   {
     nlohmann::json jgroup;
     nlohmann::json jlabels;

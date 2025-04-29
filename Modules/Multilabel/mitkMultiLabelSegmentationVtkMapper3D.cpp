@@ -112,7 +112,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
     }
   }
 
-  const auto nrOfGroups = image->GetNumberOfLayers();
+  const auto nrOfGroups = image->GetNumberOfGroups();
   for (unsigned int groupID = 0; groupID < nrOfGroups; ++groupID)
   {
     localStorage->m_TransferFunctions[groupID] = vtkSmartPointer<vtkColorTransferFunction>::New();
@@ -135,7 +135,7 @@ namespace
 {
   std::vector<mitk::MultiLabelSegmentation::GroupIndexType> GetOutdatedGroups(const mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls, const mitk::MultiLabelSegmentation* seg)
   {
-    const auto nrOfGroups = seg->GetNumberOfLayers();
+    const auto nrOfGroups = seg->GetNumberOfGroups();
     std::vector<mitk::MultiLabelSegmentation::GroupIndexType> result;
 
     for (mitk::MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < nrOfGroups; ++groupID)
@@ -179,7 +179,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   if (isGeometryModified || visibilityChanged)
   {
     //if geometry is outdated or visibility changed all groups need regeneration
-    outdatedGroups.resize(image->GetNumberOfLayers());
+    outdatedGroups.resize(image->GetNumberOfGroups());
     std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
   }
 
@@ -197,7 +197,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   if (isLookupModified)
   {
     //if lookup table is modified all groups need a new color mapping
-    outdatedGroups.resize(image->GetNumberOfLayers());
+    outdatedGroups.resize(image->GetNumberOfGroups());
     std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
   }
 
@@ -218,7 +218,7 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRe
 
   image->Update();
 
-  const auto numberOfGroups = image->GetNumberOfLayers();
+  const auto numberOfGroups = image->GetNumberOfGroups();
 
   if (numberOfGroups != localStorage->m_NumberOfGroups)
   {

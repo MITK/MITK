@@ -32,7 +32,7 @@ static void ConvertLabelSetImageToImage(const itk::Image<TPixel, VDimension> *,
   typedef itk::ComposeImageFilter<ImageType> ComposeFilterType;
   typedef itk::ImageDuplicator<ImageType> DuplicatorType;
 
-  auto numberOfLayers = labelSetImage->GetNumberOfLayers();
+  auto numberOfLayers = labelSetImage->GetNumberOfGroups();
 
   if (numberOfLayers > 1)
   {
@@ -69,7 +69,7 @@ mitk::Image::Pointer mitk::ConvertLabelSetImageToImage(MultiLabelSegmentation::C
 {
   Image::Pointer image;
 
-  if (labelSetImage->GetNumberOfLayers() > 0)
+  if (labelSetImage->GetNumberOfGroups() > 0)
   {
     if (labelSetImage->GetDimension() == 4)
     {

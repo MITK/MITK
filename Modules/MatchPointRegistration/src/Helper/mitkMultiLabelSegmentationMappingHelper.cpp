@@ -45,7 +45,7 @@ mitk::MultiLabelSegmentation::Pointer
 
   resultLabelSetImage->Initialize(resultTemplate, true, false);
 
-  for (MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < input->GetNumberOfLayers(); ++groupID)
+  for (MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < input->GetNumberOfGroups(); ++groupID)
   {
     auto inputGroupImage = input->GetGroupImage(groupID);
     auto mappedGroupImage = ImageMappingHelper::map(inputGroupImage, registration, throwOnOutOfInputAreaError, 0, resultGeometry, throwOnMappingError, errorValue, mitk::ImageMappingInterpolator::NearestNeighbor);

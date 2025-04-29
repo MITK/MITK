@@ -58,7 +58,7 @@ namespace mitk
 
     const ContourModel *GetFeedbackContour() const;
 
-    /** (Re)initialize the feesback contour by creating a new instance.
+    /** (Re)initialize the feedback contour by creating a new instance.
      * It is assured that the new instance as the same time geometry than
      * the working image.*/
     void InitializeFeedbackContour(bool isClosed);
@@ -67,11 +67,11 @@ namespace mitk
     void ClearsCurrentFeedbackContour(bool isClosed);
 
     /** Updates the feedback contour of the currently selected time point. The update will be done
-     * by clearing all existings vertices at the current time point and copying the vertics of the
+     * by clearing all existing vertices at the current time point and copying the vertics of the
      * source model at the specified source time step.*/
     void UpdateCurrentFeedbackContour(const ContourModel* sourceModel, TimeStepType sourceTimeStep = 0);
     /** Updates the feedback contour at the time step specified by feedbackTimeStep. The update will be done
-     * by clearing all existings vertices at feedbackTimeStep and copying the vertics of the
+     * by clearing all existing vertices at feedbackTimeStep and copying the vertics of the
      * source model at the specified source time step.*/
     void UpdateFeedbackContour(const ContourModel* sourceModel, TimeStepType feedbackTimeStep, TimeStepType sourceTimeStep = 0);
 
@@ -113,11 +113,12 @@ namespace mitk
 
     /** Helper methods that checks all precondition and if they are fulfilled does the following:
      * 1. Gets the contour of the time point specified by positionEvent.
-     * 2. Gets the affacted working slice of the time point specified by positionEvent.
+     * 2. Gets the affected working slice of the time point specified by positionEvent.
      * 3. projects the contour onto the working slice and then fills it with the passed paintingPixelValue (adjusted by the current active label value)
      * to the slice.
      * 4. writes the slice back into the working image using SegTool2D::WriteBackSegmentationResult().
-     * @param positionEvent
+     * @param positionEvent The position event that indicates that triggers the update of the segmentation.
+     * It i.a. encodes the slice position that should be updated.
      * @param labelValue The value of the label that should be updated.
      * @param setInvisibleAfterSuccess Indicates if the feedback contour should be set invisible after the update of the seg result.
      * @param addMode If false is passed the content of the contour will be set to background (thus label will be erased).

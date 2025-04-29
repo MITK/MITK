@@ -30,7 +30,7 @@ namespace
   bool DetermineMinimumAndMaximumIndicesOfNonBackgroundPixels(const mitk::MultiLabelSegmentation* labelSetImage, itk::Index<3>& minIndex, itk::Index<3>& maxIndex)
   {
     const auto background = mitk::MultiLabelSegmentation::UNLABELED_VALUE;
-    const auto numLayers = labelSetImage->GetNumberOfLayers();
+    const auto numLayers = labelSetImage->GetNumberOfGroups();
     const auto numTimeSteps = labelSetImage->GetTimeSteps();
 
     const itk::Index<3> dim = {
@@ -118,7 +118,7 @@ namespace
   //
   mitk::MultiLabelSegmentation::Pointer Crop(mitk::MultiLabelSegmentation::Pointer labelSetImage, const itk::Index<3>& minIndex, const itk::Index<3>& maxIndex)
   {
-    const auto numLayers = labelSetImage->GetNumberOfLayers();
+    const auto numLayers = labelSetImage->GetNumberOfGroups();
     const auto numTimeSteps = labelSetImage->GetTimeSteps();
 
     const itk::Index<3> croppedDim = {

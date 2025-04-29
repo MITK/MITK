@@ -374,7 +374,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   {
     outputSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(m_Controls->outputSegSelector->GetSelectedNode()->GetData());
 
-    if (outputSeg->GetNumberOfLayers() > 0)
+    if (outputSeg->GetNumberOfGroups() > 0)
     {
       refImage = outputSeg->GetGroupImage(0);
     }
@@ -481,7 +481,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
   //Ensure that we have the first layer to add
   mitk::MultiLabelSegmentation::GroupIndexType currentGroupIndex = 0;
-  if (m_Controls->radioAddToSeg->isChecked() || 0 == outputSeg->GetNumberOfLayers())
+  if (m_Controls->radioAddToSeg->isChecked() || 0 == outputSeg->GetNumberOfGroups())
   {
     currentGroupIndex = outputSeg->AddLayer();
   }

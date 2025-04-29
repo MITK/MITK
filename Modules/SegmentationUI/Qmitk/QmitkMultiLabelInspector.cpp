@@ -652,7 +652,7 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::MultiLabelSegment
   if (m_Segmentation.IsNull())
     return;
 
-  if (m_Segmentation->GetNumberOfLayers() < 2)
+  if (m_Segmentation->GetNumberOfGroups() < 2)
     return;
 
   auto currentIndex = m_Model->indexOfGroup(groupID);
@@ -708,7 +708,7 @@ void QmitkMultiLabelInspector::RemoveGroup()
   if (m_Segmentation.IsNull())
     return;
 
-  if (m_Segmentation->GetNumberOfLayers() < 2)
+  if (m_Segmentation->GetNumberOfGroups() < 2)
   {
     QMessageBox::information(this, "Delete group", "Cannot delete last remaining group. A segmentation must contain at least a single group.");
     return;
@@ -793,7 +793,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       QObject::connect(renameAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnRenameGroup);
       menu->addAction(renameAction);
 
-      if (m_Segmentation->GetNumberOfLayers() > 1)
+      if (m_Segmentation->GetNumberOfGroups() > 1)
       {
         QAction* removeAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")), "Delete group", this);
         QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnDeleteGroup);

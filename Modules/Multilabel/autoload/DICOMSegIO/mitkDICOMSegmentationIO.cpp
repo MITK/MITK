@@ -158,7 +158,7 @@ namespace mitk
     }
 
     // Iterate over all layers. For each a dcm file will be generated
-    for (unsigned int layer = 0; layer < input->GetNumberOfLayers(); ++layer)
+    for (unsigned int layer = 0; layer < input->GetNumberOfGroups(); ++layer)
     {
       vector<itkInternalImageType::Pointer> segmentations;
 
@@ -230,7 +230,7 @@ namespace mitk
 
         std::string filePath = path.substr(0, path.find_last_of("."));
         // If there is more than one layer, we have to write more than 1 dicom file
-        if (input->GetNumberOfLayers() != 1)
+        if (input->GetNumberOfGroups() != 1)
           filePath = filePath + std::to_string(layer) + ".dcm";
         else
           filePath = filePath + ".dcm";
@@ -471,7 +471,7 @@ namespace mitk
       DICOMIOHelper::SetProperties(labelSetImage, findings);
 
       // Set active layer to the first layer of the labelset image
-      if (labelSetImage->GetNumberOfLayers() > 1 && labelSetImage->GetActiveLayer() != 0)
+      if (labelSetImage->GetNumberOfGroups() > 1 && labelSetImage->GetActiveLayer() != 0)
         labelSetImage->SetActiveLayer(0);
     }
     catch (const std::exception &e)

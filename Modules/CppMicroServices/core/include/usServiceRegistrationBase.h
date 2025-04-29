@@ -161,6 +161,8 @@ public:
    */
   void Unregister();
 
+  bool IsAvailable() const;
+
   /**
    * Compare two ServiceRegistrationBase objects.
    *

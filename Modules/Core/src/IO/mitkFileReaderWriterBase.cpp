@@ -193,7 +193,7 @@ namespace mitk
 
   void FileReaderWriterBase::UnregisterMimeType()
   {
-    if (m_MimeTypeReg)
+    if (m_MimeTypeReg.IsAvailable())
     {
       try
       {

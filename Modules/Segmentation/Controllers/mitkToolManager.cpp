@@ -157,14 +157,10 @@ const mitk::ToolManager::ToolVectorTypeConst mitk::ToolManager::GetTools()
 
 mitk::Tool *mitk::ToolManager::GetToolById(int id)
 {
-  try
-  {
-    return m_Tools.at(id);
-  }
-  catch (const std::exception &)
-  {
-    return nullptr;
-  }
+  if (id >= 0 && id < m_Tools.size())
+    return m_Tools[id];
+
+  return nullptr;
 }
 
 bool mitk::ToolManager::ActivateTool(int id)
@@ -467,14 +463,10 @@ mitk::ToolManager::DataVectorType mitk::ToolManager::GetReferenceData()
 
 mitk::DataNode *mitk::ToolManager::GetReferenceData(int idx)
 {
-  try
-  {
-    return m_ReferenceData.at(idx);
-  }
-  catch (const std::exception &)
-  {
-    return nullptr;
-  }
+  if (idx >= 0 && idx < m_ReferenceData.size())
+    return m_ReferenceData[idx];
+
+  return nullptr;
 }
 
 mitk::ToolManager::DataVectorType mitk::ToolManager::GetWorkingData()

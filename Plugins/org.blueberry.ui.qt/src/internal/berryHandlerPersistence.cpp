@@ -90,6 +90,7 @@ void HandlerPersistence::ReRead()
     if (TAG_COMMAND == name)
     {
       indexedConfigurationElements[INDEX_COMMAND_DEFINITIONS].push_back(configurationElement);
+      break;
     }
   }
 
@@ -104,6 +105,7 @@ void HandlerPersistence::ReRead()
     if (TAG_HANDLER == name)
     {
       indexedConfigurationElements[INDEX_HANDLER_DEFINITIONS].push_back(configurationElement);
+      break;
     }
   }
 

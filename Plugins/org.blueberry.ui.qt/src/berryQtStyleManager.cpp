@@ -353,17 +353,8 @@ void QtStyleManager::SetStyle(const QString& fileName)
 
   this->UpdateWorkbenchStyleSheet();
 
-  try
-  {
+  if (PlatformUI::IsWorkbenchRunning())
     PlatformUI::GetWorkbench()->UpdateTheme();
-  }
-  catch (...)
-  {
-    // Swallow any exception if the Workbench instance has not been created yet.
-    // Will be called later again but for now we just want to make sure that the
-    // application style sheet can be at least already retrieved from qApp to
-    // theme icons in plugins with eager activation policy.
-  }
 }
 
 void QtStyleManager::SetFont(const QString& fontName)

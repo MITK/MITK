@@ -55,7 +55,6 @@ berry::XMLMemento::Pointer berry::XMLMemento::CreateReadRoot(
     berry::XMLMemento::XMLByteInputStream& reader, const QString& baseDir)
 {
   QString errorMessage;
-  Poco::Exception exception("");
 
   try
   {
@@ -78,13 +77,9 @@ berry::XMLMemento::Pointer berry::XMLMemento::CreateReadRoot(
     errorMessage = QString("Could not parse content of XML file: ") + QString::fromStdString(e.displayText());
   }
 
-  QString problemText = QString::fromStdString(exception.message());
-  if (problemText.isEmpty())
-  {
-    problemText = errorMessage.isEmpty() ? "Could not find root element node of XML file." : errorMessage;
-  }
-  throw WorkbenchException(problemText);
-
+  throw WorkbenchException(errorMessage.isEmpty()
+    ? "Could not find root element node of XML file."
+    : errorMessage);
 }
 
 berry::XMLMemento::Pointer berry::XMLMemento::CreateWriteRoot(

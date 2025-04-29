@@ -244,6 +244,14 @@ void ServiceRegistrationBase::Unregister()
   }
 }
 
+bool ServiceRegistrationBase::IsAvailable() const
+{
+  if (d != nullptr)
+    return d->available;
+
+  return false;
+}
+
 bool ServiceRegistrationBase::operator<(const ServiceRegistrationBase& o) const
 {
   if ((!d && !o.d) || !o.d) return false;

@@ -157,7 +157,7 @@ const mitk::ToolManager::ToolVectorTypeConst mitk::ToolManager::GetTools()
 
 mitk::Tool *mitk::ToolManager::GetToolById(int id)
 {
-  if (id >= 0 && id < m_Tools.size())
+  if (id >= 0 && id < static_cast<int>(m_Tools.size()))
     return m_Tools[id];
 
   return nullptr;
@@ -463,7 +463,7 @@ mitk::ToolManager::DataVectorType mitk::ToolManager::GetReferenceData()
 
 mitk::DataNode *mitk::ToolManager::GetReferenceData(int idx)
 {
-  if (idx >= 0 && idx < m_ReferenceData.size())
+  if (idx >= 0 && idx < static_cast<int>(m_ReferenceData.size()))
     return m_ReferenceData[idx];
 
   return nullptr;

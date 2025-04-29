@@ -616,7 +616,7 @@ namespace mitk
 
 
   using ImageDimensionVectorType = std::vector<unsigned int>;
-  MITKCORE_EXPORT ImageDimensionVectorType DeterminImageDimensionsFromTimeGeometry(const TimeGeometry* timeGeometry);
+  MITKCORE_EXPORT ImageDimensionVectorType DetermineImageDimensionsFromTimeGeometry(const TimeGeometry* timeGeometry);
 
   /**
   * @brief Equal A function comparing two images for being equal in meta- and imagedata

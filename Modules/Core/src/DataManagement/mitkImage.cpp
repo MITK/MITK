@@ -1271,7 +1271,7 @@ bool mitk::Image::IsRotated() const
   return ret;
 }
 
-mitk::ImageDimensionVectorType mitk::DeterminImageDimensionsFromTimeGeometry(const TimeGeometry* timeGeometry)
+mitk::ImageDimensionVectorType mitk::DetermineImageDimensionsFromTimeGeometry(const TimeGeometry* timeGeometry)
 {
   auto geometry = timeGeometry->GetGeometryForTimeStep(0);
 

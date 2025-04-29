@@ -126,7 +126,7 @@ mitk::Image::Pointer mitk::MultiLabelSegmentation::GenerateNewGroupImage() const
 
   mitk::PixelType pixelType(mitk::MakeScalarPixelType<MultiLabelSegmentation::PixelType>());
 
-  auto geometryDimensions = DeterminImageDimensionsFromTimeGeometry(this->GetTimeGeometry());
+  auto geometryDimensions = DetermineImageDimensionsFromTimeGeometry(this->GetTimeGeometry());
   if (geometryDimensions.size() == 2)
   {
     auto dimensions = std::array{ m_GroupImageDimensions[0], m_GroupImageDimensions[1], 1u };

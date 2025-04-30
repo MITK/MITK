@@ -44,16 +44,9 @@ namespace mitk
   {
   public:
     /**
-    * \brief BeforeChangeLayerEvent (e.g. used for GUI integration)
-    * As soon as active labelset should be changed, the signal emits.
-    * Emitted by SetActiveLayer(int layer);
-    */
-    Message<> BeforeChangeLayerEvent;
-
-    /**
     * \brief AfterchangeLayerEvent (e.g. used for GUI integration)
     * As soon as active labelset was changed, the signal emits.
-    * Emitted by SetActiveLayer(int layer);
+    * Emitted by SetActiveLabel();
     */
     Message<> AfterChangeLayerEvent;
 
@@ -545,7 +538,7 @@ namespace mitk
       GroupNameVectorType m_Groups;
 
       /**This type is internally used to track which label is currently
-       * associated with which layer.*/
+       * associated with which group.*/
       using GroupToLabelMapType = std::vector<LabelValueVectorType>;
       /* Dictionary that maps between group id (key) and label values in the group (vector of label value).*/
       GroupToLabelMapType m_GroupToLabelMap;
@@ -589,8 +582,8 @@ namespace mitk
     bool IsEmpty(PixelType pixelValue, TimeStepType t = 0) const;
 
     /**
-     * @brief Gets the ID of the currently active layer
-     * @return the ID of the active layer
+     * @brief Gets the ID of the currently active group
+     * @return the ID of the active group
      * @pre at least on group must exist.
      */
     unsigned int GetActiveLayer() const;
@@ -600,11 +593,11 @@ namespace mitk
     const Label* GetActiveLabel() const;
 
     /**
-     * @brief Get the number of all existing mitk::Labels for a given layer
-     * @param layer the layer ID for which the active mitk::Labels should be retrieved
-     * @return the number of all existing mitk::Labels for the given layer
+     * @brief Get the number of all existing mitk::Labels for a given group
+     * @param group the group ID for which the active mitk::Labels should be retrieved
+     * @return the number of all existing mitk::Labels for the given group
      */
-    unsigned int GetNumberOfLabels(unsigned int layer) const;
+    unsigned int GetNumberOfLabels(unsigned int group) const;
 
     /**
      * @brief Returns the number of all labels summed up across all layers
@@ -617,22 +610,22 @@ namespace mitk
     unsigned int GetNumberOfGroups() const;
 
     /**
-     * \brief Adds a new layer to the MultiLabelSegmentation. The new layer will be set as the active one.
-     * \param labels Labels that will be added to the new layer if provided
-     * \return the layer ID of the new layer
+     * \brief Adds a new group to the MultiLabelSegmentation. The new group will be set as the active one.
+     * \param labels Labels that will be added to the new group if provided
+     * \return the group ID of the new group
      */
-    GroupIndexType AddLayer(ConstLabelVector labels = {});
+    GroupIndexType AddGroup(ConstLabelVector labels = {});
 
    /**
-    * \brief Adds a layer based on a provided mitk::Image.
+    * \brief Adds a group based on a provided mitk::Image.
     * \param layerImage is added to the vector of label images
-    * \param labels labels that will be cloned and added to the new layer if provided
-    * \return the layer ID of the new layer
+    * \param labels labels that will be cloned and added to the new group if provided
+    * \return the group ID of the new group
     * \pre layerImage must be valid instance
     * \pre layerImage needs to have the same geometry then the segmentation
     * \pre layerImage must have the pixel value equal to LabelValueType.
     */
-    GroupIndexType AddLayer(mitk::Image* layerImage, ConstLabelVector labels = {});
+    GroupIndexType AddGroup(mitk::Image* layerImage, ConstLabelVector labels = {});
 
   protected:
     mitkCloneMacro(Self);
@@ -640,12 +633,6 @@ namespace mitk
       MultiLabelSegmentation();
     MultiLabelSegmentation(const MultiLabelSegmentation &other);
     ~MultiLabelSegmentation() override;
-
-    template <typename TPixel, unsigned int VImageDimension>
-    void LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension> *source, unsigned int layer);
-
-    template <typename TPixel, unsigned int VImageDimension>
-    void ImageToLayerContainerProcessing(const itk::Image<TPixel, VImageDimension> *source, unsigned int layer) const;
 
     template <typename ImageType>
     void CalculateCenterOfMassProcessing(ImageType *input, LabelValueType index);
@@ -660,7 +647,7 @@ namespace mitk
       returns a sorted list of all labels (including the value for Unlabeled pixels..*/
     LabelValueVectorType GetUsedLabelValues() const;
 
-    std::vector<Image::Pointer> m_LayerContainer;
+    std::vector<Image::Pointer> m_GroupContainer;
   };
 
   /**
@@ -671,7 +658,7 @@ namespace mitk
   * Following aspects are tested for equality:
   *  - MultiLabelSegmentation members
   *  - working image data
-  *  - layer image data
+  *  - group image data
   *  - labels in label set
   *
   * @param rightHandSide An image to be compared
@@ -727,14 +714,13 @@ namespace mitk
 
   /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
   a specified destination label for a specific time step. Function processes the whole image volume of the specified time step.
-  @remark in its current implementation the function only transfers contents of the active layer of the passed MultiLabelSegmentations.
   @remark the function assumes that it is only called with source and destination image of same geometry.
   @remark CAUTION: The function is not save if sourceImage and destinationImage are the same instance and more than one label is transferred,
   because the changes are made in-place for performance reasons in multiple passes. If a mapped value A equals an "old value"
   that occurs later in the mapping, one ends up with a wrong transfer, as a pixel would be first mapped to A and then later again, because
   it is also an "old" value in the mapping table.
-  @param sourceImage Pointer to the MultiLabelSegmentation which active layer should be used as source for the transfer.
-  @param destinationImage Pointer to the MultiLabelSegmentation which active layer should be used as destination for the transfer.
+  @param sourceImage Pointer to the MultiLabelSegmentation that should be used as source for the transfer.
+  @param destinationImage Pointer to the MultiLabelSegmentation that should be used as destination for the transfer.
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
   The order in which the labels will be transferred is the same order of elements in the labelMapping.
@@ -748,8 +734,8 @@ namespace mitk
   @param timeStep indicate the time step that should be transferred.
   @pre sourceImage and destinationImage must be valid
   @pre sourceImage and destinationImage must contain the indicated timeStep
-  @pre sourceImage must contain all indicated sourceLabels in its active layer.
-  @pre destinationImage must contain all indicated destinationLabels in its active layer.*/
+  @pre sourceImage must contain all indicated sourceLabels.
+  @pre destinationImage must contain all indicated destinationLabels.*/
   MITKMULTILABEL_EXPORT void TransferLabelContentAtTimeStep(const MultiLabelSegmentation* sourceImage, MultiLabelSegmentation* destinationImage,
     const TimeStepType timeStep, LabelValueMappingVector labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,

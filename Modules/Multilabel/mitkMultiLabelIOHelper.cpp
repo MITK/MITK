@@ -107,7 +107,7 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
     {
       while (!inputImage->ExistGroup(layerIndex))
       {
-        inputImage->AddLayer();
+        inputImage->AddGroup();
       }
     }
 

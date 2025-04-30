@@ -288,7 +288,7 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
 
       if (newPreviewImage->GetNumberOfGroups() == 0)
       {
-        newPreviewImage->AddLayer();
+        newPreviewImage->AddGroup();
       }
 
       auto* activeLabel = newPreviewImage->GetActiveLabel();

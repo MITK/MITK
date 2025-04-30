@@ -483,7 +483,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   mitk::MultiLabelSegmentation::GroupIndexType currentGroupIndex = 0;
   if (m_Controls->radioAddToSeg->isChecked() || 0 == outputSeg->GetNumberOfGroups())
   {
-    currentGroupIndex = outputSeg->AddLayer();
+    currentGroupIndex = outputSeg->AddGroup();
   }
 
   //Transfer content and add labels
@@ -492,7 +492,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     mitk::ProgressBar::GetInstance()->Progress();
 
     if (m_Controls->radioSingleGroup->isChecked() && node != imageNodes.front())
-      currentGroupIndex = outputSeg->AddLayer();
+      currentGroupIndex = outputSeg->AddGroup();
 
     const auto& labelsMapping = labelsMappingMap.at(node);
     for (auto [oldV, correctedV] : labelsMapping)
@@ -517,7 +517,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     mitk::ProgressBar::GetInstance()->Progress();
 
     if (m_Controls->radioSingleGroup->isChecked() && (node != nonimageNodes.front() || !imageNodes.empty()))
-      currentGroupIndex = outputSeg->AddLayer();
+      currentGroupIndex = outputSeg->AddGroup();
 
     const auto& labelsMapping = labelsMappingMap.at(node);
     for (auto [oldV, correctedV] : labelsMapping)

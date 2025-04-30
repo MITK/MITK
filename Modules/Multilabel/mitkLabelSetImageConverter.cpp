@@ -171,7 +171,7 @@ mitk::MultiLabelSegmentation::Pointer mitk::ConvertImageVectorToLabelSetImage(co
     }
     else
     {
-      labelSetImage->AddLayer(groupImage);
+      labelSetImage->AddGroup(groupImage);
     }
   }
 

@@ -57,7 +57,7 @@ void QmitkCopyLabelToGroupDialog::accept()
 {
   const auto destinationGroup = m_Ui->groupComboBox->currentIndex() != 0
     ? m_Ui->groupComboBox->currentData().toUInt()
-    : m_Segmentation->AddLayer();
+    : m_Segmentation->AddGroup();
 
   m_DestinationLabel = m_Segmentation->AddLabel(m_SourceLabel, destinationGroup);
 

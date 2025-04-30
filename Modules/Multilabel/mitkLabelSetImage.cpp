@@ -55,7 +55,7 @@ const mitk::MultiLabelSegmentation::LabelValueType mitk::MultiLabelSegmentation:
 
 bool mitk::MultiLabelSegmentation::IsSliceSet(int s, int t, int n) const
 {
-  for (const auto& image : m_LayerContainer)
+  for (const auto& image : m_GroupContainer)
   {
     if (!image->IsSliceSet(s, t, n)) return false;
   }
@@ -64,7 +64,7 @@ bool mitk::MultiLabelSegmentation::IsSliceSet(int s, int t, int n) const
 
 bool mitk::MultiLabelSegmentation::IsVolumeSet(int t, int n) const
 {
-  for (const auto& image : m_LayerContainer)
+  for (const auto& image : m_GroupContainer)
   {
     if (!image->IsVolumeSet(t, n)) return false;
   }
@@ -73,7 +73,7 @@ bool mitk::MultiLabelSegmentation::IsVolumeSet(int t, int n) const
 
 bool mitk::MultiLabelSegmentation::IsChannelSet(int n) const
 {
-  for (const auto& image : m_LayerContainer)
+  for (const auto& image : m_GroupContainer)
   {
     if (!image->IsChannelSet(n)) return false;
   }
@@ -108,9 +108,9 @@ mitk::MultiLabelSegmentation::MultiLabelSegmentation(const mitk::MultiLabelSegme
     m_GroupImageDimensions(other.m_GroupImageDimensions)
 {
   GroupIndexType i = 0;
-  for (auto groupImage : other.m_LayerContainer)
+  for (auto groupImage : other.m_GroupContainer)
   {
-    this->AddLayer(groupImage->Clone(), other.GetConstLabelsByValue(other.GetLabelValuesByGroup(i)));
+    this->AddGroup(groupImage->Clone(), other.GetConstLabelsByValue(other.GetLabelValuesByGroup(i)));
     i++;
   }
   m_Groups = other.m_Groups;
@@ -162,7 +162,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage,
   }
   else
   {
-    for (auto& imagePtr : m_LayerContainer)
+    for (auto& imagePtr : m_GroupContainer)
     {
       imagePtr = this->GenerateNewGroupImage();
       ClearImageBuffer(imagePtr);
@@ -175,7 +175,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage,
   // Add an initial LabelSet and corresponding image data to the stack
   if (ensure1stGroup && this->GetNumberOfGroups() == 0)
   {
-    AddLayer();
+    AddGroup();
   }
 }
 
@@ -217,7 +217,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::TimeGeometry* geometry
   }
   else
   {
-    for (auto& imagePtr : m_LayerContainer)
+    for (auto& imagePtr : m_GroupContainer)
     {
       imagePtr = this->GenerateNewGroupImage();
       ClearImageBuffer(imagePtr);
@@ -227,7 +227,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::TimeGeometry* geometry
   // Add an initial LabelSet and corresponding image data to the stack
   if (ensure1stGroup && this->GetNumberOfGroups() == 0)
   {
-    AddLayer();
+    AddGroup();
   }
 }
 
@@ -244,7 +244,7 @@ mitk::MultiLabelSegmentation::~MultiLabelSegmentation()
 
 unsigned int mitk::MultiLabelSegmentation::GetActiveLayer() const
 {
-  if (m_LayerContainer.size() == 0) mitkThrow() << "Cannot return active layer index. No layer is available.";
+  if (m_GroupContainer.size() == 0) mitkThrow() << "Cannot return active group index. No group is available.";
   if (m_ActiveLabelValue == UNLABELED_VALUE) return 0;
 
   return this->GetGroupIndexOfLabel(m_ActiveLabelValue);
@@ -252,7 +252,7 @@ unsigned int mitk::MultiLabelSegmentation::GetActiveLayer() const
 
 unsigned int mitk::MultiLabelSegmentation::GetNumberOfGroups() const
 {
-  return m_LayerContainer.size();
+  return m_GroupContainer.size();
 }
 
 void mitk::MultiLabelSegmentation::RemoveGroup(GroupIndexType indexToDelete)
@@ -275,10 +275,10 @@ void mitk::MultiLabelSegmentation::RemoveGroup(GroupIndexType indexToDelete)
     // remove the group entries in the maps and the image.
     m_Groups.erase(m_Groups.begin() + indexToDelete);
     m_GroupToLabelMap.erase(m_GroupToLabelMap.begin() + indexToDelete);
-    m_LayerContainer.erase(m_LayerContainer.begin() + indexToDelete);
+    m_GroupContainer.erase(m_GroupContainer.begin() + indexToDelete);
   }
 
-  //update old indexes in m_LabelToGroupMap to new layer indexes
+  //update old indexes in m_LabelToGroupMap to new group indexes
   for (auto& element : m_LabelToGroupMap)
   {
     if (element.second > indexToDelete) element.second = element.second -1;
@@ -355,24 +355,24 @@ mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation:
   return result;
 }
 
-mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddLayer(ConstLabelVector labels)
+mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddGroup(ConstLabelVector labels)
 {
   auto newImage = this->GenerateNewGroupImage();
   ClearImageBuffer(newImage);
 
-  return this->AddLayer(newImage, labels);
+  return this->AddGroup(newImage, labels);
 }
 
-mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddLayer(mitk::Image* layerImage, ConstLabelVector labels)
+mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddGroup(mitk::Image* groupImage, ConstLabelVector labels)
 {
   GroupIndexType newGroupID = m_Groups.size();
 
-  if (nullptr == layerImage)
+  if (nullptr == groupImage)
     mitkThrow() << "Cannot add group. Passed group image is nullptr.";
 
   bool equalGeometries = Equal(
     *(this->GetTimeGeometry()),
-    *(layerImage->GetTimeGeometry()),
+    *(groupImage->GetTimeGeometry()),
     NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION,
     NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION,
     false);
@@ -380,11 +380,11 @@ mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddLa
   if (!equalGeometries)
     mitkThrow() << "Cannot add group. Passed group image has not the same geometry like segmentation.";
 
-  if (layerImage->GetPixelType() != MakePixelType<LabelValueType, LabelValueType, 1>())
-    mitkThrow() << "Cannot add group. Passed group image has incorrect pixel type. Only LabelValueType is supported. Invalid pixel type: "<< layerImage->GetPixelType().GetTypeAsString();
+  if (groupImage->GetPixelType() != MakePixelType<LabelValueType, LabelValueType, 1>())
+    mitkThrow() << "Cannot add group. Passed group image has incorrect pixel type. Only LabelValueType is supported. Invalid pixel type: "<< groupImage->GetPixelType().GetTypeAsString();
 
-  // push a new working image for the new layer
-  m_LayerContainer.push_back(layerImage);
+  // push a new working image for the new group
+  m_GroupContainer.push_back(groupImage);
 
   m_Groups.push_back("");
   m_GroupToLabelMap.push_back({});
@@ -393,7 +393,7 @@ mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddLa
   {
     if (m_LabelMap.end() != m_LabelMap.find(label->GetValue()))
     {
-      mitkThrow() << "Cannot add layer. Labels that should be added with layer use at least one label value that is already in use. Conflicted label value: " << label->GetValue();
+      mitkThrow() << "Cannot add group. Labels that should be added with group use at least one label value that is already in use. Conflicted label value: " << label->GetValue();
     }
 
     auto labelClone = label->Clone();
@@ -411,7 +411,7 @@ mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddLa
 
 void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& labelSet)
 {
-  if (m_LayerContainer.size() <= groupID)
+  if (m_GroupContainer.size() <= groupID)
   {
     mitkThrow() << "Trying to replace labels of non-existing group. Invalid group id: "<<groupID;
   }
@@ -447,7 +447,7 @@ mitk::Image* mitk::MultiLabelSegmentation::GetGroupImage(GroupIndexType groupID)
 {
   if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
 
-  return m_LayerContainer[groupID];
+  return m_GroupContainer[groupID];
 }
 
 
@@ -455,7 +455,7 @@ const mitk::Image* mitk::MultiLabelSegmentation::GetGroupImage(GroupIndexType gr
 {
   if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;
 
-  return m_LayerContainer.at(groupID).GetPointer();
+  return m_GroupContainer.at(groupID).GetPointer();
 }
 
 void mitk::MultiLabelSegmentation::UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep)
@@ -465,12 +465,12 @@ void mitk::MultiLabelSegmentation::UpdateGroupImage(GroupIndexType groupID, cons
   if (this->GetTimeSteps()<=timestep) mitkThrow() << "Error, cannot update group image. Assigned time step is not valid for segmentation. Invalid time step: " << timestep;
   if (sourceImage->GetTimeSteps() <= sourceTimestep) mitkThrow() << "Error, cannot update group image. Requested time step of source image is not valid. Invalid source time step: " << sourceTimestep;
 
-  if (!mitk::Equal(*(m_LayerContainer[groupID]->GetGeometry(timestep)), *(sourceImage->GetGeometry(sourceTimestep)), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
+  if (!mitk::Equal(*(m_GroupContainer[groupID]->GetGeometry(timestep)), *(sourceImage->GetGeometry(sourceTimestep)), mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION))
     mitkThrow() << "Error, cannot update group image. Passed sourceImage has not the same geometry then the MultiLabelSegmentationInstance.";
 
   auto imageTimeStep = SelectImageByTimeStep(sourceImage, sourceTimestep);
   mitk::ImageReadAccessor sourceImageAcc(imageTimeStep);
-  m_LayerContainer[groupID]->SetVolume(sourceImageAcc.GetData(), timestep);
+  m_GroupContainer[groupID]->SetVolume(sourceImageAcc.GetData(), timestep);
 }
 
 
@@ -496,8 +496,13 @@ void mitk::MultiLabelSegmentation::SetActiveLabel(LabelValueType label)
 {
   if (m_ActiveLabelValue != label)
   {
+    const auto oldGroup = this->GetGroupIndexOfLabel(m_ActiveLabelValue);
     m_ActiveLabelValue = label;
     Modified();
+    if (oldGroup != this->GetGroupIndexOfLabel(m_ActiveLabelValue))
+    {
+      AfterChangeLayerEvent.Send();
+    }
   }
 }
 
@@ -547,7 +552,7 @@ void mitk::MultiLabelSegmentation::ClearGroupImage(GroupIndexType groupID, TimeS
 
 void mitk::MultiLabelSegmentation::ClearGroupImages()
 {
-  for (GroupIndexType groupID = 0; groupID < m_LayerContainer.size(); ++groupID)
+  for (GroupIndexType groupID = 0; groupID < m_GroupContainer.size(); ++groupID)
   {
     try
     {
@@ -570,7 +575,7 @@ void mitk::MultiLabelSegmentation::ClearGroupImages(TimeStepType timestep)
   if (timestep >= this->GetTimeSteps())
     mitkThrow() << "Error, cannot clear group image time step. Time step " << timestep << " is invalid. Number of time steps: " << this->GetTimeSteps();
 
-  for (GroupIndexType groupID = 0; groupID < m_LayerContainer.size(); ++groupID)
+  for (GroupIndexType groupID = 0; groupID < m_GroupContainer.size(); ++groupID)
   {
     try
     {
@@ -758,7 +763,7 @@ mitk::Label* mitk::MultiLabelSegmentation::AddLabel(mitk::Label* label, GroupInd
     std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
 
     unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
-    if (m_LayerContainer.size() >= max_size)
+    if (m_GroupContainer.size() >= max_size)
       return nullptr;
 
     if (addAsClone) newLabel = label->Clone();
@@ -919,10 +924,10 @@ void mitk::MultiLabelSegmentation::UpdateLookupTable(PixelType pixelValue)
   m_LookupTable->SetTableValue(static_cast<int>(pixelValue), rgba);
 }
 
-unsigned int mitk::MultiLabelSegmentation::GetNumberOfLabels(unsigned int layer) const
+unsigned int mitk::MultiLabelSegmentation::GetNumberOfLabels(unsigned int group) const
 {
-  if (layer >= m_Groups.size()) mitkThrow() << "Cannot get number of labels in group. Group is unknown. Invalid index:" << layer;
-  return m_GroupToLabelMap[layer].size();
+  if (group >= m_Groups.size()) mitkThrow() << "Cannot get number of labels in group. Group is unknown. Invalid index:" << group;
+  return m_GroupToLabelMap[group].size();
 }
 
 unsigned int mitk::MultiLabelSegmentation::GetTotalNumberOfLabels() const
@@ -1024,7 +1029,7 @@ itk::ModifiedTimeType mitk::MultiLabelSegmentation::GetMTime() const
 {
   itk::ModifiedTimeType result = Superclass::GetMTime();
 
-  for (const auto& groupImage : m_LayerContainer)
+  for (const auto& groupImage : m_GroupContainer)
   {
     result = std::max(result, groupImage->GetMTime());
   }
@@ -1057,59 +1062,6 @@ void mitk::MultiLabelSegmentation::CalculateCenterOfMassProcessing(ImageType *it
     this->GetSlicedGeometry()->IndexToWorld(pos, pos);
     label->SetCenterOfMassCoordinates(pos);
   }
-}
-
-template <typename TPixel, unsigned int VImageDimension>
-void mitk::MultiLabelSegmentation::LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension> *target,
-                                                          unsigned int layer)
-{
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typename ImageType::Pointer itkSource;
-  // mitk::CastToItkImage(m_LayerContainer[layer], itkSource);
-  itkSource = ImageToItkImage<TPixel, VImageDimension>(m_LayerContainer[layer]);
-  typedef itk::ImageRegionConstIterator<ImageType> SourceIteratorType;
-  typedef itk::ImageRegionIterator<ImageType> TargetIteratorType;
-
-  SourceIteratorType sourceIter(itkSource, itkSource->GetLargestPossibleRegion());
-  sourceIter.GoToBegin();
-
-  TargetIteratorType targetIter(target, target->GetLargestPossibleRegion());
-  targetIter.GoToBegin();
-
-  while (!sourceIter.IsAtEnd())
-  {
-    targetIter.Set(sourceIter.Get());
-    ++sourceIter;
-    ++targetIter;
-  }
-}
-
-template <typename TPixel, unsigned int VImageDimension>
-void mitk::MultiLabelSegmentation::ImageToLayerContainerProcessing(const itk::Image<TPixel, VImageDimension> *source,
-                                                          unsigned int layer) const
-{
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typename ImageType::Pointer itkTarget;
-  // mitk::CastToItkImage(m_LayerContainer[layer], itkTarget);
-  itkTarget = ImageToItkImage<TPixel, VImageDimension>(m_LayerContainer[layer]);
-
-  typedef itk::ImageRegionConstIterator<ImageType> SourceIteratorType;
-  typedef itk::ImageRegionIterator<ImageType> TargetIteratorType;
-
-  SourceIteratorType sourceIter(source, source->GetLargestPossibleRegion());
-  sourceIter.GoToBegin();
-
-  TargetIteratorType targetIter(itkTarget, itkTarget->GetLargestPossibleRegion());
-  targetIter.GoToBegin();
-
-  while (!sourceIter.IsAtEnd())
-  {
-    targetIter.Set(sourceIter.Get());
-    ++sourceIter;
-    ++targetIter;
-  }
-
-  m_LayerContainer[layer]->Modified();
 }
 
 template <typename ImageType>
@@ -1209,7 +1161,7 @@ bool mitk::MultiLabelSegmentation::ExistLabel(LabelValueType value, GroupIndexTy
 
 bool mitk::MultiLabelSegmentation::ExistGroup(GroupIndexType index) const
 {
-  return index < m_LayerContainer.size();
+  return index < m_GroupContainer.size();
 }
 
 mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::GetGroupIndexOfLabel(LabelValueType value) const
@@ -1425,11 +1377,11 @@ bool mitk::Equal(const mitk::MultiLabelSegmentation &leftHandSide,
     ;
   }
 
-  // number layers
+  // number groups
   returnValue = leftHandSide.GetNumberOfGroups() == rightHandSide.GetNumberOfGroups();
   if (!returnValue)
   {
-    MITK_INFO(verbose) << "Number of layers not equal.";
+    MITK_INFO(verbose) << "Number of groups not equal.";
     return false;
   }
 
@@ -1441,11 +1393,11 @@ bool mitk::Equal(const mitk::MultiLabelSegmentation &leftHandSide,
     return false;
   }
 
-  // active layer
+  // active group
   returnValue = leftHandSide.GetActiveLayer() == rightHandSide.GetActiveLayer();
   if (!returnValue)
   {
-    MITK_INFO(verbose) << "Active layer not equal.";
+    MITK_INFO(verbose) << "Active group not equal.";
     return false;
   }
 
@@ -1455,7 +1407,7 @@ bool mitk::Equal(const mitk::MultiLabelSegmentation &leftHandSide,
     return false;
   }
 
-  for (unsigned int layerIndex = 0; layerIndex < leftHandSide.GetNumberOfGroups(); layerIndex++)
+  for (unsigned int groupIndex = 0; groupIndex < leftHandSide.GetNumberOfGroups(); groupIndex++)
   {
     if (4 == leftHandSide.GetDimension())
     {
@@ -1463,23 +1415,23 @@ bool mitk::Equal(const mitk::MultiLabelSegmentation &leftHandSide,
     }
     else
     {
-      // layer image data
+      // group image data
       returnValue =
-        mitk::Equal(*leftHandSide.GetGroupImage(layerIndex), *rightHandSide.GetGroupImage(layerIndex), eps, verbose);
+        mitk::Equal(*leftHandSide.GetGroupImage(groupIndex), *rightHandSide.GetGroupImage(groupIndex), eps, verbose);
       if (!returnValue)
       {
-        MITK_INFO(verbose) << "Layer image data not equal.";
+        MITK_INFO(verbose) << "Group image data not equal.";
         return false;
       }
     }
 
     // label data
-    auto leftLabelsInGroup = leftHandSide.GetLabelValuesByGroup(layerIndex);
-    auto rightLabelsInGroup = rightHandSide.GetLabelValuesByGroup(layerIndex);
+    auto leftLabelsInGroup = leftHandSide.GetLabelValuesByGroup(groupIndex);
+    auto rightLabelsInGroup = rightHandSide.GetLabelValuesByGroup(groupIndex);
 
     if (leftLabelsInGroup.size()!=rightLabelsInGroup.size())
     {
-      MITK_INFO(verbose) << "Number of layer labels is not equal. Invalid layer:" <<layerIndex;
+      MITK_INFO(verbose) << "Number of group labels is not equal. Invalid group:" <<groupIndex;
       return false;
     }
 
@@ -1487,7 +1439,7 @@ bool mitk::Equal(const mitk::MultiLabelSegmentation &leftHandSide,
     {
       if (!mitk::Equal(*(leftHandSide.GetLabel(leftLabelsInGroup[index])), *(rightHandSide.GetLabel(rightLabelsInGroup[index])),eps,verbose))
       {
-        MITK_INFO(verbose) << "At least one label in layer is not equal. Invalid layer:" << layerIndex;
+        MITK_INFO(verbose) << "At least one label in group is not equal. Invalid group:" << groupIndex;
         return false;
       }
     }

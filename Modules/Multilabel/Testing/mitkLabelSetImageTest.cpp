@@ -140,8 +140,8 @@ public:
     mitk::Label::Pointer label3 = mitk::Label::New(30, "Label3");
 
     m_LabelSetImage->AddLabel(label1, 0);
-    m_LabelSetImage->AddLayer({ label2, label22, label3 });
-    m_LabelSetImage->AddLayer();
+    m_LabelSetImage->AddGroup({ label2, label22, label3 });
+    m_LabelSetImage->AddGroup();
     this->ResetEvents();
   }
 
@@ -184,7 +184,7 @@ public:
     label2->SetValue(300);
 
     m_LabelSetImage->AddLabel(label1, 0);
-    m_LabelSetImage->AddLayer({ label2, label3 });
+    m_LabelSetImage->AddGroup({ label2, label3 });
 
     auto clone = m_LabelSetImage->Clone();
     MITK_ASSERT_EQUAL(m_LabelSetImage, clone, "MultiLabelSegmentation clone is not equal.");
@@ -194,7 +194,7 @@ public:
   {
     CPPUNIT_ASSERT_MESSAGE("Number of layers is not zero", m_LabelSetImage->GetNumberOfGroups() == 1);
 
-    m_LabelSetImage->AddLayer();
+    m_LabelSetImage->AddGroup();
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - number of layers is not one",
                            m_LabelSetImage->GetNumberOfGroups() == 2);
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - active layer has wrong ID",
@@ -214,7 +214,7 @@ public:
     label2->SetValue(200);
 
 
-    const auto layerID = m_LabelSetImage->AddLayer({ label1, label2 });
+    const auto layerID = m_LabelSetImage->AddGroup({ label1, label2 });
     m_LabelSetImage->SetActiveLabel(200);
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - number of layers is not two",
                            m_LabelSetImage->GetNumberOfGroups() == 3);
@@ -237,7 +237,7 @@ public:
     label2->SetValue(200);
 
     mitk::MultiLabelSegmentation::ConstLabelVectorType refLayer = { label1, label2 };
-    unsigned int layerID = m_LabelSetImage->AddLayer(refLayer);
+    unsigned int layerID = m_LabelSetImage->AddGroup(refLayer);
     m_LabelSetImage->SetActiveLabel(200);
 
     auto activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
@@ -288,7 +288,7 @@ public:
     mitk::Label::Pointer label2 = mitk::Label::New(20,"Label2");
 
     m_LabelSetImage->AddLabel(label1,0);
-    m_LabelSetImage->AddLayer();
+    m_LabelSetImage->AddGroup();
     m_LabelSetImage->AddLabel(label2,1);
     this->ResetEvents();
 
@@ -419,7 +419,7 @@ public:
     mitk::Label::PixelType value = 200;
     label->SetValue(value);
 
-    m_LabelSetImage->AddLayer();
+    m_LabelSetImage->AddGroup();
     m_LabelSetImage->AddLabel(label,1);
     CPPUNIT_ASSERT_MESSAGE("Existing label was not found", m_LabelSetImage->ExistLabel(value) == true);
 
@@ -436,7 +436,7 @@ public:
     label2->SetName("Label2");
     label2->SetValue(200);
 
-    m_LabelSetImage->AddLayer({label1, label2});
+    m_LabelSetImage->AddGroup({label1, label2});
 
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(0) == true);
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(1) == true);
@@ -450,7 +450,7 @@ public:
     auto refActiveLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
 
     // Add new layers
-    m_LabelSetImage->AddLayer();
+    m_LabelSetImage->AddGroup();
 
     mitk::Label::Pointer label1 = mitk::Label::New();
     label1->SetName("Label1");
@@ -461,7 +461,7 @@ public:
     label2->SetValue(200);
 
     mitk::MultiLabelSegmentation::ConstLabelVectorType newlayer = { label1, label2 };
-    unsigned int layerID = m_LabelSetImage->AddLayer(newlayer);
+    unsigned int layerID = m_LabelSetImage->AddGroup(newlayer);
     m_LabelSetImage->SetActiveLabel(200);
 
     auto activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));

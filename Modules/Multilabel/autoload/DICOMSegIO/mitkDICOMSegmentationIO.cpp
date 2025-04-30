@@ -418,7 +418,7 @@ namespace mitk
           {
             // Add a new group because we have to expect every label to be overlapping
             // the label content is directly transferred here.
-            groupID = labelSetImage->AddLayer(segmentImage);
+            groupID = labelSetImage->AddGroup(segmentImage);
           }
 
           // Add the new label

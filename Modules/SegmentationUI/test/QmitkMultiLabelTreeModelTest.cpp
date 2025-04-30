@@ -79,8 +79,8 @@ public:
     seg->AddLabel(CreateLabel("A", 5),0);
     seg->AddLabel(CreateLabel("B", 4),0);
 
-    seg->AddLayer();
-    seg->AddLayer();
+    seg->AddGroup();
+    seg->AddGroup();
 
     seg->AddLabel(CreateLabel("B", 9),2);
 
@@ -277,7 +277,7 @@ public:
     QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
 
-    m_Segmentation->AddLayer();
+    m_Segmentation->AddGroup();
 
     CPPUNIT_ASSERT_EQUAL(4, model.rowCount(QModelIndex()));
     CheckModelGroup0Default(model);

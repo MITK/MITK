@@ -50,7 +50,7 @@ mitk::MultiLabelSegmentation::Pointer
     auto inputGroupImage = input->GetGroupImage(groupID);
     auto mappedGroupImage = ImageMappingHelper::map(inputGroupImage, registration, throwOnOutOfInputAreaError, 0, resultGeometry, throwOnMappingError, errorValue, mitk::ImageMappingInterpolator::NearestNeighbor);
 
-    resultLabelSetImage->AddLayer(mappedGroupImage, input->GetConstLabelsByValue(input->GetLabelValuesByGroup(groupID)));
+    resultLabelSetImage->AddGroup(mappedGroupImage, input->GetConstLabelsByValue(input->GetLabelValuesByGroup(groupID)));
   }
 
   resultLabelSetImage->SetActiveLabel(input->GetActiveLabel()->GetValue());

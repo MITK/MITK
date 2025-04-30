@@ -226,7 +226,7 @@ void QmitkBooleanOperationsWidget::SaveResultLabelMask(const mitk::Image* result
   auto labels = m_Controls->labelInspector->GetSelectedLabels();
   if (labels.empty()) mitkThrow() << "Widget is in invalid state. Processing was triggered with no label selected.";
 
-  auto groupID = seg->AddLayer();
+  auto groupID = seg->AddGroup();
   auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(seg, labelName, true);
   seg->AddLabelWithContent(newLabel, resultMask, groupID, 1);
 

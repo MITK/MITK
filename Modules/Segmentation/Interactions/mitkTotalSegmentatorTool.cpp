@@ -173,7 +173,7 @@ mitk::MultiLabelSegmentation::Pointer mitk::TotalSegmentatorTool::AgglomerateLab
   initImage->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dimensions);
   aggloLabelImage->Initialize(initImage);
   aggloLabelImage->SetGeometry(geometry);
-  const auto layerIndex = aggloLabelImage->AddLayer();
+  const auto layerIndex = aggloLabelImage->AddGroup();
   int numFiles = static_cast<int>(filePaths.size());
 
   #pragma omp parallel for

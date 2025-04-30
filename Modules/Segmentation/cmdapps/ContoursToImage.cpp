@@ -249,7 +249,7 @@ int main(int argc, char* argv[])
         }
         else
         {
-          labelSetImage->AddLayer(image);
+          labelSetImage->AddGroup(image);
           auto label = mitk::LabelSetImageHelper::CreateNewLabel(labelSetImage);
           label->SetValue(labelValue);
           labelSetImage->AddLabel(label, labelSetImage->GetActiveLayer(), false, false);

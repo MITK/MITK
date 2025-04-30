@@ -41,7 +41,7 @@ mitk::MultiLabelSegmentation::Pointer
   auto mappedTimeGeometry = ImageMappingHelper::CreateResultTimeGeometry(input, resultGeometry);
 
   auto resultTemplate = mitk::Image::New();
-  resultTemplate->Initialize(mitk::MakeScalarPixelType<MultiLabelSegmentation::PixelType>(), *mappedTimeGeometry, 1, input->GetTimeSteps());
+  resultTemplate->Initialize(MultiLabelSegmentation::GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
 
   resultLabelSetImage->Initialize(resultTemplate, true, false);
 

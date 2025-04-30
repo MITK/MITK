@@ -53,6 +53,12 @@ namespace mitk
 
 const mitk::MultiLabelSegmentation::LabelValueType mitk::MultiLabelSegmentation::UNLABELED_VALUE = 0;
 
+mitk::PixelType mitk::MultiLabelSegmentation::GetPixelType()
+{
+  return MakePixelType<LabelValueType, LabelValueType, 1>();
+};
+
+
 bool mitk::MultiLabelSegmentation::IsSliceSet(int s, int t, int n) const
 {
   for (const auto& image : m_GroupContainer)
@@ -123,7 +129,7 @@ mitk::Image::Pointer mitk::MultiLabelSegmentation::GenerateNewGroupImage() const
 {
   auto groupImage = Image::New();
 
-  mitk::PixelType pixelType(mitk::MakeScalarPixelType<MultiLabelSegmentation::PixelType>());
+  auto pixelType = this->GetPixelType();
 
   auto geometryDimensions = DetermineImageDimensionsFromTimeGeometry(this->GetTimeGeometry());
   if (geometryDimensions.size() == 2)
@@ -185,14 +191,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::TimeGeometry* geometry
 
   auto clonedGeometry = geometry->Clone();
 
-  m_GroupImageDimensions.clear();
-  m_GroupImageDimensions.push_back(clonedGeometry->GetGeometryForTimeStep(0)->GetExtent(0) + 0.5);
-  m_GroupImageDimensions.push_back(clonedGeometry->GetGeometryForTimeStep(0)->GetExtent(1) + 0.5);
-  auto zDim = clonedGeometry->GetGeometryForTimeStep(0)->GetExtent(2) + 0.5;
-  if (zDim > 1)
-      m_GroupImageDimensions.push_back(zDim);
-  if (clonedGeometry->CountTimeSteps() > 1)
-    m_GroupImageDimensions.push_back(clonedGeometry->CountTimeSteps());
+  m_GroupImageDimensions = DetermineImageDimensionsFromTimeGeometry(clonedGeometry);
 
   // make sure the image geometry flag is properly set for all time steps
   for (TimeStepType step = 0; step < clonedGeometry->CountTimeSteps(); ++step)
@@ -857,7 +856,7 @@ const mitk::Label* mitk::MultiLabelSegmentation::GetActiveLabel() const
   return finding == m_LabelMap.end() ? nullptr : finding->second;
 }
 
-void mitk::MultiLabelSegmentation::UpdateCenterOfMass(PixelType pixelValue)
+void mitk::MultiLabelSegmentation::UpdateCenterOfMass(LabelValueType pixelValue)
 {
   if (4 == this->GetDimension())
   {
@@ -869,7 +868,7 @@ void mitk::MultiLabelSegmentation::UpdateCenterOfMass(PixelType pixelValue)
   }
 }
 
-bool mitk::MultiLabelSegmentation::IsEmpty(PixelType pixelValue, TimeStepType t) const
+bool mitk::MultiLabelSegmentation::IsEmpty(LabelValueType pixelValue, TimeStepType t) const
 {
   Image::ConstPointer image = this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue));
   image = SelectImageByTimeStep(image, t);
@@ -879,7 +878,7 @@ bool mitk::MultiLabelSegmentation::IsEmpty(PixelType pixelValue, TimeStepType t)
   for (int i = 0; i < 3; ++i)
     numPixels *= static_cast<size_t>(image->GetDimension(i));
 
-  ImagePixelReadAccessor<PixelType, 3> accessor(image);
+  ImagePixelReadAccessor<LabelValueType, 3> accessor(image);
   auto pixels = accessor.GetData();
 
   for (size_t i = 0; i < numPixels; ++i)
@@ -905,7 +904,7 @@ void mitk::MultiLabelSegmentation::SetLookupTable(mitk::LookupTable* lut)
   this->Modified();
 }
 
-void mitk::MultiLabelSegmentation::UpdateLookupTable(PixelType pixelValue)
+void mitk::MultiLabelSegmentation::UpdateLookupTable(LabelValueType pixelValue)
 {
   auto label = this->GetLabel(pixelValue);
   if (label.IsNull()) mitkThrow() << "Cannot update lookup table. Unknown label value provided. Unknown label value:" << pixelValue;
@@ -984,7 +983,7 @@ void mitk::MultiLabelSegmentation::InitializeByLabeledImageProcessing(MultiLabel
   while (!sourceIter.IsAtEnd())
   {
     const auto originalSourceValue = sourceIter.Get();
-    const auto sourceValue = static_cast<PixelType>(originalSourceValue);
+    const auto sourceValue = static_cast<LabelValueType>(originalSourceValue);
 
     if (originalSourceValue > mitk::Label::MAX_LABEL_VALUE)
     {
@@ -1065,7 +1064,7 @@ void mitk::MultiLabelSegmentation::CalculateCenterOfMassProcessing(ImageType *it
 }
 
 template <typename ImageType>
-void mitk::MultiLabelSegmentation::EraseLabelProcessing(ImageType *itkImage, PixelType pixelValue)
+void mitk::MultiLabelSegmentation::EraseLabelProcessing(ImageType *itkImage, LabelValueType pixelValue)
 {
   typedef itk::ImageRegionIterator<ImageType> IteratorType;
 
@@ -1074,7 +1073,7 @@ void mitk::MultiLabelSegmentation::EraseLabelProcessing(ImageType *itkImage, Pix
 
   while (!iter.IsAtEnd())
   {
-    PixelType value = iter.Get();
+    LabelValueType value = iter.Get();
 
     if (value == pixelValue)
     {

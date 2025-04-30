@@ -38,7 +38,7 @@ namespace mitk
 
     itkNewMacro(Self);
 
-    typedef MultiLabelSegmentation::PixelType LabelType;
+    typedef MultiLabelSegmentation::LabelValueType LabelType;
 
     typedef std::map<LabelType, unsigned long> LabelMapType;
 

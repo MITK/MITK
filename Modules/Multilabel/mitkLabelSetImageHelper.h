@@ -75,7 +75,11 @@ namespace mitk
     MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassName(const MultiLabelSegmentation* labelSetImage, MultiLabelSegmentation::GroupIndexType groupID);
     MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassName(const MultiLabelSegmentation* labelSetImage, MultiLabelSegmentation::GroupIndexType groupID, const MultiLabelSegmentation::LabelValueVectorType& labelValues);
 
+    /** Type that represents the mapping from a source group id to relevant target group ids (first map) and then to mapping to respective
+    label value mapping vectors for each target group id (inner/second map).*/
     using SourceToTargetGroupIDToLabelValueMappingMapType = std::map<MultiLabelSegmentation::GroupIndexType, std::map<MultiLabelSegmentation::GroupIndexType, LabelValueMappingVector> >;
+    /** Helper function that takes a label mapping vector and deduces which group ids are needed in the source segmentation and target segmentation to conduct a mapping of pixel values.
+    The result is e.g. used by TransferLabelContent.*/
     MITKMULTILABEL_EXPORT SourceToTargetGroupIDToLabelValueMappingMapType SplitLabelValueMappingBySourceAndTargetGroup(const MultiLabelSegmentation* sourceSeg, const MultiLabelSegmentation* targetSeg, const LabelValueMappingVector& labelMapping);
 
     MITKMULTILABEL_EXPORT std::string CreateDisplayGroupName(const MultiLabelSegmentation* labelSetImage, MultiLabelSegmentation::GroupIndexType groupID);

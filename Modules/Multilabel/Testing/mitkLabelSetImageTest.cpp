@@ -461,7 +461,7 @@ public:
     label2->SetValue(200);
 
     mitk::MultiLabelSegmentation::ConstLabelVectorType newlayer = { label1, label2 };
-    unsigned int layerID = m_LabelSetImage->AddGroup(newlayer);
+    m_LabelSetImage->AddGroup(newlayer);
     m_LabelSetImage->SetActiveLabel(200);
 
     auto activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));

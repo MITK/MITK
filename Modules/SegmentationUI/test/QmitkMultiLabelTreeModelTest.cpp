@@ -75,8 +75,6 @@ public:
   */
   void PopulateSegmentation(mitk::MultiLabelSegmentation* seg)
   {
-    seg->SetActiveLayer(0);
-
     seg->AddLabel(CreateLabel("A", 1),0);
     seg->AddLabel(CreateLabel("A", 5),0);
     seg->AddLabel(CreateLabel("B", 4),0);
@@ -208,8 +206,7 @@ public:
     QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
 
-    //Add label instance (not visible) to labelwith multiple instances (at the end)
-    m_Segmentation->SetActiveLayer(0);
+    //Add label instance (not visible) to label with multiple instances (at the end)
     auto newLabel = CreateLabel("A", 100);
     newLabel->SetVisible(false);
     m_Segmentation->AddLabel(newLabel,0);
@@ -233,7 +230,6 @@ public:
     CheckModelGroup2Default(model);
 
     //Add label instance (not locked) to label with multiple instances (in between)
-    m_Segmentation->SetActiveLayer(0);
     newLabel = CreateLabel("A", 7);
     newLabel->SetLocked(false);
     m_Segmentation->AddLabel(newLabel,0);
@@ -263,7 +259,6 @@ public:
     model.SetSegmentation(m_Segmentation);
 
     //Add label instance to an empty group
-    m_Segmentation->SetActiveLayer(1);
     newLabel = CreateLabel("A", 3);
     m_Segmentation->AddLabel(newLabel,1);
 
@@ -541,7 +536,6 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 2,0 })));
 
     //check instance modifications with multi instance label
-    m_Segmentation->SetActiveLayer(2);
     m_Segmentation->AddLabel(CreateLabel("B", 33),2);
     label->SetVisible(true);
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));

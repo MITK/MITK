@@ -78,7 +78,7 @@ public:
 
     auto lsimage1 = dynamic_cast<mitk::MultiLabelSegmentation*>(testImages[0].GetPointer());
 
-    CPPUNIT_ASSERT_MESSAGE("Number of layers is not correct", lsimage1->GetNumberOfLayers() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Number of layers is not correct", lsimage1->GetNumberOfGroups() == 1);
     CPPUNIT_ASSERT_MESSAGE("Number of labels is not correct", lsimage1->GetTotalNumberOfLabels() == 0);
   }
 

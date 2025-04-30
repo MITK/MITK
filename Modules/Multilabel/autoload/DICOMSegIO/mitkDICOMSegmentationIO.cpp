@@ -469,10 +469,6 @@ namespace mitk
 
       auto findings = DICOMIOHelper::ExtractPathsOfInterest(tagsOfInterestList, frames);
       DICOMIOHelper::SetProperties(labelSetImage, findings);
-
-      // Set active layer to the first layer of the labelset image
-      if (labelSetImage->GetNumberOfGroups() > 1 && labelSetImage->GetActiveLayer() != 0)
-        labelSetImage->SetActiveLayer(0);
     }
     catch (const std::exception &e)
     {

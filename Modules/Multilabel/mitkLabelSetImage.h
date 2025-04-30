@@ -612,7 +612,6 @@ namespace mitk
      */
     unsigned int GetTotalNumberOfLabels() const;
 
-    void SetActiveLayer(unsigned int layer);
     void SetActiveLabel(LabelValueType label);
 
     unsigned int GetNumberOfGroups() const;
@@ -662,8 +661,6 @@ namespace mitk
     LabelValueVectorType GetUsedLabelValues() const;
 
     std::vector<Image::Pointer> m_LayerContainer;
-
-    int m_ActiveLayer;
   };
 
   /**

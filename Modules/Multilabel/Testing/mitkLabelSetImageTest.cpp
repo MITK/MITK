@@ -71,7 +71,6 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestGetNumberOfLabels);
   MITK_TEST(TestExistsLabel);
   MITK_TEST(TestExistsGroup);
-  MITK_TEST(TestSetActiveLayer);
   MITK_TEST(TestRemoveLayer);
   MITK_TEST(TestRemoveLabels);
   MITK_TEST(TestEraseLabels);
@@ -422,7 +421,6 @@ public:
 
     m_LabelSetImage->AddLayer();
     m_LabelSetImage->AddLabel(label,1);
-    m_LabelSetImage->SetActiveLayer(0);
     CPPUNIT_ASSERT_MESSAGE("Existing label was not found", m_LabelSetImage->ExistLabel(value) == true);
 
     CPPUNIT_ASSERT_MESSAGE("Non existing label was found", m_LabelSetImage->ExistLabel(10000) == false);
@@ -445,44 +443,10 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(20) == false);
   }
 
-  void TestSetActiveLayer()
-  {
-    // Cache active layer
-    auto refActiveLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
-
-    // Add new layer
-    mitk::Label::Pointer label1 = mitk::Label::New();
-    label1->SetName("Label1");
-    label1->SetValue(1);
-
-    mitk::Label::Pointer label2 = mitk::Label::New();
-    label2->SetName("Label2");
-    label2->SetValue(200);
-
-    mitk::MultiLabelSegmentation::ConstLabelVectorType newlayer = { label1, label2 };
-    unsigned int layerID = m_LabelSetImage->AddLayer(newlayer);
-
-    // Set initial layer as active layer
-    m_LabelSetImage->SetActiveLayer(0);
-    auto activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
-    CPPUNIT_ASSERT_MESSAGE("Wrong active labelset returned",
-                           mitk::Equal(refActiveLayer, activeLayer, 0.00001, true));
-
-    // Set previously added layer as active layer
-    m_LabelSetImage->SetActiveLayer(layerID);
-    activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
-    CPPUNIT_ASSERT_MESSAGE("Wrong active labelset returned",
-                           mitk::Equal(newlayer, activeLayer, 0.00001, true));
-
-    // Set a non existing layer as active layer - nothing should change
-    m_LabelSetImage->SetActiveLayer(10000);
-    CPPUNIT_ASSERT_MESSAGE("Wrong active labelset returned",
-                           mitk::Equal(newlayer, activeLayer, 0.00001, true));
-  }
-
   void TestRemoveLayer()
   {
     // Cache active layer
+    m_LabelSetImage->AddLabel(mitk::Label::New(1, "Initial Label"),0,false);
     auto refActiveLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
 
     // Add new layers
@@ -490,7 +454,7 @@ public:
 
     mitk::Label::Pointer label1 = mitk::Label::New();
     label1->SetName("Label1");
-    label1->SetValue(1);
+    label1->SetValue(10);
 
     mitk::Label::Pointer label2 = mitk::Label::New();
     label2->SetName("Label2");
@@ -498,7 +462,7 @@ public:
 
     mitk::MultiLabelSegmentation::ConstLabelVectorType newlayer = { label1, label2 };
     unsigned int layerID = m_LabelSetImage->AddLayer(newlayer);
-    m_LabelSetImage->SetActiveLayer(layerID);
+    m_LabelSetImage->SetActiveLabel(200);
 
     auto activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
     CPPUNIT_ASSERT_MESSAGE("Wrong active labelset returned",

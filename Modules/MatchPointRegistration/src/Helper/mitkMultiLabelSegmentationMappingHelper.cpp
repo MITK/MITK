@@ -53,7 +53,6 @@ mitk::MultiLabelSegmentation::Pointer
     resultLabelSetImage->AddLayer(mappedGroupImage, input->GetConstLabelsByValue(input->GetLabelValuesByGroup(groupID)));
   }
 
-  resultLabelSetImage->SetActiveLayer(input->GetActiveLayer());
   resultLabelSetImage->SetActiveLabel(input->GetActiveLabel()->GetValue());
 
   return resultLabelSetImage;

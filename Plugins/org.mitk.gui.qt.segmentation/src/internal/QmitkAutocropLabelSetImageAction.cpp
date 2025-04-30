@@ -160,9 +160,7 @@ namespace
 
     for (std::remove_const_t<decltype(numLayers)> layer = 0; layer < numLayers; ++layer)
     {
-      labelSetImage->SetActiveLayer(layer);
       auto groupID = croppedLabelSetImage->AddLayer();
-      croppedLabelSetImage->SetActiveLayer(groupID);
 
       for (std::remove_const_t<decltype(numTimeSteps)> timeStep = 0; timeStep < numTimeSteps; ++timeStep)
       {
@@ -215,9 +213,6 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
     if (labelSetImage.IsNull())
       continue;
 
-    // Backup currently active layer as we need to restore it later
-    auto activeLayer = labelSetImage->GetActiveLayer();
-
     mitk::MultiLabelSegmentation::Pointer croppedLabelSetImage;
     itk::Index<3> minIndex;
     itk::Index<3> maxIndex;
@@ -227,7 +222,6 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
       if (!DetermineMinimumAndMaximumIndicesOfNonBackgroundPixels(labelSetImage, minIndex, maxIndex))
       {
         MITK_WARN << "Autocrop was skipped: Image \"" << dataNode->GetName() << "\" is empty.";
-        labelSetImage->SetActiveLayer(activeLayer); // Restore the originally active layer
         return;
       }
 
@@ -236,12 +230,8 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
     catch (const mitk::Exception& e)
     {
       MITK_ERROR << "Autocrop was aborted: Image read access to \"" << dataNode->GetName() << "\" was denied. Details: "<< e.what();
-      labelSetImage->SetActiveLayer(activeLayer); // Restore the originally active layer
       return;
     }
-
-    // Restore the originally active layer in the cropped MultiLabelSegmentation
-    croppedLabelSetImage->SetActiveLayer(activeLayer);
 
     // Override the original MultiLabelSegmentation with the cropped MultiLabelSegmentation
     dataNode->SetData(croppedLabelSetImage);

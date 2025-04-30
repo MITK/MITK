@@ -617,7 +617,6 @@ mitk::Label* QmitkMultiLabelInspector::AddNewGroup()
   {
     this->WaitCursorOn();
     groupID = m_Segmentation->AddLayer();
-    m_Segmentation->SetActiveLayer(groupID);
     this->WaitCursorOff();
     newLabel =  this->AddNewLabelInternal(groupID);
   }

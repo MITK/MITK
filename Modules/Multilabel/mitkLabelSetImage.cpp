@@ -91,7 +91,7 @@ const mitk::MultiLabelSegmentation::GroupImageDimensionVectorType& mitk::MultiLa
 };
 
 mitk::MultiLabelSegmentation::MultiLabelSegmentation()
-  : mitk::SlicedData(), m_ActiveLabelValue(0), m_UnlabeledLabelLock(false), m_ActiveLayer(0)
+  : mitk::SlicedData(), m_ActiveLabelValue(0), m_UnlabeledLabelLock(false)
 {
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
@@ -105,8 +105,7 @@ mitk::MultiLabelSegmentation::MultiLabelSegmentation(const mitk::MultiLabelSegme
     m_ActiveLabelValue(other.m_ActiveLabelValue),
     m_LookupTable(other.m_LookupTable->Clone()),
     m_UnlabeledLabelLock(other.m_UnlabeledLabelLock),
-    m_GroupImageDimensions(other.m_GroupImageDimensions),
-    m_ActiveLayer(other.GetActiveLayer())
+    m_GroupImageDimensions(other.m_GroupImageDimensions)
 {
   GroupIndexType i = 0;
   for (auto groupImage : other.m_LayerContainer)
@@ -147,7 +146,7 @@ void mitk::MultiLabelSegmentation::Initialize()
 
 void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage, bool resetLabels, bool ensure1stGroup)
 {
-  if (nullptr == templateImage) mitkThrow() << "Cannot initialize multi label segementation instance. Passed template image is a nullptr.";
+  if (nullptr == templateImage) mitkThrow() << "Cannot initialize multi label segmentation instance. Passed template image is a nullptr.";
 
   auto originalGeometry = templateImage->GetTimeGeometry()->Clone();
   originalGeometry->UpdateBoundingBox();
@@ -182,7 +181,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::Image * templateImage,
 
 void mitk::MultiLabelSegmentation::Initialize(const mitk::TimeGeometry* geometry, bool resetLabels, bool ensure1stGroup)
 {
-  if (nullptr == geometry) mitkThrow() << "Cannot initialize multi label segementation instance. Passed time geometry is a nullptr.";
+  if (nullptr == geometry) mitkThrow() << "Cannot initialize multi label segmentation instance. Passed time geometry is a nullptr.";
 
   auto clonedGeometry = geometry->Clone();
 
@@ -201,7 +200,7 @@ void mitk::MultiLabelSegmentation::Initialize(const mitk::TimeGeometry* geometry
     if (!clonedGeometry->GetGeometryCloneForTimeStep(step)->GetImageGeometry())
     {
       MITK_WARN("Image.3DnT.Initialize") << " Attempt to initialize an image with a non-image geometry. "
-        "Re-interpretting the initialization geometry for timestep "
+        "Re-interpreting the initialization geometry for time step "
         << step << " as image geometry, the original geometry remains unchanged.";
       clonedGeometry->GetGeometryForTimeStep(step)->ImageGeometryOn();
     }
@@ -260,27 +259,6 @@ void mitk::MultiLabelSegmentation::RemoveGroup(GroupIndexType indexToDelete)
 {
   if (!this->ExistGroup(indexToDelete)) mitkThrow() << "Cannot remove group. Group does not exist. Invalid group index: "<<indexToDelete;
 
-  const auto activeIndex = GetActiveLayer();
-
-  auto newActiveIndex = activeIndex;
-  //determine new active group index (after the group will be removed);
-  if (indexToDelete < activeIndex)
-  { //lower the index because position in m_LayerContainer etc has changed
-    newActiveIndex = activeIndex-1;
-  }
-  else if (indexToDelete == activeIndex)
-  {
-    if (this->GetNumberOfGroups() == 1)
-    { //last layer is about to be deleted
-      newActiveIndex = 0;
-    }
-    else
-    {
-      //we have to add/subtract one more because we have not removed the layer yet, thus the group count is to 1 high.
-      newActiveIndex = indexToDelete+1 < GetNumberOfGroups() ? indexToDelete : GetNumberOfGroups() - 2;
-    }
-  }
-
   auto relevantLabels = m_GroupToLabelMap[indexToDelete];
 
   {
@@ -300,14 +278,24 @@ void mitk::MultiLabelSegmentation::RemoveGroup(GroupIndexType indexToDelete)
     m_LayerContainer.erase(m_LayerContainer.begin() + indexToDelete);
   }
 
-  //update old indexes in m_GroupToLabelMap to new layer indexes
+  //update old indexes in m_LabelToGroupMap to new layer indexes
   for (auto& element : m_LabelToGroupMap)
   {
     if (element.second > indexToDelete) element.second = element.second -1;
   }
 
-  //correct active layer index
-  m_ActiveLayer = newActiveIndex;
+  if (!this->ExistLabel(m_ActiveLabelValue))
+  {
+    //the current active label was removed with the group. Set active label to the first defined label
+    if (!m_LabelMap.empty())
+    {
+      m_ActiveLabelValue = m_LabelMap.begin()->first;
+    }
+    else
+    {
+      m_ActiveLabelValue = MultiLabelSegmentation::UNLABELED_VALUE;
+    }
+  }
 
   this->InvokeEvent(LabelsChangedEvent(relevantLabels));
   this->InvokeEvent(GroupRemovedEvent(indexToDelete));
@@ -503,25 +491,14 @@ void mitk::MultiLabelSegmentation::SetGroupName(GroupIndexType groupID, const st
   this->InvokeEvent(GroupModifiedEvent(groupID));
 }
 
-void mitk::MultiLabelSegmentation::SetActiveLayer(unsigned int layer)
-{
-  if (layer != GetActiveLayer() && (layer < this->GetNumberOfLayers()))
-  {
-    m_ActiveLayer = layer;
-    this->Modified();
-  }
-}
 
 void mitk::MultiLabelSegmentation::SetActiveLabel(LabelValueType label)
 {
-  m_ActiveLabelValue = label;
-
-  if (label != UNLABELED_VALUE)
+  if (m_ActiveLabelValue != label)
   {
-    auto groupID = this->GetGroupIndexOfLabel(label);
-    if (groupID!=this->GetActiveLayer()) this->SetActiveLayer(groupID);
+    m_ActiveLabelValue = label;
+    Modified();
   }
-  Modified();
 }
 
 void mitk::MultiLabelSegmentation::ClearGroupImage(GroupIndexType groupID)

@@ -85,7 +85,7 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
     return false;
   }
 
-  auto activeLayerBackup = inputImage->GetActiveLayer();
+  auto activeLabelBackup = inputImage->GetActiveLabel();
 
   int numberOfLayers = 0;
   rootElement->QueryIntAttribute("layers", &numberOfLayers);
@@ -148,7 +148,10 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
       continue;
   }
 
-  inputImage->SetActiveLayer(activeLayerBackup);
+  if (nullptr != activeLabelBackup)
+  {
+    inputImage->SetActiveLabel(activeLabelBackup->GetValue());
+  }
 
   return true;
 }

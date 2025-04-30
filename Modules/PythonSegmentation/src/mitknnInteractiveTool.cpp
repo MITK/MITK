@@ -469,7 +469,7 @@ void mitk::nnInteractiveTool::StartSession()
   auto imageAtTimeStep = this->GetImageByTimeStep(image, timeStep);
   const auto spacing = imageAtTimeStep->GetGeometry()->GetSpacing();
 
-  mitk::PixelType maskPixelType(mitk::MakeScalarPixelType<MultiLabelSegmentation::PixelType>());
+  const auto maskPixelType = MultiLabelSegmentation::GetPixelType>();
   m_Impl->TargetBuffer->Initialize(maskPixelType, *(imageAtTimeStep->GetTimeGeometry()));
 
   pythonContext->TransferBaseDataToPython(imageAtTimeStep, "mitk_image");

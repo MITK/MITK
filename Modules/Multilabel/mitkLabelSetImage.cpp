@@ -243,7 +243,7 @@ mitk::MultiLabelSegmentation::~MultiLabelSegmentation()
 
 unsigned int mitk::MultiLabelSegmentation::GetActiveLayer() const
 {
-  if (m_GroupContainer.size() == 0) mitkThrow() << "Cannot return active group index. No group is available.";
+  if (m_GroupContainer.empty()) mitkThrow() << "Cannot return active group index. No group is available.";
   if (m_ActiveLabelValue == UNLABELED_VALUE) return 0;
 
   return this->GetGroupIndexOfLabel(m_ActiveLabelValue);

@@ -495,10 +495,23 @@ void mitk::MultiLabelSegmentation::SetActiveLabel(LabelValueType label)
 {
   if (m_ActiveLabelValue != label)
   {
-    const auto oldGroup = this->GetGroupIndexOfLabel(m_ActiveLabelValue);
+    bool eventNeeded = false;
+    if (m_ActiveLabelValue != label)
+    {
+      if (UNLABELED_VALUE == m_ActiveLabelValue || UNLABELED_VALUE == label)
+      {
+        eventNeeded = true;
+      }
+      else if (this->GetGroupIndexOfLabel(m_ActiveLabelValue) != this->GetGroupIndexOfLabel(label))
+      {
+        eventNeeded = true;
+      }
+    }
+
     m_ActiveLabelValue = label;
     Modified();
-    if (oldGroup != this->GetGroupIndexOfLabel(m_ActiveLabelValue))
+
+    if (eventNeeded)
     {
       AfterChangeLayerEvent.Send();
     }

@@ -52,6 +52,8 @@ public:
 
   void SetBaseRenderer(mitk::BaseRenderer* baseRenderer);
 
+  QmitkRenderWindowDataNodeTableModel* GetStorageModel() const;
+
   void SetSelectAll(bool selectAll);
   bool GetSelectAll() const;
   void SelectAll();
@@ -63,9 +65,11 @@ Q_SIGNALS:
 
   void SelectionModeChanged(bool selectAll);
   void DeregisterSynchronization();
+  void NodeVisibilityChanged(mitk::DataNode::Pointer node, const bool visibility);
 
 public Q_SLOTS:
   void SetSelection(const NodeList& newSelection);
+  void SetNodeVisibility(mitk::DataNode::Pointer node, const bool visibility);
 
 private Q_SLOTS:
 

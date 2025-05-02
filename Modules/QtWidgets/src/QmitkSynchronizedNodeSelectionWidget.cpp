@@ -119,6 +119,11 @@ void QmitkSynchronizedNodeSelectionWidget::SetBaseRenderer(mitk::BaseRenderer* b
   this->Initialize();
 }
 
+QmitkRenderWindowDataNodeTableModel* QmitkSynchronizedNodeSelectionWidget::GetStorageModel() const
+{
+  return m_StorageModel.get();
+}
+
 void QmitkSynchronizedNodeSelectionWidget::SetSelectAll(bool selectAll)
 {
   if (selectAll == m_Controls.selectionModeCheckBox->isChecked())
@@ -190,8 +195,9 @@ void QmitkSynchronizedNodeSelectionWidget::OnTableClicked(const QModelIndex& ind
 
   if (index.column() == 1) // node visibility column
   {
-    bool visibiliy = index.data(Qt::EditRole).toBool();
-    m_StorageModel->setData(index, QVariant(!visibiliy), Qt::EditRole);
+    bool visibility = index.data(Qt::EditRole).toBool();
+    m_StorageModel->setData(index, QVariant(!visibility), Qt::EditRole);
+    emit NodeVisibilityChanged(dataNode, !visibility);
     return;
   }
 
@@ -543,4 +549,18 @@ void QmitkSynchronizedNodeSelectionWidget::SetSynchGroup(const GroupSyncIndexTyp
 QmitkSynchronizedNodeSelectionWidget::GroupSyncIndexType QmitkSynchronizedNodeSelectionWidget::GetSynchGroup() const
 {
   return m_SynchGroupIndex;
+}
+
+void QmitkSynchronizedNodeSelectionWidget::SetNodeVisibility(mitk::DataNode::Pointer node, const bool visibility)
+{
+  auto baseRenderer = m_BaseRenderer.Lock();
+  if (baseRenderer.IsNull())
+  {
+    return;
+  }
+  node->SetVisibility(visibility, baseRenderer);
+
+  // Explicitly request an update since a renderer-specific property change does not mark the node as modified.
+  // see https://phabricator.mitk.org/T22322
+  mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
 }

@@ -30,8 +30,8 @@ found in the LICENSE file.
 *        with base renderer-specific functionality.
 * 
 *        Given a base renderer, the selection widget is able to display and access render window specific properties
-*        of the selected nodes, making it possible to switch between a "synchronized" and "desynchronized" selection
-*        state.
+*        of the selected nodes. It can be connected with other QmitkSynchronizedNodeSelectionWidgets to synchronize
+*        their state.
 *        The widget can be used to decide if all data nodes of the data storage should be selected or
 *        only an individually selected set of nodes, defined by a 'QmitkNodeSelectionDialog'.
 *        If individual nodes are selected / removed from the selection, the widget can inform other

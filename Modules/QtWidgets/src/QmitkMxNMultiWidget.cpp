@@ -368,8 +368,8 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,
     utilityWidget, &QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection);
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SynchGroupChanged, this, &QmitkMxNMultiWidget::SetSynchronizationGroup);
-  connect(this, &QmitkMxNMultiWidget::SynchGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSynchGroupAdded);
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncGroupChanged, this, &QmitkMxNMultiWidget::SetSynchronizationGroup);
+  connect(this, &QmitkMxNMultiWidget::SyncGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSyncGroupAdded);
 
   // needs to be done after 'QmitkRenderWindowUtilityWidget::ToggleSynchronization' has been connected
   // initially synchronize the node selection widget
@@ -497,7 +497,7 @@ nlohmann::json QmitkMxNMultiWidget::BuildJSONFromLayout(const QSplitter* splitte
     {
       widgetJSON["isWindow"] = true;
       widgetJSON["viewDirection"] = widgetWindow->GetSliceNavigationController()->GetViewDirectionAsString();
-      widgetJSON["synchGroup"] = widgetWindow->GetUtilityWidget()->GetSynchGroup();
+      widgetJSON["syncGroup"] = widgetWindow->GetUtilityWidget()->GetSyncGroup();
     }
     widgetJSON["size"] = sizes[i];
     content.push_back(widgetJSON);
@@ -542,7 +542,7 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
         viewPlane = mitk::AnatomicalPlane::Sagittal;
       }
 
-      const GroupSyncIndexType synchGroup = object["synchGroup"].get<const GroupSyncIndexType>();
+      const GroupSyncIndexType syncGroup = object["syncGroup"].get<const GroupSyncIndexType>();
 
       // repurpose existing render windows as far as they already exist
       auto window = GetWindowFromIndex(*windowCounter);
@@ -551,7 +551,7 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
         window = CreateRenderWindowWidget();
       }
 
-      window->GetUtilityWidget()->SetSynchGroup(synchGroup);
+      window->GetUtilityWidget()->SetSyncGroup(syncGroup);
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();
       split->addWidget(window.get());
@@ -590,7 +590,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
       }
 
       auto utilityWidget = window->GetUtilityWidget();
-      utilityWidget->SetSynchGroup(rowCounter);
+      utilityWidget->SetSyncGroup(rowCounter);
       utilityWidget->SetDataSelection(QList({ node }));
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();
@@ -642,7 +642,7 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup()
   m_SynchronizedWidgetConnectors[newIndex] = std::make_unique<QmitkSynchronizedWidgetConnector>();
   m_SynchronizedWidgetConnectors[newIndex]->ChangeSelection(currentSelection);
 
-  emit SynchGroupAdded(newIndex);
+  emit SyncGroupAdded(newIndex);
 }
 
 void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index)
@@ -652,10 +652,10 @@ void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelection
     this->AddSynchronizationGroup();
   }
 
-  auto old_index = synchronizedWidget->GetSynchGroup();
+  auto old_index = synchronizedWidget->GetSyncGroup();
   if (old_index == index)
     return;
-  synchronizedWidget->SetSynchGroup(index);
+  synchronizedWidget->SetSyncGroup(index);
 
   // For the initial setting of the synchronization, nothing old is there to disconnect
   if (old_index != -1)

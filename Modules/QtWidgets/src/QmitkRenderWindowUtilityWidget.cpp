@@ -31,7 +31,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QWidget* parent/* = nullptr */,
   QmitkRenderWindow* renderWindow/* = nullptr */,
   mitk::DataStorage* dataStorage/* = nullptr */,
-  const int nSynchGroups/* = 1 */)
+  const int nSyncGroups/* = 1 */)
   : m_NodeSelectionWidget(nullptr)
   , m_SliceNavigationWidget(nullptr)
   , m_StepperAdapter(nullptr)
@@ -62,14 +62,14 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   dataMenu->addAction(dataAction);
   layout->addWidget(menuBar);
 
-  m_SynchGroupSelector = new QComboBox(this);
-  for (int i=0; i<nSynchGroups; ++i)
-    m_SynchGroupSelector->insertItem(i, QString("Group %1").arg(i));
-  m_SynchGroupSelector->addItem("New");
-  m_SynchGroupSelector->setMinimumContentsLength(8);
-  connect(m_SynchGroupSelector, &QComboBox::currentIndexChanged,
-    this, &QmitkRenderWindowUtilityWidget::OnSynchGroupSelectionChanged);
-  layout->addWidget(m_SynchGroupSelector);
+  m_SyncGroupSelector = new QComboBox(this);
+  for (int i=0; i<nSyncGroups; ++i)
+    m_SyncGroupSelector->insertItem(i, QString("Group %1").arg(i));
+  m_SyncGroupSelector->addItem("New");
+  m_SyncGroupSelector->setMinimumContentsLength(8);
+  connect(m_SyncGroupSelector, &QComboBox::currentIndexChanged,
+    this, &QmitkRenderWindowUtilityWidget::OnSyncGroupSelectionChanged);
+  layout->addWidget(m_SyncGroupSelector);
 
   auto* sliceNavigationController = m_BaseRenderer->GetSliceNavigationController();
   m_SliceNavigationWidget = new QmitkSliceNavigationWidget(this);
@@ -99,26 +99,26 @@ QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
 {
 }
 
-void QmitkRenderWindowUtilityWidget::SetSynchGroup(const GroupSyncIndexType index)
+void QmitkRenderWindowUtilityWidget::SetSyncGroup(const GroupSyncIndexType index)
 {
-  m_SynchGroupSelector->setCurrentIndex(index);
+  m_SyncGroupSelector->setCurrentIndex(index);
 }
 
-QmitkRenderWindowUtilityWidget::GroupSyncIndexType QmitkRenderWindowUtilityWidget::GetSynchGroup() const
+QmitkRenderWindowUtilityWidget::GroupSyncIndexType QmitkRenderWindowUtilityWidget::GetSyncGroup() const
 {
-  return m_SynchGroupSelector->currentIndex();
+  return m_SyncGroupSelector->currentIndex();
 }
 
-void QmitkRenderWindowUtilityWidget::OnSynchGroupSelectionChanged(int index)
+void QmitkRenderWindowUtilityWidget::OnSyncGroupSelectionChanged(int index)
 {
-  if (index == m_SynchGroupSelector->count() - 1)
+  if (index == m_SyncGroupSelector->count() - 1)
   {
-    m_SynchGroupSelector->blockSignals(true);
-    m_SynchGroupSelector->insertItem(index, QString("Group %1").arg(index));
-    m_SynchGroupSelector->setCurrentIndex(index);
-    m_SynchGroupSelector->blockSignals(false);
+    m_SyncGroupSelector->blockSignals(true);
+    m_SyncGroupSelector->insertItem(index, QString("Group %1").arg(index));
+    m_SyncGroupSelector->setCurrentIndex(index);
+    m_SyncGroupSelector->blockSignals(false);
   }
-  emit SynchGroupChanged(m_NodeSelectionWidget, index);
+  emit SyncGroupChanged(m_NodeSelectionWidget, index);
 }
 
 void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)
@@ -202,12 +202,12 @@ QmitkSynchronizedNodeSelectionWidget* QmitkRenderWindowUtilityWidget::GetNodeSel
   return m_NodeSelectionWidget;
 }
 
-void QmitkRenderWindowUtilityWidget::OnSynchGroupAdded(const GroupSyncIndexType index)
+void QmitkRenderWindowUtilityWidget::OnSyncGroupAdded(const GroupSyncIndexType index)
 {
-  if (index == m_SynchGroupSelector->count() - 1)
+  if (index == m_SyncGroupSelector->count() - 1)
   {
-    m_SynchGroupSelector->blockSignals(true);
-    m_SynchGroupSelector->insertItem(index, QString("Group %1").arg(index));
-    m_SynchGroupSelector->blockSignals(false);
+    m_SyncGroupSelector->blockSignals(true);
+    m_SyncGroupSelector->insertItem(index, QString("Group %1").arg(index));
+    m_SyncGroupSelector->blockSignals(false);
   }
 }

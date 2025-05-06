@@ -55,28 +55,28 @@ public:
     QWidget* parent = nullptr,
     QmitkRenderWindow* renderWindow = nullptr,
     mitk::DataStorage* dataStorage = nullptr,
-    const int nSynchGroups = 1
+    const int nSyncGroups = 1
   );
 
   ~QmitkRenderWindowUtilityWidget() override;
 
   using GroupSyncIndexType = int;
 
-  void SetSynchGroup(const GroupSyncIndexType index);
-  GroupSyncIndexType GetSynchGroup() const;
-  void OnSynchGroupSelectionChanged(int index);
+  void SetSyncGroup(const GroupSyncIndexType index);
+  GroupSyncIndexType GetSyncGroup() const;
+  void OnSyncGroupSelectionChanged(int index);
 
   void SetGeometry(const itk::EventObject& event);
   QmitkSynchronizedNodeSelectionWidget* GetNodeSelectionWidget() const;
 
 public Q_SLOTS:
   void UpdateViewPlaneSelection();
-  void OnSynchGroupAdded(const GroupSyncIndexType index);
+  void OnSyncGroupAdded(const GroupSyncIndexType index);
 
 Q_SIGNALS:
 
   void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
-  void SynchGroupChanged(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, GroupSyncIndexType index);
+  void SyncGroupChanged(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, GroupSyncIndexType index);
   void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
 
 private:
@@ -84,7 +84,7 @@ private:
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
   QPushButton* m_SynchPushButton;
-  QComboBox* m_SynchGroupSelector;
+  QComboBox* m_SyncGroupSelector;
   QmitkSliceNavigationWidget* m_SliceNavigationWidget;
   QmitkStepperAdapter* m_StepperAdapter;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;

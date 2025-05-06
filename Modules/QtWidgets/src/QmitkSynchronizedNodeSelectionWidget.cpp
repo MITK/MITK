@@ -24,7 +24,7 @@ found in the LICENSE file.
 
 QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidget* parent)
   : QmitkAbstractNodeSelectionWidget(parent)
-  , m_SynchGroupIndex(-1)
+  , m_SyncGroupIndex(-1)
 {
   m_Controls.setupUi(this);
 
@@ -529,7 +529,7 @@ void QmitkSynchronizedNodeSelectionWidget::SelectAll()
   this->HandleChangeOfInternalSelection(currentSelection);
 }
 
-void QmitkSynchronizedNodeSelectionWidget::SetSynchGroup(const GroupSyncIndexType index)
+void QmitkSynchronizedNodeSelectionWidget::SetSyncGroup(const GroupSyncIndexType index)
 {
   auto baseRenderer = m_BaseRenderer.Lock();
   if (baseRenderer.IsNull())
@@ -537,7 +537,7 @@ void QmitkSynchronizedNodeSelectionWidget::SetSynchGroup(const GroupSyncIndexTyp
     return;
   }
 
-  m_SynchGroupIndex = index;
+  m_SyncGroupIndex = index;
 
   // Since the synchronization might lead to a different node order depending on the layer properties, the render window
   // needs to be updated.
@@ -546,9 +546,9 @@ void QmitkSynchronizedNodeSelectionWidget::SetSynchGroup(const GroupSyncIndexTyp
   mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
 }
 
-QmitkSynchronizedNodeSelectionWidget::GroupSyncIndexType QmitkSynchronizedNodeSelectionWidget::GetSynchGroup() const
+QmitkSynchronizedNodeSelectionWidget::GroupSyncIndexType QmitkSynchronizedNodeSelectionWidget::GetSyncGroup() const
 {
-  return m_SynchGroupIndex;
+  return m_SyncGroupIndex;
 }
 
 void QmitkSynchronizedNodeSelectionWidget::SetNodeVisibility(mitk::DataNode::Pointer node, const bool visibility)

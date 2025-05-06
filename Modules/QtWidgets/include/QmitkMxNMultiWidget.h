@@ -112,7 +112,7 @@ Q_SIGNALS:
   void Moved();
   void UpdateUtilityWidgetViewPlanes();
   void LayoutChanged();
-  void SynchGroupAdded(const GroupSyncIndexType index);
+  void SyncGroupAdded(const GroupSyncIndexType index);
 
 private:
 

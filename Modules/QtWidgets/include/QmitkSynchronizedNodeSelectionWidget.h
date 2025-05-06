@@ -58,8 +58,8 @@ public:
   bool GetSelectAll() const;
   void SelectAll();
   using GroupSyncIndexType = int;
-  void SetSynchGroup(const GroupSyncIndexType index);
-  GroupSyncIndexType GetSynchGroup() const;
+  void SetSyncGroup(const GroupSyncIndexType index);
+  GroupSyncIndexType GetSyncGroup() const;
 
 Q_SIGNALS:
 
@@ -101,7 +101,7 @@ private:
   mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
 
   std::unique_ptr<QmitkRenderWindowDataNodeTableModel> m_StorageModel;
-  GroupSyncIndexType m_SynchGroupIndex;
+  GroupSyncIndexType m_SyncGroupIndex;
 
 };
 

@@ -496,16 +496,13 @@ void mitk::MultiLabelSegmentation::SetActiveLabel(LabelValueType label)
   if (m_ActiveLabelValue != label)
   {
     bool eventNeeded = false;
-    if (m_ActiveLabelValue != label)
+    if (UNLABELED_VALUE == m_ActiveLabelValue || UNLABELED_VALUE == label || !this->ExistLabel(m_ActiveLabelValue))
     {
-      if (UNLABELED_VALUE == m_ActiveLabelValue || UNLABELED_VALUE == label)
-      {
-        eventNeeded = true;
-      }
-      else if (this->GetGroupIndexOfLabel(m_ActiveLabelValue) != this->GetGroupIndexOfLabel(label))
-      {
-        eventNeeded = true;
-      }
+      eventNeeded = true;
+    }
+    else if (this->GetGroupIndexOfLabel(m_ActiveLabelValue) != this->GetGroupIndexOfLabel(label))
+    {
+      eventNeeded = true;
     }
 
     m_ActiveLabelValue = label;

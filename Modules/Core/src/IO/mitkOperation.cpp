@@ -16,10 +16,6 @@ mitk::Operation::Operation(mitk::OperationType operationType) : m_OperationType(
 {
 }
 
-mitk::Operation::~Operation()
-{
-}
-
 mitk::OperationType mitk::Operation::GetOperationType()
 {
   return m_OperationType;

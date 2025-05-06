@@ -31,15 +31,16 @@ namespace mitk
   public:
     mitkClassMacroNoParent(Operation)
 
-      //##Documentation
-      //## Constructor
-      Operation(OperationType operationType);
-
-    virtual ~Operation();
-
+    virtual ~Operation() = default;
     OperationType GetOperationType();
 
   protected:
+    Operation(OperationType operationType);
+    Operation(const Operation&) = default;
+    Operation(Operation&&) = default;
+    Operation& operator=(const Operation&) = default;
+    Operation& operator=(Operation&&) = default;
+
     OperationType m_OperationType;
   };
 

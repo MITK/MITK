@@ -415,25 +415,75 @@ void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType group
     mitkThrow() << "Trying to replace labels of non-existing group. Invalid group id: "<<groupID;
   }
 
-  //remove old group labels
+  auto oldActiveLabel = m_ActiveLabelValue;
+
+  LabelValueVectorType removedLabels;
+  LabelValueVectorType addedLabels;
+  LabelValueVectorType modifiedLabels;
+
   LabelValueVectorType oldLabels;
   {
     std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+
+    //remove old group labels
     oldLabels = this->m_GroupToLabelMap[groupID];
     for (auto labelID : oldLabels)
     {
       this->RemoveLabelFromMap(labelID);
-      this->InvokeEvent(LabelRemovedEvent(labelID));
+      if (std::find_if(labelSet.cbegin(), labelSet.cend(), [labelID](const Label* label){return label->GetValue() == labelID;}) == labelSet.cend())
+      { //label is not in the new set, so it will be effectively removed
+        removedLabels.push_back(labelID);
+      }
+    }
 
+    //add new labels to group
+    for (auto label : labelSet)
+    {
+      if (m_LabelMap.find(label->GetValue()) != m_LabelMap.cend())
+      {
+        auto conflictingGroup = this->GetGroupIndexOfLabel(label->GetValue());
+        mitkThrow() << "Error while replacing labels. Label value is already existing in another group. Invalid label: " << label->GetValue() << "; conflicting group: " << conflictingGroup;
+      }
+
+      // add DICOM information of the label
+      auto clonedLabel = label->Clone();
+      DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(clonedLabel);
+
+      this->AddLabelToMap(clonedLabel->GetValue(), clonedLabel, groupID);
+      this->RegisterLabel(clonedLabel);
+
+      if (std::find(oldLabels.cbegin(), oldLabels.cend(), label->GetValue()) == oldLabels.cend())
+      { //label was not in the old set, so it was effectively added
+        addedLabels.push_back(clonedLabel->GetValue());
+      }
+      else
+      {
+        modifiedLabels.push_back(clonedLabel->GetValue());
+      }
     }
   }
+
+  //now after the manipulation operation send all events
+  for (auto labelID : removedLabels)
+  {
+    this->InvokeEvent(LabelRemovedEvent(labelID));
+  }
+  for (auto labelID : addedLabels)
+  {
+    this->InvokeEvent(LabelAddedEvent(labelID));
+  }
+  for (auto labelID : modifiedLabels)
+  {
+    this->InvokeEvent(LabelModifiedEvent(labelID));
+  }
+
   this->InvokeEvent(LabelsChangedEvent(oldLabels));
   this->InvokeEvent(GroupModifiedEvent(groupID));
+  this->Modified();
 
-  //add new labels to group
-  for (auto label : labelSet)
-  {
-    this->AddLabel(label->Clone(), groupID, true, false);
+  if (!this->ExistLabel(oldActiveLabel))
+  { //Active label must be redefined, because it was removed by replacement.
+    this->SetActiveLabel(m_LabelMap.empty() ? UNLABELED_VALUE : m_LabelMap.begin()->second->GetValue());
   }
 }
 

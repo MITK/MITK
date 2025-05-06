@@ -88,8 +88,6 @@ void QmitkMultiLabelInspector::Initialize()
   m_Model->SetSegmentation(m_Segmentation);
   m_Controls->view->expandAll();
 
-  m_LastValidSelectedLabels = {};
-
   //in single selection mode, if at least one label exist select the first label of the mode.
   if (m_Segmentation.IsNotNull() && !this->GetMultiSelectionMode() && m_Segmentation->GetTotalNumberOfLabels() > 0)
   {
@@ -294,14 +292,29 @@ void QmitkMultiLabelInspector::OnChangeModelSelection(const QItemSelection& /*se
     if (internalSelection.empty())
     {
       //empty selections are not allowed by UI interactions, there should always be at least on label selected.
-      //but selections are e.g. also cleared if the model is updated (e.g. due to addition of labels)
-      UpdateSelectionModel(m_LastValidSelectedLabels);
+      //but selections are e.g. also cleared if the model is updated (e.g. due to addition of labels).
+      //In this case all valid elements of m_LastValidSelectedLabels should be used. If no element is valid
+      //we set the selection to empty.
+      auto segmentation = this->GetMultiLabelSegmentation();
+      mitk::MultiLabelSegmentation::LabelValueVectorType validLabels;
+      std::copy_if(m_LastValidSelectedLabels.cbegin(), m_LastValidSelectedLabels.cend(),
+        std::back_inserter(validLabels),
+        [segmentation](mitk::MultiLabelSegmentation::LabelValueType x) { return segmentation->ExistLabel(x); });
+
+      if (!validLabels.empty())
+      {
+        UpdateSelectionModel(validLabels);
+        if (validLabels.size() != m_LastValidSelectedLabels.size())
+        {
+          m_LastValidSelectedLabels = validLabels;
+          emit CurrentSelectionChanged(GetSelectedLabels());
+        }
+        return;
+      }
     }
-    else
-    {
-      m_LastValidSelectedLabels = internalSelection;
-      emit CurrentSelectionChanged(GetSelectedLabels());
-    }
+
+    m_LastValidSelectedLabels = internalSelection;
+    emit CurrentSelectionChanged(GetSelectedLabels());
   }
 }
 

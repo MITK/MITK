@@ -30,6 +30,10 @@ found in the LICENSE file.
 #include "mitkNodePredicateGeometry.h"
 #include "mitkSegTool2D.h"
 
+#include <mitkSegGroupModifyOperation.h>
+#include <mitkSegGroupModifyOperationApplier.h>
+#include <mitkUndoController.h>
+
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
   m_ProgressCommand = ToolCommand::New();
@@ -468,7 +472,25 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
       }
 
       auto labelMapping = this->GetLabelMapping();
+
+      const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+
+      auto undoOperation =
+        SegGroupModifyOperation::CreatFromSegmentation(resultSegmentation, {resultSegmentation->GetActiveLayer()},
+          m_CreateAllTimeSteps, timeStep);
+
+      auto oldGroupCount = resultSegmentation->GetNumberOfGroups();
       this->PreparePreviewToResultTransfer(labelMapping);
+
+      // REMARK: the following code in this scope assumes that PreparePreviewToResultTransfer does not change
+      // the number of groups. Currently all changes are only expected in the active group.
+      if (oldGroupCount != resultSegmentation->GetNumberOfGroups())
+      {
+        mitkThrow() << "Cannot confirm/transfer segmentation. Internal tool state is invalid."
+          << " Tool has changed the number of layers. Current base implementation expects that"
+          << " this does not happen.";
+      }
+
       if (m_CreateAllTimeSteps)
       {
         for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
@@ -478,23 +500,30 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
       }
       else
       {
-        const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
         this->TransferSegmentationsAtTimeStep(previewImage, resultSegmentation, timeStep, labelMapping);
       }
+
+      auto redoOperation =
+        SegGroupModifyOperation::CreatFromSegmentation(resultSegmentation, { resultSegmentation->GetActiveLayer() },
+          m_CreateAllTimeSteps, timeStep);
+
+      /*============= BEGIN undo/redo feature block ========================*/
+      // create an operation event for the undo stack
+      UndoStackItem::IncCurrGroupEventId();
+      UndoStackItem::IncCurrObjectEventId();
+      OperationEvent* undoStackItem =
+        new OperationEvent(SegGroupModifyOperationApplier::GetInstance(), redoOperation, undoOperation, "Segmentation "+std::string(this->GetName()));
+
+      // add it to the undo controller
+      UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
+      /*============= END undo/redo feature block ========================*/
 
       // since we are maybe working on a smaller referenceImage, pad it to the size of the original referenceImage
       if (m_ReferenceDataNode.GetPointer() != m_SegmentationInputNode.GetPointer())
       {
-        PadImageFilter::Pointer padFilter = PadImageFilter::New();
-
-        padFilter->SetInput(0, resultSegmentation);
-        padFilter->SetInput(1, dynamic_cast<Image*>(m_ReferenceDataNode->GetData()));
-        padFilter->SetBinaryFilter(true);
-        padFilter->SetUpperThreshold(1);
-        padFilter->SetLowerThreshold(1);
-        padFilter->Update();
-
-        resultSegmentationNode->SetData(padFilter->GetOutput());
+        mitkThrow() << "Feature of having a smaller referenceImage then actual workingImage is currently"
+          " not supported for new MultiLabelSegmentation class. Evaluation is pending if this feature"
+          " should be supported in the future.";
       }
       this->EnsureTargetSegmentationNodeInDataStorage();
     }

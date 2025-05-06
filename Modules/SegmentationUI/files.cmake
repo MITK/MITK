@@ -25,7 +25,6 @@ set(CPP_FILES
   Qmitk/QmitknnUNetWorker.cpp
   Qmitk/QmitknnUNetGPU.cpp
   Qmitk/QmitkSurfaceStampWidget.cpp
-  Qmitk/QmitkMaskStampWidget.cpp
   Qmitk/QmitkStaticDynamicSegmentationDialog.cpp
   Qmitk/QmitkSimpleLabelSetListWidget.cpp
   Qmitk/QmitkSegmentationTaskListWidget.cpp
@@ -36,6 +35,9 @@ set(CPP_FILES
   Qmitk/QmitkMultiLabelTreeModel.cpp
   Qmitk/QmitkMultiLabelTreeView.cpp
   Qmitk/QmitkMultiLabelPresetHelper.cpp
+  Qmitk/QmitkMultiLabelSelectionButton.cpp
+  Qmitk/QmitkMultiLabelSelectionLabel.cpp
+  Qmitk/QmitkMultiLabelSelectionWidget.cpp
   Qmitk/QmitkLabelColorItemDelegate.cpp
   Qmitk/QmitkLabelToggleItemDelegate.cpp
   Qmitk/QmitkFindSegmentationTaskDialog.cpp
@@ -82,7 +84,6 @@ set(MOC_H_FILES
   Qmitk/QmitknnUNetWorker.h
   Qmitk/QmitknnUNetEnsembleLayout.h
   Qmitk/QmitkSurfaceStampWidget.h
-  Qmitk/QmitkMaskStampWidget.h
   Qmitk/QmitkStaticDynamicSegmentationDialog.h
   Qmitk/QmitkSimpleLabelSetListWidget.h
   Qmitk/QmitkSegmentationTaskListWidget.h
@@ -90,6 +91,9 @@ set(MOC_H_FILES
   Qmitk/QmitkSetupVirtualEnvUtil.h
   Qmitk/QmitkMultiLabelInspector.h
   Qmitk/QmitkMultiLabelManager.h
+  Qmitk/QmitkMultiLabelSelectionLabel.h
+  Qmitk/QmitkMultiLabelSelectionWidget.h
+  Qmitk/QmitkMultiLabelSelectionButton.h
   Qmitk/QmitkMultiLabelTreeModel.h
   Qmitk/QmitkMultiLabelTreeView.h
   Qmitk/QmitkLabelColorItemDelegate.h
@@ -100,6 +104,7 @@ set(MOC_H_FILES
   Qmitk/QmitkMonaiLabelToolGUI.h
   Qmitk/QmitkMonaiLabel2DToolGUI.h
   Qmitk/QmitkMonaiLabel3DToolGUI.h
+
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.h
@@ -113,13 +118,14 @@ set(UI_FILES
   Qmitk/QmitkGrowCutToolWidgetControls.ui
   Qmitk/QmitkOtsuToolWidgetControls.ui
   Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
-  Qmitk/QmitkMaskStampWidgetGUIControls.ui
   Qmitk/QmitknnUNetToolGUIControls.ui
   Qmitk/QmitkEditableContourToolGUIControls.ui
   Qmitk/QmitkSegmentationTaskListWidget.ui
   Qmitk/QmitkTotalSegmentatorGUIControls.ui
   Qmitk/QmitkMultiLabelInspectorControls.ui
   Qmitk/QmitkMultiLabelManagerControls.ui
+  Qmitk/QmitkMultiLabelSelectionLabel.ui
+  Qmitk/QmitkMultiLabelSelectionWidget.ui
   Qmitk/QmitkFindSegmentationTaskDialog.ui
   Qmitk/QmitkSegmentAnythingGUIControls.ui
   Qmitk/QmitkMedSAMGUIControls.ui

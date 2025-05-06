@@ -19,7 +19,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * Writes a LabelSetImage to a file.
+  * Writes a MultiLabelSegmentation to a file.
   * mitk::Identifiable UID is supported and will be serialized.
   * @ingroup Process
   */
@@ -28,7 +28,7 @@ namespace mitk
   class MultiLabelSegmentationIO : public mitk::AbstractFileIO
   {
   public:
-    typedef mitk::LabelSetImage InputType;
+    typedef mitk::MultiLabelSegmentation InputType;
 
     MultiLabelSegmentationIO();
 

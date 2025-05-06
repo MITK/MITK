@@ -31,6 +31,7 @@ found in the LICENSE file.
 #include <mitkMAPAlgorithmInfoSelection.h>
 #include <mitkRegistrationHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
+#include <mitkMultiLabelPredicateHelper.h>
 
 // Qmitk
 #include "QmitkMatchPointFrameCorrection.h"
@@ -234,12 +235,10 @@ void QmitkMatchPointFrameCorrection::ConfigureNodeSelectorPredicates()
 
   m_Controls.imageNodeSelector->SetNodePredicate(mitk::NodePredicateAnd::New(isImage, imageDimensionPredicate));
 
-  mitk::NodePredicateAnd::Pointer maskPredicate = mitk::NodePredicateAnd::New(mitk::MITKRegistrationHelper::MaskNodePredicate(), maskDimensionPredicate);
+  mitk::NodePredicateAnd::Pointer maskPredicate = mitk::NodePredicateAnd::New(mitk::GetMultiLabelSegmentationPredicate(), maskDimensionPredicate);
   if (m_spSelectedTargetData != nullptr)
   {
-    auto hasSameGeometry = mitk::NodePredicateGeometry::New(m_spSelectedTargetData->GetGeometry());
-    hasSameGeometry->SetCheckPrecision(1e-10);
-    maskPredicate = mitk::NodePredicateAnd::New(maskPredicate, hasSameGeometry);
+    maskPredicate = mitk::NodePredicateAnd::New(mitk::GetMultiLabelSegmentationPredicate(m_spSelectedTargetData->GetGeometry()), maskDimensionPredicate);
   }
 
   m_Controls.maskNodeSelector->SetNodePredicate(maskPredicate);

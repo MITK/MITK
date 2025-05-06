@@ -266,6 +266,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
         }
         if (layout)
         {
+          layout->setContentsMargins(0, 0, 0, 0);
           layout->addWidget(gui);
           layout->activate();
         }

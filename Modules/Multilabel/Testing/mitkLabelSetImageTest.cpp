@@ -23,11 +23,11 @@ namespace CppUnit
 {
   namespace StringHelper
   {
-    template<> inline std::string toString(const mitk::LabelSetImage::LabelValueVectorType& lvs)
+    template<> inline std::string toString(const mitk::MultiLabelSegmentation::LabelValueVectorType& lvs)
     {
       std::ostringstream stream;
       stream << "[";
-      for (mitk::LabelSetImage::LabelValueVectorType::const_iterator iter = lvs.begin(); iter!=lvs.end(); ++iter)
+      for (mitk::MultiLabelSegmentation::LabelValueVectorType::const_iterator iter = lvs.begin(); iter!=lvs.end(); ++iter)
       {
         stream << *iter;
         if (iter + 1 != lvs.end()) stream << ", ";
@@ -71,7 +71,6 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestGetNumberOfLabels);
   MITK_TEST(TestExistsLabel);
   MITK_TEST(TestExistsGroup);
-  MITK_TEST(TestSetActiveLayer);
   MITK_TEST(TestRemoveLayer);
   MITK_TEST(TestRemoveLabels);
   MITK_TEST(TestEraseLabels);
@@ -80,7 +79,7 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  mitk::LabelSetImage::Pointer m_LabelSetImage;
+  mitk::MultiLabelSegmentation::Pointer m_LabelSetImage;
   int m_LabelAddedEventCount;
   int m_LabelModifiedEventCount;
   int m_LabelRemovedEventCount;
@@ -93,7 +92,7 @@ public:
   void setUp() override
   {
     // Create a new labelset image
-    m_LabelSetImage = mitk::LabelSetImage::New();
+    m_LabelSetImage = mitk::MultiLabelSegmentation::New();
     mitk::Image::Pointer regularImage = mitk::Image::New();
     unsigned int dimensions[3] = { 96, 128, 52 };
     regularImage->Initialize(mitk::MakeScalarPixelType<char>(), 3, dimensions);
@@ -111,7 +110,7 @@ public:
 
   void tearDown() override
   {
-    // Delete LabelSetImage
+    // Delete MultiLabelSegmentation
     m_LabelSetImage = nullptr;
   }
 
@@ -141,16 +140,16 @@ public:
     mitk::Label::Pointer label3 = mitk::Label::New(30, "Label3");
 
     m_LabelSetImage->AddLabel(label1, 0);
-    m_LabelSetImage->AddLayer({ label2, label22, label3 });
-    m_LabelSetImage->AddLayer();
+    m_LabelSetImage->AddGroup({ label2, label22, label3 });
+    m_LabelSetImage->AddGroup();
     this->ResetEvents();
   }
 
   void TestInitialize()
   {
     // LabelSet image should always has the pixel type mitk::Label::PixelType
-    CPPUNIT_ASSERT_MESSAGE("LabelSetImage has wrong pixel type",
-                           m_LabelSetImage->GetPixelType() == mitk::MakeScalarPixelType<mitk::Label::PixelType>());
+    CPPUNIT_ASSERT_MESSAGE("MultiLabelSegmentation has wrong pixel type",
+                           m_LabelSetImage->GetGroupImage(0)->GetPixelType() == mitk::MakeScalarPixelType<mitk::Label::PixelType>());
 
     mitk::Image::Pointer regularImage = mitk::Image::New();
     unsigned int dimensions[3] = { 96, 128, 52 };
@@ -158,11 +157,11 @@ public:
 
     mitk::BaseGeometry::Pointer regularImageGeo = regularImage->GetGeometry();
     mitk::BaseGeometry::Pointer labelImageGeo = m_LabelSetImage->GetGeometry();
-    MITK_ASSERT_EQUAL(labelImageGeo, regularImageGeo, "LabelSetImage has wrong geometry");
+    MITK_ASSERT_EQUAL(labelImageGeo, regularImageGeo, "MultiLabelSegmentation has wrong geometry");
 
     // By default one layer should be added
     CPPUNIT_ASSERT_MESSAGE("Image was not correctly initialized - number of layers is not one",
-                           m_LabelSetImage->GetNumberOfLayers() == 1);
+                           m_LabelSetImage->GetNumberOfGroups() == 1);
     CPPUNIT_ASSERT_MESSAGE("Image was not correctly initialized - active layer has wrong ID",
                            m_LabelSetImage->GetActiveLayer() == 0);
 
@@ -185,19 +184,19 @@ public:
     label2->SetValue(300);
 
     m_LabelSetImage->AddLabel(label1, 0);
-    m_LabelSetImage->AddLayer({ label2, label3 });
+    m_LabelSetImage->AddGroup({ label2, label3 });
 
     auto clone = m_LabelSetImage->Clone();
-    MITK_ASSERT_EQUAL(m_LabelSetImage, clone, "LabelSetImage clone is not equal.");
+    MITK_ASSERT_EQUAL(m_LabelSetImage, clone, "MultiLabelSegmentation clone is not equal.");
   }
 
   void TestAddLayer()
   {
-    CPPUNIT_ASSERT_MESSAGE("Number of layers is not zero", m_LabelSetImage->GetNumberOfLayers() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Number of layers is not zero", m_LabelSetImage->GetNumberOfGroups() == 1);
 
-    m_LabelSetImage->AddLayer();
+    m_LabelSetImage->AddGroup();
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - number of layers is not one",
-                           m_LabelSetImage->GetNumberOfLayers() == 2);
+                           m_LabelSetImage->GetNumberOfGroups() == 2);
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - active layer has wrong ID",
                            m_LabelSetImage->GetActiveLayer() == 0);
 
@@ -215,10 +214,10 @@ public:
     label2->SetValue(200);
 
 
-    const auto layerID = m_LabelSetImage->AddLayer({ label1, label2 });
+    const auto layerID = m_LabelSetImage->AddGroup({ label1, label2 });
     m_LabelSetImage->SetActiveLabel(200);
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - number of layers is not two",
-                           m_LabelSetImage->GetNumberOfLayers() == 3);
+                           m_LabelSetImage->GetNumberOfGroups() == 3);
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - active layer has wrong ID",
                            m_LabelSetImage->GetActiveLayer() == layerID);
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - active label is wrong",
@@ -237,8 +236,8 @@ public:
     label2->SetName("Label2");
     label2->SetValue(200);
 
-    mitk::LabelSetImage::ConstLabelVectorType refLayer = { label1, label2 };
-    unsigned int layerID = m_LabelSetImage->AddLayer(refLayer);
+    mitk::MultiLabelSegmentation::ConstLabelVectorType refLayer = { label1, label2 };
+    unsigned int layerID = m_LabelSetImage->AddGroup(refLayer);
     m_LabelSetImage->SetActiveLabel(200);
 
     auto activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
@@ -271,7 +270,7 @@ public:
                            m_LabelSetImage->GetActiveLabel()->GetValue() == value2);
 
     CPPUNIT_ASSERT_MESSAGE("Active Label was not correctly retrieved with const getter",
-      const_cast<const mitk::LabelSetImage*>(m_LabelSetImage.GetPointer())->GetActiveLabel()->GetValue() == value2);
+      const_cast<const mitk::MultiLabelSegmentation*>(m_LabelSetImage.GetPointer())->GetActiveLabel()->GetValue() == value2);
 
   }
 
@@ -289,7 +288,7 @@ public:
     mitk::Label::Pointer label2 = mitk::Label::New(20,"Label2");
 
     m_LabelSetImage->AddLabel(label1,0);
-    m_LabelSetImage->AddLayer();
+    m_LabelSetImage->AddGroup();
     m_LabelSetImage->AddLabel(label2,1);
     this->ResetEvents();
 
@@ -310,43 +309,43 @@ public:
 
     auto labels = m_LabelSetImage->GetLabelValuesByGroup(0);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for group 0",
-      mitk::LabelSetImage::LabelValueVectorType({ 1 }), labels);
+      mitk::MultiLabelSegmentation::LabelValueVectorType({ 1 }), labels);
 
     labels = m_LabelSetImage->GetLabelValuesByGroup(1);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for group 1",
-      mitk::LabelSetImage::LabelValueVectorType({ 20, 22, 30 }), labels);
+      mitk::MultiLabelSegmentation::LabelValueVectorType({ 20, 22, 30 }), labels);
 
     labels = m_LabelSetImage->GetLabelValuesByGroup(2);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for group 2",
-      mitk::LabelSetImage::LabelValueVectorType(), labels);
+      mitk::MultiLabelSegmentation::LabelValueVectorType(), labels);
 
     CPPUNIT_ASSERT_THROW(m_LabelSetImage->GetLabelValuesByGroup(3), mitk::Exception);
 
     labels = m_LabelSetImage->GetLabelValuesByName(0, "Label1");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for \"Label2\" in group 0",
-      mitk::LabelSetImage::LabelValueVectorType({ 1 }), labels);
+      mitk::MultiLabelSegmentation::LabelValueVectorType({ 1 }), labels);
 
     labels = m_LabelSetImage->GetLabelValuesByName(1, "Label2");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for \"Label2\" in group 1",
-      mitk::LabelSetImage::LabelValueVectorType({ 20, 22 }), labels);
+      mitk::MultiLabelSegmentation::LabelValueVectorType({ 20, 22 }), labels);
 
     labels = m_LabelSetImage->GetLabelValuesByName(1, "Label3");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for \"Label3\" in group 1",
-      mitk::LabelSetImage::LabelValueVectorType({ 30 }), labels);
+      mitk::MultiLabelSegmentation::LabelValueVectorType({ 30 }), labels);
 
     labels = m_LabelSetImage->GetLabelValuesByName(2, "Label1");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for group 2",
-      mitk::LabelSetImage::LabelValueVectorType(), labels);
+      mitk::MultiLabelSegmentation::LabelValueVectorType(), labels);
 
     labels = m_LabelSetImage->GetLabelValuesByName(0, "unkown");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for unkown name",
-      mitk::LabelSetImage::LabelValueVectorType(), labels);
+      mitk::MultiLabelSegmentation::LabelValueVectorType(), labels);
 
     CPPUNIT_ASSERT_THROW(m_LabelSetImage->GetLabelValuesByName(3,"invalid"), mitk::Exception);
 
     labels = m_LabelSetImage->GetAllLabelValues();
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for unkown name",
-      mitk::LabelSetImage::LabelValueVectorType({1,20,22,30}), labels);
+      mitk::MultiLabelSegmentation::LabelValueVectorType({1,20,22,30}), labels);
 
     CPPUNIT_ASSERT_MESSAGE("Event count incorrect", CheckEvents(0, 0, 0, 0, 0, 0, 0));
   }
@@ -420,9 +419,8 @@ public:
     mitk::Label::PixelType value = 200;
     label->SetValue(value);
 
-    m_LabelSetImage->AddLayer();
+    m_LabelSetImage->AddGroup();
     m_LabelSetImage->AddLabel(label,1);
-    m_LabelSetImage->SetActiveLayer(0);
     CPPUNIT_ASSERT_MESSAGE("Existing label was not found", m_LabelSetImage->ExistLabel(value) == true);
 
     CPPUNIT_ASSERT_MESSAGE("Non existing label was found", m_LabelSetImage->ExistLabel(10000) == false);
@@ -438,67 +436,33 @@ public:
     label2->SetName("Label2");
     label2->SetValue(200);
 
-    m_LabelSetImage->AddLayer({label1, label2});
+    m_LabelSetImage->AddGroup({label1, label2});
 
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(0) == true);
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(1) == true);
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(20) == false);
   }
 
-  void TestSetActiveLayer()
-  {
-    // Cache active layer
-    auto refActiveLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
-
-    // Add new layer
-    mitk::Label::Pointer label1 = mitk::Label::New();
-    label1->SetName("Label1");
-    label1->SetValue(1);
-
-    mitk::Label::Pointer label2 = mitk::Label::New();
-    label2->SetName("Label2");
-    label2->SetValue(200);
-
-    mitk::LabelSetImage::ConstLabelVectorType newlayer = { label1, label2 };
-    unsigned int layerID = m_LabelSetImage->AddLayer(newlayer);
-
-    // Set initial layer as active layer
-    m_LabelSetImage->SetActiveLayer(0);
-    auto activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
-    CPPUNIT_ASSERT_MESSAGE("Wrong active labelset returned",
-                           mitk::Equal(refActiveLayer, activeLayer, 0.00001, true));
-
-    // Set previously added layer as active layer
-    m_LabelSetImage->SetActiveLayer(layerID);
-    activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
-    CPPUNIT_ASSERT_MESSAGE("Wrong active labelset returned",
-                           mitk::Equal(newlayer, activeLayer, 0.00001, true));
-
-    // Set a non existing layer as active layer - nothing should change
-    m_LabelSetImage->SetActiveLayer(10000);
-    CPPUNIT_ASSERT_MESSAGE("Wrong active labelset returned",
-                           mitk::Equal(newlayer, activeLayer, 0.00001, true));
-  }
-
   void TestRemoveLayer()
   {
     // Cache active layer
+    m_LabelSetImage->AddLabel(mitk::Label::New(1, "Initial Label"),0,false);
     auto refActiveLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
 
     // Add new layers
-    m_LabelSetImage->AddLayer();
+    m_LabelSetImage->AddGroup();
 
     mitk::Label::Pointer label1 = mitk::Label::New();
     label1->SetName("Label1");
-    label1->SetValue(1);
+    label1->SetValue(10);
 
     mitk::Label::Pointer label2 = mitk::Label::New();
     label2->SetName("Label2");
     label2->SetValue(200);
 
-    mitk::LabelSetImage::ConstLabelVectorType newlayer = { label1, label2 };
-    unsigned int layerID = m_LabelSetImage->AddLayer(newlayer);
-    m_LabelSetImage->SetActiveLayer(layerID);
+    mitk::MultiLabelSegmentation::ConstLabelVectorType newlayer = { label1, label2 };
+    m_LabelSetImage->AddGroup(newlayer);
+    m_LabelSetImage->SetActiveLabel(200);
 
     auto activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
     CPPUNIT_ASSERT_MESSAGE("Wrong active labelset returned",
@@ -506,7 +470,7 @@ public:
 
     m_LabelSetImage->RemoveGroup(1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of layers, after a layer was removed",
-                           m_LabelSetImage->GetNumberOfLayers() == 2);
+                           m_LabelSetImage->GetNumberOfGroups() == 2);
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(2) == false);
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(1) == true);
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(0) == true);
@@ -514,7 +478,7 @@ public:
     m_LabelSetImage->RemoveGroup(1);
     activeLayer = m_LabelSetImage->GetConstLabelsByValue(m_LabelSetImage->GetLabelValuesByGroup(m_LabelSetImage->GetActiveLayer()));
     CPPUNIT_ASSERT_MESSAGE("Wrong number of layers, after a layer was removed",
-                           m_LabelSetImage->GetNumberOfLayers() == 1);
+                           m_LabelSetImage->GetNumberOfGroups() == 1);
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(1) == false);
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(0) == true);
     CPPUNIT_ASSERT_MESSAGE("Wrong active layer",
@@ -522,7 +486,7 @@ public:
 
     m_LabelSetImage->RemoveGroup(0);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of layers, after a layer was removed",
-                           m_LabelSetImage->GetNumberOfLayers() == 0);
+                           m_LabelSetImage->GetNumberOfGroups() == 0);
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(0) == false);
     CPPUNIT_ASSERT_THROW_MESSAGE("GetActiveLayers does not fail although all layer have been removed",
                            m_LabelSetImage->GetActiveLayer(), mitk::Exception);
@@ -534,13 +498,13 @@ public:
       mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
 
     m_LabelSetImage = nullptr;
-    m_LabelSetImage = mitk::LabelSetImage::New();
+    m_LabelSetImage = mitk::MultiLabelSegmentation::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels(0) == 5);
     // 2ndMin because of unlabeled pixels = 0
-    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValue2ndMin() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 7);
 
     CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
                            m_LabelSetImage->ExistLabel(3) == true);
@@ -556,9 +520,9 @@ public:
     // Values within the image are 0, 1, 3, 5, 6, 7 - New Min / Max value should be 5 / 6
     // 2ndMin because of unlabeled pixels = 0
     CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 were not removed from the image",
-                           m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 5);
+                           m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValue2ndMin() == 5);
     CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not removed from the image",
-                           m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
+                           m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 6);
   }
 
   void TestEraseLabels()
@@ -567,13 +531,13 @@ public:
       mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
 
     m_LabelSetImage = nullptr;
-    m_LabelSetImage = mitk::LabelSetImage::New();
+    m_LabelSetImage = mitk::MultiLabelSegmentation::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels(0) == 5);
     // 2ndMin because of unlabeled pixels = 0
-    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValue2ndMin() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 7);
 
     CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
       m_LabelSetImage->ExistLabel(3) == true);
@@ -589,9 +553,9 @@ public:
     // Values within the image are 0, 1, 3, 5, 6, 7 - New Min / Max value should be 5 / 6
     // 2ndMin because of unlabeled pixels = 0
     CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 were not erased from the image",
-      m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 5);
+      m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValue2ndMin() == 5);
     CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not erased from the image",
-      m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
+      m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 6);
   }
 
   void TestMergeLabels()
@@ -600,25 +564,25 @@ public:
       mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
 
     m_LabelSetImage = nullptr;
-    m_LabelSetImage = mitk::LabelSetImage::New();
+    m_LabelSetImage = mitk::MultiLabelSegmentation::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels(0) == 5);
     // 2ndMin because of unlabeled pixels = 0
-    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValue2ndMin() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 7);
 
     CPPUNIT_ASSERT_MESSAGE("Label with ID 6 does not exist after initialization",
       m_LabelSetImage->ExistLabel(6) == true);
 
     // Merge label 7 with label 6. Result should be that label 7 is not present anymore.
     m_LabelSetImage->MergeLabel(6, 7);
-    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not removed from the image", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
+    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not removed from the image", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 6);
 
     // Count all pixels with value 6 = 507
     // Count all pixels with value 7 = 823
     // Check if merged label has 507 + 823 = 1330 pixels
-    CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 1330);
+    CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetCountOfMaxValuedVoxels() == 1330);
 
     CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
       m_LabelSetImage->ExistLabel(3) == true);
@@ -629,13 +593,13 @@ public:
     std::vector<mitk::Label::PixelType> vectorOfSourcePixelValues{ 5, 6 };
     m_LabelSetImage->MergeLabels(3, vectorOfSourcePixelValues);
     // Values within the image are 0, 1, 3, 5, 6, 7 - New Max value should be 3
-    CPPUNIT_ASSERT_MESSAGE("Labels with value 5 and 6 were not removed from the image", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 3);
+    CPPUNIT_ASSERT_MESSAGE("Labels with value 5 and 6 were not removed from the image", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetScalarValueMax() == 3);
 
     // Count all pixels with value 3 = 1893
     // Count all pixels with value 5 = 2143
     // Count all pixels with value 6 = 1330
     // Check if merged label has 1893 + 2143 + 1330 = 5366 pixels
-    CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 5366);
+    CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetGroupImage(0)->GetStatistics()->GetCountOfMaxValuedVoxels() == 5366);
   }
 
   void TestCreateLabelMask()
@@ -644,7 +608,7 @@ public:
       mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
 
     m_LabelSetImage = nullptr;
-    m_LabelSetImage = mitk::LabelSetImage::New();
+    m_LabelSetImage = mitk::MultiLabelSegmentation::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
 
     auto labelMask = mitk::CreateLabelMask(m_LabelSetImage,6);

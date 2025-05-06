@@ -47,7 +47,7 @@ namespace mitk
    *
    * \section mitkPointSetDisplayOptions
    *
-   * The default mappers for this data structure are mitk::PointSetGLMapper2D and
+   * The default mappers for this data structure are mitk::PointSetVtkMapper2D and
    * mitk::PointSetVtkMapper3D. See these classes for display options which can
    * can be set via properties.
    *
@@ -222,6 +222,11 @@ namespace mitk
      * If no point is found, then -1 is returned
      */
     virtual int SearchSelectedPoint(int t = 0) const;
+
+    /**
+     * \brief Deselect all points in all time steps.
+     */
+    virtual void ClearSelection();
 
     /** \brief returns true if a point exists at this position */
     virtual bool IndexExists(int position, int t = 0) const;

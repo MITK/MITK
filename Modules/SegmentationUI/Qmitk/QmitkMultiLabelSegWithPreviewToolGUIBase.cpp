@@ -141,7 +141,7 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::EnableWidgets(bool enabled)
   }
 }
 
-void QmitkMultiLabelSegWithPreviewToolGUIBase::SetLabelSetPreview(const mitk::LabelSetImage* preview)
+void QmitkMultiLabelSegWithPreviewToolGUIBase::SetLabelSetPreview(const mitk::MultiLabelSegmentation* preview)
 {
   if (nullptr != m_LabelSelectionList)
   {

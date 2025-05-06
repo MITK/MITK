@@ -193,10 +193,18 @@ mitk::DecayTimeMapType mitk::DeduceDecayTime_AcquisitionMinusStartSliceResolved(
     if (!startDateTimeProps.empty())
     {
       startDateTimeProp = dynamic_cast<const mitk::DICOMProperty*>(startDateTimeProps.begin()->second.GetPointer());
+      if (nullptr == startDateTimeProp)
+      {
+        mitkThrow() << "Invalid application state. DCM StartDateTime property is not of type mitk::DICOMProperty.";
+      }
     }
     if (!startTimeProps.empty())
     {
       startTimeProp = dynamic_cast<const mitk::DICOMProperty*>(startTimeProps.begin()->second.GetPointer());
+      if (nullptr==startTimeProp)
+      {
+        mitkThrow() << "Invalid application state. DCM StartTime property is not of type mitk::DICOMProperty.";
+      }
     }
 
     auto timeVector = acqDateProp->GetAvailableTimeSteps();
@@ -208,6 +216,10 @@ mitk::DecayTimeMapType mitk::DeduceDecayTime_AcquisitionMinusStartSliceResolved(
       {
         OFDateTime acqTime;
         const bool convertResult = ConvertDICOMDateTimeString(acqDateProp->GetValue(timestep, sliceIndex, true, true), acqTimeProp->GetValue(timestep, sliceIndex, true, true), acqTime);
+        if (!convertResult)
+        {
+          mitkThrow() << "Conversion of the acquisition time string was not possible.";
+        }
 
         OFDateTime startTime;
         if (startDateTimeProp)
@@ -217,6 +229,10 @@ mitk::DecayTimeMapType mitk::DeduceDecayTime_AcquisitionMinusStartSliceResolved(
         else
         {
           const bool convertResult = ConvertDICOMDateTimeString(acqDateProp->GetValue(timestep, sliceIndex, true, true), startTimeProp->GetValue(timestep, sliceIndex, true, true), startTime);
+          if (!convertResult)
+          {
+            mitkThrow() << "Conversion of the start time string was not possible.";
+          }
         }
 
 

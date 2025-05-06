@@ -57,6 +57,25 @@ namespace
     // For 2D renderers, the distance between these points is the screen resolution.
     return pW1.EuclideanDistanceTo(pW2);
   }
+
+  bool GetColorFromProperty(const mitk::DataNode* node, const std::string& propertyName, mitk::BaseRenderer* renderer, std::array<double, 4>& color)
+  {
+    std::array<float, 3> propertyColor;
+    bool foundColorProperty = node->GetColor(propertyColor.data(), renderer, propertyName.c_str());
+
+    if (!foundColorProperty && renderer != nullptr)
+      foundColorProperty = node->GetColor(propertyColor.data(), nullptr, propertyName.c_str());
+
+    if (!foundColorProperty)
+      return false;
+
+    color[0] = propertyColor[0];
+    color[1] = propertyColor[1];
+    color[2] = propertyColor[2];
+    color[3] = 1.0;
+
+    return true;
+  }
 }
 
 // constructor LocalStorage
@@ -70,6 +89,7 @@ mitk::PointSetVtkMapper2D::LocalStorage::LocalStorage()
   // scales
   m_UnselectedScales = vtkSmartPointer<vtkFloatArray>::New();
   m_SelectedScales = vtkSmartPointer<vtkFloatArray>::New();
+  m_SelectedContourScales = vtkSmartPointer<vtkFloatArray>::New();
 
   // distances
   m_DistancesBetweenPoints = vtkSmartPointer<vtkFloatArray>::New();
@@ -80,24 +100,29 @@ mitk::PointSetVtkMapper2D::LocalStorage::LocalStorage()
   // glyph source (provides the different shapes)
   m_UnselectedGlyphSource2D = vtkSmartPointer<vtkGlyphSource2D>::New();
   m_SelectedGlyphSource2D = vtkSmartPointer<vtkGlyphSource2D>::New();
+  m_SelectedContourGlyphSource2D = vtkSmartPointer<vtkGlyphSource2D>::New();
 
   // glyphs
   m_UnselectedGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();
   m_SelectedGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();
+  m_SelectedContourGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();
 
   // polydata
   m_VtkUnselectedPointListPolyData = vtkSmartPointer<vtkPolyData>::New();
   m_VtkSelectedPointListPolyData = vtkSmartPointer<vtkPolyData>::New();
+  m_VtkSelectedContourPointListPolyData = vtkSmartPointer<vtkPolyData>::New();
   m_VtkContourPolyData = vtkSmartPointer<vtkPolyData>::New();
 
   // actors
   m_UnselectedActor = vtkSmartPointer<vtkActor>::New();
   m_SelectedActor = vtkSmartPointer<vtkActor>::New();
+  m_SelectedContourActor = vtkSmartPointer<vtkActor>::New();
   m_ContourActor = vtkSmartPointer<vtkActor>::New();
 
   // mappers
   m_VtkUnselectedPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_VtkSelectedPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_VtkSelectedContourPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_VtkContourPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 
   // propassembly
@@ -129,7 +154,10 @@ mitk::PointSetVtkMapper2D::PointSetVtkMapper2D()
     m_IDShapeProperty(mitk::PointSetShapeProperty::CROSS),
     m_FillShape(false),
     m_DistanceToPlane(4.0f),
-    m_FixedSizeOnScreen(false)
+    m_FixedSizeOnScreen(false),
+    m_Resolution(8),
+    m_KeepShapeWhenSelected(false),
+    m_ShowSelectedContour(false)
 {
 }
 
@@ -258,6 +286,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
 
   ls->m_UnselectedScales->Reset();
   ls->m_SelectedScales->Reset();
+  ls->m_SelectedContourScales->Reset();
 
   ls->m_DistancesBetweenPoints->Reset();
 
@@ -267,6 +296,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
 
   ls->m_UnselectedScales->SetNumberOfComponents(3);
   ls->m_SelectedScales->SetNumberOfComponents(3);
+  ls->m_SelectedContourScales->SetNumberOfComponents(3);
 
   int NumberContourPoints = 0;
   bool pointsOnSameSideOfPlane = false;
@@ -344,6 +374,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
         // point is scaled according to its distance to the plane
         ls->m_SelectedScales->InsertNextTuple3(
             std::max(0.0f, m_Point2DSize - (2 * dist)), 0, 0);
+        ls->m_SelectedContourScales->InsertNextTuple3(
+          std::max(0.0f, m_Point2DSize + 0.125f - (2 * dist)), 0, 0);
       }
       else
       {
@@ -542,11 +574,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
 
   // apply properties to glyph
   ls->m_UnselectedGlyphSource2D->SetGlyphType(m_IDShapeProperty);
-
-  if (m_FillShape)
-    ls->m_UnselectedGlyphSource2D->FilledOn();
-  else
-    ls->m_UnselectedGlyphSource2D->FilledOff();
+  ls->m_UnselectedGlyphSource2D->SetResolution(m_Resolution);
+  ls->m_UnselectedGlyphSource2D->SetFilled(m_FillShape);
 
   // apply transform
   vtkSmartPointer<vtkTransformFilter> transformFilterU = vtkSmartPointer<vtkTransformFilter>::New();
@@ -571,9 +600,18 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
 
   //---- SELECTED POINTS  -----//
 
-  ls->m_SelectedGlyphSource2D->SetGlyphTypeToDiamond();
-  ls->m_SelectedGlyphSource2D->CrossOn();
-  ls->m_SelectedGlyphSource2D->FilledOff();
+  if (m_KeepShapeWhenSelected)
+  {
+    ls->m_SelectedGlyphSource2D->SetGlyphType(m_IDShapeProperty);
+    ls->m_SelectedGlyphSource2D->SetResolution(m_Resolution);
+    ls->m_SelectedGlyphSource2D->SetFilled(m_FillShape);
+  }
+  else
+  {
+    ls->m_SelectedGlyphSource2D->SetGlyphTypeToDiamond();
+    ls->m_SelectedGlyphSource2D->CrossOn();
+    ls->m_SelectedGlyphSource2D->FilledOff();
+  }
 
   // apply transform
   vtkSmartPointer<vtkTransformFilter> transformFilterS = vtkSmartPointer<vtkTransformFilter>::New();
@@ -595,6 +633,34 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
   ls->m_SelectedActor->GetProperty()->SetLineWidth(m_PointLineWidth);
 
   ls->m_PropAssembly->AddPart(ls->m_SelectedActor);
+
+  if (m_ShowSelectedContour)
+  {
+    ls->m_SelectedContourGlyphSource2D->SetGlyphType(ls->m_SelectedGlyphSource2D->GetGlyphType());
+    ls->m_SelectedContourGlyphSource2D->SetResolution(ls->m_SelectedGlyphSource2D->GetResolution());
+    ls->m_SelectedContourGlyphSource2D->FilledOff();
+
+    // apply transform
+    vtkSmartPointer<vtkTransformFilter> transformFilterSC = vtkSmartPointer<vtkTransformFilter>::New();
+    transformFilterSC->SetInputConnection(ls->m_SelectedContourGlyphSource2D->GetOutputPort());
+    transformFilterSC->SetTransform(transform);
+
+    ls->m_VtkSelectedContourPointListPolyData->SetPoints(ls->m_SelectedPoints);
+    ls->m_VtkSelectedContourPointListPolyData->GetPointData()->SetVectors(ls->m_SelectedContourScales);
+
+    // apply transform of current plane to glyphs
+    ls->m_SelectedContourGlyph3D->SetSourceConnection(transformFilterSC->GetOutputPort());
+    ls->m_SelectedContourGlyph3D->SetInputData(ls->m_VtkSelectedContourPointListPolyData);
+    ls->m_SelectedContourGlyph3D->SetScaleFactor(m_FixedSizeOnScreen ? resolution : 1.0);
+    ls->m_SelectedContourGlyph3D->SetScaleModeToScaleByVector();
+    ls->m_SelectedContourGlyph3D->SetVectorModeToUseVector();
+
+    ls->m_VtkSelectedContourPolyDataMapper->SetInputConnection(ls->m_SelectedContourGlyph3D->GetOutputPort());
+    ls->m_SelectedContourActor->SetMapper(ls->m_VtkSelectedContourPolyDataMapper);
+    ls->m_SelectedContourActor->GetProperty()->SetLineWidth(m_PointLineWidth);
+
+    ls->m_PropAssembly->AddPart(ls->m_SelectedContourActor);
+  }
 }
 
 void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
@@ -615,6 +681,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   {
     ls->m_UnselectedActor->VisibilityOff();
     ls->m_SelectedActor->VisibilityOff();
+    ls->m_SelectedContourActor->VisibilityOff();
     ls->m_ContourActor->VisibilityOff();
     ls->m_PropAssembly->VisibilityOff();
     return;
@@ -645,6 +712,9 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   node->GetBoolProperty("Pointset.2D.fill shape", m_FillShape, renderer);
   node->GetFloatProperty("Pointset.2D.distance to plane", m_DistanceToPlane, renderer);
   node->GetBoolProperty("Pointset.2D.fixed size on screen", m_FixedSizeOnScreen, renderer);
+  node->GetIntProperty("Pointset.2D.resolution", m_Resolution, renderer);
+  node->GetBoolProperty("Pointset.2D.keep shape when selected", m_KeepShapeWhenSelected, renderer);
+  node->GetBoolProperty("Pointset.2D.selected.show contour", m_ShowSelectedContour, renderer);
 
   mitk::PointSetShapeProperty::Pointer shape =
     dynamic_cast<mitk::PointSetShapeProperty *>(this->GetDataNode()->GetProperty("Pointset.2D.shape", renderer));
@@ -664,39 +734,23 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   if (m_ShowPoints)
   {
     float unselectedColor[4];
-    double selectedColor[4] = {1.0f, 0.0f, 0.0f, 1.0f}; // red
+    std::array<double, 4> selectedColor = {1.0, 0.0, 0.0, 1.0}; // red
+    std::array<double, 4> selectedContourColor = { 0.125, 0.625, 0.875, 1.0 };
 
     ls->m_UnselectedActor->VisibilityOn();
     ls->m_SelectedActor->VisibilityOn();
+    ls->m_SelectedContourActor->SetVisibility(m_ShowSelectedContour);
 
     // check if there is a color property
     GetDataNode()->GetColor(unselectedColor);
 
-    // get selected color property
-    if (dynamic_cast<mitk::ColorProperty *>(
-          this->GetDataNode()->GetPropertyList(renderer)->GetProperty("selectedcolor")) != nullptr)
-    {
-      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(
-                               this->GetDataNode()->GetPropertyList(renderer)->GetProperty("selectedcolor"))
-                               ->GetValue();
-      selectedColor[0] = tmpColor[0];
-      selectedColor[1] = tmpColor[1];
-      selectedColor[2] = tmpColor[2];
-      selectedColor[3] = 1.0f; // alpha value
-    }
-    else if (dynamic_cast<mitk::ColorProperty *>(
-               this->GetDataNode()->GetPropertyList(nullptr)->GetProperty("selectedcolor")) != nullptr)
-    {
-      mitk::Color tmpColor =
-        dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(nullptr)->GetProperty("selectedcolor"))
-          ->GetValue();
-      selectedColor[0] = tmpColor[0];
-      selectedColor[1] = tmpColor[1];
-      selectedColor[2] = tmpColor[2];
-      selectedColor[3] = 1.0f; // alpha value
-    }
+    GetColorFromProperty(node, "selectedcolor", renderer, selectedColor);
+    GetColorFromProperty(node, "Pointset.2D.selected.contour color", renderer, selectedContourColor);
 
-    ls->m_SelectedActor->GetProperty()->SetColor(selectedColor);
+    ls->m_SelectedContourActor->GetProperty()->SetColor(selectedContourColor.data());
+    ls->m_SelectedContourActor->GetProperty()->SetOpacity(opacity);
+
+    ls->m_SelectedActor->GetProperty()->SetColor(selectedColor.data());
     ls->m_SelectedActor->GetProperty()->SetOpacity(opacity);
 
     ls->m_UnselectedActor->GetProperty()->SetColor(unselectedColor[0], unselectedColor[1], unselectedColor[2]);
@@ -706,6 +760,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   {
     ls->m_UnselectedActor->VisibilityOff();
     ls->m_SelectedActor->VisibilityOff();
+    ls->m_SelectedContourActor->VisibilityOff();
   }
 
   if (m_ShowContour)
@@ -776,6 +831,10 @@ void mitk::PointSetVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk:
                     renderer,
                     overwrite); // show the point at a certain distance above/below the 2D imaging plane.
   node->AddProperty("Pointset.2D.fixed size on screen", mitk::BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty("Pointset.2D.resolution", IntProperty::New(8), renderer, overwrite);
+  node->AddProperty("Pointset.2D.keep shape when selected", BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty("Pointset.2D.selected.show contour", BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty("Pointset.2D.selected.contour color", ColorProperty::New(0.125f, 0.625f, 0.875f), renderer, overwrite);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

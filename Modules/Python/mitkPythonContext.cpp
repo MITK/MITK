@@ -16,15 +16,14 @@ found in the LICENSE file.
 #include <swigpyrun.h>
 
 mitk::PythonContext::PythonContext()
-  //: m_GlobalDictionary(PyDict_New()), m_LocalDictionary(PyDict_New())
 {
   if (!Py_IsInitialized())
   {
     Py_Initialize();
   }
-  PyObject *gdict = PyDict_New();
-  m_GlobalDictionary = PyObjectPtr(gdict);
-  m_LocalDictionary = PyObjectPtr(gdict);
+
+  m_GlobalDictionary.reset(PyDict_New());
+  m_LocalDictionary.reset(PyDict_New());
 }
 
 void mitk::PythonContext::Activate()
@@ -189,7 +188,7 @@ void mitk::PythonContext::ClearVirtualEnvironmentPath()
   }
 }
 
-bool mitk::PythonContext::IsVariableExists(const std::string &varName)
+bool mitk::PythonContext::HasVariable(const std::string &varName)
 {
   PyObject *pyVar = PyDict_GetItemString(m_LocalDictionary.get(), varName.c_str());
   if (pyVar == NULL && !(pyVar = PyDict_GetItemString(m_GlobalDictionary.get(), varName.c_str())))
@@ -213,7 +212,7 @@ std::string mitk::PythonContext::GetPythonExceptionTraceback()
     PyObjectPtr pExceptionList(PyObject_CallFunctionObjArgs(
       pFormatExceptionMethod.get(), pExceptionType.get(), pException.get(), pExceptionTypeTb.get(), NULL));
 #else
-  PyObject *ptype, *pvalue, *ptraceback;
+  PyObject* ptype, * pvalue, * ptraceback;
   PyErr_Fetch(&ptype, &pvalue, &ptraceback); // Deprecated since python 3.12
   PyObjectPtr pTracebackMod(PyImport_ImportModule("traceback"));
   PyObjectPtr pFormatExceptionMethod(PyObject_GetAttrString(pTracebackMod.get(), "format_exception"));

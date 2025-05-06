@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 #include <vtkLinearTransform.h>
-#include "vtk_glew.h"
+#include "vtk_glad.h"
 
 mitk::ContourMapper2D::ContourMapper2D()
 {

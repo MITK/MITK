@@ -39,7 +39,7 @@ namespace mitk
     itkCloneMacro(Self);
 
     using HistogramType = itk::Statistics::Histogram<double>;
-    using LabelValueType = LabelSetImage::LabelValueType;
+    using LabelValueType = MultiLabelSegmentation::LabelValueType;
 
     void SetRequestedRegionToLargestPossibleRegion() override {}
 
@@ -133,7 +133,7 @@ namespace mitk
 
     /** Value that can be used to query for the statistic if no mask was provided.*/
     static constexpr LabelValueType NO_MASK_LABEL_VALUE = Label::UNLABELED_VALUE;
-    using LabelValueVectorType = LabelSetImage::LabelValueVectorType;
+    using LabelValueVectorType = MultiLabelSegmentation::LabelValueVectorType;
     LabelValueVectorType GetExistingLabelValues() const;
 
     /**

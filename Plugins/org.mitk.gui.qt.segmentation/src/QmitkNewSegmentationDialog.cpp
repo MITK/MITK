@@ -154,8 +154,8 @@ namespace
     nodePrefs->PutByteArray("QmitkNewSegmentationDialog geometry", reinterpret_cast<const std::byte*>(geometry.data()), geometry.size());
   }
 
-  // Get names of all labels in all layers of a LabelSetImage.
-  QStringList GetExistingLabelNames(mitk::LabelSetImage* labelSetImage)
+  // Get names of all labels in all layers of a MultiLabelSegmentation.
+  QStringList GetExistingLabelNames(mitk::MultiLabelSegmentation* labelSetImage)
   {
     auto names = labelSetImage->GetLabelClassNames();
     QStringList existingLabelNames;
@@ -185,7 +185,7 @@ namespace
   }
 }
 
-QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::LabelSetImage* labelSetImage, Mode mode)
+QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::MultiLabelSegmentation* labelSetImage, Mode mode)
   : QDialog(parent),
     m_Ui(new Ui::QmitkNewSegmentationDialog),
     m_SuggestOnce(true),
@@ -367,7 +367,7 @@ void QmitkNewSegmentationDialog::OnSuggestionSelected()
   }
 }
 
-bool QmitkNewSegmentationDialog::DoRenameLabel(mitk::Label* label, mitk::LabelSetImage* segmentation, QWidget* parent, Mode mode)
+bool QmitkNewSegmentationDialog::DoRenameLabel(mitk::Label* label, mitk::MultiLabelSegmentation* segmentation, QWidget* parent, Mode mode)
 {
   if (nullptr == label)
     mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label is null.";

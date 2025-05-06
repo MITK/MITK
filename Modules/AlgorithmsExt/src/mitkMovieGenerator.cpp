@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkMovieGenerator.h"
 #include "mitkConfig.h"
 #include <mitkRenderingManager.h>
-#include "vtk_glew.h"
+#include "vtk_glad.h"
 
 #if WIN32
 #ifndef __GNUC__

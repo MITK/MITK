@@ -75,18 +75,18 @@ private Q_SLOTS:
 
   void OnCurrentLabelSelectionChanged(QmitkMultiLabelManager::LabelValueVectorType labels);
 
-  void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&);
+  void OnGoToLabel(mitk::MultiLabelSegmentation::LabelValueType label, const mitk::Point3D&);
   void OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const;
 
-  void OnLabelAdded(mitk::LabelSetImage::LabelValueType labelValue);
-  void OnLabelRemoved(mitk::LabelSetImage::LabelValueType labelValue);
-  void OnGroupRemoved(mitk::LabelSetImage::GroupIndexType groupIndex);
+  void OnLabelAdded(mitk::MultiLabelSegmentation::LabelValueType labelValue);
+  void OnLabelRemoved(mitk::MultiLabelSegmentation::LabelValueType labelValue);
+  void OnGroupRemoved(mitk::MultiLabelSegmentation::GroupIndexType groupIndex);
 
 private:
 
   using Self = QmitkSegmentationView;
 
-  mitk::LabelSetImage* GetWorkingImage();
+  mitk::MultiLabelSegmentation* GetWorkingImage();
   void AddObserversToWorkingImage();
   void RemoveObserversFromWorkingImage();
 
@@ -138,7 +138,7 @@ private:
 
   std::string GetDefaultLabelSetPreset() const;
 
-  mitk::LabelSetImage* GetCurrentSegmentation() const;
+  mitk::MultiLabelSegmentation* GetCurrentSegmentation() const;
 
   QWidget* m_Parent;
 

@@ -10,7 +10,7 @@ endif()
 set(proj VTK)
 mitk_query_custom_ep_vars()
 
-set(proj_DEPENDENCIES ${${proj}_CUSTOM_DEPENDENCIES})
+set(proj_DEPENDENCIES nlohmann_json ${${proj}_CUSTOM_DEPENDENCIES})
 set(VTK_DEPENDS ${proj})
 
 if(NOT DEFINED VTK_DIR)
@@ -56,8 +56,8 @@ if(NOT DEFINED VTK_DIR)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    GIT_REPOSITORY https://github.com/MITK/VTK.git
-    GIT_TAG ef49b4f7b240ec62b4a7014fe97858be54fe9157 # v9.3.0-patched
+    GIT_REPOSITORY https://github.com/Kitware/VTK.git
+    GIT_TAG 40ef44cb1bda31f1dca400452125fcf43f9b0626 # 2025-04-09
     GIT_SUBMODULES ""
     CMAKE_GENERATOR ${gen}
     CMAKE_GENERATOR_PLATFORM ${gen_platform}
@@ -72,6 +72,7 @@ if(NOT DEFINED VTK_DIR)
       -DVTK_MODULE_ENABLE_VTK_GUISupportQtQuick:STRING=NO
       -DVTK_MODULE_ENABLE_VTK_IOIOSS:STRING=NO # See T29633
       -DVTK_MODULE_ENABLE_VTK_ioss:STRING=NO   # See T29633
+      -DVTK_MODULE_USE_EXTERNAL_VTK_nlohmannjson:BOOL=ON
       -DVTK_REPORT_OPENGL_ERRORS:BOOL=OFF
       -DVTK_QT_VERSION:STRING=6
       ${additional_cmake_args}

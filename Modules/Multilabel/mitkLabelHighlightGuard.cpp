@@ -36,7 +36,7 @@ mitk::DataNode::Pointer mitk::LabelHighlightGuard::GetSegmentationNode() const
   return m_Node.Lock();
 }
 
-void mitk::LabelHighlightGuard::SetHighlightedLabels(LabelSetImage::LabelValueVectorType labels)
+void mitk::LabelHighlightGuard::SetHighlightedLabels(MultiLabelSegmentation::LabelValueVectorType labels)
 {
   auto ownNode = m_Node.Lock();
   if (ownNode.IsNotNull() && labels != m_Labels)
@@ -67,7 +67,7 @@ mitk::LabelHighlightGuard::~LabelHighlightGuard()
   this->SetSegmentationNode(nullptr);
 }
 
-void mitk::LabelHighlightGuard::UpdateNode(DataNode* node, LabelSetImage::LabelValueVectorType labels, bool highlightInvisible)
+void mitk::LabelHighlightGuard::UpdateNode(DataNode* node, MultiLabelSegmentation::LabelValueVectorType labels, bool highlightInvisible)
 {
   if (nullptr == node)
     return;

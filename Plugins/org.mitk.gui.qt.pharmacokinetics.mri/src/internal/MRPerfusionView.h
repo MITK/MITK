@@ -86,14 +86,6 @@ protected:
       mitk::ParameterFitImageGeneratorBase::Pointer& generator);
 
   template <typename TParameterizer>
-  void GenerateLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
-      mitk::ParameterFitImageGeneratorBase::Pointer& generator);
-  template <typename TParameterizer>
-  void GenerateLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
-      mitk::ParameterFitImageGeneratorBase::Pointer& generator);
-
-
-  template <typename TParameterizer>
   void GenerateAIFbasedModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
                                  mitk::ParameterFitImageGeneratorBase::Pointer& generator);
   template <typename TParameterizer>
@@ -119,7 +111,7 @@ protected:
   mitk::DataNode::Pointer GenerateConcentrationNode(mitk::Image* image, const std::string& nodeName) const;
 
   void OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
-
+  void OnAIFMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
   void OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 
   /*! @brief The view's UI controls */
@@ -133,9 +125,11 @@ protected:
 
   /* Images selected by user/ui for the fit */
   mitk::Image::Pointer m_selectedImage;
-  mitk::Image::Pointer m_selectedMask;
-  mitk::Image::Pointer m_selectedAIFMask;
   mitk::Image::Pointer m_selectedAIFImage;
+
+  /* Masks used in the current fit */
+  mitk::Image::Pointer m_ImageMask;
+  mitk::Image::Pointer m_AIFMask;
 
   mitk::ModelFactoryBase::Pointer m_selectedModelFactory;
 

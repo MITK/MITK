@@ -44,14 +44,14 @@ public:
   ~QmitkMultiLabelManager() override;
 
 
-  using LabelValueVectorType = mitk::LabelSetImage::LabelValueVectorType;
+  using LabelValueVectorType = mitk::MultiLabelSegmentation::LabelValueVectorType;
 
   /**
   * @brief Retrieve the currently selected labels (equals the last CurrentSelectionChanged values).
   */
   LabelValueVectorType GetSelectedLabels() const;
 
-  mitk::LabelSetImage* GetMultiLabelSegmentation() const;
+  mitk::MultiLabelSegmentation* GetMultiLabelSegmentation() const;
   mitk::DataNode* GetMultiLabelNode() const;
 
 Q_SIGNALS:
@@ -69,7 +69,7 @@ Q_SIGNALS:
   * @param label The label that should be focused.
   * @param point in World coordinate that should be focused.
   */
-  void GoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& point) const;
+  void GoToLabel(mitk::MultiLabelSegmentation::LabelValueType label, const mitk::Point3D& point) const;
 
   /** @brief Signal that is emitted, if a label should be (re)named and default
   * label naming is deactivated.
@@ -95,7 +95,7 @@ public Q_SLOTS:
   *
   * @param selectedLabel Value of the label instance that should be selected.
   */
-  void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
+  void SetSelectedLabel(mitk::MultiLabelSegmentation::LabelValueType selectedLabel);
 
   /**
   * @brief Sets the segmentation that will be used /monitored by the widget.
@@ -106,7 +106,7 @@ public Q_SLOTS:
   * setting.
   * @pre Segmentation node is nullptr.
   */
-  void SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation);
+  void SetMultiLabelSegmentation(mitk::MultiLabelSegmentation* segmentation);
 
   /**
   * @brief Sets the segmentation node that will be used /monitored by the widget.
@@ -137,7 +137,7 @@ private Q_SLOTS:
   // reaction to the change of labels. If multiple labels are selected, it is ignored.
   void OnSelectedLabelChanged(const LabelValueVectorType& labels);
 
-  // LabelSetImage Dependent
+  // MultiLabelSegmentation Dependent
   void OnCreateDetailedSurface(bool);
   void OnCreateSmoothedSurface(bool);
   // reaction to the signal "createMask" from QmitkLabelSetTableWidget
@@ -148,7 +148,7 @@ private Q_SLOTS:
   void OnSavePreset();
   void OnLoadPreset();
 
-  void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position) const;
+  void OnGoToLabel(mitk::MultiLabelSegmentation::LabelValueType label, const mitk::Point3D& position) const;
   void OnLabelRenameRequested(mitk::Label* label, bool rename, bool& canceled) const;
   void OnModelUpdated();
   void OnSegmentationChanged();
@@ -173,8 +173,8 @@ private:
   void AddSegmentationObserver();
   void RemoveSegmentationObserver();
 
-  void OnLabelEvent(mitk::LabelSetImage::LabelValueType labelValue);
-  void OnGroupEvent(mitk::LabelSetImage::GroupIndexType groupIndex);
+  void OnLabelEvent(mitk::MultiLabelSegmentation::LabelValueType labelValue);
+  void OnGroupEvent(mitk::MultiLabelSegmentation::GroupIndexType groupIndex);
 
   Ui::QmitkMultiLabelManagerControls* m_Controls;
 

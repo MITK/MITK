@@ -102,8 +102,6 @@ mitk::ExtrudePlanarFigureFilter::~ExtrudePlanarFigureFilter()
 
 void mitk::ExtrudePlanarFigureFilter::GenerateData()
 {
-  typedef PlanarFigure::PolyLineType PolyLine;
-
   if (m_Length <= 0)
     mitkThrow() << "Length is not positive!";
 
@@ -151,7 +149,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
 
   for (size_t i = 0; i < numPolyLines; ++i)
   {
-    const PolyLine polyLine = input->GetPolyLine(i);
+    const auto& polyLine = input->GetPolyLine(i);
     const size_t numPoints = polyLine.size();
 
     if (numPoints < 2)

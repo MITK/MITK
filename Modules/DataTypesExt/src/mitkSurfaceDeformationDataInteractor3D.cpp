@@ -58,6 +58,8 @@ void mitk::SurfaceDeformationDataInteractor3D::DataNodeChanged()
   }
   else
     m_Surface = nullptr;
+
+  Superclass::DataNodeChanged();
 }
 
 bool mitk::SurfaceDeformationDataInteractor3D::CheckOverObject(const InteractionEvent *interactionEvent)

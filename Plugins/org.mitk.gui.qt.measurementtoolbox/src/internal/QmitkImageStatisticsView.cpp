@@ -480,7 +480,7 @@ mitk::NodePredicateBase::Pointer QmitkImageStatisticsView::GenerateROIPredicate(
     {
       bool sameGeometry = true;
 
-      if (dynamic_cast<const mitk::Image*>(node->GetData()) != nullptr)
+      if (dynamic_cast<const mitk::MultiLabelSegmentation*>(node->GetData()) != nullptr)
       {
         sameGeometry = imageGeoPredicate->CheckNode(node);
       }

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkLabelSetImage_h
-#define mitkLabelSetImage_h
+#ifndef mitkMultiLabelSegmentation_h
+#define mitkMultiLabelSegmentation_h
 
 #include <shared_mutex>
 #include <mitkImage.h>
@@ -25,7 +25,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** @brief LabelSetImage class for handling labels and layers in a segmentation session.
+  /** @brief MultiLabelSegmentation class for handling labels and layers in a segmentation session.
   *
   * Events that are potentially send by the class in regard to groups or labels:
   * - LabelAddedEvent is emitted whenever a new label has been added.
@@ -40,36 +40,18 @@ namespace mitk
   *
   * @ingroup Data
   */
-  class MITKMULTILABEL_EXPORT LabelSetImage : public Image
+  class MITKMULTILABEL_EXPORT MultiLabelSegmentation : public SlicedData
   {
   public:
     /**
-    * \brief BeforeChangeLayerEvent (e.g. used for GUI integration)
-    * As soon as active labelset should be changed, the signal emits.
-    * Emitted by SetActiveLayer(int layer);
-    */
-    Message<> BeforeChangeLayerEvent;
-
-    /**
     * \brief AfterchangeLayerEvent (e.g. used for GUI integration)
     * As soon as active labelset was changed, the signal emits.
-    * Emitted by SetActiveLayer(int layer);
+    * Emitted by SetActiveLabel();
     */
     Message<> AfterChangeLayerEvent;
 
-    ///////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-    // FUTURE MultiLabelSegmentation:
-    // Section that already contains declarations used in the new class.
-    // So this part of the interface will stay after refactoring towards
-    // the new MultiLabelSegmentation class (see T28524). This section was introduced
-    // because some of the planned features are already urgently needed.
-    ///////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-    mitkClassMacro(LabelSetImage, Image);
+    mitkClassMacro(MultiLabelSegmentation, SlicedData);
     itkNewMacro(Self);
-
-    typedef mitk::Label::PixelType PixelType;
 
     using GroupIndexType = std::size_t;
     using LabelValueType = mitk::Label::PixelType;
@@ -78,6 +60,48 @@ namespace mitk
     using LabelValueVectorType = std::vector<LabelValueType>;
 
     const static LabelValueType UNLABELED_VALUE;
+    //* Returns the pixel type used in group images*/
+    static PixelType GetPixelType();
+
+    enum class MergeStyle
+    {
+      Replace, //The old label content of a label value will be replaced by its new label content.
+      //Therefore pixels that are labeled might become unlabeled again.
+      //(This means that a lock of the value is also ignored).
+      Merge //The union of old and new label content will be generated.
+    };
+
+    enum class OverwriteStyle
+    {
+      RegardLocks, //Locked labels in the same spatial group will not be overwritten/changed.
+      IgnoreLocks //Label locks in the same spatial group will be ignored, so these labels might be changed.
+    };
+
+    /**
+      * @brief Check whether slice @a s at time @a t in channel @a n is set
+      */
+    bool IsSliceSet(int s = 0, int t = 0, int n = 0) const override;
+
+    /**
+      * @brief Check whether volume at time @a t in channel @a n is set
+      */
+    bool IsVolumeSet(int t = 0, int n = 0) const override;
+
+    /**
+      * @brief Check whether the channel @a n is set
+      */
+    bool IsChannelSet(int n = 0) const override;
+
+    /**
+      * @brief Get dimension of the MultiLabelSegmentation instance.
+      */
+    unsigned int GetDimension() const;
+    using GroupImageDimensionVectorType = std::vector<unsigned int>;
+    /**
+      * @brief Returns a vector of that contains the size (in pixel) for all dimensions of the
+      * MultiLabelSegmentation instance. It is simelar to mitk::Image::GetDimensions.
+      */
+    const GroupImageDimensionVectorType& GetDimensions() const;
 
     /** \brief Adds a label instance to a group of the multi label image.
     * @remark By default, if the pixel value of the label is already used in the image, the label
@@ -157,7 +181,7 @@ namespace mitk
     /**
      * @brief Erases the label with the given value from the labelset image.
      * The label itself will not be erased from the respective mitk::LabelSet. In order to
-     * remove the label itself use mitk::LabelSetImage::RemoveLabels()
+     * remove the label itself use mitk::MultiLabelSegmentation::RemoveLabels()
      * @param labelValue the pixel value of the label that will be erased from the labelset image
      * @pre labelValue must exist.
      */
@@ -172,6 +196,58 @@ namespace mitk
     void EraseLabels(const LabelValueVectorType& labelValues);
 
     /**
+     * @brief Merges the content of a source label into the target label.
+     *
+     * @param targetLabelValue The value of the label that should be the merged label.
+     * @param sourceLabelValue The value of the label that should be merged into the specified one
+     * @param overwriteStyle Controls if the merge operation should regard the label locks in the
+     * group of the target label.
+     * @pre targetLabelValue must exist.
+     * @pre sourceLabelValue must exist.
+     * @remark the group that is modified by the operation is defined by the targetLabelValue. So you
+     * can do mergings across groups. This will result in copying the source contents. If you want to
+     * remove the content of the source labels that must be done explicitly by calling EraseLabel(s) (if
+     * you just want to remove the pixel content) or RemoveLabel(s) (if you want remove the label
+     * completely)
+     */
+    void MergeLabel(LabelValueType targetLabelValue, LabelValueType sourceLabelValue,
+      OverwriteStyle overwriteStyle = OverwriteStyle::RegardLocks);
+
+    /**
+     * @brief Merges the content of a source labels into the target label.
+     *
+     * @param targetLabelValue The value of the label that should be the merged label.
+     * @param sourceLabelValues The values of the labels that should be merged into the target label
+     * with merge style "Merge".
+     * @param overwriteStyle Controls if/how the merge operation should regard the label locks in the
+     * group of the target label.
+     * @pre targetLabelValue must exist.
+     * @pre sourceLabelValues must exist.
+     * @remark If a spatial group is empty after the operation, it might be removed. The removal of an spatial group
+     * might invalidate any other spatial group index (due to new sorting/ordering).
+     */
+    void MergeLabels(LabelValueType targetLabelValue, const LabelValueVectorType& sourceLabelValues,
+      OverwriteStyle overwriteStyle = OverwriteStyle::RegardLocks);
+
+    /**
+     * \brief Adds a new group to the MultiLabelSegmentation. The new group will be set as the active one.
+     * \param labels Labels that will be added to the new group if provided
+     * \return the group ID of the new group
+     */
+    GroupIndexType AddGroup(ConstLabelVector labels = {});
+
+    /**
+     * \brief Adds a group based on a provided mitk::Image.
+     * \param layerImage is added to the vector of label images
+     * \param labels labels that will be cloned and added to the new group if provided
+     * \return the group ID of the new group
+     * \pre layerImage must be valid instance
+     * \pre layerImage needs to have the same geometry then the segmentation
+     * \pre layerImage must have the pixel value equal to LabelValueType.
+     */
+    GroupIndexType AddGroup(mitk::Image* layerImage, ConstLabelVector labels = {});
+
+    /**
      * @brief Removes a whole group including all its labels.
      * @remark with removing a group all groups with greater index will be re-indexed to
      * close the gap. Hence externally stored spatial group indices may become invalid.
@@ -180,6 +256,7 @@ namespace mitk
      * @pre group index must be valid.
      */
     void RemoveGroup(GroupIndexType group);
+
 
     /** \brief  Returns true if the value exists in the MultiLabelSegmentation instance*/
     bool ExistLabel(LabelValueType value) const;
@@ -345,6 +422,40 @@ namespace mitk
      *@pre groupID must reference an existing group.*/
     const mitk::Image* GetGroupImage(GroupIndexType groupID) const;
 
+    /** Updates a group image by copying a given source image content.
+    * @remark the pixel content of the sourceImage will be simply copied. It won't
+    * be checked if the source only contains valid label values for the group.
+    * This must be ensured by the callee of the function. If only some labels should be
+    * transfered/updated, TransferLabelContent(...) is a better option.
+    * @pre sourceImage must point to a valid image
+    * @pre groupID must indicate an existing group
+    * @pre sourceImage and this instance must have the same time geometry.
+    */
+    void UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep = 0);
+
+    /**
+     * @brief clears all label pixel content from the indicated group.
+     * @pre groupID must point to a valid group.
+     */
+    void ClearGroupImage(GroupIndexType groupID);
+    /**
+     * @brief clears all label pixel content from the indicated group.
+     * @pre groupID must point to a valid group.
+     * @pre timestep must be a valid.
+     */
+     void ClearGroupImage(GroupIndexType groupID, TimeStepType timestep);
+
+    /**
+     * @brief clears all label pixel content of all groups.
+     * @pre groupID must point to a valid group.
+     */
+    void ClearGroupImages();
+    /**
+     * @brief clears all label pixel content of all groups in one time step.
+     * @pre timestep must be a valid.
+     */
+    void ClearGroupImages(TimeStepType timestep);
+
     /** Returns the name of the indicated group. String may be empty if no name was defined.
      * Remark: The name neither is guaranteed to be defined nor that it is unique. Use the index
      * to uniquely refer to a group.
@@ -360,123 +471,83 @@ namespace mitk
     /** Updates the lookup table for a label indicated by the passed label value using the color of the label.
     * @pre labelValue must exist.
     */
-    void UpdateLookupTable(PixelType pixelValue);
+    void UpdateLookupTable(LabelValueType pixelValue);
 
-    protected:
+    /** Initializes the instance by completely resetting it and releasing all group images. The geometric information is
+    kept.*/
+    void Initialize() override;
 
-      void OnLabelModified(const Object* sender, const itk::EventObject&);
+    /**
+    * @brief Initialize new (or re-initialize) the segmentation based on the properties
+    * and geometric information of a passed image. The pixel content will be reseted.
+    *
+    * @param templateImage Template for the initialization
+    * @param resetLabels Indicate if the labels should be reseted on initialization.
+    * True (default): all label and group informations will be removed. False: label
+    * information and groups are kept, but all pixel information will be erased
+    * (cf EraseLabel(...)).
+    * @param ensure1stGroup Indicates if the initialization guarantees that the first
+    * group always exists afterwards (true) or if after initialization no group will be
+    * added even if no group is defined (false; e.g if labels are reseted or instance has
+    * no groups so far)
+    */
+    void Initialize(const mitk::Image* templateImage, bool resetLabels = true, bool ensure1stGroup = true);
 
-      /** Helper to ensure that the maps are correctly populated for a new label instance.*/
-      void AddLabelToMap(LabelValueType labelValue, Label* label, GroupIndexType groupID);
-      void RemoveLabelFromMap(LabelValueType labelValue);
-      /** Helper to ensure label events are correctly connected and lookup table is updated for a new label instance.*/
-      void RegisterLabel(Label* label);
-      /** Helper to ensure label events are unregistered.*/
-      void ReleaseLabel(Label* label);
+    /**
+    * @brief Initialize new (or re-initialize) the segmentation based on the passed time geometry
+    * information. The pixel content will be reseted.
+    *
+    * @param geometry Time geometry that should be used.
+    * @param resetLabels Indicate if the labels should be reseted on initialization.
+    * True (default): all label and group informations will be removed. False: label
+    * information and groups are kept, but all pixel information will be erased
+    * (cf EraseLabel(...)).
+    * @param ensure1stGroup Indicates if the initialization guarantees that the first
+    * group always exists afterwards (true) or if after initialization no group will be
+    * added even if no group is defined (false; e.g if labels are reseted or instance has
+    * no groups so far)
+    */
+    void Initialize(const mitk::TimeGeometry* geometry, bool resetLabels = true, bool ensure1stGroup = true);
 
-      /** Helper class used internally to apply lambda functions to the labels specified by the passed label value vector.
-      */
-      void ApplyToLabels(const LabelValueVectorType& values, std::function<void(Label*)>&& lambda);
-      /** Helper class used internally to for visiting the labels specified by the passed label value vector
-      * with the lambda function.
-      */
-      void VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const;
+    /** @brief Initialize a new mitk::MultiLabelSegmentation by a given image.
+     * For all distinct pixel values of the parameter image new labels will
+     * be created. If the number of distinct pixel values exceeds mitk::Label::MAX_LABEL_VALUE
+     * an exception will be raised.
+     * @param image the image which is used for initialization
+     */
+    void InitializeByLabeledImage(const mitk::Image* image);
 
-      LabelValueType m_ActiveLabelValue;
-
-    private:
-      using LabelMapType = std::map<LabelValueType, Label::Pointer>;
-      /** Dictionary that holds all known labels (label value is the key).*/
-      LabelMapType m_LabelMap;
-
-      using GroupNameVectorType = std::vector<std::string>;
-      /** Vector storing the names of all groups. If a group has no user name defined, string is empty.*/
-      GroupNameVectorType m_Groups;
-
-      /**This type is internally used to track which label is currently
-       * associated with which layer.*/
-      using GroupToLabelMapType = std::vector<LabelValueVectorType>;
-      /* Dictionary that maps between group id (key) and label values in the group (vector of label value).*/
-      GroupToLabelMapType m_GroupToLabelMap;
-      using LabelToGroupMapType = std::map<LabelValueType, GroupIndexType>;
-      /* Dictionary that maps between label value (key) and group id (value)*/
-      LabelToGroupMapType m_LabelToGroupMap;
-
-      using LabelEventGuardMapType = std::map<LabelValueType, ITKEventObserverGuard>;
-      LabelEventGuardMapType m_LabelModEventGuardMap;
-
-      LookupTable::Pointer m_LookupTable;
-
-      /** Indicates if the MultiLabelSegmentation allows to overwrite unlabeled pixels in normal pixel manipulation operations (e.g. TransferLabelConent).*/
-      bool m_UnlabeledLabelLock;
-
-      /** Mutex used to secure manipulations of the internal state of label and group maps.*/
-      std::shared_mutex m_LabelNGroupMapsMutex;
-
-    public:
-
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-    // END FUTURE MultiLabelSegmentation
-    ///////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-
-    /** DON'T USE. WORKAROUND method that is used until the rework is finished to
-    ensure always getting a group image and not this.
-    @warning Don't use. This method is going to be removed as soon as T30194 is
-    solved.*/
-      const mitk::Image* GetGroupImageWorkaround(GroupIndexType groupID) const;
+    /** Override default version. It will return the highest MTime of all group images and self.*/
+    itk::ModifiedTimeType GetMTime() const override;
 
     /**
       * \brief  */
-      void UpdateCenterOfMass(PixelType pixelValue);
+    void UpdateCenterOfMass(LabelValueType pixelValue);
+
+    using BaseData::IsEmpty;
+
+    /** \brief Checks if a label is empty at a given time step (does not contain any pixels).
+      */
+    bool IsEmpty(const Label* label, TimeStepType t = 0) const;
+    bool IsEmpty(LabelValueType pixelValue, TimeStepType t = 0) const;
 
     /**
-     * @brief Initialize an empty mitk::LabelSetImage using the information
-     *        of an mitk::Image
-     * @param image the image which is used for initializing the mitk::LabelSetImage
-     */
-    using mitk::Image::Initialize;
-    void Initialize(const mitk::Image *image) override;
-
-    /**
-      * \brief removes all pixel content form the active layer.*/
-    void ClearBuffer();
-
-    /**
-     * @brief Merges the mitk::Label with a given target value with the active label
-     *
-     * @param pixelValue          the value of the label that should be the new merged label
-     * @param sourcePixelValue    the value of the label that should be merged into the specified one
-     */
-    void MergeLabel(PixelType pixelValue, PixelType sourcePixelValue);
-
-    /**
-     * @brief Merges a list of mitk::Labels with the mitk::Label that has a specific value
-     *
-     * @param pixelValue                  the value of the label that should be the new merged label
-     * @param vectorOfSourcePixelValues   the list of label values that should be merge into the specified one
-     */
-    void MergeLabels(PixelType pixelValue, const std::vector<PixelType>& vectorOfSourcePixelValues);
-
-    /**
-     * @brief Gets the ID of the currently active layer
-     * @return the ID of the active layer
+     * @brief Gets the ID of the currently active group
+     * @return the ID of the active group
      * @pre at least on group must exist.
      */
     unsigned int GetActiveLayer() const;
 
+    void SetActiveLabel(LabelValueType label);
     Label* GetActiveLabel();
-
     const Label* GetActiveLabel() const;
 
     /**
-     * @brief Get the number of all existing mitk::Labels for a given layer
-     * @param layer the layer ID for which the active mitk::Labels should be retrieved
-     * @return the number of all existing mitk::Labels for the given layer
+     * @brief Get the number of all existing mitk::Labels for a given group
+     * @param group the group ID for which the active mitk::Labels should be retrieved
+     * @return the number of all existing mitk::Labels for the given group
      */
-    unsigned int GetNumberOfLabels(unsigned int layer) const;
+    unsigned int GetNumberOfLabels(unsigned int group) const;
 
     /**
      * @brief Returns the number of all labels summed up across all layers
@@ -484,75 +555,86 @@ namespace mitk
      */
     unsigned int GetTotalNumberOfLabels() const;
 
-    /** @brief Initialize a new mitk::LabelSetImage by a given image.
-     * For all distinct pixel values of the parameter image new labels will
-     * be created. If the number of distinct pixel values exceeds mitk::Label::MAX_LABEL_VALUE
-     * an exception will be raised.
-     * @param image the image which is used for initialization
-     */
-    void InitializeByLabeledImage(mitk::Image::Pointer image);
-
-    void MaskStamp(mitk::Image *mask, bool forceOverwrite);
-
-    void SetActiveLayer(unsigned int layer);
-    void SetActiveLabel(LabelValueType label);
-
-    unsigned int GetNumberOfLayers() const;
-
-    /**
-     * \brief Adds a new layer to the LabelSetImage. The new layer will be set as the active one.
-     * \param labels Labels that will be added to the new layer if provided
-     * \return the layer ID of the new layer
-     */
-    GroupIndexType AddLayer(ConstLabelVector labels = {});
-
-   /**
-    * \brief Adds a layer based on a provided mitk::Image.
-    * \param layerImage is added to the vector of label images
-    * \param labels labels that will be cloned and added to the new layer if provided
-    * \return the layer ID of the new layer
-    * \pre layerImage must be valid instance
-    * \pre layerImage needs to have the same geometry then the segmentation
-    * \pre layerImage must have the pixel value equal to LabelValueType.
-    */
-    GroupIndexType AddLayer(mitk::Image* layerImage, ConstLabelVector labels = {});
+    unsigned int GetNumberOfGroups() const;
 
   protected:
     mitkCloneMacro(Self);
 
-      LabelSetImage();
-    LabelSetImage(const LabelSetImage &other);
-    ~LabelSetImage() override;
+    MultiLabelSegmentation();
+    MultiLabelSegmentation(const MultiLabelSegmentation& other);
+    ~MultiLabelSegmentation() override;
 
-    template <typename TPixel, unsigned int VImageDimension>
-    void LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension> *source, unsigned int layer);
+    void OnLabelModified(const Object* sender, const itk::EventObject&);
 
-    template <typename TPixel, unsigned int VImageDimension>
-    void ImageToLayerContainerProcessing(const itk::Image<TPixel, VImageDimension> *source, unsigned int layer) const;
+    /** Helper to ensure that the maps are correctly populated for a new label instance.*/
+    void AddLabelToMap(LabelValueType labelValue, Label* label, GroupIndexType groupID);
+    void RemoveLabelFromMap(LabelValueType labelValue);
+    /** Helper to ensure label events are correctly connected and lookup table is updated for a new label instance.*/
+    void RegisterLabel(Label* label);
+    /** Helper to ensure label events are unregistered.*/
+    void ReleaseLabel(Label* label);
+
+    /** Helper class used internally to apply lambda functions to the labels specified by the passed label value vector.
+    */
+    void ApplyToLabels(const LabelValueVectorType& values, std::function<void(Label*)>&& lambda);
+    /** Helper class used internally to for visiting the labels specified by the passed label value vector
+    * with the lambda function.
+    */
+    void VisitLabels(const LabelValueVectorType& values, std::function<void(const Label*)>&& lambda) const;
+
+    LabelValueType m_ActiveLabelValue;
 
     template <typename ImageType>
-    void CalculateCenterOfMassProcessing(ImageType *input, LabelValueType index);
+    void CalculateCenterOfMassProcessing(ImageType* input, LabelValueType index);
 
     template <typename ImageType>
-    void EraseLabelProcessing(ImageType *input, PixelType index);
+    void EraseLabelProcessing(ImageType* input, LabelValueType index);
 
-    template <typename ImageType>
-    void MergeLabelProcessing(ImageType *input, PixelType pixelValue, PixelType index);
-
-    template <typename ImageType>
-    void MaskStampProcessing(ImageType *input, mitk::Image *mask, bool forceOverwrite);
-
-    template <typename LabelSetImageType, typename ImageType>
-    void InitializeByLabeledImageProcessing(LabelSetImageType *input, ImageType *other);
+    template <typename MultiLabelSegmentationType, typename ImageType>
+    void InitializeByLabeledImageProcessing(MultiLabelSegmentationType* input, const ImageType* other);
 
     /** helper needed for ensuring unique values.
       returns a sorted list of all labels (including the value for Unlabeled pixels..*/
     LabelValueVectorType GetUsedLabelValues() const;
 
-    std::vector<Image::Pointer> m_LayerContainer;
+  private:
+    /** Generates a new group image that fits to the geometry of the current instance.
+      @remark The pixel values are not initialized. E.g. use clear Image buffer for that.*/
+    Image::Pointer GenerateNewGroupImage() const;
 
-    int m_ActiveLayer;
-    bool m_activeLayerInvalid;
+    std::vector<Image::Pointer> m_GroupContainer;
+
+    using LabelMapType = std::map<LabelValueType, Label::Pointer>;
+    /** Dictionary that holds all known labels (label value is the key).*/
+    LabelMapType m_LabelMap;
+
+    using GroupNameVectorType = std::vector<std::string>;
+    /** Vector storing the names of all groups. If a group has no user name defined, string is empty.*/
+    GroupNameVectorType m_Groups;
+
+    /**This type is internally used to track which label is currently
+      * associated with which group.*/
+    using GroupToLabelMapType = std::vector<LabelValueVectorType>;
+    /* Dictionary that maps between group id (key) and label values in the group (vector of label value).*/
+    GroupToLabelMapType m_GroupToLabelMap;
+    using LabelToGroupMapType = std::map<LabelValueType, GroupIndexType>;
+    /* Dictionary that maps between label value (key) and group id (value)*/
+    LabelToGroupMapType m_LabelToGroupMap;
+
+    using LabelEventGuardMapType = std::map<LabelValueType, ITKEventObserverGuard>;
+    LabelEventGuardMapType m_LabelModEventGuardMap;
+
+    LookupTable::Pointer m_LookupTable;
+
+    /** Indicates if the MultiLabelSegmentation allows to overwrite unlabeled pixels in normal pixel manipulation operations (e.g. TransferLabelConent).*/
+    bool m_UnlabeledLabelLock;
+
+    /** Mutex used to secure manipulations of the internal state of label and group maps.*/
+    std::shared_mutex m_LabelNGroupMapsMutex;
+
+    /** This variable stores the dimensions of the multi label segmentation, in order to make it available even
+    when no group image is available.*/
+    GroupImageDimensionVectorType m_GroupImageDimensions;
   };
 
   /**
@@ -561,9 +643,9 @@ namespace mitk
   * @ingroup MITKTestingAPI
   *
   * Following aspects are tested for equality:
-  *  - LabelSetImage members
+  *  - MultiLabelSegmentation members
   *  - working image data
-  *  - layer image data
+  *  - group image data
   *  - labels in label set
   *
   * @param rightHandSide An image to be compared
@@ -572,8 +654,8 @@ namespace mitk
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return true, if all subsequent comparisons are true, false otherwise
   */
-  MITKMULTILABEL_EXPORT bool Equal(const mitk::LabelSetImage &leftHandSide,
-                                   const mitk::LabelSetImage &rightHandSide,
+  MITKMULTILABEL_EXPORT bool Equal(const mitk::MultiLabelSegmentation &leftHandSide,
+                                   const mitk::MultiLabelSegmentation &rightHandSide,
                                    ScalarType eps,
                                    bool verbose);
 
@@ -591,44 +673,41 @@ namespace mitk
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return true, if all subsequent comparisons are true, false otherwise
   */
-  MITKMULTILABEL_EXPORT bool Equal(const mitk::LabelSetImage::ConstLabelVectorType& leftHandSide,
-    const mitk::LabelSetImage::ConstLabelVectorType& rightHandSide,
+  MITKMULTILABEL_EXPORT bool Equal(const mitk::MultiLabelSegmentation::ConstLabelVectorType& leftHandSide,
+    const mitk::MultiLabelSegmentation::ConstLabelVectorType& rightHandSide,
     ScalarType eps,
     bool verbose);
 
+  /**
+  * @brief Equal A function comparing two vectors of label values for being equal in data
+  *
+  * @ingroup MITKTestingAPI
+  *
+  * Following aspects are tested for equality:
+  *  - Label values in vector
+  *
+  * @param rightHandSide A vector of label values to be compared
+  * @param leftHandSide A vector of label values to be compared
+  * @param orderIsRelevant Indicating if only the presence of the same values
+  * in the vectors are relevant or also their ordering.Tolerance for comparison.
+  * @return true, if all subsequent comparisons are true, false otherwise
+  */
+  MITKMULTILABEL_EXPORT bool Equal(const mitk::MultiLabelSegmentation::LabelValueVectorType& leftHandSide,
+    const mitk::MultiLabelSegmentation::LabelValueVectorType& rightHandSide,
+    bool orderIsRelevant = false);
 
-  /** temporary namespace that is used until the new class MultiLabelSegmentation is
-    introduced. It allows to already introduce/use some upcoming definitions, while
-    refactoring code.*/
-  namespace MultiLabelSegmentation
-  {
-    enum class MergeStyle
-    {
-      Replace, //The old label content of a label value will be replaced by its new label content.
-               //Therefore pixels that are labeled might become unlabeled again.
-               //(This means that a lock of the value is also ignored).
-      Merge //The union of old and new label content will be generated.
-    };
-
-    enum class OverwriteStyle
-    {
-      RegardLocks, //Locked labels in the same spatial group will not be overwritten/changed.
-      IgnoreLocks //Label locks in the same spatial group will be ignored, so these labels might be changed.
-    };
-  }
 
   using LabelValueMappingVector = std::vector < std::pair<Label::PixelType, Label::PixelType> >;
 
   /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
   a specified destination label for a specific time step. Function processes the whole image volume of the specified time step.
-  @remark in its current implementation the function only transfers contents of the active layer of the passed LabelSetImages.
   @remark the function assumes that it is only called with source and destination image of same geometry.
   @remark CAUTION: The function is not save if sourceImage and destinationImage are the same instance and more than one label is transferred,
   because the changes are made in-place for performance reasons in multiple passes. If a mapped value A equals an "old value"
   that occurs later in the mapping, one ends up with a wrong transfer, as a pixel would be first mapped to A and then later again, because
   it is also an "old" value in the mapping table.
-  @param sourceImage Pointer to the LabelSetImage which active layer should be used as source for the transfer.
-  @param destinationImage Pointer to the LabelSetImage which active layer should be used as destination for the transfer.
+  @param sourceImage Pointer to the MultiLabelSegmentation that should be used as source for the transfer.
+  @param destinationImage Pointer to the MultiLabelSegmentation that should be used as destination for the transfer.
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
   The order in which the labels will be transferred is the same order of elements in the labelMapping.
@@ -642,18 +721,18 @@ namespace mitk
   @param timeStep indicate the time step that should be transferred.
   @pre sourceImage and destinationImage must be valid
   @pre sourceImage and destinationImage must contain the indicated timeStep
-  @pre sourceImage must contain all indicated sourceLabels in its active layer.
-  @pre destinationImage must contain all indicated destinationLabels in its active layer.*/
-  MITKMULTILABEL_EXPORT void TransferLabelContentAtTimeStep(const LabelSetImage* sourceImage, LabelSetImage* destinationImage,
+  @pre sourceImage must contain all indicated sourceLabels.
+  @pre destinationImage must contain all indicated destinationLabels.*/
+  MITKMULTILABEL_EXPORT void TransferLabelContentAtTimeStep(const MultiLabelSegmentation* sourceImage, MultiLabelSegmentation* destinationImage,
     const TimeStepType timeStep, LabelValueMappingVector labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
   /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
   a specified destination label. Function processes the whole image volume for all time steps.
-  For more details please see TransferLabelContentAtTimeStep for LabelSetImages.
+  For more details please see TransferLabelContentAtTimeStep for MultiLabelSegmentations.
   @sa TransferLabelContentAtTimeStep*/
-  MITKMULTILABEL_EXPORT void TransferLabelContent(const LabelSetImage* sourceImage, LabelSetImage* destinationImage, LabelValueMappingVector labelMapping = { {1,1} },
+  MITKMULTILABEL_EXPORT void TransferLabelContent(const MultiLabelSegmentation* sourceImage, MultiLabelSegmentation* destinationImage, LabelValueMappingVector labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
@@ -687,8 +766,8 @@ namespace mitk
   @pre sourceImage and destinationImage must contain the indicated timeStep
   @pre destinationLabelVector must contain all indicated destinationLabels for mapping.*/
   MITKMULTILABEL_EXPORT void TransferLabelContentAtTimeStep(const Image* sourceImage, Image* destinationImage, const mitk::ConstLabelVector& destinationLabelVector,
-    const TimeStepType timeStep, mitk::Label::PixelType sourceBackground = LabelSetImage::UNLABELED_VALUE,
-    mitk::Label::PixelType destinationBackground = LabelSetImage::UNLABELED_VALUE,
+    const TimeStepType timeStep, mitk::Label::PixelType sourceBackground = MultiLabelSegmentation::UNLABELED_VALUE,
+    mitk::Label::PixelType destinationBackground = MultiLabelSegmentation::UNLABELED_VALUE,
     bool destinationBackgroundLocked = false,
     LabelValueMappingVector labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
@@ -699,8 +778,8 @@ namespace mitk
   For more details please see TransferLabelContentAtTimeStep.
   @sa TransferLabelContentAtTimeStep*/
   MITKMULTILABEL_EXPORT void TransferLabelContent(const Image* sourceImage, Image* destinationImage, const mitk::ConstLabelVector& destinationLabelVector,
-    mitk::Label::PixelType sourceBackground = LabelSetImage::UNLABELED_VALUE,
-    mitk::Label::PixelType destinationBackground = LabelSetImage::UNLABELED_VALUE,
+    mitk::Label::PixelType sourceBackground = MultiLabelSegmentation::UNLABELED_VALUE,
+    mitk::Label::PixelType destinationBackground = MultiLabelSegmentation::UNLABELED_VALUE,
     bool destinationBackgroundLocked = false,
     LabelValueMappingVector labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,

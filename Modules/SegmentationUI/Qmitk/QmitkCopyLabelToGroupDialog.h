@@ -19,7 +19,7 @@ found in the LICENSE file.
 namespace mitk
 {
   class Label;
-  class LabelSetImage;
+  class MultiLabelSegmentation;
 }
 
 namespace Ui
@@ -32,7 +32,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkCopyLabelToGroupDialog : public QDialog
   Q_OBJECT
 
 public:
-  QmitkCopyLabelToGroupDialog(mitk::LabelSetImage* segmentation, mitk::Label* label, QWidget* parent = nullptr);
+  QmitkCopyLabelToGroupDialog(mitk::MultiLabelSegmentation* segmentation, mitk::Label* label, QWidget* parent = nullptr);
   ~QmitkCopyLabelToGroupDialog() override;
 
   void accept() override;
@@ -42,7 +42,7 @@ public:
 private:
   Ui::QmitkCopyLabelToGroupDialog* m_Ui;
 
-  mitk::LabelSetImage* m_Segmentation;
+  mitk::MultiLabelSegmentation* m_Segmentation;
   mitk::Label* m_SourceLabel;
   mitk::Label* m_DestinationLabel;
 };

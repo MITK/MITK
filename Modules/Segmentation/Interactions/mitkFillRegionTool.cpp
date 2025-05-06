@@ -49,7 +49,7 @@ const char *mitk::FillRegionTool::GetName() const
 
 void mitk::FillRegionTool::PrepareFilling(const Image* /*workingSlice*/, Point3D /*seedPoint*/)
 {
-  auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
+  auto labelSetImage = this->GetWorkingData();
 
   if (nullptr == labelSetImage) mitkThrow() << "Invalid state of FillRegionTool. Working image is not of correct type.";
 

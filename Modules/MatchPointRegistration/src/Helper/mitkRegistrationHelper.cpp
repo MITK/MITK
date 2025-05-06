@@ -150,15 +150,4 @@ namespace mitk
     return InternalPointSetNodePredicate.GetPointer();
   }
 
-  NodePredicateBase::ConstPointer MITKRegistrationHelper::MaskNodePredicate()
-  {
-    auto isLabelSetImage = mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
-    auto hasBinaryProperty = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-    auto isLegacyMask = mitk::NodePredicateAnd::New(ImageNodePredicate(), hasBinaryProperty);
-
-    auto isLabelSetOrLegacyMask = mitk::NodePredicateOr::New(isLabelSetImage, isLegacyMask);
-
-    return isLabelSetOrLegacyMask.GetPointer();
-  }
-
 }

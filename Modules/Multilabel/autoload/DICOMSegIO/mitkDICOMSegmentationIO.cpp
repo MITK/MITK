@@ -42,7 +42,7 @@ found in the LICENSE file.
 namespace mitk
 {
   DICOMSegmentationIO::DICOMSegmentationIO()
-    : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(),
+    : AbstractFileIO(MultiLabelSegmentation::GetStaticNameOfClass(),
       mitk::MitkDICOMSEGIOMimeTypes::DICOMSEG_MIMETYPE_NAME(),
       "DICOM Segmentation")
   {
@@ -89,7 +89,7 @@ namespace mitk
       return Unsupported;
 
     // Check if the input file is a segmentation
-    const LabelSetImage *input = dynamic_cast<const LabelSetImage *>(this->GetInput());
+    const MultiLabelSegmentation *input = dynamic_cast<const MultiLabelSegmentation *>(this->GetInput());
 
     if (input)
     {
@@ -118,7 +118,7 @@ namespace mitk
     LocalFile localFile(this);
     const std::string path = localFile.GetFileName();
 
-    auto input = dynamic_cast<const LabelSetImage *>(this->GetInput());
+    auto input = dynamic_cast<const MultiLabelSegmentation *>(this->GetInput());
     if (input == nullptr)
       mitkThrow() << "Cannot write non-image data";
 
@@ -158,7 +158,7 @@ namespace mitk
     }
 
     // Iterate over all layers. For each a dcm file will be generated
-    for (unsigned int layer = 0; layer < input->GetNumberOfLayers(); ++layer)
+    for (unsigned int layer = 0; layer < input->GetNumberOfGroups(); ++layer)
     {
       vector<itkInternalImageType::Pointer> segmentations;
 
@@ -230,7 +230,7 @@ namespace mitk
 
         std::string filePath = path.substr(0, path.find_last_of("."));
         // If there is more than one layer, we have to write more than 1 dicom file
-        if (input->GetNumberOfLayers() != 1)
+        if (input->GetNumberOfGroups() != 1)
           filePath = filePath + std::to_string(layer) + ".dcm";
         else
           filePath = filePath + ".dcm";
@@ -273,7 +273,7 @@ namespace mitk
   {
     mitk::LocaleSwitch localeSwitch("C");
 
-    LabelSetImage::Pointer labelSetImage;
+    MultiLabelSegmentation::Pointer labelSetImage;
     std::vector<BaseData::Pointer> result;
 
     const std::string path = this->GetLocalFileName();
@@ -334,7 +334,7 @@ namespace mitk
       vector<map<unsigned, dcmqi::SegmentAttributes *>>::const_iterator segmentIter =
         metaInfo.segmentsAttributesMappingList.begin();
 
-      // For each itk image add a layer to the LabelSetImage output
+      // For each itk image add a layer to the MultiLabelSegmentation output
       for (auto &segItkImage : segItkImages)
       {
         // Get the labeled image and cast it to mitkImage
@@ -355,7 +355,7 @@ namespace mitk
         while (!iter.IsAtEnd())
         {
           itkInputImageType::PixelType value = iter.Get();
-          if (value != LabelSetImage::UNLABELED_VALUE)
+          if (value != MultiLabelSegmentation::UNLABELED_VALUE)
           {
             segValue = value;
             break;
@@ -402,7 +402,7 @@ namespace mitk
         if (labelSetImage.IsNull())
         {
           // Initialize the labelSetImage with the read image
-          labelSetImage = LabelSetImage::New();
+          labelSetImage = MultiLabelSegmentation::New();
           labelSetImage->InitializeByLabeledImage(segmentImage);
           // Check if the segment image contained labeled pixels. At this point it either contains no (when no labeled pixels where in the image)
           // or one label (as DCMSeg segments only represent one labels). So either generate a new label or used the only existing one.
@@ -413,12 +413,12 @@ namespace mitk
         }
         else
         {
-          LabelSetImage::GroupIndexType groupID = 0;
+          MultiLabelSegmentation::GroupIndexType groupID = 0;
           if (assumeOverlappingSegments)
           {
             // Add a new group because we have to expect every label to be overlapping
             // the label content is directly transferred here.
-            groupID = labelSetImage->AddLayer(segmentImage);
+            groupID = labelSetImage->AddGroup(segmentImage);
           }
 
           // Add the new label
@@ -434,7 +434,7 @@ namespace mitk
             //the label content has to be transferred, as no new group was added.
             mitk::TransferLabelContent(segmentImage, labelSetImage->GetGroupImage(groupID),
               labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(groupID)),
-              mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, {{segValue,newLabel->GetValue()}});
+              mitk::MultiLabelSegmentation::UNLABELED_VALUE, mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, {{segValue,newLabel->GetValue()}});
           }
 
         }
@@ -469,10 +469,6 @@ namespace mitk
 
       auto findings = DICOMIOHelper::ExtractPathsOfInterest(tagsOfInterestList, frames);
       DICOMIOHelper::SetProperties(labelSetImage, findings);
-
-      // Set active layer to the first layer of the labelset image
-      if (labelSetImage->GetNumberOfLayers() > 1 && labelSetImage->GetActiveLayer() != 0)
-        labelSetImage->SetActiveLayer(0);
     }
     catch (const std::exception &e)
     {
@@ -491,7 +487,7 @@ namespace mitk
 
   const std::string mitk::DICOMSegmentationIO::CreateMetaDataJsonFile(int layer)
   {
-    const mitk::LabelSetImage *image = dynamic_cast<const mitk::LabelSetImage *>(this->GetInput());
+    const mitk::MultiLabelSegmentation *image = dynamic_cast<const mitk::MultiLabelSegmentation *>(this->GetInput());
 
     const std::string output;
     dcmqi::JSONSegmentationMetaInformationHandler handler;

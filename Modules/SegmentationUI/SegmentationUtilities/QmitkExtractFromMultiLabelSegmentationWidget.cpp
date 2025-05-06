@@ -111,7 +111,7 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   auto node = m_Controls->segNodeSelector->GetSelectedNodes().front();
 
-  auto seg = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  auto seg = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
 
   auto selectedLabelValues = seg->GetAllLabelValues();
   if (m_Controls->checkExtractSelected->isChecked())
@@ -131,7 +131,7 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
   {
     if (m_Controls->checkInstanceMap->isChecked())
     {
-      auto image = seg->GetGroupImageWorkaround(groupID)->Clone();
+      auto image = seg->GetGroupImage(groupID)->Clone();
       std::string name = "InstanceMap group "+std::to_string(groupID);
       this->StoreToDataStorage(image, name, node);
       mitk::ProgressBar::GetInstance()->Progress();

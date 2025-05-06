@@ -207,7 +207,7 @@ namespace mitk
     /**
     * \brief Actually paints the polyline defined by the figure.
     */
-    void PaintPolyLine(const mitk::PlanarFigure::PolyLineType vertices,
+    void PaintPolyLine(const PlanarFigure::PolyLineType& vertices,
                        bool closed,
                        Point2D &anchorPoint,
                        const PlaneGeometry *planarFigurePlaneGeometry,

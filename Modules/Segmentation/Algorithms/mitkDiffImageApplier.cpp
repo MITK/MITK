@@ -161,20 +161,29 @@ void mitk::DiffImageApplier::ExecuteOperation(Operation *operation)
         image3D = timeSelector->GetOutput();
       }
 
-      auto labelSetImage = dynamic_cast<mitk::LabelSetImage* >(m_Image.GetPointer());
+      /////////////////////////////////////////////////////////////
+      //Commented out code that does not work due to changes in #536.
+      //This break functionality, but code has to be completly to be rworked
+      //anyways will be done directly after #536 in #81
+      //choose to just defunc code for now to avoid making the code review
+      //of #536 even more complex
+
+      //auto labelSetImage = dynamic_cast<mitk::MultiLabelSegmentation* >(m_Image.GetPointer());
 
       // this will do a long long if/else to find out both pixel types
-      TransferLabelContentAtTimeStep(
-        m_SliceDifferenceImage,
-        labelSetImage,
-        labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(labelSetImage->GetActiveLayer())),
-        m_TimeStep,
-        0,
-        0,
-        false,
-        {{1, m_DestinationLabel}},
-        mitk::MultiLabelSegmentation::MergeStyle::Merge,
-        mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+      //TransferLabelContentAtTimeStep(
+      //  m_SliceDifferenceImage,
+      //  labelSetImage,
+      //  labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(labelSetImage->GetActiveLayer())),
+      //  m_TimeStep,
+      //  0,
+      //  0,
+      //  false,
+      //  {{1, m_DestinationLabel}},
+      //  mitk::MultiLabelSegmentation::MergeStyle::Merge,
+      //  mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
+      /////////////////////////////////////////////////////////////
 
       if (m_Factor == 1 || m_Factor == -1)
       {

@@ -40,8 +40,8 @@ void QmitkNodeDescriptorManager::Initialize()
   auto isBinaryImage = mitk::NodePredicateAnd::New(isBinary, isImage);
   AddDescriptor(new QmitkNodeDescriptor("ImageMask", ":/Qmitk/Binaerbilder_48.png", isBinaryImage, this));
 
-  auto isLabelSetImage = mitk::NodePredicateDataType::New("LabelSetImage");
-  AddDescriptor(new QmitkNodeDescriptor("LabelSetImage", ":/Qmitk/LabelSetImage_48.png", isLabelSetImage, this));
+  auto isLabelSetImage = mitk::NodePredicateDataType::New("MultiLabelSegmentation");
+  AddDescriptor(new QmitkNodeDescriptor("MultiLabelSegmentation", ":/Qmitk/SegmentationIcon_48.png", isLabelSetImage, this));
 
   auto segmentationTaskListIcon = QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/SegmentationTaskListIcon.svg"));
   auto isSegmentationTaskList = mitk::NodePredicateDataType::New("SegmentationTaskList");

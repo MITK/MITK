@@ -108,7 +108,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Get the origin, e.g. the upper-left corner of the plane
-    const Point3D GetOrigin() const;
+    Point3D GetOrigin() const;
 
     //##Documentation
     //## @brief Set the origin, i.e. the upper-left corner of the plane
@@ -118,7 +118,7 @@ namespace mitk
     //##Documentation
     //## @brief Get the spacing (size of a pixel).
     //##
-    const mitk::Vector3D GetSpacing() const;
+    mitk::Vector3D GetSpacing() const;
 
     //##Documentation
     //## @brief Set the spacing (m_Spacing).
@@ -500,6 +500,19 @@ namespace mitk
       }
       return IsIndexInside(pt_index);
     }
+
+    //##Documentation
+    //## @brief Clamps a point to lie within the geometry's bounds.
+    //##
+    //## If the given point lies outside the geometry's bounds, it is projected
+    //## onto the nearest point inside the box. If the point is already inside,
+    //## it is returned unchanged.
+    //##
+    //## @param point The point to clamp.
+    //## @return The clamped point, guaranteed to lie within the geometry's bounds.
+    //##
+    //## @see ClampPoint(Point3D&) for a version that clamps a point in-place.
+    Point3D ClampPoint(const Point3D& point) const;
 
     // ********************************* Image Geometry ********************************
     //##Documentation

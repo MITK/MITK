@@ -68,7 +68,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   double circumference = 0.0;
   unsigned int i, j;
 
-  const PolyLineType polyLine = m_PolyLines[0];
+  const auto& polyLine = m_PolyLines[0];
 
   if (polyLine.empty())
     return;
@@ -224,7 +224,7 @@ std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection(const m
   std::vector<mitk::Point2D> intersectionList;
 
   ControlPointListType polyLinePoints;
-  const PolyLineType tempList = m_PolyLines[0];
+  const auto& tempList = m_PolyLines[0];
   for (auto iter = tempList.cbegin(); iter != tempList.cend(); ++iter)
   {
     polyLinePoints.push_back(*iter);

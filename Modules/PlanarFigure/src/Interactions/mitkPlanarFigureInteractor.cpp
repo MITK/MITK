@@ -67,6 +67,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION("points_can_be_added_or_removed", CheckFigureIsExtendable);
   CONNECT_CONDITION("figure_can_be_deleted", CheckFigureIsDeletable);
   CONNECT_CONDITION("figure_is_editable", CheckFigureIsEditable);
+  CONNECT_CONDITION("continuous_points_mode", CheckContinuousPointsMode);
 
   CONNECT_FUNCTION("finalize_figure", FinalizeFigure);
   CONNECT_FUNCTION("hide_preview_point", HidePreviewPoint)
@@ -85,6 +86,11 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("end_hovering", EndHovering);
   CONNECT_FUNCTION("delete_figure", DeleteFigure);
   CONNECT_FUNCTION("reset_on_point_select", PerformPointResetOnSelect);
+}
+
+bool mitk::PlanarFigureInteractor::CheckContinuousPointsMode(const InteractionEvent*)
+{
+  return m_ContinuousPointsMode;
 }
 
 bool mitk::PlanarFigureInteractor::CheckFigurePlaced(const InteractionEvent * /*interactionEvent*/)
@@ -825,7 +831,12 @@ void mitk::PlanarFigureInteractor::SetPrecision(mitk::ScalarType precision)
 
 void mitk::PlanarFigureInteractor::SetMinimumPointDistance(ScalarType minimumDistance)
 {
-  m_MinimumPointDistance = minimumDistance;
+  m_MinimumPointDistance = minimumDistance * minimumDistance; // Used squared in distance calculations.
+}
+
+void mitk::PlanarFigureInteractor::EnableContinuousPointsMode()
+{
+  m_ContinuousPointsMode = true;
 }
 
 bool mitk::PlanarFigureInteractor::TransformPositionEventToPoint2D(const InteractionPositionEvent *positionEvent,
@@ -926,14 +937,12 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(const InteractionPosition
 
   // Iterate over all polylines of planar figure, and check if
   // any one is close to the current display position
-  typedef mitk::PlanarFigure::PolyLineType VertexContainerType;
-
   Point2D polyLinePoint;
   Point2D firstPolyLinePoint;
   Point2D previousPolyLinePoint;
   for (unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop)
   {
-    const VertexContainerType polyLine = planarFigure->GetPolyLine(loop);
+    const auto& polyLine = planarFigure->GetPolyLine(loop);
 
     bool firstPoint(true);
     for (auto it = polyLine.begin(); it != polyLine.end(); ++it)
@@ -1069,7 +1078,15 @@ bool mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
   renderer->WorldToDisplay(newPoint3D, newDisplayPosition);
 
   const int selectedControlPoint = planarFigure->GetSelectedControlPoint();
-  for (int i = 0; i < (int)planarFigure->GetNumberOfControlPoints(); ++i)
+  const int numControlPoints = static_cast<int>(planarFigure->GetNumberOfControlPoints());
+
+  // For performance reasons we only check the distance to the previous
+  // control point in continuous points mode.
+  const int startIndex = m_ContinuousPointsMode
+    ? numControlPoints - 2
+    : 0;
+
+  for (int i = startIndex; i < numControlPoints; ++i)
   {
     if (i != selectedControlPoint)
     {

@@ -242,7 +242,7 @@ endforeach()
 
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_OpenMP "Use OpenMP" OFF)
-option(MITK_USE_Python3 "Use Python 3" ON)
+option(MITK_USE_Python3 "Use Python 3" OFF)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -378,7 +378,7 @@ endif()
 # -----------------------------------------
 # Custom dependency logic
 
-if(WIN32 AND Qt6_DIR)
+if(WIN32 AND Qt6_DIR AND NOT OPENSSL_ROOT_DIR)
   set(_dir_candidate "${Qt6_DIR}/../../../../../Tools/OpenSSLv3/Win_x64")
   get_filename_component(_dir_candidate ${_dir_candidate} ABSOLUTE)
   if(EXISTS "${_dir_candidate}")

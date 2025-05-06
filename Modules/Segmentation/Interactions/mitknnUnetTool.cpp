@@ -47,7 +47,9 @@ void mitk::nnUNetTool::RenderOutputBuffer()
       if (nullptr != this->GetPreviewSegmentationNode())
       {
         auto previewImage = this->GetPreviewSegmentation();
-        previewImage->InitializeByLabeledImage(m_OutputBuffer);
+        previewImage->InitializeByLabeledImage(m_OutputBuffer->GetGroupImage(0));
+        //we currently assume that nnUNet does not support overlapping segmentations
+        //and therefor will produce only one group.
       }
     }
     catch (const mitk::Exception &e)
@@ -57,12 +59,12 @@ void mitk::nnUNetTool::RenderOutputBuffer()
   }
 }
 
-void mitk::nnUNetTool::SetOutputBuffer(LabelSetImage::Pointer segmentation)
+void mitk::nnUNetTool::SetOutputBuffer(MultiLabelSegmentation::Pointer segmentation)
 {
   m_OutputBuffer = segmentation;
 }
 
-mitk::LabelSetImage::Pointer mitk::nnUNetTool::GetOutputBuffer()
+mitk::MultiLabelSegmentation::Pointer mitk::nnUNetTool::GetOutputBuffer()
 {
   return m_OutputBuffer;
 }
@@ -130,7 +132,7 @@ namespace
   }
 } // namespace
 
-void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType /*timeStep*/)
+void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, MultiLabelSegmentation* previewImage, TimeStepType /*timeStep*/)
 {
   if (this->GetMitkTempDir().empty())
   {
@@ -310,7 +312,7 @@ void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image
     previewImage->InitializeByLabeledImage(outputImage);
     previewImage->SetGeometry(inputAtTimeStep->GetGeometry());
     m_InputBuffer = inputAtTimeStep;
-    m_OutputBuffer = mitk::LabelSetImage::New();
+    m_OutputBuffer = mitk::MultiLabelSegmentation::New();
     m_OutputBuffer->InitializeByLabeledImage(outputImage);
     m_OutputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
   }

@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <mitkLabelSetImageToSurfaceThreadedFilter.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkRenderingManager.h>
-#include <mitkShowSegmentationAsSurface.h>
 #include <mitkStatusBar.h>
 #include <mitkToolManagerProvider.h>
 
@@ -166,13 +165,13 @@ void QmitkMultiLabelManager::SetSelectedLabels(const LabelValueVectorType& selec
   UpdateControls();
 }
 
-void QmitkMultiLabelManager::SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel)
+void QmitkMultiLabelManager::SetSelectedLabel(mitk::MultiLabelSegmentation::LabelValueType selectedLabel)
 {
   this->m_Controls->labelInspector->SetSelectedLabel(selectedLabel);
   UpdateControls();
 }
 
-void QmitkMultiLabelManager::SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation)
+void QmitkMultiLabelManager::SetMultiLabelSegmentation(mitk::MultiLabelSegmentation* segmentation)
 {
   this->m_Controls->labelInspector->SetMultiLabelSegmentation(segmentation);
 
@@ -180,7 +179,7 @@ void QmitkMultiLabelManager::SetMultiLabelSegmentation(mitk::LabelSetImage* segm
   // which is triggered by the inspector when setting the segmentation or node 
 }
 
-mitk::LabelSetImage* QmitkMultiLabelManager::GetMultiLabelSegmentation() const
+mitk::MultiLabelSegmentation* QmitkMultiLabelManager::GetMultiLabelSegmentation() const
 {
   return this->m_Controls->labelInspector->GetMultiLabelSegmentation();
 }
@@ -265,7 +264,7 @@ void QmitkMultiLabelManager::UpdateControls()
   m_Controls->btnAddInstance->setEnabled(hasWorkingData && labels.size()==1);
   m_Controls->btnAddLabel->setEnabled(hasWorkingData);
   m_Controls->btnLoadPreset->setEnabled(hasWorkingData);
-  m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && !labels.empty() && this->GetMultiLabelSegmentation()->GetNumberOfLayers()>1);
+  m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && !labels.empty() && this->GetMultiLabelSegmentation()->GetNumberOfGroups()>1);
   m_Controls->btnRemoveLabel->setEnabled(hasWorkingData && !labels.empty());
   m_Controls->btnRemoveInstance->setEnabled(hasWorkingData && !labels.empty() && hasMultipleInstances);
   m_Controls->btnSavePreset->setEnabled(hasWorkingData);
@@ -477,7 +476,7 @@ void QmitkMultiLabelManager::OnLoadPreset()
   QmitkLoadMultiLabelPreset({ this->GetMultiLabelSegmentation() });
 }
 
-void QmitkMultiLabelManager::OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position) const
+void QmitkMultiLabelManager::OnGoToLabel(mitk::MultiLabelSegmentation::LabelValueType label, const mitk::Point3D& position) const
 {
   emit GoToLabel(label, position);
 }
@@ -556,13 +555,13 @@ void QmitkMultiLabelManager::RemoveSegmentationObserver()
   m_GroupRemovedObserver.Reset();
 }
 
-void QmitkMultiLabelManager::OnLabelEvent(mitk::LabelSetImage::LabelValueType /*labelValue*/)
+void QmitkMultiLabelManager::OnLabelEvent(mitk::MultiLabelSegmentation::LabelValueType /*labelValue*/)
 {
   if (!m_Controls->labelInspector->GetModelManipulationOngoing())
     this->UpdateControls();
 }
 
-void QmitkMultiLabelManager::OnGroupEvent(mitk::LabelSetImage::GroupIndexType /*groupIndex*/)
+void QmitkMultiLabelManager::OnGroupEvent(mitk::MultiLabelSegmentation::GroupIndexType /*groupIndex*/)
 {
   if (!m_Controls->labelInspector->GetModelManipulationOngoing())
     this->UpdateControls();

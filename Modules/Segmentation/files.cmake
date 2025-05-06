@@ -17,6 +17,8 @@ set(CPP_FILES
   Algorithms/mitkSegmentationHelper.cpp
   Algorithms/mitkSegmentationObjectFactory.cpp
   Algorithms/mitkSegChangeOperationBase.cpp
+  Algorithms/mitkSegGroupModifyOperation.cpp
+  Algorithms/mitkSegGroupModifyOperationApplier.cpp
   Algorithms/mitkSegSliceOperation.cpp
   Algorithms/mitkSegSliceOperationApplier.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp

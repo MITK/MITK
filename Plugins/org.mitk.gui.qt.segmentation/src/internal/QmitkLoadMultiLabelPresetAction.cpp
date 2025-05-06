@@ -18,13 +18,13 @@ found in the LICENSE file.
 
 void QmitkLoadMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
-  std::vector<mitk::LabelSetImage::Pointer> images;
+  std::vector<mitk::MultiLabelSegmentation::Pointer> images;
   for (const auto &node : selectedNodes)
   {
     if (node.IsNull())
       continue;
 
-    mitk::LabelSetImage::Pointer image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+    mitk::MultiLabelSegmentation::Pointer image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
 
     if (image.IsNull())
       continue;

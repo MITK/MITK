@@ -210,7 +210,7 @@ void mitk::SegmentAnythingPythonService::CreateTempDirs(const std::string &dirPa
   m_OutDir = IOUtil::CreateTemporaryDirectory("sam-out-XXXXXX", m_MitkTempDir);
 }
 
-mitk::LabelSetImage::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProcess(long timeOut) const
+mitk::MultiLabelSegmentation::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFromProcess(long timeOut) const
 {
   std::string outputImagePath = m_OutDir + IOUtil::GetDirectorySeparator() + m_CurrentUId + ".nrrd";
   auto start = sys_clock::now();
@@ -226,7 +226,7 @@ mitk::LabelSetImage::Pointer mitk::SegmentAnythingPythonService::RetrieveImageFr
       
     }
   }
-  LabelSetImage::Pointer outputBuffer = mitk::IOUtil::Load<LabelSetImage>(outputImagePath);
+  MultiLabelSegmentation::Pointer outputBuffer = mitk::IOUtil::Load<MultiLabelSegmentation>(outputImagePath);
   return outputBuffer;
 }
 

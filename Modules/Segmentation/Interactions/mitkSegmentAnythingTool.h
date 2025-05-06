@@ -149,7 +149,7 @@ namespace mitk
      * @param previewImage
      * @param timeStep
      */
-    void DoUpdatePreview(const Image *inputAtTimeStep, const Image *oldSegAtTimeStep, LabelSetImage *previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image *inputAtTimeStep, const Image *oldSegAtTimeStep, MultiLabelSegmentation *previewImage, TimeStepType timeStep) override;
 
     /**
      * @brief Get the Points from positive and negative pointsets as std::vector.

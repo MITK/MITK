@@ -115,19 +115,6 @@ bool SetLabelColor(const mitk::IPropertyProvider* propertyProvider, mitk::Label*
   return false;
 }
 
-void CopyImageToActiveLayerImage(const mitk::Image* image, mitk::LabelSetImage* labelSetImage)
-{
-  mitk::ImageReadAccessor readAccessor(image);
-  mitk::ImageWriteAccessor writeAccessor(labelSetImage);
-
-  auto size = sizeof(mitk::Label::PixelType);
-
-  for (size_t dim = 0; dim < image->GetDimension(); ++dim)
-    size *= image->GetDimension(dim);
-
-  memcpy(writeAccessor.GetData(), readAccessor.GetData(), size);
-}
-
 OutputFormat ParseOutputFormat(const mitk::IFileIO::Options& args)
 {
   auto it = args.find("format");
@@ -202,7 +189,7 @@ int main(int argc, char* argv[])
     fs::path outputPath(outputFilename);
     CreateParentDirectories(outputPath);
 
-    mitk::LabelSetImage::Pointer labelSetImage; // Only used for "multilabel" output
+    mitk::MultiLabelSegmentation::Pointer labelSetImage; // Only used for "multilabel" output
     unsigned int nonameCounter = 0; // Helper variable to generate placeholder names for nameless contour sets
 
     for (auto input : inputs)
@@ -257,26 +244,24 @@ int main(int argc, char* argv[])
       {
         if (labelSetImage.IsNull())
         {
-          labelSetImage = mitk::LabelSetImage::New();
-          labelSetImage->Initialize(image);
-
-          CopyImageToActiveLayerImage(image, labelSetImage);
+          labelSetImage = mitk::MultiLabelSegmentation::New();
+          labelSetImage->InitializeByLabeledImage(image);
         }
         else
         {
-          labelSetImage->AddLayer(image);
+          labelSetImage->AddGroup(image);
+          auto label = mitk::LabelSetImageHelper::CreateNewLabel(labelSetImage);
+          label->SetValue(labelValue);
+          labelSetImage->AddLabel(label, labelSetImage->GetActiveLayer(), false, false);
         }
 
-        auto label = mitk::LabelSetImageHelper::CreateNewLabel(labelSetImage);
-        label->SetValue(labelValue);
+        auto label = labelSetImage->GetLabel(labelValue);
 
         SetLabelName(input, label);
         SetLabelColor(input, label);
 
         if (format == OutputFormat::Multilabel)
           MITK_INFO << "Creating label: " << label->GetName() << " [" << labelValue << ']';
-
-        labelSetImage->AddLabel(label, labelSetImage->GetActiveLayer(), false, false);
 
         if (format == OutputFormat::Label)
         {

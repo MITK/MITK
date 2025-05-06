@@ -135,7 +135,7 @@ namespace mitk
     mitk::Image::ConstPointer m_InputBuffer;
 
     /**
-     * @brief Renders the output LabelSetImage.
+     * @brief Renders the output MultiLabelSegmentation.
      * To called in the main thread.
      */
     void RenderOutputBuffer();
@@ -143,9 +143,9 @@ namespace mitk
     /**
      * @brief Get the Output Buffer object
      *
-     * @return LabelSetImage::Pointer
+     * @return MultiLabelSegmentation::Pointer
      */
-    LabelSetImage::Pointer GetOutputBuffer();
+    MultiLabelSegmentation::Pointer GetOutputBuffer();
 
     /**
      * @brief Sets the outputBuffer to nullptr
@@ -160,7 +160,7 @@ namespace mitk
 
     mitk::DataNode *GetRefNode();
 
-    void SetOutputBuffer(LabelSetImage::Pointer);
+    void SetOutputBuffer(MultiLabelSegmentation::Pointer);
 
   protected:
     /**
@@ -183,14 +183,14 @@ namespace mitk
      * 3. Sets RESULTS_FOLDER and CUDA_VISIBLE_DEVICES variables in the environment.
      * 3. Iterates through the parameter queue (m_ParamQ) and executes "nnUNet_predict" command with the parameters
      * 4. Expects an output image to be saved in the temporary directory by the python process. Loads it as
-     *    LabelSetImage and sets to previewImage.
+     *    MultiLabelSegmentation and sets to previewImage.
      *
      * @param inputAtTimeStep
      * @param oldSegAtTimeStep
      * @param previewImage
      * @param timeStep
      */
-    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) override;
     void UpdatePrepare() override;
 
   private:
@@ -207,7 +207,7 @@ namespace mitk
     bool m_MultiModal;
     bool m_Ensemble = false;
     bool m_Predict;
-    LabelSetImage::Pointer m_OutputBuffer;
+    MultiLabelSegmentation::Pointer m_OutputBuffer;
     unsigned int m_GpuId;
     const std::string m_TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
   };

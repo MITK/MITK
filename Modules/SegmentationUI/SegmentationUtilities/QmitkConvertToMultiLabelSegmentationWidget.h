@@ -30,7 +30,7 @@ namespace mitk
   class DataStorage;
   class Surface;
   class Image;
-  class LabelSetImage;
+  class MultiLabelSegmentation;
 }
 
 /*!

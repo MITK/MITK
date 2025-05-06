@@ -203,7 +203,7 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    void GenerateImageSlice(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs);
+    void GenerateImageSlice(mitk::BaseRenderer* renderer, const std::vector<mitk::MultiLabelSegmentation::GroupIndexType>& outdatedGroupIDs);
 
     void GenerateActiveLabelOutline(mitk::BaseRenderer* renderer);
 

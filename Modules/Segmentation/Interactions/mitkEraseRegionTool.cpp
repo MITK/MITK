@@ -62,7 +62,7 @@ mitk::Image::Pointer mitk::EraseRegionTool::GenerateFillImage(const Image* worki
   seedLabelValue = accessor.GetPixelByIndex(seedIndex);
   Image::Pointer fillImage;
 
-  if ( seedLabelValue == LabelSetImage::UNLABELED_VALUE)
+  if ( seedLabelValue == MultiLabelSegmentation::UNLABELED_VALUE)
   {
     return nullptr;
   }
@@ -76,5 +76,5 @@ mitk::Image::Pointer mitk::EraseRegionTool::GenerateFillImage(const Image* worki
 
 void mitk::EraseRegionTool::PrepareFilling(const Image* /*workingSlice*/, Point3D /*seedPoint*/)
 {
-  m_FillLabelValue = LabelSetImage::UNLABELED_VALUE;
+  m_FillLabelValue = MultiLabelSegmentation::UNLABELED_VALUE;
 };

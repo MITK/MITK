@@ -13,8 +13,9 @@ found in the LICENSE file.
 #ifndef QmitknnInteractiveToolGUI_h
 #define QmitknnInteractiveToolGUI_h
 
-#include "QmitkSegWithPreviewToolGUIBase.h"
+#include <QmitkSegWithPreviewToolGUIBase.h>
 #include <mitknnInteractiveTool.h>
+#include <MitkPythonSegmentationUIExports.h>
 
 class QButtonGroup;
 class QPushButton;
@@ -24,7 +25,7 @@ namespace Ui
   class QmitknnInteractiveToolGUI;
 }
 
-class MITKSEGMENTATIONUI_EXPORT QmitknnInteractiveToolGUI : public QmitkSegWithPreviewToolGUIBase
+class MITKPYTHONSEGMENTATIONUI_EXPORT QmitknnInteractiveToolGUI : public QmitkSegWithPreviewToolGUIBase
 {
   Q_OBJECT
 

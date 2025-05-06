@@ -128,13 +128,13 @@ QString QmitkMultiLabelSelectionWidget::GetEmptyInfo() const
   return m_Controls->labelSelection->GetEmptyInfo();
 }
 
-void QmitkMultiLabelSelectionWidget::SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation)
+void QmitkMultiLabelSelectionWidget::SetMultiLabelSegmentation(mitk::MultiLabelSegmentation* segmentation)
 {
   m_Controls->labelSelection->SetMultiLabelSegmentation(segmentation);
   m_Popup->GetInspector()->SetMultiLabelSegmentation(segmentation);
 }
 
-mitk::LabelSetImage* QmitkMultiLabelSelectionWidget::GetMultiLabelSegmentation() const
+mitk::MultiLabelSegmentation* QmitkMultiLabelSelectionWidget::GetMultiLabelSegmentation() const
 {
   return m_Controls->labelSelection->GetMultiLabelSegmentation();
 }
@@ -156,7 +156,7 @@ void QmitkMultiLabelSelectionWidget::SetSelectedLabels(const LabelValueVectorTyp
   m_Popup->GetInspector()->SetSelectedLabels(selectedLabels);
 }
 
-void QmitkMultiLabelSelectionWidget::SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel)
+void QmitkMultiLabelSelectionWidget::SetSelectedLabel(mitk::MultiLabelSegmentation::LabelValueType selectedLabel)
 {
   this->SetSelectedLabels({ selectedLabel });
 }

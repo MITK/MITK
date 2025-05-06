@@ -67,7 +67,7 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation(Operation *operation)
     imageOperation->GetImage()->Modified();
 
     PlaneGeometry::ConstPointer plane = dynamic_cast<const PlaneGeometry *>(imageOperation->GetWorldGeometry());
-    SegTool2D::UpdateAllSurfaceInterpolations(dynamic_cast<LabelSetImage*>(imageOperation->GetImage()), imageOperation->GetTimeStep(), plane, true);
+    SegTool2D::UpdateAllSurfaceInterpolations(dynamic_cast<MultiLabelSegmentation*>(imageOperation->GetImage()), imageOperation->GetTimeStep(), plane, true);
   }
 }
 

@@ -455,7 +455,12 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction*, InteractionEv
 
   if (m_FillFeedbackContour)
   {
-    this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, m_PaintingPixelValue);
+    auto workingSeg = this->GetWorkingData();
+    if (!workingSeg)
+      return;
+    const auto activeLabelValue = workingSeg->GetActiveLabel()->GetValue();
+
+    this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, activeLabelValue, m_PaintingPixelValue != 0);
 
     m_ScreenYDifference = 0;
     m_ScreenXDifference = 0;

@@ -242,7 +242,7 @@ endforeach()
 
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_OpenMP "Use OpenMP" OFF)
-option(MITK_USE_Python3 "Use Python 3" ON)
+option(MITK_USE_Python3 "Use Python 3" OFF)
 
 #-----------------------------------------------------------------------------
 # Build configurations

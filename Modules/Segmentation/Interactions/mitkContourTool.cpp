@@ -89,7 +89,13 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
   assert(positionEvent->GetSender()->GetRenderWindow());
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 
-  this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, m_PaintingPixelValue);
+
+  auto workingSeg = this->GetWorkingData();
+  if (!workingSeg)
+    return;
+  const auto activeLabelValue = workingSeg->GetActiveLabel()->GetValue();
+
+  this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, activeLabelValue, m_PaintingPixelValue!=0);
 }
 
 /**

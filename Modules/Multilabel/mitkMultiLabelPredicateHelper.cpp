@@ -23,7 +23,7 @@ found in the LICENSE file.
 mitk::NodePredicateBase::Pointer mitk::GetMultiLabelSegmentationPredicate(const mitk::BaseGeometry* referenceGeometry)
 {
   auto segPredicate = mitk::NodePredicateAnd::New();
-  segPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
+  segPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::MultiLabelSegmentation>::New());
   segPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   segPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
 

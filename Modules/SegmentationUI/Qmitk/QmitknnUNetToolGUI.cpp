@@ -15,6 +15,11 @@ found in the LICENSE file.
 #include "mitkProcessExecutor.h"
 #include "mitknnUnetTool.h"
 #include <mitkTimeNavigationController.h>
+
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+
 #include <QApplication>
 #include <QDir>
 #include <QDirIterator>
@@ -42,7 +47,7 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIB
 
   // define predicates for multi modal data selection combobox
   auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto labelSetImageType = mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
+  auto labelSetImageType = mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::MultiLabelSegmentation>::New());
   m_MultiModalPredicate = mitk::NodePredicateAnd::New(imageType, labelSetImageType).GetPointer();
 
   m_nnUNetThread = new QThread(this);
@@ -412,7 +417,7 @@ void QmitknnUNetToolGUI::UpdateCacheCountOnUI()
   m_Controls.cacheCountLabel->setText(cacheText);
 }
 
-void QmitknnUNetToolGUI::AddToCache(size_t &hashKey, mitk::LabelSetImage::ConstPointer mlPreview)
+void QmitknnUNetToolGUI::AddToCache(size_t &hashKey, mitk::MultiLabelSegmentation::ConstPointer mlPreview)
 {
   nnUNetCache *newCacheObj = new nnUNetCache;
   newCacheObj->m_SegCache = mlPreview;
@@ -687,7 +692,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
         {
           nnUNetCache *cacheObject = m_Cache[hashKey];
           MITK_INFO << "fetched pointer " << cacheObject->m_SegCache.GetPointer();
-          tool->SetOutputBuffer(const_cast<mitk::LabelSetImage *>(cacheObject->m_SegCache.GetPointer()));
+          tool->SetOutputBuffer(const_cast<mitk::MultiLabelSegmentation *>(cacheObject->m_SegCache.GetPointer()));
           this->SegmentationResultHandler(tool, true);
         }
       }

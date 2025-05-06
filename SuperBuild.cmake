@@ -353,7 +353,6 @@ endforeach()
 # Optional python variables
 if(MITK_USE_Python3)
   list(APPEND mitk_optional_cache_args
-       -DMITK_USE_Python3:BOOL=${MITK_USE_Python3}
        "-DPython3_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
        "-DPython3_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIRS}"
        "-DPython3_LIBRARY:FILEPATH=${Python3_LIBRARY}"
@@ -462,6 +461,7 @@ ExternalProject_Add(${proj}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
     -DQt6_DIR:PATH=${Qt6_DIR}
+    -DMITK_USE_Python3:BOOL=${MITK_USE_Python3}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}

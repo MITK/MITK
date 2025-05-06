@@ -78,7 +78,7 @@ void QmitkCreateMultiLabelSegmentationAction::Run(const QList<mitk::DataNode::Po
       return;
     }
 
-    auto newLabelSetImage = dynamic_cast<mitk::LabelSetImage*>(newSegmentationNode->GetData());
+    auto newLabelSetImage = dynamic_cast<mitk::MultiLabelSegmentation*>(newSegmentationNode->GetData());
     if (nullptr == newLabelSetImage)
     {
       // something went wrong

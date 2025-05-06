@@ -21,7 +21,7 @@ namespace mitk
 {
   /**
   @brief Gets a predicate for a valid multi label segmentation node
-  @details Predicate: DataType:LabelSetImage && !(Property:binary) && !(Property:helper object) && isSubGeometry(referenceGeometry; if set) 
+  @details Predicate: DataType:MultiLabelSegmentation && !(Property:binary) && !(Property:helper object) && isSubGeometry(referenceGeometry; if set) 
   */
   mitk::NodePredicateBase::Pointer MITKMULTILABEL_EXPORT GetMultiLabelSegmentationPredicate(const mitk::BaseGeometry* referenceGeometry = nullptr);
   /**

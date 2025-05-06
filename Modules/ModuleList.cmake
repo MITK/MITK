@@ -31,7 +31,6 @@ set(MITK_MODULES
   ContourModel
   SurfaceInterpolation
   BoundingShape
-  Python
   Segmentation
   QtWidgets
   QtWidgetsExt
@@ -58,4 +57,7 @@ set(MITK_MODULES
   DICOMPM
   ROI
   PET
+  Python
+  PythonSegmentation
+  PythonSegmentationUI
 )

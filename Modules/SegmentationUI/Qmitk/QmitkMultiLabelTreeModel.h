@@ -34,14 +34,14 @@ class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelTreeModel : public QAbstractItemM
     Q_OBJECT
 
 public:
-  using LabelValueType = mitk::LabelSetImage::LabelValueType;
-  using GroupIndexType = mitk::LabelSetImage::GroupIndexType;
+  using LabelValueType = mitk::MultiLabelSegmentation::LabelValueType;
+  using GroupIndexType = mitk::MultiLabelSegmentation::GroupIndexType;
 
   QmitkMultiLabelTreeModel(QObject *parent = nullptr);
   ~QmitkMultiLabelTreeModel() override;
 
-  void SetSegmentation(mitk::LabelSetImage* segmentation);
-  const mitk::LabelSetImage* GetSegmentation() const;
+  void SetSegmentation(mitk::MultiLabelSegmentation* segmentation);
+  const mitk::MultiLabelSegmentation* GetSegmentation() const;
 
   Qt::ItemFlags flags(const QModelIndex &index) const override;
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -57,7 +57,7 @@ public:
   /** returns the index of a passed label value (always first column). If label value does not exist in
   segmentation or segmentation is not set an invalid index will be returned.*/
   QModelIndex indexOfLabel(mitk::Label::PixelType labelValue) const;
-  QModelIndex indexOfGroup(mitk::LabelSetImage::GroupIndexType groupIndex) const;
+  QModelIndex indexOfGroup(mitk::MultiLabelSegmentation::GroupIndexType groupIndex) const;
   /** Returns the index to the next node in the tree that behaves like an instance (label node with only one instance
   or instance node). If current index is at the end, an invalid index is returned.*/
   QModelIndex ClosestLabelInstanceIndex(const QModelIndex& currentIndex) const;
@@ -143,7 +143,7 @@ private:
   void GenerateInternalGroupTree(unsigned int layerID, QmitkMultiLabelSegTreeItem* layerItem);
   QmitkMultiLabelSegTreeItem* GenerateInternalTree();
 
-  mitk::LabelSetImage::Pointer m_Segmentation;
+  mitk::MultiLabelSegmentation::Pointer m_Segmentation;
 
   std::mutex m_Mutex;
   std::unique_ptr<QmitkMultiLabelSegTreeItem> m_RootItem;

@@ -142,7 +142,7 @@ namespace
       this->InvokeEvent(LassoEvent(contour));
 
       // Clear the working mask to prepare for the next interaction.
-      this->GetWorkingDataNode()->GetDataAs<mitk::LabelSetImage>()->ClearBuffer();
+      this->GetWorkingDataNode()->GetDataAs<mitk::MultiLabelSegmentation>()->ClearGroupImages();
     }
 
     void OnInvertLogic(mitk::StateMachineAction*, mitk::InteractionEvent*) override
@@ -189,7 +189,7 @@ namespace mitk::nnInteractive
       const auto promptType = m_Owner->GetCurrentPromptType();
       const auto& labelName = GetPromptTypeAsString(promptType);
       const auto& color = GetColor(promptType, ColorIntensity::Vibrant);
-      this->MaskNode->GetDataAs<LabelSetImage>()->AddLabel(labelName, color, 0);
+      this->MaskNode->GetDataAs<MultiLabelSegmentation>()->AddLabel(labelName, color, 0);
 
       m_Owner->GetDataStorage()->Add(this->MaskNode, referenceNode);
     }

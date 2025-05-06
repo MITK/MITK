@@ -82,7 +82,7 @@ namespace mitk
      * @param detectIntersection if true the slice is eroded before contour extraction. If the slice is empty after the
      * erosion it is most likely an intersecting contour an will not be added to the SurfaceInterpolationController
      */
-    static void UpdateAllSurfaceInterpolations(const LabelSetImage* workingImage,
+    static void UpdateAllSurfaceInterpolations(const MultiLabelSegmentation* workingImage,
                                            TimeStepType timeStep,
                                            const PlaneGeometry *plane,
                                            bool detectIntersection);
@@ -151,7 +151,7 @@ namespace mitk
      * @brief returns the segmentation node that should be modified by the tool.
      */
     DataNode* GetWorkingDataNode() const;
-    Image* GetWorkingData() const;
+    MultiLabelSegmentation* GetWorkingData() const;
 
     DataNode* GetReferenceDataNode() const;
     Image* GetReferenceData() const;
@@ -279,7 +279,7 @@ namespace mitk
      * is set to be time point change aware, OnTimePointChanged() will be called.*/
     void OnTimePointChangedInternal();
 
-    static void  RemoveContourFromInterpolator(const SliceInformation& sliceInfo, LabelSetImage::LabelValueType labelValue);
+    static void  RemoveContourFromInterpolator(const SliceInformation& sliceInfo, MultiLabelSegmentation::LabelValueType labelValue);
 
     // The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string m_Contourmarkername;

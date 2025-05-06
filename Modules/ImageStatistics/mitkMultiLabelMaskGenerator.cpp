@@ -16,7 +16,7 @@ found in the LICENSE file.
 unsigned int mitk::MultiLabelMaskGenerator::GetNumberOfMasks() const
 {
   if (m_MultiLabelSegmentation.IsNull()) mitkThrow() << "Invalid state. Cannot get number of masks. MultiLabelSegmentation is not set.";
-  return m_MultiLabelSegmentation->GetNumberOfLayers();
+  return m_MultiLabelSegmentation->GetNumberOfGroups();
 }
 
 mitk::Image::ConstPointer mitk::MultiLabelMaskGenerator::DoGetMask(unsigned int maskID)

@@ -40,7 +40,7 @@ found in the LICENSE file.
     auto labeledImage = mitk::ImportItkImage(label2image->GetOutput());
 
     if (m_OutputIsLabelSetImage) {
-      auto labeledBinaryImage = mitk::LabelSetImage::New();
+      auto labeledBinaryImage = mitk::MultiLabelSegmentation::New();
       labeledBinaryImage->InitializeByLabeledImage(labeledImage);
       this->SetOutput(MakeNameFromOutputIndex(0), labeledBinaryImage.GetPointer());
     }

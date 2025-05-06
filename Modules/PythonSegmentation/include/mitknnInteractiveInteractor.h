@@ -54,7 +54,7 @@ namespace mitk::nnInteractive
    * responsible for ensuring that no more than one interactor is enabled
    * at a time.
    */
-  class MITKSEGMENTATION_EXPORT Interactor
+  class MITKPYTHONSEGMENTATION_EXPORT Interactor
   {
   public:
     virtual ~Interactor();

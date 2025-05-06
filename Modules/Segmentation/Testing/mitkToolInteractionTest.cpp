@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkInteractionTestHelper.h>
 #include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingConfig.h>
@@ -100,20 +101,25 @@ public:
     CPPUNIT_ASSERT(tool != nullptr);
 
     // Create empty segmentation working image
-    mitk::DataNode::Pointer workingImageNode = mitk::DataNode::New();
     const std::string organName = "test";
     mitk::Color color; // actually it doesn't matter which color we are using
     color.SetRed(1);   // but CreateEmptySegmentationNode expects a color parameter
     color.SetGreen(0);
     color.SetBlue(0);
+    auto workingImageNode = mitk::LabelSetImageHelper::CreateEmptySegmentationNode(organName);
+    auto workingImage = mitk::MultiLabelSegmentation::New();
+    workingImageNode->SetData(workingImage);
     if (preSegmentationImagePath.empty())
     {
-      workingImageNode = tool->CreateEmptySegmentationNode(patientImage, organName, color);
+      workingImage->Initialize(patientImage);
+      workingImage->AddLabel(organName, color, 0);
     }
     else
     {
       mitk::Image::Pointer preSegmentation = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath(preSegmentationImagePath));
-      workingImageNode = tool->CreateSegmentationNode(preSegmentation, organName, color);
+      workingImage->InitializeByLabeledImage(preSegmentation);
+      workingImage->GetLabel(1)->SetColor(color);
+      workingImage->GetLabel(1)->SetName(organName);
     }
 
     CPPUNIT_ASSERT(workingImageNode.IsNotNull());

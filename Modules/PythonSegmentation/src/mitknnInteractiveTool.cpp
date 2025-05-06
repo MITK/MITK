@@ -28,13 +28,13 @@ using namespace mitk::nnInteractive;
 
 namespace mitk
 {
-  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive")
+  MITK_TOOL_MACRO(MITKPYTHONSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive")
 
   class nnInteractiveTool::Impl
   {
   public:
     Impl()
-      : TargetBuffer(LabelSetImage::New()),
+      : TargetBuffer(Image::New()),
         PromptType(PromptType::Positive),
         AutoZoom(true),
         AutoRefine(false)
@@ -102,10 +102,10 @@ namespace mitk
     void AddBoxInteraction(const PlanarFigure* box, const Image* inputAtTimeStep) const;
     void AddScribbleInteraction(const Image* mask) const;
     void AddLassoInteraction(const Image* mask) const;
-    void AddInitialSegInteraction(LabelSetImage* previewImage, TimeStepType timeStep) const;
+    void AddInitialSegInteraction(MultiLabelSegmentation* previewImage, TimeStepType timeStep) const;
     void ResetInteractions() const;
 
-    LabelSetImage::Pointer TargetBuffer;
+    Image::Pointer TargetBuffer;
     nnInteractive::PromptType PromptType;
     InteractorMap Interactors;
     Image::Pointer InitialSeg;
@@ -154,9 +154,9 @@ const char** mitk::nnInteractiveTool::GetXPM() const
 
 us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
 {
-  auto module = us::GetModuleContext()->GetModule();
-  auto resource = module->GetResource("AI.svg");
-  return resource;
+  auto segmentationModule = us::GetModuleContext()->GetModule("MitkSegmentation");
+  auto iconResource = segmentationModule->GetResource("AI.svg");
+  return iconResource;
 }
 
 bool mitk::nnInteractiveTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
@@ -307,7 +307,7 @@ void mitk::nnInteractiveTool::InitializeSessionWithMask(Image* mask)
   this->UpdatePreview();
 }
 
-void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, MultiLabelSegmentation* previewImage, TimeStepType timeStep)
 {
   // This method assumes it is only called when an interaction has occurred or
   // when a session should be (re)initialized with a label mask. Otherwise,
@@ -351,8 +351,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
         return;
     }
 
-    ImageReadAccessor readAccessor(m_Impl->TargetBuffer.GetPointer());
-    previewImage->SetVolume(readAccessor.GetData(), timeStep);
+    previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep);
   }
   else if (m_Impl->InitialSeg.IsNotNull())
   {
@@ -470,7 +469,8 @@ void mitk::nnInteractiveTool::StartSession()
   auto imageAtTimeStep = this->GetImageByTimeStep(image, timeStep);
   const auto spacing = imageAtTimeStep->GetGeometry()->GetSpacing();
 
-  m_Impl->TargetBuffer->Initialize(imageAtTimeStep);
+  const auto maskPixelType = MultiLabelSegmentation::GetPixelType();
+  m_Impl->TargetBuffer->Initialize(maskPixelType, *(imageAtTimeStep->GetTimeGeometry()));
 
   pythonContext->TransferBaseDataToPython(imageAtTimeStep, "mitk_image");
   pythonContext->TransferBaseDataToPython(m_Impl->TargetBuffer.GetPointer(), "mitk_target_buffer");
@@ -607,7 +607,7 @@ void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask) const
   m_PythonContext->ExecuteString(pyCommands.str());
 }
 
-void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(LabelSetImage* previewImage, TimeStepType timeStep) const
+void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(MultiLabelSegmentation* previewImage, TimeStepType timeStep) const
 {
   m_PythonContext->TransferBaseDataToPython(this->InitialSeg, "mitk_initial_seg");
 
@@ -620,8 +620,7 @@ void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(LabelSetImage* prev
 
   m_PythonContext->ExecuteString(pyCommands.str());
 
-  ImageReadAccessor readAccessor(this->TargetBuffer.GetPointer());
-  previewImage->SetVolume(readAccessor.GetData(), timeStep);
+  previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), this->TargetBuffer, timeStep);
 }
 
 void mitk::nnInteractiveTool::Impl::ResetInteractions() const

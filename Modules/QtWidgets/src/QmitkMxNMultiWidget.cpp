@@ -419,7 +419,7 @@ void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
   try
   {
     auto version = jsonData->at("version").get<std::string>();
-    if (version != "1.1")
+    if (version.at(0) != '1')
     {
       QMessageBox::warning(this, "Load layout", "Unknown/Outdated layout version, could not load");
       return;
@@ -542,7 +542,9 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
         viewPlane = mitk::AnatomicalPlane::Sagittal;
       }
 
-      const GroupSyncIndexType syncGroup = object["syncGroup"].get<const GroupSyncIndexType>();
+      GroupSyncIndexType syncGroup = 0;
+      if (object.contains("syncGroup"))
+        syncGroup = object["syncGroup"].get<GroupSyncIndexType>();
 
       // repurpose existing render windows as far as they already exist
       auto window = GetWindowFromIndex(*windowCounter);

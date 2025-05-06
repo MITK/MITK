@@ -93,8 +93,7 @@ void QmitkPythonView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> n
   m_PythonContext->TransferBaseDataToPython(image);
   auto stdOut = m_PythonContext->GetStdOut();
   m_Controls->pythonOutput->clear();
-  m_Controls->pythonOutput->setText(QString::fromStdString(result));
-
+  m_Controls->pythonOutput->setText(QString::fromStdString(stdOut));
 }
 
 void QmitkPythonView::OnSitePackageSelected(const QString & /*sitePackagesFolder*/)

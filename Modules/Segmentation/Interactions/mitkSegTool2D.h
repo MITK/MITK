@@ -24,7 +24,7 @@ found in the LICENSE file.
 #include <mitkPlanePositionManager.h>
 #include <mitkRestorePlanePositionOperation.h>
 
-#include <mitkDiffSliceOperation.h>
+#include <mitkSegSliceOperation.h>
 
 #include <usModuleResource.h>
 
@@ -123,9 +123,14 @@ namespace mitk
      * Calls static WriteBackSegmentationResults*/
     static void WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep);
 
-    /** Convenience overloaded version that can be called for a given planeGeometry, slice image and time step.
-     * For more details see protected WriteSliceToVolume version.*/
-    static void WriteSliceToVolume(Image* workingImage, const PlaneGeometry* planeGeometry, const Image* slice, TimeStepType timeStep, bool allowUndo);
+    /** Writes a provided slice into the passed working image. The content of working image that is covered
+    * by the slice will be completely overwritten.
+    * @param workingImage Pointer to the image that is the target of the write operation.
+    * @param planeGeometry Geometry that indicates the plane that should be overwritten by the slice.
+    * @param slice Image containing the slice that should be written into working image.
+    * @param timeStep Time step of the working image that should be overwritten.
+    * @pre workingImage, planeGeometry and slice must point to valid instances.*/
+    static void WriteSliceToVolume(Image* workingImage, const PlaneGeometry* planeGeometry, const Image* slice, TimeStepType timeStep);
 
     void SetShowMarkerNodes(bool);
 
@@ -238,16 +243,14 @@ namespace mitk
      * @pre workingNode must point to a valid instance and contain an image instance as data.*/
     static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true, bool allowUndo = true);
 
-    /** Writes a provided slice into the passed working image. The content of working image that is covered
+    /** Convenience overloaded version that can be called with a slice info.
+    * Writes a provided slice into the passed working image. The content of working image that is covered
     * by the slice will be completely overwritten. If asked for it also generates the needed
     * undo/redo steps.
     * @param workingImage Pointer to the image that is the target of the write operation.
     * @param sliceInfo SliceInfo instance that contains the slice image, the defining plane geometry and time step.
-    * @param allowUndo Indicates if undo/redo operations should be registered for the write operation
-    * performed by this call. true: undo/redo will be generated; false: no undo/redo will be generated, so
-    * this operation cannot be revoked by the user.
     * @pre workingImage must point to a valid instance.*/
-    static void WriteSliceToVolume(Image* workingImage, const SliceInformation &sliceInfo, bool allowUndo);
+    static void WriteSliceToVolume(Image* workingImage, const SliceInformation &sliceInfo);
 
     /**
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure.

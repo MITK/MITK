@@ -10,37 +10,37 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkDiffSliceOperationApplier_h
-#define mitkDiffSliceOperationApplier_h
+#ifndef mitkSegSliceOperationApplier_h
+#define mitkSegSliceOperationApplier_h
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include <mitkOperationActor.h>
+#include <MitkSegmentationExports.h>
 
 namespace mitk
 {
-  /** \brief Executes a DiffSliceOperation.
-    \sa DiffSliceOperation
+  /** \brief Executes a SegSliceOperation.
+    \sa SegSliceOperation
   */
-  class MITKSEGMENTATION_EXPORT DiffSliceOperationApplier : public OperationActor
+  class MITKSEGMENTATION_EXPORT SegSliceOperationApplier : public OperationActor
   {
   public:
-    mitkClassMacroNoParent(DiffSliceOperationApplier)
+    mitkClassMacroNoParent(SegSliceOperationApplier)
 
       /** \brief Returns an instance of the class */
-      static DiffSliceOperationApplier *GetInstance();
+      static SegSliceOperationApplier *GetInstance();
 
-    /** \brief Executes a DiffSliceOperation.
-      \sa DiffSliceOperation
+    /** \brief Executes a SegSliceOperation.
+      \sa SegSliceOperation
       Note:
-        Only DiffSliceOperation is supported.
+        Only SegSliceOperation is supported.
     */
     void ExecuteOperation(Operation *op) override;
 
   protected:
-    DiffSliceOperationApplier();
+    SegSliceOperationApplier();
 
-    ~DiffSliceOperationApplier() override;
+    ~SegSliceOperationApplier() override;
   };
 }
 #endif

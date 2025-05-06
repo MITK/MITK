@@ -76,5 +76,5 @@ void mitk::MonaiLabel2DTool::WriteBackResults(MultiLabelSegmentation *previewIma
   }
   mitk::SegTool2D::WriteSliceToVolume(previewImage->GetGroupImage(previewImage->GetActiveLayer()),
     this->GetWorkingPlaneGeometry(), segResults->GetGroupImage(previewImage->GetActiveLayer()),
-    timeStep, false);
+    timeStep);
  }

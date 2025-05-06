@@ -302,7 +302,7 @@ void mitk::SegmentAnythingTool::DoUpdatePreview(const Image *inputAtTimeStep,
         mitk::MultiLabelSegmentation::Pointer outputBuffer = m_PythonService->RetrieveImageFromProcess(this->GetTimeOutLimit());
         m_ProgressCommand->SetProgress(180);
         mitk::SegTool2D::WriteSliceToVolume(previewSeg->GetGroupImage(previewSeg->GetActiveLayer()),
-          this->GetWorkingPlaneGeometry(), outputBuffer->GetGroupImage(outputBuffer->GetActiveLayer()), timeStep, false);
+          this->GetWorkingPlaneGeometry(), outputBuffer->GetGroupImage(outputBuffer->GetActiveLayer()), timeStep);
         this->SetSelectedLabels({MASK_VALUE});
         this->EmitSAMStatusMessageEvent("Successfully generated segmentation.");
       }

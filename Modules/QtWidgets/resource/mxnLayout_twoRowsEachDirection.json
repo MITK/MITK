@@ -8,19 +8,19 @@
                     "isWindow": true,
                     "size": 403,
                     "viewDirection": "Axial",
-                    "synchGroup": 0
+                    "synchGroup": 1
                 },
                 {
                     "isWindow": true,
                     "size": 403,
                     "viewDirection": "Sagittal",
-                    "synchGroup": 0
+                    "synchGroup": 1
                 },
                 {
                     "isWindow": true,
                     "size": 403,
                     "viewDirection": "Coronal",
-                    "synchGroup": 0
+                    "synchGroup": 1
                 }
             ],
             "isWindow": false,
@@ -33,19 +33,19 @@
                     "isWindow": true,
                     "size": 403,
                     "viewDirection": "Axial",
-                    "synchGroup": 1
+                    "synchGroup": 2
                 },
                 {
                     "isWindow": true,
                     "size": 403,
                     "viewDirection": "Sagittal",
-                    "synchGroup": 1
+                    "synchGroup": 2
                 },
                 {
                     "isWindow": true,
                     "size": 403,
                     "viewDirection": "Coronal",
-                    "synchGroup": 1
+                    "synchGroup": 2
                 }
             ],
             "isWindow": false,

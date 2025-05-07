@@ -46,7 +46,7 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 void QmitkMxNMultiWidget::InitializeMultiWidget()
 {
 
-  AddSynchronizationGroup();
+  AddSynchronizationGroup(1);
   SetLayout(1, 1);
   SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
   auto displayActionEventHandler = GetDisplayActionEventHandler();
@@ -373,7 +373,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   // needs to be done after 'QmitkRenderWindowUtilityWidget::ToggleSynchronization' has been connected
   // initially synchronize the node selection widget
-  SetSynchronizationGroup(utilityWidget->GetNodeSelectionWidget(), 0);
+  SetSynchronizationGroup(utilityWidget->GetNodeSelectionWidget(), 1);
 
 
   auto layoutManager = GetMultiWidgetLayoutManager();
@@ -542,7 +542,7 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
         viewPlane = mitk::AnatomicalPlane::Sagittal;
       }
 
-      GroupSyncIndexType syncGroup = 0;
+      GroupSyncIndexType syncGroup = 1;
       if (object.contains("syncGroup"))
         syncGroup = object["syncGroup"].get<GroupSyncIndexType>();
 
@@ -593,7 +593,6 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
 
       auto utilityWidget = window->GetUtilityWidget();
       utilityWidget->SetSyncGroup(rowCounter);
-      utilityWidget->SetDataSelection(QList({ node }));
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();
       auto baseRenderer = mitk::BaseRenderer::GetInstance(window->GetRenderWindow()->GetVtkRenderWindow());
@@ -602,6 +601,10 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
       hSplit->addWidget(window.get());
       window->show();
     }
+
+    m_SynchronizedWidgetConnectors[rowCounter]->ChangeSelectionMode(false);
+    m_SynchronizedWidgetConnectors[rowCounter]->ChangeSelection(QList({ node }));
+
     auto sizes = QList<int>({1, 1, 1});
     hSplit->setSizes(sizes);
     vSplit->addWidget(hSplit);
@@ -622,7 +625,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   emit LayoutChanged();
 }
 
-void QmitkMxNMultiWidget::AddSynchronizationGroup()
+void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index)
 {
   auto dataStorage = this->GetDataStorage();
   if (nullptr == dataStorage)
@@ -640,18 +643,17 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup()
     currentSelection.append(node);
   }
 
-  GroupSyncIndexType newIndex = m_SynchronizedWidgetConnectors.size();
-  m_SynchronizedWidgetConnectors[newIndex] = std::make_unique<QmitkSynchronizedWidgetConnector>();
-  m_SynchronizedWidgetConnectors[newIndex]->ChangeSelection(currentSelection);
+  m_SynchronizedWidgetConnectors[index] = std::make_unique<QmitkSynchronizedWidgetConnector>();
+  m_SynchronizedWidgetConnectors[index]->ChangeSelection(currentSelection);
 
-  emit SyncGroupAdded(newIndex);
+  emit SyncGroupAdded(index);
 }
 
 void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index)
 {
-  while (index >= static_cast<GroupSyncIndexType>(m_SynchronizedWidgetConnectors.size()))
+  if (m_SynchronizedWidgetConnectors.find(index) == m_SynchronizedWidgetConnectors.end())
   {
-    this->AddSynchronizationGroup();
+    this->AddSynchronizationGroup(index);
   }
 
   auto old_index = synchronizedWidget->GetSyncGroup();

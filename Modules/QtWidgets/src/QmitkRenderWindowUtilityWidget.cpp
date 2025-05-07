@@ -64,7 +64,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
 
   m_SyncGroupSelector = new QComboBox(this);
   for (int i=0; i<nSyncGroups; ++i)
-    m_SyncGroupSelector->insertItem(i, QString("Group %1").arg(i));
+    m_SyncGroupSelector->insertItem(i, QString("Group %1").arg(i+1));
   m_SyncGroupSelector->addItem("New");
   m_SyncGroupSelector->setMinimumContentsLength(8);
   connect(m_SyncGroupSelector, &QComboBox::currentIndexChanged,
@@ -101,7 +101,12 @@ QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
 
 void QmitkRenderWindowUtilityWidget::SetSyncGroup(const GroupSyncIndexType index)
 {
-  m_SyncGroupSelector->setCurrentIndex(index);
+  if (index == 0)
+  {
+    MITK_ERROR << "Invalid call to SetSyncGroup. Group index can't be 0.";
+    return;
+  }
+  m_SyncGroupSelector->setCurrentIndex(index - 1);
 }
 
 QmitkRenderWindowUtilityWidget::GroupSyncIndexType QmitkRenderWindowUtilityWidget::GetSyncGroup() const
@@ -114,11 +119,11 @@ void QmitkRenderWindowUtilityWidget::OnSyncGroupSelectionChanged(int index)
   if (index == m_SyncGroupSelector->count() - 1)
   {
     m_SyncGroupSelector->blockSignals(true);
-    m_SyncGroupSelector->insertItem(index, QString("Group %1").arg(index));
+    m_SyncGroupSelector->insertItem(index, QString("Group %1").arg(index+1));
     m_SyncGroupSelector->setCurrentIndex(index);
     m_SyncGroupSelector->blockSignals(false);
   }
-  emit SyncGroupChanged(m_NodeSelectionWidget, index);
+  emit SyncGroupChanged(m_NodeSelectionWidget, index+1);
 }
 
 void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)
@@ -204,10 +209,11 @@ QmitkSynchronizedNodeSelectionWidget* QmitkRenderWindowUtilityWidget::GetNodeSel
 
 void QmitkRenderWindowUtilityWidget::OnSyncGroupAdded(const GroupSyncIndexType index)
 {
-  if (index == m_SyncGroupSelector->count() - 1)
+  int comboBoxIndex = index - 1;
+  if (comboBoxIndex == m_SyncGroupSelector->count() - 1)
   {
     m_SyncGroupSelector->blockSignals(true);
-    m_SyncGroupSelector->insertItem(index, QString("Group %1").arg(index));
+    m_SyncGroupSelector->insertItem(comboBoxIndex, QString("Group %1").arg(index));
     m_SyncGroupSelector->blockSignals(false);
   }
 }

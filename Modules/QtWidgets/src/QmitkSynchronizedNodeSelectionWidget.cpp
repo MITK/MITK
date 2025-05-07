@@ -537,6 +537,12 @@ void QmitkSynchronizedNodeSelectionWidget::SetSyncGroup(const GroupSyncIndexType
     return;
   }
 
+  if (index == 0)
+  {
+    MITK_ERROR << "Invalid call to SetSyncGroup. Group index can't be 0.";
+    return;
+  }
+
   m_SyncGroupIndex = index;
 
   // Since the synchronization might lead to a different node order depending on the layer properties, the render window

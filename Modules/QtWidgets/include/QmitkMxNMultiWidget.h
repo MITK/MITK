@@ -121,7 +121,7 @@ private:
 
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer GetWindowFromIndex(size_t index);
-  void AddSynchronizationGroup();
+  void AddSynchronizationGroup(const GroupSyncIndexType index);
   void SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index);
 
   static nlohmann::json BuildJSONFromLayout(const QSplitter* splitter);

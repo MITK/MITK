@@ -627,6 +627,12 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
 
 void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index)
 {
+  if (index == 0)
+  {
+    MITK_ERROR << "Invalid call to SetSyncGroup. Group index can't be 0.";
+    return;
+  }
+
   auto dataStorage = this->GetDataStorage();
   if (nullptr == dataStorage)
   {

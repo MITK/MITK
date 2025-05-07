@@ -66,11 +66,13 @@ public:
   QStringList mimeTypes() const override;
   QMimeData* mimeData(const QModelIndexList& indexes) const override;
 
+  void moveNodesLayer(QSet<mitk::DataNode*> movedNodes, int targetLayer);
   bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) override;
 
 Q_SIGNALS:
 
   void ModelUpdated();
+  void NodesLayerMoved(QSet<mitk::DataNode*> nodes, int layer);
 
 private:
 

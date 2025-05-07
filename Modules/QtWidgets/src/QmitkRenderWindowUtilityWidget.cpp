@@ -30,7 +30,8 @@ found in the LICENSE file.
 QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QWidget* parent/* = nullptr */,
   QmitkRenderWindow* renderWindow/* = nullptr */,
-  mitk::DataStorage* dataStorage/* = nullptr */)
+  mitk::DataStorage* dataStorage/* = nullptr */,
+  const int nSyncGroups/* = 1 */)
   : m_NodeSelectionWidget(nullptr)
   , m_SliceNavigationWidget(nullptr)
   , m_StepperAdapter(nullptr)
@@ -61,19 +62,14 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   dataMenu->addAction(dataAction);
   layout->addWidget(menuBar);
 
-  m_SynchPushButton = new QPushButton(this);
-  auto* synchIcon = new QIcon();
-  auto synchronizeSvg = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/lock.svg"));
-  auto desynchronizeSvg = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/unlock.svg"));
-  synchIcon->addPixmap(synchronizeSvg.pixmap(64), QIcon::Normal, QIcon::On);
-  synchIcon->addPixmap(desynchronizeSvg.pixmap(64), QIcon::Normal, QIcon::Off);
-  m_SynchPushButton->setIcon(*synchIcon);
-  m_SynchPushButton->setToolTip("Synchronize / desynchronize data management");
-  m_SynchPushButton->setCheckable(true);
-  m_SynchPushButton->setChecked(true);
-  connect(m_SynchPushButton, &QPushButton::clicked,
-    this, &QmitkRenderWindowUtilityWidget::ToggleSynchronization);
-  layout->addWidget(m_SynchPushButton);
+  m_SyncGroupSelector = new QComboBox(this);
+  for (int i=0; i<nSyncGroups; ++i)
+    m_SyncGroupSelector->insertItem(i, QString("Group %1").arg(i+1));
+  m_SyncGroupSelector->addItem("New");
+  m_SyncGroupSelector->setMinimumContentsLength(8);
+  connect(m_SyncGroupSelector, &QComboBox::currentIndexChanged,
+    this, &QmitkRenderWindowUtilityWidget::OnSyncGroupSelectionChanged);
+  layout->addWidget(m_SyncGroupSelector);
 
   auto* sliceNavigationController = m_BaseRenderer->GetSliceNavigationController();
   m_SliceNavigationWidget = new QmitkSliceNavigationWidget(this);
@@ -89,7 +85,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_ViewDirectionSelector = new QComboBox(this);
   QStringList viewDirections{ "axial", "coronal", "sagittal"};
   m_ViewDirectionSelector->insertItems(0, viewDirections);
-  m_ViewDirectionSelector->setMinimumContentsLength(12);
+  m_ViewDirectionSelector->setMinimumContentsLength(7);
   connect(m_ViewDirectionSelector, &QComboBox::currentTextChanged, this, &QmitkRenderWindowUtilityWidget::ChangeViewDirection);
   UpdateViewPlaneSelection();
 
@@ -103,14 +99,31 @@ QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
 {
 }
 
-void QmitkRenderWindowUtilityWidget::ToggleSynchronization(bool synchronized)
+void QmitkRenderWindowUtilityWidget::SetSyncGroup(const GroupSyncIndexType index)
 {
-  if (m_SynchPushButton->isChecked() != synchronized)
+  if (index == 0)
   {
-    m_SynchPushButton->setChecked(synchronized);
+    MITK_ERROR << "Invalid call to SetSyncGroup. Group index can't be 0.";
+    return;
   }
-  m_NodeSelectionWidget->SetSynchronized(synchronized);
-  emit SynchronizationToggled(m_NodeSelectionWidget);
+  m_SyncGroupSelector->setCurrentIndex(index - 1);
+}
+
+QmitkRenderWindowUtilityWidget::GroupSyncIndexType QmitkRenderWindowUtilityWidget::GetSyncGroup() const
+{
+  return m_SyncGroupSelector->currentIndex();
+}
+
+void QmitkRenderWindowUtilityWidget::OnSyncGroupSelectionChanged(int index)
+{
+  if (index == m_SyncGroupSelector->count() - 1)
+  {
+    m_SyncGroupSelector->blockSignals(true);
+    m_SyncGroupSelector->insertItem(index, QString("Group %1").arg(index+1));
+    m_SyncGroupSelector->setCurrentIndex(index);
+    m_SyncGroupSelector->blockSignals(false);
+  }
+  emit SyncGroupChanged(m_NodeSelectionWidget, index+1);
 }
 
 void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)
@@ -186,5 +199,21 @@ void QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection()
     break;
   default:
     break;
+  }
+}
+
+QmitkSynchronizedNodeSelectionWidget* QmitkRenderWindowUtilityWidget::GetNodeSelectionWidget() const
+{
+  return m_NodeSelectionWidget;
+}
+
+void QmitkRenderWindowUtilityWidget::OnSyncGroupAdded(const GroupSyncIndexType index)
+{
+  int comboBoxIndex = index - 1;
+  if (comboBoxIndex == m_SyncGroupSelector->count() - 1)
+  {
+    m_SyncGroupSelector->blockSignals(true);
+    m_SyncGroupSelector->insertItem(comboBoxIndex, QString("Group %1").arg(index));
+    m_SyncGroupSelector->blockSignals(false);
   }
 }

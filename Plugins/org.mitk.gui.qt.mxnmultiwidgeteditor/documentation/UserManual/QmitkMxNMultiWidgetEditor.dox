@@ -98,7 +98,7 @@
 	Each window view has a utility menu at the top with four UI elements that allow to perform the following actions:
 	<ul>
 		<li> Data selection button: Select which data should be selected and visible inside the window view
-		<li> Lock / unlock button: Set the lock state of a window to couple / decouple the window from other windows.
+		<li> Sync Group drop down menu: Select the current sync group to synchronize with other windows
 		<li> Slice slider: Navigate along the view direction of this window
 		<li> View direction drop down menu: Select the current anatomical view plane / view direction
 	</ul>
@@ -122,16 +122,14 @@
 	on the selected node, using default zoom and centered camera position.
 	If you want so reset the camera to focus on the whole scene / all selected nodes, you can use the window menu, see
 	\ref org_mitk_editors_mxnmultiwidget_Layout.
-	Resetting a window only affects the corresponding window view, regardless of any synchronization / lock state.
+	Resetting a window only affects the corresponding window view, regardless of any synchronization state.
 
-\subsubsection org_mitk_editors_mxnmultiwidget_Lock_Button Lock button
-	So far showing / hiding nodes or removing them from a selection / changing a selection affected all window views.
-	If you want to use individual selections for a window view, you can unlock / decouple the window view from other window views
-	by clicking on the lock button in the utility menu.
-	This will decouple the current window view. Changing the visibility of a node or selecting individual nodes / removing nodes
-	using the data node selection button will affect only the current window view.
-	This allows to show different images in each window view, e.g. by decoupling multiple window views and selecting individual nodes
-	in each window.
+\subsubsection org_mitk_editors_mxnmultiwidget_Sync_Group Sync Group
+  By default, all render windows share the same selection / visibilities, since they are all in the same sync group.
+  If you want to use individual selections for a window / group of windows, you can change the sync group by clicking on the
+  sync group dropdown and selecting either an existing group or creating a new one.
+  Any windows with the same sync group will synchronize their node selection, its order, and each node's visibility with each other.
+	This allows to show different images in different windows, or organize windows in groups that show the same data respectively.
 	It is still possible to have a synchronized mouse interaction, see \ref org_mitk_editors_mxnmultiwidget_Synchronization and
 	\ref org_mitk_editors_mxnmultiwidget_Interaction_Mode.
 

@@ -1109,7 +1109,23 @@ void QmitkMultiLabelInspector::OnClearLabels(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
-    m_Segmentation->EraseLabels(this->GetSelectedLabels());
+
+    auto labelValues = this->GetSelectedLabels();
+    mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType containingGroups;
+    for (const auto label : labelValues) containingGroups.insert(m_Segmentation->GetGroupIndexOfLabel(label));
+    auto clearedLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, m_Segmentation->GetLabel(labelValues.front()));
+    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, containingGroups, true, 0, true);
+
+    m_Segmentation->EraseLabels(labelValues);
+
+    std::ostringstream stream;
+    stream << "Clear labels \"" << clearedLabelName << "\"";
+    if (labelValues.size() > 1)
+    {
+      stream << "and " << labelValues.size() - 1 << "other labels";
+    }
+    undoRedoGenerator.RegisterUndoRedoOperationEvent(stream.str());
+
     this->WaitCursorOff();
     // this is needed as workaround for (T27307). It circumvents the fact that modifications
     // of data (here the segmentation) does not directly trigger the modification of the
@@ -1280,7 +1296,13 @@ void QmitkMultiLabelInspector::OnClearLabel(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
+
+    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue()) }, true, 0, true);
+
     m_Segmentation->EraseLabel(currentLabel->GetValue());
+
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Clear label \"" + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, currentLabel) + "\"");
+
     this->WaitCursorOff();
 
     // this is needed as workaround for (T27307). It circumvents the fact that modifications

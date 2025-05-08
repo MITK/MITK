@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
 
+#include <mitkSegGroupModifyOperation.h>
+
 // Qmitk
 #include <QmitkCopyLabelToGroupDialog.h>
 #include <QmitkMultiLabelTreeModel.h>
@@ -578,27 +580,36 @@ void QmitkMultiLabelInspector::DeleteLabelInternal(const LabelValueVectorType& l
   if (!m_AllowLabelModification)
     mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of DeleteLabelInternal.";
 
-  if (m_Segmentation.IsNull())
+  if (m_Segmentation.IsNull() || labelValues.empty())
   {
     return;
   }
 
-  QVariant nextLabelVariant;
-
   this->WaitCursorOn();
-  m_ModelManipulationOngoing = true;
-  for (auto labelValue : labelValues)
-  {
-    if (labelValue == labelValues.back())
-    {
-      auto currentIndex = m_Model->indexOfLabel(labelValue);
-      auto nextIndex = m_Model->ClosestLabelInstanceIndex(currentIndex);
-      nextLabelVariant = nextIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
-    }
 
-    m_Segmentation->RemoveLabel(labelValue);
-  }
+  mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType containingGroups;
+  for (const auto label : labelValues) containingGroups.insert(m_Segmentation->GetGroupIndexOfLabel(label));
+  auto deletedLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, m_Segmentation->GetLabel(labelValues.front()));
+  mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, containingGroups, true);
+
+  m_ModelManipulationOngoing = true;
+
+  auto currentIndex = m_Model->indexOfLabel(labelValues.back());
+  auto nextIndex = m_Model->ClosestLabelInstanceIndex(currentIndex);
+  auto nextLabelVariant = nextIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
+
+  m_Segmentation->RemoveLabels(labelValues);
+
   m_ModelManipulationOngoing = false;
+
+  std::ostringstream stream;
+  stream << "Remove labels \"" << deletedLabelName << "\"";
+  if (labelValues.size() > 1)
+  {
+    stream << "and " << labelValues.size() - 1 << "other labels";
+  }
+  undoRedoGenerator.RegisterUndoRedoOperationEvent(stream.str());
+
   this->WaitCursorOff();
 
   if (nextLabelVariant.isValid())
@@ -1159,8 +1170,27 @@ void QmitkMultiLabelInspector::OnDeleteLabels(bool /*value*/)
 
   if (answerButton == QMessageBox::Yes)
   {
+    auto labelValues = this->GetSelectedLabels();
+
+    if (labelValues.empty()) return;
+
     this->WaitCursorOn();
+
+    mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType containingGroups;
+    for (const auto label : labelValues) containingGroups.insert(m_Segmentation->GetGroupIndexOfLabel(label));
+    auto deletedLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, m_Segmentation->GetLabel(labelValues.front()));
+    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, containingGroups, true);
+
     m_Segmentation->RemoveLabels(this->GetSelectedLabels());
+
+    std::ostringstream stream;
+    stream << "Remove labels \"" << deletedLabelName << "\"";
+    if (labelValues.size() > 1)
+    {
+      stream << "and " << labelValues.size() - 1 << "other labels";
+    }
+    undoRedoGenerator.RegisterUndoRedoOperationEvent(stream.str());
+
     this->WaitCursorOff();
 
     // this is needed as workaround for (T27307). It circumvents the fact that modifications

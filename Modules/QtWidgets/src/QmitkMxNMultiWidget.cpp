@@ -164,23 +164,29 @@ bool QmitkMxNMultiWidget::HasCoupledRenderWindows() const
 
 void QmitkMxNMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName)
 {
-  RenderWindowWidgetPointer renderWindowWidget;
+  QSet< RenderWindowWidgetPointer > renderWindowWidgets;
   if (widgetName.isNull() || widgetName.isEmpty())
   {
-    renderWindowWidget = GetActiveRenderWindowWidget();
+    for (const auto& [windowName, renderWindowWidget] : this->GetRenderWindowWidgets())
+    {
+      renderWindowWidgets.insert(renderWindowWidget);
+    }
   }
   else
   {
-    renderWindowWidget = GetRenderWindowWidget(widgetName);
+    renderWindowWidgets = { GetRenderWindowWidget(widgetName) };
   }
 
-  if (nullptr != renderWindowWidget)
+  if (renderWindowWidgets.isEmpty())
   {
-    renderWindowWidget->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+    MITK_ERROR << "Position can not be set for an unknown render window widget.";
     return;
   }
 
-  MITK_ERROR << "Position can not be set for an unknown render window widget.";
+  for (auto renderWindowWidget : renderWindowWidgets)
+  {
+    renderWindowWidget->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+  }
 }
 
 const mitk::Point3D QmitkMxNMultiWidget::GetSelectedPosition(const QString& widgetName) const

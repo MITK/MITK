@@ -504,6 +504,7 @@ nlohmann::json QmitkMxNMultiWidget::BuildJSONFromLayout(const QSplitter* splitte
       widgetJSON["isWindow"] = true;
       widgetJSON["viewDirection"] = widgetWindow->GetSliceNavigationController()->GetViewDirectionAsString();
       widgetJSON["syncGroup"] = widgetWindow->GetUtilityWidget()->GetSyncGroup();
+      widgetJSON["selectAll"] = widgetWindow->GetUtilityWidget()->GetNodeSelectionWidget()->GetSelectAll();
     }
     widgetJSON["size"] = sizes[i];
     content.push_back(widgetJSON);
@@ -560,6 +561,12 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
       }
 
       window->GetUtilityWidget()->SetSyncGroup(syncGroup);
+
+      bool selectAll = true;
+      if (object.contains("selectAll"))
+        selectAll = object["selectAll"].get<bool>();
+      window->GetUtilityWidget()->GetNodeSelectionWidget()->SetSelectAll(selectAll);
+
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();
       split->addWidget(window.get());

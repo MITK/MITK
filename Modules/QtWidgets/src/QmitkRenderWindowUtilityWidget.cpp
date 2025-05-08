@@ -111,7 +111,7 @@ void QmitkRenderWindowUtilityWidget::SetSyncGroup(const GroupSyncIndexType index
 
 QmitkRenderWindowUtilityWidget::GroupSyncIndexType QmitkRenderWindowUtilityWidget::GetSyncGroup() const
 {
-  return m_SyncGroupSelector->currentIndex();
+  return m_SyncGroupSelector->currentIndex() + 1;
 }
 
 void QmitkRenderWindowUtilityWidget::OnSyncGroupSelectionChanged(int index)

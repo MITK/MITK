@@ -392,9 +392,16 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
     mitkThrow() << "QmitkMultiLabelInspector is in an invalid state. AddNewLabelInstanceInternal was called with a non existing label as template";
 
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(templateLabel->GetValue());
+
+  mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID },
+    false, 0, false, true);
+
   m_ModelManipulationOngoing = true;
   auto newLabel = m_Segmentation->AddLabel(templateLabel, groupID, true);
   m_ModelManipulationOngoing = false;
+
+  undoRedoGenerator.RegisterUndoRedoOperationEvent("Add label instance \"" + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, newLabel) + "\"");
+
   this->SetSelectedLabel(newLabel->GetValue());
 
   auto index = m_Model->indexOfLabel(newLabel->GetValue());
@@ -441,9 +448,14 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::MultiLabe
 
   if (canceled) return nullptr;
 
+  mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { containingGroup },
+    false, 0, false, true);
+
   m_ModelManipulationOngoing = true;
   m_Segmentation->AddLabel(newLabel, containingGroup, false);
   m_ModelManipulationOngoing = false;
+
+  undoRedoGenerator.RegisterUndoRedoOperationEvent("Add label \""+ mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, newLabel)+"\"");
 
   this->SetSelectedLabel(newLabel->GetValue());
 

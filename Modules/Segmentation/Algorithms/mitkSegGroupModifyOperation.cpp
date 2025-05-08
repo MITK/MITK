@@ -15,6 +15,10 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 
+#include <mitkSegGroupModifyOperation.h>
+#include <mitkSegGroupModifyOperationApplier.h>
+#include <mitkUndoController.h>
+
 mitk::SegGroupModifyOperation::SegGroupModifyOperation(MultiLabelSegmentation* segmentation,
   const ModifyGroupImageMapType& modifiedGroupImages,
   const ModifyLabelsMapType& modifiedLabels)
@@ -76,8 +80,12 @@ mitk::MultiLabelSegmentation::ConstLabelVectorType mitk::SegGroupModifyOperation
 mitk::SegGroupModifyOperation* mitk::SegGroupModifyOperation::CreatFromSegmentation(
   MultiLabelSegmentation* segmentation,
   const std::set<MultiLabelSegmentation::GroupIndexType>& relevantGroupIDs,
-  bool coverAllTimeSteps, TimeStepType relevantTimeStep)
+  bool coverAllTimeSteps, TimeStepType relevantTimeStep,
+  bool noLabels, bool noGroupImages)
 {
+  if (noLabels && noGroupImages)
+    mitkThrow() << "Invalid call of mitk::SegGroupModifyOperation::CreatFromSegmentation. Arguments noLabels and noGroupImages must not be both true at the same time.";
+
   SegGroupModifyOperation::ModifyLabelsMapType labelData;
   SegGroupModifyOperation::ModifyGroupImageMapType imageData;
 
@@ -90,27 +98,66 @@ mitk::SegGroupModifyOperation* mitk::SegGroupModifyOperation::CreatFromSegmentat
 
   for (auto groupID : relevantGroupIDs)
   {
-    //clone relevant labels
-    auto labels = segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(groupID));
-    MultiLabelSegmentation::ConstLabelVectorType clonedLabels;
-    clonedLabels.reserve(labels.size());
-
-    std::transform(labels.begin(), labels.end(),
-      std::back_inserter(clonedLabels),
-      [](const Label* label)
-      {
-        return label->Clone();
-      });
-
-    labelData.emplace(groupID, std::move(clonedLabels));
-
-    //clone all relevant images
-    for (auto aTimeStep : relevantTSs)
+    if (!noLabels)
     {
-      imageData[groupID][aTimeStep] = SelectImageByTimeStep(segmentation->GetGroupImage(groupID), aTimeStep)->Clone();
+      //clone relevant labels
+      auto labels = segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(groupID));
+      MultiLabelSegmentation::ConstLabelVectorType clonedLabels;
+      clonedLabels.reserve(labels.size());
+
+      std::transform(labels.begin(), labels.end(),
+        std::back_inserter(clonedLabels),
+        [](const Label* label)
+        {
+          return label->Clone();
+        });
+
+      labelData.emplace(groupID, std::move(clonedLabels));
+    }
+
+    if (!noGroupImages)
+    {
+      //clone all relevant images
+      for (auto aTimeStep : relevantTSs)
+      {
+        imageData[groupID][aTimeStep] = SelectImageByTimeStep(segmentation->GetGroupImage(groupID), aTimeStep)->Clone();
+      }
     }
   }
 
   return new SegGroupModifyOperation(segmentation, imageData, labelData);
+}
+
+mitk::SegGroupModifyUndoRedoHelper::SegGroupModifyUndoRedoHelper(MultiLabelSegmentation* segmentation,
+  const GroupIndexSetType& relevantGroupIDs, bool coverAllTimeSteps, TimeStepType timeStep,
+  bool noLabels, bool noGroupImages):
+  m_Segmentation(segmentation), m_RelevantGroupIDs(relevantGroupIDs),
+  m_CoverAllTimeSteps(coverAllTimeSteps), m_TimeStep(timeStep), m_UndoOperation(nullptr), m_NoLabels(noLabels), m_NoGroupImages(noGroupImages)
+{
+  m_UndoOperation = SegGroupModifyOperation::CreatFromSegmentation(m_Segmentation, m_RelevantGroupIDs, m_CoverAllTimeSteps, m_TimeStep, m_NoLabels, m_NoGroupImages);
+}
+
+mitk::SegGroupModifyUndoRedoHelper::~SegGroupModifyUndoRedoHelper()
+{
+  if (nullptr != m_UndoOperation)
+    delete m_UndoOperation;
+};
+
+void mitk::SegGroupModifyUndoRedoHelper::RegisterUndoRedoOperationEvent(const std::string& description)
+{
+  if (nullptr == m_UndoOperation)
+    mitkThrow() << "Invalid usage of SegGroupModifyUndoRedoGenerator. You can only call GenerateUndoRedoOperationEvent once.";
+
+  UndoStackItem::IncCurrGroupEventId();
+  UndoStackItem::IncCurrObjectEventId();
+
+  auto redoOperation =
+    SegGroupModifyOperation::CreatFromSegmentation(m_Segmentation, m_RelevantGroupIDs, m_CoverAllTimeSteps, m_TimeStep, m_NoLabels, m_NoGroupImages);
+
+  OperationEvent* undoStackItem =
+    new OperationEvent(SegGroupModifyOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
+  m_UndoOperation = nullptr; //Ownership is no at undoStackItem
+
+  UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
 }
 

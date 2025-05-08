@@ -31,8 +31,6 @@ found in the LICENSE file.
 #include "mitkSegTool2D.h"
 
 #include <mitkSegGroupModifyOperation.h>
-#include <mitkSegGroupModifyOperationApplier.h>
-#include <mitkUndoController.h>
 
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
@@ -475,9 +473,8 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
 
       const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
-      auto undoOperation =
-        SegGroupModifyOperation::CreatFromSegmentation(resultSegmentation, {resultSegmentation->GetActiveLayer()},
-          m_CreateAllTimeSteps, timeStep);
+      SegGroupModifyUndoRedoHelper undoRedoGenerator(resultSegmentation, { resultSegmentation->GetActiveLayer() },
+        m_CreateAllTimeSteps, timeStep);
 
       auto oldGroupCount = resultSegmentation->GetNumberOfGroups();
       this->PreparePreviewToResultTransfer(labelMapping);
@@ -503,20 +500,7 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
         this->TransferSegmentationsAtTimeStep(previewImage, resultSegmentation, timeStep, labelMapping);
       }
 
-      auto redoOperation =
-        SegGroupModifyOperation::CreatFromSegmentation(resultSegmentation, { resultSegmentation->GetActiveLayer() },
-          m_CreateAllTimeSteps, timeStep);
-
-      /*============= BEGIN undo/redo feature block ========================*/
-      // create an operation event for the undo stack
-      UndoStackItem::IncCurrGroupEventId();
-      UndoStackItem::IncCurrObjectEventId();
-      OperationEvent* undoStackItem =
-        new OperationEvent(SegGroupModifyOperationApplier::GetInstance(), redoOperation, undoOperation, "Segmentation "+std::string(this->GetName()));
-
-      // add it to the undo controller
-      UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
-      /*============= END undo/redo feature block ========================*/
+      undoRedoGenerator.RegisterUndoRedoOperationEvent("Segmentation " + std::string(this->GetName()));
 
       // since we are maybe working on a smaller referenceImage, pad it to the size of the original referenceImage
       if (m_ReferenceDataNode.GetPointer() != m_SegmentationInputNode.GetPointer())

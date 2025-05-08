@@ -58,12 +58,41 @@ namespace mitk
     SegGroupModifyOperation& operator=(const SegGroupModifyOperation&) = delete;
 
     static SegGroupModifyOperation* CreatFromSegmentation(MultiLabelSegmentation* segmentation,
-      const std::set<MultiLabelSegmentation::GroupIndexType>& relevantGroupIDs, bool coverAllTimeSteps, TimeStepType timeStep = 0);
+      const std::set<MultiLabelSegmentation::GroupIndexType>& relevantGroupIDs, bool coverAllTimeSteps, TimeStepType timeStep = 0,
+      bool noLabels = false, bool noGroupImages = false);
 
   protected:
     using ModifyCompressedImageMapType = std::map<MultiLabelSegmentation::GroupIndexType, std::map<TimeStepType, std::unique_ptr<CompressedImageContainer>>>;
     ModifyCompressedImageMapType m_ModifiedImages;
     ModifyLabelsMapType m_ModifiedLabels;
   };
+
+  class MITKSEGMENTATION_EXPORT SegGroupModifyUndoRedoHelper
+  {
+  public:
+
+    using GroupIndexSetType = std::set<MultiLabelSegmentation::GroupIndexType>;
+
+    /** \brief */
+    SegGroupModifyUndoRedoHelper(MultiLabelSegmentation* segmentation,
+      const GroupIndexSetType& relevantGroupIDs, bool coverAllTimeSteps, TimeStepType timeStep = 0,
+      bool noLabels = false, bool noGroupImages = false);
+
+    ~SegGroupModifyUndoRedoHelper();
+
+    void RegisterUndoRedoOperationEvent(const std::string& description);
+
+  protected:
+    MultiLabelSegmentation::Pointer m_Segmentation;
+    GroupIndexSetType m_RelevantGroupIDs;
+    bool m_CoverAllTimeSteps;
+    TimeStepType m_TimeStep;
+    bool m_NoLabels;
+    bool m_NoGroupImages;
+
+    SegGroupModifyOperation* m_UndoOperation;
+  };
+
+
 }
 #endif

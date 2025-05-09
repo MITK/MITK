@@ -735,3 +735,30 @@ std::vector<std::string> mitk::DataNode::GetPropertyContextNames() const
 {
   return this->GetPropertyListNames();
 }
+
+bool mitk::DataNode::PropertyExists(const char* propertyKey, const mitk::BaseRenderer* renderer) const
+{
+  if (nullptr == propertyKey)
+    return false;
+
+  mitk::PropertyList::Pointer propertyList;
+
+  if (nullptr == renderer)
+  {
+    propertyList = m_PropertyList;
+  }
+  else
+  {
+    auto it = m_MapOfPropertyLists.find(renderer->GetName());
+
+    if (m_MapOfPropertyLists.end() == it)
+    {
+      return false;
+    }
+
+    propertyList = it->second;
+    }
+
+  auto property = m_PropertyList->GetProperty(propertyKey);
+  return nullptr != property;
+}

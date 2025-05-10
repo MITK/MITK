@@ -55,7 +55,6 @@ void QmitkTotalSegmentatorPreferencePage::CreateQtControl(QWidget *parent)
     this->ShowErrorMessage("Error occurred while loading preferences");
     return;
   }
-  this->AutoParsePythonPaths();
   this->SetDeviceInfo();
   m_Ui->overrideBox->setChecked(m_Preferences->GetBool("TotalSeg/isCustomInstall", false));
   bool isCustomInstall = m_Ui->overrideBox->isChecked();
@@ -65,15 +64,22 @@ void QmitkTotalSegmentatorPreferencePage::CreateQtControl(QWidget *parent)
   m_Ui->customEnvComboBox->setEnabled(isCustomInstall);
   QString m_CustomInstallPath = QString::fromStdString(m_Preferences->Get("TotalSeg/customInstallPath", ""));
   m_SysPythonPath = QString::fromStdString(m_Preferences->Get("TotalSeg/sysPythonPath", ""));
-  if (!m_SysPythonPath.isEmpty() && m_Ui->sysPythonComboBox->findText(m_SysPythonPath) == -1)
+  QStringList pythonDirs = QmitkSetupVirtualEnvUtil::AutoParsePythonPaths();
+  m_Ui->sysPythonComboBox->addItems(pythonDirs);
+  m_Ui->sysPythonComboBox->addItem("Select...");
+  int sysPythonId = m_Ui->sysPythonComboBox->findText(m_SysPythonPath);
+  if (!m_SysPythonPath.isEmpty() && sysPythonId == -1)
   {
     m_Ui->sysPythonComboBox->addItem(m_SysPythonPath);
+    m_Ui->sysPythonComboBox->setCurrentIndex(m_Ui->sysPythonComboBox->count() - 1);
+  }
+  else
+  {
+    m_Ui->sysPythonComboBox->setCurrentIndex(sysPythonId);
   }
 #ifndef _WIN32
   m_Ui->sysPythonComboBox->addItem("/usr/bin");
 #endif
-  m_Ui->sysPythonComboBox->addItem("Select...");
-  m_Ui->sysPythonComboBox->setCurrentIndex(0);
 
   if (!(m_CustomInstallPath.isEmpty()) && m_CustomInstallPath != "Select...")
   {
@@ -107,7 +113,7 @@ void QmitkTotalSegmentatorPreferencePage::CreateQtControl(QWidget *parent)
           QOverload<int>::of(&QComboBox::activated),
           [=](int index) { OnSystemPythonChanged(m_Ui->sysPythonComboBox->itemText(index)); });
 
-  this->UpdateStatusLabel();
+  this->UpdateStatusLabel(); 
 }
 
 QWidget *QmitkTotalSegmentatorPreferencePage::GetQtControl() const
@@ -174,11 +180,26 @@ void QmitkTotalSegmentatorPreferencePage::OnInstallButtonClicked()
 
   //GUI
   this->WriteStatusMessage("<b>STATUS: </b>Installing TotalSegmentator...");
-  QmitkToolInstallDialog *installDialog = new QmitkToolInstallDialog(m_Control);
+  QmitkToolInstallDialog *installDialog = new QmitkToolInstallDialog(m_Control, "TotalSegmentator");
   installDialog->show();
 
   //Start async process for installation
-  QFuture<bool> future = QtConcurrent::run([&] { return m_Installer.SetupVirtualEnv(m_Installer.VENV_NAME); });
+   QFuture<bool> future = QtConcurrent::run([&] {
+      return m_Installer.SetupVirtualEnv(
+        m_Installer.VENV_NAME,
+        m_Installer.PACKAGES,
+        [&]
+        {
+          std::string pythonCode; // python syntax to check if torch is installed with CUDA.
+          pythonCode.append("import torch;");
+          pythonCode.append("print('TotalSegmentator was installed with CUDA') if torch.cuda.is_available() else "
+                            "print('TotalSegmentator was "
+                            "installed WITHOUT CUDA');");
+          m_Installer.ExecutePython(pythonCode, &QmitkTotalSegmentatorToolInstaller::PrintProcessEvent);
+          return true;
+        },
+        &QmitkTotalSegmentatorToolInstaller::PrintProcessEvent);
+      });
   while (future.isRunning())
   {
     qApp->processEvents();
@@ -357,42 +378,6 @@ QString QmitkTotalSegmentatorPreferencePage::GetPythonPathFromUI(const QString &
     fullPath = fullPath.mid(fullPath.indexOf(")") + 2);
   }
   return fullPath.simplified();
-}
-
-void QmitkTotalSegmentatorPreferencePage::AutoParsePythonPaths()
-{
-  QString homeDir = QDir::homePath();
-  std::vector<QString> searchDirs;
-#ifdef _WIN32
-  searchDirs.push_back(QString("C:") + QDir::separator() + QString("ProgramData") + QDir::separator() +
-                       QString("anaconda3"));
-#else
-  // Add search locations for possible standard python paths here
-  searchDirs.push_back(homeDir + QDir::separator() + "anaconda3");
-  searchDirs.push_back(homeDir + QDir::separator() + "miniconda3");
-  searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "miniconda3");
-  searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "anaconda3");
-#endif
-  for (QString searchDir : searchDirs)
-  {
-    if (searchDir.endsWith("anaconda3", Qt::CaseInsensitive))
-    {
-      if (QDir(searchDir).exists())
-      {
-        m_Ui->sysPythonComboBox->addItem("(base): " + searchDir);
-        searchDir.append((QDir::separator() + QString("envs")));
-      }
-    }
-    for (QDirIterator subIt(searchDir, QDir::AllDirs, QDirIterator::NoIteratorFlags); subIt.hasNext();)
-    {
-      subIt.next();
-      QString envName = subIt.fileName();
-      if (!envName.startsWith('.')) // Filter out irrelevant hidden folders, if any.
-      {
-        m_Ui->sysPythonComboBox->addItem("(" + envName + "): " + subIt.filePath());
-      }
-    }
-  }
 }
 
 void QmitkTotalSegmentatorPreferencePage::SetDeviceInfo()

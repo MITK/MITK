@@ -5,6 +5,7 @@ set(SRC_CPP_FILES
   QmitkTotalSegmentatorPreferencePage.cpp
   QmitkToolInstallDialog.cpp
   QmitkTotalSegmentatorToolInstaller.cpp
+  QmitkSegmentAnythingToolInstaller.cpp
 )
 
 set(INTERNAL_CPP_FILES

@@ -44,8 +44,8 @@ if(NOT DEFINED ITK_DIR)
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      UPDATE_COMMAND ""
-     GIT_REPOSITORY https://github.com/InsightSoftwareConsortium/ITK.git
-     GIT_TAG 898def645183e6a2d3293058ade451ec416c4514 # tag: v5.4.2
+     GIT_REPOSITORY https://github.com/MITK/ITK.git
+     GIT_TAG 080810f0334a08592168a9dc1d67ec50510a818f # branch: v5.4.3-patched
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS

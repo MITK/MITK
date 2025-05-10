@@ -94,6 +94,8 @@ public:
   void EnableCrosshair();
   void DisableCrosshair();
 
+  using GroupSyncIndexType = int;
+
 public Q_SLOTS:
 
   // mouse events
@@ -110,6 +112,7 @@ Q_SIGNALS:
   void Moved();
   void UpdateUtilityWidgetViewPlanes();
   void LayoutChanged();
+  void SyncGroupAdded(const GroupSyncIndexType index);
 
 private:
 
@@ -118,13 +121,13 @@ private:
 
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer GetWindowFromIndex(size_t index);
-  void SetInitialSelection();
-  void ToggleSynchronization(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
+  void AddSynchronizationGroup(const GroupSyncIndexType index);
+  void SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index);
 
   static nlohmann::json BuildJSONFromLayout(const QSplitter* splitter);
   QSplitter* BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);
 
-  std::unique_ptr<QmitkSynchronizedWidgetConnector> m_SynchronizedWidgetConnector;
+  std::map < GroupSyncIndexType, std::unique_ptr<QmitkSynchronizedWidgetConnector> > m_SynchronizedWidgetConnectors;
 
   bool m_CrosshairVisibility;
 

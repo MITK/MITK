@@ -97,7 +97,7 @@ public:
    */
   mitk::DataStorage *GetDataStorage();
 
-  void SetActiveLabelValue(mitk::LabelSetImage::LabelValueType labelValue);
+  void SetActiveLabelValue(mitk::MultiLabelSegmentation::LabelValueType labelValue);
 
   /**
     Just public because it is called by itk::Commands. You should not need to call this.
@@ -305,7 +305,7 @@ private:
   mitk::DataNode::Pointer m_FeedbackNode;
   mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
 
-  mitk::Image *m_Segmentation;
+  mitk::MultiLabelSegmentation *m_Segmentation;
 
   mitk::SliceNavigationController *m_LastSNC;
   unsigned int m_LastSliceIndex;

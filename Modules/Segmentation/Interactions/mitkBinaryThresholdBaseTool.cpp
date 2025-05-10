@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkBinaryThresholdBaseTool.h"
 
 #include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
+#include "mitkITKImageImport.h"
 #include "mitkImageStatisticsHolder.h"
 #include "mitkLabelSetImage.h"
 #include <itkBinaryThresholdImageFilter.h>
@@ -98,7 +98,7 @@ void mitk::BinaryThresholdBaseTool::InitiateToolByInput()
   }
 }
 
-void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, MultiLabelSegmentation* previewImage, TimeStepType timeStep)
 {
   if (nullptr != inputAtTimeStep && nullptr != previewImage)
   {
@@ -108,7 +108,7 @@ void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep
 
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::BinaryThresholdBaseTool::ITKThresholding(const itk::Image<TPixel, VImageDimension>* inputImage,
-                                                    LabelSetImage *segmentation,
+                                                    MultiLabelSegmentation *segmentation,
                                                     unsigned int timeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
@@ -126,5 +126,7 @@ void mitk::BinaryThresholdBaseTool::ITKThresholding(const itk::Image<TPixel, VIm
   filter->SetOutsideValue(0);
   filter->Update();
 
-  segmentation->SetVolume((void *)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
+  auto outputImage = ImportItkImage(filter->GetOutput());
+
+  segmentation->UpdateGroupImage(segmentation->GetGroupIndexOfLabel(activeValue), outputImage, timeStep);
 }

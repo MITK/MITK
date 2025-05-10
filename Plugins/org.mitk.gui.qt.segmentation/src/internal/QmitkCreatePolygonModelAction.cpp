@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+#include <mitkLabelSetImage.h>
 
 // Blueberry
 #include <berryIWorkbenchPage.h>
@@ -41,9 +42,9 @@ QmitkCreatePolygonModelAction::~QmitkCreatePolygonModelAction()
 void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selectedNodes)
 {
   DataNode::Pointer selectedNode = selectedNodes[0];
-  Image::Pointer image = dynamic_cast<mitk::Image *>(selectedNode->GetData());
+  mitk::MultiLabelSegmentation::Pointer segmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(selectedNode->GetData());
 
-  if (image.IsNull())
+  if (segmentation.IsNull())
   {
     return;
   }
@@ -61,7 +62,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
     if (smoothingHint)
     {
       smoothing = 0.0;
-      Vector3D spacing = image->GetGeometry()->GetSpacing();
+      Vector3D spacing = segmentation->GetGeometry()->GetSpacing();
 
       for (Vector3D::Iterator iter = spacing.Begin(); iter != spacing.End(); ++iter)
         smoothing = max(smoothing, *iter);
@@ -80,7 +81,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
 
     // set filter parameter
     surfaceFilter->SetDataStorage(*m_DataStorage);
-    surfaceFilter->SetPointerParameter("Input", image);
+    surfaceFilter->SetPointerParameter("Input", segmentation);
     surfaceFilter->SetPointerParameter("Group node", selectedNode);
     surfaceFilter->SetParameter("Show result", true);
     surfaceFilter->SetParameter("Sync visibility", false);

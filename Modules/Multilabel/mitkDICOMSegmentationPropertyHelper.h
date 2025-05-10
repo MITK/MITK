@@ -24,7 +24,7 @@ namespace mitk
   class MITKMULTILABEL_EXPORT DICOMSegmentationPropertyHelper
   {
   public:
-    static void DeriveDICOMSegmentationProperties(LabelSetImage* dicomSegImage);
+    static void DeriveDICOMSegmentationProperties(MultiLabelSegmentation* dicomSegImage);
     static void SetDICOMSegmentProperties(Label *label);
   };
 }

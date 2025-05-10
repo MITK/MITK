@@ -246,7 +246,7 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     // 3. Fill contour into slice
     mitk::ContourModel::Pointer projectedContour =
       mitk::ContourModelUtils::ProjectContourTo2DSlice(slice, contour);
-    mitk::ContourModelUtils::FillContourInSlice(projectedContour, slice, outputImage, m_PaintingPixelValue);
+    mitk::ContourModelUtils::FillContourInSlice(projectedContour, 0, slice, m_PaintingPixelValue);
 
     // 4. Write slice back into image volume
     reslice->SetInputSlice(slice->GetVtkImageData());

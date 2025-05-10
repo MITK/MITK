@@ -17,6 +17,7 @@ found in the LICENSE file.s
 #include "mitkProcessExecutor.h"
 #include <MitkSegmentationUIExports.h>
 #include <QString>
+#include <functional>
 
 /**
  * @brief Abstract Class to Setup a python virtual environment and pip install required packages.
@@ -31,10 +32,17 @@ public:
   QmitkSetupVirtualEnvUtil();
 
   /**
-   * @brief Implement the method in child class 
-   * to setup the virtual environment.
+   * @brief Sets up a python virtual environment in the DKFZ directory with given
+   * @param venvName : Name of the virtual env folder
+   * @param packages : List of packages to be installed except Pytorch
+   * @param validator : Functor to run and validate the virtual env setup
+   * @param printCallback : ITK functor to custom print the virtual en setup log.
+   * 
    */
-  virtual bool SetupVirtualEnv(const QString& venvName) = 0;
+  bool SetupVirtualEnv(const QString &venvName,
+                       const QStringList &packages,
+                       std::function<bool()> validator,
+                       CallbackType printCallback);
 
   /**
    * @brief Get the Virtual Env Path object. Override this method in the respective
@@ -208,6 +216,12 @@ public:
   * version of Python could not be found.
   */
   static std::pair<QString, QString> GetExactPythonPath(const QString &pyEnv);
+  
+  /**
+   * @brief Searches and parses paths of python virtual environments
+   * from predefined lookout locations
+   */
+  static QStringList AutoParsePythonPaths();
 
 private:
   QString m_PythonPath;

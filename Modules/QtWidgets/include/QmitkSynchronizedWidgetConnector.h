@@ -117,6 +117,9 @@ Q_SIGNALS:
   */
   void SelectionModeChanged(bool selectAll);
 
+  void NodeVisibilityChanged(mitk::DataNode::Pointer node, const bool visibility);
+  void NodesLayerMoved(QSet<mitk::DataNode*> movedNodes, const int targetLayer);
+
 public Q_SLOTS:
   /*
   * @brief Set a new internal selection and send this new selection to connected

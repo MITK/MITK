@@ -30,7 +30,7 @@ namespace mitk::nnInteractive
    *
    * Interaction is handled through the PlanarFigureInteractor.
    */
-  class MITKSEGMENTATION_EXPORT BoxInteractor : public Interactor
+  class MITKPYTHONSEGMENTATION_EXPORT BoxInteractor : public Interactor
   {
   public:
     BoxInteractor();

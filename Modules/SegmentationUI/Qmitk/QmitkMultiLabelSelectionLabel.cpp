@@ -56,7 +56,7 @@ bool QmitkMultiLabelSelectionLabel::GetHighlightingActivated() const
   return m_HighlightingActivated;
 }
 
-void QmitkMultiLabelSelectionLabel::SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation)
+void QmitkMultiLabelSelectionLabel::SetMultiLabelSegmentation(mitk::MultiLabelSegmentation* segmentation)
 {
   if (segmentation != m_Segmentation)
   {
@@ -65,7 +65,7 @@ void QmitkMultiLabelSelectionLabel::SetMultiLabelSegmentation(mitk::LabelSetImag
   }
 }
 
-mitk::LabelSetImage* QmitkMultiLabelSelectionLabel::GetMultiLabelSegmentation() const
+mitk::MultiLabelSegmentation* QmitkMultiLabelSelectionLabel::GetMultiLabelSegmentation() const
 {
   return m_Segmentation;
 }
@@ -86,7 +86,7 @@ void QmitkMultiLabelSelectionLabel::SetMultiLabelNode(mitk::DataNode* node)
         {
           if (widget.m_SegmentationNodeDataMTime < node->GetDataReferenceChangedTime())
           {
-            auto newSeg = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+            auto newSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
             if (nullptr == newSeg) mitkThrow() << "Invalid usage. Node set does not contain a segmentation. Invalid node name: " << node->GetName();
 
             widget.m_SegmentationNodeDataMTime = node->GetDataReferenceChangedTime();
@@ -157,7 +157,7 @@ void QmitkMultiLabelSelectionLabel::UpdateWidget()
   }
 }
 
-void QmitkMultiLabelSelectionLabel::SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel)
+void QmitkMultiLabelSelectionLabel::SetSelectedLabel(mitk::MultiLabelSegmentation::LabelValueType selectedLabel)
 {
   this->SetSelectedLabels({ selectedLabel });
 }

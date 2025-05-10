@@ -25,13 +25,13 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * Read and Writes a LabelSetImage to a dcm file
+   * Read and Writes a MultiLabelSegmentation to a dcm file
    * @ingroup Process
    */
   class DICOMSegmentationIO : public mitk::AbstractFileIO
   {
   public:
-    typedef mitk::LabelSetImage InputType;
+    typedef mitk::MultiLabelSegmentation InputType;
     typedef itk::Image<unsigned short, 3> itkInputImageType;
     typedef itk::Image<short, 3> itkInternalImageType;
 

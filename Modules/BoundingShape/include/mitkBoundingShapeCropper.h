@@ -95,7 +95,7 @@ namespace mitk
      **/
     virtual void ComputeData(mitk::Image *input3D, int boTimeStep);
 
-    // virtual void ComputeData(mitk::LabelSetImage* image, int boTimeStep);
+    // virtual void ComputeData(mitk::MultiLabelSegmentation* image, int boTimeStep);
 
   private:
     /**

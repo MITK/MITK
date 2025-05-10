@@ -337,7 +337,7 @@ void AddLabelTreeItems(const mitk::ImageStatisticsContainer* statistic, const mi
     {
       //currently we only show statistics of the labeled pixel if a mask is provided
       QString labelLabel = QStringLiteral("unnamed label");
-      const auto multiLabelSeg = dynamic_cast<mitk::LabelSetImage*>(maskNode->GetData());
+      const auto multiLabelSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(maskNode->GetData());
       mitk::Label::ConstPointer labelInstance;
       if (nullptr != multiLabelSeg)
       {

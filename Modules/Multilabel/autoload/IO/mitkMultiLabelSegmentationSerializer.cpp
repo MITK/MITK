@@ -17,23 +17,23 @@ found in the LICENSE file.
 
 #include <mitkIOUtil.h>
 
-MITK_REGISTER_SERIALIZER(LabelSetImageSerializer)
+MITK_REGISTER_SERIALIZER(MultiLabelSegmentationSerializer)
 
-mitk::LabelSetImageSerializer::LabelSetImageSerializer()
+mitk::MultiLabelSegmentationSerializer::MultiLabelSegmentationSerializer()
 {
 }
 
-mitk::LabelSetImageSerializer::~LabelSetImageSerializer()
+mitk::MultiLabelSegmentationSerializer::~MultiLabelSegmentationSerializer()
 {
 }
 
-std::string mitk::LabelSetImageSerializer::Serialize()
+std::string mitk::MultiLabelSegmentationSerializer::Serialize()
 {
-  const auto *image = dynamic_cast<const LabelSetImage *>(m_Data.GetPointer());
+  const auto *image = dynamic_cast<const MultiLabelSegmentation *>(m_Data.GetPointer());
   if (image == nullptr)
   {
     MITK_ERROR << " Object at " << (const void *)this->m_Data
-               << " is not an mitk::LabelSetImage. Cannot serialize as LabelSetImage.";
+               << " is not an mitk::MultiLabelSegmentation. Cannot serialize as MultiLabelSegmentation.";
     return "";
   }
 
@@ -51,7 +51,7 @@ std::string mitk::LabelSetImageSerializer::Serialize()
     mitk::IOUtil::Save(image, fullname);
     //    LabelSetImageWriter::Pointer writer = LabelSetImageWriter::New();
     //    writer->SetFileName(fullname);
-    //    writer->SetInput(const_cast<LabelSetImage*>(image));
+    //    writer->SetInput(const_cast<MultiLabelSegmentation*>(image));
     //    writer->Write();
   }
   catch (std::exception &e)

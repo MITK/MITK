@@ -71,25 +71,25 @@ private:
 };
 
 
-mitk::Image::Pointer GenerateInternal(const mitk::LabelSetImage* segmentation, mitk::LabelSetImage::LabelValueVectorType labelValues, std::function<BoolOpsFunctionType> opsFunction,
+mitk::Image::Pointer GenerateInternal(const mitk::MultiLabelSegmentation* segmentation, mitk::MultiLabelSegmentation::LabelValueVectorType labelValues, std::function<BoolOpsFunctionType> opsFunction,
   std::function<void(float progress)> progressCallback = [](float) {})
 {
   if (nullptr == segmentation) mitkThrow() << "Cannot perform boolean operation. Passed segmentation is not valid";
 
   mitk::Image::Pointer result = mitk::Image::New();
-  result->Initialize(mitk::MakeScalarPixelType<mitk::LabelSetImage::LabelValueType>(), *(segmentation->GetTimeGeometry()));
+  result->Initialize(mitk::MakeScalarPixelType<mitk::MultiLabelSegmentation::LabelValueType>(), *(segmentation->GetTimeGeometry()));
 
   const auto timeStepCount = segmentation->GetTimeGeometry()->CountTimeSteps();
 
   for (mitk::TimeStepType i = 0; i < timeStepCount; ++i)
   {
-    using OpsFilterType = itk::NaryFunctorImageFilter<ITKGroupImageType, ITKGroupImageType, BoolOpsFunctor<mitk::LabelSetImage::LabelValueType> >;
+    using OpsFilterType = itk::NaryFunctorImageFilter<ITKGroupImageType, ITKGroupImageType, BoolOpsFunctor<mitk::MultiLabelSegmentation::LabelValueType> >;
     auto opsFilter = OpsFilterType::New();
 
     mitk::ITKEventObserverGuard eventGuard(opsFilter, itk::ProgressEvent(), [&opsFilter, progressCallback, i, timeStepCount](const itk::EventObject& /*event*/)
       { progressCallback(opsFilter->GetProgress() + static_cast<float>(i) / static_cast<float>(timeStepCount)); });
 
-    BoolOpsFunctor<mitk::LabelSetImage::LabelValueType> functor(opsFunction);
+    BoolOpsFunctor<mitk::MultiLabelSegmentation::LabelValueType> functor(opsFunction);
     opsFilter->SetFunctor(functor);
     std::vector < ITKGroupImageType::ConstPointer > inputImages;
 
@@ -116,7 +116,7 @@ mitk::Image::Pointer GenerateInternal(const mitk::LabelSetImage* segmentation, m
 }
 
 
-mitk::Image::Pointer mitk::BooleanOperation::GenerateUnion(const LabelSetImage* segmentation, LabelSetImage::LabelValueVectorType labelValues,
+mitk::Image::Pointer mitk::BooleanOperation::GenerateUnion(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::LabelValueVectorType labelValues,
   std::function<void(float progress)> progressCallback)
 {
   auto unionOps = [labelValues](const std::vector<mitk::Label::PixelType>& inputArray)
@@ -136,7 +136,7 @@ mitk::Image::Pointer mitk::BooleanOperation::GenerateUnion(const LabelSetImage* 
   return GenerateInternal(segmentation, labelValues, unionOps, progressCallback);
 }
 
-mitk::Image::Pointer mitk::BooleanOperation::GenerateIntersection(const LabelSetImage* segmentation, LabelSetImage::LabelValueVectorType labelValues,
+mitk::Image::Pointer mitk::BooleanOperation::GenerateIntersection(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::LabelValueVectorType labelValues,
   std::function<void(float progress)> progressCallback)
 {
   auto intersectOps = [labelValues](const std::vector<mitk::Label::PixelType>& inputArray)
@@ -156,8 +156,8 @@ mitk::Image::Pointer mitk::BooleanOperation::GenerateIntersection(const LabelSet
   return GenerateInternal(segmentation, labelValues, intersectOps, progressCallback);
 }
 
-mitk::Image::Pointer mitk::BooleanOperation::GenerateDifference(const LabelSetImage* segmentation, LabelSetImage::LabelValueType minuendLabelValue,
-  const LabelSetImage::LabelValueVectorType subtrahendLabelValues, std::function<void(float progress)> progressCallback)
+mitk::Image::Pointer mitk::BooleanOperation::GenerateDifference(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::LabelValueType minuendLabelValue,
+  const MultiLabelSegmentation::LabelValueVectorType subtrahendLabelValues, std::function<void(float progress)> progressCallback)
 {
   auto intersectOps = [minuendLabelValue, subtrahendLabelValues](const std::vector<mitk::Label::PixelType>& inputArray)
     {

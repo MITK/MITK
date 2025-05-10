@@ -42,9 +42,12 @@ QmitkMedSAMToolGUI::QmitkMedSAMToolGUI() : QmitkSegWithPreviewToolGUIBase(true)
     return result;
   };
   m_Preferences = GetPreferences();
-  m_Preferences->OnPropertyChanged +=
-    mitk::MessageDelegate1<QmitkMedSAMToolGUI, const mitk::IPreferences::ChangeEvent &>(
-      this, &QmitkMedSAMToolGUI::OnPreferenceChangedEvent);
+  if (nullptr != m_Preferences)
+  {
+    m_Preferences->OnPropertyChanged +=
+      mitk::MessageDelegate1<QmitkMedSAMToolGUI, const mitk::IPreferences::ChangeEvent &>(
+        this, &QmitkMedSAMToolGUI::OnPreferenceChangedEvent);
+  }
 }
 
 QmitkMedSAMToolGUI::~QmitkMedSAMToolGUI()
@@ -54,6 +57,12 @@ QmitkMedSAMToolGUI::~QmitkMedSAMToolGUI()
   {
     tool->SAMStatusMessageEvent -=
       mitk::MessageDelegate1<QmitkMedSAMToolGUI, const std::string &>(this, &QmitkMedSAMToolGUI::StatusMessageListener);
+  }
+  if (nullptr != m_Preferences)
+  {
+    m_Preferences->OnPropertyChanged -=
+      mitk::MessageDelegate1<QmitkMedSAMToolGUI, const mitk::IPreferences::ChangeEvent &>(
+        this, &QmitkMedSAMToolGUI::OnPreferenceChangedEvent);
   }
 }
 
@@ -110,20 +119,7 @@ void QmitkMedSAMToolGUI::InitializeUI(QBoxLayout *mainLayout)
   QIcon arrowIcon = QmitkStyleManager::ThemeIcon(
     QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg"));
   m_Controls.activateButton->setIcon(arrowIcon);
-
-  bool isInstalled = this->ValidatePrefences();
-  if (isInstalled)
-  {
-    QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));
-    welcomeText += " MedSAM is already found installed.";
-  }
-  else
-  {
-    welcomeText += " MedSAM tool is not configured correctly. Please go to Preferences (Cntl+P) > Segment Anything to "
-                   "configure and/or install SAM & MedSAM.";
-  }
-  this->EnableAll(isInstalled);
-  this->WriteStatusMessage(welcomeText);
+  this->UpdateMedSAMStatusMessage(welcomeText);
   this->ShowProgressBar(false);
   m_Controls.samProgressBar->setMaximum(0);
 
@@ -132,11 +128,31 @@ void QmitkMedSAMToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
 bool QmitkMedSAMToolGUI::ValidatePrefences()
 {
-  const QString storageDir = QString::fromStdString(m_Preferences->Get("sam python path", ""));
-  bool isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(storageDir);
+  if (nullptr == m_Preferences)
+  {
+    this->WriteErrorMessage("Error while loading preferences.");
+    return false;
+  }
   std::string modelType = m_Preferences->Get("sam modeltype", "");
-  std::string path = m_Preferences->Get("sam parent path", "");
-  return (isInstalled && !modelType.empty() && !path.empty());
+  std::string path = m_Preferences->Get("sam python path", "");
+  return (!modelType.empty() && !path.empty());
+}
+
+void QmitkMedSAMToolGUI::UpdateMedSAMStatusMessage(QString &initText)
+{
+  bool isInstalled = this->ValidatePrefences();
+  if (isInstalled)
+  {
+    QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));
+    initText += " MedSAM is already installed. Model type '" + modelType + "' selected in Preferences.";
+  }
+  else
+  {
+    initText += " MedSAM tool is not configured correctly. Please go to Preferences (Ctrl+P) > Segment Anything to "
+                "configure and/or install MedSAM.";
+  }
+  this->EnableAll(isInstalled);
+  this->WriteStatusMessage(initText);
 }
 
 void QmitkMedSAMToolGUI::StatusMessageListener(const std::string &message)
@@ -203,12 +219,12 @@ void QmitkMedSAMToolGUI::OnActivateBtnClicked()
     this->EnableAll(false);
     qApp->processEvents();
     QString pythonPath = QString::fromStdString(m_Preferences->Get("sam python path", ""));
-    if (!QmitkSegmentAnythingToolGUI::IsSAMInstalled(pythonPath))
+    if (pythonPath.isEmpty())
     {
       throw std::runtime_error(WARNING_SAM_NOT_FOUND);
     }
     tool->SetPythonPath(pythonPath.toStdString());
-    tool->SetGpuId(m_Preferences->GetInt("sam gpuid", -1));
+    tool->SetGpuId(m_Preferences->GetInt("sam deviceId", -1));
     tool->SetModelType("vit_b"); // MedSAM only works with vit_b
     tool->SetTimeOutLimit(m_Preferences->GetInt("sam timeout", 300));
     tool->SetCheckpointPath(m_Preferences->Get("sam parent path", ""));
@@ -264,13 +280,14 @@ void QmitkMedSAMToolGUI::OnResetPicksClicked()
 
 void QmitkMedSAMToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &event)
 {
+  QString statusMessage;
+  statusMessage += "A Preference change was detected. Please initialize the tool again.\n";
+  this->UpdateMedSAMStatusMessage(statusMessage);
+
   const std::string property = event.GetProperty();
   const std::string modelType = "modeltype";
   if (property.compare(property.size() - modelType.size(), modelType.size(), modelType) == 0)
     return; // Model type change ignored.
-
-  this->EnableAll(true);
-  this->WriteStatusMessage("A Preference change was detected. Please initialize the tool again.");
   auto tool = this->GetConnectedToolAs<mitk::MedSAMTool>();
   if (nullptr != tool)
   {

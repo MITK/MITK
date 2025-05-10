@@ -79,14 +79,14 @@ namespace mitk
      * 2. Parses Label names from map_to_binary.py for using later on.
      * 3. Calls "run_totalsegmentator" method.
      * 4. Expects an output image to be saved in the temporary directory by the python process. Loads it as
-     *    LabelSetImage and sets to previewImage.
+     *    MultiLabelSegmentation and sets to previewImage.
      *
      * @param inputAtTimeStep
      * @param oldSegAtTimeStep
      * @param previewImage
      * @param timeStep
      */
-    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) override;
     void UpdatePrepare() override;
 
   private:
@@ -98,10 +98,10 @@ namespace mitk
     void run_totalsegmentator(ProcessExecutor*, const std::string&, const std::string&, bool, bool, int, const std::string&);
 
     /**
-     * @brief Applies the m_LabelMapTotal lookup table on the output segmentation LabelSetImage.
+     * @brief Applies the m_LabelMapTotal lookup table on the output segmentation MultiLabelSegmentation.
      * 
      */
-    void MapLabelsToSegmentation(const mitk::LabelSetImage*, mitk::LabelSetImage*, std::map<mitk::Label::PixelType, std::string>&);
+    void MapLabelsToSegmentation(const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation*, std::map<mitk::Label::PixelType, std::string>&);
 
     /**
      * @brief Parses map_to_binary.py file to extract label ids and names
@@ -118,15 +118,15 @@ namespace mitk
     std::string GetLabelMapPath();
 
     /**
-     * @brief Agglomerate many individual mask image files into one multi-label LabelSetImage in the
+     * @brief Agglomerate many individual mask image files into one multi-label MultiLabelSegmentation in the
      * given filePath order.
      * 
      * @param filePaths 
      * @param dimension 
      * @param geometry 
-     * @return LabelSetImage::Pointer 
+     * @return MultiLabelSegmentation::Pointer 
      */
-    LabelSetImage::Pointer AgglomerateLabelFiles(std::vector<std::string>& filePaths, const unsigned int* dimension, mitk::BaseGeometry* geometry);
+    MultiLabelSegmentation::Pointer AgglomerateLabelFiles(std::vector<std::string>& filePaths, const unsigned int* dimension, mitk::BaseGeometry* geometry);
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;

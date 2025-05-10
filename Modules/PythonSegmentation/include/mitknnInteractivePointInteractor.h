@@ -14,6 +14,8 @@ found in the LICENSE file.
 #define mitknnInteractivePointInteractor_h
 
 #include <mitknnInteractiveInteractor.h>
+#include <mitkPoint.h>
+
 #include <optional>
 
 namespace mitk::nnInteractive
@@ -25,7 +27,7 @@ namespace mitk::nnInteractive
    *
    * Interaction is handled through the PointSetDataInteractor.
    */
-  class MITKSEGMENTATION_EXPORT PointInteractor : public Interactor
+  class MITKPYTHONSEGMENTATION_EXPORT PointInteractor : public Interactor
   {
   public:
     PointInteractor();

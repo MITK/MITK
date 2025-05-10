@@ -25,7 +25,8 @@ found in the LICENSE file.
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include <mitkMAPAlgorithmHelper.h>
-#include <mitkImageStitchingHelper.h>
+#include <mitkImageMappingHelper.h>
+#include <mitkMultiLabelSegmentationMappingHelper.h>
 
 struct Settings
 {
@@ -155,7 +156,9 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs, Set
 
 int main(int argc, char* argv[])
 {
+  mitk::BaseData::ConstPointer input;
   mitk::Image::ConstPointer inputImage;
+  mitk::MultiLabelSegmentation::ConstPointer inputSeg;
   mitk::MAPRegistrationWrapper::ConstPointer registration;
   mitk::BaseGeometry::Pointer refGeometry;
 
@@ -208,11 +211,25 @@ int main(int argc, char* argv[])
   try
   {
     std::cout << "Load input data..." << std::endl;
-    inputImage = mitk::IOUtil::Load<mitk::Image>(settings.inFileName);
+    auto loadedInputs = mitk::IOUtil::Load(settings.inFileName);
 
-    if (inputImage.IsNull())
+    if (loadedInputs.empty())
     {
-      MITK_ERROR << "Cannot load input image.";
+      MITK_ERROR << "Cannot load input.";
+      return EXIT_FAILURE;
+    }
+
+    if (loadedInputs.size() >1)
+    {
+      MITK_WARN << "more then one object loaded. Only the first will be mapped.";
+    }
+
+    input = loadedInputs[0];
+    inputImage = dynamic_cast<const mitk::Image*>(input.GetPointer());
+    inputSeg = dynamic_cast<const mitk::MultiLabelSegmentation*>(input.GetPointer());
+    if (inputImage.IsNull() && inputSeg.IsNull())
+    {
+      MITK_ERROR << "Cannot load input as image or multi label segmentation.";
       return EXIT_FAILURE;
     }
 
@@ -249,7 +266,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-      refGeometry = inputImage->GetGeometry();
+      refGeometry = input->GetGeometry();
     }
 
     //check for super/sub sampling
@@ -261,11 +278,19 @@ int main(int argc, char* argv[])
         settings.superSamplingFactors[2]);
     }
 
-    std::cout << "Map the images ..." << std::endl;
+    mitk::BaseData::Pointer output;
+    if (inputImage.IsNotNull())
+    {
+      std::cout << "Map the image ..." << std::endl;
+      output = mitk::ImageMappingHelper::map(inputImage, registration, false, settings.paddingValue, refGeometry, true, 0, settings.interpolatorType);
+    }
+    else if (inputSeg.IsNotNull())
+    {
+      std::cout << "Map the multi label segmentation ..." << std::endl;
+      output = mitk::MultiLabelSegmentationMappingHelper::map(inputSeg, registration, false, refGeometry, true, 0);
+    }
 
-    auto output = mitk::ImageMappingHelper::map(inputImage, registration, false, settings.paddingValue, refGeometry, true, 0, settings.interpolatorType);
-
-    std::cout << "Save output image: " << settings.outFileName << std::endl;
+    std::cout << "Save output: " << settings.outFileName << std::endl;
 
     mitk::IOUtil::Save(output, settings.outFileName);
 

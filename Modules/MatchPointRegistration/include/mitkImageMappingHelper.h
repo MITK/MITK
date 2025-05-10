@@ -47,6 +47,10 @@ namespace mitk
     typedef ::mitk::Image InputImageType;
     typedef ::mitk::Image ResultImageType;
 
+    MITKMATCHPOINTREGISTRATION_EXPORT TimeGeometry::Pointer CreateResultTimeGeometry(const mitk::BaseData* input,
+      const mitk::ImageMappingHelper::ResultImageGeometryType* resultGeometry);
+
+
     /**Helper that maps a given input image
      * @param input Image that should be mapped.
      * @param registration Pointer to the registration instance that should be used for mapping
@@ -58,7 +62,7 @@ namespace mitk
      * @param interpolatorType Indicates the type of interpolation strategy that should be used.
      * @pre input must be valid
      * @pre registration must be valid
-     * @pre Dimensionality of the registration must match with the input imageinput must be valid
+     * @pre Dimensionality of the registration must match with the input image must be valid
      * @remark Depending in the settings of throwOnOutOfInputAreaError and throwOnMappingError it may also throw
      * due to inconsistencies in the mapping process. See parameter description.
      * @result Pointer to the resulting mapped image.h*/
@@ -79,7 +83,7 @@ namespace mitk
      * @param interpolatorType Indicates the type of interpolation strategy that should be used.
      * @pre input must be valid
      * @pre registration must be valid
-     * @pre Dimensionality of the registration must match with the input imageinput must be valid
+     * @pre Dimensionality of the registration must match with the input image must be valid
      * @remark Depending in the settings of throwOnOutOfInputAreaError and throwOnMappingError it may also throw
      * due to inconsistencies in the mapping process. See parameter description.
      * @result Pointer to the resulting mapped image.h*/

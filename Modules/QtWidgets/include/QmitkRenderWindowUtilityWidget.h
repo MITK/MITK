@@ -35,6 +35,16 @@ namespace mitk
 
 class QmitkRenderWindow;
 
+/*
+* @brief The 'QmitkRenderWindowUtilityWidget' can be added to a 'QMitkRenderWindowWidget' to extend it
+*        with window-specific utilities.
+*
+*        It offers to select the viewing direction of the window, as well as a 'QmitkSliceNavigationWidget'
+*        to scroll through the current view direction.
+*        In addition, it contains a 'QmitkSynchronizedNodeSelectionWidget' that controls renderer-specific
+*        properties and shown nodes, as well as a synchronization-group selector to share this state with
+*        other render windows.
+*/
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowUtilityWidget : public QWidget
 {
 	Q_OBJECT
@@ -44,21 +54,29 @@ public:
   QmitkRenderWindowUtilityWidget(
     QWidget* parent = nullptr,
     QmitkRenderWindow* renderWindow = nullptr,
-    mitk::DataStorage* dataStorage = nullptr
+    mitk::DataStorage* dataStorage = nullptr,
+    const int nSyncGroups = 1
   );
 
   ~QmitkRenderWindowUtilityWidget() override;
 
-  void ToggleSynchronization(bool synchronized);
+  using GroupSyncIndexType = int;
+
+  void SetSyncGroup(const GroupSyncIndexType index);
+  GroupSyncIndexType GetSyncGroup() const;
+  void OnSyncGroupSelectionChanged(int index);
 
   void SetGeometry(const itk::EventObject& event);
+  QmitkSynchronizedNodeSelectionWidget* GetNodeSelectionWidget() const;
 
 public Q_SLOTS:
   void UpdateViewPlaneSelection();
+  void OnSyncGroupAdded(const GroupSyncIndexType index);
 
 Q_SIGNALS:
 
   void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
+  void SyncGroupChanged(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, GroupSyncIndexType index);
   void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
 
 private:
@@ -66,6 +84,7 @@ private:
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
   QPushButton* m_SynchPushButton;
+  QComboBox* m_SyncGroupSelector;
   QmitkSliceNavigationWidget* m_SliceNavigationWidget;
   QmitkStepperAdapter* m_StepperAdapter;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;

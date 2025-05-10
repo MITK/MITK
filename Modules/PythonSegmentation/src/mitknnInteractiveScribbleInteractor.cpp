@@ -156,7 +156,9 @@ namespace
       auto mask = mitk::Image::New();
 
       // This initializes only the metadata of the image.
-      mask->Initialize(this->GetWorkingData());
+      mask->Initialize(this->GetWorkingData()->GetGroupImage(0)); //we can just use the first group
+                                                                  //as content is not relevant but
+                                                                  //just the image geometry
 
       // Allocate and initialize the image volume based on the metadata.
       InitializeVolume(mask);
@@ -231,7 +233,7 @@ namespace mitk::nnInteractive
 
     void SetActiveScribbleLabel(PromptType promptType)
     {
-      this->ScribbleNode->GetDataAs<LabelSetImage>()->SetActiveLabel(m_ScribbleLabels[promptType]);
+      this->ScribbleNode->GetDataAs<MultiLabelSegmentation>()->SetActiveLabel(m_ScribbleLabels[promptType]);
       this->ScribbleNode->SetBoolProperty("labelset.contour.active", false);
     }
 
@@ -243,7 +245,7 @@ namespace mitk::nnInteractive
       // Check if all labels of the scribble node are empty.
       for (const auto [promptType, pixelValue] : m_ScribbleLabels)
       {
-        if (!this->ScribbleNode->GetDataAs<LabelSetImage>()->IsEmpty(pixelValue))
+        if (!this->ScribbleNode->GetDataAs<MultiLabelSegmentation>()->IsEmpty(pixelValue))
           return false;
       }
 
@@ -261,7 +263,7 @@ namespace mitk::nnInteractive
       const auto& color = GetColor(promptType, ColorIntensity::Muted);
 
       // Create an unlocked label for the given prompt type.
-      auto label = this->ScribbleNode->GetDataAs<LabelSetImage>()->AddLabel(name, color, 0);
+      auto label = this->ScribbleNode->GetDataAs<MultiLabelSegmentation>()->AddLabel(name, color, 0);
       label->SetLocked(false);
 
       // Store a mapping from the prompt type to the label/pixel value.

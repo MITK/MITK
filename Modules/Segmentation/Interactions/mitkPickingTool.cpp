@@ -153,7 +153,7 @@ void mitk::PickingTool::ClearSeeds()
 
 template <typename TPixel, unsigned int VImageDimension>
 void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
-  mitk::Image* segmentation,
+  mitk::MultiLabelSegmentation* segmentation,
   const mitk::PointSet* seedPoints,
   unsigned int timeStep, const mitk::BaseGeometry* inputGeometry, const mitk::Label::PixelType outputValue,
   const mitk::Label::PixelType backgroundValue,
@@ -233,13 +233,14 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
 
   if (itkResultImage.IsNotNull())
   {
-    segmentation->SetVolume((void*)(itkResultImage->GetPixelContainer()->GetBufferPointer()),timeStep);
+    auto outputImage = mitk::ImportItkImage(itkResultImage);
+    segmentation->UpdateGroupImage(segmentation->GetGroupIndexOfLabel(outputValue), outputImage, timeStep);
   }
   emptyTimeStep = itkResultImage.IsNull();
 
 }
 
-void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep)
 {
   if (nullptr != oldSegAtTimeStep && nullptr != previewImage && m_PointSet.IsNotNull())
   {
@@ -249,7 +250,7 @@ void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
       const auto activeValue = this->GetActiveLabelValueOfPreview();
       this->SetSelectedLabels({activeValue});
 
-      AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry(), activeValue, mitk::LabelSetImage::UNLABELED_VALUE, emptyTimeStep));
+      AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry(), activeValue, mitk::MultiLabelSegmentation::UNLABELED_VALUE, emptyTimeStep));
     }
     if (emptyTimeStep)
     {

@@ -34,7 +34,7 @@ namespace
 }
 
 bool mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(const std::string &presetFilename,
-                                                     const mitk::LabelSetImage *inputImage)
+                                                     const mitk::MultiLabelSegmentation *inputImage)
 {
   const auto filename = EnsureExtension(presetFilename);
 
@@ -42,10 +42,10 @@ bool mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(const std::string &preset
   xmlDocument.InsertEndChild(xmlDocument.NewDeclaration());
 
   auto *rootElement = xmlDocument.NewElement("LabelSetImagePreset");
-  rootElement->SetAttribute("layers", inputImage->GetNumberOfLayers());
+  rootElement->SetAttribute("layers", inputImage->GetNumberOfGroups());
   xmlDocument.InsertEndChild(rootElement);
 
-  for (unsigned int layerIndex = 0; layerIndex < inputImage->GetNumberOfLayers(); layerIndex++)
+  for (unsigned int layerIndex = 0; layerIndex < inputImage->GetNumberOfGroups(); layerIndex++)
   {
     auto *layerElement = xmlDocument.NewElement("Layer");
     layerElement->SetAttribute("index", layerIndex);
@@ -62,7 +62,7 @@ bool mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(const std::string &preset
 }
 
 bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &presetFilename,
-                                                     mitk::LabelSetImage *inputImage)
+                                                     mitk::MultiLabelSegmentation *inputImage)
 {
   if (nullptr == inputImage)
     return false;
@@ -85,7 +85,7 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
     return false;
   }
 
-  auto activeLayerBackup = inputImage->GetActiveLayer();
+  auto activeLabelBackup = inputImage->GetActiveLabel();
 
   int numberOfLayers = 0;
   rootElement->QueryIntAttribute("layers", &numberOfLayers);
@@ -107,7 +107,7 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
     {
       while (!inputImage->ExistGroup(layerIndex))
       {
-        inputImage->AddLayer();
+        inputImage->AddGroup();
       }
     }
 
@@ -121,7 +121,7 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
       auto label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElement);
       const auto labelValue = label->GetValue();
 
-      if (LabelSetImage::UNLABELED_VALUE != labelValue)
+      if (MultiLabelSegmentation::UNLABELED_VALUE != labelValue)
       {
         if (inputImage->ExistLabel(labelValue))
         {
@@ -148,7 +148,10 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
       continue;
   }
 
-  inputImage->SetActiveLayer(activeLayerBackup);
+  if (nullptr != activeLabelBackup)
+  {
+    inputImage->SetActiveLabel(activeLabelBackup->GetValue());
+  }
 
   return true;
 }
@@ -313,7 +316,7 @@ std::string mitk::MultiLabelIOHelper::GetStringByKey(const itk::MetaDataDictiona
   return metaString;
 }
 
-nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mitk::LabelSetImage* inputImage)
+nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mitk::MultiLabelSegmentation* inputImage)
 {
   if (nullptr == inputImage)
   {
@@ -322,7 +325,7 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
 
   nlohmann::json result;
 
-  for (LabelSetImage::GroupIndexType i = 0; i < inputImage->GetNumberOfLayers(); i++)
+  for (MultiLabelSegmentation::GroupIndexType i = 0; i < inputImage->GetNumberOfGroups(); i++)
   {
     nlohmann::json jgroup;
     nlohmann::json jlabels;

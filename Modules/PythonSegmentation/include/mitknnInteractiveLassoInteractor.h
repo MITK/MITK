@@ -10,29 +10,35 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitknnInteractiveScribbleInteractor_h
-#define mitknnInteractiveScribbleInteractor_h
+#ifndef mitknnInteractiveLassoInteractor_h
+#define mitknnInteractiveLassoInteractor_h
 
 #include <mitknnInteractiveInteractor.h>
 
+namespace mitk
+{
+  class Image;
+}
+
 namespace mitk::nnInteractive
 {
-  /** \brief %nnInteractive interactor for freehand brushstrokes.
+  /** \brief %nnInteractive interactor for drawing contours.
    *
-   * Scribbles are managed as labels of a common LabelSetImage, organized
-   * by PromptType.
+   * Contours are managed as a list of ContourModel data nodes, organized
+   * by PromptType. The most recently drawn contour is also available as a
+   * binary image mask.
    *
-   * Interaction is handled through the DrawPaintbrushTool.
+   * Interaction is handled through the AddContourTool.
    */
-  class MITKSEGMENTATION_EXPORT ScribbleInteractor : public Interactor
+  class MITKPYTHONSEGMENTATION_EXPORT LassoInteractor : public Interactor
   {
   public:
-    ScribbleInteractor();
-    ~ScribbleInteractor() override;
+    LassoInteractor();
+    ~LassoInteractor() override;
 
     bool HasInteractions() const override;
 
-    const Image* GetLastScribbleMask() const;
+    const Image* GetLastLassoMask() const;
 
   private:
     void OnSetToolManager() override;

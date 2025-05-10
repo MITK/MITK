@@ -137,7 +137,7 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    bool GenerateVolumeMapping(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs);
+    bool GenerateVolumeMapping(mitk::BaseRenderer* renderer, const std::vector<mitk::MultiLabelSegmentation::GroupIndexType>& outdatedGroupIDs);
 
     /** \brief Generates the look up table that should be used.
       */

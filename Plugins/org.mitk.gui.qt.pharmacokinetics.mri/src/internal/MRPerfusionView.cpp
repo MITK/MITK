@@ -175,8 +175,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   //Model fit configuration
   m_Controls.groupBox_FitConfiguration->hide();
 
-  m_Controls.checkBox_Constraints->setEnabled(false);
-  m_Controls.constraintManager->setEnabled(false);
   m_Controls.initialValuesManager->setEnabled(false);
   m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
 
@@ -942,7 +940,7 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
   factory = mitk::TwoCompartmentExchangeModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
 
-  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
+  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("MultiLabelSegmentation");
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
   mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);

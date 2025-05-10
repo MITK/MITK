@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <QButtonGroup>
 #include <QMessageBox>
 
-MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
+MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
 
 namespace
 {
@@ -63,7 +63,7 @@ namespace
     return geometry->TimePointToTimeStep(timePoint);
   }
 
-  bool IsLabelEmpty(const mitk::LabelSetImage* segmentation, const mitk::Label* label)
+  bool IsLabelEmpty(const mitk::MultiLabelSegmentation* segmentation, const mitk::Label* label)
   {
     if (!segmentation->IsEmpty(label, GetCurrentTimeStep(segmentation)))
       return false;
@@ -351,7 +351,7 @@ mitk::nnInteractiveTool* QmitknnInteractiveToolGUI::GetTool()
 void QmitknnInteractiveToolGUI::OnMaskButtonClicked()
 {
   auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  const auto* segmentation = toolManager->GetWorkingData(0)->GetDataAs<mitk::LabelSetImage>();
+  const auto* segmentation = toolManager->GetWorkingData(0)->GetDataAs<mitk::MultiLabelSegmentation>();
   auto activeLabel = segmentation->GetActiveLabel();
 
   if (activeLabel == nullptr)

@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <mitkContourModel.h>
 #include <mitkImage.h>
+#include <mitkLabelSetImage.h>
+
 #include <vtkSmartPointer.h>
 
 #include <MitkContourModelExports.h>
@@ -51,20 +53,6 @@ namespace mitk
 
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value.
-    This version always uses the contour of time step 0 and fills the image.
-    \deprecated This function is deprecated. Use FillContourInSlice2() (in
-    conjunction e.g. with TransferLabelContent()) instead.
-    \pre sliceImage points to a valid instance
-    \pre projectedContour points to a valid instance
-    */
-    //[[deprecated]]
-    DEPRECATED(static void FillContourInSlice(const ContourModel *projectedContour,
-                                   Image *sliceImage,
-                                   const Image* workingImage,
-                                   int paintingPixelValue = 1));
-
-    /**
-    \brief Fill a contour in a 2D slice with a specified pixel value.
     This overloaded version uses the contour at the passed contourTimeStep
     to fill the passed image slice.
     \deprecated This function is deprecated. Use FillContourInSlice2() (in
@@ -73,11 +61,10 @@ namespace mitk
     \pre projectedContour points to a valid instance
     */
     //[[deprecated]]
-    DEPRECATED(static void FillContourInSlice(const ContourModel *projectedContour,
-                                   TimeStepType contourTimeStep,
-                                   Image *sliceImage,
-                                   const Image* workingImage,
-                                   int paintingPixelValue = 1));
+    DEPRECATED(static void FillContourInSlice(const ContourModel* projectedContour,
+      TimeStepType contourTimeStep,
+      Image* sliceImage,
+      int paintingPixelValue = 1));
 
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value.
@@ -116,7 +103,6 @@ namespace mitk
     \param filledImage Pointer to the image content that should be checked to decide if a pixel in resultImage should
     be filled with paintingPixelValue or not.
     \param resultImage Pointer to the image content that should be overwritten guided by the content of filledImage.
-    \param image Pointer to an mitk image that allows to define the LabelSet image which states steer the filling process.
     If an LabelSet instance is passed its states (e.g. locked labels etc...) will be used. If nullptr or an normal image
     is passed, then simply any pixel position indicated by filledImage will be overwritten.
     \param paintingPixelValue the pixelvalue/label that should be used in the result image when filling.
@@ -127,7 +113,6 @@ namespace mitk
     [[deprecated]]
     static void FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage,
                                  vtkSmartPointer<vtkImageData> resultImage,
-                                 const Image* image,
                                  int paintingPixelValue,
                                  double fillForegroundThreshold = 1.0);
 
@@ -135,16 +120,6 @@ namespace mitk
     \brief Move the contour in time step 0 to to a new contour model at the given time step.
     */
     static ContourModel::Pointer MoveZerothContourTimeStep(const ContourModel *contour, TimeStepType timeStep);
-
-    /**
-    \brief Retrieves the active pixel value of a (labelset) image.
-           If the image is basic image, the pixel value 1 (one) will be returned.
-           If the image is actually a labelset image, the pixel value of the active label of the active layer will be
-           returned.
-
-    \param workingImage   The (labelset) image to retrieve the active pixel value of.
-    */
-    static int GetActivePixelValue(const Image* workingImage);
 
   protected:
     ContourModelUtils();

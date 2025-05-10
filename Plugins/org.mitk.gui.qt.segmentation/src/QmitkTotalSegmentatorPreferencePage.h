@@ -59,12 +59,6 @@ private:
   void WriteErrorMessage(const QString &message);
 
   /**
-   * @brief Searches and parses paths of python virtual environments
-   * from predefined lookout locations
-   */
-  void AutoParsePythonPaths();
-
-  /**
    * @brief Adds GPU information to the device combo box.
    * In case, there aren't any GPUs available, the combo box will be
    * rendered editable and "cpu" will be added.

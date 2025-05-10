@@ -70,7 +70,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
 {
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
   mitk::DataNode* node = this->GetDataNode();
-  auto* image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  auto* image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
   assert(image && image->IsInitialized());
 
   localStorage->m_LabelLookupTable = image->GetLookupTable()->Clone();
@@ -112,7 +112,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
     }
   }
 
-  const auto nrOfGroups = image->GetNumberOfLayers();
+  const auto nrOfGroups = image->GetNumberOfGroups();
   for (unsigned int groupID = 0; groupID < nrOfGroups; ++groupID)
   {
     localStorage->m_TransferFunctions[groupID] = vtkSmartPointer<vtkColorTransferFunction>::New();
@@ -133,12 +133,12 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateLookupTable(mitk::BaseRend
 
 namespace
 {
-  std::vector<mitk::LabelSetImage::GroupIndexType> GetOutdatedGroups(const mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls, const mitk::LabelSetImage* seg)
+  std::vector<mitk::MultiLabelSegmentation::GroupIndexType> GetOutdatedGroups(const mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls, const mitk::MultiLabelSegmentation* seg)
   {
-    const auto nrOfGroups = seg->GetNumberOfLayers();
-    std::vector<mitk::LabelSetImage::GroupIndexType> result;
+    const auto nrOfGroups = seg->GetNumberOfGroups();
+    std::vector<mitk::MultiLabelSegmentation::GroupIndexType> result;
 
-    for (mitk::LabelSetImage::GroupIndexType groupID = 0; groupID < nrOfGroups; ++groupID)
+    for (mitk::MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < nrOfGroups; ++groupID)
     {
       const auto groupImage = seg->GetGroupImage(groupID);
       if (groupImage->GetMTime() > ls->m_LastDataUpdateTime
@@ -157,7 +157,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   mitk::DataNode *node = this->GetDataNode();
-  auto *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
+  auto *image = dynamic_cast<mitk::MultiLabelSegmentation *>(node->GetData());
   assert(image && image->IsInitialized());
 
   bool isLookupModified = localStorage->m_LabelLookupTable.IsNull() ||
@@ -179,7 +179,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   if (isGeometryModified || visibilityChanged)
   {
     //if geometry is outdated or visibility changed all groups need regeneration
-    outdatedGroups.resize(image->GetNumberOfLayers());
+    outdatedGroups.resize(image->GetNumberOfGroups());
     std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
   }
 
@@ -197,7 +197,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   if (isLookupModified)
   {
     //if lookup table is modified all groups need a new color mapping
-    outdatedGroups.resize(image->GetNumberOfLayers());
+    outdatedGroups.resize(image->GetNumberOfGroups());
     std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
   }
 
@@ -209,16 +209,16 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   }
 }
 
-bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRenderer* renderer, const std::vector<mitk::LabelSetImage::GroupIndexType>& outdatedGroupIDs)
+bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(mitk::BaseRenderer* renderer, const std::vector<mitk::MultiLabelSegmentation::GroupIndexType>& outdatedGroupIDs)
 {
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
   mitk::DataNode* node = this->GetDataNode();
-  auto* image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  auto* image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
   assert(image && image->IsInitialized());
 
   image->Update();
 
-  const auto numberOfGroups = image->GetNumberOfLayers();
+  const auto numberOfGroups = image->GetNumberOfGroups();
 
   if (numberOfGroups != localStorage->m_NumberOfGroups)
   {
@@ -318,7 +318,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
     return;
   }
 
-  auto *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
+  auto *image = dynamic_cast<mitk::MultiLabelSegmentation *>(node->GetData());
 
   if (image == nullptr || image->IsInitialized() == false)
     return;

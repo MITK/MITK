@@ -21,7 +21,7 @@ found in the LICENSE file.
 
 /**
   \brief Widget that offers a simple list that displays all labels (color and name) in the active
-  layer of a LabelSetImage.
+  layer of a MultiLabelSegmentation.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkSimpleLabelSetListWidget : public QWidget
 {
@@ -34,14 +34,14 @@ public:
   using LabelVectorType = std::vector<mitk::Label::ConstPointer>;
 
   LabelVectorType SelectedLabels() const;
-  const mitk::LabelSetImage* GetLabelSetImage() const;
+  const mitk::MultiLabelSegmentation* GetLabelSetImage() const;
 
 signals:
   void SelectedLabelsChanged(const LabelVectorType& selectedLabels);
   void ActiveLayerChanged();
 
 public slots :
-  void SetLabelSetImage(const mitk::LabelSetImage* image);
+  void SetLabelSetImage(const mitk::MultiLabelSegmentation* image);
   void SetSelectedLabels(const LabelVectorType& selectedLabels);
 
 protected slots:
@@ -50,11 +50,11 @@ protected slots:
 
 protected:
   void OnLayerChanged();
-  void OnLabelChanged(mitk::LabelSetImage::LabelValueType lv);
+  void OnLabelChanged(mitk::MultiLabelSegmentation::LabelValueType lv);
 
   void ResetList();
 
-  mitk::LabelSetImage::ConstPointer m_LabelSetImage;
+  mitk::MultiLabelSegmentation::ConstPointer m_LabelSetImage;
   QListWidget* m_LabelList;
   bool m_Emmiting;
 

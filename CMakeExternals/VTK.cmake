@@ -10,7 +10,7 @@ endif()
 set(proj VTK)
 mitk_query_custom_ep_vars()
 
-set(proj_DEPENDENCIES nlohmann_json ${${proj}_CUSTOM_DEPENDENCIES})
+set(proj_DEPENDENCIES nlohmann_json TBB ${${proj}_CUSTOM_DEPENDENCIES})
 set(VTK_DEPENDS ${proj})
 
 if(NOT DEFINED VTK_DIR)
@@ -75,6 +75,8 @@ if(NOT DEFINED VTK_DIR)
       -DVTK_MODULE_USE_EXTERNAL_VTK_nlohmannjson:BOOL=ON
       -DVTK_REPORT_OPENGL_ERRORS:BOOL=OFF
       -DVTK_QT_VERSION:STRING=6
+      "-DTBB_DIR:PATH=${TBB_DIR}"
+      -DVTK_SMP_IMPLEMENTATION_TYPE:STRING=TBB
       ${additional_cmake_args}
       ${${proj}_CUSTOM_CMAKE_ARGS}
     CMAKE_CACHE_ARGS

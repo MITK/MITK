@@ -110,11 +110,12 @@ namespace mitk
 
   template<class TModelFactory>
   void
-    ModelFitProviderBase<TModelFactory>::UnregisterService()
+  ModelFitProviderBase<TModelFactory>::UnregisterService()
   {
     try
     {
-      d->m_Reg.Unregister();
+      if (d->m_Reg.IsAvailable())
+        d->m_Reg.Unregister();
     }
     catch (const std::exception &)
     {

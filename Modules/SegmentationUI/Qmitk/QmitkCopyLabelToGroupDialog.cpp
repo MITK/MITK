@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkCopyLabelToGroupDialog.h"
 
-#include <mitkSegGroupModifyOperation.h>
+#include <mitkSegGroupOperationApplier.h>
 
 #include <ui_QmitkCopyLabelToGroupDialog.h>
 
@@ -61,6 +61,13 @@ void QmitkCopyLabelToGroupDialog::accept()
   const auto destinationGroup = m_Ui->groupComboBox->currentIndex() != 0
     ? m_Ui->groupComboBox->currentData().toUInt()
     : m_Segmentation->AddGroup();
+
+  if (m_Ui->groupComboBox->currentIndex() == 0)
+  {
+    mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(m_Segmentation, {destinationGroup }, false, true);
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert new destination group \"" + std::to_string(destinationGroup) + "\" for label copy.");
+  }
+
   const auto sourceGroup = m_Segmentation->GetGroupIndexOfLabel(m_SourceLabel->GetValue());
 
   mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { sourceGroup, destinationGroup }, true);

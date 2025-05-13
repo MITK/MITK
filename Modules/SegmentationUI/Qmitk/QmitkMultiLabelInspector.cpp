@@ -396,7 +396,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(templateLabel->GetValue());
 
   mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID },
-    false, 0, false, true);
+    false, 0, false, true, true);
 
   m_ModelManipulationOngoing = true;
   auto newLabel = m_Segmentation->AddLabel(templateLabel, groupID, true);
@@ -451,7 +451,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::MultiLabe
   if (canceled) return nullptr;
 
   mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { containingGroup },
-    false, 0, false, true);
+    false, 0, false, true, true);
 
   m_ModelManipulationOngoing = true;
   m_Segmentation->AddLabel(newLabel, containingGroup, false);
@@ -652,8 +652,14 @@ mitk::Label* QmitkMultiLabelInspector::AddNewGroup()
   try
   {
     this->WaitCursorOn();
+
     groupID = m_Segmentation->AddGroup();
+
+    mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID }, false, true);
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert new group \"" + std::to_string(groupID) + "\"");
+
     this->WaitCursorOff();
+
     newLabel =  this->AddNewLabelInternal(groupID);
   }
   catch (mitk::Exception& e)

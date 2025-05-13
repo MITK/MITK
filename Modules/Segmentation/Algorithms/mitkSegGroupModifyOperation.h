@@ -22,7 +22,7 @@ namespace mitk
   class Image;
 
   /** \brief An Operation for applying an edited slice to the a group of a MultiLabelSegmentation.
-    \sa SegGroupModifyOperationApplier
+    \sa SegGroupOperationApplier
     This Operation can be used to realize undo-redo functionality for e.g. segmentation purposes.
   */
   class MITKSEGMENTATION_EXPORT SegGroupModifyOperation : public SegChangeOperationBase
@@ -35,11 +35,13 @@ namespace mitk
     using ModifyLabelsMapType = std::map<MultiLabelSegmentation::GroupIndexType, MultiLabelSegmentation::ConstLabelVectorType>;
     using GroupIndexVectorType = std::vector<MultiLabelSegmentation::GroupIndexType>;
     using TimeStepVectorType = std::vector<TimeStepType>;
+    using ModifyGroupNameMapType = std::map<MultiLabelSegmentation::GroupIndexType, std::string >;
 
     /** \brief */
     SegGroupModifyOperation(MultiLabelSegmentation* segmentation,
       const ModifyGroupImageMapType& modifiedGroupImages,
-      const ModifyLabelsMapType& modifiedLabels);
+      const ModifyLabelsMapType& modifiedLabels,
+      const ModifyGroupNameMapType& modifiedNames);
 
     ~SegGroupModifyOperation() override = default;
 
@@ -47,11 +49,13 @@ namespace mitk
     TimeStepVectorType GetImageTimeSteps(MultiLabelSegmentation::GroupIndexType groupID) const;
 
     GroupIndexVectorType GetLabelGroupIDs() const;
+    GroupIndexVectorType GetNameGroupIDs() const;
 
     /** \brief Get the modified group image for a certain group and time step that is applied in the operation.*/
     Image::Pointer GetModifiedGroupImage(MultiLabelSegmentation::GroupIndexType groupID, TimeStepType timeStep) const;
     /** \brief Get the modified group image for a certain group and time step that is applied in the operation.*/
     MultiLabelSegmentation::ConstLabelVectorType GetModifiedLabels(MultiLabelSegmentation::GroupIndexType groupID) const;
+    std::string GetModifiedName(MultiLabelSegmentation::GroupIndexType groupID) const;
 
     // Explicitly delete copy operations because internally std::unique_ptr are used.
     SegGroupModifyOperation(const SegGroupModifyOperation&) = delete;
@@ -59,40 +63,14 @@ namespace mitk
 
     static SegGroupModifyOperation* CreatFromSegmentation(MultiLabelSegmentation* segmentation,
       const std::set<MultiLabelSegmentation::GroupIndexType>& relevantGroupIDs, bool coverAllTimeSteps, TimeStepType timeStep = 0,
-      bool noLabels = false, bool noGroupImages = false);
+      bool noLabels = false, bool noGroupImages = false, bool noNames = false);
 
   protected:
     using ModifyCompressedImageMapType = std::map<MultiLabelSegmentation::GroupIndexType, std::map<TimeStepType, std::unique_ptr<CompressedImageContainer>>>;
     ModifyCompressedImageMapType m_ModifiedImages;
     ModifyLabelsMapType m_ModifiedLabels;
+    ModifyGroupNameMapType m_ModifiedNames;
   };
-
-  class MITKSEGMENTATION_EXPORT SegGroupModifyUndoRedoHelper
-  {
-  public:
-
-    using GroupIndexSetType = std::set<MultiLabelSegmentation::GroupIndexType>;
-
-    /** \brief */
-    SegGroupModifyUndoRedoHelper(MultiLabelSegmentation* segmentation,
-      const GroupIndexSetType& relevantGroupIDs, bool coverAllTimeSteps, TimeStepType timeStep = 0,
-      bool noLabels = false, bool noGroupImages = false);
-
-    ~SegGroupModifyUndoRedoHelper();
-
-    void RegisterUndoRedoOperationEvent(const std::string& description);
-
-  protected:
-    MultiLabelSegmentation::Pointer m_Segmentation;
-    GroupIndexSetType m_RelevantGroupIDs;
-    bool m_CoverAllTimeSteps;
-    TimeStepType m_TimeStep;
-    bool m_NoLabels;
-    bool m_NoGroupImages;
-
-    SegGroupModifyOperation* m_UndoOperation;
-  };
-
 
 }
 #endif

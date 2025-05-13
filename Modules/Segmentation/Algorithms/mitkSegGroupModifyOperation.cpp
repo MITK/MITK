@@ -12,17 +12,13 @@ found in the LICENSE file.
 
 #include "mitkSegGroupModifyOperation.h"
 #include <mitkImageTimeSelector.h>
-
 #include <mitkImage.h>
-
-#include <mitkSegGroupModifyOperation.h>
-#include <mitkSegGroupModifyOperationApplier.h>
-#include <mitkUndoController.h>
 
 mitk::SegGroupModifyOperation::SegGroupModifyOperation(MultiLabelSegmentation* segmentation,
   const ModifyGroupImageMapType& modifiedGroupImages,
-  const ModifyLabelsMapType& modifiedLabels)
-  : SegChangeOperationBase(segmentation, 1), m_ModifiedLabels(modifiedLabels)
+  const ModifyLabelsMapType& modifiedLabels,
+  const ModifyGroupNameMapType& modifiedNames)
+  : SegChangeOperationBase(segmentation, 1), m_ModifiedLabels(modifiedLabels), m_ModifiedNames(modifiedNames)
 {
   for (auto& [groupID, tsImageMap] : modifiedGroupImages)
   {
@@ -66,6 +62,16 @@ mitk::SegGroupModifyOperation::GroupIndexVectorType mitk::SegGroupModifyOperatio
   return result;
 }
 
+mitk::SegGroupModifyOperation::GroupIndexVectorType mitk::SegGroupModifyOperation::GetNameGroupIDs() const
+{
+  GroupIndexVectorType result;
+  for (auto& pair : m_ModifiedNames)
+  {
+    result.push_back(pair.first);
+  }
+  return result;
+}
+
 mitk::Image::Pointer mitk::SegGroupModifyOperation::GetModifiedGroupImage(MultiLabelSegmentation::GroupIndexType groupID, TimeStepType timeStep) const
 {
   auto image = m_ModifiedImages.at(groupID).at(timeStep)->DecompressImage();
@@ -77,17 +83,23 @@ mitk::MultiLabelSegmentation::ConstLabelVectorType mitk::SegGroupModifyOperation
   return m_ModifiedLabels.at(groupID);
 }
 
+std::string mitk::SegGroupModifyOperation::GetModifiedName(MultiLabelSegmentation::GroupIndexType groupID) const
+{
+  return m_ModifiedNames.at(groupID);
+}
+
 mitk::SegGroupModifyOperation* mitk::SegGroupModifyOperation::CreatFromSegmentation(
   MultiLabelSegmentation* segmentation,
   const std::set<MultiLabelSegmentation::GroupIndexType>& relevantGroupIDs,
   bool coverAllTimeSteps, TimeStepType relevantTimeStep,
-  bool noLabels, bool noGroupImages)
+  bool noLabels, bool noGroupImages, bool noNames)
 {
   if (noLabels && noGroupImages)
     mitkThrow() << "Invalid call of mitk::SegGroupModifyOperation::CreatFromSegmentation. Arguments noLabels and noGroupImages must not be both true at the same time.";
 
   SegGroupModifyOperation::ModifyLabelsMapType labelData;
   SegGroupModifyOperation::ModifyGroupImageMapType imageData;
+  SegGroupModifyOperation::ModifyGroupNameMapType names;
 
   std::vector<TimeStepType> relevantTSs({ relevantTimeStep });
   if (coverAllTimeSteps)
@@ -120,44 +132,16 @@ mitk::SegGroupModifyOperation* mitk::SegGroupModifyOperation::CreatFromSegmentat
       //clone all relevant images
       for (auto aTimeStep : relevantTSs)
       {
-        imageData[groupID][aTimeStep] = SelectImageByTimeStep(segmentation->GetGroupImage(groupID), aTimeStep)->Clone();
+        imageData[groupID][aTimeStep] = SelectImageByTimeStep(segmentation->GetGroupImage(groupID), aTimeStep);
       }
+    }
+
+    if (!noNames)
+    {
+      names.emplace(groupID, segmentation->GetGroupName(groupID));
     }
   }
 
-  return new SegGroupModifyOperation(segmentation, imageData, labelData);
-}
-
-mitk::SegGroupModifyUndoRedoHelper::SegGroupModifyUndoRedoHelper(MultiLabelSegmentation* segmentation,
-  const GroupIndexSetType& relevantGroupIDs, bool coverAllTimeSteps, TimeStepType timeStep,
-  bool noLabels, bool noGroupImages):
-  m_Segmentation(segmentation), m_RelevantGroupIDs(relevantGroupIDs),
-  m_CoverAllTimeSteps(coverAllTimeSteps), m_TimeStep(timeStep), m_UndoOperation(nullptr), m_NoLabels(noLabels), m_NoGroupImages(noGroupImages)
-{
-  m_UndoOperation = SegGroupModifyOperation::CreatFromSegmentation(m_Segmentation, m_RelevantGroupIDs, m_CoverAllTimeSteps, m_TimeStep, m_NoLabels, m_NoGroupImages);
-}
-
-mitk::SegGroupModifyUndoRedoHelper::~SegGroupModifyUndoRedoHelper()
-{
-  if (nullptr != m_UndoOperation)
-    delete m_UndoOperation;
-};
-
-void mitk::SegGroupModifyUndoRedoHelper::RegisterUndoRedoOperationEvent(const std::string& description)
-{
-  if (nullptr == m_UndoOperation)
-    mitkThrow() << "Invalid usage of SegGroupModifyUndoRedoGenerator. You can only call GenerateUndoRedoOperationEvent once.";
-
-  UndoStackItem::IncCurrGroupEventId();
-  UndoStackItem::IncCurrObjectEventId();
-
-  auto redoOperation =
-    SegGroupModifyOperation::CreatFromSegmentation(m_Segmentation, m_RelevantGroupIDs, m_CoverAllTimeSteps, m_TimeStep, m_NoLabels, m_NoGroupImages);
-
-  OperationEvent* undoStackItem =
-    new OperationEvent(SegGroupModifyOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
-  m_UndoOperation = nullptr; //Ownership is no at undoStackItem
-
-  UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
+  return new SegGroupModifyOperation(segmentation, imageData, labelData, names);
 }
 

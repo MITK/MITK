@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.undoredoview"
+          name="Undo/Redo Inspector"
+          class="QmitkUndoRedoView"
+          icon="resources/undo_redo_inspector.svg"
+		  category="General">
+          <description>View the undo redo stack of the application.</description>
+	</view>
+  </extension>
+
+</plugin>

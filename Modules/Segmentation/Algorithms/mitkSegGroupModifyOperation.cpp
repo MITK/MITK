@@ -94,8 +94,8 @@ mitk::SegGroupModifyOperation* mitk::SegGroupModifyOperation::CreatFromSegmentat
   bool coverAllTimeSteps, TimeStepType relevantTimeStep,
   bool noLabels, bool noGroupImages, bool noNames)
 {
-  if (noLabels && noGroupImages)
-    mitkThrow() << "Invalid call of mitk::SegGroupModifyOperation::CreatFromSegmentation. Arguments noLabels and noGroupImages must not be both true at the same time.";
+  if (noLabels && noGroupImages && noNames)
+    mitkThrow() << "Invalid call of mitk::SegGroupModifyOperation::CreatFromSegmentation. Arguments noLabels, noGroupImages and noNames must not be both true at the same time.";
 
   SegGroupModifyOperation::ModifyLabelsMapType labelData;
   SegGroupModifyOperation::ModifyGroupImageMapType imageData;

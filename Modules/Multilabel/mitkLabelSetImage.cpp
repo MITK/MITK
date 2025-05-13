@@ -358,18 +358,30 @@ mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation:
 
 mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddGroup(ConstLabelVector labels)
 {
-  auto newImage = this->GenerateNewGroupImage();
-  ClearImageBuffer(newImage);
-
-  return this->AddGroup(newImage, labels);
+  auto newID = this->GetNumberOfGroups();
+  this->InsertGroup(newID, labels);
+  return newID;
 }
 
 mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddGroup(mitk::Image* groupImage, ConstLabelVector labels)
 {
-  GroupIndexType newGroupID = m_Groups.size();
+  auto newID = this->GetNumberOfGroups();
+  this->InsertGroup(newID, groupImage, labels);
+  return newID;
+}
 
+void mitk::MultiLabelSegmentation::InsertGroup(GroupIndexType groupID, ConstLabelVector labels, std::string name)
+{
+  auto newImage = this->GenerateNewGroupImage();
+  ClearImageBuffer(newImage);
+
+  this->InsertGroup(groupID, newImage, labels, name);
+}
+
+void mitk::MultiLabelSegmentation::InsertGroup(GroupIndexType groupID, mitk::Image* groupImage, ConstLabelVector labels, std::string name)
+{
   if (nullptr == groupImage)
-    mitkThrow() << "Cannot add group. Passed group image is nullptr.";
+    mitkThrow() << "Cannot insert group. Passed group image is nullptr.";
 
   bool equalGeometries = Equal(
     *(this->GetTimeGeometry()),
@@ -379,35 +391,51 @@ mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddGr
     false);
 
   if (!equalGeometries)
-    mitkThrow() << "Cannot add group. Passed group image has not the same geometry like segmentation.";
+    mitkThrow() << "Cannot insert group. Passed group image has not the same geometry like segmentation.";
 
   if (groupImage->GetPixelType() != MakePixelType<LabelValueType, LabelValueType, 1>())
-    mitkThrow() << "Cannot add group. Passed group image has incorrect pixel type. Only LabelValueType is supported. Invalid pixel type: "<< groupImage->GetPixelType().GetTypeAsString();
+    mitkThrow() << "Cannot insert group. Passed group image has incorrect pixel type. Only LabelValueType is supported. Invalid pixel type: " << groupImage->GetPixelType().GetTypeAsString();
 
-  // push a new working image for the new group
-  m_GroupContainer.push_back(groupImage);
+  if (groupID > m_Groups.size())
+    mitkThrow() << "Cannot insert group. Passed insert position is out of bounds. Current number of groups: "<<m_Groups.size() << "; invalid insertion group index : " << groupID;
 
-  m_Groups.push_back("");
-  m_GroupToLabelMap.push_back({});
-
-  for (auto label : labels)
   {
-    if (m_LabelMap.end() != m_LabelMap.find(label->GetValue()))
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+
+    // push a new working image for the new group
+    m_GroupContainer.insert(m_GroupContainer.begin()+groupID, groupImage);
+
+    m_Groups.insert(m_Groups.begin() + groupID, name);
+    m_GroupToLabelMap.insert(m_GroupToLabelMap.begin() + groupID, LabelValueVectorType());
+
+    //update old indexes in m_LabelToGroupMap to new group indexes
+    for (auto& element : m_LabelToGroupMap)
     {
-      mitkThrow() << "Cannot add group. Labels that should be added with group use at least one label value that is already in use. Conflicted label value: " << label->GetValue();
+      if (element.second > groupID) element.second = element.second + 1;
     }
 
-    auto labelClone = label->Clone();
+    for (auto label : labels)
+    {
+      if (m_LabelMap.end() != m_LabelMap.find(label->GetValue()))
+      {
+        mitkThrow() << "Cannot add group. Labels that should be added with group use at least one label value that is already in use. Conflicted label value: " << label->GetValue();
+      }
 
-    DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(labelClone);
-    this->AddLabelToMap(labelClone->GetValue(), labelClone, newGroupID);
-    this->RegisterLabel(labelClone);
+      auto labelClone = label->Clone();
+
+      DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(labelClone);
+      this->AddLabelToMap(labelClone->GetValue(), labelClone, groupID);
+      this->RegisterLabel(labelClone);
+    }
   }
 
   this->Modified();
-  this->InvokeEvent(GroupAddedEvent(newGroupID));
+  this->InvokeEvent(GroupAddedEvent(groupID));
 
-  return newGroupID;
+  for (GroupIndexType modGroupID = groupID + 1; modGroupID < m_Groups.size(); ++modGroupID)
+  {
+    this->InvokeEvent(GroupModifiedEvent(modGroupID));
+  }
 }
 
 void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& labelSet)

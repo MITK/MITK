@@ -230,7 +230,8 @@ namespace mitk
       OverwriteStyle overwriteStyle = OverwriteStyle::RegardLocks);
 
     /**
-     * \brief Adds a new group to the MultiLabelSegmentation. The new group will be set as the active one.
+     * \brief Adds a new group to the MultiLabelSegmentation. The new group will be set as the active one,
+     * if also labels are added.
      * \param labels Labels that will be added to the new group if provided
      * \return the group ID of the new group
      */
@@ -246,6 +247,31 @@ namespace mitk
      * \pre layerImage must have the pixel value equal to LabelValueType.
      */
     GroupIndexType AddGroup(mitk::Image* layerImage, ConstLabelVector labels = {});
+
+    /**
+     * \brief Inserts a new group to the MultiLabelSegmentation. The new group will be set as the active one,
+     * if also labels are added,.
+     * \param groupID ID/position of the group where it should be inserted. If the group should be inserted
+     * at the end groupID has to be the current number of groups.
+     * \param labels Labels that will be added to the new group if provided
+     * \param name Display name of the inserted group
+     */
+    void InsertGroup(GroupIndexType groupID, ConstLabelVector labels = {}, std::string name = "");
+
+    /**
+     * \brief Inserts a new group to the MultiLabelSegmentation. The new group will be set as the active one,
+     * if also labels are added.
+     * \param groupID ID/position of the group where it should be inserted. If the group should be inserted
+     * at the end groupID has to be the current number of groups.
+     * \param layerImage contains the label pixel information that should be directly added for the new
+     * inserted group.
+     * \param labels Labels that will be added to the new group if provided
+     * \param name Display name of the inserted group
+     * \pre layerImage must be valid instance
+     * \pre layerImage needs to have the same geometry then the segmentation
+     * \pre layerImage must have the pixel value equal to LabelValueType.
+     */
+    void InsertGroup(GroupIndexType groupID, mitk::Image* layerImage, ConstLabelVector labels = {}, std::string name = "");
 
     /**
      * @brief Removes a whole group including all its labels.

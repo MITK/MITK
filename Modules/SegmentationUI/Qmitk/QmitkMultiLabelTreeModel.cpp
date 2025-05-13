@@ -500,7 +500,11 @@ bool QmitkMultiLabelTreeModel::setData(const QModelIndex& index, const QVariant&
       if (item->m_ItemType == QmitkMultiLabelSegTreeItem::ItemType::Group)
       {
         auto groupID = item->GetGroupID();
+
+        mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID }, true, 0, true, true);
         m_Segmentation->SetGroupName(groupID, value.toString().toStdString());
+        undoRedoGenerator.RegisterUndoRedoOperationEvent("Rename group #" + std::to_string(groupID));
+
         m_Segmentation->Modified();
         return true;
       }

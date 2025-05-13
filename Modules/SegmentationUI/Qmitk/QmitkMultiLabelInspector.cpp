@@ -1353,11 +1353,16 @@ void QmitkMultiLabelInspector::OnRenameGroup()
     auto newName = QInputDialog::getText(this, "Change name of the group", "Group name:", QLineEdit::Normal, QString::fromStdString(groupName), &dlgOK);
     if (dlgOK)
     {
+      mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID }, true, 0, true, true);
+
       m_Segmentation->SetGroupName(groupID, newName.toStdString());
       // this is needed as workaround for (T27307). It circumvents the fact that modifications
       // of data (here the segmentation) does not directly trigger the modification of the
       // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
       // listens to the datastorage for modification would not get notified.
+
+      undoRedoGenerator.RegisterUndoRedoOperationEvent("Rename group #" + std::to_string(groupID));
+
       if (m_SegmentationNode.IsNotNull())
       {
         m_SegmentationNode->Modified();

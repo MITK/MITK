@@ -30,7 +30,7 @@ found in the LICENSE file.
 #include "mitkNodePredicateGeometry.h"
 #include "mitkSegTool2D.h"
 
-#include <mitkSegGroupModifyOperation.h>
+#include <mitkSegGroupOperationApplier.h>
 
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
@@ -474,7 +474,7 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
       const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
       SegGroupModifyUndoRedoHelper undoRedoGenerator(resultSegmentation, { resultSegmentation->GetActiveLayer() },
-        m_CreateAllTimeSteps, timeStep);
+        m_CreateAllTimeSteps, timeStep, false, false, true);
 
       auto oldGroupCount = resultSegmentation->GetNumberOfGroups();
       this->PreparePreviewToResultTransfer(labelMapping);

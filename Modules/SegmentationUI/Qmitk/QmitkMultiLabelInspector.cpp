@@ -703,9 +703,13 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::MultiLabelSegment
   try
   {
     this->WaitCursorOn();
+    mitk::SegGroupRemoveUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID });
+
     m_ModelManipulationOngoing = true;
     m_Segmentation->RemoveGroup(groupID);
     m_ModelManipulationOngoing = false;
+
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Remove group \"" + m_Segmentation->GetGroupName(groupID) + "\"");
     this->WaitCursorOff();
   }
   catch (mitk::Exception& e)
@@ -1120,7 +1124,7 @@ void QmitkMultiLabelInspector::OnClearLabels(bool /*value*/)
     mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType containingGroups;
     for (const auto label : labelValues) containingGroups.insert(m_Segmentation->GetGroupIndexOfLabel(label));
     auto clearedLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, m_Segmentation->GetLabel(labelValues.front()));
-    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, containingGroups, true, 0, true);
+    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, containingGroups, true, 0, true, false, true);
 
     m_Segmentation->EraseLabels(labelValues);
 
@@ -1303,7 +1307,7 @@ void QmitkMultiLabelInspector::OnClearLabel(bool /*value*/)
   {
     this->WaitCursorOn();
 
-    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue()) }, true, 0, true);
+    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue()) }, true, 0, true, false, true);
 
     m_Segmentation->EraseLabel(currentLabel->GetValue());
 

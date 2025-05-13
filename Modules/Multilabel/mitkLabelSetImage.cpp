@@ -271,17 +271,19 @@ void mitk::MultiLabelSegmentation::RemoveGroup(GroupIndexType indexToDelete)
       m_LabelMap.erase(labelValue);
       this->InvokeEvent(LabelRemovedEvent(labelValue));
     }
+
     // remove the group entries in the maps and the image.
     m_Groups.erase(m_Groups.begin() + indexToDelete);
     m_GroupToLabelMap.erase(m_GroupToLabelMap.begin() + indexToDelete);
     m_GroupContainer.erase(m_GroupContainer.begin() + indexToDelete);
+
+    //update old indexes in m_LabelToGroupMap to new group indexes
+    for (auto& element : m_LabelToGroupMap)
+    {
+      if (element.second > indexToDelete) element.second = element.second - 1;
+    }
   }
 
-  //update old indexes in m_LabelToGroupMap to new group indexes
-  for (auto& element : m_LabelToGroupMap)
-  {
-    if (element.second > indexToDelete) element.second = element.second -1;
-  }
 
   if (!this->ExistLabel(m_ActiveLabelValue))
   {

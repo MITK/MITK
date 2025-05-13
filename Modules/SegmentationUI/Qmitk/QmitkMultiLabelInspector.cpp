@@ -1241,7 +1241,13 @@ void QmitkMultiLabelInspector::OnMergeLabels(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
+
+    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue()) }, true);
+
     m_Segmentation->MergeLabels(currentLabel->GetValue(), this->GetSelectedLabels());
+
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Merge into label \"" + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, currentLabel) + "\"");
+
     this->WaitCursorOff();
 
     // this is needed as workaround for (T27307). It circumvents the fact that modifications

@@ -86,6 +86,10 @@ namespace mitk
     bool RedoListEmpty() override;
 
     //##Documentation
+    //## @brief True, if UndoList is empty
+    bool UndoListEmpty() override;
+
+    //##Documentation
     //## @brief Gets the limit on the size of the undo history.
     //## The undo limit determines how many items can be stored
     //## in the undo stack. If the value is 0 that means that

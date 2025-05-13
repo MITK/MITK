@@ -184,6 +184,11 @@ bool mitk::LimitedLinearUndo::RedoListEmpty()
   return m_RedoList.empty();
 }
 
+bool mitk::LimitedLinearUndo::UndoListEmpty()
+{
+  return m_UndoList.empty();
+}
+
 std::size_t mitk::LimitedLinearUndo::GetUndoLimit() const
 {
   return m_UndoLimit;

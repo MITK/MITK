@@ -57,6 +57,10 @@ namespace mitk
     virtual bool RedoListEmpty() = 0;
 
     //##Documentation
+    //## @brief true if UndoList is empty
+    virtual bool UndoListEmpty() = 0;
+
+    //##Documentation
     //## @brief Gets the limit on the size of the undo history.
     //## The undo limit determines how many items can be stored
     //## in the undo stack. If the value is 0 that means that

@@ -4,7 +4,7 @@
     <view id="org.mitk.views.undoredoview"
           name="Undo/Redo Inspector"
           class="QmitkUndoRedoView"
-          icon="resources/undo_redo_inspector.svg"
+          icon="resources/undo_redo_view.svg"
 		  category="General">
           <description>View the undo redo stack of the application.</description>
 	</view>

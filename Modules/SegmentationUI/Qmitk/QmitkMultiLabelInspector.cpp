@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
 
-#include <mitkSegGroupModifyOperation.h>
+#include <mitkSegGroupOperationApplier.h>
 
 // Qmitk
 #include <QmitkCopyLabelToGroupDialog.h>

@@ -195,17 +195,34 @@ const mitk::Point3D QmitkStdMultiWidget::GetSelectedPosition(const QString& /*wi
 
 void QmitkStdMultiWidget::SetCrosshairVisibility(bool visible)
 {
+  std::vector<mitk::DataNode*> planeNodes;
+
   if (m_PlaneNode1.IsNotNull())
-  {
-    m_PlaneNode1->SetVisibility(visible);
-  }
+    planeNodes.push_back(m_PlaneNode1);
+
   if (m_PlaneNode2.IsNotNull())
-  {
-    m_PlaneNode2->SetVisibility(visible);
-  }
+    planeNodes.push_back(m_PlaneNode2);
+
   if (m_PlaneNode3.IsNotNull())
+    planeNodes.push_back(m_PlaneNode3);
+
+  if (planeNodes.empty())
+    return;
+
+  const auto& renderWindows = mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+
+  std::vector<std::string> rendererNames;
+  rendererNames.reserve(renderWindows.size());
+
+  for (auto renderWindow : renderWindows)
+    rendererNames.emplace_back(mitk::BaseRenderer::GetInstance(renderWindow)->GetName());
+
+  for (auto planeNode : planeNodes)
   {
-    m_PlaneNode3->SetVisibility(visible);
+    for (const auto& rendererName : rendererNames)
+      planeNode->RemoveProperty("visible", rendererName);
+
+    planeNode->SetVisibility(visible);
   }
 
   emit NotifyCrosshairVisibilityChanged(visible);

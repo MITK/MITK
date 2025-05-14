@@ -21,7 +21,7 @@ found in the LICENSE file.
 // VTK
 #include <vtkSmartPointer.h>
 class vtkAssembly;
-class vtkCutter;
+class vtkPolyDataPlaneCutter;
 class vtkPlane;
 class vtkLookupTable;
 class vtkGlyph3D;
@@ -104,7 +104,7 @@ namespace mitk
       /**
          * @brief m_Cutter Filter to cut out the 2D slice.
          */
-      vtkSmartPointer<vtkCutter> m_Cutter;
+      vtkSmartPointer<vtkPolyDataPlaneCutter> m_Cutter;
       /**
          * @brief m_CuttingPlane The plane where to cut off the 2D slice.
          */

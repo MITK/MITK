@@ -82,6 +82,9 @@ found in the LICENSE file.
 // method), we include the ITK header here.
 #include <itkImageIOFactoryRegisterManager.h>
 
+#include <itkMultiThreaderBase.h>
+#include <vtkSMPTools.h>
+
 namespace
 {
   void HandleMicroServicesMessages(us::MsgType type, const char* msg)
@@ -194,6 +197,21 @@ namespace
     service->RegisterProperty<mitk::VtkResliceInterpolationProperty>();
     service->RegisterProperty<mitk::VtkScalarModeProperty>();
   }
+
+  void LimitDefaultNumberOfThreads(int numThreads)
+  {
+    if (std::getenv("ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS") == nullptr)
+    {
+      if (itk::MultiThreaderBase::GetGlobalDefaultNumberOfThreads() > numThreads)
+        itk::MultiThreaderBase::SetGlobalDefaultNumberOfThreads(numThreads);
+    }
+
+    if (std::getenv("VTK_SMP_MAX_THREADS") == nullptr)
+    {
+      if (vtkSMPTools::GetEstimatedDefaultNumberOfThreads() > numThreads)
+        vtkSMPTools::Initialize(numThreads);
+    }
+  }
 }
 
 class FixedNiftiImageIO : public itk::NiftiImageIO
@@ -224,6 +242,8 @@ protected:
 
 void MitkCoreActivator::Load(us::ModuleContext *context)
 {
+  LimitDefaultNumberOfThreads(16);
+
   // Handle messages from CppMicroServices
   us::installMsgHandler(HandleMicroServicesMessages);
 

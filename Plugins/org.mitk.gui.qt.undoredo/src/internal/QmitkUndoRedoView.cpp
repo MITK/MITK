@@ -78,7 +78,7 @@ void QmitkUndoRedoView::SetFocus()
   m_Controls.undoRedoListView->setFocus();
 }
 
-void QmitkUndoRedoView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkUndoRedoView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
   // Not reacting to selection changes
   // This view shows the global undo stack regardless of selected nodes

@@ -21,6 +21,7 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage AnnotationPage
  -# \subpage PersistenceConceptPage
  -# \subpage SelectionConceptPage
+ -# \subpage MxNConceptPage
 -# \subpage QVTKRendering
 -# Interaction
  -# \subpage DataInteractionPage

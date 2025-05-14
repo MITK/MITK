@@ -78,6 +78,12 @@ public:
    */
   bool ValidatePrefences();
 
+  /**
+   * @brief Checks if the preferences are correctly set and displays appropriate
+   * status message appending to the initial string provided as argument.
+   */
+  void UpdateMedSAMStatusMessage(QString &initText);
+
 protected:
   QmitkMedSAMToolGUI();
   ~QmitkMedSAMToolGUI();

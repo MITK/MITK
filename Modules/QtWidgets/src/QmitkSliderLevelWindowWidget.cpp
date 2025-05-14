@@ -86,21 +86,15 @@ void QmitkSliderLevelWindowWidget::SetLevelWindowManager(mitk::LevelWindowManage
 
 void QmitkSliderLevelWindowWidget::OnPropertyModified(const itk::EventObject &)
 {
-  try
+  if (m_Manager->GetLevelWindowProperty().IsNotNull())
   {
     m_LevelWindow = m_Manager->GetLevelWindow();
     this->show();
-    Update();
+    this->Update();
   }
-  catch (...)
+  else
   {
-    try
-    {
-      this->hide();
-    }
-    catch (...)
-    {
-    }
+    this->hide();
   }
 }
 

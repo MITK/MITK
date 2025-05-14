@@ -335,6 +335,17 @@ QMimeData* QmitkRenderWindowDataNodeTableModel::mimeData(const QModelIndexList& 
   return mimeData;
 }
 
+void QmitkRenderWindowDataNodeTableModel::moveNodesLayer(QSet<mitk::DataNode*> movedNodes, int targetLayer)
+{
+  auto baseRenderer = m_BaseRenderer.Lock();
+  for (const auto& dataNode : std::as_const(movedNodes))
+  {
+    m_RenderWindowLayerController->MoveNodeToPosition(dataNode, targetLayer, baseRenderer);
+  }
+
+  this->UpdateModelData();
+}
+
 bool QmitkRenderWindowDataNodeTableModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex& parent)
 {
   if (action == Qt::IgnoreAction)
@@ -349,21 +360,25 @@ bool QmitkRenderWindowDataNodeTableModel::dropMimeData(const QMimeData* data, Qt
 
   if (parent.isValid())
   {
-    auto baseRenderer = m_BaseRenderer.Lock();
     int layer = -1;
-    auto dataNode = this->data(parent, QmitkDataNodeRawPointerRole).value<mitk::DataNode*>();
-    if (nullptr != dataNode)
+    auto targetNode = this->data(parent, QmitkDataNodeRawPointerRole).value<mitk::DataNode*>();
+    auto movedNodes = QmitkMimeTypes::ToDataNodePtrList(data);
+
+    // In the table model, each column has its own entry. To avoid duplicate moving, filter out unique nodes.
+    QSet<mitk::DataNode*> uniqueMovedNodes;
+    for (const auto& dataNode : std::as_const(movedNodes))
     {
-      dataNode->GetIntProperty("layer", layer, baseRenderer);
+      uniqueMovedNodes.insert(dataNode);
     }
 
-    auto dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
-    for (const auto& dataNode : std::as_const(dataNodeList))
+    auto baseRenderer = m_BaseRenderer.Lock();
+    if (nullptr != targetNode)
     {
-      m_RenderWindowLayerController->MoveNodeToPosition(dataNode, layer, baseRenderer);
+      targetNode->GetIntProperty("layer", layer, baseRenderer);
     }
 
-    this->UpdateModelData();
+    this->moveNodesLayer(uniqueMovedNodes, layer);
+    emit NodesLayerMoved(uniqueMovedNodes, layer);
 
     return true;
   }

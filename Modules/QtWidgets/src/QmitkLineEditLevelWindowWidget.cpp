@@ -80,7 +80,7 @@ QmitkLineEditLevelWindowWidget::~QmitkLineEditLevelWindowWidget()
 
 void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject &)
 {
-  try
+  if (m_Manager->GetLevelWindowProperty().IsNotNull())
   {
     m_LevelWindow = m_Manager->GetLevelWindow();
     QString level;
@@ -105,15 +105,9 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject &
     m_WindowInput->setEnabled(!m_LevelWindow.IsFixed());
     this->show();
   }
-  catch (...)
+  else
   {
-    try
-    {
-      this->hide();
-    }
-    catch (...)
-    {
-    }
+    this->hide();
   }
 }
 

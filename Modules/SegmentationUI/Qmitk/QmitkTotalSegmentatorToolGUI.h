@@ -86,7 +86,6 @@ protected:
     "total_mr",
     "cerebral_bleed",
     "hip_implant",
-    "coronary_arteries",
     "body",
     "lung_vessels",
     "pleural_pericard_effusion",
@@ -94,7 +93,13 @@ protected:
     "head_muscles",
     "headneck_bones_vessels",
     "headneck_muscles",
-    "liver_vessels"
+    "liver_vessels",
+    "oculomotor_muscles",
+    "lung_nodules",
+    "kidney_cysts",
+    "breasts",
+    "liver_segments",
+    "liver_segments_mr"
   };
 };
 

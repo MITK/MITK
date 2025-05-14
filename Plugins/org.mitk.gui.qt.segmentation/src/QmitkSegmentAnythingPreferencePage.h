@@ -14,34 +14,21 @@ found in the LICENSE file.
 #define QmitkSegmentAnythingPreferencePage_h
 
 #include <berryIQtPreferencePage.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
 #include <QmitknnUNetGPU.h>
 #include <QString>
-#include <QmitkSetupVirtualEnvUtil.h>
 #include <QStandardPaths>
 #include <ui_QmitkSegmentAnythingPreferencePage.h>
 #include <QDir>
-
-class QWidget;
+#include <QMessageBox>
+#include <QmitkSegmentAnythingToolInstaller.h>
 
 namespace Ui
 {
   class QmitkSegmentAnythingPreferencePage;
 }
-
-class QmitkSAMInstaller : public QmitkSetupVirtualEnvUtil
-{
-public:
-  const QString VENV_NAME = ".sam";
-  const QString SAM_VERSION = "1.0"; // currently, unused
-  const std::vector<QString> PACKAGES = {QString("git+https://github.com/MIC-DKFZ/agent-sam.git@v0.2")};
-  const QString STORAGE_DIR;
-  inline QmitkSAMInstaller(
-    const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
-                            qApp->organizationName() + QDir::separator())
-    : QmitkSetupVirtualEnvUtil(baseDir), STORAGE_DIR(baseDir){};
-  bool SetupVirtualEnv(const QString &) override;
-  QString GetVirtualEnvPath() override;
-};
 
 class QmitkSegmentAnythingPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -62,14 +49,14 @@ public:
 private slots:
   void OnInstallBtnClicked();
   void OnClearInstall();
-  std::pair<QString, QString> OnSystemPythonChanged(const QString &);
+  void OnSystemPythonChanged(const QString &pyEnv);
 
 protected:
   /**
-   * @brief Searches and parses paths of python virtual environments
-   * from predefined lookout locations
+   * @brief Checks if SegmentAnything is found inside the selected python virtual environment.
+   * @return bool
    */
-  void AutoParsePythonPaths();
+  bool IsSAMInstalled(const QString &pythonPath);
 
   /**
    * @brief Get the virtual env path from UI combobox removing any
@@ -84,25 +71,35 @@ protected:
    * In case, there aren't any GPUs available, the combo box will be
    * rendered editable.
    */
-  void SetGPUInfo();
+  void SetDeviceInfo();
 
   /**
    * @brief Returns GPU id of the selected GPU from the Combo box.
    * @return int
    */
-  int FetchSelectedGPUFromUI() const;
+  int FetchSelectedDeviceFromUI() const;
 
   void WriteStatusMessage(const QString &);
   void WriteErrorMessage(const QString &);
 
 private:
+
+  /**
+   * @brief Creates a QMessage object and shows on screen.
+   */
+  void ShowErrorMessage(const QString &, QMessageBox::Icon = QMessageBox::Critical);
+
   Ui::QmitkSegmentAnythingPreferencePage* m_Ui;
-  QmitkSAMInstaller m_Installer;
+  QmitkSAMToolInstaller m_Installer;
   QWidget* m_Control;
   QmitkGPULoader m_GpuLoader;
   QString m_PythonPath;
+  QString m_SysPythonPath;
   const QString CPU_ID = "cpu";
   const QStringList VALID_MODELS = {"vit_b", "vit_l", "vit_h"};
+  static const QString WARNING_PYTHON_NOT_FOUND;
+
+  mitk::IPreferences *m_Preferences;
 };
 
 #endif

@@ -30,8 +30,8 @@ found in the LICENSE file.
 *        with base renderer-specific functionality.
 * 
 *        Given a base renderer, the selection widget is able to display and access render window specific properties
-*        of the selected nodes, making it possible to switch between a "synchronized" and "desynchronized" selection
-*        state.
+*        of the selected nodes. It can be connected with other QmitkSynchronizedNodeSelectionWidgets to synchronize
+*        their state.
 *        The widget can be used to decide if all data nodes of the data storage should be selected or
 *        only an individually selected set of nodes, defined by a 'QmitkNodeSelectionDialog'.
 *        If individual nodes are selected / removed from the selection, the widget can inform other
@@ -52,19 +52,24 @@ public:
 
   void SetBaseRenderer(mitk::BaseRenderer* baseRenderer);
 
+  QmitkRenderWindowDataNodeTableModel* GetStorageModel() const;
+
   void SetSelectAll(bool selectAll);
   bool GetSelectAll() const;
   void SelectAll();
-  void SetSynchronized(bool synchronize);
-  bool IsSynchronized() const;
+  using GroupSyncIndexType = int;
+  void SetSyncGroup(const GroupSyncIndexType index);
+  GroupSyncIndexType GetSyncGroup() const;
 
 Q_SIGNALS:
 
   void SelectionModeChanged(bool selectAll);
   void DeregisterSynchronization();
+  void NodeVisibilityChanged(mitk::DataNode::Pointer node, const bool visibility);
 
 public Q_SLOTS:
   void SetSelection(const NodeList& newSelection);
+  void SetNodeVisibility(mitk::DataNode::Pointer node, const bool visibility);
 
 private Q_SLOTS:
 
@@ -82,14 +87,11 @@ protected:
   void OnNodePredicateChanged() override;
   void ReviseSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection) override;
   void OnInternalSelectionChanged() override;
-  bool AllowEmissionOfSelection(const NodeList& emissionCandidates) const override;
   void OnNodeAddedToStorage(const mitk::DataNode* node) override;
   void OnNodeModified(const itk::Object* caller, const itk::EventObject& event) override;
 
 private:
 
-  void ReviseSynchronizedSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection);
-  void ReviseDesynchronizedSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection);
   void ReinitNode(const mitk::DataNode* dataNode);
   void RemoveFromInternalSelection(mitk::DataNode* dataNode);
   bool IsParentNodeSelected(const mitk::DataNode* dataNode) const;
@@ -99,6 +101,7 @@ private:
   mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
 
   std::unique_ptr<QmitkRenderWindowDataNodeTableModel> m_StorageModel;
+  GroupSyncIndexType m_SyncGroupIndex;
 
 };
 

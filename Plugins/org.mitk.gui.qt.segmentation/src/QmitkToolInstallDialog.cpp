@@ -23,14 +23,15 @@ QObject* QmitkToolInstallDialog::GetConsoleOutput()
   return s_ConsoleOutput;
 }
 
-QmitkToolInstallDialog::QmitkToolInstallDialog(QWidget* parent)
+QmitkToolInstallDialog::QmitkToolInstallDialog(QWidget* parent, QString toolName)
   : QDialog(parent),
     m_IsInstalling(true),
     m_Ui(new Ui::QmitkToolInstallDialog)
 {
   m_Ui->setupUi(this);
+  m_Ui->statusLabel->setText("Installing " + toolName + ". This might take a few minutes...");
   s_ConsoleOutput = m_Ui->consoleOutput;
-
+  this->setWindowTitle(toolName + " Installer");
   connect(m_Ui->closePushButton, &QPushButton::clicked, this, &QmitkToolInstallDialog::close);
 }
 

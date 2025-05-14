@@ -10,19 +10,21 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkTotalSegmentatorToolInstaller_h
-#define QmitkTotalSegmentatorToolInstaller_h
+#ifndef QmitkSegmentAnythingToolInstaller_h
+#define QmitkSegmentAnythingToolInstaller_h
 
+#include <QApplication>
 #include <QmitkSetupVirtualEnvUtil.h>
+#include <QStringList>
 
-class QmitkTotalSegmentatorToolInstaller : public QmitkSetupVirtualEnvUtil
+class QmitkSAMToolInstaller : public QmitkSetupVirtualEnvUtil
 {
 public:
   static const QString VENV_NAME;
-  static const QString TOTALSEGMENTATOR_VERSION;
+  static const QString SAM_VERSION; // currently, unused
   static const QStringList PACKAGES;
   static const QString STORAGE_DIR;
-  QmitkTotalSegmentatorToolInstaller();
+  QmitkSAMToolInstaller();
   QString GetVirtualEnvPath() override;
   static void PrintProcessEvent(itk::Object *, const itk::EventObject &e, void *);
 };

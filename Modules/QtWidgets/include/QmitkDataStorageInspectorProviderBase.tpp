@@ -139,7 +139,8 @@ void
 {
   try
   {
-    d->m_Reg.Unregister();
+    if (d->m_Reg.IsAvailable())
+      d->m_Reg.Unregister();
   }
   catch (const std::exception &)
   {

@@ -16,7 +16,7 @@ found in the LICENSE file.s
 #include <QStandardPaths>
 #include <itkCommand.h>
 #include <regex>
-#include <QDir>
+#include <QDirIterator>
 #include <QApplication>
 #include <QProcess>
 #include <QStringDecoder>
@@ -25,6 +25,56 @@ QmitkSetupVirtualEnvUtil::QmitkSetupVirtualEnvUtil()
 {
   m_BaseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
               qApp->organizationName() + QDir::separator();
+}
+
+bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(const QString &venvName,
+                                               const QStringList &packages,
+                                               std::function<bool()> validator,
+                                               CallbackType printCallback)
+{
+  if (this->GetSystemPythonPath().isEmpty())
+  {
+    return false;
+  }
+  if (!QmitkSetupVirtualEnvUtil::IsVenvInstalled(GetSystemPythonPath()))
+  {
+    return false;
+  }
+  QDir folderPath(this->GetBaseDir());
+  folderPath.mkdir(venvName);
+  if (!folderPath.cd(venvName))
+  {
+    return false; // Check if directory creation was successful.
+  }
+  mitk::ProcessExecutor::ArgumentListType args;
+  auto spExec = mitk::ProcessExecutor::New();
+  auto spCommand = itk::CStyleCommand::New();
+  spCommand->SetCallback(printCallback);
+  spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
+
+  args.push_back("-m");
+  args.push_back("venv");
+  args.push_back(venvName.toStdString());
+#ifdef _WIN32
+  QString pythonFile = GetSystemPythonPath() + QDir::separator() + "python.exe";
+  QString pythonExeFolder = "Scripts";
+#else
+  QString pythonFile = GetSystemPythonPath() + QDir::separator() + "python3";
+  QString pythonExeFolder = "bin";
+#endif
+  spExec->Execute(GetBaseDir().toStdString(), pythonFile.toStdString(), args); // Setup local virtual environment
+  if (folderPath.cd(pythonExeFolder))
+  {
+    this->SetPythonPath(folderPath.absolutePath());
+    this->SetPipPath(folderPath.absolutePath());
+    this->InstallPytorch(printCallback);
+    for (auto &package : packages)
+    {
+      this->PipInstall(package.toStdString(), printCallback);
+    }
+    return validator();
+  }
+  return false;
 }
 
 QmitkSetupVirtualEnvUtil::QmitkSetupVirtualEnvUtil(const QString &baseDir)
@@ -119,7 +169,7 @@ void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir, Cal
   args.push_back("-m");
   args.push_back("pip");
   args.push_back("install");
-  args.push_back("light-the-torch==0.7.5");
+  args.push_back("light-the-torch==0.8.0");
   spExec->Execute(workingDir, "python", args);
   PipInstall("torch>=2.0.0", workingDir, callback, "ltt");
   PipInstall("torchvision>=0.15.0", workingDir, callback, "ltt");
@@ -281,4 +331,45 @@ QString QmitkSetupVirtualEnvUtil::GetPipPackageVersion(const QString &pythonPath
     }
   }
   return version;
+}
+
+QStringList QmitkSetupVirtualEnvUtil::AutoParsePythonPaths()
+{
+  static QStringList foundDirs;
+  if (foundDirs.empty())
+  {
+    QString homeDir = QDir::homePath();
+    std::vector<QString> searchDirs;
+#ifdef _WIN32
+      searchDirs.push_back(QString("C:") + QDir::separator() + QString("ProgramData") + QDir::separator() +
+                           QString("anaconda3"));
+#else
+      // Add search locations for possible standard python paths here
+      searchDirs.push_back(homeDir + QDir::separator() + "anaconda3");
+      searchDirs.push_back(homeDir + QDir::separator() + "miniconda3");
+      searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "miniconda3");
+      searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "anaconda3");
+#endif
+    for (QString searchDir : searchDirs)
+    {
+      if (searchDir.endsWith("anaconda3", Qt::CaseInsensitive))
+      {
+        if (QDir(searchDir).exists())
+        {
+          foundDirs.push_back("(base): " + searchDir);
+          searchDir.append((QDir::separator() + QString("envs")));
+        }
+      }
+      for (QDirIterator subIt(searchDir, QDir::AllDirs, QDirIterator::NoIteratorFlags); subIt.hasNext();)
+      {
+        subIt.next();
+        QString envName = subIt.fileName();
+        if (!envName.startsWith('.')) // Filter out irrelevant hidden folders, if any.
+        {
+          foundDirs.push_back("(" + envName + "): " + subIt.filePath());
+        }
+      }
+    }
+  }
+  return foundDirs;
 }

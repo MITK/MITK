@@ -1,0 +1,68 @@
+/**
+\page MxNConceptPage MxN Multi-Widget Concept
+
+\tableofcontents
+
+
+\section MxNConceptPage_Introduction Introduction to the MxN View
+
+The MxN MultiWidget View allows users to freely arrange as many render windows as they
+like in arbitrary arrangements. These windows are linked with each other in so-called
+"Synchronization Groups" (short: "Sync Groups") that share node-selections and -properties
+such as visibility and layer (i.e. the ordering which node is in front of which).
+For more detailed information on how to use it, take a look at \ref org_mitk_editors_mxnmultiwidget help page.
+Here, we will give an overview of the most relevant classes for the MxN View.
+
+
+\image html MxNClassesOverview.png "Overview of MxN related classes" width=60%
+\image latex MxNClassesOverview.png "Overview of MxN related classes" width=60%
+
+
+\section MxNConceptPage_MxNWidget MxN Multi-Widget
+
+The \ref QmitkMxNMultiWidget is the main class for the MxN View, taking care of organizing
+the render windows and sync groups. It creates new render windows when necessary and extends
+them with a \ref QmitkRenderWindowUtilityWidget, which it connects to for signals if the
+window's sync group changes.
+To offload the synchronization of different windows, it uses \ref QmitkSynchronizedWidgetConnector,
+one for each sync group.
+
+
+\section MxNConceptPage_UtilityWidget Utility Widget
+
+Unlike in the standard 4-window-view, in the MxN View each \ref QmitkRenderWindowWidget is
+extended with a \ref QmitkRenderWindowUtilityWidget. This widget takes the form of a bar
+at the top of the render window, with features including:
+ - Selecting a view direction (i.e. "sagittal", "axial", "coronal")
+ - Navigating along the current view axis via a \ref QmitkSliceNavigationWidget
+ - Selecting a synchronization group
+ - A \ref QmitkSynchronizedNodeSelectionWidget to change the shown selection of nodes, as well as their properties
+
+When the sync group of a render window is changed, this signal will inform the \ref MxNConceptPage_MxNWidget
+of the change to handle the synchronization.
+
+
+\section MxNConceptPage_SynchronizedNodeSelectionWidget Synchronized Node Selection Widget
+
+To select and modify the data shown in each render window, their \ref MxNConceptPage_UtilityWidget contains
+a \ref QmitkSynchronizedNodeSelectionWidget. In it, one can change the current selection of nodes,
+as well as their visibility and ordering. This state is synchronized with every other render window
+that is part of the same sync group, as specified in their utility widgets.
+Changes in the selection of nodes or their visibility are directly signalled from the \ref QmitkSynchronizedNodeSelectionWidget,
+while changes in the node order (i.e. their layers) are emitted by the contained \ref QmitkRenderWindowDataNodeTableModel.
+Each Synchronized Node Selection widget has exactly <i>one</i> data model that takes care of its
+selection and node properties.
+
+
+\section MxNConceptPage_SynchronizedWidgetConnector Synchronized Widget Connector
+
+A \ref QmitkSynchronizedWidgetConnector takes care of synchronizing the widgets belonging to one
+sync group. New widgets can be added via
+`QmitkSynchronizedWidgetConnector::ConnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget)`
+and removed via
+` QmitkSynchronizedWidgetConnector::DisconnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget)`.
+Connected \ref QmitkSynchronizedNodeSelectionWidget will inform each other of changes to their
+node selections and their visibility / ordering. To get newly connected widgets up to date, the
+\ref QmitkSynchronizedWidgetConnector internally saves the current selection and selection mode.
+
+*/

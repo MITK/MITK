@@ -78,3 +78,10 @@ void mitk::MonaiLabel2DTool::WriteBackResults(MultiLabelSegmentation *previewIma
     this->GetWorkingPlaneGeometry(), segResults->GetGroupImage(previewImage->GetActiveLayer()),
     timeStep, false);
  }
+
+void mitk::MonaiLabel2DTool::ConfirmCleanUp()
+{
+   this->ResetPreviewContent();
+   this->ClearSeeds();
+   RenderingManager::GetInstance()->RequestUpdateAll();
+}

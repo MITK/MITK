@@ -119,9 +119,19 @@ namespace mitk
       TimePointType timePoint,
       unsigned int component = 0);
 
-    /** Convenience overloaded version that can be called for a given planeGeometry, slice image and time step.
-     * Calls static WriteBackSegmentationResults*/
-    static void WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep);
+    /** \brief Writes the provided segmentation result slice into the data of the passed workingNode.
+     * The function is a public convenience wrapper around the static protected overload of this function
+     * and does the following: 1) passed slice is written to workingNode (and generate and undo/redo step);
+     * 2) update the surface interpolation and 3) mark the node as modified.
+     * @param workingNode Pointer to the node that contains the working image.
+     * @param planeGeometry Indicates where the slice should be added in the data of the working node.
+     * @param segmentationResult Point to the slice image that should be added.
+     * @param timeStep time step of the working node data that should be modified
+     * @param toolName Name of the tool that should be used as description in the undo operation.
+     * @pre workingNode must point to a valid instance and contain an image instance as data.
+     * @pre planeGeometry must point to a valid instance.
+     * @pre segmentationResult must point to a valid instance.*/
+    static void WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep, const std::string& toolname);
 
     /** Writes a provided slice into the passed working image. The content of working image that is covered
     * by the slice will be completely overwritten.
@@ -240,8 +250,9 @@ namespace mitk
      * @param writeSliceToVolume If set to false the write operation (WriteSliceToVolume will be skipped)
      * and only the surface interpolation will be updated.
      * @param allowUndo Indicates if undo/redo operations should be registered for the write operation
+     * @param toolName Name of the tool that should be used as description in the undo operation.
      * @pre workingNode must point to a valid instance and contain an image instance as data.*/
-    static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true, bool allowUndo = true);
+    static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true, bool allowUndo = true, const std::string& toolname = "");
 
     /** Convenience overloaded version that can be called with a slice info.
     * Writes a provided slice into the passed working image. The content of working image that is covered

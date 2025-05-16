@@ -426,7 +426,7 @@ void mitk::SegWithPreviewTool::TransferSegmentationsAtTimeStep(const MultiLabelS
             m_MergeStyle,
             m_OverwriteStyle);
           //We use WriteBackSegmentationResult to ensure undo/redo is supported also by derived tools of this class.
-          SegTool2D::WriteBackSegmentationResult(this->GetTargetSegmentationNode(), m_WorkingPlaneGeometry, resultSlice, timeStep);
+          SegTool2D::WriteBackSegmentationResult(this->GetTargetSegmentationNode(), m_WorkingPlaneGeometry, resultSlice, timeStep,this->GetName());
         }
       }
     }

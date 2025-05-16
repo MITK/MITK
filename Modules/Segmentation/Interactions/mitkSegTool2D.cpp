@@ -226,7 +226,7 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
     {
       // Test whether there is something to extract or whether the slice just contains intersections of others
 
-      //Remark we cannot just errode the clone of sliceInfo.slice, because Erode currently only
+      //Remark we cannot just erode the clone of sliceInfo.slice, because Erode currently only
       //works on pixel value 1. But we need to erode active label. Therefore we use TransferLabelContent
       //as workaround.
       //If MorphologicalOperations::Erode is supports user defined pixel values, the workaround
@@ -533,13 +533,13 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const InteractionPositionEvent
   }
 }
 
-void mitk::SegTool2D::WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep)
+void mitk::SegTool2D::WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep, const std::string& toolName)
 {
   if (!planeGeometry || !segmentationResult)
     return;
 
   SliceInformation sliceInfo(segmentationResult, const_cast<mitk::PlaneGeometry*>(planeGeometry), timeStep);
-  Self::WriteBackSegmentationResults(workingNode, { sliceInfo }, true);
+  Self::WriteBackSegmentationResults(workingNode, { sliceInfo }, true, true, toolName);
 }
 
 void mitk::SegTool2D::WriteBackSegmentationResult(const PlaneGeometry *planeGeometry,
@@ -582,7 +582,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
       ->GetPlaneGeometry(0));
   const unsigned int slicePosition = m_LastEventSender->GetSliceNavigationController()->GetStepper()->GetPos();
 
-  mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume, m_UndoEnabled);
+  mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume, m_UndoEnabled, this->GetName());
 
 
   /* A cleaner solution would be to add a contour marker for each slice info. It currently
@@ -591,7 +591,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
   this->AddContourmarker(plane3, slicePosition);
 }
 
-void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume, bool allowUndo)
+void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume, bool allowUndo, const std::string& toolName)
 {
   if (sliceList.empty())
   {
@@ -653,7 +653,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
           // create an operation event for the undo stack
           UndoStackItem::IncCurrObjectEventId();
           OperationEvent* undoStackItem =
-            new OperationEvent(SegSliceOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation");
+            new OperationEvent(SegSliceOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation "+toolName);
 
           // add it to the undo controller
           UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);

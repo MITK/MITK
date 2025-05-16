@@ -811,7 +811,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     { {0, mitk::MultiLabelSegmentation::UNLABELED_VALUE}, {1, activeValue} }
   );
 
-  mitk::SegTool2D::WriteBackSegmentationResult(workingNode, planeGeometry, interpolatedSlice, timeStep);
+  mitk::SegTool2D::WriteBackSegmentationResult(workingNode, planeGeometry, interpolatedSlice, timeStep, "2D Interpolation");
   m_FeedbackNode->SetData(nullptr);
 }
 

@@ -81,6 +81,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   this->EnableAll(false);
   m_Controls->statusLabel->setTextFormat(Qt::RichText);
   m_Controls->subtaskComboBox->addItems(VALID_TASKS);
+  this->ToggleLicensedTasks(!m_Preferences->Get("TotalSeg/licenseText", "").empty());
   QString welcomeText = "<b>STATUS: </b><i>Welcome to the TotalSegmentator tool.</i>";
   connect(m_Controls->previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   m_Controls->fastBox->setChecked(true);
@@ -190,11 +191,6 @@ void QmitkTotalSegmentatorToolGUI::WriteErrorMessage(const QString &message)
 
 void QmitkTotalSegmentatorToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &)
 {
-  if (nullptr == m_Preferences)
-  {
-    this->ShowErrorMessage("Error occurred while loading preference changes.");
-    return;
-  }
   bool isAvailable = !(m_Preferences->Get("TotalSeg/totalSegPath", "").empty());
   this->EnableAll(isAvailable);
   QString text = "<b>STATUS: </b><i>Welcome to TotalSegmentator tool.";
@@ -209,4 +205,19 @@ void QmitkTotalSegmentatorToolGUI::OnPreferenceChangedEvent(const mitk::IPrefere
     this->EnableAll(isAvailable);
   }
   this->WriteStatusMessage(text);
+  this->ToggleLicensedTasks(!m_Preferences->Get("TotalSeg/licenseText", "").empty());
+}
+
+void QmitkTotalSegmentatorToolGUI::ToggleLicensedTasks(bool activate)
+{
+  if (activate)
+  {
+    m_Controls->subtaskComboBox->addItems(LICENSED_TASKS);
   }
+  else
+  {
+    m_Controls->subtaskComboBox->clear();
+    m_Controls->subtaskComboBox->addItems(VALID_TASKS);
+  }
+}
+

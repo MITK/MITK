@@ -56,6 +56,11 @@ protected:
    * @brief Enable (or Disable) GUI elements.
    */
   void EnableAll(bool);
+  
+  /**
+   * @brief Adds and removes licensed task in combo box.
+   */
+  void ToggleLicensedTasks(bool activate);
 
   /**
    * @brief Creates a QMessage object and shows on screen.
@@ -101,6 +106,21 @@ protected:
     "liver_segments",
     "liver_segments_mr"
   };
+
+  const QStringList LICENSED_TASKS = {"heartchambers_highres",
+                                      "appendicular_bones",
+                                      "appendicular_bones_mr",
+                                      "tissue_types",
+                                      "tissue_types_mr",
+                                      "tissue_4_types",
+                                      "brain_structures",
+                                      "vertebrae_body",
+                                      "face",
+                                      "face_mr",
+                                      "thigh_shoulder_muscles",
+                                      "thigh_shoulder_muscles_mr",
+                                      "coronary_arteries"};
+
 };
 
 #endif

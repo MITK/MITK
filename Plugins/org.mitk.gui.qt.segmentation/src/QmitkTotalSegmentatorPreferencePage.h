@@ -86,10 +86,17 @@ private:
    */
   bool IsTotalSegmentatorInstalled(const QString &pythonPath);
 
-   /**
+  /**
    * @brief Returns device id of the selected device from the Combo box.
    */
   int FetchSelectedDeviceFromUI() const;
+
+  /**
+   * @brief Applies license string to Totalsegmentator to faciliate use of licensed tasks.
+   * Empty license string argument will remove the existing license.
+   */
+  void AddOrRemoveLicense(const QString &licenseText);
+
 
   void UpdateTotalSegPreferencePath();
 
@@ -102,6 +109,7 @@ private:
   static const QString WARNING_TOTALSEG_NOT_FOUND;
   static const QString WARNING_PYTHON_NOT_FOUND;
   mitk::IPreferences *m_Preferences;
+  const int LICENCE_KEY_LENGTH = 18;
 
 protected slots:
 
@@ -129,6 +137,11 @@ protected slots:
    * @brief Qt Slot
    */
   void OnInstallButtonClicked();
+  
+  /**
+   * @brief Qt Slot
+   */
+  void OnApplyButtonClicked();
 };
 
 #endif

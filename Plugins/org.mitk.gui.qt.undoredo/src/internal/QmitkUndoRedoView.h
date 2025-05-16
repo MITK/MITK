@@ -53,7 +53,7 @@ private:
   void UpdateButtonStatus();
   void OnUndoStackChanged(const itk::EventObject& e);
 
-  Ui::QmitkUndoRedoViewControls m_Controls;
+  std::unique_ptr<Ui::QmitkUndoRedoViewControls> m_Controls;
   QStandardItemModel* m_UndoRedoModel;
 
   mitk::ITKEventObserverGuard m_UndoStackObserverGuard;

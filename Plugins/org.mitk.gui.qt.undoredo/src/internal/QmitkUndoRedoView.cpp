@@ -17,7 +17,7 @@
 const std::string QmitkUndoRedoView::VIEW_ID = "org.mitk.views.undoredoview";
 
 QmitkUndoRedoView::QmitkUndoRedoView()
-  : m_UndoRedoModel(nullptr)
+  : m_Controls(new Ui::QmitkUndoRedoViewControls()), m_UndoRedoModel(nullptr)
 {
   m_UndoController.reset(new mitk::UndoController(mitk::UndoController::VERBOSE_LIMITEDLINEARUNDO));
 }
@@ -29,7 +29,7 @@ QmitkUndoRedoView::~QmitkUndoRedoView()
 void QmitkUndoRedoView::CreateQtPartControl(QWidget* parent)
 {
   // Setup UI
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   // Get the undo model from the global undo stack
   auto undoModel = dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel());
@@ -37,15 +37,15 @@ void QmitkUndoRedoView::CreateQtPartControl(QWidget* parent)
   if (!undoModel)
   {
     QMessageBox::warning(parent, "Warning", "No VerboseLimitedLinearUndo model found. Undo/Redo functionality will be unavailable.");
-    m_Controls.undoButton->setEnabled(false);
-    m_Controls.redoButton->setEnabled(false);
-    m_Controls.undoRedoListView->setEnabled(false);
+    m_Controls->undoButton->setEnabled(false);
+    m_Controls->redoButton->setEnabled(false);
+    m_Controls->undoRedoListView->setEnabled(false);
     return;
   }
 
   auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
-  m_Controls.undoButton->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-undo.svg"));
-  m_Controls.redoButton->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-redo.svg"));
+  m_Controls->undoButton->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-undo.svg"));
+  m_Controls->redoButton->setIcon(QmitkStyleManager::ThemeIcon(basePath + "edit-redo.svg"));
 
   // Setup the model for the list view
   m_UndoRedoModel = new QStandardItemModel(this);
@@ -53,12 +53,12 @@ void QmitkUndoRedoView::CreateQtPartControl(QWidget* parent)
   m_UndoRedoModel->setHeaderData(0, Qt::Horizontal, "Description");
 
   // Set the model directly to the view without proxy
-  m_Controls.undoRedoListView->setModel(m_UndoRedoModel);
+  m_Controls->undoRedoListView->setModel(m_UndoRedoModel);
 
   // Connect signals and slots
-  connect(m_Controls.undoButton, SIGNAL(clicked()), this, SLOT(OnUndoButtonClicked()));
-  connect(m_Controls.redoButton, SIGNAL(clicked()), this, SLOT(OnRedoButtonClicked()));
-  connect(m_Controls.undoRedoListView->selectionModel(),
+  connect(m_Controls->undoButton, SIGNAL(clicked()), this, SLOT(OnUndoButtonClicked()));
+  connect(m_Controls->redoButton, SIGNAL(clicked()), this, SLOT(OnRedoButtonClicked()));
+  connect(m_Controls->undoRedoListView->selectionModel(),
           SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
           this,
           SLOT(OnListSelectionChanged(const QItemSelection&, const QItemSelection&)));
@@ -75,7 +75,7 @@ void QmitkUndoRedoView::CreateQtPartControl(QWidget* parent)
 
 void QmitkUndoRedoView::SetFocus()
 {
-  m_Controls.undoRedoListView->setFocus();
+  m_Controls->undoRedoListView->setFocus();
 }
 
 void QmitkUndoRedoView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& /*nodes*/)
@@ -152,7 +152,8 @@ void QmitkUndoRedoView::UpdateUndoRedoList()
   // Current operation position as separator
   QStandardItem* currentPositionItem = new QStandardItem("--- Current Position ---");
   currentPositionItem->setData(Qt::AlignCenter, Qt::TextAlignmentRole);
-  currentPositionItem->setBackground(QBrush(QColor(230, 230, 255)));
+  currentPositionItem->setBackground(QBrush(m_Controls->undoRedoListView->palette().color(QPalette::Highlight)));
+  currentPositionItem->setForeground(QBrush(m_Controls->undoRedoListView->palette().color(QPalette::Dark)));
   currentPositionItem->setFlags(Qt::ItemIsEnabled); // Make it non-selectable
 
   auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
@@ -184,6 +185,6 @@ void QmitkUndoRedoView::UpdateButtonStatus()
   if (nullptr == undoModel)
 
   // Update undo/redo button states
-  m_Controls.undoButton->setEnabled(!undoModel->UndoListEmpty());
-  m_Controls.redoButton->setEnabled(!undoModel->RedoListEmpty());
+  m_Controls->undoButton->setEnabled(!undoModel->UndoListEmpty());
+  m_Controls->redoButton->setEnabled(!undoModel->RedoListEmpty());
 }

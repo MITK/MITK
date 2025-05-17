@@ -71,6 +71,7 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
 
   connect(m_Model, &QAbstractItemModel::modelReset, this, &QmitkMultiLabelInspector::OnModelReset);
   connect(m_Model, &QAbstractItemModel::dataChanged, this, &QmitkMultiLabelInspector::OnDataChanged);
+  connect(m_Model, &QmitkMultiLabelTreeModel::modelChanged, this, &QmitkMultiLabelInspector::OnModelChanged);
   connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnChangeModelSelection(const QItemSelection&, const QItemSelection&)));
   connect(view, &QAbstractItemView::customContextMenuRequested, this, &QmitkMultiLabelInspector::OnContextMenuRequested);
   connect(view, &QAbstractItemView::doubleClicked, this, &QmitkMultiLabelInspector::OnItemDoubleClicked);
@@ -219,6 +220,58 @@ void QmitkMultiLabelInspector::OnModelReset()
   m_ModelManipulationOngoing = false;
 }
 
+QmitkMultiLabelInspector::LabelValueVectorType FilterValidLabels(QmitkMultiLabelInspector::LabelValueVectorType labelValues, mitk::MultiLabelSegmentation* segmentation)
+{
+  mitk::MultiLabelSegmentation::LabelValueVectorType validLabels;
+  std::copy_if(labelValues.cbegin(), labelValues.cend(),
+    std::back_inserter(validLabels),
+    [segmentation](mitk::MultiLabelSegmentation::LabelValueType x) { return segmentation->ExistLabel(x); });
+
+  return validLabels;
+}
+
+void QmitkMultiLabelInspector::OnModelChanged()
+{
+  if (!m_ModelManipulationOngoing)
+  { //the model was changed externally and not by this instance
+    //ensure that selection state is still valid
+    //If this instance is manipulating it, it will take care of direct selection directly
+
+    QmitkMultiLabelInspector::LabelValueVectorType validLabels;
+
+    if (m_CheckSelectionDueToExternalModelChange)
+    { //selection model tried an update while label model was still updating.
+      //check selection now for validity and use it if appropriated.
+      m_CheckSelectionDueToExternalModelChange = false;
+      validLabels = FilterValidLabels(GetSelectedLabelsFromSelectionModel(), this->GetMultiLabelSegmentation());
+    }
+
+    if (validLabels.empty())
+    {
+      //empty selections are not allowed by UI interactions, there should always be at least one valid label selected.
+      //but selections are e.g. also cleared if the model is updated (e.g. due to addition of labels).
+      //In this case all valid elements of m_LastValidSelectedLabels should be used.
+      validLabels = FilterValidLabels(m_LastValidSelectedLabels, this->GetMultiLabelSegmentation());
+    }
+
+    if (validLabels.empty() && m_Model->GetNearestLabelValueToLastChange() != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
+    {
+      //we use the nearest existing label as valid value, like we do it in DeletLabelInternal
+      validLabels = { m_Model->GetNearestLabelValueToLastChange() };
+    }
+
+    if (!validLabels.empty())
+    {
+      UpdateSelectionModel(validLabels);
+    }
+    else
+    {
+      m_LastValidSelectedLabels = {};
+      emit CurrentSelectionChanged(GetSelectedLabels());
+    }
+  }
+}
+
 void QmitkMultiLabelInspector::OnDataChanged(const QModelIndex& topLeft, const QModelIndex& /*bottomRight*/,
   const QList<int>& /*roles*/)
 {
@@ -290,33 +343,51 @@ void QmitkMultiLabelInspector::OnChangeModelSelection(const QItemSelection& /*se
 {
   if (!m_ModelManipulationOngoing)
   {
-    auto internalSelection = GetSelectedLabelsFromSelectionModel();
-    if (internalSelection.empty())
+    if(!m_Model->GetModelUpdateOngoing())
     {
-      //empty selections are not allowed by UI interactions, there should always be at least on label selected.
-      //but selections are e.g. also cleared if the model is updated (e.g. due to addition of labels).
-      //In this case all valid elements of m_LastValidSelectedLabels should be used. If no element is valid
-      //we set the selection to empty.
-      auto segmentation = this->GetMultiLabelSegmentation();
-      mitk::MultiLabelSegmentation::LabelValueVectorType validLabels;
-      std::copy_if(m_LastValidSelectedLabels.cbegin(), m_LastValidSelectedLabels.cend(),
-        std::back_inserter(validLabels),
-        [segmentation](mitk::MultiLabelSegmentation::LabelValueType x) { return segmentation->ExistLabel(x); });
+      auto internallySelectedLabels = this->GetSelectedLabelsFromSelectionModel();
+      auto validLabels = FilterValidLabels(internallySelectedLabels, this->GetMultiLabelSegmentation());
 
-      if (!validLabels.empty())
-      {
+      if (internallySelectedLabels.size() == validLabels.size())
+      { //all labels selected by the selection model are valid
+        //set the state of this instance accordingly
+        m_LastValidSelectedLabels = validLabels;
+        emit CurrentSelectionChanged(GetSelectedLabels());
+      }
+      else if (!validLabels.empty())
+      { //only a part of the selection model is valid. Update it accordingly, this will
+        //lead to a re-triggering of this function
         UpdateSelectionModel(validLabels);
-        if (validLabels.size() != m_LastValidSelectedLabels.size())
+      }
+      else
+      {
+        //empty selections are not allowed by UI interactions, there should always be at least one valid label selected.
+        //but selections are e.g. also cleared if the model is updated (e.g. due to addition of labels).
+        //In this case all valid elements of m_LastValidSelectedLabels should be used.
+        validLabels = FilterValidLabels(m_LastValidSelectedLabels, this->GetMultiLabelSegmentation());
+
+        if (validLabels.empty() && m_Model->GetNearestLabelValueToLastChange() != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
         {
-          m_LastValidSelectedLabels = validLabels;
+          //we use the nearest existing label as valid value, like we do it in DeletLabelInternal
+          validLabels = { m_Model->GetNearestLabelValueToLastChange() };
+        }
+
+        if (!validLabels.empty())
+        {
+          UpdateSelectionModel(validLabels);
+        }
+        else
+        {
+          m_LastValidSelectedLabels = {};
           emit CurrentSelectionChanged(GetSelectedLabels());
         }
-        return;
       }
     }
-
-    m_LastValidSelectedLabels = internalSelection;
-    emit CurrentSelectionChanged(GetSelectedLabels());
+    else
+    { //the model is changed by an external source (not by this instance; e.g. an undo operation or another instance)
+      //need to check the selection after the model change is needed
+      m_CheckSelectionDueToExternalModelChange = true;
+    }
   }
 }
 
@@ -594,10 +665,6 @@ void QmitkMultiLabelInspector::DeleteLabelInternal(const LabelValueVectorType& l
 
   m_ModelManipulationOngoing = true;
 
-  auto currentIndex = m_Model->indexOfLabel(labelValues.back());
-  auto nextIndex = m_Model->ClosestLabelInstanceIndex(currentIndex);
-  auto nextLabelVariant = nextIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
-
   m_Segmentation->RemoveLabels(labelValues);
 
   m_ModelManipulationOngoing = false;
@@ -612,24 +679,28 @@ void QmitkMultiLabelInspector::DeleteLabelInternal(const LabelValueVectorType& l
 
   this->WaitCursorOff();
 
-  if (nextLabelVariant.isValid())
+  auto validSelectedLabels = FilterValidLabels(m_LastValidSelectedLabels, this->GetMultiLabelSegmentation());
+  if (validSelectedLabels.empty())
   {
-    auto newLabelValue = nextLabelVariant.value<LabelValueType>();
-    this->SetSelectedLabel(newLabelValue);
-
-    auto index = m_Model->indexOfLabel(newLabelValue); //we have to get index again, because it could have changed due to remove operation.
-    if (index.isValid())
+    auto newLabelValue = m_Model->GetNearestLabelValueToLastChange();
+    if (newLabelValue != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
     {
-      m_Controls->view->expand(index.parent());
+      this->SetSelectedLabel(newLabelValue);
+
+      auto index = m_Model->indexOfLabel(newLabelValue); //we have to get index again, because it could have changed due to remove operation.
+      if (index.isValid())
+      {
+        m_Controls->view->expand(index.parent());
+      }
+      else
+      {
+        mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
+      }
     }
     else
     {
-      mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
+      this->SetSelectedLabels({});
     }
-  }
-  else
-  {
-    this->SetSelectedLabels({});
   }
 
   emit ModelUpdated();
@@ -696,10 +767,6 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::MultiLabelSegment
   if (m_Segmentation->GetNumberOfGroups() < 2)
     return;
 
-  auto currentIndex = m_Model->indexOfGroup(groupID);
-  auto nextIndex = m_Model->ClosestLabelInstanceIndex(currentIndex);
-  auto labelVariant = nextIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
-
   try
   {
     this->WaitCursorOn();
@@ -722,24 +789,28 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::MultiLabelSegment
     return;
   }
 
-  if (labelVariant.isValid())
+  auto validSelectedLabels = FilterValidLabels(m_LastValidSelectedLabels, this->GetMultiLabelSegmentation());
+  if (validSelectedLabels.empty())
   {
-    auto newLabelValue = labelVariant.value<LabelValueType>();
-    this->SetSelectedLabel(newLabelValue);
-
-    auto index = m_Model->indexOfLabel(newLabelValue); //we have to get index again, because it could have changed due to remove operation.
-    if (index.isValid())
+    auto newLabelValue = m_Model->GetNearestLabelValueToLastChange();
+    if (newLabelValue != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
     {
-      m_Controls->view->expand(index.parent());
+      this->SetSelectedLabel(newLabelValue);
+
+      auto index = m_Model->indexOfLabel(newLabelValue); //we have to get index again, because it could have changed due to remove operation.
+      if (index.isValid())
+      {
+        m_Controls->view->expand(index.parent());
+      }
+      else
+      {
+        mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
+      }
     }
     else
     {
-      mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
+      this->SetSelectedLabels({});
     }
-  }
-  else
-  {
-    this->SetSelectedLabels({});
   }
 
   emit ModelUpdated();

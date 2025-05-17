@@ -727,7 +727,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewGroup()
     groupID = m_Segmentation->AddGroup();
 
     mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID }, false, true);
-    undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert new group \"" + std::to_string(groupID) + "\"");
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert new group \"" + mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID) + "\"");
 
     this->WaitCursorOff();
 
@@ -771,7 +771,7 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::MultiLabelSegment
   {
     this->WaitCursorOn();
     mitk::SegGroupRemoveUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID });
-    auto deletedGroupName = m_Segmentation->GetGroupName(groupID);
+    auto deletedGroupName = mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID);
 
     m_ModelManipulationOngoing = true;
     m_Segmentation->RemoveGroup(groupID);
@@ -1421,7 +1421,7 @@ void QmitkMultiLabelInspector::OnRenameGroup()
     auto groupID = groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
 
     bool dlgOK;
-    auto groupName = m_Segmentation->GetGroupName(groupID);
+    auto groupName = mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID);
     auto newName = QInputDialog::getText(this, "Change name of the group", "Group name:", QLineEdit::Normal, QString::fromStdString(groupName), &dlgOK);
     if (dlgOK)
     {

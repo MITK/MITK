@@ -704,12 +704,13 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::MultiLabelSegment
   {
     this->WaitCursorOn();
     mitk::SegGroupRemoveUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID });
+    auto deletedGroupName = m_Segmentation->GetGroupName(groupID);
 
     m_ModelManipulationOngoing = true;
     m_Segmentation->RemoveGroup(groupID);
     m_ModelManipulationOngoing = false;
 
-    undoRedoGenerator.RegisterUndoRedoOperationEvent("Remove group \"" + m_Segmentation->GetGroupName(groupID) + "\"");
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Remove group \"" + deletedGroupName + "\"");
     this->WaitCursorOff();
   }
   catch (mitk::Exception& e)

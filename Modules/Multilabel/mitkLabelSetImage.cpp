@@ -411,7 +411,7 @@ void mitk::MultiLabelSegmentation::InsertGroup(GroupIndexType groupID, mitk::Ima
     //update old indexes in m_LabelToGroupMap to new group indexes
     for (auto& element : m_LabelToGroupMap)
     {
-      if (element.second > groupID) element.second = element.second + 1;
+      if (element.second >= groupID) element.second = element.second + 1;
     }
 
     for (auto label : labels)
@@ -511,7 +511,7 @@ void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType group
   this->InvokeEvent(GroupModifiedEvent(groupID));
   this->Modified();
 
-  if (!this->ExistLabel(oldActiveLabel))
+  if (!this->ExistLabel(m_ActiveLabelValue) && !this->ExistLabel(oldActiveLabel))
   { //Active label must be redefined, because it was removed by replacement.
     this->SetActiveLabel(m_LabelMap.empty() ? UNLABELED_VALUE : m_LabelMap.begin()->second->GetValue());
   }

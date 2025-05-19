@@ -48,6 +48,8 @@ found in the LICENSE file.
 #include <mitkImageToContourFilter.h>
 #include <mitkImagePixelReadAccessor.h>
 
+#include <mitkSegGroupOperationApplier.h>
+
 //  Includes for the merge operation
 #include "mitkImageToContourFilter.h"
 #include <mitkLabelSetImage.h>
@@ -1041,6 +1043,8 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   auto timeStep = segmentationGeometry->TimePointToTimeStep(m_TimePoint);
   const mitk::Label::PixelType newDestinationLabel = segmentation->GetActiveLabel()->GetValue();
 
+  mitk::SegGroupModifyUndoRedoHelper undoHelper(segmentation, { segmentation->GetActiveLayer() }, false, timeStep, true, false, true);
+
   TransferLabelContentAtTimeStep(
     interpolatedSegmentation,
     segmentation->GetGroupImage(segmentation->GetActiveLayer()),
@@ -1055,7 +1059,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
   this->Show3DInterpolationResult(false);
 
-  std::string name = segmentationDataNode->GetName() + " 3D-interpolation - " + activeLabelName;
+  std::string name = "3D-interpolation - " + activeLabelName;
   mitk::TimeBounds timeBounds;
 
   if (1 < interpolatedSurface->GetTimeSteps())
@@ -1075,6 +1079,10 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   {
     timeBounds = segmentationGeometry->GetTimeBounds(0);
   }
+
+  undoHelper.RegisterUndoRedoOperationEvent(name);
+
+  name = segmentationDataNode->GetName() + " " + name;
 
   auto* surfaceGeometry = static_cast<mitk::ProportionalTimeGeometry*>(interpolatedSurface->GetTimeGeometry());
   surfaceGeometry->SetFirstTimePoint(timeBounds[0]);

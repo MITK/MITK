@@ -460,7 +460,7 @@ void QmitkSynchronizedNodeSelectionWidget::RemoveFromInternalSelection(mitk::Dat
     emit SelectionModeChanged(false);
   }
 
-  this->RemoveNodeFromSelection(dataNode);
+  this->RemoveNodeFromInternalSelection(dataNode);
 }
 
 bool QmitkSynchronizedNodeSelectionWidget::IsParentNodeSelected(const mitk::DataNode* dataNode) const

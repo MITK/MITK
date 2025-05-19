@@ -337,7 +337,16 @@ void QmitkAbstractNodeSelectionWidget::OnNodeAddedToStorage(const mitk::DataNode
 void QmitkAbstractNodeSelectionWidget::NodeRemovedFromStorage(const mitk::DataNode* node)
 {
   this->OnNodeRemovedFromStorage(node);
-  this->RemoveNodeFromSelection(node);
+
+  //Check external selection and remove deleted node if it is part of it
+  //in order to avoid that the widget keeps a deleted node "alive" that was set externally.
+  auto finding = std::find(std::begin(m_CurrentExternalSelection), std::end(m_CurrentExternalSelection), node);
+  if (finding != std::end(m_CurrentExternalSelection))
+  {
+    m_CurrentExternalSelection.erase(finding);
+  }
+
+  this->RemoveNodeFromInternalSelection(node);
 }
 
 void QmitkAbstractNodeSelectionWidget::OnNodeRemovedFromStorage(const mitk::DataNode* /*node*/)
@@ -354,7 +363,7 @@ void QmitkAbstractNodeSelectionWidget::OnNodeModified(const itk::Object* caller,
     {
       if (m_NodePredicate.IsNotNull() && !m_NodePredicate->CheckNode(node))
       {
-        this->RemoveNodeFromSelection(node);
+        this->RemoveNodeFromInternalSelection(node);
       }
       else
       {
@@ -389,7 +398,7 @@ QmitkAbstractNodeSelectionWidget::NodeList QmitkAbstractNodeSelectionWidget::Com
   return result;
 }
 
-void QmitkAbstractNodeSelectionWidget::RemoveNodeFromSelection(const mitk::DataNode* node)
+void QmitkAbstractNodeSelectionWidget::RemoveNodeFromInternalSelection(const mitk::DataNode* node)
 {
   auto newSelection = m_CurrentInternalSelection;
 

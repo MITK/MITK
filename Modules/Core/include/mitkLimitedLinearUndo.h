@@ -119,6 +119,13 @@ namespace mitk
     //## corresponding to the given values; if nothing found, then returns nullptr
     OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) override;
 
+    /**
+     * @brief Removes invalid operations from the undo/redo stack.
+     * Iterates through m_UndoList and m_RedoList and removes invalid OperationEvents.
+     * @return Number of invalid operations removed
+     */
+    unsigned int RemoveInvalidOperations() override;
+
   protected:
     //##Documentation
     //## Constructor

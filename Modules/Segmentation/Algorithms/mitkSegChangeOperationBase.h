@@ -43,7 +43,7 @@ namespace mitk
     ~SegChangeOperationBase() override = default;
 
     /** \brief Check if it is a valid operation.*/
-    virtual bool IsValid() const;
+    bool IsValid() const override;
 
     mitk::MultiLabelSegmentation::Pointer GetSegmentation();
     const mitk::MultiLabelSegmentation::ConstPointer GetSegmentation() const;

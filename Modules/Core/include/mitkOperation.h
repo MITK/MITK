@@ -31,6 +31,10 @@ namespace mitk
   public:
     mitkClassMacroNoParent(Operation)
 
+    /** Function indicates if the operation is currently still valid and
+     could be conducted. Default implementation returns always true.*/
+    virtual bool IsValid() const;
+
     virtual ~Operation() = default;
     OperationType GetOperationType();
 

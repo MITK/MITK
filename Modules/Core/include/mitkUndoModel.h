@@ -94,6 +94,15 @@ namespace mitk
     //## needed to get the old Position of an Element for declaring an UndoOperation
     virtual OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) = 0;
 
+    /**
+     * @brief Removes invalid operations from the undo/redo stack.
+     *
+     * Iterates through all stored OperationEvents and removes those that are no longer valid.
+     *
+     * @return Number of invalid operations removed
+     */
+    virtual unsigned int RemoveInvalidOperations() = 0;
+
   protected:
     UndoModel(){};
     ~UndoModel() override{};

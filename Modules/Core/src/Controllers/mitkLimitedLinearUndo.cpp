@@ -250,3 +250,43 @@ int mitk::LimitedLinearUndo::FirstObjectEventIdOfCurrentGroup(mitk::LimitedLinea
 
   return firstObjectEventId;
 }
+
+unsigned int mitk::LimitedLinearUndo::RemoveInvalidOperations()
+{
+  unsigned int removedCount = 0;
+
+  // Check undo list and remove invalid operations
+  auto undoIter = m_UndoList.begin();
+  while (undoIter != m_UndoList.end())
+  {
+    if (!(*undoIter)->IsValid())
+    {
+      delete (*undoIter);
+      undoIter = m_UndoList.erase(undoIter);
+      removedCount++;
+    }
+    else
+    {
+      ++undoIter;
+    }
+  }
+
+  // Check redo list and remove invalid operations
+  auto redoIter = m_RedoList.begin();
+  while (redoIter != m_RedoList.end())
+  {
+    if (!(*redoIter)->IsValid())
+    {
+      delete (*redoIter);
+      redoIter = m_RedoList.erase(redoIter);
+      removedCount++;
+    }
+    else
+    {
+      ++redoIter;
+    }
+  }
+
+  InvokeEvent(UndoStackEvent());
+  return removedCount;
+}

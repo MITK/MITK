@@ -20,3 +20,8 @@ mitk::OperationType mitk::Operation::GetOperationType()
 {
   return m_OperationType;
 }
+
+bool mitk::Operation::IsValid() const
+{
+  return true;
+}

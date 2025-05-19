@@ -26,6 +26,96 @@ found in the LICENSE file.
 #include "mitkContourModelSetMapper3D.h"
 #include "mitkContourModelSetWriter.h"
 #include "mitkContourModelWriter.h"
+#include <mitkRTStructMapper2D.h>
+
+namespace
+{
+  bool IsRTStruct(const mitk::BaseData* data)
+  {
+    auto modality = data->GetConstProperty("DICOM.0008.0060");
+    return modality.IsNotNull() && modality->GetValueAsString() == "RTSTRUCT";
+  }
+
+  bool GetPlaneNormalFromSpreadVertices(const mitk::ContourModel* contour, mitk::Vector3D& planeNormal)
+  {
+    if (contour == nullptr)
+      return false;
+
+    const int numVertices = contour->GetNumberOfVertices();
+
+    if (numVertices < 3)
+      return false;
+
+    const auto p0 = contour->GetVertexAt(0)->Coordinates;
+    const auto p1 = contour->GetVertexAt(numVertices / 3)->Coordinates;
+    const auto p2 = contour->GetVertexAt(numVertices * 2 / 3)->Coordinates;
+
+    const auto v1 = p1 - p0;
+    const auto v2 = p2 - p0;
+
+    auto n = itk::CrossProduct(v1, v2);
+
+    if (n.GetNorm() < 1e-6)
+      return false;
+
+    n.Normalize();
+
+    planeNormal = n;
+    return true;
+  }
+
+  bool IsPointOnPlane(const mitk::Point3D& point, const mitk::Point3D& planePoint, const mitk::Vector3D& planeNormal)
+  {
+    return std::abs((point - planePoint) * planeNormal) < 1e-6;
+  }
+
+  bool UseRTStructMapper(const mitk::ContourModelSet* contours)
+  {
+    if (!IsRTStruct(contours))
+      return false;
+
+    const int numContours = contours->GetSize();
+    auto planeNormal = itk::MakeFilled<mitk::Vector3D>(0);
+    auto hasNormal = false;
+
+    for (int contourIndex = 0; contourIndex < numContours; ++contourIndex)
+    {
+      const auto* contour = contours->GetContourModelAt(contourIndex);
+      hasNormal = GetPlaneNormalFromSpreadVertices(contour, planeNormal);
+
+      if (hasNormal)
+        break;
+    }
+
+    if (!hasNormal)
+      return false;
+
+    for (int contourIndex = 0; contourIndex < numContours; ++contourIndex)
+    {
+      const auto* contour = contours->GetContourModelAt(contourIndex);
+
+      if (contour == nullptr)
+        continue;
+
+      const int numVertices = contour->GetNumberOfVertices();
+
+      if (numVertices < 3)
+        continue;
+
+      const auto& planePoint = contour->GetVertexAt(0)->Coordinates;
+
+      for (int vertexIndex = 1; vertexIndex < numVertices; ++vertexIndex)
+      {
+        const auto& point = contour->GetVertexAt(vertexIndex)->Coordinates;
+
+        if (!IsPointOnPlane(point, planePoint, planeNormal))
+          return false;
+      }
+    }
+
+    return true;
+  }
+}
 
 mitk::ContourObjectFactory::ContourObjectFactory() : CoreObjectFactoryBase()
 {
@@ -48,7 +138,6 @@ mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode *n
 
   if (id == mitk::BaseRenderer::Standard2D)
   {
-    std::string classname("ContourModel");
     if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != nullptr)
     {
       newMapper = mitk::ContourModelGLMapper2D::New();
@@ -56,7 +145,15 @@ mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode *n
     }
     else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != nullptr)
     {
-      newMapper = mitk::ContourModelSetGLMapper2D::New();
+      if (UseRTStructMapper(node->GetDataAs<ContourModelSet>()))
+      {
+        newMapper = RTStructMapper2D::New();
+      }
+      else
+      {
+        newMapper = ContourModelSetGLMapper2D::New();
+      }
+
       newMapper->SetDataNode(node);
     }
   }

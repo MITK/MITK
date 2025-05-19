@@ -203,6 +203,8 @@ void mitk::LimitedLinearUndo::SetUndoLimit(std::size_t undoLimit)
       m_UndoList.erase(m_UndoList.begin(), m_UndoList.end() - undoLimit);
     }
     m_UndoLimit = undoLimit;
+
+    InvokeEvent(UndoStackEvent());
   }
 }
 

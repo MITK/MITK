@@ -45,7 +45,8 @@ protected:
 private slots:
   void OnUndoButtonClicked();
   void OnRedoButtonClicked();
-  void OnListSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+  void OnChangeLimitClicked();
+  void OnCheckLimitChanged(bool);
 
 private:
   mitk::VerboseLimitedLinearUndo* GetUndoModel() const;

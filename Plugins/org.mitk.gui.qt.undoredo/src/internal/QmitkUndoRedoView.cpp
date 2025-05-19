@@ -11,7 +11,7 @@
 #include <QMessageBox>
 #include <QStandardItem>
 #include <QIcon>
-
+#include <QInputDialog>
 #include <QmitkStyleManager.h>
 
 const std::string QmitkUndoRedoView::VIEW_ID = "org.mitk.views.undoredoview";
@@ -58,10 +58,8 @@ void QmitkUndoRedoView::CreateQtPartControl(QWidget* parent)
   // Connect signals and slots
   connect(m_Controls->undoButton, SIGNAL(clicked()), this, SLOT(OnUndoButtonClicked()));
   connect(m_Controls->redoButton, SIGNAL(clicked()), this, SLOT(OnRedoButtonClicked()));
-  connect(m_Controls->undoRedoListView->selectionModel(),
-          SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-          this,
-          SLOT(OnListSelectionChanged(const QItemSelection&, const QItemSelection&)));
+  connect(m_Controls->btnLimit, SIGNAL(clicked()), this, SLOT(OnChangeLimitClicked()));
+  connect(m_Controls->checkLimit, &QAbstractButton::toggled, this, &QmitkUndoRedoView::OnCheckLimitChanged);
 
   // Use ITKEventObserver to listen for undo stack changes
   m_UndoStackObserverGuard = mitk::ITKEventObserverGuard(undoModel, mitk::UndoStackEvent(), [this](const itk::EventObject&) {this->OnUndoStackChanged(); });
@@ -110,23 +108,45 @@ void QmitkUndoRedoView::OnRedoButtonClicked()
   }
 }
 
-void QmitkUndoRedoView::OnListSelectionChanged(const QItemSelection& selected, const QItemSelection& /*deselected*/)
+void QmitkUndoRedoView::OnChangeLimitClicked()
 {
-  // User selected an item in the list - we could implement "jump to" functionality here
-  // but currently just using it to show the selection
-  if (selected.indexes().isEmpty())
-    return;
+  auto undoModel = this->GetUndoModel();
+  if (nullptr != undoModel)
+  {
+    bool ok = false;
+    auto newLimit = QInputDialog::getInt(m_Controls->undoRedoListView->parentWidget(), "Select the undo stack limit", "New max undo steps:",undoModel->GetUndoLimit(), 1, 9999, 1, &ok);
+    if (ok)
+    {
+      undoModel->SetUndoLimit(newLimit);
+      this->UpdateUndoRedoList();
+      this->UpdateButtonStatus();
+    }
+ }
+}
 
-  // For now, just updating button status
-  UpdateButtonStatus();
+void QmitkUndoRedoView::OnCheckLimitChanged(bool)
+{
+  auto undoModel = this->GetUndoModel();
+  if (nullptr != undoModel)
+  {
+    if (m_Controls->checkLimit->isChecked() && undoModel->GetUndoLimit() == 0)
+    {
+      undoModel->SetUndoLimit(100);
+    }
+    else if (!m_Controls->checkLimit->isChecked())
+    {
+      undoModel->SetUndoLimit(0);
+    }
+  }
+  this->UpdateButtonStatus();
 }
 
 void QmitkUndoRedoView::OnUndoStackChanged()
 {
   // The undo stack has changed, update our view
   // This is called by the ITK event mechanism when the undo stack changes
-  UpdateUndoRedoList();
-  UpdateButtonStatus();
+  this->UpdateUndoRedoList();
+  this->UpdateButtonStatus();
 }
 
 mitk::VerboseLimitedLinearUndo* QmitkUndoRedoView::GetUndoModel() const
@@ -180,9 +200,27 @@ void QmitkUndoRedoView::UpdateUndoRedoList()
 void QmitkUndoRedoView::UpdateButtonStatus()
 {
   auto undoModel = this->GetUndoModel();
-  if (nullptr == undoModel)
 
-  // Update undo/redo button states
-  m_Controls->undoButton->setEnabled(!undoModel->UndoListEmpty());
-  m_Controls->redoButton->setEnabled(!undoModel->RedoListEmpty());
+  m_Controls->undoRedoListView->setEnabled(nullptr != undoModel);
+
+  m_Controls->undoButton->setEnabled(nullptr != undoModel && !undoModel->UndoListEmpty());
+  m_Controls->redoButton->setEnabled(nullptr != undoModel && !undoModel->RedoListEmpty());
+
+  m_Controls->checkLimit->setEnabled(nullptr != undoModel);
+  m_Controls->checkLimit->setChecked(nullptr != undoModel && undoModel->GetUndoLimit() > 0);
+  m_Controls->labelLimit->setVisible(nullptr != undoModel && m_Controls->checkLimit->isChecked());
+  m_Controls->btnLimit->setVisible(nullptr != undoModel && m_Controls->checkLimit->isChecked());
+  QString limitText = "unknown";
+  if (nullptr != undoModel)
+  {
+    if (undoModel->GetUndoLimit() > 0)
+    {
+      limitText = QString::number(undoModel->GetUndoLimit());
+    }
+    else
+    {
+      limitText = "unlimited";
+    }
+  }
+  m_Controls->labelLimit->setText(limitText);
 }

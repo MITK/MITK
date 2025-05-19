@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+#include <mitkUndoController.h>
 
 // qt
 #include <QKeyEvent>
@@ -96,6 +97,16 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
     if (keySequence == deleteSelectedNodes)
     {
       RemoveAction::Run(dataManagerView->GetSite(), dataStorage, selectedNodes);
+      selectedNodes.clear(); //clear list to avoid smart pointers keeping removed nodes alive.
+      // explicitly trigger undo model again. It is also done in the data storage itself, but
+      // as long as the data manager is active it has no effect, as the data manager keeps
+      // the removed nodes alive due to the list of smart pointer selections.
+      auto undoModel = mitk::UndoController::GetCurrentUndoModel();
+      if (nullptr != undoModel)
+      {
+        undoModel->RemoveInvalidOperations();
+      }
+
       return true;
     }
     if (keySequence == toggleVisibility)
@@ -118,6 +129,7 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
       ShowDetailsAction::Run(selectedNodes);
       return true;
     }
+
   }
   // standard event processing
   return QObject::eventFilter(obj, event);

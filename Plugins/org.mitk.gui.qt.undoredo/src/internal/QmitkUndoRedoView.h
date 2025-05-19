@@ -51,7 +51,7 @@ private:
   mitk::VerboseLimitedLinearUndo* GetUndoModel() const;
   void UpdateUndoRedoList();
   void UpdateButtonStatus();
-  void OnUndoStackChanged(const itk::EventObject& e);
+  void OnUndoStackChanged();
 
   std::unique_ptr<Ui::QmitkUndoRedoViewControls> m_Controls;
   QStandardItemModel* m_UndoRedoModel;

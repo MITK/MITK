@@ -64,9 +64,7 @@ void QmitkUndoRedoView::CreateQtPartControl(QWidget* parent)
           SLOT(OnListSelectionChanged(const QItemSelection&, const QItemSelection&)));
 
   // Use ITKEventObserver to listen for undo stack changes
-  itk::ReceptorMemberCommand<QmitkUndoRedoView>::Pointer command = itk::ReceptorMemberCommand<QmitkUndoRedoView>::New();
-  command->SetCallbackFunction(this, &QmitkUndoRedoView::OnUndoStackChanged);
-  m_UndoStackObserverGuard = mitk::ITKEventObserverGuard(undoModel, mitk::UndoStackEvent(), command);
+  m_UndoStackObserverGuard = mitk::ITKEventObserverGuard(undoModel, mitk::UndoStackEvent(), [this](const itk::EventObject&) {this->OnUndoStackChanged(); });
 
   // Update the view initially
   UpdateUndoRedoList();
@@ -123,7 +121,7 @@ void QmitkUndoRedoView::OnListSelectionChanged(const QItemSelection& selected, c
   UpdateButtonStatus();
 }
 
-void QmitkUndoRedoView::OnUndoStackChanged(const itk::EventObject& /*e*/)
+void QmitkUndoRedoView::OnUndoStackChanged()
 {
   // The undo stack has changed, update our view
   // This is called by the ITK event mechanism when the undo stack changes

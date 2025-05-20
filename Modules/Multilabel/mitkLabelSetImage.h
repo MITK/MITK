@@ -440,6 +440,22 @@ namespace mitk
 
     void ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& newLabels);
 
+    /**
+    * \brief Replaces the labels in the segmentation by their passed counterparts.
+    *
+    * @remark The passed label instances will be cloned before added to ensure clear ownership
+    * of the new labels.
+    * @remark The pixel content of the old labels will not be removed.
+    * @remark In difference to ReplaceGroupLabels only existing labels will be "update" (no matter the group)
+    * no labels will be removed or added.
+    * @param labelsUpdates The vector of label replacements
+    * @pre all label values of labelsUpdates must exist in the segmentation.
+    * @pre new label values must not be used in other groups.
+    */
+    void ReplaceLabels(const ConstLabelVectorType& labelsUpdates);
+
+    void ReplaceLabels(const LabelVectorType& newLabels);
+
     /** Returns the pointer to the image that contains the labeling of the indicate group.
      *@pre groupID must reference an existing group.*/
     mitk::Image* GetGroupImage(GroupIndexType groupID);

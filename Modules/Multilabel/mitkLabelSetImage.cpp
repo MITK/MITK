@@ -522,6 +522,41 @@ void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType group
   return ReplaceGroupLabels(groupID, ConvertLabelVectorConst(labelSet));
 }
 
+void mitk::MultiLabelSegmentation::ReplaceLabels(const ConstLabelVectorType& newLabels)
+{
+  for (auto& label : newLabels)
+  {
+    if (!this->ExistLabel(label->GetValue()))
+    {
+      mitkThrow() << "Trying to replace unknown label. Invalid label value: " << label->GetValue();
+    }
+  }
+
+  {
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+
+    for (auto label : newLabels)
+    {
+      auto clonedLabel = label->Clone();
+
+      this->ReleaseLabel(m_LabelMap[label->GetValue()]);
+        m_LabelMap[label->GetValue()] = clonedLabel;
+      this->RegisterLabel(clonedLabel);
+      clonedLabel->Modified(); //indicate a modification for the label as the
+                               //replacement has overwritten old values
+                               //e.g. relevant for the QmitkMultiLabelTreeModel
+    }
+  }
+
+  this->InvokeEvent(LabelsChangedEvent(ExtractLabelValuesFromLabelVector(newLabels)));
+  this->Modified();
+}
+
+void mitk::MultiLabelSegmentation::ReplaceLabels(const LabelVectorType& newLabels)
+{
+  return ReplaceLabels(ConvertLabelVectorConst(newLabels));
+}
+
 mitk::Image* mitk::MultiLabelSegmentation::GetGroupImage(GroupIndexType groupID)
 {
   if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot return group image. Group ID is invalid. Invalid ID: " << groupID;

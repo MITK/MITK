@@ -68,12 +68,6 @@ void QmitkTotalSegmentatorToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newT
 
 void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
-  if (nullptr == m_Preferences)
-  {
-    this->ShowErrorMessage("Error occurred while loading preferences.");
-    return;
-  }
-
   auto wrapperWidget = new QWidget(this);
   mainLayout->addWidget(wrapperWidget);
   m_Controls->setupUi(wrapperWidget);
@@ -81,7 +75,8 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   this->EnableAll(false);
   m_Controls->statusLabel->setTextFormat(Qt::RichText);
   m_Controls->subtaskComboBox->addItems(VALID_TASKS);
-  this->ToggleLicensedTasks(m_Preferences->GetBool("TotalSeg/haslicense", false));
+  bool hasLicense = m_Preferences->GetBool("TotalSeg/hasLicense", false);
+  this->ToggleLicensedTasks(hasLicense);
   QString welcomeText = "<b>STATUS: </b><i>Welcome to the TotalSegmentator tool.</i>";
   connect(m_Controls->previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   m_Controls->fastBox->setChecked(true);
@@ -112,11 +107,6 @@ void QmitkTotalSegmentatorToolGUI::EnableAll(bool isEnable)
 
 void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
 {
-  if (nullptr == m_Preferences)
-  {
-    this->ShowErrorMessage("Error occurred while loading preferences.");
-    return;
-  }
   auto tool = this->GetConnectedToolAs<mitk::TotalSegmentatorTool>();
   if (nullptr == tool)
   {
@@ -205,7 +195,8 @@ void QmitkTotalSegmentatorToolGUI::OnPreferenceChangedEvent(const mitk::IPrefere
     this->EnableAll(isAvailable);
   }
   this->WriteStatusMessage(text);
-  this->ToggleLicensedTasks(m_Preferences->GetBool("TotalSeg/hasLicense", false));
+  bool hasLicense = m_Preferences->GetBool("TotalSeg/hasLicense", false);
+  this->ToggleLicensedTasks(hasLicense);
 }
 
 void QmitkTotalSegmentatorToolGUI::ToggleLicensedTasks(bool activate)

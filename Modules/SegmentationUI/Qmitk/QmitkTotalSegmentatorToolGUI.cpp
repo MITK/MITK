@@ -81,7 +81,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   this->EnableAll(false);
   m_Controls->statusLabel->setTextFormat(Qt::RichText);
   m_Controls->subtaskComboBox->addItems(VALID_TASKS);
-  this->ToggleLicensedTasks(!m_Preferences->Get("TotalSeg/licenseText", "").empty());
+  this->ToggleLicensedTasks(m_Preferences->GetBool("TotalSeg/haslicense", false));
   QString welcomeText = "<b>STATUS: </b><i>Welcome to the TotalSegmentator tool.</i>";
   connect(m_Controls->previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   m_Controls->fastBox->setChecked(true);
@@ -205,7 +205,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreferenceChangedEvent(const mitk::IPrefere
     this->EnableAll(isAvailable);
   }
   this->WriteStatusMessage(text);
-  this->ToggleLicensedTasks(!m_Preferences->Get("TotalSeg/licenseText", "").empty());
+  this->ToggleLicensedTasks(m_Preferences->GetBool("TotalSeg/hasLicense", false));
 }
 
 void QmitkTotalSegmentatorToolGUI::ToggleLicensedTasks(bool activate)

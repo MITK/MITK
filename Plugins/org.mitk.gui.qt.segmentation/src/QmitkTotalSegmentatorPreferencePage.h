@@ -97,8 +97,17 @@ private:
    */
   void AddOrRemoveLicense(const QString &licenseText);
 
+  /**
+   * @brief Queries Totalsegmentator to fetch and show the
+   * license key on the UI.
+   */
+  void UpdateLicenseBox();
 
-  void UpdateTotalSegPreferencePath();
+  /**
+   * @brief Returns the absolute path of the current python executable
+   * adjusted to the OS
+   */
+  QString GetExactPythonPath();
 
   Ui::QmitkTotalSegmentatorPreferencePage *m_Ui;
   QWidget *m_Control;
@@ -109,7 +118,7 @@ private:
   static const QString WARNING_TOTALSEG_NOT_FOUND;
   static const QString WARNING_PYTHON_NOT_FOUND;
   mitk::IPreferences *m_Preferences;
-  const int LICENCE_KEY_LENGTH = 18;
+  const int LICENSE_KEY_LENGTH = 18;
 
 protected slots:
 

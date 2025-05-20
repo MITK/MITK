@@ -31,6 +31,68 @@ namespace
     auto *preferencesService = mitk::CoreServices::GetPreferencesService();
     return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   }
+
+  // Returns license key if already set
+  QString GetLicenseKey(const QString &pythonPath)
+  {
+    QProcess pyProcess;
+    QString licenseText;
+    pyProcess.start(pythonPath + QDir::separator() +
+#ifdef _WIN32
+                      "python.exe",
+#else
+                      "python3",
+#endif
+                    QStringList() << "-c"
+                                  << "import totalsegmentator.config as tc;"
+                                      "print(tc.get_license_number())",
+                    QProcess::ReadOnly);
+    if (pyProcess.waitForFinished())
+    {
+      licenseText = QString(QStringDecoder(QStringDecoder::Utf8)(pyProcess.readAllStandardOutput()));
+    }
+    return licenseText;
+  }
+
+  // Resets license key to empty string, i.e. no more license
+  QString ResetLicenseKey(const QString &pythonPath)
+  {
+    QProcess pyProcess;
+    QString statusText;
+    pyProcess.start(pythonPath + QDir::separator() + 
+#ifdef _WIN32
+                      "python.exe",
+#else
+                      "python3",
+#endif
+                    QStringList() << "-c"
+                                  << "import totalsegmentator.config as tc;tc.set_license_number('', True);"
+                                     "print('Removed License.')",
+                    QProcess::ReadOnly);
+    if (pyProcess.waitForFinished())
+    {
+      statusText = QString(QStringDecoder(QStringDecoder::Utf8)(pyProcess.readAllStandardOutput()));
+    }
+    return statusText;
+  }
+
+  // Sets Totalseg license key 
+  QString SetLicenseKey(const QString &pythonPath, const QString &licenseText)
+  {
+    QProcess pyProcess;
+    QString statusText;
+    pyProcess.start(pythonPath + QDir::separator() + "totalseg_set_license"
+#ifdef _WIN32
+                      ".exe"
+#endif
+                    ,QStringList() << "-l" << licenseText,
+                     QProcess::ReadOnly);
+    if (pyProcess.waitForFinished())
+    {
+      statusText = QString(QStringDecoder(QStringDecoder::Utf8)(pyProcess.readAllStandardOutput()));
+    }
+    return statusText;
+  }
 }
 
 void QmitkTotalSegmentatorPreferencePage::Init(berry::IWorkbench::Pointer) {}
@@ -99,13 +161,7 @@ void QmitkTotalSegmentatorPreferencePage::CreateQtControl(QWidget *parent)
     m_Ui->installTotalButton->setEnabled(true);
     m_IsInstalled = false;
   }
-
-  m_Ui->licenseBox->setMaxLength(LICENCE_KEY_LENGTH);
-  QString licenseText = QString::fromStdString(m_Preferences->Get("TotalSeg/licenseText", ""));
-  if (!licenseText.isEmpty())
-  {
-    m_Ui->licenseBox->setText(licenseText);
-  }
+  m_Ui->licenseBox->setMaxLength(LICENSE_KEY_LENGTH);
 
   connect(m_Ui->installTotalButton, SIGNAL(clicked()), this, SLOT(OnInstallButtonClicked()));
   connect(m_Ui->clearTotalbutton, SIGNAL(clicked()), this, SLOT(OnClearButtonClicked()));
@@ -119,6 +175,7 @@ void QmitkTotalSegmentatorPreferencePage::CreateQtControl(QWidget *parent)
           [=](int index) { OnSystemPythonChanged(m_Ui->sysPythonComboBox->itemText(index)); });
 
   this->UpdateStatusLabel(); 
+  this->UpdateLicenseBox();
 }
 
 QWidget *QmitkTotalSegmentatorPreferencePage::GetQtControl() const
@@ -132,13 +189,13 @@ bool QmitkTotalSegmentatorPreferencePage::PerformOk()
   m_Preferences->Put("TotalSeg/sysPythonPath", m_SysPythonPath.toStdString());
   m_Preferences->PutBool("TotalSeg/isCustomInstall", m_Ui->overrideBox->isChecked());
   m_Preferences->PutInt("TotalSeg/deviceId", this->FetchSelectedDeviceFromUI());
-  this->UpdateTotalSegPreferencePath();
+  m_Preferences->Put("TotalSeg/totalSegPath", this->GetExactPythonPath().toStdString());
   return true;
 }
 
 void QmitkTotalSegmentatorPreferencePage::PerformCancel()
 {
-  this->UpdateTotalSegPreferencePath();
+  m_Preferences->Put("TotalSeg/totalSegPath", this->GetExactPythonPath().toStdString());
 }
 
 void QmitkTotalSegmentatorPreferencePage::Update(){}
@@ -193,8 +250,7 @@ void QmitkTotalSegmentatorPreferencePage::OnInstallButtonClicked()
           std::string pythonCode; // python syntax to check if torch is installed with CUDA.
           pythonCode.append("import torch;");
           pythonCode.append("print('TotalSegmentator was installed with CUDA') if torch.cuda.is_available() else "
-                            "print('TotalSegmentator was "
-                            "installed WITHOUT CUDA');");
+                            "print('TotalSegmentator was installed WITHOUT CUDA');");
           m_Installer.ExecutePython(pythonCode, &QmitkTotalSegmentatorToolInstaller::PrintProcessEvent);
           return true;
         },
@@ -222,8 +278,8 @@ void QmitkTotalSegmentatorPreferencePage::OnInstallButtonClicked()
     m_Ui->installTotalButton->setDisabled(false);
     this->WriteStatusMessage("<b>ERROR: </b>Couldn't install TotalSegmentator.");
   }
-
   this->UpdateStatusLabel();
+  this->UpdateLicenseBox();
 }
 
 void QmitkTotalSegmentatorPreferencePage::OnClearButtonClicked()
@@ -417,29 +473,24 @@ int QmitkTotalSegmentatorPreferencePage::FetchSelectedDeviceFromUI() const
   }
 }
 
-void QmitkTotalSegmentatorPreferencePage::UpdateTotalSegPreferencePath()
+QString QmitkTotalSegmentatorPreferencePage::GetExactPythonPath()
 {
-  if (nullptr == m_Preferences)
-  {
-    this->ShowErrorMessage("Error occurred while saving preferences");
-    return;
-  }
-  m_Preferences->Put("TotalSeg/totalSegPath", "");
-  if (m_Ui->overrideBox->isChecked()) // check && store installation variables
+  QString pythonPath;
+  if (m_Ui->overrideBox->isChecked())
   {
     QString customInstallPath = this->GetPythonPathFromUI(m_Ui->customEnvComboBox->currentText());
     if (this->IsTotalSegmentatorInstalled(customInstallPath))
     {
-      customInstallPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(customInstallPath).first;
-      m_Preferences->Put("TotalSeg/totalSegPath", customInstallPath.toStdString());
+      pythonPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(customInstallPath).first;
     }
   }
   else
   {
     QString installPath = m_Installer.GetExactPythonPath(m_Installer.GetVirtualEnvPath()).first;
     if (this->IsTotalSegmentatorInstalled(installPath))
-      m_Preferences->Put("TotalSeg/totalSegPath", installPath.toStdString());
+      pythonPath = installPath;
   }
+  return pythonPath;
 }
 
 void QmitkTotalSegmentatorPreferencePage::ShowErrorMessage(const QString &message, QMessageBox::Icon icon)
@@ -465,32 +516,26 @@ void QmitkTotalSegmentatorPreferencePage::WriteStatusMessage(const QString &mess
 
 void QmitkTotalSegmentatorPreferencePage::OnApplyButtonClicked() 
 {
-  QString licenseText = m_Ui->licenseBox->text();
+  QString licenseText = m_Ui->licenseBox->text().trimmed();
   this->AddOrRemoveLicense(licenseText);
 }
 
 void QmitkTotalSegmentatorPreferencePage::AddOrRemoveLicense(const QString &licenseText)
 {
-  std::string pythonPath = m_Preferences->Get("TotalSeg/totalSegPath", "");
-  if (pythonPath.empty())
+  QString pythonPath = this->GetExactPythonPath();
+  if (pythonPath.isEmpty())
   {
     this->ShowErrorMessage("TotalSegmentator not found to apply the license key.");
     return;
   }
-  QProcess pyProcess;
-  if (licenseText.isEmpty()) // remove licence key
+  QString statusResponse;
+  if (licenseText.isEmpty()) // remove license key
   {
-    pyProcess.start(QString::fromStdString(pythonPath) + QDir::separator() + "python.exe",
-                    QStringList() << "-c"
-                                  << "import totalsegmentator.config as tc;tc.set_license_number('', True);"
-                                     "print('Removed License.')",
-                    QProcess::ReadOnly);
+    statusResponse = ::ResetLicenseKey(pythonPath);
   }
-  else if (licenseText.length() == LICENCE_KEY_LENGTH) // apply valid license
+  else if (licenseText.length() == LICENSE_KEY_LENGTH) // apply valid license
   {
-    pyProcess.start(QString::fromStdString(pythonPath) + QDir::separator() + "totalseg_set_license.exe",
-                    QStringList() << "-l" << licenseText,
-                    QProcess::ReadOnly);
+    statusResponse = ::SetLicenseKey(pythonPath, licenseText);
   }
   else
   {
@@ -499,12 +544,17 @@ void QmitkTotalSegmentatorPreferencePage::AddOrRemoveLicense(const QString &lice
     MITK_INFO << errorText;
     return;
   }
-  if (pyProcess.waitForFinished())
-  {
-    QString statusText = QString(QStringDecoder(QStringDecoder::Utf8)(pyProcess.readAllStandardOutput()));
-    MITK_INFO << statusText;
-    this->WriteStatusMessage(statusText);
-    if (!statusText.startsWith("ERROR"))
-      m_Preferences->Put("TotalSeg/licenseText", licenseText.toStdString());
-  }
+  this->WriteStatusMessage(statusResponse);
+  if (statusResponse.startsWith("ERROR") || statusResponse.startsWith("Removed"))
+    m_Preferences->PutBool("TotalSeg/hasLicense", false);
+  else
+    m_Preferences->PutBool("TotalSeg/hasLicense", true);
+}
+
+void QmitkTotalSegmentatorPreferencePage::UpdateLicenseBox()
+{
+  QString pythonPath = this->GetExactPythonPath();
+  m_Ui->licenseBox->clear();
+  if (!pythonPath.isEmpty())// populate license text box
+    m_Ui->licenseBox->setText(::GetLicenseKey(pythonPath));
 }

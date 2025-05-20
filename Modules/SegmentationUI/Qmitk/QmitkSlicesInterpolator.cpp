@@ -48,7 +48,7 @@ found in the LICENSE file.
 #include <mitkImageToContourFilter.h>
 #include <mitkImagePixelReadAccessor.h>
 
-#include <mitkSegGroupOperationApplier.h>
+#include <mitkSegChangeOperationApplier.h>
 
 //  Includes for the merge operation
 #include "mitkImageToContourFilter.h"

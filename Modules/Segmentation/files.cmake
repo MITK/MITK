@@ -17,12 +17,11 @@ set(CPP_FILES
   Algorithms/mitkSegmentationHelper.cpp
   Algorithms/mitkSegmentationObjectFactory.cpp
   Algorithms/mitkSegChangeOperationBase.cpp
+  Algorithms/mitkSegChangeOperationApplier.cpp
   Algorithms/mitkSegGroupInsertOperation.cpp
   Algorithms/mitkSegGroupModifyOperation.cpp
   Algorithms/mitkSegGroupRemoveOperation.cpp
-  Algorithms/mitkSegGroupOperationApplier.cpp
   Algorithms/mitkSegSliceOperation.cpp
-  Algorithms/mitkSegSliceOperationApplier.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp

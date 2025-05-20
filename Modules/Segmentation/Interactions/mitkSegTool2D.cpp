@@ -42,7 +42,7 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 
 #include <mitkUndoController.h>
-#include <mitkSegSliceOperationApplier.h>
+#include <mitkSegChangeOperationApplier.h>
 
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkLabelSetImage.h"
@@ -653,7 +653,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
           // create an operation event for the undo stack
           UndoStackItem::IncCurrObjectEventId();
           OperationEvent* undoStackItem =
-            new OperationEvent(SegSliceOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation "+toolName);
+            new OperationEvent(SegChangeOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation "+toolName);
 
           // add it to the undo controller
           UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);

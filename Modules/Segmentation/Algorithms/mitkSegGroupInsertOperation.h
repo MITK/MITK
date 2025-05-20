@@ -22,7 +22,7 @@ namespace mitk
   class Image;
 
   /** \brief An Operation for applying an edited slice to the a group of a MultiLabelSegmentation.
-    \sa SegGroupOperationApplier
+    \sa SegChangeOperationApplier
     This Operation can be used to realize undo-redo functionality for e.g. segmentation purposes.
   */
   class MITKSEGMENTATION_EXPORT SegGroupInsertOperation : public SegChangeOperationBase

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSegGroupOperationApplier_h
-#define mitkSegGroupOperationApplier_h
+#ifndef mitkSegChangeOperationApplier_h
+#define mitkSegChangeOperationApplier_h
 
 #include "mitkCommon.h"
 #include <mitkOperationActor.h>
@@ -19,16 +19,16 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** \brief Executes a SegGroupModifyOperation.
+  /** \brief Executes a all operations based on SegChangeOperationBase.
     \sa SegGroupModifyOperation
   */
-  class MITKSEGMENTATION_EXPORT SegGroupOperationApplier : public OperationActor
+  class MITKSEGMENTATION_EXPORT SegChangeOperationApplier : public OperationActor
   {
   public:
-    mitkClassMacroNoParent(SegGroupOperationApplier)
+    mitkClassMacroNoParent(SegChangeOperationApplier)
 
       /** \brief Returns an instance of the class */
-      static SegGroupOperationApplier *GetInstance();
+      static SegChangeOperationApplier *GetInstance();
 
     /** \brief Executes a SegGroupModifyOperation.
       \sa SegGroupModifyOperation
@@ -38,9 +38,9 @@ namespace mitk
     void ExecuteOperation(Operation *op) override;
 
   protected:
-    SegGroupOperationApplier();
+    SegChangeOperationApplier();
 
-    ~SegGroupOperationApplier() override;
+    ~SegChangeOperationApplier() override;
   };
 
 

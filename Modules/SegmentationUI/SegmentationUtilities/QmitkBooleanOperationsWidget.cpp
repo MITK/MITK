@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <mitkBooleanOperation.h>
 #include <mitkProgressBar.h>
 #include <mitkLabelSetImageHelper.h>
-#include <mitkSegGroupOperationApplier.h>
+#include <mitkSegChangeOperationApplier.h>
 
 
 QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)

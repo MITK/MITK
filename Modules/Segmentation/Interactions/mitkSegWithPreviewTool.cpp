@@ -30,7 +30,7 @@ found in the LICENSE file.
 #include "mitkNodePredicateGeometry.h"
 #include "mitkSegTool2D.h"
 
-#include <mitkSegGroupOperationApplier.h>
+#include <mitkSegChangeOperationApplier.h>
 
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {

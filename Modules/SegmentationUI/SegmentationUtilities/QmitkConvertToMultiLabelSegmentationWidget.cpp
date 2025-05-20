@@ -34,7 +34,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkLabelSetImageConverter.h>
-#include <mitkSegGroupOperationApplier.h>
+#include <mitkSegChangeOperationApplier.h>
 
 #include <QmitkNodeSelectionDialog.h>
 #include <QMessageBox>

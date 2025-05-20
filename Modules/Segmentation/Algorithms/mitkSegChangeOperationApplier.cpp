@@ -10,11 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegGroupOperationApplier.h"
+#include "mitkSegChangeOperationApplier.h"
 
 #include "mitkSegGroupModifyOperation.h"
 #include "mitkSegGroupInsertOperation.h"
 #include "mitkSegGroupRemoveOperation.h"
+#include "mitkSegSliceOperation.h"
+
+#include "mitkSegTool2D.h"
 #include "mitkRenderingManager.h"
 
 #include <mitkUndoController.h>
@@ -22,23 +25,24 @@ found in the LICENSE file.
 // VTK
 #include <vtkSmartPointer.h>
 
-mitk::SegGroupOperationApplier::SegGroupOperationApplier()
+mitk::SegChangeOperationApplier::SegChangeOperationApplier()
 {
 }
 
-mitk::SegGroupOperationApplier::~SegGroupOperationApplier()
+mitk::SegChangeOperationApplier::~SegChangeOperationApplier()
 {
 }
 
-void mitk::SegGroupOperationApplier::ExecuteOperation(Operation *operation)
+void mitk::SegChangeOperationApplier::ExecuteOperation(Operation *operation)
 {
   auto* segOperation = dynamic_cast<SegChangeOperationBase*>(operation);
   auto* modOperation = dynamic_cast<SegGroupModifyOperation *>(operation);
   auto* insertOperation = dynamic_cast<SegGroupInsertOperation*>(operation);
   auto* removeOperation = dynamic_cast<SegGroupRemoveOperation*>(operation);
+  auto* segSliceOperation = dynamic_cast<SegSliceOperation*>(operation);
 
   // check if the operation is valid
-  if (!segOperation->IsValid())
+  if (nullptr != segOperation || !segOperation->IsValid())
     return;
 
   if (nullptr != modOperation)
@@ -95,12 +99,17 @@ void mitk::SegGroupOperationApplier::ExecuteOperation(Operation *operation)
       segmentation->RemoveGroup(groupID);
     }
   }
-
+  else if (segSliceOperation->IsValid())
+  {
+    auto relevantGroupImage = segSliceOperation->GetSegmentation()->GetGroupImage(segSliceOperation->GetGroupID());
+    SegTool2D::WriteSliceToVolume(relevantGroupImage, segSliceOperation->GetSlicePlaneGeometry(), segSliceOperation->GetSlice(), segSliceOperation->GetTimeStep());
+    SegTool2D::UpdateAllSurfaceInterpolations(segSliceOperation->GetSegmentation(), segSliceOperation->GetTimeStep(), segSliceOperation->GetSlicePlaneGeometry(), true);
+  }
 }
 
-mitk::SegGroupOperationApplier *mitk::SegGroupOperationApplier::GetInstance()
+mitk::SegChangeOperationApplier *mitk::SegChangeOperationApplier::GetInstance()
 {
-  static auto *s_Instance = new SegGroupOperationApplier();
+  static auto *s_Instance = new SegChangeOperationApplier();
   return s_Instance;
 }
 
@@ -134,7 +143,7 @@ void mitk::SegGroupModifyUndoRedoHelper::RegisterUndoRedoOperationEvent(const st
       m_NoLabels, m_NoGroupImages, m_NoNames);
 
   OperationEvent* undoStackItem =
-    new OperationEvent(SegGroupOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
+    new OperationEvent(SegChangeOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
   m_UndoOperation = nullptr; //Ownership is no at undoStackItem
 
   UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
@@ -166,7 +175,7 @@ void mitk::SegGroupInsertUndoRedoHelper::RegisterUndoRedoOperationEvent(const st
     SegGroupInsertOperation::CreatFromSegmentation(m_Segmentation, m_RelevantGroupIDs, m_NoLabels, m_NoGroupImages);
 
   OperationEvent* undoStackItem =
-    new OperationEvent(SegGroupOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
+    new OperationEvent(SegChangeOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
   m_UndoOperation = nullptr; //Ownership is no at undoStackItem
 
   UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
@@ -197,7 +206,7 @@ void mitk::SegGroupRemoveUndoRedoHelper::RegisterUndoRedoOperationEvent(const st
   auto redoOperation = new SegGroupRemoveOperation(m_Segmentation, m_RelevantGroupIDs);
 
   OperationEvent* undoStackItem =
-    new OperationEvent(SegGroupOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
+    new OperationEvent(SegChangeOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
   m_UndoOperation = nullptr; //Ownership is no at undoStackItem
 
   UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);

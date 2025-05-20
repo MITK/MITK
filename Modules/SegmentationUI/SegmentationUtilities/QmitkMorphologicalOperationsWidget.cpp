@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkProgressBar.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkLabelSetImageHelper.h>
-#include <mitkSegGroupOperationApplier.h>
+#include <mitkSegChangeOperationApplier.h>
 
 QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
   : QWidget(parent)

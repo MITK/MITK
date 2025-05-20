@@ -15,9 +15,7 @@ found in the LICENSE file.
 #include <mitkMultiLabelEvents.h>
 #include <mitkRenderingManager.h>
 #include <mitkLabelSetImageHelper.h>
-#include <mitkSegGroupOperationApplier.h>
-
-#include <mitkSegGroupOperationApplier.h>
+#include <mitkSegChangeOperationApplier.h>
 
 #include <QmitkStyleManager.h>
 

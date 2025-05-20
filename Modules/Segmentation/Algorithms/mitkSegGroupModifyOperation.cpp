@@ -94,6 +94,9 @@ mitk::SegGroupModifyOperation* mitk::SegGroupModifyOperation::CreatFromSegmentat
   bool coverAllTimeSteps, TimeStepType relevantTimeStep,
   bool noLabels, bool noGroupImages, bool noNames)
 {
+  if (nullptr == segmentation)
+    mitkThrow() << "Invalid call of CreatFromSegmentation. Segmentation is not valid (nullptr).";
+
   if (noLabels && noGroupImages && noNames)
     mitkThrow() << "Invalid call of mitk::SegGroupModifyOperation::CreatFromSegmentation. Arguments noLabels, noGroupImages and noNames must not be both true at the same time.";
 

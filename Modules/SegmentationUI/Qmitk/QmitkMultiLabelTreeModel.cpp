@@ -931,7 +931,14 @@ void QmitkMultiLabelTreeModel::OnLabelModified(LabelValueType labelValue)
   if (nullptr == instanceItem)
   {
     mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel received a LabelModified signal for a label that is not represented in the model. Invalid label: " << labelValue;
-    mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel received a LabelModified signal for a label that is not represented in the model. Invalid label: " << labelValue;
+  }
+
+  auto internalLabel = instanceItem->GetLabel();
+  auto segLabel = m_Segmentation->GetLabel(labelValue);
+  if (segLabel != internalLabel)
+  { //label instance has been changed in the segmentation instance
+    //we have to update internal pointer
+    instanceItem->m_Label = segLabel;
   }
 
   auto labelItem = instanceItem->ParentItem();

@@ -1449,6 +1449,8 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
   auto relevantLabelValues = this->GetCurrentlyAffactedLabelInstances();
   auto currentLabel = this->GetCurrentLabel();
 
+  mitk::SegLabelPropModifyUndoRedoHelper undoRedoHelper(m_Segmentation, relevantLabelValues);
+
   bool canceled = false;
   emit LabelRenameRequested(currentLabel, true, canceled);
 
@@ -1465,7 +1467,6 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
       label->SetName(currentLabel->GetName());
       label->SetColor(currentLabel->GetColor());
       m_Segmentation->UpdateLookupTable(label->GetValue());
-      m_Segmentation->GetLookupTable()->Modified();
       mitk::DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 
       // this is needed as workaround for (T27307). It circumvents the fact that modifications
@@ -1478,6 +1479,9 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
       }
     }
   }
+  m_Segmentation->GetLookupTable()->Modified();
+
+  undoRedoHelper.RegisterUndoRedoOperationEvent("Change label name/color");
   emit ModelUpdated();
 }
 

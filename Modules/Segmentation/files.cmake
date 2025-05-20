@@ -21,6 +21,7 @@ set(CPP_FILES
   Algorithms/mitkSegGroupInsertOperation.cpp
   Algorithms/mitkSegGroupModifyOperation.cpp
   Algorithms/mitkSegGroupRemoveOperation.cpp
+  Algorithms/mitkSegLabelPropModifyOperation.cpp
   Algorithms/mitkSegSliceOperation.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp

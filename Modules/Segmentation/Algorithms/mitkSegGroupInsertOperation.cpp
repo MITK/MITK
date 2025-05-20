@@ -93,6 +93,9 @@ mitk::SegGroupInsertOperation* mitk::SegGroupInsertOperation::CreatFromSegmentat
   const GroupIndexSetType& relevantGroupIDs,
   bool noLabels, bool noGroupImages)
 {
+  if (nullptr == segmentation)
+    mitkThrow() << "Invalid call of CreatFromSegmentation. Segmentation is not valid (nullptr).";
+
   SegGroupInsertOperation::ModifyLabelsMapType labelData;
   SegGroupInsertOperation::ModifyGroupImageMapType imageData;
 

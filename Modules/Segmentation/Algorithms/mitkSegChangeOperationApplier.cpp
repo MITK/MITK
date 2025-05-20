@@ -12,13 +12,14 @@ found in the LICENSE file.
 
 #include "mitkSegChangeOperationApplier.h"
 
-#include "mitkSegGroupModifyOperation.h"
-#include "mitkSegGroupInsertOperation.h"
-#include "mitkSegGroupRemoveOperation.h"
-#include "mitkSegSliceOperation.h"
+#include <mitkSegLabelPropModifyOperation.h>
+#include <mitkSegGroupModifyOperation.h>
+#include <mitkSegGroupInsertOperation.h>
+#include <mitkSegGroupRemoveOperation.h>
+#include <mitkSegSliceOperation.h>
 
-#include "mitkSegTool2D.h"
-#include "mitkRenderingManager.h"
+#include <mitkSegTool2D.h>
+#include <mitkRenderingManager.h>
 
 #include <mitkUndoController.h>
 
@@ -39,15 +40,16 @@ void mitk::SegChangeOperationApplier::ExecuteOperation(Operation *operation)
   auto* modOperation = dynamic_cast<SegGroupModifyOperation *>(operation);
   auto* insertOperation = dynamic_cast<SegGroupInsertOperation*>(operation);
   auto* removeOperation = dynamic_cast<SegGroupRemoveOperation*>(operation);
-  auto* segSliceOperation = dynamic_cast<SegSliceOperation*>(operation);
+  auto* sliceOperation = dynamic_cast<SegSliceOperation*>(operation);
+  auto* labelPropModOperation = dynamic_cast<SegLabelPropModifyOperation*>(operation);
 
   // check if the operation is valid
-  if (nullptr != segOperation || !segOperation->IsValid())
+  if (nullptr == segOperation || !segOperation->IsValid())
     return;
 
+  auto segmentation = segOperation->GetSegmentation();
   if (nullptr != modOperation)
   {
-    auto segmentation = modOperation->GetSegmentation();
     bool modified = false;
 
     for (auto modifiedImageGroupID : modOperation->GetImageGroupIDs())
@@ -75,8 +77,6 @@ void mitk::SegChangeOperationApplier::ExecuteOperation(Operation *operation)
   }
   else if (nullptr != insertOperation)
   {
-    auto segmentation = insertOperation->GetSegmentation();
-
     for (auto groupID : insertOperation->GetGroupIDs())
     {
       auto groupImage = insertOperation->GetGroupImage(groupID);
@@ -92,18 +92,21 @@ void mitk::SegChangeOperationApplier::ExecuteOperation(Operation *operation)
   }
   else if (nullptr != removeOperation)
   {
-    auto segmentation = removeOperation->GetSegmentation();
-
     for (auto groupID : removeOperation->GetGroupIDs())
     {
       segmentation->RemoveGroup(groupID);
     }
   }
-  else if (segSliceOperation->IsValid())
+  else if (nullptr != sliceOperation)
   {
-    auto relevantGroupImage = segSliceOperation->GetSegmentation()->GetGroupImage(segSliceOperation->GetGroupID());
-    SegTool2D::WriteSliceToVolume(relevantGroupImage, segSliceOperation->GetSlicePlaneGeometry(), segSliceOperation->GetSlice(), segSliceOperation->GetTimeStep());
-    SegTool2D::UpdateAllSurfaceInterpolations(segSliceOperation->GetSegmentation(), segSliceOperation->GetTimeStep(), segSliceOperation->GetSlicePlaneGeometry(), true);
+    auto relevantGroupImage = segmentation->GetGroupImage(sliceOperation->GetGroupID());
+    SegTool2D::WriteSliceToVolume(relevantGroupImage, sliceOperation->GetSlicePlaneGeometry(), sliceOperation->GetSlice(), sliceOperation->GetTimeStep());
+    SegTool2D::UpdateAllSurfaceInterpolations(segmentation, sliceOperation->GetTimeStep(), sliceOperation->GetSlicePlaneGeometry(), true);
+  }
+  else if (nullptr != labelPropModOperation)
+  {
+    auto segmentation = labelPropModOperation->GetSegmentation();
+    segmentation->ReplaceLabels(labelPropModOperation->GetModifiedLabels());
   }
 }
 
@@ -144,7 +147,7 @@ void mitk::SegGroupModifyUndoRedoHelper::RegisterUndoRedoOperationEvent(const st
 
   OperationEvent* undoStackItem =
     new OperationEvent(SegChangeOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
-  m_UndoOperation = nullptr; //Ownership is no at undoStackItem
+  m_UndoOperation = nullptr; //Ownership is now at undoStackItem
 
   UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
 }
@@ -176,7 +179,7 @@ void mitk::SegGroupInsertUndoRedoHelper::RegisterUndoRedoOperationEvent(const st
 
   OperationEvent* undoStackItem =
     new OperationEvent(SegChangeOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
-  m_UndoOperation = nullptr; //Ownership is no at undoStackItem
+  m_UndoOperation = nullptr; //Ownership is now at undoStackItem
 
   UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
 }
@@ -207,7 +210,37 @@ void mitk::SegGroupRemoveUndoRedoHelper::RegisterUndoRedoOperationEvent(const st
 
   OperationEvent* undoStackItem =
     new OperationEvent(SegChangeOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
-  m_UndoOperation = nullptr; //Ownership is no at undoStackItem
+  m_UndoOperation = nullptr; //Ownership is now at undoStackItem
+
+  UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
+}
+
+mitk::SegLabelPropModifyUndoRedoHelper::SegLabelPropModifyUndoRedoHelper(MultiLabelSegmentation* segmentation,
+  const MultiLabelSegmentation::LabelValueVectorType& relevantLabels) :
+  m_Segmentation(segmentation), m_RelevantLabels(relevantLabels), m_UndoOperation(nullptr)
+{
+  m_UndoOperation = SegLabelPropModifyOperation::CreatFromSegmentation(m_Segmentation, m_RelevantLabels);
+}
+
+mitk::SegLabelPropModifyUndoRedoHelper::~SegLabelPropModifyUndoRedoHelper()
+{
+  if (nullptr != m_UndoOperation)
+    delete m_UndoOperation;
+};
+
+void mitk::SegLabelPropModifyUndoRedoHelper::RegisterUndoRedoOperationEvent(const std::string& description)
+{
+  if (nullptr == m_UndoOperation)
+    mitkThrow() << "Invalid usage of SegLabelPropModifyUndoRedoHelper. You can only call RegisterUndoRedoOperationEvent once.";
+
+  UndoStackItem::IncCurrGroupEventId();
+  UndoStackItem::IncCurrObjectEventId();
+
+  auto redoOperation = SegLabelPropModifyOperation::CreatFromSegmentation(m_Segmentation, m_RelevantLabels);
+
+  OperationEvent* undoStackItem =
+    new OperationEvent(SegChangeOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
+  m_UndoOperation = nullptr; //Ownership is now at undoStackItem
 
   UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
 }

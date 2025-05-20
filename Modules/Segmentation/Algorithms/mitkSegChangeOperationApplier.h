@@ -118,5 +118,24 @@ namespace mitk
     SegChangeOperationBase* m_UndoOperation;
   };
 
+  class MITKSEGMENTATION_EXPORT SegLabelPropModifyUndoRedoHelper
+  {
+  public:
+
+    /** \brief */
+    SegLabelPropModifyUndoRedoHelper(MultiLabelSegmentation* segmentation,
+      const MultiLabelSegmentation::LabelValueVectorType& relevantLabels);
+
+    ~SegLabelPropModifyUndoRedoHelper();
+
+    void RegisterUndoRedoOperationEvent(const std::string& description);
+
+  protected:
+    MultiLabelSegmentation::Pointer m_Segmentation;
+    MultiLabelSegmentation::LabelValueVectorType m_RelevantLabels;
+
+
+    SegChangeOperationBase* m_UndoOperation;
+  };
 }
 #endif

@@ -477,10 +477,12 @@ void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
   {
     std::string foreground = this->ConvertPointsAsListString(baseGeometry, m_PointSetPositive);
     std::string background = this->ConvertPointsAsListString(baseGeometry, m_PointSetNegative);
+    bool resetState = (m_PointSetPositive->GetSize() == 1 && m_PointSetNegative->GetSize() == 0);
     std::stringstream paramString;
     paramString << "{" 
                 << "\"foreground\":" << foreground 
                 << ",\"background\":" << background
+                << ",\"reset_state\":" << (resetState ? "true" : "false")
                 << "}";
     MITK_DEBUG << paramString.str();
     items.push_back({"params", paramString.str(), "", ""});

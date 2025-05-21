@@ -356,7 +356,7 @@ void QmitkSynchronizedNodeSelectionWidget::OnNodeAddedToStorage(const mitk::Data
 
 
   bool visibleInRenderer = false;
-  if (node->PropertyExists("visible", baseRenderer))
+  if (node->PropertyIsOwned("visible", baseRenderer->GetName(), false))
     node->GetBoolProperty("visible", visibleInRenderer, baseRenderer);
   // The selection mode determines if we want to show all nodes from the data storage
   // or use a local selected list of nodes.

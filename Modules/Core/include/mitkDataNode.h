@@ -581,12 +581,6 @@ namespace mitk
      */
     unsigned long GetDataReferenceChangedTime() const { return m_DataReferenceChangedTime.GetMTime(); }
 
-    /*
-    * \brief Check if a given property exists for a specific renderer. If no renderer
-    * is specified, checks for general properties.
-    */
-    bool PropertyExists(const char* propertyKey, const mitk::BaseRenderer* renderer = nullptr) const;
-
   protected:
     DataNode();
 

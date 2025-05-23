@@ -354,6 +354,10 @@ void QmitkSynchronizedNodeSelectionWidget::OnNodeAddedToStorage(const mitk::Data
     return;
   }
 
+
+  bool visibleInRenderer = false;
+  if (node->PropertyIsOwned("visible", baseRenderer->GetName(), false))
+    node->GetBoolProperty("visible", visibleInRenderer, baseRenderer);
   // The selection mode determines if we want to show all nodes from the data storage
   // or use a local selected list of nodes.
   // We need to hide each new incoming data node, if we use a local selection,
@@ -361,9 +365,10 @@ void QmitkSynchronizedNodeSelectionWidget::OnNodeAddedToStorage(const mitk::Data
   // We need to add the incoming node to our selection, if the selection mode check box
   // is checked.
   // We want to add the incoming node to our selection, if the node is a child node
-  // of an already selected node.
+  // of an already selected node or it is already explicitly visible for this renderer
+  // via properties.
   // Nodes added to the selection will be made visible.
-  if (m_Controls.selectionModeCheckBox->isChecked() || this->IsParentNodeSelected(node))
+  if (m_Controls.selectionModeCheckBox->isChecked() || this->IsParentNodeSelected(node) || visibleInRenderer)
   {
     auto currentSelection = this->GetCurrentInternalSelection();
     // Check if the nodes is already part of the internal selection.

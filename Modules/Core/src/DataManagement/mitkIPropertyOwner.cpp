@@ -15,3 +15,15 @@ found in the LICENSE file.
 mitk::IPropertyOwner::~IPropertyOwner()
 {
 }
+
+bool mitk::IPropertyOwner::PropertyIsOwned(const std::string& propertyKey,
+                                           const std::string& contextName /* = "" */,
+                                           bool fallBackOnDefaultContext /* = true */) const
+{
+  auto keys = this->GetPropertyKeys(contextName, fallBackOnDefaultContext);
+
+  if (std::find(keys.begin(), keys.end(), propertyKey) != keys.end())
+    return true;
+  else
+    return false;
+}

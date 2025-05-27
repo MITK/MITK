@@ -1498,7 +1498,10 @@ us_tinfl_status us_tinfl_decompress(us_tinfl_decompressor *r, const us_mz_uint8 
       {
         us_mz_uint8 *p = r->m_tables[0].m_code_size; us_mz_uint i;
         r->m_table_sizes[0] = 288; r->m_table_sizes[1] = 32; US_TINFL_MEMSET(r->m_tables[1].m_code_size, 5, 32);
-        for ( i = 0; i <= 143; ++i) *p++ = 8; for ( ; i <= 255; ++i) *p++ = 9; for ( ; i <= 279; ++i) *p++ = 7; for ( ; i <= 287; ++i) *p++ = 8;
+        for ( i = 0; i <= 143; ++i) *p++ = 8;
+        for ( ; i <= 255; ++i) *p++ = 9;
+        for ( ; i <= 279; ++i) *p++ = 7;
+        for ( ; i <= 287; ++i) *p++ = 8;
       }
       else
       {
@@ -1910,8 +1913,8 @@ static void us_tdefl_optimize_huffman_table(us_tdefl_compressor *d, int table_nu
   while (d->m_bits_in >= 8) { \
     if (d->m_pOutput_buf < d->m_pOutput_buf_end) \
       *d->m_pOutput_buf++ = (us_mz_uint8)(d->m_bit_buffer); \
-      d->m_bit_buffer >>= 8; \
-      d->m_bits_in -= 8; \
+    d->m_bit_buffer >>= 8; \
+    d->m_bits_in -= 8; \
   } \
 } US_MZ_MACRO_END
 
@@ -2282,12 +2285,15 @@ static US_MZ_FORCEINLINE void us_tdefl_find_match(us_tdefl_compressor *d, us_mz_
         if (US_TDEFL_READ_UNALIGNED_WORD(&d->m_dict[probe_pos + match_len - 1]) == c01) break;
       US_TDEFL_PROBE; US_TDEFL_PROBE; US_TDEFL_PROBE;
     }
-    if (!dist) break; q = (const us_mz_uint16*)(d->m_dict + probe_pos); if (US_TDEFL_READ_UNALIGNED_WORD(q) != s01) continue; p = s; probe_len = 32;
+    if (!dist) break;
+    q = (const us_mz_uint16*)(d->m_dict + probe_pos);
+    if (US_TDEFL_READ_UNALIGNED_WORD(q) != s01) continue;
+    p = s; probe_len = 32;
     do { } while ( (US_TDEFL_READ_UNALIGNED_WORD(++p) == US_TDEFL_READ_UNALIGNED_WORD(++q)) && (US_TDEFL_READ_UNALIGNED_WORD(++p) == US_TDEFL_READ_UNALIGNED_WORD(++q)) &&
                    (US_TDEFL_READ_UNALIGNED_WORD(++p) == US_TDEFL_READ_UNALIGNED_WORD(++q)) && (US_TDEFL_READ_UNALIGNED_WORD(++p) == US_TDEFL_READ_UNALIGNED_WORD(++q)) && (--probe_len > 0) );
     if (!probe_len)
     {
-      *pMatch_dist = dist; *pMatch_len = US_MZ_MIN(max_match_len, US_TDEFL_MAX_MATCH_LEN); break;
+      *pMatch_dist = dist; *pMatch_len = US_MZ_MIN(max_match_len, (us_mz_uint)US_TDEFL_MAX_MATCH_LEN); break;
     }
     else if ((probe_len = ((us_mz_uint)(p - s) * 2) + (us_mz_uint)(*(const us_mz_uint8*)p == *(const us_mz_uint8*)q)) > match_len)
     {
@@ -2415,7 +2421,7 @@ static us_mz_bool us_tdefl_compress_fast(us_tdefl_compressor *d)
 
       total_lz_bytes += cur_match_len;
       lookahead_pos += cur_match_len;
-      dict_size = US_MZ_MIN(dict_size + cur_match_len, US_TDEFL_LZ_DICT_SIZE);
+      dict_size = US_MZ_MIN(dict_size + cur_match_len, (us_mz_uint)US_TDEFL_LZ_DICT_SIZE);
       cur_pos = (cur_pos + cur_match_len) & US_TDEFL_LZ_DICT_SIZE_MASK;
       US_MZ_ASSERT(lookahead_size >= cur_match_len);
       lookahead_size -= cur_match_len;
@@ -2443,7 +2449,7 @@ static us_mz_bool us_tdefl_compress_fast(us_tdefl_compressor *d)
       d->m_huff_count[0][lit]++;
 
       lookahead_pos++;
-      dict_size = US_MZ_MIN(dict_size + 1, US_TDEFL_LZ_DICT_SIZE);
+      dict_size = US_MZ_MIN(dict_size + 1, (us_mz_uint)US_TDEFL_LZ_DICT_SIZE);
       cur_pos = (cur_pos + 1) & US_TDEFL_LZ_DICT_SIZE_MASK;
       lookahead_size--;
 
@@ -2597,7 +2603,7 @@ static us_mz_bool us_tdefl_compress_normal(us_tdefl_compressor *d)
     d->m_lookahead_pos += len_to_move;
     US_MZ_ASSERT(d->m_lookahead_size >= len_to_move);
     d->m_lookahead_size -= len_to_move;
-    d->m_dict_size = US_MZ_MIN(d->m_dict_size + len_to_move, US_TDEFL_LZ_DICT_SIZE);
+    d->m_dict_size = US_MZ_MIN(d->m_dict_size + len_to_move, (us_mz_uint)US_TDEFL_LZ_DICT_SIZE);
     // Check if it's time to flush the current LZ codes to the internal output buffer.
     if ( (d->m_pLZ_code_buf > &d->m_lz_code_buf[US_TDEFL_LZ_CODE_BUF_SIZE - 8]) ||
          ( (d->m_total_lz_bytes > 31*1024) && (((((us_mz_uint)(d->m_pLZ_code_buf - d->m_lz_code_buf) * 115) >> 7) >= d->m_total_lz_bytes) || (d->m_flags & US_TDEFL_FORCE_ALL_RAW_BLOCKS))) )
@@ -3626,7 +3632,7 @@ us_mz_bool us_mz_zip_reader_extract_to_mem_no_alloc(us_mz_zip_archive *pZip, us_
   else
   {
     // Temporarily allocate a read buffer.
-    read_buf_size = US_MZ_MIN(file_stat.m_comp_size, US_MZ_ZIP_MAX_IO_BUF_SIZE);
+    read_buf_size = US_MZ_MIN(file_stat.m_comp_size, (us_mz_uint64)US_MZ_ZIP_MAX_IO_BUF_SIZE);
 #ifdef _MSC_VER
     if (((0, sizeof(size_t) == sizeof(us_mz_uint32))) && (read_buf_size > 0x7FFFFFFF))
 #else
@@ -3785,7 +3791,7 @@ us_mz_bool us_mz_zip_reader_extract_to_callback(us_mz_zip_archive *pZip, us_mz_u
   }
   else
   {
-    read_buf_size = US_MZ_MIN(file_stat.m_comp_size, US_MZ_ZIP_MAX_IO_BUF_SIZE);
+    read_buf_size = US_MZ_MIN(file_stat.m_comp_size, (us_mz_uint64)US_MZ_ZIP_MAX_IO_BUF_SIZE);
     if (NULL == (pRead_buf = pZip->m_pAlloc(pZip->m_pAlloc_opaque, 1, (size_t)read_buf_size)))
       return US_MZ_FALSE;
     read_buf_avail = 0;
@@ -4501,7 +4507,7 @@ us_mz_bool us_mz_zip_writer_add_file(us_mz_zip_archive *pZip, const char *pArchi
     {
       while (uncomp_remaining)
       {
-        us_mz_uint n = (us_mz_uint)US_MZ_MIN(US_MZ_ZIP_MAX_IO_BUF_SIZE, uncomp_remaining);
+        us_mz_uint n = (us_mz_uint)US_MZ_MIN((us_mz_uint64)US_MZ_ZIP_MAX_IO_BUF_SIZE, uncomp_remaining);
         if ((US_MZ_FREAD(pRead_buf, 1, n, pSrc_file) != n) || (pZip->m_pWrite(pZip->m_pIO_opaque, cur_archive_file_ofs, pRead_buf, n) != n))
         {
           pZip->m_pFree(pZip->m_pAlloc_opaque, pRead_buf);
@@ -4540,7 +4546,7 @@ us_mz_bool us_mz_zip_writer_add_file(us_mz_zip_archive *pZip, const char *pArchi
 
       for ( ; ; )
       {
-        size_t in_buf_size = (us_mz_uint32)US_MZ_MIN(uncomp_remaining, US_MZ_ZIP_MAX_IO_BUF_SIZE);
+        size_t in_buf_size = (us_mz_uint32)US_MZ_MIN(uncomp_remaining, (us_mz_uint64)US_MZ_ZIP_MAX_IO_BUF_SIZE);
         us_tdefl_status status;
 
         if (US_MZ_FREAD(pRead_buf, 1, in_buf_size, pSrc_file) != in_buf_size)
@@ -4644,12 +4650,12 @@ us_mz_bool us_mz_zip_writer_add_from_zip_reader(us_mz_zip_archive *pZip, us_mz_z
   n = US_MZ_READ_LE16(pLocal_header + US_MZ_ZIP_LDH_FILENAME_LEN_OFS) + US_MZ_READ_LE16(pLocal_header + US_MZ_ZIP_LDH_EXTRA_LEN_OFS);
   comp_bytes_remaining = n + US_MZ_READ_LE32(pSrc_central_header + US_MZ_ZIP_CDH_COMPRESSED_SIZE_OFS);
 
-  if (NULL == (pBuf = pZip->m_pAlloc(pZip->m_pAlloc_opaque, 1, (size_t)US_MZ_MAX(sizeof(us_mz_uint32) * 4, US_MZ_MIN(US_MZ_ZIP_MAX_IO_BUF_SIZE, comp_bytes_remaining)))))
+  if (NULL == (pBuf = pZip->m_pAlloc(pZip->m_pAlloc_opaque, 1, (size_t)US_MZ_MAX(sizeof(us_mz_uint32) * 4, US_MZ_MIN((us_mz_uint64)US_MZ_ZIP_MAX_IO_BUF_SIZE, comp_bytes_remaining)))))
     return US_MZ_FALSE;
 
   while (comp_bytes_remaining)
   {
-    n = (us_mz_uint)US_MZ_MIN(US_MZ_ZIP_MAX_IO_BUF_SIZE, comp_bytes_remaining);
+    n = (us_mz_uint)US_MZ_MIN((us_mz_uint64)US_MZ_ZIP_MAX_IO_BUF_SIZE, comp_bytes_remaining);
     if (pSource_zip->m_pRead(pSource_zip->m_pIO_opaque, cur_src_file_ofs, pBuf, n) != n)
     {
       pZip->m_pFree(pZip->m_pAlloc_opaque, pBuf);

@@ -112,8 +112,8 @@ void mitk::SegChangeOperationApplier::ExecuteOperation(Operation *operation)
 
 mitk::SegChangeOperationApplier *mitk::SegChangeOperationApplier::GetInstance()
 {
-  static auto *s_Instance = new SegChangeOperationApplier();
-  return s_Instance;
+  static SegChangeOperationApplier s_Instance;
+  return &s_Instance;
 }
 
 

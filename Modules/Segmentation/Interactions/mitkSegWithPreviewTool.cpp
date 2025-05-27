@@ -484,7 +484,7 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
       if (oldGroupCount != resultSegmentation->GetNumberOfGroups())
       {
         mitkThrow() << "Cannot confirm/transfer segmentation. Internal tool state is invalid."
-          << " Tool has changed the number of layers. Current base implementation expects that"
+          << " Tool has changed the number of groups. Current base implementation expects that"
           << " this does not happen.";
       }
 

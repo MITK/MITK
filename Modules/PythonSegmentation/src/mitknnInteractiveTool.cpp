@@ -445,6 +445,9 @@ void mitk::nnInteractiveTool::StartSession()
     ? "cuda:0"
     : "cpu";
 
+  if (!isCUDAAvailable)
+    this->SetAutoZoom(false);
+
   pyCommands.clear(); pyCommands
     << "session = inference_class(\n"
     << "    device=torch.device('" << torchDevice << "'),\n"

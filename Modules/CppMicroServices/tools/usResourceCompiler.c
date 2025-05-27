@@ -19,7 +19,7 @@
 
 ============================================================================*/
 
-#include "miniz.h"
+#include "us_miniz.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -29,20 +29,20 @@
 #define US_STR_(x) #x
 #define US_STR(x) US_STR_(x)
 
-static int cleanup_archive(mz_zip_archive* writeArchive)
+static int cleanup_archive(us_mz_zip_archive* writeArchive)
 {
-  if (writeArchive && writeArchive->m_zip_mode != MZ_ZIP_MODE_INVALID)
+  if (writeArchive && writeArchive->m_zip_mode != US_MZ_ZIP_MODE_INVALID)
   {
-    if (writeArchive->m_zip_mode != MZ_ZIP_MODE_WRITING_HAS_BEEN_FINALIZED)
+    if (writeArchive->m_zip_mode != US_MZ_ZIP_MODE_WRITING_HAS_BEEN_FINALIZED)
     {
-      if (!mz_zip_writer_finalize_archive(writeArchive))
+      if (!us_mz_zip_writer_finalize_archive(writeArchive))
       {
         return -1;
       }
     }
-    if (writeArchive->m_zip_mode != MZ_ZIP_MODE_INVALID)
+    if (writeArchive->m_zip_mode != US_MZ_ZIP_MODE_INVALID)
     {
-      if (!mz_zip_writer_end(writeArchive))
+      if (!us_mz_zip_writer_end(writeArchive))
       {
         return -1;
       }
@@ -51,7 +51,7 @@ static int cleanup_archive(mz_zip_archive* writeArchive)
   return 0;
 }
 
-static void exit_printf(mz_zip_archive* writeArchive, const char* format, ...)
+static void exit_printf(us_mz_zip_archive* writeArchive, const char* format, ...)
 {
   va_list args;
   cleanup_archive(writeArchive);
@@ -62,7 +62,7 @@ static void exit_printf(mz_zip_archive* writeArchive, const char* format, ...)
   exit(EXIT_FAILURE);
 }
 
-static void exit_perror(mz_zip_archive* writeArchive, const char* desc)
+static void exit_perror(us_mz_zip_archive* writeArchive, const char* desc)
 {
   cleanup_archive(writeArchive);
   fprintf(stderr, "error: ");
@@ -218,8 +218,8 @@ void* malloc_or_abort(size_t size)
 
 static int cmpzipindex(const void *i1, const void *i2)
 {
-  mz_uint index1 = *(const mz_uint*)i1;
-  mz_uint index2 = *(const mz_uint*)i2;
+  us_mz_uint index1 = *(const us_mz_uint*)i1;
+  us_mz_uint index2 = *(const us_mz_uint*)i2;
   return index1 == index2 ? 0 : (index1 < index2 ? -1 : 1);
 }
 
@@ -231,14 +231,14 @@ static int cmpstringp(const void *p1, const void *p2)
 typedef struct us_archived_names_tag
 {
   char** names;
-  mz_uint size;
-  mz_uint capacity;
-  mz_uint orderedSize;
+  us_mz_uint size;
+  us_mz_uint capacity;
+  us_mz_uint orderedSize;
 } us_archived_names;
 
 static void us_archived_names_free(us_archived_names * archivedNames)
 {
-  mz_uint i;
+  us_mz_uint i;
   for (i = 0; i < archivedNames->size; ++i)
   {
     free(archivedNames->names[i]);
@@ -281,14 +281,14 @@ static int us_archived_names_append(us_archived_names* archivedNames, const char
       abort();
     }
     memset(archivedNames->names + archivedNames->capacity, 0, sizeof(char*) * (newCapacity - archivedNames->capacity));
-    archivedNames->capacity = (mz_uint)newCapacity;
+    archivedNames->capacity = (us_mz_uint)newCapacity;
   }
 
   if (archivedNames->names[archivedNames->size] == NULL)
   {
-    archivedNames->names[archivedNames->size] = malloc_or_abort(MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE * sizeof(char));
+    archivedNames->names[archivedNames->size] = malloc_or_abort(US_MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE * sizeof(char));
   }
-  US_STRCPY(archivedNames->names[archivedNames->size], MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE, archiveName);
+  US_STRCPY(archivedNames->names[archivedNames->size], US_MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE, archiveName);
   ++archivedNames->size;
 
   return US_OK;
@@ -300,11 +300,11 @@ static void us_archived_names_sort(us_archived_names* archivedNames)
   archivedNames->orderedSize = archivedNames->size;
 }
 
-static int us_zip_writer_add_dir_entries(mz_zip_archive* pZip, const char* pArchive_name, us_archived_names* archived_dirs)
+static int us_zip_writer_add_dir_entries(us_mz_zip_archive* pZip, const char* pArchive_name, us_archived_names* archived_dirs)
 {
   size_t end;
   size_t length = strlen(pArchive_name);
-  char dirName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
+  char dirName[US_MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
   if (sizeof dirName < length - 1)
   {
     // This should be impossible
@@ -326,7 +326,7 @@ static int us_zip_writer_add_dir_entries(mz_zip_archive* pZip, const char* pArch
       {
         dbg_print("-- found new dir entry %s\n", dirName);
         // The directory entry does not yet exist, so add it
-        if (!mz_zip_writer_add_mem(pZip, dirName, NULL, 0, MZ_NO_COMPRESSION))
+        if (!us_mz_zip_writer_add_mem(pZip, dirName, NULL, 0, US_MZ_NO_COMPRESSION))
         {
           dbg_print("-- zip add_mem error\n");
           return US_MZ_ERROR_ADD_FILE;
@@ -338,16 +338,16 @@ static int us_zip_writer_add_dir_entries(mz_zip_archive* pZip, const char* pArch
   return US_OK;
 }
 
-static int us_zip_writer_add_file(mz_zip_archive *pZip, const char *pArchive_name,
+static int us_zip_writer_add_file(us_mz_zip_archive *pZip, const char *pArchive_name,
                                   const char *pSrc_filename, const void *pComment,
-                                  mz_uint16 comment_size, mz_uint level_and_flags,
+                                  us_mz_uint16 comment_size, us_mz_uint level_and_flags,
                                   us_archived_names* archived_names,
                                   us_archived_names* archived_dirs)
 {
   int retCode = us_archived_names_append(archived_names, pArchive_name);
   if (US_OK != retCode) return retCode;
 
-  if (!mz_zip_writer_add_file(pZip, pArchive_name, pSrc_filename, pComment,
+  if (!us_mz_zip_writer_add_file(pZip, pArchive_name, pSrc_filename, pComment,
                               comment_size, level_and_flags))
   {
     return US_MZ_ERROR_ADD_FILE;
@@ -355,20 +355,20 @@ static int us_zip_writer_add_file(mz_zip_archive *pZip, const char *pArchive_nam
   return us_zip_writer_add_dir_entries(pZip, pArchive_name, archived_dirs);
 }
 
-static int us_zip_writer_add_from_zip_reader(mz_zip_archive *pZip, mz_zip_archive *pSource_zip,
-                                             mz_uint file_index, us_archived_names* archived_names,
+static int us_zip_writer_add_from_zip_reader(us_mz_zip_archive *pZip, us_mz_zip_archive *pSource_zip,
+                                             us_mz_uint file_index, us_archived_names* archived_names,
                                              us_archived_names* archived_dirs,
-                                             char* archiveName, mz_uint archiveNameSize)
+                                             char* archiveName, us_mz_uint archiveNameSize)
 {
   int retCode = 0;
 
-  mz_uint numBytes = mz_zip_reader_get_filename(pSource_zip, file_index, archiveName, archiveNameSize);
+  us_mz_uint numBytes = us_mz_zip_reader_get_filename(pSource_zip, file_index, archiveName, archiveNameSize);
   if (numBytes > 1 && archiveName[numBytes-2] != '/')
   {
     retCode = us_archived_names_append(archived_names, archiveName);
     if (US_OK != retCode) return retCode;
 
-    if (!mz_zip_writer_add_from_zip_reader(pZip, pSource_zip, file_index))
+    if (!us_mz_zip_writer_add_from_zip_reader(pZip, pSource_zip, file_index))
     {
       return US_MZ_ERROR_ADD_FILE;
     }
@@ -395,24 +395,24 @@ int main(int argc, char** argv)
   size_t moduleNameLength = 0;
 
   FILE* zipfileStream = NULL;
-  mz_zip_archive writeArchive;
+  us_mz_zip_archive writeArchive;
 
   us_archived_names archivedNames;
   us_archived_names archivedDirs;
 
   FILE* appendStream = NULL;
 
-  char archiveName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
+  char archiveName[US_MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
 
   int numZipArgs = 0;
   int* zipArgIndices = NULL;
 
-  mz_zip_archive currFileArchive;
+  us_mz_zip_archive currFileArchive;
 
   int zipArgIndex = 0;
 
   char readBuffer[1024];
-  mz_uint numRead = 0;
+  us_mz_uint numRead = 0;
 
 
   // ---------------------------------------------------------------------------------
@@ -534,7 +534,7 @@ int main(int argc, char** argv)
   dbg_print("Creating zip archive\n");
   remove(zipFile);
 
-  if (!mz_zip_writer_init_file(&writeArchive, zipFile, 0))
+  if (!us_mz_zip_writer_init_file(&writeArchive, zipFile, 0))
   {
     exit_printf(&writeArchive, "Internal error, could not init new zip archive\n");
   }
@@ -563,17 +563,17 @@ int main(int argc, char** argv)
     {
       // check if the current file is a valid zip archive
       memset(&currFileArchive, 0, sizeof(currFileArchive));
-      if (mz_zip_reader_init_file(&currFileArchive, fileName, 0))
+      if (us_mz_zip_reader_init_file(&currFileArchive, fileName, 0))
       {
         dbg_print("Input is a valid zip archive: %s\n", fileName);
         zipArgIndices[numZipArgs++] = argIndex;
-        mz_zip_reader_end(&currFileArchive);
+        us_mz_zip_reader_end(&currFileArchive);
       }
       // silently ignore files which are not zip archives
       continue;
     }
 
-    if (fileNameLength + 1 + moduleNameLength > MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE - 1)
+    if (fileNameLength + 1 + moduleNameLength > US_MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE - 1)
     {
       exit_printf(&writeArchive, "Resource filename too long: %s\n", moduleName);
     }
@@ -602,19 +602,19 @@ int main(int argc, char** argv)
 
   for (zipArgIndex = 0; zipArgIndex < numZipArgs; ++zipArgIndex)
   {
-    mz_zip_archive currZipArchive;
+    us_mz_zip_archive currZipArchive;
     const char* currArchiveFileName = NULL;
-    mz_uint currZipIndex = 0;
-    mz_uint numZipIndices = 0;
+    us_mz_uint currZipIndex = 0;
+    us_mz_uint numZipIndices = 0;
 
-    memset(&currZipArchive, 0, sizeof(mz_zip_archive));
+    memset(&currZipArchive, 0, sizeof(us_mz_zip_archive));
     currArchiveFileName = argv[zipArgIndices[zipArgIndex]];
-    if (!mz_zip_reader_init_file(&currZipArchive, currArchiveFileName, 0))
+    if (!us_mz_zip_reader_init_file(&currZipArchive, currArchiveFileName, 0))
     {
       exit_printf(&writeArchive, "Could not initialize zip archive %s\n", currArchiveFileName);
     }
 
-    numZipIndices = mz_zip_reader_get_num_files(&currZipArchive);
+    numZipIndices = us_mz_zip_reader_get_num_files(&currZipArchive);
     for (currZipIndex = 0; currZipIndex < numZipIndices; ++currZipIndex)
     {
       errCode = us_zip_writer_add_from_zip_reader(&writeArchive, &currZipArchive, currZipIndex, &archivedNames,
@@ -627,17 +627,17 @@ int main(int argc, char** argv)
       }
       else if (errCode != US_OK)
       {
-        mz_zip_reader_end(&currZipArchive);
+        us_mz_zip_reader_end(&currZipArchive);
         exit_printf(&writeArchive, us_error_msg[errCode], archiveName, currArchiveFileName);
       }
     }
 
-    mz_zip_reader_end(&currZipArchive);
+    us_mz_zip_reader_end(&currZipArchive);
     us_archived_names_sort(&archivedNames);
   }
 
   // We are finished, finalize the zip archive
-  if (!mz_zip_writer_finalize_archive(&writeArchive))
+  if (!us_mz_zip_writer_finalize_archive(&writeArchive))
   {
     exit_printf(&writeArchive, "Could not finalize zip archive\n");
   }

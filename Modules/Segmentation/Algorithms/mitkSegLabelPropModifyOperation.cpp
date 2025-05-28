@@ -23,7 +23,7 @@ mitk::SegLabelPropModifyOperation::SegLabelPropModifyOperation(MultiLabelSegment
     if (!segmentation->ExistLabel(label->GetValue()))
     {
       mitkThrow() << "Invalid usage of SegLabelPropModifyOperation. At least one modified label passed to the operation"
-        " does nit exist in segmentation. Invalid label value: " << label->GetValue();
+        " does not exist in segmentation. Invalid label value: " << label->GetValue();
     }
   }
 }

@@ -57,7 +57,7 @@ namespace mitk
     SegGroupInsertOperation(const SegGroupInsertOperation&) = delete;
     SegGroupInsertOperation& operator=(const SegGroupInsertOperation&) = delete;
 
-    static SegGroupInsertOperation* CreatFromSegmentation(MultiLabelSegmentation* segmentation,
+    static SegGroupInsertOperation* CreateFromSegmentation(MultiLabelSegmentation* segmentation,
       const GroupIndexSetType& relevantGroupIDs,
       bool noLabels = false, bool noGroupImages = false);
 

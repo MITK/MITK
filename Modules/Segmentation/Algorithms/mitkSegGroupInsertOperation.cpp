@@ -88,7 +88,7 @@ std::string mitk::SegGroupInsertOperation::GetGroupName(MultiLabelSegmentation::
   return "";
 }
 
-mitk::SegGroupInsertOperation* mitk::SegGroupInsertOperation::CreatFromSegmentation(
+mitk::SegGroupInsertOperation* mitk::SegGroupInsertOperation::CreateFromSegmentation(
   MultiLabelSegmentation* segmentation,
   const GroupIndexSetType& relevantGroupIDs,
   bool noLabels, bool noGroupImages)

@@ -26,29 +26,10 @@ found in the LICENSE file.
 // VTK
 #include <vtkSmartPointer.h>
 
-mitk::SegChangeOperationApplier::SegChangeOperationApplier()
+
+namespace
 {
-}
-
-mitk::SegChangeOperationApplier::~SegChangeOperationApplier()
-{
-}
-
-void mitk::SegChangeOperationApplier::ExecuteOperation(Operation *operation)
-{
-  auto* segOperation = dynamic_cast<SegChangeOperationBase*>(operation);
-  auto* modOperation = dynamic_cast<SegGroupModifyOperation *>(operation);
-  auto* insertOperation = dynamic_cast<SegGroupInsertOperation*>(operation);
-  auto* removeOperation = dynamic_cast<SegGroupRemoveOperation*>(operation);
-  auto* sliceOperation = dynamic_cast<SegSliceOperation*>(operation);
-  auto* labelPropModOperation = dynamic_cast<SegLabelPropModifyOperation*>(operation);
-
-  // check if the operation is valid
-  if (nullptr == segOperation || !segOperation->IsValid())
-    return;
-
-  auto segmentation = segOperation->GetSegmentation();
-  if (nullptr != modOperation)
+  void ApplyGroupModification(mitk::SegGroupModifyOperation* modOperation, mitk::MultiLabelSegmentation* segmentation)
   {
     bool modified = false;
 
@@ -68,14 +49,15 @@ void mitk::SegChangeOperationApplier::ExecuteOperation(Operation *operation)
 
     for (auto modifiedGroupID : modOperation->GetLabelGroupIDs())
     {
-        segmentation->ReplaceGroupLabels(modifiedGroupID, modOperation->GetModifiedLabels(modifiedGroupID));
+      segmentation->ReplaceGroupLabels(modifiedGroupID, modOperation->GetModifiedLabels(modifiedGroupID));
     }
     for (auto modifiedGroupID : modOperation->GetNameGroupIDs())
     {
       segmentation->SetGroupName(modifiedGroupID, modOperation->GetModifiedName(modifiedGroupID));
     }
   }
-  else if (nullptr != insertOperation)
+
+  void ApplyGroupInsert(mitk::SegGroupInsertOperation* insertOperation, mitk::MultiLabelSegmentation* segmentation)
   {
     for (auto groupID : insertOperation->GetGroupIDs())
     {
@@ -90,23 +72,66 @@ void mitk::SegChangeOperationApplier::ExecuteOperation(Operation *operation)
       }
     }
   }
-  else if (nullptr != removeOperation)
+
+  void ApplyGroupRemove(mitk::SegGroupRemoveOperation* removeOperation, mitk::MultiLabelSegmentation* segmentation)
   {
     for (auto groupID : removeOperation->GetGroupIDs())
     {
       segmentation->RemoveGroup(groupID);
     }
   }
-  else if (nullptr != sliceOperation)
+
+  void ApplySliceOperation(mitk::SegSliceOperation* sliceOperation, mitk::MultiLabelSegmentation* segmentation)
   {
     auto relevantGroupImage = segmentation->GetGroupImage(sliceOperation->GetGroupID());
-    SegTool2D::WriteSliceToVolume(relevantGroupImage, sliceOperation->GetSlicePlaneGeometry(), sliceOperation->GetSlice(), sliceOperation->GetTimeStep());
-    SegTool2D::UpdateAllSurfaceInterpolations(segmentation, sliceOperation->GetTimeStep(), sliceOperation->GetSlicePlaneGeometry(), true);
+    mitk::SegTool2D::WriteSliceToVolume(relevantGroupImage, sliceOperation->GetSlicePlaneGeometry(), sliceOperation->GetSlice(), sliceOperation->GetTimeStep());
+    mitk::SegTool2D::UpdateAllSurfaceInterpolations(segmentation, sliceOperation->GetTimeStep(), sliceOperation->GetSlicePlaneGeometry(), true);
   }
-  else if (nullptr != labelPropModOperation)
+
+  void ApplyPropertyModification(mitk::SegLabelPropModifyOperation* labelPropModOperation, mitk::MultiLabelSegmentation* segmentation)
   {
-    auto segmentation = labelPropModOperation->GetSegmentation();
     segmentation->ReplaceLabels(labelPropModOperation->GetModifiedLabels());
+  }
+}
+
+
+mitk::SegChangeOperationApplier::SegChangeOperationApplier()
+{
+}
+
+mitk::SegChangeOperationApplier::~SegChangeOperationApplier()
+{
+}
+
+void mitk::SegChangeOperationApplier::ExecuteOperation(Operation *operation)
+{
+  auto segOperation = dynamic_cast<SegChangeOperationBase*>(operation);
+
+  // check if the operation is valid
+  if (nullptr == segOperation || !segOperation->IsValid())
+    return;
+
+  auto segmentation = segOperation->GetSegmentation();
+
+  if (auto modOperation = dynamic_cast<SegGroupModifyOperation*>(operation); nullptr != modOperation)
+  {
+    ApplyGroupModification(modOperation, segmentation);
+  }
+  else if (auto insertOperation = dynamic_cast<SegGroupInsertOperation*>(operation); nullptr != insertOperation)
+  {
+    ApplyGroupInsert(insertOperation, segmentation);
+  }
+  else if (auto removeOperation = dynamic_cast<SegGroupRemoveOperation*>(operation); nullptr != removeOperation)
+  {
+    ApplyGroupRemove(removeOperation, segmentation);
+  }
+  else if (auto sliceOperation = dynamic_cast<SegSliceOperation*>(operation); nullptr != sliceOperation)
+  {
+    ApplySliceOperation(sliceOperation, segmentation);
+  }
+  else if (auto labelPropModOperation = dynamic_cast<SegLabelPropModifyOperation*>(operation); nullptr != labelPropModOperation)
+  {
+    ApplyPropertyModification(labelPropModOperation, segmentation);
   }
 }
 
@@ -115,7 +140,6 @@ mitk::SegChangeOperationApplier *mitk::SegChangeOperationApplier::GetInstance()
   static SegChangeOperationApplier s_Instance;
   return &s_Instance;
 }
-
 
 mitk::SegGroupModifyUndoRedoHelper::SegGroupModifyUndoRedoHelper(MultiLabelSegmentation* segmentation,
   const GroupIndexSetType& relevantGroupIDs, bool coverAllTimeSteps, TimeStepType timeStep,
@@ -129,8 +153,7 @@ mitk::SegGroupModifyUndoRedoHelper::SegGroupModifyUndoRedoHelper(MultiLabelSegme
 
 mitk::SegGroupModifyUndoRedoHelper::~SegGroupModifyUndoRedoHelper()
 {
-  if (nullptr != m_UndoOperation)
-    delete m_UndoOperation;
+  delete m_UndoOperation;
 };
 
 void mitk::SegGroupModifyUndoRedoHelper::RegisterUndoRedoOperationEvent(const std::string& description)
@@ -162,8 +185,7 @@ mitk::SegGroupInsertUndoRedoHelper::SegGroupInsertUndoRedoHelper(MultiLabelSegme
 
 mitk::SegGroupInsertUndoRedoHelper::~SegGroupInsertUndoRedoHelper()
 {
-  if (nullptr != m_UndoOperation)
-    delete m_UndoOperation;
+  delete m_UndoOperation;
 };
 
 void mitk::SegGroupInsertUndoRedoHelper::RegisterUndoRedoOperationEvent(const std::string& description)
@@ -175,7 +197,7 @@ void mitk::SegGroupInsertUndoRedoHelper::RegisterUndoRedoOperationEvent(const st
   UndoStackItem::IncCurrObjectEventId();
 
   auto redoOperation =
-    SegGroupInsertOperation::CreatFromSegmentation(m_Segmentation, m_RelevantGroupIDs, m_NoLabels, m_NoGroupImages);
+    SegGroupInsertOperation::CreateFromSegmentation(m_Segmentation, m_RelevantGroupIDs, m_NoLabels, m_NoGroupImages);
 
   OperationEvent* undoStackItem =
     new OperationEvent(SegChangeOperationApplier::GetInstance(), redoOperation, m_UndoOperation, description);
@@ -189,13 +211,12 @@ mitk::SegGroupRemoveUndoRedoHelper::SegGroupRemoveUndoRedoHelper(MultiLabelSegme
   const GroupIndexSetType& relevantGroupIDs, bool noLabels, bool noGroupImages) :
   m_Segmentation(segmentation), m_RelevantGroupIDs(relevantGroupIDs), m_UndoOperation(nullptr)
 {
-  m_UndoOperation = SegGroupInsertOperation::CreatFromSegmentation(m_Segmentation, m_RelevantGroupIDs, noLabels, noGroupImages);
+  m_UndoOperation = SegGroupInsertOperation::CreateFromSegmentation(m_Segmentation, m_RelevantGroupIDs, noLabels, noGroupImages);
 }
 
 mitk::SegGroupRemoveUndoRedoHelper::~SegGroupRemoveUndoRedoHelper()
 {
-  if (nullptr != m_UndoOperation)
-    delete m_UndoOperation;
+  delete m_UndoOperation;
 };
 
 void mitk::SegGroupRemoveUndoRedoHelper::RegisterUndoRedoOperationEvent(const std::string& description)
@@ -224,8 +245,7 @@ mitk::SegLabelPropModifyUndoRedoHelper::SegLabelPropModifyUndoRedoHelper(MultiLa
 
 mitk::SegLabelPropModifyUndoRedoHelper::~SegLabelPropModifyUndoRedoHelper()
 {
-  if (nullptr != m_UndoOperation)
-    delete m_UndoOperation;
+  delete m_UndoOperation;
 };
 
 void mitk::SegLabelPropModifyUndoRedoHelper::RegisterUndoRedoOperationEvent(const std::string& description)

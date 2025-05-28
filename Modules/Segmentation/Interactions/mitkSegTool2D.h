@@ -131,7 +131,7 @@ namespace mitk
      * @pre workingNode must point to a valid instance and contain an image instance as data.
      * @pre planeGeometry must point to a valid instance.
      * @pre segmentationResult must point to a valid instance.*/
-    static void WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep, const std::string& toolname);
+    static void WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep, const std::string& toolName);
 
     /** Writes a provided slice into the passed working image. The content of working image that is covered
     * by the slice will be completely overwritten.
@@ -252,7 +252,7 @@ namespace mitk
      * @param allowUndo Indicates if undo/redo operations should be registered for the write operation
      * @param toolName Name of the tool that should be used as description in the undo operation.
      * @pre workingNode must point to a valid instance and contain an image instance as data.*/
-    static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true, bool allowUndo = true, const std::string& toolname = "");
+    static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true, bool allowUndo = true, const std::string& toolName = "");
 
     /** Convenience overloaded version that can be called with a slice info.
     * Writes a provided slice into the passed working image. The content of working image that is covered

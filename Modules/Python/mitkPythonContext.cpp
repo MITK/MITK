@@ -36,7 +36,6 @@ void mitk::PythonContext::Activate()
   pythonCommand.append("import os, sys, io\n");
   pythonCommand.append("sys.path.append('" + programPath + "')\n");
   pythonCommand.append("import numpy\n");
-  pythonCommand.append("import SimpleITK as sitk\n");
   pythonCommand.append("import pyMITK\n");
   this->ExecuteString(pythonCommand);
 }

@@ -44,9 +44,6 @@ found in the LICENSE file.
 #include <mitkIDataStorageReference.h>
 #include <mitkIDataStorageService.h>
 
-// mitk gui common plugin
-#include <mitkDataNodeObject.h>
-
 // mitk gui qt application plugin
 #include <QmitkDataNodeGlobalReinitAction.h>
 #include <QmitkDataNodeToggleVisibilityAction.h>

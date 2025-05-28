@@ -286,5 +286,7 @@ unsigned int mitk::LimitedLinearUndo::RemoveInvalidOperations()
   // Check redo list and remove invalid operations
   removedCount += RemoveInvalidOperationsFromList(m_RedoList);
 
+  if (removedCount>0) InvokeEvent(UndoStackEvent());
+
   return removedCount;
 }

@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 #include <mitkSegChangeOperationApplier.h>
 
+#include <mitkSegChangeOperationApplier.h>
+
 #include <QmitkStyleManager.h>
 
 
@@ -484,7 +486,9 @@ bool QmitkMultiLabelTreeModel::setData(const QModelIndex& index, const QVariant&
         }
         else if (TableColumns::COLOR_COL == index.column())
         {
+          mitk::SegLabelPropModifyUndoRedoHelper undoGenerator(m_Segmentation, { label->GetValue() });
           label->SetColor(QtToMitk(value.value<QColor>()));
+          undoGenerator.RegisterUndoRedoOperationEvent("Change color of \"" + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, label) + "\"");
         }
         else if (TableColumns::VISIBLE_COL == index.column())
         {

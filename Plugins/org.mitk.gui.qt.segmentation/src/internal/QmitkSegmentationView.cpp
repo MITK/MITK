@@ -1060,6 +1060,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
 
   m_Controls->toolSelectionBox2D->setEnabled(toolSelectionBoxesEnabled);
   m_Controls->toolSelectionBox3D->setEnabled(toolSelectionBoxesEnabled);
+  m_Controls->slicesInterpolator->setEnabled(toolSelectionBoxesEnabled);
 
   this->UpdateWarningLabel(warning);
 

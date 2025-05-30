@@ -874,6 +874,12 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     mitk::SegTool2D::DetermineAffectedImageSlice(segmentation3D, planeGeometry, sliceDimension, sliceIndex);
 
+    if (sliceIndex == -1 || sliceDimension == -1)
+    {
+      MITK_ERROR << "Unable to determine affected image slice. Render windows seems to be not initialized on image geometry.";
+      return;
+    }
+
     const auto numSlices = m_Segmentation->GetDimensions()[sliceDimension];
     mitk::ProgressBar::GetInstance()->AddStepsToDo(numSlices);
 
@@ -1228,8 +1234,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
       }
 
       const auto* activeLabel = labelSetImage->GetActiveLabel();
-      const auto* segmentation = dynamic_cast<mitk::Image*>(workingNode->GetData());
-      if (nullptr != activeLabel && nullptr != segmentation)
+      if (nullptr != activeLabel)
       {
         auto activeLabelImage = mitk::CreateLabelMask(labelSetImage, activeLabel->GetValue());
         m_Interpolator->SetSegmentationVolume(activeLabelImage);

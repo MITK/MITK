@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include <berryWorkbenchAdvisor.h>
 #include <berryWorkbenchWindowAdvisor.h>
 
+#include <mitkITKEventObserverGuard.h>
+
 #include <org_mitk_gui_qt_ext_Export.h>
 
 #include <QList>
@@ -113,6 +115,8 @@ private:
 
   void PropertyChange(const berry::Object::Pointer& /*source*/, int propId);
 
+  void OnUndoStackChanged();
+
   static QString QT_SETTINGS_FILENAME;
 
   QScopedPointer<berry::IPartListener> titlePartListener;
@@ -172,6 +176,8 @@ private:
   QAction* openDicomEditorAction;
   QAction* openStdMultiWidgetEditorAction;
   QAction* openMxNMultiWidgetEditorAction;
+
+  mitk::ITKEventObserverGuard m_UndoStackObserverGuard;
 };
 
 #endif

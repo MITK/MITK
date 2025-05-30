@@ -901,6 +901,14 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   }
   mainWindow->addToolBar(mainActionsToolBar);
 
+  // ==== Undo/Redo update handling ==================================
+  auto undoModel = dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel());
+  if (nullptr != undoModel)
+  {
+    m_UndoStackObserverGuard.Reset(undoModel, mitk::UndoStackEvent(), [this](const itk::EventObject&) {this->OnUndoStackChanged(); });
+  }
+  this->OnUndoStackChanged(); //ensure the enable state of undoAction/redoAction is correct
+
   // ==== Perspective Toolbar ==================================
   auto   qPerspectiveToolbar = new QToolBar;
   qPerspectiveToolbar->setObjectName("perspectiveToolBar");
@@ -1501,4 +1509,12 @@ QString QmitkExtWorkbenchWindowAdvisor::GetQSettingsFile() const
 {
   QFileInfo settingsInfo = QmitkCommonExtPlugin::getContext()->getDataFile(QT_SETTINGS_FILENAME);
   return settingsInfo.canonicalFilePath();
+}
+
+void QmitkExtWorkbenchWindowAdvisor::OnUndoStackChanged()
+{
+  auto undoModel = dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel());
+
+  this->undoAction->setEnabled(nullptr != undoModel && !undoModel->UndoListEmpty());
+  this->redoAction->setEnabled(nullptr != undoModel && !undoModel->RedoListEmpty());
 }

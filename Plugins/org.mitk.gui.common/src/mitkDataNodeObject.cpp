@@ -21,7 +21,7 @@ DataNodeObject::DataNodeObject() :
 
 }
 
-DataNodeObject::DataNodeObject(DataNode::Pointer node) :
+DataNodeObject::DataNodeObject(DataNode* node) :
   m_Node(node)
 {
 
@@ -29,7 +29,7 @@ DataNodeObject::DataNodeObject(DataNode::Pointer node) :
 
 DataNode::Pointer DataNodeObject::GetDataNode() const
 {
-  return m_Node;
+  return m_Node.Lock();
 }
 
 bool DataNodeObject::operator==(const berry::Object* obj) const

@@ -34,6 +34,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkLabelSetImageConverter.h>
+#include <mitkSegChangeOperationApplier.h>
 
 #include <QmitkNodeSelectionDialog.h>
 #include <QMessageBox>
@@ -370,6 +371,8 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   mitk::Image::Pointer refImage;
   const mitk::DataNode* refNode;
 
+  std::set<mitk::MultiLabelSegmentation::GroupIndexType> addedGroups;
+
   if (m_Controls->radioAddToSeg->isChecked())
   {
     outputSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(m_Controls->outputSegSelector->GetSelectedNode()->GetData());
@@ -484,6 +487,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   if (m_Controls->radioAddToSeg->isChecked() || 0 == outputSeg->GetNumberOfGroups())
   {
     currentGroupIndex = outputSeg->AddGroup();
+    addedGroups.insert(currentGroupIndex);
   }
 
   //Transfer content and add labels
@@ -492,7 +496,10 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     mitk::ProgressBar::GetInstance()->Progress();
 
     if (m_Controls->radioSingleGroup->isChecked() && node != imageNodes.front())
+    {
       currentGroupIndex = outputSeg->AddGroup();
+      addedGroups.insert(currentGroupIndex);
+    }
 
     const auto& labelsMapping = labelsMappingMap.at(node);
     for (auto [oldV, correctedV] : labelsMapping)
@@ -517,7 +524,10 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     mitk::ProgressBar::GetInstance()->Progress();
 
     if (m_Controls->radioSingleGroup->isChecked() && (node != nonimageNodes.front() || !imageNodes.empty()))
+    {
       currentGroupIndex = outputSeg->AddGroup();
+      addedGroups.insert(currentGroupIndex);
+    }
 
     const auto& labelsMapping = labelsMappingMap.at(node);
     for (auto [oldV, correctedV] : labelsMapping)
@@ -538,6 +548,9 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
   if (m_Controls->radioAddToSeg->isChecked())
   {
+    mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(outputSeg, addedGroups);
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert conversion groups to segmentation node \n"+ m_Controls->outputSegSelector->GetSelectedNode()->GetName()+"\"");
+
     m_Controls->outputSegSelector->GetSelectedNode()->Modified();
   }
   else

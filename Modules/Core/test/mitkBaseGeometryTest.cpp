@@ -74,6 +74,13 @@ protected:
   void PreSetSpacing(const mitk::Vector3D &/*aSpacing*/) override{};
 };
 
+class DummyOperation : public mitk::Operation
+{
+public:
+  DummyOperation() : Operation(mitk::OpNOTHING) {};
+  ~DummyOperation() override {};
+};
+
 class mitkBaseGeometryTestSuite : public mitk::TestFixture
 {
   // List of Tests
@@ -941,7 +948,7 @@ public:
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
 
     // Test operation Nothing
-    auto opN = new mitk::Operation(mitk::OpNOTHING);
+    auto opN = new DummyOperation();
     dummy->ExecuteOperation(opN);
     MITK_ASSERT_EQUAL(dummy, newDummy, "Dummy execute operation 1");
 

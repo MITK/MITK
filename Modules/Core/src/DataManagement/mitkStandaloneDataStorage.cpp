@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include "mitkNodePredicateProperty.h"
 #include "mitkProperties.h"
 
+#include <mitkUndoController.h>
+
 mitk::StandaloneDataStorage::StandaloneDataStorage() : mitk::DataStorage()
 {
 }
@@ -110,6 +112,12 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataNode *node)
     /* remove node from both relation adjacency lists */
     this->RemoveFromRelation(node, m_SourceNodes);
     this->RemoveFromRelation(node, m_DerivedNodes);
+  }
+
+  auto undoModel = UndoController::GetCurrentUndoModel();
+  if (nullptr != undoModel)
+  {
+    undoModel->RemoveInvalidOperations();
   }
 }
 

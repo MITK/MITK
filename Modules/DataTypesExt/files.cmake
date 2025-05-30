@@ -3,7 +3,6 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 set(CPP_FILES
   mitkAffineBaseDataInteractor3D.cpp
   mitkAffineImageCropperInteractor.cpp
-  mitkApplyDiffImageOperation.cpp
   mitkBoundingObject.cpp
   mitkBoundingObjectGroup.cpp
   mitkCellOperation.cpp

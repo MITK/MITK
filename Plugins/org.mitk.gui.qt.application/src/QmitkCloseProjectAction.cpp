@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
+#include <mitkUndoController.h>
 
 #include <berryIEditorReference.h>
 #include <berryIWorkbenchPage.h>
@@ -112,8 +113,18 @@ void QmitkCloseProjectAction::Run()
     }
 
     /* Remove everything */
-    mitk::DataStorage::SetOfObjects::ConstPointer nodesToRemove = dataStorage->GetAll();
-    dataStorage->Remove(nodesToRemove);
+    {
+      mitk::DataStorage::SetOfObjects::ConstPointer nodesToRemove = dataStorage->GetAll();
+      dataStorage->Remove(nodesToRemove);
+    }
+
+    // explicitly trigger undo model again. It is also done in the data storage itself, but
+    // as long as the nodesToRemove variable exist, it has no effect, as the smart pointer keeps
+    // the removed nodes alive due to the list of smart pointer selections.
+    if (auto undoModel = mitk::UndoController::GetCurrentUndoModel(); nullptr != undoModel)
+    {
+      undoModel->RemoveInvalidOperations();
+    }
 
     // Remove the datastorage from the data storage service
     dss->RemoveDataStorageReference(dataStorageRef);

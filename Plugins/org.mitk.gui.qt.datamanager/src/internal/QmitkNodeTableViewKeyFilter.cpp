@@ -95,7 +95,15 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
     }
     if (keySequence == deleteSelectedNodes)
     {
-      RemoveAction::Run(dataManagerView->GetSite(), dataStorage, selectedNodes);
+      QList<mitk::WeakPointer<mitk::DataNode>> weakNodes;
+
+      for (auto node : selectedNodes)
+      {
+        weakNodes.push_back(node.GetPointer());
+      }
+      selectedNodes.clear(); //clear list to avoid smart pointers keeping removed nodes alive
+      RemoveAction::Run(dataManagerView->GetSite(), dataStorage, weakNodes);
+
       return true;
     }
     if (keySequence == toggleVisibility)
@@ -118,6 +126,7 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
       ShowDetailsAction::Run(selectedNodes);
       return true;
     }
+
   }
   // standard event processing
   return QObject::eventFilter(obj, event);

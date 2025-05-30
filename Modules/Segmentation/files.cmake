@@ -8,9 +8,6 @@ set(CPP_FILES
   Algorithms/mitkContourSetToPointSetFilter.cpp
   Algorithms/mitkContourUtils.cpp
   Algorithms/mitkCorrectorAlgorithm.cpp
-  Algorithms/mitkDiffImageApplier.cpp
-  Algorithms/mitkDiffSliceOperation.cpp
-  Algorithms/mitkDiffSliceOperationApplier.cpp
   Algorithms/mitkGrowCutSegmentationFilter.cpp
   Algorithms/mitkImageLiveWireContourModelFilter.cpp
   Algorithms/mitkImageToContourFilter.cpp
@@ -18,6 +15,13 @@ set(CPP_FILES
   Algorithms/mitkOtsuSegmentationFilter.cpp
   Algorithms/mitkSegmentationHelper.cpp
   Algorithms/mitkSegmentationObjectFactory.cpp
+  Algorithms/mitkSegChangeOperationBase.cpp
+  Algorithms/mitkSegChangeOperationApplier.cpp
+  Algorithms/mitkSegGroupInsertOperation.cpp
+  Algorithms/mitkSegGroupModifyOperation.cpp
+  Algorithms/mitkSegGroupRemoveOperation.cpp
+  Algorithms/mitkSegLabelPropModifyOperation.cpp
+  Algorithms/mitkSegSliceOperation.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp

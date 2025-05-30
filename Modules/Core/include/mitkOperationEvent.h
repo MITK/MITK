@@ -16,9 +16,14 @@ found in the LICENSE file.
 #include "mitkOperation.h"
 #include "mitkOperationActor.h"
 #include "mitkUndoModel.h"
-#include <MitkCoreExports.h>
+
+#include <mitkITKEventObserverGuard.h>
+
 #include <list>
 #include <string>
+
+
+#include <MitkCoreExports.h>
 
 namespace mitk
 {
@@ -73,6 +78,10 @@ namespace mitk
 
     virtual void ReverseOperations();
     virtual void ReverseAndExecute();
+
+    //## @brief returns true if the destination still is present and the operations
+    //## are still valid. Returns falso if one of the conditions is not true.
+    virtual bool IsValid() const = 0;
 
     //##Documentation
     //## @brief Increases the current ObjectEventId
@@ -166,9 +175,9 @@ namespace mitk
     //##reverses and executes both operations (used, when moved from undo to redo stack)
     void ReverseAndExecute() override;
 
-    //## @brief returns true if the destination still is present
-    //## and false if it already has been deleted
-    virtual bool IsValid();
+    //## @brief returns true if the destination still is present and the operations
+    //## are still valid. Returns false if one of the conditions is not true.
+    bool IsValid() const override;
 
   protected:
     void OnObjectDeleted();
@@ -176,7 +185,7 @@ namespace mitk
   private:
     // Has to be observed for itk::DeleteEvents.
     // When destination is deleted, this stack item is invalid!
-    OperationActor *m_Destination;
+    OperationActor* m_Destination;
 
     //## reference to the operation
     Operation *m_Operation;
@@ -189,8 +198,7 @@ namespace mitk
     //## hide operator=
     void operator=(const OperationEvent &);
 
-    // observertag used to listen to m_Destination
-    unsigned long m_DeleteTag;
+    ITKEventObserverGuard m_DelObserver;
 
     //## stores if destination is valid or already has been freed
     bool m_Invalid;

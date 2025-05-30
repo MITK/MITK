@@ -20,9 +20,11 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
+#include <mitkUndoController.h>
+
 namespace RemoveAction
 {
-  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, const QList<mitk::DataNode::Pointer>& selectedNodes, QWidget* parent /* = nullptr*/)
+  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, const QList<mitk::WeakPointer<mitk::DataNode>>& selectedNodes, QWidget* parent /* = nullptr*/)
   {
     if (selectedNodes.empty())
     {
@@ -30,9 +32,10 @@ namespace RemoveAction
     }
 
     QString question("Do you really want to remove ");
-    for (auto& dataNode : selectedNodes)
+    for (auto& weakNode : selectedNodes)
     {
-      if (nullptr == dataNode)
+      auto dataNode = weakNode.Lock();
+      if (dataNode.IsNull())
       {
         continue;
       }
@@ -50,14 +53,23 @@ namespace RemoveAction
 
     if (answerButton == QMessageBox::Yes)
     {
-      for (auto& dataNode : selectedNodes)
+      for (auto& weakNode : selectedNodes)
       {
-        if (nullptr == dataNode)
+        auto dataNode = weakNode.Lock();
+        if (dataNode.IsNull())
         {
           continue;
         }
 
         dataStorage->Remove(dataNode);
+      }
+      // explicitly trigger undo model again. It is also done in the data storage itself, but
+      // as long as the dataNode variable exist, it has no effect, as the smart pointer keeps
+      // the removed nodes alive due to the list of smart pointer selections.
+      auto undoModel = mitk::UndoController::GetCurrentUndoModel();
+      if (nullptr != undoModel)
+      {
+        undoModel->RemoveInvalidOperations();
       }
 
       auto* prefService = mitk::CoreServices::GetPreferencesService();
@@ -111,6 +123,10 @@ void QmitkDataNodeRemoveAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
-  auto selectedNodes = GetSelectedNodes();
+  QList<mitk::WeakPointer<mitk::DataNode>> weakNodes;
+
+
+  auto selectedNodes = GetSelectedWeakNodes();
+
   RemoveAction::Run(workbenchPartSite, dataStorage, selectedNodes, m_Parent);
 }

@@ -163,7 +163,7 @@ namespace
       // Allocate and initialize the image volume based on the metadata.
       InitializeVolume(mask);
 
-      this->WriteSliceToVolume(mask, m_CurrentPlane, m_PaintingSlice, 0, false);
+      SegTool2D::WriteSliceToVolume(mask, m_CurrentPlane, m_PaintingSlice, 0);
 
       Superclass::OnMouseReleased(action, event);
 

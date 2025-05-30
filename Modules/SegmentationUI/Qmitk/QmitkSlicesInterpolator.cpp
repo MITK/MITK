@@ -14,10 +14,8 @@ found in the LICENSE file.
 #include "QmitkRenderWindow.h"
 #include "QmitkRenderWindowWidget.h"
 
-#include "mitkApplyDiffImageOperation.h"
 #include "mitkColorProperty.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkDiffImageApplier.h"
 #include "mitkInteractionConst.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkOperationEvent.h"
@@ -47,6 +45,9 @@ found in the LICENSE file.
 
 #include <mitkImageToContourFilter.h>
 #include <mitkImagePixelReadAccessor.h>
+
+#include <mitkLabelSetImageHelper.h>
+#include <mitkSegChangeOperationApplier.h>
 
 //  Includes for the merge operation
 #include "mitkImageToContourFilter.h"
@@ -811,7 +812,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     { {0, mitk::MultiLabelSegmentation::UNLABELED_VALUE}, {1, activeValue} }
   );
 
-  mitk::SegTool2D::WriteBackSegmentationResult(workingNode, planeGeometry, interpolatedSlice, timeStep);
+  mitk::SegTool2D::WriteBackSegmentationResult(workingNode, planeGeometry, interpolatedSlice, timeStep, "2D Interpolation");
   m_FeedbackNode->SetData(nullptr);
 }
 
@@ -946,34 +947,29 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     m_Interpolator->DisableSliceImageCache();
 
-    //  Do and Undo Operations
     if (totalChangedSlices > 0)
     {
-      /////////////////////////////////////////////////////////////
-      //Commented out code that does not work due to changes in #536.
-      //This break functionality, but code has to be completly to be rworked
-      //anyways will be done directly after #536 in #81
-      //choose to just defunc code for now to avoid making the code review
-      //of #536 even more complex
+      const auto activeLabel = m_Segmentation->GetActiveLabel();
+      auto newDestinationLabel = activeLabel->GetValue();
+      auto activeLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, activeLabel);
 
-      //// Create do/undo operations
-      //auto* doOp = new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
+      mitk::SegGroupModifyUndoRedoHelper undoHelper(m_Segmentation, { m_Segmentation->GetActiveLayer() }, false, timeStep, true, false, true);
 
-      //auto* undoOp = new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
-      //undoOp->SetFactor(-1.0);
+      TransferLabelContentAtTimeStep(
+        diffImage,
+        m_Segmentation->GetGroupImage(m_Segmentation->GetActiveLayer()),
+        m_Segmentation->GetConstLabelsByValue(m_Segmentation->GetLabelValuesByGroup(m_Segmentation->GetActiveLayer())),
+        timeStep,
+        0,
+        0,
+        false,
+        { {1, newDestinationLabel} },
+        mitk::MultiLabelSegmentation::MergeStyle::Merge,
+        mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
-      //auto comment = "Confirm all interpolations (" + std::to_string(totalChangedSlices) + ")";
-      //auto* undoStackItem = new mitk::OperationEvent(mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment);
+      std::string name = "3D-interpolation - " + activeLabelName;
 
-      //mitk::OperationEvent::IncCurrGroupEventId();
-      //mitk::OperationEvent::IncCurrObjectEventId();
-      //mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
-      //const auto newDestinationLabel = dynamic_cast<mitk::MultiLabelSegmentation*>(m_Segmentation)->GetActiveLabel()->GetValue();
-      //mitk::DiffImageApplier::GetInstanceForUndo()->SetDestinationLabel(newDestinationLabel);
-      //// Apply the changes to the original image
-      //mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation(doOp);
-
-      /////////////////////////////////////////////////////////////
+      undoHelper.RegisterUndoRedoOperationEvent(name);
     }
     m_FeedbackNode->SetData(nullptr);
   }
@@ -1010,7 +1006,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
   auto segmentation = GetData<mitk::MultiLabelSegmentation>(segmentationDataNode);
   auto activeLabelColor = segmentation->GetActiveLabel()->GetColor();
-  std::string activeLabelName = segmentation->GetActiveLabel()->GetName();
+  std::string activeLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(segmentation, segmentation->GetActiveLabel());
 
   if (referenceImage.IsNull() || segmentation.IsNull())
     return;
@@ -1041,6 +1037,8 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   auto timeStep = segmentationGeometry->TimePointToTimeStep(m_TimePoint);
   const mitk::Label::PixelType newDestinationLabel = segmentation->GetActiveLabel()->GetValue();
 
+  mitk::SegGroupModifyUndoRedoHelper undoHelper(segmentation, { segmentation->GetActiveLayer() }, false, timeStep, true, false, true);
+
   TransferLabelContentAtTimeStep(
     interpolatedSegmentation,
     segmentation->GetGroupImage(segmentation->GetActiveLayer()),
@@ -1055,7 +1053,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
   this->Show3DInterpolationResult(false);
 
-  std::string name = segmentationDataNode->GetName() + " 3D-interpolation - " + activeLabelName;
+  std::string name = "3D-interpolation - " + activeLabelName;
   mitk::TimeBounds timeBounds;
 
   if (1 < interpolatedSurface->GetTimeSteps())
@@ -1075,6 +1073,10 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   {
     timeBounds = segmentationGeometry->GetTimeBounds(0);
   }
+
+  undoHelper.RegisterUndoRedoOperationEvent(name);
+
+  name = segmentationDataNode->GetName() + " " + name;
 
   auto* surfaceGeometry = static_cast<mitk::ProportionalTimeGeometry*>(interpolatedSurface->GetTimeGeometry());
   surfaceGeometry->SetFirstTimePoint(timeBounds[0]);

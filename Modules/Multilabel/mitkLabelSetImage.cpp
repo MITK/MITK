@@ -271,17 +271,19 @@ void mitk::MultiLabelSegmentation::RemoveGroup(GroupIndexType indexToDelete)
       m_LabelMap.erase(labelValue);
       this->InvokeEvent(LabelRemovedEvent(labelValue));
     }
+
     // remove the group entries in the maps and the image.
     m_Groups.erase(m_Groups.begin() + indexToDelete);
     m_GroupToLabelMap.erase(m_GroupToLabelMap.begin() + indexToDelete);
     m_GroupContainer.erase(m_GroupContainer.begin() + indexToDelete);
+
+    //update old indexes in m_LabelToGroupMap to new group indexes
+    for (auto& element : m_LabelToGroupMap)
+    {
+      if (element.second > indexToDelete) element.second = element.second - 1;
+    }
   }
 
-  //update old indexes in m_LabelToGroupMap to new group indexes
-  for (auto& element : m_LabelToGroupMap)
-  {
-    if (element.second > indexToDelete) element.second = element.second -1;
-  }
 
   if (!this->ExistLabel(m_ActiveLabelValue))
   {
@@ -356,18 +358,30 @@ mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation:
 
 mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddGroup(ConstLabelVector labels)
 {
-  auto newImage = this->GenerateNewGroupImage();
-  ClearImageBuffer(newImage);
-
-  return this->AddGroup(newImage, labels);
+  auto newID = this->GetNumberOfGroups();
+  this->InsertGroup(newID, labels);
+  return newID;
 }
 
 mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddGroup(mitk::Image* groupImage, ConstLabelVector labels)
 {
-  GroupIndexType newGroupID = m_Groups.size();
+  auto newID = this->GetNumberOfGroups();
+  this->InsertGroup(newID, groupImage, labels);
+  return newID;
+}
 
+void mitk::MultiLabelSegmentation::InsertGroup(GroupIndexType groupID, ConstLabelVector labels, std::string name)
+{
+  auto newImage = this->GenerateNewGroupImage();
+  ClearImageBuffer(newImage);
+
+  this->InsertGroup(groupID, newImage, labels, name);
+}
+
+void mitk::MultiLabelSegmentation::InsertGroup(GroupIndexType groupID, mitk::Image* groupImage, ConstLabelVector labels, std::string name)
+{
   if (nullptr == groupImage)
-    mitkThrow() << "Cannot add group. Passed group image is nullptr.";
+    mitkThrow() << "Cannot insert group. Passed group image is nullptr.";
 
   bool equalGeometries = Equal(
     *(this->GetTimeGeometry()),
@@ -377,35 +391,51 @@ mitk::MultiLabelSegmentation::GroupIndexType mitk::MultiLabelSegmentation::AddGr
     false);
 
   if (!equalGeometries)
-    mitkThrow() << "Cannot add group. Passed group image has not the same geometry like segmentation.";
+    mitkThrow() << "Cannot insert group. Passed group image has not the same geometry like segmentation.";
 
   if (groupImage->GetPixelType() != MakePixelType<LabelValueType, LabelValueType, 1>())
-    mitkThrow() << "Cannot add group. Passed group image has incorrect pixel type. Only LabelValueType is supported. Invalid pixel type: "<< groupImage->GetPixelType().GetTypeAsString();
+    mitkThrow() << "Cannot insert group. Passed group image has incorrect pixel type. Only LabelValueType is supported. Invalid pixel type: " << groupImage->GetPixelType().GetTypeAsString();
 
-  // push a new working image for the new group
-  m_GroupContainer.push_back(groupImage);
+  if (groupID > m_Groups.size())
+    mitkThrow() << "Cannot insert group. Passed insert position is out of bounds. Current number of groups: "<<m_Groups.size() << "; invalid insertion group index : " << groupID;
 
-  m_Groups.push_back("");
-  m_GroupToLabelMap.push_back({});
-
-  for (auto label : labels)
   {
-    if (m_LabelMap.end() != m_LabelMap.find(label->GetValue()))
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+
+    // push a new working image for the new group
+    m_GroupContainer.insert(m_GroupContainer.begin()+groupID, groupImage);
+
+    m_Groups.insert(m_Groups.begin() + groupID, name);
+    m_GroupToLabelMap.insert(m_GroupToLabelMap.begin() + groupID, LabelValueVectorType());
+
+    //update old indexes in m_LabelToGroupMap to new group indexes
+    for (auto& element : m_LabelToGroupMap)
     {
-      mitkThrow() << "Cannot add group. Labels that should be added with group use at least one label value that is already in use. Conflicted label value: " << label->GetValue();
+      if (element.second >= groupID) element.second = element.second + 1;
     }
 
-    auto labelClone = label->Clone();
+    for (auto label : labels)
+    {
+      if (m_LabelMap.end() != m_LabelMap.find(label->GetValue()))
+      {
+        mitkThrow() << "Cannot add group. Labels that should be added with group use at least one label value that is already in use. Conflicted label value: " << label->GetValue();
+      }
 
-    DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(labelClone);
-    this->AddLabelToMap(labelClone->GetValue(), labelClone, newGroupID);
-    this->RegisterLabel(labelClone);
+      auto labelClone = label->Clone();
+
+      DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(labelClone);
+      this->AddLabelToMap(labelClone->GetValue(), labelClone, groupID);
+      this->RegisterLabel(labelClone);
+    }
   }
 
   this->Modified();
-  this->InvokeEvent(GroupAddedEvent(newGroupID));
+  this->InvokeEvent(GroupAddedEvent(groupID));
 
-  return newGroupID;
+  for (GroupIndexType modGroupID = groupID + 1; modGroupID < m_Groups.size(); ++modGroupID)
+  {
+    this->InvokeEvent(GroupModifiedEvent(modGroupID));
+  }
 }
 
 void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& labelSet)
@@ -415,31 +445,116 @@ void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType group
     mitkThrow() << "Trying to replace labels of non-existing group. Invalid group id: "<<groupID;
   }
 
-  //remove old group labels
+  auto oldActiveLabel = m_ActiveLabelValue;
+
+  LabelValueVectorType removedLabels;
+  LabelValueVectorType addedLabels;
+  LabelValueVectorType modifiedLabels;
+
   LabelValueVectorType oldLabels;
   {
     std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+
+    //remove old group labels
     oldLabels = this->m_GroupToLabelMap[groupID];
     for (auto labelID : oldLabels)
     {
       this->RemoveLabelFromMap(labelID);
-      this->InvokeEvent(LabelRemovedEvent(labelID));
+      if (std::find_if(labelSet.cbegin(), labelSet.cend(), [labelID](const Label* label){return label->GetValue() == labelID;}) == labelSet.cend())
+      { //label is not in the new set, so it will be effectively removed
+        removedLabels.push_back(labelID);
+      }
+    }
 
+    //add new labels to group
+    for (auto label : labelSet)
+    {
+      if (m_LabelMap.find(label->GetValue()) != m_LabelMap.cend())
+      {
+        auto conflictingGroup = this->GetGroupIndexOfLabel(label->GetValue());
+        mitkThrow() << "Error while replacing labels. Label value is already existing in another group. Invalid label: " << label->GetValue() << "; conflicting group: " << conflictingGroup;
+      }
+
+      // add DICOM information of the label
+      auto clonedLabel = label->Clone();
+      DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(clonedLabel);
+
+      this->AddLabelToMap(clonedLabel->GetValue(), clonedLabel, groupID);
+      this->RegisterLabel(clonedLabel);
+
+      if (std::find(oldLabels.cbegin(), oldLabels.cend(), label->GetValue()) == oldLabels.cend())
+      { //label was not in the old set, so it was effectively added
+        addedLabels.push_back(clonedLabel->GetValue());
+      }
+      else
+      {
+        modifiedLabels.push_back(clonedLabel->GetValue());
+      }
     }
   }
+
+  //now after the manipulation operation send all events
+  for (auto labelID : removedLabels)
+  {
+    this->InvokeEvent(LabelRemovedEvent(labelID));
+  }
+  for (auto labelID : addedLabels)
+  {
+    this->InvokeEvent(LabelAddedEvent(labelID));
+  }
+  for (auto labelID : modifiedLabels)
+  {
+    this->InvokeEvent(LabelModifiedEvent(labelID));
+  }
+
   this->InvokeEvent(LabelsChangedEvent(oldLabels));
   this->InvokeEvent(GroupModifiedEvent(groupID));
+  this->Modified();
 
-  //add new labels to group
-  for (auto label : labelSet)
-  {
-    this->AddLabel(label->Clone(), groupID, true, false);
+  if (!this->ExistLabel(m_ActiveLabelValue) && !this->ExistLabel(oldActiveLabel))
+  { //Active label must be redefined, because it was removed by replacement.
+    this->SetActiveLabel(m_LabelMap.empty() ? UNLABELED_VALUE : m_LabelMap.begin()->second->GetValue());
   }
 }
 
 void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& labelSet)
 {
   return ReplaceGroupLabels(groupID, ConvertLabelVectorConst(labelSet));
+}
+
+void mitk::MultiLabelSegmentation::ReplaceLabels(const ConstLabelVectorType& newLabels)
+{
+  for (auto& label : newLabels)
+  {
+    if (!this->ExistLabel(label->GetValue()))
+    {
+      mitkThrow() << "Trying to replace unknown label. Invalid label value: " << label->GetValue();
+    }
+  }
+
+  {
+    std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
+
+    for (auto label : newLabels)
+    {
+      auto clonedLabel = label->Clone();
+
+      this->ReleaseLabel(m_LabelMap[label->GetValue()]);
+        m_LabelMap[label->GetValue()] = clonedLabel;
+      this->RegisterLabel(clonedLabel);
+      clonedLabel->Modified(); //indicate a modification for the label as the
+                               //replacement has overwritten old values
+                               //e.g. relevant for the QmitkMultiLabelTreeModel
+    }
+  }
+
+  this->InvokeEvent(LabelsChangedEvent(ExtractLabelValuesFromLabelVector(newLabels)));
+  this->Modified();
+}
+
+void mitk::MultiLabelSegmentation::ReplaceLabels(const LabelVectorType& newLabels)
+{
+  return ReplaceLabels(ConvertLabelVectorConst(newLabels));
 }
 
 mitk::Image* mitk::MultiLabelSegmentation::GetGroupImage(GroupIndexType groupID)

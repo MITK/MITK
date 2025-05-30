@@ -223,9 +223,13 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
   std::vector<mitk::MultiLabelSegmentation::GroupIndexType> outdatedGroups;
   auto currentTimestep = this->GetTimestep();
-  if (isGeometryModified || contentBecameValid || localStorage->m_LastTimeStep!= currentTimestep)
+  if (isGeometryModified ||
+      contentBecameValid ||
+      localStorage->m_LastTimeStep!= currentTimestep ||
+      localStorage->m_NumberOfLayers != segmentation->GetNumberOfGroups())
   {
     //if geometry is outdated or we have valid content again
+    // or a new time step or the number of groups where changed
     // -> all groups need regeneration
     outdatedGroups.resize(segmentation->GetNumberOfGroups());
     std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);

@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <org_mitk_gui_common_Export.h>
 
 #include <mitkDataNode.h>
+#include <mitkWeakPointer.h>
 
 namespace mitk
 {
@@ -35,16 +36,14 @@ public:
   berryObjectMacro(mitk::DataNodeObject);
 
   DataNodeObject();
-  DataNodeObject(DataNode::Pointer node);
+  DataNodeObject(DataNode* node);
 
   DataNode::Pointer GetDataNode() const;
 
   bool operator==(const berry::Object* obj) const override;
 
 private:
-
-  DataNode::Pointer m_Node;
-
+  WeakPointer<DataNode> m_Node;
 
 };
 

@@ -184,6 +184,11 @@ bool mitk::LimitedLinearUndo::RedoListEmpty()
   return m_RedoList.empty();
 }
 
+bool mitk::LimitedLinearUndo::UndoListEmpty()
+{
+  return m_UndoList.empty();
+}
+
 std::size_t mitk::LimitedLinearUndo::GetUndoLimit() const
 {
   return m_UndoLimit;
@@ -198,6 +203,8 @@ void mitk::LimitedLinearUndo::SetUndoLimit(std::size_t undoLimit)
       m_UndoList.erase(m_UndoList.begin(), m_UndoList.end() - undoLimit);
     }
     m_UndoLimit = undoLimit;
+
+    InvokeEvent(UndoStackEvent());
   }
 }
 
@@ -244,4 +251,42 @@ int mitk::LimitedLinearUndo::FirstObjectEventIdOfCurrentGroup(mitk::LimitedLinea
   }
 
   return firstObjectEventId;
+}
+
+namespace
+{
+  unsigned int RemoveInvalidOperationsFromList(mitk::LimitedLinearUndo::UndoContainer& list)
+  {
+    unsigned int removedCount = 0;
+    auto undoIter = list.begin();
+    while (undoIter != list.end())
+    {
+      if (!(*undoIter)->IsValid())
+      {
+        delete (*undoIter);
+        undoIter = list.erase(undoIter);
+        removedCount++;
+      }
+      else
+      {
+        ++undoIter;
+      }
+    }
+    return removedCount;
+  }
+
+}
+
+
+unsigned int mitk::LimitedLinearUndo::RemoveInvalidOperations()
+{
+  // Check undo list and remove invalid operations
+  unsigned int removedCount = RemoveInvalidOperationsFromList(m_UndoList);
+
+  // Check redo list and remove invalid operations
+  removedCount += RemoveInvalidOperationsFromList(m_RedoList);
+
+  if (removedCount>0) InvokeEvent(UndoStackEvent());
+
+  return removedCount;
 }

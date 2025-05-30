@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkBooleanOperation.h>
 #include <mitkProgressBar.h>
 #include <mitkLabelSetImageHelper.h>
+#include <mitkSegChangeOperationApplier.h>
 
 
 QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
@@ -227,8 +228,13 @@ void QmitkBooleanOperationsWidget::SaveResultLabelMask(const mitk::Image* result
   if (labels.empty()) mitkThrow() << "Widget is in invalid state. Processing was triggered with no label selected.";
 
   auto groupID = seg->AddGroup();
+
+  mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(seg, { groupID });
+
   auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(seg, labelName, true);
   seg->AddLabelWithContent(newLabel, resultMask, groupID, 1);
+
+  undoRedoGenerator.RegisterUndoRedoOperationEvent("Add boolean operation result as new group \"" + std::to_string(groupID) + "\".");
 
   m_Controls->labelInspector->GetMultiLabelSegmentation()->Modified();
   m_Controls->labelInspector->GetMultiLabelNode()->Modified();

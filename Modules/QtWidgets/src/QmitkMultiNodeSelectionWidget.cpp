@@ -141,7 +141,7 @@ void QmitkMultiNodeSelectionWidget::OnInternalSelectionChanged()
 
 void QmitkMultiNodeSelectionWidget::OnClearSelection(const mitk::DataNode* node)
 {
-  this->RemoveNodeFromSelection(node);
+  this->RemoveNodeFromInternalSelection(node);
 }
 
 void QmitkMultiNodeSelectionWidget::changeEvent(QEvent *event)

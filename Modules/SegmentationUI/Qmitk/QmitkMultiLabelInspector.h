@@ -233,11 +233,14 @@ public Q_SLOTS:
   void SetVisibilityOfAffectedLabels(bool visible) const;
   void SetLockOfAffectedLabels(bool visible) const;
 
-protected:
-  void Initialize();
+protected Q_SLOTS:
   void OnModelReset();
+  void OnModelChanged();
   void OnDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,
     const QList<int>& roles = QList<int>());
+
+protected:
+  void Initialize();
 
   QmitkMultiLabelTreeModel* m_Model;
   mitk::MultiLabelSegmentation::Pointer m_Segmentation;
@@ -338,6 +341,9 @@ private:
   bool m_ModelManipulationOngoing = false;
 
   bool m_AboutToShowContextMenu = false;
+
+  bool m_CheckSelectionDueToExternalModelChange = true;
+
   mitk::DataNode::Pointer m_SegmentationNode;
   unsigned long m_SegmentationNodeDataMTime;
   mitk::ITKEventObserverGuard m_SegmentationObserver;

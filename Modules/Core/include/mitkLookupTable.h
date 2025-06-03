@@ -191,6 +191,7 @@ namespace mitk
      * \li MULTILABEL A LookupTable for multilabel images.
      * \li PET_COLOR A LookupTable for PET color rendering.
      * \li PET_20 A LookupTable for PET_20 color rendering.
+     * \li PET_BLACK_WHITE A LookupTable for PET white to black color rendering.
      * \li TURBO An improved rainbow LookupTable for visualization.
      *
      * The different LookupTableTypes can be applied in the MitkWorkbench via right-clicking
@@ -212,6 +213,7 @@ namespace mitk
       MULTILABEL,
       PET_COLOR,
       PET_20,
+      PET_BLACK_WHITE,
       TURBO
     };
 
@@ -251,13 +253,14 @@ namespace mitk
     virtual void BuildLegacyRainbowColorLookupTable();
     virtual void BuildInverseGrayScaleLookupTable();
     virtual void BuildHotIronLookupTable();
-	  virtual void BuildPlasmaLookupTable();
-	  virtual void BuildInfernoLookupTable();
-	  virtual void BuildViridisLookupTable();
+    virtual void BuildPlasmaLookupTable();
+    virtual void BuildInfernoLookupTable();
+    virtual void BuildViridisLookupTable();
     virtual void BuildMagmaLookupTable();
     virtual void BuildJetLookupTable(bool transparent = false);
     virtual void BuildPETColorLookupTable();
     virtual void BuildPET20LookupTable();
+    virtual void BuildPETBWLookupTable();
     virtual void BuildMultiLabelLookupTable();
     virtual void BuildTurboLookupTable();
 

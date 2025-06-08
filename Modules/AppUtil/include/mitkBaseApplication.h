@@ -98,6 +98,7 @@ namespace mitk
     static const QString ARG_LOG_QT_MESSAGES;
     static const QString ARG_SEGMENTATION_LABELSET_PRESET;
     static const QString ARG_SEGMENTATION_LABEL_SUGGESTIONS;
+    static const QString ARG_FULL_SCREEN_MODE;
 
     // BlueBerry specific plugin framework properties
 
@@ -170,6 +171,17 @@ namespace mitk
      */
     void setSafeMode(bool safeMode);
     bool getSafeMode() const;
+
+    /**
+     * Put the application in full screen mode, which will cover the whole screen
+     * and has no window frame.
+     *
+     * Calling this method after run() has been called has no effect.
+     *
+     * @param fullScreenMode
+     */
+    void setFullScreenMode(bool fullScreenMode);
+    bool getFullScreenMode() const;
 
     /**
      * Set a list of library names or absolute file paths

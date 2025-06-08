@@ -62,7 +62,7 @@ const char* mitk::OtsuTool3D::GetName() const
   return "Otsu";
 }
 
-void mitk::OtsuTool3D::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::OtsuTool3D::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, MultiLabelSegmentation* previewImage, TimeStepType timeStep)
 {
   int numberOfThresholds = m_NumberOfRegions - 1;
 
@@ -82,8 +82,7 @@ void mitk::OtsuTool3D::DoUpdatePreview(const Image* inputAtTimeStep, const Image
     mitkThrow() << "itkOtsuFilter error (image dimension must be in {2, 3} and image must not be RGB)";
   }
 
-  mitk::ImageReadAccessor newMitkImgAcc(otsuFilter->GetOutput());
-  previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
+  previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), otsuFilter->GetOutput(), timeStep);
 }
 
 void mitk::OtsuTool3D::UpdatePrepare()

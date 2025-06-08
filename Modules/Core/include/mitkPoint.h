@@ -67,6 +67,14 @@ namespace mitk
     {
     }
 
+    template <typename... Args,
+              typename = std::enable_if_t<(sizeof...(Args) == NPointDimension)>>
+    explicit Point(Args... args)
+    {
+      size_t i = 0;
+      ((this->GetDataPointer()[i++] = static_cast<TCoordRep>(args)), ...);
+    }
+
     /**
      * Copies the elements from array array to this.
      * Note that this method will assign doubles to floats without complaining!

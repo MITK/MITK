@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageConverter.h>
 #include <vtkPolyDataNormals.h>
+#include <omp.h>
 
 namespace mitk
 {
@@ -59,8 +60,10 @@ namespace mitk
     {
       Image::Pointer image;
       GetPointerParameter("Input", image);
+      MultiLabelSegmentation::Pointer labelSetImage;
+      GetPointerParameter("Input", labelSetImage);
 
-      return image.IsNotNull() && GetGroupNode();
+      return (labelSetImage.IsNotNull() || image.IsNotNull()) && GetGroupNode();
     }
     catch (std::invalid_argument &)
     {
@@ -70,9 +73,6 @@ namespace mitk
 
   bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   {
-    Image::Pointer image;
-    GetPointerParameter("Input", image);
-
     bool smooth(true);
     GetParameter("Smooth", smooth);
 
@@ -95,15 +95,23 @@ namespace mitk
               << applyMedian << " median kernel " << medianKernelSize << " mesh reduction " << decimateMesh
               << " reductionRate " << reductionRate;
 
-    auto labelSetImage = dynamic_cast<LabelSetImage *>(image.GetPointer());
+    MultiLabelSegmentation::Pointer labelSetImage;
+    GetPointerParameter("Input", labelSetImage);
 
     if (nullptr != labelSetImage)
     {
       const auto labels = labelSetImage->GetLabels();
 
-      for (auto label : labels)
+      int numLabels = static_cast<int>(labels.size());
+      m_SurfaceNodes.reserve(numLabels);
+
+      omp_lock_t lock;
+      omp_init_lock(&lock);
+
+      #pragma omp parallel for
+      for (int i = 0; i < numLabels; ++i)
       {
-        auto labelImage = CreateLabelMask(labelSetImage, label->GetValue());
+        auto labelImage = CreateLabelMask(labelSetImage, labels[i]->GetValue());
 
         if (labelImage.IsNull())
           continue;
@@ -117,20 +125,26 @@ namespace mitk
 
         if (smooth && (polyData->GetNumberOfPoints() < 1 || polyData->GetNumberOfCells() < 1))
         {
-          MITK_WARN << "Label \"" << label->GetName() << "\" didn't produce any smoothed surface data (try again without smoothing).";
+          MITK_WARN << "Label \"" << labels[i]->GetName() << "\" didn't produce any smoothed surface data (try again without smoothing).";
           continue;
         }
 
         auto node = DataNode::New();
         node->SetData(labelSurface);
-        node->SetColor(label->GetColor());
-        node->SetName(label->GetName());
+        node->SetColor(labels[i]->GetColor());
+        node->SetName(labels[i]->GetName());
 
+        omp_set_lock(&lock);
         m_SurfaceNodes.push_back(node);
+        omp_unset_lock(&lock);
       }
+
+      omp_destroy_lock(&lock);
     }
     else
     {
+      Image::Pointer image;
+      GetPointerParameter("Input", image);
       auto surface = this->ConvertBinaryImageToSurface(image);
 
       if (surface.IsNotNull())

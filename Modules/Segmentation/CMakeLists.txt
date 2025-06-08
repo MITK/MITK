@@ -7,6 +7,8 @@ mitk_create_module(
     Rendering
     SegmentationUtilities/BooleanOperations
     SegmentationUtilities/MorphologicalOperations
+  PCH
+    mitkTool.h
   DEPENDS
     MitkAlgorithmsExt
     MitkBoundingShape
@@ -23,9 +25,12 @@ mitk_create_module(
       GrowCut
       ITKLabelMap
       ITKMathematicalMorphology
+      OpenMP::OpenMP_CXX
       VTK::ImagingGeneral
 )
 
-add_subdirectory(autoload/IO)
-add_subdirectory(cmdapps)
-add_subdirectory(Testing)
+if(TARGET ${MODULE_TARGET})
+  add_subdirectory(autoload/IO)
+  add_subdirectory(cmdapps)
+  add_subdirectory(Testing)
+endif()

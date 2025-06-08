@@ -41,7 +41,7 @@ QmitkImageStatisticsCalculationRunnable::~QmitkImageStatisticsCalculationRunnabl
 void QmitkImageStatisticsCalculationRunnable::Initialize(const mitk::Image* image, const mitk::BaseData* mask)
 {
   if (nullptr!= mask &&
-      nullptr == dynamic_cast<const mitk::LabelSetImage*>(mask) &&
+      nullptr == dynamic_cast<const mitk::MultiLabelSegmentation*>(mask) &&
       nullptr == dynamic_cast<const mitk::Image*>(mask) &&
       nullptr == dynamic_cast<const mitk::PlanarFigure*>(mask))
     mitkThrow() << "Cannot initialize QmitkImageStatisticsCalculationRunnable. Mask data is not a supported type.";
@@ -110,7 +110,7 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
   // the same holds for the ::SetPlanarFigure()
   try
   {
-    auto multiLabelMask = dynamic_cast<const mitk::LabelSetImage*>(m_MaskData.GetPointer());
+    auto multiLabelMask = dynamic_cast<const mitk::MultiLabelSegmentation*>(m_MaskData.GetPointer());
     auto binLabelMask = dynamic_cast<const mitk::Image*>(m_MaskData.GetPointer());
     auto pfMask = dynamic_cast<const mitk::PlanarFigure*>(m_MaskData.GetPointer());
 

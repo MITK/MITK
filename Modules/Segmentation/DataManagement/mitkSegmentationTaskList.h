@@ -39,6 +39,13 @@ namespace mitk
         fs::path Result;
       };
 
+      struct MITKSEGMENTATION_EXPORT Scene
+      {
+        fs::path Path;
+        std::string Image;
+        std::string Segmentation;
+      };
+
       Task();
       ~Task();
 
@@ -54,6 +61,7 @@ namespace mitk
       mitkSegmentationTaskValueMacro(fs::path, Result)
       mitkSegmentationTaskValueMacro(bool, Dynamic)
       mitkSegmentationTaskValueMacro(Form, Form)
+      mitkSegmentationTaskValueMacro(Scene, Scene)
 
     private:
       const Task* m_Defaults;
@@ -73,6 +81,7 @@ namespace mitk
     mitkSegmentationTaskListValueMacro(fs::path, Result)
     mitkSegmentationTaskListValueMacro(bool, Dynamic)
     mitkSegmentationTaskListValueMacro(Task::Form, Form)
+    mitkSegmentationTaskListValueMacro(Task::Scene, Scene)
 
     size_t GetNumberOfTasks() const;
     size_t AddTask(const Task& subtask);

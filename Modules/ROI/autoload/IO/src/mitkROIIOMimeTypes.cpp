@@ -33,6 +33,9 @@ bool mitk::MitkROIIOMimeTypes::MitkROIMimeType::AppliesTo(const std::string& pat
   if (!fs::exists(path)) // T18572
     return result;
 
+  if (fs::is_directory(path))
+    return false;
+
   std::ifstream file(path);
 
   if (!file.is_open())

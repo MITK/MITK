@@ -1,9 +1,5 @@
 set(TOOL_CPPS "")
 
-# temporary suppress warnings in the following files until image accessors are fully integrated.
-set_source_files_properties( src/DataManagement/mitkImage.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
-set_source_files_properties( src/Controllers/mitkSliceNavigationController.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
-
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
   set(optional_public_target_depends stdc++fs)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
@@ -21,6 +17,9 @@ mitk_create_module(
       src/Interactions
       src/IO
       src/Rendering
+  PCH
+    mitkBaseRenderer.h
+    mitkImage.h
   DEPENDS
     PUBLIC
       MitkLog

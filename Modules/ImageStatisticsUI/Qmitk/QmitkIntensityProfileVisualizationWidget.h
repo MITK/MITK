@@ -13,13 +13,17 @@ found in the LICENSE file.
 #define QmitkIntensityProfileVisualizationWidget_h
 
 //Qt
-#include <QWidget>
+#include <QmitkChartWidget.h>
 
 #include <MitkImageStatisticsUIExports.h>
-#include <ui_QmitkIntensityProfileVisualizationWidget.h>
 
 //mitk
 #include <mitkIntensityProfile.h>
+
+namespace Ui
+{
+	class QmitkIntensityProfileControls;
+};
 
 /**
 * \brief Widget for displaying intensity profiles.
@@ -55,7 +59,7 @@ private:
 
 private:
 
-	Ui::QmitkIntensityProfileControls m_Controls;
+	Ui::QmitkIntensityProfileControls *m_Controls;
   QmitkChartWidget::ColorTheme m_ChartStyle = QmitkChartWidget::ColorTheme::darkstyle;
 
 	std::vector<double> m_IntensityProfileList;

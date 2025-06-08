@@ -27,7 +27,15 @@ endif()
 cmake_policy(SET CMP0091 OLD)
 
 if(POLICY CMP0135)
-  cmake_policy(SET CMP0135 NEW) # https://cmake.org/cmake/help/v3.24/policy/CMP0135.html
+  # https://cmake.org/cmake/help/v3.24/policy/CMP0135.html
+  # Set timestamps of extracted ExternalProject_Add() downloads to time of extraction.
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
+if(POLICY CMP0167)
+  # https://cmake.org/cmake/help/v3.30/policy/CMP0167.html
+  # The FindBoost module is removed.
+  cmake_policy(SET CMP0167 OLD)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -41,7 +49,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2024.06.99)
+  project(MITK VERSION 2024.12.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -191,6 +199,7 @@ option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
 option(MITK_FAST_TESTING "Disable long-running tests like packaging" OFF)
 option(MITK_XVFB_TESTING "Execute test drivers through xvfb-run" OFF)
+option(MITK_PCH "Enable precompiled headers" ON)
 
 option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
@@ -199,6 +208,7 @@ mark_as_advanced(
   MITK_XVFB_TESTING
   MITK_FAST_TESTING
   MITK_BUILD_ALL_APPS
+  MITK_PCH
 )
 
 #-----------------------------------------------------------------------------
@@ -368,7 +378,7 @@ endif()
 # -----------------------------------------
 # Custom dependency logic
 
-if(WIN32 AND Qt6_DIR)
+if(WIN32 AND Qt6_DIR AND NOT OPENSSL_ROOT_DIR)
   set(_dir_candidate "${Qt6_DIR}/../../../../../Tools/OpenSSLv3/Win_x64")
   get_filename_component(_dir_candidate ${_dir_candidate} ABSOLUTE)
   if(EXISTS "${_dir_candidate}")
@@ -412,9 +422,9 @@ if(MITK_USE_Python3)
   set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
 
   if(APPLE)
-    set(python3_mininum_version 3.11)
+    set(python3_mininum_version 3.12)
   else()
-    set(python3_mininum_version 3.8)
+    set(python3_mininum_version 3.9)
   endif()
 
   find_package(Python3 ${python3_mininum_version} REQUIRED COMPONENTS Interpreter Development NumPy)
@@ -424,6 +434,7 @@ if(MITK_USE_Python3)
     string(REPLACE "\\" "/" Python3_STDLIB "${Python3_STDLIB}")
     string(REPLACE "\\" "/" Python3_SITELIB "${Python3_SITELIB}")
   endif()
+  link_directories(${Python3_LIBRARY_DIRS})
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
@@ -1085,6 +1096,23 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER
 #-----------------------------------------------------------------------------
 
 add_subdirectory(Utilities)
+
+set(MITK_WRAP_PYTHON_ENABLED OFF)
+if(MITK_USE_SWIG AND MITK_USE_Python3)
+  set(SWIG_VERSION 4.3.0 CACHE STRING "" FORCE)
+  find_package(SWIG ${SWIG_VERSION} COMPONENTS python)
+
+  if(SWIG_FOUND)
+    option(MITK_WRAP_PYTHON "" ON)
+
+    if(MITK_WRAP_PYTHON)
+      set(MITK_WRAP_PYTHON_ENABLED ON)
+    endif()
+  else()
+   message(SEND_ERROR "SWIG not found!")
+  endif()
+endif()
+
 
 add_subdirectory(Modules)
 

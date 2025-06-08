@@ -12,96 +12,109 @@ found in the LICENSE file.
 
 #include <QmitkDataNodeOpacityAction.h>
 
-// mitk core
 #include <mitkRenderingManager.h>
 
-// qt
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QSlider>
 
 QmitkDataNodeOpacityAction::QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
-  : QWidgetAction(parent)
-  , QmitkAbstractDataNodeAction(workbenchPartSite)
+  : QWidgetAction(parent),
+    QmitkAbstractDataNodeAction(workbenchPartSite),
+    m_Slider(nullptr)
 {
-  InitializeAction();
+  this->InitializeAction();
 }
 
 QmitkDataNodeOpacityAction::QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
-  : QWidgetAction(parent)
-  , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
+  : QmitkDataNodeOpacityAction(parent, berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
-  InitializeAction();
 }
 
 void QmitkDataNodeOpacityAction::InitializeAction()
 {
-  m_OpacitySlider = new QSlider;
-  m_OpacitySlider->setMinimum(0);
-  m_OpacitySlider->setMaximum(100);
-  m_OpacitySlider->setOrientation(Qt::Horizontal);
-  connect(m_OpacitySlider, &QSlider::valueChanged, this, &QmitkDataNodeOpacityAction::OnOpacityChanged);
+  auto label = new QLabel("Opacity: ");
 
-  QLabel* opacityLabel = new QLabel(tr("Opacity: "));
-  QHBoxLayout* opacityWidgetLayout = new QHBoxLayout;
-  opacityWidgetLayout->setContentsMargins(4, 4, 4, 4);
-  opacityWidgetLayout->addWidget(opacityLabel);
-  opacityWidgetLayout->addWidget(m_OpacitySlider);
+  m_Slider = new QSlider;
+  m_Slider->setMinimum(0);
+  m_Slider->setMaximum(100);
+  m_Slider->setOrientation(Qt::Horizontal);
 
-  QWidget* opacityWidget = new QWidget;
-  opacityWidget->setLayout(opacityWidgetLayout);
+  auto layout = new QHBoxLayout;
+  layout->setContentsMargins(4, 4, 4, 4);
+  layout->addWidget(label);
+  layout->addWidget(m_Slider);
 
-  setDefaultWidget(opacityWidget);
+  auto widget = new QWidget;
+  widget->setLayout(layout);
 
-  connect(this, &QAction::changed, this, &QmitkDataNodeOpacityAction::OnActionChanged);
+  this->setDefaultWidget(widget);
+
+  connect(m_Slider, &QSlider::valueChanged, this, &QmitkDataNodeOpacityAction::OnOpacityChanged);
 }
 
-void QmitkDataNodeOpacityAction::InitializeWithDataNode(const mitk::DataNode* dataNode)
+void QmitkDataNodeOpacityAction::InitializeWithDataNode(const mitk::DataNode*)
 {
-  if (nullptr == dataNode)
-  {
-    m_OpacitySlider->setValue(static_cast<int>(0));
-    return;
-  }
+  // Get all selected nodes that have an opacity property.
+  auto nodes = this->GetSelectedOpacityNodes();
 
-  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
+  // Disable the opacity slider if no nodes would be affected anyway.
+  m_Slider->setDisabled(nodes.empty());
 
-  float opacity = 0.0;
-  if (dataNode->GetFloatProperty("opacity", opacity, baseRenderer))
-  {
-    m_OpacitySlider->setValue(static_cast<int>(opacity * 100));
-  }
+  // For the initially shown opacity value, choose the maximum opacity of all
+  // potentially affected nodes. Also works nicely with a single node or
+  // in particular with all nodes having the same opacity anyway.
+
+  float opacity = 0.0f;
+
+  for (auto node : nodes)
+    opacity = std::max(opacity, this->GetOpacity(node).value());
+
+  // Do not trigger the valueChanged signal of the slider when initializing
+  // its value since affected nodes may have different opacities in the
+  // beginning and we only want to change them when the opacity is actively
+  // changed through user interaction.
+
+  m_Slider->blockSignals(true);
+  m_Slider->setValue(static_cast<int>(opacity * 100));
+  m_Slider->blockSignals(false);
 }
 
 void QmitkDataNodeOpacityAction::OnOpacityChanged(int value)
 {
-  auto dataNode = GetSelectedNode();
-  if (dataNode.IsNull())
-  {
-    return;
-  }
+  float opacity = value * 0.01f;
 
-  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
+  for (auto node : this->GetSelectedOpacityNodes())
+    node->SetOpacity(opacity);
 
-  float opacity = static_cast<float>(value) / 100.0f;
-  dataNode->SetFloatProperty("opacity", opacity, baseRenderer);
+  auto renderer = this->GetBaseRenderer();
 
-  if (nullptr == baseRenderer)
+  if (renderer.IsNull())
   {
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else
   {
-    mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+    auto renderWindow = renderer->GetRenderWindow();
+    mitk::RenderingManager::GetInstance()->RequestUpdate(renderWindow);
   }
 }
 
-void QmitkDataNodeOpacityAction::OnActionChanged()
+std::optional<float> QmitkDataNodeOpacityAction::GetOpacity(mitk::DataNode* node)
 {
-  auto dataNode = GetSelectedNode();
-  if (dataNode.IsNull())
-  {
-    return;
-  }
+  if (float opacity = 0.0f; node != nullptr && node->GetOpacity(opacity, this->GetBaseRenderer()))
+    return opacity;
 
-  InitializeWithDataNode(dataNode);
+  return std::nullopt;
+}
+
+std::vector<mitk::DataNode*> QmitkDataNodeOpacityAction::GetSelectedOpacityNodes()
+{
+  auto nodes = this->GetSelectedNodes();
+  std::vector<mitk::DataNode*> opacityNodes;
+
+  std::copy_if(nodes.begin(), nodes.end(), std::back_inserter(opacityNodes),
+    [this](mitk::DataNode* node) { return this->GetOpacity(node).has_value(); });
+
+  return opacityNodes;
 }

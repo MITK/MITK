@@ -11,7 +11,7 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **MITK version**
-E.g. v2024.06.2
+E.g. v2024.12
 
 **Operating system**
 E.g. Windows 11, Ubuntu 24.04, macOS Ventura 13

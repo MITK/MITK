@@ -22,8 +22,10 @@ found in the LICENSE file.
 // Qt includes
 #include <QString>
 
-// ui includes
-#include "ui_ListenerViewMitkControls.h"
+namespace Ui
+{
+  class ListenerViewMitkControls;
+}
 
 /**
  * \ingroup org_mitk_example_gui_selectionservicemitk
@@ -71,7 +73,7 @@ private Q_SLOTS:
   void ToggleRadioMethod(QString selectStr);
 
 private:
-  Ui::ListenerViewMitkControls m_Controls;
+  Ui::ListenerViewMitkControls *m_Controls;
 
   QWidget *m_Parent;
 };

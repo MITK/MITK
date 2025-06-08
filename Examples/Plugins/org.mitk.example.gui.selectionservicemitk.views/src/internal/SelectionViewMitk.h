@@ -16,8 +16,10 @@ found in the LICENSE file.
 // QMitk includes
 #include <QmitkAbstractView.h>
 
-// ui includes
-#include "ui_SelectionViewMitkControls.h"
+namespace Ui
+{
+  class SelectionViewMitkControls;
+}
 
 /**
  * \ingroup org_mitk_example_gui_selectionservicemitk
@@ -49,7 +51,7 @@ private:
   QItemSelectionModel *GetDataNodeSelectionModel() const override;
   //! [MITK Selection Provider method]
 
-  Ui::SelectionViewMitkControls m_Controls;
+  Ui::SelectionViewMitkControls *m_Controls;
 
   QWidget *m_Parent;
 };

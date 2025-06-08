@@ -45,6 +45,10 @@
   #include "dirent_win32.h"
 #endif
 
+#ifdef US_HAVE_CXXABI_H
+  #include <cxxabi.h>
+#endif
+
 //-------------------------------------------------------------------
 // Module auto-loading
 //-------------------------------------------------------------------
@@ -299,10 +303,6 @@ void message_output(MsgType msgType, const char *buf)
   #endif
   }
 }
-
-#ifdef US_HAVE_CXXABI_H
-#include <cxxabi.h>
-#endif
 
 US_Core_EXPORT ::std::string GetDemangledName(const ::std::type_info& typeInfo)
 {

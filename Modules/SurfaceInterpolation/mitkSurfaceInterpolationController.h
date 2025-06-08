@@ -24,7 +24,7 @@ namespace mitk
 {
   class ComputeContourSetNormalsFilter;
   class CreateDistanceImageFromSurfaceFilter;
-  class LabelSetImage;
+  class MultiLabelSegmentation;
   class ReduceContourSetFilter;
 
   class MITKSURFACEINTERPOLATION_EXPORT SurfaceInterpolationController : public itk::Object
@@ -90,14 +90,14 @@ namespace mitk
      * @brief Performs the interpolation.
      *
      */
-    void Interpolate(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep);
+    void Interpolate(const MultiLabelSegmentation* segmentationImage, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep);
 
     /**
      * @brief Get the Result of the interpolation operation.
      *
      * @return mitk::Surface::Pointer
      */
-    mitk::Surface::Pointer GetInterpolationResult(const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep);
+    mitk::Surface::Pointer GetInterpolationResult(const MultiLabelSegmentation* segmentationImage, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep);
 
     /**
      * @brief Sets the minimum spacing of the current selected segmentation
@@ -124,7 +124,7 @@ namespace mitk
      * @brief Get the current selected segmentation for which the interpolation is performed
      * @return the current segmentation image
      */
-    mitk::LabelSetImage* GetCurrentSegmentation();
+    mitk::MultiLabelSegmentation* GetCurrentSegmentation();
 
     void SetDataStorage(DataStorage::Pointer ds);
 
@@ -132,13 +132,13 @@ namespace mitk
      * Sets the current list of contourpoints which is used for the surface interpolation
      * @param currentSegmentationImage The current selected segmentation
      */
-    void SetCurrentInterpolationSession(LabelSetImage* currentSegmentationImage);
+    void SetCurrentInterpolationSession(MultiLabelSegmentation* currentSegmentationImage);
 
     /**
      * @brief Remove interpolation session
      * @param segmentationImage the session to be removed
      */
-    void RemoveInterpolationSession(const LabelSetImage* segmentationImage);
+    void RemoveInterpolationSession(const MultiLabelSegmentation* segmentationImage);
 
     /**
      * @brief Removes all sessions
@@ -152,9 +152,9 @@ namespace mitk
      * @param labelValue label from which to get the contours.
      * @return std::vector<ContourPositionInformation> Returns contours.
      */
-    CPIVector* GetContours(LabelSetImage::LabelValueType labelValue, TimeStepType timeStep);
+    CPIVector* GetContours(MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep);
 
-    std::vector<LabelSetImage::LabelValueType> GetAffectedLabels(const LabelSetImage* seg, TimeStepType timeStep, const PlaneGeometry* plane) const;
+    std::vector<MultiLabelSegmentation::LabelValueType> GetAffectedLabels(const MultiLabelSegmentation* seg, TimeStepType timeStep, const PlaneGeometry* plane) const;
 
     /**
      * @brief Triggered with the "Reinit Interpolation" action. The contours are used to repopulate the
@@ -171,7 +171,7 @@ namespace mitk
      * @param timeStep Time step in which to remove the contours.
      * @remark if the label or time step does not exist, nothing happens.
      */
-    void RemoveContours(const LabelSetImage* segmentationImage, mitk::Label::PixelType label, TimeStepType timeStep);
+    void RemoveContours(const MultiLabelSegmentation* segmentationImage, mitk::Label::PixelType label, TimeStepType timeStep);
 
     /**
      * @brief Removes contours of a particular label and at a given time step for the current session/segmentation.
@@ -180,7 +180,7 @@ namespace mitk
      * @param label Label of contour to remove.
      * @remark if the label or time step does not exist, nothing happens.
      */
-    void RemoveContours(const LabelSetImage* segmentationImage, mitk::Label::PixelType label);
+    void RemoveContours(const MultiLabelSegmentation* segmentationImage, mitk::Label::PixelType label);
 
     unsigned int GetNumberOfInterpolationSessions();
 
@@ -227,13 +227,13 @@ namespace mitk
     void AddPlaneGeometryNodeToDataStorage(const ContourPositionInformation& contourInfo) const;
 
     DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode) const;
-    DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, LabelSetImage::LabelValueType labelValue) const;
-    DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep) const;
+    DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, MultiLabelSegmentation::LabelValueType labelValue) const;
+    DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep) const;
 
     /**
      * Adds Contours from the active Label to the interpolation pipeline
      */
-    void AddActiveLabelContoursForInterpolation(ReduceContourSetFilter* reduceFilter, const LabelSetImage* segmentationImage, LabelSetImage::LabelValueType labelValue, TimeStepType timeStep);
+    void AddActiveLabelContoursForInterpolation(ReduceContourSetFilter* reduceFilter, const MultiLabelSegmentation* segmentationImage, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep);
 
     /**
      * @brief Clears the interpolation data structures. Called from CompleteReinitialization().
@@ -241,7 +241,7 @@ namespace mitk
      */
     void ClearInterpolationSession();
 
-    void RemoveObserversInternal(const mitk::LabelSetImage* segmentationImage);
+    void RemoveObserversInternal(const mitk::MultiLabelSegmentation* segmentationImage);
 
     /**
      * @brief Add contour to the interpolation pipeline
@@ -254,7 +254,7 @@ namespace mitk
     unsigned int m_DistanceImageVolume;
     mitk::DataStorage::Pointer m_DataStorage;
 
-    WeakPointer<LabelSetImage> m_SelectedSegmentation;
+    WeakPointer<MultiLabelSegmentation> m_SelectedSegmentation;
   };
 }
 

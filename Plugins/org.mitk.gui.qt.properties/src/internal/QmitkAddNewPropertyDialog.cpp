@@ -49,11 +49,11 @@ void QmitkAddNewPropertyDialog::Initialize()
   m_Controls.persistentLabel->setVisible(m_BaseData.IsNotNull());
   m_Controls.persistentCheckBox->setVisible(m_BaseData.IsNotNull());
 
-  connect(m_Controls.typeComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(ShowAdequateValueWidget(const QString&)));
+  connect(m_Controls.typeComboBox, &QComboBox::currentIndexChanged, this, &QmitkAddNewPropertyDialog::ShowAdequateValueWidget);
   connect(m_Controls.addButton, SIGNAL(clicked()), this, SLOT(AddNewProperty()));
   connect(m_Controls.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
-  this->ShowAdequateValueWidget(types[0]);
+  this->ShowAdequateValueWidget(0);
 }
 
 void QmitkAddNewPropertyDialog::AddNewProperty()
@@ -163,8 +163,10 @@ bool QmitkAddNewPropertyDialog::ValidateValue()
   return false;
 }
 
-void QmitkAddNewPropertyDialog::ShowAdequateValueWidget(const QString& type)
+void QmitkAddNewPropertyDialog::ShowAdequateValueWidget(int index)
 {
+
+  const auto type = m_Controls.typeComboBox->itemText(index);
   m_Controls.valueLineEdit->clear();
   m_Controls.valueLineEdit->hide();
 

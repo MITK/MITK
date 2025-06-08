@@ -32,6 +32,9 @@ mitk::DataInteractor::DataInteractor()
 
 mitk::DataInteractor::~DataInteractor()
 {
+  if (m_DataNode.IsExpired())
+    return;
+
   auto dataNode = m_DataNode.Lock();
 
   if (dataNode.IsNotNull())
@@ -108,4 +111,5 @@ void mitk::DataInteractor::NotifyResultReady()
 
 void mitk::DataInteractor::DataNodeChanged()
 {
+  this->ResetToStartState();
 }

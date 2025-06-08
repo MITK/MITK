@@ -1,2 +1,2 @@
 PATH=@MITK_RUNTIME_PATH@;%PATH%
-@VS_BUILD_TYPE@\MitkWorkbench.exe
+@VS_BUILD_TYPE@\MitkWorkbench.exe -style windowsvista

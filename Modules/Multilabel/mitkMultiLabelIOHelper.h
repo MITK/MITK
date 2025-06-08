@@ -33,7 +33,7 @@ namespace itk
 
 namespace mitk
 {
-  class LabelSetImage;
+  class MultiLabelSegmentation;
 
   const constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
   const constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
@@ -42,7 +42,7 @@ namespace mitk
   const constexpr char* const PROPERTY_KEY_UID = "org_mitk_uid";
 
   /**
-   * @brief The MultiLabelIOHelper is a static helper class that supports serialization of mitk::LabelSetImage
+   * @brief The MultiLabelIOHelper is a static helper class that supports serialization of mitk::MultiLabelSegmentation
    *
    * This class provides static functions for converting mitk::Label into XML and also allows the serialization
    * of mitk::LabelSet as presets
@@ -58,16 +58,16 @@ namespace mitk
      * @return true if the serialization was successful and false otherwise
      */
     static bool SaveLabelSetImagePreset(const std::string &presetFilename,
-                                        const mitk::LabelSetImage *inputImage);
+                                        const mitk::MultiLabelSegmentation *inputImage);
 
     /**
-     * @brief Loads an existing preset for a mitk::LabelSetImage from presetFilename and applies it to inputImage
+     * @brief Loads an existing preset for a mitk::MultiLabelSegmentation from presetFilename and applies it to inputImage
      * @param presetFilename the filename of the preset including the filesystem path
      * @param inputImage the image to which the loaded preset will be applied
      * @return true if the deserilization was successful and false otherwise
      */
     static bool LoadLabelSetImagePreset(const std::string &presetFilename,
-                                        mitk::LabelSetImage *inputImage);
+                                        mitk::MultiLabelSegmentation *inputImage);
 
     /**
      * @brief Creates a mitk::Label from an XML element
@@ -111,7 +111,7 @@ namespace mitk
     static std::string GetStringByKey(const itk::MetaDataDictionary& dic, const std::string& key);
 
 
-    static nlohmann::json SerializeMultLabelGroupsToJSON(const mitk::LabelSetImage* inputImage);
+    static nlohmann::json SerializeMultLabelGroupsToJSON(const mitk::MultiLabelSegmentation* inputImage);
 
     using LabelGroupMetaData = std::pair < std::string, LabelVector>;
     static std::vector<LabelGroupMetaData> DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets);

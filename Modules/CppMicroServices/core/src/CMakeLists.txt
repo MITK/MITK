@@ -50,8 +50,6 @@ set(_srcs
   module/usModuleSettings.cpp
   module/usModuleUtils.cpp
   module/usModuleVersion.cpp
-
-  ../../third_party/miniz.c
 )
 
 set(_private_headers

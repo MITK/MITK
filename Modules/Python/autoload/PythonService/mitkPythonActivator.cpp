@@ -12,50 +12,35 @@ found in the LICENSE file.
 #ifndef mitkPythonActivator_h
 #define mitkPythonActivator_h
 
-// Microservices
-#include "mitkPythonService.h"
 #include <usModuleActivator.h>
 #include "usModuleContext.h"
+#include "mitkPythonContext.h"
+#include "mitkIPythonService.h"
 #include <usServiceRegistration.h>
 
 namespace mitk
 {
-    ///
-    /// installs the PythonService
-    /// runs all initial commands (setting env paths etc)
-    ///
     class PythonActivator : public us::ModuleActivator
     {
     public:
 
         void Load(us::ModuleContext* context) override
         {
-          MITK_DEBUG << "PythonActivator::Load";
           // Registering PythonService as MicroService
-          m_PythonService = itk::SmartPointer<mitk::PythonService>(new PythonService());
-
+          m_PythonService = std::make_unique<mitk::IPythonService>();
           us::ServiceProperties _PythonServiceProps;
           _PythonServiceProps["Name"] = std::string("PythonService");
-
-          m_PythonServiceRegistration = context->RegisterService<mitk::IPythonService>(m_PythonService.GetPointer(), _PythonServiceProps);
+          _PythonServiceProps["service.ranking"] = int(0);
+          m_PythonServiceRegistration = context->RegisterService<mitk::IPythonService>(m_PythonService.get(), _PythonServiceProps);
         }
 
-        void Unload(us::ModuleContext*) override
-        {
-          MITK_DEBUG("PythonActivator") << "PythonActivator::Unload";
-          MITK_DEBUG("PythonActivator") << "m_PythonService GetReferenceCount " << m_PythonService->GetReferenceCount();
-          m_PythonServiceRegistration.Unregister();
-          m_PythonService->Delete();
-          MITK_DEBUG("PythonActivator") << "m_PythonService GetReferenceCount " << m_PythonService->GetReferenceCount();
-        }
+        void Unload(us::ModuleContext*) override {}
 
-        ~PythonActivator() override
-        {
-        }
+        ~PythonActivator() override{}
 
     private:
-        itk::SmartPointer<mitk::PythonService> m_PythonService;
-        us::ServiceRegistration<PythonService> m_PythonServiceRegistration;
+      std::unique_ptr<mitk::IPythonService> m_PythonService;
+      us::ServiceRegistration<mitk::IPythonService> m_PythonServiceRegistration;
     };
 }
 

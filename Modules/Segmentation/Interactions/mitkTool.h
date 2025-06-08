@@ -21,12 +21,7 @@ found in the LICENSE file.
 #include "mitkInteractionEventObserver.h"
 #include "mitkLabelSetImage.h"
 #include "mitkMessage.h"
-#include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateDimension.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateOr.h"
-#include "mitkNodePredicateProperty.h"
+#include "mitkNodePredicateBase.h"
 #include "mitkToolEvents.h"
 #include "mitkToolFactoryMacro.h"
 #include <MitkSegmentationExports.h>
@@ -154,6 +149,14 @@ namespace mitk
     */
     virtual const char *GetGroup() const;
 
+    /**
+    \brief Returns whether this tool is eligible for auto-initialization by ToolManager.
+
+    Overload this method and return \c false to hide this tool from any ToolManager that does not explicitly
+    initialize this tool.
+    */
+    virtual bool IsEligibleForAutoInit() const;
+
     virtual void InitializeStateMachine();
 
     /**
@@ -181,11 +184,6 @@ namespace mitk
 
     virtual NodePredicateBase::ConstPointer GetReferenceDataPreference() const;
     virtual NodePredicateBase::ConstPointer GetWorkingDataPreference() const;
-
-    DataNode::Pointer CreateEmptySegmentationNode(const Image *original,
-                                                  const std::string &organName,
-                                                  const mitk::Color &color) const;
-    DataNode::Pointer CreateSegmentationNode(Image *image, const std::string &organName, const mitk::Color &color) const;
 
     /** Function used to check if a tool can handle the referenceData and (if specified) the working data.
      @pre referenceData must be a valid pointer
@@ -242,31 +240,6 @@ namespace mitk
 
   private:
     ToolManager* m_ToolManager;
-
-    // for reference data
-    NodePredicateDataType::Pointer m_PredicateImages;
-    NodePredicateDimension::Pointer m_PredicateDim3;
-    NodePredicateDimension::Pointer m_PredicateDim4;
-    NodePredicateOr::Pointer m_PredicateDimension;
-    NodePredicateAnd::Pointer m_PredicateImage3D;
-
-    NodePredicateProperty::Pointer m_PredicateBinary;
-    NodePredicateNot::Pointer m_PredicateNotBinary;
-
-    NodePredicateProperty::Pointer m_PredicateSegmentation;
-    NodePredicateNot::Pointer m_PredicateNotSegmentation;
-
-    NodePredicateProperty::Pointer m_PredicateHelper;
-    NodePredicateNot::Pointer m_PredicateNotHelper;
-
-    NodePredicateAnd::Pointer m_PredicateImageColorful;
-
-    NodePredicateAnd::Pointer m_PredicateImageColorfulNotHelper;
-
-    NodePredicateAnd::Pointer m_PredicateReference;
-
-    // for working data
-    NodePredicateAnd::Pointer m_IsSegmentationPredicate;
 
     std::string m_InteractorType;
 

@@ -173,7 +173,7 @@ namespace mitk
   protected:
     MonaiLabelTool();
     ~MonaiLabelTool();
-    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) override;
     void ConnectActionsAndFunctions() override;
 
     /**
@@ -197,6 +197,10 @@ namespace mitk
      */
     virtual void OnDelete(StateMachineAction *, InteractionEvent *);
 
+    void OnMove(StateMachineAction *, InteractionEvent *);
+    void OnRelease(StateMachineAction *, InteractionEvent *);
+    void OnPrimaryButtonPressed(StateMachineAction *, InteractionEvent *);
+    
     /*
      * @brief Clear all seed points and call UpdatePreview to reset the segmentation Preview
      */
@@ -210,9 +214,9 @@ namespace mitk
                                                   const PointSet::Pointer pointSet) const;
 
     /**
-     * @brief Writes back segmentation results in 3D or 2D shape to preview LabelSetImage.
+     * @brief Writes back segmentation results in 3D or 2D shape to preview MultiLabelSegmentation.
      */
-    virtual void WriteBackResults(LabelSetImage *, LabelSetImage *, TimeStepType) const = 0;
+    virtual void WriteBackResults(MultiLabelSegmentation *, MultiLabelSegmentation *, TimeStepType) const = 0;
 
     PointSet::Pointer m_PointSetPositive;
     PointSet::Pointer m_PointSetNegative;

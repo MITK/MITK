@@ -32,6 +32,7 @@ void mitk::MonaiLabel2DTool::Activated()
 {
   Superclass::Activated();
   this->SetLabelTransferScope(LabelTransferScope::AllLabels);
+  this->KeepActiveAfterAcceptOn();
 }
 
 const char **mitk::MonaiLabel2DTool::GetXPM() const
@@ -64,8 +65,8 @@ void mitk::MonaiLabel2DTool::WriteImage(const Image *inputAtTimeStep, const std:
   IOUtil::Save(extendedImage.GetPointer(), inputImagePath);
 }
 
-void mitk::MonaiLabel2DTool::WriteBackResults(LabelSetImage *previewImage,
-                                              LabelSetImage *segResults,
+void mitk::MonaiLabel2DTool::WriteBackResults(MultiLabelSegmentation *previewImage,
+                                              MultiLabelSegmentation *segResults,
                                               TimeStepType timeStep) const
  {
   if (segResults->GetTimeGeometry()->CountTimeSteps() > 1)
@@ -73,5 +74,14 @@ void mitk::MonaiLabel2DTool::WriteBackResults(LabelSetImage *previewImage,
     mitkThrow() << "Invalid time geometry found while writing back segmentation. "
                    " Expected static segmentation output from model.";
   }
-  mitk::SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), segResults, timeStep, false);
+  mitk::SegTool2D::WriteSliceToVolume(previewImage->GetGroupImage(previewImage->GetActiveLayer()),
+    this->GetWorkingPlaneGeometry(), segResults->GetGroupImage(previewImage->GetActiveLayer()),
+    timeStep);
  }
+
+void mitk::MonaiLabel2DTool::ConfirmCleanUp()
+{
+   this->ResetPreviewContent();
+   this->ClearSeeds();
+   RenderingManager::GetInstance()->RequestUpdateAll();
+}

@@ -22,15 +22,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkDicomExternalDataWidget" name="widget" native="true"/>
+    <widget class="QmitkDicomImportWidget" name="widget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkDicomExternalDataWidget</class>
+   <class>QmitkDicomImportWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkDicomExternalDataWidget.h</header>
+   <header>QmitkDicomImportWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -207,6 +207,15 @@ void WWinPartService::Reset()
 
     QList<IWorkbenchPartReference::Pointer> refs(page->GetOpenParts());
 
+    // Close editors before views. For example, views that implement IRenderWindowPartListener would not
+    // get notified via RenderWindowPartDeactivated before their own destruction otherwise, making it
+    // impossible to determine in their destructor if a IRenderWindowPart pointer is still valid.
+
+    std::sort(refs.begin(), refs.end(), [](IWorkbenchPartReference::Pointer lhs, IWorkbenchPartReference::Pointer rhs) {
+      return dynamic_cast<IEditorPart*>(lhs->GetPart(false).GetPointer()) != nullptr &&
+             dynamic_cast<IEditorPart*>(rhs->GetPart(false).GetPointer()) == nullptr;
+    });
+
     for (int i = 0; i < refs.size(); i++)
     {
       IWorkbenchPartReference::Pointer reference = refs[i];

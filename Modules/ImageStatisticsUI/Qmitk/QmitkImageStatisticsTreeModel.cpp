@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include "mitkProportionalTimeGeometry.h"
 #include "mitkStatisticsToImageRelationRule.h"
 #include "mitkStatisticsToMaskRelationRule.h"
+#include <mitkLabelSetImageHelper.h>
 
 #include "QmitkStyleManager.h"
 
@@ -336,14 +337,14 @@ void AddLabelTreeItems(const mitk::ImageStatisticsContainer* statistic, const mi
     {
       //currently we only show statistics of the labeled pixel if a mask is provided
       QString labelLabel = QStringLiteral("unnamed label");
-      const auto multiLabelSeg = dynamic_cast<mitk::LabelSetImage*>(maskNode->GetData());
+      const auto multiLabelSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(maskNode->GetData());
       mitk::Label::ConstPointer labelInstance;
       if (nullptr != multiLabelSeg)
       {
         labelInstance = multiLabelSeg->GetLabel(labelValue);
         if (labelInstance.IsNotNull())
         {
-          labelLabel = QString::fromStdString(labelInstance->GetName() + " [" + labelInstance->GetTrackingID() + "]");
+          labelLabel = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayLabelName(multiLabelSeg, labelInstance));
         }
         else
         {

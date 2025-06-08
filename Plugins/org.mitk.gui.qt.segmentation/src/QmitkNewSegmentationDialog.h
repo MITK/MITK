@@ -26,7 +26,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class LabelSetImage;
+  class MultiLabelSegmentation;
   class Label;
 }
 
@@ -55,9 +55,9 @@ public:
    * In NewLabel mode it is assumed that the label has not yet been added, hence for example a look-up table update is not done.
    * In RenameLabel mode the segmentation (if provided) is updated.
    */
-  static bool DoRenameLabel(mitk::Label* label, mitk::LabelSetImage* segmentation, QWidget* parent = nullptr, Mode mode = NewLabel);
+  static bool DoRenameLabel(mitk::Label* label, mitk::MultiLabelSegmentation* segmentation, QWidget* parent = nullptr, Mode mode = NewLabel);
 
-  explicit QmitkNewSegmentationDialog(QWidget *parent = nullptr, mitk::LabelSetImage* labelSetImage = nullptr, Mode mode = NewLabel);
+  explicit QmitkNewSegmentationDialog(QWidget *parent = nullptr, mitk::MultiLabelSegmentation* labelSetImage = nullptr, Mode mode = NewLabel);
   ~QmitkNewSegmentationDialog() override;
 
   QString GetName() const;
@@ -71,7 +71,7 @@ private:
   void OnFinished(int result);
   void OnSuggestionSelected();
   void OnColorButtonClicked();
-  void OnTextChanged(const QString& text);
+  void OnTextEdited(const QString& text);
 
   void SetSuggestions(const SuggestionsType& suggestions, bool replaceStandardSuggestions = false);
   void UpdateColorButtonBackground();

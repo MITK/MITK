@@ -30,7 +30,7 @@ public:
 
 private slots:
   void AddNewProperty();
-  void ShowAdequateValueWidget(const QString& type);
+  void ShowAdequateValueWidget(int index);
   bool ValidateValue();
 
 private:

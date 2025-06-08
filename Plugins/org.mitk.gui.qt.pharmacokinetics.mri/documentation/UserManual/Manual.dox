@@ -38,13 +38,25 @@ Currently the following pharmacokinetic models for gadolinium-based contrast age
 
 \subsection FIT_DCE_Settings_model Model specific settings
 Selecting one of the \ref FIT_DCE_General_models "supported models" will open below tabs for further configuration of the model.
-- The descriptive Brix model requires only definition of the duration of the bolus, i.e. the overall time of the injection (<i>Injection Time [min]</i>).
-- The standard Tofts model, the extended Tofts model and the 2CXM are compartment models that require the input of the concentration time curve in the tissue feeding artery, the arterial input function (AIF).
+- The descriptive Brix model requires only definition of the duration of the bolus, i.e. the overall time of the injection (<i>Injection Time [min]</i>).\n
+- The standard Tofts model, the extended Tofts model and the 2CXM are compartment models that require the input of the concentration time curve in the tissue feeding artery, the arterial input function (AIF).\n
 In the DCE MR Perfusion Datafit View, the arterial input function can be defined in several ways. For patient individual image derived AIFs, select the radio button <i>Select AIF from Image</i>.
-In that case, a segmentation ROI for the artery has to be selected. This can be done by clicking on the <i>AIF Mask</i> selection widget and selecting a suitable AIF segmentation from the data loaded in the Data Manager. In cases where the respective artery does not lie in the same image as the investigated tissue (e.g. in animal experiments, where a slice through the heart is used for AIF extraction), a dedicated AIF image can be selected using the corresponding <i>Dedicated AIF image</i> selection widget.
-An alternative option is to define the AIF via an external file by selecting <i>Select AIF from File</i> (e.g. for population derived AIFs or AIFs from blood sampling). By clicking the <i>Browse</i> button, one can select a csv file that holds the AIF values and corresponding timepoints (in tuple format (Time, Value)).
-Caution: the file must not contain a header line, but the first line must start with Time and Intensity values.
+In that case, a segmentation ROI for the artery has to be selected. This can be done by clicking on the <i>AIF Mask</i> selection widget and selecting a suitable AIF segmentation from the data loaded in the Data Manager.
+In cases where the respective artery does not lie in the same image as the investigated tissue (e.g. in animal experiments, where a slice through the heart is used for AIF extraction), a dedicated AIF image can be selected using the corresponding <i>Dedicated AIF image</i> selection widget.\n
+An alternative option is to define the AIF via an external file by selecting <i>Select AIF from File</i> (e.g. for population derived AIFs or AIFs from blood sampling).
+By clicking the <i>Browse</i> button, one can select a csv file that holds the AIF values and corresponding timepoints (in tuple format (Time, Value)).\n
+<i>Caution</i>: the file must not contain a header line, but the first line must start with Time and Intensity values.\n
 Furthermore, the <i>Hematocrit Level</i> has to be set (from 0 to 1) for conversion from whole blood to plasma concentration. It is set as default to the literature value of 0.45.
+
+\subsection FIT_DCE_Settings_concentration Signal to concentration conversion settings
+\imageMacro{dce_mri_concentration.png, "Example screenshot for concentration conversion settings.", 10}
+Most models require contrast agent concentration values as input rather than raw signal intensities (i.e. all compartment models).
+The DCE MR Perfusion DataFit View offers a variety of tools for the conversion from signal to concentration:
+by means of relative and absolute signal enhancement and via a T1-map calculated by the variable flip angle method.
+A more detailed description of these conversion methods can be found here: \ref org_mitk_views_pharmacokinetics_concentration_mri.
+For the conversion methods, a baseline image prior to contrast agent arrival is required.
+In many dynamic data sets, multiple images are part of the baseline. The <i>Baseline Range Selection</i> allows for selection of a range of time frames, from which the average image (along the time dimension) is calculated and set as baseline input image.
+Remark: The number of the first time frame is 0.
 
 \subsection FIT_DCE_Settings_start Start parameter
 \imageMacro{dce_mri_start.png, "Example screenshot for start parameter settings.", 10}
@@ -61,15 +73,6 @@ The first column specifies the parameter(s) involved in the constraint (if multi
 The second column <i>Type</i> defines whether the constraint defines an upper or lower boundary.
 <i>Value</i> defines the actual constraint value, that should not be crossed, and <i>Width</i> allows for a certain tolerance width.
 
-\subsection FIT_DCE_Settings_concentration Signal to concentration conversion settings
-\imageMacro{dce_mri_concentration.png, "Example screenshot for concentration conversion settings.", 10}
-Most models require contrast agent concentration values as input rather than raw signal intensities (i.e. all compartment models).
-The DCE MR Perfusion DataFit View offers a variety of tools for the conversion from signal to concentration:
-by means of relative and absolute signal enhancement and via a T1-map calculated by the variable flip angle method.
-A more detailed description of these conversion methods can be found here: \ref org_mitk_views_pharmacokinetics_concentration_mri.
-For the conversion methods, a baseline image prior to contrast agent arrival is required.
-In many dynamic data sets, multiple images are part of the baseline. The <i>Baseline Range Selection</i> allows for selection of a range of time frames, from which the average image (along the time dimension) is calculated and set as baseline input image.
-Remark: The number of the first time frame is 0.
 
 \section FIT_DCE_Fitting Executing a fit
 
@@ -89,6 +92,51 @@ In the following definitions, an <i>evaluation</i> describes the process of cost
 
 After all necessary configurations are set, the button <i>Start Modelling</i> is enabled, which starts the fitting routine.
 Progress can be seen in the message box on the bottom. Resulting parameter maps will afterwards be added to the Data Manager as sub-nodes of the analyzed 4D image.
+
+
+\section FIT_DCE_FAQs FAQs
+-  <b>I generated a parameter map using a pharmacokinetic model (e.g. Standard Tofts model), but I get
+unreasonable voxel values. What could be the reason for this?</b>\n
+Pharmacokinetic models are fitted to concentration time curves and not signal time curves. Please make sure you
+have converted the dynamic signal curves to concentration time curves, which you can do in the "DCE MR Perfusion
+DataFit View" under the tab "Conversion: Signal to Concentration".
+Another reason might be that the fitting routine got caught up in a local rather than a global minimum and therefore the fitting results are poor parameter estimates.
+This can be improved by setting reasonable initial parameters and fitting constraints in the "Start parameter" and "Constraints" tabs. \n
+\n
+
+- <b>I have generated a parameter map and it is shown as data node in the data manager. Why can't I see it in the standard display window?</b>\n
+You might be in a slice of a 3D image, in which the map is not visible. Right-click on the parameter map and select "Reinit".
+Now you can scroll through the slices until you see the map in the standard display. \n
+Make sure that the "Concentration" node is toggled off. \n
+The level-window might be set such that the map is not visible. When the map is open in the standard display,
+right-click on the slider and select "Use optimized level-window".
+Afterwards you can fine-tune the level-window by left-click on the slider and moving the mouse up/down or left/right.\n
+Other nodes in the data manager could potentially be displayed if not deselected. To make sure that only the paramenter maps are visible, right click on the parameter map and select "Show only selected nodes".\n
+\n
+
+- <b>Why are my K^trans values much higher than literature values?</b>\n
+In MITK, K^trans values are reported in units of ml/min/100ml (which can be e.g. seen by right clicking on the map,
+selecting "Show details" and scrolling to the field "modelfit.parameter.unit".). Literature values are sometimes reported in units of min<sup>-1</sup>, which will be smaller by a factor of 100.\n
+\n
+
+- <b>What are the exact formulas for relative and absolute signal conversion and how should I set the factor k?</b>\n
+You can find a detailed description in the documentation of the concentration curve converter view. Either by
+ opening the view in the workbench and pressing F1 or here: \ref org_mitk_views_pharmacokinetics_concentration_mri. \n
+The proportionality factor k is dependent on many different factors and is usually not known.
+However, it does not need to be known as long as k is tissue independent.
+When fitting an AIF-based pharmacokinetic model based on the standard tracer-kinetic theory of linear and stationary systems,
+which is e.g. true for the standard Tofts model, k cancels out because it is the same for blood and tissue.
+Therefore, you can for example just set k = 1.0 (which is also set as default value). \n
+\n
+
+- <b>How can I load the AIF from a file? Which format is needed?</b>\n
+You can load the previously generated AIF as a .csv (or .txt) file. In this file, the AIF values and corresponding timepoints are arranged in the tuple format (timepoint, AIF value), e.g. for the timepoints (0.0, 1.0, 2.0) and AIF values (0.0,
+ 1.5, 5.0) the file would look like this:\n
+ 0.0, 0.0\n
+ 1.0, 1.5\n
+ 2.0, 5.0\n
+Please be aware that the file must not contain a header line, but the first line must already start with timepoints and AIF values.
+
 
 \section FIT_DCE_lit References/Literature
 - \anchor FIT_DCE_lit_ref1 [1] Brix G, Semmler W, Port R, Schad LR, Layer G, Lorenz WJ. Pharmacokinetic parameters in CNS Gd-DTPA enhanced MR imaging. J Comput Assist Tomogr. 1991;15:621–8.

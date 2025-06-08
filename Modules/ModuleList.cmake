@@ -42,8 +42,6 @@ set(MITK_MODULES
   QtOverlays
   DICOMUI
   Remeshing
-  Python
-  QtPython
   Persistence
   RT
   RTUI
@@ -58,4 +56,8 @@ set(MITK_MODULES
   PharmacokineticsUI
   DICOMPM
   ROI
+  PET
+  Python
+  PythonSegmentation
+  PythonSegmentationUI
 )

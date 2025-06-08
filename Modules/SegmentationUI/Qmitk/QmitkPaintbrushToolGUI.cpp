@@ -12,17 +12,17 @@ found in the LICENSE file.
 
 #include "QmitkPaintbrushToolGUI.h"
 
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qpainter.h>
-#include <qpushbutton.h>
-#include <qslider.h>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QPainter>
+#include <QPushButton>
+#include <QSlider>
 
 QmitkPaintbrushToolGUI::QmitkPaintbrushToolGUI() : QmitkToolGUI(), m_Slider(nullptr)
 {
   // create the visible widgets
   QBoxLayout *layout = new QHBoxLayout(this);
-  this->setContentsMargins(0, 0, 0, 0);
+  layout->setContentsMargins(0, 0, 0, 0);
 
   QLabel *label = new QLabel("Size ", this);
   QFont f = label->font();

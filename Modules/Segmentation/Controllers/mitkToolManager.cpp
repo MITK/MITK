@@ -32,7 +32,6 @@ mitk::ToolManager::ToolManager(DataStorage *storage)
 {
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools
                                     // are registered) - bug 1029
-  this->InitializeTools();
 }
 
 void mitk::ToolManager::EnsureTimeObservation()
@@ -121,6 +120,9 @@ void mitk::ToolManager::InitializeTools()
   {
     if (auto *tool = dynamic_cast<Tool *>(iter->GetPointer()))
     {
+      if (!tool->IsEligibleForAutoInit())
+        continue;
+
       tool->InitializeStateMachine();
       tool->SetToolManager(this); // important to call right after instantiation
       tool->ErrorMessage += MessageDelegate1<mitk::ToolManager, std::string>(this, &ToolManager::OnToolErrorMessage);
@@ -155,14 +157,10 @@ const mitk::ToolManager::ToolVectorTypeConst mitk::ToolManager::GetTools()
 
 mitk::Tool *mitk::ToolManager::GetToolById(int id)
 {
-  try
-  {
-    return m_Tools.at(id);
-  }
-  catch (const std::exception &)
-  {
-    return nullptr;
-  }
+  if (id >= 0 && id < static_cast<int>(m_Tools.size()))
+    return m_Tools[id];
+
+  return nullptr;
 }
 
 bool mitk::ToolManager::ActivateTool(int id)
@@ -465,14 +463,10 @@ mitk::ToolManager::DataVectorType mitk::ToolManager::GetReferenceData()
 
 mitk::DataNode *mitk::ToolManager::GetReferenceData(int idx)
 {
-  try
-  {
-    return m_ReferenceData.at(idx);
-  }
-  catch (const std::exception &)
-  {
-    return nullptr;
-  }
+  if (idx >= 0 && idx < static_cast<int>(m_ReferenceData.size()))
+    return m_ReferenceData[idx];
+
+  return nullptr;
 }
 
 mitk::ToolManager::DataVectorType mitk::ToolManager::GetWorkingData()

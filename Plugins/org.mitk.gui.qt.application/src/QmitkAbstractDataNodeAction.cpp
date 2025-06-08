@@ -40,6 +40,29 @@ QList<mitk::DataNode::Pointer> AbstractDataNodeAction::GetSelectedNodes(berry::I
   return selectedNodes;
 }
 
+QList<mitk::WeakPointer<mitk::DataNode>> AbstractDataNodeAction::GetSelectedWeakNodes(berry::IWorkbenchPartSite::Pointer workbenchPartSite)
+{
+  QList<mitk::WeakPointer<mitk::DataNode>> selectedNodes;
+  if (workbenchPartSite.IsNull())
+  {
+    return selectedNodes;
+  }
+
+  berry::ISelection::ConstPointer selection = workbenchPartSite->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
+  mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
+  if (currentSelection.IsNull() || currentSelection->IsEmpty())
+  {
+    return selectedNodes;
+  }
+
+  auto nodes = currentSelection->GetSelectedDataNodes();
+  for (auto node : nodes)
+  {
+    selectedNodes.push_back(node.GetPointer());
+  }
+  return selectedNodes;
+}
+
 QmitkAbstractDataNodeAction::QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer workbenchPartSite)
 {
   m_WorkbenchPartSite = workbenchPartSite;
@@ -61,9 +84,17 @@ void QmitkAbstractDataNodeAction::SetDataStorage(mitk::DataStorage* dataStorage)
 
 void QmitkAbstractDataNodeAction::SetSelectedNodes(const QList<mitk::DataNode::Pointer>& selectedNodes)
 {
-  m_SelectedNodes = selectedNodes;
-  // use the first selected node to initialize the data node actions
-  InitializeWithDataNode(m_SelectedNodes.front());
+  m_SelectedNodes.clear();
+  for (auto node : selectedNodes)
+  {
+    m_SelectedNodes.push_back(node.GetPointer());
+  }
+
+  if (!m_SelectedNodes.empty())
+  {
+    // use the first selected node to initialize the data node actions
+    InitializeWithDataNode(GetSelectedNodes().front());
+  }
 }
 
 void QmitkAbstractDataNodeAction::SetBaseRenderer(mitk::BaseRenderer* baseRenderer)
@@ -80,7 +111,25 @@ mitk::BaseRenderer::Pointer QmitkAbstractDataNodeAction::GetBaseRenderer()
   return m_BaseRenderer.Lock();
 }
 
+QList<mitk::DataNode::Pointer> ConvertWeakPointersToSmartPointer(const QList<mitk::WeakPointer<mitk::DataNode>>& weakNodes)
+{
+  QList<mitk::DataNode::Pointer> nodes;
+  for (const auto& weakNode : weakNodes)
+  {
+    auto node = weakNode.Lock();
+    if (node.IsNotNull())
+    {
+      nodes.push_back(node);
+    }
+  }
+  return nodes;
+}
 QList<mitk::DataNode::Pointer> QmitkAbstractDataNodeAction::GetSelectedNodes() const
+{
+  return ConvertWeakPointersToSmartPointer(this->GetSelectedWeakNodes());
+}
+
+QList<mitk::WeakPointer<mitk::DataNode>> QmitkAbstractDataNodeAction::GetSelectedWeakNodes() const
 {
   if (!m_SelectedNodes.isEmpty())
   {
@@ -96,7 +145,7 @@ QList<mitk::DataNode::Pointer> QmitkAbstractDataNodeAction::GetSelectedNodes() c
   }
 
   // retrieve selection from the workbench selection service
-  return AbstractDataNodeAction::GetSelectedNodes(workbenchPartSite);
+  return AbstractDataNodeAction::GetSelectedWeakNodes(workbenchPartSite);
 }
 
 mitk::DataNode::Pointer QmitkAbstractDataNodeAction::GetSelectedNode() const

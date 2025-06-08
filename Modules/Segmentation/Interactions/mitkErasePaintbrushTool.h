@@ -55,6 +55,8 @@ namespace mitk
   protected:
     ErasePaintbrushTool(); // purposely hidden
     ~ErasePaintbrushTool() override;
+
+    void OnInvertLogic(StateMachineAction* action, InteractionEvent* event) override;
   };
 
 } // namespace

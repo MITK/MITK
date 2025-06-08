@@ -34,6 +34,9 @@ bool mitk::MitkSegmentationIOMimeTypes::MitkSegmentationTaskListMimeType::Applie
   if (!fs::exists(path)) // T18572
     return result;
 
+  if (fs::is_directory(path))
+    return false;
+
   std::ifstream file(path);
 
   if (!file.is_open())
@@ -47,7 +50,7 @@ bool mitk::MitkSegmentationIOMimeTypes::MitkSegmentationTaskListMimeType::Applie
   if ("MITK Segmentation Task List" != json.value("FileFormat", ""))
     return false;
 
-  if (auto version = json.value<int>("Version", 0); version < 1 || version > 2)
+  if (auto version = json.value<int>("Version", 0); version < 1 || version > 3)
     return false;
 
   return true;

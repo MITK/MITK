@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include "mitkImageAccessorBase.h"
 #include "mitkImageDataItem.h"
 #include "mitkImageDescriptor.h"
-#include "mitkImageVtkAccessor.h"
+#include "mitkImageVtkWriteAccessor.h"
 #include "mitkLevelWindow.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkSlicedData.h"
@@ -71,7 +71,6 @@ namespace mitk
     friend class SubImageSelector;
 
     friend class ImageAccessorBase;
-    friend class ImageVtkAccessor;
     friend class ImageVtkReadAccessor;
     friend class ImageVtkWriteAccessor;
     friend class ImageReadAccessor;
@@ -614,6 +613,10 @@ namespace mitk
     /** A mutex, which needs to be locked to manage m_VtkReaders */
     mutable std::mutex m_VtkReadersLock;
   };
+
+
+  using ImageDimensionVectorType = std::vector<unsigned int>;
+  MITKCORE_EXPORT ImageDimensionVectorType DetermineImageDimensionsFromTimeGeometry(const TimeGeometry* timeGeometry);
 
   /**
   * @brief Equal A function comparing two images for being equal in meta- and imagedata

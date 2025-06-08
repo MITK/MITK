@@ -110,9 +110,9 @@ namespace mitk
 
   //##Documentation
   //## @brief Get the origin, e.g. the upper-left corner of the plane
-  const Point3D GeometryTransformHolder::GetOrigin() const
+  Point3D GeometryTransformHolder::GetOrigin() const
   {
-    Point3D origin = Point3D(this->GetIndexToWorldTransform()->GetOffset());
+    Point3D origin(this->GetIndexToWorldTransform()->GetOffset());
     return origin;
   }
 
@@ -128,7 +128,7 @@ namespace mitk
   //##Documentation
   //## @brief Get the spacing (size of a pixel).
   //##
-  const mitk::Vector3D GeometryTransformHolder::GetSpacing() const
+  mitk::Vector3D GeometryTransformHolder::GetSpacing() const
   {
     mitk::Vector3D spacing;
     CopySpacingFromTransform(this->GetIndexToWorldTransform(), spacing);

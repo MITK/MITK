@@ -106,6 +106,10 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
   m_Controls.maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
+
+  m_Controls.maskLabelSelector->hide();
+  m_Controls.maskLabelSelector->SetHighlightingActivated(true);
+
   connect(m_Controls.btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
 
   connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
@@ -117,12 +121,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnImageNodeSelectionChanged);
   connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnMaskNodeSelectionChanged);
-
-
-  connect(m_Controls.AIFMaskNodeSelector,
-    &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
-    this,
-    &MRPerfusionView::UpdateGUIControls);
+  connect(m_Controls.AIFMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnAIFMaskNodeSelectionChanged);
 
   connect(m_Controls.AIFImageNodeSelector,
     &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
@@ -135,11 +134,14 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.btnAIFFile->setVisible(false);
   m_Controls.aifFilePath->setEnabled(false);
   m_Controls.aifFilePath->setVisible(false);
+  m_Controls.aifFilePath->setText("Please select AIF file.");
   m_Controls.radioAIFImage->setChecked(true);
   m_Controls.AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
   m_Controls.AIFMaskNodeSelector->setVisible(true);
   m_Controls.AIFMaskNodeSelector->setEnabled(true);
+  m_Controls.AIFMaskLabelSelector->hide();
+  m_Controls.AIFMaskLabelSelector->SetHighlightingActivated(true);
   m_Controls.AIFImageNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.AIFImageNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
   m_Controls.AIFImageNodeSelector->setEnabled(false);
@@ -151,6 +153,8 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskLabelSelector, SLOT(setVisible(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskLabelSelector, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.labelAIFMask, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setEnabled(bool)));
@@ -161,11 +165,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-
-
   connect(m_Controls.btnAIFFile, SIGNAL(clicked()), this, SLOT(LoadAIFfromFile()));
-
-
 
   //Brix setting
   m_Controls.groupDescBrix->hide();
@@ -175,17 +175,15 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   //Model fit configuration
   m_Controls.groupBox_FitConfiguration->hide();
 
-  m_Controls.checkBox_Constraints->setEnabled(false);
-  m_Controls.constraintManager->setEnabled(false);
   m_Controls.initialValuesManager->setEnabled(false);
   m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
 
-  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
 
 
-  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)), m_Controls.initialValuesManager, SLOT(setEnabled(bool)));
+  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)), m_Controls.initialValuesManager, SLOT(setEnabled(bool)));
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager, SLOT(setEnabled(bool)));
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager, SLOT(setVisible(bool)));
 
@@ -245,6 +243,9 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.lineFitName->setPlaceholderText(QString::fromStdString(this->GetDefaultFitName()));
   m_Controls.lineFitName->setEnabled(!m_FittingInProgress);
 
+  m_Controls.maskLabelSelector->setVisible(m_selectedMaskNode.IsNotNull());
+  m_Controls.AIFMaskLabelSelector->setVisible(m_selectedAIFMaskNode.IsNotNull());
+
   m_Controls.checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
 
   bool isDescBrixFactory = dynamic_cast<mitk::DescriptivePharmacokineticBrixModelFactory*>
@@ -255,8 +256,6 @@ void MRPerfusionView::UpdateGUIControls()
                                   (m_selectedModelFactory.GetPointer()) != nullptr;
   bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>
                        (m_selectedModelFactory.GetPointer()) != nullptr;
-
-
 
 
   m_Controls.groupAIF->setVisible(isToftsFactory || is2CXMFactory);
@@ -270,7 +269,6 @@ void MRPerfusionView::UpdateGUIControls()
     m_Controls.toolboxConfiguration->setItemEnabled(0, true);
   }
   m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory );
-  m_Controls.AIFImageNodeSelector->setVisible(!m_Controls.radioAIFFile->isChecked());
   m_Controls.AIFImageNodeSelector->setVisible(m_Controls.radioAIFImage->isChecked() && m_Controls.checkDedicatedAIFImage->isChecked());
 
   m_Controls.groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
@@ -283,10 +281,12 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.groupBox_FitConfiguration->setEnabled(!m_FittingInProgress);
 
 
-  m_Controls.radioROIbased->setEnabled(m_selectedMask.IsNotNull());
+  m_Controls.radioROIbased->setEnabled(m_selectedMaskNode);
 
   m_Controls.btnModelling->setEnabled(m_selectedImage.IsNotNull()
-                                      && m_selectedModelFactory.IsNotNull() && !m_FittingInProgress && CheckModelSettings());
+                                      && (m_selectedMaskNode.IsNull() || (m_selectedMaskNode.IsNotNull() && !m_Controls.maskLabelSelector->GetSelectedLabels().empty()))
+                                      && m_selectedModelFactory.IsNotNull()
+                                      && !m_FittingInProgress && CheckModelSettings());
 
   m_Controls.spinBox_baselineStartTimeStep->setEnabled( m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
   m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
@@ -316,7 +316,7 @@ void MRPerfusionView::OnModellSet(int index)
                                (m_selectedModelFactory->CreateDefaultConstraints().GetPointer());
 
     m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
-        m_selectedModelFactory->GetDefaultInitialParameterization());
+        m_selectedModelFactory->GetDefaultInitialParameterization(), m_selectedModelFactory->GetParameterUnits());
 
     if (this->m_modelConstraints.IsNull())
     {
@@ -324,7 +324,7 @@ void MRPerfusionView::OnModellSet(int index)
     }
 
     m_Controls.constraintManager->setChecker(this->m_modelConstraints,
-        this->m_selectedModelFactory->GetParameterNames());
+        this->m_selectedModelFactory->GetParameterNames(), this->m_selectedModelFactory->GetParameterUnits());
 
   }
 
@@ -369,6 +369,8 @@ void MRPerfusionView::OnModellingButtonClicked()
   {
     m_HasGeneratedNewInput = false;
     m_HasGeneratedNewInputAIF = false;
+
+    m_ImageMask = m_Controls.maskLabelSelector->CreateSelectedLabelMask();
 
     mitk::ParameterFitImageGeneratorBase::Pointer generator = nullptr;
     mitk::modelFit::ModelFitInfo::Pointer fitSession = nullptr;
@@ -498,42 +500,49 @@ void MRPerfusionView::OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer>
 void MRPerfusionView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
   m_selectedMaskNode = nullptr;
-  m_selectedMask = nullptr;
 
   if (m_Controls.maskNodeSelector->GetSelectedNode().IsNotNull())
   {
     this->m_selectedMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
-    auto selectedLabelSetMask = dynamic_cast<mitk::LabelSetImage*>(m_selectedMaskNode->GetData());
 
-    if (selectedLabelSetMask != nullptr)
-    {
-      if (selectedLabelSetMask->GetAllLabelValues().size() > 1)
-      {
-        MITK_INFO << "Selected mask has multiple labels. Only use first used to mask the model fit.";
-      }
-      this->m_selectedMask = mitk::CreateLabelMask(selectedLabelSetMask, selectedLabelSetMask->GetAllLabelValues().front(), true);
-    }
+    m_Controls.maskLabelSelector->SetMultiLabelNode(m_selectedMaskNode);
 
-
-    if (this->m_selectedMask.IsNotNull() && this->m_selectedMask->GetTimeSteps() > 1)
+    if (m_Controls.maskLabelSelector->GetMultiLabelSegmentation()->GetTimeSteps() > 1)
     {
       MITK_INFO <<
         "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
-        m_Controls.maskNodeSelector->GetSelectedNode()->GetName();
-      this->m_selectedMask = SelectImageByTimeStep(m_selectedMask, 0);
-
+        m_selectedMaskNode->GetName();
     }
   }
 
-  if (m_selectedMask.IsNull())
+  if (m_selectedMaskNode.IsNull())
   {
     this->m_Controls.radioPixelBased->setChecked(true);
   }
 
-
   UpdateGUIControls();
 }
 
+void MRPerfusionView::OnAIFMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
+{
+  m_selectedAIFMaskNode = nullptr;
+
+  if (m_Controls.AIFMaskNodeSelector->GetSelectedNode().IsNotNull())
+  {
+    m_selectedAIFMaskNode = m_Controls.AIFMaskNodeSelector->GetSelectedNode();
+
+    m_Controls.AIFMaskLabelSelector->SetMultiLabelNode(m_selectedAIFMaskNode);
+
+    if (m_Controls.AIFMaskLabelSelector->GetMultiLabelSegmentation()->GetTimeSteps() > 1)
+    {
+      MITK_INFO <<
+        "Selected AIF mask has multiple timesteps. Only use first timestep to mask model fit. AIF mask name: " <<
+        m_selectedAIFMaskNode->GetName();
+    }
+  }
+
+  UpdateGUIControls();
+}
 
 bool MRPerfusionView::CheckModelSettings() const
 {
@@ -561,6 +570,7 @@ bool MRPerfusionView::CheckModelSettings() const
       if (this->m_Controls.radioAIFImage->isChecked())
       {
         ok = ok && m_Controls.AIFMaskNodeSelector->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls.AIFMaskLabelSelector->GetSelectedLabels().size() == 1;
 
         if (this->m_Controls.checkDedicatedAIFImage->isChecked())
         {
@@ -606,7 +616,7 @@ bool MRPerfusionView::CheckModelSettings() const
       ok = false;
     }
 
-    if (this->m_Controls.radioButton_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
+    if (this->m_Controls.checkBox_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
     {
       std::string warning = "Warning. Invalid start parameters. At least one parameter as an invalid image setting as source.";
       MITK_ERROR << warning;
@@ -631,7 +641,7 @@ bool MRPerfusionView::CheckBaselineSelectionSettings() const
 void MRPerfusionView::ConfigureInitialParametersOfParameterizer(mitk::ModelParameterizerBase*
     parameterizer) const
 {
-  if (m_Controls.radioButton_StartParameters->isChecked())
+  if (m_Controls.checkBox_StartParameters->isChecked())
   {
     //use user defined initial parameters
     mitk::InitialParameterizationDelegateBase::Pointer paramDelegate = m_Controls.initialValuesManager->getInitialParametrizationDelegate();
@@ -669,10 +679,10 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_PixelBased(mitk::modelFit::Mo
   fitGenerator->SetModelParameterizer(modelParameterizer);
   std::string roiUID = "";
 
-  if (m_selectedMask.IsNotNull())
+  if (m_selectedMaskNode.IsNotNull())
   {
-    fitGenerator->SetMask(m_selectedMask);
-    roiUID = m_selectedMask->GetUID();
+    fitGenerator->SetMask(mitk::SelectImageByTimeStep(m_ImageMask,0));
+    roiUID = m_Controls.maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
   }
 
   fitGenerator->SetDynamicImage(m_selectedImage);
@@ -688,7 +698,7 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_PixelBased(mitk::modelFit::Mo
 void MRPerfusionView::GenerateDescriptiveBrixModel_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
     modelFitInfo, mitk::ParameterFitImageGeneratorBase::Pointer& generator)
 {
-  if (m_selectedMask.IsNull())
+  if (m_selectedMaskNode.IsNull())
   {
     return;
   }
@@ -699,10 +709,12 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_ROIBased(mitk::modelFit::Mode
   mitk::DescriptivePharmacokineticBrixModelValueBasedParameterizer::Pointer modelParameterizer =
     mitk::DescriptivePharmacokineticBrixModelValueBasedParameterizer::New();
 
+  auto maskAt1stTS = mitk::SelectImageByTimeStep(m_ImageMask, 0);
+
   //Compute ROI signal
   mitk::MaskedDynamicImageStatisticsGenerator::Pointer signalGenerator =
     mitk::MaskedDynamicImageStatisticsGenerator::New();
-  signalGenerator->SetMask(m_selectedMask);
+  signalGenerator->SetMask(maskAt1stTS);
   signalGenerator->SetDynamicImage(m_selectedImage);
   signalGenerator->Generate();
 
@@ -718,102 +730,14 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_ROIBased(mitk::modelFit::Mode
 
   //Parametrize fit generator
   fitGenerator->SetModelParameterizer(modelParameterizer);
-  fitGenerator->SetMask(m_selectedMask);
+  fitGenerator->SetMask(maskAt1stTS);
   fitGenerator->SetFitFunctor(fitFunctor);
   fitGenerator->SetSignal(roiSignal);
   fitGenerator->SetTimeGrid(mitk::ExtractTimeGrid(m_selectedImage));
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = this->m_selectedMask->GetUID();
-
-  //Create model info
-  modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), this->GetFitName(), roiUID);
-  mitk::ScalarListLookupTable::ValueType infoSignal;
-
-  for (mitk::MaskedDynamicImageStatisticsGenerator::ResultType::const_iterator pos =
-         roiSignal.begin(); pos != roiSignal.end(); ++pos)
-  {
-    infoSignal.push_back(*pos);
-  }
-
-  modelFitInfo->inputData.SetTableValue("ROI", infoSignal);
-}
-
-template <typename TParameterizer>
-void MRPerfusionView::GenerateLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
-    modelFitInfo, mitk::ParameterFitImageGeneratorBase::Pointer& generator)
-{
-  mitk::PixelBasedParameterFitImageGenerator::Pointer fitGenerator =
-    mitk::PixelBasedParameterFitImageGenerator::New();
-
-  typename TParameterizer::Pointer modelParameterizer = TParameterizer::New();
-
-  this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
-
-  //Specify fitting strategy and criterion parameters
-  mitk::ModelFitFunctorBase::Pointer fitFunctor = CreateDefaultFitFunctor(modelParameterizer);
-
-  //Parametrize fit generator
-  fitGenerator->SetModelParameterizer(modelParameterizer);
-  std::string roiUID = "";
-
-  if (m_selectedMask.IsNotNull())
-  {
-    fitGenerator->SetMask(m_selectedMask);
-    roiUID = this->m_selectedMask->GetUID();
-  }
-
-  fitGenerator->SetDynamicImage(m_selectedImage);
-  fitGenerator->SetFitFunctor(fitFunctor);
-
-  generator = fitGenerator.GetPointer();
-
-  //Create model info
-  modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), this->GetFitName(), roiUID);
-}
-
-template <typename TParameterizer>
-void MRPerfusionView::GenerateLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
-    modelFitInfo, mitk::ParameterFitImageGeneratorBase::Pointer& generator)
-{
-  if (m_selectedMask.IsNull())
-  {
-    return;
-  }
-
-  mitk::ROIBasedParameterFitImageGenerator::Pointer fitGenerator =
-    mitk::ROIBasedParameterFitImageGenerator::New();
-
-  typename TParameterizer::Pointer modelParameterizer = TParameterizer::New();
-
-  //Compute ROI signal
-  mitk::MaskedDynamicImageStatisticsGenerator::Pointer signalGenerator =
-    mitk::MaskedDynamicImageStatisticsGenerator::New();
-  signalGenerator->SetMask(m_selectedMask);
-  signalGenerator->SetDynamicImage(m_selectedImage);
-  signalGenerator->Generate();
-
-  mitk::MaskedDynamicImageStatisticsGenerator::ResultType roiSignal = signalGenerator->GetMean();
-
-  //Model configuration (static parameters) can be done now
-  this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
-
-  //Specify fitting strategy and criterion parameters
-  mitk::ModelFitFunctorBase::Pointer fitFunctor = CreateDefaultFitFunctor(modelParameterizer);
-
-  //Parametrize fit generator
-  fitGenerator->SetModelParameterizer(modelParameterizer);
-  fitGenerator->SetMask(m_selectedMask);
-  fitGenerator->SetFitFunctor(fitFunctor);
-  fitGenerator->SetSignal(roiSignal);
-  fitGenerator->SetTimeGrid(mitk::ExtractTimeGrid(m_selectedImage));
-
-  generator = fitGenerator.GetPointer();
-
-  std::string roiUID = this->m_selectedMask->GetUID();
+  std::string roiUID = m_Controls.maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -858,10 +782,10 @@ void MRPerfusionView::GenerateAIFbasedModelFit_PixelBased(mitk::modelFit::ModelF
   fitGenerator->SetModelParameterizer(modelParameterizer);
   std::string roiUID = "";
 
-  if (m_selectedMask.IsNotNull())
+  if (m_selectedMaskNode.IsNotNull())
   {
-    fitGenerator->SetMask(m_selectedMask);
-    roiUID = this->m_selectedMask->GetUID();
+    fitGenerator->SetMask(mitk::SelectImageByTimeStep(m_ImageMask, 0));
+    roiUID = m_Controls.maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
   }
 
   fitGenerator->SetDynamicImage(this->m_inputImage);
@@ -890,7 +814,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
   mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
   mitk::ParameterFitImageGeneratorBase::Pointer& generator)
 {
-  if (m_selectedMask.IsNull())
+  if (m_selectedMaskNode.IsNull())
   {
     return;
   }
@@ -912,11 +836,12 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
 
   this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
 
+  auto maskAt1stTS = mitk::SelectImageByTimeStep(m_ImageMask, 0);
 
   //Compute ROI signal
   mitk::MaskedDynamicImageStatisticsGenerator::Pointer signalGenerator =
     mitk::MaskedDynamicImageStatisticsGenerator::New();
-  signalGenerator->SetMask(m_selectedMask);
+  signalGenerator->SetMask(maskAt1stTS);
   signalGenerator->SetDynamicImage(this->m_inputImage);
   signalGenerator->Generate();
 
@@ -927,14 +852,14 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
 
   //Parametrize fit generator
   fitGenerator->SetModelParameterizer(modelParameterizer);
-  fitGenerator->SetMask(m_selectedMask);
+  fitGenerator->SetMask(maskAt1stTS);
   fitGenerator->SetFitFunctor(fitFunctor);
   fitGenerator->SetSignal(roiSignal);
   fitGenerator->SetTimeGrid(mitk::ExtractTimeGrid(this->m_inputImage));
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = this->m_selectedMask->GetUID();
+  std::string roiUID = m_Controls.maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -1002,7 +927,8 @@ void MRPerfusionView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
 MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedNewInput(false), m_HasGeneratedNewInputAIF(false)
 {
   m_selectedImage = nullptr;
-  m_selectedMask = nullptr;
+  m_ImageMask = nullptr;
+  m_AIFMask = nullptr;
 
   mitk::ModelFactoryBase::Pointer factory =
     mitk::DescriptivePharmacokineticBrixModelFactory::New().GetPointer();
@@ -1014,7 +940,7 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
   factory = mitk::TwoCompartmentExchangeModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
 
-  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
+  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("MultiLabelSegmentation");
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
   mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
@@ -1202,24 +1128,18 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
 
     //mask settings
     this->m_selectedAIFMaskNode = m_Controls.AIFMaskNodeSelector->GetSelectedNode();
-    this->m_selectedAIFMask = dynamic_cast<mitk::Image*>(this->m_selectedAIFMaskNode->GetData());
+    this->m_AIFMask = m_Controls.AIFMaskLabelSelector->CreateSelectedLabelMask();
 
-    if (this->m_selectedAIFMask->GetTimeSteps() > 1)
+    if (this->m_AIFMask.IsNotNull())
     {
-      MITK_INFO <<
-                "Selected AIF mask has multiple timesteps. Only use first timestep to mask model fit. AIF Mask name: "
-                <<
-                m_selectedAIFMaskNode->GetName() ;
-      mitk::ImageTimeSelector::Pointer maskedImageTimeSelector = mitk::ImageTimeSelector::New();
-      maskedImageTimeSelector->SetInput(this->m_selectedAIFMask);
-      maskedImageTimeSelector->SetTimeNr(0);
-      maskedImageTimeSelector->UpdateLargestPossibleRegion();
-      this->m_selectedAIFMask = maskedImageTimeSelector->GetOutput();
-    }
-
-    if (this->m_selectedAIFMask.IsNotNull())
-    {
-      aifGenerator->SetMask(this->m_selectedAIFMask);
+      if (this->m_AIFMask->GetTimeSteps() > 1)
+      {
+        MITK_INFO <<
+          "Selected AIF mask has multiple timesteps. Only use first timestep to mask model fit. AIF Mask name: "
+          <<
+          m_selectedAIFMaskNode->GetName();
+      }
+      aifGenerator->SetMask(mitk::SelectImageByTimeStep(this->m_AIFMask,0));
     }
 
     //image settings
@@ -1251,9 +1171,16 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
 void MRPerfusionView::LoadAIFfromFile()
 {
   QFileDialog dialog;
-  dialog.setNameFilter(tr("Images (*.csv"));
+  dialog.setFileMode(QFileDialog::ExistingFile);
+  QStringList filters;
+  dialog.setNameFilter(tr("CSV and Text Files (*.csv *.txt)"));
 
   QString fileName = dialog.getOpenFileName();
+
+  if (fileName.isEmpty())
+  {
+    return;
+  }
 
   m_Controls.aifFilePath->setText(fileName);
 
@@ -1268,8 +1195,8 @@ void MRPerfusionView::LoadAIFfromFile()
   if (!in1.is_open())
   {
     this->m_Controls.infoBox->append(QString("Could not open AIF File!"));
+    return;
   }
-
 
   std::vector< std::string > vec1;
   std::string line1;
@@ -1279,9 +1206,19 @@ void MRPerfusionView::LoadAIFfromFile()
     Tokenizer tok(line1);
     vec1.assign(tok.begin(), tok.end());
 
+    if (vec1.size() < 2)
+    {
+      this->m_Controls.infoBox->append(QString("Invalid content in AIF File: %1").arg(QString::fromStdString(line1)));
+      this->AIFinputGrid.clear();
+      this->AIFinputFunction.clear();
+      return;
+    }
+
     this->AIFinputGrid.push_back(convertToDouble(vec1[0]));
     this->AIFinputFunction.push_back(convertToDouble(vec1[1]));
   }
+  in1.close();
+  this->m_Controls.infoBox->append(QString("AIF File successfully loaded!"));
 }
 
 void MRPerfusionView::PrepareConcentrationImage()

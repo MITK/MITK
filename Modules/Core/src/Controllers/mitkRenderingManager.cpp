@@ -786,6 +786,22 @@ namespace mitk
     }
   }
 
+  void RenderingManager::SetConstrainedPanningZooming(bool constrain)
+  {
+    if (m_ConstrainedPanningZooming != constrain)
+    {
+      m_ConstrainedPanningZooming = constrain;
+
+      for (auto renderWindow : this->GetAllRegisteredRenderWindows())
+      {
+        auto renderer = BaseRenderer::GetInstance(renderWindow);
+        renderer->SetConstrainZoomingAndPanning(constrain);
+      }
+
+      this->Modified();
+    }
+  }
+
   // Create and register generic RenderingManagerFactory.
   TestingRenderingManagerFactory renderingManagerFactory;
 } // namespace

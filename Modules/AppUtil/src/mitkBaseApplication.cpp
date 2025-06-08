@@ -104,7 +104,7 @@ namespace
     // Manage Qt options as array of pairs, consisting of argument name and argument value requirement.
     // Qt command-line options: https://doc.qt.io/qt-6/qguiapplication.html#supported-command-line-options
 
-    std::array<std::pair<std::string, bool>, 12> qtOptions {{
+    std::array<std::pair<std::string, bool>, 13> qtOptions {{
       { "platform", true },
       { "platformpluginpath", true },
       { "platformtheme", true },
@@ -116,7 +116,8 @@ namespace
       { "reverse", false },
       { "session", true },
       { "display", true },
-      { "geometry", true }
+      { "geometry", true },
+      { "style", true }
     }};
 
     for (const auto& qtOption : qtOptions)
@@ -592,7 +593,7 @@ namespace mitk
     {
       // If not set explicitly otherwise, prefer xcb as platform on Linux, as we had issues
       // with wayland in combination with VTK and GLEW. Note that the shell scripts for
-      // excutables in our installers also set the platform to xcb.
+      // executables in our installers also set the platform to xcb.
       if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
         qputenv("QT_QPA_PLATFORM", "xcb");
     }
@@ -601,7 +602,12 @@ namespace mitk
 #endif
 
     // Prevent conflicts between native OpenGL applications and QWebEngine
-    QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
+    if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND"))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+      QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+#else
+      QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
+#endif
 
     // If parameters have been set before, we have to store them to hand them
     // through to the application

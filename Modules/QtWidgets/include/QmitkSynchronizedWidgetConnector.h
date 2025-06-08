@@ -33,7 +33,7 @@ found in the LICENSE file.
 *        In order to desynchronize a node selection widget,
 *        'DisconnectWidget(const QmitkSynchronizedNodeSelectionWidget*)' has to be used.
 *        If a new node selection has been connected / synchronized,
-*        'SynchronizeWidget(QmitkSynchronizedNodeSelectionWidget*' can be used to initialy set
+*        'SynchronizeWidget(QmitkSynchronizedNodeSelectionWidget*' can be used to initially set
 *        the current selection and the current selection mode.
 *        For this, both values are stored in this class internally.
 */
@@ -116,6 +116,9 @@ Q_SIGNALS:
   *                     False otherwise.
   */
   void SelectionModeChanged(bool selectAll);
+
+  void NodeVisibilityChanged(mitk::DataNode::Pointer node, const bool visibility);
+  void NodesLayerMoved(QSet<mitk::DataNode*> movedNodes, const int targetLayer);
 
 public Q_SLOTS:
   /*

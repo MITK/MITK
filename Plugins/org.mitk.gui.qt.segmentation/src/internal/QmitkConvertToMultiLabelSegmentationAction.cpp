@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "mitkRenderingManager.h"
 
 //needed for qApp
-#include <qcoreapplication.h>
+#include <QCoreApplication>
 
 QmitkConvertToMultiLabelSegmentationAction::QmitkConvertToMultiLabelSegmentationAction()
 {
@@ -38,7 +38,7 @@ void QmitkConvertToMultiLabelSegmentationAction::Run( const QList<mitk::DataNode
         continue;
       }
 
-      mitk::LabelSetImage::Pointer lsImage = mitk::LabelSetImage::New();
+      mitk::MultiLabelSegmentation::Pointer lsImage = mitk::MultiLabelSegmentation::New();
       try
       {
         lsImage->InitializeByLabeledImage(referenceImage);

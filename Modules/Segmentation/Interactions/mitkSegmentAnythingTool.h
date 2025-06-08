@@ -127,13 +127,17 @@ namespace mitk
      */
     virtual void OnDelete(StateMachineAction*, InteractionEvent*);
 
+    void OnMove(StateMachineAction*, InteractionEvent*);
+    void OnRelease(StateMachineAction*, InteractionEvent*);
+    void OnPrimaryButtonPressed(StateMachineAction *, InteractionEvent *);
+
     /*
      * @brief Clear all seed points and call UpdatePreview to reset the segmentation Preview
      */
     void ClearSeeds();
 
     /**
-     * @brief Overriden method from the tool manager to execute the segmentation
+     * @brief Overridden method from the tool manager to execute the segmentation
      * Implementation:
      * 1. Creates Hash for input image from current plane geometry.
      * 2. Transfers image pointer to python service along with the hash code.
@@ -145,7 +149,7 @@ namespace mitk
      * @param previewImage
      * @param timeStep
      */
-    void DoUpdatePreview(const Image *inputAtTimeStep, const Image *oldSegAtTimeStep, LabelSetImage *previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image *inputAtTimeStep, const Image *oldSegAtTimeStep, MultiLabelSegmentation *previewImage, TimeStepType timeStep) override;
 
     /**
      * @brief Get the Points from positive and negative pointsets as std::vector.
@@ -196,7 +200,7 @@ namespace mitk
      */
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry *baseGeometry, const mitk::Point3D &point3d);
 
-    std::unique_ptr<SegmentAnythingPythonService> m_PythonService;
+    SegmentAnythingPythonService::Pointer m_PythonService;
 
   private:
     std::string m_MitkTempDir;

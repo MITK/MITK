@@ -14,10 +14,8 @@ found in the LICENSE file.
 #include "QmitkRenderWindow.h"
 #include "QmitkRenderWindowWidget.h"
 
-#include "mitkApplyDiffImageOperation.h"
 #include "mitkColorProperty.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkDiffImageApplier.h"
 #include "mitkInteractionConst.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkOperationEvent.h"
@@ -30,6 +28,9 @@ found in the LICENSE file.
 #include <mitkTimeNavigationController.h>
 #include "mitkToolManager.h"
 #include "mitkUndoController.h"
+
+#include <mitkNodePredicateProperty.h>
+
 
 #include <mitkExtractSliceFilter.h>
 #include <mitkPlanarCircle.h>
@@ -44,6 +45,9 @@ found in the LICENSE file.
 
 #include <mitkImageToContourFilter.h>
 #include <mitkImagePixelReadAccessor.h>
+
+#include <mitkLabelSetImageHelper.h>
+#include <mitkSegChangeOperationApplier.h>
 
 //  Includes for the merge operation
 #include "mitkImageToContourFilter.h"
@@ -256,7 +260,7 @@ void QmitkSlicesInterpolator::SetDataStorage(mitk::DataStorage::Pointer storage)
   }
 }
 
-void QmitkSlicesInterpolator::SetActiveLabelValue(mitk::LabelSetImage::LabelValueType labelValue)
+void QmitkSlicesInterpolator::SetActiveLabelValue(mitk::MultiLabelSegmentation::LabelValueType labelValue)
 {
   bool changedValue = labelValue != this->m_CurrentActiveLabelValue;
 
@@ -528,7 +532,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
   if (m_ToolManager->GetWorkingData(0) != nullptr)
   {
-    m_Segmentation = dynamic_cast<mitk::Image *>(m_ToolManager->GetWorkingData(0)->GetData());
+    m_Segmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(m_ToolManager->GetWorkingData(0)->GetData());
     m_BtnReinit3DInterpolation->setEnabled(true);
   }
   else
@@ -677,7 +681,7 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
     return;
   }
 
-  m_Segmentation = dynamic_cast<mitk::Image*>(node->GetData());
+  m_Segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
   if (nullptr == m_Segmentation)
   {
     return;
@@ -697,7 +701,7 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
   int clickedSliceIndex = -1;
 
   // calculate real slice position, i.e. slice of the image
-  mitk::SegTool2D::DetermineAffectedImageSlice(m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex);
+  mitk::SegTool2D::DetermineAffectedImageSlice(m_Segmentation->GetGroupImage(m_Segmentation->GetActiveLayer()), plane, clickedSliceDimension, clickedSliceIndex);
 
   mitk::Image::Pointer interpolation =
     m_Interpolator->Interpolate(clickedSliceDimension, clickedSliceIndex, plane, timeStep);
@@ -709,7 +713,7 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
     auto* workingNode = m_ToolManager->GetWorkingData(0);
     if (workingNode != nullptr)
     {
-      auto* activeLabel = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData())->GetActiveLabel();
+      auto* activeLabel = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData())->GetActiveLabel();
       if (nullptr != activeLabel)
       {
         auto activeColor = activeLabel->GetColor();
@@ -727,7 +731,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
   if (workingNode && workingNode->GetData())
   {
-    const auto segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    const auto segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData());
 
     if (segmentation == nullptr)
     {
@@ -775,7 +779,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
   if (nullptr == workingNode || nullptr == interpolatedPreview)
     return;
 
-  auto* segmentationImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  auto* segmentationImage = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData());
   if (nullptr == segmentationImage)
     return;
 
@@ -787,9 +791,15 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     return;
   }
 
+  if (!segmentationImage->ExistLabel(m_CurrentActiveLabelValue))
+  {
+    MITK_ERROR << "OnAcceptInterpolationClicked triggered with no valid label selected. Currently selected invalid label: " << m_CurrentActiveLabelValue;
+    return;
+  }
+
   const auto timeStep = segmentationImage->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
 
-  auto interpolatedSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, segmentationImage, timeStep)->Clone();
+  auto interpolatedSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, segmentationImage->GetGroupImage(segmentationImage->GetGroupIndexOfLabel(m_CurrentActiveLabelValue)), timeStep)->Clone();
   auto activeValue = segmentationImage->GetActiveLabel()->GetValue();
   mitk::TransferLabelContentAtTimeStep(
     interpolatedPreview,
@@ -797,12 +807,12 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     segmentationImage->GetConstLabelsByValue(segmentationImage->GetLabelValuesByGroup(segmentationImage->GetActiveLayer())),
     timeStep,
     0,
-    mitk::LabelSetImage::UNLABELED_VALUE,
+    mitk::MultiLabelSegmentation::UNLABELED_VALUE,
     false,
-    { {0, mitk::LabelSetImage::UNLABELED_VALUE}, {1, activeValue} }
+    { {0, mitk::MultiLabelSegmentation::UNLABELED_VALUE}, {1, activeValue} }
   );
 
-  mitk::SegTool2D::WriteBackSegmentationResult(workingNode, planeGeometry, interpolatedSlice, timeStep);
+  mitk::SegTool2D::WriteBackSegmentationResult(workingNode, planeGeometry, interpolatedSlice, timeStep, "2D Interpolation");
   m_FeedbackNode->SetData(nullptr);
 }
 
@@ -816,43 +826,32 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
    */
   if (m_Segmentation)
   {
-    mitk::Image::Pointer segmentation3D = m_Segmentation;
-    unsigned int timeStep = 0;
-
-    if (4 == m_Segmentation->GetDimension())
+    if (!m_Segmentation->ExistLabel(m_CurrentActiveLabelValue))
     {
-      const auto* geometry = m_Segmentation->GetTimeGeometry();
-
-      if (!geometry->IsValidTimePoint(m_TimePoint))
-      {
-        MITK_WARN << "Cannot accept all interpolations. Time point selected by passed SliceNavigationController is not "
-                     "within the time bounds of segmentation. Time point: "
-                  << m_TimePoint;
-        return;
-      }
-
-      mitk::Image::Pointer activeLabelImage;
-      try
-      {
-        auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(m_Segmentation);
-        activeLabelImage = mitk::CreateLabelMask(labelSetImage, labelSetImage->GetActiveLabel()->GetValue());
-      }
-      catch (const std::exception& e)
-      {
-        MITK_ERROR << e.what() << " | NO LABELSETIMAGE IN WORKING NODE\n";
-      }
-
-      m_Interpolator->SetSegmentationVolume(activeLabelImage);
-
-      timeStep = geometry->TimePointToTimeStep(m_TimePoint);
-
-      auto timeSelector = mitk::ImageTimeSelector::New();
-      timeSelector->SetInput(m_Segmentation);
-      timeSelector->SetTimeNr(timeStep);
-      timeSelector->Update();
-
-      segmentation3D = timeSelector->GetOutput();
+      MITK_ERROR << "AcceptAllInterpolations triggered with no valid label selected. Currently selected invalid label: " << m_CurrentActiveLabelValue;
+      return;
     }
+    if (!m_Segmentation->GetTimeGeometry()->IsValidTimePoint(m_TimePoint))
+    {
+      MITK_WARN << "Cannot accept all interpolations. Time point selected by passed SliceNavigationController is not "
+        "within the time bounds of segmentation. Time point: "
+        << m_TimePoint;
+      return;
+    }
+
+    mitk::Image::Pointer activeLabelImage;
+    try
+    {
+      activeLabelImage = mitk::CreateLabelMask(m_Segmentation, m_CurrentActiveLabelValue);
+    }
+    catch (const std::exception& e)
+    {
+      MITK_ERROR << e.what() << " | NO LABELSETIMAGE IN WORKING NODE\n";
+    }
+    m_Interpolator->SetSegmentationVolume(activeLabelImage);
+
+    const auto relevantGroupImage = m_Segmentation->GetGroupImage(m_Segmentation->GetGroupIndexOfLabel(m_CurrentActiveLabelValue));
+    const auto segmentation3D = mitk::SelectImageByTimePoint(relevantGroupImage, m_TimePoint);
 
     // Create an empty diff image for the undo operation
     auto diffImage = mitk::Image::New();
@@ -865,10 +864,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       // Set all pixels to zero
       auto pixelType = mitk::MakeScalarPixelType<mitk::Tool::DefaultSegmentationDataType>();
 
-      // For legacy purpose support former pixel type of segmentations (before multilabel)
-      if (itk::IOComponentEnum::UCHAR == m_Segmentation->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType())
-        pixelType = mitk::MakeScalarPixelType<unsigned char>();
-
       memset(accessor.GetData(), 0, pixelType.GetSize() * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2));
     }
 
@@ -878,9 +873,15 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     int sliceDimension = -1;
     int sliceIndex = -1;
 
-    mitk::SegTool2D::DetermineAffectedImageSlice(m_Segmentation, planeGeometry, sliceDimension, sliceIndex);
+    mitk::SegTool2D::DetermineAffectedImageSlice(segmentation3D, planeGeometry, sliceDimension, sliceIndex);
 
-    const auto numSlices = m_Segmentation->GetDimension(sliceDimension);
+    if (sliceIndex == -1 || sliceDimension == -1)
+    {
+      MITK_ERROR << "Unable to determine affected image slice. Render windows seems to be not initialized on image geometry.";
+      return;
+    }
+
+    const auto numSlices = m_Segmentation->GetDimensions()[sliceDimension];
     mitk::ProgressBar::GetInstance()->AddStepsToDo(numSlices);
 
     std::atomic_uint totalChangedSlices;
@@ -897,6 +898,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     std::vector<std::thread> threads;
     threads.reserve(numThreads);
+
+    auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
 
     // This lambda will be executed by the threads
     auto interpolate = [=, &interpolator = m_Interpolator, &totalChangedSlices](unsigned int threadIndex)
@@ -950,26 +953,29 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     m_Interpolator->DisableSliceImageCache();
 
-    const mitk::Label::PixelType newDestinationLabel = dynamic_cast<mitk::LabelSetImage *>(m_Segmentation)->GetActiveLabel()->GetValue();
-
-    //  Do and Undo Operations
     if (totalChangedSlices > 0)
     {
-      // Create do/undo operations
-      auto* doOp = new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
+      const auto activeLabel = m_Segmentation->GetActiveLabel();
+      auto newDestinationLabel = activeLabel->GetValue();
+      auto activeLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, activeLabel);
 
-      auto* undoOp = new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
-      undoOp->SetFactor(-1.0);
+      mitk::SegGroupModifyUndoRedoHelper undoHelper(m_Segmentation, { m_Segmentation->GetActiveLayer() }, false, timeStep, true, false, true);
 
-      auto comment = "Confirm all interpolations (" + std::to_string(totalChangedSlices) + ")";
-      auto* undoStackItem = new mitk::OperationEvent(mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment);
+      TransferLabelContentAtTimeStep(
+        diffImage,
+        m_Segmentation->GetGroupImage(m_Segmentation->GetActiveLayer()),
+        m_Segmentation->GetConstLabelsByValue(m_Segmentation->GetLabelValuesByGroup(m_Segmentation->GetActiveLayer())),
+        timeStep,
+        0,
+        0,
+        false,
+        { {1, newDestinationLabel} },
+        mitk::MultiLabelSegmentation::MergeStyle::Merge,
+        mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
-      mitk::OperationEvent::IncCurrGroupEventId();
-      mitk::OperationEvent::IncCurrObjectEventId();
-      mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
-      mitk::DiffImageApplier::GetInstanceForUndo()->SetDestinationLabel(newDestinationLabel);
-      // Apply the changes to the original image
-      mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation(doOp);
+      std::string name = "3D-interpolation - " + activeLabelName;
+
+      undoHelper.RegisterUndoRedoOperationEvent(name);
     }
     m_FeedbackNode->SetData(nullptr);
   }
@@ -1004,11 +1010,9 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
   auto* segmentationDataNode = m_ToolManager->GetWorkingData(0);
 
-  auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(segmentationDataNode->GetData());
-  auto activeLabelColor = labelSetImage->GetActiveLabel()->GetColor();
-  std::string activeLabelName = labelSetImage->GetActiveLabel()->GetName();
-
-  auto segmentation = GetData<mitk::Image>(segmentationDataNode);
+  auto segmentation = GetData<mitk::MultiLabelSegmentation>(segmentationDataNode);
+  auto activeLabelColor = segmentation->GetActiveLabel()->GetColor();
+  std::string activeLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(segmentation, segmentation->GetActiveLabel());
 
   if (referenceImage.IsNull() || segmentation.IsNull())
     return;
@@ -1031,18 +1035,20 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
   surfaceToImageFilter->SetImage(referenceImage);
   surfaceToImageFilter->SetMakeOutputBinary(true);
-  surfaceToImageFilter->SetUShortBinaryPixelType(itk::IOComponentEnum::USHORT == segmentation->GetPixelType().GetComponentType());
+  surfaceToImageFilter->SetUShortBinaryPixelType(true);
   surfaceToImageFilter->SetInput(interpolatedSurface);
   surfaceToImageFilter->Update();
 
   mitk::Image::Pointer interpolatedSegmentation = surfaceToImageFilter->GetOutput();
   auto timeStep = segmentationGeometry->TimePointToTimeStep(m_TimePoint);
-  const mitk::Label::PixelType newDestinationLabel = labelSetImage->GetActiveLabel()->GetValue();
+  const mitk::Label::PixelType newDestinationLabel = segmentation->GetActiveLabel()->GetValue();
+
+  mitk::SegGroupModifyUndoRedoHelper undoHelper(segmentation, { segmentation->GetActiveLayer() }, false, timeStep, true, false, true);
 
   TransferLabelContentAtTimeStep(
     interpolatedSegmentation,
-    labelSetImage,
-    labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(labelSetImage->GetActiveLayer())),
+    segmentation->GetGroupImage(segmentation->GetActiveLayer()),
+    segmentation->GetConstLabelsByValue(segmentation->GetLabelValuesByGroup(segmentation->GetActiveLayer())),
     timeStep,
     0,
     0,
@@ -1053,7 +1059,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
   this->Show3DInterpolationResult(false);
 
-  std::string name = segmentationDataNode->GetName() + " 3D-interpolation - " + activeLabelName;
+  std::string name = "3D-interpolation - " + activeLabelName;
   mitk::TimeBounds timeBounds;
 
   if (1 < interpolatedSurface->GetTimeSteps())
@@ -1073,6 +1079,10 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   {
     timeBounds = segmentationGeometry->GetTimeBounds(0);
   }
+
+  undoHelper.RegisterUndoRedoOperationEvent(name);
+
+  name = segmentationDataNode->GetName() + " " + name;
 
   auto* surfaceGeometry = static_cast<mitk::ProportionalTimeGeometry*>(interpolatedSurface->GetTimeGeometry());
   surfaceGeometry->SetFirstTimePoint(timeBounds[0]);
@@ -1108,7 +1118,7 @@ void QmitkSlicesInterpolator::OnReinit3DInterpolation()
     {
       try
       {
-        auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
+        auto labelSetImage = GetData<mitk::MultiLabelSegmentation>(m_ToolManager->GetWorkingData(0));
         if (!labelSetImage->GetTimeGeometry()->IsValidTimePoint(m_TimePoint))
         {
           MITK_ERROR << "Invalid time point requested for interpolation pipeline.";
@@ -1217,7 +1227,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 
     if (workingNode)
     {
-      auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+      auto labelSetImage = GetData<mitk::MultiLabelSegmentation>(workingNode);
       if (nullptr == labelSetImage)
       {
         MITK_ERROR << "NO LABELSETIMAGE IN WORKING NODE\n";
@@ -1226,8 +1236,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
       }
 
       const auto* activeLabel = labelSetImage->GetActiveLabel();
-      const auto* segmentation = dynamic_cast<mitk::Image*>(workingNode->GetData());
-      if (nullptr != activeLabel && nullptr != segmentation)
+      if (nullptr != activeLabel)
       {
         auto activeLabelImage = mitk::CreateLabelMask(labelSetImage, activeLabel->GetValue());
         m_Interpolator->SetSegmentationVolume(activeLabelImage);
@@ -1253,7 +1262,7 @@ void QmitkSlicesInterpolator::Run3DInterpolation()
     return;
   }
 
-  const auto segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  const auto segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData());
 
   if (segmentation == nullptr)
   {
@@ -1280,7 +1289,7 @@ void QmitkSlicesInterpolator::StopUpdateInterpolationTimer()
   if(m_ToolManager)
   {
     const auto* workingNode = m_ToolManager->GetWorkingData(0);
-    const auto activeColor = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData())->GetActiveLabel()->GetColor();
+    const auto activeColor = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData())->GetActiveLabel()->GetColor();
     m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(activeColor));
   }
 
@@ -1354,7 +1363,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::Event
     return;
   }
 
-  const auto segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  const auto segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData());
 
   if (segmentation == nullptr)
   {
@@ -1400,7 +1409,7 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
 
       m_SurfaceInterpolator->SetDistanceImageVolume(50000);
 
-      auto segmentationImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+      auto segmentationImage = dynamic_cast<mitk::MultiLabelSegmentation *>(workingNode->GetData());
       m_SurfaceInterpolator->SetCurrentInterpolationSession(segmentationImage);
     }
     else
@@ -1446,7 +1455,7 @@ void QmitkSlicesInterpolator::CheckSupportedImageDimension()
 {
   if (m_ToolManager->GetWorkingData(0))
   {
-    m_Segmentation = dynamic_cast<mitk::Image *>(m_ToolManager->GetWorkingData(0)->GetData());
+    m_Segmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(m_ToolManager->GetWorkingData(0)->GetData());
 
     if (m_3DInterpolationEnabled && m_Segmentation && ((m_Segmentation->GetDimension() != 3) || (m_Segmentation->GetDimension() != 4)) )
     {

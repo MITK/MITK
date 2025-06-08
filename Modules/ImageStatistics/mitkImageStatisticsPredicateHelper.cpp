@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkImageStatisticsPredicateHelper.h"
 
+#include <mitkMultiLabelPredicateHelper.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateDataType.h>
@@ -43,14 +44,12 @@ namespace mitk
   mitk::NodePredicateBase::Pointer GetImageStatisticsMaskPredicate()
   {
     auto isImage = mitk::NodePredicateDataType::New("Image");
-    auto isLabelSetImage = mitk::NodePredicateDataType::New("LabelSetImage");
     auto hasBinaryProperty = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
     auto isBinaryImage = mitk::NodePredicateAnd::New(isImage, hasBinaryProperty);
     auto isNoHelperObjectPredicate = GetNoHelperObjectPredicate();
+    auto isBinaryMaskForImageStatistics = mitk::NodePredicateAnd::New(isBinaryImage, isNoHelperObjectPredicate);
 
-    auto isLabelSetOrBinaryImage = mitk::NodePredicateOr::New(isLabelSetImage, isBinaryImage);
-    auto isMaskForImageStatistics = mitk::NodePredicateAnd::New(isLabelSetOrBinaryImage, isNoHelperObjectPredicate);
-    return isMaskForImageStatistics.GetPointer();
+    return mitk::NodePredicateOr::New(GetMultiLabelSegmentationPredicate(), isBinaryMaskForImageStatistics).GetPointer();
   }
 
   mitk::NodePredicateBase::Pointer GetImageStatisticsPlanarFigurePredicate()

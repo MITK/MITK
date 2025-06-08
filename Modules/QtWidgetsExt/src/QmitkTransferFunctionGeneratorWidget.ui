@@ -110,10 +110,10 @@ Or save and load your own created transfer functions in a folder in XML format.<
           </size>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose from generic MITK transfer function presets to apply to standard CT data or MR data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Choose a generic preset to apply it to standard CT or MR data.</string>
          </property>
          <property name="statusTip">
-          <string>Load a MITK internal preset</string>
+          <string>Load a preset</string>
          </property>
          <property name="currentIndex">
           <number>-1</number>
@@ -123,6 +123,9 @@ Or save and load your own created transfer functions in a folder in XML format.<
            <width>16</width>
            <height>16</height>
           </size>
+         </property>
+         <property name="placeholderText">
+          <string>Choose a CT/MR preset...</string>
          </property>
          <property name="duplicatesEnabled">
           <bool>false</bool>
@@ -161,7 +164,7 @@ Or save and load your own created transfer functions in a folder in XML format.<
             <enum>Qt::AutoText</enum>
            </property>
            <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
            </property>
            <property name="wordWrap">
             <bool>false</bool>

@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <MitkQtWidgetsExports.h>
 
 #include <mitkDataStorage.h>
+#include <mitkINodeSelectionListener.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
 
@@ -27,7 +28,7 @@ class QmitkAbstractDataStorageModel;
 * \class QmitkAbstractNodeSelectionWidget
 * \brief Abstract base class for the selection of data from a data storage.
 */
-class MITKQTWIDGETS_EXPORT QmitkAbstractNodeSelectionWidget : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkAbstractNodeSelectionWidget : public QWidget, public mitk::INodeSelectionListener
 {
   Q_OBJECT
 
@@ -71,6 +72,8 @@ public:
    This is a type also often used in the  mitk code base.*/
   ConstNodeStdVector GetSelectedNodesStdVector() const;
 
+  void OnSelectionReceived(const std::string& context, const std::vector<mitk::DataNode::Pointer>& selection) override;
+
 Q_SIGNALS:
   /**
   * @brief A signal that will be emitted if the selected node has changed.
@@ -87,7 +90,7 @@ public Q_SLOTS:
   *   An outgoing selection can then at most contain the filtered nodes.
   *   If false, the incoming non-visible selection will be stored and later added to the outgoing selection,
   *   to include the original selection that could not be modified.
-  *   The part of the original selection, that is non-visible are the nodes, that do not fullfill the predicate.
+  *   The part of the original selection, that is non-visible are the nodes, that do not fulfill the predicate.
   *
   * @par selectOnlyVisibleNodes   The bool value to define the selection modus.
   */
@@ -135,11 +138,11 @@ public Q_SLOTS:
   void SetSelectionIsOptional(bool isOptional);
 
 protected Q_SLOTS:
-  /** Call to remove a node from the current selection. If the node is part of the current selection,
+  /** Call to remove a node from the current (internal) selection. If the node is part of the current selection,
   *   this will trigger ReviseSelectionChanged(), AllowEmissionOfSelection() and if there is really a change,
   *   will also emit CurrentSelectionChanged.
   */
-  void RemoveNodeFromSelection(const mitk::DataNode* node);
+  void RemoveNodeFromInternalSelection(const mitk::DataNode* node);
 
 protected:
   /** Method is called if the display of the selected nodes should be updated (e.g. because the selection changed). */

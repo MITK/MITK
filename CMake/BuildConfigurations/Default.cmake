@@ -21,4 +21,5 @@ set(MITK_CONFIG_PLUGINS
   org.mitk.gui.qt.viewnavigator
   org.mitk.gui.qt.imagecropper
   org.mitk.gui.qt.pixelvalue
+  org.mitk.gui.qt.undoredo
 )

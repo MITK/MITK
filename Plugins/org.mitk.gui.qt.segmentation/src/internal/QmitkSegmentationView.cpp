@@ -17,15 +17,17 @@ found in the LICENSE file.
 #include <berryIWorkbenchPage.h>
 
 // mitk
-#include <mitkApplicationCursor.h>
 #include <mitkBaseApplication.h>
 #include <mitkBaseRendererHelper.h>
 #include <mitkCameraController.h>
+#include <mitkCoreServices.h>
+#include <mitkINodeSelectionService.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkMultiLabelIOHelper.h>
 #include <mitkManualPlacementAnnotationRenderer.h>
 #include <mitkNodePredicateSubGeometry.h>
+#include <mitkNodePredicateProperty.h>
 #include <mitkSegmentationObjectFactory.h>
 #include <mitkSegTool2D.h>
 #include <mitkStatusBar.h>
@@ -54,6 +56,12 @@ found in the LICENSE file.
 #include <vtkQImageToImageSource.h>
 
 #include <regex>
+
+#include <mitkSegmentationPluginConfig.h>
+
+#if MITK_HAS_PYTHON
+  #include <mitkPythonSegmentationUI.h>
+#endif
 
 namespace
 {
@@ -86,6 +94,10 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_DefaultLabelNaming(true)
   , m_SelectionChangeIsAlreadyBeingHandled(false)
 {
+#if MITK_HAS_PYTHON
+  mitk::PythonSegmentationUI::EnforceLinkage();
+#endif
+
   m_SegmentationPredicate = mitk::GetMultiLabelSegmentationPredicate();
 
   m_ReferencePredicate = mitk::GetSegmentationReferenceImagePredicate();
@@ -115,6 +127,10 @@ QmitkSegmentationView::~QmitkSegmentationView()
       (*dataIter).first->GetProperty("visible")->RemoveObserver((*dataIter).second);
     }
     m_ReferenceDataObserverTags.clear();
+
+    auto nodeSelectionService = mitk::CoreServices::GetNodeSelectionService();
+    nodeSelectionService->RemoveListener(VIEW_ID + "/referenceNode", m_Controls->referenceNodeSelector);
+    nodeSelectionService->RemoveListener(VIEW_ID + "/workingNode", m_Controls->workingNodeSelector);
 
     mitk::RenderingManager::GetInstance()->RemoveObserver(m_RenderingManagerObserverTag);
 
@@ -252,27 +268,27 @@ void QmitkSegmentationView::OnAnySelectionChanged()
   this->UpdateGUI();
 }
 
-void QmitkSegmentationView::OnLabelAdded(mitk::LabelSetImage::LabelValueType)
+void QmitkSegmentationView::OnLabelAdded(mitk::MultiLabelSegmentation::LabelValueType)
 {
   this->ValidateSelectionInput();
 }
 
-void QmitkSegmentationView::OnLabelRemoved(mitk::LabelSetImage::LabelValueType)
+void QmitkSegmentationView::OnLabelRemoved(mitk::MultiLabelSegmentation::LabelValueType)
 {
   this->ValidateSelectionInput();
 }
 
-void QmitkSegmentationView::OnGroupRemoved(mitk::LabelSetImage::GroupIndexType)
+void QmitkSegmentationView::OnGroupRemoved(mitk::MultiLabelSegmentation::GroupIndexType)
 {
   this->ValidateSelectionInput();
 }
 
-mitk::LabelSetImage* QmitkSegmentationView::GetWorkingImage()
+mitk::MultiLabelSegmentation* QmitkSegmentationView::GetWorkingImage()
 {
   if (m_WorkingNode.IsNull())
     return nullptr;
 
-  return dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  return dynamic_cast<mitk::MultiLabelSegmentation*>(m_WorkingNode->GetData());
 }
 
 void QmitkSegmentationView::AddObserversToWorkingImage()
@@ -329,7 +345,7 @@ void QmitkSegmentationView::OnLabelToggleShortcutActivated()
     return;
   }
 
-  auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  auto workingImage = dynamic_cast<mitk::MultiLabelSegmentation*>(m_WorkingNode->GetData());
   if (nullptr == workingImage)
   {
     return;
@@ -375,7 +391,7 @@ void QmitkSegmentationView::OnNewSegmentation()
   if (referenceImage->GetDimension() <= 1)
   {
     QMessageBox::information(
-      m_Parent, "New segmentation", "Segmentation is currently not supported for 2D images");
+      m_Parent, "New segmentation", "Segmentation is not supported for 1-dimensional images.");
     return;
   }
 
@@ -392,7 +408,7 @@ void QmitkSegmentationView::OnNewSegmentation()
   try
   {
     this->WaitCursorOn();
-    newSegmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(m_ReferenceNode, segTemplateImage);
+    newSegmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(m_ReferenceNode, segTemplateImage, "", this->GetDataStorage());
     this->WaitCursorOff();
   }
   catch (mitk::Exception& e)
@@ -403,7 +419,7 @@ void QmitkSegmentationView::OnNewSegmentation()
     return;
   }
 
-  auto newLabelSetImage = dynamic_cast<mitk::LabelSetImage*>(newSegmentationNode->GetData());
+  auto newLabelSetImage = dynamic_cast<mitk::MultiLabelSegmentation*>(newSegmentationNode->GetData());
   if (nullptr == newLabelSetImage)
   {
     // something went wrong
@@ -448,7 +464,6 @@ std::string QmitkSegmentationView::GetDefaultLabelSetPreset() const
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)
 {
-  this->ResetMouseCursor();
   mitk::StatusBar::GetInstance()->DisplayText("");
 
   if (id >= 0)
@@ -457,9 +472,6 @@ void QmitkSegmentationView::OnManualTool2DSelected(int id)
     text += m_ToolManager->GetToolById(id)->GetName();
     text += "\"";
     mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
-
-    us::ModuleResource resource = m_ToolManager->GetToolById(id)->GetCursorIconResource();
-    this->SetMouseCursor(resource, 0, 0);
   }
 }
 
@@ -494,7 +506,7 @@ void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManage
   m_Controls->slicesInterpolator->SetActiveLabelValue(labelValue);
 }
 
-void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType /*label*/, const mitk::Point3D& pos)
+void QmitkSegmentationView::OnGoToLabel(mitk::MultiLabelSegmentation::LabelValueType /*label*/, const mitk::Point3D& pos)
 {
   if (m_RenderWindowPart)
   {
@@ -515,12 +527,12 @@ void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rena
   canceled = !QmitkNewSegmentationDialog::DoRenameLabel(label, nullptr, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
 }
 
-mitk::LabelSetImage* QmitkSegmentationView::GetCurrentSegmentation() const
+mitk::MultiLabelSegmentation* QmitkSegmentationView::GetCurrentSegmentation() const
 {
   auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
   if (workingNode.IsNull()) mitkThrow() << "Segmentation view is in an invalid state. Working node is null, but a label selection change has been triggered.";
 
-  auto segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  auto segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(workingNode->GetData());
   if (nullptr == segmentation) mitkThrow() << "Segmentation view is in an invalid state. Working node contains no segmentation, but a label selection change has been triggered.";
 
   return segmentation;
@@ -564,6 +576,10 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    connect(m_Controls->workingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
            this, &Self::OnSegmentationSelectionChanged);
 
+   auto nodeSelectionService = mitk::CoreServices::GetNodeSelectionService();
+   nodeSelectionService->AddListener(VIEW_ID + "/referenceNode", m_Controls->referenceNodeSelector);
+   nodeSelectionService->AddListener(VIEW_ID + "/workingNode", m_Controls->workingNodeSelector);
+
    // *------------------------
    // * TOOLMANAGER
    // *------------------------
@@ -572,7 +588,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_ToolManager->InitializeTools();
 
    QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything' 'MedSAM' 'MONAI Label 2D'");
-   QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut TotalSegmentator 'MONAI Label 3D'");
+   QString segTools3D = tr("nnInteractive Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut TotalSegmentator 'MONAI Label 3D'");
 
 #ifdef __linux__
    segTools3D.append(" nnUNet"); // plugin not enabled for MacOS / Windows
@@ -786,7 +802,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   context->ungetService(ppmRef);
   service = nullptr;
 
-  auto image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  auto image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
   mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
 }
 
@@ -818,7 +834,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     return;
   }
 
-  auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  auto labelSetImage = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
   if (nullptr == labelSetImage)
   {
     return;
@@ -931,31 +947,6 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
   }
 }
 
-void QmitkSegmentationView::ResetMouseCursor()
-{
-  if (m_MouseCursorSet)
-  {
-    mitk::ApplicationCursor::GetInstance()->PopCursor();
-    m_MouseCursorSet = false;
-  }
-}
-
-void QmitkSegmentationView::SetMouseCursor(const us::ModuleResource& resource, int hotspotX, int hotspotY)
-{
-  // Remove previously set mouse cursor
-  if (m_MouseCursorSet)
-  {
-    this->ResetMouseCursor();
-  }
-
-  if (resource)
-  {
-    us::ModuleResourceStream cursor(resource, std::ios::binary);
-    mitk::ApplicationCursor::GetInstance()->PushCursor(cursor, hotspotX, hotspotY);
-    m_MouseCursorSet = true;
-  }
-}
-
 void QmitkSegmentationView::UpdateGUI()
 {
   mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
@@ -1025,7 +1016,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     m_Controls->toolSelectionBox2D->setEnabled(true);
     m_Controls->toolSelectionBox3D->setEnabled(true);
 
-    auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+    auto labelSetImage = dynamic_cast<mitk::MultiLabelSegmentation *>(workingNode->GetData());
     numberOfLabels = labelSetImage->GetTotalNumberOfLabels();
 
     if (numberOfLabels > 0)
@@ -1069,6 +1060,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
 
   m_Controls->toolSelectionBox2D->setEnabled(toolSelectionBoxesEnabled);
   m_Controls->toolSelectionBox3D->setEnabled(toolSelectionBoxesEnabled);
+  m_Controls->slicesInterpolator->setEnabled(toolSelectionBoxesEnabled);
 
   this->UpdateWarningLabel(warning);
 

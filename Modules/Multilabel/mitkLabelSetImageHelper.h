@@ -20,9 +20,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /**
-   *
-   */
+  class DataStorage;
+
   namespace LabelSetImageHelper
   {
     /**
@@ -42,14 +41,16 @@ namespace mitk
      * (e.g. link the segmentation node with its parent node).
      *
      * @param referenceNode             The reference node from which the name of the new segmentation node
-     *                                  is derived.
+     *                                  is derived. If passed pointer is null, the name "unknown" will be used.
      * @param initialSegmentationImage  The segmentation image that is used to initialize the label set image.
      * @param segmentationName          An optional name for the new segmentation node.
+     * @param dataStorage               The data storage of the reference node (if given, used to generate a unique node name).
      *
      * @return                          The new segmentation node as a data node pointer.
      */
     MITKMULTILABEL_EXPORT mitk::DataNode::Pointer CreateNewSegmentationNode(const DataNode* referenceNode,
-      const Image* initialSegmentationImage = nullptr, const std::string& segmentationName = std::string());
+      const Image* initialSegmentationImage = nullptr, const std::string& segmentationName = std::string(),
+      const DataStorage* dataStorage = nullptr);
 
     /**
      * @brief This function creates and returns a new label. The label is automatically assigned an
@@ -65,17 +66,33 @@ namespace mitk
      *
      * @return                The new label.
      */
-    MITKMULTILABEL_EXPORT Label::Pointer CreateNewLabel(const LabelSetImage* labelSetImage, const std::string& namePrefix = "Label", bool hideIDIfUnique = false);
+    MITKMULTILABEL_EXPORT Label::Pointer CreateNewLabel(const MultiLabelSegmentation* labelSetImage, const std::string& namePrefix = "Label", bool hideIDIfUnique = false);
 
-    using GroupIDToLabelValueMapType = std::map<mitk::LabelSetImage::GroupIndexType, LabelSetImage::LabelValueVectorType>;
-    MITKMULTILABEL_EXPORT GroupIDToLabelValueMapType SplitLabelValuesByGroup(const LabelSetImage* labelSetImage, const LabelSetImage::LabelValueVectorType& labelValues);
+    using GroupIDToLabelValueMapType = std::map<mitk::MultiLabelSegmentation::GroupIndexType, MultiLabelSegmentation::LabelValueVectorType>;
+    MITKMULTILABEL_EXPORT GroupIDToLabelValueMapType SplitLabelValuesByGroup(const MultiLabelSegmentation* labelSetImage, const MultiLabelSegmentation::LabelValueVectorType& labelValues);
 
-    using LabelClassNameToLabelValueMapType = std::map<std::string, LabelSetImage::LabelValueVectorType>;
-    MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassNamwe(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID);
-    MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassNamwe(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID, const LabelSetImage::LabelValueVectorType& labelValues);
+    using LabelClassNameToLabelValueMapType = std::map<std::string, MultiLabelSegmentation::LabelValueVectorType>;
+    MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassName(const MultiLabelSegmentation* labelSetImage, MultiLabelSegmentation::GroupIndexType groupID);
+    MITKMULTILABEL_EXPORT LabelClassNameToLabelValueMapType SplitLabelValuesByClassName(const MultiLabelSegmentation* labelSetImage, MultiLabelSegmentation::GroupIndexType groupID, const MultiLabelSegmentation::LabelValueVectorType& labelValues);
 
-    MITKMULTILABEL_EXPORT std::string CreateDisplayGroupName(const LabelSetImage* labelSetImage, LabelSetImage::GroupIndexType groupID);
+    /** Type that represents the mapping from a source group id to relevant target group ids (first map) and then to mapping to respective
+    label value mapping vectors for each target group id (inner/second map).*/
+    using SourceToTargetGroupIDToLabelValueMappingMapType = std::map<MultiLabelSegmentation::GroupIndexType, std::map<MultiLabelSegmentation::GroupIndexType, LabelValueMappingVector> >;
+    /** Helper function that takes a label mapping vector and deduces which group ids are needed in the source segmentation and target segmentation to conduct a mapping of pixel values.
+    The result is e.g. used by TransferLabelContent.*/
+    MITKMULTILABEL_EXPORT SourceToTargetGroupIDToLabelValueMappingMapType SplitLabelValueMappingBySourceAndTargetGroup(const MultiLabelSegmentation* sourceSeg, const MultiLabelSegmentation* targetSeg, const LabelValueMappingVector& labelMapping);
 
+    MITKMULTILABEL_EXPORT std::string CreateDisplayGroupName(const MultiLabelSegmentation* labelSetImage, MultiLabelSegmentation::GroupIndexType groupID);
+
+    /** Helper that creates the human readable display name for a label. If label segmentation image is not null, the function will also check
+    * if the label is the only label with its name in the segmentation. If not, the tracking ID will be added in square brackets to the display
+    * name.
+    */
+    MITKMULTILABEL_EXPORT std::string CreateDisplayLabelName(const MultiLabelSegmentation* labelSetImage, const Label* label);
+
+    /** Helper that creates a HTML string that contains the display name and a square glyph with the color of the label.
+    */
+    MITKMULTILABEL_EXPORT std::string CreateHTMLLabelName(const Label* label, const MultiLabelSegmentation* segmentation = nullptr);
   } // namespace LabelSetImageHelper
 } // namespace mitk
 

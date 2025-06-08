@@ -13,13 +13,19 @@ found in the LICENSE file.
 #define QmitkImageStatisticsWidget_h
 
 #include <MitkImageStatisticsUIExports.h>
-#include <ui_QmitkImageStatisticsWidget.h>
 
 #include <mitkDataStorage.h>
 #include <mitkDataNode.h>
 
+#include <QWidget>
+
 class QSortFilterProxyModel;
 class QmitkImageStatisticsTreeModel;
+
+namespace Ui
+{
+  class QmitkImageStatisticsControls;
+}
 
 class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsWidget : public QWidget
 {
@@ -58,7 +64,7 @@ private:
   /** \brief  Saves the image statistics to the clipboard */
   void OnClipboardButtonClicked();
 
-  Ui::QmitkImageStatisticsControls m_Controls;
+  Ui::QmitkImageStatisticsControls *m_Controls;
   QmitkImageStatisticsTreeModel *m_imageStatisticsModel;
   QSortFilterProxyModel *m_ProxyModel;
 };

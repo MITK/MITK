@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkIsoSurface.h"
+#include <ui_QmitkIsoSurfaceControls.h>
 
 // MITK headers
 #include <mitkManualSegmentationToSurfaceFilter.h>

@@ -17,7 +17,10 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
 
+#include <mitkSegChangeOperationApplier.h>
+
 // Qmitk
+#include <QmitkCopyLabelToGroupDialog.h>
 #include <QmitkMultiLabelTreeModel.h>
 #include <QmitkLabelColorItemDelegate.h>
 #include <QmitkLabelToggleItemDelegate.h>
@@ -68,6 +71,7 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
 
   connect(m_Model, &QAbstractItemModel::modelReset, this, &QmitkMultiLabelInspector::OnModelReset);
   connect(m_Model, &QAbstractItemModel::dataChanged, this, &QmitkMultiLabelInspector::OnDataChanged);
+  connect(m_Model, &QmitkMultiLabelTreeModel::modelChanged, this, &QmitkMultiLabelInspector::OnModelChanged);
   connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnChangeModelSelection(const QItemSelection&, const QItemSelection&)));
   connect(view, &QAbstractItemView::customContextMenuRequested, this, &QmitkMultiLabelInspector::OnContextMenuRequested);
   connect(view, &QAbstractItemView::doubleClicked, this, &QmitkMultiLabelInspector::OnItemDoubleClicked);
@@ -86,8 +90,6 @@ void QmitkMultiLabelInspector::Initialize()
   m_ModelManipulationOngoing = false;
   m_Model->SetSegmentation(m_Segmentation);
   m_Controls->view->expandAll();
-
-  m_LastValidSelectedLabels = {};
 
   //in single selection mode, if at least one label exist select the first label of the mode.
   if (m_Segmentation.IsNotNull() && !this->GetMultiSelectionMode() && m_Segmentation->GetTotalNumberOfLabels() > 0)
@@ -152,7 +154,7 @@ void QmitkMultiLabelInspector::SetDefaultLabelNaming(bool defaultLabelNaming)
   m_DefaultLabelNaming = defaultLabelNaming;
 }
 
-void QmitkMultiLabelInspector::SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation)
+void QmitkMultiLabelInspector::SetMultiLabelSegmentation(mitk::MultiLabelSegmentation* segmentation)
 {
   if (segmentation != m_Segmentation)
   {
@@ -162,7 +164,7 @@ void QmitkMultiLabelInspector::SetMultiLabelSegmentation(mitk::LabelSetImage* se
   }
 }
 
-mitk::LabelSetImage* QmitkMultiLabelInspector::GetMultiLabelSegmentation() const
+mitk::MultiLabelSegmentation* QmitkMultiLabelInspector::GetMultiLabelSegmentation() const
 {
   return m_Segmentation;
 }
@@ -183,7 +185,7 @@ void QmitkMultiLabelInspector::SetMultiLabelNode(mitk::DataNode* node)
         {
           if (widget.m_SegmentationNodeDataMTime < node->GetDataReferenceChangedTime())
           {
-            auto newSeg = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+            auto newSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
             if (nullptr == newSeg) mitkThrow() << "Invalid usage. Node set does not contain a segmentation.";
 
             widget.m_SegmentationNodeDataMTime = node->GetDataReferenceChangedTime();
@@ -218,6 +220,58 @@ void QmitkMultiLabelInspector::OnModelReset()
   m_ModelManipulationOngoing = false;
 }
 
+QmitkMultiLabelInspector::LabelValueVectorType FilterValidLabels(QmitkMultiLabelInspector::LabelValueVectorType labelValues, mitk::MultiLabelSegmentation* segmentation)
+{
+  mitk::MultiLabelSegmentation::LabelValueVectorType validLabels;
+  std::copy_if(labelValues.cbegin(), labelValues.cend(),
+    std::back_inserter(validLabels),
+    [segmentation](mitk::MultiLabelSegmentation::LabelValueType x) { return segmentation->ExistLabel(x); });
+
+  return validLabels;
+}
+
+void QmitkMultiLabelInspector::OnModelChanged()
+{
+  if (!m_ModelManipulationOngoing)
+  { //the model was changed externally and not by this instance
+    //ensure that selection state is still valid
+    //If this instance is manipulating it, it will take care of direct selection directly
+
+    QmitkMultiLabelInspector::LabelValueVectorType validLabels;
+
+    if (m_CheckSelectionDueToExternalModelChange)
+    { //selection model tried an update while label model was still updating.
+      //check selection now for validity and use it if appropriated.
+      m_CheckSelectionDueToExternalModelChange = false;
+      validLabels = FilterValidLabels(GetSelectedLabelsFromSelectionModel(), this->GetMultiLabelSegmentation());
+    }
+
+    if (validLabels.empty())
+    {
+      //empty selections are not allowed by UI interactions, there should always be at least one valid label selected.
+      //but selections are e.g. also cleared if the model is updated (e.g. due to addition of labels).
+      //In this case all valid elements of m_LastValidSelectedLabels should be used.
+      validLabels = FilterValidLabels(m_LastValidSelectedLabels, this->GetMultiLabelSegmentation());
+    }
+
+    if (validLabels.empty() && m_Model->GetNearestLabelValueToLastChange() != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
+    {
+      //we use the nearest existing label as valid value, like we do it in DeletLabelInternal
+      validLabels = { m_Model->GetNearestLabelValueToLastChange() };
+    }
+
+    if (!validLabels.empty())
+    {
+      UpdateSelectionModel(validLabels);
+    }
+    else
+    {
+      m_LastValidSelectedLabels = {};
+      emit CurrentSelectionChanged(GetSelectedLabels());
+    }
+  }
+}
+
 void QmitkMultiLabelInspector::OnDataChanged(const QModelIndex& topLeft, const QModelIndex& /*bottomRight*/,
   const QList<int>& /*roles*/)
 {
@@ -225,20 +279,9 @@ void QmitkMultiLabelInspector::OnDataChanged(const QModelIndex& topLeft, const Q
     m_Controls->view->expand(topLeft);
 }
 
-bool EqualLabelSelections(const QmitkMultiLabelInspector::LabelValueVectorType& selection1, const QmitkMultiLabelInspector::LabelValueVectorType& selection2)
-{
-  if (selection1.size() == selection2.size())
-  {
-    // lambda to compare node pointer inside both lists
-    return std::is_permutation(selection1.begin(), selection1.end(), selection2.begin());
-  }
-
-  return false;
-}
-
 void QmitkMultiLabelInspector::SetSelectedLabels(const LabelValueVectorType& selectedLabels)
 {
-  if (EqualLabelSelections(this->GetSelectedLabels(), selectedLabels))
+  if (mitk::Equal(this->GetSelectedLabels(), selectedLabels))
   {
     return;
   }
@@ -263,7 +306,7 @@ void QmitkMultiLabelInspector::UpdateSelectionModel(const LabelValueVectorType& 
   m_Controls->view->selectionModel()->select(newCurrentSelection, QItemSelectionModel::ClearAndSelect|QItemSelectionModel::Current);
 }
 
-void QmitkMultiLabelInspector::SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel)
+void QmitkMultiLabelInspector::SetSelectedLabel(mitk::MultiLabelSegmentation::LabelValueType selectedLabel)
 {
   this->SetSelectedLabels({ selectedLabel });
 }
@@ -275,9 +318,9 @@ QmitkMultiLabelInspector::LabelValueVectorType QmitkMultiLabelInspector::GetSele
   for (const auto& index : std::as_const(selectedIndexes))
   {
     QVariant qvariantDataNode = m_Model->data(index, QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
-    if (qvariantDataNode.canConvert<mitk::LabelSetImage::LabelValueType>())
+    if (qvariantDataNode.canConvert<mitk::MultiLabelSegmentation::LabelValueType>())
     {
-      result.push_back(qvariantDataNode.value<mitk::LabelSetImage::LabelValueType>());
+      result.push_back(qvariantDataNode.value<mitk::MultiLabelSegmentation::LabelValueType>());
     }
   }
   return result;
@@ -300,17 +343,50 @@ void QmitkMultiLabelInspector::OnChangeModelSelection(const QItemSelection& /*se
 {
   if (!m_ModelManipulationOngoing)
   {
-    auto internalSelection = GetSelectedLabelsFromSelectionModel();
-    if (internalSelection.empty())
+    if(!m_Model->GetModelUpdateOngoing())
     {
-      //empty selections are not allowed by UI interactions, there should always be at least on label selected.
-      //but selections are e.g. also cleared if the model is updated (e.g. due to addition of labels)
-      UpdateSelectionModel(m_LastValidSelectedLabels);
+      auto internallySelectedLabels = this->GetSelectedLabelsFromSelectionModel();
+      auto validLabels = FilterValidLabels(internallySelectedLabels, this->GetMultiLabelSegmentation());
+
+      if (internallySelectedLabels.size() == validLabels.size())
+      { //all labels selected by the selection model are valid
+        //set the state of this instance accordingly
+        m_LastValidSelectedLabels = validLabels;
+        emit CurrentSelectionChanged(GetSelectedLabels());
+      }
+      else if (!validLabels.empty())
+      { //only a part of the selection model is valid. Update it accordingly, this will
+        //lead to a re-triggering of this function
+        UpdateSelectionModel(validLabels);
+      }
+      else
+      {
+        //empty selections are not allowed by UI interactions, there should always be at least one valid label selected.
+        //but selections are e.g. also cleared if the model is updated (e.g. due to addition of labels).
+        //In this case all valid elements of m_LastValidSelectedLabels should be used.
+        validLabels = FilterValidLabels(m_LastValidSelectedLabels, this->GetMultiLabelSegmentation());
+
+        if (validLabels.empty() && m_Model->GetNearestLabelValueToLastChange() != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
+        {
+          //we use the nearest existing label as valid value, like we do it in DeletLabelInternal
+          validLabels = { m_Model->GetNearestLabelValueToLastChange() };
+        }
+
+        if (!validLabels.empty())
+        {
+          UpdateSelectionModel(validLabels);
+        }
+        else
+        {
+          m_LastValidSelectedLabels = {};
+          emit CurrentSelectionChanged(GetSelectedLabels());
+        }
+      }
     }
     else
-    {
-      m_LastValidSelectedLabels = internalSelection;
-      emit CurrentSelectionChanged(GetSelectedLabels());
+    { //the model is changed by an external source (not by this instance; e.g. an undo operation or another instance)
+      //need to check the selection after the model change is needed
+      m_CheckSelectionDueToExternalModelChange = true;
     }
   }
 }
@@ -389,9 +465,16 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
     mitkThrow() << "QmitkMultiLabelInspector is in an invalid state. AddNewLabelInstanceInternal was called with a non existing label as template";
 
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(templateLabel->GetValue());
+
+  mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID },
+    false, 0, false, true, true);
+
   m_ModelManipulationOngoing = true;
   auto newLabel = m_Segmentation->AddLabel(templateLabel, groupID, true);
   m_ModelManipulationOngoing = false;
+
+  undoRedoGenerator.RegisterUndoRedoOperationEvent("Add label instance \"" + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, newLabel) + "\"");
+
   this->SetSelectedLabel(newLabel->GetValue());
 
   auto index = m_Model->indexOfLabel(newLabel->GetValue());
@@ -428,7 +511,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstance()
   return result;
 }
 
-mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::LabelSetImage::GroupIndexType& containingGroup)
+mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::MultiLabelSegmentation::GroupIndexType& containingGroup)
 {
   auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(m_Segmentation);
 
@@ -438,9 +521,14 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::LabelSetI
 
   if (canceled) return nullptr;
 
+  mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { containingGroup },
+    false, 0, false, true, true);
+
   m_ModelManipulationOngoing = true;
   m_Segmentation->AddLabel(newLabel, containingGroup, false);
   m_ModelManipulationOngoing = false;
+
+  undoRedoGenerator.RegisterUndoRedoOperationEvent("Add label \""+ mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, newLabel)+"\"");
 
   this->SetSelectedLabel(newLabel->GetValue());
 
@@ -468,7 +556,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabel()
   }
 
   auto currentLabel = this->GetFirstSelectedLabelObject();
-  mitk::LabelSetImage::GroupIndexType groupID = nullptr != currentLabel
+  mitk::MultiLabelSegmentation::GroupIndexType groupID = nullptr != currentLabel
     ? m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue())
     : 0;
 
@@ -563,47 +651,56 @@ void QmitkMultiLabelInspector::DeleteLabelInternal(const LabelValueVectorType& l
   if (!m_AllowLabelModification)
     mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of DeleteLabelInternal.";
 
-  if (m_Segmentation.IsNull())
+  if (m_Segmentation.IsNull() || labelValues.empty())
   {
     return;
   }
 
-  QVariant nextLabelVariant;
-
   this->WaitCursorOn();
-  m_ModelManipulationOngoing = true;
-  for (auto labelValue : labelValues)
-  {
-    if (labelValue == labelValues.back())
-    {
-      auto currentIndex = m_Model->indexOfLabel(labelValue);
-      auto nextIndex = m_Model->ClosestLabelInstanceIndex(currentIndex);
-      nextLabelVariant = nextIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
-    }
 
-    m_Segmentation->RemoveLabel(labelValue);
-  }
+  mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType containingGroups;
+  for (const auto label : labelValues) containingGroups.insert(m_Segmentation->GetGroupIndexOfLabel(label));
+  auto deletedLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, m_Segmentation->GetLabel(labelValues.front()));
+  mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, containingGroups, true);
+
+  m_ModelManipulationOngoing = true;
+
+  m_Segmentation->RemoveLabels(labelValues);
+
   m_ModelManipulationOngoing = false;
+
+  std::ostringstream stream;
+  stream << "Remove labels \"" << deletedLabelName << "\"";
+  if (labelValues.size() > 1)
+  {
+    stream << "and " << labelValues.size() - 1 << "other labels";
+  }
+  undoRedoGenerator.RegisterUndoRedoOperationEvent(stream.str());
+
   this->WaitCursorOff();
 
-  if (nextLabelVariant.isValid())
+  auto validSelectedLabels = FilterValidLabels(m_LastValidSelectedLabels, this->GetMultiLabelSegmentation());
+  if (validSelectedLabels.empty())
   {
-    auto newLabelValue = nextLabelVariant.value<LabelValueType>();
-    this->SetSelectedLabel(newLabelValue);
-
-    auto index = m_Model->indexOfLabel(newLabelValue); //we have to get index again, because it could have changed due to remove operation.
-    if (index.isValid())
+    auto newLabelValue = m_Model->GetNearestLabelValueToLastChange();
+    if (newLabelValue != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
     {
-      m_Controls->view->expand(index.parent());
+      this->SetSelectedLabel(newLabelValue);
+
+      auto index = m_Model->indexOfLabel(newLabelValue); //we have to get index again, because it could have changed due to remove operation.
+      if (index.isValid())
+      {
+        m_Controls->view->expand(index.parent());
+      }
+      else
+      {
+        mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
+      }
     }
     else
     {
-      mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
+      this->SetSelectedLabels({});
     }
-  }
-  else
-  {
-    this->SetSelectedLabels({});
   }
 
   emit ModelUpdated();
@@ -620,15 +717,20 @@ mitk::Label* QmitkMultiLabelInspector::AddNewGroup()
     return nullptr;
   }
 
-  mitk::LabelSetImage::GroupIndexType groupID = 0;
+  mitk::MultiLabelSegmentation::GroupIndexType groupID = 0;
   mitk::Label* newLabel = nullptr;
   m_ModelManipulationOngoing = true;
   try
   {
     this->WaitCursorOn();
-    groupID = m_Segmentation->AddLayer();
-    m_Segmentation->SetActiveLayer(groupID);
+
+    groupID = m_Segmentation->AddGroup();
+
+    mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID }, false, true);
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert new group \"" + mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID) + "\"");
+
     this->WaitCursorOff();
+
     newLabel =  this->AddNewLabelInternal(groupID);
   }
   catch (mitk::Exception& e)
@@ -654,7 +756,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewGroup()
   return newLabel;
 }
 
-void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::LabelSetImage::GroupIndexType& groupID)
+void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::MultiLabelSegmentation::GroupIndexType& groupID)
 {
   if (!m_AllowLabelModification)
     mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of RemoveLabel.";
@@ -662,19 +764,20 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::LabelSetImage::Gr
   if (m_Segmentation.IsNull())
     return;
 
-  if (m_Segmentation->GetNumberOfLayers() < 2)
+  if (m_Segmentation->GetNumberOfGroups() < 2)
     return;
-
-  auto currentIndex = m_Model->indexOfGroup(groupID);
-  auto nextIndex = m_Model->ClosestLabelInstanceIndex(currentIndex);
-  auto labelVariant = nextIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
 
   try
   {
     this->WaitCursorOn();
+    mitk::SegGroupRemoveUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID });
+    auto deletedGroupName = mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID);
+
     m_ModelManipulationOngoing = true;
     m_Segmentation->RemoveGroup(groupID);
     m_ModelManipulationOngoing = false;
+
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Remove group \"" + deletedGroupName + "\"");
     this->WaitCursorOff();
   }
   catch (mitk::Exception& e)
@@ -686,24 +789,28 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::LabelSetImage::Gr
     return;
   }
 
-  if (labelVariant.isValid())
+  auto validSelectedLabels = FilterValidLabels(m_LastValidSelectedLabels, this->GetMultiLabelSegmentation());
+  if (validSelectedLabels.empty())
   {
-    auto newLabelValue = labelVariant.value<LabelValueType>();
-    this->SetSelectedLabel(newLabelValue);
-
-    auto index = m_Model->indexOfLabel(newLabelValue); //we have to get index again, because it could have changed due to remove operation.
-    if (index.isValid())
+    auto newLabelValue = m_Model->GetNearestLabelValueToLastChange();
+    if (newLabelValue != mitk::MultiLabelSegmentation::UNLABELED_VALUE)
     {
-      m_Controls->view->expand(index.parent());
+      this->SetSelectedLabel(newLabelValue);
+
+      auto index = m_Model->indexOfLabel(newLabelValue); //we have to get index again, because it could have changed due to remove operation.
+      if (index.isValid())
+      {
+        m_Controls->view->expand(index.parent());
+      }
+      else
+      {
+        mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
+      }
     }
     else
     {
-      mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
+      this->SetSelectedLabels({});
     }
-  }
-  else
-  {
-    this->SetSelectedLabels({});
   }
 
   emit ModelUpdated();
@@ -718,7 +825,7 @@ void QmitkMultiLabelInspector::RemoveGroup()
   if (m_Segmentation.IsNull())
     return;
 
-  if (m_Segmentation->GetNumberOfLayers() < 2)
+  if (m_Segmentation->GetNumberOfGroups() < 2)
   {
     QMessageBox::information(this, "Delete group", "Cannot delete last remaining group. A segmentation must contain at least a single group.");
     return;
@@ -754,7 +861,7 @@ void QmitkMultiLabelInspector::OnDeleteGroup()
 
   if (groupIDVariant.isValid())
   {
-    auto groupID = groupIDVariant.value<mitk::LabelSetImage::GroupIndexType>();
+    auto groupID = groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
     auto groupName = QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID));
     auto question = QStringLiteral("Do you really want to delete group \"%1\" including all of its labels?").arg(groupName);
     auto answer = QMessageBox::question(this, QString("Delete group \"%1\"").arg(groupName), question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
@@ -803,7 +910,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       QObject::connect(renameAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnRenameGroup);
       menu->addAction(renameAction);
 
-      if (m_Segmentation->GetNumberOfLayers() > 1)
+      if (m_Segmentation->GetNumberOfGroups() > 1)
       {
         QAction* removeAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")), "Delete group", this);
         QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnDeleteGroup);
@@ -964,6 +1071,10 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
         menu->addAction(clearAction);
       }
 
+      auto copyLabelToGroupAction = new QAction("&Copy to group...", this);
+      QObject::connect(copyLabelToGroupAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnCopyToGroup);
+      menu->addAction(copyLabelToGroupAction);
+
       if (m_AllowVisibilityModification)
       {
         if (m_AllowLabelModification) menu->addSeparator();
@@ -984,6 +1095,19 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
   QObject::connect(menu, &QMenu::aboutToHide, this, &QmitkMultiLabelInspector::OnMouseLeave);
   m_AboutToShowContextMenu = true;
   menu->popup(QCursor::pos());
+}
+
+void QmitkMultiLabelInspector::OnCopyToGroup()
+{
+  auto selectedLabels = this->GetSelectedLabels();
+
+  if (selectedLabels.empty())
+    return;
+
+  QmitkCopyLabelToGroupDialog dialog(m_Segmentation, m_Segmentation->GetLabel(selectedLabels.front()));
+
+  if (dialog.exec() == QDialog::Accepted)
+    this->SetSelectedLabel(dialog.GetDestinationLabel()->GetValue());
 }
 
 QWidgetAction* QmitkMultiLabelInspector::CreateOpacityAction()
@@ -1067,7 +1191,23 @@ void QmitkMultiLabelInspector::OnClearLabels(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
-    m_Segmentation->EraseLabels(this->GetSelectedLabels());
+
+    auto labelValues = this->GetSelectedLabels();
+    mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType containingGroups;
+    for (const auto label : labelValues) containingGroups.insert(m_Segmentation->GetGroupIndexOfLabel(label));
+    auto clearedLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, m_Segmentation->GetLabel(labelValues.front()));
+    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, containingGroups, true, 0, true, false, true);
+
+    m_Segmentation->EraseLabels(labelValues);
+
+    std::ostringstream stream;
+    stream << "Clear labels \"" << clearedLabelName << "\"";
+    if (labelValues.size() > 1)
+    {
+      stream << "and " << labelValues.size() - 1 << "other labels";
+    }
+    undoRedoGenerator.RegisterUndoRedoOperationEvent(stream.str());
+
     this->WaitCursorOff();
     // this is needed as workaround for (T27307). It circumvents the fact that modifications
     // of data (here the segmentation) does not directly trigger the modification of the
@@ -1128,8 +1268,27 @@ void QmitkMultiLabelInspector::OnDeleteLabels(bool /*value*/)
 
   if (answerButton == QMessageBox::Yes)
   {
+    auto labelValues = this->GetSelectedLabels();
+
+    if (labelValues.empty()) return;
+
     this->WaitCursorOn();
+
+    mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType containingGroups;
+    for (const auto label : labelValues) containingGroups.insert(m_Segmentation->GetGroupIndexOfLabel(label));
+    auto deletedLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, m_Segmentation->GetLabel(labelValues.front()));
+    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, containingGroups, true);
+
     m_Segmentation->RemoveLabels(this->GetSelectedLabels());
+
+    std::ostringstream stream;
+    stream << "Remove labels \"" << deletedLabelName << "\"";
+    if (labelValues.size() > 1)
+    {
+      stream << "and " << labelValues.size() - 1 << "other labels";
+    }
+    undoRedoGenerator.RegisterUndoRedoOperationEvent(stream.str());
+
     this->WaitCursorOff();
 
     // this is needed as workaround for (T27307). It circumvents the fact that modifications
@@ -1154,7 +1313,13 @@ void QmitkMultiLabelInspector::OnMergeLabels(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
+
+    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue()) }, true);
+
     m_Segmentation->MergeLabels(currentLabel->GetValue(), this->GetSelectedLabels());
+
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Merge into label \"" + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, currentLabel) + "\"");
+
     this->WaitCursorOff();
 
     // this is needed as workaround for (T27307). It circumvents the fact that modifications
@@ -1175,7 +1340,7 @@ void QmitkMultiLabelInspector::OnAddLabel()
 
   if (groupIDVariant.isValid())
   {
-    auto groupID = groupIDVariant.value<mitk::LabelSetImage::GroupIndexType>();
+    auto groupID = groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
     this->AddNewLabelInternal(groupID);
 
     // this is needed as workaround for (T27307). It circumvents the fact that modifications
@@ -1219,7 +1384,13 @@ void QmitkMultiLabelInspector::OnClearLabel(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
+
+    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue()) }, true, 0, true, false, true);
+
     m_Segmentation->EraseLabel(currentLabel->GetValue());
+
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Clear label \"" + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, currentLabel) + "\"");
+
     this->WaitCursorOff();
 
     // this is needed as workaround for (T27307). It circumvents the fact that modifications
@@ -1247,18 +1418,23 @@ void QmitkMultiLabelInspector::OnRenameGroup()
 
   if (groupIDVariant.isValid())
   {
-    auto groupID = groupIDVariant.value<mitk::LabelSetImage::GroupIndexType>();
+    auto groupID = groupIDVariant.value<mitk::MultiLabelSegmentation::GroupIndexType>();
 
     bool dlgOK;
-    auto groupName = m_Segmentation->GetGroupName(groupID);
+    auto groupName = mitk::LabelSetImageHelper::CreateDisplayGroupName(m_Segmentation, groupID);
     auto newName = QInputDialog::getText(this, "Change name of the group", "Group name:", QLineEdit::Normal, QString::fromStdString(groupName), &dlgOK);
     if (dlgOK)
     {
+      mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID }, true, 0, true, true);
+
       m_Segmentation->SetGroupName(groupID, newName.toStdString());
       // this is needed as workaround for (T27307). It circumvents the fact that modifications
       // of data (here the segmentation) does not directly trigger the modification of the
       // owning node (see T27307). Therefore other code (like renderers or model views) that e.g.
       // listens to the datastorage for modification would not get notified.
+
+      undoRedoGenerator.RegisterUndoRedoOperationEvent("Rename group #" + std::to_string(groupID));
+
       if (m_SegmentationNode.IsNotNull())
       {
         m_SegmentationNode->Modified();
@@ -1272,6 +1448,8 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
 {
   auto relevantLabelValues = this->GetCurrentlyAffactedLabelInstances();
   auto currentLabel = this->GetCurrentLabel();
+
+  mitk::SegLabelPropModifyUndoRedoHelper undoRedoHelper(m_Segmentation, relevantLabelValues);
 
   bool canceled = false;
   emit LabelRenameRequested(currentLabel, true, canceled);
@@ -1289,7 +1467,6 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
       label->SetName(currentLabel->GetName());
       label->SetColor(currentLabel->GetColor());
       m_Segmentation->UpdateLookupTable(label->GetValue());
-      m_Segmentation->GetLookupTable()->Modified();
       mitk::DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 
       // this is needed as workaround for (T27307). It circumvents the fact that modifications
@@ -1302,6 +1479,9 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
       }
     }
   }
+  m_Segmentation->GetLookupTable()->Modified();
+
+  undoRedoHelper.RegisterUndoRedoOperationEvent("Change label name/color");
   emit ModelUpdated();
 }
 
@@ -1412,11 +1592,11 @@ void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) 
   if (currentLabel.IsNull())
     return;
 
-  const mitk::Point3D& pos = currentLabel->GetCenterOfMassCoordinates();
+  const auto pos = currentLabel->GetCenterOfMassIndex();
 
   if (pos.GetVnlVector().max_value() > 0.0)
   {
-    emit GoToLabel(currentLabel->GetValue(), pos);
+    emit GoToLabel(currentLabel->GetValue(), currentLabel->GetCenterOfMassCoordinates());
   }
 }
 

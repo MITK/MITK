@@ -53,9 +53,13 @@ namespace mitk
     std::vector<MimeType> result;
     for (const auto &elem : m_NameToMimeType)
     {
-      if (elem.second.AppliesTo(filePath))
+      try
       {
-        result.push_back(elem.second);
+        if (elem.second.AppliesTo(filePath))
+          result.push_back(elem.second);
+      }
+      catch (...)
+      {
       }
     }
     std::sort(result.begin(), result.end());

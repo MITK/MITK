@@ -1,1 +1,1 @@
-start "" /B "%~dp0bin\%~n0.exe" %*
+start "" /B "%~dp0bin\%~n0.exe" -style windowsvista %*

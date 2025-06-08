@@ -151,7 +151,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
   //create result image, get mask node and reference image
   mitk::Image::Pointer resultImage(nullptr);
-  mitk::LabelSetImage::Pointer segmentation = m_Controls->labelInspector->GetMultiLabelSegmentation();
+  mitk::MultiLabelSegmentation::Pointer segmentation = m_Controls->labelInspector->GetMultiLabelSegmentation();
   mitk::Image::Pointer referenceImage = static_cast<mitk::Image*>(m_Controls->imageNodeSelector->GetSelectedNode()->GetData());
 
   mitk::ProgressBar::GetInstance()->Progress();

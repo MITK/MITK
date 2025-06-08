@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkDicomLocalStorageWidget</class>
+ <widget class="QWidget" name="QmitkDicomLocalStorageWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>434</width>
+    <height>284</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="viewButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>View</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Plugins/org.mitk.gui.qt.dicombrowser/resources/dicom.qrc">
+         <normaloff>:/org.mitk.gui.qt.dicombrowser/viewIcon.png</normaloff>:/org.mitk.gui.qt.dicombrowser/viewIcon.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="deleteButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Delete</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Plugins/org.mitk.gui.qt.datamanager/resources/datamanager.qrc">
+         <normaloff>:/org.mitk.gui.qt.datamanager/Remove_48.png</normaloff>:/org.mitk.gui.qt.datamanager/Remove_48.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="ctkDICOMTableManager" name="tableManager" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ctkDICOMTableManager</class>
+   <extends>QWidget</extends>
+   <header location="global">ctkDICOMTableManager.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../Plugins/org.mitk.gui.qt.datamanager/resources/datamanager.qrc"/>
+  <include location="../../../Plugins/org.mitk.gui.qt.dicombrowser/resources/dicom.qrc"/>
+ </resources>
+ <connections/>
+</ui>

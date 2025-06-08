@@ -16,8 +16,6 @@ found in the LICENSE file.
 #include "mitkToolManagerProvider.h"
 #include <mitkSurface.h>
 
-//needed for qApp
-#include <qcoreapplication.h>
 #include <QApplication>
 
 QmitkConvertSurfaceToLabelAction::QmitkConvertSurfaceToLabelAction()
@@ -39,7 +37,7 @@ void QmitkConvertSurfaceToLabelAction::Run( const QList<mitk::DataNode::Pointer>
     return;
   }
 
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
+  mitk::MultiLabelSegmentation* workingImage = dynamic_cast<mitk::MultiLabelSegmentation*>( workingNode->GetData() );
   assert(workingImage);
 
   foreach ( mitk::DataNode::Pointer surfaceNode, selectedNodes )

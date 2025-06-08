@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include "mitkMessage.h"
 
-#include <qlayout.h>
+#include <QGridLayout>
 
 QmitkSimpleLabelSetListWidget::QmitkSimpleLabelSetListWidget(QWidget* parent) : QWidget(parent), m_LabelList(nullptr), m_Emmiting(false)
 {
@@ -54,12 +54,12 @@ QmitkSimpleLabelSetListWidget::LabelVectorType QmitkSimpleLabelSetListWidget::Se
   return result;
 }
 
-const mitk::LabelSetImage* QmitkSimpleLabelSetListWidget::GetLabelSetImage() const
+const mitk::MultiLabelSegmentation* QmitkSimpleLabelSetListWidget::GetLabelSetImage() const
 {
   return m_LabelSetImage;
 }
 
-void QmitkSimpleLabelSetListWidget::SetLabelSetImage(const mitk::LabelSetImage* image)
+void QmitkSimpleLabelSetListWidget::SetLabelSetImage(const mitk::MultiLabelSegmentation* image)
 {
   if (image != m_LabelSetImage)
   {
@@ -91,6 +91,8 @@ void QmitkSimpleLabelSetListWidget::SetLabelSetImage(const mitk::LabelSetImage* 
       m_LabelSetImage->AfterChangeLayerEvent += mitk::MessageDelegate<QmitkSimpleLabelSetListWidget>(
         this, &QmitkSimpleLabelSetListWidget::OnLayerChanged);
     }
+
+    this->ResetList();
   }
 }
 
@@ -107,7 +109,7 @@ void QmitkSimpleLabelSetListWidget::OnLayerChanged()
   }
 }
 
-void QmitkSimpleLabelSetListWidget::OnLabelChanged(mitk::LabelSetImage::LabelValueType lv)
+void QmitkSimpleLabelSetListWidget::OnLabelChanged(mitk::MultiLabelSegmentation::LabelValueType lv)
 {
   if (!this->m_Emmiting
     && (!m_LabelSetImage->ExistLabel(lv) || m_LabelSetImage->GetGroupIndexOfLabel(lv)==m_LabelSetImage->GetActiveLayer()))

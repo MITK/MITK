@@ -11,87 +11,99 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkPythonView.h"
-#include <QmitkCtkPythonShell.h>
-#include "mitkPluginActivator.h"
-#include <QmitkPythonVariableStackTableView.h>
-#include <QmitkPythonTextEditor.h>
-#include <QmitkPythonSnippets.h>
 
-#include <QHeaderView>
-#include <QSplitter>
-#include <QGridLayout>
+#include "mitkNodePredicateDataType.h"
+#include "mitkLabelSetImage.h"
+#include "mitkLabelSetImageHelper.h"
+#include <QList>
 
 const std::string QmitkPythonView::VIEW_ID = "org.mitk.views.python";
 
-struct QmitkPythonViewData
+QmitkPythonView::QmitkPythonView() : m_Controls(nullptr)
 {
-    // widget
-    QmitkPythonVariableStackTableView* m_PythonVariableStackTableView;
-    QmitkPythonSnippets* m_PythonSnippets;
-
-    QmitkCtkPythonShell* m_PythonShell;
-    QmitkPythonTextEditor* m_TextEditor;
-};
-
-QmitkPythonView::QmitkPythonView()
-    : d( new QmitkPythonViewData )
-{
-    d->m_PythonVariableStackTableView = nullptr;
-    d->m_PythonShell = nullptr;
+  m_ReferencePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
+  m_PythonContext = mitk::PythonContext::New();
+  m_PythonContext->Activate();
+  std::string pythonCommand;
+  pythonCommand.append("_mitk_stdout = io.StringIO()\n");
+  pythonCommand.append("sys.stdout = sys.stderr = _mitk_stdout\n");
+  m_PythonContext->ExecuteString(pythonCommand);
 }
 
-QmitkPythonView::~QmitkPythonView()
+void QmitkPythonView::CreateQtPartControl(QWidget *parent)
 {
-    delete d;
-}
+  m_Controls = new Ui::QmitkPythonViewControls;
+  m_Controls->setupUi(parent);
+  m_Controls->referenceNodeSelector->SetDataStorage(GetDataStorage());
+  m_Controls->referenceNodeSelector->SetNodePredicate(m_ReferencePredicate);
+  m_Controls->referenceNodeSelector->SetInvalidInfo("Select an image");
+  m_Controls->referenceNodeSelector->SetPopUpTitel("Select an image");
+  m_Controls->referenceNodeSelector->SetPopUpHint(
+    "Select an image that should be used to define the geometry and bounds of the segmentation.");
 
-void QmitkPythonView::CreateQtPartControl(QWidget* parent)
-{
-    d->m_PythonVariableStackTableView = new QmitkPythonVariableStackTableView;
-    d->m_PythonVariableStackTableView->SetDataStorage(this->GetDataStorage());
-    //d->m_PythonVariableStackTableView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
-
-    QString snippetsFilePath = mitk::PluginActivator::m_XmlFilePath;
-    MITK_DEBUG("QmitkPythonView") << "got snippetsFilePath " << snippetsFilePath.toStdString();
-
-    d->m_PythonSnippets = new QmitkPythonSnippets(snippetsFilePath);
-
-    MITK_DEBUG("QmitkPythonView") << "initializing varStackSnippetsTab";
-    QTabWidget* varStackSnippetsTab = new QTabWidget;
-    varStackSnippetsTab->addTab( d->m_PythonVariableStackTableView, "Variable Stack" );
-    varStackSnippetsTab->addTab( d->m_PythonSnippets, "Snippets" );
-    varStackSnippetsTab->setTabPosition( QTabWidget::South );
-
-    MITK_DEBUG("QmitkPythonView") << "initializing m_PythonShell";
-    d->m_PythonShell = new QmitkCtkPythonShell;
-
-    MITK_DEBUG("QmitkPythonView") << "initializing m_TextEditor";
-    d->m_TextEditor = new QmitkPythonTextEditor;
-
-    MITK_DEBUG("QmitkPythonView") << "initializing tabWidgetConsoleEditor";
-    QTabWidget* tabWidgetConsoleEditor = new QTabWidget;
-    tabWidgetConsoleEditor->addTab( d->m_PythonShell, "Console" );
-    tabWidgetConsoleEditor->addTab( d->m_TextEditor, "Text Editor" );
-    tabWidgetConsoleEditor->setTabPosition( QTabWidget::South );
-
-    QList<int> sizes;
-    sizes << 1 << 3;
-    QSplitter* splitter = new QSplitter;
-    splitter->addWidget(varStackSnippetsTab);
-    splitter->addWidget(tabWidgetConsoleEditor);
-    splitter->setStretchFactor ( 0, 1 );
-    splitter->setStretchFactor ( 1, 3 );
-
-    QGridLayout* layout = new QGridLayout;
-    layout->addWidget( splitter, 0, 0 );
-    parent->setLayout(layout);
-
-    MITK_DEBUG("QmitkPythonView") << "creating connections for m_PythonSnippets";
-    connect( d->m_PythonSnippets, SIGNAL(PasteCommandRequested(QString)), d->m_PythonShell, SLOT(Paste(QString)) );
-    connect( d->m_PythonSnippets, SIGNAL(PasteCommandRequested(QString)), d->m_TextEditor, SLOT(Paste(QString)) );
+  QFont monospaceFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+  m_Controls->pythonConsole->setFont(monospaceFont);
+  m_Controls->pythonConsole->setStyleSheet("background-color: black; color: white;");
+  QFontMetrics metrics(monospaceFont); // Get font metrics of the current font
+  int spaceWidth = metrics.horizontalAdvance(' ');
+  m_Controls->pythonConsole->setTabStopDistance(spaceWidth * 4);
+  connect(m_Controls->executeButton, SIGNAL(clicked()), this, SLOT(OnExecuteBtnClicked()));
+  connect(m_Controls->referenceNodeSelector,
+          &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
+          this,
+          &QmitkPythonView::OnCurrentSelectionChanged);
+  connect(m_Controls->venvSelectionButton,
+          SIGNAL(directoryChanged(const QString &)),
+          this,
+          SLOT(OnSitePackageSelected(const QString &)));
+  connect(m_Controls->venvDeleteButton, SIGNAL(clicked()), this, SLOT(OnSitePackageDeleted()));
+  
+  QString pythonCommand = "pyMITK.SayHi()\n";
+  m_Controls->pythonConsole->setPlainText(pythonCommand);
+  this->OnExecuteBtnClicked();
 }
 
 void QmitkPythonView::SetFocus()
 {
-    d->m_PythonShell->setFocus();
+  m_Controls->referenceNodeSelector->setFocus();
+}
+
+void QmitkPythonView::OnExecuteBtnClicked()
+{
+  QString text = m_Controls->pythonConsole->toPlainText();
+  std::string pyCommand = text.toStdString();
+  std::string result = m_PythonContext->ExecuteString(pyCommand);
+  m_Controls->pythonOutput->clear();
+  m_Controls->pythonOutput->setText(QString::fromStdString(result));
+}
+
+void QmitkPythonView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+{
+  if (nodes.size() == 0)
+  {
+    return;
+  }
+  mitk::DataNode::Pointer node = nodes.first();
+  auto *image = dynamic_cast<mitk::Image *>(node->GetData());
+  if (nullptr == image)
+  {
+    MITK_ERROR << "image was null";
+    return;
+  }
+  m_PythonContext->TransferBaseDataToPython(image);
+  auto stdOut = m_PythonContext->GetStdOut();
+  m_Controls->pythonOutput->clear();
+  m_Controls->pythonOutput->setText(QString::fromStdString(stdOut));
+}
+
+void QmitkPythonView::OnSitePackageSelected(const QString & /*sitePackagesFolder*/)
+{
+  const QString sitePackageFolder = m_Controls->venvSelectionButton->directory();
+  m_Controls->venvSelectionButton->setText(sitePackageFolder);
+  m_PythonContext->SetVirtualEnvironmentPath(sitePackageFolder.toStdString());
+}
+
+void QmitkPythonView::OnSitePackageDeleted()
+{
+  m_PythonContext->ClearVirtualEnvironmentPath();
 }

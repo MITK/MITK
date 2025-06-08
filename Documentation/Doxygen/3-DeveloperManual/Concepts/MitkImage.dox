@@ -79,12 +79,12 @@ Image accessors provide an image access, which is
     to access pixel values easily (see next section).
 
 The existing instantiable image accessor classes are: mitk::ImageReadAccessor,
-mitk::ImageWriteAccessor and mitk::ImageVtkAccessor. They all inherit from
-mitk::ImageAccessorBase, which mainly contains the lock functionality and a representation
-of the specified image area. The classes mitk::ImageReadAccessor and
+mitk::ImageWriteAccessor, mitk::ImageVtkReadAccessor and mitk::ImageVtkWriteAccessor.
+They all inherit from mitk::ImageAccessorBase, which mainly contains the lock functionality
+and a representation of the specified image area. The classes mitk::ImageReadAccessor and
 mitk::ImageWriteAccessor provide access to an mitk::Image or mitk::ImageDataItem and
-supply a (const) void* pointer, while mitk::ImageVtkAccessor supports Vtk image access in
-a legacy mode (you should not instantiate it).
+supply a (const) void* pointer, while mitk::ImageVtkReadAccessor and mitk::ImageVtkWriteAccessor
+support VTK image access.
 
 \imageMacro{mitkimageaccessorhierarchy.png,"",16}
 

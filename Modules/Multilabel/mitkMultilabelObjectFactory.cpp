@@ -46,7 +46,7 @@ mitk::Mapper::Pointer mitk::MultilabelObjectFactory::CreateMapper(mitk::DataNode
 
   if (id == mitk::BaseRenderer::Standard2D)
   {
-    if ((dynamic_cast<mitk::LabelSetImage *>(data) != nullptr))
+    if ((dynamic_cast<mitk::MultiLabelSegmentation *>(data) != nullptr))
     {
       newMapper = mitk::LabelSetImageVtkMapper2D::New();
       newMapper->SetDataNode(node);
@@ -54,7 +54,7 @@ mitk::Mapper::Pointer mitk::MultilabelObjectFactory::CreateMapper(mitk::DataNode
   }
   else if (id == mitk::BaseRenderer::Standard3D)
   {
-    if ((dynamic_cast<mitk::LabelSetImage*>(data) != nullptr))
+    if ((dynamic_cast<mitk::MultiLabelSegmentation*>(data) != nullptr))
     {
       newMapper = mitk::MultiLabelSegmentationVtkMapper3D::New();
       newMapper->SetDataNode(node);
@@ -71,7 +71,7 @@ void mitk::MultilabelObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   if (node->GetData() == nullptr)
     return;
 
-  if (dynamic_cast<LabelSetImage *>(node->GetData()) != nullptr)
+  if (dynamic_cast<MultiLabelSegmentation *>(node->GetData()) != nullptr)
   {
     mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(node);
     mitk::MultiLabelSegmentationVtkMapper3D::SetDefaultProperties(node);
@@ -87,7 +87,7 @@ void mitk::MultilabelObjectFactory::SetDefaultProperties(mitk::DataNode *node)
       labelSetImageFilter.AddEntry("binaryimage.selectedcolor", PropertyFilter::Blacklist);
       labelSetImageFilter.AddEntry("outline binary shadow color", PropertyFilter::Blacklist);
 
-      propertyFilters->AddFilter(labelSetImageFilter, "LabelSetImage");
+      propertyFilters->AddFilter(labelSetImageFilter, "MultiLabelSegmentation");
     }
   }
 }

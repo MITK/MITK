@@ -229,7 +229,7 @@
            <x>0</x>
            <y>0</y>
            <width>528</width>
-           <height>155</height>
+           <height>129</height>
           </rect>
          </property>
          <attribute name="label">
@@ -237,9 +237,9 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QRadioButton" name="radioButton_StartParameters">
+           <widget class="QCheckBox" name="checkBox_StartParameters">
             <property name="text">
-             <string>Enter Fit Starting Parameters manually</string>
+             <string>Enter Fit Starting Parameters</string>
             </property>
            </widget>
           </item>
@@ -261,7 +261,7 @@
            <x>0</x>
            <y>0</y>
            <width>528</width>
-           <height>232</height>
+           <height>234</height>
           </rect>
          </property>
          <attribute name="label">

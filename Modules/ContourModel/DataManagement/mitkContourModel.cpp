@@ -30,9 +30,15 @@ mitk::ContourModel::ContourModel() : m_UpdateBoundingBox(true)
 }
 
 mitk::ContourModel::ContourModel(const ContourModel &other)
-  : BaseData(other), m_ContourSeries(other.m_ContourSeries), m_lineInterpolation(other.m_lineInterpolation)
+  : BaseData(other),
+    m_SelectedVertex(nullptr),
+    m_lineInterpolation(other.m_lineInterpolation),
+    m_UpdateBoundingBox(true)
 {
-  m_SelectedVertex = nullptr;
+  m_ContourSeries.reserve(other.m_ContourSeries.size());
+
+  for (const auto& element : other.m_ContourSeries)
+    m_ContourSeries.push_back(element->Clone());
 }
 
 mitk::ContourModel::~ContourModel()

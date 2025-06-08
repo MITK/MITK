@@ -117,12 +117,12 @@ void GenericDataFittingView::CreateQtPartControl(QWidget* parent)
   m_Controls.initialValuesManager->setEnabled(false);
   m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
 
-  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
 
   connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), this,
           SLOT(UpdateGUIControls()));
-  connect(m_Controls.radioButton_StartParameters, SIGNAL(toggled(bool)),
+  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)),
           m_Controls.initialValuesManager,
           SLOT(setEnabled(bool)));
 
@@ -227,10 +227,10 @@ void GenericDataFittingView::OnModellSet(int index)
     }
 
     m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
-      m_selectedModelFactory->GetDefaultInitialParameterization());
+      m_selectedModelFactory->GetDefaultInitialParameterization(), m_selectedModelFactory->GetParameterUnits() );
 
     m_Controls.constraintManager->setChecker(this->m_modelConstraints,
-      this->m_selectedModelFactory->GetParameterNames());
+      this->m_selectedModelFactory->GetParameterNames(), this->m_selectedModelFactory->GetParameterUnits());
 
   }
 
@@ -248,6 +248,7 @@ void GenericDataFittingView::PrepareFitConfiguration()
   if (m_selectedModelFactory)
   {
     mitk::ModelBase::ParameterNamesType paramNames = m_selectedModelFactory->GetParameterNames();
+    mitk::ModelBase::ParamterUnitMapType paramUnits = m_selectedModelFactory->GetParameterUnits();
     unsigned int nrOfPools = this->m_Controls.nrOfParams->value();
 
     //init values
@@ -258,12 +259,13 @@ void GenericDataFittingView::PrepareFitConfiguration()
 
       auto parameterizer = m_selectedModelFactory->CreateParameterizer(fitInfo);
       paramNames = parameterizer->GetParameterNames();
+      paramUnits = parameterizer->GetParameterUnits();
 
-      m_Controls.initialValuesManager->setInitialValues(paramNames, parameterizer->GetDefaultInitialParameterization());
+      m_Controls.initialValuesManager->setInitialValues(paramNames, parameterizer->GetDefaultInitialParameterization(), paramUnits);
     }
     else
     {
-      m_Controls.initialValuesManager->setInitialValues(paramNames, this->m_selectedModelFactory->GetDefaultInitialParameterization());
+      m_Controls.initialValuesManager->setInitialValues(paramNames, this->m_selectedModelFactory->GetDefaultInitialParameterization(), paramUnits);
     }
 
     //constraints
@@ -275,7 +277,7 @@ void GenericDataFittingView::PrepareFitConfiguration()
       this->m_modelConstraints = mitk::SimpleBarrierConstraintChecker::New();
     }
 
-    m_Controls.constraintManager->setChecker(this->m_modelConstraints, paramNames);
+    m_Controls.constraintManager->setChecker(this->m_modelConstraints, paramNames, paramUnits);
   }
 };
 
@@ -437,7 +439,7 @@ void GenericDataFittingView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Po
   if (m_Controls.maskNodeSelector->GetSelectedNode().IsNotNull())
   {
     this->m_selectedMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
-    auto selectedLabelSetMask = dynamic_cast<mitk::LabelSetImage*>(m_selectedMaskNode->GetData());
+    auto selectedLabelSetMask = dynamic_cast<mitk::MultiLabelSegmentation*>(m_selectedMaskNode->GetData());
 
     if (selectedLabelSetMask != nullptr)
     {
@@ -487,7 +489,7 @@ bool GenericDataFittingView::CheckModelSettings() const
   {
     ok = false;
   }
-  if (this->m_Controls.radioButton_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
+  if (this->m_Controls.checkBox_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
   {
     std::string warning = "Warning. Invalid start parameters. At least one parameter has an invalid image setting as source.";
     MITK_ERROR << warning;
@@ -502,7 +504,7 @@ bool GenericDataFittingView::CheckModelSettings() const
 void GenericDataFittingView::ConfigureInitialParametersOfParameterizer(mitk::ModelParameterizerBase*
     parameterizer) const
 {
-  if (m_Controls.radioButton_StartParameters->isChecked())
+  if (m_Controls.checkBox_StartParameters->isChecked())
   {
     //use user defined initial parameters
     mitk::ValueBasedParameterizationDelegate::Pointer paramDelegate =

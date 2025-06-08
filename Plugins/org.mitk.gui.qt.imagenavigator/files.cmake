@@ -8,7 +8,7 @@ set(INTERNAL_CPP_FILES
 )
 
 set(UI_FILES
-  src/internal/QmitkImageNavigatorViewControls.ui
+  src/internal/QmitkImageNavigatorView.ui
 )
 
 set(MOC_H_FILES

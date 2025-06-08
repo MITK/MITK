@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include "QmitkSegmentationView.h"
 #include "QmitkSegmentationPreferencePage.h"
 #include "QmitkSegmentAnythingPreferencePage.h"
+#include "QmitkTotalSegmentatorPreferencePage.h"
 #include "QmitkSegmentationUtilitiesView.h"
 #include "QmitkSegmentationTaskListView.h"
 
@@ -23,7 +24,6 @@ found in the LICENSE file.
 #include "QmitkLoadMultiLabelPresetAction.h"
 #include "QmitkSaveMultiLabelPresetAction.h"
 #include "QmitkConvertSurfaceToLabelAction.h"
-#include "QmitkConvertMaskToLabelAction.h"
 #include "QmitkConvertToMultiLabelSegmentationAction.h"
 #include "QmitkCreateMultiLabelSegmentationAction.h"
 #include <mitkBoundingShapeObjectFactory.h>
@@ -52,6 +52,7 @@ void PluginActivator::start(ctkPluginContext *context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentAnythingPreferencePage, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkTotalSegmentatorPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationUtilitiesView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationTaskListView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropAction, context)
@@ -60,7 +61,6 @@ void PluginActivator::start(ctkPluginContext *context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkLoadMultiLabelPresetAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSaveMultiLabelPresetAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertSurfaceToLabelAction, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertMaskToLabelAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertToMultiLabelSegmentationAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkCreateMultiLabelSegmentationAction, context)
   

@@ -24,7 +24,9 @@ found in the LICENSE file.
 #include <mitkPlanePositionManager.h>
 #include <mitkRestorePlanePositionOperation.h>
 
-#include <mitkDiffSliceOperation.h>
+#include <mitkSegSliceOperation.h>
+
+#include <usModuleResource.h>
 
 namespace mitk
 {
@@ -75,12 +77,12 @@ namespace mitk
      * @brief Updates the surface interpolations by extracting the contour form the given slice for all labels
      * that have a surface contour information stored for the given plane at the given timestep.
      * @param workingImage the segmentation image
-     * @param timeStep the time step for wich the surface interpolation information should be updated.
+     * @param timeStep the time step for which the surface interpolation information should be updated.
      * @param plane the plane in which the slice lies
      * @param detectIntersection if true the slice is eroded before contour extraction. If the slice is empty after the
      * erosion it is most likely an intersecting contour an will not be added to the SurfaceInterpolationController
      */
-    static void UpdateAllSurfaceInterpolations(const LabelSetImage* workingImage,
+    static void UpdateAllSurfaceInterpolations(const MultiLabelSegmentation* workingImage,
                                            TimeStepType timeStep,
                                            const PlaneGeometry *plane,
                                            bool detectIntersection);
@@ -117,13 +119,28 @@ namespace mitk
       TimePointType timePoint,
       unsigned int component = 0);
 
-    /** Convenience overloaded version that can be called for a given planeGeometry, slice image and time step.
-     * Calls static WriteBackSegmentationResults*/
-    static void WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep);
+    /** \brief Writes the provided segmentation result slice into the data of the passed workingNode.
+     * The function is a public convenience wrapper around the static protected overload of this function
+     * and does the following: 1) passed slice is written to workingNode (and generate and undo/redo step);
+     * 2) update the surface interpolation and 3) mark the node as modified.
+     * @param workingNode Pointer to the node that contains the working image.
+     * @param planeGeometry Indicates where the slice should be added in the data of the working node.
+     * @param segmentationResult Point to the slice image that should be added.
+     * @param timeStep time step of the working node data that should be modified
+     * @param toolName Name of the tool that should be used as description in the undo operation.
+     * @pre workingNode must point to a valid instance and contain an image instance as data.
+     * @pre planeGeometry must point to a valid instance.
+     * @pre segmentationResult must point to a valid instance.*/
+    static void WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep, const std::string& toolName);
 
-    /** Convenience overloaded version that can be called for a given planeGeometry, slice image and time step.
-     * For more details see protected WriteSliceToVolume version.*/
-    static void WriteSliceToVolume(Image* workingImage, const PlaneGeometry* planeGeometry, const Image* slice, TimeStepType timeStep, bool allowUndo);
+    /** Writes a provided slice into the passed working image. The content of working image that is covered
+    * by the slice will be completely overwritten.
+    * @param workingImage Pointer to the image that is the target of the write operation.
+    * @param planeGeometry Geometry that indicates the plane that should be overwritten by the slice.
+    * @param slice Image containing the slice that should be written into working image.
+    * @param timeStep Time step of the working image that should be overwritten.
+    * @pre workingImage, planeGeometry and slice must point to valid instances.*/
+    static void WriteSliceToVolume(Image* workingImage, const PlaneGeometry* planeGeometry, const Image* slice, TimeStepType timeStep);
 
     void SetShowMarkerNodes(bool);
 
@@ -149,7 +166,7 @@ namespace mitk
      * @brief returns the segmentation node that should be modified by the tool.
      */
     DataNode* GetWorkingDataNode() const;
-    Image* GetWorkingData() const;
+    MultiLabelSegmentation* GetWorkingData() const;
 
     DataNode* GetReferenceDataNode() const;
     Image* GetReferenceData() const;
@@ -232,19 +249,19 @@ namespace mitk
      * empty, the function call does nothing.
      * @param writeSliceToVolume If set to false the write operation (WriteSliceToVolume will be skipped)
      * and only the surface interpolation will be updated.
+     * @param allowUndo Indicates if undo/redo operations should be registered for the write operation
+     * @param toolName Name of the tool that should be used as description in the undo operation.
      * @pre workingNode must point to a valid instance and contain an image instance as data.*/
-    static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true);
+    static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true, bool allowUndo = true, const std::string& toolName = "");
 
-    /** Writes a provided slice into the passed working image. The content of working image that is covered
+    /** Convenience overloaded version that can be called with a slice info.
+    * Writes a provided slice into the passed working image. The content of working image that is covered
     * by the slice will be completely overwritten. If asked for it also generates the needed
     * undo/redo steps.
     * @param workingImage Pointer to the image that is the target of the write operation.
     * @param sliceInfo SliceInfo instance that contains the slice image, the defining plane geometry and time step.
-    * @param allowUndo Indicates if undo/redo operations should be registered for the write operation
-    * performed by this call. true: undo/redo will be generated; false: no undo/redo will be generated, so
-    * this operation cannot be revoked by the user.
     * @pre workingImage must point to a valid instance.*/
-    static void WriteSliceToVolume(Image* workingImage, const SliceInformation &sliceInfo, bool allowUndo);
+    static void WriteSliceToVolume(Image* workingImage, const SliceInformation &sliceInfo);
 
     /**
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure.
@@ -252,6 +269,7 @@ namespace mitk
       PlanarFigure's Geometry
     */
     int AddContourmarker(const PlaneGeometry* planeGeometry, unsigned int sliceIndex);
+    void DisableContourMarkers();
 
     void InteractiveSegmentationBugMessage(const std::string &message) const;
 
@@ -264,23 +282,30 @@ namespace mitk
 
     itkGetMacro(LastTimePointTriggered, TimePointType);
 
+    void PushCursor();
+    void PushCursor(us::ModuleResource cursorResource);
+    void PopCursor(bool popFirstCursor = false);
+    void PopAllCursors();
+
   private:
     /** Internal method that gets triggered as soon as the tool manager indicates a
      * time point change. If the time point has changed since last time and tool
      * is set to be time point change aware, OnTimePointChanged() will be called.*/
     void OnTimePointChangedInternal();
 
-    static void  RemoveContourFromInterpolator(const SliceInformation& sliceInfo, LabelSetImage::LabelValueType labelValue);
+    static void  RemoveContourFromInterpolator(const SliceInformation& sliceInfo, MultiLabelSegmentation::LabelValueType labelValue);
 
     // The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string m_Contourmarkername;
-
+    bool m_EnableContourMarkers = true;
     bool m_ShowMarkerNodes = false;
     static bool m_SurfaceInterpolationEnabled;
 
     bool m_IsTimePointChangeAware = true;
 
     TimePointType m_LastTimePointTriggered = 0.;
+
+    unsigned int m_NumPushedCursors = 0;
   };
 
 } // namespace

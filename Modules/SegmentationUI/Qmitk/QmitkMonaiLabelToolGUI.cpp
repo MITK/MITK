@@ -40,7 +40,9 @@ namespace
     {"segmentation_spleen", "Radiology"},
     {"segmentation_vertebra", "Radiology"},
     {"deepgrow_pipeline", "Radiology"},
-    {"vertebra_pipeline", "Radiology"}};
+    {"vertebra_pipeline", "Radiology"},
+    {"sam_2d", "Radiology"},
+    {"sam_3d", "Radiology"}};
 
   /* Strictly unsupported models in MITK and corresponding app */
   const static QMap<QString, QString> BLACKLISTED_MODELS = {
@@ -82,8 +84,9 @@ void QmitkMonaiLabelToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 
 void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
-  m_Controls.setupUi(this);
-  mainLayout->addLayout(m_Controls.verticalLayout);
+  auto wrapperWidget = new QWidget(this);
+  mainLayout->addWidget(wrapperWidget);
+  m_Controls.setupUi(wrapperWidget);
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   connect(m_Controls.fetchUrl, SIGNAL(clicked()), this, SLOT(OnFetchBtnClicked()));
@@ -253,7 +256,7 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   }
   catch (...)
   {
-    std::string errorMsg = "Unkown error occured while generation MONAI Label segmentation.";
+    std::string errorMsg = "Unknown error occurred while generating MONAI Label segmentation.";
     this->ShowErrorMessage(errorMsg);
     m_Controls.previewButton->setEnabled(true);
     return;

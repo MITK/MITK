@@ -32,12 +32,12 @@ class mitkTransferLabelTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  mitk::LabelSetImage::Pointer m_SourceImage;
+  mitk::MultiLabelSegmentation::Pointer m_SourceImage;
 
 public:
   void setUp() override
   {
-    m_SourceImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_source.nrrd"));
+    m_SourceImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_source.nrrd"));
   }
 
   void tearDown() override
@@ -47,10 +47,10 @@ public:
 
   void TestTransfer_defaults()
   {
-    auto destinationImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
-    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
-    auto refmage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks.nrrd"));
-    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks_lockedExterior.nrrd"));
+    auto destinationImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
+    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
+    auto refmage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks.nrrd"));
+    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks_lockedExterior.nrrd"));
 
     mitk::TransferLabelContent(m_SourceImage, destinationImage);
     mitk::TransferLabelContent(m_SourceImage, destinationLockedUnlabeledImage);
@@ -63,10 +63,10 @@ public:
 
   void TestTransfer_Merge_RegardLocks()
   {
-    auto destinationImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
-    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
-    auto refmage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_regardLocks.nrrd"));
-    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_regardLocks_lockedExterior.nrrd"));
+    auto destinationImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
+    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
+    auto refmage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_regardLocks.nrrd"));
+    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_regardLocks_lockedExterior.nrrd"));
 
     mitk::TransferLabelContent(m_SourceImage, destinationImage, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Merge, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
     mitk::TransferLabelContent(m_SourceImage, destinationLockedUnlabeledImage, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Merge, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
@@ -79,10 +79,10 @@ public:
 
   void TestTransfer_Merge_IgnoreLocks()
   {
-    auto destinationImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
-    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
-    auto refmage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_ignoreLocks.nrrd"));
-    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_ignoreLocks_lockedExterior.nrrd"));
+    auto destinationImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
+    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
+    auto refmage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_ignoreLocks.nrrd"));
+    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_ignoreLocks_lockedExterior.nrrd"));
 
     mitk::TransferLabelContent(m_SourceImage, destinationImage, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Merge, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
     mitk::TransferLabelContent(m_SourceImage, destinationLockedUnlabeledImage, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Merge, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
@@ -95,10 +95,10 @@ public:
 
   void TestTransfer_Replace_RegardLocks()
   {
-    auto destinationImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
-    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
-    auto refmage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks.nrrd"));
-    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks_lockedExterior.nrrd"));
+    auto destinationImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
+    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
+    auto refmage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks.nrrd"));
+    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks_lockedExterior.nrrd"));
 
     mitk::TransferLabelContent(m_SourceImage, destinationImage, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
     mitk::TransferLabelContent(m_SourceImage, destinationLockedUnlabeledImage, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
@@ -111,10 +111,10 @@ public:
 
   void TestTransfer_Replace_IgnoreLocks()
   {
-    auto destinationImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
-    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
-    auto refmage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_ignoreLocks.nrrd"));
-    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_ignoreLocks_lockedExterior.nrrd"));
+    auto destinationImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
+    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
+    auto refmage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_ignoreLocks.nrrd"));
+    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_ignoreLocks_lockedExterior.nrrd"));
 
     mitk::TransferLabelContent(m_SourceImage, destinationImage, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
     mitk::TransferLabelContent(m_SourceImage, destinationLockedUnlabeledImage, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
@@ -128,10 +128,10 @@ public:
 
   void TestTransfer_multipleLabels()
   {
-    auto destinationImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
-    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
-    auto refmage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_multipleLabels.nrrd"));
-    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_multipleLabels_lockedExterior.nrrd"));
+    auto destinationImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
+    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
+    auto refmage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_multipleLabels.nrrd"));
+    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_multipleLabels_lockedExterior.nrrd"));
 
     mitk::TransferLabelContent(m_SourceImage, destinationImage, { {1,1}, {3,1}, {2,4}, {4,2} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
     mitk::TransferLabelContent(m_SourceImage, destinationLockedUnlabeledImage, { {1,1}, {3,1}, {2,4}, {4,2} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
@@ -144,10 +144,10 @@ public:
 
   void TestTransfer_Merge_RegardLocks_AtTimeStep()
   {
-    auto destinationImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
-    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
-    auto refmage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_regardLocks.nrrd"));
-    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_regardLocks_lockedExterior.nrrd"));
+    auto destinationImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
+    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
+    auto refmage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_regardLocks.nrrd"));
+    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_regardLocks_lockedExterior.nrrd"));
 
     mitk::TransferLabelContentAtTimeStep(m_SourceImage, destinationImage, 0, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Merge, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
     mitk::TransferLabelContentAtTimeStep(m_SourceImage, destinationLockedUnlabeledImage, 0, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Merge, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
@@ -160,10 +160,10 @@ public:
 
   void TestTransfer_Merge_IgnoreLocks_AtTimeStep()
   {
-    auto destinationImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
-    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
-    auto refmage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_ignoreLocks.nrrd"));
-    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_ignoreLocks_lockedExterior.nrrd"));
+    auto destinationImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
+    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
+    auto refmage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_ignoreLocks.nrrd"));
+    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_merge_ignoreLocks_lockedExterior.nrrd"));
 
     mitk::TransferLabelContentAtTimeStep(m_SourceImage, destinationImage, 0, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Merge, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
     mitk::TransferLabelContentAtTimeStep(m_SourceImage, destinationLockedUnlabeledImage, 0, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Merge, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
@@ -176,10 +176,10 @@ public:
 
   void TestTransfer_Replace_RegardLocks_AtTimeStep()
   {
-    auto destinationImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
-    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
-    auto refmage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks.nrrd"));
-    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks_lockedExterior.nrrd"));
+    auto destinationImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
+    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
+    auto refmage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks.nrrd"));
+    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_regardLocks_lockedExterior.nrrd"));
 
     mitk::TransferLabelContentAtTimeStep(m_SourceImage, destinationImage, 0, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
     mitk::TransferLabelContentAtTimeStep(m_SourceImage, destinationLockedUnlabeledImage, 0, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
@@ -192,10 +192,10 @@ public:
 
   void TestTransfer_Replace_IgnoreLocks_AtTimeStep()
   {
-    auto destinationImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
-    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
-    auto refmage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_ignoreLocks.nrrd"));
-    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_ignoreLocks_lockedExterior.nrrd"));
+    auto destinationImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
+    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
+    auto refmage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_ignoreLocks.nrrd"));
+    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_replace_ignoreLocks_lockedExterior.nrrd"));
 
     mitk::TransferLabelContentAtTimeStep(m_SourceImage, destinationImage, 0, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
     mitk::TransferLabelContentAtTimeStep(m_SourceImage, destinationLockedUnlabeledImage, 0, { {1,1} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
@@ -209,10 +209,10 @@ public:
 
   void TestTransfer_multipleLabels_AtTimeStep()
   {
-    auto destinationImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
-    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
-    auto refmage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_multipleLabels.nrrd"));
-    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::LabelSetImage>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_multipleLabels_lockedExterior.nrrd"));
+    auto destinationImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination.nrrd"));
+    auto destinationLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_destination_lockedExterior.nrrd"));
+    auto refmage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_multipleLabels.nrrd"));
+    auto refLockedUnlabeledImage = mitk::IOUtil::Load<mitk::MultiLabelSegmentation>(GetTestDataFilePath("Multilabel/LabelTransferTest_result_multipleLabels_lockedExterior.nrrd"));
 
     mitk::TransferLabelContentAtTimeStep(m_SourceImage, destinationImage, 0, { {1,1}, {3,1}, {2,4}, {4,2} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
     mitk::TransferLabelContentAtTimeStep(m_SourceImage, destinationLockedUnlabeledImage, 0, { {1,1}, {3,1}, {2,4}, {4,2} }, mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);

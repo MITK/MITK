@@ -13,19 +13,23 @@ found in the LICENSE file.
 #ifndef QmitkImageStatisticsView_h
 #define QmitkImageStatisticsView_h
 
-#include "ui_QmitkImageStatisticsViewControls.h"
-
+#include <QmitkAbstractNodeSelectionWidget.h>
 #include <QmitkAbstractView.h>
-#include <mitkImageStatisticsContainer.h>
+#include <QmitkChartWidget.h>
 #include <QmitkNodeSelectionDialog.h>
 #include <QmitkSliceNavigationListener.h>
 
-#include <mitkPropertyRelations.h>
-
+#include <mitkImageStatisticsContainer.h>
 #include <mitkIRenderWindowPartListener.h>
+#include <mitkPropertyRelations.h>
 
 class QmitkImageStatisticsDataGenerator;
 class QmitkDataGenerationJobBase;
+
+namespace Ui
+{
+  class QmitkImageStatisticsViewControls;
+}
 
 /*!
 \brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
@@ -43,8 +47,7 @@ public:
 
   static const std::string VIEW_ID;
 
-  /*!
-  \brief default destructor */
+  QmitkImageStatisticsView();
   ~QmitkImageStatisticsView() override;
 
 protected:
@@ -79,7 +82,7 @@ protected:
   void OnSelectedTimePointChanged(const mitk::TimePointType& newTimePoint);
 
   // member variable
-  Ui::QmitkImageStatisticsViewControls m_Controls;
+  Ui::QmitkImageStatisticsViewControls* m_Controls;
 
 private:
   QmitkNodeSelectionDialog::SelectionCheckFunctionType CheckForSameGeometry() const;

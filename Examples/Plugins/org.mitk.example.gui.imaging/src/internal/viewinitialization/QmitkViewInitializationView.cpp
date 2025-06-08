@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkViewInitializationView.h"
+#include <ui_QmitkViewInitializationViewControls.h>
 
 #include "mitkNodePredicateDataType.h"
 

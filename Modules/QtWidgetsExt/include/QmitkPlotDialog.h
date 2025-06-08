@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "MitkQtWidgetsExtExports.h"
 #include "mitkCommon.h"
 #include <QmitkPlotWidget.h>
-#include <qdialog.h>
+#include <QDialog>
 
 /**
 * Provides a GUI interface for plotting curves using QmitkPlotWidget.

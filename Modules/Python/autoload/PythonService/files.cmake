@@ -1,4 +1,3 @@
-set(CPP_FILES
-  mitkPythonService.cpp
+SET(CPP_FILES
   mitkPythonActivator.cpp
 )

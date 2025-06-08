@@ -16,11 +16,12 @@ mitk::Operation::Operation(mitk::OperationType operationType) : m_OperationType(
 {
 }
 
-mitk::Operation::~Operation()
-{
-}
-
 mitk::OperationType mitk::Operation::GetOperationType()
 {
   return m_OperationType;
+}
+
+bool mitk::Operation::IsValid() const
+{
+  return true;
 }

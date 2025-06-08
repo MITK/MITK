@@ -86,21 +86,15 @@ void QmitkSliderLevelWindowWidget::SetLevelWindowManager(mitk::LevelWindowManage
 
 void QmitkSliderLevelWindowWidget::OnPropertyModified(const itk::EventObject &)
 {
-  try
+  if (m_Manager->GetLevelWindowProperty().IsNotNull())
   {
     m_LevelWindow = m_Manager->GetLevelWindow();
     this->show();
-    Update();
+    this->Update();
   }
-  catch (...)
+  else
   {
-    try
-    {
-      this->hide();
-    }
-    catch (...)
-    {
-    }
+    this->hide();
   }
 }
 
@@ -314,7 +308,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
     else
     {
       setCursor(Qt::ArrowCursor);
-      this->setToolTip("Left click and mouse move to adjust the slider");
+      this->setToolTip("Left click and move mouse to adjust the slider.");
       m_Resize = false;
       m_Bottom = false;
     }

@@ -10,7 +10,7 @@ endif()
 set(proj ITK)
 mitk_query_custom_ep_vars()
 
-set(proj_DEPENDENCIES GDCM ${${proj}_CUSTOM_DEPENDENCIES})
+set(proj_DEPENDENCIES GDCM TBB ${${proj}_CUSTOM_DEPENDENCIES})
 
 if(MITK_USE_HDF5)
   list(APPEND proj_DEPENDENCIES HDF5)
@@ -44,8 +44,8 @@ if(NOT DEFINED ITK_DIR)
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      UPDATE_COMMAND ""
-     GIT_REPOSITORY https://github.com/InsightSoftwareConsortium/ITK.git
-     GIT_TAG 311b7060ef39e371f3cd209ec135284ff5fde735 # tag: v5.4.0
+     GIT_REPOSITORY https://github.com/MITK/ITK.git
+     GIT_TAG 080810f0334a08592168a9dc1d67ec50510a818f # branch: v5.4.3-patched
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS
@@ -58,6 +58,8 @@ if(NOT DEFINED ITK_DIR)
        -DITK_USE_SYSTEM_HDF5:BOOL=ON
        -DHDF5_DIR:PATH=${HDF5_DIR}
        -DModule_GrowCut:BOOL=ON
+       "-DTBB_DIR:PATH=${TBB_DIR}"
+       -DModule_ITKTBB:BOOL=ON
        ${${proj}_CUSTOM_CMAKE_ARGS}
      CMAKE_CACHE_ARGS
        ${ep_common_cache_args}

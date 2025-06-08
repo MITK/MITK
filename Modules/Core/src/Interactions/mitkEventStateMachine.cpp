@@ -152,12 +152,12 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent *event, DataNode *dat
       }
       catch (const std::exception &e)
       {
-        MITK_ERROR << "Unhandled excaption caught in ExecuteAction(): " << e.what();
+        MITK_ERROR << "Unhandled exception caught in ExecuteAction(): " << e.what();
         return false;
       }
       catch (...)
       {
-        MITK_ERROR << "Unhandled excaption caught in ExecuteAction()";
+        MITK_ERROR << "Unhandled exception caught in ExecuteAction()";
         return false;
       }
     }
@@ -281,13 +281,13 @@ mitk::StateMachineTransition *mitk::EventStateMachine::GetExecutableTransition(m
         }
         catch (const std::exception &e)
         {
-          MITK_ERROR << "Unhandled excaption caught in CheckCondition(): " << e.what();
+          MITK_ERROR << "Unhandled exception caught in CheckCondition(): " << e.what();
           currentConditionFulfilled = false;
           break;
         }
         catch (...)
         {
-          MITK_ERROR << "Unhandled excaption caught in CheckCondition()";
+          MITK_ERROR << "Unhandled exception caught in CheckCondition()";
           currentConditionFulfilled = false;
           break;
         }
@@ -320,7 +320,8 @@ mitk::StateMachineTransition *mitk::EventStateMachine::GetExecutableTransition(m
 
 void mitk::EventStateMachine::ResetToStartState()
 {
-  m_CurrentState = m_StateMachineContainer->GetStartState();
+  if (m_StateMachineContainer != nullptr)
+    m_CurrentState = m_StateMachineContainer->GetStartState();
 }
 
 void mitk::EventStateMachine::SetMouseCursor(const char *xpm[], int hotspotX, int hotspotY)

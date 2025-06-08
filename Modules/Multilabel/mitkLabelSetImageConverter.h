@@ -18,27 +18,27 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * \brief Convert mitk::LabelSetImage to mitk::Image (itk::VectorImage)
+   * \brief Convert mitk::MultiLabelSegmentation to mitk::Image (itk::VectorImage)
    */
-  MITKMULTILABEL_EXPORT Image::Pointer ConvertLabelSetImageToImage(LabelSetImage::ConstPointer labelSetImage);
+  MITKMULTILABEL_EXPORT Image::Pointer ConvertLabelSetImageToImage(MultiLabelSegmentation::ConstPointer labelSetImage);
 
   /**
-   * \brief Convert mitk::Image to mitk::LabelSetImage, templating and differentation between itk::Image and
+   * \brief Convert mitk::Image to mitk::MultiLabelSegmentation, templating and differentation between itk::Image and
    * itk::VectorImage is internal
    */
-  MITKMULTILABEL_EXPORT LabelSetImage::Pointer ConvertImageToLabelSetImage(Image::Pointer image);
-  MITKMULTILABEL_EXPORT LabelSetImage::Pointer ConvertImageVectorToLabelSetImage(const std::vector<mitk::Image::Pointer>& images, const TimeGeometry* timeGeometry);
+  MITKMULTILABEL_EXPORT MultiLabelSegmentation::Pointer ConvertImageToLabelSetImage(Image::Pointer image);
+  MITKMULTILABEL_EXPORT MultiLabelSegmentation::Pointer ConvertImageVectorToLabelSetImage(const std::vector<mitk::Image::Pointer>& images, const TimeGeometry* timeGeometry);
 
   MITKMULTILABEL_EXPORT std::vector<mitk::Image::Pointer> SplitVectorImage(const Image* vecImage);
 
   /** Function takes a vector of labels and transfers all labels as clones with adapted label values to the result vector.
   The values will be adapted according to the provided mapping (key is the old value, value the new).
   @remark: Only labels will be transferred, nothing else. So things like message observers or m_ReservedLabelValuesFunctor must be copied explicitly.*/
-  MITKMULTILABEL_EXPORT LabelSetImage::LabelVectorType GenerateLabelSetWithMappedValues(const LabelSetImage::ConstLabelVectorType&, LabelValueMappingVector labelMapping);
+  MITKMULTILABEL_EXPORT MultiLabelSegmentation::LabelVectorType GenerateLabelSetWithMappedValues(const MultiLabelSegmentation::ConstLabelVectorType&, LabelValueMappingVector labelMapping);
 
-  MITKMULTILABEL_EXPORT Image::Pointer ConvertImageToGroupImage(const Image* inputImage, mitk::LabelSetImage::LabelValueVectorType& foundLabels);
+  MITKMULTILABEL_EXPORT Image::Pointer ConvertImageToGroupImage(const Image* inputImage, mitk::MultiLabelSegmentation::LabelValueVectorType& foundLabels);
 
-  MITKMULTILABEL_EXPORT bool CheckForLabelValueConflictsAndResolve(const mitk::LabelSetImage::LabelValueVectorType& newValues, mitk::LabelSetImage::LabelValueVectorType& usedLabelValues, mitk::LabelSetImage::LabelValueVectorType& correctedLabelValues);
+  MITKMULTILABEL_EXPORT bool CheckForLabelValueConflictsAndResolve(const mitk::MultiLabelSegmentation::LabelValueVectorType& newValues, mitk::MultiLabelSegmentation::LabelValueVectorType& usedLabelValues, mitk::MultiLabelSegmentation::LabelValueVectorType& correctedLabelValues);
 
   /** Function creates a binary mask representing only the specified label of the multi label segmentation.
   * @param segmentation Pointer to the segmentation that is the source for the mask.
@@ -47,9 +47,9 @@ namespace mitk
   * (createBinaryMap==false).
   * @pre segmentation must point to a valid instance.
   * @pre labelValue must exist in segmentation.*/
-  MITKMULTILABEL_EXPORT Image::Pointer CreateLabelMask(const LabelSetImage* segmentation, LabelSetImage::LabelValueType labelValue, bool createBinaryMap = true);
+  MITKMULTILABEL_EXPORT Image::Pointer CreateLabelMask(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::LabelValueType labelValue, bool createBinaryMap = true);
 
-  using IDToLabelClassNameMapType = std::map<LabelSetImage::LabelValueType, std::string>;
+  using IDToLabelClassNameMapType = std::map<MultiLabelSegmentation::LabelValueType, std::string>;
   /** Function creates a map of all label classes in a specified group.
   * @param segmentation Pointer to the segmentation that is the source for the map.
   * @param groupID the group that should be used.
@@ -59,7 +59,7 @@ namespace mitk
   * the pixel value of each found class in the map.
   * @pre segmentation must point to a valid instance.
   * @pre groupID must exist in segmentation.*/
-  MITKMULTILABEL_EXPORT std::pair<Image::Pointer, IDToLabelClassNameMapType> CreateLabelClassMap(const LabelSetImage* segmentation, LabelSetImage::GroupIndexType groupID, const LabelSetImage::LabelValueVectorType& selectedLabels);
+  MITKMULTILABEL_EXPORT std::pair<Image::Pointer, IDToLabelClassNameMapType> CreateLabelClassMap(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::GroupIndexType groupID, const MultiLabelSegmentation::LabelValueVectorType& selectedLabels);
 
   /** Function creates a map of all label classes in a specified group.
   * @overload
@@ -70,7 +70,7 @@ namespace mitk
   * the pixel value of each found class in the map.
   * @pre segmentation must point to a valid instance.
   * @pre groupID must exist in segmentation.*/
-  MITKMULTILABEL_EXPORT std::pair<Image::Pointer, IDToLabelClassNameMapType> CreateLabelClassMap(const LabelSetImage* segmentation, LabelSetImage::GroupIndexType groupID);
+  MITKMULTILABEL_EXPORT std::pair<Image::Pointer, IDToLabelClassNameMapType> CreateLabelClassMap(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::GroupIndexType groupID);
 
 }
 

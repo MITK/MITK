@@ -15,6 +15,9 @@ found in the LICENSE file.
 // mitk core
 #include "mitkProperties.h"
 #include "mitkResliceMethodProperty.h"
+#include "mitkIPreferencesService.h"
+#include "mitkIPreferences.h"
+#include "mitkCoreServices.h"
 
 // qt
 #include <QActionGroup>
@@ -38,6 +41,17 @@ found in the LICENSE file.
 
 // c++
 #include <cmath>
+
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto preferencesService = mitk::CoreServices::GetPreferencesService();
+    if (preferencesService->GetSystemPreferences() == nullptr)
+      return nullptr;
+    return preferencesService->GetSystemPreferences()->Node("org.mitk.editors");
+  }
+}
 
 unsigned int QmitkRenderWindowMenu::m_DefaultThickMode(1);
 
@@ -499,10 +513,16 @@ void QmitkRenderWindowMenu::OnCrosshairMenuAboutToShow()
     if (currentMode == 0)
       currentNum = 0;
 
+    int maxTS = 50;
+    auto preferences = GetPreferences();
+    if (preferences != nullptr)
+      maxTS = preferences->GetInt("max TS", 50);
+
     QSlider *m_TSSlider = new QSlider(crosshairModesMenu);
     m_TSSlider->setMinimum(0);
-    m_TSSlider->setMaximum(50);
+    m_TSSlider->setMaximum(maxTS);
     m_TSSlider->setValue(currentNum);
+    m_TSSlider->setToolTip("Sets the virtual slice thickness.\nIt is the number of slices that are integrated in a maximum intensity projection (MIP).");
 
     m_TSSlider->setOrientation(Qt::Horizontal);
 

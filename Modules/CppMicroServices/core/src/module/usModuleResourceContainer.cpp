@@ -26,7 +26,7 @@
 #include "usModuleResource.h"
 #include "usLog_p.h"
 
-#include "miniz.h"
+#include "us_miniz.h"
 
 #include <set>
 #include <cstring>
@@ -59,11 +59,11 @@ struct ModuleResourceContainerPrivate
   {
     if (m_SortedEntries.empty())
     {
-      mz_uint numFiles = mz_zip_reader_get_num_files(&m_ZipArchive);
-      for (mz_uint fileIndex = 0; fileIndex < numFiles; ++fileIndex)
+      us_mz_uint numFiles = us_mz_zip_reader_get_num_files(&m_ZipArchive);
+      for (us_mz_uint fileIndex = 0; fileIndex < numFiles; ++fileIndex)
       {
-        char fileName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
-        mz_zip_reader_get_filename(&m_ZipArchive, fileIndex, fileName, MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE);
+        char fileName[US_MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
+        us_mz_zip_reader_get_filename(&m_ZipArchive, fileIndex, fileName, US_MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE);
         m_SortedEntries.insert(std::make_pair(std::string(fileName), fileIndex));
       }
     }
@@ -72,7 +72,7 @@ struct ModuleResourceContainerPrivate
   const ModuleInfo* m_ModuleInfo;
   bool m_IsValid;
 
-  mz_zip_archive m_ZipArchive;
+  us_mz_zip_archive m_ZipArchive;
 
   std::set<NameIndexPair, PairComp> m_SortedEntries;
 };
@@ -80,7 +80,7 @@ struct ModuleResourceContainerPrivate
 ModuleResourceContainer::ModuleResourceContainer(const ModuleInfo* moduleInfo)
   : d(new ModuleResourceContainerPrivate(moduleInfo))
 {
-  if (mz_zip_reader_init_file(&d->m_ZipArchive, moduleInfo->location.c_str(), 0))
+  if (us_mz_zip_reader_init_file(&d->m_ZipArchive, moduleInfo->location.c_str(), 0))
   {
     d->m_IsValid = true;
   }
@@ -94,7 +94,7 @@ ModuleResourceContainer::~ModuleResourceContainer()
 {
   if (IsValid())
   {
-    mz_zip_reader_end(&d->m_ZipArchive);
+    us_mz_zip_reader_end(&d->m_ZipArchive);
   }
   delete d;
 }
@@ -108,7 +108,7 @@ bool ModuleResourceContainer::GetStat(ModuleResourceContainer::Stat& stat) const
 {
   if (IsValid())
   {
-    int fileIndex = mz_zip_reader_locate_file(&d->m_ZipArchive, stat.filePath.c_str(), nullptr, 0);
+    int fileIndex = us_mz_zip_reader_locate_file(&d->m_ZipArchive, stat.filePath.c_str(), nullptr, 0);
     if (fileIndex >= 0)
     {
       return GetStat(fileIndex, stat);
@@ -123,14 +123,14 @@ bool ModuleResourceContainer::GetStat(int index, ModuleResourceContainer::Stat& 
   {
     if (index >= 0)
     {
-      mz_zip_archive_file_stat zipStat;
-      if (!mz_zip_reader_file_stat(&d->m_ZipArchive, index, &zipStat))
+      us_mz_zip_archive_file_stat zipStat;
+      if (!us_mz_zip_reader_file_stat(&d->m_ZipArchive, index, &zipStat))
       {
         return false;
       }
       stat.index = index;
       stat.filePath = zipStat.m_filename;
-      stat.isDir = mz_zip_reader_is_file_a_directory(&d->m_ZipArchive, index) ? true : false;
+      stat.isDir = us_mz_zip_reader_is_file_a_directory(&d->m_ZipArchive, index) ? true : false;
       stat.modifiedTime = zipStat.m_time;
       // This will limit the size info from uint64 to uint32 on 32-bit
       // architectures. We don't care because we assume resources > 2GB
@@ -146,7 +146,7 @@ bool ModuleResourceContainer::GetStat(int index, ModuleResourceContainer::Stat& 
 
 void* ModuleResourceContainer::GetData(int index) const
 {
-  return mz_zip_reader_extract_to_heap(&d->m_ZipArchive, index, nullptr, 0);
+  return us_mz_zip_reader_extract_to_heap(&d->m_ZipArchive, index, nullptr, 0);
 }
 
 const ModuleInfo*ModuleResourceContainer::GetModuleInfo() const

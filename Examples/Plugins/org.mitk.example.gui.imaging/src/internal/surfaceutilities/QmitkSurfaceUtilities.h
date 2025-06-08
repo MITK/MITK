@@ -17,7 +17,10 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_QmitkSurfaceUtilitiesControls.h"
+namespace Ui
+{
+  class QmitkSurfaceUtilitiesControls;
+}
 
 /*!
   \brief TODO
@@ -58,6 +61,6 @@ protected:
   /** @brief Converts euler angles (in degrees!) to a rotation matrix. */
   itk::Matrix<double, 3, 3> ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma);
 
-  Ui::QmitkSurfaceUtilitiesControls m_Controls;
+  Ui::QmitkSurfaceUtilitiesControls* m_Controls;
 };
 #endif

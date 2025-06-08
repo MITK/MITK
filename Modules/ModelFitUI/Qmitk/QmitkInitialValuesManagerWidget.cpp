@@ -16,6 +16,9 @@ found in the LICENSE file.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateGeometry.h>
 #include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+
 #include <mitkImage.h>
 
 #include "QmitkInitialValuesManagerWidget.h"
@@ -30,6 +33,10 @@ QmitkInitialValuesManagerWidget::QmitkInitialValuesManagerWidget(QWidget*)
   m_InternalModel = new QmitkInitialValuesModel(this);
   m_TypeDelegate = new QmitkInitialValuesTypeDelegate(this);
   m_ValuesDelegate = new QmitkInitialValuesDelegate(this);
+
+  m_NoHiddenOrHelperPredicate = mitk::NodePredicateAnd::New(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")),
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+  m_ValuesDelegate->setNodePredicate(m_NoHiddenOrHelperPredicate);
 
   this->m_Controls.initialsView->setModel(m_InternalModel);
 
@@ -54,9 +61,11 @@ QmitkInitialValuesManagerWidget::~QmitkInitialValuesManagerWidget()
 
 void QmitkInitialValuesManagerWidget::setInitialValues(const
     mitk::ModelTraitsInterface::ParameterNamesType& names,
-    const mitk::ModelTraitsInterface::ParametersType values)
+    const mitk::ModelTraitsInterface::ParametersType values,
+    const mitk::ModelTraitsInterface::ParamterUnitMapType units
+  )
 {
-  this->m_InternalModel->setInitialValues(names, values);
+  this->m_InternalModel->setInitialValues(names, values, units);
 }
 
 void QmitkInitialValuesManagerWidget::setInitialValues(const
@@ -80,11 +89,13 @@ void QmitkInitialValuesManagerWidget::setReferenceImageGeometry(mitk::BaseGeomet
   {
     mitk::NodePredicateGeometry::Pointer hasGeo = mitk::NodePredicateGeometry::New(refgeo);
     mitk::NodePredicateAnd::Pointer isValidInitialImage = mitk::NodePredicateAnd::New(isImage, hasGeo, is3D);
+    isValidInitialImage->AddPredicate(m_NoHiddenOrHelperPredicate);
     m_ValuesDelegate->setNodePredicate(isValidInitialImage);
   }
   else
   {
     mitk::NodePredicateAnd::Pointer isValidInitialImage = mitk::NodePredicateAnd::New(isImage, is3D);
+    isValidInitialImage->AddPredicate(m_NoHiddenOrHelperPredicate);
     m_ValuesDelegate->setNodePredicate(isImage);
   }
 

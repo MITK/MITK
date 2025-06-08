@@ -18,8 +18,10 @@ found in the LICENSE file.
 #include <berryIStructuredSelection.h>
 #include <berryQtViewPart.h>
 
-// ui includes
-#include "ui_ListenerViewControls.h"
+namespace Ui
+{
+  class ListenerViewControls;
+}
 
 /**
  * \ingroup org_mitk_example_gui_selectionserviceqt
@@ -73,7 +75,7 @@ private:
 
   friend struct berry::SelectionChangedAdapter<ListenerView>;
 
-  Ui::ListenerViewControls m_Controls;
+  Ui::ListenerViewControls *m_Controls;
 
   QWidget *m_Parent;
 };

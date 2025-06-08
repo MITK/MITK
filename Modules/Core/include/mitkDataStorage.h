@@ -139,7 +139,7 @@ namespace mitk
     //##Documentation
     //## @brief Convenience method to get the first node with a given name
     //##
-    DataNode *GetNamedNode(const std::string name) const { return this->GetNamedNode(name.c_str()); }
+    DataNode *GetNamedNode(const std::string& name) const { return this->GetNamedNode(name.c_str()); }
     //##Documentation
     //## @brief Convenience method to get the first node with a given name that is derived from sourceNode
     //##
@@ -165,7 +165,7 @@ namespace mitk
     //## @brief Convenience method to get the first data object of a given data type with a given name
     //##
     template <class DataType>
-    DataType *GetNamedObject(const std::string name) const
+    DataType *GetNamedObject(const std::string& name) const
     {
       return this->GetNamedObject<DataType>(name.c_str());
     }
@@ -187,6 +187,20 @@ namespace mitk
       else
         return dynamic_cast<DataType *>(n->GetData());
     }
+
+    //##Documentation
+    //## @brief Get a unique node name by potentially appending an increasing number, starting from 2.
+    //##
+    //## Fills gaps between existing numbers to maintain a compact sequence. If a source node
+    //## is provided, the uniqueness check is restricted to its derived nodes rather than
+    //## all nodes.
+    //##
+    //## @param name The base name to make unique
+    //## @param sourceNode The node whose derived nodes define the search space
+    //## @param onlyDirectDerivations Only consider direct derivations in search space
+    //## @return A unique name derived from the given base name
+    //##
+    std::string GetUniqueName(const std::string& name, const DataNode* sourceNode = nullptr, bool onlyDirectDerivations = true) const;
 
     //##Documentation
     //## @brief Returns a list of used grouptags

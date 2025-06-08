@@ -5,13 +5,17 @@
 ## Overview
 
 MITK Segmentation Task Lists are a JSON-based file format defining a list of segmentation tasks.
-Segmentation tasks consist at least of a path to a reference image and a unique result path.
+Segmentation tasks consist at least of a path to a reference image (or MITK scene in version 3 or later of the MITK Segmentation Task List file format) and a unique result path.
 The result path specifies where the final segmentation of the task is expected to be located once it is done.
 
 Optional properties of a segmentation task include a task name and description as well as various presettings for the segmentation like a label name, a list of suggested names and colors for new labels, a label set preset, or even a pre-segmentation to begin with.
 The complete set of properties is specified further below in the file format specification.
 
-MITK Segmentation Task Lists must be considered experimental at the moment and are prone to change without any prior warning.
+Version 2 of the file format adds support for MITK Forms.
+Version 3 adds support for MITK scenes.
+See the file format specification below for more details.
+
+MITK Segmentation Task Lists must be considered experimental at the moment and at least their latest version is prone to change without any prior warning.
 
 ## File format
 
@@ -215,3 +219,60 @@ The submitted CSV responses might look like the following table:
 ---------------------- | --------- | ------------------------------------------ | ------------------------------------------------------------------
 "2024-09-26T09:15:35Z" | "Case 01" | "Yes"                                      | "screenshots/screenshot_ZDeCZI.png"
 "2024-09-26T09:23:58Z" | "Case 02" | "No"                                       | ""
+
+### Version 3 and MITK Scenes
+
+Version 3 of the MITK Segmentation Task List file format adds support for MITK Scenes (\*.mitk or \*.mitksceneindex files), allowing arbitrary input data in addition to an image.
+
+A task object (including the `Defaults` object) can now reference an MITK Scene file instead of an image.
+It is mutually exclusive to the `Image` field of a task (you cannot have both in a task).
+This includes implicit mixing of `Image` and `Scene` through the optional `Defaults` JSON object.
+For example, it is invalid to specify an `Image` in the `Defaults` object while specifying a `Scene` in a `Task` and vice versa, as the task would end up having both.
+
+`Scene` is a JSON object consisting of the two mandatory fields `Path` and `Image`, as well as an optional field `Segmentation`:
+
+~~~{.json}
+"Scene": {
+  "Path": "scenes/pet-ct.mitk",
+  "Image": "CT",
+  "Segmentation": "CT-Seg"
+}
+~~~
+
+- `Path` (*file path*): Mandatory path to the MITK scene file.
+- `Image` (*string*): Mandatory name of an image data node in the MITK scene file that is used as reference image for the segmentation.
+- `Segmentation` (*string*): Optional name of a segmentation data node in the MITK scene file that is used as pre-segmentation.
+
+Make sure to use unique data node names for `Image` and `Segmentation` in an MITK scene as otherwise it may result in undefined behavior.
+
+Contrary to `Image`, if a `Scene` has a `Segmentation` (*string*), it still can be overridden by the `Segmentation` (*file path*) of a `Task`.
+
+In the following example, `Scene` is specified in the `Defaults` object so it is used in all tasks.
+The scene has a pre-segmentation.
+However, the pre-segmentation of the scene is overridden in the second task by a `Segmentation` file.
+
+~~~{.json}
+{
+  "FileFormat": "MITK Segmentation Task List",
+  "Version": 3,
+  "Name": "Example Segmentation Task List with an MITK Scene",
+  "Defaults": {
+    "Scene": {
+        "Path": "scenes/pet-ct.mitk",
+        "Image": "CT",
+        "Segmentation": "CT-Seg"
+    }
+  },
+  "Tasks": [
+    {
+      "Name": "PET-CT - Case 01",
+      "Result": "results/pet-ct-01.nrrd"
+    },
+    {
+      "Name": "PET-CT - Case 02",
+      "Segmentation": "segmentations/pet-ct-02.nrrd",
+      "Result": "results/pet-ct-02.nrrd"
+    }
+  ]
+}
+~~~

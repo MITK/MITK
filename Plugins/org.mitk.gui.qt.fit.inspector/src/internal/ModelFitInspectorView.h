@@ -30,6 +30,7 @@ found in the LICENSE file.
 #include "mitkModelFitPlotDataHelper.h"
 #include "QmitkSelectionServiceConnector.h"
 #include "QmitkFitParameterModel.h"
+#include <QmitkSimpleTextOverlayWidget.h>
 
 // Qt
 #include "ui_ModelFitInspectorViewControls.h"
@@ -135,6 +136,9 @@ protected:
   const mitk::ModelBase::TimeGridType GetCurrentTimeGrid() const;
 
   Ui::ModelFitInspectorViewControls m_Controls;
+
+  QmitkSimpleTextOverlayWidget* m_ErrorOverlay;
+
   mitk::IRenderWindowPart* m_renderWindowPart;
 
   /**	@brief	Is a visualization currently running? */
@@ -177,6 +181,9 @@ protected:
   itk::TimeStamp m_lastRefreshTime;
 
   mitk::ModelFitPlotData m_PlotCurves;
+
+  bool m_RefreshPlotDataErrorOccured;
+  QString m_LastRefreshPlotDataErrorString;
 
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
   QmitkFitParameterModel* m_FitParameterModel;

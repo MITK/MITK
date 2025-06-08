@@ -27,16 +27,6 @@ MITK is a cross-platform C++ toolkit and officially supports:
 
 For details, please read the [Supported Platforms][platforms] page.
 
-### Build status of develop branch
-
-[![Windows][windows-build-status]][cdash]
-[![Ubuntu 20.04][ubuntu-20.04-build-status]][cdash]
-[![Ubuntu 22.04][ubuntu-22.04-build-status]][cdash]
-[![macOS 12 Monterey][macos-12-build-status]][cdash]
-[![macOS 13 Ventura][macos-13-build-status]][cdash]
-
-We highly recommend to use the stable **master** branch instead. It is updated 1-2 times per month accompanied by curated [changelogs][changelog] and [snapshot installers][snapshot-installers].
-
 License
 -------
 
@@ -47,7 +37,7 @@ MITK is available as free open-source software under a [3-clause BSD license][li
 Download
 --------
 
-The MITK source code and binaries for the *MitkWorkbench* application are released regularly according to the [MITK release cycle][release-cycle]. See the [Download][download] page for a list of releases.
+The *MitkWorkbench* application and a bunch of command-line apps are released twice per year on our [Download][download] page and the [GitHub Releases][releases] page.
 
 The official MITK source code is available in the [MITK Git repository][git_repo]. The Git clone command is
 
@@ -58,18 +48,22 @@ Active development takes place in the MITK develop branch and its usage is advis
 How to contribute
 -----------------
 
-Contributions of all kind are happily accepted. However, to make the contribution process as smooth as possible, please read the [How to contribute to MITK][contribute] page if you plan to contribute to MITK.
+Contributions are encouraged. To make the contribution process as smooth as possible, please read [Contributing to MITK][contribute] before.
 
 Build instructions
 ------------------
 
-MITK uses [CMake][cmake] to configure a build tree. The following is a crash course about cloning, configuring, and building MITK on a Linux/Unix system:
+MITK uses [CMake][cmake] to configure a build tree. The following is a crash course about cloning, configuring, and building MITK with Ninja on Linux or macOS when all [prerequisites][prerequisites] are met:
 
     git clone https://github.com/MITK/MITK.git
-    mkdir MITK-build
-    cd MITK-build
-    cmake ../MITK
-    make -j4
+    mkdir MITK-superbuild
+    cmake -S MITK -B MITK-superbuild -G "Ninja" -D CMAKE_BUILD_TYPE=Release
+    cmake --build MITK-superbuild
+
+On Windows, configuring and building with Visual Studio/MSBuild would look something like this:
+
+    cmake -S MITK -B MITK-superbuild -G "Visual Studio 17 2022"
+    cmake --build MITK-superbuild --config Release -- -m
 
 Read the comprehensive [build instructions][build] page for details.
 
@@ -78,7 +72,7 @@ Useful links
 
  - [Homepage][mitk]
  - [Download][download]
- - [Mailing list][mailinglist]
+ - [Create an issue/ask for help][issues]
 
 [logo]: https://github.com/MITK/MITK/raw/master/mitk.png
 [mitk]: https://www.mitk.org
@@ -89,20 +83,13 @@ Useful links
 [mitk-devmanual]: https://docs.mitk.org/nightly/DeveloperManualPortal.html
 [mitk-apiref]: https://docs.mitk.org/nightly/usergroup0.html
 [platforms]: https://docs.mitk.org/nightly/SupportedPlatformsPage.html
+[prerequisites]: https://docs.mitk.org/nightly/BuildInstructionsPage.html#BuildInstructions_Prerequisites
+[build]: https://docs.mitk.org/nightly/BuildInstructionsPage.html
 [dkfz]: https://www.dkfz.de
 [license]: https://github.com/MITK/MITK/blob/master/LICENSE
-[release-cycle]: https://www.mitk.org/MitkReleaseCycle
 [download]: https://www.mitk.org/Download
+[releases]: https://github.com/MITK/MITK/releases
 [git_repo]: https://github.com/MITK/MITK
-[contribute]: https://www.mitk.org/How_to_contribute
+[contribute]: https://github.com/MITK/MITK/blob/master/CONTRIBUTING.md
 [cmake]: https://www.cmake.org
-[build]: https://docs.mitk.org/nightly/BuildInstructionsPage.html
-[mailinglist]: https://www.mitk.org/Mailinglist
-[cdash]: https://cdash.mitk.org/index.php?project=MITK
-[changelog]: https://phabricator.mitk.org/w/mitk/changelog/
-[snapshot-installers]: https://www.mitk.org/download/ci/snapshots/
-[windows-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FWindows&subject=Windows
-[ubuntu-22.04-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FUbuntu+22.04&subject=Ubuntu+22.04
-[ubuntu-20.04-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FUbuntu+20.04&subject=Ubuntu+20.04
-[macOS-12-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Monterey&subject=macOS+12+Monterey
-[macOS-13-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Ventura&subject=macOS+13+Ventura
+[issues]: https://github.com/MITK/MITK/issues

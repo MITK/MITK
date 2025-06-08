@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "DicomView.h"
+#include <ui_QmitkDicomViewControls.h>
 
 #include "org_mitk_example_gui_customviewer_views_Activator.h"
 
@@ -26,7 +27,9 @@ found in the LICENSE file.
 
 const std::string DicomView::VIEW_ID = "org.mitk.customviewer.views.dicomview";
 
-DicomView::DicomView() : m_Parent(nullptr)
+DicomView::DicomView()
+  : m_Controls(new Ui::QmitkDicomViewControls),
+    m_Parent(nullptr)
 {
 }
 
@@ -39,64 +42,46 @@ void DicomView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets
   m_Parent = parent;
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   // remove unused widgets
-  QPushButton *downloadButton = parent->findChild<QPushButton *>("downloadButton");
-  downloadButton->setVisible(false);
+  QPushButton* addToLocalStorageButton = parent->findChild<QPushButton*>("addToLocalStorageButton");
+  addToLocalStorageButton->setVisible(false);
 
-  connect(m_Controls.importButton, SIGNAL(clicked()), m_Controls.widget, SLOT(OnFolderCDImport()));
-  connect(m_Controls.widget,
-          SIGNAL(SignalDicomToDataManager(const QHash<QString, QVariant> &)),
-          this,
-          SLOT(AddDataNodeFromDICOM(const QHash<QString, QVariant> &)));
+  connect(m_Controls->widget, &QmitkDicomImportWidget::ViewSeries,
+    this, &DicomView::OnViewSeries);
 
   m_Parent->setEnabled(true);
 }
 // //! [DicomViewCreatePartControl]
 
 // //! [DicomViewCreateAddDataNodeInformation]
-void DicomView::AddDataNodeFromDICOM(QHash<QString, QVariant> eventProperties)
+void DicomView::OnViewSeries(const std::vector<std::pair<std::string, std::optional<std::string>>>& series)
 {
-  QStringList listOfFilesForSeries;
-  std::vector<std::string> seriesToLoad;
+  auto results = mitk::IOUtil::Load(series.front().first, *(this->GetDataStorage().GetPointer()));
 
-  listOfFilesForSeries = eventProperties["FilesForSeries"].toStringList();
-
-  if (!listOfFilesForSeries.isEmpty())
+  if (results->empty())
   {
-    QStringListIterator it(listOfFilesForSeries);
-
-    while (it.hasNext())
-    {
-      seriesToLoad.push_back(it.next().toStdString());
-    }
-
-    auto results = mitk::IOUtil::Load(seriesToLoad, *(this->GetDataStorage().GetPointer()));
-
-    if (results->empty())
-    {
-      MITK_ERROR << "Error loading Dicom series";
-    }
-    // //! [DicomViewCreateAddDataNodeLoadSeries]
-    else
-    {
-      // //! [DicomViewCreateAddDataNode]
-      mitk::DataStorage::Pointer ds = this->GetDataStorage();
-      // //! [DicomViewCreateAddDataNode]
-      mitk::RenderingManager::GetInstance()->SetDataStorage(ds);
-      auto geometry = ds->ComputeBoundingGeometry3D(ds->GetAll());
-      mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
-
-      // //! [DicomViewCreateAddDataNodeActivatePersp]
-      berry::IWorkbenchWindow::Pointer window = this->GetSite()->GetWorkbenchWindow();
-      QString perspectiveId = "org.mitk.example.viewerperspective";
-      window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      // //! [DicomViewCreateAddDataNodeActivatePersp]
-    }
-    // //! [DicomViewCreateAddDataNodeLoadSeries]
+    MITK_ERROR << "Error loading Dicom series";
   }
+  // //! [DicomViewCreateAddDataNodeLoadSeries]
+  else
+  {
+    // //! [DicomViewCreateAddDataNode]
+    mitk::DataStorage::Pointer ds = this->GetDataStorage();
+    // //! [DicomViewCreateAddDataNode]
+    mitk::RenderingManager::GetInstance()->SetDataStorage(ds);
+    auto geometry = ds->ComputeBoundingGeometry3D(ds->GetAll());
+    mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
+
+    // //! [DicomViewCreateAddDataNodeActivatePersp]
+    berry::IWorkbenchWindow::Pointer window = this->GetSite()->GetWorkbenchWindow();
+    QString perspectiveId = "org.mitk.example.viewerperspective";
+    window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    // //! [DicomViewCreateAddDataNodeActivatePersp]
+  }
+  // //! [DicomViewCreateAddDataNodeLoadSeries]
 }
 // //! [DicomViewCreateAddDataNodeInformation]
 

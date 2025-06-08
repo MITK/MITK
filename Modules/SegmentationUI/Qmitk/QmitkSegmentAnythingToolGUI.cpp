@@ -47,9 +47,12 @@ QmitkSegmentAnythingToolGUI::QmitkSegmentAnythingToolGUI() : QmitkSegWithPreview
     return result;
   };
   m_Preferences = GetPreferences();
-  m_Preferences->OnPropertyChanged +=
-    mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI, const mitk::IPreferences::ChangeEvent &>(
-      this, &QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent);
+  if (nullptr != m_Preferences)
+  {
+    m_Preferences->OnPropertyChanged +=
+      mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI, const mitk::IPreferences::ChangeEvent &>(
+        this, &QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent);
+  }
 }
 
 QmitkSegmentAnythingToolGUI::~QmitkSegmentAnythingToolGUI() 
@@ -60,11 +63,20 @@ QmitkSegmentAnythingToolGUI::~QmitkSegmentAnythingToolGUI()
     tool->SAMStatusMessageEvent -= mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI, const std::string&>(
       this, &QmitkSegmentAnythingToolGUI::StatusMessageListener);
   }
+  if (nullptr != m_Preferences)
+  {
+  m_Preferences->OnPropertyChanged -=
+    mitk::MessageDelegate1<QmitkSegmentAnythingToolGUI, const mitk::IPreferences::ChangeEvent &>(
+      this, &QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent);
+  }
 }
 
 void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
-  m_Controls.setupUi(this);
+  auto wrapperWidget = new QWidget(this);
+  mainLayout->addWidget(wrapperWidget);
+  m_Controls.setupUi(wrapperWidget);
+
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
 
   QString welcomeText;
@@ -77,32 +89,40 @@ void QmitkSegmentAnythingToolGUI::InitializeUI(QBoxLayout *mainLayout)
   QIcon arrowIcon = QmitkStyleManager::ThemeIcon(
     QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg"));
   m_Controls.activateButton->setIcon(arrowIcon);
+  this->UpdateSAMStatusMessage(welcomeText);
+  this->ShowProgressBar(false);
+  m_Controls.samProgressBar->setMaximum(0);
 
+  Superclass::InitializeUI(mainLayout);
+}
+
+void QmitkSegmentAnythingToolGUI::UpdateSAMStatusMessage(QString &initText)
+{
   bool isInstalled = this->ValidatePrefences();
   if (isInstalled)
   {
     QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));
-    welcomeText += " SAM is already found installed. Model type '" + modelType + "' selected in Preferences.";
+    initText += " SAM is already installed. Model type '" + modelType + "' selected in Preferences.";
   }
   else
   {
-    welcomeText += " SAM tool is not configured correctly. Please go to Preferences (Cntl+P) > Segment Anything to configure and/or install SAM.";
+    initText += " SAM tool is not configured correctly. Please go to Preferences (Ctrl+P) > Segment Anything to "
+                   "configure and/or install SAM.";
   }
   this->EnableAll(isInstalled);
-  this->WriteStatusMessage(welcomeText);
-  this->ShowProgressBar(false);
-  m_Controls.samProgressBar->setMaximum(0);
-  mainLayout->addLayout(m_Controls.verticalLayout);
-  Superclass::InitializeUI(mainLayout);
+  this->WriteStatusMessage(initText);
 }
 
 bool QmitkSegmentAnythingToolGUI::ValidatePrefences()
 {
+  if (nullptr == m_Preferences)
+  {
+    this->WriteErrorMessage("Error while loading preferences.");
+    return false;
+  }
   const QString storageDir = QString::fromStdString(m_Preferences->Get("sam python path", ""));
-  bool isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(storageDir);
   std::string modelType = m_Preferences->Get("sam modeltype", "");
-  std::string path = m_Preferences->Get("sam parent path", "");
-  return (isInstalled && !modelType.empty() && !path.empty());
+  return (!storageDir.isEmpty() && !modelType.empty());
 }
 
 void QmitkSegmentAnythingToolGUI::EnableAll(bool isEnable)
@@ -171,12 +191,12 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
     this->EnableAll(false);
     qApp->processEvents();
     QString pythonPath = QString::fromStdString(m_Preferences->Get("sam python path", ""));
-    if (!QmitkSegmentAnythingToolGUI::IsSAMInstalled(pythonPath))
+    if (pythonPath.isEmpty())
     {
       throw std::runtime_error(WARNING_SAM_NOT_FOUND);
     }
     tool->SetPythonPath(pythonPath.toStdString());
-    tool->SetGpuId(m_Preferences->GetInt("sam gpuid", -1));
+    tool->SetGpuId(m_Preferences->GetInt("sam deviceId", -1));
     const QString modelType = QString::fromStdString(m_Preferences->Get("sam modeltype", ""));  
     tool->SetModelType(modelType.toStdString());
     tool->SetTimeOutLimit(m_Preferences->GetInt("sam timeout", 300));
@@ -207,7 +227,7 @@ void QmitkSegmentAnythingToolGUI::OnActivateBtnClicked()
   }
   catch (...)
   {
-    std::string errorMsg = "Unkown error occured while generation Segment Anything segmentation.";
+    std::string errorMsg = "Unkown error occurred while generation Segment Anything segmentation.";
     this->ShowErrorMessage(errorMsg);
     this->EnableAll(true);
     return;
@@ -246,35 +266,6 @@ void QmitkSegmentAnythingToolGUI::ShowProgressBar(bool enabled)
   m_Controls.samProgressBar->setVisible(enabled);
 }
 
-bool QmitkSegmentAnythingToolGUI::IsSAMInstalled(const QString &pythonPath)
-{
-  QString fullPath = pythonPath;
-  bool isPythonExists = false;
-  bool isSamExists = false;
-#ifdef _WIN32
-  isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
-  if (!(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
-  {
-    fullPath += QDir::separator() + QString("Scripts");
-    isPythonExists =
-      (!isPythonExists) ? QFile::exists(fullPath + QDir::separator() + QString("python.exe")) : isPythonExists;
-  }
-#else
-  isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python3"));
-  if (!(fullPath.endsWith("bin", Qt::CaseInsensitive) || fullPath.endsWith("bin/", Qt::CaseInsensitive)))
-  {
-    fullPath += QDir::separator() + QString("bin");
-    isPythonExists =
-      (!isPythonExists) ? QFile::exists(fullPath + QDir::separator() + QString("python3")) : isPythonExists;
-  }
-#endif
-  isSamExists = QFile::exists(fullPath + QDir::separator() + QString("run_inference_daemon.py"))
-                && QFile::exists(fullPath + QDir::separator() + QString("sam_runner.py"))
-                && QFile::exists(fullPath + QDir::separator() + QString("medsam_runner.py"));
-  bool isExists = isSamExists && isPythonExists;
-  return isExists;
-}
-
 void QmitkSegmentAnythingToolGUI::OnResetPicksClicked()
 {
   auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
@@ -286,11 +277,11 @@ void QmitkSegmentAnythingToolGUI::OnResetPicksClicked()
 
 void QmitkSegmentAnythingToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent&)
 {
-  this->EnableAll(true);
-  this->WriteStatusMessage("A Preference change was detected. Please initialize the tool again.");
   auto tool = this->GetConnectedToolAs<mitk::SegmentAnythingTool>();
   if (nullptr != tool)
   {
     tool->IsReadyOff();
   }
+  QString statusMessage = "A Preference change was detected. Please initialize the tool again.\n";
+  this->UpdateSAMStatusMessage(statusMessage);
 }

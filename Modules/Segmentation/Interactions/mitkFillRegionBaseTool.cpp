@@ -80,7 +80,7 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
   if (nullptr == positionEvent)
     return;
 
-  auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
+  auto labelSetImage = this->GetWorkingData();
   if (nullptr == labelSetImage)
   {
     return;
@@ -125,7 +125,7 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
     activeLabelClone->SetLocked(false);
   }
 
-  TransferLabelContentAtTimeStep(fillImage, workingSlice, { activeLabelClone }, 0, LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false, { {1, m_FillLabelValue} }, m_MergeStyle);
+  TransferLabelContentAtTimeStep(fillImage, workingSlice, { activeLabelClone }, 0, MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, { {1, m_FillLabelValue} }, m_MergeStyle);
 
   this->WriteBackSegmentationResult(positionEvent, workingSlice);
 

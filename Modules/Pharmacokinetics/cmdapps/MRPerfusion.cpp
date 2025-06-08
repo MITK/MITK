@@ -61,7 +61,6 @@ mitk::Image::Pointer mask;
 mitk::Image::Pointer aifImage;
 mitk::Image::Pointer aifMask;
 
-bool useConstraints(false);
 bool verbose(false);
 bool roibased(false);
 bool preview(false);
@@ -138,8 +137,6 @@ void setupParser(mitkCommandLineParser& parser)
     parser.addArgument(
         "roibased", "r", mitkCommandLineParser::Bool, "Roi based fitting", "Will compute a mean intensity signal over the ROI before fitting it. If this mode is used a mask must be specified.");
     parser.addArgument(
-      "constraints", "c", mitkCommandLineParser::Bool, "Constraints", "Indicates if constraints should be used for the fitting (if flag is set the default constraints will be used.).", us::Any(false));
-    parser.addArgument(
       "preview", "p", mitkCommandLineParser::Bool, "Preview outputs", "The application previews the outputs (filename, type) it would produce with the current settings.");
     parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
     parser.endGroup();
@@ -194,12 +191,6 @@ bool configureApplicationSettings(std::map<std::string, us::Any> parsedArgs)
         roibased = us::any_cast<bool>(parsedArgs["roibased"]);
     }
 
-    useConstraints = false;
-    if (parsedArgs.count("constraints"))
-    {
-      useConstraints = us::any_cast<bool>(parsedArgs["constraints"]);
-    }
-
     aifHematocritLevel = 0.45;
     if (parsedArgs.count("hematocrit"))
     {
@@ -224,10 +215,7 @@ mitk::ModelFitFunctorBase::Pointer createDefaultFitFunctor(
         mitk::NormalizedSumOfSquaredDifferencesFitCostFunction::New();
     fitFunctor->RegisterEvaluationParameter("Chi^2", chi2);
 
-    if (useConstraints)
-    {
-      fitFunctor->SetConstraintChecker(modelFactory->CreateDefaultConstraints().GetPointer());
-    }
+    fitFunctor->SetConstraintChecker(modelFactory->CreateDefaultConstraints().GetPointer());
 
     mitk::ModelBase::Pointer refModel = parameterizer->GenerateParameterizedModel();
 

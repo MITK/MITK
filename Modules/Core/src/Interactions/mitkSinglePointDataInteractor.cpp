@@ -99,6 +99,8 @@ void mitk::SinglePointDataInteractor::DataNodeChanged()
       m_PointSet = points;
     }
   }
+
+  Superclass::DataNodeChanged();
 }
 
 void mitk::SinglePointDataInteractor::SetMaxPoints(unsigned int)

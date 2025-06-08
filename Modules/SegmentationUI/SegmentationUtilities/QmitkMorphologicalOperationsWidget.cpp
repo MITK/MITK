@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkProgressBar.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitkLabelSetImageHelper.h>
+#include <mitkSegChangeOperationApplier.h>
 
 QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
   : QWidget(parent)
@@ -42,7 +43,7 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Dat
     this, &QmitkMorphologicalOperationsWidget::OnSelectionChanged);
 
   connect(m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged,
-    this, [this](mitk::LabelSetImage::LabelValueVectorType /*labels*/) {this->ConfigureButtons(); });
+    this, [this](mitk::MultiLabelSegmentation::LabelValueVectorType /*labels*/) {this->ConfigureButtons(); });
 
   m_Controls->segNodeSelector->SetAutoSelectNewNodes(true);
 }
@@ -151,16 +152,25 @@ void QmitkMorphologicalOperationsWidget::SaveResultLabelMask(const mitk::Image* 
 
   if (m_Controls->checkNewLabel->isChecked())
   {
-    auto groupID = seg->AddLayer();
+    auto groupID = seg->AddGroup();
+    mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(seg, { groupID });
+
     auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(seg, labelName, true);
     seg->AddLabelWithContent(newLabel, resultMask, groupID, 1);
+
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Add morphologic operation result \n" + labelName + "\" in new group");
   }
   else
   {
     auto groupID = seg->GetGroupIndexOfLabel(labels.front());
+
+    mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(seg, { groupID }, true);
+
     mitk::TransferLabelContent(resultMask, seg->GetGroupImage(groupID), seg->GetConstLabelsByValue(seg->GetLabelValuesByGroup(groupID)),
-      mitk::LabelSetImage::UNLABELED_VALUE, mitk::LabelSetImage::UNLABELED_VALUE, false, { {1, labels.front()} },
+      mitk::MultiLabelSegmentation::UNLABELED_VALUE, mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, { {1, labels.front()} },
       mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Update \n" + labelName + "\" by morphologic operation result");
   }
 
   m_Controls->labelInspector->GetMultiLabelSegmentation()->Modified();

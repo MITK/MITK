@@ -18,7 +18,6 @@ found in the LICENSE file.
 
 #include "mitkDataNode.h"
 #include "mitkPointSetDataInteractor.h"
-#include "ui_QmitkSimpleMeasurementControls.h"
 
 namespace Ui
 {

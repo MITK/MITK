@@ -11,13 +11,16 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "ListenerViewMitk.h"
+#include <ui_ListenerViewMitkControls.h>
 
 // Mitk includes
 #include "mitkDataNodeObject.h"
 
 const std::string ListenerViewMitk::VIEW_ID = "org.mitk.views.listenerviewmitk";
 
-ListenerViewMitk::ListenerViewMitk() : m_Parent(nullptr)
+ListenerViewMitk::ListenerViewMitk()
+  :  m_Controls(new Ui::ListenerViewMitkControls),
+    m_Parent(nullptr)
 {
 }
 
@@ -25,7 +28,7 @@ void ListenerViewMitk::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets
   m_Parent = parent;
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   m_Parent->setEnabled(true);
 }
@@ -34,9 +37,9 @@ void ListenerViewMitk::ToggleRadioMethod(QString selectStr)
 {
   // change the radio button state according to the name of the selected data node
   if (selectStr == "DataNode 1")
-    m_Controls.radioButton->toggle();
+    m_Controls->radioButton->toggle();
   else if (selectStr == "DataNode 2")
-    m_Controls.radioButton_2->toggle();
+    m_Controls->radioButton_2->toggle();
 }
 
 void ListenerViewMitk::SetFocus()

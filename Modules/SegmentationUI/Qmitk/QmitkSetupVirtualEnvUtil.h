@@ -17,6 +17,7 @@ found in the LICENSE file.s
 #include "mitkProcessExecutor.h"
 #include <MitkSegmentationUIExports.h>
 #include <QString>
+#include <functional>
 
 /**
  * @brief Abstract Class to Setup a python virtual environment and pip install required packages.
@@ -25,14 +26,23 @@ found in the LICENSE file.s
 class MITKSEGMENTATIONUI_EXPORT QmitkSetupVirtualEnvUtil
 {
 public:
+  using CallbackType = void (*)(itk::Object *, const itk::EventObject &, void *);
+
   QmitkSetupVirtualEnvUtil(const QString& baseDir);
   QmitkSetupVirtualEnvUtil();
 
   /**
-   * @brief Implement the method in child class 
-   * to setup the virtual environment.
+   * @brief Sets up a python virtual environment in the DKFZ directory with given
+   * @param venvName : Name of the virtual env folder
+   * @param packages : List of packages to be installed except Pytorch
+   * @param validator : Functor to run and validate the virtual env setup
+   * @param printCallback : ITK functor to custom print the virtual en setup log.
+   * 
    */
-  virtual bool SetupVirtualEnv(const QString& venvName) = 0;
+  bool SetupVirtualEnv(const QString &venvName,
+                       const QStringList &packages,
+                       std::function<bool()> validator,
+                       CallbackType printCallback);
 
   /**
    * @brief Get the Virtual Env Path object. Override this method in the respective
@@ -54,7 +64,7 @@ public:
    */
   void PipInstall(const std::string &library,
                   const std::string &workingDir,
-                  void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                  CallbackType callback,
                   const std::string &command = "pip3");
 
   /**
@@ -64,8 +74,7 @@ public:
    * @param callback 
    * @param command 
    */
-  void PipInstall(const std::string &library,
-                  void (*callback)(itk::Object *, const itk::EventObject &, void *),
+  void PipInstall(const std::string &library, CallbackType callback,
                   const std::string &command = "pip3");
 
 
@@ -80,7 +89,7 @@ public:
    */
   void ExecutePython(const std::string &args,
                      const std::string &pythonPath,
-                     void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                     CallbackType callback,
                      const std::string &command = "python");
 
   /**
@@ -91,8 +100,7 @@ public:
    * @param callback 
    * @param command 
    */
-  void ExecutePython(const std::string &args,
-                     void (*callback)(itk::Object *, const itk::EventObject &, void *),
+  void ExecutePython(const std::string &args, CallbackType callback,
                      const std::string &command = "python");
 
   /**
@@ -103,13 +111,20 @@ public:
    * @param workingDir 
    * @param callback 
    */
-  void InstallPytorch(const std::string &workingDir, void (*callback)(itk::Object *, const itk::EventObject &, void *));
+  void InstallPytorch(const std::string &workingDir, CallbackType callback);
 
   /**
    * @brief Overloaded function to install pytorch using light-the-torch package, correctly 
    * identifying cuda version.
    */
   void InstallPytorch();
+
+  /**
+   * @brief Overloaded function to install pytorch using light-the-torch package, correctly
+   * identifying cuda version.
+   */
+  void InstallPytorch(CallbackType callback);
+
 
   /**
    * @brief Get the Base Dir object
@@ -201,6 +216,12 @@ public:
   * version of Python could not be found.
   */
   static std::pair<QString, QString> GetExactPythonPath(const QString &pyEnv);
+  
+  /**
+   * @brief Searches and parses paths of python virtual environments
+   * from predefined lookout locations
+   */
+  static QStringList AutoParsePythonPaths();
 
 private:
   QString m_PythonPath;

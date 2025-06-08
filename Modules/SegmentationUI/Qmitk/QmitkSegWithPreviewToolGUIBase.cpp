@@ -12,10 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkSegWithPreviewToolGUIBase.h"
 
-#include <qcheckbox.h>
-#include <qpushbutton.h>
-#include <qboxlayout.h>
-#include <qlabel.h>
+#include <QCheckBox>
+#include <QPushButton>
+#include <QVBoxLayout>
 #include <QApplication>
 
 bool DefaultEnableConfirmSegBtnFunction(bool enabled)
@@ -23,7 +22,11 @@ bool DefaultEnableConfirmSegBtnFunction(bool enabled)
   return enabled;
 }
 
-QmitkSegWithPreviewToolGUIBase::QmitkSegWithPreviewToolGUIBase(bool mode2D) : QmitkToolGUI(), m_EnableConfirmSegBtnFnc(DefaultEnableConfirmSegBtnFunction), m_Mode2D(mode2D)
+QmitkSegWithPreviewToolGUIBase::QmitkSegWithPreviewToolGUIBase(bool mode2D, bool enableTimeSteps)
+  : QmitkToolGUI(),
+    m_EnableConfirmSegBtnFnc(DefaultEnableConfirmSegBtnFunction),
+    m_Mode2D(mode2D),
+    m_EnableProcessingOfAllTimeSteps(enableTimeSteps)
 {
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 }
@@ -49,6 +52,7 @@ void QmitkSegWithPreviewToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
   {
     // create the visible widgets
     m_MainLayout = new QVBoxLayout(this);
+    m_MainLayout->setContentsMargins(0, 0, 0, 0);
     m_ConfirmSegBtn = new QPushButton("Confirm Segmentation", this);
     connect(m_ConfirmSegBtn, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()));
 
@@ -63,7 +67,7 @@ void QmitkSegWithPreviewToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
     m_CheckProcessAll = new QCheckBox("Process all time steps", this);
     m_CheckProcessAll->setChecked(false);
     m_CheckProcessAll->setToolTip("Process all time steps of the dynamic segmentation and not just the currently visible time step.");
-    m_CheckProcessAll->setVisible(!m_Mode2D);
+    m_CheckProcessAll->setVisible(!m_Mode2D && m_EnableProcessingOfAllTimeSteps);
     //remark: keep m_CheckProcessAll deactivated in 2D because in this refactoring
     //it should be kept to the status quo and it was not clear how interpolation
     //would behave. As soon as it is sorted out we can remove that "feature switch"
@@ -122,7 +126,10 @@ void QmitkSegWithPreviewToolGUIBase::ConnectNewTool(mitk::SegWithPreviewTool* ne
   newTool->CurrentlyBusy +=
     mitk::MessageDelegate1<QmitkSegWithPreviewToolGUIBase, bool>(this, &QmitkSegWithPreviewToolGUIBase::BusyStateChanged);
 
-  m_CheckProcessAll->setVisible(newTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
+  m_CheckProcessAll->setVisible(
+    !m_Mode2D &&
+    m_EnableProcessingOfAllTimeSteps &&
+    newTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
 
   this->EnableWidgets(true);
 }

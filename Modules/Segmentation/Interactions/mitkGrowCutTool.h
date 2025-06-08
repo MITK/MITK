@@ -51,7 +51,7 @@ namespace mitk
 
     void DoUpdatePreview(const Image *inputAtTimeStep,
                          const Image *oldSegAtTimeStep,
-                         LabelSetImage *previewImage,
+                         MultiLabelSegmentation *previewImage,
                          TimeStepType timeStep) override;
 
     double m_DistancePenalty = 0.0;

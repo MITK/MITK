@@ -43,7 +43,8 @@ namespace mitk
 
     void Activated() override;
     void WriteImage(const Image *inputAtTimeStep, const std::string &inputImagePath) const override;
-    void WriteBackResults(LabelSetImage *previewImage, LabelSetImage *segResults, TimeStepType timeStep) const override;
+    void WriteBackResults(MultiLabelSegmentation *previewImage, MultiLabelSegmentation *segResults, TimeStepType timeStep) const override;
+    void ConfirmCleanUp() override;
 
   protected:
     MonaiLabel2DTool() = default;

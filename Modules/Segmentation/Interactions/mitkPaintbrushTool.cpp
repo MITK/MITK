@@ -20,11 +20,10 @@ found in the LICENSE file.
 #include "mitkLevelWindowProperty.h"
 #include "mitkImageWriteAccessor.h"
 
-int mitk::PaintbrushTool::m_Size = 10;
-
 mitk::PaintbrushTool::PaintbrushTool(bool startWithFillMode)
   : FeedbackContourTool("PressMoveReleaseWithCTRLInversionAllMouseMoves"),
-  m_FillMode(startWithFillMode),
+    m_FillMode(startWithFillMode),
+    m_Size(10),
     m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
 {
   m_MasterContour = ContourModel::New();
@@ -45,6 +44,11 @@ void mitk::PaintbrushTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("InvertLogic", OnInvertLogic);
 }
 
+int mitk::PaintbrushTool::GetFillValue() const
+{
+  return 255;
+}
+
 void mitk::PaintbrushTool::Activated()
 {
   Superclass::Activated();
@@ -54,7 +58,7 @@ void mitk::PaintbrushTool::Activated()
     mitk::MessageDelegate<mitk::PaintbrushTool>(this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified);
 
   m_PaintingNode = DataNode::New();
-  m_PaintingNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(0, m_InternalFillValue)));
+  m_PaintingNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(0, this->GetFillValue())));
   m_PaintingNode->SetProperty("binary", mitk::BoolProperty::New(true));
 
   m_PaintingNode->SetProperty("outline binary", mitk::BoolProperty::New(true));
@@ -383,7 +387,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
   if (leftMouseButtonPressed)
   {
-    ContourModelUtils::FillContourInSlice2(contour, m_PaintingSlice, m_InternalFillValue);
+    ContourModelUtils::FillContourInSlice2(contour, m_PaintingSlice, this->GetFillValue());
 
     const double dist = indexCoordinates.EuclideanDistanceTo(m_LastPosition);
     const double radius = static_cast<double>(m_Size) / 2.0;
@@ -435,7 +439,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
       gapContour->AddVertex(vertex);
 
-      ContourModelUtils::FillContourInSlice2(gapContour, m_PaintingSlice, m_InternalFillValue);
+      ContourModelUtils::FillContourInSlice2(gapContour, m_PaintingSlice, this->GetFillValue());
     }
   }
   else
@@ -466,17 +470,16 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
 void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  // When mouse is released write segmentationresult back into image
+  // When mouse is released write segmentation result back into image
   auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
     return;
 
-  DataNode* workingNode(this->GetToolManager()->GetWorkingData(0));
-  auto workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-  Label::PixelType activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
+  auto workingSeg = this->GetWorkingData();
+  Label::PixelType activePixelValue = workingSeg->GetActiveLabel()->GetValue();
   if (!m_FillMode)
   {
-    activePixelValue = LabelSetImage::UNLABELED_VALUE;
+    activePixelValue = MultiLabelSegmentation::UNLABELED_VALUE;
   }
 
   //as paintbrush tools should always allow to manipulate active label
@@ -484,18 +487,18 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
   //the active label can always be changed even if locked)
   //we realize that by cloning the relevant label and changing the lock state
   //this fillLabelSet is used for the transfer.
-  auto destinationLabels = workingImage->GetConstLabelsByValue(workingImage->GetLabelValuesByGroup(workingImage->GetActiveLayer()));
-  auto activeLabelClone = workingImage->GetActiveLabel()->Clone();
+  auto destinationLabels = workingSeg->GetConstLabelsByValue(workingSeg->GetLabelValuesByGroup(workingSeg->GetActiveLayer()));
+  auto activeLabelClone = workingSeg->GetActiveLabel()->Clone();
   if (nullptr != activeLabelClone)
   {
     activeLabelClone->SetLocked(false);
-    auto activeIter = std::find(destinationLabels.begin(), destinationLabels.end(), workingImage->GetActiveLabel());
+    auto activeIter = std::find(destinationLabels.begin(), destinationLabels.end(), workingSeg->GetActiveLabel());
     if (activeIter == destinationLabels.end()) mitkThrow() << "Application is in an invalid state. Active label is not contained in the labelset, but its group was requested.";
     *activeIter = activeLabelClone;
   }
 
 
-  TransferLabelContentAtTimeStep(m_PaintingSlice, m_WorkingSlice, destinationLabels, 0, LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false, { {m_InternalFillValue, activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
+  TransferLabelContentAtTimeStep(m_PaintingSlice, m_WorkingSlice, destinationLabels, 0, MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, { {this->GetFillValue(), activePixelValue}}, mitk::MultiLabelSegmentation::MergeStyle::Merge);
 
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 
@@ -579,19 +582,13 @@ void mitk::PaintbrushTool::ResetWorkingSlice(const InteractionPositionEvent* eve
   m_PaintingSlice = nullptr;
   m_PaintingNode->SetData(nullptr);
 
-  DataNode* workingNode = this->GetToolManager()->GetWorkingData(0);
-  if (nullptr == workingNode)
+  auto segmentation = this->GetWorkingData();
+  if (nullptr == segmentation)
   {
     return;
   }
 
-  Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
-  if (nullptr == image)
-  {
-    return;
-  }
-
-  m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
+  m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, segmentation->GetGroupImage(segmentation->GetActiveLayer()))->Clone();
 
   m_PaintingSlice = Image::New();
   m_PaintingSlice->Initialize(m_WorkingSlice);

@@ -753,16 +753,6 @@ namespace mitk
       return IFileWriter::Unsupported;
     }
 
-    //Fix to ensure T29391. Can be removed as soon as T28524 is solved
-    //and the new MultiLabelSegmentation class is in place, as
-    //segmentations won't be confused with simple images anymore.
-    std::string className = this->GetInput()->GetNameOfClass();
-    if (className == "LabelSetImage")
-    {
-      // We cannot write a null object, DUH!
-      return IFileWriter::Unsupported;
-    }
-
     if (!m_ImageIO->SupportsDimension(image->GetDimension()))
     {
       // okay, dimension is not supported. We have to look at a special case:

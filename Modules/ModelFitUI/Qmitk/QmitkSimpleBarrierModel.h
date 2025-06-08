@@ -38,9 +38,11 @@ public:
   /** Sets the data handled by the model and resets the modified flag
    @param pChecker Pointer to the checker instance that should be managed.
    @param names List of all possible parameter names. It is assumed that the
-   index of the list equals the parameter index in the respective fitting model.*/
+   index of the list equals the parameter index in the respective fitting model.
+   @param units*/
   void setChecker(mitk::SimpleBarrierConstraintChecker* pChecker,
-                  const mitk::ModelTraitsInterface::ParameterNamesType& names);
+                  const mitk::ModelTraitsInterface::ParameterNamesType& names,
+                  const mitk::ModelTraitsInterface::ParamterUnitMapType units);
 
   Qt::ItemFlags flags(const QModelIndex& index) const override;
   QVariant data(const QModelIndex& index, int role) const override;
@@ -58,6 +60,7 @@ public:
 private:
   mitk::SimpleBarrierConstraintChecker::Pointer m_Checker;
   mitk::ModelTraitsInterface::ParameterNamesType m_ParameterNames;
+  mitk::ModelTraitsInterface::ParamterUnitMapType m_ParameterUnits;
 
   /** Indicates if the data of the model was modified, since the model was set. */
   bool m_modified;

@@ -113,6 +113,7 @@ function(mitk_create_module)
       SUBPROJECTS            # list of CDash labels (deprecated)
       INCLUDE_DIRS           # include directories: [PUBLIC|PRIVATE|INTERFACE] <list>
       INTERNAL_INCLUDE_DIRS  # include dirs internal to this module (DEPRECATED)
+      PCH                    # list of header files for precompiled header
       DEPENDS                # list of modules this module depends on: [PUBLIC|PRIVATE|INTERFACE] <list>
       DEPENDS_INTERNAL       # list of modules this module internally depends on (DEPRECATED)
       PACKAGE_DEPENDS        # list of "packages this module depends on (e.g. Qt, VTK, etc.): [PUBLIC|PRIVATE|INTERFACE] <package-list>
@@ -443,7 +444,7 @@ function(mitk_create_module)
       # set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules")
     else()
       if(MODULE_EXECUTABLE)
-        if(MITK_SHOW_CONSOLE_WINDOW)
+        if(MITK_SHOW_CONSOLE_WINDOW OR CMDAPP_NAME) # CMDAPP_NAME is set by mitkFunctionCreateCommandLineApp()
           set(_SHOW_CONSOLE_OPTION "")
         else()
           set(_SHOW_CONSOLE_OPTION WIN32)
@@ -589,6 +590,12 @@ function(mitk_create_module)
       set(_module_property_type INTERFACE)
     else()
       set(_module_property_type PUBLIC)
+    endif()
+
+    if(MITK_PCH AND MODULE_PCH)
+      list(TRANSFORM MODULE_PCH PREPEND "<")
+      list(TRANSFORM MODULE_PCH APPEND ">")
+      target_precompile_headers(${MODULE_TARGET} PRIVATE ${MODULE_PCH})
     endif()
 
     if(MODULE_TARGET_DEPENDS)

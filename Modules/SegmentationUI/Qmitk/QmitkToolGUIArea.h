@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "mitkCommon.h"
 #include <MitkSegmentationUIExports.h>
 
-#include <qwidget.h>
+#include <QWidget>
 
 /**
   \brief Dummy class for putting into a GUI (mainly using Qt Designer).

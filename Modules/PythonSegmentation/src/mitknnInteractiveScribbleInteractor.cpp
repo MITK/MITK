@@ -113,6 +113,7 @@ namespace
 
     void Activate(const mitk::Color& color)
     {
+      this->SetEnable3DInterpolation(false);
       this->Activated();
       this->Enable();
 
@@ -125,12 +126,12 @@ namespace
     {
       this->Disable();
       this->Deactivated();
+      this->SetEnable3DInterpolation(true);
     }
 
   protected:
     ScribbleTool()
     {
-      this->SetEnable3DInterpolation(false);
       this->DisableContourMarkers();
       this->SetSize(3);
       this->Disable();

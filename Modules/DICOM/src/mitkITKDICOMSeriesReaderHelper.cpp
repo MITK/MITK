@@ -257,8 +257,19 @@ bool ConvertDICOMDateTimeString( const std::string& dateString,
 
 boost::posix_time::ptime ConvertOFDateTimeToPTime( const OFDateTime& time )
 {
+  const boost::posix_time::ptime min_date_time(boost::posix_time::min_date_time);
+  const boost::gregorian::date::year_type min_year = min_date_time.date().year();
+  unsigned int year = time.getDate().getYear();
+
+  if (year < min_year)
+  {
+    MITK_WARN << "Year " << year << " is before the supported minimum " << min_year
+              << " in Boost.Date_Time. Adding " << min_year << " years to proceed.";
+    year += min_year;
+  }
+
   const boost::gregorian::date boostDate(
-    time.getDate().getYear(), time.getDate().getMonth(), time.getDate().getDay() );
+    year, time.getDate().getMonth(), time.getDate().getDay() );
 
   const boost::posix_time::time_duration boostTime =
     boost::posix_time::hours( time.getTime().getHour() )

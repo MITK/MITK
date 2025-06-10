@@ -113,7 +113,7 @@ bool configureApplicationSettings(const std::map<std::string, us::Any>& parsedAr
       referenceImageFilename = us::any_cast<std::string>(parsedArgs.at("reference"));
     }
 
-    if (parsedArgs.count("separate-groups"))
+    if (parsedArgs.count("groups"))
     {
       auto separateGroups = us::any_cast<bool>(parsedArgs.at("groups"));
       groupingMode = separateGroups ? GroupingMode::SeparateGroups : GroupingMode::SingleGroup;

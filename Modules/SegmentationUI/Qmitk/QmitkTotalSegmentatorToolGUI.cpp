@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <QmitkStyleManager.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
+#include <QMutex>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkTotalSegmentatorToolGUI, "")
 
@@ -52,6 +53,12 @@ QmitkTotalSegmentatorToolGUI::QmitkTotalSegmentatorToolGUI()
 
 QmitkTotalSegmentatorToolGUI::~QmitkTotalSegmentatorToolGUI()
 {
+  auto tool = this->GetConnectedToolAs<mitk::TotalSegmentatorTool>();
+  if (nullptr != tool)
+  {
+    tool->TotalSegDownloadMessageEvent -= mitk::MessageDelegate1<QmitkTotalSegmentatorToolGUI, const bool>(
+      this, &QmitkTotalSegmentatorToolGUI::DownloadStatusWorker);
+  }
   if (nullptr != m_Preferences)
   {
     m_Preferences->OnPropertyChanged -=
@@ -68,6 +75,12 @@ void QmitkTotalSegmentatorToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newT
 
 void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
+  auto tool = this->GetConnectedToolAs<mitk::TotalSegmentatorTool>();
+  if (nullptr != tool)
+  {
+    tool->TotalSegDownloadMessageEvent += mitk::MessageDelegate1<QmitkTotalSegmentatorToolGUI, const bool>(
+      this, &QmitkTotalSegmentatorToolGUI::DownloadStatusWorker);
+  }
   auto wrapperWidget = new QWidget(this);
   mainLayout->addWidget(wrapperWidget);
   m_Controls->setupUi(wrapperWidget);
@@ -212,3 +225,18 @@ void QmitkTotalSegmentatorToolGUI::ToggleLicensedTasks(bool activate)
   }
 }
 
+void QmitkTotalSegmentatorToolGUI::DownloadStatusWorker(const bool isDownloading)
+{
+  static QMutex mutex;
+  QMutexLocker locker(&mutex);
+  QString statusText;
+  if (isDownloading)
+  { 
+    statusText = "<b>STATUS: </b><i>Downloading model... this might take some time.</i>";
+  }
+  else
+  {
+    statusText = "<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>";
+  }
+  this->WriteStatusMessage(statusText);
+}

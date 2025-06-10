@@ -131,7 +131,8 @@ void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
       break;
     case (mitk::LookupTable::PET_BLACK_WHITE):
       this->BuildPETBWLookupTable();
-    break;    case (mitk::LookupTable::TURBO):
+      break;
+    case (mitk::LookupTable::TURBO):
       this->BuildTurboLookupTable();
       break;
     case (mitk::LookupTable::LEGACY_RAINBOW_COLOR):

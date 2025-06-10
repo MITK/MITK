@@ -84,9 +84,6 @@ void QmitkEditableContourToolGUIBase::OnAutoConfirm(bool on)
   m_Controls->m_ConfirmButton->setVisible(!on);
   m_Controls->m_ClearButton->setVisible(!on);
 
-  if (on)
-    m_Controls->m_AddBtn->click();
-
   if (m_NewTool.IsNotNull())
   {
     if (on && m_NewTool->IsEditingContour())

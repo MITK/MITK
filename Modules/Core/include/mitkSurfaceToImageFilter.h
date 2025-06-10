@@ -92,6 +92,12 @@ namespace mitk
     double m_Tolerance;
   };
 
+  /** Helper function for conveniently convert a passed surface into a image containing the content of the
+   * surface as a binary mask that can be used as a label content of a segmentation.
+   * @param refImage Pointer to a image that serves as template for the image that should be generated.
+   * @param surface Pointer to the surface that should be converted into an image.*/
+  MITKCORE_EXPORT mitk::Image::Pointer ConvertSurfaceToLabelMask(const mitk::Image* refImage, const mitk::Surface* surface);
+
 } // namespace mitk
 
 #endif

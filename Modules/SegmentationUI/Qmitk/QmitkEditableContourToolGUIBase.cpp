@@ -11,6 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QmitkEditableContourToolGUIBase.h>
+#include <QmitkStyleManager.h>
+
 #include <ui_QmitkEditableContourToolGUIControls.h>
 
 #include <QButtonGroup>
@@ -19,21 +21,30 @@ found in the LICENSE file.
 
 QmitkEditableContourToolGUIBase::QmitkEditableContourToolGUIBase()
   : QmitkToolGUI(),
-    m_Controls(new Ui::QmitkEditableContourToolGUIControls),
-    m_ModeButtonGroup(new QButtonGroup(this))
+    m_Controls(new Ui::QmitkEditableContourToolGUIControls)
 {
   m_Controls->setupUi(this);
 
   m_Controls->m_ConfirmButton->hide();
-  m_Controls->m_AddMode->hide();
-  m_Controls->m_SubtractMode->hide();
   m_Controls->m_ClearButton->hide();
   m_Controls->m_Information->hide();
 
-  m_ModeButtonGroup->addButton(m_Controls->m_AddMode, static_cast<int>(Mode::Add));
-  m_ModeButtonGroup->addButton(m_Controls->m_SubtractMode, static_cast<int>(Mode::Subtract));
+  m_Controls->m_AddBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/lasso_mode_add.svg")));
+  m_Controls->m_SubtractBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/lasso_mode_subtract.svg")));
 
-  connect(m_ModeButtonGroup, &QButtonGroup::idClicked, [this](int id) { this->OnModeToggled(static_cast<Mode>(id)); });
+  connect(m_Controls->m_AddBtn, &QPushButton::clicked, this, [=](bool)
+    {
+      m_Controls->m_AddBtn->setChecked(true);
+      m_Controls->m_SubtractBtn->setChecked(false);
+      this->OnModeToggled(Mode::Add);
+    });
+  connect(m_Controls->m_SubtractBtn, &QPushButton::clicked, this, [=](bool)
+    {
+      m_Controls->m_SubtractBtn->setChecked(true);
+      m_Controls->m_AddBtn->setChecked(false);
+      this->OnModeToggled(Mode::Subtract);
+    });
+
   connect(this, &Self::NewToolAssociated, this, &Self::OnNewToolAssociated);
   connect(m_Controls->m_AutoCheck, &QCheckBox::toggled, this, &Self::OnAutoConfirm);
   connect(m_Controls->m_ConfirmButton, &QPushButton::clicked, this, &Self::OnConfirmSegmentation);
@@ -59,7 +70,10 @@ void QmitkEditableContourToolGUIBase::OnNewToolAssociated(mitk::Tool* tool)
     ? Mode::Add
     : Mode::Subtract;
 
-  m_ModeButtonGroup->button(static_cast<int>(mode))->setChecked(true);
+  if (m_NewTool->GetAddMode())
+    m_Controls->m_AddBtn->click();
+  else
+    m_Controls->m_SubtractBtn->click();
 
   this->OnAutoConfirm(autoConfirm);
   this->OnModeToggled(mode);
@@ -69,11 +83,6 @@ void QmitkEditableContourToolGUIBase::OnAutoConfirm(bool on)
 {
   m_Controls->m_ConfirmButton->setVisible(!on);
   m_Controls->m_ClearButton->setVisible(!on);
-  m_Controls->m_AddMode->setVisible(!on);
-  m_Controls->m_SubtractMode->setVisible(!on);
-
-  if (on)
-    m_Controls->m_AddMode->setChecked(true);
 
   if (m_NewTool.IsNotNull())
   {
@@ -81,7 +90,7 @@ void QmitkEditableContourToolGUIBase::OnAutoConfirm(bool on)
       this->OnConfirmSegmentation();
 
     m_NewTool->SetAutoConfirm(on);
-    m_NewTool->SetAddMode(m_Controls->m_AddMode->isChecked());
+    m_NewTool->SetAddMode(m_Controls->m_AddBtn->isChecked());
   }
 }
 

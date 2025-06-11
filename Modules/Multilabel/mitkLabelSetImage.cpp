@@ -140,6 +140,10 @@ mitk::Image::Pointer mitk::MultiLabelSegmentation::GenerateNewGroupImage() const
   else
   {
     groupImage->Initialize(pixelType, *(this->GetTimeGeometry()));
+    groupImage->SetClonedTimeGeometry(this->GetTimeGeometry()); //This is needed because Image::Initialize does not set the
+                                                                //time bounds of images with one time step correctly.
+                                                                //Didn't fix it in Image::Initialize() because I wasn't sure
+                                                                //if it breaks legacy code.
   }
   groupImage->GetTimeGeometry()->UpdateBoundingBox();
   return groupImage;

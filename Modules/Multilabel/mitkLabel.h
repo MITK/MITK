@@ -54,7 +54,14 @@ namespace mitk
     void SetName(const std::string &name);
     std::string GetName() const;
 
+    void SetTrackingID(const std::string& trackingID);
     std::string GetTrackingID() const;
+
+    void SetTrackingUID(const std::string& trackingUID);
+    std::string GetTrackingUID() const;
+
+    void SetDescription(const std::string& description);
+    std::string GetDescription() const;
 
     void SetCenterOfMassIndex(const mitk::Point3D &center);
     mitk::Point3D GetCenterOfMassIndex() const;

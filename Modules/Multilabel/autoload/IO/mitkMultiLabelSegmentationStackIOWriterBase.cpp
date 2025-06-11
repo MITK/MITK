@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "mitkMultiLabelSegmentationStackIOBase.h"
 #include "mitkMultiLabelSegmentationIO.h"
 #include "mitkBasePropertySerializer.h"
 #include "mitkIOMimeTypes.h"
@@ -38,12 +39,12 @@ namespace mitk
   const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_KEY = "modality";
   const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_VALUE = "org.mitk.multilabel.segmentation";
   const constexpr char* const MULTILABEL_SEGMENTATION_VERSION_KEY = "org.mitk.multilabel.segmentation.version";
-  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 2;
+  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 1;
   const constexpr char* const MULTILABEL_SEGMENTATION_LABELS_INFO_KEY = "org.mitk.multilabel.segmentation.labelgroups";
   const constexpr char* const MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY = "org.mitk.multilabel.segmentation.unlabeledlabellock";
 
-  MultiLabelSegmentationIO::MultiLabelSegmentationIO()
-    : AbstractFileIO(MultiLabelSegmentation::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Multilabel Segmentation")
+  MultiLabelSegmentationStackIOBase::MultiLabelSegmentationStackIOBase()
+    : AbstractFileIO(MultiLabelSegmentation::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Segmentation Stack")
   {
     this->InitializeDefaultMetaDataKeys();
     AbstractFileWriter::SetRanking(10);
@@ -51,7 +52,7 @@ namespace mitk
     this->RegisterService();
   }
 
-  IFileIO::ConfidenceLevel MultiLabelSegmentationIO::GetWriterConfidenceLevel() const
+  IFileIO::ConfidenceLevel MultiLabelSegmentationStackIOBase::GetWriterConfidenceLevel() const
   {
     if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
       return Unsupported;
@@ -62,7 +63,7 @@ namespace mitk
       return Unsupported;
   }
 
-  void MultiLabelSegmentationIO::Write()
+  void MultiLabelSegmentationStackIOBase::Write()
   {
     ValidateOutputLocation();
 
@@ -124,7 +125,7 @@ namespace mitk
     }
   }
 
-  IFileIO::ConfidenceLevel MultiLabelSegmentationIO::GetReaderConfidenceLevel() const
+  IFileIO::ConfidenceLevel MultiLabelSegmentationStackIOBase::GetReaderConfidenceLevel() const
   {
     if (AbstractFileIO::GetReaderConfidenceLevel() == Unsupported)
       return Unsupported;
@@ -144,7 +145,7 @@ namespace mitk
       return Unsupported;
   }
 
-  std::vector<BaseData::Pointer> MultiLabelSegmentationIO::DoRead()
+  std::vector<BaseData::Pointer> MultiLabelSegmentationStackIOBase::DoRead()
   {
     itk::NrrdImageIO::Pointer nrrdImageIO = itk::NrrdImageIO::New();
 
@@ -164,30 +165,20 @@ namespace mitk
     //generate multi label images
     auto output = ConvertImageToLabelSetImage(rawimage);
 
-    //get label groups definitions
+    //get label set definitions
     auto jsonStr = MultiLabelIOHelper::GetStringByKey(dictionary, MULTILABEL_SEGMENTATION_LABELS_INFO_KEY);
     nlohmann::json jlabelsets = nlohmann::json::parse(jsonStr);
-    auto labelGroups = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(jlabelsets);
+    std::vector<mitk::LabelSet::Pointer> labelsets = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(jlabelsets);
 
-    if (labelGroups.empty() && output->GetNumberOfGroups()==1)
+    if (labelsets.size() != output->GetNumberOfLayers())
     {
-      if (output->GetTotalNumberOfLabels() > 0)
-      {
-        mitkThrow() << "Loaded data is in an invalid state. Data contains no meta information for labels but pixel content indicates labels. Number of detected invalid labels: " << output->GetTotalNumberOfLabels();
-      }
-
-      MITK_INFO << "Segmentation contains only one layer and has no label information. Assuming empty label.";
-    }
-    else if (labelGroups.size() != output->GetNumberOfGroups())
-    {
-      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfGroups() << "; found label groups: " << labelGroups.size();
+      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfLayers() << "; found labelsets: " << labelsets.size();
     }
 
     MultiLabelSegmentation::GroupIndexType id = 0;
-    for (auto& groupInfo : labelGroups)
+    for (auto labelset : labelsets)
     {
-      output->ReplaceGroupLabels(id, groupInfo.labels);
-      if (!groupInfo.name.empty()) output->SetGroupName(id, groupInfo.name);
+      output->AddLabelSetToLayer(id, labelset);
       id++;
     }
 
@@ -217,9 +208,9 @@ namespace mitk
     return result;
   }
 
-  MultiLabelSegmentationIO *MultiLabelSegmentationIO::IOClone() const { return new MultiLabelSegmentationIO(*this); }
+  MultiLabelSegmentationStackIOBase *MultiLabelSegmentationStackIOBase::IOClone() const { return new MultiLabelSegmentationStackIOBase(*this); }
 
-  void MultiLabelSegmentationIO::InitializeDefaultMetaDataKeys()
+  void MultiLabelSegmentationStackIOBase::InitializeDefaultMetaDataKeys()
   {
     this->m_DefaultMetaDataKeys.push_back("NRRD.space");
     this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");

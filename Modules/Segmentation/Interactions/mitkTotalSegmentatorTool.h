@@ -126,6 +126,11 @@ namespace mitk
      */
     MultiLabelSegmentation::Pointer AgglomerateLabelFiles(std::vector<std::string>& filePaths, const unsigned int* dimension, mitk::BaseGeometry* geometry);
 
+    /**
+     * @brief Callback to process stdout and stderr outs from the python sub-process.
+     */
+    void PythonProcessEvent(itk::Object*, const itk::EventObject &e);
+
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_SubTask = "total";

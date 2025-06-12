@@ -37,40 +37,39 @@ namespace mitk
 
 namespace
 {
-  mitk::TotalSegmentatorTool *toolPtr;
   const std::string DOWNLOAD_STRING = "Downloading";
   const std::string ZERO_PERCENT_STRING = " 0%";
   const std::string HUNDRED_PERCENT_STRING = "100%";
+}
 
-  void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
+void mitk::TotalSegmentatorTool::PythonProcessEvent(itk::Object* /*pCaller*/, const itk::EventObject& e)
+{
+  std::string testCOUT, testCERR;
+  const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
+  if (pEvent)
   {
-    std::string testCOUT, testCERR;
-    const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
-    if (pEvent)
+    testCOUT = testCOUT + pEvent->GetOutput();
+    MITK_INFO << testCOUT;
+  }
+  
+  const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
+  if (pErrEvent)
+  {
+    testCERR = testCERR + pErrEvent->GetOutput();
+    MITK_ERROR << testCERR;
+    if (testCERR.find(DOWNLOAD_STRING) != std::string::npos)
     {
-      testCOUT = testCOUT + pEvent->GetOutput();
-      MITK_INFO << testCOUT;
-    }
-
-    const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
-    if (pErrEvent)
-    {
-      testCERR = testCERR + pErrEvent->GetOutput();
-      MITK_ERROR << testCERR;
-      if (testCERR.find(DOWNLOAD_STRING) != std::string::npos)
+      if (testCERR.find(ZERO_PERCENT_STRING) != std::string::npos)
       {
-        if (testCERR.find(ZERO_PERCENT_STRING) != std::string::npos)
-        {
-          toolPtr->TotalSegDownloadMessageEvent.Send(true);
-        }
-        else if (testCERR.find(HUNDRED_PERCENT_STRING) != std::string::npos)
-        {
-          toolPtr->TotalSegDownloadMessageEvent.Send(false);
-        }
+        this->TotalSegDownloadMessageEvent.Send(true);
+      }
+      else if (testCERR.find(HUNDRED_PERCENT_STRING) != std::string::npos)
+      {
+        this->TotalSegDownloadMessageEvent.Send(false);
       }
     }
   }
-} // namespace
+}
 
 mitk::TotalSegmentatorTool::~TotalSegmentatorTool()
 {
@@ -88,7 +87,6 @@ void mitk::TotalSegmentatorTool::Activated()
   Superclass::Activated();
   this->SetLabelTransferScope(LabelTransferScope::AllLabels);
   this->SetLabelTransferMode(LabelTransferMode::AddLabel);
-  ::toolPtr = this;
 }
 
 const char **mitk::TotalSegmentatorTool::GetXPM() const
@@ -118,9 +116,10 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
   }
   ProcessExecutor::Pointer spExec = ProcessExecutor::New();
-  itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
-  spCommand->SetCallback(&onPythonProcessEvent);
+  auto spCommand = itk::MemberCommand<mitk::TotalSegmentatorTool>::New();
+  spCommand->SetCallbackFunction(this, &mitk::TotalSegmentatorTool::PythonProcessEvent);
   spExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
+
   m_ProgressCommand->SetProgress(5);
 
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;

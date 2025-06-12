@@ -26,8 +26,17 @@ You need:
   -# <a href="https://cmake.org/">CMake</a> (version \minimumCMakeVersion or higher)
   -# <a href="https://www.qt.io/">Qt</a> \minimumQt6Version if you plan to develop Qt-based
      applications
-  -# If you are using <b>macOS</b> you need an XCode installation and the
-     Command Line Tools as it provides the necessary compilers and SDKs
+  -# <a href="https://www.doxygen.nl/">Doxygen</a> and <a href="https://graphviz.org/">GraphViz</a> for documentation
+  -# If you are using <b>macOS</b> you need an the Command Line Tools as they provide the
+     necessary compilers and SDKs: <tt>xcode-select --install</tt>
+
+To build MITK on macOS, install the following packages, e. g. with HomeBrew:
+
+\code{.unparsed}
+brew install freetype graphviz libomp openssl@3
+\endcode
+
+If OpenMP is not automatically found on macOS, add the <tt>OpenMP_ROOT</tt> PATH CMake variable to the cache, e. g. <tt>/opt/homebrew/opt/libomp</tt>.
 
 To build MITK on Linux, install the following packages, e. g. with APT:
 

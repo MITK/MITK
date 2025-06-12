@@ -104,6 +104,7 @@ found in the LICENSE file.
 #define BERRY_ARCH_SPARC   0x08
 #define BERRY_ARCH_AMD64   0x09
 #define BERRY_ARCH_ARM     0x0a
+#define BERRY_ARCH_ARM64   0x0b
 
 
 #if defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
@@ -149,6 +150,9 @@ found in the LICENSE file.
   #else
     #define BERRY_ARCH_LITTLE_ENDIAN 1
   #endif
+#elif defined(__aarch64__)
+  #define BERRY_ARCH BERRY_ARCH_ARM64
+  #define BERRY_ARCH_LITTLE_ENDIAN 1
 #endif
 
 
@@ -233,6 +237,7 @@ public:
   static const int ARCH_SPARC;
   static const int ARCH_AMD64;
   static const int ARCH_ARM;
+  static const int ARCH_ARM64;
 
   static const QString PROP_QTPLUGIN_PATH;
 

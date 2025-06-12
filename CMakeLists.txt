@@ -420,6 +420,7 @@ endif()
 
 if(MITK_USE_Python3)
   set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
+  set(MITK_USE_SWIG ON CACHE BOOL "" FORCE)
 
   if(APPLE)
     set(python3_mininum_version 3.12)

@@ -35,27 +35,22 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, TotalSegmentatorTool, "Total Segmentator");
 }
 
-namespace
-{
-  const std::string DOWNLOAD_STRING = "Downloading";
-  const std::string ZERO_PERCENT_STRING = " 0%";
-  const std::string HUNDRED_PERCENT_STRING = "100%";
-}
-
 void mitk::TotalSegmentatorTool::PythonProcessEvent(itk::Object* /*pCaller*/, const itk::EventObject& e)
 {
-  std::string testCOUT, testCERR;
+  static const std::string DOWNLOAD_STRING = "Downloading";
+  static const std::string ZERO_PERCENT_STRING = " 0%";
+  static const std::string HUNDRED_PERCENT_STRING = "100%";
+
   const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
   if (pEvent)
   {
-    testCOUT = testCOUT + pEvent->GetOutput();
-    MITK_INFO << testCOUT;
+    MITK_INFO << pEvent->GetOutput();
   }
   
   const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
   if (pErrEvent)
   {
-    testCERR = testCERR + pErrEvent->GetOutput();
+    std::string testCERR = pErrEvent->GetOutput();
     MITK_ERROR << testCERR;
     if (testCERR.find(DOWNLOAD_STRING) != std::string::npos)
     {

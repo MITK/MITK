@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <QmitkStyleManager.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
-#include <QMutex>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkTotalSegmentatorToolGUI, "")
 
@@ -227,12 +226,11 @@ void QmitkTotalSegmentatorToolGUI::ToggleLicensedTasks(bool activate)
 
 void QmitkTotalSegmentatorToolGUI::DownloadStatusWorker(const bool isDownloading)
 {
-  static QMutex mutex;
-  QMutexLocker locker(&mutex);
+  QMutexLocker locker(&m_Mutex);
   QString statusText;
   if (isDownloading)
   { 
-    statusText = "<b>STATUS: </b><i>Downloading model... this might take some time.</i>";
+    statusText = "<b>STATUS: </b><i>Downloading model... This might take a while.</i>";
   }
   else
   {

@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 #include <mitkIPreferences.h>
-
+#include <QMutex>
 #include <QMessageBox>
 
 namespace Ui
@@ -82,6 +82,12 @@ protected:
    */
   void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent&);
 
+  /**
+   * @brief Update status label as per status received from mitk::Message event
+   */
+  void DownloadStatusWorker(const bool isDownloading);
+
+  QMutex m_Mutex;
   Ui::QmitkTotalSegmentatorToolGUIControls* m_Controls;
   bool m_FirstPreviewComputation = true;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;

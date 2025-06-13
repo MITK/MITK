@@ -61,12 +61,10 @@ namespace mitk
     itkGetConstMacro(Fast, bool);
     itkBooleanMacro(Fast);
 
-    /**
-     * @brief Static function to print out everything from itk::EventObject.
-     * Used as callback in mitk::ProcessExecutor object.
-     *  
-     */
-    static void onPythonProcessEvent(itk::Object *, const itk::EventObject &e, void *);
+   /**
+    * @brief Event triggered after model download started.
+    */
+    mitk::Message1<const bool> TotalSegDownloadMessageEvent;
 
   protected:
     TotalSegmentatorTool();
@@ -127,6 +125,11 @@ namespace mitk
      * @return MultiLabelSegmentation::Pointer 
      */
     MultiLabelSegmentation::Pointer AgglomerateLabelFiles(std::vector<std::string>& filePaths, const unsigned int* dimension, mitk::BaseGeometry* geometry);
+
+    /**
+     * @brief Callback to process stdout and stderr outs from the python sub-process.
+     */
+    void PythonProcessEvent(itk::Object*, const itk::EventObject &e);
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;

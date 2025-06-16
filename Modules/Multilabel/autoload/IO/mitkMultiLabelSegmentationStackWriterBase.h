@@ -16,47 +16,33 @@ found in the LICENSE file.
 #include <mitkAbstractFileWriter.h>
 #include <mitkLabelSetImage.h>
 
+#include <itkImageIOBase.h>
+
+#include <MitkMultilabelIOExports.h>
+
 namespace mitk
 {
   /**
-  * Writes a MultiLabelSegmentation to a file.
-  * mitk::Identifiable UID is supported and will be serialized.
+  * Base class for writes that export MultiLabelSegmentation to a
+  * stack of image file (per group or per label) including a meta
+  * data file.
   * @ingroup Process
   */
-  // The export macro should be removed. Currently, the unit
-  // tests directly instantiate this class.
-  class MultiLabelSegmentationStackWriterBase : public mitk::AbstractFileWriter
+  class MITKMULTILABELIO_EXPORT MultiLabelSegmentationStackWriterBase : public mitk::AbstractFileWriter
   {
   public:
     typedef mitk::MultiLabelSegmentation InputType;
 
-    MultiLabelSegmentationStackWriterBase();
-
-    // -------------- AbstractFileReader -------------
-
-    using AbstractFileReader::Read;
-
-    ConfidenceLevel GetReaderConfidenceLevel() const override;
-
-    // -------------- AbstractFileWriter -------------
+    MultiLabelSegmentationStackWriterBase(const CustomMimeType& mimeType,
+      const std::string& description);
 
     void Write() override;
-    ConfidenceLevel GetWriterConfidenceLevel() const override;
+    ConfidenceLevel GetConfidenceLevel() const override;
 
   protected:
-    /**
-    * @brief Reads a number of mitk::LabelSetImages from the file system
-    * @return a vector of mitk::LabelSetImages
-    * @throws throws an mitk::Exception if an error ocurrs during parsing the nrrd header
-    */
-    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
-
-    // Fills the m_DefaultMetaDataKeys vector with default values
-    virtual void InitializeDefaultMetaDataKeys();
+    virtual itk::ImageIOBase::Pointer GetITKIO() const = 0;
 
   private:
-    MultiLabelSegmentationStackWriterBase *IOClone() const override;
-
     std::vector<std::string> m_DefaultMetaDataKeys;
   };
 } // end of namespace mitk

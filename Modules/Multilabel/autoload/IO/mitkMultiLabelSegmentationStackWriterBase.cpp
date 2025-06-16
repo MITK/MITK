@@ -33,28 +33,39 @@ found in the LICENSE file.
 
 #include <tinyxml2.h>
 
+namespace
+{
+  const constexpr char* const OPTION_SAVE_STRATEGY = "Save strategy";
+  const constexpr char* const OPTION_SAVE_STRATEGY_INSTANCE = "instance";
+  const constexpr char* const OPTION_SAVE_STRATEGY_GROUP = "group";
+  const constexpr char* const OPTION_INSTANCE_VALUE = "Instance value";
+  const constexpr char* const OPTION_INSTANCE_VALUE_BINARY = "binary";
+  const constexpr char* const OPTION_INSTANCE_VALUE_ORIGINAL = "original";
+}
+
 namespace mitk
 {
-
-  const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_KEY = "modality";
-  const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_VALUE = "org.mitk.multilabel.segmentation";
-  const constexpr char* const MULTILABEL_SEGMENTATION_VERSION_KEY = "org.mitk.multilabel.segmentation.version";
-  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 1;
-  const constexpr char* const MULTILABEL_SEGMENTATION_LABELS_INFO_KEY = "org.mitk.multilabel.segmentation.labelgroups";
-  const constexpr char* const MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY = "org.mitk.multilabel.segmentation.unlabeledlabellock";
-
-  MultiLabelSegmentationStackWriterBase::MultiLabelSegmentationStackWriterBase()
-    : AbstractFileIO(MultiLabelSegmentation::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Segmentation Stack")
+  MultiLabelSegmentationStackWriterBase::MultiLabelSegmentationStackWriterBase(const CustomMimeType& mimeType,
+    const std::string& description)
+    : AbstractFileWriter(MultiLabelSegmentation::GetStaticNameOfClass(), mimeType, description)
   {
-    this->InitializeDefaultMetaDataKeys();
-    AbstractFileWriter::SetRanking(10);
-    AbstractFileReader::SetRanking(10);
-    this->RegisterService();
+    Options defaultOptions;
+
+    std::vector<std::string> instanceSaveStrategy;
+    instanceSaveStrategy.push_back(OPTION_SAVE_STRATEGY_GROUP);
+    instanceSaveStrategy.push_back(OPTION_SAVE_STRATEGY_INSTANCE);
+    defaultOptions[OPTION_SAVE_STRATEGY] = instanceSaveStrategy;
+    std::vector<std::string> instanceValue;
+    instanceValue.push_back(OPTION_INSTANCE_VALUE_ORIGINAL);
+    instanceValue.push_back(OPTION_INSTANCE_VALUE_BINARY);
+    defaultOptions[OPTION_INSTANCE_VALUE] = instanceValue;
+
+    this->SetDefaultOptions(defaultOptions);
   }
 
-  IFileIO::ConfidenceLevel MultiLabelSegmentationStackWriterBase::GetWriterConfidenceLevel() const
+  IFileIO::ConfidenceLevel MultiLabelSegmentationStackWriterBase::GetConfidenceLevel() const
   {
-    if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
+    if (AbstractFileWriter::GetConfidenceLevel() == Unsupported)
       return Unsupported;
     const auto *input = static_cast<const MultiLabelSegmentation *>(this->GetInput());
     if (input)
@@ -69,157 +80,93 @@ namespace mitk
 
     auto input = dynamic_cast<const MultiLabelSegmentation *>(this->GetInput());
 
-    mitk::LocaleSwitch localeSwitch("C");
+    const auto options = this->GetOptions();
 
-    mitk::Image::Pointer inputVector = mitk::ConvertLabelSetImageToImage(input);
-
-    // image write
-    if (inputVector.IsNull())
-    {
-      mitkThrow() << "Cannot write non-image data";
-    }
-
-    itk::NrrdImageIO::Pointer nrrdImageIo = itk::NrrdImageIO::New();
-
-    ItkImageIO::PreparImageIOToWriteImage(nrrdImageIo, inputVector);
+    const auto groupSaveStrategy = options.find(OPTION_SAVE_STRATEGY)->second.ToString() == OPTION_SAVE_STRATEGY_GROUP;
+    const auto binaryValueMapping = options.find(OPTION_INSTANCE_VALUE)->second.ToString() == OPTION_INSTANCE_VALUE_BINARY;
 
     LocalFile localFile(this);
-    const std::string path = localFile.GetFileName();
+    const auto path = localFile.GetFileName();
 
-    MITK_INFO << "Writing image: " << path << std::endl;
+    const auto fileExt = itksys::SystemTools::GetFilenameExtension(path);
+    const auto fileStemPath = itksys::SystemTools::JoinPath({"", itksys::SystemTools::GetFilenamePath(path), itksys::SystemTools::GetFilenameWithoutExtension(path)});
 
-    try
+    const auto saveStrategy = options.find(OPTION_SAVE_STRATEGY)->second.ToString();
+
+    nlohmann::json metaInfo;
+
+    if (groupSaveStrategy)
     {
-      itk::EncapsulateMetaData<std::string>(
-        nrrdImageIo->GetMetaDataDictionary(), std::string(MULTILABEL_SEGMENTATION_MODALITY_KEY), std::string(MULTILABEL_SEGMENTATION_MODALITY_VALUE));
+      auto groupFileNameCallback = [fileStemPath, fileExt](const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::GroupIndexType groupIndex)
+        {
+          return fileStemPath + "_group_" + std::to_string(groupIndex) + "" + fileExt;
+        };
 
-      //nrrd does only support string meta information. So we have to convert before.
-      itk::EncapsulateMetaData<std::string>(
-        nrrdImageIo->GetMetaDataDictionary(), std::string(MULTILABEL_SEGMENTATION_VERSION_KEY), std::to_string(MULTILABEL_SEGMENTATION_VERSION_VALUE));
+      metaInfo = MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(input, groupFileNameCallback);
 
-      auto json = MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(input);
-      itk::EncapsulateMetaData<std::string>(
-        nrrdImageIo->GetMetaDataDictionary(), std::string(MULTILABEL_SEGMENTATION_LABELS_INFO_KEY), json.dump());
-      // end label set specific meta data
-
-      //nrrd does only support string meta information. So we have to convert before.
-      itk::EncapsulateMetaData<std::string>(
-        nrrdImageIo->GetMetaDataDictionary(), std::string(MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY), std::to_string(input->GetUnlabeledLabelLock()));
-
-      // Handle properties
-      ItkImageIO::SavePropertyListAsMetaData(nrrdImageIo->GetMetaDataDictionary(), input->GetPropertyList(), this->GetMimeType()->GetName());
-
-      // Handle UID
-      itk::EncapsulateMetaData<std::string>(nrrdImageIo->GetMetaDataDictionary(), PROPERTY_KEY_UID, input->GetUID());
-
+      auto imageIO = this->GetITKIO();
       // use compression if available
-      nrrdImageIo->UseCompressionOn();
-      nrrdImageIo->SetFileName(path);
+      imageIO->UseCompressionOn();
+      mitk::LocaleSwitch localeSwitch("C");
 
-      ImageReadAccessor imageAccess(inputVector);
-      nrrdImageIo->Write(imageAccess.GetData());
-    }
-    catch (const std::exception &e)
-    {
-      mitkThrow() << e.what();
-    }
-  }
-
-  IFileIO::ConfidenceLevel MultiLabelSegmentationStackWriterBase::GetReaderConfidenceLevel() const
-  {
-    if (AbstractFileIO::GetReaderConfidenceLevel() == Unsupported)
-      return Unsupported;
-    const std::string fileName = this->GetLocalFileName();
-    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-    io->SetFileName(fileName);
-    io->ReadImageInformation();
-
-    itk::MetaDataDictionary imgMetaDataDictionary = io->GetMetaDataDictionary();
-    std::string value("");
-    itk::ExposeMetaData<std::string>(imgMetaDataDictionary, "modality", value);
-    if (value.compare(MULTILABEL_SEGMENTATION_MODALITY_VALUE) == 0)
-    {
-      return Supported;
-    }
-    else
-      return Unsupported;
-  }
-
-  std::vector<BaseData::Pointer> MultiLabelSegmentationStackWriterBase::DoRead()
-  {
-    itk::NrrdImageIO::Pointer nrrdImageIO = itk::NrrdImageIO::New();
-
-    std::vector<BaseData::Pointer> result;
-
-    auto rawimage = ItkImageIO::LoadRawMitkImageFromImageIO(nrrdImageIO, this->GetLocalFileName());
-
-    const itk::MetaDataDictionary& dictionary = nrrdImageIO->GetMetaDataDictionary();
-
-    //check version
-    auto version = MultiLabelIOHelper::GetIntByKey(dictionary, MULTILABEL_SEGMENTATION_VERSION_KEY);
-    if (version > MULTILABEL_SEGMENTATION_VERSION_VALUE)
-    {
-      mitkThrow() << "Data to read has unsupported version. Software is to old to ensure correct reading. Please use a compatible version of MITK or store data in another format. Version of data: " << version << "; Supported versions up to: "<<MULTILABEL_SEGMENTATION_VERSION_VALUE;
-    }
-
-    //generate multi label images
-    auto output = ConvertImageToLabelSetImage(rawimage);
-
-    //get label set definitions
-    auto jsonStr = MultiLabelIOHelper::GetStringByKey(dictionary, MULTILABEL_SEGMENTATION_LABELS_INFO_KEY);
-    nlohmann::json jlabelsets = nlohmann::json::parse(jsonStr);
-    std::vector<mitk::LabelSet::Pointer> labelsets = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(jlabelsets);
-
-    if (labelsets.size() != output->GetNumberOfLayers())
-    {
-      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfLayers() << "; found labelsets: " << labelsets.size();
-    }
-
-    MultiLabelSegmentation::GroupIndexType id = 0;
-    for (auto labelset : labelsets)
-    {
-      output->AddLabelSetToLayer(id, labelset);
-      id++;
-    }
-
-    bool unlabeledLock = MultiLabelIOHelper::GetIntByKey(dictionary, MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY) != 0;
-    output->SetUnlabeledLabelLock(unlabeledLock);
-
-    //meta data handling
-    auto props = ItkImageIO::ExtractMetaDataAsPropertyList(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
-    for (auto& [name, prop] : *(props->GetMap()))
-    {
-      output->SetProperty(name, prop->Clone()); //need to clone to avoid that all outputs pointing to the same prop instances.
-    }
-
-    // Handle UID
-    if (dictionary.HasKey(PROPERTY_KEY_UID))
-    {
-      itk::MetaDataObject<std::string>::ConstPointer uidData = dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(PROPERTY_KEY_UID));
-      if (uidData.IsNotNull())
+      for (MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < input->GetNumberOfGroups(); ++groupID)
       {
-        mitk::UIDManipulator uidManipulator(output);
-        uidManipulator.SetUID(uidData->GetMetaDataObjectValue());
+        const auto groupImage = input->GetGroupImage(groupID);
+        ItkImageIO::PreparImageIOToWriteImage(imageIO, groupImage);
+        imageIO->SetFileName(groupFileNameCallback(input, groupID));
+
+        ImageReadAccessor imageAccess(groupImage);
+        imageIO->Write(imageAccess.GetData());
       }
     }
-    result.push_back(output.GetPointer());
+    else
+    {
+      auto labelFileNameCallback = [fileStemPath, fileExt](const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::LabelValueType labelValue)
+        {
+          return fileStemPath + "_label_" + std::to_string(labelValue) + "" + fileExt;
+        };
 
-    MITK_INFO << "...finished!";
-    return result;
-  }
+      auto labelFileValueCallback = [binaryValueMapping](const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::LabelValueType labelValue)
+        {
+          if (binaryValueMapping)
+            return static_cast<mitk::MultiLabelSegmentation::LabelValueType>(1);
 
-  MultiLabelSegmentationStackWriterBase *MultiLabelSegmentationStackWriterBase::IOClone() const { return new MultiLabelSegmentationStackWriterBase(*this); }
+          return labelValue;
+        };
 
-  void MultiLabelSegmentationStackWriterBase::InitializeDefaultMetaDataKeys()
-  {
-    this->m_DefaultMetaDataKeys.push_back("NRRD.space");
-    this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");
-    this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TYPE);
-    this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS);
-    this->m_DefaultMetaDataKeys.push_back("ITK.InputFilterName");
-    this->m_DefaultMetaDataKeys.push_back("org.mitk.multilabel.");
-    this->m_DefaultMetaDataKeys.push_back("MITK.IO.");
-    this->m_DefaultMetaDataKeys.push_back(MULTILABEL_SEGMENTATION_MODALITY_KEY);
+      metaInfo = MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(input, nullptr, labelFileNameCallback, labelFileValueCallback);
+
+      auto imageIO = this->GetITKIO();
+      // use compression if available
+      imageIO->UseCompressionOn();
+      mitk::LocaleSwitch localeSwitch("C");
+
+      for (const auto labelValue : input->GetAllLabelValues())
+      {
+        const auto labelImage = CreateLabelMask(input, labelValue, binaryValueMapping);
+        ItkImageIO::PreparImageIOToWriteImage(imageIO, labelImage);
+        imageIO->SetFileName(labelFileNameCallback(input, labelValue));
+
+        ImageReadAccessor imageAccess(labelImage);
+        imageIO->Write(imageAccess.GetData());
+      }
+    }
+
+    nlohmann::json stackContent;
+    stackContent["version"] = "1";
+    stackContent["type"] = "org.mitk.multilabel.segmentation.stack";
+    stackContent["groups"] = metaInfo;
+    const auto metaFileName = fileStemPath + ".mitklabel.json";
+    MITK_INFO << "Writing meta data for segmentation: " << metaFileName << std::endl;
+    std::ofstream file(metaFileName);
+    if (file.is_open())
+    {
+      file << std::setw(4) << stackContent << std::endl;
+    }
+    else
+    {
+      mitkThrow() << "Cannot write meta data. Cannot open file: " << metaFileName;
+    }
   }
 
 } // namespace

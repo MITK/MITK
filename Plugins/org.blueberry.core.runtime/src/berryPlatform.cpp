@@ -52,6 +52,7 @@ const int Platform::ARCH_POWER = BERRY_ARCH_POWER;
 const int Platform::ARCH_SPARC = BERRY_ARCH_SPARC;
 const int Platform::ARCH_AMD64 = BERRY_ARCH_AMD64;
 const int Platform::ARCH_ARM = BERRY_ARCH_ARM;
+const int Platform::ARCH_ARM64 = BERRY_ARCH_ARM64;
 
 const QString Platform::PROP_QTPLUGIN_PATH = "BlueBerry.qtplugin_path";
 

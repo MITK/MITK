@@ -331,7 +331,9 @@ mitk::MultiLabelIOHelper::LabelGroupMetaData::LabelGroupMetaData(const std::stri
   : name(groupName), labels(groupLabels), properties(groupProperties)
 {};
 
-nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mitk::MultiLabelSegmentation* inputImage)
+nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mitk::MultiLabelSegmentation* inputImage,
+  GroupFileNameCallback groupFileNameCallback, LabelFileNameCallback labelFileNameCallback,
+  LabelFileValueCallback labelFileValueCallback)
 {
   if (nullptr == inputImage)
   {
@@ -347,7 +349,18 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
 
     for (const auto& label : inputImage->GetConstLabelsByValue(inputImage->GetLabelValuesByGroup(i)))
     {
-      jlabels.emplace_back(SerializeLabelToJSON(label));
+      auto jLabel = SerializeLabelToJSON(label);
+      if (nullptr != labelFileNameCallback)
+      {
+        auto labelFile = labelFileNameCallback(inputImage, label->GetValue());
+        jLabel["file"] = labelFile;
+      }
+      if (nullptr != labelFileValueCallback)
+      {
+        auto labelValue = labelFileValueCallback(inputImage, label->GetValue());
+        jLabel["file_value"] = labelValue;
+      }
+      jlabels.emplace_back(jLabel);
     }
 
     jgroup["labels"] = jlabels;
@@ -356,6 +369,12 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
     if (!name.empty())
     {
       jgroup["name"] = name;
+    }
+
+    if (nullptr != groupFileNameCallback)
+    {
+      auto groupFile = groupFileNameCallback(inputImage, i);
+      jgroup["file"] = groupFile;
     }
 
     result.emplace_back(jgroup);

@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <mitkLabel.h>
 
+#include <mitkLabelSetImage.h>
+
 #include <itkSmartPointer.h>
 #include <nlohmann/json.hpp>
 
@@ -33,8 +35,6 @@ namespace itk
 
 namespace mitk
 {
-  class MultiLabelSegmentation;
-
   const constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
   const constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
   const constexpr char* const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org_mitk_timegeometry_type";
@@ -125,12 +125,26 @@ namespace mitk
       ~LabelGroupMetaData() = default;
     };
 
+
+    using GroupFileNameCallback = std::function<std::string(const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::GroupIndexType)>;
+    using LabelFileNameCallback = std::function<std::string(const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::LabelValueType)>;
+    using LabelFileValueCallback = std::function<mitk::MultiLabelSegmentation::LabelValueType(const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::LabelValueType)>;
+
     /**
      * @brief Serialize meta data all groups of the multilabel segmentation to JSON format (v2)
      * @param inputSegmentation the multilabel segmentation to serialize
+     * @param groupFileNameCallback Optional call back function. If provided the property "file" on group level
+     * based on the returned string will be set.
+     * @param labelFileNameCallback Optional call back function. If provided the property "file" per label
+     * based on the returned string will be set.
+     * @param labelFileValueCallback Optional call back function. If provided the property "file_value" per label
+     * will be set according to the returned value.
      * @return JSON representation of the groups
      */
-    static nlohmann::json SerializeMultLabelGroupsToJSON(const mitk::MultiLabelSegmentation* inputSegmentation);
+    static nlohmann::json SerializeMultLabelGroupsToJSON(const mitk::MultiLabelSegmentation* inputSegmentation,
+      GroupFileNameCallback groupFileNameCallback = nullptr ,
+      LabelFileNameCallback labelFileNameCallback = nullptr,
+      LabelFileValueCallback labelFileValueCallback = nullptr);
 
     /**
      * @brief Deserialize meta data of multilabel groups from JSON format (v2)

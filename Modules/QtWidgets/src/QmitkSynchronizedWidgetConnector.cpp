@@ -53,6 +53,9 @@ void QmitkSynchronizedWidgetConnector::ConnectWidget(const QmitkSynchronizedNode
   connect(nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::NodeVisibilityChanged,
     this, &QmitkSynchronizedWidgetConnector::NodeVisibilityChanged);
 
+  connect(nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::NodeVisibilityChanged,
+    this, &QmitkSynchronizedWidgetConnector::OnNodeVisibilityChanged);
+
   connect(this, &QmitkSynchronizedWidgetConnector::NodeVisibilityChanged,
     nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SetNodeVisibility);
 
@@ -115,6 +118,17 @@ void QmitkSynchronizedWidgetConnector::SynchronizeWidget(QmitkSynchronizedNodeSe
   }
 
   nodeSelectionWidget->SetSelectAll(m_SelectAll);
+
+  // Need to explicitly set visibility true, since selected but invisible nodes in the sync group don't trigger selection changes
+  for (auto& node : nodeSelectionWidget->GetSelectedNodes())
+  {
+    nodeSelectionWidget->SetNodeVisibility(node, true);
+  }
+
+  for (auto& node : this->m_InternalInvisibles)
+  {
+    nodeSelectionWidget->SetNodeVisibility(node, false);
+  }
 }
 
 QmitkSynchronizedWidgetConnector::NodeList QmitkSynchronizedWidgetConnector::GetNodeSelection() const
@@ -143,6 +157,14 @@ void QmitkSynchronizedWidgetConnector::ChangeSelectionMode(bool selectAll)
     m_SelectAll = selectAll;
     emit SelectionModeChanged(m_SelectAll);
   }
+}
+
+void QmitkSynchronizedWidgetConnector::OnNodeVisibilityChanged(mitk::DataNode::Pointer node, bool const visibility)
+{
+  if (!visibility)
+    this->m_InternalInvisibles.insert(node.GetPointer());
+  else
+    this->m_InternalInvisibles.remove(node.GetPointer());
 }
 
 void QmitkSynchronizedWidgetConnector::DeregisterWidget()

@@ -18,12 +18,11 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * Writes a MultiLabelSegmentation to a file.
+  * Writes a MultiLabelSegmentation as stacks of nifti files includin meta
+  * information as mitklabel.json file.
   * mitk::Identifiable UID is supported and will be serialized.
   * @ingroup Process
   */
-  // The export macro should be removed. Currently, the unit
-  // tests directly instantiate this class.
   class MultiLabelSegmentationStackNiftiWriter : public MultiLabelSegmentationStackWriterBase
   {
   public:

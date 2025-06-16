@@ -11,27 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkMultiLabelSegmentationStackWriterBase.h"
-#include "mitkMultiLabelSegmentationIO.h"
-#include "mitkBasePropertySerializer.h"
-#include "mitkIOMimeTypes.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkMultiLabelIOHelper.h"
 #include "mitkLabelSetImageConverter.h"
 #include <mitkLocaleSwitch.h>
-#include <mitkArbitraryTimeGeometry.h>
-#include <mitkIPropertyPersistence.h>
-#include <mitkCoreServices.h>
 #include <mitkItkImageIO.h>
-#include <mitkUIDManipulator.h>
 
 // itk
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
-#include "itkMetaDataDictionary.h"
-#include "itkMetaDataObject.h"
-#include "itkNrrdImageIO.h"
-
-#include <tinyxml2.h>
+#include <itksys/SystemTools.hxx>
 
 namespace
 {
@@ -156,6 +143,10 @@ namespace mitk
     stackContent["version"] = "1";
     stackContent["type"] = "org.mitk.multilabel.segmentation.stack";
     stackContent["groups"] = metaInfo;
+    if (auto properties = input->GetPropertyList(); !properties->IsEmpty())
+      properties->ToJSON(stackContent["properties"]);
+    stackContent["uid"] = input->GetUID();
+
     const auto metaFileName = fileStemPath + ".mitklabel.json";
     MITK_INFO << "Writing meta data for segmentation: " << metaFileName << std::endl;
     std::ofstream file(metaFileName);

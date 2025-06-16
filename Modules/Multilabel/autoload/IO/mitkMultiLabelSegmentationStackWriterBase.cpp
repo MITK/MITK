@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelSegmentationStackIOBase.h"
+#include "mitkMultiLabelSegmentationStackWriterBase.h"
 #include "mitkMultiLabelSegmentationIO.h"
 #include "mitkBasePropertySerializer.h"
 #include "mitkIOMimeTypes.h"
@@ -43,7 +43,7 @@ namespace mitk
   const constexpr char* const MULTILABEL_SEGMENTATION_LABELS_INFO_KEY = "org.mitk.multilabel.segmentation.labelgroups";
   const constexpr char* const MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY = "org.mitk.multilabel.segmentation.unlabeledlabellock";
 
-  MultiLabelSegmentationStackIOBase::MultiLabelSegmentationStackIOBase()
+  MultiLabelSegmentationStackWriterBase::MultiLabelSegmentationStackWriterBase()
     : AbstractFileIO(MultiLabelSegmentation::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Segmentation Stack")
   {
     this->InitializeDefaultMetaDataKeys();
@@ -52,7 +52,7 @@ namespace mitk
     this->RegisterService();
   }
 
-  IFileIO::ConfidenceLevel MultiLabelSegmentationStackIOBase::GetWriterConfidenceLevel() const
+  IFileIO::ConfidenceLevel MultiLabelSegmentationStackWriterBase::GetWriterConfidenceLevel() const
   {
     if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
       return Unsupported;
@@ -63,7 +63,7 @@ namespace mitk
       return Unsupported;
   }
 
-  void MultiLabelSegmentationStackIOBase::Write()
+  void MultiLabelSegmentationStackWriterBase::Write()
   {
     ValidateOutputLocation();
 
@@ -125,7 +125,7 @@ namespace mitk
     }
   }
 
-  IFileIO::ConfidenceLevel MultiLabelSegmentationStackIOBase::GetReaderConfidenceLevel() const
+  IFileIO::ConfidenceLevel MultiLabelSegmentationStackWriterBase::GetReaderConfidenceLevel() const
   {
     if (AbstractFileIO::GetReaderConfidenceLevel() == Unsupported)
       return Unsupported;
@@ -145,7 +145,7 @@ namespace mitk
       return Unsupported;
   }
 
-  std::vector<BaseData::Pointer> MultiLabelSegmentationStackIOBase::DoRead()
+  std::vector<BaseData::Pointer> MultiLabelSegmentationStackWriterBase::DoRead()
   {
     itk::NrrdImageIO::Pointer nrrdImageIO = itk::NrrdImageIO::New();
 
@@ -208,9 +208,9 @@ namespace mitk
     return result;
   }
 
-  MultiLabelSegmentationStackIOBase *MultiLabelSegmentationStackIOBase::IOClone() const { return new MultiLabelSegmentationStackIOBase(*this); }
+  MultiLabelSegmentationStackWriterBase *MultiLabelSegmentationStackWriterBase::IOClone() const { return new MultiLabelSegmentationStackWriterBase(*this); }
 
-  void MultiLabelSegmentationStackIOBase::InitializeDefaultMetaDataKeys()
+  void MultiLabelSegmentationStackWriterBase::InitializeDefaultMetaDataKeys()
   {
     this->m_DefaultMetaDataKeys.push_back("NRRD.space");
     this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");

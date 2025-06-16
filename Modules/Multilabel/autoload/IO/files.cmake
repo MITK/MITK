@@ -4,5 +4,5 @@ set(CPP_FILES
   mitkMultilabelIOMimeTypes.cpp
   mitkMultiLabelSegmentationIO.cpp
   mitkMultiLabelSegmentationSerializer.cpp
-  mitkMultiLabelSegmentationStackIOWriterBase.cpp
+  mitkMultiLabelSegmentationStackWriterBase.cpp
 )

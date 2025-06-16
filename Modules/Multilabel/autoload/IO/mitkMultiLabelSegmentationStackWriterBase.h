@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkMultiLabelSegmentationStackIOBase_h
-#define mitkMultiLabelSegmentationStackIOBase_h
+#ifndef mitkMultiLabelSegmentationStackWriterBase_h
+#define mitkMultiLabelSegmentationStackWriterBase_h
 
-#include <mitkAbstractFileIO.h>
+#include <mitkAbstractFileWriter.h>
 #include <mitkLabelSetImage.h>
 
 namespace mitk
@@ -25,12 +25,12 @@ namespace mitk
   */
   // The export macro should be removed. Currently, the unit
   // tests directly instantiate this class.
-  class MultiLabelSegmentationStackIOBase : public mitk::AbstractFileIO
+  class MultiLabelSegmentationStackWriterBase : public mitk::AbstractFileWriter
   {
   public:
     typedef mitk::MultiLabelSegmentation InputType;
 
-    MultiLabelSegmentationStackIOBase();
+    MultiLabelSegmentationStackWriterBase();
 
     // -------------- AbstractFileReader -------------
 
@@ -55,7 +55,7 @@ namespace mitk
     virtual void InitializeDefaultMetaDataKeys();
 
   private:
-    MultiLabelSegmentationStackIOBase *IOClone() const override;
+    MultiLabelSegmentationStackWriterBase *IOClone() const override;
 
     std::vector<std::string> m_DefaultMetaDataKeys;
   };

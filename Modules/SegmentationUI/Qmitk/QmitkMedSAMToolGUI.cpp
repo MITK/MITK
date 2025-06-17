@@ -280,14 +280,12 @@ void QmitkMedSAMToolGUI::OnResetPicksClicked()
 
 void QmitkMedSAMToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &event)
 {
-  QString statusMessage;
-  statusMessage += "A Preference change was detected. Please initialize the tool again.\n";
-  this->UpdateMedSAMStatusMessage(statusMessage);
-
   const std::string property = event.GetProperty();
-  const std::string modelType = "modeltype";
+  static const std::string modelType = "modeltype";
   if (property.compare(property.size() - modelType.size(), modelType.size(), modelType) == 0)
     return; // Model type change ignored.
+  QString statusMessage = "A Preference change was detected. Please initialize the tool again.\n";
+  this->UpdateMedSAMStatusMessage(statusMessage);
   auto tool = this->GetConnectedToolAs<mitk::MedSAMTool>();
   if (nullptr != tool)
   {

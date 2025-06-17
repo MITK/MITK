@@ -377,8 +377,8 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncGroupChanged, this, &QmitkMxNMultiWidget::SetSynchronizationGroup);
   connect(this, &QmitkMxNMultiWidget::SyncGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSyncGroupAdded);
 
-  // needs to be done after 'QmitkRenderWindowUtilityWidget::ToggleSynchronization' has been connected
-  // initially synchronize the node selection widget
+  // initialize the node selection widget with all nodes to set required properties, then synchronize with default group
+  utilityWidget->GetNodeSelectionWidget()->SelectAll();
   SetSynchronizationGroup(utilityWidget->GetNodeSelectionWidget(), 1);
 
 

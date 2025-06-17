@@ -160,7 +160,7 @@ void QmitkSetupVirtualEnvUtil::PrintProcessEvent(itk::Object * /*pCaller*/, cons
   }
 }
 
-void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir, CallbackType callback, const QString &torchVersion)
+void QmitkSetupVirtualEnvUtil::InstallPytorch(const QString &workingDir, CallbackType callback, const QString &torchVersion)
 {
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
@@ -171,19 +171,19 @@ void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir, Cal
   args.push_back("pip");
   args.push_back("install");
   args.push_back("light-the-torch==0.8.0");
-  spExec->Execute(workingDir, "python", args);
+  spExec->Execute(workingDir.toStdString(), "python", args);
   std::string torchVersionSpec = torchVersion.isEmpty() ? "torch>=2.0.0" : ("torch==" + torchVersion.toStdString());
-  PipInstall(torchVersionSpec, workingDir, callback, "ltt");
+  PipInstall(torchVersionSpec, workingDir.toStdString(), callback, "ltt");
 }
 
 void QmitkSetupVirtualEnvUtil::InstallPytorch(const QString &torchVersion)
 {
-  this->InstallPytorch(GetPythonPath().toStdString(), &PrintProcessEvent, torchVersion);
+  this->InstallPytorch(GetPythonPath(), &PrintProcessEvent, torchVersion);
 }
 
 void QmitkSetupVirtualEnvUtil::InstallPytorch(CallbackType callback, const QString &torchVersion)
 {
-  this->InstallPytorch(GetPythonPath().toStdString(), callback, torchVersion);
+  this->InstallPytorch(GetPythonPath(), callback, torchVersion);
 }
 
 bool QmitkSetupVirtualEnvUtil::IsVenvInstalled(const QString &pythonPath)

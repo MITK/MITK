@@ -112,7 +112,7 @@ public:
    * @param workingDir 
    * @param callback 
    */
-  void InstallPytorch(const std::string &workingDir, CallbackType callback, const QString& torchVersion = "");
+  void InstallPytorch(const QString &workingDir, CallbackType callback, const QString &torchVersion = "");
 
   /**
    * @brief Overloaded function to install pytorch using light-the-torch package, correctly 

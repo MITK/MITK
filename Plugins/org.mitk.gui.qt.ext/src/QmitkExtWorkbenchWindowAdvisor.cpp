@@ -60,6 +60,7 @@ found in the LICENSE file.
 #include <QmitkApplicationConstants.h>
 
 #include <itkConfigure.h>
+#include <mitkBaseApplication.h>
 #include <mitkVersion.h>
 #include <mitkIDataStorageService.h>
 #include <mitkIDataStorageReference.h>
@@ -614,6 +615,15 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   // Load icon theme
   QIcon::setThemeSearchPaths(QStringList() << QStringLiteral(":/org_mitk_icons/icons/"));
   QIcon::setThemeName(QStringLiteral("awesome"));
+
+  // Enable full screen support
+  if (auto application = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance()); application->getFullScreenMode())
+  {
+    mainWindow->setWindowFlags(Qt::FramelessWindowHint);
+    // Used that way as mainWindow->showMaximized() renders the application very
+    // unresponsive with around 5 FPS.
+    mainWindow->setGeometry(QApplication::primaryScreen()->geometry());
+  }
 
   // ==== Application menu ============================
 

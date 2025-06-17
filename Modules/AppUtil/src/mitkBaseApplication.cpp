@@ -175,7 +175,7 @@ namespace mitk
   const QString BaseApplication::ARG_LOG_QT_MESSAGES = "Qt.logMessages";
   const QString BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET = "Segmentation.labelSetPreset";
   const QString BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS = "Segmentation.labelSuggestions";
-  const QString BaseApplication::ARG_FULL_SCREEN_MODE = "Workbench.fullscreen";
+  const QString BaseApplication::ARG_FULL_SCREEN_MODE = "MITK.fullscreen";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
   const QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
@@ -714,26 +714,6 @@ namespace mitk
 
     // 10. Set the CTK Plugin Framework properties
     ctkPluginFrameworkLauncher::setFrameworkProperties(d->m_FWProps);
-
-    if (d->m_FullScreenMode)
-    {
-      // Set up a one-shot timer to make the window fullscreen after the whole
-      // initialization is done. Directly now the QMainWindow wouldn't be available.
-      QTimer::singleShot(500, []() {
-        // Access the workbench through berry Platform
-        QWidgetList topWidgets = QApplication::topLevelWidgets();
-        for (QWidget* widget : topWidgets)
-        {
-          if (QMainWindow* mainWindow = qobject_cast<QMainWindow*>(widget))
-          {
-            // Found the main window, make it fullscreen
-            mainWindow->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-            mainWindow->showFullScreen();
-            return;
-          }
-        }
-        });
-    }
   }
 
   void BaseApplication::uninitialize()

@@ -37,12 +37,13 @@ public:
    * @param packages : List of packages to be installed except Pytorch
    * @param validator : Functor to run and validate the virtual env setup
    * @param printCallback : ITK functor to custom print the virtual en setup log.
-   * 
+   * @param torchVersion: Exact version of pytorch version (optional)
    */
   bool SetupVirtualEnv(const QString &venvName,
                        const QStringList &packages,
                        std::function<bool()> validator,
-                       CallbackType printCallback);
+                       CallbackType printCallback,
+                       std::string torchVersion = "");
 
   /**
    * @brief Get the Virtual Env Path object. Override this method in the respective
@@ -111,19 +112,19 @@ public:
    * @param workingDir 
    * @param callback 
    */
-  void InstallPytorch(const std::string &workingDir, CallbackType callback);
+  void InstallPytorch(const std::string &workingDir, CallbackType callback, const std::string torchVersion = "");
 
   /**
    * @brief Overloaded function to install pytorch using light-the-torch package, correctly 
    * identifying cuda version.
    */
-  void InstallPytorch();
+  void InstallPytorch(const std::string torchVersion = "");
 
   /**
    * @brief Overloaded function to install pytorch using light-the-torch package, correctly
    * identifying cuda version.
    */
-  void InstallPytorch(CallbackType callback);
+  void InstallPytorch(CallbackType callback, const std::string torchVersion = "");
 
 
   /**

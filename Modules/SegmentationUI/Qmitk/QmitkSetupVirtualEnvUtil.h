@@ -43,7 +43,7 @@ public:
                        const QStringList &packages,
                        std::function<bool()> validator,
                        CallbackType printCallback,
-                       std::string torchVersion = "");
+                       const QString &torchVersion = "");
 
   /**
    * @brief Get the Virtual Env Path object. Override this method in the respective
@@ -112,19 +112,19 @@ public:
    * @param workingDir 
    * @param callback 
    */
-  void InstallPytorch(const std::string &workingDir, CallbackType callback, const std::string torchVersion = "");
+  void InstallPytorch(const std::string &workingDir, CallbackType callback, const QString& torchVersion = "");
 
   /**
    * @brief Overloaded function to install pytorch using light-the-torch package, correctly 
    * identifying cuda version.
    */
-  void InstallPytorch(const std::string torchVersion = "");
+  void InstallPytorch(const QString& torchVersion = "");
 
   /**
    * @brief Overloaded function to install pytorch using light-the-torch package, correctly
    * identifying cuda version.
    */
-  void InstallPytorch(CallbackType callback, const std::string torchVersion = "");
+  void InstallPytorch(CallbackType callback, const QString& torchVersion = "");
 
 
   /**

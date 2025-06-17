@@ -31,7 +31,7 @@ bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(const QString &venvName,
                                                const QStringList &packages,
                                                std::function<bool()> validator,
                                                CallbackType printCallback,
-                                               std::string torchVersion)
+                                               const QString &torchVersion)
 {
   if (this->GetSystemPythonPath().isEmpty())
   {
@@ -160,7 +160,7 @@ void QmitkSetupVirtualEnvUtil::PrintProcessEvent(itk::Object * /*pCaller*/, cons
   }
 }
 
-void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir, CallbackType callback, const std::string torchVersion)
+void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir, CallbackType callback, const QString &torchVersion)
 {
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
@@ -172,24 +172,16 @@ void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir, Cal
   args.push_back("install");
   args.push_back("light-the-torch==0.8.0");
   spExec->Execute(workingDir, "python", args);
-  std::string torchVersionSpec;
-  if (torchVersion.empty())
-  {
-    torchVersionSpec = "torch>=2.0.0";
-  }
-  else
-  {
-    torchVersionSpec = "torch==" + torchVersion;
-  }
+  std::string torchVersionSpec = torchVersion.isEmpty() ? "torch>=2.0.0" : ("torch==" + torchVersion.toStdString());
   PipInstall(torchVersionSpec, workingDir, callback, "ltt");
 }
 
-void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string torchVersion)
+void QmitkSetupVirtualEnvUtil::InstallPytorch(const QString &torchVersion)
 {
   this->InstallPytorch(GetPythonPath().toStdString(), &PrintProcessEvent, torchVersion);
 }
 
-void QmitkSetupVirtualEnvUtil::InstallPytorch(CallbackType callback, const std::string torchVersion)
+void QmitkSetupVirtualEnvUtil::InstallPytorch(CallbackType callback, const QString &torchVersion)
 {
   this->InstallPytorch(GetPythonPath().toStdString(), callback, torchVersion);
 }

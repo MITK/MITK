@@ -151,7 +151,7 @@ public Q_SLOTS:
   * @param  node   A pointer to the data node for which visibility was toggled.
   * @param  visibility   The new visibility of the respective data node.
   */
-  void OnNodeVisibilityChanged(mitk::DataNode::Pointer node, const bool visibility);
+  void OnNodeVisibilityChanged(mitk::DataNode::Pointer node, bool visibility);
 
   /*
   * @brief Decrease the internal counter of connections to keep track of how many
@@ -166,7 +166,7 @@ public Q_SLOTS:
 private:
 
   NodeList m_InternalSelection;
-  QSet<mitk::DataNode*> m_InternalInvisibles;
+  std::set<mitk::DataNode*> m_InternalInvisibles;
   bool m_SelectAll;
   unsigned int m_ConnectionCounter;
 

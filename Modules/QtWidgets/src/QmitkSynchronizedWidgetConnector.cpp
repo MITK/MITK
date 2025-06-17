@@ -159,12 +159,12 @@ void QmitkSynchronizedWidgetConnector::ChangeSelectionMode(bool selectAll)
   }
 }
 
-void QmitkSynchronizedWidgetConnector::OnNodeVisibilityChanged(mitk::DataNode::Pointer node, bool const visibility)
+void QmitkSynchronizedWidgetConnector::OnNodeVisibilityChanged(mitk::DataNode::Pointer node, bool visibility)
 {
   if (!visibility)
     this->m_InternalInvisibles.insert(node.GetPointer());
   else
-    this->m_InternalInvisibles.remove(node.GetPointer());
+    this->m_InternalInvisibles.erase(node.GetPointer());
 }
 
 void QmitkSynchronizedWidgetConnector::DeregisterWidget()

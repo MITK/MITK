@@ -56,6 +56,7 @@ found in the LICENSE file.
 
 #include <itkConfigure.h>
 #include <mitkVersion.h>
+#include <mitkBaseApplication.h>
 #include <mitkIDataStorageService.h>
 #include <mitkIDataStorageReference.h>
 #include <mitkDataStorageEditorInput.h>

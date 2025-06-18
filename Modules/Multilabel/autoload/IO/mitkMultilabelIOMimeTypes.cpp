@@ -58,7 +58,7 @@ bool mitk::MitkMultilabelIOMimeTypes::LegacyLabelSetMimeType::AppliesTo(const st
   }
   catch(const std::exception& e)
   {
-    MITK_DEBUG << "Error while try to anylize NRRD file for LegacyLabelSetMimeType. File: " << path <<"; Error: " << e.what();
+    MITK_DEBUG << "Error while try to analyze NRRD file for LegacyLabelSetMimeType. File: " << path <<"; Error: " << e.what();
   }
   catch(...)
   {
@@ -88,9 +88,38 @@ std::string mitk::MitkMultilabelIOMimeTypes::LEGACYLABELSET_MIMETYPE_NAME()
   return IOMimeTypes::DEFAULT_BASE_NAME() + ".legacylabelsetimage";
 }
 
+mitk::MitkMultilabelIOMimeTypes::MultiLabelMetaMimeType::MultiLabelMetaMimeType()
+  : CustomMimeType(MULTILABELMETA_MIMETYPE_NAME())
+{
+  this->AddExtension("mitklabel.json");
+  this->SetCategory("MITK MultiLabel");
+  this->SetComment("MITK MultiLabel meta data");
+}
+
+mitk::MitkMultilabelIOMimeTypes::MultiLabelMetaMimeType* mitk::MitkMultilabelIOMimeTypes::MultiLabelMetaMimeType::Clone() const
+{
+  return new MultiLabelMetaMimeType(*this);
+}
+
+bool mitk::MitkMultilabelIOMimeTypes::MultiLabelMetaMimeType::AppliesTo(const std::string& path) const
+{
+  return CustomMimeType::AppliesTo(path);
+};
+
+mitk::MitkMultilabelIOMimeTypes::MultiLabelMetaMimeType mitk::MitkMultilabelIOMimeTypes::MULTILABELMETA_MIMETYPE()
+{
+  return MultiLabelMetaMimeType();
+}
+
+std::string mitk::MitkMultilabelIOMimeTypes::MULTILABELMETA_MIMETYPE_NAME()
+{
+  return IOMimeTypes::DEFAULT_BASE_NAME() + ".multilabel.meta";
+}
+
 std::vector<mitk::CustomMimeType*> mitk::MitkMultilabelIOMimeTypes::Get()
 {
   std::vector<CustomMimeType*> mimeTypes;
   mimeTypes.push_back(LEGACYLABELSET_MIMETYPE().Clone());
+  mimeTypes.push_back(MULTILABELMETA_MIMETYPE().Clone());
   return mimeTypes;
 }

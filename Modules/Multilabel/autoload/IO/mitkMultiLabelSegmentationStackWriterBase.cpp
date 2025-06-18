@@ -28,6 +28,7 @@ namespace
   const constexpr char* const OPTION_INSTANCE_VALUE = "Instance value";
   const constexpr char* const OPTION_INSTANCE_VALUE_BINARY = "binary";
   const constexpr char* const OPTION_INSTANCE_VALUE_ORIGINAL = "original";
+  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 2;
 }
 
 namespace mitk
@@ -140,7 +141,7 @@ namespace mitk
     }
 
     nlohmann::json stackContent;
-    stackContent["version"] = "1";
+    stackContent["version"] = MULTILABEL_SEGMENTATION_VERSION_VALUE;
     stackContent["type"] = "org.mitk.multilabel.segmentation.stack";
     stackContent["groups"] = metaInfo;
     if (auto properties = input->GetPropertyList(); !properties->IsEmpty())

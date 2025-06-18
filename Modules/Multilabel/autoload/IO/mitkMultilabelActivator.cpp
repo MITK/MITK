@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "mitkLegacyLabelSetImageIO.h"
 #include "mitkMultiLabelSegmentationIO.h"
 #include "mitkMultiLabelSegmentationStackNiftiWriter.h"
+#include "mitkMultiLabelSegmentationStackReader.h"
 #include "mitkMultilabelIOMimeTypes.h"
 
 #include <memory>
@@ -31,6 +32,7 @@ namespace mitk
     std::vector<std::unique_ptr<AbstractFileIO>> m_FileIOs;
     std::unique_ptr<IFileReader> m_LegacyLabelSetImageIOReader;
     std::unique_ptr<MultiLabelSegmentationStackNiftiWriter> m_MultiLabelSegmentationStackNiftiWriter;
+    std::unique_ptr<MultiLabelSegmentationStackReader> m_MultiLabelSegmentationStackReader;
 
   public:
     void Load(us::ModuleContext *context) override
@@ -48,6 +50,7 @@ namespace mitk
       m_FileIOs.push_back(std::make_unique<MultiLabelSegmentationIO>());
 
       m_MultiLabelSegmentationStackNiftiWriter = std::make_unique<MultiLabelSegmentationStackNiftiWriter>();
+      m_MultiLabelSegmentationStackReader = std::make_unique<MultiLabelSegmentationStackReader>();
     }
 
     void Unload(us::ModuleContext *) override

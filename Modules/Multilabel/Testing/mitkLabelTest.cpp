@@ -60,7 +60,7 @@ public:
   void TestSetName()
   {
     mitk::Label::Pointer label = mitk::Label::New();
-    std::string initialName("noName!");
+    std::string initialName("Unknown label name");
     std::string labelName = label->GetName();
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong name", initialName.compare(labelName) == 0);
 
@@ -108,7 +108,7 @@ public:
     mitk::Label::Pointer label = mitk::Label::New();
     mitk::Color currentColor = label->GetColor();
     mitk::Color colorToBeCompared;
-    colorToBeCompared.Set(0, 0, 0);
+    colorToBeCompared.Set(1., 1., 1.);
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong color", currentColor.GetBlue() == colorToBeCompared.GetBlue());
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong color", currentColor.GetGreen() == colorToBeCompared.GetGreen());
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong color", currentColor.GetRed() == colorToBeCompared.GetRed());

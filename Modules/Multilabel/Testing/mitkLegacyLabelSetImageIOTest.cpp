@@ -37,7 +37,7 @@ private:
   mitk::MultiLabelSegmentation::ConstLabelVectorType m_labelSet2_adapted;
 
 public:
-  mitk::Label::Pointer GenerateLabel(mitk::Label::PixelType value, const std::string& name, float r, float g, float b) const
+  mitk::Label::Pointer GenerateLabel(mitk::Label::PixelType value, const std::string& name, float r, float g, float b, int layer) const
   {
     auto label = mitk::Label::New(value, name);
     mitk::Color color;
@@ -45,24 +45,24 @@ public:
     color.SetGreen(g);
     color.SetBlue(b);
     label->SetColor(color);
-
+    label->SetIntProperty("layer", layer);
     return label;
   }
 
   void setUp() override
   {
-    auto label = GenerateLabel(1, "Label 1", 0.745098054f, 0.f, 0.196078435f);
-    auto label2 = GenerateLabel(2, "Label 2", 0.952941179, 0.764705896, 0);
+    auto label = GenerateLabel(1, "Label 1", 0.745098054f, 0.f, 0.196078435f,0);
+    auto label2 = GenerateLabel(2, "Label 2", 0.952941179, 0.764705896, 0, 0);
     m_labelSet1 = { label, label2 };
 
-    label = GenerateLabel(1, "Label 3", 0.552941203, 0.713725507, 0);
-    label2 = GenerateLabel(2, "Label 4", 0.631372571, 0.792156875, 0.945098042);
-    auto label3 = GenerateLabel(3, "Label 5", 0.639215708, 0.250980407, 0.725490212);
+    label = GenerateLabel(1, "Label 3", 0.552941203, 0.713725507, 0, 1);
+    label2 = GenerateLabel(2, "Label 4", 0.631372571, 0.792156875, 0.945098042, 1);
+    auto label3 = GenerateLabel(3, "Label 5", 0.639215708, 0.250980407, 0.725490212, 1);
     m_labelSet2 = { label, label2, label3 };
 
-    label = GenerateLabel(3, "Label 3", 0.552941203, 0.713725507, 0);
-    label2 = GenerateLabel(4, "Label 4", 0.631372571, 0.792156875, 0.945098042);
-    label3 = GenerateLabel(5, "Label 5", 0.639215708, 0.250980407, 0.725490212);
+    label = GenerateLabel(3, "Label 3", 0.552941203, 0.713725507, 0, 1);
+    label2 = GenerateLabel(4, "Label 4", 0.631372571, 0.792156875, 0.945098042, 1);
+    label3 = GenerateLabel(5, "Label 5", 0.639215708, 0.250980407, 0.725490212, 1);
     m_labelSet2_adapted = { label, label2, label3 };
   }
 

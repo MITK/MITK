@@ -151,7 +151,7 @@ namespace mitk
      * @param listOfLabelGroups JSON representation of label groups
      * @return vector of label group metadata
      */
-    static std::vector<LabelGroupMetaData> DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets);
+    static std::vector<LabelGroupMetaData> DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelGroups);
 
     /**
      * @brief Serialize a single label to JSON
@@ -173,6 +173,25 @@ namespace mitk
      * @return JSON representation of the property
      */
     static nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelPropertyToJSON(const BaseProperty* property);
+
+    template<typename TValueType>
+    static bool GetValueFromJson(const nlohmann::json& labelJson, const std::string& key, TValueType& value)
+    {
+      if (labelJson.find(key) != labelJson.end())
+      {
+        try
+        {
+          value = labelJson[key].get<TValueType>();
+          return true;
+        }
+        catch (...)
+        {
+          MITK_ERROR << "Unable to read label information from json. Value has wrong type. Failed key: " << key << "; invalid value: " << labelJson[key].dump();
+          throw;
+        }
+      }
+      return false;
+    }
 
   private:
     MultiLabelIOHelper();

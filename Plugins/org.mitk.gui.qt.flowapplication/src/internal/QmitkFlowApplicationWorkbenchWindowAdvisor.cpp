@@ -408,7 +408,7 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   if (auto application = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance()); application->getFullScreenMode())
   {
     mainWindow->setWindowFlags(Qt::FramelessWindowHint);
-    // Used that way as mainWindow->showMaximized() renders the application very
+    // Used that way as mainWindow->showFullscreen() renders the application very
     // unresponsive with around 5 FPS.
     mainWindow->setGeometry(QApplication::primaryScreen()->geometry());
   }

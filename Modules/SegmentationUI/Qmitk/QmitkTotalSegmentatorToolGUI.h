@@ -110,7 +110,8 @@ protected:
     "kidney_cysts",
     "breasts",
     "liver_segments",
-    "liver_segments_mr"
+    "liver_segments_mr",
+    "craniofacial_structures"
   };
 
   const QStringList LICENSED_TASKS = {"heartchambers_highres",

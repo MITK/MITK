@@ -254,7 +254,8 @@ void QmitkTotalSegmentatorPreferencePage::OnInstallButtonClicked()
           m_Installer.ExecutePython(pythonCode, &QmitkTotalSegmentatorToolInstaller::PrintProcessEvent);
           return true;
         },
-        &QmitkTotalSegmentatorToolInstaller::PrintProcessEvent);
+        &QmitkTotalSegmentatorToolInstaller::PrintProcessEvent,
+        "2.7.1");
       });
   while (future.isRunning())
   {

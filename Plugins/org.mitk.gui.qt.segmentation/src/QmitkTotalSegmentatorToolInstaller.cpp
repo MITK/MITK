@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <QMutex>
 
 const QString QmitkTotalSegmentatorToolInstaller::VENV_NAME = ".totalsegmentator_v2";
-const QString QmitkTotalSegmentatorToolInstaller::TOTALSEGMENTATOR_VERSION = "2.8.0";
+const QString QmitkTotalSegmentatorToolInstaller::TOTALSEGMENTATOR_VERSION = "2.9.0";
 const QStringList QmitkTotalSegmentatorToolInstaller::PACKAGES = {
     "Totalsegmentator==" + TOTALSEGMENTATOR_VERSION,
     "nnunetv2<=2.6.0",

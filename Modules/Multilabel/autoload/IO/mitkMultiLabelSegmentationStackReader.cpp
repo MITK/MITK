@@ -13,9 +13,7 @@ found in the LICENSE file.
 #include "mitkMultiLabelSegmentationStackReader.h"
 
 #include "mitkMultilabelIOMimeTypes.h"
-#include "mitkImageAccessByItk.h"
 #include "mitkMultiLabelIOHelper.h"
-#include "mitkLabelSetImageConverter.h"
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkIPropertyPersistence.h>
@@ -26,35 +24,36 @@ found in the LICENSE file.
 
 // itk
 #include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
-#include "itkMetaDataDictionary.h"
-#include "itkMetaDataObject.h"
-#include "itkNrrdImageIO.h"
 
 namespace
 {
 
   const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_VALUE = "org.mitk.multilabel.segmentation";
   const constexpr char* const MULTILABEL_SEGMENTATION_VERSION_KEY = "org.mitk.multilabel.segmentation.version";
-  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 2;
+  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 3;
   const constexpr char* const MULTILABEL_SEGMENTATION_LABELS_INFO_KEY = "org.mitk.multilabel.segmentation.labelgroups";
   const constexpr char* const MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY = "org.mitk.multilabel.segmentation.unlabeledlabellock";
 
-  mitk::Image::Pointer LoadImageBasedOnFileName(const std::string& fileName)
+  mitk::Image::Pointer LoadImageBasedOnFileName(const std::string& fileName, const std::string& fileBase)
   {
+    const auto loadPath = itksys::SystemTools::FileIsFullPath(fileName.c_str()) ?
+      fileName :
+      itksys::SystemTools::CollapseFullPath(fileName, fileBase);
+
     //We use directly itk instead of mitk::IOUtil. The latter would be more flexible, but recursive
     //calling of the io services is not working as they are statefull (e.g. the file name).
     auto imageIO = itk::ImageIOFactory::CreateImageIO(
-      fileName.c_str(), itk::CommonEnums::IOFileMode::ReadMode);
+      loadPath.c_str(), itk::CommonEnums::IOFileMode::ReadMode);
 
     if (nullptr == imageIO)
-      mitkThrow() << "Cannot load image. ITK does not support the format. Unsupported file: " << fileName;
+    {
+      mitkThrow() << "Cannot load image. ITK does not support the format. Unsupported file: " << loadPath;
+    }
 
-    return mitk::ItkImageIO::LoadRawMitkImageFromImageIO(imageIO, fileName);
-
+    return mitk::ItkImageIO::LoadRawMitkImageFromImageIO(imageIO, loadPath);
   }
 
-  mitk::Image::Pointer LoadImageBasedOnFileProperty(const mitk::PropertyList* properties)
+  mitk::Image::Pointer LoadImageBasedOnFileProperty(const mitk::PropertyList* properties, const std::string& fileBase)
   {
     std::string fileName;
     bool imageDefined = properties->GetStringProperty("file", fileName);
@@ -62,7 +61,7 @@ namespace
     mitk::Image::Pointer image;
     if (imageDefined)
     {
-      image = LoadImageBasedOnFileName(fileName);
+      image = LoadImageBasedOnFileName(fileName, fileBase);
     }
 
     return image;
@@ -188,6 +187,8 @@ namespace
       return result;
     }
 
+    auto filePathBase = itksys::SystemTools::GetFilenamePath(this->GetLocalFileName());
+
     nlohmann::json fileContent;
     try
     {
@@ -220,7 +221,7 @@ namespace
 
     for (const auto& groupInfo : groupInfos)
     {
-      auto groupImage = LoadImageBasedOnFileProperty(groupInfo.properties);
+      auto groupImage = LoadImageBasedOnFileProperty(groupInfo.properties, filePathBase);
       auto cleanedLabels = CleanImportLabels(groupInfo.labels);
 
       if (!segInitialized)
@@ -236,7 +237,7 @@ namespace
           auto firstFileName = FindFirstFileInJson(fileContent["groups"]);
           if (!firstFileName.empty())
           {
-            initImage = LoadImageBasedOnFileName(firstFileName);
+            initImage = LoadImageBasedOnFileName(firstFileName, filePathBase);
           }
         }
 
@@ -263,7 +264,7 @@ namespace
 
       for (const auto& label : groupInfo.labels)
       {
-        mitk::Image::Pointer labelImage = LoadImageBasedOnFileProperty(label);
+        mitk::Image::Pointer labelImage = LoadImageBasedOnFileProperty(label, filePathBase);
         if (labelImage.IsNotNull())
         {
           if (!segInitialized)

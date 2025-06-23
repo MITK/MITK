@@ -3,6 +3,7 @@ set(MODULE_TESTS
     mitkLabelSetImageTest.cpp
     mitkLegacyLabelSetImageIOTest.cpp
     mitkMultiLabelSegmentationIOTest.cpp
+    mitkMultiLabelSegmentationStackReaderTest.cpp
     mitkTransferLabelTest.cpp
 )
 

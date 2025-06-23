@@ -111,7 +111,7 @@ namespace mitk
     *   react to events from / send changes to renderers whose name begins with this prefix.
     *
     */
-    virtual void InitActionsImpl(std::string prefixFilter = "") { }
+    virtual void InitActionsImpl(std::string /* prefixFilter = "" */) { }
 
     WeakPointer<DisplayActionEventBroadcast> m_ObservableBroadcast;
     std::vector<OberserverTagType> m_ObserverTags;

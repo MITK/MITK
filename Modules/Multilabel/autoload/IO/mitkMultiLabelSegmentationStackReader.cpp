@@ -28,7 +28,7 @@ found in the LICENSE file.
 namespace
 {
 
-  const constexpr char* const MULTILABEL_SEGMENTATION_TYPE_VALUE = "org.mitk.multilabel.segmentation.stackn";
+  const constexpr char* const MULTILABEL_SEGMENTATION_TYPE_VALUE = "org.mitk.multilabel.segmentation.stack";
   const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 3;
 
   mitk::Image::Pointer LoadImageBasedOnFileName(const std::string& fileName, const std::string& fileBase)

@@ -172,7 +172,7 @@ namespace mitk
      * @param property Pointer to the property that should be serialized
      * @return JSON representation of the property
      */
-    static nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelPropertyToJSON(const BaseProperty* property);
+    static nlohmann::json SerializeLabelPropertyToJSON(const BaseProperty* property);
 
     template<typename TValueType>
     static bool GetValueFromJson(const nlohmann::json& labelJson, const std::string& key, TValueType& value)

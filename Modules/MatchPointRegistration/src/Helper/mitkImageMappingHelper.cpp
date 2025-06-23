@@ -137,7 +137,7 @@ void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Imag
       const auto voxelCount = static_cast<typename ResultImageDescriptorType::SizeType::SizeValueType>(geoBounds[(2 * i) + 1] - geoBounds[2 * i]);
       size[i] = voxelCount*fieldSpacing[i];
 
-      if (floor(size[i] / fieldSpacing[i]) < floor(voxelCount))
+      if (std::floor(size[i] / fieldSpacing[i]) < std::floor(voxelCount))
       {
         // MatchPoint in the ImageMappingTask internally computes the number of voxels and floors the result
         // to ensure the discretized voxel volume is never larger then the requested real world coordinate

@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkMultiLabelSegmentationStackNiftiWriter.h"
 
-#include "mitkIOMimeTypes.h"
+#include "mitkMultilabelIOMimeTypes.h"
 
 // itk
 #include "itkNiftiImageIO.h"
@@ -20,7 +20,7 @@ found in the LICENSE file.
 namespace mitk
 {
   MultiLabelSegmentationStackNiftiWriter::MultiLabelSegmentationStackNiftiWriter()
-    : MultiLabelSegmentationStackWriterBase(IOMimeTypes::NIFTI_MIMETYPE(), "MITK ML Segmentation NIFTI Stack")
+    : MultiLabelSegmentationStackWriterBase(MitkMultilabelIOMimeTypes::MULTILABEL_NIFTISTACK_MIMETYPE(), "MITK ML Segmentation NIFTI Stack")
   {
     AbstractFileWriter::SetRanking(5);
     this->RegisterService();
@@ -33,5 +33,9 @@ namespace mitk
     return itk::NiftiImageIO::New();
   }
 
+  std::string MultiLabelSegmentationStackNiftiWriter::GetStackImageExtension() const
+  {
+    return ".nii.gz";
+  }
 
 } // namespace

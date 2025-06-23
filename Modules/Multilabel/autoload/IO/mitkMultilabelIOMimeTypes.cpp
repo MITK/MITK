@@ -186,11 +186,49 @@ std::string mitk::MitkMultilabelIOMimeTypes::MULTILABELMETA_MIMETYPE_NAME()
   return IOMimeTypes::DEFAULT_BASE_NAME() + ".multilabel.meta";
 }
 
+mitk::MitkMultilabelIOMimeTypes::MultiLabelNiftiStackMimeType::MultiLabelNiftiStackMimeType()
+  : CustomMimeType(MULTILABEL_NIFTISTACK_MIMETYPE_NAME())
+{
+  this->AddExtension("mitklabel.json");
+  this->AddExtension("nii");
+  this->AddExtension("nii.gz");
+  this->AddExtension("NII");
+  this->AddExtension("NII.GZ");
+  this->SetCategory("MITK MultiLabel");
+  this->SetComment("MITK Segmentation NIFTI Stack");
+}
+
+bool mitk::MitkMultilabelIOMimeTypes::MultiLabelNiftiStackMimeType::AppliesTo(const std::string& path) const
+{
+  bool canRead = CustomMimeType::AppliesTo(path);
+
+  if (!fs::exists(path)) // T18572
+    return canRead;
+
+  return canRead;
+}
+
+mitk::MitkMultilabelIOMimeTypes::MultiLabelNiftiStackMimeType* mitk::MitkMultilabelIOMimeTypes::MultiLabelNiftiStackMimeType::Clone() const
+{
+  return new MultiLabelNiftiStackMimeType(*this);
+}
+
+mitk::MitkMultilabelIOMimeTypes::MultiLabelNiftiStackMimeType mitk::MitkMultilabelIOMimeTypes::MULTILABEL_NIFTISTACK_MIMETYPE()
+{
+  return MultiLabelNiftiStackMimeType();
+}
+
+std::string mitk::MitkMultilabelIOMimeTypes::MULTILABEL_NIFTISTACK_MIMETYPE_NAME()
+{
+  return IOMimeTypes::DEFAULT_BASE_NAME() + ".multilabel.segmentation.stack.nifti";
+}
+
 std::vector<mitk::CustomMimeType*> mitk::MitkMultilabelIOMimeTypes::Get()
 {
   std::vector<CustomMimeType*> mimeTypes;
   mimeTypes.push_back(LEGACYLABELSET_MIMETYPE().Clone());
   mimeTypes.push_back(MULTILABEL_SEGMENTATION_MIMETYPE().Clone());
   mimeTypes.push_back(MULTILABELMETA_MIMETYPE().Clone());
+  mimeTypes.push_back(MULTILABEL_NIFTISTACK_MIMETYPE().Clone());
   return mimeTypes;
 }

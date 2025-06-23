@@ -41,6 +41,7 @@ namespace mitk
 
   protected:
     virtual itk::ImageIOBase::Pointer GetITKIO() const = 0;
+    virtual std::string GetStackImageExtension() const = 0;
 
   private:
     std::vector<std::string> m_DefaultMetaDataKeys;

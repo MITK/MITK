@@ -31,7 +31,7 @@ namespace mitk
 
   protected:
     itk::ImageIOBase::Pointer GetITKIO() const override;
-
+    std::string GetStackImageExtension() const override;
   private:
     MultiLabelSegmentationStackNiftiWriter *Clone() const override;
   };

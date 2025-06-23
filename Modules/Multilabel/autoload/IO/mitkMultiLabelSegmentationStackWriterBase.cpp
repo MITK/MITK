@@ -28,7 +28,7 @@ namespace
   const constexpr char* const OPTION_INSTANCE_VALUE = "Instance value";
   const constexpr char* const OPTION_INSTANCE_VALUE_BINARY = "binary";
   const constexpr char* const OPTION_INSTANCE_VALUE_ORIGINAL = "original";
-  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 2;
+  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 3;
 }
 
 namespace mitk
@@ -57,9 +57,29 @@ namespace mitk
       return Unsupported;
     const auto *input = static_cast<const MultiLabelSegmentation *>(this->GetInput());
     if (input)
+    {
+      if (input->GetTimeGeometry()->CountTimeSteps() > 1)
+      {
+        //currently 4D is not supported. Should be fixed by issue #599
+        return Unsupported;
+      }
+
       return Supported;
+    }
     else
+    {
       return Unsupported;
+    }
+  }
+
+
+  std::string GenerateGroupFilePath(const std::string& fileStemPath, const mitk::MultiLabelSegmentation::GroupIndexType& groupIndex, const std::string& fileExt)
+  {
+    return fileStemPath + "_group_" + std::to_string(groupIndex) + "" + fileExt;
+  }
+  std::string GenerateLabelFilePath(const std::string& fileStemPath, const mitk::MultiLabelSegmentation::LabelValueType& labelValue, const std::string& fileExt)
+  {
+    return fileStemPath + "_label_" + std::to_string(labelValue) + "" + fileExt;
   }
 
   void MultiLabelSegmentationStackWriterBase::Write()
@@ -76,8 +96,9 @@ namespace mitk
     LocalFile localFile(this);
     const auto path = localFile.GetFileName();
 
-    const auto fileExt = itksys::SystemTools::GetFilenameExtension(path);
-    const auto fileStemPath = itksys::SystemTools::JoinPath({"", itksys::SystemTools::GetFilenamePath(path), itksys::SystemTools::GetFilenameWithoutExtension(path)});
+    const auto imageFileExt = this->GetStackImageExtension();
+    const auto absFileStemPath = itksys::SystemTools::JoinPath({"", itksys::SystemTools::GetFilenamePath(path), itksys::SystemTools::GetFilenameWithoutExtension(path)});
+    const auto relFileStemPath = itksys::SystemTools::JoinPath({"", ".", itksys::SystemTools::GetFilenameWithoutExtension(path) });
 
     const auto saveStrategy = options.find(OPTION_SAVE_STRATEGY)->second.ToString();
 
@@ -85,9 +106,9 @@ namespace mitk
 
     if (groupSaveStrategy)
     {
-      auto groupFileNameCallback = [fileStemPath, fileExt](const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::GroupIndexType groupIndex)
+      auto groupFileNameCallback = [relFileStemPath, imageFileExt](const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::GroupIndexType groupIndex)
         {
-          return fileStemPath + "_group_" + std::to_string(groupIndex) + "" + fileExt;
+          return GenerateGroupFilePath(relFileStemPath, groupIndex, imageFileExt);
         };
 
       metaInfo = MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(input, groupFileNameCallback);
@@ -101,7 +122,7 @@ namespace mitk
       {
         const auto groupImage = input->GetGroupImage(groupID);
         ItkImageIO::PreparImageIOToWriteImage(imageIO, groupImage);
-        imageIO->SetFileName(groupFileNameCallback(input, groupID));
+        imageIO->SetFileName(GenerateGroupFilePath(absFileStemPath, groupID, imageFileExt));
 
         ImageReadAccessor imageAccess(groupImage);
         imageIO->Write(imageAccess.GetData());
@@ -109,9 +130,9 @@ namespace mitk
     }
     else
     {
-      auto labelFileNameCallback = [fileStemPath, fileExt](const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::LabelValueType labelValue)
+      auto labelFileNameCallback = [relFileStemPath, imageFileExt](const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::LabelValueType labelValue)
         {
-          return fileStemPath + "_label_" + std::to_string(labelValue) + "" + fileExt;
+          return GenerateLabelFilePath(relFileStemPath, labelValue, imageFileExt);
         };
 
       auto labelFileValueCallback = [binaryValueMapping](const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::LabelValueType labelValue)
@@ -133,7 +154,7 @@ namespace mitk
       {
         const auto labelImage = CreateLabelMask(input, labelValue, binaryValueMapping);
         ItkImageIO::PreparImageIOToWriteImage(imageIO, labelImage);
-        imageIO->SetFileName(labelFileNameCallback(input, labelValue));
+        imageIO->SetFileName(GenerateLabelFilePath(absFileStemPath, labelValue, imageFileExt));
 
         ImageReadAccessor imageAccess(labelImage);
         imageIO->Write(imageAccess.GetData());
@@ -143,12 +164,37 @@ namespace mitk
     nlohmann::json stackContent;
     stackContent["version"] = MULTILABEL_SEGMENTATION_VERSION_VALUE;
     stackContent["type"] = "org.mitk.multilabel.segmentation.stack";
+
+    //handle properties
     stackContent["groups"] = metaInfo;
     if (auto properties = input->GetPropertyList(); !properties->IsEmpty())
-      properties->ToJSON(stackContent["properties"]);
+    {
+      //clone properties to sort out the ones that should not be seriealized
+      auto cleanedProps = properties->Clone();
+      std::vector<std::string> unwantedPropNames = { "NRRD", "MITK.IO", "modality",
+        "org.mitk.multilabel.segmentation", "org.mitk.uid", "path"};
+
+      for (auto propName : cleanedProps->GetPropertyKeys())
+      {
+        for (auto unwantedName : unwantedPropNames)
+        {
+          // does the start match the default key
+          if (propName.substr(0, unwantedName.length()).find(unwantedName) != std::string::npos)
+          {
+            cleanedProps->RemoveProperty(propName);
+            break;
+          }
+        }
+      }
+      cleanedProps->ToJSON(stackContent["properties"]);
+
+    }
+
+    //handle UID
     stackContent["uid"] = input->GetUID();
 
-    const auto metaFileName = fileStemPath + ".mitklabel.json";
+    //save meta file
+    const auto metaFileName = absFileStemPath + ".mitklabel.json";
     MITK_INFO << "Writing meta data for segmentation: " << metaFileName << std::endl;
     std::ofstream file(metaFileName);
     if (file.is_open())

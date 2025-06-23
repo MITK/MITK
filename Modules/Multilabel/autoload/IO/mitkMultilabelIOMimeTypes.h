@@ -54,7 +54,21 @@ namespace mitk
 
     MITKMULTILABELIO_EXPORT MultiLabelMetaMimeType MULTILABELMETA_MIMETYPE();
     MITKMULTILABELIO_EXPORT std::string MULTILABELMETA_MIMETYPE_NAME();
+
+    class MITKMULTILABELIO_EXPORT MultiLabelNiftiStackMimeType : public CustomMimeType
+    {
+    public:
+      MultiLabelNiftiStackMimeType();
+
+      bool AppliesTo(const std::string& path) const override;
+      MultiLabelNiftiStackMimeType* Clone() const override;
+    };
+
+    MITKMULTILABELIO_EXPORT MultiLabelNiftiStackMimeType MULTILABEL_NIFTISTACK_MIMETYPE();
+    MITKMULTILABELIO_EXPORT std::string MULTILABEL_NIFTISTACK_MIMETYPE_NAME();
+
     MITKMULTILABELIO_EXPORT std::vector<CustomMimeType*> Get();
+
   }
 }
 

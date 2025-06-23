@@ -295,51 +295,6 @@ void QmitkConvertToMultiLabelSegmentationWidget::OnConvertPressed()
   }
 }
 
-
-mitk::Image::Pointer ConvertSurfaceToImage(const mitk::Image* refImage, const mitk::Surface* surface)
-{
-  mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
-  surfaceToImageFilter->MakeOutputBinaryOn();
-  surfaceToImageFilter->UShortBinaryPixelTypeOn();
-  surfaceToImageFilter->SetInput(surface);
-  surfaceToImageFilter->SetImage(refImage);
-  try
-  {
-    surfaceToImageFilter->Update();
-  }
-  catch (itk::ExceptionObject& excpt)
-  {
-    MITK_ERROR << excpt.GetDescription();
-    return nullptr;
-  }
-
-  return surfaceToImageFilter->GetOutput();
-}
-
-mitk::Image::Pointer ConvertContourModelSetToImage(mitk::Image* refImage, mitk::ContourModelSet* contourSet)
-{
-  // Use mitk::ContourModelSetToImageFilter to fill the ContourModelSet into the image
-  mitk::ContourModelSetToImageFilter::Pointer contourFiller = mitk::ContourModelSetToImageFilter::New();
-  contourFiller->SetImage(refImage);
-  contourFiller->SetInput(contourSet);
-  contourFiller->MakeOutputLabelPixelTypeOn();
-
-  try
-  {
-    contourFiller->Update();
-  }
-  catch (const std::exception& e)
-  {
-    MITK_ERROR << "Error while converting contour model. " << e.what();
-  }
-  catch (...)
-  {
-    MITK_ERROR << "Unknown error while converting contour model.";
-  }
-
-  return contourFiller->GetOutput();
-}
-
 void CheckForLabelCollision(const QmitkNodeSelectionDialog::NodeList& nodes,
   const std::map<const mitk::DataNode*, mitk::MultiLabelSegmentation::LabelValueVectorType>& foundLabelsMap,
   mitk::MultiLabelSegmentation::LabelValueVectorType& usedLabelValues,
@@ -422,17 +377,15 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     auto contourModelSet = dynamic_cast<mitk::ContourModelSet*>(node->GetData());
     if (nullptr != surface)
     {
-      convertedImage = ConvertSurfaceToImage(refImage, surface);
+      convertedImage = mitk::ConvertSurfaceToLabelMask(refImage, surface);
     }
     else if (nullptr != contourModelSet)
     {
-      convertedImage = ConvertContourModelSetToImage(refImage, contourModelSet);
+      convertedImage = mitk::ConvertContourModelSetToLabelMask(refImage, contourModelSet);
     }
     else if (nullptr != contourModel)
     {
-      auto contourModelSet = mitk::ContourModelSet::New();
-      contourModelSet->AddContourModel(contourModel);
-      convertedImage = ConvertContourModelSetToImage(refImage, contourModelSet);
+      convertedImage = mitk::ConvertContourModelToLabelMask(refImage, contourModel);
     }
     else
     {

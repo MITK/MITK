@@ -41,7 +41,6 @@ found in the LICENSE file.
 #include <mitkNodePredicateGeometry.h>
 #include <mitkColorProperty.h>
 #include <mitkException.h>
-#include "ConvertToMultiLabelSegmentation.h"
 
 // Global variables
 std::vector<std::string> inputFilenames;

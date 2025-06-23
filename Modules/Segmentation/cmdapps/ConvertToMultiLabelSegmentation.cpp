@@ -41,6 +41,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateGeometry.h>
 #include <mitkColorProperty.h>
 #include <mitkException.h>
+#include "ConvertToMultiLabelSegmentation.h"
 
 // Global variables
 std::vector<std::string> inputFilenames;
@@ -218,6 +219,14 @@ void CheckForLabelCollision(const std::vector<InputData>& inputs,
   }
 }
 
+bool IsUnsupportedDataType(InputData& inputData)
+{
+  return nullptr == dynamic_cast<mitk::Image*>(inputData.data.GetPointer()) &&
+    nullptr == dynamic_cast<mitk::Surface*>(inputData.data.GetPointer()) &&
+    nullptr == dynamic_cast<mitk::ContourModel*>(inputData.data.GetPointer()) &&
+    nullptr == dynamic_cast<mitk::ContourModelSet*>(inputData.data.GetPointer());
+}
+
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -225,16 +234,16 @@ int main(int argc, char* argv[])
 
   const std::map<std::string, us::Any>& parsedArgs = parser.parseArguments(argc, argv);
 
-  if (!configureApplicationSettings(parsedArgs))
-  {
-    MITK_ERROR << "Invalid command line arguments. Use -h or --help for usage information.";
-    return EXIT_FAILURE;
-  }
-
   if (parsedArgs.count("help") || parsedArgs.count("h"))
   {
     std::cout << parser.helpText();
     return EXIT_SUCCESS;
+  }
+
+  if (!configureApplicationSettings(parsedArgs))
+  {
+    MITK_ERROR << "Invalid command line arguments. Use -h or --help for usage information.";
+    return EXIT_FAILURE;
   }
 
   if (inputFilenames.empty())
@@ -272,10 +281,7 @@ int main(int argc, char* argv[])
         inputData.data = loadedData[0];
 
         // Check data type
-        if (nullptr == dynamic_cast<mitk::Image*>(inputData.data.GetPointer()) &&
-          nullptr == dynamic_cast<mitk::Surface*>(inputData.data.GetPointer()) &&
-          nullptr == dynamic_cast<mitk::ContourModel*>(inputData.data.GetPointer()) &&
-          nullptr == dynamic_cast<mitk::ContourModelSet*>(inputData.data.GetPointer()))
+        if (IsUnsupportedDataType(inputData))
         {
           MITK_ERROR << "Unsupported data type ("<< inputData.data->GetNameOfClass() << ")"
             "for file: " << filename;

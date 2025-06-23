@@ -28,11 +28,8 @@ found in the LICENSE file.
 namespace
 {
 
-  const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_VALUE = "org.mitk.multilabel.segmentation";
-  const constexpr char* const MULTILABEL_SEGMENTATION_VERSION_KEY = "org.mitk.multilabel.segmentation.version";
+  const constexpr char* const MULTILABEL_SEGMENTATION_TYPE_VALUE = "org.mitk.multilabel.segmentation.stackn";
   const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 3;
-  const constexpr char* const MULTILABEL_SEGMENTATION_LABELS_INFO_KEY = "org.mitk.multilabel.segmentation.labelgroups";
-  const constexpr char* const MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY = "org.mitk.multilabel.segmentation.unlabeledlabellock";
 
   mitk::Image::Pointer LoadImageBasedOnFileName(const std::string& fileName, const std::string& fileBase)
   {
@@ -169,7 +166,7 @@ namespace
       return Unsupported;
     }
 
-    if (fileContent.contains("type") && fileContent["type"] == "org.mitk.multilabel.segmentation.stack")
+    if (fileContent.contains("type") && fileContent["type"] == MULTILABEL_SEGMENTATION_TYPE_VALUE)
     {
       return Supported;
     }

@@ -18,24 +18,24 @@ found in the LICENSE file.
 // itk
 #include <itkEventObject.h>
 
-void mitk::DisplayActionEventHandlerStd::InitActionsImpl()
+void mitk::DisplayActionEventHandlerStd::InitActionsImpl(std::string prefixFilter /* = "" */)
 {
   // synchronized action event function
-  StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventFunctions::SetCrosshairSynchronizedAction();
+  StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventFunctions::SetCrosshairSynchronizedAction(prefixFilter);
   ConnectDisplayActionEvent(DisplaySetCrosshairEvent(nullptr, Point3D()), actionFunction);
 
   // desynchronized action event function
-  actionFunction = DisplayActionEventFunctions::MoveSenderCameraAction();
+  actionFunction = DisplayActionEventFunctions::MoveSenderCameraAction(prefixFilter);
   ConnectDisplayActionEvent(DisplayMoveEvent(nullptr, Vector2D()), actionFunction);
 
   // desynchronized action event function
-  actionFunction = DisplayActionEventFunctions::ZoomSenderCameraAction();
+  actionFunction = DisplayActionEventFunctions::ZoomSenderCameraAction(prefixFilter);
   ConnectDisplayActionEvent(DisplayZoomEvent(nullptr, 0.0, Point2D()), actionFunction);
 
   // desynchronized action event function
-  actionFunction = DisplayActionEventFunctions::ScrollSliceStepperAction();
+  actionFunction = DisplayActionEventFunctions::ScrollSliceStepperAction(prefixFilter);
   ConnectDisplayActionEvent(DisplayScrollEvent(nullptr, 0, true), actionFunction);
 
-  actionFunction = mitk::DisplayActionEventFunctions::SetLevelWindowAction();
+  actionFunction = mitk::DisplayActionEventFunctions::SetLevelWindowAction(prefixFilter);
   ConnectDisplayActionEvent(mitk::DisplaySetLevelWindowEvent(nullptr, mitk::ScalarType(), mitk::ScalarType()), actionFunction);
 }

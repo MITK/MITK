@@ -25,60 +25,84 @@ namespace mitk
     * @brief Returns an 'std::function' that can be used  to react on the 'DisplayMoveEvent'.
     *   The function performs a move of the camera controller of the sending renderer by a vector
     *   that was previously determined by the mouse interaction event.
+    *
+    * @param prefixFilter The prefix of associated renderer names. The action will only react to events from
+    *   renderers whose name begins with this prefix.
     */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveSenderCameraAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveSenderCameraAction(std::string prefixFilter = "");
     /**
     * @brief Returns an 'std::function' that can be used  to react on the 'DisplaySetCrosshairEvent'.
     *   The function performs a slice selection of the slice navigation controller and will set
     *   the cross hair for all 2D-render windows.
     *   The new position was previously determined by the mouse interaction event.
+    *
+    * @param prefixFilter The prefix of associated renderer names. The action will only react to events from
+    *   renderers whose name begins with this prefix.
     */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairAction(std::string prefixFilter = "");
     /**
     * @brief Returns an 'std::function' that can be used  to react on the 'DisplayZoomEvent'.
     *   The function performs a zoom of the camera controller of the sending renderer by a zoom factor
     *   that was previously determined by the mouse interaction event.
+    *
+    * @param prefixFilter The prefix of associated renderer names. The action will only react to events from
+    *   renderers whose name begins with this prefix.
     */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomSenderCameraAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomSenderCameraAction(std::string prefixFilter = "");
     /**
     * @brief Returns an 'std::function' that can be used  to react on the 'DisplayScrollEvent'.
     *   The function performs a slice scrolling of the slice navigation controller of the sending renderer.
     *   The new position was previously determined by the mouse interaction event.
+    *
+    * @param prefixFilter The prefix of associated renderer names. The action will only react to events from
+    *   renderers whose name begins with this prefix.
     */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperAction(std::string prefixFilter = "");
     /**
     * @brief Returns an 'std::function' that can be used  to react on the 'DisplaySetLevelWindowEvent'.
     *   The function sets the 'levelwindow' property of the topmost visible image that is display by the sending renderer.
     *   The level and window value for this property were previously determined by the mouse interaction event.
     */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetLevelWindowAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetLevelWindowAction(std::string prefixFilter = "");
     /**
     * @brief Returns an 'std::function' that can be used  to react on the 'DisplayMoveEvent'.
     *   The function performs a move of the camera controller of all renderer (synchronized)
     *   by a vector that was previously determined by the mouse interaction event.
     *   The renderer need to be managed by the same rendering manager.
+    *
+    * @param prefixFilter The prefix of associated renderer names. The action will only react to events from / send
+    *   changes to renderers whose name begins with this prefix.
     */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveCameraSynchronizedAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveCameraSynchronizedAction(std::string prefixFilter = "");
     /**
     * @brief Returns an 'std::function' that can be used  to react on the 'DisplaySetCrosshairEvent'.
     *   The function performs a slice selection of the slice navigation controller and will set
     *   the cross hair for all 2D-render windows.
     *   The new position was previously determined by the mouse interaction event.
+    *
+    * @param prefixFilter The prefix of associated renderer names. The action will only react to events from / send
+    *   changes to renderers whose name begins with this prefix.
     * @todo Currently there is no need to distinguish between this and the non-synchronized version
     */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairSynchronizedAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairSynchronizedAction(std::string prefixFilter = "");
     /**
     * @brief Returns an 'std::function' that can be used  to react on the 'DisplayZoomEvent'.
     *   The function performs a zoom of the camera controller of all 2D-renderer (synchronized)
     *   by a zoom factor that was previously determined by the mouse interaction event.
+    *
+    * @param prefixFilter The prefix of associated renderer names. The action will only react to events from / send
+    *   changes to renderers whose name begins with this prefix.
     */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomCameraSynchronizedAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomCameraSynchronizedAction(std::string prefixFilter = "");
     /**
     * @brief Returns an 'std::function' that can be used  to react on the 'DisplayScrollEvent'.
     *   The function performs a slice scrolling of the slice navigation controller of all 2D-renderer (synchronized).
     *   The new position was previously determined by the mouse interaction event.
+    *
+    * @param prefixFilter The prefix of associated renderer names. The action will only react to events from / send
+    *   changes to renderers whose name begins with this prefix.
     */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperSynchronizedAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperSynchronizedAction(std::string prefixFilter = "");
 
   } // end namespace DisplayActionEventFunctions
 } // end namespace mitk

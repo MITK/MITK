@@ -91,7 +91,7 @@ void QmitkStdMultiWidget::InitializeMultiWidget()
   auto displayActionEventHandler = GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
-    displayActionEventHandler->InitActions();
+    displayActionEventHandler->InitActions(this->GetMultiWidgetName().toStdString());
   }
 }
 

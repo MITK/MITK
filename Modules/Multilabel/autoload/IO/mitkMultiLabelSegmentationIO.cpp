@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkMultiLabelSegmentationIO.h"
 #include "mitkBasePropertySerializer.h"
-#include "mitkIOMimeTypes.h"
+#include "mitkMultilabelIOMimeTypes.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkMultiLabelIOHelper.h"
 #include "mitkLabelSetImageConverter.h"
@@ -38,12 +38,12 @@ namespace mitk
   const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_KEY = "modality";
   const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_VALUE = "org.mitk.multilabel.segmentation";
   const constexpr char* const MULTILABEL_SEGMENTATION_VERSION_KEY = "org.mitk.multilabel.segmentation.version";
-  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 2;
+  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 3;
   const constexpr char* const MULTILABEL_SEGMENTATION_LABELS_INFO_KEY = "org.mitk.multilabel.segmentation.labelgroups";
   const constexpr char* const MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY = "org.mitk.multilabel.segmentation.unlabeledlabellock";
 
   MultiLabelSegmentationIO::MultiLabelSegmentationIO()
-    : AbstractFileIO(MultiLabelSegmentation::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Multilabel Segmentation")
+    : AbstractFileIO(MultiLabelSegmentation::GetStaticNameOfClass(), MitkMultilabelIOMimeTypes::MULTILABEL_SEGMENTATION_MIMETYPE(), "MITK Multilabel Segmentation")
   {
     this->InitializeDefaultMetaDataKeys();
     AbstractFileWriter::SetRanking(10);
@@ -198,7 +198,20 @@ namespace mitk
     auto props = ItkImageIO::ExtractMetaDataAsPropertyList(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
     for (auto& [name, prop] : *(props->GetMap()))
     {
-      output->SetProperty(name, prop->Clone()); //need to clone to avoid that all outputs pointing to the same prop instances.
+      bool addProp = true;
+      for (auto unwantedName : m_DefaultMetaDataKeys)
+      {
+        // Only add properties that are not default meta information
+        if (name.substr(0, unwantedName.length()).find(unwantedName) != std::string::npos)
+        {
+          addProp = false;
+          break;
+        }
+      }
+      if (addProp)
+      {
+        output->SetProperty(name, prop->Clone()); //need to clone to avoid that all outputs pointing to the same prop instances.
+      }
     }
 
     // Handle UID

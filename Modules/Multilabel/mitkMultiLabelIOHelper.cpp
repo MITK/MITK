@@ -358,7 +358,10 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
       if (nullptr != labelFileValueCallback)
       {
         auto labelValue = labelFileValueCallback(inputImage, label->GetValue());
-        jLabel["file_value"] = labelValue;
+        if (labelValue != label->GetValue())
+        {
+          jLabel["file_value"] = labelValue;
+        }
       }
       jlabels.emplace_back(jLabel);
     }
@@ -451,7 +454,11 @@ void SerializeLabelCustomPropertiesToJSON(const mitk::Label* label, nlohmann::js
   // Define reserved property keys that are handled explicitly
   static const std::set<std::string> reservedKeys = {
     "name", "locked", "opacity", "visible", "color", "value",
-    "tracking_id", "tracking_uid", "description"
+    "tracking_id", "tracking_uid", "description",
+    //the following keys will be ignored on purpose
+    "center.coordinates", "center.index",
+    "DICOM.0062.0002.0062.0005", //covered by "name"
+    "DICOM.0062.0002.0062.0004" //set automatically
   };
 
   for (const auto& [key, property] : *propMap)

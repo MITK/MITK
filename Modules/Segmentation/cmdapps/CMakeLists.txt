@@ -5,4 +5,8 @@ if(BUILD_SegmentationCmdApps OR MITK_BUILD_ALL_APPS)
     NAME ContoursToImage
     DEPENDS MitkSegmentation
   )
+  mitkFunctionCreateCommandLineApp(
+    NAME ConvertToMultiLabelSegmentation
+    DEPENDS MitkSegmentation
+  )
 endif()

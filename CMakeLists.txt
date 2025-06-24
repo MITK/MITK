@@ -420,6 +420,7 @@ endif()
 
 if(MITK_USE_Python3)
   set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
+  set(MITK_USE_SWIG ON CACHE BOOL "" FORCE)
 
   if(APPLE)
     set(python3_mininum_version 3.12)
@@ -1099,7 +1100,8 @@ add_subdirectory(Utilities)
 
 set(MITK_WRAP_PYTHON_ENABLED OFF)
 if(MITK_USE_SWIG AND MITK_USE_Python3)
-  find_package(SWIG 4.3.0 COMPONENTS python)
+  set(SWIG_VERSION 4.3.0 CACHE STRING "" FORCE)
+  find_package(SWIG ${SWIG_VERSION} COMPONENTS python)
 
   if(SWIG_FOUND)
     option(MITK_WRAP_PYTHON "" ON)

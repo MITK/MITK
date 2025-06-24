@@ -13,13 +13,9 @@ mitk_check_dynamic_lookup(MODULE
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 option(MITK_PYTHON_THREADS "Enable threaded python usage by unlocking the GIL." ON )
-option(MITK_PYTHON_EGG "Add building of python eggs to the dist target." OFF )
-option(MITK_PYTHON_WHEEL "Add building of python wheels to the dist target." ON )
 
 mark_as_advanced(
-  MITK_PYTHON_THREADS
-  MITK_PYTHON_EGG
-  MITK_PYTHON_WHEEL
+    MITK_PYTHON_THREADS
 )
 
 set(libraries

@@ -5,7 +5,7 @@ include_directories(${US_INCLUDE_DIRS})
 
 add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_NAME}\")
 
-set(srcs usResourceCompiler.c ../third_party/miniz.c)
+set(srcs usResourceCompiler.c)
 
 add_executable(${US_RCC_EXECUTABLE_NAME} ${srcs})
 if(WIN32)
@@ -14,7 +14,7 @@ endif()
 
 set_property(
   TARGET ${US_RCC_EXECUTABLE_NAME} APPEND PROPERTY
-  COMPILE_DEFINITIONS "MINIZ_NO_ARCHIVE_READING_API;MINIZ_NO_ZLIB_COMPATIBLE_NAMES"
+  COMPILE_DEFINITIONS "US_MINIZ_NO_ARCHIVE_READING_API;US_MINIZ_NO_ZLIB_COMPATIBLE_NAMES"
   )
 
 set_property(

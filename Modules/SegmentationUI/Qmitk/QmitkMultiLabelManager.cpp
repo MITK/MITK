@@ -22,6 +22,8 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkStatusBar.h>
 #include <mitkToolManagerProvider.h>
+#include <mitkSegChangeOperationApplier.h>
+#include <mitkLabelSetImageHelper.h>
 
 // Qmitk
 #include <QmitkStyleManager.h>
@@ -125,14 +127,25 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
 {
   auto selectedLabels = this->GetSelectedLabels();
 
+  mitk::SegLabelPropModifyUndoRedoHelper undoRedoHelper(this->GetMultiLabelSegmentation(), selectedLabels);
+
   for (auto labelValue : selectedLabels)
   {
     auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(labelValue);
     if (currentLabel.IsNull())
       continue;
+
+    mitk::SegLabelPropModifyUndoRedoHelper undoRedoHelper(this->GetMultiLabelSegmentation(), { labelValue });
+
     bool canceled = false;
     emit LabelRenameRequested(currentLabel, true, canceled);
+
+    if (!canceled)
+    {
+      undoRedoHelper.RegisterUndoRedoOperationEvent("Change label name/color of \""+mitk::LabelSetImageHelper::CreateDisplayLabelName(this->GetMultiLabelSegmentation(), currentLabel)+"\"");
+    }
   }
+
 }
 
 void QmitkMultiLabelManager::OnSelectedLabelChanged(const LabelValueVectorType& labels)

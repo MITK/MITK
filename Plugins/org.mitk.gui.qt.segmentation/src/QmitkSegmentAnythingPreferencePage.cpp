@@ -273,7 +273,7 @@ void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
           m_Installer.ExecutePython(pythonCode, &QmitkSAMToolInstaller::PrintProcessEvent);
           return true;
         },
-        &QmitkSAMToolInstaller::PrintProcessEvent);
+        &QmitkSAMToolInstaller::PrintProcessEvent, "2.6.0");
       });
   while (future.isRunning())
   {

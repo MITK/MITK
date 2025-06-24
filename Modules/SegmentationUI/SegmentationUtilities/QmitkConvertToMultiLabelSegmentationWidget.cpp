@@ -34,6 +34,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkLabelSetImageConverter.h>
+#include <mitkSegChangeOperationApplier.h>
 
 #include <QmitkNodeSelectionDialog.h>
 #include <QMessageBox>
@@ -294,51 +295,6 @@ void QmitkConvertToMultiLabelSegmentationWidget::OnConvertPressed()
   }
 }
 
-
-mitk::Image::Pointer ConvertSurfaceToImage(const mitk::Image* refImage, const mitk::Surface* surface)
-{
-  mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
-  surfaceToImageFilter->MakeOutputBinaryOn();
-  surfaceToImageFilter->UShortBinaryPixelTypeOn();
-  surfaceToImageFilter->SetInput(surface);
-  surfaceToImageFilter->SetImage(refImage);
-  try
-  {
-    surfaceToImageFilter->Update();
-  }
-  catch (itk::ExceptionObject& excpt)
-  {
-    MITK_ERROR << excpt.GetDescription();
-    return nullptr;
-  }
-
-  return surfaceToImageFilter->GetOutput();
-}
-
-mitk::Image::Pointer ConvertContourModelSetToImage(mitk::Image* refImage, mitk::ContourModelSet* contourSet)
-{
-  // Use mitk::ContourModelSetToImageFilter to fill the ContourModelSet into the image
-  mitk::ContourModelSetToImageFilter::Pointer contourFiller = mitk::ContourModelSetToImageFilter::New();
-  contourFiller->SetImage(refImage);
-  contourFiller->SetInput(contourSet);
-  contourFiller->MakeOutputLabelPixelTypeOn();
-
-  try
-  {
-    contourFiller->Update();
-  }
-  catch (const std::exception& e)
-  {
-    MITK_ERROR << "Error while converting contour model. " << e.what();
-  }
-  catch (...)
-  {
-    MITK_ERROR << "Unknown error while converting contour model.";
-  }
-
-  return contourFiller->GetOutput();
-}
-
 void CheckForLabelCollision(const QmitkNodeSelectionDialog::NodeList& nodes,
   const std::map<const mitk::DataNode*, mitk::MultiLabelSegmentation::LabelValueVectorType>& foundLabelsMap,
   mitk::MultiLabelSegmentation::LabelValueVectorType& usedLabelValues,
@@ -369,6 +325,8 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   mitk::MultiLabelSegmentation::Pointer outputSeg;
   mitk::Image::Pointer refImage;
   const mitk::DataNode* refNode;
+
+  std::set<mitk::MultiLabelSegmentation::GroupIndexType> addedGroups;
 
   if (m_Controls->radioAddToSeg->isChecked())
   {
@@ -419,17 +377,15 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     auto contourModelSet = dynamic_cast<mitk::ContourModelSet*>(node->GetData());
     if (nullptr != surface)
     {
-      convertedImage = ConvertSurfaceToImage(refImage, surface);
+      convertedImage = mitk::ConvertSurfaceToLabelMask(refImage, surface);
     }
     else if (nullptr != contourModelSet)
     {
-      convertedImage = ConvertContourModelSetToImage(refImage, contourModelSet);
+      convertedImage = mitk::ConvertContourModelSetToLabelMask(refImage, contourModelSet);
     }
     else if (nullptr != contourModel)
     {
-      auto contourModelSet = mitk::ContourModelSet::New();
-      contourModelSet->AddContourModel(contourModel);
-      convertedImage = ConvertContourModelSetToImage(refImage, contourModelSet);
+      convertedImage = mitk::ConvertContourModelToLabelMask(refImage, contourModel);
     }
     else
     {
@@ -484,6 +440,7 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
   if (m_Controls->radioAddToSeg->isChecked() || 0 == outputSeg->GetNumberOfGroups())
   {
     currentGroupIndex = outputSeg->AddGroup();
+    addedGroups.insert(currentGroupIndex);
   }
 
   //Transfer content and add labels
@@ -492,7 +449,10 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     mitk::ProgressBar::GetInstance()->Progress();
 
     if (m_Controls->radioSingleGroup->isChecked() && node != imageNodes.front())
+    {
       currentGroupIndex = outputSeg->AddGroup();
+      addedGroups.insert(currentGroupIndex);
+    }
 
     const auto& labelsMapping = labelsMappingMap.at(node);
     for (auto [oldV, correctedV] : labelsMapping)
@@ -517,7 +477,10 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
     mitk::ProgressBar::GetInstance()->Progress();
 
     if (m_Controls->radioSingleGroup->isChecked() && (node != nonimageNodes.front() || !imageNodes.empty()))
+    {
       currentGroupIndex = outputSeg->AddGroup();
+      addedGroups.insert(currentGroupIndex);
+    }
 
     const auto& labelsMapping = labelsMappingMap.at(node);
     for (auto [oldV, correctedV] : labelsMapping)
@@ -538,6 +501,9 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
   if (m_Controls->radioAddToSeg->isChecked())
   {
+    mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(outputSeg, addedGroups);
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert conversion groups to segmentation node \n"+ m_Controls->outputSegSelector->GetSelectedNode()->GetName()+"\"");
+
     m_Controls->outputSegSelector->GetSelectedNode()->Modified();
   }
   else

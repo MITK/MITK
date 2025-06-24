@@ -8,6 +8,8 @@
 #! \param DESCRIPTION (optional) A human-readable description of your application.
 #!        The usage depends on the CPack generator (on Windows, this is a descriptive
 #!        text for the created shortcuts).
+#! \param ID (optional) Used on macOS as CFBundleIdentifier.
+#! \param COPYRIGHT (optional) Used on macOS as NSHumanReadableCopyright.
 #! \param SOURCES (optional) A list of source files to compile into your executable. Defaults
 #!        to <name>.cpp.
 #! \param PLUGINS (optional) A list of required plug-ins. Defaults to all known plug-ins.
@@ -29,7 +31,7 @@
 #!
 function(mitkFunctionCreateBlueBerryApplication)
 
-cmake_parse_arguments(_APP "NO_PROVISIONING;NO_INSTALL" "NAME;DESCRIPTION" "SOURCES;PLUGINS;EXCLUDE_PLUGINS;LINK_LIBRARIES;LIBRARY_DIRS" ${ARGN})
+cmake_parse_arguments(_APP "NO_PROVISIONING;NO_INSTALL" "NAME;DESCRIPTION;ID;COPYRIGHT" "SOURCES;PLUGINS;EXCLUDE_PLUGINS;LINK_LIBRARIES;LIBRARY_DIRS" ${ARGN})
 
 if(NOT _APP_NAME)
   message(FATAL_ERROR "NAME argument cannot be empty.")
@@ -83,9 +85,9 @@ if(WIN32)
 endif()
 
 if(MITK_SHOW_CONSOLE_WINDOW)
-  add_executable(${_APP_NAME} MACOSX_BUNDLE ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
+  qt_add_executable(${_APP_NAME} MACOSX_BUNDLE ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 else()
-  add_executable(${_APP_NAME} MACOSX_BUNDLE WIN32 ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
+  qt_add_executable(${_APP_NAME} MACOSX_BUNDLE WIN32 ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 endif()
 
 if(NOT CMAKE_CURRENT_SOURCE_DIR MATCHES "^${CMAKE_SOURCE_DIR}/.*")
@@ -120,10 +122,20 @@ endif()
 # -----------------------------------------------------------------------
 if(APPLE)
   if( _APP_DESCRIPTION)
-    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_NAME "${_APP_DESCRIPTION}")
+    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "${_APP_DESCRIPTION}")
   else()
-    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_NAME "${_APP_NAME}")
+    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "${_APP_NAME}")
   endif()
+  if(_APP_ID)
+    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER "${_APP_ID}")
+  endif()
+  if(_APP_COPYRIGHT)
+    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_COPYRIGHT "${_APP_COPYRIGHT}")
+  endif()
+  set_target_properties(${_APP_NAME} PROPERTIES
+    MACOSX_BUNDLE_BUNDLE_VERSION "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERSION_PATCH}"
+    MACOSX_BUNDLE_SHORT_VERSION_STRING "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERSION_PATCH}"
+  )
   set(icon_name "icon.icns")
   set(icon_full_path "${CMAKE_CURRENT_SOURCE_DIR}/icons/${icon_name}")
   if(EXISTS "${icon_full_path}")

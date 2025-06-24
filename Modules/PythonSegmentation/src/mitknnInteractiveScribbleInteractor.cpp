@@ -113,6 +113,7 @@ namespace
 
     void Activate(const mitk::Color& color)
     {
+      this->SetEnable3DInterpolation(false);
       this->Activated();
       this->Enable();
 
@@ -125,12 +126,12 @@ namespace
     {
       this->Disable();
       this->Deactivated();
+      this->SetEnable3DInterpolation(true);
     }
 
   protected:
     ScribbleTool()
     {
-      this->SetEnable3DInterpolation(false);
       this->DisableContourMarkers();
       this->SetSize(3);
       this->Disable();
@@ -163,7 +164,7 @@ namespace
       // Allocate and initialize the image volume based on the metadata.
       InitializeVolume(mask);
 
-      this->WriteSliceToVolume(mask, m_CurrentPlane, m_PaintingSlice, 0, false);
+      SegTool2D::WriteSliceToVolume(mask, m_CurrentPlane, m_PaintingSlice, 0);
 
       Superclass::OnMouseReleased(action, event);
 

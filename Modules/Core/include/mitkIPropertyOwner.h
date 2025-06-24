@@ -75,6 +75,22 @@ namespace mitk
     virtual void RemoveProperty(const std::string &propertyKey,
                                 const std::string &contextName = "",
                                 bool fallBackOnDefaultContext = false) = 0;
+
+    /**
+    * \brief Checks if a certain property exists.
+    *
+    * \param[in] propertyKey Key of property.
+    * \param[in] contextName Optional, default is empty string (default
+    *            context). Search in specified context.
+    * \param[in] fallBackOnDefaultContext Optional, default is true. Also
+    *            search in default context if property was not found in given
+    *            context.
+    *
+    * \return true if property is found, false otherwise.
+    */
+    virtual bool PropertyIsOwned(const std::string& propertyKey,
+                                 const std::string& contextName = "",
+                                 bool fallBackOnDefaultContext = true) const;
   };
 } // namespace mitk
 

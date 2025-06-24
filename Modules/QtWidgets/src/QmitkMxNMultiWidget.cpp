@@ -52,7 +52,7 @@ void QmitkMxNMultiWidget::InitializeMultiWidget()
   auto displayActionEventHandler = GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
-    displayActionEventHandler->InitActions();
+    displayActionEventHandler->InitActions(this->GetMultiWidgetName().toStdString());
   }
 }
 
@@ -67,10 +67,11 @@ void QmitkMxNMultiWidget::Synchronize(bool synchronized)
     SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
   }
 
+  std::string prefixFilter = synchronized ? "" : this->GetMultiWidgetName().toStdString();
   auto displayActionEventHandler = GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
-    displayActionEventHandler->InitActions();
+    displayActionEventHandler->InitActions(prefixFilter);
   }
 }
 
@@ -377,8 +378,8 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncGroupChanged, this, &QmitkMxNMultiWidget::SetSynchronizationGroup);
   connect(this, &QmitkMxNMultiWidget::SyncGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSyncGroupAdded);
 
-  // needs to be done after 'QmitkRenderWindowUtilityWidget::ToggleSynchronization' has been connected
-  // initially synchronize the node selection widget
+  // initialize the node selection widget with all nodes to set required properties, then synchronize with default group
+  utilityWidget->GetNodeSelectionWidget()->SelectAll();
   SetSynchronizationGroup(utilityWidget->GetNodeSelectionWidget(), 1);
 
 

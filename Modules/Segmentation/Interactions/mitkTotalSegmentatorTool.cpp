@@ -35,6 +35,37 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, TotalSegmentatorTool, "Total Segmentator");
 }
 
+void mitk::TotalSegmentatorTool::PythonProcessEvent(itk::Object* /*pCaller*/, const itk::EventObject& e)
+{
+  static const std::string DOWNLOAD_STRING = "Downloading";
+  static const std::string ZERO_PERCENT_STRING = " 0%";
+  static const std::string HUNDRED_PERCENT_STRING = "100%";
+
+  const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
+  if (pEvent)
+  {
+    MITK_INFO << pEvent->GetOutput();
+  }
+  
+  const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
+  if (pErrEvent)
+  {
+    std::string testCERR = pErrEvent->GetOutput();
+    MITK_ERROR << testCERR;
+    if (testCERR.find(DOWNLOAD_STRING) != std::string::npos)
+    {
+      if (testCERR.find(ZERO_PERCENT_STRING) != std::string::npos)
+      {
+        this->TotalSegDownloadMessageEvent.Send(true);
+      }
+      else if (testCERR.find(HUNDRED_PERCENT_STRING) != std::string::npos)
+      {
+        this->TotalSegDownloadMessageEvent.Send(false);
+      }
+    }
+  }
+}
+
 mitk::TotalSegmentatorTool::~TotalSegmentatorTool()
 {
   fs::remove_all(this->GetMitkTempDir());
@@ -70,27 +101,6 @@ const char *mitk::TotalSegmentatorTool::GetName() const
   return "TotalSegmentator";
 }
 
-void mitk::TotalSegmentatorTool::onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
-{
-  std::string testCOUT;
-  std::string testCERR;
-  const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
-
-  if (pEvent)
-  {
-    testCOUT = testCOUT + pEvent->GetOutput();
-    MITK_INFO << testCOUT;
-  }
-
-  const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
-
-  if (pErrEvent)
-  {
-    testCERR = testCERR + pErrEvent->GetOutput();
-    MITK_ERROR << testCERR;
-  }
-}
-
 void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                  const Image * /*oldSegAtTimeStep*/,
                                                  MultiLabelSegmentation *previewImage,
@@ -101,9 +111,10 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
   }
   ProcessExecutor::Pointer spExec = ProcessExecutor::New();
-  itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
-  spCommand->SetCallback(&onPythonProcessEvent);
+  auto spCommand = itk::MemberCommand<mitk::TotalSegmentatorTool>::New();
+  spCommand->SetCallbackFunction(this, &mitk::TotalSegmentatorTool::PythonProcessEvent);
   spExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
+
   m_ProgressCommand->SetProgress(5);
 
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;

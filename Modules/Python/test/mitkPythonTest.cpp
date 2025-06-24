@@ -21,14 +21,14 @@ found in the LICENSE file.
 class mitkPythonTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPythonTestSuite);
-  MITK_TEST(TestPythonContextExclusivity);
   MITK_TEST(TestEvaluateOperationWithResult);
   MITK_TEST(TestCopyImageToAndBackPython);
+  MITK_TEST(TestPythonContextExclusivity);
   CPPUNIT_TEST_SUITE_END();
 
 public:
 
-  void setUp(){}
+  void setUp() {}
 
   void TestEvaluateOperationWithResult()
   {

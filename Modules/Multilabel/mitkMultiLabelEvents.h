@@ -170,7 +170,7 @@ namespace mitk
   /** Event class that is used to indicated if a group is added in a MultiLabel class.
   *
   * It has a member that indicates the group id the event is referring to.
-  * Use the ANY_GROUP value if you want to define an rvent (e.g. for adding an observer)
+  * Use the ANY_GROUP value if you want to define an event (e.g. for adding an observer)
   * that reacts to every group and not just to a special one.
   */
   mitkMultiLabelEventMacroDeclaration(GroupAddedEvent, AnyGroupEvent, AnyGroupEvent::GroupIndexType);
@@ -178,7 +178,7 @@ namespace mitk
   /** Event class that is used to indicated if a group is modified in a MultiLabel class.
   *
   * It has a member that indicates the group id the event is referring to.
-  * Use the ANY_GROUP value if you want to define an rvent (e.g. for adding an observer)
+  * Use the ANY_GROUP value if you want to define an event (e.g. for adding an observer)
   * that reacts to every group and not just to a special one.
   */
   mitkMultiLabelEventMacroDeclaration(GroupModifiedEvent, AnyGroupEvent, AnyGroupEvent::GroupIndexType);
@@ -186,7 +186,7 @@ namespace mitk
   /** Event class that is used to indicated if a group is removed in a MultiLabel class.
   *
   * It has a member that indicates the group id the event is referring to.
-  * Use the ANY_GROUP value if you want to define an rvent (e.g. for adding an observer)
+  * Use the ANY_GROUP value if you want to define an event (e.g. for adding an observer)
   * that reacts to every group and not just to a special one.
   */
   mitkMultiLabelEventMacroDeclaration(GroupRemovedEvent, AnyGroupEvent, AnyGroupEvent::GroupIndexType);

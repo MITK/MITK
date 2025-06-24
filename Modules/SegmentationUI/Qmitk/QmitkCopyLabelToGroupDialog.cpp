@@ -11,6 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkCopyLabelToGroupDialog.h"
+
+#include <mitkSegChangeOperationApplier.h>
+
 #include <ui_QmitkCopyLabelToGroupDialog.h>
 
 #include <mitkLabelSetImageHelper.h>
@@ -59,10 +62,20 @@ void QmitkCopyLabelToGroupDialog::accept()
     ? m_Ui->groupComboBox->currentData().toUInt()
     : m_Segmentation->AddGroup();
 
+  if (m_Ui->groupComboBox->currentIndex() == 0)
+  {
+    mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(m_Segmentation, {destinationGroup }, false, true);
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert new destination group \"" + std::to_string(destinationGroup) + "\" for label copy.");
+  }
+
+  const auto sourceGroup = m_Segmentation->GetGroupIndexOfLabel(m_SourceLabel->GetValue());
+
+  mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { sourceGroup, destinationGroup }, true);
+
   m_DestinationLabel = m_Segmentation->AddLabel(m_SourceLabel, destinationGroup);
 
   mitk::TransferLabelContent(
-    m_Segmentation->GetGroupImage(m_Segmentation->GetGroupIndexOfLabel(m_SourceLabel->GetValue())),
+    m_Segmentation->GetGroupImage(sourceGroup),
     m_Segmentation->GetGroupImage(destinationGroup),
     m_Segmentation->GetConstLabelsByValue(m_Segmentation->GetLabelValuesByGroup(destinationGroup)),
     mitk::MultiLabelSegmentation::UNLABELED_VALUE,
@@ -73,6 +86,8 @@ void QmitkCopyLabelToGroupDialog::accept()
     m_Ui->regardLocksRadioButton->isChecked()
       ? mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks
       : mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
+
+  undoRedoGenerator.RegisterUndoRedoOperationEvent("Copy label \""+ mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, m_SourceLabel)+"\" to group "+std::to_string(destinationGroup));
 
   m_Segmentation->SetActiveLabel(m_DestinationLabel->GetValue());
 

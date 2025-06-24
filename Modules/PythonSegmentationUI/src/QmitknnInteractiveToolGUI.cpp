@@ -273,6 +273,10 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   if (backend == mitk::nnInteractive::Backend::CUDA)
     return;
 
+  m_Ui->autoZoomCheckBox->setEnabled(false);
+  m_Ui->autoZoomCheckBox->setChecked(false);
+  m_Ui->autoZoomCheckBox->setToolTip("Auto-zoom is not available with CPU backend.");
+
   message = QString(
     "<div style='line-height: 1.25'>"
       "<p><strong>Warning:</strong> The CUDA backend is unavailable. Falling back to the CPU backend, which is "

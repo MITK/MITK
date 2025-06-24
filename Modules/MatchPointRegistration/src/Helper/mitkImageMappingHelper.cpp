@@ -125,16 +125,28 @@ void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Imag
     typename ResultImageDescriptorType::SpacingType fieldSpacing;
     typename ResultImageDescriptorType::DirectionType matrix;
 
-    mitk::ImageMappingHelper::ResultImageGeometryType::BoundsArrayType geoBounds = resultGeometry->GetBounds();
-    mitk::Vector3D geoSpacing = resultGeometry->GetSpacing();
-    mitk::Point3D geoOrigin = resultGeometry->GetOrigin();
-    mitk::AffineTransform3D::MatrixType geoMatrix = resultGeometry->GetIndexToWorldTransform()->GetMatrix();
+    const mitk::ImageMappingHelper::ResultImageGeometryType::BoundsArrayType geoBounds = resultGeometry->GetBounds();
+    const mitk::Vector3D geoSpacing = resultGeometry->GetSpacing();
+    const mitk::Point3D geoOrigin = resultGeometry->GetOrigin();
+    const mitk::AffineTransform3D::MatrixType geoMatrix = resultGeometry->GetIndexToWorldTransform()->GetMatrix();
 
     for (unsigned int i = 0; i<VImageDimension; ++i)
     {
       origin[i] = static_cast<typename ResultImageDescriptorType::PointType::ValueType>(geoOrigin[i]);
       fieldSpacing[i] = static_cast<typename ResultImageDescriptorType::SpacingType::ValueType>(geoSpacing[i]);
-      size[i] = static_cast<typename ResultImageDescriptorType::SizeType::SizeValueType>(geoBounds[(2*i)+1]-geoBounds[2*i])*fieldSpacing[i];
+      const auto voxelCount = static_cast<typename ResultImageDescriptorType::SizeType::SizeValueType>(geoBounds[(2 * i) + 1] - geoBounds[2 * i]);
+      size[i] = voxelCount*fieldSpacing[i];
+
+      if (std::floor(size[i] / fieldSpacing[i]) < std::floor(voxelCount))
+      {
+        // MatchPoint in the ImageMappingTask internally computes the number of voxels and floors the result
+        // to ensure the discretized voxel volume is never larger then the requested real world coordinate
+        // result volume. Due to imprecision in double math operations in combination with floor() this can
+        // lead in loosing one slice. Such a case was just detected. To compensate for that double precision
+        // error we add half a spacing to ensure the number of voxel in the dimension match.
+        size[i] += 0.5 * fieldSpacing[i];
+        MITK_INFO << "Fixed field size for ResultImageDescriptor of image mapping operation.";
+      }
     }
 
     //Matrix extraction

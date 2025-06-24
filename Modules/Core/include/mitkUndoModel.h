@@ -57,6 +57,10 @@ namespace mitk
     virtual bool RedoListEmpty() = 0;
 
     //##Documentation
+    //## @brief true if UndoList is empty
+    virtual bool UndoListEmpty() = 0;
+
+    //##Documentation
     //## @brief Gets the limit on the size of the undo history.
     //## The undo limit determines how many items can be stored
     //## in the undo stack. If the value is 0 that means that
@@ -89,6 +93,15 @@ namespace mitk
     //##
     //## needed to get the old Position of an Element for declaring an UndoOperation
     virtual OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) = 0;
+
+    /**
+     * @brief Removes invalid operations from the undo/redo stack.
+     *
+     * Iterates through all stored OperationEvents and removes those that are no longer valid.
+     *
+     * @return Number of invalid operations removed
+     */
+    virtual unsigned int RemoveInvalidOperations() = 0;
 
   protected:
     UndoModel(){};

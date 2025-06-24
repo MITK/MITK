@@ -42,7 +42,7 @@ namespace mitk
 
     /**
      * @brief Imports essential python packages: numpy, os, sys, io
-     * SimpleITK and pyMITK. Also adds current bin folder to path.
+     * and pyMITK. Also adds current bin folder to path.
      */
     void Activate();
 

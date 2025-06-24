@@ -94,21 +94,12 @@ mitk::OperationEvent::OperationEvent(OperationActor *destination,
   {
     itk::SimpleMemberCommand<OperationEvent>::Pointer command = itk::SimpleMemberCommand<OperationEvent>::New();
     command->SetCallbackFunction(this, &OperationEvent::OnObjectDeleted);
-    m_DeleteTag = object->AddObserver(itk::DeleteEvent(), command);
+    m_DelObserver.Reset(object, itk::DeleteEvent(), command);
   }
 }
 
 mitk::OperationEvent::~OperationEvent()
 {
-  // remove the observer if the data m_Destination still is present
-  if (!m_Invalid)
-  {
-    if (auto *object = dynamic_cast<itk::Object *>(m_Destination))
-    {
-      object->RemoveObserver(m_DeleteTag);
-    }
-  }
-
   delete m_Operation;
   delete m_UndoOperation;
 }
@@ -120,9 +111,7 @@ void mitk::OperationEvent::ReverseOperations()
   if (m_Operation == nullptr)
     return;
 
-  Operation *tempOperation = m_Operation;
-  m_Operation = m_UndoOperation;
-  m_UndoOperation = tempOperation;
+  std::swap(m_Operation, m_UndoOperation);
 
   UndoStackItem::ReverseOperations();
 }
@@ -144,7 +133,9 @@ void mitk::OperationEvent::OnObjectDeleted()
   m_Invalid = true;
 }
 
-bool mitk::OperationEvent::IsValid()
+bool mitk::OperationEvent::IsValid() const
 {
-  return !m_Invalid;
+  return !m_Invalid
+    && m_Operation != nullptr && m_Operation->IsValid()
+    && m_UndoOperation != nullptr && m_UndoOperation->IsValid();
 }

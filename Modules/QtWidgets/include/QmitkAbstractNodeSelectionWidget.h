@@ -138,11 +138,11 @@ public Q_SLOTS:
   void SetSelectionIsOptional(bool isOptional);
 
 protected Q_SLOTS:
-  /** Call to remove a node from the current selection. If the node is part of the current selection,
+  /** Call to remove a node from the current (internal) selection. If the node is part of the current selection,
   *   this will trigger ReviseSelectionChanged(), AllowEmissionOfSelection() and if there is really a change,
   *   will also emit CurrentSelectionChanged.
   */
-  void RemoveNodeFromSelection(const mitk::DataNode* node);
+  void RemoveNodeFromInternalSelection(const mitk::DataNode* node);
 
 protected:
   /** Method is called if the display of the selected nodes should be updated (e.g. because the selection changed). */

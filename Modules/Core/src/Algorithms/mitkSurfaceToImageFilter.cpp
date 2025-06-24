@@ -232,3 +232,29 @@ const mitk::Image *mitk::SurfaceToImageFilter::GetImage(void)
 {
   return static_cast<const mitk::Image *>(this->ProcessObject::GetInput(1));
 }
+
+mitk::Image::Pointer mitk::ConvertSurfaceToLabelMask(const mitk::Image* refImage, const mitk::Surface* surface)
+{
+  if (nullptr == refImage)
+    mitkThrow() << "Cannot convert to label mask. Passed reference image is nullptr.";
+  if (nullptr == surface)
+    mitkThrow() << "Cannot convert to label mask. Passed input is nullptr.";
+
+  mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
+  surfaceToImageFilter->MakeOutputBinaryOn();
+  surfaceToImageFilter->UShortBinaryPixelTypeOn();
+  surfaceToImageFilter->SetInput(surface);
+  surfaceToImageFilter->SetImage(refImage);
+
+  try
+  {
+    surfaceToImageFilter->Update();
+  }
+  catch (const itk::ExceptionObject& excpt)
+  {
+    MITK_ERROR << "Surface conversion failed: " << excpt.GetDescription();
+    return nullptr;
+  }
+
+  return surfaceToImageFilter->GetOutput();
+}

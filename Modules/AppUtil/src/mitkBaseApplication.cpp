@@ -44,6 +44,9 @@ found in the LICENSE file.
 #include <QWebEngineUrlScheme>
 #include <QQuickWindow>
 
+#include <QMainWindow>
+#include <QTimer>
+
 namespace
 {
   void outputImportantQtMessage(QtMsgType type, const QMessageLogContext&, const QString& msg)
@@ -172,6 +175,7 @@ namespace mitk
   const QString BaseApplication::ARG_LOG_QT_MESSAGES = "Qt.logMessages";
   const QString BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET = "Segmentation.labelSetPreset";
   const QString BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS = "Segmentation.labelSuggestions";
+  const QString BaseApplication::ARG_FULL_SCREEN_MODE = "MITK.fullscreen";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
   const QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
@@ -222,6 +226,7 @@ namespace mitk
     SplashCloserCallback *m_SplashscreenClosingCallback;
 
     bool m_LogQtMessages;
+    bool m_FullScreenMode;
 
     QStringList m_PreloadLibs;
     QString m_ProvFile;
@@ -237,7 +242,8 @@ namespace mitk
         m_SafeMode(true),
         m_Splashscreen(nullptr),
         m_SplashscreenClosingCallback(nullptr),
-        m_LogQtMessages(false)
+        m_LogQtMessages(false),
+        m_FullScreenMode(false)
     {
 #ifdef Q_OS_MAC
       /* On macOS the process serial number is passed as an command line argument (-psn_<NUMBER>)
@@ -283,6 +289,12 @@ namespace mitk
       if (ARG_LOG_QT_MESSAGES.toStdString() == name)
       {
         m_LogQtMessages = true;
+        return;
+      }
+
+      if (ARG_FULL_SCREEN_MODE.toStdString() == name)
+      {
+        m_FullScreenMode = true;
         return;
       }
 
@@ -510,6 +522,19 @@ namespace mitk
   bool BaseApplication::getSafeMode() const
   {
     return d->m_SafeMode;
+  }
+
+  void BaseApplication::setFullScreenMode(bool fullscreenMode)
+  {
+    if (nullptr != qApp)
+      return;
+
+    d->m_FullScreenMode = fullscreenMode;
+  }
+
+  bool BaseApplication::getFullScreenMode() const
+  {
+    return d->m_FullScreenMode;
   }
 
   void BaseApplication::setPreloadLibraries(const QStringList &libraryBaseNames)
@@ -908,6 +933,11 @@ namespace mitk
     Poco::Util::Option labelSuggestionsOption(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "", "use this list of predefined suggestions for segmentation labels");
     labelSuggestionsOption.argument("<filename>").binding(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString());
     options.addOption(labelSuggestionsOption);
+
+    Poco::Util::Option fullscreenOption(ARG_FULL_SCREEN_MODE.toStdString(), "", "use this flag to start the application in full screen mode w/o window frame");
+    fullscreenOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
+    options.addOption(fullscreenOption);
+
 
     // Make Poco aware of QGuiApplication command-line options, even though they are only parsed by
     // Qt. Otherwise, Poco would throw exceptions for unknown options.

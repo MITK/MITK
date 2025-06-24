@@ -10,6 +10,8 @@
 %naturalvar; // All non-primitive types will use const reference typemaps
 %include "numpy.i"
 %nothread mitk::Image::GetAsNumpy;
+%nothread mitk::Image::GetSpacing;
+%nothread mitk::Image::GetOrigin;
 
 %constant int ComponentTypeUInt8 = TypeDefinitions::ComponentTypeUInt8;
 %constant int ComponentTypeInt8 = TypeDefinitions::ComponentTypeInt8;
@@ -262,6 +264,32 @@ MITK_CLASS_SWIG_MACRO(mitk, Image)
                 GetNumpyTypeFromTypeID(static_cast<int>(self->GetPixelType().GetComponentType())),
                 const_cast<void*>(mitkBufferPtr));
         return result;
+    }
+
+    PyObject* GetSpacing() 
+    {
+        unsigned int dim = self->GetDimension();
+        mitk::Vector3D spacing = self->GetGeometry()->GetSpacing();
+        PyObject* listObj = PyList_New(dim);
+        for (unsigned int i = 0; i < dim; ++i)
+        {
+            PyObject* num = PyFloat_FromDouble(spacing[dim-i-1]);
+            PyList_SET_ITEM(listObj, i, num);
+        }
+        return listObj;
+    }
+
+    PyObject* GetOrigin() 
+    {
+        unsigned int dim = self->GetDimension();
+        mitk::Point3D origin = self->GetGeometry()->GetOrigin();
+        PyObject* listObj = PyList_New(dim);
+        for (unsigned int i = 0; i < dim; ++i)
+        {
+            PyObject* num = PyFloat_FromDouble(origin[dim-i-1]);
+            PyList_SET_ITEM(listObj, i, num);
+        }
+        return listObj;
     }
 }
 

@@ -436,6 +436,7 @@ void QmitkSegmentationView::OnNewSegmentation()
       QmitkNewSegmentationDialog::DoRenameLabel(newLabel, nullptr, m_Parent);
 
     newLabelSetImage->AddLabel(newLabel, newLabelSetImage->GetActiveLayer());
+    newLabelSetImage->SetActiveLabel(newLabel->GetValue());
   }
 
   if (!this->GetDataStorage()->Exists(newSegmentationNode))

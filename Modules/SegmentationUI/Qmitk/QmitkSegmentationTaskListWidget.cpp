@@ -1030,6 +1030,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
         label->SetName(m_TaskList->GetLabelName(current));
 
       segmentation->AddLabel(label, segmentation->GetActiveLayer());
+      segmentation->SetActiveLabel(label->GetValue());
     }
 
     if (scene.IsNull())

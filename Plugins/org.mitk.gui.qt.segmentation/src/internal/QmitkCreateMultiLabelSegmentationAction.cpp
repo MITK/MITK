@@ -87,6 +87,7 @@ void QmitkCreateMultiLabelSegmentationAction::Run(const QList<mitk::DataNode::Po
 
     mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
     newLabelSetImage->AddLabel(newLabel, 0);
+    newLabelSetImage->SetActiveLabel(newLabel->GetValue());
 
     if (!m_DataStorage->Exists(newSegmentationNode))
     {

@@ -921,7 +921,6 @@ mitk::Label* mitk::MultiLabelSegmentation::AddLabel(mitk::Label* label, GroupInd
   }
 
   this->InvokeEvent(LabelAddedEvent(newLabel->GetValue()));
-  m_ActiveLabelValue = newLabel->GetValue();
   this->Modified();
 
   return newLabel;
@@ -1070,7 +1069,7 @@ void mitk::MultiLabelSegmentation::InitializeByLabeledImage(const Image* image)
 
   try
   {
-    this->Initialize(image, true);
+    this->Initialize(image, true, true);
     auto groupImage = this->GetGroupImage(0);
 
     if (groupImage->GetDimension() == 3)
@@ -1094,6 +1093,12 @@ void mitk::MultiLabelSegmentation::InitializeByLabeledImage(const Image* image)
   {
     mitkThrow() << "Could not initialize by provided labeled image due to unknown error.";
   }
+
+  if (this->GetNumberOfLabels(0) > 0)
+  {
+    m_ActiveLabelValue = this->GetLabelValuesByGroup(0).front();
+  }
+
   this->Modified();
 }
 

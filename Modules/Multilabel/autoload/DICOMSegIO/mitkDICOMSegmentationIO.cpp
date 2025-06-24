@@ -446,6 +446,11 @@ namespace mitk
 
       labelSetImage->SetAllLabelsVisible(true);
 
+      if (labelSetImage->GetTotalNumberOfLabels() > 0)
+      {
+        labelSetImage->SetActiveLabel(labelSetImage->GetAllLabelValues().front());
+      }
+
       // Add some general DICOM Segmentation properties
       mitk::IDICOMTagsOfInterest *toiSrv = DICOMIOHelper::GetTagsOfInterestService();
       auto tagsOfInterest = toiSrv->GetTagsOfInterest();

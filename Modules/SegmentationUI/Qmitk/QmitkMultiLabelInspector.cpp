@@ -471,6 +471,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
 
   m_ModelManipulationOngoing = true;
   auto newLabel = m_Segmentation->AddLabel(templateLabel, groupID, true);
+  m_Segmentation->SetActiveLabel(newLabel->GetValue());
   m_ModelManipulationOngoing = false;
 
   undoRedoGenerator.RegisterUndoRedoOperationEvent("Add label instance \"" + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, newLabel) + "\"");
@@ -526,6 +527,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::MultiLabe
 
   m_ModelManipulationOngoing = true;
   m_Segmentation->AddLabel(newLabel, containingGroup, false);
+  m_Segmentation->SetActiveLabel(newLabel->GetValue());
   m_ModelManipulationOngoing = false;
 
   undoRedoGenerator.RegisterUndoRedoOperationEvent("Add label \""+ mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, newLabel)+"\"");

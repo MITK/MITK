@@ -22,13 +22,13 @@ found in the LICENSE file.
 
 namespace
 {
-  const constexpr char* const OPTION_SAVE_STRATEGY = "Save strategy";
-  const constexpr char* const OPTION_SAVE_STRATEGY_INSTANCE = "instance";
-  const constexpr char* const OPTION_SAVE_STRATEGY_GROUP = "group";
-  const constexpr char* const OPTION_INSTANCE_VALUE = "Instance value";
-  const constexpr char* const OPTION_INSTANCE_VALUE_BINARY = "binary";
-  const constexpr char* const OPTION_INSTANCE_VALUE_ORIGINAL = "original";
-  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 3;
+  constexpr const char* OPTION_SAVE_STRATEGY = "Save strategy";
+  constexpr const char* OPTION_SAVE_STRATEGY_INSTANCE = "instance";
+  constexpr const char* OPTION_SAVE_STRATEGY_GROUP = "group";
+  constexpr const char* OPTION_INSTANCE_VALUE = "Instance value";
+  constexpr const char* OPTION_INSTANCE_VALUE_BINARY = "binary";
+  constexpr const char* OPTION_INSTANCE_VALUE_ORIGINAL = "original";
+  constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 3;
 }
 
 namespace mitk

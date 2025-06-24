@@ -93,17 +93,25 @@ namespace mitk
     *        All currently connected display action events will be removed as observer from the broadcast instance.
     *
     * @pre    The class' observable (the display action event broadcast) has to be set.
+    *
+    * @param prefixFilter The prefix of associated renderer names. Can be used to filter events, such that actions will only
+    *   react to events from / send changes to renderers whose name begins with this prefix.
+    *
     * @throw  mitk::Exception, if the class' observable is null.
     */
-    void InitActions();
+    void InitActions(std::string prefixFilter = "");
 
   protected:
 
     /**
     * @brief Sub-classes need to implement this function to define a customized behavior
     *        for default action pre-definition.
+    *
+    * @param prefixFilter The prefix of associated renderer names. Can be used to filter events, such that actions will only
+    *   react to events from / send changes to renderers whose name begins with this prefix.
+    *
     */
-    virtual void InitActionsImpl() { }
+    virtual void InitActionsImpl(std::string /* prefixFilter = "" */) { }
 
     WeakPointer<DisplayActionEventBroadcast> m_ObservableBroadcast;
     std::vector<OberserverTagType> m_ObserverTags;

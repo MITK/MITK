@@ -294,6 +294,11 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkAbstractMultiWidget::Ge
   }
 }
 
+QString QmitkAbstractMultiWidget::GetMultiWidgetName() const
+{
+  return this->m_Impl->m_MultiWidgetName;
+}
+
 QString QmitkAbstractMultiWidget::GetNameFromIndex(int row, int column) const
 {
   if (0 <= row && m_Impl->m_MultiWidgetRows > row && 0 <= column && m_Impl->m_MultiWidgetColumns > column)

@@ -52,7 +52,7 @@ void QmitkMxNMultiWidget::InitializeMultiWidget()
   auto displayActionEventHandler = GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
-    displayActionEventHandler->InitActions();
+    displayActionEventHandler->InitActions(this->GetMultiWidgetName().toStdString());
   }
 }
 
@@ -67,10 +67,11 @@ void QmitkMxNMultiWidget::Synchronize(bool synchronized)
     SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
   }
 
+  std::string prefixFilter = synchronized ? "" : this->GetMultiWidgetName().toStdString();
   auto displayActionEventHandler = GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
-    displayActionEventHandler->InitActions();
+    displayActionEventHandler->InitActions(prefixFilter);
   }
 }
 

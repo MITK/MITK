@@ -100,15 +100,6 @@ namespace mitk
     void SetSegmentationVolume(const Image *segmentation);
 
     /**
-      \brief Set a reference image (original patient image) - optional.
-
-      If this volume is set (must exactly match the dimensions of the segmentation),
-      the interpolation algorithm may consider image content to improve the interpolated
-      (estimated) segmentation.
-     */
-    void SetReferenceVolume(const Image *segmentation);
-
-    /**
       \brief Update after changing a single slice.
 
       \param sliceDiff is a 2D image with the difference image of the slice determined by sliceDimension and sliceIndex.
@@ -229,7 +220,6 @@ namespace mitk
 
     Image::ConstPointer m_Segmentation;
     std::pair<unsigned long, bool> m_SegmentationModifiedObserverTag; // first: actual tag, second: tag assigned / valid?
-    Image::ConstPointer m_ReferenceImage;
     bool m_BlockModified;
     bool m_2DInterpolationActivated;
 

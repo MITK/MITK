@@ -152,6 +152,10 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
   {
     inputImage->SetActiveLabel(activeLabelBackup->GetValue());
   }
+  else if (inputImage->GetTotalNumberOfLabels() > 0)
+  {
+    inputImage->SetActiveLabel(inputImage->GetAllLabelValues().front());
+  }
 
   return true;
 }

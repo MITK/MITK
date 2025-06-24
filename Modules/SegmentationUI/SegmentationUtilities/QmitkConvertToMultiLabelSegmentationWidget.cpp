@@ -499,6 +499,11 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
       mitk::MultiLabelSegmentation::UNLABELED_VALUE, mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, labelsMapping);
   }
 
+  if (outputSeg->GetTotalNumberOfLabels() > 0)
+  {
+    outputSeg->SetActiveLabel(outputSeg->GetAllLabelValues().front());
+  }
+
   if (m_Controls->radioAddToSeg->isChecked())
   {
     mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(outputSeg, addedGroups);

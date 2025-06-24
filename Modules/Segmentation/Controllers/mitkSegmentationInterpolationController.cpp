@@ -169,40 +169,7 @@ void mitk::SegmentationInterpolationController::SetSegmentationVolume(const Imag
     AccessFixedDimensionByItk_2(segmentation3D, ScanWholeVolume, 3, m_Segmentation, timeStep);
   }
 
-  // PrintStatus();
-
-  SetReferenceVolume(m_ReferenceImage);
-
   Modified();
-}
-
-void mitk::SegmentationInterpolationController::SetReferenceVolume(const Image *referenceImage)
-{
-  m_ReferenceImage = referenceImage;
-
-  if (m_ReferenceImage.IsNull())
-    return;                           // no image set - ignore it then
-  assert(m_Segmentation.IsNotNull()); // should never happen
-
-  // ensure the reference image has the same dimensionality and extents as the segmentation image
-  if (m_ReferenceImage.IsNull() || m_Segmentation.IsNull() ||
-      m_ReferenceImage->GetDimension() != m_Segmentation->GetDimension() ||
-      m_ReferenceImage->GetPixelType().GetNumberOfComponents() != 1 ||
-      m_Segmentation->GetPixelType().GetNumberOfComponents() != 1)
-  {
-    MITK_WARN << "Segmentation image has different image characteristics than reference image." << std::endl;
-    m_ReferenceImage = nullptr;
-    return;
-  }
-
-  for (unsigned int dim = 0; dim < m_Segmentation->GetDimension(); ++dim)
-    if (m_ReferenceImage->GetDimension(dim) != m_Segmentation->GetDimension(dim))
-    {
-      MITK_WARN << "original patient image does not match segmentation (different extent in dimension " << dim
-                << "), ignoring patient image" << std::endl;
-      m_ReferenceImage = nullptr;
-      return;
-    }
 }
 
 void mitk::SegmentationInterpolationController::SetChangedVolume(const Image *sliceDiff, unsigned int timeStep)
@@ -578,7 +545,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
     sliceDimension,
     resultImage,
     timeStep,
-    m_ReferenceImage);
+    nullptr);
 }
 
 mitk::Image::Pointer mitk::SegmentationInterpolationController::ExtractSlice(const PlaneGeometry* planeGeometry, unsigned int sliceIndex, unsigned int timeStep, bool cache)

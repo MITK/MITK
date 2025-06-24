@@ -1213,7 +1213,6 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
   if (m_ToolManager)
   {
     mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
-    mitk::DataNode *referenceNode = m_ToolManager->GetReferenceData(0);
     QWidget::setEnabled(workingNode != nullptr);
 
     m_BtnApply2D->setEnabled(on);
@@ -1240,12 +1239,6 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
       {
         auto activeLabelImage = mitk::CreateLabelMask(labelSetImage, activeLabel->GetValue());
         m_Interpolator->SetSegmentationVolume(activeLabelImage);
-
-        if (referenceNode)
-        {
-          mitk::Image *referenceImage = dynamic_cast<mitk::Image *>(referenceNode->GetData());
-          m_Interpolator->SetReferenceVolume(referenceImage); // may be nullptr
-        }
       }
     }
   }

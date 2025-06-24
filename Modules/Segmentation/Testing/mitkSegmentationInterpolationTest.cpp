@@ -87,7 +87,6 @@ private:
     //        mitk::IOUtil::Save(m_SegmentationImage, "SOME PATH");
 
     m_InterpolationController->SetSegmentationVolume(m_SegmentationImage);
-    m_InterpolationController->SetReferenceVolume(m_ReferenceImage);
 
     // This could be easier...
     mitk::SliceNavigationController::Pointer navigationController = mitk::SliceNavigationController::New();

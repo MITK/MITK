@@ -202,8 +202,10 @@ namespace
   {
     if (std::getenv("ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS") == nullptr)
     {
-      if (itk::MultiThreaderBase::GetGlobalDefaultNumberOfThreads() > numThreads)
-        itk::MultiThreaderBase::SetGlobalDefaultNumberOfThreads(numThreads);
+      auto itkNumThreads = static_cast<itk::ThreadIdType>(numThreads);
+
+      if (itk::MultiThreaderBase::GetGlobalDefaultNumberOfThreads() > itkNumThreads)
+        itk::MultiThreaderBase::SetGlobalDefaultNumberOfThreads(itkNumThreads);
     }
 
     if (std::getenv("VTK_SMP_MAX_THREADS") == nullptr)

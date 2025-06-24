@@ -463,7 +463,7 @@ The tool assumes that you have Python >= 3.9 installed and available on your mac
 directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv package using the following command:  `apt install python3-venv`. For best results, your machine should be ideally equipped with a CUDA-enabled GPU. 
 
 \subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow:
-    -# Install TotalSegmentator: Goto Preferences (Ctrl+P) > TotalSegmentator and click "Install TotalSegmentator" to install TotalSegmentator (version: 2.4.0) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    -# Install TotalSegmentator: Goto Preferences (Ctrl+P) > TotalSegmentator and click "Install TotalSegmentator" to install TotalSegmentator (version: 2.9.0) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
     \imageMacro{QmitkSegmentation_TotalSegmentatorTool_Preferences.png,"TotalSegmentator Preferences",10.00}
     -# A new dialog window will open up, showing a detailed log. When the donwload is done, the "Close" button will be enabled and you may close the window.
     -# Note: If Python is not listed by MITK in "System Python Path", click "Select..." in the dropdown to choose an unlisted installation of Python and try downloading again. 

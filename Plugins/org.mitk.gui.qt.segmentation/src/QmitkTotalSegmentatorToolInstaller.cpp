@@ -18,10 +18,10 @@ found in the LICENSE file.
 #include <QMutex>
 
 const QString QmitkTotalSegmentatorToolInstaller::VENV_NAME = ".totalsegmentator_v2";
-const QString QmitkTotalSegmentatorToolInstaller::TOTALSEGMENTATOR_VERSION = "2.8.0";
+const QString QmitkTotalSegmentatorToolInstaller::TOTALSEGMENTATOR_VERSION = "2.9.0";
 const QStringList QmitkTotalSegmentatorToolInstaller::PACKAGES = {
     "Totalsegmentator==" + TOTALSEGMENTATOR_VERSION,
-    "nnunetv2<=2.6.0",
+    "nnunetv2==2.6.0",
     "SimpleITK<=2.4.1",
     "xvfbwrapper<=0.2.10",
     "dicom2nifti<=2.6.0",

@@ -159,6 +159,7 @@ namespace mitk
       {"breasts", {"breast.nii.gz"}},
       {"liver_segments", {"liver_segment_1.nii.gz", "liver_segment_2.nii.gz", "liver_segment_3.nii.gz", "liver_segment_4.nii.gz", "liver_segment_5.nii.gz", "liver_segment_6.nii.gz", "liver_segment_7.nii.gz", "liver_segment_8.nii.gz"}},
       {"liver_segments_mr", {"liver_segment_1.nii.gz", "liver_segment_2.nii.gz", "liver_segment_3.nii.gz", "liver_segment_4.nii.gz", "liver_segment_5.nii.gz", "liver_segment_6.nii.gz", "liver_segment_7.nii.gz", "liver_segment_8.nii.gz"}},
+      {"craniofacial_structures", {"mandible.nii.gz", "teeth_lower.nii.gz", "skull.nii.gz", "head.nii.gz", "sinus_maxillary.nii.gz", "sinus_frontal.nii.gz", "teeth_upper.nii.gz"}}
     };  
   }; // class
 } // namespace

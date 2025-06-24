@@ -25,7 +25,7 @@ found in the LICENSE file.
 //////////////////////////////////////////////////////////////////////////
 // STANDARD FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::MoveSenderCameraAction(std::string prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::MoveSenderCameraAction(const std::string& prefixFilter)
 {
   auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
   {
@@ -46,7 +46,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Move
   return actionFunction;
 }
 
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetCrosshairAction(std::string prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetCrosshairAction(const std::string& prefixFilter)
 {
   auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
   {
@@ -66,7 +66,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetC
   return actionFunction;
 }
 
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ZoomSenderCameraAction(std::string prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ZoomSenderCameraAction(const std::string& prefixFilter)
 {
   auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
   {
@@ -90,7 +90,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Zoom
   return actionFunction;
 }
 
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ScrollSliceStepperAction(std::string prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ScrollSliceStepperAction(const std::string& prefixFilter)
 {
   auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
   {
@@ -133,7 +133,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
   return actionFunction;
 }
 
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetLevelWindowAction(std::string prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetLevelWindowAction(const std::string& prefixFilter)
 {
   auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
   {
@@ -183,7 +183,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetL
 //////////////////////////////////////////////////////////////////////////
 // SYNCHRONIZED FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::MoveCameraSynchronizedAction(std::string prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::MoveCameraSynchronizedAction(const std::string& prefixFilter)
 {
   auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
   {
@@ -214,7 +214,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Move
   return actionFunction;
 }
 
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetCrosshairSynchronizedAction(std::string prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetCrosshairSynchronizedAction(const std::string& prefixFilter)
 {
   auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
   {
@@ -243,7 +243,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetC
   return actionFunction;
 }
 
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ZoomCameraSynchronizedAction(std::string prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ZoomCameraSynchronizedAction(const std::string& prefixFilter)
 {
   auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
   {
@@ -277,7 +277,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Zoom
   return actionFunction;
 }
 
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction(std::string prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction(const std::string& prefixFilter)
 {
   auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
   {

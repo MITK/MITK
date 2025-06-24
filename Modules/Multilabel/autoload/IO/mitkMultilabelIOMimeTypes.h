@@ -32,7 +32,43 @@ namespace mitk
     MITKMULTILABELIO_EXPORT LegacyLabelSetMimeType LEGACYLABELSET_MIMETYPE();
     MITKMULTILABELIO_EXPORT std::string LEGACYLABELSET_MIMETYPE_NAME();
 
+    class MITKMULTILABELIO_EXPORT MultiLabelSegmentationMimeType : public CustomMimeType
+    {
+    public:
+      MultiLabelSegmentationMimeType();
+
+      bool AppliesTo(const std::string& path) const override;
+      MultiLabelSegmentationMimeType* Clone() const override;
+    };
+
+    MITKMULTILABELIO_EXPORT MultiLabelSegmentationMimeType MULTILABEL_SEGMENTATION_MIMETYPE();
+    MITKMULTILABELIO_EXPORT std::string MULTILABEL_SEGMENTATION_MIMETYPE_NAME();
+
+    class MITKMULTILABELIO_EXPORT MultiLabelMetaMimeType : public CustomMimeType
+    {
+    public:
+      MultiLabelMetaMimeType();
+      bool AppliesTo(const std::string& path) const override;
+      MultiLabelMetaMimeType* Clone() const override;
+    };
+
+    MITKMULTILABELIO_EXPORT MultiLabelMetaMimeType MULTILABELMETA_MIMETYPE();
+    MITKMULTILABELIO_EXPORT std::string MULTILABELMETA_MIMETYPE_NAME();
+
+    class MITKMULTILABELIO_EXPORT MultiLabelNiftiStackMimeType : public CustomMimeType
+    {
+    public:
+      MultiLabelNiftiStackMimeType();
+
+      bool AppliesTo(const std::string& path) const override;
+      MultiLabelNiftiStackMimeType* Clone() const override;
+    };
+
+    MITKMULTILABELIO_EXPORT MultiLabelNiftiStackMimeType MULTILABEL_NIFTISTACK_MIMETYPE();
+    MITKMULTILABELIO_EXPORT std::string MULTILABEL_NIFTISTACK_MIMETYPE_NAME();
+
     MITKMULTILABELIO_EXPORT std::vector<CustomMimeType*> Get();
+
   }
 }
 

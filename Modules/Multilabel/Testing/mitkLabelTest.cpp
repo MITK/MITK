@@ -26,7 +26,6 @@ class mitkLabelTestSuite : public mitk::TestFixture
   MITK_TEST(TestSetCenterOfMassCoordinates);
   MITK_TEST(TestSetColor);
   MITK_TEST(TestSetValue);
-  MITK_TEST(TestSetLayer);
   MITK_TEST(TestSetProperty);
   CPPUNIT_TEST_SUITE_END();
 
@@ -61,7 +60,7 @@ public:
   void TestSetName()
   {
     mitk::Label::Pointer label = mitk::Label::New();
-    std::string initialName("noName!");
+    std::string initialName("Unknown label name");
     std::string labelName = label->GetName();
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong name", initialName.compare(labelName) == 0);
 
@@ -109,7 +108,7 @@ public:
     mitk::Label::Pointer label = mitk::Label::New();
     mitk::Color currentColor = label->GetColor();
     mitk::Color colorToBeCompared;
-    colorToBeCompared.Set(0, 0, 0);
+    colorToBeCompared.Set(1., 1., 1.);
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong color", currentColor.GetBlue() == colorToBeCompared.GetBlue());
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong color", currentColor.GetGreen() == colorToBeCompared.GetGreen());
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong color", currentColor.GetRed() == colorToBeCompared.GetRed());
@@ -133,19 +132,6 @@ public:
     valueToBeCompared = 12345;
     initialValue = label->GetValue();
     CPPUNIT_ASSERT_MESSAGE("Label has wrong value", initialValue == valueToBeCompared);
-  }
-
-  void TestSetLayer()
-  {
-    mitk::Label::Pointer label = mitk::Label::New();
-    int initialLayer(0);
-    int valueToBeCompared = label->GetValue();
-    CPPUNIT_ASSERT_MESSAGE("Initial label has wrong layer", initialLayer == valueToBeCompared);
-
-    label->SetLayer(2);
-    valueToBeCompared = 2;
-    initialLayer = label->GetLayer();
-    CPPUNIT_ASSERT_MESSAGE("Label has wrong layer", initialLayer == valueToBeCompared);
   }
 
   void TestSetProperty()

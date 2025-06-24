@@ -54,7 +54,14 @@ namespace mitk
     void SetName(const std::string &name);
     std::string GetName() const;
 
+    void SetTrackingID(const std::string& trackingID);
     std::string GetTrackingID() const;
+
+    void SetTrackingUID(const std::string& trackingUID);
+    std::string GetTrackingUID() const;
+
+    void SetDescription(const std::string& description);
+    std::string GetDescription() const;
 
     void SetCenterOfMassIndex(const mitk::Point3D &center);
     mitk::Point3D GetCenterOfMassIndex() const;
@@ -67,9 +74,6 @@ namespace mitk
 
     void SetValue(PixelType pixelValue);
     PixelType GetValue() const;
-
-    void SetLayer(unsigned int layer);
-    unsigned int GetLayer() const;
 
     void SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
 

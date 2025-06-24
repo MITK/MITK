@@ -1,11 +1,10 @@
 set(CPP_FILES
   mitkLegacyLabelSetImageIO.cpp
-  mitkLegacyLabelSetImageIO.h
   mitkMultilabelActivator.cpp
   mitkMultilabelIOMimeTypes.cpp
-  mitkMultilabelIOMimeTypes.h
   mitkMultiLabelSegmentationIO.cpp
-  mitkMultiLabelSegmentationIO.h
   mitkMultiLabelSegmentationSerializer.cpp
-  mitkMultiLabelSegmentationSerializer.h
+  mitkMultiLabelSegmentationStackWriterBase.cpp
+  mitkMultiLabelSegmentationStackNiftiWriter.cpp
+  mitkMultiLabelSegmentationStackReader.cpp
 )

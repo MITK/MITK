@@ -279,7 +279,7 @@ void mitk::TotalSegmentatorTool::ParseLabelMapTotalDefault()
     }
     else if (this->GetSubTask() == DEFAULT_TOTAL_TASK_MRI && m_LabelMapTotalMR.empty())
     {
-      start_line = 231, end_line = 288;
+      start_line = 231, end_line = 282;
       targetMap = &m_LabelMapTotalMR;
     }
     else

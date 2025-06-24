@@ -114,6 +114,8 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
 
   this->PrepareFilling(workingSlice, click);
 
+  auto relevantLabelValues = labelSetImage->GetLabelValuesByGroup(labelSetImage->GetActiveLayer());
+
   //as fill region tools should always allow to manipulate active label
   //(that is what the user expects/knows when using tools so far:
   //the active label can always be changed even if locked)
@@ -125,7 +127,11 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
     activeLabelClone->SetLocked(false);
   }
 
-  TransferLabelContentAtTimeStep(fillImage, workingSlice, { activeLabelClone }, 0, MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, { {1, m_FillLabelValue} }, m_MergeStyle);
+  relevantLabelValues.erase(std::remove(relevantLabelValues.begin(), relevantLabelValues.end(), activeLabelClone->GetValue()));
+  auto relevantLabels = labelSetImage->GetConstLabelsByValue(relevantLabelValues);
+  relevantLabels.push_back(activeLabelClone);
+
+  TransferLabelContentAtTimeStep(fillImage, workingSlice, relevantLabels, 0, MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, { {1, m_FillLabelValue} }, m_MergeStyle);
 
   this->WriteBackSegmentationResult(positionEvent, workingSlice);
 

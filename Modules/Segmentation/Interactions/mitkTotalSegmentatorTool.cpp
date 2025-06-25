@@ -193,10 +193,11 @@ mitk::MultiLabelSegmentation::Pointer mitk::TotalSegmentatorTool::AgglomerateLab
     auto const &outputImagePath = filePaths[labelId-1];
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     auto label = LabelSetImageHelper::CreateNewLabel(aggloLabelImage, "object");
-
+    auto outputBuffer = mitk::MultiLabelSegmentation::New();
+    outputBuffer->InitializeByLabeledImage(outputImage);
     #pragma omp critical
     {
-      aggloLabelImage->AddLabelWithContent(label, outputImage, layerIndex, 1, false);
+      aggloLabelImage->AddLabelWithContent(label, outputBuffer->GetGroupImage(0), layerIndex, 1, false);
     }
   }
   return aggloLabelImage;

@@ -68,9 +68,6 @@ public:
   /** Returns a node predicate that identifies image nodes.*/
   static NodePredicateBase::ConstPointer ImageNodePredicate();
 
-  /** Returns a node predicate that identifies segmentation/mask nodes.*/
-  static NodePredicateBase::ConstPointer MaskNodePredicate();
-
   /** Returns a node predicate that identifies point set nodes.*/
   static NodePredicateBase::ConstPointer PointSetNodePredicate();
 

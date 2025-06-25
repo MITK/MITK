@@ -31,7 +31,7 @@ class QmitkToolInstallDialog : public QDialog
 public:
   static QObject* GetConsoleOutput();
 
-  explicit QmitkToolInstallDialog(QWidget *parent = nullptr);
+  explicit QmitkToolInstallDialog(QWidget *parent = nullptr, QString tool = "");
   ~QmitkToolInstallDialog();
 
   /**

@@ -29,6 +29,7 @@ found in the LICENSE file.
 namespace AbstractDataNodeAction
 {
   MITK_QT_APP QList<mitk::DataNode::Pointer> GetSelectedNodes(berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  MITK_QT_APP QList<mitk::WeakPointer<mitk::DataNode>> GetSelectedWeakNodes(berry::IWorkbenchPartSite::Pointer workbenchPartSite);
 }
 
 class MITK_QT_APP QmitkAbstractDataNodeAction
@@ -57,10 +58,11 @@ protected:
 
   mitk::DataNode::Pointer GetSelectedNode() const;
   QList<mitk::DataNode::Pointer> GetSelectedNodes() const;
+  QList<mitk::WeakPointer<mitk::DataNode>> GetSelectedWeakNodes() const;
 
   berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-  QList<mitk::DataNode::Pointer> m_SelectedNodes;
+  QList<mitk::WeakPointer<mitk::DataNode>> m_SelectedNodes;
 
 private:
 

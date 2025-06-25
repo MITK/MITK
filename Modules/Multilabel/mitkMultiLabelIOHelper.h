@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <mitkLabel.h>
 
+#include <mitkLabelSetImage.h>
+
 #include <itkSmartPointer.h>
 #include <nlohmann/json.hpp>
 
@@ -33,8 +35,6 @@ namespace itk
 
 namespace mitk
 {
-  class LabelSetImage;
-
   const constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
   const constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
   const constexpr char* const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org_mitk_timegeometry_type";
@@ -42,7 +42,7 @@ namespace mitk
   const constexpr char* const PROPERTY_KEY_UID = "org_mitk_uid";
 
   /**
-   * @brief The MultiLabelIOHelper is a static helper class that supports serialization of mitk::LabelSetImage
+   * @brief The MultiLabelIOHelper is a static helper class that supports serialization of mitk::MultiLabelSegmentation
    *
    * This class provides static functions for converting mitk::Label into XML and also allows the serialization
    * of mitk::LabelSet as presets
@@ -51,23 +51,23 @@ namespace mitk
   {
   public:
     /**
-     * @brief Saves the mitk::LabelSet configuration of inputImage to presetFilename.
+     * @brief Saves the mitk::LabelSet configuration of inputSegmentation to presetFilename.
      * The preset is stored as "*.lsetp"
      * @param presetFilename the filename including the filesystem path
-     * @param inputImage the input image from which the preset should be generated
+     * @param inputSegmentation the input image from which the preset should be generated
      * @return true if the serialization was successful and false otherwise
      */
     static bool SaveLabelSetImagePreset(const std::string &presetFilename,
-                                        const mitk::LabelSetImage *inputImage);
+                                        const mitk::MultiLabelSegmentation *inputImage);
 
     /**
-     * @brief Loads an existing preset for a mitk::LabelSetImage from presetFilename and applies it to inputImage
+     * @brief Loads an existing preset for a mitk::MultiLabelSegmentation from presetFilename and applies it to inputSegmentation
      * @param presetFilename the filename of the preset including the filesystem path
-     * @param inputImage the image to which the loaded preset will be applied
+     * @param inputSegmentation the image to which the loaded preset will be applied
      * @return true if the deserilization was successful and false otherwise
      */
     static bool LoadLabelSetImagePreset(const std::string &presetFilename,
-                                        mitk::LabelSetImage *inputImage);
+                                        mitk::MultiLabelSegmentation *inputImage);
 
     /**
      * @brief Creates a mitk::Label from an XML element
@@ -110,15 +110,88 @@ namespace mitk
     * If the key does not exist an empty string is returned.*/
     static std::string GetStringByKey(const itk::MetaDataDictionary& dic, const std::string& key);
 
+    /**
+     * @brief Structure to hold label group metadata including labels and group properties
+     */
+    struct MITKMULTILABEL_EXPORT LabelGroupMetaData
+    {
+      std::string name;
+      LabelVector labels;
+      PropertyList::Pointer properties; // For custom group properties
 
-    static nlohmann::json SerializeMultLabelGroupsToJSON(const mitk::LabelSetImage* inputImage);
+      LabelGroupMetaData();
+      LabelGroupMetaData(const std::string& groupName, const LabelVector& groupLabels);
+      LabelGroupMetaData(const std::string& groupName, const LabelVector& groupLabels, PropertyList* groupProperties);
+      ~LabelGroupMetaData() = default;
+    };
 
-    using LabelGroupMetaData = std::pair < std::string, LabelVector>;
-    static std::vector<LabelGroupMetaData> DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets);
 
+    using GroupFileNameCallback = std::function<std::string(const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::GroupIndexType)>;
+    using LabelFileNameCallback = std::function<std::string(const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::LabelValueType)>;
+    using LabelFileValueCallback = std::function<mitk::MultiLabelSegmentation::LabelValueType(const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation::LabelValueType)>;
+
+    /**
+     * @brief Serialize meta data all groups of the multilabel segmentation to JSON format (v2)
+     * @param inputSegmentation the multilabel segmentation to serialize
+     * @param groupFileNameCallback Optional call back function. If provided the property "file" on group level
+     * based on the returned string will be set.
+     * @param labelFileNameCallback Optional call back function. If provided the property "file" per label
+     * based on the returned string will be set.
+     * @param labelFileValueCallback Optional call back function. If provided the property "file_value" per label
+     * will be set according to the returned value.
+     * @return JSON representation of the groups
+     */
+    static nlohmann::json SerializeMultLabelGroupsToJSON(const mitk::MultiLabelSegmentation* inputSegmentation,
+      GroupFileNameCallback groupFileNameCallback = nullptr ,
+      LabelFileNameCallback labelFileNameCallback = nullptr,
+      LabelFileValueCallback labelFileValueCallback = nullptr);
+
+    /**
+     * @brief Deserialize meta data of multilabel groups from JSON format (v2)
+     * @param listOfLabelGroups JSON representation of label groups
+     * @return vector of label group metadata
+     */
+    static std::vector<LabelGroupMetaData> DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelGroups);
+
+    /**
+     * @brief Serialize a single label to JSON
+     * @param label the label to serialize
+     * @return JSON representation of the label
+     */
     static nlohmann::json SerializeLabelToJSON(const Label* label);
 
+    /**
+     * @brief Deserialize a single label from JSON
+     * @param labelJson JSON representation of the label
+     * @return pointer to the deserialized label
+     */
     static mitk::Label::Pointer DeserializeLabelFromJSON(const nlohmann::json& labelJson);
+
+    /**
+     * @brief Serialize the property of a label to JSON
+     * @param property Pointer to the property that should be serialized
+     * @return JSON representation of the property
+     */
+    static nlohmann::json SerializeLabelPropertyToJSON(const BaseProperty* property);
+
+    template<typename TValueType>
+    static bool GetValueFromJson(const nlohmann::json& labelJson, const std::string& key, TValueType& value)
+    {
+      if (labelJson.find(key) != labelJson.end())
+      {
+        try
+        {
+          value = labelJson[key].get<TValueType>();
+          return true;
+        }
+        catch (...)
+        {
+          MITK_ERROR << "Unable to read label information from json. Value has wrong type. Failed key: " << key << "; invalid value: " << labelJson[key].dump();
+          throw;
+        }
+      }
+      return false;
+    }
 
   private:
     MultiLabelIOHelper();

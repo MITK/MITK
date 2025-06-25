@@ -56,12 +56,11 @@ namespace mitk
     @param dictionary Reference to the meta data dictionary that contains the information that should be extracted.*/
     static PropertyList::Pointer ExtractMetaDataAsPropertyList(const itk::MetaDataDictionary& dictionary, const std::string& mimeTypeName, const std::vector<std::string>& defaultMetaDataKeys);
 
-    /** Helper function that van be used to extract a raw mitk image for the passed path using the also passed ImageIOBase instance.
+    /** Helper function that can be used to extract a raw mitk image for the passed path using the also passed ImageIOBase instance.
     Raw means, that only the pixel data and geometry information is loaded. But e.g. no properties etc...*/
     static Image::Pointer LoadRawMitkImageFromImageIO(itk::ImageIOBase* imageIO, const std::string& path);
 
-    /** Helper function that van be used to extract a raw mitk image for the passed path using the also passed ImageIOBase instance.
-    Raw means, that only the pixel data and geometry information is loaded. But e.g. no properties etc...*/
+    /** Helper function that can be used to prepare a mitk image being written to file using the also passed ImageIOBase instance.*/
     static void PreparImageIOToWriteImage(itk::ImageIOBase* imageIO, const Image* image);
 
     static void SavePropertyListAsMetaData(itk::MetaDataDictionary& dictionary, const PropertyList* properties, const std::string& mimeTypeName);

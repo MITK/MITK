@@ -95,13 +95,13 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
   // These points are used by the vtkLassoStencilSource to create
   // a vtkImageStencil.
   const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
-  const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
+  const auto& planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
   const mitk::BaseGeometry *imageGeometry3D = m_InputImage->GetGeometry( 0 );
   // If there is a second poly line in a closed planar figure, treat it as a hole.
-  PlanarFigure::PolyLineType planarFigureHolePolyline;
+  const PlanarFigure::PolyLineType* planarFigureHolePolyline = nullptr;
 
   if (m_PlanarFigure->GetPolyLinesSize() == 2)
-    planarFigureHolePolyline = m_PlanarFigure->GetPolyLine(1);
+    planarFigureHolePolyline = &m_PlanarFigure->GetPolyLine(1);
 
 
   // Determine x- and y-dimensions depending on principal axis
@@ -141,12 +141,12 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromClosedPlanarFigure(
 
   vtkSmartPointer<vtkPoints> holePoints;
 
-  if (!planarFigureHolePolyline.empty())
+  if (planarFigureHolePolyline != nullptr && !planarFigureHolePolyline->empty())
   {
     holePoints = vtkSmartPointer<vtkPoints>::New();
     Point3D point3D;
 
-    for (const auto& point : planarFigureHolePolyline)
+    for (const auto& point : *planarFigureHolePolyline)
     {
       planarFigurePlaneGeometry->Map(point, point3D);
       imageGeometry3D->WorldToIndex(point3D, point3D);
@@ -254,7 +254,7 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
 
   // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
   const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
-  const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
+  const auto& planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
   const mitk::BaseGeometry *imageGeometry3D = m_InputImage->GetGeometry( 0 );
 
   // Determine x- and y-dimensions depending on principal axis

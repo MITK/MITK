@@ -28,9 +28,13 @@ namespace mitk
     * @brief Initializes common synchronized display actions by using the synchronized display action event functions.
     *
     * @pre    The class' observable (the display action event broadcast) has to be set to connect display events.
+    *
+    * @param prefixFilter The prefix of associated renderer names. Actions will only react to events from / send
+    *                     changes to renderers whose name begins with this prefix.
+    *
     * @throw  mitk::Exception, if the class' observable is null.
     */
-    void InitActionsImpl() override;
+    void InitActionsImpl(std::string prefixFilter = "") override;
   };
 } // end namespace mitk
 

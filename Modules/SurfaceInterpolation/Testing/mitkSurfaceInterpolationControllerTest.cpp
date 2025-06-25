@@ -59,17 +59,17 @@ public:
   mitk::Image::Pointer createImage(unsigned int *dimensions)
   {
     mitk::Image::Pointer newImage = mitk::Image::New();
-    // mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
+    // mitk::MultiLabelSegmentation::Pointer newImage = mitk::MultiLabelSegmentation::New();
     mitk::PixelType p_type = mitk::MakeScalarPixelType<unsigned char>();
     newImage->Initialize(p_type, 3, dimensions);
     AccessFixedDimensionByItk(newImage, ClearBufferProcessing, 3);
     return newImage;
   }
 
-  mitk::LabelSetImage::Pointer createLabelSetImage(unsigned int *dimensions)
+  mitk::MultiLabelSegmentation::Pointer createLabelSetImage(unsigned int *dimensions)
   {
     mitk::Image::Pointer image = createImage(dimensions);
-    mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
+    mitk::MultiLabelSegmentation::Pointer newImage = mitk::MultiLabelSegmentation::New();
     newImage->InitializeByLabeledImage(image);
     return newImage;
   }
@@ -82,10 +82,10 @@ public:
     return newImage;
   }
 
-  mitk::LabelSetImage::Pointer createLabelSetImage4D(unsigned int *dimensions)
+  mitk::MultiLabelSegmentation::Pointer createLabelSetImage4D(unsigned int *dimensions)
   {
     mitk::Image::Pointer image = createImage4D(dimensions);
-    mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
+    mitk::MultiLabelSegmentation::Pointer newImage = mitk::MultiLabelSegmentation::New();
     newImage->InitializeByLabeledImage(image);
     return newImage;
   }
@@ -114,10 +114,10 @@ public:
   {
     // Create image for testing
     unsigned int dimensions1[] = {10, 10, 10};
-    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage(dimensions1);
+    mitk::MultiLabelSegmentation::Pointer segmentation_1 = createLabelSetImage(dimensions1);
 
     unsigned int dimensions2[] = {20, 10, 30};
-    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage(dimensions2);
+    mitk::MultiLabelSegmentation::Pointer segmentation_2 = createLabelSetImage(dimensions2);
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
@@ -212,10 +212,10 @@ public:
   {
     // Create image for testing
     unsigned int dimensions1[] = {10, 10, 10};
-    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage(dimensions1);
+    mitk::MultiLabelSegmentation::Pointer segmentation_1 = createLabelSetImage(dimensions1);
 
     unsigned int dimensions2[] = {20, 10, 30};
-    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage(dimensions2);
+    mitk::MultiLabelSegmentation::Pointer segmentation_2 = createLabelSetImage(dimensions2);
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
@@ -310,7 +310,7 @@ public:
 
     // Create another segmentation image
     unsigned int dimensions2[] = {20, 20, 20, 4};
-    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
+    mitk::MultiLabelSegmentation::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
     m_Controller->SetCurrentInterpolationSession(segmentation_2);
 
     auto planeGeometry4 = CreatePlaneGeometry(4);
@@ -388,7 +388,7 @@ public:
   {
     // Create segmentation image
     unsigned int dimensions1[] = {12, 12, 12, 3};
-    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
+    mitk::MultiLabelSegmentation::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
 
 
@@ -445,10 +445,10 @@ public:
   {
     // Create segmentation image
     unsigned int dimensions[] = { 20, 10, 30, 4 };
-    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions);
+    mitk::MultiLabelSegmentation::Pointer segmentation_1 = createLabelSetImage4D(dimensions);
     segmentation_1->AddLabel(mitk::Label::New(1, "Label1"), 0);
     segmentation_1->AddLabel(mitk::Label::New(2, "Label2"), 0);
-    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage4D(dimensions);
+    mitk::MultiLabelSegmentation::Pointer segmentation_2 = createLabelSetImage4D(dimensions);
     segmentation_2->AddLabel(mitk::Label::New(1, "Label1"), 0);
     segmentation_2->AddLabel(mitk::Label::New(2, "Label2"), 0);
 
@@ -492,13 +492,13 @@ public:
   }
 
 
-  bool AssertImagesEqual4D(mitk::LabelSetImage *img1, mitk::LabelSetImage *img2)
+  bool AssertImagesEqual4D(mitk::MultiLabelSegmentation *img1, mitk::MultiLabelSegmentation *img2)
   {
     auto selector1 = mitk::ImageTimeSelector::New();
-    selector1->SetInput(img1);
+    selector1->SetInput(img1->GetGroupImage(0));
     selector1->SetChannelNr(0);
     auto selector2 = mitk::ImageTimeSelector::New();
-    selector2->SetInput(img2);
+    selector2->SetInput(img2->GetGroupImage(0));
     selector2->SetChannelNr(0);
 
     int numTs1 = img1->GetTimeSteps();
@@ -537,15 +537,15 @@ public:
   {
     // Create image for testing
     unsigned int dimensions1[] = {10, 10, 10, 5};
-    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
+    mitk::MultiLabelSegmentation::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
     // mitk::Image * segmentationImage_1 = dynamic_cast<mitk::Image *>(segmentation_1.GetPointer());
 
     unsigned int dimensions2[] = {20, 10, 30, 4};
-    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
+    mitk::MultiLabelSegmentation::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
-    auto currentSegmentation = dynamic_cast<mitk::LabelSetImage *>(m_Controller->GetCurrentSegmentation());
+    auto currentSegmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(m_Controller->GetCurrentSegmentation());
     AssertImagesEqual4D(currentSegmentation, segmentation_1->Clone());
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
                            m_Controller->GetCurrentSegmentation() == segmentation_1.GetPointer());
@@ -556,7 +556,7 @@ public:
     m_Controller->SetCurrentInterpolationSession(segmentation_2);
     // MITK_ASSERT_EQUAL(m_Controller->GetCurrentSegmentation(), segmentation_2->Clone(), "Segmentation images are not
     // equal");
-    currentSegmentation = dynamic_cast<mitk::LabelSetImage *>(m_Controller->GetCurrentSegmentation());
+    currentSegmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(m_Controller->GetCurrentSegmentation());
     // AssertImagesEqual4D(currentSegmentation, segmentation_2->Clone());
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
                            currentSegmentation == segmentation_2.GetPointer());
@@ -567,7 +567,7 @@ public:
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
     // MITK_ASSERT_EQUAL(m_Controller->GetCurrentSegmentation(), segmentation_1->Clone(), "Segmentation images are not
     // equal");
-    currentSegmentation = dynamic_cast<mitk::LabelSetImage *>(m_Controller->GetCurrentSegmentation());
+    currentSegmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(m_Controller->GetCurrentSegmentation());
     AssertImagesEqual4D(currentSegmentation, segmentation_1->Clone());
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
                            m_Controller->GetCurrentSegmentation() == segmentation_1.GetPointer());
@@ -578,7 +578,7 @@ public:
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
     // MITK_ASSERT_EQUAL(m_Controller->GetCurrentSegmentation(), segmentation_1->Clone(), "Segmentation images are not
     // equal");
-    currentSegmentation = dynamic_cast<mitk::LabelSetImage *>(m_Controller->GetCurrentSegmentation());
+    currentSegmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(m_Controller->GetCurrentSegmentation());
     AssertImagesEqual4D(currentSegmentation, segmentation_1->Clone());
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
                            m_Controller->GetCurrentSegmentation() == segmentation_1.GetPointer());
@@ -596,10 +596,10 @@ public:
   {
     // Create image for testing
     unsigned int dimensions1[] = {10, 10, 10, 4};
-    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
+    mitk::MultiLabelSegmentation::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
 
     unsigned int dimensions2[] = {20, 10, 30, 5};
-    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
+    mitk::MultiLabelSegmentation::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
@@ -613,10 +613,10 @@ public:
   {
     // Create image for testing
     unsigned int dimensions1[] = {10, 10, 10, 3};
-    mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
+    mitk::MultiLabelSegmentation::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
 
     unsigned int dimensions2[] = {20, 10, 30, 6};
-    mitk::LabelSetImage::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
+    mitk::MultiLabelSegmentation::Pointer segmentation_2 = createLabelSetImage4D(dimensions2);
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
@@ -650,7 +650,7 @@ public:
     {
       // Create image for testing
       unsigned int dimensions1[] = {10, 10, 10, 7};
-      mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
+      mitk::MultiLabelSegmentation::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);
       m_Controller->SetCurrentInterpolationSession(segmentation_1);
     }
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 0",

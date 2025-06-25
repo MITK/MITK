@@ -87,7 +87,7 @@ void mitk::DisplayActionEventHandler::DisconnectObserver(OberserverTagType obser
   }
 }
 
-void mitk::DisplayActionEventHandler::InitActions()
+void mitk::DisplayActionEventHandler::InitActions(std::string prefixFilter /* = "" */)
 {
   auto observableBroadcast = m_ObservableBroadcast.Lock();
 
@@ -104,5 +104,5 @@ void mitk::DisplayActionEventHandler::InitActions()
   }
   m_ObserverTags.clear();
 
-  InitActionsImpl();
+  InitActionsImpl(prefixFilter);
 }

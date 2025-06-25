@@ -7,17 +7,20 @@
                 {
                     "isWindow": true,
                     "size": 403,
-                    "viewDirection": "Axial"
+                    "viewDirection": "Axial",
+                    "synchGroup": 1
                 },
                 {
                     "isWindow": true,
                     "size": 403,
-                    "viewDirection": "Sagittal"
+                    "viewDirection": "Sagittal",
+                    "synchGroup": 1
                 },
                 {
                     "isWindow": true,
                     "size": 403,
-                    "viewDirection": "Coronal"
+                    "viewDirection": "Coronal",
+                    "synchGroup": 1
                 }
             ],
             "isWindow": false,
@@ -29,17 +32,20 @@
                 {
                     "isWindow": true,
                     "size": 403,
-                    "viewDirection": "Axial"
+                    "viewDirection": "Axial",
+                    "synchGroup": 2
                 },
                 {
                     "isWindow": true,
                     "size": 403,
-                    "viewDirection": "Sagittal"
+                    "viewDirection": "Sagittal",
+                    "synchGroup": 2
                 },
                 {
                     "isWindow": true,
                     "size": 403,
-                    "viewDirection": "Coronal"
+                    "viewDirection": "Coronal",
+                    "synchGroup": 2
                 }
             ],
             "isWindow": false,

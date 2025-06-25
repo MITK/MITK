@@ -399,7 +399,10 @@ void ApplicationContainer::Launch(ApplicationHandle* appHandle)
     ctkApplicationLauncher* appLauncher = nullptr;
     {
       QMutexLocker l(this);
-      appLauncher = launcherTracker->getService();
+
+      if (!launcherTracker->getServiceReferences().empty())
+        appLauncher = launcherTracker->getService();
+
       if (appLauncher == nullptr)
       {
         if (isDefault)

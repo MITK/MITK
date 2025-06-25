@@ -57,8 +57,15 @@ void mitk::ContourTool::OnMousePressed(StateMachineAction *, InteractionEvent *i
   this->AddVertexToCurrentFeedbackContour(point);
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
-  assert(positionEvent->GetSender()->GetRenderWindow());
-  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+  auto renderWindow = positionEvent->GetSender()->GetRenderWindow();
+  assert(renderWindow);
+  auto renderManager = mitk::RenderingManager::GetInstance();
+  //This ensures that contour tools also make the renderwindow they interact with the focused
+  //window. For this tools it does not happen automatically as the mouse press event does not
+  //reach the RenderWindowManager. By Setting the focus it is possible to pass events like
+  //hot keys for time or slice cycling to the window
+  renderManager->SetRenderWindowFocus(renderWindow);
+  renderManager->RequestUpdate(renderWindow);
 }
 
 /**
@@ -89,7 +96,13 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
   assert(positionEvent->GetSender()->GetRenderWindow());
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 
-  this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, m_PaintingPixelValue);
+
+  auto workingSeg = this->GetWorkingData();
+  if (!workingSeg)
+    return;
+  const auto activeLabelValue = workingSeg->GetActiveLabel()->GetValue();
+
+  this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, activeLabelValue, m_PaintingPixelValue!=0);
 }
 
 /**

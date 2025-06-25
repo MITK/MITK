@@ -56,9 +56,13 @@ void Step8::SetupWidgets()
 
   // Initialize the multiWidget with the render windows
   multiWidget->InitializeMultiWidget();
+  multiWidget->ResetCrosshair();
 
   // Add the displayed views to the DataStorage to see their positions in 2D and 3D
   multiWidget->AddPlanesToDataStorage();
+
+  // Turn on the menu widgets
+  multiWidget->ActivateMenuWidget(true);
 
   //*************************************************************************
   // Part Ib: create and initialize LevelWindowWidget

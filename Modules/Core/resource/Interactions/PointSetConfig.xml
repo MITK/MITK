@@ -11,6 +11,9 @@
   <event_variant class="InteractionKeyEvent" name="Abort">
     <attribute name="Key" value="Escape"/>
   </event_variant>
+  <event_variant class="InteractionKeyEvent" name="KeyDelete">
+    <attribute name="Key" value="Delete"/>
+  </event_variant>
   <event_variant class="MousePressEvent" name="DeletePoint">
     <attribute name="EventButton" value="LeftMouseButton"/>
     <attribute name="Modifiers" value="alt"/>

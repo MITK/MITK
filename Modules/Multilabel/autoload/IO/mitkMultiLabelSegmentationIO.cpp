@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkMultiLabelSegmentationIO.h"
 #include "mitkBasePropertySerializer.h"
-#include "mitkIOMimeTypes.h"
+#include "mitkMultilabelIOMimeTypes.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkMultiLabelIOHelper.h"
 #include "mitkLabelSetImageConverter.h"
@@ -38,12 +38,12 @@ namespace mitk
   const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_KEY = "modality";
   const constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_VALUE = "org.mitk.multilabel.segmentation";
   const constexpr char* const MULTILABEL_SEGMENTATION_VERSION_KEY = "org.mitk.multilabel.segmentation.version";
-  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 2;
+  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 3;
   const constexpr char* const MULTILABEL_SEGMENTATION_LABELS_INFO_KEY = "org.mitk.multilabel.segmentation.labelgroups";
   const constexpr char* const MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY = "org.mitk.multilabel.segmentation.unlabeledlabellock";
 
   MultiLabelSegmentationIO::MultiLabelSegmentationIO()
-    : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Multilabel Segmentation")
+    : AbstractFileIO(MultiLabelSegmentation::GetStaticNameOfClass(), MitkMultilabelIOMimeTypes::MULTILABEL_SEGMENTATION_MIMETYPE(), "MITK Multilabel Segmentation")
   {
     this->InitializeDefaultMetaDataKeys();
     AbstractFileWriter::SetRanking(10);
@@ -55,7 +55,7 @@ namespace mitk
   {
     if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
       return Unsupported;
-    const auto *input = static_cast<const LabelSetImage *>(this->GetInput());
+    const auto *input = static_cast<const MultiLabelSegmentation *>(this->GetInput());
     if (input)
       return Supported;
     else
@@ -66,7 +66,7 @@ namespace mitk
   {
     ValidateOutputLocation();
 
-    auto input = dynamic_cast<const LabelSetImage *>(this->GetInput());
+    auto input = dynamic_cast<const MultiLabelSegmentation *>(this->GetInput());
 
     mitk::LocaleSwitch localeSwitch("C");
 
@@ -164,12 +164,12 @@ namespace mitk
     //generate multi label images
     auto output = ConvertImageToLabelSetImage(rawimage);
 
-    //get label set definitions
+    //get label groups definitions
     auto jsonStr = MultiLabelIOHelper::GetStringByKey(dictionary, MULTILABEL_SEGMENTATION_LABELS_INFO_KEY);
     nlohmann::json jlabelsets = nlohmann::json::parse(jsonStr);
     auto labelGroups = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(jlabelsets);
 
-    if (labelGroups.empty() && output->GetNumberOfLayers()==1)
+    if (labelGroups.empty() && output->GetNumberOfGroups()==1)
     {
       if (output->GetTotalNumberOfLabels() > 0)
       {
@@ -178,16 +178,16 @@ namespace mitk
 
       MITK_INFO << "Segmentation contains only one layer and has no label information. Assuming empty label.";
     }
-    else if (labelGroups.size() != output->GetNumberOfLayers())
+    else if (labelGroups.size() != output->GetNumberOfGroups())
     {
-      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfLayers() << "; found label groups: " << labelGroups.size();
+      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfGroups() << "; found label groups: " << labelGroups.size();
     }
 
-    LabelSetImage::GroupIndexType id = 0;
-    for (auto [name, labels] : labelGroups)
+    MultiLabelSegmentation::GroupIndexType id = 0;
+    for (auto& groupInfo : labelGroups)
     {
-      output->ReplaceGroupLabels(id, labels);
-      if (!name.empty()) output->SetGroupName(id, name);
+      output->ReplaceGroupLabels(id, groupInfo.labels);
+      if (!groupInfo.name.empty()) output->SetGroupName(id, groupInfo.name);
       id++;
     }
 
@@ -198,7 +198,20 @@ namespace mitk
     auto props = ItkImageIO::ExtractMetaDataAsPropertyList(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
     for (auto& [name, prop] : *(props->GetMap()))
     {
-      output->SetProperty(name, prop->Clone()); //need to clone to avoid that all outputs pointing to the same prop instances.
+      bool addProp = true;
+      for (auto unwantedName : m_DefaultMetaDataKeys)
+      {
+        // Only add properties that are not default meta information
+        if (name.substr(0, unwantedName.length()).find(unwantedName) != std::string::npos)
+        {
+          addProp = false;
+          break;
+        }
+      }
+      if (addProp)
+      {
+        output->SetProperty(name, prop->Clone()); //need to clone to avoid that all outputs pointing to the same prop instances.
+      }
     }
 
     // Handle UID

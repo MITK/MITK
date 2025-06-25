@@ -32,6 +32,11 @@ public:
   bool isTransparentForMouseEvents() const;
   void setTransparentForMouseEvents(bool transparent = true);
 
+  int getOpacity() const;
+
+public slots:
+  void setOpacity(int opacity);
+
 protected:
   bool event(QEvent* e) override;
   bool eventFilter(QObject* watched, QEvent* event) override;
@@ -40,6 +45,9 @@ protected:
 private:
   void installEventFilterOnParent();
   void removeEventFilterFromParent();
+
+  int m_Opacity = 63;
+
 };
 
 #endif

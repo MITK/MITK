@@ -50,6 +50,21 @@ void QmitkSynchronizedWidgetConnector::ConnectWidget(const QmitkSynchronizedNode
   connect(this, &QmitkSynchronizedWidgetConnector::SelectionModeChanged,
     nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SetSelectAll);
 
+  connect(nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::NodeVisibilityChanged,
+    this, &QmitkSynchronizedWidgetConnector::NodeVisibilityChanged);
+
+  connect(nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::NodeVisibilityChanged,
+    this, &QmitkSynchronizedWidgetConnector::OnNodeVisibilityChanged);
+
+  connect(this, &QmitkSynchronizedWidgetConnector::NodeVisibilityChanged,
+    nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SetNodeVisibility);
+
+  connect(nodeSelectionWidget->GetStorageModel(), &QmitkRenderWindowDataNodeTableModel::NodesLayerMoved,
+    this, &QmitkSynchronizedWidgetConnector::NodesLayerMoved);
+
+  connect(this, &QmitkSynchronizedWidgetConnector::NodesLayerMoved,
+    nodeSelectionWidget->GetStorageModel(), &QmitkRenderWindowDataNodeTableModel::moveNodesLayer);
+
   connect(nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::DeregisterSynchronization,
     this, &QmitkSynchronizedWidgetConnector::DeregisterWidget);
 
@@ -69,6 +84,18 @@ void QmitkSynchronizedWidgetConnector::DisconnectWidget(const QmitkSynchronizedN
 
   disconnect(this, &QmitkSynchronizedWidgetConnector::SelectionModeChanged,
     nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SetSelectAll);
+
+  disconnect(nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::NodeVisibilityChanged,
+    this, &QmitkSynchronizedWidgetConnector::NodeVisibilityChanged);
+
+  disconnect(this, &QmitkSynchronizedWidgetConnector::NodeVisibilityChanged,
+    nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SetNodeVisibility);
+
+  disconnect(nodeSelectionWidget->GetStorageModel(), &QmitkRenderWindowDataNodeTableModel::NodesLayerMoved,
+    this, &QmitkSynchronizedWidgetConnector::NodesLayerMoved);
+
+  disconnect(this, &QmitkSynchronizedWidgetConnector::NodesLayerMoved,
+    nodeSelectionWidget->GetStorageModel(), &QmitkRenderWindowDataNodeTableModel::moveNodesLayer);
 
   disconnect(nodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::DeregisterSynchronization,
     this, &QmitkSynchronizedWidgetConnector::DeregisterWidget);
@@ -91,6 +118,17 @@ void QmitkSynchronizedWidgetConnector::SynchronizeWidget(QmitkSynchronizedNodeSe
   }
 
   nodeSelectionWidget->SetSelectAll(m_SelectAll);
+
+  // Need to explicitly set visibility true, since selected but invisible nodes in the sync group don't trigger selection changes
+  for (auto& node : nodeSelectionWidget->GetSelectedNodes())
+  {
+    nodeSelectionWidget->SetNodeVisibility(node, true);
+  }
+
+  for (auto& node : this->m_InternalInvisibles)
+  {
+    nodeSelectionWidget->SetNodeVisibility(node, false);
+  }
 }
 
 QmitkSynchronizedWidgetConnector::NodeList QmitkSynchronizedWidgetConnector::GetNodeSelection() const
@@ -119,6 +157,14 @@ void QmitkSynchronizedWidgetConnector::ChangeSelectionMode(bool selectAll)
     m_SelectAll = selectAll;
     emit SelectionModeChanged(m_SelectAll);
   }
+}
+
+void QmitkSynchronizedWidgetConnector::OnNodeVisibilityChanged(mitk::DataNode::Pointer node, bool visibility)
+{
+  if (!visibility)
+    this->m_InternalInvisibles.insert(node.GetPointer());
+  else
+    this->m_InternalInvisibles.erase(node.GetPointer());
 }
 
 void QmitkSynchronizedWidgetConnector::DeregisterWidget()

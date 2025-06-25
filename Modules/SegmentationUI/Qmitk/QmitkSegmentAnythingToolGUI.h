@@ -35,12 +35,6 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
-  /**
-   * @brief Checks if SegmentAnything is found inside the selected python virtual environment.
-   * @return bool
-   */
-  static bool IsSAMInstalled(const QString &);
-
 protected slots:
   /**
    * @brief Qt Slot
@@ -109,6 +103,12 @@ protected:
    * @return bool 
    */
   bool ValidatePrefences();
+
+   /**
+   * @brief Checks if the preferences are correctly set and displays appropriate
+   * status message appending to the initial string provided as argument.
+   */
+  void UpdateSAMStatusMessage(QString &initText);
 
 private:
   mitk::IPreferences* m_Preferences;

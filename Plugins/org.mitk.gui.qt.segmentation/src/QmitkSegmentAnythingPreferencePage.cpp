@@ -12,141 +12,169 @@ found in the LICENSE file.
 
 #include "QmitkSegmentAnythingPreferencePage.h"
 
-#include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
 #include <mitkProcessExecutor.h>
 #include <itkCommand.h>
 #include <QmitkSegmentAnythingToolGUI.h>
+#include "QmitkToolInstallDialog.h"
 
 #include <QFileDialog>
 #include <QmitkStyleManager.h>
-#include <QDir>
 #include <QDirIterator>
+#include <QCursor>
+#include <QFuture>
+#include <QtConcurrent/QtConcurrentRun>
+#include <QApplication>
 
 
 namespace
 {
-  mitk::IPreferences* GetPreferences()
+  mitk::IPreferences *GetPreferences()
   {
-    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    auto *preferencesService = mitk::CoreServices::GetPreferencesService();
     return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   }
 }
 
 QmitkSegmentAnythingPreferencePage::QmitkSegmentAnythingPreferencePage()
-  : m_Ui(new Ui::QmitkSegmentAnythingPreferencePage),
-    m_Control(nullptr){}
+  : m_Ui(new Ui::QmitkSegmentAnythingPreferencePage), m_Control(nullptr){}
 
 QmitkSegmentAnythingPreferencePage::~QmitkSegmentAnythingPreferencePage(){}
 
 void QmitkSegmentAnythingPreferencePage::Init(berry::IWorkbench::Pointer){}
 
-void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget* parent)
+const QString QmitkSegmentAnythingPreferencePage::WARNING_PYTHON_NOT_FOUND =
+  "Python is not detected in the selected path.\n"
+  "Please select a path with a valid python install.";
+
+void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget *parent)
 {
   m_Control = new QWidget(parent);
   m_Ui->setupUi(m_Control);
 
   m_Ui->samModelTipLabel->hide();
+  m_Ui->timeoutEdit->setValidator(new QIntValidator(0, 1000, this));
+  QIcon deleteIcon =
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/edit-delete.svg"));
+  m_Ui->clearSAMButton->setIcon(deleteIcon);
+  
+  m_Ui->samModelTypeComboBox->addItems(VALID_MODELS);
+  m_Ui->deviceComboBox->addItem(CPU_ID);
+  m_Preferences = GetPreferences();
+  if (nullptr == m_Preferences)
+  {
+    this->ShowErrorMessage("Error occurred while loading preferences.");
+    return;
+  }
+
+  m_SysPythonPath = QString::fromStdString(m_Preferences->Get("sam systemPython path", ""));
+  m_Ui->sysPythonComboBox->setDuplicatesEnabled(false);
+  QStringList pythonDirs = QmitkSetupVirtualEnvUtil::AutoParsePythonPaths();
+  m_Ui->sysPythonComboBox->addItems(pythonDirs);
+  m_Ui->sysPythonComboBox->addItem("Select...");
+  int sysPythonId = m_Ui->sysPythonComboBox->findText(m_SysPythonPath);
+  if (!m_SysPythonPath.isEmpty() && sysPythonId == -1)
+  {
+    m_Ui->sysPythonComboBox->addItem(m_SysPythonPath);
+    m_Ui->sysPythonComboBox->setCurrentIndex(m_Ui->sysPythonComboBox->count() - 1);
+  }
+  else
+  {
+    m_Ui->sysPythonComboBox->setCurrentIndex(sysPythonId);
+  }
 #ifndef _WIN32
   m_Ui->sysPythonComboBox->addItem("/usr/bin");
 #endif
-  this->AutoParsePythonPaths();
-  m_Ui->timeoutEdit->setValidator(new QIntValidator(0, 1000, this));
-  m_Ui->sysPythonComboBox->addItem("Select...");
-  m_Ui->sysPythonComboBox->setCurrentIndex(0);
+  QString installPath = QString::fromStdString(m_Preferences->Get("sam python path", ""));
+  bool isInstalled = !installPath.isEmpty();
+  QString welcomeText;
+  if (isInstalled)
+  {
+    m_PythonPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(installPath).first;
+    m_Installer.SetVirtualEnvPath(m_PythonPath);
+    welcomeText += " Segment Anything is already found installed.";
+    m_Ui->installSAMButton->setEnabled(false);
+  }
+  else
+  {
+    welcomeText += " Segment Anything not installed. Please click on \"Install SAM with MedSAM\" above. \
+      The installation will create a new virtual environment using the System Python selected above.";
+    m_Ui->installSAMButton->setEnabled(true);
+  }
+
   connect(m_Ui->installSAMButton, SIGNAL(clicked()), this, SLOT(OnInstallBtnClicked()));
   connect(m_Ui->clearSAMButton, SIGNAL(clicked()), this, SLOT(OnClearInstall()));
   connect(m_Ui->sysPythonComboBox,
           QOverload<int>::of(&QComboBox::activated),
           [=](int index) { OnSystemPythonChanged(m_Ui->sysPythonComboBox->itemText(index)); });
-  QIcon deleteIcon =
-    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/edit-delete.svg"));
-  m_Ui->clearSAMButton->setIcon(deleteIcon);
-  const QString storageDir = m_Installer.GetVirtualEnvPath();
-  bool isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(storageDir);
-  QString welcomeText;
-  if (isInstalled)
-  {
-    m_PythonPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(storageDir).first;
-    m_Installer.SetVirtualEnvPath(m_PythonPath);
-    welcomeText += " Segment Anything tool & MedSAM is already found installed.";
-    m_Ui->installSAMButton->setEnabled(false);
-  }
-  else
-  {
-    welcomeText += " Segment Anything tool & MedSAM not installed. Please click on \"Install SAM with MedSAM\" above. \
-      The installation will create a new virtual environment using the System Python selected above.";
-    m_Ui->installSAMButton->setEnabled(true);
-  }
+
   this->WriteStatusMessage(welcomeText);
-  m_Ui->samModelTypeComboBox->addItems(VALID_MODELS);
-  m_Ui->gpuComboBox->addItem(CPU_ID);
-  this->SetGPUInfo();
+  this->SetDeviceInfo();
   this->Update();
 }
 
-QWidget* QmitkSegmentAnythingPreferencePage::GetQtControl() const
+QWidget *QmitkSegmentAnythingPreferencePage::GetQtControl() const
 {
   return m_Control;
 }
 
 bool QmitkSegmentAnythingPreferencePage::PerformOk()
 {
-  auto* prefs = GetPreferences();
-  prefs->Put("sam parent path", m_Installer.STORAGE_DIR.toStdString());
-  prefs->Put("sam python path", m_PythonPath.toStdString());
-  prefs->Put("sam modeltype", m_Ui->samModelTypeComboBox->currentText().toStdString());
-  prefs->PutInt("sam gpuid", FetchSelectedGPUFromUI());
-  prefs->PutInt("sam timeout", std::stoi(m_Ui->timeoutEdit->text().toStdString()));
+  m_Preferences->Put("sam systemPython path", m_SysPythonPath.toStdString());
+  m_Preferences->Put("sam python path", m_PythonPath.toStdString());
+  m_Preferences->Put("sam modeltype", m_Ui->samModelTypeComboBox->currentText().toStdString());
+  m_Preferences->PutInt("sam deviceId", FetchSelectedDeviceFromUI());
+  m_Preferences->PutInt("sam timeout", std::stoi(m_Ui->timeoutEdit->text().toStdString()));
   return true;
 }
 
-void QmitkSegmentAnythingPreferencePage::PerformCancel(){}
+void QmitkSegmentAnythingPreferencePage::PerformCancel()
+{
+  m_Preferences->Put("sam python path", m_PythonPath.toStdString());
+}
 
 void QmitkSegmentAnythingPreferencePage::Update()
 {
-  auto* prefs = GetPreferences();
-  m_Ui->samModelTypeComboBox->setCurrentText(QString::fromStdString(prefs->Get("sam modeltype", "vit_b")));
-  m_Ui->timeoutEdit->setText(QString::number(prefs->GetInt("sam timeout", 300)));
-  int gpuId = prefs->GetInt("sam gpuid", -1);
+  m_Ui->samModelTypeComboBox->setCurrentText(QString::fromStdString(m_Preferences->Get("sam modeltype", "vit_b")));
+  m_Ui->timeoutEdit->setText(QString::number(m_Preferences->GetInt("sam timeout", 300)));
+  int gpuId = m_Preferences->GetInt("sam deviceId", -1);
   if (gpuId == -1)
   {
-    m_Ui->gpuComboBox->setCurrentText(CPU_ID);
+    m_Ui->deviceComboBox->setCurrentText(CPU_ID);
   }
   else if (m_GpuLoader.GetGPUCount() == 0)
   {
-    m_Ui->gpuComboBox->setCurrentText(QString::number(gpuId));
+    m_Ui->deviceComboBox->setCurrentText(QString::number(gpuId));
   }
   else
   {
     std::vector<QmitkGPUSpec> specs = m_GpuLoader.GetAllGPUSpecs();
     QmitkGPUSpec gpuSpec = specs[gpuId];
-    m_Ui->gpuComboBox->setCurrentText(QString::number(gpuSpec.id) + ": " + gpuSpec.name + " (" + gpuSpec.memory + ")");
+    m_Ui->deviceComboBox->setCurrentText(QString::number(gpuSpec.id) + ": " + gpuSpec.name + " (" + gpuSpec.memory + ")");
   }
 }
 
-std::pair<QString, QString> QmitkSegmentAnythingPreferencePage::OnSystemPythonChanged(const QString &pyEnv)
+void QmitkSegmentAnythingPreferencePage::OnSystemPythonChanged(const QString &pyEnv)
 {
-  std::pair<QString, QString> pyPath;
   if (pyEnv == QString("Select..."))
   {
     QString path = QFileDialog::getExistingDirectory(m_Ui->sysPythonComboBox->parentWidget(), "Python Path", "dir");
-    if (!path.isEmpty())
+    std::pair<QString, QString> pyPath;
+    pyPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(this->GetPythonPathFromUI(path));
+    if (!pyPath.first.isEmpty())
     {
-      this->OnSystemPythonChanged(path);                           // recall same function for new path validation
-      bool oldState = m_Ui->sysPythonComboBox->blockSignals(true); // block signal firing while inserting item
       m_Ui->sysPythonComboBox->insertItem(0, path);
       m_Ui->sysPythonComboBox->setCurrentIndex(0);
-      m_Ui->sysPythonComboBox->blockSignals(oldState); // unblock signal firing after inserting item. Remove this after Qt6 migration
+      m_SysPythonPath = pyPath.first;
+    }
+    else
+    {
+      this->ShowErrorMessage(WARNING_PYTHON_NOT_FOUND);
     }
   }
   else
   {
-    QString uiPyPath = this->GetPythonPathFromUI(pyEnv);
-    pyPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(uiPyPath);
+    m_SysPythonPath = pyEnv;
   }
-  return pyPath;
 }
 
 QString QmitkSegmentAnythingPreferencePage::GetPythonPathFromUI(const QString &pyUI) const
@@ -159,62 +187,26 @@ QString QmitkSegmentAnythingPreferencePage::GetPythonPathFromUI(const QString &p
   return fullPath.simplified();
 }
 
-void QmitkSegmentAnythingPreferencePage::AutoParsePythonPaths()
-{
-  QString homeDir = QDir::homePath();
-  std::vector<QString> searchDirs;
-#ifdef _WIN32
-  searchDirs.push_back(QString("C:") + QDir::separator() + QString("ProgramData") + QDir::separator() +
-                       QString("anaconda3"));
-#else
-  // Add search locations for possible standard python paths here
-  searchDirs.push_back(homeDir + QDir::separator() + "anaconda3");
-  searchDirs.push_back(homeDir + QDir::separator() + "miniconda3");
-  searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "miniconda3");
-  searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "anaconda3");
-#endif
-  for (QString searchDir : searchDirs)
-  {
-    if (searchDir.endsWith("anaconda3", Qt::CaseInsensitive))
-    {
-      if (QDir(searchDir).exists())
-      {
-        m_Ui->sysPythonComboBox->addItem("(base): " + searchDir);
-        searchDir.append((QDir::separator() + QString("envs")));
-      }
-    }
-    for (QDirIterator subIt(searchDir, QDir::AllDirs, QDirIterator::NoIteratorFlags); subIt.hasNext();)
-    {
-      subIt.next();
-      QString envName = subIt.fileName();
-      if (!envName.startsWith('.')) // Filter out irrelevant hidden folders, if any.
-      {
-        m_Ui->sysPythonComboBox->addItem("(" + envName + "): " + subIt.filePath());
-      }
-    }
-  }
-}
-
-void QmitkSegmentAnythingPreferencePage::SetGPUInfo()
+void QmitkSegmentAnythingPreferencePage::SetDeviceInfo()
 {
   std::vector<QmitkGPUSpec> specs = m_GpuLoader.GetAllGPUSpecs();
   for (const QmitkGPUSpec &gpuSpec : specs)
   {
-    m_Ui->gpuComboBox->addItem(QString::number(gpuSpec.id) + ": " + gpuSpec.name + " (" + gpuSpec.memory + ")");
+    m_Ui->deviceComboBox->addItem(QString::number(gpuSpec.id) + ": " + gpuSpec.name + " (" + gpuSpec.memory + ")");
   }
   if (specs.empty())
   {
-    m_Ui->gpuComboBox->setCurrentIndex(m_Ui->gpuComboBox->findText("cpu"));
+    m_Ui->deviceComboBox->setCurrentIndex(m_Ui->deviceComboBox->findText("cpu"));
   }
   else
   {
-    m_Ui->gpuComboBox->setCurrentIndex(m_Ui->gpuComboBox->count()-1);
+    m_Ui->deviceComboBox->setCurrentIndex(m_Ui->deviceComboBox->count()-1);
   }
 }
 
-int QmitkSegmentAnythingPreferencePage::FetchSelectedGPUFromUI() const
+int QmitkSegmentAnythingPreferencePage::FetchSelectedDeviceFromUI() const
 {
-  QString gpuInfo = m_Ui->gpuComboBox->currentText();
+  QString gpuInfo = m_Ui->deviceComboBox->currentText();
   if ("cpu" == gpuInfo)
   {
     return -1;
@@ -233,7 +225,8 @@ int QmitkSegmentAnythingPreferencePage::FetchSelectedGPUFromUI() const
 void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
 {
   this->OnClearInstall(); // Clear any installation before
-  const auto [path, version] = OnSystemPythonChanged(m_Ui->sysPythonComboBox->currentText());
+  QString uiPyPath = this->GetPythonPathFromUI(m_Ui->sysPythonComboBox->currentText());
+  const auto [path, version] = QmitkSetupVirtualEnvUtil::GetExactPythonPath(uiPyPath);
   if (path.isEmpty())
   {
     this->WriteErrorMessage("<b>ERROR: </b>Couldn't find compatible Python.");
@@ -257,41 +250,67 @@ void QmitkSegmentAnythingPreferencePage::OnInstallBtnClicked()
   {
     return;
   }
-  this->WriteStatusMessage("<b>STATUS: </b>Installing SAM & MedSAM...");
+
+  //GUI
+  this->WriteStatusMessage("<b>STATUS: </b>Installing Segment Anything...");
   m_Ui->installSAMButton->setEnabled(false);
   m_Installer.SetSystemPythonPath(path);
-  bool isInstalled = false;
-  if (m_Installer.SetupVirtualEnv(m_Installer.VENV_NAME))
+  QmitkToolInstallDialog *installDialog = new QmitkToolInstallDialog(m_Control, "Segment Anything");
+  installDialog->show();
+
+  //Start async process for installation
+  QFuture<bool> future = QtConcurrent::run([&] {
+      return m_Installer.SetupVirtualEnv(
+        m_Installer.VENV_NAME,
+        m_Installer.PACKAGES,
+        [&]
+        {
+          std::string pythonCode; // python syntax to check if torch is installed with CUDA.
+          pythonCode.append("import torch;");
+          pythonCode.append("print('Segment Anything was installed with CUDA') if "
+                            "torch.cuda.is_available() else print('Segment Anything was "
+                            "installed WITHOUT CUDA');");
+          m_Installer.ExecutePython(pythonCode, &QmitkSAMToolInstaller::PrintProcessEvent);
+          return true;
+        },
+        &QmitkSAMToolInstaller::PrintProcessEvent, "2.6.0");
+      });
+  while (future.isRunning())
   {
-    isInstalled = QmitkSegmentAnythingToolGUI::IsSAMInstalled(m_Installer.GetVirtualEnvPath());
+    qApp->processEvents();
+    QThread::msleep(100);
   }
-  if (isInstalled)
+  if (future.result() && this->IsSAMInstalled(m_Installer.GetVirtualEnvPath()))
   {
     m_PythonPath = QmitkSetupVirtualEnvUtil::GetExactPythonPath(m_Installer.GetVirtualEnvPath()).first;
-    this->WriteStatusMessage("<b>STATUS: </b>Successfully installed SAM & MedSAM.");
+    this->WriteStatusMessage("<b>STATUS: </b>Successfully installed Segment Anything.");
+    installDialog->FinishInstallation("Successfully installed Segment Anything.");
   }
   else
   {
-    this->WriteErrorMessage("<b>ERROR: </b>Couldn't install SAM & MedSAM.");
+    this->WriteErrorMessage("<b>ERROR: </b>Couldn't install Segment Anything.");
     m_Ui->installSAMButton->setEnabled(true);
+    installDialog->FinishInstallation("Something went wrong while installing Segment Anything. Please try again.");
   }
 }
 
 void QmitkSegmentAnythingPreferencePage::OnClearInstall()
 {
   QDir folderPath(m_Installer.GetVirtualEnvPath());
-  bool isDeleted = folderPath.removeRecursively();
-  if (isDeleted)
+  QCursor cursor = m_Control->cursor();
+  m_Control->setCursor(Qt::BusyCursor);
+  if (folderPath.removeRecursively())
   {
     this->WriteStatusMessage("Deleted SAM installation.");
     m_Ui->installSAMButton->setEnabled(true);
-    m_PythonPath.clear();
+    m_PythonPath = "";
   }
   else
   {
     MITK_ERROR << "The virtual environment couldn't be removed. Please check if you have the required access "
                   "privileges or, some other process is accessing the folders.";
   }
+  m_Control->setCursor(cursor);
 }
 
 void QmitkSegmentAnythingPreferencePage::WriteStatusMessage(const QString &message)
@@ -308,59 +327,37 @@ void QmitkSegmentAnythingPreferencePage::WriteErrorMessage(const QString &messag
   qApp->processEvents();
 }
 
-QString QmitkSAMInstaller::GetVirtualEnvPath()
+void QmitkSegmentAnythingPreferencePage::ShowErrorMessage(const QString &message, QMessageBox::Icon icon)
 {
-  return STORAGE_DIR + VENV_NAME;
+  QMessageBox *messageBox = new QMessageBox(icon, nullptr, message);
+  messageBox->setAttribute(Qt::WA_DeleteOnClose, true);
+  MITK_WARN << message;
+  messageBox->exec();
 }
 
-bool QmitkSAMInstaller::SetupVirtualEnv(const QString &venvName)
+bool QmitkSegmentAnythingPreferencePage::IsSAMInstalled(const QString &pythonPath)
 {
-  if (GetSystemPythonPath().isEmpty())
-  {
-    return false;
-  }
-  if (!QmitkSetupVirtualEnvUtil::IsVenvInstalled(GetSystemPythonPath()))
-  {
-    return false;
-  }
-  QDir folderPath(GetBaseDir());
-  folderPath.mkdir(venvName);
-  if (!folderPath.cd(venvName))
-  {
-    return false; // Check if directory creation was successful.
-  }
-  mitk::ProcessExecutor::ArgumentListType args;
-  auto spExec = mitk::ProcessExecutor::New();
-  auto spCommand = itk::CStyleCommand::New();
-  spCommand->SetCallback(&PrintProcessEvent);
-  spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
-
-  args.push_back("-m");
-  args.push_back("venv");
-  args.push_back(venvName.toStdString());
+  QString fullPath = pythonPath;
+  bool hasPython = false;
+  bool hasSam = false;
 #ifdef _WIN32
-  QString pythonFile = GetSystemPythonPath() + QDir::separator() + "python.exe";
-  QString pythonExeFolder = "Scripts";
-#else
-  QString pythonFile = GetSystemPythonPath() + QDir::separator() + "python3";
-  QString pythonExeFolder = "bin";
-#endif
-  spExec->Execute(GetBaseDir().toStdString(), pythonFile.toStdString(), args); // Setup local virtual environment
-  if (folderPath.cd(pythonExeFolder))
+  hasPython = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
+  if (!(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
   {
-    this->SetPythonPath(folderPath.absolutePath());
-    this->SetPipPath(folderPath.absolutePath());
-    this->InstallPytorch();
-    for (auto &package : PACKAGES)
-    {
-      this->PipInstall(package.toStdString(), &PrintProcessEvent);
-    }
-    std::string pythonCode; // python syntax to check if torch is installed with CUDA.
-    pythonCode.append("import torch;");
-    pythonCode.append("print('Pytorch was installed with CUDA') if torch.cuda.is_available() else print('PyTorch was "
-                      "installed WITHOUT CUDA');");
-    this->ExecutePython(pythonCode, &PrintProcessEvent);
-    return true;
+    fullPath += QDir::separator() + QString("Scripts");
+    hasPython = (!hasPython) ? QFile::exists(fullPath + QDir::separator() + QString("python.exe")) : hasPython;
   }
-  return false;
+#else
+  hasPython = QFile::exists(fullPath + QDir::separator() + QString("python3"));
+  if (!(fullPath.endsWith("bin", Qt::CaseInsensitive) || fullPath.endsWith("bin/", Qt::CaseInsensitive)))
+  {
+    fullPath += QDir::separator() + QString("bin");
+    hasPython = (!hasPython) ? QFile::exists(fullPath + QDir::separator() + QString("python3")) : hasPython;
+  }
+#endif
+  hasSam = QFile::exists(fullPath + QDir::separator() + QString("run_inference_daemon.py")) &&
+           QFile::exists(fullPath + QDir::separator() + QString("sam_runner.py")) &&
+           QFile::exists(fullPath + QDir::separator() + QString("medsam_runner.py"));
+  bool isInstalled = hasSam && hasPython;
+  return isInstalled;
 }

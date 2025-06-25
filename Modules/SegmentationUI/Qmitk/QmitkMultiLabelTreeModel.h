@@ -34,14 +34,14 @@ class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelTreeModel : public QAbstractItemM
     Q_OBJECT
 
 public:
-  using LabelValueType = mitk::LabelSetImage::LabelValueType;
-  using GroupIndexType = mitk::LabelSetImage::GroupIndexType;
+  using LabelValueType = mitk::MultiLabelSegmentation::LabelValueType;
+  using GroupIndexType = mitk::MultiLabelSegmentation::GroupIndexType;
 
   QmitkMultiLabelTreeModel(QObject *parent = nullptr);
   ~QmitkMultiLabelTreeModel() override;
 
-  void SetSegmentation(mitk::LabelSetImage* segmentation);
-  const mitk::LabelSetImage* GetSegmentation() const;
+  void SetSegmentation(mitk::MultiLabelSegmentation* segmentation);
+  const mitk::MultiLabelSegmentation* GetSegmentation() const;
 
   Qt::ItemFlags flags(const QModelIndex &index) const override;
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -57,10 +57,7 @@ public:
   /** returns the index of a passed label value (always first column). If label value does not exist in
   segmentation or segmentation is not set an invalid index will be returned.*/
   QModelIndex indexOfLabel(mitk::Label::PixelType labelValue) const;
-  QModelIndex indexOfGroup(mitk::LabelSetImage::GroupIndexType groupIndex) const;
-  /** Returns the index to the next node in the tree that behaves like an instance (label node with only one instance
-  or instance node). If current index is at the end, an invalid index is returned.*/
-  QModelIndex ClosestLabelInstanceIndex(const QModelIndex& currentIndex) const;
+  QModelIndex indexOfGroup(mitk::MultiLabelSegmentation::GroupIndexType groupIndex) const;
   /** Returns the index to the first child node (or itself) in the tree that behaves like an instance (label node with only one instance
   or instance node). If current index is at the end, an invalid index is returned. If an invalid index is passed into the methods,
   the search starts at the root; thus the whole tree is search for the first label instance.*/
@@ -116,6 +113,10 @@ public:
 
   bool GetAllowVisibilityModification() const;
   bool GetAllowLockModification() const;
+  bool GetModelUpdateOngoing() const;
+  /** Returns the label value that is in the tree the closest instance to the latest removed label. If there was no label removal so far or no
+  label is left, the function will return mitk::MultiLabelSegmentation::UNLABELED_VALUE.*/
+  LabelValueType GetNearestLabelValueToLastChange() const;
 
 public Q_SLOTS:
   void SetAllowVisibilityModification(bool vmod);
@@ -142,8 +143,11 @@ private:
   void UpdateInternalTree();
   void GenerateInternalGroupTree(unsigned int layerID, QmitkMultiLabelSegTreeItem* layerItem);
   QmitkMultiLabelSegTreeItem* GenerateInternalTree();
+  /** Returns the tree item to the next node in the tree that behaves like an instance (label node with only one instance
+  or instance node). If current index is at the end, nullptr is returned.*/
+  const QmitkMultiLabelSegTreeItem* ClosestLabelInstanceIndex(const QmitkMultiLabelSegTreeItem* currentItem) const;
 
-  mitk::LabelSetImage::Pointer m_Segmentation;
+  mitk::MultiLabelSegmentation::Pointer m_Segmentation;
 
   std::mutex m_Mutex;
   std::unique_ptr<QmitkMultiLabelSegTreeItem> m_RootItem;
@@ -156,6 +160,9 @@ private:
 
   bool m_AllowVisibilityModification = true;
   bool m_AllowLockModification = true;
+  bool m_ModelUpdateOngoing = false;
+
+  mitk::MultiLabelSegmentation::LabelValueType m_NearestLabelValueToLastChange;
 
   mitk::ITKEventObserverGuard m_LabelAddedObserver;
   mitk::ITKEventObserverGuard m_LabelModifiedObserver;

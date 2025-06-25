@@ -31,15 +31,20 @@ namespace mitk
   public:
     mitkClassMacroNoParent(Operation)
 
-      //##Documentation
-      //## Constructor
-      Operation(OperationType operationType);
+    /** Function indicates if the operation is currently still valid and
+     could be conducted. Default implementation returns always true.*/
+    virtual bool IsValid() const;
 
-    virtual ~Operation();
-
+    virtual ~Operation() = default;
     OperationType GetOperationType();
 
   protected:
+    Operation(OperationType operationType);
+    Operation(const Operation&) = default;
+    Operation(Operation&&) = default;
+    Operation& operator=(const Operation&) = default;
+    Operation& operator=(Operation&&) = default;
+
     OperationType m_OperationType;
   };
 

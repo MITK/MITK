@@ -54,11 +54,11 @@ namespace mitk
     itkGetMacro(SensibleMaximumThreshold, ScalarType);
 
     void InitiateToolByInput() override;
-    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) override;
 
     template <typename TPixel, unsigned int VImageDimension>
     void ITKThresholding(const itk::Image<TPixel, VImageDimension>* inputImage,
-                         LabelSetImage *segmentation,
+                         MultiLabelSegmentation *segmentation,
                          unsigned int timeStep);
 
   private:

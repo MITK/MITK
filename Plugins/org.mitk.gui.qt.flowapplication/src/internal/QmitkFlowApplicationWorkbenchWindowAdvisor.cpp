@@ -56,6 +56,7 @@ found in the LICENSE file.
 
 #include <itkConfigure.h>
 #include <mitkVersion.h>
+#include <mitkBaseApplication.h>
 #include <mitkIDataStorageService.h>
 #include <mitkIDataStorageReference.h>
 #include <mitkDataStorageEditorInput.h>
@@ -403,6 +404,15 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QIcon::setThemeSearchPaths(QStringList() << QStringLiteral(":/org_mitk_icons/icons/"));
   QIcon::setThemeName(QStringLiteral("awesome"));
 
+  // Enable full screen support
+  if (auto application = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance()); application->getFullScreenMode())
+  {
+    mainWindow->setWindowFlags(Qt::FramelessWindowHint);
+    // Used that way as mainWindow->showFullscreen() renders the application very
+    // unresponsive with around 5 FPS.
+    mainWindow->setGeometry(QApplication::primaryScreen()->geometry());
+  }
+
   // ==== Application menu ============================
 
   QMenuBar* menuBar = mainWindow->menuBar();
@@ -593,6 +603,14 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   }
 
   mainWindow->addToolBar(mainActionsToolBar);
+
+  // ==== Undo/Redo update handling ==================================
+  auto undoModel = dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel());
+  if (nullptr != undoModel)
+  {
+    m_UndoStackObserverGuard.Reset(undoModel, mitk::UndoStackEvent(), [this](const itk::EventObject&) {this->OnUndoStackChanged(); });
+  }
+  this->OnUndoStackChanged(); //ensure the enable state of undoAction/redoAction is correct
 
   // ==== View Toolbar ==================================
 
@@ -953,6 +971,15 @@ QString QmitkFlowApplicationWorkbenchWindowAdvisor::GetQSettingsFile() const
   QFileInfo settingsInfo = QmitkFlowApplicationPlugin::GetDefault()->GetPluginContext()->getDataFile(QT_SETTINGS_FILENAME);
   return settingsInfo.canonicalFilePath();
 }
+
+void QmitkFlowApplicationWorkbenchWindowAdvisor::OnUndoStackChanged()
+{
+  auto undoModel = dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel());
+
+  this->undoAction->setEnabled(nullptr != undoModel && !undoModel->UndoListEmpty());
+  this->redoAction->setEnabled(nullptr != undoModel && !undoModel->RedoListEmpty());
+}
+
 
 //--------------------------------------------------------------------------------
 // Ugly hack from here on. Feel free to delete when command framework

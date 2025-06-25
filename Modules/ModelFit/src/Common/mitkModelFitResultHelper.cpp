@@ -23,6 +23,10 @@ found in the LICENSE file.
 #include <mitkDICOMPMPropertyHelper.h>
 #include <mitkDICOMQIPropertyHelper.h>
 
+#include <mitkLevelWindowProperty.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkRenderingModeProperty.h>
+
 namespace mitk
 {
   namespace modelFit
@@ -225,6 +229,26 @@ MITKMODELFIT_EXPORT mitk::DataNode::Pointer mitk::modelFit::CreateResultNode( co
   // Set DICOM properties, paramap-secific (DICOMPM) and general properties from source data (DICOMQI)
   mitk::DICOMQIPropertyHelper::DeriveDICOMSourceProperties(modelFitInfo->inputImage, parameterImage);
   mitk::DICOMPMPropertyHelper::DeriveDICOMPMProperties(parameterImage);
+
+  // Add properties to ensure suitable visualization
+  // adjust level/window to new image
+  mitk::LevelWindow levelwindow;
+  levelwindow.SetAuto(parameterImage,false,false);
+  auto levWinProp = mitk::LevelWindowProperty::New();
+  levWinProp->SetLevelWindow(levelwindow);
+  parameterImage->SetProperty("levelwindow", levWinProp);
+  // set lookup table
+  auto lut = mitk::LookupTable::New();
+  if (name == "stop_condition")
+  {
+    lut->SetType(LookupTable::MULTILABEL);
+    result->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_COLOR));
+  }
+  else
+  {
+    lut->SetType(LookupTable::JET_TRANSPARENT);
+  }
+  result->SetProperty("LookupTable", mitk::LookupTableProperty::New(lut));
 
   return result;
 }

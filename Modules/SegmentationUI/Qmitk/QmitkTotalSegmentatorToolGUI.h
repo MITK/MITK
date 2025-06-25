@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 #include <mitkIPreferences.h>
-
+#include <QMutex>
 #include <QMessageBox>
 
 namespace Ui
@@ -56,6 +56,11 @@ protected:
    * @brief Enable (or Disable) GUI elements.
    */
   void EnableAll(bool);
+  
+  /**
+   * @brief Adds and removes licensed task in combo box.
+   */
+  void ToggleLicensedTasks(bool activate);
 
   /**
    * @brief Creates a QMessage object and shows on screen.
@@ -77,6 +82,12 @@ protected:
    */
   void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent&);
 
+  /**
+   * @brief Update status label as per status received from mitk::Message event
+   */
+  void DownloadStatusWorker(const bool isDownloading);
+
+  QMutex m_Mutex;
   Ui::QmitkTotalSegmentatorToolGUIControls* m_Controls;
   bool m_FirstPreviewComputation = true;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
@@ -86,7 +97,6 @@ protected:
     "total_mr",
     "cerebral_bleed",
     "hip_implant",
-    "coronary_arteries",
     "body",
     "lung_vessels",
     "pleural_pericard_effusion",
@@ -94,8 +104,30 @@ protected:
     "head_muscles",
     "headneck_bones_vessels",
     "headneck_muscles",
-    "liver_vessels"
+    "liver_vessels",
+    "oculomotor_muscles",
+    "lung_nodules",
+    "kidney_cysts",
+    "breasts",
+    "liver_segments",
+    "liver_segments_mr",
+    "craniofacial_structures"
   };
+
+  const QStringList LICENSED_TASKS = {"heartchambers_highres",
+                                      "appendicular_bones",
+                                      "appendicular_bones_mr",
+                                      "tissue_types",
+                                      "tissue_types_mr",
+                                      "tissue_4_types",
+                                      "brain_structures",
+                                      "vertebrae_body",
+                                      "face",
+                                      "face_mr",
+                                      "thigh_shoulder_muscles",
+                                      "thigh_shoulder_muscles_mr",
+                                      "coronary_arteries"};
+
 };
 
 #endif

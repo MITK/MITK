@@ -29,6 +29,8 @@ set(_exclude_plugins
 mitkFunctionCreateBlueBerryApplication(
   NAME MitkFlowBench
   DESCRIPTION "MITK FlowBench"
+  ID "org.mitk.flowbench"
+  COPYRIGHT "Copyright (c) German Cancer Research Center (DKFZ). All rights reserved."
   EXCLUDE_PLUGINS ${_exclude_plugins}
 )
 

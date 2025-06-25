@@ -117,6 +117,9 @@ Q_SIGNALS:
   */
   void SelectionModeChanged(bool selectAll);
 
+  void NodeVisibilityChanged(mitk::DataNode::Pointer node, const bool visibility);
+  void NodesLayerMoved(QSet<mitk::DataNode*> movedNodes, const int targetLayer);
+
 public Q_SLOTS:
   /*
   * @brief Set a new internal selection and send this new selection to connected
@@ -128,6 +131,7 @@ public Q_SLOTS:
   * @param  nodes   A list of data nodes that are newly selected.
   */
   void ChangeSelection(NodeList nodes);
+
   /*
   * @brief Set a new selection mode and send this new selection mode to connected
   *        QmitkSynchronizedNodeSelectionWidgets using the 'SelectionModeChanged'-signal.
@@ -139,6 +143,16 @@ public Q_SLOTS:
   *                     False otherwise.
   */
   void ChangeSelectionMode(bool selectAll);
+
+  /*
+  * @brief When the visibility of a node is changed in a connected widget,
+  *        update the internal set of invisible selected nodes.
+  *        This information is needed to fully synchronize newly connected widgets.
+  * @param  node   A pointer to the data node for which visibility was toggled.
+  * @param  visibility   The new visibility of the respective data node.
+  */
+  void OnNodeVisibilityChanged(mitk::DataNode::Pointer node, bool visibility);
+
   /*
   * @brief Decrease the internal counter of connections to keep track of how many
   *        QmitkSynchronizedNodeSelectionWidgets are synchronized.
@@ -152,6 +166,7 @@ public Q_SLOTS:
 private:
 
   NodeList m_InternalSelection;
+  std::set<mitk::DataNode*> m_InternalInvisibles;
   bool m_SelectAll;
   unsigned int m_ConnectionCounter;
 

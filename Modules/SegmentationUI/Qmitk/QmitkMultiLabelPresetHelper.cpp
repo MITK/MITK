@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QMessageBox>
 
-void QmitkSaveMultiLabelPreset(const mitk::LabelSetImage* segmentation)
+void QmitkSaveMultiLabelPreset(const mitk::MultiLabelSegmentation* segmentation)
 {
   if (nullptr == segmentation)
     mitkThrow() << "Invalid call of QmitkSaveMultiLabelPreset. Passed image is a null pointer.";
@@ -35,7 +35,7 @@ void QmitkSaveMultiLabelPreset(const mitk::LabelSetImage* segmentation)
   }
 }
 
-void QmitkLoadMultiLabelPreset(const std::vector<mitk::LabelSetImage::Pointer>& segmentations)
+void QmitkLoadMultiLabelPreset(const std::vector<mitk::MultiLabelSegmentation::Pointer>& segmentations)
 {
   const auto filename = QFileDialog::getOpenFileName(nullptr, QStringLiteral("Load Label Set Preset"),
     QString(), QStringLiteral("Label set preset (*.lsetp)")).toStdString();

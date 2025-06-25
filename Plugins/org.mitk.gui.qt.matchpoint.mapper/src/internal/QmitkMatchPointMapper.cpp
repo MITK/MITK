@@ -31,6 +31,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataProperty.h>
+#include <mitkMultiLabelPredicateHelper.h>
 
 // Qmitk
 #include "QmitkMatchPointMapper.h"
@@ -135,7 +136,7 @@ bool  QmitkMatchPointMapper::IsAbleToRefineGeometry() const
 
 bool  QmitkMatchPointMapper::IsBinaryInput() const
 {
-    auto maskPredicate = mitk::MITKRegistrationHelper::MaskNodePredicate();
+    auto maskPredicate = mitk::GetMultiLabelSegmentationPredicate();
 
     bool result = false;
 
@@ -248,10 +249,10 @@ void QmitkMatchPointMapper::ConfigureNodePredicates(const mitk::DataNode* reg)
   auto isImage = mitk::MITKRegistrationHelper::ImageNodePredicate();
   auto isPointSet = mitk::MITKRegistrationHelper::PointSetNodePredicate();
 
-  auto isData = mitk::NodePredicateOr::New(isImage, isPointSet);
+  auto isImageBasedData = mitk::NodePredicateOr::New(isImage, mitk::GetMultiLabelSegmentationPredicate());
 
-  mitk::NodePredicateBase::ConstPointer inputPredicate = isData.GetPointer();
-  mitk::NodePredicateBase::ConstPointer refPredicate = isImage.GetPointer();
+  mitk::NodePredicateBase::ConstPointer inputPredicate = mitk::NodePredicateOr::New(isImageBasedData, isPointSet);
+  mitk::NodePredicateBase::ConstPointer refPredicate = isImageBasedData.GetPointer();
 
   if (reg != nullptr)
   {
@@ -267,12 +268,12 @@ void QmitkMatchPointMapper::ConfigureNodePredicates(const mitk::DataNode* reg)
       if (movingDim == 3)
       {
         //Remark: Point sets are always 3D
-        auto is3DInput = mitk::NodePredicateOr::New(isPointSet, mitk::NodePredicateAnd::New(isImage, hasCorrectDim));
+        auto is3DInput = mitk::NodePredicateOr::New(isPointSet, mitk::NodePredicateAnd::New(isImageBasedData, hasCorrectDim));
         inputPredicate = is3DInput.GetPointer();
       }
       else
       {
-        auto is2DInput = mitk::NodePredicateAnd::New(isImage, hasCorrectDim);
+        auto is2DInput = mitk::NodePredicateAnd::New(isImageBasedData, hasCorrectDim);
         inputPredicate = is2DInput.GetPointer();
       }
 
@@ -281,7 +282,7 @@ void QmitkMatchPointMapper::ConfigureNodePredicates(const mitk::DataNode* reg)
       auto targetDimCheck = GenerateDimCheckLambda(targetDim);
       auto hasCorrectTargetDim = mitk::NodePredicateFunction::New(targetDimCheck);
 
-      auto isRef = mitk::NodePredicateAnd::New(isImage, hasCorrectTargetDim);
+      auto isRef = mitk::NodePredicateAnd::New(isImageBasedData, hasCorrectTargetDim);
       refPredicate = isRef;
 
     }

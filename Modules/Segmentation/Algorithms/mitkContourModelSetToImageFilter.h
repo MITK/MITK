@@ -19,6 +19,7 @@ found in the LICENSE file.
 namespace mitk
 {
   class ContourModelSet;
+  class ContourModel;
 
   /**
     * @brief Fills a given mitk::ContourModelSet into a given mitk::Image
@@ -96,5 +97,17 @@ namespace mitk
 
     const mitk::Image *m_ReferenceImage;
   };
+
+  /** Helper function for conveniently convert a passed contour model set into a image containing the content of the
+   * set as a binary mask that can be used as a label content of a segmentation.
+   * @param refImage Pointer to a image that serves as template for the image that should be generated.
+   * @param contourSet Pointer to the contour set that should be converted into an image.*/
+  MITKSEGMENTATION_EXPORT Image::Pointer ConvertContourModelSetToLabelMask(const mitk::Image* refImage, mitk::ContourModelSet* contourSet);
+
+  /** Helper function for conveniently convert a passed contour model into a image containing the content of the
+   * model as a binary mask that can be used as a label content of a segmentation.
+   * @param refImage Pointer to a image that serves as template for the image that should be generated.
+   * @param contourModel Pointer to the contour model that should be converted into an image.*/
+  MITKSEGMENTATION_EXPORT Image::Pointer ConvertContourModelToLabelMask(const mitk::Image* refImage, mitk::ContourModel* contourModel);
 }
 #endif

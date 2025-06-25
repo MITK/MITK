@@ -152,13 +152,7 @@ void mitk::ContourModelUtils::FillContourInSlice2(
 }
 
 void mitk::ContourModelUtils::FillContourInSlice(
-  const ContourModel *projectedContour, Image *sliceImage, const Image* workingImage, int paintingPixelValue)
-{
-  FillContourInSlice(projectedContour, 0, sliceImage, workingImage, paintingPixelValue);
-}
-
-void mitk::ContourModelUtils::FillContourInSlice(
-  const ContourModel *projectedContour, TimeStepType contourTimeStep, Image *sliceImage, const Image* workingImage, int paintingPixelValue)
+  const ContourModel *projectedContour, TimeStepType contourTimeStep, Image *sliceImage, int paintingPixelValue)
 {
   if (nullptr == projectedContour)
   {
@@ -214,53 +208,21 @@ void mitk::ContourModelUtils::FillContourInSlice(
 
   vtkSmartPointer<vtkImageData> filledImage = imageStencil->GetOutput();
   vtkSmartPointer<vtkImageData> resultImage = sliceImage->GetVtkImageData();
-  FillSliceInSlice(filledImage, resultImage, workingImage, paintingPixelValue);
+
+  FillSliceInSlice(filledImage, resultImage, paintingPixelValue);
 
   sliceImage->SetVolume(resultImage->GetScalarPointer());
 }
 
 void mitk::ContourModelUtils::FillSliceInSlice(
-  vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, const Image* image, int paintingPixelValue, double fillForegroundThreshold)
+  vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, int paintingPixelValue, double fillForegroundThreshold)
 {
-  auto labelImage = dynamic_cast<const LabelSetImage *>(image);
   const auto numberOfPoints = filledImage->GetNumberOfPoints();
 
-  if (nullptr == labelImage)
+  for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
   {
-    for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
-    {
-      if (fillForegroundThreshold <= filledImage->GetPointData()->GetScalars()->GetTuple1(i))
-        resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
-    }
-  }
-  else
-  {
-    if (paintingPixelValue != LabelSetImage::UNLABELED_VALUE)
-    {
-      for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
-      {
-        const auto filledValue = filledImage->GetPointData()->GetScalars()->GetTuple1(i);
-        if (fillForegroundThreshold <= filledValue)
-        {
-          const auto existingValue = resultImage->GetPointData()->GetScalars()->GetTuple1(i);
-
-          if (!labelImage->IsLabelLocked(existingValue))
-            resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
-        }
-      }
-    }
-    else
-    {
-      const auto activePixelValue = labelImage->GetActiveLabel()->GetValue();
-      for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
-      {
-        if (fillForegroundThreshold <= filledImage->GetPointData()->GetScalars()->GetTuple1(i))
-        {
-          if (resultImage->GetPointData()->GetScalars()->GetTuple1(i) == activePixelValue)
-            resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
-        }
-      }
-    }
+    if (fillForegroundThreshold <= filledImage->GetPointData()->GetScalars()->GetTuple1(i))
+      resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
   }
 }
 
@@ -279,14 +241,3 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(c
   return resultContour;
 }
 
-int mitk::ContourModelUtils::GetActivePixelValue(const Image* workingImage)
-{
-  auto labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage);
-  int activePixelValue = 1;
-  if (nullptr != labelSetImage)
-  {
-    activePixelValue = labelSetImage->GetActiveLabel()->GetValue();
-  }
-
-  return activePixelValue;
-}

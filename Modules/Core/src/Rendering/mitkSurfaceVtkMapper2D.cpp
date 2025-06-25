@@ -28,12 +28,12 @@ found in the LICENSE file.
 #include <vtkActor.h>
 #include <vtkArrowSource.h>
 #include <vtkAssembly.h>
-#include <vtkCutter.h>
 #include <vtkGlyph3D.h>
 #include <vtkLookupTable.h>
 #include <vtkPlane.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataPlaneCutter.h>
 #include <vtkReverseSense.h>
 #include <vtkTransformPolyDataFilter.h>
 
@@ -46,8 +46,8 @@ mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
   m_PropAssembly = vtkSmartPointer<vtkAssembly>::New();
   m_PropAssembly->AddPart(m_Actor);
   m_CuttingPlane = vtkSmartPointer<vtkPlane>::New();
-  m_Cutter = vtkSmartPointer<vtkCutter>::New();
-  m_Cutter->SetCutFunction(m_CuttingPlane);
+  m_Cutter = vtkSmartPointer<vtkPolyDataPlaneCutter>::New();
+  m_Cutter->SetPlane(m_CuttingPlane);
   m_Mapper->SetInputConnection(m_Cutter->GetOutputPort());
 
   m_NormalGlyph = vtkSmartPointer<vtkGlyph3D>::New();

@@ -28,6 +28,7 @@ mitk::Label::Label() : PropertyList()
     SetVisible(true);
   if (GetProperty("opacity") == nullptr)
     SetOpacity(0.6);
+
   if (GetProperty("center.coordinates") == nullptr)
   {
     mitk::Point3D pnt;
@@ -47,15 +48,16 @@ mitk::Label::Label() : PropertyList()
   if (GetProperty("color") == nullptr)
   {
     mitk::Color col;
-    col.Set(0, 0, 0);
+    col.Set(1, 1, 1);
     SetColor(col);
   }
+
   if (GetProperty("name") == nullptr)
-    SetName("noName!");
+    SetName("Unknown label name");
   if (GetProperty("value") == nullptr)
     SetValue(0);
-  if (GetProperty("layer") == nullptr)
-    SetLayer(0);
+  if (GetProperty("description") == nullptr)
+    SetDescription("");
 
   DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(this);
 }
@@ -162,7 +164,56 @@ std::string mitk::Label::GetName() const
 
 std::string mitk::Label::GetTrackingID() const
 {
-  return std::to_string(this->GetValue());
+  std::string trackingID = std::to_string(this->GetValue());
+  GetStringProperty("tracking_id", trackingID);
+  return trackingID;
+}
+
+void mitk::Label::SetTrackingID(const std::string& trackingID)
+{
+  mitk::StringProperty* property = dynamic_cast<mitk::StringProperty*>(GetProperty("tracking_id"));
+  if (property != nullptr)
+    // Update Property
+    property->SetValue(trackingID);
+  else
+    // Create new Property
+    SetStringProperty("tracking_id", trackingID.c_str());
+}
+
+std::string mitk::Label::GetTrackingUID() const
+{
+  std::string trackingUID = "";
+  GetStringProperty("tracking_uid", trackingUID);
+  return trackingUID;
+}
+
+void mitk::Label::SetTrackingUID(const std::string& trackingUID)
+{
+  mitk::StringProperty* property = dynamic_cast<mitk::StringProperty*>(GetProperty("tracking_uid"));
+  if (property != nullptr)
+    // Update Property
+    property->SetValue(trackingUID);
+  else
+    // Create new Property
+    SetStringProperty("tracking_uid", trackingUID.c_str());
+}
+
+std::string mitk::Label::GetDescription() const
+{
+  std::string description = "";
+  GetStringProperty("description", description);
+  return description;
+}
+
+void mitk::Label::SetDescription(const std::string& description)
+{
+  mitk::StringProperty* property = dynamic_cast<mitk::StringProperty*>(GetProperty("description"));
+  if (property != nullptr)
+    // Update Property
+    property->SetValue(description);
+  else
+    // Create new Property
+    SetStringProperty("description", description.c_str());
 }
 
 void mitk::Label::SetValue(PixelType pixelValue)
@@ -183,25 +234,6 @@ mitk::Label::PixelType mitk::Label::GetValue() const
   assert(property);
   pixelValue = property->GetValue();
   return pixelValue;
-}
-
-void mitk::Label::SetLayer(unsigned int layer)
-{
-  mitk::UIntProperty *property = dynamic_cast<mitk::UIntProperty *>(GetProperty("layer"));
-  if (property != nullptr)
-    // Update Property
-    property->SetValue(layer);
-  else
-    // Create new Property
-    SetProperty("layer", mitk::UIntProperty::New(layer));
-}
-
-unsigned int mitk::Label::GetLayer() const
-{
-  unsigned int layer;
-  mitk::UIntProperty *prop = dynamic_cast<mitk::UIntProperty *>(GetProperty("layer"));
-  layer = prop->GetValue();
-  return layer;
 }
 
 const mitk::Color &mitk::Label::GetColor() const

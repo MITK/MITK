@@ -125,16 +125,28 @@ void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Imag
     typename ResultImageDescriptorType::SpacingType fieldSpacing;
     typename ResultImageDescriptorType::DirectionType matrix;
 
-    mitk::ImageMappingHelper::ResultImageGeometryType::BoundsArrayType geoBounds = resultGeometry->GetBounds();
-    mitk::Vector3D geoSpacing = resultGeometry->GetSpacing();
-    mitk::Point3D geoOrigin = resultGeometry->GetOrigin();
-    mitk::AffineTransform3D::MatrixType geoMatrix = resultGeometry->GetIndexToWorldTransform()->GetMatrix();
+    const mitk::ImageMappingHelper::ResultImageGeometryType::BoundsArrayType geoBounds = resultGeometry->GetBounds();
+    const mitk::Vector3D geoSpacing = resultGeometry->GetSpacing();
+    const mitk::Point3D geoOrigin = resultGeometry->GetOrigin();
+    const mitk::AffineTransform3D::MatrixType geoMatrix = resultGeometry->GetIndexToWorldTransform()->GetMatrix();
 
     for (unsigned int i = 0; i<VImageDimension; ++i)
     {
       origin[i] = static_cast<typename ResultImageDescriptorType::PointType::ValueType>(geoOrigin[i]);
       fieldSpacing[i] = static_cast<typename ResultImageDescriptorType::SpacingType::ValueType>(geoSpacing[i]);
-      size[i] = static_cast<typename ResultImageDescriptorType::SizeType::SizeValueType>(geoBounds[(2*i)+1]-geoBounds[2*i])*fieldSpacing[i];
+      const auto voxelCount = static_cast<typename ResultImageDescriptorType::SizeType::SizeValueType>(geoBounds[(2 * i) + 1] - geoBounds[2 * i]);
+      size[i] = voxelCount*fieldSpacing[i];
+
+      if (std::floor(size[i] / fieldSpacing[i]) < std::floor(voxelCount))
+      {
+        // MatchPoint in the ImageMappingTask internally computes the number of voxels and floors the result
+        // to ensure the discretized voxel volume is never larger then the requested real world coordinate
+        // result volume. Due to imprecision in double math operations in combination with floor() this can
+        // lead in loosing one slice. Such a case was just detected. To compensate for that double precision
+        // error we add half a spacing to ensure the number of voxel in the dimension match.
+        size[i] += 0.5 * fieldSpacing[i];
+        MITK_INFO << "Fixed field size for ResultImageDescriptor of image mapping operation.";
+      }
     }
 
     //Matrix extraction
@@ -144,7 +156,7 @@ void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Imag
 
     /// \warning 2D MITK images could have a 3D rotation, since they have a 3x3 geometry matrix.
     /// If it is only a rotation around the transversal plane normal, it can be express with a 2x2 matrix.
-    /// In this case, the ITK image conservs this information and is identical to the MITK image!
+    /// In this case, the ITK image conserves this information and is identical to the MITK image!
     /// If the MITK image contains any other rotation, the ITK image will have no rotation at all.
     /// Spacing is of course conserved in both cases.
 
@@ -238,18 +250,17 @@ void doMapTimesteps(const mitk::ImageMappingHelper::InputImageType* input, mitk:
   }
 }
 
-mitk::TimeGeometry::Pointer CreateResultTimeGeometry(const mitk::ImageMappingHelper::InputImageType* input, const mitk::ImageMappingHelper::ResultImageGeometryType* resultGeometry)
-{
-  mitk::TimeGeometry::ConstPointer timeGeometry = input->GetTimeGeometry();
-  mitk::TimeGeometry::Pointer mappedTimeGeometry = timeGeometry->Clone();
 
-  for (unsigned int i = 0; i < input->GetTimeSteps(); ++i)
-  {
-    mitk::ImageMappingHelper::ResultImageGeometryType::Pointer mappedGeometry = resultGeometry->Clone();
-    mappedTimeGeometry->SetTimeStepGeometry(mappedGeometry, i);
-  }
+mitk::TimeGeometry::Pointer mitk::ImageMappingHelper::CreateResultTimeGeometry(const BaseData* input, const mitk::ImageMappingHelper::ResultImageGeometryType* resultGeometry)
+{
+  const auto timeGeometry = input->GetTimeGeometry();
+  auto mappedTimeGeometry = timeGeometry->Clone();
+
+  mappedTimeGeometry->ReplaceTimeStepGeometries(resultGeometry);
+
   return mappedTimeGeometry;
 }
+
 
 mitk::ImageMappingHelper::ResultImageType::Pointer
   mitk::ImageMappingHelper::map(const InputImageType* input, const RegistrationType* registration,
@@ -267,60 +278,18 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 
   ResultImageType::Pointer result;
 
-  auto inputLabelSetImage = dynamic_cast<const LabelSetImage*>(input);
-
-  if (nullptr == inputLabelSetImage)
-  {
-    if (input->GetTimeSteps() == 1)
-    { //map the image and done
-      AccessByItk_n(input, doMITKMap, (result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
-    }
-    else
-    { //map every time step and compose
-
-      auto mappedTimeGeometry = CreateResultTimeGeometry(input, resultGeometry);
-      result = mitk::Image::New();
-      result->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
-
-      doMapTimesteps(input, result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType);
-    }
+  if (input->GetTimeSteps() == 1)
+  { //map the image and done
+    AccessByItk_n(input, doMITKMap, (result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
   }
   else
-  {
-    auto resultLabelSetImage = LabelSetImage::New();
+  { //map every time step and compose
 
     auto mappedTimeGeometry = CreateResultTimeGeometry(input, resultGeometry);
+    result = mitk::Image::New();
+    result->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
 
-    auto resultTemplate = mitk::Image::New();
-    resultTemplate->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
-
-    resultLabelSetImage->Initialize(resultTemplate);
-
-    auto cloneInput = inputLabelSetImage->Clone();
-    //We need to clone the LabelSetImage due to its illposed design. It is state full
-    //and we have to iterate through all layers as active layers to ensure the content
-    //was really stored (directly working with the layer images does not work with the
-    //active layer). The clone wastes resources but is the easiest and safest way to
-    //ensure 1) correct mapping 2) avoid race conditions with other parts of the
-    //application because we would change the state of the input.
-    //This whole code block should be reworked as soon as T28525 is done.
-
-    for (unsigned int layerID = 0; layerID < inputLabelSetImage->GetNumberOfLayers(); ++layerID)
-    {
-      if (resultLabelSetImage->GetNumberOfLayers() <= layerID)
-      {
-        resultLabelSetImage->AddLayer();
-      }
-      resultLabelSetImage->ReplaceGroupLabels(layerID, inputLabelSetImage->GetConstLabelsByValue(inputLabelSetImage->GetLabelValuesByGroup(layerID)));
-      cloneInput->SetActiveLayer(layerID);
-      resultLabelSetImage->SetActiveLayer(layerID);
-
-      doMapTimesteps(cloneInput, resultLabelSetImage, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, mitk::ImageMappingInterpolator::Linear);
-    }
-
-    resultLabelSetImage->SetActiveLayer(inputLabelSetImage->GetActiveLayer());
-    resultLabelSetImage->SetActiveLabel(inputLabelSetImage->GetActiveLabel()->GetValue());
-    result = resultLabelSetImage;
+    doMapTimesteps(input, result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType);
   }
 
   return result;

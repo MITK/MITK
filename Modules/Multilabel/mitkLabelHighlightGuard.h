@@ -32,7 +32,7 @@ namespace mitk
     void SetSegmentationNode(DataNode* node);
     DataNode::Pointer GetSegmentationNode() const;
 
-    void SetHighlightedLabels(LabelSetImage::LabelValueVectorType labels);
+    void SetHighlightedLabels(MultiLabelSegmentation::LabelValueVectorType labels);
     void SetHighlightInvisibleLabels(bool highlightInvisible);
 
     ~LabelHighlightGuard();
@@ -48,8 +48,8 @@ namespace mitk
     };
 
   protected:
-    static void UpdateNode(DataNode* node, LabelSetImage::LabelValueVectorType labels, bool highlightInvisible);
-    LabelSetImage::LabelValueVectorType m_Labels = {};
+    static void UpdateNode(DataNode* node, MultiLabelSegmentation::LabelValueVectorType labels, bool highlightInvisible);
+    MultiLabelSegmentation::LabelValueVectorType m_Labels = {};
     bool m_HighlightInvisible = false;
     WeakPointer<DataNode> m_Node;
   };

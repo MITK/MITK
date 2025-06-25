@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include "mitkPlaneGeometry.h"
 #include <mitkTimeNavigationController.h>
 #include "mitkImageAccessByItk.h"
+#include "mitkNodePredicateProperty.h"
+#include "mitkLabelSetImageHelper.h"
 
 // Include of the new ImageExtractor
 #include "mitkMorphologicalOperations.h"
@@ -39,9 +41,8 @@ found in the LICENSE file.
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
 
-#include "mitkOperationEvent.h"
-#include "mitkUndoController.h"
-#include <mitkDiffSliceOperationApplier.h>
+#include <mitkUndoController.h>
+#include <mitkSegChangeOperationApplier.h>
 
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkLabelSetImage.h"
@@ -148,27 +149,32 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice(const Image *image,
   return true;
 }
 
-void mitk::SegTool2D::UpdateAllSurfaceInterpolations(const LabelSetImage *workingImage,
+void mitk::SegTool2D::UpdateAllSurfaceInterpolations(const MultiLabelSegmentation *workingSeg,
                                                  TimeStepType timeStep,
                                                  const PlaneGeometry *plane,
                                                  bool detectIntersection)
 {
-  if (nullptr == workingImage) mitkThrow() << "Cannot update surface interpolation. Invalid working image passed.";
+  if (nullptr == workingSeg) mitkThrow() << "Cannot update surface interpolation. Invalid working image passed.";
   if (nullptr == plane) mitkThrow() << "Cannot update surface interpolation. Invalid plane passed.";
 
-  auto affectedLabels = mitk::SurfaceInterpolationController::GetInstance()->GetAffectedLabels(workingImage, timeStep, plane);
-  for (auto affectedLabel : affectedLabels)
+  auto affectedLabels = mitk::SurfaceInterpolationController::GetInstance()->GetAffectedLabels(workingSeg, timeStep, plane);
+  auto affectedGroupLabelMapping = LabelSetImageHelper::SplitLabelValuesByGroup(workingSeg, affectedLabels);
+
+  for (const auto& [groupID, relevantLabels] : affectedGroupLabelMapping)
   {
-    auto groupID = workingImage->GetGroupIndexOfLabel(affectedLabel);
-    auto slice = GetAffectedImageSliceAs2DImage(plane, workingImage->GetGroupImage(groupID), timeStep);
-    std::vector<SliceInformation> slices = { SliceInformation(slice, plane, timeStep) };
-    Self::UpdateSurfaceInterpolation(slices, workingImage, detectIntersection, affectedLabel, true);
+    const auto groupImage = workingSeg->GetGroupImage(groupID);
+    auto slice = GetAffectedImageSliceAs2DImage(plane, groupImage, timeStep);
+    for (auto relevantLabel : relevantLabels)
+    {
+      std::vector<SliceInformation> slices = { SliceInformation(slice, plane, timeStep) };
+      Self::UpdateSurfaceInterpolation(slices, groupImage, detectIntersection, relevantLabel, true);
+    }
   }
 
   if(!affectedLabels.empty()) mitk::SurfaceInterpolationController::GetInstance()->Modified();
 }
 
-void  mitk::SegTool2D::RemoveContourFromInterpolator(const SliceInformation& sliceInfo, LabelSetImage::LabelValueType labelValue)
+void  mitk::SegTool2D::RemoveContourFromInterpolator(const SliceInformation& sliceInfo, MultiLabelSegmentation::LabelValueType labelValue)
 {
   mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo;
   contourInfo.LabelValue = labelValue;
@@ -220,7 +226,7 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
     {
       // Test whether there is something to extract or whether the slice just contains intersections of others
 
-      //Remark we cannot just errode the clone of sliceInfo.slice, because Erode currently only
+      //Remark we cannot just erode the clone of sliceInfo.slice, because Erode currently only
       //works on pixel value 1. But we need to erode active label. Therefore we use TransferLabelContent
       //as workaround.
       //If MorphologicalOperations::Erode is supports user defined pixel values, the workaround
@@ -229,9 +235,9 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
       mitk::Image::Pointer slice2 = Image::New();
       slice2->Initialize(sliceInfo.slice);
       AccessByItk(slice2, ClearBufferProcessing);
-      LabelSetImage::LabelValueType erodeValue = 1;
+      MultiLabelSegmentation::LabelValueType erodeValue = 1;
       auto label = Label::New(erodeValue, "");
-      TransferLabelContent(sliceInfo.slice, slice2, { label }, LabelSetImage::UNLABELED_VALUE, LabelSetImage::UNLABELED_VALUE, false, { {activeLabelValue, erodeValue} });
+      TransferLabelContent(sliceInfo.slice, slice2, { label }, MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, { {activeLabelValue, erodeValue} });
       //Workaround ends
 
       mitk::MorphologicalOperations::Erode(slice2, 2, mitk::MorphologicalOperations::Ball);
@@ -336,19 +342,13 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionPositionEvent *positionEvent) const
 {
-  const auto workingNode = this->GetWorkingDataNode();
-  if (!workingNode)
+  const auto workingData = this->GetWorkingData();
+  if (!workingData)
   {
     return nullptr;
   }
 
-  const auto *workingImage = dynamic_cast<Image *>(workingNode->GetData());
-  if (!workingImage)
-  {
-    return nullptr;
-  }
-
-  return GetAffectedImageSliceAs2DImage(positionEvent, workingImage);
+  return GetAffectedImageSliceAs2DImage(positionEvent, workingData->GetGroupImage(workingData->GetActiveLayer()));
 }
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const InteractionPositionEvent *positionEvent) const
@@ -359,7 +359,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const Interactio
     return nullptr;
   }
 
-  auto *referenceImage = dynamic_cast<Image *>(referenceNode->GetData());
+  auto *referenceImage = this->GetReferenceData();
   if (!referenceImage)
   {
     return nullptr;
@@ -385,7 +385,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PlaneGeome
     return nullptr;
   }
 
-  auto* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());
+  auto* referenceImage = this->GetReferenceData();
   if (!referenceImage)
   {
     return nullptr;
@@ -481,12 +481,12 @@ mitk::DataNode* mitk::SegTool2D::GetWorkingDataNode() const
   return nullptr;
 }
 
-mitk::Image* mitk::SegTool2D::GetWorkingData() const
+mitk::MultiLabelSegmentation* mitk::SegTool2D::GetWorkingData() const
 {
   auto node = this->GetWorkingDataNode();
   if (nullptr != node)
   {
-    return dynamic_cast<Image*>(node->GetData());
+    return dynamic_cast<MultiLabelSegmentation*>(node->GetData());
   }
   return nullptr;
 }
@@ -522,20 +522,24 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const InteractionPositionEvent
 
   if (planeGeometry && segmentationResult && !abstractTransformGeometry)
   {
-    const auto workingNode = this->GetWorkingDataNode();
-    auto *image = dynamic_cast<Image *>(workingNode->GetData());
-    const auto timeStep = positionEvent->GetSender()->GetTimeStep(image);
+    auto* segmentation = this->GetWorkingData();
+    if (nullptr == segmentation)
+    {
+      mitkThrow() << "Cannot process WriteBackSegmentationResult. Working data node is not set or does not contain a MultiLabelSegmentation instance.";
+    }
+
+    const auto timeStep = positionEvent->GetSender()->GetTimeStep(segmentation);
     this->WriteBackSegmentationResult(planeGeometry, segmentationResult, timeStep);
   }
 }
 
-void mitk::SegTool2D::WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep)
+void mitk::SegTool2D::WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep, const std::string& toolName)
 {
   if (!planeGeometry || !segmentationResult)
     return;
 
   SliceInformation sliceInfo(segmentationResult, const_cast<mitk::PlaneGeometry*>(planeGeometry), timeStep);
-  Self::WriteBackSegmentationResults(workingNode, { sliceInfo }, true);
+  Self::WriteBackSegmentationResults(workingNode, { sliceInfo }, true, true, toolName);
 }
 
 void mitk::SegTool2D::WriteBackSegmentationResult(const PlaneGeometry *planeGeometry,
@@ -578,7 +582,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
       ->GetPlaneGeometry(0));
   const unsigned int slicePosition = m_LastEventSender->GetSliceNavigationController()->GetStepper()->GetPos();
 
-  mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume);
+  mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume, m_UndoEnabled, this->GetName());
 
 
   /* A cleaner solution would be to add a contour marker for each slice info. It currently
@@ -587,7 +591,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
   this->AddContourmarker(plane3, slicePosition);
 }
 
-void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume)
+void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume, bool allowUndo, const std::string& toolName)
 {
   if (sliceList.empty())
   {
@@ -599,34 +603,67 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
     mitkThrow() << "Cannot write slice to working node. Working node is invalid.";
   }
 
-  auto image = dynamic_cast<Image*>(workingNode->GetData());
-
-  mitk::Label::PixelType activeLabelValue = 0;
-
-  try{
-    auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-    activeLabelValue = labelSetImage->GetActiveLabel()->GetValue();
-  }
-  catch(...)
+  auto segmentation = dynamic_cast<MultiLabelSegmentation*>(workingNode->GetData());
+  if (nullptr == segmentation)
   {
-    mitkThrow() << "Working node does not contain  labelSetImage.";
+    mitkThrow() << "Working node does not contain labelSetImage.";
   }
 
-
-  if (nullptr == image)
+  const auto activeLabelValue = segmentation->GetActiveLabel()->GetValue();
+  const auto groupIndex = segmentation->GetGroupIndexOfLabel(activeLabelValue);
+  auto groupImage = segmentation->GetGroupImage(groupIndex);
+  if (nullptr == groupImage)
   {
-    mitkThrow() << "Cannot write slice to working node. Working node does not contain an image.";
+    mitkThrow() << "Cannot write slice to working node. Segmentation/tool are in an invalid/inconsistent state.";
   }
 
-  for (const auto& sliceInfo : sliceList)
+  if (writeSliceToVolume)
   {
-    if (writeSliceToVolume && nullptr != sliceInfo.plane && sliceInfo.slice.IsNotNull())
+    if (allowUndo)
     {
-      SegTool2D::WriteSliceToVolume(image, sliceInfo, true);
+      //ensure that all undo/redo items come in a new dedicated group
+      UndoStackItem::IncCurrGroupEventId();
+    }
+
+    for (const auto& sliceInfo : sliceList)
+    {
+      if (nullptr != sliceInfo.plane && sliceInfo.slice.IsNotNull())
+      {
+        SegSliceOperation* undoOperation = nullptr;
+
+        if (allowUndo)
+        {
+          /*============= BEGIN undo/redo feature block ========================*/
+          // Create undo operation by caching the not yet modified slices
+          mitk::Image::Pointer originalSlice = GetAffectedImageSliceAs2DImage(sliceInfo.plane, groupImage, sliceInfo.timestep);
+          undoOperation =
+            new SegSliceOperation(segmentation, groupIndex, originalSlice, sliceInfo.timestep, sliceInfo.plane);
+          /*============= END undo/redo feature block ========================*/
+        }
+
+        SegTool2D::WriteSliceToVolume(groupImage, sliceInfo);
+
+        if (allowUndo)
+        {
+          /*============= BEGIN undo/redo feature block ========================*/
+          // specify the redo operation with the edited slice
+          auto* doOperation =
+            new SegSliceOperation(segmentation, groupIndex, sliceInfo.slice, sliceInfo.timestep, sliceInfo.plane);
+
+          // create an operation event for the undo stack
+          UndoStackItem::IncCurrObjectEventId();
+          OperationEvent* undoStackItem =
+            new OperationEvent(SegChangeOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation "+toolName);
+
+          // add it to the undo controller
+          UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
+          /*============= END undo/redo feature block ========================*/
+        }
+      }
     }
   }
 
-  SegTool2D::UpdateSurfaceInterpolation(sliceList, image, false, activeLabelValue);
+  SegTool2D::UpdateSurfaceInterpolation(sliceList, groupImage, false, activeLabelValue);
 
   // also mark its node as modified (T27308). Can be removed if T27307
   // is properly solved
@@ -635,34 +672,21 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const PlaneGeometry* planeGeometry, const Image* slice, TimeStepType timeStep, bool allowUndo)
-{
-  SliceInformation sliceInfo(slice, planeGeometry, timeStep);
-
-  WriteSliceToVolume(workingImage, sliceInfo, allowUndo);
-}
-
-void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const SliceInformation &sliceInfo, bool allowUndo)
+void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const PlaneGeometry* planeGeometry, const Image* slice, TimeStepType timeStep)
 {
   if (nullptr == workingImage)
   {
-    mitkThrow() << "Cannot write slice to working node. Working node does not contain an image.";
+    mitkThrow() << "Cannot write slice to working image. Working image is null.";
   }
 
-  DiffSliceOperation* undoOperation = nullptr;
-
-  if (allowUndo)
+  if (nullptr == planeGeometry)
   {
-    /*============= BEGIN undo/redo feature block ========================*/
-    // Create undo operation by caching the not yet modified slices
-    mitk::Image::Pointer originalSlice = GetAffectedImageSliceAs2DImage(sliceInfo.plane, workingImage, sliceInfo.timestep);
-    undoOperation =
-      new DiffSliceOperation(workingImage,
-        originalSlice,
-        dynamic_cast<SlicedGeometry3D*>(originalSlice->GetGeometry()),
-        sliceInfo.timestep,
-        sliceInfo.plane);
-    /*============= END undo/redo feature block ========================*/
+    mitkThrow() << "Cannot write slice to working image. Plane geometry is null.";
+  }
+
+  if (nullptr == slice)
+  {
+    mitkThrow() << "Cannot write slice to working image. Slice is null.";
   }
 
   // Make sure that for reslicing and overwriting the same algorithm is used. We can specify the mode of the vtk
@@ -674,7 +698,7 @@ void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const SliceInforma
   // mitkVTKImageOverwrite is true.
   // Reason: because then the input slice is not touched but
   // used to overwrite the input of the ExtractSliceFilter.
-  auto noneConstSlice = const_cast<Image*>(sliceInfo.slice.GetPointer());
+  auto noneConstSlice = const_cast<Image*>(slice);
   reslice->SetInputSlice(noneConstSlice->GetVtkImageData());
 
   // set overwrite mode to true to write back to the image volume
@@ -683,10 +707,10 @@ void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const SliceInforma
 
   mitk::ExtractSliceFilter::Pointer extractor = mitk::ExtractSliceFilter::New(reslice);
   extractor->SetInput(workingImage);
-  extractor->SetTimeStep(sliceInfo.timestep);
-  extractor->SetWorldGeometry(sliceInfo.plane);
+  extractor->SetTimeStep(timeStep);
+  extractor->SetWorldGeometry(planeGeometry);
   extractor->SetVtkOutputRequest(false);
-  extractor->SetResliceTransformByGeometry(workingImage->GetGeometry(sliceInfo.timestep));
+  extractor->SetResliceTransformByGeometry(workingImage->GetGeometry(timeStep));
 
   extractor->Modified();
   extractor->Update();
@@ -694,30 +718,12 @@ void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const SliceInforma
   // the image was modified within the pipeline, but not marked so
   workingImage->Modified();
   workingImage->GetVtkImageData()->Modified();
-
-  if (allowUndo)
-  {
-    /*============= BEGIN undo/redo feature block ========================*/
-    // specify the redo operation with the edited slice
-    auto* doOperation =
-      new DiffSliceOperation(workingImage,
-        extractor->GetOutput(),
-        dynamic_cast<SlicedGeometry3D*>(sliceInfo.slice->GetGeometry()),
-        sliceInfo.timestep,
-        sliceInfo.plane);
-
-    // create an operation event for the undo stack
-    OperationEvent* undoStackItem =
-      new OperationEvent(DiffSliceOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation");
-
-    // add it to the undo controller
-    UndoStackItem::IncCurrObjectEventId();
-    UndoStackItem::IncCurrGroupEventId();
-    UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
-    /*============= END undo/redo feature block ========================*/
-  }
 }
 
+void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const SliceInformation &sliceInfo)
+{
+  WriteSliceToVolume(workingImage, sliceInfo.plane, sliceInfo.slice, sliceInfo.timestep);
+}
 
 void mitk::SegTool2D::SetShowMarkerNodes(bool status)
 {
@@ -729,9 +735,14 @@ void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
   m_SurfaceInterpolationEnabled = enabled;
 }
 
+void mitk::SegTool2D::DisableContourMarkers()
+{
+  m_EnableContourMarkers = false;
+}
+
 int mitk::SegTool2D::AddContourmarker(const PlaneGeometry* planeGeometry, unsigned int sliceIndex)
 {
-  if (planeGeometry == nullptr)
+  if (!m_EnableContourMarkers || planeGeometry == nullptr)
     return -1;
 
   us::ServiceReference<PlanePositionManagerService> serviceRef =

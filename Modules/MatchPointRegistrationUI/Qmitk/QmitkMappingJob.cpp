@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkMAPRegistrationWrapper.h>
 #include <mitkMatchPointPropertyTags.h>
 #include <mitkPointSetMappingHelper.h>
+#include <mitkMultiLabelSegmentationMappingHelper.h>
 #include <mitkProperties.h>
 
 // Qt
@@ -77,6 +78,7 @@ void QmitkMappingJob::run()
 {
   const mitk::Image *inputImage = this->GetInputDataAsImage();
   const mitk::PointSet *inputSet = this->GetInputDataAsPointSet();
+  const mitk::MultiLabelSegmentation* inputSeg = dynamic_cast<const mitk::MultiLabelSegmentation*>(m_spInputData.GetPointer());
   m_spMappedData = nullptr;
 
   if (m_doGeometryRefinement)
@@ -118,7 +120,7 @@ void QmitkMappingJob::run()
 
       if (inputImage)
       {
-        spResultData = mitk::ImageMappingHelper::map(this->GetInputDataAsImage(),
+        spResultData = mitk::ImageMappingHelper::map(inputImage,
                                                      this->GetRegistration(),
                                                      !(this->m_allowUndefPixels),
                                                      this->m_paddingValue,
@@ -135,6 +137,16 @@ void QmitkMappingJob::run()
         errorValue.pointSpec = mitk::PTUNDEFINED;
         errorValue.selected = false;
         spResultData = mitk::PointSetMappingHelper::map(inputSet, this->GetRegistration(), -1, false, errorValue);
+      }
+      else if (inputSeg)
+      {
+        spResultData = mitk::MultiLabelSegmentationMappingHelper::map(inputSeg,
+          this->GetRegistration(),
+          !(this->m_allowUndefPixels),
+          this->m_spRefGeometry,
+          !(this->m_allowUnregPixels),
+          this->m_errorValue)
+          .GetPointer();
       }
 
       if (spResultData.IsNotNull())

@@ -11,31 +11,34 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkCopyLabelToGroupDialog.h"
+
+#include <mitkSegChangeOperationApplier.h>
+
 #include <ui_QmitkCopyLabelToGroupDialog.h>
 
 #include <mitkLabelSetImageHelper.h>
 
 namespace
 {
-  QString GetDisplayedLabelName(const mitk::LabelSetImage* segmentation, const mitk::Label* label)
+  QString GetDisplayedLabelName(const mitk::MultiLabelSegmentation* segmentation, const mitk::Label* label)
   {
     return QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayLabelName(segmentation, label));
   }
 
-  QString GetDisplayedGroupName(const mitk::LabelSetImage* segmentation, mitk::LabelSetImage::GroupIndexType group)
+  QString GetDisplayedGroupName(const mitk::MultiLabelSegmentation* segmentation, mitk::MultiLabelSegmentation::GroupIndexType group)
   {
     return QString::fromStdString(mitk::LabelSetImageHelper::CreateDisplayGroupName(segmentation, group));
   }
 }
 
-QmitkCopyLabelToGroupDialog::QmitkCopyLabelToGroupDialog(mitk::LabelSetImage* segmentation, mitk::Label* label, QWidget* parent)
+QmitkCopyLabelToGroupDialog::QmitkCopyLabelToGroupDialog(mitk::MultiLabelSegmentation* segmentation, mitk::Label* label, QWidget* parent)
   : QDialog(parent),
     m_Ui(new Ui::QmitkCopyLabelToGroupDialog),
     m_Segmentation(segmentation),
     m_SourceLabel(label),
     m_DestinationLabel(nullptr)
 {
-  const auto numberOfGroups = segmentation->GetNumberOfLayers();
+  const auto numberOfGroups = segmentation->GetNumberOfGroups();
   const auto sourceGroup = segmentation->GetGroupIndexOfLabel(m_SourceLabel->GetValue());
 
   m_Ui->setupUi(this);
@@ -57,22 +60,34 @@ void QmitkCopyLabelToGroupDialog::accept()
 {
   const auto destinationGroup = m_Ui->groupComboBox->currentIndex() != 0
     ? m_Ui->groupComboBox->currentData().toUInt()
-    : m_Segmentation->AddLayer();
+    : m_Segmentation->AddGroup();
+
+  if (m_Ui->groupComboBox->currentIndex() == 0)
+  {
+    mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(m_Segmentation, {destinationGroup }, false, true);
+    undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert new destination group \"" + std::to_string(destinationGroup) + "\" for label copy.");
+  }
+
+  const auto sourceGroup = m_Segmentation->GetGroupIndexOfLabel(m_SourceLabel->GetValue());
+
+  mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { sourceGroup, destinationGroup }, true);
 
   m_DestinationLabel = m_Segmentation->AddLabel(m_SourceLabel, destinationGroup);
 
   mitk::TransferLabelContent(
-    m_Segmentation->GetGroupImage(m_Segmentation->GetGroupIndexOfLabel(m_SourceLabel->GetValue())),
+    m_Segmentation->GetGroupImage(sourceGroup),
     m_Segmentation->GetGroupImage(destinationGroup),
     m_Segmentation->GetConstLabelsByValue(m_Segmentation->GetLabelValuesByGroup(destinationGroup)),
-    mitk::LabelSetImage::UNLABELED_VALUE,
-    mitk::LabelSetImage::UNLABELED_VALUE,
+    mitk::MultiLabelSegmentation::UNLABELED_VALUE,
+    mitk::MultiLabelSegmentation::UNLABELED_VALUE,
     false,
     {{ m_SourceLabel->GetValue(), m_DestinationLabel->GetValue() }},
     mitk::MultiLabelSegmentation::MergeStyle::Replace,
     m_Ui->regardLocksRadioButton->isChecked()
       ? mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks
       : mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
+
+  undoRedoGenerator.RegisterUndoRedoOperationEvent("Copy label \""+ mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, m_SourceLabel)+"\" to group "+std::to_string(destinationGroup));
 
   m_Segmentation->SetActiveLabel(m_DestinationLabel->GetValue());
 

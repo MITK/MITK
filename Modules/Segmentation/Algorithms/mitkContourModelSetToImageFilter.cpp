@@ -246,7 +246,7 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     // 3. Fill contour into slice
     mitk::ContourModel::Pointer projectedContour =
       mitk::ContourModelUtils::ProjectContourTo2DSlice(slice, contour);
-    mitk::ContourModelUtils::FillContourInSlice(projectedContour, slice, outputImage, m_PaintingPixelValue);
+    mitk::ContourModelUtils::FillContourInSlice(projectedContour, 0, slice, m_PaintingPixelValue);
 
     // 4. Write slice back into image volume
     reslice->SetInputSlice(slice->GetVtkImageData());
@@ -302,4 +302,42 @@ void mitk::ContourModelSetToImageFilter::InitializeOutputEmpty()
       memset(writeAccess.GetData(), 0, byteSize);
     }
   }
+}
+
+mitk::Image::Pointer mitk::ConvertContourModelSetToLabelMask(const mitk::Image* refImage, mitk::ContourModelSet* contourSet)
+{
+  if (nullptr == refImage)
+    mitkThrow() << "Cannot convert to label mask. Passed reference image is nullptr.";
+  if (nullptr == contourSet)
+    mitkThrow() << "Cannot convert to label mask. Passed input is nullptr.";
+
+  // Use mitk::ContourModelSetToImageFilter to fill the ContourModelSet into the image
+  mitk::ContourModelSetToImageFilter::Pointer contourFiller = mitk::ContourModelSetToImageFilter::New();
+  contourFiller->SetImage(refImage);
+  contourFiller->SetInput(contourSet);
+  contourFiller->MakeOutputLabelPixelTypeOn();
+
+  try
+  {
+    contourFiller->Update();
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "Contour model conversion failed: " << e.what();
+    return nullptr;
+  }
+
+  return contourFiller->GetOutput();
+}
+
+mitk::Image::Pointer mitk::ConvertContourModelToLabelMask(const mitk::Image* refImage, mitk::ContourModel* contourModel)
+{
+  if (nullptr == refImage)
+    mitkThrow() << "Cannot convert to label mask. Passed reference image is nullptr.";
+  if (nullptr == contourModel)
+    mitkThrow() << "Cannot convert to label mask. Passed input is nullptr.";
+
+  auto contourModelSet = mitk::ContourModelSet::New();
+  contourModelSet->AddContourModel(contourModel);
+  return ConvertContourModelSetToLabelMask(refImage, contourModelSet);
 }

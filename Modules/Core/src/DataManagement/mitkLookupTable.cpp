@@ -43,6 +43,7 @@ std::vector<std::string> mitk::LookupTable::typenameList = {
   "Multilabel",
   "PET Color",
   "PET 20",
+  "PET Black/White",
   "Turbo"
 };
 
@@ -127,6 +128,9 @@ void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
       break;
     case (mitk::LookupTable::PET_20):
       this->BuildPET20LookupTable();
+      break;
+    case (mitk::LookupTable::PET_BLACK_WHITE):
+      this->BuildPETBWLookupTable();
       break;
     case (mitk::LookupTable::TURBO):
       this->BuildTurboLookupTable();
@@ -528,6 +532,21 @@ void mitk::LookupTable::BuildPET20LookupTable()
   m_LookupTable = lut;
   this->Modified();
 }
+
+void mitk::LookupTable::BuildPETBWLookupTable()
+{
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+  lut->SetRampToLinear();
+  lut->SetSaturationRange(0.0, 0.0);
+  lut->SetHueRange(0.0, 0.0);
+  lut->SetValueRange(1.0, 0.0);
+  lut->Build();
+  lut->SetTableValue(0, 1.0, 1.0, 1.0, 1.0);
+
+  m_LookupTable = lut;
+  this->Modified();
+}
+
 
 void mitk::LookupTable::BuildTurboLookupTable()
 {

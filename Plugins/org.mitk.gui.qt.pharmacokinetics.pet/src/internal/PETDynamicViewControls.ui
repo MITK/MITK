@@ -203,8 +203,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>715</width>
-           <height>166</height>
+           <width>707</width>
+           <height>113</height>
           </rect>
          </property>
          <property name="toolTip">
@@ -220,7 +220,7 @@
           <item>
            <widget class="QCheckBox" name="checkBox_StartParameters">
             <property name="text">
-             <string>Enter Fit Starting Parameters</string>
+             <string>Use User defined Fit Starting Parameters</string>
             </property>
            </widget>
           </item>
@@ -234,8 +234,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>171</width>
-           <height>34</height>
+           <width>707</width>
+           <height>113</height>
           </rect>
          </property>
          <attribute name="label">
@@ -245,7 +245,10 @@
           <item>
            <widget class="QCheckBox" name="checkBox_Constraints">
             <property name="text">
-             <string>Enter Constraints for Fit Parameters</string>
+             <string>Use Constraints for Fit Parameters</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -298,6 +301,12 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QmitkSimpleBarrierManagerWidget</class>
    <extends>QWidget</extends>
    <header>QmitkSimpleBarrierManagerWidget.h</header>
@@ -306,12 +315,6 @@
    <class>QmitkInitialValuesManagerWidget</class>
    <extends>QWidget</extends>
    <header>QmitkInitialValuesManagerWidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QmitkSingleNodeSelectionWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkSingleNodeSelectionWidget.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

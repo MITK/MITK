@@ -35,7 +35,6 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          const QString& multiWidgetName/* = "mxn"*/)
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
-  , m_SynchronizedWidgetConnector(std::make_unique<QmitkSynchronizedWidgetConnector>())
   , m_CrosshairVisibility(false)
 {
 }
@@ -46,15 +45,15 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 
 void QmitkMxNMultiWidget::InitializeMultiWidget()
 {
+
+  AddSynchronizationGroup(1);
   SetLayout(1, 1);
   SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
   auto displayActionEventHandler = GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
-    displayActionEventHandler->InitActions();
+    displayActionEventHandler->InitActions(this->GetMultiWidgetName().toStdString());
   }
-
-  this->SetInitialSelection();
 }
 
 void QmitkMxNMultiWidget::Synchronize(bool synchronized)
@@ -68,10 +67,11 @@ void QmitkMxNMultiWidget::Synchronize(bool synchronized)
     SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
   }
 
+  std::string prefixFilter = synchronized ? "" : this->GetMultiWidgetName().toStdString();
   auto displayActionEventHandler = GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
-    displayActionEventHandler->InitActions();
+    displayActionEventHandler->InitActions(prefixFilter);
   }
 }
 
@@ -165,23 +165,29 @@ bool QmitkMxNMultiWidget::HasCoupledRenderWindows() const
 
 void QmitkMxNMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName)
 {
-  RenderWindowWidgetPointer renderWindowWidget;
+  QSet< RenderWindowWidgetPointer > renderWindowWidgets;
   if (widgetName.isNull() || widgetName.isEmpty())
   {
-    renderWindowWidget = GetActiveRenderWindowWidget();
+    for (const auto& [windowName, renderWindowWidget] : this->GetRenderWindowWidgets())
+    {
+      renderWindowWidgets.insert(renderWindowWidget);
+    }
   }
   else
   {
-    renderWindowWidget = GetRenderWindowWidget(widgetName);
+    renderWindowWidgets = { GetRenderWindowWidget(widgetName) };
   }
 
-  if (nullptr != renderWindowWidget)
+  if (renderWindowWidgets.isEmpty())
   {
-    renderWindowWidget->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+    MITK_ERROR << "Position can not be set for an unknown render window widget.";
     return;
   }
 
-  MITK_ERROR << "Position can not be set for an unknown render window widget.";
+  for (auto renderWindowWidget : renderWindowWidgets)
+  {
+    renderWindowWidget->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+  }
 }
 
 const mitk::Point3D QmitkMxNMultiWidget::GetSelectedPosition(const QString& widgetName) const
@@ -364,17 +370,18 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
 
-  QmitkRenderWindowUtilityWidget* utilityWidget = new QmitkRenderWindowUtilityWidget(this, renderWindow, GetDataStorage());
+  QmitkRenderWindowUtilityWidget* utilityWidget = new QmitkRenderWindowUtilityWidget(this, renderWindow, GetDataStorage(), m_SynchronizedWidgetConnectors.size());
   renderWindowWidget->AddUtilityWidget(utilityWidget);
 
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SynchronizationToggled,
-    this, &QmitkMxNMultiWidget::ToggleSynchronization);
   connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,
     utilityWidget, &QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection);
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncGroupChanged, this, &QmitkMxNMultiWidget::SetSynchronizationGroup);
+  connect(this, &QmitkMxNMultiWidget::SyncGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSyncGroupAdded);
 
-  // needs to be done after 'QmitkRenderWindowUtilityWidget::ToggleSynchronization' has been connected
-  // initially synchronize the node selection widget
-  utilityWidget->ToggleSynchronization(true);
+  // initialize the node selection widget with all nodes to set required properties, then synchronize with default group
+  utilityWidget->GetNodeSelectionWidget()->SelectAll();
+  SetSynchronizationGroup(utilityWidget->GetNodeSelectionWidget(), 1);
+
 
   auto layoutManager = GetMultiWidgetLayoutManager();
   connect(renderWindow, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
@@ -419,9 +426,9 @@ void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
   try
   {
     auto version = jsonData->at("version").get<std::string>();
-    if (version != "1.0")
+    if (version.at(0) != '1')
     {
-      QMessageBox::warning(this, "Load layout", "Unknown layout version, could not load");
+      QMessageBox::warning(this, "Load layout", "Unknown/Outdated layout version, could not load");
       return;
     }
 
@@ -468,7 +475,7 @@ void QmitkMxNMultiWidget::SaveLayout(std::ostream* outStream)
   }
 
   auto layoutJSON = BuildJSONFromLayout(splitter);
-  layoutJSON["version"] = "1.0";
+  layoutJSON["version"] = "1.1";
   layoutJSON["name"] = "Custom Layout";
 
   *outStream << std::setw(4) << layoutJSON << std::endl;
@@ -497,6 +504,8 @@ nlohmann::json QmitkMxNMultiWidget::BuildJSONFromLayout(const QSplitter* splitte
     {
       widgetJSON["isWindow"] = true;
       widgetJSON["viewDirection"] = widgetWindow->GetSliceNavigationController()->GetViewDirectionAsString();
+      widgetJSON["syncGroup"] = widgetWindow->GetUtilityWidget()->GetSyncGroup();
+      widgetJSON["selectAll"] = widgetWindow->GetUtilityWidget()->GetNodeSelectionWidget()->GetSelectAll();
     }
     widgetJSON["size"] = sizes[i];
     content.push_back(widgetJSON);
@@ -541,12 +550,23 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
         viewPlane = mitk::AnatomicalPlane::Sagittal;
       }
 
+      GroupSyncIndexType syncGroup = 1;
+      if (object.contains("syncGroup"))
+        syncGroup = object["syncGroup"].get<GroupSyncIndexType>();
+
       // repurpose existing render windows as far as they already exist
       auto window = GetWindowFromIndex(*windowCounter);
       if (window == nullptr)
       {
         window = CreateRenderWindowWidget();
       }
+
+      window->GetUtilityWidget()->SetSyncGroup(syncGroup);
+
+      bool selectAll = true;
+      if (object.contains("selectAll"))
+        selectAll = object["selectAll"].get<bool>();
+      window->GetUtilityWidget()->GetNodeSelectionWidget()->SetSelectAll(selectAll);
 
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();
@@ -571,8 +591,10 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   auto vSplit = new QSplitter(Qt::Vertical);
 
   unsigned int windowCounter = 0;
+  unsigned int rowCounter = 0;
   for (auto node : nodes)
   {
+    rowCounter++;
     auto hSplit = new QSplitter(Qt::Horizontal);
     for (auto viewPlane : { mitk::AnatomicalPlane::Axial, mitk::AnatomicalPlane::Coronal, mitk::AnatomicalPlane::Sagittal })
     {
@@ -584,8 +606,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
       }
 
       auto utilityWidget = window->GetUtilityWidget();
-      utilityWidget->ToggleSynchronization(false);
-      utilityWidget->SetDataSelection(QList({ node }));
+      utilityWidget->SetSyncGroup(rowCounter);
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();
       auto baseRenderer = mitk::BaseRenderer::GetInstance(window->GetRenderWindow()->GetVtkRenderWindow());
@@ -594,6 +615,10 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
       hSplit->addWidget(window.get());
       window->show();
     }
+
+    m_SynchronizedWidgetConnectors[rowCounter]->ChangeSelectionMode(false);
+    m_SynchronizedWidgetConnectors[rowCounter]->ChangeSelection(QList({ node }));
+
     auto sizes = QList<int>({1, 1, 1});
     hSplit->setSizes(sizes);
     vSplit->addWidget(hSplit);
@@ -614,8 +639,14 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   emit LayoutChanged();
 }
 
-void QmitkMxNMultiWidget::SetInitialSelection()
+void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index)
 {
+  if (index == 0)
+  {
+    MITK_ERROR << "Invalid call to SetSyncGroup. Group index can't be 0.";
+    return;
+  }
+
   auto dataStorage = this->GetDataStorage();
   if (nullptr == dataStorage)
   {
@@ -632,20 +663,28 @@ void QmitkMxNMultiWidget::SetInitialSelection()
     currentSelection.append(node);
   }
 
-  m_SynchronizedWidgetConnector->ChangeSelection(currentSelection);
+  m_SynchronizedWidgetConnectors[index] = std::make_unique<QmitkSynchronizedWidgetConnector>();
+  m_SynchronizedWidgetConnectors[index]->ChangeSelection(currentSelection);
+
+  emit SyncGroupAdded(index);
 }
 
-void QmitkMxNMultiWidget::ToggleSynchronization(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget)
+void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index)
 {
-  bool synchronized = synchronizedWidget->IsSynchronized();
+  if (m_SynchronizedWidgetConnectors.find(index) == m_SynchronizedWidgetConnectors.end())
+  {
+    this->AddSynchronizationGroup(index);
+  }
 
-  if (synchronized)
-  {
-    m_SynchronizedWidgetConnector->ConnectWidget(synchronizedWidget);
-    m_SynchronizedWidgetConnector->SynchronizeWidget(synchronizedWidget);
-  }
-  else
-  {
-    m_SynchronizedWidgetConnector->DisconnectWidget(synchronizedWidget);
-  }
+  auto old_index = synchronizedWidget->GetSyncGroup();
+  if (old_index == index)
+    return;
+  synchronizedWidget->SetSyncGroup(index);
+
+  // For the initial setting of the synchronization, nothing old is there to disconnect
+  if (old_index != -1)
+    m_SynchronizedWidgetConnectors[old_index]->DisconnectWidget(synchronizedWidget);
+
+  m_SynchronizedWidgetConnectors[index]->ConnectWidget(synchronizedWidget);
+  m_SynchronizedWidgetConnectors[index]->SynchronizeWidget(synchronizedWidget);
 }

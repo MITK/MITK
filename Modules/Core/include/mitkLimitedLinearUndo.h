@@ -86,6 +86,10 @@ namespace mitk
     bool RedoListEmpty() override;
 
     //##Documentation
+    //## @brief True, if UndoList is empty
+    bool UndoListEmpty() override;
+
+    //##Documentation
     //## @brief Gets the limit on the size of the undo history.
     //## The undo limit determines how many items can be stored
     //## in the undo stack. If the value is 0 that means that
@@ -114,6 +118,13 @@ namespace mitk
     //## @brief Returns the last specified OperationEvent in Undo-list
     //## corresponding to the given values; if nothing found, then returns nullptr
     OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) override;
+
+    /**
+     * @brief Removes invalid operations from the undo/redo stack.
+     * Iterates through m_UndoList and m_RedoList and removes invalid OperationEvents.
+     * @return Number of invalid operations removed
+     */
+    unsigned int RemoveInvalidOperations() override;
 
   protected:
     //##Documentation

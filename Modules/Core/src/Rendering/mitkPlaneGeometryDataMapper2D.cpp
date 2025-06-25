@@ -172,18 +172,6 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer
 {
   BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  // The PlaneGeometryDataMapper2D mapper is special in that the rendering of
-  // OTHER PlaneGeometryDatas affects how we render THIS PlaneGeometryData
-  // (for the gap at the point where they intersect). A change in any of the
-  // other PlaneGeometryData nodes could mean that we render ourself
-  // differently, so we check for that here.
-  for (auto it = s_AllInstances.begin(); it != s_AllInstances.end(); ++it)
-  {
-    bool generateDataRequired = ls->IsGenerateDataRequired(renderer, this, (*it)->GetDataNode());
-    if (generateDataRequired)
-      break;
-  }
-
   ls->UpdateGenerateDataTime();
 
   // Collect all other PlaneGeometryDatas that are being mapped by this mapper

@@ -29,6 +29,8 @@ mitk_create_module(
       VTK::ImagingGeneral
 )
 
-add_subdirectory(autoload/IO)
-add_subdirectory(cmdapps)
-add_subdirectory(Testing)
+if(TARGET ${MODULE_TARGET})
+  add_subdirectory(autoload/IO)
+  add_subdirectory(cmdapps)
+  add_subdirectory(Testing)
+endif()

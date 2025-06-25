@@ -71,7 +71,7 @@ bool QmitkOverlayWidget::eventFilter(QObject* watched, QEvent* event)
 void QmitkOverlayWidget::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
-  painter.fillRect(this->rect(), QColor(0, 0, 0, 63));
+  painter.fillRect(this->rect(), QColor(0, 0, 0, m_Opacity));
 }
 
 void QmitkOverlayWidget::installEventFilterOnParent()
@@ -89,4 +89,15 @@ void QmitkOverlayWidget::removeEventFilterFromParent()
     return;
 
   this->parent()->removeEventFilter(this);
+}
+
+int QmitkOverlayWidget::getOpacity() const
+{
+  return m_Opacity;
+}
+
+void QmitkOverlayWidget::setOpacity(int opacity)
+{
+  m_Opacity = opacity;
+  this->update();
 }

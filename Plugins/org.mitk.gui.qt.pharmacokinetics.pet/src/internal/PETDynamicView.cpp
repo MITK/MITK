@@ -432,7 +432,7 @@ void PETDynamicView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*
   if (m_Controls.maskNodeSelector->GetSelectedNode().IsNotNull())
   {
     this->m_selectedMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
-    auto selectedLabelSetMask = dynamic_cast<mitk::LabelSetImage*>(m_selectedMaskNode->GetData());
+    auto selectedLabelSetMask = dynamic_cast<mitk::MultiLabelSegmentation*>(m_selectedMaskNode->GetData());
 
     if (selectedLabelSetMask != nullptr)
     {

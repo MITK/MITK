@@ -40,7 +40,9 @@ namespace
     {"segmentation_spleen", "Radiology"},
     {"segmentation_vertebra", "Radiology"},
     {"deepgrow_pipeline", "Radiology"},
-    {"vertebra_pipeline", "Radiology"}};
+    {"vertebra_pipeline", "Radiology"},
+    {"sam_2d", "Radiology"},
+    {"sam_3d", "Radiology"}};
 
   /* Strictly unsupported models in MITK and corresponding app */
   const static QMap<QString, QString> BLACKLISTED_MODELS = {

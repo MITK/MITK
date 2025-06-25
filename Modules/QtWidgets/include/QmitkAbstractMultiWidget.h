@@ -100,6 +100,7 @@ public:
   RenderWindowWidgetPointer GetFirstRenderWindowWidget() const;
   RenderWindowWidgetPointer GetLastRenderWindowWidget() const;
 
+  QString GetMultiWidgetName() const;
   virtual QString GetNameFromIndex(int row, int column) const;
   virtual QString GetNameFromIndex(size_t index) const;
 

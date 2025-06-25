@@ -20,10 +20,9 @@ class QmitkTotalSegmentatorToolInstaller : public QmitkSetupVirtualEnvUtil
 public:
   static const QString VENV_NAME;
   static const QString TOTALSEGMENTATOR_VERSION;
-  static const std::vector<QString> PACKAGES;
+  static const QStringList PACKAGES;
   static const QString STORAGE_DIR;
   QmitkTotalSegmentatorToolInstaller();
-  bool SetupVirtualEnv(const QString &) override;
   QString GetVirtualEnvPath() override;
   static void PrintProcessEvent(itk::Object *, const itk::EventObject &e, void *);
 };

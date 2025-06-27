@@ -228,7 +228,6 @@ void QmitkMatchPointFrameCorrection::CreateQtPartControl(QWidget* parent)
 void QmitkMatchPointFrameCorrection::ConfigureNodeSelectorPredicates()
 {
   auto isImage = mitk::MITKRegistrationHelper::ImageNodePredicate();
-  mitk::NodePredicateBase::Pointer maskDimensionPredicate = mitk::NodePredicateOr::New(mitk::NodePredicateDimension::New(3), mitk::NodePredicateDimension::New(4)).GetPointer();
   mitk::NodePredicateDimension::Pointer imageDimensionPredicate = mitk::NodePredicateDimension::New(4);
 
   m_Controls.imageNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
@@ -236,11 +235,7 @@ void QmitkMatchPointFrameCorrection::ConfigureNodeSelectorPredicates()
 
   m_Controls.imageNodeSelector->SetNodePredicate(mitk::NodePredicateAnd::New(isImage, imageDimensionPredicate));
 
-  mitk::NodePredicateAnd::Pointer maskPredicate = mitk::NodePredicateAnd::New(mitk::GetMultiLabelSegmentationPredicate(), maskDimensionPredicate);
-  if (m_spSelectedTargetData != nullptr)
-  {
-    maskPredicate = mitk::NodePredicateAnd::New(mitk::GetMultiLabelSegmentationPredicate(m_spSelectedTargetData->GetGeometry()), maskDimensionPredicate);
-  }
+  auto maskPredicate = (m_spSelectedTargetData.IsNull()) ? mitk::GetMultiLabelSegmentationPredicate() : mitk::GetMultiLabelSegmentationPredicate(m_spSelectedTargetData->GetGeometry());
 
   m_Controls.maskNodeSelector->SetNodePredicate(maskPredicate);
 }

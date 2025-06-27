@@ -534,12 +534,10 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
     m_Controls.targetMaskNodeSelector->SetPopUpHint("Select a segmentation that serves as target mask for the registration.");
 
     mitk::BaseGeometry::Pointer movingGeometry = m_Controls.movingNodeSelector->GetSelectedNode().IsNotNull() ? m_Controls.movingNodeSelector->GetSelectedNode()->GetData()->GetGeometry() : nullptr;
-    nodePredicate = mitk::NodePredicateAnd::New(mitk::GetMultiLabelSegmentationPredicate(movingGeometry), dimensionPredicate);
-    m_Controls.movingMaskNodeSelector->SetNodePredicate(nodePredicate);
+    m_Controls.movingMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(movingGeometry));
 
     mitk::BaseGeometry::Pointer targetGeometry = m_Controls.targetNodeSelector->GetSelectedNode().IsNotNull() ? m_Controls.targetNodeSelector->GetSelectedNode()->GetData()->GetGeometry() : nullptr;
-    nodePredicate = mitk::NodePredicateAnd::New(mitk::GetMultiLabelSegmentationPredicate(movingGeometry), dimensionPredicate);
-    m_Controls.targetMaskNodeSelector->SetNodePredicate(nodePredicate);
+    m_Controls.targetMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(targetGeometry));
   }
 
 }

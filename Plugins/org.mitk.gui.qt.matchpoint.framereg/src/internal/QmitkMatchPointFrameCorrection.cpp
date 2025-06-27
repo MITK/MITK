@@ -63,7 +63,6 @@ QmitkMatchPointFrameCorrection::QmitkMatchPointFrameCorrection()
   : m_Parent(nullptr), m_LoadedDLLHandle(nullptr), m_LoadedAlgorithm(nullptr), m_CanLoadAlgorithm(false), m_Working(false)
 {
   m_spSelectedTargetData = nullptr;
-  m_spSelectedTargetMaskData = nullptr;
 }
 
 QmitkMatchPointFrameCorrection::~QmitkMatchPointFrameCorrection()
@@ -199,6 +198,8 @@ void QmitkMatchPointFrameCorrection::CreateQtPartControl(QWidget* parent)
   this->m_Controls.maskNodeSelector->SetPopUpTitel("Select target mask.");
   this->m_Controls.maskNodeSelector->SetPopUpHint("Select a target mask (mask of the target/first frame).");
 
+  m_Controls.maskLabelSelector->SetHighlightingActivated(true);
+
   m_Controls.m_tabs->setCurrentIndex(0);
 
   m_Controls.m_mapperSettings->AllowSampling(false);
@@ -252,7 +253,6 @@ void QmitkMatchPointFrameCorrection::CheckInputs()
   m_spSelectedTargetData = nullptr;
 
   m_spSelectedTargetMaskNode = nullptr;
-  m_spSelectedTargetMaskData = nullptr;
 
   if (m_LoadedAlgorithm.IsNull())
   {
@@ -267,10 +267,10 @@ void QmitkMatchPointFrameCorrection::CheckInputs()
       m_spSelectedTargetData = m_spSelectedTargetNode->GetData();
     }
 
-    m_spSelectedTargetMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
-    if (m_spSelectedTargetMaskNode.IsNotNull())
+    if (m_Controls.maskNodeSelector->GetSelectedNode() != m_spSelectedTargetMaskNode)
     {
-      m_spSelectedTargetMaskData = dynamic_cast<mitk::Image*>(m_spSelectedTargetMaskNode->GetData());
+      m_Controls.maskLabelSelector->SetMultiLabelNode(m_Controls.maskNodeSelector->GetSelectedNode());
+      m_spSelectedTargetMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
     }
   }
 
@@ -336,6 +336,8 @@ void QmitkMatchPointFrameCorrection::ConfigureRegistrationControls()
   m_Controls.imageNodeSelector->setEnabled(!m_Working);
   m_Controls.maskNodeSelector->setEnabled(!m_Working);
 
+  m_Controls.maskLabelSelector->setVisible(m_spSelectedTargetMaskNode.IsNotNull());
+
   if (m_LoadedAlgorithm.IsNotNull())
   {
     m_Controls.m_tabSettings->setEnabled(!m_Working);
@@ -349,6 +351,7 @@ void QmitkMatchPointFrameCorrection::ConfigureRegistrationControls()
                                        (m_LoadedAlgorithm.GetPointer());
 
     m_Controls.maskNodeSelector->setVisible(pMaskReg != nullptr);
+    m_Controls.maskLabelSelector->setVisible(m_spSelectedTargetMaskNode.IsNotNull() && pMaskReg != nullptr);
     m_Controls.label_TargetMask->setVisible(pMaskReg != nullptr);
     if (!pMaskReg)
     {
@@ -530,10 +533,11 @@ void QmitkMatchPointFrameCorrection::OnStartRegBtnPushed()
   pJob->m_TargetDataUID = mitk::EnsureUID(this->m_spSelectedTargetNode->GetData());
   pJob->m_IgnoreList = this->GenerateIgnoreList();
 
-  if (m_spSelectedTargetMaskData.IsNotNull())
+  auto targetMask = m_Controls.maskLabelSelector->CreateSelectedLabelMask();
+  if (targetMask.IsNotNull())
   {
-    pJob->m_spTargetMask = m_spSelectedTargetMaskData;
-    pJob->m_TargetMaskDataUID = mitk::EnsureUID(this->m_spSelectedTargetMaskNode->GetData());
+    pJob->m_spTargetMask = mitk::SelectImageByTimeStep(targetMask, 0);
+    pJob->m_TargetMaskDataUID = mitk::EnsureUID(this->m_spSelectedTargetMaskNode->GetData()) + "#" + std::to_string(m_Controls.maskLabelSelector->GetSelectedLabels().front());
   }
 
   pJob->m_MappedName = m_Controls.m_leRegJobName->text().toStdString();

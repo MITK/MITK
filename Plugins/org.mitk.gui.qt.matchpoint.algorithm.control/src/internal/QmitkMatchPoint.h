@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include "ui_QmitkMatchPointControls.h"
 
 #include <mitkImage.h>
+#include <mitkLabelSetImage.h>
 
 // MatchPoint
 #include <mapDeploymentDLLInfo.h>
@@ -184,14 +185,6 @@ private:
 
   mitk::DataNode::Pointer m_spSelectedTargetMaskNode;
   mitk::DataNode::Pointer m_spSelectedMovingMaskNode;
-  /*Data of the selected target mask node that should be used for registration.
-  Can be the direct return of node->GetData(), but can also be a sub
-  set (like a special time frame).*/
-  mitk::Image::ConstPointer m_spSelectedTargetMaskData;
-  /*Data of the selected moving mask node that should be used for registration.
-  Can be the direct return of node->GetData(), but can also be a sub
-  set (like a special time frame).*/
-  mitk::Image::ConstPointer m_spSelectedMovingMaskData;
 
   // boolean variables to control visibility of GUI elements
   bool m_CanLoadAlgorithm;

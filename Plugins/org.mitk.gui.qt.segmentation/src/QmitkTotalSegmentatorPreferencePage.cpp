@@ -380,8 +380,9 @@ void QmitkTotalSegmentatorPreferencePage::UpdateStatusLabel()
     }
     else
     {
-      text += "Compatible version of TotalSegmentator is not detected. Please 'Install TotalSegmentator'"
-              " or use your own custom virtual environment.\n";
+      text += "Compatible version of TotalSegmentator is not detected. Either use your own custom virtual "
+              "environment or click 'Install TotalSegmentator'.\nThe installation will create a new virtual "
+              "environment using the System Python selected above.\n";
     }
   }
   if (m_DeviceLoader.GetGPUCount() == 0)

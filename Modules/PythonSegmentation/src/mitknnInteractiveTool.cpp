@@ -415,7 +415,7 @@ void mitk::nnInteractiveTool::StartSession()
     << "repo_id = 'nnInteractive/nnInteractive'\n"
     << "download_path = snapshot_download(\n"
     << "    repo_id = repo_id,\n"
-    << "    allow_patterns = ['" << MODEL << "'],\n"
+    << "    allow_patterns = ['" << MODEL << "/*'],\n"
     << "    force_download = False\n"
     << ")\n"
     << "checkpoint_path = Path(download_path).joinpath('" << MODEL << "')\n";

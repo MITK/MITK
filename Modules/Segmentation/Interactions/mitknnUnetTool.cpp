@@ -47,8 +47,8 @@ void mitk::nnUNetTool::RenderOutputBuffer()
       if (nullptr != this->GetPreviewSegmentationNode())
       {
         auto previewImage = this->GetPreviewSegmentation();
-        previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_OutputBuffer->GetGroupImage(0), 0);
-        //previewImage->InitializeByLabeledImage(m_OutputBuffer->GetGroupImage(0));
+        previewImage->RemoveLabels(previewImage->GetLabelValuesByGroup(previewImage->GetActiveLayer()));
+        previewImage->InitializeByLabeledImage(m_OutputBuffer->GetGroupImage(0));
         //we currently assume that nnUNet does not support overlapping segmentations
         //and therefor will produce only one group.
       }

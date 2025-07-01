@@ -29,7 +29,7 @@ Boolean operations allows to perform the following fundamental operations on two
 
 <ul>
 	<li> <b>Difference:</b> Subtracts the second segmentation from the first segmentation.
-	<li> <b>Intersection:</b> Extracts the overlapping areas of the two selected segmentations.
+	<li> <b>Intersection:</b> Extracts the overlapping areas of all selected segmentations.
 	<li> <b>Union:</b> Combines the two existing segmentations.
 </ul>
 

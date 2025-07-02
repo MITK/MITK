@@ -393,7 +393,6 @@ void mitk::nnInteractiveTool::ConfirmCleanUp()
 
 void mitk::nnInteractiveTool::StartSession()
 {
-  constexpr auto VENV_PATH = "D:/miniforge3/envs/nnInteractive/Lib/site-packages";
   constexpr auto MODEL = "nnInteractive_v1.0";
 
   if (this->IsSessionRunning())
@@ -403,7 +402,6 @@ void mitk::nnInteractiveTool::StartSession()
   m_Impl->SetPythonContext(pythonContext);
 
   pythonContext->Activate();
-  pythonContext->SetVirtualEnvironmentPath(VENV_PATH);
 
   std::ostringstream pyCommands; pyCommands
     << "import torch\n"

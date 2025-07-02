@@ -80,17 +80,15 @@ if(_mitk_executable_targets)
   endforeach()
 endif()
 
-# Install PythonQt
+# Install pyMITK
 
-if(MITK_USE_Python3 AND PythonQt_DIR)
-  set(_python_qt_lib "${PythonQt_DIR}/")
+if(MITK_WRAP_PYTHON_ENABLED)
+  MITK_INSTALL(TARGETS pyMITK)
   if(WIN32)
-    set(_python_qt_lib "${_python_qt_lib}bin")
+    MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/pyMITK.py")
   else()
-    set(_python_qt_lib "${_python_qt_lib}lib")
+    MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/pyMITK.py")
   endif()
-  set(_python_qt_lib "${_python_qt_lib}/${_prefix}PythonQt${_ext}")
-  MITK_INSTALL(FILES ${_python_qt_lib})
 endif()
 
 # Install Qt plugins

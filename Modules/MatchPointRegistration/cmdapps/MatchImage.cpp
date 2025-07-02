@@ -15,8 +15,10 @@ found in the LICENSE file.
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include <mitkMAPAlgorithmHelper.h>
+#include <mitkMaskedAlgorithmHelper.h>
 #include <mitkPointSet.h>
 #include <mitkImageTimeSelector.h>
+#include <mitkLabelSetImageConverter.h>
 
 #include <itkStdStreamLogOutput.h>
 
@@ -36,6 +38,7 @@ found in the LICENSE file.
 #include <mapRegistrationBase.h>
 
 #include <nlohmann/json.hpp>
+#include <mitkLabelSetImage.h>
 
 struct Settings
 {
@@ -43,6 +46,10 @@ struct Settings
   std::string targetFileName = "";
   std::string outFileName = "";
   std::string algFileName = "";
+  std::string movingMaskFileName = "";
+  std::string movingMaskLabelName = "";
+  std::string targetMaskFileName = "";
+  std::string targetMaskLabelName = "";
   std::string parameters = "";
 };
 
@@ -56,15 +63,17 @@ void SetupParser(mitkCommandLineParser& parser)
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
   parser.beginGroup("Required I/O parameters");
+
   parser.addArgument(
     "moving", "m",
     mitkCommandLineParser::File,
     "Moving image files", "Path to the data that should be registered into the target space.",
     us::Any(), false, false, false, mitkCommandLineParser::Input);
+
   parser.addArgument(
     "target", "t",
     mitkCommandLineParser::File,
-    "Tareget image files", "Path to the data that should be the target data on which the moving data should be registered.",
+    "Target image files", "Path to the data that should be the target data on which the moving data should be registered.",
     us::Any(), false, false, false, mitkCommandLineParser::Input);
 
   parser.addArgument(
@@ -73,8 +82,8 @@ void SetupParser(mitkCommandLineParser& parser)
     "Registration algorithm", "Path to the registration algorithm that should be used for registration.",
     us::Any(), false, false, false, mitkCommandLineParser::Input);
 
-  parser.addArgument("output",
-    "o",
+  parser.addArgument(
+    "output", "o",
     mitkCommandLineParser::File,
     "Output file path",
     "Path to the generated registration.",
@@ -83,8 +92,38 @@ void SetupParser(mitkCommandLineParser& parser)
   parser.endGroup();
 
   parser.beginGroup("Optional parameters");
+
+  parser.addArgument(
+    "moving_mask", "mm",
+    mitkCommandLineParser::File,
+    "Moving image mask", "Path to the data that should be used to mask the moving image for registration.",
+    us::Any(),
+    true, false, false);
+
+  parser.addArgument(
+    "moving_mask_label", "mml",
+    mitkCommandLineParser::String,
+    "Moving image mask label", "Name of the label to use for masking of the moving image. (required if there are multiple labels in the selected mask).",
+    us::Any(),
+    true, false, false);
+
+  parser.addArgument(
+    "target_mask", "tm",
+    mitkCommandLineParser::File,
+    "Target image mask", "Path to the data that should be used to mask the target image for registration.",
+    us::Any(),
+    true, false, false);
+
+  parser.addArgument(
+    "target_mask_label", "tml",
+    mitkCommandLineParser::String,
+    "Target image mask label", "Name of the label to use for masking of the target image. (required if there are multiple labels in the selected mask).",
+    us::Any(),
+    true, false, false);
+
   parser.addArgument(
     "parameters", "p", mitkCommandLineParser::String, "Parameters", "Json string containing a json object that contains the parameters that should be passed to the algorithm as key value pairs.");
+
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.endGroup();
 }
@@ -100,6 +139,22 @@ bool ConfigureApplicationSettings(std::map<std::string, us::Any> parsedArgs, Set
     settings.targetFileName = us::any_cast<std::string>(parsedArgs["target"]);
     settings.outFileName = us::any_cast<std::string>(parsedArgs["output"]);
     settings.algFileName = us::any_cast<std::string>(parsedArgs["algorithm"]);
+    if (parsedArgs.count("moving_mask") > 0)
+    {
+      settings.movingMaskFileName = us::any_cast<std::string>(parsedArgs["moving_mask"]);
+    }
+    if (parsedArgs.count("moving_mask_label") > 0)
+    {
+      settings.movingMaskLabelName = us::any_cast<std::string>(parsedArgs["moving_mask_label"]);
+    }
+    if (parsedArgs.count("target_mask") > 0)
+    {
+      settings.targetMaskFileName = us::any_cast<std::string>(parsedArgs["target_mask"]);
+    }
+    if (parsedArgs.count("target_mask_label") > 0)
+    {
+      settings.targetMaskLabelName = us::any_cast<std::string>(parsedArgs["target_mask_label"]);
+    }
     if (parsedArgs.count("parameters") > 0)
     {
       settings.parameters = us::any_cast<std::string>(parsedArgs["parameters"]);
@@ -150,14 +205,47 @@ map::deployment::RegistrationAlgorithmBasePointer loadAlgorithm(const Settings& 
   return spAlgorithmBase;
 };
 
-mitk::Image::Pointer ExtractFirstFrame(const mitk::Image* dynamicImage)
+mitk::Image::Pointer loadMaskImage(std::string filepath, std::string labelName = "")
 {
-  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-  imageTimeSelector->SetInput(dynamicImage);
-  imageTimeSelector->SetTimeNr(0);
-  imageTimeSelector->UpdateLargestPossibleRegion();
+  auto maskRaw = mitk::IOUtil::Load(filepath).front();
 
-  return imageTimeSelector->GetOutput();
+  if (auto maskImage = dynamic_cast<mitk::Image*>(maskRaw.GetPointer()))
+    return maskImage;
+
+  if (auto maskMultiLabelImage = dynamic_cast<mitk::MultiLabelSegmentation*>(maskRaw.GetPointer()))
+  {
+    if (maskMultiLabelImage->GetTotalNumberOfLabels() == 1)
+      return mitk::CreateLabelMask(maskMultiLabelImage, maskMultiLabelImage->GetAllLabelValues().front());
+
+    if (labelName.empty())
+    {
+      MITK_INFO << "Selected mask has multiple labels. Using first one. If you want a certain label, please specify via the --movingMaskLabel / --targetMaskLabel argument.";
+      return mitk::CreateLabelMask(maskMultiLabelImage, maskMultiLabelImage->GetAllLabelValues().front());
+    }
+
+    mitk::MultiLabelSegmentation::LabelValueVectorType labelValues;
+    for (mitk::MultiLabelSegmentation::GroupIndexType groupIndex = 0; groupIndex < maskMultiLabelImage->GetNumberOfGroups(); ++groupIndex)
+    {
+      auto groupLabels = maskMultiLabelImage->GetLabelValuesByName(groupIndex, labelName);
+      labelValues.insert(labelValues.end(), groupLabels.begin(), groupLabels.end());
+    }
+
+    if (labelValues.size() == 0)
+    {
+      MITK_ERROR << "No label '" << labelName << "' found for the segmentation " << filepath;
+      return nullptr;
+    }
+    if (labelValues.size() > 1)
+    {
+      MITK_ERROR << "Multiple labels called '" << labelName << "' found for the segmentation " << filepath;
+      return nullptr;
+    }
+
+    return mitk::CreateLabelMask(maskMultiLabelImage, labelValues.front());
+  }
+
+  MITK_ERROR << "Selected image mask is neither an image nor a MultiLabelSegmentation: " << filepath;
+  return nullptr;
 }
 
 template <typename TValueType>
@@ -446,9 +534,37 @@ int main(int argc, char* argv[])
       std::cout << "Target image has multiple time steps. Use first time step for registration." << std::endl;
     }
 
+    mitk::Image::Pointer movingMask, targetMask;
+
+    if (!settings.movingMaskFileName.empty())
+    {
+      std::cout << "Load moving image mask..." << std::endl;
+      movingMask = loadMaskImage(settings.movingMaskFileName, settings.movingMaskLabelName);
+
+      if (movingMask.IsNull())
+      {
+        MITK_ERROR << "Cannot load moving image mask.";
+        return EXIT_FAILURE;
+      }
+    }
+
+    if (!settings.targetMaskFileName.empty())
+    {
+      std::cout << "Load target image mask..." << std::endl;
+      targetMask = loadMaskImage(settings.targetMaskFileName, settings.targetMaskLabelName);
+
+      if (targetMask.IsNull())
+      {
+        MITK_ERROR << "Cannot load target image mask.";
+        return EXIT_FAILURE;
+      }
+    }
+
     std::cout << "Start registration...." << std::endl;
     mitk::MAPAlgorithmHelper helper(algorithm);
+    mitk::MaskedAlgorithmHelper maskedHelper(algorithm);
     helper.SetData(movingImage, targetImage);
+    maskedHelper.SetMasks(movingMask, targetMask);
 
     ::itk::StdStreamLogOutput::Pointer spStreamLogOutput = ::itk::StdStreamLogOutput::New();
     spStreamLogOutput->SetStream(std::cout);

@@ -221,7 +221,7 @@ void SaveablesList::FillModelsClosing(Saveable::Set& modelsClosing,
        it != modelsDecrementing.end(); ++it)
   {
     Saveable::Pointer model = it.key();
-    if (it.value() == modelRefCounts[model])
+    if (const auto finding = modelRefCounts.find(model); finding != modelRefCounts.end() && it.value() == finding.value())
     {
       modelsClosing.insert(model);
     }

@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "berryIWorkbenchPart.h"
 #include "berryIWorkbenchPage.h"
 #include "berryUIException.h"
+#include "berryLog.h"
 
 #include <QIcon>
 
@@ -38,17 +39,35 @@ void DefaultSaveable::DoSave(/*IProgressMonitor monitor*/)
 
 QString DefaultSaveable::GetName() const
 {
-  return part.Lock()->GetPartName();
+  auto partPtr = part.Lock();
+  if (partPtr.IsNull())
+  {
+    return "";
+  }
+
+  return partPtr->GetPartName();
 }
 
 QIcon DefaultSaveable::GetImageDescriptor() const
 {
-  return part.Lock()->GetTitleImage();
+  auto partPtr = part.Lock();
+  if (partPtr.IsNull())
+  {
+    return QIcon();
+  }
+
+  return partPtr->GetTitleImage();
 }
 
 QString DefaultSaveable::GetToolTipText() const
 {
-  return part.Lock()->GetTitleToolTip();
+  auto partPtr = part.Lock();
+  if (partPtr.IsNull())
+  {
+    return "";
+  }
+
+  return partPtr->GetTitleToolTip();
 }
 
 bool DefaultSaveable::IsDirty() const
@@ -63,7 +82,15 @@ bool DefaultSaveable::IsDirty() const
 
 uint DefaultSaveable::HashCode() const
 {
-  return part.Lock()->HashCode();
+  auto partPtr = part.Lock();
+  if (partPtr.IsNull())
+  {
+    BERRY_ERROR << "Error, Application might be in invalid state. HashCode was requested from a "
+      "berry::DefaultSaveable instance that does not contain a valid part." << std::endl;
+    return 0;
+  }
+
+  return partPtr->HashCode();
 }
 
 bool DefaultSaveable::operator<(const Object* obj) const

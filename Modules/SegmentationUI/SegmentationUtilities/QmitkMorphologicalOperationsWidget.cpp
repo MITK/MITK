@@ -89,7 +89,7 @@ void QmitkMorphologicalOperationsWidget::OnClosingButtonClicked()
 
 void QmitkMorphologicalOperationsWidget::OnOpeningButtonClicked()
 {
-  this->Processing(mitk::MorphologicalOperations::Opening, "Open");
+  this->Processing(mitk::MorphologicalOperations::Opening, "Opening");
 }
 
 void QmitkMorphologicalOperationsWidget::OnDilatationButtonClicked()

@@ -185,7 +185,7 @@
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>Keeps just the overlapping areas of the two segmentations</string>
+        <string>Keeps just the areas where all segmentations overlap.</string>
        </property>
        <property name="text">
         <string>Intersection</string>

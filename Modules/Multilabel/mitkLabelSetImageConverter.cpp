@@ -360,6 +360,52 @@ mitk::Image::Pointer mitk::CreateLabelMask(const MultiLabelSegmentation* segment
   return mask;
 }
 
+mitk::Image::Pointer mitk::CreateFilteredGroupImage(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::GroupIndexType groupID, const MultiLabelSegmentation::LabelValueVectorType& selectedLabels)
+{
+  if (nullptr == segmentation) mitkThrow() << "Error, cannot create label class map. Passed segmentation is nullptr.";
+  if (!segmentation->ExistGroup(groupID)) mitkThrow() << "Error, cannot create label  class map. GroupID is invalid. Invalid ID: " << groupID;
+
+  auto resultImage = mitk::Image::New();
+
+  // map->Initialize(segmentation) does not work here if this label set image has a single slice,
+  // since the map would be automatically flattened to a 2-d image, whereas we expect the
+  // original dimension of this label set image. Hence, initialize the map more explicitly:
+  resultImage->Initialize(MultiLabelSegmentation::GetPixelType(), segmentation->GetDimension(), segmentation->GetDimensions().data());
+  resultImage->SetTimeGeometry(segmentation->GetTimeGeometry()->Clone());
+
+  ClearImageBuffer(resultImage);
+
+  // get relevant labels (as intersect of groupLabels and selectedLabels
+  auto groupValues = segmentation->GetLabelValuesByGroup(groupID);
+  auto relevantDetectLambda = [&selectedLabels](MultiLabelSegmentation::LabelValueVectorType& result, MultiLabelSegmentation::LabelValueType element)
+    {
+      if (std::find(selectedLabels.begin(), selectedLabels.end(), element) != selectedLabels.end())
+      {
+        result.push_back(element);
+      }
+      return result;
+    };
+
+  auto relevantGroupValues = std::accumulate(groupValues.begin(),
+    groupValues.end(),
+    MultiLabelSegmentation::LabelValueVectorType(),
+    relevantDetectLambda);
+
+  ConstLabelVector destLabels;
+  LabelValueMappingVector transferMapping;
+
+  for (const auto& labelValue : relevantGroupValues)
+  {
+    transferMapping.emplace_back(std::make_pair(labelValue, labelValue));
+  }
+
+  TransferLabelContent(segmentation->GetGroupImage(groupID), resultImage.GetPointer(),
+    segmentation->GetConstLabelsByValue(relevantGroupValues), MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, transferMapping, MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
+
+  return resultImage;
+}
+
+
 std::pair<mitk::Image::Pointer, mitk::IDToLabelClassNameMapType> mitk::CreateLabelClassMap(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::GroupIndexType groupID, const MultiLabelSegmentation::LabelValueVectorType& selectedLabels)
 {
   if (nullptr == segmentation) mitkThrow() << "Error, cannot create label class map. Passed segmentation is nullptr.";

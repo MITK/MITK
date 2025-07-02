@@ -377,7 +377,7 @@ mitk::Image::Pointer mitk::CreateFilteredGroupImage(const MultiLabelSegmentation
 
   // get relevant labels (as intersect of groupLabels and selectedLabels
   auto groupValues = segmentation->GetLabelValuesByGroup(groupID);
-  auto relevantDetectLamba = [&selectedLabels](MultiLabelSegmentation::LabelValueVectorType& result, MultiLabelSegmentation::LabelValueType element)
+  auto relevantDetectLambda = [&selectedLabels](MultiLabelSegmentation::LabelValueVectorType& result, MultiLabelSegmentation::LabelValueType element)
     {
       if (std::find(selectedLabels.begin(), selectedLabels.end(), element) != selectedLabels.end())
       {
@@ -389,7 +389,7 @@ mitk::Image::Pointer mitk::CreateFilteredGroupImage(const MultiLabelSegmentation
   auto relevantGroupValues = std::accumulate(groupValues.begin(),
     groupValues.end(),
     MultiLabelSegmentation::LabelValueVectorType(),
-    relevantDetectLamba);
+    relevantDetectLambda);
 
   ConstLabelVector destLabels;
   LabelValueMappingVector transferMapping;

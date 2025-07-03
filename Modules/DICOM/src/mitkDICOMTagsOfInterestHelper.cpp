@@ -85,6 +85,22 @@ mitk::GetDefaultDICOMTagsOfInterest()
     /*dicom.study.PhysiciansOfRecord*/ result.insert(MakeEntry(DICOMTag(0x0008, 0x1048)));
     /*dicom.study.NameOfPhysicianReadingStudy*/ result.insert(MakeEntry(DICOMTag(0x0008, 0x1060)));
 
+    // Clinical Trial Subject
+    result.insert(MakeEntry(DICOMTag(0x0012, 0x0010))); // Clinical Trial Sponsor Name
+    result.insert(MakeEntry(DICOMTag(0x0012, 0x0020))); // Clinical Trial Protocol ID
+    result.insert(MakeEntry(DICOMTag(0x0012, 0x0021))); // Clinical Trial Protocol Name
+    result.insert(MakeEntry(DICOMTag(0x0012, 0x0030))); // Clinical Trial Site ID
+    result.insert(MakeEntry(DICOMTag(0x0012, 0x0031))); // Clinical Trial Site Name
+    result.insert(MakeEntry(DICOMTag(0x0012, 0x0040))); // Clinical Trial Subject ID
+    result.insert(MakeEntry(DICOMTag(0x0012, 0x0042))); // Clinical Trial Subject Reading ID
+
+    // Clinical Trial Study
+    result.insert(MakeEntry(DICOMTag(0x0012, 0x0050))); // Clinical Trial Time Point ID
+
+    // Clinical Trial Series
+    result.insert(MakeEntry(DICOMTag(0x0012, 0x0060))); // Clinical Trial Coordinating Center Name
+    result.insert(MakeEntry(DICOMTag(0x0012, 0x0071))); // Clinical Trial Series ID
+
     // General Series module
     /*dicom.series.Modality*/ result.insert(MakeEntry(DICOMTag(0x0008, 0x0060)));
     /*dicom.series.SeriesInstanceUID*/ result.insert(MakeEntry(DICOMTag(0x0020, 0x000e)));
@@ -114,6 +130,13 @@ mitk::GetDefaultDICOMTagsOfInterest()
     // Image Plane module
     /*dicom.PixelSpacing*/ result.insert(MakeEntry(DICOMTag(0x0028, 0x0030)));
     /*dicom.ImagerPixelSpacing*/ result.insert(MakeEntry(DICOMTag(0x0018, 0x1164)));
+
+    //additional for Segmentation
+
+    // Segmentation Image
+    result.insert(MakeEntry(DICOMTag(0x0070, 0x0080))); // Content Label
+    result.insert(MakeEntry(DICOMTag(0x0070, 0x0081))); // Content Description
+    result.insert(MakeEntry(DICOMTag(0x0070, 0x0084))); // Content Creator Name
 
     //additional for RT
     /*dicom.RescaleIntercept*/ result.insert(MakeEntry(DICOMTag(0x0028, 0x1052)));

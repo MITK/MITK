@@ -136,7 +136,39 @@ namespace
     return "";
   }
 
+  void EnsurePropertyPersistance(const mitk::PropertyList* properties)
+  {
+    mitk::LocaleSwitch localeSwitch("C");
+
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> propPersistenceService(mitk::CoreServices::GetPropertyPersistence());
+
+    for (auto [name, property] : *(properties->GetMap()))
+    {
+      std::string assumedKey = name;
+      std::replace(assumedKey.begin(), assumedKey.end(), '.', '_');
+
+      // Check if there is already a info for the key and our mime type.
+      mitk::IPropertyPersistence::InfoResultType infoList = propPersistenceService->GetInfo(name);
+
+      auto predicate = [](const mitk::PropertyPersistenceInfo::ConstPointer& x) {
+        return x.IsNotNull() && x->GetMimeTypeName() == mitk::PropertyPersistenceInfo::ANY_MIMETYPE_NAME();
+        };
+      auto finding = std::find_if(infoList.begin(), infoList.end(), predicate);
+
+      if (finding == infoList.end())
+      { // we have not found anything suitable so we generate our own info
+        auto newInfo = mitk::PropertyPersistenceInfo::New();
+        newInfo->SetNameAndKey(name, assumedKey);
+        newInfo->SetMimeTypeName(mitk::PropertyPersistenceInfo::ANY_MIMETYPE_NAME());
+
+        propPersistenceService->AddInfo(newInfo);
+      }
+    }
+  }
+
 }
+
+
   mitk::MultiLabelSegmentationStackReader::MultiLabelSegmentationStackReader()
     : AbstractFileReader(MitkMultilabelIOMimeTypes::MULTILABELMETA_MIMETYPE(), "MITK Multilabel Segmentation Stack")
   {
@@ -288,6 +320,8 @@ namespace
     {
       auto loadedProperties = mitk::PropertyList::New();
       loadedProperties->FromJSON(fileContent["properties"]);
+
+      EnsurePropertyPersistance(loadedProperties);
 
       segmentation->GetPropertyList()->ConcatenatePropertyList(loadedProperties, true);
     }

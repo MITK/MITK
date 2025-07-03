@@ -234,6 +234,7 @@ namespace mitk
 
   void MultiLabelSegmentationIO::InitializeDefaultMetaDataKeys()
   {
+    this->m_DefaultMetaDataKeys.push_back("org.mitk.uid");
     this->m_DefaultMetaDataKeys.push_back("NRRD.space");
     this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");
     this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TYPE);

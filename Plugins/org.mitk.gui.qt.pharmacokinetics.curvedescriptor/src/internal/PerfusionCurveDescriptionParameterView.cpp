@@ -31,7 +31,6 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
-#include <mitkNodePredicateDimension.h>
 #include "mitkNodePredicateFunction.h"
 #include <mitkMultiLabelPredicateHelper.h>
 

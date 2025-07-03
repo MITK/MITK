@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include "ui_QmitkMatchPointFrameCorrectionControls.h"
 
 #include <mitkImage.h>
+#include <mitkLabelSetImage.h>
 
 // MatchPoint
 #include <mapDeploymentDLLInfo.h>
@@ -179,7 +180,6 @@ private:
   mitk::BaseData::ConstPointer m_spSelectedTargetData;
 
   mitk::DataNode::Pointer m_spSelectedTargetMaskNode;
-  mitk::Image::ConstPointer m_spSelectedTargetMaskData;
 
   // boolean variables to control visibility of GUI elements
   bool m_CanLoadAlgorithm;

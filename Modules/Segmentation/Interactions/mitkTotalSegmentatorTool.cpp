@@ -157,9 +157,9 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     this->run_totalsegmentator(
       spExec, inputImagePath, outputImagePath, this->GetFast(), !isSubTask, this->GetGpuId(), this->GetSubTask());
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
+    outputImage->SetGeometry(inputAtTimeStep->GetGeometry());
     outputBuffer = mitk::MultiLabelSegmentation::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
-    outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
     targetLabelMap = (this->GetSubTask() == DEFAULT_TOTAL_TASK) ? m_LabelMapTotal : m_LabelMapTotalMR;
   } 
   m_ProgressCommand->SetProgress(180);

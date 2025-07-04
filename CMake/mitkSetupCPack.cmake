@@ -66,7 +66,7 @@ else()
 endif()
 
 # determine possible system specific extension
-set(CPACK_PACKAGE_ARCH "unkown-architecture")
+set(CPACK_PACKAGE_ARCH "unknown-architecture")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES Windows)
   if(CMAKE_CL_64)

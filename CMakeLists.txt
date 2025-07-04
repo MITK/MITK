@@ -103,8 +103,8 @@ SUPPRESS_VC_DEPRECATED_WARNINGS()
 #-----------------------------------------------------------------------------
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Debug' as none was specified.")
-  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+  message(STATUS "Setting build type to 'Release' as none was specified.")
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 
   # Set the possible values of build type for cmake-gui
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
@@ -412,6 +412,22 @@ if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
 endif()
 
 if(MITK_USE_Python3)
+  # Debug builds with Python are troublesome: only offer release build types.
+  if(CMAKE_CONFIGURATION_TYPES)
+    set(config_types ${CMAKE_CONFIGURATION_TYPES})
+    list(FIND config_types "Debug" debug_index)
+    if(NOT debug_index EQUAL -1)
+      list(REMOVE_AT config_types debug_index)
+      set(CMAKE_CONFIGURATION_TYPES "${config_types}" CACHE STRING "" FORCE)
+      message(NOTICE "Removed \"Debug\" from CMAKE_CONFIGURATION_TYPES. Debug builds with Python are not supported.")
+    endif()
+  else()
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Release" "MinSizeRel" "RelWithDebInfo")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+      message(WARNING "Debug builds with Python are not supported.")
+    endif()
+  endif()
+
   set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
   set(MITK_USE_SWIG ON CACHE BOOL "" FORCE)
 

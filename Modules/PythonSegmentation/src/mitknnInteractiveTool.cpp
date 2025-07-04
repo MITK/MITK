@@ -26,6 +26,24 @@ found in the LICENSE file.
 
 using namespace mitk::nnInteractive;
 
+namespace
+{
+  // Allocate and initialize a 3D image volume with zeros, then transfer
+  // ownership of the memory to the given image.
+  void InitializeVolume(mitk::Image* image)
+  {
+    size_t numPixels = 1;
+
+    for (int i = 0; i < 3; ++i)
+      numPixels *= image->GetDimension(i);
+
+    auto data = new mitk::Label::PixelType[numPixels];
+    std::memset(data, 0, numPixels * sizeof(mitk::Label::PixelType));
+
+    image->SetImportVolume(data, 0, 0, mitk::Image::ManageMemory);
+  }
+}
+
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKPYTHONSEGMENTATION_EXPORT, nnInteractiveTool, "nnInteractive")
@@ -472,6 +490,7 @@ void mitk::nnInteractiveTool::StartSession()
 
   const auto maskPixelType = MultiLabelSegmentation::GetPixelType();
   m_Impl->TargetBuffer->Initialize(maskPixelType, *(imageAtTimeStep->GetTimeGeometry()));
+  InitializeVolume(m_Impl->TargetBuffer);
 
   pythonContext->TransferBaseDataToPython(imageAtTimeStep, "mitk_image");
   pythonContext->TransferBaseDataToPython(m_Impl->TargetBuffer.GetPointer(), "mitk_target_buffer");

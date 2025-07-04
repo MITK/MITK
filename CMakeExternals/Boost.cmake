@@ -291,6 +291,7 @@ g"
       COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/Boost-pre_download.cmake
       DEPENDEES mkdir
       DEPENDERS download
+      INDEPENDENT TRUE
       WORKING_DIRECTORY ${stamp_dir}
     )
 

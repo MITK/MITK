@@ -2,15 +2,8 @@
     in CMake/PackageDepends/MITK_Boost_Config.cmake can be removed. See the first
     long comment in CMakeExternals/Boost.cmake for details. ]]
 
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.18)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.22)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
-
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.19 AND CMAKE_VERSION VERSION_LESS 3.19.2)
-  message(FATAL_ERROR "\
-CMake v${CMAKE_VERSION} is defective [1]. \
-Please either downgrade to v3.18 or upgrade to at least v3.19.2.\n\
-[1] https://gitlab.kitware.com/cmake/cmake/-/issues/21529")
-endif()
 
 #-----------------------------------------------------------------------------
 # Policies
@@ -110,8 +103,8 @@ SUPPRESS_VC_DEPRECATED_WARNINGS()
 #-----------------------------------------------------------------------------
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Debug' as none was specified.")
-  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+  message(STATUS "Setting build type to 'Release' as none was specified.")
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 
   # Set the possible values of build type for cmake-gui
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
@@ -185,6 +178,23 @@ if(MSVC_VERSION VERSION_GREATER_EQUAL 1928)
 
   if(NOT CMAKE_VS_GLOBALS MATCHES "(^|;)EnforceProcessCountAcrossBuilds=")
     list(APPEND CMAKE_VS_GLOBALS EnforceProcessCountAcrossBuilds=true)
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
+# Explicitly set CMAKE_OSX_ARCHITECTURES if not set
+#-----------------------------------------------------------------------------
+
+if(APPLE AND NOT CMAKE_OSX_ARCHITECTURES)
+  include(CheckCXXSymbolExists)
+
+  check_cxx_symbol_exists(__aarch64__ "" IS_ARM64)
+  check_cxx_symbol_exists(__x86_64__ "" IS_X86_64)
+
+  if(IS_ARM64)
+    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architecture for macOS" FORCE)
+  elseif(IS_X86_64)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "Build architecture for macOS" FORCE)
   endif()
 endif()
 
@@ -419,6 +429,22 @@ if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
 endif()
 
 if(MITK_USE_Python3)
+  # Debug builds with Python are troublesome: only offer release build types.
+  if(CMAKE_CONFIGURATION_TYPES)
+    set(config_types ${CMAKE_CONFIGURATION_TYPES})
+    list(FIND config_types "Debug" debug_index)
+    if(NOT debug_index EQUAL -1)
+      list(REMOVE_AT config_types ${debug_index})
+      set(CMAKE_CONFIGURATION_TYPES "${config_types}" CACHE STRING "" FORCE)
+      message(NOTICE "Removed \"Debug\" from CMAKE_CONFIGURATION_TYPES. Debug builds with Python are not supported.")
+    endif()
+  else()
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Release" "MinSizeRel" "RelWithDebInfo")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+      message(WARNING "Debug builds with Python are not supported.")
+    endif()
+  endif()
+
   set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
   set(MITK_USE_SWIG ON CACHE BOOL "" FORCE)
 

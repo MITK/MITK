@@ -156,7 +156,8 @@ namespace mitk
                      mitk::Point2D &anchorPoint,
                      const mitk::PlaneGeometry *planarFigurePlaneGeometry,
                      const mitk::PlaneGeometry *rendererPlaneGeometry,
-                     const mitk::BaseRenderer *renderer);
+                     const mitk::BaseRenderer *renderer,
+                     vtkContext2D* context2D);
 
     /**
     * \brief Renders the quantities of the figure below the text annotations.
@@ -166,7 +167,8 @@ namespace mitk
                           const mitk::Point2D anchorPoint,
                           double &annotationOffset,
                           float globalOpacity,
-                          const PlanarFigureDisplayMode lineDisplayMode);
+                          const PlanarFigureDisplayMode lineDisplayMode,
+                          vtkContext2D* context2D);
 
     /**
     * \brief Renders the text annotations.
@@ -176,7 +178,8 @@ namespace mitk
                            const mitk::Point2D anchorPoint,
                            float globalOpacity,
                            const PlanarFigureDisplayMode lineDisplayMode,
-                           double &annotationOffset);
+                           double &annotationOffset,
+                           vtkContext2D* context2D);
 
     /**
     * \brief Renders the control-points.
@@ -185,7 +188,8 @@ namespace mitk
                              const PlanarFigureDisplayMode lineDisplayMode,
                              const mitk::PlaneGeometry *planarFigurePlaneGeometry,
                              const mitk::PlaneGeometry *rendererPlaneGeometry,
-                             mitk::BaseRenderer *renderer);
+                             mitk::BaseRenderer *renderer,
+                             vtkContext2D* context2D);
 
     void TransformObjectToDisplay(const mitk::Point2D &point2D,
                                   mitk::Point2D &displayPoint,
@@ -202,7 +206,8 @@ namespace mitk
                     PlanarFigureControlPointStyleProperty::Shape shape,
                     const mitk::PlaneGeometry *objectGeometry,
                     const mitk::PlaneGeometry *rendererGeometry,
-                    const mitk::BaseRenderer *renderer);
+                    const mitk::BaseRenderer *renderer,
+                    vtkContext2D* context2D);
 
     /**
     * \brief Actually paints the polyline defined by the figure.
@@ -212,7 +217,8 @@ namespace mitk
                        Point2D &anchorPoint,
                        const PlaneGeometry *planarFigurePlaneGeometry,
                        const PlaneGeometry *rendererPlaneGeometry,
-                       const mitk::BaseRenderer *renderer);
+                       const mitk::BaseRenderer *renderer,
+                       vtkContext2D* context2D);
 
     /**
     * \brief Internally used by RenderLines() to draw the mainlines using
@@ -222,7 +228,8 @@ namespace mitk
                        Point2D &anchorPoint,
                        const PlaneGeometry *planarFigurePlaneGeometry,
                        const PlaneGeometry *rendererPlaneGeometry,
-                       const mitk::BaseRenderer *renderer);
+                       const mitk::BaseRenderer *renderer,
+                       vtkContext2D* context2D);
 
     /**
     * \brief Internally used by RenderLines() to draw the helperlines using
@@ -232,7 +239,8 @@ namespace mitk
                          Point2D &anchorPoint,
                          const PlaneGeometry *planarFigurePlaneGeometry,
                          const PlaneGeometry *rendererPlaneGeometry,
-                         const mitk::BaseRenderer *renderer);
+                         const mitk::BaseRenderer *renderer,
+                         vtkContext2D* context2D);
 
     void InitializeDefaultPlanarFigureProperties();
 
@@ -309,7 +317,6 @@ namespace mitk
 
     bool m_Initialized;
 
-    vtkNew<vtkContext2D> m_Context;
     vtkSmartPointer<vtkPen> m_Pen;
   };
 

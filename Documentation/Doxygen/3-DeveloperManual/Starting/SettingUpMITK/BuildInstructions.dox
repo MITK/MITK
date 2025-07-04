@@ -44,11 +44,10 @@ To build MITK on Linux, install the following packages, e. g. with APT:
 sudo apt install build-essential doxygen git graphviz libegl-dev libfreetype6-dev libglu1-mesa-dev libopengl-dev libpcre2-dev libssl-dev libtiff5-dev libxcomposite1 libxcursor-dev libxcb-cursor-dev libxdamage-dev libxi-dev libxkbcommon-dev libxt-dev mesa-common-dev
 \endcode
 
-For the Python integration, install NumPy and SimpleITK, e. g.:
+For the Python integration, install NumPy and the dev package of PCRE2, e. g.:
 
 \code{.unparsed}
-sudo apt install python3-numpy python3-pip
-pip3 install SimpleITK
+sudo apt install python3-numpy libpcre2-dev
 \endcode
 
 On macOS, also install SWIG, e. g. with HomeBrew:

@@ -182,6 +182,23 @@ if(MSVC_VERSION VERSION_GREATER_EQUAL 1928)
 endif()
 
 #-----------------------------------------------------------------------------
+# Explicitly set CMAKE_OSX_ARCHITECTURES if not set
+#-----------------------------------------------------------------------------
+
+if(APPLE AND NOT CMAKE_OSX_ARCHITECTURES)
+  include(CheckCXXSymbolExists)
+
+  check_cxx_symbol_exists(__aarch64__ "" IS_ARM64)
+  check_cxx_symbol_exists(__x86_64__ "" IS_X86_64)
+
+  if(IS_ARM64)
+    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architecture for macOS" FORCE)
+  elseif(IS_X86_64)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "Build architecture for macOS" FORCE)
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Additional MITK Options (also shown during superbuild)
 #-----------------------------------------------------------------------------
 

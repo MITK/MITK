@@ -23,8 +23,9 @@ namespace
 {
   mitk::IPreferences* GetPreferences()
   {
-    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
-    return preferencesService->GetSystemPreferences()->Node("/General/UndoRedo");
+    auto preferencesService = mitk::CoreServices::GetPreferencesService();
+    auto systemPref = preferencesService->GetSystemPreferences();
+    return nullptr != systemPref ? systemPref->Node("/General/UndoRedo") : nullptr;
   }
 
   void SetUndoLimitPreference(unsigned int limit)

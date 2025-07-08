@@ -17,11 +17,51 @@ found in the LICENSE file.
 
 #include <itksys/SystemTools.hxx>
 
-#include "mitkPreferenceListReaderOptionsFunctor.h"
-#include "mitkIOMetaInformationPropertyConstants.h"
-#include "mitkIOVolumeSplitReason.h"
-
+#include <mitkPreferenceListReaderOptionsFunctor.h>
+#include <mitkIOMetaInformationPropertyConstants.h>
+#include <mitkIOVolumeSplitReason.h>
+#include <mitkIFileIO.h>
 #include "mitkPropertyKeyPath.h"
+
+#include <nlohmann/json.hpp>
+
+mitk::IFileIO::Options ConvertJsonToOptions(const nlohmann::json& j)
+{
+  mitk::IFileIO::Options options;
+
+  for (auto it = j.begin(); it != j.end(); ++it)
+  {
+    const std::string& key = it.key();
+    const auto& val = it.value();
+
+    if (val.is_boolean())
+    {
+      options[key] = val.get<bool>();
+    }
+    else if (val.is_number_integer())
+    {
+      options[key] = val.get<int>();
+    }
+    else if (val.is_number_unsigned())
+    {
+      options[key] = val.get<unsigned int>();
+    }
+    else if (val.is_number_float())
+    {
+      options[key] = val.get<double>();
+    }
+    else if (val.is_string())
+    {
+      options[key] = val.get<std::string>();
+    }
+    else
+    {
+      mitkThrow() << "Cannot parse options. Unsupported JSON value type for key: " << key;
+    }
+  }
+
+  return options;
+}
 
 int main(int argc, char* argv[])
 {
@@ -34,11 +74,18 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
-  parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
+  parser.beginGroup("Required I/O parameters");
   parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file:", "Input path that should be loaded.",us::Any(),false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output path where the result should be stored. If the input generates multiple outputs the index will be added for all but the first output (before the extension; starting with 0).", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.endGroup();
+
+  parser.beginGroup("Optional parameters");
   parser.addArgument("reader", "r", mitkCommandLineParser::String, "Reader Name", "Enforce a certain reader to be used for loading the input.", us::Any());
   parser.addArgument("list-readers", "lr", mitkCommandLineParser::Bool, "List reader names", "Print names of all available readers.", us::Any());
+  parser.addArgument("input-options", "", mitkCommandLineParser::String, "Input reader options", "Json dictionary string containing the options as key and value pairs that should be passed to the reader for loading the input.", us::Any());
+  parser.addArgument("output-options", "", mitkCommandLineParser::String, "Input reader options", "Json dictionary string containing the options as key and value pairs that should be passed to the writer for saving the output.", us::Any());
+  parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
+  parser.endGroup();
 
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -90,8 +137,44 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
+  mitk::IFileIO::Options inputOptions;
+  if (parsedArgs.count("input-options"))
+  {
+    try
+    {
+      auto optionJson = nlohmann::json::parse(parsedArgs["input-options"].ToString());
+      inputOptions = ConvertJsonToOptions(optionJson);
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << "\nError(s) occurred while parsing input options.\n";
+      std::cerr << "Error messages:\n";
+      std::cerr << e.what() << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
   mitk::PreferenceListReaderOptionsFunctor::ListType emptyList = {};
-  mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(preference, emptyList);
+  mitk::PreferenceListReaderOptionsFunctor functor = inputOptions.empty() ?
+        mitk::PreferenceListReaderOptionsFunctor(preference, emptyList):
+        mitk::PreferenceListReaderOptionsFunctor(preference, emptyList, inputOptions);
+
+  mitk::IFileIO::Options ouptputOptions;
+  if (parsedArgs.count("output-options"))
+  {
+    try
+    {
+      auto optionJson = nlohmann::json::parse(parsedArgs["output-options"].ToString());
+      ouptputOptions = ConvertJsonToOptions(optionJson);
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << "\nError(s) occurred while parsing output options\n";
+      std::cerr << "Error messages:\n";
+      std::cerr << e.what() << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
 
   std::string extension = itksys::SystemTools::GetFilenameExtension(outputFilename);
   std::string filename = itksys::SystemTools::GetFilenameWithoutExtension(outputFilename);
@@ -108,7 +191,7 @@ int main(int argc, char* argv[])
 
   try
   {
-    dataObjs = mitk::IOUtil::Load(inputFilename, &functor);
+      dataObjs = mitk::IOUtil::Load(inputFilename, &functor);
   }
   catch (const std::exception& e)
   {
@@ -134,7 +217,14 @@ int main(int argc, char* argv[])
     std::cout << "Write data object #"<<count<<" to: "<<writeName << std::endl;
     try
     {
-      mitk::IOUtil::Save(dataObj, writeName);
+      if (ouptputOptions.empty())
+      {
+        mitk::IOUtil::Save(dataObj, writeName);
+      }
+      else
+      {
+        mitk::IOUtil::Save(dataObj, writeName,ouptputOptions);
+      }
     }
     catch (const std::exception& e)
     {

@@ -37,7 +37,7 @@ namespace
 
     return prefs != nullptr
       ? prefs->GetInt("UndoLimit", DEFAULT_UNDO_REDO_LIMIT)
-      : true;
+      : DEFAULT_UNDO_REDO_LIMIT; //no pref is available use the default limit
   }
 }
 

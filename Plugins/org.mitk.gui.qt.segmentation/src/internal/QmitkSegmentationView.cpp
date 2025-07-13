@@ -649,6 +649,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->referenceNodeSelector->SetAutoSelectNewNodes(true);
    m_Controls->workingNodeSelector->SetAutoSelectNewNodes(true);
 
+   m_Controls->splitter->setObjectName("QmitkSegmentationViewSplitter");
+   m_Controls->splitter->setHandleWidth(2);
    this->UpdateGUI();
 }
 

@@ -120,165 +120,168 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QmitkMultiLabelManager" name="multiLabelWidget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>1</verstretch>
-      </sizepolicy>
-     </property>
+  <item>
+    <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+        <enum>Qt::Vertical</enum>
+      </property>
+		<widget class="QmitkMultiLabelManager" name="multiLabelWidget" native="true">
+		 <property name="sizePolicy">
+		  <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+		   <horstretch>0</horstretch>
+		   <verstretch>1</verstretch>
+		  </sizepolicy>
+		 </property>
+		</widget>
+		<widget class="QTabWidget" name="tabWidgetSegmentationTools">
+		 <property name="sizePolicy">
+		  <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+		   <horstretch>0</horstretch>
+		   <verstretch>4</verstretch>
+		  </sizepolicy>
+		 </property>
+		 <property name="styleSheet">
+		  <string notr="true">QTabWidget::tab-bar { alignment: middle; }</string>
+		 </property>
+		 <property name="currentIndex">
+		  <number>0</number>
+		 </property>
+		 <widget class="QWidget" name="tab2DTools">
+		  <attribute name="title">
+		   <string>2D tools</string>
+		  </attribute>
+		  <layout class="QVBoxLayout" name="verticalLayout2D">
+		   <item>
+			<widget class="QmitkToolGUIArea" name="toolGUIArea2D" native="true">
+			 <property name="sizePolicy">
+			  <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+			   <horstretch>0</horstretch>
+			   <verstretch>0</verstretch>
+			  </sizepolicy>
+			 </property>
+			 <property name="font">
+			  <font>
+			   <weight>50</weight>
+			   <bold>false</bold>
+			  </font>
+			 </property>
+			</widget>
+		   </item>
+		   <item>
+			<widget class="QmitkToolSelectionBox" name="toolSelectionBox2D" native="true">
+			 <property name="sizePolicy">
+			  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+			   <horstretch>0</horstretch>
+			   <verstretch>0</verstretch>
+			  </sizepolicy>
+			 </property>
+			 <property name="font">
+			  <font>
+			   <weight>50</weight>
+			   <bold>false</bold>
+			  </font>
+			 </property>
+			</widget>
+		   </item>
+		   <item>
+			<widget class="QLabel" name="interpolatorWarningLabel">
+			 <property name="sizePolicy">
+			  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+			   <horstretch>0</horstretch>
+			   <verstretch>0</verstretch>
+			  </sizepolicy>
+			 </property>
+			 <property name="text">
+			  <string/>
+			 </property>
+			</widget>
+		   </item>
+		   <item>
+			<widget class="QmitkSlicesInterpolator" name="slicesInterpolator" native="true">
+			 <property name="sizePolicy">
+			  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+			   <horstretch>0</horstretch>
+			   <verstretch>0</verstretch>
+			  </sizepolicy>
+			 </property>
+			 <property name="font">
+			  <font>
+			   <weight>50</weight>
+			   <bold>false</bold>
+			  </font>
+			 </property>
+			</widget>
+		   </item>
+		   <item>
+			<spacer name="verticalSpacer2D">
+			 <property name="orientation">
+			  <enum>Qt::Vertical</enum>
+			 </property>
+			 <property name="sizeHint" stdset="0">
+			  <size>
+			   <width>0</width>
+			   <height>0</height>
+			  </size>
+			 </property>
+			</spacer>
+		   </item>
+		  </layout>
+		 </widget>
+		 <widget class="QWidget" name="tab3DTools">
+		  <attribute name="title">
+		   <string>3D tools</string>
+		  </attribute>
+		  <layout class="QVBoxLayout" name="verticalLayout3D">
+		   <item>
+			<widget class="QmitkToolGUIArea" name="toolGUIArea3D" native="true">
+			 <property name="sizePolicy">
+			  <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+			   <horstretch>0</horstretch>
+			   <verstretch>0</verstretch>
+			  </sizepolicy>
+			 </property>
+			 <property name="font">
+			  <font>
+			   <weight>50</weight>
+			   <bold>false</bold>
+			  </font>
+			 </property>
+			</widget>
+		   </item>
+		   <item>
+			<widget class="QmitkToolSelectionBox" name="toolSelectionBox3D" native="true">
+			 <property name="sizePolicy">
+			  <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+			   <horstretch>0</horstretch>
+			   <verstretch>0</verstretch>
+			  </sizepolicy>
+			 </property>
+			 <property name="font">
+			  <font>
+			   <weight>50</weight>
+			   <bold>false</bold>
+			  </font>
+			 </property>
+			</widget>
+		   </item>
+		   <item>
+			<spacer name="verticalSpacer3D">
+			 <property name="orientation">
+			  <enum>Qt::Vertical</enum>
+			 </property>
+			 <property name="sizeHint" stdset="0">
+			  <size>
+			   <width>0</width>
+			   <height>0</height>
+			  </size>
+			 </property>
+			</spacer>
+		   </item>
+		  </layout>
+		 </widget>
+		</widget>
     </widget>
-   </item>
-   <item>
-    <widget class="QTabWidget" name="tabWidgetSegmentationTools">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>4</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QTabWidget::tab-bar { alignment: middle; }</string>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="tab2DTools">
-      <attribute name="title">
-       <string>2D tools</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout2D">
-       <item>
-        <widget class="QmitkToolGUIArea" name="toolGUIArea2D" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QmitkToolSelectionBox" name="toolSelectionBox2D" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="interpolatorWarningLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QmitkSlicesInterpolator" name="slicesInterpolator" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer2D">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab3DTools">
-      <attribute name="title">
-       <string>3D tools</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout3D">
-       <item>
-        <widget class="QmitkToolGUIArea" name="toolGUIArea3D" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QmitkToolSelectionBox" name="toolSelectionBox3D" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer3D">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
+  </item>
   </layout>
  </widget>
  <customwidgets>

@@ -288,7 +288,7 @@ bool mitk::nnInteractive::LassoInteractor::HasInteractions() const
 
 const mitk::Image* mitk::nnInteractive::LassoInteractor::GetLastLassoMask() const
 {
-  return m_Impl->MaskNode->GetDataAs<Image>();
+  return m_Impl->MaskNode->GetDataAs<MultiLabelSegmentation>()->GetGroupImage(0);
 }
 
 void mitk::nnInteractive::LassoInteractor::OnSetToolManager()

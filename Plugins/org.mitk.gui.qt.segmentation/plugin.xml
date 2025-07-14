@@ -53,7 +53,6 @@
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Autocrop" icon="" class="QmitkAutocropAction" />
-    <contextMenuAction nodeDescriptorName="ImageMask" label="Convert to Segmentation" icon="" class="QmitkConvertToMultiLabelSegmentationAction" />
     <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Autocrop" icon="" class="QmitkAutocropLabelSetImageAction" />
@@ -78,6 +77,7 @@
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Labeling" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Tools" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="nnUNet" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="nnInteractive" />
 
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Segmentation" />
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Difference" />

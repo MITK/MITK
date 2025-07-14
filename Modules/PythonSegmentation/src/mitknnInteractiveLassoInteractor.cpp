@@ -189,7 +189,10 @@ namespace mitk::nnInteractive
       const auto promptType = m_Owner->GetCurrentPromptType();
       const auto& labelName = GetPromptTypeAsString(promptType);
       const auto& color = GetColor(promptType, ColorIntensity::Vibrant);
-      this->MaskNode->GetDataAs<MultiLabelSegmentation>()->AddLabel(labelName, color, 0);
+
+      auto mask = this->MaskNode->GetDataAs<MultiLabelSegmentation>();
+      auto label = mask->AddLabel(labelName, color, 0);
+      mask->SetActiveLabel(label->GetValue());
 
       m_Owner->GetDataStorage()->Add(this->MaskNode, referenceNode);
     }

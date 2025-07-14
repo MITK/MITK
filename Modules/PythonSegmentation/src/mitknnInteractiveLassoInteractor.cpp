@@ -142,7 +142,7 @@ namespace
       this->InvokeEvent(LassoEvent(contour));
 
       // Clear the working mask to prepare for the next interaction.
-      this->GetWorkingDataNode()->GetDataAs<mitk::MultiLabelSegmentation>()->ClearGroupImages();
+      this->GetWorkingData()->ClearGroupImage(0);
     }
 
     void OnInvertLogic(mitk::StateMachineAction*, mitk::InteractionEvent*) override

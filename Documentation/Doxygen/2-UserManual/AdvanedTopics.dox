@@ -1,0 +1,9 @@
+/**
+\page AdvancedTopicsPage  Advanced MITK user topics
+
+Collection of more advanced topics and indepth information for (power) users.
+
+<ul>
+  <li> \subpage MITKFileConverterSegStacksPage </li>
+</ul>
+*/

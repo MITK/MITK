@@ -12,6 +12,7 @@ Alternatively, you can <a href="https://www.mitk.org/wiki/Contact">contact us di
 <ul>
   <li> \subpage MITKWorkbenchManualPage </li>
   <li> \subpage PluginListPage </li>
+  <li> \subpage MITKCmdAppsPage </li>
   <li> \subpage AdvancedTopicsPage </li>
 </ul>
 */

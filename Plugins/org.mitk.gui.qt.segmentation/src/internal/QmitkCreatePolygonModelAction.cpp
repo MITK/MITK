@@ -43,8 +43,9 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
 {
   DataNode::Pointer selectedNode = selectedNodes[0];
   mitk::MultiLabelSegmentation::Pointer segmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(selectedNode->GetData());
+  mitk::Image::Pointer imageMask = dynamic_cast<mitk::Image*>(selectedNode->GetData());
 
-  if (segmentation.IsNull())
+  if (segmentation.IsNull() && imageMask.IsNull())
   {
     return;
   }
@@ -62,7 +63,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
     if (smoothingHint)
     {
       smoothing = 0.0;
-      Vector3D spacing = segmentation->GetGeometry()->GetSpacing();
+      Vector3D spacing = selectedNode->GetData()->GetGeometry()->GetSpacing();
 
       for (Vector3D::Iterator iter = spacing.Begin(); iter != spacing.End(); ++iter)
         smoothing = max(smoothing, *iter);
@@ -81,7 +82,14 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
 
     // set filter parameter
     surfaceFilter->SetDataStorage(*m_DataStorage);
-    surfaceFilter->SetPointerParameter("Input", segmentation);
+    if (segmentation.IsNotNull())
+    {
+      surfaceFilter->SetPointerParameter("Input", segmentation);
+    }
+    else
+    {
+      surfaceFilter->SetPointerParameter("Input", imageMask);
+    }
     surfaceFilter->SetPointerParameter("Group node", selectedNode);
     surfaceFilter->SetParameter("Show result", true);
     surfaceFilter->SetParameter("Sync visibility", false);

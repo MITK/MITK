@@ -11,14 +11,15 @@ Find the usage instructions of CmdApps deployed with the MITK Workbench release 
 
 <h2>List of CmdApps</h2>
 <ul>
-  <li> \subpage MitkConvertToMultiLabelSegmentationPage </li> - Conversion of input data into a MITK Multi Label Segmentation
-  <li> \subpage MitkDICOMVolumeDiagnosticsPage </li> - Diagnostics for DICOM volume reading
-  <li> \subpage MITKFileConverterPage </li> - File format conversion of mitk supported file
-  <li> \subpage MitkFuse3Dto4DImagePage </li> - Fusing 3D images to a 4D dynamic image
-  <li> \subpage MitkGenericFittingPage </li> - Generic fitting on 4D image data
-  <li> \subpage MitkMapImagePage </li> - Mapping of a image/segmentation based on a registration
-  <li> \subpage MitkMatchImagePage </li> - Deducing the registration of a moving and a target image
-  <li> \subpage MitkSplit4Dto3DImagePage </li> - Splitting a 4D dynamic image into 3D frame image
-  <li> \subpage MitkStitch3DImagesPage </li> - Stitching of multiple 3D image into a larger 3D image
+  <li> \subpage MitkConvertToMultiLabelSegmentationPage - Conversion of input data into a MITK Multi Label Segmentation </li>
+  <li> \subpage MitkDICOMVolumeDiagnosticsPage - Diagnostics for DICOM volume reading </li>
+  <li> \subpage MITKFileConverterPage - File format conversion of mitk supported file </li>
+  <li> \subpage MitkImageTypeConverterPage - Conversion of scalar pixel types </li>
+  <li> \subpage MitkFuse3Dto4DImagePage - Fusing 3D images to a 4D dynamic image </li>
+  <li> \subpage MitkGenericFittingPage - Generic fitting on 4D image data </li>
+  <li> \subpage MitkMapImagePage - Mapping of a image/segmentation based on a registration </li>
+  <li> \subpage MitkMatchImagePage - Deducing the registration of a moving and a target image </li>
+  <li> \subpage MitkSplit4Dto3DImagePage - Splitting a 4D dynamic image into 3D frame image </li>
+  <li> \subpage MitkStitch3DImagesPage - Stitching of multiple 3D image into a larger 3D image </li>
 </ul>
 */

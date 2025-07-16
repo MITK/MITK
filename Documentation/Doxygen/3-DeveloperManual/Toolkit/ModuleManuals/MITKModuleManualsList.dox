@@ -1,28 +1,28 @@
 /**
 \page MITKModuleManualsListPage MITK Module Manuals
 
-Overview
+\section MITKModuleManualsListPage_Overview Overview
 
 The modules are shared libraries that provide functionality that can be used by developers.
 
-\subpage MITKModuleManualsList List of Module Manuals
+\section MITKModuleManualsListPage_ListOfModuleManuals List of Module Manuals
 
 <ul>
-  <li> \ref AnnotationModulePage
-  <li> \ref ChartModule
-  <li> \ref LegacyGLModule
-  <li> \ref mitkPython_Overview
+  <li> \subpage AnnotationModulePage
+  <li> \subpage ChartModule
+  <li> \subpage LegacyGLModule
 </ul>
 
-\subpage MITKModuleManualsListPageAdditionalInformation Additional Information on Certain Modules
+\section MITKModuleManualsListPage_AdditionalInformationOnCertainModules Additional Information on Certain Modules
 <ul>
-  <li> \ref PlanarPropertiesPage
+  <li> \subpage PlanarPropertiesPage
+  <li> \subpage mitkBasicImageProcessingMiniAppsPortalPage
 </ul>
 
-\subpage MITKMigrationGuides Migration Guides
+\section MITKModuleManualsListPage_MigrationGuides Migration Guides
 <ul>
-  <li> \ref GeometryMigration
-  <li> \ref InteractionMigration
-  <li> \ref OverlayMigration
+  <li> \subpage GeometryMigration
+  <li> \subpage InteractionMigration
+  <li> \subpage OverlayMigration
 </ul>
 */

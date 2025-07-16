@@ -5,7 +5,6 @@
 \tableofcontents
 
 This page will give you an overview of creating your own command line tool that can be integrated into a MiniApp.
-If you don't know about MiniApps, you can read about their purpose and use at \ref MiniAppExplainPage page.
 
 \section MiniAppCommandLineToolHowToPageDescription What's a MiniApp command line tool?
 

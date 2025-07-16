@@ -18,7 +18,7 @@ found in the LICENSE file.
 // itk
 #include <itkEventObject.h>
 
-void mitk::DisplayActionEventHandlerSynchronized::InitActionsImpl(std::string prefixFilter /* = "" */)
+void mitk::DisplayActionEventHandlerSynchronized::InitActionsImpl(const std::string& prefixFilter /* = "" */)
 {
   StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventFunctions::MoveCameraSynchronizedAction(prefixFilter);
   ConnectDisplayActionEvent(DisplayMoveEvent(nullptr, Vector2D()), actionFunction);

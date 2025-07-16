@@ -106,3 +106,7 @@ void mitk::DisplayActionEventHandler::InitActions(std::string prefixFilter /* = 
 
   InitActionsImpl(prefixFilter);
 }
+
+void mitk::DisplayActionEventHandler::InitActionsImpl(const std::string&)
+{
+}

@@ -1,8 +1,0 @@
-/**
-\page MITKMigrationGuides Migration Guides
-
-\li \subpage GeometryMigration
-\li \subpage InteractionMigration
-\li \subpage  OverlayMigration
-
-*/

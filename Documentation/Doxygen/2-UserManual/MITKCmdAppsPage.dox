@@ -1,25 +1,24 @@
 /**
-\page MITKCmdAppsPage MITK CmdApps (Command line Applications)
+\page MITKCmdAppsPage MITK Command Line Apps
 
+MITK provides a set of small command line tools, each designed to perform a specific task.
+For example, resampling an image or converting between file formats.
 
-CmdApps are small command line tools provided by MITK. Generally the purpose of each of these tools is designed to fulfill one simple task,
-e.g. resample an image or file conversion.
+These tools offer command line access to various MITK features, making it easier to process data in batch workflows.
 
-They are intended to provide command line access to a variety of features of MITK, thus facilitating batched processing of data.
+Below is a list of the command line apps included in the MITK Workbench release configuration, along with usage instructions.
 
-Find the usage instructions of CmdApps deployed with the MITK Workbench release configuration below.
-
-<h2>List of CmdApps</h2>
+<h2>List of Command Line Apps</h2>
 <ul>
-  <li> \subpage MitkConvertToMultiLabelSegmentationPage - Conversion of input data into a MITK Multi Label Segmentation </li>
-  <li> \subpage MitkDICOMVolumeDiagnosticsPage - Diagnostics for DICOM volume reading </li>
-  <li> \subpage MITKFileConverterPage - File format conversion of mitk supported file </li>
-  <li> \subpage MitkImageTypeConverterPage - Conversion of scalar pixel types </li>
-  <li> \subpage MitkFuse3Dto4DImagePage - Fusing 3D images to a 4D dynamic image </li>
-  <li> \subpage MitkGenericFittingPage - Generic fitting on 4D image data </li>
-  <li> \subpage MitkMapImagePage - Mapping of a image/segmentation based on a registration </li>
-  <li> \subpage MitkMatchImagePage - Deducing the registration of a moving and a target image </li>
-  <li> \subpage MitkSplit4Dto3DImagePage - Splitting a 4D dynamic image into 3D frame image </li>
-  <li> \subpage MitkStitch3DImagesPage - Stitching of multiple 3D image into a larger 3D image </li>
+  <li> \subpage MitkConvertToMultiLabelSegmentationPage – Converts input data into an MITK Multi-Label Segmentation </li>
+  <li> \subpage MitkDICOMVolumeDiagnosticsPage – Performs diagnostics on DICOM volume reading </li>
+  <li> \subpage MITKFileConverterPage – Converts between supported MITK file formats </li>
+  <li> \subpage MitkImageTypeConverterPage – Converts scalar pixel types </li>
+  <li> \subpage MitkFuse3Dto4DImagePage – Fuses multiple 3D images into a 4D dynamic image </li>
+  <li> \subpage MitkGenericFittingPage – Performs generic fitting on 4D image data </li>
+  <li> \subpage MitkMapImagePage – Maps an image or segmentation based on a registration </li>
+  <li> \subpage MitkMatchImagePage – Determines the registration between a moving and a target image </li>
+  <li> \subpage MitkSplit4Dto3DImagePage – Splits a 4D dynamic image into individual 3D frames </li>
+  <li> \subpage MitkStitch3DImagesPage – Stitches multiple 3D images into a larger composite image </li>
 </ul>
 */

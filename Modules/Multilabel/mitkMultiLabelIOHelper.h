@@ -51,19 +51,19 @@ namespace mitk
   {
   public:
     /**
-     * @brief Saves the mitk::LabelSet configuration of inputSegmentation to presetFilename.
+     * @brief Saves the mitk::LabelSet configuration of inputImage to presetFilename.
      * The preset is stored as "*.lsetp"
      * @param presetFilename the filename including the filesystem path
-     * @param inputSegmentation the input image from which the preset should be generated
+     * @param inputImage the input image from which the preset should be generated
      * @return true if the serialization was successful and false otherwise
      */
     static bool SaveLabelSetImagePreset(const std::string &presetFilename,
                                         const mitk::MultiLabelSegmentation *inputImage);
 
     /**
-     * @brief Loads an existing preset for a mitk::MultiLabelSegmentation from presetFilename and applies it to inputSegmentation
+     * @brief Loads an existing preset for a mitk::MultiLabelSegmentation from presetFilename and applies it to inputImage
      * @param presetFilename the filename of the preset including the filesystem path
-     * @param inputSegmentation the image to which the loaded preset will be applied
+     * @param inputImage the image to which the loaded preset will be applied
      * @return true if the deserilization was successful and false otherwise
      */
     static bool LoadLabelSetImagePreset(const std::string &presetFilename,

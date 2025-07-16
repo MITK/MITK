@@ -111,6 +111,7 @@ public:
    * 
    * @param workingDir 
    * @param callback 
+   * @param torchVersion 
    */
   void InstallPytorch(const QString &workingDir, CallbackType callback, const QString &torchVersion = "");
 

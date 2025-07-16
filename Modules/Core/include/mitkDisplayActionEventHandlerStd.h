@@ -39,7 +39,7 @@ namespace mitk
     *
     * @throw  mitk::Exception, if the class' observable is null.
     */
-    void InitActionsImpl(std::string prefixFilter = "") override;
+    void InitActionsImpl(const std::string& prefixFilter = "") override;
   };
 } // end namespace mitk
 

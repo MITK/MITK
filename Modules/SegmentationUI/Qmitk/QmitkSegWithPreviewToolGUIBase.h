@@ -85,6 +85,8 @@ protected:
   void SetMergeStyle(mitk::MultiLabelSegmentation::MergeStyle mergeStyle);
   void SetOverwriteStyle(mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle);
 
+  QPushButton* GetConfirmSegmentationButton() const;
+
 private:
   QCheckBox* m_CheckIgnoreLocks = nullptr;
   QCheckBox* m_CheckMerge = nullptr;

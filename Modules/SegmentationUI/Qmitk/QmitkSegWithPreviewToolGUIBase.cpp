@@ -181,7 +181,7 @@ void QmitkSegWithPreviewToolGUIBase::SetMergeStyle(mitk::MultiLabelSegmentation:
   {
     m_CheckMerge->setChecked(mergeStyle == mitk::MultiLabelSegmentation::MergeStyle::Merge);
   }
-};
+}
 
 void QmitkSegWithPreviewToolGUIBase::SetOverwriteStyle(mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
 {
@@ -189,5 +189,9 @@ void QmitkSegWithPreviewToolGUIBase::SetOverwriteStyle(mitk::MultiLabelSegmentat
   {
     m_CheckIgnoreLocks->setChecked(overwriteStyle == mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
   }
-};
+}
 
+QPushButton* QmitkSegWithPreviewToolGUIBase::GetConfirmSegmentationButton() const
+{
+  return m_ConfirmSegBtn;
+}

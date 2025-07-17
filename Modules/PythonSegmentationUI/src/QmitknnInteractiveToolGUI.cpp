@@ -166,8 +166,8 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   // TODO: Once we agree on a common shortcut concept, this should be moved to the base class.
 
   auto confirmButton = this->GetConfirmSegmentationButton();
-  confirmButton->setToolTip("Press the spacebar to confirm a segmentation");
-  auto confirmSegmentation = new QShortcut(QKeySequence(Qt::Key_Space), this);
+  confirmButton->setToolTip("Press C to confirm a segmentation");
+  auto confirmSegmentation = new QShortcut(QKeySequence(Qt::Key_C), this);
   connect(confirmSegmentation, &QShortcut::activated, confirmButton, &QPushButton::click);
 }
 

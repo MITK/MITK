@@ -566,7 +566,10 @@ bool mitk::SegWithPreviewTool::EnsureUpToDateUserDefinedActiveLabel()
   if (nullptr != workingImage)
   {
     // this is a fix for T28131 / T28986, which should be refactored if T28524 is being worked on
-    auto newLabel = workingImage->GetActiveLabel()->GetValue();
+    auto activeLabel = workingImage->GetActiveLabel();
+    auto newLabel = activeLabel != nullptr
+      ? activeLabel->GetValue()
+      : Label::UNLABELED_VALUE;
     labelChanged = newLabel != m_UserDefinedActiveLabel;
     m_UserDefinedActiveLabel = newLabel;
   }

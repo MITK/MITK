@@ -357,14 +357,14 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
       if (nullptr != labelFileNameCallback)
       {
         auto labelFile = labelFileNameCallback(inputImage, label->GetValue());
-        jLabel["file"] = labelFile;
+        jLabel["_file"] = labelFile;
       }
       if (nullptr != labelFileValueCallback)
       {
         auto labelValue = labelFileValueCallback(inputImage, label->GetValue());
         if (labelValue != label->GetValue())
         {
-          jLabel["file_value"] = labelValue;
+          jLabel["_file_value"] = labelValue;
         }
       }
       jlabels.emplace_back(jLabel);
@@ -384,7 +384,7 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
     if (nullptr != groupFileNameCallback)
     {
       auto groupFile = groupFileNameCallback(inputImage, i);
-      jgroup["file"] = groupFile;
+      jgroup["_file"] = groupFile;
     }
 
     result.emplace_back(jgroup);

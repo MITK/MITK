@@ -133,11 +133,11 @@ namespace mitk
     /**
      * @brief Serialize meta data all groups of the multilabel segmentation to JSON format (v2)
      * @param inputSegmentation the multilabel segmentation to serialize
-     * @param groupFileNameCallback Optional call back function. If provided the property "file" on group level
+     * @param groupFileNameCallback Optional call back function. If provided the property "_file" on group level
      * based on the returned string will be set.
-     * @param labelFileNameCallback Optional call back function. If provided the property "file" per label
+     * @param labelFileNameCallback Optional call back function. If provided the property "_file" per label
      * based on the returned string will be set.
-     * @param labelFileValueCallback Optional call back function. If provided the property "file_value" per label
+     * @param labelFileValueCallback Optional call back function. If provided the property "_file_value" per label
      * will be set according to the returned value.
      * @return JSON representation of the groups
      */

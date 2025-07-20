@@ -66,7 +66,7 @@ Each entry in `"groups"` defines a group of labels:
 ```json
 {
   "name": "Custom Group Name",
-  "file": "./Group_0.nrrd",
+  "_file": "./Group_0.nrrd",
   "labels": [ ... ],
   "myCustomGroupProperty": "value"
 }
@@ -75,7 +75,7 @@ Each entry in `"groups"` defines a group of labels:
 | Key      | Required | Description                               |
 |----------|----------|-------------------------------------------|
 | `name`   | ❌        | Optional group name                       |
-| `file`   | ❌        | Path to the group image file              |
+| `_file`   | ❌        | Path to the group image file              |
 | `labels` | ✅        | Array of labels in the group              |
 | *(any)*  | ❌        | Any additional key is stored as a custom property |
 
@@ -89,8 +89,8 @@ Each label includes visual and semantic metadata, and optionally its own image f
 {
   "name": "Label 1",
   "value": 1,
-  "file": "./Label_1.nii.gz",
-  "file_value": 1,
+  "_file": "./Label_1.nii.gz",
+  "_file_value": 1,
   "color": [1.0, 0.0, 0.0],
   "opacity": 0.6,
   "locked": true,
@@ -107,8 +107,8 @@ Each label includes visual and semantic metadata, and optionally its own image f
 |----------------|----------|--------------------------------------------------------|
 | `name`         | ✅        | Label name. When stored as DICOM this will be mapped into the tag `Segment Label (0062,0005)` |
 | `value`        | ✅        | Unique label value (*it hase to be unique for the whole segmentation not just the group!*) |
-| `file`         | ❌        | Path to binary label image                             |
-| `file_value`   | ❌        | Voxel value in the image to map to/form `value` on import/export            |
+| `_file`         | ❌        | Path to binary label image                             |
+| `_file_value`   | ❌        | Voxel value in the image to map to/form `value` on import/export            |
 | `color`        | ✅        | Controls UI color — RGB values `[r, g, b]` (0.0–1.0). When stored as DICOM this will be mapped into the tag `Recommended Display CIELab Value (0062,000D)` |
 | `opacity`      | ✅        | Opacity (0.0–1.0)                                      |
 | `locked`       | ✅        | Controls UI editability — `true` disables editing   |
@@ -118,13 +118,15 @@ Each label includes visual and semantic metadata, and optionally its own image f
 | `description`  | ❌        | Optional user description. When stored as DICOM this will be mapped into the tag `Segment Description (0062,0006)` |
 | *(any)*        | ❌        | Custom label properties (e.g., DICOM metadata, flags)  |
 
-
+### Meta keys/properties
+Some keys on group and label level are not supposed to be converted into regular properties, but the are supposed as meta information that control the way labels are processed/handled.
+Those meta keys will not be "imported", thus transformed into properties of the label data structure. Those keys are indicated by a "_" prefix. The most regular seen keys of that type are `_file` and `_file_value`.
 
 ## Mapping Image Voxel Values
 
 To **control voxel value interpretation**:
 
-- Use `file_value` to specify which voxel value in the image corresponds to this label.
+- Use `_file_value` to specify which voxel value in the image corresponds to this label.
 - This is especially useful for **binary masks**, where all label voxels are `1`.
 
 ### Example
@@ -133,14 +135,12 @@ To **control voxel value interpretation**:
 {
   "name": "Label 5",
   "value": 6,
-  "file": "./binary_label_6.nii.gz",
-  "file_value": 1  // voxel value 1 will be mapped to label value 6
+  "_file": "./binary_label_6.nii.gz",
+  "_file_value": 1  // voxel value 1 will be mapped to label value 6
 }
 ```
 
-If `file_value` is omitted, the label `value` must match the voxel value in the image.
-
-
+If `_file_value` is omitted, the label `value` must match the voxel value in the image.
 
 ## Properties Support
 
@@ -162,19 +162,41 @@ Saved under `"properties"`:
 }
 ```
 
-These can store standard metadata (e.g., DICOM attributes) or user-defined content.
+These can store standard metadata (e.g., DICOM attributes) or user-defined content. On this level (which resembles the level of a data instance (like an image)) the properties are stored in the same format like any node or data properties in MITK.
 
 ### Label/Group Custom Properties
 
-Labels and groups may contain custom tags. Supported types:
+Labels and groups may contain custom tags/properties.
+For simplicity/readablility reasons simple types are directly stored as simple key/value pairs.
+
+Supported types:
 
 - Strings
 - Integers
 - Floats
 - Booleans
-- Structured properties (e.g., `TemporoSpatialStringProperty`)
+- Structured properties (e.g. `TemporoSpatialStringProperty`)
 
 Unknown or unsupported types may cause import failure if not handled correctly.
+Structured properties (representing more complex properties (e.g. `TemporoSpatialStringProperty`) are stored in the following structure:
+
+```json
+ <property_name>: {
+   "type": <property_class_name>,
+   "value": <property_content>
+  }
+```
+- <property_name>: Name of the property
+- <property_class_name>: Name of the property class that is persisted here
+- <property_content>: JSON content of the property
+
+Example for a structured property stored at group or label level:
+```json
+"DICOM.0062.0002.0062.0008": {
+  "type": "TemporoSpatialStringProperty",
+  "value": { "values": [{"t": 0, "value": "SEMIAUTOMATIC", "z": 0}]}
+}
+```
 
 ---
 
@@ -182,9 +204,9 @@ Unknown or unsupported types may cause import failure if not handled correctly.
 
 A mixed segmentation stack may contain:
 
-- A group image (`file`) containing label values (e.g., 1, 2, 3).
-- Specific label images (`file`) with optional `file_value` mappings.
-- One group might not have a `file` at all, relying entirely on per-label images.
+- A group image (`_file`) containing label values (e.g., 1, 2, 3).
+- Specific label images (`_file`) with optional `_file_value` mappings.
+- One group might not have a `_file` at all, relying entirely on per-label images.
 
 ### Example
 
@@ -192,12 +214,12 @@ A mixed segmentation stack may contain:
 {
   "groups": [
     {
-      "file": "./Group_0.nrrd",
+      "_file": "./Group_0.nrrd",
       "labels": [
         {
           "name": "Bone",
           "value": 1,
-          "file": "./BoneMask.nii.gz",
+          "_file": "./BoneMask.nii.gz",
           "color": [0.8, 0.1, 0.1],
           "locked": true,
           "visible": true,
@@ -221,8 +243,8 @@ A mixed segmentation stack may contain:
         {
           "name": "Vessel",
           "value": 3,
-          "file": "./Vessel.nii.gz",
-          "file_value": 1,
+          "_file": "./Vessel.nii.gz",
+          "_file_value": 1,
           "color": [0.1, 0.1, 0.8],
           "locked": false,
           "visible": true,

@@ -29,6 +29,7 @@ namespace itk
   IndexedUnaryFunctorImageFilter< TInputImage, TOutputImage, TFunction >
     ::IndexedUnaryFunctorImageFilter()
   {
+    this->DynamicMultiThreadingOff();
     this->SetNumberOfRequiredInputs(1);
     this->InPlaceOff();
   }

@@ -17,21 +17,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPETSUVCalculationView.h"
 #include <ui_QmitkPETSUVCalculationViewControls.h>
 
+#include <iostream>
+
 #include <itkIndexedUnaryFunctorImageFilter.h>
 #include <mitkITKImageImport.h>
 #include <mitkImageCast.h>
+
 #include <mitkSUVCalculation.h>
 #include <mitkSUVFunctorPolicy.h>
 #include <mitkWorkbenchUtil.h>
-#include <QInputDialog>
-#include <QMessageBox>
-#include <iostream>
+
 #include <mitkDICOMProperty.h>
 #include <mitkDICOMTagPath.h>
 #include <mitkHalfLifeConstants.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkSUVCalculationHelper.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkMultiLabelPredicateHelper.h>
+
+#include <QInputDialog>
+#include <QMessageBox>
 
 const std::string QmitkPETSUVCalculationView::VIEW_ID = "org.mitk.QmitkPETSUVCalculationView";
 
@@ -52,14 +60,32 @@ void QmitkPETSUVCalculationView::CreateQtPartControl(QWidget *parent)
 
   connect(m_Controls->activitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnInjectedActivityChanged(double)));
 
-  connect(m_Controls->weightSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnBodyWeightChanged(int)));
+  connect(m_Controls.weightSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnBodyWeightChanged(double)));
 
   connect(m_Controls->timeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnTimeToMeasurementChanged(int)));
 
   connect(m_Controls->radioTimeUser, SIGNAL(toggled(bool)), m_Controls->timeSpinBox, SLOT(setEnabled(bool)));
 
-  m_Controls->radioTimeAuto->setChecked(true);
-  m_Controls->timeSpinBox->setEnabled(false);
+  connect(m_Controls.petNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkPETSUVCalculationView::OnPETSelectionChanged);
+
+
+  m_Controls.petNodeSelector->SetSelectionIsOptional(false);
+
+  this->m_Controls.petNodeSelector->SetInvalidInfo("Select PET image for conversion.");
+  this->m_Controls.petNodeSelector->SetEmptyInfo("Select PET image for conversion.");
+  this->m_Controls.petNodeSelector->SetPopUpTitel("Select PET image.");
+  this->m_Controls.petNodeSelector->SetPopUpHint("Select a PET image that should be the source for the SUV conversion.");
+
+  m_Controls.petNodeSelector->SetDataStorage(this->GetDataStorage());
+
+  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+  auto isNoMask = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
+
+  auto petInputPredicate = mitk::NodePredicateAnd::New(isImage, isNoMask);
+  m_Controls.petNodeSelector->SetNodePredicate(petInputPredicate);
+
+  // Should be done last, if everything else is configured because it triggers the autoselection of data.
+  m_Controls.petNodeSelector->SetAutoSelectNewNodes(true);
 
   this->UpdateWidgets();
 }
@@ -73,7 +99,7 @@ void QmitkPETSUVCalculationView::OnInjectedActivityChanged(double value)
   }
 }
 
-void QmitkPETSUVCalculationView::OnBodyWeightChanged(int value)
+void QmitkPETSUVCalculationView::OnBodyWeightChanged(double value)
 {
   if (!this->m_internalUpdate)
   {
@@ -147,18 +173,24 @@ std::string GetBaseDatePropValueAsString(const mitk::BaseData *data, const mitk:
 
 void QmitkPETSUVCalculationView::OnCalculateSUVButtonClicked()
 {
+  auto inputNode = m_Controls.petNodeSelector->GetSelectedNode();
   mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-  std::string nameOfResultImage = m_selectedNode->GetName();
+  std::string nameOfResultImage = inputNode->GetName();
   nameOfResultImage.append("_SUV");
   resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage));
-  mitk::Image *image = dynamic_cast<mitk::Image *>(m_selectedNode->GetData());
+  const auto image = dynamic_cast<mitk::Image *>(inputNode->GetData());
+
+  if (nullptr == image)
+  {
+    mitkThrow() << "QmitkPETSUVCalculationView is in invalid state. Selected node does not contain an mitk::Image, despite the PET node selector should enforce it.";
+  }
 
   mitk::DICOMTagPath modalityPath(0x0008, 0x0060);
   mitk::DICOMTagPath radioActivityUnitsPath(0x0054, 0x1001);
 
-  QString modality = QString::fromStdString(GetBaseDatePropValueAsString(m_selectedNode->GetData(), modalityPath));
+  QString modality = QString::fromStdString(GetBaseDatePropValueAsString(image, modalityPath));
   QString unit =
-    QString::fromStdString(GetBaseDatePropValueAsString(m_selectedNode->GetData(), radioActivityUnitsPath));
+    QString::fromStdString(GetBaseDatePropValueAsString(image, radioActivityUnitsPath));
 
   bool isPET = modality.compare(QString("PT"), Qt::CaseInsensitive) == 0;
   bool isBqMl = unit.compare(QString("BQML"), Qt::CaseInsensitive) == 0;
@@ -212,7 +244,7 @@ void QmitkPETSUVCalculationView::OnCalculateSUVButtonClicked()
     mitk::Image::Pointer imageSUV = CalcSUV(image);
 
     resultNode->SetData(imageSUV); // set data of new node
-    this->GetDataStorage()->Add(resultNode, m_selectedNode);
+    this->GetDataStorage()->Add(resultNode, inputNode);
   }
 }
 
@@ -333,7 +365,7 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
 
     m_Controls->labelAutoNuclide->setText(QString::fromStdString(this->m_DefinedNuclide));
 
-    bool valid = m_selectedNode.IsNotNull() && m_injectedActivity != 0 && m_bodyweight != 0 &&
+    bool valid = m_Controls.petNodeSelector->GetSelectedNode().IsNotNull() && m_injectedActivity != 0 && m_bodyweight != 0 &&
                  (m_userDecayTime != 0 || m_validAutoTime) && m_halfLife != 0;
     m_Controls->btnCalculateSUV->setEnabled(valid);
 
@@ -341,95 +373,78 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
   }
 }
 
-void QmitkPETSUVCalculationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-                                                    const QList<mitk::DataNode::Pointer> & /*nodes*/)
+void QmitkPETSUVCalculationView::OnPETSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
   m_Controls->btnCalculateSUV->setEnabled(false);
-  mitk::DataNode *newNode = NULL;
+  auto newNode = m_Controls.petNodeSelector->GetSelectedNode();
 
-  QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
+  this->m_injectedActivity = 0.;
+  this->m_bodyweight = 0.;
+  this->m_userDecayTime = 0;
+  this->m_autoDecayTime.clear();
+  this->m_validAutoTime = false;
+  this->m_DefinedNuclide.clear();
+  this->m_halfLife = 0.;
 
-  if (dataNodes.empty())
+  if (newNode.IsNotNull() && this->m_Controls.checkAuto->isChecked())
   {
-    newNode = NULL;
-  }
-  else
-  {
-    newNode = dataNodes[0];
-  }
-
-  if (newNode != this->m_selectedNode)
-  {
-    this->m_selectedNode = newNode;
-
-    this->m_injectedActivity = 0;
-    this->m_bodyweight = 0;
-    this->m_userDecayTime = 0;
-    this->m_autoDecayTime.clear();
-    this->m_validAutoTime = false;
-    this->m_DefinedNuclide.clear();
-    this->m_halfLife = 0;
-
-    if (this->m_selectedNode && this->m_Controls->checkAuto->isChecked())
+    auto activities = mitk::GetRadionuclideTotalDose(newNode->GetData());
+    if (activities.empty())
     {
-      auto activities = mitk::GetRadionuclideTotalDose(newNode->GetData());
-      if (activities.empty())
-      {
-        MITK_ERROR << "Error reading injected activity.";
-      }
-      else if (activities.size() > 1)
-      {
-        MITK_WARN << "There are more then one radonuclide total doses stored for the node. First one will be used: "
-                  << activities[0];
-      }
-      else
-      {
-        this->m_injectedActivity = activities[0];
-      }
-
-      try
-      {
-        m_bodyweight = mitk::GetPatientsWeight(newNode->GetData());
-      }
-      catch (const mitk::Exception &e)
-      {
-        MITK_ERROR << "Error reading patient body weight. Error details:" << e;
-      }
-
-      m_DefinedNuclide = mitk::GetRadionuclideNames(newNode->GetData());
-
-      auto halflifes = mitk::GetRadionuclideHalfLife(newNode->GetData());
-      if (halflifes.empty())
-      {
-        MITK_ERROR << "Error reading radio nuclide half life.";
-      }
-      else if (halflifes.size() > 1)
-      {
-        MITK_WARN << "There are more then one radonuclide half life stored for the node. First one will be used: "
-                  << halflifes[0];
-      }
-      else
-      {
-        this->m_halfLife = halflifes[0];
-      }
-
-      if (this->m_Controls->radioTimeAuto->isChecked())
-      {
-        try
-        {
-          this->m_autoDecayTime = mitk::DeduceDecayTime_AcquisitionMinusStartSliceResolved(newNode->GetData());
-          m_validAutoTime = true;
-        }
-        catch (const mitk::Exception &e)
-        {
-          m_validAutoTime = false;
-          MITK_ERROR << "Error deducing decay time. Error details:" << e;
-        }
-      }
+      MITK_ERROR << "Error reading injected activity.";
+    }
+    else if (activities.size() > 1)
+    {
+      MITK_WARN << "There are more then one radonuclide total doses stored for the node. First one will be used: "
+        << activities[0];
+    }
+    else
+    {
+      this->m_injectedActivity = activities[0];
     }
 
-    this->UpdateWidgets();
+    try
+    {
+      m_bodyweight = mitk::GetPatientsWeight(newNode->GetData());
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << "Error reading patient body weight. Error details:" << e;
+    }
+
+    m_DefinedNuclide = mitk::GetRadionuclideNames(newNode->GetData());
+
+    auto halflifes = mitk::GetRadionuclideHalfLife(newNode->GetData());
+    if (halflifes.empty())
+    {
+      MITK_ERROR << "Error reading radio nuclide half life.";
+    }
+    else if (halflifes.size() > 1)
+    {
+      MITK_WARN << "There are more then one radonuclide half life stored for the node. First one will be used: "
+        << halflifes[0];
+    }
+    else
+    {
+      this->m_halfLife = halflifes[0];
+    }
+
+    if (this->m_Controls.radioTimeAuto->isChecked())
+    {
+      try
+      {
+        this->m_autoDecayTime = mitk::DeduceDecayTime_AcquisitionMinusStartSliceResolved(newNode->GetData());
+        m_validAutoTime = true;
+      }
+      catch (const mitk::Exception& e)
+      {
+        m_validAutoTime = false;
+        MITK_ERROR << "Error deducing decay time. Error details:" << e;
+      }
+    }
   }
+
+  this->UpdateWidgets();
 }
 
 void QmitkPETSUVCalculationView::GenerateHalfLifeMap()

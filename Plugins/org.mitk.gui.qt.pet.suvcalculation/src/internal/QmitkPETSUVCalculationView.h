@@ -48,9 +48,10 @@ protected slots:
   void OnNuclideLookupClicked();
 
   void OnInjectedActivityChanged(double);
-  void OnBodyWeightChanged(int);
+  void OnBodyWeightChanged(double);
   void OnHalfLifeChanged(double);
   void OnTimeToMeasurementChanged(int);
+  void OnPETSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
 protected:
   // Overridden base class functions
@@ -77,22 +78,17 @@ protected:
 
   mitk::Image::Pointer CalcSUV(mitk::Image *inputImage) const;
 
-  void UpdatePatientWeight();
-
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer> &nodes) override;
-
   // Variables
 
   /*! @brief The view's UI controls */
   std::unique_ptr<Ui::QmitkPETSUVCalculationViewControls> m_Controls;
-  mitk::DataNode::Pointer m_selectedNode;
 
 private:
   /**Activity in Bq*/
   double m_injectedActivity;
 
   /**Weight in kg*/
-  int m_bodyweight;
+  double m_bodyweight;
 
   /** Time between injection and image acquesition in sec. Used when defined by user and not autodetected.*/
   int m_userDecayTime;

@@ -53,7 +53,7 @@ namespace
   mitk::Image::Pointer LoadImageBasedOnFileProperty(const mitk::PropertyList* properties, const std::string& fileBase)
   {
     std::string fileName;
-    bool imageDefined = properties->GetStringProperty("file", fileName);
+    bool imageDefined = properties->GetStringProperty("_file", fileName);
 
     mitk::Image::Pointer image;
     if (imageDefined)
@@ -68,7 +68,7 @@ namespace
   {
     mitk::Label::PixelType fileValue = label->GetValue();
 
-    if (auto property = dynamic_cast<mitk::IntProperty*>(label->GetProperty("file_value")); nullptr != property)
+    if (auto property = dynamic_cast<mitk::IntProperty*>(label->GetProperty("_file_value")); nullptr != property)
     {
       fileValue = static_cast<mitk::Label::PixelType>(property->GetValue());
     }
@@ -82,7 +82,7 @@ namespace
 
     for (const auto& label : labels)
     {
-      if (nullptr == label->GetProperty("file"))
+      if (nullptr == label->GetProperty("_file"))
       {
         result.push_back(MakeLabelMapping(label));
       }
@@ -98,8 +98,8 @@ namespace
     for (const auto& label : labels)
     {
       auto cleanedLabel = label->Clone();
-      cleanedLabel->RemoveProperty("file");
-      cleanedLabel->RemoveProperty("file_value");
+      cleanedLabel->RemoveProperty("_file");
+      cleanedLabel->RemoveProperty("_file_value");
       result.push_back(cleanedLabel);
     }
 
@@ -112,7 +112,7 @@ namespace
     {
       for (const auto& [key, value] : j.items())
       {
-        if (key == "file")
+        if (key == "_file")
           return value;
 
         if (value.is_structured())  // object or array

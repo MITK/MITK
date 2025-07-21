@@ -36,12 +36,49 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateFunction.h>
 #include <mitkMultiLabelPredicateHelper.h>
 
 #include <QInputDialog>
 #include <QMessageBox>
 
 const std::string QmitkPETSUVCalculationView::VIEW_ID = "org.mitk.QmitkPETSUVCalculationView";
+
+namespace
+{
+  mitk::NodePredicateBase::Pointer GenerateSelectionPredicate(bool onlyPET)
+  {
+    auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+    auto isNoMask = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
+
+    auto petInputPredicate = mitk::NodePredicateAnd::New(isImage, isNoMask);
+
+    if (onlyPET)
+    {
+      auto modalityCheck = [](const mitk::DataNode* node)
+        {
+          bool result = false;
+
+          if (nullptr == node || nullptr == node->GetData())
+            return result;
+
+          auto props = mitk::GetPropertyByDICOMTagPath(node->GetData(), mitk::DICOMTagPath(0x0008, 0x0060));
+
+          if (!props.empty())
+          {
+            result = props.begin()->second->GetValueAsString() == "PT";
+          }
+
+          return result;
+        };
+      auto modalityPredicate = mitk::NodePredicateFunction::New(modalityCheck);
+      petInputPredicate->AddPredicate(modalityPredicate);
+    }
+
+    return petInputPredicate;
+  }
+
+}
 
 void QmitkPETSUVCalculationView::SetFocus()
 {
@@ -57,14 +94,13 @@ void QmitkPETSUVCalculationView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->btnNuclideLookup, SIGNAL(clicked()), this, SLOT(OnNuclideLookupClicked()));
 
   connect(m_Controls->halflifeSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnHalfLifeChanged(double)));
-
   connect(m_Controls->activitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnInjectedActivityChanged(double)));
-
   connect(m_Controls.weightSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnBodyWeightChanged(double)));
-
   connect(m_Controls->timeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnTimeToMeasurementChanged(int)));
 
   connect(m_Controls->radioTimeUser, SIGNAL(toggled(bool)), m_Controls->timeSpinBox, SLOT(setEnabled(bool)));
+
+  connect(m_Controls.checkPETonly, &QCheckBox::toggled, this, &QmitkPETSUVCalculationView::OnCheckPETOnlyToggled);
 
   connect(m_Controls.petNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkPETSUVCalculationView::OnPETSelectionChanged);
 
@@ -78,16 +114,17 @@ void QmitkPETSUVCalculationView::CreateQtPartControl(QWidget *parent)
 
   m_Controls.petNodeSelector->SetDataStorage(this->GetDataStorage());
 
-  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto isNoMask = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
-
-  auto petInputPredicate = mitk::NodePredicateAnd::New(isImage, isNoMask);
-  m_Controls.petNodeSelector->SetNodePredicate(petInputPredicate);
+  m_Controls.petNodeSelector->SetNodePredicate(GenerateSelectionPredicate(m_Controls.checkPETonly->isChecked()));
 
   // Should be done last, if everything else is configured because it triggers the autoselection of data.
   m_Controls.petNodeSelector->SetAutoSelectNewNodes(true);
 
   this->UpdateWidgets();
+}
+
+void QmitkPETSUVCalculationView::OnCheckPETOnlyToggled(bool)
+{
+  m_Controls.petNodeSelector->SetNodePredicate(GenerateSelectionPredicate(m_Controls.checkPETonly->isChecked()));
 }
 
 void QmitkPETSUVCalculationView::OnInjectedActivityChanged(double value)
@@ -237,9 +274,18 @@ void QmitkPETSUVCalculationView::OnCalculateSUVButtonClicked()
 
   if (isPET && isBqMl && hasValidInputs)
   {
-    MITK_INFO << "Calculating SUV: Injected activity = " << m_injectedActivity / 1000.0
-              << "kBq; Scaled body weight = " << m_bodyweight << " kg; Time to measurement = " << m_userDecayTime / 60
-              << " min; Half Life = " << m_halfLife / 60 << " min";
+    if (m_validAutoTime)
+    {
+      MITK_INFO << "Calculating SUV: Injected activity = " << m_injectedActivity / 1000.0
+        << " kBq; Scaled body weight = " << m_bodyweight << " kg; Time to measurement = automatically detected"
+        << " min; Half Life = " << m_halfLife / 60 << " min";
+    }
+    else
+    {
+      MITK_INFO << "Calculating SUV: Injected activity = " << m_injectedActivity / 1000.0
+        << " kBq; Scaled body weight = " << m_bodyweight << " kg; Time to measurement = " << m_userDecayTime / 60
+        << " min; Half Life = " << m_halfLife / 60 << " min";
+    }
 
     mitk::Image::Pointer imageSUV = CalcSUV(image);
 

@@ -46,6 +46,7 @@ protected slots:
 
   void OnCalculateSUVButtonClicked();
   void OnNuclideLookupClicked();
+  void OnCheckPETOnlyToggled(bool);
 
   void OnInjectedActivityChanged(double);
   void OnBodyWeightChanged(double);

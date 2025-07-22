@@ -56,4 +56,5 @@ else()
   )
 endif()
 
-execute_process(COMMAND ${SWIG_EXECUTABLE} -python -external-runtime)
+set(SWIG_RUNTIME_HEADER "${MITK_BINARY_DIR}/swigpyrun.h")
+execute_process(COMMAND ${SWIG_EXECUTABLE} -python -external-runtime ${SWIG_RUNTIME_HEADER})

@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitknnInteractiveTool.h>
 
 #include <mitkImageReadAccessor.h>
+#include <mitkFileSystem.h>
 #include <mitknnInteractiveBoxInteractor.h>
 #include <mitknnInteractiveLassoInteractor.h>
 #include <mitknnInteractivePointInteractor.h>
@@ -23,6 +24,9 @@ found in the LICENSE file.
 
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
+
+#include <optional>
+#include <regex>
 
 using namespace mitk::nnInteractive;
 
@@ -41,6 +45,27 @@ namespace
     std::memset(data, 0, numPixels * sizeof(mitk::Label::PixelType));
 
     image->SetImportVolume(data, 0, 0, mitk::Image::ManageMemory);
+  }
+
+  std::optional<fs::path> FindPythonVersionDir(const fs::path& baseDir)
+  {
+    const std::regex regex(R"(python3\.\d+)");
+
+    if (!fs::exists(baseDir) || !fs::is_directory(baseDir))
+      return std::nullopt;
+
+    for (const auto& entry : fs::directory_iterator(baseDir))
+    {
+      if (entry.is_directory())
+      {
+        const auto dirName = entry.path().filename().string();
+
+        if (std::regex_match(dirName, regex))
+          return entry.path();
+      }
+    }
+
+    return std::nullopt;
   }
 }
 
@@ -405,9 +430,46 @@ void mitk::nnInteractiveTool::ConfirmCleanUp()
   this->ConfirmCleanUpEvent.Send(true);
 }
 
+bool mitk::nnInteractiveTool::CreatePythonContext(const std::string& pythonExecutable)
+{
+  auto pythonDir = std::filesystem::path(pythonExecutable).parent_path();
+
+#if defined(_WIN32)
+  auto path = (pythonDir / "Lib" / "site-packages").string();
+  std::replace(path.begin(), path.end(), '\\', '/');
+#else
+  auto pythonVersionDir = FindPythonVersionDir(pythonDir.parent_path() / "lib");
+
+  if (!pythonVersionDir.has_value())
+    return false;
+
+  auto path = (pythonVersionDir.value() / "site-packages").string();
+#endif
+
+  auto pythonContext = PythonContext::New();
+  pythonContext->SetVirtualEnvironmentPath(path);
+  pythonContext->Activate();
+
+  m_Impl->SetPythonContext(pythonContext);
+  return true;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Functions and methods that execute Python code
 ////////////////////////////////////////////////////////////////////////////////
+
+bool mitk::nnInteractiveTool::IsInstalled()
+{
+  std::ostringstream pyCommands; pyCommands
+    << "import importlib.util\n"
+    << "if importlib.util.find_spec('nnInteractive') is not None:\n"
+    << "    nninteractive_is_installed = True\n";
+
+  auto pythonContext = m_Impl->GetPythonContext();
+  pythonContext->ExecuteString(pyCommands.str());
+
+  return pythonContext->HasVariable("nninteractive_is_installed");
+}
 
 void mitk::nnInteractiveTool::StartSession()
 {
@@ -415,11 +477,6 @@ void mitk::nnInteractiveTool::StartSession()
 
   if (this->IsSessionRunning())
     this->EndSession();
-
-  auto pythonContext = PythonContext::New();
-  m_Impl->SetPythonContext(pythonContext);
-
-  pythonContext->Activate();
 
   std::ostringstream pyCommands; pyCommands
     << "import torch\n"
@@ -436,6 +493,7 @@ void mitk::nnInteractiveTool::StartSession()
     << ")\n"
     << "checkpoint_path = Path(download_path).joinpath('" << MODEL << "')\n";
 
+  auto pythonContext = m_Impl->GetPythonContext();
   pythonContext->ExecuteString(pyCommands.str());
 
   pyCommands.clear(); pyCommands

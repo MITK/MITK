@@ -25,6 +25,8 @@ namespace mitk::nnInteractive
 
 namespace mitk
 {
+  class PythonContext;
+
   class MITKPYTHONSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
   {
   public:
@@ -54,6 +56,8 @@ namespace mitk
 
     std::optional<nnInteractive::Backend> GetBackend() const;
 
+    bool CreatePythonContext(const std::string& pythonExecutable);
+    bool IsInstalled();
     void StartSession();
     void EndSession();
     bool IsSessionRunning() const;

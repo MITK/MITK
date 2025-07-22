@@ -22,3 +22,7 @@ mitkFunctionAddExternalProject(NAME SWIG OFF ADVANCED NO_PACKAGE)
 if(MITK_USE_Qt6)
  mitkFunctionAddExternalProject(NAME Qt6Qwt6 ON ADVANCED DEPENDS Qt6)
 endif()
+
+if(MITK_USE_Python3)
+  mitkFunctionAddExternalProject(NAME Python3 ON ADVANCED COMPONENTS Interpreter Development NumPy)
+endif()

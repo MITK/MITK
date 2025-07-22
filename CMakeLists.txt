@@ -447,21 +447,6 @@ if(MITK_USE_Python3)
 
   set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
   set(MITK_USE_SWIG ON CACHE BOOL "" FORCE)
-
-  if(APPLE)
-    set(python3_mininum_version 3.12)
-  else()
-    set(python3_mininum_version 3.9)
-  endif()
-
-  find_package(Python3 ${python3_mininum_version} REQUIRED COMPONENTS Interpreter Development NumPy)
-
-  if(WIN32)
-    string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")
-    string(REPLACE "\\" "/" Python3_STDLIB "${Python3_STDLIB}")
-    string(REPLACE "\\" "/" Python3_SITELIB "${Python3_SITELIB}")
-  endif()
-  link_directories(${Python3_LIBRARY_DIRS})
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
@@ -946,7 +931,10 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
   get_property(_components GLOBAL PROPERTY MITK_${ep}_COMPONENTS)
   if(MITK_USE_${ep} AND _package)
     if(_components)
-      find_package(${_package} COMPONENTS ${_components} REQUIRED CONFIG)
+      find_package(${_package} COMPONENTS ${_components} QUIET CONFIG)
+      if(NOT ${_package}_DIR)
+        find_package(${_package} COMPONENTS ${_components} REQUIRED MODULE)
+      endif()
     else()
       # Prefer config mode first because it finds external
       # <proj>Config.cmake files pointed at by <proj>_DIR variables.
@@ -957,14 +945,14 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
         #and would get lost for all EPs that use on Find<proj>.cmake instead of config
         #files.
         set(_temp_EP_${_package}_dir ${${_package}_DIR})
-      endif(DEFINED ${_package}_DIR)
+      endif()
 
       find_package(${_package} QUIET CONFIG)
       string(TOUPPER "${_package}" _package_uc)
       if(NOT (${_package}_FOUND OR ${_package_uc}_FOUND))
         if(DEFINED _temp_EP_${_package}_dir)
             set(${_package}_DIR ${_temp_EP_${_package}_dir} CACHE PATH "externally set dir of the package ${_package}" FORCE)
-        endif(DEFINED _temp_EP_${_package}_dir)
+        endif()
 
         find_package(${_package} REQUIRED)
       endif()

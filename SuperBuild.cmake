@@ -269,6 +269,7 @@ foreach(p ${external_projects})
 
   list(APPEND mitk_depends ${${p}_DEPENDS})
 endforeach()
+
 if (SWIG_EXECUTABLE)
   list(APPEND mitk_superbuild_ep_args -DSWIG_EXECUTABLE=${SWIG_EXECUTABLE})
 endif()
@@ -350,18 +351,10 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
   endif()
 endforeach()
 
-# Optional python variables
-if(MITK_USE_Python3)
+if(Python3_ROOT_DIR)
   list(APPEND mitk_optional_cache_args
-    "-DPython3_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
-    "-DPython3_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIRS}"
-    "-DPython3_STDLIB:FILEPATH=${Python3_STDLIB}"
-    "-DPython3_SITELIB:FILEPATH=${Python3_SITELIB}"
+    "-DPython3_ROOT_DIR:PATH=${Python3_ROOT_DIR}"
   )
-
-  if(Python3_LIBRARY)
-    list(APPEND mitk_optional_cache_args "-DPython3_LIBRARY:FILEPATH=${Python3_LIBRARY}")
-  endif()
 endif()
 
 if(OPENSSL_ROOT_DIR)

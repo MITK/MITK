@@ -19,6 +19,14 @@ found in the LICENSE file.
 #include <QProcess>
 #include <QScrollBar>
 
+namespace
+{
+  constexpr const char* TORCH = "torch==2.7.1";
+  constexpr const char* TORCH_VISION = "torchvision==0.22.1";
+  constexpr const char* NNINTERACTIVE = "nninteractive==1.0.1";
+  constexpr const char* CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu118";
+}
+
 using Self = QmitknnInteractiveInstallDialog;
 
 QmitknnInteractiveInstallDialog::QmitknnInteractiveInstallDialog(const QString& pythonExecutable, QWidget* parent)
@@ -56,11 +64,11 @@ void QmitknnInteractiveInstallDialog::OnYesClicked()
 
   if (m_InstallStep == InstallStep::PyTorch) // Only on Windows
   {
-    args.append({ "torch", "torchvision", "--index-url", "https://download.pytorch.org/whl/cu118" });
+    args.append({ TORCH, TORCH_VISION, "--index-url", CUDA_INDEX_URL });
   }
   else
   {
-    args.append("nninteractive");
+    args.append(NNINTERACTIVE);
   }
 
   m_Process->start(m_PythonExecutable, args);
@@ -108,7 +116,7 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
     {
       m_InstallStep = InstallStep::nnInteractive;
 
-      QStringList args = { "-m", "pip", "install", "--no-warn-script-location", "nninteractive" };
+      QStringList args = { "-m", "pip", "install", "--no-warn-script-location", NNINTERACTIVE };
       m_Process->start(m_PythonExecutable, args);
     }
     else

@@ -17,7 +17,7 @@ if(MITK_USE_${proj})
     set(release_date 20250712)
 
     set(pip_install
-      numpy
+      "numpy~=2.3"
     )
 
     set(base_url "https://github.com/astral-sh/python-build-standalone/releases/download/${release_date}")

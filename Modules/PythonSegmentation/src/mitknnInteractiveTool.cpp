@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include <mitknnInteractiveTool.h>
 
 #include <mitkImageReadAccessor.h>
-#include <mitkFileSystem.h>
 #include <mitknnInteractiveBoxInteractor.h>
 #include <mitknnInteractiveLassoInteractor.h>
 #include <mitknnInteractivePointInteractor.h>
@@ -24,9 +23,6 @@ found in the LICENSE file.
 
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
-
-#include <optional>
-#include <regex>
 
 using namespace mitk::nnInteractive;
 
@@ -45,27 +41,6 @@ namespace
     std::memset(data, 0, numPixels * sizeof(mitk::Label::PixelType));
 
     image->SetImportVolume(data, 0, 0, mitk::Image::ManageMemory);
-  }
-
-  std::optional<fs::path> FindPythonVersionDir(const fs::path& baseDir)
-  {
-    const std::regex regex(R"(python3\.\d+)");
-
-    if (!fs::exists(baseDir) || !fs::is_directory(baseDir))
-      return std::nullopt;
-
-    for (const auto& entry : fs::directory_iterator(baseDir))
-    {
-      if (entry.is_directory())
-      {
-        const auto dirName = entry.path().filename().string();
-
-        if (std::regex_match(dirName, regex))
-          return entry.path();
-      }
-    }
-
-    return std::nullopt;
   }
 }
 
@@ -430,28 +405,22 @@ void mitk::nnInteractiveTool::ConfirmCleanUp()
   this->ConfirmCleanUpEvent.Send(true);
 }
 
-bool mitk::nnInteractiveTool::CreatePythonContext(const std::string& pythonExecutable)
+bool mitk::nnInteractiveTool::CreatePythonContext()
 {
-  auto pythonDir = std::filesystem::path(pythonExecutable).parent_path();
+  auto pythonContext = PythonContext::New();
 
-#if defined(_WIN32)
-  auto path = (pythonDir / "Lib" / "site-packages").string();
-  std::replace(path.begin(), path.end(), '\\', '/');
-#else
-  auto pythonVersionDir = FindPythonVersionDir(pythonDir.parent_path() / "lib");
-
-  if (!pythonVersionDir.has_value())
+  if (pythonContext->GetPythonExecutable().empty())
     return false;
 
-  auto path = (pythonVersionDir.value() / "site-packages").string();
-#endif
-
-  auto pythonContext = PythonContext::New();
-  pythonContext->SetVirtualEnvironmentPath(path);
   pythonContext->Activate();
-
   m_Impl->SetPythonContext(pythonContext);
+
   return true;
+}
+
+mitk::PythonContext* mitk::nnInteractiveTool::GetPythonContext() const
+{
+  return m_Impl->GetPythonContext();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

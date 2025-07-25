@@ -15,13 +15,13 @@ found in the LICENSE file.
 
 #include <mitkLabelSetImageConverter.h>
 #include <mitknnInteractiveInteractor.h>
+#include <mitkPythonContext.h>
 #include <mitkToolManagerProvider.h>
 
 #include <QmitknnInteractiveInstallDialog.h>
 #include <QmitkStyleManager.h>
 
 #include <QBoxLayout>
-#include <QDir>
 #include <QButtonGroup>
 #include <QMessageBox>
 #include <QShortcut>
@@ -101,37 +101,6 @@ namespace
 
     auto button = QMessageBox::question(nullptr, title, message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     return button == QMessageBox::Yes;
-  }
-
-  QString FindPythonExecutable()
-  {
-    QDir appDir(QCoreApplication::applicationDirPath());
-
-#if defined(Q_OS_WINDOWS)
-    auto buildTreePython = appDir.filePath("..\\..\\..\\ep\\src\\Python3\\python.exe");
-#elif defined(Q_OS_LINUX)
-    auto buildTreePython = appDir.filePath("../../ep/src/Python3/bin/python3");
-#else
-    auto buildTreePython = appDir.filePath("../../../../../ep/src/Python3/bin/python3"); // TODO
-#endif
-
-    if (QFileInfo::exists(buildTreePython))
-      return QDir::cleanPath(buildTreePython);
-
-    // TODO: Check for installed Python in writable location
-
-#if defined(Q_OS_WINDOWS)
-    auto installedPython = appDir.filePath("..\\Python3\\python.exe");
-#elif defined(Q_OS_LINUX)
-    auto installedPython = appDir.filePath("../Python3/bin/python3");
-#else
-    auto installedPython = appDir.filePath("Python3/bin/python3"); // TODO
-#endif
-
-    if (QFileInfo::exists(installedPython))
-      return QDir::cleanPath(installedPython); // TODO: Copy to writable location
-
-    return {};
   }
 }
 
@@ -314,21 +283,14 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 {
   m_Ui->initializeButton->setEnabled(false);
 
-  auto pythonExecutable = FindPythonExecutable();
-
-  if (pythonExecutable.isEmpty())
+  if (!this->GetTool()->CreatePythonContext())
   {
     QMessageBox::critical(this, "Python not found", "The MITK-internal Python interpreter was not found!");
     m_Ui->initializeButton->setEnabled(true);
     return;
   }
 
-  if (!this->GetTool()->CreatePythonContext(pythonExecutable.toStdString()))
-  {
-    QMessageBox::critical(this, "Python not found", "The site-packages folder of the MITK-internal Python interpreter was not found!");
-    m_Ui->initializeButton->setEnabled(true);
-    return;
-  }
+  auto pythonExecutable = QString::fromStdString(this->GetTool()->GetPythonContext()->GetPythonExecutable().string());
 
   if (!this->Install(pythonExecutable))
   {

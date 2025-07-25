@@ -52,11 +52,7 @@ mitk::PythonContext::PythonContext()
 
     if (!pythonHome.empty())
     {
-#if defined(_WIN32)
       Py_SetPythonHome(pythonHome.wstring().c_str());
-#else
-      Py_SetPythonHome(pythonHome.native().c_str());
-#endif
     }
     else
     {

@@ -43,28 +43,35 @@ if(MITK_USE_${proj})
     endif()
 
     set(url "${base_url}/cpython-${version}+${release_date}-${arch}-${platform}-${variant}.tar.gz")
-
-    if(WIN32)
-      set(python3_executable "<SOURCE_DIR>/python.exe")
-    else()
-      set(python3_executable "<SOURCE_DIR>/bin/python3")
-    endif()
-
-    list(JOIN pip_install " " packages)
+    set(install_dir "${MITK_BINARY_DIR}/MITK-build/python")
 
     ExternalProject_Add(${proj}
       URL ${url}
       URL_HASH ${url_hash}
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
-      INSTALL_COMMAND ${python3_executable} -m pip install --upgrade pip --no-warn-script-location
-              COMMAND ${python3_executable} -m pip install ${packages} --no-warn-script-location
+      INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>" "${install_dir}"
       DEPENDS "${proj_DEPENDENCIES}"
     )
 
-    ExternalProject_Get_Property(${proj} SOURCE_DIR)
-    set(Python3_DIR ${SOURCE_DIR})
-    set(Python3_ROOT_DIR ${SOURCE_DIR})
+    if(WIN32)
+      set(python3_executable "python.exe")
+    else()
+      set(python3_executable "bin/python3")
+    endif()
+
+    list(JOIN pip_install " " packages)
+
+    ExternalProject_Add_Step(${proj} pip
+      COMMAND ${python3_executable} -m pip install --upgrade pip --no-warn-script-location
+      COMMAND ${python3_executable} -m pip install ${packages} --no-warn-script-location
+      DEPENDEES patch
+      DEPENDERS configure
+      WORKING_DIRECTORY "<SOURCE_DIR>"
+    )
+
+    set(Python3_DIR ${install_dir})
+    set(Python3_ROOT_DIR ${install_dir})
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()

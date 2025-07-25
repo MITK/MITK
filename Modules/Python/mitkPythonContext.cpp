@@ -15,10 +15,54 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <swigpyrun.h>
 
+namespace
+{
+  fs::path Up(fs::path path, int levels)
+  {
+    while (levels-- > 0)
+      path = path.parent_path();
+
+    return path;
+  }
+
+  fs::path FindPythonHome()
+  {
+    auto appDir = fs::path(mitk::IOUtil::GetProgramPath()).remove_filename();
+
+#if defined(_WIN32)
+    auto buildTreePython = Up(appDir, 2) / "python";
+#elif defined(__APPLE__)
+    auto buildTreePython = Up(appDir, 4) / "python";
+#else
+    auto buildTreePython = Up(appDir, 1) / "python";
+#endif
+
+    if (fs::exists(buildTreePython))
+      return buildTreePython.lexically_normal();
+
+    return {}; // TODO
+  }
+}
+
 mitk::PythonContext::PythonContext()
 {
   if (!Py_IsInitialized())
   {
+    auto pythonHome = FindPythonHome();
+
+    if (!pythonHome.empty())
+    {
+#if defined(_WIN32)
+      Py_SetPythonHome(pythonHome.wstring().c_str());
+#else
+      Py_SetPythonHome(pythonHome.native().c_str());
+#endif
+    }
+    else
+    {
+      MITK_ERROR << "Could not call Py_SetPythonHome() with correct path.";
+    }
+
     Py_Initialize();
   }
 
@@ -31,7 +75,7 @@ void mitk::PythonContext::Activate()
   std::string programPath = mitk::IOUtil::GetProgramPath();
   std::replace(programPath.begin(), programPath.end(), '\\', '/');
   programPath.append("/");
-  MITK_INFO << "Program path: " <<  programPath;
+
   std::string pythonCommand;
   pythonCommand.append("import os, sys, io\n");
   pythonCommand.append("sys.path.append('" + programPath + "')\n");
@@ -232,4 +276,33 @@ std::string mitk::PythonContext::GetPythonExceptionTraceback()
     }
   }
   return errorMessage;
+}
+
+fs::path mitk::PythonContext::GetPythonHome() const
+{
+  auto pythonHome = Py_GetPythonHome();
+
+  if (!fs::exists(pythonHome))
+    return {};
+
+  return pythonHome;
+}
+
+fs::path mitk::PythonContext::GetPythonExecutable() const
+{
+  auto pythonHome = this->GetPythonHome();
+
+  if (pythonHome.empty())
+    return {};
+
+#if defined(_WIN32)
+  auto pythonExecutable = fs::path(pythonHome) / "python.exe";
+#else
+  auto pythonExecutable = fs::path(pythonHome) / "bin" / "python3";
+#endif
+
+  if (!fs::exists(pythonExecutable))
+    return {};
+
+  return pythonExecutable;
 }

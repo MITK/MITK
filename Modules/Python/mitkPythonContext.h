@@ -21,6 +21,7 @@ found in the LICENSE file.
 #pragma pop_macro("slots")
 #include <MitkPythonExports.h>
 #include "mitkCommon.h"
+#include <mitkFileSystem.h>
 
 namespace mitk
 {
@@ -101,6 +102,9 @@ namespace mitk
      * However, it won't remove packages specified via .pth paths in the user site, if any. 
      */
     void ClearVirtualEnvironmentPath();
+
+    fs::path GetPythonHome() const;
+    fs::path GetPythonExecutable() const;
 
   private:
     std::string m_CurrentUserSite;

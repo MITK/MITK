@@ -11,7 +11,14 @@ if(MITK_USE_Python3)
 
   if(TARGET ${MODULE_TARGET})
     find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED MODULE)
-    get_filename_component(MITK_PYTHON_LIBRARY_FILENAME "${Python3_LIBRARIES}" NAME)
+
+    if(WIN32)
+      get_filename_component(MITK_PYTHON_LIBRARY_FILENAME "${Python3_LIBRARIES}" NAME_WE)
+      string(APPEND MITK_PYTHON_LIBRARY_FILENAME ".dll")
+    else()
+      get_filename_component(MITK_PYTHON_LIBRARY_FILENAME "${Python3_LIBRARIES}" NAME)
+    endif()
+
     configure_file(mitkPythonHelper.h.in mitkPythonHelper.h @ONLY)
     
     if(NOT WIN32)

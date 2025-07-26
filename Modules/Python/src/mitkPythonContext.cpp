@@ -10,45 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPythonContext.h"
+#include <mitkPythonContext.h>
+#include <mitkPythonHelper.h>
 #include <mitkIOUtil.h>
-#include <mitkExceptionMacro.h>
+
 #include <swigpyrun.h>
-
-namespace
-{
-  fs::path Up(fs::path path, int levels)
-  {
-    while (levels-- > 0)
-      path = path.parent_path();
-
-    return path;
-  }
-
-  fs::path FindPythonHome()
-  {
-    auto appDir = fs::path(mitk::IOUtil::GetProgramPath()).remove_filename();
-
-#if defined(_WIN32)
-    auto buildTreePython = Up(appDir, 2) / "python";
-#elif defined(__APPLE__)
-    auto buildTreePython = Up(appDir, 4) / "python";
-#else
-    auto buildTreePython = Up(appDir, 1) / "python";
-#endif
-
-    if (fs::exists(buildTreePython))
-      return buildTreePython.lexically_normal();
-
-    return {}; // TODO
-  }
-}
 
 mitk::PythonContext::PythonContext()
 {
   if (!Py_IsInitialized())
   {
-    auto pythonHome = FindPythonHome();
+    auto pythonHome = PythonHelper::GetHomePath();
 
     if (!pythonHome.empty())
     {
@@ -99,7 +71,7 @@ std::string mitk::PythonContext::ExecuteFile(const std::string &filePath)
     PyRun_File(file, "script.py", commandType, m_GlobalDictionary.get(), m_LocalDictionary.get()));
   if (!executionResult)
   {
-    // PyErr_Print(); prints stacktrace on console 
+    // PyErr_Print(); prints stacktrace on console
     std::string traceback = this->GetPythonExceptionTraceback();
     mitkThrow() << "An error occured while running the Python code. " << traceback;
   }
@@ -115,7 +87,7 @@ std::string mitk::PythonContext::ExecuteString(const std::string &pyCommands)
     PyRun_String(pyCommands.c_str(), commandType, m_GlobalDictionary.get(), m_LocalDictionary.get()));
   if (!executionResult)
   {
-    //PyErr_Print();  prints stacktrace on console 
+    //PyErr_Print();  prints stacktrace on console
     std::string traceback = this->GetPythonExceptionTraceback();
     mitkThrow() << "An error occured while running the Python code. " << traceback;
   }
@@ -168,17 +140,20 @@ mitk::Image* mitk::PythonContext::LoadImageFromPython(const std::string &varName
 void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData, const std::string &varName)
 {
   PyGILState_STATE state = PyGILState_Ensure();
+
   std::string pythonCommand;
   pythonCommand.append(varName);
   pythonCommand.append(" = None\n");
   pythonCommand.append("def _receive(image_from_cxx):\n"
-                       "    print('receive called with %s', image_from_cxx)\n"
-                       "    print('Python transferred image has dimension', image_from_cxx.GetDimension())\n"
+                       //"    print('receive called with %s', image_from_cxx)\n"
+                       //"    print('Python transferred image has dimension', image_from_cxx.GetDimension())\n"
                        "    global " + varName + "\n"
                        "    " + varName + " = image_from_cxx\n");
   this->ExecuteString(pythonCommand.c_str());
+
   int owned = 0;
   swig_type_info *pTypeInfo = nullptr;
+
   if (dynamic_cast<mitk::Image *>(mitkBaseData))
   {
     pTypeInfo = SWIG_TypeQuery("_p_mitk__Image");
@@ -187,17 +162,22 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData,
   {
     MITK_INFO << "Object is of unsupported type";
   }
+
   PyObject *pInstance = SWIG_NewPointerObj(reinterpret_cast<void *>(mitkBaseData), pTypeInfo, owned);
+
   if (nullptr == pInstance)
   {
     MITK_ERROR << "Something went wrong creating the Python instance of the image\n";
   }
+
   PyObject *receive = PyDict_GetItemString(m_LocalDictionary.get(), "_receive");
   PyObjectPtr result(PyObject_CallFunctionObjArgs(receive, pInstance, NULL));
+
   if (nullptr == result)
   {
     MITK_ERROR << "Something went wrong setting the image in Python\n";
   }
+
   PyGILState_Release(state);
 }
 
@@ -274,31 +254,3 @@ std::string mitk::PythonContext::GetPythonExceptionTraceback()
   return errorMessage;
 }
 
-fs::path mitk::PythonContext::GetPythonHome() const
-{
-  auto pythonHome = Py_GetPythonHome();
-
-  if (!fs::exists(pythonHome))
-    return {};
-
-  return pythonHome;
-}
-
-fs::path mitk::PythonContext::GetPythonExecutable() const
-{
-  auto pythonHome = this->GetPythonHome();
-
-  if (pythonHome.empty())
-    return {};
-
-#if defined(_WIN32)
-  auto pythonExecutable = fs::path(pythonHome) / "python.exe";
-#else
-  auto pythonExecutable = fs::path(pythonHome) / "bin" / "python3";
-#endif
-
-  if (!fs::exists(pythonExecutable))
-    return {};
-
-  return pythonExecutable;
-}

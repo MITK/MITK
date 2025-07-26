@@ -11,17 +11,19 @@ found in the LICENSE file.
 ============================================================================*/
 #ifndef mitkPythonContext_h
 #define mitkPythonContext_h
+
 #define PY_SSIZE_T_CLEAN
 
 #include <itkLightObject.h>
 #include <mitkImage.h>
+
 #pragma push_macro("slots")
 #undef slots
-#include "Python.h"
+#include <Python.h>
 #pragma pop_macro("slots")
+
 #include <MitkPythonExports.h>
-#include "mitkCommon.h"
-#include <mitkFileSystem.h>
+#include <mitkCommon.h>
 
 namespace mitk
 {
@@ -29,15 +31,15 @@ namespace mitk
   {
     void operator()(PyObject *obj) const { Py_XDECREF(obj); }
   };
-  using PyObjectPtr = std::unique_ptr<PyObject, PyObjectDeleter>;
 
+  using PyObjectPtr = std::unique_ptr<PyObject, PyObjectDeleter>;
 
   class MITKPYTHON_EXPORT PythonContext : public itk::LightObject
   {
   public:
     mitkClassMacroItkParent(PythonContext, itk::LightObject);
     itkFactorylessNewMacro(Self);
-    
+
     PythonContext();
     ~PythonContext();
 
@@ -48,7 +50,7 @@ namespace mitk
     void Activate();
 
     /**
-     * @brief Check if given variable exists in the current context defined by 
+     * @brief Check if given variable exists in the current context defined by
      * `globals` (m_GlobalDictionary) & `locals` (m_LocalDictionary) namespaces.
      */
     bool HasVariable(const std::string &varName);
@@ -66,13 +68,13 @@ namespace mitk
     void TransferBaseDataToPython(mitk::BaseData *mitkImage, const std::string &varName = "_mitk_image");
 
     /**
-     * @brief Executes the given python syntax in the current context defined by 
+     * @brief Executes the given python syntax in the current context defined by
      * `globals` (m_GlobalDictionary) & `locals` (m_LocalDictionary) namespaces.
      */
     std::string ExecuteString(const std::string &pyCommands);
 
     /**
-     * @brief Executes the given python file in the current context defined by 
+     * @brief Executes the given python file in the current context defined by
      * `globals` (m_GlobalDictionary) & `locals` (m_LocalDictionary)
      */
     std::string ExecuteFile(const std::string &filePath);
@@ -91,7 +93,7 @@ namespace mitk
 
     /**
      * @brief Sets user-site from a (e.g virtual environment site-packages) directory.
-     * The packages and .pth files inside the site is added to `sys.path` by using 
+     * The packages and .pth files inside the site is added to `sys.path` by using
      * `site.addsitedir` call.
      * See: https://docs.python.org/3/library/site.html#site.addsitedir
      */
@@ -99,17 +101,16 @@ namespace mitk
 
      /**
      * @brief Removes the current VirtualEnvironment site-package path from `sys.path`.
-     * However, it won't remove packages specified via .pth paths in the user site, if any. 
+     * However, it won't remove packages specified via .pth paths in the user site, if any.
      */
     void ClearVirtualEnvironmentPath();
-
-    fs::path GetPythonHome() const;
-    fs::path GetPythonExecutable() const;
 
   private:
     std::string m_CurrentUserSite;
     PyObjectPtr m_GlobalDictionary;
     PyObjectPtr m_LocalDictionary;
   };
-} // namespace mitk
+}
+
 #endif
+

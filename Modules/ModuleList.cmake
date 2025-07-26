@@ -57,6 +57,7 @@ set(MITK_MODULES
   DICOMPM
   ROI
   PET
+  PythonHelper
   Python
   PythonSegmentation
   PythonSegmentationUI

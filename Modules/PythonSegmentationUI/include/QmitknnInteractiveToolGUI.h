@@ -56,7 +56,7 @@ protected:
   mitk::nnInteractiveTool* GetTool();
   void UncheckOtherInteractorButtons(QPushButton* interactorButton);
 
-  bool Install(const QString& pythonExecutable);
+  bool Install();
 
 private:
   Ui::QmitknnInteractiveToolGUI* m_Ui;

@@ -28,7 +28,7 @@ class QmitknnInteractiveInstallDialog : public QDialog
   Q_OBJECT
 
 public:
-  QmitknnInteractiveInstallDialog(const QString& pythonExecutable, QWidget* parent = nullptr);
+  explicit QmitknnInteractiveInstallDialog(QWidget* parent = nullptr);
   ~QmitknnInteractiveInstallDialog() override;
 
 protected:
@@ -46,7 +46,6 @@ protected:
   void AutoScrollToBottom();
 
 private:
-  QString m_PythonExecutable;
   Ui::QmitknnInteractiveInstallDialog* m_Ui;
   QProcess* m_Process;
   InstallStep m_InstallStep;

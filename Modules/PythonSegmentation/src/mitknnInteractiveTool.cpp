@@ -405,17 +405,12 @@ void mitk::nnInteractiveTool::ConfirmCleanUp()
   this->ConfirmCleanUpEvent.Send(true);
 }
 
-bool mitk::nnInteractiveTool::CreatePythonContext()
+void mitk::nnInteractiveTool::CreatePythonContext()
 {
   auto pythonContext = PythonContext::New();
-
-  if (pythonContext->GetPythonExecutable().empty())
-    return false;
-
   pythonContext->Activate();
-  m_Impl->SetPythonContext(pythonContext);
 
-  return true;
+  m_Impl->SetPythonContext(pythonContext);
 }
 
 mitk::PythonContext* mitk::nnInteractiveTool::GetPythonContext() const

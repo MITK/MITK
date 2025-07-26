@@ -56,7 +56,7 @@ namespace mitk
 
     std::optional<nnInteractive::Backend> GetBackend() const;
 
-    bool CreatePythonContext();
+    void CreatePythonContext();
     PythonContext* GetPythonContext() const;
     bool IsInstalled();
     void StartSession();

@@ -270,12 +270,12 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
   connect(m_Ui->maskButton, &QPushButton::clicked, this, &Self::OnMaskButtonClicked);
 }
 
-bool QmitknnInteractiveToolGUI::Install(const QString& pythonExecutable)
+bool QmitknnInteractiveToolGUI::Install()
 {
   if (this->GetTool()->IsInstalled())
     return true;
 
-  QmitknnInteractiveInstallDialog installDialog(pythonExecutable);
+  QmitknnInteractiveInstallDialog installDialog;
   return installDialog.exec() == QDialog::Accepted;
 }
 
@@ -283,16 +283,9 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 {
   m_Ui->initializeButton->setEnabled(false);
 
-  if (!this->GetTool()->CreatePythonContext())
-  {
-    QMessageBox::critical(this, "Python not found", "The MITK-internal Python interpreter was not found!");
-    m_Ui->initializeButton->setEnabled(true);
-    return;
-  }
+  this->GetTool()->CreatePythonContext();
 
-  auto pythonExecutable = QString::fromStdString(this->GetTool()->GetPythonContext()->GetPythonExecutable().string());
-
-  if (!this->Install(pythonExecutable))
+  if (!this->Install())
   {
     m_Ui->initializeButton->setEnabled(true);
     return;

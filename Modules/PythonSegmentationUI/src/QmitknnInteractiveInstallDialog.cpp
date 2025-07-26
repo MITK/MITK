@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <ui_QmitknnInteractiveInstallDialog.h>
 
 #include <mitkLogMacros.h>
+#include <mitkPythonHelper.h>
 
 #include <QMessageBox>
 #include <QProcess>
@@ -29,9 +30,8 @@ namespace
 
 using Self = QmitknnInteractiveInstallDialog;
 
-QmitknnInteractiveInstallDialog::QmitknnInteractiveInstallDialog(const QString& pythonExecutable, QWidget* parent)
+QmitknnInteractiveInstallDialog::QmitknnInteractiveInstallDialog(QWidget* parent)
   : QDialog(parent),
-    m_PythonExecutable(pythonExecutable),
     m_Ui(new Ui::QmitknnInteractiveInstallDialog),
     m_Process(new QProcess(this)),
 #if defined(Q_OS_WIN)
@@ -71,7 +71,7 @@ void QmitknnInteractiveInstallDialog::OnYesClicked()
     args.append(NNINTERACTIVE);
   }
 
-  m_Process->start(m_PythonExecutable, args);
+  m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
 }
 
 void QmitknnInteractiveInstallDialog::OnStandardOutputReady()
@@ -117,7 +117,7 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
       m_InstallStep = InstallStep::nnInteractive;
 
       QStringList args = { "-m", "pip", "install", "--no-warn-script-location", NNINTERACTIVE };
-      m_Process->start(m_PythonExecutable, args);
+      m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
     }
     else
     {

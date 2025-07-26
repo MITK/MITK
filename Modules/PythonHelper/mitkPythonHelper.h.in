@@ -9,23 +9,21 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef mitkIPythonService_h
-#define mitkIPythonService_h
 
-#include <mitkServiceInterface.h>
-#include <MitkPythonExports.h>
-#include "mitkCommon.h"
+#ifndef mitkPythonHelper_h
+#define mitkPythonHelper_h
 
-namespace mitk
+#include <mitkFileSystem.h>
+#include <MitkPythonHelperExports.h>
+
+#cmakedefine MITK_PYTHON_LIBRARY_FILENAME "@MITK_PYTHON_LIBRARY_FILENAME@"
+
+namespace mitk::PythonHelper
 {
-
-  class MITKPYTHON_EXPORT IPythonService
-  {
-  public:
-    IPythonService();      
-    ~IPythonService() = default;
-  };
+  MITKPYTHONHELPER_EXPORT fs::path GetHomePath();
+  MITKPYTHONHELPER_EXPORT fs::path GetLibraryPath();
+  MITKPYTHONHELPER_EXPORT fs::path GetExecutablePath();
 }
-MITK_DECLARE_SERVICE_INTERFACE(mitk::IPythonService, "org.mitk.services.IPythonService")
 
 #endif
+

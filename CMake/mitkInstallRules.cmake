@@ -83,7 +83,13 @@ endif()
 # Install Python3
 
 if(MITK_USE_Python3)
-  install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/src/Python3/" DESTINATION "python" USE_SOURCE_PERMISSIONS)
+  if(APPLE)
+    set(_install_DESTINATION "../Resources/python")
+    MITK_INSTALL(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/src/Python3/" USE_SOURCE_PERMISSIONS)
+    set(_install_DESTINATION "")
+  else()
+    install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/src/Python3/" DESTINATION "python" USE_SOURCE_PERMISSIONS)
+  endif()
 endif()
 
 # Install pyMITK

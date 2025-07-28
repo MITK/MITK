@@ -59,14 +59,18 @@ fs::path mitk::PythonHelper::GetHomePath()
   if (fs::exists(buildTreePython) && fs::is_directory(buildTreePython))
     return buildTreePython.lexically_normal();
 
+#if defined(__APPLE__)
+  auto installedPython = Up(appDir, 1) / "Resources" / "python";
+#else
   auto installedPython = Up(appDir, 1) / "python";
+#endif
 
   if (fs::exists(installedPython) && fs::is_directory(installedPython))
   {
     if (IsDirectoryWritable(installedPython))
       return installedPython.lexically_normal();
 
-    // TODO: Copy to writable location
+    // TODO: Copy to writable location / use venv in writable location
   }
 
   return {};

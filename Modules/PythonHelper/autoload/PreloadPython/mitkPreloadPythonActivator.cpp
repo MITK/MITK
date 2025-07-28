@@ -18,12 +18,12 @@ found in the LICENSE file.
 
 #include <usModuleActivator.h>
 
-#if defined(__linux__)
-#include <dlfcn.h>
-#elif defined(_WIN32)
+#if defined(_WIN32)
 #include <array>
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#else
+#include <dlfcn.h>
 #endif
 
 namespace
@@ -62,10 +62,7 @@ namespace mitk
       const auto pythonLibrary = PythonHelper::GetLibraryPath();
       MITK_INFO << "Preload Python: " << pythonLibrary.string();
 
-#if defined(__linux__)
-      if (dlopen(pythonLibrary.string().c_str(), RTLD_NOW | RTLD_GLOBAL) == nullptr)
-        MITK_ERROR << "Failed to preload Python: " << dlerror();
-#elif defined(_WIN32)
+#if defined(_WIN32)
       // Tell Hugging Face to not use symlinks on Windows as it requires either
       // admin rights or Windows to be in developer mode.
       SetEnvironmentVariableA("HF_HUB_DISABLE_SYMLINKS", "1");
@@ -74,6 +71,9 @@ namespace mitk
 
       if (handle == nullptr)
         MITK_ERROR << "Failed to preload Python: " << GetLastErrorAsString();
+#else
+      if (dlopen(pythonLibrary.string().c_str(), RTLD_NOW | RTLD_GLOBAL) == nullptr)
+        MITK_ERROR << "Failed to preload Python: " << dlerror();
 #endif
     }
 

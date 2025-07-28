@@ -199,6 +199,8 @@ macro(_fixup_target)
 
     if(APPLE)
       include(FixMacOSInstaller)
+    elseif(WIN32)
+      include(FixWindowsInstaller)
     endif()
   ")
 endmacro()

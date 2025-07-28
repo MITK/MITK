@@ -22,6 +22,26 @@ namespace
 
     return path;
   }
+
+  bool IsDirectoryWritable(const fs::path& path)
+  {
+    if (!fs::is_directory(path))
+      return false;
+
+    const auto testFile = path / ".is_writable.tmp";
+    std::ofstream stream(testFile.string());
+
+    if (!stream.is_open())
+      return false;
+
+    stream << "delete me";
+    stream.close();
+
+    std::error_code error;
+    fs::remove(testFile, error);
+
+    return !error;
+  }
 }
 
 fs::path mitk::PythonHelper::GetHomePath()
@@ -36,8 +56,18 @@ fs::path mitk::PythonHelper::GetHomePath()
   auto buildTreePython = Up(appDir, 1) / "python";
 #endif
 
-  if (fs::exists(buildTreePython))
+  if (fs::exists(buildTreePython) && fs::is_directory(buildTreePython))
     return buildTreePython.lexically_normal();
+
+  auto installedPython = Up(appDir, 1) / "python";
+
+  if (fs::exists(installedPython) && fs::is_directory(installedPython))
+  {
+    if (IsDirectoryWritable(installedPython))
+      return installedPython.lexically_normal();
+
+    // TODO: Copy to writable location
+  }
 
   return {};
 }

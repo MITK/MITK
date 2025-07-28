@@ -80,6 +80,12 @@ if(_mitk_executable_targets)
   endforeach()
 endif()
 
+# Install Python3
+
+if(MITK_USE_Python3)
+  install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/src/Python3/" DESTINATION "python")
+endif()
+
 # Install pyMITK
 
 if(MITK_WRAP_PYTHON_ENABLED)

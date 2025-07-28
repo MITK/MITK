@@ -18,7 +18,36 @@ found in the LICENSE file.
 
 #include <usModuleActivator.h>
 
+#if defined(__linux__)
 #include <dlfcn.h>
+#elif defined(_WIN32)
+#include <array>
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#endif
+
+namespace
+{
+#if defined(_WIN32)
+  std::string GetLastErrorAsString()
+  {
+    std::array<char, 1024> buffer;
+
+    auto size = FormatMessageA(
+      FORMAT_MESSAGE_FROM_SYSTEM |
+      FORMAT_MESSAGE_IGNORE_INSERTS,
+      nullptr,
+      GetLastError(),
+      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+      buffer.data(),
+      static_cast<DWORD>(buffer.size()),
+      nullptr
+    );
+
+    return std::string(buffer.data(), size);
+  }
+#endif
+}
 
 namespace mitk
 {
@@ -32,9 +61,16 @@ namespace mitk
     {
       const auto pythonLibrary = PythonHelper::GetLibraryPath();
       MITK_INFO << "Preload Python: " << pythonLibrary.string();
-      
+
+#if defined(__linux__)
       if (dlopen(pythonLibrary.string().c_str(), RTLD_NOW | RTLD_GLOBAL) == nullptr)
         MITK_ERROR << "Failed to preload Python: " << dlerror();
+#elif defined(_WIN32)
+      auto handle = LoadLibraryEx(pythonLibrary.string().c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
+
+      if (handle == nullptr)
+        MITK_ERROR << "Failed to preload Python: " << GetLastErrorAsString();
+#endif
     }
 
     void Unload(us::ModuleContext*) override

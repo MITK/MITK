@@ -21,9 +21,7 @@ if(MITK_USE_Python3)
 
     configure_file(mitkPythonHelper.h.in mitkPythonHelper.h @ONLY)
     
-    if(NOT WIN32)
-      add_subdirectory(autoload/PreloadPython)
-    endif()
+    add_subdirectory(autoload/PreloadPython)
   endif()
 endif()
 

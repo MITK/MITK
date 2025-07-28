@@ -83,7 +83,7 @@ endif()
 # Install Python3
 
 if(MITK_USE_Python3)
-  install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/src/Python3/" DESTINATION "python")
+  install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/src/Python3/" DESTINATION "python" USE_SOURCE_PERMISSIONS)
 endif()
 
 # Install pyMITK

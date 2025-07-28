@@ -66,6 +66,10 @@ namespace mitk
       if (dlopen(pythonLibrary.string().c_str(), RTLD_NOW | RTLD_GLOBAL) == nullptr)
         MITK_ERROR << "Failed to preload Python: " << dlerror();
 #elif defined(_WIN32)
+      // Tell Hugging Face to not use symlinks on Windows as it requires either
+      // admin rights or Windows to be in developer mode.
+      SetEnvironmentVariableA("HF_HUB_DISABLE_SYMLINKS", "1");
+
       auto handle = LoadLibraryEx(pythonLibrary.string().c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
 
       if (handle == nullptr)

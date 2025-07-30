@@ -80,27 +80,34 @@ if(_mitk_executable_targets)
   endforeach()
 endif()
 
-# Install Python3
+# Install Python3 and pyMITK
 
 if(MITK_USE_Python3)
   if(APPLE)
-    set(_install_DESTINATION "../Resources/python")
-    MITK_INSTALL(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/src/Python3/" USE_SOURCE_PERMISSIONS)
-    set(_install_DESTINATION "")
+    set(_python_dest "../Resources/python")
   else()
-    install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/src/Python3/" DESTINATION "python" USE_SOURCE_PERMISSIONS)
+    set(_python_dest "../python")
   endif()
-endif()
 
-# Install pyMITK
+  set(_install_DESTINATION "${_python_dest}")
 
-if(MITK_WRAP_PYTHON_ENABLED)
-  MITK_INSTALL(TARGETS pyMITK)
-  if(WIN32)
-    MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/pyMITK.py")
-  else()
-    MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/pyMITK.py")
+  MITK_INSTALL(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/src/Python3/" USE_SOURCE_PERMISSIONS)
+
+  if(MITK_WRAP_PYTHON_ENABLED)
+    file(RELATIVE_PATH _rel_sitearch "${Python3_ROOT_DIR}" "${Python3_SITEARCH}")
+    set(_install_DESTINATION "${_python_dest}/${_rel_sitearch}/pyMITK")
+
+    MITK_INSTALL(TARGETS pyMITK) # Will be renamed to __init__.py by the
+                                 # Fix<OS>Installer.cmake scripts.
+
+    if(WIN32)
+      MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/pyMITK.py")
+    else()
+      MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/pyMITK.py")
+    endif()
   endif()
+
+  set(_install_DESTINATION "")
 endif()
 
 # Install Qt plugins

@@ -78,7 +78,10 @@ void QmitknnInteractiveInstallDialog::OnStandardOutputReady()
 {
   auto output = QString::fromLocal8Bit(m_Process->readAllStandardOutput());
   output.replace('\n', "<br>");
+
+  m_Ui->textEdit->moveCursor(QTextCursor::End);
   m_Ui->textEdit->insertHtml(QString("<span style=\"font-family: 'Courier New', monospace\">%1</span>").arg(output));
+
   this->AutoScrollToBottom();
 }
 
@@ -86,7 +89,10 @@ void QmitknnInteractiveInstallDialog::OnStandardErrorReady()
 {
   auto errorOutput = QString::fromLocal8Bit(m_Process->readAllStandardError());
   errorOutput.replace('\n', "<br>");
+
+  m_Ui->textEdit->moveCursor(QTextCursor::End);
   m_Ui->textEdit->insertHtml(QString("<span style=\"font-family: 'Courier New', monospace; color: red\">%1</span>").arg(errorOutput));
+
   this->AutoScrollToBottom();
 }
 

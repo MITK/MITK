@@ -186,9 +186,9 @@ Structured properties (representing more complex properties (e.g. `TemporoSpatia
    "value": <property_content>
   }
 ```
-- <property_name>: Name of the property
-- <property_class_name>: Name of the property class that is persisted here
-- <property_content>: JSON content of the property
+- \<property_name\>: Name of the property
+- \<property_class_name\>: Name of the property class that is persisted here
+- \<property_content\>: JSON content of the property
 
 Example for a structured property stored at group or label level:
 ```json

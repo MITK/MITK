@@ -29,7 +29,6 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usModuleResource.h>
 #include <usServiceReference.h>
-#include <omp.h>
 
 namespace mitk
 {

@@ -17,7 +17,10 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageConverter.h>
 #include <vtkPolyDataNormals.h>
+
+#ifdef MITK_USE_OpenMP
 #include <omp.h>
+#endif
 
 namespace mitk
 {
@@ -105,8 +108,10 @@ namespace mitk
       int numLabels = static_cast<int>(labels.size());
       m_SurfaceNodes.reserve(numLabels);
 
+#ifdef MITK_USE_OpenMP
       omp_lock_t lock;
       omp_init_lock(&lock);
+#endif
 
       #pragma omp parallel for
       for (int i = 0; i < numLabels; ++i)
@@ -134,12 +139,18 @@ namespace mitk
         node->SetColor(labels[i]->GetColor());
         node->SetName(labels[i]->GetName());
 
+#ifdef MITK_USE_OpenMP
         omp_set_lock(&lock);
+#endif
         m_SurfaceNodes.push_back(node);
+#ifdef MITK_USE_OpenMP
         omp_unset_lock(&lock);
+#endif
       }
 
+#ifdef MITK_USE_OpenMP
       omp_destroy_lock(&lock);
+#endif
     }
     else
     {

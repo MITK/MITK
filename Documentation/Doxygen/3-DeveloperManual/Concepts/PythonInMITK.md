@@ -22,7 +22,7 @@ At first glance, solutions like Conda, Micromamba, or the officially provided em
 
 However, it's a classic "too good to be true" scenario. All of these solutions share a fundamental flaw: **they are not truly isolated**. Instead, they are dynamically linked to various system libraries and other dependencies.
 
-Sooner or later, you'll run into issues like failed builds or runtime crashes due to **binary-incompatible versions of shared dependencies** like Zlib, OpenMP, or others. These libraries are loaded dynamically at runtime and may export the same symbols, leading to symbol collisions, undefined behavior, or crashes. It quickly becomes a mess.
+Sooner or later, you'll run into issues like failed builds or runtime crashes due to **binary-incompatible versions of shared dependencies** like Zlib for example. These libraries are loaded dynamically at runtime and may export the same symbols, leading to symbol collisions, undefined behavior, or crashes. It quickly becomes a mess.
 
 ## Standalone Python Builds to the rescue
 

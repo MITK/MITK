@@ -93,18 +93,16 @@ if(MITK_USE_Python3)
 
   MITK_INSTALL(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/src/Python3/" USE_SOURCE_PERMISSIONS)
 
-  if(MITK_WRAP_PYTHON_ENABLED)
-    file(RELATIVE_PATH _rel_sitearch "${Python3_ROOT_DIR}" "${Python3_SITEARCH}")
-    set(_install_DESTINATION "${_python_dest}/${_rel_sitearch}/pyMITK")
+  file(RELATIVE_PATH _rel_sitearch "${Python3_ROOT_DIR}" "${Python3_SITEARCH}")
+  set(_install_DESTINATION "${_python_dest}/${_rel_sitearch}/pyMITK")
 
-    MITK_INSTALL(TARGETS pyMITK) # Will be renamed to __init__.py by the
-                                 # Fix<OS>Installer.cmake scripts.
+  MITK_INSTALL(TARGETS pyMITK) # Will be renamed to __init__.py by the
+                               # Fix<OS>Installer.cmake scripts.
 
-    if(WIN32)
-      MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/pyMITK.py")
-    else()
-      MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/pyMITK.py")
-    endif()
+  if(WIN32)
+    MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/pyMITK.py")
+  else()
+    MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/pyMITK.py")
   endif()
 
   set(_install_DESTINATION "")

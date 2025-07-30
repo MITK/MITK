@@ -251,8 +251,7 @@ endforeach()
 # MITK superbuild
 
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-option(MITK_USE_OpenMP "Use OpenMP" OFF)
-option(MITK_USE_Python3 "Use Python 3" OFF)
+option(MITK_USE_OpenMP "Use OpenMP" ON)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -445,8 +444,10 @@ if(MITK_USE_Python3)
     endif()
   endif()
 
-  set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
-  set(MITK_USE_SWIG ON CACHE BOOL "" FORCE)
+  if(APPLE AND MITK_USE_OpenMP)
+    message(WARNING "OpenMP is not supported on macOS when MITK_USE_Python3 is enabled.")
+    set(MITK_USE_OpenMP OFF CACHE BOOL "" FORCE)
+  endif()
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
@@ -1094,18 +1095,11 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER
 
 add_subdirectory(Utilities)
 
-set(MITK_WRAP_PYTHON_ENABLED OFF)
-if(MITK_USE_SWIG AND MITK_USE_Python3)
+if(MITK_USE_SWIG)
   set(SWIG_VERSION 4.3.0 CACHE STRING "" FORCE)
   find_package(SWIG ${SWIG_VERSION} COMPONENTS python)
 
-  if(SWIG_FOUND)
-    option(MITK_WRAP_PYTHON "" ON)
-
-    if(MITK_WRAP_PYTHON)
-      set(MITK_WRAP_PYTHON_ENABLED ON)
-    endif()
-  else()
+  if(NOT SWIG_FOUND)
    message(SEND_ERROR "SWIG not found!")
   endif()
 endif()

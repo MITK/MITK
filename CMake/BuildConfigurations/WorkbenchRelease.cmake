@@ -2,6 +2,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/Default.cmake)
 
 set(MITK_CONFIG_PACKAGES ${MITK_CONFIG_PACKAGES}
   MatchPoint
+  SWIG
   Python3
 )
 

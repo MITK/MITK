@@ -2,11 +2,11 @@
 # Python Standalone Builds
 #------------------------------------------------------------
 
-set(proj Python3)
-set(proj_DEPENDENCIES )
-set(${proj}_DEPENDS ${proj})
+if(MITK_USE_Python3)
+  set(proj Python3)
+  set(proj_DEPENDENCIES )
+  set(${proj}_DEPENDS ${proj})
 
-if(MITK_USE_${proj})
   # Sanity checks
   if(DEFINED ${proj}_DIR AND NOT EXISTS "${${proj}_DIR}")
     message(FATAL_ERROR "${proj}_DIR variable is defined but corresponds to non-existing directory")

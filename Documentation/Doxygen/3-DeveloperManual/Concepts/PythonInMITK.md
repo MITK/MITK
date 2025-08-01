@@ -22,7 +22,7 @@ At first glance, solutions like Conda, Micromamba, or the officially provided em
 
 However, it's a classic "too good to be true" scenario. All of these solutions share a fundamental flaw: **they are not truly isolated**. Instead, they are dynamically linked to various system libraries and other dependencies.
 
-Sooner or later, you'll run into issues like failed builds or runtime crashes due to **binary-incompatible versions of shared dependencies** like Zlib for example. These libraries are loaded dynamically at runtime and may export the same symbols, leading to symbol collisions, undefined behavior, or crashes. It quickly becomes a mess.
+Sooner or later, you'll run into issues like failed builds or runtime crashes due to **binary-incompatible versions of shared dependencies**. These libraries are loaded dynamically at runtime and may export the same symbols, leading to symbol collisions, undefined behavior, or crashes. It quickly becomes a mess.
 
 ## Standalone Python Builds to the rescue
 
@@ -65,7 +65,7 @@ Leaving Python wrapping aside for now, the Python integration in MITK is split i
 
 1. **MitkPythonHelper**: This module **does not** link against the Python library. It mainly provides utility functions to query paths such as the Python home directory, the Python library, and the Python executable - all of which may differ between the build tree and installed versions of MITK.
 
-2. **MitkPreloadPython**: This module **does not** depend on the Python library at link time. It is automatically loaded with the **MitkCore** module. Its sole purpose is to load the correct Python library at runtime with **global symbol visibility** as early as possible to prevent later loads (e.g., via link-time dependencies of other modules) from restricting symbol visibility or accidentally loading a Python library from a different location.
+2. **MitkPreloadPython**: This module **does not** depend on the Python library at link time. It is automatically loaded with the **MitkCore** module. Its sole purpose is to load the correct Python library at runtime with **global symbol visibility** as early as possible to prevent later loads (e.g., via link-time dependencies of other modules) from restricting symbol visibility or accidentally loading a Python library from a different location. It also sets and unsets a few environment variables to ensure a clean and functioning Python environment.
 
 3. **MitkPython**: This module **does** link against the Python library. It provides the `mitk::PythonContext` class, which serves as the main bridge between MITK and Python.
 

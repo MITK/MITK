@@ -60,7 +60,7 @@ void QmitknnInteractiveInstallDialog::OnYesClicked()
   m_Ui->progressBar->setRange(0, 0);
   m_Ui->textEdit->clear();
 
-  QStringList args = { "-m", "pip", "install", "--no-warn-script-location" };
+  QStringList args = { "-m", "pip", "install" };
 
   if (m_InstallStep == InstallStep::PyTorch) // Only on Windows
   {
@@ -122,7 +122,7 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
     {
       m_InstallStep = InstallStep::nnInteractive;
 
-      QStringList args = { "-m", "pip", "install", "--no-warn-script-location", NNINTERACTIVE };
+      QStringList args = { "-m", "pip", "install", NNINTERACTIVE };
       m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
     }
     else

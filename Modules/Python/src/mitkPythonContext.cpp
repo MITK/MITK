@@ -18,21 +18,10 @@ found in the LICENSE file.
 
 mitk::PythonContext::PythonContext()
 {
+
+
   if (!Py_IsInitialized())
-  {
-    auto pythonHome = PythonHelper::GetHomePath();
-
-    if (!pythonHome.empty())
-    {
-      Py_SetPythonHome(pythonHome.wstring().c_str());
-    }
-    else
-    {
-      MITK_ERROR << "Could not call Py_SetPythonHome() with correct path.";
-    }
-
     Py_Initialize();
-  }
 
   m_GlobalDictionary.reset(PyDict_New());
   m_LocalDictionary.reset(PyDict_New());

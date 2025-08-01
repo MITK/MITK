@@ -13,6 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPreloadPythonActivator_h
 #define mitkPreloadPythonActivator_h
 
+#include <mitkEnvironment.h>
 #include <mitkLog.h>
 #include <mitkPythonHelper.h>
 
@@ -59,19 +60,29 @@ namespace mitk
 
     void Load(us::ModuleContext*) override
     {
+      const auto pythonHome = PythonHelper::GetHomePath();
       const auto pythonLibrary = PythonHelper::GetLibraryPath();
+
       MITK_INFO << "Preload Python: " << pythonLibrary.string();
 
+      UnsetEnv("PYTHONHOME");
+      UnsetEnv("VIRTUAL_ENV");
+
 #if defined(_WIN32)
+      AddPathEnv(pythonHome);
+      AddPathEnv(pythonHome / "Scripts");
+
       // Tell Hugging Face to not use symlinks on Windows as it requires either
       // admin rights or Windows to be in developer mode.
-      SetEnvironmentVariableA("HF_HUB_DISABLE_SYMLINKS", "1");
+      SetEnv("HF_HUB_DISABLE_SYMLINKS", "1");
 
       auto handle = LoadLibraryEx(pythonLibrary.string().c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
 
       if (handle == nullptr)
         MITK_ERROR << "Failed to preload Python: " << GetLastErrorAsString();
 #else
+      AddPathEnv(pythonHome / "bin");
+
       if (dlopen(pythonLibrary.string().c_str(), RTLD_NOW | RTLD_GLOBAL) == nullptr)
         MITK_ERROR << "Failed to preload Python: " << dlerror();
 #endif

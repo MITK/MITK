@@ -437,44 +437,50 @@ bool mitk::nnInteractiveTool::IsInstalled()
 
 void mitk::nnInteractiveTool::StartSession()
 {
-  constexpr auto MODEL = "nnInteractive_v1.0";
+  constexpr auto MODEL_CHECKPOINT = "nnInteractive_v1.0";
 
   if (this->IsSessionRunning())
     this->EndSession();
 
-  std::ostringstream pyCommands; pyCommands
-    << "import torch\n"
-    << "import nnInteractive\n"
-    << "from pathlib import Path\n"
-    << "from nnunetv2.utilities.find_class_by_name import recursive_find_python_class\n"
-    << "from batchgenerators.utilities.file_and_folder_operations import join, load_json\n"
-    << "from huggingface_hub import snapshot_download\n"
-    << "repo_id = 'nnInteractive/nnInteractive'\n"
-    << "download_path = snapshot_download(\n"
-    << "    repo_id = repo_id,\n"
-    << "    allow_patterns = ['" << MODEL << "/*'],\n"
-    << "    force_download = False\n"
-    << ")\n"
-    << "checkpoint_path = Path(download_path).joinpath('" << MODEL << "')\n";
-
   auto pythonContext = m_Impl->GetPythonContext();
-  pythonContext->ExecuteString(pyCommands.str());
 
-  pyCommands.clear(); pyCommands
-    << "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
-    << "    inference_class = load_json(\n"
-    << "        Path(checkpoint_path).joinpath('inference_session_class.json'))\n"
-    << "    if isinstance (inference_class, dict):\n"
-    << "        inference_class = inference_class['inference_class']\n"
-    << "else:\n"
-    << "    inference_class = 'nnInteractiveInferenceSession'\n"
-    << "inference_class = recursive_find_python_class(\n"
-    << "    join(nnInteractive.__path__[0], 'inference'),\n"
-    << "    inference_class,\n"
-    << "    'nnInteractive.inference'\n"
-    << ")\n";
+  {
+    std::ostringstream pyCommands; pyCommands
+      << "import torch\n"
+      << "import nnInteractive\n"
+      << "from importlib.metadata import version\n"
+      << "from pathlib import Path\n"
+      << "from nnunetv2.utilities.find_class_by_name import recursive_find_python_class\n"
+      << "from batchgenerators.utilities.file_and_folder_operations import join, load_json\n"
+      << "from huggingface_hub import snapshot_download\n"
+      << "print(f'nnInteractive version: {version(\"nnInteractive\")}')\n"
+      << "print('Model checkpoint: " << MODEL_CHECKPOINT << "')\n"
+      << "repo_id = 'nnInteractive/nnInteractive'\n"
+      << "download_path = snapshot_download(\n"
+      << "    repo_id = repo_id,\n"
+      << "    allow_patterns = ['" << MODEL_CHECKPOINT << "/*'],\n"
+      << "    force_download = False\n"
+      << ")\n"
+      << "checkpoint_path = Path(download_path).joinpath('" << MODEL_CHECKPOINT << "')\n";
+    pythonContext->ExecuteString(pyCommands.str());
+  }
 
-  pythonContext->ExecuteString(pyCommands.str());
+  {
+    std::ostringstream pyCommands; pyCommands
+      << "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
+      << "    inference_class = load_json(\n"
+      << "        Path(checkpoint_path).joinpath('inference_session_class.json'))\n"
+      << "    if isinstance (inference_class, dict):\n"
+      << "        inference_class = inference_class['inference_class']\n"
+      << "else:\n"
+      << "    inference_class = 'nnInteractiveInferenceSession'\n"
+      << "inference_class = recursive_find_python_class(\n"
+      << "    join(nnInteractive.__path__[0], 'inference'),\n"
+      << "    inference_class,\n"
+      << "    'nnInteractive.inference'\n"
+      << ")\n";
+    pythonContext->ExecuteString(pyCommands.str());
+  }
 
   m_Impl->ResetBackend();
 
@@ -486,17 +492,18 @@ void mitk::nnInteractiveTool::StartSession()
   if (!isCUDAAvailable)
     this->SetAutoZoom(false);
 
-  pyCommands.clear(); pyCommands
-    << "session = inference_class(\n"
-    << "    device=torch.device('" << torchDevice << "'),\n"
-    << "    use_torch_compile=False,\n"
-    << "    torch_n_threads=os.cpu_count(),\n"
-    << "    verbose=False,\n"
-    << "    do_autozoom=" << m_Impl->AutoZoom << '\n'
-    << ")\n"
-    << "session.initialize_from_trained_model_folder(checkpoint_path)\n";
-
-  pythonContext->ExecuteString(pyCommands.str());
+  {
+    std::ostringstream pyCommands; pyCommands
+      << "session = inference_class(\n"
+      << "    device=torch.device('" << torchDevice << "'),\n"
+      << "    use_torch_compile=False,\n"
+      << "    torch_n_threads=os.cpu_count(),\n"
+      << "    verbose=False,\n"
+      << "    do_autozoom=" << m_Impl->AutoZoom << '\n'
+      << ")\n"
+      << "session.initialize_from_trained_model_folder(checkpoint_path)\n";
+    pythonContext->ExecuteString(pyCommands.str());
+  }
 
   m_Impl->SetBackend(isCUDAAvailable
     ? Backend::CUDA
@@ -517,18 +524,19 @@ void mitk::nnInteractiveTool::StartSession()
   pythonContext->TransferBaseDataToPython(imageAtTimeStep, "mitk_image");
   pythonContext->TransferBaseDataToPython(m_Impl->TargetBuffer.GetPointer(), "mitk_target_buffer");
 
-  pyCommands.clear(); pyCommands
-    << "image = mitk_image.GetAsNumpy()\n"
-    << "spacing = [\n"
+  {
+    std::ostringstream pyCommands; pyCommands
+      << "image = mitk_image.GetAsNumpy()\n"
+      << "spacing = [\n"
       << std::to_string(spacing[2]) << ", "
       << std::to_string(spacing[1]) << ", "
       << std::to_string(spacing[0]) << "]\n"
-    << "target_buffer = mitk_target_buffer.GetAsNumpy()\n"
-    << "torch_target_buffer = torch.from_numpy(target_buffer)\n"
-    << "session.set_image(image[None], {'spacing': spacing})\n"
-    << "session.set_target_buffer(torch_target_buffer)\n";
-
-  pythonContext->ExecuteString(pyCommands.str());
+      << "target_buffer = mitk_target_buffer.GetAsNumpy()\n"
+      << "torch_target_buffer = torch.from_numpy(target_buffer)\n"
+      << "session.set_image(image[None], {'spacing': spacing})\n"
+      << "session.set_target_buffer(torch_target_buffer)\n";
+    pythonContext->ExecuteString(pyCommands.str());
+  }
 }
 
 void mitk::nnInteractiveTool::EndSession()

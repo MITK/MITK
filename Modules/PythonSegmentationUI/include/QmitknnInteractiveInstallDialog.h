@@ -34,8 +34,9 @@ public:
 protected:
   enum class InstallStep
   {
-    PyTorch, // On Windows, we need a separate install step that uses pip --index-url.
-    nnInteractive
+    Upgrade_Pip,
+    Install_PyTorch, // On Windows, we need a separate install step that uses pip --index-url.
+    Install_nnInteractive
   };
 
   void OnYesClicked();

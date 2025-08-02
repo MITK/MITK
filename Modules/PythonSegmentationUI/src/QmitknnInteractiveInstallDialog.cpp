@@ -34,11 +34,7 @@ QmitknnInteractiveInstallDialog::QmitknnInteractiveInstallDialog(QWidget* parent
   : QDialog(parent),
     m_Ui(new Ui::QmitknnInteractiveInstallDialog),
     m_Process(new QProcess(this)),
-#if defined(Q_OS_WIN)
-    m_InstallStep(InstallStep::PyTorch)
-#else
-    m_InstallStep(InstallStep::nnInteractive)
-#endif
+    m_InstallStep(InstallStep::Upgrade_Pip)
 {
   m_Ui->setupUi(this);
 
@@ -60,17 +56,7 @@ void QmitknnInteractiveInstallDialog::OnYesClicked()
   m_Ui->progressBar->setRange(0, 0);
   m_Ui->textEdit->clear();
 
-  QStringList args = { "-m", "pip", "install" };
-
-  if (m_InstallStep == InstallStep::PyTorch) // Only on Windows
-  {
-    args.append({ TORCH, TORCH_VISION, "--index-url", CUDA_INDEX_URL });
-  }
-  else
-  {
-    args.append(NNINTERACTIVE);
-  }
-
+  QStringList args = { "-m", "pip", "install", "--upgrade", "pip" };
   m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
 }
 
@@ -106,7 +92,7 @@ void QmitknnInteractiveInstallDialog::AutoScrollToBottom()
 
 void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-  if (exitStatus != QProcess::NormalExit || exitCode != 0)
+  if (m_InstallStep != InstallStep::Upgrade_Pip && (exitStatus != QProcess::NormalExit || exitCode != 0))
   {
     m_Ui->progressBar->setRange(0, 100);
     m_Ui->progressBar->setValue(0);
@@ -118,12 +104,17 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
   }
   else
   {
-    if (m_InstallStep == InstallStep::PyTorch) // Only on Windows
+    if (m_InstallStep == InstallStep::Upgrade_Pip)
     {
-      m_InstallStep = InstallStep::nnInteractive;
-
-      QStringList args = { "-m", "pip", "install", NNINTERACTIVE };
-      m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
+#if defined(_WIN32)
+      m_InstallStep = InstallStep::Install_PyTorch;
+#else
+      m_InstallStep = InstallStep::Install_nnInteractive;
+#endif
+    }
+    else if (m_InstallStep == InstallStep::Install_PyTorch)
+    {
+      m_InstallStep = InstallStep::Install_nnInteractive;
     }
     else
     {
@@ -136,6 +127,19 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
       disconnect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &Self::OnYesClicked);
       connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
       m_Ui->buttonBox->setEnabled(true);
+
+      return;
+    }
+
+    if (m_InstallStep == InstallStep::Install_PyTorch) // Only on Windows
+    {
+      QStringList args = { "-m", "pip", "install", TORCH, TORCH_VISION, "--index-url", CUDA_INDEX_URL };
+      m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
+    }
+    else // InstallStep::Install_nnInteractive
+    {
+      QStringList args = { "-m", "pip", "install", NNINTERACTIVE };
+      m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
     }
   }
 

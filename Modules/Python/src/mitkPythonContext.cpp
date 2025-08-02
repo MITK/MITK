@@ -170,33 +170,6 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData,
   PyGILState_Release(state);
 }
 
-void mitk::PythonContext::SetVirtualEnvironmentPath(const std::string& absolutePath)
-{
-  m_CurrentUserSite.clear();
-  std::string pythonCommand;
-  pythonCommand.append("import site\n");
-  pythonCommand.append("site.addsitedir('" + absolutePath + "')\n");
-  this->ExecuteString(pythonCommand);
-  m_CurrentUserSite = absolutePath;
-}
-
-void mitk::PythonContext::ClearVirtualEnvironmentPath()
-{
-  if (!m_CurrentUserSite.empty())
-  {
-    std::string pythonCommand;
-    pythonCommand.append("from pathlib import Path\n");
-    pythonCommand.append("_venv_path = Path('" + m_CurrentUserSite + "')\n");
-    pythonCommand.append("sys_paths = list(sys.path)\n");
-    pythonCommand.append("root_path = str(_venv_path.parent.parent)\n");
-    pythonCommand.append("for _path in sys_paths:\n");
-    pythonCommand.append("  if _path.startswith(root_path):\n");
-    pythonCommand.append("    sys.path.remove(_path)\n");
-    this->ExecuteString(pythonCommand);
-    m_CurrentUserSite.clear();
-  }
-}
-
 bool mitk::PythonContext::HasVariable(const std::string &varName)
 {
   PyObject *pyVar = PyDict_GetItemString(m_LocalDictionary.get(), varName.c_str());

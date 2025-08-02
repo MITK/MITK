@@ -91,22 +91,7 @@ namespace mitk
      */
     std::string GetStdOut(const std::string &varName = "_mitk_stdout");
 
-    /**
-     * @brief Sets user-site from a (e.g virtual environment site-packages) directory.
-     * The packages and .pth files inside the site is added to `sys.path` by using
-     * `site.addsitedir` call.
-     * See: https://docs.python.org/3/library/site.html#site.addsitedir
-     */
-    void SetVirtualEnvironmentPath(const std::string &absolutePath); // site-package
-
-     /**
-     * @brief Removes the current VirtualEnvironment site-package path from `sys.path`.
-     * However, it won't remove packages specified via .pth paths in the user site, if any.
-     */
-    void ClearVirtualEnvironmentPath();
-
   private:
-    std::string m_CurrentUserSite;
     PyObjectPtr m_GlobalDictionary;
     PyObjectPtr m_LocalDictionary;
   };

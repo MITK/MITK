@@ -24,7 +24,7 @@ namespace
 {
   constexpr const char* TORCH = "torch==2.7.1";
   constexpr const char* TORCH_VISION = "torchvision==0.22.1";
-  constexpr const char* NNINTERACTIVE = "nninteractive==1.0.1"; //"nninteractive>=1.1.1,<2.0.0";
+  constexpr const char* NNINTERACTIVE = "nninteractive>=1.1.2,<2.0.0";
   constexpr const char* CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu118";
 }
 

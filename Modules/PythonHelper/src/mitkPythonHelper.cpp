@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkPythonHelper.h>
+#include <mitkEnvironment.h>
 #include <mitkIOUtil.h>
 
 namespace
@@ -25,7 +26,7 @@ namespace
 
   bool IsDirectoryWritable(const fs::path& path)
   {
-    if (!fs::is_directory(path))
+    if (path.empty() || !fs::exists(path) || !fs::is_directory(path))
       return false;
 
     const auto testFile = path / ".is_writable.tmp";
@@ -38,9 +39,66 @@ namespace
     stream.close();
 
     std::error_code error;
-    fs::remove(testFile, error);
+    return fs::remove(testFile, error) || !error;
+  }
 
-    return !error;
+  std::hash<fs::path>::result_type HashAppPath()
+  {
+    fs::path appPath = mitk::IOUtil::GetProgramPath();
+
+    if (!appPath.empty())
+      return std::hash<fs::path>{}(appPath);
+
+    return {};
+  }
+
+  std::string GetPathHashAsString(const std::hash<fs::path>::result_type& hash)
+  {
+    std::stringstream stream;
+    stream << std::hex << std::uppercase << std::setw(16) << std::setfill('0') << hash;
+    return stream.str();
+  }
+
+  fs::path GetVirtualEnvBasePath()
+  {
+    fs::path basePath;
+
+#if defined(_WIN32)
+    basePath = mitk::GetEnv("LocalAppData").value_or("");
+#elif defined(__APPLE__)
+    basePath = mitk::GetEnv("HOME").value_or("");
+
+    if (!basePath.empty())
+      basePath /= "Library/Application Support";
+#else
+    basePath = mitk::GetEnv("XDG_DATA_HOME").value_or("");
+
+    if (basePath.empty())
+    {
+      const fs::path homePath = mitk::GetEnv("HOME").value_or("");
+
+      if (!homePath.empty())
+        basePath = homePath / ".local/share";
+    }
+#endif
+
+    if (!basePath.empty())
+    {
+      if (const auto hash = HashAppPath(); hash != 0)
+      {
+        const auto hashString = GetPathHashAsString(hash);
+        const fs::path venvPath = basePath / "mitk_venvs" / hashString;
+        std::error_code error;
+
+        if (!fs::exists(venvPath))
+          fs::create_directories(venvPath, error);
+
+        if (!error && IsDirectoryWritable(venvPath))
+          return venvPath;
+      }
+    }
+
+    return {};
   }
 }
 
@@ -66,12 +124,7 @@ fs::path mitk::PythonHelper::GetHomePath()
 #endif
 
   if (fs::exists(installedPython) && fs::is_directory(installedPython))
-  {
-    if (IsDirectoryWritable(installedPython))
-      return installedPython.lexically_normal();
-
-    // TODO: Copy to writable location / use venv in writable location
-  }
+    return installedPython.lexically_normal();
 
   return {};
 }
@@ -97,16 +150,33 @@ fs::path mitk::PythonHelper::GetLibraryPath()
 
 fs::path mitk::PythonHelper::GetExecutablePath()
 {
-  auto homePath = GetHomePath();
+  fs::path venvPath;
+  fs::path execPath;
 
-  if (homePath.empty())
-    return {};
+  if (const auto VIRTUAL_ENV = GetEnv("VIRTUAL_ENV"); VIRTUAL_ENV.has_value())
+    venvPath = VIRTUAL_ENV.value();
+
+  if (fs::exists(venvPath / "pyvenv.cfg"))
+  {
+#if defined(_WIN32)
+    execPath = venvPath / "Scripts" / "python.exe";
+#else
+    execPath = venvPath / "bin" / "python3";
+#endif
+  }
+  else
+  {
+    const auto homePath = GetHomePath();
+
+    if (homePath.empty())
+      return {};
 
 #if defined(_WIN32)
-  auto execPath = homePath / "python.exe";
+    execPath = homePath / "python.exe";
 #else
-  auto execPath = homePath / "bin" / "python3";
+    execPath = homePath / "bin" / "python3";
 #endif
+  }
 
   if (fs::exists(execPath))
     return execPath;
@@ -114,3 +184,72 @@ fs::path mitk::PythonHelper::GetExecutablePath()
   return {};
 }
 
+std::optional<fs::path> mitk::PythonHelper::CreateVirtualEnv(const std::string& name)
+{
+  if (name.empty())
+    return std::nullopt;
+
+  const auto basePath = GetVirtualEnvBasePath();
+
+  if (basePath.empty())
+    return std::nullopt;
+
+  const auto venvPath = basePath / name;
+
+  if (!fs::exists(venvPath))
+  {
+    std::error_code error;
+    fs::create_directory(venvPath, error);
+
+    if (error)
+      return std::nullopt;
+  }
+
+  const auto venvConfigPath = venvPath / "pyvenv.cfg";
+
+  if (fs::exists(venvConfigPath))
+    return venvPath;
+
+  const auto execPath = GetExecutablePath();
+
+  if (execPath.empty())
+    return std::nullopt;
+
+  auto venvCommand = "\"" + execPath.string() + "\" -m venv \"" + venvPath.string() + "\"";
+
+#if defined(_WIN32)
+  // Workaround for std::system() on Windows resp. cmd.exe: a leading quote would be swallowed.
+  venvCommand = "if 1==1 " + venvCommand;
+#endif
+
+  if (auto result = std::system(venvCommand.c_str()); result != 0)
+    return std::nullopt;
+
+  if (fs::exists(venvConfigPath))
+    return venvPath;
+
+  return std::nullopt;
+}
+
+bool mitk::PythonHelper::ActivateVirtualEnv(const fs::path& venvPath)
+{
+  if (venvPath.empty() || !fs::exists(venvPath / "pyvenv.cfg"))
+    return false;
+
+  if (!SetEnv("VIRTUAL_ENV", venvPath.string()))
+    return false;
+
+#if defined(_WIN32)
+  const auto pythonExecDir = venvPath / "Scripts";
+#else
+  const auto pythonExecDir = venvPath / "bin";
+#endif
+
+  if (!AddPathEnv(pythonExecDir))
+  {
+    UnsetEnv("VIRTUAL_ENV");
+    return false;
+  }
+
+  return true;
+}

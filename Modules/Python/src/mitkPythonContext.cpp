@@ -18,7 +18,10 @@ found in the LICENSE file.
 
 mitk::PythonContext::PythonContext()
 {
+  auto venvPath = PythonHelper::CreateVirtualEnv("default");
 
+  if (venvPath.has_value() && PythonHelper::ActivateVirtualEnv(venvPath.value()))
+    MITK_INFO << "Using virtual environment: " << venvPath.value().string();
 
   if (!Py_IsInitialized())
     Py_Initialize();
@@ -33,12 +36,24 @@ void mitk::PythonContext::Activate()
   std::replace(programPath.begin(), programPath.end(), '\\', '/');
   programPath.append("/");
 
-  std::string pythonCommand;
-  pythonCommand.append("import os, sys, io\n");
-  pythonCommand.append("sys.path.append('" + programPath + "')\n");
-  pythonCommand.append("import numpy\n");
-  pythonCommand.append("import pyMITK\n");
-  this->ExecuteString(pythonCommand);
+  std::ostringstream pyCommands; pyCommands
+    << "import os, site, sys\n"
+    << "app_dir = '" << programPath << "'\n"
+    << "if app_dir not in sys.path:\n"
+    << "    sys.path.insert(0, app_dir)\n"
+    << "import numpy\n"
+    << "import pyMITK\n"
+    << "venv = os.environ.get('VIRTUAL_ENV')\n"
+    << "if venv:\n"
+    << "    if os.name == 'nt':\n"
+    << "        site_packages = os.path.join(venv, 'Lib', 'site-packages')\n"
+    << "    else:\n"
+    << "        version = f'python{sys.version_info.major}.{sys.version_info.minor}'\n"
+    << "        site_packages = os.path.join(venv, 'lib', version, 'site-packages')\n"
+    << "    if site_packages not in sys.path:\n"
+    << "        site.addsitedir(site_packages)\n";
+
+  this->ExecuteString(pyCommands.str());
 }
 
 mitk::PythonContext::~PythonContext()

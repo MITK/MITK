@@ -38,20 +38,24 @@ void mitk::PythonContext::Activate()
 
   std::ostringstream pyCommands; pyCommands
     << "import os, site, sys\n"
+    << "def add_site_packages(base_path):\n"
+    << "    import os, site, sys\n"
+    << "    if os.name == 'nt':\n"
+    << "        site_packages = os.path.join(base_path, 'Lib', 'site-packages')\n"
+    << "    else:\n"
+    << "        version = f'python{sys.version_info.major}.{sys.version_info.minor}'\n"
+    << "        site_packages = os.path.join(base_path, 'lib', version, 'site-packages')\n"
+    << "    if site_packages not in sys.path:\n"
+    << "        site.addsitedir(site_packages)\n"
+    << "add_site_packages(sys.base_prefix)\n"
+    << "import numpy\n"
     << "app_dir = '" << programPath << "'\n"
     << "if app_dir not in sys.path:\n"
     << "    sys.path.insert(0, app_dir)\n"
-    << "import numpy\n"
     << "import pyMITK\n"
     << "venv = os.environ.get('VIRTUAL_ENV')\n"
     << "if venv:\n"
-    << "    if os.name == 'nt':\n"
-    << "        site_packages = os.path.join(venv, 'Lib', 'site-packages')\n"
-    << "    else:\n"
-    << "        version = f'python{sys.version_info.major}.{sys.version_info.minor}'\n"
-    << "        site_packages = os.path.join(venv, 'lib', version, 'site-packages')\n"
-    << "    if site_packages not in sys.path:\n"
-    << "        site.addsitedir(site_packages)\n";
+    << "    add_site_packages(venv)\n";
 
   this->ExecuteString(pyCommands.str());
 }

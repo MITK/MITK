@@ -42,7 +42,7 @@ namespace
     return fs::remove(testFile, error) || !error;
   }
 
-  std::hash<fs::path>::result_type HashAppPath()
+  size_t HashAppPath()
   {
     fs::path appPath = mitk::IOUtil::GetProgramPath();
 
@@ -52,7 +52,7 @@ namespace
     return {};
   }
 
-  std::string GetPathHashAsString(const std::hash<fs::path>::result_type& hash)
+  std::string GetPathHashAsString(size_t hash)
   {
     std::stringstream stream;
     stream << std::hex << std::uppercase << std::setw(16) << std::setfill('0') << hash;

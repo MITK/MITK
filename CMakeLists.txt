@@ -31,6 +31,12 @@ if(POLICY CMP0167)
   cmake_policy(SET CMP0167 OLD)
 endif()
 
+if(POLICY CMP0177)
+  # https://cmake.org/cmake/help/v3.31/policy/CMP0177.html
+  # install() DESTINATION paths are normalized.
+  cmake_policy(SET CMP0177 NEW)
+endif()
+
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #-----------------------------------------------------------------------------

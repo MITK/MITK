@@ -65,7 +65,13 @@ namespace mitk
 
       MITK_INFO << "Preload Python: " << pythonLibrary.string();
 
+#if defined(__APPLE__)
+      SetEnv("PYTHONHOME", pythonHome.string());
+#else
       UnsetEnv("PYTHONHOME");
+#endif
+
+      UnsetEnv("PYTHONPATH");
       UnsetEnv("VIRTUAL_ENV");
 
 #if defined(_WIN32)

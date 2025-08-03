@@ -32,9 +32,11 @@ mitk::PythonContext::PythonContext()
 
 void mitk::PythonContext::Activate()
 {
-  std::string programPath = mitk::IOUtil::GetProgramPath();
-  std::replace(programPath.begin(), programPath.end(), '\\', '/');
-  programPath.append("/");
+  std::string appPath = IOUtil::GetAppBundlePath(IOUtil::AppBundlePath::Parent).string();
+
+#if defined(_WIN32)
+  std::replace(appPath.begin(), appPath.end(), '\\', '/');
+#endif
 
   std::ostringstream pyCommands; pyCommands
     << "import os, site, sys\n"
@@ -49,7 +51,7 @@ void mitk::PythonContext::Activate()
     << "        site.addsitedir(site_packages)\n"
     << "add_site_packages(sys.base_prefix)\n"
     << "import numpy\n"
-    << "app_dir = '" << programPath << "'\n"
+    << "app_dir = '" << appPath << "'\n"
     << "if app_dir not in sys.path:\n"
     << "    sys.path.insert(0, app_dir)\n"
     << "import pyMITK\n"

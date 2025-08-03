@@ -39,3 +39,18 @@ get_filename_component(app ${bundle_path} NAME_WE)
 set(app_path "${bundle_path}/Contents/MacOS/${app}")
 execute_process(COMMAND install_name_tool -add_rpath "@executable_path/../Frameworks" ${app_path} ERROR_QUIET)
 execute_process(COMMAND install_name_tool -add_rpath "@executable_path/../../../../.." ${qtwebengineprocess_path} ERROR_QUIET)
+
+###############################################################
+# (2) Fix pyMITK package by renaming pyMITK.py to __init__.py #
+###############################################################
+
+file(GLOB lib_dirs "${bundle_path}/Contents/Resources/python/lib/python3.*")
+foreach(lib_dir IN LISTS lib_dirs)
+  if(IS_DIRECTORY "${lib_dir}")
+    set(pymitk_dir "${lib_dir}/site-packages/pyMITK")
+    if(EXISTS "${pymitk_dir}/pyMITK.py")
+      file(RENAME "${pymitk_dir}/pyMITK.py" "${pymitk_dir}/__init__.py")
+      break()
+    endif()
+  endif()
+endforeach()

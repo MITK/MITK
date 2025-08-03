@@ -42,9 +42,29 @@ namespace
     return fs::remove(testFile, error) || !error;
   }
 
-  size_t HashAppPath()
+  fs::path GetAppPath()
   {
     fs::path appPath = mitk::IOUtil::GetProgramPath();
+
+#if defined(__APPLE__)
+    if (appPath.filename() == "MacOS")
+    {
+      if (const auto contentsPath = appPath.parent_path(); contentsPath.filename() == "Contents")
+      {
+        if (const auto bundlePath = contentsPath.parent_path(); bundlePath.extension() == ".app")
+        {
+          appPath = bundlePath;
+        }
+      }
+    }
+#endif
+
+    return appPath;
+  }
+
+  size_t HashAppPath()
+  {
+    auto appPath = GetAppPath();
 
     if (!appPath.empty())
       return std::hash<fs::path>{}(appPath);
@@ -52,7 +72,7 @@ namespace
     return {};
   }
 
-  std::string GetPathHashAsString(size_t hash)
+  std::string GetHashAsString(size_t hash)
   {
     std::stringstream stream;
     stream << std::hex << std::uppercase << std::setw(16) << std::setfill('0') << hash;
@@ -86,7 +106,7 @@ namespace
     {
       if (const auto hash = HashAppPath(); hash != 0)
       {
-        const auto hashString = GetPathHashAsString(hash);
+        const auto hashString = GetHashAsString(hash);
         const fs::path venvPath = basePath / "mitk_venvs" / hashString;
         std::error_code error;
 
@@ -218,7 +238,9 @@ std::optional<fs::path> mitk::PythonHelper::CreateVirtualEnv(const std::string& 
   auto venvCommand = "\"" + execPath.string() + "\" -m venv \"" + venvPath.string() + "\"";
 
 #if defined(_WIN32)
-  // Workaround for std::system() on Windows resp. cmd.exe: a leading quote would be swallowed.
+  // Workaround for std::system() on Windows:
+  //   If the command starts with a quote, it may be misinterpreted or truncated.
+  //   Prepend a no-op to ensure the full command is preserved.
   venvCommand = "if 1==1 " + venvCommand;
 #endif
 

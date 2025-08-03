@@ -42,29 +42,9 @@ namespace
     return fs::remove(testFile, error) || !error;
   }
 
-  fs::path GetAppPath()
-  {
-    fs::path appPath = mitk::IOUtil::GetProgramPath();
-
-#if defined(__APPLE__)
-    if (appPath.filename() == "MacOS")
-    {
-      if (const auto contentsPath = appPath.parent_path(); contentsPath.filename() == "Contents")
-      {
-        if (const auto bundlePath = contentsPath.parent_path(); bundlePath.extension() == ".app")
-        {
-          appPath = bundlePath;
-        }
-      }
-    }
-#endif
-
-    return appPath;
-  }
-
   size_t HashAppPath()
   {
-    auto appPath = GetAppPath();
+    auto appPath = mitk::IOUtil::GetAppBundlePath(mitk::IOUtil::AppBundlePath::Self);
 
     if (!appPath.empty())
       return std::hash<fs::path>{}(appPath);

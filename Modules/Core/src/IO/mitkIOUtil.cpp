@@ -365,6 +365,28 @@ namespace mitk
   }
 #endif
 
+  fs::path IOUtil::GetAppBundlePath(AppBundlePath path)
+  {
+    fs::path appPath = GetProgramPath();
+
+#if defined(US_PLATFORM_APPLE)
+    if (appPath.filename() == "MacOS")
+    {
+      if (const auto contentsPath = appPath.parent_path(); contentsPath.filename() == "Contents")
+      {
+        if (const auto bundlePath = contentsPath.parent_path(); bundlePath.extension() == ".app")
+        {
+          appPath = path == AppBundlePath::Parent
+            ? bundlePath.parent_path()
+            : bundlePath;
+        }
+      }
+    }
+#endif
+
+    return appPath;
+  }
+
   char IOUtil::GetDirectorySeparator()
   {
 #ifdef US_PLATFORM_WINDOWS

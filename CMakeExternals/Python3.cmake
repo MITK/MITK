@@ -50,7 +50,8 @@ if(MITK_USE_Python3)
       URL_HASH ${url_hash}
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
-      INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>" "${install_dir}"
+      INSTALL_COMMAND ${CMAKE_COMMAND} -E rm -rf "${install_dir}"
+              COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>" "${install_dir}"
       DEPENDS "${proj_DEPENDENCIES}"
     )
 

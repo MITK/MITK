@@ -59,6 +59,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \subpage org_mitk_petSUVCalculation </li>
   <li> \subpage org_blueberry_ui_qt_objectinspector </li>
   <li> \subpage org_mitk_gui_qt_xnat </li>
+  <li> \subpage org_mitk_views_pythonsettings </li>
 </ul>
 
 */

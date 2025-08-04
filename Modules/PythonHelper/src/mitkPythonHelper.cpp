@@ -58,48 +58,6 @@ namespace
     stream << std::hex << std::uppercase << std::setw(16) << std::setfill('0') << hash;
     return stream.str();
   }
-
-  fs::path GetVirtualEnvBasePath()
-  {
-    fs::path basePath;
-
-#if defined(_WIN32)
-    basePath = mitk::GetEnv("LocalAppData").value_or("");
-#elif defined(__APPLE__)
-    basePath = mitk::GetEnv("HOME").value_or("");
-
-    if (!basePath.empty())
-      basePath /= "Library/Application Support";
-#else
-    basePath = mitk::GetEnv("XDG_DATA_HOME").value_or("");
-
-    if (basePath.empty())
-    {
-      const fs::path homePath = mitk::GetEnv("HOME").value_or("");
-
-      if (!homePath.empty())
-        basePath = homePath / ".local/share";
-    }
-#endif
-
-    if (!basePath.empty())
-    {
-      if (const auto hash = HashAppPath(); hash != 0)
-      {
-        const auto hashString = GetHashAsString(hash);
-        const fs::path venvPath = basePath / "mitk_venvs" / hashString;
-        std::error_code error;
-
-        if (!fs::exists(venvPath))
-          fs::create_directories(venvPath, error);
-
-        if (!error && IsDirectoryWritable(venvPath))
-          return venvPath;
-      }
-    }
-
-    return {};
-  }
 }
 
 fs::path mitk::PythonHelper::GetHomePath()
@@ -180,6 +138,48 @@ fs::path mitk::PythonHelper::GetExecutablePath()
 
   if (fs::exists(execPath))
     return execPath;
+
+  return {};
+}
+
+fs::path mitk::PythonHelper::GetVirtualEnvBasePath()
+{
+  fs::path basePath;
+
+#if defined(_WIN32)
+  basePath = mitk::GetEnv("LocalAppData").value_or("");
+#elif defined(__APPLE__)
+  basePath = mitk::GetEnv("HOME").value_or("");
+
+  if (!basePath.empty())
+    basePath /= "Library/Application Support";
+#else
+  basePath = mitk::GetEnv("XDG_DATA_HOME").value_or("");
+
+  if (basePath.empty())
+  {
+    const fs::path homePath = mitk::GetEnv("HOME").value_or("");
+
+    if (!homePath.empty())
+      basePath = homePath / ".local/share";
+  }
+#endif
+
+  if (!basePath.empty())
+  {
+    if (const auto hash = HashAppPath(); hash != 0)
+    {
+      const auto hashString = GetHashAsString(hash);
+      const fs::path venvPath = basePath / "mitk_venvs" / hashString;
+      std::error_code error;
+
+      if (!fs::exists(venvPath))
+        fs::create_directories(venvPath, error);
+
+      if (!error && IsDirectoryWritable(venvPath))
+        return venvPath;
+    }
+  }
 
   return {};
 }

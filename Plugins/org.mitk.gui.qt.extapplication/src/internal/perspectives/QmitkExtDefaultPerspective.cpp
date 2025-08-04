@@ -35,6 +35,7 @@ void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer
   berry::IPlaceholderFolderLayout::Pointer bottomFolder = layout->CreatePlaceholderFolder("bottom", berry::IPageLayout::BOTTOM, 0.7f, editorArea);
   bottomFolder->AddPlaceholder("org.blueberry.views.logview");
   bottomFolder->AddPlaceholder("org.mitk.views.modules");
+  bottomFolder->AddPlaceholder("org.mitk.views.pythonsettings");
 
   layout->AddPerspectiveShortcut("org.mitk.mitkworkbench.perspectives.editor");
   layout->AddPerspectiveShortcut("org.mitk.mitkworkbench.perspectives.visualization");

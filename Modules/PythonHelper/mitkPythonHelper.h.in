@@ -29,6 +29,7 @@ namespace mitk::PythonHelper
   MITKPYTHONHELPER_EXPORT fs::path GetHomePath();
   MITKPYTHONHELPER_EXPORT fs::path GetLibraryPath();
   MITKPYTHONHELPER_EXPORT fs::path GetExecutablePath();
+  MITKPYTHONHELPER_EXPORT fs::path GetVirtualEnvBasePath();
   MITKPYTHONHELPER_EXPORT std::optional<fs::path> CreateVirtualEnv(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const fs::path& venvPath);
 }

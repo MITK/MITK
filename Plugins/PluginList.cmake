@@ -1,8 +1,6 @@
-
 # Plug-ins must be ordered according to their dependencies
 
 set(MITK_PLUGINS
-
   org.blueberry.core.runtime:ON
   org.blueberry.core.expressions:OFF
   org.blueberry.core.commands:OFF
@@ -66,4 +64,5 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.pixelvalue:ON
   org.mitk.gui.qt.pet.suvcalculation:OFF
   org.mitk.gui.qt.undoredo:OFF
+  org.mitk.gui.qt.pythonsettings:OFF
 )

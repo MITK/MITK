@@ -9,31 +9,17 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
+
 #ifndef mitkPythonContext_h
 #define mitkPythonContext_h
 
-#define PY_SSIZE_T_CLEAN
-
-#include <itkLightObject.h>
 #include <mitkImage.h>
-
-#pragma push_macro("slots")
-#undef slots
-#include <Python.h>
-#pragma pop_macro("slots")
-
 #include <MitkPythonExports.h>
-#include <mitkCommon.h>
+
+#include <memory>
 
 namespace mitk
 {
-  struct PyObjectDeleter
-  {
-    void operator()(PyObject *obj) const { Py_XDECREF(obj); }
-  };
-
-  using PyObjectPtr = std::unique_ptr<PyObject, PyObjectDeleter>;
-
   class MITKPYTHON_EXPORT PythonContext : public itk::LightObject
   {
   public:
@@ -92,8 +78,8 @@ namespace mitk
     std::string GetStdOut(const std::string &varName = "_mitk_stdout");
 
   private:
-    PyObjectPtr m_GlobalDictionary;
-    PyObjectPtr m_LocalDictionary;
+    struct Impl;
+    std::unique_ptr<Impl> m_Impl;
   };
 }
 

@@ -9,14 +9,16 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#define PY_SSIZE_T_CLEAN
 
-#include <Python.h>
-#include <filesystem>
 #include <mitkCoreServices.h>
+#include <mitkFileSystem.h>
 #include <mitkIOUtil.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
+
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+
 #include <swigpyrun.h>
 
 class mitkPyMITKTestSuite : public mitk::TestFixture
@@ -128,7 +130,7 @@ public:
 
     std::string imsaveCommand = "pyMITK.IOUtil.imsave(image,'" + imagePath + "')";
     PyRun_SimpleString(imsaveCommand.c_str());
-    CPPUNIT_ASSERT(std::filesystem::file_size(imagePath) > 0);
+    CPPUNIT_ASSERT(fs::file_size(imagePath) > 0);
     std::remove(imagePath.c_str());
     PyRun_SimpleString("del image");
   }

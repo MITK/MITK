@@ -14,9 +14,29 @@ found in the LICENSE file.
 #include <mitkPythonHelper.h>
 #include <mitkIOUtil.h>
 
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+
 #include <swigpyrun.h>
 
+namespace
+{
+  struct PyObjectDeleter
+  {
+    void operator()(PyObject *obj) const { Py_XDECREF(obj); }
+  };
+
+  using PyObjectPtr = std::unique_ptr<PyObject, PyObjectDeleter>;
+}
+
+struct mitk::PythonContext::Impl
+{
+  PyObjectPtr GlobalDictionary;
+  PyObjectPtr LocalDictionary;
+};
+
 mitk::PythonContext::PythonContext()
+  : m_Impl(std::make_unique<Impl>())
 {
   auto venvPath = PythonHelper::CreateVirtualEnv("default");
 
@@ -26,8 +46,8 @@ mitk::PythonContext::PythonContext()
   if (!Py_IsInitialized())
     Py_Initialize();
 
-  m_GlobalDictionary.reset(PyDict_New());
-  m_LocalDictionary.reset(PyDict_New());
+  m_Impl->GlobalDictionary.reset(PyDict_New());
+  m_Impl->LocalDictionary.reset(PyDict_New());
 }
 
 void mitk::PythonContext::Activate()
@@ -64,8 +84,8 @@ void mitk::PythonContext::Activate()
 
 mitk::PythonContext::~PythonContext()
 {
-  PyDict_Clear(m_LocalDictionary.get());
-  PyDict_Clear(m_GlobalDictionary.get());
+  PyDict_Clear(m_Impl->LocalDictionary.get());
+  PyDict_Clear(m_Impl->GlobalDictionary.get());
 }
 
 std::string mitk::PythonContext::ExecuteFile(const std::string &filePath)
@@ -78,7 +98,7 @@ std::string mitk::PythonContext::ExecuteFile(const std::string &filePath)
     mitkThrow() << "An error occured while reading python file.";
   }
   PyObjectPtr executionResult(
-    PyRun_File(file, "script.py", commandType, m_GlobalDictionary.get(), m_LocalDictionary.get()));
+    PyRun_File(file, "script.py", commandType, m_Impl->GlobalDictionary.get(), m_Impl->LocalDictionary.get()));
   if (!executionResult)
   {
     // PyErr_Print(); prints stacktrace on console
@@ -94,7 +114,7 @@ std::string mitk::PythonContext::ExecuteString(const std::string &pyCommands)
   PyGILState_STATE state = PyGILState_Ensure();
   int commandType = Py_file_input;
   PyObjectPtr executionResult(
-    PyRun_String(pyCommands.c_str(), commandType, m_GlobalDictionary.get(), m_LocalDictionary.get()));
+    PyRun_String(pyCommands.c_str(), commandType, m_Impl->GlobalDictionary.get(), m_Impl->LocalDictionary.get()));
   if (!executionResult)
   {
     //PyErr_Print();  prints stacktrace on console
@@ -109,7 +129,7 @@ std::string mitk::PythonContext::GetStdOut(const std::string &varName)
 {
   PyGILState_STATE state = PyGILState_Ensure();
   std::string _mitk_stdout;
-  PyObject *capture_output = PyDict_GetItemString(m_LocalDictionary.get(), varName.c_str());
+  PyObject *capture_output = PyDict_GetItemString(m_Impl->LocalDictionary.get(), varName.c_str());
   if (capture_output)
   {
     PyObjectPtr output_val(PyObject_CallMethod(capture_output, "getvalue", nullptr));
@@ -127,8 +147,8 @@ std::string mitk::PythonContext::GetStdOut(const std::string &varName)
 mitk::Image* mitk::PythonContext::LoadImageFromPython(const std::string &varName)
 {
   PyGILState_STATE state = PyGILState_Ensure();
-  PyObject *pyImage = PyDict_GetItemString(m_LocalDictionary.get(), varName.c_str());
-  if (pyImage == NULL && !(pyImage = PyDict_GetItemString(m_GlobalDictionary.get(), varName.c_str())))
+  PyObject *pyImage = PyDict_GetItemString(m_Impl->LocalDictionary.get(), varName.c_str());
+  if (pyImage == NULL && !(pyImage = PyDict_GetItemString(m_Impl->GlobalDictionary.get(), varName.c_str())))
   {
     mitkThrow() << "Could not get image from Python";
   }
@@ -180,7 +200,7 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData,
     MITK_ERROR << "Something went wrong creating the Python instance of the image\n";
   }
 
-  PyObject *receive = PyDict_GetItemString(m_LocalDictionary.get(), "_receive");
+  PyObject *receive = PyDict_GetItemString(m_Impl->LocalDictionary.get(), "_receive");
   PyObjectPtr result(PyObject_CallFunctionObjArgs(receive, pInstance, NULL));
 
   if (nullptr == result)
@@ -193,8 +213,8 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData,
 
 bool mitk::PythonContext::HasVariable(const std::string &varName)
 {
-  PyObject *pyVar = PyDict_GetItemString(m_LocalDictionary.get(), varName.c_str());
-  if (pyVar == NULL && !(pyVar = PyDict_GetItemString(m_GlobalDictionary.get(), varName.c_str())))
+  PyObject *pyVar = PyDict_GetItemString(m_Impl->LocalDictionary.get(), varName.c_str());
+  if (pyVar == NULL && !(pyVar = PyDict_GetItemString(m_Impl->GlobalDictionary.get(), varName.c_str())))
   {
     return false;
   }

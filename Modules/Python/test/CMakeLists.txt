@@ -1,1 +1,3 @@
-MITK_CREATE_MODULE_TESTS()
+mitk_create_module_tests(
+  PACKAGE_DEPENDS PRIVATE Python3|Python
+)

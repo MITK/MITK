@@ -1,6 +1,6 @@
 mitk_create_module(
   DEPENDS MitkPythonHelper
-  PACKAGE_DEPENDS PUBLIC Python3|Python
+  PACKAGE_DEPENDS PRIVATE Python3|Python
 )
 
 if(TARGET ${MODULE_TARGET})

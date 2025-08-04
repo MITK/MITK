@@ -11,6 +11,8 @@ function(mitkSwigPrepareFiles swig_module swig_file)
     # which are given as optional parameters to the input file.
     set(ADDITIONAL_TMP_SWIG_INCLUDES "")
 
+     get_filename_component(MITK_BINARY_DIR_REALPATH "${MITK_BINARY_DIR}" REALPATH)
+
     foreach(library_name ${ARGN})
         # Extracting all include directories from each given project and
         # then including these directories to the newly created swig project.
@@ -20,9 +22,16 @@ function(mitkSwigPrepareFiles swig_module swig_file)
         # Adding each include path as an additional swig parameter using
         # the swig-option "-I":
         foreach(INCLUDE_PATH ${LIBRARY_INCLUDES} ${ITK_INCLUDE_DIRS})
-            list(APPEND ADDITIONAL_TMP_SWIG_INCLUDES -I${INCLUDE_PATH} )
+            list(APPEND ADDITIONAL_TMP_SWIG_INCLUDES -I${INCLUDE_PATH})
 
-            file(GLOB_RECURSE header_files "${INCLUDE_PATH}/*.h")
+            get_filename_component(INCLUDE_PATH_REALPATH "${INCLUDE_PATH}" REALPATH)
+
+            if(MITK_BINARY_DIR_REALPATH STREQUAL INCLUDE_PATH_REALPATH)
+              file(GLOB header_files "${INCLUDE_PATH}/*.h")
+            else()
+              file(GLOB_RECURSE header_files "${INCLUDE_PATH}/*.h")
+            endif()
+
             list(APPEND SWIG_MODULE_${swig_module}_EXTRA_DEPS ${header_files})
             # export variable to parent scope
             set(SWIG_MODULE_${swig_module}_EXTRA_DEPS

@@ -60,6 +60,10 @@ namespace mitk
 
     void Load(us::ModuleContext*) override
     {
+      // Do nothing if this module was loaded from Python (pyMITK).
+      if (GetEnv("PYMITK").has_value())
+        return;
+
       const auto pythonHome = PythonHelper::GetHomePath();
       const auto pythonLibrary = PythonHelper::GetLibraryPath();
 

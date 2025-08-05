@@ -4,6 +4,12 @@
 #endif
 #define SWIG_FILE_WITH_INIT
 %}
+
+%pythonbegin %{
+import os
+os.environ["PYMITK"] = "1"
+%}
+
 %module pyMITK
 %include <mitk_swig_std.i>
 

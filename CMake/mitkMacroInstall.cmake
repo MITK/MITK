@@ -60,8 +60,15 @@ macro(_fixup_target)
 
   mitkFunctionGetLibrarySearchPaths(_search_paths ${intermediate_dir})
 
-  if (MITK_USE_Python3)
-    get_filename_component(_python_lib "${Python3_LIBRARIES}" NAME)
+  if(MITK_USE_Python3)
+    if(WIN32)
+      get_filename_component(_python_lib "${Python3_LIBRARIES}" NAME_WE)
+      if(_python_lib)
+        string(APPEND _python_lib ".dll")
+      endif()
+    else()
+      get_filename_component(_python_lib "${Python3_LIBRARIES}" NAME)
+    endif()
   endif()
 
   install(CODE "

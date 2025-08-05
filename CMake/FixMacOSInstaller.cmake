@@ -40,8 +40,14 @@ set(app_path "${bundle_path}/Contents/MacOS/${app}")
 execute_process(COMMAND install_name_tool -add_rpath "@executable_path/../Frameworks" ${app_path} ERROR_QUIET)
 execute_process(COMMAND install_name_tool -add_rpath "@executable_path/../../../../.." ${qtwebengineprocess_path} ERROR_QUIET)
 
+# TODO: Fix QWebEngineCore.framework
+
+###########################################
+# (2) TODO: Fix @rpath deps of _pyMITK.so #
+###########################################
+
 ###############################################################
-# (2) Fix pyMITK package by renaming pyMITK.py to __init__.py #
+# (3) Fix pyMITK package by renaming pyMITK.py to __init__.py #
 ###############################################################
 
 file(GLOB lib_dirs "${bundle_path}/Contents/Resources/python/lib/python3.*")

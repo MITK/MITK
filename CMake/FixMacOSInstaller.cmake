@@ -41,22 +41,3 @@ execute_process(COMMAND install_name_tool -add_rpath "@executable_path/../Framew
 execute_process(COMMAND install_name_tool -add_rpath "@executable_path/../../../../.." ${qtwebengineprocess_path} ERROR_QUIET)
 
 # TODO: Fix QWebEngineCore.framework
-
-###########################################
-# (2) TODO: Fix @rpath deps of _pyMITK.so #
-###########################################
-
-###############################################################
-# (3) Fix pyMITK package by renaming pyMITK.py to __init__.py #
-###############################################################
-
-file(GLOB lib_dirs "${bundle_path}/Contents/Resources/python/lib/python3.*")
-foreach(lib_dir IN LISTS lib_dirs)
-  if(IS_DIRECTORY "${lib_dir}")
-    set(pymitk_dir "${lib_dir}/site-packages/pyMITK")
-    if(EXISTS "${pymitk_dir}/pyMITK.py")
-      file(RENAME "${pymitk_dir}/pyMITK.py" "${pymitk_dir}/__init__.py")
-      break()
-    endif()
-  endif()
-endforeach()

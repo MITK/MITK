@@ -80,7 +80,7 @@ if(_mitk_executable_targets)
   endforeach()
 endif()
 
-# Install Python3 and pyMITK
+# Install Python3 with pyMITK
 
 if(MITK_USE_Python3)
   if(APPLE)
@@ -90,21 +90,11 @@ if(MITK_USE_Python3)
   endif()
 
   set(_install_DESTINATION "${_python_dest}")
-
-  MITK_INSTALL(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/src/Python3/" USE_SOURCE_PERMISSIONS)
+  MITK_INSTALL(DIRECTORY "${MITK_BINARY_DIR}/python/" USE_SOURCE_PERMISSIONS)
 
   file(RELATIVE_PATH _rel_sitearch "${Python3_ROOT_DIR}" "${Python3_SITEARCH}")
   set(_install_DESTINATION "${_python_dest}/${_rel_sitearch}/pyMITK")
-
   MITK_INSTALL(TARGETS pyMITK)
-
-  if(WIN32)
-    MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/pyMITK.py")
-  else()
-    MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/pyMITK.py")
-  endif()
-
-  # pyMITK.py is renamed to __init__.py by the Fix<OS>Installer.cmake scripts.
 
   set(_install_DESTINATION "")
 endif()

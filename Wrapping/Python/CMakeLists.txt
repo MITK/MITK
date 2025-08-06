@@ -40,7 +40,14 @@ swig_add_library(pyMITK LANGUAGE python SOURCES MITKWRAP.i)
 set_property(TARGET pyMITK PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Wrapping")
 target_link_libraries(pyMITK Python3::Python ${libraries})
 mitk_target_link_libraries_with_dynamic_lookup(${SWIG_MODULE_pyMITK_REAL_NAME} ${Python3_LIBRARIES})
-set_target_properties(pyMITK PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SWIG_OUTDIR}")
+
+set(lib_output_dir "${CMAKE_SWIG_OUTDIR}")
+
+if(CMAKE_CONFIGURATION_TYPES)
+  string(APPEND lib_output_dir "/$<CONFIG>/..")
+endif()
+
+set_target_properties(pyMITK PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${lib_output_dir}")
 
 if(APPLE)
   set_target_properties(pyMITK PROPERTIES

@@ -94,6 +94,8 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
 {
   if (m_InstallStep != InstallStep::Upgrade_Pip && (exitStatus != QProcess::NormalExit || exitCode != 0))
   {
+    m_InstallStep = InstallStep::Upgrade_Pip;
+
     m_Ui->progressBar->setRange(0, 100);
     m_Ui->progressBar->setValue(0);
 

@@ -67,7 +67,7 @@ namespace mitk
       const auto pythonHome = PythonHelper::GetHomePath();
       const auto pythonLibrary = PythonHelper::GetLibraryPath();
 
-      MITK_INFO << "Preload Python: " << pythonLibrary.string();
+      // MITK_INFO << "Preload Python: " << pythonLibrary.string();
 
 #if defined(__APPLE__)
       SetEnv("PYTHONHOME", pythonHome.string());

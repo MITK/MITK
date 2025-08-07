@@ -184,17 +184,35 @@ fs::path mitk::PythonHelper::GetVirtualEnvBasePath()
   return {};
 }
 
-std::optional<fs::path> mitk::PythonHelper::CreateVirtualEnv(const std::string& name)
+fs::path mitk::PythonHelper::GetVirtualEnvPath(const std::string& name)
 {
   if (name.empty())
-    return std::nullopt;
+    return {};
 
   const auto basePath = GetVirtualEnvBasePath();
 
   if (basePath.empty())
-    return std::nullopt;
+    return {};
 
-  const auto venvPath = basePath / name;
+  return basePath / name;
+}
+
+bool mitk::PythonHelper::VirtualEnvExists(const std::string& name)
+{
+  const auto venvPath = GetVirtualEnvPath(name);
+
+  if (venvPath.empty())
+    return false;
+
+  return fs::exists(venvPath / "pyvenv.cfg");
+}
+
+fs::path mitk::PythonHelper::CreateVirtualEnv(const std::string& name)
+{
+  const auto venvPath = GetVirtualEnvPath(name);
+
+  if (venvPath.empty())
+    return {};
 
   if (!fs::exists(venvPath))
   {
@@ -202,7 +220,7 @@ std::optional<fs::path> mitk::PythonHelper::CreateVirtualEnv(const std::string& 
     fs::create_directory(venvPath, error);
 
     if (error)
-      return std::nullopt;
+      return {};
   }
 
   const auto venvConfigPath = venvPath / "pyvenv.cfg";
@@ -213,7 +231,7 @@ std::optional<fs::path> mitk::PythonHelper::CreateVirtualEnv(const std::string& 
   const auto execPath = GetExecutablePath();
 
   if (execPath.empty())
-    return std::nullopt;
+    return {};
 
   auto venvCommand = "\"" + execPath.string() + "\" -m venv \"" + venvPath.string() + "\"";
 
@@ -225,26 +243,31 @@ std::optional<fs::path> mitk::PythonHelper::CreateVirtualEnv(const std::string& 
 #endif
 
   if (auto result = std::system(venvCommand.c_str()); result != 0)
-    return std::nullopt;
+    return {};
 
   if (fs::exists(venvConfigPath))
     return venvPath;
 
-  return std::nullopt;
+  return {};
 }
 
-bool mitk::PythonHelper::ActivateVirtualEnv(const fs::path& venvPath)
+bool mitk::PythonHelper::ActivateVirtualEnv(const std::string& name)
 {
-  if (venvPath.empty() || !fs::exists(venvPath / "pyvenv.cfg"))
+  return ActivateVirtualEnv(GetVirtualEnvPath(name));
+}
+
+bool mitk::PythonHelper::ActivateVirtualEnv(const fs::path& path)
+{
+  if (path.empty() || !fs::exists(path / "pyvenv.cfg"))
     return false;
 
-  if (!SetEnv("VIRTUAL_ENV", venvPath.string()))
+  if (!SetEnv("VIRTUAL_ENV", path.string()))
     return false;
 
 #if defined(_WIN32)
-  const auto pythonExecDir = venvPath / "Scripts";
+  const auto pythonExecDir = path / "Scripts";
 #else
-  const auto pythonExecDir = venvPath / "bin";
+  const auto pythonExecDir = path / "bin";
 #endif
 
   if (!AddPathEnv(pythonExecDir))

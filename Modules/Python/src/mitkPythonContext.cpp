@@ -27,6 +27,24 @@ namespace
   };
 
   using PyObjectPtr = std::unique_ptr<PyObject, PyObjectDeleter>;
+
+  void ActivateVirtualEnv(const std::string& venvName)
+  {
+    if (!mitk::PythonHelper::VirtualEnvExists(venvName))
+    {
+      MITK_INFO << "Create virtual environment: " << venvName;
+      const auto venvPath = mitk::PythonHelper::CreateVirtualEnv(venvName);
+
+      if (venvPath.empty())
+        mitkThrow() << "Could not create virtual environment: "
+                    << mitk::PythonHelper::GetVirtualEnvPath(venvName);
+    }
+
+    if (!mitk::PythonHelper::ActivateVirtualEnv(venvName))
+      mitkThrow() << "Could not activate virtual environment: " << venvName;
+
+    MITK_INFO << "Using virtual environment: " << venvName;
+  }
 }
 
 struct mitk::PythonContext::Impl
@@ -35,13 +53,10 @@ struct mitk::PythonContext::Impl
   PyObjectPtr LocalDictionary;
 };
 
-mitk::PythonContext::PythonContext()
+mitk::PythonContext::PythonContext(const std::string& venvName)
   : m_Impl(std::make_unique<Impl>())
 {
-  auto venvPath = PythonHelper::CreateVirtualEnv("default");
-
-  if (venvPath.has_value() && PythonHelper::ActivateVirtualEnv(venvPath.value()))
-    MITK_INFO << "Using virtual environment: " << venvPath.value().string();
+  ActivateVirtualEnv(venvName);
 
   if (!Py_IsInitialized())
     Py_Initialize();

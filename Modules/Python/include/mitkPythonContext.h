@@ -24,10 +24,9 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(PythonContext, itk::LightObject);
-    itkFactorylessNewMacro(Self);
 
-    PythonContext();
-    ~PythonContext();
+    itkFactorylessNewMacro(Self);
+    mitkNewMacro1Param(Self, const std::string&);
 
     /**
      * @brief Imports essential python packages: numpy, os, sys, io
@@ -76,6 +75,10 @@ namespace mitk
      * See: https://docs.python.org/3/library/io.html#io.StringIO.getvalue
      */
     std::string GetStdOut(const std::string &varName = "_mitk_stdout");
+
+  protected:
+    explicit PythonContext(const std::string& venvName = "default");
+    ~PythonContext();
 
   private:
     struct Impl;

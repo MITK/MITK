@@ -56,6 +56,7 @@ protected:
   mitk::nnInteractiveTool* GetTool();
   void UncheckOtherInteractorButtons(QPushButton* interactorButton);
 
+  bool CreateVirtualEnv();
   bool Install();
 
 private:

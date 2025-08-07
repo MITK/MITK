@@ -16,8 +16,6 @@ found in the LICENSE file.
 #include <mitkFileSystem.h>
 #include <MitkPythonHelperExports.h>
 
-#include <optional>
-
 #cmakedefine MITK_PYTHON_LIBRARY_FILENAME "@MITK_PYTHON_LIBRARY_FILENAME@"
 
 namespace mitk::PythonHelper
@@ -29,9 +27,13 @@ namespace mitk::PythonHelper
   MITKPYTHONHELPER_EXPORT fs::path GetHomePath();
   MITKPYTHONHELPER_EXPORT fs::path GetLibraryPath();
   MITKPYTHONHELPER_EXPORT fs::path GetExecutablePath();
+
   MITKPYTHONHELPER_EXPORT fs::path GetVirtualEnvBasePath();
-  MITKPYTHONHELPER_EXPORT std::optional<fs::path> CreateVirtualEnv(const std::string& name);
-  MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const fs::path& venvPath);
+  MITKPYTHONHELPER_EXPORT fs::path GetVirtualEnvPath(const std::string& name);
+  MITKPYTHONHELPER_EXPORT bool VirtualEnvExists(const std::string& name);
+  MITKPYTHONHELPER_EXPORT fs::path CreateVirtualEnv(const std::string& name);
+  MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const std::string& name);
+  MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const fs::path& path);
 }
 
 #endif

@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImageConverter.h>
 #include <mitknnInteractiveInteractor.h>
 #include <mitkPythonContext.h>
+#include <mitkPythonHelper.h>
 #include <mitkToolManagerProvider.h>
 
 #include <QmitknnInteractiveInstallDialog.h>
@@ -23,9 +24,14 @@ found in the LICENSE file.
 
 #include <QBoxLayout>
 #include <QButtonGroup>
+#include <QEventLoop>
+#include <QFutureWatcher>
 #include <QMessageBox>
+#include <QProgressDialog>
 #include <QShortcut>
 #include <QTimer>
+
+#include <QtConcurrent>
 
 MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
 
@@ -270,6 +276,45 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
   connect(m_Ui->maskButton, &QPushButton::clicked, this, &Self::OnMaskButtonClicked);
 }
 
+bool QmitknnInteractiveToolGUI::CreateVirtualEnv()
+{
+  const auto venvName = this->GetTool()->GetVirtualEnvName();
+
+  if (mitk::PythonHelper::VirtualEnvExists(venvName))
+    return true;
+
+  auto dialog = new QProgressDialog("Create virtual environment...", {}, 0, 0, this);
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  dialog->setWindowModality(Qt::WindowModal);
+  dialog->setWindowTitle("nnInteractive");
+  dialog->setMinimumDuration(0);
+  dialog->show();
+
+  QEventLoop loop;
+  bool result = false;
+
+  auto future = QtConcurrent::run([venvName]() {
+    return mitk::PythonHelper::CreateVirtualEnv(venvName);
+  });
+
+  auto watcher = new QFutureWatcher<fs::path>();
+
+  connect(watcher, &QFutureWatcher<fs::path>::finished, this, [&]() {
+    dialog->close();
+
+    const auto venvPath = watcher->result();
+    result = !venvPath.empty();
+
+    watcher->deleteLater();
+    loop.quit();
+  });
+
+  watcher->setFuture(future);
+  loop.exec();
+
+  return result;
+}
+
 bool QmitknnInteractiveToolGUI::Install()
 {
   if (this->GetTool()->IsInstalled())
@@ -293,9 +338,9 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 #else
   m_Ui->initializeButton->setEnabled(false);
 
-  this->GetTool()->CreatePythonContext();
-
-  if (!this->Install())
+  if (!CreateVirtualEnv() ||
+      !this->GetTool()->CreatePythonContext() ||
+      !Install())
   {
     m_Ui->initializeButton->setEnabled(true);
     return;

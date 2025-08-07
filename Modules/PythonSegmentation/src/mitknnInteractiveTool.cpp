@@ -405,12 +405,27 @@ void mitk::nnInteractiveTool::ConfirmCleanUp()
   this->ConfirmCleanUpEvent.Send(true);
 }
 
-void mitk::nnInteractiveTool::CreatePythonContext()
+std::string mitk::nnInteractiveTool::GetVirtualEnvName() const
 {
-  auto pythonContext = PythonContext::New();
-  pythonContext->Activate();
+  return this->GetName();
+}
 
-  m_Impl->SetPythonContext(pythonContext);
+bool mitk::nnInteractiveTool::CreatePythonContext()
+{
+  try
+  {
+    auto pythonContext = PythonContext::New(this->GetVirtualEnvName());
+    pythonContext->Activate();
+
+    m_Impl->SetPythonContext(pythonContext);
+  }
+  catch (const Exception& e)
+  {
+    MITK_ERROR << e.GetDescription();
+    return false;
+  }
+
+  return true;
 }
 
 mitk::PythonContext* mitk::nnInteractiveTool::GetPythonContext() const
@@ -422,7 +437,7 @@ mitk::PythonContext* mitk::nnInteractiveTool::GetPythonContext() const
 // Functions and methods that execute Python code
 ////////////////////////////////////////////////////////////////////////////////
 
-bool mitk::nnInteractiveTool::IsInstalled()
+bool mitk::nnInteractiveTool::IsInstalled() const
 {
   std::ostringstream pyCommands; pyCommands
     << "import importlib.util\n"

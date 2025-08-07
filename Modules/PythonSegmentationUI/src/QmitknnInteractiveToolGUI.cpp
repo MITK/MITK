@@ -20,18 +20,14 @@ found in the LICENSE file.
 #include <mitkToolManagerProvider.h>
 
 #include <QmitknnInteractiveInstallDialog.h>
+#include <QmitkRun.h>
 #include <QmitkStyleManager.h>
 
 #include <QBoxLayout>
 #include <QButtonGroup>
-#include <QEventLoop>
-#include <QFutureWatcher>
 #include <QMessageBox>
-#include <QProgressDialog>
 #include <QShortcut>
 #include <QTimer>
-
-#include <QtConcurrent>
 
 MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
 
@@ -283,36 +279,11 @@ bool QmitknnInteractiveToolGUI::CreateVirtualEnv()
   if (mitk::PythonHelper::VirtualEnvExists(venvName))
     return true;
 
-  auto dialog = new QProgressDialog("Create virtual environment...", {}, 0, 0, this);
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
-  dialog->setWindowModality(Qt::WindowModal);
-  dialog->setWindowTitle("nnInteractive");
-  dialog->setMinimumDuration(0);
-  dialog->show();
-
-  QEventLoop loop;
-  bool result = false;
-
-  auto future = QtConcurrent::run([venvName]() {
+  const auto venvPath = QmitkRunAsyncBlocking<fs::path>("nnInteractive", "Creating virtual environment...", [&]() {
     return mitk::PythonHelper::CreateVirtualEnv(venvName);
   });
 
-  auto watcher = new QFutureWatcher<fs::path>();
-
-  connect(watcher, &QFutureWatcher<fs::path>::finished, this, [&]() {
-    dialog->close();
-
-    const auto venvPath = watcher->result();
-    result = !venvPath.empty();
-
-    watcher->deleteLater();
-    loop.quit();
-  });
-
-  watcher->setFuture(future);
-  loop.exec();
-
-  return result;
+  return !venvPath.empty();
 }
 
 bool QmitknnInteractiveToolGUI::Install()

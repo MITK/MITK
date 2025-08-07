@@ -281,6 +281,16 @@ bool QmitknnInteractiveToolGUI::Install()
 
 void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 {
+#if defined(__APPLE__) && !defined(__aarch64__)
+  QMessageBox::information(
+    nullptr,
+    "nnInteractive - Unsupported Platform",
+    "<div style='line-height: 1.25'>"
+      "<p><strong>Unsupported platform:</strong> nnInteractive requires an Apple "
+      "Silicon Mac. It is not compatible with Intel-based Macs.</p>"
+    "</div>",
+    QMessageBox::Ok);
+#else
   m_Ui->initializeButton->setEnabled(false);
 
   this->GetTool()->CreatePythonContext();
@@ -317,8 +327,8 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 
       const auto errorMessage = QString(
         "<div style='line-height: 1.25'>"
-        "<p>Error while initializing nnInteractive.</p>"
-        "<p>Reason: %1</p>"
+          "<p>Error while initializing nnInteractive.</p>"
+          "<p>Reason: %1</p>"
         "</div>")
         .arg(QString::fromLocal8Bit(e.GetDescription()));
 
@@ -353,14 +363,15 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 
     const QString cpuBackendMessage = QString(
       "<div style='line-height: 1.25'>"
-      "<p><strong>Warning:</strong> The CUDA backend is unavailable. Falling back to the CPU backend, which is "
-      "<em>significantly (!)</em> slower.</p>"
-      "<p>For a smooth experience and quick response times, a compatible NVIDIA GPU with up-to-date drivers "
-      "is highly recommended.</p>"
+        "<p><strong>Warning:</strong> The CUDA backend is unavailable. Falling back to the CPU backend, which is "
+        "<em>significantly (!)</em> slower.</p>"
+        "<p>For a smooth experience and quick response times, a compatible NVIDIA GPU with up-to-date drivers "
+        "is highly recommended.</p>"
       "</div>");
 
     QMessageBox::warning(nullptr, title, cpuBackendMessage);
   });
+#endif
 }
 
 void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()

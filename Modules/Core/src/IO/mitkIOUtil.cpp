@@ -365,7 +365,7 @@ namespace mitk
   }
 #endif
 
-  fs::path IOUtil::GetAppBundlePath(AppBundlePath path)
+  fs::path IOUtil::GetAppBundlePath([[maybe_unused]] AppBundlePath path)
   {
     fs::path appPath = GetProgramPath();
 

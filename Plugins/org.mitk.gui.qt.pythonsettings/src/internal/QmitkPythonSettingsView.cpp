@@ -12,7 +12,10 @@ found in the LICENSE file.
 
 #include "QmitkPythonSettingsView.h"
 #include <ui_QmitkPythonSettingsView.h>
+
 #include <mitkPythonHelper.h>
+
+#include <QmitkRun.h>
 
 #include <array>
 
@@ -259,8 +262,9 @@ void QmitkPythonSettingsView::DeleteSelectedVenvs()
   {
     const auto venvPath = item->venvPath();
 
-    MITK_INFO << "Deleting virtual environment: " << venvPath.toStdString();
-    QDir(venvPath).removeRecursively(); // TODO: Do async and report progress.
+    QmitkRunAsyncBlocking("Delete selected virtual environments", QString("Deleting \"%1\"...").arg(venvPath), [&venvPath]() {
+      QDir(venvPath).removeRecursively();
+    });
   }
 
   this->RefreshVenvsTreeWidget();

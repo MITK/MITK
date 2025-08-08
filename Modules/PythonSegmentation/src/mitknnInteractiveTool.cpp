@@ -441,13 +441,12 @@ bool mitk::nnInteractiveTool::IsInstalled() const
 {
   std::ostringstream pyCommands; pyCommands
     << "import importlib.util\n"
-    << "if importlib.util.find_spec('nnInteractive') is not None:\n"
-    << "    nninteractive_is_installed = True\n";
+    << "nninteractive_is_installed = importlib.util.find_spec('nnInteractive') is not None\n";
 
   auto pythonContext = m_Impl->GetPythonContext();
   pythonContext->ExecuteString(pyCommands.str());
 
-  return pythonContext->HasVariable("nninteractive_is_installed");
+  return pythonContext->GetVariableAs<bool>("nninteractive_is_installed").value_or(false);
 }
 
 void mitk::nnInteractiveTool::StartSession()
@@ -585,12 +584,16 @@ bool mitk::nnInteractiveTool::Impl::IsCUDAAvailable() const
 {
   std::ostringstream pyCommands; pyCommands
     << "import torch\n"
-    << "if torch.cuda.is_available():\n"
-    << "    cuda_is_available = True\n";
+    << "try:\n"
+    << "    torch.cuda.init()\n"
+    << "    torch.empty(1, device='cuda')\n"
+    << "    cuda_is_available = True\n"
+    << "except Exception:\n"
+    << "    cuda_is_available = False\n";
 
   m_PythonContext->ExecuteString(pyCommands.str());
 
-  return m_PythonContext->HasVariable("cuda_is_available");
+  return m_PythonContext->GetVariableAs<bool>("cuda_is_available").value_or(false);
 }
 
 void mitk::nnInteractiveTool::Impl::SetAutoZoom() const

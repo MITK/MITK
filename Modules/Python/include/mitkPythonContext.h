@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <MitkPythonExports.h>
 
 #include <memory>
+#include <optional>
 
 namespace mitk
 {
@@ -39,6 +40,21 @@ namespace mitk
      * `globals` (m_GlobalDictionary) & `locals` (m_LocalDictionary) namespaces.
      */
     bool HasVariable(const std::string &varName);
+
+    template <typename T>
+    std::optional<T> GetVariableAs(const std::string& varName);
+
+    template <>
+    std::optional<bool> GetVariableAs<bool>(const std::string& varName);
+
+    template <>
+    std::optional<int> GetVariableAs<int>(const std::string& varName);
+
+    template <>
+    std::optional<double> GetVariableAs<double>(const std::string& varName);
+
+    template <>
+    std::optional<std::string> GetVariableAs<std::string>(const std::string& varName);
 
     /**
      * @brief Provides view into mitk::Image type object in Python

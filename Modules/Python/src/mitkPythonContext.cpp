@@ -49,6 +49,19 @@ namespace
 
 struct mitk::PythonContext::Impl
 {
+  PyObjectPtr GetVariable(const std::string& varName)
+  {
+    auto obj = PyDict_GetItemString(LocalDictionary.get(), varName.c_str());
+
+    if (!obj)
+      obj = PyDict_GetItemString(GlobalDictionary.get(), varName.c_str());
+
+    if (obj)
+      Py_INCREF(obj); // Promote from borrowed to owned reference.
+
+    return PyObjectPtr(obj);
+  }
+
   PyObjectPtr GlobalDictionary;
   PyObjectPtr LocalDictionary;
 };
@@ -234,6 +247,60 @@ bool mitk::PythonContext::HasVariable(const std::string &varName)
     return false;
   }
   return true;
+}
+
+template <>
+std::optional<bool> mitk::PythonContext::GetVariableAs<bool>(const std::string& varName)
+{
+  auto obj = m_Impl->GetVariable(varName);
+
+  if (!obj)
+    return std::nullopt;
+
+  auto isTrue = PyObject_IsTrue(obj.get());
+
+  if (isTrue == -1)
+    return std::nullopt;
+
+  return isTrue != 0;
+}
+
+template <>
+std::optional<int> mitk::PythonContext::GetVariableAs<int>(const std::string& varName)
+{
+  PyObjectPtr obj = m_Impl->GetVariable(varName);
+
+  if (!obj || !PyLong_Check(obj.get()))
+    return std::nullopt;
+
+  return static_cast<int>(PyLong_AsLong(obj.get()));
+}
+
+template <>
+std::optional<double> mitk::PythonContext::GetVariableAs<double>(const std::string& varName)
+{
+  PyObjectPtr obj = m_Impl->GetVariable(varName);
+
+  if (!obj || !PyFloat_Check(obj.get()))
+    return std::nullopt;
+
+  return PyFloat_AsDouble(obj.get());
+}
+
+template <>
+std::optional<std::string> mitk::PythonContext::GetVariableAs<std::string>(const std::string& varName)
+{
+  PyObjectPtr obj = m_Impl->GetVariable(varName);
+
+  if (!obj || !PyUnicode_Check(obj.get()))
+    return std::nullopt;
+
+  auto str = PyUnicode_AsUTF8(obj.get());
+
+  if (str == nullptr)
+    return std::nullopt;
+
+  return str;
 }
 
 std::string mitk::PythonContext::GetPythonExceptionTraceback()

@@ -372,6 +372,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     m_Ui->autoZoomCheckBox->setChecked(false);
     m_Ui->autoZoomCheckBox->setToolTip("Auto-zoom is not available with CPU backend.");
 
+  #if !defined(__APPLE__)
     const QString cpuBackendMessage = QString(
       "<h3 %1>No compatible CUDA device detected</h3>"
       "<p %1>Falling back to CPU processing, which is <em>significantly slower</em>.</p>"
@@ -386,6 +387,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
       .arg(LINE_HEIGHT_STYLE);
 
     QMessageBox::warning(nullptr, "nnInteractive", cpuBackendMessage);
+  #endif
   });
 #endif
 }

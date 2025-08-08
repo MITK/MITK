@@ -36,6 +36,8 @@ found in the LICENSE file.
 
 namespace
 {
+  constexpr auto LINE_HEIGHT_STYLE = "style='line-height: 1.25'";
+
   QString ReadConfigValue(const QString& fileName, const QString& key)
   {
     QFile file(fileName);
@@ -248,10 +250,10 @@ void QmitkPythonSettingsView::DeleteSelectedVenvs()
   const auto answer = QMessageBox::question(
     nullptr,
     "Delete selected virtual environments",
-    "<div style='line-height: 1.25'>"
-      "<p><em>Warning:</em> This action cannot be undone. Deleting active environments may cause the application to crash.</p>"
-      "<p>Are you sure you want to delete the selected virtual environments?</p>"
-    "</div>",
+    QString(
+      "<h3 %1>Delete selected virtual environments?</h3>"
+      "<p %1><em>Warning:</em> This action cannot be undone. Deleting active "
+      "environments may cause the application to crash.</p>").arg(LINE_HEIGHT_STYLE),
     QMessageBox::Yes | QMessageBox::No,
     QMessageBox::No);
 

@@ -440,12 +440,12 @@ bool mitk::nnInteractiveTool::IsInstalled() const
 {
   std::ostringstream pyCommands; pyCommands
     << "import importlib.util\n"
-    << "nninteractive_is_installed = importlib.util.find_spec('nnInteractive') is not None\n";
+    << "is_installed = importlib.util.find_spec('nnInteractive') is not None\n";
 
   auto pythonContext = m_Impl->GetPythonContext();
   pythonContext->ExecuteString(pyCommands.str());
 
-  return pythonContext->GetVariableAs<bool>("nninteractive_is_installed").value_or(false);
+  return pythonContext->GetVariableAs<bool>("is_installed").value_or(false);
 }
 
 bool mitk::nnInteractiveTool::GetCUDADeviceInfo(CUDADeviceInfo& info) const
@@ -505,22 +505,21 @@ void mitk::nnInteractiveTool::StartSession()
 
     if (deviceInfo.Major < 6)
     {
-      MITK_WARN << "Minimum required compute capability is 6.0.";
+      MITK_WARN << "Minimum required compute capability is 6.0";
       switchToCUDADevice = false;
     }
 
     if (deviceInfo.TotalMemoryMB < 6000)
     {
-      MITK_WARN << "Minimum required total memory is 6 GB.";
+      MITK_WARN << "Minimum required total memory is 6 GB";
       switchToCUDADevice = false;
     }
 
     useCUDADevice = switchToCUDADevice;
   }
-  else
-  {
-    MITK_WARN << "No CUDA device found. Using CPU instead.";
-  }
+
+  if (!useCUDADevice)
+    MITK_WARN << "No compatible CUDA device detected. Falling back to CPU processing.";
 
   {
     std::ostringstream pyCommands; pyCommands

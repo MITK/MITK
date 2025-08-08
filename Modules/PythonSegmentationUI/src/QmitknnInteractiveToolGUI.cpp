@@ -33,6 +33,8 @@ MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, 
 
 namespace
 {
+  constexpr auto LINE_HEIGHT_STYLE = "style='line-height: 1.25'";
+
   void SetIcon(QAbstractButton* button, const char* icon)
   {
     button->setIcon(QmitkStyleManager::ThemeIcon(QString(":/nnInteractive/%1").arg(icon)));
@@ -74,34 +76,30 @@ namespace
     if (!segmentation->IsEmpty(label, GetCurrentTimeStep(segmentation)))
       return false;
 
-    QString title = "nnInteractive - Initialize with Mask";
-
     auto message = QString(
-      "<div style='line-height: 1.25'>"
-        "<p>The selected label cannot be used as a mask to start a new "
-        "session because it is empty.</p>"
-        "<p>Selected label: %1</p>"
-      "</div>")
+      "<h3 %1>Initialize with Mask</h3>"
+      "<p %1>The selected label cannot be used as a mask to start a new "
+      "session because it is empty.</p>"
+      "<p %1>Selected label: %2</p>")
+      .arg(LINE_HEIGHT_STYLE)
       .arg(GetLabelAsString(label));
 
-    QMessageBox::information(nullptr, title, message, QMessageBox::Ok);
+    QMessageBox::information(nullptr, "nnInteractive", message, QMessageBox::Ok);
 
     return true;
   }
 
   bool ConfirmInitializationWithMask(const mitk::Label* label)
   {
-    QString title = "nnInteractive - Initialize with Mask";
-
     auto message = QString(
-      "<div style='line-height: 1.25'>"
-        "<p>Do you want to <b>reset all interactions</b> and start a new "
-        "session based on the existing content of the selected label?</p>"
-        "<p>Selected label: %1</p>"
-      "</div>")
+      "<h3 %1>Initialize with Mask</h3>"
+      "<p %1>Do you want to <strong>reset all interactions</strong> and start a "
+      "new session based on the existing content of the selected label?</p>"
+      "<p %1>Selected label: %2</p>")
+      .arg(LINE_HEIGHT_STYLE)
       .arg(GetLabelAsString(label));
 
-    auto button = QMessageBox::question(nullptr, title, message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    auto button = QMessageBox::question(nullptr, "nnInteractive", message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     return button == QMessageBox::Yes;
   }
 }
@@ -300,11 +298,12 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 #if defined(__APPLE__) && !defined(__aarch64__)
   QMessageBox::information(
     nullptr,
-    "nnInteractive - Unsupported Platform",
-    "<div style='line-height: 1.25'>"
-      "<p><strong>Unsupported platform:</strong> nnInteractive requires an Apple "
-      "Silicon Mac. It is not compatible with Intel-based Macs.</p>"
-    "</div>",
+    "nnInteractive",
+    QString(
+      "<h3 %1>Unsupported Platform</h3>"
+      "<p %1>nnInteractive requires an Apple Silicon Mac.</p>"
+      "<p %1>It is not compatible with Intel-based Macs.</p>")
+      .arg(LINE_HEIGHT_STYLE),
     QMessageBox::Ok);
 #else
   m_Ui->initializeButton->setEnabled(false);
@@ -317,16 +316,13 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     return;
   }
 
-  const QString title = "nnInteractive";
-
-  const QString initMessage(
-    "<div style='line-height: 1.25'>"
-      "<p>Initializing, please wait a few seconds...</p>"
-      "<p><small><em>Note:</em> The first initialization after downloading MITK may take a minute "
-      "instead. Please be patient.</small></p>"
-    "</div>");
+  const auto initMessage = QString(
+    "<h3 %1>Initializing nnInteractive</h3>"
+    "<p %1>Please wait a few seconds...</p>"
+    "<p %1><small><em>Note:</em> The first initialization after downloading MITK may take a minute "
+    "instead. Please be patient.</small></p>").arg(LINE_HEIGHT_STYLE);
  
-  auto messageBox = new QMessageBox(QMessageBox::Information, title, initMessage);
+  auto messageBox = new QMessageBox(QMessageBox::Information, "nnInteractive", initMessage);
   messageBox->setStandardButtons(QMessageBox::NoButton);
   messageBox->setAttribute(Qt::WA_DeleteOnClose);
   messageBox->show();
@@ -342,10 +338,9 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
       messageBox->accept();
 
       const auto errorMessage = QString(
-        "<div style='line-height: 1.25'>"
-          "<p>Error while initializing nnInteractive.</p>"
-          "<p>Reason: %1</p>"
-        "</div>")
+        "<h3 %1>Error while initializing nnInteractive:</h3>"
+        "<p>%2</p>")
+        .arg(LINE_HEIGHT_STYLE)
         .arg(QString::fromLocal8Bit(e.GetDescription()));
 
       MITK_ERROR << errorMessage.toStdString();
@@ -378,14 +373,19 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     m_Ui->autoZoomCheckBox->setToolTip("Auto-zoom is not available with CPU backend.");
 
     const QString cpuBackendMessage = QString(
-      "<div style='line-height: 1.25'>"
-        "<p><strong>Warning:</strong> The CUDA backend is unavailable. Falling back to the CPU backend, which is "
-        "<em>significantly (!)</em> slower.</p>"
-        "<p>For a smooth experience and quick response times, a compatible NVIDIA GPU with up-to-date drivers "
-        "is highly recommended.</p>"
-      "</div>");
+      "<h3 %1>No compatible CUDA device detected</h3>"
+      "<p %1>Falling back to CPU processing, which is <em>significantly slower</em>.</p>"
+      "<p %1>For smooth performance and fast response times, a compatible NVIDIA GPU with at "
+      "least 6 GB VRAM is required:</p>"
+      "<ul %1>"
+        "<li %1>Minimum: Pascal architecture (e.g., GeForce GTX 1060)</li>"
+        "<li %1>Better: Turing architecture (e.g., GeForce RTX 2070)</li>"
+        "<li %1>Best: Ampere or newer (e.g., GeForce RTX 3080)</li>"
+      "</ul>"
+      "<p %1>6 GB VRAM is the absolute minimum; 12 GB or more is recommended for optimal results.</p>")
+      .arg(LINE_HEIGHT_STYLE);
 
-    QMessageBox::warning(nullptr, title, cpuBackendMessage);
+    QMessageBox::warning(nullptr, "nnInteractive", cpuBackendMessage);
   });
 #endif
 }

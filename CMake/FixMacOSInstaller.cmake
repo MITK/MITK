@@ -26,7 +26,8 @@ foreach(qt_framework ${qt_frameworks})
 endforeach()
 
 # Do the same for QtWebEngineProcess
-set(qtwebenginecore_helpers_path "${bundle_path}/Contents/Frameworks/QtWebEngineCore.framework/Helpers")
+set(qtwebenginecore_path "${bundle_path}/Contents/Frameworks/QtWebEngineCore.framework")
+set(qtwebenginecore_helpers_path "${qtwebenginecore_path}/Helpers")
 set(qtwebengineprocess_path "${qtwebenginecore_helpers_path}/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess")
 foreach(qt_framework ${qt_frameworks})
   set(from "@executable_path/../Frameworks/${qt_framework}.framework/Versions/A/${qt_framework}")
@@ -38,7 +39,7 @@ endforeach()
 # Move Helpers directory into Versions/A and create a symlink at the previous location.
 execute_process(COMMAND "${CMAKE_COMMAND}" -E rename
   "${qtwebenginecore_helpers_path}"
-  "${qtwebenginecore_helpers_path}/../Versions/A/Helpers"
+  "${qtwebenginecore_path}/Versions/A/Helpers"
 )
 execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink
   "Versions/Current/Helpers"

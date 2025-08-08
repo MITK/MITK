@@ -23,7 +23,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;h3 style=&quot; margin-top:14px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:125%;&quot;&gt;&lt;span style=&quot; font-size:large; font-weight:700;&quot;&gt;Do you want to install nnInteractive?&lt;/span&gt;&lt;/h3&gt;&lt;p&gt;To use this tool, nnInteractive must be installed first. The installation may require up to 6 GB of disk space.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;h3 style=&quot; margin-top:14px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:125%;&quot;&gt;&lt;span style=&quot; font-size:large; font-weight:700;&quot;&gt;Do you want to install nnInteractive?&lt;/span&gt;&lt;/h3&gt;&lt;p&gt;To use this tool, nnInteractive must be installed first. The installation may require up to 8 GB of disk space.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="textFormat">
       <enum>Qt::TextFormat::RichText</enum>

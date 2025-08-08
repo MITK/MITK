@@ -30,6 +30,14 @@ namespace mitk
   class MITKPYTHONSEGMENTATION_EXPORT nnInteractiveTool : public SegWithPreviewTool
   {
   public:
+    struct CUDADeviceInfo
+    {
+      std::string Name;
+      int Major;
+      int Minor;
+      int TotalMemoryMB;
+    };
+
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool)
     itkFactorylessNewMacro(Self)
 
@@ -60,6 +68,7 @@ namespace mitk
     bool CreatePythonContext();
     PythonContext* GetPythonContext() const;
     bool IsInstalled() const;
+    bool GetCUDADeviceInfo(CUDADeviceInfo& info) const;
     void StartSession();
     void EndSession();
     bool IsSessionRunning() const;

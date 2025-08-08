@@ -114,7 +114,6 @@ namespace mitk
     }
 
     // Methods that execute Python code are defined at the bottom of this file.
-    bool IsCUDAAvailable() const;
     void SetAutoZoom() const;
     void AddPointInteraction(const Point3D& point, const Image* inputAtTimeStep) const;
     void AddBoxInteraction(const PlanarFigure* box, const Image* inputAtTimeStep) const;
@@ -449,6 +448,43 @@ bool mitk::nnInteractiveTool::IsInstalled() const
   return pythonContext->GetVariableAs<bool>("nninteractive_is_installed").value_or(false);
 }
 
+bool mitk::nnInteractiveTool::GetCUDADeviceInfo(CUDADeviceInfo& info) const
+{
+  std::ostringstream pyCommands; pyCommands
+    << "import torch\n"
+    << "is_cuda_available = False\n"
+    << "try:\n"
+    << "    if torch.cuda.is_available():\n"
+    << "        name = torch.cuda.get_device_name(0)\n"
+    << "        props = torch.cuda.get_device_properties(0)\n"
+    << "        total_memory_mb = props.total_memory // (1024 ** 2)\n"
+    << "        major = props.major\n"
+    << "        minor = props.minor\n"
+    << "        is_cuda_available = True\n"
+    << "except Exception:\n"
+    << "    pass\n";
+
+  try
+  {
+    auto pythonContext = m_Impl->GetPythonContext();
+    pythonContext->ExecuteString(pyCommands.str());
+
+    if (!pythonContext->GetVariableAs<bool>("is_cuda_available").value_or(false))
+      return false;
+
+    info.Name = pythonContext->GetVariableAs<std::string>("name").value_or("");
+    info.TotalMemoryMB = pythonContext->GetVariableAs<int>("total_memory_mb").value_or(0);
+    info.Major = pythonContext->GetVariableAs<int>("major").value_or(0);
+    info.Minor = pythonContext->GetVariableAs<int>("minor").value_or(0);
+
+    return true;
+  }
+  catch (...)
+  {
+    return false;
+  }
+}
+
 void mitk::nnInteractiveTool::StartSession()
 {
   constexpr auto MODEL_CHECKPOINT = "nnInteractive_v1.0";
@@ -457,6 +493,34 @@ void mitk::nnInteractiveTool::StartSession()
     this->EndSession();
 
   auto pythonContext = m_Impl->GetPythonContext();
+  bool useCUDADevice = false;
+
+  if (CUDADeviceInfo deviceInfo; this->GetCUDADeviceInfo(deviceInfo))
+  {
+    MITK_INFO << "Found CUDA device: " << deviceInfo.Name;
+    MITK_INFO << "  Compute capability: " << deviceInfo.Major << "." << deviceInfo.Minor;
+    MITK_INFO << "  Total memory: " << deviceInfo.TotalMemoryMB << " MB";
+
+    bool switchToCUDADevice = true;
+
+    if (deviceInfo.Major < 6)
+    {
+      MITK_WARN << "Minimum required compute capability is 6.0.";
+      switchToCUDADevice = false;
+    }
+
+    if (deviceInfo.TotalMemoryMB < 6000)
+    {
+      MITK_WARN << "Minimum required total memory is 6 GB.";
+      switchToCUDADevice = false;
+    }
+
+    useCUDADevice = switchToCUDADevice;
+  }
+  else
+  {
+    MITK_WARN << "No CUDA device found. Using CPU instead.";
+  }
 
   {
     std::ostringstream pyCommands; pyCommands
@@ -498,18 +562,13 @@ void mitk::nnInteractiveTool::StartSession()
 
   m_Impl->ResetBackend();
 
-  bool isCUDAAvailable = m_Impl->IsCUDAAvailable();
-  const std::string torchDevice = isCUDAAvailable
-    ? "cuda:0"
-    : "cpu";
-
-  if (!isCUDAAvailable)
+  if (!useCUDADevice)
     this->SetAutoZoom(false);
 
   {
     std::ostringstream pyCommands; pyCommands
       << "session = inference_class(\n"
-      << "    device=torch.device('" << torchDevice << "'),\n"
+      << "    device=torch.device('" << (useCUDADevice ? "cuda:0" : "cpu") << "'),\n"
       << "    use_torch_compile=False,\n"
       << "    torch_n_threads=os.cpu_count(),\n"
       << "    verbose=False,\n"
@@ -519,7 +578,7 @@ void mitk::nnInteractiveTool::StartSession()
     pythonContext->ExecuteString(pyCommands.str());
   }
 
-  m_Impl->SetBackend(isCUDAAvailable
+  m_Impl->SetBackend(useCUDADevice
     ? Backend::CUDA
     : Backend::CPU);
 
@@ -578,22 +637,6 @@ bool mitk::nnInteractiveTool::IsSessionRunning() const
     return false;
   
   return pythonContext->HasVariable("session");
-}
-
-bool mitk::nnInteractiveTool::Impl::IsCUDAAvailable() const
-{
-  std::ostringstream pyCommands; pyCommands
-    << "import torch\n"
-    << "try:\n"
-    << "    torch.cuda.init()\n"
-    << "    torch.empty(1, device='cuda')\n"
-    << "    cuda_is_available = True\n"
-    << "except Exception:\n"
-    << "    cuda_is_available = False\n";
-
-  m_PythonContext->ExecuteString(pyCommands.str());
-
-  return m_PythonContext->GetVariableAs<bool>("cuda_is_available").value_or(false);
 }
 
 void mitk::nnInteractiveTool::Impl::SetAutoZoom() const

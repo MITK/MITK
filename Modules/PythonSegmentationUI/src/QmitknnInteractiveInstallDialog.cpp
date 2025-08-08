@@ -133,7 +133,10 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
     m_Ui->buttonBox->setEnabled(true);
 
     this->AutoScrollToBottom();
-    this->accept();
+
+    if (m_Ui->autoCloseCheckBox->isChecked())
+      this->accept();
+
     return;
   }
 

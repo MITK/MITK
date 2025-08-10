@@ -90,16 +90,16 @@ namespace mitk
   };
 
   template <>
-  std::optional<bool> PythonContext::GetVariableAs<bool>(const std::string&);
+  MITKPYTHON_EXPORT std::optional<bool> PythonContext::GetVariableAs<bool>(const std::string&);
 
   template <>
-  std::optional<int> PythonContext::GetVariableAs<int>(const std::string&);
+  MITKPYTHON_EXPORT std::optional<int> PythonContext::GetVariableAs<int>(const std::string&);
 
   template <>
-  std::optional<double> PythonContext::GetVariableAs<double>(const std::string&);
+  MITKPYTHON_EXPORT std::optional<double> PythonContext::GetVariableAs<double>(const std::string&);
 
   template <>
-  std::optional<std::string> PythonContext::GetVariableAs<std::string>(const std::string&);
+  MITKPYTHON_EXPORT std::optional<std::string> PythonContext::GetVariableAs<std::string>(const std::string&);
 }
 
 #endif

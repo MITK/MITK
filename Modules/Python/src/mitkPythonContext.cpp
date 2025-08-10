@@ -69,7 +69,8 @@ struct mitk::PythonContext::Impl
 mitk::PythonContext::PythonContext(const std::string& venvName)
   : m_Impl(std::make_unique<Impl>())
 {
-  ActivateVirtualEnv(venvName);
+  if (!venvName.empty())
+    ActivateVirtualEnv(venvName);
 
   if (!Py_IsInitialized())
     Py_Initialize();

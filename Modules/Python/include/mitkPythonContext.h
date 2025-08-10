@@ -93,7 +93,7 @@ namespace mitk
     std::string GetStdOut(const std::string &varName = "_mitk_stdout");
 
   protected:
-    explicit PythonContext(const std::string& venvName = "default");
+    explicit PythonContext(const std::string& venvName = {});
     ~PythonContext();
 
   private:

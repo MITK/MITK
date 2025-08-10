@@ -47,7 +47,7 @@ namespace
     auto appPath = mitk::IOUtil::GetAppBundlePath(mitk::IOUtil::AppBundlePath::Self);
 
     if (!appPath.empty())
-      return std::hash<fs::path>{}(appPath);
+      return std::hash<std::string>{}(appPath.string());
 
     return {};
   }

@@ -68,6 +68,9 @@ fs::path mitk::PythonHelper::GetHomePath()
   auto buildTreePython = Up(appDir, 2) / "python";
 #elif defined(__APPLE__)
   auto buildTreePython = Up(appDir, 4) / "python";
+
+  if (!fs::exists(buildTreePython) || !fs::is_directory(buildTreePython))
+    buildTreePython = Up(appDir, 1) / "python";
 #else
   auto buildTreePython = Up(appDir, 1) / "python";
 #endif

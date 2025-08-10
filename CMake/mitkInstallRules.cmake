@@ -126,6 +126,9 @@ if(MITK_USE_Qt6)
 
     set(_install_DESTINATION "plugins/xcbglintegrations")
     MITK_INSTALL(FILES "${_qmake_path}/../plugins/xcbglintegrations/libqxcb-glx-integration.so")
+
+    set(_install_DESTINATION "plugins/platformthemes")
+    MITK_INSTALL(FILES "${_qmake_path}/../plugins/platformthemes/libqgtk3.so")
   endif()
 
   # Install platform-specific Qt styles

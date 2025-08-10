@@ -44,18 +44,6 @@ namespace mitk
     template <typename T>
     std::optional<T> GetVariableAs(const std::string& varName);
 
-    template <>
-    std::optional<bool> GetVariableAs<bool>(const std::string& varName);
-
-    template <>
-    std::optional<int> GetVariableAs<int>(const std::string& varName);
-
-    template <>
-    std::optional<double> GetVariableAs<double>(const std::string& varName);
-
-    template <>
-    std::optional<std::string> GetVariableAs<std::string>(const std::string& varName);
-
     /**
      * @brief Provides view into mitk::Image type object in Python
      * as mitk::Image* pointer in MITK.
@@ -100,6 +88,18 @@ namespace mitk
     struct Impl;
     std::unique_ptr<Impl> m_Impl;
   };
+
+  template <>
+  std::optional<bool> PythonContext::GetVariableAs<bool>(const std::string&);
+
+  template <>
+  std::optional<int> PythonContext::GetVariableAs<int>(const std::string&);
+
+  template <>
+  std::optional<double> PythonContext::GetVariableAs<double>(const std::string&);
+
+  template <>
+  std::optional<std::string> PythonContext::GetVariableAs<std::string>(const std::string&);
 }
 
 #endif

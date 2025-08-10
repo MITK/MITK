@@ -18,6 +18,7 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
+  resources/QmitkPythonSettings.qrc
 )
 
 set(CPP_FILES)

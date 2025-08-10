@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkPythonHelper.h>
 
 #include <QmitkRun.h>
+#include <QmitkStyleManager.h>
 
 #include <array>
 
@@ -224,6 +225,9 @@ void QmitkPythonSettingsView::CreateQtPartControl(QWidget* parent)
   using Self = QmitkPythonSettingsView;
 
   m_Ui->setupUi(parent);
+
+  m_Ui->deleteVenvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonSettingsView/trash.svg")));
+  m_Ui->refreshVenvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonSettingsView/arrow-rotate-right.svg")));
 
   connect(m_Ui->venvsTreeWidget, &QTreeWidget::itemDoubleClicked, [](QTreeWidgetItem* item, int) {
     if (auto venvItem = dynamic_cast<const QmitkVenvTreeWidgetItem*>(item); venvItem != nullptr)

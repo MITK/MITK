@@ -74,6 +74,7 @@ found in the LICENSE file.
 // UGLYYY
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
 #include "internal/QmitkCommonExtPlugin.h"
+#include "internal/QmitkThemedStyle.h"
 #include "mitkUndoController.h"
 #include "mitkVerboseLimitedLinearUndo.h"
 #include <QToolBar>
@@ -615,6 +616,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   // Load icon theme
   QIcon::setThemeSearchPaths(QStringList() << QStringLiteral(":/org_mitk_icons/icons/"));
   QIcon::setThemeName(QStringLiteral("awesome"));
+  QApplication::setStyle(new QmitkThemedStyle(QApplication::style()));
 
   // Enable full screen support
   if (auto application = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance()); application->getFullScreenMode())

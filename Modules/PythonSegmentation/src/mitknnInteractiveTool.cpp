@@ -696,7 +696,7 @@ void mitk::nnInteractiveTool::Impl::AddScribbleInteraction(const Image* mask) co
   std::ostringstream pyCommands; pyCommands
     << "scribble_mask = mitk_scribble_mask.GetAsNumpy()\n"
     << "session.add_scribble_interaction(\n"
-    << "    scribble_mask.astype(numpy.uint8),\n"
+    << "    scribble_mask.astype(np.uint8),\n"
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
     << ")\n";
 
@@ -710,7 +710,7 @@ void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask) const
   std::ostringstream pyCommands; pyCommands
     << "lasso_mask = mitk_lasso_mask.GetAsNumpy()\n"
     << "session.add_lasso_interaction(\n"
-    << "    lasso_mask.astype(numpy.uint8),\n"
+    << "    lasso_mask.astype(np.uint8),\n"
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
     << ")\n";
 
@@ -724,7 +724,7 @@ void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(MultiLabelSegmentat
   std::ostringstream pyCommands; pyCommands
     << "initial_seg = mitk_initial_seg.GetAsNumpy()\n"
     << "session.add_initial_seg_interaction(\n"
-    << "    initial_seg.astype(numpy.uint8),\n"
+    << "    initial_seg.astype(np.uint8),\n"
     << "    run_prediction=" << (this->AutoRefine ? "True" : "False") << '\n'
     << ")\n";
 

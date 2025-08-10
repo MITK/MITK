@@ -99,7 +99,7 @@ void mitk::PythonContext::Activate()
     << "    if site_packages not in sys.path:\n"
     << "        site.addsitedir(site_packages)\n"
     << "add_site_packages(sys.base_prefix)\n"
-    << "import numpy\n"
+    << "import numpy as np\n"
     << "app_dir = '" << appPath << "'\n"
     << "if app_dir not in sys.path:\n"
     << "    sys.path.insert(0, app_dir)\n"

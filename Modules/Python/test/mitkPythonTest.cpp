@@ -32,10 +32,11 @@ public:
 
   void TestEvaluateOperationWithResult()
   {
-    auto pythonContext = mitk::PythonContext::New();
+    auto pythonContext = mitk::PythonContext::New("test_A");
     pythonContext->Activate();
     std::string pythonCommand;
-    pythonCommand.append("_mitk_stdout = io.StringIO()\n");
+    pythonCommand.append("from io import StringIO\n");
+    pythonCommand.append("_mitk_stdout = StringIO()\n");
     pythonCommand.append("sys.stdout = sys.stderr = _mitk_stdout\n");
     pythonContext->ExecuteString(pythonCommand);
     std::string result = pythonContext->ExecuteString("print(5+5)\n");
@@ -44,7 +45,7 @@ public:
 
   void TestCopyImageToAndBackPython()
   {
-    auto pythonContext = mitk::PythonContext::New();
+    auto pythonContext = mitk::PythonContext::New("test_A");
     if (pythonContext.IsNotNull())
     {
       pythonContext->Activate();
@@ -79,8 +80,8 @@ public:
 
   void TestPythonContextExclusivity()
   {
-    auto pythonContext_1 = mitk::PythonContext::New();
-    auto pythonContext_2 = mitk::PythonContext::New();
+    auto pythonContext_1 = mitk::PythonContext::New("test_A");
+    auto pythonContext_2 = mitk::PythonContext::New("test_B");
     if (pythonContext_1.IsNotNull() && pythonContext_2.IsNotNull())
     {
       try

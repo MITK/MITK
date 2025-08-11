@@ -148,10 +148,8 @@ if(MITK_USE_Qt6)
   # Install Qt WebEngine
 
   if(APPLE)
-    set(_install_DESTINATION "../Frameworks/QtWebEngineCore.framework")
-
-    get_filename_component(_real_path "${_qmake_path}/../lib/QtWebEngineCore.framework/Helpers" REALPATH)
-    MITK_INSTALL(DIRECTORY ${_real_path} USE_SOURCE_PERMISSIONS)
+    set(_install_DESTINATION "../Frameworks/QtWebEngineCore.framework/Versions/A")
+    MITK_INSTALL(DIRECTORY "${_qmake_path}/../lib/QtWebEngineCore.framework/Versions/A/Helpers" USE_SOURCE_PERMISSIONS)
 
     # Translations are included in the Resources directory of
     # QtWebEngineCore.framework and are installed by default.

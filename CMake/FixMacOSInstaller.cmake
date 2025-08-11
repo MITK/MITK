@@ -27,24 +27,24 @@ endforeach()
 
 # Do the same for QtWebEngineProcess
 set(qtwebenginecore_path "${bundle_path}/Contents/Frameworks/QtWebEngineCore.framework")
-set(qtwebenginecore_helpers_path "${qtwebenginecore_path}/Helpers")
+set(qtwebenginecore_helpers_path "${qtwebenginecore_path}/Versions/A/Helpers")
+set(qtwebenginecore_helpers_symlink "${qtwebenginecore_path}/Helpers")
 set(qtwebengineprocess_path "${qtwebenginecore_helpers_path}/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess")
-foreach(qt_framework ${qt_frameworks})
-  set(from "@executable_path/../Frameworks/${qt_framework}.framework/Versions/A/${qt_framework}")
-  set(to "@rpath/${qt_framework}.framework/Versions/A/${qt_framework}")
-  execute_process(COMMAND install_name_tool -change ${from} ${to} ${qtwebengineprocess_path} ERROR_QUIET)
-endforeach()
+if(EXISTS "${qtwebengineprocess_path}")
+  foreach(qt_framework ${qt_frameworks})
+    set(from "@executable_path/../Frameworks/${qt_framework}.framework/Versions/A/${qt_framework}")
+    set(to "@rpath/${qt_framework}.framework/Versions/A/${qt_framework}")
+    execute_process(COMMAND install_name_tool -change ${from} ${to} ${qtwebengineprocess_path} ERROR_QUIET)
+  endforeach()
 
-# To make QtWebEngineCore.framework valid for codesign it must not be unsealed.
-# Move Helpers directory into Versions/A and create a symlink at the previous location.
-execute_process(COMMAND "${CMAKE_COMMAND}" -E rename
-  "${qtwebenginecore_helpers_path}"
-  "${qtwebenginecore_path}/Versions/A/Helpers"
-)
-execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink
-  "Versions/Current/Helpers"
-  "${qtwebenginecore_helpers_path}"
-)
+  if(NOT IS_SYMLINK "${qtwebenginecore_helpers_symlink}")
+    # Create a symlink to the Helpers directory at the top level of the QtWebEngineCore framework
+    execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink
+      "Versions/Current/Helpers"
+      "${qtwebenginecore_helpers_symlink}"
+    )
+  endif()
+endif()
 
 # Add corresponding rpath entries to the actual application and QtWebEngineProcess.
 # The install name tool returns an error if an entry is already present.

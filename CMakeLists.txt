@@ -31,6 +31,12 @@ if(POLICY CMP0167)
   cmake_policy(SET CMP0167 OLD)
 endif()
 
+if(POLICY CMP0177)
+  # https://cmake.org/cmake/help/v3.31/policy/CMP0177.html
+  # install() DESTINATION paths are normalized.
+  cmake_policy(SET CMP0177 NEW)
+endif()
+
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #-----------------------------------------------------------------------------
@@ -251,8 +257,7 @@ endforeach()
 # MITK superbuild
 
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-option(MITK_USE_OpenMP "Use OpenMP" OFF)
-option(MITK_USE_Python3 "Use Python 3" OFF)
+option(MITK_USE_OpenMP "Use OpenMP" ON)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -445,23 +450,10 @@ if(MITK_USE_Python3)
     endif()
   endif()
 
-  set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
-  set(MITK_USE_SWIG ON CACHE BOOL "" FORCE)
-
-  if(APPLE)
-    set(python3_mininum_version 3.12)
-  else()
-    set(python3_mininum_version 3.9)
+  if(APPLE AND MITK_USE_OpenMP)
+    message(WARNING "OpenMP is not supported on macOS when MITK_USE_Python3 is enabled.")
+    set(MITK_USE_OpenMP OFF CACHE BOOL "" FORCE)
   endif()
-
-  find_package(Python3 ${python3_mininum_version} REQUIRED COMPONENTS Interpreter Development NumPy)
-
-  if(WIN32)
-    string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")
-    string(REPLACE "\\" "/" Python3_STDLIB "${Python3_STDLIB}")
-    string(REPLACE "\\" "/" Python3_SITELIB "${Python3_SITELIB}")
-  endif()
-  link_directories(${Python3_LIBRARY_DIRS})
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
@@ -946,7 +938,10 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
   get_property(_components GLOBAL PROPERTY MITK_${ep}_COMPONENTS)
   if(MITK_USE_${ep} AND _package)
     if(_components)
-      find_package(${_package} COMPONENTS ${_components} REQUIRED CONFIG)
+      find_package(${_package} COMPONENTS ${_components} QUIET CONFIG)
+      if(NOT ${_package}_DIR)
+        find_package(${_package} COMPONENTS ${_components} REQUIRED MODULE)
+      endif()
     else()
       # Prefer config mode first because it finds external
       # <proj>Config.cmake files pointed at by <proj>_DIR variables.
@@ -957,14 +952,14 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
         #and would get lost for all EPs that use on Find<proj>.cmake instead of config
         #files.
         set(_temp_EP_${_package}_dir ${${_package}_DIR})
-      endif(DEFINED ${_package}_DIR)
+      endif()
 
       find_package(${_package} QUIET CONFIG)
       string(TOUPPER "${_package}" _package_uc)
       if(NOT (${_package}_FOUND OR ${_package_uc}_FOUND))
         if(DEFINED _temp_EP_${_package}_dir)
             set(${_package}_DIR ${_temp_EP_${_package}_dir} CACHE PATH "externally set dir of the package ${_package}" FORCE)
-        endif(DEFINED _temp_EP_${_package}_dir)
+        endif()
 
         find_package(${_package} REQUIRED)
       endif()
@@ -999,24 +994,6 @@ endif()
 
 if(MITK_USE_OpenMP)
   find_package(OpenMP REQUIRED COMPONENTS CXX)
-else()
-  find_package(OpenMP QUIET COMPONENTS CXX)
-
-  if(OpenMP_FOUND)
-    set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
-  elseif(APPLE AND OpenMP_libomp_LIBRARY AND NOT OpenMP_CXX_LIB_NAMES)
-    set(OpenMP_CXX_LIB_NAMES libomp CACHE STRING "" FORCE)
-    get_filename_component(openmp_lib_dir "${OpenMP_libomp_LIBRARY}" DIRECTORY)
-    set(openmp_include_dir "${openmp_lib_dir}/../include")
-    if(EXISTS "${openmp_include_dir}")
-      get_filename_component(openmp_include_dir "${openmp_include_dir}" REALPATH)
-      set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I${openmp_include_dir}" CACHE STRING "" FORCE)
-      find_package(OpenMP QUIET COMPONENTS CXX)
-      if(OpenMP_FOUND)
-        set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
-      endif()
-    endif()
-  endif()
 endif()
 
 # Qt support
@@ -1124,18 +1101,11 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER
 
 add_subdirectory(Utilities)
 
-set(MITK_WRAP_PYTHON_ENABLED OFF)
-if(MITK_USE_SWIG AND MITK_USE_Python3)
+if(MITK_USE_SWIG)
   set(SWIG_VERSION 4.3.0 CACHE STRING "" FORCE)
   find_package(SWIG ${SWIG_VERSION} COMPONENTS python)
 
-  if(SWIG_FOUND)
-    option(MITK_WRAP_PYTHON "" ON)
-
-    if(MITK_WRAP_PYTHON)
-      set(MITK_WRAP_PYTHON_ENABLED ON)
-    endif()
-  else()
+  if(NOT SWIG_FOUND)
    message(SEND_ERROR "SWIG not found!")
   endif()
 endif()

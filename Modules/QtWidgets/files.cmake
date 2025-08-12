@@ -85,6 +85,7 @@ set(CPP_FILES
   QmitkRenderWindowDataNodeTableModel.cpp
   QmitkSynchronizedNodeSelectionWidget.cpp
   QmitkSynchronizedWidgetConnector.cpp
+  QmitkRun.cpp
 )
 
 set(MOC_H_FILES

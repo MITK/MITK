@@ -85,21 +85,9 @@ if(WIN32)
 endif()
 
 if(MITK_SHOW_CONSOLE_WINDOW)
-  qt_add_executable(${_APP_NAME} MACOSX_BUNDLE ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
+  qt_add_executable(${_APP_NAME} MANUAL_FINALIZATION MACOSX_BUNDLE ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 else()
-  qt_add_executable(${_APP_NAME} MACOSX_BUNDLE WIN32 ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
-endif()
-
-if(NOT CMAKE_CURRENT_SOURCE_DIR MATCHES "^${CMAKE_SOURCE_DIR}/.*")
-  foreach(MITK_EXTENSION_DIR ${MITK_ABSOLUTE_EXTENSION_DIRS})
-    if("${CMAKE_CURRENT_SOURCE_DIR}/" MATCHES "^${MITK_EXTENSION_DIR}/.*")
-      get_filename_component(MITK_EXTENSION_ROOT_FOLDER "${MITK_EXTENSION_DIR}" NAME)
-      set_property(TARGET ${_APP_NAME} PROPERTY FOLDER "${MITK_EXTENSION_ROOT_FOLDER}/Applications")
-      break()
-    endif()
-  endforeach()
-else()
-  set_property(TARGET ${_APP_NAME} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Applications")
+  qt_add_executable(${_APP_NAME} MANUAL_FINALIZATION MACOSX_BUNDLE WIN32 ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 endif()
 
 mitk_use_modules(TARGET ${_APP_NAME} MODULES MitkAppUtil)
@@ -239,6 +227,30 @@ if(NOT _APP_NO_INSTALL)
   # Tell cpack the executables that you want in the start menu as links
   set(MITK_CPACK_PACKAGE_EXECUTABLES ${MITK_CPACK_PACKAGE_EXECUTABLES} "${_APP_NAME};${_APP_DESCRIPTION}" CACHE INTERNAL "Collecting windows shortcuts to executables")
 
+endif()
+
+# -----------------------------------------------------------------------
+# Finalize target
+# -----------------------------------------------------------------------
+
+qt_finalize_target(${_APP_NAME})
+
+if(NOT CMAKE_CURRENT_SOURCE_DIR MATCHES "^${CMAKE_SOURCE_DIR}/.*")
+  foreach(MITK_EXTENSION_DIR ${MITK_ABSOLUTE_EXTENSION_DIRS})
+    if("${CMAKE_CURRENT_SOURCE_DIR}/" MATCHES "^${MITK_EXTENSION_DIR}/.*")
+      get_filename_component(MITK_EXTENSION_ROOT_FOLDER "${MITK_EXTENSION_DIR}" NAME)
+      set_property(TARGET ${_APP_NAME} PROPERTY FOLDER "${MITK_EXTENSION_ROOT_FOLDER}/Applications")
+      if(TARGET "${_APP_NAME}_qmlimportscan")
+        set_property(TARGET "${_APP_NAME}_qmlimportscan" PROPERTY FOLDER "${MITK_EXTENSION_ROOT_FOLDER}/Applications/Auxiliary")
+      endif()
+      break()
+    endif()
+  endforeach()
+else()
+  set_property(TARGET ${_APP_NAME} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Applications")
+  if(TARGET "${_APP_NAME}_qmlimportscan")
+    set_property(TARGET "${_APP_NAME}_qmlimportscan" PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Applications/Auxiliary")
+  endif()
 endif()
 
 endfunction()

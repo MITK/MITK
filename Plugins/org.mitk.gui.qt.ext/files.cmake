@@ -14,6 +14,7 @@ set(INTERNAL_CPP_FILES
   QmitkStartupPreferencePage.cpp
   QmitkCommonExtPlugin.cpp
   QmitkModuleView.cpp
+  QmitkThemedStyle.cpp
 )
 
 set(UI_FILES

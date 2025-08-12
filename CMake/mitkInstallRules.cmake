@@ -80,15 +80,23 @@ if(_mitk_executable_targets)
   endforeach()
 endif()
 
-# Install pyMITK
+# Install Python3 with pyMITK
 
-if(MITK_WRAP_PYTHON_ENABLED)
-  MITK_INSTALL(TARGETS pyMITK)
-  if(WIN32)
-    MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/pyMITK.py")
+if(MITK_USE_Python3)
+  if(APPLE)
+    set(_python_dest "../Resources/python")
   else()
-    MITK_INSTALL(FILES "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/pyMITK.py")
+    set(_python_dest "../python")
   endif()
+
+  set(_install_DESTINATION "${_python_dest}")
+  MITK_INSTALL(DIRECTORY "${MITK_BINARY_DIR}/python/" USE_SOURCE_PERMISSIONS)
+
+  file(RELATIVE_PATH _rel_sitearch "${Python3_ROOT_DIR}" "${Python3_SITEARCH}")
+  set(_install_DESTINATION "${_python_dest}/${_rel_sitearch}/pyMITK")
+  MITK_INSTALL(TARGETS pyMITK)
+
+  set(_install_DESTINATION "")
 endif()
 
 # Install Qt plugins
@@ -118,6 +126,9 @@ if(MITK_USE_Qt6)
 
     set(_install_DESTINATION "plugins/xcbglintegrations")
     MITK_INSTALL(FILES "${_qmake_path}/../plugins/xcbglintegrations/libqxcb-glx-integration.so")
+
+    set(_install_DESTINATION "plugins/platformthemes")
+    MITK_INSTALL(FILES "${_qmake_path}/../plugins/platformthemes/libqgtk3.so")
   endif()
 
   # Install platform-specific Qt styles
@@ -137,10 +148,8 @@ if(MITK_USE_Qt6)
   # Install Qt WebEngine
 
   if(APPLE)
-    set(_install_DESTINATION "../Frameworks/QtWebEngineCore.framework")
-
-    get_filename_component(_real_path "${_qmake_path}/../lib/QtWebEngineCore.framework/Helpers" REALPATH)
-    MITK_INSTALL(DIRECTORY ${_real_path} USE_SOURCE_PERMISSIONS)
+    set(_install_DESTINATION "../Frameworks/QtWebEngineCore.framework/Versions/A")
+    MITK_INSTALL(DIRECTORY "${_qmake_path}/../lib/QtWebEngineCore.framework/Versions/A/Helpers" USE_SOURCE_PERMISSIONS)
 
     # Translations are included in the Resources directory of
     # QtWebEngineCore.framework and are installed by default.

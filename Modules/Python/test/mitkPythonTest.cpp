@@ -35,7 +35,8 @@ public:
     auto pythonContext = mitk::PythonContext::New();
     pythonContext->Activate();
     std::string pythonCommand;
-    pythonCommand.append("_mitk_stdout = io.StringIO()\n");
+    pythonCommand.append("from io import StringIO\n");
+    pythonCommand.append("_mitk_stdout = StringIO()\n");
     pythonCommand.append("sys.stdout = sys.stderr = _mitk_stdout\n");
     pythonContext->ExecuteString(pythonCommand);
     std::string result = pythonContext->ExecuteString("print(5+5)\n");

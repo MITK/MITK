@@ -37,6 +37,7 @@ brew install freetype graphviz libomp openssl@3
 \endcode
 
 If OpenMP is not automatically found on macOS, add the <tt>OpenMP_ROOT</tt> PATH CMake variable to the cache, e. g. <tt>/opt/homebrew/opt/libomp</tt>.
+Due to imcompatibilities, OpenMP is not used on macOS if <tt>MITK_USE_Python3</tt> is enabled.
 
 To build MITK on Linux, install the following packages, e. g. with APT:
 
@@ -115,8 +116,7 @@ CMake will present you a couple of options, these are the most important ones:
  - <tt><b>MITK_USE_BLUEBERRY</b></tt> Build the BlueBerry application framework
  - <tt><b>MITK_USE_Boost_LIBRARIES</b></tt> If you need binary Boost libraries,
    specify them here.
- - <tt><b>MITK_USE_Python3</b></tt> Enables Python wrapping in MITK. This will also
-   configure ITK and VTK to build Python wrappers.
+ - <tt><b>MITK_USE_Python3</b></tt> Enables Python wrapping in MITK.
  - <tt><b>MITK_USE_Qt6</b></tt> Build MITK code which depends on Qt 6
 
 If you are satisfied with the configuration of your MITK superbuild, generate

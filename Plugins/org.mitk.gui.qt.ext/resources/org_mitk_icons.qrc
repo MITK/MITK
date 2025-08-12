@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/org_mitk_icons">
         <file>icons/awesome/index.theme</file>
+        <file>icons/awesome/scalable/actions/dialog-ok.svg</file>
+        <file>icons/awesome/scalable/actions/dialog-cancel.svg</file>
         <file>icons/awesome/scalable/actions/document-open.svg</file>
         <file>icons/awesome/scalable/actions/document-print.svg</file>
         <file>icons/awesome/scalable/actions/document-save.svg</file>

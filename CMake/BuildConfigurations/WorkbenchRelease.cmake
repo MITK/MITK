@@ -2,6 +2,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/Default.cmake)
 
 set(MITK_CONFIG_PACKAGES ${MITK_CONFIG_PACKAGES}
   MatchPoint
+  SWIG
+  Python3
 )
 
 set(MITK_CONFIG_PLUGINS ${MITK_CONFIG_PLUGINS}
@@ -19,6 +21,7 @@ set(MITK_CONFIG_PLUGINS ${MITK_CONFIG_PLUGINS}
   org.mitk.gui.qt.pharmacokinetics.mri
   org.mitk.gui.qt.pharmacokinetics.concentration.mri
   org.mitk.gui.qt.pharmacokinetics.curvedescriptor
+  org.mitk.gui.qt.pythonsettings
 )
 
 if(NOT MITK_USE_SUPERBUILD)

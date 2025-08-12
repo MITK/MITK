@@ -114,7 +114,6 @@ namespace mitk
     }
 
     // Methods that execute Python code are defined at the bottom of this file.
-    bool IsCUDAAvailable() const;
     void SetAutoZoom() const;
     void AddPointInteraction(const Point3D& point, const Image* inputAtTimeStep) const;
     void AddBoxInteraction(const PlanarFigure* box, const Image* inputAtTimeStep) const;
@@ -405,78 +404,180 @@ void mitk::nnInteractiveTool::ConfirmCleanUp()
   this->ConfirmCleanUpEvent.Send(true);
 }
 
+std::string mitk::nnInteractiveTool::GetVirtualEnvName() const
+{
+  return this->GetName();
+}
+
+bool mitk::nnInteractiveTool::CreatePythonContext()
+{
+  try
+  {
+    auto pythonContext = PythonContext::New(this->GetVirtualEnvName());
+    pythonContext->Activate();
+
+    m_Impl->SetPythonContext(pythonContext);
+  }
+  catch (const Exception& e)
+  {
+    MITK_ERROR << e.GetDescription();
+    return false;
+  }
+
+  return true;
+}
+
+mitk::PythonContext* mitk::nnInteractiveTool::GetPythonContext() const
+{
+  return m_Impl->GetPythonContext();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Functions and methods that execute Python code
 ////////////////////////////////////////////////////////////////////////////////
 
+bool mitk::nnInteractiveTool::IsInstalled() const
+{
+  std::ostringstream pyCommands; pyCommands
+    << "import importlib.util\n"
+    << "is_installed = importlib.util.find_spec('nnInteractive') is not None\n";
+
+  auto pythonContext = m_Impl->GetPythonContext();
+  pythonContext->ExecuteString(pyCommands.str());
+
+  return pythonContext->GetVariableAs<bool>("is_installed").value_or(false);
+}
+
+bool mitk::nnInteractiveTool::GetCUDADeviceInfo(CUDADeviceInfo& info) const
+{
+  std::ostringstream pyCommands; pyCommands
+    << "import torch\n"
+    << "is_cuda_available = False\n"
+    << "try:\n"
+    << "    if torch.cuda.is_available():\n"
+    << "        name = torch.cuda.get_device_name(0)\n"
+    << "        props = torch.cuda.get_device_properties(0)\n"
+    << "        total_memory_mb = props.total_memory // (1024 ** 2)\n"
+    << "        major = props.major\n"
+    << "        minor = props.minor\n"
+    << "        is_cuda_available = True\n"
+    << "except Exception:\n"
+    << "    pass\n";
+
+  try
+  {
+    auto pythonContext = m_Impl->GetPythonContext();
+    pythonContext->ExecuteString(pyCommands.str());
+
+    if (!pythonContext->GetVariableAs<bool>("is_cuda_available").value_or(false))
+      return false;
+
+    info.Name = pythonContext->GetVariableAs<std::string>("name").value_or("");
+    info.TotalMemoryMB = pythonContext->GetVariableAs<int>("total_memory_mb").value_or(0);
+    info.Major = pythonContext->GetVariableAs<int>("major").value_or(0);
+    info.Minor = pythonContext->GetVariableAs<int>("minor").value_or(0);
+
+    return true;
+  }
+  catch (...)
+  {
+    return false;
+  }
+}
+
 void mitk::nnInteractiveTool::StartSession()
 {
-  constexpr auto MODEL = "nnInteractive_v1.0";
+  constexpr auto MODEL_CHECKPOINT = "nnInteractive_v1.0";
 
   if (this->IsSessionRunning())
     this->EndSession();
 
-  auto pythonContext = PythonContext::New();
-  m_Impl->SetPythonContext(pythonContext);
+  auto pythonContext = m_Impl->GetPythonContext();
+  bool useCUDADevice = false;
 
-  pythonContext->Activate();
+  if (CUDADeviceInfo deviceInfo; this->GetCUDADeviceInfo(deviceInfo))
+  {
+    MITK_INFO << "Found CUDA device: " << deviceInfo.Name;
+    MITK_INFO << "  Compute capability: " << deviceInfo.Major << "." << deviceInfo.Minor;
+    MITK_INFO << "  Total memory: " << deviceInfo.TotalMemoryMB << " MB";
 
-  std::ostringstream pyCommands; pyCommands
-    << "import torch\n"
-    << "import nnInteractive\n"
-    << "from pathlib import Path\n"
-    << "from nnunetv2.utilities.find_class_by_name import recursive_find_python_class\n"
-    << "from batchgenerators.utilities.file_and_folder_operations import join, load_json\n"
-    << "from huggingface_hub import snapshot_download\n"
-    << "repo_id = 'nnInteractive/nnInteractive'\n"
-    << "download_path = snapshot_download(\n"
-    << "    repo_id = repo_id,\n"
-    << "    allow_patterns = ['" << MODEL << "/*'],\n"
-    << "    force_download = False\n"
-    << ")\n"
-    << "checkpoint_path = Path(download_path).joinpath('" << MODEL << "')\n";
+    bool switchToCUDADevice = true;
 
-  pythonContext->ExecuteString(pyCommands.str());
+    if (deviceInfo.Major < 6)
+    {
+      MITK_WARN << "Minimum required compute capability is 6.0";
+      switchToCUDADevice = false;
+    }
 
-  pyCommands.clear(); pyCommands
-    << "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
-    << "    inference_class = load_json(\n"
-    << "        Path(checkpoint_path).joinpath('inference_session_class.json'))\n"
-    << "    if isinstance (inference_class, dict):\n"
-    << "        inference_class = inference_class['inference_class']\n"
-    << "else:\n"
-    << "    inference_class = 'nnInteractiveInferenceSession'\n"
-    << "inference_class = recursive_find_python_class(\n"
-    << "    join(nnInteractive.__path__[0], 'inference'),\n"
-    << "    inference_class,\n"
-    << "    'nnInteractive.inference'\n"
-    << ")\n";
+    if (deviceInfo.TotalMemoryMB < 6000)
+    {
+      MITK_WARN << "Minimum required total memory is 6 GB";
+      switchToCUDADevice = false;
+    }
 
-  pythonContext->ExecuteString(pyCommands.str());
+    useCUDADevice = switchToCUDADevice;
+  }
+
+  if (!useCUDADevice)
+    MITK_WARN << "No compatible CUDA device detected. Falling back to CPU processing.";
+
+  {
+    std::ostringstream pyCommands; pyCommands
+      << "import torch\n"
+      << "import nnInteractive\n"
+      << "from importlib.metadata import version\n"
+      << "from pathlib import Path\n"
+      << "from nnunetv2.utilities.find_class_by_name import recursive_find_python_class\n"
+      << "from batchgenerators.utilities.file_and_folder_operations import join, load_json\n"
+      << "from huggingface_hub import snapshot_download\n"
+      << "print(f'nnInteractive version: {version(\"nnInteractive\")}')\n"
+      << "print('Model checkpoint: " << MODEL_CHECKPOINT << "')\n"
+      << "repo_id = 'nnInteractive/nnInteractive'\n"
+      << "download_path = snapshot_download(\n"
+      << "    repo_id = repo_id,\n"
+      << "    allow_patterns = ['" << MODEL_CHECKPOINT << "/*'],\n"
+      << "    force_download = False\n"
+      << ")\n"
+      << "checkpoint_path = Path(download_path).joinpath('" << MODEL_CHECKPOINT << "')\n";
+    pythonContext->ExecuteString(pyCommands.str());
+  }
+
+  {
+    std::ostringstream pyCommands; pyCommands
+      << "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
+      << "    inference_class = load_json(\n"
+      << "        Path(checkpoint_path).joinpath('inference_session_class.json'))\n"
+      << "    if isinstance (inference_class, dict):\n"
+      << "        inference_class = inference_class['inference_class']\n"
+      << "else:\n"
+      << "    inference_class = 'nnInteractiveInferenceSession'\n"
+      << "inference_class = recursive_find_python_class(\n"
+      << "    join(nnInteractive.__path__[0], 'inference'),\n"
+      << "    inference_class,\n"
+      << "    'nnInteractive.inference'\n"
+      << ")\n";
+    pythonContext->ExecuteString(pyCommands.str());
+  }
 
   m_Impl->ResetBackend();
 
-  bool isCUDAAvailable = m_Impl->IsCUDAAvailable();
-  const std::string torchDevice = isCUDAAvailable
-    ? "cuda:0"
-    : "cpu";
-
-  if (!isCUDAAvailable)
+  if (!useCUDADevice)
     this->SetAutoZoom(false);
 
-  pyCommands.clear(); pyCommands
-    << "session = inference_class(\n"
-    << "    device=torch.device('" << torchDevice << "'),\n"
-    << "    use_torch_compile=False,\n"
-    << "    torch_n_threads=os.cpu_count(),\n"
-    << "    verbose=False,\n"
-    << "    do_autozoom=" << m_Impl->AutoZoom << '\n'
-    << ")\n"
-    << "session.initialize_from_trained_model_folder(checkpoint_path)\n";
+  {
+    std::ostringstream pyCommands; pyCommands
+      << "session = inference_class(\n"
+      << "    device=torch.device('" << (useCUDADevice ? "cuda:0" : "cpu") << "'),\n"
+      << "    use_torch_compile=False,\n"
+      << "    torch_n_threads=os.cpu_count(),\n"
+      << "    verbose=False,\n"
+      << "    do_autozoom=" << m_Impl->AutoZoom << '\n'
+      << ")\n"
+      << "session.initialize_from_trained_model_folder(checkpoint_path)\n";
+    pythonContext->ExecuteString(pyCommands.str());
+  }
 
-  pythonContext->ExecuteString(pyCommands.str());
-
-  m_Impl->SetBackend(isCUDAAvailable
+  m_Impl->SetBackend(useCUDADevice
     ? Backend::CUDA
     : Backend::CPU);
 
@@ -495,18 +596,19 @@ void mitk::nnInteractiveTool::StartSession()
   pythonContext->TransferBaseDataToPython(imageAtTimeStep, "mitk_image");
   pythonContext->TransferBaseDataToPython(m_Impl->TargetBuffer.GetPointer(), "mitk_target_buffer");
 
-  pyCommands.clear(); pyCommands
-    << "image = mitk_image.GetAsNumpy()\n"
-    << "spacing = [\n"
+  {
+    std::ostringstream pyCommands; pyCommands
+      << "image = mitk_image.GetAsNumpy()\n"
+      << "spacing = [\n"
       << std::to_string(spacing[2]) << ", "
       << std::to_string(spacing[1]) << ", "
       << std::to_string(spacing[0]) << "]\n"
-    << "target_buffer = mitk_target_buffer.GetAsNumpy()\n"
-    << "torch_target_buffer = torch.from_numpy(target_buffer)\n"
-    << "session.set_image(image[None], {'spacing': spacing})\n"
-    << "session.set_target_buffer(torch_target_buffer)\n";
-
-  pythonContext->ExecuteString(pyCommands.str());
+      << "target_buffer = mitk_target_buffer.GetAsNumpy()\n"
+      << "torch_target_buffer = torch.from_numpy(target_buffer)\n"
+      << "session.set_image(image[None], {'spacing': spacing})\n"
+      << "session.set_target_buffer(torch_target_buffer)\n";
+    pythonContext->ExecuteString(pyCommands.str());
+  }
 }
 
 void mitk::nnInteractiveTool::EndSession()
@@ -534,18 +636,6 @@ bool mitk::nnInteractiveTool::IsSessionRunning() const
     return false;
   
   return pythonContext->HasVariable("session");
-}
-
-bool mitk::nnInteractiveTool::Impl::IsCUDAAvailable() const
-{
-  std::ostringstream pyCommands; pyCommands
-    << "import torch\n"
-    << "if torch.cuda.is_available():\n"
-    << "    cuda_is_available = True\n";
-
-  m_PythonContext->ExecuteString(pyCommands.str());
-
-  return m_PythonContext->HasVariable("cuda_is_available");
 }
 
 void mitk::nnInteractiveTool::Impl::SetAutoZoom() const
@@ -606,7 +696,7 @@ void mitk::nnInteractiveTool::Impl::AddScribbleInteraction(const Image* mask) co
   std::ostringstream pyCommands; pyCommands
     << "scribble_mask = mitk_scribble_mask.GetAsNumpy()\n"
     << "session.add_scribble_interaction(\n"
-    << "    scribble_mask.astype(numpy.uint8),\n"
+    << "    scribble_mask.astype(np.uint8),\n"
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
     << ")\n";
 
@@ -620,7 +710,7 @@ void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask) const
   std::ostringstream pyCommands; pyCommands
     << "lasso_mask = mitk_lasso_mask.GetAsNumpy()\n"
     << "session.add_lasso_interaction(\n"
-    << "    lasso_mask.astype(numpy.uint8),\n"
+    << "    lasso_mask.astype(np.uint8),\n"
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
     << ")\n";
 
@@ -634,7 +724,7 @@ void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(MultiLabelSegmentat
   std::ostringstream pyCommands; pyCommands
     << "initial_seg = mitk_initial_seg.GetAsNumpy()\n"
     << "session.add_initial_seg_interaction(\n"
-    << "    initial_seg.astype(numpy.uint8),\n"
+    << "    initial_seg.astype(np.uint8),\n"
     << "    run_prediction=" << (this->AutoRefine ? "True" : "False") << '\n'
     << ")\n";
 

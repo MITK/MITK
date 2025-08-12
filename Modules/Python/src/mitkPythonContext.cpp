@@ -122,7 +122,7 @@ std::string mitk::PythonContext::ExecuteFile(const std::string &filePath)
   PyGILState_STATE state = PyGILState_Ensure();
   int commandType = Py_file_input;
   FILE *file = fopen(filePath.c_str(), "rb");
-  if (NULL == file)
+  if (nullptr == file)
   {
     mitkThrow() << "An error occured while reading python file.";
   }
@@ -177,7 +177,7 @@ mitk::Image* mitk::PythonContext::LoadImageFromPython(const std::string &varName
 {
   PyGILState_STATE state = PyGILState_Ensure();
   PyObject *pyImage = PyDict_GetItemString(m_Impl->LocalDictionary.get(), varName.c_str());
-  if (pyImage == NULL && !(pyImage = PyDict_GetItemString(m_Impl->GlobalDictionary.get(), varName.c_str())))
+  if (pyImage == nullptr && !(pyImage = PyDict_GetItemString(m_Impl->GlobalDictionary.get(), varName.c_str())))
   {
     mitkThrow() << "Could not get image from Python";
   }
@@ -230,7 +230,7 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData,
   }
 
   PyObject *receive = PyDict_GetItemString(m_Impl->LocalDictionary.get(), "_receive");
-  PyObjectPtr result(PyObject_CallFunctionObjArgs(receive, pInstance, NULL));
+  PyObjectPtr result(PyObject_CallFunctionObjArgs(receive, pInstance, nullptr));
 
   if (nullptr == result)
   {
@@ -243,7 +243,7 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData,
 bool mitk::PythonContext::HasVariable(const std::string &varName)
 {
   PyObject *pyVar = PyDict_GetItemString(m_Impl->LocalDictionary.get(), varName.c_str());
-  if (pyVar == NULL && !(pyVar = PyDict_GetItemString(m_Impl->GlobalDictionary.get(), varName.c_str())))
+  if (pyVar == nullptr && !(pyVar = PyDict_GetItemString(m_Impl->GlobalDictionary.get(), varName.c_str())))
   {
     return false;
   }
@@ -316,16 +316,16 @@ std::string mitk::PythonContext::GetPythonExceptionTraceback()
     PyObjectPtr pExceptionType(PyObject_Type(pException.get()));
     PyObjectPtr pExceptionTypeTb(PyException_GetTraceback(pException.get()));
     PyObjectPtr pExceptionList(PyObject_CallFunctionObjArgs(
-      pFormatExceptionMethod.get(), pExceptionType.get(), pException.get(), pExceptionTypeTb.get(), NULL));
+      pFormatExceptionMethod.get(), pExceptionType.get(), pException.get(), pExceptionTypeTb.get(), nullptr));
 #else
   PyObject* ptype, * pvalue, * ptraceback;
   PyErr_Fetch(&ptype, &pvalue, &ptraceback); // Deprecated since python 3.12
   PyObjectPtr pTracebackMod(PyImport_ImportModule("traceback"));
   PyObjectPtr pFormatExceptionMethod(PyObject_GetAttrString(pTracebackMod.get(), "format_exception"));
-  if (NULL != ptype)
+  if (nullptr != ptype)
   {
     PyObjectPtr pExceptionList(
-      PyObject_CallFunctionObjArgs(pFormatExceptionMethod.get(), ptype, pvalue, ptraceback, NULL));
+      PyObject_CallFunctionObjArgs(pFormatExceptionMethod.get(), ptype, pvalue, ptraceback, nullptr));
 #endif
     if (pExceptionList && PyList_Check(pExceptionList.get()))
     {

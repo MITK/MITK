@@ -22,10 +22,10 @@ found in the LICENSE file.
 
 namespace
 {
-  constexpr const char* TORCH = "torch==2.7.1";
-  constexpr const char* TORCH_VISION = "torchvision==0.22.1";
-  constexpr const char* NNINTERACTIVE = "nninteractive>=1.1.2,<2.0.0";
-  constexpr const char* CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu118";
+  constexpr auto TORCH = "torch==2.7.1";
+  constexpr auto TORCH_VISION = "torchvision==0.22.1";
+  constexpr auto NNINTERACTIVE = "nninteractive>=1.1.2,<2.0.0";
+  constexpr auto CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu118";
 }
 
 using Self = QmitknnInteractiveInstallDialog;
@@ -84,9 +84,7 @@ void QmitknnInteractiveInstallDialog::OnStandardErrorReady()
 
 void QmitknnInteractiveInstallDialog::AutoScrollToBottom()
 {
-  auto scrollBar = m_Ui->textEdit->verticalScrollBar();
-
-  if (scrollBar != nullptr)
+  if (auto scrollBar = m_Ui->textEdit->verticalScrollBar(); scrollBar != nullptr)
     scrollBar->setValue(scrollBar->maximum());
 }
 

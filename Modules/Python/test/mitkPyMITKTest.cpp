@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkFileSystem.h>
 #include <mitkIOUtil.h>
+#include <mitkNodePredicateGeometry.h>
 #include <mitkPythonContext.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -58,7 +59,14 @@ public:
     auto image = pythonContext->LoadImageFromPython("image");
 
     CPPUNIT_ASSERT(image != nullptr);
-    CPPUNIT_ASSERT_EQUAL(3U, image->GetDimension());
+
+    auto refImage = mitk::IOUtil::Load<mitk::Image>(m_ImagePath);
+
+    CPPUNIT_ASSERT(mitk::Equal(
+      *refImage,
+      *image,
+      mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION,
+      false));
   }
 
   void TestTransferImage()
@@ -92,6 +100,15 @@ public:
     pythonContext->ExecuteString(pyCommands.str());
 
     CPPUNIT_ASSERT(fs::file_size(imagePath) > 0);
+
+    auto refImage = mitk::IOUtil::Load<mitk::Image>(m_ImagePath);
+    auto savedImage = mitk::IOUtil::Load<mitk::Image>(imagePath);
+
+    CPPUNIT_ASSERT(mitk::Equal(
+      *refImage,
+      *savedImage,
+      mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION,
+      false));
 
     std::error_code error;
     fs::remove(imagePath, error);

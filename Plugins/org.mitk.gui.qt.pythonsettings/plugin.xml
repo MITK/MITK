@@ -4,7 +4,7 @@
     <view id="org.mitk.views.pythonsettings"
           name="Python Settings"
           category="General"
-          icon="resources/python-logo-only.svg"
+          icon="resources/python-gear.svg"
           class="QmitkPythonSettingsView" />
   </extension>
 </plugin>

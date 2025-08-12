@@ -13,7 +13,7 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/python-logo-only.svg
+  resources/python-gear.svg
   plugin.xml
 )
 

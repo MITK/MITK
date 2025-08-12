@@ -92,6 +92,9 @@ void QmitknnInteractiveInstallDialog::AutoScrollToBottom()
 
 void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+  // If any step fails, offer to restart from the beginning.
+  // Exception: allow pip upgrade errors, since upgrading pip is optional.
+
   if (m_InstallStep != InstallStep::Upgrade_Pip && (exitStatus != QProcess::NormalExit || exitCode != 0))
   {
     m_InstallStep = InstallStep::Upgrade_Pip;
@@ -108,9 +111,12 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
     return;
   }
 
+  // Current step completed successfully - determine the next step.
+
   if (m_InstallStep == InstallStep::Upgrade_Pip)
   {
 #if defined(_WIN32)
+    // On Windows, installing PyTorch is a separate step to allow passing --index-url to pip.
     m_InstallStep = InstallStep::Install_PyTorch;
 #else
     m_InstallStep = InstallStep::Install_nnInteractive;
@@ -122,6 +128,8 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
   }
   else
   {
+    // All steps completed successfully.
+
     m_Ui->progressBar->setRange(0, 100);
     m_Ui->progressBar->setValue(100);
 
@@ -140,7 +148,9 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
     return;
   }
 
-  if (m_InstallStep == InstallStep::Install_PyTorch) // Only on Windows
+  // More steps remain - run the next one.
+
+  if (m_InstallStep == InstallStep::Install_PyTorch)
   {
     QStringList args = { "-m", "pip", "install", TORCH, TORCH_VISION, "--index-url", CUDA_INDEX_URL };
     m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);

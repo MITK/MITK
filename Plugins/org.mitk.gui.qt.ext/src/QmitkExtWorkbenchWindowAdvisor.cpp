@@ -616,6 +616,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   // Load icon theme
   QIcon::setThemeSearchPaths(QStringList() << QStringLiteral(":/org_mitk_icons/icons/"));
   QIcon::setThemeName(QStringLiteral("awesome"));
+
+  // Style icons of Qt's standard message boxes
   QApplication::setStyle(new QmitkThemedStyle(QApplication::style()));
 
   // Enable full screen support

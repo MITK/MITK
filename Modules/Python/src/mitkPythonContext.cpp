@@ -204,8 +204,6 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData,
   pythonCommand.append(varName);
   pythonCommand.append(" = None\n");
   pythonCommand.append("def _receive(image_from_cxx):\n"
-                       //"    print('receive called with %s', image_from_cxx)\n"
-                       //"    print('Python transferred image has dimension', image_from_cxx.GetDimension())\n"
                        "    global " + varName + "\n"
                        "    " + varName + " = image_from_cxx\n");
   this->ExecuteString(pythonCommand.c_str());

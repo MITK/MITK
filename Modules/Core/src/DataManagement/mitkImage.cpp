@@ -1273,6 +1273,14 @@ bool mitk::Image::IsRotated() const
 
 mitk::ImageDimensionVectorType mitk::DetermineImageDimensionsFromTimeGeometry(const TimeGeometry* timeGeometry)
 {
+  /* That is logic wise the same code like used in
+     void mitk::Image::Initialize(const mitk::PixelType &type,
+                             const mitk::TimeGeometry &geometry,
+                             unsigned int channels,
+                             int tDim)
+     Via this function it is made generally available.
+     To also deduce (image) dimensions purely based on time geometries.
+  */
   auto geometry = timeGeometry->GetGeometryForTimeStep(0);
 
   ImageDimensionVectorType result = {

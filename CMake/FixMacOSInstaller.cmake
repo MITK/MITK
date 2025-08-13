@@ -85,3 +85,19 @@ foreach(lib_dir IN LISTS lib_dirs)
     endif()
   endif()
 endforeach()
+
+###############################
+# (3) Thin universal binaries #
+###############################
+
+file(GLOB_RECURSE all_files LIST_DIRECTORIES FALSE "${bundle_path}/*")
+message("Thinning universal binaries to ${_osx_arch}...")
+foreach(file_path IN LISTS all_files)
+  execute_process(COMMAND file "${file_path}" OUTPUT_VARIABLE file_info)
+  if(file_info MATCHES "universal")
+    execute_process(COMMAND lipo -info "${file_path}" OUTPUT_VARIABLE lipo_info)
+    if(lipo_info MATCHES "${_osx_arch}")
+      execute_process(COMMAND lipo -thin "${_osx_arch}" "${file_path}" -output "${file_path}")
+    endif()
+  endif()
+endforeach()

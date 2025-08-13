@@ -223,6 +223,7 @@ macro(_fixup_target)
     fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${_target_location}\" \"\${PLUGINS}\" \"\${DIRS}\")
 
     if(APPLE)
+      set(_osx_arch \"${CMAKE_OSX_ARCHITECTURES}\")
       include(FixMacOSInstaller)
     elseif(UNIX)
       include(FixLinuxInstaller)

@@ -101,3 +101,16 @@ foreach(file_path IN LISTS all_files)
     endif()
   endif()
 endforeach()
+
+################
+# (4) codesign #
+################
+
+execute_process(COMMAND
+  codesign --force --deep --sign "${_codesign_id}" "${bundle_path}"
+)
+execute_process(COMMAND
+  find "$bundle_path}/Contents/Resources/python"
+    -type f \( -perm /111 -o -name "*.dylib" -o -name "*.so" \)
+    -exec codesign --force --sign "${_codesign_id}" {} \;
+)

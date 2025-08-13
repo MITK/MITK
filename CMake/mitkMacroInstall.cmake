@@ -224,6 +224,7 @@ macro(_fixup_target)
 
     if(APPLE)
       set(_osx_arch \"${CMAKE_OSX_ARCHITECTURES}\")
+      set(_codesign_id \"${MITK_CODESIGN_IDENTITY}\")
       include(FixMacOSInstaller)
     elseif(UNIX)
       include(FixLinuxInstaller)

@@ -191,16 +191,30 @@ endif()
 # Explicitly set CMAKE_OSX_ARCHITECTURES if not set
 #-----------------------------------------------------------------------------
 
-if(APPLE AND NOT CMAKE_OSX_ARCHITECTURES)
-  include(CheckCXXSymbolExists)
+if(APPLE)
+  if(NOT CMAKE_OSX_ARCHITECTURES)
+    include(CheckCXXSymbolExists)
 
-  check_cxx_symbol_exists(__aarch64__ "" IS_ARM64)
-  check_cxx_symbol_exists(__x86_64__ "" IS_X86_64)
+    check_cxx_symbol_exists(__aarch64__ "" IS_ARM64)
+    check_cxx_symbol_exists(__x86_64__ "" IS_X86_64)
 
-  if(IS_ARM64)
-    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architecture for macOS" FORCE)
-  elseif(IS_X86_64)
-    set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "Build architecture for macOS" FORCE)
+    if(IS_ARM64)
+      set(osx_arch "arm64")
+    elseif(IS_X86_64)
+      set(osx_arch "x86_64")
+    else()
+      message(FATAL_ERROR "Unknown architecture (expected arm64 or x86_64)!")
+    endif()
+
+    set(CMAKE_OSX_ARCHITECTURES "${osx_arch}" CACHE STRING "Build architecture for macOS" FORCE)
+  endif()
+
+  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Deployment target for macOS" FORCE)
+  endif()
+
+  if(NOT MITK_CODESIGN_IDENTITY)
+    set(MITK_CODESIGN_IDENTITY "-" CACHE STRING "Codesign identity for signing app bundles on macOS" FORCE)
   endif()
 endif()
 

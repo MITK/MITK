@@ -1343,9 +1343,15 @@ endforeach()
 
 # if no application specific configuration file was used, use default
 if(use_default_config)
-  configure_file(${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in
-                 ${MITK_BINARY_DIR}/MITKCPackOptions.cmake @ONLY)
+  configure_file("${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in"
+                 "${MITK_BINARY_DIR}/MITKCPackOptions.cmake" @ONLY)
   set(CPACK_PROJECT_CONFIG_FILE "${MITK_BINARY_DIR}/MITKCPackOptions.cmake")
+endif()
+
+if(APPLE)
+  configure_file("${MITK_SOURCE_DIR}/CMake/FixMacOSInstaller.cmake.in"
+                 "${MITK_BINARY_DIR}/FixMacOSInstaller.cmake" @ONLY)
+  list(APPEND CPACK_PRE_BUILD_SCRIPTS "${MITK_BINARY_DIR}/FixMacOSInstaller.cmake")
 endif()
 
 # include CPack model once all variables are set

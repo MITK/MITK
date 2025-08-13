@@ -34,7 +34,7 @@ bool mitk::NodePredicateDimension::CheckNode(const mitk::DataNode *node) const
     throw std::invalid_argument("NodePredicateDimension: invalid node");
 
   const auto data = node->GetData();
-  if (nullptr != data)
+  if (nullptr == data)
     return false;
 
   const auto *image = dynamic_cast<mitk::Image *>(data);
@@ -43,7 +43,8 @@ bool mitk::NodePredicateDimension::CheckNode(const mitk::DataNode *node) const
     return (image->GetDimension() == m_Dimension && image->GetPixelType().GetNumberOfComponents() == m_PixelComponents);
   }
   else if (auto timeGeometry = data->GetTimeGeometry(); nullptr!=timeGeometry && m_PixelComponents == 1)
-  { //node is not an image but, pixel component is default, so only dimension gets checked.
+  { //node data is not of type image, but as pixel component is default,we can fall back on
+    //only checking the dimension via the time geometry information of data.
     return m_Dimension == DetermineImageDimensionsFromTimeGeometry(timeGeometry).size();
   }
 

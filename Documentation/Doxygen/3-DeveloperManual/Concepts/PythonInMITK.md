@@ -129,11 +129,17 @@ This premature loading fails because, in Standalone Python Builds, library paths
 To work around this, we use macOS’s `DYLD_INSERT_LIBRARIES` feature to manually preload the Python library by setting the `ENVIRONMENT` test property for all Python tests.
 As a result, the tests run correctly via CTest, but still abort when executed directly.
 
+### Converting Python into a framework for packaging on macOS
+
+To sign an application bundle on macOS with `codesign`, the bundle must follow certain rules regarding the location and format of its binaries.
+Therefore, we convert the `python` directory from `MITK-build` into `Python.framework` for packaging.
+This conversion is handled in the `MITK-build/FixMacOSInstaller.cmake` script, which CPack executes as a post-build step.
+
 ### Importing pyMITK in the Python interpreter of an installed MITK on macOS
 
 We are using CMake's `BundleUtilities` to create application bundles on macOS.
 Unfortunately, it rewrites all library dependency paths to start with `@executable_path/../MacOS`, which works fine for executables in the usual `Contents/MacOS` folder of an app bundle.
-However, this breaks when the Python interpreter in `Contents/Resources/python/bin` tries to load the dependencies of the `pyMITK` package.
+However, this breaks when the Python interpreter in `Contents/Frameworks/Python.framework/Versions/A/bin` tries to load the dependencies of the `pyMITK` package.
 
 To fix this, we adjust the runtime dependency paths of the `pyMITK` package to use an `@loader_path` approach in the `FixMacOSInstaller.cmake` script, which runs automatically after `fixup_bundle()` has finished modifying all paths.
 This fix currently does not cover autoload-modules, which is why they cannot be loaded in this scenario.

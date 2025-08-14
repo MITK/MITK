@@ -191,16 +191,30 @@ endif()
 # Explicitly set CMAKE_OSX_ARCHITECTURES if not set
 #-----------------------------------------------------------------------------
 
-if(APPLE AND NOT CMAKE_OSX_ARCHITECTURES)
-  include(CheckCXXSymbolExists)
+if(APPLE)
+  if(NOT CMAKE_OSX_ARCHITECTURES)
+    include(CheckCXXSymbolExists)
 
-  check_cxx_symbol_exists(__aarch64__ "" IS_ARM64)
-  check_cxx_symbol_exists(__x86_64__ "" IS_X86_64)
+    check_cxx_symbol_exists(__aarch64__ "" IS_ARM64)
+    check_cxx_symbol_exists(__x86_64__ "" IS_X86_64)
 
-  if(IS_ARM64)
-    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architecture for macOS" FORCE)
-  elseif(IS_X86_64)
-    set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "Build architecture for macOS" FORCE)
+    if(IS_ARM64)
+      set(osx_arch "arm64")
+    elseif(IS_X86_64)
+      set(osx_arch "x86_64")
+    else()
+      message(FATAL_ERROR "Unknown architecture (expected arm64 or x86_64)!")
+    endif()
+
+    set(CMAKE_OSX_ARCHITECTURES "${osx_arch}" CACHE STRING "Build architecture for macOS" FORCE)
+  endif()
+
+  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "" CACHE STRING "Deployment target for macOS")
+  endif()
+
+  if(NOT MITK_CODESIGN_IDENTITY)
+    set(MITK_CODESIGN_IDENTITY "-" CACHE STRING "Codesign identity for signing app bundles on macOS" FORCE)
   endif()
 endif()
 
@@ -1329,9 +1343,15 @@ endforeach()
 
 # if no application specific configuration file was used, use default
 if(use_default_config)
-  configure_file(${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in
-                 ${MITK_BINARY_DIR}/MITKCPackOptions.cmake @ONLY)
+  configure_file("${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in"
+                 "${MITK_BINARY_DIR}/MITKCPackOptions.cmake" @ONLY)
   set(CPACK_PROJECT_CONFIG_FILE "${MITK_BINARY_DIR}/MITKCPackOptions.cmake")
+endif()
+
+if(APPLE)
+  configure_file("${MITK_SOURCE_DIR}/CMake/FixMacOSInstaller.cmake.in"
+                 "${MITK_BINARY_DIR}/FixMacOSInstaller.cmake" @ONLY)
+  list(APPEND CPACK_PRE_BUILD_SCRIPTS "${MITK_BINARY_DIR}/FixMacOSInstaller.cmake")
 endif()
 
 # include CPack model once all variables are set
@@ -1442,6 +1462,13 @@ set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
+
+if(APPLE AND MITK_USE_Python3)
+  configure_file(
+    "${MITK_SOURCE_DIR}/CMake/PythonInfo.plist.in"
+    "${MITK_BINARY_DIR}/python/Info.plist" @ONLY
+  )
+endif()
 
 write_basic_config_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   VERSION ${MITK_VERSION_STRING} COMPATIBILITY AnyNewerVersion)

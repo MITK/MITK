@@ -39,13 +39,6 @@ if(TARGET ${CMAKE_PROJECT_NAME}-autoload)
   add_dependencies(MitkFlowBench ${CMAKE_PROJECT_NAME}-autoload)
 endif()
 
-#Setting application icon for macOS systems
-set_target_properties(MitkFlowBench PROPERTIES MACOSX_BUNDLE_ICON_FILE "icon.icns")
-
-if(APPLE)
-  install(FILES "icons/icon.icns" DESTINATION "MitkFlowBench.app/Contents/Resources")
-endif(APPLE)
-
 # Add a build time dependency to legacy BlueBerry bundles.
 if(MITK_MODULES_ENABLED_PLUGINS)
   add_dependencies(MitkFlowBench ${MITK_MODULES_ENABLED_PLUGINS})

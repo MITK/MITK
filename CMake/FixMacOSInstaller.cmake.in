@@ -1,8 +1,10 @@
+cmake_policy(SET CMP0012 NEW) # if() recognizes numbers and boolean constants.
+
 file(GLOB bundle_paths LIST_DIRECTORIES TRUE "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/*.app")
 
 foreach(bundle_path IN LISTS bundle_paths)
   get_filename_component(bundle_name ${bundle_path} NAME)
-  message("  Fixing ${bundle_name}...")
+  message("  Fixing ${bundle_name}")
 
   ###########################
   # Thin universal binaries #
@@ -35,7 +37,7 @@ foreach(bundle_path IN LISTS bundle_paths)
   # For each Qt framework, change the style of dependencies to other
   # Qt frameworks from @executable_path to @rpath. The install name tool
   # only changes existing dependencies.
-  message("    Changing path style of Qt frameworks from @executable_path to @rpath...")
+  message("    Changing path style of Qt frameworks from @executable_path to @rpath")
   foreach(qt_framework ${qt_frameworks})
     set(in "${bundle_path}/Contents/Frameworks/${qt_framework}.framework/Versions/A/${qt_framework}")
     foreach(other_qt_framework ${qt_frameworks})
@@ -73,55 +75,78 @@ foreach(bundle_path IN LISTS bundle_paths)
   execute_process(COMMAND install_name_tool -add_rpath "@executable_path/../Frameworks" ${app_path} ERROR_QUIET)
   execute_process(COMMAND install_name_tool -add_rpath "@executable_path/../../../../../../.." ${qtwebengineprocess_path} ERROR_QUIET)
 
-  ############################################
-  # Use @loader_path dependencies for pyMITK #
-  ############################################
+  if(@MITK_USE_Python3@) # MITK_USE_Python3
 
-  file(GLOB lib_dirs "${bundle_path}/Contents/Resources/python/lib/python3.*")
-  foreach(lib_dir IN LISTS lib_dirs)
-    if(IS_DIRECTORY "${lib_dir}")
-      set(pymitk_dir "${lib_dir}/site-packages/pyMITK")
-      if(EXISTS "${pymitk_dir}/_pyMITK.so")
-        message("    Changing path style of pyMITK dependencies from @executable_path to @loader_path...")
-        file(GET_RUNTIME_DEPENDENCIES
-          LIBRARIES "${pymitk_dir}/_pyMITK.so"
-          BUNDLE_EXECUTABLE "${app_path}"
-          PRE_EXCLUDE_REGEXES "^/"
-          RESOLVED_DEPENDENCIES_VAR deps
-        )
-        foreach(dep IN LISTS deps)
-          get_filename_component(dep_path "${dep}" REALPATH)
-          #get_filename_component(dep_name "${dep}" NAME)
-          #message("      ${dep_name}")
-          foreach(other_dep IN LISTS deps)
-            get_filename_component(other_dep_name "${other_dep}" NAME)
-            set(from "@executable_path/../MacOS/${other_dep_name}")
-            set(to "@loader_path/${other_dep_name}")
-            execute_process(COMMAND install_name_tool -change "${from}" "${to}" "${dep_path}" ERROR_QUIET)
-          endforeach()
-          # TODO: Autoload modules
-        endforeach()
-        break()
+    #################################
+    # Convert Python into framework #
+    #################################
+
+    message("    Convert Python into framework")
+    set(python_framework_path "${bundle_path}/Contents/Frameworks/Python.framework")
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -E make_directory "Versions/A/Resources"
+      WORKING_DIRECTORY "${python_framework_path}"
+    )
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -E rename "Info.plist" "Versions/A/Resources/Info.plist"
+      COMMAND ${CMAKE_COMMAND} -E create_symlink "A" "Versions/Current"
+      COMMAND ${CMAKE_COMMAND} -E rename "bin" "Versions/A/bin"
+      COMMAND ${CMAKE_COMMAND} -E rename "include/python3.@Python3_VERSION_MINOR@" "Versions/A/Headers"
+      COMMAND ${CMAKE_COMMAND} -E rename "lib" "Versions/A/lib"
+      COMMAND ${CMAKE_COMMAND} -E rename "share" "Versions/A/share"
+      WORKING_DIRECTORY "${python_framework_path}"
+    )
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -E create_symlink "Versions/Current/Headers" "Headers"
+      COMMAND ${CMAKE_COMMAND} -E create_symlink "Versions/Current/Resources" "Resources"
+      COMMAND ${CMAKE_COMMAND} -E rename "Versions/A/lib/libpython3.@Python3_VERSION_MINOR@.dylib" "Versions/A/Python"
+      COMMAND ${CMAKE_COMMAND} -E rm -rf "include"
+      WORKING_DIRECTORY "${python_framework_path}"
+    )
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -E create_symlink "../Python" "Versions/A/lib/libpython3.@Python3_VERSION_MINOR@.dylib"
+      COMMAND ${CMAKE_COMMAND} -E create_symlink "Versions/Current/Python" "Python"
+      WORKING_DIRECTORY "${python_framework_path}"
+    )
+
+    ############################################
+    # Use @loader_path dependencies for pyMITK #
+    ############################################
+
+    set(pymitk_dir "${python_framework_path}/Versions/A/lib/python3.@Python3_VERSION_MINOR@/site-packages/pyMITK")
+    if(EXISTS "${pymitk_dir}/_pyMITK.so")
+      message("    Changing path style of pyMITK dependencies from @executable_path to @loader_path")
+      file(GET_RUNTIME_DEPENDENCIES
+        LIBRARIES "${pymitk_dir}/_pyMITK.so"
+        BUNDLE_EXECUTABLE "${app_path}"
+        PRE_EXCLUDE_REGEXES "^/"
+        RESOLVED_DEPENDENCIES_VAR deps
+        UNRESOLVED_DEPENDENCIES_VAR unresolved_deps
+      )
+      if(unresolved_deps)
+        message(FATAL_ERROR "Unresolved dependencies: ${unresolved_deps}")
       endif()
+      foreach(dep IN LISTS deps)
+        get_filename_component(dep_path "${dep}" REALPATH)
+        foreach(other_dep IN LISTS deps)
+          get_filename_component(other_dep_name "${other_dep}" NAME)
+          set(from "@executable_path/../MacOS/${other_dep_name}")
+          set(to "@loader_path/${other_dep_name}")
+          execute_process(COMMAND install_name_tool -change "${from}" "${to}" "${dep_path}" ERROR_QUIET)
+        endforeach()
+        # TODO: Autoload modules
+      endforeach()
     endif()
-  endforeach()
+
+  endif() # MITK_USE_Python3
 
   ############
   # codesign #
   ############
 
-  message("    Signing app bundle...")
+  message("    Signing app bundle with identity \"@MITK_CODESIGN_IDENTITY@\"")
   execute_process(COMMAND
     codesign #[[--options runtime]] --force --deep --sign "@MITK_CODESIGN_IDENTITY@" "${bundle_path}"
   )
-
-  #[[set(python_path "${bundle_path}/Contents/Resources/python")
-  if(EXISTS "${python_path}")
-    execute_process(COMMAND
-      find "${python_path}"
-        -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" \)
-        -exec codesign --force --sign "@MITK_CODESIGN_IDENTITY@" {} \;
-    )
-  endif()]]
 
 endforeach()

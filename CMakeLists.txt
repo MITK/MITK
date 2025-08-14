@@ -210,7 +210,7 @@ if(APPLE)
   endif()
 
   if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Deployment target for macOS" FORCE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "" CACHE STRING "Deployment target for macOS")
   endif()
 
   if(NOT MITK_CODESIGN_IDENTITY)
@@ -1462,6 +1462,13 @@ set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
+
+if(APPLE AND MITK_USE_Python3)
+  configure_file(
+    "${MITK_SOURCE_DIR}/CMake/PythonInfo.plist.in"
+    "${MITK_BINARY_DIR}/python/Info.plist" @ONLY
+  )
+endif()
 
 write_basic_config_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   VERSION ${MITK_VERSION_STRING} COMPATIBILITY AnyNewerVersion)

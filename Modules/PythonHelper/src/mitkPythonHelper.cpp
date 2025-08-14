@@ -79,7 +79,7 @@ fs::path mitk::PythonHelper::GetHomePath()
     return buildTreePython.lexically_normal();
 
 #if defined(__APPLE__)
-  auto installedPython = Up(appDir, 1) / "Resources" / "python";
+  auto installedPython = Up(appDir, 1) / "Frameworks" / "Python.framework" / "Versions" / "A";
 #else
   auto installedPython = Up(appDir, 1) / "python";
 #endif

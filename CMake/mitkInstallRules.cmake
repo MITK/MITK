@@ -1,8 +1,10 @@
 # Install MITK icon and logo
 
-MITK_INSTALL(FILES
-  "${MITK_SOURCE_DIR}/mitk.ico"
-  "${MITK_SOURCE_DIR}/mitk.bmp")
+if(WIN32)
+  MITK_INSTALL(FILES
+    "${MITK_SOURCE_DIR}/mitk.ico"
+    "${MITK_SOURCE_DIR}/mitk.bmp")
+endif()
 
 # Helper vars
 
@@ -84,7 +86,7 @@ endif()
 
 if(MITK_USE_Python3)
   if(APPLE)
-    set(_python_dest "../Resources/python")
+    set(_python_dest "../Frameworks/Python.framework")
   else()
     set(_python_dest "../python")
   endif()

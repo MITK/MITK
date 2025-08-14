@@ -52,7 +52,7 @@ set_target_properties(pyMITK PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${lib_output_d
 if(APPLE)
   set_target_properties(pyMITK PROPERTIES
     BUILD_RPATH "@loader_path/../../../../../lib;@loader_path/../../../../../../ep/lib"
-    INSTALL_RPATH "@loader_path/../../../../../../MacOS"
+    INSTALL_RPATH "@loader_path/../../../../../../../../MacOS"
   )
 endif()
 

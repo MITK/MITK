@@ -209,8 +209,10 @@ if(APPLE)
     set(CMAKE_OSX_ARCHITECTURES "${osx_arch}" CACHE STRING "Build architecture for macOS" FORCE)
   endif()
 
-  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "" CACHE STRING "Deployment target for macOS")
+  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_SYSROOT)
+    get_filename_component(macosx_sdk_name "${CMAKE_OSX_SYSROOT}" NAME)
+    string(REGEX REPLACE "^MacOSX([0-9]+)\\..*" "\\1" macosx_sdk_version_major "${macosx_sdk_name}")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "${macosx_sdk_version_major}.0" CACHE STRING "Deployment target version for macOS" FORCE)
   endif()
 
   if(NOT MITK_CODESIGN_IDENTITY)

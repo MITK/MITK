@@ -16,10 +16,6 @@ if(MITK_USE_Python3)
     set(version 3.12.11)
     set(release_date 20250712)
 
-    set(pip_install
-      "numpy~=2.3"
-    )
-
     set(base_url "https://github.com/astral-sh/python-build-standalone/releases/download/${release_date}")
     set(variant "install_only_stripped")
 
@@ -61,15 +57,24 @@ if(MITK_USE_Python3)
       set(python3_executable "bin/python3")
     endif()
 
-    list(JOIN pip_install " " packages)
-
-    ExternalProject_Add_Step(${proj} pip
-      COMMAND ${python3_executable} -m pip install --upgrade pip --no-warn-script-location
-      COMMAND ${python3_executable} -m pip install ${packages} --no-warn-script-location
-      DEPENDEES patch
-      DEPENDERS configure
-      WORKING_DIRECTORY "<SOURCE_DIR>"
-    )
+    if(CMAKE_OSX_ARCHITECTURES AND CMAKE_OSX_DEPLOYMENT_TARGET)
+      ExternalProject_Add_Step(${proj} pip
+        COMMAND ${python3_executable} "${MITK_SOURCE_DIR}/CMakeExternals/Python3_macOS_numpy.py"
+          --arch "${CMAKE_OSX_ARCHITECTURES}"
+          --osx-target "${CMAKE_OSX_DEPLOYMENT_TARGET}"
+        DEPENDEES patch
+        DEPENDERS configure
+        WORKING_DIRECTORY "<SOURCE_DIR>"
+      )
+    else()
+      ExternalProject_Add_Step(${proj} pip
+        COMMAND ${python3_executable} -m pip install --no-warn-script-location --upgrade pip
+        COMMAND ${python3_executable} -m pip install --no-warn-script-location numpy~=2.3
+        DEPENDEES patch
+        DEPENDERS configure
+        WORKING_DIRECTORY "<SOURCE_DIR>"
+      )
+    endif()
 
     set(Python3_DIR ${install_dir})
     set(Python3_ROOT_DIR ${install_dir})

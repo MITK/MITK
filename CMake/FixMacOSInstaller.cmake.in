@@ -146,7 +146,13 @@ foreach(bundle_path IN LISTS bundle_paths)
 
   message("    Signing app bundle with identity \"@MITK_CODESIGN_IDENTITY@\"")
   execute_process(COMMAND
-    codesign #[[--options runtime]] --force --deep --sign "@MITK_CODESIGN_IDENTITY@" "${bundle_path}"
+    codesign
+      --options runtime
+      --entitlements "@MITK_SOURCE_DIR@/CMake/entitlements.plist"
+      --force
+      --deep
+      --sign "@MITK_CODESIGN_IDENTITY@"
+      "${bundle_path}"
   )
 
 endforeach()

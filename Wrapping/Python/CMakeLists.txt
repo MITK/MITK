@@ -60,6 +60,7 @@ add_custom_command(
   TARGET pyMITK
   POST_BUILD
   COMMAND "${CMAKE_COMMAND}" -E rename pyMITK.py __init__.py
+  COMMAND "${Python3_EXECUTABLE}" -m compileall -f "${pyMITK_PACKAGE_DIR}"
   WORKING_DIRECTORY "${pyMITK_PACKAGE_DIR}"
 )
 

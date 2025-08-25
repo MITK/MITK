@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/QmitkPythonSettingsView">
+        <file>arrow-rotate-right.svg</file>
+        <file>python-gear.svg</file>
+        <file>trash.svg</file>
+    </qresource>
+</RCC>

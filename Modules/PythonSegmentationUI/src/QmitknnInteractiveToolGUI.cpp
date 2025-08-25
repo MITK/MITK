@@ -15,18 +15,26 @@ found in the LICENSE file.
 
 #include <mitkLabelSetImageConverter.h>
 #include <mitknnInteractiveInteractor.h>
+#include <mitkPythonContext.h>
+#include <mitkPythonHelper.h>
 #include <mitkToolManagerProvider.h>
 
+#include <QmitknnInteractiveInstallDialog.h>
+#include <QmitkRun.h>
 #include <QmitkStyleManager.h>
 
 #include <QBoxLayout>
 #include <QButtonGroup>
 #include <QMessageBox>
+#include <QShortcut>
+#include <QTimer>
 
 MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
 
 namespace
 {
+  constexpr auto LINE_HEIGHT_STYLE = "style='line-height: 1.25'";
+
   void SetIcon(QAbstractButton* button, const char* icon)
   {
     button->setIcon(QmitkStyleManager::ThemeIcon(QString(":/nnInteractive/%1").arg(icon)));
@@ -68,34 +76,30 @@ namespace
     if (!segmentation->IsEmpty(label, GetCurrentTimeStep(segmentation)))
       return false;
 
-    QString title = "nnInteractive - Initialize with Mask";
-
     auto message = QString(
-      "<div style='line-height: 1.25'>"
-        "<p>The selected label cannot be used as a mask to start a new "
-        "session because it is empty.</p>"
-        "<p>Selected label: %1</p>"
-      "</div>")
+      "<h3 %1>Initialize with Mask</h3>"
+      "<p %1>The selected label cannot be used as a mask to start a new "
+      "session because it is empty.</p>"
+      "<p %1>Selected label: %2</p>")
+      .arg(LINE_HEIGHT_STYLE)
       .arg(GetLabelAsString(label));
 
-    QMessageBox::information(nullptr, title, message, QMessageBox::Ok);
+    QMessageBox::information(nullptr, "nnInteractive", message, QMessageBox::Ok);
 
     return true;
   }
 
   bool ConfirmInitializationWithMask(const mitk::Label* label)
   {
-    QString title = "nnInteractive - Initialize with Mask";
-
     auto message = QString(
-      "<div style='line-height: 1.25'>"
-        "<p>Do you want to <b>reset all interactions</b> and start a new "
-        "session based on the existing content of the selected label?</p>"
-        "<p>Selected label: %1</p>"
-      "</div>")
+      "<h3 %1>Initialize with Mask</h3>"
+      "<p %1>Do you want to <strong>reset all interactions</strong> and start a "
+      "new session based on the existing content of the selected label?</p>"
+      "<p %1>Selected label: %2</p>")
+      .arg(LINE_HEIGHT_STYLE)
       .arg(GetLabelAsString(label));
 
-    auto button = QMessageBox::question(nullptr, title, message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    auto button = QMessageBox::question(nullptr, "nnInteractive", message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     return button == QMessageBox::Yes;
   }
 }
@@ -153,6 +157,20 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
     this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
 
   Superclass::InitializeUI(mainLayout);
+
+  // Set shortcut to reset all interactions.
+
+  m_Ui->resetButton->setToolTip("Press R to reset all interactions");
+  auto reset = new QShortcut(QKeySequence(Qt::Key_R), this);
+  connect(reset, &QShortcut::activated, m_Ui->resetButton, &QPushButton::click);
+
+  // Set shortcut to confirm a segmentation.
+  // TODO: Once we agree on a common shortcut concept, this should be moved to the base class.
+
+  auto confirmButton = this->GetConfirmSegmentationButton();
+  confirmButton->setToolTip("Press C to confirm a segmentation");
+  auto confirmSegmentation = new QShortcut(QKeySequence(Qt::Key_C), this);
+  connect(confirmSegmentation, &QShortcut::activated, confirmButton, &QPushButton::click);
 }
 
 void QmitknnInteractiveToolGUI::OnAutoRefineCheckBoxToggled(bool checked)
@@ -184,10 +202,47 @@ void QmitknnInteractiveToolGUI::InitializePromptType()
       this->OnPromptTypeChanged();
     }
   });
+
+  // Set shortcut to toggle the prompt type.
+
+  const QString toolTip("Press T to switch the prompt types");
+  m_Ui->positiveButton->setToolTip(toolTip);
+  m_Ui->negativeButton->setToolTip(toolTip);
+
+  auto togglePromptType = new QShortcut(QKeySequence(Qt::Key_T), this);
+
+  connect(togglePromptType, &QShortcut::activated, this, [this]() {
+    if (m_Ui->positiveButton->isChecked())
+    {
+      m_PromptTypeButtonGroup->button(static_cast<int>(PromptType::Negative))->click();
+    }
+    else
+    {
+      m_PromptTypeButtonGroup->button(static_cast<int>(PromptType::Positive))->click();
+    }
+  });
 }
 
 void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
 {
+  // Set shortcuts to toggle interactor buttons.
+
+  m_Ui->pointButton->setToolTip("Press P to toggle the point interaction");
+  auto togglePointInteractor = new QShortcut(QKeySequence(Qt::Key_P), this);
+  connect(togglePointInteractor, &QShortcut::activated, m_Ui->pointButton, &QPushButton::click);
+
+  m_Ui->boxButton->setToolTip("Press B to toggle the box interaction");
+  auto toggleBoxInteractor = new QShortcut(QKeySequence(Qt::Key_B), this);
+  connect(toggleBoxInteractor, &QShortcut::activated, m_Ui->boxButton, &QPushButton::click);
+
+  m_Ui->scribbleButton->setToolTip("Press S to toggle the scribble interaction");
+  auto toggleScribbleInteractor = new QShortcut(QKeySequence(Qt::Key_S), this);
+  connect(toggleScribbleInteractor, &QShortcut::activated, m_Ui->scribbleButton, &QPushButton::click);
+
+  m_Ui->lassoButton->setToolTip("Press L to toggle the lasso interaction");
+  auto toggleLassoInteractor = new QShortcut(QKeySequence(Qt::Key_L), this);
+  connect(toggleLassoInteractor, &QShortcut::activated, m_Ui->lassoButton, &QPushButton::click);
+
   m_InteractorButtons[InteractionType::Point] = m_Ui->pointButton;
   m_InteractorButtons[InteractionType::Box] = m_Ui->boxButton;
   m_InteractorButtons[InteractionType::Scribble] = m_Ui->scribbleButton;
@@ -215,77 +270,126 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
   connect(m_Ui->maskButton, &QPushButton::clicked, this, &Self::OnMaskButtonClicked);
 }
 
-void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
+bool QmitknnInteractiveToolGUI::CreateVirtualEnv()
 {
-  m_Ui->initializeButton->setEnabled(!checked);
+  const auto venvName = this->GetTool()->GetVirtualEnvName();
 
-  QString title = "nnInteractive";
+  if (mitk::PythonHelper::VirtualEnvExists(venvName))
+    return true;
 
-  auto message = QString(
-    "<div style='line-height: 1.25'>"
-      "<p>Initializing, please wait a few seconds...</p>"
-      "<p><small><em>Note:</em> The first initialization after downloading MITK may take a minute "
-      "instead. Please be patient.</small></p>"
-    "</div>");
- 
-  QMessageBox messageBox(QMessageBox::Information, title, message);
-  messageBox.setStandardButtons(QMessageBox::NoButton);
-  messageBox.show();
-  qApp->processEvents();
+  const auto venvPath = QmitkRunAsyncBlocking<fs::path>("nnInteractive", "Creating virtual environment...", [&]() {
+    return mitk::PythonHelper::CreateVirtualEnv(venvName);
+  });
 
-  try
+  return !venvPath.empty();
+}
+
+bool QmitknnInteractiveToolGUI::Install()
+{
+  if (this->GetTool()->IsInstalled())
+    return true;
+
+  QmitknnInteractiveInstallDialog installDialog;
+  return installDialog.exec() == QDialog::Accepted;
+}
+
+void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
+{
+#if defined(__APPLE__) && !defined(__aarch64__)
+  QMessageBox::information(
+    nullptr,
+    "nnInteractive",
+    QString(
+      "<h3 %1>Unsupported Platform</h3>"
+      "<p %1>nnInteractive requires an Apple Silicon Mac.</p>"
+      "<p %1>It is not compatible with Intel-based Macs.</p>")
+      .arg(LINE_HEIGHT_STYLE),
+    QMessageBox::Ok);
+#else
+  m_Ui->initializeButton->setEnabled(false);
+
+  if (!CreateVirtualEnv() ||
+      !this->GetTool()->CreatePythonContext() ||
+      !Install())
   {
-    this->GetTool()->StartSession();
-  }
-  catch (const mitk::Exception& e)
-  {
-    messageBox.accept();
-
-    message = QString(
-      "<div style='line-height: 1.25'>"
-        "<p>Error while initializing nnInteractive.</p>"
-        "<p>Reason: %1</p>"
-      "</div>")
-      .arg(QString::fromLocal8Bit(e.GetDescription()));
-
-    MITK_ERROR << message.toStdString();
-    auto errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr, message);
-    errorMsgBox->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    errorMsgBox->setAttribute(Qt::WA_DeleteOnClose, true);
-    errorMsgBox->setModal(true);
-    errorMsgBox->exec();
-
     m_Ui->initializeButton->setEnabled(true);
     return;
   }
 
-  messageBox.accept();
+  const auto initMessage = QString(
+    "<h3 %1>Initializing nnInteractive</h3>"
+    "<p %1>Please wait a few seconds...</p>"
+    "<p %1><small><em>Note:</em> The first initialization after downloading MITK may take a minute "
+    "instead. Please be patient.</small></p>").arg(LINE_HEIGHT_STYLE);
+ 
+  auto messageBox = new QMessageBox(QMessageBox::Information, "nnInteractive", initMessage);
+  messageBox->setStandardButtons(QMessageBox::NoButton);
+  messageBox->setAttribute(Qt::WA_DeleteOnClose);
+  messageBox->show();
+  qApp->processEvents();
 
-  m_Ui->resetButton->setEnabled(checked);
-  m_Ui->promptTypeGroupBox->setEnabled(checked);
-  m_Ui->interactionToolsGroupBox->setEnabled(checked);
+  QTimer::singleShot(100, this, [=]() {
+    try
+    {
+      this->GetTool()->StartSession();
+    }
+    catch (const mitk::Exception& e)
+    {
+      messageBox->accept();
 
-  auto backend = this->GetTool()->GetBackend();
+      const auto errorMessage = QString(
+        "<h3 %1>Error while initializing nnInteractive:</h3>"
+        "<p>%2</p>")
+        .arg(LINE_HEIGHT_STYLE)
+        .arg(QString::fromLocal8Bit(e.GetDescription()));
 
-  if (!backend.has_value())
-    return;
+      MITK_ERROR << errorMessage.toStdString();
+      auto errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr, errorMessage);
+      errorMsgBox->setTextInteractionFlags(Qt::TextSelectableByMouse);
+      errorMsgBox->setAttribute(Qt::WA_DeleteOnClose, true);
+      errorMsgBox->setModal(true);
+      errorMsgBox->exec();
 
-  if (backend == mitk::nnInteractive::Backend::CUDA)
-    return;
+      m_Ui->initializeButton->setEnabled(true);
+      return;
+    }
 
-  m_Ui->autoZoomCheckBox->setEnabled(false);
-  m_Ui->autoZoomCheckBox->setChecked(false);
-  m_Ui->autoZoomCheckBox->setToolTip("Auto-zoom is not available with CPU backend.");
+    messageBox->accept();
 
-  message = QString(
-    "<div style='line-height: 1.25'>"
-      "<p><strong>Warning:</strong> The CUDA backend is unavailable. Falling back to the CPU backend, which is "
-      "<em>significantly (!)</em> slower.</p>"
-      "<p>For a smooth experience and quick response times, a compatible NVIDIA GPU with up-to-date drivers "
-      "is highly recommended.</p>"
-    "</div>");
+    m_Ui->resetButton->setEnabled(true);
+    m_Ui->promptTypeGroupBox->setEnabled(true);
+    m_Ui->interactionToolsGroupBox->setEnabled(true);
 
-  QMessageBox::warning(nullptr, title, message);
+    auto backend = this->GetTool()->GetBackend();
+
+    if (!backend.has_value())
+      return;
+
+    if (backend == mitk::nnInteractive::Backend::CUDA)
+      return;
+
+    m_Ui->autoZoomCheckBox->setEnabled(false);
+    m_Ui->autoZoomCheckBox->setChecked(false);
+    m_Ui->autoZoomCheckBox->setToolTip("Auto-zoom is not available with CPU backend.");
+
+  #if !defined(__APPLE__)
+    const QString cpuBackendMessage = QString(
+      "<h3 %1>No compatible CUDA device detected</h3>"
+      "<p %1>Falling back to CPU processing, which is <em>significantly slower</em>.</p>"
+      "<p %1>For smooth performance and fast response times, a compatible NVIDIA GPU with at "
+      "least 6 GB VRAM is required:</p>"
+      "<ul %1>"
+        "<li %1>Minimum: Pascal architecture (e.g., GeForce GTX 1060)</li>"
+        "<li %1>Better: Turing architecture (e.g., GeForce RTX 2070)</li>"
+        "<li %1>Best: Ampere or newer (e.g., GeForce RTX 3080)</li>"
+      "</ul>"
+      "<p %1>6 GB VRAM is the absolute minimum; 12 GB or more is recommended for optimal results.</p>")
+      .arg(LINE_HEIGHT_STYLE);
+
+    QMessageBox::warning(nullptr, "nnInteractive", cpuBackendMessage);
+  #endif
+  });
+#endif
 }
 
 void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()

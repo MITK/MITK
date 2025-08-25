@@ -138,11 +138,7 @@ endif()
 
 set(MITK_USE_Python3 @MITK_USE_Python3@)
 if(MITK_USE_Python3)
-  set(PYTHON_EXECUTABLE "@PYTHON_EXECUTABLE@" CACHE FILEPATH "")
-  set(PYTHON_INCLUDE_DIR "@PYTHON_INCLUDE_DIR@" CACHE PATH "")
-  set(PYTHON_LIBRARY "@PYTHON_LIBRARY@" CACHE FILEPATH "")
-  set(PYTHON_INCLUDE_DIR2 "@PYTHON_INCLUDE_DIR2@" CACHE PATH "")
-
+  set(Python3_ROOT_DIR @Python3_ROOT_DIR@)
   mitkMacroFindDependency(Python3 COMPONENTS Interpreter Development NumPy)
 endif()
 

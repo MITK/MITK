@@ -269,6 +269,7 @@ foreach(p ${external_projects})
 
   list(APPEND mitk_depends ${${p}_DEPENDS})
 endforeach()
+
 if (SWIG_EXECUTABLE)
   list(APPEND mitk_superbuild_ep_args -DSWIG_EXECUTABLE=${SWIG_EXECUTABLE})
 endif()
@@ -350,15 +351,10 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
   endif()
 endforeach()
 
-# Optional python variables
-if(MITK_USE_Python3)
+if(Python3_ROOT_DIR)
   list(APPEND mitk_optional_cache_args
-       "-DPython3_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
-       "-DPython3_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIRS}"
-       "-DPython3_LIBRARY:FILEPATH=${Python3_LIBRARY}"
-       "-DPython3_STDLIB:FILEPATH=${Python3_STDLIB}"
-       "-DPython3_SITELIB:FILEPATH=${Python3_SITELIB}"
-      )
+    "-DPython3_ROOT_DIR:PATH=${Python3_ROOT_DIR}"
+  )
 endif()
 
 if(OPENSSL_ROOT_DIR)
@@ -452,6 +448,7 @@ ExternalProject_Add(${proj}
     -DMITK_ACCESSBYITK_VECTOR_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_DIMENSIONS:STRING=${MITK_ACCESSBYITK_DIMENSIONS}
     -DMITK_CUSTOM_REVISION_DESC:STRING=${MITK_CUSTOM_REVISION_DESC}
+    "-DMITK_CODESIGN_IDENTITY:STRING=${MITK_CODESIGN_IDENTITY}"
     # --------------- External project options ---------------
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
     -DMITK_EXTERNAL_PROJECT_PREFIX:PATH=${ep_prefix}
@@ -461,7 +458,6 @@ ExternalProject_Add(${proj}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
     -DQt6_DIR:PATH=${Qt6_DIR}
-    -DMITK_USE_Python3:BOOL=${MITK_USE_Python3}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}

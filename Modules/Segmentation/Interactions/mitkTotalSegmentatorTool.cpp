@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkLabelSetImageHelper.h>
+#include <mitkImageCast.h>
 
 #include <algorithm>
 #include <mitkFileSystem.h>
@@ -28,7 +29,6 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usModuleResource.h>
 #include <usServiceReference.h>
-#include <omp.h>
 
 namespace mitk
 {
@@ -151,15 +151,16 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
                     labelId++;
                     fileName = (outDir + IOUtil::GetDirectorySeparator() + fileName); });
     outputBuffer = AgglomerateLabelFiles(files, inputAtTimeStep->GetDimensions(), inputAtTimeStep->GetGeometry());
+    outputBuffer->SetActiveLabel(1);
   }
   else
   {
     this->run_totalsegmentator(
       spExec, inputImagePath, outputImagePath, this->GetFast(), !isSubTask, this->GetGpuId(), this->GetSubTask());
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
+    outputImage->SetGeometry(inputAtTimeStep->GetGeometry());
     outputBuffer = mitk::MultiLabelSegmentation::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
-    outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
     targetLabelMap = (this->GetSubTask() == DEFAULT_TOTAL_TASK) ? m_LabelMapTotal : m_LabelMapTotalMR;
   } 
   m_ProgressCommand->SetProgress(180);
@@ -193,11 +194,14 @@ mitk::MultiLabelSegmentation::Pointer mitk::TotalSegmentatorTool::AgglomerateLab
     auto const &outputImagePath = filePaths[labelId-1];
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     auto label = LabelSetImageHelper::CreateNewLabel(aggloLabelImage, "object");
-    auto outputBuffer = mitk::MultiLabelSegmentation::New();
-    outputBuffer->InitializeByLabeledImage(outputImage);
+    auto itkImage = itk::Image<mitk::MultiLabelSegmentation::LabelValueType, 3>::New();
+    mitk::CastToItkImage(outputImage, itkImage);
+    auto outputBuffer = mitk::Image::New();
+    mitk::CastToMitkImage(itkImage, outputBuffer);
+
     #pragma omp critical
     {
-      aggloLabelImage->AddLabelWithContent(label, outputBuffer->GetGroupImage(0), layerIndex, 1, false);
+      aggloLabelImage->AddLabelWithContent(label, outputBuffer, layerIndex, 1, false);
     }
   }
   return aggloLabelImage;

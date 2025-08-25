@@ -9,7 +9,7 @@ MITK_CREATE_MODULE(
     PUBLIC MitkPlanarFigure MitkAnnotation
     PRIVATE MitkSegmentation
   PACKAGE_DEPENDS
-    PUBLIC VTK|GUISupportQt+RenderingQt Qt6|Widgets+OpenGL+Core CTK|CTKWidgets
+    PUBLIC VTK|GUISupportQt+RenderingQt Qt6|Concurrent+Widgets+OpenGL+Core CTK|CTKWidgets
     PRIVATE nlohmann_json
 )
 

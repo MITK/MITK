@@ -14,6 +14,7 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage ReaderWriterPage
  -# \subpage MitkImagePage
  -# \subpage MITKSegmentationTaskListsPage
+ -# \subpage MITKSegmentationStackFormatPage
  -# \subpage MITKROIPage
  -# \subpage PropertiesPage
  -# \subpage GeometryOverviewPage
@@ -30,4 +31,5 @@ The following items describe some issues about MITK on a more abstract level.
 -# \subpage ExceptionPage
 -# \subpage ModularizationPage "Modularization Concept"
  -# \ref ModularizationPageOverview
+-# \subpage PythonInMITKPage
 */

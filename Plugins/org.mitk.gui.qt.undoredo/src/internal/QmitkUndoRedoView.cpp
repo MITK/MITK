@@ -4,6 +4,9 @@
 #include <mitkRenderingManager.h>
 #include <mitkUndoController.h>
 #include <mitkVerboseLimitedLinearUndo.h>
+#include "mitkCoreServices.h"
+#include "mitkIPreferencesService.h"
+#include "mitkIPreferences.h"
 
 #include <QmitkRenderWindow.h>
 
@@ -13,6 +16,28 @@
 #include <QIcon>
 #include <QInputDialog>
 #include <QmitkStyleManager.h>
+
+
+
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto preferencesService = mitk::CoreServices::GetPreferencesService();
+    auto systemPref = preferencesService->GetSystemPreferences();
+    return nullptr != systemPref ? systemPref->Node("/General/UndoRedo") : nullptr;
+  }
+
+  void SetUndoLimitPreference(unsigned int limit)
+  {
+    auto* prefs = GetPreferences();
+
+    if (prefs != nullptr)
+    {
+      prefs->PutInt("UndoLimit", limit);
+    }
+  }
+}
 
 const std::string QmitkUndoRedoView::VIEW_ID = "org.mitk.views.undoredoview";
 
@@ -118,6 +143,7 @@ void QmitkUndoRedoView::OnChangeLimitClicked()
     if (ok)
     {
       undoModel->SetUndoLimit(newLimit);
+      SetUndoLimitPreference(newLimit);
       this->UpdateUndoRedoList();
       this->UpdateButtonStatus();
     }

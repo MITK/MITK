@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <MitkCoreExports.h>
 #include <mitkDataStorage.h>
+#include <mitkFileSystem.h>
 #include <mitkImage.h>
 #include <mitkPointSet.h>
 #include <mitkSurface.h>
@@ -109,6 +110,21 @@ namespace mitk
      * @return The location of the currently running executable, without the filename.
      */
     static std::string GetProgramPath();
+
+    enum class AppBundlePath
+    {
+      Parent,
+      Self
+    };
+
+    /**
+     * Get the file system path where the app bundle of the running executable is located on macOS.
+     *
+     * When AppBundlePath::Self is passed, the path of the app bundle is returned instead.
+     *
+     * On other operating systems, always the result of GetProgramPath() is returned instead.
+     */
+    static fs::path GetAppBundlePath(AppBundlePath path = AppBundlePath::Parent);
 
     /**
      * Get the default temporary path.

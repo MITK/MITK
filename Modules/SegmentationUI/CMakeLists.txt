@@ -12,7 +12,6 @@ mitk_create_module(
     MitkSegmentation
   TARGET_DEPENDS
     PRIVATE
-      Qt6::Concurrent
       nlohmann_json::nlohmann_json
   PACKAGE_DEPENDS
     PRIVATE

@@ -18,7 +18,7 @@ found in the LICENSE file.
 // itk
 #include <itkEventObject.h>
 
-void mitk::DisplayActionEventHandlerStd::InitActionsImpl(std::string prefixFilter /* = "" */)
+void mitk::DisplayActionEventHandlerStd::InitActionsImpl(const std::string& prefixFilter /* = "" */)
 {
   // synchronized action event function
   StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventFunctions::SetCrosshairSynchronizedAction(prefixFilter);

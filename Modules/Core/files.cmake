@@ -5,6 +5,7 @@ set(CPP_FILES
   mitkCoreObjectFactory.cpp
   mitkCoreObjectFactoryBase.cpp
   mitkCoreServices.cpp
+  mitkEnvironment.cpp
   mitkException.cpp
 
   Algorithms/mitkBaseDataSource.cpp

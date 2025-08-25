@@ -132,6 +132,11 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
     if (m_Controls->checkInstanceMap->isChecked())
     {
       auto image = seg->GetGroupImage(groupID)->Clone();
+      if (m_Controls->checkExtractSelected->isChecked())
+      {
+        image = mitk::CreateFilteredGroupImage(seg, groupID, labelValues);
+      }
+
       std::string name = "InstanceMap group "+std::to_string(groupID);
       this->StoreToDataStorage(image, name, node);
       mitk::ProgressBar::GetInstance()->Progress();

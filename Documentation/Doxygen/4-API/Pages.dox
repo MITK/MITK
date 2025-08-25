@@ -57,4 +57,7 @@
 \page deprecatedSince2024_12 Deprecated as of 2024.06
 \ingroup MITKDeprecatedAPI
 
+\page deprecatedSince2025_08 Deprecated as of 2025.08
+\ingroup MITKDeprecatedAPI
+
 */

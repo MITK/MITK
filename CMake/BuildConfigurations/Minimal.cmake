@@ -2,6 +2,7 @@ set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
 set(MITK_USE_BLUEBERRY OFF CACHE BOOL "" FORCE)
 set(MITK_USE_CTK OFF CACHE BOOL "" FORCE)
-set(MITK_USE_httplib OFF CACHE BOOL "" FORCE)
+# MitkSegmentation currently has a hard dependency on httplib
+# set(MITK_USE_httplib OFF CACHE BOOL "" FORCE)
 set(MITK_USE_Qt6 OFF CACHE BOOL "" FORCE)
 set(MITK_USE_Qt6Qwt6 OFF CACHE BOOL "" FORCE)

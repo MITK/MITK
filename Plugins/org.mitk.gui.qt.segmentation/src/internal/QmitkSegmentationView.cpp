@@ -105,8 +105,6 @@ QmitkSegmentationView::QmitkSegmentationView()
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
-  m_RenderWindowPart = this->GetRenderWindowPart();
-
   if (nullptr != m_Controls)
   {
     // deactivate all tools
@@ -612,7 +610,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    // setup 2D tools
    m_Controls->toolSelectionBox2D->SetToolManager(*m_ToolManager);
-   m_Controls->toolSelectionBox2D->SetGenerateAccelerators(true);
+   m_Controls->toolSelectionBox2D->SetGenerateAccelerators(false); // TODO: Doesn't work for buttons with same initial letter and blocks shortcuts for tools.
    m_Controls->toolSelectionBox2D->SetToolGUIArea(m_Controls->toolGUIArea2D);
    m_Controls->toolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString());
    connect(m_Controls->toolSelectionBox2D, &QmitkToolSelectionBox::ToolSelected,
@@ -620,7 +618,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    // setup 3D Tools
    m_Controls->toolSelectionBox3D->SetToolManager(*m_ToolManager);
-   m_Controls->toolSelectionBox3D->SetGenerateAccelerators(true);
+   m_Controls->toolSelectionBox3D->SetGenerateAccelerators(false); // TODO: Doesn't work for buttons with same initial letter and blocks shortcuts for tools.
    m_Controls->toolSelectionBox3D->SetToolGUIArea(m_Controls->toolGUIArea3D);
    m_Controls->toolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
 
@@ -651,6 +649,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->referenceNodeSelector->SetAutoSelectNewNodes(true);
    m_Controls->workingNodeSelector->SetAutoSelectNewNodes(true);
 
+   m_Controls->splitter->setObjectName("QmitkSegmentationViewSplitter");
+   m_Controls->splitter->setHandleWidth(2);
    this->UpdateGUI();
 }
 

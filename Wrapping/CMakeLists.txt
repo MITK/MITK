@@ -1,6 +1,5 @@
-if(MITK_WRAP_PYTHON_ENABLED)
+if(MITK_USE_SWIG)
   include(UseSWIG)
-
   include(mitkSwigPrepareFiles)
 
   # Path to common files

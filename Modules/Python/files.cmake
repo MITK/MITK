@@ -1,8 +1,8 @@
-SET(CPP_FILES
+set(H_FILES
+  include/mitkPythonContext.h
+)
+
+set(CPP_FILES
   mitkPythonContext.cpp
-  mitkIPythonService.cpp
 )
-SET(H_FILES
-  mitkPythonContext.h
-  mitkIPythonService.h
-)
+

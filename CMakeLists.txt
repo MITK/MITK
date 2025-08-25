@@ -2,15 +2,8 @@
     in CMake/PackageDepends/MITK_Boost_Config.cmake can be removed. See the first
     long comment in CMakeExternals/Boost.cmake for details. ]]
 
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.18)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.22)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
-
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.19 AND CMAKE_VERSION VERSION_LESS 3.19.2)
-  message(FATAL_ERROR "\
-CMake v${CMAKE_VERSION} is defective [1]. \
-Please either downgrade to v3.18 or upgrade to at least v3.19.2.\n\
-[1] https://gitlab.kitware.com/cmake/cmake/-/issues/21529")
-endif()
 
 #-----------------------------------------------------------------------------
 # Policies
@@ -38,6 +31,12 @@ if(POLICY CMP0167)
   cmake_policy(SET CMP0167 OLD)
 endif()
 
+if(POLICY CMP0177)
+  # https://cmake.org/cmake/help/v3.31/policy/CMP0177.html
+  # install() DESTINATION paths are normalized.
+  cmake_policy(SET CMP0177 NEW)
+endif()
+
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #-----------------------------------------------------------------------------
@@ -49,7 +48,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2024.12.99)
+  project(MITK VERSION 2025.08.00)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -110,8 +109,8 @@ SUPPRESS_VC_DEPRECATED_WARNINGS()
 #-----------------------------------------------------------------------------
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Debug' as none was specified.")
-  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+  message(STATUS "Setting build type to 'Release' as none was specified.")
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 
   # Set the possible values of build type for cmake-gui
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
@@ -189,6 +188,39 @@ if(MSVC_VERSION VERSION_GREATER_EQUAL 1928)
 endif()
 
 #-----------------------------------------------------------------------------
+# Explicitly set CMAKE_OSX_ARCHITECTURES if not set
+#-----------------------------------------------------------------------------
+
+if(APPLE)
+  if(NOT CMAKE_OSX_ARCHITECTURES)
+    include(CheckCXXSymbolExists)
+
+    check_cxx_symbol_exists(__aarch64__ "" IS_ARM64)
+    check_cxx_symbol_exists(__x86_64__ "" IS_X86_64)
+
+    if(IS_ARM64)
+      set(osx_arch "arm64")
+    elseif(IS_X86_64)
+      set(osx_arch "x86_64")
+    else()
+      message(FATAL_ERROR "Unknown architecture (expected arm64 or x86_64)!")
+    endif()
+
+    set(CMAKE_OSX_ARCHITECTURES "${osx_arch}" CACHE STRING "Build architecture for macOS" FORCE)
+  endif()
+
+  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_SYSROOT)
+    get_filename_component(macosx_sdk_name "${CMAKE_OSX_SYSROOT}" NAME)
+    string(REGEX REPLACE "^MacOSX([0-9]+)\\..*" "\\1" macosx_sdk_version_major "${macosx_sdk_name}")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "${macosx_sdk_version_major}.0" CACHE STRING "Deployment target version for macOS" FORCE)
+  endif()
+
+  if(NOT MITK_CODESIGN_IDENTITY)
+    set(MITK_CODESIGN_IDENTITY "-" CACHE STRING "Codesign identity for signing app bundles on macOS" FORCE)
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Additional MITK Options (also shown during superbuild)
 #-----------------------------------------------------------------------------
 
@@ -241,8 +273,7 @@ endforeach()
 # MITK superbuild
 
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-option(MITK_USE_OpenMP "Use OpenMP" OFF)
-option(MITK_USE_Python3 "Use Python 3" OFF)
+option(MITK_USE_OpenMP "Use OpenMP" ON)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -419,23 +450,26 @@ if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
 endif()
 
 if(MITK_USE_Python3)
-  set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
-  set(MITK_USE_SWIG ON CACHE BOOL "" FORCE)
-
-  if(APPLE)
-    set(python3_mininum_version 3.12)
+  # Debug builds with Python are troublesome: only offer release build types.
+  if(CMAKE_CONFIGURATION_TYPES)
+    set(config_types ${CMAKE_CONFIGURATION_TYPES})
+    list(FIND config_types "Debug" debug_index)
+    if(NOT debug_index EQUAL -1)
+      list(REMOVE_AT config_types ${debug_index})
+      set(CMAKE_CONFIGURATION_TYPES "${config_types}" CACHE STRING "" FORCE)
+      message(NOTICE "Removed \"Debug\" from CMAKE_CONFIGURATION_TYPES. Debug builds with Python are not supported.")
+    endif()
   else()
-    set(python3_mininum_version 3.9)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Release" "MinSizeRel" "RelWithDebInfo")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+      message(WARNING "Debug builds with Python are not supported.")
+    endif()
   endif()
 
-  find_package(Python3 ${python3_mininum_version} REQUIRED COMPONENTS Interpreter Development NumPy)
-
-  if(WIN32)
-    string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")
-    string(REPLACE "\\" "/" Python3_STDLIB "${Python3_STDLIB}")
-    string(REPLACE "\\" "/" Python3_SITELIB "${Python3_SITELIB}")
+  if(APPLE AND MITK_USE_OpenMP)
+    message(WARNING "OpenMP is not supported on macOS when MITK_USE_Python3 is enabled.")
+    set(MITK_USE_OpenMP OFF CACHE BOOL "" FORCE)
   endif()
-  link_directories(${Python3_LIBRARY_DIRS})
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
@@ -920,7 +954,10 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
   get_property(_components GLOBAL PROPERTY MITK_${ep}_COMPONENTS)
   if(MITK_USE_${ep} AND _package)
     if(_components)
-      find_package(${_package} COMPONENTS ${_components} REQUIRED CONFIG)
+      find_package(${_package} COMPONENTS ${_components} QUIET CONFIG)
+      if(NOT ${_package}_DIR)
+        find_package(${_package} COMPONENTS ${_components} REQUIRED MODULE)
+      endif()
     else()
       # Prefer config mode first because it finds external
       # <proj>Config.cmake files pointed at by <proj>_DIR variables.
@@ -931,14 +968,14 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
         #and would get lost for all EPs that use on Find<proj>.cmake instead of config
         #files.
         set(_temp_EP_${_package}_dir ${${_package}_DIR})
-      endif(DEFINED ${_package}_DIR)
+      endif()
 
       find_package(${_package} QUIET CONFIG)
       string(TOUPPER "${_package}" _package_uc)
       if(NOT (${_package}_FOUND OR ${_package_uc}_FOUND))
         if(DEFINED _temp_EP_${_package}_dir)
             set(${_package}_DIR ${_temp_EP_${_package}_dir} CACHE PATH "externally set dir of the package ${_package}" FORCE)
-        endif(DEFINED _temp_EP_${_package}_dir)
+        endif()
 
         find_package(${_package} REQUIRED)
       endif()
@@ -973,24 +1010,6 @@ endif()
 
 if(MITK_USE_OpenMP)
   find_package(OpenMP REQUIRED COMPONENTS CXX)
-else()
-  find_package(OpenMP QUIET COMPONENTS CXX)
-
-  if(OpenMP_FOUND)
-    set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
-  elseif(APPLE AND OpenMP_libomp_LIBRARY AND NOT OpenMP_CXX_LIB_NAMES)
-    set(OpenMP_CXX_LIB_NAMES libomp CACHE STRING "" FORCE)
-    get_filename_component(openmp_lib_dir "${OpenMP_libomp_LIBRARY}" DIRECTORY)
-    set(openmp_include_dir "${openmp_lib_dir}/../include")
-    if(EXISTS "${openmp_include_dir}")
-      get_filename_component(openmp_include_dir "${openmp_include_dir}" REALPATH)
-      set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I${openmp_include_dir}" CACHE STRING "" FORCE)
-      find_package(OpenMP QUIET COMPONENTS CXX)
-      if(OpenMP_FOUND)
-        set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
-      endif()
-    endif()
-  endif()
 endif()
 
 # Qt support
@@ -1098,18 +1117,11 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER
 
 add_subdirectory(Utilities)
 
-set(MITK_WRAP_PYTHON_ENABLED OFF)
-if(MITK_USE_SWIG AND MITK_USE_Python3)
+if(MITK_USE_SWIG)
   set(SWIG_VERSION 4.3.0 CACHE STRING "" FORCE)
   find_package(SWIG ${SWIG_VERSION} COMPONENTS python)
 
-  if(SWIG_FOUND)
-    option(MITK_WRAP_PYTHON "" ON)
-
-    if(MITK_WRAP_PYTHON)
-      set(MITK_WRAP_PYTHON_ENABLED ON)
-    endif()
-  else()
+  if(NOT SWIG_FOUND)
    message(SEND_ERROR "SWIG not found!")
   endif()
 endif()
@@ -1333,9 +1345,15 @@ endforeach()
 
 # if no application specific configuration file was used, use default
 if(use_default_config)
-  configure_file(${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in
-                 ${MITK_BINARY_DIR}/MITKCPackOptions.cmake @ONLY)
+  configure_file("${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in"
+                 "${MITK_BINARY_DIR}/MITKCPackOptions.cmake" @ONLY)
   set(CPACK_PROJECT_CONFIG_FILE "${MITK_BINARY_DIR}/MITKCPackOptions.cmake")
+endif()
+
+if(APPLE)
+  configure_file("${MITK_SOURCE_DIR}/CMake/FixMacOSInstaller.cmake.in"
+                 "${MITK_BINARY_DIR}/FixMacOSInstaller.cmake" @ONLY)
+  list(APPEND CPACK_PRE_BUILD_SCRIPTS "${MITK_BINARY_DIR}/FixMacOSInstaller.cmake")
 endif()
 
 # include CPack model once all variables are set
@@ -1446,6 +1464,13 @@ set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
+
+if(APPLE AND MITK_USE_Python3)
+  configure_file(
+    "${MITK_SOURCE_DIR}/CMake/PythonInfo.plist.in"
+    "${MITK_BINARY_DIR}/python/Info.plist" @ONLY
+  )
+endif()
 
 write_basic_config_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   VERSION ${MITK_VERSION_STRING} COMPATIBILITY AnyNewerVersion)

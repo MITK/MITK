@@ -4,6 +4,12 @@
 #endif
 #define SWIG_FILE_WITH_INIT
 %}
+
+%pythonbegin %{
+import os
+os.environ["PYMITK"] = "1"
+%}
+
 %module pyMITK
 %include <mitk_swig_std.i>
 
@@ -52,9 +58,9 @@ NPY_TYPES GetNumpyTypeFromTypeID(int componentTypeID)
    switch (componentTypeID)
    {
         case TypeDefinitions::ComponentTypeUInt8 :
-            return NPY_USHORT;
+            return NPY_UBYTE;
         case TypeDefinitions::ComponentTypeInt8 :
-            return NPY_SHORT;
+            return NPY_BYTE;
         case TypeDefinitions::ComponentTypeUInt16 :
             return NPY_USHORT;
         case TypeDefinitions::ComponentTypeInt16 :

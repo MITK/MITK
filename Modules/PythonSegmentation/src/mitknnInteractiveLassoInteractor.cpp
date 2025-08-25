@@ -142,7 +142,7 @@ namespace
       this->InvokeEvent(LassoEvent(contour));
 
       // Clear the working mask to prepare for the next interaction.
-      this->GetWorkingDataNode()->GetDataAs<mitk::MultiLabelSegmentation>()->ClearGroupImages();
+      this->GetWorkingData()->ClearGroupImage(0);
     }
 
     void OnInvertLogic(mitk::StateMachineAction*, mitk::InteractionEvent*) override
@@ -189,7 +189,10 @@ namespace mitk::nnInteractive
       const auto promptType = m_Owner->GetCurrentPromptType();
       const auto& labelName = GetPromptTypeAsString(promptType);
       const auto& color = GetColor(promptType, ColorIntensity::Vibrant);
-      this->MaskNode->GetDataAs<MultiLabelSegmentation>()->AddLabel(labelName, color, 0);
+
+      auto mask = this->MaskNode->GetDataAs<MultiLabelSegmentation>();
+      auto label = mask->AddLabel(labelName, color, 0);
+      mask->SetActiveLabel(label->GetValue());
 
       m_Owner->GetDataStorage()->Add(this->MaskNode, referenceNode);
     }
@@ -288,7 +291,7 @@ bool mitk::nnInteractive::LassoInteractor::HasInteractions() const
 
 const mitk::Image* mitk::nnInteractive::LassoInteractor::GetLastLassoMask() const
 {
-  return m_Impl->MaskNode->GetDataAs<Image>();
+  return m_Impl->MaskNode->GetDataAs<MultiLabelSegmentation>()->GetGroupImage(0);
 }
 
 void mitk::nnInteractive::LassoInteractor::OnSetToolManager()

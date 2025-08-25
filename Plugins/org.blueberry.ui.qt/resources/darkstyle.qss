@@ -640,3 +640,11 @@ QTreeView::indicator:checked, QTreeView::indicator:indeterminate {
 QTreeView::indicator:checked:selected, QTreeView::indicator:indeterminate:selected {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-checked-selected.svg);
 }
+
+QSplitter#QmitkSegmentationViewSplitter::handle {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    border-top: 1px dotted #9e9e9e;
+    border-bottom: 1px dotted #9e9e9e;
+    background-color: transparent;
+}

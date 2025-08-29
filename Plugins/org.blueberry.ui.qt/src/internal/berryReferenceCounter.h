@@ -185,12 +185,12 @@ public:
    */
   int RemoveRef(I id)
   {
-    RefRec rec = mapIdToRec[id];
-    if (rec.GetRef() == 0)
+    typename QHash<I, RefRec>::iterator rec = mapIdToRec.find(id);
+    if (rec == mapIdToRec.end())
     {
       return 0;
     }
-    int newCount = rec.RemoveRef();
+    int newCount = rec.value().RemoveRef();
     if (newCount <= 0)
     {
       mapIdToRec.remove(id);

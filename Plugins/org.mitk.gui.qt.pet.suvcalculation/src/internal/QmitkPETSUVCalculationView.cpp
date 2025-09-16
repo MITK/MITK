@@ -92,6 +92,25 @@ void QmitkPETSUVCalculationView::CreateQtPartControl(QWidget *parent)
 
   connect(m_Controls->btnCalculateSUV, SIGNAL(clicked()), this, SLOT(OnCalculateSUVButtonClicked()));
   connect(m_Controls->btnNuclideLookup, SIGNAL(clicked()), this, SLOT(OnNuclideLookupClicked()));
+  // Tree view for decay times
+  m_Controls.decayTimeView->setAlternatingRowColors(true);
+  m_Controls.decayTimeView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_Controls.decayTimeView->setRootIsDecorated(true);
+  m_Controls.decayTimeView->setSortingEnabled(false);
+
+  // Set up model and delegate
+  m_decayTimeModel = std::make_unique<DecayTimeMapModel>(this);
+
+  m_Controls.decayTimeView->setModel(m_decayTimeModel.get());
+  m_Controls.decayTimeView->setItemDelegate(new DecayTimeDelegate(this));
+
+  // Configure tree view appearance
+  m_Controls.decayTimeView->header()->setStretchLastSection(false);
+  m_Controls.decayTimeView->header()->resizeSection(0, 200);
+  m_Controls.decayTimeView->header()->resizeSection(1, 150);
+  m_Controls.decayTimeView->header()->setDefaultSectionSize(150);
+
+
 
   connect(m_Controls->halflifeSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnHalfLifeChanged(double)));
   connect(m_Controls->activitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnInjectedActivityChanged(double)));
@@ -99,6 +118,7 @@ void QmitkPETSUVCalculationView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->timeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnTimeToMeasurementChanged(int)));
 
   connect(m_Controls->radioTimeUser, SIGNAL(toggled(bool)), m_Controls->timeSpinBox, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioTimeUser, &QRadioButton::toggled, this, &QmitkPETSUVCalculationView::UpdateWidgets);
 
   connect(m_Controls.checkPETonly, &QCheckBox::toggled, this, &QmitkPETSUVCalculationView::OnCheckPETOnlyToggled);
 
@@ -149,7 +169,7 @@ void QmitkPETSUVCalculationView::OnTimeToMeasurementChanged(int value)
 {
   if (!this->m_internalUpdate)
   {
-    this->m_userDecayTime = value * 60; // widget is [min], internal is [sec]
+//    this->m_userDecayTime = value * 60; // widget is [min], internal is [sec]
     this->UpdateWidgets();
   }
 }
@@ -270,8 +290,8 @@ void QmitkPETSUVCalculationView::OnCalculateSUVButtonClicked()
   }
 
   bool hasValidInputs =
-    m_injectedActivity != 0 && m_bodyweight != 0 && (m_userDecayTime != 0 || m_validAutoTime) && m_halfLife != 0;
-
+    m_injectedActivity != 0 && m_bodyweight != 0 && (/*m_userDecayTime != 0 ||*/ m_validAutoTime) && m_halfLife != 0;
+  //TODO valid input should also check user times
   if (isPET && isBqMl && hasValidInputs)
   {
     if (m_validAutoTime)
@@ -283,7 +303,7 @@ void QmitkPETSUVCalculationView::OnCalculateSUVButtonClicked()
     else
     {
       MITK_INFO << "Calculating SUV: Injected activity = " << m_injectedActivity / 1000.0
-        << " kBq; Scaled body weight = " << m_bodyweight << " kg; Time to measurement = " << m_userDecayTime / 60
+        << " kBq; Scaled body weight = " << m_bodyweight << " kg; Time to measurement = " /*<< m_userDecayTime / 60*/
         << " min; Half Life = " << m_halfLife / 60 << " min";
     }
 
@@ -354,7 +374,8 @@ mitk::Image::Pointer QmitkPETSUVCalculationView::CalcSUV(mitk::Image *inputImage
     else
     {
       mitk::SUVbwFunctorPolicy::DecayTimeFunctionType decayFunction =
-        [this](const mitk::SUVbwFunctorPolicy::IndexType & /*sliceIndex*/) { return this->m_userDecayTime; };
+        [this](const mitk::SUVbwFunctorPolicy::IndexType& /*sliceIndex*/) { throw 0;
+      return 0; };
       functor.SetDecayTimeFunctor(decayFunction);
     }
 
@@ -384,7 +405,9 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
     m_Controls->weightSpinBox->setValue(this->m_bodyweight);
 
     m_Controls->timeInfo->clear();
-    if (m_Controls->radioTimeUser->isChecked())
+    m_Controls.timeSpinBox->setEnabled(m_Controls.radioTimeUser->isChecked());
+
+    if (m_Controls.radioTimeUser->isChecked())
     {
       m_Controls->timeSpinBox->setValue(this->m_userDecayTime / 60.0); // widget is [min], internal is [sec]
     }
@@ -412,8 +435,10 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
     m_Controls->labelAutoNuclide->setText(QString::fromStdString(this->m_DefinedNuclide));
 
     bool valid = m_Controls.petNodeSelector->GetSelectedNode().IsNotNull() && m_injectedActivity != 0 && m_bodyweight != 0 &&
-                 (m_userDecayTime != 0 || m_validAutoTime) && m_halfLife != 0;
+                 (/*m_userDecayTime != 0 || */ m_validAutoTime) && m_halfLife != 0;
     m_Controls->btnCalculateSUV->setEnabled(valid);
+
+    m_decayTimeModel->SetMode(m_Controls.radioTimeAuto->isChecked() ? DecayTimeMapModel::Mode::Auto : DecayTimeMapModel::Mode::UserDefined);
 
     this->m_internalUpdate = false;
   }
@@ -426,7 +451,6 @@ void QmitkPETSUVCalculationView::OnPETSelectionChanged(QList<mitk::DataNode::Poi
 
   this->m_injectedActivity = 0.;
   this->m_bodyweight = 0.;
-  this->m_userDecayTime = 0;
   this->m_autoDecayTime.clear();
   this->m_validAutoTime = false;
   this->m_DefinedNuclide.clear();
@@ -488,6 +512,15 @@ void QmitkPETSUVCalculationView::OnPETSelectionChanged(QList<mitk::DataNode::Poi
         MITK_ERROR << "Error deducing decay time. Error details:" << e;
       }
     }
+    else
+    {
+      m_autoDecayTime.clear();
+      for (mitk::TimeStepType ts = 0; ts < newNode->GetData()->GetTimeSteps(); ++ts)
+      {
+        m_autoDecayTime[ts][0] = 0.;
+      }
+    }
+    m_decayTimeModel->SetDecayTimeMap(m_autoDecayTime);
   }
 
   this->UpdateWidgets();
@@ -507,7 +540,6 @@ QmitkPETSUVCalculationView::QmitkPETSUVCalculationView()
   : m_Controls(std::make_unique<Ui::QmitkPETSUVCalculationViewControls>()),
     m_injectedActivity(0),
     m_bodyweight(0),
-    m_userDecayTime(0),
     m_validAutoTime(false),
     m_halfLife(0),
     m_internalUpdate(false)
@@ -515,6 +547,319 @@ QmitkPETSUVCalculationView::QmitkPETSUVCalculationView()
   GenerateHalfLifeMap();
 }
 
-QmitkPETSUVCalculationView::~QmitkPETSUVCalculationView()
+
+
+DecayTimeMapModel::DecayTimeMapModel(QObject* parent)
+  : QAbstractItemModel(parent)
+  , m_Mode(Mode::Auto)
 {
+}
+
+QModelIndex DecayTimeMapModel::index(int row, int column, const QModelIndex& parent) const
+{
+  if (!hasIndex(row, column, parent))
+    return QModelIndex();
+
+  if (!hasSingleTimeStep() && m_Mode == Mode::Auto)
+  {
+    if (!parent.isValid())
+    { //we have a time step level and thats it
+      return createIndex(row, column);
+    }
+    else
+    { //we also have a 2nd slice index level and that is it.
+      //we encode the row of the time level as internal data
+      return createIndex(row, column, static_cast<quintptr>(parent.row()+1)); // mark as 2nd level child
+    }
+  }
+
+  return createIndex(row, column);
+}
+
+QModelIndex DecayTimeMapModel::parent(const QModelIndex& child) const
+{
+  if (!child.isValid())
+    return QModelIndex();
+
+  if (m_Mode == Mode::Auto && !hasSingleTimeStep())
+  {
+    if (child.internalPointer() != nullptr)
+    { //we are on the second level
+      const auto timeStepRow = static_cast<int>(child.internalId()-1);
+      return createIndex(timeStepRow, 0);
+    }
+  }
+
+  return QModelIndex();
+}
+
+int DecayTimeMapModel::rowCount(const QModelIndex& parent) const
+{
+  if (!parent.isValid())
+  {
+    if (m_Mode != Mode::UserDefined && hasSingleTimeStep())
+    {
+      return static_cast<int>(m_DecayTimeMap.begin()->second.size());
+    }
+
+    return static_cast<int>(m_DecayTimeMap.size());
+  }
+
+  if (m_Mode == Mode::Auto && !hasSingleTimeStep())
+  {
+    auto timeStep = GetTimeStep(parent);
+    if (timeStep && m_DecayTimeMap.count(*timeStep))
+    {
+      return static_cast<int>(m_DecayTimeMap.at(*timeStep).size());
+    }
+  }
+
+  return 0;
+}
+
+int DecayTimeMapModel::columnCount(const QModelIndex&) const
+{
+  return 2;
+}
+
+QVariant DecayTimeMapModel::data(const QModelIndex& index, int role) const
+{
+  if (!index.isValid() || role != Qt::DisplayRole)
+    return QVariant();
+
+  if (role == Qt::DisplayRole || role == Qt::EditRole)
+  {
+    const int col = index.column();
+
+    auto timeStepOpt = GetTimeStep(index);
+    auto sliceOpt = GetSliceIndex(index);
+
+    if (m_Mode == Mode::UserDefined)
+    {
+      if (!timeStepOpt)
+        return QVariant();
+
+      if (col == 0)
+      {
+        return QString("Time Step %1").arg(*timeStepOpt);
+      }
+      else
+      {
+        auto decayTime = m_DecayTimeMap.at(*timeStepOpt).at(*sliceOpt);
+        return QVariant(decayTime);
+      }
+    }
+    else
+    {
+      if (!index.parent().isValid() && !this->hasSingleTimeStep())
+      {
+        if (col == 0 && timeStepOpt)
+          return QString("Time Step %1").arg(*timeStepOpt);
+      }
+      else
+      {
+        if (timeStepOpt && sliceOpt)
+        {
+          auto decayTime = m_DecayTimeMap.at(*timeStepOpt).at(*sliceOpt);
+          if (col == 0)
+            return QString("Slice %1").arg(*sliceOpt);
+          else
+            return QVariant(decayTime);
+        }
+      }
+    }
+  }
+  else if (role == Qt::ToolTipRole && index.column() == 1)
+  {
+    return QString("Decay time in seconds");
+  }
+
+  return {};
+}
+
+QVariant DecayTimeMapModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+  if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+    switch (section) {
+    case 0: return "Item";
+    case 1: return "Decay Time [s]";
+    default: return QVariant();
+    }
+  }
+  return QVariant();
+}
+
+Qt::ItemFlags DecayTimeMapModel::flags(const QModelIndex& index) const
+{
+  if (!index.isValid())
+    return Qt::NoItemFlags;
+
+  Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+
+  // Only allow editing decay time column in user-defined mode
+  if (m_Mode == Mode::UserDefined && index.column() == 1) {
+    flags |= Qt::ItemIsEditable;
+  }
+
+  return flags;
+}
+
+bool DecayTimeMapModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+  if (role != Qt::EditRole || !index.isValid() || index.column() != 1)
+    return false;
+
+  if (m_Mode == Mode::Auto)
+    return false;
+
+  bool ok = false;
+  double newDecay = value.toDouble(&ok);
+  if (!ok)
+    return false;
+
+  auto timeStepOpt = GetTimeStep(index.parent());
+  auto sliceOpt = GetSliceIndex(index);
+  if (!timeStepOpt || !sliceOpt)
+    return false;
+
+  auto& decay = m_DecayTimeMap[*timeStepOpt][*sliceOpt];
+  decay = newDecay;
+  emit dataChanged(index, index);
+  return true;
+}
+
+void DecayTimeMapModel::SetDecayTimeMap(const mitk::DecayTimeMapType& decayTimeMap)
+{
+  beginResetModel();
+  m_DecayTimeMap = decayTimeMap;
+  endResetModel();
+}
+
+void DecayTimeMapModel::SetMode(Mode mode)
+{
+  if (m_Mode != mode) {
+    beginResetModel();
+    m_Mode = mode;
+    endResetModel();
+  }
+}
+
+DecayTimeMapModel::Mode DecayTimeMapModel::GetMode() const
+{
+  return m_Mode;
+}
+
+bool DecayTimeMapModel::hasSingleTimeStep() const
+{
+  return m_DecayTimeMap.size() == 1;
+}
+
+std::optional<mitk::TimeStepType> DecayTimeMapModel::GetTimeStep(const QModelIndex& index) const
+{
+  if (!index.isValid())
+    return std::nullopt;
+
+  if (hasSingleTimeStep())
+  { //if there is only one time step it is always clear
+    return 0;
+  }
+
+  if (index.parent().isValid())
+  { //we are at the slice level. Deduce timestep from parent
+    return GetTimeStep(index.parent());
+  }
+
+  //we are top level (time step) so we can take just the row
+  auto it = m_DecayTimeMap.begin();
+  std::advance(it, index.row());
+  return it->first;
+}
+
+std::optional<mitk::SlicedData::IndexValueType> DecayTimeMapModel::GetSliceIndex(const QModelIndex& index) const
+{
+  if (!index.isValid())
+    return std::nullopt;
+
+  if (m_Mode == Mode::UserDefined)
+  {// in user mode we always only have slice 0. As the decay time is set for every slice in the timestep the same
+    return 0;
+  }
+
+  if (hasSingleTimeStep())
+  { //auto mode with only one time step only has one level which is the slice level -> get directly the row
+    const auto& slices = m_DecayTimeMap.begin()->second;
+    auto it = slices.begin();
+    std::advance(it, index.row());
+    return it->first;
+  }
+
+  if (index.parent().isValid())
+  {
+    auto tsOpt = GetTimeStep(index);
+    if (!tsOpt || !m_DecayTimeMap.count(*tsOpt))
+      return std::nullopt;
+
+    const auto& slices = m_DecayTimeMap.at(*tsOpt);
+    auto it = slices.begin();
+    std::advance(it, index.row());
+    return it->first;
+  }
+
+  return std::nullopt;
+}
+
+
+//=============================================================================
+// DecayTimeDelegate Implementation
+//=============================================================================
+
+DecayTimeDelegate::DecayTimeDelegate(QObject* parent)
+  : QStyledItemDelegate(parent)
+{
+}
+
+QWidget* DecayTimeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option,
+  const QModelIndex& index) const
+{
+  Q_UNUSED(option)
+
+    if (index.column() != 1) // Only column 1 (decay time) is editable
+      return nullptr;
+
+  auto* spinBox = new QDoubleSpinBox(parent);
+  spinBox->setRange(MIN_DECAY_TIME, MAX_DECAY_TIME);
+  spinBox->setDecimals(DECIMALS);
+  spinBox->setSingleStep(SINGLE_STEP);
+  spinBox->setSuffix(" [s]");
+
+  return spinBox;
+}
+
+void DecayTimeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
+{
+  auto* spinBox = qobject_cast<QDoubleSpinBox*>(editor);
+  if (!spinBox)
+    return;
+
+  double value = index.model()->data(index, Qt::EditRole).toDouble();
+  spinBox->setValue(value);
+}
+
+void DecayTimeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
+  const QModelIndex& index) const
+{
+  auto* spinBox = qobject_cast<QDoubleSpinBox*>(editor);
+  if (!spinBox)
+    return;
+
+  spinBox->interpretText();
+  double value = spinBox->value();
+  model->setData(index, value, Qt::EditRole);
+}
+
+void DecayTimeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,
+  const QModelIndex& index) const
+{
+  Q_UNUSED(index)
+    editor->setGeometry(option.rect);
 }

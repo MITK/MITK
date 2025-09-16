@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>453</width>
-    <height>659</height>
+    <width>447</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -176,16 +176,6 @@ Uncheck, if you want to use this view with any kind of image.</string>
       <string>Time to measurment</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="2" column="1">
-       <widget class="QRadioButton" name="radioTimeAuto">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string>Auto detect</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
@@ -206,6 +196,23 @@ Uncheck, if you want to use this view with any kind of image.</string>
          </widget>
         </item>
        </layout>
+      </item>
+      <item row="2" column="1">
+       <widget class="QRadioButton" name="radioTimeAuto">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="text">
+         <string>Auto detect</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QRadioButton" name="radioTimeUser">
+        <property name="text">
+         <string>User defined</string>
+        </property>
+       </widget>
       </item>
       <item row="2" column="2">
        <widget class="QTextEdit" name="timeInfo">
@@ -251,15 +258,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QRadioButton" name="radioTimeUser">
-        <property name="text">
-         <string>User defined</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <widget class="QTreeView" name="decayTimeView"/>
    </item>
    <item>
     <widget class="QCheckBox" name="checkAuto">

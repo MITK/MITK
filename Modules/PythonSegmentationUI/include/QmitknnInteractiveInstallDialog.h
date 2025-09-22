@@ -39,6 +39,7 @@ protected:
     Install_nnInteractive
   };
 
+  void OnShowAdvancedSettingsButtonClicked(bool checked);
   void OnYesClicked();
   void OnStandardOutputReady();
   void OnStandardErrorReady();

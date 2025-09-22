@@ -22,10 +22,15 @@ found in the LICENSE file.
 
 namespace
 {
-  constexpr auto TORCH = "torch==2.7.1";
-  constexpr auto TORCH_VISION = "torchvision==0.22.1";
+  constexpr auto TORCH = "torch>=2.8.0,<3.0.0";
+  constexpr auto TORCH_VISION = "torchvision>=0.23.0,<1.0.0";
   constexpr auto NNINTERACTIVE = "nninteractive>=1.1.2,<2.0.0";
-  constexpr auto CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu118";
+
+  // Starting with CUDA 12.9 we get the following error on our lowest
+  // supported GPU architecture (e.g. GeForce 10 Series):
+  //   torch.AcceleratorError: CUDA error: no kernel image is available
+  //   for exec
+  constexpr auto CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu128";
 }
 
 using Self = QmitknnInteractiveInstallDialog;

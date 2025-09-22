@@ -75,7 +75,7 @@ void QmitknnInteractiveInstallDialog::OnShowAdvancedSettingsButtonClicked(bool c
   m_Ui->advancedGroupBox->setVisible(checked);
   m_Ui->advancedButton->setText(checked
     ? "Hide advanced settings"
-    : "Show advanved settings");
+    : "Show advanced settings");
 }
 
 void QmitknnInteractiveInstallDialog::OnYesClicked()

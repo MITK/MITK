@@ -76,6 +76,11 @@ namespace mitk
      * \return The root node of the preferences tree.
      */
     virtual IPreferences* GetSystemPreferences() = 0;
+
+    /**
+     * \brief Open the preferences dialog if possible.
+     */
+    virtual void OpenPreferencesDialog(const std::string& page = {});
   };
 }
 

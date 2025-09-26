@@ -21,6 +21,7 @@ set(INTERNAL_CPP_FILES
   QmitkConvertSurfaceToLabelAction.cpp
   QmitkConvertToMultiLabelSegmentationAction.cpp
   QmitkCreateMultiLabelSegmentationAction.cpp
+  QmitknnInteractivePreferencePage.cpp
 )
 
 set(UI_FILES
@@ -32,6 +33,7 @@ set(UI_FILES
   src/internal/QmitkSegmentationViewControls.ui
   src/internal/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/QmitkSegmentationTaskListView.ui
+  src/internal/QmitknnInteractivePreferencePage.ui
 )
 
 set(MOC_H_FILES
@@ -52,6 +54,7 @@ set(MOC_H_FILES
   src/internal/QmitkConvertSurfaceToLabelAction.h
   src/internal/QmitkConvertToMultiLabelSegmentationAction.h
   src/internal/QmitkCreateMultiLabelSegmentationAction.h
+  src/internal/QmitknnInteractivePreferencePage.h
 )
 
 set(CACHED_RESOURCE_FILES

@@ -470,6 +470,21 @@ if(MITK_USE_Python3)
     message(WARNING "OpenMP is not supported on macOS when MITK_USE_Python3 is enabled.")
     set(MITK_USE_OpenMP OFF CACHE BOOL "" FORCE)
   endif()
+else()
+  # MITK_USE_Python3 is OFF - ensure Debug configuration is available
+  if(CMAKE_CONFIGURATION_TYPES)
+    set(config_types ${CMAKE_CONFIGURATION_TYPES})
+    list(FIND config_types "Debug" debug_index)
+    if(debug_index EQUAL -1)
+      # Debug is not present, add it back
+      list(INSERT config_types 0 "Debug")
+      set(CMAKE_CONFIGURATION_TYPES "${config_types}" CACHE STRING "" FORCE)
+      message(NOTICE "Added \"Debug\" back to CMAKE_CONFIGURATION_TYPES since Python3 is disabled.")
+    endif()
+  else()
+    # For single-config generators, restore the full list of build types
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+  endif()
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)

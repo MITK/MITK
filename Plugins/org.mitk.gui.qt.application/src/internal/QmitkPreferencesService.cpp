@@ -38,7 +38,7 @@ mitk::IPreferences* QmitkPreferencesService::GetSystemPreferences()
   return m_PreferencesService->GetSystemPreferences();
 }
 
-void QmitkPreferencesService::OpenPreferencesDialog(const std::string& page)
+bool QmitkPreferencesService::OpenPreferencesDialog(const std::string& page)
 {
   QmitkPreferencesDialog dialog(QApplication::activeWindow());
 
@@ -46,4 +46,6 @@ void QmitkPreferencesService::OpenPreferencesDialog(const std::string& page)
     dialog.SetSelectedPage(QString::fromStdString(page));
 
   dialog.exec();
+
+  return true;
 }

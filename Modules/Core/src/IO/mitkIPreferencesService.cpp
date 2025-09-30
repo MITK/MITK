@@ -16,6 +16,7 @@ mitk::IPreferencesService::~IPreferencesService()
 {
 }
 
-void mitk::IPreferencesService::OpenPreferencesDialog(const std::string&)
+bool mitk::IPreferencesService::OpenPreferencesDialog(const std::string&)
 {
+  return false;
 }

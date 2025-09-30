@@ -26,7 +26,7 @@ public:
   void UninitializeStorage(bool removeFile) override;
   mitk::IPreferences* GetSystemPreferences() override;
 
-  void OpenPreferencesDialog(const std::string& page = {}) override;
+  bool OpenPreferencesDialog(const std::string& page = {}) override;
 
 private:
   mitk::CoreServicePointer<mitk::IPreferencesService> m_PreferencesService;

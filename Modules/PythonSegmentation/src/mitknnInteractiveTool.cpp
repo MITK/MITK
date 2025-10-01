@@ -12,7 +12,10 @@ found in the LICENSE file.
 
 #include <mitknnInteractiveTool.h>
 
+#include <mitkCoreServices.h>
 #include <mitkImageReadAccessor.h>
+#include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
 #include <mitknnInteractiveBoxInteractor.h>
 #include <mitknnInteractiveLassoInteractor.h>
 #include <mitknnInteractivePointInteractor.h>
@@ -23,6 +26,8 @@ found in the LICENSE file.
 
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
+
+#include <regex>
 
 using namespace mitk::nnInteractive;
 
@@ -41,6 +46,23 @@ namespace
     std::memset(data, 0, numPixels * sizeof(mitk::Label::PixelType));
 
     image->SetImportVolume(data, 0, 0, mitk::Image::ManageMemory);
+  }
+
+  std::optional<int> parseCUDADevice(const std::string& gpuBackend)
+  {
+    const std::regex regex(R"(^\s*cuda:(\d+)\s*$)");
+    std::smatch match;
+
+    if (std::regex_match(gpuBackend, match, regex))
+      return std::stoi(match[1].str());
+
+    return std::nullopt;
+  }
+
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   }
 }
 
@@ -450,13 +472,20 @@ bool mitk::nnInteractiveTool::IsInstalled() const
 
 bool mitk::nnInteractiveTool::GetCUDADeviceInfo(CUDADeviceInfo& info) const
 {
+  auto prefs = GetPreferences();
+  const auto gpuBackend = prefs->Get("nnInteractive/gpuBackend", "cuda:0");
+  auto cudaDevice = parseCUDADevice(gpuBackend);
+
+  if (!cudaDevice.has_value())
+    return false;
+
   std::ostringstream pyCommands; pyCommands
     << "import torch\n"
     << "is_cuda_available = False\n"
     << "try:\n"
     << "    if torch.cuda.is_available():\n"
-    << "        name = torch.cuda.get_device_name(0)\n"
-    << "        props = torch.cuda.get_device_properties(0)\n"
+    << "        name = torch.cuda.get_device_name(" << cudaDevice.value() << ")\n"
+    << "        props = torch.cuda.get_device_properties(" << cudaDevice.value() << ")\n"
     << "        total_memory_mb = props.total_memory // (1024 ** 2)\n"
     << "        major = props.major\n"
     << "        minor = props.minor\n"
@@ -487,41 +516,61 @@ bool mitk::nnInteractiveTool::GetCUDADeviceInfo(CUDADeviceInfo& info) const
 
 void mitk::nnInteractiveTool::StartSession()
 {
-  constexpr auto MODEL_CHECKPOINT = "nnInteractive_v1.0";
-
   if (this->IsSessionRunning())
     this->EndSession();
 
   auto pythonContext = m_Impl->GetPythonContext();
   bool useCUDADevice = false;
 
-  if (CUDADeviceInfo deviceInfo; this->GetCUDADeviceInfo(deviceInfo))
+  auto prefs = GetPreferences();
+  const auto backendPref = prefs->Get("nnInteractive/backend", "auto");
+  const auto gpuBackendPref = prefs->Get("nnInteractive/gpuBackend", "cuda:0");
+
+  if (backendPref != "cpu")
   {
-    MITK_INFO << "Found CUDA device: " << deviceInfo.Name;
-    MITK_INFO << "  Compute capability: " << deviceInfo.Major << "." << deviceInfo.Minor;
-    MITK_INFO << "  Total memory: " << deviceInfo.TotalMemoryMB << " MB";
+    CUDADeviceInfo deviceInfo;
 
-    bool switchToCUDADevice = true;
-
-    if (deviceInfo.Major < 6)
+    if (this->GetCUDADeviceInfo(deviceInfo))
     {
-      MITK_WARN << "Minimum required compute capability is 6.0";
-      switchToCUDADevice = false;
+      MITK_INFO << "Found CUDA device: " << deviceInfo.Name;
+      MITK_INFO << "  Compute capability: " << deviceInfo.Major << "." << deviceInfo.Minor;
+      MITK_INFO << "  Total memory: " << deviceInfo.TotalMemoryMB << " MB";
+
+      bool switchToCUDADevice = true;
+
+      if (deviceInfo.Major < 6)
+      {
+        MITK_WARN << "Minimum required compute capability is 6.0";
+        switchToCUDADevice = false;
+      }
+
+      if (deviceInfo.TotalMemoryMB < 6000)
+      {
+        MITK_WARN << "Minimum required total memory is 6 GB";
+        switchToCUDADevice = false;
+      }
+
+      useCUDADevice = switchToCUDADevice;
     }
 
-    if (deviceInfo.TotalMemoryMB < 6000)
+    if (!useCUDADevice)
     {
-      MITK_WARN << "Minimum required total memory is 6 GB";
-      switchToCUDADevice = false;
+      if (backendPref == "auto")
+      {
+        MITK_WARN << "No compatible CUDA device detected. Falling back to CPU processing.";
+      }
+      else
+      {
+        MITK_WARN << "CPU backend would have been auto-selected, but the CUDA backend has been manually enforced. "
+                  << "Continue at your own risk.";
+        useCUDADevice = true;
+      }
     }
-
-    useCUDADevice = switchToCUDADevice;
   }
 
-  if (!useCUDADevice)
-    MITK_WARN << "No compatible CUDA device detected. Falling back to CPU processing.";
-
   {
+    const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
+
     std::ostringstream pyCommands; pyCommands
       << "import torch\n"
       << "import nnInteractive\n"
@@ -531,14 +580,14 @@ void mitk::nnInteractiveTool::StartSession()
       << "from batchgenerators.utilities.file_and_folder_operations import join, load_json\n"
       << "from huggingface_hub import snapshot_download\n"
       << "print(f'nnInteractive version: {version(\"nnInteractive\")}')\n"
-      << "print('Model checkpoint: " << MODEL_CHECKPOINT << "')\n"
+      << "print('Model checkpoint: " << modelCheckpoint << "')\n"
       << "repo_id = 'nnInteractive/nnInteractive'\n"
       << "download_path = snapshot_download(\n"
       << "    repo_id = repo_id,\n"
-      << "    allow_patterns = ['" << MODEL_CHECKPOINT << "/*'],\n"
+      << "    allow_patterns = ['" << modelCheckpoint << "/*'],\n"
       << "    force_download = False\n"
       << ")\n"
-      << "checkpoint_path = Path(download_path).joinpath('" << MODEL_CHECKPOINT << "')\n";
+      << "checkpoint_path = Path(download_path).joinpath('" << modelCheckpoint << "')\n";
     pythonContext->ExecuteString(pyCommands.str());
   }
 
@@ -567,7 +616,7 @@ void mitk::nnInteractiveTool::StartSession()
   {
     std::ostringstream pyCommands; pyCommands
       << "session = inference_class(\n"
-      << "    device=torch.device('" << (useCUDADevice ? "cuda:0" : "cpu") << "'),\n"
+      << "    device=torch.device('" << (useCUDADevice ? gpuBackendPref : "cpu") << "'),\n"
       << "    use_torch_compile=False,\n"
       << "    torch_n_threads=os.cpu_count(),\n"
       << "    verbose=False,\n"
@@ -591,7 +640,7 @@ void mitk::nnInteractiveTool::StartSession()
 
   const auto maskPixelType = MultiLabelSegmentation::GetPixelType();
   m_Impl->TargetBuffer->Initialize(maskPixelType, *(imageAtTimeStep->GetTimeGeometry()));
-  InitializeVolume(m_Impl->TargetBuffer);
+  ::InitializeVolume(m_Impl->TargetBuffer);
 
   pythonContext->TransferBaseDataToPython(imageAtTimeStep, "mitk_image");
   pythonContext->TransferBaseDataToPython(m_Impl->TargetBuffer.GetPointer(), "mitk_target_buffer");

@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include "QmitkShowPreferencePageHandler.h"
 
 #include <usModuleInitialization.h>
+#include <usGetModuleContext.h>
+#include <usServiceProperties.h>
 
 US_INITIALIZE_MODULE
 
@@ -38,6 +40,14 @@ namespace mitk
     BERRY_REGISTER_EXTENSION_CLASS(QmitkShowPreferencePageHandler, context)
 
     QmitkRegisterClasses();
+
+    m_PreferencesService.reset(new QmitkPreferencesService);
+
+    us::ServiceProperties props;
+    props[us::ServiceConstants::SERVICE_RANKING()] = 10;
+
+    auto moduleContext = us::GetModuleContext();
+    moduleContext->RegisterService<mitk::IPreferencesService>(m_PreferencesService.get(), props);
   }
 
   void org_mitk_gui_qt_application_Activator::stop(ctkPluginContext* context)

@@ -35,6 +35,7 @@ set(INTERNAL_CPP_FILES
   QmitkGeneralPreferencePage.cpp
   QmitkToolBarsPreferencePage.cpp
   QmitkShowPreferencePageHandler.cpp
+  QmitkPreferencesService.cpp
 )
 
 set(MOC_H_FILES

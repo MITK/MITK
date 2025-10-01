@@ -15,6 +15,8 @@ found in the LICENSE file.
 #define MITKPLUGINACTIVATOR_H
 
 #include <ctkPluginActivator.h>
+#include "QmitkPreferencesService.h"
+#include <memory>
 
 namespace mitk {
 
@@ -35,6 +37,8 @@ public:
 private:
 
   static ctkPluginContext* m_Context;
+
+  std::unique_ptr<QmitkPreferencesService> m_PreferencesService;
 
 }; // org_mitk_gui_qt_application_Activator
 

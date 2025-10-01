@@ -22,10 +22,15 @@ found in the LICENSE file.
 
 namespace
 {
-  constexpr auto TORCH = "torch==2.7.1";
-  constexpr auto TORCH_VISION = "torchvision==0.22.1";
+  constexpr auto TORCH = "torch>=2.8.0,<3.0.0";
+  constexpr auto TORCH_VISION = "torchvision>=0.23.0,<1.0.0";
   constexpr auto NNINTERACTIVE = "nninteractive>=1.1.2,<2.0.0";
-  constexpr auto CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu118";
+
+  // Starting with CUDA 12.9 we get the following error on our lowest
+  // supported GPU architecture (e.g. GeForce 10 Series):
+  //   torch.AcceleratorError: CUDA error: no kernel image is available
+  //   for exec
+  constexpr auto CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu128";
 }
 
 using Self = QmitknnInteractiveInstallDialog;
@@ -38,6 +43,21 @@ QmitknnInteractiveInstallDialog::QmitknnInteractiveInstallDialog(QWidget* parent
 {
   m_Ui->setupUi(this);
 
+  m_Ui->advancedGroupBox->hide();
+
+  m_Ui->torchLineEdit->setText(TORCH);
+  m_Ui->torchvisionLineEdit->setText(TORCH_VISION);
+  m_Ui->nnInteractiveLineEdit->setText(NNINTERACTIVE);
+
+#if defined(_WIN32)
+  m_Ui->indexUrlLineEdit->setText(CUDA_INDEX_URL);
+#else
+  m_Ui->indexUrlLabel->hide();
+  m_Ui->indexUrlLineEdit->hide();
+#endif
+
+  connect(m_Ui->advancedButton, &QPushButton::clicked, this, &Self::OnShowAdvancedSettingsButtonClicked);
+
   disconnect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &Self::OnYesClicked);
 
@@ -48,6 +68,14 @@ QmitknnInteractiveInstallDialog::QmitknnInteractiveInstallDialog(QWidget* parent
 
 QmitknnInteractiveInstallDialog::~QmitknnInteractiveInstallDialog()
 {
+}
+
+void QmitknnInteractiveInstallDialog::OnShowAdvancedSettingsButtonClicked(bool checked)
+{
+  m_Ui->advancedGroupBox->setVisible(checked);
+  m_Ui->advancedButton->setText(checked
+    ? "Hide advanced settings"
+    : "Show advanced settings");
 }
 
 void QmitknnInteractiveInstallDialog::OnYesClicked()
@@ -150,12 +178,33 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
 
   if (m_InstallStep == InstallStep::Install_PyTorch)
   {
-    QStringList args = { "-m", "pip", "install", TORCH, TORCH_VISION, "--index-url", CUDA_INDEX_URL };
+    auto torch = m_Ui->torchLineEdit->text();
+
+    if (torch.isEmpty())
+      torch = TORCH;
+
+    auto torchvision = m_Ui->torchvisionLineEdit->text();
+
+    if (torchvision.isEmpty())
+      torchvision = TORCH_VISION;
+
+    auto indexUrl = m_Ui->indexUrlLineEdit->text();
+
+    if (indexUrl.isEmpty())
+      indexUrl = CUDA_INDEX_URL;
+
+    QStringList args = { "-m", "pip", "install", torch, torchvision, "--index-url", indexUrl };
+
     m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
   }
   else // InstallStep::Install_nnInteractive
   {
-    QStringList args = { "-m", "pip", "install", NNINTERACTIVE };
+    auto nnInteractive = m_Ui->nnInteractiveLineEdit->text();
+
+    if (nnInteractive.isEmpty())
+      nnInteractive = NNINTERACTIVE;
+
+    QStringList args = { "-m", "pip", "install", nnInteractive };
     m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
   }
 }

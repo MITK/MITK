@@ -43,8 +43,10 @@ protected:
   void InitializeUI(QBoxLayout* mainLayout) override;
   void InitializePromptType();
   void InitializeInteractorButtons();
+  void EnableInitializeButtons(bool enabled);
 
   void OnInitializeButtonToggled(bool checked);
+  void OnSettingsButtonClicked();
   void OnResetInteractionsButtonClicked();
   void OnAutoRefineCheckBoxToggled(bool checked);
   void OnAutoZoomCheckBoxToggled(bool checked);

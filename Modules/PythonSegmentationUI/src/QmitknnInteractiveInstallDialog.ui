@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>400</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,6 +34,58 @@
      <property name="textInteractionFlags">
       <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
      </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="advancedGroupBox">
+     <property name="title">
+      <string>Advanced settings</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="torchLabel">
+        <property name="text">
+         <string>torch:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="torchLineEdit"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="torchvisionLabel">
+        <property name="text">
+         <string>torchvision:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="torchvisionLineEdit"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="nnInteractiveLabel">
+        <property name="text">
+         <string>nninteractive:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="nnInteractiveLineEdit"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="indexUrlLabel">
+        <property name="text">
+         <string>--index-url:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="indexUrlLineEdit"/>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -68,6 +120,16 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="advancedButton">
+       <property name="text">
+        <string>Show advanced settings</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QCheckBox" name="autoCloseCheckBox">
        <property name="text">

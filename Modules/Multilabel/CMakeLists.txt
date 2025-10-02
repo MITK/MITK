@@ -1,6 +1,4 @@
 mitk_create_module(
-  PCH
-    mitkBaseData.h
   DEPENDS MitkCore MitkAlgorithmsExt MitkSceneSerializationBase MitkDICOMQI
   PACKAGE_DEPENDS ITK|Smoothing
 )

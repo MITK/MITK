@@ -525,7 +525,7 @@ namespace mitk
     *
     * @param templateImage Template for the initialization
     * @param resetLabels Indicate if the labels should be reseted on initialization.
-    * True (default): all label and group informations will be removed. False: label
+    * True (default): all label and group information will be removed. False: label
     * information and groups are kept, but all pixel information will be erased
     * (cf EraseLabel(...)).
     * @param ensure1stGroup Indicates if the initialization guarantees that the first
@@ -541,7 +541,7 @@ namespace mitk
     *
     * @param geometry Time geometry that should be used.
     * @param resetLabels Indicate if the labels should be reseted on initialization.
-    * True (default): all label and group informations will be removed. False: label
+    * True (default): all label and group information will be removed. False: label
     * information and groups are kept, but all pixel information will be erased
     * (cf EraseLabel(...)).
     * @param ensure1stGroup Indicates if the initialization guarantees that the first

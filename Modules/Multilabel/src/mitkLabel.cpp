@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 const mitk::Label::PixelType mitk::Label::MAX_LABEL_VALUE = std::numeric_limits<mitk::Label::PixelType>::max();
 
-mitk::Label::Label() : PropertyList()
+mitk::Label::Label() : PropertyList(), m_Value(UNLABELED_VALUE)
 {
   if (GetProperty("locked") == nullptr)
     SetLocked(true);
@@ -54,8 +54,7 @@ mitk::Label::Label() : PropertyList()
 
   if (GetProperty("name") == nullptr)
     SetName("Unknown label name");
-  if (GetProperty("value") == nullptr)
-    SetValue(0);
+
   if (GetProperty("description") == nullptr)
     SetDescription("");
 
@@ -219,21 +218,17 @@ void mitk::Label::SetDescription(const std::string& description)
 void mitk::Label::SetValue(PixelType pixelValue)
 {
   mitk::UShortProperty *property = dynamic_cast<mitk::UShortProperty *>(GetProperty("value"));
-  if (property != nullptr)
+  if (pixelValue != m_Value)
+  {
     // Update Property
-    property->SetValue(pixelValue);
-  else
-    // Create new Property
-    SetProperty("value", mitk::UShortProperty::New(pixelValue));
+    m_Value = pixelValue;
+    this->Modified();
+  }
 }
 
 mitk::Label::PixelType mitk::Label::GetValue() const
 {
-  PixelType pixelValue;
-  mitk::UShortProperty *property = dynamic_cast<UShortProperty *>(GetProperty("value"));
-  assert(property);
-  pixelValue = property->GetValue();
-  return pixelValue;
+  return m_Value;
 }
 
 const mitk::Color &mitk::Label::GetColor() const
@@ -286,6 +281,25 @@ mitk::Point3D mitk::Label::GetCenterOfMassCoordinates() const
   mitk::Point3dProperty *property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.coordinates"));
   return property->GetValue();
 }
+
+void mitk::Label::Update(const Label* templateLabel, bool updateLabelValue)
+{
+  if (nullptr == templateLabel)
+    mitkThrow() << "Invalid call of Label::Update. Passed label is null.";
+
+  auto keys = templateLabel->GetPropertyKeys();
+  for (const auto& key : keys)
+  {
+    auto destProp = templateLabel->GetConstProperty(key)->Clone();
+    this->SetProperty(key, destProp); //The implementation of SetProperty ensures
+                                      //that only the content will be assigned if
+                                      //key does already exist.
+  }
+
+  if (updateLabelValue)
+    this->SetValue(templateLabel->GetValue());
+}
+
 
 itk::LightObject::Pointer mitk::Label::InternalClone() const
 {

@@ -79,6 +79,15 @@ namespace mitk
 
     using itk::Object::Modified;
     void Modified() { Superclass::Modified(); }
+
+    /** @brief Function updates the property values of a label provided as templates.
+    If a property exists in the destination label only the value will be updated (therefor observers and pointers
+    stay valid). If the property does not exist, it will be cloned and added. No properties will be removed.
+    @param templateLabel Label instance that provides the new values for properties
+    @param updateLabelValue Indicate if also the label value should be updated.
+    */
+    void Update(const Label* templateLabel, bool updateLabelValue = false);
+
     Label();
     Label(PixelType value, const std::string& name);
     ~Label() override;
@@ -89,6 +98,7 @@ namespace mitk
     Label(const Label &other);
 
   private:
+    PixelType m_Value;
     itk::LightObject::Pointer InternalClone() const override;
   };
 

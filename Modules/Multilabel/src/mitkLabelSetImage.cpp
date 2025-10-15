@@ -969,6 +969,18 @@ void mitk::MultiLabelSegmentation::RenameLabel(LabelValueType pixelValue, const 
   DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 }
 
+void mitk::MultiLabelSegmentation::UpdateLabel(LabelValueType labelValue, const Label* templateLabel)
+{
+  auto label = GetLabel(labelValue);
+  if (label.IsNull()) mitkThrow() << "Cannot update label. Unknown label value provided. Unknown label value:" << labelValue;
+  if (templateLabel == nullptr) mitkThrow() << "Cannot update label. Null pointer passed as template label.";
+
+  label->Update(templateLabel, false);
+
+  this->UpdateLookupTable(labelValue);
+  m_LookupTable->Modified();
+}
+
 mitk::Label *mitk::MultiLabelSegmentation::GetActiveLabel()
 {
   if (m_ActiveLabelValue == UNLABELED_VALUE) return nullptr;
@@ -1400,6 +1412,17 @@ const mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegment
     mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
 
   return m_GroupToLabelMap[index];
+}
+
+const mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::GetLabelValuesByName(const std::string_view name) const
+{
+  LabelValueVectorType result;
+
+  auto searchName = [&result, name](const Label* l) { if (l->GetName() == name) result.push_back(l->GetValue()); };
+
+  this->VisitLabels(this->GetAllLabelValues(), searchName);
+
+  return result;
 }
 
 const mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::GetLabelValuesByName(GroupIndexType index, const std::string_view name) const

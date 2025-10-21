@@ -48,8 +48,6 @@ namespace mitk
     void Write() override;
     ConfidenceLevel GetWriterConfidenceLevel() const override;
 
-    static std::vector<mitk::DICOMTagPath> GetDICOMTagsOfInterest();
-
   protected:
     /**
      * @brief Reads a number of DICOM segmentation from the file system

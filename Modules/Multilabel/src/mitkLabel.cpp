@@ -15,10 +15,59 @@ found in the LICENSE file.
 #include "itkProcessObject.h"
 #include <itkCommand.h>
 #include <mitkProperties.h>
-#include <mitkDICOMSegmentationPropertyHelper.h>
+#include <mitkDICOMSegmentationConstants.h>
 #include <mitkStringProperty.h>
 
 const mitk::Label::PixelType mitk::Label::MAX_LABEL_VALUE = std::numeric_limits<mitk::Label::PixelType>::max();
+
+namespace
+{
+  const std::map<std::string, std::string>& GetPropertyNameLookup()
+  {
+    static const std::map<std::string, std::string> lookup = {
+      // Mapping for legacy label properties that were wrong and therefore deprecated
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_SUB_PATH()),
+        "PatientName" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_SUB_PATH()),
+        "PatientName" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_SUB_PATH()),
+        "PatientName" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_MEANING_SUB_PATH()),
+        "PatientName" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_SCHEME_SUB_PATH()),
+        "PatientName" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_SUB_PATH()),
+        "PatientName" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_MEANING_SUB_PATH()),
+        "PatientName" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_SUB_PATH()),
+        "PatientName" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_SUB_PATH()),
+        "PatientName" },
+        // Mapping between DICOMTag paths and human readable keywords used internally as for label properties
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_LABEL_SUB_PATH()), "name" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_DESCRIPTION_SUB_PATH()), "description" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_ALGORITHM_TYPE_SUB_PATH()), "algorithm_type" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_ALGORITHM_NAME_SUB_PATH()), "algorithm_name" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_TRACKING_ID_SUB_PATH()), "tracking_id" },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_TRACKING_UID_SUB_PATH()), "tracking_uid" }
+    };
+    return lookup;
+  }
+
+  std::string EnsureInternalPropertyName(const std::string& externalName)
+  {
+    auto mapping = GetPropertyNameLookup();
+    auto finding = mapping.find(externalName);
+
+    if (finding != mapping.end())
+    {
+      return finding->second;
+    }
+
+    return externalName;
+  }
+}
 
 mitk::Label::Label() : PropertyList(), m_Value(UNLABELED_VALUE)
 {
@@ -57,8 +106,6 @@ mitk::Label::Label() : PropertyList(), m_Value(UNLABELED_VALUE)
 
   if (GetProperty("description") == nullptr)
     SetDescription("");
-
-  DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(this);
 }
 
 mitk::Label::Label(PixelType value, const std::string& name) : Label()
@@ -92,7 +139,20 @@ void mitk::Label::SetProperty(const std::string &propertyKey, BaseProperty *prop
   command->SetCallbackFunction(this, &Label::Modified);
   property->AddObserver(itk::ModifiedEvent(), command);
 
-  Superclass::SetProperty(propertyKey, property, contextName, fallBackOnDefaultContext);
+  auto internalKey = EnsureInternalPropertyName(propertyKey);
+  Superclass::SetProperty(internalKey, property, contextName, fallBackOnDefaultContext);
+}
+
+mitk::BaseProperty::ConstPointer mitk::Label::GetConstProperty(const std::string& propertyKey, const std::string& contextName, bool fallBackOnDefaultContext) const
+{
+  auto internalKey = EnsureInternalPropertyName(propertyKey);
+  return Superclass::GetConstProperty(internalKey, contextName, fallBackOnDefaultContext);
+}
+
+mitk::BaseProperty* mitk::Label::GetNonConstProperty(const std::string& propertyKey, const std::string& contextName, bool fallBackOnDefaultContext)
+{
+  auto internalKey = EnsureInternalPropertyName(propertyKey);
+  return Superclass::GetNonConstProperty(internalKey, contextName, fallBackOnDefaultContext);
 }
 
 void mitk::Label::SetLocked(bool locked)
@@ -181,7 +241,7 @@ void mitk::Label::SetTrackingID(const std::string& trackingID)
 
 std::string mitk::Label::GetTrackingUID() const
 {
-  std::string trackingUID = "";
+  std::string trackingUID = std::to_string(this->GetValue());
   GetStringProperty("tracking_uid", trackingUID);
   return trackingUID;
 }
@@ -281,6 +341,90 @@ mitk::Point3D mitk::Label::GetCenterOfMassCoordinates() const
   mitk::Point3dProperty *property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.coordinates"));
   return property->GetValue();
 }
+
+void mitk::Label::SetAlgorithmType(AlgorithmType algoType)
+{
+  if (algoType == AlgorithmType::Undefined)
+  {
+    this->RemoveProperty("algorithm_type");
+  }
+  else
+  {
+    std::string text = "AUTOMATIC";
+    if (algoType == AlgorithmType::MANUAL)
+      text = "MANUAL";
+    else if (algoType == AlgorithmType::SEMIAUTOMATIC)
+      text = "SEMIAUTOMATIC";
+
+    mitk::StringProperty* property = dynamic_cast<mitk::StringProperty*>(this->GetProperty("algorithm_type"));
+    if (property != nullptr)
+      // Update Property
+      property->SetValue(text);
+    else
+      // Create new Property
+      SetStringProperty("algorithm_type", text.c_str());
+  }
+}
+
+mitk::Label::AlgorithmType mitk::Label::GetAlgorithmType() const
+{
+  std::string text = this->GetAlgorithmTypeStr();
+
+  if (text.empty())
+    return AlgorithmType::Undefined;
+  else if (text =="MANUAL")
+    return AlgorithmType::MANUAL;
+  else if (text == "SEMIAUTOMATIC")
+    return AlgorithmType::SEMIAUTOMATIC;
+
+  return AlgorithmType::AUTOMATIC;
+}
+
+std::string mitk::Label::GetAlgorithmTypeStr() const
+{
+  std::string text = "";
+  GetStringProperty("algorithm_type", text);
+  return text;
+}
+
+void mitk::Label::SetAlgorithmName(const std::string& algoName)
+{
+  mitk::StringProperty* property = dynamic_cast<mitk::StringProperty*>(this->GetProperty("algorithm_name"));
+  if (property != nullptr)
+    // Update Property
+    property->SetValue(algoName);
+  else
+    // Create new Property
+    SetStringProperty("algorithm_type", algoName.c_str());
+}
+
+std::string mitk::Label::GetAlgorithmName() const
+{
+  std::string text = "MITK Segmentation";
+  GetStringProperty("algorithm_name", text);
+  return text;
+}
+
+void mitk::Label::AddToolUse(AlgorithmType algoType, const std::string& algoName)
+{
+  auto currentType = this->GetAlgorithmType();
+  auto currentName = this->GetAlgorithmName();
+
+  if (currentType == AlgorithmType::Undefined)
+    this->SetAlgorithmType(algoType);
+  else if (currentType != algoType)
+    this->SetAlgorithmType(AlgorithmType::SEMIAUTOMATIC);
+
+  auto pos = currentName.find(algoName);
+  if (pos != std::string::npos)
+  {
+    if (!currentName.empty())
+      currentName += " | ";
+    currentName += algoName;
+    this->SetAlgorithmName(currentName);
+  }
+}
+
 
 void mitk::Label::Update(const Label* templateLabel, bool updateLabelValue)
 {

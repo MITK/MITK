@@ -65,16 +65,18 @@ namespace mitk
 
     enum class MergeStyle
     {
-      Replace, //The old label content of a label value will be replaced by its new label content.
-      //Therefore pixels that are labeled might become unlabeled again.
-      //(This means that a lock of the value is also ignored).
-      Merge //The union of old and new label content will be generated.
+      Replace, /**<The old label content of a label value will be replaced by its new label content.
+      Therefore pixels that are labeled might become unlabeled again.
+      (This means that a lock of the value is also ignored).*/
+      Merge /**<The union of old and new label content will be generated.*/
     };
 
     enum class OverwriteStyle
     {
-      RegardLocks, //Locked labels in the same spatial group will not be overwritten/changed.
-      IgnoreLocks //Label locks in the same spatial group will be ignored, so these labels might be changed.
+      ///Locked labels in the same spatial group will not be overwritten/changed.
+      RegardLocks,
+      ///Label locks in the same spatial group will be ignored, so these labels might be changed.
+      IgnoreLocks
     };
 
     /**

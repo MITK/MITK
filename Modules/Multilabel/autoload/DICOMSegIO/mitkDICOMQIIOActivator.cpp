@@ -28,7 +28,6 @@ namespace mitk
   class DICOMQIIOActivator : public us::ModuleActivator
   {
     std::vector<AbstractFileIO *> m_FileIOs;
-    DICOMTagsOfInterestAddHelper m_TagHelper;
 
   public:
     void Load(us::ModuleContext * context) override

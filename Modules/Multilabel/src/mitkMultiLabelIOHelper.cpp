@@ -761,3 +761,19 @@ mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nl
 
   return resultLabel;
 }
+
+void mitk::MultiLabelIOHelper::RemoveMetaPropertiesFromLabel(Label* label)
+{
+  if (nullptr == label)
+  {
+    mitkThrow() << "Invalid call of RemoveMetaPropertiesFromLabel. Passed label pointer is null.";
+  }
+  auto labelKeys = label->GetPropertyKeys();
+  for (const auto& key : labelKeys)
+  {
+    if (key.find('_') == 0)
+    {
+      label->RemoveProperty(key);
+    }
+  }
+}

@@ -533,6 +533,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   if (m_ToolManager->GetWorkingData(0) != nullptr)
   {
     m_Segmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(m_ToolManager->GetWorkingData(0)->GetData());
+    m_CurrentActiveLabelValue = 0;
     m_BtnReinit3DInterpolation->setEnabled(true);
   }
   else

@@ -135,6 +135,10 @@ private:
 
   void UpdateGUI();
 
+  QString CheckForWarnings() const;
+
+  void UpdateControlsOnLabelChanges();
+
   void ValidateSelectionInput();
 
   void UpdateWarningLabel(QString text);

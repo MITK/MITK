@@ -410,7 +410,44 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
       }
       else
       {
-        name = QString::fromStdString(label->GetName()) + QString("\nLabel instance ID: %1\nPixel value: %2").arg(item->GetLabelValue()).arg(item->GetLabelValue());
+        name = QString::fromStdString(label->GetName());
+        name += QString("\nPixel value: %1").arg(item->GetLabelValue());
+        if (!label->GetTrackingID().empty())
+        {
+          name += QString("\nTracking ID: %1").arg(QString::fromStdString(label->GetTrackingID()));
+        }
+        if (label->GetAnatomicRegionCount()>0)
+        {
+          auto code = label->GetAnatomicRegion(0);
+          name += QString("\nAnatomic region: %1").arg(QString::fromStdString(code.GetMeaning()));
+        }
+        if (label->GetPrimaryAnatomicStructureCount() > 0)
+        {
+          auto code = label->GetPrimaryAnatomicStructure(0);
+          QString modifier = "";
+          if (code.GetModifierCount() > 0)
+          {
+            modifier = " (" + QString::fromStdString(code.GetModifier(0).GetMeaning()) + ")";
+          }
+          name += QString("\nPrimary anatomic structure: %1 %2").arg(QString::fromStdString(code.GetMeaning())).arg(modifier);
+        }
+        if (auto code = label->GetSegmentedPropertyCategory(); code.has_value())
+        {
+          name += QString("\nType category: %1").arg(QString::fromStdString(code->GetMeaning()));
+        }
+        if (auto code = label->GetSegmentedPropertyType(); code.has_value())
+        {
+          QString modifier = "";
+          if (code->GetModifierCount() > 0)
+          {
+            modifier = " (" + QString::fromStdString(code->GetModifier(0).GetMeaning()) + ")";
+          }
+          name += QString("\nType: %1 %2").arg(QString::fromStdString(code->GetMeaning())).arg(modifier);
+        }
+        if (!label->GetDescription().empty())
+        {
+          name += QString("\nDescription:\n%1").arg(QString::fromStdString(label->GetDescription()));
+        }
       }
       return QVariant(name);
     }

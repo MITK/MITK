@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+#include <mitkLabelSuggestionHelper.h>
 
 #include <QFileDialog>
 
@@ -80,6 +81,7 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   prefs->Put("label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
   prefs->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
   prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
+  prefs->PutBool("enforce suggestions", m_Ui->enforceSuggestionsCheckBox->isChecked());
   prefs->PutBool("monailabel allow all models", m_Ui->allowAllModelsCheckBox->isChecked());
   prefs->PutInt("monailabel timeout", std::stoi(m_Ui->monaiTimeoutEdit->text().toStdString()));
 
@@ -131,22 +133,17 @@ void QmitkSegmentationPreferencePage::Update()
     m_Ui->askForNameRadioButton->setChecked(true);
   }
 
-  auto labelSuggestions = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "");
-  isOverriddenByCmdLineArg = !labelSuggestions.empty();
-
-  if (!isOverriddenByCmdLineArg)
-    labelSuggestions = prefs->Get("label suggestions", "");
+  mitk::LabelSuggestionHelper::Preferences defaultPrefs;
+  auto labelSuggestions = prefs->Get("label suggestions", defaultPrefs.labelSuggestionFile);
 
   m_Ui->defaultNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
   m_Ui->askForNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->suggestionsLineEdit->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->suggestionsToolButton->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->suggestionsCmdLineArgLabel->setVisible(isOverriddenByCmdLineArg);
 
   m_Ui->suggestionsLineEdit->setText(QString::fromStdString(labelSuggestions));
 
-  m_Ui->replaceStandardSuggestionsCheckBox->setChecked(prefs->GetBool("replace standard suggestions", true));
-  m_Ui->suggestOnceCheckBox->setChecked(prefs->GetBool("suggest once", true));
+  m_Ui->replaceStandardSuggestionsCheckBox->setChecked(prefs->GetBool("replace standard suggestions", defaultPrefs.replaceStandardSuggestions));
+  m_Ui->suggestOnceCheckBox->setChecked(prefs->GetBool("suggest once", defaultPrefs.suggestionOnce));
+  m_Ui->enforceSuggestionsCheckBox->setChecked(prefs->GetBool("enforce suggestions", defaultPrefs.enforceSuggestions));
 
   m_Ui->allowAllModelsCheckBox->setChecked(prefs->GetBool("monailabel allow all models", true));
   m_Ui->monaiTimeoutEdit->setText(QString::number(prefs->GetInt("monailabel timeout", 180)));

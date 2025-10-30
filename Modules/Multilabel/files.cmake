@@ -11,6 +11,7 @@ set(CPP_FILES
   mitkLabelSetImageToSurfaceFilter.cpp
   mitkLabelSetImageToSurfaceThreadedFilter.cpp
   mitkLabelSetImageVtkMapper2D.cpp
+  mitkLabelSuggestionHelper.cpp
   mitkMultiLabelEvents.cpp
   mitkMultiLabelIOHelper.cpp
   mitkMultilabelObjectFactory.cpp

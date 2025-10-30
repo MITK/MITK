@@ -889,7 +889,7 @@ mitk::Label* mitk::MultiLabelSegmentation::AddLabel(mitk::Label* label, GroupInd
     std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
 
     unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
-    if (m_GroupContainer.size() >= max_size)
+    if (m_LabelMap.size() >= max_size)
       return nullptr;
 
     if (addAsClone) newLabel = label->Clone();

@@ -477,7 +477,8 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
 
   if (m_SuggestionHelper.IsNotNull())
   {
-    if (!m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, templateLabel->GetName()))
+    auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+    if (suggestionPrefs.enforceSuggestions && !m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, templateLabel->GetName()))
       mitkThrow() << "QmitkMultiLabelInspector is in an invalid state. AddNewLabelInstanceInternal was called for a template label that is not allowed to have (further) instances.";
   }
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(templateLabel->GetValue());
@@ -976,7 +977,8 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       if (m_SuggestionHelper.IsNotNull())
       {
         auto label = this->GetFirstSelectedLabelObject();
-        instanceIsAllowed = m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, label->GetName());
+        auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+        instanceIsAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, label->GetName());
       }
 
       QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "Add label instance", this);
@@ -1070,7 +1072,8 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
         if (m_SuggestionHelper.IsNotNull())
         {
           auto label = this->GetFirstSelectedLabelObject();
-          instanceIsAllowed = m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, label->GetName());
+          auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+          instanceIsAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, label->GetName());
         }
 
         QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "&Add label instance", this);

@@ -300,8 +300,10 @@ void QmitkMultiLabelManager::UpdateControls()
   bool instanceAllowed = true;
   if (hasWorkingData && labels.size()==1 && m_SuggestionHelper.IsNotNull())
   {
-    instanceAllowed = m_SuggestionHelper->IsNewInstanceAllowed(segmentation, segmentation->GetLabel(labels.front())->GetName());
+    auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+    instanceAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(segmentation, segmentation->GetLabel(labels.front())->GetName());
   }
+
   m_Controls->labelSearchBox->setEnabled(hasWorkingData);
   m_Controls->btnAddGroup->setEnabled(hasWorkingData);
   m_Controls->btnAddInstance->setEnabled(hasWorkingData && labels.size()==1 && instanceAllowed);

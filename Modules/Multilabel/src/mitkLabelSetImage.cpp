@@ -428,7 +428,6 @@ void mitk::MultiLabelSegmentation::InsertGroup(GroupIndexType groupID, mitk::Ima
 
       auto labelClone = label->Clone();
 
-      DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(labelClone);
       this->AddLabelToMap(labelClone->GetValue(), labelClone, groupID);
       this->RegisterLabel(labelClone);
     }
@@ -480,9 +479,7 @@ void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType group
         mitkThrow() << "Error while replacing labels. Label value is already existing in another group. Invalid label: " << label->GetValue() << "; conflicting group: " << conflictingGroup;
       }
 
-      // add DICOM information of the label
       auto clonedLabel = label->Clone();
-      DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(clonedLabel);
 
       this->AddLabelToMap(clonedLabel->GetValue(), clonedLabel, groupID);
       this->RegisterLabel(clonedLabel);
@@ -914,9 +911,6 @@ mitk::Label* mitk::MultiLabelSegmentation::AddLabel(mitk::Label* label, GroupInd
       }
     }
 
-    // add DICOM information of the label
-    DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(newLabel);
-
     this->AddLabelToMap(pixelValue, newLabel, groupID);
     this->RegisterLabel(newLabel);
   }
@@ -964,9 +958,6 @@ void mitk::MultiLabelSegmentation::RenameLabel(LabelValueType pixelValue, const 
 
   this->UpdateLookupTable(pixelValue);
   m_LookupTable->Modified();
-
-  // change DICOM information of the label
-  DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 }
 
 void mitk::MultiLabelSegmentation::UpdateLabel(LabelValueType labelValue, const Label* templateLabel)

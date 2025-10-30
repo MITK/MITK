@@ -518,22 +518,15 @@ namespace mitk
           segmentAttribute->setSegmentAlgorithmType(label->GetAlgorithmTypeStr());
           segmentAttribute->setSegmentAlgorithmName(label->GetAlgorithmName());
 
+          if (label->GetAnatomicRegionCount()>0)
           { //Anatomic region
-            auto valueProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_SUB_PATH()));
+            auto anatomicRegion = label->GetAnatomicRegion(0); //currently DCMQI only supports one anatomic region code
 
-            auto schemeProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_SUB_PATH()));
-
-            auto neaningProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_SUB_PATH()));
-
-            if (valueProp != nullptr && schemeProp != nullptr && neaningProp != nullptr)
+            if (!anatomicRegion.GetValue().empty() && !anatomicRegion.GetScheme().empty() && !anatomicRegion.GetMeaning().empty())
             {
-              segmentAttribute->setAnatomicRegionSequence(valueProp->GetValueAsString(),
-                schemeProp->GetValueAsString(),
-                neaningProp->GetValueAsString());
-              handler.setBodyPartExamined(neaningProp->GetValueAsString());
+              segmentAttribute->setAnatomicRegionSequence(anatomicRegion.GetValue(),
+                anatomicRegion.GetScheme(), anatomicRegion.GetMeaning());
+              handler.setBodyPartExamined(anatomicRegion.GetMeaning());
             }
             else
             {
@@ -541,77 +534,72 @@ namespace mitk
               segmentAttribute->setSegmentedPropertyTypeCodeSequence("M-03000", "SRT", "Mass");
               handler.setBodyPartExamined("Mass");
             }
+
+            if (anatomicRegion.GetModifierCount() > 0)
+            {
+              //Anatomic Region Modifier (DCMQI only supports one modifier)
+              auto arMod = anatomicRegion.GetModifier(0);
+
+              if (!arMod.GetValue().empty() && !arMod.GetScheme().empty() && !arMod.GetMeaning().empty())
+              {
+                segmentAttribute->setAnatomicRegionModifierSequence(arMod.GetValue(),
+                  arMod.GetScheme(), arMod.GetMeaning());
+              }
+            }
+
           }
 
           { //Segment category
-            auto segmentCategoryCodeValueProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_SUB_PATH()));
+            auto segCat = label->GetSegmentedPropertyCategory();
 
-            auto segmentCategoryCodeSchemeProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_SUB_PATH()));
-
-            auto segmentCategoryCodeMeaningProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_MEANING_SUB_PATH()));
-
-            if (segmentCategoryCodeValueProp != nullptr && segmentCategoryCodeSchemeProp != nullptr &&
-              segmentCategoryCodeMeaningProp != nullptr)
-              segmentAttribute->setSegmentedPropertyCategoryCodeSequence(
-                segmentCategoryCodeValueProp->GetValueAsString(),
-                segmentCategoryCodeSchemeProp->GetValueAsString(),
-                segmentCategoryCodeMeaningProp->GetValueAsString());
+            if (segCat.has_value() && !segCat->GetValue().empty() && !segCat->GetScheme().empty() && !segCat->GetMeaning().empty())
+            {
+              segmentAttribute->setSegmentedPropertyCategoryCodeSequence(segCat->GetValue(),
+                segCat->GetScheme(), segCat->GetMeaning());
+              handler.setBodyPartExamined(segCat->GetMeaning());
+            }
             else
+            {
               // some default values
               segmentAttribute->setSegmentedPropertyCategoryCodeSequence(
                 "M-01000", "SRT", "Morphologically Altered Structure");
+            }
           }
 
           {
-            auto segmentTypeCodeValueProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_SUB_PATH()));
+            auto segType = label->GetSegmentedPropertyType();
 
-            auto segmentTypeCodeSchemeProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_SCHEME_SUB_PATH()));
-
-            auto segmentTypeCodeMeaningProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_MEANING_SUB_PATH()));
-
-            if (segmentTypeCodeValueProp != nullptr && segmentTypeCodeSchemeProp != nullptr &&
-              segmentTypeCodeMeaningProp != nullptr)
+            if (segType.has_value() && !segType->GetValue().empty() && !segType->GetScheme().empty() && !segType->GetMeaning().empty())
             {
-              segmentAttribute->setSegmentedPropertyTypeCodeSequence(segmentTypeCodeValueProp->GetValueAsString(),
-                segmentTypeCodeSchemeProp->GetValueAsString(),
-                segmentTypeCodeMeaningProp->GetValueAsString());
+              segmentAttribute->setSegmentedPropertyTypeCodeSequence(segType->GetValue(),
+                segType->GetScheme(), segType->GetMeaning());
             }
             else
             {
               // some default values
               segmentAttribute->setSegmentedPropertyTypeCodeSequence("M-03000", "SRT", "Mass");
             }
-          }
 
-          { //Segment Type Modifier (DCMQI only supports one modifier, therefore the index is always 1)
-            auto segmentModifierCodeValueProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_MODIFIER_CODE_VALUE_SUB_PATH(1)));
+            if (segType->GetModifierCount() > 0)
+            {
+              //Segment Type Modifier (DCMQI only supports one modifier
+              auto segTypeMod = segType->GetModifier(0);
 
-            auto segmentModifierCodeSchemeProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_MODIFIER_CODE_SCHEME_SUB_PATH(1)));
-
-            auto segmentModifierCodeMeaningProp = label->GetConstProperty(
-              mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_MODIFIER_CODE_MEANING_SUB_PATH(1)));
-
-            if (segmentModifierCodeValueProp != nullptr && segmentModifierCodeSchemeProp != nullptr &&
-              segmentModifierCodeMeaningProp != nullptr)
-              segmentAttribute->setSegmentedPropertyTypeModifierCodeSequence(
-                segmentModifierCodeValueProp->GetValueAsString(),
-                segmentModifierCodeSchemeProp->GetValueAsString(),
-                segmentModifierCodeMeaningProp->GetValueAsString());
+              if (!segTypeMod.GetValue().empty() && !segTypeMod.GetScheme().empty() && !segTypeMod.GetMeaning().empty())
+              {
+                segmentAttribute->setSegmentedPropertyTypeModifierCodeSequence(segTypeMod.GetValue(),
+                  segTypeMod.GetScheme(), segTypeMod.GetMeaning());
+              }
+            }
           }
 
           Color color = label->GetColor();
           segmentAttribute->setRecommendedDisplayRGBValue(color[0] * 255, color[1] * 255, color[2] * 255);
 
-          segmentAttribute->setTrackingIdentifier(label->GetTrackingID());
-          segmentAttribute->setTrackingUniqueIdentifier(label->GetTrackingUID());
+          if (!label->GetTrackingID().empty())
+            segmentAttribute->setTrackingIdentifier(label->GetTrackingID());
+          if (!label->GetTrackingUID().empty())
+            segmentAttribute->setTrackingUniqueIdentifier(label->GetTrackingUID());
         }
       }
     }
@@ -621,9 +609,8 @@ namespace mitk
   void mitk::DICOMSegmentationIO::SetLabelProperties(mitk::Label *label, dcmqi::SegmentAttributes *segmentAttribute)
   {
     // Segment Algorithm Type: Type of algorithm used to generate the segment.
-    if (!segmentAttribute->getSegmentAlgorithmType().empty())
-      label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_ALGORITHM_TYPE_SUB_PATH()),
-        StringProperty::New(segmentAttribute->getSegmentAlgorithmType()));
+    label->SetAlgorithmTypeStr(segmentAttribute->getSegmentAlgorithmType());
+    label->SetAlgorithmName(segmentAttribute->getSegmentAlgorithmName());
 
     // Add Segmented Property Category Code Sequence tags
     auto categoryCodeSequence = segmentAttribute->getSegmentedPropertyCategoryCodeSequence();
@@ -631,21 +618,12 @@ namespace mitk
     {
       OFString codeValue; // (0008,0100) Code Value
       categoryCodeSequence->getCodeValue(codeValue);
-      label->SetProperty(
-        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_SUB_PATH()).c_str(),
-        StringProperty::New(codeValue.c_str()));
-
       OFString codeScheme; // (0008,0102) Coding Scheme Designator
       categoryCodeSequence->getCodingSchemeDesignator(codeScheme);
-      label->SetProperty(
-        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_SUB_PATH()).c_str(),
-        StringProperty::New(codeScheme.c_str()));
-
       OFString codeMeaning; // (0008,0104) Code Meaning
       categoryCodeSequence->getCodeMeaning(codeMeaning);
-      label->SetProperty(
-        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_MEANING_SUB_PATH()).c_str(),
-        StringProperty::New(codeMeaning.c_str()));
+
+      label->SetSegmentedPropertyCategory(DICOMCodeSequence(codeValue, codeScheme, codeValue));
     }
 
     // Add Segmented Property Type Code Sequence tags
@@ -654,43 +632,27 @@ namespace mitk
     {
       OFString codeValue; // (0008,0100) Code Value
       typeCodeSequence->getCodeValue(codeValue);
-      label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_SUB_PATH()).c_str(),
-        StringProperty::New(codeValue.c_str()));
-
       OFString codeScheme; // (0008,0102) Coding Scheme Designator
       typeCodeSequence->getCodingSchemeDesignator(codeScheme);
-      label->SetProperty(
-        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_SCHEME_SUB_PATH()).c_str(),
-        StringProperty::New(codeScheme.c_str()));
-
       OFString codeMeaning; // (0008,0104) Code Meaning
       typeCodeSequence->getCodeMeaning(codeMeaning);
-      label->SetProperty(
-        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_MEANING_SUB_PATH()).c_str(),
-        StringProperty::New(codeMeaning.c_str()));
-    }
 
-    // Add Segmented Property Type Modifier Code Sequence tags
-    auto modifierCodeSequence = segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence();
-    if (modifierCodeSequence != nullptr)
-    {
-      OFString codeValue; // (0008,0100) Code Value
-      modifierCodeSequence->getCodeValue(codeValue);
-      label->SetProperty(
-        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_MODIFIER_CODE_VALUE_SUB_PATH(1)).c_str(),
-        StringProperty::New(codeValue.c_str()));
+      DICOMCodeSequenceWithModifiers code = DICOMCodeSequenceWithModifiers(codeValue, codeScheme, codeValue);
 
-      OFString codeScheme; // (0008,0102) Coding Scheme Designator
-      modifierCodeSequence->getCodingSchemeDesignator(codeScheme);
-      label->SetProperty(
-        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_MODIFIER_CODE_SCHEME_SUB_PATH(1)).c_str(),
-        StringProperty::New(codeScheme.c_str()));
+      // Add Segmented Property Type Modifier Code Sequence tags
+      auto modifierCodeSequence = segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence();
+      if (modifierCodeSequence != nullptr)
+      {
+        OFString modValue; // (0008,0100) Code Value
+        modifierCodeSequence->getCodeValue(modValue);
+        OFString modScheme; // (0008,0102) Coding Scheme Designator
+        modifierCodeSequence->getCodingSchemeDesignator(modScheme);
+        OFString modMeaning; // (0008,0104) Code Meaning
+        modifierCodeSequence->getCodeMeaning(modMeaning);
+        code.AddModifier(DICOMCodeSequence(modValue, modScheme, modMeaning));
+      }
 
-      OFString codeMeaning; // (0008,0104) Code Meaning
-      modifierCodeSequence->getCodeMeaning(codeMeaning);
-      label->SetProperty(
-        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_MODIFIER_CODE_MEANING_SUB_PATH(1)).c_str(),
-        StringProperty::New(codeMeaning.c_str()));
+      label->SetSegmentedPropertyType(code);
     }
 
     // Add Anatomic RegionSequence tags
@@ -699,23 +661,30 @@ namespace mitk
     {
       OFString codeValue; // (0008,0100) Code Value
       atomicRegionSequence->getCodeValue(codeValue);
-      label->SetProperty(
-        DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_SUB_PATH()).c_str(),
-        StringProperty::New(codeValue.c_str()));
-
       OFString codeScheme; // (0008,0102) Coding Scheme Designator
       atomicRegionSequence->getCodingSchemeDesignator(codeScheme);
-      label->SetProperty(
-        DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_SUB_PATH()).c_str(),
-        StringProperty::New(codeScheme.c_str()));
-
       OFString codeMeaning; // (0008,0104) Code Meaning
       atomicRegionSequence->getCodeMeaning(codeMeaning);
-      label->SetProperty(
-        DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_SUB_PATH()).c_str(),
-        StringProperty::New(codeMeaning.c_str()));
+
+      DICOMCodeSequenceWithModifiers code = DICOMCodeSequenceWithModifiers(codeValue, codeScheme, codeValue);
+      // Add Segmented Property Type Modifier Code Sequence tags
+      auto modifierCodeSequence = segmentAttribute->getAnatomicRegionModifierSequence();
+      if (modifierCodeSequence != nullptr)
+      {
+        OFString modValue; // (0008,0100) Code Value
+        modifierCodeSequence->getCodeValue(modValue);
+        OFString modScheme; // (0008,0102) Coding Scheme Designator
+        modifierCodeSequence->getCodingSchemeDesignator(modScheme);
+        OFString modMeaning; // (0008,0104) Code Meaning
+        modifierCodeSequence->getCodeMeaning(modMeaning);
+        code.AddModifier(DICOMCodeSequence(modValue, modScheme, modMeaning));
+      }
+
+      label->SetAnatomicRegion(code);
     }
 
+    //we always set the tracking information (even if it is an empty string),
+    //as MITK label would otherwise derive an tracking ID automatically
     label->SetTrackingID(segmentAttribute->getTrackingIdentifier());
     label->SetTrackingUID(segmentAttribute->getTrackingUniqueIdentifier());
   }

@@ -18,56 +18,65 @@ found in the LICENSE file.
 #include <mitkDICOMSegmentationConstants.h>
 #include <mitkStringProperty.h>
 
+#include <regex>
+
 const mitk::Label::PixelType mitk::Label::MAX_LABEL_VALUE = std::numeric_limits<mitk::Label::PixelType>::max();
 
-namespace
+namespace mitk
 {
-  const std::map<std::string, std::string>& GetPropertyNameLookup()
+  namespace LabelPropertyConstants
   {
-    static const std::map<std::string, std::string> lookup = {
-      // Mapping for legacy label properties that were wrong and therefore deprecated
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_SUB_PATH()),
-        "PatientName" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_SUB_PATH()),
-        "PatientName" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_SUB_PATH()),
-        "PatientName" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_MEANING_SUB_PATH()),
-        "PatientName" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_SCHEME_SUB_PATH()),
-        "PatientName" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_SUB_PATH()),
-        "PatientName" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_MEANING_SUB_PATH()),
-        "PatientName" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_SUB_PATH()),
-        "PatientName" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_SUB_PATH()),
-        "PatientName" },
-        // Mapping between DICOMTag paths and human readable keywords used internally as for label properties
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_LABEL_SUB_PATH()), "name" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_DESCRIPTION_SUB_PATH()), "description" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_ALGORITHM_TYPE_SUB_PATH()), "algorithm_type" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_ALGORITHM_NAME_SUB_PATH()), "algorithm_name" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_TRACKING_ID_SUB_PATH()), "tracking_id" },
-        { mitk::DICOMTagPathToPropertyName(mitk::DICOMSegmentationConstants::SEGMENT_TRACKING_UID_SUB_PATH()), "tracking_uid" }
-    };
-    return lookup;
-  }
-
-  std::string EnsureInternalPropertyName(const std::string& externalName)
-  {
-    auto mapping = GetPropertyNameLookup();
-    auto finding = mapping.find(externalName);
-
-    if (finding != mapping.end())
+    const std::string& GetAnatomicRegionPropertyBaseName()
     {
-      return finding->second;
+      static const std::string name = "anatomic_region";
+      return name;
     }
 
-    return externalName;
+    const std::string& GetPrimaryAnatomicStructurePropertyBaseName()
+    {
+      static const std::string name = "primary_anatomic_structure";
+      return name;
+    }
+
+    const std::string& GetSegmentedPropertyCategoryPropertyBaseName()
+    {
+      static const std::string name = "segmented_property_category";
+      return name;
+    }
+
+    const std::string& GetSegmentedPropertyTypePropertyBaseName()
+    {
+      static const std::string name = "segmented_property_type";
+      return name;
+    }
+
+    const std::string& GetModifierPropertySubName()
+    {
+      static const std::string name = "modifier";
+      return name;
+    }
+
+    const std::string& GetValuePropertySubName()
+    {
+      static const std::string name = "value";
+      return name;
+    }
+
+    const std::string& GetSchemePropertySubName()
+    {
+      static const std::string name = "scheme";
+      return name;
+    }
+
+    const std::string& GetMeaningPropertySubName()
+    {
+      static const std::string name = "meaning";
+      return name;
+    }
   }
-}
+} // namespace mitk
+
+
 
 mitk::Label::Label() : PropertyList(), m_Value(UNLABELED_VALUE)
 {
@@ -114,7 +123,7 @@ mitk::Label::Label(PixelType value, const std::string& name) : Label()
   this->SetName(name);
 }
 
-mitk::Label::Label(const Label &other) : PropertyList(other)
+mitk::Label::Label(const Label &other) : PropertyList(other), m_Value(other.m_Value)
 // copy constructor of property List handles the coping action
 {
   auto *map = this->GetMap();
@@ -139,20 +148,17 @@ void mitk::Label::SetProperty(const std::string &propertyKey, BaseProperty *prop
   command->SetCallbackFunction(this, &Label::Modified);
   property->AddObserver(itk::ModifiedEvent(), command);
 
-  auto internalKey = EnsureInternalPropertyName(propertyKey);
-  Superclass::SetProperty(internalKey, property, contextName, fallBackOnDefaultContext);
+  Superclass::SetProperty(propertyKey, property, contextName, fallBackOnDefaultContext);
 }
 
 mitk::BaseProperty::ConstPointer mitk::Label::GetConstProperty(const std::string& propertyKey, const std::string& contextName, bool fallBackOnDefaultContext) const
 {
-  auto internalKey = EnsureInternalPropertyName(propertyKey);
-  return Superclass::GetConstProperty(internalKey, contextName, fallBackOnDefaultContext);
+  return Superclass::GetConstProperty(propertyKey, contextName, fallBackOnDefaultContext);
 }
 
 mitk::BaseProperty* mitk::Label::GetNonConstProperty(const std::string& propertyKey, const std::string& contextName, bool fallBackOnDefaultContext)
 {
-  auto internalKey = EnsureInternalPropertyName(propertyKey);
-  return Superclass::GetNonConstProperty(internalKey, contextName, fallBackOnDefaultContext);
+  return Superclass::GetNonConstProperty(propertyKey, contextName, fallBackOnDefaultContext);
 }
 
 void mitk::Label::SetLocked(bool locked)
@@ -223,7 +229,7 @@ std::string mitk::Label::GetName() const
 
 std::string mitk::Label::GetTrackingID() const
 {
-  std::string trackingID = std::to_string(this->GetValue());
+  std::string trackingID = "";
   GetStringProperty("tracking_id", trackingID);
   return trackingID;
 }
@@ -241,7 +247,7 @@ void mitk::Label::SetTrackingID(const std::string& trackingID)
 
 std::string mitk::Label::GetTrackingUID() const
 {
-  std::string trackingUID = std::to_string(this->GetValue());
+  std::string trackingUID = "";
   GetStringProperty("tracking_uid", trackingUID);
   return trackingUID;
 }
@@ -344,25 +350,36 @@ mitk::Point3D mitk::Label::GetCenterOfMassCoordinates() const
 
 void mitk::Label::SetAlgorithmType(AlgorithmType algoType)
 {
-  if (algoType == AlgorithmType::Undefined)
+  std::string text = "";
+  if (algoType == AlgorithmType::MANUAL)
+    text = "MANUAL";
+  else if (algoType == AlgorithmType::SEMIAUTOMATIC)
+    text = "SEMIAUTOMATIC";
+  else if (algoType == AlgorithmType::AUTOMATIC)
+    text = "AUTOMATIC";
+
+  this->SetAlgorithmTypeStr(text);
+}
+
+void mitk::Label::SetAlgorithmTypeStr(const std::string& algoType)
+{
+  if (algoType.empty())
   {
     this->RemoveProperty("algorithm_type");
   }
+  else if (algoType != "MANUAL" && algoType != "SEMIAUTOMATIC" && algoType != "AUTOMATIC")
+  {
+    mitkThrow() << "Invalid call of Label::SetAlgorithmTypeStr. Passed string is an unsupported type. Invalid string: "<<algoType;
+  }
   else
   {
-    std::string text = "AUTOMATIC";
-    if (algoType == AlgorithmType::MANUAL)
-      text = "MANUAL";
-    else if (algoType == AlgorithmType::SEMIAUTOMATIC)
-      text = "SEMIAUTOMATIC";
-
     mitk::StringProperty* property = dynamic_cast<mitk::StringProperty*>(this->GetProperty("algorithm_type"));
     if (property != nullptr)
       // Update Property
-      property->SetValue(text);
+      property->SetValue(algoType);
     else
       // Create new Property
-      SetStringProperty("algorithm_type", text.c_str());
+      SetStringProperty("algorithm_type", algoType.c_str());
   }
 }
 
@@ -444,6 +461,245 @@ void mitk::Label::Update(const Label* templateLabel, bool updateLabelValue)
     this->SetValue(templateLabel->GetValue());
 }
 
+void mitk::Label::SetDICOMCodeSequenceAsProperties(const PropertyKeyPath& basePath,
+  const DICOMCodeSequence& code,
+  bool withModifiers)
+{
+  PropertyKeyPath valuePath = basePath;
+  valuePath.AddElement(LabelPropertyConstants::GetValuePropertySubName());
+
+  PropertyKeyPath schemePath = basePath;
+  schemePath.AddElement(LabelPropertyConstants::GetSchemePropertySubName());
+
+  PropertyKeyPath meaningPath = basePath;
+  meaningPath.AddElement(LabelPropertyConstants::GetMeaningPropertySubName());
+
+  SetStringProperty(PropertyKeyPathToPropertyName(valuePath).c_str(), code.GetValue().c_str());
+  SetStringProperty(PropertyKeyPathToPropertyName(schemePath).c_str(), code.GetScheme().c_str());
+  SetStringProperty(PropertyKeyPathToPropertyName(meaningPath).c_str(), code.GetMeaning().c_str());
+
+  // Handle modifiers if requested
+  if (withModifiers)
+  {
+    const DICOMCodeSequenceWithModifiers* codeWithMods = dynamic_cast<const DICOMCodeSequenceWithModifiers*>(&code);
+    if (codeWithMods != nullptr)
+    {
+      // Remove all existing modifiers first
+      PropertyKeyPath modifierSearchPath = basePath;
+      modifierSearchPath.AddAnySelection(LabelPropertyConstants::GetModifierPropertySubName());
+      modifierSearchPath.AddAnyElement();
+
+      std::string modifierPattern = PropertyKeyPathToPropertyRegEx(modifierSearchPath);
+      std::regex modifierRegex(modifierPattern);
+
+      auto propertyKeys = this->GetPropertyKeys();
+      for (const auto& key : propertyKeys)
+      {
+        if (std::regex_match(key, modifierRegex))
+        {
+          this->RemoveProperty(key);
+        }
+      }
+
+      // Set new modifiers
+      const auto& modifiers = codeWithMods->GetModifiers();
+      for (std::size_t i = 0; i < modifiers.size(); ++i)
+      {
+        PropertyKeyPath modifierPath = basePath;
+        modifierPath.AddSelection(LabelPropertyConstants::GetModifierPropertySubName(), i);
+        SetDICOMCodeSequenceAsProperties(modifierPath, modifiers[i], false);
+      }
+    }
+  }
+}
+
+std::optional<mitk::DICOMCodeSequence> mitk::Label::GetDICOMCodeSequenceFromProperties(const PropertyKeyPath& basePath) const
+{
+  PropertyKeyPath valuePath = basePath;
+  valuePath.AddElement(LabelPropertyConstants::GetValuePropertySubName());
+
+  PropertyKeyPath schemePath = basePath;
+  schemePath.AddElement(LabelPropertyConstants::GetSchemePropertySubName());
+
+  PropertyKeyPath meaningPath = basePath;
+  meaningPath.AddElement(LabelPropertyConstants::GetMeaningPropertySubName());
+
+  std::string value, scheme, meaning;
+  GetStringProperty(PropertyKeyPathToPropertyName(valuePath).c_str(), value);
+  GetStringProperty(PropertyKeyPathToPropertyName(schemePath).c_str(), scheme);
+  GetStringProperty(PropertyKeyPathToPropertyName(meaningPath).c_str(), meaning);
+
+  auto result = DICOMCodeSequence(value, scheme, meaning);
+
+  if (result.IsEmpty())
+    return std::optional<mitk::DICOMCodeSequence>();
+
+  return result;
+}
+
+std::optional<mitk::DICOMCodeSequenceWithModifiers> mitk::Label::GetDICOMCodeSequenceWithModifiersFromProperties(const PropertyKeyPath& basePath) const
+{
+  // Get the base code
+  auto baseCode = GetDICOMCodeSequenceFromProperties(basePath);
+
+  if (!baseCode.has_value())
+    return std::optional<mitk::DICOMCodeSequenceWithModifiers>();
+
+  DICOMCodeSequenceWithModifiers result(*baseCode);
+
+  // Find all modifiers
+  PropertyKeyPath modifierSearchPath = basePath;
+  modifierSearchPath.AddAnySelection(LabelPropertyConstants::GetModifierPropertySubName());
+  modifierSearchPath.AddElement(LabelPropertyConstants::GetValuePropertySubName());
+
+  auto modifierEntries = FindIndexedPropertyNames(this, modifierSearchPath);
+
+  for (const auto& entry : modifierEntries)
+  {
+    PropertyKeyPath modifierPath = basePath;
+    modifierPath.AddSelection(LabelPropertyConstants::GetModifierPropertySubName(), entry.first);
+    auto modifier = GetDICOMCodeSequenceFromProperties(modifierPath);
+
+    // Only add non-empty modifiers
+    if (modifier.has_value() && !modifier->IsEmpty())
+    {
+      result.AddModifier(*modifier);
+    }
+  }
+
+  return result;
+}
+
+void mitk::Label::RemoveDICOMCodeSequenceProperties(const PropertyKeyPath& basePath)
+{
+  PropertyKeyPath valuePath = basePath;
+  valuePath.AddElement(LabelPropertyConstants::GetValuePropertySubName());
+
+  PropertyKeyPath schemePath = basePath;
+  schemePath.AddElement(LabelPropertyConstants::GetSchemePropertySubName());
+
+  PropertyKeyPath meaningPath = basePath;
+  meaningPath.AddElement(LabelPropertyConstants::GetMeaningPropertySubName());
+
+  this->RemoveProperty(PropertyKeyPathToPropertyName(valuePath).c_str());
+  this->RemoveProperty(PropertyKeyPathToPropertyName(schemePath).c_str());
+  this->RemoveProperty(PropertyKeyPathToPropertyName(meaningPath).c_str());
+
+  // Also remove any modifiers
+  PropertyKeyPath modifierSearchPath = basePath;
+  modifierSearchPath.AddAnySelection(LabelPropertyConstants::GetModifierPropertySubName());
+  modifierSearchPath.AddAnyElement();
+
+  std::string modifierPattern = PropertyKeyPathToPropertyRegEx(modifierSearchPath);
+  std::regex modifierRegex(modifierPattern);
+
+  auto propertyKeys = this->GetPropertyKeys();
+  for (const auto& key : propertyKeys)
+  {
+    if (std::regex_match(key, modifierRegex))
+    {
+      this->RemoveProperty(key);
+    }
+  }
+}
+
+void mitk::Label::SetAnatomicRegion(const DICOMCodeSequenceWithModifiers& code, std::size_t index)
+{
+  PropertyKeyPath basePath;
+  basePath.AddSelection(LabelPropertyConstants::GetAnatomicRegionPropertyBaseName(), index);
+  SetDICOMCodeSequenceAsProperties(basePath, code, true);
+}
+
+mitk::DICOMCodeSequenceWithModifiers mitk::Label::GetAnatomicRegion(std::size_t index) const
+{
+  PropertyKeyPath basePath;
+  basePath.AddSelection(LabelPropertyConstants::GetAnatomicRegionPropertyBaseName(), index);
+  auto result = GetDICOMCodeSequenceWithModifiersFromProperties(basePath);
+
+  if (!result.has_value())
+    mitkThrow() << "Cannot get AnatomicRegion code. Index seems to be invalid. Index: " << index;
+
+  return *result;
+}
+
+std::size_t mitk::Label::GetAnatomicRegionCount() const
+{
+  PropertyKeyPath searchPath;
+  searchPath.AddAnySelection(LabelPropertyConstants::GetAnatomicRegionPropertyBaseName());
+  searchPath.AddElement(LabelPropertyConstants::GetValuePropertySubName());
+
+  return FindIndexedPropertyNames(this, searchPath).size();
+}
+
+void mitk::Label::RemoveAnatomicRegion(std::size_t index)
+{
+  PropertyKeyPath basePath;
+  basePath.AddSelection(LabelPropertyConstants::GetAnatomicRegionPropertyBaseName(), index);
+  RemoveDICOMCodeSequenceProperties(basePath);
+}
+
+void mitk::Label::SetPrimaryAnatomicStructure(const DICOMCodeSequenceWithModifiers& code, std::size_t index)
+{
+  PropertyKeyPath basePath;
+  basePath.AddSelection(LabelPropertyConstants::GetPrimaryAnatomicStructurePropertyBaseName(), index);
+  SetDICOMCodeSequenceAsProperties(basePath, code, true);
+}
+
+mitk::DICOMCodeSequenceWithModifiers mitk::Label::GetPrimaryAnatomicStructure(std::size_t index) const
+{
+  PropertyKeyPath basePath;
+  basePath.AddSelection(LabelPropertyConstants::GetPrimaryAnatomicStructurePropertyBaseName(), index);
+  auto result = GetDICOMCodeSequenceWithModifiersFromProperties(basePath);
+
+  if (!result.has_value())
+    mitkThrow() << "Cannot get PrimaryAnatomicStructure code. Index seems to be invalid. Index: " << index;
+
+  return *result;
+}
+
+std::size_t mitk::Label::GetPrimaryAnatomicStructureCount() const
+{
+  PropertyKeyPath searchPath;
+  searchPath.AddAnySelection(LabelPropertyConstants::GetPrimaryAnatomicStructurePropertyBaseName());
+  searchPath.AddElement(LabelPropertyConstants::GetValuePropertySubName());
+
+  return FindIndexedPropertyNames(this, searchPath).size();
+}
+
+void mitk::Label::RemovePrimaryAnatomicStructure(std::size_t index)
+{
+  PropertyKeyPath basePath;
+  basePath.AddSelection(LabelPropertyConstants::GetPrimaryAnatomicStructurePropertyBaseName(), index);
+  RemoveDICOMCodeSequenceProperties(basePath);
+}
+
+void mitk::Label::SetSegmentedPropertyCategory(const DICOMCodeSequence& code)
+{
+  PropertyKeyPath basePath;
+  basePath.AddElement(LabelPropertyConstants::GetSegmentedPropertyCategoryPropertyBaseName());
+  SetDICOMCodeSequenceAsProperties(basePath, code, false);
+}
+
+std::optional<mitk::DICOMCodeSequence> mitk::Label::GetSegmentedPropertyCategory() const
+{
+  PropertyKeyPath basePath;
+  basePath.AddElement(LabelPropertyConstants::GetSegmentedPropertyCategoryPropertyBaseName());
+  return GetDICOMCodeSequenceFromProperties(basePath);
+}
+
+void mitk::Label::SetSegmentedPropertyType(const DICOMCodeSequenceWithModifiers& code)
+{
+  PropertyKeyPath basePath;
+  basePath.AddElement(LabelPropertyConstants::GetSegmentedPropertyTypePropertyBaseName());
+  SetDICOMCodeSequenceAsProperties(basePath, code, true);
+}
+
+std::optional<mitk::DICOMCodeSequenceWithModifiers> mitk::Label::GetSegmentedPropertyType() const
+{
+  PropertyKeyPath basePath;
+  basePath.AddElement(LabelPropertyConstants::GetSegmentedPropertyTypePropertyBaseName());
+  return GetDICOMCodeSequenceWithModifiersFromProperties(basePath);
+}
 
 itk::LightObject::Pointer mitk::Label::InternalClone() const
 {

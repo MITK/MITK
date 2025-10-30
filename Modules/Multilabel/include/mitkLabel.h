@@ -18,9 +18,69 @@ found in the LICENSE file.
 #include <mitkPropertyList.h>
 #include <mitkPoint.h>
 #include <mitkVector.h>
+#include <mitkPropertyKeyPath.h>
+#include <mitkDICOMCodeSequence.h>
+#include <mitkDICOMCodeSequenceWithModifiers.h>
+
+#include <optional>
+#include <map>
 
 namespace mitk
 {
+  /**
+   * @brief Constants for property key path elements of properties of the label.
+   */
+  namespace LabelPropertyConstants
+  {
+    /**
+     * @brief Gets the property key path element for anatomic region.
+     * @return The string "anatomic_region"
+     */
+    MITKMULTILABEL_EXPORT const std::string& GetAnatomicRegionPropertyBaseName();
+
+    /**
+     * @brief Gets the property key path element for primary anatomic structure.
+     * @return The string "primary_anatomic_structure"
+     */
+    MITKMULTILABEL_EXPORT const std::string& GetPrimaryAnatomicStructurePropertyBaseName();
+
+    /**
+     * @brief Gets the property key path element for segmented property category.
+     * @return The string "segmented_property_category"
+     */
+    MITKMULTILABEL_EXPORT const std::string& GetSegmentedPropertyCategoryPropertyBaseName();
+
+    /**
+     * @brief Gets the property key path element for segmented property type.
+     * @return The string "segmented_property_type"
+     */
+    MITKMULTILABEL_EXPORT const std::string& GetSegmentedPropertyTypePropertyBaseName();
+
+    /**
+     * @brief Gets the property key path element for modifier.
+     * @return The string "modifier"
+     */
+    MITKMULTILABEL_EXPORT const std::string& GetModifierPropertySubName();
+
+    /**
+     * @brief Gets the property key path element for code value.
+     * @return The string "value"
+     */
+    MITKMULTILABEL_EXPORT const std::string& GetValuePropertySubName();
+
+    /**
+     * @brief Gets the property key path element for code scheme.
+     * @return The string "scheme"
+     */
+    MITKMULTILABEL_EXPORT const std::string& GetSchemePropertySubName();
+
+    /**
+     * @brief Gets the property key path element for code meaning.
+     * @return The string "meaning"
+     */
+    MITKMULTILABEL_EXPORT const std::string& GetMeaningPropertySubName();
+  }
+
   //##
   //##Documentation
   //## @brief A data structure describing a label.
@@ -88,6 +148,7 @@ namespace mitk
     };
 
     void SetAlgorithmType(AlgorithmType algoType);
+    void SetAlgorithmTypeStr(const std::string& algoType);
     AlgorithmType GetAlgorithmType() const;
     std::string GetAlgorithmTypeStr() const;
     void SetAlgorithmName(const std::string& algoName);
@@ -99,6 +160,82 @@ namespace mitk
      current algorithm name, the new algoName will be appended (separated by "|").
      */
     void AddToolUse(AlgorithmType algoType, const std::string& algoName);
+
+    /**
+         * @brief Sets an anatomic region code at the specified index.
+         * @param code The DICOMCodeSequenceWithModifiers representing the anatomic region
+         * @param index The index at which to store the code (default: 0)
+         */
+    void SetAnatomicRegion(const DICOMCodeSequenceWithModifiers& code, std::size_t index = 0);
+
+    /**
+     * @brief Gets an anatomic region code at the specified index.
+     * @param index The index of the code to retrieve (default: 0)
+     * @return The DICOMCodeSequenceWithModifiers at the specified index, or an empty code if not found
+     */
+    DICOMCodeSequenceWithModifiers GetAnatomicRegion(std::size_t index = 0) const;
+
+    /**
+     * @brief Gets the number of anatomic region codes stored.
+     * @return The count of anatomic region codes
+     */
+    std::size_t GetAnatomicRegionCount() const;
+
+    /**
+     * @brief Removes an anatomic region code at the specified index.
+     * @param index The index of the code to remove
+     */
+    void RemoveAnatomicRegion(std::size_t index);
+
+    /**
+     * @brief Sets a primary anatomic structure code at the specified index.
+     * @param code The DICOMCodeSequenceWithModifiers representing the primary anatomic structure
+     * @param index The index at which to store the code (default: 0)
+     */
+    void SetPrimaryAnatomicStructure(const DICOMCodeSequenceWithModifiers& code, std::size_t index = 0);
+
+    /**
+     * @brief Gets a primary anatomic structure code at the specified index.
+     * @param index The index of the code to retrieve (default: 0)
+     * @return The DICOMCodeSequenceWithModifiers at the specified index, or an empty code if not found
+     */
+    DICOMCodeSequenceWithModifiers GetPrimaryAnatomicStructure(std::size_t index = 0) const;
+
+    /**
+     * @brief Gets the number of primary anatomic structure codes stored.
+     * @return The count of primary anatomic structure codes
+     */
+    std::size_t GetPrimaryAnatomicStructureCount() const;
+
+    /**
+     * @brief Removes a primary anatomic structure code at the specified index.
+     * @param index The index of the code to remove
+     */
+    void RemovePrimaryAnatomicStructure(std::size_t index);
+
+    /**
+     * @brief Sets the segmented property category code.
+     * @param code The DICOMCodeSequence representing the segmented property category
+     */
+    void SetSegmentedPropertyCategory(const DICOMCodeSequence& code);
+
+    /**
+     * @brief Gets the segmented property category code.
+     * @return The DICOMCodeSequence representing the segmented property category
+     */
+    std::optional<DICOMCodeSequence> GetSegmentedPropertyCategory() const;
+
+    /**
+     * @brief Sets the segmented property type code with optional modifiers.
+     * @param code The DICOMCodeSequenceWithModifiers representing the segmented property type
+     */
+    void SetSegmentedPropertyType(const DICOMCodeSequenceWithModifiers& code);
+
+    /**
+     * @brief Gets the segmented property type code with modifiers.
+     * @return The DICOMCodeSequenceWithModifiers representing the segmented property type
+     */
+    std::optional<DICOMCodeSequenceWithModifiers> GetSegmentedPropertyType() const;
 
     void SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
     BaseProperty::ConstPointer GetConstProperty(const std::string& propertyKey, const std::string& contextName = "", bool fallBackOnDefaultContext = true) const override;
@@ -127,7 +264,38 @@ namespace mitk
 
   private:
     PixelType m_Value;
+
     itk::LightObject::Pointer InternalClone() const override;
+
+    /**
+     * @brief Helper function to set a DICOMCode as properties.
+     * @param basePath The base property key path
+     * @param code The DICOMCode to store
+     * @param withModifiers If true, also store modifiers (code must be DICOMCodeSequenceWithModifiers)
+     */
+    void SetDICOMCodeSequenceAsProperties(const PropertyKeyPath& basePath,
+      const DICOMCodeSequence& code,
+      bool withModifiers);
+
+    /**
+     * @brief Helper function to get a DICOMCodeSequence from properties.
+     * @param basePath The base property key path
+     * @return The DICOMCodeSequence retrieved from properties
+     */
+    std::optional<DICOMCodeSequence> GetDICOMCodeSequenceFromProperties(const PropertyKeyPath& basePath) const;
+
+    /**
+     * @brief Helper function to get a DICOMCodeSequenceWithModifiers from properties.
+     * @param basePath The base property key path
+     * @return The DICOMCodeSequenceWithModifiers retrieved from properties including modifiers
+     */
+    std::optional<DICOMCodeSequenceWithModifiers> GetDICOMCodeSequenceWithModifiersFromProperties(const PropertyKeyPath& basePath) const;
+
+    /**
+     * @brief Helper function to remove DICOMCodeSequence properties.
+     * @param basePath The base property key path
+     */
+    void RemoveDICOMCodeSequenceProperties(const PropertyKeyPath& basePath);
   };
 
   using LabelVector = std::vector<Label::Pointer>;

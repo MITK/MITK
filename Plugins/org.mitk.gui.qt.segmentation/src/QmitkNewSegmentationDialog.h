@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <org_mitk_gui_qt_segmentation_Export.h>
 
 #include <mitkColorProperty.h>
+#include <mitkLabelSetImage.h>
 
 #include <vector>
 #include <utility>
@@ -23,12 +24,6 @@ found in the LICENSE file.
 #include <QColor>
 #include <QDialog>
 #include <QString>
-
-namespace mitk
-{
-  class MultiLabelSegmentation;
-  class Label;
-}
 
 namespace Ui
 {
@@ -42,9 +37,7 @@ class MITK_QT_SEGMENTATION QmitkNewSegmentationDialog : public QDialog
   Q_OBJECT
 
 public:
-  using SuggestionsType = std::vector<std::pair<QString, QColor>>;
-
-  enum Mode
+  enum class Mode
   {
     NewLabel,
     RenameLabel
@@ -55,16 +48,15 @@ public:
    * In NewLabel mode it is assumed that the label has not yet been added, hence for example a look-up table update is not done.
    * In RenameLabel mode the segmentation (if provided) is updated.
    */
-  static bool DoRenameLabel(mitk::Label* label, mitk::MultiLabelSegmentation* segmentation, QWidget* parent = nullptr, Mode mode = NewLabel);
+  static bool DoRenameLabel(mitk::Label* label, mitk::MultiLabelSegmentation* segmentation, QWidget* parent = nullptr, Mode mode = Mode::NewLabel);
 
-  explicit QmitkNewSegmentationDialog(QWidget *parent = nullptr, mitk::MultiLabelSegmentation* labelSetImage = nullptr, Mode mode = NewLabel);
+  explicit QmitkNewSegmentationDialog(const mitk::MultiLabelSegmentation* labelSetImage,
+    const mitk::Label* label = nullptr, Mode mode = Mode::NewLabel, QWidget* parent = nullptr);
   ~QmitkNewSegmentationDialog() override;
 
   QString GetName() const;
   mitk::Color GetColor() const;
-
-  void SetName(const QString& name);
-  void SetColor(const mitk::Color& color);
+  const mitk::Label* GetSuggestion() const;
 
 private:
   void OnAccept();
@@ -73,18 +65,16 @@ private:
   void OnColorButtonClicked();
   void OnTextEdited(const QString& text);
 
-  void SetSuggestions(const SuggestionsType& suggestions, bool replaceStandardSuggestions = false);
   void UpdateColorButtonBackground();
   void UpdateNameList();
+  void UpdateOKButton();
 
   Ui::QmitkNewSegmentationDialog* m_Ui;
 
-  bool m_SuggestOnce;
-
-  QString m_Name;
+  mitk::MultiLabelSegmentation::ConstLabelVectorType m_Suggestions;
+  mitk::Label::Pointer m_Suggestion;
   QColor m_Color;
-
-  SuggestionsType m_Suggestions;
+  QString m_Name;
 };
 
 #endif

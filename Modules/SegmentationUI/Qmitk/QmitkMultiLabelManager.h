@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 #include <mitkNumericTypes.h>
 #include <mitkITKEventObserverGuard.h>
+#include <mitkLabelSuggestionHelper.h>
 
 #include <QWidget>
 
@@ -53,6 +54,8 @@ public:
 
   mitk::MultiLabelSegmentation* GetMultiLabelSegmentation() const;
   mitk::DataNode* GetMultiLabelNode() const;
+
+  const mitk::LabelSuggestionHelper* GetLabelSuggestionHelper() const;
 
 Q_SIGNALS:
   /**
@@ -117,6 +120,8 @@ public Q_SLOTS:
   void SetMultiLabelNode(mitk::DataNode* node);
 
   void SetDataStorage(mitk::DataStorage *storage);
+
+  void SetLabelSuggestionHelper(const mitk::LabelSuggestionHelper* suggestionHelper);
 
   void UpdateControls();
 
@@ -194,6 +199,10 @@ private:
   mitk::ITKEventObserverGuard m_GroupAddedObserver;
   mitk::ITKEventObserverGuard m_GroupModifiedObserver;
   mitk::ITKEventObserverGuard m_GroupRemovedObserver;
+
+  mitk::LabelSuggestionHelper::ConstPointer m_SuggestionHelper;
+  mitk::ITKEventObserverGuard m_SuggestionObserver;
+
 };
 
 #endif

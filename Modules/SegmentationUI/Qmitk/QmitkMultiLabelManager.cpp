@@ -212,6 +212,30 @@ void QmitkMultiLabelManager::SetDataStorage(mitk::DataStorage *storage)
   m_DataStorage = storage;
 }
 
+const mitk::LabelSuggestionHelper* QmitkMultiLabelManager::GetLabelSuggestionHelper() const
+{
+  return m_SuggestionHelper;
+}
+
+void QmitkMultiLabelManager::SetLabelSuggestionHelper(const mitk::LabelSuggestionHelper* suggestionHelper)
+{
+  if (suggestionHelper != m_SuggestionHelper)
+  {
+    m_SuggestionHelper = suggestionHelper;
+    m_Controls->labelInspector->SetLabelSuggestionHelper(suggestionHelper);
+
+    auto& widget = *this;
+    auto updateWidgets = [&widget](const itk::EventObject&)
+      {
+        widget.UpdateControls();
+      };
+
+    m_SuggestionObserver.Reset(suggestionHelper, itk::ModifiedEvent(), updateWidgets);
+    this->UpdateControls();
+  }
+}
+
+
 void QmitkMultiLabelManager::OnSearchLabel()
 {
   //std::string text = m_Controls->labelSearchBox->text().toStdString();
@@ -268,13 +292,19 @@ void QmitkMultiLabelManager::OnSearchLabel()
 
 void QmitkMultiLabelManager::UpdateControls()
 {
-  bool hasWorkingData = this->GetMultiLabelSegmentation() != nullptr;
+  auto segmentation = this->GetMultiLabelSegmentation();
+  bool hasWorkingData = segmentation != nullptr;
 
   auto labels = this->m_Controls->labelInspector->GetSelectedLabels();
   bool hasMultipleInstances = this->m_Controls->labelInspector->GetLabelInstancesOfSelectedFirstLabel().size() > 1;
+  bool instanceAllowed = true;
+  if (hasWorkingData && labels.size()==1 && m_SuggestionHelper.IsNotNull())
+  {
+    instanceAllowed = m_SuggestionHelper->IsNewInstanceAllowed(segmentation, segmentation->GetLabel(labels.front())->GetName());
+  }
   m_Controls->labelSearchBox->setEnabled(hasWorkingData);
   m_Controls->btnAddGroup->setEnabled(hasWorkingData);
-  m_Controls->btnAddInstance->setEnabled(hasWorkingData && labels.size()==1);
+  m_Controls->btnAddInstance->setEnabled(hasWorkingData && labels.size()==1 && instanceAllowed);
   m_Controls->btnAddLabel->setEnabled(hasWorkingData);
   m_Controls->btnLoadPreset->setEnabled(hasWorkingData);
   m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && !labels.empty() && this->GetMultiLabelSegmentation()->GetNumberOfGroups()>1);

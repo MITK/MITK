@@ -35,11 +35,11 @@ namespace
     auto property = label->GetConstProperty(mitk::LabelSuggestionHelper::PROPERTY_MAX_INSTANCE_OCCURRENCE);
 
     if (nullptr == property)
-      return globalOnlyOnce ? 1 : std::nullopt; // Unlimited
+      return globalOnlyOnce ? std::optional{ 1u } : std::nullopt; // Unlimited
 
     auto intProperty = dynamic_cast<const mitk::IntProperty*>(property.GetPointer());
     if (nullptr == intProperty)
-      return globalOnlyOnce ? 1 : std::nullopt; // Unlimited
+      return globalOnlyOnce ? std::optional{ 1u } : std::nullopt; // Unlimited
 
     return intProperty->GetValue();
   }

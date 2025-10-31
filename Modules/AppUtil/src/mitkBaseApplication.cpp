@@ -174,7 +174,6 @@ namespace mitk
   const QString BaseApplication::ARG_XARGS = "xargs";
   const QString BaseApplication::ARG_LOG_QT_MESSAGES = "Qt.logMessages";
   const QString BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET = "Segmentation.labelSetPreset";
-  const QString BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS = "Segmentation.labelSuggestions";
   const QString BaseApplication::ARG_FULL_SCREEN_MODE = "MITK.fullscreen";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
@@ -929,10 +928,6 @@ namespace mitk
     Poco::Util::Option labelSetPresetOption(ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "", "use this label set preset for new segmentations");
     labelSetPresetOption.argument("<filename>").binding(ARG_SEGMENTATION_LABELSET_PRESET.toStdString());
     options.addOption(labelSetPresetOption);
-
-    Poco::Util::Option labelSuggestionsOption(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "", "use this list of predefined suggestions for segmentation labels");
-    labelSuggestionsOption.argument("<filename>").binding(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString());
-    options.addOption(labelSuggestionsOption);
 
     Poco::Util::Option fullscreenOption(ARG_FULL_SCREEN_MODE.toStdString(), "", "use this flag to start the application in full screen mode w/o window frame");
     fullscreenOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));

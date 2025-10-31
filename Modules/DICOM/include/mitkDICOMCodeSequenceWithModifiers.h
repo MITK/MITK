@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkDICOMCodeSequenceWithModifiers_h
 
 
-#include "mitkDICOMCodeSequence.h"
+#include <mitkDICOMCodeSequence.h>
 
 #include <vector>
 

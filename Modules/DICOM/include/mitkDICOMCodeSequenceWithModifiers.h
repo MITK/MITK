@@ -49,6 +49,7 @@ namespace mitk
      * @param code The base DICOMCodeSequence
      */
     explicit DICOMCodeSequenceWithModifiers(const DICOMCodeSequence& code);
+    DICOMCodeSequenceWithModifiers& operator = (const DICOMCodeSequence& code);
 
     ~DICOMCodeSequenceWithModifiers() override = default;
 

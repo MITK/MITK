@@ -28,6 +28,15 @@ namespace mitk
   {
   }
 
+  DICOMCodeSequenceWithModifiers& DICOMCodeSequenceWithModifiers::operator = (const DICOMCodeSequence& code)
+  {
+    this->m_Value = code.GetValue();
+    this->m_Scheme = code.GetScheme();
+    this->m_Meaning = code.GetMeaning();
+    this->m_Modifiers.clear();
+    return *this;
+  }
+
   void DICOMCodeSequenceWithModifiers::AddModifier(const DICOMCodeSequence& modifier)
   {
     m_Modifiers.push_back(modifier);
@@ -42,21 +51,21 @@ namespace mitk
   {
     if (index >= m_Modifiers.size())
       mitkThrow() << "Called GetModifier() with invalid index. Index: " << index;
-    return m_Modifiers.at(index);
+    return m_Modifiers[index];
   }
 
   DICOMCodeSequence& DICOMCodeSequenceWithModifiers::GetModifier(std::size_t index)
   {
     if (index >= m_Modifiers.size())
       mitkThrow() << "Called GetModifier() with invalid index. Index: " << index;
-    return m_Modifiers.at(index);
+    return m_Modifiers[index];
   }
 
   void DICOMCodeSequenceWithModifiers::SetModifier(std::size_t index, const DICOMCodeSequence& modifier)
   {
     if (index >= m_Modifiers.size())
       mitkThrow() << "Called SetModifier() with invalid index. Index: " << index;
-    m_Modifiers.at(index) = modifier;
+    m_Modifiers[index] = modifier;
   }
 
   void DICOMCodeSequenceWithModifiers::SetModifiers(const ModifierVector& modifiers)

@@ -87,7 +87,7 @@ namespace mitk
      * @param suggestOnce If true, filter out suggestions already used in the segmentation
      * @return Vector of valid label suggestions
      */
-    ConstLabelVectorType GetValidAddSuggestions(const MultiLabelSegmentation* segmentation = nullptr,
+    ConstLabelVectorType GetValidSuggestionsForNewLabels(const MultiLabelSegmentation* segmentation = nullptr,
                                                         bool suggestOnce = true) const;
 
     /**
@@ -101,7 +101,7 @@ namespace mitk
      * @param suggestOnce If true, filter out suggestions already used (except the label's current name)
      * @return Vector of valid label suggestions for renaming
      */
-    ConstLabelVectorType GetValidRenameSuggestions(const MultiLabelSegmentation* segmentation,
+    ConstLabelVectorType GetValidSuggestionsForRenamingLabels(const MultiLabelSegmentation* segmentation,
                                                    const std::string_view labelName,
                                                    bool suggestOnce = true) const;
 
@@ -138,10 +138,11 @@ namespace mitk
     struct Preferences
     {
       std::string labelSuggestionFile = "";
-      bool replaceStandardSuggestions = true; //>indicates if standard suggestions should be kept
-      bool enforceSuggestions = false; //>indicates if only suggestions are allowed or if users can define own label names
-      bool suggestionOnce = true; //>the global preference settings of suggestions are only allowed
-                           // once if the max multiplicity is not explicitly specified for a label suggestions.
+      bool replaceStandardSuggestions = true; ///< indicates if standard suggestions should be kept
+      bool enforceSuggestions = false; ///< indicates if only suggestions are allowed or if users can define own label names
+      /// the global preference settings of suggestions are only allowed once if the max multiplicity
+      /// is not explicitly specified for a label suggestions.
+      bool suggestionOnce = true;
     };
 
     // Get all relevant preferences and consider command-line arguments overrides.

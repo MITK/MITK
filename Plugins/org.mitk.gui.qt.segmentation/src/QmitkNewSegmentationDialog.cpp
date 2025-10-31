@@ -85,8 +85,8 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(
   }
 
   m_Suggestions = (mode == Mode::NewLabel)
-    ? suggestionHelper->GetValidAddSuggestions(segmentation, suggestionPref.suggestionOnce)
-    : suggestionHelper->GetValidRenameSuggestions(segmentation,
+    ? suggestionHelper->GetValidSuggestionsForNewLabels(segmentation, suggestionPref.suggestionOnce)
+    : suggestionHelper->GetValidSuggestionsForRenamingLabels(segmentation,
       label ? label->GetName() : "");
 
   m_TotalSuggestions = static_cast<int>(m_Suggestions.size());

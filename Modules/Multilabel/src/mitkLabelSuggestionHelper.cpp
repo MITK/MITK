@@ -79,8 +79,7 @@ namespace mitk
     }
     catch (const nlohmann::json::parse_error& e)
     {
-      MITK_ERROR << "Cannot reader data due to parsing error. Parse error: " << e.what() << '\n';
-      throw;
+      mitkThrow() << "Cannot reader data due to parsing error. Parse error: " << e.what() << '\n';
     }
 
     return this->ParseSuggestions(fileContent, replaceExisting);
@@ -132,8 +131,7 @@ namespace mitk
       }
       catch (const nlohmann::json::parse_error& e)
       {
-        MITK_ERROR << "Cannot reader data due to parsing error. Parse error: " << e.what() << '\n';
-        throw;
+        mitkThrow() << "Cannot reader data due to parsing error. Parse error: " << e.what() << '\n';
       }
 
       this->ParseSuggestions(fileContent, true);
@@ -145,13 +143,13 @@ namespace mitk
     }
   }
 
-  LabelSuggestionHelper::ConstLabelVectorType LabelSuggestionHelper::GetValidAddSuggestions(
+  LabelSuggestionHelper::ConstLabelVectorType LabelSuggestionHelper::GetValidSuggestionsForNewLabels(
     const MultiLabelSegmentation *segmentation, bool suggestOnce) const
   {
     return FilterSuggestions(m_Suggestions, segmentation);
   }
 
-  LabelSuggestionHelper::ConstLabelVectorType LabelSuggestionHelper::GetValidRenameSuggestions(
+  LabelSuggestionHelper::ConstLabelVectorType LabelSuggestionHelper::GetValidSuggestionsForRenamingLabels(
     const MultiLabelSegmentation *segmentation, const std::string_view labelName, bool suggestOnce) const
   {
     if (segmentation == nullptr)

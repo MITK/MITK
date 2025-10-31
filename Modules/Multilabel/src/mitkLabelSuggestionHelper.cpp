@@ -30,6 +30,8 @@ found in the LICENSE file.
 
 namespace
 {
+  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 4;
+
   std::optional<unsigned int> GetMaxInstanceOccurrenceOfLabel(const mitk::Label* label, bool globalOnlyOnce)
   {
     auto property = label->GetConstProperty(mitk::LabelSuggestionHelper::PROPERTY_MAX_INSTANCE_OCCURRENCE);
@@ -80,6 +82,21 @@ namespace mitk
     catch (const nlohmann::json::parse_error& e)
     {
       mitkThrow() << "Cannot reader data due to parsing error. Parse error: " << e.what() << '\n';
+    }
+
+    //check version
+    int version = 0;
+
+    if (MultiLabelIOHelper::GetValueFromJson<int>(fileContent, "version", version))
+    {
+      if (version > MULTILABEL_SEGMENTATION_VERSION_VALUE)
+      {
+        mitkThrow() << "Suggestion file to parse has unsupported version. Software is to old to ensure correct reading. Please use a compatible version of MITK or store data in another format. Version of data: " << version << "; Supported versions up to: " << MULTILABEL_SEGMENTATION_VERSION_VALUE;
+      }
+    }
+    else
+    {
+      MITK_INFO << "Data has unknown version. Assuming that it can be read. Result might be invalid.";
     }
 
     return this->ParseSuggestions(fileContent, replaceExisting);

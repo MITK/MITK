@@ -29,7 +29,7 @@ namespace
 {
 
   const constexpr char* const MULTILABEL_SEGMENTATION_TYPE_VALUE = "org.mitk.multilabel.segmentation.stack";
-  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 3;
+  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 4;
 
   mitk::Image::Pointer LoadImageBasedOnFileName(const std::string& fileName, const std::string& fileBase)
   {

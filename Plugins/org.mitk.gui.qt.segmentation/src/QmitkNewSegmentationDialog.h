@@ -58,23 +58,44 @@ public:
   mitk::Color GetColor() const;
   const mitk::Label* GetSuggestion() const;
 
-private:
+private slots:
   void OnAccept();
   void OnFinished(int result);
   void OnSuggestionSelected();
+  void OnSuggestionDoubleClicked();
   void OnColorButtonClicked();
-  void OnTextEdited(const QString& text);
+  void OnNameEdited(const QString& text);
+  void OnFilterEdited(const QString& text);
+  void OnFilterClearClicked();
+  void OnAutoFilterToggled(bool checked);
 
+private:
+  void InitializeDialog();
+  void SetupConnections();
+  void LoadAndApplyPreferences();
+  void UpdateUI();
   void UpdateColorButtonBackground();
   void UpdateNameList();
+  void UpdateSuggestionInfo();
   void UpdateOKButton();
+  void UpdateControlStates();
+  void ApplyFilter(const QString& filterText);
+  void SelectSuggestionByName(const QString& name);
+  bool TryPreselectMatchingSuggestion(const QString& name);
+  bool GetAutoFilter() const;
 
   Ui::QmitkNewSegmentationDialog* m_Ui;
+
+  Mode m_Mode;
+  bool m_EnforceSuggestions;
 
   mitk::MultiLabelSegmentation::ConstLabelVectorType m_Suggestions;
   mitk::Label::Pointer m_Suggestion;
   QColor m_Color;
   QString m_Name;
+
+  int m_TotalSuggestions;
+  int m_VisibleSuggestions;
 };
 
 #endif

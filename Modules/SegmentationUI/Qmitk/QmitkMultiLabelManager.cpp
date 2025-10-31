@@ -224,11 +224,7 @@ void QmitkMultiLabelManager::SetLabelSuggestionHelper(const mitk::LabelSuggestio
     m_SuggestionHelper = suggestionHelper;
     m_Controls->labelInspector->SetLabelSuggestionHelper(suggestionHelper);
 
-    auto& widget = *this;
-    auto updateWidgets = [&widget](const itk::EventObject&)
-      {
-        widget.UpdateControls();
-      };
+    auto updateWidgets = [this](const itk::EventObject&) { this->UpdateControls(); };
 
     m_SuggestionObserver.Reset(suggestionHelper, itk::ModifiedEvent(), updateWidgets);
     this->UpdateControls();

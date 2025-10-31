@@ -174,7 +174,7 @@ namespace mitk
      */
     static ConstLabelVectorType FilterSuggestions(const ConstLabelVectorType& suggestions,
                                                    const MultiLabelSegmentation* segmentation,
-                                                   const std::optional<std::string_view> labelName = std::optional<std::string_view>());
+                                                   const std::optional<std::string_view> labelName = std::nullopt);
 
     ConstLabelVectorType m_Suggestions;
   };

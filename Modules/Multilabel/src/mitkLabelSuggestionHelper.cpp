@@ -161,13 +161,13 @@ namespace mitk
   }
 
   LabelSuggestionHelper::ConstLabelVectorType LabelSuggestionHelper::GetValidSuggestionsForNewLabels(
-    const MultiLabelSegmentation *segmentation, bool suggestOnce) const
+    const MultiLabelSegmentation *segmentation) const
   {
     return FilterSuggestions(m_Suggestions, segmentation);
   }
 
   LabelSuggestionHelper::ConstLabelVectorType LabelSuggestionHelper::GetValidSuggestionsForRenamingLabels(
-    const MultiLabelSegmentation *segmentation, const std::string_view labelName, bool suggestOnce) const
+    const MultiLabelSegmentation *segmentation, const std::string_view labelName) const
   {
     if (segmentation == nullptr)
       mitkThrow() << "Invalid use of GetValidRenameSuggestions. Passed segmentation pointer is null.";
@@ -238,12 +238,9 @@ namespace mitk
 
     for (const auto &suggestion : suggestions)
     {
-      bool shouldInclude = true;
-
       auto maxInstance = GetMaxInstanceOccurrenceOfLabel(suggestion, GetSuggestionPreferences().suggestionOnce);
 
       auto currentCount = segmentation->GetLabelValuesByName(suggestion->GetName()).size();
-      auto hasLimit = !maxInstance.has_value();
 
       if ((labelName.has_value() && labelName.value() == suggestion->GetName()) || //label is excluded from filtering
         !maxInstance.has_value() || //no limit is defined

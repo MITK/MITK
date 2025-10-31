@@ -85,7 +85,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(
   }
 
   m_Suggestions = (mode == Mode::NewLabel)
-    ? suggestionHelper->GetValidSuggestionsForNewLabels(segmentation, suggestionPref.suggestionOnce)
+    ? suggestionHelper->GetValidSuggestionsForNewLabels(segmentation)
     : suggestionHelper->GetValidSuggestionsForRenamingLabels(segmentation,
       label ? label->GetName() : "");
 
@@ -484,7 +484,7 @@ void QmitkNewSegmentationDialog::OnFilterClearClicked()
   this->ApplyFilter("");
 }
 
-void QmitkNewSegmentationDialog::OnAutoFilterToggled(bool checked)
+void QmitkNewSegmentationDialog::OnAutoFilterToggled(bool /*checked*/)
 {
   m_Ui->filterLineEdit->clear();
 

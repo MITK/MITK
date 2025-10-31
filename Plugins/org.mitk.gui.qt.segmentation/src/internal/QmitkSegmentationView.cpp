@@ -1055,9 +1055,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
   auto referenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
   auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
 
-  bool hasReferenceNode = referenceNode.IsNotNull();
-  bool hasWorkingNode = workingNode.IsNotNull();
-
+  const bool hasWorkingNode = workingNode.IsNotNull();
 
   m_Controls->multiLabelWidget->setEnabled(hasWorkingNode);
 

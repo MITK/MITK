@@ -610,7 +610,6 @@ namespace mitk
   {
     // Precondition: path must have exactly one AnySelection node
     std::size_t anySelectionCount = 0;
-    std::size_t anySelectionIndex = 0;
 
     for (std::size_t i = 0; i < path.GetSize(); ++i)
     {
@@ -618,7 +617,6 @@ namespace mitk
       if (node.type == PropertyKeyPath::NodeInfo::NodeType::AnySelection)
       {
         anySelectionCount++;
-        anySelectionIndex = i;
       }
     }
 

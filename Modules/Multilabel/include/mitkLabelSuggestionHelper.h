@@ -84,11 +84,9 @@ namespace mitk
      * - Existing labels in the segmentation
      *
      * @param segmentation The segmentation to check against (can be nullptr)
-     * @param suggestOnce If true, filter out suggestions already used in the segmentation
      * @return Vector of valid label suggestions
      */
-    ConstLabelVectorType GetValidSuggestionsForNewLabels(const MultiLabelSegmentation* segmentation = nullptr,
-                                                        bool suggestOnce = true) const;
+    ConstLabelVectorType GetValidSuggestionsForNewLabels(const MultiLabelSegmentation* segmentation = nullptr) const;
 
     /**
      * @brief Get valid suggestions for renaming a specific label.
@@ -98,12 +96,10 @@ namespace mitk
      *
      * @param segmentation The segmentation containing the label
      * @param labelName The label name that should be checked for renaming
-     * @param suggestOnce If true, filter out suggestions already used (except the label's current name)
      * @return Vector of valid label suggestions for renaming
      */
     ConstLabelVectorType GetValidSuggestionsForRenamingLabels(const MultiLabelSegmentation* segmentation,
-                                                   const std::string_view labelName,
-                                                   bool suggestOnce = true) const;
+                                                   const std::string_view labelName) const;
 
     /**
      * @brief Check if a new instance of a label is allowed.

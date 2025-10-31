@@ -283,7 +283,6 @@ void mitk::Label::SetDescription(const std::string& description)
 
 void mitk::Label::SetValue(PixelType pixelValue)
 {
-  mitk::UShortProperty *property = dynamic_cast<mitk::UShortProperty *>(GetProperty("value"));
   if (pixelValue != m_Value)
   {
     // Update Property

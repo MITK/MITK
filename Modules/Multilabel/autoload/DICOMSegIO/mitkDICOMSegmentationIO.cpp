@@ -515,7 +515,10 @@ namespace mitk
         {
           segmentAttribute->setSegmentLabel(label->GetName());
           segmentAttribute->setSegmentDescription(label->GetDescription());
-          segmentAttribute->setSegmentAlgorithmType(label->GetAlgorithmTypeStr());
+          std::string algorithmType = label->GetAlgorithmTypeStr();
+          if (algorithmType.empty())
+            algorithmType = "MANUAL"; //DICOM always needs a type. If undefined we default to "MANUAL"
+          segmentAttribute->setSegmentAlgorithmType(algorithmType);
           segmentAttribute->setSegmentAlgorithmName(label->GetAlgorithmName());
 
           if (label->GetAnatomicRegionCount()>0)

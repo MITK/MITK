@@ -777,3 +777,17 @@ void mitk::MultiLabelIOHelper::RemoveMetaPropertiesFromLabel(Label* label)
     }
   }
 }
+
+mitk::LabelVector mitk::MultiLabelIOHelper::CreateCleanLabels(const LabelVector& labels)
+{
+  mitk::MultiLabelSegmentation::LabelVectorType result;
+
+  for (const auto& label : labels)
+  {
+    auto cleanedLabel = label->Clone();
+    mitk::MultiLabelIOHelper::RemoveMetaPropertiesFromLabel(cleanedLabel);
+    result.push_back(cleanedLabel);
+  }
+
+  return result;
+}

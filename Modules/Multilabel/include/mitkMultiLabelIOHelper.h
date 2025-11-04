@@ -202,6 +202,14 @@ namespace mitk
     */
     static void RemoveMetaPropertiesFromLabel(Label* label);
 
+    /**
+     * @brief Remove all meta properties from all label clones of the passed vector.
+     * Meta properties (indicated by a preceding "_" in the property name) are used to steer code logic e.g. in the case
+     * of label loading or suggestion handling. They are not to be used in concrete label instances.
+     * This method clones all passed labels and removes all meta properties form the clones.
+     * @param labels Vector with all labels that should be cloned and cleaned.
+    */
+    static LabelVector CreateCleanLabels(const LabelVector& labels);
 
   private:
     MultiLabelIOHelper() = delete;

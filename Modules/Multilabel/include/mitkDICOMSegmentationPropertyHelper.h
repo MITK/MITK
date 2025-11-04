@@ -25,7 +25,6 @@ namespace mitk
   {
   public:
     static void DeriveDICOMSegmentationProperties(MultiLabelSegmentation* dicomSegImage);
-    static void SetDICOMSegmentProperties(Label *label);
   };
 }
 #endif

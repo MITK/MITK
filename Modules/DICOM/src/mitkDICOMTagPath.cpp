@@ -54,11 +54,11 @@ namespace mitk
     NodeInfo() : type(NodeType::Invalid), tag(0, 0), selection(0)
   {
     ;
-  };
+  }
 
   DICOMTagPath::NodeInfo::
     NodeInfo(const DICOMTag& aTag, NodeType aType, ItemSelectionIndex index) : type(aType), tag(aTag), selection(index)
-  {};
+  {}
 
   bool DICOMTagPath::NodeInfo::operator == (const NodeInfo& right) const
   {
@@ -67,7 +67,7 @@ namespace mitk
     if (this->selection != right.selection) return false;
 
     return true;
-  };
+  }
 
   bool DICOMTagPath::NodeInfo::
     Matches(const NodeInfo& right) const
@@ -88,12 +88,12 @@ namespace mitk
       }
     }
     return false;
-  };
+  }
 
   bool DICOMTagPath::IsEmpty() const
   {
     return m_NodeInfos.empty();
-  };
+  }
 
   bool
     DICOMTagPath::
@@ -105,7 +105,7 @@ namespace mitk
     }
 
     return true;
-  };
+  }
 
   bool
     DICOMTagPath::
@@ -119,7 +119,7 @@ namespace mitk
     }
 
     return result;
-  };
+  }
 
   DICOMTagPath::PathIndexType DICOMTagPath::Size() const
   {
@@ -132,7 +132,7 @@ namespace mitk
   {
     m_NodeInfos.push_back(newNode);
     return m_NodeInfos.size() - 1;
-  };
+  }
 
   const DICOMTagPath::NodeInfo&
     DICOMTagPath::
@@ -144,7 +144,7 @@ namespace mitk
     }
 
     return m_NodeInfos[index];
-  };
+  }
 
   DICOMTagPath::NodeInfo&
     DICOMTagPath::
@@ -156,35 +156,35 @@ namespace mitk
     }
 
     return m_NodeInfos[index];
-  };
+  }
 
   const DICOMTagPath::NodeInfo&
     DICOMTagPath::
     GetFirstNode() const
   {
     return GetNode(0);
-  };
+  }
 
   const DICOMTagPath::NodeInfo&
     DICOMTagPath::
     GetLastNode() const
   {
     return GetNode(Size() - 1);
-  };
+  }
 
   DICOMTagPath::NodeInfo&
     DICOMTagPath::
     GetLastNode()
   {
     return GetNode(Size() - 1);
-  };
+  }
 
   const DICOMTagPath::NodeInfoVectorType&
     DICOMTagPath::
     GetNodes() const
   {
     return m_NodeInfos;
-  };
+  }
 
   std::string
     DICOMTagPath::
@@ -194,14 +194,11 @@ namespace mitk
 
     if (this->Size() == 0) return nameStream.str();
 
-    PathIndexType i = 0;
+    bool first = true;
     for (const auto& node : m_NodeInfos)
     {
-      if (i)
-      {
-        nameStream << ".";
-      }
-      ++i;
+      if (!first) nameStream << ".";
+      first = false;
 
       if (node.type == NodeInfo::NodeType::AnyElement)
       {
@@ -231,14 +228,14 @@ namespace mitk
     }
 
     return nameStream.str();
-  };
+  }
 
   bool
     DICOMTagPath::
     operator == (const DICOMTagPath& path) const
   {
     return this->m_NodeInfos == path.m_NodeInfos;
-  };
+  }
 
   bool
     DICOMTagPath::
@@ -271,7 +268,7 @@ namespace mitk
     Equals(const DICOMTagPath& path) const
   {
     return DICOMTagPathesMatch(*this, path);
-  };
+  }
 
   DICOMTagPath&
     DICOMTagPath::
@@ -282,35 +279,72 @@ namespace mitk
     this->m_NodeInfos = path.m_NodeInfos;
 
     return *this;
-  };
+  }
+
+  DICOMTagPath DICOMTagPath::operator + (const DICOMTagPath& right) const
+  {
+    DICOMTagPath result(*this);
+    result += right;
+    return result;
+  }
+
+  DICOMTagPath DICOMTagPath::operator + (const std::string& pathStr) const
+  {
+    DICOMTagPath result(*this);
+    result += pathStr;
+    return result;
+  }
+
+  DICOMTagPath operator + (const std::string& pathStr, const DICOMTagPath& right)
+  {
+    DICOMTagPath result;
+    result.FromStr(pathStr);
+    result += right;
+    return result;
+  }
+
+  DICOMTagPath& DICOMTagPath::operator += (const DICOMTagPath& right)
+  {
+    m_NodeInfos.insert(m_NodeInfos.end(),
+                       right.m_NodeInfos.begin(),
+                       right.m_NodeInfos.end());
+    return *this;
+  }
+
+  DICOMTagPath& DICOMTagPath::operator += (const std::string& pathStr)
+  {
+    DICOMTagPath additionalPath;
+    additionalPath.FromStr(pathStr);
+    return *this += additionalPath;
+  }
 
   DICOMTagPath&
     DICOMTagPath::AddAnyElement()
   {
     m_NodeInfos.emplace_back(DICOMTag(0,0), NodeInfo::NodeType::AnyElement);
     return *this;
-  };
+  }
 
   DICOMTagPath&
     DICOMTagPath::AddElement(unsigned int group, unsigned int element)
   {
     m_NodeInfos.emplace_back(DICOMTag(group, element), NodeInfo::NodeType::Element);
     return *this;
-  };
+  }
 
   DICOMTagPath&
     DICOMTagPath::AddAnySelection(unsigned int group, unsigned int element)
   {
     m_NodeInfos.emplace_back(DICOMTag(group, element), NodeInfo::NodeType::AnySelection);
     return *this;
-  };
+  }
 
   DICOMTagPath&
     DICOMTagPath::AddSelection(unsigned int group, unsigned int element, ItemSelectionIndex index)
   {
     m_NodeInfos.emplace_back(DICOMTag(group, element), NodeInfo::NodeType::SequenceSelection, index);
     return *this;
-  };
+  }
 
   DICOMTagPath&
     DICOMTagPath::
@@ -350,35 +384,39 @@ namespace mitk
           info.type = NodeInfo::NodeType::Element;
           info.tag = DICOMTag(std::stoul(sm[1], nullptr, 16), std::stoul(sm[2], nullptr, 16));
         }
+        else
+        {
+          mitkThrow() << "Error while parsing string into DICOMTagPath. Invalid sub string found: \"" << subStr << "\"";
+        }
       }
       result.push_back(info);
     }
 
     this->m_NodeInfos.swap(result);
     return *this;
-  };
+  }
 
   DICOMTagPath::DICOMTagPath()
   {
     Reset();
-  };
+  }
 
   DICOMTagPath::
     DICOMTagPath(const DICOMTagPath& path)
   {
     *this = path;
-  };
+  }
 
   DICOMTagPath::
     DICOMTagPath(const DICOMTag& tag)
   {
     m_NodeInfos.emplace_back(tag, NodeInfo::NodeType::Element);
-  };
+  }
 
   DICOMTagPath::DICOMTagPath(unsigned int group, unsigned int element)
   {
     m_NodeInfos.emplace_back(DICOMTag(group,element));
-  };
+  }
 
   DICOMTagPath::
     ~DICOMTagPath() {};
@@ -388,7 +426,7 @@ namespace mitk
     Reset()
   {
     this->m_NodeInfos.clear();
-  };
+  }
 
   bool
     DICOMTagPath::
@@ -396,8 +434,8 @@ namespace mitk
   {
     auto leftPos = left.GetNodes().cbegin();
     auto rightPos = right.GetNodes().cbegin();
-    auto leftEnd = left.GetNodes().cend();
-    auto rightEnd = right.GetNodes().cend();
+    const auto leftEnd = left.GetNodes().cend();
+    const auto rightEnd = right.GetNodes().cend();
 
     while (leftPos != leftEnd && rightPos != rightEnd)
     {
@@ -406,9 +444,8 @@ namespace mitk
       ++rightPos;
     }
 
-    if (leftPos == leftEnd && rightPos == rightEnd) return true;
-    else return false;
-  };
+    return (leftPos == leftEnd && rightPos == rightEnd);
+  }
 
   std::ostream & operator<<(std::ostream &os, const DICOMTagPath &value)
   {
@@ -721,5 +758,51 @@ namespace mitk
     }
 
     return nameStream.str();
-  };
+  }
+
+  std::string DICOMTagPathToReadableName(const DICOMTagPath& tagPath, bool includeTagNumbers)
+  {
+    if (tagPath.IsEmpty())
+    {
+      return "<empty path>";
+    }
+
+    std::ostringstream result;
+
+    for (const auto& node : tagPath.GetNodes())
+    {
+
+      if (node.type == DICOMTagPath::NodeInfo::NodeType::AnyElement)
+      {
+        result << "<any element>";
+      }
+      else if (node.type == DICOMTagPath::NodeInfo::NodeType::Invalid)
+      {
+        result << "<invalid node>";
+      }
+      else
+      {
+        result << node.tag.GetName();
+
+        if (includeTagNumbers)
+        {
+          result << " ("
+                 << std::setw(4) << std::setfill('0') << std::hex << std::uppercase
+                 << node.tag.GetGroup() << ","
+                 << std::setw(4) << std::setfill('0') << std::hex << std::uppercase
+                 << node.tag.GetElement() << std::dec << ")";
+        }
+
+        if (node.type == DICOMTagPath::NodeInfo::NodeType::SequenceSelection)
+        {
+          result << "[" << node.selection << "]";
+        }
+        else if (node.type == DICOMTagPath::NodeInfo::NodeType::AnySelection)
+        {
+          result << "[*]";
+        }
+      }
+    }
+   return result.str();
+  }
 }

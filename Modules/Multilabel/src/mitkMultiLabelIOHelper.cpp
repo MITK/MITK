@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkStringProperty.h>
 #include <mitkCoreServices.h>
 #include <mitkIPropertyDeserialization.h>
+#include <mitkDICOMSegmentationConstants.h>
 
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
@@ -197,7 +198,20 @@ mitk::Label::Pointer mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(const ti
   while (propElem)
   {
     MultiLabelIOHelper::PropertyFromXMLElement(name, prop, propElem);
-    label->SetProperty(name, prop);
+    if (name == "value")
+    {
+      auto castedProp = dynamic_cast<mitk::UShortProperty*>(prop.GetPointer());
+      if (castedProp != nullptr)
+      {
+        label->SetValue(castedProp->GetValue());
+      }
+      else
+        mitkThrow() << "Cannot load legacy label information from xml. Value property is encoded with the wrong property type. Used property type: " << *prop.GetPointer();
+    }
+    else
+    {
+      label->SetProperty(name, prop);
+    }
     propElem = propElem->NextSiblingElement("property");
   }
 
@@ -528,8 +542,8 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelToJSON(const Label* label
   j["locked"] = label->GetLocked();
   j["opacity"] = label->GetOpacity();
   j["visible"] = label->GetVisible();
-  j["tracking_id"] = label->GetTrackingID();
-
+  if (!label->GetTrackingID().empty())
+    j["tracking_id"] = label->GetTrackingID();
   if (!label->GetTrackingUID().empty())
     j["tracking_uid"] = label->GetTrackingUID();
   if (!label->GetDescription().empty())
@@ -557,25 +571,98 @@ mitk::BaseProperty::Pointer CreatePropertyFromJSON(const std::string& typeStr, c
   return property;
 }
 
+namespace
+{
+  const std::map<std::string, std::string>& GetDeprecatedNameLookup()
+  {
+    static const std::map<std::string, std::string> lookup = {
+      // Mapping for legacy label properties that were wrong and therefore deprecated
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_SUB_PATH()),
+        mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetMeaningPropertySubName()},
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_SUB_PATH()),
+        mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetSchemePropertySubName() },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_SUB_PATH()),
+        mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetValuePropertySubName() },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_MEANING_SUB_PATH()),
+        mitk::LabelPropertyConstants::GetSegmentedPropertyTypePropertyBaseName() + "." + mitk::LabelPropertyConstants::GetMeaningPropertySubName() },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_SCHEME_SUB_PATH()),
+        mitk::LabelPropertyConstants::GetSegmentedPropertyTypePropertyBaseName() + "." + mitk::LabelPropertyConstants::GetSchemePropertySubName() },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_SUB_PATH()),
+        mitk::LabelPropertyConstants::GetSegmentedPropertyTypePropertyBaseName() + "." + mitk::LabelPropertyConstants::GetValuePropertySubName() },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_MEANING_SUB_PATH()),
+        mitk::LabelPropertyConstants::GetSegmentedPropertyCategoryPropertyBaseName() + "." + mitk::LabelPropertyConstants::GetMeaningPropertySubName()},
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_SUB_PATH()),
+        mitk::LabelPropertyConstants::GetSegmentedPropertyCategoryPropertyBaseName() + "." + mitk::LabelPropertyConstants::GetSchemePropertySubName() },
+        { mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0062, 0x0002) + mitk::DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_SUB_PATH()),
+        mitk::LabelPropertyConstants::GetSegmentedPropertyCategoryPropertyBaseName() + "." + mitk::LabelPropertyConstants::GetValuePropertySubName() }
+    };
+    return lookup;
+  }
+
+  const std::map<std::string, std::string>& GetConvinienceNameLookup()
+  {
+    static const std::map<std::string, std::string> lookup = {
+      // Mapping for the case that human defined jsons miss the index
+        { mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + "." + mitk::LabelPropertyConstants::GetMeaningPropertySubName(),
+        mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetMeaningPropertySubName()},
+        { mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + "." + mitk::LabelPropertyConstants::GetSchemePropertySubName(),
+        mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetSchemePropertySubName() },
+        { mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + "." + mitk::LabelPropertyConstants::GetValuePropertySubName(),
+        mitk::LabelPropertyConstants::GetAnatomicRegionPropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetValuePropertySubName() },
+        { mitk::LabelPropertyConstants::GetPrimaryAnatomicStructurePropertyBaseName() + "." + mitk::LabelPropertyConstants::GetMeaningPropertySubName(),
+        mitk::LabelPropertyConstants::GetPrimaryAnatomicStructurePropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetMeaningPropertySubName()},
+        { mitk::LabelPropertyConstants::GetPrimaryAnatomicStructurePropertyBaseName() + "." + mitk::LabelPropertyConstants::GetSchemePropertySubName(),
+        mitk::LabelPropertyConstants::GetPrimaryAnatomicStructurePropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetSchemePropertySubName() },
+        { mitk::LabelPropertyConstants::GetPrimaryAnatomicStructurePropertyBaseName() + "." + mitk::LabelPropertyConstants::GetValuePropertySubName(),
+        mitk::LabelPropertyConstants::GetPrimaryAnatomicStructurePropertyBaseName() + ".[0]." + mitk::LabelPropertyConstants::GetValuePropertySubName() }
+    };
+    return lookup;
+  }
+  std::string EnsureCorrectPropertyName(const std::string& externalName)
+  {
+    auto mapping = GetDeprecatedNameLookup();
+    auto finding = mapping.find(externalName);
+
+    if (finding != mapping.end())
+    {
+      MITK_DEBUG << "Deserialized label used deprecated property names. Converted deprecated name into valid name. Deprecated name: \"" << externalName << "\"; new name: \"" << finding->second << "\"";
+      return finding->second;
+    }
+
+    auto mapping2 = GetConvinienceNameLookup();
+    auto finding2 = mapping2.find(externalName);
+
+    if (finding2 != mapping2.end())
+    {
+      MITK_DEBUG << "Deserialized label used a simplified index-less name. Converted name into valid name. Original name: \"" << externalName << "\"; new name: \"" << finding->second << "\"";
+      return finding->second;
+    }
+
+    return externalName;
+  }
+}
+
 mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nlohmann::json& labelJson)
 {
   Label::Pointer resultLabel = Label::New();
 
   for (const auto& [key, jValue] : labelJson.items())
   {
-    if (key == "name")
+    auto internalKey = EnsureCorrectPropertyName(key);
+
+    if (internalKey == "name")
     {
       std::string name;
       if (GetValueFromJson(labelJson, "name", name))
         resultLabel->SetName(name);
     }
-    else if (key == "value")
+    else if (internalKey == "value")
     {
       Label::PixelType value = 1;
       if (GetValueFromJson(labelJson, "value", value))
         resultLabel->SetValue(value);
     }
-    else if (key == "color")
+    else if (internalKey == "color")
     {
       Color color;
       if (jValue.contains("value"))
@@ -587,43 +674,52 @@ mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nl
       }
       else
       { // simple new serialization directly as array
-        color.SetRed(jValue[0].get<float>());
-        color.SetGreen(jValue[1].get<float>());
-        color.SetBlue(jValue[2].get<float>());
+        if (jValue[0].is_number_float())
+        { //assume color coded in float (0.0..1.0)
+          color.SetRed(jValue[0].get<float>());
+          color.SetGreen(jValue[1].get<float>());
+          color.SetBlue(jValue[2].get<float>());
+        }
+        else
+        { //assume color coded in int (0..255)
+          color.SetRed(jValue[0].get<unsigned int>()/255.f);
+          color.SetGreen(jValue[1].get<unsigned int>()/255.f);
+          color.SetBlue(jValue[2].get<unsigned int>()/255.f);
+        }
       }
       resultLabel->SetColor(color);
     }
-    else if (key == "locked")
+    else if (internalKey == "locked")
     {
       bool locked = false;
       if (GetValueFromJson(labelJson, "locked", locked))
         resultLabel->SetLocked(locked);
     }
-    else if (key == "opacity")
+    else if (internalKey == "opacity")
     {
       float opacity = 1.;
       if (GetValueFromJson(labelJson, "opacity", opacity))
         resultLabel->SetOpacity(opacity);
     }
-    else if (key == "visible")
+    else if (internalKey == "visible")
     {
       bool visible = true;
       if (GetValueFromJson(labelJson, "visible", visible))
         resultLabel->SetVisible(visible);
     }
-    else if (key == "tracking_uid")
+    else if (internalKey == "tracking_uid")
     {
       std::string tracking_uid;
       if (GetValueFromJson(labelJson, "tracking_uid", tracking_uid))
         resultLabel->SetTrackingUID(tracking_uid);
     }
-    else if (key == "tracking_id")
+    else if (internalKey == "tracking_id")
     {
       std::string tracking_id;
       if (GetValueFromJson(labelJson, "tracking_id", tracking_id))
         resultLabel->SetTrackingID(tracking_id);
     }
-    else if (key == "description")
+    else if (internalKey == "description")
     {
       std::string description;
       if (GetValueFromJson(labelJson, "description", description))
@@ -634,34 +730,50 @@ mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nl
       if (jValue.contains("type"))
       { // full property specification
         auto property = CreatePropertyFromJSON(jValue["type"], jValue["value"]);
-        resultLabel->SetProperty(key, property);
+        resultLabel->SetProperty(internalKey, property);
       }
       else
       { // support for direct simple types
         if (jValue.is_string())
         {
-          resultLabel->SetStringProperty(key.c_str(), jValue.get<std::string>().c_str());
+          resultLabel->SetStringProperty(internalKey.c_str(), jValue.get<std::string>().c_str());
         }
         else if (jValue.is_number_integer())
         {
-          resultLabel->SetIntProperty(key.c_str(), jValue.get<int>());
+          resultLabel->SetIntProperty(internalKey.c_str(), jValue.get<int>());
         }
         else if (jValue.is_number_float())
         {
-          resultLabel->SetFloatProperty(key.c_str(), jValue.get<float>());
+          resultLabel->SetFloatProperty(internalKey.c_str(), jValue.get<float>());
         }
         else if (jValue.is_boolean())
         {
-          resultLabel->SetBoolProperty(key.c_str(), jValue.get<bool>());
+          resultLabel->SetBoolProperty(internalKey.c_str(), jValue.get<bool>());
         }
         else
         {
-          MITK_ERROR << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << key << "; invalid value: " << jValue.dump();
-          mitkThrow() << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << key << "; invalid value: " << jValue.dump();
+          MITK_ERROR << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << internalKey << "; invalid value: " << jValue.dump();
+          mitkThrow() << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << internalKey << "; invalid value: " << jValue.dump();
         }
       }
     }
   }
 
   return resultLabel;
+}
+
+void mitk::MultiLabelIOHelper::RemoveMetaPropertiesFromLabel(Label* label)
+{
+  if (nullptr == label)
+  {
+    mitkThrow() << "Invalid call of RemoveMetaPropertiesFromLabel. Passed label pointer is null.";
+  }
+  auto labelKeys = label->GetPropertyKeys();
+  for (const auto& key : labelKeys)
+  {
+    if (key.find('_') == 0)
+    {
+      label->RemoveProperty(key);
+    }
+  }
 }

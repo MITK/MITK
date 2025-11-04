@@ -428,7 +428,6 @@ void mitk::MultiLabelSegmentation::InsertGroup(GroupIndexType groupID, mitk::Ima
 
       auto labelClone = label->Clone();
 
-      DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(labelClone);
       this->AddLabelToMap(labelClone->GetValue(), labelClone, groupID);
       this->RegisterLabel(labelClone);
     }
@@ -480,9 +479,7 @@ void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType group
         mitkThrow() << "Error while replacing labels. Label value is already existing in another group. Invalid label: " << label->GetValue() << "; conflicting group: " << conflictingGroup;
       }
 
-      // add DICOM information of the label
       auto clonedLabel = label->Clone();
-      DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(clonedLabel);
 
       this->AddLabelToMap(clonedLabel->GetValue(), clonedLabel, groupID);
       this->RegisterLabel(clonedLabel);
@@ -892,7 +889,7 @@ mitk::Label* mitk::MultiLabelSegmentation::AddLabel(mitk::Label* label, GroupInd
     std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
 
     unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
-    if (m_GroupContainer.size() >= max_size)
+    if (m_LabelMap.size() >= max_size)
       return nullptr;
 
     if (addAsClone) newLabel = label->Clone();
@@ -913,9 +910,6 @@ mitk::Label* mitk::MultiLabelSegmentation::AddLabel(mitk::Label* label, GroupInd
         mitkThrow() << "Cannot add label due to conflicting label value that already exists in the MultiLabelSegmentation. Conflicting label value: " << pixelValue;
       }
     }
-
-    // add DICOM information of the label
-    DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(newLabel);
 
     this->AddLabelToMap(pixelValue, newLabel, groupID);
     this->RegisterLabel(newLabel);
@@ -964,9 +958,18 @@ void mitk::MultiLabelSegmentation::RenameLabel(LabelValueType pixelValue, const 
 
   this->UpdateLookupTable(pixelValue);
   m_LookupTable->Modified();
+}
 
-  // change DICOM information of the label
-  DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
+void mitk::MultiLabelSegmentation::UpdateLabel(LabelValueType labelValue, const Label* templateLabel)
+{
+  auto label = GetLabel(labelValue);
+  if (label.IsNull()) mitkThrow() << "Cannot update label. Unknown label value provided. Unknown label value:" << labelValue;
+  if (templateLabel == nullptr) mitkThrow() << "Cannot update label. Null pointer passed as template label.";
+
+  label->Update(templateLabel, false);
+
+  this->UpdateLookupTable(labelValue);
+  m_LookupTable->Modified();
 }
 
 mitk::Label *mitk::MultiLabelSegmentation::GetActiveLabel()
@@ -1400,6 +1403,17 @@ const mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegment
     mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
 
   return m_GroupToLabelMap[index];
+}
+
+const mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::GetLabelValuesByName(const std::string_view name) const
+{
+  LabelValueVectorType result;
+
+  auto searchName = [&result, name](const Label* l) { if (l->GetName() == name) result.push_back(l->GetValue()); };
+
+  this->VisitLabels(this->GetAllLabelValues(), searchName);
+
+  return result;
 }
 
 const mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::GetLabelValuesByName(GroupIndexType index, const std::string_view name) const

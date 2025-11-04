@@ -214,6 +214,17 @@ bool QmitkMultiLabelInspector::GetModelManipulationOngoing() const
   return m_ModelManipulationOngoing;
 }
 
+const mitk::LabelSuggestionHelper* QmitkMultiLabelInspector::GetLabelSuggestionHelper() const
+{
+  return m_SuggestionHelper;
+}
+
+void QmitkMultiLabelInspector::SetLabelSuggestionHelper(const mitk::LabelSuggestionHelper* suggestionHelper)
+{
+  m_SuggestionHelper = suggestionHelper;
+}
+
+
 void QmitkMultiLabelInspector::OnModelReset()
 {
   m_LastValidSelectedLabels = {};
@@ -464,6 +475,12 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
   if (nullptr == templateLabel)
     mitkThrow() << "QmitkMultiLabelInspector is in an invalid state. AddNewLabelInstanceInternal was called with a non existing label as template";
 
+  if (m_SuggestionHelper.IsNotNull())
+  {
+    auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+    if (suggestionPrefs.enforceSuggestions && !m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, templateLabel->GetName()))
+      mitkThrow() << "QmitkMultiLabelInspector is in an invalid state. AddNewLabelInstanceInternal was called for a template label that is not allowed to have (further) instances.";
+  }
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(templateLabel->GetValue());
 
   mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID },
@@ -515,9 +532,10 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstance()
 mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::MultiLabelSegmentation::GroupIndexType& containingGroup)
 {
   auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(m_Segmentation);
+  auto suggestionPref = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
 
   bool canceled = false;
-  if (!m_DefaultLabelNaming)
+  if (!m_DefaultLabelNaming || suggestionPref.enforceSuggestions)
     emit LabelRenameRequested(newLabel, false, canceled);
 
   if (canceled) return nullptr;
@@ -955,7 +973,16 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
   {
     if (m_AllowLabelModification)
     {
+      bool instanceIsAllowed = true;
+      if (m_SuggestionHelper.IsNotNull())
+      {
+        auto label = this->GetFirstSelectedLabelObject();
+        auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+        instanceIsAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, label->GetName());
+      }
+
       QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "Add label instance", this);
+      addInstanceAction->setEnabled(instanceIsAllowed);
       QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
       menu->addAction(addInstanceAction);
 
@@ -1041,7 +1068,16 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     {
       if (m_AllowLabelModification)
       {
+        bool instanceIsAllowed = true;
+        if (m_SuggestionHelper.IsNotNull())
+        {
+          auto label = this->GetFirstSelectedLabelObject();
+          auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+          instanceIsAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, label->GetName());
+        }
+
         QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "&Add label instance", this);
+        addInstanceAction->setEnabled(instanceIsAllowed);
         QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
         menu->addAction(addInstanceAction);
 
@@ -1469,7 +1505,6 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
       label->SetName(currentLabel->GetName());
       label->SetColor(currentLabel->GetColor());
       m_Segmentation->UpdateLookupTable(label->GetValue());
-      mitk::DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 
       // this is needed as workaround for (T27307). It circumvents the fact that modifications
       // of data (here the segmentation) does not directly trigger the modification of the

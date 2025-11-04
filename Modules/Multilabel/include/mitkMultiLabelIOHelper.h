@@ -193,8 +193,18 @@ namespace mitk
       return false;
     }
 
+    /**
+     * @brief Remove all meta properties from a label instance.
+     * Meta properties (indicated by a preceding "_" in the property name) are used to steer code logic e.g. in the case
+     * of label loading or suggestion handling. They are not to be used in concrete label instances.
+     * This method removes all meta properties form a label.
+     * @param label Pointer to the label instance that should be stripped of its labels.
+    */
+    static void RemoveMetaPropertiesFromLabel(Label* label);
+
+
   private:
-    MultiLabelIOHelper();
+    MultiLabelIOHelper() = delete;
   };
 }
 

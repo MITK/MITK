@@ -262,8 +262,13 @@ std::string mitk::LabelSetImageHelper::CreateDisplayLabelName(const MultiLabelSe
     labelName = "Unnamed";
 
   if (nullptr != labelSetImage &&
-      labelSetImage->GetLabelValuesByName(labelSetImage->GetGroupIndexOfLabel(label->GetValue()), label->GetName()).size() > 1)
-    labelName += " [" + label->GetTrackingID() + ']';
+    labelSetImage->GetLabelValuesByName(labelSetImage->GetGroupIndexOfLabel(label->GetValue()), label->GetName()).size() > 1)
+  {
+    if (!label->GetTrackingID().empty())
+      labelName += " [ID: " + label->GetTrackingID() + ']';
+    else
+      labelName += " [" + std::to_string(label->GetValue()) + ']';
+  }
 
   return labelName;
 }

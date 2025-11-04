@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <mitkExceptionMacro.h>
 #include <mitkPropertyKeyPath.h>
+#include <mitkIPropertyProvider.h>
 
 #include <regex>
 
@@ -602,4 +603,57 @@ namespace mitk
 
     return nameStream.str();
   };
+
+
+  std::map<PropertyKeyPath::ItemSelectionIndex, std::string>
+    FindIndexedPropertyNames(const IPropertyProvider* provider, const PropertyKeyPath& path)
+  {
+    // Precondition: path must have exactly one AnySelection node
+    std::size_t anySelectionCount = 0;
+
+    for (std::size_t i = 0; i < path.GetSize(); ++i)
+    {
+      const auto& node = path.GetNode(i);
+      if (node.type == PropertyKeyPath::NodeInfo::NodeType::AnySelection)
+      {
+        anySelectionCount++;
+      }
+    }
+
+    if (anySelectionCount != 1)
+    {
+      mitkThrow() << "CountIndexedEntries requires exactly one AnySelection node in the path.";
+    }
+
+    std::map<PropertyKeyPath::ItemSelectionIndex, std::string> result;
+    auto propertyKeys = provider->GetPropertyKeys();
+
+    std::string regexPattern = PropertyKeyPathToPropertyRegEx(path);
+    std::regex indexRegex(regexPattern);
+
+    for (const auto& key : propertyKeys)
+    {
+      std::smatch match;
+      if (std::regex_match(key, match, indexRegex))
+      {
+        // The capture group index corresponds to the AnySelection position
+        // Regex captures are indexed starting at 1 (0 is the full match)
+        if (match.size() > 1)
+        {
+          try
+          {
+            PropertyKeyPath::ItemSelectionIndex index = std::stoull(match[1].str());
+            result[index] = key;
+          }
+          catch (const std::exception&)
+          {
+            // Skip invalid index entries
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
 } // namespace mitk

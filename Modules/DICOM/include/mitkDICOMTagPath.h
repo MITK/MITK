@@ -132,6 +132,26 @@ namespace mitk
 
     DICOMTagPath& operator = (const DICOMTagPath& path);
 
+    /** Concatenates two DICOM tag paths.
+    * \param [in] right The path to append to this path.
+    * \return A new DICOMTagPath containing all nodes from both paths.*/
+    DICOMTagPath operator + (const DICOMTagPath& right) const;
+
+    /** Concatenates two DICOM tag paths.
+    * \param [in] right The path to append to this path.
+    * \return A new DICOMTagPath containing all nodes from both paths.*/
+    DICOMTagPath operator + (const std::string& pathStr) const;
+
+    /** Appends another path to this path.
+    * \param [in] right The path to append.
+    * \return Reference to this path.*/
+    DICOMTagPath& operator += (const DICOMTagPath& right);
+
+    /** Appends a string representation of a path to this path.
+    * \param [in] pathStr String representation of a path to append.
+    * \return Reference to this path.*/
+    DICOMTagPath& operator += (const std::string& pathStr);
+
     DICOMTagPath& AddAnyElement();
     DICOMTagPath& AddElement(unsigned int group, unsigned int element);
     DICOMTagPath& AddAnySelection(unsigned int group, unsigned int element);
@@ -156,6 +176,12 @@ namespace mitk
 
   MITKDICOM_EXPORT std::ostream& operator<<(std::ostream& os, const DICOMTagPath& path);
 
+  /** Concatenates a string with a DICOM tag path (reverse order).
+  * \param [in] pathStr String representation of a path.
+  * \param [in] right The DICOMTagPath to append.
+  * \return A new DICOMTagPath with the concatenated result.*/
+  MITKDICOM_EXPORT DICOMTagPath operator + (const std::string& pathStr, const DICOMTagPath& right);
+
   MITKDICOM_EXPORT std::string DICOMTagPathToPropertyRegEx(const DICOMTagPath& tagPath);
   MITKDICOM_EXPORT std::string DICOMTagPathToPersistenceKeyRegEx(const DICOMTagPath& tagPath);
   MITKDICOM_EXPORT std::string DICOMTagPathToPersistenceKeyTemplate(const DICOMTagPath& tagPath);
@@ -169,8 +195,21 @@ namespace mitk
   /** Converts the passed property name into a tag path. If the property name cannot be converted
    into a valid path, the returned path is empty.*/
   MITKDICOM_EXPORT DICOMTagPath PropertyNameToDICOMTagPath(const std::string& propertyName);
+
   /** returns the correct property name for a given DICOMTagPath instance. */
   MITKDICOM_EXPORT std::string DICOMTagPathToPropertyName(const DICOMTagPath& tagPath);
+
+  /** Converts a DICOM tag path to a human-readable description.
+   * This function uses DCMTK/GDCM dictionaries to resolve tag names.
+   * For sequences, it shows the hierarchy with proper descriptions.
+   * \param [in] tagPath The path to convert.
+   * \param [in] includeTagNumbers If true, includes tag numbers in format "Name (GGGG,EEEE)".
+   * \return A human-readable string describing the path.
+   * Example: "Patient Name" or "Referenced Study Sequence[0].Study Instance UID"
+   */
+  MITKDICOM_EXPORT std::string DICOMTagPathToReadableName(
+    const DICOMTagPath& tagPath,
+    bool includeTagNumbers = false);
 }
 
 #endif

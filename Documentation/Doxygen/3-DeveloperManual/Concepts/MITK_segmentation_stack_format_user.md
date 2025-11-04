@@ -91,7 +91,7 @@ Each label includes visual and semantic metadata, and optionally its own image f
   "value": 1,
   "_file": "./Label_1.nii.gz",
   "_file_value": 1,
-  "color": [1.0, 0.0, 0.0],
+  "color": [255, 0, 0],
   "opacity": 0.6,
   "locked": true,
   "visible": true,
@@ -109,13 +109,15 @@ Each label includes visual and semantic metadata, and optionally its own image f
 | `value`        | ✅        | Unique label value (*it hase to be unique for the whole segmentation not just the group!*) |
 | `_file`         | ❌        | Path to binary label image                             |
 | `_file_value`   | ❌        | Voxel value in the image to map to/form `value` on import/export            |
-| `color`        | ✅        | Controls UI color — RGB values `[r, g, b]` (0.0–1.0). When stored as DICOM this will be mapped into the tag `Recommended Display CIELab Value (0062,000D)` |
-| `opacity`      | ✅        | Opacity (0.0–1.0)                                      |
-| `locked`       | ✅        | Controls UI editability — `true` disables editing   |
-| `visible`      | ✅        | Visibility in the UI                                   |
-| `tracking_id`  | ✅        | Tracking ID (string or number). When stored as DICOM this will be mapped into the tag `TrackingID (0062,0020)` |
-| `tracking_uid` | ❌        | Optional unique identifier. When stored as DICOM this will be mapped into the tag `TrackingUID (0062,0021)` |
+| `color`        |  ❌        | Controls UI color — RGB values `[r, g, b]` If encoded as unsigned int, the value range per channel is 0–255. If encoded as float, the value range per channel is 0.0–1.0. If encoded as float the value range per channel is 0.0–1.0. Default is [1.,1.,1.] if not set. When stored as DICOM this will be mapped into the tag `Recommended Display CIELab Value (0062,000D)` |
+| `opacity`      | ❌        | Opacity; default is 1 (0.0–1.0)                                      |
+| `locked`       | ❌        | Controls UI editability — `true` disables editing   |
+| `visible`      | ❌        | Visibility in the UI                                   |
+| `tracking_id`  | ❌        | Tracking ID (string or number). If not set, the value will be assumed as ID. When stored as DICOM this will be mapped into the tag `TrackingID (0062,0020)` |
+| `tracking_uid` | ❌        | Optional unique identifier. If not set, the value will be assumed as UID. When stored as DICOM this will be mapped into the tag `TrackingUID (0062,0021)` |
 | `description`  | ❌        | Optional user description. When stored as DICOM this will be mapped into the tag `Segment Description (0062,0006)` |
+| `algorithm_type`  | ❌        | Optional type specification of the algorithm(s) used for the label. Allowed strings: "MANUAL", "SEMIAUTOMATIC" and "AUTOMATIC". When stored as DICOM this will be mapped into the tag `Algorithm Type (0062,0008)` |
+| `algorithm_name`  | ❌        | Optional descriptiv string of the algorithms used for the label. If more then one algorithm was used the names are seperated by "|". When stored as DICOM this will be mapped into the tag `Algorithm Type (0062,0009)` |
 | *(any)*        | ❌        | Custom label properties (e.g., DICOM metadata, flags)  |
 
 ### Meta keys/properties
@@ -171,10 +173,10 @@ For simplicity/readablility reasons simple types are directly stored as simple k
 
 Supported types:
 
-- Strings
-- Integers
-- Floats
-- Booleans
+- String
+- Integer
+- Float
+- Boolean
 - Structured properties (e.g. `TemporoSpatialStringProperty`)
 
 Unknown or unsupported types may cause import failure if not handled correctly.
@@ -220,11 +222,10 @@ A mixed segmentation stack may contain:
           "name": "Bone",
           "value": 1,
           "_file": "./BoneMask.nii.gz",
-          "color": [0.8, 0.1, 0.1],
+          "color": [200, 200, 200],
           "locked": true,
           "visible": true,
           "opacity": 0.6,
-          "tracking_id": "1"
         },
         {
           "name": "Muscle",

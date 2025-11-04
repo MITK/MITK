@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkITKEventObserverGuard.h>
 #include <mitkIRenderWindowPartListener.h>
+#include <mitkLabelSetImageHelper.h>
 
 /**
 * @brief The segmentation view provides a set of tool to use different segmentation algorithms.
@@ -106,6 +107,8 @@ private:
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
+  void UpdateLabelSuggestions();
+
   void OnPreferencesChanged(const mitk::IPreferences* prefs) override;
 
   void NodeAdded(const mitk::DataNode* node) override;
@@ -131,6 +134,10 @@ private:
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
 
   void UpdateGUI();
+
+  QString CheckForWarnings() const;
+
+  void UpdateControlsOnLabelChanges();
 
   void ValidateSelectionInput();
 
@@ -171,6 +178,8 @@ private:
   mitk::ITKEventObserverGuard m_LabelAddedObserver;
   mitk::ITKEventObserverGuard m_LabelRemovedObserver;
   mitk::ITKEventObserverGuard m_GroupRemovedObserver;
+
+  mitk::LabelSuggestionHelper::Pointer m_LabelSuggestionHelper;
 };
 
 #endif

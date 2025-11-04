@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <org_mitk_gui_qt_segmentation_Export.h>
 
 #include <mitkColorProperty.h>
+#include <mitkLabelSetImage.h>
 
 #include <vector>
 #include <utility>
@@ -23,12 +24,6 @@ found in the LICENSE file.
 #include <QColor>
 #include <QDialog>
 #include <QString>
-
-namespace mitk
-{
-  class MultiLabelSegmentation;
-  class Label;
-}
 
 namespace Ui
 {
@@ -42,9 +37,7 @@ class MITK_QT_SEGMENTATION QmitkNewSegmentationDialog : public QDialog
   Q_OBJECT
 
 public:
-  using SuggestionsType = std::vector<std::pair<QString, QColor>>;
-
-  enum Mode
+  enum class Mode
   {
     NewLabel,
     RenameLabel
@@ -55,36 +48,54 @@ public:
    * In NewLabel mode it is assumed that the label has not yet been added, hence for example a look-up table update is not done.
    * In RenameLabel mode the segmentation (if provided) is updated.
    */
-  static bool DoRenameLabel(mitk::Label* label, mitk::MultiLabelSegmentation* segmentation, QWidget* parent = nullptr, Mode mode = NewLabel);
+  static bool DoRenameLabel(mitk::Label* label, mitk::MultiLabelSegmentation* segmentation, QWidget* parent = nullptr, Mode mode = Mode::NewLabel);
 
-  explicit QmitkNewSegmentationDialog(QWidget *parent = nullptr, mitk::MultiLabelSegmentation* labelSetImage = nullptr, Mode mode = NewLabel);
+  explicit QmitkNewSegmentationDialog(const mitk::MultiLabelSegmentation* labelSetImage,
+    const mitk::Label* label = nullptr, Mode mode = Mode::NewLabel, QWidget* parent = nullptr);
   ~QmitkNewSegmentationDialog() override;
 
   QString GetName() const;
   mitk::Color GetColor() const;
+  const mitk::Label* GetSuggestion() const;
 
-  void SetName(const QString& name);
-  void SetColor(const mitk::Color& color);
-
-private:
+private slots:
   void OnAccept();
   void OnFinished(int result);
   void OnSuggestionSelected();
+  void OnSuggestionDoubleClicked();
   void OnColorButtonClicked();
-  void OnTextEdited(const QString& text);
+  void OnNameEdited(const QString& text);
+  void OnFilterEdited(const QString& text);
+  void OnFilterClearClicked();
+  void OnAutoFilterToggled(bool checked);
 
-  void SetSuggestions(const SuggestionsType& suggestions, bool replaceStandardSuggestions = false);
+private:
+  void InitializeDialog();
+  void SetupConnections();
+  void LoadAndApplyPreferences();
+  void UpdateUI();
   void UpdateColorButtonBackground();
   void UpdateNameList();
+  void UpdateSuggestionInfo();
+  void UpdateOKButton();
+  void UpdateControlStates();
+  void ApplyFilter(const QString& filterText);
+  void SelectSuggestionByName(const QString& name);
+  bool TryPreselectMatchingSuggestion(const QString& name);
+  bool GetAutoFilter() const;
 
   Ui::QmitkNewSegmentationDialog* m_Ui;
 
-  bool m_SuggestOnce;
+  Mode m_Mode;
+  bool m_EnforceSuggestions;
 
-  QString m_Name;
+  mitk::MultiLabelSegmentation::ConstLabelVectorType m_Suggestions;
+  mitk::Label::Pointer m_Suggestion;
   QColor m_Color;
+  QString m_Name;
 
-  SuggestionsType m_Suggestions;
+  int m_TotalSuggestions;
+  int m_VisibleSuggestions;
 };
 
 #endif

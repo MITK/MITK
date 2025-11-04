@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <usServiceEvent.h>
 
 #include "mitkDICOMSegmentationIO.h"
-#include <mitkDICOMTagsOfInterestAddHelper.h>
 
 #include <mitkDICOMSegIOMimeTypes.h>
 
@@ -29,7 +28,6 @@ namespace mitk
   class DICOMQIIOActivator : public us::ModuleActivator
   {
     std::vector<AbstractFileIO *> m_FileIOs;
-    DICOMTagsOfInterestAddHelper m_TagHelper;
 
   public:
     void Load(us::ModuleContext * context) override
@@ -47,9 +45,6 @@ namespace mitk
       }
 
       m_FileIOs.push_back(new DICOMSegmentationIO());
-
-      DICOMTagsOfInterestAddHelper::TagsOfInterestVector tags = DICOMSegmentationIO::GetDICOMTagsOfInterest();
-      m_TagHelper.Activate(context, tags);
     }
 
     void Unload(us::ModuleContext *) override
@@ -58,7 +53,6 @@ namespace mitk
       {
         delete elem;
       }
-      m_TagHelper.Deactivate();
     }
   };
 }

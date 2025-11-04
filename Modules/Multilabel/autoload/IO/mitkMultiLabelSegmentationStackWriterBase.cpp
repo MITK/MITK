@@ -28,7 +28,7 @@ namespace
   constexpr const char* OPTION_INSTANCE_VALUE = "Instance value";
   constexpr const char* OPTION_INSTANCE_VALUE_BINARY = "binary";
   constexpr const char* OPTION_INSTANCE_VALUE_ORIGINAL = "original";
-  constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 3;
+  constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 4;
 }
 
 namespace mitk

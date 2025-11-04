@@ -65,16 +65,18 @@ namespace mitk
 
     enum class MergeStyle
     {
-      Replace, //The old label content of a label value will be replaced by its new label content.
-      //Therefore pixels that are labeled might become unlabeled again.
-      //(This means that a lock of the value is also ignored).
-      Merge //The union of old and new label content will be generated.
+      Replace, /**<The old label content of a label value will be replaced by its new label content.
+      Therefore pixels that are labeled might become unlabeled again.
+      (This means that a lock of the value is also ignored).*/
+      Merge /**<The union of old and new label content will be generated.*/
     };
 
     enum class OverwriteStyle
     {
-      RegardLocks, //Locked labels in the same spatial group will not be overwritten/changed.
-      IgnoreLocks //Label locks in the same spatial group will be ignored, so these labels might be changed.
+      ///Locked labels in the same spatial group will not be overwritten/changed.
+      RegardLocks,
+      ///Label locks in the same spatial group will be ignored, so these labels might be changed.
+      IgnoreLocks
     };
 
     /**
@@ -159,6 +161,17 @@ namespace mitk
     * @pre Indicated label value must exist.
     */
     void RenameLabel(LabelValueType labelValue, const std::string& name, const Color& color);
+
+    /** \brief allows to update the properties of a certain label
+    * If a property exists in the destination label only the value will be
+    * updated (therefor observers and pointers stay valid). If the property
+    * does not exist, it will be cloned and added. No properties will be removed.
+    * @param labelValue Value of the label that should be changed
+    * @param templateLabel Instance that provides the new property values.
+    * @pre Indicated label value must exist.
+    * @pre templateLabel must point to a valid instance.
+    */
+    void UpdateLabel(LabelValueType labelValue, const Label* templateLabel);
 
     /**
      * @brief Removes the label with the given value.
@@ -359,6 +372,13 @@ namespace mitk
      * @pre group index must exist.
      */
     const LabelValueVectorType GetLabelValuesByGroup(GroupIndexType index) const;
+
+    /**
+     * @brief Returns a vector of all label values of the segmentation having a certain name.
+     * @param name Name of the label instances one is looking for.
+     * @return the respective vector of label values.
+     */
+    const LabelValueVectorType GetLabelValuesByName(const std::string_view name) const;
 
     /**
      * @brief Returns a vector of all label values located on the specified group having a certain name.

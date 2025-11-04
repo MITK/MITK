@@ -29,41 +29,219 @@ namespace
 {
   std::string EnsureExtension(const std::string& filename)
   {
-    const std::string extension = ".lsetp";
+    const std::string extension = ".mitklabel.json";
 
     if (filename.size() < extension.size() || std::string::npos == filename.find(extension, filename.size() - extension.size()))
       return filename + extension;
 
     return filename;
   }
+
+  bool LoadLegacyLabelSetImagePreset(const std::string& presetFilename,
+    mitk::MultiLabelSegmentation* inputImage)
+  {
+    if (nullptr == inputImage)
+      return false;
+
+    const auto filename = EnsureExtension(presetFilename);
+
+    tinyxml2::XMLDocument xmlDocument;
+
+    if (tinyxml2::XML_SUCCESS != xmlDocument.LoadFile(filename.c_str()))
+    {
+      MITK_WARN << "Label set preset file \"" << filename << "\" does not exist or cannot be opened";
+      return false;
+    }
+
+    auto* rootElement = xmlDocument.FirstChildElement("LabelSetImagePreset");
+
+    if (nullptr == rootElement)
+    {
+      MITK_WARN << "Not a valid Label set preset";
+      return false;
+    }
+
+    auto activeLabelBackup = inputImage->GetActiveLabel();
+
+    int numberOfLayers = 0;
+    rootElement->QueryIntAttribute("layers", &numberOfLayers);
+
+    auto* layerElement = rootElement->FirstChildElement("Layer");
+
+    if (nullptr == layerElement)
+    {
+      MITK_WARN << "Label set preset does not contain any layers";
+      return false;
+    }
+
+    for (int layerIndex = 0; layerIndex < numberOfLayers; layerIndex++)
+    {
+      int numberOfLabels = 0;
+      layerElement->QueryIntAttribute("labels", &numberOfLabels);
+
+      if (!inputImage->ExistGroup(layerIndex))
+      {
+        while (!inputImage->ExistGroup(layerIndex))
+        {
+          inputImage->AddGroup();
+        }
+      }
+
+      auto* labelElement = layerElement->FirstChildElement("Label");
+
+      if (nullptr == labelElement)
+        continue;
+
+      for (int labelIndex = 0; labelIndex < numberOfLabels; labelIndex++)
+      {
+        auto label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElement);
+        const auto labelValue = label->GetValue();
+
+        if (mitk::MultiLabelSegmentation::UNLABELED_VALUE != labelValue)
+        {
+          if (inputImage->ExistLabel(labelValue))
+          {
+            // Override existing label with label from preset
+            auto alreadyExistingLabel = inputImage->GetLabel(labelValue);
+            alreadyExistingLabel->ConcatenatePropertyList(label);
+            inputImage->UpdateLookupTable(labelValue);
+          }
+          else
+          {
+            inputImage->AddLabel(label, layerIndex, false);
+          }
+        }
+
+        labelElement = labelElement->NextSiblingElement("Label");
+
+        if (nullptr == labelElement)
+          continue;
+      }
+
+      layerElement = layerElement->NextSiblingElement("Layer");
+
+      if (nullptr == layerElement)
+        continue;
+    }
+
+    if (nullptr != activeLabelBackup)
+    {
+      inputImage->SetActiveLabel(activeLabelBackup->GetValue());
+    }
+    else if (inputImage->GetTotalNumberOfLabels() > 0)
+    {
+      inputImage->SetActiveLabel(inputImage->GetAllLabelValues().front());
+    }
+
+    return true;
+  }
+
+
+  bool LoadNewJSONPreset(const std::string& presetFilename,
+    mitk::MultiLabelSegmentation* inputImage)
+  {
+    if (nullptr == inputImage)
+      return false;
+
+    std::ifstream input(presetFilename);
+    if (!input.is_open())
+    {
+      return false;
+    }
+
+    nlohmann::json fileContent;
+    try
+    {
+      input >> fileContent;
+    }
+    catch (const nlohmann::json::parse_error& e)
+    {
+      mitkThrow() << "Cannot reader data due to parsing error. Parse error: " << e.what() << '\n';
+    }
+
+    //check version
+    int version = 0;
+
+    if (!mitk::MultiLabelIOHelper::GetValueFromJson<int>(fileContent, "version", version))
+    {
+      MITK_WARN << "Preset has unknown version. Assuming that it can be read. Result might be invalid.";
+    }
+    else
+    {
+      const int MULTILABEL_SEGMENTATION_VERSION_VALUE = 4;
+      if (version > MULTILABEL_SEGMENTATION_VERSION_VALUE)
+      {
+        mitkThrow() << "Preset to read has unsupported version. Software is to old to ensure correct reading. Please use a compatible version of MITK or store data in another format. Version of data: " << version << "; Supported versions up to: " << MULTILABEL_SEGMENTATION_VERSION_VALUE;
+      }
+    }
+
+    auto groupInfos = mitk::MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(fileContent["groups"]);
+
+    mitk::MultiLabelSegmentation::GroupIndexType groupIndex = 0;
+    for (const auto& groupInfo : groupInfos)
+    {
+      auto cleanedLabels = mitk::MultiLabelIOHelper::CreateCleanLabels(groupInfo.labels);
+
+      if (inputImage->ExistGroup(groupIndex))
+      { //group exists so update name and labels
+        inputImage->SetGroupName(groupIndex, groupInfo.name);
+
+        for (auto label : cleanedLabels)
+        {
+          if (mitk::MultiLabelSegmentation::UNLABELED_VALUE != label->GetValue())
+          {
+            if (inputImage->ExistLabel(label->GetValue()))
+            {
+              // Override existing label with label from preset
+              auto alreadyExistingLabel = inputImage->GetLabel(label->GetValue());
+              alreadyExistingLabel->Update(label);
+              inputImage->UpdateLookupTable(label->GetValue());
+            }
+            else
+            {
+              inputImage->AddLabel(label, groupIndex, false, false);
+            }
+          }
+        }
+      }
+      else
+      { //add new group
+        inputImage->AddGroup(mitk::MultiLabelSegmentation::ConvertLabelVectorConst(cleanedLabels));
+        inputImage->SetGroupName(groupIndex, groupInfo.name);
+      }
+
+      groupIndex++;
+    }
+
+    return true;
+  }
 }
 
 bool mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(const std::string &presetFilename,
-                                                     const mitk::MultiLabelSegmentation *inputImage)
+                                                     const mitk::MultiLabelSegmentation* input)
 {
+  if (nullptr == input)
+    return false;
+
   const auto filename = EnsureExtension(presetFilename);
 
-  tinyxml2::XMLDocument xmlDocument;
-  xmlDocument.InsertEndChild(xmlDocument.NewDeclaration());
+  int MULTILABEL_SEGMENTATION_VERSION_VALUE = 4;
+  nlohmann::json stackContent;
+  stackContent["version"] = MULTILABEL_SEGMENTATION_VERSION_VALUE;
+  stackContent["type"] = "org.mitk.multilabel.segmentation.preset";
+  stackContent["groups"] = MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(input);
 
-  auto *rootElement = xmlDocument.NewElement("LabelSetImagePreset");
-  rootElement->SetAttribute("layers", inputImage->GetNumberOfGroups());
-  xmlDocument.InsertEndChild(rootElement);
-
-  for (unsigned int layerIndex = 0; layerIndex < inputImage->GetNumberOfGroups(); layerIndex++)
+  std::ofstream file(filename);
+  if (file.is_open())
   {
-    auto *layerElement = xmlDocument.NewElement("Layer");
-    layerElement->SetAttribute("index", layerIndex);
-    layerElement->SetAttribute("labels", inputImage->GetNumberOfLabels(layerIndex));
-    rootElement->InsertEndChild(layerElement);
-
-    auto labelsInGroup = inputImage->GetConstLabelsByValue(inputImage->GetLabelValuesByGroup(layerIndex));
-
-    for (const auto& label : labelsInGroup)
-      layerElement->InsertEndChild(MultiLabelIOHelper::GetLabelAsXMLElement(xmlDocument, label));
+    file << std::setw(4) << stackContent << std::endl;
+  }
+  else
+  {
+    mitkThrow() << "Cannot write meta data. Cannot open file: " << filename;
   }
 
-  return tinyxml2::XML_SUCCESS == xmlDocument.SaveFile(filename.c_str());
+  return true;
 }
 
 bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &presetFilename,
@@ -72,94 +250,21 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
   if (nullptr == inputImage)
     return false;
 
-  const auto filename = EnsureExtension(presetFilename);
-
-  tinyxml2::XMLDocument xmlDocument;
-
-  if (tinyxml2::XML_SUCCESS != xmlDocument.LoadFile(filename.c_str()))
+  //first try new format
+  bool result = false;
+  try
   {
-    MITK_WARN << "Label set preset file \"" << filename << "\" does not exist or cannot be opened";
-    return false;
+    result = LoadNewJSONPreset(presetFilename, inputImage);
+  }
+  catch (Exception& e)
+  {
+    MITK_INFO << "Loading of multi label preset as JSON failed. Reason: " <<e.what();
   }
 
-  auto *rootElement = xmlDocument.FirstChildElement("LabelSetImagePreset");
-
-  if (nullptr == rootElement)
-  {
-    MITK_WARN << "Not a valid Label set preset";
-    return false;
-  }
-
-  auto activeLabelBackup = inputImage->GetActiveLabel();
-
-  int numberOfLayers = 0;
-  rootElement->QueryIntAttribute("layers", &numberOfLayers);
-
-  auto* layerElement = rootElement->FirstChildElement("Layer");
-
-  if (nullptr == layerElement)
-  {
-    MITK_WARN << "Label set preset does not contain any layers";
-    return false;
-  }
-
-  for (int layerIndex = 0; layerIndex < numberOfLayers; layerIndex++)
-  {
-    int numberOfLabels = 0;
-    layerElement->QueryIntAttribute("labels", &numberOfLabels);
-
-    if (!inputImage->ExistGroup(layerIndex))
-    {
-      while (!inputImage->ExistGroup(layerIndex))
-      {
-        inputImage->AddGroup();
-      }
-    }
-
-    auto *labelElement = layerElement->FirstChildElement("Label");
-
-    if (nullptr == labelElement)
-      continue;
-
-    for (int labelIndex = 0; labelIndex < numberOfLabels; labelIndex++)
-    {
-      auto label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElement);
-      const auto labelValue = label->GetValue();
-
-      if (MultiLabelSegmentation::UNLABELED_VALUE != labelValue)
-      {
-        if (inputImage->ExistLabel(labelValue))
-        {
-          // Override existing label with label from preset
-          auto alreadyExistingLabel = inputImage->GetLabel(labelValue);
-          alreadyExistingLabel->ConcatenatePropertyList(label);
-          inputImage->UpdateLookupTable(labelValue);
-        }
-        else
-        {
-          inputImage->AddLabel(label, layerIndex, false);
-        }
-      }
-
-      labelElement = labelElement->NextSiblingElement("Label");
-
-      if (nullptr == labelElement)
-        continue;
-    }
-
-    layerElement = layerElement->NextSiblingElement("Layer");
-
-    if (nullptr == layerElement)
-      continue;
-  }
-
-  if (nullptr != activeLabelBackup)
-  {
-    inputImage->SetActiveLabel(activeLabelBackup->GetValue());
-  }
-  else if (inputImage->GetTotalNumberOfLabels() > 0)
-  {
-    inputImage->SetActiveLabel(inputImage->GetAllLabelValues().front());
+  if (!result)
+  { // try to load with legacy format
+    MITK_INFO << "Try to load as legacy xml preset.";
+    return LoadLegacyLabelSetImagePreset(presetFilename, inputImage);
   }
 
   return true;

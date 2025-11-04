@@ -22,8 +22,8 @@ void QmitkSaveMultiLabelPreset(const mitk::MultiLabelSegmentation* segmentation)
   if (nullptr == segmentation)
     mitkThrow() << "Invalid call of QmitkSaveMultiLabelPreset. Passed image is a null pointer.";
 
-  const auto filename = QFileDialog::getSaveFileName(nullptr, QStringLiteral("Save Label Set Preset"),
-    QString(), QStringLiteral("Label set preset (*.lsetp)")).toStdString();
+  const auto filename = QFileDialog::getSaveFileName(nullptr, QStringLiteral("Save Multi Label Preset"),
+    QString(), QStringLiteral("Multi label definition (*.mitklabel.json)")).toStdString();
 
   if (filename.empty())
     return;
@@ -37,8 +37,8 @@ void QmitkSaveMultiLabelPreset(const mitk::MultiLabelSegmentation* segmentation)
 
 void QmitkLoadMultiLabelPreset(const std::vector<mitk::MultiLabelSegmentation::Pointer>& segmentations)
 {
-  const auto filename = QFileDialog::getOpenFileName(nullptr, QStringLiteral("Load Label Set Preset"),
-    QString(), QStringLiteral("Label set preset (*.lsetp)")).toStdString();
+  const auto filename = QFileDialog::getOpenFileName(nullptr, QStringLiteral("Load Multi Label Preset"),
+    QString(), QStringLiteral("Multi label definition (*.mitklabel.json);;Legacy label set preset (*.lsetp)")).toStdString();
 
   if (filename.empty())
     return;

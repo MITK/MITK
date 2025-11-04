@@ -253,14 +253,24 @@ namespace mitk
 
   LabelSuggestionHelper::Preferences LabelSuggestionHelper::GetSuggestionPreferences()
   {
-    auto* nodePrefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+    auto prefService = mitk::CoreServices::GetPreferencesService();
 
     Preferences prefs;
 
-    prefs.labelSuggestionFile = nodePrefs->Get("label suggestions", "");
-    prefs.replaceStandardSuggestions = nodePrefs->GetBool("replace standard suggestions", true);
-    prefs.enforceSuggestions = nodePrefs->GetBool("enforce suggestions", false);
-    prefs.suggestionOnce = nodePrefs->GetBool("suggest once", true);
+    if (nullptr != prefService)
+    {
+      auto systemPref = prefService->GetSystemPreferences();
+      if (nullptr != systemPref)
+      {
+        auto* nodePrefs = systemPref->Node("/org.mitk.views.segmentation");
+
+
+        prefs.labelSuggestionFile = nodePrefs->Get("label suggestions", "");
+        prefs.replaceStandardSuggestions = nodePrefs->GetBool("replace standard suggestions", true);
+        prefs.enforceSuggestions = nodePrefs->GetBool("enforce suggestions", false);
+        prefs.suggestionOnce = nodePrefs->GetBool("suggest once", true);
+      }
+    }
 
     return prefs;
   }

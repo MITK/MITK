@@ -411,7 +411,7 @@ void mitk::Label::SetAlgorithmName(const std::string& algoName)
     property->SetValue(algoName);
   else
     // Create new Property
-    SetStringProperty("algorithm_type", algoName.c_str());
+    SetStringProperty("algorithm_name", algoName.c_str());
 }
 
 std::string mitk::Label::GetAlgorithmName() const
@@ -432,10 +432,10 @@ void mitk::Label::AddToolUse(AlgorithmType algoType, const std::string& algoName
     this->SetAlgorithmType(AlgorithmType::SEMIAUTOMATIC);
 
   auto pos = currentName.find(algoName);
-  if (pos != std::string::npos)
+  if (pos == std::string::npos)
   {
     if (!currentName.empty())
-      currentName += " | ";
+      currentName += "|";
     currentName += algoName;
     this->SetAlgorithmName(currentName);
   }

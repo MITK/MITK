@@ -236,7 +236,7 @@ namespace
     for (const auto& groupInfo : groupInfos)
     {
       auto groupImage = LoadImageBasedOnFileProperty(groupInfo.properties, filePathBase);
-      auto cleanedLabels = MultiLabelSegmentation::ConvertLabelVectorConst(MultiLabelIOHelper::CreateCleanLabels(groupInfo.labels));
+      auto cleanedLabels = MultiLabelSegmentation::ConvertLabelVectorConst(MultiLabelIOHelper::CloneLabelsWithoutMetaProperties(groupInfo.labels));
 
       if (!segInitialized)
       {

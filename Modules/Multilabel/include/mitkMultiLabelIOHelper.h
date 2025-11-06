@@ -210,7 +210,7 @@ namespace mitk
      * This method clones all passed labels and removes all meta properties form the clones.
      * @param labels Vector with all labels that should be cloned and cleaned.
     */
-    static LabelVector CreateCleanLabels(const LabelVector& labels);
+    static LabelVector CloneLabelsWithoutMetaProperties(const LabelVector& labels);
 
   private:
     MultiLabelIOHelper() = delete;

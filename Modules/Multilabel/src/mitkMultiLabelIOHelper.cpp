@@ -27,29 +27,17 @@ found in the LICENSE file.
 
 namespace
 {
-  std::string EnsureExtension(const std::string& filename)
-  {
-    const std::string extension = ".mitklabel.json";
-
-    if (filename.size() < extension.size() || std::string::npos == filename.find(extension, filename.size() - extension.size()))
-      return filename + extension;
-
-    return filename;
-  }
-
   bool LoadLegacyLabelSetImagePreset(const std::string& presetFilename,
     mitk::MultiLabelSegmentation* inputImage)
   {
     if (nullptr == inputImage)
       return false;
 
-    const auto filename = EnsureExtension(presetFilename);
-
     tinyxml2::XMLDocument xmlDocument;
 
-    if (tinyxml2::XML_SUCCESS != xmlDocument.LoadFile(filename.c_str()))
+    if (tinyxml2::XML_SUCCESS != xmlDocument.LoadFile(presetFilename.c_str()))
     {
-      MITK_WARN << "Label set preset file \"" << filename << "\" does not exist or cannot be opened";
+      MITK_WARN << "Label set preset file \"" << presetFilename << "\" does not exist or cannot be opened";
       return false;
     }
 
@@ -99,7 +87,7 @@ namespace
 
         if (mitk::MultiLabelSegmentation::UNLABELED_VALUE != labelValue)
         {
-          if (inputImage->ExistLabel(labelValue))
+          if (inputImage->ExistLabel(labelValue, layerIndex))
           {
             // Override existing label with label from preset
             auto alreadyExistingLabel = inputImage->GetLabel(labelValue);
@@ -108,6 +96,10 @@ namespace
           }
           else
           {
+            if (inputImage->ExistLabel(labelValue))
+            { //label is the wrong group so we need to remove it there before adding it in its new form.
+              inputImage->RemoveLabel(labelValue);
+            }
             inputImage->AddLabel(label, layerIndex, false);
           }
         }
@@ -185,7 +177,7 @@ namespace
     mitk::MultiLabelSegmentation::GroupIndexType groupIndex = 0;
     for (const auto& groupInfo : groupInfos)
     {
-      auto cleanedLabels = mitk::MultiLabelIOHelper::CreateCleanLabels(groupInfo.labels);
+      auto cleanedLabels = mitk::MultiLabelIOHelper::CloneLabelsWithoutMetaProperties(groupInfo.labels);
 
       if (inputImage->ExistGroup(groupIndex))
       { //group exists so update name and labels
@@ -193,26 +185,33 @@ namespace
 
         for (auto label : cleanedLabels)
         {
-          if (mitk::MultiLabelSegmentation::UNLABELED_VALUE != label->GetValue())
+          if (inputImage->ExistLabel(label->GetValue(), groupIndex))
+          {
+            // Override existing label with label from preset
+            auto alreadyExistingLabel = inputImage->GetLabel(label->GetValue());
+            alreadyExistingLabel->Update(label);
+            inputImage->UpdateLookupTable(label->GetValue());
+          }
+          else
           {
             if (inputImage->ExistLabel(label->GetValue()))
-            {
-              // Override existing label with label from preset
-              auto alreadyExistingLabel = inputImage->GetLabel(label->GetValue());
-              alreadyExistingLabel->Update(label);
-              inputImage->UpdateLookupTable(label->GetValue());
+            { //label is the wrong group so we need to remove it there before adding it in its new form.
+              inputImage->RemoveLabel(label->GetValue());
             }
-            else
-            {
-              inputImage->AddLabel(label, groupIndex, false, false);
-            }
+            const bool adaptValue = label->GetValue() == mitk::Label::UNLABELED_VALUE ? true : false;
+            inputImage->AddLabel(label, groupIndex, false, adaptValue);
           }
         }
       }
       else
       { //add new group
-        inputImage->AddGroup(mitk::MultiLabelSegmentation::ConvertLabelVectorConst(cleanedLabels));
+        inputImage->AddGroup();
         inputImage->SetGroupName(groupIndex, groupInfo.name);
+        for (auto label : cleanedLabels)
+        {
+          const bool adaptValue = label->GetValue() == mitk::Label::UNLABELED_VALUE ? true : false;
+          inputImage->AddLabel(label, groupIndex, false, adaptValue);
+        }
       }
 
       groupIndex++;
@@ -228,22 +227,20 @@ bool mitk::MultiLabelIOHelper::SaveMultiLabelSegmentationPreset(const std::strin
   if (nullptr == input)
     return false;
 
-  const auto filename = EnsureExtension(presetFilename);
-
   int MULTILABEL_SEGMENTATION_VERSION_VALUE = 4;
   nlohmann::json stackContent;
   stackContent["version"] = MULTILABEL_SEGMENTATION_VERSION_VALUE;
   stackContent["type"] = "org.mitk.multilabel.segmentation.preset";
   stackContent["groups"] = MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(input);
 
-  std::ofstream file(filename);
+  std::ofstream file(presetFilename);
   if (file.is_open())
   {
     file << std::setw(4) << stackContent << std::endl;
   }
   else
   {
-    mitkThrow() << "Cannot write meta data. Cannot open file: " << filename;
+    mitkThrow() << "Cannot write meta data. Cannot open file: " << presetFilename;
   }
 
   return true;
@@ -888,7 +885,7 @@ void mitk::MultiLabelIOHelper::RemoveMetaPropertiesFromLabel(Label* label)
   }
 }
 
-mitk::LabelVector mitk::MultiLabelIOHelper::CreateCleanLabels(const LabelVector& labels)
+mitk::LabelVector mitk::MultiLabelIOHelper::CloneLabelsWithoutMetaProperties(const LabelVector& labels)
 {
   mitk::MultiLabelSegmentation::LabelVectorType result;
 

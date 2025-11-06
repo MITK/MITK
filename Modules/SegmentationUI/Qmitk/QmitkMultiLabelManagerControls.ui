@@ -215,7 +215,7 @@
      <item>
       <widget class="QToolButton" name="btnLoadPreset">
        <property name="toolTip">
-        <string>Load a label preset from file.</string>
+        <string>Load and applies a label preset from file.</string>
        </property>
        <property name="text">
         <string>...</string>

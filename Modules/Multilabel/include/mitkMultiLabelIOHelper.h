@@ -52,8 +52,8 @@ namespace mitk
   public:
     /**
      * @brief Saves the mitk::LabelSet configuration of inputImage to presetFilename.
-     * The preset is stored as "*.lsetp"
-     * @param presetFilename the filename including the filesystem path
+     * The preset is stored as "*.multilabel.json"
+     * @param presetFilename the filename including the file system path
      * @param inputImage the input image from which the preset should be generated
      * @return true if the serialization was successful and false otherwise
      */
@@ -62,7 +62,7 @@ namespace mitk
 
     /**
      * @brief Loads an existing preset for a mitk::MultiLabelSegmentation from presetFilename and applies it to inputImage
-     * @param presetFilename the filename of the preset including the filesystem path
+     * @param presetFilename the filename of the preset including the file system path
      * @param inputImage the image to which the loaded preset will be applied
      * @return true if the deserilization was successful and false otherwise
      */

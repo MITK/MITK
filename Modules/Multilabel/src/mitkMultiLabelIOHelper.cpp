@@ -217,7 +217,7 @@ namespace
   }
 }
 
-bool mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(const std::string &presetFilename,
+bool mitk::MultiLabelIOHelper::SaveMultiLabelSegmentationPreset(const std::string &presetFilename,
                                                      const mitk::MultiLabelSegmentation* input)
 {
   if (nullptr == input)
@@ -244,17 +244,17 @@ bool mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(const std::string &preset
   return true;
 }
 
-bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &presetFilename,
-                                                     mitk::MultiLabelSegmentation *inputImage)
+bool mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(const std::string &presetFilename,
+                                                     mitk::MultiLabelSegmentation *inputSegmentation)
 {
-  if (nullptr == inputImage)
+  if (nullptr == inputSegmentation)
     return false;
 
   //first try new format
   bool result = false;
   try
   {
-    result = LoadNewJSONPreset(presetFilename, inputImage);
+    result = LoadNewJSONPreset(presetFilename, inputSegmentation);
   }
   catch (Exception& e)
   {
@@ -264,7 +264,7 @@ bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &preset
   if (!result)
   { // try to load with legacy format
     MITK_INFO << "Try to load as legacy xml preset.";
-    return LoadLegacyLabelSetImagePreset(presetFilename, inputImage);
+    return LoadLegacyLabelSetImagePreset(presetFilename, inputSegmentation);
   }
 
   return true;

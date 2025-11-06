@@ -51,23 +51,24 @@ namespace mitk
   {
   public:
     /**
-     * @brief Saves the mitk::LabelSet configuration of inputImage to presetFilename.
+     * @brief Saves the mitk::LabelSet configuration of inputSegmentation to presetFilename.
      * The preset is stored as "*.multilabel.json"
      * @param presetFilename the filename including the file system path
-     * @param inputImage the input image from which the preset should be generated
+     * @param inputSegmentation the input image from which the preset should be generated
      * @return true if the serialization was successful and false otherwise
      */
-    static bool SaveLabelSetImagePreset(const std::string &presetFilename,
-                                        const mitk::MultiLabelSegmentation *inputImage);
+    static bool SaveMultiLabelSegmentationPreset(const std::string &presetFilename,
+                                        const mitk::MultiLabelSegmentation *inputSegmentation);
 
     /**
-     * @brief Loads an existing preset for a mitk::MultiLabelSegmentation from presetFilename and applies it to inputImage
+     * @brief Loads an existing preset for a mitk::MultiLabelSegmentation from presetFilename and applies it to inputSegmentation
+     * This functions supports the new format (.multilabel.json) and the legacy format (*.lpset)
      * @param presetFilename the filename of the preset including the file system path
-     * @param inputImage the image to which the loaded preset will be applied
+     * @param inputSegmentation the image to which the loaded preset will be applied
      * @return true if the deserilization was successful and false otherwise
      */
-    static bool LoadLabelSetImagePreset(const std::string &presetFilename,
-                                        mitk::MultiLabelSegmentation *inputImage);
+    static bool LoadMultiLabelSegementationPreset(const std::string &presetFilename,
+                                        mitk::MultiLabelSegmentation *inputSegmentation);
 
     /**
      * @brief Creates a mitk::Label from an XML element

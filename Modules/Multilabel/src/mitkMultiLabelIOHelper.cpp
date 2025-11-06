@@ -156,7 +156,7 @@ namespace
     }
     catch (const nlohmann::json::parse_error& e)
     {
-      mitkThrow() << "Cannot reader data due to parsing error. Parse error: " << e.what() << '\n';
+      mitkThrow() << "Cannot read data due to parsing error. Parse error: " << e.what() << '\n';
     }
 
     //check version
@@ -171,7 +171,12 @@ namespace
       const int MULTILABEL_SEGMENTATION_VERSION_VALUE = 4;
       if (version > MULTILABEL_SEGMENTATION_VERSION_VALUE)
       {
-        mitkThrow() << "Preset to read has unsupported version. Software is to old to ensure correct reading. Please use a compatible version of MITK or store data in another format. Version of data: " << version << "; Supported versions up to: " << MULTILABEL_SEGMENTATION_VERSION_VALUE;
+        mitkThrow() << "The preset you are trying to load has an unsupported version. "
+            << "This software is too old to ensure correct loading. "
+            << "Please use a compatible version of MITK or save the data in another format. "
+            << "Data version: " << version 
+            << "; supported versions up to: " << MULTILABEL_SEGMENTATION_VERSION_VALUE;
+
       }
     }
 

@@ -87,22 +87,8 @@ mitk::Label::Label() : PropertyList(), m_Value(UNLABELED_VALUE)
   if (GetProperty("opacity") == nullptr)
     SetOpacity(0.6);
 
-  if (GetProperty("center.coordinates") == nullptr)
-  {
-    mitk::Point3D pnt;
-    pnt.SetElement(0, 0);
-    pnt.SetElement(1, 0);
-    pnt.SetElement(2, 0);
-    SetCenterOfMassCoordinates(pnt);
-  }
-  if (GetProperty("center.index") == nullptr)
-  {
-    mitk::Point3D pnt;
-    pnt.SetElement(0, 0);
-    pnt.SetElement(1, 0);
-    pnt.SetElement(2, 0);
-    SetCenterOfMassIndex(pnt);
-  }
+  this->ResetCenterOfMass();
+
   if (GetProperty("color") == nullptr)
   {
     mitk::Color col;
@@ -340,6 +326,17 @@ void mitk::Label::SetCenterOfMassCoordinates(const mitk::Point3D &center)
     // Create new Property
     SetProperty("center.coordinates", mitk::Point3dProperty::New(center));
 }
+
+void mitk::Label::ResetCenterOfMass()
+{
+    mitk::Point3D pnt;
+    pnt.SetElement(0, 0);
+    pnt.SetElement(1, 0);
+    pnt.SetElement(2, 0);
+    SetCenterOfMassCoordinates(pnt);
+    SetCenterOfMassIndex(pnt);
+}
+
 
 mitk::Point3D mitk::Label::GetCenterOfMassCoordinates() const
 {

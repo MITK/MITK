@@ -514,6 +514,11 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
 
   m_ModelManipulationOngoing = true;
   auto newLabel = m_Segmentation->AddLabel(templateLabel, groupID, true);
+  //remove properties that where copied by the template but are instance specific
+  newLabel->ResetCenterOfMass();
+  newLabel->SetAlgorithmType(mitk::Label::AlgorithmType::Undefined);
+  newLabel->SetAlgorithmName("");
+
   m_Segmentation->SetActiveLabel(newLabel->GetValue());
   m_ModelManipulationOngoing = false;
 

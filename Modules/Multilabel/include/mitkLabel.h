@@ -128,6 +128,7 @@ namespace mitk
 
     void SetCenterOfMassCoordinates(const mitk::Point3D &center);
     mitk::Point3D GetCenterOfMassCoordinates() const;
+    void ResetCenterOfMass();
 
     void SetColor(const mitk::Color &);
     const mitk::Color &GetColor() const;

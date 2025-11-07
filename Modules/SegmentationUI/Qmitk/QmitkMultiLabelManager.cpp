@@ -33,14 +33,12 @@ found in the LICENSE file.
 #include <QLabel>
 #include <QWidgetAction>
 #include <QColorDialog>
-#include <QCompleter>
 #include <QDateTime>
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QShortcut>
-#include <QStringListModel>
 
 // itk
 #include <itksys/SystemTools.hxx>
@@ -49,28 +47,11 @@ found in the LICENSE file.
 
 
 QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
-  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelManagerControls), m_Completer(nullptr), m_ProcessingManualSelection(false), m_DataStorage(nullptr)
+  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelManagerControls), m_ProcessingManualSelection(false), m_DataStorage(nullptr)
 {
   m_Controls->setupUi(this);
 
-  m_Controls->labelSearchBox->setAlwaysShowClearIcon(true);
-  m_Controls->labelSearchBox->setShowSearchIcon(true);
-
-  QStringList completionList;
-  completionList << "";
-  m_Completer = new QCompleter(completionList, this);
-  m_Completer->setCaseSensitivity(Qt::CaseInsensitive);
-  m_Controls->labelSearchBox->setCompleter(m_Completer);
-
   m_Controls->labelInspector->SetAllowLabelModification(true);
-
-  connect(m_Controls->labelSearchBox, SIGNAL(returnPressed()), this, SLOT(OnSearchLabel()));
-
-  QStringListModel *completeModel = static_cast<QStringListModel *>(m_Completer->model());
-  completeModel->setStringList(GetLabelStringList());
-
-  // See T29549
-  m_Controls->labelSearchBox->hide();
 
   m_Controls->btnSavePreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
   m_Controls->btnLoadPreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg")));
@@ -231,61 +212,6 @@ void QmitkMultiLabelManager::SetLabelSuggestionHelper(const mitk::LabelSuggestio
   }
 }
 
-
-void QmitkMultiLabelManager::OnSearchLabel()
-{
-  //std::string text = m_Controls->labelSearchBox->text().toStdString();
-  //int pixelValue = -1;
-  //int row = -1;
-  //for (int i = 0; i < m_Controls->m_LabelSetTableWidget->rowCount(); ++i)
-  //{
-  //  if (m_Controls->m_LabelSetTableWidget->item(i, 0)->text().toStdString().compare(text) == 0)
-  //  {
-  //    pixelValue = m_Controls->m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt();
-  //    row = i;
-  //    break;
-  //  }
-  //}
-  //if (pixelValue == -1)
-  //{
-  //  return;
-  //}
-
-  //GetWorkingImage()->GetActiveLabelSet()->SetActiveLabel(pixelValue);
-
-  //QTableWidgetItem *nameItem = m_Controls->m_LabelSetTableWidget->item(row, NAME_COL);
-  //if (!nameItem)
-  //{
-  //  return;
-  //}
-
-  //m_Controls->m_LabelSetTableWidget->clearSelection();
-  //m_Controls->m_LabelSetTableWidget->selectRow(row);
-  //m_Controls->m_LabelSetTableWidget->scrollToItem(nameItem);
-
-  //GetWorkingImage()->GetActiveLabelSet()->SetActiveLabel(pixelValue);
-
-  //this->WaitCursorOn();
-  //mitk::Point3D pos =
-  //  GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetCenterOfMassCoordinates();
-
-  //m_ToolManager->WorkingDataChanged();
-
-  //if (pos.GetVnlVector().max_value() > 0.0)
-  //{
-  //  emit goToLabel(pos);
-  //}
-  //else
-  //{
-  //  GetWorkingImage()->UpdateCenterOfMass(pixelValue, GetWorkingImage()->GetActiveLayer());
-  //  mitk::Point3D pos =
-  //    GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetCenterOfMassCoordinates();
-  //  emit goToLabel(pos);
-  //}
-
-  //this->WaitCursorOff();
-}
-
 void QmitkMultiLabelManager::UpdateControls()
 {
   auto segmentation = this->GetMultiLabelSegmentation();
@@ -300,7 +226,6 @@ void QmitkMultiLabelManager::UpdateControls()
     instanceAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(segmentation, segmentation->GetLabel(labels.front())->GetName());
   }
 
-  m_Controls->labelSearchBox->setEnabled(hasWorkingData);
   m_Controls->btnAddGroup->setEnabled(hasWorkingData);
   m_Controls->btnAddInstance->setEnabled(hasWorkingData && labels.size()==1 && instanceAllowed);
   m_Controls->btnAddLabel->setEnabled(hasWorkingData);
@@ -312,9 +237,6 @@ void QmitkMultiLabelManager::UpdateControls()
 
   if (!hasWorkingData)
     return;
-
-  QStringListModel *completeModel = dynamic_cast<QStringListModel *>(m_Completer->model());
-  completeModel->setStringList(GetLabelStringList());
 }
 
 void QmitkMultiLabelManager::OnCreateCroppedMask(bool)

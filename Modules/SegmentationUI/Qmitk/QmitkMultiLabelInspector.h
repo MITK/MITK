@@ -26,6 +26,7 @@ found in the LICENSE file.
 class QmitkMultiLabelTreeModel;
 class QStyledItemDelegate;
 class QWidgetAction;
+class QCompleter;
 
 namespace Ui
 {
@@ -42,6 +43,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelInspector : public QWidget
 
 public:
   QmitkMultiLabelInspector(QWidget* parent = nullptr);
+
   ~QmitkMultiLabelInspector();
 
   bool GetMultiSelectionMode() const;
@@ -320,6 +322,9 @@ private Q_SLOTS:
   void OnEntered(const QModelIndex& index);
   void OnMouseLeave();
 
+  void OnSearchLabel();
+  void RefreshCompleter();
+
   QWidgetAction* CreateOpacityAction();
 
 private:
@@ -355,6 +360,8 @@ private:
   mitk::LabelHighlightGuard m_LabelHighlightGuard;
   mitk::LabelSuggestionHelper::ConstPointer m_SuggestionHelper;
   mitk::ITKEventObserverGuard m_SuggestionObserver;
+
+  QCompleter* m_Completer;
 };
 
 #endif

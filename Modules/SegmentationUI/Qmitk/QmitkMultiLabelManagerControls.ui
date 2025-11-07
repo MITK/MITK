@@ -19,7 +19,7 @@
   <property name="styleSheet">
    <string notr="true"/>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
    <property name="leftMargin">
     <number>6</number>
    </property>
@@ -243,24 +243,9 @@
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="ctkSearchBox" name="labelSearchBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>ctkSearchBox</class>
-   <extends>QLineEdit</extends>
-   <header location="global">ctkSearchBox.h</header>
-  </customwidget>
   <customwidget>
    <class>QmitkMultiLabelInspector</class>
    <extends>QWidget</extends>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>200</height>
+    <height>226</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -73,6 +73,25 @@
      <attribute name="headerStretchLastSection">
       <bool>false</bool>
      </attribute>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="labelSearchBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Enter the label name (or a substring of the name) to search for a specific label.</string>
+     </property>
+     <property name="placeholderText">
+      <string>Search for a specific label...</string>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
   </layout>

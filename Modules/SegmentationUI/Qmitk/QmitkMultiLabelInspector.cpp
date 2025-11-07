@@ -1652,13 +1652,13 @@ void QmitkMultiLabelInspector::OnItemDoubleClicked(const QModelIndex& index)
 
 void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) const
 {
-  this->WaitCursorOn();
-  m_Segmentation->UpdateCenterOfMass(labelID);
-  this->WaitCursorOff();
-
   const auto currentLabel = m_Segmentation->GetLabel(labelID);
   if (currentLabel.IsNull())
     return;
+
+  this->WaitCursorOn();
+  m_Segmentation->UpdateCenterOfMass(labelID);
+  this->WaitCursorOff();
 
   const auto pos = currentLabel->GetCenterOfMassIndex();
 

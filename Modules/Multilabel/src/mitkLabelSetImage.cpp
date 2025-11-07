@@ -990,13 +990,20 @@ const mitk::Label* mitk::MultiLabelSegmentation::GetActiveLabel() const
 
 void mitk::MultiLabelSegmentation::UpdateCenterOfMass(LabelValueType pixelValue)
 {
-  if (4 == this->GetDimension())
-  {
-    AccessFixedDimensionByItk_1(this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue)), CalculateCenterOfMassProcessing, 4, pixelValue);
-  }
-  else
-  {
-    AccessByItk_1(this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue)), CalculateCenterOfMassProcessing, pixelValue);
+  auto label = this->GetLabel(pixelValue);
+  if (label.IsNull())
+    return;
+
+  if (label->GetCenterOfMassMTime()<this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue))->GetMTime())
+  { //the mtime of the center of mass prop is smaller then the group image -> recalculate to be on the safe side.
+    if (4 == this->GetDimension())
+    {
+      AccessFixedDimensionByItk_1(this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue)), CalculateCenterOfMassProcessing, 4, pixelValue);
+    }
+    else
+    {
+      AccessByItk_1(this->GetGroupImage(this->GetGroupIndexOfLabel(pixelValue)), CalculateCenterOfMassProcessing, pixelValue);
+    }
   }
 }
 
@@ -1182,22 +1189,22 @@ void mitk::MultiLabelSegmentation::CalculateCenterOfMassProcessing(ImageType *it
     return;
   }
 
-  auto labelGeometryFilter = itk::LabelGeometryImageFilter<ImageType>::New();
-  labelGeometryFilter->SetInput(itkImage);
-  labelGeometryFilter->Update();
-  auto centroid = labelGeometryFilter->GetCentroid(pixelValue);
-
-  mitk::Point3D pos;
-  pos[0] = centroid[0];
-  pos[1] = centroid[1];
-  pos[2] = centroid[2];
-
   auto label = this->GetLabel(pixelValue);
   if (label.IsNotNull())
   {
-    label->SetCenterOfMassIndex(pos);
-    this->GetSlicedGeometry()->IndexToWorld(pos, pos);
-    label->SetCenterOfMassCoordinates(pos);
+    auto labelGeometryFilter = itk::LabelGeometryImageFilter<ImageType>::New();
+    labelGeometryFilter->SetInput(itkImage);
+    labelGeometryFilter->Update();
+    auto centroid = labelGeometryFilter->GetCentroid(pixelValue);
+
+    mitk::Point3D pos;
+    pos[0] = centroid[0];
+    pos[1] = centroid[1];
+    pos[2] = centroid[2];
+    mitk::Point3D coordinates;
+
+    this->GetSlicedGeometry()->IndexToWorld(pos, coordinates);
+    label->UpdateCenterOfMass(pos,coordinates);
   }
 }
 

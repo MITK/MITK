@@ -87,8 +87,6 @@ mitk::Label::Label() : PropertyList(), m_Value(UNLABELED_VALUE)
   if (GetProperty("opacity") == nullptr)
     SetOpacity(0.6);
 
-  this->ResetCenterOfMass();
-
   if (GetProperty("color") == nullptr)
   {
     mitk::Color col;
@@ -303,8 +301,10 @@ void mitk::Label::SetCenterOfMassIndex(const mitk::Point3D &center)
 {
   mitk::Point3dProperty *property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.index"));
   if (property != nullptr)
+  {
     // Update Property
     property->SetValue(center);
+  }
   else
     // Create new Property
     SetProperty("center.index", mitk::Point3dProperty::New(center));
@@ -313,36 +313,80 @@ void mitk::Label::SetCenterOfMassIndex(const mitk::Point3D &center)
 mitk::Point3D mitk::Label::GetCenterOfMassIndex() const
 {
   mitk::Point3dProperty *property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.index"));
-  return property->GetValue();
+  if (nullptr!= property)
+    return property->GetValue();
+
+  mitk::Point3D pnt;
+  pnt.SetElement(0, 0);
+  pnt.SetElement(1, 0);
+  pnt.SetElement(2, 0);
+
+  return pnt;
 }
 
 void mitk::Label::SetCenterOfMassCoordinates(const mitk::Point3D &center)
 {
   mitk::Point3dProperty *property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.coordinates"));
   if (property != nullptr)
+  {
     // Update Property
     property->SetValue(center);
+  }
   else
     // Create new Property
     SetProperty("center.coordinates", mitk::Point3dProperty::New(center));
 }
 
-void mitk::Label::ResetCenterOfMass()
-{
-    mitk::Point3D pnt;
-    pnt.SetElement(0, 0);
-    pnt.SetElement(1, 0);
-    pnt.SetElement(2, 0);
-    SetCenterOfMassCoordinates(pnt);
-    SetCenterOfMassIndex(pnt);
-}
-
-
 mitk::Point3D mitk::Label::GetCenterOfMassCoordinates() const
 {
   mitk::Point3dProperty *property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.coordinates"));
-  return property->GetValue();
+  if (nullptr != property)
+    return property->GetValue();
+
+  mitk::Point3D pnt;
+  pnt.SetElement(0, 0);
+  pnt.SetElement(1, 0);
+  pnt.SetElement(2, 0);
+
+  return pnt;
 }
+
+void mitk::Label::ResetCenterOfMass()
+{
+  mitk::Point3D pnt;
+  pnt.SetElement(0, 0);
+  pnt.SetElement(1, 0);
+  pnt.SetElement(2, 0);
+  SetCenterOfMassCoordinates(pnt);
+  SetCenterOfMassIndex(pnt);
+}
+
+itk::ModifiedTimeType mitk::Label::GetCenterOfMassMTime() const
+{
+  auto centerProp = this->GetConstProperty("center.index");
+  if (centerProp.IsNotNull())
+    return centerProp->GetMTime();
+
+  return 0;
+}
+
+void mitk::Label::UpdateCenterOfMass(const mitk::Point3D& index, const mitk::Point3D& coordinates)
+{
+  this->SetCenterOfMassCoordinates(coordinates);
+  this->SetCenterOfMassIndex(index);
+
+  //we ensure that updating always modifies the prop to avoid recomputation of COM in case of no changes
+  mitk::Point3dProperty* property = dynamic_cast<mitk::Point3dProperty*>(GetProperty("center.coordinates"));
+  if (property != nullptr)
+  {
+    property->Modified();
+  }
+  property = dynamic_cast<mitk::Point3dProperty*>(GetProperty("center.index"));
+  if (property != nullptr)
+  {
+    property->Modified();
+  }
+};
 
 void mitk::Label::SetAlgorithmType(AlgorithmType algoType)
 {

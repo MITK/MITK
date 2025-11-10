@@ -1,4 +1,4 @@
-include(${CMAKE_CURRENT_LIST_DIR}/WorkbenchReleaseNoPython.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/internal/WorkbenchReleaseBase.cmake)
 
 set(MITK_CONFIG_PACKAGES ${MITK_CONFIG_PACKAGES}
   SWIG

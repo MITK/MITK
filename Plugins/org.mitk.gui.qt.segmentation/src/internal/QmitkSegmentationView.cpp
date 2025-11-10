@@ -427,7 +427,7 @@ void QmitkSegmentationView::OnNewSegmentation()
 
   const auto labelSetPreset = this->GetDefaultLabelSetPreset();
 
-  if (labelSetPreset.empty() || !mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(labelSetPreset, newLabelSetImage))
+  if (labelSetPreset.empty() || !mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(labelSetPreset, newLabelSetImage))
   {
     auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
 

@@ -27,139 +27,246 @@ found in the LICENSE file.
 
 namespace
 {
-  std::string EnsureExtension(const std::string& filename)
+  bool LoadLegacyLabelSetImagePreset(const std::string& presetFilename,
+    mitk::MultiLabelSegmentation* inputImage)
   {
-    const std::string extension = ".lsetp";
+    if (nullptr == inputImage)
+      return false;
 
-    if (filename.size() < extension.size() || std::string::npos == filename.find(extension, filename.size() - extension.size()))
-      return filename + extension;
+    tinyxml2::XMLDocument xmlDocument;
 
-    return filename;
-  }
-}
-
-bool mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(const std::string &presetFilename,
-                                                     const mitk::MultiLabelSegmentation *inputImage)
-{
-  const auto filename = EnsureExtension(presetFilename);
-
-  tinyxml2::XMLDocument xmlDocument;
-  xmlDocument.InsertEndChild(xmlDocument.NewDeclaration());
-
-  auto *rootElement = xmlDocument.NewElement("LabelSetImagePreset");
-  rootElement->SetAttribute("layers", inputImage->GetNumberOfGroups());
-  xmlDocument.InsertEndChild(rootElement);
-
-  for (unsigned int layerIndex = 0; layerIndex < inputImage->GetNumberOfGroups(); layerIndex++)
-  {
-    auto *layerElement = xmlDocument.NewElement("Layer");
-    layerElement->SetAttribute("index", layerIndex);
-    layerElement->SetAttribute("labels", inputImage->GetNumberOfLabels(layerIndex));
-    rootElement->InsertEndChild(layerElement);
-
-    auto labelsInGroup = inputImage->GetConstLabelsByValue(inputImage->GetLabelValuesByGroup(layerIndex));
-
-    for (const auto& label : labelsInGroup)
-      layerElement->InsertEndChild(MultiLabelIOHelper::GetLabelAsXMLElement(xmlDocument, label));
-  }
-
-  return tinyxml2::XML_SUCCESS == xmlDocument.SaveFile(filename.c_str());
-}
-
-bool mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(const std::string &presetFilename,
-                                                     mitk::MultiLabelSegmentation *inputImage)
-{
-  if (nullptr == inputImage)
-    return false;
-
-  const auto filename = EnsureExtension(presetFilename);
-
-  tinyxml2::XMLDocument xmlDocument;
-
-  if (tinyxml2::XML_SUCCESS != xmlDocument.LoadFile(filename.c_str()))
-  {
-    MITK_WARN << "Label set preset file \"" << filename << "\" does not exist or cannot be opened";
-    return false;
-  }
-
-  auto *rootElement = xmlDocument.FirstChildElement("LabelSetImagePreset");
-
-  if (nullptr == rootElement)
-  {
-    MITK_WARN << "Not a valid Label set preset";
-    return false;
-  }
-
-  auto activeLabelBackup = inputImage->GetActiveLabel();
-
-  int numberOfLayers = 0;
-  rootElement->QueryIntAttribute("layers", &numberOfLayers);
-
-  auto* layerElement = rootElement->FirstChildElement("Layer");
-
-  if (nullptr == layerElement)
-  {
-    MITK_WARN << "Label set preset does not contain any layers";
-    return false;
-  }
-
-  for (int layerIndex = 0; layerIndex < numberOfLayers; layerIndex++)
-  {
-    int numberOfLabels = 0;
-    layerElement->QueryIntAttribute("labels", &numberOfLabels);
-
-    if (!inputImage->ExistGroup(layerIndex))
+    if (tinyxml2::XML_SUCCESS != xmlDocument.LoadFile(presetFilename.c_str()))
     {
-      while (!inputImage->ExistGroup(layerIndex))
-      {
-        inputImage->AddGroup();
-      }
+      MITK_WARN << "Label set preset file \"" << presetFilename << "\" does not exist or cannot be opened";
+      return false;
     }
 
-    auto *labelElement = layerElement->FirstChildElement("Label");
+    auto* rootElement = xmlDocument.FirstChildElement("LabelSetImagePreset");
 
-    if (nullptr == labelElement)
-      continue;
-
-    for (int labelIndex = 0; labelIndex < numberOfLabels; labelIndex++)
+    if (nullptr == rootElement)
     {
-      auto label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElement);
-      const auto labelValue = label->GetValue();
+      MITK_WARN << "Not a valid Label set preset";
+      return false;
+    }
 
-      if (MultiLabelSegmentation::UNLABELED_VALUE != labelValue)
+    auto activeLabelBackup = inputImage->GetActiveLabel();
+
+    int numberOfLayers = 0;
+    rootElement->QueryIntAttribute("layers", &numberOfLayers);
+
+    auto* layerElement = rootElement->FirstChildElement("Layer");
+
+    if (nullptr == layerElement)
+    {
+      MITK_WARN << "Label set preset does not contain any layers";
+      return false;
+    }
+
+    for (int layerIndex = 0; layerIndex < numberOfLayers; layerIndex++)
+    {
+      int numberOfLabels = 0;
+      layerElement->QueryIntAttribute("labels", &numberOfLabels);
+
+      if (!inputImage->ExistGroup(layerIndex))
       {
-        if (inputImage->ExistLabel(labelValue))
+        while (!inputImage->ExistGroup(layerIndex))
         {
-          // Override existing label with label from preset
-          auto alreadyExistingLabel = inputImage->GetLabel(labelValue);
-          alreadyExistingLabel->ConcatenatePropertyList(label);
-          inputImage->UpdateLookupTable(labelValue);
-        }
-        else
-        {
-          inputImage->AddLabel(label, layerIndex, false);
+          inputImage->AddGroup();
         }
       }
 
-      labelElement = labelElement->NextSiblingElement("Label");
+      auto* labelElement = layerElement->FirstChildElement("Label");
 
       if (nullptr == labelElement)
         continue;
+
+      for (int labelIndex = 0; labelIndex < numberOfLabels; labelIndex++)
+      {
+        auto label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElement);
+        const auto labelValue = label->GetValue();
+
+        if (mitk::MultiLabelSegmentation::UNLABELED_VALUE != labelValue)
+        {
+          if (inputImage->ExistLabel(labelValue, layerIndex))
+          {
+            // Override existing label with label from preset
+            auto alreadyExistingLabel = inputImage->GetLabel(labelValue);
+            alreadyExistingLabel->ConcatenatePropertyList(label);
+            inputImage->UpdateLookupTable(labelValue);
+          }
+          else
+          {
+            if (inputImage->ExistLabel(labelValue))
+            { //label is the wrong group so we need to remove it there before adding it in its new form.
+              inputImage->RemoveLabel(labelValue);
+            }
+            inputImage->AddLabel(label, layerIndex, false);
+          }
+        }
+
+        labelElement = labelElement->NextSiblingElement("Label");
+
+        if (nullptr == labelElement)
+          continue;
+      }
+
+      layerElement = layerElement->NextSiblingElement("Layer");
+
+      if (nullptr == layerElement)
+        continue;
     }
 
-    layerElement = layerElement->NextSiblingElement("Layer");
+    if (nullptr != activeLabelBackup)
+    {
+      inputImage->SetActiveLabel(activeLabelBackup->GetValue());
+    }
+    else if (inputImage->GetTotalNumberOfLabels() > 0)
+    {
+      inputImage->SetActiveLabel(inputImage->GetAllLabelValues().front());
+    }
 
-    if (nullptr == layerElement)
-      continue;
+    return true;
   }
 
-  if (nullptr != activeLabelBackup)
+
+  bool LoadNewJSONPreset(const std::string& presetFilename,
+    mitk::MultiLabelSegmentation* inputImage)
   {
-    inputImage->SetActiveLabel(activeLabelBackup->GetValue());
+    if (nullptr == inputImage)
+      return false;
+
+    std::ifstream input(presetFilename);
+    if (!input.is_open())
+    {
+      return false;
+    }
+
+    nlohmann::json fileContent;
+    try
+    {
+      input >> fileContent;
+    }
+    catch (const nlohmann::json::parse_error& e)
+    {
+      mitkThrow() << "Cannot read data due to parsing error. Parse error: " << e.what() << '\n';
+    }
+
+    //check version
+    int version = 0;
+
+    if (!mitk::MultiLabelIOHelper::GetValueFromJson<int>(fileContent, "version", version))
+    {
+      MITK_WARN << "Preset has unknown version. Assuming that it can be read. Result might be invalid.";
+    }
+    else
+    {
+      const int MULTILABEL_SEGMENTATION_VERSION_VALUE = 4;
+      if (version > MULTILABEL_SEGMENTATION_VERSION_VALUE)
+      {
+        mitkThrow() << "The preset you are trying to load has an unsupported version. "
+            << "This software is too old to ensure correct loading. "
+            << "Please use a compatible version of MITK or save the data in another format. "
+            << "Data version: " << version 
+            << "; supported versions up to: " << MULTILABEL_SEGMENTATION_VERSION_VALUE;
+
+      }
+    }
+
+    auto groupInfos = mitk::MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(fileContent["groups"]);
+
+    mitk::MultiLabelSegmentation::GroupIndexType groupIndex = 0;
+    for (const auto& groupInfo : groupInfos)
+    {
+      auto cleanedLabels = mitk::MultiLabelIOHelper::CloneLabelsWithoutMetaProperties(groupInfo.labels);
+
+      if (inputImage->ExistGroup(groupIndex))
+      { //group exists so update name and labels
+        inputImage->SetGroupName(groupIndex, groupInfo.name);
+
+        for (auto label : cleanedLabels)
+        {
+          if (inputImage->ExistLabel(label->GetValue(), groupIndex))
+          {
+            // Override existing label with label from preset
+            auto alreadyExistingLabel = inputImage->GetLabel(label->GetValue());
+            alreadyExistingLabel->Update(label);
+            inputImage->UpdateLookupTable(label->GetValue());
+          }
+          else
+          {
+            if (inputImage->ExistLabel(label->GetValue()))
+            { //label is the wrong group so we need to remove it there before adding it in its new form.
+              inputImage->RemoveLabel(label->GetValue());
+            }
+            const bool adaptValue = label->GetValue() == mitk::Label::UNLABELED_VALUE ? true : false;
+            inputImage->AddLabel(label, groupIndex, false, adaptValue);
+          }
+        }
+      }
+      else
+      { //add new group
+        inputImage->AddGroup();
+        inputImage->SetGroupName(groupIndex, groupInfo.name);
+        for (auto label : cleanedLabels)
+        {
+          const bool adaptValue = label->GetValue() == mitk::Label::UNLABELED_VALUE ? true : false;
+          inputImage->AddLabel(label, groupIndex, false, adaptValue);
+        }
+      }
+
+      groupIndex++;
+    }
+
+    return true;
   }
-  else if (inputImage->GetTotalNumberOfLabels() > 0)
+}
+
+bool mitk::MultiLabelIOHelper::SaveMultiLabelSegmentationPreset(const std::string &presetFilename,
+                                                     const mitk::MultiLabelSegmentation* input)
+{
+  if (nullptr == input)
+    return false;
+
+  int MULTILABEL_SEGMENTATION_VERSION_VALUE = 4;
+  nlohmann::json stackContent;
+  stackContent["version"] = MULTILABEL_SEGMENTATION_VERSION_VALUE;
+  stackContent["type"] = "org.mitk.multilabel.segmentation.preset";
+  stackContent["groups"] = MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(input);
+
+  std::ofstream file(presetFilename);
+  if (file.is_open())
   {
-    inputImage->SetActiveLabel(inputImage->GetAllLabelValues().front());
+    file << std::setw(4) << stackContent << std::endl;
+  }
+  else
+  {
+    mitkThrow() << "Cannot write meta data. Cannot open file: " << presetFilename;
+  }
+
+  return true;
+}
+
+bool mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(const std::string &presetFilename,
+                                                     mitk::MultiLabelSegmentation *inputSegmentation)
+{
+  if (nullptr == inputSegmentation)
+    return false;
+
+  //first try new format
+  bool result = false;
+  try
+  {
+    result = LoadNewJSONPreset(presetFilename, inputSegmentation);
+  }
+  catch (Exception& e)
+  {
+    MITK_INFO << "Loading of multi label preset as JSON failed. Reason: " <<e.what();
+  }
+
+  if (!result)
+  { // try to load with legacy format
+    MITK_INFO << "Try to load as legacy xml preset.";
+    return LoadLegacyLabelSetImagePreset(presetFilename, inputSegmentation);
   }
 
   return true;
@@ -776,4 +883,18 @@ void mitk::MultiLabelIOHelper::RemoveMetaPropertiesFromLabel(Label* label)
       label->RemoveProperty(key);
     }
   }
+}
+
+mitk::LabelVector mitk::MultiLabelIOHelper::CloneLabelsWithoutMetaProperties(const LabelVector& labels)
+{
+  mitk::MultiLabelSegmentation::LabelVectorType result;
+
+  for (const auto& label : labels)
+  {
+    auto cleanedLabel = label->Clone();
+    mitk::MultiLabelIOHelper::RemoveMetaPropertiesFromLabel(cleanedLabel);
+    result.push_back(cleanedLabel);
+  }
+
+  return result;
 }

@@ -51,23 +51,24 @@ namespace mitk
   {
   public:
     /**
-     * @brief Saves the mitk::LabelSet configuration of inputImage to presetFilename.
-     * The preset is stored as "*.lsetp"
-     * @param presetFilename the filename including the filesystem path
-     * @param inputImage the input image from which the preset should be generated
+     * @brief Saves the mitk::LabelSet configuration of inputSegmentation to presetFilename.
+     * The preset is stored as "*.multilabel.json"
+     * @param presetFilename the filename including the file system path
+     * @param inputSegmentation the input image from which the preset should be generated
      * @return true if the serialization was successful and false otherwise
      */
-    static bool SaveLabelSetImagePreset(const std::string &presetFilename,
-                                        const mitk::MultiLabelSegmentation *inputImage);
+    static bool SaveMultiLabelSegmentationPreset(const std::string &presetFilename,
+                                        const mitk::MultiLabelSegmentation *inputSegmentation);
 
     /**
-     * @brief Loads an existing preset for a mitk::MultiLabelSegmentation from presetFilename and applies it to inputImage
-     * @param presetFilename the filename of the preset including the filesystem path
-     * @param inputImage the image to which the loaded preset will be applied
+     * @brief Loads an existing preset for a mitk::MultiLabelSegmentation from presetFilename and applies it to inputSegmentation
+     * This functions supports the new format (.multilabel.json) and the legacy format (*.lpset)
+     * @param presetFilename the filename of the preset including the file system path
+     * @param inputSegmentation the image to which the loaded preset will be applied
      * @return true if the deserilization was successful and false otherwise
      */
-    static bool LoadLabelSetImagePreset(const std::string &presetFilename,
-                                        mitk::MultiLabelSegmentation *inputImage);
+    static bool LoadMultiLabelSegementationPreset(const std::string &presetFilename,
+                                        mitk::MultiLabelSegmentation *inputSegmentation);
 
     /**
      * @brief Creates a mitk::Label from an XML element
@@ -202,6 +203,14 @@ namespace mitk
     */
     static void RemoveMetaPropertiesFromLabel(Label* label);
 
+    /**
+     * @brief Remove all meta properties from all label clones of the passed vector.
+     * Meta properties (indicated by a preceding "_" in the property name) are used to steer code logic e.g. in the case
+     * of label loading or suggestion handling. They are not to be used in concrete label instances.
+     * This method clones all passed labels and removes all meta properties form the clones.
+     * @param labels Vector with all labels that should be cloned and cleaned.
+    */
+    static LabelVector CloneLabelsWithoutMetaProperties(const LabelVector& labels);
 
   private:
     MultiLabelIOHelper() = delete;

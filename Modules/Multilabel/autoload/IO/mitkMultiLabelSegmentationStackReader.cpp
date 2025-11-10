@@ -91,20 +91,6 @@ namespace
     return result;
   }
 
-  mitk::MultiLabelSegmentation::ConstLabelVectorType CleanImportLabels(const mitk::MultiLabelSegmentation::LabelVectorType& labels)
-  {
-    mitk::MultiLabelSegmentation::ConstLabelVectorType result;
-
-    for (const auto& label : labels)
-    {
-      auto cleanedLabel = label->Clone();
-      mitk::MultiLabelIOHelper::RemoveMetaPropertiesFromLabel(cleanedLabel);
-      result.push_back(cleanedLabel);
-    }
-
-    return result;
-  }
-
   std::string FindFirstFileInJson(const nlohmann::json& j)
   {
     if (j.is_object())
@@ -250,7 +236,7 @@ namespace
     for (const auto& groupInfo : groupInfos)
     {
       auto groupImage = LoadImageBasedOnFileProperty(groupInfo.properties, filePathBase);
-      auto cleanedLabels = CleanImportLabels(groupInfo.labels);
+      auto cleanedLabels = MultiLabelSegmentation::ConvertLabelVectorConst(MultiLabelIOHelper::CloneLabelsWithoutMetaProperties(groupInfo.labels));
 
       if (!segInitialized)
       {

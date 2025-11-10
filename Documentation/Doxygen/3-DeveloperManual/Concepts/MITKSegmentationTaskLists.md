@@ -8,7 +8,7 @@ MITK Segmentation Task Lists are a JSON-based file format defining a list of seg
 Segmentation tasks consist at least of a path to a reference image (or MITK scene in version 3 or later of the MITK Segmentation Task List file format) and a unique result path.
 The result path specifies where the final segmentation of the task is expected to be located once it is done.
 
-Optional properties of a segmentation task include a task name and description as well as various presettings for the segmentation like a label name, a list of suggested names and colors for new labels, a label set preset, or even a pre-segmentation to begin with.
+Optional properties of a segmentation task include a task name and description as well as various presettings for the segmentation like a label name, a list of suggested templates for new labels, a label set preset, or even a pre-segmentation to begin with.
 The complete set of properties is specified further below in the file format specification.
 
 Version 2 of the file format adds support for MITK Forms.
@@ -64,7 +64,7 @@ In addition, tasks can define various optional properties that mainly specify th
 - `Description` (*string*): A short description/definition of the task.
 - `LabelName` (*string*): The name of the first label in a new segmentation that is created for the task on the fly.
 - `LabelNameSuggestions` (*file path*): A Label Suggestions JSON file specifying names and optional colors that are suggested to the user for new labels in the segmentation.
-- `Preset` (*file path*): A Label Set Preset XML file in MITK's .lsetp file format. The preset is applied to a new segmentation that is created for the task on the fly. We recommend to use the Segmentation plugin to create such label set preset files as described in its [user guide](@ref org_mitk_views_segmentationlabelpresets).
+- `Preset` (*file path*): A Multi Label Preset. It is either stored in MITK's MultiLabel Segmentation Stack Format (.mitklabel.json) as JSON or in MITK's legacy preset format (.lsetp). The preset is applied to a new segmentation that is created for the task on the fly. We recommend to use the Segmentation plugin to create such label set preset files as described in its [user guide](@ref org_mitk_views_segmentationlabelpresets).
 - `Segmentation` (*file path*): A pre-segmentation that a user can start with or should refine.
 - `Dynamic` (*boolean*): In case `Image` refers to a dynamic (3d+t) image, specifies whether the segmentation should be static (*false*), i.e. equal for all time steps, or dynamic (*true*), i.e. individual for each time step.
 
@@ -126,8 +126,8 @@ For simplicity, we chose to define tasks around organs for this example and name
     },
     {
       "Name": "Kidneys",
-      "Description": "This task provides an image and a label set preset that is applied to the new segmentation.",
-      "Preset": "presets/kidneys.lsetp",
+      "Description": "This task provides an image and a label preset that is applied to the new segmentation.",
+      "Preset": "presets/kidneys.multilabel.json",
       "Result": "results/kidneys.nrrd"
     },
     {

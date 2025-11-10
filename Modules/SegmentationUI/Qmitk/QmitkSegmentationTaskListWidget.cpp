@@ -1020,7 +1020,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     if (m_TaskList->HasPreset(current))
     {
       const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetPreset(current));
-      mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(path.string(), segmentation);
+      mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(path.string(), segmentation);
     }
     else
     {

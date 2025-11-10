@@ -307,7 +307,9 @@ void mitk::Label::SetCenterOfMassIndex(const mitk::Point3D &center)
   }
   else
     // Create new Property
+  {
     SetProperty("center.index", mitk::Point3dProperty::New(center));
+  }
 }
 
 mitk::Point3D mitk::Label::GetCenterOfMassIndex() const
@@ -316,10 +318,7 @@ mitk::Point3D mitk::Label::GetCenterOfMassIndex() const
   if (nullptr!= property)
     return property->GetValue();
 
-  mitk::Point3D pnt;
-  pnt.SetElement(0, 0);
-  pnt.SetElement(1, 0);
-  pnt.SetElement(2, 0);
+  Point3D pnt(0, 0, 0);
 
   return pnt;
 }
@@ -334,7 +333,9 @@ void mitk::Label::SetCenterOfMassCoordinates(const mitk::Point3D &center)
   }
   else
     // Create new Property
+  {
     SetProperty("center.coordinates", mitk::Point3dProperty::New(center));
+  }
 }
 
 mitk::Point3D mitk::Label::GetCenterOfMassCoordinates() const
@@ -343,20 +344,14 @@ mitk::Point3D mitk::Label::GetCenterOfMassCoordinates() const
   if (nullptr != property)
     return property->GetValue();
 
-  mitk::Point3D pnt;
-  pnt.SetElement(0, 0);
-  pnt.SetElement(1, 0);
-  pnt.SetElement(2, 0);
+  Point3D pnt(0, 0, 0);
 
   return pnt;
 }
 
 void mitk::Label::ResetCenterOfMass()
 {
-  mitk::Point3D pnt;
-  pnt.SetElement(0, 0);
-  pnt.SetElement(1, 0);
-  pnt.SetElement(2, 0);
+  Point3D pnt(0, 0, 0);
   SetCenterOfMassCoordinates(pnt);
   SetCenterOfMassIndex(pnt);
 }

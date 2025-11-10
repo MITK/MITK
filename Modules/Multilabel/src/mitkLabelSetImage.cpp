@@ -1197,10 +1197,7 @@ void mitk::MultiLabelSegmentation::CalculateCenterOfMassProcessing(ImageType *it
     labelGeometryFilter->Update();
     auto centroid = labelGeometryFilter->GetCentroid(pixelValue);
 
-    mitk::Point3D pos;
-    pos[0] = centroid[0];
-    pos[1] = centroid[1];
-    pos[2] = centroid[2];
+    Point3D pos(centroid[0], centroid[1], centroid[2]);
     mitk::Point3D coordinates;
 
     this->GetSlicedGeometry()->IndexToWorld(pos, coordinates);

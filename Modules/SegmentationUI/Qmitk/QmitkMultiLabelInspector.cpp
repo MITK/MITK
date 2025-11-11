@@ -22,6 +22,7 @@ found in the LICENSE file.
 // Qmitk
 #include <QmitkCopyLabelToGroupDialog.h>
 #include <QmitkMultiLabelTreeModel.h>
+#include <QmitkFlatLabelInstanceProxyModel.h>
 #include <QmitkLabelColorItemDelegate.h>
 #include <QmitkLabelToggleItemDelegate.h>
 #include <QmitkStyleManager.h>
@@ -32,6 +33,7 @@ found in the LICENSE file.
 #include <QWidgetAction>
 #include <QMessageBox>
 #include <QKeyEvent>
+#include <QCompleter>
 
 #include <QInputDialog>
 
@@ -39,7 +41,7 @@ found in the LICENSE file.
 
 
 QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/)
-  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelInspector), m_SegmentationNodeDataMTime(0)
+  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelInspector), m_SegmentationNodeDataMTime(0), m_Completer(nullptr)
 {
   m_Controls->setupUi(this);
 
@@ -69,6 +71,10 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   header->setSectionResizeMode(3, QHeaderView::ResizeToContents);
   view->setContextMenuPolicy(Qt::CustomContextMenu);
 
+  m_Completer = new QCompleter(this);
+  this->RefreshCompleter();
+  m_Controls->labelSearchBox->setCompleter(m_Completer);
+
   connect(m_Model, &QAbstractItemModel::modelReset, this, &QmitkMultiLabelInspector::OnModelReset);
   connect(m_Model, &QAbstractItemModel::dataChanged, this, &QmitkMultiLabelInspector::OnDataChanged);
   connect(m_Model, &QmitkMultiLabelTreeModel::modelChanged, this, &QmitkMultiLabelInspector::OnModelChanged);
@@ -77,6 +83,23 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   connect(view, &QAbstractItemView::doubleClicked, this, &QmitkMultiLabelInspector::OnItemDoubleClicked);
   connect(view, &QAbstractItemView::entered, this, &QmitkMultiLabelInspector::OnEntered);
   connect(view, &QmitkMultiLabelTreeView::MouseLeave, this, &QmitkMultiLabelInspector::OnMouseLeave);
+
+  connect(m_Controls->labelSearchBox, &QLineEdit::returnPressed, this, &QmitkMultiLabelInspector::OnSearchLabel);
+  connect(m_Completer, SIGNAL(activated(QString)), this, SLOT(OnSearchLabel()));
+}
+
+void QmitkMultiLabelInspector::RefreshCompleter()
+{
+  if (!m_Model || !m_Completer) return;
+
+  auto proxy = new QmitkFlatLabelInstanceProxyModel(this);
+  proxy->setSourceModel(m_Model);
+  m_Completer->setModel(nullptr);
+  m_Completer->setModel(proxy);
+  m_Completer->setCaseSensitivity(Qt::CaseInsensitive);
+  m_Completer->setCompletionColumn(0);
+  m_Completer->setCompletionMode(QCompleter::PopupCompletion);
+  m_Completer->setFilterMode(Qt::MatchContains);
 }
 
 QmitkMultiLabelInspector::~QmitkMultiLabelInspector()
@@ -103,6 +126,9 @@ void QmitkMultiLabelInspector::Initialize()
       m_Controls->view->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::NoUpdate);
     }
   }
+
+  this->RefreshCompleter();
+  m_Controls->labelSearchBox->setEnabled(m_Segmentation.IsNotNull());
 }
 
 void QmitkMultiLabelInspector::SetMultiSelectionMode(bool multiMode)
@@ -488,6 +514,11 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
 
   m_ModelManipulationOngoing = true;
   auto newLabel = m_Segmentation->AddLabel(templateLabel, groupID, true);
+  //remove properties that where copied by the template but are instance specific
+  newLabel->ResetCenterOfMass();
+  newLabel->SetAlgorithmType(mitk::Label::AlgorithmType::Undefined);
+  newLabel->SetAlgorithmName("");
+
   m_Segmentation->SetActiveLabel(newLabel->GetValue());
   m_ModelManipulationOngoing = false;
 
@@ -1621,13 +1652,13 @@ void QmitkMultiLabelInspector::OnItemDoubleClicked(const QModelIndex& index)
 
 void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) const
 {
-  this->WaitCursorOn();
-  m_Segmentation->UpdateCenterOfMass(labelID);
-  this->WaitCursorOff();
-
   const auto currentLabel = m_Segmentation->GetLabel(labelID);
   if (currentLabel.IsNull())
     return;
+
+  this->WaitCursorOn();
+  m_Segmentation->UpdateCenterOfMass(labelID);
+  this->WaitCursorOff();
 
   const auto pos = currentLabel->GetCenterOfMassIndex();
 
@@ -1680,4 +1711,43 @@ void QmitkMultiLabelInspector::keyReleaseEvent(QKeyEvent* event)
   }
 
   QWidget::keyPressEvent(event);
+}
+
+void QmitkMultiLabelInspector::OnSearchLabel()
+{
+  if (!m_Completer || !m_Model)
+    return;
+
+  const QString text = m_Controls->labelSearchBox->text().trimmed();
+  if (text.isEmpty())
+    return;
+
+  auto flatProxy = qobject_cast<QmitkFlatLabelInstanceProxyModel*>(m_Completer->model());
+  if (!flatProxy)
+    return;
+
+  // Find matching entries (case-insensitive, substring)
+  // we need to use here the flat model and not just completionModel, as we need to get the real index
+  // to fetch the label instance value later on.
+  QList<QModelIndex> matches =
+    flatProxy->match(flatProxy->index(0, 0), Qt::DisplayRole, text, 1, Qt::MatchContains | Qt::MatchWrap);
+
+  if (matches.isEmpty())
+    return; // nothing matched -> do nothing
+
+  QModelIndex proxyMatch = matches.first();
+  QModelIndex srcMatch = flatProxy->mapToSource(proxyMatch);
+  QVariant labelVariant = m_Model->data(srcMatch, QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
+
+  if (!labelVariant.isValid() ||
+    !labelVariant.canConvert<mitk::MultiLabelSegmentation::LabelValueType>())
+    return;
+
+  const mitk::MultiLabelSegmentation::LabelValueType labelID =
+    labelVariant.value<mitk::MultiLabelSegmentation::LabelValueType>();
+
+  this->SetSelectedLabel(labelID);
+  this->PrepareGoToLabel(labelID);
+
+  m_Controls->labelSearchBox->clear();
 }

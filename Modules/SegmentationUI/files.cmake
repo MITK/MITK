@@ -38,6 +38,7 @@ set(CPP_FILES
   Qmitk/QmitkMultiLabelSelectionButton.cpp
   Qmitk/QmitkMultiLabelSelectionLabel.cpp
   Qmitk/QmitkMultiLabelSelectionWidget.cpp
+  Qmitk/QmitkFlatLabelInstanceProxyModel.cpp
   Qmitk/QmitkLabelColorItemDelegate.cpp
   Qmitk/QmitkLabelToggleItemDelegate.cpp
   Qmitk/QmitkFindSegmentationTaskDialog.cpp
@@ -94,6 +95,7 @@ set(MOC_H_FILES
   Qmitk/QmitkMultiLabelSelectionLabel.h
   Qmitk/QmitkMultiLabelSelectionWidget.h
   Qmitk/QmitkMultiLabelSelectionButton.h
+  Qmitk/QmitkFlatLabelInstanceProxyModel.h
   Qmitk/QmitkMultiLabelTreeModel.h
   Qmitk/QmitkMultiLabelTreeView.h
   Qmitk/QmitkLabelColorItemDelegate.h

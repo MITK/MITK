@@ -23,7 +23,6 @@ found in the LICENSE file.
 
 #include <QWidget>
 
-class QmitkDataStorageComboBox;
 class QCompleter;
 
 namespace Ui
@@ -137,8 +136,6 @@ private Q_SLOTS:
 
   void OnRenameLabelShortcutActivated();
 
-  // reaction to "returnPressed" signal from ...
-  void OnSearchLabel();
   // reaction to the change of labels. If multiple labels are selected, it is ignored.
   void OnSelectedLabelChanged(const LabelValueVectorType& labels);
 
@@ -182,8 +179,6 @@ private:
   void OnGroupEvent(mitk::MultiLabelSegmentation::GroupIndexType groupIndex);
 
   Ui::QmitkMultiLabelManagerControls* m_Controls;
-
-  QCompleter *m_Completer;
 
   QStringList m_OrganColors;
 

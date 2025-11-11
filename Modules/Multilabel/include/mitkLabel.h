@@ -123,11 +123,13 @@ namespace mitk
     void SetDescription(const std::string& description);
     std::string GetDescription() const;
 
-    void SetCenterOfMassIndex(const mitk::Point3D &center);
     mitk::Point3D GetCenterOfMassIndex() const;
 
-    void SetCenterOfMassCoordinates(const mitk::Point3D &center);
     mitk::Point3D GetCenterOfMassCoordinates() const;
+    void ResetCenterOfMass();
+    //returns the mtime of the last center of mass property update.
+    itk::ModifiedTimeType GetCenterOfMassMTime() const;
+    void UpdateCenterOfMass(const mitk::Point3D& index, const mitk::Point3D& coordinates);
 
     void SetColor(const mitk::Color &);
     const mitk::Color &GetColor() const;
@@ -261,6 +263,9 @@ namespace mitk
     using PropertyList::GetProperty;
 
     Label(const Label &other);
+
+    void SetCenterOfMassIndex(const mitk::Point3D& center);
+    void SetCenterOfMassCoordinates(const mitk::Point3D& center);
 
   private:
     PixelType m_Value;

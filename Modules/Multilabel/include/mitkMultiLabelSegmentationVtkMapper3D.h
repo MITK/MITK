@@ -32,6 +32,8 @@ class vtkLookupTable;
 class vtkVolumeProperty;
 class vtkVolume;
 class vtkSmartVolumeMapper;
+class vtkColorTransferFunction;
+class vtkPiecewiseFunction;
 
 namespace mitk
 {
@@ -83,8 +85,8 @@ namespace mitk
       std::vector<vtkSmartPointer<vtkImageData>> m_LayerImages;
       std::vector<vtkSmartPointer<vtkVolume>> m_LayerVolumes;
 
-      std::vector <vtkSmartPointer<vtkColorTransferFunction> > m_TransferFunctions;
-      std::vector <vtkSmartPointer<vtkPiecewiseFunction> > m_OpacityTransferFunctions;
+      vtkSmartPointer<vtkColorTransferFunction> m_TransferFunction;
+      vtkSmartPointer<vtkPiecewiseFunction> m_OpacityTransferFunction;
 
       /** Vector containing the pointer of the currently used group images.
        * IMPORTANT: This member must not be used to access any data.
@@ -100,27 +102,21 @@ namespace mitk
       /** look up table for label colors. */
       mitk::LookupTable::Pointer m_LabelLookupTable;
 
-      unsigned int m_NumberOfGroups;
-
       /** \brief Default constructor of the local storage. */
       LocalStorage();
       /** \brief Default destructor of the local storage. */
       ~LocalStorage() override;
     };
 
-    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-    mitk::LocalStorageHandler<LocalStorage> m_LSH;
-
     /** \brief Get the LocalStorage corresponding to the current renderer. */
-    LocalStorage *GetLocalStorage(mitk::BaseRenderer *renderer);
+    LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
 
-    /** \brief Set the default properties for general image rendering. */
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = nullptr, bool overwrite = false);
 
   protected:
     /** Default constructor */
     MultiLabelSegmentationVtkMapper3D();
-    /** Default deconstructor */
+    /** Default destructor */
     ~MultiLabelSegmentationVtkMapper3D() override;
 
     /** \brief Does the actual resampling, without rendering the image yet.
@@ -137,11 +133,14 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    bool GenerateVolumeMapping(mitk::BaseRenderer* renderer, const std::vector<mitk::MultiLabelSegmentation::GroupIndexType>& outdatedGroupIDs);
+    bool GenerateVolumeMapping(LocalStorage* localStorage, const std::vector<mitk::MultiLabelSegmentation::GroupIndexType>& outdatedGroupIDs);
 
     /** \brief Generates the look up table that should be used.
       */
-    void GenerateLookupTable(mitk::BaseRenderer* renderer);
+    void UpdateLookupTable(LocalStorage* localStorage);
+
+    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
   };
 
 } // namespace mitk

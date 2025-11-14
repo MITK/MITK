@@ -22,7 +22,7 @@ found in the LICENSE file.
 
 namespace
 {
-  constexpr auto TORCH = "torch>=2.8.0,<3.0.0";
+  constexpr auto TORCH = "torch>=2.8.0,<2.9.0"; // PyTorch 2.9.0 is super slow, scheduled to get fixed with 2.9.1
   constexpr auto TORCH_VISION = "torchvision>=0.23.0,<1.0.0";
   constexpr auto NNINTERACTIVE = "nninteractive>=1.1.2,<2.0.0";
 

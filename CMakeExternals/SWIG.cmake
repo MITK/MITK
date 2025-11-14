@@ -6,7 +6,7 @@ if(MITK_USE_SWIG)
     message(FATAL_ERROR "SWIG_DIR variable is defined but corresponds to non-existing directory")
   endif()
 
-  set(SWIG_TARGET_VERSION 4.3.0)
+  set(SWIG_TARGET_VERSION 4.4.0)
   set(proj SWIG)
   set(proj_DEPENDENCIES)
   set(SWIG_DEPENDS ${proj})
@@ -23,8 +23,8 @@ if(MITK_USE_SWIG)
 
       # swig.exe available as pre-built binary on Windows:
       ExternalProject_Add(${proj}
-        URL https://www.mitk.org/download/thirdparty/swigwin-4.3.0.zip
-        URL_MD5 591f99627c27d9865a70d1aff23a60cf
+        URL https://www.mitk.org/download/thirdparty/swigwin-${SWIG_TARGET_VERSION}.zip
+        URL_MD5 16bdcc5f39a172879e93f57cea91dfef
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
@@ -41,8 +41,8 @@ if(MITK_USE_SWIG)
 
       ExternalProject_add(${proj}
         LIST_SEPARATOR ${sep}
-        URL https://www.mitk.org/download/thirdparty/swig-4.3.0.tar.gz
-        URL_MD5 6a0555a2063c78447c5912136f013c43
+        URL https://www.mitk.org/download/thirdparty/swig-${SWIG_TARGET_VERSION}.tar.gz
+        URL_MD5 62d77e7d90057d5410f7a28ff57d854f
         INSTALL_DIR ${ep_prefix}/src/${proj}-install
         CONFIGURE_COMMAND <SOURCE_DIR>/./configure
                           CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}

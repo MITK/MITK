@@ -12,10 +12,6 @@ mitk_query_custom_ep_vars()
 
 set(proj_DEPENDENCIES GDCM TBB ${${proj}_CUSTOM_DEPENDENCIES})
 
-if(MITK_USE_HDF5)
-  list(APPEND proj_DEPENDENCIES HDF5)
-endif()
-
 set(ITK_DEPENDS ${proj})
 
 if(NOT DEFINED ITK_DIR)
@@ -55,8 +51,6 @@ if(NOT DEFINED ITK_DIR)
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
        -DGDCM_DIR:PATH=${GDCM_DIR}
-       -DITK_USE_SYSTEM_HDF5:BOOL=ON
-       -DHDF5_DIR:PATH=${HDF5_DIR}
        -DModule_GrowCut:BOOL=ON
        "-DTBB_DIR:PATH=${TBB_DIR}"
        -DModule_ITKTBB:BOOL=ON

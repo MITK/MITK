@@ -423,16 +423,12 @@ endif()
 
 find_package(OpenSSL 3)
 
-if(NOT OpenSSL_FOUND)
-  find_package(OpenSSL 1.1.1)
-endif()
-
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
 
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
 
 if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
-  set(openssl_message "Could not find OpenSSL (dependency of cpp-httplib).\n")
+  set(openssl_message "Could not find OpenSSL.\n")
   if(UNIX)
     if(APPLE)
       set(openssl_message "${openssl_message}Please install it using your favorite package management "
@@ -441,10 +437,8 @@ if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
       set(openssl_message "${openssl_message}Please install the dev package of OpenSSL (i.e. libssl-dev).\n")
     endif()
   else()
-    set(openssl_message "${openssl_message}Please either install Win32 OpenSSL:\n"
-                        "  https://slproweb.com/products/Win32OpenSSL.html\n"
-                        "Or use the Qt Maintenance tool to install (recommended):\n"
-                        "  Developer and Designer Tools > OpenSSL Toolkit > OpenSSL 64-bit binaries\n")
+    set(openssl_message "${openssl_message}Please install OpenSSL, e.g.:\n"
+                        "  https://slproweb.com/products/Win32OpenSSL.html")
   endif()
   set(openssl_message "${openssl_message}If it still cannot be found, you can hint CMake to find OpenSSL by "
                       "adding/setting the OPENSSL_ROOT_DIR variable to the root directory of an "
@@ -697,7 +691,7 @@ if(OpenSSL_FOUND AND WIN32)
           try to find the "../bin" binary directory.
         - Use the base file names of the link libraries to find corresponding
           DLLs like "<base name>*.dll", that usually are named like
-          "<base name>-1_1-x64.dll" or similar.
+          "<base name>-3-x64.dll" or similar.
    ]]
   set(openssl_ssl_dll "")
   set(openssl_crypto_dll "")

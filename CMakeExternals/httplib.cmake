@@ -22,15 +22,9 @@ if(MITK_USE_${proj})
       )
     endif()
 
-    if(OPENSSL_VERSION VERSION_GREATER_EQUAL 3)
-      set(GIT_TAG eacc1ca98e5fef25184c7d417e8417225e05e65d) # v0.27.0 cpp-httplib
-    else()
-      set(GIT_TAG cbca63f091ef1147ff57e90eb1ee5e558aa05d2c) # v0.14.3 cpp-httplib fallback version with OPENSSLv1 support
-    endif()
-
     ExternalProject_Add(${proj}
       GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
-      GIT_TAG ${GIT_TAG}
+      GIT_TAG eacc1ca98e5fef25184c7d417e8417225e05e65d # v0.27.0
       CMAKE_ARGS ${ep_common_args}
       CMAKE_CACHE_ARGS ${cmake_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS ${ep_common_cache_default_args}

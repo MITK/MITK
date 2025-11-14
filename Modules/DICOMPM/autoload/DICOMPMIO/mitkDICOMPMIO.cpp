@@ -138,7 +138,7 @@ namespace mitk
 	try
 	  {
 	    // convert from unique to raw pointer
-	    vector<DcmDataset*> rawVecDataset;
+	    vector<DcmItem*> rawVecDataset;
 	    for ( const auto& dcmDataSet : dcmDatasetsSourceImage ) { rawVecDataset.push_back( dcmDataSet.get() ); }
 	    std::unique_ptr<dcmqi::ParaMapConverter> PMconverter(new dcmqi::ParaMapConverter());
 	    std::unique_ptr<DcmDataset> PMresult (PMconverter->itkimage2paramap(itkParamapImage, rawVecDataset, tmpMetaInfoFile));

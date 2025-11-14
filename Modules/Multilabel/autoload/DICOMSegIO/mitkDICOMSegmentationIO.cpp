@@ -128,7 +128,7 @@ namespace mitk
     // Iterate over all layers. For each a dcm file will be generated
     for (unsigned int layer = 0; layer < input->GetNumberOfGroups(); ++layer)
     {
-      vector<itkInternalImageType::Pointer> segmentations;
+      vector<itkInternalImageType::ConstPointer> segmentations;
 
       try
       {
@@ -177,7 +177,7 @@ namespace mitk
       try
       {
         //TODO is there a better way? Interface expects a vector of raw pointer.
-        vector<DcmDataset*> rawVecDataset;
+        vector<DcmItem*> rawVecDataset;
         for (const auto& dcmDataSet : dcmDatasetsSourceImage)
           rawVecDataset.push_back(dcmDataSet.get());
 

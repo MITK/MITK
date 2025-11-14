@@ -472,7 +472,7 @@ void mitk::MonaiLabelTool::PostInferRequest(const std::string &hostName,
   std::stringstream buffer_lf_img;
   buffer_lf_img << input.rdbuf();
   input.close();
-  httplib::MultipartFormDataItems items;
+  httplib::UploadFormDataItems items;
   if (m_RequestParameters->model.IsInteractive())
   {
     std::string foreground = this->ConvertPointsAsListString(baseGeometry, m_PointSetPositive);

@@ -9,7 +9,7 @@ import urllib.request
 
 parser = argparse.ArgumentParser(description="Find latest NumPy wheel for specific macOS version")
 parser.add_argument("--arch", help="CPU arch: x86_64 or arm64", default="arm64")
-parser.add_argument("--osx-target", help="CMAKE_OSX_DEPLOYMENT_TARGET, e.g. 12.0", default="12.0")
+parser.add_argument("--osx-target", help="CMAKE_OSX_DEPLOYMENT_TARGET, e.g. 13.0", default="13.0")
 args = parser.parse_args()
 
 # Parse macOS version from wheel filename

@@ -27,7 +27,7 @@ if(NOT DEFINED tinyxml2_DIR)
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      GIT_REPOSITORY https://github.com/leethomason/tinyxml2.git
-     GIT_TAG 8.0.0
+     GIT_TAG 9148bdf719e997d1f474be6bcc7943881046dba1 # 11.0.0
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS
@@ -36,7 +36,8 @@ if(NOT DEFINED tinyxml2_DIR)
      CMAKE_CACHE_ARGS
        ${ep_common_cache_args}
        -DBUILD_TESTING:BOOL=OFF
-       -DBUILD_TESTS:BOOL=OFF
+       -Dtinyxml2_BUILD_TESTING:BOOL=OFF
+       -Dtinyxml2_INSTALL_PKGCONFIG:BOOL=OFF
      CMAKE_CACHE_DEFAULT_ARGS
        ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}

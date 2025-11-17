@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <mitkLabelSuggestionHelper.h>
 
+#include <mitkRenderingManager.h>
+
 #include <QFileDialog>
 
 #include <ui_QmitkSegmentationPreferencePageControls.h>
@@ -85,6 +87,9 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   prefs->PutBool("monailabel allow all models", m_Ui->allowAllModelsCheckBox->isChecked());
   prefs->PutInt("monailabel timeout", std::stoi(m_Ui->monaiTimeoutEdit->text().toStdString()));
 
+  prefs->PutBool("activate 3D rendering", m_Ui->check3DRendering->isChecked());
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+
   return true;
 }
 
@@ -148,6 +153,7 @@ void QmitkSegmentationPreferencePage::Update()
   m_Ui->allowAllModelsCheckBox->setChecked(prefs->GetBool("monailabel allow all models", true));
   m_Ui->monaiTimeoutEdit->setText(QString::number(prefs->GetInt("monailabel timeout", 180)));
 
+  m_Ui->check3DRendering->setChecked(prefs->GetBool("activate 3D rendering", true));
 }
 
 void QmitkSegmentationPreferencePage::OnLabelSetPresetButtonClicked()

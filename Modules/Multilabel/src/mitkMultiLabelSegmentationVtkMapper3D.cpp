@@ -18,7 +18,8 @@ found in the LICENSE file.
 #include <mitkVectorProperty.h>
 #include <mitkLabelHighlightGuard.h>
 
-// MITK Rendering
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 // VTK
 #include <vtkImageData.h>
@@ -233,7 +234,12 @@ mitk::MultiLabelSegmentationVtkMapper3D::CheckForOutdatedGroups(mitk::MultiLabel
   }
 
 
-  if (!positionChanges.empty() || fadedPipelineChanged)
+  if (!positionChanges.empty() //update due to position change
+    || fadedPipelineChanged //update because the faded pipeline was (de)activated
+    || (!ls->m_GroupPipelines.empty() && ls->m_Actors->GetParts()->GetNumberOfItems()==0) //we have pipelines but no actor parts
+                                                                                          //can happen e.g. if 3D rendering pref
+                                                                                          //changes
+    )
   {
     // connect actor from scratch with all pipelines as some positions have changed
     // (this includes the case where a new group has been added or a group was deleted in between).
@@ -385,7 +391,6 @@ namespace
 
     return supported;
   }
-
 }
 
 void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *renderer)
@@ -419,7 +424,13 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
   bool hide3Dvisualize = false;
   node->GetBoolProperty("org.mitk.multilabel.3D.hide", hide3Dvisualize, renderer);
 
-  if (!visible || hide3Dvisualize)
+  const auto pref3DRendering = nullptr != localStorage->m_SegPreferences ? localStorage->m_SegPreferences->GetBool("activate 3D rendering", true) : true;
+  const auto changed3DRendering = pref3DRendering != localStorage->m_3DRenderingPreference;
+  localStorage->m_3DRenderingPreference = pref3DRendering;
+
+  if (!visible
+    || hide3Dvisualize
+    || !pref3DRendering)
   {
     // Nothing to see. Clear the actor. We regenerate its contents later if necessary.
     localStorage->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
@@ -458,7 +469,8 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
       (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
       (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
       (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
-      (localStorage->m_LastPropertyUpdateTime < segmentation->GetPropertyList()->GetMTime()))
+      (localStorage->m_LastPropertyUpdateTime < segmentation->GetPropertyList()->GetMTime()) ||
+      changed3DRendering)
   {
     this->GenerateDataForRenderer(renderer);
     localStorage->m_LastPropertyUpdateTime.Modified();
@@ -501,4 +513,17 @@ mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::LocalStorage() : m_LastUp
   m_TransferFunction->AddRGBPoint(mitk::Label::MAX_LABEL_VALUE, 1., 1., 1.);
   m_OpacityTransferFunction->AddPoint(mitk::Label::MAX_LABEL_VALUE, 0.0);
   m_FadedOpacityTransferFunction->AddPoint(mitk::Label::MAX_LABEL_VALUE, 0.0);
+
+  m_SegPreferences = nullptr;
+  m_3DRenderingPreference = true;
+
+  auto prefService = mitk::CoreServices::GetPreferencesService();
+  if (nullptr != prefService)
+  {
+    auto systemPref = prefService->GetSystemPreferences();
+    if (nullptr != systemPref)
+    {
+      m_SegPreferences= systemPref->Node("/org.mitk.views.segmentation");
+    }
+  }
 }

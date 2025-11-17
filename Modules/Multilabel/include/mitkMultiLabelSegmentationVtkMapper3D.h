@@ -38,6 +38,7 @@ class vtkPiecewiseFunction;
 namespace mitk
 {
   class MultiLabelSegmentationGroupMapping;
+  class IPreferences;
 
   /** \brief Mapper to resample and display 2D slices of a 3D labelset image.
    *
@@ -106,6 +107,9 @@ namespace mitk
        * False: No, mapper will not render something. If optional has no value it
        * means that no check was done so far.*/
       std::optional<bool> m_GPUCheckSuccessfull;
+      bool m_3DRenderingPreference;
+
+      IPreferences* m_SegPreferences;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();

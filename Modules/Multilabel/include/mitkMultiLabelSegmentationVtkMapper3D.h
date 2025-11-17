@@ -37,6 +37,7 @@ class vtkPiecewiseFunction;
 
 namespace mitk
 {
+  class MultiLabelSegmentationGroupMapping;
 
   /** \brief Mapper to resample and display 2D slices of a 3D labelset image.
    *
@@ -81,23 +82,17 @@ namespace mitk
     public:
       vtkSmartPointer<vtkPropAssembly> m_Actors;
 
-      std::vector<vtkSmartPointer<vtkSmartVolumeMapper>> m_LayerVolumeMappers;
-      std::vector<vtkSmartPointer<vtkImageData>> m_LayerImages;
-      std::vector<vtkSmartPointer<vtkVolume>> m_LayerVolumes;
+      std::map<const Image*, std::unique_ptr<MultiLabelSegmentationGroupMapping>> m_GroupPipelines;
 
       vtkSmartPointer<vtkColorTransferFunction> m_TransferFunction;
       vtkSmartPointer<vtkPiecewiseFunction> m_OpacityTransferFunction;
-
-      /** Vector containing the pointer of the currently used group images.
-       * IMPORTANT: This member must not be used to access any data.
-       * Its purpose is to allow checking if the order of the groups has changed
-       * in order to adapt the pipe line accordingly*/
-      std::vector<const Image*> m_GroupImageIDs;
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastDataUpdateTime;
       /** \brief Timestamp of last update of a property. */
       itk::TimeStamp m_LastPropertyUpdateTime;
+
+      mitk::TimeStepType m_LastUpdateTimeStep;
 
       /** look up table for label colors. */
       mitk::LookupTable::Pointer m_LabelLookupTable;
@@ -133,11 +128,16 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    bool GenerateVolumeMapping(LocalStorage* localStorage, const std::vector<mitk::MultiLabelSegmentation::GroupIndexType>& outdatedGroupIDs);
-
     /** \brief Generates the look up table that should be used.
       */
     void UpdateLookupTable(LocalStorage* localStorage);
+
+    using OutdatedGroupVectorType = std::vector<std::pair<mitk::MultiLabelSegmentation::GroupIndexType, const mitk::Image*>>;
+    /** Checks if groups are outdated, or obsolete. obsolete groups will be removed. Outdated groups will be indicated
+    in the output as such. New groups will be added to the local storage and also marked as outdated.*/
+    OutdatedGroupVectorType CheckForOutdatedGroups(mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls, mitk::MultiLabelSegmentation* seg);
+
+    void UpdateVolumeMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedData);
 
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::LocalStorageHandler<LocalStorage> m_LSH;

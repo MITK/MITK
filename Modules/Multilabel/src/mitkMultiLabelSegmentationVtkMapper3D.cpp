@@ -46,6 +46,27 @@ namespace
   }
 }
 
+namespace mitk
+{
+  class MultiLabelSegmentationGroupMapping
+  {
+  public:
+    vtkSmartPointer<vtkSmartVolumeMapper> m_VolumeMapper;
+    vtkSmartPointer<vtkImageData> m_VtkImage;
+    vtkSmartPointer<vtkVolume> m_Volume;
+    //indicated the index it was added to the actor in order to identify if there are changes
+    //in sequence
+    MultiLabelSegmentation::GroupIndexType m_ActorOrder = 0;
+
+    MultiLabelSegmentationGroupMapping()
+    {
+      m_VtkImage = vtkSmartPointer<vtkImageData>::New();
+      m_VolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+      m_Volume = vtkSmartPointer<vtkVolume>::New();
+    }
+  };
+}
+
 mitk::MultiLabelSegmentationVtkMapper3D::MultiLabelSegmentationVtkMapper3D()
 {
 }
@@ -110,119 +131,114 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
   localStorage->m_OpacityTransferFunction->Modified();
 }
 
-namespace
+mitk::MultiLabelSegmentationVtkMapper3D::OutdatedGroupVectorType
+mitk::MultiLabelSegmentationVtkMapper3D::CheckForOutdatedGroups(mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls, mitk::MultiLabelSegmentation* seg)
 {
-  std::vector<mitk::MultiLabelSegmentation::GroupIndexType> GetOutdatedGroups(const mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls, const mitk::MultiLabelSegmentation* seg)
-  {
-    const auto nrOfGroups = seg->GetNumberOfGroups();
-    std::vector<mitk::MultiLabelSegmentation::GroupIndexType> result;
+  assert(seg && seg->IsInitialized());
 
-    for (mitk::MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < nrOfGroups; ++groupID)
-    {
-      const auto groupImage = seg->GetGroupImage(groupID);
-      if (groupImage->GetMTime() > ls->m_LastDataUpdateTime
-        || groupImage->GetPipelineMTime() > ls->m_LastDataUpdateTime
-        || ls->m_GroupImageIDs.size() <= groupID
-        || groupImage != ls->m_GroupImageIDs[groupID])
+  const auto nrOfGroups = seg->GetNumberOfGroups();
+  OutdatedGroupVectorType result;
+  OutdatedGroupVectorType positionChanges;
+  std::unordered_set<mitk::Image*> existingGroupImages;
+
+  for (mitk::MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < nrOfGroups; ++groupID)
+  {
+    const auto groupImage = seg->GetGroupImage(groupID);
+    existingGroupImages.insert(groupImage);
+
+    auto finding = ls->m_GroupPipelines.find(groupImage);
+
+    if (finding != ls->m_GroupPipelines.end())
+    { //group image has a pipeline
+      const bool imageIsOutdated = groupImage->GetMTime() > ls->m_LastDataUpdateTime
+        || groupImage->GetPipelineMTime() > ls->m_LastDataUpdateTime;
+      const bool groupPositionHasChanged = groupID != finding->second->m_ActorOrder;
+      if (imageIsOutdated || groupPositionHasChanged)
       {
-        result.push_back(groupID);
+        result.push_back({ groupID, groupImage });
+
+        if (groupPositionHasChanged) positionChanges.push_back({ groupID, groupImage });
       }
     }
-    return result;
+    else
+    { //new group image, we need a pipeline for that
+      auto newPipeline = ls->m_GroupPipelines.insert(std::make_pair(groupImage, std::make_unique<mitk::MultiLabelSegmentationGroupMapping>()));
+
+      //pipeline->m_VtkImage will be set and connected in the update function
+      auto& pipeline = newPipeline.first->second;
+
+      auto spacing = seg->GetGeometry()->GetSpacing();
+      double minSpacing = std::min({ spacing[0], spacing[1], spacing[2] });
+
+      // Critical: Sample densely enough to capture thin slices
+      pipeline->m_VolumeMapper->SetAutoAdjustSampleDistances(0);
+      pipeline->m_VolumeMapper->SetSampleDistance(minSpacing * 0.5); // Half the minimum voxel size
+      pipeline->m_VolumeMapper->SetBlendModeToComposite();
+
+      // Set up gradient opacity to handle thin slices
+      auto gradientOpacity = vtkSmartPointer<vtkPiecewiseFunction>::New();
+      gradientOpacity->AddPoint(0, 1.0);      // Full opacity at zero gradient (flat surfaces)
+      gradientOpacity->AddPoint(10, 1.0);     // Keep full opacity for small gradients
+      gradientOpacity->AddPoint(255, 1.0);    // Full opacity everywhere
+
+      pipeline->m_Volume->GetProperty()->SetGradientOpacity(gradientOpacity);
+
+      pipeline->m_Volume->GetProperty()->ShadeOn();
+      pipeline->m_Volume->GetProperty()->SetDiffuse(0.8);
+      pipeline->m_Volume->GetProperty()->SetAmbient(0.3);
+      pipeline->m_Volume->GetProperty()->SetSpecular(0.1);
+      pipeline->m_Volume->GetProperty()->SetInterpolationTypeToNearest();
+      pipeline->m_Volume->SetMapper(pipeline->m_VolumeMapper);
+      pipeline->m_ActorOrder = groupID;
+
+      //new pipelines are always outdated
+      result.push_back({ groupID, groupImage });
+      positionChanges.push_back({ groupID, groupImage });
+    }
   }
+
+  //find all pipelines that refer to image that are not needed anymore and remove them
+  std::vector < const mitk::Image*> missing;
+  for (auto const& [key, value] : ls->m_GroupPipelines)
+  {
+    if (std::find(existingGroupImages.begin(), existingGroupImages.end(), key)
+      == existingGroupImages.end())
+    {
+      missing.push_back(key);
+    }
+  }
+
+  for (auto& key : missing)
+  {
+    ls->m_Actors->RemovePart(ls->m_GroupPipelines[key]->m_Volume);
+    ls->m_GroupPipelines.erase(key);
+  }
+
+  if (!positionChanges.empty())
+  {
+    // connect actor from scratch with all pipelines as some positions have changed
+    // (this includes the case where a new group has been added or a group was deleted in between).
+    ls->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
+    for (auto& [key, pipeline] : ls->m_GroupPipelines)
+    {
+      ls->m_Actors->AddPart(pipeline->m_Volume);
+    }
+  }
+
+  return result;
 }
 
-void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
-{
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-  mitk::DataNode *node = this->GetDataNode();
-  auto *image = dynamic_cast<mitk::MultiLabelSegmentation *>(node->GetData());
-  assert(image && image->IsInitialized());
-
-  bool isLookupModified = localStorage->m_LabelLookupTable.IsNull() ||
-    (localStorage->m_LabelLookupTable->GetMTime() < image->GetLookupTable()->GetMTime()) ||
-    PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.labels.highlighted", localStorage->m_LabelLookupTable->GetMTime()) ||
-    PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.highlight_invisible", localStorage->m_LabelLookupTable->GetMTime()) ||
-    PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime());
-
-  auto outdatedGroups = GetOutdatedGroups(localStorage, image);
-
-  bool isGeometryModified = (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
-    (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime());
-
-  // check if visibility has been switched on since last update
-  bool visibilityChanged =
-    PropertyTimeStampIsNewer(node, renderer, "visible", localStorage->m_LastDataUpdateTime) ||
-    PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.3D.hide", localStorage->m_LastDataUpdateTime);
-
-  if (isGeometryModified || visibilityChanged)
-  {
-    //if geometry is outdated or visibility changed all groups need regeneration
-    outdatedGroups.resize(image->GetNumberOfGroups());
-    std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
-  }
-
-  if (!outdatedGroups.empty())
-  {
-    auto hasValidContent = this->GenerateVolumeMapping(localStorage, outdatedGroups);
-    if (!hasValidContent) return;
-  }
-
-  if (isLookupModified)
-  {
-    this->UpdateLookupTable(localStorage);
-  }
-
-  if (isLookupModified)
-  {
-    //if lookup table is modified all groups need a new color mapping
-    outdatedGroups.resize(image->GetNumberOfGroups());
-    std::iota(outdatedGroups.begin(), outdatedGroups.end(), 0);
-  }
-
-  for (const auto groupID : outdatedGroups)
-  {
-    localStorage->m_LayerVolumes[groupID]->GetProperty()->SetColor(localStorage->m_TransferFunction);
-    localStorage->m_LayerVolumes[groupID]->GetProperty()->SetScalarOpacity(localStorage->m_OpacityTransferFunction);
-    localStorage->m_LayerVolumes[groupID]->Update();
-  }
-}
-
-bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(LocalStorage* localStorage, const std::vector<mitk::MultiLabelSegmentation::GroupIndexType>& outdatedGroupIDs)
+void mitk::MultiLabelSegmentationVtkMapper3D::UpdateVolumeMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedGroups)
 {
   mitk::DataNode* node = this->GetDataNode();
-  auto* image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
-  assert(image && image->IsInitialized());
+  auto* segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
+  assert(segmentation && segmentation->IsInitialized());
 
-  image->Update();
-
-  const auto currentNumberOfGroups = localStorage->m_GroupImageIDs.size();
-  const auto numberOfGroups = image->GetNumberOfGroups();
-
-  if (numberOfGroups != currentNumberOfGroups)
-  {
-    localStorage->m_GroupImageIDs.resize(numberOfGroups);
-    localStorage->m_LayerImages.resize(numberOfGroups);
-    localStorage->m_LayerVolumeMappers.resize(numberOfGroups);
-    localStorage->m_LayerVolumes.resize(numberOfGroups);
-
-    if (numberOfGroups > currentNumberOfGroups)
-    {
-      for (unsigned int groupID = currentNumberOfGroups; groupID < numberOfGroups; ++groupID)
-      {
-        localStorage->m_GroupImageIDs[groupID] = nullptr;
-        localStorage->m_LayerImages[groupID] = vtkSmartPointer<vtkImageData>::New();
-        localStorage->m_LayerVolumeMappers[groupID] = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-        localStorage->m_LayerVolumes[groupID] = vtkSmartPointer<vtkVolume>::New();
-      }
-    }
-
-    localStorage->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
-  }
+  segmentation->Update();
 
   //Compute normalized orientation matrix of segmentation to ensure that the volume is shown
   //at the right spot (same geometry like segmentation)
-  const auto geometry = image->GetGeometry();
+  const auto geometry = segmentation->GetGeometry();
   auto spacing = geometry->GetSpacing();
   auto orientationMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
   orientationMatrix->DeepCopy(geometry->GetVtkMatrix());
@@ -234,18 +250,27 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(LocalStorage
     orientationMatrix->SetElement(i, 2, orientationMatrix->GetElement(i, 2) / spacing[2]);
   }
 
-  for (unsigned int groupID = 0; groupID < numberOfGroups; ++groupID)
-    localStorage->m_LayerVolumes[groupID]->SetUserMatrix(orientationMatrix);
+  const auto timeStep = this->GetTimestep();
 
-  for (const auto groupID : outdatedGroupIDs)
+  for (auto& [groupID, groupImage] : outdatedGroups)
   {
-    const auto groupImage = image->GetGroupImage(groupID);
-    localStorage->m_GroupImageIDs[groupID] = groupImage;
+    auto finding = localStorage->m_GroupPipelines.find(groupImage);
+    if (finding == localStorage->m_GroupPipelines.end())
+    {
+      MITK_ERROR << "MultiLabelSegmentationVtkMapper3D is in invalid state. Group image is indicated as outdated that has no pipeline: Group image pointer: " << groupImage;
+      return;
+    }
+    auto& pipeline = finding->second;
+    pipeline->m_Volume->SetUserMatrix(orientationMatrix);
 
-    localStorage->m_LayerImages[groupID] = groupImage->GetVtkImageData(this->GetTimestep());
+    // we could also search for the nonConst groupImage in segmentation, but the const cast
+    // is faster and legit as we have access to the non const segmentation anyways.
+    auto nonConstImage = const_cast<Image*>(groupImage);
+    pipeline->m_VtkImage = nonConstImage->GetVtkImageData(timeStep);
+    pipeline->m_VolumeMapper->SetInputData(pipeline->m_VtkImage);
 
     // Force VTK to recompute scalar range from the actual data
-    auto scalars = localStorage->m_LayerImages[groupID]->GetPointData()->GetScalars();
+    auto scalars = pipeline->m_VtkImage->GetPointData()->GetScalars();
     if (scalars)
     {
       // This forces VTK to scan the actual data and recompute range
@@ -254,49 +279,66 @@ bool mitk::MultiLabelSegmentationVtkMapper3D::GenerateVolumeMapping(LocalStorage
     }
 
     // Force the vtkImageData to update its cached range
-    localStorage->m_LayerImages[groupID]->Modified();
-    localStorage->m_LayerImages[groupID]->GetScalarRange(); // This should now be correct
+    pipeline->m_VtkImage->Modified();
+    pipeline->m_VtkImage->GetScalarRange(); // This should now be correct
+    pipeline->m_VolumeMapper->Update();
 
-
-    localStorage->m_LayerVolumeMappers[groupID]->SetInputData(localStorage->m_LayerImages[groupID]);
-
-
-
-    // DIAGNOSTIC: Check the actual data
-    double actualRange[2];
-    localStorage->m_LayerImages[groupID]->GetScalarRange(actualRange);
-    std::cout << "Group " << groupID << " vtkImageData scalar range: ["
-      << actualRange[0] << ", " << actualRange[1] << "]" << std::endl;
-
-    // DIAGNOSTIC: Check what the mapper sees
-    localStorage->m_LayerVolumeMappers[groupID]->Update();
-    double mapperRange[2];
-
-    localStorage->m_LayerVolumeMappers[groupID]->GetInput()->GetScalarRange(mapperRange);
-    // DIAGNOSTIC END
-
-    std::cout << "Mapper sees scalar range: ["
-      << mapperRange[0] << ", " << mapperRange[1] << "]" << std::endl;
-
-    localStorage->m_LayerVolumes[groupID]->GetProperty()->ShadeOn();
-    localStorage->m_LayerVolumes[groupID]->GetProperty()->SetDiffuse(1.0);
-    localStorage->m_LayerVolumes[groupID]->GetProperty()->SetAmbient(0.4);
-    localStorage->m_LayerVolumes[groupID]->GetProperty()->SetSpecular(0.2);
-    localStorage->m_LayerVolumes[groupID]->GetProperty()->SetInterpolationTypeToNearest();
-
-    localStorage->m_LayerVolumes[groupID]->SetMapper(localStorage->m_LayerVolumeMappers[groupID]);
+    pipeline->m_Volume->GetProperty()->SetColor(localStorage->m_TransferFunction);
+    pipeline->m_Volume->GetProperty()->SetScalarOpacity(localStorage->m_OpacityTransferFunction);
+    pipeline->m_Volume->Update();
   }
 
-  if (localStorage->m_Actors->GetParts()->GetNumberOfItems() == 0)
+  localStorage->m_Actors->Modified();
+  localStorage->m_LastDataUpdateTime.Modified();
+  localStorage->m_LastUpdateTimeStep = timeStep;
+}
+
+void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
+{
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+  mitk::DataNode* node = this->GetDataNode();
+  auto* image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
+  assert(image && image->IsInitialized());
+  image->Update();
+
+  const bool isLookupModified = localStorage->m_LabelLookupTable.IsNull() ||
+    (localStorage->m_LabelLookupTable->GetMTime() < image->GetLookupTable()->GetMTime()) ||
+    PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.labels.highlighted", localStorage->m_LabelLookupTable->GetMTime()) ||
+    PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.highlight_invisible", localStorage->m_LabelLookupTable->GetMTime()) ||
+    PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime());
+
+  if (isLookupModified)
   {
-    for (unsigned int groupID = 0; groupID < numberOfGroups; ++groupID)
+    this->UpdateLookupTable(localStorage);
+  }
+
+  auto outdatedGroups = this->CheckForOutdatedGroups(localStorage, image);
+
+  const bool isGeometryModified = (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
+    (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime());
+
+  // check if visibility has been switched on since last update
+  const bool visibilityChanged =
+    PropertyTimeStampIsNewer(node, renderer, "visible", localStorage->m_LastDataUpdateTime) ||
+    PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.3D.hide", localStorage->m_LastDataUpdateTime);
+
+  const bool timeStepChanged = this->GetTimestep() != localStorage->m_LastUpdateTimeStep;
+
+  if (isGeometryModified || visibilityChanged || isLookupModified || timeStepChanged)
+  {
+    //if geometry is outdated, lookup table, timestep or visibility changed all groups need regeneration
+    outdatedGroups.clear();
+    MultiLabelSegmentation::GroupIndexType groupID = 0;
+    for (auto& [key, pipeline] : localStorage->m_GroupPipelines)
     {
-      localStorage->m_Actors->AddPart(localStorage->m_LayerVolumes[groupID]);
+      outdatedGroups.emplace_back(groupID, key);
     }
   }
 
-  localStorage->m_LastDataUpdateTime.Modified();
-  return true;
+  if (!outdatedGroups.empty())
+  {
+    this->UpdateVolumeMapping(localStorage, outdatedGroups);
+  }
 }
 
 void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *renderer)
@@ -370,7 +412,7 @@ mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::~LocalStorage()
 {
 }
 
-mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::LocalStorage()
+mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::LocalStorage() : m_LastUpdateTimeStep(0)
 {
   // Do as much actions as possible in here to avoid double executions.
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
@@ -387,5 +429,4 @@ mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::LocalStorage()
   m_OpacityTransferFunction->AddPoint(0, 0.);
   m_TransferFunction->AddRGBPoint(mitk::Label::MAX_LABEL_VALUE, 1., 1., 1.);
   m_OpacityTransferFunction->AddPoint(mitk::Label::MAX_LABEL_VALUE, 0.5);
-
 }

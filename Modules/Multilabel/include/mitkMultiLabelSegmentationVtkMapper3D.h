@@ -86,6 +86,11 @@ namespace mitk
 
       vtkSmartPointer<vtkColorTransferFunction> m_TransferFunction;
       vtkSmartPointer<vtkPiecewiseFunction> m_OpacityTransferFunction;
+      vtkSmartPointer<vtkPiecewiseFunction> m_FadedOpacityTransferFunction;
+
+      /** indicated if highlighting is in use and therefor also
+       the Faded pipeline should be used for none highlighted labels.*/
+      bool m_UseFadedPipeline;
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastDataUpdateTime;
@@ -135,7 +140,8 @@ namespace mitk
     using OutdatedGroupVectorType = std::vector<std::pair<mitk::MultiLabelSegmentation::GroupIndexType, const mitk::Image*>>;
     /** Checks if groups are outdated, or obsolete. obsolete groups will be removed. Outdated groups will be indicated
     in the output as such. New groups will be added to the local storage and also marked as outdated.*/
-    OutdatedGroupVectorType CheckForOutdatedGroups(mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls, mitk::MultiLabelSegmentation* seg);
+    OutdatedGroupVectorType CheckForOutdatedGroups(mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls,
+      mitk::MultiLabelSegmentation* seg, bool fadedPipelineChanged);
 
     void UpdateVolumeMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedData);
 

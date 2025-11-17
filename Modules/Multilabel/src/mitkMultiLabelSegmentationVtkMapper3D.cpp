@@ -24,7 +24,7 @@ found in the LICENSE file.
 #include <vtkImageData.h>
 #include <vtkLookupTable.h>
 #include <vtkVolume.h>
-#include <vtkSmartVolumeMapper.h>
+#include <vtkGPUVolumeRayCastMapper.h>
 #include <vtkVolumeProperty.h>
 #include <vtkSmartPointer.h>
 #include <vtkColorTransferFunction.h>
@@ -51,11 +51,11 @@ namespace mitk
   class MultiLabelSegmentationGroupMapping
   {
   public:
-    vtkSmartPointer<vtkSmartVolumeMapper> m_VolumeMapper;
+    vtkSmartPointer<vtkGPUVolumeRayCastMapper> m_VolumeMapper;
     vtkSmartPointer<vtkVolume> m_Volume;
 
     /** In highlighting mode used for all labels that are faded out.*/
-    vtkSmartPointer<vtkSmartVolumeMapper> m_FadedVolumeMapper;
+    vtkSmartPointer<vtkGPUVolumeRayCastMapper> m_FadedVolumeMapper;
     /** In highlighting mode used for all labels that are faded out.*/
     vtkSmartPointer<vtkVolume> m_FadedVolume;
 
@@ -67,9 +67,9 @@ namespace mitk
     MultiLabelSegmentationGroupMapping()
     {
       m_VtkImage = vtkSmartPointer<vtkImageData>::New();
-      m_VolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+      m_VolumeMapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
       m_Volume = vtkSmartPointer<vtkVolume>::New();
-      m_FadedVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+      m_FadedVolumeMapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
       m_FadedVolume = vtkSmartPointer<vtkVolume>::New();
     }
   };
@@ -366,10 +366,48 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   }
 }
 
+namespace
+{
+  bool IsGPUMapperSupported(mitk::BaseRenderer* renderer)
+  {
+    vtkNew<vtkImageData> tiny;
+    tiny->SetDimensions(2, 2, 2);
+    tiny->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+
+    vtkNew<vtkGPUVolumeRayCastMapper> mapper;
+    mapper->SetInputData(tiny);
+
+    bool supported = (0 != mapper->IsRenderSupported(renderer->GetVtkRenderer()->GetRenderWindow(), nullptr));
+
+    return supported;
+  }
+
+}
+
 void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *renderer)
 {
   auto localStorage = m_LSH.GetLocalStorage(renderer);
   const auto* node = this->GetDataNode();
+
+  if (nullptr == localStorage || nullptr == node)
+  {
+    return;
+  }
+
+  if (!localStorage->m_GPUCheckSuccessfull.has_value())
+  {
+    const auto hasGPU = IsGPUMapperSupported(renderer);
+    localStorage->m_GPUCheckSuccessfull = hasGPU;
+    if (!hasGPU)
+    {
+      MITK_INFO << "No GPU available. 3D rendering of MultilabelSegmentation is deactivated for node: " << node->GetName();
+    }
+  }
+
+  if (!localStorage->m_GPUCheckSuccessfull.value())
+  {
+    return;
+  }
 
   bool visible = true;
   node->GetVisibility(visible, renderer, "visible");

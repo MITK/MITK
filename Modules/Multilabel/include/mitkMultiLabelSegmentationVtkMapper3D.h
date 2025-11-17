@@ -102,6 +102,11 @@ namespace mitk
       /** look up table for label colors. */
       mitk::LookupTable::Pointer m_LabelLookupTable;
 
+      /** Indicates if GPU is available for the mapper. True: Yes, mapper will work
+       * False: No, mapper will not render something. If optional has no value it
+       * means that no check was done so far.*/
+      std::optional<bool> m_GPUCheckSuccessfull;
+
       /** \brief Default constructor of the local storage. */
       LocalStorage();
       /** \brief Default destructor of the local storage. */

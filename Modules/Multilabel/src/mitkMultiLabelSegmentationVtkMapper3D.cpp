@@ -111,33 +111,37 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
   auto highlightEnd = highlightedLabelValues.cend();
 
   mitk::BoolProperty::Pointer boolProp = dynamic_cast<mitk::BoolProperty*>(node->GetNonConstProperty(LabelHighlightGuard::PROPERTY_NAME_HIGHLIGHT_INVISIBLE()));
-  const bool highlightInvisible = boolProp.IsNull() ? false : boolProp->GetValue();
-
-  localStorage->m_UseFadedPipeline = !highlightedLabelValues.empty();
+  const bool highlightInvisibleLabels = boolProp.IsNull() ? false : boolProp->GetValue();
+  const bool highlightingActive = !highlightedLabelValues.empty();
+  localStorage->m_UseFadedPipeline = highlightingActive;
 
   double rgba[4];
   for (const auto& value : labelValues)
   {
     lookUpTable->GetTableValue(value, rgba);
-    const bool isHighlightedValue = highlightedLabelValues.empty() || highlightEnd != std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), value);
+    bool isHighlightedValue = false;
 
-    if (!isHighlightedValue)
-    { //make all none highlighted values more transparent
-      rgba[3] *= 0.01;
-    }
-    else
+    if (highlightingActive)
     {
-      if (highlightInvisible || rgba[3] != 0)
+      isHighlightedValue = highlightEnd != std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), value);
+      if (!isHighlightedValue)
+      { //make all none highlighted values more transparent
+        rgba[3] *= 0.01;
+      }
+      else
       {
-        rgba[3] = 1.;
+        if (rgba[3] != 0 || highlightInvisibleLabels)
+        { //highlight a label if it is visible or if also invisible labels should be highlighted
+          rgba[3] = 1.;
+        }
       }
     }
     lookUpTable->SetTableValue(value, rgba);
 
     localStorage->m_TransferFunction->AddRGBPoint(value, rgba[0], rgba[1], rgba[2]);
 
-    const double opacityNormal = (isHighlightedValue || !localStorage->m_UseFadedPipeline) ? rgba[3] : 0.;
-    const double opacityFaded = !(isHighlightedValue || !localStorage->m_UseFadedPipeline) ? rgba[3] : 0.;
+    const double opacityNormal = (isHighlightedValue || !highlightingActive) ? rgba[3] : 0.;
+    const double opacityFaded = !(isHighlightedValue || !highlightingActive) ? rgba[3] : 0.;
 
     localStorage->m_OpacityTransferFunction->AddPoint(value, opacityNormal);
     localStorage->m_FadedOpacityTransferFunction->AddPoint(value, opacityFaded);

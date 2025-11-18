@@ -690,11 +690,13 @@ if(OpenSSL_FOUND AND WIN32)
       heuristic to automatically set them:
 
         - Based on the link libraries (usually located in a lib folder),
-          try to find the "../bin" binary directory.
+          try to find the closest bin directory.
         - Use the base file names of the link libraries to find corresponding
           DLLs like "<base name>*.dll", that usually are named like
           "<base name>-1_1-x64.dll" or similar.
    ]]
+  include(mitkFunctionFindClosestBinDirectory)
+
   set(openssl_ssl_dll "")
   set(openssl_crypto_dll "")
 
@@ -715,11 +717,9 @@ if(OpenSSL_FOUND AND WIN32)
     endif()
 
     if(EXISTS "${openssl_ssl_lib}")
-      get_filename_component(openssl_bin_dir "${openssl_ssl_lib}" DIRECTORY)
-      get_filename_component(openssl_bin_dir "${openssl_bin_dir}" DIRECTORY)
-      set(openssl_bin_dir "${openssl_bin_dir}/bin")
+      mitkFindClosestBinDirectory("${openssl_ssl_lib}" openssl_bin_dir)
 
-      if(EXISTS "${openssl_bin_dir}")
+      if(openssl_bin_dir AND EXISTS "${openssl_bin_dir}")
         get_filename_component(openssl_ssl_basename "${openssl_ssl_lib}" NAME_WE)
         file(GLOB openssl_ssl_dll "${openssl_bin_dir}/${openssl_ssl_basename}*.dll")
         list(LENGTH openssl_ssl_dll num_findings)

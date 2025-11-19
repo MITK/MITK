@@ -46,12 +46,15 @@ public:
 
   void Update() override;
 
+
 protected Q_SLOTS:
 
   void OnLabelSetPresetButtonClicked();
   void OnSuggestionsButtonClicked();
+  void OnBuilInSuggestionsChanged(int);
 
 protected:
+  void FillBuiltInSuggestionComboBox(std::string& standardLabelSuggestions);
 
   Ui::QmitkSegmentationPreferencePageControls* m_Ui;
   QWidget* m_Control;

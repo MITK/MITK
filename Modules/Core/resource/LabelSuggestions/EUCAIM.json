@@ -1,0 +1,75 @@
+{
+  "version": 3,
+  "type": "org.mitk.multilabel.segmentation.stack",
+  "properties": {
+	"name":	"EUCAIM Vocabulary",
+	"version": 1,
+	"description": "Label vocabulary v1.3 defined by the EUCAIM project."
+	},
+  "groups": [
+    {
+      "labels": [
+        {
+          "name": "Abdomen",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D4000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Abdomen",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-D4000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Abdomen"
+        },
+        {
+          "name": "Adenohypophysis",
+          "color": [
+            60,
+            143,
+            83
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-B1100",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Adenohypophysis",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-B1100",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Adenohypophysis"
+        },
+        {
+          "name": "Adrenal gland",
+          "color": [
+            249,
+            186,
+            150
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-B3000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Adrenal Gland",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-B3000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Adrenal Gland"
+        }
+	  ]
+    }
+  ]
+}

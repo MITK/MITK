@@ -78,9 +78,9 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(
   auto suggestionHelper = mitk::LabelSuggestionHelper::New();
   suggestionHelper->LoadStandardSuggestions();
 
-  if (!suggestionPref.labelSuggestionFile.empty())
+  if (!suggestionPref.externalLabelSuggestionFile.empty())
   {
-    suggestionHelper->ParseSuggestions(suggestionPref.labelSuggestionFile,
+    suggestionHelper->ParseSuggestions(suggestionPref.externalLabelSuggestionFile,
       suggestionPref.replaceStandardSuggestions);
   }
 

@@ -66,6 +66,22 @@ namespace mitk
 
   LabelSuggestionHelper::~LabelSuggestionHelper() {}
 
+  void LabelSuggestionHelper::LoadStandardSuggestions()
+  {
+    auto suggestionPref = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+
+    auto json = GetStandardSuggesitions();
+
+    if (json.has_value())
+    {
+      this->ParseSuggestions(json.value());
+    }
+    else
+    { //no standard is defined. Suggestions should be empty
+      m_Suggestions.clear();
+    }
+  }
+
   bool LabelSuggestionHelper::ParseSuggestions(const std::string& filePath, bool replaceExisting)
   {
     std::ifstream input(filePath);
@@ -132,32 +148,97 @@ namespace mitk
     return true;
   }
 
-  void LabelSuggestionHelper::LoadStandardSuggestions()
+  std::map<std::string, nlohmann::json> LabelSuggestionHelper::GetAllAvailableBuiltInSuggestions()
   {
+    std::map<std::string, nlohmann::json> result;
+
     try
     {
-      us::ModuleResource presetResource = us::GetModuleContext()->GetModule("MitkCore")->GetResource("mitkLabelSuggestions_classic.json");
-      if (!presetResource) return;
+      auto modules = us::GetModuleContext()->GetModules();
 
-      us::ModuleResourceStream presetStream(presetResource);
+      for (auto& aModule : modules)
+      {
+        auto resources = aModule->FindResources("/LabelSuggestions","*.json",false);
+        for (auto& resource : resources)
+        {
+          if (!resource) continue;
+
+          std::string id = aModule->GetName() + ":" + resource.GetCompleteBaseName();
+
+          us::ModuleResourceStream jsonStream(resource);
+
+          nlohmann::json fileContent;
+          try
+          {
+            jsonStream >> fileContent;
+          }
+          catch (const nlohmann::json::parse_error& e)
+          {
+            mitkThrow() << "Cannot read built-in config due to parsing error. Problematic resource: "<< id <<"; Parse error: " << e.what() << '\n';
+          }
+
+          result.emplace(id, fileContent);
+        }
+      }
+    }
+    catch (const std::exception& e)
+    {
+      MITK_WARN << "Failed to get all built-in suggestions: " << e.what();
+      return {};
+    }
+
+    return result;
+  }
+
+  std::optional<nlohmann::json> LabelSuggestionHelper::GetStandardSuggesitions()
+  {
+    auto suggestionPref = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+
+    std::optional<nlohmann::json> result;
+
+    auto pos = suggestionPref.standardLabelSuggestionResource.find(':');
+    std::string moduleName;
+    std::string configName;
+
+    if (pos == std::string::npos)
+    {
+      return result;
+    }
+
+    moduleName = suggestionPref.standardLabelSuggestionResource.substr(0, pos);
+    configName = suggestionPref.standardLabelSuggestionResource.substr(pos + 1);
+
+    try
+    {
+      auto aModule = us::GetModuleContext()->GetModule(moduleName);
+      std::string filepath = "/LabelSuggestions/" + configName + ".json";
+
+      auto resource = aModule->GetResource(filepath);
+
+      if (!resource)
+      {
+        MITK_WARN << "Built-in suggestions indicated by preference could not be found. Preference: " << suggestionPref.standardLabelSuggestionResource << "; resource path: " << filepath;
+      }
+
+      us::ModuleResourceStream jsonStream(resource);
 
       nlohmann::json fileContent;
       try
       {
-        presetStream >> fileContent;
+        jsonStream >> fileContent;
       }
       catch (const nlohmann::json::parse_error& e)
       {
-        mitkThrow() << "Cannot reader data due to parsing error. Parse error: " << e.what() << '\n';
+        mitkThrow() << "Cannot read built-in config due to parsing error. Problematic resource: " << filepath << "; Parse error: " << e.what() << '\n';
       }
 
-      this->ParseSuggestions(fileContent, true);
+      result = fileContent;
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
-      MITK_WARN << "Failed to load standard suggestions: " << e.what();
-      return;
+      MITK_WARN << "Failed to get built-in standard label suggestions: " << e.what();
     }
+    return result;
   }
 
   LabelSuggestionHelper::ConstLabelVectorType LabelSuggestionHelper::GetValidSuggestionsForNewLabels(
@@ -264,8 +345,8 @@ namespace mitk
       {
         auto* nodePrefs = systemPref->Node("/org.mitk.views.segmentation");
 
-
-        prefs.labelSuggestionFile = nodePrefs->Get("label suggestions", "");
+        prefs.externalLabelSuggestionFile = nodePrefs->Get("external label suggestions", "");
+        prefs.standardLabelSuggestionResource = nodePrefs->Get("standard label suggestions", "");
         prefs.replaceStandardSuggestions = nodePrefs->GetBool("replace standard suggestions", true);
         prefs.enforceSuggestions = nodePrefs->GetBool("enforce suggestions", false);
         prefs.suggestionOnce = nodePrefs->GetBool("suggest once", true);

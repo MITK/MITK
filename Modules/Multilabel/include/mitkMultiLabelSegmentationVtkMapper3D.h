@@ -32,9 +32,13 @@ class vtkLookupTable;
 class vtkVolumeProperty;
 class vtkVolume;
 class vtkSmartVolumeMapper;
+class vtkColorTransferFunction;
+class vtkPiecewiseFunction;
 
 namespace mitk
 {
+  class MultiLabelSegmentationGroupMapping;
+  class IPreferences;
 
   /** \brief Mapper to resample and display 2D slices of a 3D labelset image.
    *
@@ -79,28 +83,33 @@ namespace mitk
     public:
       vtkSmartPointer<vtkPropAssembly> m_Actors;
 
-      std::vector<vtkSmartPointer<vtkSmartVolumeMapper>> m_LayerVolumeMappers;
-      std::vector<vtkSmartPointer<vtkImageData>> m_LayerImages;
-      std::vector<vtkSmartPointer<vtkVolume>> m_LayerVolumes;
+      std::map<const Image*, std::unique_ptr<MultiLabelSegmentationGroupMapping>> m_GroupPipelines;
 
-      std::vector <vtkSmartPointer<vtkColorTransferFunction> > m_TransferFunctions;
-      std::vector <vtkSmartPointer<vtkPiecewiseFunction> > m_OpacityTransferFunctions;
+      vtkSmartPointer<vtkColorTransferFunction> m_TransferFunction;
+      vtkSmartPointer<vtkPiecewiseFunction> m_OpacityTransferFunction;
+      vtkSmartPointer<vtkPiecewiseFunction> m_FadedOpacityTransferFunction;
 
-      /** Vector containing the pointer of the currently used group images.
-       * IMPORTANT: This member must not be used to access any data.
-       * Its purpose is to allow checking if the order of the groups has changed
-       * in order to adapt the pipe line accordingly*/
-      std::vector<const Image*> m_GroupImageIDs;
+      /** indicated if highlighting is in use and therefor also
+       the Faded pipeline should be used for none highlighted labels.*/
+      bool m_UseFadedPipeline;
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastDataUpdateTime;
       /** \brief Timestamp of last update of a property. */
       itk::TimeStamp m_LastPropertyUpdateTime;
 
+      mitk::TimeStepType m_LastUpdateTimeStep;
+
       /** look up table for label colors. */
       mitk::LookupTable::Pointer m_LabelLookupTable;
 
-      unsigned int m_NumberOfGroups;
+      /** Indicates if GPU is available for the mapper. True: Yes, mapper will work
+       * False: No, mapper will not render something. If optional has no value it
+       * means that no check was done so far.*/
+      std::optional<bool> m_GPUCheckSuccessfull;
+      bool m_3DRenderingPreference;
+
+      IPreferences* m_SegPreferences;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
@@ -108,19 +117,15 @@ namespace mitk
       ~LocalStorage() override;
     };
 
-    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-    mitk::LocalStorageHandler<LocalStorage> m_LSH;
-
     /** \brief Get the LocalStorage corresponding to the current renderer. */
-    LocalStorage *GetLocalStorage(mitk::BaseRenderer *renderer);
+    LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
 
-    /** \brief Set the default properties for general image rendering. */
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = nullptr, bool overwrite = false);
 
   protected:
     /** Default constructor */
     MultiLabelSegmentationVtkMapper3D();
-    /** Default deconstructor */
+    /** Default destructor */
     ~MultiLabelSegmentationVtkMapper3D() override;
 
     /** \brief Does the actual resampling, without rendering the image yet.
@@ -137,11 +142,20 @@ namespace mitk
       */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    bool GenerateVolumeMapping(mitk::BaseRenderer* renderer, const std::vector<mitk::MultiLabelSegmentation::GroupIndexType>& outdatedGroupIDs);
-
     /** \brief Generates the look up table that should be used.
       */
-    void GenerateLookupTable(mitk::BaseRenderer* renderer);
+    void UpdateLookupTable(LocalStorage* localStorage);
+
+    using OutdatedGroupVectorType = std::vector<std::pair<mitk::MultiLabelSegmentation::GroupIndexType, const mitk::Image*>>;
+    /** Checks if groups are outdated, or obsolete. obsolete groups will be removed. Outdated groups will be indicated
+    in the output as such. New groups will be added to the local storage and also marked as outdated.*/
+    OutdatedGroupVectorType CheckForOutdatedGroups(mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls,
+      mitk::MultiLabelSegmentation* seg, bool fadedPipelineChanged);
+
+    void UpdateVolumeMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedData);
+
+    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
   };
 
 } // namespace mitk

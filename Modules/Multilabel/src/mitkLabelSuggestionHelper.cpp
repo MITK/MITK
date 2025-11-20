@@ -174,7 +174,7 @@ namespace mitk
           }
           catch (const nlohmann::json::parse_error& e)
           {
-            mitkThrow() << "Cannot reader built-in config due to parsing error. Problematic resource: "<< id <<"; Parse error : " << e.what() << '\n';
+            mitkThrow() << "Cannot read built-in config due to parsing error. Problematic resource: "<< id <<"; Parse error: " << e.what() << '\n';
           }
 
           result.emplace(id, fileContent);
@@ -229,7 +229,7 @@ namespace mitk
       }
       catch (const nlohmann::json::parse_error& e)
       {
-        mitkThrow() << "Cannot reader built-in config due to parsing error. Problematic resource: " << filepath << "; Parse error : " << e.what() << '\n';
+        mitkThrow() << "Cannot read built-in config due to parsing error. Problematic resource: " << filepath << "; Parse error: " << e.what() << '\n';
       }
 
       result = fileContent;

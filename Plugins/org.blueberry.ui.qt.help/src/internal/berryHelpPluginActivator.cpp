@@ -458,17 +458,23 @@ void QCHPluginListener::addPlugin(QSharedPointer<ctkPlugin> plugin)
     {
       QByteArray content = plugin->getResource(resource);
       QFile localFile(qchDirInfo.absoluteFilePath() + "/" + resource.section('/', -1));
-      localFile.open(QIODevice::WriteOnly);
-      localFile.write(content);
-      localFile.close();
-      if (localFile.error() != QFile::NoError)
+      if (localFile.open(QIODevice::WriteOnly))
       {
-        BERRY_WARN << "Error writing " << localFile.fileName().toStdString()
-                   << ": " << localFile.errorString().toStdString();
+        localFile.write(content);
+        localFile.close();
+        if (localFile.error() != QFile::NoError)
+        {
+          BERRY_WARN << "Error writing " << localFile.fileName().toStdString()
+            << ": " << localFile.errorString().toStdString();
+        }
+        else
+        {
+          localQCHFiles << localFile.fileName();
+        }
       }
       else
       {
-        localQCHFiles << localFile.fileName();
+        BERRY_ERROR << "Error creating or opening " << localFile.fileName().toStdString();
       }
     }
 

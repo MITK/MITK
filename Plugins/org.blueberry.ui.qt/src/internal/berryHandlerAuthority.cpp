@@ -32,7 +32,7 @@ found in the LICENSE file.
 #include "berryEvaluationContext.h"
 #include "berryExpression.h"
 
-#include <QTime>
+#include <QElapsedTimer>
 
 namespace berry {
 

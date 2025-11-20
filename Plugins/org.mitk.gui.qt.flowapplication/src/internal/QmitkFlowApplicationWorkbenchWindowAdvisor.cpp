@@ -1108,7 +1108,11 @@ void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onIntro()
     QRegularExpression reg("(.*)<title>(\\n)*");
     QRegularExpression reg2("(\\n)*</title>(.*)");
     QFile file(":/org.mitk.gui.qt.ext/index.html");
-    file.open(QIODevice::ReadOnly | QIODevice::Text); //text file only for reading
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) //text file only for reading
+    {
+      MITK_ERROR << "Could not open intro file!";
+      return;
+    }
 
     QString text = QString(file.readAll());
 

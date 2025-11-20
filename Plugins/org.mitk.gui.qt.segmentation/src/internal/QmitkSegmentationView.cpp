@@ -747,13 +747,15 @@ void QmitkSegmentationView::RenderWindowPartInputChanged(mitk::IRenderWindowPart
 void QmitkSegmentationView::UpdateLabelSuggestions()
 {
   auto suggestionPref = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+
   m_LabelSuggestionHelper->LoadStandardSuggestions(); // this does not only ensure suggestions to be loaded, but
   // also that the helper indicates modified, if any preference
   // is changed (e.g. the "enforce suggestions") and reflected
   // in the LabelManager widget that listens to the modify event.
-  if (!suggestionPref.labelSuggestionFile.empty())
+
+  if (!suggestionPref.externalLabelSuggestionFile.empty())
   {
-    m_LabelSuggestionHelper->ParseSuggestions(suggestionPref.labelSuggestionFile, suggestionPref.replaceStandardSuggestions);
+    m_LabelSuggestionHelper->ParseSuggestions(suggestionPref.externalLabelSuggestionFile, suggestionPref.replaceStandardSuggestions);
   }
 }
 

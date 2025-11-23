@@ -157,11 +157,6 @@ namespace mitk
     itkGetMacro(IsTimePointChangeAware, bool);
     itkBooleanMacro(IsTimePointChangeAware);
 
-  protected:
-    SegTool2D();             // purposely hidden
-    SegTool2D(const char *, const us::Module *interactorModule = nullptr); // purposely hidden
-    ~SegTool2D() override;
-
     /**
      * @brief returns the segmentation node that should be modified by the tool.
      */
@@ -170,6 +165,11 @@ namespace mitk
 
     DataNode* GetReferenceDataNode() const;
     Image* GetReferenceData() const;
+
+  protected:
+    SegTool2D();             // purposely hidden
+    SegTool2D(const char *, const us::Module *interactorModule = nullptr); // purposely hidden
+    ~SegTool2D() override;
 
     /**
      * This function can be reimplemented by derived classes to react on changes of the current

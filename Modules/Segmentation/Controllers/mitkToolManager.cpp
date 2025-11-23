@@ -341,6 +341,8 @@ void mitk::ToolManager::SetWorkingData(DataVectorType data)
       this->ActivateTool(-1);
     // workaround end
 
+    m_ActiveWorkingLabel = MultiLabelSegmentation::UNLABELED_VALUE; //changing the working data also leads to a reset of the active label.
+
     // attach new observers
     m_WorkingDataObserverTags.clear();
     for (auto dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
@@ -433,6 +435,16 @@ void mitk::ToolManager::SetRoiData(DataNode *data)
   this->SetRoiData(v);
 }
 
+void mitk::ToolManager::SetActiveWorkingLabel(MultiLabelSegmentation::LabelValueType labelValue)
+{
+  if (labelValue != m_ActiveWorkingLabel)
+  {
+    m_ActiveWorkingLabel = labelValue;
+
+    ActiveWorkingLabelChanged.Send();
+  }
+}
+
 void mitk::ToolManager::OnOneOfTheRoiDataDeletedConst(const itk::Object *caller, const itk::EventObject &e)
 {
   OnOneOfTheRoiDataDeleted(const_cast<itk::Object *>(caller), e);
@@ -489,6 +501,11 @@ mitk::DataNode *mitk::ToolManager::GetRoiData(int idx)
   {
     return nullptr;
   }
+}
+
+mitk::MultiLabelSegmentation::LabelValueType mitk::ToolManager::GetActiveWorkingLabel()
+{
+  return m_ActiveWorkingLabel;
 }
 
 mitk::DataStorage::Pointer mitk::ToolManager::GetDataStorage() const

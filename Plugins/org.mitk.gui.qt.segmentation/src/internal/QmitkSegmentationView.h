@@ -94,6 +94,7 @@ private:
   void CreateQtPartControl(QWidget* parent) override;
 
   void SetFocus() override {}
+
   /**
   * @brief Enable or disable the SegmentationInteractor.
   *
@@ -101,7 +102,9 @@ private:
   * If the active tool is valid, the SegmentationInteractor is enabled
   * to listen to 'SegmentationInteractionEvent's.
   */
-  void ActiveToolChanged();
+  void OnActiveToolChanged();
+
+  void OnActiveWorkingLabelSelectionChanged();
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;

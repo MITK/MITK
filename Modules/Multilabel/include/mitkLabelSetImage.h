@@ -391,6 +391,17 @@ namespace mitk
     const LabelValueVectorType GetLabelValuesByName(GroupIndexType index, const std::string_view name) const;
 
     /**
+     * @brief Returns a vector of all label values that are covering passed position in world coordinates.
+     * @param index the index of the group for which the vector of labels should be retrieved.
+     * If no index is passed. The coordinates will be checked for all groups.
+     * @param timeStep the time step of the segmentation for which the labels should be checked/retrieved.
+     * @return the respective vector of label values.
+     * @pre group index must exist.
+     */
+    const LabelValueVectorType GetLabelValuesByCoordinates(const Point3D& coordinates, TimeStepType timeStep = 0,
+      std::optional<GroupIndexType> index = std::make_optional<GroupIndexType>()) const;
+
+    /**
     * Returns a vector with (class) names of all label instances used in the segmentation (over all groups)
     */
     std::vector<std::string> GetLabelClassNames() const;

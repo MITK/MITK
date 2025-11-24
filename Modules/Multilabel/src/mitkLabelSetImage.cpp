@@ -22,6 +22,10 @@ found in the LICENSE file.
 #include <mitkNodePredicateGeometry.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkImageTimeSelector.h>
+
+#include <mitkPixelTypeMultiplex.h>
+#include <mitkImagePixelReadAccessor.h>
+
 #include <itkLabelGeometryImageFilter.h>
 #include <itkCommand.h>
 #include <itkBinaryFunctorImageFilter.h>
@@ -1428,6 +1432,38 @@ const mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegment
 
   this->VisitLabels(this->GetLabelValuesByGroup(index), searchName);
 
+  return result;
+}
+
+const mitk::MultiLabelSegmentation::LabelValueVectorType mitk::MultiLabelSegmentation::GetLabelValuesByCoordinates(const Point3D& coordinates,
+  TimeStepType timeStep, std::optional<GroupIndexType> index) const
+{
+  std::vector<GroupIndexType> relevantGroups;
+  if (index.has_value())
+  {
+    relevantGroups.push_back(index.value());
+  }
+  else
+  {
+    relevantGroups.resize(m_GroupContainer.size());
+    std::iota(relevantGroups.begin(), relevantGroups.end(), 0);
+  }
+
+  mitk::MultiLabelSegmentation::LabelValueVectorType result;
+
+  if (!this->GetGeometry(timeStep)->IsInside(coordinates))
+    return result;
+
+  for (auto groupIndex : relevantGroups)
+  {
+    auto groupImage = this->GetGroupImage(groupIndex);
+    mitk::ImagePixelReadAccessor<mitk::MultiLabelSegmentation::LabelValueType, 3> pixelReader(SelectImageByTimeStep(groupImage,timeStep));
+
+    if (auto pixel = pixelReader.GetPixelByWorldCoordinates(coordinates); pixel != MultiLabelSegmentation::UNLABELED_VALUE)
+    {
+      result.emplace_back(pixel);
+    }
+  }
   return result;
 }
 

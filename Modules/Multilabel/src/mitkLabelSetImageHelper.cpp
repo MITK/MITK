@@ -287,3 +287,52 @@ std::string mitk::LabelSetImageHelper::CreateHTMLLabelName(const mitk::Label* la
   stream << "</font>";
   return stream.str();
 }
+
+std::string mitk::LabelSetImageHelper::CreateHTMLLabelDetails(const mitk::Label* label, const mitk::MultiLabelSegmentation* segmentation)
+{
+  std::stringstream stream;
+  stream << "<font class=\"normal\"> ";
+
+  stream << "<b>Pixel value:</b> " << label->GetValue();
+  if (nullptr != segmentation && segmentation->GetNumberOfGroups() > 1 && segmentation->ExistLabel(label->GetValue()))
+  {
+    stream << "<br/><b>Group:</b> " << CreateDisplayGroupName(segmentation, segmentation->GetGroupIndexOfLabel(label->GetValue()));
+  }
+  if (!label->GetTrackingID().empty())
+  {
+    stream <<"<br/><b>Tracking ID:</b> "<< label->GetTrackingID();
+  }
+  if (label->GetAnatomicRegionCount() > 0)
+  {
+    auto code = label->GetAnatomicRegion(0);
+    stream <<"<br/><b>Anatomic region:</b> " << code.GetMeaning();
+  }
+  if (label->GetPrimaryAnatomicStructureCount() > 0)
+  {
+    auto code = label->GetPrimaryAnatomicStructure(0);
+    stream << "<br/><b>Primary anatomic structure:</b> " << code.GetMeaning();
+    if (code.GetModifierCount() > 0)
+    {
+      stream << " (" <<code.GetModifier(0).GetMeaning()<<")";
+    }
+  }
+  if (auto code = label->GetSegmentedPropertyCategory(); code.has_value())
+  {
+    stream <<"<br/><b>Type category:</b> " << code->GetMeaning();
+  }
+  if (auto code = label->GetSegmentedPropertyType(); code.has_value())
+  {
+    stream << "<br/><b>Type:</b> " << code->GetMeaning();
+    if (code->GetModifierCount() > 0)
+    {
+      stream << " (" << code->GetModifier(0).GetMeaning() << ")";
+    }
+  }
+  if (!label->GetDescription().empty())
+  {
+    stream <<"<br/><b>Description:</b> " << label->GetDescription();
+  }
+
+  stream << "</font>";
+  return stream.str();
+}

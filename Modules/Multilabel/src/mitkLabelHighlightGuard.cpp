@@ -47,6 +47,11 @@ void mitk::LabelHighlightGuard::SetHighlightedLabels(MultiLabelSegmentation::Lab
   }
 }
 
+mitk::MultiLabelSegmentation::LabelValueVectorType mitk::LabelHighlightGuard::GetHighlightedLabels() const
+{
+  return m_Labels;
+}
+
 void mitk::LabelHighlightGuard::SetHighlightInvisibleLabels(bool highlightInvisible)
 {
   auto ownNode = m_Node.Lock();

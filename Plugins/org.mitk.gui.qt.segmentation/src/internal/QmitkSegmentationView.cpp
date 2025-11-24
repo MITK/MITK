@@ -144,7 +144,9 @@ QmitkSegmentationView::~QmitkSegmentationView()
   }
 
   m_ToolManager->ActiveToolChanged -=
-    mitk::MessageDelegate<Self>(this, &Self::ActiveToolChanged);
+    mitk::MessageDelegate<Self>(this, &Self::OnActiveToolChanged);
+  m_ToolManager->ActiveWorkingLabelChanged -=
+    mitk::MessageDelegate<Self>(this, &Self::OnActiveWorkingLabelSelectionChanged);
 
   delete m_Controls;
 }
@@ -592,7 +594,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_ToolManager->SetDataStorage(*(this->GetDataStorage()));
    m_ToolManager->InitializeTools();
 
-   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything' 'MedSAM' 'MONAI Label 2D'");
+   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' 'Segment Anything' 'MedSAM' 'MONAI Label 2D' Selection");
    QString segTools3D = tr("nnInteractive Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut TotalSegmentator 'MONAI Label 3D'");
 
 #ifdef __linux__
@@ -663,7 +665,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    this->UpdateGUI();
 }
 
-void QmitkSegmentationView::ActiveToolChanged()
+void QmitkSegmentationView::OnActiveToolChanged()
 {
   if (nullptr == m_RenderWindowPart)
   {
@@ -684,6 +686,19 @@ void QmitkSegmentationView::ActiveToolChanged()
 
   // set the interaction reference geometry for the render window part (might be nullptr)
   m_RenderWindowPart->SetInteractionReferenceGeometry(interactionReferenceGeometry);
+}
+
+void QmitkSegmentationView::OnActiveWorkingLabelSelectionChanged()
+{
+  auto segmentation = this->GetCurrentSegmentation();
+
+  if (nullptr == segmentation || nullptr == m_ToolManager)
+  {
+    return;
+  }
+
+  auto tmLabel = m_ToolManager->GetActiveWorkingLabel();
+  m_Controls->multiLabelWidget->SetSelectedLabel(tmLabel);
 }
 
 void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -712,8 +727,10 @@ void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* r
     {
       // react if the active tool changed, only if a render window part with decoupled render windows is used
       m_ToolManager->ActiveToolChanged +=
-        mitk::MessageDelegate<Self>(this, &Self::ActiveToolChanged);
+        mitk::MessageDelegate<Self>(this, &Self::OnActiveToolChanged);
     }
+    m_ToolManager->ActiveWorkingLabelChanged +=
+      mitk::MessageDelegate<Self>(this, &Self::OnActiveWorkingLabelSelectionChanged);
   }
 }
 
@@ -727,7 +744,9 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
 
   // remove message-connection to make sure no message is processed if no render window part is available
   m_ToolManager->ActiveToolChanged -=
-    mitk::MessageDelegate<Self>(this, &Self::ActiveToolChanged);
+    mitk::MessageDelegate<Self>(this, &Self::OnActiveToolChanged);
+  m_ToolManager->ActiveWorkingLabelChanged -=
+    mitk::MessageDelegate<Self>(this, &Self::OnActiveWorkingLabelSelectionChanged);
 
   m_Controls->slicesInterpolator->Uninitialize();
 }

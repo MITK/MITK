@@ -18,6 +18,7 @@ set(CPP_FILES
   QmitkFileReaderOptionsDialog.cpp
   QmitkFileReaderWriterOptionsWidget.cpp
   QmitkFileWriterOptionsDialog.cpp
+  QmitkFloatingTextPopup.cpp
   QmitkInteractionSchemeToolBar.cpp
   QmitkIOUtil.cpp
   QmitkLevelWindowPresetDefinitionDialog.cpp
@@ -102,6 +103,7 @@ set(MOC_H_FILES
   include/QmitkFileReaderOptionsDialog.h
   include/QmitkFileReaderWriterOptionsWidget.h
   include/QmitkFileWriterOptionsDialog.h
+  include/QmitkFloatingTextPopup.h
   include/QmitkInteractionSchemeToolBar.h
   include/QmitkLevelWindowPresetDefinitionDialog.h
   include/QmitkLevelWindowRangeChangeDialog.h

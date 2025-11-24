@@ -30,7 +30,7 @@ QmitkLabelSelectionToolGUI::QmitkLabelSelectionToolGUI() : QmitkToolGUI(),
 
   connect(m_Controls->m_OnlyActiveGroupCheck, &QCheckBox::stateChanged, this, &QmitkLabelSelectionToolGUI::OnCheckChanged);
 
-  connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
+  connect(this, &QmitkLabelSelectionToolGUI::NewToolAssociated, this, &QmitkLabelSelectionToolGUI::OnNewToolAssociated);
 
   m_FloatingPopup->SetOpacity(100);
   m_FloatingPopup->SetEnabled(false);

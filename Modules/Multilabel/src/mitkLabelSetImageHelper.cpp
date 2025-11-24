@@ -296,7 +296,7 @@ std::string mitk::LabelSetImageHelper::CreateHTMLLabelDetails(const mitk::Label*
   stream << "<b>Pixel value:</b> " << label->GetValue();
   if (nullptr != segmentation && segmentation->GetNumberOfGroups() > 1 && segmentation->ExistLabel(label->GetValue()))
   {
-    stream << "<br/><b>Group:</b> " << segmentation->GetGroupName(segmentation->GetGroupIndexOfLabel(label->GetValue()));
+    stream << "<br/><b>Group:</b> " << CreateDisplayGroupName(segmentation, segmentation->GetGroupIndexOfLabel(label->GetValue()));
   }
   if (!label->GetTrackingID().empty())
   {

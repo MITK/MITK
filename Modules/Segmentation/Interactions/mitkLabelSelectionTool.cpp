@@ -126,6 +126,7 @@ void mitk::LabelSelectionTool::OnMouseReleased(StateMachineAction*, InteractionE
   const auto labels = m_HighlightGuard.GetHighlightedLabels();
   if (!labels.empty())
   {
-    this->GetToolManager()->SetActiveWorkingLabel({ labels.front()});
+
+    this->GetToolManager()->SetActiveWorkingLabel( labels.front() );
   }
 }

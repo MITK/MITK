@@ -31,12 +31,7 @@ mitk::LabelSelectionTool::~LabelSelectionTool()
 
 us::ModuleResource mitk::LabelSelectionTool::GetIconResource() const
 {
-  return us::GetModuleContext()->GetModule()->GetResource("Lasso.svg");
-}
-
-us::ModuleResource mitk::LabelSelectionTool::GetCursorIconResource() const
-{
-  return us::GetModuleContext()->GetModule()->GetResource("Lasso_Cursor.svg");
+  return us::GetModuleContext()->GetModule()->GetResource("Selection.svg");
 }
 
 const char** mitk::LabelSelectionTool::GetXPM() const

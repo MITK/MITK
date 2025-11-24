@@ -22,11 +22,14 @@ found in the LICENSE file.
 
 namespace
 {
-  constexpr auto TORCH = "torch>=2.8.0,<3.0.0";
+  // With PyTorch v2.9.0, nnInteractive has a 4x performance regression.
+  // Starting with PyTorch v2.9.1, support for the GeForce 10-series GPUs is dropped.
+  constexpr auto TORCH = "torch>=2.8.0,<2.9.0";
+
   constexpr auto TORCH_VISION = "torchvision>=0.23.0,<1.0.0";
   constexpr auto NNINTERACTIVE = "nninteractive>=1.1.2,<2.0.0";
 
-  // Starting with CUDA 12.9 we get the following error on our lowest
+  // Starting with CUDA v12.9 we get the following error on our lowest
   // supported GPU architecture (e.g. GeForce 10 Series):
   //   torch.AcceleratorError: CUDA error: no kernel image is available
   //   for exec

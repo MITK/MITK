@@ -61,6 +61,7 @@ if(MITK_USE_Python3)
       ExternalProject_Add_Step(${proj} check_openssl
         COMMAND ${python3_executable} "${MITK_SOURCE_DIR}/CMakeExternals/Python3_CheckOpenSSL.py"
           --expected "${OPENSSL_VERSION}"
+          --skip-if-built-in
         DEPENDEES patch
         DEPENDERS configure
         WORKING_DIRECTORY "<SOURCE_DIR>"

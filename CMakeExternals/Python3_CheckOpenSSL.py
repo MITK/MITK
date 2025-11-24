@@ -19,6 +19,7 @@ def extract_major_minor(version_string: str) -> str:
 
 parser = argparse.ArgumentParser(description="Check OpenSSL version used by Python Standalone Builds")
 parser.add_argument("--expected", required=True, help="Expected OpenSSL version (found by CMake)")
+parser.add_argument("--skip-if-built-in", dest="skip_builtin", action="store_true", help="Skip version check if Python uses a built-in OpenSSL")
 args = parser.parse_args()
 
 expected_version = extract_major_minor(args.expected)
@@ -26,6 +27,10 @@ expected_version = extract_major_minor(args.expected)
 if not expected_version:
     sys.stderr.write(f"ERROR: Could not parse expected OpenSSL version from '{args.expected}'\n")
     sys.exit(1)
+
+if args.skip_builtin and not hasattr(ssl._ssl, "__file__"):
+    print("OK: Python Standalone Builds uses a built-in version of OpenSSL.")
+    sys.exit(0)
 
 actual_version = extract_major_minor(ssl.OPENSSL_VERSION)
 

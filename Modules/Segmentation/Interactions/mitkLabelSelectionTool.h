@@ -43,6 +43,7 @@ namespace mitk
     Message<> IndicatedLabelsChanged;
 
     us::ModuleResource GetIconResource() const override;
+    us::ModuleResource GetCursorIconResource() const override;
 
     const char** GetXPM() const override;
 

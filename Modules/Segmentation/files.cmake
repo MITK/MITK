@@ -107,6 +107,7 @@ set(RESOURCE_FILES
   RegionGrowing.svg
   RegionGrowing_Cursor.svg
   Selection.svg
+  Selection_Cursor.svg
   Subtract.svg
   Subtract_Cursor.svg
   Threshold.svg

@@ -13,7 +13,6 @@ found in the LICENSE file.
 #ifndef QmitkPreferencesService_h
 #define QmitkPreferencesService_h
 
-#include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 
 class QmitkPreferencesService : public mitk::IPreferencesService
@@ -29,7 +28,7 @@ public:
   bool OpenPreferencesDialog(const std::string& page = {}) override;
 
 private:
-  mitk::CoreServicePointer<mitk::IPreferencesService> m_PreferencesService;
+  mitk::IPreferencesService* m_PreferencesService;
 };
 
 #endif

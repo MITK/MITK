@@ -268,7 +268,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     bool textureInterpolation = false;
     node->GetBoolProperty("texture interpolation", textureInterpolation, renderer);
 
-    // set the interpolation modus according to the property
+    // set the interpolation mode according to the property
     localStorage->m_LayerTextureVector[groupID]->SetInterpolate(textureInterpolation);
 
     localStorage->m_LayerTextureVector[groupID]->SetInputConnection(
@@ -283,10 +283,15 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     localStorage->m_LayerActorVector[groupID]->GetProperty()->SetOpacity(opacity);
   }
 
-  auto activeLayer = segmentation->GetActiveLayer();
-  bool activeGroupIsOutdated = std::find(outdatedGroups.begin(), outdatedGroups.end(), activeLayer) != outdatedGroups.end();
+  const auto activeLayer = segmentation->GetActiveLayer();
+  const bool activeGroupIsOutdated = std::find(outdatedGroups.begin(), outdatedGroups.end(), activeLayer) != outdatedGroups.end();
+  const auto activeLabel = segmentation->GetActiveLabel();
+  const MultiLabelSegmentation::LabelValueType activeLabelValue = nullptr != activeLabel ? activeLabel->GetValue() : MultiLabelSegmentation::UNLABELED_VALUE;
+
+  const bool activeLabelChanged = activeLabelValue != localStorage->m_LastActiveLabelValue;
 
   if (activeGroupIsOutdated
+      || activeLabelChanged
       || PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LastActiveLabelUpdateTime.GetMTime())
       || PropertyTimeStampIsNewer(node, renderer, "labelset.contour.active", localStorage->m_LastActiveLabelUpdateTime.GetMTime())
       || PropertyTimeStampIsNewer(node, renderer, "labelset.contour.width", localStorage->m_LastActiveLabelUpdateTime.GetMTime())
@@ -402,8 +407,8 @@ void mitk::LabelSetImageVtkMapper2D::GenerateImageSlice(mitk::BaseRenderer* rend
 void mitk::LabelSetImageVtkMapper2D::GenerateActiveLabelOutline(mitk::BaseRenderer* renderer)
 {
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
-  mitk::DataNode* node = this->GetDataNode();
-  auto* image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
+  DataNode* node = this->GetDataNode();
+  auto* image = dynamic_cast<MultiLabelSegmentation*>(node->GetData());
 
   int activeLayer = image->GetActiveLayer();
 
@@ -411,14 +416,15 @@ void mitk::LabelSetImageVtkMapper2D::GenerateActiveLabelOutline(mitk::BaseRender
   node->GetOpacity(opacity, renderer, "opacity");
   opacity *= this->GetOpacityFactor();
 
-  mitk::Label* activeLabel = image->GetActiveLabel();
+  Label* activeLabel = image->GetActiveLabel();
+  MultiLabelSegmentation::LabelValueType activeLabelValue = nullptr != activeLabel ? activeLabel->GetValue() : MultiLabelSegmentation::UNLABELED_VALUE;
   bool contourActive = false;
   node->GetBoolProperty("labelset.contour.active", contourActive, renderer);
   if (nullptr != activeLabel && contourActive && activeLabel->GetVisible())
   {
     //generate contours/outlines
     localStorage->m_OutlinePolyData =
-      this->CreateOutlinePolyData(renderer, localStorage->m_ReslicedImageVector[activeLayer], activeLabel->GetValue());
+      this->CreateOutlinePolyData(renderer, localStorage->m_ReslicedImageVector[activeLayer], activeLabelValue);
     localStorage->m_OutlineActor->SetVisibility(true);
     localStorage->m_OutlineShadowActor->SetVisibility(true);
     const mitk::Color& color = activeLabel->GetColor();
@@ -440,6 +446,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateActiveLabelOutline(mitk::BaseRender
     localStorage->m_OutlineActor->SetVisibility(false);
     localStorage->m_OutlineShadowActor->SetVisibility(false);
   }
+  localStorage->m_LastActiveLabelValue = activeLabelValue;
   localStorage->m_LastActiveLabelUpdateTime.Modified();
 }
 

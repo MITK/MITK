@@ -15,6 +15,18 @@ found in the LICENSE file.
 
 #include <mitkIPreferencesService.h>
 
+/**
+ * \brief Proxy for the core preferences service that additionally
+ * provides the ability to open the preferences dialog.
+ *
+ * This service is registered with a higher service rank so that it
+ * transparently replaces the default core preferences service when the
+ * latter is requested via service lookup.
+ *
+ * The class forwards all calls to the underlying core preferences service,
+ * but also implements OpenPreferencesDialog(), which requires Qt and
+ * therefore cannot be provided by the core service itself.
+ */
 class QmitkPreferencesService : public mitk::IPreferencesService
 {
 public:
@@ -28,6 +40,7 @@ public:
   bool OpenPreferencesDialog(const std::string& page = {}) override;
 
 private:
+  // Raw, non-owning pointer; the core service is guaranteed to outlive this proxy.
   mitk::IPreferencesService* m_PreferencesService;
 };
 

@@ -29,11 +29,13 @@ namespace
   constexpr auto TORCH_VISION = "torchvision>=0.23.0,<1.0.0";
   constexpr auto NNINTERACTIVE = "nninteractive>=1.1.2,<2.0.0";
 
+#if defined(_WIN32)
   // Starting with CUDA v12.9 we get the following error on our lowest
   // supported GPU architecture (e.g. GeForce 10 Series):
   //   torch.AcceleratorError: CUDA error: no kernel image is available
   //   for exec
   constexpr auto CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu128";
+#endif
 }
 
 using Self = QmitknnInteractiveInstallDialog;

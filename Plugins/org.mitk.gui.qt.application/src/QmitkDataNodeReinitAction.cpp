@@ -67,17 +67,17 @@ namespace ReinitAction
 
     if (1 == nodes->Size()) // Special case: If exactly one ...
     {
-      auto image = dynamic_cast<mitk::Image*>(nodes->ElementAt(0)->GetData());
+      auto slicedData = dynamic_cast<mitk::SlicedData*>(nodes->ElementAt(0)->GetData());
 
-      if (nullptr != image) // ... image is selected, reinit is expected to rectify askew images.
+      if (nullptr != slicedData) // ... image-like data node is selected, reinit is expected to rectify askew geometries.
       {
         if (nullptr == baseRenderer)
         {
-          mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry());
+          mitk::RenderingManager::GetInstance()->InitializeViews(slicedData->GetTimeGeometry());
         }
         else
         {
-          mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), image->GetTimeGeometry());
+          mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), slicedData->GetTimeGeometry());
         }
         return;
       }

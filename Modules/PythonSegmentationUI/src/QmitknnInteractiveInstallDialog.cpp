@@ -144,12 +144,7 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
 
   if (m_InstallStep == InstallStep::Upgrade_Pip)
   {
-#if defined(_WIN32)
-    // On Windows, installing PyTorch is a separate step to allow passing --index-url to pip.
     m_InstallStep = InstallStep::Install_PyTorch;
-#else
-    m_InstallStep = InstallStep::Install_nnInteractive;
-#endif
   }
   else if (m_InstallStep == InstallStep::Install_PyTorch)
   {
@@ -191,12 +186,16 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
     if (torchvision.isEmpty())
       torchvision = TORCH_VISION;
 
+    QStringList args = { "-m", "pip", "install", torch, torchvision };
+
+#if defined(_WIN32)
     auto indexUrl = m_Ui->indexUrlLineEdit->text();
 
     if (indexUrl.isEmpty())
       indexUrl = CUDA_INDEX_URL;
 
-    QStringList args = { "-m", "pip", "install", torch, torchvision, "--index-url", indexUrl };
+    args.append({ "--index-url", indexUrl });
+#endif
 
     m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
   }

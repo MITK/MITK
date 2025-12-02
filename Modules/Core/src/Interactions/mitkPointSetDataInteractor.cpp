@@ -29,6 +29,7 @@ void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
   // Condition which is evaluated before transition is taken
   // following actions in the statemachine are only executed if it returns TRUE
   CONNECT_CONDITION("isoverpoint", CheckSelection);
+  CONNECT_CONDITION("canaddpoint", CanAddPoint);
   CONNECT_FUNCTION("addpoint", AddPoint);
   CONNECT_FUNCTION("selectpoint", SelectPoint);
   CONNECT_FUNCTION("unselect", UnSelectPointAtPosition);
@@ -158,7 +159,8 @@ mitk::PointSetDataInteractor::PointSetDataInteractor()
   : m_MaxNumberOfPoints(0),
     m_SelectionAccuracy(3.5),
     m_IsMovementEnabled(true),
-    m_IsRemovalEnabled(true)
+    m_IsRemovalEnabled(true),
+    m_Is3DPointPlacementEnabled(true)
 {
 }
 
@@ -174,6 +176,11 @@ void mitk::PointSetDataInteractor::EnableMovement(bool enabled)
 void mitk::PointSetDataInteractor::EnableRemoval(bool enabled)
 {
   m_IsRemovalEnabled = enabled;
+}
+
+void mitk::PointSetDataInteractor::Enable3DPointPlacement(bool enabled)
+{
+  m_Is3DPointPlacementEnabled = enabled;
 }
 
 void mitk::PointSetDataInteractor::SetBounds(BaseGeometry* geometry)
@@ -604,6 +611,11 @@ bool mitk::PointSetDataInteractor::CheckSelection(const mitk::InteractionEvent *
       return true;
   }
   return false;
+}
+
+bool mitk::PointSetDataInteractor::CanAddPoint(const InteractionEvent* interactionEvent)
+{
+  return m_Is3DPointPlacementEnabled || interactionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard3D;
 }
 
 void mitk::PointSetDataInteractor::UnselectAll(unsigned int timeStep, ScalarType timeInMs)

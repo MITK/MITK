@@ -199,6 +199,9 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
     args.append({ "--index-url", indexUrl });
 #endif
 
+    if (m_Ui->noCacheDirCheckBox->isChecked())
+      args.append("--no-cache-dir");
+
     m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
   }
   else // InstallStep::Install_nnInteractive
@@ -209,6 +212,10 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
       nnInteractive = NNINTERACTIVE;
 
     QStringList args = { "-m", "pip", "install", nnInteractive };
+
+    if (m_Ui->noCacheDirCheckBox->isChecked())
+      args.append("--no-cache-dir");
+
     m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
   }
 }

@@ -448,84 +448,118 @@ void mitk::MultiLabelSegmentation::InsertGroup(GroupIndexType groupID, mitk::Ima
 
 void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& labelSet)
 {
-  if (m_GroupContainer.size() <= groupID)
+  this->ReplaceGroupLabels({ {groupID, labelSet} });
+}
+
+void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& labelSet)
+{
+  this->ReplaceGroupLabels(groupID, ConvertLabelVectorConst(labelSet));
+}
+
+void mitk::MultiLabelSegmentation::ReplaceGroupLabels(std::map<MultiLabelSegmentation::GroupIndexType, MultiLabelSegmentation::ConstLabelVectorType> newGroupLabels)
+{
+  for (const auto& [groupID, groupLabels] : newGroupLabels)
   {
-    mitkThrow() << "Trying to replace labels of non-existing group. Invalid group id: "<<groupID;
+    if (m_GroupContainer.size() <= groupID)
+    {
+      mitkThrow() << "Trying to replace labels of non-existing group. Invalid group id: " << groupID;
+    }
   }
 
   auto oldActiveLabel = m_ActiveLabelValue;
 
-  LabelValueVectorType removedLabels;
-  LabelValueVectorType addedLabels;
-  LabelValueVectorType modifiedLabels;
+  LabelValueVectorType removedLabelValues;
+  LabelValueVectorType addedLabelValues;
+  LabelValueVectorType modifiedLabelValues;
 
-  LabelValueVectorType oldLabels;
+  LabelValueVectorType oldLabelsValues;
+
+  auto valueFoundLambda = [&newGroupLabels](const MultiLabelSegmentation::LabelValueType searchedValue)
+    {
+      for (auto& [groupID, groupLabels] : newGroupLabels)
+      {
+        if (std::find_if(groupLabels.cbegin(), groupLabels.cend(), [searchedValue](const Label* label) {return label->GetValue() == searchedValue; }) != groupLabels.cend())
+        {
+          return true;
+        }
+      }
+      return false;
+    };
+
   {
     std::lock_guard<std::shared_mutex> guard(m_LabelNGroupMapsMutex);
 
-    //remove old group labels
-    oldLabels = this->m_GroupToLabelMap[groupID];
-    for (auto labelID : oldLabels)
+    // remove old group labels en bloc to avoid later potential value conflicts
+    // if a value moves from one group to another.
+    for (auto& [groupID, groupLabels] : newGroupLabels)
     {
-      this->RemoveLabelFromMap(labelID);
-      if (std::find_if(labelSet.cbegin(), labelSet.cend(), [labelID](const Label* label){return label->GetValue() == labelID;}) == labelSet.cend())
-      { //label is not in the new set, so it will be effectively removed
-        removedLabels.push_back(labelID);
+      auto oldValuesInGroup = this->m_GroupToLabelMap[groupID];
+      for (auto labelID : oldValuesInGroup)
+      {
+        this->RemoveLabelFromMap(labelID);
+        if (!valueFoundLambda(labelID))
+        { //label is not in the new set, so it will be effectively removed
+          removedLabelValues.push_back(labelID);
+        }
       }
+      oldLabelsValues.insert(oldLabelsValues.end(), oldValuesInGroup.begin(), oldValuesInGroup.end());
     }
 
-    //add new labels to group
-    for (auto label : labelSet)
+    // add new labels to group
+    for (auto& [groupID, groupLabels] : newGroupLabels)
     {
-      if (m_LabelMap.find(label->GetValue()) != m_LabelMap.cend())
+      for (auto label : groupLabels)
       {
-        auto conflictingGroup = this->GetGroupIndexOfLabel(label->GetValue());
-        mitkThrow() << "Error while replacing labels. Label value is already existing in another group. Invalid label: " << label->GetValue() << "; conflicting group: " << conflictingGroup;
-      }
+        if (m_LabelMap.find(label->GetValue()) != m_LabelMap.cend())
+        {
+          auto conflictingGroup = this->GetGroupIndexOfLabel(label->GetValue());
+          mitkThrow() << "Error while replacing labels. Label value is already existing in another group. Invalid label: " << label->GetValue() << "; conflicting group: " << conflictingGroup;
+        }
 
-      auto clonedLabel = label->Clone();
+        auto clonedLabel = label->Clone();
 
-      this->AddLabelToMap(clonedLabel->GetValue(), clonedLabel, groupID);
-      this->RegisterLabel(clonedLabel);
+        this->AddLabelToMap(clonedLabel->GetValue(), clonedLabel, groupID);
+        this->RegisterLabel(clonedLabel);
 
-      if (std::find(oldLabels.cbegin(), oldLabels.cend(), label->GetValue()) == oldLabels.cend())
-      { //label was not in the old set, so it was effectively added
-        addedLabels.push_back(clonedLabel->GetValue());
-      }
-      else
-      {
-        modifiedLabels.push_back(clonedLabel->GetValue());
+        if (std::find(oldLabelsValues.cbegin(), oldLabelsValues.cend(), label->GetValue()) == oldLabelsValues.cend())
+        { //label was not in the old set, so it was effectively added
+          addedLabelValues.push_back(clonedLabel->GetValue());
+        }
+        else
+        {
+          modifiedLabelValues.push_back(clonedLabel->GetValue());
+        }
       }
     }
   }
 
   //now after the manipulation operation send all events
-  for (auto labelID : removedLabels)
+  for (auto labelID : removedLabelValues)
   {
     this->InvokeEvent(LabelRemovedEvent(labelID));
   }
-  for (auto labelID : addedLabels)
+  for (auto labelID : addedLabelValues)
   {
     this->InvokeEvent(LabelAddedEvent(labelID));
   }
-  for (auto labelID : modifiedLabels)
+  for (auto labelID : modifiedLabelValues)
   {
     this->InvokeEvent(LabelModifiedEvent(labelID));
   }
 
-  this->InvokeEvent(LabelsChangedEvent(oldLabels));
-  this->InvokeEvent(GroupModifiedEvent(groupID));
+  this->InvokeEvent(LabelsChangedEvent(oldLabelsValues));
+
+  for (const auto& [groupID, groupLabels] : newGroupLabels)
+  {
+    this->InvokeEvent(GroupModifiedEvent(groupID));
+  }
+
   this->Modified();
 
   if (!this->ExistLabel(m_ActiveLabelValue) && !this->ExistLabel(oldActiveLabel))
   { //Active label must be redefined, because it was removed by replacement.
     this->SetActiveLabel(m_LabelMap.empty() ? UNLABELED_VALUE : m_LabelMap.begin()->second->GetValue());
   }
-}
-
-void mitk::MultiLabelSegmentation::ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& labelSet)
-{
-  return ReplaceGroupLabels(groupID, ConvertLabelVectorConst(labelSet));
 }
 
 void mitk::MultiLabelSegmentation::ReplaceLabels(const ConstLabelVectorType& newLabels)

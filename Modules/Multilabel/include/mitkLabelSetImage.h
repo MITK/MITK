@@ -472,6 +472,21 @@ namespace mitk
     void ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& newLabels);
 
     /**
+    * \brief Replaces the labels of all passed group IDs (map key) with a given vector of labels (map value).
+    *
+    * This is an overloaded version that allows to directly replace multiple groups at once. That mitigates the problem
+    * of label value conflict if a label value moves from one replaced group to another.
+    * @remark The passed label instances will be cloned before added to ensure clear ownership
+    * of the new labels.
+    * @remark The pixel content of the old labels will not be removed.
+    * @param newGroupLabels Map that indicated the groups that should be replaced (map key) and the labels that should be
+    * used for replacement (respective map value).
+    * @pre Groups that should be replaced must exist.
+    * @pre new label values must not be used in other groups, that are not replaced.
+    */
+    void ReplaceGroupLabels(std::map<MultiLabelSegmentation::GroupIndexType, MultiLabelSegmentation::ConstLabelVectorType> newGroupLabels);
+
+    /**
     * \brief Replaces the labels in the segmentation by their passed counterparts.
     *
     * @remark The passed label instances will be cloned before added to ensure clear ownership

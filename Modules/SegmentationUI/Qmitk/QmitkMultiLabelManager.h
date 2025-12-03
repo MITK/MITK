@@ -184,6 +184,8 @@ private:
 
   QStringList m_LabelStringList;
 
+  QShortcut* m_AddLabelInstanceShortcut;
+
   bool m_ProcessingManualSelection;
 
   mitk::DataStorage* m_DataStorage;

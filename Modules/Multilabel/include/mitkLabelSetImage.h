@@ -392,6 +392,7 @@ namespace mitk
 
     /**
      * @brief Returns a vector of all label values that are covering passed position in world coordinates.
+     * @param coordinates the world coordinates of the location of interest.
      * @param index the index of the group for which the vector of labels should be retrieved.
      * If no index is passed. The coordinates will be checked for all groups.
      * @param timeStep the time step of the segmentation for which the labels should be checked/retrieved.

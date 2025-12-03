@@ -138,7 +138,7 @@ namespace mitk
     DICOMTagPath operator + (const DICOMTagPath& right) const;
 
     /** Concatenates two DICOM tag paths.
-    * \param [in] right The path to append to this path.
+    * \param [in] pathStr The path to append to this path.
     * \return A new DICOMTagPath containing all nodes from both paths.*/
     DICOMTagPath operator + (const std::string& pathStr) const;
 

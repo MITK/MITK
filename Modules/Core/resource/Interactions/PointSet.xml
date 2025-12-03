@@ -1,6 +1,7 @@
 <statemachine>
     <state name="start" startstate="true">
         <transition event_class="InteractionPositionEvent" event_variant="AddPointClick" target="start">
+             <condition name="canaddpoint"/>
              <action name="addpoint"/>
         </transition>
         <transition event_class="MouseMoveEvent" event_variant="CheckSelected" target="selected">

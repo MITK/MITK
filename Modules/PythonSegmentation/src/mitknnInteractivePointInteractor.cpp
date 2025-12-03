@@ -38,6 +38,7 @@ namespace mitk::nnInteractive
       this->Interactor->EnableInteraction(false);
       this->Interactor->EnableMovement(false);
       this->Interactor->EnableRemoval(false);
+      this->Interactor->Enable3DPointPlacement(false);
     }
 
     ~Impl()

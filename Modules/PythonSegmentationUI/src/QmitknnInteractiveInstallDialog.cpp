@@ -29,11 +29,13 @@ namespace
   constexpr auto TORCH_VISION = "torchvision>=0.23.0,<1.0.0";
   constexpr auto NNINTERACTIVE = "nninteractive>=1.1.2,<2.0.0";
 
+#if defined(_WIN32)
   // Starting with CUDA v12.9 we get the following error on our lowest
   // supported GPU architecture (e.g. GeForce 10 Series):
   //   torch.AcceleratorError: CUDA error: no kernel image is available
   //   for exec
   constexpr auto CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu128";
+#endif
 }
 
 using Self = QmitknnInteractiveInstallDialog;
@@ -144,12 +146,7 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
 
   if (m_InstallStep == InstallStep::Upgrade_Pip)
   {
-#if defined(_WIN32)
-    // On Windows, installing PyTorch is a separate step to allow passing --index-url to pip.
     m_InstallStep = InstallStep::Install_PyTorch;
-#else
-    m_InstallStep = InstallStep::Install_nnInteractive;
-#endif
   }
   else if (m_InstallStep == InstallStep::Install_PyTorch)
   {
@@ -191,12 +188,19 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
     if (torchvision.isEmpty())
       torchvision = TORCH_VISION;
 
+    QStringList args = { "-m", "pip", "install", torch, torchvision };
+
+#if defined(_WIN32)
     auto indexUrl = m_Ui->indexUrlLineEdit->text();
 
     if (indexUrl.isEmpty())
       indexUrl = CUDA_INDEX_URL;
 
-    QStringList args = { "-m", "pip", "install", torch, torchvision, "--index-url", indexUrl };
+    args.append({ "--index-url", indexUrl });
+#endif
+
+    if (m_Ui->noCacheDirCheckBox->isChecked())
+      args.append("--no-cache-dir");
 
     m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
   }
@@ -208,6 +212,10 @@ void QmitknnInteractiveInstallDialog::OnProcessFinished(int exitCode, QProcess::
       nnInteractive = NNINTERACTIVE;
 
     QStringList args = { "-m", "pip", "install", nnInteractive };
+
+    if (m_Ui->noCacheDirCheckBox->isChecked())
+      args.append("--no-cache-dir");
+
     m_Process->start(QString::fromStdString(mitk::PythonHelper::GetExecutablePath().string()), args);
   }
 }

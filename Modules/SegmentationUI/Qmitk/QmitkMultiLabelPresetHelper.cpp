@@ -33,6 +33,11 @@ void QmitkSaveMultiLabelPreset(const mitk::MultiLabelSegmentation* segmentation)
   if (filename.empty())
     return;
 
+  const std::string ext = ".mitklabel.json";
+
+  if (filename.size() < ext.size() || filename.compare(filename.size() - ext.size(), ext.size(), ext) != 0)
+    filename += ext;
+
   if (!mitk::MultiLabelIOHelper::SaveMultiLabelSegmentationPreset(filename, segmentation))
   {
     QMessageBox::critical(nullptr, QStringLiteral("Save Multi Label Preset"),

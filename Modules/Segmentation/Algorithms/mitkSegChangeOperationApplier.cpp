@@ -47,10 +47,14 @@ namespace
       segmentation->Modified();
     }
 
+    std::map<mitk::MultiLabelSegmentation::GroupIndexType, mitk::MultiLabelSegmentation::ConstLabelVectorType> replaceMap;
+
     for (auto modifiedGroupID : modOperation->GetLabelGroupIDs())
     {
-      segmentation->ReplaceGroupLabels(modifiedGroupID, modOperation->GetModifiedLabels(modifiedGroupID));
+      replaceMap.insert(std::make_pair(modifiedGroupID, modOperation->GetModifiedLabels(modifiedGroupID)));
     }
+    segmentation->ReplaceGroupLabels(replaceMap);
+
     for (auto modifiedGroupID : modOperation->GetNameGroupIDs())
     {
       segmentation->SetGroupName(modifiedGroupID, modOperation->GetModifiedName(modifiedGroupID));

@@ -38,7 +38,7 @@ sudo apt install bison build-essential doxygen git graphviz \
 On Windows, install <b>Visual Studio 2022</b> with the <b>Desktop development with C++</b> workload.
 
 You also need an OpenSSL version that matches the OpenSSL dependency of MITK’s Python package.
-Currently, this is <b>OpenSSL 3.0</b>.
+Currently, this is <b>OpenSSL \requiredOpenSSLVersion</b>.
 We recommend using the builds provided by
 <a href="https://slproweb.com/products/Win32OpenSSL.html">Shining Light Productions</a>.
 

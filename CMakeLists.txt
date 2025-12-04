@@ -409,21 +409,15 @@ endif()
 # -----------------------------------------
 # Custom dependency logic
 
-if(WIN32 AND Qt6_DIR AND NOT OPENSSL_ROOT_DIR)
-  set(_dir_candidate "${Qt6_DIR}/../../../../../Tools/OpenSSLv3/Win_x64")
-  get_filename_component(_dir_candidate ${_dir_candidate} ABSOLUTE)
-  if(EXISTS "${_dir_candidate}")
-    set(OPENSSL_ROOT_DIR "${_dir_candidate}")
-  endif()
-endif()
-
-find_package(OpenSSL 3)
-
-if(NOT OpenSSL_FOUND)
-  find_package(OpenSSL 1.1.1)
-endif()
-
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
+
+set(MITK_REQUIRED_OPENSSL_VERSION 3.0) # Match with Python's OpenSSL version on Windows
+
+if(WIN32)
+  find_package(OpenSSL ${MITK_REQUIRED_OPENSSL_VERSION} EXACT)
+else()
+  find_package(OpenSSL 3)
+endif()
 
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
 
@@ -437,10 +431,9 @@ if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
       set(openssl_message "${openssl_message}Please install the dev package of OpenSSL (i.e. libssl-dev).\n")
     endif()
   else()
-    set(openssl_message "${openssl_message}Please either install Win32 OpenSSL:\n"
-                        "  https://slproweb.com/products/Win32OpenSSL.html\n"
-                        "Or use the Qt Maintenance tool to install (recommended):\n"
-                        "  Developer and Designer Tools > OpenSSL Toolkit > OpenSSL 64-bit binaries\n")
+    set(openssl_message "${openssl_message}Please install OpenSSL version ${MITK_REQUIRED_OPENSSL_VERSION}.\n"
+                        "We recommend builds from Shining Light Productions:\n"
+                        "  https://slproweb.com/products/Win32OpenSSL.html\n")
   endif()
   set(openssl_message "${openssl_message}If it still cannot be found, you can hint CMake to find OpenSSL by "
                       "adding/setting the OPENSSL_ROOT_DIR variable to the root directory of an "

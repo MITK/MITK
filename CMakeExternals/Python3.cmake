@@ -13,8 +13,8 @@ if(MITK_USE_Python3)
   endif()
 
   if(NOT DEFINED ${proj}_DIR)
-    set(version 3.12.11)
-    set(release_date 20250712)
+    set(version 3.12.11)       # IMPORTANT: On any version update, adapt MITK_REQUIRED_OPENSSL_VERSION
+    set(release_date 20250712) #            in the top-level CMakeLists.txt.
 
     set(base_url "https://github.com/astral-sh/python-build-standalone/releases/download/${release_date}")
     set(variant "install_only_stripped")

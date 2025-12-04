@@ -45,7 +45,7 @@ as well as in the current master branch.
 | ----------------------------------- | --------------------------------------------------
 | Microsoft Windows 10                | Visual Studio 2022
 | Linux Ubuntu 24.04                  | Default GCC version
-
+| Apple macOS 26 Tahoe                | Default Apple Clang version
 
 All platforms not listed above are not officially supported by the MITK team. However, we will happily accept
 contributions to improve support for other platforms as long as we have the hardware and capacity for maintenance.

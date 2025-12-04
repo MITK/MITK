@@ -58,8 +58,7 @@ void QmitkLoadMultiLabelPreset(const std::vector<mitk::MultiLabelSegmentation::P
     std::set<int> s(temp.begin(), temp.end());
     mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType groupIDs(temp.begin(), temp.end());
 
-    undoHelpers.push_back(std::unique_ptr<mitk::SegGroupModifyUndoRedoHelper>(new mitk::SegGroupModifyUndoRedoHelper(segmentation, groupIDs,
-      true)));
+    undoHelpers.push_back(std::make_unique<mitk::SegGroupModifyUndoRedoHelper>(segmentation, groupIDs, true));
 
     mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(filename, segmentation);
   }

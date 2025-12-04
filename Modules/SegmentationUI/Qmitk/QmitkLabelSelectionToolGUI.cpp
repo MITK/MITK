@@ -32,14 +32,34 @@ QmitkLabelSelectionToolGUI::QmitkLabelSelectionToolGUI() : QmitkToolGUI(),
 
   connect(this, &QmitkLabelSelectionToolGUI::NewToolAssociated, this, &QmitkLabelSelectionToolGUI::OnNewToolAssociated);
 
+  if (auto activeWindow = qApp->activeWindow(); activeWindow != nullptr)
+    activeWindow->installEventFilter(this);
+
   m_FloatingPopup->SetOpacity(100);
   m_FloatingPopup->SetEnabled(false);
 
   this->OnIndicatedLabelsChanged();
 }
 
+bool QmitkLabelSelectionToolGUI::eventFilter(QObject* object, QEvent* event)
+{
+  if (event->type() == QEvent::Enter)
+  {
+    this->OnIndicatedLabelsChanged();
+  }
+  else if (event->type() == QEvent::Leave)
+  {
+    m_FloatingPopup->SetEnabled(false);
+  }
+
+  return QmitkToolGUI::eventFilter(object, event);
+}
+
 QmitkLabelSelectionToolGUI::~QmitkLabelSelectionToolGUI()
 {
+  if (auto activeWindow = qApp->activeWindow(); activeWindow != nullptr)
+    activeWindow->removeEventFilter(this);
+
   if (m_LabelSelectionTool.IsNotNull())
   {
     m_LabelSelectionTool->IndicatedLabelsChanged -=

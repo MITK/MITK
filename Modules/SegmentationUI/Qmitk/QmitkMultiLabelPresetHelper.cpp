@@ -51,7 +51,7 @@ void QmitkLoadMultiLabelPreset(const std::vector<mitk::MultiLabelSegmentation::P
     nullptr,
     QStringLiteral("Load Multi Label Preset"),
     QString(),
-    QStringLiteral("Multi label preset (*.mitklabel.json);;Legacy label set preset (*.lsetp)")).toUtf8().toStdString();
+    QStringLiteral("Multi label preset (*.mitklabel.json;*.json;*.lsetp)")).toUtf8().toStdString();
 
   if (filename.empty())
     return;

@@ -47,11 +47,17 @@ void QmitkSaveMultiLabelPreset(const mitk::MultiLabelSegmentation* segmentation)
 
 void QmitkLoadMultiLabelPreset(const std::vector<mitk::MultiLabelSegmentation::Pointer>& segmentations)
 {
+#if defined(_WIN32)
+  const auto filter = QStringLiteral("Multi label preset (*.mitklabel.json;*.json;*.lsetp)");
+#else
+  const auto filter = "All JSON files (*.json);;Multi label preset (*.mitklabel.json);;Legacy label set preset (*.lsetp)";
+#endif
+
   const auto filename = QFileDialog::getOpenFileName(
     nullptr,
     QStringLiteral("Load Multi Label Preset"),
     QString(),
-    QStringLiteral("Multi label preset (*.mitklabel.json;*.json;*.lsetp)")).toUtf8().toStdString();
+    filter).toUtf8().toStdString();
 
   if (filename.empty())
     return;

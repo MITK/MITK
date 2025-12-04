@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <QWidget>
 
 class QCompleter;
+class QShortcut;
 
 namespace Ui
 {

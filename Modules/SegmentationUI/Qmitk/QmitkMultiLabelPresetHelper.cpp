@@ -60,7 +60,7 @@ void QmitkLoadMultiLabelPreset(const std::vector<mitk::MultiLabelSegmentation::P
 
     undoHelpers.push_back(std::make_unique<mitk::SegGroupModifyUndoRedoHelper>(segmentation, groupIDs, true));
 
-    mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(filename, segmentation);
+    mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(filename, segmentation);
   }
 
   for (auto& undoHelper : undoHelpers)

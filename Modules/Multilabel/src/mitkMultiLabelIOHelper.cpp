@@ -246,7 +246,7 @@ bool mitk::MultiLabelIOHelper::SaveMultiLabelSegmentationPreset(const std::strin
   return true;
 }
 
-bool mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(const std::string &presetFilename,
+bool mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(const std::string &presetFilename,
                                                      mitk::MultiLabelSegmentation *inputSegmentation)
 {
   if (nullptr == inputSegmentation)

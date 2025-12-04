@@ -97,4 +97,25 @@ git clone https://github.com/MITK/MITK.git
 cmake -S MITK -B MITK-superbuild -G "Visual Studio 17 2022"
 cmake --build MITK-superbuild -- -m
 \endcode
+
+\section BuildInstructions_Superbuild_Note A note on the MITK superbuild
+
+The MITK superbuild has the major advantage that most of MITK’s dependencies are built automatically and do not need to be provided manually.
+The trade-off is that it requires a short introduction to understand how the superbuild concept works.
+
+The superbuild compiles not only all dependencies, but also MITK itself as the final step.
+
+When developing with MITK, and as long as no dependencies are changed or updated, it is sufficient to
+continuously build only MITK.
+There is no need to run the superbuild again and again.
+
+Here is the crucial point from a CMake perspective:
+Both the superbuild and the MITK build **share the same source directory**.
+The only difference is the **build directory**, for example:
+
+- Superbuild: <tt>/path/to/MITK-superbuild</tt>
+- MITK build (inside the superbuild): <tt>/path/to/MITK-superbuild/MITK-build</tt>
+
+Once the superbuild has finished, you usually switch the build directory in CMake to the <tt>MITK-build</tt> directory.
+This reveals an entirely different set of CMake options, now specific to building MITK itself.
 */

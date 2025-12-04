@@ -98,7 +98,7 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   // that is requested to be selected.
 
   connect(m_Completer, qOverload<const QString&>(&QCompleter::activated), labelSearchBox,
-    [labelSearchBox](const QString& text)
+    [labelSearchBox](const QString&)
     {
       QTimer::singleShot(0, [labelSearchBox]() { labelSearchBox->clear(); });
     });

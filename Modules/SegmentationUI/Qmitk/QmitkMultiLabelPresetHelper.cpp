@@ -53,10 +53,10 @@ void QmitkLoadMultiLabelPreset(const std::vector<mitk::MultiLabelSegmentation::P
       continue;
 
     //create a set with all group IDs as all groups should be captured.
-    std::vector<mitk::MultiLabelSegmentation::GroupIndexType> temp(segmentation->GetNumberOfGroups());
-    std::iota(temp.begin(), temp.end(), 0);
-    std::set<int> s(temp.begin(), temp.end());
-    mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType groupIDs(temp.begin(), temp.end());
+    mitk::SegGroupModifyUndoRedoHelper::GroupIndexSetType groupIDs;
+    const auto numGroups = segmentation->GetNumberOfGroups();
+    for (unsigned int i = 0; i < numGroups; ++i)
+      groupIDs.insert(i);
 
     undoHelpers.push_back(std::make_unique<mitk::SegGroupModifyUndoRedoHelper>(segmentation, groupIDs, true));
 

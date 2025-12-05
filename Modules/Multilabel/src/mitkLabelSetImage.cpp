@@ -1151,6 +1151,15 @@ void mitk::MultiLabelSegmentation::InitializeByLabeledImage(const Image* image)
   this->Modified();
 }
 
+namespace
+{
+  // Helper function to calculate number of digits needed
+  constexpr int GetRequiredDigits(mitk::MultiLabelSegmentation::LabelValueType maxValue)
+  {
+    return maxValue > 0 ? static_cast<int>(std::floor(std::log10(maxValue))) + 1 : 1;
+  }
+}
+
 template <typename MultiLabelSegmentationType, typename ImageType>
 void mitk::MultiLabelSegmentation::InitializeByLabeledImageProcessing(MultiLabelSegmentationType *labelSetImage, const ImageType *image)
 {
@@ -1163,6 +1172,9 @@ void mitk::MultiLabelSegmentation::InitializeByLabeledImageProcessing(MultiLabel
   SourceIteratorType sourceIter(image, image->GetRequestedRegion());
   sourceIter.GoToBegin();
 
+  mitk::MultiLabelSegmentation::LabelValueType maxLabelValue = 0;
+  std::vector<mitk::Label*> addedLabels;
+
   while (!sourceIter.IsAtEnd())
   {
     const auto originalSourceValue = sourceIter.Get();
@@ -1170,7 +1182,9 @@ void mitk::MultiLabelSegmentation::InitializeByLabeledImageProcessing(MultiLabel
 
     if (originalSourceValue > mitk::Label::MAX_LABEL_VALUE)
     {
-      mitkThrow() << "Cannot initialize MultiLabelSegmentation by image. Image contains a pixel value that exceeds the label value range. Invalid pixel value:" << originalSourceValue;
+      mitkThrow() << "Cannot initialize MultiLabelSegmentation by image. Image contains a pixel "
+                  << "value that exceeds the label value range.Invalid pixel value : "
+                  << originalSourceValue;
     }
 
     targetIter.Set(sourceValue);
@@ -1179,11 +1193,9 @@ void mitk::MultiLabelSegmentation::InitializeByLabeledImageProcessing(MultiLabel
     {
       if (this->GetTotalNumberOfLabels() >= mitk::Label::MAX_LABEL_VALUE)
       {
-        mitkThrow() << "Cannot initialize MultiLabelSegmentation by image. Image contains to many labels.";
+        mitkThrow() << "Cannot initialize MultiLabelSegmentation by image. "
+                    << "Image contains to many labels.";
       }
-
-      std::stringstream name;
-      name << "object-" << sourceValue;
 
       double rgba[4];
       this->GetLookupTable()->GetTableValue(sourceValue, rgba);
@@ -1194,17 +1206,30 @@ void mitk::MultiLabelSegmentation::InitializeByLabeledImageProcessing(MultiLabel
       color.SetBlue(rgba[2]);
 
       auto label = mitk::Label::New();
-      label->SetName(name.str().c_str());
       label->SetColor(color);
       label->SetOpacity(rgba[3]);
       label->SetValue(sourceValue);
 
+      addedLabels.push_back(label); // this is used for faster access in next loop.
+      //we need to do the adding here already to ensure correct checking and correction of labels
       this->AddLabel(label,0,false);
+
+      maxLabelValue = std::max(maxLabelValue, sourceValue);
     }
 
     ++sourceIter;
     ++targetIter;
   }
+
+  auto requiredDigits = GetRequiredDigits(maxLabelValue);
+
+  for (auto label : addedLabels)
+  {
+    std::ostringstream name;
+    name << "object-" << std::setw(requiredDigits) << std::setfill('0') << label->GetValue();
+    label->SetName(name.str().c_str());
+  }
+
 }
 
 itk::ModifiedTimeType mitk::MultiLabelSegmentation::GetMTime() const

@@ -1539,6 +1539,7 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
 {
   auto relevantLabelValues = this->GetCurrentlyAffactedLabelInstances();
   auto currentLabel = this->GetCurrentLabel();
+  auto selectedLabels = this->GetSelectedLabels();
 
   mitk::SegLabelPropModifyUndoRedoHelper undoRedoHelper(m_Segmentation, relevantLabelValues);
 
@@ -1546,6 +1547,7 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
   emit LabelRenameRequested(currentLabel, true, canceled);
 
   if (canceled) return;
+
 
   for (auto value : relevantLabelValues)
   {
@@ -1571,7 +1573,12 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
   }
   m_Segmentation->GetLookupTable()->Modified();
 
-  undoRedoHelper.RegisterUndoRedoOperationEvent("Change label name/color");
+  undoRedoHelper.RegisterUndoRedoOperationEvent("Change label(s) name/color");
+
+  // ensure that the labels that where selected before renaming are also selected afterwards
+  // it can differ as renaming might change the location in the view, but the selected index in the view is kept
+  this->SetSelectedLabels(selectedLabels);
+
   emit ModelUpdated();
 }
 

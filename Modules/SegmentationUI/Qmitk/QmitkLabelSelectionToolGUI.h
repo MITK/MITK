@@ -54,6 +54,8 @@ protected:
   QmitkLabelSelectionToolGUI();
   ~QmitkLabelSelectionToolGUI() override;
 
+  bool eventFilter(QObject* object, QEvent* event) override;
+
   Ui::QmitkLabelSelectionToolGUIControls* m_Controls;
   itk::SmartPointer<mitk::LabelSelectionTool> m_LabelSelectionTool;
   std::unique_ptr<QmitkFloatingTextPopup> m_FloatingPopup;

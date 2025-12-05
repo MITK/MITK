@@ -637,6 +637,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    // create general signal / slot connections
    connect(m_Controls->newSegmentationButton, &QToolButton::clicked, this, &Self::OnNewSegmentation);
+   connect(m_Controls->createInitialSegmentationBtn, &QPushButton::clicked, this, &Self::OnNewSegmentation);
 
    connect(m_Controls->slicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &Self::OnShowMarkerNodes);
 
@@ -813,6 +814,7 @@ void QmitkSegmentationView::NodeAdded(const mitk::DataNode* node)
     this->ApplyDisplayOptions(const_cast<mitk::DataNode*>(node));
 
   this->ApplySelectionMode();
+  this->UpdateGUI();
 }
 
 void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
@@ -846,6 +848,8 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 
   auto image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
   mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
+
+  this->UpdateGUI();
 }
 
 void QmitkSegmentationView::ApplyDisplayOptions()
@@ -1076,9 +1080,21 @@ void QmitkSegmentationView::ValidateSelectionInput()
   auto referenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
   auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
 
+  const bool hasReferenceNode = referenceNode.IsNotNull();
   const bool hasWorkingNode = workingNode.IsNotNull();
 
-  m_Controls->multiLabelWidget->setEnabled(hasWorkingNode);
+  if (hasWorkingNode)
+  {
+    m_Controls->workingNodeStackedLayout->setCurrentWidget(m_Controls->workingNodeSelector);
+  }
+  else
+  {
+    m_Controls->workingNodeStackedLayout->setCurrentWidget(m_Controls->createInitialSegmentationBtn);
+  }
+  m_Controls->createInitialSegmentationBtn->setEnabled(hasReferenceNode);
+  m_Controls->newSegmentationButton->setVisible(hasWorkingNode);
+  m_Controls->multiLabelWidget->setVisible(hasWorkingNode);
+  m_Controls->tabWidgetSegmentationTools->setVisible(hasWorkingNode);
 
   m_ToolManager->SetReferenceData(referenceNode);
   m_ToolManager->SetWorkingData(workingNode);

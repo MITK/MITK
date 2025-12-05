@@ -127,6 +127,6 @@ void mitk::LabelSelectionTool::OnMouseReleased(StateMachineAction*, InteractionE
   if (!labels.empty())
   {
 
-    this->GetToolManager()->SetActiveWorkingLabel( labels.front() );
+    this->GetToolManager()->SetActiveWorkingLabel( labels.back() );
   }
 }

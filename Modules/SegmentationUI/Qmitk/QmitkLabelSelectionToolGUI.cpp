@@ -78,12 +78,12 @@ void QmitkLabelSelectionToolGUI::OnIndicatedLabelsChanged()
     {
       QString content;
 
-      for (const auto& aLabel : labels)
+      for (auto it = labels.crbegin(); it != labels.crend(); ++it)
       {
         content.append("<p><b>\n");
-        content.append(QString::fromStdString(mitk::LabelSetImageHelper::CreateHTMLLabelName(segmentation->GetLabel(aLabel), segmentation)));
+        content.append(QString::fromStdString(mitk::LabelSetImageHelper::CreateHTMLLabelName(segmentation->GetLabel(*it), segmentation)));
         content.append("</b><br/>\n");
-        content.append(QString::fromStdString(mitk::LabelSetImageHelper::CreateHTMLLabelDetails(segmentation->GetLabel(aLabel), segmentation)));
+        content.append(QString::fromStdString(mitk::LabelSetImageHelper::CreateHTMLLabelDetails(segmentation->GetLabel(*it), segmentation)));
         content.append("</p>\n");
       }
 

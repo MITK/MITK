@@ -289,6 +289,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateVolumeMapping(LocalStorage* 
     }
     auto& pipeline = finding->second;
     pipeline->m_Volume->SetUserMatrix(orientationMatrix);
+    pipeline->m_FadedVolume->SetUserMatrix(orientationMatrix);
 
     // we could also search for the nonConst groupImage in segmentation, but the const cast
     // is faster and legit as we have access to the non const segmentation anyways.

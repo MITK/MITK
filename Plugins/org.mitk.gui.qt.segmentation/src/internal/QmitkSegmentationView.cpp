@@ -996,17 +996,12 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
 void QmitkSegmentationView::UpdateGUI()
 {
   mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
-  bool hasReferenceNode = referenceNode != nullptr;
+  const bool hasReferenceNode = referenceNode != nullptr;
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  bool hasWorkingNode = workingNode != nullptr;
+  const bool hasWorkingNode = workingNode != nullptr;
 
-  m_Controls->newSegmentationButton->setEnabled(false);
-
-  if (hasReferenceNode)
-  {
-    m_Controls->newSegmentationButton->setEnabled(true);
-  }
+  m_Controls->newSegmentationButton->setEnabled(hasReferenceNode);
 
   if (hasWorkingNode && hasReferenceNode)
   {

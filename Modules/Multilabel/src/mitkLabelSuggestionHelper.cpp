@@ -345,11 +345,11 @@ namespace mitk
       {
         auto* nodePrefs = systemPref->Node("/org.mitk.views.segmentation");
 
-        prefs.externalLabelSuggestionFile = nodePrefs->Get("external label suggestions", "");
-        prefs.standardLabelSuggestionResource = nodePrefs->Get("standard label suggestions", "");
-        prefs.replaceStandardSuggestions = nodePrefs->GetBool("replace standard suggestions", true);
-        prefs.enforceSuggestions = nodePrefs->GetBool("enforce suggestions", false);
-        prefs.suggestionOnce = nodePrefs->GetBool("suggest once", true);
+        prefs.externalLabelSuggestionFile = nodePrefs->Get("external label suggestions", prefs.externalLabelSuggestionFile);
+        prefs.standardLabelSuggestionResource = nodePrefs->Get("standard label suggestions", prefs.standardLabelSuggestionResource);
+        prefs.replaceStandardSuggestions = nodePrefs->GetBool("replace standard suggestions", prefs.replaceStandardSuggestions);
+        prefs.enforceSuggestions = nodePrefs->GetBool("enforce suggestions", prefs.enforceSuggestions);
+        prefs.suggestionOnce = nodePrefs->GetBool("suggest once", prefs.suggestionOnce);
       }
     }
 

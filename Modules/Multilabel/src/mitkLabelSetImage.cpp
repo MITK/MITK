@@ -1183,7 +1183,7 @@ void mitk::MultiLabelSegmentation::InitializeByLabeledImageProcessing(MultiLabel
       }
 
       std::stringstream name;
-      name << "object-" << sourceValue;
+      name << "object-" << std::setw(3) << std::setfill('0') << sourceValue;
 
       double rgba[4];
       this->GetLookupTable()->GetTableValue(sourceValue, rgba);

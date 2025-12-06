@@ -107,7 +107,8 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
   if (nullptr == labelSetImage)
     return nullptr;
 
-  const std::regex genericLabelNameRegEx(namePrefix + " ([1-9][0-9]*)");
+  const unsigned int minDigitsCount = 2;
+  const std::regex genericLabelNameRegEx(namePrefix + " ([0-9]{"+std::to_string(minDigitsCount)+",})");
   int maxGenericLabelNumber = 0;
 
   std::vector<std::array<int, 3>> colorsInUse = { {0,0,0} }; //black is always in use.
@@ -133,7 +134,9 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
   }
   else
   {
-    newLabel->SetName(namePrefix + " " + std::to_string(maxGenericLabelNumber + 1));
+    std::ostringstream name;
+    name << namePrefix << " " << std::setw(minDigitsCount) << std::setfill('0') << maxGenericLabelNumber + 1;
+    newLabel->SetName(name.str().c_str());
   }
 
   auto lookupTable = mitk::LookupTable::New();

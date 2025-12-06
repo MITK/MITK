@@ -135,7 +135,7 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
   else
   {
     std::ostringstream name;
-    name << "namePrefix " << std::setw(minDigitsCount) << std::setfill('0') << maxGenericLabelNumber + 1;
+    name << namePrefix << " " << std::setw(minDigitsCount) << std::setfill('0') << maxGenericLabelNumber + 1;
     newLabel->SetName(name.str().c_str());
   }
 

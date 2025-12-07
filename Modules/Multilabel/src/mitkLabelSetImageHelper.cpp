@@ -108,7 +108,7 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
     return nullptr;
 
   const unsigned int minDigitsCount = 2;
-  const std::regex genericLabelNameRegEx(namePrefix + " ([0-9]{"+std::to_string(minDigitsCount)+",})");
+  const std::regex genericLabelNameRegEx(namePrefix + " ([0-9]+)");
   int maxGenericLabelNumber = 0;
 
   std::vector<std::array<int, 3>> colorsInUse = { {0,0,0} }; //black is always in use.

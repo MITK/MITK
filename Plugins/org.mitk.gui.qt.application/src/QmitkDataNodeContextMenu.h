@@ -30,6 +30,7 @@ found in the LICENSE file.
 #include "QmitkDataNodeComponentAction.h"
 #include "QmitkDataNodeTextureInterpolationAction.h"
 #include "QmitkDataNodeSurfaceRepresentationAction.h"
+#include "Qmitk3DMultiSegVisStyleAction.h"
 #include "QmitkNodeDescriptor.h"
 
 // mitk core
@@ -115,6 +116,7 @@ private:
   QmitkNodeDescriptor* m_PlanarDoubleEllipseNodeDescriptor;
   QmitkNodeDescriptor* m_PlanarBezierCurveNodeDescriptor;
   QmitkNodeDescriptor* m_PlanarSubdivisionPolygonNodeDescriptor;
+  QmitkNodeDescriptor* m_MultiLabelSegmentationDescriptor;
 
   //////////////////////////////////////////////////////////////////////////
   // default actions
@@ -133,6 +135,7 @@ private:
   QmitkDataNodeComponentAction* m_ComponentAction;
   QmitkDataNodeTextureInterpolationAction* m_TextureInterpolationAction;
   QmitkDataNodeSurfaceRepresentationAction* m_SurfaceRepresentationAction;
+  Qmitk3DMultiSegVisStyleAction* m_3DMultiSegVisStyleAction;
 
   bool m_SurfaceDecimation;
 };

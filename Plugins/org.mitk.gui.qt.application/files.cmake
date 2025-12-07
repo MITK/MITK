@@ -1,4 +1,5 @@
 set(SRC_CPP_FILES
+  Qmitk3DMultiSegVisStyleAction.cpp
   QmitkAbstractDataNodeAction.cpp
   QmitkApplicationConstants.cpp
   QmitkCloseProjectAction.cpp
@@ -39,6 +40,7 @@ set(INTERNAL_CPP_FILES
 )
 
 set(MOC_H_FILES
+  src/Qmitk3DMultiSegVisStyleAction.h
   src/QmitkCloseProjectAction.h
   src/QmitkDataNodeColorAction.h
   src/QmitkDataNodeColorMapAction.h

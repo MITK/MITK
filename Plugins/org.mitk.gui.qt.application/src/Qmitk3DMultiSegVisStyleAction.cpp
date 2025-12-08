@@ -26,27 +26,22 @@ found in the LICENSE file.
 #include <QMenu>
 
 Qmitk3DMultiSegVisStyleAction::Qmitk3DMultiSegVisStyleAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
-  : QAction(parent)
-  , QmitkAbstractDataNodeAction(workbenchpartSite)
+  : Qmitk3DMultiSegVisStyleAction(parent, workbenchpartSite.GetPointer())
 {
-  setText(tr("3D visualization"));
-  InitializeAction();
 }
 
 Qmitk3DMultiSegVisStyleAction::Qmitk3DMultiSegVisStyleAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchpartSite))
 {
-  setText(tr("3D visualization"));
-  InitializeAction();
+  this->setText(tr("3D visualization"));
+  this->InitializeAction();
 }
 
 void Qmitk3DMultiSegVisStyleAction::InitializeAction()
 {
-  setCheckable(true);
-
-  setMenu(new QMenu);
-  connect(menu(), &QMenu::aboutToShow, this, &Qmitk3DMultiSegVisStyleAction::OnMenuAboutShow);
+  this->setMenu(new QMenu);
+  connect(this->menu(), &QMenu::aboutToShow, this, &Qmitk3DMultiSegVisStyleAction::OnMenuAboutShow);
 }
 
 void Qmitk3DMultiSegVisStyleAction::OnMenuAboutShow()
@@ -62,7 +57,7 @@ void Qmitk3DMultiSegVisStyleAction::OnMenuAboutShow()
   bool hide3Dvisualize = false;
   dataNode->GetBoolProperty("org.mitk.multilabel.3D.hide", hide3Dvisualize, baseRenderer);
 
-  menu()->clear();
+  this->menu()->clear();
 
   auto visAction = menu()->addAction("off");
   visAction->setCheckable(true);

@@ -560,11 +560,13 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // setup overlay widget to show a warning message with a button
    m_GeometryViolationWarningOverlay = new QmitkButtonOverlayWidget(m_Controls->tabWidgetSegmentationTools);
    m_GeometryViolationWarningOverlay->setVisible(false);
-   m_GeometryViolationWarningOverlay->SetOverlayText(
-     QStringLiteral("<font style=\"color: red; font-weight: bold; \"> <p style=\"text-align:center\">Tool use is not possible because the "
-       "render window geometries<br>does not match the segmentation geometry.</p></center></font>"));
-   m_GeometryViolationWarningOverlay->SetButtonText(" Reinit render\n window geometry");
-   m_GeometryViolationWarningOverlay->setOpacity(160);
+   m_GeometryViolationWarningOverlay->SetOverlayText(QStringLiteral(
+     "<p style=\"color:red; text-align:center\">"
+       "The views are not aligned to the segmentation slices.<br>"
+       "Align the views to use the segmentation tools."
+     "</p>"));
+   m_GeometryViolationWarningOverlay->SetButtonText(" Align views");
+   m_GeometryViolationWarningOverlay->setOpacity(200);
    m_GeometryViolationWarningOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/reset.svg")));
 
    // *------------------------
@@ -1061,7 +1063,7 @@ void QmitkSegmentationView::CheckForVisibilityWarnings() const
 
   if (referenceNode.IsNotNull() && nullptr != m_RenderWindowPart && m_RenderWindowPart->HasCoupledRenderWindows() && !referenceNode->IsVisible(nullptr))
   {
-    m_Controls->visibilityRefWarningLabel->setText(tr("<font color=\"#FFC107\">") + tr("Warning: The selected reference image is currently not visible!") + tr("</font>"));
+    m_Controls->visibilityRefWarningLabel->setText("<font color=\"#FFC107\">" + tr("Warning: The selected reference image is currently not visible!") + "</font>");
     m_Controls->visibilityRefWarningLabel->show();
   }
   else
@@ -1071,7 +1073,7 @@ void QmitkSegmentationView::CheckForVisibilityWarnings() const
 
   if (workingNode.IsNotNull() && nullptr != m_RenderWindowPart && m_RenderWindowPart->HasCoupledRenderWindows() && !workingNode->IsVisible(nullptr))
   {
-    m_Controls->visibilitySegWarningLabel->setText(tr("<font style=\"color: red; font-weight: bold; \">") + tr("Error: The selected segmentation is currently not visible!<p/>Please, make it visible before you proceed.") + tr("</font>"));
+    m_Controls->visibilitySegWarningLabel->setText("<font style=\"color: red;\">" + tr("Error: The selected segmentation is currently not visible!<br>Make it visible to proceed.") + "</font>");
     m_Controls->visibilitySegWarningLabel->show();
   }
   else

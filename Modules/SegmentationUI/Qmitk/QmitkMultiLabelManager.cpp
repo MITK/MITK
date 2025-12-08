@@ -108,8 +108,6 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
 {
   auto selectedLabels = this->GetSelectedLabels();
 
-  mitk::SegLabelPropModifyUndoRedoHelper undoRedoHelper(this->GetMultiLabelSegmentation(), selectedLabels);
-
   for (auto labelValue : selectedLabels)
   {
     auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(labelValue);
@@ -127,6 +125,9 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
     }
   }
 
+  // ensure that the labels that where selected before renaming are also selected afterwards
+  // it can differ as renaming might change the location in the view, but the selected index in the view is kept
+  this->SetSelectedLabels(selectedLabels);
 }
 
 void QmitkMultiLabelManager::OnSelectedLabelChanged(const LabelValueVectorType& labels)

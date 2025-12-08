@@ -13,14 +13,14 @@ found in the LICENSE file.
 #include "QmitkButtonOverlayWidget.h"
 
 #include <QmitkStyleManager.h>
-
 #include <QVBoxLayout>
+#include <QApplication>
 
 QmitkButtonOverlayWidget::QmitkButtonOverlayWidget(QWidget* parent)
   : QmitkOverlayWidget(parent)
 {
   m_MessageLabel = new QLabel(this);
-  m_MessageLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  m_MessageLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
   m_PushButton = new QPushButton(this);
   connect(m_PushButton, &QPushButton::clicked,
@@ -30,8 +30,8 @@ QmitkButtonOverlayWidget::QmitkButtonOverlayWidget(QWidget* parent)
   auto* layout = new QVBoxLayout(this);
   layout->setAlignment(Qt::AlignCenter);
   layout->addStretch();
-  layout->addWidget(m_MessageLabel);
-  layout->addWidget(m_PushButton);
+  layout->addWidget(m_MessageLabel, 0, Qt::AlignCenter);
+  layout->addWidget(m_PushButton, 0, Qt::AlignCenter);
   layout->addStretch();
 
   this->setAttribute(Qt::WA_TransparentForMouseEvents, false);

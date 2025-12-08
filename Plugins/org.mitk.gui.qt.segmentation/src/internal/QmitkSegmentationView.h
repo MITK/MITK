@@ -139,8 +139,8 @@ private:
 
   void UpdateGUI();
 
-  void CheckForVisibilityWarnings() const;
-  void CheckForGeometryWarnings() const;
+  void CheckForReferenceVisibilityWarnings() const;
+  void CheckForToolViolations() const;
 
   void UpdateControlsOnLabelChanges();
 
@@ -184,7 +184,8 @@ private:
 
   mitk::LabelSuggestionHelper::Pointer m_LabelSuggestionHelper;
 
-  QmitkButtonOverlayWidget* m_GeometryViolationWarningOverlay;
+  QmitkButtonOverlayWidget* m_GeometryViolationOverlay;
+  QmitkButtonOverlayWidget* m_VisibleSegViolationOverlay;
 };
 
 #endif

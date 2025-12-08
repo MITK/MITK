@@ -94,7 +94,8 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_MouseCursorSet(false)
   , m_DefaultLabelNaming(true)
   , m_SelectionChangeIsAlreadyBeingHandled(false)
-  , m_GeometryViolationWarningOverlay(nullptr)
+  , m_GeometryViolationOverlay(nullptr)
+  , m_VisibleSegViolationOverlay(nullptr)
 {
 #if MITK_HAS_PYTHON
   mitk::PythonSegmentationUI::EnforceLinkage();
@@ -558,16 +559,25 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->setupUi(parent);
 
    // setup overlay widget to show a warning message with a button
-   m_GeometryViolationWarningOverlay = new QmitkButtonOverlayWidget(m_Controls->tabWidgetSegmentationTools);
-   m_GeometryViolationWarningOverlay->setVisible(false);
-   m_GeometryViolationWarningOverlay->SetOverlayText(QStringLiteral(
+   m_GeometryViolationOverlay = new QmitkButtonOverlayWidget(m_Controls->tabWidgetSegmentationTools);
+   m_GeometryViolationOverlay->setVisible(false);
+   m_GeometryViolationOverlay->SetOverlayText(QStringLiteral(
      "<p style=\"color:red; text-align:center\">"
        "The views are not aligned to the segmentation slices.<br>"
        "Align the views to use the segmentation tools."
      "</p>"));
-   m_GeometryViolationWarningOverlay->SetButtonText(" Align views");
-   m_GeometryViolationWarningOverlay->setOpacity(200);
-   m_GeometryViolationWarningOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/reset.svg")));
+   m_GeometryViolationOverlay->SetButtonText(" Align views");
+   m_GeometryViolationOverlay->setOpacity(200);
+   m_GeometryViolationOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/reset.svg")));
+
+   m_VisibleSegViolationOverlay = new QmitkButtonOverlayWidget(m_Controls->tabWidgetSegmentationTools);
+   m_VisibleSegViolationOverlay->setVisible(false);
+   m_VisibleSegViolationOverlay->SetOverlayText(QStringLiteral("<font style=\"color: red;\">"
+     "Error: The selected segmentation is currently not visible!<br>Make it visible to proceed."
+     "</font>"));
+   m_VisibleSegViolationOverlay->SetButtonText(" Show segmentation");
+   m_VisibleSegViolationOverlay->setOpacity(200);
+   m_VisibleSegViolationOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")));
 
    // *------------------------
    // * SHORTCUTS
@@ -659,7 +669,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::GoToLabel, this, &Self::OnGoToLabel);
    connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::LabelRenameRequested, this, &Self::OnLabelRenameRequested);
 
-   connect(m_GeometryViolationWarningOverlay, &QmitkButtonOverlayWidget::Clicked, this, [this]()
+   connect(m_GeometryViolationOverlay, &QmitkButtonOverlayWidget::Clicked, this, [this]()
      {
      auto node = this->m_Controls->workingNodeSelector->GetSelectedNode();
      if (node.IsNull())
@@ -670,6 +680,16 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
      mitk::RenderingManager::GetInstance()->InitializeViews(seg->GetTimeGeometry());
      this->ValidateSelectionInput();
+     });
+
+   connect(m_VisibleSegViolationOverlay, &QmitkButtonOverlayWidget::Clicked, this, [this]()
+     {
+       auto node = this->m_Controls->workingNodeSelector->GetSelectedNode();
+       if (node.IsNull())
+         return;
+       node->SetVisibility(true);
+       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+       this->ValidateSelectionInput();
      });
 
    auto command = itk::SimpleMemberCommand<Self>::New();
@@ -1049,14 +1069,14 @@ void QmitkSegmentationView::UpdateControlsOnLabelChanges()
   unsigned int numberOfLabels = labelSetImage ? labelSetImage->GetTotalNumberOfLabels() : 0;
 
   // Enable tools only if we have both nodes, labels, and no visibility warnings
-  bool toolSelectionBoxesEnabled = referenceNode.IsNotNull() && workingNode.IsNotNull() && numberOfLabels > 0 && !m_Controls->visibilitySegWarningLabel->isVisible() && !m_GeometryViolationWarningOverlay->isVisible();
+  bool toolSelectionBoxesEnabled = referenceNode.IsNotNull() && workingNode.IsNotNull() && numberOfLabels > 0 && !m_VisibleSegViolationOverlay->isVisible() && !m_GeometryViolationOverlay->isVisible();
 
   m_Controls->toolSelectionBox2D->setEnabled(toolSelectionBoxesEnabled);
   m_Controls->toolSelectionBox3D->setEnabled(toolSelectionBoxesEnabled);
   m_Controls->slicesInterpolator->setEnabled(toolSelectionBoxesEnabled);
 }
 
-void QmitkSegmentationView::CheckForVisibilityWarnings() const
+void QmitkSegmentationView::CheckForReferenceVisibilityWarnings() const
 {
   auto referenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
   auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
@@ -1070,25 +1090,14 @@ void QmitkSegmentationView::CheckForVisibilityWarnings() const
   {
     m_Controls->visibilityRefWarningLabel->hide();
   }
-
-  if (workingNode.IsNotNull() && nullptr != m_RenderWindowPart && m_RenderWindowPart->HasCoupledRenderWindows() && !workingNode->IsVisible(nullptr))
-  {
-    m_Controls->visibilitySegWarningLabel->setText("<font style=\"color: red;\">" + tr("Error: The selected segmentation is currently not visible!<br>Make it visible to proceed.") + "</font>");
-    m_Controls->visibilitySegWarningLabel->show();
-  }
-  else
-  {
-    m_Controls->visibilitySegWarningLabel->hide();
-  }
-
 }
 
-void QmitkSegmentationView::CheckForGeometryWarnings() const
+void QmitkSegmentationView::CheckForToolViolations() const
 {
   auto referenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
   auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
 
-  bool invalid = false;
+  bool hasGeometryViolation = false;
 
   // Here we need to check whether the geometry of the selected segmentation image (working image geometry)
   // is aligned with the geometry of the 3D render window.
@@ -1106,13 +1115,20 @@ void QmitkSegmentationView::CheckForGeometryWarnings() const
     {
       if (!mitk::Equal(*workingNodeGeometry->GetBoundingBox(), *renderWindowGeometry->GetBoundingBox(), mitk::eps, true))
       {
-        invalid = true;
+        hasGeometryViolation = true;
       }
 
     }
   }
 
-  this->m_GeometryViolationWarningOverlay->setVisible(invalid);
+  const bool hasVisibilitViolation = workingNode.IsNotNull()
+    && nullptr != m_RenderWindowPart
+    && m_RenderWindowPart->HasCoupledRenderWindows()
+    && !workingNode->IsVisible(nullptr);
+
+  this->m_GeometryViolationOverlay->setVisible(hasGeometryViolation);
+  this->m_VisibleSegViolationOverlay->setVisible(hasVisibilitViolation && !hasGeometryViolation); // We only show this overlay,
+                                                                                                  // if the geometry violation is not already shown.
 }
 
 void QmitkSegmentationView::ValidateSelectionInput()
@@ -1153,7 +1169,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     m_Controls->multiLabelWidget->SetMultiLabelNode(nullptr);
   }
 
-  this->CheckForVisibilityWarnings();
-  this->CheckForGeometryWarnings();
+  this->CheckForReferenceVisibilityWarnings();
+  this->CheckForToolViolations();
   this->UpdateControlsOnLabelChanges();
 }

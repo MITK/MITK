@@ -25,7 +25,7 @@ namespace mitk
   * A context menu action, which is linked to the context menu <br>
   * through an extension point. For an example check the <br>
   * <code> plugin.xml </code> and the connected classes of <br>
-  * the the segmentation bundle and also the <code> QmitkDataManagerView.cpp </code> <br>
+  * the segmentation bundle and also the <code> QmitkDataManagerView.cpp </code> <br>
   * in this bundle.
   */
   struct IContextMenuAction

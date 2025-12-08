@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <mitkLogMacros.h>
 #include <mitkPythonHelper.h>
 
-#include <QMessageBox>
 #include <QProcess>
 #include <QScrollBar>
 

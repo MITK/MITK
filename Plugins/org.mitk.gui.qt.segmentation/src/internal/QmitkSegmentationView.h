@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "ui_QmitkSegmentationViewControls.h"
 
 #include <QmitkAbstractView.h>
+#include <QmitkButtonOverlayWidget.h>
 #include <mitkITKEventObserverGuard.h>
 #include <mitkIRenderWindowPartListener.h>
 #include <mitkLabelSetImageHelper.h>
@@ -138,13 +139,12 @@ private:
 
   void UpdateGUI();
 
-  QString CheckForWarnings() const;
+  void CheckForVisibilityWarnings() const;
+  void CheckForGeometryWarnings() const;
 
   void UpdateControlsOnLabelChanges();
 
   void ValidateSelectionInput();
-
-  void UpdateWarningLabel(QString text);
 
   std::string GetDefaultLabelSetPreset() const;
 
@@ -183,6 +183,8 @@ private:
   mitk::ITKEventObserverGuard m_GroupRemovedObserver;
 
   mitk::LabelSuggestionHelper::Pointer m_LabelSuggestionHelper;
+
+  QmitkButtonOverlayWidget* m_GeometryViolationWarningOverlay;
 };
 
 #endif

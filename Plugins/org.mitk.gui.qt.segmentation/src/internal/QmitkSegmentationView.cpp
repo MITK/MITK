@@ -572,9 +572,11 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    m_VisibleSegViolationOverlay = new QmitkButtonOverlayWidget(m_Controls->tabWidgetSegmentationTools);
    m_VisibleSegViolationOverlay->setVisible(false);
-   m_VisibleSegViolationOverlay->SetOverlayText(QStringLiteral("<font style=\"color: red;\">"
-     "Error: The selected segmentation is currently not visible!<br>Make it visible to proceed."
-     "</font>"));
+   m_VisibleSegViolationOverlay->SetOverlayText(QStringLiteral(
+     "<p style=\"color:red; text-align:center\">"
+       "The selected segmentation is currently invisible.<br>"
+       "Make it visible to use the segmentation tools."
+     "</p>"));
    m_VisibleSegViolationOverlay->SetButtonText(" Show segmentation");
    m_VisibleSegViolationOverlay->setOpacity(200);
    m_VisibleSegViolationOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")));

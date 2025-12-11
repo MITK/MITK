@@ -12,7 +12,7 @@ There are several reader and writer in MITK that support this format.
 
 
 ## 📄 JSON File Structure
-In all three use cases we the same json file structure is used. Its layout and properties are explained in the following section.
+In all three use cases the same json file structure is used. Its layout and properties are explained in the following section.
 Use case specific details will be explained in the use case sections.
 ### Top-Level Fields
 
@@ -29,7 +29,7 @@ Use case specific details will be explained in the use case sections.
 | Key         | Required | Description                                         |
 |-------------|----------|-----------------------------------------------------|
 | `version`   | ✅       | Format version (integer)                           |
-| `type`      | ✅       | Depending on the purpose it can be: `"org.mitk.multilabel.segmentation.stack"`; `"org.mitk.multilabel.segmentation.preset"` or `"org.mitk.multilabel.segmentation.suggestions"`. Remark: only in the use case 1 (import/export) the type is really checked and import would fail if the JSON has the wrong type.|
+| `type`      | ✅       | Depending on the purpose it can be: `"org.mitk.multilabel.segmentation.stack"`, `"org.mitk.multilabel.segmentation.preset"` or `"org.mitk.multilabel.segmentation.suggestions"`. Remark: only in use case 1 (import/export) the type is really checked and import would fail if the JSON has the wrong type.|
 | `uid`       | ❌       | Unique ID for the segmentation                     |
 | `groups`    | ✅       | Array of label groups                              |
 | `properties`| ❌       | Global image metadata/properties (only use case 1) |
@@ -83,7 +83,7 @@ Each label includes visual and semantic metadata, and optionally its own image f
 |----------------|----------|--------------------------------------------------------|
 | `name`         | ✅ | ✅ | ✅ | Label name. When stored as DICOM this will be mapped into the tag `Segment Label (0062,0005)` |
 | `value`        | ✅ | ⭕ | ✅ | Unique label value (*it has to be unique for the whole segmentation not just the group!*) |
-| `color`        | ⭕ | ⭕ | ⭕ | Controls UI color — RGB values `[r, g, b]` If encoded as unsigned int, the value range per channel is 0–255. If encoded as float, the value range per channel is 0.0–1.0. If encoded as float the value range per channel is 0.0–1.0. Default is [1.,1.,1.] if not set. When stored as DICOM this will be mapped into the tag `Recommended Display CIELab Value (0062,000D)` |
+| `color`        | ⭕ | ⭕ | ⭕ | Controls UI color — RGB values `[r, g, b]` If encoded as unsigned int, the value range per channel is 0–255. If encoded as float, the value range per channel is 0.0–1.0. Default is [1.,1.,1.] if not set. When stored as DICOM this will be mapped into the tag `Recommended Display CIELab Value (0062,000D)` |
 | `opacity`      | ⭕ | ⭕ | ⭕ | Opacity; default is 1 (0.0–1.0)                                      |
 | `locked`       | ⭕ | ⭕ | ⭕ | Controls UI edit-ability — `true` disables editing   |
 | `visible`      | ⭕ | ⭕ | ⭕ | Visibility in the UI                                   |
@@ -91,7 +91,7 @@ Each label includes visual and semantic metadata, and optionally its own image f
 | `tracking_uid` | ⭕ | | ⭕ | Optional unique identifier. If not set, the value will be assumed as UID. When stored as DICOM this will be mapped into the tag `TrackingUID (0062,0021)` |
 | `description`  | ⭕ | ⭕ | ⭕ | Optional user description. When stored as DICOM this will be mapped into the tag `Segment Description (0062,0006)` |
 | `algorithm_type` | ⭕ | ⭕ | ⭕ | Optional type specification of the algorithm(s) used for the label. Allowed strings: "MANUAL", "SEMIAUTOMATIC" and "AUTOMATIC". When stored as DICOM this will be mapped into the tag `Algorithm Type (0062,0008)` |
-| `algorithm_name` | ⭕ | ⭕ | ⭕ | Optional descriptive string of the algorithms used for the label. If more then one algorithm was used the names are separated by "\|". When stored as DICOM this will be mapped into the tag `Algorithm Type (0062,0009)` |
+| `algorithm_name` | ⭕ | ⭕ | ⭕ | Optional descriptive string of the algorithms used for the label. If more then one algorithm was used the names are separated by "\|". When stored as DICOM this will be mapped into the tag `Algorithm Name (0062,0009)` |
 | *(any)*        | ⭕ | ⭕ | ⭕ | Custom label properties (e.g., DICOM metadata, flags)  |
 | `_file`         | ⭕ | | | Path to binary label image                             |
 | `_file_value`   | ⭕ | | | Voxel value in the image to map to/form `value` on import/export            |
@@ -180,7 +180,7 @@ MySegmentation/
 
 The `.json` file determines how image files are interpreted and combined into a `mitk::MultiLabelSegmentation`.
 The images can have any format that is supported by MITK.
-**IMPROTANT**: The images of one segmentation stack have to have the same image geometry
+**IMPORTANT**: The images of one segmentation stack have to have the same image geometry!
 
 
 ### 🧩 How Data is Structured

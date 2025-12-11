@@ -247,7 +247,7 @@ The Segmentation Plugin offers a number of preferences which can be set via the 
 - **3D display:** Activate 3D rendering of segmentations (requires GPU)
 - **Data node selection mode:** Show only selected nodes - ensures only the selected segmentation and its reference image are visible
 
-**Note:** To control 3D rendering for individual segmentations, right-click the segmentation in the Data Manager and toggle the **"3D visualization"** entry in the context menu.
+**Note:** To control 3D rendering for individual segmentations, right-click the segmentation in the Data Manager and toggle the **3D visualization** entry in the context menu.
 
 ### Label management
 

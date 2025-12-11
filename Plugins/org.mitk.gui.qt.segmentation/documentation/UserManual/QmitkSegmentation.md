@@ -54,8 +54,8 @@ For an introduction to the Segmentation Utilities or Segmentation Task List, ref
 | **Feature** | **Behavior** |
 |-------------|-------------|
 | **Locked labels** | Act as "cookie cutters" - prevent override within same group |
-| **Group overlap** | Labels from different groups can overlap (not override each other) |
-| **Tool crosshair** | Crosshair movement disabled when manual tools are active |
+| **Group overlap** | Labels from different groups can overlap (not overriding each other) |
+| **Tool crosshair** | Crosshair movement is disabled when manual tools are active |
 | **Close tool** | Uses region's label, not necessarily the active label |
 | **Fill/Erase tools** | Only work on unlocked labels or active label regions |
 | **Preset loading** | Never removes undefined labels (except when moving to different group) |
@@ -66,7 +66,7 @@ The Segmentation View has a few prerequisites regarding segmentations and their 
 
 - Images must be two or three-dimensional and may be either static or dynamic, e.g., are time-resolved resp. have different pixel values for different time steps.
 - Images must be single-valued, i.e. CT, MRI or ultrasound. Images from color doppler or photographic (RGB) images are only partially supported (please be aware that some tools might not be compatible with this image type).
-- Segmentations must be congruent to their reference images.
+- Segmentations must be congruent to their reference images, e.g., their voxel grids must match.
 
 ## Image selection and creating new segmentations {#org_mitk_views_segmentationdataselection}
 
@@ -133,13 +133,13 @@ Renaming of labels and label instances can be found in their content menu as sho
 
 ## Label highlighting {#org_mitk_views_segmentationlabelhighlighting}
 
-Especially if you have segmentations with many label instances or the label names are not telling, it can be nontrivial to identify the label instance in the label inspector of the segmentation view. To mitigate this problem MITK uses label highlighting in the render windows. As long as you hover with the mouse cursor over a group, label or label instance, the respective label instances will be highlighted in the render windows. Highlighted labels will visually pop out by being shown with full opacity (no transparency) while the opacity of all non-highlighted labels of the same segmentation will be reduced to 30% of the current opacity value (they become very transparent).
+Especially if you have segmentations with many label instances or the label names are not telling, it can be nontrivial to match the pixel content of a label with its entry in the list of labels (called label inspector) in the Segmentation plugin. To mitigate this problem, MITK uses label highlighting. As long as you hover with the mouse cursor over a group, label or label instance in the segmentation plugin, the pixels of the respective label instances will be highlighted. Highlighted labels will visually pop out by being shown with full opacity (no transparency) while the opacity of all non-highlighted labels of the same segmentation will be reduced, e.g., they become more transparent.
 
 By default, label instances that are set to be invisible are not shown while highlighted. By pressing the shift key, one can enforce also invisible label instances to be shown while highlighting.
 
 **Remark:** The highlighting is supported in all views that use the label inspector (e.g. also the segmentation utilities).
 
-**Hint:** You can also use the [Selection tool] to highlight labels by with mouse interaction in the rendering windows.
+**Hint:** You can also use the [Selection tool] to highlight labels by hovering over their pixels with the mouse cursor.
 
 ## Context menus {#org_mitk_views_segmentationcontextmenus}
 
@@ -149,7 +149,6 @@ Actions for organization of groups, labels, and label instances (as well as othe
 
 Most actions available in these context menus are self-explanatory or were already described above by other means of access like the tool button bar for adding and removing groups, labels, and label instances.
 
-Labels and label instances can be **renamed**, while groups have fixed names.
 Note that renaming a label instance will make a separate label out of it, since all instances of the same label share a single common name.
 
 **Clear content** only clears the pixels of a label instance but won't delete the actual label instance.
@@ -158,7 +157,7 @@ Groups can be **locked** and **unlocked** as a whole from their context menu, wh
 
 ## Label search bar {#org_mitk_views_segmentationlabelsearchbar}
 
-The label search bar is located directly at the bottom of the label manager and provides quick access to label instances.
+The label search bar is located directly below the list of labels and provides quick access to label instances.
 
 ![Label search bar](QmitkSegmentation_Searchbar.png)
 
@@ -168,7 +167,7 @@ Type any substring into the search field to display a dropdown list showing all 
 - Use **arrow keys** to navigate the list before pressing Return
 - Click on any entry with the **mouse** to select it directly
 
-When a label instance is selected from the search results, it becomes active in the label manager and the render windows automatically center on the instance's centroid (equivalent to double-clicking the label).
+When a label instance is selected from the search results, it becomes active and the views center on the label's pixel content (equivalent to double-clicking a label).
 
 ## Label name and color suggestions {#org_mitk_views_segmentationlabelsuggestions}
 
@@ -186,18 +185,18 @@ The dialog displays the current color and name of the label. Its behavior depend
 
 **Non-enforced mode:**
 - Type the label name directly and click on the color to change it
-- Optionally enable **"Auto-filter suggestions"** to filter the suggestion list based on the current name input
+- Optionally enable **Auto-filter suggestions** to filter the suggestion list based on the current name input
 - If auto-filter is disabled, use the filter field in the Label suggestion box to search suggestions
 
 **Hint:** Double-click any suggestion to select it and automatically close the dialog.
 
 ### Label suggestion file format {#org_mitk_views_segmentationlabelsuggestions_format}
 
-Label name and color suggestions are stored in a special version of the MITK Stacked Segmentation Format JSON. The custom suggestion list must contain an array of objects, each with a mandatory "name" string and an optional "color" string. In addition suggestions can also define additional information that should be associated with the label and also the maximum number of instance occurrences allowed (unique, unlimited, max number).
+Label name and color suggestions are stored in a special version of the MITK Stacked Segmentation Format (JSON). The custom suggestion list must contain an array of objects, each with a mandatory "name" string and an optional "color" string. In addition, suggestions can also define additional information that should be associated with the label as well as the maximum number of instance occurrences allowed (unique, unlimited, max number).
 
 You can configure which suggestion file to use and how suggestions are handled in the preferences (Ctrl+P) > Segmentation. For detailed information about the MITK Stacked Segmentation Format, refer to the format specification.
 
-Since suggestions use the same format as segmentations stored in the MITK Stacked Segmentation Format, you can use those also as suggestions for other segmentations if desired.
+Since suggestions use the same format as segmentations stored in the MITK Stacked Segmentation format, you may use those as suggestions for other segmentations as well, if desired.
 
 ## Saving and loading label set presets {#org_mitk_views_segmentationlabelpresets}
 
@@ -214,15 +213,15 @@ Label set presets are applied to any segmentation session by clicking on the 'Lo
 
 When loading a preset onto an existing segmentation:
 - Label instances **not defined in the preset** remain unchanged - they are neither removed nor modified
-- Label instances **defined in the preset** are added (if they don't exist) or have their properties updated (name, color, visibility)
-- The actual **pixel contents remain untouched** during preset loading
+- Label instances **defined in the preset** are added, if they don't exist, or have their properties updated otherwise (name, color, visibility)
+- The **pixel contents** of any label **remain untouched** (see exception below)
 - **Exception:** If a label is moved to a different group by the preset, the old label's pixel content will be removed
 
 ### File format and compatibility
 
-Label set presets are stored in a version of the MITK Stacked Segmentation Format JSON. For detailed information about this format, refer to the dedicated in-depth documentation.
+Label set presets are stored in a version of the MITK Stacked Segmentation Format (JSON). For detailed information about this format, refer to the respective in-depth documentation.
 
-Since presets use the same format as segmentations, you can use any segmentation stored in the MITK Stacked Segmentation Format as a preset for other segmentations if desired.
+Since presets use the same format as segmentations stored in the MITK Stacked Segmentation format, you may use those as a preset for other segmentations as well, if desired.
 
 ### Default preset
 

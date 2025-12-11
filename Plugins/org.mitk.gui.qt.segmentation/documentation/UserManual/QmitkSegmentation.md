@@ -247,7 +247,7 @@ The Segmentation Plugin offers a number of preferences which can be set via the 
 - **3D display:** Activate 3D rendering of segmentations (requires GPU)
 - **Data node selection mode:** Show only selected nodes - ensures only the selected segmentation and its reference image are visible
 
-**Note:** To control 3D rendering for individual segmentations, right-click the segmentation in the Data Manager and toggle the **"3D visualization"** entry in the context menu.
+**Note:** To control 3D rendering for individual segmentations, right-click the segmentation in the Data Manager and toggle the **3D visualization** entry in the context menu.
 
 ### Label management
 
@@ -313,18 +313,18 @@ Adding and subtracting voxels can be iteratively repeated for the same segmentat
 
 The tool is a more advanced version of the add/subtract tool. It offers you the following features:
 
-1. Generating a polygon segmentation (click left mouse button to set ancor point)
+1. Generating a polygon segmentation (click left mouse button to set anchor point)
 2. Freehand contouring (like the add tool; press left mouse button while moving the mouse)
-3. Move ancor points (select an ancor point, press left mouse button while moving the mouse)
-4. Add new ancor points (press CTRL while click left mouse to add an ancor to the contour)
-5. Delete an ancor point (press Del while ancor point is selected)
+3. Move anchor points (select an anchor point, press left mouse button while moving the mouse)
+4. Add new anchor points (press CTRL while click left mouse to add an anchor to the contour)
+5. Delete an anchor point (press Del while ancor point is selected)
 6. Segmentation can be added to the label (Add mode) or subtracted (Subtract mode)
 
 To start a segmentation double left click where the first ancor point should be. To end the segmentation double left click where the last ancor point should be.
 Please note that:
 
-- feature 3-6 are only available, if auto confirm is *not* activated
-- feature 3-5 is not available for freehand contour segments
+- Features 3-6 are only available, if auto confirm is *not* activated
+- Features 3-5 are not available for freehand contour segments
 
 | **Category** | **Action** | **Shortcut** |
 |--------------|------------|----------------------|
@@ -467,7 +467,7 @@ The Selection tool allows you to identify and select labels directly in the 2D r
 
 If multiple labels from different groups overlap at the mouse position, all of them will be highlighted simultaneously (unless the "Check only active group" option is enabled).
 
-The tool provides a **"Check only active group"** option. When enabled, only labels belonging to the same group as the currently active label will be highlighted by the mouse cursor.
+The tool provides a **Check only active group** option. When enabled, only labels belonging to the same group as the currently active label will be highlighted by the mouse cursor.
 
 **Left-click** to select the topmost highlighted label instance in the label manager and make it the active label.
 

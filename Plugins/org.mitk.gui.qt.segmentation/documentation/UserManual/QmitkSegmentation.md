@@ -31,12 +31,17 @@ For an introduction to the Segmentation Utilities or Segmentation Task List, ref
 | **Category** | **Action** | **Shortcut / Method** |
 |--------------|------------|----------------------|
 | **Preferences** | Open preferences | `Ctrl+P` |
+| **Label Management** | Add new label to active group| `Ctrl+L` `Ctrl+A` |
+|  | Add new label instance of active label | `Ctrl+L` `Ctrl+I` |
+|  | Delete active label instance | `Ctrl+L` `Ctrl+D` |
+|  | Toggle active label visibility | `Ctrl+H` |
+|  | Toggle to next label as active label | `Ctrl+L` `Ctrl+N` |
 | **Label Renaming** | Rename label | `Ctrl+L` `Ctrl+R` |
 |  | Rename label (alternative) | `Alt+Double-Click` label |
+|  | Quick select suggestion in the Name/Rename dialog| `Double-click` suggestion |
 | **Label Navigation** | Select and center on label | `Double-click` label |
 |  | Highlight label in views | `Hover` over label |
 |  | Show invisible labels | `Shift+Hover` |
-| **Label Suggestions** | Quick select suggestion | `Double-click` suggestion |
 | **Tool Modifiers** | Invert tool behavior (Add↔Subtract, Paint↔Wipe)| `Ctrl+Draw` |
 | **Lasso Tool** | Start/end segmentation | `Double left-click` |
 |  | Add anchor point | `Ctrl+Left-Click` |
@@ -58,7 +63,7 @@ For an introduction to the Segmentation Utilities or Segmentation Task List, ref
 | **Tool crosshair** | Crosshair movement is disabled when manual tools are active |
 | **Close tool** | Uses region's label, not necessarily the active label |
 | **Fill/Erase tools** | Only work on unlocked labels or active label regions |
-| **Preset loading** | Never removes undefined labels (except when moving to different group) |
+| **Preset loading** | Label presets do not remove labels that are not affected by them. Also it never removes pixel content (except when moving to different group) |
 
 ## Image and segmentation prerequisites {#org_mitk_views_segmentationtechnicalissues}
 
@@ -232,7 +237,7 @@ To streamline your workflow, you can set a default label set preset in the Segme
 
 The Segmentation Plugin offers a number of preferences which can be set via the MITK Workbench application preferences (Ctrl+P):
 
-![Segmentation preferences](QmitkSegmentationPreferences.png)
+![Segmentation preferences](QmitkSegmentation_Preferences.png)
 
 ### Display options
 
@@ -241,6 +246,8 @@ The Segmentation Plugin offers a number of preferences which can be set via the 
 - **Opacity factor:** Adjust the transparency of segmentation overlays (slider from 0-100%)
 - **3D display:** Activate 3D rendering of segmentations (requires GPU)
 - **Data node selection mode:** Show only selected nodes - ensures only the selected segmentation and its reference image are visible
+
+**Note:** To control 3D rendering for individual segmentations, right-click the segmentation in the Data Manager and toggle the **"3D visualization"** entry in the context menu.
 
 ### Label management
 
@@ -259,8 +266,6 @@ The Segmentation Plugin offers a number of preferences which can be set via the 
 
 - **Allow all models:** Show all available MONAI Label models (when unchecked, only compatible models are shown)
 - **Time out (s):** Set the timeout duration in seconds for MONAI Label server requests (default: 180)
-
-**Note:** To control 3D rendering for individual segmentations, right-click the segmentation in the Data Manager and toggle the **"3D visualization"** entry in the context menu.
 
 ## Segmentation tool overview {#org_mitk_views_segmentationtooloverview}
 
@@ -298,6 +303,10 @@ This behavior is disabled as long as any of the manual segmentation tools are ac
 Use the left mouse button to draw a closed contour. When releasing the mouse button, the contour will be added (Add tool) to or removed (Subtract tool) from the current segmentation.
 Adding and subtracting voxels can be iteratively repeated for the same segmentation. Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. instead of adding voxels, they will be subtracted).
 
+| **Category** | **Action** | **Shortcut** |
+|--------------|------------|----------------------|
+| **Tool Modifiers** | Invert tool behavior (Add↔Subtract, Paint↔Wipe)| `Ctrl+Draw` |
+
 ### Lasso tool {#org_mitk_views_segmentationlassotool}
 
 ![Lasso tool](QmitkSegmentation_Lasso.png)
@@ -317,12 +326,24 @@ Please note that:
 - feature 3-6 are only available, if auto confirm is *not* activated
 - feature 3-5 is not available for freehand contour segments
 
+| **Category** | **Action** | **Shortcut** |
+|--------------|------------|----------------------|
+| **Lasso Tool** | Start/end segmentation | `Double left-click` |
+|  | Add anchor point | `Ctrl+Left-Click` |
+|  | Delete anchor point | `Del` (when selected) |
+|  | Move anchor point | `Click+Drag` anchor |
+
+
 ### Paint and wipe tools {#org_mitk_views_segmentationpaintwipetools}
 
 ![Paint and wipe tools](QmitkSegmentation_IMGIconPaintWipe.png)
 
 Use the *Size* slider to change the radius of the round paintbrush tool. Move the mouse in any 2D window and press the left button to draw or erase pixels.
 Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. instead of painting voxels, they will be wiped).
+
+| **Category** | **Action** | **Shortcut** |
+|--------------|------------|----------------------|
+| **Tool Modifiers** | Invert tool behavior (Add↔Subtract, Paint↔Wipe)| `Ctrl+Draw` |
 
 ### Region growing tool {#org_mitk_views_segmentationregiongrowingtool}
 
@@ -336,6 +357,11 @@ Moving the mouse up / down is different from left / right:
 Moving up the cursor while holding the left mouse button widens the range for the included grey values; moving it down narrows it.
 Moving the mouse left and right will shift the range.
 The tool will select more or less pixels, corresponding to the changing gray value range.
+
+| **Category** | **Action** | **Shortcut** |
+|--------------|------------|----------------------|
+| **Region Growing** | Widen/narrow gray value range | Mouse Up/Down while drawing |
+|  | Shift gray value range | Mouse Left/Right while drawing |
 
 ### Fill tool {#org_mitk_views_segmentationfilltool}
 
@@ -371,8 +397,6 @@ The tool handling is the same like the Lasso tool (see for more info), except it
 
 ### Segment Anything Tool {#org_mitk_views_segmentationSegmentAnything}
 
-![Segment Anything tool](QmitkSegmentation_nnUnetTool.png)
-
 ![Segment Anything tool](QmitkSegmentation_SAMTool.png)
 
 The Segment Anything Tool is a deep learning-based interactive segmentation tool. Originally created by MetaAI, MITK presents this model for medical image segmentation tasks.
@@ -380,6 +404,11 @@ The tool requires that you have Python 3 installed and available on your machine
 For a detailed explanation of what this algorithm is able to, please refer to https://ai.facebook.com/research/publications/segment-anything/
 
 Any adjustments to the [Level Window](@ref org_mitk_editors_stdmultiwidget_Levelwindow) setting impacts the segmentation. However, any applied color maps are ignored.
+
+| **Category** | **Action** | **Shortcut** |
+|--------------|------------|----------------------|
+| **AI Tools (SAM/MedSAM)** | Positive click | `Shift+Left-Click` |
+|  | Negative click (adjust mask) | `Shift+Right-Click` |
 
 #### Workflow: {#org_mitk_views_segmentationSegmentAnythingWorkflow}
 

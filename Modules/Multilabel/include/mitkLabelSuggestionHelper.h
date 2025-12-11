@@ -102,7 +102,7 @@ namespace mitk
      * @brief Get valid suggestions for adding new labels to a segmentation.
      *
      * Filters suggestions based on:
-     * - Occurrence constraints (_max_class_occurrence, _max_instance_occurrence)
+     * - Occurrence constraints (_max_instance_occurrence)
      * - Suggest-once policy (if enabled)
      * - Existing labels in the segmentation
      *

@@ -26,7 +26,7 @@ For an introduction to the Segmentation Utilities or Segmentation Task List, ref
 
 ## Quick Reference {#org_mitk_views_segmentationquickreference}
 
-### Keyboard Shortcuts & Tips
+### Keyboard Shortcuts and Tips
 
 | **Category** | **Action** | **Shortcut / Method** |
 |--------------|------------|----------------------|
@@ -42,7 +42,7 @@ For an introduction to the Segmentation Utilities or Segmentation Task List, ref
 | **Label Navigation** | Select and center on label | `Double-click` label |
 |  | Highlight label in views | `Hover` over label |
 |  | Show invisible labels | `Shift+Hover` |
-| **Tool Modifiers** | Invert tool behavior (Add↔Subtract, Paint↔Wipe)| `Ctrl+Draw` |
+| **Tool Modifiers** | Invert tool behavior (Add ↔ Subtract, Paint ↔ Wipe)| `Ctrl+Draw` |
 | **Lasso Tool** | Start/end segmentation | `Double left-click` |
 |  | Add anchor point | `Ctrl+Left-Click` |
 |  | Delete anchor point | `Del` (when selected) |
@@ -343,7 +343,7 @@ Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. i
 
 | **Category** | **Action** | **Shortcut** |
 |--------------|------------|----------------------|
-| **Tool Modifiers** | Invert tool behavior (Add↔Subtract, Paint↔Wipe)| `Ctrl+Draw` |
+| **Tool Modifiers** | Invert tool behavior (Add ↔ Subtract, Paint ↔ Wipe)| `Ctrl+Draw` |
 
 ### Region growing tool {#org_mitk_views_segmentationregiongrowingtool}
 
@@ -441,7 +441,7 @@ Any adjustments to the Level Window setting impacts the segmentation. However, a
 
 #### Workflow {#org_mitk_views_segmentationMedSAMWorkflow}
 
-1. Install MedSAM: Goto Preferences (Ctrl+P) > Segment Anything and click "Install Segment Anything with MedSAM" to install Segment Anything (version: 1.0) & MedSAM tool backends together. 
+1. Install MedSAM: Goto Preferences (Ctrl+P) > Segment Anything and click "Install Segment Anything with MedSAM" to install Segment Anything (version: 1.0) and MedSAM tool backends together.
    The installation process implicitly creates a python virtual environment using the Python located in "System Python" in a directory maintained by MITK. Make sure you have a working internet connection, which might take a while. It is a one-time job, though.
    Once installed, the "Install Segment Anything with MedSAM" button is grayed out. For details, refer to the Segment Anything tool workflow.
 

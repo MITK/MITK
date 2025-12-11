@@ -305,7 +305,7 @@ Adding and subtracting voxels can be iteratively repeated for the same segmentat
 
 | **Category** | **Action** | **Shortcut** |
 |--------------|------------|----------------------|
-| **Tool Modifiers** | Invert tool behavior (Add↔Subtract, Paint↔Wipe)| `Ctrl+Draw` |
+| **Tool Modifiers** | Invert tool behavior (Add ↔ Subtract, Paint ↔ Wipe)| `Ctrl+Draw` |
 
 ### Lasso tool {#org_mitk_views_segmentationlassotool}
 
@@ -403,7 +403,7 @@ The Segment Anything Tool is a deep learning-based interactive segmentation tool
 The tool requires that you have Python 3 installed and available on your machine. Note: On Debian/Ubuntu systems, you need to install git, python3-pip, python3-venv package using the following command: `apt install git python3-pip python3-venv`. For best experience, your machine should be ideally equipped with a CUDA-enabled GPU.
 For a detailed explanation of what this algorithm is able to, please refer to https://ai.facebook.com/research/publications/segment-anything/
 
-Any adjustments to the [Level Window](@ref org_mitk_editors_stdmultiwidget_Levelwindow) setting impacts the segmentation. However, any applied color maps are ignored.
+Any adjustments to the Level Window setting impacts the segmentation. However, any applied color maps are ignored.
 
 | **Category** | **Action** | **Shortcut** |
 |--------------|------------|----------------------|
@@ -437,7 +437,7 @@ Any adjustments to the [Level Window](@ref org_mitk_editors_stdmultiwidget_Level
 The MedSAM (Segment Anything in Medical Images) tool is a specialization of the the Segment Anything (SAM) tool. A new foundation model in the back end is dedicated to universal medical image segmentation.
 Just like the Segment Anything tool, the MedSAM tool requires that you have Python 3 installed and available on your machine. Note: On Debian/Ubuntu systems, you need to install the git, python3-pip, and python3-venv packages using the following command: `sudo apt install git python3-pip python3-venv`.
 For best experience, your machine should be ideally equipped with a CUDA-enabled GPU.
-Any adjustments to the [Level Window](@ref org_mitk_editors_stdmultiwidget_Levelwindow) setting impacts the segmentation. However, any applied color maps are ignored.
+Any adjustments to the Level Window setting impacts the segmentation. However, any applied color maps are ignored.
 
 #### Workflow {#org_mitk_views_segmentationMedSAMWorkflow}
 
@@ -512,6 +512,65 @@ After restarting the application and load your project you can click on "Reinit 
 The 3D tools operate on the whole image and require usually a small amount of interaction like placing seed-points or specifying certain parameters. All 3D tools provide
 an immediate segmentation feedback, which is displayed as a transparent green overlay. For accepting a preview you have to press the *Confirm* button of the selected tool.
 The following 3D tools are available:
+
+### nnInteractive {#org_mitk_views_segmentation3dnninteractive}
+
+![nnInteractive tool](QmitkSegmentation_IMGIconnnInteractive.png)
+
+| **Category** | **Action** | **Shortcut** |
+|--------------|------------|----------------------|
+| **nnInteractive** | Switch prompt type (positive ↔ negative) | `T` |
+|  | Toggle point interaction | `P` |
+|  | Toggle box interaction | `B` |
+|  | Toggle scribble interaction | `S` |
+|  | Toggle lasso interaction | `L` |
+|  | Confirm segmentation | `C` |
+| **Label management** | Add and select new label | `CTRL+L, CTRL+A` |
+
+The nnInteractive tool is a state-of-the-art AI solution for fully segmenting organs and other anatomical structures with minimal user interaction - often a single click is sufficient.
+This capability comes with significant resource requirements, including several gigabytes of disk space and a powerful GPU.
+Although nnInteractive can run on CPUs, performance is orders of magnitude slower compared to modern GPUs with at least 6 GB of VRAM.
+A truly interactive experience is only achievable on high-performance GPUs such as an Nvidia GeForce 4090, which can typically deliver response times of roughly one second per interaction.
+
+![Segmenting a whole kidney with a single Point interaction](nnInteractive_Point.gif)
+
+#### Installation
+
+Before its first use, nnInteractive must be installed.
+The first time you click **Initialize**, an installation dialog appears.
+In most cases, you can simply confirm the dialog and wait a few minutes for nnInteractive to complete installation.
+
+If installation fails, several advanced settings are available to assist with troubleshooting.
+These options require some technical understanding.
+
+![Installing nnInteractive](nnInteractive_Install.png)
+
+#### Initialization
+
+nnInteractive must be initialized before it can operate on an image.
+During initialization, the AI model weights are uploaded to the GPU, which may take several seconds.
+The very first initialization after installation may take up to a minute because the weights must be downloaded from the internet.
+
+Once initialization completes successfully, you can begin using the nnInteractive tool.
+If no supported GPU is detected, a warning message will inform you that nnInteractive will run slowly and will recommend hardware that enables a fully interactive workflow.
+
+If initialization fails, you may attempt to change the device on which nnInteractive is executed.
+A **Settings** button is available next to the **Initialize** button, opening the nnInteractive preferences page.
+There you can switch between *Auto* (default), *CPU*, and *GPU*.
+When selecting *GPU*, you may also specify the device number if you are working on a multi-GPU system.
+
+![A warning when nnInteractive is running on CPU](nnInteractive_CPU.png)
+
+#### Interactions
+
+After a session has been initialized, you can begin interacting by placing points, drawing bounding boxes, outlining contours, or scribbling with simple mouse clicks.
+Each interaction can be set to positive or negative, thereby adding or removing areas from the proposed segmentation.
+
+A key characteristic of nnInteractive is that individual interactions cannot be undone.
+Instead, you may reset all current interactions and start over.
+When you are satisfied with the result - often after only a single point or scribble - press **Confirm Segmentation** to write the segmented pixels to the currently selected label.
+
+Within a single session, you can switch the active label at any time to segment multiple structures without reinitializing nnInteractive.
 
 ### 3D Threshold tool {#org_mitk_views_segmentation3dthresholdtool}
 
@@ -650,7 +709,7 @@ MITK is tested for the Radiology app and only supports auto and click-based "dee
 The tool requires that you have a URL to a (self-) hosted MONAI Label server.
 For a detailed explanation of what MONAI Label is capable of, please refer to https://docs.monai.io/projects/label/en/latest/.
 
-Any adjustments to the [Level Window](@ref org_mitk_editors_stdmultiwidget_Levelwindow) setting impacts the segmentation. However, any applied color maps are ignored.
+Any adjustments to the Level Window setting impacts the segmentation. However, any applied color maps are ignored.
 
 #### Workflow: {#org_mitk_views_segmentationMonaiLabelWorkflow}
 

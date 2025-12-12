@@ -13,8 +13,8 @@ if(MITK_USE_Python3)
   endif()
 
   if(NOT DEFINED ${proj}_DIR)
-    set(version 3.12.11)
-    set(release_date 20250712)
+    set(version 3.12.11)       # IMPORTANT: On any version update, adapt MITK_REQUIRED_OPENSSL_VERSION
+    set(release_date 20250712) #            in the top-level CMakeLists.txt.
 
     set(base_url "https://github.com/astral-sh/python-build-standalone/releases/download/${release_date}")
     set(variant "install_only_stripped")
@@ -55,6 +55,17 @@ if(MITK_USE_Python3)
       set(python3_executable "python.exe")
     else()
       set(python3_executable "bin/python3")
+    endif()
+
+    if(OPENSSL_VERSION)
+      ExternalProject_Add_Step(${proj} check_openssl
+        COMMAND ${python3_executable} "${MITK_SOURCE_DIR}/CMakeExternals/Python3_CheckOpenSSL.py"
+          --expected "${OPENSSL_VERSION}"
+          --skip-if-built-in
+        DEPENDEES patch
+        DEPENDERS configure
+        WORKING_DIRECTORY "<SOURCE_DIR>"
+      )
     endif()
 
     if(CMAKE_OSX_ARCHITECTURES AND CMAKE_OSX_DEPLOYMENT_TARGET)

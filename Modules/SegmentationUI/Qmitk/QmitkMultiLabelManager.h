@@ -19,11 +19,12 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 #include <mitkNumericTypes.h>
 #include <mitkITKEventObserverGuard.h>
+#include <mitkLabelSuggestionHelper.h>
 
 #include <QWidget>
 
-class QmitkDataStorageComboBox;
 class QCompleter;
+class QShortcut;
 
 namespace Ui
 {
@@ -53,6 +54,8 @@ public:
 
   mitk::MultiLabelSegmentation* GetMultiLabelSegmentation() const;
   mitk::DataNode* GetMultiLabelNode() const;
+
+  const mitk::LabelSuggestionHelper* GetLabelSuggestionHelper() const;
 
 Q_SIGNALS:
   /**
@@ -118,6 +121,8 @@ public Q_SLOTS:
 
   void SetDataStorage(mitk::DataStorage *storage);
 
+  void SetLabelSuggestionHelper(const mitk::LabelSuggestionHelper* suggestionHelper);
+
   void UpdateControls();
 
   virtual void setEnabled(bool enabled);
@@ -132,8 +137,6 @@ private Q_SLOTS:
 
   void OnRenameLabelShortcutActivated();
 
-  // reaction to "returnPressed" signal from ...
-  void OnSearchLabel();
   // reaction to the change of labels. If multiple labels are selected, it is ignored.
   void OnSelectedLabelChanged(const LabelValueVectorType& labels);
 
@@ -178,11 +181,11 @@ private:
 
   Ui::QmitkMultiLabelManagerControls* m_Controls;
 
-  QCompleter *m_Completer;
-
   QStringList m_OrganColors;
 
   QStringList m_LabelStringList;
+
+  QShortcut* m_AddLabelInstanceShortcut;
 
   bool m_ProcessingManualSelection;
 
@@ -194,6 +197,10 @@ private:
   mitk::ITKEventObserverGuard m_GroupAddedObserver;
   mitk::ITKEventObserverGuard m_GroupModifiedObserver;
   mitk::ITKEventObserverGuard m_GroupRemovedObserver;
+
+  mitk::LabelSuggestionHelper::ConstPointer m_SuggestionHelper;
+  mitk::ITKEventObserverGuard m_SuggestionObserver;
+
 };
 
 #endif

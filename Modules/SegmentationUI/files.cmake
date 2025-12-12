@@ -38,6 +38,7 @@ set(CPP_FILES
   Qmitk/QmitkMultiLabelSelectionButton.cpp
   Qmitk/QmitkMultiLabelSelectionLabel.cpp
   Qmitk/QmitkMultiLabelSelectionWidget.cpp
+  Qmitk/QmitkFlatLabelInstanceProxyModel.cpp
   Qmitk/QmitkLabelColorItemDelegate.cpp
   Qmitk/QmitkLabelToggleItemDelegate.cpp
   Qmitk/QmitkFindSegmentationTaskDialog.cpp
@@ -46,6 +47,7 @@ set(CPP_FILES
   Qmitk/QmitkMonaiLabelToolGUI.cpp
   Qmitk/QmitkMonaiLabel2DToolGUI.cpp
   Qmitk/QmitkMonaiLabel3DToolGUI.cpp
+  Qmitk/QmitkLabelSelectionToolGUI.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.cpp
@@ -94,6 +96,7 @@ set(MOC_H_FILES
   Qmitk/QmitkMultiLabelSelectionLabel.h
   Qmitk/QmitkMultiLabelSelectionWidget.h
   Qmitk/QmitkMultiLabelSelectionButton.h
+  Qmitk/QmitkFlatLabelInstanceProxyModel.h
   Qmitk/QmitkMultiLabelTreeModel.h
   Qmitk/QmitkMultiLabelTreeView.h
   Qmitk/QmitkLabelColorItemDelegate.h
@@ -104,7 +107,7 @@ set(MOC_H_FILES
   Qmitk/QmitkMonaiLabelToolGUI.h
   Qmitk/QmitkMonaiLabel2DToolGUI.h
   Qmitk/QmitkMonaiLabel3DToolGUI.h
-
+  Qmitk/QmitkLabelSelectionToolGUI.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.h
@@ -130,6 +133,7 @@ set(UI_FILES
   Qmitk/QmitkSegmentAnythingGUIControls.ui
   Qmitk/QmitkMedSAMGUIControls.ui
   Qmitk/QmitkMonaiLabelToolGUIControls.ui
+  Qmitk/QmitkLabelSelectionToolGUIControls.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
   SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui

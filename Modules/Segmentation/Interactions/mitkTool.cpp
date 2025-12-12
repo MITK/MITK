@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
 #include "mitkVtkResliceInterpolationProperty.h"
-#include <mitkDICOMSegmentationPropertyHelper.cpp>
+#include <mitkDICOMSegmentationPropertyHelper.h>
 #include <mitkToolManager.h>
 #include <mitkMultiLabelPredicateHelper.h>
 

@@ -331,4 +331,6 @@ Interactions/PointSetConfigLMB.xml
 
 mitkLevelWindowPresets.xml
 mitkAnatomicalStructureColorPresets.xml
+LabelSuggestions/mitk_classic.json
+LabelSuggestions/EUCAIM.json
 )

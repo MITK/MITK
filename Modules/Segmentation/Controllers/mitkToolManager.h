@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include "mitkTool.h"
 #include "mitkWeakPointer.h"
 #include <MitkSegmentationExports.h>
+#include <mitkLabelSetImage.h>
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
@@ -91,6 +92,8 @@ namespace mitk
     Message<> ReferenceDataChanged;
     Message<> WorkingDataChanged;
     Message<> RoiDataChanged;
+    Message<> ActiveWorkingLabelChanged;
+
     Message<> SelectedTimePointChanged;
 
     Message1<std::string> ToolErrorMessage;
@@ -180,6 +183,11 @@ namespace mitk
     DataVectorType GetReferenceData();
 
     /**
+      \brief Set the active label value for the current working data.
+    */
+    void SetActiveWorkingLabel(MultiLabelSegmentation::LabelValueType labelValue);
+
+    /**
       \brief Get the current reference data.
       \warning If there is a list of items, this method will only return the first list item.
     */
@@ -205,6 +213,11 @@ namespace mitk
      \brief Get the roi data at position idx
      */
     DataNode *GetRoiData(int idx);
+
+    /**
+      \brief Get the active label value for the current working data.
+    */
+    MultiLabelSegmentation::LabelValueType GetActiveWorkingLabel();
 
     DataStorage::Pointer GetDataStorage() const;
     void SetDataStorage(DataStorage &storage);
@@ -271,6 +284,8 @@ namespace mitk
 
     DataVectorType m_RoiData;
     NodeTagMapType m_RoiDataObserverTags;
+
+    MultiLabelSegmentation::LabelValueType m_ActiveWorkingLabel;
 
     int m_RegisteredClients;
 

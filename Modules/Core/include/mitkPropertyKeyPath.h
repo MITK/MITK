@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include <mitkExceptionMacro.h>
 
@@ -22,6 +23,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class IPropertyProvider;
+
   /** @brief Class that can be used to specify nested or wild carded property keys. E.g.
    * for the use in context of the property persistence service or the property relation service.\n
    * Following assumptions are made /preconditions are defined:
@@ -211,6 +214,17 @@ namespace mitk
   MITKCORE_EXPORT PropertyKeyPath PropertyNameToPropertyKeyPath(const std::string &propertyName);
   /** returns the correct property name for a given PropertyKeyPath instance. */
   MITKCORE_EXPORT std::string PropertyKeyPathToPropertyName(const PropertyKeyPath &tagPath);
+
+  /**
+   * @brief Helper function to find indexed entries for a PropertyKeyPath in a property provider.
+   * @param provider Pointer to the property provider which property names should be scanned.
+   * @param path PropertyKeyPath with exactly one AnySelection node
+   * @return Map with index as key and full property name as value
+   * @pre path must contain exactly one AnySelection node
+   */
+  MITKCORE_EXPORT std::map<PropertyKeyPath::ItemSelectionIndex, std::string>
+    FindIndexedPropertyNames(const IPropertyProvider* provider, const PropertyKeyPath& path);
+
 } // namespace mitk
 
 #endif

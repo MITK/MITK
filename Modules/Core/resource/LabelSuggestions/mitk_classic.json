@@ -1,0 +1,2739 @@
+{
+  "version": 3,
+  "type": "org.mitk.multilabel.segmentation.stack",
+  "properties": {
+	"name":	"MITK Anatomical Structures (classic)",
+	"version": 1,
+	"description": "Classical default label suggestion of MITK (Standard till 2025.08)"
+	},
+  "groups": [
+    {
+      "name": "MITK Anatomical Structures",
+      "labels": [
+        {
+          "name": "Abdomen",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D4000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Abdomen",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-D4000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Abdomen"
+        },
+        {
+          "name": "Adenohypophysis",
+          "color": [
+            60,
+            143,
+            83
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-B1100",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Adenohypophysis",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-B1100",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Adenohypophysis"
+        },
+        {
+          "name": "Adrenal gland",
+          "color": [
+            249,
+            186,
+            150
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-B3000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Adrenal Gland",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-B3000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Adrenal Gland"
+        },
+        {
+          "name": "Adrenal gland (right)",
+          "color": [
+            249,
+            186,
+            150
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-B3000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Adrenal Gland",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-B3000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Adrenal Gland",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Adrenal gland (left)",
+          "color": [
+            249,
+            186,
+            150
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-B3000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Adrenal Gland",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-B3000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Adrenal Gland",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Amygdala",
+          "color": [
+            98,
+            153,
+            112
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-A3230",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Amygdala",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-A3230",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Amygdala"
+        },
+        {
+          "name": "Amygdala (right)",
+          "color": [
+            98,
+            153,
+            112
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-A3230",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Amygdala",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-A3230",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Amygdala",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Amygdala (left)",
+          "color": [
+            98,
+            153,
+            112
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-A3230",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Amygdala",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-A3230",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Amygdala",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Anus",
+          "color": [
+            255,
+            224,
+            199
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-59900",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Anus",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-59900",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Anus"
+        },
+        {
+          "name": "Aorta",
+          "color": [
+            224,
+            97,
+            76
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-42000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Aorta",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-42000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Aorta"
+        },
+        {
+          "name": "Aortic valve",
+          "color": [
+            218,
+            123,
+            97
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-35400",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Aortic Valve",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-35400",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Aortic Valve"
+        },
+        {
+          "name": "Appendix",
+          "color": [
+            161,
+            107,
+            54
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-59200",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Appendix",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-59200",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Appendix"
+        },
+        {
+          "name": "Artery",
+          "color": [
+            216,
+            101,
+            79
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-41066",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Artery"
+        },
+        {
+          "name": "Bile ",
+          "color": [
+            0,
+            145,
+            30
+          ],
+          "segmented_property_category.value": "T-D0080",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Body Substance",
+          "segmented_property_type.value": "T-60650",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Bile"
+        },
+        {
+          "name": "Bile duct",
+          "color": [
+            0,
+            145,
+            30
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-60610",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Bile Duct"
+        },
+        {
+          "name": "Bladder",
+          "color": [
+            222,
+            154,
+            132
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-74000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Bladder"
+        },
+        {
+          "name": "Blood clot",
+          "color": [
+            145,
+            60,
+            66
+          ],
+          "segmented_property_category.value": "M-01000",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Morphologically Altered Structure",
+          "segmented_property_type.value": "M-35000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Blood Clot"
+        },
+        {
+          "name": "Blood vessel",
+          "color": [
+            255,
+            49,
+            49
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-40000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Blood Vessel"
+        },
+        {
+          "name": "Bone",
+          "color": [
+            241,
+            214,
+            145
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-D016E",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Bone"
+        },
+        {
+          "name": "Brain",
+          "color": [
+            250,
+            250,
+            225
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-A0100",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Brain",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-A0100",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Brain"
+        },
+        {
+          "name": "Bronchi",
+          "color": [
+            175,
+            216,
+            244
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-A0100",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Bronchi",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-A0100",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Bronchi"
+        },
+        {
+          "name": "Capillary",
+          "color": [
+            183,
+            156,
+            220
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-40050",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Capillary"
+        },
+        {
+          "name": "Cartilage",
+          "color": [
+            111,
+            184,
+            210
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-D021B",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Cartilage"
+        },
+        {
+          "name": "Cerebellar white matter",
+          "color": [
+            194,
+            195,
+            164
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-A6080",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Cerebellar White Matter",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-A6080",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Cerebellar White Matter"
+        },
+        {
+          "name": "Cerebral grey matter",
+          "color": [
+            128,
+            174,
+            128
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-A2020",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Cerebral Grey Matter",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-A2020",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Cerebral Grey Matter"
+        },
+        {
+          "name": "Cerebral white matter",
+          "color": [
+            250,
+            250,
+            225
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-A2030",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Cerebral White Matter",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-A2030",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Cerebral White Matter"
+        },
+        {
+          "name": "Chest",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D3000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Chest",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-D3000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Chest"
+        },
+        {
+          "name": "Colon",
+          "color": [
+            204,
+            168,
+            143
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-59302",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Colon",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-59302",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Colon"
+        },
+        {
+          "name": "Coccyx",
+          "color": [
+            255,
+            255,
+            153
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-11BF0",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Coccyx",
+          "anatomic_region.[0].value": "T-D2000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Spine",
+          "primary_anatomic_structure.[0].value": "T-11BF0",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Coccyx"
+        },
+        {
+          "name": "Duodenum",
+          "color": [
+            255,
+            253,
+            229
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-58200",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Duodenum",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-58200",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Duodenum"
+        },
+        {
+          "name": "Cyst",
+          "color": [
+            205,
+            205,
+            100
+          ],
+          "segmented_property_category.value": "M-01000",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Morphologically Altered Structure",
+          "segmented_property_type.value": "M-3340A",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Cyst"
+        },
+        {
+          "name": "Edema",
+          "color": [
+            140,
+            224,
+            228
+          ],
+          "segmented_property_category.value": "M-01000",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Morphologically Altered Structure",
+          "segmented_property_type.value": "M-36300",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Edema"
+        },
+        {
+          "name": "Elbow",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D06CA",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Elbow",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D06CA",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Elbow"
+        },
+        {
+          "name": "Elbow (right)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D06CA",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Elbow",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D06CA",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Elbow",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Elbow (left)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D06CA",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Elbow",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D06CA",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Elbow",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Embolus",
+          "color": [
+            150,
+            98,
+            83
+          ],
+          "segmented_property_category.value": "M-01000",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Morphologically Altered Structure",
+          "segmented_property_type.value": "M-35300",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Embolus"
+        },
+        {
+          "name": "Esophagus",
+          "color": [
+            211,
+            171,
+            143
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-56000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Esophagus",
+          "anatomic_region.[0].value": "T-D1600",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Neck",
+          "primary_anatomic_structure.[0].value": "T-56000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Esophagus"
+        },
+        {
+          "name": "Eyeball",
+          "color": [
+            194,
+            142,
+            0
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-AA636",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Fundus of Eye",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-AA636",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Fundus of Eye"
+        },
+        {
+          "name": "Eyeball (right)",
+          "color": [
+            194,
+            142,
+            0
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-AA636",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Fundus of Eye",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-AA636",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Fundus of Eye",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Eyeball (left)",
+          "color": [
+            194,
+            142,
+            0
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-AA636",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Fundus of Eye",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-AA636",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Fundus of Eye",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Fallopian tube",
+          "color": [
+            255,
+            190,
+            165
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D6101",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Fallopian Tube",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-D6101",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Fallopian Tube"
+        },
+        {
+          "name": "Fallopian tube (right)",
+          "color": [
+            255,
+            190,
+            165
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D6101",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Fallopian Tube",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-D6101",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Fallopian Tube",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Fallopian tube (left)",
+          "color": [
+            255,
+            190,
+            165
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D6101",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Fallopian Tube",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-D6101",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Fallopian Tube",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Fat",
+          "color": [
+            230,
+            220,
+            70
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "F-03D38",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Body Fat"
+        },
+        {
+          "name": "Feces",
+          "color": [
+            78,
+            63,
+            0
+          ],
+          "segmented_property_category.value": "T-D0080",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Body Substance",
+          "segmented_property_type.value": "T-59666",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Feces"
+        },
+        {
+          "name": "Foot",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D9700",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Foot",
+          "anatomic_region.[0].value": "T-D9000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Lower Limb",
+          "primary_anatomic_structure.[0].value": "T-D9700",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Foot"
+        },
+        {
+          "name": "Foot (right)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D9700",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Foot",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D9000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Lower Limb",
+          "primary_anatomic_structure.[0].value": "T-D9700",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Foot",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Foot (left)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D9700",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Foot",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D9000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Lower Limb",
+          "primary_anatomic_structure.[0].value": "T-D9700",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Foot",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Gallbladder",
+          "color": [
+            139,
+            150,
+            98
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-63002",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Gallbladder",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-63002",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Gallbladder"
+        },
+        {
+          "name": "Gas",
+          "color": [
+            218,
+            255,
+            255
+          ],
+          "segmented_property_category.value": "T-D0080",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Body Substance",
+          "segmented_property_type.value": "C-10080",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Gas"
+        },
+        {
+          "name": "Hand",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D8701",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Hand",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D8701",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Hand"
+        },
+        {
+          "name": "Hand (right)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D8701",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Hand",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D8701",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Hand",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Hand (left)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D8701",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Hand",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D8701",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Hand",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Heart",
+          "color": [
+            206,
+            110,
+            84
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-32000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Heart",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-32000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Heart"
+        },
+        {
+          "name": "Hemorrhage",
+          "color": [
+            188,
+            65,
+            28
+          ],
+          "segmented_property_category.value": "M-01000",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Morphologically Altered Structure",
+          "segmented_property_type.value": "M-37000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Hemorrhage"
+        },
+        {
+          "name": "Hip",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D2503",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Hip Region",
+          "anatomic_region.[0].value": "T-D9000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Lower Limb",
+          "primary_anatomic_structure.[0].value": "T-D2503",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Hip Region"
+        },
+        {
+          "name": "Hip (right)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D2503",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Hip Region",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D9000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Lower Limb",
+          "primary_anatomic_structure.[0].value": "T-D2503",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Hip Region",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Hip (left)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D2503",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Hip Region",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D9000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Lower Limb",
+          "primary_anatomic_structure.[0].value": "T-D2503",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Hip Region",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Kidney",
+          "color": [
+            185,
+            102,
+            83
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-71000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Kidney",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-71000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Kidney"
+        },
+        {
+          "name": "Kidney (right)",
+          "color": [
+            185,
+            102,
+            83
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-71000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Kidney",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-71000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Kidney",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Kidney (left)",
+          "color": [
+            185,
+            102,
+            83
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-71000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Kidney",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-71000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Kidney",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Knee",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D03BA",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Knee Region",
+          "anatomic_region.[0].value": "T-D9000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Lower Limb",
+          "primary_anatomic_structure.[0].value": "T-D03BA",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Knee Region"
+        },
+        {
+          "name": "Knee (right)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D03BA",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Knee Region",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D9000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Lower Limb",
+          "primary_anatomic_structure.[0].value": "T-D03BA",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Knee Region",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Knee (left)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D03BA",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Knee Region",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D9000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Lower Limb",
+          "primary_anatomic_structure.[0].value": "T-D03BA",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Knee Region",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Larynx",
+          "color": [
+            150,
+            208,
+            243
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-2410C",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Larynx",
+          "anatomic_region.[0].value": "T-D1600",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Neck",
+          "primary_anatomic_structure.[0].value": "T-2410C",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Larynx"
+        },
+        {
+          "name": "Ligament",
+          "color": [
+            183,
+            214,
+            211
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-18010",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Ligament"
+        },
+        {
+          "name": "Lesion",
+          "color": [
+            221,
+            130,
+            101
+          ],
+          "segmented_property_category.value": "M-01000",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Morphologically Altered Structure",
+          "segmented_property_type.value": "M-01100",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Lesion"
+        },
+        {
+          "name": "Liver",
+          "color": [
+            221,
+            130,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-62000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Liver",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-62000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Liver"
+        },
+        {
+          "name": "Lung",
+          "color": [
+            197,
+            165,
+            145
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-28000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Lung",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-28000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Lung"
+        },
+        {
+          "name": "Lung (right)",
+          "color": [
+            197,
+            165,
+            145
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-28000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Lung",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-28000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Lung",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Lung (left)",
+          "color": [
+            197,
+            165,
+            145
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-28000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Lung",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-28000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Lung",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Lymph node",
+          "color": [
+            68,
+            172,
+            100
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-C4000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Lymph Node"
+        },
+        {
+          "name": "Lymph node of head",
+          "color": [
+            68,
+            172,
+            100
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-C4100",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Lymph Node of Head",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head"	  
+        },
+        {
+          "name": "Lymph node of head and neck",
+          "color": [
+            68,
+            172,
+            100
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-C4004",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Lymph Node of Head and Neck",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "anatomic_region.[1].value": "T-D1600",
+          "anatomic_region.[1].scheme": "SRT",
+          "anatomic_region.[1].meaning": "Neck"
+        },
+        {
+          "name": "Lymphatic vessel",
+          "color": [
+            111,
+            197,
+            131
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-C6010",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Lymphatic Vessel"
+        },
+        {
+          "name": "Mandible",
+          "color": [
+            222,
+            198,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-11180",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Mandible",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-11180",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Mandible"
+        },
+        {
+          "name": "Mass",
+          "color": [
+            144,
+            238,
+            144
+          ],
+          "segmented_property_category.value": "M-01000",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Morphologically Altered Structure",
+          "segmented_property_type.value": "M-03000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Mass"
+        },
+        {
+          "name": "Mediastinum",
+          "color": [
+            255,
+            244,
+            209
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D3300",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Mediastinum",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-D3300",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Mediastinum"
+        },
+        {
+          "name": "Mitral valve",
+          "color": [
+            159,
+            63,
+            27
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-35300",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Mitral Valve",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-35300",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Mitral Valve"
+        },
+        {
+          "name": "Muscle",
+          "color": [
+            192,
+            104,
+            88
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-13001",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Muscle"
+        },
+        {
+          "name": "Necrosis",
+          "color": [
+            216,
+            191,
+            216
+          ],
+          "segmented_property_category.value": "M-01000",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Morphologically Altered Structure",
+          "segmented_property_type.value": "M-54000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Necrosis"
+        },
+        {
+          "name": "Needle",
+          "color": [
+            240,
+            255,
+            30
+          ],
+          "segmented_property_category.value": "A-00004",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Physical Object",
+          "segmented_property_type.value": "A-30360",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Needle"
+        },
+        {
+          "name": "Neoplasm, primary",
+          "color": [
+            128,
+            174,
+            128
+          ],
+          "segmented_property_category.value": "M-01000",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Morphologically Altered Structure",
+          "segmented_property_type.value": "M-80003",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Neoplasm, Primary"
+        },
+        {
+          "name": "Neoplasm, secondary",
+          "color": [
+            241,
+            214,
+            145
+          ],
+          "segmented_property_category.value": "M-01000",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Morphologically Altered Structure",
+          "segmented_property_type.value": "M-80006",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Neoplasm, Secondary"
+        },
+        {
+          "name": "Nerve",
+          "color": [
+            244,
+            214,
+            49
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-D0598",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Nerve"
+        },
+        {
+          "name": "Nose",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-21003",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Nose",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-21003",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Nose"
+        },
+        {
+          "name": "Organ",
+          "color": [
+            221,
+            130,
+            101
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-1A310",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Organ"
+        },
+        {
+          "name": "Ovary",
+          "color": [
+            213,
+            141,
+            113
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-87000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Ovary",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-87000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Ovary"
+        },
+        {
+          "name": "Ovary (right)",
+          "color": [
+            213,
+            141,
+            113
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-87000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Ovary",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-87000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Ovary",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Ovary (left)",
+          "color": [
+            213,
+            141,
+            113
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-87000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Ovary",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-87000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Ovary",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Pancreas",
+          "color": [
+            249,
+            180,
+            111
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D4034",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Pancreas",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-D4034",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Pancreas"
+        },
+        {
+          "name": "Pelvis",
+          "color": [
+            255,
+            255,
+            153
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-12375",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Pelvis",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-12375",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Pelvis"
+        },
+        {
+          "name": "Penis",
+          "color": [
+            255,
+            222,
+            199
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-91000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Penis",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-91000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Penis"
+        },
+        {
+          "name": "Pericardium",
+          "color": [
+            255,
+            244,
+            209
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-39000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Pericardium",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-39000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Pericardium"
+        },
+        {
+          "name": "Peritoneum",
+          "color": [
+            255,
+            255,
+            220
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D4400",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Peritoneum",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-D4400",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Peritoneum"
+        },
+        {
+          "name": "Pharynx",
+          "color": [
+            184,
+            105,
+            108
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-55002",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Pharynx",
+          "anatomic_region.[0].value": "T-D1600",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Neck",
+          "primary_anatomic_structure.[0].value": "T-55002",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Pharynx"
+        },
+        {
+          "name": "Prostate",
+          "color": [
+            230,
+            158,
+            140
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-92000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Prostate",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-92000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Prostate"
+        },
+        {
+          "name": "Right ventricle",
+          "color": [
+            181,
+            85,
+            57
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-32500",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Right Ventricle",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-32500",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Right Ventricle"
+        },
+        {
+          "name": "Rectum",
+          "color": [
+            161,
+            107,
+            54
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-59600",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Rectum",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-59600",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Rectum"
+        },
+        {
+          "name": "Sacrum",
+          "color": [
+            255,
+            255,
+            153
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-11AD0",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Sacrum",
+          "anatomic_region.[0].value": "T-D2000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Spine",
+          "primary_anatomic_structure.[0].value": "T-11AD0",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Sacrum"
+        },
+        {
+          "name": "Seminal vesicle",
+          "color": [
+            245,
+            172,
+            147
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-93000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Seminal Vesicle",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-93000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Seminal Vesicle"
+        },
+        {
+          "name": "Seminal vesicle (right)",
+          "color": [
+            245,
+            172,
+            147
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-93000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Seminal Vesicle",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-93000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Seminal Vesicle",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Seminal vesicle (left)",
+          "color": [
+            245,
+            172,
+            147
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-93000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Seminal Vesicle",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-93000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Seminal Vesicle",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Shoulder",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D2220",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Shoulder",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D2220",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Shoulder"
+        },
+        {
+          "name": "Shoulder (right)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D2220",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Shoulder",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D2220",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Shoulder",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Shoulder (left)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D2220",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Shoulder",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D2220",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Shoulder",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Skin",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-01000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Skin"
+        },
+        {
+          "name": "Skull",
+          "color": [
+            241,
+            213,
+            144
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-11100",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Skull",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-11100",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Skull"
+        },
+        {
+          "name": "Small intestine",
+          "color": [
+            205,
+            167,
+            142
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-58000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Small Intestine",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-58000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Small Intestine"
+        },
+        {
+          "name": "Spinal cord",
+          "color": [
+            244,
+            214,
+            49
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-A7013",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Spinal Cord",
+          "anatomic_region.[0].value": "T-D2000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Spine",
+          "primary_anatomic_structure.[0].value": "T-A7013",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Spinal Cord"
+        },
+        {
+          "name": "Spleen",
+          "color": [
+            157,
+            108,
+            162
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-C3000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Spleen",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-C3000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Spleen"
+        },
+        {
+          "name": "Sternum",
+          "color": [
+            244,
+            217,
+            154
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-11210",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Sternum",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-11210",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Sternum"
+        },
+        {
+          "name": "Stomach",
+          "color": [
+            216,
+            132,
+            105
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-57001",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Stomach",
+          "anatomic_region.[0].value": "T-D4000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Abdomen",
+          "primary_anatomic_structure.[0].value": "T-57001",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Stomach"
+        },
+        {
+          "name": "Teeth",
+          "color": [
+            255,
+            250,
+            220
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-5401E",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Tooth",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-5401E",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Tooth"
+        },
+        {
+          "name": "Tendon",
+          "color": [
+            152,
+            189,
+            207
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-17010",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Tendon"
+        },
+        {
+          "name": "Testicle",
+          "color": [
+            199,
+            232,
+            255
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-94000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Testis",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-94000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Testis"
+        },
+        {
+          "name": "Testis (right)",
+          "color": [
+            199,
+            232,
+            255
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-94000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Testis",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-94000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Testis",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Testis (left)",
+          "color": [
+            199,
+            232,
+            255
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-94000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Testis",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-94000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Testis",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Thalamus",
+          "color": [
+            122,
+            101,
+            38
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D0593",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Thalamus",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-D0593",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Thalamus"
+        },
+        {
+          "name": "Thalamus (right)",
+          "color": [
+            122,
+            101,
+            38
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D0593",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Thalamus",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-D0593",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Thalamus",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Thalamus (left)",
+          "color": [
+            122,
+            101,
+            38
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D0593",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Thalamus",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D1100",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Head",
+          "primary_anatomic_structure.[0].value": "T-D0593",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Thalamus",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        },
+        {
+          "name": "Thymus",
+          "color": [
+            47,
+            150,
+            103
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-C8000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Thymus",
+          "anatomic_region.[0].value": "T-D3000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Thorax",
+          "primary_anatomic_structure.[0].value": "T-C8000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Thymus"
+        },
+        {
+          "name": "Thyroid gland",
+          "color": [
+            62,
+            162,
+            114
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-B0004",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Thyroid Gland",
+          "anatomic_region.[0].value": "T-D1600",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Neck",
+          "primary_anatomic_structure.[0].value": "T-B0004",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Thyroid Gland"
+        },
+        {
+          "name": "Tissue",
+          "color": [
+            128,
+            174,
+            128
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-D0050",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Tissue"
+        },
+        {
+          "name": "Tongue",
+          "color": [
+            166,
+            84,
+            94
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-5300D",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Tongue",
+          "anatomic_region.[0].value": "T-D1600",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Neck",
+          "primary_anatomic_structure.[0].value": "T-5300D",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Tongue"
+        },
+        {
+          "name": "Trachea",
+          "color": [
+            182,
+            228,
+            255
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-25000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Trachea",
+          "anatomic_region.[0].value": "T-D1600",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Neck",
+          "primary_anatomic_structure.[0].value": "T-25000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Trachea"
+        },
+        {
+          "name": "Urethra",
+          "color": [
+            124,
+            186,
+            223
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-75001",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Urethra",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-75001",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Urethra"
+        },
+        {
+          "name": "Urine",
+          "color": [
+            214,
+            230,
+            130
+          ],
+          "segmented_property_category.value": "T-D0080",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Body Substance",
+          "segmented_property_type.value": "T-70060",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Urine"
+        },
+        {
+          "name": "Urinary bladder",
+          "color": [
+            222,
+            154,
+            132
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-74000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Bladder",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-74000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Bladder"
+        },
+        {
+          "name": "Uterus",
+          "color": [
+            255,
+            181,
+            158
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-83000",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Uterus",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-83000",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Uterus"
+        },
+        {
+          "name": "Vagina",
+          "color": [
+            193,
+            123,
+            103
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-82003",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Vagina",
+          "anatomic_region.[0].value": "T-D6000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Pelvis",
+          "primary_anatomic_structure.[0].value": "T-82003",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Vagina"
+        },
+        {
+          "name": "Vein",
+          "color": [
+            0,
+            151,
+            206
+          ],
+          "segmented_property_category.value": "T-D0050",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Tissue",
+          "segmented_property_type.value": "T-4806E",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Vein"
+        },
+        {
+          "name": "Vertebra",
+          "color": [
+            255,
+            255,
+            153
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-11510",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Vertebra",
+          "anatomic_region.[0].value": "T-D2000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Spine",
+          "primary_anatomic_structure.[0].value": "T-11510",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Vertebra"
+        },
+        {
+          "name": "Wrist",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D0787",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Wrist Region",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D0787",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Wrist Region"
+        },
+        {
+          "name": "Wrist (right)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D0787",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Wrist Region",
+          "segmented_property_type.modifier.[0].value": "G-A100",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Right",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D0787",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Wrist Region",
+          "primary_anatomic_structure.modifier.[0].value": "G-A100",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Right"
+        },
+        {
+          "name": "Wrist (left)",
+          "color": [
+            177,
+            122,
+            101
+          ],
+          "segmented_property_category.value": "T-D000A",
+          "segmented_property_category.scheme": "SRT",
+          "segmented_property_category.meaning": "Anatomical Structure",
+          "segmented_property_type.value": "T-D0787",
+          "segmented_property_type.scheme": "SRT",
+          "segmented_property_type.meaning": "Wrist Region",
+          "segmented_property_type.modifier.[0].value": "G-A101",
+          "segmented_property_type.modifier.[0].scheme": "SRT",
+          "segmented_property_type.modifier.[0].meaning": "Left",
+          "anatomic_region.[0].value": "T-D8000",
+          "anatomic_region.[0].scheme": "SRT",
+          "anatomic_region.[0].meaning": "Upper Limb",
+          "primary_anatomic_structure.[0].value": "T-D0787",
+          "primary_anatomic_structure.[0].scheme": "SRT",
+          "primary_anatomic_structure.[0].meaning": "Wrist Region",
+          "primary_anatomic_structure.modifier.[0].value": "G-A101",
+          "primary_anatomic_structure.modifier.[0].scheme": "SRT",
+          "primary_anatomic_structure.modifier.[0].meaning": "Left"
+        }
+      ]
+    }
+  ]
+}

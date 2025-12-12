@@ -22,6 +22,7 @@ found in the LICENSE file.
 // Qmitk
 #include <QmitkCopyLabelToGroupDialog.h>
 #include <QmitkMultiLabelTreeModel.h>
+#include <QmitkFlatLabelInstanceProxyModel.h>
 #include <QmitkLabelColorItemDelegate.h>
 #include <QmitkLabelToggleItemDelegate.h>
 #include <QmitkStyleManager.h>
@@ -32,14 +33,15 @@ found in the LICENSE file.
 #include <QWidgetAction>
 #include <QMessageBox>
 #include <QKeyEvent>
+#include <QCompleter>
+#include <QTimer>
 
 #include <QInputDialog>
 
 #include <ui_QmitkMultiLabelInspectorControls.h>
 
-
 QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/)
-  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelInspector), m_SegmentationNodeDataMTime(0)
+  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelInspector), m_SegmentationNodeDataMTime(0), m_Completer(nullptr)
 {
   m_Controls->setupUi(this);
 
@@ -69,6 +71,12 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   header->setSectionResizeMode(3, QHeaderView::ResizeToContents);
   view->setContextMenuPolicy(Qt::CustomContextMenu);
 
+  m_Completer = new QCompleter(this);
+  this->RefreshCompleter();
+
+  auto labelSearchBox = m_Controls->labelSearchBox;
+  labelSearchBox->setCompleter(m_Completer);
+
   connect(m_Model, &QAbstractItemModel::modelReset, this, &QmitkMultiLabelInspector::OnModelReset);
   connect(m_Model, &QAbstractItemModel::dataChanged, this, &QmitkMultiLabelInspector::OnDataChanged);
   connect(m_Model, &QmitkMultiLabelTreeModel::modelChanged, this, &QmitkMultiLabelInspector::OnModelChanged);
@@ -77,6 +85,43 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   connect(view, &QAbstractItemView::doubleClicked, this, &QmitkMultiLabelInspector::OnItemDoubleClicked);
   connect(view, &QAbstractItemView::entered, this, &QmitkMultiLabelInspector::OnEntered);
   connect(view, &QmitkMultiLabelTreeView::MouseLeave, this, &QmitkMultiLabelInspector::OnMouseLeave);
+
+  connect(labelSearchBox, &QLineEdit::returnPressed, this, &QmitkMultiLabelInspector::OnSearchLabel);
+
+  // Pressing return on the completer also triggers the line edit signal, resulting in a redundant
+  // call of OnLabelSearch(). At this time (same for a click on a completer entry), the text of the
+  // line edit is not yet set. Hence, it cannot be cleared by OnSearchLabel().
+  //
+  // The trick is to use a zero-delay single-shot timer to immediately clear the text after it
+  // was set by the completer. Since we cannot prevent the redundant call when pressing enter,
+  // We can early-out in OnSearchLabel() when the currently selected label already is the label
+  // that is requested to be selected.
+
+  connect(m_Completer, qOverload<const QString&>(&QCompleter::activated), labelSearchBox,
+    [labelSearchBox](const QString&)
+    {
+      QTimer::singleShot(0, [labelSearchBox]() { labelSearchBox->clear(); });
+    });
+
+  connect(m_Completer, qOverload<const QString&>(&QCompleter::activated),
+    [this, labelSearchBox](const QString& text)
+    {
+      labelSearchBox->setText(text); this->OnSearchLabel();
+    });
+}
+
+void QmitkMultiLabelInspector::RefreshCompleter()
+{
+  if (!m_Model || !m_Completer) return;
+
+  auto proxy = new QmitkFlatLabelInstanceProxyModel(this);
+  proxy->setSourceModel(m_Model);
+  m_Completer->setModel(nullptr);
+  m_Completer->setModel(proxy);
+  m_Completer->setCaseSensitivity(Qt::CaseInsensitive);
+  m_Completer->setCompletionColumn(0);
+  m_Completer->setCompletionMode(QCompleter::PopupCompletion);
+  m_Completer->setFilterMode(Qt::MatchContains);
 }
 
 QmitkMultiLabelInspector::~QmitkMultiLabelInspector()
@@ -103,6 +148,9 @@ void QmitkMultiLabelInspector::Initialize()
       m_Controls->view->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::NoUpdate);
     }
   }
+
+  this->RefreshCompleter();
+  m_Controls->labelSearchBox->setEnabled(m_Segmentation.IsNotNull());
 }
 
 void QmitkMultiLabelInspector::SetMultiSelectionMode(bool multiMode)
@@ -213,6 +261,17 @@ bool QmitkMultiLabelInspector::GetModelManipulationOngoing() const
 {
   return m_ModelManipulationOngoing;
 }
+
+const mitk::LabelSuggestionHelper* QmitkMultiLabelInspector::GetLabelSuggestionHelper() const
+{
+  return m_SuggestionHelper;
+}
+
+void QmitkMultiLabelInspector::SetLabelSuggestionHelper(const mitk::LabelSuggestionHelper* suggestionHelper)
+{
+  m_SuggestionHelper = suggestionHelper;
+}
+
 
 void QmitkMultiLabelInspector::OnModelReset()
 {
@@ -464,6 +523,12 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
   if (nullptr == templateLabel)
     mitkThrow() << "QmitkMultiLabelInspector is in an invalid state. AddNewLabelInstanceInternal was called with a non existing label as template";
 
+  if (m_SuggestionHelper.IsNotNull())
+  {
+    auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+    if (suggestionPrefs.enforceSuggestions && !m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, templateLabel->GetName()))
+      mitkThrow() << "QmitkMultiLabelInspector is in an invalid state. AddNewLabelInstanceInternal was called for a template label that is not allowed to have (further) instances.";
+  }
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(templateLabel->GetValue());
 
   mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { groupID },
@@ -471,6 +536,11 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
 
   m_ModelManipulationOngoing = true;
   auto newLabel = m_Segmentation->AddLabel(templateLabel, groupID, true);
+  //remove properties that where copied by the template but are instance specific
+  newLabel->ResetCenterOfMass();
+  newLabel->SetAlgorithmType(mitk::Label::AlgorithmType::Undefined);
+  newLabel->SetAlgorithmName("");
+
   m_Segmentation->SetActiveLabel(newLabel->GetValue());
   m_ModelManipulationOngoing = false;
 
@@ -515,9 +585,10 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstance()
 mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::MultiLabelSegmentation::GroupIndexType& containingGroup)
 {
   auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(m_Segmentation);
+  auto suggestionPref = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
 
   bool canceled = false;
-  if (!m_DefaultLabelNaming)
+  if (!m_DefaultLabelNaming || suggestionPref.enforceSuggestions)
     emit LabelRenameRequested(newLabel, false, canceled);
 
   if (canceled) return nullptr;
@@ -955,7 +1026,16 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
   {
     if (m_AllowLabelModification)
     {
+      bool instanceIsAllowed = true;
+      if (m_SuggestionHelper.IsNotNull())
+      {
+        auto label = this->GetFirstSelectedLabelObject();
+        auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+        instanceIsAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, label->GetName());
+      }
+
       QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "Add label instance", this);
+      addInstanceAction->setEnabled(instanceIsAllowed);
       QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
       menu->addAction(addInstanceAction);
 
@@ -1041,7 +1121,16 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     {
       if (m_AllowLabelModification)
       {
+        bool instanceIsAllowed = true;
+        if (m_SuggestionHelper.IsNotNull())
+        {
+          auto label = this->GetFirstSelectedLabelObject();
+          auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+          instanceIsAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(m_Segmentation, label->GetName());
+        }
+
         QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "&Add label instance", this);
+        addInstanceAction->setEnabled(instanceIsAllowed);
         QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
         menu->addAction(addInstanceAction);
 
@@ -1450,6 +1539,7 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
 {
   auto relevantLabelValues = this->GetCurrentlyAffactedLabelInstances();
   auto currentLabel = this->GetCurrentLabel();
+  auto selectedLabels = this->GetSelectedLabels();
 
   mitk::SegLabelPropModifyUndoRedoHelper undoRedoHelper(m_Segmentation, relevantLabelValues);
 
@@ -1457,6 +1547,7 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
   emit LabelRenameRequested(currentLabel, true, canceled);
 
   if (canceled) return;
+
 
   for (auto value : relevantLabelValues)
   {
@@ -1469,7 +1560,6 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
       label->SetName(currentLabel->GetName());
       label->SetColor(currentLabel->GetColor());
       m_Segmentation->UpdateLookupTable(label->GetValue());
-      mitk::DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 
       // this is needed as workaround for (T27307). It circumvents the fact that modifications
       // of data (here the segmentation) does not directly trigger the modification of the
@@ -1483,7 +1573,12 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
   }
   m_Segmentation->GetLookupTable()->Modified();
 
-  undoRedoHelper.RegisterUndoRedoOperationEvent("Change label name/color");
+  undoRedoHelper.RegisterUndoRedoOperationEvent("Change label(s) name/color");
+
+  // ensure that the labels that where selected before renaming are also selected afterwards
+  // it can differ as renaming might change the location in the view, but the selected index in the view is kept
+  this->SetSelectedLabels(selectedLabels);
+
   emit ModelUpdated();
 }
 
@@ -1586,13 +1681,13 @@ void QmitkMultiLabelInspector::OnItemDoubleClicked(const QModelIndex& index)
 
 void QmitkMultiLabelInspector::PrepareGoToLabel(mitk::Label::PixelType labelID) const
 {
-  this->WaitCursorOn();
-  m_Segmentation->UpdateCenterOfMass(labelID);
-  this->WaitCursorOff();
-
   const auto currentLabel = m_Segmentation->GetLabel(labelID);
   if (currentLabel.IsNull())
     return;
+
+  this->WaitCursorOn();
+  m_Segmentation->UpdateCenterOfMass(labelID);
+  this->WaitCursorOff();
 
   const auto pos = currentLabel->GetCenterOfMassIndex();
 
@@ -1645,4 +1740,48 @@ void QmitkMultiLabelInspector::keyReleaseEvent(QKeyEvent* event)
   }
 
   QWidget::keyPressEvent(event);
+}
+
+void QmitkMultiLabelInspector::OnSearchLabel()
+{
+  if (!m_Completer || !m_Model)
+    return;
+
+  const QString text = m_Controls->labelSearchBox->text().trimmed();
+  if (text.isEmpty())
+    return;
+
+  auto flatProxy = qobject_cast<QmitkFlatLabelInstanceProxyModel*>(m_Completer->model());
+  if (!flatProxy)
+    return;
+
+  // Find matching entries (case-insensitive, substring)
+  // we need to use here the flat model and not just completionModel, as we need to get the real index
+  // to fetch the label instance value later on.
+  QList<QModelIndex> matches =
+    flatProxy->match(flatProxy->index(0, 0), Qt::DisplayRole, text, 1, Qt::MatchContains | Qt::MatchWrap);
+
+  if (matches.isEmpty())
+    return; // nothing matched -> do nothing
+
+  QModelIndex proxyMatch = matches.first();
+  QModelIndex srcMatch = flatProxy->mapToSource(proxyMatch);
+  QVariant labelVariant = m_Model->data(srcMatch, QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
+
+  if (!labelVariant.isValid() ||
+    !labelVariant.canConvert<mitk::MultiLabelSegmentation::LabelValueType>())
+    return;
+
+  const mitk::MultiLabelSegmentation::LabelValueType labelID =
+    labelVariant.value<mitk::MultiLabelSegmentation::LabelValueType>();
+
+  auto selectedLabels = this->GetSelectedLabels();
+
+  if (selectedLabels.empty() || selectedLabels.front() != labelID)
+  {
+    this->SetSelectedLabel(labelID);
+    this->PrepareGoToLabel(labelID);
+  }
+
+  m_Controls->labelSearchBox->clear();
 }

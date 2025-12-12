@@ -52,6 +52,7 @@ set(CPP_FILES
   Interactions/mitkFillRegionBaseTool.cpp
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkGrowCutTool.cpp
+  Interactions/mitkLabelSelectionTool.cpp
   Interactions/mitkLassoTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
   Interactions/mitkMedSAMTool.cpp
@@ -74,6 +75,7 @@ set(CPP_FILES
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
   Interactions/mitkTotalSegmentatorTool.cpp
+  Interactions/mitkLabelSelectionTool.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp
@@ -104,6 +106,8 @@ set(RESOURCE_FILES
   Picking.svg
   RegionGrowing.svg
   RegionGrowing_Cursor.svg
+  Selection.svg
+  Selection_Cursor.svg
   Subtract.svg
   Subtract_Cursor.svg
   Threshold.svg
@@ -115,8 +119,10 @@ set(RESOURCE_FILES
   Interactions/ContourModelModificationInteractor.xml
   Interactions/dummy.xml
   Interactions/EditableContourTool.xml
+  Interactions/LabelSelectionTool.xml
   Interactions/MouseReleaseOnly.xml
   Interactions/PickingTool.xml
+  Interactions/LabelSelectionTool.xml
   Interactions/PressMoveRelease.xml
   Interactions/PressMoveReleaseAndPointSetting.xml
   Interactions/PressMoveReleaseWithCTRLInversion.xml

@@ -52,7 +52,6 @@ namespace mitk
     mitkClassMacro(FeedbackContourTool, SegTool2D);
 
   protected:
-    FeedbackContourTool();             // purposely hidden
     FeedbackContourTool(const char *); // purposely hidden
     ~FeedbackContourTool() override;
 

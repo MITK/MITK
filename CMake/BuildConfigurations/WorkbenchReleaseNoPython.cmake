@@ -1,0 +1,12 @@
+include(${CMAKE_CURRENT_LIST_DIR}/internal/WorkbenchReleaseBase.cmake)
+
+# Ensure that Python is really not configured (can happen if one switches config back and forth)
+list(REMOVE_ITEM MITK_CONFIG_PLUGINS org.mitk.gui.qt.pythonsettings)
+if(DEFINED MITK_USE_Python3 AND MITK_USE_Python3)
+    message(STATUS "MITK_USE_Python3 is set to TRUE, remove it as we have selected a NoPython configuration")
+    unset(MITK_USE_Python3 CACHE)
+endif()
+if(DEFINED MITK_USE_SWIG AND MITK_USE_SWIG)
+    message(STATUS "MITK_USE_SWIG is set to TRUE, remove it as we have selected a NoPython configuration")
+    unset(MITK_USE_SWIG CACHE)
+endif()

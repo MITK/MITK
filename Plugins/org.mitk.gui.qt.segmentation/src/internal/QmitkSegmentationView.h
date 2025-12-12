@@ -16,8 +16,10 @@ found in the LICENSE file.
 #include "ui_QmitkSegmentationViewControls.h"
 
 #include <QmitkAbstractView.h>
+#include <QmitkButtonOverlayWidget.h>
 #include <mitkITKEventObserverGuard.h>
 #include <mitkIRenderWindowPartListener.h>
+#include <mitkLabelSetImageHelper.h>
 
 /**
 * @brief The segmentation view provides a set of tool to use different segmentation algorithms.
@@ -93,6 +95,7 @@ private:
   void CreateQtPartControl(QWidget* parent) override;
 
   void SetFocus() override {}
+
   /**
   * @brief Enable or disable the SegmentationInteractor.
   *
@@ -100,11 +103,15 @@ private:
   * If the active tool is valid, the SegmentationInteractor is enabled
   * to listen to 'SegmentationInteractionEvent's.
   */
-  void ActiveToolChanged();
+  void OnActiveToolChanged();
+
+  void OnActiveWorkingLabelSelectionChanged();
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
+
+  void UpdateLabelSuggestions();
 
   void OnPreferencesChanged(const mitk::IPreferences* prefs) override;
 
@@ -132,9 +139,12 @@ private:
 
   void UpdateGUI();
 
-  void ValidateSelectionInput();
+  void CheckForReferenceVisibilityWarnings() const;
+  void CheckForToolViolations() const;
 
-  void UpdateWarningLabel(QString text);
+  void UpdateControlsOnLabelChanges();
+
+  void ValidateSelectionInput();
 
   std::string GetDefaultLabelSetPreset() const;
 
@@ -171,6 +181,11 @@ private:
   mitk::ITKEventObserverGuard m_LabelAddedObserver;
   mitk::ITKEventObserverGuard m_LabelRemovedObserver;
   mitk::ITKEventObserverGuard m_GroupRemovedObserver;
+
+  mitk::LabelSuggestionHelper::Pointer m_LabelSuggestionHelper;
+
+  QmitkButtonOverlayWidget* m_GeometryViolationOverlay;
+  QmitkButtonOverlayWidget* m_VisibleSegViolationOverlay;
 };
 
 #endif

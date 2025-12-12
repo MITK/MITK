@@ -24,6 +24,8 @@ set(CPP_FILES
   mitkGantryTiltInformation.cpp
   mitkClassicDICOMSeriesReader.cpp
   mitkThreeDnTDICOMSeriesReader.cpp
+  mitkDICOMCodeSequence.cpp
+  mitkDICOMCodeSequenceWithModifiers.cpp
   mitkDICOMTag.cpp
   mitkDICOMTagsOfInterestHelper.cpp
   mitkDICOMTagCache.cpp

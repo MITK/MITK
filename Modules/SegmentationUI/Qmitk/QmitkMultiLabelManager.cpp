@@ -33,14 +33,12 @@ found in the LICENSE file.
 #include <QLabel>
 #include <QWidgetAction>
 #include <QColorDialog>
-#include <QCompleter>
 #include <QDateTime>
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QShortcut>
-#include <QStringListModel>
 
 // itk
 #include <itksys/SystemTools.hxx>
@@ -49,28 +47,11 @@ found in the LICENSE file.
 
 
 QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
-  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelManagerControls), m_Completer(nullptr), m_ProcessingManualSelection(false), m_DataStorage(nullptr)
+  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelManagerControls), m_AddLabelInstanceShortcut(nullptr), m_ProcessingManualSelection(false), m_DataStorage(nullptr)
 {
   m_Controls->setupUi(this);
 
-  m_Controls->labelSearchBox->setAlwaysShowClearIcon(true);
-  m_Controls->labelSearchBox->setShowSearchIcon(true);
-
-  QStringList completionList;
-  completionList << "";
-  m_Completer = new QCompleter(completionList, this);
-  m_Completer->setCaseSensitivity(Qt::CaseInsensitive);
-  m_Controls->labelSearchBox->setCompleter(m_Completer);
-
   m_Controls->labelInspector->SetAllowLabelModification(true);
-
-  connect(m_Controls->labelSearchBox, SIGNAL(returnPressed()), this, SLOT(OnSearchLabel()));
-
-  QStringListModel *completeModel = static_cast<QStringListModel *>(m_Completer->model());
-  completeModel->setStringList(GetLabelStringList());
-
-  // See T29549
-  m_Controls->labelSearchBox->hide();
 
   m_Controls->btnSavePreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
   m_Controls->btnLoadPreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg")));
@@ -102,8 +83,8 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   auto* addLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_A), this);
   connect(addLabelShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabel);
 
-  auto* addLabelInstanceShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), this);
-  connect(addLabelInstanceShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabelInstance);
+  m_AddLabelInstanceShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), this);
+  connect(m_AddLabelInstanceShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabelInstance);
 
   auto* deleteLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_D), this);
   connect(deleteLabelShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::DeleteLabelInstance);
@@ -127,8 +108,6 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
 {
   auto selectedLabels = this->GetSelectedLabels();
 
-  mitk::SegLabelPropModifyUndoRedoHelper undoRedoHelper(this->GetMultiLabelSegmentation(), selectedLabels);
-
   for (auto labelValue : selectedLabels)
   {
     auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(labelValue);
@@ -146,6 +125,9 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
     }
   }
 
+  // ensure that the labels that where selected before renaming are also selected afterwards
+  // it can differ as renaming might change the location in the view, but the selected index in the view is kept
+  this->SetSelectedLabels(selectedLabels);
 }
 
 void QmitkMultiLabelManager::OnSelectedLabelChanged(const LabelValueVectorType& labels)
@@ -212,81 +194,54 @@ void QmitkMultiLabelManager::SetDataStorage(mitk::DataStorage *storage)
   m_DataStorage = storage;
 }
 
-void QmitkMultiLabelManager::OnSearchLabel()
+const mitk::LabelSuggestionHelper* QmitkMultiLabelManager::GetLabelSuggestionHelper() const
 {
-  //std::string text = m_Controls->labelSearchBox->text().toStdString();
-  //int pixelValue = -1;
-  //int row = -1;
-  //for (int i = 0; i < m_Controls->m_LabelSetTableWidget->rowCount(); ++i)
-  //{
-  //  if (m_Controls->m_LabelSetTableWidget->item(i, 0)->text().toStdString().compare(text) == 0)
-  //  {
-  //    pixelValue = m_Controls->m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt();
-  //    row = i;
-  //    break;
-  //  }
-  //}
-  //if (pixelValue == -1)
-  //{
-  //  return;
-  //}
+  return m_SuggestionHelper;
+}
 
-  //GetWorkingImage()->GetActiveLabelSet()->SetActiveLabel(pixelValue);
+void QmitkMultiLabelManager::SetLabelSuggestionHelper(const mitk::LabelSuggestionHelper* suggestionHelper)
+{
+  if (suggestionHelper != m_SuggestionHelper)
+  {
+    m_SuggestionHelper = suggestionHelper;
+    m_Controls->labelInspector->SetLabelSuggestionHelper(suggestionHelper);
 
-  //QTableWidgetItem *nameItem = m_Controls->m_LabelSetTableWidget->item(row, NAME_COL);
-  //if (!nameItem)
-  //{
-  //  return;
-  //}
+    auto updateWidgets = [this](const itk::EventObject&) { this->UpdateControls(); };
 
-  //m_Controls->m_LabelSetTableWidget->clearSelection();
-  //m_Controls->m_LabelSetTableWidget->selectRow(row);
-  //m_Controls->m_LabelSetTableWidget->scrollToItem(nameItem);
-
-  //GetWorkingImage()->GetActiveLabelSet()->SetActiveLabel(pixelValue);
-
-  //this->WaitCursorOn();
-  //mitk::Point3D pos =
-  //  GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetCenterOfMassCoordinates();
-
-  //m_ToolManager->WorkingDataChanged();
-
-  //if (pos.GetVnlVector().max_value() > 0.0)
-  //{
-  //  emit goToLabel(pos);
-  //}
-  //else
-  //{
-  //  GetWorkingImage()->UpdateCenterOfMass(pixelValue, GetWorkingImage()->GetActiveLayer());
-  //  mitk::Point3D pos =
-  //    GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetCenterOfMassCoordinates();
-  //  emit goToLabel(pos);
-  //}
-
-  //this->WaitCursorOff();
+    m_SuggestionObserver.Reset(suggestionHelper, itk::ModifiedEvent(), updateWidgets);
+    this->UpdateControls();
+  }
 }
 
 void QmitkMultiLabelManager::UpdateControls()
 {
-  bool hasWorkingData = this->GetMultiLabelSegmentation() != nullptr;
+  auto segmentation = this->GetMultiLabelSegmentation();
+  bool hasWorkingData = segmentation != nullptr;
 
   auto labels = this->m_Controls->labelInspector->GetSelectedLabels();
   bool hasMultipleInstances = this->m_Controls->labelInspector->GetLabelInstancesOfSelectedFirstLabel().size() > 1;
-  m_Controls->labelSearchBox->setEnabled(hasWorkingData);
+  bool instanceAllowed = true;
+  if (hasWorkingData && labels.size()==1 && m_SuggestionHelper.IsNotNull())
+  {
+    auto suggestionPrefs = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+    instanceAllowed = !suggestionPrefs.enforceSuggestions || m_SuggestionHelper->IsNewInstanceAllowed(segmentation, segmentation->GetLabel(labels.front())->GetName());
+  }
+
   m_Controls->btnAddGroup->setEnabled(hasWorkingData);
-  m_Controls->btnAddInstance->setEnabled(hasWorkingData && labels.size()==1);
   m_Controls->btnAddLabel->setEnabled(hasWorkingData);
-  m_Controls->btnLoadPreset->setEnabled(hasWorkingData);
+  m_Controls->btnAddInstance->setEnabled(hasWorkingData && labels.size()==1 && instanceAllowed);
+  if (nullptr != m_AddLabelInstanceShortcut)
+    m_AddLabelInstanceShortcut->setEnabled(hasWorkingData && labels.size() == 1 && instanceAllowed);
+
   m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && !labels.empty() && this->GetMultiLabelSegmentation()->GetNumberOfGroups()>1);
   m_Controls->btnRemoveLabel->setEnabled(hasWorkingData && !labels.empty());
   m_Controls->btnRemoveInstance->setEnabled(hasWorkingData && !labels.empty() && hasMultipleInstances);
+
+  m_Controls->btnLoadPreset->setEnabled(hasWorkingData);
   m_Controls->btnSavePreset->setEnabled(hasWorkingData);
 
   if (!hasWorkingData)
     return;
-
-  QStringListModel *completeModel = dynamic_cast<QStringListModel *>(m_Completer->model());
-  completeModel->setStringList(GetLabelStringList());
 }
 
 void QmitkMultiLabelManager::OnCreateCroppedMask(bool)

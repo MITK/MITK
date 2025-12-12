@@ -15,3 +15,8 @@ found in the LICENSE file.
 mitk::IPreferencesService::~IPreferencesService()
 {
 }
+
+bool mitk::IPreferencesService::OpenPreferencesDialog(const std::string&)
+{
+  return false;
+}

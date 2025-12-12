@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitkProvisioningInfo.h"
 
 #include <mitkLog.h>
+#include <mitkExceptionMacro.h>
 
 #include <QCoreApplication>
 #include <QFile>
@@ -35,7 +36,9 @@ namespace mitk
   void ProvisioningInfo::readProvisioningFile(const QString &filePath)
   {
     QFile file(filePath);
-    file.open(QFile::ReadOnly);
+    if (!file.open(QFile::ReadOnly))
+      mitkThrow() << "Cannot open provisioning info file: " << filePath.toStdString();
+
     QTextStream fileStream(&file);
     QRegularExpression sep("\\s+");
     QString line;

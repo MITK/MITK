@@ -29,7 +29,7 @@ namespace
 {
 
   const constexpr char* const MULTILABEL_SEGMENTATION_TYPE_VALUE = "org.mitk.multilabel.segmentation.stack";
-  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 3;
+  const constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 4;
 
   mitk::Image::Pointer LoadImageBasedOnFileName(const std::string& fileName, const std::string& fileBase)
   {
@@ -68,7 +68,7 @@ namespace
   {
     mitk::Label::PixelType fileValue = label->GetValue();
 
-    if (auto property = dynamic_cast<mitk::IntProperty*>(label->GetProperty("_file_value")); nullptr != property)
+    if (auto property = dynamic_cast<const mitk::IntProperty*>(label->GetConstProperty("_file_value").GetPointer()); nullptr != property)
     {
       fileValue = static_cast<mitk::Label::PixelType>(property->GetValue());
     }
@@ -82,25 +82,10 @@ namespace
 
     for (const auto& label : labels)
     {
-      if (nullptr == label->GetProperty("_file"))
+      if (nullptr == label->GetConstProperty("_file"))
       {
         result.push_back(MakeLabelMapping(label));
       }
-    }
-
-    return result;
-  }
-
-  mitk::MultiLabelSegmentation::ConstLabelVectorType CleanImportLabels(const mitk::MultiLabelSegmentation::LabelVectorType& labels)
-  {
-    mitk::MultiLabelSegmentation::ConstLabelVectorType result;
-
-    for (const auto& label : labels)
-    {
-      auto cleanedLabel = label->Clone();
-      cleanedLabel->RemoveProperty("_file");
-      cleanedLabel->RemoveProperty("_file_value");
-      result.push_back(cleanedLabel);
     }
 
     return result;
@@ -251,7 +236,7 @@ namespace
     for (const auto& groupInfo : groupInfos)
     {
       auto groupImage = LoadImageBasedOnFileProperty(groupInfo.properties, filePathBase);
-      auto cleanedLabels = CleanImportLabels(groupInfo.labels);
+      auto cleanedLabels = MultiLabelSegmentation::ConvertLabelVectorConst(MultiLabelIOHelper::CloneLabelsWithoutMetaProperties(groupInfo.labels));
 
       if (!segInitialized)
       {

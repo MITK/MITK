@@ -27,6 +27,8 @@ class mitkLabelTestSuite : public mitk::TestFixture
   MITK_TEST(TestSetColor);
   MITK_TEST(TestSetValue);
   MITK_TEST(TestSetProperty);
+  MITK_TEST(TestAlgorithmFunctions);
+  MITK_TEST(TestDICOMFunctions);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -73,6 +75,7 @@ public:
   {
     mitk::Label::Pointer label = mitk::Label::New();
     mitk::Point3D currentIndex = label->GetCenterOfMassIndex();
+    mitk::Point3D other;
     mitk::Point3D indexToBeCompared;
     indexToBeCompared.Fill(0);
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong center of mass index",
@@ -81,7 +84,7 @@ public:
     indexToBeCompared.SetElement(0, 234.3f);
     indexToBeCompared.SetElement(1, -53);
     indexToBeCompared.SetElement(2, 120);
-    label->SetCenterOfMassIndex(indexToBeCompared);
+    label->UpdateCenterOfMass(indexToBeCompared,other);
     currentIndex = label->GetCenterOfMassIndex();
     CPPUNIT_ASSERT_MESSAGE("Label has wrong center of mass index", mitk::Equal(currentIndex, indexToBeCompared));
   }
@@ -90,6 +93,7 @@ public:
   {
     mitk::Label::Pointer label = mitk::Label::New();
     mitk::Point3D currentPoint = label->GetCenterOfMassCoordinates();
+    mitk::Point3D other;
     mitk::Point3D pointToBeCompared;
     pointToBeCompared.Fill(0);
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong center of mass index",
@@ -98,7 +102,7 @@ public:
     pointToBeCompared.SetElement(0, 234.3f);
     pointToBeCompared.SetElement(1, -53);
     pointToBeCompared.SetElement(2, 120);
-    label->SetCenterOfMassCoordinates(pointToBeCompared);
+    label->UpdateCenterOfMass(other, pointToBeCompared);
     currentPoint = label->GetCenterOfMassCoordinates();
     CPPUNIT_ASSERT_MESSAGE("Label has wrong center of mass index", mitk::Equal(currentPoint, pointToBeCompared));
   }
@@ -143,6 +147,112 @@ public:
     std::string propVal;
     label->GetStringProperty("cba", propVal);
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong value", propVal.compare("abc") == 0);
+  }
+
+  void TestAlgorithmFunctions()
+  {
+    mitk::Label::Pointer label = mitk::Label::New();
+
+    // --- Check all AlgorithmType values and their string representations ---
+    struct AlgoPair { mitk::Label::AlgorithmType type; std::string str; };
+    std::vector<AlgoPair> algoPairs = {
+        {mitk::Label::AlgorithmType::Undefined, ""},
+        {mitk::Label::AlgorithmType::MANUAL, "MANUAL"},
+        {mitk::Label::AlgorithmType::SEMIAUTOMATIC, "SEMIAUTOMATIC"},
+        {mitk::Label::AlgorithmType::AUTOMATIC, "AUTOMATIC"}
+    };
+
+    for (const auto& pair : algoPairs)
+    {
+      label->SetAlgorithmType(pair.type);
+      CPPUNIT_ASSERT(label->GetAlgorithmType() == pair.type);
+      CPPUNIT_ASSERT(label->GetAlgorithmTypeStr() == pair.str);
+    }
+
+    // --- Algorithm Name ---
+    std::string algoName1 = "ToolA";
+    label->SetAlgorithmName(algoName1);
+    CPPUNIT_ASSERT(label->GetAlgorithmName() == algoName1);
+
+    // --- AddToolUse: same type, new tool ---
+    label->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+    label->AddToolUse(mitk::Label::AlgorithmType::MANUAL, "ToolB");
+    CPPUNIT_ASSERT(label->GetAlgorithmType() == mitk::Label::AlgorithmType::MANUAL);
+    std::string name = label->GetAlgorithmName();
+    CPPUNIT_ASSERT(name == "ToolA|ToolB");
+
+    // --- AddToolUse: different type, new tool ---
+    label->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "nnUNet");
+    CPPUNIT_ASSERT(label->GetAlgorithmType() == mitk::Label::AlgorithmType::SEMIAUTOMATIC);
+    name = label->GetAlgorithmName();
+    CPPUNIT_ASSERT(name == "ToolA|ToolB|nnUNet");
+
+    // --- Check that AddToolUse does not duplicate existing tool ---
+    label->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "nnUNet");
+    CPPUNIT_ASSERT(label->GetAlgorithmType() == mitk::Label::AlgorithmType::SEMIAUTOMATIC);
+    name = label->GetAlgorithmName();
+    CPPUNIT_ASSERT(name == "ToolA|ToolB|nnUNet");
+  }
+
+  void TestDICOMFunctions()
+  {
+    mitk::Label::Pointer label = mitk::Label::New();
+
+    // --- AnatomicRegion with multiple entries and modifiers ---
+    mitk::DICOMCodeSequenceWithModifiers region1("T-12345", "SRT", "Heart");
+    region1.AddModifier(mitk::DICOMCodeSequence("T-54321", "SRT", "Anterior"));
+    label->SetAnatomicRegion(region1, 0);
+
+    mitk::DICOMCodeSequenceWithModifiers region2("T-67890", "SRT", "Lung");
+    label->SetAnatomicRegion(region2, 1);
+
+    CPPUNIT_ASSERT(label->GetAnatomicRegionCount() == 2);
+
+    auto retrievedRegion1 = label->GetAnatomicRegion(0);
+    CPPUNIT_ASSERT(retrievedRegion1.GetValue() == "T-12345");
+    CPPUNIT_ASSERT(retrievedRegion1.GetModifiers().size() == 1);
+    CPPUNIT_ASSERT(retrievedRegion1.GetModifiers()[0].GetValue() == "T-54321");
+
+    auto retrievedRegion2 = label->GetAnatomicRegion(1);
+    CPPUNIT_ASSERT(retrievedRegion2.GetValue() == "T-67890");
+    CPPUNIT_ASSERT(retrievedRegion2.GetModifiers().empty());
+
+    // --- PrimaryAnatomicStructure with multiple entries ---
+    mitk::DICOMCodeSequenceWithModifiers primary1("T-11111", "SRT", "LeftVentricle");
+    primary1.AddModifier(mitk::DICOMCodeSequence("T-22222", "SRT", "Base"));
+    label->SetPrimaryAnatomicStructure(primary1, 0);
+
+    mitk::DICOMCodeSequenceWithModifiers primary2("T-33333", "SRT", "RightVentricle");
+    label->SetPrimaryAnatomicStructure(primary2, 1);
+
+    CPPUNIT_ASSERT(label->GetPrimaryAnatomicStructureCount() == 2);
+
+    auto retrievedPrimary1 = label->GetPrimaryAnatomicStructure(0);
+    CPPUNIT_ASSERT(retrievedPrimary1.GetValue() == "T-11111");
+    CPPUNIT_ASSERT(retrievedPrimary1.GetModifiers().size() == 1);
+    CPPUNIT_ASSERT(retrievedPrimary1.GetModifiers()[0].GetValue() == "T-22222");
+
+    auto retrievedPrimary2 = label->GetPrimaryAnatomicStructure(1);
+    CPPUNIT_ASSERT(retrievedPrimary2.GetValue() == "T-33333");
+    CPPUNIT_ASSERT(retrievedPrimary2.GetModifiers().empty());
+
+    // --- SegmentedPropertyCategory ---
+    mitk::DICOMCodeSequence segCatCode("1234", "SRT", "Organ");
+    label->SetSegmentedPropertyCategory(segCatCode);
+    auto retrievedSegCat = label->GetSegmentedPropertyCategory();
+    CPPUNIT_ASSERT(retrievedSegCat.has_value());
+    CPPUNIT_ASSERT(retrievedSegCat->GetValue() == "1234");
+
+    // --- SegmentedPropertyType with modifiers ---
+    mitk::DICOMCodeSequenceWithModifiers segTypeCode("5678", "SRT", "Tissue");
+    segTypeCode.AddModifier(mitk::DICOMCodeSequence("8765", "SRT", "Modified"));
+    label->SetSegmentedPropertyType(segTypeCode);
+
+    auto retrievedSegType = label->GetSegmentedPropertyType();
+    CPPUNIT_ASSERT(retrievedSegType.has_value());
+    CPPUNIT_ASSERT(retrievedSegType->GetValue() == "5678");
+    CPPUNIT_ASSERT(retrievedSegType->GetModifiers().size() == 1);
+    CPPUNIT_ASSERT(retrievedSegType->GetModifiers()[0].GetValue() == "8765");
   }
 };
 

@@ -1,0 +1,163 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef mitkMultiLabelSegmentationVtkMapper3D_h
+#define mitkMultiLabelSegmentationVtkMapper3D_h
+
+// MITK
+#include "MitkMultilabelExports.h"
+#include "mitkCommon.h"
+
+// MITK Rendering
+#include "mitkBaseRenderer.h"
+#include "mitkExtractSliceFilter.h"
+#include "mitkLabelSetImage.h"
+#include "mitkVtkMapper.h"
+
+// VTK
+#include <vtkSmartPointer.h>
+
+class vtkPolyDataMapper;
+class vtkImageData;
+class vtkLookupTable;
+class vtkVolumeProperty;
+class vtkVolume;
+class vtkSmartVolumeMapper;
+class vtkColorTransferFunction;
+class vtkPiecewiseFunction;
+
+namespace mitk
+{
+  class MultiLabelSegmentationGroupMapping;
+  class IPreferences;
+
+  /** \brief Mapper to resample and display 2D slices of a 3D labelset image.
+   *
+   * Properties that can be set for labelset images and influence this mapper are:
+   *
+   *   - \b "labelset.contour.active": (BoolProperty) whether to show only the active label as a contour or not
+   *   - \b "labelset.contour.width": (FloatProperty) line width of the contour
+
+   * The default properties are:
+
+   *   - \b "labelset.contour.active", mitk::BoolProperty::New( true ), renderer, overwrite )
+   *   - \b "labelset.contour.width", mitk::FloatProperty::New( 2.0 ), renderer, overwrite )
+
+   * \ingroup Mapper
+   */
+  class MITKMULTILABEL_EXPORT MultiLabelSegmentationVtkMapper3D : public VtkMapper
+  {
+  public:
+    /** Standard class typedefs. */
+    mitkClassMacro(MultiLabelSegmentationVtkMapper3D, VtkMapper);
+
+    /** Method for creation through the object factory. */
+    itkNewMacro(Self);
+
+    /** \brief Checks whether this mapper needs to update itself and generate
+     * data. */
+    void Update(mitk::BaseRenderer *renderer) override;
+
+    //### methods of MITK-VTK rendering pipeline
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    //### end of methods of MITK-VTK rendering pipeline
+
+    /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
+    /**
+       * To render axial, coronal, and sagittal, the mapper is called three times.
+       * For performance reasons, the corresponding data for each view is saved in the
+       * internal helper class LocalStorage. This allows rendering n views with just
+       * 1 mitkMapper using n vtkMapper.
+       * */
+    class MITKMULTILABEL_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
+    {
+    public:
+      vtkSmartPointer<vtkPropAssembly> m_Actors;
+
+      std::map<const Image*, std::unique_ptr<MultiLabelSegmentationGroupMapping>> m_GroupPipelines;
+
+      vtkSmartPointer<vtkColorTransferFunction> m_TransferFunction;
+      vtkSmartPointer<vtkPiecewiseFunction> m_OpacityTransferFunction;
+      vtkSmartPointer<vtkPiecewiseFunction> m_FadedOpacityTransferFunction;
+
+      /** indicated if highlighting is in use and therefor also
+       the Faded pipeline should be used for none highlighted labels.*/
+      bool m_UseFadedPipeline;
+
+      /** \brief Timestamp of last update of stored data. */
+      itk::TimeStamp m_LastDataUpdateTime;
+      /** \brief Timestamp of last update of a property. */
+      itk::TimeStamp m_LastPropertyUpdateTime;
+
+      mitk::TimeStepType m_LastUpdateTimeStep;
+
+      /** look up table for label colors. */
+      mitk::LookupTable::Pointer m_LabelLookupTable;
+
+      /** Indicates if GPU is available for the mapper. True: Yes, mapper will work
+       * False: No, mapper will not render something. If optional has no value it
+       * means that no check was done so far.*/
+      std::optional<bool> m_GPUCheckSuccessfull;
+      bool m_3DRenderingPreference;
+
+      IPreferences* m_SegPreferences;
+
+      /** \brief Default constructor of the local storage. */
+      LocalStorage();
+      /** \brief Default destructor of the local storage. */
+      ~LocalStorage() override;
+    };
+
+    /** \brief Get the LocalStorage corresponding to the current renderer. */
+    LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
+
+    static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = nullptr, bool overwrite = false);
+
+  protected:
+    /** Default constructor */
+    MultiLabelSegmentationVtkMapper3D();
+    /** Default destructor */
+    ~MultiLabelSegmentationVtkMapper3D() override;
+
+    /** \brief Does the actual resampling, without rendering the image yet.
+      * All the data is generated inside this method. The vtkProp (or Actor)
+      * is filled with content (i.e. the resliced image).
+      *
+      * After generation, a 4x4 transformation matrix(t) of the current slice is obtained
+      * from the vtkResliceImage object via GetReslicesAxis(). This matrix is
+      * applied to each textured plane (actor->SetUserTransform(t)) to transform everything
+      * to the actual 3D position (cf. the following image).
+      *
+      * \image html cameraPositioning3D.png
+      *
+      */
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+
+    /** \brief Generates the look up table that should be used.
+      */
+    void UpdateLookupTable(LocalStorage* localStorage);
+
+    using OutdatedGroupVectorType = std::vector<std::pair<mitk::MultiLabelSegmentation::GroupIndexType, const mitk::Image*>>;
+    /** Checks if groups are outdated, or obsolete. obsolete groups will be removed. Outdated groups will be indicated
+    in the output as such. New groups will be added to the local storage and also marked as outdated.*/
+    OutdatedGroupVectorType CheckForOutdatedGroups(mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls,
+      mitk::MultiLabelSegmentation* seg, bool fadedPipelineChanged);
+
+    void UpdateVolumeMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedData);
+
+    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
+  };
+
+} // namespace mitk
+
+#endif

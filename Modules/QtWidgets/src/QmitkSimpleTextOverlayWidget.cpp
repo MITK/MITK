@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include "QTextDocument"
 #include "QPainter"
-#include "QApplication" 
+#include "QApplication"
 
 QmitkSimpleTextOverlayWidget::QmitkSimpleTextOverlayWidget(QWidget* parent)
   : QmitkOverlayWidget(parent)

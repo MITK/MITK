@@ -82,9 +82,8 @@ namespace mitk
       AddPathEnv(pythonHome);
       AddPathEnv(pythonHome / "Scripts");
 
-      // Tell Hugging Face to not use symlinks on Windows as it requires either
-      // admin rights or Windows to be in developer mode.
-      SetEnv("HF_HUB_DISABLE_SYMLINKS", "1");
+      // Tell Hugging Face to suppress warnings about symlinks on Windows.
+      SetEnv("HF_HUB_DISABLE_SYMLINKS_WARNING", "1");
 
       auto handle = LoadLibraryEx(pythonLibrary.string().c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
 

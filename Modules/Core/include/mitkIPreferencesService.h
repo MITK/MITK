@@ -76,6 +76,23 @@ namespace mitk
      * \return The root node of the preferences tree.
      */
     virtual IPreferences* GetSystemPreferences() = 0;
+
+    /**
+     * \brief Opens the preferences dialog, if available.
+     *
+     * This method attempts to open the preferences dialog. The exact behavior
+     * depends on the implementation - it may be non-blocking (e.g., using
+     * `QDialog::open()`) or blocking until the dialog is closed (e.g., using
+     * `QDialog::exec()`).
+     *
+     * \param page Optional. The ID of the preference page to display initially.
+     *             This should correspond to a page ID defined in a plugin.xml file.
+     *             If empty, the default preferences page will be shown.
+     *
+     * \return `true` if the preferences dialog was successfully opened;
+               otherwise `false`.
+     */
+    virtual bool OpenPreferencesDialog(const std::string& page = {});
   };
 }
 

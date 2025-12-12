@@ -13,25 +13,27 @@ found in the LICENSE file.
 #include "QmitkLoadMultiLabelPresetAction.h"
 
 #include <mitkLabelSetImage.h>
+
 #include <QmitkMultiLabelPresetHelper.h>
 
 
 void QmitkLoadMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
-  std::vector<mitk::MultiLabelSegmentation::Pointer> images;
+  std::vector<mitk::MultiLabelSegmentation::Pointer> segmentations;
+
   for (const auto &node : selectedNodes)
   {
     if (node.IsNull())
       continue;
 
-    mitk::MultiLabelSegmentation::Pointer image = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
+    mitk::MultiLabelSegmentation::Pointer segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
 
-    if (image.IsNull())
+    if (segmentation.IsNull())
       continue;
 
-    images.emplace_back(image);
+    segmentations.emplace_back(segmentation);
   }
-  QmitkLoadMultiLabelPreset(images);
+  QmitkLoadMultiLabelPreset(segmentations);
 }
 
 void QmitkLoadMultiLabelPresetAction::SetDataStorage(mitk::DataStorage*)

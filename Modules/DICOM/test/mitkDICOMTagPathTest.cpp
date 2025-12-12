@@ -30,6 +30,14 @@ class mitkDICOMTagPathTestSuite : public mitk::TestFixture
   MITK_TEST(DICOMTagPathToPropertyName);
   MITK_TEST(ExecutePropertyRegEx);
 
+  MITK_TEST(TestOperatorPlusWithTwoPaths);
+  MITK_TEST(TestOperatorPlusWithString);
+  MITK_TEST(TestOperatorPlusReverse);
+  MITK_TEST(TestOperatorPlusEquals);
+  MITK_TEST(TestOperatorPlusChaining);
+  MITK_TEST(TestOperatorPlusWithWildcards);
+
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -230,6 +238,123 @@ public:
       }
     }
   }
+
+  void TestOperatorPlusWithTwoPaths()
+  {
+    mitk::DICOMTagPath path1(0x0010, 0x0011);
+    mitk::DICOMTagPath path2(0x0020, 0x0022);
+
+    mitk::DICOMTagPath combined = path1 + path2;
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Combined path should have size 2",
+      static_cast<mitk::DICOMTagPath::PathIndexType>(2),
+      combined.Size());
+
+    CPPUNIT_ASSERT_EQUAL(0x0010u, combined.GetNode(0).tag.GetGroup());
+    CPPUNIT_ASSERT_EQUAL(0x0011u, combined.GetNode(0).tag.GetElement());
+    CPPUNIT_ASSERT_EQUAL(0x0020u, combined.GetNode(1).tag.GetGroup());
+    CPPUNIT_ASSERT_EQUAL(0x0022u, combined.GetNode(1).tag.GetElement());
+
+    // Original paths should remain unchanged
+    CPPUNIT_ASSERT_EQUAL(static_cast<mitk::DICOMTagPath::PathIndexType>(1), path1.Size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<mitk::DICOMTagPath::PathIndexType>(1), path2.Size());
+  }
+
+  void TestOperatorPlusWithString()
+  {
+    mitk::DICOMTagPath basePath(0x0010, 0x0011); // Patient Name
+
+    // Add another element using string
+    mitk::DICOMTagPath extended = basePath + "(0020,0022)"; // Patient ID
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Extended path should have size 2",
+      static_cast<mitk::DICOMTagPath::PathIndexType>(2),
+      extended.Size());
+
+    CPPUNIT_ASSERT_EQUAL(0x0010u, extended.GetNode(0).tag.GetGroup());
+    CPPUNIT_ASSERT_EQUAL(0x0011u, extended.GetNode(0).tag.GetElement());
+    CPPUNIT_ASSERT_EQUAL(0x0020u, extended.GetNode(1).tag.GetGroup());
+    CPPUNIT_ASSERT_EQUAL(0x0022u, extended.GetNode(1).tag.GetElement());
+
+    // Test with sequence selection
+    mitk::DICOMTagPath withSelection = basePath + "(0003,0033)[0]";
+    CPPUNIT_ASSERT_EQUAL(static_cast<mitk::DICOMTagPath::PathIndexType>(2), withSelection.Size());
+    CPPUNIT_ASSERT_EQUAL(mitk::DICOMTagPath::NodeInfo::NodeType::SequenceSelection,
+      withSelection.GetNode(1).type);
+    CPPUNIT_ASSERT_EQUAL(0, withSelection.GetNode(1).selection);
+  }
+
+  void TestOperatorPlusReverse()
+  {
+    mitk::DICOMTagPath path(0x0020, 0x0022);
+    std::string prefix = "(0010,0011)";
+
+    mitk::DICOMTagPath combined = prefix + path;
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<mitk::DICOMTagPath::PathIndexType>(2), combined.Size());
+
+    CPPUNIT_ASSERT_EQUAL(0x0010u, combined.GetNode(0).tag.GetGroup());
+    CPPUNIT_ASSERT_EQUAL(0x0011u, combined.GetNode(0).tag.GetElement());
+    CPPUNIT_ASSERT_EQUAL(0x0020u, combined.GetNode(1).tag.GetGroup());
+    CPPUNIT_ASSERT_EQUAL(0x0022u, combined.GetNode(1).tag.GetElement());
+  }
+
+  void TestOperatorPlusEquals()
+  {
+    mitk::DICOMTagPath path(0x0010, 0x0010); // Patient Name
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<mitk::DICOMTagPath::PathIndexType>(1), path.Size());
+
+    // Use += with another path
+    mitk::DICOMTagPath addition(0x0010, 0x0020);
+    path += addition;
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<mitk::DICOMTagPath::PathIndexType>(2), path.Size());
+    CPPUNIT_ASSERT_EQUAL(0x0020u, path.GetNode(1).tag.GetElement());
+
+    // Use += with string
+    path += "(0010,0030)"; // Patient Birth Date
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<mitk::DICOMTagPath::PathIndexType>(3), path.Size());
+    CPPUNIT_ASSERT_EQUAL(0x0030u, path.GetNode(2).tag.GetElement());
+  }
+
+  void TestOperatorPlusChaining()
+  {
+    // Test multiple concatenations in one expression
+    mitk::DICOMTagPath chained =
+      mitk::DICOMTagPath(0x0008, 0x1140) +  // Referenced Image Sequence
+      "(0008,1155)" +                       // Referenced SOP Instance UID
+      mitk::DICOMTagPath(0x0020, 0x0013);   // Instance Number
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<mitk::DICOMTagPath::PathIndexType>(3), chained.Size());
+    CPPUNIT_ASSERT_EQUAL(0x1140u, chained.GetNode(0).tag.GetElement());
+    CPPUNIT_ASSERT_EQUAL(0x1155u, chained.GetNode(1).tag.GetElement());
+    CPPUNIT_ASSERT_EQUAL(0x0013u, chained.GetNode(2).tag.GetElement());
+  }
+
+  void TestOperatorPlusWithWildcards()
+  {
+    mitk::DICOMTagPath path;
+    path.AddAnySelection(0x0008, 0x1140); // Referenced Image Sequence[*]
+
+    mitk::DICOMTagPath extended = path + "(0008,1155)";
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<mitk::DICOMTagPath::PathIndexType>(2), extended.Size());
+    CPPUNIT_ASSERT_EQUAL(mitk::DICOMTagPath::NodeInfo::NodeType::AnySelection,
+      extended.GetNode(0).type);
+    CPPUNIT_ASSERT_EQUAL(mitk::DICOMTagPath::NodeInfo::NodeType::Element,
+      extended.GetNode(1).type);
+
+    // Test with any element wildcard
+    mitk::DICOMTagPath wildcardPath;
+    wildcardPath.AddElement(0x0010, 0x0010);
+    wildcardPath.AddAnyElement();
+
+    mitk::DICOMTagPath afterWildcard = wildcardPath + mitk::DICOMTagPath(0x0020, 0x0013);
+    CPPUNIT_ASSERT_EQUAL(static_cast<mitk::DICOMTagPath::PathIndexType>(3), afterWildcard.Size());
+  }
+
 
 };
 

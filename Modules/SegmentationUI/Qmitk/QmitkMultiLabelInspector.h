@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 #include <mitkDataNode.h>
 #include <mitkLabelHighlightGuard.h>
+#include <mitkLabelSuggestionHelper.h>
 
 #include <QWidget>
 #include <QItemSelectionModel>
@@ -25,6 +26,7 @@ found in the LICENSE file.
 class QmitkMultiLabelTreeModel;
 class QStyledItemDelegate;
 class QWidgetAction;
+class QCompleter;
 
 namespace Ui
 {
@@ -41,6 +43,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelInspector : public QWidget
 
 public:
   QmitkMultiLabelInspector(QWidget* parent = nullptr);
+
   ~QmitkMultiLabelInspector();
 
   bool GetMultiSelectionMode() const;
@@ -95,6 +98,8 @@ public:
    * If no label is selected an empty vector will be returned.
    */
   LabelValueVectorType GetLabelInstancesOfSelectedFirstLabel() const;
+
+  const mitk::LabelSuggestionHelper* GetLabelSuggestionHelper() const;
 
 Q_SIGNALS:
   /**
@@ -176,6 +181,8 @@ public Q_SLOTS:
   void SetAllowLabelModification(bool labelMod);
 
   void SetDefaultLabelNaming(bool defaultLabelNaming);
+
+  void SetLabelSuggestionHelper(const mitk::LabelSuggestionHelper* suggestionHelper);
 
   /** @brief Adds an instance of the same label/class like the first label instance
   * indicated by GetSelectedLabels() to the segmentation.
@@ -315,6 +322,9 @@ private Q_SLOTS:
   void OnEntered(const QModelIndex& index);
   void OnMouseLeave();
 
+  void OnSearchLabel();
+  void RefreshCompleter();
+
   QWidgetAction* CreateOpacityAction();
 
 private:
@@ -348,6 +358,10 @@ private:
   unsigned long m_SegmentationNodeDataMTime;
   mitk::ITKEventObserverGuard m_SegmentationObserver;
   mitk::LabelHighlightGuard m_LabelHighlightGuard;
+  mitk::LabelSuggestionHelper::ConstPointer m_SuggestionHelper;
+  mitk::ITKEventObserverGuard m_SuggestionObserver;
+
+  QCompleter* m_Completer;
 };
 
 #endif

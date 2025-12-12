@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include "QmitknnInteractiveToolGUI.h"
 #include <ui_QmitknnInteractiveToolGUI.h>
 
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitknnInteractiveInteractor.h>
 #include <mitkPythonContext.h>
@@ -142,6 +144,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   SetIcon(m_Ui->maskButton, "Mask");
 
   connect(m_Ui->initializeButton, &QPushButton::toggled, this, &Self::OnInitializeButtonToggled);
+  connect(m_Ui->settingsButton, &QPushButton::clicked, this, &Self::OnSettingsButtonClicked);
   connect(m_Ui->resetButton, &QPushButton::clicked, this, &Self::OnResetInteractionsButtonClicked);
 
   this->InitializePromptType();
@@ -171,6 +174,12 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   confirmButton->setToolTip("Press C to confirm a segmentation");
   auto confirmSegmentation = new QShortcut(QKeySequence(Qt::Key_C), this);
   connect(confirmSegmentation, &QShortcut::activated, confirmButton, &QPushButton::click);
+}
+
+void QmitknnInteractiveToolGUI::EnableInitializeButtons(bool enabled)
+{
+  m_Ui->initializeButton->setEnabled(enabled);
+  m_Ui->settingsButton->setEnabled(enabled);
 }
 
 void QmitknnInteractiveToolGUI::OnAutoRefineCheckBoxToggled(bool checked)
@@ -306,13 +315,13 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
       .arg(LINE_HEIGHT_STYLE),
     QMessageBox::Ok);
 #else
-  m_Ui->initializeButton->setEnabled(false);
+  this->EnableInitializeButtons(false);
 
   if (!CreateVirtualEnv() ||
       !this->GetTool()->CreatePythonContext() ||
       !Install())
   {
-    m_Ui->initializeButton->setEnabled(true);
+    this->EnableInitializeButtons(true);
     return;
   }
 
@@ -337,20 +346,19 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     {
       messageBox->accept();
 
-      const auto errorMessage = QString(
-        "<h3 %1>Error while initializing nnInteractive:</h3>"
-        "<p>%2</p>")
-        .arg(LINE_HEIGHT_STYLE)
-        .arg(QString::fromLocal8Bit(e.GetDescription()));
+      const std::string errorMessage = "nnInteractive reported an error during initialization (see details).";
+      MITK_ERROR << errorMessage << '\n' << e.GetDescription();
 
-      MITK_ERROR << errorMessage.toStdString();
-      auto errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr, errorMessage);
+      auto errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr,
+        QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(QString::fromStdString(errorMessage)));
+
+      errorMsgBox->setDetailedText(QString::fromLocal8Bit(e.GetDescription()));
       errorMsgBox->setTextInteractionFlags(Qt::TextSelectableByMouse);
       errorMsgBox->setAttribute(Qt::WA_DeleteOnClose, true);
       errorMsgBox->setModal(true);
       errorMsgBox->exec();
 
-      m_Ui->initializeButton->setEnabled(true);
+      this->EnableInitializeButtons(true);
       return;
     }
 
@@ -390,6 +398,11 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
   #endif
   });
 #endif
+}
+
+void QmitknnInteractiveToolGUI::OnSettingsButtonClicked()
+{
+  mitk::CoreServices::GetPreferencesService()->OpenPreferencesDialog("org.mitk.gui.qt.application.nnInteractionPreferencePage");
 }
 
 void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()

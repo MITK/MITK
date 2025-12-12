@@ -48,7 +48,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2025.08.00)
+  project(MITK VERSION 2025.12.00)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -409,21 +409,15 @@ endif()
 # -----------------------------------------
 # Custom dependency logic
 
-if(WIN32 AND Qt6_DIR AND NOT OPENSSL_ROOT_DIR)
-  set(_dir_candidate "${Qt6_DIR}/../../../../../Tools/OpenSSLv3/Win_x64")
-  get_filename_component(_dir_candidate ${_dir_candidate} ABSOLUTE)
-  if(EXISTS "${_dir_candidate}")
-    set(OPENSSL_ROOT_DIR "${_dir_candidate}")
-  endif()
-endif()
-
-find_package(OpenSSL 3)
-
-if(NOT OpenSSL_FOUND)
-  find_package(OpenSSL 1.1.1)
-endif()
-
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
+
+set(MITK_REQUIRED_OPENSSL_VERSION 3.0) # Match with Python's OpenSSL version on Windows
+
+if(WIN32)
+  find_package(OpenSSL ${MITK_REQUIRED_OPENSSL_VERSION} EXACT)
+else()
+  find_package(OpenSSL 3)
+endif()
 
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
 
@@ -437,10 +431,9 @@ if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
       set(openssl_message "${openssl_message}Please install the dev package of OpenSSL (i.e. libssl-dev).\n")
     endif()
   else()
-    set(openssl_message "${openssl_message}Please either install Win32 OpenSSL:\n"
-                        "  https://slproweb.com/products/Win32OpenSSL.html\n"
-                        "Or use the Qt Maintenance tool to install (recommended):\n"
-                        "  Developer and Designer Tools > OpenSSL Toolkit > OpenSSL 64-bit binaries\n")
+    set(openssl_message "${openssl_message}Please install OpenSSL version ${MITK_REQUIRED_OPENSSL_VERSION}.\n"
+                        "We recommend builds from Shining Light Productions:\n"
+                        "  https://slproweb.com/products/Win32OpenSSL.html\n")
   endif()
   set(openssl_message "${openssl_message}If it still cannot be found, you can hint CMake to find OpenSSL by "
                       "adding/setting the OPENSSL_ROOT_DIR variable to the root directory of an "
@@ -469,6 +462,21 @@ if(MITK_USE_Python3)
   if(APPLE AND MITK_USE_OpenMP)
     message(WARNING "OpenMP is not supported on macOS when MITK_USE_Python3 is enabled.")
     set(MITK_USE_OpenMP OFF CACHE BOOL "" FORCE)
+  endif()
+else()
+  # MITK_USE_Python3 is OFF - ensure Debug configuration is available
+  if(CMAKE_CONFIGURATION_TYPES)
+    set(config_types ${CMAKE_CONFIGURATION_TYPES})
+    list(FIND config_types "Debug" debug_index)
+    if(debug_index EQUAL -1)
+      # Debug is not present, add it back
+      list(INSERT config_types 0 "Debug")
+      set(CMAKE_CONFIGURATION_TYPES "${config_types}" CACHE STRING "" FORCE)
+      message(NOTICE "Added \"Debug\" back to CMAKE_CONFIGURATION_TYPES since Python3 is disabled.")
+    endif()
+  else()
+    # For single-config generators, restore the full list of build types
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
   endif()
 endif()
 
@@ -675,11 +683,13 @@ if(OpenSSL_FOUND AND WIN32)
       heuristic to automatically set them:
 
         - Based on the link libraries (usually located in a lib folder),
-          try to find the "../bin" binary directory.
+          try to find the closest bin directory.
         - Use the base file names of the link libraries to find corresponding
           DLLs like "<base name>*.dll", that usually are named like
           "<base name>-1_1-x64.dll" or similar.
    ]]
+  include(mitkFunctionFindClosestBinDirectory)
+
   set(openssl_ssl_dll "")
   set(openssl_crypto_dll "")
 
@@ -700,11 +710,9 @@ if(OpenSSL_FOUND AND WIN32)
     endif()
 
     if(EXISTS "${openssl_ssl_lib}")
-      get_filename_component(openssl_bin_dir "${openssl_ssl_lib}" DIRECTORY)
-      get_filename_component(openssl_bin_dir "${openssl_bin_dir}" DIRECTORY)
-      set(openssl_bin_dir "${openssl_bin_dir}/bin")
+      mitkFindClosestBinDirectory("${openssl_ssl_lib}" openssl_bin_dir)
 
-      if(EXISTS "${openssl_bin_dir}")
+      if(openssl_bin_dir AND EXISTS "${openssl_bin_dir}")
         get_filename_component(openssl_ssl_basename "${openssl_ssl_lib}" NAME_WE)
         file(GLOB openssl_ssl_dll "${openssl_bin_dir}/${openssl_ssl_basename}*.dll")
         list(LENGTH openssl_ssl_dll num_findings)

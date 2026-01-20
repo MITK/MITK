@@ -17,7 +17,9 @@ found in the LICENSE file.
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-#include <swigpyrun.h>
+#include <pybind11/pybind11.h>
+
+namespace py = pybind11;
 
 namespace
 {
@@ -103,7 +105,7 @@ void mitk::PythonContext::Activate()
     << "app_dir = '" << appPath << "'\n"
     << "if app_dir not in sys.path:\n"
     << "    sys.path.insert(0, app_dir)\n"
-    << "import pyMITK\n"
+    << "import mitk\n"
     << "venv = os.environ.get('VIRTUAL_ENV')\n"
     << "if venv:\n"
     << "    add_site_packages(venv)\n";
@@ -176,63 +178,64 @@ std::string mitk::PythonContext::GetStdOut(const std::string &varName)
 mitk::Image* mitk::PythonContext::LoadImageFromPython(const std::string &varName)
 {
   PyGILState_STATE state = PyGILState_Ensure();
-  PyObject *pyImage = PyDict_GetItemString(m_Impl->LocalDictionary.get(), varName.c_str());
-  if (pyImage == nullptr && !(pyImage = PyDict_GetItemString(m_Impl->GlobalDictionary.get(), varName.c_str())))
+
+  try
   {
-    mitkThrow() << "Could not get image from Python";
+    py::dict localDict = py::reinterpret_borrow<py::dict>(m_Impl->LocalDictionary.get());
+    py::dict globalDict = py::reinterpret_borrow<py::dict>(m_Impl->GlobalDictionary.get());
+
+    py::object pyImage;
+
+    if (localDict.contains(varName.c_str()))
+    {
+      pyImage = localDict[varName.c_str()];
+    }
+    else if (globalDict.contains(varName.c_str()))
+    {
+      pyImage = globalDict[varName.c_str()];
+    }
+    else
+    {
+      mitkThrow() << "Cloud not get image from Python: " << varName;
+    }
+
+    auto image = pyImage.cast<Image::Pointer>();
+
+    MITK_INFO << "C++ received image has dimension: " << image->GetDimension();
+
+    PyGILState_Release(state);
+    return image;
   }
-  int res = 0; // status variable to check if result is OK
-  void *voidImage;
-  swig_type_info *pTypeInfo = nullptr;
-  pTypeInfo = SWIG_TypeQuery("_p_mitk__Image");
-  res = SWIG_ConvertPtr(pyImage, &voidImage, pTypeInfo, 0); // get image from Python as void pointer
-  if (!SWIG_IsOK(res))
+  catch (const py::cast_error& e)
   {
-    mitkThrow() << "Could not cast image to C++ type";
+    PyGILState_Release(state);
+    mitkThrow() << "Could not cast Python object to mitk::Image: " << e.what();
   }
-  mitk::Image *mitkImage = reinterpret_cast<mitk::Image *>(voidImage); // cast void pointer to mitk::Image
-  MITK_INFO << "C++ received image has dimension: " << mitkImage->GetDimension();
-  PyGILState_Release(state);
-  return mitkImage;
 }
 
-void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData *mitkBaseData, const std::string &varName)
+void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData* baseData, const std::string& varName)
 {
-  PyGILState_STATE state = PyGILState_Ensure();
+  auto state = PyGILState_Ensure();
 
-  std::string pythonCommand;
-  pythonCommand.append(varName);
-  pythonCommand.append(" = None\n");
-  pythonCommand.append("def _receive(image_from_cxx):\n"
-                       "    global " + varName + "\n"
-                       "    " + varName + " = image_from_cxx\n");
-  this->ExecuteString(pythonCommand.c_str());
-
-  int owned = 0;
-  swig_type_info *pTypeInfo = nullptr;
-
-  if (dynamic_cast<mitk::Image *>(mitkBaseData))
+  try
   {
-    pTypeInfo = SWIG_TypeQuery("_p_mitk__Image");
+    auto main = py::module_::import("__main__");
+    auto globals = main.attr("__dict__");
+
+    if (auto image = dynamic_cast<Image*>(baseData))
+    {
+      Image::Pointer imagePtr = image;
+      auto pyImage = py::cast(imagePtr);
+      globals[varName.c_str()] = pyImage;
+    }
+    else
+    {
+      MITK_ERROR << "Unsupported BaseData type";
+    }
   }
-  else
+  catch (const py::error_already_set& e)
   {
-    MITK_INFO << "Object is of unsupported type";
-  }
-
-  PyObject *pInstance = SWIG_NewPointerObj(reinterpret_cast<void *>(mitkBaseData), pTypeInfo, owned);
-
-  if (nullptr == pInstance)
-  {
-    MITK_ERROR << "Something went wrong creating the Python instance of the image\n";
-  }
-
-  PyObject *receive = PyDict_GetItemString(m_Impl->LocalDictionary.get(), "_receive");
-  PyObjectPtr result(PyObject_CallFunctionObjArgs(receive, pInstance, nullptr));
-
-  if (nullptr == result)
-  {
-    MITK_ERROR << "Something went wrong setting the image in Python\n";
+    MITK_ERROR << "Python error: " << e.what();
   }
 
   PyGILState_Release(state);

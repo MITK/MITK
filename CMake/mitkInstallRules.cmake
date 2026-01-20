@@ -82,7 +82,7 @@ if(_mitk_executable_targets)
   endforeach()
 endif()
 
-# Install Python3 with pyMITK
+# Install Python3 with MITK Python module
 
 if(MITK_USE_Python3)
   if(APPLE)
@@ -95,8 +95,8 @@ if(MITK_USE_Python3)
   MITK_INSTALL(DIRECTORY "${MITK_BINARY_DIR}/python/" USE_SOURCE_PERMISSIONS)
 
   file(RELATIVE_PATH _rel_sitearch "${Python3_ROOT_DIR}" "${Python3_SITEARCH}")
-  set(_install_DESTINATION "${_python_dest}/${_rel_sitearch}/pyMITK")
-  MITK_INSTALL(TARGETS pyMITK)
+  set(_install_DESTINATION "${_python_dest}/${_rel_sitearch}/mitk")
+  MITK_INSTALL(TARGETS mitk_python_bindings)
 
   set(_install_DESTINATION "")
 endif()

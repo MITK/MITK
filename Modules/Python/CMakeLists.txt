@@ -1,6 +1,6 @@
 mitk_create_module(
   DEPENDS MitkPythonHelper
-  PACKAGE_DEPENDS PRIVATE Python3|Python
+  PACKAGE_DEPENDS PRIVATE Python3|Python pybind11
 )
 
 if(TARGET ${MODULE_TARGET})

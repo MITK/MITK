@@ -106,9 +106,22 @@ namespace mitk
      */
     static std::string GetTestDataFilePath(const std::string &testData)
     {
+      return GetTestDataFilePath(testData, MITK_DATA_DIR);
+    }
+
+
+    /**
+     * \brief Get the absolute path for project specific test data.
+     *
+     * \param testData The realative path in the project specific test data repository.
+     *
+     * \return The absolute path for the project specific test data.
+     */
+    static std::string GetTestDataFilePath(const std::string &testData, const std::string &project )
+    {
       if (itksys::SystemTools::FileIsFullPath(testData.c_str()))
         return testData;
-      return std::string(MITK_DATA_DIR) + "/" + testData;
+      return project + "/" + testData;
     }
 
   private:

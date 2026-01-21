@@ -361,7 +361,7 @@ void mitk::nnInteractiveTool::SetPreviewLabel(MultiLabelSegmentation::LabelValue
     image->AddLabel(label, 0, false, false);
   }
 
-  image->GetLabel(value)->SetColor(this->GetSpecialPreviewColor());
+  image->GetLabel(value)->SetColor(color);
   image->UpdateLookupTable(value);
 
   image->SetActiveLabel(value);

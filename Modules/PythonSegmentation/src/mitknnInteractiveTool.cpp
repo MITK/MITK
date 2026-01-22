@@ -357,7 +357,7 @@ void mitk::nnInteractiveTool::SetPreviewLabel(MultiLabelSegmentation::LabelValue
 
   if (label.IsNull())
   {
-    label = Label::New(1, "preview");
+    label = Label::New(value, "preview");
     image->AddLabel(label, 0, false, false);
   }
 

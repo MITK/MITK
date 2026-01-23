@@ -27,7 +27,10 @@ found in the LICENSE file.
 // MitkXNAT Module
 #include "mitkXnatSessionTracker.h"
 
+#include <QFileInfo>
+
 class QMenu;
+class QDir;
 
 /*!
 \brief QmitkXnatTreeBrowserView

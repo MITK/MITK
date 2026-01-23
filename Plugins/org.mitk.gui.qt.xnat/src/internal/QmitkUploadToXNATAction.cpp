@@ -174,7 +174,6 @@ void QmitkUploadToXNATAction::Run( const QList<mitk::DataNode::Pointer> &selecte
       file->save();
     }
   }
-  dataStorageServiceTracker.close();
 }
 
 void QmitkUploadToXNATAction::SetDataStorage(mitk::DataStorage* /*dataStorage*/)

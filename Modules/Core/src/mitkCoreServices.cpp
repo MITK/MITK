@@ -46,7 +46,7 @@ namespace mitk
   }
 
   template <class S>
-  static S *GetCoreService(us::ModuleContext *context)
+  static S *GetCoreService(us::ModuleContext *context, bool isOptional = false)
   {
     if (context == nullptr)
       context = us::GetModuleContext();
@@ -58,28 +58,7 @@ namespace mitk
       coreService = context->GetService(serviceRef);
     }
 
-    assert(coreService && "Asserting non-nullptr MITK core service");
-    {
-      std::lock_guard<std::mutex> l(s_ContextToServicesMapMutex());
-      s_ContextToServicesMap()[context].insert(std::make_pair(coreService, serviceRef));
-    }
-
-    return coreService;
-  }
-
-  template <class S>
-  static S *GetOptionalCoreService(us::ModuleContext *context)
-  {
-    if (context == nullptr)
-      context = us::GetModuleContext();
-
-    S *coreService = nullptr;
-    us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
-    if (serviceRef)
-    {
-      coreService = context->GetService(serviceRef);
-    }
-
+    assert((coreService || isOptional) && "Asserting non-nullptr MITK core service");
     if (coreService != nullptr)
     {
       std::lock_guard<std::mutex> l(s_ContextToServicesMapMutex());
@@ -91,7 +70,7 @@ namespace mitk
 
   IDataStorageService* CoreServices::GetDataStorageService(us::ModuleContext* context)
   {
-    return GetOptionalCoreService<IDataStorageService>(context);
+    return GetCoreService<IDataStorageService>(context,true);
   }
 
   INodeSelectionService* CoreServices::GetNodeSelectionService(us::ModuleContext* context)

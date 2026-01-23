@@ -46,7 +46,7 @@ namespace mitk
   }
 
   template <class S>
-  static S *GetCoreService(us::ModuleContext *context, bool isOptional = false)
+  static S *GetCoreService(us::ModuleContext *context, [[maybe_unused]] bool isOptional = false)
   {
     if (context == nullptr)
       context = us::GetModuleContext();

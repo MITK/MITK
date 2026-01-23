@@ -230,6 +230,7 @@ set(CPP_FILES
   IO/mitkAbstractFileIO.cpp
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
+  IO/mitkPropertyJsonSerialization.cpp
   IO/mitkCustomMimeType.cpp
   IO/mitkFileReader.cpp
   IO/mitkFileReaderRegistry.cpp

@@ -123,6 +123,7 @@ set(MODULE_TESTS
   mitkTemporalJoinImagesFilterTest.cpp
   mitkPreferencesTest.cpp
   mitkIOVolumeSplitReasonTest.cpp
+  mitkPropertyJsonSerializationTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS

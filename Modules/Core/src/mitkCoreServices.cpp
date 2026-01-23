@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkCoreServices.h"
 
+#include <mitkIDataStorageService.h>
 #include <mitkIMimeTypeProvider.h>
 #include <mitkINodeSelectionService.h>
 #include <mitkIPropertyAliases.h>
@@ -64,6 +65,33 @@ namespace mitk
     }
 
     return coreService;
+  }
+
+  template <class S>
+  static S *GetOptionalCoreService(us::ModuleContext *context)
+  {
+    if (context == nullptr)
+      context = us::GetModuleContext();
+
+    S *coreService = nullptr;
+    us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
+    if (serviceRef)
+    {
+      coreService = context->GetService(serviceRef);
+    }
+
+    if (coreService != nullptr)
+    {
+      std::lock_guard<std::mutex> l(s_ContextToServicesMapMutex());
+      s_ContextToServicesMap()[context].insert(std::make_pair(coreService, serviceRef));
+    }
+
+    return coreService;
+  }
+
+  IDataStorageService* CoreServices::GetDataStorageService(us::ModuleContext* context)
+  {
+    return GetOptionalCoreService<IDataStorageService>(context);
   }
 
   INodeSelectionService* CoreServices::GetNodeSelectionService(us::ModuleContext* context)

@@ -95,6 +95,8 @@ set(CPP_FILES
   DataManagement/mitkImageVtkWriteAccessor.cpp
   DataManagement/mitkImageWriteAccessor.cpp
   DataManagement/mitkDataStorageReference.cpp
+  DataManagement/mitkDataStorageService.cpp
+  DataManagement/mitkIDataStorageService.cpp
   DataManagement/mitkINodeSelectionService.cpp
   DataManagement/mitkIntPropertyExtension.cpp
   DataManagement/mitkIPersistenceService.cpp

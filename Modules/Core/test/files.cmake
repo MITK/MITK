@@ -124,6 +124,7 @@ set(MODULE_TESTS
   mitkPreferencesTest.cpp
   mitkIOVolumeSplitReasonTest.cpp
   mitkDataStorageReferenceTest.cpp
+  mitkDataStorageServiceTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS

@@ -124,6 +124,7 @@ set(MODULE_TESTS
   mitkPreferencesTest.cpp
   mitkIOVolumeSplitReasonTest.cpp
   mitkDataStorageReferenceTest.cpp
+  mitkPropertyJsonSerializationTest.cpp
   mitkDataStorageServiceTest.cpp
 )
 

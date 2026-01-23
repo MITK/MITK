@@ -18,8 +18,8 @@ found in the LICENSE file.
 
 #include "mitkIRenderWindowPart.h"
 
-#include <mitkIDataStorageReference.h>
 #include <mitkDataStorage.h>
+#include <mitkDataStorageReference.h>
 
 #include <org_mitk_gui_qt_common_Export.h>
 
@@ -88,9 +88,9 @@ protected:
   void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input) override;
 
   /**
-   * Get a reference to the DataStorage set by the editor input.
+   * Get info about the DataStorage set by the editor input.
    */
-  virtual mitk::IDataStorageReference::Pointer GetDataStorageReference() const;
+  virtual mitk::DataStorageReference GetDataStorageReference() const;
 
   /**
    * Get the DataStorage set by the editor input.

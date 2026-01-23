@@ -15,16 +15,15 @@ found in the LICENSE file.
 #include "mitkCoreObjectFactory.h"
 
 #include <berryIEditorPart.h>
-#include <berryIWorkbenchPage.h>
 #include <berryIWorkbench.h>
-#include <mitkDataStorageEditorInput.h>
+#include <berryIWorkbenchPage.h>
 
-#include "internal/QmitkCommonExtPlugin.h"
+#include <mitkCoreServices.h>
+#include <mitkDataStorageEditorInput.h>
+#include <mitkDataStorageReference.h>
 #include <mitkIDataStorageService.h>
 
 #include <QWidget>
-
-class ctkPluginContext;
 
 QmitkOpenMxNMultiWidgetEditorAction::QmitkOpenMxNMultiWidgetEditorAction(berry::IWorkbenchWindow::Pointer window)
   : QAction(nullptr)
@@ -59,16 +58,11 @@ void QmitkOpenMxNMultiWidgetEditorAction::Run()
     m_Window->GetWorkbench()->ShowPerspective(defaultPerspId, m_Window);
   }
 
-  ctkPluginContext* context = QmitkCommonExtPlugin::getContext();
-  ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
-  if (serviceRef)
+  mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
+  if (dsService)
   {
-    mitk::IDataStorageService* dsService = context->getService<mitk::IDataStorageService>(serviceRef);
-    if (dsService)
-    {
-      mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
-      berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(dsRef));
-      m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.mxnmultiwidget", true, berry::IWorkbenchPage::MATCH_ID);
-    }
+    mitk::DataStorageReference dsRef = dsService->GetActiveDataStorageReference();
+    berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(dsRef));
+    m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.mxnmultiwidget", true, berry::IWorkbenchPage::MATCH_ID);
   }
 }

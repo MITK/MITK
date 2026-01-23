@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkXnatTreeBrowserView.h"
 
 #include <mitkCoreServices.h>
+#include <mitkIDataStorageService.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
@@ -90,14 +91,11 @@ static bool doesDirExist(QDir myDir)
 }
 
 QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView() :
-  m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
   m_TreeModel(new QmitkXnatTreeModel()),
   m_Tracker(nullptr),
   m_DownloadPath(QString::fromStdString(mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID.toStdString())->Get("Download Path", ""))),
   m_SilentMode(false)
 {
-  m_DataStorageServiceTracker.open();
-
   // Set DownloadPath
   if (m_DownloadPath.isEmpty())
   {
@@ -111,7 +109,6 @@ QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView() :
 
 QmitkXnatTreeBrowserView::~QmitkXnatTreeBrowserView()
 {
-  m_DataStorageServiceTracker.close();
   delete m_TreeModel;
   delete m_Tracker;
 }
@@ -710,8 +707,13 @@ void QmitkXnatTreeBrowserView::InternalOpenFiles(const QFileInfoList & fileList,
     return;
   }
 
-  mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
-  mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
+  mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
+  if (!dsService)
+  {
+    MITK_ERROR << "IDataStorageService not available.";
+    return;
+  }
+  mitk::DataStorage::Pointer dataStorage = dsService->GetActiveDataStorage();
   QStringList list;
   list << fileList.at(0).absoluteFilePath();
   try
@@ -728,8 +730,7 @@ void QmitkXnatTreeBrowserView::InternalOpenFiles(const QFileInfoList & fileList,
     MITK_INFO << e;
     return;
   }
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
-        dsService->GetDataStorage()->GetDataStorage());
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
 }
 
 void QmitkXnatTreeBrowserView::OnContextMenuDownloadFile()

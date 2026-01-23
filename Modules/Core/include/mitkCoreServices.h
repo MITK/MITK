@@ -28,6 +28,7 @@ found in the LICENSE file.
 namespace mitk
 {
   struct IMimeTypeProvider;
+  class IDataStorageService;
   class INodeSelectionService;
   class IPropertyAliases;
   class IPropertyDescriptions;
@@ -59,6 +60,15 @@ namespace mitk
   class MITKCORE_EXPORT CoreServices
   {
   public:
+
+    /**
+     * @brief Get an IDataStorageService instance.
+     * @param context The module context of the module getting the service.
+     * @return An IDataStorageService instance, or nullptr if no implementation is registered.
+     * @note Unlike other core services, this may return nullptr if no plugin has registered
+     *       an implementation (e.g., in headless/testing scenarios).
+     */
+    static IDataStorageService* GetDataStorageService(us::ModuleContext* context = us::GetModuleContext());
 
     /**
      * @brief Get an INodeSelectionsService instance.
@@ -155,10 +165,19 @@ namespace mitk
   /**
    * @brief A RAII helper class for core service objects.
    *
-   * This is class is intended for usage in local scopes; it calls
+   * This class is intended for usage in local scopes; it calls
    * CoreServices::Unget(S*) in its destructor. You should not construct
    * multiple CoreServicePointer instances using the same service pointer,
    * unless it is retrieved by a new call to a CoreServices getter method.
+   *
+   * For optional services (like IDataStorageService), check validity before use:
+   * \code
+   * CoreServicePointer<IDataStorageService> dsService(CoreServices::GetDataStorageService());
+   * if (dsService)
+   * {
+   *   auto storage = dsService->GetActiveDataStorage();
+   * }
+   * \endcode
    *
    * @see CoreServices
    */
@@ -170,29 +189,46 @@ namespace mitk
       : m_Service(service),
         m_Context(context)
     {
-      assert(service);
     }
 
     ~CoreServicePointer()
     {
-      try
+      if (m_Service != nullptr)
       {
-        CoreServices::Unget(m_Service, m_Context);
+        try
+        {
+          CoreServices::Unget(m_Service, m_Context);
+        }
+        catch (const std::exception &e)
+        {
+          MITK_ERROR << e.what();
+        }
+        catch (...)
+        {
+          MITK_ERROR << "Ungetting core service failed.";
+        }
       }
-      catch (const std::exception &e)
-      {
-        MITK_ERROR << e.what();
-      }
-      catch (...)
-      {
-        MITK_ERROR << "Ungetting core service failed.";
-      }
+    }
+
+    /** Check if this pointer holds a valid service. */
+    explicit operator bool() const
+    {
+      return m_Service != nullptr;
     }
 
     S *operator->() const
     {
       return m_Service;
     }
+
+    S *Get() const
+    {
+      return m_Service;
+    }
+
+    // Non-copyable
+    CoreServicePointer(const CoreServicePointer&) = delete;
+    CoreServicePointer& operator=(const CoreServicePointer&) = delete;
 
   private:
     S *const m_Service;

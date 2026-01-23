@@ -10,13 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIDataStorageService.h"
+#include <mitkIDataStorageService.h>
 
-namespace mitk
+mitk::IDataStorageService::~IDataStorageService()
 {
-
-IDataStorageService::~IDataStorageService()
-{
-}
-
 }

@@ -26,8 +26,8 @@ found in the LICENSE file.
 #include <mitkWorkbenchUtil.h>
 
 #include <mitkDataStorage.h>
+#include <mitkDataStorageReference.h>
 #include <mitkRenderingManager.h>
-#include <mitkIDataStorageReference.h>
 
 #include <QItemSelectionModel>
 
@@ -79,7 +79,7 @@ class QmitkAbstractViewSelectionProvider;
  * <li>void NodeChanged(const mitk::DataNode* node)
  * <li>void NodeRemoved(const mitk::DataNode* node)
  * <li>void DataStorageModified()
- * <li>void DataStorageChanged(mitk::IDataStorageReference::Pointer dsRef)
+ * <li>void DataStorageChanged(mitk::DataStorageReference dsRef)
  * </ul>
  *
  * \see mitk::ILifecycleAwarePart
@@ -180,9 +180,9 @@ protected:
   virtual mitk::IPreferences* GetPreferences() const;
 
   /**
-   * Returns a reference to the currently active DataStorage.
+   * Returns info about the currently active DataStorage.
    */
-  mitk::IDataStorageReference::Pointer GetDataStorageReference() const;
+  mitk::DataStorageReference GetDataStorageReference() const;
 
   /**
    * Returns the currently active DataStorage.
@@ -327,9 +327,9 @@ private:
    * Called when the currently active DataStorage changed.
    * May be reimplemented by deriving classes.
    *
-   * \param dsRef A reference to the new active DataStorage.
+   * \param dsRef Info about the new active DataStorage.
    */
-  virtual void DataStorageChanged(mitk::IDataStorageReference::Pointer dsRef);
+  virtual void DataStorageChanged(mitk::DataStorageReference dsRef);
 
   /**
    * Creates a scroll area for this view and calls CreateQtPartControl then

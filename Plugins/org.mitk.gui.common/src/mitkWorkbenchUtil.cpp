@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <berryIEditorRegistry.h>
 #include <berryCoreException.h>
 
-#include "mitkIDataStorageService.h"
 #include "mitkDataStorageEditorInput.h"
 #include "mitkRenderingManager.h"
 #include "mitkIRenderingManager.h"
@@ -27,6 +26,8 @@ found in the LICENSE file.
 #include "mitkNodePredicateProperty.h"
 #include "mitkCoreObjectFactory.h"
 #include <mitkCoreServices.h>
+#include <mitkDataStorageReference.h>
+#include <mitkIDataStorageService.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 #include <mitkIOMimeTypes.h>
@@ -87,29 +88,20 @@ namespace mitk {
       return editorDesc;
     }
 
-    static mitk::IDataStorageReference::Pointer GetDataStorageReference()
+    static mitk::DataStorageReference GetActiveDataStorageReference()
     {
-      ctkPluginContext* context = mitk::PluginActivator::GetContext();
-      mitk::IDataStorageService* dss = nullptr;
-      ctkServiceReference dsRef = context->getServiceReference<mitk::IDataStorageService>();
-      if (dsRef)
-      {
-        dss = context->getService<mitk::IDataStorageService>(dsRef);
-      }
+      mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
 
-      if (nullptr == dss)
+      if (!dsService)
       {
         QString msg = "IDataStorageService service not available. Unable to open files.";
         MITK_WARN << msg.toStdString();
         QMessageBox::warning(QApplication::activeWindow(), "Unable to open files", msg);
-        return mitk::IDataStorageReference::Pointer(nullptr);
+        return mitk::DataStorageReference();
       }
 
-      // Get the active data storage (or the default one, if none is active)
-      mitk::IDataStorageReference::Pointer dataStorageRef = dss->GetDataStorage();
-      context->ungetService(dsRef);
-
-      return dataStorageRef;
+      // Get the active data storage reference (or the default one, if none is active)
+      return dsService->GetActiveDataStorageReference();
     }
 
   }; // end struct WorkbenchUtilPrivate
@@ -123,12 +115,12 @@ namespace mitk {
       return;
     }
 
-    mitk::IDataStorageReference::Pointer dataStorageReference = WorkbenchUtilPrivate::GetDataStorageReference();
-    if (nullptr == dataStorageReference)
+    mitk::DataStorageReference dsRef = WorkbenchUtilPrivate::GetActiveDataStorageReference();
+    if (!dsRef.IsValid())
     {
       return;
     }
-    mitk::DataStorage::Pointer dataStorage = dataStorageReference->GetDataStorage();
+    mitk::DataStorage::Pointer dataStorage = dsRef.GetStorage();
 
     // Turn off ASSERT
 #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
@@ -203,7 +195,7 @@ namespace mitk {
       try
       {
         // Activate the editor using the same data storage or open the default editor
-        mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(dataStorageReference));
+        mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(dsRef));
         berry::IEditorPart::Pointer editor = mitk::WorkbenchUtil::OpenEditor(window->GetActivePage(), input, true);
         mitk::IRenderWindowPart* renderEditor = dynamic_cast<mitk::IRenderWindowPart*>(editor.GetPointer());
         mitk::IRenderingManager* renderingManager = renderEditor == nullptr ? nullptr : renderEditor->GetRenderingManager();
@@ -343,13 +335,13 @@ namespace mitk {
       return nullptr;
     }
 
-    mitk::IDataStorageReference::Pointer dataStorageReference = WorkbenchUtilPrivate::GetDataStorageReference();
-    if (nullptr == dataStorageReference)
+    mitk::DataStorageReference dsRef = WorkbenchUtilPrivate::GetActiveDataStorageReference();
+    if (!dsRef.IsValid())
     {
       return nullptr;
     }
 
-    mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(dataStorageReference));
+    mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(dsRef));
 
     bool activate = false;
     if (strategies & ACTIVATE)

@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <QString>
 #include <QFileInfo>
 
-#include "internal/mitkDataStorageService.h"
+#include <mitkDataStorageService.h>
 
 #include <usModuleRegistry.h>
 #include <usModule.h>
@@ -86,12 +86,12 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   mitk::VtkLoggingAdapter::Initialize();
   mitk::ItkLoggingAdapter::Initialize();
 
-  //initialize data storage service
-  dataStorageService.reset(new DataStorageService());
-  context->registerService<mitk::IDataStorageService>(dataStorageService.data());
-
-  // Get the MitkCore Module Context
+  // Get the MitkCore Module Context (needed for service registration)
   mitkContext = us::ModuleRegistry::GetModule(1)->GetModuleContext();
+
+  // Initialize and register data storage service via CppMicroServices
+  dataStorageService.reset(new DataStorageService());
+  m_DataStorageServiceReg = mitkContext->RegisterService<IDataStorageService>(dataStorageService.data());
 
   // Process all already registered services
   std::vector<us::ServiceReferenceU> refs = mitkContext->GetServiceReferences("");
@@ -120,6 +120,8 @@ void org_mitk_core_services_Activator::stop(ctkPluginContext* /*context*/)
   //clean up logging
   mitk::LogBackend::Unregister();
 
+  // Unregister and cleanup data storage service
+  m_DataStorageServiceReg.Unregister();
   dataStorageService.reset();
   mitkContext = nullptr;
   pluginContext = nullptr;

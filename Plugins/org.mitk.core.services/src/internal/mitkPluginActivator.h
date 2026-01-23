@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <berrySmartPointer.h>
 
 #include <usServiceEvent.h>
+#include <usServiceRegistration.h>
 
 namespace us
 {
@@ -28,6 +29,7 @@ namespace mitk
 {
 
 class DataStorageService;
+class IDataStorageService;
 
 class org_mitk_core_services_Activator : public QObject, public ctkPluginActivator
 {
@@ -50,6 +52,7 @@ public:
 private:
 
   QScopedPointer<DataStorageService> dataStorageService;
+  us::ServiceRegistration<IDataStorageService> m_DataStorageServiceReg;
 
   QMap<long, QObject*> mapMitkIdToAdapter;
   QMap<long, ctkServiceRegistration> mapMitkIdToRegistration;

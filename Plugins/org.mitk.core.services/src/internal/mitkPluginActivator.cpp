@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <QFileInfo>
 
 #include <mitkDataStorageService.h>
-#include <mitkIDataStorageService.h>
 
 #include <usModuleRegistry.h>
 #include <usModule.h>

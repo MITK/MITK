@@ -27,9 +27,6 @@ found in the LICENSE file.
 // MitkXNAT Module
 #include "mitkXnatSessionTracker.h"
 
-#include <mitkIDataStorageService.h>
-#include <ctkServiceTracker.h>
-
 class QMenu;
 
 /*!
@@ -123,7 +120,6 @@ private:
 
   void CleanUp();
 
-  ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
   QmitkXnatTreeModel* m_TreeModel;
 
   mitk::XnatSessionTracker* m_Tracker;

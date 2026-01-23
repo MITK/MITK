@@ -57,12 +57,12 @@ found in the LICENSE file.
 #include <itkConfigure.h>
 #include <mitkVersion.h>
 #include <mitkBaseApplication.h>
-#include <mitkIDataStorageService.h>
-#include <mitkIDataStorageReference.h>
+#include <mitkCoreServices.h>
 #include <mitkDataStorageEditorInput.h>
+#include <mitkDataStorageReference.h>
+#include <mitkIDataStorageService.h>
 #include <mitkWorkbenchUtil.h>
 #include <vtkVersionMacros.h>
-#include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
@@ -736,17 +736,12 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowOpen()
   // Force Rendering Window Creation on startup.
   berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
 
-  ctkPluginContext* context = QmitkFlowApplicationPlugin::GetDefault()->GetPluginContext();
-  ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
-  if (serviceRef)
+  mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
+  if (dsService)
   {
-    mitk::IDataStorageService *dsService = context->getService<mitk::IDataStorageService>(serviceRef);
-    if (dsService)
-    {
-      mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
-      mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dsRef));
-      mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(),dsInput);
-    }
+    mitk::DataStorageReference dsRef = dsService->GetActiveDataStorageReference();
+    mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dsRef));
+    mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(), dsInput);
   }
 }
 

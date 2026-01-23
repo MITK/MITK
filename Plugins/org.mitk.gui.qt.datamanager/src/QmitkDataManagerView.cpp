@@ -40,8 +40,7 @@ found in the LICENSE file.
 #include <QmitkIOUtil.h>
 #include <QmitkNodeDescriptorManager.h>
 
-// mitk core services plugin
-#include <mitkIDataStorageReference.h>
+// mitk core services
 #include <mitkIDataStorageService.h>
 
 // mitk gui qt application plugin

@@ -72,21 +72,20 @@ void QmitkAbstractRenderEditor::Init(berry::IEditorSite::Pointer site, berry::IE
   }
 }
 
-mitk::IDataStorageReference::Pointer QmitkAbstractRenderEditor::GetDataStorageReference() const
+mitk::DataStorageReference QmitkAbstractRenderEditor::GetDataStorageReference() const
 {
   mitk::DataStorageEditorInput::Pointer input = this->GetEditorInput().Cast<mitk::DataStorageEditorInput>();
   if (input.IsNotNull())
   {
     return input->GetDataStorageReference();
   }
-  return mitk::IDataStorageReference::Pointer(nullptr);
+  return mitk::DataStorageReference();
 }
 
 mitk::DataStorage::Pointer QmitkAbstractRenderEditor::GetDataStorage() const
 {
-  mitk::IDataStorageReference::Pointer ref = this->GetDataStorageReference();
-  if (ref.IsNotNull()) return ref->GetDataStorage();
-  return mitk::DataStorage::Pointer(nullptr);
+  mitk::DataStorageReference info = this->GetDataStorageReference();
+  return info.GetStorage();
 }
 
 mitk::IPreferences* QmitkAbstractRenderEditor::GetPreferences() const

@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkCloseProjectAction.h"
-#include "internal/org_mitk_gui_qt_application_Activator.h"
 
-#include <mitkIDataStorageService.h>
+#include <mitkCoreServices.h>
 #include <mitkDataStorageEditorInput.h>
+#include <mitkIDataStorageService.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
@@ -68,45 +68,33 @@ void QmitkCloseProjectAction::Run()
 {
   try
   {
-    ctkPluginContext* context = mitk::PluginActivator::GetContext();
-    mitk::IDataStorageService* dss = nullptr;
-    ctkServiceReference dsRef = context->getServiceReference<mitk::IDataStorageService>();
-    if (dsRef)
-    {
-      dss = context->getService<mitk::IDataStorageService>(dsRef);
-    }
+    mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
 
-    if (!dss)
+    if (!dsService)
     {
       MITK_WARN << "IDataStorageService service not available. Unable to close project.";
-      context->ungetService(dsRef);
       return;
     }
 
-    mitk::IDataStorageReference::Pointer dataStorageRef = dss->GetActiveDataStorage();
-    if (dataStorageRef.IsNull())
-    {
-      // No active data storage set (i.e. not editor with a DataStorageEditorInput is active).
-      dataStorageRef = dss->GetDefaultDataStorage();
-    }
+    mitk::DataStorageReference storageInfo = dsService->GetActiveDataStorageReference();
+    mitk::DataStorage::Pointer dataStorage = storageInfo.GetStorage();
 
-    mitk::DataStorage::Pointer dataStorage = dataStorageRef->GetDataStorage();
     if (dataStorage.IsNull())
     {
       MITK_WARN << "No data storage available. Cannot close project.";
       return;
     }
 
-    //check if we got the default datastorage and if there is anything else then helper object in the storage
-    if(dataStorageRef->IsDefault() &&
-       dataStorage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))))->empty())
+    // Check if we got the default datastorage and if there is anything else than helper objects in the storage
+    if (storageInfo.IsDefault() &&
+        dataStorage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))))->empty())
     {
       return;
     }
 
     /* Ask, if the user is sure about that */
     QString msg = "Are you sure that you want to close the current project (%1)?\nThis will remove all data objects.";
-    if (QMessageBox::question(nullptr, "Remove all data?", msg.arg(dataStorageRef->GetLabel()),
+    if (QMessageBox::question(nullptr, "Remove all data?", msg.arg(QString::fromStdString(storageInfo.GetLabel())),
                               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
     {
       return;
@@ -118,19 +106,22 @@ void QmitkCloseProjectAction::Run()
       dataStorage->Remove(nodesToRemove);
     }
 
-    // explicitly trigger undo model again. It is also done in the data storage itself, but
-    // as long as the nodesToRemove variable exist, it has no effect, as the smart pointer keeps
+    // Explicitly trigger undo model again. It is also done in the data storage itself, but
+    // as long as the nodesToRemove variable exists, it has no effect, as the smart pointer keeps
     // the removed nodes alive due to the list of smart pointer selections.
     if (auto undoModel = mitk::UndoController::GetCurrentUndoModel(); nullptr != undoModel)
     {
       undoModel->RemoveInvalidOperations();
     }
 
-    // Remove the datastorage from the data storage service
-    dss->RemoveDataStorageReference(dataStorageRef);
+    // Remove the datastorage from the data storage service (unless it's the default)
+    if (!storageInfo.IsDefault())
+    {
+      dsService->RemoveDataStorage(storageInfo.GetLabel());
+    }
 
     // Close all editors with this data storage as input
-    mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dataStorageRef));
+    mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(storageInfo));
     QList<berry::IEditorReference::Pointer> dsEditors =
         m_Window->GetActivePage()->FindEditors(dsInput, QString(), berry::IWorkbenchPage::MATCH_INPUT);
 

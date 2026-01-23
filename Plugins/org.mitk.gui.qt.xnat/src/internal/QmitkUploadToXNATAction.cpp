@@ -16,6 +16,7 @@ found in the LICENSE file.
 
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
 #include <QmitkSelectXnatUploadDestinationDialog.h>
+#include <mitkCoreServices.h>
 #include <mitkIDataStorageService.h>
 #include <mitkIOUtil.h>
 #include <mitkNodePredicateProperty.h>
@@ -24,7 +25,6 @@ found in the LICENSE file.
 #include <ctkXnatFile.h>
 #include <ctkXnatObject.h>
 #include <ctkXnatResource.h>
-#include <ctkServiceTracker.h>
 #include <ctkXnatSession.h>
 
 #include <QDir>
@@ -88,10 +88,13 @@ void QmitkUploadToXNATAction::Run( const QList<mitk::DataNode::Pointer> &selecte
   if (selectedNode == nullptr)
     return;
 
-  ctkServiceTracker<mitk::IDataStorageService*> dataStorageServiceTracker (mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext());
-  dataStorageServiceTracker.open();
-  mitk::IDataStorageService* dsService = dataStorageServiceTracker.getService();
-  mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
+  mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
+  if (!dsService)
+  {
+    MITK_ERROR << "IDataStorageService not available.";
+    return;
+  }
+  mitk::DataStorage::Pointer dataStorage = dsService->GetActiveDataStorage();
 
   mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("xnat.url");
   mitk::DataStorage::SetOfObjects::ConstPointer result = dataStorage->GetSources(selectedNode, pred);

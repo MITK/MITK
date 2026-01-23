@@ -16,7 +16,8 @@ found in the LICENSE file.
 #include <berryIEditorInput.h>
 #include <berryIPersistableElement.h>
 
-#include <mitkIDataStorageReference.h>
+#include <mitkDataStorage.h>
+#include <mitkDataStorageReference.h>
 
 #include <org_mitk_gui_common_Export.h>
 
@@ -37,7 +38,7 @@ public:
   berryObjectMacro(DataStorageEditorInput);
 
   DataStorageEditorInput();
-  DataStorageEditorInput(IDataStorageReference::Pointer ref);
+  DataStorageEditorInput(const DataStorageReference& reference);
 
   bool Exists() const override;
   QString GetName() const override;
@@ -47,7 +48,15 @@ public:
   const berry::IPersistableElement* GetPersistable() const override;
   Object* GetAdapter(const QString &adapterType) const override;
 
-  IDataStorageReference::Pointer GetDataStorageReference();
+  /**
+   * \brief Get the DataStorageReference associated with this input.
+   *
+   * If no DataStorage was provided in the constructor, this method
+   * lazily retrieves the active DataStorage info from IDataStorageService.
+   *
+   * \return The DataStorageReference, which may be invalid if no service is available.
+   */
+  DataStorageReference GetDataStorageReference();
 
   bool operator==(const berry::Object*) const override;
 
@@ -56,7 +65,7 @@ private:
   //QString GetFactoryId() const;
   //void SaveState(const berry::SmartPointer<berry::IMemento>& memento) const;
 
-  IDataStorageReference::Pointer m_DataStorageRef;
+  DataStorageReference m_DataStorageReference;
 };
 
 }

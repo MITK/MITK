@@ -42,7 +42,7 @@ DataStorage::Pointer DataStorageService::GetActiveDataStorage() const
 
   if (!m_ActiveLabel.empty())
   {
-    const DataStorageReference* info = FindStorageByLabel(m_ActiveLabel);
+    const DataStorageReference* info = this->FindStorageByLabel(m_ActiveLabel);
     if (info != nullptr)
     {
       return info->GetStorage();
@@ -57,7 +57,7 @@ DataStorageReference DataStorageService::GetActiveDataStorageReference() const
 
   if (!m_ActiveLabel.empty())
   {
-    const DataStorageReference* info = FindStorageByLabel(m_ActiveLabel);
+    const DataStorageReference* info = this->FindStorageByLabel(m_ActiveLabel);
     if (info != nullptr)
     {
       return *info;
@@ -77,7 +77,7 @@ bool DataStorageService::SetActiveDataStorage(const std::string& label)
   }
 
   // Check that the label exists
-  if (FindStorageByLabel(label) != nullptr)
+  if (this->FindStorageByLabel(label) != nullptr)
   {
     m_ActiveLabel = label;
     return true;
@@ -96,13 +96,12 @@ bool DataStorageService::AddDataStorage(const std::string& label, DataStorage::P
   std::lock_guard<std::mutex> lock(m_Mutex);
 
   // Check for duplicate label
-  if (label == DEFAULT_LABEL || FindStorageByLabel(label) != nullptr)
+  if (label == DEFAULT_LABEL || this->FindStorageByLabel(label) != nullptr)
   {
     return false;
   }
 
-  DataStorageReference info(label, storage, false);
-  m_Storages.push_back(info);
+  m_Storages.emplace_back(label, storage);
   return true;
 }
 
@@ -110,20 +109,19 @@ DataStorageReference DataStorageService::CreateDataStorage(const std::string& la
 {
   if (label.empty())
   {
-    return DataStorageReference();
+    return std::nullopt;
   }
 
   std::lock_guard<std::mutex> lock(m_Mutex);
 
   // Check for duplicate label
-  if (label == DEFAULT_LABEL || FindStorageByLabel(label) != nullptr)
+  if (label == DEFAULT_LABEL || this->FindStorageByLabel(label) != nullptr)
   {
     return DataStorageReference(); // Return invalid info
   }
 
   auto storage = StandaloneDataStorage::New();
-  DataStorageReference info(label, storage.GetPointer(), false);
-  m_Storages.push_back(info);
+  m_Storages.emplace_back(label, storage.GetPointer());
 
   return info;
 }
@@ -137,7 +135,7 @@ std::optional<DataStorageReference> DataStorageService::GetDataStorageReference(
     return m_DefaultStorage;
   }
 
-  const DataStorageReference* info = FindStorageByLabel(label);
+  const DataStorageReference* info = this->FindStorageByLabel(label);
   if (info != nullptr)
   {
     return *info;
@@ -208,7 +206,7 @@ bool DataStorageService::HasDataStorage(const std::string& label) const
     return true;
   }
 
-  return FindStorageByLabel(label) != nullptr;
+  return this->FindStorageByLabel(label) != nullptr;
 }
 
 bool DataStorageService::RemoveDataStorage(const std::string& label)

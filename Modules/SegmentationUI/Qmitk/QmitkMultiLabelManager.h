@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <QWidget>
 
 class QCompleter;
+class QShortcut;
 
 namespace Ui
 {
@@ -183,6 +184,8 @@ private:
   QStringList m_OrganColors;
 
   QStringList m_LabelStringList;
+
+  QShortcut* m_AddLabelInstanceShortcut;
 
   bool m_ProcessingManualSelection;
 

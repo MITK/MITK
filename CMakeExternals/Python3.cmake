@@ -13,8 +13,8 @@ if(MITK_USE_Python3)
   endif()
 
   if(NOT DEFINED ${proj}_DIR)
-    set(version 3.12.12)
-    set(release_date 20251031)
+    set(version 3.12.12)       # IMPORTANT: On any version update, adapt MITK_REQUIRED_OPENSSL_VERSION
+    set(release_date 20260114) #            in the top-level CMakeLists.txt.
 
     set(base_url "https://github.com/astral-sh/python-build-standalone/releases/download/${release_date}")
     set(variant "install_only_stripped")
@@ -22,20 +22,20 @@ if(MITK_USE_Python3)
     if(WIN32)
       set(platform "pc-windows-msvc")
       set(arch "x86_64")
-      set(url_hash "SHA256=6871bee00f8055ef7e210523cb34a727cff7df03261d6e0b8d405592edab8f1e")
+      set(url_hash "SHA256=65544affdc45a3755db3a08fd0b36c5b590bb49337b99a19b8840c33189fe75e")
     elseif(APPLE)
       set(platform "apple-darwin")
       if(CMAKE_OSX_ARCHITECTURES STREQUAL "x86_64")
         set(arch "x86_64")
-        set(url_hash "SHA256=10538a63ce7aa4d0891a3181150159fb5d3b750470a638ef8255a25dc50b9961")
+        set(url_hash "SHA256=bcd4bc53a5f7d6baa2976a62fd95c6907f86c4ad7ae220c2ee1f49deba8c6d1c")
       else()
         set(arch "aarch64")
-        set(url_hash "SHA256=2539a9105e47237aa8caabeed20587778f4acf9c6c4b3fe77f9bc2fd320720d2")
+        set(url_hash "SHA256=ed1f300bd3b45aa481d887b2dd8e12f989b583f67755c219a6092756a09b609f")
       endif()
     else()
       set(platform "unknown-linux-gnu")
       set(arch "x86_64_v2")
-      set(url_hash "SHA256=009534a3a6a0b78054fd9c93943d894a89a8ee3318501c92a0b9684e903bdda9")
+      set(url_hash "SHA256=3426df806b8072a80e6adf88de005d7f010ea90ddbea1d1d725118c5ab04ac5a")
     endif()
 
     set(url "${base_url}/cpython-${version}+${release_date}-${arch}-${platform}-${variant}.tar.gz")
@@ -55,6 +55,17 @@ if(MITK_USE_Python3)
       set(python3_executable "python.exe")
     else()
       set(python3_executable "bin/python3")
+    endif()
+
+    if(OPENSSL_VERSION)
+      ExternalProject_Add_Step(${proj} check_openssl
+        COMMAND ${python3_executable} "${MITK_SOURCE_DIR}/CMakeExternals/Python3_CheckOpenSSL.py"
+          --expected "${OPENSSL_VERSION}"
+          --skip-if-built-in
+        DEPENDEES patch
+        DEPENDERS configure
+        WORKING_DIRECTORY "<SOURCE_DIR>"
+      )
     endif()
 
     if(CMAKE_OSX_ARCHITECTURES AND CMAKE_OSX_DEPLOYMENT_TARGET)

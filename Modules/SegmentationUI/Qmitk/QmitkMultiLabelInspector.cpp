@@ -34,11 +34,11 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QCompleter>
+#include <QTimer>
 
 #include <QInputDialog>
 
 #include <ui_QmitkMultiLabelInspectorControls.h>
-
 
 QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/)
   : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelInspector), m_SegmentationNodeDataMTime(0), m_Completer(nullptr)
@@ -73,7 +73,9 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
 
   m_Completer = new QCompleter(this);
   this->RefreshCompleter();
-  m_Controls->labelSearchBox->setCompleter(m_Completer);
+
+  auto labelSearchBox = m_Controls->labelSearchBox;
+  labelSearchBox->setCompleter(m_Completer);
 
   connect(m_Model, &QAbstractItemModel::modelReset, this, &QmitkMultiLabelInspector::OnModelReset);
   connect(m_Model, &QAbstractItemModel::dataChanged, this, &QmitkMultiLabelInspector::OnDataChanged);
@@ -84,8 +86,28 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   connect(view, &QAbstractItemView::entered, this, &QmitkMultiLabelInspector::OnEntered);
   connect(view, &QmitkMultiLabelTreeView::MouseLeave, this, &QmitkMultiLabelInspector::OnMouseLeave);
 
-  connect(m_Controls->labelSearchBox, &QLineEdit::returnPressed, this, &QmitkMultiLabelInspector::OnSearchLabel);
-  connect(m_Completer, SIGNAL(activated(QString)), this, SLOT(OnSearchLabel()));
+  connect(labelSearchBox, &QLineEdit::returnPressed, this, &QmitkMultiLabelInspector::OnSearchLabel);
+
+  // Pressing return on the completer also triggers the line edit signal, resulting in a redundant
+  // call of OnLabelSearch(). At this time (same for a click on a completer entry), the text of the
+  // line edit is not yet set. Hence, it cannot be cleared by OnSearchLabel().
+  //
+  // The trick is to use a zero-delay single-shot timer to immediately clear the text after it
+  // was set by the completer. Since we cannot prevent the redundant call when pressing enter,
+  // We can early-out in OnSearchLabel() when the currently selected label already is the label
+  // that is requested to be selected.
+
+  connect(m_Completer, qOverload<const QString&>(&QCompleter::activated), labelSearchBox,
+    [labelSearchBox](const QString&)
+    {
+      QTimer::singleShot(0, [labelSearchBox]() { labelSearchBox->clear(); });
+    });
+
+  connect(m_Completer, qOverload<const QString&>(&QCompleter::activated),
+    [this, labelSearchBox](const QString& text)
+    {
+      labelSearchBox->setText(text); this->OnSearchLabel();
+    });
 }
 
 void QmitkMultiLabelInspector::RefreshCompleter()
@@ -1517,6 +1539,7 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
 {
   auto relevantLabelValues = this->GetCurrentlyAffactedLabelInstances();
   auto currentLabel = this->GetCurrentLabel();
+  auto selectedLabels = this->GetSelectedLabels();
 
   mitk::SegLabelPropModifyUndoRedoHelper undoRedoHelper(m_Segmentation, relevantLabelValues);
 
@@ -1524,6 +1547,7 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
   emit LabelRenameRequested(currentLabel, true, canceled);
 
   if (canceled) return;
+
 
   for (auto value : relevantLabelValues)
   {
@@ -1549,7 +1573,12 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
   }
   m_Segmentation->GetLookupTable()->Modified();
 
-  undoRedoHelper.RegisterUndoRedoOperationEvent("Change label name/color");
+  undoRedoHelper.RegisterUndoRedoOperationEvent("Change label(s) name/color");
+
+  // ensure that the labels that where selected before renaming are also selected afterwards
+  // it can differ as renaming might change the location in the view, but the selected index in the view is kept
+  this->SetSelectedLabels(selectedLabels);
+
   emit ModelUpdated();
 }
 
@@ -1746,8 +1775,13 @@ void QmitkMultiLabelInspector::OnSearchLabel()
   const mitk::MultiLabelSegmentation::LabelValueType labelID =
     labelVariant.value<mitk::MultiLabelSegmentation::LabelValueType>();
 
-  this->SetSelectedLabel(labelID);
-  this->PrepareGoToLabel(labelID);
+  auto selectedLabels = this->GetSelectedLabels();
+
+  if (selectedLabels.empty() || selectedLabels.front() != labelID)
+  {
+    this->SetSelectedLabel(labelID);
+    this->PrepareGoToLabel(labelID);
+  }
 
   m_Controls->labelSearchBox->clear();
 }

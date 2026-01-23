@@ -133,6 +133,8 @@ namespace mitk
 
       unsigned int m_NumberOfLayers;
 
+      MultiLabelSegmentation::LabelValueType m_LastActiveLabelValue = MultiLabelSegmentation::UNLABELED_VALUE;
+
       /** \brief Default constructor of the local storage. */
       LocalStorage();
       /** \brief Default destructor of the local storage. */

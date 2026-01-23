@@ -103,7 +103,7 @@ public:
     mitk::MultiLabelSegmentation::Pointer loadedSegmentation = mitk::MultiLabelSegmentation::New();
     loadedSegmentation->Initialize(m_Segmentation->GetTimeGeometry(), true, false);
 
-    bool loadOK = mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(m_TempPresetFile, loadedSegmentation);
+    bool loadOK = mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(m_TempPresetFile, loadedSegmentation);
     CPPUNIT_ASSERT_MESSAGE("Loading JSON preset should succeed", loadOK);
 
     CPPUNIT_ASSERT_MESSAGE("Loaded segmentation should contain at least one label", mitk::Equal(*loadedSegmentation, *m_Segmentation, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION,true));
@@ -111,7 +111,7 @@ public:
 
   void TestLoadLegacyXMLPreset()
   {
-    bool loadOK = mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(m_TestLegacyFile, m_EmptySegmentation);
+    bool loadOK = mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(m_TestLegacyFile, m_EmptySegmentation);
     CPPUNIT_ASSERT_MESSAGE("Loading legacy XML preset should succeed", loadOK);
 
     CPPUNIT_ASSERT_MESSAGE("Legacy preset should contain 2 groups",
@@ -137,7 +137,7 @@ public:
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // test loading into segmentation with existing labels
-    loadOK = mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(m_TestLegacyFile, m_Segmentation);
+    loadOK = mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(m_TestLegacyFile, m_Segmentation);
     CPPUNIT_ASSERT_MESSAGE("Loading legacy XML preset should succeed", loadOK);
 
     CPPUNIT_ASSERT_MESSAGE("Legacy preset should contain 2 groups",
@@ -167,7 +167,7 @@ public:
 
   void TestLoadJSONPreset()
   {
-    bool loadOK = mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(m_TestJSONFile, m_EmptySegmentation);
+    bool loadOK = mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(m_TestJSONFile, m_EmptySegmentation);
     CPPUNIT_ASSERT_MESSAGE("Loading JSON preset should succeed", loadOK);
 
     CPPUNIT_ASSERT_MESSAGE("Preset should contain 2 groups",
@@ -196,7 +196,7 @@ public:
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // test loading into segmentation with existing labels
-    loadOK = mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(m_TestJSONFile, m_Segmentation);
+    loadOK = mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(m_TestJSONFile, m_Segmentation);
     CPPUNIT_ASSERT_MESSAGE("Loading JSON preset should succeed", loadOK);
 
     CPPUNIT_ASSERT_MESSAGE("Preset should contain 2 groups",

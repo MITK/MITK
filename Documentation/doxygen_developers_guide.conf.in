@@ -282,6 +282,7 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\"" \
                          "minimumCMakeVersion=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION@" \
                          "minimumQt6Version=@MITK_QT6_MINIMUM_VERSION@" \
+                         "requiredOpenSSLVersion=@MITK_REQUIRED_OPENSSL_VERSION@" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
                          "developersguidemainpage{1}=\mainpage" \
                          "usersguidemainpage{1}=\page \1" \

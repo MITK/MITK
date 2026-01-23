@@ -70,6 +70,8 @@ namespace mitk
     itkGetMacro(RequestDeactivationConfirmation, bool);
     itkBooleanMacro(RequestDeactivationConfirmation);
 
+    Color GetSpecialPreviewColor() const;
+
     /*itk macro was not used on purpose, to avoid the change of mtime.*/
     void SetMergeStyle(MultiLabelSegmentation::MergeStyle mergeStyle);
     itkGetMacro(MergeStyle, MultiLabelSegmentation::MergeStyle);

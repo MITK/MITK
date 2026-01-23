@@ -82,6 +82,7 @@ namespace mitk
 
     void EnableMovement(bool enabled = true);
     void EnableRemoval(bool enabled = true);
+    void Enable3DPointPlacement(bool enabled = true);
 
     /**
      * @brief Sets the boundaries within which points can be placed.
@@ -116,6 +117,7 @@ namespace mitk
     virtual int GetPointIndexByPosition(Point3D position, unsigned int time = 0, float accuracy = -1);
 
     virtual bool CheckSelection(const InteractionEvent *interactionEvent);
+    virtual bool CanAddPoint(const InteractionEvent *interactionEvent);
 
     /** Adds a point at the given coordinates.
      *  Every time a point is added it is also checked if the maximal number of points is reached,
@@ -190,6 +192,7 @@ namespace mitk
     float m_SelectionAccuracy; // accuracy that's needed to select a point
     bool m_IsMovementEnabled;
     bool m_IsRemovalEnabled;
+    bool m_Is3DPointPlacementEnabled;
     mitk::BaseGeometry::Pointer m_Bounds;
 
     // FUNCTIONS

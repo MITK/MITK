@@ -1020,7 +1020,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     if (m_TaskList->HasPreset(current))
     {
       const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetPreset(current));
-      mitk::MultiLabelIOHelper::LoadMultiLabelSegementationPreset(path.string(), segmentation);
+      mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(path.string(), segmentation);
     }
     else
     {
@@ -1078,14 +1078,14 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetLabelNameSuggestions(current));
 
       prefs->PutBool("default label naming", false);
-      prefs->Put("label suggestions", path.string());
+      prefs->Put("external label suggestions", path.string());
       prefs->PutBool("replace standard suggestions", true);
       prefs->PutBool("suggest once", true);
     }
     else
     {
       prefs->PutBool("default label naming", true);
-      prefs->Put("label suggestions", "");
+      prefs->Put("external label suggestions", "");
     }
   }
 

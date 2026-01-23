@@ -391,6 +391,18 @@ namespace mitk
     const LabelValueVectorType GetLabelValuesByName(GroupIndexType index, const std::string_view name) const;
 
     /**
+     * @brief Returns a vector of all label values that are covering passed position in world coordinates.
+     * @param coordinates the world coordinates of the location of interest.
+     * @param index the index of the group for which the vector of labels should be retrieved.
+     * If no index is passed. The coordinates will be checked for all groups.
+     * @param timeStep the time step of the segmentation for which the labels should be checked/retrieved.
+     * @return the respective vector of label values.
+     * @pre group index must exist.
+     */
+    const LabelValueVectorType GetLabelValuesByCoordinates(const Point3D& coordinates, TimeStepType timeStep = 0,
+      std::optional<GroupIndexType> index = std::make_optional<GroupIndexType>()) const;
+
+    /**
     * Returns a vector with (class) names of all label instances used in the segmentation (over all groups)
     */
     std::vector<std::string> GetLabelClassNames() const;
@@ -459,6 +471,21 @@ namespace mitk
     void ReplaceGroupLabels(const GroupIndexType groupID, const ConstLabelVectorType& newLabels);
 
     void ReplaceGroupLabels(const GroupIndexType groupID, const LabelVectorType& newLabels);
+
+    /**
+    * \brief Replaces the labels of all passed group IDs (map key) with a given vector of labels (map value).
+    *
+    * This is an overloaded version that allows to directly replace multiple groups at once. That mitigates the problem
+    * of label value conflict if a label value moves from one replaced group to another.
+    * @remark The passed label instances will be cloned before added to ensure clear ownership
+    * of the new labels.
+    * @remark The pixel content of the old labels will not be removed.
+    * @param newGroupLabels Map that indicated the groups that should be replaced (map key) and the labels that should be
+    * used for replacement (respective map value).
+    * @pre Groups that should be replaced must exist.
+    * @pre new label values must not be used in other groups, that are not replaced.
+    */
+    void ReplaceGroupLabels(std::map<MultiLabelSegmentation::GroupIndexType, MultiLabelSegmentation::ConstLabelVectorType> newGroupLabels);
 
     /**
     * \brief Replaces the labels in the segmentation by their passed counterparts.

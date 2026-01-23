@@ -326,6 +326,20 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
   if (!item)
     return QVariant();
 
+  // Safe guard: avoid accessing segmentation state mid-update
+  if (m_ModelUpdateOngoing)
+  {
+    switch (role)
+    {
+    case Qt::DisplayRole:
+    case Qt::EditRole:
+    case Qt::DecorationRole:
+      return QVariant();      // benign safe fallback
+    default:
+      break;
+    }
+  }
+
   if (role == Qt::DisplayRole||role == Qt::EditRole)
   {
     if (TableColumns::NAME_COL == index.column())

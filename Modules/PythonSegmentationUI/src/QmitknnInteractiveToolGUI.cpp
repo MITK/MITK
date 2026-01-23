@@ -346,14 +346,13 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     {
       messageBox->accept();
 
-      const auto errorMessage = QString(
-        "<h3 %1>Error while initializing nnInteractive:</h3>"
-        "<p>%2</p>")
-        .arg(LINE_HEIGHT_STYLE)
-        .arg(QString::fromLocal8Bit(e.GetDescription()));
+      const std::string errorMessage = "nnInteractive reported an error during initialization (see details).";
+      MITK_ERROR << errorMessage << '\n' << e.GetDescription();
 
-      MITK_ERROR << errorMessage.toStdString();
-      auto errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr, errorMessage);
+      auto errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr,
+        QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(QString::fromStdString(errorMessage)));
+
+      errorMsgBox->setDetailedText(QString::fromLocal8Bit(e.GetDescription()));
       errorMsgBox->setTextInteractionFlags(Qt::TextSelectableByMouse);
       errorMsgBox->setAttribute(Qt::WA_DeleteOnClose, true);
       errorMsgBox->setModal(true);

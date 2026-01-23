@@ -33,6 +33,8 @@ namespace mitk
     DataNode::Pointer GetSegmentationNode() const;
 
     void SetHighlightedLabels(MultiLabelSegmentation::LabelValueVectorType labels);
+    MultiLabelSegmentation::LabelValueVectorType GetHighlightedLabels() const;
+
     void SetHighlightInvisibleLabels(bool highlightInvisible);
 
     ~LabelHighlightGuard();

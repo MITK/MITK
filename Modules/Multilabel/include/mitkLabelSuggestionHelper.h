@@ -48,10 +48,39 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    // Property names for occurrence constraints
+    /** Property names for occurrence constraints */
     static constexpr const char* PROPERTY_MAX_INSTANCE_OCCURRENCE = "_max_instance_occurrence";
 
     using ConstLabelVectorType = MultiLabelSegmentation::ConstLabelVectorType;
+
+    struct Preferences
+    {
+      ////File path to an external suggestion config that should be loaded. Empty string indicated no external config should be loaded.
+      std::string externalLabelSuggestionFile = "";
+      ////ID of the built-in standard suggestion config that should be loaded. Empty string indicated no default should be loaded.
+      std::string standardLabelSuggestionResource = "MitkCore:mitk_classic";
+      bool replaceStandardSuggestions = true; ///< indicates if standard suggestions should be kept
+      bool enforceSuggestions = false; ///< indicates if only suggestions are allowed or if users can define own label names
+      /// the global preference settings of suggestions are only allowed once if the max multiplicity
+      /// is not explicitly specified for a label suggestions.
+      bool suggestionOnce = true;
+    };
+
+    // Get all relevant preferences and consider command-line arguments overrides.
+    static Preferences GetSuggestionPreferences();
+
+    /** Get all built-in suggestions for labels compiled into on of the modules.
+    * The function searches all modules for resources in the sub folder "/LabelSuggestions".
+    * @return map with key value pairs where the value is the json representing the found configuration and
+    * the key is a ID string in the format "<module_name>:<resource_basename>"; one example is e.g.
+    * "MitkCore:mitk_classic" will point to the resource "LabelSuggestions/mitk_classic.json" of MitkCore module.
+    */
+    static std::map<std::string, nlohmann::json> GetAllAvailableBuiltInSuggestions();
+
+    /** Get the built-in label suggestion config that is currently indicated by the preferences.*/
+    std::optional<nlohmann::json> GetStandardSuggesitions();
+
+    void LoadStandardSuggestions();
 
     /**
      * @brief Parse label suggestions from a JSON file.
@@ -70,16 +99,10 @@ namespace mitk
     bool ParseSuggestions(const nlohmann::json& jsonSuggestions, bool replaceExisting = true);
 
     /**
-     * @brief Resets suggestions and load standard suggestions from AnatomicalStructureColorPresets.
-     *
-     */
-    void LoadStandardSuggestions();
-
-    /**
      * @brief Get valid suggestions for adding new labels to a segmentation.
      *
      * Filters suggestions based on:
-     * - Occurrence constraints (_max_class_occurrence, _max_instance_occurrence)
+     * - Occurrence constraints (_max_instance_occurrence)
      * - Suggest-once policy (if enabled)
      * - Existing labels in the segmentation
      *
@@ -130,19 +153,6 @@ namespace mitk
      * @param label The label to add as a suggestion
      */
     void AddSuggestion(Label::Pointer label);
-
-    struct Preferences
-    {
-      std::string labelSuggestionFile = "";
-      bool replaceStandardSuggestions = true; ///< indicates if standard suggestions should be kept
-      bool enforceSuggestions = false; ///< indicates if only suggestions are allowed or if users can define own label names
-      /// the global preference settings of suggestions are only allowed once if the max multiplicity
-      /// is not explicitly specified for a label suggestions.
-      bool suggestionOnce = true;
-    };
-
-    // Get all relevant preferences and consider command-line arguments overrides.
-    static Preferences GetSuggestionPreferences();
 
   protected:
     LabelSuggestionHelper();

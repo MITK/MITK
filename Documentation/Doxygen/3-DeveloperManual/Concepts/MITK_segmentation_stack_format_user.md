@@ -2,42 +2,18 @@
 
 [TOC]
 
-This document explains the **MITK MultiLabel Segmentation Stack Format**, including the structure of image and JSON files. This format allows exporting/importing a multi-label segmentation composed of multiple labeled regions, grouped logically, and enriched with metadata.
+This document explains the **MITK MultiLabel Segmentation Stack Format**, including the structure of image and JSON files.
+This format supports multiple usecases:
+1. **Exporting/importing multilabel segmentations** as stacked image files composed of multiple labeled regions, grouped logically, and enriched with metadata.
+2. **Defining label suggestions** for guided label naming in interactive segmentations
+3. **Defining label presets** for streamlined segmentation workflows with predefined labels and groups
+
 There are several reader and writer in MITK that support this format.
-
-## 📦 File Structure Overview
-
-A typical stack includes:
-```
-MySegmentation/
-├── MySegmentation_Group_0.nrrd             # optional group image ( (multiple) label values in one image)
-├── MySegmentation_Label_1.nii.gz           # optional label image (per label)
-├── ...
-└── MySegmentation.mitklabel.json           # required JSON meta file
-```
-
-The `.json` file determines how image files are interpreted and combined into a `mitk::MultiLabelSegmentation`.
-The images can have any format that is supported by MITK.
-**IMPROTANT**: The images of one segmentation stack have to have the same image geometry
-
-
-## 🧩 How Data is Structured
-
-Segmentations are organized into **label groups**. Each group may:
-
-- Contain one or more labels
-- Reference a single **group image** (multi-label voxel values)
-- Or contain multiple **label-specific binary masks**
-
-This is configured by the `save_strategy`:
-- `group`: Saves one image per group
-- `label`: Saves one image per label
-
-MITK handles both variants at import/export.
 
 
 ## 📄 JSON File Structure
-
+In all three use cases the same json file structure is used. Its layout and properties are explained in the following section.
+Use case specific details will be explained in the use case sections.
 ### Top-Level Fields
 
 ```json
@@ -52,11 +28,11 @@ MITK handles both variants at import/export.
 
 | Key         | Required | Description                                         |
 |-------------|----------|-----------------------------------------------------|
-| `version`   | ✅        | Format version (integer)                           |
-| `type`      | ✅        | Must be `"org.mitk.multilabel.segmentation.stack"` |
-| `uid`       | ❌        | Unique ID for the segmentation                     |
-| `groups`    | ✅        | Array of label groups                              |
-| `properties`| ❌        | Global image metadata/properties                   |
+| `version`   | ✅       | Format version (integer)                           |
+| `type`      | ✅       | Depending on the purpose it can be: `"org.mitk.multilabel.segmentation.stack"`, `"org.mitk.multilabel.segmentation.preset"` or `"org.mitk.multilabel.segmentation.suggestions"`. Remark: only in use case 1 (import/export) the type is really checked and import would fail if the JSON has the wrong type.|
+| `uid`       | ❌       | Unique ID for the segmentation                     |
+| `groups`    | ✅       | Array of label groups                              |
+| `properties`| ❌       | Global image metadata/properties (only use case 1) |
 
 
 ### Group Structure
@@ -75,7 +51,7 @@ Each entry in `"groups"` defines a group of labels:
 | Key      | Required | Description                               |
 |----------|----------|-------------------------------------------|
 | `name`   | ❌        | Optional group name                       |
-| `_file`   | ❌        | Path to the group image file              |
+| `_file`  | ❌        | Path to the group image file (only use case 1) |
 | `labels` | ✅        | Array of labels in the group              |
 | *(any)*  | ❌        | Any additional key is stored as a custom property |
 
@@ -103,46 +79,28 @@ Each label includes visual and semantic metadata, and optionally its own image f
 }
 ```
 
-| Key           | Required | Description                                            |
+| Key           | Import/ Export | Suggestion | Preset |Description                                            |
 |----------------|----------|--------------------------------------------------------|
-| `name`         | ✅        | Label name. When stored as DICOM this will be mapped into the tag `Segment Label (0062,0005)` |
-| `value`        | ✅        | Unique label value (*it hase to be unique for the whole segmentation not just the group!*) |
-| `_file`         | ❌        | Path to binary label image                             |
-| `_file_value`   | ❌        | Voxel value in the image to map to/form `value` on import/export            |
-| `color`        |  ❌        | Controls UI color — RGB values `[r, g, b]` If encoded as unsigned int, the value range per channel is 0–255. If encoded as float, the value range per channel is 0.0–1.0. If encoded as float the value range per channel is 0.0–1.0. Default is [1.,1.,1.] if not set. When stored as DICOM this will be mapped into the tag `Recommended Display CIELab Value (0062,000D)` |
-| `opacity`      | ❌        | Opacity; default is 1 (0.0–1.0)                                      |
-| `locked`       | ❌        | Controls UI editability — `true` disables editing   |
-| `visible`      | ❌        | Visibility in the UI                                   |
-| `tracking_id`  | ❌        | Tracking ID (string or number). If not set, the value will be assumed as ID. When stored as DICOM this will be mapped into the tag `TrackingID (0062,0020)` |
-| `tracking_uid` | ❌        | Optional unique identifier. If not set, the value will be assumed as UID. When stored as DICOM this will be mapped into the tag `TrackingUID (0062,0021)` |
-| `description`  | ❌        | Optional user description. When stored as DICOM this will be mapped into the tag `Segment Description (0062,0006)` |
-| `algorithm_type`  | ❌        | Optional type specification of the algorithm(s) used for the label. Allowed strings: "MANUAL", "SEMIAUTOMATIC" and "AUTOMATIC". When stored as DICOM this will be mapped into the tag `Algorithm Type (0062,0008)` |
-| `algorithm_name`  | ❌        | Optional descriptiv string of the algorithms used for the label. If more then one algorithm was used the names are seperated by "|". When stored as DICOM this will be mapped into the tag `Algorithm Type (0062,0009)` |
-| *(any)*        | ❌        | Custom label properties (e.g., DICOM metadata, flags)  |
+| `name`         | ✅ | ✅ | ✅ | Label name. When stored as DICOM this will be mapped into the tag `Segment Label (0062,0005)` |
+| `value`        | ✅ | ⭕ | ✅ | Unique label value (*it has to be unique for the whole segmentation not just the group!*) |
+| `color`        | ⭕ | ⭕ | ⭕ | Controls UI color — RGB values `[r, g, b]` If encoded as unsigned int, the value range per channel is 0–255. If encoded as float, the value range per channel is 0.0–1.0. Default is [1.,1.,1.] if not set. When stored as DICOM this will be mapped into the tag `Recommended Display CIELab Value (0062,000D)` |
+| `opacity`      | ⭕ | ⭕ | ⭕ | Opacity; default is 1 (0.0–1.0)                                      |
+| `locked`       | ⭕ | ⭕ | ⭕ | Controls UI edit-ability — `true` disables editing   |
+| `visible`      | ⭕ | ⭕ | ⭕ | Visibility in the UI                                   |
+| `tracking_id`  | ⭕ | | ⭕ | Tracking ID (string or number). If not set, the value will be assumed as ID. When stored as DICOM this will be mapped into the tag `TrackingID (0062,0020)` |
+| `tracking_uid` | ⭕ | | ⭕ | Optional unique identifier. If not set, the value will be assumed as UID. When stored as DICOM this will be mapped into the tag `TrackingUID (0062,0021)` |
+| `description`  | ⭕ | ⭕ | ⭕ | Optional user description. When stored as DICOM this will be mapped into the tag `Segment Description (0062,0006)` |
+| `algorithm_type` | ⭕ | ⭕ | ⭕ | Optional type specification of the algorithm(s) used for the label. Allowed strings: "MANUAL", "SEMIAUTOMATIC" and "AUTOMATIC". When stored as DICOM this will be mapped into the tag `Algorithm Type (0062,0008)` |
+| `algorithm_name` | ⭕ | ⭕ | ⭕ | Optional descriptive string of the algorithms used for the label. If more then one algorithm was used the names are separated by "\|". When stored as DICOM this will be mapped into the tag `Algorithm Name (0062,0009)` |
+| *(any)*        | ⭕ | ⭕ | ⭕ | Custom label properties (e.g., DICOM metadata, flags)  |
+| `_file`         | ⭕ | | | Path to binary label image                             |
+| `_file_value`   | ⭕ | | | Voxel value in the image to map to/form `value` on import/export            |
+| `_max_instance_occurrence` | ⭕ | | | If not set or `null`: unlimited instances allowed. If set to integer N: label can only be instantiated N times. |
 
+Legend: ✅: required | ⭕: optional | `empty cell`: not supported/ignored
 ### Meta keys/properties
 Some keys on group and label level are not supposed to be converted into regular properties, but the are supposed as meta information that control the way labels are processed/handled.
 Those meta keys will not be "imported", thus transformed into properties of the label data structure. Those keys are indicated by a "_" prefix. The most regular seen keys of that type are `_file` and `_file_value`.
-
-## Mapping Image Voxel Values
-
-To **control voxel value interpretation**:
-
-- Use `_file_value` to specify which voxel value in the image corresponds to this label.
-- This is especially useful for **binary masks**, where all label voxels are `1`.
-
-### Example
-
-```json
-{
-  "name": "Label 5",
-  "value": 6,
-  "_file": "./binary_label_6.nii.gz",
-  "_file_value": 1  // voxel value 1 will be mapped to label value 6
-}
-```
-
-If `_file_value` is omitted, the label `value` must match the voxel value in the image.
 
 ## Properties Support
 
@@ -201,8 +159,65 @@ Example for a structured property stored at group or label level:
 ```
 
 ---
+## Use Case 1: Exporting/importing Multilabel Segmentations as segmentation image stacks
 
-## 📚 Real-World Example: Mixed Format
+### Overview
+
+Convert between a unified `MultiLabelSegmentation` and a stack of individual label images with metadata using the [MitkFileConverter](@ref MITKFileConverterPage) or the MITK Workbench.
+
+**Top-level type:** `"org.mitk.multilabel.segmentation.stack"`
+
+### 📦 File Structure Overview
+
+A typical stack includes:
+```
+MySegmentation/
+├── MySegmentation_Group_0.nrrd             # optional group image ( (multiple) label values in one image)
+├── MySegmentation_Label_1.nii.gz           # optional label image (per label)
+├── ...
+└── MySegmentation.mitklabel.json           # required JSON meta file
+```
+
+The `.json` file determines how image files are interpreted and combined into a `mitk::MultiLabelSegmentation`.
+The images can have any format that is supported by MITK.
+**IMPORTANT**: The images of one segmentation stack have to have the same image geometry!
+
+
+### 🧩 How Data is Structured
+
+Segmentations are organized into **label groups**. Each group may:
+
+- Contain one or more labels
+- Reference a single **group image** (multi-label voxel values)
+- Or contain multiple **label-specific binary masks**
+
+This is configured by the `save_strategy`:
+- `group`: Saves one image per group
+- `label`: Saves one image per label
+
+MITK handles both variants at import/export.
+
+### Mapping Image Voxel Values
+
+To **control voxel value interpretation**:
+
+- Use `_file_value` to specify which voxel value in the image corresponds to this label.
+- This is especially useful for **binary masks**, where all label voxels are `1`.
+
+#### Example
+
+```json
+{
+  "name": "Label 5",
+  "value": 6,
+  "_file": "./binary_label_6.nii.gz",
+  "_file_value": 1  // voxel value 1 will be mapped to label value 6
+}
+```
+
+If `_file_value` is omitted, the label `value` must match the voxel value in the image.
+
+### 📚 Real-World Example: Mixed Format
 
 A mixed segmentation stack may contain:
 
@@ -210,8 +225,7 @@ A mixed segmentation stack may contain:
 - Specific label images (`_file`) with optional `_file_value` mappings.
 - One group might not have a `_file` at all, relying entirely on per-label images.
 
-### Example
-
+#### Example
 ```json
 {
   "groups": [
@@ -258,14 +272,59 @@ A mixed segmentation stack may contain:
 }
 ```
 
-### Explanation
+#### Explanation
 
 - Group 0 uses a group image and overrides it for label "Bone" via file "./BoneMask.nii.gz".
 - If the group image contains also a label of value 1, it will be overwritten by the dedicated definition of "Bone". 
 - Group 1 has no group image. It contains binary mask label (pixel/label value in file: 1) with explicit voxel mapping to the label value 3.
 
 
-## Importing and exporting segmentation stacks
+### Importing and exporting segmentation stacks
 
 The cmd app [MitkFileConverter](@ref MITKFileConverterPage).offers the possibility to import and export segmentation stacks (also using this json meta file).
 For more information about how to do that please visit the [MitkFileConverter segmentation stack guide](@ref MITKFileConverterSegStacksPage).
+
+---
+
+## Use Case 2: Label Suggestions
+
+### Overview
+
+Define suggested labels that users can select during interactive segmentation in the (Re)name label dialog of the MITK Workbench.
+Suggestions can specify instance limits to control how many times a label can be used. For more information, please visit the documentation of the MITK Workbench Segmentation View.
+
+**Top-level type:** `"org.mitk.multilabel.segmentation.suggestion"`
+Remark: The type is used only as guidance. The workbench can use any stacked segmentation JSON as a list of suggestions (multiple groups will just be merged).
+
+### Suggestions: Specific Property Behavior
+
+| Property | Behavior |
+|----------|----------|
+| `_max_instance_occurrence`| If not set or `null`: unlimited instances allowed. If set to integer N: label can only be instantiated N times. |
+| All other [Meta keys/properties] | **Ignored** |
+| Standard properties | **Applied** to label instance when suggestion is picked |
+
+**Example:** A label with `"_max_instance_occurrence": 2` can only be added twice to the segmentation.
+
+---
+
+## Use Case 3: Label Presets
+
+### Overview
+
+Define reusable label/group configurations for segmentation workflows. Presets provide a template that can be applied to create labels with predefined properties automatically.
+For more information, please visit the documentation of the MITK Workbench Segmentation View.
+
+**Top-level type:** `"org.mitk.multilabel.segmentation.preset"`
+Remark: The type is used only as guidance. The workbench can use any stacked segmentation JSON as a preset.
+
+### Presets: Specific Property Behavior
+
+| Property | Behavior |
+|----------|----------|
+| [Meta keys/properties] | **Ignored** |
+| Standard properties | **Applied** to label instance when preset is applied |
+
+**Note:** Presets focus purely on label appearance and naming conventions, not on instance control or storage metadata.
+
+---

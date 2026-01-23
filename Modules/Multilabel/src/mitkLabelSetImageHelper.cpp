@@ -107,7 +107,8 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
   if (nullptr == labelSetImage)
     return nullptr;
 
-  const std::regex genericLabelNameRegEx(namePrefix + " ([1-9][0-9]*)");
+  const unsigned int minDigitsCount = 2;
+  const std::regex genericLabelNameRegEx(namePrefix + " ([0-9]+)");
   int maxGenericLabelNumber = 0;
 
   std::vector<std::array<int, 3>> colorsInUse = { {0,0,0} }; //black is always in use.
@@ -133,7 +134,9 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
   }
   else
   {
-    newLabel->SetName(namePrefix + " " + std::to_string(maxGenericLabelNumber + 1));
+    std::ostringstream name;
+    name << namePrefix << " " << std::setw(minDigitsCount) << std::setfill('0') << maxGenericLabelNumber + 1;
+    newLabel->SetName(name.str().c_str());
   }
 
   auto lookupTable = mitk::LookupTable::New();
@@ -284,6 +287,55 @@ std::string mitk::LabelSetImageHelper::CreateHTMLLabelName(const mitk::Label* la
     << "; font-size: 20px '>&#x25A0;</span>" << std::dec;
 
   stream << "<font class=\"normal\"> " << CreateDisplayLabelName(segmentation, label);
+  stream << "</font>";
+  return stream.str();
+}
+
+std::string mitk::LabelSetImageHelper::CreateHTMLLabelDetails(const mitk::Label* label, const mitk::MultiLabelSegmentation* segmentation)
+{
+  std::stringstream stream;
+  stream << "<font class=\"normal\"> ";
+
+  stream << "<b>Pixel value:</b> " << label->GetValue();
+  if (nullptr != segmentation && segmentation->GetNumberOfGroups() > 1 && segmentation->ExistLabel(label->GetValue()))
+  {
+    stream << "<br/><b>Group:</b> " << CreateDisplayGroupName(segmentation, segmentation->GetGroupIndexOfLabel(label->GetValue()));
+  }
+  if (!label->GetTrackingID().empty())
+  {
+    stream <<"<br/><b>Tracking ID:</b> "<< label->GetTrackingID();
+  }
+  if (label->GetAnatomicRegionCount() > 0)
+  {
+    auto code = label->GetAnatomicRegion(0);
+    stream <<"<br/><b>Anatomic region:</b> " << code.GetMeaning();
+  }
+  if (label->GetPrimaryAnatomicStructureCount() > 0)
+  {
+    auto code = label->GetPrimaryAnatomicStructure(0);
+    stream << "<br/><b>Primary anatomic structure:</b> " << code.GetMeaning();
+    if (code.GetModifierCount() > 0)
+    {
+      stream << " (" <<code.GetModifier(0).GetMeaning()<<")";
+    }
+  }
+  if (auto code = label->GetSegmentedPropertyCategory(); code.has_value())
+  {
+    stream <<"<br/><b>Type category:</b> " << code->GetMeaning();
+  }
+  if (auto code = label->GetSegmentedPropertyType(); code.has_value())
+  {
+    stream << "<br/><b>Type:</b> " << code->GetMeaning();
+    if (code->GetModifierCount() > 0)
+    {
+      stream << " (" << code->GetModifier(0).GetMeaning() << ")";
+    }
+  }
+  if (!label->GetDescription().empty())
+  {
+    stream <<"<br/><b>Description:</b> " << label->GetDescription();
+  }
+
   stream << "</font>";
   return stream.str();
 }

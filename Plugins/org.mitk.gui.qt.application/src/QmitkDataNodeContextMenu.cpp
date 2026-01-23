@@ -101,6 +101,7 @@ void QmitkDataNodeContextMenu::InitNodeDescriptors()
   m_PlanarDoubleEllipseNodeDescriptor = nodeDescriptorManager->GetDescriptor("PlanarDoubleEllipse");
   m_PlanarBezierCurveNodeDescriptor = nodeDescriptorManager->GetDescriptor("PlanarBezierCurve");
   m_PlanarSubdivisionPolygonNodeDescriptor = nodeDescriptorManager->GetDescriptor("PlanarSubdivisionPolygon");
+  m_MultiLabelSegmentationDescriptor = nodeDescriptorManager->GetDescriptor("MultiLabelSegmentation");
 }
 
 void QmitkDataNodeContextMenu::InitDefaultActions()
@@ -191,6 +192,14 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
   {
     m_SegmentDataNodeDescriptor->AddAction(m_TextureInterpolationAction, false);
     m_DescriptorActionList.push_back(std::make_pair(m_SegmentDataNodeDescriptor, m_TextureInterpolationAction));
+  }
+
+
+  if (nullptr != m_MultiLabelSegmentationDescriptor)
+  {
+    m_3DMultiSegVisStyleAction = new Qmitk3DMultiSegVisStyleAction(m_Parent, workbenchPartSite);
+    m_MultiLabelSegmentationDescriptor->AddAction(m_3DMultiSegVisStyleAction, false);
+    m_DescriptorActionList.push_back(std::make_pair(m_MultiLabelSegmentationDescriptor, m_3DMultiSegVisStyleAction));
   }
 
   m_SurfaceRepresentationAction = new QmitkDataNodeSurfaceRepresentationAction(m_Parent, workbenchPartSite);

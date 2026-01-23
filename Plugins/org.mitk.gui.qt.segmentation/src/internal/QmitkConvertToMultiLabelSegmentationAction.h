@@ -18,7 +18,6 @@ found in the LICENSE file.
 
 #include "vector"
 #include "mitkDataNode.h"
-//#include "mitkImage.h"
 
 class MITK_QT_SEGMENTATION QmitkConvertToMultiLabelSegmentationAction : public QObject, public mitk::IContextMenuAction
 {

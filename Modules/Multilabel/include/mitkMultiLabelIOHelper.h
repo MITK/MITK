@@ -67,7 +67,7 @@ namespace mitk
      * @param inputSegmentation the image to which the loaded preset will be applied
      * @return true if the deserilization was successful and false otherwise
      */
-    static bool LoadMultiLabelSegementationPreset(const std::string &presetFilename,
+    static bool LoadMultiLabelSegmentationPreset(const std::string &presetFilename,
                                         mitk::MultiLabelSegmentation *inputSegmentation);
 
     /**

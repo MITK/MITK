@@ -109,15 +109,45 @@ foreach(bundle_path IN LISTS bundle_paths)
       WORKING_DIRECTORY "${python_framework_path}"
     )
 
-    ############################################
-    # Use @loader_path dependencies for pyMITK #
-    ############################################
+    ##############
+    # Fix pyMITK #
+    ##############
 
     set(pymitk_dir "${python_framework_path}/Versions/A/lib/python3.@Python3_VERSION_MINOR@/site-packages/pyMITK")
-    if(EXISTS "${pymitk_dir}/_pyMITK.so")
+    set(pymitk_lib "${pymitk_dir}/_pyMITK.so")
+    if(EXISTS "${pymitk_lib}")
+      set(freetype_bundled "${bundle_path}/Contents/MacOS/libfreetype.6.dylib")
+      if(EXISTS "${freetype_bundled}")
+
+        #########################################
+        # Rewrite libfreetype path using @rpath #
+        #########################################
+
+        message("    Checking for freetype dependency in pyMITK")
+
+        execute_process(COMMAND otool -L "${pymitk_lib}" OUTPUT_VARIABLE pymitk_otool)
+        string(REGEX MATCH "[^\n\t ]*\\/libfreetype\\.6\\.dylib" from "${pymitk_otool}")
+
+        if(from)
+          set(to "@rpath/libfreetype.6.dylib")
+          message("      Found freetype reference: ${from}")
+          message("      Rewriting to: ${to}")
+
+          execute_process(COMMAND install_name_tool -change "${from}" "${to}" "${pymitk_lib}")
+        else()
+          message("    No freetype dependency to fix")
+        endif()
+      else()
+        message("    Bundled freetype not found")
+      endif()
+
+      ############################################
+      # Use @loader_path dependencies for pyMITK #
+      ############################################
+
       message("    Changing path style of pyMITK dependencies from @executable_path to @loader_path")
       file(GET_RUNTIME_DEPENDENCIES
-        LIBRARIES "${pymitk_dir}/_pyMITK.so"
+        LIBRARIES "${pymitk_lib}"
         BUNDLE_EXECUTABLE "${app_path}"
         PRE_EXCLUDE_REGEXES "^/"
         RESOLVED_DEPENDENCIES_VAR deps

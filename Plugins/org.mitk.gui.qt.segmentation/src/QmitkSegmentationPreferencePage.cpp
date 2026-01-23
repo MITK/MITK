@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <mitkLabelSuggestionHelper.h>
 
+#include <mitkRenderingManager.h>
+
 #include <QFileDialog>
 
 #include <ui_QmitkSegmentationPreferencePageControls.h>
@@ -55,6 +57,7 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
 
   connect(m_Ui->labelSetPresetToolButton, SIGNAL(clicked()), this, SLOT(OnLabelSetPresetButtonClicked()));
   connect(m_Ui->suggestionsToolButton, SIGNAL(clicked()), this, SLOT(OnSuggestionsButtonClicked()));
+  connect(m_Ui->comboBuiltInSuggestions, &QComboBox::currentIndexChanged, this, &QmitkSegmentationPreferencePage::OnBuilInSuggestionsChanged);
 
   this->Update();
   m_Initializing = false;
@@ -78,12 +81,18 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   prefs->PutBool("selection mode", m_Ui->selectionModeCheckBox->isChecked());
   prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
   prefs->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
-  prefs->Put("label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
+
+  prefs->Put("standard label suggestions", m_Ui->comboBuiltInSuggestions->currentText().toStdString());
+  prefs->Put("external label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
   prefs->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
   prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
   prefs->PutBool("enforce suggestions", m_Ui->enforceSuggestionsCheckBox->isChecked());
+
   prefs->PutBool("monailabel allow all models", m_Ui->allowAllModelsCheckBox->isChecked());
   prefs->PutInt("monailabel timeout", std::stoi(m_Ui->monaiTimeoutEdit->text().toStdString()));
+
+  prefs->PutBool("activate 3D rendering", m_Ui->check3DRendering->isChecked());
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 
   return true;
 }
@@ -112,6 +121,7 @@ void QmitkSegmentationPreferencePage::Update()
 
   m_Ui->selectionModeCheckBox->setChecked(prefs->GetBool("selection mode", false));
 
+  //label presets
   auto labelSetPreset = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
   bool isOverriddenByCmdLineArg = !labelSetPreset.empty();
 
@@ -133,21 +143,48 @@ void QmitkSegmentationPreferencePage::Update()
     m_Ui->askForNameRadioButton->setChecked(true);
   }
 
-  mitk::LabelSuggestionHelper::Preferences defaultPrefs;
-  auto labelSuggestions = prefs->Get("label suggestions", defaultPrefs.labelSuggestionFile);
-
   m_Ui->defaultNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
   m_Ui->askForNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
 
-  m_Ui->suggestionsLineEdit->setText(QString::fromStdString(labelSuggestions));
+  //label suggestions
+  mitk::LabelSuggestionHelper::Preferences defaultPrefs;
+
+  auto standardLabelSuggestions = prefs->Get("standard label suggestions", defaultPrefs.standardLabelSuggestionResource);
+
+  FillBuiltInSuggestionComboBox(standardLabelSuggestions);
+
+  auto externalLabelSuggestions = prefs->Get("external label suggestions", defaultPrefs.externalLabelSuggestionFile);
+
+  m_Ui->suggestionsLineEdit->setText(QString::fromStdString(externalLabelSuggestions));
 
   m_Ui->replaceStandardSuggestionsCheckBox->setChecked(prefs->GetBool("replace standard suggestions", defaultPrefs.replaceStandardSuggestions));
   m_Ui->suggestOnceCheckBox->setChecked(prefs->GetBool("suggest once", defaultPrefs.suggestionOnce));
   m_Ui->enforceSuggestionsCheckBox->setChecked(prefs->GetBool("enforce suggestions", defaultPrefs.enforceSuggestions));
 
+  //MONAI
+
   m_Ui->allowAllModelsCheckBox->setChecked(prefs->GetBool("monailabel allow all models", true));
   m_Ui->monaiTimeoutEdit->setText(QString::number(prefs->GetInt("monailabel timeout", 180)));
 
+  m_Ui->check3DRendering->setChecked(prefs->GetBool("activate 3D rendering", true));
+}
+
+void QmitkSegmentationPreferencePage::FillBuiltInSuggestionComboBox(std::string& standardLabelSuggestions)
+{
+  auto builtInConfigs = mitk::LabelSuggestionHelper::GetAllAvailableBuiltInSuggestions();
+  m_Ui->comboBuiltInSuggestions->clear();
+
+  for (const auto& [key, val] : builtInConfigs)
+  {
+    m_Ui->comboBuiltInSuggestions->addItem(QString::fromStdString(key));
+  }
+
+  const QString target = QString::fromStdString(standardLabelSuggestions);
+  int index = m_Ui->comboBuiltInSuggestions->findText(target);
+
+  if (index != -1) {
+    m_Ui->comboBuiltInSuggestions->setCurrentIndex(index);  // Select existing key
+  }
 }
 
 void QmitkSegmentationPreferencePage::OnLabelSetPresetButtonClicked()
@@ -164,4 +201,58 @@ void QmitkSegmentationPreferencePage::OnSuggestionsButtonClicked()
 
   if (!filename.isEmpty())
     m_Ui->suggestionsLineEdit->setText(filename);
+}
+
+void QmitkSegmentationPreferencePage::OnBuilInSuggestionsChanged(int index)
+{
+  auto builtInConfigs = mitk::LabelSuggestionHelper::GetAllAvailableBuiltInSuggestions();
+  m_Ui->labelBuiltInSuggestionsInfo->clear();
+
+  QString info;
+
+  auto finding = builtInConfigs.find(m_Ui->comboBuiltInSuggestions->itemText(index).toStdString());
+
+  if (finding != builtInConfigs.end())
+  {
+    try
+    {
+      auto& json = finding->second;
+      if (json.contains("properties") && json["properties"].is_object())
+      {
+        const auto& props = json["properties"];
+
+        std::string name = props.value("name", "");
+        std::string description = props.value("description", "");
+
+        if (!name.empty()) 
+        {
+          info.append("<i><b>Name:</b> ");
+          info.append(QString::fromStdString(name));
+          info.append("</i>");
+        }
+
+        if (!description.empty())
+        {
+          if (!info.isEmpty())
+          {
+            info.append("<br/>");
+          }
+          info.append("<i><b>Description:</b> ");
+          info.append(QString::fromStdString(description));
+          info.append("</i>");
+        }
+      }
+    }
+    catch (const nlohmann::json::parse_error& e)
+    {
+      info.append("Cannot provide info due to parsing error. Parse error: ").append(e.what());
+    }
+  }
+  else
+  {
+    MITK_ERROR << "Not able to load standard label suggestions. Resource specified in the preferences cannot be find. Invalid resource ID: " << m_Ui->comboBuiltInSuggestions->itemData(index).toString().toStdString();
+  }
+
+  m_Ui->labelBuiltInSuggestionsInfo->setText(info);
+  m_Ui->labelBuiltInSuggestionsInfo->setVisible(!info.isEmpty());
 }

@@ -93,6 +93,13 @@ namespace mitk
     /** Helper that creates a HTML string that contains the display name and a square glyph with the color of the label.
     */
     MITKMULTILABEL_EXPORT std::string CreateHTMLLabelName(const Label* label, const MultiLabelSegmentation* segmentation = nullptr);
+
+    /** Helper that creates a HTML string that contains the detailed information of the label as html content.
+    * If the segmentation instance is provided, also the group information will be printed if the segmentation has more then one group and
+    * contains the label.
+    */
+    MITKMULTILABEL_EXPORT std::string CreateHTMLLabelDetails(const mitk::Label* label, const MultiLabelSegmentation* segmentation = nullptr);
+
   } // namespace LabelSetImageHelper
 } // namespace mitk
 

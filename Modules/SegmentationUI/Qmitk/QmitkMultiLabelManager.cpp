@@ -47,7 +47,7 @@ found in the LICENSE file.
 
 
 QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
-  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelManagerControls), m_ProcessingManualSelection(false), m_DataStorage(nullptr)
+  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelManagerControls), m_AddLabelInstanceShortcut(nullptr), m_ProcessingManualSelection(false), m_DataStorage(nullptr)
 {
   m_Controls->setupUi(this);
 
@@ -83,8 +83,8 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   auto* addLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_A), this);
   connect(addLabelShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabel);
 
-  auto* addLabelInstanceShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), this);
-  connect(addLabelInstanceShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabelInstance);
+  m_AddLabelInstanceShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), this);
+  connect(m_AddLabelInstanceShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabelInstance);
 
   auto* deleteLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_D), this);
   connect(deleteLabelShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::DeleteLabelInstance);
@@ -108,8 +108,6 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
 {
   auto selectedLabels = this->GetSelectedLabels();
 
-  mitk::SegLabelPropModifyUndoRedoHelper undoRedoHelper(this->GetMultiLabelSegmentation(), selectedLabels);
-
   for (auto labelValue : selectedLabels)
   {
     auto currentLabel = this->GetMultiLabelSegmentation()->GetLabel(labelValue);
@@ -127,6 +125,9 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
     }
   }
 
+  // ensure that the labels that where selected before renaming are also selected afterwards
+  // it can differ as renaming might change the location in the view, but the selected index in the view is kept
+  this->SetSelectedLabels(selectedLabels);
 }
 
 void QmitkMultiLabelManager::OnSelectedLabelChanged(const LabelValueVectorType& labels)
@@ -227,12 +228,16 @@ void QmitkMultiLabelManager::UpdateControls()
   }
 
   m_Controls->btnAddGroup->setEnabled(hasWorkingData);
-  m_Controls->btnAddInstance->setEnabled(hasWorkingData && labels.size()==1 && instanceAllowed);
   m_Controls->btnAddLabel->setEnabled(hasWorkingData);
-  m_Controls->btnLoadPreset->setEnabled(hasWorkingData);
+  m_Controls->btnAddInstance->setEnabled(hasWorkingData && labels.size()==1 && instanceAllowed);
+  if (nullptr != m_AddLabelInstanceShortcut)
+    m_AddLabelInstanceShortcut->setEnabled(hasWorkingData && labels.size() == 1 && instanceAllowed);
+
   m_Controls->btnRemoveGroup->setEnabled(hasWorkingData && !labels.empty() && this->GetMultiLabelSegmentation()->GetNumberOfGroups()>1);
   m_Controls->btnRemoveLabel->setEnabled(hasWorkingData && !labels.empty());
   m_Controls->btnRemoveInstance->setEnabled(hasWorkingData && !labels.empty() && hasMultipleInstances);
+
+  m_Controls->btnLoadPreset->setEnabled(hasWorkingData);
   m_Controls->btnSavePreset->setEnabled(hasWorkingData);
 
   if (!hasWorkingData)

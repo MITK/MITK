@@ -62,7 +62,7 @@ public:
   bool SetActiveDataStorage(const std::string& label) override;
 
   bool AddDataStorage(const std::string& label, DataStorage::Pointer storage) override;
-  DataStorageReference CreateDataStorage(const std::string& label) override;
+  std::optional<DataStorageReference> CreateDataStorage(const std::string& label) override;
   std::optional<DataStorageReference> GetDataStorageReference(const std::string& label) const override;
   std::optional<std::string> GetLabel(const DataStorage* storage) const override;
   std::vector<std::string> GetAllLabels() const override;
@@ -72,9 +72,7 @@ public:
 
 private:
   /** Helper to find reference by name. Is not secured. Assumes that the caller holds m_Mutex.*/
-  DataStorageReference* FindStorageByLabel(const std::string& label);
-  /** Helper to find reference by name. Is not secured. Assumes that the caller holds m_Mutex.*/
-  const DataStorageReference* FindStorageByLabel(const std::string& label) const;
+  DataStorageReference FindStorageByLabel(const std::string& label) const;
 
   mutable std::mutex m_Mutex;
   DataStorageReference m_DefaultStorage;

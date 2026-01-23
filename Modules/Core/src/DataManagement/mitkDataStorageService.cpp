@@ -42,10 +42,10 @@ DataStorage::Pointer DataStorageService::GetActiveDataStorage() const
 
   if (!m_ActiveLabel.empty())
   {
-    const DataStorageReference* info = this->FindStorageByLabel(m_ActiveLabel);
-    if (info != nullptr)
+    auto info = this->FindStorageByLabel(m_ActiveLabel);
+    if (info.IsValid())
     {
-      return info->GetStorage();
+      return info.GetStorage();
     }
   }
   return m_DefaultStorage.GetStorage();
@@ -57,10 +57,10 @@ DataStorageReference DataStorageService::GetActiveDataStorageReference() const
 
   if (!m_ActiveLabel.empty())
   {
-    const DataStorageReference* info = this->FindStorageByLabel(m_ActiveLabel);
-    if (info != nullptr)
+    auto info = this->FindStorageByLabel(m_ActiveLabel);
+    if (info.IsValid())
     {
-      return *info;
+      return info;
     }
   }
   return m_DefaultStorage;
@@ -77,7 +77,7 @@ bool DataStorageService::SetActiveDataStorage(const std::string& label)
   }
 
   // Check that the label exists
-  if (this->FindStorageByLabel(label) != nullptr)
+  if (this->FindStorageByLabel(label).IsValid())
   {
     m_ActiveLabel = label;
     return true;
@@ -96,7 +96,7 @@ bool DataStorageService::AddDataStorage(const std::string& label, DataStorage::P
   std::lock_guard<std::mutex> lock(m_Mutex);
 
   // Check for duplicate label
-  if (label == DEFAULT_LABEL || this->FindStorageByLabel(label) != nullptr)
+  if (label == DEFAULT_LABEL || this->FindStorageByLabel(label).IsValid())
   {
     return false;
   }
@@ -105,7 +105,7 @@ bool DataStorageService::AddDataStorage(const std::string& label, DataStorage::P
   return true;
 }
 
-DataStorageReference DataStorageService::CreateDataStorage(const std::string& label)
+std::optional<DataStorageReference> DataStorageService::CreateDataStorage(const std::string& label)
 {
   if (label.empty())
   {
@@ -115,15 +115,16 @@ DataStorageReference DataStorageService::CreateDataStorage(const std::string& la
   std::lock_guard<std::mutex> lock(m_Mutex);
 
   // Check for duplicate label
-  if (label == DEFAULT_LABEL || this->FindStorageByLabel(label) != nullptr)
+  if (label == DEFAULT_LABEL || this->FindStorageByLabel(label).IsValid())
   {
-    return DataStorageReference(); // Return invalid info
+    return std::nullopt;
   }
 
   auto storage = StandaloneDataStorage::New();
-  m_Storages.emplace_back(label, storage.GetPointer());
+  DataStorageReference dsRef(label, storage.GetPointer(), false);
+  m_Storages.push_back(dsRef);
 
-  return info;
+  return dsRef;
 }
 
 std::optional<DataStorageReference> DataStorageService::GetDataStorageReference(const std::string& label) const
@@ -135,10 +136,10 @@ std::optional<DataStorageReference> DataStorageService::GetDataStorageReference(
     return m_DefaultStorage;
   }
 
-  const DataStorageReference* info = this->FindStorageByLabel(label);
-  if (info != nullptr)
+  auto info = this->FindStorageByLabel(label);
+  if (info.IsValid())
   {
-    return *info;
+    return info;
   }
 
   return std::nullopt;
@@ -206,7 +207,7 @@ bool DataStorageService::HasDataStorage(const std::string& label) const
     return true;
   }
 
-  return this->FindStorageByLabel(label) != nullptr;
+  return this->FindStorageByLabel(label).IsValid();
 }
 
 bool DataStorageService::RemoveDataStorage(const std::string& label)
@@ -242,30 +243,17 @@ bool DataStorageService::RemoveDataStorage(const std::string& label)
   return false;
 }
 
-DataStorageReference* DataStorageService::FindStorageByLabel(const std::string& label)
-{
-  // Note: caller must hold m_Mutex
-  for (auto& info : m_Storages)
-  {
-    if (info.GetLabel() == label)
-    {
-      return &info;
-    }
-  }
-  return nullptr;
-}
-
-const DataStorageReference* DataStorageService::FindStorageByLabel(const std::string& label) const
+DataStorageReference DataStorageService::FindStorageByLabel(const std::string& label) const
 {
   // Note: caller must hold m_Mutex
   for (const auto& info : m_Storages)
   {
     if (info.GetLabel() == label)
     {
-      return &info;
+      return info;
     }
   }
-  return nullptr;
+  return DataStorageReference();
 }
 
 } // namespace mitk

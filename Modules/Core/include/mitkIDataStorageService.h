@@ -106,7 +106,8 @@ namespace mitk
      * Use this method to add a DataStorage that was created elsewhere
      * to the service's management. The service takes shared ownership.
      *
-     * \param label Human-readable label for the storage. Must be unique.
+     * \param label Human-readable label for the storage. Must be unique and
+     * not an empty string (as empty labels always indicate default storage).
      * \param storage The DataStorage to register.
      * \return true if registered successfully, false if label already exists
      * (then the state of the service isn't changed and no storage is added.)
@@ -120,9 +121,9 @@ namespace mitk
      * For registering an existing DataStorage, use AddDataStorage() instead.
      *
      * \param label Human-readable label for the storage. Must be unique.
-     * \return Info about the newly created DataStorage, or invalid info if label exists.
+     * \return Info about the newly created DataStorage, or null option if label exists.
      */
-    virtual DataStorageReference CreateDataStorage(const std::string& label) = 0;
+    virtual std::optional<DataStorageReference> CreateDataStorage(const std::string& label) = 0;
 
     /**
      * \brief Get info about a specific DataStorage by label.

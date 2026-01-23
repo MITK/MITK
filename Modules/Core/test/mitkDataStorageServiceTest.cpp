@@ -142,15 +142,15 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE(
       "CreateDataStorage should return valid info",
-      info.IsValid());
+      info->IsValid());
 
     CPPUNIT_ASSERT_MESSAGE(
       "Created storage should have correct label",
-      info.GetLabel() == "TestStorage");
+      info->GetLabel() == "TestStorage");
 
     CPPUNIT_ASSERT_MESSAGE(
       "Created storage should not be marked as default",
-      !info.IsDefault());
+      !info->IsDefault());
 
     CPPUNIT_ASSERT_MESSAGE(
       "Service should have the created storage",
@@ -164,7 +164,7 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE(
       "CreateDataStorage with duplicate label should return invalid info",
-      !info.IsValid());
+      !info.has_value());
   }
 
   void CreateDataStorage_WithEmptyLabel_ReturnsInvalid()
@@ -173,7 +173,7 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE(
       "CreateDataStorage with empty label should return invalid info",
-      !info.IsValid());
+      !info.has_value());
   }
 
   void AddDataStorage_AddsExistingStorage()
@@ -220,7 +220,7 @@ public:
     auto active = m_Service->GetActiveDataStorage();
     CPPUNIT_ASSERT_MESSAGE(
       "GetActiveDataStorage should return the newly set storage",
-      active.GetPointer() == info.GetStorage().GetPointer());
+      active.GetPointer() == info->GetStorage().GetPointer());
 
     auto activeInfo = m_Service->GetActiveDataStorageReference();
     CPPUNIT_ASSERT_MESSAGE(
@@ -269,7 +269,7 @@ public:
     m_Service->CreateDataStorage("Other1");
     auto info = m_Service->CreateDataStorage("LabelTest");
     m_Service->CreateDataStorage("Other2");
-    auto storage = info.GetStorage();
+    auto storage = info->GetStorage();
 
     auto label = m_Service->GetLabel(storage.GetPointer());
     CPPUNIT_ASSERT_MESSAGE(

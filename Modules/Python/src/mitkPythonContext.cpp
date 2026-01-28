@@ -219,14 +219,11 @@ void mitk::PythonContext::TransferBaseDataToPython(mitk::BaseData* baseData, con
 
   try
   {
-    auto main = py::module_::import("__main__");
-    auto globals = main.attr("__dict__");
+    auto globals = py::reinterpret_borrow<py::dict>(m_Impl->GlobalDictionary.get());
 
     if (auto image = dynamic_cast<Image*>(baseData))
     {
-      Image::Pointer imagePtr = image;
-      auto pyImage = py::cast(imagePtr);
-      globals[varName.c_str()] = pyImage;
+      globals[varName.c_str()] = py::cast(image, py::return_value_policy::reference);
     }
     else
     {

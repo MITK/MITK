@@ -647,12 +647,12 @@ void mitk::nnInteractiveTool::StartSession()
 
   {
     std::ostringstream pyCommands; pyCommands
-      << "image = mitk_image.GetAsNumpy()\n"
+      << "image = mitk_image.as_numpy()\n"
       << "spacing = [\n"
       << std::to_string(spacing[2]) << ", "
       << std::to_string(spacing[1]) << ", "
       << std::to_string(spacing[0]) << "]\n"
-      << "target_buffer = mitk_target_buffer.GetAsNumpy()\n"
+      << "target_buffer = mitk_target_buffer.as_numpy()\n"
       << "torch_target_buffer = torch.from_numpy(target_buffer)\n"
       << "session.set_image(image[None], {'spacing': spacing})\n"
       << "session.set_target_buffer(torch_target_buffer)\n";
@@ -743,7 +743,7 @@ void mitk::nnInteractiveTool::Impl::AddScribbleInteraction(const Image* mask) co
   m_PythonContext->TransferBaseDataToPython(const_cast<Image*>(mask), "mitk_scribble_mask");
 
   std::ostringstream pyCommands; pyCommands
-    << "scribble_mask = mitk_scribble_mask.GetAsNumpy()\n"
+    << "scribble_mask = mitk_scribble_mask.as_numpy()\n"
     << "session.add_scribble_interaction(\n"
     << "    scribble_mask.astype(np.uint8),\n"
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
@@ -757,7 +757,7 @@ void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask) const
   m_PythonContext->TransferBaseDataToPython(const_cast<Image*>(mask), "mitk_lasso_mask");
 
   std::ostringstream pyCommands; pyCommands
-    << "lasso_mask = mitk_lasso_mask.GetAsNumpy()\n"
+    << "lasso_mask = mitk_lasso_mask.as_numpy()\n"
     << "session.add_lasso_interaction(\n"
     << "    lasso_mask.astype(np.uint8),\n"
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
@@ -771,7 +771,7 @@ void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(MultiLabelSegmentat
   m_PythonContext->TransferBaseDataToPython(this->InitialSeg, "mitk_initial_seg");
 
   std::ostringstream pyCommands; pyCommands
-    << "initial_seg = mitk_initial_seg.GetAsNumpy()\n"
+    << "initial_seg = mitk_initial_seg.as_numpy()\n"
     << "session.add_initial_seg_interaction(\n"
     << "    initial_seg.astype(np.uint8),\n"
     << "    run_prediction=" << (this->AutoRefine ? "True" : "False") << '\n'

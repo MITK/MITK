@@ -652,7 +652,7 @@ void mitk::nnInteractiveTool::StartSession()
       << std::to_string(spacing[2]) << ", "
       << std::to_string(spacing[1]) << ", "
       << std::to_string(spacing[0]) << "]\n"
-      << "target_buffer = mitk_target_buffer.as_numpy()\n"
+      << "target_buffer = mitk_target_buffer.as_numpy(writeable=False)\n" // TODO: Should be writable
       << "torch_target_buffer = torch.from_numpy(target_buffer)\n"
       << "session.set_image(image[None], {'spacing': spacing})\n"
       << "session.set_target_buffer(torch_target_buffer)\n";
@@ -668,7 +668,10 @@ void mitk::nnInteractiveTool::EndSession()
   std::ostringstream pyCommands; pyCommands
     << "session._reset_session()\n"
     << "del session.network\n"
-    << "del session\n";
+    << "del session\n"
+    << "del torch_target_buffer\n"
+    << "del target_buffer\n"
+    << "del image\n";
 
   if (m_Impl->GetBackend() == Backend::CUDA)
     pyCommands << "torch.cuda.empty_cache()\n";
@@ -747,7 +750,8 @@ void mitk::nnInteractiveTool::Impl::AddScribbleInteraction(const Image* mask) co
     << "session.add_scribble_interaction(\n"
     << "    scribble_mask.astype(np.uint8),\n"
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
-    << ")\n";
+    << ")\n"
+    << "del scribble_mask\n";
 
   m_PythonContext->ExecuteString(pyCommands.str());
 }
@@ -761,7 +765,8 @@ void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask) const
     << "session.add_lasso_interaction(\n"
     << "    lasso_mask.astype(np.uint8),\n"
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
-    << ")\n";
+    << ")\n"
+    << "del lasso_mask\n";
 
   m_PythonContext->ExecuteString(pyCommands.str());
 }
@@ -775,7 +780,8 @@ void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(MultiLabelSegmentat
     << "session.add_initial_seg_interaction(\n"
     << "    initial_seg.astype(np.uint8),\n"
     << "    run_prediction=" << (this->AutoRefine ? "True" : "False") << '\n'
-    << ")\n";
+    << ")\n"
+    << "del initial_seg\n";
 
   m_PythonContext->ExecuteString(pyCommands.str());
 

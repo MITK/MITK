@@ -390,7 +390,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
         return;
     }
 
-    previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep);
+    previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0, ImageAccessorBase::IgnoreLock);
   }
   else if (m_Impl->InitialSeg.IsNotNull())
   {
@@ -652,7 +652,7 @@ void mitk::nnInteractiveTool::StartSession()
       << std::to_string(spacing[2]) << ", "
       << std::to_string(spacing[1]) << ", "
       << std::to_string(spacing[0]) << "]\n"
-      << "target_buffer = mitk_target_buffer.as_numpy(writeable=False)\n" // TODO: Should be writable
+      << "target_buffer = mitk_target_buffer.as_numpy(writeable=True)\n"
       << "torch_target_buffer = torch.from_numpy(target_buffer)\n"
       << "session.set_image(image[None], {'spacing': spacing})\n"
       << "session.set_target_buffer(torch_target_buffer)\n";
@@ -785,7 +785,7 @@ void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(MultiLabelSegmentat
 
   m_PythonContext->ExecuteString(pyCommands.str());
 
-  previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), this->TargetBuffer, timeStep);
+  previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), this->TargetBuffer, timeStep, 0, ImageAccessorBase::IgnoreLock);
 }
 
 void mitk::nnInteractiveTool::Impl::ResetInteractions() const

@@ -520,7 +520,7 @@ namespace mitk
     * @pre groupID must indicate an existing group
     * @pre sourceImage and this instance must have the same time geometry.
     */
-    void UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep = 0);
+    void UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep = 0, int sourceAccessOptions = ImageAccessorBase::DefaultBehavior);
 
     /**
      * @brief clears all label pixel content from the indicated group.

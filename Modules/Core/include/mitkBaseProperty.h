@@ -110,6 +110,52 @@ namespace mitk
     virtual bool Assign(const BaseProperty &) = 0;
   };
 
+  /**
+   * @brief Serialize a property to self contained JSON.
+   *
+   * This is a helper methods that converts the property in a self contained json (so
+   * nothing more is needed to serialize or deserialize w/o any loss.
+   * Simple property types (StringProperty, IntProperty, FloatProperty, BoolProperty)
+   * are serialized directly as their JSON primitive values.
+   * Complex types are serialized as objects with "type" and "value" fields.
+   *
+   * JSON format:
+   * - Simple types (string, int, float, bool) serialize directly as their JSON value
+   * - Complex types use: {"type": "ClassName", "value": {...}}
+   *
+   * @param property The property to serialize. Must not be nullptr.
+   * @return JSON representation of the property.
+   * @throws mitk::Exception if property is nullptr or does not support JSON serialization.
+   */
+  MITKCORE_EXPORT nlohmann::json ConvertPropertyToSelfContainedJson(const BaseProperty* property);
+
+  /**
+   * @brief Deserialize a property from self contained JSON representation.
+   *
+   * This is a helper methods that converts the property from a self contained json (so
+   * nothing more is needed to serialize or deserialize w/o any loss.
+   * Handles both simple JSON values (string, int, float, bool) and complex
+   * property objects with "type" and "value" fields.
+   *
+   * For simple values, the type is inferred from the JSON type:
+   * - JSON string -> StringProperty
+   * - JSON integer -> IntProperty
+   * - JSON float -> FloatProperty
+   * - JSON boolean -> BoolProperty
+   *
+   * For complex types, uses IPropertyDeserialization service to create instances.
+   *
+   *
+   * JSON format:
+   * - Simple types (string, int, float, bool) serialize directly as their JSON value
+   * - Complex types use: {"type": "ClassName", "value": {...}}
+   *
+   * @param json The JSON value to deserialize.
+   * @return Created property.
+   * @throws mitk::Exception if JSON type is unsupported or deserialization fails.
+   */
+  MITKCORE_EXPORT BaseProperty::Pointer ConvertPropertyFromSelfContainedJson(const nlohmann::json& json);
+
 } // namespace mitk
 
 #endif

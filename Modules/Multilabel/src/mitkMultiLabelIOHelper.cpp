@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <mitkBasePropertySerializer.h>
 #include <mitkDICOMSegmentationConstants.h>
 #include <mitkProperties.h>
-#include <mitkPropertyJsonSerialization.h>
 #include <mitkStringProperty.h>
 
 #include "itkMetaDataDictionary.h"
@@ -599,7 +598,7 @@ void SerializeLabelCustomPropertiesToJSON(const mitk::Label* label, nlohmann::js
 nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelPropertyToJSON(const BaseProperty* property)
 {
   // Delegate to the generic PropertyJsonSerialization utility in MitkCore
-  return PropertyJsonSerialization::ToJson(property);
+  return ConvertPropertyToSelfContainedJson(property);
 }
 
 nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelToJSON(const Label* label)
@@ -791,7 +790,7 @@ mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nl
       // Delegate to PropertyJsonSerialization for property deserialization
       try
       {
-        auto property = PropertyJsonSerialization::FromJson(jValue);
+        auto property = ConvertPropertyFromSelfContainedJson(jValue);
         resultLabel->SetProperty(internalKey, property);
       }
       catch (Exception& e)

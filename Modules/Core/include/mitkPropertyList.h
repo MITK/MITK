@@ -263,6 +263,30 @@ namespace mitk
     itk::LightObject::Pointer InternalClone() const override;
   };
 
+  /**
+   * @brief Serialize all properties from a PropertyList to self contained JSON representations.
+   *
+   * This is a helper methods that converts the property list to self contained json
+   * representations (see ConvertPropertyToSelfContainedJson() for more details).
+   *
+   * @param propertyList The list to serialize. Must not be nullptr.
+   * @return JSON object with property names as keys.
+   * @throws mitk::Exception if propertyList is nullptr or a property fails to serialize.
+   */
+  MITKCORE_EXPORT nlohmann::json ConvertPropertyListToSelfContainedJson(const mitk::PropertyList* propertyList);
+
+  /**
+   * @brief Deserialize a property list from self contained JSON representations.
+   *
+   * This is a helper methods that converts the property list from self contained json
+   * representations (see ConvertPropertyFromSelfContainedJson() for more details).
+   *
+   * @param json Source JSON object containing properties.
+   * @return New PropertyList containing the deserialized properties.
+   * @throws mitk::Exception if JSON is not an object or a property fails to deserialize.
+   */
+  MITKCORE_EXPORT PropertyList::Pointer ConvertPropertyListFromSelfContainedJson(const nlohmann::json& json);
+
 } // namespace mitk
 
 #endif

@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "mitkTestFixture.h"
 #include "mitkTestingMacros.h"
 
-#include <mitkPropertyJsonSerialization.h>
 #include <mitkColorProperty.h>
 #include <mitkProperties.h>
 #include <mitkPropertyList.h>
@@ -49,7 +48,7 @@ public:
     auto prop = mitk::StringProperty::New("test value");
 
     // Serialize
-    auto json = mitk::PropertyJsonSerialization::ToJson(prop);
+    auto json = mitk::ConvertPropertyToSelfContainedJson(prop);
 
     // String properties should serialize directly as JSON string
     CPPUNIT_ASSERT_MESSAGE("StringProperty should serialize as JSON string",
@@ -57,7 +56,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("test value"), json.get<std::string>());
 
     // Deserialize
-    auto restored = mitk::PropertyJsonSerialization::FromJson(json);
+    auto restored = mitk::ConvertPropertyFromSelfContainedJson(json);
     CPPUNIT_ASSERT_MESSAGE("Deserialized property should not be null", restored.IsNotNull());
 
     auto restoredString = dynamic_cast<mitk::StringProperty*>(restored.GetPointer());
@@ -70,7 +69,7 @@ public:
     auto prop = mitk::IntProperty::New(42);
 
     // Serialize
-    auto json = mitk::PropertyJsonSerialization::ToJson(prop);
+    auto json = mitk::ConvertPropertyToSelfContainedJson(prop);
 
     // Int properties should serialize directly as JSON integer
     CPPUNIT_ASSERT_MESSAGE("IntProperty should serialize as JSON integer",
@@ -78,7 +77,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(42, json.get<int>());
 
     // Deserialize
-    auto restored = mitk::PropertyJsonSerialization::FromJson(json);
+    auto restored = mitk::ConvertPropertyFromSelfContainedJson(json);
     CPPUNIT_ASSERT_MESSAGE("Deserialized property should not be null", restored.IsNotNull());
 
     auto restoredInt = dynamic_cast<mitk::IntProperty*>(restored.GetPointer());
@@ -91,7 +90,7 @@ public:
     auto prop = mitk::FloatProperty::New(3.14f);
 
     // Serialize
-    auto json = mitk::PropertyJsonSerialization::ToJson(prop);
+    auto json = mitk::ConvertPropertyToSelfContainedJson(prop);
 
     // Float properties should serialize directly as JSON number
     CPPUNIT_ASSERT_MESSAGE("FloatProperty should serialize as JSON number",
@@ -99,7 +98,7 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.14f, json.get<float>(), 0.001f);
 
     // Deserialize
-    auto restored = mitk::PropertyJsonSerialization::FromJson(json);
+    auto restored = mitk::ConvertPropertyFromSelfContainedJson(json);
     CPPUNIT_ASSERT_MESSAGE("Deserialized property should not be null", restored.IsNotNull());
 
     auto restoredFloat = dynamic_cast<mitk::FloatProperty*>(restored.GetPointer());
@@ -112,7 +111,7 @@ public:
     auto prop = mitk::DoubleProperty::New(3.14159265359);
 
     // Serialize
-    auto json = mitk::PropertyJsonSerialization::ToJson(prop);
+    auto json = mitk::ConvertPropertyToSelfContainedJson(prop);
 
     // DoubleProperty should serialize as complex type to avoid conversion inconsistency
     CPPUNIT_ASSERT_MESSAGE("DoubleProperty should serialize as JSON object",
@@ -124,7 +123,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("DoubleProperty"), json["type"].get<std::string>());
 
     // Deserialize
-    auto restored = mitk::PropertyJsonSerialization::FromJson(json);
+    auto restored = mitk::ConvertPropertyFromSelfContainedJson(json);
     CPPUNIT_ASSERT_MESSAGE("Deserialized property should not be null", restored.IsNotNull());
 
     // Should deserialize back to DoubleProperty, not FloatProperty
@@ -139,8 +138,8 @@ public:
     auto propFalse = mitk::BoolProperty::New(false);
 
     // Serialize
-    auto jsonTrue = mitk::PropertyJsonSerialization::ToJson(propTrue);
-    auto jsonFalse = mitk::PropertyJsonSerialization::ToJson(propFalse);
+    auto jsonTrue = mitk::ConvertPropertyToSelfContainedJson(propTrue);
+    auto jsonFalse = mitk::ConvertPropertyToSelfContainedJson(propFalse);
 
     // Bool properties should serialize directly as JSON boolean
     CPPUNIT_ASSERT_MESSAGE("BoolProperty(true) should serialize as JSON boolean",
@@ -151,8 +150,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(false, jsonFalse.get<bool>());
 
     // Deserialize
-    auto restoredTrue = mitk::PropertyJsonSerialization::FromJson(jsonTrue);
-    auto restoredFalse = mitk::PropertyJsonSerialization::FromJson(jsonFalse);
+    auto restoredTrue = mitk::ConvertPropertyFromSelfContainedJson(jsonTrue);
+    auto restoredFalse = mitk::ConvertPropertyFromSelfContainedJson(jsonFalse);
 
     CPPUNIT_ASSERT_MESSAGE("Deserialized true property should not be null", restoredTrue.IsNotNull());
     CPPUNIT_ASSERT_MESSAGE("Deserialized false property should not be null", restoredFalse.IsNotNull());
@@ -175,7 +174,7 @@ public:
     auto prop = mitk::ColorProperty::New(color);
 
     // Serialize
-    auto json = mitk::PropertyJsonSerialization::ToJson(prop);
+    auto json = mitk::ConvertPropertyToSelfContainedJson(prop);
 
     // ColorProperty is complex, should have type and value
     CPPUNIT_ASSERT_MESSAGE("ColorProperty should serialize as JSON object",
@@ -187,7 +186,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("ColorProperty"), json["type"].get<std::string>());
 
     // Deserialize
-    auto restored = mitk::PropertyJsonSerialization::FromJson(json);
+    auto restored = mitk::ConvertPropertyFromSelfContainedJson(json);
     CPPUNIT_ASSERT_MESSAGE("Deserialized property should not be null", restored.IsNotNull());
 
     auto restoredColor = dynamic_cast<mitk::ColorProperty*>(restored.GetPointer());
@@ -208,7 +207,7 @@ public:
     propList->SetBoolProperty("visible", true);
 
     // Serialize
-    auto json = mitk::PropertyJsonSerialization::PropertyListToJson(propList);
+    auto json = mitk::ConvertPropertyListToSelfContainedJson(propList);
 
     // Should be an object with all properties
     CPPUNIT_ASSERT_MESSAGE("PropertyList should serialize as JSON object",
@@ -233,7 +232,7 @@ public:
       {"visible", false}
     };
 
-    auto propList = mitk::PropertyJsonSerialization::PropertyListFromJson(json);
+    auto propList = mitk::ConvertPropertyListFromSelfContainedJson(json);
     CPPUNIT_ASSERT_MESSAGE("PropertyList should not be null", propList.IsNotNull());
 
     std::string name;
@@ -254,27 +253,27 @@ public:
 
   void TestNullPropertyThrows()
   {
-    CPPUNIT_ASSERT_THROW(mitk::PropertyJsonSerialization::ToJson(nullptr), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::ConvertPropertyToSelfContainedJson(nullptr), mitk::Exception);
   }
 
   void TestNullPropertyListThrows()
   {
-    CPPUNIT_ASSERT_THROW(mitk::PropertyJsonSerialization::PropertyListToJson(nullptr), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::ConvertPropertyListToSelfContainedJson(nullptr), mitk::Exception);
   }
 
   void TestUnsupportedJsonTypeThrows()
   {
     // JSON array is not a supported type for property deserialization
     nlohmann::json jsonArray = nlohmann::json::array({1, 2, 3});
-    CPPUNIT_ASSERT_THROW(mitk::PropertyJsonSerialization::FromJson(jsonArray), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::ConvertPropertyFromSelfContainedJson(jsonArray), mitk::Exception);
 
     // JSON null is not a supported type
     nlohmann::json jsonNull = nullptr;
-    CPPUNIT_ASSERT_THROW(mitk::PropertyJsonSerialization::FromJson(jsonNull), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::ConvertPropertyFromSelfContainedJson(jsonNull), mitk::Exception);
 
     // Non-object JSON for PropertyListFromJson should throw
     nlohmann::json jsonString = "not an object";
-    CPPUNIT_ASSERT_THROW(mitk::PropertyJsonSerialization::PropertyListFromJson(jsonString), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::ConvertPropertyListFromSelfContainedJson(jsonString), mitk::Exception);
   }
 };
 

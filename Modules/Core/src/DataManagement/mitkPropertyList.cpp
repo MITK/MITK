@@ -420,3 +420,40 @@ void mitk::PropertyList::FromJSON(const nlohmann::json& j)
 
   m_Properties = properties;
 }
+
+nlohmann::json mitk::ConvertPropertyListToSelfContainedJson(const mitk::PropertyList* propertyList)
+{
+  if (propertyList == nullptr)
+  {
+    mitkThrow() << "Invalid call of ConvertPropertyListToSelfContainedJson. "
+      << "Passed propertyList pointer is null.";
+  }
+
+  nlohmann::json result = nlohmann::json::object();
+
+  const PropertyList::PropertyMap* propMap = propertyList->GetMap();
+  for (const auto& [key, property] : *propMap)
+  {
+    result[key] = ConvertPropertyToSelfContainedJson(property);
+  }
+
+  return result;
+}
+
+mitk::PropertyList::Pointer mitk::ConvertPropertyListFromSelfContainedJson(const nlohmann::json& json)
+{
+  if (!json.is_object())
+  {
+    mitkThrow() << "Invalid JSON for ConvertPropertyListFromSelfContainedJson. Expected JSON object.";
+  }
+
+  auto propertyList = PropertyList::New();
+
+  for (const auto& [key, value] : json.items())
+  {
+    auto property = ConvertPropertyFromSelfContainedJson(value);
+    propertyList->SetProperty(key, property);
+  }
+
+  return propertyList;
+}

@@ -60,7 +60,7 @@ void InitPixelType(py::module_& m)
     });
 
   m.def("make_pixel_type",
-    py::overload_cast<const py::object&, size_t>(&MakePixelType),
+    [](const py::object& dtype, size_t components) { return MakePixelType(dtype, components); },
     py::arg("dtype"),
     py::arg("components") = 1);
 }

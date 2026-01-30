@@ -11,7 +11,7 @@ pybind11_add_module(mitk_python_bindings
 )
 
 target_link_libraries(mitk_python_bindings
-  PRIVATE MitkCore
+  PRIVATE MitkCore Python3::Python
 )
 
 set_target_properties(mitk_python_bindings PROPERTIES

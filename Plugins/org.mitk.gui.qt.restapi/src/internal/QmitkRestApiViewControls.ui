@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkRestApiViewControls</class>
+ <widget class="QWidget" name="QmitkRestApiViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>REST API</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="statusGroupBox">
+     <property name="title">
+      <string>Server Status</string>
+     </property>
+     <layout class="QVBoxLayout" name="statusLayout">
+      <item>
+       <layout class="QHBoxLayout" name="statusIndicatorLayout">
+        <item>
+         <widget class="QWidget" name="m_StatusIndicator" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string>background-color: gray; border-radius: 8px;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="m_StatusLabel">
+          <property name="text">
+           <string>Unknown</string>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="statusSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_RefreshButton">
+          <property name="text">
+           <string>Refresh</string>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>80</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QFormLayout" name="serverInfoLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="urlLabel">
+          <property name="text">
+           <string>Server URL:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="urlLayout">
+          <item>
+           <widget class="QLabel" name="m_ServerUrlLabel">
+            <property name="text">
+             <string>-</string>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::TextSelectableByMouse</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="m_CopyUrlButton">
+            <property name="text">
+             <string>Copy</string>
+            </property>
+            <property name="toolTip">
+             <string>Copy server URL to clipboard</string>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>60</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="urlSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="hostPortLabel">
+          <property name="text">
+           <string>Configuration:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="m_HostPortLabel">
+          <property name="text">
+           <string>-</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="m_StartStopButton">
+        <property name="text">
+         <string>Start Server</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="activityGroupBox">
+     <property name="title">
+      <string>Request Activity</string>
+     </property>
+     <layout class="QFormLayout" name="activityLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="clientIPsLabel">
+        <property name="text">
+         <string>Connected Clients:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="m_ClientIPsLabel">
+        <property name="text">
+         <string>-</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::TextSelectableByMouse</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lastEndpointLabel">
+        <property name="text">
+         <string>Last Request:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="m_LastEndpointLabel">
+        <property name="text">
+         <string>-</string>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::TextSelectableByMouse</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lastResponseCodeLabel">
+        <property name="text">
+         <string>Response Code:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="m_LastResponseCodeLabel">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="m_TabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="queriedTab">
+      <attribute name="title">
+       <string>Queried Nodes</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="queriedTabLayout">
+       <item>
+        <widget class="QLabel" name="queriedInfoLabel">
+         <property name="text">
+          <string>Nodes that have been accessed via REST API:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QmitkDataStorageListInspector" name="m_QueriedNodesInspector"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="modifiedTab">
+      <attribute name="title">
+       <string>Modified Nodes</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="modifiedTabLayout">
+       <item>
+        <widget class="QLabel" name="modifiedInfoLabel">
+         <property name="text">
+          <string>Nodes that have been modified via REST API:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QmitkDataStorageListInspector" name="m_ModifiedNodesInspector"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageListInspector</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkDataStorageListInspector.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

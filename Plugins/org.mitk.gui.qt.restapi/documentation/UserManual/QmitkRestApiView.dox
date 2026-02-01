@@ -1,0 +1,199 @@
+/**
+
+\page org_mitk_views_restapi The REST API View
+
+\imageMacro{restapi-dox.svg,"Icon of the REST API View",2.00}
+
+\tableofcontents
+
+\section org_mitk_views_restapi_overview Overview
+
+The REST API View provides monitoring and control for the MITK REST API server. This server enables external applications such as Python scripts, web applications, or other tools to interact with MITK Workbench programmatically via standard HTTP requests.
+
+With the REST API, external processes can:
+- Query and modify data nodes in the Data Storage
+- Read and write node properties
+- Create and delete nodes
+- Access node hierarchies and relationships
+
+The REST API View allows you to:
+- Start and stop the REST server
+- Monitor server status and connection information
+- Copy the server URL for use in external applications
+- Track which clients have connected
+- See the last request processed
+- View which nodes have been accessed or modified via the API
+
+\imageMacro{QmitkRestApiView_Overview.png,"REST API View overview",16.00}
+
+\section org_mitk_views_restapi_serverstatus Server Status
+
+The Server Status section displays the current state of the REST API server:
+
+\subsection org_mitk_views_restapi_statusindicator Status Indicator
+
+A colored indicator shows the server state at a glance:
+- <b>Green</b>: Server is running and accepting connections
+- <b>Red</b>: Server is stopped
+- <b>Gray</b>: REST API service is not available
+
+\subsection org_mitk_views_restapi_serverurl Server URL
+
+When the server is running, the full URL is displayed (e.g., <tt>http://127.0.0.1:8080</tt>). Click the <b>Copy</b> button to copy this URL to the clipboard for use in external applications.
+
+\subsection org_mitk_views_restapi_configuration Configuration
+
+Shows the current host and port configuration (e.g., <tt>127.0.0.1:8080</tt>). This can be changed in the preferences.
+
+\subsection org_mitk_views_restapi_startstop Start/Stop Server
+
+Click the <b>Start Server</b> / <b>Stop Server</b> button to control the server lifecycle. The button text changes based on the current server state.
+
+\section org_mitk_views_restapi_activity Request Activity
+
+The Request Activity section provides information about client connections and requests:
+
+\subsection org_mitk_views_restapi_clients Connected Clients
+
+Displays a list of IP addresses that have sent requests to the server since it was started. This helps you identify which machines or processes are connected.
+
+\subsection org_mitk_views_restapi_lastrequest Last Request
+
+Shows the most recent request processed by the server, including:
+- <b>HTTP Method</b>: GET, POST, PUT, PATCH, or DELETE
+- <b>Endpoint</b>: The API path that was accessed (e.g., <tt>/api/v1/datastorage/nodes</tt>)
+
+\subsection org_mitk_views_restapi_responsecode Response Code
+
+Shows the HTTP response code of the last request:
+- <b>200</b>: Success
+- <b>201</b>: Created (for POST requests)
+- <b>400</b>: Bad request
+- <b>404</b>: Not found
+- <b>500</b>: Internal server error
+
+\section org_mitk_views_restapi_nodetabs Node Tracking Tabs
+
+The view includes two tabs that show which nodes have been accessed via the REST API:
+
+\subsection org_mitk_views_restapi_queriednodes Queried Nodes
+
+Lists all data nodes that have been accessed (read) through the REST API. When a node is queried via the API, it receives a <tt>restapi.uid</tt> property that uniquely identifies it for API operations.
+
+\subsection org_mitk_views_restapi_modifiednodes Modified Nodes
+
+Lists all data nodes that have been modified through the REST API. This includes nodes where properties have been changed, or nodes that have been created via the API. Modified nodes receive a <tt>restapi.modified</tt> property.
+
+These lists help you track which parts of your data have been touched by external processes.
+
+\section org_mitk_views_restapi_preferences Preferences
+
+The REST API preferences can be accessed via <b>Window > Preferences > REST API</b> or by pressing <tt>Ctrl+P</tt> and navigating to REST API.
+
+\imageMacro{QmitkRestApiView_Preferences.png,"REST API Preferences",16.00}
+
+\subsection org_mitk_views_restapi_prefs_general General Settings
+
+- <b>Enable REST API</b>: Master switch to enable or disable the REST API functionality
+- <b>Auto-start server</b>: When enabled, the server starts automatically when MITK Workbench launches
+
+\subsection org_mitk_views_restapi_prefs_network Network Settings
+
+- <b>Host</b>: The network interface to bind to (default: <tt>127.0.0.1</tt> for localhost only)
+  - Use <tt>127.0.0.1</tt> to only allow connections from the local machine
+  - Use <tt>0.0.0.0</tt> to allow connections from any network interface (use with caution)
+- <b>Port</b>: The port number to listen on (default: <tt>8080</tt>)
+
+\subsection org_mitk_views_restapi_prefs_performance Performance Settings
+
+- <b>Thread Pool Size</b>: Number of threads for handling concurrent requests (default: 4)
+- <b>Read Timeout</b>: Maximum time in seconds to wait for incoming request data (default: 30)
+- <b>Write Timeout</b>: Maximum time in seconds to wait for sending response data (default: 30)
+
+\section org_mitk_views_restapi_usage Using the REST API
+
+\subsection org_mitk_views_restapi_usage_quickstart Quick Start
+
+1. Open the REST API View from <b>Window > Show View > REST API</b>
+2. Click <b>Start Server</b>
+3. Copy the server URL using the <b>Copy</b> button
+4. Use the URL in your external application (Python script, web browser, etc.)
+
+\subsection org_mitk_views_restapi_usage_endpoints API Endpoints
+
+The REST API provides the following main endpoints (base URL: <tt>http://host:port/api/v1</tt>):
+
+<table>
+<tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+<tr><td>GET</td><td><tt>/health</tt></td><td>Health check</td></tr>
+<tr><td>GET</td><td><tt>/info</tt></td><td>API information</td></tr>
+<tr><td>GET</td><td><tt>/datastorage/nodes</tt></td><td>List all nodes</td></tr>
+<tr><td>POST</td><td><tt>/datastorage/nodes</tt></td><td>Create a new node</td></tr>
+<tr><td>GET</td><td><tt>/datastorage/nodes/{uid}</tt></td><td>Get node details</td></tr>
+<tr><td>DELETE</td><td><tt>/datastorage/nodes/{uid}</tt></td><td>Delete a node</td></tr>
+<tr><td>GET</td><td><tt>/datastorage/nodes/{uid}/properties</tt></td><td>Get node properties</td></tr>
+<tr><td>PUT</td><td><tt>/datastorage/nodes/{uid}/properties/{key}</tt></td><td>Set a property</td></tr>
+</table>
+
+\subsection org_mitk_views_restapi_usage_python Python Example
+
+Here is a simple Python example to list all nodes:
+
+\code{.py}
+import requests
+
+# Use the URL from the REST API View
+url = "http://127.0.0.1:8080/api/v1/datastorage/nodes"
+
+response = requests.get(url)
+if response.status_code == 200:
+    nodes = response.json()["data"]
+    for node in nodes:
+        print(f"{node['name']} ({node['data_type']})")
+\endcode
+
+\subsection org_mitk_views_restapi_usage_curl Testing with curl
+
+You can test the API using curl from the command line:
+
+\code{.sh}
+# Check server health
+curl http://127.0.0.1:8080/api/v1/health
+
+# List all nodes
+curl http://127.0.0.1:8080/api/v1/datastorage/nodes
+
+# Get a specific node (replace {uid} with actual UID)
+curl http://127.0.0.1:8080/api/v1/datastorage/nodes/{uid}
+\endcode
+
+\section org_mitk_views_restapi_security Security Considerations
+
+<b>Important:</b> The REST API is intended for local development and trusted network environments.
+
+- By default, the server only listens on <tt>127.0.0.1</tt> (localhost), meaning only processes on the same machine can connect.
+- If you change the host to <tt>0.0.0.0</tt>, the server becomes accessible from other machines on your network. Only do this in trusted environments.
+- There is currently no authentication. Any process that can reach the server can read and modify your data.
+- For production or untrusted environments, consider using a firewall or VPN.
+
+\section org_mitk_views_restapi_troubleshooting Troubleshooting
+
+\subsection org_mitk_views_restapi_trouble_notavailable "REST API service not available"
+
+This message appears when the REST API module is not loaded. Ensure:
+- The MitkRESTAPI module is included in your MITK build
+- The autoload module is properly configured
+
+\subsection org_mitk_views_restapi_trouble_portinuse Server fails to start
+
+If the server fails to start, the status will show an error message. Common causes:
+- <b>Port already in use</b>: Another application is using the configured port. Change the port in preferences.
+- <b>Permission denied</b>: On some systems, ports below 1024 require administrator privileges.
+
+\subsection org_mitk_views_restapi_trouble_noconnection Cannot connect from external application
+
+- Verify the server is running (green status indicator)
+- Check that you're using the correct URL (use the Copy button)
+- If connecting from another machine, ensure the host is set to <tt>0.0.0.0</tt> and no firewall is blocking the connection
+
+*/

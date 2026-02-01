@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.RestApiPreferencePage"
+          name="REST API"
+          class="QmitkRestApiPreferencePage"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.restapi"
+          name="REST API"
+          class="QmitkRestApiView"
+          icon="resources/restapi.svg"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.RestApiPreferencePageKeywords"
+             label="rest api server http port host"/>
+  </extension>
+
+</plugin>

@@ -41,17 +41,18 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      //##Documentation
-      //## @brief Adds a DataNode containing a data object to its internal storage
-      //##
-      //## This Method adds a new data object to the StandaloneDataStorage. The new object is
-      //## passed in the first parameter. The second parameter is a set
-      //## of source objects, that were used to create this object. The new object will have
-      //## a 'was created from' relation to its source objects.
-      //## the addition of a new object will fire the notification mechanism.
-      //## If the node parameter is nullptr or if the DataNode has already been added,
-      //## an exception will be thrown.
-      void Add(mitk::DataNode *node, const mitk::DataStorage::SetOfObjects *parents = nullptr) override;
+    //##Documentation
+    //## @brief Adds a DataNode containing a data object to its internal storage
+    //##
+    //## This Method adds a new data object to the StandaloneDataStorage. The new object is
+    //## passed in the first parameter. The second parameter is a set
+    //## of source objects, that were used to create this object. The new object will have
+    //## a 'was created from' relation to its source objects.
+    //## the addition of a new object will fire the notification mechanism.
+    //## If the node parameter is nullptr or if the DataNode has already been added,
+    //## an exception will be thrown.
+    void Add(mitk::DataNode *node, const mitk::DataStorage::SetOfObjects *parents = nullptr) override;
+    using DataStorage::Add; //ensure that also "void Add(DataNode *node, DataNode *parent);" is visible
 
     //##Documentation
     //## @brief Removes node from the StandaloneDataStorage

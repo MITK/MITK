@@ -1,0 +1,20 @@
+/**
+  \defgroup org_mitk_gui_qt_restapi org.mitk.gui.qt.restapi
+  \ingroup MITKPlugins
+
+  \brief Plugin for monitoring and controlling the MITK REST API server.
+
+  This plugin provides a view for managing the REST API server that enables external applications
+  to interact with MITK Workbench via HTTP requests. It also provides a preferences page for
+  configuring server settings such as host, port, and timeouts.
+
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_restapi_internal Internal
+  \ingroup org_mitk_gui_qt_restapi
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.restapi plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

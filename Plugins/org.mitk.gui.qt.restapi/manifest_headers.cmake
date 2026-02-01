@@ -1,0 +1,5 @@
+set(Plugin-Name "MITK REST API")
+set(Plugin-Version "1.0")
+set(Plugin-Vendor "DKFZ")
+set(Plugin-ContactAddress "https://www.mitk.org")
+set(Require-Plugin org.mitk.gui.qt.common)

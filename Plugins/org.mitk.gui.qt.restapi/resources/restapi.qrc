@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/org.mitk.gui.qt.restapi">
+    <file>restapi.svg</file>
+  </qresource>
+</RCC>

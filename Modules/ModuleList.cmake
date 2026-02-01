@@ -4,6 +4,7 @@
 set(MITK_MODULES
   Log
   Core
+  RESTAPI
   Forms
   FormsUI
   CommandLine

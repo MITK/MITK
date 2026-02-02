@@ -98,8 +98,7 @@ void InitSlicedGeometry3D(py::module_& m)
 
 void InitTimeGeometry(py::module_& m)
 {
-  py::class_<TimeGeometry, TimeGeometry::Pointer>(m, "TimeGeometry")
-    .def_static("new", &TimeGeometry::New);
+  py::class_<TimeGeometry, TimeGeometry::Pointer>(m, "TimeGeometry");
 }
 
 void InitArbitraryTimeGeometry(py::module_& m)

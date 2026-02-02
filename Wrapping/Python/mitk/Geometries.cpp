@@ -98,7 +98,8 @@ void InitSlicedGeometry3D(py::module_& m)
 
 void InitTimeGeometry(py::module_& m)
 {
-  py::class_<TimeGeometry, TimeGeometry::Pointer>(m, "TimeGeometry");
+  py::class_<TimeGeometry, TimeGeometry::Pointer>(m, "TimeGeometry")
+    .def("count_time_steps", &TimeGeometry::CountTimeSteps);
 }
 
 void InitArbitraryTimeGeometry(py::module_& m)
@@ -120,6 +121,6 @@ void InitGeometries(py::module_& m)
   InitPlaneGeometry(m);
   InitSlicedGeometry3D(m);
   InitTimeGeometry(m);
-  InitArbitratyTimeGeometry(m);
+  InitArbitraryTimeGeometry(m);
   InitProportionalTimeGeometry(m);
 }

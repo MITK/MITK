@@ -102,7 +102,7 @@ void InitTimeGeometry(py::module_& m)
     .def_static("new", &TimeGeometry::New);
 }
 
-void InitArbitratyTimeGeometry(py::module_& m)
+void InitArbitraryTimeGeometry(py::module_& m)
 {
   py::class_<ArbitraryTimeGeometry, TimeGeometry, ArbitraryTimeGeometry::Pointer>(m, "ArbitraryTimeGeometry")
     .def_static("new", &ArbitraryTimeGeometry::New);

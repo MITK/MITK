@@ -79,13 +79,18 @@ private:
   httplib::Request CreateRequest(const std::string& path = "",
                                   const std::string& body = "",
                                   const std::unordered_map<std::string, std::string>& pathParams = {},
-                                  const std::multimap<std::string, std::string>& queryParams = {})
+                                  const std::multimap<std::string, std::string>& queryParams = {},
+                                  const std::string& contentType = "")
   {
     httplib::Request req;
     req.path = path;
     req.body = body;
     req.path_params = pathParams;
     req.params = queryParams;
+    if (!contentType.empty())
+    {
+      req.set_header("Content-Type", contentType);
+    }
     return req;
   }
 
@@ -289,7 +294,7 @@ public:
     nlohmann::json body;
     body["name"] = "NewNode";
 
-    auto req = this->CreateRequest("/api/v1/datastorage/nodes", body.dump());
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes", body.dump(), {}, {}, "application/json");
     httplib::Response res;
 
     m_Controller->HandlePOST_nodes(req, res);
@@ -303,7 +308,7 @@ public:
 
   void CreateNodeWithInvalidJson()
   {
-    auto req = this->CreateRequest("/api/v1/datastorage/nodes", "not valid json");
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes", "not valid json", {}, {}, "application/json");
     httplib::Response res;
 
     m_Controller->HandlePOST_nodes(req, res);
@@ -455,7 +460,7 @@ public:
 
     auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + parentUid + "/children",
                                    body.dump(),
-                                   {{"uid", parentUid}});
+                                   {{"uid", parentUid}}, {}, "application/json");
     httplib::Response res;
 
     m_Controller->HandlePOST_nodes_uid_children(req, res);

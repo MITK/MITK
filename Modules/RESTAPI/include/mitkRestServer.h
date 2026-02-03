@@ -92,6 +92,28 @@ namespace mitk
     // Request tracking
     std::set<std::string> m_ClientIPs;
     std::optional<RequestInfo> m_LastRequest;
+    // Temporary directory for data serialization
+    std::string m_TempDirectory;
+
+    /**
+     * @brief Create and setup the temporary directory for data operations.
+     *
+     * Called during Start(). Creates a unique temp directory for this server session.
+     *
+     * @return true if successful.
+     */
+    bool SetupTempDirectory();
+
+    /**
+     * @brief Clean up the temporary directory.
+     *
+     * Called during Stop(). Removes all files and the directory itself.
+     * Takes the path as a parameter to allow thread-safe cleanup after
+     * the path has been copied from m_TempDirectory while holding the lock.
+     *
+     * @param tempDir Path to the temporary directory to clean up.
+     */
+    static void CleanupTempDirectory(const std::string& tempDir);
   };
 }
 

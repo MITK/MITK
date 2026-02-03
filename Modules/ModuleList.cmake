@@ -4,7 +4,6 @@
 set(MITK_MODULES
   Log
   Core
-  RESTAPI
   Forms
   FormsUI
   CommandLine
@@ -62,4 +61,5 @@ set(MITK_MODULES
   Python
   PythonSegmentation
   PythonSegmentationUI
+  RESTAPI
 )

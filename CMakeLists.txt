@@ -415,7 +415,7 @@ endif()
 
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
 
-set(MITK_REQUIRED_OPENSSL_VERSION 3.5) # Match with Python's OpenSSL version on Windows
+set(MITK_REQUIRED_OPENSSL_VERSION 3.5) # Match Python's OpenSSL version on Windows
 
 if(WIN32)
   find_package(OpenSSL ${MITK_REQUIRED_OPENSSL_VERSION} EXACT)
@@ -429,20 +429,32 @@ if(MITK_USE_httplib AND NOT OpenSSL_FOUND)
   set(openssl_message "Could not find OpenSSL.\n")
   if(UNIX)
     if(APPLE)
-      set(openssl_message "${openssl_message}Please install it using your favorite package management "
-                          "system (i.e. Homebrew or MacPorts).\n")
+      set(openssl_message "\
+${openssl_message}Please install it with MacPorts or Homebrew, for example.
+")
     else()
-      set(openssl_message "${openssl_message}Please install the dev package of OpenSSL (i.e. libssl-dev).\n")
+      set(openssl_message "\
+${openssl_message}Please install its development package (for example libssl-dev \
+on Ubuntu).
+")
     endif()
   else()
-    set(openssl_message "${openssl_message}Please install OpenSSL version ${MITK_REQUIRED_OPENSSL_VERSION}.\n"
-                        "We recommend builds from Shining Light Productions:\n"
-                        "  https://slproweb.com/products/Win32OpenSSL.html\n")
+    set(openssl_message "\
+${openssl_message}Please install OpenSSL v${MITK_REQUIRED_OPENSSL_VERSION} (exact \
+version required). We recommend builds from Shining Light Productions:
+  https://slproweb.com/products/Win32OpenSSL.html
+You will likely want to download the installer named something like:
+  Win64 OpenSSL v${MITK_REQUIRED_OPENSSL_VERSION}.x (not the \"Light\" variant)
+If you previously installed another version to the same location, make sure \
+to uninstall it first.
+")
   endif()
-  set(openssl_message "${openssl_message}If it still cannot be found, you can hint CMake to find OpenSSL by "
-                      "adding/setting the OPENSSL_ROOT_DIR variable to the root directory of an "
-                      "OpenSSL installation. Make sure to clear variables of partly found "
-                      "versions of OpenSSL before, or they will be mixed up.")
+  set(openssl_message "\
+${openssl_message}If OpenSSL still cannot be found, you can help CMake locate \
+it by setting the OPENSSL_ROOT_DIR variable to the root directory of an OpenSSL \
+installation. Make sure to clear any cached variables of partially detected \
+OpenSSL versions beforehand, or they may be mixed up.
+")
   message(FATAL_ERROR ${openssl_message})
 endif()
 

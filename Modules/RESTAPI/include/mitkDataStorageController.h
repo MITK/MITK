@@ -284,6 +284,76 @@ namespace mitk
     void HandlePOST_nodes_uid_generic(const httplib::Request& req, httplib::Response& res, const std::optional<std::string>& parentUID);
 
 
+    /**
+     * @brief Determine transfer mode from request headers.
+     *
+     * Checks X-MITK-Transfer-Mode header and Accept header.
+     *
+     * @param req The request.
+     * @return "direct" or "file-reference".
+     */
+    std::string DetermineTransferMode(const httplib::Request& req) const;
+
+    /**
+     * @brief Extract filename from Content-Disposition header.
+     *
+     * @param req The request.
+     * @return The filename, or empty string if not found.
+     */
+    std::string ExtractFilenameFromContentDisposition(const httplib::Request& req) const;
+
+    /**
+     * @brief Build data_metadata JSON for a BaseData object.
+     *
+     * @param data The data object.
+     * @return JSON with type-specific metadata.
+     */
+    nlohmann::json BuildDataMetadata(const mitk::BaseData* data) const;
+
+    /**
+     * @brief Result of resolving a data file path from a request.
+     */
+    struct ResolveDataPathResult
+    {
+      bool success;                    ///< Whether resolution succeeded
+      std::string filePath;            ///< Resolved file path
+      bool isTemporary;                ///< True if file was created from direct upload (should be deleted)
+      int errorStatus;                 ///< HTTP status code if failed
+      nlohmann::json errorResponse;    ///< Error response JSON if failed
+    };
+
+    /**
+     * @brief Resolve data file path from request body.
+     *
+     * Handles both direct transfer (binary body -> temp file) and
+     * file-reference mode (JSON body with file_path).
+     *
+     * @param req The HTTP request.
+     * @param contentType The Content-Type header value.
+     * @return Result with file path or error information.
+     */
+    ResolveDataPathResult ResolveDataPath(const httplib::Request& req, const std::string& contentType);
+
+    /**
+     * @brief Result of loading data from a file.
+     */
+    struct LoadDataResult
+    {
+      bool success;                              ///< Whether loading succeeded
+      std::vector<mitk::BaseData::Pointer> data; ///< Loaded data objects
+      int errorStatus;                           ///< HTTP status code if failed
+      nlohmann::json errorResponse;              ///< Error response JSON if failed
+    };
+
+    /**
+     * @brief Load data from a file path.
+     *
+     * @param filePath The file path to load from.
+     * @param requestPath The original request path (for error messages).
+     * @return Result with loaded data or error information.
+     */
+    LoadDataResult LoadDataFromFile(const std::string& filePath, const std::string& requestPath);
+
     DataStorageBridge& m_Bridge;
     std::string m_TempDirectory;
   };

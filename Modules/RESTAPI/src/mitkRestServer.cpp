@@ -16,7 +16,9 @@ found in the LICENSE file.
 #include "mitkDataStorageController.h"
 
 #include <httplib.h>
+#include <mitkIOUtil.h>
 #include <mitkLog.h>
+#include <mitkFileSystem.h>
 
 namespace mitk
 {
@@ -40,8 +42,8 @@ bool RestServer::Start()
     return true;  // Already running
   }
 
-  // Clear any previous error
-  m_LastError = std::nullopt;
+  m_RequestLog.clear();
+  m_ClientIPs.clear();
 
   if (!m_PendingConfig.enabled)
   {
@@ -133,9 +135,10 @@ void RestServer::Stop()
     m_HealthController.reset();
     m_DataStorageController.reset();
 
-    // Clear request tracking
+    // Clear request tracking and log
     m_ClientIPs.clear();
-    m_LastRequest = std::nullopt;
+    m_RequestLog.clear();
+
     // Copy and clear temp directory path while holding the lock
     // to prevent race condition if Start() is called concurrently
     tempDirToCleanup = std::move(m_TempDirectory);
@@ -213,7 +216,44 @@ std::vector<std::string> RestServer::GetClientIPs() const
 std::optional<RequestInfo> RestServer::GetLastRequestInfo() const
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
-  return m_LastRequest;
+  if (m_RequestLog.empty())
+  {
+    return std::nullopt;
+  }
+
+  return m_RequestLog.back();
+}
+
+void RestServer::SetLogLimit(std::optional<unsigned int> limit)
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_LogLimit = limit;
+
+  if (m_LogLimit.has_value())
+  {
+    while (m_RequestLog.size() > m_LogLimit.value())
+    {
+      m_RequestLog.pop_front();
+    }
+  }
+}
+
+std::optional<unsigned int> RestServer::GetLogLimit() const
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  return m_LogLimit;
+}
+
+std::vector<RequestInfo> RestServer::GetRequestLog() const
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  return std::vector<RequestInfo>(m_RequestLog.begin(), m_RequestLog.end());
+}
+
+void RestServer::ClearRequestLog()
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_RequestLog.clear();
 }
 
 void RestServer::RecordRequest(const std::string& endpoint, const std::string& method,
@@ -221,7 +261,16 @@ void RestServer::RecordRequest(const std::string& endpoint, const std::string& m
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
   m_ClientIPs.insert(clientIP);
-  m_LastRequest = RequestInfo{endpoint, method, responseCode, clientIP};
+
+  RequestInfo info{endpoint, method, responseCode, clientIP};
+
+  m_RequestLog.push_back(info);
+
+  // Trim log if limit is set and exceeded
+  while (m_LogLimit.has_value() && m_RequestLog.size() > m_LogLimit.value())
+  {
+    m_RequestLog.pop_front();
+  }
 }
 
 void RestServer::RegisterRoutes()

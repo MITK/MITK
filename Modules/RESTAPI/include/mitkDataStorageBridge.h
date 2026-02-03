@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define mitkDataStorageBridge_h
 
 #include <mitkDataStorage.h>
+#include <mitkBaseData.h>
 #include <mitkNodePredicateBase.h>
 #include "mitkNodeUidMapper.h"
 #include "mitkNodeQueryParams.h"
@@ -117,6 +118,17 @@ namespace mitk
      */
     bool HasDataStorage() const;
 
+    /**
+     * @brief Get the UID for a DataNode.
+     *
+     * Creates a UID if the node doesn't have one yet.
+     *
+     * @param node The node to get the UID for. Must not be nullptr.
+     * @return The UID for this node.
+     * @throws std::invalid_argument if node is nullptr.
+     */
+    std::string GetNodeUid(const DataNode* node) const;
+
     // Node operations
 
     /**
@@ -201,6 +213,53 @@ namespace mitk
      * @return DeleteResult with success status and deleted UIDs.
      */
     DeleteResult DeleteNode(const std::string& uid, bool recursive = false);
+
+    // Data operations
+
+    /**
+     * @brief Result of a GetNodeData operation.
+     */
+    struct GetNodeDataResult
+    {
+      bool nodeFound;         ///< Whether the node with the given UID exists
+      BaseData::Pointer data; ///< Clone of the data, or nullptr if node has no data
+    };
+
+    /**
+     * @brief Get a clone of the node's data for thread-safe processing.
+     *
+     * Returns a clone of the BaseData attached to the node. The clone is
+     * independent of the original data and can be safely processed (e.g.,
+     * serialized) without holding locks and without affecting the original.
+     *
+     * This method is designed for scenarios where the caller needs to perform
+     * potentially slow operations on the data (like serialization) without
+     * blocking other DataStorage operations.
+     *
+     * @param uid The node UID.
+     * @return GetNodeDataResult with nodeFound status and cloned data.
+     *         - nodeFound=false: Node does not exist
+     *         - nodeFound=true, data=nullptr: Node exists but has no data
+     *         - nodeFound=true, data!=nullptr: Node exists and data is cloned
+     */
+    GetNodeDataResult GetNodeData(const std::string& uid) const;
+
+    /**
+     * @brief Set or replace the data on a node.
+     *
+     * Thread-safe assignment of BaseData to a node. The data is assigned
+     * directly (not cloned), so the caller should not modify the data object
+     * after calling this method.
+     *
+     * Can be used to:
+     * - Set data on an empty node (data_type was null)
+     * - Replace existing data with new data
+     *
+     * @param uid The node UID.
+     * @param data The data to assign. Can be nullptr to clear the node's data.
+     * @return true if successful, false if node not found.
+     */
+    bool SetNodeData(const std::string& uid, BaseData* data);
 
     // Property operations
 

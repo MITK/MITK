@@ -123,4 +123,57 @@ namespace mitk
     response["error"]["children_count"] = childrenCount;
     return response;
   }
+
+  ErrorResponse::Json ErrorResponse::NoData(const std::string& nodeUid, const std::string& instance)
+  {
+    return Create(
+      CODE_NO_DATA,
+      "No Data",
+      "Node '" + nodeUid + "' has no data attached",
+      404,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::UnsupportedFormat(const std::string& detail, const std::string& instance)
+  {
+    return Create(
+      CODE_UNSUPPORTED_FORMAT,
+      "Unsupported Format",
+      detail,
+      415,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::SerializationError(const std::string& detail, const std::string& instance)
+  {
+    return Create(
+      CODE_SERIALIZATION_ERROR,
+      "Serialization Error",
+      detail,
+      500,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::FileNotFound(const std::string& filePath, const std::string& instance)
+  {
+    return Create(
+      CODE_FILE_NOT_FOUND,
+      "File Not Found",
+      "Referenced file path does not exist: " + filePath,
+      422,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::FileReadError(
+    const std::string& filePath,
+    const std::string& detail,
+    const std::string& instance)
+  {
+    return Create(
+      CODE_FILE_READ_ERROR,
+      "File Read Error",
+      "Cannot read file '" + filePath + "': " + detail,
+      422,
+      instance);
+  }
 }

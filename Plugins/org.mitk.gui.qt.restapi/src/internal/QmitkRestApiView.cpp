@@ -23,6 +23,7 @@ found in the LICENSE file.
 
 #include <QApplication>
 #include <QClipboard>
+#include <QHeaderView>
 
 const std::string QmitkRestApiView::VIEW_ID = "org.mitk.views.restapi";
 
@@ -56,6 +57,13 @@ void QmitkRestApiView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.m_StartStopButton, &QPushButton::clicked, this, &QmitkRestApiView::OnStartStopClicked);
   connect(m_Controls.m_RefreshButton, &QPushButton::clicked, this, &QmitkRestApiView::OnRefreshStatus);
   connect(m_Controls.m_CopyUrlButton, &QPushButton::clicked, this, &QmitkRestApiView::OnCopyUrlClicked);
+  connect(m_Controls.m_ClearLogButton, &QPushButton::clicked, this, &QmitkRestApiView::OnClearLogClicked);
+
+  // Setup request log table
+  m_Controls.m_RequestLogTable->horizontalHeader()->setStretchLastSection(true);
+  m_Controls.m_RequestLogTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  m_Controls.m_RequestLogTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+  m_Controls.m_RequestLogTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 
   // Setup status timer to periodically update status
   m_StatusTimer = new QTimer(this);
@@ -234,6 +242,9 @@ void QmitkRestApiView::UpdateServerStatus()
     m_Controls.m_LastEndpointLabel->setText("-");
     m_Controls.m_LastResponseCodeLabel->setText("-");
   }
+
+  // Update request log table
+  this->UpdateRequestLogTable();
 }
 
 void QmitkRestApiView::OnCopyUrlClicked()
@@ -242,5 +253,72 @@ void QmitkRestApiView::OnCopyUrlClicked()
   if (!urlText.isEmpty() && urlText != "-")
   {
     QApplication::clipboard()->setText(urlText);
+  }
+}
+
+void QmitkRestApiView::OnClearLogClicked()
+{
+  auto* service = this->GetRestServerService();
+  if (service != nullptr)
+  {
+    service->ClearRequestLog();
+    this->UpdateRequestLogTable();
+  }
+}
+
+void QmitkRestApiView::UpdateRequestLogTable()
+{
+  auto* service = this->GetRestServerService();
+  if (service == nullptr)
+  {
+    m_Controls.m_RequestLogTable->setRowCount(0);
+    return;
+  }
+
+  auto requestLog = service->GetRequestLog();
+
+  // Only update if the row count changed to avoid flickering
+  int currentRowCount = m_Controls.m_RequestLogTable->rowCount();
+  int newRowCount = static_cast<int>(requestLog.size());
+
+  if (currentRowCount != newRowCount)
+  {
+    m_Controls.m_RequestLogTable->setRowCount(newRowCount);
+  }
+
+  // Populate table (oldest first, most recent at bottom)
+  for (int i = 0; i < newRowCount; ++i)
+  {
+    const auto& info = requestLog[i];
+
+    auto* ipItem = new QTableWidgetItem(QString::fromStdString(info.clientIP));
+    auto* responseItem = new QTableWidgetItem(QString::number(info.responseCode));
+    auto* methodItem = new QTableWidgetItem(QString::fromStdString(info.method));
+    auto* endpointItem = new QTableWidgetItem(QString::fromStdString(info.endpoint));
+
+    // Color code response codes
+    if (info.responseCode >= 200 && info.responseCode < 300)
+    {
+      responseItem->setData(Qt::BackgroundRole, QColor("#4CAF50")); // Green for success
+    }
+    else if (info.responseCode >= 400 && info.responseCode < 500)
+    {
+      responseItem->setData(Qt::BackgroundRole, QColor("#FF9800")); // Orange for client errors
+    }
+    else if (info.responseCode >= 500)
+    {
+      responseItem->setData(Qt::BackgroundRole, QColor("#F44336")); // Red for server errors
+    }
+
+    m_Controls.m_RequestLogTable->setItem(i, 0, ipItem);
+    m_Controls.m_RequestLogTable->setItem(i, 1, responseItem);
+    m_Controls.m_RequestLogTable->setItem(i, 2, methodItem);
+    m_Controls.m_RequestLogTable->setItem(i, 3, endpointItem);
+  }
+
+  // Scroll to bottom to show most recent entries
+  if (newRowCount > 0)
+  {
+    m_Controls.m_RequestLogTable->scrollToBottom();
   }
 }

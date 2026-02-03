@@ -28,6 +28,7 @@ found in the LICENSE file.
  * - Start/stop server controls
  * - Tab showing nodes queried via REST API (with restapi.uid property)
  * - Tab showing nodes modified via REST API (with restapi.modified property)
+ * - Tab showing request log with client IP, method, endpoint, and response code
  * - List of client IPs that have sent requests
  * - Last endpoint requested with response code
  */
@@ -49,9 +50,11 @@ private Q_SLOTS:
   void OnStartStopClicked();
   void OnRefreshStatus();
   void OnCopyUrlClicked();
+  void OnClearLogClicked();
 
 private:
   void UpdateServerStatus();
+  void UpdateRequestLogTable();
   void SetupNodeInspectors();
   mitk::IRestServerService* GetRestServerService() const;
 

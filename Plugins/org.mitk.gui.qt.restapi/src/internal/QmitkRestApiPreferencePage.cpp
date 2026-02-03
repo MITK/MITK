@@ -47,6 +47,10 @@ void QmitkRestApiPreferencePage::CreateQtControl(QWidget* parent)
   m_Control = new QWidget(parent);
   m_Ui->setupUi(m_Control);
 
+  // Connect checkbox to enable/disable the spin box
+  connect(m_Ui->m_LogLimitEnabledCheckBox, &QCheckBox::toggled,
+          m_Ui->m_LogLimitSpinBox, &QSpinBox::setEnabled);
+
   this->Update();
 }
 
@@ -67,6 +71,8 @@ bool QmitkRestApiPreferencePage::PerformOk()
   prefs->PutInt("threadPoolSize", m_Ui->m_ThreadPoolSizeSpinBox->value());
   prefs->PutInt("readTimeoutSeconds", m_Ui->m_ReadTimeoutSpinBox->value());
   prefs->PutInt("writeTimeoutSeconds", m_Ui->m_WriteTimeoutSpinBox->value());
+  prefs->PutBool("logLimitEnabled", m_Ui->m_LogLimitEnabledCheckBox->isChecked());
+  prefs->PutInt("logLimit", m_Ui->m_LogLimitSpinBox->value());
 
   // Also update the REST server's pending configuration directly
   auto restModule = us::ModuleRegistry::GetModule("MitkRESTAPI");
@@ -90,6 +96,16 @@ bool QmitkRestApiPreferencePage::PerformOk()
           config.writeTimeoutSeconds = m_Ui->m_WriteTimeoutSpinBox->value();
 
           service->SetConfig(config);
+
+          // Apply log limit setting
+          if (m_Ui->m_LogLimitEnabledCheckBox->isChecked())
+          {
+            service->SetLogLimit(static_cast<unsigned int>(m_Ui->m_LogLimitSpinBox->value()));
+          }
+          else
+          {
+            service->SetLogLimit(std::nullopt);
+          }
         }
       }
     }
@@ -116,4 +132,10 @@ void QmitkRestApiPreferencePage::Update()
   m_Ui->m_ThreadPoolSizeSpinBox->setValue(prefs->GetInt("threadPoolSize", defaults.threadPoolSize));
   m_Ui->m_ReadTimeoutSpinBox->setValue(prefs->GetInt("readTimeoutSeconds", defaults.readTimeoutSeconds));
   m_Ui->m_WriteTimeoutSpinBox->setValue(prefs->GetInt("writeTimeoutSeconds", defaults.writeTimeoutSeconds));
+
+  // Log limit settings (default: disabled, 100 entries)
+  bool logLimitEnabled = prefs->GetBool("logLimitEnabled", false);
+  m_Ui->m_LogLimitEnabledCheckBox->setChecked(logLimitEnabled);
+  m_Ui->m_LogLimitSpinBox->setValue(prefs->GetInt("logLimit", 100));
+  m_Ui->m_LogLimitSpinBox->setEnabled(logLimitEnabled);
 }

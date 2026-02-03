@@ -240,6 +240,66 @@
         </item>
        </layout>
       </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="logLimitLabel">
+        <property name="text">
+         <string>Request log limit:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <layout class="QHBoxLayout" name="logLimitLayout">
+        <item>
+         <widget class="QCheckBox" name="m_LogLimitEnabledCheckBox">
+          <property name="toolTip">
+           <string>If checked, limits the number of requests kept in the log. If unchecked, all requests are kept.</string>
+          </property>
+          <property name="text">
+           <string>Limit to</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="m_LogLimitSpinBox">
+          <property name="toolTip">
+           <string>Maximum number of request log entries to keep</string>
+          </property>
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>999</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="logLimitEntriesLabel">
+          <property name="text">
+           <string>entries</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="logLimitSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
      </layout>
     </widget>
    </item>

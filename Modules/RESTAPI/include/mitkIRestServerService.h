@@ -168,6 +168,37 @@ namespace mitk
      * @return The last request info, or std::nullopt if no requests have been processed.
      */
     virtual std::optional<RequestInfo> GetLastRequestInfo() const = 0;
+
+    /**
+     * @brief Set the request log limit.
+     *
+     * Controls how many request entries are kept in the log.
+     * The log is cleared when the server starts.
+     *
+     * @param limit Maximum number of entries to keep, or std::nullopt for unlimited.
+     */
+    virtual void SetLogLimit(std::optional<unsigned int> limit) = 0;
+
+    /**
+     * @brief Get the current request log limit.
+     *
+     * @return The limit, or std::nullopt if unlimited.
+     */
+    virtual std::optional<unsigned int> GetLogLimit() const = 0;
+
+    /**
+     * @brief Get all logged requests.
+     *
+     * Returns the request log in chronological order (oldest first).
+     *
+     * @return Vector of request info entries.
+     */
+    virtual std::vector<RequestInfo> GetRequestLog() const = 0;
+
+    /**
+     * @brief Clear all logged requests.
+     */
+    virtual void ClearRequestLog() = 0;
   };
 }
 

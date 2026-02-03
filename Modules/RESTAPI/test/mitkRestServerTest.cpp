@@ -29,6 +29,10 @@ class mitkRestServerTestSuite : public mitk::TestFixture
   MITK_TEST(PendingVsRunningConfig);
   MITK_TEST(HandlesDataStorageConnection);
   MITK_TEST(DisabledConfigPreventsStart);
+  // Request logging tests
+  MITK_TEST(LogLimitDefaultsToUnlimited);
+  MITK_TEST(LogLimitCanBeSet);
+  MITK_TEST(ClearRequestLogWorks);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -207,6 +211,47 @@ public:
     CPPUNIT_ASSERT(!started);
     CPPUNIT_ASSERT(!m_Server->IsRunning());
     CPPUNIT_ASSERT(m_Server->GetLastError().has_value());
+  }
+
+  // ===== Request logging tests =====
+
+  void LogLimitDefaultsToUnlimited()
+  {
+    // Default log limit should be nullopt (unlimited)
+    CPPUNIT_ASSERT(!m_Server->GetLogLimit().has_value());
+
+    // Request log should be empty initially
+    auto log = m_Server->GetRequestLog();
+    CPPUNIT_ASSERT(log.empty());
+  }
+
+  void LogLimitCanBeSet()
+  {
+    // Set a limit
+    m_Server->SetLogLimit(100);
+    auto limit = m_Server->GetLogLimit();
+    CPPUNIT_ASSERT(limit.has_value());
+    CPPUNIT_ASSERT_EQUAL(100u, limit.value());
+
+    // Set to unlimited
+    m_Server->SetLogLimit(std::nullopt);
+    CPPUNIT_ASSERT(!m_Server->GetLogLimit().has_value());
+
+    // Set limit again
+    m_Server->SetLogLimit(50);
+    limit = m_Server->GetLogLimit();
+    CPPUNIT_ASSERT(limit.has_value());
+    CPPUNIT_ASSERT_EQUAL(50u, limit.value());
+  }
+
+  void ClearRequestLogWorks()
+  {
+    // The log is managed internally, but we can test the clear interface
+    // Note: Actual request recording happens during HTTP requests, which
+    // we can't easily simulate in this unit test. We test the clear interface.
+    m_Server->ClearRequestLog();
+    auto log = m_Server->GetRequestLog();
+    CPPUNIT_ASSERT(log.empty());
   }
 };
 

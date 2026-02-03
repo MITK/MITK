@@ -259,6 +259,83 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="requestLogTab">
+      <attribute name="title">
+       <string>Request Log</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="requestLogTabLayout">
+       <item>
+        <layout class="QHBoxLayout" name="requestLogHeaderLayout">
+         <item>
+          <widget class="QLabel" name="requestLogInfoLabel">
+           <property name="text">
+            <string>Logged requests (most recent at bottom):</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="requestLogSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_ClearLogButton">
+           <property name="text">
+            <string>Clear Log</string>
+           </property>
+           <property name="toolTip">
+            <string>Clear all logged requests</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="m_RequestLogTable">
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>false</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>Client IP</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Response</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Method</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Endpoint</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

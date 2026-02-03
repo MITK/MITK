@@ -32,9 +32,6 @@ found in the LICENSE file.
 #include <berryINullSelectionListener.h>
 #include <berryUIException.h>
 
-// CTK Includes
-#include <ctkServiceTracker.h>
-
 // Qt Includes
 #include <QItemSelectionModel>
 #include <QApplication>
@@ -48,21 +45,17 @@ public:
 
   QmitkAbstractViewPrivate(QmitkAbstractView* qq)
     : q(qq)
-    , m_DataStorageServiceTracker(QmitkCommonActivator::GetContext())
     , m_Parent(nullptr)
     , m_DataNodeItemModel(new QmitkDataNodeItemModel)
     , m_DataNodeSelectionModel(new QItemSelectionModel(m_DataNodeItemModel))
     , m_InDataStorageChanged(false)
   {
-    m_DataStorageServiceTracker.open();
   }
 
   ~QmitkAbstractViewPrivate()
   {
     delete m_DataNodeSelectionModel;
     delete m_DataNodeItemModel;
-
-    m_DataStorageServiceTracker.close();
   }
 
   /**
@@ -142,8 +135,6 @@ public:
   QList<mitk::DataNode::Pointer> DataNodeSelectionToQList(mitk::DataNodeSelection::ConstPointer currentSelection) const;
 
   QmitkAbstractView* const q;
-
-  ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
 
   /**
    * Saves the parent of this view (this is the scrollarea created in CreatePartControl(QWidget*)
@@ -305,7 +296,7 @@ void QmitkAbstractView::DataStorageModified()
 {
 }
 
-void QmitkAbstractView::DataStorageChanged(mitk::IDataStorageReference::Pointer /*dsRef*/)
+void QmitkAbstractView::DataStorageChanged(mitk::DataStorageReference /*dsRef*/)
 {
 }
 
@@ -389,26 +380,26 @@ mitk::IPreferences* QmitkAbstractView::GetPreferences() const
 
 mitk::DataStorage::Pointer QmitkAbstractView::GetDataStorage() const
 {
-  mitk::IDataStorageService* dsService = d->m_DataStorageServiceTracker.getService();
+  mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
 
-  if (dsService != nullptr)
+  if (dsService)
   {
-    return dsService->GetDataStorage()->GetDataStorage();
+    return dsService->GetActiveDataStorage();
   }
 
   return nullptr;
 }
 
-mitk::IDataStorageReference::Pointer QmitkAbstractView::GetDataStorageReference() const
+mitk::DataStorageReference QmitkAbstractView::GetDataStorageReference() const
 {
-  mitk::IDataStorageService* dsService = d->m_DataStorageServiceTracker.getService();
+  mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
 
-  if (dsService != nullptr)
+  if (dsService)
   {
-    return dsService->GetDataStorage();
+    return dsService->GetActiveDataStorageReference();
   }
 
-  return mitk::IDataStorageReference::Pointer(nullptr);
+  return mitk::DataStorageReference();
 }
 
 QList<mitk::DataNode::Pointer> QmitkAbstractView::GetCurrentSelection() const

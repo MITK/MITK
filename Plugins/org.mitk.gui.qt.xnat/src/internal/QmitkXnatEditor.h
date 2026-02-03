@@ -17,16 +17,12 @@ found in the LICENSE file.
 #include <berryQtEditorPart.h>
 #include <berryISelectionListener.h>
 
-#include <mitkIDataStorageService.h>
-
 #include <QmitkAbstractView.h>
 
 #include "ui_QmitkXnatEditorControls.h"
 
 #include "ctkXnatListModel.h"
 #include "ctkXnatSession.h"
-
-#include <ctkServiceTracker.h>
 
 #include "mitkXnatSessionTracker.h"
 
@@ -104,7 +100,6 @@ private:
 
   int m_ParentCount;
   QString m_DownloadPath;
-  ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
 
   void InternalFileDownload(const QModelIndex& index);
   int ParentChecker(ctkXnatObject* child);

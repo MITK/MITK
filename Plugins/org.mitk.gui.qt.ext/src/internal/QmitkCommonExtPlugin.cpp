@@ -83,11 +83,10 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
 {
   if (!arguments.empty())
   {
-    ctkServiceReference serviceRef = _context->getServiceReference<mitk::IDataStorageService>();
-    if (serviceRef)
+    mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
+    if (dsService)
     {
-       mitk::IDataStorageService* dataStorageService = _context->getService<mitk::IDataStorageService>(serviceRef);
-       mitk::DataStorage::Pointer dataStorage = dataStorageService->GetDefaultDataStorage()->GetDataStorage();
+       mitk::DataStorage::Pointer dataStorage = dsService->GetDefaultDataStorage();
 
        int argumentsAdded = 0;
        for (int i = 0; i < arguments.size(); ++i)
@@ -141,7 +140,7 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
     }
     else
     {
-      MITK_ERROR << "A service reference for mitk::IDataStorageService does not exist";
+      MITK_ERROR << "IDataStorageService not available. Unable to load files.";
     }
   }
 }

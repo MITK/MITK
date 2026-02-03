@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <berryWorkbenchPreferenceConstants.h>
 
 #include <mitkDataStorageEditorInput.h>
+#include <mitkDataStorageReference.h>
 #include <mitkIDataStorageService.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
@@ -91,16 +92,10 @@ namespace
 
         workbench->ShowPerspective(id, workbenchWindow);
 
-        auto context = QmitkMitkWorkbenchIntroPlugin::GetDefault()->GetPluginContext();
-        auto serviceReference = context->getServiceReference<mitk::IDataStorageService>();
-
-        mitk::IDataStorageService* service = serviceReference
-          ? context->getService<mitk::IDataStorageService>(serviceReference)
-          : nullptr;
-
-        if (service)
+        mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
+        if (dsService)
         {
-          berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(service->GetActiveDataStorage()));
+          berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(dsService->GetActiveDataStorageReference()));
 
           auto page = introSite->GetPage();
           auto editorPart = page->FindEditor(editorInput);

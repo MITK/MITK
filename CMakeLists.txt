@@ -1129,16 +1129,6 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER
 
 add_subdirectory(Utilities)
 
-if(MITK_USE_SWIG)
-  set(SWIG_VERSION 4.4.0 CACHE STRING "" FORCE)
-  find_package(SWIG ${SWIG_VERSION} COMPONENTS python)
-
-  if(NOT SWIG_FOUND)
-   message(SEND_ERROR "SWIG not found!")
-  endif()
-endif()
-
-
 add_subdirectory(Modules)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/Modules/ModuleList.cmake")

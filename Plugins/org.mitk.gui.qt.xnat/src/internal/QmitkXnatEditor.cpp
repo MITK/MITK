@@ -46,6 +46,7 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <QmitkIOUtil.h>
 #include <mitkCoreServices.h>
+#include <mitkIDataStorageService.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
@@ -59,10 +60,8 @@ m_DownloadPath(QString::fromStdString(mitk::CoreServices::GetPreferencesService(
 GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", ""))),
 m_ListModel(new ctkXnatListModel()),
 m_Session(0),
-m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
 m_SelectionListener(new berry::SelectionChangedAdapter<QmitkXnatEditor>(this, &QmitkXnatEditor::SelectionChanged))
 {
-  m_DataStorageServiceTracker.open();
   if (m_DownloadPath.isEmpty())
   {
     QString xnatFolder = "XNAT_DOWNLOADS";
@@ -78,7 +77,6 @@ QmitkXnatEditor::~QmitkXnatEditor()
   delete m_ListModel;
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   s->RemoveSelectionListener(m_SelectionListener.data());
-  m_DataStorageServiceTracker.close();
 }
 
 bool QmitkXnatEditor::IsDirty() const
@@ -342,37 +340,39 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
     {
       // Download file and put into datamanager
       InternalFileDownload(index);
-      mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
-      if (dsService != nullptr)
+
+      mitk::CoreServicePointer<mitk::IDataStorageService> dsService(mitk::CoreServices::GetDataStorageService());
+      if (!dsService)
       {
-        QString name = file->property("Name");
-        QString filePath = m_DownloadPath + name;
-
-        if (file->property("collection") == "DICOM")
-        {
-          QDirIterator it(m_DownloadPath, QStringList() << name, QDir::Files, QDirIterator::Subdirectories);
-          while (it.hasNext()) {
-            it.next();
-            filePath = it.filePath();
-          }
-        }
-
-        mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
-        mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
-        QStringList list;
-        list << filePath;
-        try
-        {
-          QmitkIOUtil::Load(list, *dataStorage);
-        }
-        catch (const mitk::Exception& e)
-        {
-          MITK_INFO << e;
-          return;
-        }
-        mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
-          dsService->GetDataStorage()->GetDataStorage());
+        MITK_ERROR << "IDataStorageService not available.";
+        return;
       }
+
+      QString name = file->property("Name");
+      QString filePath = m_DownloadPath + name;
+
+      if (file->property("collection") == "DICOM")
+      {
+        QDirIterator it(m_DownloadPath, QStringList() << name, QDir::Files, QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+          it.next();
+          filePath = it.filePath();
+        }
+      }
+
+      mitk::DataStorage::Pointer dataStorage = dsService->GetActiveDataStorage();
+      QStringList list;
+      list << filePath;
+      try
+      {
+        QmitkIOUtil::Load(list, *dataStorage);
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_INFO << e;
+        return;
+      }
+      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
     }
     else
     {

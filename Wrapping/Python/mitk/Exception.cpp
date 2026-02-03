@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIDataStorageService.h"
+#include <pybind11/pybind11.h>
+#include <mitkException.h>
 
-namespace mitk
+namespace py = pybind11;
+using namespace mitk;
+
+void InitException(py::module_& m)
 {
-
-IDataStorageService::~IDataStorageService()
-{
-}
-
+  py::register_exception<mitk::Exception>(m, "Exception");
 }

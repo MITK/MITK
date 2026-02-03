@@ -16,8 +16,8 @@ mitkFunctionAddExternalProject(NAME CTK ON DEPENDS Qt6 DCMTK DOC "Use CTK in MIT
 mitkFunctionAddExternalProject(NAME DCMQI ON DEPENDS DCMTK ITK DOC "Use dcmqi in MITK")
 mitkFunctionAddExternalProject(NAME MatchPoint OFF ADVANCED DEPENDS Boost ITK DOC "Use the MatchPoint translation image registration library")
 mitkFunctionAddExternalProject(NAME httplib ON DEPENDS ZLIB)
-mitkFunctionAddExternalProject(NAME SWIG OFF ADVANCED NO_PACKAGE)
-mitkFunctionAddExternalProject(NAME Python3 OFF ADVANCED DEPENDS SWIG COMPONENTS Interpreter Development NumPy)
+mitkFunctionAddExternalProject(NAME Python3 OFF ADVANCED COMPONENTS Interpreter Development NumPy)
+mitkFunctionAddExternalProject(NAME pybind11 OFF ADVANCED)
 
 if(MITK_USE_Qt6)
  mitkFunctionAddExternalProject(NAME Qt6Qwt6 ON ADVANCED DEPENDS Qt6)

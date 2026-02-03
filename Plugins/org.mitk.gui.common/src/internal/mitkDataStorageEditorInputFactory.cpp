@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitkDataStorageEditorInputFactory.h"
 
 #include <mitkDataStorageEditorInput.h>
+#include <mitkDataStorageReference.h>
 
 #include <berryIMemento.h>
 
@@ -22,9 +23,15 @@ static QString TAG_PATH = "path";
 static QString TAG_LABEL = "label";
 static QString ID_FACTORY = "org.mitk.ui.DataStorageEditorInputFactory";
 
-berry::IAdaptable* DataStorageEditorInputFactory::CreateElement(const berry::IMemento::Pointer& memento)
+berry::IAdaptable* DataStorageEditorInputFactory::CreateElement(const berry::IMemento::Pointer& /*memento*/)
 {
-  memento->
+  // TODO: Implement restoration of DataStorageEditorInput from memento
+  //
+  // old code:
+  // memento->
+  //
+  // Remark this implementation was never finished until now and it seems also not currently compiling...
+  return nullptr;
 }
 
 QString DataStorageEditorInputFactory::GetFactoryId()
@@ -34,18 +41,18 @@ QString DataStorageEditorInputFactory::GetFactoryId()
 
 void DataStorageEditorInputFactory::SaveState(const berry::IMemento::Pointer& memento, const DataStorageEditorInput* input)
 {
-  IDataStorageReference::Pointer dataStorageRef = input->GetDataStorageReference();
-  if (dataStorageRef)
+  DataStorageReference dsRef = input->GetDataStorageReference();
+  if (dsRef.IsValid())
   {
-    QString label = dataStorageRef->GetLabel();
-    DataStorage::Pointer dataStorage = dataStorageRef->GetDataStorage();
+    QString label = QString::fromStdString(dsRef.GetLabel());
+    DataStorage::Pointer dataStorage = dsRef.GetStorage();
     if (dataStorage)
     {
       memento->PutString(TAG_LABEL, label);
       auto nodes = dataStorage->GetAll();
       for(auto nodeIter = nodes.begin(); nodeIter != nodes.end(); ++nodeIter)
       {
-        //(*nodeIter)->GetP
+        // TODO: Implement node serialization
       }
     }
   }

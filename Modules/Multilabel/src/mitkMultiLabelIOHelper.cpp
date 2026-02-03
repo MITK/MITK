@@ -14,11 +14,9 @@ found in the LICENSE file.
 
 #include "mitkLabelSetImage.h"
 #include <mitkBasePropertySerializer.h>
+#include <mitkDICOMSegmentationConstants.h>
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
-#include <mitkCoreServices.h>
-#include <mitkIPropertyDeserialization.h>
-#include <mitkDICOMSegmentationConstants.h>
 
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
@@ -599,37 +597,8 @@ void SerializeLabelCustomPropertiesToJSON(const mitk::Label* label, nlohmann::js
 
 nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelPropertyToJSON(const BaseProperty* property)
 {
-  if (property == nullptr)
-  {
-    mitkThrow() << "Invalid call of SerializeLabelPropertyToJSON. Passed property pointer is null.";
-  }
-
-  // Try to handle common property types directly
-  if (auto stringProp = dynamic_cast<const StringProperty*>(property); nullptr!=stringProp)
-  {
-    return stringProp->GetValueAsString();
-  }
-  else if (auto intProp = dynamic_cast<const IntProperty*>(property); nullptr != intProp)
-  {
-    return intProp->GetValue();
-  }
-  else if (auto floatProp = dynamic_cast<const FloatProperty*>(property); nullptr != floatProp)
-  {
-    return floatProp->GetValue();
-  }
-  else if (auto boolProp = dynamic_cast<const BoolProperty*>(property); nullptr != boolProp)
-  {
-    return boolProp->GetValue();
-  }
-
-  // For complex properties, store with type information
-  nlohmann::json propJson;
-  propJson["type"] = property->GetNameOfClass();
-
-  nlohmann::json valueJson;
-  property->ToJSON(valueJson);
-  propJson["value"] = valueJson;
-  return propJson;
+  // Delegate to the generic PropertyJsonSerialization utility in MitkCore
+  return ConvertPropertyToSelfContainedJson(property);
 }
 
 nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelToJSON(const Label* label)
@@ -661,22 +630,6 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelToJSON(const Label* label
 
   return j;
 };
-
-mitk::BaseProperty::Pointer CreatePropertyFromJSON(const std::string& typeStr, const nlohmann::json& serializedPropertyValue)
-{
-  mitk::CoreServicePointer<mitk::IPropertyDeserialization> service(mitk::CoreServices::GetPropertyDeserialization());
-  auto property = service->CreateInstance(typeStr);
-
-  if (property.IsNull())
-  {
-    MITK_ERROR << "Cannot create property instance of class \"" << typeStr << "\"!";
-    return nullptr;
-  }
-
-  property->FromJSON(serializedPropertyValue);
-
-  return property;
-}
 
 namespace
 {
@@ -834,34 +787,16 @@ mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nl
     }
     else
     { //unknown custom key that we just store as additional property
-      if (jValue.contains("type"))
-      { // full property specification
-        auto property = CreatePropertyFromJSON(jValue["type"], jValue["value"]);
+      // Delegate to PropertyJsonSerialization for property deserialization
+      try
+      {
+        auto property = ConvertPropertyFromSelfContainedJson(jValue);
         resultLabel->SetProperty(internalKey, property);
       }
-      else
-      { // support for direct simple types
-        if (jValue.is_string())
-        {
-          resultLabel->SetStringProperty(internalKey.c_str(), jValue.get<std::string>().c_str());
-        }
-        else if (jValue.is_number_integer())
-        {
-          resultLabel->SetIntProperty(internalKey.c_str(), jValue.get<int>());
-        }
-        else if (jValue.is_number_float())
-        {
-          resultLabel->SetFloatProperty(internalKey.c_str(), jValue.get<float>());
-        }
-        else if (jValue.is_boolean())
-        {
-          resultLabel->SetBoolProperty(internalKey.c_str(), jValue.get<bool>());
-        }
-        else
-        {
-          MITK_ERROR << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << internalKey << "; invalid value: " << jValue.dump();
-          mitkThrow() << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << internalKey << "; invalid value: " << jValue.dump();
-        }
+      catch (Exception& e)
+      {
+        MITK_ERROR << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << internalKey << "; invalid value: " << jValue.dump();
+        mitkReThrow(e) << "Unable to read custom label property from JSON. Value has wrong type. Failed key: " << internalKey << "; invalid value: " << jValue.dump();
       }
     }
   }

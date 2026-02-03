@@ -175,6 +175,11 @@ namespace mitk
     return m_DataStorage.IsNotNull();
   }
 
+  std::string DataStorageBridge::GetNodeUid(const DataNode* node) const
+  {
+    return m_UidMapper->GetOrCreateUid(node);
+  }
+
   bool DataStorageBridge::IsInternalProperty(const std::string& key)
   {
     // Check if key starts with INTERNAL_PROPERTY_PREFIX ("restapi.")
@@ -437,8 +442,8 @@ namespace mitk
           }
           else if (field == "data_type")
           {
-            auto* dataA = a->GetData();
-            auto* dataB = b->GetData();
+            auto dataA = a->GetData();
+            auto dataB = b->GetData();
             valA = dataA ? (std::string("mitk::") + dataA->GetNameOfClass()) : "";
             valB = dataB ? (std::string("mitk::") + dataB->GetNameOfClass()) : "";
           }
@@ -494,7 +499,7 @@ namespace mitk
       return std::nullopt;
     }
 
-    auto* node = m_UidMapper->FindNodeByUid(uid);
+    auto node = m_UidMapper->FindNodeByUid(uid);
     if (node == nullptr)
     {
       return std::nullopt;
@@ -655,7 +660,7 @@ namespace mitk
       return result;
     }
 
-    auto* node = m_UidMapper->FindNodeByUid(uid);
+    auto node = m_UidMapper->FindNodeByUid(uid);
     if (node == nullptr)
     {
       return result;
@@ -692,7 +697,7 @@ namespace mitk
       }
 
       // Delete all descendants (children first, then grandchildren, etc.)
-      for (auto* descendant : toDelete)
+      for (auto descendant : toDelete)
       {
         // Use GetOrCreateUid to ensure all deleted children have UIDs for reporting
         result.deletedChildren.push_back(m_UidMapper->GetOrCreateUid(descendant));
@@ -707,6 +712,63 @@ namespace mitk
     return result;
   }
 
+  DataStorageBridge::GetNodeDataResult DataStorageBridge::GetNodeData(const std::string& uid) const
+  {
+    std::lock_guard<std::mutex> lock(m_Mutex);
+
+    GetNodeDataResult result;
+    result.nodeFound = false;
+    result.data = nullptr;
+
+    if (m_DataStorage.IsNull())
+    {
+      return result;
+    }
+
+    auto node = m_UidMapper->FindNodeByUid(uid);
+    if (node == nullptr)
+    {
+      return result;  // nodeFound = false
+    }
+
+    result.nodeFound = true;
+
+    auto data = node->GetData();
+    if (data == nullptr)
+    {
+      return result;  // nodeFound = true, data = nullptr
+    }
+
+    // Clone the data for thread-safe processing outside the lock
+    // This allows the caller to serialize/process the data without
+    // blocking other DataStorage operations
+    result.data = dynamic_cast<BaseData*>(data->Clone().GetPointer());
+    return result;
+  }
+
+  bool DataStorageBridge::SetNodeData(const std::string& uid, BaseData* data)
+  {
+    std::lock_guard<std::mutex> lock(m_Mutex);
+
+    if (m_DataStorage.IsNull())
+    {
+      return false;
+    }
+
+    auto node = m_UidMapper->FindNodeByUid(uid);
+    if (node == nullptr)
+    {
+      return false;
+    }
+
+    node->SetData(data);
+
+    // Mark node as modified via REST API
+    MarkNodeAsModified(node, "data_set");
+
+    return true;
+  }
+
   std::optional<DataStorageBridge::Json> DataStorageBridge::GetNodeProperties(
     const std::string& uid,
     const PropertyQueryParams& params) const
@@ -718,7 +780,7 @@ namespace mitk
       return std::nullopt;
     }
 
-    auto* node = m_UidMapper->FindNodeByUid(uid);
+    auto node = m_UidMapper->FindNodeByUid(uid);
     if (node == nullptr)
     {
       return std::nullopt;
@@ -737,7 +799,7 @@ namespace mitk
 
     if (params.scope == PropertyScope::Data || (propertyList == nullptr && params.scope == PropertyScope::All))
     {
-      auto* data = node->GetData();
+      auto data = node->GetData();
       if (data != nullptr)
       {
         propertyList = data->GetPropertyList();
@@ -754,7 +816,7 @@ namespace mitk
     {
       // Return just property names as array
       Json names = Json::array();
-      auto* propMap = propertyList->GetMap();
+      auto propMap = propertyList->GetMap();
       for (auto it = propMap->begin(); it != propMap->end(); ++it)
       {
         // Skip internal properties (restapi.*)
@@ -823,7 +885,7 @@ namespace mitk
       return std::nullopt;
     }
 
-    auto* node = m_UidMapper->FindNodeByUid(uid);
+    auto node = m_UidMapper->FindNodeByUid(uid);
     if (node == nullptr)
     {
       return std::nullopt;
@@ -861,7 +923,7 @@ namespace mitk
       return false;
     }
 
-    auto* node = m_UidMapper->FindNodeByUid(uid);
+    auto node = m_UidMapper->FindNodeByUid(uid);
     if (node == nullptr)
     {
       return false;
@@ -882,7 +944,7 @@ namespace mitk
 
         if (params.scope == PropertyScope::Data)
         {
-          auto* data = node->GetData();
+          auto data = node->GetData();
           if (data != nullptr)
           {
             data->SetProperty(key, prop, contextName);
@@ -928,7 +990,7 @@ namespace mitk
       return false;
     }
 
-    auto* node = m_UidMapper->FindNodeByUid(uid);
+    auto node = m_UidMapper->FindNodeByUid(uid);
     if (node == nullptr)
     {
       return false;
@@ -939,7 +1001,7 @@ namespace mitk
 
     if (params.scope == PropertyScope::Data)
     {
-      auto* data = node->GetData();
+      auto data = node->GetData();
       if (data != nullptr)
       {
         propertyList = data->GetPropertyList();
@@ -982,7 +1044,7 @@ namespace mitk
       return std::nullopt;
     }
 
-    auto* node = m_UidMapper->FindNodeByUid(uid);
+    auto node = m_UidMapper->FindNodeByUid(uid);
     if (node == nullptr)
     {
       return std::nullopt;
@@ -998,7 +1060,7 @@ namespace mitk
 
     if (params.scope == PropertyScope::Data)
     {
-      auto* data = node->GetData();
+      auto data = node->GetData();
       if (data != nullptr)
       {
         propertyList = data->GetPropertyList();
@@ -1016,7 +1078,7 @@ namespace mitk
 
     // Collect existing property names
     std::vector<std::string> existingNames;
-    auto* propMap = propertyList->GetMap();
+    auto propMap = propertyList->GetMap();
     for (auto it = propMap->begin(); it != propMap->end(); ++it)
     {
       existingNames.push_back(it->first);
@@ -1090,7 +1152,7 @@ namespace mitk
       return std::nullopt;
     }
 
-    auto* node = m_UidMapper->FindNodeByUid(uid);
+    auto node = m_UidMapper->FindNodeByUid(uid);
     if (node == nullptr)
     {
       return std::nullopt;
@@ -1126,7 +1188,7 @@ namespace mitk
     auto sources = m_DataStorage->GetSources(node);
     if (sources->Size() > 0)
     {
-      auto* parent = sources->ElementAt(0).GetPointer();
+      auto parent = sources->ElementAt(0).GetPointer();
       result["parent_uid"] = m_UidMapper->GetOrCreateUid(parent);
     }
     else
@@ -1135,7 +1197,7 @@ namespace mitk
     }
 
     // Get data type
-    auto* data = node->GetData();
+    auto data = node->GetData();
     if (data != nullptr)
     {
       result["data_type"] = std::string("mitk::") + data->GetNameOfClass();
@@ -1163,7 +1225,7 @@ namespace mitk
     auto sources = m_DataStorage->GetSources(node);
     while (sources->Size() > 0)
     {
-      auto* parent = sources->ElementAt(0).GetPointer();
+      auto parent = sources->ElementAt(0).GetPointer();
       path = "/" + parent->GetName() + path;
       sources = m_DataStorage->GetSources(parent);
     }

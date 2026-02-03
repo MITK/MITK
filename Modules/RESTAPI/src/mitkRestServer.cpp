@@ -52,22 +52,30 @@ bool RestServer::Start()
 
   try
   {
-    // Create new server instance
     m_Server = std::make_unique<httplib::Server>();
 
-    // Configure server
     m_Server->set_read_timeout(m_PendingConfig.readTimeoutSeconds);
     m_Server->set_write_timeout(m_PendingConfig.writeTimeoutSeconds);
+
+    // Setup temp directory for data serialization
+    if (!this->SetupTempDirectory())
+    {
+      m_LastError = "Failed to create temporary directory for data operations";
+      MITK_ERROR << *m_LastError;
+      return false;
+    }
 
     // Create controllers
     m_HealthController = std::make_unique<HealthController>(*m_Bridge);
     m_DataStorageController = std::make_unique<DataStorageController>(*m_Bridge);
+    m_DataStorageController->SetTempDirectory(m_TempDirectory);
 
     // Register routes
     this->RegisterRoutes();
 
     // Copy pending config to running config before starting
     m_RunningConfig = m_PendingConfig;
+
     // Start server in separate thread
     m_Running = true;
     m_ServerThread = std::make_unique<std::thread>(&RestServer::ServerThreadFunc, this);
@@ -90,6 +98,7 @@ void RestServer::Stop()
 {
   std::unique_ptr<std::thread> threadToJoin;
   bool wasRunning = false;
+  std::string tempDirToCleanup;
 
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
@@ -127,7 +136,14 @@ void RestServer::Stop()
     // Clear request tracking
     m_ClientIPs.clear();
     m_LastRequest = std::nullopt;
+    // Copy and clear temp directory path while holding the lock
+    // to prevent race condition if Start() is called concurrently
+    tempDirToCleanup = std::move(m_TempDirectory);
+    m_TempDirectory.clear();
   }
+
+  // Clean up temp directory outside lock (may take time)
+  this->CleanupTempDirectory(tempDirToCleanup);
 
   if (wasRunning)
   {
@@ -276,6 +292,19 @@ void RestServer::RegisterRoutes()
       this->RecordRequest(req.path, "POST", res.status, req.remote_addr);
     });
 
+  // Data endpoints
+  m_Server->Get(apiBase + "/datastorage/nodes/:uid/data",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_DataStorageController->HandleGET_nodes_uid_data(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/datastorage/nodes/:uid/data",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_DataStorageController->HandlePUT_nodes_uid_data(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
   // Property endpoints
   m_Server->Get(apiBase + "/datastorage/nodes/:uid/properties",
     [this](const httplib::Request& req, httplib::Response& res) {
@@ -346,6 +375,44 @@ void RestServer::ServerThreadFunc()
     // This ensures IsRunning() returns the correct state
     m_Running = false;
     m_RunningConfig = std::nullopt;
+  }
+}
+
+bool RestServer::SetupTempDirectory()
+{
+  try
+  {
+    m_TempDirectory = IOUtil::CreateTemporaryDirectory("mitk-rest-XXXXXX");
+    MITK_DEBUG << "Created REST API temp directory: " << m_TempDirectory;
+    return true;
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "Failed to create temp directory: " << e.what();
+    return false;
+  }
+}
+
+void RestServer::CleanupTempDirectory(const std::string& tempDir)
+{
+  if (tempDir.empty())
+  {
+    return;
+  }
+
+  try
+  {
+    fs::path tempPath(tempDir);
+    if (fs::exists(tempPath))
+    {
+      // Remove all contents recursively
+      fs::remove_all(tempPath);
+      MITK_DEBUG << "Cleaned up REST API temp directory: " << tempDir;
+    }
+  }
+  catch (const std::exception& e)
+  {
+    MITK_WARN << "Failed to cleanup temp directory: " << e.what();
   }
 }
 

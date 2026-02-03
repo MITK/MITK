@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include <mitkStringProperty.h>
 #include <mitkProperties.h>
 #include <mitkImage.h>
+#include <mitkImageGenerator.h>
+#include <mitkSurface.h>
 
 #include <set>
 
@@ -69,6 +71,15 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(DeleteNodeWithChildrenNonRecursive);
   MITK_TEST(DeleteNodeWithChildrenRecursive);
   MITK_TEST(DeleteRootNodeWithSubtree);
+  // Data operations
+  MITK_TEST(GetNodeDataReturnsClone);
+  MITK_TEST(GetNodeDataWithNoData);
+  MITK_TEST(GetNodeDataWithNonExistentNode);
+  MITK_TEST(SetNodeDataToExistingNode);
+  MITK_TEST(SetNodeDataToEmptyNode);
+  MITK_TEST(SetNodeDataClearsData);
+  MITK_TEST(SetNodeDataWithNonExistentNode);
+  MITK_TEST(SetNodeDataSetsModificationTracking);
   MITK_TEST(GetNodeProperties);
   MITK_TEST(GetNodePropertiesWithScope);
   MITK_TEST(GetNodePropertiesWithFiltering);
@@ -853,6 +864,173 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0), m_DataStorage->GetSources(m_Root3)->Size());
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), m_DataStorage->GetSources(m_Child3)->Size());
     CPPUNIT_ASSERT(m_DataStorage->GetSources(m_Child3)->front() == m_Root3.GetPointer());
+  }
+
+  // ===== Data operation tests =====
+
+  void GetNodeDataReturnsClone()
+  {
+    // Create a node with image data
+    auto nodeWithData = mitk::DataNode::New();
+    nodeWithData->SetName("NodeWithImageData");
+
+    auto originalImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(10, 10, 10);
+    nodeWithData->SetData(originalImage);
+    m_DataStorage->Add(nodeWithData);
+
+    auto nodeUid = FindUidByName("NodeWithImageData");
+
+    // Get a clone of the data
+    auto result = m_Bridge->GetNodeData(nodeUid);
+
+    // Verify node was found and data was returned
+    CPPUNIT_ASSERT(result.nodeFound);
+    CPPUNIT_ASSERT(result.data.IsNotNull());
+
+    // Verify it's an Image
+    auto* imageClone = dynamic_cast<mitk::Image*>(result.data.GetPointer());
+    CPPUNIT_ASSERT(imageClone != nullptr);
+
+    // Verify the clone is a DIFFERENT object (not the same pointer)
+    CPPUNIT_ASSERT(imageClone != originalImage.GetPointer());
+
+    // Verify clone has the same dimensions
+    CPPUNIT_ASSERT_EQUAL(originalImage->GetDimension(), imageClone->GetDimension());
+    for (unsigned int i = 0; i < originalImage->GetDimension(); ++i)
+    {
+      CPPUNIT_ASSERT_EQUAL(originalImage->GetDimension(i), imageClone->GetDimension(i));
+    }
+  }
+
+  void GetNodeDataWithNoData()
+  {
+    // Root1 has no data attached
+    auto result = m_Bridge->GetNodeData(m_Root1Uid);
+
+    // Node should be found, but data should be nullptr
+    CPPUNIT_ASSERT(result.nodeFound);
+    CPPUNIT_ASSERT(result.data.IsNull());
+  }
+
+  void GetNodeDataWithNonExistentNode()
+  {
+    // Non-existent node
+    auto result = m_Bridge->GetNodeData("non-existent-uid");
+
+    // Node should NOT be found
+    CPPUNIT_ASSERT(!result.nodeFound);
+    CPPUNIT_ASSERT(result.data.IsNull());
+  }
+
+  void SetNodeDataToExistingNode()
+  {
+    // Create a node with image data
+    auto nodeWithData = mitk::DataNode::New();
+    nodeWithData->SetName("NodeForDataReplacement");
+
+    auto originalImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(5, 5, 5);
+    nodeWithData->SetData(originalImage);
+    m_DataStorage->Add(nodeWithData);
+
+    auto nodeUid = FindUidByName("NodeForDataReplacement");
+
+    // Create new image with different dimensions
+    auto newImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(8, 8, 8);
+
+    // Replace the data
+    bool success = m_Bridge->SetNodeData(nodeUid, newImage);
+    CPPUNIT_ASSERT(success);
+
+    // Verify the data was replaced
+    auto* currentData = nodeWithData->GetData();
+    CPPUNIT_ASSERT(currentData != nullptr);
+    CPPUNIT_ASSERT(currentData == newImage.GetPointer());
+
+    // Verify dimensions changed
+    auto* currentImage = dynamic_cast<mitk::Image*>(currentData);
+    CPPUNIT_ASSERT(currentImage != nullptr);
+    CPPUNIT_ASSERT_EQUAL(8u, currentImage->GetDimension(0));
+  }
+
+  void SetNodeDataToEmptyNode()
+  {
+    // Root1 has no data - set data on it
+    auto newImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(7, 7, 7);
+
+    bool success = m_Bridge->SetNodeData(m_Root1Uid, newImage);
+    CPPUNIT_ASSERT(success);
+
+    // Verify the data was set
+    auto* currentData = m_Root1->GetData();
+    CPPUNIT_ASSERT(currentData != nullptr);
+    CPPUNIT_ASSERT(currentData == newImage.GetPointer());
+
+    // Verify via GetNode that data_type is now set
+    auto nodeJson = m_Bridge->GetNode(m_Root1Uid);
+    CPPUNIT_ASSERT(nodeJson.has_value());
+    CPPUNIT_ASSERT(!nodeJson.value()["data_type"].is_null());
+    CPPUNIT_ASSERT_EQUAL(std::string("mitk::Image"), nodeJson.value()["data_type"].get<std::string>());
+  }
+
+  void SetNodeDataClearsData()
+  {
+    // Create a node with data
+    auto nodeWithData = mitk::DataNode::New();
+    nodeWithData->SetName("NodeForDataClearing");
+    nodeWithData->SetData(mitk::ImageGenerator::GenerateRandomImage<unsigned char>(5, 5, 5));
+    m_DataStorage->Add(nodeWithData);
+
+    auto nodeUid = FindUidByName("NodeForDataClearing");
+
+    // Verify data exists
+    CPPUNIT_ASSERT(nodeWithData->GetData() != nullptr);
+
+    // Set data to nullptr to clear it
+    bool success = m_Bridge->SetNodeData(nodeUid, nullptr);
+    CPPUNIT_ASSERT(success);
+
+    // Verify data is now nullptr
+    CPPUNIT_ASSERT(nodeWithData->GetData() == nullptr);
+
+    // Verify via GetNode that data_type is now null
+    auto nodeJson = m_Bridge->GetNode(nodeUid);
+    CPPUNIT_ASSERT(nodeJson.has_value());
+    CPPUNIT_ASSERT(nodeJson.value()["data_type"].is_null());
+  }
+
+  void SetNodeDataWithNonExistentNode()
+  {
+    auto newImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(5, 5, 5);
+
+    bool success = m_Bridge->SetNodeData("non-existent-uid", newImage);
+    CPPUNIT_ASSERT(!success);
+  }
+
+  void SetNodeDataSetsModificationTracking()
+  {
+    // Create a fresh node without modification tracking
+    auto freshNode = mitk::DataNode::New();
+    freshNode->SetName("FreshNodeForDataMod");
+    m_DataStorage->Add(freshNode);
+
+    auto nodeUid = FindUidByName("FreshNodeForDataMod");
+
+    // Verify no modification tracking yet
+    bool modified = false;
+    CPPUNIT_ASSERT(!freshNode->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
+
+    // Set data
+    auto newImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(5, 5, 5);
+    bool success = m_Bridge->SetNodeData(nodeUid, newImage);
+    CPPUNIT_ASSERT(success);
+
+    // Verify modification tracking is now set
+    CPPUNIT_ASSERT(freshNode->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
+    CPPUNIT_ASSERT(modified);
+
+    std::string lastMod;
+    CPPUNIT_ASSERT(freshNode->GetStringProperty(mitk::DataStorageBridge::LAST_MODIFICATION_PROPERTY_KEY, lastMod));
+    CPPUNIT_ASSERT_EQUAL(std::string("data_set"), lastMod);
   }
 
   void GetNodeProperties()

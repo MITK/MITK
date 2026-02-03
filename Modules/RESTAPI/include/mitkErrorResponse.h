@@ -40,6 +40,11 @@ namespace mitk
     static constexpr const char* CODE_PROPERTY_PROTECTED = "PROPERTY_PROTECTED";
     static constexpr const char* CODE_NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
     static constexpr const char* CODE_NODE_HAS_CHILDREN = "NODE_HAS_CHILDREN";
+    static constexpr const char* CODE_NO_DATA = "NO_DATA";
+    static constexpr const char* CODE_UNSUPPORTED_FORMAT = "UNSUPPORTED_FORMAT";
+    static constexpr const char* CODE_SERIALIZATION_ERROR = "SERIALIZATION_ERROR";
+    static constexpr const char* CODE_FILE_NOT_FOUND = "FILE_NOT_FOUND";
+    static constexpr const char* CODE_FILE_READ_ERROR = "FILE_READ_ERROR";
 
     /**
      * @brief Create an RFC 7807 error response.
@@ -132,6 +137,52 @@ namespace mitk
      * @return JSON error response with status 409
      */
     static Json NodeHasChildren(int childrenCount, const std::string& instance = "");
+
+    /**
+     * @brief Create a "No data" error response.
+     *
+     * @param nodeUid The node UID that has no data
+     * @param instance Request path
+     * @return JSON error response with status 404
+     */
+    static Json NoData(const std::string& nodeUid, const std::string& instance = "");
+
+    /**
+     * @brief Create an "Unsupported format" error response.
+     *
+     * @param detail Description of the format issue
+     * @param instance Request path
+     * @return JSON error response with status 415
+     */
+    static Json UnsupportedFormat(const std::string& detail, const std::string& instance = "");
+
+    /**
+     * @brief Create a "Serialization error" error response.
+     *
+     * @param detail Description of the serialization failure
+     * @param instance Request path
+     * @return JSON error response with status 500
+     */
+    static Json SerializationError(const std::string& detail, const std::string& instance = "");
+
+    /**
+     * @brief Create a "File not found" error response.
+     *
+     * @param filePath The file path that was not found
+     * @param instance Request path
+     * @return JSON error response with status 422
+     */
+    static Json FileNotFound(const std::string& filePath, const std::string& instance = "");
+
+    /**
+     * @brief Create a "File read error" error response.
+     *
+     * @param filePath The file path that could not be read
+     * @param detail Description of the read error
+     * @param instance Request path
+     * @return JSON error response with status 422
+     */
+    static Json FileReadError(const std::string& filePath, const std::string& detail, const std::string& instance = "");
   };
 }
 

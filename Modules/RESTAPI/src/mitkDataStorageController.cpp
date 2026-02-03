@@ -14,7 +14,20 @@ found in the LICENSE file.
 #include "mitkErrorResponse.h"
 #include "mitkNodeQueryParams.h"
 
+#include <mitkBaseDataSerializer.h>
+#include <mitkFileSystem.h>
+#include <mitkIOUtil.h>
+#include <mitkImage.h>
+#include <mitkSurface.h>
+#include <mitkPointSet.h>
+
+#include <vtkPolyData.h>
+
+#include <itkObjectFactoryBase.h>
+
 #include <algorithm>
+#include <fstream>
+#include <regex>
 #include <sstream>
 
 namespace mitk
@@ -22,6 +35,38 @@ namespace mitk
 
 namespace
 {
+  // JSON key constants to avoid magic strings
+  constexpr const char* JSON_KEY_TRANSFER = "transfer";
+  constexpr const char* JSON_KEY_MODE = "mode";
+  constexpr const char* JSON_KEY_FILE_PATH = "file_path";
+  constexpr const char* JSON_KEY_DIRECTORY_PATH = "directory_path";
+  constexpr const char* JSON_KEY_SIZE_BYTES = "size_bytes";
+  constexpr const char* JSON_KEY_DATA_METADATA = "data_metadata";
+  constexpr const char* JSON_KEY_DATA = "data";
+  constexpr const char* JSON_KEY_META = "meta";
+  constexpr const char* JSON_KEY_WARNING = "warning";
+  constexpr const char* JSON_KEY_UID = "uid";
+  constexpr const char* JSON_KEY_NAME = "name";
+  constexpr const char* JSON_KEY_KEY = "key";
+  constexpr const char* JSON_KEY_VALUE = "value";
+  constexpr const char* JSON_KEY_NEGATED = "negated";
+  constexpr const char* JSON_KEY_ERROR = "error";
+  constexpr const char* JSON_KEY_PROPERTY = "property";
+
+  // Transfer mode constants
+  constexpr const char* TRANSFER_MODE_DIRECT = "direct";
+  constexpr const char* TRANSFER_MODE_FILE_REFERENCE = "file-reference";
+
+  // MIME type constants
+  constexpr const char* MIME_APPLICATION_JSON = "application/json";
+  constexpr const char* MIME_APPLICATION_OCTET_STREAM = "application/octet-stream";
+
+  // Header constants
+  constexpr const char* HEADER_TRANSFER_MODE = "X-MITK-Transfer-Mode";
+  constexpr const char* HEADER_DATA_FORMAT = "X-MITK-Data-Format";
+  constexpr const char* HEADER_ACCEPT = "Accept";
+  constexpr const char* HEADER_CONTENT_TYPE = "Content-Type";
+  constexpr const char* HEADER_CONTENT_DISPOSITION = "Content-Disposition";
   /**
    * @brief Parse a comma-separated string into a vector of trimmed values.
    *
@@ -128,6 +173,137 @@ namespace
 DataStorageController::DataStorageController(DataStorageBridge& bridge)
   : m_Bridge(bridge)
 {
+}
+
+void DataStorageController::SetTempDirectory(const std::string& tempDir)
+{
+  m_TempDirectory = tempDir;
+}
+
+std::string DataStorageController::DetermineTransferMode(const httplib::Request& req) const
+{
+  // Check X-MITK-Transfer-Mode header first
+  if (req.has_header(HEADER_TRANSFER_MODE))
+  {
+    const std::string mode = req.get_header_value(HEADER_TRANSFER_MODE);
+    if (mode == TRANSFER_MODE_FILE_REFERENCE || mode == TRANSFER_MODE_DIRECT)
+    {
+      return mode;
+    }
+  }
+
+  // Fall back to Accept header
+  if (req.has_header(HEADER_ACCEPT))
+  {
+    const std::string accept = req.get_header_value(HEADER_ACCEPT);
+    if (accept.find(MIME_APPLICATION_JSON) != std::string::npos)
+    {
+      return TRANSFER_MODE_FILE_REFERENCE;
+    }
+    if (accept.find(MIME_APPLICATION_OCTET_STREAM) != std::string::npos)
+    {
+      return TRANSFER_MODE_DIRECT;
+    }
+  }
+
+  // Default to direct mode
+  return TRANSFER_MODE_DIRECT;
+}
+
+std::string DataStorageController::ExtractFilenameFromContentDisposition(const httplib::Request& req) const
+{
+  if (!req.has_header(HEADER_CONTENT_DISPOSITION))
+  {
+    return "";
+  }
+
+  const std::string disposition = req.get_header_value(HEADER_CONTENT_DISPOSITION);
+
+  // Parse filename from Content-Disposition header
+  // Format: attachment; filename="name.ext" or filename=name.ext
+  const std::regex filenameRegex(R"(filename\s*=\s*(?:\"([^\"]+)\"|([^\s;]+)))");
+  std::smatch match;
+  if (std::regex_search(disposition, match, filenameRegex))
+  {
+    // match[1] is quoted filename, match[2] is unquoted
+    return match[1].matched ? match[1].str() : match[2].str();
+  }
+
+  return "";
+}
+
+nlohmann::json DataStorageController::BuildDataMetadata(const mitk::BaseData* data) const
+{
+  nlohmann::json metadata;
+
+  if (data == nullptr)
+  {
+    return metadata;
+  }
+
+  // Handle Image data
+  if (auto* image = dynamic_cast<const mitk::Image*>(data))
+  {
+    // Dimensions
+    nlohmann::json dimensions = nlohmann::json::array();
+    for (unsigned int i = 0; i < image->GetDimension(); ++i)
+    {
+      dimensions.push_back(static_cast<int>(image->GetDimension(i)));
+    }
+    metadata["dimensions"] = dimensions;
+
+    // Spacing
+    auto geometry = image->GetGeometry();
+    if (geometry != nullptr)
+    {
+      auto spacing = geometry->GetSpacing();
+      metadata["spacing"] = {spacing[0], spacing[1], spacing[2]};
+
+      auto origin = geometry->GetOrigin();
+      metadata["origin"] = {origin[0], origin[1], origin[2]};
+    }
+
+    // Pixel type
+    auto pixelType = image->GetPixelType();
+    metadata["pixel_type"] = pixelType.GetComponentTypeAsString();
+  }
+  // Handle Surface data
+  else if (auto* surface = dynamic_cast<const mitk::Surface*>(data))
+  {
+    auto* vtkPoly = surface->GetVtkPolyData();
+    if (vtkPoly != nullptr)
+    {
+      metadata["points_count"] = static_cast<int>(vtkPoly->GetNumberOfPoints());
+      metadata["cells_count"] = static_cast<int>(vtkPoly->GetNumberOfCells());
+
+      double bounds[6];
+      vtkPoly->GetBounds(bounds);
+      metadata["bounds"] = {bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]};
+    }
+  }
+  // Handle PointSet data
+  else if (auto* pointSet = dynamic_cast<const mitk::PointSet*>(data))
+  {
+    metadata["points_count"] = static_cast<int>(pointSet->GetSize());
+
+    auto geometry = pointSet->GetGeometry();
+    if (geometry != nullptr)
+    {
+      auto bounds = geometry->GetBounds();
+      metadata["bounds"] = {bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]};
+    }
+  }
+
+  return metadata;
+}
+
+void DataStorageController::SendBinaryResponse(httplib::Response& res, const std::string& data,
+                                               const std::string& filename)
+{
+  res.status = 200;
+  res.set_content(data, MIME_APPLICATION_OCTET_STREAM);
+  // Content-Disposition includes filename with extension; format can be derived from extension
+  res.set_header(HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
 }
 
 NodeQueryParams DataStorageController::ParseNodeQueryParams(const httplib::Request& req) const
@@ -322,6 +498,171 @@ void DataStorageController::SendErrorResponse(httplib::Response& res, int status
   res.set_content(error.dump(), "application/json");
 }
 
+DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataPath(
+  const httplib::Request& req, const std::string& contentType)
+{
+  ResolveDataPathResult result;
+  result.success = false;
+  result.isTemporary = false;
+  result.errorStatus = 0;
+
+  const bool isFileReference = (contentType.find(MIME_APPLICATION_JSON) != std::string::npos);
+  const bool isDirectTransfer = (contentType.find(MIME_APPLICATION_OCTET_STREAM) != std::string::npos);
+
+  if (isFileReference)
+  {
+    // Parse JSON body to get file path
+    nlohmann::json body;
+    try
+    {
+      body = nlohmann::json::parse(req.body);
+    }
+    catch (const nlohmann::json::parse_error& e)
+    {
+      result.errorStatus = 400;
+      result.errorResponse = ErrorResponse::InvalidRequest(
+        "Invalid JSON: " + std::string(e.what()), req.path);
+      return result;
+    }
+
+    if (!body.contains(JSON_KEY_TRANSFER) || !body[JSON_KEY_TRANSFER].contains(JSON_KEY_FILE_PATH))
+    {
+      result.errorStatus = 400;
+      result.errorResponse = ErrorResponse::InvalidRequest(
+        "Missing transfer.file_path in request body", req.path);
+      return result;
+    }
+
+    const fs::path filePath(body[JSON_KEY_TRANSFER][JSON_KEY_FILE_PATH].get<std::string>());
+
+    if (!fs::exists(filePath))
+    {
+      result.errorStatus = 422;
+      result.errorResponse = ErrorResponse::FileNotFound(filePath.string(), req.path);
+      return result;
+    }
+
+    result.success = true;
+    result.filePath = filePath.string();
+    result.isTemporary = false;
+  }
+  else if (isDirectTransfer)
+  {
+    if (req.body.empty())
+    {
+      result.errorStatus = 400;
+      result.errorResponse = ErrorResponse::InvalidRequest("Request body is empty", req.path);
+      return result;
+    }
+
+    // Get file extension from Content-Disposition or X-MITK-Data-Format
+    std::string extension;
+    const std::string filename = this->ExtractFilenameFromContentDisposition(req);
+    if (!filename.empty())
+    {
+      const fs::path filenamePath(filename);
+      if (filenamePath.has_extension())
+      {
+        extension = filenamePath.extension().string();
+      }
+    }
+
+    if (extension.empty() && req.has_header(HEADER_DATA_FORMAT))
+    {
+      extension = "." + req.get_header_value(HEADER_DATA_FORMAT);
+    }
+
+    if (extension.empty())
+    {
+      result.errorStatus = 400;
+      result.errorResponse = ErrorResponse::InvalidRequest(
+        "Cannot determine file format. Provide filename in Content-Disposition header "
+        "or use X-MITK-Data-Format header.", req.path);
+      return result;
+    }
+
+    // Create temp file
+    fs::path tempFilePath;
+    try
+    {
+      tempFilePath = fs::path(IOUtil::CreateTemporaryFile("upload_XXXXXX" + extension, m_TempDirectory));
+    }
+    catch (const std::exception& e)
+    {
+      result.errorStatus = 500;
+      result.errorResponse = ErrorResponse::InternalError(
+        "Failed to create temporary file: " + std::string(e.what()), req.path);
+      return result;
+    }
+
+    // Write request body to temp file
+    try
+    {
+      std::ofstream outFile(tempFilePath, std::ios::binary);
+      if (!outFile.is_open())
+      {
+        result.errorStatus = 500;
+        result.errorResponse = ErrorResponse::InternalError(
+          "Failed to open temporary file for writing", req.path);
+        return result;
+      }
+      outFile.write(req.body.c_str(), static_cast<std::streamsize>(req.body.size()));
+      outFile.close();
+    }
+    catch (const std::exception& e)
+    {
+      fs::remove(tempFilePath);
+      result.errorStatus = 500;
+      result.errorResponse = ErrorResponse::InternalError(
+        "Failed to write temporary file: " + std::string(e.what()), req.path);
+      return result;
+    }
+
+    result.success = true;
+    result.filePath = tempFilePath.string();
+    result.isTemporary = true;
+  }
+  else
+  {
+    result.errorStatus = 415;
+    result.errorResponse = ErrorResponse::UnsupportedFormat(
+      "Unsupported Content-Type. Use 'application/json' for file-reference mode or "
+      "'application/octet-stream' for direct transfer mode.", req.path);
+  }
+
+  return result;
+}
+
+DataStorageController::LoadDataResult DataStorageController::LoadDataFromFile(
+  const std::string& filePath, const std::string& requestPath)
+{
+  LoadDataResult result;
+  result.success = false;
+  result.errorStatus = 0;
+
+  try
+  {
+    result.data = IOUtil::Load(filePath);
+  }
+  catch (const std::exception& e)
+  {
+    result.errorStatus = 422;
+    result.errorResponse = ErrorResponse::FileReadError(filePath, e.what(), requestPath);
+    return result;
+  }
+
+  if (result.data.empty() || result.data[0].IsNull())
+  {
+    result.errorStatus = 415;
+    result.errorResponse = ErrorResponse::UnsupportedFormat(
+      "No data could be loaded from file", requestPath);
+    return result;
+  }
+
+  result.success = true;
+  return result;
+}
+
 void DataStorageController::HandleGET_nodes(const httplib::Request& req, httplib::Response& res)
 {
   if (!m_Bridge.HasDataStorage())
@@ -428,39 +769,151 @@ void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httpli
     return;
   }
 
-  // Parse request body
+  // Determine transfer mode from Content-Type
+  const std::string contentType = req.has_header(HEADER_CONTENT_TYPE)
+    ? req.get_header_value(HEADER_CONTENT_TYPE)
+    : "";
+
+  const bool isJsonMode = (contentType.find(MIME_APPLICATION_JSON) != std::string::npos);
+  const bool isDirectTransfer = (contentType.find(MIME_APPLICATION_OCTET_STREAM) != std::string::npos);
+
   nlohmann::json nodeData;
-  try
+  bool hasDataTransfer = false;
+  std::string tempFilePath;
+  bool deleteTempFile = false;
+
+  if (isJsonMode)
   {
-    if (!req.body.empty())
+    // JSON body mode: parse for name, properties, and optional transfer section
+    try
     {
-      nodeData = nlohmann::json::parse(req.body);
+      if (!req.body.empty())
+      {
+        nodeData = nlohmann::json::parse(req.body);
+      }
+    }
+    catch (const nlohmann::json::parse_error& e)
+    {
+      this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+        "Invalid JSON: " + std::string(e.what()), req.path));
+      return;
+    }
+
+    // Check if there's a transfer section for data loading
+    if (nodeData.contains(JSON_KEY_TRANSFER) && nodeData[JSON_KEY_TRANSFER].contains(JSON_KEY_FILE_PATH))
+    {
+      hasDataTransfer = true;
     }
   }
-  catch (const nlohmann::json::parse_error& e)
+  else if (isDirectTransfer)
   {
-    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid JSON: " + std::string(e.what()), req.path));
+    // Binary body mode: name comes from query parameter
+    if (req.has_param(JSON_KEY_NAME))
+    {
+      nodeData[JSON_KEY_NAME] = req.get_param_value(JSON_KEY_NAME);
+    }
+    hasDataTransfer = true;
+  }
+  else if (!contentType.empty())
+  {
+    // Unsupported Content-Type
+    this->SendErrorResponse(res, 415, ErrorResponse::UnsupportedFormat(
+      "Unsupported Content-Type. Use 'application/json' or 'application/octet-stream'.", req.path));
+    return;
+  }
+  // If no Content-Type and no body, create node with defaults only
+
+  // Resolve data path if transfer is requested
+  std::string dataFilePath;
+  if (hasDataTransfer)
+  {
+    auto pathResult = this->ResolveDataPath(req, contentType);
+    if (!pathResult.success)
+    {
+      this->SendErrorResponse(res, pathResult.errorStatus, pathResult.errorResponse);
+      return;
+    }
+    dataFilePath = pathResult.filePath;
+    deleteTempFile = pathResult.isTemporary;
+  }
+
+  // Helper for cleanup
+  auto cleanupTempFile = [&]() {
+    if (deleteTempFile && !dataFilePath.empty())
+    {
+      try { fs::remove(dataFilePath); }
+      catch (const std::exception&) { /* ignore */ }
+    }
+  };
+
+  // Create the node (without data initially)
+  // Remove transfer section from nodeData as it's not a node property
+  nlohmann::json nodeDataForCreation = nodeData;
+  if (nodeDataForCreation.is_object() && nodeDataForCreation.contains(JSON_KEY_TRANSFER))
+  {
+    nodeDataForCreation.erase(JSON_KEY_TRANSFER);
+  }
+
+  auto createResult = m_Bridge.CreateNode(nodeDataForCreation);
+  if (!createResult.success)
+  {
+    cleanupTempFile();
+    this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to create node", req.path));
     return;
   }
 
-  auto createResult = m_Bridge.CreateNode(nodeData);
-  if (!createResult.success)
+  // Load and assign data if transfer was requested
+  std::string dataWarning;
+  if (hasDataTransfer)
   {
-    this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to create node", req.path));
-    return;
+    auto loadResult = this->LoadDataFromFile(dataFilePath, req.path);
+    if (!loadResult.success)
+    {
+      // Node was created but data loading failed - delete the node
+      m_Bridge.DeleteNode(createResult.uid, false);
+      cleanupTempFile();
+      this->SendErrorResponse(res, loadResult.errorStatus, loadResult.errorResponse);
+      return;
+    }
+
+    // Assign data to node
+    if (!m_Bridge.SetNodeData(createResult.uid, loadResult.data[0]))
+    {
+      m_Bridge.DeleteNode(createResult.uid, false);
+      cleanupTempFile();
+      this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
+        "Failed to assign data to node", req.path));
+      return;
+    }
+
+    // Check for multiple data warning
+    if (loadResult.data.size() > 1)
+    {
+      dataWarning = "File contained " + std::to_string(loadResult.data.size()) +
+        " data objects. Only the first one was assigned to the node. " +
+        std::to_string(loadResult.data.size() - 1) + " data object(s) were discarded.";
+    }
+
+    cleanupTempFile();
   }
 
   // Get the created node details
   auto node = m_Bridge.GetNode(createResult.uid);
 
   nlohmann::json response;
-  response["data"] = node.value();
-  response["meta"]["location"] = "/api/v1/datastorage/nodes/" + createResult.uid;
+  response[JSON_KEY_DATA] = node.value();
+  response[JSON_KEY_META]["location"] = "/api/v1/datastorage/nodes/" + createResult.uid;
 
   // Report any properties that failed to deserialize
   if (!createResult.failedProperties.empty())
   {
-    response["meta"]["failed_properties"] = createResult.failedProperties;
+    response[JSON_KEY_META]["failed_properties"] = createResult.failedProperties;
+  }
+
+  // Add data warning if applicable
+  if (!dataWarning.empty())
+  {
+    response[JSON_KEY_META][JSON_KEY_WARNING] = dataWarning;
   }
 
   this->SendJsonResponse(res, 201, response);
@@ -644,7 +1097,7 @@ void DataStorageController::HandlePOST_nodes_uid_children(const httplib::Request
     return;
   }
 
-  std::string parentUid = req.path_params.at("uid");
+  const std::string parentUid = req.path_params.at("uid");
 
   // Check if parent node exists
   auto parentNode = m_Bridge.GetNode(parentUid);
@@ -654,43 +1107,421 @@ void DataStorageController::HandlePOST_nodes_uid_children(const httplib::Request
     return;
   }
 
-  // Parse request body
+  // Determine transfer mode from Content-Type
+  const std::string contentType = req.has_header(HEADER_CONTENT_TYPE)
+    ? req.get_header_value(HEADER_CONTENT_TYPE)
+    : "";
+
+  const bool isJsonMode = (contentType.find(MIME_APPLICATION_JSON) != std::string::npos);
+  const bool isDirectTransfer = (contentType.find(MIME_APPLICATION_OCTET_STREAM) != std::string::npos);
+
   nlohmann::json nodeData;
-  try
+  bool hasDataTransfer = false;
+  std::string dataFilePath;
+  bool deleteTempFile = false;
+
+  if (isJsonMode)
   {
-    if (!req.body.empty())
+    // JSON body mode
+    try
     {
-      nodeData = nlohmann::json::parse(req.body);
+      if (!req.body.empty())
+      {
+        nodeData = nlohmann::json::parse(req.body);
+      }
+    }
+    catch (const nlohmann::json::parse_error& e)
+    {
+      this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+        "Invalid JSON: " + std::string(e.what()), req.path));
+      return;
+    }
+
+    // Check if there's a transfer section
+    if (nodeData.contains(JSON_KEY_TRANSFER) && nodeData[JSON_KEY_TRANSFER].contains(JSON_KEY_FILE_PATH))
+    {
+      hasDataTransfer = true;
     }
   }
-  catch (const nlohmann::json::parse_error& e)
+  else if (isDirectTransfer)
   {
-    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid JSON: " + std::string(e.what()), req.path));
+    // Binary body mode: name from query parameter
+    if (req.has_param(JSON_KEY_NAME))
+    {
+      nodeData[JSON_KEY_NAME] = req.get_param_value(JSON_KEY_NAME);
+    }
+    hasDataTransfer = true;
+  }
+  else if (!contentType.empty())
+  {
+    this->SendErrorResponse(res, 415, ErrorResponse::UnsupportedFormat(
+      "Unsupported Content-Type. Use 'application/json' or 'application/octet-stream'.", req.path));
+    return;
+  }
+  // If no Content-Type and no body, create node with defaults only
+
+  // Resolve data path if transfer is requested
+  if (hasDataTransfer)
+  {
+    auto pathResult = this->ResolveDataPath(req, contentType);
+    if (!pathResult.success)
+    {
+      this->SendErrorResponse(res, pathResult.errorStatus, pathResult.errorResponse);
+      return;
+    }
+    dataFilePath = pathResult.filePath;
+    deleteTempFile = pathResult.isTemporary;
+  }
+
+  // Helper for cleanup
+  auto cleanupTempFile = [&]() {
+    if (deleteTempFile && !dataFilePath.empty())
+    {
+      try { fs::remove(dataFilePath); }
+      catch (const std::exception&) { /* ignore */ }
+    }
+  };
+
+  // Create the node (without data initially)
+  nlohmann::json nodeDataForCreation = nodeData;
+  if (nodeDataForCreation.is_object() && nodeDataForCreation.contains(JSON_KEY_TRANSFER))
+  {
+    nodeDataForCreation.erase(JSON_KEY_TRANSFER);
+  }
+
+  auto createResult = m_Bridge.CreateNode(nodeDataForCreation, parentUid);
+  if (!createResult.success)
+  {
+    cleanupTempFile();
+    this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to create child node", req.path));
     return;
   }
 
-  // Use CreateNode with parent UID - eliminates need for separate CreateChildNode method
-  auto createResult = m_Bridge.CreateNode(nodeData, parentUid);
-  if (!createResult.success)
+  // Load and assign data if transfer was requested
+  std::string dataWarning;
+  if (hasDataTransfer)
   {
-    this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to create child node", req.path));
-    return;
+    auto loadResult = this->LoadDataFromFile(dataFilePath, req.path);
+    if (!loadResult.success)
+    {
+      m_Bridge.DeleteNode(createResult.uid, false);
+      cleanupTempFile();
+      this->SendErrorResponse(res, loadResult.errorStatus, loadResult.errorResponse);
+      return;
+    }
+
+    if (!m_Bridge.SetNodeData(createResult.uid, loadResult.data[0]))
+    {
+      m_Bridge.DeleteNode(createResult.uid, false);
+      cleanupTempFile();
+      this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
+        "Failed to assign data to node", req.path));
+      return;
+    }
+
+    if (loadResult.data.size() > 1)
+    {
+      dataWarning = "File contained " + std::to_string(loadResult.data.size()) +
+        " data objects. Only the first one was assigned to the node. " +
+        std::to_string(loadResult.data.size() - 1) + " data object(s) were discarded.";
+    }
+
+    cleanupTempFile();
   }
 
   // Get the created node details
   auto node = m_Bridge.GetNode(createResult.uid);
 
   nlohmann::json response;
-  response["data"] = node.value();
-  response["meta"]["location"] = "/api/v1/datastorage/nodes/" + createResult.uid;
+  response[JSON_KEY_DATA] = node.value();
+  response[JSON_KEY_META]["location"] = "/api/v1/datastorage/nodes/" + createResult.uid;
 
-  // Report any properties that failed to deserialize
   if (!createResult.failedProperties.empty())
   {
-    response["meta"]["failed_properties"] = createResult.failedProperties;
+    response[JSON_KEY_META]["failed_properties"] = createResult.failedProperties;
+  }
+
+  if (!dataWarning.empty())
+  {
+    response[JSON_KEY_META][JSON_KEY_WARNING] = dataWarning;
   }
 
   this->SendJsonResponse(res, 201, response);
+}
+
+void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req, httplib::Response& res)
+{
+  if (!m_Bridge.HasDataStorage())
+  {
+    this->SendErrorResponse(res, 503, ErrorResponse::DataStorageNotAvailable(req.path));
+    return;
+  }
+
+  const std::string uid = req.path_params.at("uid");
+
+  // Get a clone of the node's data for thread-safe serialization
+  // The result distinguishes between "node not found" and "node has no data"
+  const auto dataResult = m_Bridge.GetNodeData(uid);
+
+  if (!dataResult.nodeFound)
+  {
+    this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
+    return;
+  }
+
+  if (dataResult.data.IsNull())
+  {
+    this->SendErrorResponse(res, 404, ErrorResponse::NoData(uid, req.path));
+    return;
+  }
+
+  // Use the cloned data for all subsequent operations
+  const auto* const baseData = dataResult.data.GetPointer();
+
+  // Get node info for the filename hint (we know node exists at this point)
+  const auto nodeJson = m_Bridge.GetNode(uid);
+
+  // Determine transfer mode
+  const std::string transferMode = this->DetermineTransferMode(req);
+
+  // Find appropriate serializer using ITK ObjectFactory
+  const std::string serializerName = std::string(baseData->GetNameOfClass()) + "Serializer";
+  const auto instances = itk::ObjectFactoryBase::CreateAllInstance(serializerName.c_str());
+
+  if (instances.empty())
+  {
+    this->SendErrorResponse(res, 415, ErrorResponse::UnsupportedFormat(
+      "No serializer found for data type: " + std::string(baseData->GetNameOfClass()), req.path));
+    return;
+  }
+
+  // Find the first valid serializer
+  mitk::BaseDataSerializer* serializer = nullptr;
+  for (auto& instance : instances)
+  {
+    serializer = dynamic_cast<mitk::BaseDataSerializer*>(instance.GetPointer());
+    if (serializer != nullptr)
+    {
+      break;
+    }
+  }
+
+  if (serializer == nullptr)
+  {
+    this->SendErrorResponse(res, 415, ErrorResponse::UnsupportedFormat(
+      "No valid serializer found for data type: " + std::string(baseData->GetNameOfClass()), req.path));
+    return;
+  }
+
+  // Create a per-request temp subdirectory for this serialization
+  // This ensures all files created by the serializer are in one place
+  fs::path requestTempDir;
+  try
+  {
+    requestTempDir = fs::path(IOUtil::CreateTemporaryDirectory("data_XXXXXX", m_TempDirectory));
+  }
+  catch (const std::exception& e)
+  {
+    this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
+      "Failed to create temp directory: " + std::string(e.what()), req.path));
+    return;
+  }
+
+  // Configure serializer
+  serializer->SetData(baseData);
+
+  // Use node name as filename hint (from the JSON response)
+  const std::string nodeName = "data_"+ uid;
+  serializer->SetFilenameHint(nodeName);
+  serializer->SetWorkingDirectory(requestTempDir.string());
+
+  // Serialize
+  std::string writtenFilename;
+  try
+  {
+    writtenFilename = serializer->Serialize();
+  }
+  catch (const std::exception& e)
+  {
+    // Clean up the per-request temp directory on error
+    fs::remove_all(requestTempDir);
+    this->SendErrorResponse(res, 500, ErrorResponse::SerializationError(
+      "Serialization failed: " + std::string(e.what()), req.path));
+    return;
+  }
+
+  if (writtenFilename.empty())
+  {
+    fs::remove_all(requestTempDir);
+    this->SendErrorResponse(res, 500, ErrorResponse::SerializationError(
+      "Serialization returned empty filename", req.path));
+    return;
+  }
+
+  // Build full path to serialized file using std::filesystem for OS independence
+  const fs::path fullPath = requestTempDir / writtenFilename;
+
+  if (transferMode == TRANSFER_MODE_FILE_REFERENCE)
+  {
+    try
+    {
+      // Return JSON response with file path
+      // The per-request temp directory persists until server stop
+      // or client explicitly cleans it up
+      // Note: format is not included as it can be derived from file extension in file_path
+      nlohmann::json response;
+      response[JSON_KEY_TRANSFER][JSON_KEY_MODE] = TRANSFER_MODE_FILE_REFERENCE;
+
+      // Get file size using std::filesystem
+      if (fs::exists(fullPath))
+      {
+        response[JSON_KEY_TRANSFER][JSON_KEY_SIZE_BYTES] = static_cast<int64_t>(fs::file_size(fullPath));
+      }
+      response[JSON_KEY_TRANSFER][JSON_KEY_FILE_PATH] = fullPath.string();
+
+      // Include the directory path so client knows where all related files are
+      response[JSON_KEY_TRANSFER][JSON_KEY_DIRECTORY_PATH] = requestTempDir.string();
+
+      // Add data metadata
+      response[JSON_KEY_DATA_METADATA] = this->BuildDataMetadata(baseData);
+
+      this->SendJsonResponse(res, 200, response);
+    }
+    catch (const std::exception& e)
+    {
+      fs::remove_all(requestTempDir);
+      this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
+        "Failed to build file-reference response: " + std::string(e.what()), req.path));
+    }
+  }
+  else // direct mode
+  {
+    try
+    {
+      // Read file and return as binary
+      std::ifstream file(fullPath, std::ios::binary);
+      if (!file.is_open())
+      {
+        fs::remove_all(requestTempDir);
+        this->SendErrorResponse(res, 500, ErrorResponse::SerializationError(
+          "Failed to read serialized file", req.path));
+        return;
+      }
+
+      std::ostringstream contentStream;
+      contentStream << file.rdbuf();
+      const std::string content = contentStream.str();
+      file.close();
+
+      // For direct mode, we can clean up the per-request temp directory immediately
+      // since we've read all the data into memory
+      fs::remove_all(requestTempDir);
+
+      this->SendBinaryResponse(res, content, writtenFilename);
+    }
+    catch (const std::exception& e)
+    {
+      fs::remove_all(requestTempDir);
+      this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
+        "Failed to read and send data: " + std::string(e.what()), req.path));
+    }
+  }
+}
+
+void DataStorageController::HandlePUT_nodes_uid_data(const httplib::Request& req, httplib::Response& res)
+{
+  if (!m_Bridge.HasDataStorage())
+  {
+    this->SendErrorResponse(res, 503, ErrorResponse::DataStorageNotAvailable(req.path));
+    return;
+  }
+
+  const std::string uid = req.path_params.at("uid");
+
+  // Check if node exists
+  const auto nodeJson = m_Bridge.GetNode(uid);
+  if (!nodeJson.has_value())
+  {
+    this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
+    return;
+  }
+
+  // Get Content-Type header
+  const std::string contentType = req.has_header(HEADER_CONTENT_TYPE)
+    ? req.get_header_value(HEADER_CONTENT_TYPE)
+    : "";
+
+  // Validate Content-Type
+  const bool isFileReference = (contentType.find(MIME_APPLICATION_JSON) != std::string::npos);
+  const bool isDirectTransfer = (contentType.find(MIME_APPLICATION_OCTET_STREAM) != std::string::npos);
+
+  if (!isFileReference && !isDirectTransfer)
+  {
+    this->SendErrorResponse(res, 415, ErrorResponse::UnsupportedFormat(
+      "Unsupported Content-Type. Use 'application/json' for file-reference mode or "
+      "'application/octet-stream' for direct transfer mode.", req.path));
+    return;
+  }
+
+  // Resolve data file path
+  auto pathResult = this->ResolveDataPath(req, contentType);
+  if (!pathResult.success)
+  {
+    this->SendErrorResponse(res, pathResult.errorStatus, pathResult.errorResponse);
+    return;
+  }
+
+  // Helper for cleanup
+  auto cleanupTempFile = [&]() {
+    if (pathResult.isTemporary && !pathResult.filePath.empty())
+    {
+      try { fs::remove(pathResult.filePath); }
+      catch (const std::exception&) { /* ignore */ }
+    }
+  };
+
+  // Load data from file
+  auto loadResult = this->LoadDataFromFile(pathResult.filePath, req.path);
+  if (!loadResult.success)
+  {
+    cleanupTempFile();
+    this->SendErrorResponse(res, loadResult.errorStatus, loadResult.errorResponse);
+    return;
+  }
+
+  // Assign loaded data to node
+  if (!m_Bridge.SetNodeData(uid, loadResult.data[0]))
+  {
+    cleanupTempFile();
+    this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
+      "Failed to assign data to node", req.path));
+    return;
+  }
+
+  cleanupTempFile();
+
+  // Build response
+  const auto updatedNodeJson = m_Bridge.GetNode(uid);
+
+  nlohmann::json response;
+  if (updatedNodeJson.has_value())
+  {
+    response[JSON_KEY_DATA] = updatedNodeJson.value();
+  }
+  else
+  {
+    response[JSON_KEY_DATA][JSON_KEY_UID] = uid;
+  }
+
+  if (loadResult.data.size() > 1)
+  {
+    response[JSON_KEY_META][JSON_KEY_WARNING] =
+      "File contained " + std::to_string(loadResult.data.size()) +
+      " data objects. Only the first one was assigned to the node. " +
+      std::to_string(loadResult.data.size() - 1) + " data object(s) were discarded.";
+  }
+
+  this->SendJsonResponse(res, 200, response);
 }
 
 void DataStorageController::HandleGET_nodes_uid_properties(const httplib::Request& req, httplib::Response& res)

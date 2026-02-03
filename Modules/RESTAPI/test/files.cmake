@@ -4,4 +4,5 @@ set(MODULE_TESTS
   mitkDataStorageBridgeTest.cpp
   mitkHealthControllerTest.cpp
   mitkDataStorageControllerTest.cpp
+  mitkDataStorageControllerDataTest.cpp
 )

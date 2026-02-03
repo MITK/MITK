@@ -612,7 +612,7 @@ const mitk::Image* mitk::MultiLabelSegmentation::GetGroupImage(GroupIndexType gr
   return m_GroupContainer.at(groupID).GetPointer();
 }
 
-void mitk::MultiLabelSegmentation::UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep)
+void mitk::MultiLabelSegmentation::UpdateGroupImage(GroupIndexType groupID, const mitk::Image* sourceImage, TimeStepType timestep, TimeStepType sourceTimestep, int sourceAccessOptions)
 {
   if (!this->ExistGroup(groupID)) mitkThrow() << "Error, cannot update group image. Group ID is invalid. Invalid ID: " << groupID;
   if (nullptr == sourceImage) mitkThrow() << "Error, cannot update group image. Passed sourceImage is invalid.";
@@ -623,7 +623,7 @@ void mitk::MultiLabelSegmentation::UpdateGroupImage(GroupIndexType groupID, cons
     mitkThrow() << "Error, cannot update group image. Passed sourceImage has not the same geometry then the MultiLabelSegmentationInstance.";
 
   auto imageTimeStep = SelectImageByTimeStep(sourceImage, sourceTimestep);
-  mitk::ImageReadAccessor sourceImageAcc(imageTimeStep);
+  mitk::ImageReadAccessor sourceImageAcc(imageTimeStep, nullptr, sourceAccessOptions);
   m_GroupContainer[groupID]->SetVolume(sourceImageAcc.GetData(), timestep);
 }
 

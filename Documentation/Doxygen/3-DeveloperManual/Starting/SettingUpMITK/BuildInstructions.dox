@@ -53,7 +53,7 @@ xcode-select --install
 Then install the following packages, for example via Homebrew:
 
 \code{.unparsed}
-brew install freetype graphviz libomp openssl@3 swig
+brew install freetype graphviz libomp openssl@3
 \endcode
 
 Note: Because of known incompatibilities, OpenMP is disabled on macOS when <tt>MITK_USE_Python3</tt> is enabled (default), though.

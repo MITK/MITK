@@ -8,7 +8,7 @@ There are at least three closely intertwined aspects to consider when working wi
 
 1. **Embedding Python** using the Python C API by including Python.h and linking against the Python library in C++.
 2. **Running the Python interpreter** as a separate process, passing command-line arguments.
-3. **Exposing MITK functionality to Python** via pyMITK, using SWIG to generate the necessary bindings.
+3. **Exposing MITK functionality to Python** via the mitk Python module, using pybind11 to generate the necessary bindings.
 
 Each of these aspects comes with its own challenges, and their integration imposes certain restrictions and pitfalls that can affect one another.
 As such, even minor changes to one of these components require careful consideration of the others.
@@ -84,10 +84,9 @@ In most cases, you won't need to interact with the `MitkPreloadPython` module di
 To run the Python interpreter as a separate process, use `MitkPythonHelper`.
 To exchange data (e.g., images) between MITK and Python, use `MitkPython`.
 
-## SWIG Wrapping: pyMITK
+## Python Wrapping: The mitk Python module
 
-The Python wrapping of MITK is handled by SWIG in the `pyMITK` build target.
-The SWIG runtime header is generated at `MITK-build/swigpyrun.h`, and the pyMITK module is built as a Python package inside the site-packages folder of `MITK-build/python`.
+The Python wrapping of MITK is handled by pybind11.
 
 **Note**: Currently, only a small subset of MITK is wrapped — primarily to support data exchange, such as transferring images, between MITK and Python.
 
@@ -135,12 +134,12 @@ To sign an application bundle on macOS with `codesign`, the bundle must follow c
 Therefore, we convert the `python` directory from `MITK-build` into `Python.framework` for packaging.
 This conversion is handled in the `MITK-build/FixMacOSInstaller.cmake` script, which CPack executes as a post-build step.
 
-### Importing pyMITK in the Python interpreter of an installed MITK on macOS
+### Importing mitk in the Python interpreter of an installed MITK on macOS
 
 We are using CMake's `BundleUtilities` to create application bundles on macOS.
 Unfortunately, it rewrites all library dependency paths to start with `@executable_path/../MacOS`, which works fine for executables in the usual `Contents/MacOS` folder of an app bundle.
-However, this breaks when the Python interpreter in `Contents/Frameworks/Python.framework/Versions/A/bin` tries to load the dependencies of the `pyMITK` package.
+However, this breaks when the Python interpreter in `Contents/Frameworks/Python.framework/Versions/A/bin` tries to load the dependencies of the `mitk` package.
 
-To fix this, we adjust the runtime dependency paths of the `pyMITK` package to use an `@loader_path` approach in the `FixMacOSInstaller.cmake` script, which runs automatically after `fixup_bundle()` has finished modifying all paths.
+To fix this, we adjust the runtime dependency paths of the `mitk` package to use an `@loader_path` approach in the `FixMacOSInstaller.cmake` script, which runs automatically after `fixup_bundle()` has finished modifying all paths.
 This fix currently does not cover autoload-modules, which is why they cannot be loaded in this scenario.
 Running the Python interpreter as subprocess of an MITK application, however, will load autoload-modules correctly.

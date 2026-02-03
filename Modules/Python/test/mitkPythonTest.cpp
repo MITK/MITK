@@ -13,103 +13,126 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 #include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
-#include <mitkStandardFileLocations.h>
 #include <mitkIOUtil.h>
 #include <mitkPythonContext.h>
-
 
 class mitkPythonTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPythonTestSuite);
-  MITK_TEST(TestEvaluateOperationWithResult);
-  MITK_TEST(TestCopyImageToAndBackPython);
+  MITK_TEST(TestExecuteAndGetVariable);
+  MITK_TEST(TestBindImageToPython);
+  MITK_TEST(TestImageAsNumpyAccessors);
   MITK_TEST(TestPythonContextExclusivity);
   CPPUNIT_TEST_SUITE_END();
 
 public:
 
-  void setUp() {}
-
-  void TestEvaluateOperationWithResult()
+  void setUp()
   {
-    auto pythonContext = mitk::PythonContext::New();
-    pythonContext->Activate();
-    std::string pythonCommand;
-    pythonCommand.append("from io import StringIO\n");
-    pythonCommand.append("_mitk_stdout = StringIO()\n");
-    pythonCommand.append("sys.stdout = sys.stderr = _mitk_stdout\n");
-    pythonContext->ExecuteString(pythonCommand);
-    std::string result = pythonContext->ExecuteString("print(5+5)\n");
-    CPPUNIT_ASSERT_MESSAGE("Result should be 10", result == "10\n");
   }
 
-  void TestCopyImageToAndBackPython()
+  void TestExecuteAndGetVariable()
   {
-    auto pythonContext = mitk::PythonContext::New();
-    if (pythonContext.IsNotNull())
+    mitk::PythonContext pythonContext;
+    pythonContext.Activate();
+
+    pythonContext.Execute("result = 5 + 5");
+    auto result = pythonContext.GetVariableAsInt("result");
+
+    CPPUNIT_ASSERT_MESSAGE("Variable 'result' should exist", result.has_value());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Result should be 10", 10, result.value());
+  }
+
+  void TestBindImageToPython()
+  {
+    mitk::PythonContext pythonContext;
+    pythonContext.Activate();
+
+    auto image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
+
+    try
     {
-      pythonContext->Activate();
-      mitk::Image::Pointer image_in = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
-      mitk::Image::Pointer image_out;
-      try
-      {
-        pythonContext->TransferBaseDataToPython(image_in.GetPointer());
-      }
-      catch (const mitk::Exception &e)
-      {
-        MITK_ERROR << e.GetDescription();
-        CPPUNIT_FAIL("Error in copying mitk image to Python");
-      }
-      try
-      {
-        image_out = pythonContext->LoadImageFromPython("_mitk_image");
-      }
-      catch (const mitk::Exception &e)
-      {
-        MITK_ERROR << e.GetDescription();
-        CPPUNIT_FAIL("Error in copying mitk image from Python");
-      }
-      CPPUNIT_ASSERT_MESSAGE("copy an image to python and back should result in equal image",
-                             mitk::Equal(*image_in, *image_out, mitk::eps, true));
+      pythonContext.BindImage(image, "test_image");
     }
-    else
+    catch (const mitk::Exception& e)
     {
-      CPPUNIT_FAIL("Error occured while TestCopyImageToAndBackPython");
+      MITK_ERROR << e.GetDescription();
+      CPPUNIT_FAIL("Error in binding MITK image to Python");
     }
+
+    CPPUNIT_ASSERT_MESSAGE("test_image should exist in context", pythonContext.HasVariable("test_image"));
+
+    pythonContext.Execute("dims = test_image.get_dimension()");
+    auto dims = pythonContext.GetVariableAsInt("dims");
+
+    CPPUNIT_ASSERT_MESSAGE("Variable 'dims' should exist", dims.has_value());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Image should have 3 dimensions", 3, dims.value());
+  }
+
+  void TestImageAsNumpyAccessors()
+  {
+    mitk::PythonContext pythonContext;
+    pythonContext.Activate();
+
+    auto image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
+    pythonContext.BindImage(image, "test_image");
+
+    // Test read-only accessor
+    pythonContext.Execute(
+      "import gc\n"
+      "arr_ro = test_image.as_numpy()\n"
+      "ro_shape = arr_ro.shape\n"
+      "ro_writeable = arr_ro.flags.writeable\n"
+      "del arr_ro\n"
+    );
+
+    auto roWriteable = pythonContext.GetVariableAsBool("ro_writeable");
+    CPPUNIT_ASSERT_MESSAGE("ro_writeable should exist", roWriteable.has_value());
+    CPPUNIT_ASSERT_MESSAGE("Read-only array should not be writeable", !roWriteable.value());
+
+    // Test writeable accessor
+    pythonContext.Execute(
+      "arr_rw = test_image.as_numpy(writeable=True)\n"
+      "rw_writeable = arr_rw.flags.writeable\n"
+      "original_value = int(arr_rw[0, 0, 0])\n"
+      "arr_rw[0, 0, 0] = 42\n"
+      "modified_value = int(arr_rw[0, 0, 0])\n"
+      "del arr_rw\n"
+    );
+
+    auto rwWriteable = pythonContext.GetVariableAsBool("rw_writeable");
+    CPPUNIT_ASSERT_MESSAGE("rw_writeable should exist", rwWriteable.has_value());
+    CPPUNIT_ASSERT_MESSAGE("Writeable array should be writeable", rwWriteable.value());
+
+    auto modifiedValue = pythonContext.GetVariableAsInt("modified_value");
+    CPPUNIT_ASSERT_MESSAGE("modified_value should exist", modifiedValue.has_value());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Modified value should be 42", 42, modifiedValue.value());
   }
 
   void TestPythonContextExclusivity()
   {
-    auto pythonContext_1 = mitk::PythonContext::New();
-    auto pythonContext_2 = mitk::PythonContext::New();
-    if (pythonContext_1.IsNotNull() && pythonContext_2.IsNotNull())
+    mitk::PythonContext pythonContext_1;
+    mitk::PythonContext pythonContext_2;
+
+    try
     {
-      try
-      {
-        pythonContext_1->ExecuteString("test_var_context_1 = 10\n");
-        pythonContext_2->ExecuteString("test_var_context_2 = 20\n");
-      }
-      catch (const mitk::Exception &e)
-      {
-        MITK_ERROR << e.GetDescription();
-        CPPUNIT_FAIL("Error in executing commands in python");
-      }
-      bool isVarExists = pythonContext_1->HasVariable("test_var_context_1");
-      CPPUNIT_ASSERT_MESSAGE("test_var_context_1 should be found in context 1", isVarExists);
-
-      isVarExists = pythonContext_1->HasVariable("test_var_context_2");
-      CPPUNIT_ASSERT_MESSAGE("test_var_context_2 should not be found in context 1", !isVarExists);
-
-      isVarExists = pythonContext_2->HasVariable("test_var_context_2");
-      CPPUNIT_ASSERT_MESSAGE("test_var_context_2 should be found in context 2", isVarExists);
-
-      isVarExists = pythonContext_2->HasVariable("test_var_context_1");
-      CPPUNIT_ASSERT_MESSAGE("test_var_context_1 should not be found in context 2", !isVarExists);
+      pythonContext_1.Execute("test_var_context_1 = 10");
+      pythonContext_2.Execute("test_var_context_2 = 20");
     }
-    else
+    catch (const mitk::Exception& e)
     {
-      CPPUNIT_FAIL("Error occured while TestCopyImageToAndBackPython");
+      MITK_ERROR << e.GetDescription();
+      CPPUNIT_FAIL("Error in executing commands in Python");
     }
+
+    CPPUNIT_ASSERT_MESSAGE("test_var_context_1 should be found in context 1",
+                           pythonContext_1.HasVariable("test_var_context_1"));
+    CPPUNIT_ASSERT_MESSAGE("test_var_context_2 should not be found in context 1",
+                           !pythonContext_1.HasVariable("test_var_context_2"));
+    CPPUNIT_ASSERT_MESSAGE("test_var_context_2 should be found in context 2",
+                           pythonContext_2.HasVariable("test_var_context_2"));
+    CPPUNIT_ASSERT_MESSAGE("test_var_context_1 should not be found in context 2",
+                           !pythonContext_2.HasVariable("test_var_context_1"));
   }
 };
 

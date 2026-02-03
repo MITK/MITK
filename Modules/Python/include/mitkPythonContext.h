@@ -13,93 +13,114 @@ found in the LICENSE file.
 #ifndef mitkPythonContext_h
 #define mitkPythonContext_h
 
-#include <mitkImage.h>
 #include <MitkPythonExports.h>
 
 #include <memory>
 #include <optional>
+#include <string>
 
 namespace mitk
 {
-  class MITKPYTHON_EXPORT PythonContext : public itk::LightObject
+  class Image;
+
+  /**
+   * \brief Provides a Python interpreter context for executing Python code and
+   *        interacting with MITK data like images.
+   *
+   * This class wraps a Python interpreter and maintains separate global and
+   * local dictionaries for executing Python code. It allows binding MITK data
+   * like images to Python variables and retrieving Python variables from the
+   * context in a type-safe manner.
+   */
+  class MITKPYTHON_EXPORT PythonContext
   {
   public:
-    mitkClassMacroItkParent(PythonContext, itk::LightObject);
-
-    itkFactorylessNewMacro(Self);
-    mitkNewMacro1Param(Self, const std::string&);
+    /**
+     * \brief Constructs a PythonContext and optionally creates or activates a
+     *        virtual environment.
+     *
+     * \param venvName Name of the Python virtual environment to create or
+                       activate. If empty, no virtual environment is used.
+     */
+    explicit PythonContext(const std::string& venvName = {});
 
     /**
-     * @brief Imports essential python packages: numpy, os, sys, io
-     * and pyMITK. Also adds current bin folder to path.
+     * \brief Destructor. Clears internal Python dictionaries.
+     */
+    ~PythonContext();
+
+    /**
+     * \brief Initializes the Python interpreter context and sets up module
+     *        paths.
+     *
+     * Adds the application path and the active virtual environment's
+     * site-packages to the Python sys.path. Also imports NumPy and MITK Python
+     * modules.
      */
     void Activate();
 
     /**
-     * @brief Check if given variable exists in the current context defined by
-     * `globals` (m_GlobalDictionary) & `locals` (m_LocalDictionary) namespaces.
+     * \brief Checks whether a Python variable with the given name exists.
+     *
+     * \param varName Name of the Python variable to check.
+     *
+     * \return True if the variable exists in either the local or global
+     *         dictionary.
      */
     bool HasVariable(const std::string &varName);
 
-    template <typename T>
-    std::optional<T> GetVariableAs(const std::string& varName);
+    /**
+     * \brief Retrieves a Python variable as a bool.
+     *
+     * \param varName Name of the Python variable.
+     *
+     * \return std::optional<bool> containing the value if it exists and can be
+     *         cast, std::nullopt otherwise.
+     */
+    std::optional<bool> GetVariableAsBool(const std::string& varName);
 
     /**
-     * @brief Provides view into mitk::Image type object in Python
-     * as mitk::Image* pointer in MITK.
+     * \brief Retrieves a Python variable as an int.
+     *
+     * \param varName Name of the Python variable.
+     *
+     * \return std::optional<int> containing the value if it exists and can be
+     *         cast, std::nullopt otherwise.
      */
-    mitk::Image* LoadImageFromPython(const std::string &varName);
+    std::optional<int> GetVariableAsInt(const std::string& varName);
 
     /**
-     * @brief Creates view of mitk::BaseData pointer in MITK into corresponding SWIG proxy
-     * type object in Python.
+     * \brief Retrieves a Python variable as a string.
+     *
+     * \param varName Name of the Python variable.
+     *
+     * \return std::optional<std::string> containing the value if it exists and
+     *         can be cast, std::nullopt otherwise.
      */
-    void TransferBaseDataToPython(mitk::BaseData *mitkImage, const std::string &varName = "_mitk_image");
+    std::optional<std::string> GetVariableAsString(const std::string& varName);
 
     /**
-     * @brief Executes the given python syntax in the current context defined by
-     * `globals` (m_GlobalDictionary) & `locals` (m_LocalDictionary) namespaces.
+     * \brief Binds an MITK image to a Python variable in the global dictionary.
+     *
+     * \param image Pointer to the Image to bind. If nullptr, the variable is
+     *              set to None.
+     * \param varName Name of the Python variable to assign the image to.
      */
-    std::string ExecuteString(const std::string &pyCommands);
+    void BindImage(mitk::Image* image, const std::string& varName);
 
     /**
-     * @brief Executes the given python file in the current context defined by
-     * `globals` (m_GlobalDictionary) & `locals` (m_LocalDictionary)
+     * \brief Executes arbitrary Python code with the context's dictionaries.
+     *
+     * \param expression The Python code to execute.
+     *
+     * \throws mitk::Exception if execution fails.
      */
-    std::string ExecuteFile(const std::string &filePath);
-
-    /**
-     * @brief Returns any exception stacktrace occured in python as string back
-     * to MITK.
-     */
-    std::string GetPythonExceptionTraceback();
-
-    /**
-     * @brief Returns value from the given string stream object.
-     * See: https://docs.python.org/3/library/io.html#io.StringIO.getvalue
-     */
-    std::string GetStdOut(const std::string &varName = "_mitk_stdout");
-
-  protected:
-    explicit PythonContext(const std::string& venvName = {});
-    ~PythonContext();
+    void Execute(const std::string &expression);
 
   private:
     struct Impl;
     std::unique_ptr<Impl> m_Impl;
   };
-
-  template <>
-  MITKPYTHON_EXPORT std::optional<bool> PythonContext::GetVariableAs<bool>(const std::string&);
-
-  template <>
-  MITKPYTHON_EXPORT std::optional<int> PythonContext::GetVariableAs<int>(const std::string&);
-
-  template <>
-  MITKPYTHON_EXPORT std::optional<double> PythonContext::GetVariableAs<double>(const std::string&);
-
-  template <>
-  MITKPYTHON_EXPORT std::optional<std::string> PythonContext::GetVariableAs<std::string>(const std::string&);
 }
 
 #endif

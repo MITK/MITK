@@ -13,8 +13,8 @@ if(MITK_USE_Python3)
   endif()
 
   if(NOT DEFINED ${proj}_DIR)
-    set(version 3.12.11)       # IMPORTANT: On any version update, adapt MITK_REQUIRED_OPENSSL_VERSION
-    set(release_date 20250712) #            in the top-level CMakeLists.txt.
+    set(version 3.12.12)       # IMPORTANT: On any version update, adapt MITK_REQUIRED_OPENSSL_VERSION
+    set(release_date 20260114) #            in the top-level CMakeLists.txt.
 
     set(base_url "https://github.com/astral-sh/python-build-standalone/releases/download/${release_date}")
     set(variant "install_only_stripped")
@@ -22,20 +22,20 @@ if(MITK_USE_Python3)
     if(WIN32)
       set(platform "pc-windows-msvc")
       set(arch "x86_64")
-      set(url_hash "SHA256=49911a479230f9a0ad33fc6742229128249f695502360dab3f5fd9096585e9a5")
+      set(url_hash "SHA256=65544affdc45a3755db3a08fd0b36c5b590bb49337b99a19b8840c33189fe75e")
     elseif(APPLE)
       set(platform "apple-darwin")
       if(CMAKE_OSX_ARCHITECTURES STREQUAL "x86_64")
         set(arch "x86_64")
-        set(url_hash "SHA256=1154b0be69bdd8c144272cee596181f096577d535bff1548f8df49e0d7d9c721")
+        set(url_hash "SHA256=bcd4bc53a5f7d6baa2976a62fd95c6907f86c4ad7ae220c2ee1f49deba8c6d1c")
       else()
         set(arch "aarch64")
-        set(url_hash "SHA256=0a5748a455ebd0ef0419bffa0b239c1596ea021937fa4c9eb3b8893cf7b46d48")
+        set(url_hash "SHA256=ed1f300bd3b45aa481d887b2dd8e12f989b583f67755c219a6092756a09b609f")
       endif()
     else()
       set(platform "unknown-linux-gnu")
       set(arch "x86_64_v2")
-      set(url_hash "SHA256=ddf0c26a2df22156672e7476fda10845056d13d4b5223de6ba054d25bfcd9d3c")
+      set(url_hash "SHA256=3426df806b8072a80e6adf88de005d7f010ea90ddbea1d1d725118c5ab04ac5a")
     endif()
 
     set(url "${base_url}/cpython-${version}+${release_date}-${arch}-${platform}-${variant}.tar.gz")

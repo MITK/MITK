@@ -12,10 +12,6 @@ mitk_query_custom_ep_vars()
 
 set(proj_DEPENDENCIES GDCM TBB ${${proj}_CUSTOM_DEPENDENCIES})
 
-if(MITK_USE_HDF5)
-  list(APPEND proj_DEPENDENCIES HDF5)
-endif()
-
 set(ITK_DEPENDS ${proj})
 
 if(NOT DEFINED ITK_DIR)
@@ -45,7 +41,7 @@ if(NOT DEFINED ITK_DIR)
      LIST_SEPARATOR ${sep}
      UPDATE_COMMAND ""
      GIT_REPOSITORY https://github.com/MITK/ITK.git
-     GIT_TAG 080810f0334a08592168a9dc1d67ec50510a818f # branch: v5.4.3-patched
+     GIT_TAG b60e158fb235badc6226d06ca883e4221d8640e8 # branch: v5.4.4-patched
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS
@@ -55,8 +51,6 @@ if(NOT DEFINED ITK_DIR)
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
        -DGDCM_DIR:PATH=${GDCM_DIR}
-       -DITK_USE_SYSTEM_HDF5:BOOL=ON
-       -DHDF5_DIR:PATH=${HDF5_DIR}
        -DModule_GrowCut:BOOL=ON
        "-DTBB_DIR:PATH=${TBB_DIR}"
        -DModule_ITKTBB:BOOL=ON

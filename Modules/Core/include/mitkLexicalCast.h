@@ -34,7 +34,7 @@ namespace mitk
       try
       {
         stream.unsetf(std::ios::skipws);
-        stream.precision(boost::detail::lcast_get_precision<Target>());
+        stream.precision(boost::detail::lcast_precision<Target>::value);
         stream >> result;
       }
       catch (const std::ios_base::failure &)

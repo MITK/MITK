@@ -16,7 +16,7 @@ if(NOT DEFINED TBB_DIR)
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
     GIT_REPOSITORY https://github.com/uxlfoundation/oneTBB.git
-    GIT_TAG 45587e94dfb6dfe00220c5f520020a5bc745e92f # v2022.1.0
+    GIT_TAG f1862f38f83568d96e814e469ab61f88336cc595 # v2022.3.0
     CMAKE_GENERATOR ${gen}
     CMAKE_GENERATOR_PLATFORM ${gen_platform}
     CMAKE_ARGS

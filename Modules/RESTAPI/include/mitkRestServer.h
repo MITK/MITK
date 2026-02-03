@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <atomic>
 #include <mutex>
 #include <set>
+#include <deque>
 
 // Forward declaration for httplib
 namespace httplib { class Server; }
@@ -67,6 +68,11 @@ namespace mitk
     std::vector<std::string> GetClientIPs() const override;
     std::optional<RequestInfo> GetLastRequestInfo() const override;
 
+    void SetLogLimit(std::optional<unsigned int> limit) override;
+    std::optional<unsigned int> GetLogLimit() const override;
+    std::vector<RequestInfo> GetRequestLog() const override;
+    void ClearRequestLog() override;
+
   private:
     void RecordRequest(const std::string& endpoint, const std::string& method,
                        int responseCode, const std::string& clientIP);
@@ -91,7 +97,11 @@ namespace mitk
 
     // Request tracking
     std::set<std::string> m_ClientIPs;
-    std::optional<RequestInfo> m_LastRequest;
+
+    // Request logging
+    std::deque<RequestInfo> m_RequestLog;
+    std::optional<unsigned int> m_LogLimit;
+
     // Temporary directory for data serialization
     std::string m_TempDirectory;
 

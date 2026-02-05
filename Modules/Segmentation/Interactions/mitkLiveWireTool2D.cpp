@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include <mitkContourModelUtils.h>
 #include <mitkLiveWireTool2D.h>
-#include <mitkLiveWireTool2D.xpm>
 #include <mitkToolManager.h>
 #include <mitkTimeNavigationController.h>
 
@@ -39,11 +38,6 @@ void mitk::LiveWireTool2D::ConnectActionsAndFunctions()
 {
   mitk::EditableContourTool::ConnectActionsAndFunctions();
   CONNECT_FUNCTION("MovePoint", OnMouseMoveNoDynamicCosts);
-}
-
-const char **mitk::LiveWireTool2D::GetXPM() const
-{
-  return mitkLiveWireTool2D_xpm;
 }
 
 us::ModuleResource mitk::LiveWireTool2D::GetIconResource() const

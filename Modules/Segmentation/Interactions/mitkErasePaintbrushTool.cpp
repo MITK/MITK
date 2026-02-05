@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "mitkErasePaintbrushTool.h"
 
-#include "mitkErasePaintbrushTool.xpm"
-
 // us
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -31,11 +29,6 @@ mitk::ErasePaintbrushTool::ErasePaintbrushTool() : PaintbrushTool(false)
 
 mitk::ErasePaintbrushTool::~ErasePaintbrushTool()
 {
-}
-
-const char **mitk::ErasePaintbrushTool::GetXPM() const
-{
-  return mitkErasePaintbrushTool_xpm;
 }
 
 us::ModuleResource mitk::ErasePaintbrushTool::GetIconResource() const

@@ -32,7 +32,6 @@ namespace mitk
     itkCloneMacro(Self);
 
     const char *GetName() const override;
-    const char **GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
 
     void Activated() override;

@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "mitkAutoCropTool.h"
 
-#include "mitkAutoCropTool.xpm"
-
 #include "mitkAutoCropImageFilter.h"
 
 namespace mitk
@@ -27,11 +25,6 @@ mitk::AutoCropTool::AutoCropTool()
 
 mitk::AutoCropTool::~AutoCropTool()
 {
-}
-
-const char **mitk::AutoCropTool::GetXPM() const
-{
-  return mitkAutoCropTool_xpm;
 }
 
 const char *mitk::AutoCropTool::GetName() const

@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "mitkSubtractContourTool.h"
 
-#include "mitkSubtractContourTool.xpm"
-
 // us
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -32,11 +30,6 @@ mitk::SubtractContourTool::SubtractContourTool() : ContourTool(0)
 
 mitk::SubtractContourTool::~SubtractContourTool()
 {
-}
-
-const char **mitk::SubtractContourTool::GetXPM() const
-{
-  return mitkSubtractContourTool_xpm;
 }
 
 us::ModuleResource mitk::SubtractContourTool::GetIconResource() const

@@ -37,11 +37,6 @@ void mitk::LassoTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("MovePoint", OnMouseMoved);
 }
 
-const char **mitk::LassoTool::GetXPM() const
-{
-  return nullptr;
-}
-
 us::ModuleResource mitk::LassoTool::GetIconResource() const
 {
   return us::GetModuleContext()->GetModule()->GetResource("Lasso.svg");

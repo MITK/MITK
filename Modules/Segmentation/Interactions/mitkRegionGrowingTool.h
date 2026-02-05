@@ -53,7 +53,6 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      const char **GetXPM() const override;
     us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
 

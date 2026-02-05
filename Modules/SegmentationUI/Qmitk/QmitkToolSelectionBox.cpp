@@ -491,11 +491,7 @@ void QmitkToolSelectionBox::RecreateButtons()
 
     us::ModuleResource iconResource = tool->GetIconResource();
 
-    if (!iconResource.IsValid())
-    {
-      button->setIcon(QIcon(QPixmap(tool->GetXPM())));
-    }
-    else
+    if (iconResource.IsValid())
     {
       auto isSVG = "svg" == iconResource.GetSuffix();
       auto openmode = isSVG ? std::ios_base::in : std::ios_base::binary;

@@ -84,11 +84,6 @@ void mitk::TotalSegmentatorTool::Activated()
   this->SetLabelTransferMode(LabelTransferMode::AddLabel);
 }
 
-const char **mitk::TotalSegmentatorTool::GetXPM() const
-{
-  return nullptr;
-}
-
 us::ModuleResource mitk::TotalSegmentatorTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();

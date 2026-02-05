@@ -40,11 +40,6 @@ mitk::GrowCutTool::GrowCutTool() : SegWithPreviewTool(true, "PressMoveReleaseAnd
 
 mitk::GrowCutTool::~GrowCutTool() {}
 
-const char **mitk::GrowCutTool::GetXPM() const
-{
-  return nullptr;
-}
-
 const char *mitk::GrowCutTool::GetName() const
 {
   return "GrowCut";

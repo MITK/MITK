@@ -31,11 +31,6 @@ mitk::BinaryThresholdULTool::~BinaryThresholdULTool()
 {
 }
 
-const char **mitk::BinaryThresholdULTool::GetXPM() const
-{
-  return nullptr;
-}
-
 us::ModuleResource mitk::BinaryThresholdULTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();

@@ -35,11 +35,6 @@ void mitk::MonaiLabel2DTool::Activated()
   this->KeepActiveAfterAcceptOn();
 }
 
-const char **mitk::MonaiLabel2DTool::GetXPM() const
-{
-  return nullptr;
-}
-
 us::ModuleResource mitk::MonaiLabel2DTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();

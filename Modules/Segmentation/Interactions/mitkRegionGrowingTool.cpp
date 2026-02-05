@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "mitkRegionGrowingTool.h"
 #include "mitkBaseRenderer.h"
 #include "mitkImageToContourModelFilter.h"
-#include "mitkRegionGrowingTool.xpm"
 #include "mitkRenderingManager.h"
 #include "mitkToolManager.h"
 
@@ -62,11 +61,6 @@ void mitk::RegionGrowingTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("PrimaryButtonPressed", OnMousePressed);
   CONNECT_FUNCTION("Move", OnMouseMoved);
   CONNECT_FUNCTION("Release", OnMouseReleased);
-}
-
-const char **mitk::RegionGrowingTool::GetXPM() const
-{
-  return mitkRegionGrowingTool_xpm;
 }
 
 us::ModuleResource mitk::RegionGrowingTool::GetIconResource() const

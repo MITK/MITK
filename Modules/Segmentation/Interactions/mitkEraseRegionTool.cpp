@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "mitkEraseRegionTool.h"
 
-#include "mitkEraseRegionTool.xpm"
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkImageGenerator.h>
 #include <mitkImageAccessByItk.h>
@@ -26,11 +25,6 @@ found in the LICENSE file.
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, EraseRegionTool, "Erase tool");
-}
-
-const char **mitk::EraseRegionTool::GetXPM() const
-{
-  return mitkEraseRegionTool_xpm;
 }
 
 us::ModuleResource mitk::EraseRegionTool::GetIconResource() const

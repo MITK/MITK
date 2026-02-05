@@ -31,11 +31,6 @@ void mitk::MonaiLabel3DTool::Activated()
   this->SetLabelTransferScope(LabelTransferScope::AllLabels);
 }
 
-const char **mitk::MonaiLabel3DTool::GetXPM() const
-{
-  return nullptr;
-}
-
 us::ModuleResource mitk::MonaiLabel3DTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();

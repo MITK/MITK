@@ -50,7 +50,6 @@ namespace mitk
     us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
     const char *GetName() const override;
-    const char **GetXPM() const override;
 
   protected:
     LiveWireTool2D();

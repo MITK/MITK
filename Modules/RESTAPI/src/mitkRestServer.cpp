@@ -72,8 +72,16 @@ bool RestServer::Start()
     m_DataStorageController = std::make_unique<DataStorageController>(*m_Bridge);
     m_DataStorageController->SetTempDirectory(m_TempDirectory);
 
+    // Connect uptime callback to HealthController
+    m_HealthController->SetUptimeCallback([this]() -> std::optional<int64_t> {
+      return this->GetUptimeSeconds();
+    });
+
     // Register routes
     this->RegisterRoutes();
+
+    // Record start time for uptime tracking
+    m_StartTime = std::chrono::steady_clock::now();
 
     // Copy pending config to running config before starting
     m_RunningConfig = m_PendingConfig;
@@ -131,6 +139,7 @@ void RestServer::Stop()
     // Clean up server resources
     m_Running = false;
     m_RunningConfig = std::nullopt;
+    m_StartTime = std::nullopt;
     m_Server.reset();
     m_HealthController.reset();
     m_DataStorageController.reset();
@@ -254,6 +263,19 @@ void RestServer::ClearRequestLog()
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
   m_RequestLog.clear();
+}
+
+std::optional<int64_t> RestServer::GetUptimeSeconds() const
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  if (!m_Running || !m_StartTime.has_value())
+  {
+    return std::nullopt;
+  }
+
+  auto now = std::chrono::steady_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - m_StartTime.value());
+  return duration.count();
 }
 
 void RestServer::RecordRequest(const std::string& endpoint, const std::string& method,

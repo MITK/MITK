@@ -761,14 +761,8 @@ void DataStorageController::HandleGET_nodes(const httplib::Request& req, httplib
   this->SendJsonResponse(res, 200, response);
 }
 
-void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httplib::Response& res)
+void DataStorageController::HandlePOST_nodes_uid_generic(const httplib::Request& req, httplib::Response& res, const std::optional<std::string>& parentUID)
 {
-  if (!m_Bridge.HasDataStorage())
-  {
-    this->SendErrorResponse(res, 503, ErrorResponse::DataStorageNotAvailable(req.path));
-    return;
-  }
-
   // Determine transfer mode from Content-Type
   const std::string contentType = req.has_header(HEADER_CONTENT_TYPE)
     ? req.get_header_value(HEADER_CONTENT_TYPE)
@@ -779,12 +773,12 @@ void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httpli
 
   nlohmann::json nodeData;
   bool hasDataTransfer = false;
-  std::string tempFilePath;
+  std::string dataFilePath;
   bool deleteTempFile = false;
 
   if (isJsonMode)
   {
-    // JSON body mode: parse for name, properties, and optional transfer section
+    // JSON body mode
     try
     {
       if (!req.body.empty())
@@ -799,7 +793,7 @@ void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httpli
       return;
     }
 
-    // Check if there's a transfer section for data loading
+    // Check if there's a transfer section
     if (nodeData.contains(JSON_KEY_TRANSFER) && nodeData[JSON_KEY_TRANSFER].contains(JSON_KEY_FILE_PATH))
     {
       hasDataTransfer = true;
@@ -807,7 +801,7 @@ void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httpli
   }
   else if (isDirectTransfer)
   {
-    // Binary body mode: name comes from query parameter
+    // Binary body mode: name from query parameter
     if (req.has_param(JSON_KEY_NAME))
     {
       nodeData[JSON_KEY_NAME] = req.get_param_value(JSON_KEY_NAME);
@@ -816,7 +810,6 @@ void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httpli
   }
   else if (!contentType.empty())
   {
-    // Unsupported Content-Type
     this->SendErrorResponse(res, 415, ErrorResponse::UnsupportedFormat(
       "Unsupported Content-Type. Use 'application/json' or 'application/octet-stream'.", req.path));
     return;
@@ -824,7 +817,6 @@ void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httpli
   // If no Content-Type and no body, create node with defaults only
 
   // Resolve data path if transfer is requested
-  std::string dataFilePath;
   if (hasDataTransfer)
   {
     auto pathResult = this->ResolveDataPath(req, contentType);
@@ -844,21 +836,28 @@ void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httpli
       try { fs::remove(dataFilePath); }
       catch (const std::exception&) { /* ignore */ }
     }
-  };
+    };
 
   // Create the node (without data initially)
-  // Remove transfer section from nodeData as it's not a node property
   nlohmann::json nodeDataForCreation = nodeData;
   if (nodeDataForCreation.is_object() && nodeDataForCreation.contains(JSON_KEY_TRANSFER))
   {
     nodeDataForCreation.erase(JSON_KEY_TRANSFER);
   }
 
-  auto createResult = m_Bridge.CreateNode(nodeDataForCreation);
+  auto createResult = m_Bridge.CreateNode(nodeDataForCreation, parentUID);
   if (!createResult.success)
   {
     cleanupTempFile();
-    this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to create node", req.path));
+    if (parentUID.has_value())
+    {
+      this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to create child node", req.path));
+    }
+    else
+    if (parentUID.has_value())
+    {
+      this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to create node", req.path));
+    }
     return;
   }
 
@@ -869,14 +868,12 @@ void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httpli
     auto loadResult = this->LoadDataFromFile(dataFilePath, req.path);
     if (!loadResult.success)
     {
-      // Node was created but data loading failed - delete the node
       m_Bridge.DeleteNode(createResult.uid, false);
       cleanupTempFile();
       this->SendErrorResponse(res, loadResult.errorStatus, loadResult.errorResponse);
       return;
     }
 
-    // Assign data to node
     if (!m_Bridge.SetNodeData(createResult.uid, loadResult.data[0]))
     {
       m_Bridge.DeleteNode(createResult.uid, false);
@@ -886,7 +883,6 @@ void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httpli
       return;
     }
 
-    // Check for multiple data warning
     if (loadResult.data.size() > 1)
     {
       dataWarning = "File contained " + std::to_string(loadResult.data.size()) +
@@ -904,19 +900,28 @@ void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httpli
   response[JSON_KEY_DATA] = node.value();
   response[JSON_KEY_META]["location"] = "/api/v1/datastorage/nodes/" + createResult.uid;
 
-  // Report any properties that failed to deserialize
   if (!createResult.failedProperties.empty())
   {
     response[JSON_KEY_META]["failed_properties"] = createResult.failedProperties;
   }
 
-  // Add data warning if applicable
   if (!dataWarning.empty())
   {
     response[JSON_KEY_META][JSON_KEY_WARNING] = dataWarning;
   }
 
   this->SendJsonResponse(res, 201, response);
+}
+
+void DataStorageController::HandlePOST_nodes(const httplib::Request& req, httplib::Response& res)
+{
+  if (!m_Bridge.HasDataStorage())
+  {
+    this->SendErrorResponse(res, 503, ErrorResponse::DataStorageNotAvailable(req.path));
+    return;
+  }
+
+  this->HandlePOST_nodes_uid_generic(req, res, std::nullopt);
 }
 
 void DataStorageController::HandleGET_nodes_uid(const httplib::Request& req, httplib::Response& res)
@@ -1107,146 +1112,7 @@ void DataStorageController::HandlePOST_nodes_uid_children(const httplib::Request
     return;
   }
 
-  // Determine transfer mode from Content-Type
-  const std::string contentType = req.has_header(HEADER_CONTENT_TYPE)
-    ? req.get_header_value(HEADER_CONTENT_TYPE)
-    : "";
-
-  const bool isJsonMode = (contentType.find(MIME_APPLICATION_JSON) != std::string::npos);
-  const bool isDirectTransfer = (contentType.find(MIME_APPLICATION_OCTET_STREAM) != std::string::npos);
-
-  nlohmann::json nodeData;
-  bool hasDataTransfer = false;
-  std::string dataFilePath;
-  bool deleteTempFile = false;
-
-  if (isJsonMode)
-  {
-    // JSON body mode
-    try
-    {
-      if (!req.body.empty())
-      {
-        nodeData = nlohmann::json::parse(req.body);
-      }
-    }
-    catch (const nlohmann::json::parse_error& e)
-    {
-      this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
-        "Invalid JSON: " + std::string(e.what()), req.path));
-      return;
-    }
-
-    // Check if there's a transfer section
-    if (nodeData.contains(JSON_KEY_TRANSFER) && nodeData[JSON_KEY_TRANSFER].contains(JSON_KEY_FILE_PATH))
-    {
-      hasDataTransfer = true;
-    }
-  }
-  else if (isDirectTransfer)
-  {
-    // Binary body mode: name from query parameter
-    if (req.has_param(JSON_KEY_NAME))
-    {
-      nodeData[JSON_KEY_NAME] = req.get_param_value(JSON_KEY_NAME);
-    }
-    hasDataTransfer = true;
-  }
-  else if (!contentType.empty())
-  {
-    this->SendErrorResponse(res, 415, ErrorResponse::UnsupportedFormat(
-      "Unsupported Content-Type. Use 'application/json' or 'application/octet-stream'.", req.path));
-    return;
-  }
-  // If no Content-Type and no body, create node with defaults only
-
-  // Resolve data path if transfer is requested
-  if (hasDataTransfer)
-  {
-    auto pathResult = this->ResolveDataPath(req, contentType);
-    if (!pathResult.success)
-    {
-      this->SendErrorResponse(res, pathResult.errorStatus, pathResult.errorResponse);
-      return;
-    }
-    dataFilePath = pathResult.filePath;
-    deleteTempFile = pathResult.isTemporary;
-  }
-
-  // Helper for cleanup
-  auto cleanupTempFile = [&]() {
-    if (deleteTempFile && !dataFilePath.empty())
-    {
-      try { fs::remove(dataFilePath); }
-      catch (const std::exception&) { /* ignore */ }
-    }
-  };
-
-  // Create the node (without data initially)
-  nlohmann::json nodeDataForCreation = nodeData;
-  if (nodeDataForCreation.is_object() && nodeDataForCreation.contains(JSON_KEY_TRANSFER))
-  {
-    nodeDataForCreation.erase(JSON_KEY_TRANSFER);
-  }
-
-  auto createResult = m_Bridge.CreateNode(nodeDataForCreation, parentUid);
-  if (!createResult.success)
-  {
-    cleanupTempFile();
-    this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to create child node", req.path));
-    return;
-  }
-
-  // Load and assign data if transfer was requested
-  std::string dataWarning;
-  if (hasDataTransfer)
-  {
-    auto loadResult = this->LoadDataFromFile(dataFilePath, req.path);
-    if (!loadResult.success)
-    {
-      m_Bridge.DeleteNode(createResult.uid, false);
-      cleanupTempFile();
-      this->SendErrorResponse(res, loadResult.errorStatus, loadResult.errorResponse);
-      return;
-    }
-
-    if (!m_Bridge.SetNodeData(createResult.uid, loadResult.data[0]))
-    {
-      m_Bridge.DeleteNode(createResult.uid, false);
-      cleanupTempFile();
-      this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
-        "Failed to assign data to node", req.path));
-      return;
-    }
-
-    if (loadResult.data.size() > 1)
-    {
-      dataWarning = "File contained " + std::to_string(loadResult.data.size()) +
-        " data objects. Only the first one was assigned to the node. " +
-        std::to_string(loadResult.data.size() - 1) + " data object(s) were discarded.";
-    }
-
-    cleanupTempFile();
-  }
-
-  // Get the created node details
-  auto node = m_Bridge.GetNode(createResult.uid);
-
-  nlohmann::json response;
-  response[JSON_KEY_DATA] = node.value();
-  response[JSON_KEY_META]["location"] = "/api/v1/datastorage/nodes/" + createResult.uid;
-
-  if (!createResult.failedProperties.empty())
-  {
-    response[JSON_KEY_META]["failed_properties"] = createResult.failedProperties;
-  }
-
-  if (!dataWarning.empty())
-  {
-    response[JSON_KEY_META][JSON_KEY_WARNING] = dataWarning;
-  }
-
-  this->SendJsonResponse(res, 201, response);
+  this->HandlePOST_nodes_uid_generic(req, res, parentUid);
 }
 
 void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req, httplib::Response& res)

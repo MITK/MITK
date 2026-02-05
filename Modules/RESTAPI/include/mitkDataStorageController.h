@@ -276,6 +276,10 @@ namespace mitk
      */
     LoadDataResult LoadDataFromFile(const std::string& filePath, const std::string& requestPath);
 
+    /**helper to avoid redundant code. Assumes that if parentUID is set, we are in "child mode".*/
+    void HandlePOST_nodes_uid_generic(const httplib::Request& req, httplib::Response& res, const std::optional<std::string>& parentUID);
+
+
     DataStorageBridge& m_Bridge;
     std::string m_TempDirectory;
   };

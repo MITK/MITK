@@ -445,11 +445,12 @@ NodeQueryParams DataStorageController::ParseNodeQueryParams(const httplib::Reque
   return params;
 }
 
-PropertyQueryParams DataStorageController::ParsePropertyQueryParams(const httplib::Request& req) const
+PropertyQueryParams DataStorageController::ParsePropertyQueryParams(const httplib::Request& req, PropertyScope defaultScope) const
 {
   PropertyQueryParams params;
+  params.scope = defaultScope;
 
-  // Property scope (per API spec: "all", "node", "data")
+  // Property scope
   if (req.has_param("property_scope"))
   {
     std::string scopeStr = req.get_param_value("property_scope");
@@ -461,7 +462,11 @@ PropertyQueryParams DataStorageController::ParsePropertyQueryParams(const httpli
     {
       params.scope = PropertyScope::Data;
     }
-    // Default is "all"
+    else if (scopeStr == "all")
+    {
+      params.scope = PropertyScope::All;
+    }
+    // If invalid value, keep the default
   }
 
   // Context (for renderer-specific properties)
@@ -719,6 +724,12 @@ void DataStorageController::HandleGET_nodes(const httplib::Request& req, httplib
     scopeStr = "data";
   }
   response["meta"]["property_scope"] = scopeStr;
+
+  // Add path_query to meta when path filter is used (per API spec Section 6.4)
+  if (params.path.has_value())
+  {
+    response["meta"]["path_query"] = params.path.value();
+  }
 
   // Filters applied
   nlohmann::json filtersApplied = nlohmann::json::object();
@@ -1017,6 +1028,12 @@ void DataStorageController::HandlePATCH_nodes_uid(const httplib::Request& req, h
 
   // Return updated node
   auto updatedNode = m_Bridge.GetNode(uid);
+  if (!updatedNode.has_value())
+  {
+    this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
+      "Node was updated but could not be retrieved", req.path));
+    return;
+  }
 
   nlohmann::json response;
   response["data"] = updatedNode.value();
@@ -1108,6 +1125,12 @@ void DataStorageController::HandleGET_nodes_uid_children(const httplib::Request&
   response["meta"]["limit"] = queryResult.limit;
   response["meta"]["offset"] = queryResult.offset;
   response["meta"]["returned_count"] = returnedCount;
+
+  // Add path_query to meta when path filter is used (per API spec Section 6.4)
+  if (params.path.has_value())
+  {
+    response["meta"]["path_query"] = params.path.value();
+  }
 
   // Include pagination links if applicable
   auto links = BuildPaginationLinks(req, queryResult.limit, queryResult.offset, queryResult.totalCount, returnedCount);
@@ -1532,7 +1555,8 @@ void DataStorageController::HandlePUT_nodes_uid_properties_key(const httplib::Re
   }
 
   // Parse property query parameters for context and scope
-  auto params = this->ParsePropertyQueryParams(req);
+  // Per API spec: PUT /properties/{name} defaults to "node" scope
+  auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
 
   // Parse request body
   nlohmann::json value;
@@ -1589,7 +1613,8 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
   }
 
   // Parse property query parameters for context and scope
-  auto params = this->ParsePropertyQueryParams(req);
+  // Per API spec: DELETE /properties/{name} defaults to "node" scope
+  auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
 
   // Check for protected properties (like "name") - only protected in node scope
   if (key == "name" && params.scope != PropertyScope::Data)
@@ -1629,7 +1654,8 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
   }
 
   // Parse property query parameters for context and scope
-  auto params = this->ParsePropertyQueryParams(req);
+  // Per API spec: PUT /properties defaults to "node" scope
+  auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
 
   // Parse request body
   nlohmann::json properties;
@@ -1695,7 +1721,8 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
   }
 
   // Parse property query parameters for context and scope
-  auto params = this->ParsePropertyQueryParams(req);
+  // Per API spec: PATCH /properties defaults to "node" scope
+  auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
 
   // Parse request body
   nlohmann::json properties;

@@ -68,6 +68,16 @@ class mitkDataStorageControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PropertyKeyWithSpace);
   MITK_TEST(PropertyKeyWithDot);
   MITK_TEST(PathFilterWithSpace);
+
+  // PATCH /nodes/:uid tests
+  MITK_TEST(PatchNodeReparent);
+  MITK_TEST(PatchNodeReparentToNull);
+  MITK_TEST(PatchNodeNotFound);
+
+  // Fields parameter tests
+  MITK_TEST(GetNodesWithFieldsSelection);
+  MITK_TEST(GetNodesWithFieldsSelectionPartialMatch);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -774,6 +784,155 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, json["meta"]["total_count"].get<int>());
     CPPUNIT_ASSERT_EQUAL(std::string("My Node"), json["data"][0]["name"].get<std::string>());
   }
+
+  // ===== PATCH /nodes/:uid tests =====
+
+  void PatchNodeReparent()
+  {
+    // Create parent node
+    auto parent = mitk::DataNode::New();
+    parent->SetName("NewParent");
+    m_DataStorage->Add(parent);
+
+    // Create child node (initially top-level)
+    auto child = mitk::DataNode::New();
+    child->SetName("ChildToMove");
+    m_DataStorage->Add(child);
+
+    auto parentUid = this->FindUidByName("NewParent");
+    auto childUid = this->FindUidByName("ChildToMove");
+
+    // Reparent child under parent
+    nlohmann::json body;
+    body["parent_uid"] = parentUid;
+
+    auto req = this->CreateRequest(
+      "/api/v1/datastorage/nodes/" + childUid,
+      body.dump(),
+      {{"uid", childUid}}, {}, "application/json");
+    httplib::Response res;
+
+    m_Controller->HandlePATCH_nodes_uid(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(childUid, json["data"]["uid"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(parentUid, json["data"]["parent_uid"].get<std::string>());
+
+    // Verify parent now has the child
+    auto parentNode = m_Bridge->GetNode(parentUid);
+    CPPUNIT_ASSERT(parentNode.has_value());
+    CPPUNIT_ASSERT_EQUAL(1, parentNode.value()["children_count"].get<int>());
+  }
+
+  void PatchNodeReparentToNull()
+  {
+    // Create parent and child
+    auto parent = mitk::DataNode::New();
+    parent->SetName("ParentToLeave");
+    m_DataStorage->Add(parent);
+
+    auto child = mitk::DataNode::New();
+    child->SetName("ChildToMakeTopLevel");
+    m_DataStorage->Add(child, parent);
+
+    auto childUid = this->FindUidByName("ChildToMakeTopLevel");
+
+    // Move child to top-level (parent_uid = null)
+    nlohmann::json body;
+    body["parent_uid"] = nullptr;
+
+    auto req = this->CreateRequest(
+      "/api/v1/datastorage/nodes/" + childUid,
+      body.dump(),
+      {{"uid", childUid}}, {}, "application/json");
+    httplib::Response res;
+
+    m_Controller->HandlePATCH_nodes_uid(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json["data"]["parent_uid"].is_null());
+  }
+
+  void PatchNodeNotFound()
+  {
+    nlohmann::json body;
+    body["parent_uid"] = "some-parent";
+
+    auto req = this->CreateRequest(
+      "/api/v1/datastorage/nodes/nonexistent",
+      body.dump(),
+      {{"uid", "nonexistent"}}, {}, "application/json");
+    httplib::Response res;
+
+    m_Controller->HandlePATCH_nodes_uid(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("NODE_NOT_FOUND"), json["error"]["code"].get<std::string>());
+  }
+
+  // ===== Fields parameter tests =====
+
+  void GetNodesWithFieldsSelection()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("FieldsTestNode");
+    m_DataStorage->Add(node);
+
+    // Request only uid and name fields
+    auto req = this->CreateRequest(
+      "/api/v1/datastorage/nodes", "",
+      {},
+      {{"fields", "uid,name"}});
+    httplib::Response res;
+
+    m_Controller->HandleGET_nodes(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    auto json = nlohmann::json::parse(res.body);
+
+    // Verify only requested fields are present
+    auto nodeJson = json["data"][0];
+    CPPUNIT_ASSERT(nodeJson.contains("uid"));
+    CPPUNIT_ASSERT(nodeJson.contains("name"));
+    CPPUNIT_ASSERT(!nodeJson.contains("path"));
+    CPPUNIT_ASSERT(!nodeJson.contains("parent_uid"));
+    CPPUNIT_ASSERT(!nodeJson.contains("children_count"));
+    CPPUNIT_ASSERT(!nodeJson.contains("data_type"));
+
+    // Verify fields are in meta
+    CPPUNIT_ASSERT(json["meta"].contains("fields"));
+    auto fields = json["meta"]["fields"];
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), fields.size());
+  }
+
+  void GetNodesWithFieldsSelectionPartialMatch()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("PartialFieldsNode");
+    m_DataStorage->Add(node);
+
+    // Request fields including one that doesn't exist
+    auto req = this->CreateRequest(
+      "/api/v1/datastorage/nodes", "",
+      {},
+      {{"fields", "uid,name,nonexistent_field"}});
+    httplib::Response res;
+
+    m_Controller->HandleGET_nodes(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    auto json = nlohmann::json::parse(res.body);
+
+    // Verify only existing requested fields are present
+    auto nodeJson = json["data"][0];
+    CPPUNIT_ASSERT(nodeJson.contains("uid"));
+    CPPUNIT_ASSERT(nodeJson.contains("name"));
+    CPPUNIT_ASSERT(!nodeJson.contains("nonexistent_field"));
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkDataStorageController)

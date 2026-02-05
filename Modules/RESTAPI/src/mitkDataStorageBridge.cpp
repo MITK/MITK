@@ -630,6 +630,12 @@ namespace mitk
 
     // Reparent: remove and re-add under new parent
     // This is the same approach used by QmitkDataStorageTreeModel
+    //
+    // Important: Preserve the UID across reparenting operation.
+    // The NodeUidMapper clears mappings when a node is removed from DataStorage,
+    // so we save the UID and restore the mapping after re-adding.
+    const std::string preservedUid = uid;
+
     m_DataStorage->Remove(node);
     if (newParent != nullptr)
     {
@@ -640,7 +646,8 @@ namespace mitk
       m_DataStorage->Add(node);  // Move to root level
     }
 
-    // Mark node as modified via REST API
+    m_UidMapper->RestoreUid(node, preservedUid);
+
     MarkNodeAsModified(node, "reparented");
 
     return true;

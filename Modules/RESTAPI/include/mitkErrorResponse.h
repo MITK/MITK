@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 #include <string>
+#include <vector>
 
 #include <MitkRESTAPIExports.h>
 
@@ -45,6 +46,7 @@ namespace mitk
     static constexpr const char* CODE_SERIALIZATION_ERROR = "SERIALIZATION_ERROR";
     static constexpr const char* CODE_FILE_NOT_FOUND = "FILE_NOT_FOUND";
     static constexpr const char* CODE_FILE_READ_ERROR = "FILE_READ_ERROR";
+    static constexpr const char* CODE_TRANSFER_MODE_NOT_AVAILABLE = "TRANSFER_MODE_NOT_AVAILABLE";
 
     /**
      * @brief Create an RFC 7807 error response.
@@ -183,6 +185,19 @@ namespace mitk
      * @return JSON error response with status 422
      */
     static Json FileReadError(const std::string& filePath, const std::string& detail, const std::string& instance = "");
+
+    /**
+     * @brief Create a "Transfer mode not available" error response.
+     *
+     * @param requestedMode The requested transfer mode that is not supported
+     * @param availableModes List of available transfer modes
+     * @param instance Request path
+     * @return JSON error response with status 406
+     */
+    static Json TransferModeNotAvailable(
+      const std::string& requestedMode,
+      const std::vector<std::string>& availableModes,
+      const std::string& instance = "");
   };
 }
 

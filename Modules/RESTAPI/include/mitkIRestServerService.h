@@ -199,6 +199,13 @@ namespace mitk
      * @brief Clear all logged requests.
      */
     virtual void ClearRequestLog() = 0;
+
+    /**
+     * @brief Get the server uptime in seconds.
+     *
+     * @return Uptime in seconds, or std::nullopt if server is not running.
+     */
+    virtual std::optional<int64_t> GetUptimeSeconds() const = 0;
   };
 }
 

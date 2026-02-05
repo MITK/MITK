@@ -59,6 +59,8 @@ class mitkDataStorageControllerDataTestSuite : public mitk::TestFixture
   MITK_TEST(PutDataInvalidJson);
   MITK_TEST(PutDataMissingFilePath);
   MITK_TEST(PutDataFileNotFound);
+  MITK_TEST(PutDataUnsupportedTransferMode);
+  MITK_TEST(PostNodeUnsupportedTransferMode);
 
   // Transfer mode determination
   MITK_TEST(TransferModeDefaultsDirect);
@@ -426,6 +428,51 @@ public:
     CPPUNIT_ASSERT_EQUAL(422, res.status);
     const auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT_EQUAL(std::string("FILE_NOT_FOUND"), json["error"]["code"].get<std::string>());
+  }
+
+  void PutDataUnsupportedTransferMode()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("TestNode");
+    m_DataStorage->Add(node);
+
+    const std::string uid = this->GetUid(node.GetPointer());
+
+    // Use unsupported transfer mode "shared-memory"
+    nlohmann::json body;
+    body["transfer"]["mode"] = "shared-memory";
+    body["transfer"]["file_path"] = "/some/path.nrrd";
+
+    const httplib::Headers headers = {{"Content-Type", "application/json"}};
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/data", body.dump(), {{"uid", uid}}, {}, headers);
+    httplib::Response res;
+
+    m_Controller->HandlePUT_nodes_uid_data(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(406, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("TRANSFER_MODE_NOT_AVAILABLE"), json["error"]["code"].get<std::string>());
+    CPPUNIT_ASSERT(json["error"].contains("available_modes"));
+    CPPUNIT_ASSERT(json["error"]["available_modes"].is_array());
+  }
+
+  void PostNodeUnsupportedTransferMode()
+  {
+    // POST /nodes with unsupported transfer mode
+    nlohmann::json body;
+    body["name"] = "TestNode";
+    body["transfer"]["mode"] = "shared-memory";
+
+    const httplib::Headers headers = {{"Content-Type", "application/json"}};
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes", body.dump(), {}, {}, headers);
+    httplib::Response res;
+
+    m_Controller->HandlePOST_nodes(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(406, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("TRANSFER_MODE_NOT_AVAILABLE"), json["error"]["code"].get<std::string>());
+    CPPUNIT_ASSERT(json["error"].contains("available_modes"));
   }
 
   // ===== Transfer mode determination tests =====

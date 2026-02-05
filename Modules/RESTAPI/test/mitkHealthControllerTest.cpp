@@ -25,10 +25,11 @@ class mitkHealthControllerTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkHealthControllerTestSuite);
   MITK_TEST(HealthWithDataStorage);
   MITK_TEST(HealthWithoutDataStorage);
-  MITK_TEST(InfoWithDataStorage);
-  MITK_TEST(InfoWithoutDataStorage);
+  MITK_TEST(HealthContainsUptimeWhenCallbackSet);
+  MITK_TEST(HealthOmitsUptimeWhenCallbackNotSet);
   MITK_TEST(InfoContainsMitkVersion);
   MITK_TEST(InfoContainsCapabilities);
+  MITK_TEST(InfoContainsDocumentationUrl);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -83,36 +84,38 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("unavailable"), json["data"]["checks"]["datastorage"].get<std::string>());
   }
 
-  void InfoWithDataStorage()
+  void HealthContainsUptimeWhenCallbackSet()
   {
-    m_Bridge->SetDataStorage(m_DataStorage);
+    // Set uptime callback that returns a fixed value
+    m_Controller->SetUptimeCallback([]() -> std::optional<int64_t> {
+      return 42;
+    });
 
     httplib::Request req;
     httplib::Response res;
 
-    m_Controller->HandleGET_info(req, res);
+    m_Controller->HandleGET_health(req, res);
 
     CPPUNIT_ASSERT_EQUAL(200, res.status);
 
     auto json = nlohmann::json::parse(res.body);
-    CPPUNIT_ASSERT_EQUAL(std::string("MITK Workbench REST API"), json["data"]["name"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(std::string("v1"), json["data"]["api_version"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(true, json["data"]["datastorage_available"].get<bool>());
+    CPPUNIT_ASSERT(json["data"].contains("uptime_seconds"));
+    CPPUNIT_ASSERT_EQUAL(static_cast<int64_t>(42), json["data"]["uptime_seconds"].get<int64_t>());
   }
 
-  void InfoWithoutDataStorage()
+  void HealthOmitsUptimeWhenCallbackNotSet()
   {
-    // Don't connect DataStorage
+    // No uptime callback set
 
     httplib::Request req;
     httplib::Response res;
 
-    m_Controller->HandleGET_info(req, res);
+    m_Controller->HandleGET_health(req, res);
 
     CPPUNIT_ASSERT_EQUAL(200, res.status);
 
     auto json = nlohmann::json::parse(res.body);
-    CPPUNIT_ASSERT_EQUAL(false, json["data"]["datastorage_available"].get<bool>());
+    CPPUNIT_ASSERT(!json["data"].contains("uptime_seconds"));
   }
 
   void InfoContainsMitkVersion()
@@ -144,6 +147,20 @@ public:
     CPPUNIT_ASSERT(transferModes.is_array());
     CPPUNIT_ASSERT(std::find(transferModes.begin(), transferModes.end(), "direct") != transferModes.end());
     CPPUNIT_ASSERT(std::find(transferModes.begin(), transferModes.end(), "file-reference") != transferModes.end());
+  }
+
+  void InfoContainsDocumentationUrl()
+  {
+    httplib::Request req;
+    httplib::Response res;
+
+    m_Controller->HandleGET_info(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json["data"].contains("documentation_url"));
+    CPPUNIT_ASSERT_EQUAL(std::string("https://docs.mitk.org/api/v1"), json["data"]["documentation_url"].get<std::string>());
   }
 };
 

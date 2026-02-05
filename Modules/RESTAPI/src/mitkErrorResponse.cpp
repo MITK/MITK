@@ -176,4 +176,25 @@ namespace mitk
       422,
       instance);
   }
+
+  ErrorResponse::Json ErrorResponse::TransferModeNotAvailable(
+    const std::string& requestedMode,
+    const std::vector<std::string>& availableModes,
+    const std::string& instance)
+  {
+    Json response = Create(
+      CODE_TRANSFER_MODE_NOT_AVAILABLE,
+      "Transfer Mode Not Available",
+      "Requested transfer mode '" + requestedMode + "' is not supported",
+      406,
+      instance);
+
+    Json modesArray = Json::array();
+    for (const auto& mode : availableModes)
+    {
+      modesArray.push_back(mode);
+    }
+    response["error"]["available_modes"] = modesArray;
+    return response;
+  }
 }

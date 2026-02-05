@@ -18,6 +18,10 @@ found in the LICENSE file.
 
 #include <MitkRESTAPIExports.h>
 
+#include <functional>
+#include <optional>
+#include <cstdint>
+
 namespace mitk
 {
   /**
@@ -31,6 +35,13 @@ namespace mitk
   {
   public:
     /**
+     * @brief Callback type for retrieving server uptime.
+     *
+     * Returns the server uptime in seconds, or std::nullopt if not available.
+     */
+    using UptimeCallback = std::function<std::optional<int64_t>()>;
+
+    /**
      * @brief Construct a HealthController.
      *
      * @param bridge Reference to the DataStorageBridge for status checks. It is the instance
@@ -38,6 +49,13 @@ namespace mitk
      * and channeled towards the DataStorage.
      */
     explicit HealthController(DataStorageBridge& bridge);
+
+    /**
+     * @brief Set the callback for retrieving server uptime.
+     *
+     * @param callback Function that returns uptime in seconds, or std::nullopt if unavailable.
+     */
+    void SetUptimeCallback(UptimeCallback callback);
 
     /**
      * @brief Handle GET /health request.
@@ -61,6 +79,7 @@ namespace mitk
 
   private:
     DataStorageBridge& m_Bridge;
+    UptimeCallback m_UptimeCallback;
   };
 }
 

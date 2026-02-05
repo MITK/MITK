@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStringProperty.h>
 #include <mitkProperties.h>
+#include <mitkColorProperty.h>
 #include <mitkImage.h>
 #include <mitkImageGenerator.h>
 #include <mitkSurface.h>
@@ -88,6 +89,7 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(SetNodeProperty);
   MITK_TEST(DeleteNodeProperty);
   MITK_TEST(ReplaceNodeProperties);
+  MITK_TEST(ComplexPropertySerializationRoundTrip);
   MITK_TEST(NameFilterWithExactMatch);
   MITK_TEST(NameFilterWithWildcard);
   MITK_TEST(BoolPropertyFilterUsesJsonRepresentation);
@@ -1266,6 +1268,69 @@ public:
     CPPUNIT_ASSERT(props.value().contains("newProp2"));
     CPPUNIT_ASSERT(!props.value().contains("oldProp1"));
     CPPUNIT_ASSERT(!props.value().contains("oldProp2"));
+  }
+
+  void ComplexPropertySerializationRoundTrip()
+  {
+    // Step 1: Set an initial color property directly on the node
+    mitk::Color initialColor;
+    initialColor.SetRed(0.5f);
+    initialColor.SetGreen(0.25f);
+    initialColor.SetBlue(0.75f);
+    m_Root1->SetColor(initialColor);
+
+    // Step 2: Get the property via the bridge and verify the format
+    auto prop = m_Bridge->GetNodeProperty(m_Root1Uid, "color");
+    CPPUNIT_ASSERT(prop.has_value());
+    CPPUNIT_ASSERT(prop.value().contains("color"));
+
+    // Verify the complex property format: {"color": {"value": [...], "type": "ColorProperty"}}
+    auto colorJson = prop.value()["color"];
+    CPPUNIT_ASSERT(colorJson.is_object());
+    CPPUNIT_ASSERT(colorJson.contains("value"));
+    CPPUNIT_ASSERT(colorJson.contains("type"));
+    CPPUNIT_ASSERT_EQUAL(std::string("ColorProperty"), colorJson["type"].get<std::string>());
+
+    // Verify the value array
+    auto colorArray = colorJson["value"];
+    CPPUNIT_ASSERT(colorArray.is_array());
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), colorArray.size());
+
+    // Verify the initial values match
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5, colorArray[0].get<double>(), 1e-5);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.25, colorArray[1].get<double>(), 1e-5);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.75, colorArray[2].get<double>(), 1e-5);
+
+    // Step 3: Set new values via the bridge using the complex property format
+    nlohmann::json newColorValue;
+    newColorValue["value"] = nlohmann::json::array({0.1, 0.2, 0.3});
+    newColorValue["type"] = "ColorProperty";
+
+    bool set = m_Bridge->SetNodeProperty(m_Root1Uid, "color", newColorValue);
+    CPPUNIT_ASSERT(set);
+
+    // Step 4: Get the property again and verify the new values
+    prop = m_Bridge->GetNodeProperty(m_Root1Uid, "color");
+    CPPUNIT_ASSERT(prop.has_value());
+    CPPUNIT_ASSERT(prop.value().contains("color"));
+
+    colorJson = prop.value()["color"];
+    CPPUNIT_ASSERT(colorJson.contains("value"));
+    colorArray = colorJson["value"];
+
+    // Verify the new values via bridge
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.1, colorArray[0].get<double>(), 1e-5);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.2, colorArray[1].get<double>(), 1e-5);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.3, colorArray[2].get<double>(), 1e-5);
+
+    // Step 5: Verify the underlying property is updated correctly
+    auto* colorProp = dynamic_cast<mitk::ColorProperty*>(m_Root1->GetProperty("color"));
+    CPPUNIT_ASSERT(colorProp != nullptr);
+
+    auto color = colorProp->GetColor();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.1, color.GetRed(), 1e-5f);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.2, color.GetGreen(), 1e-5f);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.3, color.GetBlue(), 1e-5f);
   }
 
   void NameFilterWithExactMatch()

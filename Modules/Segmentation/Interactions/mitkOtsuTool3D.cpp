@@ -45,11 +45,6 @@ void mitk::OtsuTool3D::Activated()
   this->SetLabelTransferMode(LabelTransferMode::AddLabel);
 }
 
-const char **mitk::OtsuTool3D::GetXPM() const
-{
-  return nullptr;
-}
-
 us::ModuleResource mitk::OtsuTool3D::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();

@@ -66,7 +66,8 @@ namespace mitk
   you pass a state machine name (interactor type).
   Names and .xml-files for valid state machines can be found in different "Interaction" directories (which might be enhanced by you).
 
-  You have to implement at least GetXPM() and GetName() to provide some identification.
+  You have to implement at least GetName() to provide some identification. Optionally, override GetIconResource()
+  to provide a tool button icon and GetCursorIconResource() for a custom cursor.
 
   Each Tool knows its ToolManager, which can provide the data that the tool should work on.
 
@@ -105,25 +106,9 @@ namespace mitk
     // no New(), there should only be subclasses
 
     /**
-    \brief Returns an icon in the XPM format.
-
-    This icon has to fit into some kind of button in most applications, so make it smaller than 25x25 pixels.
-
-    XPM is e.g. supported by The Gimp. But if you open any XPM file in your text editor, you will see that you could
-    also "draw" it with an editor.
-    */
-    //[[deprecated]]
-    DEPRECATED(virtual const char **GetXPM() const) = 0;
-
-    /**
-     * \brief Returns the path of an icon.
-     *
-     * This icon is preferred to the XPM icon.
-     */
-    virtual std::string GetIconPath() const { return ""; }
-    /**
-     * \brief Returns the path of a cursor icon.
-     *
+     * @brief Returns the cursor icon of the tool wrapped by a usModuleResource
+     * @return a valid ModuleResource or an invalid if this function
+     *         is not reimplemented
      */
     virtual us::ModuleResource GetCursorIconResource() const;
 

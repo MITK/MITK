@@ -45,8 +45,6 @@ namespace mitk
     us::ModuleResource GetIconResource() const override;
     us::ModuleResource GetCursorIconResource() const override;
 
-    const char** GetXPM() const override;
-
     const char* GetName() const override;
 
     MultiLabelSegmentation::LabelValueVectorType GetIndicatedLabels() const;

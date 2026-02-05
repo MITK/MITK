@@ -192,11 +192,6 @@ const char* mitk::nnInteractiveTool::GetName() const
   return "nnInteractive";
 }
 
-const char** mitk::nnInteractiveTool::GetXPM() const
-{
-  return nullptr;
-}
-
 us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
 {
   auto segmentationModule = us::GetModuleContext()->GetModule("MitkSegmentation");

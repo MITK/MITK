@@ -23,11 +23,6 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, FillRegionTool, "Fill tool");
 }
 
-const char **mitk::FillRegionTool::GetXPM() const
-{
-  return nullptr;
-}
-
 us::ModuleResource mitk::FillRegionTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();

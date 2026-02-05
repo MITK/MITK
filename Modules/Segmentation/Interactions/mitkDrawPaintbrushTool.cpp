@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "mitkDrawPaintbrushTool.h"
 
-#include "mitkDrawPaintbrushTool.xpm"
-
 // us
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -32,11 +30,6 @@ mitk::DrawPaintbrushTool::DrawPaintbrushTool() : PaintbrushTool(1)
 
 mitk::DrawPaintbrushTool::~DrawPaintbrushTool()
 {
-}
-
-const char **mitk::DrawPaintbrushTool::GetXPM() const
-{
-  return mitkDrawPaintbrushTool_xpm;
 }
 
 us::ModuleResource mitk::DrawPaintbrushTool::GetIconResource() const

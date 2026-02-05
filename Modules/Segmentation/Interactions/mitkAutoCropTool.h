@@ -35,7 +35,6 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      const char **GetXPM() const override;
     const char *GetName() const override;
 
   protected:

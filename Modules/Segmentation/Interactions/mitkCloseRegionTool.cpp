@@ -28,11 +28,6 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, CloseRegionTool, "Close tool");
 }
 
-const char **mitk::CloseRegionTool::GetXPM() const
-{
-  return nullptr;
-}
-
 us::ModuleResource mitk::CloseRegionTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();

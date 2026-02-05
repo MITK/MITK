@@ -42,7 +42,6 @@ namespace mitk
     itkFactorylessNewMacro(Self)
 
     const char* GetName() const override;
-    const char** GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
     bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
     void Deactivated() override;

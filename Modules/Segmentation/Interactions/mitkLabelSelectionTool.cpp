@@ -39,11 +39,6 @@ us::ModuleResource mitk::LabelSelectionTool::GetCursorIconResource() const
   return us::GetModuleContext()->GetModule()->GetResource("Selection_Cursor.svg");
 }
 
-const char** mitk::LabelSelectionTool::GetXPM() const
-{
-  return nullptr;
-}
-
 const char* mitk::LabelSelectionTool::GetName() const
 {
   return "Selection";

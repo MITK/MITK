@@ -82,11 +82,6 @@ us::ModuleResource mitk::nnUNetTool::GetIconResource() const
   return resource;
 }
 
-const char **mitk::nnUNetTool::GetXPM() const
-{
-  return nullptr;
-}
-
 const char *mitk::nnUNetTool::GetName() const
 {
   return "nnUNet";

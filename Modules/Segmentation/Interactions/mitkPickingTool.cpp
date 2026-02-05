@@ -46,11 +46,6 @@ mitk::PickingTool::~PickingTool()
 {
 }
 
-const char **mitk::PickingTool::GetXPM() const
-{
-  return nullptr;
-}
-
 const char *mitk::PickingTool::GetName() const
 {
   return "Picking";

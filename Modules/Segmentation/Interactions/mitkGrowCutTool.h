@@ -36,7 +36,6 @@ namespace mitk
     typedef itk::Image<DefaultSegmentationDataType, 3> SeedImageType;
     typedef typename SeedImageType::IndexType IndexType;
 
-    const char **GetXPM() const override;
     const char *GetName() const override;
     us::ModuleResource GetIconResource() const override;
 

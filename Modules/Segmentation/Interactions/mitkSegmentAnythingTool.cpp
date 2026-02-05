@@ -43,11 +43,6 @@ mitk::SegmentAnythingTool::SegmentAnythingTool() : SegWithPreviewTool(true, "Pre
   this->KeepActiveAfterAcceptOn();
 }
 
-const char **mitk::SegmentAnythingTool::GetXPM() const
-{
-  return nullptr;
-}
-
 const char *mitk::SegmentAnythingTool::GetName() const
 {
   return "Segment Anything";

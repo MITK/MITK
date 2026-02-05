@@ -525,6 +525,19 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
       return result;
     }
 
+    // Validate transfer mode if specified
+    if (body.contains(JSON_KEY_TRANSFER) && body[JSON_KEY_TRANSFER].contains(JSON_KEY_MODE))
+    {
+      const std::string specifiedMode = body[JSON_KEY_TRANSFER][JSON_KEY_MODE].get<std::string>();
+      if (specifiedMode != TRANSFER_MODE_DIRECT && specifiedMode != TRANSFER_MODE_FILE_REFERENCE)
+      {
+        result.errorStatus = 406;
+        result.errorResponse = ErrorResponse::TransferModeNotAvailable(
+          specifiedMode, {TRANSFER_MODE_FILE_REFERENCE, TRANSFER_MODE_DIRECT}, req.path);
+        return result;
+      }
+    }
+
     if (!body.contains(JSON_KEY_TRANSFER) || !body[JSON_KEY_TRANSFER].contains(JSON_KEY_FILE_PATH))
     {
       result.errorStatus = 400;
@@ -791,6 +804,18 @@ void DataStorageController::HandlePOST_nodes_uid_generic(const httplib::Request&
       this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
         "Invalid JSON: " + std::string(e.what()), req.path));
       return;
+    }
+
+    // Validate transfer mode if specified
+    if (nodeData.contains(JSON_KEY_TRANSFER) && nodeData[JSON_KEY_TRANSFER].contains(JSON_KEY_MODE))
+    {
+      const std::string specifiedMode = nodeData[JSON_KEY_TRANSFER][JSON_KEY_MODE].get<std::string>();
+      if (specifiedMode != TRANSFER_MODE_DIRECT && specifiedMode != TRANSFER_MODE_FILE_REFERENCE)
+      {
+        this->SendErrorResponse(res, 406, ErrorResponse::TransferModeNotAvailable(
+          specifiedMode, {TRANSFER_MODE_FILE_REFERENCE, TRANSFER_MODE_DIRECT}, req.path));
+        return;
+      }
     }
 
     // Check if there's a transfer section

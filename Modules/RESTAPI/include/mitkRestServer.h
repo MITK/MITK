@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mutex>
 #include <set>
 #include <deque>
+#include <chrono>
 
 // Forward declaration for httplib
 namespace httplib { class Server; }
@@ -73,6 +74,8 @@ namespace mitk
     std::vector<RequestInfo> GetRequestLog() const override;
     void ClearRequestLog() override;
 
+    std::optional<int64_t> GetUptimeSeconds() const override;
+
   private:
     void RecordRequest(const std::string& endpoint, const std::string& method,
                        int responseCode, const std::string& clientIP);
@@ -104,6 +107,9 @@ namespace mitk
 
     // Temporary directory for data serialization
     std::string m_TempDirectory;
+
+    // Server start time for uptime tracking
+    std::optional<std::chrono::steady_clock::time_point> m_StartTime;
 
     /**
      * @brief Create and setup the temporary directory for data operations.

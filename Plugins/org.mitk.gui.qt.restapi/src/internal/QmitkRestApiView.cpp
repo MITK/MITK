@@ -160,6 +160,7 @@ void QmitkRestApiView::UpdateServerStatus()
     m_Controls.m_StartStopButton->setEnabled(false);
     m_Controls.m_ServerUrlLabel->setText("-");
     m_Controls.m_HostPortLabel->setText("-");
+    m_Controls.m_UptimeLabel->setText("-");
     m_Controls.m_ClientIPsLabel->setText("-");
     m_Controls.m_LastEndpointLabel->setText("-");
     m_Controls.m_LastResponseCodeLabel->setText("-");
@@ -211,6 +212,35 @@ void QmitkRestApiView::UpdateServerStatus()
   m_Controls.m_HostPortLabel->setText(QString("%1:%2")
     .arg(QString::fromStdString(config->host))
     .arg(config->port));
+
+  // Update uptime display
+  auto uptime = service->GetUptimeSeconds();
+  if (uptime.has_value())
+  {
+    int64_t seconds = uptime.value();
+    int64_t hours = seconds / 3600;
+    int64_t minutes = (seconds % 3600) / 60;
+    int64_t secs = seconds % 60;
+
+    if (hours > 0)
+    {
+      m_Controls.m_UptimeLabel->setText(QString("%1h %2m %3s")
+        .arg(hours).arg(minutes).arg(secs));
+    }
+    else if (minutes > 0)
+    {
+      m_Controls.m_UptimeLabel->setText(QString("%1m %2s")
+        .arg(minutes).arg(secs));
+    }
+    else
+    {
+      m_Controls.m_UptimeLabel->setText(QString("%1s").arg(secs));
+    }
+  }
+  else
+  {
+    m_Controls.m_UptimeLabel->setText("-");
+  }
 
   // Update client IPs list
   auto clientIPs = service->GetClientIPs();

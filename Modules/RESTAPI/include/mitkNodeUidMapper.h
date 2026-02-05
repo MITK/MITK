@@ -103,6 +103,19 @@ namespace mitk
      */
     bool HasUid(const std::string& uid) const;
 
+    /**
+     * @brief Restore a UID mapping for a node.
+     *
+     * Used to preserve UIDs across operations that temporarily remove and re-add
+     * nodes to the DataStorage (e.g., reparenting). The node's previous UID is
+     * re-registered in the cache and stored as a property.
+     *
+     * @param node The node to restore the UID for. Must not be nullptr.
+     * @param uid The UID to restore.
+     * @throws std::invalid_argument if node is nullptr.
+     */
+    void RestoreUid(const DataNode* node, const std::string& uid);
+
   private:
     void OnNodeAdded(const DataNode* node);
     void OnNodeRemoved(const DataNode* node);

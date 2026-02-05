@@ -203,8 +203,12 @@ namespace mitk
 
     /**
      * @brief Parse query parameters for property requests.
+     *
+     * @param req The HTTP request.
+     * @param defaultScope Default scope if not specified in request (default: All for GET, Node for PUT/PATCH).
+     * @return Parsed property query parameters.
      */
-    PropertyQueryParams ParsePropertyQueryParams(const httplib::Request& req) const;
+    PropertyQueryParams ParsePropertyQueryParams(const httplib::Request& req, PropertyScope defaultScope = PropertyScope::All) const;
 
     /**
      * @brief Determine transfer mode from request headers.

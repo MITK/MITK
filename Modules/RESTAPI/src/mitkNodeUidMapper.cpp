@@ -149,6 +149,23 @@ bool NodeUidMapper::HasUid(const std::string& uid) const
   return m_UidToNode.find(uid) != m_UidToNode.end();
 }
 
+void NodeUidMapper::RestoreUid(const DataNode* node, const std::string& uid)
+{
+  if (node == nullptr)
+  {
+    throw std::invalid_argument("Node cannot be null");
+  }
+
+  std::lock_guard<std::mutex> lock(m_Mutex);
+
+  // Restore the mapping in both directions
+  m_UidToNode[uid] = const_cast<DataNode*>(node);
+  m_NodeToUid[node] = uid;
+
+  // Restore as property for debugging visibility
+  const_cast<DataNode*>(node)->SetStringProperty(UID_PROPERTY_KEY, uid.c_str());
+}
+
 std::string NodeUidMapper::GenerateUid()
 {
   // Format: "node_<counter>" - simple, unique within session

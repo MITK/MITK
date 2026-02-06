@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkPointSet.h"
 
+#include <vtkSmartPointer.h>
+
 namespace mitk
 {
   //##Documentation
@@ -56,7 +58,7 @@ namespace mitk
 
     mitk::LandmarkProjector::Pointer m_LandmarkProjector;
 
-    vtkAbstractTransform *m_InterpolatingAbstractTransform;
+    vtkSmartPointer<vtkAbstractTransform> m_InterpolatingAbstractTransform;
 
     mitk::PointSet::DataType::PointsContainer::ConstPointer m_TargetLandmarks;
 

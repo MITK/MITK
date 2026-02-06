@@ -49,8 +49,8 @@ namespace mitk
 
     vtkThinPlateSplineTransform *m_ThinPlateSplineTransform;
 
-    vtkPoints *m_VtkTargetLandmarks;
-    vtkPoints *m_VtkProjectedLandmarks;
+    vtkSmartPointer<vtkPoints> m_VtkTargetLandmarks;
+    vtkSmartPointer<vtkPoints> m_VtkProjectedLandmarks;
 
     //##Documentation
     //## @brief PreSetSpacing

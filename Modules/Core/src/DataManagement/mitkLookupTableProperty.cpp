@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkLookupTableProperty.h"
+#include <iomanip>
 #include <nlohmann/json.hpp>
 
 mitk::LookupTableProperty::LookupTableProperty()
@@ -43,7 +44,20 @@ bool mitk::LookupTableProperty::Assign(const BaseProperty &property)
 std::string mitk::LookupTableProperty::GetValueAsString() const
 {
   std::stringstream ss;
-  ss << m_LookupTable;
+  ss << std::fixed << std::setprecision(4);
+  auto vtkLut = m_LookupTable->GetVtkLookupTable();
+  auto n = vtkLut->GetNumberOfTableValues();
+  ss << "[LookupTable: " << n << " colors, range: ("
+     << vtkLut->GetTableRange()[0] << ", " << vtkLut->GetTableRange()[1] << ")";
+
+  auto limit = std::min(n, static_cast<vtkIdType>(3));
+  for (vtkIdType i = 0; i < limit; ++i)
+  {
+    const double *rgba = vtkLut->GetTableValue(i);
+    ss << ", (" << rgba[0] << ", " << rgba[1] << ", " << rgba[2] << ", " << rgba[3] << ")";
+  }
+
+  ss << "]";
   return ss.str();
 }
 

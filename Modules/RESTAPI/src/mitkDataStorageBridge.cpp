@@ -20,7 +20,11 @@ found in the LICENSE file.
 #include <mitkLog.h>
 
 #include <algorithm>
+#include <regex>
 #include <sstream>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
 
 
 namespace
@@ -28,34 +32,16 @@ namespace
   /**
    * @brief Convert a JSON value to its string representation for filtering.
    *
-   * This ensures filtering uses the same representation users see in the REST API:
-   * - JSON boolean true -> "true" (not "1" as GetValueAsString() returns)
-   * - JSON boolean false -> "false" (not "0" as GetValueAsString() returns)
-   * - JSON number -> string representation
+   * Needed to ensure that strings are returned w/o '\"' escapes and null is converted into empty string.
    * - JSON string -> the string value
    * - JSON null -> empty string
-   * - JSON object/array -> dump() representation
+   * - JSON boolean, number and object/array -> dump() representation
    */
   std::string JsonValueToFilterString(const nlohmann::json& json)
   {
-    if (json.is_boolean())
-    {
-      return json.get<bool>() ? "true" : "false";
-    }
-    else if (json.is_string())
+    if (json.is_string())
     {
       return json.get<std::string>();
-    }
-    else if (json.is_number_integer())
-    {
-      return std::to_string(json.get<int>());
-    }
-    else if (json.is_number_float())
-    {
-      // Use stringstream for consistent float formatting
-      std::ostringstream ss;
-      ss << json.get<double>();
-      return ss.str();
     }
     else if (json.is_null())
     {
@@ -63,7 +49,7 @@ namespace
     }
     else
     {
-      // For complex types (arrays, objects), use the JSON dump
+      // For boolean, numbers and complex types (arrays, objects), use the JSON dump
       return json.dump();
     }
   }
@@ -143,8 +129,158 @@ namespace
 
     return nullptr;
   }
-}
 
+  std::string GenerateTimestampString()
+  {
+    auto now = std::chrono::system_clock::now();
+
+    // Split into seconds + fractional part
+    auto seconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
+    auto fraction = now - seconds;
+    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(fraction).count();
+
+    std::time_t t = std::chrono::system_clock::to_time_t(seconds);
+
+    std::tm tm{};
+#if defined(_WIN32)
+    gmtime_s(&tm, &t);   // Windows thread-safe
+#else
+    gmtime_r(&t, &tm);   // POSIX thread-safe
+#endif
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%Y-%m-%dT%H:%M:%S");
+
+    // Append fractional seconds
+    oss << "." << std::setw(3) << std::setfill('0') << millis;
+
+    // UTC marker
+    oss << "Z";
+
+    return oss.str();
+  }
+
+  /**
+   * @brief Mark a node as modified via REST API.
+   *
+   * Sets the internal properties "restapi.modified" to the current timestamp and
+   * "restapi.lastmodification" to the specified operation description.
+   *
+   * @param node The node to mark as modified. Must not be nullptr.
+   * @param operation Description of the modification operation (e.g., "created", "property_set:name").
+   */
+  void MarkNodeAsModified(mitk::DataNode* node, const std::string& operation)
+  {
+    if (node == nullptr)
+    {
+      return;
+    }
+
+    node->SetStringProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, GenerateTimestampString().c_str());
+    node->SetStringProperty(mitk::DataStorageBridge::LAST_MODIFICATION_PROPERTY_KEY, operation.c_str());
+  }
+
+  /**
+   * @brief Convert a filter pattern with wildcards into a regex string.
+   *
+   * Escapes all regex-special characters in the literal segments and maps
+   * wildcard characters to their regex equivalents:
+   * - '*' -> '.*' (match zero or more characters)
+   * - '?' -> '.'  (match exactly one character)
+   *
+   * The result is anchored with ^ and $ for a full-string match.
+   *
+   * @pre filterPattern must not be empty.
+   * @param filterPattern The filter pattern (e.g., "CT*Scan", "Child?").
+   * @return A regex string that matches the same semantics.
+   */
+  std::string ConvertFilterToRegex(const std::string& filterPattern)
+  {
+    std::string regex = "^";
+
+    for (char c : filterPattern)
+    {
+      switch (c)
+      {
+        case '*': regex += ".*"; break;
+        case '?': regex += "."; break;
+        // Escape regex-special characters
+        case '.': case '+': case '(': case ')':
+        case '[': case ']': case '{': case '}':
+        case '\\': case '^': case '$': case '|':
+          regex += '\\';
+          regex += c;
+          break;
+        default:
+          regex += c;
+          break;
+      }
+    }
+
+    regex += "$";
+    return regex;
+  }
+
+  /**
+   * @brief Check if a filter pattern contains wildcard characters (* or ?).
+   */
+  bool ContainsWildcard(const std::string& filterValue)
+  {
+    return filterValue.find_first_of("*?") != std::string::npos;
+  }
+
+  /**
+   * @brief Check if a property value matches a filter pattern.
+   *
+   * Supports glob-style wildcards anywhere in the pattern:
+   * - '*' matches zero or more characters (e.g., "CT*", "*Scan", "CT*2024*Scan")
+   * - '?' matches exactly one character (e.g., "Child?", "Node_0?")
+   * - No wildcards: exact match
+   *
+   * @param propertyValue The actual property value, or std::nullopt if property doesn't exist.
+   * @param filterValue The filter pattern.
+   * @return true if the value matches the pattern.
+   */
+  bool MatchesPropertyFilter(
+    const std::optional<std::string>& propertyValue,
+    const std::string& filterValue)
+  {
+    if (!propertyValue.has_value())
+    {
+      return false;
+    }
+
+    if (!ContainsWildcard(filterValue))
+    {
+      return propertyValue.value() == filterValue;
+    }
+
+    try
+    {
+      std::regex pattern(ConvertFilterToRegex(filterValue));
+      return std::regex_match(propertyValue.value(), pattern);
+    }
+    catch (const std::regex_error&)
+    {
+      return false;
+    }
+  }
+
+  /**
+   * @brief Check if a property key is internal (starts with INTERNAL_PROPERTY_PREFIX).
+   *
+   * Internal properties are REST API metadata and should not be exposed to clients.
+   *
+   * @param key The property key to check.
+   * @return true if the property is internal.
+   */
+  bool IsInternalProperty(const std::string& key)
+  {
+    // Check if key starts with INTERNAL_PROPERTY_PREFIX ("restapi.")
+    return key.rfind(mitk::DataStorageBridge::INTERNAL_PROPERTY_PREFIX, 0) == 0;
+  }
+
+}
 
 namespace mitk
 {
@@ -166,13 +302,13 @@ namespace mitk
   DataStorage::Pointer DataStorageBridge::GetDataStorage() const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return m_DataStorage;
+    return m_DataStorage.Lock();
   }
 
   bool DataStorageBridge::HasDataStorage() const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return m_DataStorage.IsNotNull();
+    return m_DataStorage.Lock().IsNotNull();
   }
 
   std::string DataStorageBridge::GetNodeUid(const DataNode* node) const
@@ -180,77 +316,20 @@ namespace mitk
     return m_UidMapper->GetOrCreateUid(node);
   }
 
-  bool DataStorageBridge::IsInternalProperty(const std::string& key)
-  {
-    // Check if key starts with INTERNAL_PROPERTY_PREFIX ("restapi.")
-    return key.rfind(INTERNAL_PROPERTY_PREFIX, 0) == 0;
-  }
-
-  void DataStorageBridge::MarkNodeAsModified(DataNode* node, const std::string& operation)
-  {
-    if (node == nullptr)
-    {
-      return;
-    }
-
-    node->SetBoolProperty(MODIFIED_PROPERTY_KEY, true);
-    node->SetStringProperty(LAST_MODIFICATION_PROPERTY_KEY, operation.c_str());
-  }
-
-  bool DataStorageBridge::MatchesPropertyFilter(
-    const std::optional<std::string>& propertyValue,
-    const std::string& filterValue) const
-  {
-    // If property doesn't exist, it doesn't match
-    if (!propertyValue.has_value())
-    {
-      return false;
-    }
-
-    const std::string& value = propertyValue.value();
-
-    // Check for wildcard patterns per API spec:
-    // - filter.name=CT* (prefix match)
-    // - filter.name=*Scan (suffix match)
-
-    if (filterValue.length() >= 2)
-    {
-      // Prefix match: CT*
-      if (filterValue.back() == '*' && filterValue.front() != '*')
-      {
-        std::string prefix = filterValue.substr(0, filterValue.length() - 1);
-        return value.compare(0, prefix.length(), prefix) == 0;
-      }
-
-      // Suffix match: *Scan
-      if (filterValue.front() == '*' && filterValue.back() != '*')
-      {
-        std::string suffix = filterValue.substr(1);
-        if (value.length() >= suffix.length())
-        {
-          return value.compare(
-            value.length() - suffix.length(),
-            suffix.length(),
-            suffix) == 0;
-        }
-        return false;
-      }
-    }
-
-    // Exact match
-    return value == filterValue;
-  }
-
   NodePredicateBase::Pointer DataStorageBridge::BuildNodePredicate(const NodeQueryParams& params) const
   {
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
+      mitkThrow() << "BuildNodePredicate called without a valid DataStorage.";
+
     std::vector<NodePredicateBase::Pointer> predicates;
 
     // Hierarchy filter (toplevel = root nodes only)
     if (params.hierarchy == Hierarchy::Toplevel)
     {
       auto isRootPredicate = NodePredicateFunction::New(
-        [this](const DataNode* node) -> bool {
-          auto sources = m_DataStorage->GetSources(node);
+        [dataStorage](const DataNode* node) -> bool {
+          auto sources = dataStorage->GetSources(node);
           return sources->Size() == 0;
         });
       predicates.push_back(isRootPredicate.GetPointer());
@@ -271,11 +350,7 @@ namespace mitk
     if (params.dataType.has_value())
     {
       std::string dataType = params.dataType.value();
-      // Remove "mitk::" prefix if present for NodePredicateDataType
-      if (dataType.rfind("mitk::", 0) == 0)
-      {
-        dataType = dataType.substr(6);
-      }
+
       auto dataTypePredicate = NodePredicateDataType::New(dataType.c_str());
       predicates.push_back(dataTypePredicate.GetPointer());
     }
@@ -285,8 +360,8 @@ namespace mitk
     {
       const std::string targetParentUid = params.parentUid.value();
       auto parentPredicate = NodePredicateFunction::New(
-        [this, targetParentUid](const DataNode* node) -> bool {
-          auto sources = m_DataStorage->GetSources(node);
+        [this, dataStorage, targetParentUid](const DataNode* node) -> bool {
+          auto sources = dataStorage->GetSources(node);
 
           if (targetParentUid == "null")
           {
@@ -335,7 +410,7 @@ namespace mitk
             }
           }
 
-          bool matches = this->MatchesPropertyFilter(propValue, propFilter.value);
+          bool matches = MatchesPropertyFilter(propValue, propFilter.value);
 
           // Apply negation if needed (for != operator)
           return propFilter.negated ? !matches : matches;
@@ -373,7 +448,8 @@ namespace mitk
     result.limit = params.limit;
     result.offset = params.offset;
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return result;
     }
@@ -382,7 +458,7 @@ namespace mitk
     auto predicate = this->BuildNodePredicate(params);
 
     // Get filtered nodes using the predicate
-    auto filteredNodes = m_DataStorage->GetSubset(predicate);
+    auto filteredNodes = dataStorage->GetSubset(predicate);
 
     // Convert to vector for sorting and pagination
     std::vector<DataNode*> matchingNodes;
@@ -398,7 +474,7 @@ namespace mitk
     {
       const auto& sortSpec = params.sort.value();
       std::sort(matchingNodes.begin(), matchingNodes.end(),
-        [this, &sortSpec](DataNode* a, DataNode* b) {
+        [this, &sortSpec, &dataStorage](DataNode* a, DataNode* b) {
           const std::string& field = sortSpec.field;
 
           // Handle numeric fields (children_count, timestamp)
@@ -435,8 +511,8 @@ namespace mitk
           }
           else if (field == "parent_uid")
           {
-            auto sourcesA = m_DataStorage->GetSources(a);
-            auto sourcesB = m_DataStorage->GetSources(b);
+            auto sourcesA = dataStorage->GetSources(a);
+            auto sourcesB = dataStorage->GetSources(b);
             valA = (sourcesA->Size() > 0) ? m_UidMapper->GetOrCreateUid(sourcesA->ElementAt(0)) : "";
             valB = (sourcesB->Size() > 0) ? m_UidMapper->GetOrCreateUid(sourcesB->ElementAt(0)) : "";
           }
@@ -444,8 +520,8 @@ namespace mitk
           {
             auto dataA = a->GetData();
             auto dataB = b->GetData();
-            valA = dataA ? (std::string("mitk::") + dataA->GetNameOfClass()) : "";
-            valB = dataB ? (std::string("mitk::") + dataB->GetNameOfClass()) : "";
+            valA = dataA ? dataA->GetNameOfClass() : "";
+            valB = dataB ? dataB->GetNameOfClass() : "";
           }
           else
           {
@@ -494,7 +570,8 @@ namespace mitk
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return std::nullopt;
     }
@@ -515,7 +592,8 @@ namespace mitk
     CreateNodeResult result;
     result.success = false;
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return result;
     }
@@ -568,11 +646,11 @@ namespace mitk
     // Add to DataStorage (with or without parent)
     if (parentNode != nullptr)
     {
-      m_DataStorage->Add(node, parentNode);
+      dataStorage->Add(node, parentNode);
     }
     else
     {
-      m_DataStorage->Add(node);
+      dataStorage->Add(node);
     }
 
     // Get/create UID for the new node
@@ -589,7 +667,8 @@ namespace mitk
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return false;
     }
@@ -619,7 +698,7 @@ namespace mitk
     }
 
     // Check if newParent is a descendant of node
-    auto descendants = m_DataStorage->GetDerivations(node, nullptr, true);
+    auto descendants = dataStorage->GetDerivations(node, nullptr, true);
     for (auto it = descendants->Begin(); it != descendants->End(); ++it)
     {
       if (it->Value().GetPointer() == newParent)
@@ -636,14 +715,14 @@ namespace mitk
     // so we save the UID and restore the mapping after re-adding.
     const std::string preservedUid = uid;
 
-    m_DataStorage->Remove(node);
+    dataStorage->Remove(node);
     if (newParent != nullptr)
     {
-      m_DataStorage->Add(node, newParent);
+      dataStorage->Add(node, newParent);
     }
     else
     {
-      m_DataStorage->Add(node);  // Move to root level
+      dataStorage->Add(node);  // Move to root level
     }
 
     m_UidMapper->RestoreUid(node, preservedUid);
@@ -662,7 +741,8 @@ namespace mitk
     result.deletedUid = uid;
     result.childrenCount = 0;
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return result;
     }
@@ -674,7 +754,7 @@ namespace mitk
     }
 
     // Check for children
-    auto derivatives = m_DataStorage->GetDerivations(node);
+    auto derivatives = dataStorage->GetDerivations(node);
     result.childrenCount = static_cast<int>(derivatives->Size());
 
     if (result.childrenCount > 0 && !recursive)
@@ -689,7 +769,7 @@ namespace mitk
       // Collect all descendants (depth-first)
       std::vector<DataNode*> toDelete;
       std::function<void(DataNode*)> collectDescendants = [&](DataNode* n) {
-        auto children = m_DataStorage->GetDerivations(n);
+        auto children = dataStorage->GetDerivations(n);
         for (auto it = children->Begin(); it != children->End(); ++it)
         {
           collectDescendants(it->Value().GetPointer());
@@ -708,12 +788,12 @@ namespace mitk
       {
         // Use GetOrCreateUid to ensure all deleted children have UIDs for reporting
         result.deletedChildren.push_back(m_UidMapper->GetOrCreateUid(descendant));
-        m_DataStorage->Remove(descendant);
+        dataStorage->Remove(descendant);
       }
     }
 
     // Delete the node itself
-    m_DataStorage->Remove(node);
+    dataStorage->Remove(node);
     result.success = true;
 
     return result;
@@ -727,7 +807,8 @@ namespace mitk
     result.nodeFound = false;
     result.data = nullptr;
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return result;
     }
@@ -757,7 +838,8 @@ namespace mitk
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return false;
     }
@@ -782,7 +864,8 @@ namespace mitk
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return std::nullopt;
     }
@@ -887,7 +970,8 @@ namespace mitk
 
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return std::nullopt;
     }
@@ -925,7 +1009,8 @@ namespace mitk
 
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return false;
     }
@@ -992,7 +1077,8 @@ namespace mitk
 
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return false;
     }
@@ -1046,7 +1132,8 @@ namespace mitk
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return std::nullopt;
     }
@@ -1154,7 +1241,8 @@ namespace mitk
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    if (m_DataStorage.IsNull())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
     {
       return std::nullopt;
     }
@@ -1183,6 +1271,9 @@ namespace mitk
   DataStorageBridge::Json DataStorageBridge::NodeToJson(const DataNode* node) const
   {
     // Note: caller must hold m_Mutex
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
+      mitkThrow() << "NodeToJson called without a valid DataStorage.";
 
     Json result;
 
@@ -1192,7 +1283,7 @@ namespace mitk
     result["path"] = this->BuildNodePath(node);
 
     // Get parent UID if exists
-    auto sources = m_DataStorage->GetSources(node);
+    auto sources = dataStorage->GetSources(node);
     if (sources->Size() > 0)
     {
       auto parent = sources->ElementAt(0).GetPointer();
@@ -1207,7 +1298,7 @@ namespace mitk
     auto data = node->GetData();
     if (data != nullptr)
     {
-      result["data_type"] = std::string("mitk::") + data->GetNameOfClass();
+      result["data_type"] = data->GetNameOfClass();
     }
     else
     {
@@ -1226,15 +1317,18 @@ namespace mitk
   std::string DataStorageBridge::BuildNodePath(const DataNode* node) const
   {
     // Note: caller must hold m_Mutex
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
+      mitkThrow() << "BuildNodePath called without a valid DataStorage.";
 
     std::string path = "/" + node->GetName();
 
-    auto sources = m_DataStorage->GetSources(node);
+    auto sources = dataStorage->GetSources(node);
     while (sources->Size() > 0)
     {
       auto parent = sources->ElementAt(0).GetPointer();
       path = "/" + parent->GetName() + path;
-      sources = m_DataStorage->GetSources(parent);
+      sources = dataStorage->GetSources(parent);
     }
 
     return path;
@@ -1243,8 +1337,11 @@ namespace mitk
   int DataStorageBridge::GetChildrenCount(const DataNode* node) const
   {
     // Note: caller must hold m_Mutex
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNull())
+      mitkThrow() << "GetChildrenCount called without a valid DataStorage.";
 
-    auto derivatives = m_DataStorage->GetDerivations(node);
+    auto derivatives = dataStorage->GetDerivations(node);
     return static_cast<int>(derivatives->Size());
   }
 

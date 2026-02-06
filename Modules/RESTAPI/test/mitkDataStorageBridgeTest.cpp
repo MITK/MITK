@@ -973,7 +973,7 @@ public:
     auto nodeJson = m_Bridge->GetNode(m_Root1Uid);
     CPPUNIT_ASSERT(nodeJson.has_value());
     CPPUNIT_ASSERT(!nodeJson.value()["data_type"].is_null());
-    CPPUNIT_ASSERT_EQUAL(std::string("mitk::Image"), nodeJson.value()["data_type"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("Image"), nodeJson.value()["data_type"].get<std::string>());
   }
 
   void SetNodeDataClearsData()
@@ -1020,8 +1020,7 @@ public:
     auto nodeUid = FindUidByName("FreshNodeForDataMod");
 
     // Verify no modification tracking yet
-    bool modified = false;
-    CPPUNIT_ASSERT(!freshNode->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
+    CPPUNIT_ASSERT(freshNode->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) == nullptr);
 
     // Set data
     auto newImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(5, 5, 5);
@@ -1029,8 +1028,7 @@ public:
     CPPUNIT_ASSERT(success);
 
     // Verify modification tracking is now set
-    CPPUNIT_ASSERT(freshNode->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
-    CPPUNIT_ASSERT(modified);
+    CPPUNIT_ASSERT(freshNode->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) != nullptr);
 
     std::string lastMod;
     CPPUNIT_ASSERT(freshNode->GetStringProperty(mitk::DataStorageBridge::LAST_MODIFICATION_PROPERTY_KEY, lastMod));

@@ -19,8 +19,11 @@ mitk::ContourModelSet::ContourModelSet() : m_Contours(), m_UpdateBoundingBox(tru
 }
 
 mitk::ContourModelSet::ContourModelSet(const mitk::ContourModelSet &other)
-  : mitk::BaseData(other), m_Contours(other.m_Contours)
+  : mitk::BaseData(other), m_UpdateBoundingBox(other.m_UpdateBoundingBox)
 {
+  for (const auto &contour : other.m_Contours)
+    m_Contours.push_back(contour->Clone());
+
   this->InitializeTimeGeometry(1);
 }
 

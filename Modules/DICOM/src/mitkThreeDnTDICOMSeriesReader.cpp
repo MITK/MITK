@@ -23,7 +23,7 @@ mitk::ThreeDnTDICOMSeriesReader
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(const ThreeDnTDICOMSeriesReader& other )
 :DICOMITKSeriesGDCMReader(other)
-,m_Group3DandT(m_DefaultGroup3DandT), m_OnlyCondenseSameSeries(m_DefaultOnlyCondenseSameSeries)
+,m_Group3DandT(other.m_Group3DandT), m_OnlyCondenseSameSeries(other.m_OnlyCondenseSameSeries)
 {
 }
 

@@ -40,6 +40,9 @@ namespace mitk
   protected:
     mitkCloneMacro(Self);
 
+    BaseDataTestImplementation(const BaseDataTestImplementation& other) : BaseData(other) {};
+    ~BaseDataTestImplementation() override {};
+
     bool VerifyRequestedRegion() override { return false; };
     bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; };
     void SetRequestedRegionToLargestPossibleRegion() override{};

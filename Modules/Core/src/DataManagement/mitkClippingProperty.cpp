@@ -100,11 +100,4 @@ namespace mitk
     return true;
   }
 
-  itk::LightObject::Pointer ClippingProperty::InternalClone() const
-  {
-    itk::LightObject::Pointer result(new Self(*this));
-    result->UnRegister();
-    return result;
-  }
-
 } // namespace

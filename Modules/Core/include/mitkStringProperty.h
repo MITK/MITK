@@ -41,6 +41,8 @@ namespace mitk
 
     StringProperty(const StringProperty &);
 
+    mitkCloneMacro(StringProperty);
+
   public:
     mitkClassMacro(StringProperty, BaseProperty);
     typedef std::string ValueType;
@@ -65,8 +67,6 @@ namespace mitk
   private:
     // purposely not implemented
     StringProperty &operator=(const StringProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;

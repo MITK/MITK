@@ -29,13 +29,6 @@ namespace mitk
   }
 
   template <typename DATATYPE>
-  itk::LightObject::Pointer VectorProperty<DATATYPE>::InternalClone() const
-  {
-    itk::LightObject::Pointer result(new Self(*this));
-    return result;
-  }
-
-  template <typename DATATYPE>
   std::string VectorProperty<DATATYPE>::GetValueAsString() const
   {
     const size_t displayBlockLength = 3;

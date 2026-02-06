@@ -45,6 +45,8 @@ namespace mitk
 
     LevelWindowProperty(const mitk::LevelWindow &levWin);
 
+    mitkCloneMacro(LevelWindowProperty);
+
   public:
     mitkClassMacro(LevelWindowProperty, BaseProperty);
 
@@ -72,8 +74,6 @@ namespace mitk
   private:
     // purposely not implemented
     LevelWindowProperty &operator=(const LevelWindowProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;

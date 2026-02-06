@@ -93,6 +93,8 @@ namespace mitk
      */
     PointSetShapeProperty(const std::string &value);
 
+    PointSetShapeProperty(const PointSetShapeProperty &other);
+
     /**
      * this function is overridden as protected, so that the user may not add
      * additional invalid rendering types.
@@ -104,11 +106,11 @@ namespace mitk
      */
     virtual void AddPointSetShapes();
 
+    mitkCloneMacro(PointSetShapeProperty);
+
   private:
     // purposely not implemented
     PointSetShapeProperty &operator=(const PointSetShapeProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

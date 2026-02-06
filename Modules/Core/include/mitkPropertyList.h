@@ -254,13 +254,12 @@ namespace mitk
 
     ~PropertyList() override;
 
+    mitkCloneMacro(PropertyList);
+
     /**
      * @brief Map of properties.
      */
     PropertyMap m_Properties;
-
-  private:
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
   /**

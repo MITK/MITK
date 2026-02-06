@@ -69,6 +69,8 @@ namespace mitk
 
     ColorProperty(const mitk::Color &color);
 
+    mitkCloneMacro(ColorProperty);
+
   public:
     mitkClassMacro(ColorProperty, BaseProperty);
     itkFactorylessNewMacro(Self);
@@ -93,8 +95,6 @@ namespace mitk
   private:
     // purposely not implemented
     ColorProperty &operator=(const ColorProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;

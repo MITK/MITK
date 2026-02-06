@@ -145,9 +145,3 @@ bool mitk::LookupTableProperty::FromJSON(const nlohmann::json& j)
   return true;
 }
 
-itk::LightObject::Pointer mitk::LookupTableProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

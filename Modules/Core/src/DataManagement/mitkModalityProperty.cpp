@@ -17,6 +17,11 @@ mitk::ModalityProperty::ModalityProperty()
   AddEnumerationTypes();
 }
 
+mitk::ModalityProperty::ModalityProperty(const ModalityProperty &other)
+  : EnumerationProperty(other)
+{
+}
+
 mitk::ModalityProperty::ModalityProperty(const IdType &value)
 {
   AddEnumerationTypes();
@@ -61,9 +66,3 @@ void mitk::ModalityProperty::AddEnumerationTypes()
   AddEnum("Power Doppler", newId++); // ultrasound
 }
 
-itk::LightObject::Pointer mitk::ModalityProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

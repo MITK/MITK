@@ -46,11 +46,11 @@ namespace mitk
     GroupTagProperty();
     GroupTagProperty(const GroupTagProperty &);
 
+    mitkCloneMacro(GroupTagProperty);
+
   private:
     // purposely not implemented
     GroupTagProperty &operator=(const GroupTagProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;

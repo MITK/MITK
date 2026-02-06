@@ -84,6 +84,8 @@ namespace mitk
      */
     VtkInterpolationProperty(const std::string &value);
 
+    VtkInterpolationProperty(const VtkInterpolationProperty &other);
+
     /**
      * this function is overridden as protected, so that the user may not add
      * additional invalid interpolation types.
@@ -96,11 +98,11 @@ namespace mitk
      */
     virtual void AddInterpolationTypes();
 
+    mitkCloneMacro(VtkInterpolationProperty);
+
   private:
     // purposely not implemented
     VtkInterpolationProperty &operator=(const VtkInterpolationProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

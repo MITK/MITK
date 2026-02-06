@@ -158,7 +158,7 @@ namespace mitk
 
     TransferFunction(const TransferFunction &other);
 
-    itk::LightObject::Pointer InternalClone() const override;
+    mitkCloneMacro(TransferFunction);
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 

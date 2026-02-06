@@ -413,13 +413,6 @@ void mitk::LookupTable::PrintSelf(std::ostream &os, itk::Indent indent) const
   m_LookupTable->PrintHeader(os, vtkIndent());
 }
 
-itk::LightObject::Pointer mitk::LookupTable::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}
-
 void mitk::LookupTable::BuildGrayScaleLookupTable()
 {
   vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();

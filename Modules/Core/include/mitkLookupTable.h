@@ -248,6 +248,8 @@ namespace mitk
 
     LookupTable(const LookupTable &other);
 
+    mitkCloneMacro(LookupTable);
+
     virtual void BuildGrayScaleLookupTable();
     virtual void BuildLegacyBinaryLookupTable();
     virtual void BuildLegacyRainbowColorLookupTable();
@@ -272,8 +274,6 @@ namespace mitk
 
     LookupTableType m_Type;
 
-  private:
-    itk::LightObject::Pointer InternalClone() const override;
   };
 } // namespace mitk
 

@@ -108,11 +108,11 @@ namespace mitk
                                           bool allowCloseTime = false,
                                           bool allowCloseSlice = false) const;
 
+    mitkCloneMacro(TemporoSpatialStringProperty);
+
   private:
     // purposely not implemented
     TemporoSpatialStringProperty &operator=(const TemporoSpatialStringProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;

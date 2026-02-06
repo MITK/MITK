@@ -68,11 +68,11 @@ namespace mitk
 
     itk::Object::Pointer m_SmartPointer;
 
+    mitkCloneMacro(SmartPointerProperty);
+
   private:
     // purposely not implemented
     SmartPointerProperty &operator=(const SmartPointerProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     bool IsEqual(const BaseProperty &) const override;
     bool Assign(const BaseProperty &) override;

@@ -43,9 +43,3 @@ bool mitk::GroupTagProperty::FromJSON(const nlohmann::json&)
   return true;
 }
 
-itk::LightObject::Pointer mitk::GroupTagProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

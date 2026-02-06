@@ -203,13 +203,6 @@ void mitk::PropertyList::Clear()
   m_Properties.clear();
 }
 
-itk::LightObject::Pointer mitk::PropertyList::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}
-
 void mitk::PropertyList::ConcatenatePropertyList(PropertyList *pList, bool replace)
 {
   if (pList)

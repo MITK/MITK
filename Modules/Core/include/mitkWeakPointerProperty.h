@@ -62,11 +62,11 @@ namespace mitk
 
     WeakPointerProperty(itk::Object *pointer = nullptr);
 
+    mitkCloneMacro(WeakPointerProperty);
+
   private:
     // purposely not implemented
     WeakPointerProperty &operator=(const WeakPointerProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;

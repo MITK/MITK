@@ -18,6 +18,11 @@ mitk::ResliceMethodProperty::ResliceMethodProperty()
   SetValue((IdType)0);
 }
 
+mitk::ResliceMethodProperty::ResliceMethodProperty(const ResliceMethodProperty &other)
+  : EnumerationProperty(other)
+{
+}
+
 mitk::ResliceMethodProperty::ResliceMethodProperty(const IdType &value)
 {
   AddThickSlicesTypes();
@@ -42,9 +47,3 @@ void mitk::ResliceMethodProperty::AddThickSlicesTypes()
   AddEnum("mean", (IdType)5);
 }
 
-itk::LightObject::Pointer mitk::ResliceMethodProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

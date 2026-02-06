@@ -96,12 +96,15 @@ namespace mitk
     bool ToJSON(nlohmann::json& j) const override;
     bool FromJSON(const nlohmann::json& j) override;
 
+  protected:
+    VectorProperty() = default;
+    VectorProperty(const VectorProperty &other) : BaseProperty(other), m_PropertyContent(other.m_PropertyContent) {}
+
+    mitkCloneMacro(VectorProperty);
+
   private:
     /// purposely not implemented
     VectorProperty &operator=(const Self &);
-
-    /// creates a copy of it self
-    itk::LightObject::Pointer InternalClone() const override;
 
     /// compares two properties.
     bool IsEqual(const BaseProperty &an_other_property) const override;

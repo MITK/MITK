@@ -63,11 +63,11 @@ namespace mitk
 
     TransferFunctionProperty(mitk::TransferFunction::Pointer value);
 
+    mitkCloneMacro(TransferFunctionProperty);
+
   private:
     // purposely not implemented
     TransferFunctionProperty &operator=(const TransferFunctionProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;

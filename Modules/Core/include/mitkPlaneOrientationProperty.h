@@ -95,6 +95,8 @@ namespace mitk
      */
     PlaneOrientationProperty(const std::string &value);
 
+    PlaneOrientationProperty(const PlaneOrientationProperty &other);
+
     /**
      * this function is overridden as protected, so that the user may not add
      * additional invalid types.
@@ -106,11 +108,11 @@ namespace mitk
      */
     virtual void AddDecorationTypes();
 
+    mitkCloneMacro(PlaneOrientationProperty);
+
   private:
     // purposely not implemented
     PlaneOrientationProperty &operator=(const PlaneOrientationProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

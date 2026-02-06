@@ -40,6 +40,11 @@ mitk::PointSetShapeProperty::PointSetShapeProperty(const std::string &value)
     MITK_WARN << "Invalid point set shape";
 }
 
+mitk::PointSetShapeProperty::PointSetShapeProperty(const PointSetShapeProperty &other)
+  : EnumerationProperty(other)
+{
+}
+
 int mitk::PointSetShapeProperty::GetPointSetShape() const
 {
   return static_cast<int>(this->GetValueAsId());
@@ -66,9 +71,3 @@ bool mitk::PointSetShapeProperty::AddEnum(const std::string &name, const IdType 
   return Superclass::AddEnum(name, id);
 }
 
-itk::LightObject::Pointer mitk::PointSetShapeProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

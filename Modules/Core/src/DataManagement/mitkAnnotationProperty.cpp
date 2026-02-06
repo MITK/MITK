@@ -90,13 +90,6 @@ std::string mitk::AnnotationProperty::GetValueAsString() const
   return myStr.str();
 }
 
-itk::LightObject::Pointer mitk::AnnotationProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}
-
 bool mitk::AnnotationProperty::ToJSON(nlohmann::json& j) const
 {
   j = nlohmann::json{

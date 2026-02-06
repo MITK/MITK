@@ -80,6 +80,8 @@ namespace mitk
      */
     VtkResliceInterpolationProperty(const std::string &value);
 
+    VtkResliceInterpolationProperty(const VtkResliceInterpolationProperty &other);
+
     /**
      * this function is overridden as protected, so that the user may not add
      * additional invalid interpolation types.
@@ -92,11 +94,11 @@ namespace mitk
      */
     virtual void AddInterpolationTypes();
 
+    mitkCloneMacro(VtkResliceInterpolationProperty);
+
   private:
     // purposely not implemented
     VtkResliceInterpolationProperty &operator=(const VtkResliceInterpolationProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

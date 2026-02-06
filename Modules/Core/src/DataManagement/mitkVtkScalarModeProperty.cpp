@@ -45,6 +45,11 @@ mitk::VtkScalarModeProperty::VtkScalarModeProperty(const std::string &value)
   }
 }
 
+mitk::VtkScalarModeProperty::VtkScalarModeProperty(const VtkScalarModeProperty &other)
+  : EnumerationProperty(other)
+{
+}
+
 int mitk::VtkScalarModeProperty::GetVtkScalarMode()
 {
   return static_cast<int>(GetValueAsId());
@@ -89,9 +94,3 @@ bool mitk::VtkScalarModeProperty::AddEnum(const std::string &name, const IdType 
   return Superclass::AddEnum(name, id);
 }
 
-itk::LightObject::Pointer mitk::VtkScalarModeProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

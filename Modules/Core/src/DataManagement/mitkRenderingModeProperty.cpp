@@ -40,6 +40,11 @@ mitk::RenderingModeProperty::RenderingModeProperty(const std::string &value)
     MITK_WARN << "Invalid image rendering mode";
 }
 
+mitk::RenderingModeProperty::RenderingModeProperty(const RenderingModeProperty &other)
+  : EnumerationProperty(other)
+{
+}
+
 int mitk::RenderingModeProperty::GetRenderingMode()
 {
   return static_cast<int>(this->GetValueAsId());
@@ -58,9 +63,3 @@ bool mitk::RenderingModeProperty::AddEnum(const std::string &name, const IdType 
   return Superclass::AddEnum(name, id);
 }
 
-itk::LightObject::Pointer mitk::RenderingModeProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

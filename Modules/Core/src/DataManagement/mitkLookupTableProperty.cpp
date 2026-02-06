@@ -20,7 +20,7 @@ mitk::LookupTableProperty::LookupTableProperty()
 }
 
 mitk::LookupTableProperty::LookupTableProperty(const LookupTableProperty &other)
-  : mitk::BaseProperty(other), m_LookupTable(other.m_LookupTable)
+  : mitk::BaseProperty(other), m_LookupTable(other.m_LookupTable->Clone())
 {
 }
 
@@ -36,7 +36,7 @@ bool mitk::LookupTableProperty::IsEqual(const BaseProperty &property) const
 
 bool mitk::LookupTableProperty::Assign(const BaseProperty &property)
 {
-  this->m_LookupTable = static_cast<const Self &>(property).m_LookupTable;
+  this->m_LookupTable = static_cast<const Self &>(property).m_LookupTable->Clone();
   return true;
 }
 

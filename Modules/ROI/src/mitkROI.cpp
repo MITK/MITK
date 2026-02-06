@@ -91,6 +91,27 @@ mitk::ROI::Element::Element(unsigned int id)
 {
 }
 
+mitk::ROI::Element::Element(const Element& other)
+  : m_ID(other.m_ID),
+    m_Min(other.m_Min),
+    m_Max(other.m_Max),
+    m_DefaultProperties(other.m_DefaultProperties->Clone()),
+    m_Properties()
+{
+  for (const auto& [t, properties] : other.m_Properties)
+    m_Properties[t] = properties.IsNotNull() ? properties->Clone() : nullptr;
+}
+
+mitk::ROI::Element& mitk::ROI::Element::operator=(Element other)
+{
+  std::swap(m_ID, other.m_ID);
+  std::swap(m_Min, other.m_Min);
+  std::swap(m_Max, other.m_Max);
+  std::swap(m_DefaultProperties, other.m_DefaultProperties);
+  std::swap(m_Properties, other.m_Properties);
+  return *this;
+}
+
 unsigned int mitk::ROI::Element::GetID() const
 {
   return m_ID;
@@ -163,7 +184,14 @@ mitk::PropertyList* mitk::ROI::Element::GetDefaultProperties() const
 
 void mitk::ROI::Element::SetDefaultProperties(PropertyList* properties)
 {
-  m_DefaultProperties = properties;
+  if (properties == nullptr)
+  {
+    m_DefaultProperties = PropertyList::New();
+  }
+  else
+  {
+    m_DefaultProperties = properties;
+  }
 }
 
 mitk::PropertyList* mitk::ROI::Element::GetProperties(TimeStepType t) const
@@ -329,7 +357,8 @@ mitk::ROI::ROI()
 }
 
 mitk::ROI::ROI(const Self& other)
-  : BaseData(other)
+  : BaseData(other),
+    m_Elements(other.m_Elements)
 {
 }
 

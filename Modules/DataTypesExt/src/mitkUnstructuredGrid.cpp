@@ -12,7 +12,22 @@ found in the LICENSE file.
 
 #include "mitkUnstructuredGrid.h"
 
+#include <algorithm>
 #include <vtkUnstructuredGrid.h>
+
+namespace
+{
+  vtkSmartPointer<vtkUnstructuredGrid> DeepCopy(vtkUnstructuredGrid* other)
+  {
+    if (other == nullptr)
+      return nullptr;
+
+    vtkSmartPointer<vtkUnstructuredGrid> copy = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    copy->DeepCopy(other);
+
+    return copy;
+  }
+}
 
 void mitk::UnstructuredGrid::SetVtkUnstructuredGrid(vtkUnstructuredGrid *grid, unsigned int t)
 {
@@ -20,18 +35,18 @@ void mitk::UnstructuredGrid::SetVtkUnstructuredGrid(vtkUnstructuredGrid *grid, u
 
   if (m_GridSeries[t] != nullptr)
   {
-    m_GridSeries[t]->Delete();
+    if (m_GridSeries[t].GetPointer() == grid)
+      return;
   }
 
-  m_GridSeries[t] = grid;
+  m_GridSeries[t].TakeReference(grid);
 
-  // call m_VtkPolyData->Register(nullptr) to tell the reference counting that we
-  // want to keep a reference on the object
-  if (m_GridSeries[t] != nullptr)
-    m_GridSeries[t]->Register(grid);
+  if (grid != nullptr)
+    grid->Register(nullptr);
+
+  m_CalculateBoundingBox = true;
 
   this->Modified();
-  m_CalculateBoundingBox = true;
 }
 
 void mitk::UnstructuredGrid::Expand(unsigned int timeSteps)
@@ -41,19 +56,13 @@ void mitk::UnstructuredGrid::Expand(unsigned int timeSteps)
   if (timeSteps > m_GridSeries.size())
   {
     Superclass::Expand(timeSteps);
-    vtkUnstructuredGrid *pdnull = nullptr;
-    m_GridSeries.resize(timeSteps, pdnull);
+    m_GridSeries.resize(timeSteps);
     m_CalculateBoundingBox = true;
   }
 }
 
 void mitk::UnstructuredGrid::ClearData()
 {
-  for (auto it = m_GridSeries.begin(); it != m_GridSeries.end(); ++it)
-  {
-    if ((*it) != nullptr)
-      (*it)->Delete();
-  }
   m_GridSeries.clear();
 
   Superclass::ClearData();
@@ -61,10 +70,12 @@ void mitk::UnstructuredGrid::ClearData()
 
 void mitk::UnstructuredGrid::InitializeEmpty()
 {
-  vtkUnstructuredGrid *pdnull = nullptr;
-  m_GridSeries.resize(1, pdnull);
+  if (!m_GridSeries.empty())
+    this->ClearData();
+
   Superclass::InitializeTimeGeometry(1);
 
+  m_GridSeries.push_back(nullptr);
   m_Initialized = true;
 }
 
@@ -72,7 +83,7 @@ vtkUnstructuredGrid *mitk::UnstructuredGrid::GetVtkUnstructuredGrid(unsigned int
 {
   if (t < m_GridSeries.size())
   {
-    vtkUnstructuredGrid *grid = m_GridSeries[t];
+    vtkUnstructuredGrid *grid = m_GridSeries[t].GetPointer();
     if ((grid == nullptr) && (GetSource().GetPointer() != nullptr))
     {
       RegionType requestedregion;
@@ -81,7 +92,7 @@ vtkUnstructuredGrid *mitk::UnstructuredGrid::GetVtkUnstructuredGrid(unsigned int
       SetRequestedRegion(&requestedregion);
       GetSource()->Update();
     }
-    grid = m_GridSeries[t];
+    grid = m_GridSeries[t].GetPointer();
     return grid;
   }
   else
@@ -93,15 +104,14 @@ void mitk::UnstructuredGrid::Graft(const DataObject *data)
   const auto *grid = dynamic_cast<const UnstructuredGrid *>(data);
 
   if (grid == nullptr)
-    mitkThrow() << "Data object used to graft surface is not a mitk::Surface.";
+    mitkThrow() << "Data object used to graft surface is not a mitk::UnstructuredGrid.";
 
   this->CopyInformation(data);
   m_GridSeries.clear();
 
   for (unsigned int i = 0; i < grid->m_GridSeries.size(); ++i)
   {
-    m_GridSeries.push_back(vtkUnstructuredGrid::New());
-    m_GridSeries.back()->DeepCopy(const_cast<mitk::UnstructuredGrid *>(grid)->GetVtkUnstructuredGrid(i));
+    m_GridSeries.push_back(DeepCopy(grid->m_GridSeries[i]));
   }
 }
 
@@ -113,18 +123,18 @@ mitk::UnstructuredGrid::UnstructuredGrid() : m_CalculateBoundingBox(false)
 mitk::UnstructuredGrid::UnstructuredGrid(const mitk::UnstructuredGrid &other)
   : BaseData(other),
     m_LargestPossibleRegion(other.m_LargestPossibleRegion),
+    m_RequestedRegion(other.m_RequestedRegion),
     m_CalculateBoundingBox(other.m_CalculateBoundingBox)
 {
-  if (!other.m_Initialized)
+  if (!other.m_GridSeries.empty())
   {
-    this->InitializeEmpty();
+    m_GridSeries.resize(other.m_GridSeries.size());
+    std::transform(other.m_GridSeries.cbegin(), other.m_GridSeries.cend(), m_GridSeries.begin(), DeepCopy);
   }
   else
   {
-    m_GridSeries = other.m_GridSeries;
-    m_Initialized = other.m_Initialized;
+    this->InitializeEmpty();
   }
-  this->SetRequestedRegion(&other);
 }
 
 mitk::UnstructuredGrid::~UnstructuredGrid()
@@ -163,7 +173,7 @@ void mitk::UnstructuredGrid::CalculateBoundingBox()
   //
   for (unsigned int i = 0; i < m_GridSeries.size(); ++i)
   {
-    vtkUnstructuredGrid *grid = m_GridSeries[i];
+    vtkUnstructuredGrid *grid = m_GridSeries[i].GetPointer();
     double bounds[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     if ((grid != nullptr) && (grid->GetNumberOfCells() > 0))
     {

@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include "itkImageRegion.h"
 #include "mitkBaseData.h"
 
+#include <vtkSmartPointer.h>
+
 class vtkUnstructuredGrid;
 
 namespace mitk
@@ -79,7 +81,7 @@ namespace mitk
   protected:
     mitkCloneMacro(Self);
 
-    typedef std::vector<vtkUnstructuredGrid *> VTKUnstructuredGridSeries;
+    typedef std::vector<vtkSmartPointer<vtkUnstructuredGrid>> VTKUnstructuredGridSeries;
 
     UnstructuredGrid();
 

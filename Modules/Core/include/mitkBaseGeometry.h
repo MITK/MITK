@@ -562,8 +562,6 @@ namespace mitk
     BaseGeometry(const BaseGeometry &other);
     ~BaseGeometry() override;
 
-    itk::LightObject::Pointer InternalClone() const override = 0;
-
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     static const std::string GetTransformAsString(TransformType *transformType);

@@ -197,11 +197,6 @@ namespace mitk
     */
     void ReplaceTimeStepGeometries(const BaseGeometry *geometry) override;
 
-    /**
-    * \brief Makes a deep copy of the current object
-    */
-    itk::LightObject::Pointer InternalClone() const override;
-
     itkGetConstMacro(FirstTimePoint, TimePointType);
     itkSetMacro(FirstTimePoint, TimePointType);
     itkGetConstMacro(StepDuration, TimePointType);
@@ -226,11 +221,14 @@ namespace mitk
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
   protected:
+    ProportionalTimeGeometry(const ProportionalTimeGeometry &other);
     ~ProportionalTimeGeometry() override;
 
     std::vector<BaseGeometry::Pointer> m_GeometryVector;
     TimePointType m_FirstTimePoint;
     TimePointType m_StepDuration;
+
+    mitkCloneMacro(Self);
   }; // end class ProportialTimeGeometry
 
   /**

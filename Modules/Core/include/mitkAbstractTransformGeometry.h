@@ -161,8 +161,6 @@ namespace mitk
     //## \sa CalculateFrameGeometry
     virtual void SetFrameGeometry(const mitk::BaseGeometry *frameGeometry);
 
-    itk::LightObject::Pointer InternalClone() const override;
-
     //##Documentation
     //## @brief Get the parametric bounding-box
     //##
@@ -229,6 +227,8 @@ namespace mitk
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
     void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
+
+    mitkCloneMacro(Self);
   };
 } // namespace mitk
 #endif

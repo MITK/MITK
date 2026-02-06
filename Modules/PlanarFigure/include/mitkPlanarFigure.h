@@ -348,8 +348,6 @@ namespace mitk
       bool Visible;
     };
 
-    itk::LightObject::Pointer InternalClone() const override = 0;
-
     bool m_PolyLineUpToDate;
     bool m_HelperLinesUpToDate;
     bool m_FeaturesUpToDate;

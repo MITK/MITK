@@ -46,20 +46,9 @@ namespace mitk
   protected : Geometry3D();
     Geometry3D(const Geometry3D &);
 
-    /**
-      * @brief clones the geometry
-      *
-      * Overwrite in all sub-classes.
-      * Normally looks like:
-      * \code
-      *  Self::Pointer newGeometry = new Self(*this);
-      *  newGeometry->UnRegister();
-      *  return newGeometry.GetPointer();
-      * \endcode
-      */
-    itk::LightObject::Pointer InternalClone() const override;
-
     ~Geometry3D() override;
+
+    mitkCloneMacro(Self);
 
     /**
       * @brief PreSetSpacing

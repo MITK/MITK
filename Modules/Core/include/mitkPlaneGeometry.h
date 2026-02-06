@@ -440,8 +440,6 @@ namespace mitk
     */
     Point3D ProjectPointOntoPlane(const Point3D &pt) const;
 
-    itk::LightObject::Pointer InternalClone() const override;
-
     /** Implements operation to re-orient the plane */
     void ExecuteOperation(Operation *operation) override;
 
@@ -588,6 +586,8 @@ namespace mitk
     // PlaneGeometry.cpp).
     //## In Subclasses of BaseGeometry, implement own conditions or call Superclass::CheckBounds(bounds);.
     void CheckIndexToWorldTransform(mitk::AffineTransform3D *transform) override;
+
+    mitkCloneMacro(Self);
 
   private:
     /**

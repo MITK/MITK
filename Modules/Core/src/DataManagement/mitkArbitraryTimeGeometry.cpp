@@ -18,6 +18,18 @@ found in the LICENSE file.
 
 mitk::ArbitraryTimeGeometry::ArbitraryTimeGeometry() = default;
 
+mitk::ArbitraryTimeGeometry::ArbitraryTimeGeometry(const ArbitraryTimeGeometry &other)
+  : TimeGeometry(other),
+    m_MinimumTimePoints(other.m_MinimumTimePoints),
+    m_MaximumTimePoints(other.m_MaximumTimePoints)
+{
+  m_GeometryVector.reserve(other.m_GeometryVector.size());
+  for (const auto &geometry : other.m_GeometryVector)
+  {
+    m_GeometryVector.push_back(geometry->Clone());
+  }
+}
+
 mitk::ArbitraryTimeGeometry::~ArbitraryTimeGeometry() = default;
 
 void mitk::ArbitraryTimeGeometry::Initialize()
@@ -246,20 +258,6 @@ void mitk::ArbitraryTimeGeometry::SetTimeStepGeometry(BaseGeometry *geometry, Ti
   }
 
   m_GeometryVector[timeStep] = geometry;
-}
-
-itk::LightObject::Pointer mitk::ArbitraryTimeGeometry::InternalClone() const
-{
-  itk::LightObject::Pointer parent = Superclass::InternalClone();
-  ArbitraryTimeGeometry::Pointer newTimeGeometry = dynamic_cast<ArbitraryTimeGeometry *>(parent.GetPointer());
-  newTimeGeometry->m_MinimumTimePoints = this->m_MinimumTimePoints;
-  newTimeGeometry->m_MaximumTimePoints = this->m_MaximumTimePoints;
-  newTimeGeometry->m_GeometryVector.clear();
-  for (TimeStepType i = 0; i < CountTimeSteps(); ++i)
-  {
-    newTimeGeometry->m_GeometryVector.push_back( this->m_GeometryVector[i]->Clone() );
-  }
-  return parent;
 }
 
 void mitk::ArbitraryTimeGeometry::AppendNewTimeStep(BaseGeometry *geometry,

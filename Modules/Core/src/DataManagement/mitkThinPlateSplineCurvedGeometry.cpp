@@ -88,10 +88,3 @@ void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
   m_ThinPlateSplineTransform->SetSourceLandmarks(m_VtkProjectedLandmarks);
   m_ThinPlateSplineTransform->SetTargetLandmarks(m_VtkTargetLandmarks);
 }
-
-itk::LightObject::Pointer mitk::ThinPlateSplineCurvedGeometry::InternalClone() const
-{
-  mitk::BaseGeometry::Pointer newGeometry = new Self(*this);
-  newGeometry->UnRegister();
-  return newGeometry.GetPointer();
-}

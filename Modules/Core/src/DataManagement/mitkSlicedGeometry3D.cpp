@@ -596,13 +596,6 @@ void mitk::SlicedGeometry3D::SetDirectionVector(const mitk::Vector3D &directionV
 //  m_TimeBounds = timebounds;
 //}
 
-itk::LightObject::Pointer mitk::SlicedGeometry3D::InternalClone() const
-{
-  Self::Pointer newGeometry = new SlicedGeometry3D(*this);
-  newGeometry->UnRegister();
-  return newGeometry.GetPointer();
-}
-
 void mitk::SlicedGeometry3D::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os, indent);

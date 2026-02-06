@@ -35,8 +35,6 @@ namespace mitk
 
       void ComputeGeometry() override;
 
-    itk::LightObject::Pointer InternalClone() const override;
-
     vtkThinPlateSplineTransform *GetThinPlateSplineTransform() const { return m_ThinPlateSplineTransform; }
     virtual void SetSigma(double sigma);
     virtual double GetSigma() const;
@@ -61,6 +59,8 @@ namespace mitk
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
     void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
+
+    mitkCloneMacro(Self);
   };
 } // namespace mitk
 

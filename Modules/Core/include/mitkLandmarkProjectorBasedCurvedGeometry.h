@@ -39,8 +39,6 @@ namespace mitk
 
     itkGetConstMacro(InterpolatingAbstractTransform, vtkAbstractTransform *);
 
-    itk::LightObject::Pointer InternalClone() const override;
-
     //##Documentation
     //## @brief Set the landmarks through which the geometry shall pass
     itkSetConstObjectMacro(TargetLandmarks, mitk::PointSet::DataType::PointsContainer);
@@ -68,6 +66,8 @@ namespace mitk
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
     void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
+
+    mitkCloneMacro(Self);
   };
 } // namespace mitk
 

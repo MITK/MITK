@@ -209,11 +209,6 @@ namespace mitk
     */
     void SetTimeStepGeometry(BaseGeometry *geometry, TimeStepType timeStep) override;
 
-    /**
-    * \brief Makes a deep copy of the current object
-    */
-    itk::LightObject::Pointer InternalClone() const override;
-
     void ClearAllGeometries();
 
     /** Append the passed geometry to the time geometry.
@@ -240,12 +235,14 @@ namespace mitk
     bool HasCollapsedFinalTimeStep() const;
 
   protected:
+    ArbitraryTimeGeometry(const ArbitraryTimeGeometry &other);
     ~ArbitraryTimeGeometry() override;
 
     std::vector<BaseGeometry::Pointer> m_GeometryVector;
     std::vector<TimePointType> m_MinimumTimePoints;
     std::vector<TimePointType> m_MaximumTimePoints;
 
+    mitkCloneMacro(Self);
   }; // end class ArbitraryTimeGeometry
 
 } // end namespace MITK

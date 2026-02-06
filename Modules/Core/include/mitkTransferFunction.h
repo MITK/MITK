@@ -156,9 +156,9 @@ namespace mitk
     TransferFunction();
     ~TransferFunction() override;
 
-    TransferFunction(const TransferFunction &other);
+    TransferFunction(const Self &other);
 
-    mitkCloneMacro(TransferFunction);
+    mitkCloneMacro(Self);
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 

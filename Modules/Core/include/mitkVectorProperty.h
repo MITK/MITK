@@ -98,9 +98,9 @@ namespace mitk
 
   protected:
     VectorProperty() = default;
-    VectorProperty(const VectorProperty &other) : BaseProperty(other), m_PropertyContent(other.m_PropertyContent) {}
+    VectorProperty(const Self &other) : BaseProperty(other), m_PropertyContent(other.m_PropertyContent) {}
 
-    mitkCloneMacro(VectorProperty);
+    mitkCloneMacro(Self);
 
   private:
     /// purposely not implemented

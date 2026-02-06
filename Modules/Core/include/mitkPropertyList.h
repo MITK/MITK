@@ -250,11 +250,11 @@ namespace mitk
 
   protected:
     PropertyList();
-    PropertyList(const PropertyList &other);
+    PropertyList(const Self &other);
 
     ~PropertyList() override;
 
-    mitkCloneMacro(PropertyList);
+    mitkCloneMacro(Self);
 
     /**
      * @brief Map of properties.

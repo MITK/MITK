@@ -68,9 +68,10 @@ void mitk::ImageTimeSelector::GenerateData()
   // do we really need a complete volume at a time?
   if (requestedRegion.GetSize(2) > 1)
   {
-    mitk::ImageDataItem::Pointer im = this->GetVolumeData(m_TimeNr, m_ChannelNr)->Clone();
-    im->SetTimestep(0);
-    im->SetManageMemory(false);
+    mitk::ImageDataItem::Pointer src = this->GetVolumeData(m_TimeNr, m_ChannelNr);
+    mitk::ImageDataItem::Pointer im = new mitk::ImageDataItem(
+      *src, this->GetOutput()->GetImageDescriptor(), 0, 3);
+    im->SetComplete(src->IsComplete());
     this->SetVolumeItem(im, 0);
   }
   else

@@ -163,25 +163,6 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType &type,
   m_ReferenceCount = 0;
 }
 
-mitk::ImageDataItem::ImageDataItem(const ImageDataItem &other)
-  : itk::LightObject(),
-    m_Data(other.m_Data),
-    m_PixelType(new mitk::PixelType(*other.m_PixelType)),
-    m_ManageMemory(other.m_ManageMemory),
-    m_VtkImageData(nullptr),
-    m_VtkImageReadAccessor(nullptr),
-    m_VtkImageWriteAccessor(nullptr),
-    m_Offset(other.m_Offset),
-    m_IsComplete(other.m_IsComplete),
-    m_Size(other.m_Size),
-    m_Parent(other.m_Parent),
-    m_Dimension(other.m_Dimension),
-    m_Timestep(other.m_Timestep)
-{
-  // copy m_Data ??
-  for (int i = 0; i < MAX_IMAGE_DIMENSIONS; ++i)
-    m_Dimensions[i] = other.m_Dimensions[i];
-}
 
 void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsigned int dimension)
 {

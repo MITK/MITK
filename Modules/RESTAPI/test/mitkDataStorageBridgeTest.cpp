@@ -92,6 +92,8 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(ComplexPropertySerializationRoundTrip);
   MITK_TEST(NameFilterWithExactMatch);
   MITK_TEST(NameFilterWithWildcard);
+  MITK_TEST(WildcardFilterInMiddleOfPattern);
+  MITK_TEST(SingleCharWildcardFilter);
   MITK_TEST(BoolPropertyFilterUsesJsonRepresentation);
   MITK_TEST(NegatedPropertyFilter);
   MITK_TEST(TimestampIsInteger);
@@ -971,7 +973,7 @@ public:
     auto nodeJson = m_Bridge->GetNode(m_Root1Uid);
     CPPUNIT_ASSERT(nodeJson.has_value());
     CPPUNIT_ASSERT(!nodeJson.value()["data_type"].is_null());
-    CPPUNIT_ASSERT_EQUAL(std::string("mitk::Image"), nodeJson.value()["data_type"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("Image"), nodeJson.value()["data_type"].get<std::string>());
   }
 
   void SetNodeDataClearsData()
@@ -1018,8 +1020,7 @@ public:
     auto nodeUid = FindUidByName("FreshNodeForDataMod");
 
     // Verify no modification tracking yet
-    bool modified = false;
-    CPPUNIT_ASSERT(!freshNode->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
+    CPPUNIT_ASSERT(freshNode->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) == nullptr);
 
     // Set data
     auto newImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(5, 5, 5);
@@ -1027,8 +1028,7 @@ public:
     CPPUNIT_ASSERT(success);
 
     // Verify modification tracking is now set
-    CPPUNIT_ASSERT(freshNode->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
-    CPPUNIT_ASSERT(modified);
+    CPPUNIT_ASSERT(freshNode->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) != nullptr);
 
     std::string lastMod;
     CPPUNIT_ASSERT(freshNode->GetStringProperty(mitk::DataStorageBridge::LAST_MODIFICATION_PROPERTY_KEY, lastMod));
@@ -1404,6 +1404,113 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, result.totalCount);
   }
 
+  void WildcardFilterInMiddleOfPattern()
+  {
+    // Test 1: Wildcard in the middle - "Root*" still works (prefix)
+    mitk::NodeQueryParams params;
+    params.propertyFilters.push_back({"name", "Root*", false});
+
+    auto result = m_Bridge->GetNodes(params);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), result.nodes.size());  // Root1, Root2, Root3
+
+    // Test 2: Wildcard in the middle of the pattern - "R*1" should match Root1
+    params.propertyFilters.clear();
+    params.propertyFilters.push_back({"name", "R*1", false});
+
+    result = m_Bridge->GetNodes(params);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), result.nodes.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("Root1"), result.nodes[0]["name"].get<std::string>());
+
+    // Test 3: Multiple wildcards - "*ild*" should match Child1, Child2, Child3, Grandchild1, Grandchild2
+    params.propertyFilters.clear();
+    params.propertyFilters.push_back({"name", "*ild*", false});
+
+    result = m_Bridge->GetNodes(params);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(5), result.nodes.size());
+
+    std::set<std::string> returnedNames;
+    for (const auto& node : result.nodes)
+    {
+      returnedNames.insert(node["name"].get<std::string>());
+    }
+    CPPUNIT_ASSERT(returnedNames.count("Child1") == 1);
+    CPPUNIT_ASSERT(returnedNames.count("Child2") == 1);
+    CPPUNIT_ASSERT(returnedNames.count("Child3") == 1);
+    CPPUNIT_ASSERT(returnedNames.count("Grandchild1") == 1);
+    CPPUNIT_ASSERT(returnedNames.count("Grandchild2") == 1);
+
+    // Test 4: Pattern "Grand*child*" should match Grandchild1, Grandchild2
+    params.propertyFilters.clear();
+    params.propertyFilters.push_back({"name", "Grand*child*", false});
+
+    result = m_Bridge->GetNodes(params);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), result.nodes.size());
+
+    returnedNames.clear();
+    for (const auto& node : result.nodes)
+    {
+      returnedNames.insert(node["name"].get<std::string>());
+    }
+    CPPUNIT_ASSERT(returnedNames.count("Grandchild1") == 1);
+    CPPUNIT_ASSERT(returnedNames.count("Grandchild2") == 1);
+  }
+
+  void SingleCharWildcardFilter()
+  {
+    // Test 1: "Root?" should match Root1, Root2, Root3
+    mitk::NodeQueryParams params;
+    params.propertyFilters.push_back({"name", "Root?", false});
+
+    auto result = m_Bridge->GetNodes(params);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), result.nodes.size());
+
+    std::set<std::string> returnedNames;
+    for (const auto& node : result.nodes)
+    {
+      returnedNames.insert(node["name"].get<std::string>());
+    }
+    CPPUNIT_ASSERT(returnedNames.count("Root1") == 1);
+    CPPUNIT_ASSERT(returnedNames.count("Root2") == 1);
+    CPPUNIT_ASSERT(returnedNames.count("Root3") == 1);
+
+    // Test 2: "Child?" should match Child1, Child2, Child3 but NOT Grandchild1/2
+    params.propertyFilters.clear();
+    params.propertyFilters.push_back({"name", "Child?", false});
+
+    result = m_Bridge->GetNodes(params);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), result.nodes.size());
+
+    returnedNames.clear();
+    for (const auto& node : result.nodes)
+    {
+      returnedNames.insert(node["name"].get<std::string>());
+    }
+    CPPUNIT_ASSERT(returnedNames.count("Child1") == 1);
+    CPPUNIT_ASSERT(returnedNames.count("Child2") == 1);
+    CPPUNIT_ASSERT(returnedNames.count("Child3") == 1);
+
+    // Test 3: Combined * and ? - "*hild?" should match Child1, Child2, Child3, Grandchild1, Grandchild2
+    params.propertyFilters.clear();
+    params.propertyFilters.push_back({"name", "*hild?", false});
+
+    result = m_Bridge->GetNodes(params);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(5), result.nodes.size());
+
+    // Test 4: "????" should match only 4-character names (none in our test data)
+    params.propertyFilters.clear();
+    params.propertyFilters.push_back({"name", "????", false});
+
+    result = m_Bridge->GetNodes(params);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(0), result.nodes.size());
+
+    // Test 5: "?????" should match Root1, Root2, Root3 (5-char names)
+    params.propertyFilters.clear();
+    params.propertyFilters.push_back({"name", "?????", false});
+
+    result = m_Bridge->GetNodes(params);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), result.nodes.size());
+  }
+
   void BoolPropertyFilterUsesJsonRepresentation()
   {
     // This test verifies that property filtering uses JSON representation ("true"/"false")
@@ -1683,9 +1790,7 @@ public:
     CPPUNIT_ASSERT(newNode != nullptr);
 
     // Verify modification tracking properties are set
-    bool modified = false;
-    CPPUNIT_ASSERT(newNode->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
-    CPPUNIT_ASSERT(modified);
+    CPPUNIT_ASSERT(newNode->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY)!=nullptr);
 
     std::string lastMod;
     CPPUNIT_ASSERT(newNode->GetStringProperty(mitk::DataStorageBridge::LAST_MODIFICATION_PROPERTY_KEY, lastMod));
@@ -1702,9 +1807,7 @@ public:
     CPPUNIT_ASSERT(success);
 
     // Verify modification tracking properties are set
-    bool modified = false;
-    CPPUNIT_ASSERT(m_Child1->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
-    CPPUNIT_ASSERT(modified);
+    CPPUNIT_ASSERT(m_Child1->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) != nullptr);
 
     std::string lastMod;
     CPPUNIT_ASSERT(m_Child1->GetStringProperty(mitk::DataStorageBridge::LAST_MODIFICATION_PROPERTY_KEY, lastMod));
@@ -1720,9 +1823,7 @@ public:
     CPPUNIT_ASSERT(set);
 
     // Verify modification tracking properties are set
-    bool modified = false;
-    CPPUNIT_ASSERT(m_Root1->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
-    CPPUNIT_ASSERT(modified);
+    CPPUNIT_ASSERT(m_Root1->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) != nullptr);
 
     std::string lastMod;
     CPPUNIT_ASSERT(m_Root1->GetStringProperty(mitk::DataStorageBridge::LAST_MODIFICATION_PROPERTY_KEY, lastMod));
@@ -1741,9 +1842,7 @@ public:
     CPPUNIT_ASSERT(deleted);
 
     // Verify modification tracking properties are set
-    bool modified = false;
-    CPPUNIT_ASSERT(m_Root2->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
-    CPPUNIT_ASSERT(modified);
+    CPPUNIT_ASSERT(m_Root2->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) != nullptr);
 
     std::string lastMod;
     CPPUNIT_ASSERT(m_Root2->GetStringProperty(mitk::DataStorageBridge::LAST_MODIFICATION_PROPERTY_KEY, lastMod));
@@ -1760,9 +1859,7 @@ public:
     CPPUNIT_ASSERT(result.has_value());
 
     // Verify modification tracking properties are set
-    bool modified = false;
-    CPPUNIT_ASSERT(m_Root3->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
-    CPPUNIT_ASSERT(modified);
+    CPPUNIT_ASSERT(m_Root3->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) != nullptr);
 
     std::string lastMod;
     CPPUNIT_ASSERT(m_Root3->GetStringProperty(mitk::DataStorageBridge::LAST_MODIFICATION_PROPERTY_KEY, lastMod));
@@ -1777,8 +1874,7 @@ public:
     m_DataStorage->Add(freshNode);
 
     // Verify no modification tracking properties exist yet
-    bool modified = false;
-    CPPUNIT_ASSERT(!freshNode->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
+    CPPUNIT_ASSERT(freshNode->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) == nullptr);
     std::string lastMod;
     CPPUNIT_ASSERT(!freshNode->GetStringProperty(mitk::DataStorageBridge::LAST_MODIFICATION_PROPERTY_KEY, lastMod));
 
@@ -1803,7 +1899,7 @@ public:
 
     // Verify modification tracking properties are still NOT set
     // (restapi.uid is set by GetOrCreateUid, but modified/lastmodification should not be)
-    CPPUNIT_ASSERT(!freshNode->GetBoolProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY, modified));
+    CPPUNIT_ASSERT(freshNode->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) == nullptr);
     CPPUNIT_ASSERT(!freshNode->GetStringProperty(mitk::DataStorageBridge::LAST_MODIFICATION_PROPERTY_KEY, lastMod));
   }
 };

@@ -29,6 +29,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(LandmarkProjectorBasedCurvedGeometry, AbstractTransformGeometry);
+    itkCloneMacro(Self);
 
     void SetLandmarkProjector(mitk::LandmarkProjector *aLandmarkProjector);
     itkGetConstObjectMacro(LandmarkProjector, mitk::LandmarkProjector);

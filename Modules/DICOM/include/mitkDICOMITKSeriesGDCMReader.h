@@ -192,7 +192,7 @@ class MITKDICOM_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
   public:
 
     mitkClassMacro( DICOMITKSeriesGDCMReader, DICOMFileReader );
-    mitkCloneMacro( DICOMITKSeriesGDCMReader );
+    itkCloneMacro( DICOMITKSeriesGDCMReader );
     itkFactorylessNewMacro( DICOMITKSeriesGDCMReader );
     mitkNewMacro1Param( DICOMITKSeriesGDCMReader, unsigned int );
     mitkNewMacro2Param( DICOMITKSeriesGDCMReader, unsigned int, bool );
@@ -284,6 +284,7 @@ class MITKDICOM_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     }
 
   protected:
+    mitkCloneMacro( DICOMITKSeriesGDCMReader );
 
     void InternalPrintConfiguration(std::ostream& os) const override;
 

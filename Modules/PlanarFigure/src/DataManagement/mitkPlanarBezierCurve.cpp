@@ -23,6 +23,14 @@ mitk::PlanarBezierCurve::PlanarBezierCurve()
   this->SetNumberOfHelperPolyLines(1);
 }
 
+mitk::PlanarBezierCurve::PlanarBezierCurve(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_LENGTH(other.FEATURE_ID_LENGTH),
+    m_DeCasteljauPoints(other.m_DeCasteljauPoints),
+    m_NumberOfSegments(other.m_NumberOfSegments)
+{
+}
+
 void mitk::PlanarBezierCurve::EvaluateFeaturesInternal()
 {
   double length = 0.0;

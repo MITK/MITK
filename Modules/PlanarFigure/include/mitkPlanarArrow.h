@@ -54,6 +54,7 @@ namespace mitk
 
   protected:
     PlanarArrow();
+    PlanarArrow(const Self& other);
 
     mitkCloneMacro(Self);
 

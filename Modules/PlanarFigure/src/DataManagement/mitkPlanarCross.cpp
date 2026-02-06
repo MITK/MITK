@@ -29,6 +29,13 @@ mitk::PlanarCross::PlanarCross()
   m_HelperPolyLinesToBePainted->InsertElement(0, false);
 }
 
+mitk::PlanarCross::PlanarCross(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_LONGESTDIAMETER(other.FEATURE_ID_LONGESTDIAMETER),
+    FEATURE_ID_SHORTAXISDIAMETER(other.FEATURE_ID_SHORTAXISDIAMETER)
+{
+}
+
 void mitk::PlanarCross::SetSingleLineMode(bool singleLineMode)
 {
   this->SetProperty("SingleLineMode", mitk::BoolProperty::New(singleLineMode));

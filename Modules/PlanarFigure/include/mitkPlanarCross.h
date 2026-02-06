@@ -84,6 +84,7 @@ namespace mitk
 
   protected:
     PlanarCross();
+    PlanarCross(const Self& other);
     mitkCloneMacro(Self);
 
     /** \brief Spatially constrain control points of second (orthogonal) line */

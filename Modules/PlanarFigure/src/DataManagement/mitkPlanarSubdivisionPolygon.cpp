@@ -26,6 +26,13 @@ mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon() : m_TensionParameter(
   // Other properties are inherited / already initialized by parent class PlanarPolygon
 }
 
+mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon(const Self& other)
+  : PlanarPolygon(other),
+    m_TensionParameter(other.m_TensionParameter),
+    m_SubdivisionRounds(other.m_SubdivisionRounds)
+{
+}
+
 void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
 {
   this->ClearPolyLines();

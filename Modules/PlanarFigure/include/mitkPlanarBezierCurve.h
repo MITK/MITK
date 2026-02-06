@@ -44,6 +44,7 @@ namespace mitk
 
   protected:
     PlanarBezierCurve();
+    PlanarBezierCurve(const Self& other);
 
     mitkCloneMacro(Self);
 

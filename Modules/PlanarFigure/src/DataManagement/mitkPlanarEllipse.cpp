@@ -31,6 +31,18 @@ mitk::PlanarEllipse::PlanarEllipse()
   this->SetProperty("closed", mitk::BoolProperty::New(true));
 }
 
+mitk::PlanarEllipse::PlanarEllipse(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_MAJOR_AXIS(other.FEATURE_ID_MAJOR_AXIS),
+    FEATURE_ID_MINOR_AXIS(other.FEATURE_ID_MINOR_AXIS),
+    FEATURE_ID_AREA(other.FEATURE_ID_AREA),
+    m_MinRadius(other.m_MinRadius),
+    m_MaxRadius(other.m_MaxRadius),
+    m_MinMaxRadiusContraintsActive(other.m_MinMaxRadiusContraintsActive),
+    m_TreatAsCircle(other.m_TreatAsCircle)
+{
+}
+
 bool mitk::PlanarEllipse::SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist)
 {
   if (index == 0) // moving center point and control points accordingly

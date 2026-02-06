@@ -67,6 +67,7 @@ namespace mitk
 
   protected:
     PlanarSubdivisionPolygon();
+    PlanarSubdivisionPolygon(const Self& other);
 
     mitkCloneMacro(Self);
 

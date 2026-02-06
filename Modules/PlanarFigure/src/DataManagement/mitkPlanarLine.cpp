@@ -21,6 +21,12 @@ mitk::PlanarLine::PlanarLine() : FEATURE_ID_LENGTH(this->AddFeature("Length", "m
   this->SetNumberOfPolyLines(1);
 }
 
+mitk::PlanarLine::PlanarLine(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_LENGTH(other.FEATURE_ID_LENGTH)
+{
+}
+
 void mitk::PlanarLine::GeneratePolyLine()
 {
   this->ClearPolyLines();

@@ -29,6 +29,13 @@ mitk::PlanarPolygon::PlanarPolygon()
   this->SetProperty("subdivision", mitk::BoolProperty::New(false));
 }
 
+mitk::PlanarPolygon::PlanarPolygon(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_CIRCUMFERENCE(other.FEATURE_ID_CIRCUMFERENCE),
+    FEATURE_ID_AREA(other.FEATURE_ID_AREA)
+{
+}
+
 void mitk::PlanarPolygon::SetClosed(bool closed)
 {
   this->SetProperty("closed", mitk::BoolProperty::New(closed));

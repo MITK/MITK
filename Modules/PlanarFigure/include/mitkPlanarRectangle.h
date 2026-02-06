@@ -49,6 +49,7 @@ namespace mitk
 
   protected:
     PlanarRectangle();
+    PlanarRectangle(const Self& other);
 
     mitkCloneMacro(Self);
 

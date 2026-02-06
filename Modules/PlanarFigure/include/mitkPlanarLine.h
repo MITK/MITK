@@ -52,6 +52,7 @@ namespace mitk
 
   protected:
     PlanarLine();
+    PlanarLine(const Self& other);
 
     mitkCloneMacro(Self);
 

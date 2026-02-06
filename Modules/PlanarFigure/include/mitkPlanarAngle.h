@@ -50,6 +50,7 @@ namespace mitk
 
   protected:
     PlanarAngle();
+    PlanarAngle(const Self& other);
 
     mitkCloneMacro(Self);
 

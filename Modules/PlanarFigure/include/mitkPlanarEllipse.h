@@ -68,6 +68,7 @@ namespace mitk
 
   protected:
     PlanarEllipse();
+    PlanarEllipse(const Self& other);
 
     mitkCloneMacro(Self);
 

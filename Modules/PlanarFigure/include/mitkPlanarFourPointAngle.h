@@ -51,6 +51,7 @@ namespace mitk
 
   protected:
     PlanarFourPointAngle();
+    PlanarFourPointAngle(const Self& other);
 
     mitkCloneMacro(Self);
 

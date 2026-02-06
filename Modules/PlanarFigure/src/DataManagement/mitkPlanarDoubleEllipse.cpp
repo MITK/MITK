@@ -49,6 +49,20 @@ mitk::PlanarDoubleEllipse::PlanarDoubleEllipse(double fixedRadius, double fixedT
   }
 }
 
+mitk::PlanarDoubleEllipse::PlanarDoubleEllipse(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_MAJOR_AXIS(other.FEATURE_ID_MAJOR_AXIS),
+    FEATURE_ID_MINOR_AXIS(other.FEATURE_ID_MINOR_AXIS),
+    FEATURE_ID_THICKNESS(other.FEATURE_ID_THICKNESS),
+    m_NumberOfSegments(other.m_NumberOfSegments),
+    m_ConstrainCircle(other.m_ConstrainCircle),
+    m_ConstrainThickness(other.m_ConstrainThickness),
+    m_FixedRadius(other.m_FixedRadius),
+    m_FixedThickness(other.m_FixedThickness),
+    m_SizeIsFixed(other.m_SizeIsFixed)
+{
+}
+
 mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
   if (index == 2 && !m_ConstrainCircle)

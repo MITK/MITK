@@ -68,6 +68,7 @@ namespace mitk
     PlanarCircle();
     /** Constructor for fixed radius mode.*/
     PlanarCircle(double fixedRadius);
+    PlanarCircle(const Self& other);
 
     mitkCloneMacro(Self);
 

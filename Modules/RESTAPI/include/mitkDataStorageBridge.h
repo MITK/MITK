@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define mitkDataStorageBridge_h
 
 #include <mitkDataStorage.h>
+#include <mitkWeakPointer.h>
 #include <mitkBaseData.h>
 #include <mitkNodePredicateBase.h>
 #include "mitkNodeUidMapper.h"
@@ -55,7 +56,8 @@ namespace mitk
    * @section Modification Tracking
    * When a node is modified through the bridge (create, update, property changes),
    * the bridge automatically adds two internal properties to the node:
-   * - "restapi.modified" (bool): Set to true when the node is modified
+   * - "restapi.modified" (string): Set with a time stamp string of last modification.
+   *   If this property exists, the node was modified via REST
    * - "restapi.lastmodification" (string): Describes the last modification operation
    *
    * These properties are only added when a modification occurs. If the properties
@@ -357,44 +359,7 @@ namespace mitk
     std::string BuildNodePath(const DataNode* node) const;
     int GetChildrenCount(const DataNode* node) const;
 
-    /**
-     * @brief Check if a property value matches a filter pattern.
-     *
-     * Supports:
-     * - Exact match: "CT_Scan"
-     * - Prefix wildcard: "CT*"
-     * - Suffix wildcard: "*Scan"
-     *
-     * @param propertyValue The actual property value, or std::nullopt if property doesn't exist.
-     * @param filterValue The filter pattern.
-     * @return true if the value matches the pattern.
-     */
-    bool MatchesPropertyFilter(
-      const std::optional<std::string>& propertyValue,
-      const std::string& filterValue) const;
-
-    /**
-     * @brief Check if a property key is internal (starts with INTERNAL_PROPERTY_PREFIX).
-     *
-     * Internal properties are REST API metadata and should not be exposed to clients.
-     *
-     * @param key The property key to check.
-     * @return true if the property is internal.
-     */
-    static bool IsInternalProperty(const std::string& key);
-
-    /**
-     * @brief Mark a node as modified via REST API.
-     *
-     * Sets the internal properties "restapi.modified" to true and
-     * "restapi.lastmodification" to the specified operation description.
-     *
-     * @param node The node to mark as modified. Must not be nullptr.
-     * @param operation Description of the modification operation (e.g., "created", "property_set:name").
-     */
-    static void MarkNodeAsModified(DataNode* node, const std::string& operation);
-
-    DataStorage::Pointer m_DataStorage;
+    WeakPointer<DataStorage> m_DataStorage;
     std::unique_ptr<NodeUidMapper> m_UidMapper;
 
     mutable std::mutex m_Mutex;

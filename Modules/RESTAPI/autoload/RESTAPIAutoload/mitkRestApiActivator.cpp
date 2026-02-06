@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
-#include <usServiceTracker.h>
-#include <usServiceTrackerCustomizer.h>
 
 #include <mitkRestServer.h>
 #include <mitkIRestServerService.h>
@@ -37,8 +35,7 @@ namespace mitk
  * - Tracks IDataStorageService to connect DataStorage to the REST server
  * - Auto-starts server based on preferences
  */
-class RestApiActivator : public us::ModuleActivator,
-                         public us::ServiceTrackerCustomizer<IPreferencesService>
+class RestApiActivator : public us::ModuleActivator
 {
 public:
   RestApiActivator() = default;
@@ -56,25 +53,14 @@ public:
 
     MITK_INFO << "REST API module loaded, service registered";
 
-    // Start tracking IPreferencesService for configuration
-    m_PreferencesTracker = std::make_unique<us::ServiceTracker<IPreferencesService>>(context, this);
-    m_PreferencesTracker->Open();
-
-    // Start listening for IDataStorageService
     this->StartDataStorageServiceTracking();
+    this->StartPreferencesServiceTracking();
   }
 
   void Unload(us::ModuleContext* /*context*/) override
   {
-    // Stop tracking DataStorageService
+    this->StopPreferencesServiceTracking();
     this->StopDataStorageServiceTracking();
-
-    // Stop tracking preferences
-    if (m_PreferencesTracker)
-    {
-      m_PreferencesTracker->Close();
-      m_PreferencesTracker.reset();
-    }
 
     // Stop server
     if (m_RestServer)
@@ -95,35 +81,69 @@ public:
     MITK_INFO << "REST API module unloaded";
   }
 
-  // ServiceTrackerCustomizer for IPreferencesService
-  IPreferencesService* AddingService(const us::ServiceReference<IPreferencesService>& reference) override
-  {
-    auto* service = m_Context->GetService(reference);
-    if (service != nullptr)
-    {
-      this->ApplyPreferences(service);
-    }
-    return service;
-  }
-
-  void ModifiedService(
-    const us::ServiceReference<IPreferencesService>& /*reference*/,
-    IPreferencesService* service) override
-  {
-    if (service != nullptr)
-    {
-      this->ApplyPreferences(service);
-    }
-  }
-
-  void RemovedService(
-    const us::ServiceReference<IPreferencesService>& reference,
-    [[maybe_unused]] IPreferencesService* service) override
-  {
-    m_Context->UngetService(reference);
-  }
-
 private:
+
+  void StartPreferencesServiceTracking()
+  {
+    if (m_Context == nullptr)
+    {
+      return;
+    }
+
+    // Register listener for PreferencesService events
+    m_Context->AddServiceListener(
+      this,
+      &RestApiActivator::PreferencesServiceChanged,
+      std::string("(&(") + us::ServiceConstants::OBJECTCLASS() + "=" +
+      us_service_interface_iid<IPreferencesService>() + "))");
+
+    // Check if service is already available
+    auto refs = m_Context->GetServiceReferences<IPreferencesService>();
+    if (!refs.empty())
+    {
+      auto* service = m_Context->GetService(refs.front());
+      if (service != nullptr)
+      {
+        this->ApplyPreferences(service);
+        m_Context->UngetService(refs.front());
+      }
+    }
+  }
+
+  void StopPreferencesServiceTracking()
+  {
+    if (m_Context != nullptr)
+    {
+      try
+      {
+        m_Context->RemoveServiceListener(this, &RestApiActivator::PreferencesServiceChanged);
+      }
+      catch (...)
+      {
+        MITK_WARN << "Could not remove PreferencesService listener";
+      }
+    }
+  }
+
+  void PreferencesServiceChanged(const us::ServiceEvent event)
+  {
+    std::lock_guard<std::mutex> lock(m_DataStorageMutex);
+
+    if (event.GetType() == us::ServiceEvent::REGISTERED || event.GetType() == us::ServiceEvent::MODIFIED)
+    {
+      if (m_Context != nullptr)
+      {
+        us::ServiceReference<IPreferencesService> ref = event.GetServiceReference();
+        auto* service = m_Context->GetService(ref);
+        if (service != nullptr)
+        {
+          this->ApplyPreferences(service);
+          m_Context->UngetService(ref);
+        }
+      }
+    }
+  }
+
   void ApplyPreferences(IPreferencesService* prefsService)
   {
     if (prefsService == nullptr || m_RestServer == nullptr)
@@ -238,7 +258,7 @@ private:
       // Service is going away, disconnect DataStorage
       if (m_RestServer != nullptr)
       {
-        MITK_INFO << "DataStorageService unregistering, disconnecting DataStorage from REST server";
+        MITK_DEBUG << "DataStorageService unregistering, disconnecting DataStorage from REST server";
         m_RestServer->SetDataStorage(nullptr);
       }
     }
@@ -263,8 +283,6 @@ private:
 
   std::unique_ptr<RestServer> m_RestServer;
   us::ServiceRegistration<IRestServerService> m_RestServerRegistration;
-
-  std::unique_ptr<us::ServiceTracker<IPreferencesService>> m_PreferencesTracker;
 
   std::mutex m_DataStorageMutex;
 };

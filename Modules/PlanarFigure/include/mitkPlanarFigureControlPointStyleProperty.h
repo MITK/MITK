@@ -53,6 +53,8 @@ namespace mitk
   protected:
     PlanarFigureControlPointStyleProperty();
 
+    PlanarFigureControlPointStyleProperty(const PlanarFigureControlPointStyleProperty &other);
+
     PlanarFigureControlPointStyleProperty(const IdType &value);
 
     /**
@@ -72,11 +74,11 @@ namespace mitk
      */
     virtual void AddEnumTypes();
 
+    mitkCloneMacro(PlanarFigureControlPointStyleProperty);
+
   private:
     // purposely not implemented
     PlanarFigureControlPointStyleProperty &operator=(const PlanarFigureControlPointStyleProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
 } // end of namespace mitk

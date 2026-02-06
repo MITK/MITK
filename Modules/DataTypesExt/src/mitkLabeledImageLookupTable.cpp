@@ -131,9 +131,3 @@ double mitk::LabeledImageLookupTable::GenerateRandomNumber()
   return (((double)(std::rand())) / ((double)(RAND_MAX)));
 }
 
-itk::LightObject::Pointer mitk::LabeledImageLookupTable::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

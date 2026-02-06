@@ -264,13 +264,13 @@ namespace mitk
 
     Label(const Label &other);
 
+    mitkCloneMacro(Label);
+
     void SetCenterOfMassIndex(const mitk::Point3D& center);
     void SetCenterOfMassCoordinates(const mitk::Point3D& center);
 
   private:
     PixelType m_Value;
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     /**
      * @brief Helper function to set a DICOMCode as properties.

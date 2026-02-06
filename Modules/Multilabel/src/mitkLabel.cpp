@@ -736,13 +736,6 @@ std::optional<mitk::DICOMCodeSequenceWithModifiers> mitk::Label::GetSegmentedPro
   return GetDICOMCodeSequenceWithModifiersFromProperties(basePath);
 }
 
-itk::LightObject::Pointer mitk::Label::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}
-
 void mitk::Label::PrintSelf(std::ostream & /*os*/, itk::Indent /*indent*/) const
 {
   // todo

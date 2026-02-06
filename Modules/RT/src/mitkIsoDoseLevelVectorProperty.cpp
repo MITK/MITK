@@ -106,8 +106,3 @@ bool mitk::IsoDoseLevelVectorProperty::FromJSON(const nlohmann::json&)
   return false; // Not implemented
 }
 
-itk::LightObject::Pointer mitk::IsoDoseLevelVectorProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  return result;
-}

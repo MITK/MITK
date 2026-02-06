@@ -82,10 +82,3 @@ bool mitk::GridRepresentationProperty::AddEnum(const std::string &name, const Id
 {
   return Superclass::AddEnum(name, id);
 }
-
-itk::LightObject::Pointer mitk::GridRepresentationProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

@@ -74,13 +74,8 @@ namespace mitk
 
   protected:
     TestModel() {};
+    TestModel(const TestModel &other);
     ~TestModel() override {};
-
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
     DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
@@ -91,10 +86,9 @@ namespace mitk
     StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const
     override;
 
-  private:
+    mitkCloneMacro(Self);
 
-    //No copy constructor allowed
-    TestModel(const Self& source);
+  private:
     void operator=(const Self&);  //purposely not implemented
 
   };

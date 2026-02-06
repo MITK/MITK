@@ -105,13 +105,8 @@ namespace mitk
 
   protected:
     DescriptivePharmacokineticBrixModel();
+    DescriptivePharmacokineticBrixModel(const DescriptivePharmacokineticBrixModel &other);
     ~DescriptivePharmacokineticBrixModel() override;
-
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -123,6 +118,8 @@ namespace mitk
 
     void PrintSelf(std::ostream& os, ::itk::Indent indent) const override;
 
+    mitkCloneMacro(Self);
+
   private:
     /**injection time Tau in minutes [min]*/
     double m_Tau;
@@ -131,8 +128,6 @@ namespace mitk
      * Default is 1.*/
     double m_S0;
 
-    //No copy constructor allowed
-    DescriptivePharmacokineticBrixModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
 

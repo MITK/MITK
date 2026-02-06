@@ -265,6 +265,7 @@ namespace mitk
 
   protected:
     PropertyRelationRuleBase() = default;
+    PropertyRelationRuleBase(const PropertyRelationRuleBase &) {}
     ~PropertyRelationRuleBase() override = default;
 
     using InstanceIDVectorType = std::vector<InstanceIDType>;
@@ -369,8 +370,6 @@ namespace mitk
        @pre source must be valid.*/
     std::string GetDestinationUIDByInstanceID(const IPropertyProvider * source,
       const InstanceIDType & instanceID) const;
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     /** helper method that serves as a workaround until T24729 is done.
        Please remove if T24728 is done then could directly use owner->GetPropertyKeys() again.*/

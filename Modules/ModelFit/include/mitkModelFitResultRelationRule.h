@@ -65,7 +65,9 @@ namespace mitk
 
     void Disconnect_datalayer(IPropertyOwner *source, const RelationUIDType& relationUID) const override;
 
-    itk::LightObject::Pointer InternalClone() const override;
+    ModelFitResultRelationRule(const ModelFitResultRelationRule &other);
+
+    mitkCloneMacro(Self);
   };
 
 } // namespace mitk

@@ -106,7 +106,9 @@ namespace mitk
 
     bool IsSupportedRuleID(const RuleIDType& ruleID) const override;
 
-    itk::LightObject::Pointer InternalClone() const override;
+    SourceImageRelationRule(const SourceImageRelationRule &other);
+
+    mitkCloneMacro(Self);
 
     /**Prepares a new reference to an image on the data layer. Therefore an unused and valid sequence item index
     for the passed source will be generated and a relationUID property with the relationUID will be set to block the instance ID. The

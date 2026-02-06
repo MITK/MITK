@@ -84,7 +84,9 @@ namespace mitk
 
     bool IsSupportedRuleID(const RuleIDType& ruleID) const override;
 
-    itk::LightObject::Pointer InternalClone() const override;
+    GenericIDRelationRule(const GenericIDRelationRule &other);
+
+    mitkCloneMacro(Self);
 
   private:
     RuleIDType m_RuleIDTag;

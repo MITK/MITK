@@ -50,7 +50,7 @@ namespace mitk
     mitkNewMacro1Param(GenericProperty<T>, T);
     itkCloneMacro(Self);
 
-      typedef T ValueType;
+    typedef T ValueType;
 
     itkSetMacro(Value, T);
     itkGetConstMacro(Value, T);
@@ -80,16 +80,11 @@ namespace mitk
     GenericProperty(const GenericProperty &other) : BaseProperty(other), m_Value(other.m_Value) {}
     T m_Value;
 
+    mitkCloneMacro(Self);
+
   private:
     // purposely not implemented
     GenericProperty &operator=(const GenericProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override
-    {
-      itk::LightObject::Pointer result(new Self(*this));
-      result->UnRegister();
-      return result;
-    }
 
     bool IsEqual(const BaseProperty &other) const override
     {
@@ -138,20 +133,13 @@ namespace mitk
     PropertyName(const PropertyName &);                                                                                \
     PropertyName(Type x);                                                                                              \
                                                                                                                        \
-  private:                                                                                                             \
-    itk::LightObject::Pointer InternalClone() const override;                                                          \
+    mitkCloneMacro(Self);                                                                                              \
   };
 
 #define mitkDefineGenericProperty(PropertyName, Type, DefaultValue)                                                    \
   mitk::PropertyName::PropertyName() : Superclass(DefaultValue) {}                                                     \
   mitk::PropertyName::PropertyName(const PropertyName &other) : GenericProperty<Type>(other) {}                        \
   mitk::PropertyName::PropertyName(Type x) : Superclass(x) {}                                                          \
-  itk::LightObject::Pointer mitk::PropertyName::InternalClone() const                                                  \
-  {                                                                                                                    \
-    itk::LightObject::Pointer result(new Self(*this));                                                                 \
-    result->UnRegister();                                                                                              \
-    return result;                                                                                                     \
-  }                                                                                                                    \
   bool mitk::PropertyName::ToJSON(nlohmann::json& j) const                                                             \
   {                                                                                                                    \
     j = this->GetValue();                                                                                              \

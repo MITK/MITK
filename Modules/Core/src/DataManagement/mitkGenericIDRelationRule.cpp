@@ -60,6 +60,13 @@ mitk::GenericIDRelationRule::GenericIDRelationRule(const RuleIDType &ruleIDTag,
                                                    const std::string &destinationRole)
   : m_RuleIDTag(ruleIDTag), m_DisplayName(displayName), m_SourceRole(sourceRole), m_DestinationRole(destinationRole){};
 
+mitk::GenericIDRelationRule::GenericIDRelationRule(const GenericIDRelationRule &other)
+  : PropertyRelationRuleBase(other),
+    m_RuleIDTag(other.m_RuleIDTag),
+    m_DisplayName(other.m_DisplayName),
+    m_SourceRole(other.m_SourceRole),
+    m_DestinationRole(other.m_DestinationRole){};
+
 mitk::GenericIDRelationRule::DataRelationUIDVectorType mitk::GenericIDRelationRule::GetRelationUIDs_DataLayer(
   const IPropertyProvider * /*source*/, const IPropertyProvider * /*destination*/, const InstanceIDVectorType& /*instances_IDLayer*/) const
 {
@@ -75,11 +82,4 @@ void mitk::GenericIDRelationRule::Connect_datalayer(IPropertyOwner * /*source*/,
 
 void mitk::GenericIDRelationRule::Disconnect_datalayer(IPropertyOwner * /*source*/, const RelationUIDType & /*relationUID*/) const {
   // Data layer is not supported by the class. => Do nothing
-};
-
-itk::LightObject::Pointer mitk::GenericIDRelationRule::InternalClone() const
-{
-  itk::LightObject::Pointer result = Self::New(this->m_RuleIDTag, this->m_DisplayName, this->m_SourceRole, this->m_DestinationRole).GetPointer();
-
-  return result;
 };

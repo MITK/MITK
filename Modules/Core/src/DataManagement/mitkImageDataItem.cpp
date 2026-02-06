@@ -183,13 +183,6 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem &other)
     m_Dimensions[i] = other.m_Dimensions[i];
 }
 
-itk::LightObject::Pointer mitk::ImageDataItem::InternalClone() const
-{
-  Self::Pointer newGeometry = new Self(*this);
-  newGeometry->UnRegister();
-  return newGeometry.GetPointer();
-}
-
 void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsigned int dimension)
 {
   m_Size = m_PixelType->GetSize();

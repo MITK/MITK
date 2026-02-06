@@ -40,8 +40,12 @@ mitk::SegmentationTaskList::SegmentationTaskList()
 }
 
 mitk::SegmentationTaskList::SegmentationTaskList(const Self& other)
-  : BaseData(other)
+  : BaseData(other),
+    m_Defaults(other.m_Defaults),
+    m_Tasks(other.m_Tasks)
 {
+  for (auto& task : m_Tasks)
+    task.SetDefaults(&m_Defaults);
 }
 
 mitk::SegmentationTaskList::~SegmentationTaskList()

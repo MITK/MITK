@@ -169,11 +169,7 @@ mitk::ExponentialSaturationModel::StaticParameterValuesType mitk::ExponentialSat
   return result;
 };
 
-itk::LightObject::Pointer mitk::ExponentialSaturationModel::InternalClone() const
+mitk::ExponentialSaturationModel::ExponentialSaturationModel(const ExponentialSaturationModel& source)
+: Superclass(source)
 {
-  ExponentialSaturationModel::Pointer newClone = ExponentialSaturationModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}

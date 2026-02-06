@@ -81,11 +81,9 @@ namespace mitk
     GenericParamModel();
     ~GenericParamModel() override {};
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    GenericParamModel(const GenericParamModel& source);
+
+    mitkCloneMacro(GenericParamModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -100,8 +98,6 @@ namespace mitk
     /**Number of parameters the model should offer / the function string contains.*/
     ParametersSizeType m_NumberOfParameters;
 
-    //No copy constructor allowed
-    GenericParamModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

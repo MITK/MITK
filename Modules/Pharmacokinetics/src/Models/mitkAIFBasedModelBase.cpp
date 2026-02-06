@@ -63,6 +63,13 @@ mitk::AIFBasedModelBase::~AIFBasedModelBase()
 {
 }
 
+mitk::AIFBasedModelBase::AIFBasedModelBase(const AIFBasedModelBase& source)
+: Superclass(source)
+, m_AterialInputFunctionTimeGrid(source.m_AterialInputFunctionTimeGrid)
+, m_AterialInputFunctionValues(source.m_AterialInputFunctionValues)
+{
+}
+
 const mitk::AIFBasedModelBase::TimeGridType&
 mitk::AIFBasedModelBase::GetCurrentAterialInputFunctionTimeGrid() const
 {

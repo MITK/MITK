@@ -37,7 +37,14 @@ std::string mitk::GenericParamModel::GetXName() const
 
 mitk::GenericParamModel::GenericParamModel(): m_FunctionString(""), m_NumberOfParameters(1)
 {
-};
+}
+
+mitk::GenericParamModel::GenericParamModel(const GenericParamModel& source)
+: Superclass(source)
+, m_FunctionString(source.m_FunctionString)
+, m_NumberOfParameters(source.m_NumberOfParameters)
+{
+}
 
 mitk::GenericParamModel::ParameterNamesType
 mitk::GenericParamModel::GetParameterNames() const
@@ -132,12 +139,3 @@ mitk::GenericParamModel::GetStaticParameterValue(
   return result;
 };
 
-itk::LightObject::Pointer mitk::GenericParamModel::InternalClone() const
-{
-  GenericParamModel::Pointer newClone = GenericParamModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-  newClone->SetNumberOfParameters(this->m_NumberOfParameters);
-
-  return newClone.GetPointer();
-};

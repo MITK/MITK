@@ -153,13 +153,9 @@ mitk::TwoTissueCompartmentModel::ComputeModelfunction(const ParametersType& para
 
 
 
-itk::LightObject::Pointer mitk::TwoTissueCompartmentModel::InternalClone() const
+mitk::TwoTissueCompartmentModel::TwoTissueCompartmentModel(const TwoTissueCompartmentModel& source)
+: Superclass(source)
 {
-  TwoTissueCompartmentModel::Pointer newClone = TwoTissueCompartmentModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
 }
 
 void mitk::TwoTissueCompartmentModel::PrintSelf(std::ostream& os, ::itk::Indent indent) const

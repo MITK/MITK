@@ -198,11 +198,7 @@ mitk::ModelBase::DerivedParameterMapType mitk::ExponentialDecayModel::ComputeDer
   return result;
 };
 
-itk::LightObject::Pointer mitk::ExponentialDecayModel::InternalClone() const
+mitk::ExponentialDecayModel::ExponentialDecayModel(const ExponentialDecayModel& source)
+: Superclass(source)
 {
-  ExponentialDecayModel::Pointer newClone = ExponentialDecayModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}

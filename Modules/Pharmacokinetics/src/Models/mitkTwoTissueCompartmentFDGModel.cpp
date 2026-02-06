@@ -138,13 +138,9 @@ mitk::TwoTissueCompartmentFDGModel::ComputeModelfunction(const ParametersType& p
 
 
 
-itk::LightObject::Pointer mitk::TwoTissueCompartmentFDGModel::InternalClone() const
+mitk::TwoTissueCompartmentFDGModel::TwoTissueCompartmentFDGModel(const TwoTissueCompartmentFDGModel& source)
+: Superclass(source)
 {
-  TwoTissueCompartmentFDGModel::Pointer newClone = TwoTissueCompartmentFDGModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
 }
 
 void mitk::TwoTissueCompartmentFDGModel::PrintSelf(std::ostream& os, ::itk::Indent indent) const

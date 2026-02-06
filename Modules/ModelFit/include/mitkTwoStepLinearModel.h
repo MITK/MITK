@@ -124,12 +124,9 @@ namespace mitk
     TwoStepLinearModel() {};
     virtual ~TwoStepLinearModel(){};
 
+    TwoStepLinearModel(const TwoStepLinearModel& source);
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    virtual itk::LightObject::Pointer InternalClone() const;
+    mitkCloneMacro(TwoStepLinearModel);
 
     virtual ModelResultType ComputeModelfunction(const ParametersType& parameters) const;
     virtual DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
@@ -143,8 +140,6 @@ namespace mitk
 
   private:
 
-    //No copy constructor allowed
-    TwoStepLinearModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
   };
 }

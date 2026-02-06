@@ -157,11 +157,7 @@ mitk::ExpDecayOffsetModel::StaticParameterValuesType mitk::ExpDecayOffsetModel::
   return result;
 };
 
-itk::LightObject::Pointer mitk::ExpDecayOffsetModel::InternalClone() const
+mitk::ExpDecayOffsetModel::ExpDecayOffsetModel(const ExpDecayOffsetModel& source)
+: Superclass(source)
 {
-  ExpDecayOffsetModel::Pointer newClone = ExpDecayOffsetModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}

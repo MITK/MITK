@@ -128,14 +128,10 @@ mitk::ExtendedOneTissueCompartmentModel::ModelResultType mitk::ExtendedOneTissue
 
 
 
-itk::LightObject::Pointer mitk::ExtendedOneTissueCompartmentModel::InternalClone() const
+mitk::ExtendedOneTissueCompartmentModel::ExtendedOneTissueCompartmentModel(const ExtendedOneTissueCompartmentModel& source)
+: Superclass(source)
 {
-  ExtendedOneTissueCompartmentModel::Pointer newClone = ExtendedOneTissueCompartmentModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}
 
 void mitk::ExtendedOneTissueCompartmentModel::PrintSelf(std::ostream& os, ::itk::Indent indent) const
 {

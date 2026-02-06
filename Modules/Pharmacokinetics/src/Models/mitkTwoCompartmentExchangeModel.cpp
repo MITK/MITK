@@ -164,13 +164,9 @@ mitk::TwoCompartmentExchangeModel::ComputeModelfunction(const ParametersType& pa
 }
 
 
-itk::LightObject::Pointer mitk::TwoCompartmentExchangeModel::InternalClone() const
+mitk::TwoCompartmentExchangeModel::TwoCompartmentExchangeModel(const TwoCompartmentExchangeModel& source)
+: Superclass(source)
 {
-  TwoCompartmentExchangeModel::Pointer newClone = TwoCompartmentExchangeModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
 }
 
 void mitk::TwoCompartmentExchangeModel::PrintSelf(std::ostream& os, ::itk::Indent indent) const

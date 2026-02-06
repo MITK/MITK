@@ -127,6 +127,7 @@ mitk::ModelBase::~ModelBase()
 
 mitk::ModelBase::ModelBase(const ModelBase& source)
 : Superclass()
+, ModelTraitsInterface()
 , m_TimeGrid(source.m_TimeGrid)
 {
 }

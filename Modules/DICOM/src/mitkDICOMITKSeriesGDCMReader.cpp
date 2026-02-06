@@ -40,7 +40,6 @@ mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( const DICOMITKSeriesGD
 , m_FixTiltByShearing( other.m_FixTiltByShearing)
 , m_SimpleVolumeReading( other.m_SimpleVolumeReading)
 , m_SortingResultInProgress( other.m_SortingResultInProgress )
-, m_Sorter( other.m_Sorter )
 , m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
 , m_NormalDirectionConsistencySorter( other.m_NormalDirectionConsistencySorter->Clone() )
 , m_ReplacedCLocales( other.m_ReplacedCLocales )
@@ -49,6 +48,8 @@ mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( const DICOMITKSeriesGD
 , m_TagCache( other.m_TagCache )
 , m_ExternalCache(other.m_ExternalCache)
 {
+  for (const auto &sorter : other.m_Sorter)
+    m_Sorter.push_back(dynamic_cast<DICOMDatasetSorter *>(sorter->Clone().GetPointer()));
 }
 
 mitk::DICOMITKSeriesGDCMReader::~DICOMITKSeriesGDCMReader()
@@ -64,7 +65,9 @@ mitk::DICOMITKSeriesGDCMReader& mitk::DICOMITKSeriesGDCMReader::
     this->m_FixTiltByShearing                = other.m_FixTiltByShearing;
     this->m_SimpleVolumeReading              = other.m_SimpleVolumeReading;
     this->m_SortingResultInProgress          = other.m_SortingResultInProgress;
-    this->m_Sorter                           = other.m_Sorter; // TODO should clone the list items
+    this->m_Sorter.clear();
+    for (const auto &sorter : other.m_Sorter)
+      this->m_Sorter.push_back(dynamic_cast<DICOMDatasetSorter *>(sorter->Clone().GetPointer()));
     this->m_EquiDistantBlocksSorter          = other.m_EquiDistantBlocksSorter->Clone();
     this->m_NormalDirectionConsistencySorter = other.m_NormalDirectionConsistencySorter->Clone();
     this->m_ReplacedCLocales                 = other.m_ReplacedCLocales;

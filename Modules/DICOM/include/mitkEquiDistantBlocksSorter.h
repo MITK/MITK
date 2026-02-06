@@ -102,6 +102,7 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
     bool operator==(const DICOMDatasetSorter& other) const override;
 
   protected:
+    mitkCloneMacro(EquiDistantBlocksSorter);
 
     /**
       \brief Return type of AnalyzeFileForITKImageSeriesReaderSpacingAssumption().

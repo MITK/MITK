@@ -146,6 +146,7 @@ class MITKDICOM_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
     }
 
   protected:
+    mitkCloneMacro(DICOMTagBasedSorter);
 
     /**
       \brief Helper struct to feed into std::sort, configured via DICOMSortCriterion.

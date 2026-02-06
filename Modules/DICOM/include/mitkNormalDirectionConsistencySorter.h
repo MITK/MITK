@@ -56,6 +56,7 @@ class MITKDICOM_EXPORT NormalDirectionConsistencySorter : public DICOMDatasetSor
     bool operator==(const DICOMDatasetSorter& other) const override;
 
   protected:
+    mitkCloneMacro(NormalDirectionConsistencySorter);
 
     NormalDirectionConsistencySorter();
     ~NormalDirectionConsistencySorter() override;

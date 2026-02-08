@@ -85,11 +85,9 @@ namespace mitk
     ExtendedToftsModel();
     ~ExtendedToftsModel() override;
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    ExtendedToftsModel(const ExtendedToftsModel& source);
+
+    mitkCloneMacro(ExtendedToftsModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -101,9 +99,6 @@ namespace mitk
 
   private:
 
-
-    //No copy constructor allowed
-    ExtendedToftsModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
 

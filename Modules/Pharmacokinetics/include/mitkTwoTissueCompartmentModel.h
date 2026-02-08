@@ -74,11 +74,9 @@ namespace mitk
     TwoTissueCompartmentModel();
     ~TwoTissueCompartmentModel() override;
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    TwoTissueCompartmentModel(const TwoTissueCompartmentModel& source);
+
+    mitkCloneMacro(TwoTissueCompartmentModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -86,9 +84,6 @@ namespace mitk
 
   private:
 
-
-    //No copy constructor allowed
-    TwoTissueCompartmentModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

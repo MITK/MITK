@@ -130,12 +130,9 @@ namespace mitk
     ThreeStepLinearModel() {};
     ~ThreeStepLinearModel() override{};
 
+    ThreeStepLinearModel(const ThreeStepLinearModel& source);
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    mitkCloneMacro(ThreeStepLinearModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
     DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
@@ -149,8 +146,6 @@ namespace mitk
 
   private:
 
-    //No copy constructor allowed
-    ThreeStepLinearModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

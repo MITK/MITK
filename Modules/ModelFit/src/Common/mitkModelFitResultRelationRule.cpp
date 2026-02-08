@@ -31,6 +31,10 @@ mitk::ModelFitResultRelationRule::ModelFitResultRelationRule()
   : SourceImageRelationRule("Model fit input", "Model fit result relation", "fit result", "source image")
 {}
 
+mitk::ModelFitResultRelationRule::ModelFitResultRelationRule(const ModelFitResultRelationRule &other)
+  : SourceImageRelationRule(other)
+{}
+
 
 mitk::ModelFitResultRelationRule::DataRelationUIDVectorType
 mitk::ModelFitResultRelationRule::GetRelationUIDs_DataLayer(const IPropertyProvider* source,
@@ -72,9 +76,3 @@ void mitk::ModelFitResultRelationRule::Disconnect_datalayer(IPropertyOwner * sou
   //disconnected on purpose.
 }
 
-itk::LightObject::Pointer mitk::ModelFitResultRelationRule::InternalClone() const
-{
-  itk::LightObject::Pointer result = Self::New().GetPointer();
-
-  return result;
-}

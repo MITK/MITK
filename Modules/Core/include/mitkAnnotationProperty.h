@@ -68,11 +68,11 @@ namespace mitk
 
     AnnotationProperty(const AnnotationProperty &other);
 
+    mitkCloneMacro(AnnotationProperty);
+
   private:
     // purposely not implemented
     AnnotationProperty &operator=(const AnnotationProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;

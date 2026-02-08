@@ -103,8 +103,7 @@ namespace mitk
      */
     virtual void AddRepresentationTypes();
 
-  private:
-    itk::LightObject::Pointer InternalClone() const override;
+    mitkCloneMacro(GridRepresentationProperty);
   };
 } // end of namespace mitk
 #endif

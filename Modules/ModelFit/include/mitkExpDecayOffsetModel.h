@@ -105,11 +105,9 @@ namespace mitk
     ExpDecayOffsetModel() {};
     ~ExpDecayOffsetModel() override {};
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    ExpDecayOffsetModel(const ExpDecayOffsetModel& source);
+
+    mitkCloneMacro(ExpDecayOffsetModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
@@ -119,8 +117,6 @@ namespace mitk
 
   private:
 
-    //No copy constructor allowed
-    ExpDecayOffsetModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

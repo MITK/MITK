@@ -160,14 +160,10 @@ mitk::ModelBase::DerivedParameterMapType mitk::StandardToftsModel::ComputeDerive
   return result;
 };
 
-itk::LightObject::Pointer mitk::StandardToftsModel::InternalClone() const
+mitk::StandardToftsModel::StandardToftsModel(const StandardToftsModel& source)
+: Superclass(source)
 {
-  StandardToftsModel::Pointer newClone = StandardToftsModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}
 
 void mitk::StandardToftsModel::PrintSelf(std::ostream& os, ::itk::Indent indent) const
 {

@@ -20,6 +20,12 @@ mitk::PlanarFourPointAngle::PlanarFourPointAngle() : FEATURE_ID_ANGLE(this->AddF
   this->SetNumberOfPolyLines(2);
 }
 
+mitk::PlanarFourPointAngle::PlanarFourPointAngle(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_ANGLE(other.FEATURE_ID_ANGLE)
+{
+}
+
 void mitk::PlanarFourPointAngle::GeneratePolyLine()
 {
   this->ClearPolyLines();

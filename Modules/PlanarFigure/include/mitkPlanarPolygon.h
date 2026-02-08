@@ -55,6 +55,7 @@ namespace mitk
 
   protected:
     PlanarPolygon();
+    PlanarPolygon(const Self& other);
 
     mitkCloneMacro(Self);
 

@@ -82,6 +82,8 @@ namespace mitk
      */
     VtkScalarModeProperty(const std::string &value);
 
+    VtkScalarModeProperty(const VtkScalarModeProperty &other);
+
     /**
      * this function is overridden as protected, so that the user may not add
      * additional invalid scalar mode types.
@@ -94,11 +96,11 @@ namespace mitk
      */
     virtual void AddInterpolationTypes();
 
+    mitkCloneMacro(VtkScalarModeProperty);
+
   private:
     // purposely not implemented
     VtkScalarModeProperty &operator=(const VtkScalarModeProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

@@ -265,11 +265,4 @@ namespace mitk
     os << indent << "Min: " << m_Min << ", Max: " << m_Max << std::endl;
   }
 
-  itk::LightObject::Pointer mitk::TransferFunction::InternalClone() const
-  {
-    itk::LightObject::Pointer result(new Self(*this));
-    result->UnRegister();
-    return result;
-  }
-
 } // namespace

@@ -250,17 +250,16 @@ namespace mitk
 
   protected:
     PropertyList();
-    PropertyList(const PropertyList &other);
+    PropertyList(const Self &other);
 
     ~PropertyList() override;
+
+    mitkCloneMacro(Self);
 
     /**
      * @brief Map of properties.
      */
     PropertyMap m_Properties;
-
-  private:
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
   /**

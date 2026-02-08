@@ -199,11 +199,7 @@ mitk::ModelBase::DerivedParameterMapType mitk::LinearModel::ComputeDerivedParame
   return result;
 };
 
-itk::LightObject::Pointer mitk::LinearModel::InternalClone() const
+mitk::LinearModel::LinearModel(const LinearModel& source)
+: Superclass(source)
 {
-  LinearModel::Pointer newClone = LinearModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}

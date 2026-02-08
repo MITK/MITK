@@ -112,11 +112,9 @@ namespace mitk
     LinearModel() {};
     ~LinearModel() override {};
 
-    /**
-     * Actual implementation of the clone method. This method should be reimplemeted
-     * in subclasses to clone the extra required parameters.
-     */
-    itk::LightObject::Pointer InternalClone() const override;
+    LinearModel(const LinearModel& source);
+
+    mitkCloneMacro(LinearModel);
 
     ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
     DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
@@ -128,8 +126,6 @@ namespace mitk
 
   private:
 
-    //No copy constructor allowed
-    LinearModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

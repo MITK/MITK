@@ -137,6 +137,8 @@ namespace mitk
      */
     RenderingModeProperty(const std::string &value);
 
+    RenderingModeProperty(const RenderingModeProperty &other);
+
     /**
      * this function is overridden as protected, so that the user may not add
      * additional invalid rendering types.
@@ -148,11 +150,11 @@ namespace mitk
      */
     virtual void AddRenderingModes();
 
+    mitkCloneMacro(RenderingModeProperty);
+
   private:
     // purposely not implemented
     RenderingModeProperty &operator=(const RenderingModeProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

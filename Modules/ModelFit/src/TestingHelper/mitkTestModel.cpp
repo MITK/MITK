@@ -163,11 +163,7 @@ mitk::ModelBase::DerivedParameterMapType mitk::TestModel::ComputeDerivedParamete
   return result;
 };
 
-itk::LightObject::Pointer mitk::TestModel::InternalClone() const
+mitk::TestModel::TestModel(const TestModel &other)
+  : ModelBase(other)
 {
-  TestModel::Pointer newClone = TestModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
 };

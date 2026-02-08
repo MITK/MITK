@@ -664,12 +664,6 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::C
   return newID;
 }
 
-itk::LightObject::Pointer mitk::PropertyRelationRuleBase::InternalClone() const
-{
-  return Superclass::InternalClone();
-}
-
-
 mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::GetInstanceIDByPropertyName(const std::string propName)
 {
   auto proppath = PropertyNameToPropertyKeyPath(propName);

@@ -70,6 +70,8 @@ namespace mitk
 
       Element();
       explicit Element(unsigned int id);
+      Element(const Element& other);
+      Element& operator=(Element other);
       ~Element() = default;
 
       /** \brief Get a const property.

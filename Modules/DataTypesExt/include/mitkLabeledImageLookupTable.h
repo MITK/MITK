@@ -102,10 +102,9 @@ namespace mitk
      */
     virtual double GenerateRandomNumber();
 
-    mitk::LevelWindow m_LevelWindow;
+    mitkCloneMacro(LabeledImageLookupTable);
 
-  private:
-    itk::LightObject::Pointer InternalClone() const override;
+    mitk::LevelWindow m_LevelWindow;
   };
 }
 

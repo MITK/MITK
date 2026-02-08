@@ -45,6 +45,18 @@ mitk::PlanarCircle::PlanarCircle(double fixedRadius)
   this->SetProperty("closed", mitk::BoolProperty::New(true));
 }
 
+mitk::PlanarCircle::PlanarCircle(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_RADIUS(other.FEATURE_ID_RADIUS),
+    FEATURE_ID_DIAMETER(other.FEATURE_ID_DIAMETER),
+    FEATURE_ID_AREA(other.FEATURE_ID_AREA),
+    m_MinRadius(other.m_MinRadius),
+    m_MaxRadius(other.m_MaxRadius),
+    m_MinMaxRadiusContraintsActive(other.m_MinMaxRadiusContraintsActive),
+    m_RadiusFixed(other.m_RadiusFixed)
+{
+}
+
 bool mitk::PlanarCircle::SetControlPoint(unsigned int index, const Point2D &point, bool /*createIfDoesNotExist*/)
 {
   // moving center point

@@ -75,8 +75,9 @@ int mitkUnstructuredGridTest(int /* argc */, char * /*argv*/ [])
   cloneObject = testObject->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneObject->GetRequestedRegion() == testObject->GetRequestedRegion(),
                                "Testing region cloning!");
-  MITK_TEST_CONDITION_REQUIRED(cloneObject->GetVtkUnstructuredGrid() == grid,
-                               "Testing Get/Set-VtkUnstructuredGrid cloning");
+  MITK_TEST_CONDITION_REQUIRED(cloneObject->GetVtkUnstructuredGrid() != nullptr &&
+                               cloneObject->GetVtkUnstructuredGrid() != grid,
+                               "Testing Get/Set-VtkUnstructuredGrid cloning (deep copy)");
   MITK_TEST_CONDITION_REQUIRED(cloneObject->GetRequestedRegion().GetSize() == ugRegion->GetSize(),
                                "Testing Set/Get of Requested Region by RegionType1 in clone!");
   MITK_TEST_CONDITION_REQUIRED(cloneObject->GetRequestedRegion().GetIndex() == ugRegion->GetIndex(),

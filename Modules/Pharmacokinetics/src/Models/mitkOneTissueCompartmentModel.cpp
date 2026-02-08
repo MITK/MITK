@@ -123,14 +123,10 @@ mitk::OneTissueCompartmentModel::ModelResultType mitk::OneTissueCompartmentModel
 
 
 
-itk::LightObject::Pointer mitk::OneTissueCompartmentModel::InternalClone() const
+mitk::OneTissueCompartmentModel::OneTissueCompartmentModel(const OneTissueCompartmentModel& source)
+: Superclass(source)
 {
-  OneTissueCompartmentModel::Pointer newClone = OneTissueCompartmentModel::New();
-
-  newClone->SetTimeGrid(this->m_TimeGrid);
-
-  return newClone.GetPointer();
-};
+}
 
 void mitk::OneTissueCompartmentModel::PrintSelf(std::ostream& os, ::itk::Indent indent) const
 {

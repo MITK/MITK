@@ -60,9 +60,6 @@ namespace mitk
 
     mitkClassMacroItkParent(ImageDataItem, itk::LightObject);
 
-    itkCloneMacro(ImageDataItem);
-    itk::LightObject::Pointer InternalClone() const override;
-
     ImageDataItem(const ImageDataItem &aParent,
                   const mitk::ImageDescriptor::Pointer desc,
                   int timestep,
@@ -82,7 +79,8 @@ namespace mitk
                   void *data,
                   bool manageMemory);
 
-    ImageDataItem(const ImageDataItem &other);
+    ImageDataItem(const ImageDataItem &other) = delete;
+    ImageDataItem &operator=(const ImageDataItem &other) = delete;
 
     bool IsComplete() const { return m_IsComplete; }
     void SetComplete(bool complete) { m_IsComplete = complete; }
@@ -123,7 +121,6 @@ namespace mitk
     virtual void Modified() const;
 
   protected:
-
     /**Helper function to allow friend classes to access m_Data without changing their code.
     * Moved to protected visibility because only friends are allowed to access m_Data directly.
     * Other classes should used ImageWriteAccessor::GetData() or ImageReadAccessor::GetData()

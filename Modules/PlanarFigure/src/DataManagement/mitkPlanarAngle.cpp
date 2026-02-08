@@ -24,6 +24,12 @@ mitk::PlanarAngle::PlanarAngle() : FEATURE_ID_ANGLE(this->AddFeature("Angle", "d
   m_HelperPolyLinesToBePainted->InsertElement(0, false);
 }
 
+mitk::PlanarAngle::PlanarAngle(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_ANGLE(other.FEATURE_ID_ANGLE)
+{
+}
+
 void mitk::PlanarAngle::GeneratePolyLine()
 {
   this->ClearPolyLines();

@@ -93,6 +93,8 @@ namespace mitk
     AIFBasedModelBase();
     ~AIFBasedModelBase() override;
 
+    AIFBasedModelBase(const AIFBasedModelBase& source);
+
     /** Reimplementation that checks if AIF and timegrid settings are valid.
      * @param [out] error Set internally to indicate the error reason if method returns false. Is used by GetSignal() for the
      * exception comment.
@@ -113,9 +115,6 @@ namespace mitk
 
   private:
 
-
-    //No copy constructor allowed
-    AIFBasedModelBase(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
 

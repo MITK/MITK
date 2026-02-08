@@ -727,13 +727,6 @@ namespace mitk
     return pt - this->GetNormal() * this->SignedDistanceFromPlane(pt) / len;
   }
 
-  itk::LightObject::Pointer PlaneGeometry::InternalClone() const
-  {
-    Self::Pointer newGeometry = new PlaneGeometry(*this);
-    newGeometry->UnRegister();
-    return newGeometry.GetPointer();
-  }
-
   void PlaneGeometry::ExecuteOperation(Operation *operation)
   {
     vtkTransform *transform = vtkTransform::New();

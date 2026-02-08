@@ -46,6 +46,11 @@ namespace mitk
     }
   }
 
+  PlaneOrientationProperty::PlaneOrientationProperty(const PlaneOrientationProperty &other)
+    : EnumerationProperty(other)
+  {
+  }
+
   int PlaneOrientationProperty::GetPlaneDecoration() { return static_cast<int>(this->GetValueAsId()); }
   void PlaneOrientationProperty::SetPlaneDecorationToNone()
   {
@@ -72,13 +77,6 @@ namespace mitk
   bool PlaneOrientationProperty::AddEnum(const std::string &name, const IdType &id)
   {
     return Superclass::AddEnum(name, id);
-  }
-
-  itk::LightObject::Pointer PlaneOrientationProperty::InternalClone() const
-  {
-    itk::LightObject::Pointer result(new Self(*this));
-    result->UnRegister();
-    return result;
   }
 
 } // namespace

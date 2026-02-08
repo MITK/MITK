@@ -16,29 +16,41 @@ found in the LICENSE file.
 
 mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry() : Superclass()
 {
-  m_InterpolatingAbstractTransform = m_ThinPlateSplineTransform = vtkThinPlateSplineTransform::New();
+  m_ThinPlateSplineTransform = vtkThinPlateSplineTransform::New();
+  m_InterpolatingAbstractTransform.TakeReference(m_ThinPlateSplineTransform);
 
-  m_VtkTargetLandmarks = vtkPoints::New();
-  m_VtkProjectedLandmarks = vtkPoints::New();
+  m_VtkTargetLandmarks = vtkSmartPointer<vtkPoints>::New();
+  m_VtkProjectedLandmarks = vtkSmartPointer<vtkPoints>::New();
   m_ThinPlateSplineTransform->SetInverseIterations(5000);
 }
 
 mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry &other)
   : Superclass(other)
 {
+  m_ThinPlateSplineTransform = vtkThinPlateSplineTransform::New();
+  m_InterpolatingAbstractTransform.TakeReference(m_ThinPlateSplineTransform);
+  m_ThinPlateSplineTransform->SetInverseIterations(5000);
+
+  m_VtkTargetLandmarks = vtkSmartPointer<vtkPoints>::New();
+  m_VtkProjectedLandmarks = vtkSmartPointer<vtkPoints>::New();
+
+  if (other.m_VtkTargetLandmarks != nullptr)
+    m_VtkTargetLandmarks->DeepCopy(other.m_VtkTargetLandmarks);
+
+  if (other.m_VtkProjectedLandmarks != nullptr)
+    m_VtkProjectedLandmarks->DeepCopy(other.m_VtkProjectedLandmarks);
+
   this->SetSigma(other.GetSigma());
+
+  if (m_LandmarkProjector.IsNotNull())
+  {
+    m_LandmarkProjector->SetInterpolatingAbstractTransform(m_ThinPlateSplineTransform);
+    SetVtkAbstractTransform(m_LandmarkProjector->GetCompleteAbstractTransform());
+  }
 }
 
 mitk::ThinPlateSplineCurvedGeometry::~ThinPlateSplineCurvedGeometry()
 {
-  // don't need to delete m_ThinPlateSplineTransform, because it is
-  // the same as m_InterpolatingAbstractTransform, which will be deleted
-  // by the superclass.
-
-  if (m_VtkTargetLandmarks != nullptr)
-    m_VtkTargetLandmarks->Delete();
-  if (m_VtkProjectedLandmarks != nullptr)
-    m_VtkProjectedLandmarks->Delete();
 }
 
 bool mitk::ThinPlateSplineCurvedGeometry::IsValid() const
@@ -87,11 +99,4 @@ void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
 
   m_ThinPlateSplineTransform->SetSourceLandmarks(m_VtkProjectedLandmarks);
   m_ThinPlateSplineTransform->SetTargetLandmarks(m_VtkTargetLandmarks);
-}
-
-itk::LightObject::Pointer mitk::ThinPlateSplineCurvedGeometry::InternalClone() const
-{
-  mitk::BaseGeometry::Pointer newGeometry = new Self(*this);
-  newGeometry->UnRegister();
-  return newGeometry.GetPointer();
 }

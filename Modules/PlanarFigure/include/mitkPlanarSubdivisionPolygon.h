@@ -28,7 +28,7 @@ namespace mitk
   class MITKPLANARFIGURE_EXPORT PlanarSubdivisionPolygon : public PlanarPolygon
   {
   public:
-    mitkClassMacro(PlanarSubdivisionPolygon, PlanarFigure);
+    mitkClassMacro(PlanarSubdivisionPolygon, PlanarPolygon);
 
     itkFactorylessNewMacro(Self);
 
@@ -67,6 +67,7 @@ namespace mitk
 
   protected:
     PlanarSubdivisionPolygon();
+    PlanarSubdivisionPolygon(const Self& other);
 
     mitkCloneMacro(Self);
 

@@ -56,9 +56,3 @@ bool mitk::StringProperty::FromJSON(const nlohmann::json& j)
   return true;
 }
 
-itk::LightObject::Pointer mitk::StringProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

@@ -20,6 +20,11 @@ namespace mitk
 {
   ImageStatisticsContainer::ImageStatisticsContainer() { this->Reset(); }
 
+  ImageStatisticsContainer::ImageStatisticsContainer(const ImageStatisticsContainer &other)
+    : BaseData(other), m_LabelTimeStep2StatisticsMap(other.m_LabelTimeStep2StatisticsMap)
+  {
+  }
+
   // The order is derived from the old (<2018) image statistics plugin.
   const ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector
     ImageStatisticsContainer::ImageStatisticsObject::m_DefaultNames = {ImageStatisticsConstants::MEAN(),
@@ -217,23 +222,6 @@ namespace mitk
   {
     m_LabelTimeStep2StatisticsMap.clear();
     this->Modified();
-  }
-
-  itk::LightObject::Pointer ImageStatisticsContainer::InternalClone() const
-  {
-    itk::LightObject::Pointer ioPtr = Superclass::InternalClone();
-    Self::Pointer rval = dynamic_cast<Self *>(ioPtr.GetPointer());
-    if (rval.IsNull())
-    {
-      itkExceptionMacro(<< "downcast to type "
-                        << "StatisticsContainer"
-                        << " failed.");
-    }
-
-    rval->m_LabelTimeStep2StatisticsMap = m_LabelTimeStep2StatisticsMap;
-    rval->SetTimeGeometry(this->GetTimeGeometry()->Clone());
-
-    return ioPtr;
   }
 
   ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector GetAllStatisticNames(

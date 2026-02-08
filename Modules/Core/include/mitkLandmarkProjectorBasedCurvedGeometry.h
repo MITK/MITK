@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkPointSet.h"
 
+#include <vtkSmartPointer.h>
+
 namespace mitk
 {
   //##Documentation
@@ -29,6 +31,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(LandmarkProjectorBasedCurvedGeometry, AbstractTransformGeometry);
+    itkCloneMacro(Self);
 
     void SetLandmarkProjector(mitk::LandmarkProjector *aLandmarkProjector);
     itkGetConstObjectMacro(LandmarkProjector, mitk::LandmarkProjector);
@@ -38,8 +41,6 @@ namespace mitk
     virtual void ComputeGeometry();
 
     itkGetConstMacro(InterpolatingAbstractTransform, vtkAbstractTransform *);
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     //##Documentation
     //## @brief Set the landmarks through which the geometry shall pass
@@ -57,7 +58,7 @@ namespace mitk
 
     mitk::LandmarkProjector::Pointer m_LandmarkProjector;
 
-    vtkAbstractTransform *m_InterpolatingAbstractTransform;
+    vtkSmartPointer<vtkAbstractTransform> m_InterpolatingAbstractTransform;
 
     mitk::PointSet::DataType::PointsContainer::ConstPointer m_TargetLandmarks;
 
@@ -68,6 +69,8 @@ namespace mitk
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
     void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
+
+    mitkCloneMacro(Self);
   };
 } // namespace mitk
 

@@ -165,10 +165,12 @@ namespace mitk
 
   protected:
     ImageStatisticsContainer();
+    ImageStatisticsContainer(const ImageStatisticsContainer &other);
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
+    mitkCloneMacro(Self);
+
   private:
-    itk::LightObject::Pointer InternalClone() const override;
 
     using TimeStepMapType = std::map<TimeStepType, ImageStatisticsObject>;
     using LabelMapType = std::map<LabelValueType, TimeStepMapType>;

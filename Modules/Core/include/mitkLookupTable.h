@@ -246,7 +246,9 @@ namespace mitk
   protected:
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
-    LookupTable(const LookupTable &other);
+    LookupTable(const Self &other);
+
+    mitkCloneMacro(Self);
 
     virtual void BuildGrayScaleLookupTable();
     virtual void BuildLegacyBinaryLookupTable();
@@ -272,8 +274,6 @@ namespace mitk
 
     LookupTableType m_Type;
 
-  private:
-    itk::LightObject::Pointer InternalClone() const override;
   };
 } // namespace mitk
 

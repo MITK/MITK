@@ -125,6 +125,13 @@ mitk::ModelBase::~ModelBase()
 {
 }
 
+mitk::ModelBase::ModelBase(const ModelBase& source)
+: Superclass()
+, ModelTraitsInterface()
+, m_TimeGrid(source.m_TimeGrid)
+{
+}
+
 mitk::ModelBase::ModelResultType mitk::ModelBase::GetSignal(const ParametersType& parameters) const
 {
   if (parameters.size() != this->GetNumberOfParameters())

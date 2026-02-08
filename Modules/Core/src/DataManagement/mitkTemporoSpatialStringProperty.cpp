@@ -126,13 +126,6 @@ bool mitk::TemporoSpatialStringProperty::IsUniform() const
   return true;
 }
 
-itk::LightObject::Pointer mitk::TemporoSpatialStringProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}
-
 mitk::TemporoSpatialStringProperty::ValueType mitk::TemporoSpatialStringProperty::GetValue() const
 {
   std::string result = "";

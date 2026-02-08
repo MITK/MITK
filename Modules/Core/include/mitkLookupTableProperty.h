@@ -46,6 +46,8 @@ namespace mitk
 
     LookupTableProperty(const mitk::LookupTable::Pointer lut);
 
+    mitkCloneMacro(LookupTableProperty);
+
   public:
     typedef LookupTable::Pointer ValueType;
 
@@ -72,8 +74,6 @@ namespace mitk
   private:
     // purposely not implemented
     LookupTableProperty &operator=(const LookupTableProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
 
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;

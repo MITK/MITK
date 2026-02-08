@@ -168,8 +168,6 @@ namespace mitk
     virtual void SetDirectionVector(const mitk::Vector3D &directionVector);
     itkGetConstMacro(DirectionVector, const mitk::Vector3D &);
 
-      itk::LightObject::Pointer InternalClone() const override;
-
     static const std::string SLICES;
     const static std::string DIRECTION_VECTOR;
     const static std::string EVENLY_SPACED;
@@ -318,6 +316,8 @@ namespace mitk
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
     void PreSetSpacing(const mitk::Vector3D &aSpacing) override;
+
+    mitkCloneMacro(Self);
   };
 } // namespace mitk
 

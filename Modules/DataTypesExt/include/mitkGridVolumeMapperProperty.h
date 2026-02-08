@@ -65,6 +65,8 @@ namespace mitk
      */
     GridVolumeMapperProperty();
 
+    GridVolumeMapperProperty(const GridVolumeMapperProperty &other);
+
     /**
      * Constructor. Sets the representation to the given value. If it is not
      * valid, the representation is set to Wireframe(1)
@@ -91,8 +93,7 @@ namespace mitk
      */
     virtual void AddRepresentationTypes();
 
-  private:
-    itk::LightObject::Pointer InternalClone() const override;
+    mitkCloneMacro(GridVolumeMapperProperty);
   };
 } // end of namespace mitk
 #endif

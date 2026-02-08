@@ -71,14 +71,14 @@ namespace mitk
     ClippingProperty(const ClippingProperty &other);
     ClippingProperty(const Point3D &origin, const Vector3D &normal);
 
+    mitkCloneMacro(ClippingProperty);
+
   private:
     // purposely not implemented
     ClippingProperty &operator=(const ClippingProperty &);
 
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

@@ -46,17 +46,13 @@ namespace mitk
   {
   protected:
     TimeGeometry();
+    TimeGeometry(const TimeGeometry &other);
     ~TimeGeometry() override;
 
     /**
     * \brief Contains a bounding box which includes all time steps
     */
     BoundingBox::Pointer m_BoundingBox;
-
-    /**
-    * \brief Makes a deep copy of the current object
-    */
-    LightObject::Pointer InternalClone() const override;
 
   public:
     mitkClassMacroItkParent(TimeGeometry, itk::Object);

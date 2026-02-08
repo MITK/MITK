@@ -84,6 +84,8 @@ namespace mitk
      */
     VtkRepresentationProperty(const std::string &value);
 
+    VtkRepresentationProperty(const VtkRepresentationProperty &other);
+
     /**
      * this function is overridden as protected, so that the user may not add
      * additional invalid representation types.
@@ -96,11 +98,11 @@ namespace mitk
      */
     virtual void AddRepresentationTypes();
 
+    mitkCloneMacro(VtkRepresentationProperty);
+
   private:
     // purposely not implemented
     VtkRepresentationProperty &operator=(const VtkRepresentationProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

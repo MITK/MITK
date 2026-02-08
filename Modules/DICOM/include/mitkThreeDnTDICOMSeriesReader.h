@@ -43,7 +43,6 @@ class MITKDICOM_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMRead
   public:
 
     mitkClassMacro( ThreeDnTDICOMSeriesReader, DICOMITKSeriesGDCMReader );
-    mitkCloneMacro( ThreeDnTDICOMSeriesReader );
     itkNewMacro( ThreeDnTDICOMSeriesReader );
     mitkNewMacro1Param( ThreeDnTDICOMSeriesReader, unsigned int );
 
@@ -71,6 +70,7 @@ class MITKDICOM_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMRead
     }
 
   protected:
+    mitkCloneMacro( ThreeDnTDICOMSeriesReader );
 
     ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation = Superclass::m_DefaultDecimalPlacesForOrientation);
     ~ThreeDnTDICOMSeriesReader() override;

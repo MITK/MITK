@@ -24,6 +24,13 @@ mitk::PlanarRectangle::PlanarRectangle()
   this->SetNumberOfPolyLines(1);
 }
 
+mitk::PlanarRectangle::PlanarRectangle(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_CIRCUMFERENCE(other.FEATURE_ID_CIRCUMFERENCE),
+    FEATURE_ID_AREA(other.FEATURE_ID_AREA)
+{
+}
+
 bool mitk::PlanarRectangle::SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist)
 {
   // heres the deal with the rectangle:

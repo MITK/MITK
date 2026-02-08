@@ -138,9 +138,3 @@ bool mitk::SmartPointerProperty::FromJSON(const nlohmann::json&)
   return false;
 }
 
-itk::LightObject::Pointer mitk::SmartPointerProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

@@ -93,6 +93,13 @@ mitk::SourceImageRelationRule::SourceImageRelationRule(const RuleIDType &purpose
                                                    const std::string &destinationRole)
   : m_PurposeTag(purposeTag), m_DisplayName(displayName), m_SourceRole(sourceRole), m_DestinationRole(destinationRole){};
 
+mitk::SourceImageRelationRule::SourceImageRelationRule(const SourceImageRelationRule &other)
+  : PropertyRelationRuleBase(other),
+    m_PurposeTag(other.m_PurposeTag),
+    m_DisplayName(other.m_DisplayName),
+    m_SourceRole(other.m_SourceRole),
+    m_DestinationRole(other.m_DestinationRole){};
+
 mitk::SourceImageRelationRule::DataRelationUIDVectorType
 mitk::SourceImageRelationRule::GetRelationUIDs_DataLayer(const IPropertyProvider* source,
   const IPropertyProvider* destination, const InstanceIDVectorType& instances_IDLayer) const
@@ -411,9 +418,3 @@ void mitk::SourceImageRelationRule::Disconnect_datalayer(IPropertyOwner * source
   }
 };
 
-itk::LightObject::Pointer mitk::SourceImageRelationRule::InternalClone() const
-{
-  itk::LightObject::Pointer result = Self::New(this->m_PurposeTag, this->m_DisplayName, this->m_SourceRole, this->m_DestinationRole).GetPointer();
-
-  return result;
-};

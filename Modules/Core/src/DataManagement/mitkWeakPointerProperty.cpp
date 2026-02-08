@@ -77,9 +77,3 @@ bool mitk::WeakPointerProperty::FromJSON(const nlohmann::json&)
   return false;
 }
 
-itk::LightObject::Pointer mitk::WeakPointerProperty::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  result->UnRegister();
-  return result;
-}

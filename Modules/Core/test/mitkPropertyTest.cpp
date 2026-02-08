@@ -476,12 +476,12 @@ public:
     lut1->GetVtkLookupTable()->SetTableValue(0, 0.2, 0.3, 0.4);
     mitk::LookupTable::Pointer lut2 = mitk::LookupTable::New();
     lut2->GetVtkLookupTable()->SetTableValue(0, 0.2, 0.4, 0.4);
-    std::stringstream ss;
-    ss << lut1;
-    std::string strLUT1 = ss.str();
-    ss.str("");
-    ss << lut2;
-    std::string strLUT2 = ss.str();
+
+    auto prop1 = mitk::LookupTableProperty::New(lut1);
+    auto prop2 = mitk::LookupTableProperty::New(lut2);
+    std::string strLUT1 = prop1->GetValueAsString();
+    std::string strLUT2 = prop2->GetValueAsString();
+
     TestProperty<mitk::LookupTableProperty>(lut1, lut2, strLUT1, strLUT2);
   }
 };

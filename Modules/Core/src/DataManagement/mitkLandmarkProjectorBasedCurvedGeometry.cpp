@@ -16,7 +16,6 @@ found in the LICENSE file.
 mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry()
   : AbstractTransformGeometry(),
     m_LandmarkProjector(nullptr),
-    m_InterpolatingAbstractTransform(nullptr),
     m_TargetLandmarks(nullptr)
 {
 }
@@ -32,8 +31,6 @@ mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry
 
 mitk::LandmarkProjectorBasedCurvedGeometry::~LandmarkProjectorBasedCurvedGeometry()
 {
-  if (m_InterpolatingAbstractTransform != nullptr)
-    m_InterpolatingAbstractTransform->Delete();
 }
 
 void mitk::LandmarkProjectorBasedCurvedGeometry::SetLandmarkProjector(mitk::LandmarkProjector *aLandmarkProjector)
@@ -74,10 +71,4 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::ComputeGeometry()
   }
   m_LandmarkProjector->ProjectLandmarks(m_TargetLandmarks);
   SetPlane(m_LandmarkProjector->GetParameterPlane());
-}
-itk::LightObject::Pointer mitk::LandmarkProjectorBasedCurvedGeometry::InternalClone() const
-{
-  mitk::BaseGeometry::Pointer newGeometry = new LandmarkProjectorBasedCurvedGeometry(*this);
-  newGeometry->UnRegister();
-  return newGeometry.GetPointer();
 }

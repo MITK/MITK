@@ -38,16 +38,17 @@ namespace mitk
 
   protected:
     ResliceMethodProperty();
+    ResliceMethodProperty(const ResliceMethodProperty &other);
     ResliceMethodProperty(const IdType &value);
     ResliceMethodProperty(const std::string &value);
 
     void AddThickSlicesTypes();
 
+    mitkCloneMacro(ResliceMethodProperty);
+
   private:
     // purposely not implemented
     ResliceMethodProperty &operator=(const ResliceMethodProperty &);
-
-    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

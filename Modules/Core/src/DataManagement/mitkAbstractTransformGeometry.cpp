@@ -285,13 +285,6 @@ void mitk::AbstractTransformGeometry::SetOversampling(mitk::ScalarType oversampl
   SetParametricBounds(bounds);
 }
 
-itk::LightObject::Pointer mitk::AbstractTransformGeometry::InternalClone() const
-{
-  Self::Pointer newGeometry = new AbstractTransformGeometry(*this);
-  newGeometry->UnRegister();
-  return newGeometry.GetPointer();
-}
-
 void mitk::AbstractTransformGeometry::SetParametricBounds(const BoundingBox::BoundsArrayType &bounds)
 {
   m_ParametricBoundingBox = BoundingBoxType::New();

@@ -27,6 +27,13 @@ mitk::PlanarArrow::PlanarArrow() : FEATURE_ID_LENGTH(this->AddFeature("Length", 
   m_HelperPolyLinesToBePainted->InsertElement(1, false);
 }
 
+mitk::PlanarArrow::PlanarArrow(const Self& other)
+  : PlanarFigure(other),
+    FEATURE_ID_LENGTH(other.FEATURE_ID_LENGTH),
+    m_ArrowTipScaleFactor(other.m_ArrowTipScaleFactor)
+{
+}
+
 void mitk::PlanarArrow::GeneratePolyLine()
 {
   this->ClearPolyLines();

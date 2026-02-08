@@ -19,8 +19,9 @@ found in the LICENSE file.
 #include <itkArray2D.h>
 #include <itkObject.h>
 
-#include "MitkModelFitExports.h"
-#include "mitkModelTraitsInterface.h"
+#include <MitkModelFitExports.h>
+#include <mitkModelTraitsInterface.h>
+#include <mitkCommon.h>
 
 namespace mitk
 {
@@ -196,6 +197,8 @@ namespace mitk
     ModelBase();
     ~ModelBase() override;
 
+    ModelBase(const ModelBase& source);
+
     void PrintSelf(std::ostream& os, ::itk::Indent indent) const override;
 
     //timeGrid in seconds
@@ -204,8 +207,6 @@ namespace mitk
 
   private:
 
-    //No copy constructor allowed
-    ModelBase(const Self& source);
     void operator=(const Self&);  //purposely not implemented
   };
 }

@@ -35,10 +35,3 @@ mitk::Geometry3D::Geometry3D(const Geometry3D &other) : BaseGeometry(other)
 mitk::Geometry3D::~Geometry3D()
 {
 }
-
-itk::LightObject::Pointer mitk::Geometry3D::InternalClone() const
-{
-  Self::Pointer newGeometry = new Self(*this);
-  newGeometry->UnRegister();
-  return newGeometry.GetPointer();
-}

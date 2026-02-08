@@ -53,6 +53,7 @@ namespace mitk
     PlanarDoubleEllipse();
     /** Constructor for fixed size mode.*/
     PlanarDoubleEllipse(double fixedRadius, double fixedThickness);
+    PlanarDoubleEllipse(const Self& other);
 
     mitkCloneMacro(Self);
 

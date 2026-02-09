@@ -53,14 +53,12 @@ public:
 
     MITK_INFO << "REST API module loaded, service registered";
 
-    this->StartDataStorageServiceTracking();
-    this->StartPreferencesServiceTracking();
+    this->StartServiceTracking();
   }
 
   void Unload(us::ModuleContext* /*context*/) override
   {
-    this->StopPreferencesServiceTracking();
-    this->StopDataStorageServiceTracking();
+    this->StopServiceTracking();
 
     // Stop server
     if (m_RestServer)
@@ -83,63 +81,106 @@ public:
 
 private:
 
-  void StartPreferencesServiceTracking()
+  /**
+   * @brief Start tracking both IDataStorageService and IPreferencesService.
+   *
+   * Uses a single unfiltered AddServiceListener because CppMicroServices keys
+   * listeners by receiver object pointer — only one listener per 'this' is allowed.
+   * Dispatching to the correct handler happens in OnServiceChanged.
+   */
+  void StartServiceTracking()
   {
     if (m_Context == nullptr)
     {
       return;
     }
 
-    // Register listener for PreferencesService events
-    m_Context->AddServiceListener(
-      this,
-      &RestApiActivator::PreferencesServiceChanged,
-      std::string("(&(") + us::ServiceConstants::OBJECTCLASS() + "=" +
-      us_service_interface_iid<IPreferencesService>() + "))");
+    std::lock_guard<std::mutex> lock(m_Mutex);
 
-    // Check if service is already available
-    auto refs = m_Context->GetServiceReferences<IPreferencesService>();
-    if (!refs.empty())
+    // Register a single unfiltered listener. CppMicroServices keys listeners by
+    // receiver pointer, so only one AddServiceListener per 'this' is possible.
+    // We dispatch to the appropriate handler in OnServiceChanged based on service type.
+    m_Context->AddServiceListener(this, &RestApiActivator::OnServiceChanged);
+
+    // Check if services are already available
+    auto dsRefs = m_Context->GetServiceReferences<IDataStorageService>();
+    if (!dsRefs.empty())
     {
-      auto* service = m_Context->GetService(refs.front());
+      auto* service = m_Context->GetService(dsRefs.front());
+      if (service != nullptr)
+      {
+        this->ConnectDataStorage(service);
+        m_Context->UngetService(dsRefs.front());
+      }
+    }
+
+    auto prefRefs = m_Context->GetServiceReferences<IPreferencesService>();
+    if (!prefRefs.empty())
+    {
+      auto* service = m_Context->GetService(prefRefs.front());
       if (service != nullptr)
       {
         this->ApplyPreferences(service);
-        m_Context->UngetService(refs.front());
+        m_Context->UngetService(prefRefs.front());
       }
     }
   }
 
-  void StopPreferencesServiceTracking()
+  void StopServiceTracking()
   {
+    std::lock_guard<std::mutex> lock(m_Mutex);
+
     if (m_Context != nullptr)
     {
       try
       {
-        m_Context->RemoveServiceListener(this, &RestApiActivator::PreferencesServiceChanged);
+        m_Context->RemoveServiceListener(this, &RestApiActivator::OnServiceChanged);
       }
       catch (...)
       {
-        MITK_WARN << "Could not remove PreferencesService listener";
+        MITK_WARN << "Could not remove service listener";
       }
+    }
+
+    // Disconnect DataStorage from REST server
+    if (m_RestServer != nullptr)
+    {
+      m_RestServer->SetDataStorage(nullptr);
     }
   }
 
-  void PreferencesServiceChanged(const us::ServiceEvent event)
+  void OnServiceChanged(const us::ServiceEvent event)
   {
-    std::lock_guard<std::mutex> lock(m_DataStorageMutex);
+    if (m_Context == nullptr)
+    {
+      return;
+    }
 
+    const auto& ref = event.GetServiceReference();
+    const auto objectClass = ref.GetProperty(us::ServiceConstants::OBJECTCLASS());
+
+    // Dispatch to the appropriate handler based on service type
+    if (objectClass.ToString().find(us_service_interface_iid<IDataStorageService>()) != std::string::npos)
+    {
+      this->HandleDataStorageEvent(event);
+    }
+    else if (objectClass.ToString().find(us_service_interface_iid<IPreferencesService>()) != std::string::npos)
+    {
+      this->HandlePreferencesEvent(event);
+    }
+  }
+
+  void HandlePreferencesEvent(const us::ServiceEvent& event)
+  {
     if (event.GetType() == us::ServiceEvent::REGISTERED || event.GetType() == us::ServiceEvent::MODIFIED)
     {
-      if (m_Context != nullptr)
+      us::ServiceReference<IPreferencesService> ref = event.GetServiceReference();
+      auto* service = m_Context->GetService(ref);
+      if (service != nullptr)
       {
-        us::ServiceReference<IPreferencesService> ref = event.GetServiceReference();
-        auto* service = m_Context->GetService(ref);
-        if (service != nullptr)
-        {
-          this->ApplyPreferences(service);
-          m_Context->UngetService(ref);
-        }
+        std::lock_guard<std::mutex> lock(m_Mutex);
+        this->ApplyPreferences(service);
+        m_Context->UngetService(ref);
       }
     }
   }
@@ -184,81 +225,25 @@ private:
     }
   }
 
-  void StartDataStorageServiceTracking()
+  void HandleDataStorageEvent(const us::ServiceEvent& event)
   {
-    if (m_Context == nullptr)
-    {
-      return;
-    }
-
-    std::lock_guard<std::mutex> lock(m_DataStorageMutex);
-
-    // Register listener for DataStorageService events
-    m_Context->AddServiceListener(
-      this,
-      &RestApiActivator::DataStorageServiceChanged,
-      std::string("(&(") + us::ServiceConstants::OBJECTCLASS() + "=" +
-        us_service_interface_iid<IDataStorageService>() + "))");
-
-    // Check if service is already available
-    auto refs = m_Context->GetServiceReferences<IDataStorageService>();
-    if (!refs.empty())
-    {
-      auto* service = m_Context->GetService(refs.front());
-      if (service != nullptr)
-      {
-        this->ConnectDataStorage(service);
-        m_Context->UngetService(refs.front());
-      }
-    }
-  }
-
-  void StopDataStorageServiceTracking()
-  {
-    std::lock_guard<std::mutex> lock(m_DataStorageMutex);
-
-    if (m_Context != nullptr)
-    {
-      try
-      {
-        m_Context->RemoveServiceListener(this, &RestApiActivator::DataStorageServiceChanged);
-      }
-      catch (...)
-      {
-        MITK_WARN << "Could not remove DataStorageService listener";
-      }
-    }
-
-    // Disconnect DataStorage from REST server
-    if (m_RestServer != nullptr)
-    {
-      m_RestServer->SetDataStorage(nullptr);
-    }
-  }
-
-  void DataStorageServiceChanged(const us::ServiceEvent event)
-  {
-    std::lock_guard<std::mutex> lock(m_DataStorageMutex);
-
     if (event.GetType() == us::ServiceEvent::REGISTERED)
     {
-      if (m_Context != nullptr)
+      us::ServiceReference<IDataStorageService> ref = event.GetServiceReference();
+      auto* service = m_Context->GetService(ref);
+      if (service != nullptr)
       {
-        us::ServiceReference<IDataStorageService> ref = event.GetServiceReference();
-        auto* service = m_Context->GetService(ref);
-        if (service != nullptr)
-        {
-          this->ConnectDataStorage(service);
-          m_Context->UngetService(ref);
-        }
+        std::lock_guard<std::mutex> lock(m_Mutex);
+        this->ConnectDataStorage(service);
+        m_Context->UngetService(ref);
       }
     }
     else if (event.GetType() == us::ServiceEvent::UNREGISTERING)
     {
-      // Service is going away, disconnect DataStorage
+      MITK_DEBUG << "DataStorageService unregistering, disconnecting DataStorage from REST server";
       if (m_RestServer != nullptr)
       {
-        MITK_DEBUG << "DataStorageService unregistering, disconnecting DataStorage from REST server";
+        std::lock_guard<std::mutex> lock(m_Mutex);
         m_RestServer->SetDataStorage(nullptr);
       }
     }
@@ -284,7 +269,7 @@ private:
   std::unique_ptr<RestServer> m_RestServer;
   us::ServiceRegistration<IRestServerService> m_RestServerRegistration;
 
-  std::mutex m_DataStorageMutex;
+  std::mutex m_Mutex;
 };
 
 } // namespace mitk

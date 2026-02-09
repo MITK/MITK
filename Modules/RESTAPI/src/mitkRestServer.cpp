@@ -463,6 +463,27 @@ void RestServer::RegisterRoutes()
       m_SwaggerController->HandleGET_docs_js(req, res);
     });
 
+  m_Server->Get(apiBase + "/openapi.yaml",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_SwaggerController->HandleGET_openapi(req, res);
+    });
+
+  // Documentation endpoints (Swagger UI and OpenAPI spec)
+  m_Server->Get(apiBase + "/docs",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_SwaggerController->HandleGET_docs(req, res);
+    });
+
+  m_Server->Get(apiBase + "/docs/swagger-ui.css",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_SwaggerController->HandleGET_docs_css(req, res);
+    });
+
+  m_Server->Get(apiBase + "/docs/swagger-ui-bundle.js",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_SwaggerController->HandleGET_docs_js(req, res);
+    });
+
   m_Server->Get(apiBase + "/openapi.json",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_SwaggerController->HandleGET_openapi(req, res);

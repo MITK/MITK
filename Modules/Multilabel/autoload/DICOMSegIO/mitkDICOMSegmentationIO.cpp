@@ -626,7 +626,7 @@ namespace mitk
       OFString codeMeaning; // (0008,0104) Code Meaning
       categoryCodeSequence->getCodeMeaning(codeMeaning);
 
-      label->SetSegmentedPropertyCategory(DICOMCodeSequence(codeValue, codeScheme, codeValue));
+      label->SetSegmentedPropertyCategory(DICOMCodeSequence(codeValue, codeScheme, codeMeaning));
     }
 
     // Add Segmented Property Type Code Sequence tags
@@ -640,7 +640,7 @@ namespace mitk
       OFString codeMeaning; // (0008,0104) Code Meaning
       typeCodeSequence->getCodeMeaning(codeMeaning);
 
-      DICOMCodeSequenceWithModifiers code = DICOMCodeSequenceWithModifiers(codeValue, codeScheme, codeValue);
+      DICOMCodeSequenceWithModifiers code = DICOMCodeSequenceWithModifiers(codeValue, codeScheme, codeMeaning);
 
       // Add Segmented Property Type Modifier Code Sequence tags
       auto modifierCodeSequence = segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence();
@@ -669,8 +669,8 @@ namespace mitk
       OFString codeMeaning; // (0008,0104) Code Meaning
       atomicRegionSequence->getCodeMeaning(codeMeaning);
 
-      DICOMCodeSequenceWithModifiers code = DICOMCodeSequenceWithModifiers(codeValue, codeScheme, codeValue);
-      // Add Segmented Property Type Modifier Code Sequence tags
+      DICOMCodeSequenceWithModifiers code = DICOMCodeSequenceWithModifiers(codeValue, codeScheme, codeMeaning);
+      // Add Anatomic Region Modifier Code Sequence tags
       auto modifierCodeSequence = segmentAttribute->getAnatomicRegionModifierSequence();
       if (modifierCodeSequence != nullptr)
       {

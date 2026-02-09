@@ -583,7 +583,7 @@ namespace mitk
               segmentAttribute->setSegmentedPropertyTypeCodeSequence("M-03000", "SRT", "Mass");
             }
 
-            if (segType->GetModifierCount() > 0)
+            if (segType.has_value() && segType->GetModifierCount() > 0)
             {
               //Segment Type Modifier (DCMQI only supports one modifier
               auto segTypeMod = segType->GetModifier(0);

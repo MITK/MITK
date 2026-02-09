@@ -34,6 +34,7 @@ namespace mitk
   class DataStorageBridge;
   class HealthController;
   class DataStorageController;
+  class SwaggerController;
 
   /**
    * @brief HTTP REST server implementation.
@@ -102,6 +103,7 @@ namespace mitk
     std::unique_ptr<DataStorageBridge> m_Bridge;
     std::unique_ptr<HealthController> m_HealthController;
     std::unique_ptr<DataStorageController> m_DataStorageController;
+    std::unique_ptr<SwaggerController> m_SwaggerController;
 
     // State
     mutable std::mutex m_Mutex;

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include "mitkDataStorageBridge.h"
 #include "mitkHealthController.h"
 #include "mitkDataStorageController.h"
+#include "mitkSwaggerController.h"
 
 #include <httplib.h>
 #include <mitkIOUtil.h>
@@ -72,6 +73,7 @@ bool RestServer::Start()
     m_HealthController = std::make_unique<HealthController>(*m_Bridge);
     m_DataStorageController = std::make_unique<DataStorageController>(*m_Bridge);
     m_DataStorageController->SetTempDirectory(m_TempDirectory);
+    m_SwaggerController = std::make_unique<SwaggerController>();
 
     // Connect uptime callback to HealthController
     m_HealthController->SetUptimeCallback([this]() -> std::optional<int64_t> {
@@ -144,6 +146,7 @@ void RestServer::Stop()
     m_Server.reset();
     m_HealthController.reset();
     m_DataStorageController.reset();
+    m_SwaggerController.reset();
 
     // Clear request tracking and log
     m_ClientIPs.clear();
@@ -317,6 +320,19 @@ void RestServer::RegisterRoutes()
 {
   const std::string apiBase = "/api/v1";
 
+  // Enable CORS so browser-based clients (Swagger UI, web apps) can reach the API
+  // regardless of which hostname/port they were loaded from.
+  m_Server->set_default_headers({
+    {"Access-Control-Allow-Origin", "*"},
+    {"Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS"},
+    {"Access-Control-Allow-Headers", "Content-Type, Accept, Authorization, X-MITK-Transfer-Mode"}
+  });
+
+  // Handle preflight OPTIONS requests for any route
+  m_Server->Options(".*", [](const httplib::Request& /*req*/, httplib::Response& res) {
+    res.status = 204;
+  });
+
   // Health endpoints
   m_Server->Get(apiBase + "/health",
     [this](const httplib::Request& req, httplib::Response& res) {
@@ -429,6 +445,27 @@ void RestServer::RegisterRoutes()
     [this](const httplib::Request& req, httplib::Response& res) {
       m_DataStorageController->HandlePATCH_nodes_uid_properties(req, res);
       this->RecordRequest(req.path, "PATCH", res.status, req.remote_addr);
+    });
+
+  // Documentation endpoints (Swagger UI and OpenAPI spec)
+  m_Server->Get(apiBase + "/docs",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_SwaggerController->HandleGET_docs(req, res);
+    });
+
+  m_Server->Get(apiBase + "/docs/swagger-ui.css",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_SwaggerController->HandleGET_docs_css(req, res);
+    });
+
+  m_Server->Get(apiBase + "/docs/swagger-ui-bundle.js",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_SwaggerController->HandleGET_docs_js(req, res);
+    });
+
+  m_Server->Get(apiBase + "/openapi.yaml",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_SwaggerController->HandleGET_openapi(req, res);
     });
 }
 

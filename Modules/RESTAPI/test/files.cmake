@@ -5,4 +5,5 @@ set(MODULE_TESTS
   mitkHealthControllerTest.cpp
   mitkDataStorageControllerTest.cpp
   mitkDataStorageControllerDataTest.cpp
+  mitkApiConformanceTest.cpp
 )

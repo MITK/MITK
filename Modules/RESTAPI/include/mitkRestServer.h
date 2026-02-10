@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <MitkRESTAPIExports.h>
 #include <mitkIRestServerService.h>
+#include <mitkStorageThreadDispatcherBase.h>
 
 #include <memory>
 #include <thread>
@@ -62,6 +63,16 @@ namespace mitk
 
     void SetDataStorage(DataStorage* dataStorage) override;
     DataStorage* GetDataStorage() const override;
+
+    /**
+     * @brief Set the thread dispatcher for DataStorage operations.
+     *
+     * Forwards to the internal DataStorageBridge. If set, all bridge operations
+     * are dispatched to the storage-owning thread.
+     *
+     * @param dispatcher The dispatcher, or nullptr to clear.
+     */
+    void SetDispatcher(StorageThreadDispatcherBase* dispatcher);
 
     std::optional<std::string> GetServerUrl() const override;
     std::optional<std::string> GetLastError() const override;

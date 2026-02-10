@@ -292,6 +292,41 @@ namespace mitk
 
   DataStorageBridge::~DataStorageBridge() = default;
 
+  void DataStorageBridge::SetDispatcher(StorageThreadDispatcherBase* dispatcher)
+  {
+    std::lock_guard<std::mutex> lock(m_Mutex);
+    m_Dispatcher = dispatcher;
+  }
+
+  void DataStorageBridge::DispatchTask(std::function<void()> task) const
+  {
+    auto dispatcher = m_Dispatcher.Lock();
+
+    if (dispatcher.IsNotNull() && !dispatcher->IsDispatchThread())
+    {
+      dispatcher->Execute(std::move(task));
+    }
+    else
+    {
+      task();
+    }
+  }
+
+  template <typename R>
+  R DataStorageBridge::DispatchTask(std::function<R()> task) const
+  {
+    auto dispatcher = m_Dispatcher.Lock();
+
+    if (dispatcher.IsNotNull() && !dispatcher->IsDispatchThread())
+    {
+      return dispatcher->ExecuteWithResult<R>(std::move(task));
+    }
+    else
+    {
+      return task();
+    }
+  }
+
   void DataStorageBridge::SetDataStorage(DataStorage* dataStorage)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
@@ -441,421 +476,435 @@ namespace mitk
   DataStorageBridge::NodeQueryResult DataStorageBridge::GetNodes(const NodeQueryParams& params) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    NodeQueryResult result;
-    result.nodes = Json::array();
-    result.totalCount = 0;
-    result.limit = params.limit;
-    result.offset = params.offset;
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<NodeQueryResult>([this, &params]()
     {
-      return result;
-    }
+      NodeQueryResult result;
+      result.nodes = Json::array();
+      result.totalCount = 0;
+      result.limit = params.limit;
+      result.offset = params.offset;
 
-    // Build predicate from query parameters
-    auto predicate = this->BuildNodePredicate(params);
-
-    // Get filtered nodes using the predicate
-    auto filteredNodes = dataStorage->GetSubset(predicate);
-
-    // Convert to vector for sorting and pagination
-    std::vector<DataNode*> matchingNodes;
-    matchingNodes.reserve(filteredNodes->Size());
-    for (auto it = filteredNodes->Begin(); it != filteredNodes->End(); ++it)
-    {
-      matchingNodes.push_back(it->Value().GetPointer());
-    }
-
-    // Apply sorting if specified
-    // Sorting is done by JSON result fields: uid, name, path, parent_uid, data_type, children_count, timestamp
-    if (params.sort.has_value())
-    {
-      const auto& sortSpec = params.sort.value();
-      std::sort(matchingNodes.begin(), matchingNodes.end(),
-        [this, &sortSpec, &dataStorage](DataNode* a, DataNode* b) {
-          const std::string& field = sortSpec.field;
-
-          // Handle numeric fields (children_count, timestamp)
-          if (field == "children_count")
-          {
-            int countA = this->GetChildrenCount(a);
-            int countB = this->GetChildrenCount(b);
-            return sortSpec.ascending ? (countA < countB) : (countA > countB);
-          }
-          else if (field == "timestamp")
-          {
-            unsigned long timeA = a->GetMTime();
-            unsigned long timeB = b->GetMTime();
-            return sortSpec.ascending ? (timeA < timeB) : (timeA > timeB);
-          }
-
-          // Handle string fields
-          std::string valA, valB;
-
-          if (field == "uid")
-          {
-            valA = m_UidMapper->GetOrCreateUid(a);
-            valB = m_UidMapper->GetOrCreateUid(b);
-          }
-          else if (field == "name")
-          {
-            valA = a->GetName();
-            valB = b->GetName();
-          }
-          else if (field == "path")
-          {
-            valA = this->BuildNodePath(a);
-            valB = this->BuildNodePath(b);
-          }
-          else if (field == "parent_uid")
-          {
-            auto sourcesA = dataStorage->GetSources(a);
-            auto sourcesB = dataStorage->GetSources(b);
-            valA = (sourcesA->Size() > 0) ? m_UidMapper->GetOrCreateUid(sourcesA->ElementAt(0)) : "";
-            valB = (sourcesB->Size() > 0) ? m_UidMapper->GetOrCreateUid(sourcesB->ElementAt(0)) : "";
-          }
-          else if (field == "data_type")
-          {
-            auto dataA = a->GetData();
-            auto dataB = b->GetData();
-            valA = dataA ? dataA->GetNameOfClass() : "";
-            valB = dataB ? dataB->GetNameOfClass() : "";
-          }
-          else
-          {
-            // Unknown field - no sorting
-            return false;
-          }
-
-          return sortSpec.ascending ? (valA < valB) : (valA > valB);
-        });
-    }
-
-    // Store total count before pagination
-    result.totalCount = static_cast<int>(matchingNodes.size());
-
-    // Apply pagination
-    int startIdx = std::min(params.offset, static_cast<int>(matchingNodes.size()));
-    int endIdx = std::min(params.offset + params.limit, static_cast<int>(matchingNodes.size()));
-
-    // Build result with optional field selection
-    for (int i = startIdx; i < endIdx; ++i)
-    {
-      Json nodeJson = this->NodeToJson(matchingNodes[i]);
-
-      if (!params.fields.empty())
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
       {
-        Json filtered = Json::object();
-        for (const auto& field : params.fields)
+        return result;
+      }
+
+      // Build predicate from query parameters
+      auto predicate = this->BuildNodePredicate(params);
+
+      // Get filtered nodes using the predicate
+      auto filteredNodes = dataStorage->GetSubset(predicate);
+
+      // Convert to vector for sorting and pagination
+      std::vector<DataNode*> matchingNodes;
+      matchingNodes.reserve(filteredNodes->Size());
+      for (auto it = filteredNodes->Begin(); it != filteredNodes->End(); ++it)
+      {
+        matchingNodes.push_back(it->Value().GetPointer());
+      }
+
+      // Apply sorting if specified
+      // Sorting is done by JSON result fields: uid, name, path, parent_uid, data_type, children_count, timestamp
+      if (params.sort.has_value())
+      {
+        const auto& sortSpec = params.sort.value();
+        std::sort(matchingNodes.begin(), matchingNodes.end(),
+          [this, &sortSpec, &dataStorage](DataNode* a, DataNode* b) {
+            const std::string& field = sortSpec.field;
+
+            // Handle numeric fields (children_count, timestamp)
+            if (field == "children_count")
+            {
+              int countA = this->GetChildrenCount(a);
+              int countB = this->GetChildrenCount(b);
+              return sortSpec.ascending ? (countA < countB) : (countA > countB);
+            }
+            else if (field == "timestamp")
+            {
+              unsigned long timeA = a->GetMTime();
+              unsigned long timeB = b->GetMTime();
+              return sortSpec.ascending ? (timeA < timeB) : (timeA > timeB);
+            }
+
+            // Handle string fields
+            std::string valA, valB;
+
+            if (field == "uid")
+            {
+              valA = m_UidMapper->GetOrCreateUid(a);
+              valB = m_UidMapper->GetOrCreateUid(b);
+            }
+            else if (field == "name")
+            {
+              valA = a->GetName();
+              valB = b->GetName();
+            }
+            else if (field == "path")
+            {
+              valA = this->BuildNodePath(a);
+              valB = this->BuildNodePath(b);
+            }
+            else if (field == "parent_uid")
+            {
+              auto sourcesA = dataStorage->GetSources(a);
+              auto sourcesB = dataStorage->GetSources(b);
+              valA = (sourcesA->Size() > 0) ? m_UidMapper->GetOrCreateUid(sourcesA->ElementAt(0)) : "";
+              valB = (sourcesB->Size() > 0) ? m_UidMapper->GetOrCreateUid(sourcesB->ElementAt(0)) : "";
+            }
+            else if (field == "data_type")
+            {
+              auto dataA = a->GetData();
+              auto dataB = b->GetData();
+              valA = dataA ? dataA->GetNameOfClass() : "";
+              valB = dataB ? dataB->GetNameOfClass() : "";
+            }
+            else
+            {
+              // Unknown field - no sorting
+              return false;
+            }
+
+            return sortSpec.ascending ? (valA < valB) : (valA > valB);
+          });
+      }
+
+      // Store total count before pagination
+      result.totalCount = static_cast<int>(matchingNodes.size());
+
+      // Apply pagination
+      int startIdx = std::min(params.offset, static_cast<int>(matchingNodes.size()));
+      int endIdx = std::min(params.offset + params.limit, static_cast<int>(matchingNodes.size()));
+
+      // Build result with optional field selection
+      for (int i = startIdx; i < endIdx; ++i)
+      {
+        Json nodeJson = this->NodeToJson(matchingNodes[i]);
+
+        if (!params.fields.empty())
         {
-          if (nodeJson.contains(field))
+          Json filtered = Json::object();
+          for (const auto& field : params.fields)
           {
-            filtered[field] = nodeJson[field];
+            if (nodeJson.contains(field))
+            {
+              filtered[field] = nodeJson[field];
+            }
           }
+          result.nodes.push_back(filtered);
         }
-        result.nodes.push_back(filtered);
+        else
+        {
+          result.nodes.push_back(nodeJson);
+        }
       }
-      else
-      {
-        result.nodes.push_back(nodeJson);
-      }
-    }
 
-    return result;
+      return result;
+    });
   }
 
   std::optional<DataStorageBridge::Json> DataStorageBridge::GetNode(const std::string& uid) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<std::optional<Json>>([this, &uid]()
     {
-      return std::nullopt;
-    }
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
+      {
+        return std::optional<Json>(std::nullopt);
+      }
 
-    auto node = m_UidMapper->FindNodeByUid(uid);
-    if (node == nullptr)
-    {
-      return std::nullopt;
-    }
+      auto node = m_UidMapper->FindNodeByUid(uid);
+      if (node == nullptr)
+      {
+        return std::optional<Json>(std::nullopt);
+      }
 
-    return this->NodeToJson(node);
+      return std::optional<Json>(this->NodeToJson(node));
+    });
   }
 
   DataStorageBridge::CreateNodeResult DataStorageBridge::CreateNode(const Json& nodeData, const std::optional<std::string>& parentUid)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    CreateNodeResult result;
-    result.success = false;
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<CreateNodeResult>([this, &nodeData, &parentUid]()
     {
-      return result;
-    }
+      CreateNodeResult result;
+      result.success = false;
 
-    // Find parent node if specified
-    DataNode* parentNode = nullptr;
-    if (parentUid.has_value())
-    {
-      parentNode = m_UidMapper->FindNodeByUid(parentUid.value());
-      if (parentNode == nullptr)
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
       {
-        return result;  // Parent not found
+        return result;
       }
-    }
 
-    auto node = DataNode::New();
-
-    // Set name if provided
-    if (nodeData.contains("name") && nodeData["name"].is_string())
-    {
-      node->SetName(nodeData["name"].get<std::string>());
-    }
-
-    // Apply properties if provided
-    if (nodeData.contains("properties") && nodeData["properties"].is_object())
-    {
-      for (auto& [key, value] : nodeData["properties"].items())
+      // Find parent node if specified
+      DataNode* parentNode = nullptr;
+      if (parentUid.has_value())
       {
-        try
+        parentNode = m_UidMapper->FindNodeByUid(parentUid.value());
+        if (parentNode == nullptr)
         {
-          auto prop = ConvertPropertyFromSelfContainedJson(value);
-          if (prop.IsNotNull())
+          return result;  // Parent not found
+        }
+      }
+
+      auto node = DataNode::New();
+
+      // Set name if provided
+      if (nodeData.contains("name") && nodeData["name"].is_string())
+      {
+        node->SetName(nodeData["name"].get<std::string>());
+      }
+
+      // Apply properties if provided
+      if (nodeData.contains("properties") && nodeData["properties"].is_object())
+      {
+        for (auto& [key, value] : nodeData["properties"].items())
+        {
+          try
           {
-            node->SetProperty(key, prop);
+            auto prop = ConvertPropertyFromSelfContainedJson(value);
+            if (prop.IsNotNull())
+            {
+              node->SetProperty(key, prop);
+            }
+            else
+            {
+              MITK_WARN << "REST API: Failed to deserialize property '" << key << "' - null result from deserialization";
+              result.failedProperties.push_back(key);
+            }
           }
-          else
+          catch (const std::exception& e)
           {
-            MITK_WARN << "REST API: Failed to deserialize property '" << key << "' - null result from deserialization";
+            MITK_WARN << "REST API: Failed to deserialize property '" << key << "': " << e.what();
             result.failedProperties.push_back(key);
           }
         }
-        catch (const std::exception& e)
-        {
-          MITK_WARN << "REST API: Failed to deserialize property '" << key << "': " << e.what();
-          result.failedProperties.push_back(key);
-        }
       }
-    }
 
-    // Add to DataStorage (with or without parent)
-    if (parentNode != nullptr)
-    {
-      dataStorage->Add(node, parentNode);
-    }
-    else
-    {
-      dataStorage->Add(node);
-    }
+      // Add to DataStorage (with or without parent)
+      if (parentNode != nullptr)
+      {
+        dataStorage->Add(node, parentNode);
+      }
+      else
+      {
+        dataStorage->Add(node);
+      }
 
-    // Get/create UID for the new node
-    result.uid = m_UidMapper->GetOrCreateUid(node);
-    result.success = true;
+      // Get/create UID for the new node
+      result.uid = m_UidMapper->GetOrCreateUid(node);
+      result.success = true;
 
-    // Mark node as modified via REST API
-    MarkNodeAsModified(node, "created");
+      // Mark node as modified via REST API
+      MarkNodeAsModified(node, "created");
 
-    return result;
+      return result;
+    });
   }
 
   bool DataStorageBridge::UpdateNode(const std::string& uid, const Json& updates)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<bool>([this, &uid, &updates]()
     {
-      return false;
-    }
-
-    mitk::DataNode::Pointer node = m_UidMapper->FindNodeByUid(uid);
-    if (node == nullptr)
-    {
-      return false;
-    }
-
-    // Handle parent_uid for reparenting
-    if (!updates.contains("parent_uid"))
-    {
-      return false;
-    }
-
-    DataNode* newParent = nullptr;
-    if (!updates["parent_uid"].is_null())
-    {
-      std::string newParentUid = updates["parent_uid"].get<std::string>();
-      newParent = m_UidMapper->FindNodeByUid(newParentUid);
-    }
-
-    if (newParent == node)
-    { // Prevent circular references: new parent cannot be the node itself or a descendant
-      return false;
-    }
-
-    // Check if newParent is a descendant of node
-    auto descendants = dataStorage->GetDerivations(node, nullptr, true);
-    for (auto it = descendants->Begin(); it != descendants->End(); ++it)
-    {
-      if (it->Value().GetPointer() == newParent)
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
       {
-        return false;  // Would create circular reference
+        return false;
       }
-    }
 
-    // Reparent: remove and re-add under new parent
-    // This is the same approach used by QmitkDataStorageTreeModel
-    //
-    // Important: Preserve the UID across reparenting operation.
-    // The NodeUidMapper clears mappings when a node is removed from DataStorage,
-    // so we save the UID and restore the mapping after re-adding.
-    const std::string preservedUid = uid;
+      mitk::DataNode::Pointer node = m_UidMapper->FindNodeByUid(uid);
+      if (node == nullptr)
+      {
+        return false;
+      }
 
-    dataStorage->Remove(node);
-    if (newParent != nullptr)
-    {
-      dataStorage->Add(node, newParent);
-    }
-    else
-    {
-      dataStorage->Add(node);  // Move to root level
-    }
+      // Handle parent_uid for reparenting
+      if (!updates.contains("parent_uid"))
+      {
+        return false;
+      }
 
-    m_UidMapper->RestoreUid(node, preservedUid);
+      DataNode* newParent = nullptr;
+      if (!updates["parent_uid"].is_null())
+      {
+        std::string newParentUid = updates["parent_uid"].get<std::string>();
+        newParent = m_UidMapper->FindNodeByUid(newParentUid);
+      }
 
-    MarkNodeAsModified(node, "reparented");
+      if (newParent == node)
+      { // Prevent circular references: new parent cannot be the node itself or a descendant
+        return false;
+      }
 
-    return true;
+      // Check if newParent is a descendant of node
+      auto descendants = dataStorage->GetDerivations(node, nullptr, true);
+      for (auto it = descendants->Begin(); it != descendants->End(); ++it)
+      {
+        if (it->Value().GetPointer() == newParent)
+        {
+          return false;  // Would create circular reference
+        }
+      }
+
+      // Reparent: remove and re-add under new parent
+      // This is the same approach used by QmitkDataStorageTreeModel
+      //
+      // Important: Preserve the UID across reparenting operation.
+      // The NodeUidMapper clears mappings when a node is removed from DataStorage,
+      // so we save the UID and restore the mapping after re-adding.
+      const std::string preservedUid = uid;
+
+      dataStorage->Remove(node);
+      if (newParent != nullptr)
+      {
+        dataStorage->Add(node, newParent);
+      }
+      else
+      {
+        dataStorage->Add(node);  // Move to root level
+      }
+
+      m_UidMapper->RestoreUid(node, preservedUid);
+
+      MarkNodeAsModified(node, "reparented");
+
+      return true;
+    });
   }
 
   DataStorageBridge::DeleteResult DataStorageBridge::DeleteNode(const std::string& uid, bool recursive)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    DeleteResult result;
-    result.success = false;
-    result.deletedUid = uid;
-    result.childrenCount = 0;
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<DeleteResult>([this, &uid, recursive]()
     {
-      return result;
-    }
+      DeleteResult result;
+      result.success = false;
+      result.deletedUid = uid;
+      result.childrenCount = 0;
 
-    auto node = m_UidMapper->FindNodeByUid(uid);
-    if (node == nullptr)
-    {
-      return result;
-    }
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
+      {
+        return result;
+      }
 
-    // Check for children
-    auto derivatives = dataStorage->GetDerivations(node);
-    result.childrenCount = static_cast<int>(derivatives->Size());
+      auto node = m_UidMapper->FindNodeByUid(uid);
+      if (node == nullptr)
+      {
+        return result;
+      }
 
-    if (result.childrenCount > 0 && !recursive)
-    {
-      // Has children but recursive not requested
-      return result;
-    }
+      // Check for children
+      auto derivatives = dataStorage->GetDerivations(node);
+      result.childrenCount = static_cast<int>(derivatives->Size());
 
-    // If recursive, collect and delete all descendants first
-    if (recursive && result.childrenCount > 0)
-    {
-      // Collect all descendants (depth-first)
-      std::vector<DataNode*> toDelete;
-      std::function<void(DataNode*)> collectDescendants = [&](DataNode* n) {
-        auto children = dataStorage->GetDerivations(n);
-        for (auto it = children->Begin(); it != children->End(); ++it)
+      if (result.childrenCount > 0 && !recursive)
+      {
+        // Has children but recursive not requested
+        return result;
+      }
+
+      // If recursive, collect and delete all descendants first
+      if (recursive && result.childrenCount > 0)
+      {
+        // Collect all descendants (depth-first)
+        std::vector<DataNode*> toDelete;
+        std::function<void(DataNode*)> collectDescendants = [&](DataNode* n) {
+          auto children = dataStorage->GetDerivations(n);
+          for (auto it = children->Begin(); it != children->End(); ++it)
+          {
+            collectDescendants(it->Value().GetPointer());
+          }
+          toDelete.push_back(n);
+        };
+
+        // Collect children (not the node itself yet)
+        for (auto it = derivatives->Begin(); it != derivatives->End(); ++it)
         {
           collectDescendants(it->Value().GetPointer());
         }
-        toDelete.push_back(n);
-      };
 
-      // Collect children (not the node itself yet)
-      for (auto it = derivatives->Begin(); it != derivatives->End(); ++it)
-      {
-        collectDescendants(it->Value().GetPointer());
+        // Delete all descendants (children first, then grandchildren, etc.)
+        for (auto descendant : toDelete)
+        {
+          // Use GetOrCreateUid to ensure all deleted children have UIDs for reporting
+          result.deletedChildren.push_back(m_UidMapper->GetOrCreateUid(descendant));
+          dataStorage->Remove(descendant);
+        }
       }
 
-      // Delete all descendants (children first, then grandchildren, etc.)
-      for (auto descendant : toDelete)
-      {
-        // Use GetOrCreateUid to ensure all deleted children have UIDs for reporting
-        result.deletedChildren.push_back(m_UidMapper->GetOrCreateUid(descendant));
-        dataStorage->Remove(descendant);
-      }
-    }
+      // Delete the node itself
+      dataStorage->Remove(node);
+      result.success = true;
 
-    // Delete the node itself
-    dataStorage->Remove(node);
-    result.success = true;
-
-    return result;
+      return result;
+    });
   }
 
   DataStorageBridge::GetNodeDataResult DataStorageBridge::GetNodeData(const std::string& uid) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    GetNodeDataResult result;
-    result.nodeFound = false;
-    result.data = nullptr;
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<GetNodeDataResult>([this, &uid]()
     {
+      GetNodeDataResult result;
+      result.nodeFound = false;
+      result.data = nullptr;
+
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
+      {
+        return result;
+      }
+
+      auto node = m_UidMapper->FindNodeByUid(uid);
+      if (node == nullptr)
+      {
+        return result;  // nodeFound = false
+      }
+
+      result.nodeFound = true;
+
+      auto data = node->GetData();
+      if (data == nullptr)
+      {
+        return result;  // nodeFound = true, data = nullptr
+      }
+
+      // Clone the data for thread-safe processing outside the lock
+      // This allows the caller to serialize/process the data without
+      // blocking other DataStorage operations
+      result.data = dynamic_cast<BaseData*>(data->Clone().GetPointer());
       return result;
-    }
-
-    auto node = m_UidMapper->FindNodeByUid(uid);
-    if (node == nullptr)
-    {
-      return result;  // nodeFound = false
-    }
-
-    result.nodeFound = true;
-
-    auto data = node->GetData();
-    if (data == nullptr)
-    {
-      return result;  // nodeFound = true, data = nullptr
-    }
-
-    // Clone the data for thread-safe processing outside the lock
-    // This allows the caller to serialize/process the data without
-    // blocking other DataStorage operations
-    result.data = dynamic_cast<BaseData*>(data->Clone().GetPointer());
-    return result;
+    });
   }
 
   bool DataStorageBridge::SetNodeData(const std::string& uid, BaseData* data)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<bool>([this, &uid, data]()
     {
-      return false;
-    }
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
+      {
+        return false;
+      }
 
-    auto node = m_UidMapper->FindNodeByUid(uid);
-    if (node == nullptr)
-    {
-      return false;
-    }
+      auto node = m_UidMapper->FindNodeByUid(uid);
+      if (node == nullptr)
+      {
+        return false;
+      }
 
-    node->SetData(data);
+      node->SetData(data);
 
-    // Mark node as modified via REST API
-    MarkNodeAsModified(node, "data_set");
+      // Mark node as modified via REST API
+      MarkNodeAsModified(node, "data_set");
 
-    return true;
+      return true;
+    });
   }
 
   std::optional<DataStorageBridge::Json> DataStorageBridge::GetNodeProperties(
@@ -863,98 +912,100 @@ namespace mitk
     const PropertyQueryParams& params) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<std::optional<Json>>([this, &uid, &params]()
     {
-      return std::nullopt;
-    }
-
-    auto node = m_UidMapper->FindNodeByUid(uid);
-    if (node == nullptr)
-    {
-      return std::nullopt;
-    }
-
-    std::string contextName = params.context.has_value() ? params.context.value() : "";
-
-    // Get properties based on scope
-    // Note: Data properties require BaseData access which may not always be available
-    PropertyList* propertyList = nullptr;
-
-    if (params.scope == PropertyScope::Node || params.scope == PropertyScope::All)
-    {
-      propertyList = node->GetPropertyList(contextName);
-    }
-
-    if (params.scope == PropertyScope::Data || (propertyList == nullptr && params.scope == PropertyScope::All))
-    {
-      auto data = node->GetData();
-      if (data != nullptr)
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
       {
-        propertyList = data->GetPropertyList();
+        return std::optional<Json>(std::nullopt);
       }
-    }
 
-    if (propertyList == nullptr)
-    {
-      return Json::object();
-    }
-
-    // Check if we should return content or just names
-    if (!params.includeContent)
-    {
-      // Return just property names as array
-      Json names = Json::array();
-      auto propMap = propertyList->GetMap();
-      for (auto it = propMap->begin(); it != propMap->end(); ++it)
+      auto node = m_UidMapper->FindNodeByUid(uid);
+      if (node == nullptr)
       {
-        // Skip internal properties (restapi.*)
-        if (IsInternalProperty(it->first))
-        {
-          continue;
-        }
+        return std::optional<Json>(std::nullopt);
+      }
 
-        // Filter by names if specified
-        if (params.names.empty() ||
-            std::find(params.names.begin(), params.names.end(), it->first) != params.names.end())
+      std::string contextName = params.context.has_value() ? params.context.value() : "";
+
+      // Get properties based on scope
+      // Note: Data properties require BaseData access which may not always be available
+      PropertyList* propertyList = nullptr;
+
+      if (params.scope == PropertyScope::Node || params.scope == PropertyScope::All)
+      {
+        propertyList = node->GetPropertyList(contextName);
+      }
+
+      if (params.scope == PropertyScope::Data || (propertyList == nullptr && params.scope == PropertyScope::All))
+      {
+        auto data = node->GetData();
+        if (data != nullptr)
         {
-          names.push_back(it->first);
+          propertyList = data->GetPropertyList();
         }
       }
-      return names;
-    }
 
-    Json result = ConvertPropertyListToSelfContainedJson(propertyList);
-
-    // Remove internal properties (restapi.*)
-    for (auto it = result.begin(); it != result.end(); )
-    {
-      if (IsInternalProperty(it.key()))
+      if (propertyList == nullptr)
       {
-        it = result.erase(it);
+        return std::optional<Json>(Json::object());
       }
-      else
-      {
-        ++it;
-      }
-    }
 
-    // Filter by names if specified
-    if (!params.names.empty())
-    {
-      Json filtered = Json::object();
-      for (const auto& name : params.names)
+      // Check if we should return content or just names
+      if (!params.includeContent)
       {
-        if (result.contains(name))
+        // Return just property names as array
+        Json names = Json::array();
+        auto propMap = propertyList->GetMap();
+        for (auto it = propMap->begin(); it != propMap->end(); ++it)
         {
-          filtered[name] = result[name];
+          // Skip internal properties (restapi.*)
+          if (IsInternalProperty(it->first))
+          {
+            continue;
+          }
+
+          // Filter by names if specified
+          if (params.names.empty() ||
+              std::find(params.names.begin(), params.names.end(), it->first) != params.names.end())
+          {
+            names.push_back(it->first);
+          }
+        }
+        return std::optional<Json>(names);
+      }
+
+      Json result = ConvertPropertyListToSelfContainedJson(propertyList);
+
+      // Remove internal properties (restapi.*)
+      for (auto it = result.begin(); it != result.end(); )
+      {
+        if (IsInternalProperty(it.key()))
+        {
+          it = result.erase(it);
+        }
+        else
+        {
+          ++it;
         }
       }
-      return filtered;
-    }
 
-    return result;
+      // Filter by names if specified
+      if (!params.names.empty())
+      {
+        Json filtered = Json::object();
+        for (const auto& name : params.names)
+        {
+          if (result.contains(name))
+          {
+            filtered[name] = result[name];
+          }
+        }
+        return std::optional<Json>(filtered);
+      }
+
+      return std::optional<Json>(result);
+    });
   }
 
   std::optional<DataStorageBridge::Json> DataStorageBridge::GetNodeProperty(
@@ -962,37 +1013,39 @@ namespace mitk
     const std::string& key,
     const PropertyQueryParams& params) const
   {
-    // Reject access to internal properties
+    // Reject access to internal properties (no dispatch needed for this check)
     if (IsInternalProperty(key))
     {
       return std::nullopt;
     }
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<std::optional<Json>>([this, &uid, &key, &params]()
     {
-      return std::nullopt;
-    }
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
+      {
+        return std::optional<Json>(std::nullopt);
+      }
 
-    auto node = m_UidMapper->FindNodeByUid(uid);
-    if (node == nullptr)
-    {
-      return std::nullopt;
-    }
+      auto node = m_UidMapper->FindNodeByUid(uid);
+      if (node == nullptr)
+      {
+        return std::optional<Json>(std::nullopt);
+      }
 
-    auto prop = GetConstProperty(node, key, params.context, params.scope);
+      auto prop = GetConstProperty(node, key, params.context, params.scope);
 
-    if (prop == nullptr)
-    {
-      return std::nullopt;
-    }
+      if (prop == nullptr)
+      {
+        return std::optional<Json>(std::nullopt);
+      }
 
-    Json result = Json::object();
-    result[key] = ConvertPropertyToSelfContainedJson(prop);
+      Json result = Json::object();
+      result[key] = ConvertPropertyToSelfContainedJson(prop);
 
-    return result;
+      return std::optional<Json>(result);
+    });
   }
 
   bool DataStorageBridge::SetNodeProperty(
@@ -1001,67 +1054,69 @@ namespace mitk
     const Json& value,
     const PropertyQueryParams& params)
   {
-    // Reject modification of internal properties
+    // Reject modification of internal properties (no dispatch needed for this check)
     if (IsInternalProperty(key))
     {
       return false;
     }
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<bool>([this, &uid, &key, &value, &params]()
     {
-      return false;
-    }
-
-    auto node = m_UidMapper->FindNodeByUid(uid);
-    if (node == nullptr)
-    {
-      return false;
-    }
-
-    try
-    {
-      // Handle the case the also simple value forms are wrapped in {"value": ...}
-      Json propValue = value;
-      if (value.is_object() && value.contains("value") && !value.contains("type"))
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
       {
-         propValue = value["value"];
+        return false;
       }
-      auto prop = ConvertPropertyFromSelfContainedJson(propValue);
-      if (prop.IsNotNull())
-      {
-        std::string contextName = params.context.has_value() ? params.context.value() : "";
 
-        if (params.scope == PropertyScope::Data)
+      auto node = m_UidMapper->FindNodeByUid(uid);
+      if (node == nullptr)
+      {
+        return false;
+      }
+
+      try
+      {
+        // Handle the case the also simple value forms are wrapped in {"value": ...}
+        Json propValue = value;
+        if (value.is_object() && value.contains("value") && !value.contains("type"))
         {
-          auto data = node->GetData();
-          if (data != nullptr)
+           propValue = value["value"];
+        }
+        auto prop = ConvertPropertyFromSelfContainedJson(propValue);
+        if (prop.IsNotNull())
+        {
+          std::string contextName = params.context.has_value() ? params.context.value() : "";
+
+          if (params.scope == PropertyScope::Data)
           {
-            data->SetProperty(key, prop, contextName);
+            auto data = node->GetData();
+            if (data != nullptr)
+            {
+              data->SetProperty(key, prop, contextName);
+              // Mark node as modified via REST API
+              MarkNodeAsModified(node, "property_set:" + key);
+              return true;
+            }
+            return false;
+          }
+          else
+          {
+            // Default to node scope (or "all" which defaults to node)
+            node->SetProperty(key, prop, contextName);
             // Mark node as modified via REST API
             MarkNodeAsModified(node, "property_set:" + key);
             return true;
           }
-          return false;
-        }
-        else
-        {
-          // Default to node scope (or "all" which defaults to node)
-          node->SetProperty(key, prop, contextName);
-          // Mark node as modified via REST API
-          MarkNodeAsModified(node, "property_set:" + key);
-          return true;
         }
       }
-    }
-    catch (const std::exception&)
-    {
-      return false;
-    }
+      catch (const std::exception&)
+      {
+        return false;
+      }
 
-    return false;
+      return false;
+    });
   }
 
   bool DataStorageBridge::DeleteNodeProperty(
@@ -1069,60 +1124,62 @@ namespace mitk
     const std::string& key,
     const PropertyQueryParams& params)
   {
-    // Reject deletion of internal properties
+    // Reject deletion of internal properties (no dispatch needed for this check)
     if (IsInternalProperty(key))
     {
       return false;
     }
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<bool>([this, &uid, &key, &params]()
     {
-      return false;
-    }
-
-    auto node = m_UidMapper->FindNodeByUid(uid);
-    if (node == nullptr)
-    {
-      return false;
-    }
-
-    std::string contextName = params.context.has_value() ? params.context.value() : "";
-    PropertyList* propertyList = nullptr;
-
-    if (params.scope == PropertyScope::Data)
-    {
-      auto data = node->GetData();
-      if (data != nullptr)
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
       {
-        propertyList = data->GetPropertyList();
+        return false;
       }
-    }
-    else
-    {
-      // Default to node scope (or "all" which defaults to node)
-      propertyList = node->GetPropertyList(contextName);
-    }
 
-    if (propertyList == nullptr)
-    {
-      return false;
-    }
+      auto node = m_UidMapper->FindNodeByUid(uid);
+      if (node == nullptr)
+      {
+        return false;
+      }
 
-    // Check if property exists
-    if (propertyList->GetProperty(key) == nullptr)
-    {
-      return false;
-    }
+      std::string contextName = params.context.has_value() ? params.context.value() : "";
+      PropertyList* propertyList = nullptr;
 
-    propertyList->DeleteProperty(key);
+      if (params.scope == PropertyScope::Data)
+      {
+        auto data = node->GetData();
+        if (data != nullptr)
+        {
+          propertyList = data->GetPropertyList();
+        }
+      }
+      else
+      {
+        // Default to node scope (or "all" which defaults to node)
+        propertyList = node->GetPropertyList(contextName);
+      }
 
-    // Mark node as modified via REST API
-    MarkNodeAsModified(node, "property_deleted:" + key);
+      if (propertyList == nullptr)
+      {
+        return false;
+      }
 
-    return true;
+      // Check if property exists
+      if (propertyList->GetProperty(key) == nullptr)
+      {
+        return false;
+      }
+
+      propertyList->DeleteProperty(key);
+
+      // Mark node as modified via REST API
+      MarkNodeAsModified(node, "property_deleted:" + key);
+
+      return true;
+    });
   }
 
   std::optional<DataStorageBridge::Json> DataStorageBridge::ReplaceNodeProperties(
@@ -1131,141 +1188,145 @@ namespace mitk
     const PropertyQueryParams& params)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<std::optional<Json>>([this, &uid, &properties, &params]()
     {
-      return std::nullopt;
-    }
-
-    auto node = m_UidMapper->FindNodeByUid(uid);
-    if (node == nullptr)
-    {
-      return std::nullopt;
-    }
-
-    if (!properties.is_object())
-    {
-      return std::nullopt;
-    }
-
-    std::string contextName = params.context.has_value() ? params.context.value() : "";
-    PropertyList* propertyList = nullptr;
-
-    if (params.scope == PropertyScope::Data)
-    {
-      auto data = node->GetData();
-      if (data != nullptr)
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
       {
-        propertyList = data->GetPropertyList();
-      }
-    }
-    else
-    {
-      propertyList = node->GetPropertyList(contextName);
-    }
-
-    if (propertyList == nullptr)
-    {
-      return std::nullopt;
-    }
-
-    // Collect existing property names
-    std::vector<std::string> existingNames;
-    auto propMap = propertyList->GetMap();
-    for (auto it = propMap->begin(); it != propMap->end(); ++it)
-    {
-      existingNames.push_back(it->first);
-    }
-
-    // Track what was replaced vs removed
-    std::vector<std::string> replaced;
-    std::vector<std::string> removed;
-
-    // Set new properties (skip internal properties - clients cannot set them)
-    for (auto& [key, value] : properties.items())
-    {
-      // Skip internal properties
-      if (IsInternalProperty(key))
-      {
-        continue;
+        return std::optional<Json>(std::nullopt);
       }
 
-      try
+      auto node = m_UidMapper->FindNodeByUid(uid);
+      if (node == nullptr)
       {
-        auto prop = ConvertPropertyFromSelfContainedJson(value);
-        if (prop.IsNotNull())
+        return std::optional<Json>(std::nullopt);
+      }
+
+      if (!properties.is_object())
+      {
+        return std::optional<Json>(std::nullopt);
+      }
+
+      std::string contextName = params.context.has_value() ? params.context.value() : "";
+      PropertyList* propertyList = nullptr;
+
+      if (params.scope == PropertyScope::Data)
+      {
+        auto data = node->GetData();
+        if (data != nullptr)
         {
-          propertyList->SetProperty(key, prop);
-          replaced.push_back(key);
+          propertyList = data->GetPropertyList();
         }
       }
-      catch (const std::exception&)
+      else
       {
-        // Skip invalid properties
+        propertyList = node->GetPropertyList(contextName);
       }
-    }
 
-    // Remove properties that weren't in the new set
-    // (but protect system properties like "name" and internal "restapi.*" properties)
-    for (const auto& existingName : existingNames)
-    {
-      if (!properties.contains(existingName))
+      if (propertyList == nullptr)
       {
-        // Don't remove "name" property (it's protected)
-        if (existingName == "name" && params.scope != PropertyScope::Data)
+        return std::optional<Json>(std::nullopt);
+      }
+
+      // Collect existing property names
+      std::vector<std::string> existingNames;
+      auto propMap = propertyList->GetMap();
+      for (auto it = propMap->begin(); it != propMap->end(); ++it)
+      {
+        existingNames.push_back(it->first);
+      }
+
+      // Track what was replaced vs removed
+      std::vector<std::string> replaced;
+      std::vector<std::string> removed;
+
+      // Set new properties (skip internal properties - clients cannot set them)
+      for (auto& [key, value] : properties.items())
+      {
+        // Skip internal properties
+        if (IsInternalProperty(key))
         {
           continue;
         }
-        // Don't remove internal properties (restapi.*)
-        if (IsInternalProperty(existingName))
+
+        try
         {
-          continue;
+          auto prop = ConvertPropertyFromSelfContainedJson(value);
+          if (prop.IsNotNull())
+          {
+            propertyList->SetProperty(key, prop);
+            replaced.push_back(key);
+          }
         }
-        propertyList->DeleteProperty(existingName);
-        removed.push_back(existingName);
+        catch (const std::exception&)
+        {
+          // Skip invalid properties
+        }
       }
-    }
 
-    // Mark node as modified via REST API
-    MarkNodeAsModified(node, "properties_replaced");
+      // Remove properties that weren't in the new set
+      // (but protect system properties like "name" and internal "restapi.*" properties)
+      for (const auto& existingName : existingNames)
+      {
+        if (!properties.contains(existingName))
+        {
+          // Don't remove "name" property (it's protected)
+          if (existingName == "name" && params.scope != PropertyScope::Data)
+          {
+            continue;
+          }
+          // Don't remove internal properties (restapi.*)
+          if (IsInternalProperty(existingName))
+          {
+            continue;
+          }
+          propertyList->DeleteProperty(existingName);
+          removed.push_back(existingName);
+        }
+      }
 
-    Json result;
-    result["replaced"] = replaced;
-    result["removed"] = removed;
+      // Mark node as modified via REST API
+      MarkNodeAsModified(node, "properties_replaced");
 
-    return result;
+      Json result;
+      result["replaced"] = replaced;
+      result["removed"] = removed;
+
+      return std::optional<Json>(result);
+    });
   }
 
   std::optional<DataStorageBridge::Json> DataStorageBridge::GetNodeAvailableContexts(const std::string& uid) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNull())
+    return this->DispatchTask<std::optional<Json>>([this, &uid]()
     {
-      return std::nullopt;
-    }
+      auto dataStorage = m_DataStorage.Lock();
+      if (dataStorage.IsNull())
+      {
+        return std::optional<Json>(std::nullopt);
+      }
 
-    auto node = m_UidMapper->FindNodeByUid(uid);
-    if (node == nullptr)
-    {
-      return std::nullopt;
-    }
+      auto node = m_UidMapper->FindNodeByUid(uid);
+      if (node == nullptr)
+      {
+        return std::optional<Json>(std::nullopt);
+      }
 
-    Json contexts = Json::array();
+      Json contexts = Json::array();
 
-    // Add null for default context (always available)
-    contexts.push_back(nullptr);
+      // Add null for default context (always available)
+      contexts.push_back(nullptr);
 
-    // Add named contexts from the node
-    auto contextNames = node->GetPropertyContextNames();
-    for (const auto& contextName : contextNames)
-    {
-      contexts.push_back(contextName);
-    }
+      // Add named contexts from the node
+      auto contextNames = node->GetPropertyContextNames();
+      for (const auto& contextName : contextNames)
+      {
+        contexts.push_back(contextName);
+      }
 
-    return contexts;
+      return std::optional<Json>(contexts);
+    });
   }
 
   DataStorageBridge::Json DataStorageBridge::NodeToJson(const DataNode* node) const

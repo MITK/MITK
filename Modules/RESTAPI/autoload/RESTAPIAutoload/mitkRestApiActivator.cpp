@@ -142,10 +142,11 @@ private:
       }
     }
 
-    // Disconnect DataStorage from REST server
+    // Disconnect DataStorage and dispatcher from REST server
     if (m_RestServer != nullptr)
     {
       m_RestServer->SetDataStorage(nullptr);
+      m_RestServer->SetDispatcher(nullptr);
     }
   }
 
@@ -245,6 +246,7 @@ private:
       {
         std::lock_guard<std::mutex> lock(m_Mutex);
         m_RestServer->SetDataStorage(nullptr);
+        m_RestServer->SetDispatcher(nullptr);
       }
     }
   }
@@ -261,6 +263,12 @@ private:
     {
       MITK_INFO << "Connecting DataStorage to REST server";
       m_RestServer->SetDataStorage(dataStorage);
+
+      StorageThreadDispatcherBase::Pointer dispatcher = service->GetDispatcher();
+      if (dispatcher.IsNotNull())
+      {
+        m_RestServer->SetDispatcher(dispatcher);
+      }
     }
   }
 

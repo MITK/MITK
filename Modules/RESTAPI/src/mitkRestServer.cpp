@@ -192,6 +192,12 @@ void RestServer::SetDataStorage(DataStorage* dataStorage)
   m_Bridge->SetDataStorage(dataStorage);
 }
 
+void RestServer::SetDispatcher(StorageThreadDispatcherBase* dispatcher)
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_Bridge->SetDispatcher(dispatcher);
+}
+
 DataStorage* RestServer::GetDataStorage() const
 {
   std::lock_guard<std::mutex> lock(m_Mutex);

@@ -243,6 +243,18 @@ bool DataStorageService::RemoveDataStorage(const std::string& label)
   return false;
 }
 
+StorageThreadDispatcherBase* DataStorageService::GetDispatcher() const
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  return m_Dispatcher;
+}
+
+void DataStorageService::SetDispatcher(StorageThreadDispatcherBase* dispatcher)
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_Dispatcher = dispatcher;
+}
+
 DataStorageReference DataStorageService::FindStorageByLabel(const std::string& label) const
 {
   // Note: caller must hold m_Mutex

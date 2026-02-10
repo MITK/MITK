@@ -922,7 +922,7 @@ public:
       // Verify response
       const auto json = nlohmann::json::parse(res.body);
       CPPUNIT_ASSERT(json.contains("data"));
-      CPPUNIT_ASSERT_EQUAL(std::string("mitk::Image"), json["data"]["data_type"].get<std::string>());
+      CPPUNIT_ASSERT_EQUAL(std::string("Image"), json["data"]["data_type"].get<std::string>());
 
       // Verify the stored data matches the original
       auto* storedData = node->GetData();
@@ -985,7 +985,7 @@ public:
       // Verify response
       const auto json = nlohmann::json::parse(res.body);
       CPPUNIT_ASSERT(json.contains("data"));
-      CPPUNIT_ASSERT_EQUAL(std::string("mitk::Image"), json["data"]["data_type"].get<std::string>());
+      CPPUNIT_ASSERT_EQUAL(std::string("Image"), json["data"]["data_type"].get<std::string>());
 
       // File should still exist (sender keeps ownership)
       CPPUNIT_ASSERT(fs::exists(tempFilePath));
@@ -1052,7 +1052,7 @@ public:
       const auto json = nlohmann::json::parse(res.body);
       CPPUNIT_ASSERT(json.contains("data"));
       CPPUNIT_ASSERT_EQUAL(std::string("TestImageNode"), json["data"]["name"].get<std::string>());
-      CPPUNIT_ASSERT_EQUAL(std::string("mitk::Image"), json["data"]["data_type"].get<std::string>());
+      CPPUNIT_ASSERT_EQUAL(std::string("Image"), json["data"]["data_type"].get<std::string>());
 
       // File should still exist (sender keeps ownership)
       CPPUNIT_ASSERT(fs::exists(tempFilePath));
@@ -1134,7 +1134,7 @@ public:
       const auto json = nlohmann::json::parse(res.body);
       CPPUNIT_ASSERT(json.contains("data"));
       CPPUNIT_ASSERT_EQUAL(std::string("DirectUploadNode"), json["data"]["name"].get<std::string>());
-      CPPUNIT_ASSERT_EQUAL(std::string("mitk::Image"), json["data"]["data_type"].get<std::string>());
+      CPPUNIT_ASSERT_EQUAL(std::string("Image"), json["data"]["data_type"].get<std::string>());
 
       // Find the created node and verify stored data matches original
       const std::string createdUid = json["data"]["uid"].get<std::string>();
@@ -1208,7 +1208,7 @@ public:
       CPPUNIT_ASSERT(json.contains("data"));
       CPPUNIT_ASSERT_EQUAL(std::string("ChildImageNode"), json["data"]["name"].get<std::string>());
       CPPUNIT_ASSERT_EQUAL(parentUid, json["data"]["parent_uid"].get<std::string>());
-      CPPUNIT_ASSERT_EQUAL(std::string("mitk::Image"), json["data"]["data_type"].get<std::string>());
+      CPPUNIT_ASSERT_EQUAL(std::string("Image"), json["data"]["data_type"].get<std::string>());
 
       // Find the created child node and verify stored data matches original
       const std::string createdUid = json["data"]["uid"].get<std::string>();

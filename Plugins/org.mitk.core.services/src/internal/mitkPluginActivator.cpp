@@ -16,8 +16,12 @@ found in the LICENSE file.
 
 #include <QString>
 #include <QFileInfo>
+#include <QThread>
+#include <QCoreApplication>
+#include <QMetaObject>
 
 #include <mitkDataStorageService.h>
+#include <mitkStorageThreadDispatcherBase.h>
 
 #include <usModuleRegistry.h>
 #include <usModule.h>
@@ -26,6 +30,39 @@ found in the LICENSE file.
 #include <mitkVtkLoggingAdapter.h>
 #include <mitkItkLoggingAdapter.h>
 
+
+namespace
+{
+  /**
+   * @brief Qt-specific dispatcher that marshals tasks to the GUI main thread.
+   *
+   * Uses QMetaObject::invokeMethod with Qt::BlockingQueuedConnection to
+   * execute tasks on the main thread and block until completion.
+   */
+  class QtStorageThreadDispatcher : public mitk::StorageThreadDispatcherBase
+  {
+  public:
+    mitkClassMacro(QtStorageThreadDispatcher, mitk::StorageThreadDispatcherBase);
+    itkFactorylessNewMacro(Self);
+
+    bool IsDispatchThread() const override
+    {
+      auto* app = QCoreApplication::instance();
+      return app != nullptr && QThread::currentThread() == app->thread();
+    }
+
+  protected:
+    QtStorageThreadDispatcher() = default;
+    ~QtStorageThreadDispatcher() override = default;
+
+    void ExecuteDispatched(std::function<void()> task) override
+    {
+      QMetaObject::invokeMethod(
+        QCoreApplication::instance(), std::move(task), Qt::BlockingQueuedConnection);
+    }
+
+  };
+}
 
 namespace mitk
 {
@@ -91,6 +128,7 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
 
   // Initialize and register data storage service via CppMicroServices
   dataStorageService.reset(new DataStorageService());
+  dataStorageService->SetDispatcher(QtStorageThreadDispatcher::New());
   m_DataStorageServiceReg = mitkContext->RegisterService<IDataStorageService>(dataStorageService.data());
 
   // Process all already registered services

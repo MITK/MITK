@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkDataStorageReference.h>
 #include <mitkServiceInterface.h>
+#include <mitkStorageThreadDispatcherBase.h>
 
 #include <optional>
 #include <string>
@@ -178,6 +179,16 @@ namespace mitk
      * \return true if removed, false if not found or is default.
      */
     virtual bool RemoveDataStorage(const std::string& label) = 0;
+
+    /**
+     * \brief Get the configured thread dispatcher (if any).
+     *
+     * Returns the dispatcher that marshals tasks to the thread owning the DataStorage.
+     * Consumers use this to dispatch DataStorage operations from background threads.
+     *
+     * \return The dispatcher, or nullptr if none configured (headless/test scenarios).
+     */
+    virtual StorageThreadDispatcherBase* GetDispatcher() const = 0;
   };
 
 } // namespace mitk

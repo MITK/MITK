@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <MitkCoreExports.h>
 #include <mitkIDataStorageService.h>
+#include <mitkStorageThreadDispatcherBase.h>
 
 #include <mutex>
 #include <vector>
@@ -30,7 +31,7 @@ namespace mitk
  *
  * This class is exported from Core so it can be instantiated by plugins
  * or other code that needs to register the service. The actual service
- * registration is typically done by a plugin activator.
+ * registration is typically done by a activator.
  *
  * Example usage in a plugin activator:
  * \code
@@ -70,6 +71,18 @@ public:
   bool HasDataStorage(const std::string& label) const override;
   bool RemoveDataStorage(const std::string& label) override;
 
+  StorageThreadDispatcherBase* GetDispatcher() const override;
+
+  /**
+   * \brief Set the thread dispatcher for DataStorage operations.
+   *
+   * This is typically called by activator code that creates
+   * this service, injecting a project-specific dispatcher.
+   *
+   * \param dispatcher The dispatcher, or nullptr to clear.
+   */
+  void SetDispatcher(StorageThreadDispatcherBase* dispatcher);
+
 private:
   /** Helper to find reference by name. Is not secured. Assumes that the caller holds m_Mutex.*/
   DataStorageReference FindStorageByLabel(const std::string& label) const;
@@ -78,6 +91,7 @@ private:
   DataStorageReference m_DefaultStorage;
   std::string m_ActiveLabel; // Empty means use default
   std::vector<DataStorageReference> m_Storages;
+  StorageThreadDispatcherBase::Pointer m_Dispatcher;
 };
 
 } // namespace mitk

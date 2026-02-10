@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkWeakPointer.h>
 #include <mitkBaseData.h>
 #include <mitkNodePredicateBase.h>
+#include <mitkStorageThreadDispatcherBase.h>
 #include "mitkNodeUidMapper.h"
 #include "mitkNodeQueryParams.h"
 
@@ -98,6 +99,21 @@ namespace mitk
     DataStorageBridge& operator=(const DataStorageBridge&) = delete;
     DataStorageBridge(DataStorageBridge&&) = delete;
     DataStorageBridge& operator=(DataStorageBridge&&) = delete;
+
+    /**
+     * @brief Set the dispatcher for thread-safe DataStorage operations.
+     *
+     * If set, all public operations (reads and writes) are dispatched to the
+     * storage-owning thread. This is necessary because even read operations
+     * may set restapi.uid properties on first access, triggering Modified events
+     * that cascade into Qt widget updates.
+     *
+     * If not set, operations execute directly on the calling thread
+     * (suitable for tests/headless scenarios).
+     *
+     * @param dispatcher The dispatcher, or nullptr to clear.
+     */
+    void SetDispatcher(StorageThreadDispatcherBase* dispatcher);
 
     /**
      * @brief Set the DataStorage to operate on.
@@ -359,7 +375,25 @@ namespace mitk
     std::string BuildNodePath(const DataNode* node) const;
     int GetChildrenCount(const DataNode* node) const;
 
+    /**
+     * @brief Execute a task via dispatcher (if available) or directly.
+     *
+     * Handles IsDispatchThread() check internally to avoid deadlocks.
+     * Use for void-returning tasks.
+     */
+    void DispatchTask(std::function<void()> task) const;
+
+    /**
+     * @brief Execute a task via dispatcher and return a value.
+     *
+     * Handles IsDispatchThread() check internally to avoid deadlocks.
+     * Use for tasks that return a value.
+     */
+    template <typename R>
+    R DispatchTask(std::function<R()> task) const;
+
     WeakPointer<DataStorage> m_DataStorage;
+    WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
     std::unique_ptr<NodeUidMapper> m_UidMapper;
 
     mutable std::mutex m_Mutex;

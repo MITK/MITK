@@ -463,7 +463,7 @@ void RestServer::RegisterRoutes()
       m_SwaggerController->HandleGET_docs_js(req, res);
     });
 
-  m_Server->Get(apiBase + "/openapi.yaml",
+  m_Server->Get(apiBase + "/openapi.json",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_SwaggerController->HandleGET_openapi(req, res);
     });

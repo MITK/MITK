@@ -29,7 +29,7 @@ namespace mitk
    * - GET /api/v1/docs             -> Swagger UI HTML page
    * - GET /api/v1/docs/swagger-ui.css       -> Swagger UI stylesheet
    * - GET /api/v1/docs/swagger-ui-bundle.js -> Swagger UI JavaScript bundle
-   * - GET /api/v1/openapi.yaml     -> OpenAPI 3.0 specification
+   * - GET /api/v1/openapi.json      -> OpenAPI 3.0 specification
    *
    * All assets are loaded from CppMicroServices bundled resources and cached
    * in memory after first access.
@@ -48,7 +48,7 @@ namespace mitk
     /** @brief Handle GET /docs/swagger-ui-bundle.js - serves Swagger UI JavaScript. */
     void HandleGET_docs_js(const httplib::Request& req, httplib::Response& res);
 
-    /** @brief Handle GET /openapi.yaml - serves the OpenAPI specification. */
+    /** @brief Handle GET /openapi.json - serves the OpenAPI specification. */
     void HandleGET_openapi(const httplib::Request& req, httplib::Response& res);
 
   private:

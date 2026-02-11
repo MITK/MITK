@@ -1,0 +1,2436 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MITK Workbench REST API",
+    "version": "1.0.0",
+    "description": "REST API for MITK Workbench external process integration.\nEnables Python scripts, web applications, and external tools\nto interact with MITK Workbench via standard HTTP.\n\n## Transfer Modes\n\nData endpoints support two transfer modes:\n- **direct**: Binary data in HTTP body (`application/octet-stream`)\n- **file-reference**: JSON with server file path (`application/json`)\n\nThe `X-MITK-Transfer-Mode` header takes precedence over the `Accept` header\nwhen determining the response format for data endpoints.\n\n## Property Scopes\n\nProperty endpoints support three scopes:\n- **all**: Both node and data properties (default for GET)\n- **node**: Only properties from the DataNode's property list (default for PUT/PATCH/DELETE)\n- **data**: Only properties from the BaseData's property list\n\n## Error Format\n\nAll errors follow RFC 7807 Problem Details format.\n",
+    "license": {
+      "name": "BSD-3-Clause",
+      "url": "https://opensource.org/licenses/BSD-3-Clause"
+    },
+    "contact": {
+      "name": "MITK Development Team",
+      "url": "https://www.mitk.org"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Local MITK Workbench instance"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Discovery",
+      "description": "API information and health checks"
+    },
+    {
+      "name": "Nodes",
+      "description": "DataStorage node CRUD operations"
+    },
+    {
+      "name": "Children",
+      "description": "Child node operations"
+    },
+    {
+      "name": "Data",
+      "description": "Node data transfer (images, surfaces, point sets, etc.)"
+    },
+    {
+      "name": "Properties",
+      "description": "Node property operations"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "Discovery"
+        ],
+        "summary": "Get API information",
+        "description": "Returns server info including version, capabilities, and DataStorage availability. Alias for GET /info.",
+        "operationId": "getApiRoot",
+        "responses": {
+          "200": {
+            "description": "API information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ApiInfo"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "name": "MITK Workbench REST API",
+                    "version": "1.0.0",
+                    "api_version": "v1",
+                    "mitk_version": "2025.12.99",
+                    "documentation_url": "https://docs.mitk.org/api/v1",
+                    "capabilities": {
+                      "transfer_modes": [
+                        "direct",
+                        "file-reference"
+                      ],
+                      "authentication": [
+                        "api-token"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Discovery"
+        ],
+        "summary": "Health check",
+        "description": "Returns health status of the REST API server and its dependencies.",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Health status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/HealthStatus"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "status": "healthy",
+                    "checks": {
+                      "datastorage": "ok"
+                    },
+                    "uptime_seconds": 3600
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/info": {
+      "get": {
+        "tags": [
+          "Discovery"
+        ],
+        "summary": "Get API information",
+        "description": "Returns server info including version, capabilities, and DataStorage availability.",
+        "operationId": "getInfo",
+        "responses": {
+          "200": {
+            "description": "API information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ApiInfo"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "name": "MITK Workbench REST API",
+                    "version": "1.0.0",
+                    "api_version": "v1",
+                    "mitk_version": "2025.12.99",
+                    "documentation_url": "https://docs.mitk.org/api/v1",
+                    "capabilities": {
+                      "transfer_modes": [
+                        "direct",
+                        "file-reference"
+                      ],
+                      "authentication": [
+                        "api-token"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datastorage/nodes": {
+      "get": {
+        "tags": [
+          "Nodes"
+        ],
+        "summary": "List nodes",
+        "description": "Returns a paginated list of nodes from the DataStorage.\nSupports filtering by hierarchy, path, data type, parent UID, and property values.\nSupports sorting and field selection.\n",
+        "operationId": "listNodes",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "name": "hierarchy",
+            "in": "query",
+            "description": "Filter by hierarchy level.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "toplevel"
+              ],
+              "default": "all"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "description": "Path-based lookup (e.g., \"/CT_Scan\" or \"/Parent/Child\").",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "data_type",
+            "in": "query",
+            "description": "Filter by MITK data class name (e.g., \"Image\", \"Surface\").",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parent_uid",
+            "in": "query",
+            "description": "Filter by parent node UID. Use \"null\" for root nodes.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PropertyScope"
+          },
+          {
+            "$ref": "#/components/parameters/Context"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include in response (e.g., \"uid,name,data_type\").",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort field. Prefix with `-` for descending order.\nExample: `name` (ascending), `-timestamp` (descending).\n",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of nodes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Node"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ListMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "data": [
+                    {
+                      "uid": "node_1",
+                      "name": "CT_Scan",
+                      "path": "/CT_Scan",
+                      "parent_uid": null,
+                      "data_type": "Image",
+                      "children_count": 2,
+                      "timestamp": 12345
+                    }
+                  ],
+                  "meta": {
+                    "total_count": 1,
+                    "limit": 50,
+                    "offset": 0,
+                    "returned_count": 1
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Nodes"
+        ],
+        "summary": "Create a node",
+        "description": "Creates a new top-level node in the DataStorage.\n\nSupports two content types:\n- `application/json`: Node metadata and optional file-reference transfer\n- `application/octet-stream`: Direct binary data upload (name via query parameter)\n",
+        "operationId": "createNode",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Node name (used with `application/octet-stream` Content-Type).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/ContentDisposition"
+          },
+          {
+            "$ref": "#/components/parameters/DataFormat"
+          }
+        ],
+        "requestBody": {
+          "description": "Node creation data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNodeRequest"
+              },
+              "example": {
+                "name": "CT_Scan",
+                "properties": {
+                  "visible": true,
+                  "opacity": 1.0
+                }
+              }
+            },
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "description": "Binary data for the node. Requires Content-Disposition header with filename or X-MITK-Data-Format header."
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Node created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Node"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "location": {
+                          "type": "string",
+                          "description": "URL of the created node"
+                        },
+                        "failed_properties": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Property keys that failed to deserialize"
+                        },
+                        "warning": {
+                          "type": "string",
+                          "description": "Warning message (e.g., multiple data objects in file)"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "406": {
+            "$ref": "#/components/responses/TransferModeNotAvailable"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedFormat"
+          },
+          "422": {
+            "$ref": "#/components/responses/FileError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      }
+    },
+    "/datastorage/nodes/{uid}": {
+      "get": {
+        "tags": [
+          "Nodes"
+        ],
+        "summary": "Get a node",
+        "description": "Returns a single node by its UID, including available property contexts.",
+        "operationId": "getNode",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Node details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Node"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "available_contexts": {
+                          "type": "array",
+                          "description": "Available property contexts for this node",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "uid": "node_1",
+                    "name": "CT_Scan",
+                    "path": "/CT_Scan",
+                    "parent_uid": null,
+                    "data_type": "Image",
+                    "children_count": 0,
+                    "timestamp": 12345
+                  },
+                  "meta": {
+                    "available_contexts": [
+                      null
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Nodes"
+        ],
+        "summary": "Update a node",
+        "description": "Updates node metadata. Currently supports reparenting via the `parent_uid` field.\nSet `parent_uid` to null to make a node top-level.\n",
+        "operationId": "updateNode",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "parent_uid": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "New parent node UID, or null for top-level"
+                  }
+                }
+              },
+              "example": {
+                "parent_uid": "parent_node_uid"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Node updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Node"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Nodes"
+        ],
+        "summary": "Delete a node",
+        "description": "Deletes a node from the DataStorage.\nIf the node has children and `recursive` is not set to true, returns 409 Conflict.\n",
+        "operationId": "deleteNode",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          },
+          {
+            "name": "recursive",
+            "in": "query",
+            "description": "If true, also delete all children recursively.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Node deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "deleted_uid": {
+                          "type": "string"
+                        },
+                        "deleted_children": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "deleted_uid": "node_1"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "409": {
+            "description": "Node has children (use `recursive=true` to force)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/NODE_HAS_CHILDREN",
+                    "code": "NODE_HAS_CHILDREN",
+                    "title": "Node Has Children",
+                    "message": "Node has 3 children. Use ?recursive=true to delete.",
+                    "status": 409,
+                    "instance": "/api/v1/datastorage/nodes/node_1",
+                    "children_count": 3
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      }
+    },
+    "/datastorage/nodes/{uid}/children": {
+      "get": {
+        "tags": [
+          "Children"
+        ],
+        "summary": "List child nodes",
+        "description": "Returns a paginated list of child nodes for the given parent node. Supports the same filtering and pagination as GET /nodes.",
+        "operationId": "listChildren",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "description": "Path-based lookup within children.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "data_type",
+            "in": "query",
+            "description": "Filter by MITK data class name.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PropertyScope"
+          },
+          {
+            "$ref": "#/components/parameters/Context"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort field (prefix with `-` for descending).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of child nodes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Node"
+                      }
+                    },
+                    "meta": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/ListMeta"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "parent_uid": {
+                              "type": "string",
+                              "description": "UID of the parent node"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Children"
+        ],
+        "summary": "Create a child node",
+        "description": "Creates a new node as a child of the specified parent node.\nSame request format as POST /nodes.\n",
+        "operationId": "createChildNode",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Node name (used with `application/octet-stream` Content-Type).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/ContentDisposition"
+          },
+          {
+            "$ref": "#/components/parameters/DataFormat"
+          }
+        ],
+        "requestBody": {
+          "description": "Child node creation data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNodeRequest"
+              },
+              "example": {
+                "name": "Segmentation"
+              }
+            },
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Child node created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Node"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "location": {
+                          "type": "string"
+                        },
+                        "failed_properties": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "warning": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "406": {
+            "$ref": "#/components/responses/TransferModeNotAvailable"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedFormat"
+          },
+          "422": {
+            "$ref": "#/components/responses/FileError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      }
+    },
+    "/datastorage/nodes/{uid}/data": {
+      "get": {
+        "tags": [
+          "Data"
+        ],
+        "summary": "Download node data",
+        "description": "Downloads the data attached to a node (e.g., image, surface, point set).\n\nTransfer mode is determined by:\n1. `X-MITK-Transfer-Mode` header (takes precedence)\n2. `Accept` header\n3. Default: `direct` mode\n\n**Direct mode**: Returns binary data with `application/octet-stream` content type.\n**File-reference mode**: Returns JSON with a server file path.\n",
+        "operationId": "getNodeData",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          },
+          {
+            "$ref": "#/components/parameters/TransferMode"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Node data",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "Binary data (direct mode)"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileReferenceResponse"
+                },
+                "example": {
+                  "transfer": {
+                    "mode": "file-reference",
+                    "file_path": "/tmp/mitk-rest-abc123/data_node_1/data_node_1.nrrd",
+                    "directory_path": "/tmp/mitk-rest-abc123/data_node_1",
+                    "size_bytes": 1048576
+                  },
+                  "data_metadata": {
+                    "dimensions": [
+                      256,
+                      256,
+                      128
+                    ],
+                    "spacing": [
+                      1.0,
+                      1.0,
+                      1.5
+                    ],
+                    "origin": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "pixel_type": "short"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Node not found or node has no data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "nodeNotFound": {
+                    "summary": "Node not found",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/NODE_NOT_FOUND",
+                        "code": "NODE_NOT_FOUND",
+                        "title": "Node Not Found",
+                        "message": "No node found with UID 'invalid-uid'",
+                        "status": 404,
+                        "instance": "/api/v1/datastorage/nodes/invalid-uid/data"
+                      }
+                    }
+                  },
+                  "noData": {
+                    "summary": "Node has no data attached",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/NO_DATA",
+                        "code": "NO_DATA",
+                        "title": "No Data",
+                        "message": "Node 'node_1' has no data attached",
+                        "status": 404,
+                        "instance": "/api/v1/datastorage/nodes/node_1/data"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedFormat"
+          },
+          "500": {
+            "description": "Internal server error or serialization failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "internalError": {
+                    "summary": "Unexpected internal error",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/INTERNAL_ERROR",
+                        "code": "INTERNAL_ERROR",
+                        "title": "Internal Server Error",
+                        "message": "An unexpected error occurred",
+                        "status": 500
+                      }
+                    }
+                  },
+                  "serializationError": {
+                    "summary": "Data serialization failed",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/SERIALIZATION_ERROR",
+                        "code": "SERIALIZATION_ERROR",
+                        "title": "Serialization Error",
+                        "message": "Failed to serialize node data to temporary file",
+                        "status": 500
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Data"
+        ],
+        "summary": "Upload/replace node data",
+        "description": "Uploads or replaces the data on a node.\n\n**Direct transfer** (`Content-Type: application/octet-stream`):\nSend binary data in the request body. Must provide filename via\n`Content-Disposition` header or format via `X-MITK-Data-Format` header.\n\n**File-reference** (`Content-Type: application/json`):\nSend JSON with `transfer.file_path` pointing to a file on the server.\n",
+        "operationId": "putNodeData",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          },
+          {
+            "$ref": "#/components/parameters/ContentDisposition"
+          },
+          {
+            "$ref": "#/components/parameters/DataFormat"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "transfer": {
+                    "type": "object",
+                    "required": [
+                      "file_path"
+                    ],
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "enum": [
+                          "direct",
+                          "file-reference"
+                        ]
+                      },
+                      "file_path": {
+                        "type": "string",
+                        "description": "Path to file on the server"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "transfer": {
+                  "mode": "file-reference",
+                  "file_path": "/data/images/ct_scan.nrrd"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Node"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "warning": {
+                          "type": "string",
+                          "description": "Warning if file contained multiple data objects"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "406": {
+            "$ref": "#/components/responses/TransferModeNotAvailable"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedFormat"
+          },
+          "422": {
+            "description": "File not found or read error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "fileNotFound": {
+                    "summary": "Referenced file does not exist",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/FILE_NOT_FOUND",
+                        "code": "FILE_NOT_FOUND",
+                        "title": "File Not Found",
+                        "message": "Referenced file path does not exist: /path/to/file.nrrd",
+                        "status": 422
+                      }
+                    }
+                  },
+                  "fileReadError": {
+                    "summary": "File exists but could not be read",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/FILE_READ_ERROR",
+                        "code": "FILE_READ_ERROR",
+                        "title": "File Read Error",
+                        "message": "Failed to read file: /path/to/file.nrrd",
+                        "status": 422
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      }
+    },
+    "/datastorage/nodes/{uid}/properties": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Get all properties",
+        "description": "Returns all properties of a node, filtered by scope, context, and optional name list.\n",
+        "operationId": "getNodeProperties",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          },
+          {
+            "name": "property_scope",
+            "in": "query",
+            "description": "Which properties to return. Default is `all` for GET.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "node",
+                "data"
+              ],
+              "default": "all"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Context"
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "description": "Whether to include property values. Set to `false` for keys only.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "true"
+            }
+          },
+          {
+            "name": "names",
+            "in": "query",
+            "description": "Comma-separated list of specific property names to return.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Properties retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "properties": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "$ref": "#/components/schemas/PropertyValue"
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "type": "integer"
+                        },
+                        "property_scope": {
+                          "type": "string",
+                          "enum": [
+                            "all",
+                            "node",
+                            "data"
+                          ]
+                        },
+                        "context": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "available_contexts": {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "properties": {
+                      "name": "CT_Scan",
+                      "visible": true,
+                      "opacity": 1.0,
+                      "color": {
+                        "type": "ColorProperty",
+                        "value": [
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      }
+                    }
+                  },
+                  "meta": {
+                    "count": 4,
+                    "property_scope": "all",
+                    "context": null,
+                    "available_contexts": [
+                      null
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Replace all properties",
+        "description": "Replaces all properties on a node (PUT semantics).\nExisting properties not in the request are removed (except protected properties).\nDefault scope is `node`.\n",
+        "operationId": "replaceNodeProperties",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          },
+          {
+            "name": "property_scope",
+            "in": "query",
+            "description": "Which property list to replace. Default is `node` for PUT.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "node",
+                "data"
+              ],
+              "default": "node"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Context"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/PropertyValue"
+                }
+              },
+              "example": {
+                "visible": true,
+                "opacity": 0.8,
+                "color": {
+                  "type": "ColorProperty",
+                  "value": [
+                    0.0,
+                    1.0,
+                    0.0
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Properties replaced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Result of the replace operation"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "node_uid": {
+                          "type": "string"
+                        },
+                        "property_scope": {
+                          "type": "string"
+                        },
+                        "context": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Update properties (merge)",
+        "description": "Updates multiple properties on a node (merge semantics).\nOnly specified properties are modified; others remain unchanged.\nDefault scope is `node`.\n",
+        "operationId": "updateNodeProperties",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          },
+          {
+            "name": "property_scope",
+            "in": "query",
+            "description": "Which property list to update. Default is `node` for PATCH.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "node",
+                "data"
+              ],
+              "default": "node"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Context"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/PropertyValue"
+                }
+              },
+              "example": {
+                "opacity": 0.5,
+                "visible": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Properties updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "updated": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Successfully updated property keys"
+                        },
+                        "failed": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "property": {
+                                "type": "string"
+                              },
+                              "error": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "description": "Properties that failed to update"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "node_uid": {
+                          "type": "string"
+                        },
+                        "property_scope": {
+                          "type": "string"
+                        },
+                        "context": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      }
+    },
+    "/datastorage/nodes/{uid}/properties/{key}": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Get a single property",
+        "description": "Returns a single property value by key.",
+        "operationId": "getNodeProperty",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          },
+          {
+            "$ref": "#/components/parameters/PropertyKey"
+          },
+          {
+            "name": "property_scope",
+            "in": "query",
+            "description": "Which property list to search. Default is `all` for GET.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "node",
+                "data"
+              ],
+              "default": "all"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Context"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Property value",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PropertyValue"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "node_uid": {
+                          "type": "string"
+                        },
+                        "property_key": {
+                          "type": "string"
+                        },
+                        "property_scope": {
+                          "type": "string"
+                        },
+                        "context": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "opacity": 1.0
+                  },
+                  "meta": {
+                    "node_uid": "node_1",
+                    "property_key": "opacity",
+                    "property_scope": "all",
+                    "context": null
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Node or property not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "nodeNotFound": {
+                    "summary": "Node not found",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/NODE_NOT_FOUND",
+                        "code": "NODE_NOT_FOUND",
+                        "title": "Node Not Found",
+                        "message": "No node found with UID 'invalid-uid'",
+                        "status": 404,
+                        "instance": "/api/v1/datastorage/nodes/invalid-uid/properties/opacity"
+                      }
+                    }
+                  },
+                  "propertyNotFound": {
+                    "summary": "Property not found on node",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/PROPERTY_NOT_FOUND",
+                        "code": "PROPERTY_NOT_FOUND",
+                        "title": "Property Not Found",
+                        "message": "Property 'nonexistent' not found on node 'node_1'",
+                        "status": 404,
+                        "instance": "/api/v1/datastorage/nodes/node_1/properties/nonexistent"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Set a single property",
+        "description": "Sets a single property value. Creates the property if it doesn't exist.\nDefault scope is `node`.\n",
+        "operationId": "setNodeProperty",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          },
+          {
+            "$ref": "#/components/parameters/PropertyKey"
+          },
+          {
+            "name": "property_scope",
+            "in": "query",
+            "description": "Which property list to set on. Default is `node` for PUT.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "node",
+                "data"
+              ],
+              "default": "node"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Context"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Property value as JSON",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyValue"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Simple value",
+                  "value": 0.75
+                },
+                "complex": {
+                  "summary": "Complex property",
+                  "value": {
+                    "type": "ColorProperty",
+                    "value": [
+                      1.0,
+                      0.0,
+                      0.0
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Property set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PropertyValue"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "node_uid": {
+                          "type": "string"
+                        },
+                        "property_key": {
+                          "type": "string"
+                        },
+                        "replaced": {
+                          "type": "boolean",
+                          "description": "True if the property existed before"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Delete a property",
+        "description": "Deletes a property from a node.\nThe `name` property is protected and cannot be deleted in node scope.\nDefault scope is `node`.\n",
+        "operationId": "deleteNodeProperty",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/NodeUid"
+          },
+          {
+            "$ref": "#/components/parameters/PropertyKey"
+          },
+          {
+            "name": "property_scope",
+            "in": "query",
+            "description": "Which property list to delete from. Default is `node` for DELETE.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "node",
+                "data"
+              ],
+              "default": "node"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Context"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Property deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "deleted": {
+                          "type": "string",
+                          "description": "Key of the deleted property"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "deleted": "custom_property"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Property is protected and cannot be deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/PROPERTY_PROTECTED",
+                    "code": "PROPERTY_PROTECTED",
+                    "title": "Property Protected",
+                    "message": "Property 'name' cannot be deleted",
+                    "status": 400,
+                    "instance": "/api/v1/datastorage/nodes/node_1/properties/name"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Node": {
+        "type": "object",
+        "required": [
+          "uid",
+          "name",
+          "path",
+          "parent_uid",
+          "data_type",
+          "children_count",
+          "timestamp"
+        ],
+        "properties": {
+          "uid": {
+            "type": "string",
+            "description": "Unique identifier (canonical)",
+            "example": "node_1"
+          },
+          "name": {
+            "type": "string",
+            "description": "Node display name",
+            "example": "CT_Scan"
+          },
+          "path": {
+            "type": "string",
+            "description": "Full path in the hierarchy",
+            "example": "/CT_Scan"
+          },
+          "parent_uid": {
+            "type": "string",
+            "nullable": true,
+            "description": "Parent node UID (null for top-level nodes)"
+          },
+          "data_type": {
+            "type": "string",
+            "nullable": true,
+            "description": "MITK data class name (null if no data attached)",
+            "example": "Image"
+          },
+          "children_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of direct child nodes"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "ITK modified time (session-only counter, higher is newer)"
+          }
+        }
+      },
+      "ApiInfo": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "MITK Workbench REST API"
+          },
+          "version": {
+            "type": "string",
+            "example": "1.0.0"
+          },
+          "api_version": {
+            "type": "string",
+            "example": "v1"
+          },
+          "mitk_version": {
+            "type": "string",
+            "example": "2025.12.99"
+          },
+          "documentation_url": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://docs.mitk.org/api/v1"
+          },
+          "capabilities": {
+            "type": "object",
+            "properties": {
+              "transfer_modes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "direct",
+                    "file-reference"
+                  ]
+                }
+              },
+              "authentication": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "HealthStatus": {
+        "type": "object",
+        "required": [
+          "status",
+          "checks"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "healthy"
+            ],
+            "description": "Overall health status"
+          },
+          "checks": {
+            "type": "object",
+            "properties": {
+              "datastorage": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "unavailable"
+                ],
+                "description": "DataStorage connectivity"
+              }
+            }
+          },
+          "uptime_seconds": {
+            "type": "integer",
+            "description": "Server uptime in seconds (omitted if unavailable)"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "description": "RFC 7807 Problem Details error envelope",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "type",
+              "code",
+              "title",
+              "message",
+              "status"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "format": "uri",
+                "description": "Error type URI",
+                "example": "https://docs.mitk.org/api/errors/NODE_NOT_FOUND"
+              },
+              "code": {
+                "type": "string",
+                "description": "Machine-readable error code",
+                "example": "NODE_NOT_FOUND"
+              },
+              "title": {
+                "type": "string",
+                "description": "Human-readable error title",
+                "example": "Node Not Found"
+              },
+              "message": {
+                "type": "string",
+                "description": "Detailed error message",
+                "example": "No node found with UID 'invalid-uid'"
+              },
+              "status": {
+                "type": "integer",
+                "description": "HTTP status code",
+                "example": 404
+              },
+              "instance": {
+                "type": "string",
+                "description": "Request path that caused the error",
+                "example": "/api/v1/datastorage/nodes/invalid-uid"
+              }
+            }
+          }
+        }
+      },
+      "PropertyValue": {
+        "description": "Property value. Simple types are returned as-is (boolean, number, string).\nComplex types are returned as `{type, value}` objects.\n",
+        "oneOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "MITK property type name",
+                "example": "ColorProperty"
+              },
+              "value": {
+                "description": "Type-specific value representation",
+                "example": [
+                  1.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "CreateNodeRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Node name",
+            "example": "CT_Scan"
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/PropertyValue"
+            },
+            "description": "Initial properties to set on the node"
+          },
+          "transfer": {
+            "type": "object",
+            "description": "Optional data transfer via file reference",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "file-reference"
+                ]
+              },
+              "file_path": {
+                "type": "string",
+                "description": "Path to data file on the server"
+              }
+            }
+          }
+        }
+      },
+      "FileReferenceResponse": {
+        "type": "object",
+        "properties": {
+          "transfer": {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "file-reference"
+                ]
+              },
+              "file_path": {
+                "type": "string",
+                "description": "Path to the serialized data file"
+              },
+              "directory_path": {
+                "type": "string",
+                "description": "Path to the directory containing all related files"
+              },
+              "size_bytes": {
+                "type": "integer",
+                "description": "File size in bytes"
+              }
+            }
+          },
+          "data_metadata": {
+            "type": "object",
+            "description": "Type-specific metadata about the data",
+            "properties": {
+              "dimensions": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Image dimensions (Image data only)"
+              },
+              "spacing": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "Voxel spacing (Image data only)"
+              },
+              "origin": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "Image origin (Image data only)"
+              },
+              "pixel_type": {
+                "type": "string",
+                "description": "Pixel type (Image data only)"
+              },
+              "points_count": {
+                "type": "integer",
+                "description": "Number of points (Surface/PointSet data)"
+              },
+              "cells_count": {
+                "type": "integer",
+                "description": "Number of cells (Surface data only)"
+              },
+              "bounds": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "Bounding box (Surface/PointSet data)"
+              }
+            }
+          }
+        }
+      },
+      "ListMeta": {
+        "type": "object",
+        "description": "Metadata for paginated list responses",
+        "properties": {
+          "total_count": {
+            "type": "integer",
+            "description": "Total number of matching items"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Page size used",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 50
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Number of items skipped",
+            "minimum": 0,
+            "default": 0
+          },
+          "returned_count": {
+            "type": "integer",
+            "description": "Number of items in this response"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "prev": {
+                "type": "string",
+                "description": "URL for the previous page (absent if at start)"
+              },
+              "next": {
+                "type": "string",
+                "description": "URL for the next page (absent if at end)"
+              }
+            }
+          },
+          "context": {
+            "type": "string",
+            "nullable": true,
+            "description": "Property context used for filtering"
+          },
+          "property_scope": {
+            "type": "string",
+            "enum": [
+              "all",
+              "node",
+              "data"
+            ],
+            "description": "Property scope used for filtering"
+          },
+          "path_query": {
+            "type": "string",
+            "description": "Path query applied (present only when path filter is used)"
+          },
+          "filters": {
+            "type": "object",
+            "description": "Applied filters (present only when filters are active)"
+          },
+          "sort": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string"
+              },
+              "ascending": {
+                "type": "boolean"
+              }
+            },
+            "description": "Applied sort (present only when sort is active)"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Field selection (present only when fields parameter is used)"
+          }
+        }
+      }
+    },
+    "parameters": {
+      "NodeUid": {
+        "name": "uid",
+        "in": "path",
+        "required": true,
+        "description": "Node unique identifier",
+        "schema": {
+          "type": "string"
+        },
+        "example": "node_1"
+      },
+      "PropertyKey": {
+        "name": "key",
+        "in": "path",
+        "required": true,
+        "description": "Property key name",
+        "schema": {
+          "type": "string"
+        },
+        "example": "opacity"
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "Maximum number of results per page (1-1000).",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 50
+        }
+      },
+      "Offset": {
+        "name": "offset",
+        "in": "query",
+        "description": "Number of results to skip for pagination.",
+        "schema": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        }
+      },
+      "PropertyScope": {
+        "name": "property_scope",
+        "in": "query",
+        "description": "Which properties to consider.\n- `all`: Both node and data properties\n- `node`: Only node properties\n- `data`: Only data properties\n",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "all",
+            "node",
+            "data"
+          ],
+          "default": "all"
+        }
+      },
+      "Context": {
+        "name": "context",
+        "in": "query",
+        "description": "Renderer context for property lookup (e.g., a specific render window name).",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ContentDisposition": {
+        "name": "Content-Disposition",
+        "in": "header",
+        "description": "Provides the filename for binary uploads so the server can determine the\nfile format from the extension (e.g., `.nrrd`, `.nii.gz`, `.stl`).\nFormat: `attachment; filename=\"<name>.<ext>\"`\n",
+        "schema": {
+          "type": "string"
+        },
+        "example": "attachment; filename=\"image.nrrd\""
+      },
+      "DataFormat": {
+        "name": "X-MITK-Data-Format",
+        "in": "header",
+        "description": "File format extension (without leading dot) for binary uploads.\nAlternative to providing a filename via Content-Disposition.\nExamples: `nrrd`, `nii.gz`, `stl`, `vtp`\n",
+        "schema": {
+          "type": "string"
+        },
+        "example": "nrrd"
+      },
+      "TransferMode": {
+        "name": "X-MITK-Transfer-Mode",
+        "in": "header",
+        "description": "Transfer mode for data endpoints. Takes precedence over the Accept header.\n- `direct`: Binary data in response body\n- `file-reference`: JSON with server file path\n",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "direct",
+            "file-reference"
+          ]
+        }
+      }
+    },
+    "responses": {
+      "NodeNotFound": {
+        "description": "Node not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/NODE_NOT_FOUND",
+                "code": "NODE_NOT_FOUND",
+                "title": "Node Not Found",
+                "message": "No node found with UID 'invalid-uid'",
+                "status": 404,
+                "instance": "/api/v1/datastorage/nodes/invalid-uid"
+              }
+            }
+          }
+        }
+      },
+      "InvalidRequest": {
+        "description": "Invalid request (malformed JSON, missing fields, etc.)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/INVALID_REQUEST",
+                "code": "INVALID_REQUEST",
+                "title": "Invalid Request",
+                "message": "Invalid JSON: parse error at line 1",
+                "status": 400
+              }
+            }
+          }
+        }
+      },
+      "UnsupportedFormat": {
+        "description": "Unsupported media type or data format",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/UNSUPPORTED_FORMAT",
+                "code": "UNSUPPORTED_FORMAT",
+                "title": "Unsupported Format",
+                "message": "Unsupported Content-Type. Use 'application/json' or 'application/octet-stream'.",
+                "status": 415
+              }
+            }
+          }
+        }
+      },
+      "TransferModeNotAvailable": {
+        "description": "Requested transfer mode is not supported",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Error"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "available_modes": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/TRANSFER_MODE_NOT_AVAILABLE",
+                "code": "TRANSFER_MODE_NOT_AVAILABLE",
+                "title": "Transfer Mode Not Available",
+                "message": "Requested transfer mode 'invalid' is not supported",
+                "status": 406,
+                "available_modes": [
+                  "file-reference",
+                  "direct"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "FileError": {
+        "description": "File not found or read error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/FILE_NOT_FOUND",
+                "code": "FILE_NOT_FOUND",
+                "title": "File Not Found",
+                "message": "Referenced file path does not exist: /path/to/file.nrrd",
+                "status": 422
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/INTERNAL_ERROR",
+                "code": "INTERNAL_ERROR",
+                "title": "Internal Server Error",
+                "message": "An unexpected error occurred",
+                "status": 500
+              }
+            }
+          }
+        }
+      },
+      "DataStorageNotAvailable": {
+        "description": "DataStorage is not connected",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/DATASTORAGE_NOT_AVAILABLE",
+                "code": "DATASTORAGE_NOT_AVAILABLE",
+                "title": "DataStorage Not Available",
+                "message": "No DataStorage is currently connected to the REST API server",
+                "status": 503
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -102,16 +102,16 @@ void SwaggerController::HandleGET_docs_js(const httplib::Request& /*req*/, httpl
 
 void SwaggerController::HandleGET_openapi(const httplib::Request& /*req*/, httplib::Response& res)
 {
-  const std::string spec = this->LoadResource("openapi.yaml");
+  const std::string spec = this->LoadResource("openapi.json");
   if (spec.empty())
   {
     res.status = 404;
-    res.set_content("openapi.yaml not found", "text/plain");
+    res.set_content("openapi.json not found", "text/plain");
     return;
   }
 
   res.status = 200;
-  res.set_content(spec, "text/yaml");
+  res.set_content(spec, "application/json");
 }
 
 }

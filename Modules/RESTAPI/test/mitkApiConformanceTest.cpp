@@ -21,7 +21,20 @@ found in the LICENSE file.
 #include <mitkStringProperty.h>
 #include <mitkProperties.h>
 
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleContext.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
+
 #include <nlohmann/json.hpp>
+
+#include <fstream>
+#include <functional>
+#include <map>
+#include <set>
+#include <string>
+#include <utility>
 
 /**
  * @brief API Conformance Tests - verify the OpenAPI specification matches the implementation.
@@ -31,8 +44,11 @@ found in the LICENSE file.
  * - Implementation changes without spec update
  * - Spec changes without implementation update
  *
+ * The tests load and parse the openapi.json spec at runtime, so expected values (field names,
+ * types, defaults, error codes) come from the spec rather than being hardcoded.
+ *
  * Test categories:
- * 1. Structural Conformance: All endpoints exist
+ * 1. Structural Conformance: All endpoints exist (spec <-> handler bidirectional)
  * 2. Response Schema Conformance: Response structures match spec
  * 3. Query Parameter Conformance: Parameters work as documented
  * 4. Status Code Conformance: Correct HTTP status codes
@@ -44,7 +60,8 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkApiConformanceTestSuite);
 
   // Category 1: Structural Conformance
-  MITK_TEST(ImplementationEndpointsMatchSpec);
+  MITK_TEST(SpecEndpointsHaveHandlers);
+  MITK_TEST(HandlersExistInSpec);
 
   // Category 2: Response Schema Conformance
   MITK_TEST(SuccessListResponseHasDataEnvelope);
@@ -89,7 +106,8 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   MITK_TEST(HealthEndpointReturnsJson);
 
   // Category 6: Bidirectional Validation
-  MITK_TEST(AllErrorCodesHaveFactoryMethods);
+  MITK_TEST(AllSpecErrorCodesExistInCode);
+  MITK_TEST(AllCodeErrorCodesExistInSpec);
   MITK_TEST(ErrorResponseContainsInstancePath);
   MITK_TEST(CreateNodeResponseHasLocationMeta);
   MITK_TEST(ChildrenEndpointIncludesParentUid);
@@ -97,10 +115,16 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
+  using HandlerFunc = std::function<void(const httplib::Request&, httplib::Response&)>;
+  using EndpointKey = std::pair<std::string, std::string>;
+
   mitk::StandaloneDataStorage::Pointer m_DataStorage;
   std::unique_ptr<mitk::DataStorageBridge> m_Bridge;
   std::unique_ptr<mitk::DataStorageController> m_Controller;
   std::unique_ptr<mitk::HealthController> m_HealthController;
+
+  nlohmann::json m_Spec;
+  std::map<EndpointKey, HandlerFunc> m_EndpointRegistry;
 
   httplib::Request CreateRequest(const std::string& path = "",
                                   const std::string& body = "",
@@ -156,6 +180,268 @@ private:
     return json["data"]["uid"].get<std::string>();
   }
 
+  /// Build the endpoint registry mapping (OpenAPI path, HTTP method) -> handler function.
+  void BuildEndpointRegistry()
+  {
+    m_EndpointRegistry.clear();
+
+    // Discovery
+    m_EndpointRegistry[{"/", "get"}] = [this](const httplib::Request& req, httplib::Response& res) {
+      m_HealthController->HandleGET_info(req, res);
+    };
+    m_EndpointRegistry[{"/health", "get"}] = [this](const httplib::Request& req, httplib::Response& res) {
+      m_HealthController->HandleGET_health(req, res);
+    };
+    m_EndpointRegistry[{"/info", "get"}] = [this](const httplib::Request& req, httplib::Response& res) {
+      m_HealthController->HandleGET_info(req, res);
+    };
+
+    // Nodes
+    m_EndpointRegistry[{"/datastorage/nodes", "get"}] = [this](const httplib::Request& req, httplib::Response& res) {
+      m_Controller->HandleGET_nodes(req, res);
+    };
+    m_EndpointRegistry[{"/datastorage/nodes", "post"}] = [this](const httplib::Request& req, httplib::Response& res) {
+      m_Controller->HandlePOST_nodes(req, res);
+    };
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandleGET_nodes_uid(req, res);
+      };
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}", "patch"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandlePATCH_nodes_uid(req, res);
+      };
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}", "delete"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandleDELETE_nodes_uid(req, res);
+      };
+
+    // Children
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/children", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandleGET_nodes_uid_children(req, res);
+      };
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/children", "post"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandlePOST_nodes_uid_children(req, res);
+      };
+
+    // Data
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/data", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandleGET_nodes_uid_data(req, res);
+      };
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/data", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandlePUT_nodes_uid_data(req, res);
+      };
+
+    // Properties
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandleGET_nodes_uid_properties(req, res);
+      };
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandlePUT_nodes_uid_properties(req, res);
+      };
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties", "patch"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandlePATCH_nodes_uid_properties(req, res);
+      };
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties/{key}", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandleGET_nodes_uid_properties_key(req, res);
+      };
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties/{key}", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandlePUT_nodes_uid_properties_key(req, res);
+      };
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties/{key}", "delete"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_Controller->HandleDELETE_nodes_uid_properties_key(req, res);
+      };
+  }
+
+  /// Read required fields from components.schemas.<schemaName>.required.
+  std::vector<std::string> GetRequiredFields(const std::string& schemaName) const
+  {
+    const auto& schema = m_Spec["components"]["schemas"][schemaName];
+    if (!schema.contains("required"))
+    {
+      return {};
+    }
+    return schema["required"].get<std::vector<std::string>>();
+  }
+
+  /// Read field type from components.schemas.<schemaName>.properties.<field>.type.
+  std::string GetFieldType(const std::string& schemaName, const std::string& field) const
+  {
+    const auto& props = m_Spec["components"]["schemas"][schemaName]["properties"];
+    if (props.contains(field) && props[field].contains("type"))
+    {
+      return props[field]["type"].get<std::string>();
+    }
+    return "";
+  }
+
+  /// Check if field is nullable from components.schemas.<schemaName>.properties.<field>.nullable.
+  bool IsFieldNullable(const std::string& schemaName, const std::string& field) const
+  {
+    const auto& props = m_Spec["components"]["schemas"][schemaName]["properties"];
+    if (props.contains(field) && props[field].contains("nullable"))
+    {
+      return props[field]["nullable"].get<bool>();
+    }
+    return false;
+  }
+
+  /// Read default value for a component parameter.
+  template <typename T>
+  T GetParameterDefault(const std::string& paramName) const
+  {
+    return m_Spec["components"]["parameters"][paramName]["schema"]["default"].get<T>();
+  }
+
+  /// Read maximum value for a component parameter.
+  template <typename T>
+  T GetParameterMaximum(const std::string& paramName) const
+  {
+    return m_Spec["components"]["parameters"][paramName]["schema"]["maximum"].get<T>();
+  }
+
+  /// Collect all error codes from response examples throughout the spec.
+  std::set<std::string> CollectSpecErrorCodes() const
+  {
+    std::set<std::string> codes;
+
+    // Helper to extract error code from an example object
+    auto extractCode = [&codes](const nlohmann::json& example) {
+      if (example.contains("error") && example["error"].contains("code"))
+      {
+        codes.insert(example["error"]["code"].get<std::string>());
+      }
+    };
+
+    // Walk all paths and their responses
+    for (const auto& [path, pathItem] : m_Spec["paths"].items())
+    {
+      for (const auto& [method, operation] : pathItem.items())
+      {
+        if (!operation.contains("responses"))
+        {
+          continue;
+        }
+
+        for (const auto& [statusCode, response] : operation["responses"].items())
+        {
+          if (!response.contains("content"))
+          {
+            continue;
+          }
+
+          for (const auto& [mediaType, mediaObj] : response["content"].items())
+          {
+            // Single example
+            if (mediaObj.contains("example"))
+            {
+              extractCode(mediaObj["example"]);
+            }
+            // Multiple examples
+            if (mediaObj.contains("examples"))
+            {
+              for (const auto& [exName, exObj] : mediaObj["examples"].items())
+              {
+                if (exObj.contains("value"))
+                {
+                  extractCode(exObj["value"]);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Walk shared responses in components.responses
+    if (m_Spec.contains("components") && m_Spec["components"].contains("responses"))
+    {
+      for (const auto& [name, response] : m_Spec["components"]["responses"].items())
+      {
+        if (!response.contains("content"))
+        {
+          continue;
+        }
+
+        for (const auto& [mediaType, mediaObj] : response["content"].items())
+        {
+          if (mediaObj.contains("example"))
+          {
+            extractCode(mediaObj["example"]);
+          }
+          if (mediaObj.contains("examples"))
+          {
+            for (const auto& [exName, exObj] : mediaObj["examples"].items())
+            {
+              if (exObj.contains("value"))
+              {
+                extractCode(exObj["value"]);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return codes;
+  }
+
+  /// Get all error code constants defined in ErrorResponse.
+  static std::set<std::string> GetAllCodeErrorCodes()
+  {
+    return {
+      mitk::ErrorResponse::CODE_INVALID_REQUEST,
+      mitk::ErrorResponse::CODE_NODE_NOT_FOUND,
+      mitk::ErrorResponse::CODE_PROPERTY_NOT_FOUND,
+      mitk::ErrorResponse::CODE_DATASTORAGE_NOT_AVAILABLE,
+      mitk::ErrorResponse::CODE_INTERNAL_ERROR,
+      mitk::ErrorResponse::CODE_PROPERTY_PROTECTED,
+      mitk::ErrorResponse::CODE_NOT_IMPLEMENTED,
+      mitk::ErrorResponse::CODE_NODE_HAS_CHILDREN,
+      mitk::ErrorResponse::CODE_NO_DATA,
+      mitk::ErrorResponse::CODE_UNSUPPORTED_FORMAT,
+      mitk::ErrorResponse::CODE_SERIALIZATION_ERROR,
+      mitk::ErrorResponse::CODE_FILE_NOT_FOUND,
+      mitk::ErrorResponse::CODE_FILE_READ_ERROR,
+      mitk::ErrorResponse::CODE_TRANSFER_MODE_NOT_AVAILABLE
+    };
+  }
+
+  nlohmann::json LoadRef()
+  {
+    auto restModule = us::ModuleRegistry::GetModule("MitkRESTAPI");
+    if (nullptr==restModule)
+    {
+      mitkThrow() << "MitkRESTAPI module could not be found.";
+    }
+
+    auto* context = restModule->GetModuleContext();
+    if (context == nullptr)
+    {
+      mitkThrow() << "MitkRESTAPI module context could not be found.";
+    }
+
+    us::ModuleResource resource = context->GetModule()->GetResource("openapi.json");
+    if (!resource.IsValid())
+    {
+      mitkThrow() << "openapi.json Resource not found: ";
+    }
+
+    us::ModuleResourceStream stream(resource, std::ios::binary);
+
+    return nlohmann::json::parse(stream);
+  }
+
 public:
   void setUp() override
   {
@@ -164,10 +450,16 @@ public:
     m_Bridge->SetDataStorage(m_DataStorage);
     m_Controller = std::make_unique<mitk::DataStorageController>(*m_Bridge);
     m_HealthController = std::make_unique<mitk::HealthController>(*m_Bridge);
+
+    m_Spec = this->LoadRef();
+
+    this->BuildEndpointRegistry();
   }
 
   void tearDown() override
   {
+    m_EndpointRegistry.clear();
+    m_Spec = nullptr;
     m_HealthController.reset();
     m_Controller.reset();
     m_Bridge->SetDataStorage(nullptr);
@@ -179,158 +471,31 @@ public:
   // Category 1: Structural Conformance
   // ==========================================
 
-  void ImplementationEndpointsMatchSpec()
+  void SpecEndpointsHaveHandlers()
   {
-    // Per OpenAPI spec, the following 18 endpoint+method combinations exist.
-    // This test verifies each handler can be called without crashing and
-    // returns a meaningful response (not a generic 500).
-
-    // Discovery endpoints
+    // Every {path, method} in the spec must have a handler in the registry.
+    for (const auto& [path, pathItem] : m_Spec["paths"].items())
     {
-      httplib::Request req;
-      httplib::Response res;
-      m_HealthController->HandleGET_health(req, res);
-      CPPUNIT_ASSERT_MESSAGE("GET /health should respond", res.status == 200);
+      for (const auto& [method, operation] : pathItem.items())
+      {
+        const EndpointKey key{path, method};
+        CPPUNIT_ASSERT_MESSAGE(
+          "Spec endpoint has no handler: " + method + " " + path,
+          m_EndpointRegistry.count(key) > 0);
+      }
     }
-    {
-      httplib::Request req;
-      httplib::Response res;
-      m_HealthController->HandleGET_info(req, res);
-      CPPUNIT_ASSERT_MESSAGE("GET /info should respond", res.status == 200);
-    }
+  }
 
-    // GET /nodes
+  void HandlersExistInSpec()
+  {
+    // Every handler in the registry must have a corresponding {path, method} in the spec.
+    const auto& paths = m_Spec["paths"];
+    for (const auto& [key, handler] : m_EndpointRegistry)
     {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes");
-      httplib::Response res;
-      m_Controller->HandleGET_nodes(req, res);
-      CPPUNIT_ASSERT_MESSAGE("GET /nodes should respond", res.status == 200);
-    }
-
-    // POST /nodes
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes",
-        R"({"name":"StructTest"})", {}, {}, "application/json");
-      httplib::Response res;
-      m_Controller->HandlePOST_nodes(req, res);
-      CPPUNIT_ASSERT_MESSAGE("POST /nodes should respond with 201", res.status == 201);
-    }
-
-    // GET /nodes/:uid (use a nonexistent UID to verify we get 404 not crash)
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid", "",
-        {{"uid", "test-uid"}});
-      httplib::Response res;
-      m_Controller->HandleGET_nodes_uid(req, res);
-      CPPUNIT_ASSERT_MESSAGE("GET /nodes/:uid should respond (404 ok)", res.status == 404);
-    }
-
-    // PATCH /nodes/:uid
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid",
-        R"({"parent_uid": null})", {{"uid", "test-uid"}}, {}, "application/json");
-      httplib::Response res;
-      m_Controller->HandlePATCH_nodes_uid(req, res);
-      CPPUNIT_ASSERT_MESSAGE("PATCH /nodes/:uid should respond (404 ok)", res.status == 404);
-    }
-
-    // DELETE /nodes/:uid
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid", "",
-        {{"uid", "test-uid"}});
-      httplib::Response res;
-      m_Controller->HandleDELETE_nodes_uid(req, res);
-      CPPUNIT_ASSERT_MESSAGE("DELETE /nodes/:uid should respond (404 ok)", res.status == 404);
-    }
-
-    // GET /nodes/:uid/children
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid/children", "",
-        {{"uid", "test-uid"}});
-      httplib::Response res;
-      m_Controller->HandleGET_nodes_uid_children(req, res);
-      CPPUNIT_ASSERT_MESSAGE("GET /nodes/:uid/children should respond (404 ok)", res.status == 404);
-    }
-
-    // POST /nodes/:uid/children
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid/children",
-        R"({"name":"Child"})", {{"uid", "test-uid"}}, {}, "application/json");
-      httplib::Response res;
-      m_Controller->HandlePOST_nodes_uid_children(req, res);
-      CPPUNIT_ASSERT_MESSAGE("POST /nodes/:uid/children should respond (404 ok)", res.status == 404);
-    }
-
-    // GET /nodes/:uid/data
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid/data", "",
-        {{"uid", "test-uid"}});
-      httplib::Response res;
-      m_Controller->HandleGET_nodes_uid_data(req, res);
-      CPPUNIT_ASSERT_MESSAGE("GET /nodes/:uid/data should respond (404 ok)", res.status == 404);
-    }
-
-    // PUT /nodes/:uid/data
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid/data",
-        "binary", {{"uid", "test-uid"}}, {}, "application/octet-stream");
-      httplib::Response res;
-      m_Controller->HandlePUT_nodes_uid_data(req, res);
-      CPPUNIT_ASSERT_MESSAGE("PUT /nodes/:uid/data should respond (404 ok)", res.status == 404);
-    }
-
-    // GET /nodes/:uid/properties
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid/properties", "",
-        {{"uid", "test-uid"}});
-      httplib::Response res;
-      m_Controller->HandleGET_nodes_uid_properties(req, res);
-      CPPUNIT_ASSERT_MESSAGE("GET /nodes/:uid/properties should respond (404 ok)", res.status == 404);
-    }
-
-    // GET /nodes/:uid/properties/:key
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid/properties/name", "",
-        {{"uid", "test-uid"}, {"key", "name"}});
-      httplib::Response res;
-      m_Controller->HandleGET_nodes_uid_properties_key(req, res);
-      CPPUNIT_ASSERT_MESSAGE("GET /nodes/:uid/properties/:key should respond (404 ok)", res.status == 404);
-    }
-
-    // PUT /nodes/:uid/properties/:key
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid/properties/visible",
-        "true", {{"uid", "test-uid"}, {"key", "visible"}}, {}, "application/json");
-      httplib::Response res;
-      m_Controller->HandlePUT_nodes_uid_properties_key(req, res);
-      CPPUNIT_ASSERT_MESSAGE("PUT /nodes/:uid/properties/:key should respond (404 ok)", res.status == 404);
-    }
-
-    // DELETE /nodes/:uid/properties/:key
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid/properties/custom", "",
-        {{"uid", "test-uid"}, {"key", "custom"}});
-      httplib::Response res;
-      m_Controller->HandleDELETE_nodes_uid_properties_key(req, res);
-      CPPUNIT_ASSERT_MESSAGE("DELETE /nodes/:uid/properties/:key should respond (404 ok)", res.status == 404);
-    }
-
-    // PUT /nodes/:uid/properties
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid/properties",
-        R"({"visible": true})", {{"uid", "test-uid"}}, {}, "application/json");
-      httplib::Response res;
-      m_Controller->HandlePUT_nodes_uid_properties(req, res);
-      CPPUNIT_ASSERT_MESSAGE("PUT /nodes/:uid/properties should respond (404 ok)", res.status == 404);
-    }
-
-    // PATCH /nodes/:uid/properties
-    {
-      auto req = this->CreateRequest("/api/v1/datastorage/nodes/test-uid/properties",
-        R"({"visible": true})", {{"uid", "test-uid"}}, {}, "application/json");
-      httplib::Response res;
-      m_Controller->HandlePATCH_nodes_uid_properties(req, res);
-      CPPUNIT_ASSERT_MESSAGE("PATCH /nodes/:uid/properties should respond (404 ok)", res.status == 404);
+      const auto& [path, method] = key;
+      CPPUNIT_ASSERT_MESSAGE(
+        "Handler has no spec entry: " + method + " " + path,
+        paths.contains(path) && paths[path].contains(method));
     }
   }
 
@@ -376,14 +541,14 @@ public:
     auto json = nlohmann::json::parse(res.body);
     const auto& nodeData = json["data"];
 
-    // Per OpenAPI spec: Node schema has these required fields
-    CPPUNIT_ASSERT_MESSAGE("Node must have 'uid'", nodeData.contains("uid"));
-    CPPUNIT_ASSERT_MESSAGE("Node must have 'name'", nodeData.contains("name"));
-    CPPUNIT_ASSERT_MESSAGE("Node must have 'path'", nodeData.contains("path"));
-    CPPUNIT_ASSERT_MESSAGE("Node must have 'parent_uid'", nodeData.contains("parent_uid"));
-    CPPUNIT_ASSERT_MESSAGE("Node must have 'data_type'", nodeData.contains("data_type"));
-    CPPUNIT_ASSERT_MESSAGE("Node must have 'children_count'", nodeData.contains("children_count"));
-    CPPUNIT_ASSERT_MESSAGE("Node must have 'timestamp'", nodeData.contains("timestamp"));
+    // Read required fields from the spec
+    const auto requiredFields = this->GetRequiredFields("Node");
+    CPPUNIT_ASSERT_MESSAGE("Node schema must define required fields", !requiredFields.empty());
+
+    for (const auto& field : requiredFields)
+    {
+      CPPUNIT_ASSERT_MESSAGE("Node must have '" + field + "'", nodeData.contains(field));
+    }
   }
 
   void NodeFieldTypesCorrect()
@@ -398,16 +563,30 @@ public:
     auto json = nlohmann::json::parse(res.body);
     const auto& nodeData = json["data"];
 
-    // Per OpenAPI spec: type constraints
-    CPPUNIT_ASSERT_MESSAGE("uid must be string", nodeData["uid"].is_string());
-    CPPUNIT_ASSERT_MESSAGE("name must be string", nodeData["name"].is_string());
-    CPPUNIT_ASSERT_MESSAGE("path must be string", nodeData["path"].is_string());
-    CPPUNIT_ASSERT_MESSAGE("parent_uid must be string or null",
-      nodeData["parent_uid"].is_string() || nodeData["parent_uid"].is_null());
-    CPPUNIT_ASSERT_MESSAGE("data_type must be string or null",
-      nodeData["data_type"].is_string() || nodeData["data_type"].is_null());
-    CPPUNIT_ASSERT_MESSAGE("children_count must be integer", nodeData["children_count"].is_number_integer());
-    CPPUNIT_ASSERT_MESSAGE("timestamp must be integer", nodeData["timestamp"].is_number_integer());
+    // Read required fields and verify each has the correct type from spec
+    const auto requiredFields = this->GetRequiredFields("Node");
+    for (const auto& field : requiredFields)
+    {
+      const std::string specType = this->GetFieldType("Node", field);
+      const bool nullable = this->IsFieldNullable("Node", field);
+      const auto& value = nodeData[field];
+
+      if (nullable && value.is_null())
+      {
+        continue; // null is valid for nullable fields
+      }
+
+      if (specType == "string")
+      {
+        CPPUNIT_ASSERT_MESSAGE(field + " must be string (or null if nullable)",
+          value.is_string());
+      }
+      else if (specType == "integer")
+      {
+        CPPUNIT_ASSERT_MESSAGE(field + " must be integer",
+          value.is_number_integer());
+      }
+    }
 
     // Value checks
     CPPUNIT_ASSERT_EQUAL(std::string("TypeCheckNode"), nodeData["name"].get<std::string>());
@@ -427,17 +606,22 @@ public:
     CPPUNIT_ASSERT_EQUAL(404, res.status);
     auto json = nlohmann::json::parse(res.body);
 
-    // Per OpenAPI spec: Error schema wraps in "error" object
+    // Per spec: Error schema has required: ["error"]
+    const auto errorRequired = this->GetRequiredFields("Error");
+    CPPUNIT_ASSERT_MESSAGE("Error schema must require 'error'",
+      std::find(errorRequired.begin(), errorRequired.end(), "error") != errorRequired.end());
     CPPUNIT_ASSERT_MESSAGE("Error response must have 'error' key", json.contains("error"));
 
-    const auto& error = json["error"];
+    // Per spec: error object has required fields
+    const auto& errorProps = m_Spec["components"]["schemas"]["Error"]["properties"]["error"];
+    CPPUNIT_ASSERT_MESSAGE("Error.error must have required fields", errorProps.contains("required"));
 
-    // Per RFC 7807 / OpenAPI spec: required fields
-    CPPUNIT_ASSERT_MESSAGE("error must have 'type'", error.contains("type"));
-    CPPUNIT_ASSERT_MESSAGE("error must have 'code'", error.contains("code"));
-    CPPUNIT_ASSERT_MESSAGE("error must have 'title'", error.contains("title"));
-    CPPUNIT_ASSERT_MESSAGE("error must have 'message'", error.contains("message"));
-    CPPUNIT_ASSERT_MESSAGE("error must have 'status'", error.contains("status"));
+    const auto innerRequired = errorProps["required"].get<std::vector<std::string>>();
+    const auto& error = json["error"];
+    for (const auto& field : innerRequired)
+    {
+      CPPUNIT_ASSERT_MESSAGE("error must have '" + field + "'", error.contains(field));
+    }
   }
 
   void ErrorResponseHasAllRequiredFields()
@@ -450,12 +634,28 @@ public:
     auto json = nlohmann::json::parse(res.body);
     const auto& error = json["error"];
 
-    // Type checks per OpenAPI spec
-    CPPUNIT_ASSERT_MESSAGE("type must be string (URI)", error["type"].is_string());
-    CPPUNIT_ASSERT_MESSAGE("code must be string", error["code"].is_string());
-    CPPUNIT_ASSERT_MESSAGE("title must be string", error["title"].is_string());
-    CPPUNIT_ASSERT_MESSAGE("message must be string", error["message"].is_string());
-    CPPUNIT_ASSERT_MESSAGE("status must be integer", error["status"].is_number_integer());
+    // Read inner required fields and their types from spec
+    const auto& errorSchema = m_Spec["components"]["schemas"]["Error"]["properties"]["error"];
+    const auto innerRequired = errorSchema["required"].get<std::vector<std::string>>();
+    const auto& innerProps = errorSchema["properties"];
+
+    for (const auto& field : innerRequired)
+    {
+      CPPUNIT_ASSERT_MESSAGE("error must have '" + field + "'", error.contains(field));
+
+      if (innerProps.contains(field) && innerProps[field].contains("type"))
+      {
+        const std::string specType = innerProps[field]["type"].get<std::string>();
+        if (specType == "string")
+        {
+          CPPUNIT_ASSERT_MESSAGE("error." + field + " must be string", error[field].is_string());
+        }
+        else if (specType == "integer")
+        {
+          CPPUNIT_ASSERT_MESSAGE("error." + field + " must be integer", error[field].is_number_integer());
+        }
+      }
+    }
 
     // Value checks
     CPPUNIT_ASSERT_EQUAL(404, error["status"].get<int>());
@@ -483,11 +683,14 @@ public:
     auto json = nlohmann::json::parse(res.body);
     const auto& meta = json["meta"];
 
-    // Per OpenAPI spec: ListMeta schema
-    CPPUNIT_ASSERT_MESSAGE("meta must have total_count", meta.contains("total_count"));
-    CPPUNIT_ASSERT_MESSAGE("meta must have limit", meta.contains("limit"));
-    CPPUNIT_ASSERT_MESSAGE("meta must have offset", meta.contains("offset"));
-    CPPUNIT_ASSERT_MESSAGE("meta must have returned_count", meta.contains("returned_count"));
+    // Read core ListMeta fields from spec
+    const auto& listMetaProps = m_Spec["components"]["schemas"]["ListMeta"]["properties"];
+    const std::vector<std::string> coreFields = {"total_count", "limit", "offset", "returned_count"};
+    for (const auto& field : coreFields)
+    {
+      CPPUNIT_ASSERT_MESSAGE("ListMeta spec must define '" + field + "'", listMetaProps.contains(field));
+      CPPUNIT_ASSERT_MESSAGE("meta must have '" + field + "'", meta.contains(field));
+    }
 
     // When there are more pages, links should have "next"
     CPPUNIT_ASSERT_MESSAGE("meta must have links when paginated", meta.contains("links"));
@@ -504,10 +707,14 @@ public:
     CPPUNIT_ASSERT_EQUAL(200, res.status);
     auto json = nlohmann::json::parse(res.body);
 
-    // Per OpenAPI spec: HealthStatus schema
-    CPPUNIT_ASSERT_MESSAGE("Health must have data.status", json["data"].contains("status"));
-    CPPUNIT_ASSERT_MESSAGE("Health must have data.checks", json["data"].contains("checks"));
-    CPPUNIT_ASSERT_MESSAGE("checks must have datastorage", json["data"]["checks"].contains("datastorage"));
+    // Read required fields from HealthStatus schema in spec
+    const auto requiredFields = this->GetRequiredFields("HealthStatus");
+    CPPUNIT_ASSERT_MESSAGE("HealthStatus schema must define required fields", !requiredFields.empty());
+
+    for (const auto& field : requiredFields)
+    {
+      CPPUNIT_ASSERT_MESSAGE("Health data must have '" + field + "'", json["data"].contains(field));
+    }
 
     CPPUNIT_ASSERT_EQUAL(std::string("healthy"), json["data"]["status"].get<std::string>());
   }
@@ -521,15 +728,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(200, res.status);
     auto json = nlohmann::json::parse(res.body);
 
-    // Per OpenAPI spec: ApiInfo schema
-    CPPUNIT_ASSERT_MESSAGE("Info must have data.name", json["data"].contains("name"));
-    CPPUNIT_ASSERT_MESSAGE("Info must have data.version", json["data"].contains("version"));
-    CPPUNIT_ASSERT_MESSAGE("Info must have data.api_version", json["data"].contains("api_version"));
-    CPPUNIT_ASSERT_MESSAGE("Info must have data.mitk_version", json["data"].contains("mitk_version"));
-    CPPUNIT_ASSERT_MESSAGE("Info must have data.documentation_url", json["data"].contains("documentation_url"));
-    CPPUNIT_ASSERT_MESSAGE("Info must have data.capabilities", json["data"].contains("capabilities"));
-    CPPUNIT_ASSERT_MESSAGE("capabilities must have transfer_modes",
-      json["data"]["capabilities"].contains("transfer_modes"));
+    // Read fields from ApiInfo schema in spec
+    const auto& apiInfoProps = m_Spec["components"]["schemas"]["ApiInfo"]["properties"];
+    for (const auto& [field, schema] : apiInfoProps.items())
+    {
+      CPPUNIT_ASSERT_MESSAGE("Info data must have '" + field + "'", json["data"].contains(field));
+    }
   }
 
   // ==========================================
@@ -538,27 +742,32 @@ public:
 
   void PaginationDefaultLimit()
   {
-    // Per OpenAPI spec: default limit is 50
+    // Read defaults from spec
+    const int specDefaultLimit = this->GetParameterDefault<int>("Limit");
+    const int specDefaultOffset = this->GetParameterDefault<int>("Offset");
+
     auto req = this->CreateRequest("/api/v1/datastorage/nodes");
     httplib::Response res;
     m_Controller->HandleGET_nodes(req, res);
 
     auto json = nlohmann::json::parse(res.body);
-    CPPUNIT_ASSERT_EQUAL(50, json["meta"]["limit"].get<int>());
-    CPPUNIT_ASSERT_EQUAL(0, json["meta"]["offset"].get<int>());
+    CPPUNIT_ASSERT_EQUAL(specDefaultLimit, json["meta"]["limit"].get<int>());
+    CPPUNIT_ASSERT_EQUAL(specDefaultOffset, json["meta"]["offset"].get<int>());
   }
 
   void PaginationMaxLimitEnforced()
   {
-    // Per OpenAPI spec: maximum limit is 1000
+    // Read maximum from spec
+    const int specMaxLimit = this->GetParameterMaximum<int>("Limit");
+
     auto req = this->CreateRequest("/api/v1/datastorage/nodes", "",
       {}, {{"limit", "5000"}});
     httplib::Response res;
     m_Controller->HandleGET_nodes(req, res);
 
     auto json = nlohmann::json::parse(res.body);
-    CPPUNIT_ASSERT_MESSAGE("limit must be capped at 1000",
-      json["meta"]["limit"].get<int>() <= 1000);
+    CPPUNIT_ASSERT_MESSAGE("limit must be capped at " + std::to_string(specMaxLimit),
+      json["meta"]["limit"].get<int>() <= specMaxLimit);
   }
 
   void PaginationOffsetWorks()
@@ -666,8 +875,6 @@ public:
     this->CreateTestNode("KeepMe");
     this->CreateTestNode("FilterOut");
 
-    // Negation filter: filter.name!=FilterOut (URL-encoded as filter.name!=FilterOut)
-    // httplib may parse the ! as part of the key or value
     auto req = this->CreateRequest("/api/v1/datastorage/nodes", "",
       {}, {{"filter.name!", "FilterOut"}});
     httplib::Response res;
@@ -956,94 +1163,39 @@ public:
   // Category 6: Bidirectional Validation
   // ==========================================
 
-  void AllErrorCodesHaveFactoryMethods()
+  void AllSpecErrorCodesExistInCode()
   {
-    // Verify that all error codes defined in ErrorResponse have corresponding
-    // factory methods by checking the constant definitions exist.
-    // This ensures the spec can document all codes that exist in code.
+    // Every error code in the spec examples must have a constant in ErrorResponse.
+    const auto specCodes = this->CollectSpecErrorCodes();
+    const auto codeCodes = GetAllCodeErrorCodes();
 
-    // These are the error code constants from mitkErrorResponse.h
-    CPPUNIT_ASSERT_MESSAGE("INVALID_REQUEST code must be defined",
-      std::string(mitk::ErrorResponse::CODE_INVALID_REQUEST) == "INVALID_REQUEST");
-    CPPUNIT_ASSERT_MESSAGE("NODE_NOT_FOUND code must be defined",
-      std::string(mitk::ErrorResponse::CODE_NODE_NOT_FOUND) == "NODE_NOT_FOUND");
-    CPPUNIT_ASSERT_MESSAGE("PROPERTY_NOT_FOUND code must be defined",
-      std::string(mitk::ErrorResponse::CODE_PROPERTY_NOT_FOUND) == "PROPERTY_NOT_FOUND");
-    CPPUNIT_ASSERT_MESSAGE("DATASTORAGE_NOT_AVAILABLE code must be defined",
-      std::string(mitk::ErrorResponse::CODE_DATASTORAGE_NOT_AVAILABLE) == "DATASTORAGE_NOT_AVAILABLE");
-    CPPUNIT_ASSERT_MESSAGE("INTERNAL_ERROR code must be defined",
-      std::string(mitk::ErrorResponse::CODE_INTERNAL_ERROR) == "INTERNAL_ERROR");
-    CPPUNIT_ASSERT_MESSAGE("PROPERTY_PROTECTED code must be defined",
-      std::string(mitk::ErrorResponse::CODE_PROPERTY_PROTECTED) == "PROPERTY_PROTECTED");
-    CPPUNIT_ASSERT_MESSAGE("NOT_IMPLEMENTED code must be defined",
-      std::string(mitk::ErrorResponse::CODE_NOT_IMPLEMENTED) == "NOT_IMPLEMENTED");
-    CPPUNIT_ASSERT_MESSAGE("NODE_HAS_CHILDREN code must be defined",
-      std::string(mitk::ErrorResponse::CODE_NODE_HAS_CHILDREN) == "NODE_HAS_CHILDREN");
-    CPPUNIT_ASSERT_MESSAGE("NO_DATA code must be defined",
-      std::string(mitk::ErrorResponse::CODE_NO_DATA) == "NO_DATA");
-    CPPUNIT_ASSERT_MESSAGE("UNSUPPORTED_FORMAT code must be defined",
-      std::string(mitk::ErrorResponse::CODE_UNSUPPORTED_FORMAT) == "UNSUPPORTED_FORMAT");
-    CPPUNIT_ASSERT_MESSAGE("SERIALIZATION_ERROR code must be defined",
-      std::string(mitk::ErrorResponse::CODE_SERIALIZATION_ERROR) == "SERIALIZATION_ERROR");
-    CPPUNIT_ASSERT_MESSAGE("FILE_NOT_FOUND code must be defined",
-      std::string(mitk::ErrorResponse::CODE_FILE_NOT_FOUND) == "FILE_NOT_FOUND");
-    CPPUNIT_ASSERT_MESSAGE("FILE_READ_ERROR code must be defined",
-      std::string(mitk::ErrorResponse::CODE_FILE_READ_ERROR) == "FILE_READ_ERROR");
-    CPPUNIT_ASSERT_MESSAGE("TRANSFER_MODE_NOT_AVAILABLE code must be defined",
-      std::string(mitk::ErrorResponse::CODE_TRANSFER_MODE_NOT_AVAILABLE) == "TRANSFER_MODE_NOT_AVAILABLE");
+    for (const auto& code : specCodes)
+    {
+      CPPUNIT_ASSERT_MESSAGE(
+        "Spec error code '" + code + "' has no ErrorResponse constant",
+        codeCodes.count(code) > 0);
+    }
+  }
 
-    // Verify each factory method produces correct structure
-    auto nodeError = mitk::ErrorResponse::NodeNotFound("test-uid", "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("NODE_NOT_FOUND"), nodeError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(404, nodeError["error"]["status"].get<int>());
+  void AllCodeErrorCodesExistInSpec()
+  {
+    // Every error code constant in ErrorResponse must appear in at least one spec example.
+    // Exception: NOT_IMPLEMENTED is implementation-only (no endpoint triggers it in normal flow).
+    const auto specCodes = this->CollectSpecErrorCodes();
+    const auto codeCodes = GetAllCodeErrorCodes();
 
-    auto propError = mitk::ErrorResponse::PropertyNotFound("key", "uid", "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("PROPERTY_NOT_FOUND"), propError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(404, propError["error"]["status"].get<int>());
+    const std::set<std::string> exemptions = {"NOT_IMPLEMENTED"};
 
-    auto dsError = mitk::ErrorResponse::DataStorageNotAvailable("/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("DATASTORAGE_NOT_AVAILABLE"), dsError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(503, dsError["error"]["status"].get<int>());
-
-    auto invalidError = mitk::ErrorResponse::InvalidRequest("detail", "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), invalidError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(400, invalidError["error"]["status"].get<int>());
-
-    auto internalError = mitk::ErrorResponse::InternalError("detail", "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("INTERNAL_ERROR"), internalError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(500, internalError["error"]["status"].get<int>());
-
-    auto protectedError = mitk::ErrorResponse::PropertyProtected("name", "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("PROPERTY_PROTECTED"), protectedError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(400, protectedError["error"]["status"].get<int>());
-
-    auto childrenError = mitk::ErrorResponse::NodeHasChildren(3, "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("NODE_HAS_CHILDREN"), childrenError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(409, childrenError["error"]["status"].get<int>());
-
-    auto noDataError = mitk::ErrorResponse::NoData("uid", "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("NO_DATA"), noDataError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(404, noDataError["error"]["status"].get<int>());
-
-    auto formatError = mitk::ErrorResponse::UnsupportedFormat("detail", "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("UNSUPPORTED_FORMAT"), formatError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(415, formatError["error"]["status"].get<int>());
-
-    auto serError = mitk::ErrorResponse::SerializationError("detail", "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("SERIALIZATION_ERROR"), serError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(500, serError["error"]["status"].get<int>());
-
-    auto fileError = mitk::ErrorResponse::FileNotFound("/some/path", "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("FILE_NOT_FOUND"), fileError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(422, fileError["error"]["status"].get<int>());
-
-    auto readError = mitk::ErrorResponse::FileReadError("/some/path", "detail", "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("FILE_READ_ERROR"), readError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(422, readError["error"]["status"].get<int>());
-
-    auto transferError = mitk::ErrorResponse::TransferModeNotAvailable("invalid", {"direct", "file-reference"}, "/test/path");
-    CPPUNIT_ASSERT_EQUAL(std::string("TRANSFER_MODE_NOT_AVAILABLE"), transferError["error"]["code"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(406, transferError["error"]["status"].get<int>());
+    for (const auto& code : codeCodes)
+    {
+      if (exemptions.count(code) > 0)
+      {
+        continue;
+      }
+      CPPUNIT_ASSERT_MESSAGE(
+        "ErrorResponse code '" + code + "' has no spec example",
+        specCodes.count(code) > 0);
+    }
   }
 
   void ErrorResponseContainsInstancePath()

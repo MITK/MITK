@@ -23,7 +23,7 @@ set(CPP_FILES
 )
 
 set(RESOURCE_FILES
-  openapi.yaml
+  openapi.json
   swagger/index.html
   swagger/swagger-ui-bundle.js
   swagger/swagger-ui.css

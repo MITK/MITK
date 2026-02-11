@@ -10,9 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkDICOMSegmentationIO__cpp
-#define __mitkDICOMSegmentationIO__cpp
-
 #include "mitkDICOMSegmentationIO.h"
 
 #include "mitkDICOMSegIOMimeTypes.h"
@@ -185,6 +182,9 @@ namespace mitk
         auto converter = std::make_unique<dcmqi::Itk2DicomConverter>();
         std::unique_ptr<DcmDataset> result(converter->itkimage2dcmSegmentation(rawVecDataset, segmentations, tmpMetaInfoFile, false));
 
+        if (result == nullptr)
+          mitkThrow() << "dcmqi failed to convert the segmentation to DICOM SEG for group " << layer << ".";
+
         //We store only one group, thus we can specify the SegmentsOverlap Tag (0062,0013)
         // as NO
         auto condition = result->putAndInsertString(DCM_SegmentsOverlap, "NO");
@@ -331,9 +331,16 @@ namespace mitk
           ++iter;
         }
         // Get Segment information map
-        map<unsigned, dcmqi::SegmentAttributes *> segmentMap = (*segmentIter);
-        map<unsigned, dcmqi::SegmentAttributes *>::const_iterator segmentMapIter = (*segmentIter).begin();
-        dcmqi::SegmentAttributes *segmentAttribute = (*segmentMapIter).second;
+        if (segmentIter == metaInfo.segmentsAttributesMappingList.end())
+          mitkThrow() << "Segment metadata list has fewer entries than segment images.";
+
+        const auto &segmentMap = (*segmentIter);
+        if (segmentMap.empty())
+          mitkThrow() << "Segment metadata entry is empty for segment image.";
+
+        dcmqi::SegmentAttributes *segmentAttribute = segmentMap.begin()->second;
+        if (segmentAttribute == nullptr)
+          mitkThrow() << "Segment attributes are null for segment image.";
 
         OFString labelName = segmentAttribute->getSegmentLabel();
 
@@ -412,6 +419,9 @@ namespace mitk
         ++segmentIter;
       }
 
+      if (labelSetImage.IsNull())
+        mitkThrow() << "No valid segments found in DICOM SEG file.";
+
       labelSetImage->SetAllLabelsVisible(true);
 
       if (labelSetImage->GetTotalNumberOfLabels() > 0)
@@ -421,6 +431,9 @@ namespace mitk
 
       // Add some general DICOM Segmentation properties
       mitk::IDICOMTagsOfInterest *toiSrv = DICOMIOHelper::GetTagsOfInterestService();
+      if (toiSrv == nullptr)
+        mitkThrow() << "DICOM tags-of-interest service is not available.";
+
       auto tagsOfInterest = toiSrv->GetTagsOfInterest();
       DICOMTagPathList tagsOfInterestList;
       for (const auto &tag : tagsOfInterest)
@@ -583,7 +596,7 @@ namespace mitk
               segmentAttribute->setSegmentedPropertyTypeCodeSequence("M-03000", "SRT", "Mass");
             }
 
-            if (segType->GetModifierCount() > 0)
+            if (segType.has_value() && segType->GetModifierCount() > 0)
             {
               //Segment Type Modifier (DCMQI only supports one modifier
               auto segTypeMod = segType->GetModifier(0);
@@ -626,7 +639,7 @@ namespace mitk
       OFString codeMeaning; // (0008,0104) Code Meaning
       categoryCodeSequence->getCodeMeaning(codeMeaning);
 
-      label->SetSegmentedPropertyCategory(DICOMCodeSequence(codeValue, codeScheme, codeValue));
+      label->SetSegmentedPropertyCategory(DICOMCodeSequence(codeValue, codeScheme, codeMeaning));
     }
 
     // Add Segmented Property Type Code Sequence tags
@@ -640,7 +653,7 @@ namespace mitk
       OFString codeMeaning; // (0008,0104) Code Meaning
       typeCodeSequence->getCodeMeaning(codeMeaning);
 
-      DICOMCodeSequenceWithModifiers code = DICOMCodeSequenceWithModifiers(codeValue, codeScheme, codeValue);
+      DICOMCodeSequenceWithModifiers code = DICOMCodeSequenceWithModifiers(codeValue, codeScheme, codeMeaning);
 
       // Add Segmented Property Type Modifier Code Sequence tags
       auto modifierCodeSequence = segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence();
@@ -669,8 +682,8 @@ namespace mitk
       OFString codeMeaning; // (0008,0104) Code Meaning
       atomicRegionSequence->getCodeMeaning(codeMeaning);
 
-      DICOMCodeSequenceWithModifiers code = DICOMCodeSequenceWithModifiers(codeValue, codeScheme, codeValue);
-      // Add Segmented Property Type Modifier Code Sequence tags
+      DICOMCodeSequenceWithModifiers code = DICOMCodeSequenceWithModifiers(codeValue, codeScheme, codeMeaning);
+      // Add Anatomic Region Modifier Code Sequence tags
       auto modifierCodeSequence = segmentAttribute->getAnatomicRegionModifierSequence();
       if (modifierCodeSequence != nullptr)
       {
@@ -694,5 +707,3 @@ namespace mitk
 
   DICOMSegmentationIO *DICOMSegmentationIO::IOClone() const { return new DICOMSegmentationIO(*this); }
 } // namespace
-
-#endif //__mitkDICOMSegmentationIO__cpp

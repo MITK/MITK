@@ -108,7 +108,7 @@ private:
   }
 
   // Helper to get the UID for a node directly from the bridge
-  std::string GetUid(const mitk::DataNode* node)
+  std::string GetUid(mitk::DataNode* node)
   {
     return m_Bridge->GetNodeUid(node);
   }

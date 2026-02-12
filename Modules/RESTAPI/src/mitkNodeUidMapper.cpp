@@ -85,7 +85,7 @@ void NodeUidMapper::ClearRESTUIDProperty()
   }
 }
 
-std::string NodeUidMapper::GetOrCreateUid(const DataNode* node)
+std::string NodeUidMapper::GetOrCreateUid(DataNode* node)
 {
   if (node == nullptr)
   {
@@ -105,11 +105,11 @@ std::string NodeUidMapper::GetOrCreateUid(const DataNode* node)
   std::string uid = this->GenerateUid();
 
   // Store in cache
-  m_UidToNode[uid] = const_cast<DataNode*>(node);
+  m_UidToNode[uid] = node;
   m_NodeToUid[node] = uid;
 
   // Store as property for debugging visibility
-  const_cast<DataNode*>(node)->SetStringProperty(UID_PROPERTY_KEY, uid.c_str());
+  node->SetStringProperty(UID_PROPERTY_KEY, uid.c_str());
 
   return uid;
 }

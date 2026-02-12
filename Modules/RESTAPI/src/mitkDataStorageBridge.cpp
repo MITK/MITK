@@ -346,7 +346,7 @@ namespace mitk
     return m_DataStorage.Lock().IsNotNull();
   }
 
-  std::string DataStorageBridge::GetNodeUid(const DataNode* node) const
+  std::string DataStorageBridge::GetNodeUid(DataNode* node) const
   {
     return m_UidMapper->GetOrCreateUid(node);
   }
@@ -1329,7 +1329,7 @@ namespace mitk
     });
   }
 
-  DataStorageBridge::Json DataStorageBridge::NodeToJson(const DataNode* node) const
+  DataStorageBridge::Json DataStorageBridge::NodeToJson(DataNode* node) const
   {
     // Note: caller must hold m_Mutex
     auto dataStorage = m_DataStorage.Lock();
@@ -1338,7 +1338,7 @@ namespace mitk
 
     Json result;
 
-    // Get or create UID (const_cast needed because GetOrCreateUid may modify node property)
+    // Get or create UID
     result["uid"] = m_UidMapper->GetOrCreateUid(node);
     result["name"] = node->GetName();
     result["path"] = this->BuildNodePath(node);
@@ -1382,14 +1382,18 @@ namespace mitk
     if (dataStorage.IsNull())
       mitkThrow() << "BuildNodePath called without a valid DataStorage.";
 
+    constexpr int maxDepth = 256;
+
     std::string path = "/" + node->GetName();
 
     auto sources = dataStorage->GetSources(node);
-    while (sources->Size() > 0)
+    int depth = 0;
+    while (sources->Size() > 0 && depth < maxDepth)
     {
       auto parent = sources->ElementAt(0).GetPointer();
       path = "/" + parent->GetName() + path;
       sources = dataStorage->GetSources(parent);
+      ++depth;
     }
 
     return path;

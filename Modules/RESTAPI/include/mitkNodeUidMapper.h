@@ -75,7 +75,7 @@ namespace mitk
      * @return The UID for this node.
      * @throws std::invalid_argument if node is nullptr.
      */
-    std::string GetOrCreateUid(const DataNode* node);
+    std::string GetOrCreateUid(DataNode* node);
 
     /**
      * @brief Find a node by its UID.

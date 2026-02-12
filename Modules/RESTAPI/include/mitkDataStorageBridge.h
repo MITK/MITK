@@ -145,7 +145,7 @@ namespace mitk
      * @return The UID for this node.
      * @throws std::invalid_argument if node is nullptr.
      */
-    std::string GetNodeUid(const DataNode* node) const;
+    std::string GetNodeUid (DataNode* node) const;
 
     // Node operations
 
@@ -371,7 +371,7 @@ namespace mitk
      */
     NodePredicateBase::Pointer BuildNodePredicate(const NodeQueryParams& params) const;
 
-    Json NodeToJson(const DataNode* node) const;
+    Json NodeToJson(DataNode* node) const;
     std::string BuildNodePath(const DataNode* node) const;
     int GetChildrenCount(const DataNode* node) const;
 

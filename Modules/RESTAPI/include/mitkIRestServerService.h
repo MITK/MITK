@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <string>
 #include <optional>
 #include <vector>
+#include <cstdint>
 
 #include <MitkRESTAPIExports.h>
 
@@ -199,6 +200,16 @@ namespace mitk
      * @brief Clear all logged requests.
      */
     virtual void ClearRequestLog() = 0;
+
+    /**
+     * @brief Get the request log version counter.
+     *
+     * Incremented on every log mutation (new entry, clear, trim).
+     * Allows consumers to detect changes without copying the full log.
+     *
+     * @return Monotonically increasing version number.
+     */
+    virtual uint64_t GetRequestLogVersion() const = 0;
 
     /**
      * @brief Get the server uptime in seconds.

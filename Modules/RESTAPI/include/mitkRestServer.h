@@ -84,6 +84,7 @@ namespace mitk
     std::optional<unsigned int> GetLogLimit() const override;
     std::vector<RequestInfo> GetRequestLog() const override;
     void ClearRequestLog() override;
+    uint64_t GetRequestLogVersion() const override;
 
     std::optional<int64_t> GetUptimeSeconds() const override;
 
@@ -115,6 +116,7 @@ namespace mitk
     // Request logging
     std::deque<RequestInfo> m_RequestLog;
     std::optional<unsigned int> m_LogLimit;
+    uint64_t m_RequestLogVersion{0};
 
     // Temporary directory for data serialization
     std::string m_TempDirectory;

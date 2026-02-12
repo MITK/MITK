@@ -302,19 +302,21 @@ void QmitkRestApiView::UpdateRequestLogTable()
   if (service == nullptr)
   {
     m_Controls.m_RequestLogTable->setRowCount(0);
+    m_LastLogVersion = 0;
     return;
   }
 
-  auto requestLog = service->GetRequestLog();
-
-  // Only update if the row count changed to avoid flickering
-  int currentRowCount = m_Controls.m_RequestLogTable->rowCount();
-  int newRowCount = static_cast<int>(requestLog.size());
-
-  if (currentRowCount != newRowCount)
+  const auto currentVersion = service->GetRequestLogVersion();
+  if (currentVersion == m_LastLogVersion)
   {
-    m_Controls.m_RequestLogTable->setRowCount(newRowCount);
+    return;
   }
+  m_LastLogVersion = currentVersion;
+
+  auto requestLog = service->GetRequestLog();
+  const int newRowCount = static_cast<int>(requestLog.size());
+
+  m_Controls.m_RequestLogTable->setRowCount(newRowCount);
 
   // Populate table (oldest first, most recent at bottom)
   for (int i = 0; i < newRowCount; ++i)

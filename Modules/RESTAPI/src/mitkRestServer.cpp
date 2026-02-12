@@ -43,6 +43,7 @@ bool RestServer::Start()
   }
 
   m_RequestLog.clear();
+  ++m_RequestLogVersion;
   m_ClientIPs.clear();
 
   if (!m_PendingConfig.enabled)
@@ -147,6 +148,7 @@ void RestServer::Stop()
     // Clear request tracking and log
     m_ClientIPs.clear();
     m_RequestLog.clear();
+    ++m_RequestLogVersion;
 
     // Copy and clear temp directory path while holding the lock
     // to prevent race condition if Start() is called concurrently
@@ -244,12 +246,13 @@ void RestServer::SetLogLimit(std::optional<unsigned int> limit)
   std::lock_guard<std::mutex> lock(m_Mutex);
   m_LogLimit = limit;
 
-  if (m_LogLimit.has_value())
+  if (m_LogLimit.has_value() && m_RequestLog.size() > m_LogLimit.value())
   {
     while (m_RequestLog.size() > m_LogLimit.value())
     {
       m_RequestLog.pop_front();
     }
+    ++m_RequestLogVersion;
   }
 }
 
@@ -269,6 +272,13 @@ void RestServer::ClearRequestLog()
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
   m_RequestLog.clear();
+  ++m_RequestLogVersion;
+}
+
+uint64_t RestServer::GetRequestLogVersion() const
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  return m_RequestLogVersion;
 }
 
 std::optional<int64_t> RestServer::GetUptimeSeconds() const
@@ -299,6 +309,8 @@ void RestServer::RecordRequest(const std::string& endpoint, const std::string& m
   {
     m_RequestLog.pop_front();
   }
+
+  ++m_RequestLogVersion;
 }
 
 void RestServer::RegisterRoutes()

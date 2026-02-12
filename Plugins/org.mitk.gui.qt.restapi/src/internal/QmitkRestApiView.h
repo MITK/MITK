@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkIRestServerService.h>
 
 #include <QTimer>
+#include <cstdint>
 
 /**
  * @brief View for monitoring and controlling the REST API server.
@@ -60,6 +61,7 @@ private:
 
   Ui::QmitkRestApiViewControls m_Controls;
   QTimer* m_StatusTimer;
+  uint64_t m_LastLogVersion{0};
 };
 
 #endif

@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include <mitkRestServer.h>
 #include <mitkStandaloneDataStorage.h>
 
+#include <httplib.h>
+
 #include <thread>
 #include <chrono>
 
@@ -33,6 +35,12 @@ class mitkRestServerTestSuite : public mitk::TestFixture
   MITK_TEST(LogLimitDefaultsToUnlimited);
   MITK_TEST(LogLimitCanBeSet);
   MITK_TEST(ClearRequestLogWorks);
+  // Log version tests
+  MITK_TEST(LogVersionStartsAtZero);
+  MITK_TEST(LogVersionIncrementsOnClearLog);
+  MITK_TEST(LogVersionIncrementsOnStartAndStop);
+  MITK_TEST(LogVersionIncrementsOnRequest);
+  MITK_TEST(LogVersionIncrementsOnSetLogLimitTrim);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -252,6 +260,88 @@ public:
     m_Server->ClearRequestLog();
     auto log = m_Server->GetRequestLog();
     CPPUNIT_ASSERT(log.empty());
+  }
+
+  // ===== Log version tests =====
+
+  void LogVersionStartsAtZero()
+  {
+    CPPUNIT_ASSERT_EQUAL(uint64_t(0), m_Server->GetRequestLogVersion());
+  }
+
+  void LogVersionIncrementsOnClearLog()
+  {
+    const auto versionBefore = m_Server->GetRequestLogVersion();
+    m_Server->ClearRequestLog();
+    CPPUNIT_ASSERT(m_Server->GetRequestLogVersion() > versionBefore);
+  }
+
+  void LogVersionIncrementsOnStartAndStop()
+  {
+    mitk::RestServerConfig config;
+    config.port = 18090;
+    config.enabled = true;
+    m_Server->SetConfig(config);
+
+    const auto versionBeforeStart = m_Server->GetRequestLogVersion();
+    m_Server->Start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    CPPUNIT_ASSERT(m_Server->GetRequestLogVersion() > versionBeforeStart);
+
+    const auto versionBeforeStop = m_Server->GetRequestLogVersion();
+    m_Server->Stop();
+    CPPUNIT_ASSERT(m_Server->GetRequestLogVersion() > versionBeforeStop);
+  }
+
+  void LogVersionIncrementsOnRequest()
+  {
+    mitk::RestServerConfig config;
+    config.port = 18091;
+    config.enabled = true;
+    m_Server->SetConfig(config);
+
+    m_Server->Start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    const auto versionBefore = m_Server->GetRequestLogVersion();
+
+    httplib::Client client("127.0.0.1", 18091);
+    auto result = client.Get("/api/v1/health");
+    CPPUNIT_ASSERT(result != nullptr);
+
+    CPPUNIT_ASSERT(m_Server->GetRequestLogVersion() > versionBefore);
+
+    m_Server->Stop();
+  }
+
+  void LogVersionIncrementsOnSetLogLimitTrim()
+  {
+    mitk::RestServerConfig config;
+    config.port = 18092;
+    config.enabled = true;
+    m_Server->SetConfig(config);
+
+    m_Server->Start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    // Populate the log with several requests
+    httplib::Client client("127.0.0.1", 18092);
+    client.Get("/api/v1/health");
+    client.Get("/api/v1/health");
+    client.Get("/api/v1/health");
+
+    const auto versionBeforeTrim = m_Server->GetRequestLogVersion();
+
+    // Set limit lower than current log size - should trim and increment
+    m_Server->SetLogLimit(1);
+    CPPUNIT_ASSERT(m_Server->GetRequestLogVersion() > versionBeforeTrim);
+
+    // Set limit higher than current size - no trimming, should NOT increment
+    const auto versionAfterTrim = m_Server->GetRequestLogVersion();
+    m_Server->SetLogLimit(100);
+    CPPUNIT_ASSERT_EQUAL(versionAfterTrim, m_Server->GetRequestLogVersion());
+
+    m_Server->Stop();
   }
 };
 

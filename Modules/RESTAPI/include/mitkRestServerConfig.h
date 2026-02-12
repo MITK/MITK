@@ -16,8 +16,6 @@ found in the LICENSE file.
 #include <MitkRESTAPIExports.h>
 #include <string>
 
-#include <MitkRESTAPIExports.h>
-
 namespace mitk
 {
   /**

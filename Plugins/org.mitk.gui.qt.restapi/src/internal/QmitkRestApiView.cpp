@@ -51,6 +51,25 @@ void QmitkRestApiView::SetFocus()
   m_Controls.m_StartStopButton->setFocus();
 }
 
+void QmitkRestApiView::Activated()
+{
+}
+
+void QmitkRestApiView::Deactivated()
+{
+}
+
+void QmitkRestApiView::Visible()
+{
+  this->UpdateServerStatus();
+  m_StatusTimer->start(2000);
+}
+
+void QmitkRestApiView::Hidden()
+{
+  m_StatusTimer->stop();
+}
+
 void QmitkRestApiView::CreateQtPartControl(QWidget* parent)
 {
   m_Controls.setupUi(parent);
@@ -82,13 +101,9 @@ void QmitkRestApiView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_RequestLogTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
   m_Controls.m_RequestLogTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 
-  // Setup status timer to periodically update status
+  // Setup status timer (started/stopped via Visible()/Hidden())
   m_StatusTimer = new QTimer(this);
   connect(m_StatusTimer, &QTimer::timeout, this, &QmitkRestApiView::OnRefreshStatus);
-  m_StatusTimer->start(2000); // Update every 2 seconds
-
-  // Initial status update
-  this->UpdateServerStatus();
 }
 
 void QmitkRestApiView::SetupNodeInspectors()

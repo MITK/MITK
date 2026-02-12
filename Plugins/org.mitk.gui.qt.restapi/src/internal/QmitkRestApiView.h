@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "ui_QmitkRestApiViewControls.h"
 
 #include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
 #include <mitkIRestServerService.h>
 
 #include <usServiceTracker.h>
@@ -36,7 +37,7 @@ found in the LICENSE file.
  * - List of client IPs that have sent requests
  * - Last endpoint requested with response code
  */
-class QmitkRestApiView : public QmitkAbstractView
+class QmitkRestApiView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
   Q_OBJECT
 
@@ -49,6 +50,12 @@ public:
 protected:
   void SetFocus() override;
   void CreateQtPartControl(QWidget* parent) override;
+
+  // ILifecycleAwarePart
+  void Activated() override;
+  void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
 
 private Q_SLOTS:
   void OnStartStopClicked();

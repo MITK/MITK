@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <usModuleRegistry.h>
 #include <usModule.h>
 #include <usModuleContext.h>
-#include <usServiceReference.h>
 
 #include <QApplication>
 #include <QClipboard>
@@ -39,6 +38,12 @@ QmitkRestApiView::~QmitkRestApiView()
     m_StatusTimer->stop();
     delete m_StatusTimer;
   }
+
+  if (m_ServiceTracker)
+  {
+    m_ServiceTracker->Close();
+  }
+  m_ServiceTracker.reset();
 }
 
 void QmitkRestApiView::SetFocus()
@@ -49,6 +54,18 @@ void QmitkRestApiView::SetFocus()
 void QmitkRestApiView::CreateQtPartControl(QWidget* parent)
 {
   m_Controls.setupUi(parent);
+
+  // Setup service tracker for the REST API service
+  auto* restModule = us::ModuleRegistry::GetModule("MitkRESTAPI");
+  if (restModule != nullptr)
+  {
+    auto* context = restModule->GetModuleContext();
+    if (context != nullptr)
+    {
+      m_ServiceTracker = std::make_unique<us::ServiceTracker<mitk::IRestServerService>>(context);
+      m_ServiceTracker->Open();
+    }
+  }
 
   // Setup node inspectors
   this->SetupNodeInspectors();
@@ -95,26 +112,12 @@ void QmitkRestApiView::SetupNodeInspectors()
 
 mitk::IRestServerService* QmitkRestApiView::GetRestServerService() const
 {
-  auto restModule = us::ModuleRegistry::GetModule("MitkRESTAPI");
-
-  if (restModule == nullptr)
+  if (!m_ServiceTracker)
   {
     return nullptr;
   }
 
-  auto* context = restModule->GetModuleContext();
-  if (context == nullptr)
-  {
-    return nullptr;
-  }
-
-  auto refs = context->GetServiceReferences<mitk::IRestServerService>();
-  if (refs.empty())
-  {
-    return nullptr;
-  }
-
-  return context->GetService(refs.front());
+  return m_ServiceTracker->GetService();
 }
 
 void QmitkRestApiView::OnStartStopClicked()

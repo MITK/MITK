@@ -18,8 +18,11 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkIRestServerService.h>
 
+#include <usServiceTracker.h>
+
 #include <QTimer>
 #include <cstdint>
+#include <memory>
 
 /**
  * @brief View for monitoring and controlling the REST API server.
@@ -60,6 +63,7 @@ private:
   mitk::IRestServerService* GetRestServerService() const;
 
   Ui::QmitkRestApiViewControls m_Controls;
+  std::unique_ptr<us::ServiceTracker<mitk::IRestServerService>> m_ServiceTracker;
   QTimer* m_StatusTimer;
   uint64_t m_LastLogVersion{0};
 };

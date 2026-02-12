@@ -174,11 +174,20 @@ std::string NodeUidMapper::GenerateUid()
 
 void NodeUidMapper::OnNodeAdded(const DataNode* node)
 {
-  if (nullptr != node)
+  if (node == nullptr)
   {
-    // remove the uid property if existing. This could happen if a session is loaded again,
-    // as currently session doesn't filter out the property on save.
-    node->GetPropertyList()->DeleteProperty(UID_PROPERTY_KEY);
+    return;
+  }
+
+  std::lock_guard<std::mutex> lock(m_Mutex);
+
+  // Only clear the UID property if the node is not in our cache.
+  // Nodes in the cache have UIDs assigned this session (e.g., via RestoreUid
+  // during reparenting). Nodes not in the cache may carry stale UIDs
+  // from a loaded session file.
+  if (m_NodeToUid.find(node) == m_NodeToUid.end())
+  {
+    const_cast<DataNode*>(node)->GetPropertyList()->DeleteProperty(UID_PROPERTY_KEY);
   }
 }
 

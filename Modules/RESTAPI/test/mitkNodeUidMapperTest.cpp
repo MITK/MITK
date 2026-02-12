@@ -28,6 +28,7 @@ class mitkNodeUidMapperTestSuite : public mitk::TestFixture
   MITK_TEST(ClearsTransientPropertiesOnNodeAdd);
   MITK_TEST(HasUidReturnsFalseForUnknownUid);
   MITK_TEST(ThrowsOnNullNode);
+  MITK_TEST(PreservesRestoredUidOnReAdd);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -215,6 +216,39 @@ public:
   void ThrowsOnNullNode()
   {
     CPPUNIT_ASSERT_THROW(m_Mapper->GetOrCreateUid(nullptr), std::invalid_argument);
+  }
+
+  void PreservesRestoredUidOnReAdd()
+  {
+    // Simulates reparenting: remove node, restore UID, re-add node.
+    // OnNodeAdded must NOT delete the UID property when the node is already
+    // in the mapper's cache (restored via RestoreUid before re-add).
+    auto node = mitk::DataNode::New();
+    node->SetName("ReparentedNode");
+    m_DataStorage->Add(node);
+
+    auto uid = m_Mapper->GetOrCreateUid(node);
+    CPPUNIT_ASSERT(!uid.empty());
+
+    // Remove triggers OnNodeRemoved, clearing the cache entry
+    m_DataStorage->Remove(node);
+    CPPUNIT_ASSERT(!m_Mapper->HasUid(uid));
+
+    // Restore the UID before re-adding (as reparenting code would do)
+    m_Mapper->RestoreUid(node, uid);
+    CPPUNIT_ASSERT(m_Mapper->HasUid(uid));
+
+    // Re-add triggers OnNodeAdded - must NOT delete the restored UID property
+    m_DataStorage->Add(node);
+
+    // UID should still be in the cache
+    CPPUNIT_ASSERT(m_Mapper->HasUid(uid));
+    CPPUNIT_ASSERT(m_Mapper->FindNodeByUid(uid) == node.GetPointer());
+
+    // UID property should still be on the node
+    std::string value;
+    CPPUNIT_ASSERT(node->GetStringProperty(mitk::NodeUidMapper::UID_PROPERTY_KEY, value));
+    CPPUNIT_ASSERT_EQUAL(uid, value);
   }
 };
 

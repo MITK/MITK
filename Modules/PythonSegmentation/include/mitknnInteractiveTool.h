@@ -85,6 +85,8 @@ namespace mitk
     void Notify(InteractionEvent* event, bool isHandled) override;
     void ConfirmCleanUp() override;
 
+    void SetPreviewLabel(MultiLabelSegmentation::LabelValueType value, const Color& color);
+
   private:
     class Impl;
     std::unique_ptr<Impl> m_Impl;

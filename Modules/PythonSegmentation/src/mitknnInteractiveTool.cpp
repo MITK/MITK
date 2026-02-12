@@ -346,6 +346,28 @@ void mitk::nnInteractiveTool::InitializeSessionWithMask(Image* mask)
   this->UpdatePreview();
 }
 
+void mitk::nnInteractiveTool::SetPreviewLabel(MultiLabelSegmentation::LabelValueType value, const Color& color)
+{
+  auto image = this->GetPreviewSegmentation();
+
+  if (image == nullptr)
+    return;
+
+  auto label = image->GetLabel(value);
+
+  if (label.IsNull())
+  {
+    label = Label::New(value, "preview");
+    image->AddLabel(label, 0, false, false);
+  }
+
+  image->GetLabel(value)->SetColor(color);
+  image->UpdateLabel(value, label);
+
+  image->SetActiveLabel(value);
+  this->SetSelectedLabels({value});
+}
+
 void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, MultiLabelSegmentation* previewImage, TimeStepType timeStep)
 {
   // This method assumes it is only called when an interaction has occurred or
@@ -354,6 +376,8 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
 
   if (previewImage == nullptr || m_Impl->GetPythonContext() == nullptr)
     return;
+
+  this->SetPreviewLabel(1, this->GetSpecialPreviewColor());
 
   const auto* interactor = m_Impl->GetEnabledInteractor();
 

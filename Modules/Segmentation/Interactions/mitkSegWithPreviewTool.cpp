@@ -254,6 +254,13 @@ void mitk::SegWithPreviewTool::ResetPreviewContent()
   }
 }
 
+mitk::Color mitk::SegWithPreviewTool::GetSpecialPreviewColor() const
+{
+  Color color;
+  color.Set(0.0f, 1.0f, 0.0);
+  return color;
+}
+
 void mitk::SegWithPreviewTool::ResetPreviewNode()
 {
   if (m_IsUpdating)
@@ -261,16 +268,13 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
     mitkThrow() << "Used tool is implemented incorrectly. ResetPreviewNode is called while preview update is ongoing. Check implementation!";
   }
 
-  itk::RGBPixel<float> previewColor;
-  previewColor[0] = 0.0f;
-  previewColor[1] = 1.0f;
-  previewColor[2] = 0.0f;
-
   const auto image = this->GetSegmentationInput();
   if (nullptr != image)
   {
     MultiLabelSegmentation::ConstPointer workingImage =
       dynamic_cast<const MultiLabelSegmentation *>(this->GetToolManager()->GetWorkingData(0)->GetData());
+
+    const auto previewColor = this->GetSpecialPreviewColor();
 
     if (workingImage.IsNotNull())
     {

@@ -22,7 +22,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Handles all /api/v1/datastorage/* endpoints.
+   * @brief Handles all /api/v1/datastorage endpoints.
    *
    * Handler method naming convention: HandleMETHOD_path_segments()
    * The method name directly reflects the route for clarity.

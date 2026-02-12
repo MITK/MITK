@@ -26,7 +26,7 @@ namespace
   mitk::IPreferences* GetPreferences()
   {
     auto* preferencesService = mitk::CoreServices::GetPreferencesService();
-    return preferencesService->GetSystemPreferences()->Node("/org.mitk.restapi");
+    return preferencesService->GetSystemPreferences()->Node("org.mitk.restapi");
   }
 }
 

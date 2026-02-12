@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <mitkFileSystem.h>
 #include <mitkImageGenerator.h>
 #include <mitkNumericConstants.h>
+#include <mitkLog.h>
 
 #include <nlohmann/json.hpp>
 
@@ -503,8 +504,7 @@ public:
     }
     else if (res.status == 415)
     {
-      // Serializer not available - this is OK for this test
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "TransferModeDefaultsDirect skipped: serializer not available (HTTP 415)";
     }
   }
 
@@ -531,8 +531,7 @@ public:
     }
     else if (res.status == 415)
     {
-      // Serializer not available - OK for this test
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "TransferModeDirectFromHeader skipped: serializer not available (HTTP 415)";
     }
   }
 
@@ -560,8 +559,7 @@ public:
     }
     else if (res.status == 415)
     {
-      // Serializer not available - OK for this test
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "TransferModeFileReferenceFromHeader skipped: serializer not available (HTTP 415)";
     }
   }
 
@@ -587,8 +585,7 @@ public:
     }
     else if (res.status == 415)
     {
-      // Serializer not available - OK for this test
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "TransferModeFromAcceptHeader skipped: serializer not available (HTTP 415)";
     }
   }
 
@@ -646,8 +643,7 @@ public:
     }
     else if (res.status == 415)
     {
-      // Serializer not available - skip metadata verification
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "BuildImageMetadata skipped: serializer not available (HTTP 415)";
     }
   }
 
@@ -694,8 +690,7 @@ public:
     }
     else if (res.status == 415)
     {
-      // Serializer not available - skip metadata verification
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "BuildSurfaceMetadata skipped: serializer not available (HTTP 415)";
     }
   }
 
@@ -740,8 +735,7 @@ public:
     }
     else if (res.status == 415)
     {
-      // Serializer not available - skip metadata verification
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "BuildPointSetMetadata skipped: serializer not available (HTTP 415)";
     }
   }
 
@@ -800,7 +794,7 @@ public:
     }
     else if (res.status == 415)
     {
-      // Serializer not available - this is OK, test passes conditionally
+      MITK_WARN << "GetImageDataDirect skipped: serializer not available (HTTP 415)";
       const auto json = nlohmann::json::parse(res.body);
       CPPUNIT_ASSERT_EQUAL(std::string("UNSUPPORTED_FORMAT"), json["error"]["code"].get<std::string>());
     }
@@ -864,8 +858,7 @@ public:
     }
     else if (res.status == 415)
     {
-      // Serializer not available - OK for this test
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "GetImageDataFileReference skipped: serializer not available (HTTP 415)";
     }
     else
     {
@@ -892,8 +885,7 @@ public:
     }
     catch (const std::exception&)
     {
-      // If we can't save the image, skip this test
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "PutImageDataDirect skipped: could not save test image (serializer not available)";
       return;
     }
 
@@ -937,8 +929,7 @@ public:
     }
     else if (res.status == 415 || res.status == 422)
     {
-      // File format not supported or read error - OK for this test
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "PutImageDataDirect skipped: serializer not available (HTTP " << res.status << ")";
     }
     else
     {
@@ -965,8 +956,7 @@ public:
     }
     catch (const std::exception&)
     {
-      // If we can't save the image, skip this test
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "PutImageDataFileReference skipped: could not save test image (serializer not available)";
       return;
     }
 
@@ -1006,9 +996,8 @@ public:
     }
     else if (res.status == 415 || res.status == 422)
     {
-      // File format not supported or read error - clean up and pass
       fs::remove(fs::path(tempFilePath));
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "PutImageDataFileReference skipped: serializer not available (HTTP " << res.status << ")";
     }
     else
     {
@@ -1084,8 +1073,7 @@ public:
     }
     else if (res.status == 415 || res.status == 422)
     {
-      // Serializer not available or file format issue - OK for this test
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "PostNodeWithDataFileReference skipped: serializer not available (HTTP " << res.status << ")";
     }
     else
     {
@@ -1159,8 +1147,7 @@ public:
     }
     else if (res.status == 415 || res.status == 422)
     {
-      // Serializer not available - OK for this test
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "PostNodeWithDataDirect skipped: serializer not available (HTTP " << res.status << ")";
     }
     else
     {
@@ -1233,8 +1220,7 @@ public:
     }
     else if (res.status == 415 || res.status == 422)
     {
-      // Serializer not available - OK for this test
-      CPPUNIT_ASSERT(true);
+      MITK_WARN << "PostChildNodeWithDataFileReference skipped: serializer not available (HTTP " << res.status << ")";
     }
     else
     {

@@ -890,7 +890,6 @@ void DataStorageController::HandlePOST_nodes_uid_generic(const httplib::Request&
       this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to create child node", req.path));
     }
     else
-    if (parentUID.has_value())
     {
       this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to create node", req.path));
     }

@@ -13,19 +13,32 @@ found in the LICENSE file.
 #ifndef mitkPluginActivator_h
 #define mitkPluginActivator_h
 
-#include <ctkPluginActivator.h>
+#include <berryAbstractUICTKPlugin.h>
 
 namespace mitk
 {
-  class RestApiPluginActivator : public QObject, public ctkPluginActivator
+  class RestApiPluginActivator : public berry::AbstractUICTKPlugin
   {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_restapi")
     Q_INTERFACES(ctkPluginActivator)
 
   public:
+
+    RestApiPluginActivator();
+    ~RestApiPluginActivator() override;
+
     void start(ctkPluginContext* context) override;
     void stop(ctkPluginContext* context) override;
+
+    static RestApiPluginActivator* getDefault();
+
+    static ctkPluginContext* getContext();
+
+  private:
+
+    static ctkPluginContext* m_context;
+    static RestApiPluginActivator* m_Instance;
   };
 }
 

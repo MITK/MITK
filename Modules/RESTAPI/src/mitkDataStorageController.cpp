@@ -755,9 +755,9 @@ void DataStorageController::HandleGET_nodes(const httplib::Request& req, httplib
     for (const auto& pf : params.propertyFilters)
     {
       nlohmann::json filter;
-      filter["key"] = pf.key;
-      filter["value"] = pf.value;
-      filter["negated"] = pf.negated;
+      filter[JSON_KEY_KEY] = pf.key;
+      filter[JSON_KEY_VALUE] = pf.value;
+      filter[JSON_KEY_NEGATED] = pf.negated;
       propFilters.push_back(filter);
     }
     filtersApplied["property_filters"] = propFilters;
@@ -1753,8 +1753,8 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
     else
     {
       nlohmann::json failure;
-      failure["property"] = key;
-      failure["error"] = "Failed to set property value";
+      failure[JSON_KEY_PROPERTY] = key;
+      failure[JSON_KEY_ERROR] = "Failed to set property value";
       failed.push_back(failure);
     }
   }

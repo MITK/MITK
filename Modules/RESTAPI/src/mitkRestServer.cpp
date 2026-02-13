@@ -471,7 +471,11 @@ bool RestServer::SetupTempDirectory()
 {
   try
   {
-    m_TempDirectory = IOUtil::CreateTemporaryDirectory("mitk-rest-XXXXXX");
+    // Workaround: IOUtil::CreateTemporaryDirectory produces double separators
+    // when GetTempPath() returns a path with trailing separator (T-XXXXX).
+    // TODO: Fix in IOUtil::CreateTemporaryDirectory and CreateTemporaryFile.
+    m_TempDirectory = fs::path(IOUtil::CreateTemporaryDirectory("mitk-rest-XXXXXX"))
+                        .lexically_normal().string();
     MITK_DEBUG << "Created REST API temp directory: " << m_TempDirectory;
     return true;
   }

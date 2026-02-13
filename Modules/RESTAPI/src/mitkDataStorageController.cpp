@@ -603,7 +603,8 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
     fs::path tempFilePath;
     try
     {
-      tempFilePath = fs::path(IOUtil::CreateTemporaryFile("upload_XXXXXX" + extension, m_TempDirectory));
+      const std::string tempDirForFile = (fs::path(m_TempDirectory) / "").string();
+      tempFilePath = fs::path(IOUtil::CreateTemporaryFile("upload_XXXXXX" + extension, tempDirForFile));
     }
     catch (const std::exception& e)
     {
@@ -1290,10 +1291,12 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
       {
         response[JSON_KEY_TRANSFER][JSON_KEY_SIZE_BYTES] = static_cast<int64_t>(fs::file_size(fullPath));
       }
-      response[JSON_KEY_TRANSFER][JSON_KEY_FILE_PATH] = fullPath.string();
+      // Use generic_string() for paths in JSON responses to ensure consistent
+      // forward-slash separators across all platforms.
+      response[JSON_KEY_TRANSFER][JSON_KEY_FILE_PATH] = fullPath.generic_string();
 
       // Include the directory path so client knows where all related files are
-      response[JSON_KEY_TRANSFER][JSON_KEY_DIRECTORY_PATH] = requestTempDir.string();
+      response[JSON_KEY_TRANSFER][JSON_KEY_DIRECTORY_PATH] = requestTempDir.generic_string();
 
       // Add data metadata
       response[JSON_KEY_DATA_METADATA] = this->BuildDataMetadata(baseData);

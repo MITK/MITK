@@ -12,7 +12,9 @@
     <view id="org.mitk.views.restapi"
           name="REST API"
           class="QmitkRestApiView"
-          icon="resources/restapi.svg"/>
+          icon="resources/restapi.svg"
+		  category="Data"/>
+          <description>View status of the REST API and allows to start or stop it.</description>
   </extension>
 
   <extension point="org.blueberry.ui.keywords">

@@ -92,43 +92,6 @@ namespace
     return nullptr;
   }
 
-  mitk::BaseProperty::Pointer GetProperty(mitk::DataNode* node, const std::string& propertyKey,
-    const std::optional<std::string>& context, const mitk::PropertyScope scope)
-  {
-    if (nullptr == node)
-      mitkThrow() << "Wrong use of GetProperty. Node is nullptr.";
-
-    std::string contextName = context.has_value() ? context.value() : "";
-
-    mitk::BaseProperty::Pointer allResult = node->GetNonConstProperty(propertyKey, contextName, false);
-
-    if (scope == mitk::PropertyScope::All)
-    {
-      return allResult;
-    }
-
-    // scope is not all, we have to check explicit because the node implementation has a automatic
-    // fall trough...
-    mitk::BaseProperty::Pointer dataResult;
-    if (nullptr != node->GetData())
-    {
-      dataResult = node->GetData()->GetNonConstProperty(propertyKey, contextName, false);
-    }
-
-    if (scope == mitk::PropertyScope::Data)
-    {
-      return dataResult;
-    }
-
-    // scope is Node only. If dataResult and allResult are different pointer,
-    // then there is a property defined at node level.
-    if (allResult != dataResult)
-    {
-      return allResult;
-    }
-
-    return nullptr;
-  }
 
   std::string GenerateTimestampString()
   {
@@ -424,7 +387,7 @@ namespace mitk
     for (const auto& propFilter : params.propertyFilters)
     {
       auto propertyPredicate = NodePredicateFunction::New(
-        [this, params, propFilter](const DataNode* node) -> bool {
+        [params, propFilter](const DataNode* node) -> bool {
           std::optional<std::string> propValue;
 
           // Handle special fields that aren't stored as properties

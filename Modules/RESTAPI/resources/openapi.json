@@ -39,6 +39,10 @@
     {
       "name": "Properties",
       "description": "Node property operations"
+    },
+    {
+      "name": "Configuration",
+      "description": "Server configuration discovery"
     }
   ],
   "paths": {
@@ -159,6 +163,57 @@
                       "authentication": [
                         "api-token"
                       ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/config/file-access": {
+      "get": {
+        "tags": [
+          "Configuration"
+        ],
+        "summary": "Get file access configuration",
+        "description": "Returns the current file access configuration, including the mode and, when restrictions are active, the list of allowed directories. Clients can use this to discover which file paths are permitted for file-reference transfers.",
+        "operationId": "getFileAccessConfig",
+        "responses": {
+          "200": {
+            "description": "File access configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FileAccessConfig"
+                    }
+                  }
+                },
+                "examples": {
+                  "unrestricted": {
+                    "summary": "No file access restrictions",
+                    "value": {
+                      "data": {
+                        "mode": "unrestricted",
+                        "restrictions_active": false
+                      }
+                    }
+                  },
+                  "restricted": {
+                    "summary": "Restricted to specific directories",
+                    "value": {
+                      "data": {
+                        "mode": "allowed-directories",
+                        "restrictions_active": true,
+                        "allowed_paths": [
+                          "/data/images",
+                          "/data/exports"
+                        ]
+                      }
                     }
                   }
                 }
@@ -1904,6 +1959,34 @@
           }
         }
       },
+      "FileAccessConfig": {
+        "type": "object",
+        "required": [
+          "mode",
+          "restrictions_active"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "unrestricted",
+              "allowed-directories"
+            ],
+            "description": "Current file access mode"
+          },
+          "restrictions_active": {
+            "type": "boolean",
+            "description": "Whether file path restrictions are currently enforced"
+          },
+          "allowed_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of allowed directory paths (only present when restrictions are active)"
+          }
+        }
+      },
       "Error": {
         "type": "object",
         "description": "RFC 7807 Problem Details error envelope",
@@ -2426,6 +2509,87 @@
                 "title": "DataStorage Not Available",
                 "message": "No DataStorage is currently connected to the REST API server",
                 "status": 503
+              }
+            }
+          }
+        }
+      },
+      "AccessDenied": {
+        "description": "Client IP is not allowed to access the server",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/ACCESS_DENIED",
+                "code": "ACCESS_DENIED",
+                "title": "Access Denied",
+                "message": "Client IP 10.0.0.1 is not allowed",
+                "status": 403,
+                "instance": "/api/v1/datastorage/nodes"
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication required or invalid token",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/UNAUTHORIZED",
+                "code": "UNAUTHORIZED",
+                "title": "Unauthorized",
+                "message": "Authentication required. Provide Authorization: Bearer <token> header.",
+                "status": 401,
+                "instance": "/api/v1/datastorage/nodes"
+              }
+            }
+          }
+        }
+      },
+      "RateLimitExceeded": {
+        "description": "Too many requests from this client",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/RATE_LIMIT_EXCEEDED",
+                "code": "RATE_LIMIT_EXCEEDED",
+                "title": "Rate Limit Exceeded",
+                "message": "Too many requests. Try again later.",
+                "status": 429,
+                "instance": "/api/v1/datastorage/nodes",
+                "retry_after": 30
+              }
+            }
+          }
+        }
+      },
+      "FileAccessDenied": {
+        "description": "File path is outside allowed directories",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/FILE_ACCESS_DENIED",
+                "code": "FILE_ACCESS_DENIED",
+                "title": "File Access Denied",
+                "message": "Path outside allowed directories",
+                "status": 403,
+                "instance": "/api/v1/datastorage/nodes/node_1/data"
               }
             }
           }

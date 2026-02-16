@@ -24,7 +24,7 @@ namespace mitk
   {
     LocalhostOnly,  ///< Only accept connections from 127.0.0.1 and ::1 (default)
     AllowAll,        ///< Accept connections from any IP (not recommended without auth)
-    Whitelist        ///< Accept connections from listed IPs (localhost always allowed)
+    Whitelist        ///< Accept connections only from explicitly listed IPs
   };
 
   /** @brief Access mode for file system paths. */

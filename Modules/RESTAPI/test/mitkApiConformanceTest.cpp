@@ -73,6 +73,7 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   MITK_TEST(PaginationResponseHasRequiredFields);
   MITK_TEST(HealthResponseStructure);
   MITK_TEST(InfoResponseStructure);
+  MITK_TEST(FileAccessConfigResponseStructure);
 
   // Category 3: Query Parameter Conformance
   MITK_TEST(PaginationDefaultLimit);
@@ -194,6 +195,9 @@ private:
     };
     m_EndpointRegistry[{"/info", "get"}] = [this](const httplib::Request& req, httplib::Response& res) {
       m_HealthController->HandleGET_info(req, res);
+    };
+    m_EndpointRegistry[{"/config/file-access", "get"}] = [this](const httplib::Request& req, httplib::Response& res) {
+      m_HealthController->HandleGET_config_file_access(req, res);
     };
 
     // Nodes
@@ -413,7 +417,11 @@ private:
       mitk::ErrorResponse::CODE_SERIALIZATION_ERROR,
       mitk::ErrorResponse::CODE_FILE_NOT_FOUND,
       mitk::ErrorResponse::CODE_FILE_READ_ERROR,
-      mitk::ErrorResponse::CODE_TRANSFER_MODE_NOT_AVAILABLE
+      mitk::ErrorResponse::CODE_TRANSFER_MODE_NOT_AVAILABLE,
+      mitk::ErrorResponse::CODE_ACCESS_DENIED,
+      mitk::ErrorResponse::CODE_UNAUTHORIZED,
+      mitk::ErrorResponse::CODE_RATE_LIMIT_EXCEEDED,
+      mitk::ErrorResponse::CODE_FILE_ACCESS_DENIED
     };
   }
 
@@ -734,6 +742,36 @@ public:
     {
       CPPUNIT_ASSERT_MESSAGE("Info data must have '" + field + "'", json["data"].contains(field));
     }
+  }
+
+  void FileAccessConfigResponseStructure()
+  {
+    httplib::Request req;
+    httplib::Response res;
+    m_HealthController->HandleGET_config_file_access(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    auto json = nlohmann::json::parse(res.body);
+
+    CPPUNIT_ASSERT_MESSAGE("Response must have 'data' key", json.contains("data"));
+
+    // Read required fields from FileAccessConfig schema in spec
+    const auto requiredFields = this->GetRequiredFields("FileAccessConfig");
+    CPPUNIT_ASSERT_MESSAGE("FileAccessConfig schema must define required fields", !requiredFields.empty());
+
+    for (const auto& field : requiredFields)
+    {
+      CPPUNIT_ASSERT_MESSAGE("File access config data must have '" + field + "'",
+        json["data"].contains(field));
+    }
+
+    // Default mode is unrestricted
+    CPPUNIT_ASSERT_EQUAL(std::string("unrestricted"), json["data"]["mode"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(false, json["data"]["restrictions_active"].get<bool>());
+
+    // allowed_paths should not be present when unrestricted
+    CPPUNIT_ASSERT_MESSAGE("allowed_paths must not be present when unrestricted",
+      !json["data"].contains("allowed_paths"));
   }
 
   // ==========================================

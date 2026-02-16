@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkSegmentationPreferencePage.h"
 
-#include <mitkBaseApplication.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
@@ -122,15 +121,12 @@ void QmitkSegmentationPreferencePage::Update()
   m_Ui->selectionModeCheckBox->setChecked(prefs->GetBool("selection mode", false));
 
   //label presets
-  auto labelSetPreset = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
-  bool isOverriddenByCmdLineArg = !labelSetPreset.empty();
+  bool isOverridden = prefs->IsOverridden("label set preset");
+  auto labelSetPreset = prefs->Get("label set preset", "");
 
-  if (!isOverriddenByCmdLineArg)
-    labelSetPreset = prefs->Get("label set preset", "");
-
-  m_Ui->labelSetPresetLineEdit->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->labelSetPresetToolButton->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->labelSetPresetCmdLineArgLabel->setVisible(isOverriddenByCmdLineArg);
+  m_Ui->labelSetPresetLineEdit->setDisabled(isOverridden);
+  m_Ui->labelSetPresetToolButton->setDisabled(isOverridden);
+  m_Ui->labelSetPresetCmdLineArgLabel->setVisible(isOverridden);
 
   m_Ui->labelSetPresetLineEdit->setText(QString::fromStdString(labelSetPreset));
 

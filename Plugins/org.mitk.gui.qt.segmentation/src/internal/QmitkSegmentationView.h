@@ -146,8 +146,6 @@ private:
 
   void ValidateSelectionInput();
 
-  std::string GetDefaultLabelSetPreset() const;
-
   mitk::MultiLabelSegmentation* GetCurrentSegmentation() const;
 
   QWidget* m_Parent;

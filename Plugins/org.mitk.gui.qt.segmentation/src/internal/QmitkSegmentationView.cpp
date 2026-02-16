@@ -35,6 +35,7 @@ found in the LICENSE file.
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkWorkbenchUtil.h>
 #include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
 #include <mitkMultiLabelPredicateHelper.h>
 
 // Qmitk
@@ -66,6 +67,11 @@ found in the LICENSE file.
 
 namespace
 {
+  mitk::IPreferences* GetPreferences()
+  {
+    return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node(QmitkSegmentationView::VIEW_ID);
+  }
+
   QList<QmitkRenderWindow*> Get2DWindows(const QList<QmitkRenderWindow*> allWindows)
   {
     QList<QmitkRenderWindow*> all2DWindows;
@@ -430,7 +436,7 @@ void QmitkSegmentationView::OnNewSegmentation()
     return;
   }
 
-  const auto labelSetPreset = this->GetDefaultLabelSetPreset();
+  const auto labelSetPreset = m_LabelSetPresetPreference.toStdString();
 
   if (labelSetPreset.empty() || !mitk::MultiLabelIOHelper::LoadMultiLabelSegmentationPreset(labelSetPreset, newLabelSetImage))
   {
@@ -460,16 +466,6 @@ void QmitkSegmentationView::OnNewSegmentation()
 
   newSegmentationNode->SetSelected(true);
   m_Controls->workingNodeSelector->SetCurrentSelectedNode(newSegmentationNode);
-}
-
-std::string QmitkSegmentationView::GetDefaultLabelSetPreset() const
-{
-  auto labelSetPreset = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
-
-  if (labelSetPreset.empty())
-    labelSetPreset = m_LabelSetPresetPreference.toStdString();
-
-  return labelSetPreset;
 }
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)
@@ -712,6 +708,18 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    m_Controls->splitter->setObjectName("QmitkSegmentationViewSplitter");
    m_Controls->splitter->setHandleWidth(2);
+
+   // Apply command-line argument as a session-only override so all preference
+   // consumers transparently see the value without manual bypass logic.
+   auto labelSetPreset = mitk::BaseApplication::instance().config().getString(
+     mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
+
+   if (!labelSetPreset.empty())
+   {
+     auto* prefs = GetPreferences();
+     prefs->Override("label set preset", labelSetPreset);
+   }
+
    this->UpdateGUI();
 }
 

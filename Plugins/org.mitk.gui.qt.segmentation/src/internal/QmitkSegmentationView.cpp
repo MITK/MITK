@@ -67,11 +67,6 @@ found in the LICENSE file.
 
 namespace
 {
-  mitk::IPreferences* GetPreferences()
-  {
-    return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node(QmitkSegmentationView::VIEW_ID);
-  }
-
   QList<QmitkRenderWindow*> Get2DWindows(const QList<QmitkRenderWindow*> allWindows)
   {
     QList<QmitkRenderWindow*> all2DWindows;
@@ -716,7 +711,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    if (!labelSetPreset.empty())
    {
-     auto* prefs = GetPreferences();
+     auto* prefs = this->GetPreferences();
      prefs->Override("label set preset", labelSetPreset);
    }
 

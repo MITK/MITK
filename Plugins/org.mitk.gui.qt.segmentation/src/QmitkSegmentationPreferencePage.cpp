@@ -139,8 +139,9 @@ void QmitkSegmentationPreferencePage::Update()
     m_Ui->askForNameRadioButton->setChecked(true);
   }
 
-  m_Ui->defaultNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->askForNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
+  bool isLabelNamingOverridden = prefs->IsOverridden("default label naming");
+  m_Ui->defaultNameRadioButton->setDisabled(isLabelNamingOverridden);
+  m_Ui->askForNameRadioButton->setDisabled(isLabelNamingOverridden);
 
   //label suggestions
   mitk::LabelSuggestionHelper::Preferences defaultPrefs;

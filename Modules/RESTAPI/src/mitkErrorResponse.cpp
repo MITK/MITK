@@ -197,4 +197,47 @@ namespace mitk
     response["error"]["available_modes"] = modesArray;
     return response;
   }
+
+  ErrorResponse::Json ErrorResponse::AccessDenied(const std::string& detail, const std::string& instance)
+  {
+    return Create(
+      CODE_ACCESS_DENIED,
+      "Access Denied",
+      detail,
+      403,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::Unauthorized(const std::string& detail, const std::string& instance)
+  {
+    return Create(
+      CODE_UNAUTHORIZED,
+      "Unauthorized",
+      detail,
+      401,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::RateLimitExceeded(int retryAfterSeconds, const std::string& instance)
+  {
+    Json response = Create(
+      CODE_RATE_LIMIT_EXCEEDED,
+      "Rate Limit Exceeded",
+      "Too many requests. Retry after " + std::to_string(retryAfterSeconds) + " seconds.",
+      429,
+      instance);
+
+    response["error"]["retry_after"] = retryAfterSeconds;
+    return response;
+  }
+
+  ErrorResponse::Json ErrorResponse::FileAccessDenied(const std::string& detail, const std::string& instance)
+  {
+    return Create(
+      CODE_FILE_ACCESS_DENIED,
+      "File Access Denied",
+      detail,
+      403,
+      instance);
+  }
 }

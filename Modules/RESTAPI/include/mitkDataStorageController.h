@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include "mitkDataStorageBridge.h"
 #include "mitkNodeQueryParams.h"
+#include "mitkRestServerConfig.h"
 #include <httplib.h>
 
 #include <MitkRESTAPIExports.h>
@@ -66,6 +67,15 @@ namespace mitk
      * @param tempDir Path to the temporary directory.
      */
     void SetTempDirectory(const std::string& tempDir);
+
+    /**
+     * @brief Configure file access restrictions.
+     *
+     * @param mode The file access mode (Unrestricted or AllowedDirectories).
+     * @param allowedDirs List of allowed directory paths (only used in AllowedDirectories mode).
+     * @param tempDirectory Path to the temporary directory (always allowed in AllowedDirectories mode).
+     */
+    void SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs, const std::string& tempDirectory);
 
     // Node operations
 
@@ -286,6 +296,8 @@ namespace mitk
 
     DataStorageBridge& m_Bridge;
     std::string m_TempDirectory;
+    FileAccessMode m_FileAccessMode = FileAccessMode::Unrestricted;
+    std::vector<std::string> m_AllowedFileDirectories;
   };
 }
 

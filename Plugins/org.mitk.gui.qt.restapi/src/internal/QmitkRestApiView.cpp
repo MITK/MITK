@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
+#include <mitkRestServerConfig.h>
 
 #include <usModuleRegistry.h>
 #include <usModule.h>
@@ -179,6 +180,9 @@ void QmitkRestApiView::UpdateServerStatus()
     m_Controls.m_ServerUrlLabel->setText("-");
     m_Controls.m_HostPortLabel->setText("-");
     m_Controls.m_UptimeLabel->setText("-");
+    m_Controls.m_AccessModeLabel->setText("-");
+    m_Controls.m_AuthStatusLabel->setText("-");
+    m_Controls.m_FileAccessLabel->setText("-");
     m_Controls.m_ClientIPsLabel->setText("-");
     m_Controls.m_LastEndpointLabel->setText("-");
     m_Controls.m_LastResponseCodeLabel->setText("-");
@@ -258,6 +262,34 @@ void QmitkRestApiView::UpdateServerStatus()
   else
   {
     m_Controls.m_UptimeLabel->setText("-");
+  }
+
+  // Update security status labels from config
+  switch (config->clientAccessMode)
+  {
+    case mitk::ClientAccessMode::LocalhostOnly:
+      m_Controls.m_AccessModeLabel->setText("Localhost only");
+      break;
+    case mitk::ClientAccessMode::AllowAll:
+      m_Controls.m_AccessModeLabel->setText("Allow all");
+      break;
+    case mitk::ClientAccessMode::Whitelist:
+      m_Controls.m_AccessModeLabel->setText(
+        QString("Whitelist (%1 IPs)").arg(config->allowedClientIPs.size()));
+      break;
+  }
+
+  m_Controls.m_AuthStatusLabel->setText(config->requireAuth ? "Enabled" : "Disabled");
+
+  switch (config->fileAccessMode)
+  {
+    case mitk::FileAccessMode::Unrestricted:
+      m_Controls.m_FileAccessLabel->setText("Unrestricted");
+      break;
+    case mitk::FileAccessMode::AllowedDirectories:
+      m_Controls.m_FileAccessLabel->setText(
+        QString("Restricted (%1 dirs)").arg(config->allowedFileDirectories.size()));
+      break;
   }
 
   // Update client IPs list

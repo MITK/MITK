@@ -15,14 +15,106 @@ found in the LICENSE file.
 #include "mitkHealthController.h"
 #include "mitkDataStorageController.h"
 #include "mitkSwaggerController.h"
+#include "mitkErrorResponse.h"
+
+#ifndef CPPHTTPLIB_OPENSSL_SUPPORT
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#endif
 
 #include <httplib.h>
 #include <mitkIOUtil.h>
 #include <mitkLog.h>
 #include <mitkFileSystem.h>
 
+#include <algorithm>
+
 namespace mitk
 {
+
+namespace
+{
+  /**
+   * @brief Sanitize a string for safe inclusion in log messages.
+   *
+   * Replaces control characters (newlines, tabs, etc.) with their escaped
+   * representations to prevent log injection attacks.
+   *
+   * @param input The raw string from external input.
+   * @return Sanitized string safe for logging.
+   */
+  std::string SanitizeForLog(const std::string& input)
+  {
+    std::string result;
+    result.reserve(input.size());
+
+    for (const char c : input)
+    {
+      if (c == '\n')
+        result += "\\n";
+      else if (c == '\r')
+        result += "\\r";
+      else if (c == '\t')
+        result += "\\t";
+      else if (c >= 0 && c < 0x20 && c != ' ')
+        result += "\\x" + std::string(1, "0123456789abcdef"[(c >> 4) & 0xF]) +
+                  std::string(1, "0123456789abcdef"[c & 0xF]);
+      else
+        result += c;
+    }
+
+    return result;
+  }
+
+  /**
+   * @brief Check if an IP address is a localhost address.
+   */
+  bool IsLocalhostIP(const std::string& ip)
+  {
+    return ip == "127.0.0.1" || ip == "::1" || ip == "::ffff:127.0.0.1";
+  }
+
+  /**
+   * @brief Constant-time string comparison to prevent timing attacks.
+   *
+   * Always compares all bytes regardless of where the first difference is.
+   */
+  bool ConstantTimeCompare(const std::string& a, const std::string& b)
+  {
+    if (a.size() != b.size())
+    {
+      return false;
+    }
+
+    volatile unsigned char result = 0;
+    for (size_t i = 0; i < a.size(); ++i)
+    {
+      result |= static_cast<unsigned char>(a[i]) ^ static_cast<unsigned char>(b[i]);
+    }
+
+    return result == 0;
+  }
+
+  /**
+   * @brief Check if a request path is exempt from authentication.
+   *
+   * Health and info endpoints are always accessible without auth.
+   */
+  bool IsAuthExemptPath(const std::string& path)
+  {
+    return path == "/api/v1/health" ||
+           path == "/api/v1/info" ||
+           path == "/api/v1/";
+  }
+
+  /**
+   * @brief Check if a request path is exempt from rate limiting.
+   */
+  bool IsRateLimitExemptPath(const std::string& path)
+  {
+    return path == "/api/v1/health" ||
+           path == "/api/v1/info";
+  }
+}
 
 RestServer::RestServer()
   : m_Bridge(std::make_unique<DataStorageBridge>())
@@ -46,6 +138,8 @@ bool RestServer::Start()
   m_RequestLog.clear();
   ++m_RequestLogVersion;
   m_ClientIPs.clear();
+  m_RateLimitMap.clear();
+  m_RateLimitCheckCount = 0;
 
   if (!m_PendingConfig.enabled)
   {
@@ -54,12 +148,55 @@ bool RestServer::Start()
     return false;
   }
 
+  // Validate HTTPS configuration if enabled
+  if (m_PendingConfig.httpsEnabled)
+  {
+    if (m_PendingConfig.sslCertPath.empty())
+    {
+      m_LastError = "HTTPS enabled but no certificate path configured";
+      MITK_ERROR << *m_LastError;
+      return false;
+    }
+    if (m_PendingConfig.sslKeyPath.empty())
+    {
+      m_LastError = "HTTPS enabled but no private key path configured";
+      MITK_ERROR << *m_LastError;
+      return false;
+    }
+    if (!fs::exists(m_PendingConfig.sslCertPath))
+    {
+      m_LastError = "SSL certificate file not found: " + SanitizeForLog(m_PendingConfig.sslCertPath);
+      MITK_ERROR << *m_LastError;
+      return false;
+    }
+    if (!fs::exists(m_PendingConfig.sslKeyPath))
+    {
+      m_LastError = "SSL private key file not found: " + SanitizeForLog(m_PendingConfig.sslKeyPath);
+      MITK_ERROR << *m_LastError;
+      return false;
+    }
+  }
+
   try
   {
-    m_Server = std::make_unique<httplib::Server>();
+    // Create appropriate server (HTTPS or HTTP)
+    if (m_PendingConfig.httpsEnabled)
+    {
+      m_Server = std::make_unique<httplib::SSLServer>(
+        m_PendingConfig.sslCertPath.c_str(),
+        m_PendingConfig.sslKeyPath.c_str());
+    }
+    else
+    {
+      m_Server = std::make_unique<httplib::Server>();
+    }
 
     m_Server->set_read_timeout(m_PendingConfig.readTimeoutSeconds);
     m_Server->set_write_timeout(m_PendingConfig.writeTimeoutSeconds);
+
+    // Apply payload size limit
+    m_Server->set_payload_max_length(
+      static_cast<size_t>(m_PendingConfig.maxPayloadSizeMB) * 1024 * 1024);
 
     // Setup temp directory for data serialization
     if (!this->SetupTempDirectory())
@@ -74,6 +211,18 @@ bool RestServer::Start()
     m_DataStorageController = std::make_unique<DataStorageController>(*m_Bridge);
     m_DataStorageController->SetTempDirectory(m_TempDirectory);
     m_SwaggerController = std::make_unique<SwaggerController>();
+
+    // Pass file access config to controllers
+    m_DataStorageController->SetFileAccessConfig(
+      m_PendingConfig.fileAccessMode, m_PendingConfig.allowedFileDirectories, m_TempDirectory);
+    m_HealthController->SetFileAccessConfig(
+      m_PendingConfig.fileAccessMode, m_PendingConfig.allowedFileDirectories);
+
+    // Pass file access config to controllers
+    m_DataStorageController->SetFileAccessConfig(
+      m_PendingConfig.fileAccessMode, m_PendingConfig.allowedFileDirectories, m_TempDirectory);
+    m_HealthController->SetFileAccessConfig(
+      m_PendingConfig.fileAccessMode, m_PendingConfig.allowedFileDirectories);
 
     // Connect uptime callback to HealthController
     m_HealthController->SetUptimeCallback([this]() -> std::optional<int64_t> {
@@ -93,7 +242,9 @@ bool RestServer::Start()
     m_Running = true;
     m_ServerThread = std::make_unique<std::thread>(&RestServer::ServerThreadFunc, this);
 
-    MITK_INFO << "REST API server starting on " << m_PendingConfig.host << ":" << m_PendingConfig.port;
+    const std::string protocol = m_PendingConfig.httpsEnabled ? "HTTPS" : "HTTP";
+    MITK_INFO << "REST API server starting (" << protocol << ") on "
+              << SanitizeForLog(m_PendingConfig.host) << ":" << m_PendingConfig.port;
 
     return true;
   }
@@ -148,10 +299,12 @@ void RestServer::Stop()
     m_DataStorageController.reset();
     m_SwaggerController.reset();
 
-    // Clear request tracking and log
+    // Clear request tracking, log, and rate limit data
     m_ClientIPs.clear();
     m_RequestLog.clear();
     ++m_RequestLogVersion;
+    m_RateLimitMap.clear();
+    m_RateLimitCheckCount = 0;
 
     // Copy and clear temp directory path while holding the lock
     // to prevent race condition if Start() is called concurrently
@@ -218,7 +371,8 @@ std::optional<std::string> RestServer::GetServerUrl() const
     return std::nullopt;
   }
 
-  return "http://" + m_RunningConfig->host + ":" + std::to_string(m_RunningConfig->port);
+  const std::string protocol = m_RunningConfig->httpsEnabled ? "https" : "http";
+  return protocol + "://" + m_RunningConfig->host + ":" + std::to_string(m_RunningConfig->port);
 }
 
 std::optional<std::string> RestServer::GetLastError() const
@@ -316,6 +470,190 @@ void RestServer::RecordRequest(const std::string& endpoint, const std::string& m
   ++m_RequestLogVersion;
 }
 
+// --- Security middleware implementations ---
+
+bool RestServer::CheckClientAccess(const httplib::Request& req, httplib::Response& res)
+{
+  // Access m_RunningConfig without lock - called from httplib worker thread.
+  // m_RunningConfig is set before the server starts accepting connections
+  // and cleared after the server stops, so it is safe to read here.
+  const auto& config = *m_RunningConfig;
+
+  switch (config.clientAccessMode)
+  {
+    case ClientAccessMode::AllowAll:
+      return true;
+
+    case ClientAccessMode::LocalhostOnly:
+      if (IsLocalhostIP(req.remote_addr))
+      {
+        return true;
+      }
+      break;
+
+    case ClientAccessMode::Whitelist:
+    {
+      // Localhost is always allowed in whitelist mode
+      if (IsLocalhostIP(req.remote_addr))
+      {
+        return true;
+      }
+
+      const auto& allowedIPs = config.allowedClientIPs;
+      if (std::find(allowedIPs.begin(), allowedIPs.end(), req.remote_addr) != allowedIPs.end())
+      {
+        return true;
+      }
+      break;
+    }
+  }
+
+  // Denied
+  auto error = ErrorResponse::AccessDenied(
+    "Client IP " + SanitizeForLog(req.remote_addr) + " is not allowed", req.path);
+  res.status = 403;
+  res.set_content(error.dump(), "application/json");
+
+  this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
+  return false;
+}
+
+bool RestServer::CheckRateLimit(const httplib::Request& req, httplib::Response& res)
+{
+  const auto& config = *m_RunningConfig;
+
+  if (!config.rateLimitEnabled)
+  {
+    return true;
+  }
+
+  // Exempt health/info endpoints from rate limiting
+  if (IsRateLimitExemptPath(req.path))
+  {
+    return true;
+  }
+
+  const auto now = std::chrono::steady_clock::now();
+  const auto windowDuration = std::chrono::seconds(60);
+  const auto windowStart = now - windowDuration;
+
+  std::lock_guard<std::mutex> lock(m_Mutex);
+
+  auto& timestamps = m_RateLimitMap[req.remote_addr];
+
+  // Remove entries older than the window
+  while (!timestamps.empty() && timestamps.front() < windowStart)
+  {
+    timestamps.pop_front();
+  }
+
+  // Check if limit exceeded
+  if (static_cast<int>(timestamps.size()) >= config.rateLimitPerMinute)
+  {
+    // Calculate retry-after as seconds until the oldest entry expires
+    const auto oldestExpiry = timestamps.front() + windowDuration;
+    const auto retryAfter = std::chrono::duration_cast<std::chrono::seconds>(oldestExpiry - now).count();
+    const int retryAfterSeconds = std::max(static_cast<long long>(1), retryAfter);
+
+    auto error = ErrorResponse::RateLimitExceeded(retryAfterSeconds, req.path);
+    res.status = 429;
+    res.set_header("Retry-After", std::to_string(retryAfterSeconds));
+    res.set_content(error.dump(), "application/json");
+
+    this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
+    return false;
+  }
+
+  // Record this request's timestamp
+  timestamps.push_back(now);
+
+  // Periodically clean up stale IP entries to prevent memory growth
+  ++m_RateLimitCheckCount;
+  if (m_RateLimitCheckCount % 100 == 0)
+  {
+    for (auto it = m_RateLimitMap.begin(); it != m_RateLimitMap.end(); )
+    {
+      // Remove expired entries from this IP
+      while (!it->second.empty() && it->second.front() < windowStart)
+      {
+        it->second.pop_front();
+      }
+
+      // Remove IP entry if no recent requests
+      if (it->second.empty())
+      {
+        it = m_RateLimitMap.erase(it);
+      }
+      else
+      {
+        ++it;
+      }
+    }
+  }
+
+  return true;
+}
+
+bool RestServer::CheckAuthentication(const httplib::Request& req, httplib::Response& res)
+{
+  const auto& config = *m_RunningConfig;
+
+  if (!config.requireAuth)
+  {
+    return true;
+  }
+
+  // Exempt health and info endpoints
+  if (IsAuthExemptPath(req.path))
+  {
+    return true;
+  }
+
+  // Check Authorization header
+  if (!req.has_header("Authorization"))
+  {
+    auto error = ErrorResponse::Unauthorized("Authentication required. Provide Authorization: Bearer <token> header.", req.path);
+    res.status = 401;
+    res.set_header("WWW-Authenticate", "Bearer");
+    res.set_content(error.dump(), "application/json");
+
+    this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
+    return false;
+  }
+
+  const std::string authHeader = req.get_header_value("Authorization");
+
+  // Validate Bearer token format
+  const std::string bearerPrefix = "Bearer ";
+  if (authHeader.size() <= bearerPrefix.size() ||
+      authHeader.substr(0, bearerPrefix.size()) != bearerPrefix)
+  {
+    auto error = ErrorResponse::Unauthorized("Invalid authorization format. Expected: Bearer <token>", req.path);
+    res.status = 401;
+    res.set_header("WWW-Authenticate", "Bearer");
+    res.set_content(error.dump(), "application/json");
+
+    this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
+    return false;
+  }
+
+  const std::string providedToken = authHeader.substr(bearerPrefix.size());
+
+  // Constant-time comparison to prevent timing attacks
+  if (!ConstantTimeCompare(providedToken, config.apiToken))
+  {
+    auto error = ErrorResponse::Unauthorized("Invalid API token", req.path);
+    res.status = 401;
+    res.set_header("WWW-Authenticate", "Bearer");
+    res.set_content(error.dump(), "application/json");
+
+    this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
+    return false;
+  }
+
+  return true;
+}
+
 void RestServer::RegisterRoutes()
 {
   const std::string apiBase = "/api/v1";
@@ -332,6 +670,32 @@ void RestServer::RegisterRoutes()
   m_Server->Options(".*", [](const httplib::Request& /*req*/, httplib::Response& res) {
     res.status = 204;
   });
+
+  // Install security middleware as pre-routing handler.
+  // This runs before any route handler and can short-circuit the request.
+  m_Server->set_pre_routing_handler(
+    [this](const httplib::Request& req, httplib::Response& res) -> httplib::Server::HandlerResponse {
+      // 1. Client IP access check
+      if (!this->CheckClientAccess(req, res))
+      {
+        return httplib::Server::HandlerResponse::Handled;
+      }
+
+      // 2. Rate limiting check
+      if (!this->CheckRateLimit(req, res))
+      {
+        return httplib::Server::HandlerResponse::Handled;
+      }
+
+      // 3. Authentication check
+      if (!this->CheckAuthentication(req, res))
+      {
+        return httplib::Server::HandlerResponse::Handled;
+      }
+
+      // All checks passed - continue to route matching
+      return httplib::Server::HandlerResponse::Unhandled;
+    });
 
   // Health endpoints
   m_Server->Get(apiBase + "/health",
@@ -350,6 +714,13 @@ void RestServer::RegisterRoutes()
   m_Server->Get(apiBase + "/",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_HealthController->HandleGET_info(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  // File access config discovery endpoint
+  m_Server->Get(apiBase + "/config/file-access",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_HealthController->HandleGET_config_file_access(req, res);
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
@@ -514,7 +885,7 @@ void RestServer::ServerThreadFunc()
     if (!result && m_Running)
     {
       // listen() failed to start or returned unexpectedly
-      m_LastError = "Server failed to listen on " + host + ":" + std::to_string(port);
+      m_LastError = "Server failed to listen on " + SanitizeForLog(host) + ":" + std::to_string(port);
       MITK_ERROR << *m_LastError;
     }
 

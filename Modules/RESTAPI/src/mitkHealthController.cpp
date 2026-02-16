@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkHealthController.h"
+#include <mitkRestServerConfig.h>
 #include <mitkVersion.h>
 
 namespace mitk
@@ -65,6 +66,32 @@ void HealthController::HandleGET_info(const httplib::Request& /*req*/, httplib::
   capabilities["authentication"] = nlohmann::json::array({"api-token"});
 
   response["data"]["capabilities"] = capabilities;
+
+  res.status = 200;
+  res.set_content(response.dump(), "application/json");
+}
+
+void HealthController::SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs)
+{
+  m_FileAccessMode = mode;
+  m_AllowedFileDirectories = allowedDirs;
+}
+
+void HealthController::HandleGET_config_file_access(const httplib::Request& /*req*/, httplib::Response& res)
+{
+  const bool restrictionsActive = (m_FileAccessMode == FileAccessMode::AllowedDirectories);
+
+  nlohmann::json data;
+  data["mode"] = restrictionsActive ? "allowed-directories" : "unrestricted";
+  data["restrictions_active"] = restrictionsActive;
+
+  if (restrictionsActive)
+  {
+    data["allowed_paths"] = m_AllowedFileDirectories;
+  }
+
+  nlohmann::json response;
+  response["data"] = data;
 
   res.status = 200;
   res.set_content(response.dump(), "application/json");

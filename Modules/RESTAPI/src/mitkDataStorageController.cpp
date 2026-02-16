@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <itkObjectFactoryBase.h>
 
 #include <algorithm>
+#include <cctype>
 #include <fstream>
 #include <regex>
 #include <sstream>
@@ -168,6 +169,116 @@ namespace
 
     return links;
   }
+
+  /**
+   * @brief Validate a UID string.
+   *
+   * UIDs must be alphanumeric plus hyphens and underscores, 1-64 characters.
+   * The REST API UID format is "node_N" (see NodeUidMapper::GenerateUid).
+   *
+   * @param uid The UID to validate.
+   * @return true if valid, false otherwise.
+   */
+  bool ValidateUid(const std::string& uid)
+  {
+    if (uid.empty() || uid.size() > 64)
+      return false;
+    return std::all_of(uid.begin(), uid.end(), [](char c) {
+      return std::isalnum(static_cast<unsigned char>(c)) || c == '-' || c == '_';
+    });
+  }
+
+  /**
+   * @brief Validate a property key string.
+   *
+   * Keys must not be empty, must not exceed 256 characters, must not contain
+   * control characters (< 0x20), and must not start with the "restapi." prefix.
+   *
+   * @param key The property key to validate.
+   * @return true if valid, false otherwise.
+   */
+  bool ValidatePropertyKey(const std::string& key)
+  {
+    if (key.empty() || key.size() > 256)
+      return false;
+    if (key.rfind("restapi.", 0) == 0)
+      return false;
+    return std::none_of(key.begin(), key.end(), [](char c) {
+      return static_cast<unsigned char>(c) < 0x20;
+    });
+  }
+
+  /**
+   * @brief Sanitize a filename by stripping any path components.
+   *
+   * @param filename The filename (possibly with path components).
+   * @return The basename only.
+   */
+  std::string SanitizeFilename(const std::string& filename)
+  {
+    return fs::path(filename).filename().string();
+  }
+
+  /**
+   * @brief Validate a file path against access restrictions.
+   *
+   * @param filePath The file path to validate.
+   * @param mode The file access mode.
+   * @param allowedDirs The list of allowed directories.
+   * @param tempDirectory The temp directory (always allowed).
+   * @return Empty string on success, or error message on failure.
+   */
+  std::string ValidateFilePath(const std::string& filePath,
+                               FileAccessMode mode,
+                               const std::vector<std::string>& allowedDirs,
+                               const std::string& tempDirectory)
+  {
+    if (mode == FileAccessMode::Unrestricted)
+    {
+      return "";
+    }
+
+    // Canonicalize the requested path
+    std::error_code ec;
+    const fs::path canonicalPath = fs::canonical(filePath, ec);
+    if (ec)
+    {
+      return "Cannot resolve file path: " + filePath;
+    }
+
+    const std::string canonicalStr = canonicalPath.string();
+
+    // Temp directory is always allowed
+    if (!tempDirectory.empty())
+    {
+      const fs::path canonicalTempDir = fs::canonical(tempDirectory, ec);
+      if (!ec)
+      {
+        const std::string tempStr = canonicalTempDir.string();
+        if (canonicalStr.rfind(tempStr, 0) == 0)
+        {
+          return "";
+        }
+      }
+    }
+
+    // Check allowed directories
+    for (const auto& allowedDir : allowedDirs)
+    {
+      const fs::path canonicalAllowed = fs::canonical(allowedDir, ec);
+      if (ec)
+      {
+        continue;
+      }
+      const std::string allowedStr = canonicalAllowed.string();
+      if (canonicalStr.rfind(allowedStr, 0) == 0)
+      {
+        return "";
+      }
+    }
+
+    return "File path is not within any allowed directory: " + filePath;
+  }
 }  // anonymous namespace
 
 DataStorageController::DataStorageController(DataStorageBridge& bridge)
@@ -178,6 +289,13 @@ DataStorageController::DataStorageController(DataStorageBridge& bridge)
 void DataStorageController::SetTempDirectory(const std::string& tempDir)
 {
   m_TempDirectory = tempDir;
+}
+
+void DataStorageController::SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs, const std::string& tempDirectory)
+{
+  m_FileAccessMode = mode;
+  m_AllowedFileDirectories = allowedDirs;
+  m_TempDirectory = tempDirectory;
 }
 
 std::string DataStorageController::DetermineTransferMode(const httplib::Request& req) const
@@ -226,7 +344,8 @@ std::string DataStorageController::ExtractFilenameFromContentDisposition(const h
   if (std::regex_search(disposition, match, filenameRegex))
   {
     // match[1] is quoted filename, match[2] is unquoted
-    return match[1].matched ? match[1].str() : match[2].str();
+    // Sanitize by stripping any path components to prevent path traversal
+    return SanitizeFilename(match[1].matched ? match[1].str() : match[2].str());
   }
 
   return "";
@@ -557,6 +676,15 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
     {
       result.errorStatus = 422;
       result.errorResponse = ErrorResponse::FileNotFound(filePath.string(), req.path);
+      return result;
+    }
+
+    // Validate file path against access restrictions
+    auto validationError = ValidateFilePath(filePath.string(), m_FileAccessMode, m_AllowedFileDirectories, m_TempDirectory);
+    if (!validationError.empty())
+    {
+      result.errorStatus = 403;
+      result.errorResponse = ErrorResponse::FileAccessDenied(validationError, req.path);
       return result;
     }
 
@@ -968,7 +1096,12 @@ void DataStorageController::HandleGET_nodes_uid(const httplib::Request& req, htt
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   auto node = m_Bridge.GetNode(uid);
   if (!node.has_value())
@@ -998,7 +1131,12 @@ void DataStorageController::HandlePATCH_nodes_uid(const httplib::Request& req, h
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if node exists
   auto existingNode = m_Bridge.GetNode(uid);
@@ -1049,7 +1187,12 @@ void DataStorageController::HandleDELETE_nodes_uid(const httplib::Request& req, 
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Parse recursive parameter (default: false)
   bool recursive = false;
@@ -1099,7 +1242,12 @@ void DataStorageController::HandleGET_nodes_uid_children(const httplib::Request&
     return;
   }
 
-  std::string parentUid = req.path_params.at("uid");
+  const std::string parentUid = req.path_params.at("uid");
+  if (!ValidateUid(parentUid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if parent node exists
   auto parentNode = m_Bridge.GetNode(parentUid);
@@ -1151,6 +1299,11 @@ void DataStorageController::HandlePOST_nodes_uid_children(const httplib::Request
   }
 
   const std::string parentUid = req.path_params.at("uid");
+  if (!ValidateUid(parentUid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if parent node exists
   auto parentNode = m_Bridge.GetNode(parentUid);
@@ -1172,6 +1325,11 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
   }
 
   const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Get a clone of the node's data for thread-safe serialization
   // The result distinguishes between "node not found" and "node has no data"
@@ -1353,6 +1511,11 @@ void DataStorageController::HandlePUT_nodes_uid_data(const httplib::Request& req
   }
 
   const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if node exists
   const auto nodeJson = m_Bridge.GetNode(uid);
@@ -1448,7 +1611,12 @@ void DataStorageController::HandleGET_nodes_uid_properties(const httplib::Reques
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Parse property query parameters
   auto params = this->ParsePropertyQueryParams(req);
@@ -1495,8 +1663,19 @@ void DataStorageController::HandleGET_nodes_uid_properties_key(const httplib::Re
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
-  std::string key = req.path_params.at("key");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
+
+  const std::string key = req.path_params.at("key");
+  if (!ValidatePropertyKey(key))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid property key", req.path));
+    return;
+  }
 
   // First check if node exists
   auto nodeCheck = m_Bridge.GetNode(uid);
@@ -1545,8 +1724,19 @@ void DataStorageController::HandlePUT_nodes_uid_properties_key(const httplib::Re
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
-  std::string key = req.path_params.at("key");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
+
+  const std::string key = req.path_params.at("key");
+  if (!ValidatePropertyKey(key))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid property key", req.path));
+    return;
+  }
 
   // Check if node exists
   auto nodeCheck = m_Bridge.GetNode(uid);
@@ -1603,8 +1793,19 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
-  std::string key = req.path_params.at("key");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
+
+  const std::string key = req.path_params.at("key");
+  if (!ValidatePropertyKey(key))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid property key", req.path));
+    return;
+  }
 
   // Check if node exists
   auto nodeCheck = m_Bridge.GetNode(uid);
@@ -1645,7 +1846,12 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if node exists
   auto nodeCheck = m_Bridge.GetNode(uid);
@@ -1675,6 +1881,17 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
   {
     this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Request body must be a JSON object", req.path));
     return;
+  }
+
+  // Validate all property keys before replacing
+  for (const auto& [key, value] : properties.items())
+  {
+    if (!ValidatePropertyKey(key))
+    {
+      this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+        "Invalid property key: " + key, req.path));
+      return;
+    }
   }
 
   auto replaceResult = m_Bridge.ReplaceNodeProperties(uid, properties, params);
@@ -1712,7 +1929,12 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if node exists
   auto nodeCheck = m_Bridge.GetNode(uid);
@@ -1747,8 +1969,17 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
   std::vector<std::string> updated;
   std::vector<nlohmann::json> failed;
 
-  for (auto& [key, value] : properties.items())
+  for (const auto& [key, value] : properties.items())
   {
+    if (!ValidatePropertyKey(key))
+    {
+      nlohmann::json failure;
+      failure[JSON_KEY_PROPERTY] = key;
+      failure[JSON_KEY_ERROR] = "Invalid property key";
+      failed.push_back(failure);
+      continue;
+    }
+
     if (m_Bridge.SetNodeProperty(uid, key, value, params))
     {
       updated.push_back(key);

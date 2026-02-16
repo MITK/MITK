@@ -35,6 +35,9 @@ namespace mitk
 
 namespace
 {
+  /** Number of rate-limit checks between stale-entry cleanup sweeps. */
+  static constexpr uint64_t kRateLimitCleanupInterval = 100;
+
   /**
    * @brief Sanitize a string for safe inclusion in log messages.
    *
@@ -207,12 +210,6 @@ bool RestServer::Start()
     m_DataStorageController = std::make_unique<DataStorageController>(*m_Bridge);
     m_DataStorageController->SetTempDirectory(m_TempDirectory);
     m_SwaggerController = std::make_unique<SwaggerController>();
-
-    // Pass file access config to controllers
-    m_DataStorageController->SetFileAccessConfig(
-      m_PendingConfig.fileAccessMode, m_PendingConfig.allowedFileDirectories, m_TempDirectory);
-    m_HealthController->SetFileAccessConfig(
-      m_PendingConfig.fileAccessMode, m_PendingConfig.allowedFileDirectories);
 
     // Pass file access config to controllers
     m_DataStorageController->SetFileAccessConfig(
@@ -489,12 +486,6 @@ bool RestServer::CheckClientAccess(const httplib::Request& req, httplib::Respons
 
     case ClientAccessMode::Whitelist:
     {
-      // Localhost is always allowed in whitelist mode
-      if (IsLocalhostIP(req.remote_addr))
-      {
-        return true;
-      }
-
       const auto& allowedIPs = config.allowedClientIPs;
       if (std::find(allowedIPs.begin(), allowedIPs.end(), req.remote_addr) != allowedIPs.end())
       {
@@ -565,7 +556,7 @@ bool RestServer::CheckRateLimit(const httplib::Request& req, httplib::Response& 
 
   // Periodically clean up stale IP entries to prevent memory growth
   ++m_RateLimitCheckCount;
-  if (m_RateLimitCheckCount % 100 == 0)
+  if (m_RateLimitCheckCount % kRateLimitCleanupInterval == 0)
   {
     for (auto it = m_RateLimitMap.begin(); it != m_RateLimitMap.end(); )
     {

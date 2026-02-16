@@ -448,9 +448,13 @@ void RestServer::RecordRequest(const std::string& endpoint, const std::string& m
                                int responseCode, const std::string& clientIP)
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
-  m_ClientIPs.insert(clientIP);
 
-  RequestInfo info{endpoint, method, responseCode, clientIP};
+  const std::string sanitizedEndpoint = SanitizeForLog(endpoint);
+  const std::string sanitizedClientIP = SanitizeForLog(clientIP);
+
+  m_ClientIPs.insert(sanitizedClientIP);
+
+  RequestInfo info{sanitizedEndpoint, method, responseCode, sanitizedClientIP};
 
   m_RequestLog.push_back(info);
 

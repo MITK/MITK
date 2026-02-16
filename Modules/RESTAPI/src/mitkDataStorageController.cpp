@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include "mitkDataStorageController.h"
 #include "mitkErrorResponse.h"
 #include "mitkNodeQueryParams.h"
+#include <mitkExceptionMacro.h>
+#include <mitkLog.h>
 
 #include <mitkBaseDataSerializer.h>
 #include <mitkFileSystem.h>
@@ -68,6 +70,8 @@ namespace
   constexpr const char* HEADER_ACCEPT = "Accept";
   constexpr const char* HEADER_CONTENT_TYPE = "Content-Type";
   constexpr const char* HEADER_CONTENT_DISPOSITION = "Content-Disposition";
+
+
   /**
    * @brief Parse a comma-separated string into a vector of trimmed values.
    *
@@ -225,13 +229,11 @@ namespace
    * @param filePath The file path to validate.
    * @param mode The file access mode.
    * @param allowedDirs The list of allowed directories.
-   * @param tempDirectory The temp directory (always allowed).
    * @return Empty string on success, or error message on failure.
    */
   std::string ValidateFilePath(const std::string& filePath,
                                FileAccessMode mode,
-                               const std::vector<std::string>& allowedDirs,
-                               const std::string& tempDirectory)
+                               const std::vector<std::string>& allowedDirs)
   {
     if (mode == FileAccessMode::Unrestricted)
     {
@@ -248,20 +250,6 @@ namespace
 
     const std::string canonicalStr = canonicalPath.string();
 
-    // Temp directory is always allowed
-    if (!tempDirectory.empty())
-    {
-      const fs::path canonicalTempDir = fs::canonical(tempDirectory, ec);
-      if (!ec)
-      {
-        const std::string tempStr = canonicalTempDir.string();
-        if (canonicalStr.rfind(tempStr, 0) == 0)
-        {
-          return "";
-        }
-      }
-    }
-
     // Check allowed directories
     for (const auto& allowedDir : allowedDirs)
     {
@@ -271,7 +259,10 @@ namespace
         continue;
       }
       const std::string allowedStr = canonicalAllowed.string();
-      if (canonicalStr.rfind(allowedStr, 0) == 0)
+      if (canonicalStr.rfind(allowedStr, 0) == 0 &&
+          (canonicalStr.length() == allowedStr.length() ||
+           canonicalStr[allowedStr.length()] == '/' ||
+           canonicalStr[allowedStr.length()] == '\\'))
       {
         return "";
       }
@@ -685,7 +676,7 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
     }
 
     // Validate file path against access restrictions
-    auto validationError = ValidateFilePath(filePath.string(), m_FileAccessMode, m_AllowedFileDirectories, m_TempDirectory);
+    auto validationError = ValidateFilePath(filePath.string(), m_FileAccessMode, m_AllowedFileDirectories);
     if (!validationError.empty())
     {
       result.errorStatus = 403;

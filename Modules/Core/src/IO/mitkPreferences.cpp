@@ -37,107 +37,123 @@ mitk::Preferences::~Preferences()
 {
 }
 
+std::optional<std::string> mitk::Preferences::FindValue(const std::string& key) const
+{
+  auto iter = m_Overrides.find(key);
+  if (iter != m_Overrides.end())
+    return iter->second;
+
+  iter = m_Properties.find(key);
+  if (iter != m_Properties.end())
+    return iter->second;
+
+  return std::nullopt;
+}
+
+void mitk::Preferences::ValidateKeyExists(const std::string& key) const
+{
+  if (m_Properties.find(key) == m_Properties.end())
+    mitkThrow() << "Cannot override non-existent key \"" << key << "\"!";
+}
+
 std::string mitk::Preferences::Get(const std::string& key, const std::string& def) const
 {
-  auto iter = m_Properties.find(key);
-
-  return iter != m_Properties.end()
-    ? iter->second
-    : def;
+  auto value = this->FindValue(key);
+  return value.has_value() ? value.value() : def;
 }
 
 void mitk::Preferences::Put(const std::string& key, const std::string& value)
 {
-  this->Put<std::string>(key, value, [](const auto& value) { return value; });
+  this->SetProperty<std::string>(m_Properties, key, value, [](const auto& value) { return value; });
 }
 
 int mitk::Preferences::GetInt(const std::string& key, int def) const
 {
-  auto iter = m_Properties.find(key);
+  auto value = this->FindValue(key);
 
-  if (iter == m_Properties.end())
+  if (!value.has_value())
     return def;
 
   try
   {
-    return std::stoi(iter->second);
+    return std::stoi(value.value());
   }
   catch (...)
   {
-    mitkThrow() << "The property [\"" << key << "\": \"" << iter->second << "\"] does not represent a valid int value!";
+    mitkThrow() << "The property [\"" << key << "\": \"" << value.value() << "\"] does not represent a valid int value!";
   }
 }
 
 void mitk::Preferences::PutInt(const std::string& key, int value)
 {
-  this->Put<int>(key, value, [](const auto& value) { return std::to_string(value); });
+  this->SetProperty<int>(m_Properties, key, value, [](const auto& value) { return std::to_string(value); });
 }
 
 bool mitk::Preferences::GetBool(const std::string& key, bool def) const
 {
-  auto iter = m_Properties.find(key);
+  auto value = this->FindValue(key);
 
-  return iter != m_Properties.end()
-    ? boost::algorithm::to_lower_copy(iter->second) == "true"
+  return value.has_value()
+    ? boost::algorithm::to_lower_copy(value.value()) == "true"
     : def;
 }
 
 void mitk::Preferences::PutBool(const std::string& key, bool value)
 {
-  this->Put<bool>(key, value, [](const auto& value) { return value ? "true" : "false"; });
+  this->SetProperty<bool>(m_Properties, key, value, [](const auto& value) { return value ? "true" : "false"; });
 }
 
 float mitk::Preferences::GetFloat(const std::string& key, float def) const
 {
-  auto iter = m_Properties.find(key);
+  auto value = this->FindValue(key);
 
-  if (iter == m_Properties.end())
+  if (!value.has_value())
     return def;
 
   try
   {
-    return std::stof(iter->second);
+    return std::stof(value.value());
   }
   catch (...)
   {
-    mitkThrow() << "The property [\"" << key << "\": \"" << iter->second << "\"] does not represent a valid float value!";
+    mitkThrow() << "The property [\"" << key << "\": \"" << value.value() << "\"] does not represent a valid float value!";
   }
 }
 
 void mitk::Preferences::PutFloat(const std::string& key, float value)
 {
-  this->Put<float>(key, value, [](const auto& value) { return std::to_string(value); });
+  this->SetProperty<float>(m_Properties, key, value, [](const auto& value) { return std::to_string(value); });
 }
 
 double mitk::Preferences::GetDouble(const std::string& key, double def) const
 {
-  auto iter = m_Properties.find(key);
+  auto value = this->FindValue(key);
 
-  if (iter == m_Properties.end())
+  if (!value.has_value())
     return def;
 
   try
   {
-    return std::stod(iter->second);
+    return std::stod(value.value());
   }
   catch (...)
   {
-    mitkThrow() << "The property [\"" << key << "\": \"" << iter->second << "\"] does not represent a valid double value!";
+    mitkThrow() << "The property [\"" << key << "\": \"" << value.value() << "\"] does not represent a valid double value!";
   }
 }
 
 void mitk::Preferences::PutDouble(const std::string& key, double value)
 {
-  this->Put<double>(key, value, [](const auto& value) { return std::to_string(value); });
+  this->SetProperty<double>(m_Properties, key, value, [](const auto& value) { return std::to_string(value); });
 }
 
 std::vector<std::byte> mitk::Preferences::GetByteArray(const std::string& key, const std::byte* def, size_t size) const
 {
   using namespace boost::beast::detail;
 
-  auto iter = m_Properties.find(key);
+  auto value = this->FindValue(key);
 
-  if (iter == m_Properties.end())
+  if (!value.has_value())
   {
     std::vector<std::byte> array(size);
     std::copy(def, def + size, array.data());
@@ -145,7 +161,7 @@ std::vector<std::byte> mitk::Preferences::GetByteArray(const std::string& key, c
     return array;
   }
 
-  const auto& encodedArray = iter->second;
+  const auto& encodedArray = value.value();
   std::vector<std::byte> array(base64::decoded_size(encodedArray.size()));
   auto sizes = base64::decode(array.data(), encodedArray.data(), encodedArray.size());
 
@@ -156,7 +172,7 @@ std::vector<std::byte> mitk::Preferences::GetByteArray(const std::string& key, c
 
 void mitk::Preferences::PutByteArray(const std::string& key, const std::byte* array, size_t size)
 {
-  this->Put<std::pair<decltype(array), decltype(size)>>(key, std::make_pair(array, size), [](const auto& value) {
+  this->SetProperty<std::pair<decltype(array), decltype(size)>>(m_Properties, key, std::make_pair(array, size), [](const auto& value) {
     using namespace boost::beast::detail;
 
     std::vector<char> encodedArray(base64::encoded_size(value.second) + 1, '\0');
@@ -166,10 +182,77 @@ void mitk::Preferences::PutByteArray(const std::string& key, const std::byte* ar
   });
 }
 
-void mitk::Preferences::Remove(const std::string& key)
+void mitk::Preferences::Override(const std::string& key, const std::string& value)
 {
+  this->ValidateKeyExists(key);
+  this->SetProperty<std::string>(m_Overrides, key, value, [](const auto& value) { return value; });
+}
+
+void mitk::Preferences::OverrideInt(const std::string& key, int value)
+{
+  this->ValidateKeyExists(key);
+  this->SetProperty<int>(m_Overrides, key, value, [](const auto& value) { return std::to_string(value); });
+}
+
+void mitk::Preferences::OverrideBool(const std::string& key, bool value)
+{
+  this->ValidateKeyExists(key);
+  this->SetProperty<bool>(m_Overrides, key, value, [](const auto& value) { return value ? "true" : "false"; });
+}
+
+void mitk::Preferences::OverrideFloat(const std::string& key, float value)
+{
+  this->ValidateKeyExists(key);
+  this->SetProperty<float>(m_Overrides, key, value, [](const auto& value) { return std::to_string(value); });
+}
+
+void mitk::Preferences::OverrideDouble(const std::string& key, double value)
+{
+  this->ValidateKeyExists(key);
+  this->SetProperty<double>(m_Overrides, key, value, [](const auto& value) { return std::to_string(value); });
+}
+
+void mitk::Preferences::OverrideByteArray(const std::string& key, const std::byte* array, size_t size)
+{
+  this->ValidateKeyExists(key);
+  this->SetProperty<std::pair<decltype(array), decltype(size)>>(m_Overrides, key, std::make_pair(array, size), [](const auto& value) {
+    using namespace boost::beast::detail;
+
+    std::vector<char> encodedArray(base64::encoded_size(value.second) + 1, '\0');
+    base64::encode(encodedArray.data(), value.first, value.second);
+
+    return std::string(encodedArray.data());
+  });
+}
+
+bool mitk::Preferences::IsOverridden(const std::string& key) const
+{
+  return m_Overrides.count(key) > 0;
+}
+
+void mitk::Preferences::RemoveOverride(const std::string& key)
+{
+  m_Overrides.erase(key);
+  this->OnChanged(this);
+}
+
+void mitk::Preferences::ClearOverrides()
+{
+  m_Overrides.clear();
+  this->OnChanged(this);
+}
+
+bool mitk::Preferences::Remove(const std::string& key, bool forceRemoval)
+{
+  if (this->IsOverridden(key) && !forceRemoval)
+    return false;
+
+  if (this->IsOverridden(key))
+    m_Overrides.erase(key);
+
   m_Properties.erase(key);
   this->OnChanged(this);
+  return true;
 }
 
 void mitk::Preferences::Clear()
@@ -178,12 +261,21 @@ void mitk::Preferences::Clear()
   this->OnChanged(this);
 }
 
-std::vector<std::string> mitk::Preferences::Keys() const
+std::vector<std::string> mitk::Preferences::Keys(bool includeOverrides) const
 {
   std::vector<std::string> keys;
 
   for (const auto& property : m_Properties)
     keys.push_back(property.first);
+
+  if (includeOverrides)
+  {
+    for (const auto& override : m_Overrides)
+    {
+      if (m_Properties.find(override.first) == m_Properties.end())
+        keys.push_back(override.first);
+    }
+  }
 
   return keys;
 }

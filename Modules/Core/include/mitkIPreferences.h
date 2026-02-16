@@ -199,9 +199,74 @@ namespace mitk
     virtual void PutByteArray(const std::string& key, const std::byte* array, size_t size) = 0;
 
     /**
+     * \brief Set a session-only override for a string property.
+     *
+     * Overrides are not persisted to disk. The key must already exist in the persistent properties.
+     *
+     * \param key Name of the property (must already exist)
+     * \param value Override value
+     *
+     * \throw Exception The key does not exist in persistent properties.
+     */
+    virtual void Override(const std::string& key, const std::string& value) = 0;
+
+    /**
+     * \brief Set a session-only override for an \c int property.
+     *
+     * \sa Override()
+     */
+    virtual void OverrideInt(const std::string& key, int value) = 0;
+
+    /**
+     * \brief Set a session-only override for a \c bool property.
+     *
+     * \sa Override()
+     */
+    virtual void OverrideBool(const std::string& key, bool value) = 0;
+
+    /**
+     * \brief Set a session-only override for a \c float property.
+     *
+     * \sa Override()
+     */
+    virtual void OverrideFloat(const std::string& key, float value) = 0;
+
+    /**
+     * \brief Set a session-only override for a \c double property.
+     *
+     * \sa Override()
+     */
+    virtual void OverrideDouble(const std::string& key, double value) = 0;
+
+    /**
+     * \brief Set a session-only override for a byte array property.
+     *
+     * \sa Override()
+     */
+    virtual void OverrideByteArray(const std::string& key, const std::byte* array, size_t size) = 0;
+
+    /**
+     * \brief Check whether a property has a session-only override.
+     */
+    virtual bool IsOverridden(const std::string& key) const = 0;
+
+    /**
+     * \brief Remove a session-only override for a property.
+     *
+     * The underlying persistent value is revealed again.
+     */
+    virtual void RemoveOverride(const std::string& key) = 0;
+
+    /**
+     * \brief Remove all session-only overrides from this preferences node.
+     */
+    virtual void ClearOverrides() = 0;
+
+    /**
      * \brief Write all (!) preferences to disk.
      *
-     * Enforce the persistence of the whole preferences tree.
+     * Enforce the persistence of the whole preferences tree. Session-only overrides
+     * are not written to disk.
      *
      * \note Preferences are flushed automatically at least on a regular application shutdown.
      *
@@ -212,9 +277,16 @@ namespace mitk
     /**
      * \brief Remove a property from this preferences node.
      *
+     * If the key has a session-only override and \p forceRemoval is false, the removal
+     * is denied and the method returns false. If \p forceRemoval is true, both the
+     * persistent property and the override are removed.
+     *
      * \param key Name of the property
+     * \param forceRemoval If true, also remove any override for the key
+     *
+     * \return True if the key was removed, false if removal was denied due to an override
      */
-    virtual void Remove(const std::string& key) = 0;
+    virtual bool Remove(const std::string& key, bool forceRemoval = false) = 0;
 
     /**
      * \brief Remove all properties from this preferences node.
@@ -223,8 +295,10 @@ namespace mitk
 
     /**
      * \brief Get the names of all properties of this preferences node.
+     *
+     * \param includeOverrides If true, also include keys that only exist in the override layer.
      */
-    virtual std::vector<std::string> Keys() const = 0;
+    virtual std::vector<std::string> Keys(bool includeOverrides = false) const = 0;
 
     /**
      * \brief Get the name of this preferences node.

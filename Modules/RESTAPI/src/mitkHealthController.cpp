@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkHealthController.h"
+#include <mitkExceptionMacro.h>
 #include <mitkRestServerConfig.h>
 #include <mitkVersion.h>
 
@@ -73,6 +74,11 @@ void HealthController::HandleGET_info(const httplib::Request& /*req*/, httplib::
 
 void HealthController::SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs)
 {
+  if (mode == FileAccessMode::AllowedDirectories && allowedDirs.empty())
+  {
+    mitkThrow() << "SetFileAccessConfig: allowedDirs must not be empty when mode is AllowedDirectories.";
+  }
+
   m_FileAccessMode = mode;
   m_AllowedFileDirectories = allowedDirs;
 }

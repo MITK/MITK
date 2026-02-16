@@ -293,6 +293,11 @@ void DataStorageController::SetTempDirectory(const std::string& tempDir)
 
 void DataStorageController::SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs, const std::string& tempDirectory)
 {
+  if (mode == FileAccessMode::AllowedDirectories && allowedDirs.empty())
+  {
+    mitkThrow() << "SetFileAccessConfig: allowedDirs must not be empty when mode is AllowedDirectories.";
+  }
+
   m_FileAccessMode = mode;
   m_AllowedFileDirectories = allowedDirs;
   m_TempDirectory = tempDirectory;

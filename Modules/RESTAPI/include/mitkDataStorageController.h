@@ -71,6 +71,9 @@ namespace mitk
     /**
      * @brief Configure file access restrictions.
      *
+     * @pre \a mode must be a valid FileAccessMode value.
+     * @pre When \a mode is AllowedDirectories, \a allowedDirs must not be empty.
+     *
      * @param mode The file access mode (Unrestricted or AllowedDirectories).
      * @param allowedDirs List of allowed directory paths (only used in AllowedDirectories mode).
      * @param tempDirectory Path to the temporary directory (always allowed in AllowedDirectories mode).

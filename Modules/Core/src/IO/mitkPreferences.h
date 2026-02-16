@@ -106,7 +106,6 @@ namespace mitk
     }
 
     std::optional<std::string> FindValue(const std::string& key) const;
-    void ValidateKeyExists(const std::string& key) const;
 
     Properties m_Properties;
     Properties m_Overrides;

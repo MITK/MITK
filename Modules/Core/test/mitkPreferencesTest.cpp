@@ -31,7 +31,7 @@ class mitkPreferencesTestSuite : public mitk::TestFixture
   MITK_TEST(OverrideString);
   MITK_TEST(OverrideInt);
   MITK_TEST(OverrideBool);
-  MITK_TEST(OverrideOnlyExistingKeys);
+  MITK_TEST(OverrideNonExistentKey);
   MITK_TEST(IsOverridden);
   MITK_TEST(RemoveOverride);
   MITK_TEST(ClearOverrides);
@@ -219,12 +219,13 @@ public:
     CPPUNIT_ASSERT_EQUAL(true, preferences->GetBool("enabled", false));
   }
 
-  void OverrideOnlyExistingKeys()
+  void OverrideNonExistentKey()
   {
     auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
 
-    CPPUNIT_ASSERT_THROW(preferences->Override("nonexistent", "value"), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(preferences->OverrideInt("nonexistent", 42), mitk::Exception);
+    CPPUNIT_ASSERT_NO_THROW(preferences->Override("newkey", "value"));
+    CPPUNIT_ASSERT_EQUAL(std::string("value"), preferences->Get("newkey", ""));
+    CPPUNIT_ASSERT_EQUAL(true, preferences->IsOverridden("newkey"));
   }
 
   void IsOverridden()

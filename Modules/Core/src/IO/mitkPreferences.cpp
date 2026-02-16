@@ -50,12 +50,6 @@ std::optional<std::string> mitk::Preferences::FindValue(const std::string& key) 
   return std::nullopt;
 }
 
-void mitk::Preferences::ValidateKeyExists(const std::string& key) const
-{
-  if (m_Properties.find(key) == m_Properties.end())
-    mitkThrow() << "Cannot override non-existent key \"" << key << "\"!";
-}
-
 std::string mitk::Preferences::Get(const std::string& key, const std::string& def) const
 {
   auto value = this->FindValue(key);
@@ -184,37 +178,31 @@ void mitk::Preferences::PutByteArray(const std::string& key, const std::byte* ar
 
 void mitk::Preferences::Override(const std::string& key, const std::string& value)
 {
-  this->ValidateKeyExists(key);
   this->SetProperty<std::string>(m_Overrides, key, value, [](const auto& value) { return value; });
 }
 
 void mitk::Preferences::OverrideInt(const std::string& key, int value)
 {
-  this->ValidateKeyExists(key);
   this->SetProperty<int>(m_Overrides, key, value, [](const auto& value) { return std::to_string(value); });
 }
 
 void mitk::Preferences::OverrideBool(const std::string& key, bool value)
 {
-  this->ValidateKeyExists(key);
   this->SetProperty<bool>(m_Overrides, key, value, [](const auto& value) { return value ? "true" : "false"; });
 }
 
 void mitk::Preferences::OverrideFloat(const std::string& key, float value)
 {
-  this->ValidateKeyExists(key);
   this->SetProperty<float>(m_Overrides, key, value, [](const auto& value) { return std::to_string(value); });
 }
 
 void mitk::Preferences::OverrideDouble(const std::string& key, double value)
 {
-  this->ValidateKeyExists(key);
   this->SetProperty<double>(m_Overrides, key, value, [](const auto& value) { return std::to_string(value); });
 }
 
 void mitk::Preferences::OverrideByteArray(const std::string& key, const std::byte* array, size_t size)
 {
-  this->ValidateKeyExists(key);
   this->SetProperty<std::pair<decltype(array), decltype(size)>>(m_Overrides, key, std::make_pair(array, size), [](const auto& value) {
     using namespace boost::beast::detail;
 

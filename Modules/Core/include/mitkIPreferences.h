@@ -201,12 +201,11 @@ namespace mitk
     /**
      * \brief Set a session-only override for a string property.
      *
-     * Overrides are not persisted to disk. The key must already exist in the persistent properties.
+     * Overrides are not persisted to disk. If the key does not yet exist in the persistent
+     * properties, the override still takes effect for Get operations.
      *
-     * \param key Name of the property (must already exist)
+     * \param key Name of the property
      * \param value Override value
-     *
-     * \throw Exception The key does not exist in persistent properties.
      */
     virtual void Override(const std::string& key, const std::string& value) = 0;
 

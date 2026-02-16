@@ -77,27 +77,41 @@ As the name indicates, default properties can still be overridden by individual 
 
 ### Label name suggestions
 
-The `LabelNameSuggestions` property of segmentation tasks is supposed to reference a JSON file that consists of an array of objects with a mandatory `name` property and an optional `color` property.
+The `LabelNameSuggestions` property of segmentation tasks is supposed to reference a JSON file in the MITK MultiLabel Segmentation Stack Format (see @ref MITKSegmentationStackFormatPage).
+
 For example:
 
 ~~~{.json}
-[
-  {
-    "name": "Abdomen",
-    "color": "red"
+{
+  "version": 4,
+  "type": "org.mitk.multilabel.segmentation.suggestion",
+  "properties": {
+    "name": "Segmentation Task List Test Suggestions",
+    "version": 1,
+    "description": "Suggestions to test the Segmentation Task List"
   },
-  {
-    "name": "Lung",
-    "color": "#00ff00"
-  },
-  {
-    "name": "Heart"
-  },
-  {
-    "name": "Aortic Valve",
-    "color": "CornflowerBlue"
-  }
-]
+  "groups": [
+    {
+      "labels": [
+        {
+          "name": "Abdomen",
+          "color": [ 255, 0, 0 ]
+        },
+        {
+          "name": "Lung",
+          "color": [ 0, 255, 0 ]
+        },
+        {
+          "name": "Heart"
+        },
+        {
+          "name": "Aortic Valve",
+          "color": [ 0, 0, 255 ]
+        }
+      ]
+    }
+  ]
+}
 ~~~
 
 ### Example

@@ -26,6 +26,8 @@ found in the LICENSE file.
 #include <mitkLog.h>
 #include <mitkFileSystem.h>
 
+#include <openssl/crypto.h>
+
 #include <algorithm>
 
 namespace mitk
@@ -76,7 +78,7 @@ namespace
   /**
    * @brief Constant-time string comparison to prevent timing attacks.
    *
-   * Always compares all bytes regardless of where the first difference is.
+   * Uses OpenSSL's CRYPTO_memcmp for guaranteed constant-time behavior.
    */
   bool ConstantTimeCompare(const std::string& a, const std::string& b)
   {
@@ -85,13 +87,7 @@ namespace
       return false;
     }
 
-    volatile unsigned char result = 0;
-    for (size_t i = 0; i < a.size(); ++i)
-    {
-      result |= static_cast<unsigned char>(a[i]) ^ static_cast<unsigned char>(b[i]);
-    }
-
-    return result == 0;
+    return CRYPTO_memcmp(a.data(), b.data(), a.size()) == 0;
   }
 
   /**

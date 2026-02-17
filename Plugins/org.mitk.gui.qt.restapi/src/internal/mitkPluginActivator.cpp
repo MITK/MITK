@@ -37,6 +37,7 @@ namespace mitk
   {
     BERRY_REGISTER_EXTENSION_CLASS(QmitkRestApiPreferencePage, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkRestApiView, context)
+    m_Context = context;
   }
 
   void RestApiPluginActivator::stop(ctkPluginContext*)

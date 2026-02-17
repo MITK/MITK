@@ -31,7 +31,7 @@ namespace mitk
  *
  * This class is exported from Core so it can be instantiated by plugins
  * or other code that needs to register the service. The actual service
- * registration is typically done by a activator.
+ * registration is typically done by an activator.
  *
  * Example usage in a plugin activator:
  * \code

@@ -666,6 +666,31 @@ bool mitk::Image::SetImportVolume(const void *const_data, int t, int n)
   return this->SetImportVolume(const_cast<void*>(const_data), t, n, CopyMemory);
 }
 
+void mitk::Image::AllocateZeroedVolume(int t, int n)
+{
+  if (!this->IsInitialized())
+    mitkThrow() << "AllocateZeroedVolume: image is not initialized. "
+                << "Call Initialize() first to set pixel type and dimensions.";
+
+  if (m_Dimension == 0 || m_Dimension > 3)
+    mitkThrow() << "AllocateZeroedVolume: unsupported image dimension " << m_Dimension
+                << " (expected 1 to 3).";
+
+  if (this->IsVolumeSet(t, n))
+    mitkThrow() << "AllocateZeroedVolume: volume at t=" << t << ", n=" << n
+                << " is already allocated.";
+
+  size_t numBytes = this->GetPixelType().GetSize();
+
+  for (unsigned int i = 0; i < m_Dimension; ++i)
+    numBytes *= m_Dimensions[i];
+
+  auto data = new unsigned char[numBytes];
+  std::memset(data, 0, numBytes);
+
+  this->SetImportVolume(data, t, n, ManageMemory);
+}
+
 bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType importMemoryManagement)
 {
   if (IsValidChannel(n) == false)

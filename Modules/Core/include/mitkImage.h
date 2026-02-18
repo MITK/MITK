@@ -216,6 +216,20 @@ namespace mitk
     virtual bool SetImportVolume(const void *const_data, int t = 0, int n = 0);
 
     /**
+      * @brief Allocate a zero-initialized volume at time @a t in channel @a n.
+      *
+      * The image must already be initialized with a pixel type and dimensions
+      * (via any Initialize() overload) but must not yet have volume data set
+      * for the given time step and channel.
+      *
+      * Supports images with 1 to 3 dimensions.
+      *
+      * @throws mitk::Exception if the image is not initialized, has unsupported
+      *         dimensions (0 or >3), or already has volume data at (t, n).
+      */
+    virtual void AllocateZeroedVolume(int t = 0, int n = 0);
+
+    /**
       * @brief Set @a data in channel @a n. It is in
       * the responsibility of the caller to ensure that the data vector @a data
       * is really a channel (at least is not smaller than a channel), since there is

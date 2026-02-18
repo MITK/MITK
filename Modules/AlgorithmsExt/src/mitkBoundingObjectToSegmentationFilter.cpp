@@ -41,10 +41,10 @@ void mitk::BoundingObjectToSegmentationFilter::GenerateData()
   mitk::Image::Pointer outputImage = this->GetOutput();
   mitk::Image::ConstPointer inputImage = this->GetInput();
   outputImage->Initialize(inputImage);
+  outputImage->AllocateZeroedVolume();
 
   itkImageType::Pointer itkImage;
   CastToItkImage(outputImage, itkImage);
-  itkImage->FillBuffer(0);
 
   for (unsigned int i = 0; i < m_boundingObjectGroup->GetCount(); i++)
   {

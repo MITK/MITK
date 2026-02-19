@@ -1034,7 +1034,8 @@ void DataStorageController::HandlePOST_nodes_uid_generic(const httplib::Request&
       return;
     }
 
-    if (!m_Bridge.SetNodeData(createResult.uid, loadResult.data[0]))
+    const auto setDataStatus = m_Bridge.SetNodeData(createResult.uid, loadResult.data[0]);
+    if (setDataStatus != DataStorageBridge::OperationStatus::Success)
     {
       m_Bridge.DeleteNode(createResult.uid, false);
       cleanupTempFile();
@@ -1609,7 +1610,14 @@ void DataStorageController::HandlePUT_nodes_uid_data(const httplib::Request& req
   }
 
   // Assign loaded data to node
-  if (!m_Bridge.SetNodeData(uid, loadResult.data[0]))
+  const auto setDataStatus = m_Bridge.SetNodeData(uid, loadResult.data[0]);
+  if (setDataStatus == DataStorageBridge::OperationStatus::NodeNotFound)
+  {
+    cleanupTempFile();
+    this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
+    return;
+  }
+  else if (setDataStatus != DataStorageBridge::OperationStatus::Success)
   {
     cleanupTempFile();
     this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
@@ -1813,9 +1821,21 @@ void DataStorageController::HandlePUT_nodes_uid_properties_key(const httplib::Re
   // Get previous value if exists
   auto previousProperty = m_Bridge.GetNodeProperty(uid, key, params);
 
-  if (!m_Bridge.SetNodeProperty(uid, key, value, params))
+  const auto setStatus = m_Bridge.SetNodeProperty(uid, key, value, params);
+  if (setStatus == DataStorageBridge::OperationStatus::NodeNotFound)
   {
-    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Failed to set property value", req.path));
+    this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
+    return;
+  }
+  else if (setStatus == DataStorageBridge::OperationStatus::InvalidInput)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "Failed to deserialize property value or no data for requested scope", req.path));
+    return;
+  }
+  else if (setStatus != DataStorageBridge::OperationStatus::Success)
+  {
+    this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to set property value", req.path));
     return;
   }
 
@@ -1882,7 +1902,18 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
     return;
   }
 
-  if (!m_Bridge.DeleteNodeProperty(uid, key, params))
+  const auto deleteStatus = m_Bridge.DeleteNodeProperty(uid, key, params);
+  if (deleteStatus == DataStorageBridge::OperationStatus::NodeNotFound)
+  {
+    this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
+    return;
+  }
+  else if (deleteStatus == DataStorageBridge::OperationStatus::PropertyNotFound)
+  {
+    this->SendErrorResponse(res, 404, ErrorResponse::PropertyNotFound(key, uid, req.path));
+    return;
+  }
+  else if (deleteStatus != DataStorageBridge::OperationStatus::Success)
   {
     this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to delete property", req.path));
     return;
@@ -1959,7 +1990,17 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
   }
 
   auto replaceResult = m_Bridge.ReplaceNodeProperties(uid, properties, params);
-  if (!replaceResult.has_value())
+  if (replaceResult.status == DataStorageBridge::OperationStatus::NodeNotFound)
+  {
+    this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
+    return;
+  }
+  else if (replaceResult.status == DataStorageBridge::OperationStatus::InvalidInput)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Failed to replace properties", req.path));
+    return;
+  }
+  else if (replaceResult.status != DataStorageBridge::OperationStatus::Success)
   {
     this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to replace properties", req.path));
     return;
@@ -1977,7 +2018,7 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
   }
 
   nlohmann::json response;
-  response["data"] = replaceResult.value();
+  response["data"] = replaceResult.result;
   response["meta"]["node_uid"] = uid;
   response["meta"]["property_scope"] = scopeStr;
   response["meta"]["context"] = params.context.has_value() ? nlohmann::json(params.context.value()) : nlohmann::json(nullptr);
@@ -2052,7 +2093,7 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
       continue;
     }
 
-    if (m_Bridge.SetNodeProperty(uid, key, value, params))
+    if (m_Bridge.SetNodeProperty(uid, key, value, params) == DataStorageBridge::OperationStatus::Success)
     {
       updated.push_back(key);
     }

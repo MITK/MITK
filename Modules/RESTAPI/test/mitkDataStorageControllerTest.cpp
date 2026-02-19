@@ -61,6 +61,7 @@ class mitkDataStorageControllerTestSuite : public mitk::TestFixture
   MITK_TEST(GetNodePropertyNotFound);
   MITK_TEST(SetNodeProperty);
   MITK_TEST(DeleteNodeProperty);
+  MITK_TEST(DeleteNodePropertyNotFound);
   MITK_TEST(DeleteProtectedProperty);
   MITK_TEST(PatchNodeProperties);
   MITK_TEST(PutNodeProperties);
@@ -610,6 +611,27 @@ public:
     CPPUNIT_ASSERT_EQUAL(200, res.status);
     auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT_EQUAL(std::string("customProp"), json["data"]["deleted"].get<std::string>());
+  }
+
+  void DeleteNodePropertyNotFound()
+  {
+    // DELETE a property that doesn't exist on the node → 404 PROPERTY_NOT_FOUND
+    auto node = mitk::DataNode::New();
+    node->SetName("PropNode");
+    m_DataStorage->Add(node);
+
+    std::string uid = this->GetFirstNodeUid();
+
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties/nonExistentProp", "",
+                                   {{"uid", uid}, {"key", "nonExistentProp"}});
+    httplib::Response res;
+
+    m_Controller->HandleDELETE_nodes_uid_properties_key(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("PROPERTY_NOT_FOUND"),
+      json["error"]["code"].get<std::string>());
   }
 
   void DeleteProtectedProperty()

@@ -641,11 +641,11 @@ namespace mitk
       }
 
       // Find parent node if specified
-      DataNode* parentNode = nullptr;
+      DataNode::Pointer parentNode;
       if (parentUid.has_value())
       {
         parentNode = m_UidMapper->FindNodeByUid(parentUid.value());
-        if (parentNode == nullptr)
+        if (parentNode.IsNull())
         {
           return result;  // Parent not found
         }
@@ -729,7 +729,7 @@ namespace mitk
         return false;
       }
 
-      DataNode* newParent = nullptr;
+      DataNode::Pointer newParent;
       if (!updates["parent_uid"].is_null())
       {
         std::string newParentUid = updates["parent_uid"].get<std::string>();
@@ -745,7 +745,7 @@ namespace mitk
       auto descendants = dataStorage->GetDerivations(node, nullptr, true);
       for (auto it = descendants->Begin(); it != descendants->End(); ++it)
       {
-        if (it->Value().GetPointer() == newParent)
+        if (it->Value() == newParent)
         {
           return false;  // Would create circular reference
         }

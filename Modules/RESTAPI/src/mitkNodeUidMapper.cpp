@@ -119,16 +119,20 @@ std::string NodeUidMapper::GetOrCreateUid(DataNode* node)
   return uid;
 }
 
-DataNode* NodeUidMapper::FindNodeByUid(const std::string& uid) const
+DataNode::Pointer NodeUidMapper::FindNodeByUid(const std::string& uid) const
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
 
   auto it = m_UidToNode.find(uid);
   if (it != m_UidToNode.end())
   {
-    return it->second;
+    // Lock() atomically upgrades the WeakPointer to a strong reference.
+    // This is safe under the mutex: OnNodeRemoved (which precedes DataStorage
+    // releasing its reference) also requires this mutex, so a non-null
+    // WeakPointer is guaranteed to refer to a live node here.
+    return it->second.Lock();
   }
-  return nullptr;
+  return DataNode::Pointer();
 }
 
 std::optional<std::string> NodeUidMapper::GetUid(const DataNode* node) const

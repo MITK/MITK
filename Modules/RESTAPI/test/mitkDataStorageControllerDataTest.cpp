@@ -643,7 +643,7 @@ public:
     }
     else if (res.status == 415)
     {
-      MITK_WARN << "BuildImageMetadata skipped: serializer not available (HTTP 415)";
+      CPPUNIT_FAIL("BuildImageMetadata skipped: image serializer not available (HTTP 415)");
     }
   }
 
@@ -690,7 +690,7 @@ public:
     }
     else if (res.status == 415)
     {
-      MITK_WARN << "BuildSurfaceMetadata skipped: serializer not available (HTTP 415)";
+      CPPUNIT_FAIL("BuildSurfaceMetadata skipped: surface serializer not available (HTTP 415)");
     }
   }
 
@@ -735,7 +735,7 @@ public:
     }
     else if (res.status == 415)
     {
-      MITK_WARN << "BuildPointSetMetadata skipped: serializer not available (HTTP 415)";
+      CPPUNIT_FAIL("BuildPointSetMetadata skipped: pointset serializer not available (HTTP 415)");
     }
   }
 
@@ -794,9 +794,7 @@ public:
     }
     else if (res.status == 415)
     {
-      MITK_WARN << "GetImageDataDirect skipped: serializer not available (HTTP 415)";
-      const auto json = nlohmann::json::parse(res.body);
-      CPPUNIT_ASSERT_EQUAL(std::string("UNSUPPORTED_FORMAT"), json["error"]["code"].get<std::string>());
+      CPPUNIT_FAIL("GetImageDataDirect skipped: image serializer not available (HTTP 415)");
     }
     else
     {
@@ -858,7 +856,7 @@ public:
     }
     else if (res.status == 415)
     {
-      MITK_WARN << "GetImageDataFileReference skipped: serializer not available (HTTP 415)";
+      CPPUNIT_FAIL("GetImageDataFileReference skipped: image serializer not available (HTTP 415)");
     }
     else
     {
@@ -929,7 +927,7 @@ public:
     }
     else if (res.status == 415 || res.status == 422)
     {
-      MITK_WARN << "PutImageDataDirect skipped: serializer not available (HTTP " << res.status << ")";
+      CPPUNIT_FAIL("PutImageDataDirect skipped: image serializer not available (HTTP 415/442)");
     }
     else
     {
@@ -997,7 +995,7 @@ public:
     else if (res.status == 415 || res.status == 422)
     {
       fs::remove(fs::path(tempFilePath));
-      MITK_WARN << "PutImageDataFileReference skipped: serializer not available (HTTP " << res.status << ")";
+      CPPUNIT_FAIL("PutImageDataFileReference skipped: image serializer not available (HTTP 415/422)");
     }
     else
     {
@@ -1073,7 +1071,7 @@ public:
     }
     else if (res.status == 415 || res.status == 422)
     {
-      MITK_WARN << "PostNodeWithDataFileReference skipped: serializer not available (HTTP " << res.status << ")";
+      CPPUNIT_FAIL("PostNodeWithDataFileReference skipped: image serializer not available (HTTP 415/422)");
     }
     else
     {
@@ -1147,7 +1145,7 @@ public:
     }
     else if (res.status == 415 || res.status == 422)
     {
-      MITK_WARN << "PostNodeWithDataDirect skipped: serializer not available (HTTP " << res.status << ")";
+      CPPUNIT_FAIL("PostNodeWithDataDirect skipped: image serializer not available (HTTP 415/422)");
     }
     else
     {
@@ -1220,7 +1218,7 @@ public:
     }
     else if (res.status == 415 || res.status == 422)
     {
-      MITK_WARN << "PostChildNodeWithDataFileReference skipped: serializer not available (HTTP " << res.status << ")";
+      CPPUNIT_FAIL("PostChildNodeWithDataFileReference skipped: image serializer not available (HTTP 415/422)");
     }
     else
     {

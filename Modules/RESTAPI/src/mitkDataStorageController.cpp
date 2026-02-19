@@ -1746,6 +1746,14 @@ void DataStorageController::HandlePUT_nodes_uid_properties_key(const httplib::Re
   // Per API spec: PUT /properties/{name} defaults to "node" scope
   auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
 
+  // Mutation endpoints do not support scope "all"
+  if (params.scope == PropertyScope::All)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "Scope 'all' is not supported for property mutation operations. Use 'node' or 'data'.", req.path));
+    return;
+  }
+
   // Parse request body
   nlohmann::json value;
   try
@@ -1815,6 +1823,14 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
   // Per API spec: DELETE /properties/{name} defaults to "node" scope
   auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
 
+  // Mutation endpoints do not support scope "all"
+  if (params.scope == PropertyScope::All)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "Scope 'all' is not supported for property mutation operations. Use 'node' or 'data'.", req.path));
+    return;
+  }
+
   // Check for protected properties (like "name") - only protected in node scope
   if (key == "name" && params.scope != PropertyScope::Data)
   {
@@ -1860,6 +1876,14 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
   // Parse property query parameters for context and scope
   // Per API spec: PUT /properties defaults to "node" scope
   auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+
+  // Mutation endpoints do not support scope "all"
+  if (params.scope == PropertyScope::All)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "Scope 'all' is not supported for property mutation operations. Use 'node' or 'data'.", req.path));
+    return;
+  }
 
   // Parse request body
   nlohmann::json properties;
@@ -1943,6 +1967,14 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
   // Parse property query parameters for context and scope
   // Per API spec: PATCH /properties defaults to "node" scope
   auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+
+  // Mutation endpoints do not support scope "all"
+  if (params.scope == PropertyScope::All)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "Scope 'all' is not supported for property mutation operations. Use 'node' or 'data'.", req.path));
+    return;
+  }
 
   // Parse request body
   nlohmann::json properties;

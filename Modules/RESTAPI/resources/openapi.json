@@ -1318,7 +1318,6 @@
             "schema": {
               "type": "string",
               "enum": [
-                "all",
                 "node",
                 "data"
               ],
@@ -1418,7 +1417,6 @@
             "schema": {
               "type": "string",
               "enum": [
-                "all",
                 "node",
                 "data"
               ],
@@ -1655,7 +1653,6 @@
             "schema": {
               "type": "string",
               "enum": [
-                "all",
                 "node",
                 "data"
               ],
@@ -1757,7 +1754,6 @@
             "schema": {
               "type": "string",
               "enum": [
-                "all",
                 "node",
                 "data"
               ],

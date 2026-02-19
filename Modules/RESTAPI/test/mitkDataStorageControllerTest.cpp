@@ -73,6 +73,9 @@ class mitkDataStorageControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PatchNodeReparent);
   MITK_TEST(PatchNodeReparentToNull);
   MITK_TEST(PatchNodeNotFound);
+  MITK_TEST(PatchNodeMissingParentUid);
+  MITK_TEST(PatchNodeParentNotFound);
+  MITK_TEST(PatchNodeCircularReference);
 
   // Fields parameter tests
   MITK_TEST(GetNodesWithFieldsSelection);
@@ -871,6 +874,86 @@ public:
     CPPUNIT_ASSERT_EQUAL(404, res.status);
     auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT_EQUAL(std::string("NODE_NOT_FOUND"), json["error"]["code"].get<std::string>());
+  }
+
+  void PatchNodeMissingParentUid()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("NodeToUpdate");
+    m_DataStorage->Add(node);
+
+    const auto uid = this->FindUidByName("NodeToUpdate");
+
+    // Body without "parent_uid" — not a supported operation
+    nlohmann::json body;
+    body["name"] = "new_name";
+
+    auto req = this->CreateRequest(
+      "/api/v1/datastorage/nodes/" + uid,
+      body.dump(),
+      {{"uid", uid}}, {}, "application/json");
+    httplib::Response res;
+
+    m_Controller->HandlePATCH_nodes_uid(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  void PatchNodeParentNotFound()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("NodeWithBadParent");
+    m_DataStorage->Add(node);
+
+    const auto uid = this->FindUidByName("NodeWithBadParent");
+
+    nlohmann::json body;
+    body["parent_uid"] = "node_999999";
+
+    auto req = this->CreateRequest(
+      "/api/v1/datastorage/nodes/" + uid,
+      body.dump(),
+      {{"uid", uid}}, {}, "application/json");
+    httplib::Response res;
+
+    m_Controller->HandlePATCH_nodes_uid(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("NODE_NOT_FOUND"), json["error"]["code"].get<std::string>());
+  }
+
+  void PatchNodeCircularReference()
+  {
+    // Build: parent -> child
+    auto parent = mitk::DataNode::New();
+    parent->SetName("CircularParent");
+    m_DataStorage->Add(parent);
+
+    auto child = mitk::DataNode::New();
+    child->SetName("CircularChild");
+    m_DataStorage->Add(child, parent);
+
+    const auto parentUid = this->FindUidByName("CircularParent");
+    const auto childUid = this->FindUidByName("CircularChild");
+
+    // Try to reparent parent under child — would create a cycle
+    nlohmann::json body;
+    body["parent_uid"] = childUid;
+
+    auto req = this->CreateRequest(
+      "/api/v1/datastorage/nodes/" + parentUid,
+      body.dump(),
+      {{"uid", parentUid}}, {}, "application/json");
+    httplib::Response res;
+
+    m_Controller->HandlePATCH_nodes_uid(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(409, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("CIRCULAR_HIERARCHY_REFERENCE"), json["error"]["code"].get<std::string>());
   }
 
   // ===== Fields parameter tests =====

@@ -220,15 +220,6 @@ private:
     m_Grandchild2Uid = FindUidByName("Grandchild2");
   }
 
-  void ClearStorage()
-  {
-    auto all = m_DataStorage->GetAll();
-    for (auto it = all->Begin(); it != all->End(); ++it)
-    {
-      m_DataStorage->Remove(it->Value());
-    }
-  }
-
 public:
   void setUp() override
   {

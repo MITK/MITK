@@ -85,7 +85,7 @@ namespace mitk
      * @param uid The UID to look up.
      * @return The node with this UID, or nullptr if not found.
      */
-    DataNode* FindNodeByUid(const std::string& uid) const;
+    DataNode::Pointer FindNodeByUid(const std::string& uid) const;
 
     /**
      * @brief Get UID for a node if it exists (doesn't create).
@@ -122,7 +122,7 @@ namespace mitk
     std::string GenerateUid();
     void ClearRESTUIDProperty();
 
-    DataStorage* m_DataStorage = nullptr;
+    mitk::WeakPointer<DataStorage> m_DataStorage;
 
     // Thread-safe UID mappings
     mutable std::mutex m_Mutex;

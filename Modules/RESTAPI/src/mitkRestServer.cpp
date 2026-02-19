@@ -349,10 +349,10 @@ void RestServer::SetDispatcher(StorageThreadDispatcherBase* dispatcher)
   m_Bridge->SetDispatcher(dispatcher);
 }
 
-DataStorage* RestServer::GetDataStorage() const
+DataStorage::Pointer RestServer::GetDataStorage() const
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
-  return m_Bridge->GetDataStorage().GetPointer();
+  return m_Bridge->GetDataStorage();
 }
 
 std::optional<std::string> RestServer::GetServerUrl() const

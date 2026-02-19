@@ -6,9 +6,6 @@ set(H_FILES
   include/mitkNodeUidMapper.h
   include/mitkNodeQueryParams.h
   include/mitkErrorResponse.h
-  include/mitkHealthController.h
-  include/mitkDataStorageController.h
-  include/mitkSwaggerController.h
 )
 
 set(CPP_FILES

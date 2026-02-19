@@ -68,7 +68,7 @@ namespace mitk
     std::optional<RestServerConfig> GetRunningConfig() const override;
 
     void SetDataStorage(DataStorage* dataStorage) override;
-    DataStorage* GetDataStorage() const override;
+    DataStorage::Pointer GetDataStorage() const override;
 
     /**
      * @brief Set the thread dispatcher for DataStorage operations.

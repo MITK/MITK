@@ -85,7 +85,8 @@ namespace mitk
     /// Prefix for internal REST API properties (filtered from responses, protected from modification)
     static constexpr const char* INTERNAL_PROPERTY_PREFIX = "restapi.";
 
-    /// Property key for tracking if a node was modified via REST API (bool property)
+    /** Property key for tracking if a node was modified via REST API (string property).
+     If the property exists the node was modified and the value is the timestamp of the modification.*/
     static constexpr const char* MODIFIED_PROPERTY_KEY = "restapi.modified";
 
     /// Property key for tracking the last modification operation (string property)
@@ -320,7 +321,7 @@ namespace mitk
       const std::string& uid,
       const std::string& key,
       const Json& value,
-      const PropertyQueryParams& params = {});
+      const PropertyQueryParams& params);
 
     /**
      * @brief Delete a property from a node.
@@ -333,7 +334,7 @@ namespace mitk
     bool DeleteNodeProperty(
       const std::string& uid,
       const std::string& key,
-      const PropertyQueryParams& params = {});
+      const PropertyQueryParams& params);
 
     /**
      * @brief Replace all properties on a node (PUT semantics).
@@ -346,7 +347,7 @@ namespace mitk
     std::optional<Json> ReplaceNodeProperties(
       const std::string& uid,
       const Json& properties,
-      const PropertyQueryParams& params = {});
+      const PropertyQueryParams& params);
 
     /**
      * @brief Get available property contexts for a node.
@@ -396,6 +397,8 @@ namespace mitk
     WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
     std::unique_ptr<NodeUidMapper> m_UidMapper;
 
+    /** Remark: Important to ensure that this mutex is always acquired before interacting with m_UidMapper
+     * (and its mutex).*/
     mutable std::mutex m_Mutex;
   };
 }

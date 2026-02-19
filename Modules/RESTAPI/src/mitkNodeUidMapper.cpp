@@ -29,12 +29,13 @@ void NodeUidMapper::SetDataStorage(DataStorage* dataStorage)
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
 
+  auto oldDataStorage = m_DataStorage.Lock();
   // Disconnect from previous DataStorage
-  if (m_DataStorage != nullptr && m_Connected)
+  if (oldDataStorage.IsNotNull() && m_Connected)
   {
-    m_DataStorage->AddNodeEvent.RemoveListener(
+    oldDataStorage->AddNodeEvent.RemoveListener(
       MessageDelegate1<NodeUidMapper, const DataNode*>(this, &NodeUidMapper::OnNodeAdded));
-    m_DataStorage->RemoveNodeEvent.RemoveListener(
+    oldDataStorage->RemoveNodeEvent.RemoveListener(
       MessageDelegate1<NodeUidMapper, const DataNode*>(this, &NodeUidMapper::OnNodeRemoved));
     m_Connected = false;
   }
@@ -44,16 +45,17 @@ void NodeUidMapper::SetDataStorage(DataStorage* dataStorage)
   m_NodeToUid.clear();
 
   m_DataStorage = dataStorage;
+  auto newDataStorage = m_DataStorage.Lock();
 
-  if (m_DataStorage != nullptr)
+  if (newDataStorage.IsNotNull())
   {
     // Clear any existing restapi.uid properties (transient - fresh start)
     this->ClearRESTUIDProperty();
 
     // Subscribe to events
-    m_DataStorage->AddNodeEvent.AddListener(
+    newDataStorage->AddNodeEvent.AddListener(
       MessageDelegate1<NodeUidMapper, const DataNode*>(this, &NodeUidMapper::OnNodeAdded));
-    m_DataStorage->RemoveNodeEvent.AddListener(
+    newDataStorage->RemoveNodeEvent.AddListener(
       MessageDelegate1<NodeUidMapper, const DataNode*>(this, &NodeUidMapper::OnNodeRemoved));
     m_Connected = true;
   }
@@ -69,12 +71,15 @@ void NodeUidMapper::ClearRESTUIDProperty()
   // Remove any existing restapi.uid properties from all nodes
   // This ensures UIDs are truly transient across sessions
   // Note: m_Mutex is already locked by caller
-  if (m_DataStorage == nullptr)
+
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
 
-  auto allNodes = m_DataStorage->GetAll();
+  auto allNodes = dataStorage->GetAll();
   for (auto it = allNodes->Begin(); it != allNodes->End(); ++it)
   {
     auto* node = it->Value().GetPointer();

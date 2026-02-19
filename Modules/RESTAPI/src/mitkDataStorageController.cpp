@@ -1056,6 +1056,13 @@ void DataStorageController::HandlePOST_nodes_uid_generic(const httplib::Request&
   // Get the created node details
   auto node = m_Bridge.GetNode(createResult.uid);
 
+  if (!node.has_value())
+  {
+    this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
+      "Failed to find created node", req.path));
+    return;
+  }
+
   nlohmann::json response;
   response[JSON_KEY_DATA] = node.value();
   response[JSON_KEY_META]["location"] = "/api/v1/datastorage/nodes/" + createResult.uid;
@@ -1154,9 +1161,46 @@ void DataStorageController::HandlePATCH_nodes_uid(const httplib::Request& req, h
     return;
   }
 
+  // PATCH /nodes/{uid} only supports reparenting via "parent_uid"
+  if (!updates.is_object() || !updates.contains("parent_uid"))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "PATCH /nodes/{uid} only supports reparenting. "
+      "Provide 'parent_uid' in the request body (use null for root level).", req.path));
+    return;
+  }
+
+  // Validate parent_uid value: must be null (move to root) or an existing node UID
+  if (!updates["parent_uid"].is_null())
+  {
+    if (!updates["parent_uid"].is_string())
+    {
+      this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+        "Invalid 'parent_uid': must be a string UID or null.", req.path));
+      return;
+    }
+    const std::string parentUid = updates["parent_uid"].get<std::string>();
+    if (!ValidateUid(parentUid))
+    {
+      this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid parent_uid format", req.path));
+      return;
+    }
+    if (!m_Bridge.GetNode(parentUid).has_value())
+    {
+      this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(parentUid, req.path));
+      return;
+    }
+  }
+
   if (!m_Bridge.UpdateNode(uid, updates))
   {
-    this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to update node", req.path));
+    // parent_uid is present and the parent node exists; the only remaining
+    // failure is a circular hierarchy reference (target is a descendant of this node).
+    this->SendErrorResponse(res, 409, ErrorResponse::Create(
+      "CIRCULAR_HIERARCHY_REFERENCE",
+      "Circular Hierarchy Reference",
+      "Cannot reparent node: the target parent is a descendant of this node.",
+      409, req.path));
     return;
   }
 

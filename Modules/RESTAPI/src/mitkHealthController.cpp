@@ -25,6 +25,7 @@ HealthController::HealthController(DataStorageBridge& bridge)
 
 void HealthController::SetUptimeCallback(UptimeCallback callback)
 {
+  std::lock_guard<std::mutex> lock(m_Mutex);
   m_UptimeCallback = std::move(callback);
 }
 
@@ -39,12 +40,15 @@ void HealthController::HandleGET_health(const httplib::Request& /*req*/, httplib
   response["data"]["checks"] = checks;
 
   // Add uptime if available
-  if (m_UptimeCallback)
   {
-    auto uptime = m_UptimeCallback();
-    if (uptime.has_value())
+    std::lock_guard<std::mutex> lock(m_Mutex);
+    if (m_UptimeCallback)
     {
-      response["data"]["uptime_seconds"] = uptime.value();
+      auto uptime = m_UptimeCallback();
+      if (uptime.has_value())
+      {
+        response["data"]["uptime_seconds"] = uptime.value();
+      }
     }
   }
 
@@ -79,12 +83,15 @@ void HealthController::SetFileAccessConfig(FileAccessMode mode, const std::vecto
     mitkThrow() << "SetFileAccessConfig: allowedDirs must not be empty when mode is AllowedDirectories.";
   }
 
+  std::lock_guard<std::mutex> lock(m_Mutex);
   m_FileAccessMode = mode;
   m_AllowedFileDirectories = allowedDirs;
 }
 
 void HealthController::HandleGET_config_file_access(const httplib::Request& /*req*/, httplib::Response& res)
 {
+  std::lock_guard<std::mutex> lock(m_Mutex);
+
   const bool restrictionsActive = (m_FileAccessMode == FileAccessMode::AllowedDirectories);
 
   nlohmann::json data;

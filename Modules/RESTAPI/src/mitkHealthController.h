@@ -104,6 +104,7 @@ namespace mitk
 
   private:
     DataStorageBridge& m_Bridge;
+    mutable std::mutex m_Mutex;
     UptimeCallback m_UptimeCallback;
     FileAccessMode m_FileAccessMode = FileAccessMode::Unrestricted;
     std::vector<std::string> m_AllowedFileDirectories;

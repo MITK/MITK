@@ -478,7 +478,7 @@ namespace mitk
   DataStorageBridge::NodeQueryResult DataStorageBridge::GetNodes(const NodeQueryParams& params) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<NodeQueryResult>([this, &params]()
+    return this->DispatchTask<NodeQueryResult>([this, params]()
     {
       NodeQueryResult result;
       result.nodes = Json::array();
@@ -608,7 +608,7 @@ namespace mitk
   std::optional<DataStorageBridge::Json> DataStorageBridge::GetNode(const std::string& uid) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<std::optional<Json>>([this, &uid]()
+    return this->DispatchTask<std::optional<Json>>([this, uid]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -629,7 +629,7 @@ namespace mitk
   DataStorageBridge::CreateNodeResult DataStorageBridge::CreateNode(const Json& nodeData, const std::optional<std::string>& parentUid)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<CreateNodeResult>([this, &nodeData, &parentUid]()
+    return this->DispatchTask<CreateNodeResult>([this, nodeData, parentUid]()
     {
       CreateNodeResult result;
       result.success = false;
@@ -709,7 +709,7 @@ namespace mitk
   bool DataStorageBridge::UpdateNode(const std::string& uid, const Json& updates)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<bool>([this, &uid, &updates]()
+    return this->DispatchTask<bool>([this, uid, updates]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -780,7 +780,7 @@ namespace mitk
   DataStorageBridge::DeleteResult DataStorageBridge::DeleteNode(const std::string& uid, bool recursive)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<DeleteResult>([this, &uid, recursive]()
+    return this->DispatchTask<DeleteResult>([this, uid, recursive]()
     {
       DeleteResult result;
       result.success = false;
@@ -849,7 +849,7 @@ namespace mitk
   DataStorageBridge::GetNodeDataResult DataStorageBridge::GetNodeData(const std::string& uid) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<GetNodeDataResult>([this, &uid]()
+    return this->DispatchTask<GetNodeDataResult>([this, uid]()
     {
       GetNodeDataResult result;
       result.nodeFound = false;
@@ -886,7 +886,7 @@ namespace mitk
   bool DataStorageBridge::SetNodeData(const std::string& uid, BaseData* data)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<bool>([this, &uid, data]()
+    return this->DispatchTask<bool>([this, uid, data]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -914,7 +914,7 @@ namespace mitk
     const PropertyQueryParams& params) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<std::optional<Json>>([this, &uid, &params]()
+    return this->DispatchTask<std::optional<Json>>([this, uid, params]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -987,7 +987,7 @@ namespace mitk
     }
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<std::optional<Json>>([this, &uid, &key, &params]()
+    return this->DispatchTask<std::optional<Json>>([this, uid, key, params]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -1034,7 +1034,7 @@ namespace mitk
     }
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<bool>([this, &uid, &key, &value, &params]()
+    return this->DispatchTask<bool>([this, uid, key, value, params]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -1109,7 +1109,7 @@ namespace mitk
     }
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<bool>([this, &uid, &key, &params]()
+    return this->DispatchTask<bool>([this, uid, key, params]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -1172,7 +1172,7 @@ namespace mitk
     }
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<std::optional<Json>>([this, &uid, &properties, &params]()
+    return this->DispatchTask<std::optional<Json>>([this, uid, properties, params]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -1286,7 +1286,7 @@ namespace mitk
   std::optional<DataStorageBridge::Json> DataStorageBridge::GetNodeAvailableContexts(const std::string& uid) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<std::optional<Json>>([this, &uid]()
+    return this->DispatchTask<std::optional<Json>>([this, uid]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())

@@ -155,27 +155,27 @@
       </item>
       <item>
        <widget class="QPlainTextEdit" name="m_AllowedIPsTextEdit">
-        <property name="toolTip">
-         <string>List of allowed client IP addresses (one per line). Localhost is always allowed.</string>
-        </property>
-        <property name="placeholderText">
-         <string>One IP per line</string>
-        </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
           <height>80</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>List of allowed client IP addresses (one per line). Localhost is always allowed.</string>
+        </property>
+        <property name="placeholderText">
+         <string>One IP per line</string>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="m_AccessModeWarningLabel">
-        <property name="text">
-         <string>Warning: Allow All mode accepts connections from any IP address</string>
-        </property>
         <property name="styleSheet">
          <string>color: red;</string>
+        </property>
+        <property name="text">
+         <string>Warning: Allow All mode accepts connections from any IP address</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -183,12 +183,19 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="m_RequireAuthCheckBox">
-        <property name="text">
-         <string>Require API token authentication</string>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="m_RequireAuthCheckBox">
         <property name="toolTip">
          <string>If enabled, all requests must include a valid API token in the Authorization header</string>
+        </property>
+        <property name="text">
+         <string>Require API token authentication</string>
         </property>
        </widget>
       </item>
@@ -203,14 +210,14 @@
         </item>
         <item row="0" column="1">
          <widget class="QLineEdit" name="m_ApiTokenLineEdit">
-          <property name="readOnly">
-           <bool>true</bool>
+          <property name="toolTip">
+           <string>The API token used for authentication</string>
           </property>
           <property name="echoMode">
            <enum>QLineEdit::Password</enum>
           </property>
-          <property name="toolTip">
-           <string>The API token used for authentication</string>
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -220,31 +227,31 @@
        <layout class="QHBoxLayout" name="tokenButtonsLayout">
         <item>
          <widget class="QPushButton" name="m_ShowTokenButton">
-          <property name="text">
-           <string>Show</string>
-          </property>
           <property name="toolTip">
            <string>Toggle visibility of the API token</string>
+          </property>
+          <property name="text">
+           <string>Show</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="m_GenerateTokenButton">
-          <property name="text">
-           <string>Generate New Token</string>
-          </property>
           <property name="toolTip">
            <string>Generate a new random API token</string>
+          </property>
+          <property name="text">
+           <string>Generate New Token</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="m_CopyTokenButton">
-          <property name="text">
-           <string>Copy Token</string>
-          </property>
           <property name="toolTip">
            <string>Copy the API token to the clipboard</string>
+          </property>
+          <property name="text">
+           <string>Copy Token</string>
           </property>
          </widget>
         </item>
@@ -264,12 +271,19 @@
        </layout>
       </item>
       <item>
-       <widget class="QCheckBox" name="m_RateLimitCheckBox">
-        <property name="text">
-         <string>Enable rate limiting</string>
+       <widget class="Line" name="line_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="m_RateLimitCheckBox">
         <property name="toolTip">
          <string>Limit the number of requests per minute from each client</string>
+        </property>
+        <property name="text">
+         <string>Enable rate limiting</string>
         </property>
        </widget>
       </item>
@@ -286,11 +300,14 @@
          <layout class="QHBoxLayout" name="rateLimitLayout">
           <item>
            <widget class="QSpinBox" name="m_RateLimitSpinBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="toolTip">
              <string>Maximum number of requests per minute allowed from each client</string>
             </property>
-            <property name="enabled">
-             <bool>false</bool>
+            <property name="suffix">
+             <string> req/min</string>
             </property>
             <property name="minimum">
              <number>10</number>
@@ -300,9 +317,6 @@
             </property>
             <property name="value">
              <number>120</number>
-            </property>
-            <property name="suffix">
-             <string> req/min</string>
             </property>
            </widget>
           </item>
@@ -322,6 +336,13 @@
          </layout>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="Line" name="line_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
       </item>
       <item>
        <layout class="QFormLayout" name="fileAccessFormLayout">
@@ -352,6 +373,30 @@
        </layout>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="dirButtonsLayout">
+        <item>
+         <widget class="QPushButton" name="m_AddDirButton">
+          <property name="toolTip">
+           <string>Add an allowed directory</string>
+          </property>
+          <property name="text">
+           <string>Add...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_RemoveDirButton">
+          <property name="toolTip">
+           <string>Remove the selected directory from the list</string>
+          </property>
+          <property name="text">
+           <string>Remove</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QListWidget" name="m_AllowedDirsListWidget">
         <property name="maximumSize">
          <size>
@@ -365,49 +410,19 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="dirButtonsLayout">
-        <item>
-         <widget class="QPushButton" name="m_AddDirButton">
-          <property name="text">
-           <string>Add...</string>
-          </property>
-          <property name="toolTip">
-           <string>Add an allowed directory</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="m_RemoveDirButton">
-          <property name="text">
-           <string>Remove</string>
-          </property>
-          <property name="toolTip">
-           <string>Remove the selected directory from the list</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="dirButtonsSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
+       <widget class="Line" name="line_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="m_HttpsCheckBox">
-        <property name="text">
-         <string>Enable HTTPS</string>
-        </property>
         <property name="toolTip">
          <string>Enable TLS/SSL encryption for the REST API server</string>
+        </property>
+        <property name="text">
+         <string>Enable HTTPS</string>
         </property>
        </widget>
       </item>
@@ -424,21 +439,21 @@
          <layout class="QHBoxLayout" name="sslCertLayout">
           <item>
            <widget class="QLineEdit" name="m_SslCertLineEdit">
-            <property name="toolTip">
-             <string>Path to the PEM-format SSL certificate file</string>
-            </property>
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Path to the PEM-format SSL certificate file</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="m_BrowseCertButton">
-            <property name="text">
-             <string>Browse...</string>
-            </property>
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Browse...</string>
             </property>
            </widget>
           </item>
@@ -455,21 +470,21 @@
          <layout class="QHBoxLayout" name="sslKeyLayout">
           <item>
            <widget class="QLineEdit" name="m_SslKeyLineEdit">
-            <property name="toolTip">
-             <string>Path to the PEM-format SSL private key file</string>
-            </property>
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Path to the PEM-format SSL private key file</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="m_BrowseKeyButton">
-            <property name="text">
-             <string>Browse...</string>
-            </property>
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Browse...</string>
             </property>
            </widget>
           </item>
@@ -479,11 +494,11 @@
       </item>
       <item>
        <widget class="QLabel" name="httpsInfoLabel">
-        <property name="text">
-         <string>Requires PEM-format certificate and private key files</string>
-        </property>
         <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Requires PEM-format certificate and private key files</string>
         </property>
        </widget>
       </item>
@@ -630,6 +645,9 @@
           <property name="toolTip">
            <string>Maximum allowed request body size</string>
           </property>
+          <property name="suffix">
+           <string> MB</string>
+          </property>
           <property name="minimum">
            <number>1</number>
           </property>
@@ -638,9 +656,6 @@
           </property>
           <property name="value">
            <number>512</number>
-          </property>
-          <property name="suffix">
-           <string> MB</string>
           </property>
          </widget>
         </item>
@@ -680,11 +695,11 @@
         </item>
         <item>
          <widget class="QSpinBox" name="m_LogLimitSpinBox">
-          <property name="toolTip">
-           <string>Maximum number of request log entries to keep</string>
-          </property>
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Maximum number of request log entries to keep</string>
           </property>
           <property name="minimum">
            <number>1</number>

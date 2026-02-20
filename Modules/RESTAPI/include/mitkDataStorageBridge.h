@@ -361,7 +361,7 @@ namespace mitk
     struct ReplacePropertiesResult
     {
       OperationStatus status = OperationStatus::InternalError;
-      Json result;  ///< {"replaced": [...], "removed": [...]} — valid only on Success
+      Json result = {};  ///< {"replaced": [...], "removed": [...]} - valid only on Success
     };
 
     /**

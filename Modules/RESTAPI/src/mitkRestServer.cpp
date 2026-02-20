@@ -546,7 +546,7 @@ bool RestServer::CheckRateLimit(const httplib::Request& req, httplib::Response& 
     // Calculate retry-after as seconds until the oldest entry expires
     const auto oldestExpiry = timestamps.front() + windowDuration;
     const auto retryAfter = std::chrono::duration_cast<std::chrono::seconds>(oldestExpiry - now).count();
-    const int retryAfterSeconds = std::max(static_cast<long long>(1), retryAfter);
+    const int retryAfterSeconds = std::max(1, static_cast<int>(retryAfter));
 
     auto error = ErrorResponse::RateLimitExceeded(retryAfterSeconds, req.path);
     res.status = 429;

@@ -49,26 +49,29 @@ namespace mitk
     int readTimeoutSeconds = 30;
     int writeTimeoutSeconds = 30;
 
-    // Client access control (Phase 4.2)
+    // Client access control
     ClientAccessMode clientAccessMode = ClientAccessMode::LocalhostOnly;
     std::vector<std::string> allowedClientIPs;
 
-    // Authentication (Phase 4.3)
+    // Authentication
     bool requireAuth = false;
     std::string apiToken;
 
-    // Payload limits (Phase 4.4)
+    // Payload limits
     int maxPayloadSizeMB = 512;
 
-    // File path restrictions (Phase 4.5)
+    // File path restrictions
     FileAccessMode fileAccessMode = FileAccessMode::Unrestricted;
     std::vector<std::string> allowedFileDirectories;
 
-    // Rate limiting (Phase 4.6)
+    // Rate limiting
     bool rateLimitEnabled = false;
     int rateLimitPerMinute = 120;
 
-    // HTTPS (Phase 4.7)
+    // Per-IP temp dir quota for file-reference GETs
+    size_t maxActiveTempDirsPerIp = 5;
+
+    // HTTPS
     bool httpsEnabled = false;
     std::string sslCertPath;
     std::string sslKeyPath;

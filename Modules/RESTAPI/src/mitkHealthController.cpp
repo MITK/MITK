@@ -88,6 +88,12 @@ void HealthController::SetFileAccessConfig(FileAccessMode mode, const std::vecto
   m_AllowedFileDirectories = allowedDirs;
 }
 
+void HealthController::SetMaxActiveTempDirsPerIp(size_t max)
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  m_MaxActiveTempDirsPerIp = max;
+}
+
 void HealthController::HandleGET_config_file_access(const httplib::Request& /*req*/, httplib::Response& res)
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
@@ -102,6 +108,8 @@ void HealthController::HandleGET_config_file_access(const httplib::Request& /*re
   {
     data["allowed_paths"] = m_AllowedFileDirectories;
   }
+
+  data["max_active_temp_dirs_per_ip"] = m_MaxActiveTempDirsPerIp;
 
   nlohmann::json response;
   response["data"] = data;

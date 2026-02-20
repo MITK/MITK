@@ -146,6 +146,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("unrestricted"), json["data"]["mode"].get<std::string>());
     CPPUNIT_ASSERT_EQUAL(false, json["data"]["restrictions_active"].get<bool>());
     CPPUNIT_ASSERT(!json["data"].contains("allowed_paths"));
+    CPPUNIT_ASSERT(json["data"].contains("max_active_temp_dirs_per_ip"));
+    CPPUNIT_ASSERT_EQUAL(5, json["data"]["max_active_temp_dirs_per_ip"].get<int>());
   }
 
   void HealthControllerFileAccessConfigRestricted()
@@ -156,6 +158,7 @@ public:
     mitk::HealthController controller(bridge);
 
     controller.SetFileAccessConfig(mitk::FileAccessMode::AllowedDirectories, {"/data", "/images"});
+    controller.SetMaxActiveTempDirsPerIp(3);
 
     httplib::Request req;
     httplib::Response res;
@@ -168,6 +171,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(true, json["data"]["restrictions_active"].get<bool>());
     CPPUNIT_ASSERT(json["data"].contains("allowed_paths"));
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), json["data"]["allowed_paths"].size());
+    CPPUNIT_ASSERT_EQUAL(3, json["data"]["max_active_temp_dirs_per_ip"].get<int>());
   }
 };
 

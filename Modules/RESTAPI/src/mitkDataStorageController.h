@@ -17,8 +17,13 @@ found in the LICENSE file.
 #include "mitkNodeQueryParams.h"
 #include "mitkRestServerConfig.h"
 #include <httplib.h>
+#include <mitkFileSystem.h>
 
 #include <MitkRESTAPIExports.h>
+
+#include <deque>
+#include <mutex>
+#include <unordered_map>
 
 namespace mitk
 {
@@ -79,6 +84,15 @@ namespace mitk
      * @param tempDirectory Path to the temporary directory (always allowed in AllowedDirectories mode).
      */
     void SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs, const std::string& tempDirectory);
+
+    /**
+     * @brief Set the maximum number of concurrently active file-reference temp
+     *        directories per client IP.  When a client exceeds the limit its
+     *        oldest directory is evicted (deleted) to make room.  Default: 5.
+     *
+     * @pre max >= 1.
+     */
+    void SetMaxActiveTempDirsPerIp(size_t max);
 
     // Node operations
 
@@ -297,10 +311,37 @@ namespace mitk
     void HandlePOST_nodes_uid_generic(const httplib::Request& req, httplib::Response& res, const std::optional<std::string>& parentUID);
 
 
+    /**
+     * @brief Acquire a new per-request temp directory, enforcing the per-IP quota.
+     *
+     * Creates the directory, registers it for the given client IP, and evicts
+     * the oldest directory for that IP if the quota would be exceeded.
+     *
+     * @param clientIp The remote IP address of the requesting client.
+     * @return Path to the newly created temp directory.
+     */
+    fs::path AcquireRequestTempDir(const std::string& clientIp);
+
+    /**
+     * @brief Release a per-request temp directory, deleting it and deregistering it.
+     *
+     * @param clientIp The remote IP address of the requesting client.
+     * @param dir      The directory path returned by AcquireRequestTempDir().
+     */
+    void ReleaseRequestTempDir(const std::string& clientIp, const fs::path& dir);
+
     DataStorageBridge& m_Bridge;
     std::string m_TempDirectory;
     FileAccessMode m_FileAccessMode = FileAccessMode::Unrestricted;
     std::vector<std::string> m_AllowedFileDirectories;
+
+    // Per-IP bounded temp-directory quota.
+    // Map key: client IP string.  Value: deque of active dirs ordered by creation time (oldest first).
+    // Protected by m_ActiveTempDirsMutex.
+    static constexpr size_t DEFAULT_MAX_ACTIVE_TEMP_DIRS_PER_IP = 5;
+    size_t m_MaxActiveTempDirsPerIp = DEFAULT_MAX_ACTIVE_TEMP_DIRS_PER_IP;
+    mutable std::mutex m_ActiveTempDirsMutex;
+    std::unordered_map<std::string, std::deque<fs::path>> m_ActiveTempDirsByIp;
   };
 }
 

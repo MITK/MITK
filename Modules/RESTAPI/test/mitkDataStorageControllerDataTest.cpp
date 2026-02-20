@@ -84,6 +84,10 @@ class mitkDataStorageControllerDataTestSuite : public mitk::TestFixture
   MITK_TEST(PostNodeWithDataFileReference);
   MITK_TEST(PostNodeWithDataDirect);
   MITK_TEST(PostChildNodeWithDataFileReference);
+
+  // Per-IP temp dir quota tests
+  MITK_TEST(TempDirPerIpQuota);
+  MITK_TEST(TempDirDifferentIpsIndependent);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -1229,6 +1233,99 @@ public:
     // Cleanup
     fs::remove(fs::path(tempFilePath));
   }
+
+  // ===== Per-IP temp dir quota tests =====
+
+  void TempDirPerIpQuota()
+  {
+    // With quota = 2, the 3rd request from the same IP must evict the 1st directory.
+    m_Controller->SetMaxActiveTempDirsPerIp(2);
+
+    auto node = mitk::DataNode::New();
+    node->SetName("QuotaNode");
+    node->SetData(this->CreateTestImage());
+    m_DataStorage->Add(node);
+
+    const std::string uid = this->GetUid(node.GetPointer());
+    const httplib::Headers headers = {{"Accept", "application/json"}};
+
+    auto makeRequest = [&]() -> httplib::Request {
+      auto req = this->CreateRequest(
+        "/api/v1/datastorage/nodes/" + uid + "/data", "", {{"uid", uid}}, {}, headers);
+      req.remote_addr = "127.0.0.1";
+      return req;
+    };
+
+    httplib::Response res1;
+    m_Controller->HandleGET_nodes_uid_data(makeRequest(), res1);
+
+    if (res1.status != 200)
+    {
+      CPPUNIT_FAIL("TempDirPerIpQuota skipped: image serializer not available (HTTP " +
+                   std::to_string(res1.status) + ")");
+      return;
+    }
+
+    httplib::Response res2;
+    m_Controller->HandleGET_nodes_uid_data(makeRequest(), res2);
+    CPPUNIT_ASSERT_EQUAL(200, res2.status);
+
+    httplib::Response res3;
+    m_Controller->HandleGET_nodes_uid_data(makeRequest(), res3);
+    CPPUNIT_ASSERT_EQUAL(200, res3.status);
+
+    const auto dir1 = fs::path(nlohmann::json::parse(res1.body)["transfer"]["directory_path"].get<std::string>());
+    const auto dir2 = fs::path(nlohmann::json::parse(res2.body)["transfer"]["directory_path"].get<std::string>());
+    const auto dir3 = fs::path(nlohmann::json::parse(res3.body)["transfer"]["directory_path"].get<std::string>());
+
+    // The 3rd request exceeded the quota of 2 → oldest (dir1) must have been evicted.
+    CPPUNIT_ASSERT_MESSAGE("dir1 should have been evicted by 3rd request", !fs::exists(dir1));
+    CPPUNIT_ASSERT_MESSAGE("dir2 should still exist (within quota)", fs::exists(dir2));
+    CPPUNIT_ASSERT_MESSAGE("dir3 should still exist (newest)", fs::exists(dir3));
+  }
+
+  void TempDirDifferentIpsIndependent()
+  {
+    // With quota = 1, two different IPs each get one slot — neither evicts the other.
+    m_Controller->SetMaxActiveTempDirsPerIp(1);
+
+    auto node = mitk::DataNode::New();
+    node->SetName("IndependentQuotaNode");
+    node->SetData(this->CreateTestImage());
+    m_DataStorage->Add(node);
+
+    const std::string uid = this->GetUid(node.GetPointer());
+    const httplib::Headers headers = {{"Accept", "application/json"}};
+
+    auto makeRequestFromIp = [&](const std::string& ip) -> httplib::Request {
+      auto req = this->CreateRequest(
+        "/api/v1/datastorage/nodes/" + uid + "/data", "", {{"uid", uid}}, {}, headers);
+      req.remote_addr = ip;
+      return req;
+    };
+
+    httplib::Response resA;
+    m_Controller->HandleGET_nodes_uid_data(makeRequestFromIp("10.0.0.1"), resA);
+
+    if (resA.status != 200)
+    {
+      CPPUNIT_FAIL("TempDirDifferentIpsIndependent skipped: image serializer not available (HTTP " +
+                   std::to_string(resA.status) + ")");
+      return;
+    }
+
+    httplib::Response resB;
+    m_Controller->HandleGET_nodes_uid_data(makeRequestFromIp("10.0.0.2"), resB);
+    CPPUNIT_ASSERT_EQUAL(200, resB.status);
+
+    const auto dirA = fs::path(nlohmann::json::parse(resA.body)["transfer"]["directory_path"].get<std::string>());
+    const auto dirB = fs::path(nlohmann::json::parse(resB.body)["transfer"]["directory_path"].get<std::string>());
+
+    // Each IP consumed its own independent quota of 1; neither evicted the other.
+    CPPUNIT_ASSERT_MESSAGE("dirA should still exist (different IP quota)", fs::exists(dirA));
+    CPPUNIT_ASSERT_MESSAGE("dirB should still exist (different IP quota)", fs::exists(dirB));
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkDataStorageControllerData)

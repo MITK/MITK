@@ -214,8 +214,10 @@ bool RestServer::Start()
     // Pass file access config to controllers
     m_DataStorageController->SetFileAccessConfig(
       m_PendingConfig.fileAccessMode, m_PendingConfig.allowedFileDirectories, m_TempDirectory);
+    m_DataStorageController->SetMaxActiveTempDirsPerIp(m_PendingConfig.maxActiveTempDirsPerIp);
     m_HealthController->SetFileAccessConfig(
       m_PendingConfig.fileAccessMode, m_PendingConfig.allowedFileDirectories);
+    m_HealthController->SetMaxActiveTempDirsPerIp(m_PendingConfig.maxActiveTempDirsPerIp);
 
     // Connect uptime callback to HealthController
     m_HealthController->SetUptimeCallback([this]() -> std::optional<int64_t> {

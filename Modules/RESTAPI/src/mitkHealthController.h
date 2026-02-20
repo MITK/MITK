@@ -102,12 +102,20 @@ namespace mitk
      */
     void SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs);
 
+    /**
+     * @brief Set the per-IP limit for concurrent file-reference temp directories.
+     *        Reported by GET /config/file-access so clients know the eviction policy.
+     * @pre max >= 1.
+     */
+    void SetMaxActiveTempDirsPerIp(size_t max);
+
   private:
     DataStorageBridge& m_Bridge;
     mutable std::mutex m_Mutex;
     UptimeCallback m_UptimeCallback;
     FileAccessMode m_FileAccessMode = FileAccessMode::Unrestricted;
     std::vector<std::string> m_AllowedFileDirectories;
+    size_t m_MaxActiveTempDirsPerIp = 5;
   };
 }
 

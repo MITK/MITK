@@ -32,6 +32,7 @@ found in the LICENSE file.
 #include <fstream>
 #include <regex>
 #include <sstream>
+#include <mutex>
 
 namespace mitk
 {
@@ -292,6 +293,56 @@ void DataStorageController::SetFileAccessConfig(FileAccessMode mode, const std::
   m_FileAccessMode = mode;
   m_AllowedFileDirectories = allowedDirs;
   m_TempDirectory = tempDirectory;
+}
+
+void DataStorageController::SetMaxActiveTempDirsPerIp(size_t max)
+{
+  if (max < 1)
+    mitkThrow() << "SetMaxActiveTempDirsPerIp: max must be >= 1.";
+
+  std::lock_guard<std::mutex> lock(m_ActiveTempDirsMutex);
+  m_MaxActiveTempDirsPerIp = max;
+}
+
+fs::path DataStorageController::AcquireRequestTempDir(const std::string& clientIp)
+{
+  // Allocate directory before acquiring the lock (IO may be slow; no lock needed yet).
+  auto newDir = fs::path(IOUtil::CreateTemporaryDirectory("data_XXXXXX", m_TempDirectory));
+
+  std::lock_guard<std::mutex> lock(m_ActiveTempDirsMutex);
+
+  auto& queue = m_ActiveTempDirsByIp[clientIp];
+
+  // Evict this client's oldest directory if the quota is reached.
+  while (queue.size() >= m_MaxActiveTempDirsPerIp && !queue.empty())
+  {
+    fs::remove_all(queue.front());  // safe even if already deleted
+    queue.pop_front();
+  }
+
+  queue.push_back(newDir);
+  return newDir;
+}
+
+void DataStorageController::ReleaseRequestTempDir(const std::string& clientIp, const fs::path& dir)
+{
+  // Delete from disk first; deregistration is cheap even if deletion fails.
+  fs::remove_all(dir);
+
+  std::lock_guard<std::mutex> lock(m_ActiveTempDirsMutex);
+
+  auto mapIt = m_ActiveTempDirsByIp.find(clientIp);
+  if (mapIt == m_ActiveTempDirsByIp.end())
+    return;
+
+  auto& queue = mapIt->second;
+  const auto it = std::find(queue.begin(), queue.end(), dir);
+  if (it != queue.end())
+    queue.erase(it);
+
+  // Remove empty map entries to prevent the map growing unboundedly.
+  if (queue.empty())
+    m_ActiveTempDirsByIp.erase(mapIt);
 }
 
 std::string DataStorageController::DetermineTransferMode(const httplib::Request& req) const
@@ -1426,12 +1477,12 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
     return;
   }
 
-  // Create a per-request temp subdirectory for this serialization
-  // This ensures all files created by the serializer are in one place
+  // Create a per-request temp subdirectory for this serialization.
+  // AcquireRequestTempDir enforces the per-IP quota, evicting the oldest dir if needed.
   fs::path requestTempDir;
   try
   {
-    requestTempDir = fs::path(IOUtil::CreateTemporaryDirectory("data_XXXXXX", m_TempDirectory));
+    requestTempDir = this->AcquireRequestTempDir(req.remote_addr);
   }
   catch (const std::exception& e)
   {
@@ -1457,7 +1508,7 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
   catch (const std::exception& e)
   {
     // Clean up the per-request temp directory on error
-    fs::remove_all(requestTempDir);
+    this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
     this->SendErrorResponse(res, 500, ErrorResponse::SerializationError(
       "Serialization failed: " + std::string(e.what()), req.path));
     return;
@@ -1465,7 +1516,7 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
 
   if (writtenFilename.empty())
   {
-    fs::remove_all(requestTempDir);
+    this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
     this->SendErrorResponse(res, 500, ErrorResponse::SerializationError(
       "Serialization returned empty filename", req.path));
     return;
@@ -1504,7 +1555,7 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
     }
     catch (const std::exception& e)
     {
-      fs::remove_all(requestTempDir);
+      this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
       this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
         "Failed to build file-reference response: " + std::string(e.what()), req.path));
     }
@@ -1517,7 +1568,7 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
       std::ifstream file(fullPath, std::ios::binary);
       if (!file.is_open())
       {
-        fs::remove_all(requestTempDir);
+        this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
         this->SendErrorResponse(res, 500, ErrorResponse::SerializationError(
           "Failed to read serialized file", req.path));
         return;
@@ -1530,13 +1581,13 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
 
       // For direct mode, we can clean up the per-request temp directory immediately
       // since we've read all the data into memory
-      fs::remove_all(requestTempDir);
+      this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
 
       this->SendBinaryResponse(res, content, writtenFilename);
     }
     catch (const std::exception& e)
     {
-      fs::remove_all(requestTempDir);
+      this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
       this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
         "Failed to read and send data: " + std::string(e.what()), req.path));
     }

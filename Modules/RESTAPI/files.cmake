@@ -1,0 +1,21 @@
+set(H_FILES
+  include/mitkIRestServerService.h
+  include/mitkRestServerConfig.h
+  include/mitkRestServer.h
+  include/mitkDataStorageBridge.h
+  include/mitkNodeUidMapper.h
+  include/mitkNodeQueryParams.h
+  include/mitkErrorResponse.h
+  include/mitkHealthController.h
+  include/mitkDataStorageController.h
+)
+
+set(CPP_FILES
+  mitkIRestServerService.cpp
+  mitkRestServer.cpp
+  mitkDataStorageBridge.cpp
+  mitkNodeUidMapper.cpp
+  mitkErrorResponse.cpp
+  mitkHealthController.cpp
+  mitkDataStorageController.cpp
+)

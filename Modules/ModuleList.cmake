@@ -61,4 +61,5 @@ set(MITK_MODULES
   Python
   PythonSegmentation
   PythonSegmentationUI
+  RESTAPI
 )

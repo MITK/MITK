@@ -8,4 +8,5 @@ set(MODULE_TESTS
   mitkApiConformanceTest.cpp
   mitkSecurityMiddlewareTest.cpp
   mitkInputValidationTest.cpp
+  mitkRenderingControllerTest.cpp
 )

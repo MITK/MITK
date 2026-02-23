@@ -17,6 +17,7 @@ set(CPP_FILES
   mitkHealthController.cpp
   mitkDataStorageController.cpp
   mitkSwaggerController.cpp
+  mitkRenderingController.cpp
 )
 
 set(RESOURCE_FILES

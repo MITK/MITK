@@ -43,6 +43,10 @@
     {
       "name": "Configuration",
       "description": "Server configuration discovery"
+    },
+    {
+      "name": "Rendering",
+      "description": "Render window update and reinit operations"
     }
   ],
   "paths": {
@@ -1810,6 +1814,118 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      }
+    },
+    "/rendering/update": {
+      "post": {
+        "tags": [
+          "Rendering"
+        ],
+        "summary": "Trigger render window update",
+        "description": "Requests all registered render windows to be updated via `RenderingManager::RequestUpdateAll()`. Callers should use this after batching data or property changes to make them visible without triggering per-change flicker.",
+        "operationId": "postRenderingUpdate",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["all", "2d", "3d"],
+                    "default": "all",
+                    "description": "Which render windows to update: all, only 2D windows, or only 3D windows."
+                  }
+                }
+              },
+              "example": {
+                "type": "all"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Update requested successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          }
+        }
+      }
+    },
+    "/rendering/reinit": {
+      "post": {
+        "tags": [
+          "Rendering"
+        ],
+        "summary": "Reinit — fit all views to visible data or a specific node",
+        "description": "Without a request body: fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. With a JSON body containing a `uid` field: fits all render windows to the geometry of that specific node via `RenderingManager::InitializeViews()`. Equivalent to clicking the global reinit button in the Workbench.",
+        "operationId": "postRenderingReinit",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uid": {
+                    "type": "string",
+                    "description": "When provided, fit views to this node's geometry instead of all visible data.",
+                    "example": "node_1"
+                  }
+                }
+              },
+              "examples": {
+                "global": {
+                  "summary": "Global reinit (no body)",
+                  "value": {}
+                },
+                "node-scoped": {
+                  "summary": "Node-scoped reinit",
+                  "value": {
+                    "uid": "node_1"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Reinit performed successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "422": {
+            "description": "Node has no data or the data has no usable geometry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/NO_DATA",
+                    "code": "NO_DATA",
+                    "title": "No Data",
+                    "message": "Node 'node_1' has no data attached",
+                    "status": 422,
+                    "instance": "/api/v1/rendering/reinit"
+                  }
+                }
+              }
+            }
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"

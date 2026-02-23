@@ -40,6 +40,7 @@ namespace mitk
   class HealthController;
   class DataStorageController;
   class SwaggerController;
+  class RenderingController;
 
   /**
    * @brief HTTP REST server implementation.
@@ -145,6 +146,7 @@ namespace mitk
     std::unique_ptr<HealthController> m_HealthController;
     std::unique_ptr<DataStorageController> m_DataStorageController;
     std::unique_ptr<SwaggerController> m_SwaggerController;
+    std::unique_ptr<RenderingController> m_RenderingController;
 
     // State
     mutable std::mutex m_Mutex;

@@ -1,7 +1,7 @@
 # MITK Workbench REST API Specification {#MITKRESTAPISpec}
 
-**Document Version:** 1.0
-**Date:** February 21, 2026
+**Document Version:** 1.1
+**Date:** February 20, 2026
 
 ---
 
@@ -21,6 +21,7 @@
      - [Node Data Payload](#822-node-data-payload)
      - [Node Children](#823-node-children)
      - [Node Properties](#824-node-properties)
+   - [Rendering](#83-rendering)
 9. [Error Handling](#9-error-handling)
 10. [Examples](#10-examples)
 11. [Future Extensions](#11-future-extensions)
@@ -39,9 +40,8 @@ The REST API serves as the **primary control interface** (control plane) as defi
 
 ### Scope
 
-This specification covers the **Data Storage API** — operations on nodes, their data, and properties. Future specifications will cover:
+This specification covers the **Data Storage API** (nodes, data, properties) and the **Rendering API** (render window update and reinit). Future specifications will cover:
 
-- Rendering/View API
 - Project Management API
 - Task/Async Operations API
 
@@ -611,8 +611,6 @@ Health check endpoint.
   }
 }
 ```
-
-> **Note:** A `rendering` check under `checks` is planned for a future version when the Rendering API is implemented.
 
 ---
 
@@ -1556,6 +1554,82 @@ Remove a property from a node.
 
 ---
 
+### 8.3 Rendering
+
+Rendering endpoints control how MITK Workbench render windows refresh and orient themselves. They are deliberately separate from data and property endpoints: callers can batch multiple mutations (upload data, set properties) and then trigger a single render update, avoiding per-change flicker.
+
+All rendering calls are dispatched to the main/UI thread by the server — callers do not need to account for threading.
+
+#### POST /api/v1/rendering/update
+
+Request a redraw of all registered render windows.
+
+**Request body (optional, `application/json`):**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `type` | string | `"all"` | Which windows to update: `"all"`, `"2d"` (2D windows only), `"3d"` (3D windows only) |
+
+**Example (update all windows):**
+```http
+POST /api/v1/rendering/update
+```
+
+**Example (update only 2D windows):**
+```http
+POST /api/v1/rendering/update
+Content-Type: application/json
+
+{"type": "2d"}
+```
+
+**Response: 204 No Content**
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Body is present but not valid JSON, or `type` is not `"all"`, `"2d"`, or `"3d"` |
+
+---
+
+#### POST /api/v1/rendering/reinit
+
+Fit all render windows to the bounding box of all currently visible data (global reinit), or to the geometry of a specific node when a UID is supplied. Equivalent to clicking the global reinit button in the Workbench toolbar.
+
+**Request body (optional, `application/json`):**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `uid` | string | (none) | When provided, fit views to this node's geometry instead of all visible data |
+
+**Example (global reinit — fit all views to all visible data):**
+```http
+POST /api/v1/rendering/reinit
+```
+
+**Example (node-scoped reinit — fit views to a specific node):**
+```http
+POST /api/v1/rendering/reinit
+Content-Type: application/json
+
+{"uid": "node-001"}
+```
+
+**Response: 204 No Content**
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Body is present but not valid JSON |
+| 404 | `NODE_NOT_FOUND` | No node exists with the given UID |
+| 422 | `NO_DATA` | Node exists but has no data object attached |
+| 422 | `NO_GEOMETRY` | Node has data but the data has no usable time geometry |
+| 503 | `DATASTORAGE_NOT_AVAILABLE` | No DataStorage is currently connected |
+
+---
+
 ## 9. Error Handling
 
 ### 9.1 Error Response Format
@@ -1597,6 +1671,7 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 415 | `UNSUPPORTED_FORMAT` | Data format not supported |
 | 422 | `FILE_NOT_FOUND` | Referenced file path does not exist |
 | 422 | `FILE_READ_ERROR` | Cannot read referenced file |
+| 422 | `NO_GEOMETRY` | Node data has no usable time geometry |
 | 429 | `RATE_LIMITED` | Too many requests |
 | 500 | `INTERNAL_ERROR` | Unexpected server error |
 | 500 | `SERIALIZATION_ERROR` | Failed to serialize data for transfer |
@@ -1761,6 +1836,44 @@ response = requests.get(
 properties = response.json()["data"]["properties"]
 ```
 
+### 10.7 Load Image, Configure Appearance, and Refresh Render Windows
+
+A typical workflow: upload data, adjust properties, then trigger a render update and fit the views to the new data.
+
+```python
+import requests
+
+BASE_URL = "http://localhost:8080/api/v1"
+HEADERS = {"Authorization": "Bearer my-token"}
+
+# 1. Upload image
+resp = requests.post(
+    f"{BASE_URL}/datastorage/nodes",
+    headers=HEADERS,
+    json={"name": "CT_Scan", "transfer": {"file_path": "/data/ct.nrrd"}}
+)
+uid = resp.json()["data"]["uid"]
+
+# 2. Set appearance properties
+requests.patch(
+    f"{BASE_URL}/datastorage/nodes/{uid}/properties",
+    headers=HEADERS,
+    json={
+        "visible": True,
+        "opacity": 1.0,
+        "color": {"type": "ColorProperty", "value": [1.0, 1.0, 1.0]}
+    }
+)
+
+# 3. Trigger render update so the node becomes visible
+requests.post(f"{BASE_URL}/rendering/update", headers=HEADERS)
+
+# 4. Fit all views to the loaded image's geometry
+requests.post(f"{BASE_URL}/rendering/reinit", headers=HEADERS, json={"uid": uid})
+```
+
+> **Note:** Steps 3 and 4 can be combined as needed. `POST /rendering/reinit` with no body fits views to all visible data at once; with `{"uid": "..."}` in the body it focuses on a single node's geometry.
+
 ---
 
 ## 11. Future Extensions
@@ -1770,10 +1883,9 @@ properties = response.json()["data"]["properties"]
 | Feature | Target Version | Description |
 |---------|---------------|-------------|
 | Project management | v1.1 | Save/load projects |
-| Rendering API | v1.2 | View/camera control |
-| Shared memory transfer | v1.3 | Zero-copy data transfer |
-| Batch operations | v1.4 | `/datastorage/nodes/batch` endpoint |
-| Async operations | v1.4 | Long-running operations with task tracking |
+| Shared memory transfer | v1.2 | Zero-copy data transfer |
+| Batch operations | v1.3 | `/datastorage/nodes/batch` endpoint |
+| Async operations | v1.3 | Long-running operations with task tracking |
 
 ### 11.2 Extension Points
 
@@ -1811,6 +1923,8 @@ The API is designed for extension:
 | `GET` | `/api/v1/datastorage/nodes/{uid}/properties/{name}` | Get property |
 | `PUT` | `/api/v1/datastorage/nodes/{uid}/properties/{name}` | Set property |
 | `DELETE` | `/api/v1/datastorage/nodes/{uid}/properties/{name}` | Delete property |
+| `POST` | `/api/v1/rendering/update` | Trigger render window update |
+| `POST` | `/api/v1/rendering/reinit` | Fit all views to visible data (or one node when `uid` body field is given) |
 
 ### Query Parameters Summary
 
@@ -1855,6 +1969,8 @@ All endpoints are relative to the base URL `/api/v1`.
 | `/datastorage/nodes/{uid}/children` | ✓ List | ✓ Create | — | — | — |
 | `/datastorage/nodes/{uid}/properties` | ✓ Read | — | ✓ Replace all | ✓ Update | — |
 | `/datastorage/nodes/{uid}/properties/{name}` | ✓ Read | — | ✓ Set | — | ✓ Delete |
+| `/rendering/update` | — | ✓ Update | — | — | — |
+| `/rendering/reinit` | — | ✓ Reinit (global or node-scoped) | — | — | — |
 
 ---
 

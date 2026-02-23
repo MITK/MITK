@@ -24,12 +24,6 @@ found in the LICENSE file.
 #include <vtkPolygon.h>
 #include <vtkRegularPolygonSource.h>
 
-template <typename ImageType>
-void ClearBufferProcessing(ImageType* itkImage)
-{
-  itkImage->FillBuffer(0);
-}
-
 class mitkSurfaceInterpolationControllerTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkSurfaceInterpolationControllerTestSuite);
@@ -62,7 +56,7 @@ public:
     // mitk::MultiLabelSegmentation::Pointer newImage = mitk::MultiLabelSegmentation::New();
     mitk::PixelType p_type = mitk::MakeScalarPixelType<unsigned char>();
     newImage->Initialize(p_type, 3, dimensions);
-    AccessFixedDimensionByItk(newImage, ClearBufferProcessing, 3);
+    newImage->AllocateZeroedVolume();
     return newImage;
   }
 

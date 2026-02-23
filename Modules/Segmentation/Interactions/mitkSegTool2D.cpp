@@ -184,12 +184,6 @@ void  mitk::SegTool2D::RemoveContourFromInterpolator(const SliceInformation& sli
   mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(contourInfo, true);
 }
 
-template <typename ImageType>
-void ClearBufferProcessing(ImageType* itkImage)
-{
-  itkImage->FillBuffer(0);
-}
-
 void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformation>& sliceInfos,
   const Image* workingImage,
   bool detectIntersection,
@@ -234,7 +228,7 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
       //Workaround starts
       mitk::Image::Pointer slice2 = Image::New();
       slice2->Initialize(sliceInfo.slice);
-      AccessByItk(slice2, ClearBufferProcessing);
+      slice2->AllocateZeroedVolume();
       MultiLabelSegmentation::LabelValueType erodeValue = 1;
       auto label = Label::New(erodeValue, "");
       TransferLabelContent(sliceInfo.slice, slice2, { label }, MultiLabelSegmentation::UNLABELED_VALUE, MultiLabelSegmentation::UNLABELED_VALUE, false, { {activeLabelValue, erodeValue} });

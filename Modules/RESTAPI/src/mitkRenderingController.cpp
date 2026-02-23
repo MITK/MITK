@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkRenderingController.h"
 #include "mitkErrorResponse.h"
+#include <mitkException.h>
 #include <mitkRenderingManager.h>
 
 namespace mitk
@@ -68,11 +69,29 @@ void RenderingController::HandlePOST_update(const httplib::Request& req, httplib
     }
   }
 
-  this->Dispatch([type]() {
-    RenderingManager::GetInstance()->RequestUpdateAll(type);
-  });
-
-  res.status = 204;
+  try
+  {
+    this->Dispatch([type]() {
+      RenderingManager::GetInstance()->RequestUpdateAll(type);
+    });
+    res.status = 204;
+  }
+  catch (const mitk::Exception& e)
+  {
+    const auto error = ErrorResponse::Create(
+      "RENDERING_ERROR", "Rendering Error",
+      std::string("Rendering operation failed: ") + e.what(),
+      422, req.path);
+    this->SendErrorResponse(res, 422, error);
+  }
+  catch (const std::exception& e)
+  {
+    const auto error = ErrorResponse::Create(
+      "INTERNAL_ERROR", "Internal Error",
+      std::string("Unexpected error during rendering: ") + e.what(),
+      500, req.path);
+    this->SendErrorResponse(res, 500, error);
+  }
 }
 
 void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib::Response& res)
@@ -121,7 +140,12 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
 
     if (data == nullptr)
     {
-      const auto error = ErrorResponse::NoData(uid, req.path);
+      const auto error = ErrorResponse::Create(
+        "NO_DATA",
+        "No Data",
+        "Node '" + uid + "' has no data attached.",
+        422,
+        req.path);
       this->SendErrorResponse(res, 422, error);
       return;
     }
@@ -140,23 +164,61 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
       return;
     }
 
-    // Capture data (smart pointer clone) to keep geometry alive across dispatch.
-    this->Dispatch([data, geometry]() {
-      RenderingManager::GetInstance()->InitializeViews(
-        geometry, RenderingManager::REQUEST_UPDATE_ALL, true);
-    });
+    try
+    {
+      // Capture data (smart pointer clone) to keep geometry alive across dispatch.
+      this->Dispatch([data, geometry]() {
+        RenderingManager::GetInstance()->InitializeViews(
+          geometry, RenderingManager::REQUEST_UPDATE_ALL, true);
+      });
+      res.status = 204;
+    }
+    catch (const mitk::Exception& e)
+    {
+      const auto error = ErrorResponse::Create(
+        "RENDERING_ERROR", "Rendering Error",
+        std::string("Rendering operation failed: ") + e.what(),
+        422, req.path);
+      this->SendErrorResponse(res, 422, error);
+    }
+    catch (const std::exception& e)
+    {
+      const auto error = ErrorResponse::Create(
+        "INTERNAL_ERROR", "Internal Error",
+        std::string("Unexpected error during rendering: ") + e.what(),
+        500, req.path);
+      this->SendErrorResponse(res, 500, error);
+    }
   }
   else
   {
     // Global reinit: fit all views to the bounding box of all visible data.
     const auto dataStorage = m_Bridge.GetDataStorage();
 
-    this->Dispatch([dataStorage]() {
-      RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
-    });
+    try
+    {
+      this->Dispatch([dataStorage]() {
+        RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
+      });
+      res.status = 204;
+    }
+    catch (const mitk::Exception& e)
+    {
+      const auto error = ErrorResponse::Create(
+        "RENDERING_ERROR", "Rendering Error",
+        std::string("Rendering operation failed: ") + e.what(),
+        422, req.path);
+      this->SendErrorResponse(res, 422, error);
+    }
+    catch (const std::exception& e)
+    {
+      const auto error = ErrorResponse::Create(
+        "INTERNAL_ERROR", "Internal Error",
+        std::string("Unexpected error during rendering: ") + e.what(),
+        500, req.path);
+      this->SendErrorResponse(res, 500, error);
+    }
   }
-
-  res.status = 204;
 }
 
 void RenderingController::Dispatch(std::function<void()> task) const

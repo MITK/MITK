@@ -1663,7 +1663,7 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 403 | `FORBIDDEN` | Authenticated but not authorized |
 | 404 | `NODE_NOT_FOUND` | Node with given UID does not exist |
 | 404 | `PROPERTY_NOT_FOUND` | Property does not exist on node |
-| 404 | `NO_DATA` | Node exists but has no data attached |
+| 404 | `NO_DATA` | Node exists but has no data attached (422 in `/rendering` endpoints) |
 | 406 | `TRANSFER_MODE_NOT_AVAILABLE` | Requested transfer mode not supported |
 | 409 | `NODE_HAS_CHILDREN` | Cannot delete node with children |
 | 409 | `NAME_CONFLICT` | Node name conflict in same parent |

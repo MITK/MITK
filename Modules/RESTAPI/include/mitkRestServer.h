@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <MitkRESTAPIExports.h>
 #include <mitkIRestServerService.h>
 #include <mitkStorageThreadDispatcherBase.h>
+#include <mitkWeakPointer.h>
 
 #include <memory>
 #include <thread>
@@ -147,6 +148,7 @@ namespace mitk
     std::unique_ptr<DataStorageController> m_DataStorageController;
     std::unique_ptr<SwaggerController> m_SwaggerController;
     std::unique_ptr<RenderingController> m_RenderingController;
+    WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
 
     // State
     mutable std::mutex m_Mutex;

@@ -39,13 +39,13 @@ mitk::Preferences::~Preferences()
 
 std::optional<std::string> mitk::Preferences::FindValue(const std::string& key) const
 {
-  auto iter = m_Overrides.find(key);
-  if (iter != m_Overrides.end())
-    return iter->second;
+  const auto overrideIter = m_Overrides.find(key);
+  if (overrideIter != m_Overrides.end())
+    return overrideIter->second;
 
-  iter = m_Properties.find(key);
-  if (iter != m_Properties.end())
-    return iter->second;
+  const auto propertyIter = m_Properties.find(key);
+  if (propertyIter != m_Properties.end())
+    return propertyIter->second;
 
   return std::nullopt;
 }

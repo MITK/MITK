@@ -1093,8 +1093,10 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     }
     else
     {
-      prefs->OverrideBool("default label naming", true);
-      prefs->Override("external label suggestions", "");
+      prefs->RemoveOverride("default label naming");
+      prefs->RemoveOverride("external label suggestions");
+      prefs->RemoveOverride("replace standard suggestions");
+      prefs->RemoveOverride("suggest once");
     }
   }
 

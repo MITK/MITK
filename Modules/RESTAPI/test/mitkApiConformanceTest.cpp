@@ -425,7 +425,7 @@ private:
     };
   }
 
-  nlohmann::json LoadRef()
+  nlohmann::json LoadOpenAPISpec()
   {
     auto restModule = us::ModuleRegistry::GetModule("MitkRESTAPI");
     if (nullptr==restModule)
@@ -442,7 +442,7 @@ private:
     us::ModuleResource resource = context->GetModule()->GetResource("openapi.json");
     if (!resource.IsValid())
     {
-      mitkThrow() << "openapi.json Resource not found: ";
+      mitkThrow() << "openapi.json Resource not found in MitkRESTAPI module bundle";
     }
 
     us::ModuleResourceStream stream(resource, std::ios::binary);
@@ -459,7 +459,7 @@ public:
     m_Controller = std::make_unique<mitk::DataStorageController>(*m_Bridge);
     m_HealthController = std::make_unique<mitk::HealthController>(*m_Bridge);
 
-    m_Spec = this->LoadRef();
+    m_Spec = this->LoadOpenAPISpec();
 
     this->BuildEndpointRegistry();
   }
@@ -1171,7 +1171,7 @@ public:
     m_Controller->HandleGET_nodes(req, res);
 
     // Verify the response body is valid JSON
-    CPPUNIT_ASSERT_NO_THROW(auto result = nlohmann::json::parse(res.body));
+    CPPUNIT_ASSERT_NO_THROW([[maybe_unused]] auto result = nlohmann::json::parse(res.body));
 
     // Verify Content-Type header is application/json
     bool hasJsonContentType = false;
@@ -1194,7 +1194,7 @@ public:
     httplib::Response res;
     m_HealthController->HandleGET_health(req, res);
 
-    CPPUNIT_ASSERT_NO_THROW(auto result = nlohmann::json::parse(res.body));
+    CPPUNIT_ASSERT_NO_THROW([[maybe_unused]] auto result = nlohmann::json::parse(res.body));
   }
 
   // ==========================================
@@ -1222,6 +1222,8 @@ public:
     const auto specCodes = this->CollectSpecErrorCodes();
     const auto codeCodes = GetAllCodeErrorCodes();
 
+    // NOT_IMPLEMENTED is an internal sentinel code used for unimplemented features;
+    // no endpoint exposes it as a normal response, so it has no spec example.
     const std::set<std::string> exemptions = {"NOT_IMPLEMENTED"};
 
     for (const auto& code : codeCodes)

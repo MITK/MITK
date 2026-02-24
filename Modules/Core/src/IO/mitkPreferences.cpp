@@ -268,19 +268,20 @@ bool mitk::Preferences::Remove(const std::string& key, bool forceRemoval)
   if (isOverridden && !forceRemoval)
     return false;
 
-  bool changed = false;
+  const auto oldValue = this->FindValue(key);
 
   if (isOverridden)
-  {
     m_Overrides.erase(key);
-    changed = true;
-  }
 
-  if (m_Properties.erase(key) > 0)
-    changed = true;
+  m_Properties.erase(key);
 
-  if (changed)
+  if (oldValue.has_value())
+  {
     this->OnChanged(this);
+
+    if (!oldValue.value().empty())
+      this->OnPropertyChanged(ChangeEvent(this, key, oldValue.value(), std::string()));
+  }
 
   return true;
 }

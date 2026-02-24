@@ -37,6 +37,7 @@ class mitkPreferencesTestSuite : public mitk::TestFixture
   MITK_TEST(ClearOverrides);
   MITK_TEST(ClearIncludingOverrides);
   MITK_TEST(RemoveWithOverride);
+  MITK_TEST(RemoveFiresPropertyChanged);
   MITK_TEST(KeysWithOverrides);
   MITK_TEST(OverrideFiresEvents);
   MITK_TEST(RemoveOverrideFiresPropertyChanged);
@@ -305,6 +306,53 @@ public:
     CPPUNIT_ASSERT_EQUAL(true, preferences->Remove("key", true));
     CPPUNIT_ASSERT_EQUAL(std::string("default"), preferences->Get("key", "default"));
     CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("key"));
+  }
+
+  int m_RemoveOnChangedCount = 0;
+  int m_RemoveOnPropertyChangedCount = 0;
+
+  void CountRemoveOnChanged(const mitk::IPreferences*)
+  {
+    ++m_RemoveOnChangedCount;
+  }
+
+  void CountRemoveOnPropertyChanged(const mitk::IPreferences::ChangeEvent&)
+  {
+    ++m_RemoveOnPropertyChangedCount;
+  }
+
+  void RemoveFiresPropertyChanged()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    preferences->OnChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences*>(this, &mitkPreferencesTestSuite::CountRemoveOnChanged);
+    preferences->OnPropertyChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences::ChangeEvent&>(this, &mitkPreferencesTestSuite::CountRemoveOnPropertyChanged);
+
+    // Remove a persistent property
+    preferences->Put("key1", "value1");
+    m_RemoveOnChangedCount = 0;
+    m_RemoveOnPropertyChangedCount = 0;
+
+    preferences->Remove("key1");
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOnPropertyChangedCount);
+
+    // Force-remove an overridden key
+    preferences->Put("key2", "persistent");
+    preferences->Override("key2", "temporary");
+    m_RemoveOnChangedCount = 0;
+    m_RemoveOnPropertyChangedCount = 0;
+
+    preferences->Remove("key2", true);
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOnPropertyChangedCount);
+
+    // Remove a non-existent key: no events
+    m_RemoveOnChangedCount = 0;
+    m_RemoveOnPropertyChangedCount = 0;
+
+    preferences->Remove("nonexistent");
+    CPPUNIT_ASSERT_EQUAL(0, m_RemoveOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(0, m_RemoveOnPropertyChangedCount);
   }
 
   void KeysWithOverrides()

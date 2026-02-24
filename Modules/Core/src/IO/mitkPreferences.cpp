@@ -220,14 +220,45 @@ bool mitk::Preferences::IsOverridden(const std::string& key) const
 
 void mitk::Preferences::RemoveOverride(const std::string& key)
 {
-  m_Overrides.erase(key);
+  const auto overrideIter = m_Overrides.find(key);
+
+  if (overrideIter == m_Overrides.end())
+    return;
+
+  const auto oldValue = overrideIter->second;
+  m_Overrides.erase(overrideIter);
+
+  const auto propertyIter = m_Properties.find(key);
+  const auto newValue = propertyIter != m_Properties.end() ? propertyIter->second : std::string();
+
   this->OnChanged(this);
+
+  if (oldValue != newValue)
+    this->OnPropertyChanged(ChangeEvent(this, key, oldValue, newValue));
 }
 
 void mitk::Preferences::ClearOverrides()
 {
+  if (m_Overrides.empty())
+    return;
+
+  std::vector<ChangeEvent> events;
+
+  for (const auto& [key, overrideValue] : m_Overrides)
+  {
+    const auto propertyIter = m_Properties.find(key);
+    const auto newValue = propertyIter != m_Properties.end() ? propertyIter->second : std::string();
+
+    if (overrideValue != newValue)
+      events.emplace_back(this, key, overrideValue, newValue);
+  }
+
   m_Overrides.clear();
+
   this->OnChanged(this);
+
+  for (const auto& event : events)
+    this->OnPropertyChanged(event);
 }
 
 bool mitk::Preferences::Remove(const std::string& key, bool forceRemoval)

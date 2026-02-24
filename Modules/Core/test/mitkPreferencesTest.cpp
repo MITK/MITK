@@ -39,6 +39,9 @@ class mitkPreferencesTestSuite : public mitk::TestFixture
   MITK_TEST(RemoveWithOverride);
   MITK_TEST(KeysWithOverrides);
   MITK_TEST(OverrideFiresEvents);
+  MITK_TEST(RemoveOverrideFiresPropertyChanged);
+  MITK_TEST(ClearOverridesFiresPropertyChanged);
+  MITK_TEST(RemoveOverrideNoOpDoesNotFireEvents);
   MITK_TEST(FlushDoesNotPersistOverrides);
 
   CPPUNIT_TEST_SUITE_END();
@@ -345,6 +348,96 @@ public:
     preferences->Override("key", "override");
     CPPUNIT_ASSERT_EQUAL(2, m_OverrideOnChangedCount);
     CPPUNIT_ASSERT_EQUAL(2, m_OverrideOnPropertyChangedCount);
+  }
+
+  int m_RemoveOverrideOnChangedCount = 0;
+  int m_RemoveOverrideOnPropertyChangedCount = 0;
+
+  void CountRemoveOverrideOnChanged(const mitk::IPreferences*)
+  {
+    ++m_RemoveOverrideOnChangedCount;
+  }
+
+  void CountRemoveOverrideOnPropertyChanged(const mitk::IPreferences::ChangeEvent&)
+  {
+    ++m_RemoveOverrideOnPropertyChangedCount;
+  }
+
+  void RemoveOverrideFiresPropertyChanged()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    preferences->OnChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences*>(this, &mitkPreferencesTestSuite::CountRemoveOverrideOnChanged);
+    preferences->OnPropertyChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences::ChangeEvent&>(this, &mitkPreferencesTestSuite::CountRemoveOverrideOnPropertyChanged);
+
+    preferences->Put("key", "persistent");
+    preferences->Override("key", "temporary");
+    m_RemoveOverrideOnChangedCount = 0;
+    m_RemoveOverrideOnPropertyChangedCount = 0;
+
+    preferences->RemoveOverride("key");
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOverrideOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOverrideOnPropertyChangedCount);
+  }
+
+  int m_ClearOverridesOnChangedCount = 0;
+  int m_ClearOverridesOnPropertyChangedCount = 0;
+
+  void CountClearOverridesOnChanged(const mitk::IPreferences*)
+  {
+    ++m_ClearOverridesOnChangedCount;
+  }
+
+  void CountClearOverridesOnPropertyChanged(const mitk::IPreferences::ChangeEvent&)
+  {
+    ++m_ClearOverridesOnPropertyChangedCount;
+  }
+
+  void ClearOverridesFiresPropertyChanged()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    preferences->OnChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences*>(this, &mitkPreferencesTestSuite::CountClearOverridesOnChanged);
+    preferences->OnPropertyChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences::ChangeEvent&>(this, &mitkPreferencesTestSuite::CountClearOverridesOnPropertyChanged);
+
+    preferences->Put("a", "1");
+    preferences->Put("b", "2");
+    preferences->Override("a", "x");
+    preferences->Override("b", "y");
+    m_ClearOverridesOnChangedCount = 0;
+    m_ClearOverridesOnPropertyChangedCount = 0;
+
+    preferences->ClearOverrides();
+    CPPUNIT_ASSERT_EQUAL(1, m_ClearOverridesOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(2, m_ClearOverridesOnPropertyChangedCount);
+  }
+
+  int m_NoOpOnChangedCount = 0;
+  int m_NoOpOnPropertyChangedCount = 0;
+
+  void CountNoOpOnChanged(const mitk::IPreferences*)
+  {
+    ++m_NoOpOnChangedCount;
+  }
+
+  void CountNoOpOnPropertyChanged(const mitk::IPreferences::ChangeEvent&)
+  {
+    ++m_NoOpOnPropertyChangedCount;
+  }
+
+  void RemoveOverrideNoOpDoesNotFireEvents()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    preferences->OnChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences*>(this, &mitkPreferencesTestSuite::CountNoOpOnChanged);
+    preferences->OnPropertyChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences::ChangeEvent&>(this, &mitkPreferencesTestSuite::CountNoOpOnPropertyChanged);
+
+    // RemoveOverride on non-existent key should not fire
+    preferences->RemoveOverride("nonexistent");
+    CPPUNIT_ASSERT_EQUAL(0, m_NoOpOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(0, m_NoOpOnPropertyChangedCount);
+
+    // ClearOverrides on empty overrides should not fire
+    preferences->ClearOverrides();
+    CPPUNIT_ASSERT_EQUAL(0, m_NoOpOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(0, m_NoOpOnPropertyChangedCount);
   }
 
   void FlushDoesNotPersistOverrides()

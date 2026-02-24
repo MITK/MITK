@@ -232,14 +232,25 @@ void mitk::Preferences::ClearOverrides()
 
 bool mitk::Preferences::Remove(const std::string& key, bool forceRemoval)
 {
-  if (this->IsOverridden(key) && !forceRemoval)
+  const bool isOverridden = this->IsOverridden(key);
+
+  if (isOverridden && !forceRemoval)
     return false;
 
-  if (this->IsOverridden(key))
-    m_Overrides.erase(key);
+  bool changed = false;
 
-  m_Properties.erase(key);
-  this->OnChanged(this);
+  if (isOverridden)
+  {
+    m_Overrides.erase(key);
+    changed = true;
+  }
+
+  if (m_Properties.erase(key) > 0)
+    changed = true;
+
+  if (changed)
+    this->OnChanged(this);
+
   return true;
 }
 

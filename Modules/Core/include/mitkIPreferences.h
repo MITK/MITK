@@ -283,7 +283,9 @@ namespace mitk
      * \param key Name of the property
      * \param forceRemoval If true, also remove any override for the key
      *
-     * \return True if the key was removed, false if removal was denied due to an override
+     * \return True if the key is not present in preferences anymore (either it was
+     *         removed or it did not exist in the first place), false if removal was
+     *         denied due to an override
      */
     virtual bool Remove(const std::string& key, bool forceRemoval = false) = 0;
 

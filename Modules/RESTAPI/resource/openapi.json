@@ -72,7 +72,7 @@
                     "name": "MITK Workbench REST API",
                     "version": "1.0.0",
                     "api_version": "v1",
-                    "mitk_version": "2025.12.99",
+                    "mitk_version": "2026.02.0",
                     "documentation_url": "https://docs.mitk.org/api/v1",
                     "capabilities": {
                       "transfer_modes": [
@@ -153,7 +153,7 @@
                     "name": "MITK Workbench REST API",
                     "version": "1.0.0",
                     "api_version": "v1",
-                    "mitk_version": "2025.12.99",
+                    "mitk_version": "2026.02.0",
                     "documentation_url": "https://docs.mitk.org/api/v1",
                     "capabilities": {
                       "transfer_modes": [
@@ -600,12 +600,8 @@
             "in": "query",
             "description": "If true, also delete all children recursively.",
             "schema": {
-              "type": "string",
-              "enum": [
-                "true",
-                "false"
-              ],
-              "default": "false"
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -1195,12 +1191,8 @@
             "in": "query",
             "description": "Whether to include property values. Set to `false` for keys only.",
             "schema": {
-              "type": "string",
-              "enum": [
-                "true",
-                "false"
-              ],
-              "default": "true"
+              "type": "boolean",
+              "default": true
             }
           },
           {
@@ -1879,6 +1871,14 @@
       },
       "ApiInfo": {
         "type": "object",
+        "required": [
+          "name",
+          "version",
+          "api_version",
+          "mitk_version",
+          "documentation_url",
+          "capabilities"
+        ],
         "properties": {
           "name": {
             "type": "string",
@@ -1894,7 +1894,7 @@
           },
           "mitk_version": {
             "type": "string",
-            "example": "2025.12.99"
+            "example": "2026.02.0"
           },
           "documentation_url": {
             "type": "string",
@@ -1934,7 +1934,9 @@
           "status": {
             "type": "string",
             "enum": [
-              "healthy"
+              "healthy",
+              "degraded",
+              "unhealthy"
             ],
             "description": "Overall health status"
           },
@@ -2520,7 +2522,7 @@
         }
       },
       "AccessDenied": {
-        "description": "Client IP is not allowed to access the server",
+        "description": "Client IP is not allowed to access the server. Applied by pre-routing middleware to all endpoints when clientAccessMode is LocalhostOnly or Whitelist.",
         "content": {
           "application/json": {
             "schema": {
@@ -2540,7 +2542,7 @@
         }
       },
       "Unauthorized": {
-        "description": "Authentication required or invalid token",
+        "description": "Authentication required or invalid token. Applied by pre-routing middleware to all non-exempt endpoints when requireAuth=true.",
         "content": {
           "application/json": {
             "schema": {
@@ -2560,7 +2562,7 @@
         }
       },
       "RateLimitExceeded": {
-        "description": "Too many requests from this client",
+        "description": "Too many requests from this client. Applied by pre-routing middleware to all non-exempt endpoints when rateLimitEnabled=true.",
         "content": {
           "application/json": {
             "schema": {
@@ -2581,7 +2583,7 @@
         }
       },
       "FileAccessDenied": {
-        "description": "File path is outside allowed directories",
+        "description": "File path is outside allowed directories. Applied by middleware when fileAccessMode=AllowedDirectories and the requested path is not under an allowed directory.",
         "content": {
           "application/json": {
             "schema": {
@@ -2600,6 +2602,18 @@
           }
         }
       }
+    },
+    "securitySchemes": {
+      "BearerToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API token authentication. Required on all non-exempt endpoints when requireAuth=true. Provide as: Authorization: Bearer <token>"
+      }
     }
-  }
+  },
+  "security": [
+    {
+      "BearerToken": []
+    }
+  ]
 }

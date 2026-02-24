@@ -24,8 +24,8 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QClipboard>
 #include <QFileDialog>
+#include <QRandomGenerator>
 
-#include <random>
 #include <sstream>
 #include <iomanip>
 
@@ -315,15 +315,17 @@ void QmitkRestApiPreferencePage::OnShowTokenToggled()
 
 void QmitkRestApiPreferencePage::OnGenerateToken()
 {
-  std::random_device rd;
-  std::mt19937_64 gen(rd());
-  std::uniform_int_distribution<uint64_t> dist;
+  // Use Qt's CSPRNG to generate a 256-bit token (64 hex characters).
+  // QRandomGenerator::securelySeeded() uses the platform CSPRNG (BCryptGenRandom
+  // on Windows, /dev/urandom on POSIX) and is suitable for security tokens.
+  auto rng = QRandomGenerator::securelySeeded();
 
   std::ostringstream oss;
   // Generate 64 hex chars (4 x 16 hex chars from 4 x uint64_t)
   for (int i = 0; i < 4; ++i)
   {
-    oss << std::hex << std::setfill('0') << std::setw(16) << dist(gen);
+    const quint64 value = (static_cast<quint64>(rng.generate()) << 32) | rng.generate();
+    oss << std::hex << std::setfill('0') << std::setw(16) << value;
   }
 
   m_Ui->m_ApiTokenLineEdit->setText(QString::fromStdString(oss.str()));

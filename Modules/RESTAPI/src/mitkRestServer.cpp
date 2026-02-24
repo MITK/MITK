@@ -52,7 +52,7 @@ namespace
     std::string result;
     result.reserve(input.size());
 
-    for (const char c : input)
+    for (const unsigned char c : input)
     {
       if (c == '\n')
         result += "\\n";
@@ -60,11 +60,11 @@ namespace
         result += "\\r";
       else if (c == '\t')
         result += "\\t";
-      else if (c >= 0 && c < 0x20 && c != ' ')
+      else if (c < 0x20)
         result += "\\x" + std::string(1, "0123456789abcdef"[(c >> 4) & 0xF]) +
                   std::string(1, "0123456789abcdef"[c & 0xF]);
       else
-        result += c;
+        result += static_cast<char>(c);
     }
 
     return result;
@@ -85,12 +85,14 @@ namespace
    */
   bool ConstantTimeCompare(const std::string& a, const std::string& b)
   {
-    if (a.size() != b.size())
-    {
-      return false;
-    }
-
-    return CRYPTO_memcmp(a.data(), b.data(), a.size()) == 0;
+    // Compare in constant time to avoid leaking token length through timing.
+    // XOR of sizes is non-zero if they differ; CRYPTO_memcmp compares up to
+    // min(len) bytes. The combined result is zero only when both size and
+    // content match exactly.
+    volatile size_t result = a.size() ^ b.size();
+    const size_t len = std::min(a.size(), b.size());
+    result |= static_cast<size_t>(CRYPTO_memcmp(a.data(), b.data(), len));
+    return result == 0;
   }
 
   /**
@@ -102,7 +104,11 @@ namespace
   {
     return path == "/api/v1/health" ||
            path == "/api/v1/info" ||
-           path == "/api/v1/";
+           path == "/api/v1/" ||
+           path == "/api/v1/docs" ||
+           path == "/api/v1/docs/swagger-ui.css" ||
+           path == "/api/v1/docs/swagger-ui-bundle.js" ||
+           path == "/api/v1/openapi.json";
   }
 
   /**
@@ -499,6 +505,10 @@ bool RestServer::CheckClientAccess(const httplib::Request& req, httplib::Respons
       }
       break;
     }
+
+    default:
+      MITK_WARN << "Unknown clientAccessMode value: " << static_cast<int>(config.clientAccessMode);
+      break;
   }
 
   // Denied
@@ -530,24 +540,68 @@ bool RestServer::CheckRateLimit(const httplib::Request& req, httplib::Response& 
   const auto windowDuration = std::chrono::seconds(60);
   const auto windowStart = now - windowDuration;
 
-  std::lock_guard<std::mutex> lock(m_Mutex);
+  bool rateLimitExceeded = false;
+  int retryAfterSeconds = 0;
 
-  auto& timestamps = m_RateLimitMap[req.remote_addr];
-
-  // Remove entries older than the window
-  while (!timestamps.empty() && timestamps.front() < windowStart)
   {
-    timestamps.pop_front();
-  }
+    std::lock_guard<std::mutex> lock(m_Mutex);
 
-  // Check if limit exceeded
-  if (static_cast<int>(timestamps.size()) >= config.rateLimitPerMinute)
+    // NOTE: rate limiting keys on req.remote_addr (TCP source address). Behind a NAT
+    // or reverse proxy all clients share one bucket. X-Forwarded-For is intentionally
+    // not used as it can be spoofed by the client.
+    auto& timestamps = m_RateLimitMap[req.remote_addr];
+
+    // Remove entries older than the window
+    while (!timestamps.empty() && timestamps.front() < windowStart)
+    {
+      timestamps.pop_front();
+    }
+
+    if (static_cast<int>(timestamps.size()) >= config.rateLimitPerMinute)
+    {
+      // Calculate retry-after as seconds until the oldest entry expires
+      const auto oldestExpiry = timestamps.front() + windowDuration;
+      const auto retryAfter =
+        std::chrono::duration_cast<std::chrono::seconds>(oldestExpiry - now).count();
+      retryAfterSeconds = std::max(1, static_cast<int>(retryAfter));
+      rateLimitExceeded = true;
+    }
+    else
+    {
+      // Record this request's timestamp
+      timestamps.push_back(now);
+
+      // Periodically clean up stale IP entries. NOTE: cleanup runs only every
+      // kRateLimitCleanupInterval checks, so m_RateLimitMap can grow proportionally
+      // to the number of unique source IPs seen between sweeps.
+      ++m_RateLimitCheckCount;
+      if (m_RateLimitCheckCount % kRateLimitCleanupInterval == 0)
+      {
+        for (auto it = m_RateLimitMap.begin(); it != m_RateLimitMap.end(); )
+        {
+          // Remove expired entries from this IP
+          while (!it->second.empty() && it->second.front() < windowStart)
+          {
+            it->second.pop_front();
+          }
+
+          // Remove IP entry if no recent requests
+          if (it->second.empty())
+          {
+            it = m_RateLimitMap.erase(it);
+          }
+          else
+          {
+            ++it;
+          }
+        }
+      }
+    }
+  } // lock released here; RecordRequest must be called outside the lock
+    // to avoid a deadlock (RecordRequest acquires m_Mutex internally).
+
+  if (rateLimitExceeded)
   {
-    // Calculate retry-after as seconds until the oldest entry expires
-    const auto oldestExpiry = timestamps.front() + windowDuration;
-    const auto retryAfter = std::chrono::duration_cast<std::chrono::seconds>(oldestExpiry - now).count();
-    const int retryAfterSeconds = std::max(1, static_cast<int>(retryAfter));
-
     auto error = ErrorResponse::RateLimitExceeded(retryAfterSeconds, req.path);
     res.status = 429;
     res.set_header("Retry-After", std::to_string(retryAfterSeconds));
@@ -555,33 +609,6 @@ bool RestServer::CheckRateLimit(const httplib::Request& req, httplib::Response& 
 
     this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
     return false;
-  }
-
-  // Record this request's timestamp
-  timestamps.push_back(now);
-
-  // Periodically clean up stale IP entries to prevent memory growth
-  ++m_RateLimitCheckCount;
-  if (m_RateLimitCheckCount % kRateLimitCleanupInterval == 0)
-  {
-    for (auto it = m_RateLimitMap.begin(); it != m_RateLimitMap.end(); )
-    {
-      // Remove expired entries from this IP
-      while (!it->second.empty() && it->second.front() < windowStart)
-      {
-        it->second.pop_front();
-      }
-
-      // Remove IP entry if no recent requests
-      if (it->second.empty())
-      {
-        it = m_RateLimitMap.erase(it);
-      }
-      else
-      {
-        ++it;
-      }
-    }
   }
 
   return true;
@@ -635,6 +662,12 @@ bool RestServer::CheckAuthentication(const httplib::Request& req, httplib::Respo
   // Constant-time comparison to prevent timing attacks
   if (!ConstantTimeCompare(providedToken, config.apiToken))
   {
+    // Log every failed auth attempt for audit purposes.
+    // NOTE: auth-specific brute-force throttling is not implemented separately.
+    // Enable rate limiting (rateLimitEnabled=true) to bound the overall request
+    // volume from any single IP when authentication is required.
+    MITK_WARN << "REST API: authentication failed from " << SanitizeForLog(req.remote_addr);
+
     auto error = ErrorResponse::Unauthorized("Invalid API token", req.path);
     res.status = 401;
     res.set_header("WWW-Authenticate", "Bearer");
@@ -651,10 +684,13 @@ void RestServer::RegisterRoutes()
 {
   const std::string apiBase = "/api/v1";
 
-  // Enable CORS so browser-based clients (Swagger UI, web apps) can reach the API
-  // regardless of which hostname/port they were loaded from.
+  // Enable CORS for browser-based clients. When authentication is required, restrict
+  // the allowed origin to localhost to prevent arbitrary web pages from reading
+  // authenticated responses. With auth disabled, wildcard is acceptable for a local
+  // development server.
+  const std::string corsOrigin = m_PendingConfig.requireAuth ? "http://localhost" : "*";
   m_Server->set_default_headers({
-    {"Access-Control-Allow-Origin", "*"},
+    {"Access-Control-Allow-Origin", corsOrigin},
     {"Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS"},
     {"Access-Control-Allow-Headers", "Content-Type, Accept, Authorization, X-MITK-Transfer-Mode"}
   });
@@ -815,21 +851,25 @@ void RestServer::RegisterRoutes()
   m_Server->Get(apiBase + "/docs",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_SwaggerController->HandleGET_docs(req, res);
+      this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
     });
 
   m_Server->Get(apiBase + "/docs/swagger-ui.css",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_SwaggerController->HandleGET_docs_css(req, res);
+      this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
     });
 
   m_Server->Get(apiBase + "/docs/swagger-ui-bundle.js",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_SwaggerController->HandleGET_docs_js(req, res);
+      this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
     });
 
   m_Server->Get(apiBase + "/openapi.json",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_SwaggerController->HandleGET_openapi(req, res);
+      this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
     });
 }
 

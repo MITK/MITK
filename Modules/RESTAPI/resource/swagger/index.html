@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>MITK REST API Documentation</title>
-    <link rel="stylesheet" type="text/css" href="/api/v1/docs/swagger-ui.css">
+    <link rel="stylesheet" type="text/css" href="swagger-ui.css">
     <style>
         html { box-sizing: border-box; overflow-y: scroll; }
         *, *:before, *:after { box-sizing: inherit; }
@@ -12,11 +12,11 @@
 </head>
 <body>
     <div id="swagger-ui"></div>
-    <script src="/api/v1/docs/swagger-ui-bundle.js"></script>
+    <script src="swagger-ui-bundle.js"></script>
     <script>
         window.onload = function() {
             SwaggerUIBundle({
-                url: "/api/v1/openapi.json",
+                url: "../openapi.json",
                 dom_id: '#swagger-ui',
                 presets: [SwaggerUIBundle.presets.apis],
                 layout: "BaseLayout",

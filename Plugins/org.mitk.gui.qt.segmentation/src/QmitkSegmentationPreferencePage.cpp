@@ -78,13 +78,24 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   prefs->PutFloat("opacity factor", opacityFactor);
 
   prefs->PutBool("selection mode", m_Ui->selectionModeCheckBox->isChecked());
-  prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
-  prefs->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
+
+  if (!prefs->IsOverridden("label set preset"))
+    prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
+
+  if (!prefs->IsOverridden("default label naming"))
+    prefs->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
 
   prefs->Put("standard label suggestions", m_Ui->comboBuiltInSuggestions->currentText().toStdString());
-  prefs->Put("external label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
-  prefs->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
-  prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
+
+  if (!prefs->IsOverridden("external label suggestions"))
+    prefs->Put("external label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
+
+  if (!prefs->IsOverridden("replace standard suggestions"))
+    prefs->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
+
+  if (!prefs->IsOverridden("suggest once"))
+    prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
+
   prefs->PutBool("enforce suggestions", m_Ui->enforceSuggestionsCheckBox->isChecked());
 
   prefs->PutBool("monailabel allow all models", m_Ui->allowAllModelsCheckBox->isChecked());

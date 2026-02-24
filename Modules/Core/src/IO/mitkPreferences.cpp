@@ -243,9 +243,13 @@ bool mitk::Preferences::Remove(const std::string& key, bool forceRemoval)
   return true;
 }
 
-void mitk::Preferences::Clear()
+void mitk::Preferences::Clear(bool includeOverrides)
 {
   m_Properties.clear();
+
+  if (includeOverrides)
+    m_Overrides.clear();
+
   this->OnChanged(this);
 }
 

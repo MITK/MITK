@@ -289,8 +289,15 @@ namespace mitk
 
     /**
      * \brief Remove all properties from this preferences node.
+     *
+     * Session-only overrides are not affected by default. Set \p includeOverrides to \c true
+     * to also remove all overrides (equivalent to calling ClearOverrides() in addition).
+     *
+     * \param includeOverrides If true, also clear all session-only overrides.
+     *
+     * \sa ClearOverrides()
      */
-    virtual void Clear() = 0;
+    virtual void Clear(bool includeOverrides = false) = 0;
 
     /**
      * \brief Get the names of all properties of this preferences node.

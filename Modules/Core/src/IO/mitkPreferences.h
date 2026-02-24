@@ -74,7 +74,7 @@ namespace mitk
     void ClearOverrides() override;
 
     bool Remove(const std::string& key, bool forceRemoval = false) override;
-    void Clear() override;
+    void Clear(bool includeOverrides = false) override;
     std::vector<std::string> Keys(bool includeOverrides = false) const override;
     std::vector<std::string> ChildrenNames() const override;
     IPreferences* Parent() override;

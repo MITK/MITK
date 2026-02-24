@@ -35,6 +35,7 @@ class mitkPreferencesTestSuite : public mitk::TestFixture
   MITK_TEST(IsOverridden);
   MITK_TEST(RemoveOverride);
   MITK_TEST(ClearOverrides);
+  MITK_TEST(ClearIncludingOverrides);
   MITK_TEST(RemoveWithOverride);
   MITK_TEST(KeysWithOverrides);
   MITK_TEST(OverrideFiresEvents);
@@ -270,6 +271,22 @@ public:
     CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("b"));
     CPPUNIT_ASSERT_EQUAL(std::string("1"), preferences->Get("a", ""));
     CPPUNIT_ASSERT_EQUAL(std::string("2"), preferences->Get("b", ""));
+  }
+
+  void ClearIncludingOverrides()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    preferences->Put("a", "1");
+    preferences->Override("a", "x");
+    preferences->Override("b", "y");
+
+    preferences->Clear(true);
+
+    CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("a"));
+    CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("b"));
+    CPPUNIT_ASSERT_EQUAL(std::string("default"), preferences->Get("a", "default"));
+    CPPUNIT_ASSERT_EQUAL(std::string("default"), preferences->Get("b", "default"));
   }
 
   void RemoveWithOverride()

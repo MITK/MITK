@@ -23,39 +23,43 @@ found in the LICENSE file.
 namespace mitk
 {
 
-SwaggerController::SwaggerController() = default;
-
-std::string SwaggerController::LoadResource(const std::string& resourcePath)
+SwaggerController::SwaggerController()
 {
-  // Check cache first
-  auto it = m_ResourceCache.find(resourcePath);
+  // Pre-load all static resources into the cache. After construction the cache
+  // is read-only, so handler threads can access it concurrently without locking.
+  auto* context = us::GetModuleContext();
+  if (context == nullptr)
+  {
+    MITK_WARN << "SwaggerController: No module context available; documentation endpoints will return 404";
+    return;
+  }
+
+  for (const auto& resourcePath : {"swagger/index.html",
+                                    "swagger/swagger-ui.css",
+                                    "swagger/swagger-ui-bundle.js",
+                                    "openapi.json"})
+  {
+    us::ModuleResource resource = context->GetModule()->GetResource(resourcePath);
+    if (!resource.IsValid())
+    {
+      MITK_WARN << "SwaggerController: Resource not found: " << resourcePath;
+      continue;
+    }
+
+    us::ModuleResourceStream stream(resource, std::ios::binary);
+    m_ResourceCache[resourcePath] = std::string((std::istreambuf_iterator<char>(stream)),
+                                                std::istreambuf_iterator<char>{});
+  }
+}
+
+std::string SwaggerController::LoadResource(const std::string& resourcePath) const
+{
+  const auto it = m_ResourceCache.find(resourcePath);
   if (it != m_ResourceCache.end())
   {
     return it->second;
   }
-
-  auto* context = us::GetModuleContext();
-  if (context == nullptr)
-  {
-    MITK_WARN << "SwaggerController: No module context available";
-    return "";
-  }
-
-  us::ModuleResource resource = context->GetModule()->GetResource(resourcePath);
-  if (!resource.IsValid())
-  {
-    MITK_WARN << "SwaggerController: Resource not found: " << resourcePath;
-    return "";
-  }
-
-  us::ModuleResourceStream stream(resource, std::ios::binary);
-  std::string content((std::istreambuf_iterator<char>(stream)),
-                      std::istreambuf_iterator<char>{});
-
-  // Cache for subsequent requests
-  m_ResourceCache[resourcePath] = content;
-
-  return content;
+  return "";
 }
 
 void SwaggerController::HandleGET_docs(const httplib::Request& /*req*/, httplib::Response& res)
@@ -63,7 +67,7 @@ void SwaggerController::HandleGET_docs(const httplib::Request& /*req*/, httplib:
   const std::string html = this->LoadResource("swagger/index.html");
   if (html.empty())
   {
-    res.status = 503;
+    res.status = 404;
     res.set_content("Swagger UI resources not available", "text/plain");
     return;
   }

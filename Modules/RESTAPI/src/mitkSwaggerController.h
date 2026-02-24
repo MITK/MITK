@@ -55,15 +55,17 @@ namespace mitk
     /**
      * @brief Load a CppMicroServices bundled resource as a string.
      *
-     * Results are cached in m_ResourceCache after first load.
+     * All resources are pre-loaded into m_ResourceCache in the constructor,
+     * so this method is read-only after construction and safe to call from
+     * concurrent handler threads without additional locking.
      *
      * @pre Resource must exist in the module bundle.
      * @param resourcePath Path within the resource bundle.
      * @return Resource content, or empty string if not found.
      */
-    std::string LoadResource(const std::string& resourcePath);
+    std::string LoadResource(const std::string& resourcePath) const;
 
-    /** @brief In-memory cache for loaded resources (avoids repeated lookups). */
+    /** @brief Read-only after construction; safe for concurrent handler thread access. */
     std::unordered_map<std::string, std::string> m_ResourceCache;
   };
 }

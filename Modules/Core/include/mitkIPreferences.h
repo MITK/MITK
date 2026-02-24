@@ -76,11 +76,15 @@ namespace mitk
      * \brief Get a property value as string.
      *
      * If the property cannot be found, return the provided default value instead.
+     * If a session-only override exists for the key, the override value is returned
+     * instead of the persistent property value.
      *
      * \param key Name of the property
      * \param def Default value
      *
      * \return Property value or default value
+     *
+     * \sa Override()
      */
     virtual std::string Get(const std::string& key, const std::string& def) const = 0;
 
@@ -88,6 +92,8 @@ namespace mitk
      * \brief Set a property value.
      *
      * Create the property if not yet existent. Otherwise change its value.
+     * This only affects the persistent property, not any session-only override
+     * that may exist for the same key.
      *
      * Trigger an IPreferences::OnPropertyChanged event if the new value is different
      * or if a new property has been created, except the string value is empty in

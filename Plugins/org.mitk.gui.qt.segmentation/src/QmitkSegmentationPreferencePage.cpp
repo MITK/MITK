@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkSegmentationPreferencePage.h"
 
-#include <mitkBaseApplication.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
@@ -79,13 +78,24 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   prefs->PutFloat("opacity factor", opacityFactor);
 
   prefs->PutBool("selection mode", m_Ui->selectionModeCheckBox->isChecked());
-  prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
-  prefs->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
+
+  if (!prefs->IsOverridden("label set preset"))
+    prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
+
+  if (!prefs->IsOverridden("default label naming"))
+    prefs->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
 
   prefs->Put("standard label suggestions", m_Ui->comboBuiltInSuggestions->currentText().toStdString());
-  prefs->Put("external label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
-  prefs->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
-  prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
+
+  if (!prefs->IsOverridden("external label suggestions"))
+    prefs->Put("external label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
+
+  if (!prefs->IsOverridden("replace standard suggestions"))
+    prefs->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
+
+  if (!prefs->IsOverridden("suggest once"))
+    prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
+
   prefs->PutBool("enforce suggestions", m_Ui->enforceSuggestionsCheckBox->isChecked());
 
   prefs->PutBool("monailabel allow all models", m_Ui->allowAllModelsCheckBox->isChecked());
@@ -122,15 +132,12 @@ void QmitkSegmentationPreferencePage::Update()
   m_Ui->selectionModeCheckBox->setChecked(prefs->GetBool("selection mode", false));
 
   //label presets
-  auto labelSetPreset = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
-  bool isOverriddenByCmdLineArg = !labelSetPreset.empty();
+  bool isOverridden = prefs->IsOverridden("label set preset");
+  auto labelSetPreset = prefs->Get("label set preset", "");
 
-  if (!isOverriddenByCmdLineArg)
-    labelSetPreset = prefs->Get("label set preset", "");
-
-  m_Ui->labelSetPresetLineEdit->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->labelSetPresetToolButton->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->labelSetPresetCmdLineArgLabel->setVisible(isOverriddenByCmdLineArg);
+  m_Ui->labelSetPresetLineEdit->setDisabled(isOverridden);
+  m_Ui->labelSetPresetToolButton->setDisabled(isOverridden);
+  m_Ui->labelSetPresetCmdLineArgLabel->setVisible(isOverridden);
 
   m_Ui->labelSetPresetLineEdit->setText(QString::fromStdString(labelSetPreset));
 
@@ -143,8 +150,9 @@ void QmitkSegmentationPreferencePage::Update()
     m_Ui->askForNameRadioButton->setChecked(true);
   }
 
-  m_Ui->defaultNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
-  m_Ui->askForNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
+  bool isLabelNamingOverridden = prefs->IsOverridden("default label naming");
+  m_Ui->defaultNameRadioButton->setDisabled(isLabelNamingOverridden);
+  m_Ui->askForNameRadioButton->setDisabled(isLabelNamingOverridden);
 
   //label suggestions
   mitk::LabelSuggestionHelper::Preferences defaultPrefs;

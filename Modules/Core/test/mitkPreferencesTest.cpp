@@ -28,21 +28,38 @@ class mitkPreferencesTestSuite : public mitk::TestFixture
   MITK_TEST(OnPropertyChanged);
   MITK_TEST(GetInt);
   MITK_TEST(GetFloat);
+  MITK_TEST(OverrideString);
+  MITK_TEST(OverrideInt);
+  MITK_TEST(OverrideBool);
+  MITK_TEST(OverrideNonExistentKey);
+  MITK_TEST(IsOverridden);
+  MITK_TEST(RemoveOverride);
+  MITK_TEST(ClearOverrides);
+  MITK_TEST(ClearIncludingOverrides);
+  MITK_TEST(RemoveWithOverride);
+  MITK_TEST(RemoveFiresPropertyChanged);
+  MITK_TEST(KeysWithOverrides);
+  MITK_TEST(OverrideFiresEvents);
+  MITK_TEST(RemoveOverrideFiresPropertyChanged);
+  MITK_TEST(ClearOverridesFiresPropertyChanged);
+  MITK_TEST(RemoveOverrideNoOpDoesNotFireEvents);
+  MITK_TEST(FlushDoesNotPersistOverrides);
 
   CPPUNIT_TEST_SUITE_END();
 
   int m_NumberOfOnChangedEvents = 0;
   int m_NumberOfOnPropertyChangedEvents = 0;
+  std::string m_PreferencesFilename;
 
 public:
 
   void setUp() override
   {
-    const auto filename = mitk::IOUtil::CreateTemporaryFile("prefs_XXXXXX.xml");
-    fs::remove(filename); // We need a temporary filename, not an actual file
+    m_PreferencesFilename = mitk::IOUtil::CreateTemporaryFile("prefs_XXXXXX.xml");
+    fs::remove(m_PreferencesFilename); // We need a temporary filename, not an actual file
 
     auto* preferencesService = mitk::CoreServices::GetPreferencesService();
-    preferencesService->InitializeStorage(filename);
+    preferencesService->InitializeStorage(m_PreferencesFilename);
   }
 
   void tearDown() override
@@ -169,6 +186,326 @@ public:
 
     preferences->Put("string", "pi");
     CPPUNIT_ASSERT_THROW(preferences->GetFloat("string", 0.0f), mitk::Exception);
+  }
+
+  void OverrideString()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    preferences->Put("color", "red");
+    CPPUNIT_ASSERT_EQUAL(std::string("red"), preferences->Get("color", ""));
+
+    preferences->Override("color", "blue");
+    CPPUNIT_ASSERT_EQUAL(std::string("blue"), preferences->Get("color", ""));
+
+    preferences->RemoveOverride("color");
+    CPPUNIT_ASSERT_EQUAL(std::string("red"), preferences->Get("color", ""));
+  }
+
+  void OverrideInt()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    preferences->PutInt("count", 10);
+    CPPUNIT_ASSERT_EQUAL(10, preferences->GetInt("count", 0));
+
+    preferences->OverrideInt("count", 99);
+    CPPUNIT_ASSERT_EQUAL(99, preferences->GetInt("count", 0));
+  }
+
+  void OverrideBool()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    preferences->PutBool("enabled", false);
+    CPPUNIT_ASSERT_EQUAL(false, preferences->GetBool("enabled", true));
+
+    preferences->OverrideBool("enabled", true);
+    CPPUNIT_ASSERT_EQUAL(true, preferences->GetBool("enabled", false));
+  }
+
+  void OverrideNonExistentKey()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    CPPUNIT_ASSERT_NO_THROW(preferences->Override("newkey", "value"));
+    CPPUNIT_ASSERT_EQUAL(std::string("value"), preferences->Get("newkey", ""));
+    CPPUNIT_ASSERT_EQUAL(true, preferences->IsOverridden("newkey"));
+  }
+
+  void IsOverridden()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    preferences->Put("key", "value");
+    CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("key"));
+
+    preferences->Override("key", "override");
+    CPPUNIT_ASSERT_EQUAL(true, preferences->IsOverridden("key"));
+
+    preferences->RemoveOverride("key");
+    CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("key"));
+  }
+
+  void RemoveOverride()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    preferences->Put("key", "persistent");
+    preferences->Override("key", "temporary");
+    CPPUNIT_ASSERT_EQUAL(std::string("temporary"), preferences->Get("key", ""));
+
+    preferences->RemoveOverride("key");
+    CPPUNIT_ASSERT_EQUAL(std::string("persistent"), preferences->Get("key", ""));
+  }
+
+  void ClearOverrides()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    preferences->Put("a", "1");
+    preferences->Put("b", "2");
+    preferences->Override("a", "x");
+    preferences->Override("b", "y");
+    CPPUNIT_ASSERT_EQUAL(true, preferences->IsOverridden("a"));
+    CPPUNIT_ASSERT_EQUAL(true, preferences->IsOverridden("b"));
+
+    preferences->ClearOverrides();
+    CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("a"));
+    CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("b"));
+    CPPUNIT_ASSERT_EQUAL(std::string("1"), preferences->Get("a", ""));
+    CPPUNIT_ASSERT_EQUAL(std::string("2"), preferences->Get("b", ""));
+  }
+
+  void ClearIncludingOverrides()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    preferences->Put("a", "1");
+    preferences->Override("a", "x");
+    preferences->Override("b", "y");
+
+    preferences->Clear(true);
+
+    CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("a"));
+    CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("b"));
+    CPPUNIT_ASSERT_EQUAL(std::string("default"), preferences->Get("a", "default"));
+    CPPUNIT_ASSERT_EQUAL(std::string("default"), preferences->Get("b", "default"));
+  }
+
+  void RemoveWithOverride()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    preferences->Put("key", "persistent");
+    preferences->Override("key", "temporary");
+
+    CPPUNIT_ASSERT_EQUAL(false, preferences->Remove("key"));
+    CPPUNIT_ASSERT_EQUAL(std::string("temporary"), preferences->Get("key", ""));
+
+    CPPUNIT_ASSERT_EQUAL(true, preferences->Remove("key", true));
+    CPPUNIT_ASSERT_EQUAL(std::string("default"), preferences->Get("key", "default"));
+    CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("key"));
+  }
+
+  int m_RemoveOnChangedCount = 0;
+  int m_RemoveOnPropertyChangedCount = 0;
+
+  void CountRemoveOnChanged(const mitk::IPreferences*)
+  {
+    ++m_RemoveOnChangedCount;
+  }
+
+  void CountRemoveOnPropertyChanged(const mitk::IPreferences::ChangeEvent&)
+  {
+    ++m_RemoveOnPropertyChangedCount;
+  }
+
+  void RemoveFiresPropertyChanged()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    preferences->OnChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences*>(this, &mitkPreferencesTestSuite::CountRemoveOnChanged);
+    preferences->OnPropertyChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences::ChangeEvent&>(this, &mitkPreferencesTestSuite::CountRemoveOnPropertyChanged);
+
+    // Remove a persistent property
+    preferences->Put("key1", "value1");
+    m_RemoveOnChangedCount = 0;
+    m_RemoveOnPropertyChangedCount = 0;
+
+    preferences->Remove("key1");
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOnPropertyChangedCount);
+
+    // Force-remove an overridden key
+    preferences->Put("key2", "persistent");
+    preferences->Override("key2", "temporary");
+    m_RemoveOnChangedCount = 0;
+    m_RemoveOnPropertyChangedCount = 0;
+
+    preferences->Remove("key2", true);
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOnPropertyChangedCount);
+
+    // Remove a non-existent key: no events
+    m_RemoveOnChangedCount = 0;
+    m_RemoveOnPropertyChangedCount = 0;
+
+    preferences->Remove("nonexistent");
+    CPPUNIT_ASSERT_EQUAL(0, m_RemoveOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(0, m_RemoveOnPropertyChangedCount);
+  }
+
+  void KeysWithOverrides()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    preferences->Put("a", "1");
+    preferences->Put("b", "2");
+    preferences->Override("a", "x");
+
+    auto keys = preferences->Keys();
+    CPPUNIT_ASSERT_EQUAL(2, static_cast<int>(keys.size()));
+
+    auto keysWithOverrides = preferences->Keys(true);
+    CPPUNIT_ASSERT_EQUAL(2, static_cast<int>(keysWithOverrides.size()));
+  }
+
+  int m_OverrideOnChangedCount = 0;
+  int m_OverrideOnPropertyChangedCount = 0;
+
+  void CountOverrideOnChanged(const mitk::IPreferences*)
+  {
+    ++m_OverrideOnChangedCount;
+  }
+
+  void CountOverrideOnPropertyChanged(const mitk::IPreferences::ChangeEvent&)
+  {
+    ++m_OverrideOnPropertyChangedCount;
+  }
+
+  void OverrideFiresEvents()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    preferences->OnChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences*>(this, &mitkPreferencesTestSuite::CountOverrideOnChanged);
+    preferences->OnPropertyChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences::ChangeEvent&>(this, &mitkPreferencesTestSuite::CountOverrideOnPropertyChanged);
+
+    preferences->Put("key", "value");
+    CPPUNIT_ASSERT_EQUAL(1, m_OverrideOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(1, m_OverrideOnPropertyChangedCount);
+
+    preferences->Override("key", "override");
+    CPPUNIT_ASSERT_EQUAL(2, m_OverrideOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(2, m_OverrideOnPropertyChangedCount);
+  }
+
+  int m_RemoveOverrideOnChangedCount = 0;
+  int m_RemoveOverrideOnPropertyChangedCount = 0;
+
+  void CountRemoveOverrideOnChanged(const mitk::IPreferences*)
+  {
+    ++m_RemoveOverrideOnChangedCount;
+  }
+
+  void CountRemoveOverrideOnPropertyChanged(const mitk::IPreferences::ChangeEvent&)
+  {
+    ++m_RemoveOverrideOnPropertyChangedCount;
+  }
+
+  void RemoveOverrideFiresPropertyChanged()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    preferences->OnChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences*>(this, &mitkPreferencesTestSuite::CountRemoveOverrideOnChanged);
+    preferences->OnPropertyChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences::ChangeEvent&>(this, &mitkPreferencesTestSuite::CountRemoveOverrideOnPropertyChanged);
+
+    preferences->Put("key", "persistent");
+    preferences->Override("key", "temporary");
+    m_RemoveOverrideOnChangedCount = 0;
+    m_RemoveOverrideOnPropertyChangedCount = 0;
+
+    preferences->RemoveOverride("key");
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOverrideOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(1, m_RemoveOverrideOnPropertyChangedCount);
+  }
+
+  int m_ClearOverridesOnChangedCount = 0;
+  int m_ClearOverridesOnPropertyChangedCount = 0;
+
+  void CountClearOverridesOnChanged(const mitk::IPreferences*)
+  {
+    ++m_ClearOverridesOnChangedCount;
+  }
+
+  void CountClearOverridesOnPropertyChanged(const mitk::IPreferences::ChangeEvent&)
+  {
+    ++m_ClearOverridesOnPropertyChangedCount;
+  }
+
+  void ClearOverridesFiresPropertyChanged()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    preferences->OnChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences*>(this, &mitkPreferencesTestSuite::CountClearOverridesOnChanged);
+    preferences->OnPropertyChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences::ChangeEvent&>(this, &mitkPreferencesTestSuite::CountClearOverridesOnPropertyChanged);
+
+    preferences->Put("a", "1");
+    preferences->Put("b", "2");
+    preferences->Override("a", "x");
+    preferences->Override("b", "y");
+    m_ClearOverridesOnChangedCount = 0;
+    m_ClearOverridesOnPropertyChangedCount = 0;
+
+    preferences->ClearOverrides();
+    CPPUNIT_ASSERT_EQUAL(1, m_ClearOverridesOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(2, m_ClearOverridesOnPropertyChangedCount);
+  }
+
+  int m_NoOpOnChangedCount = 0;
+  int m_NoOpOnPropertyChangedCount = 0;
+
+  void CountNoOpOnChanged(const mitk::IPreferences*)
+  {
+    ++m_NoOpOnChangedCount;
+  }
+
+  void CountNoOpOnPropertyChanged(const mitk::IPreferences::ChangeEvent&)
+  {
+    ++m_NoOpOnPropertyChangedCount;
+  }
+
+  void RemoveOverrideNoOpDoesNotFireEvents()
+  {
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    preferences->OnChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences*>(this, &mitkPreferencesTestSuite::CountNoOpOnChanged);
+    preferences->OnPropertyChanged += mitk::MessageDelegate1<mitkPreferencesTestSuite, const mitk::IPreferences::ChangeEvent&>(this, &mitkPreferencesTestSuite::CountNoOpOnPropertyChanged);
+
+    // RemoveOverride on non-existent key should not fire
+    preferences->RemoveOverride("nonexistent");
+    CPPUNIT_ASSERT_EQUAL(0, m_NoOpOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(0, m_NoOpOnPropertyChangedCount);
+
+    // ClearOverrides on empty overrides should not fire
+    preferences->ClearOverrides();
+    CPPUNIT_ASSERT_EQUAL(0, m_NoOpOnChangedCount);
+    CPPUNIT_ASSERT_EQUAL(0, m_NoOpOnPropertyChangedCount);
+  }
+
+  void FlushDoesNotPersistOverrides()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    auto* preferences = preferencesService->GetSystemPreferences();
+
+    preferences->Put("key", "persistent");
+    preferences->Override("key", "temporary");
+    CPPUNIT_ASSERT_EQUAL(std::string("temporary"), preferences->Get("key", ""));
+
+    preferences->Flush();
+
+    // Re-initialize storage to reload from disk
+    preferencesService->UninitializeStorage(false);
+    preferencesService->InitializeStorage(m_PreferencesFilename);
+
+    preferences = preferencesService->GetSystemPreferences();
+    CPPUNIT_ASSERT_EQUAL(std::string("persistent"), preferences->Get("key", ""));
+    CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("key"));
   }
 };
 

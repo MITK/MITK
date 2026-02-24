@@ -765,6 +765,15 @@ void QmitkSegmentationTaskListWidget::UnloadTasks(const mitk::DataNode* skip)
 {
   this->UnsubscribeFromActiveSegmentation();
 
+  auto prefs = GetSegmentationPreferences();
+  if (prefs != nullptr)
+  {
+    prefs->RemoveOverride("default label naming");
+    prefs->RemoveOverride("external label suggestions");
+    prefs->RemoveOverride("replace standard suggestions");
+    prefs->RemoveOverride("suggest once");
+  }
+
   m_ImageNode = nullptr;
   m_SegmentationNode = nullptr;
 
@@ -1077,15 +1086,17 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     {
       auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetLabelNameSuggestions(current));
 
-      prefs->PutBool("default label naming", false);
-      prefs->Put("external label suggestions", path.string());
-      prefs->PutBool("replace standard suggestions", true);
-      prefs->PutBool("suggest once", true);
+      prefs->OverrideBool("default label naming", false);
+      prefs->Override("external label suggestions", path.string());
+      prefs->OverrideBool("replace standard suggestions", true);
+      prefs->OverrideBool("suggest once", true);
     }
     else
     {
-      prefs->PutBool("default label naming", true);
-      prefs->Put("external label suggestions", "");
+      prefs->RemoveOverride("default label naming");
+      prefs->RemoveOverride("external label suggestions");
+      prefs->RemoveOverride("replace standard suggestions");
+      prefs->RemoveOverride("suggest once");
     }
   }
 

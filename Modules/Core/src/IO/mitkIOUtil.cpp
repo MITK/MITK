@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <usModuleResourceStream.h>
 #include <mitkAbstractFileReader.h>
 #include <mitkUtf8Util.h>
+#include <mitkFileSystem.h>
 
 // ITK
 #include <itksys/SystemTools.hxx>
@@ -398,32 +399,22 @@ namespace mitk
 
   std::string IOUtil::GetTempPath()
   {
-    static std::string result;
-    if (result.empty())
+    try
     {
-#ifdef US_PLATFORM_WINDOWS
-      char tempPathTestBuffer[1];
-      DWORD bufferLength = GetTempPathA(1, tempPathTestBuffer);
-      if (bufferLength == 0)
-      {
-        mitkThrow() << GetLastErrorStr();
-      }
-      std::vector<char> tempPath(bufferLength);
-      bufferLength = GetTempPathA(bufferLength, &tempPath[0]);
-      if (bufferLength == 0)
-      {
-        mitkThrow() << GetLastErrorStr();
-      }
-      result.assign(tempPath.begin(), tempPath.begin() + static_cast<std::size_t>(bufferLength));
-#else
-      result = "/tmp/";
-#endif
-    }
+      auto tmp = fs::temp_directory_path();
 
-    return result;
+      if (tmp.has_filename() == false)
+        tmp = tmp.parent_path(); // Remove trailing path separator
+
+      return tmp.string();
+    }
+    catch (const fs::filesystem_error &e)
+    {
+      mitkThrow() << e.what();
+    }
   }
 
-  std::string IOUtil::CreateTemporaryFile(const std::string &templateName, std::string path)
+  std::string IOUtil::CreateTemporaryFile(const std::string &templateName, const std::string &path)
   {
     std::ofstream tmpOutputStream;
     std::string returnValue = CreateTemporaryFile(tmpOutputStream, templateName, path);
@@ -431,7 +422,7 @@ namespace mitk
     return returnValue;
   }
 
-  std::string IOUtil::CreateTemporaryFile(std::ofstream &f, const std::string &templateName, std::string path)
+  std::string IOUtil::CreateTemporaryFile(std::ofstream &f, const std::string &templateName, const std::string &path)
   {
     return CreateTemporaryFile(f, std::ios_base::out | std::ios_base::trunc, templateName, path);
   }
@@ -442,11 +433,9 @@ namespace mitk
                                           std::string path)
   {
     if (path.empty())
-    {
       path = GetTempPath();
-    }
 
-    path += templateName;
+    path = (fs::path(path) / templateName).string();
 
     std::vector<char> dst_path(path.begin(), path.end());
     dst_path.push_back('\0');
@@ -479,11 +468,10 @@ namespace mitk
   std::string IOUtil::CreateTemporaryDirectory(const std::string &templateName, std::string path)
   {
     if (path.empty())
-    {
       path = GetTempPath();
-    }
 
-    path += GetDirectorySeparator() + templateName;
+    path = (fs::path(path) / templateName).string();
+
     std::vector<char> dst_path(path.begin(), path.end());
     dst_path.push_back('\0');
 

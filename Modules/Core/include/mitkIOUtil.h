@@ -127,7 +127,7 @@ namespace mitk
     static fs::path GetAppBundlePath(AppBundlePath path = AppBundlePath::Parent);
 
     /**
-     * Get the default temporary path.
+     * Get the default temporary path without a trailing path separator.
      *
      * @return The default path for temporary data.
      */
@@ -162,7 +162,7 @@ namespace mitk
      */
     static std::string CreateTemporaryFile(std::ofstream &tmpStream,
                                            const std::string &templateName = "XXXXXX",
-                                           std::string path = std::string());
+                                           const std::string &path = std::string());
 
     /**
      * Create and open a temporary file.
@@ -212,7 +212,7 @@ namespace mitk
     * @throw mitk::Exception if the temporary file could not be created.
     */
     static std::string CreateTemporaryFile(const std::string &templateName = "XXXXXX",
-                                           std::string path = std::string());
+                                           const std::string &path = std::string());
 
     /**
      * Create a temporary directory.

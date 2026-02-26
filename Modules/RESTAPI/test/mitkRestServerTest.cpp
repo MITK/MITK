@@ -75,7 +75,7 @@ public:
     CPPUNIT_ASSERT(started);
 
     // Give the server thread time to start
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     CPPUNIT_ASSERT(m_Server->IsRunning());
 

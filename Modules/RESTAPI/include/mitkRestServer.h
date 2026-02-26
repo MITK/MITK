@@ -24,9 +24,14 @@ found in the LICENSE file.
 #include <set>
 #include <deque>
 #include <chrono>
+#include <unordered_map>
 
 // Forward declaration for httplib
-namespace httplib { class Server; }
+namespace httplib {
+  class Server;
+  class Request;
+  class Response;
+}
 
 namespace mitk
 {
@@ -34,6 +39,7 @@ namespace mitk
   class DataStorageBridge;
   class HealthController;
   class DataStorageController;
+  class SwaggerController;
 
   /**
    * @brief HTTP REST server implementation.
@@ -62,7 +68,7 @@ namespace mitk
     std::optional<RestServerConfig> GetRunningConfig() const override;
 
     void SetDataStorage(DataStorage* dataStorage) override;
-    DataStorage* GetDataStorage() const override;
+    DataStorage::Pointer GetDataStorage() const override;
 
     /**
      * @brief Set the thread dispatcher for DataStorage operations.
@@ -94,6 +100,42 @@ namespace mitk
     void RegisterRoutes();
     void ServerThreadFunc();
 
+    // --- Security middleware (Phase 4) ---
+
+    /**
+     * @brief Check if the client IP is allowed to access the server.
+     *
+     * Implements three modes: LocalhostOnly, AllowAll, Whitelist.
+     * Sets 403 response if denied.
+     *
+     * @pre m_RunningConfig has a value.
+     * @return true if allowed, false if denied (response already set).
+     */
+    bool CheckClientAccess(const httplib::Request& req, httplib::Response& res);
+
+    /**
+     * @brief Check if the request exceeds the rate limit.
+     *
+     * Per-IP sliding window rate limiter.
+     * Sets 429 response with Retry-After header if exceeded.
+     *
+     * @pre m_RunningConfig has a value.
+     * @return true if allowed, false if rate limited (response already set).
+     */
+    bool CheckRateLimit(const httplib::Request& req, httplib::Response& res);
+
+    /**
+     * @brief Check if the request has valid authentication.
+     *
+     * Validates Bearer token from Authorization header.
+     * Health and info endpoints are exempt.
+     * Sets 401 response if unauthorized.
+     *
+     * @pre m_RunningConfig has a value.
+     * @return true if allowed, false if unauthorized (response already set).
+     */
+    bool CheckAuthentication(const httplib::Request& req, httplib::Response& res);
+
     // Server components
     std::unique_ptr<httplib::Server> m_Server;
     std::unique_ptr<std::thread> m_ServerThread;
@@ -102,6 +144,7 @@ namespace mitk
     std::unique_ptr<DataStorageBridge> m_Bridge;
     std::unique_ptr<HealthController> m_HealthController;
     std::unique_ptr<DataStorageController> m_DataStorageController;
+    std::unique_ptr<SwaggerController> m_SwaggerController;
 
     // State
     mutable std::mutex m_Mutex;
@@ -123,6 +166,10 @@ namespace mitk
 
     // Server start time for uptime tracking
     std::optional<std::chrono::steady_clock::time_point> m_StartTime;
+
+    // Rate limiting data (protected by m_Mutex)
+    std::unordered_map<std::string, std::deque<std::chrono::steady_clock::time_point>> m_RateLimitMap;
+    uint64_t m_RateLimitCheckCount{0};
 
     /**
      * @brief Create and setup the temporary directory for data operations.

@@ -80,12 +80,14 @@ namespace mitk
     /**
      * @brief Find a node by its UID.
      *
-     * Thread-safe. Returns nullptr if not found.
+     * Thread-safe. Returns a null SmartPointer if not found or if the node
+     * has already been destroyed. Returns a strong reference to guarantee
+     * the node stays alive after the internal lock is released.
      *
      * @param uid The UID to look up.
-     * @return The node with this UID, or nullptr if not found.
+     * @return A SmartPointer to the node, or null if not found.
      */
-    DataNode* FindNodeByUid(const std::string& uid) const;
+    DataNode::Pointer FindNodeByUid(const std::string& uid) const;
 
     /**
      * @brief Get UID for a node if it exists (doesn't create).
@@ -122,11 +124,11 @@ namespace mitk
     std::string GenerateUid();
     void ClearRESTUIDProperty();
 
-    DataStorage* m_DataStorage = nullptr;
+    mitk::WeakPointer<DataStorage> m_DataStorage;
 
     // Thread-safe UID mappings
     mutable std::mutex m_Mutex;
-    std::unordered_map<std::string, DataNode*> m_UidToNode;
+    std::unordered_map<std::string, mitk::WeakPointer<DataNode>> m_UidToNode;
     std::unordered_map<const DataNode*, std::string> m_NodeToUid;
 
     // Counter for unique ID generation (never reused in session)

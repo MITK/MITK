@@ -20,8 +20,10 @@ found in the LICENSE file.
 #include <mitkIDataStorageService.h>
 #include <mitkLog.h>
 
+#include <cstdlib>
 #include <memory>
 #include <mutex>
+#include <sstream>
 
 namespace mitk
 {
@@ -206,14 +208,103 @@ private:
     RestServerConfig defaults;
     RestServerConfig config;
 
+    // Server settings
     config.host = restApiPrefs->Get("host", defaults.host);
     config.port = restApiPrefs->GetInt("port", defaults.port);
     config.enabled = restApiPrefs->GetBool("enabled", defaults.enabled);
     config.threadPoolSize = restApiPrefs->GetInt("threadPoolSize", defaults.threadPoolSize);
     config.readTimeoutSeconds = restApiPrefs->GetInt("readTimeoutSeconds", defaults.readTimeoutSeconds);
     config.writeTimeoutSeconds = restApiPrefs->GetInt("writeTimeoutSeconds", defaults.writeTimeoutSeconds);
+
+    // Client access control
+    const int accessModeInt = restApiPrefs->GetInt("clientAccessMode", static_cast<int>(defaults.clientAccessMode));
+    if (accessModeInt >= 0 && accessModeInt <= 2)
+    {
+      config.clientAccessMode = static_cast<ClientAccessMode>(accessModeInt);
+    }
+    else
+    {
+      MITK_WARN << "Invalid clientAccessMode value " << accessModeInt << "; defaulting to LocalhostOnly";
+      config.clientAccessMode = ClientAccessMode::LocalhostOnly;
+    }
+
+    const std::string allowedIPsStr = restApiPrefs->Get("allowedClientIPs", "");
+    if (!allowedIPsStr.empty())
+    {
+      std::istringstream stream(allowedIPsStr);
+      std::string line;
+      while (std::getline(stream, line))
+      {
+        // Trim whitespace
+        auto start = line.find_first_not_of(" \t\r\n");
+        if (start == std::string::npos) continue;
+        auto end = line.find_last_not_of(" \t\r\n");
+        line = line.substr(start, end - start + 1);
+        if (!line.empty())
+        {
+          config.allowedClientIPs.push_back(line);
+        }
+      }
+    }
+
+    // Authentication
     config.requireAuth = restApiPrefs->GetBool("requireAuth", defaults.requireAuth);
-    config.apiToken = restApiPrefs->Get("apiToken", defaults.apiToken);
+    // SECURITY NOTE: the token stored in preferences is unencrypted. Protect the
+    // preferences file with appropriate filesystem permissions. As a more secure
+    // alternative, set the MITK_REST_API_TOKEN environment variable; when set it
+    // takes precedence over the stored preference value.
+    const char* envToken = std::getenv("MITK_REST_API_TOKEN");
+    if (envToken != nullptr && envToken[0] != '\0')
+    {
+      config.apiToken = envToken;
+    }
+    else
+    {
+      config.apiToken = restApiPrefs->Get("apiToken", defaults.apiToken);
+    }
+
+    // Payload limits
+    config.maxPayloadSizeMB = restApiPrefs->GetInt("maxPayloadSizeMB", defaults.maxPayloadSizeMB);
+
+    // File path restrictions
+    const int fileAccessModeInt = restApiPrefs->GetInt("fileAccessMode", static_cast<int>(defaults.fileAccessMode));
+    if (fileAccessModeInt >= 0 && fileAccessModeInt <= 1)
+    {
+      config.fileAccessMode = static_cast<FileAccessMode>(fileAccessModeInt);
+    }
+    else
+    {
+      MITK_WARN << "Invalid fileAccessMode value " << fileAccessModeInt << "; defaulting to AllowedDirectories";
+      config.fileAccessMode = FileAccessMode::AllowedDirectories;
+    }
+
+    const std::string allowedDirsStr = restApiPrefs->Get("allowedFileDirectories", "");
+    if (!allowedDirsStr.empty())
+    {
+      // Preferences stores directories as semicolon-separated string
+      std::istringstream stream(allowedDirsStr);
+      std::string entry;
+      while (std::getline(stream, entry, ';'))
+      {
+        auto start = entry.find_first_not_of(" \t\r\n");
+        if (start == std::string::npos) continue;
+        auto end = entry.find_last_not_of(" \t\r\n");
+        entry = entry.substr(start, end - start + 1);
+        if (!entry.empty())
+        {
+          config.allowedFileDirectories.push_back(entry);
+        }
+      }
+    }
+
+    // Rate limiting
+    config.rateLimitEnabled = restApiPrefs->GetBool("rateLimitEnabled", defaults.rateLimitEnabled);
+    config.rateLimitPerMinute = restApiPrefs->GetInt("rateLimitPerMinute", defaults.rateLimitPerMinute);
+
+    // HTTPS
+    config.httpsEnabled = restApiPrefs->GetBool("httpsEnabled", defaults.httpsEnabled);
+    config.sslCertPath = restApiPrefs->Get("sslCertPath", defaults.sslCertPath);
+    config.sslKeyPath = restApiPrefs->Get("sslKeyPath", defaults.sslKeyPath);
 
     m_RestServer->SetConfig(config);
 

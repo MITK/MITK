@@ -21,6 +21,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <regex>
+#include <set>
 #include <sstream>
 #include <chrono>
 #include <ctime>
@@ -92,6 +93,44 @@ namespace
     return nullptr;
   }
 
+  /**
+   * @brief Get the correct set of property keys for a given scope.
+   *
+   * Uses IPropertyProvider::GetPropertyKeys() which returns only keys owned by
+   * the respective provider (no fall-through from node to data or vice versa).
+   *
+   * @pre node must not be nullptr.
+   */
+  std::vector<std::string> GetPropertyKeysForScope(
+    const mitk::DataNode* node,
+    const std::string& contextName,
+    mitk::PropertyScope scope)
+  {
+    // Get data-level keys (needed for Data and All scopes)
+    std::vector<std::string> dataKeys;
+    if (scope != mitk::PropertyScope::Node && node->GetData() != nullptr)
+    {
+      dataKeys = node->GetData()->GetPropertyKeys(contextName);
+    }
+
+    if (scope == mitk::PropertyScope::Data)
+      return dataKeys;
+
+    auto nodeKeys = node->GetPropertyKeys(contextName);
+
+    if (scope == mitk::PropertyScope::Node)
+      return nodeKeys;
+
+    // Scope::All — union of node + data keys
+    if (!dataKeys.empty())
+    {
+      std::set<std::string> allKeySet(nodeKeys.begin(), nodeKeys.end());
+      allKeySet.insert(dataKeys.begin(), dataKeys.end());
+      return std::vector<std::string>(allKeySet.begin(), allKeySet.end());
+    }
+
+    return nodeKeys;
+  }
 
   std::string GenerateTimestampString()
   {
@@ -439,7 +478,7 @@ namespace mitk
   DataStorageBridge::NodeQueryResult DataStorageBridge::GetNodes(const NodeQueryParams& params) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<NodeQueryResult>([this, &params]()
+    return this->DispatchTask<NodeQueryResult>([this, params]()
     {
       NodeQueryResult result;
       result.nodes = Json::array();
@@ -569,7 +608,7 @@ namespace mitk
   std::optional<DataStorageBridge::Json> DataStorageBridge::GetNode(const std::string& uid) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<std::optional<Json>>([this, &uid]()
+    return this->DispatchTask<std::optional<Json>>([this, uid]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -590,7 +629,7 @@ namespace mitk
   DataStorageBridge::CreateNodeResult DataStorageBridge::CreateNode(const Json& nodeData, const std::optional<std::string>& parentUid)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<CreateNodeResult>([this, &nodeData, &parentUid]()
+    return this->DispatchTask<CreateNodeResult>([this, nodeData, parentUid]()
     {
       CreateNodeResult result;
       result.success = false;
@@ -602,11 +641,11 @@ namespace mitk
       }
 
       // Find parent node if specified
-      DataNode* parentNode = nullptr;
+      DataNode::Pointer parentNode;
       if (parentUid.has_value())
       {
         parentNode = m_UidMapper->FindNodeByUid(parentUid.value());
-        if (parentNode == nullptr)
+        if (parentNode.IsNull())
         {
           return result;  // Parent not found
         }
@@ -670,7 +709,7 @@ namespace mitk
   bool DataStorageBridge::UpdateNode(const std::string& uid, const Json& updates)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<bool>([this, &uid, &updates]()
+    return this->DispatchTask<bool>([this, uid, updates]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -690,7 +729,7 @@ namespace mitk
         return false;
       }
 
-      DataNode* newParent = nullptr;
+      DataNode::Pointer newParent;
       if (!updates["parent_uid"].is_null())
       {
         std::string newParentUid = updates["parent_uid"].get<std::string>();
@@ -706,7 +745,7 @@ namespace mitk
       auto descendants = dataStorage->GetDerivations(node, nullptr, true);
       for (auto it = descendants->Begin(); it != descendants->End(); ++it)
       {
-        if (it->Value().GetPointer() == newParent)
+        if (it->Value() == newParent)
         {
           return false;  // Would create circular reference
         }
@@ -741,7 +780,7 @@ namespace mitk
   DataStorageBridge::DeleteResult DataStorageBridge::DeleteNode(const std::string& uid, bool recursive)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<DeleteResult>([this, &uid, recursive]()
+    return this->DispatchTask<DeleteResult>([this, uid, recursive]()
     {
       DeleteResult result;
       result.success = false;
@@ -810,7 +849,7 @@ namespace mitk
   DataStorageBridge::GetNodeDataResult DataStorageBridge::GetNodeData(const std::string& uid) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<GetNodeDataResult>([this, &uid]()
+    return this->DispatchTask<GetNodeDataResult>([this, uid]()
     {
       GetNodeDataResult result;
       result.nodeFound = false;
@@ -844,21 +883,21 @@ namespace mitk
     });
   }
 
-  bool DataStorageBridge::SetNodeData(const std::string& uid, BaseData* data)
+  DataStorageBridge::OperationStatus DataStorageBridge::SetNodeData(const std::string& uid, BaseData* data)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<bool>([this, &uid, data]()
+    return this->DispatchTask<OperationStatus>([this, uid, data]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
       {
-        return false;
+        return OperationStatus::InternalError;
       }
 
       auto node = m_UidMapper->FindNodeByUid(uid);
       if (node == nullptr)
       {
-        return false;
+        return OperationStatus::NodeNotFound;
       }
 
       node->SetData(data);
@@ -866,7 +905,7 @@ namespace mitk
       // Mark node as modified via REST API
       MarkNodeAsModified(node, "data_set");
 
-      return true;
+      return OperationStatus::Success;
     });
   }
 
@@ -875,7 +914,7 @@ namespace mitk
     const PropertyQueryParams& params) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<std::optional<Json>>([this, &uid, &params]()
+    return this->DispatchTask<std::optional<Json>>([this, uid, params]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -889,29 +928,25 @@ namespace mitk
         return std::optional<Json>(std::nullopt);
       }
 
-      std::string contextName = params.context.has_value() ? params.context.value() : "";
+      const std::string contextName = params.context.has_value() ? params.context.value() : "";
 
-      // Get properties based on scope
-      // Note: Data properties require BaseData access which may not always be available
-      PropertyList* propertyList = nullptr;
-
-      if (params.scope == PropertyScope::Node || params.scope == PropertyScope::All)
+      // Get the correct set of property keys for the requested scope
+      auto keys = GetPropertyKeysForScope(node, contextName, params.scope);
+      DataNode::PropertyListKeyNames filterdKeys;
+      for (const auto& key : keys)
       {
-        propertyList = node->GetPropertyList(contextName);
-      }
-
-      if (params.scope == PropertyScope::Data || (propertyList == nullptr && params.scope == PropertyScope::All))
-      {
-        auto data = node->GetData();
-        if (data != nullptr)
+        // Skip internal properties (restapi.*)
+        if (IsInternalProperty(key))
         {
-          propertyList = data->GetPropertyList();
+          continue;
         }
-      }
 
-      if (propertyList == nullptr)
-      {
-        return std::optional<Json>(Json::object());
+        // Filter by names if specified
+        if (params.names.empty() ||
+          std::find(params.names.begin(), params.names.end(), key) != params.names.end())
+        {
+          filterdKeys.push_back(key);
+        }
       }
 
       // Check if we should return content or just names
@@ -919,52 +954,21 @@ namespace mitk
       {
         // Return just property names as array
         Json names = Json::array();
-        auto propMap = propertyList->GetMap();
-        for (auto it = propMap->begin(); it != propMap->end(); ++it)
+        for (const auto& key : filterdKeys)
         {
-          // Skip internal properties (restapi.*)
-          if (IsInternalProperty(it->first))
-          {
-            continue;
-          }
-
-          // Filter by names if specified
-          if (params.names.empty() ||
-              std::find(params.names.begin(), params.names.end(), it->first) != params.names.end())
-          {
-            names.push_back(it->first);
-          }
+          names.push_back(key);
         }
         return std::optional<Json>(names);
       }
 
-      Json result = ConvertPropertyListToSelfContainedJson(propertyList);
-
-      // Remove internal properties (restapi.*)
-      for (auto it = result.begin(); it != result.end(); )
+      Json result = Json::object();
+      for (const auto& key : filterdKeys)
       {
-        if (IsInternalProperty(it.key()))
+        auto prop = GetConstProperty(node, key, params.context, params.scope);
+        if (prop != nullptr)
         {
-          it = result.erase(it);
+          result[key] = ConvertPropertyToSelfContainedJson(prop);
         }
-        else
-        {
-          ++it;
-        }
-      }
-
-      // Filter by names if specified
-      if (!params.names.empty())
-      {
-        Json filtered = Json::object();
-        for (const auto& name : params.names)
-        {
-          if (result.contains(name))
-          {
-            filtered[name] = result[name];
-          }
-        }
-        return std::optional<Json>(filtered);
       }
 
       return std::optional<Json>(result);
@@ -983,7 +987,7 @@ namespace mitk
     }
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<std::optional<Json>>([this, &uid, &key, &params]()
+    return this->DispatchTask<std::optional<Json>>([this, uid, key, params]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
@@ -1011,7 +1015,7 @@ namespace mitk
     });
   }
 
-  bool DataStorageBridge::SetNodeProperty(
+  DataStorageBridge::OperationStatus DataStorageBridge::SetNodeProperty(
     const std::string& uid,
     const std::string& key,
     const Json& value,
@@ -1020,22 +1024,28 @@ namespace mitk
     // Reject modification of internal properties (no dispatch needed for this check)
     if (IsInternalProperty(key))
     {
-      return false;
+      return OperationStatus::InvalidInput;
+    }
+
+    // Mutation operations only support Node and Data scopes, not All
+    if (params.scope == PropertyScope::All)
+    {
+      return OperationStatus::InvalidInput;
     }
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<bool>([this, &uid, &key, &value, &params]()
+    return this->DispatchTask<OperationStatus>([this, uid, key, value, params]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
       {
-        return false;
+        return OperationStatus::InternalError;
       }
 
       auto node = m_UidMapper->FindNodeByUid(uid);
       if (node == nullptr)
       {
-        return false;
+        return OperationStatus::NodeNotFound;
       }
 
       try
@@ -1049,7 +1059,7 @@ namespace mitk
         auto prop = ConvertPropertyFromSelfContainedJson(propValue);
         if (prop.IsNotNull())
         {
-          std::string contextName = params.context.has_value() ? params.context.value() : "";
+          const std::string contextName = params.context.has_value() ? params.context.value() : "";
 
           if (params.scope == PropertyScope::Data)
           {
@@ -1059,30 +1069,29 @@ namespace mitk
               data->SetProperty(key, prop, contextName);
               // Mark node as modified via REST API
               MarkNodeAsModified(node, "property_set:" + key);
-              return true;
+              return OperationStatus::Success;
             }
-            return false;
+            return OperationStatus::InvalidInput;
           }
           else
           {
-            // Default to node scope (or "all" which defaults to node)
             node->SetProperty(key, prop, contextName);
             // Mark node as modified via REST API
             MarkNodeAsModified(node, "property_set:" + key);
-            return true;
+            return OperationStatus::Success;
           }
         }
       }
       catch (const std::exception&)
       {
-        return false;
+        return OperationStatus::InvalidInput;
       }
 
-      return false;
+      return OperationStatus::InvalidInput;
     });
   }
 
-  bool DataStorageBridge::DeleteNodeProperty(
+  DataStorageBridge::OperationStatus DataStorageBridge::DeleteNodeProperty(
     const std::string& uid,
     const std::string& key,
     const PropertyQueryParams& params)
@@ -1090,25 +1099,31 @@ namespace mitk
     // Reject deletion of internal properties (no dispatch needed for this check)
     if (IsInternalProperty(key))
     {
-      return false;
+      return OperationStatus::InvalidInput;
+    }
+
+    // Mutation operations only support Node and Data scopes, not All
+    if (params.scope == PropertyScope::All)
+    {
+      return OperationStatus::InvalidInput;
     }
 
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<bool>([this, &uid, &key, &params]()
+    return this->DispatchTask<OperationStatus>([this, uid, key, params]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
       {
-        return false;
+        return OperationStatus::InternalError;
       }
 
       auto node = m_UidMapper->FindNodeByUid(uid);
       if (node == nullptr)
       {
-        return false;
+        return OperationStatus::NodeNotFound;
       }
 
-      std::string contextName = params.context.has_value() ? params.context.value() : "";
+      const std::string contextName = params.context.has_value() ? params.context.value() : "";
       PropertyList* propertyList = nullptr;
 
       if (params.scope == PropertyScope::Data)
@@ -1121,19 +1136,19 @@ namespace mitk
       }
       else
       {
-        // Default to node scope (or "all" which defaults to node)
         propertyList = node->GetPropertyList(contextName);
       }
 
       if (propertyList == nullptr)
       {
-        return false;
+        return OperationStatus::InternalError;
       }
 
-      // Check if property exists
-      if (propertyList->GetProperty(key) == nullptr)
+      // Verify the property actually exists in the targeted scope
+      auto prop = GetConstProperty(node, key, params.context, params.scope);
+      if (prop == nullptr)
       {
-        return false;
+        return OperationStatus::PropertyNotFound;
       }
 
       propertyList->DeleteProperty(key);
@@ -1141,38 +1156,45 @@ namespace mitk
       // Mark node as modified via REST API
       MarkNodeAsModified(node, "property_deleted:" + key);
 
-      return true;
+      return OperationStatus::Success;
     });
   }
 
-  std::optional<DataStorageBridge::Json> DataStorageBridge::ReplaceNodeProperties(
+  DataStorageBridge::ReplacePropertiesResult DataStorageBridge::ReplaceNodeProperties(
     const std::string& uid,
     const Json& properties,
     const PropertyQueryParams& params)
   {
+    // Mutation operations only support Node and Data scopes, not All
+    if (params.scope == PropertyScope::All)
+    {
+      return {OperationStatus::InvalidInput};
+    }
+
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<std::optional<Json>>([this, &uid, &properties, &params]()
+    return this->DispatchTask<ReplacePropertiesResult>([this, uid, properties, params]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())
       {
-        return std::optional<Json>(std::nullopt);
+        return ReplacePropertiesResult{OperationStatus::InternalError};
       }
 
       auto node = m_UidMapper->FindNodeByUid(uid);
       if (node == nullptr)
       {
-        return std::optional<Json>(std::nullopt);
+        return ReplacePropertiesResult{OperationStatus::NodeNotFound};
       }
 
       if (!properties.is_object())
       {
-        return std::optional<Json>(std::nullopt);
+        return ReplacePropertiesResult{OperationStatus::InvalidInput};
       }
 
-      std::string contextName = params.context.has_value() ? params.context.value() : "";
-      PropertyList* propertyList = nullptr;
+      const std::string contextName = params.context.has_value() ? params.context.value() : "";
 
+      // Get the correct property list for the target scope
+      PropertyList* propertyList = nullptr;
       if (params.scope == PropertyScope::Data)
       {
         auto data = node->GetData();
@@ -1188,23 +1210,18 @@ namespace mitk
 
       if (propertyList == nullptr)
       {
-        return std::optional<Json>(std::nullopt);
+        return ReplacePropertiesResult{OperationStatus::InvalidInput};
       }
 
-      // Collect existing property names
-      std::vector<std::string> existingNames;
-      auto propMap = propertyList->GetMap();
-      for (auto it = propMap->begin(); it != propMap->end(); ++it)
-      {
-        existingNames.push_back(it->first);
-      }
+      // Collect existing property keys using scope-aware helper
+      const auto existingKeys = GetPropertyKeysForScope(node, contextName, params.scope);
 
       // Track what was replaced vs removed
       std::vector<std::string> replaced;
       std::vector<std::string> removed;
 
-      // Set new properties (skip internal properties - clients cannot set them)
-      for (auto& [key, value] : properties.items())
+      // Set new properties on the correct target (skip internal properties - clients cannot set them)
+      for (const auto& [key, value] : properties.items())
       {
         // Skip internal properties
         if (IsInternalProperty(key))
@@ -1217,7 +1234,14 @@ namespace mitk
           auto prop = ConvertPropertyFromSelfContainedJson(value);
           if (prop.IsNotNull())
           {
-            propertyList->SetProperty(key, prop);
+            if (params.scope == PropertyScope::Data)
+            {
+              node->GetData()->SetProperty(key, prop, contextName);
+            }
+            else
+            {
+              node->SetProperty(key, prop, contextName);
+            }
             replaced.push_back(key);
           }
         }
@@ -1229,7 +1253,7 @@ namespace mitk
 
       // Remove properties that weren't in the new set
       // (but protect system properties like "name" and internal "restapi.*" properties)
-      for (const auto& existingName : existingNames)
+      for (const auto& existingName : existingKeys)
       {
         if (!properties.contains(existingName))
         {
@@ -1255,14 +1279,14 @@ namespace mitk
       result["replaced"] = replaced;
       result["removed"] = removed;
 
-      return std::optional<Json>(result);
+      return ReplacePropertiesResult{OperationStatus::Success, result};
     });
   }
 
   std::optional<DataStorageBridge::Json> DataStorageBridge::GetNodeAvailableContexts(const std::string& uid) const
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
-    return this->DispatchTask<std::optional<Json>>([this, &uid]()
+    return this->DispatchTask<std::optional<Json>>([this, uid]()
     {
       auto dataStorage = m_DataStorage.Lock();
       if (dataStorage.IsNull())

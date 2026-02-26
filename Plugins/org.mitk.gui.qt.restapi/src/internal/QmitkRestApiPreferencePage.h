@@ -30,6 +30,9 @@ namespace Ui
  * - Host and port
  * - Thread pool size
  * - Read/write timeouts
+ * - Security: client access mode, authentication, rate limiting
+ * - File access restrictions
+ * - HTTPS / TLS settings
  */
 class QmitkRestApiPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -46,6 +49,18 @@ public:
   bool PerformOk() override;
   void PerformCancel() override;
   void Update() override;
+
+private slots:
+  void OnClientAccessModeChanged(int index);
+  void OnShowTokenToggled();
+  void OnGenerateToken();
+  void OnCopyToken();
+  void OnFileAccessModeChanged(int index);
+  void OnAddDirectory();
+  void OnRemoveDirectory();
+  void OnHttpsToggled(bool checked);
+  void OnBrowseCert();
+  void OnBrowseKey();
 
 private:
   QWidget* m_Control;

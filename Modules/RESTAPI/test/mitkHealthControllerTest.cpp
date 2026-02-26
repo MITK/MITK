@@ -160,7 +160,9 @@ public:
 
     auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT(json["data"].contains("documentation_url"));
-    CPPUNIT_ASSERT_EQUAL(std::string("https://docs.mitk.org/api/v1"), json["data"]["documentation_url"].get<std::string>());
+    std::string refURL = "https://docs.mitk.org/" + std::to_string(MITK_VERSION_MAJOR) + "."
+      + std::to_string(MITK_VERSION_MINOR) + "/MITKRESTAPISpec.html";
+    CPPUNIT_ASSERT_EQUAL(refURL, json["data"]["documentation_url"].get<std::string>());
   }
 };
 

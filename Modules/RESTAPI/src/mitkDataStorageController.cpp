@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include "mitkDataStorageController.h"
 #include "mitkErrorResponse.h"
 #include "mitkNodeQueryParams.h"
+#include <mitkExceptionMacro.h>
+#include <mitkLog.h>
 
 #include <mitkBaseDataSerializer.h>
 #include <mitkFileSystem.h>
@@ -26,9 +28,11 @@ found in the LICENSE file.
 #include <itkObjectFactoryBase.h>
 
 #include <algorithm>
+#include <cctype>
 #include <fstream>
 #include <regex>
 #include <sstream>
+#include <mutex>
 
 namespace mitk
 {
@@ -67,6 +71,8 @@ namespace
   constexpr const char* HEADER_ACCEPT = "Accept";
   constexpr const char* HEADER_CONTENT_TYPE = "Content-Type";
   constexpr const char* HEADER_CONTENT_DISPOSITION = "Content-Disposition";
+
+
   /**
    * @brief Parse a comma-separated string into a vector of trimmed values.
    *
@@ -168,6 +174,103 @@ namespace
 
     return links;
   }
+
+  /**
+   * @brief Validate a UID string.
+   *
+   * UIDs must be alphanumeric plus hyphens and underscores, 1-64 characters.
+   * The REST API UID format is "node_N" (see NodeUidMapper::GenerateUid).
+   *
+   * @param uid The UID to validate.
+   * @return true if valid, false otherwise.
+   */
+  bool ValidateUid(const std::string& uid)
+  {
+    if (uid.empty() || uid.size() > 64)
+      return false;
+    return std::all_of(uid.begin(), uid.end(), [](char c) {
+      return std::isalnum(static_cast<unsigned char>(c)) || c == '-' || c == '_';
+    });
+  }
+
+  /**
+   * @brief Validate a property key string.
+   *
+   * Keys must not be empty, must not exceed 256 characters, must not contain
+   * control characters (< 0x20), and must not start with the "restapi." prefix.
+   *
+   * @param key The property key to validate.
+   * @return true if valid, false otherwise.
+   */
+  bool ValidatePropertyKey(const std::string& key)
+  {
+    if (key.empty() || key.size() > 256)
+      return false;
+    if (key.rfind("restapi.", 0) == 0)
+      return false;
+    return std::none_of(key.begin(), key.end(), [](char c) {
+      return static_cast<unsigned char>(c) < 0x20;
+    });
+  }
+
+  /**
+   * @brief Sanitize a filename by stripping any path components.
+   *
+   * @param filename The filename (possibly with path components).
+   * @return The basename only.
+   */
+  std::string SanitizeFilename(const std::string& filename)
+  {
+    return fs::path(filename).filename().string();
+  }
+
+  /**
+   * @brief Validate a file path against access restrictions.
+   *
+   * @param filePath The file path to validate.
+   * @param mode The file access mode.
+   * @param allowedDirs The list of allowed directories.
+   * @return Empty string on success, or error message on failure.
+   */
+  std::string ValidateFilePath(const std::string& filePath,
+                               FileAccessMode mode,
+                               const std::vector<std::string>& allowedDirs)
+  {
+    if (mode == FileAccessMode::Unrestricted)
+    {
+      return "";
+    }
+
+    // Canonicalize the requested path
+    std::error_code ec;
+    const fs::path canonicalPath = fs::canonical(filePath, ec);
+    if (ec)
+    {
+      return "Cannot resolve file path: " + filePath;
+    }
+
+    const std::string canonicalStr = canonicalPath.string();
+
+    // Check allowed directories
+    for (const auto& allowedDir : allowedDirs)
+    {
+      const fs::path canonicalAllowed = fs::canonical(allowedDir, ec);
+      if (ec)
+      {
+        continue;
+      }
+      const std::string allowedStr = canonicalAllowed.string();
+      if (canonicalStr.rfind(allowedStr, 0) == 0 &&
+          (canonicalStr.length() == allowedStr.length() ||
+           canonicalStr[allowedStr.length()] == '/' ||
+           canonicalStr[allowedStr.length()] == '\\'))
+      {
+        return "";
+      }
+    }
+
+    return "File path is not within any allowed directory: " + filePath;
+  }
 }  // anonymous namespace
 
 DataStorageController::DataStorageController(DataStorageBridge& bridge)
@@ -178,6 +281,68 @@ DataStorageController::DataStorageController(DataStorageBridge& bridge)
 void DataStorageController::SetTempDirectory(const std::string& tempDir)
 {
   m_TempDirectory = tempDir;
+}
+
+void DataStorageController::SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs, const std::string& tempDirectory)
+{
+  if (mode == FileAccessMode::AllowedDirectories && allowedDirs.empty())
+  {
+    mitkThrow() << "SetFileAccessConfig: allowedDirs must not be empty when mode is AllowedDirectories.";
+  }
+
+  m_FileAccessMode = mode;
+  m_AllowedFileDirectories = allowedDirs;
+  m_TempDirectory = tempDirectory;
+}
+
+void DataStorageController::SetMaxActiveTempDirsPerIp(size_t max)
+{
+  if (max < 1)
+    mitkThrow() << "SetMaxActiveTempDirsPerIp: max must be >= 1.";
+
+  std::lock_guard<std::mutex> lock(m_ActiveTempDirsMutex);
+  m_MaxActiveTempDirsPerIp = max;
+}
+
+fs::path DataStorageController::AcquireRequestTempDir(const std::string& clientIp)
+{
+  // Allocate directory before acquiring the lock (IO may be slow; no lock needed yet).
+  auto newDir = fs::path(IOUtil::CreateTemporaryDirectory("data_XXXXXX", m_TempDirectory));
+
+  std::lock_guard<std::mutex> lock(m_ActiveTempDirsMutex);
+
+  auto& queue = m_ActiveTempDirsByIp[clientIp];
+
+  // Evict this client's oldest directory if the quota is reached.
+  while (queue.size() >= m_MaxActiveTempDirsPerIp && !queue.empty())
+  {
+    fs::remove_all(queue.front());  // safe even if already deleted
+    queue.pop_front();
+  }
+
+  queue.push_back(newDir);
+  return newDir;
+}
+
+void DataStorageController::ReleaseRequestTempDir(const std::string& clientIp, const fs::path& dir)
+{
+  // Delete from disk first; deregistration is cheap even if deletion fails.
+  fs::remove_all(dir);
+
+  std::lock_guard<std::mutex> lock(m_ActiveTempDirsMutex);
+
+  auto mapIt = m_ActiveTempDirsByIp.find(clientIp);
+  if (mapIt == m_ActiveTempDirsByIp.end())
+    return;
+
+  auto& queue = mapIt->second;
+  const auto it = std::find(queue.begin(), queue.end(), dir);
+  if (it != queue.end())
+    queue.erase(it);
+
+  // Remove empty map entries to prevent the map growing unboundedly.
+  if (queue.empty())
+    m_ActiveTempDirsByIp.erase(mapIt);
 }
 
 std::string DataStorageController::DetermineTransferMode(const httplib::Request& req) const
@@ -226,7 +391,8 @@ std::string DataStorageController::ExtractFilenameFromContentDisposition(const h
   if (std::regex_search(disposition, match, filenameRegex))
   {
     // match[1] is quoted filename, match[2] is unquoted
-    return match[1].matched ? match[1].str() : match[2].str();
+    // Sanitize by stripping any path components to prevent path traversal
+    return SanitizeFilename(match[1].matched ? match[1].str() : match[2].str());
   }
 
   return "";
@@ -557,6 +723,15 @@ DataStorageController::ResolveDataPathResult DataStorageController::ResolveDataP
     {
       result.errorStatus = 422;
       result.errorResponse = ErrorResponse::FileNotFound(filePath.string(), req.path);
+      return result;
+    }
+
+    // Validate file path against access restrictions
+    auto validationError = ValidateFilePath(filePath.string(), m_FileAccessMode, m_AllowedFileDirectories);
+    if (!validationError.empty())
+    {
+      result.errorStatus = 403;
+      result.errorResponse = ErrorResponse::FileAccessDenied(validationError, req.path);
       return result;
     }
 
@@ -910,7 +1085,8 @@ void DataStorageController::HandlePOST_nodes_uid_generic(const httplib::Request&
       return;
     }
 
-    if (!m_Bridge.SetNodeData(createResult.uid, loadResult.data[0]))
+    const auto setDataStatus = m_Bridge.SetNodeData(createResult.uid, loadResult.data[0]);
+    if (setDataStatus != DataStorageBridge::OperationStatus::Success)
     {
       m_Bridge.DeleteNode(createResult.uid, false);
       cleanupTempFile();
@@ -931,6 +1107,13 @@ void DataStorageController::HandlePOST_nodes_uid_generic(const httplib::Request&
 
   // Get the created node details
   auto node = m_Bridge.GetNode(createResult.uid);
+
+  if (!node.has_value())
+  {
+    this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
+      "Failed to find created node", req.path));
+    return;
+  }
 
   nlohmann::json response;
   response[JSON_KEY_DATA] = node.value();
@@ -968,7 +1151,12 @@ void DataStorageController::HandleGET_nodes_uid(const httplib::Request& req, htt
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   auto node = m_Bridge.GetNode(uid);
   if (!node.has_value())
@@ -998,7 +1186,12 @@ void DataStorageController::HandlePATCH_nodes_uid(const httplib::Request& req, h
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if node exists
   auto existingNode = m_Bridge.GetNode(uid);
@@ -1020,9 +1213,46 @@ void DataStorageController::HandlePATCH_nodes_uid(const httplib::Request& req, h
     return;
   }
 
+  // PATCH /nodes/{uid} only supports reparenting via "parent_uid"
+  if (!updates.is_object() || !updates.contains("parent_uid"))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "PATCH /nodes/{uid} only supports reparenting. "
+      "Provide 'parent_uid' in the request body (use null for root level).", req.path));
+    return;
+  }
+
+  // Validate parent_uid value: must be null (move to root) or an existing node UID
+  if (!updates["parent_uid"].is_null())
+  {
+    if (!updates["parent_uid"].is_string())
+    {
+      this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+        "Invalid 'parent_uid': must be a string UID or null.", req.path));
+      return;
+    }
+    const std::string parentUid = updates["parent_uid"].get<std::string>();
+    if (!ValidateUid(parentUid))
+    {
+      this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid parent_uid format", req.path));
+      return;
+    }
+    if (!m_Bridge.GetNode(parentUid).has_value())
+    {
+      this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(parentUid, req.path));
+      return;
+    }
+  }
+
   if (!m_Bridge.UpdateNode(uid, updates))
   {
-    this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to update node", req.path));
+    // parent_uid is present and the parent node exists; the only remaining
+    // failure is a circular hierarchy reference (target is a descendant of this node).
+    this->SendErrorResponse(res, 409, ErrorResponse::Create(
+      "CIRCULAR_HIERARCHY_REFERENCE",
+      "Circular Hierarchy Reference",
+      "Cannot reparent node: the target parent is a descendant of this node.",
+      409, req.path));
     return;
   }
 
@@ -1049,7 +1279,12 @@ void DataStorageController::HandleDELETE_nodes_uid(const httplib::Request& req, 
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Parse recursive parameter (default: false)
   bool recursive = false;
@@ -1099,7 +1334,12 @@ void DataStorageController::HandleGET_nodes_uid_children(const httplib::Request&
     return;
   }
 
-  std::string parentUid = req.path_params.at("uid");
+  const std::string parentUid = req.path_params.at("uid");
+  if (!ValidateUid(parentUid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if parent node exists
   auto parentNode = m_Bridge.GetNode(parentUid);
@@ -1151,6 +1391,11 @@ void DataStorageController::HandlePOST_nodes_uid_children(const httplib::Request
   }
 
   const std::string parentUid = req.path_params.at("uid");
+  if (!ValidateUid(parentUid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if parent node exists
   auto parentNode = m_Bridge.GetNode(parentUid);
@@ -1172,6 +1417,11 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
   }
 
   const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Get a clone of the node's data for thread-safe serialization
   // The result distinguishes between "node not found" and "node has no data"
@@ -1227,12 +1477,12 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
     return;
   }
 
-  // Create a per-request temp subdirectory for this serialization
-  // This ensures all files created by the serializer are in one place
+  // Create a per-request temp subdirectory for this serialization.
+  // AcquireRequestTempDir enforces the per-IP quota, evicting the oldest dir if needed.
   fs::path requestTempDir;
   try
   {
-    requestTempDir = fs::path(IOUtil::CreateTemporaryDirectory("data_XXXXXX", m_TempDirectory));
+    requestTempDir = this->AcquireRequestTempDir(req.remote_addr);
   }
   catch (const std::exception& e)
   {
@@ -1258,7 +1508,7 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
   catch (const std::exception& e)
   {
     // Clean up the per-request temp directory on error
-    fs::remove_all(requestTempDir);
+    this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
     this->SendErrorResponse(res, 500, ErrorResponse::SerializationError(
       "Serialization failed: " + std::string(e.what()), req.path));
     return;
@@ -1266,7 +1516,7 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
 
   if (writtenFilename.empty())
   {
-    fs::remove_all(requestTempDir);
+    this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
     this->SendErrorResponse(res, 500, ErrorResponse::SerializationError(
       "Serialization returned empty filename", req.path));
     return;
@@ -1305,7 +1555,7 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
     }
     catch (const std::exception& e)
     {
-      fs::remove_all(requestTempDir);
+      this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
       this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
         "Failed to build file-reference response: " + std::string(e.what()), req.path));
     }
@@ -1318,7 +1568,7 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
       std::ifstream file(fullPath, std::ios::binary);
       if (!file.is_open())
       {
-        fs::remove_all(requestTempDir);
+        this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
         this->SendErrorResponse(res, 500, ErrorResponse::SerializationError(
           "Failed to read serialized file", req.path));
         return;
@@ -1331,13 +1581,13 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
 
       // For direct mode, we can clean up the per-request temp directory immediately
       // since we've read all the data into memory
-      fs::remove_all(requestTempDir);
+      this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
 
       this->SendBinaryResponse(res, content, writtenFilename);
     }
     catch (const std::exception& e)
     {
-      fs::remove_all(requestTempDir);
+      this->ReleaseRequestTempDir(req.remote_addr, requestTempDir);
       this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
         "Failed to read and send data: " + std::string(e.what()), req.path));
     }
@@ -1353,6 +1603,11 @@ void DataStorageController::HandlePUT_nodes_uid_data(const httplib::Request& req
   }
 
   const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if node exists
   const auto nodeJson = m_Bridge.GetNode(uid);
@@ -1406,7 +1661,14 @@ void DataStorageController::HandlePUT_nodes_uid_data(const httplib::Request& req
   }
 
   // Assign loaded data to node
-  if (!m_Bridge.SetNodeData(uid, loadResult.data[0]))
+  const auto setDataStatus = m_Bridge.SetNodeData(uid, loadResult.data[0]);
+  if (setDataStatus == DataStorageBridge::OperationStatus::NodeNotFound)
+  {
+    cleanupTempFile();
+    this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
+    return;
+  }
+  else if (setDataStatus != DataStorageBridge::OperationStatus::Success)
   {
     cleanupTempFile();
     this->SendErrorResponse(res, 500, ErrorResponse::InternalError(
@@ -1448,7 +1710,12 @@ void DataStorageController::HandleGET_nodes_uid_properties(const httplib::Reques
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Parse property query parameters
   auto params = this->ParsePropertyQueryParams(req);
@@ -1495,8 +1762,19 @@ void DataStorageController::HandleGET_nodes_uid_properties_key(const httplib::Re
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
-  std::string key = req.path_params.at("key");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
+
+  const std::string key = req.path_params.at("key");
+  if (!ValidatePropertyKey(key))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid property key", req.path));
+    return;
+  }
 
   // First check if node exists
   auto nodeCheck = m_Bridge.GetNode(uid);
@@ -1545,8 +1823,19 @@ void DataStorageController::HandlePUT_nodes_uid_properties_key(const httplib::Re
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
-  std::string key = req.path_params.at("key");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
+
+  const std::string key = req.path_params.at("key");
+  if (!ValidatePropertyKey(key))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid property key", req.path));
+    return;
+  }
 
   // Check if node exists
   auto nodeCheck = m_Bridge.GetNode(uid);
@@ -1559,6 +1848,14 @@ void DataStorageController::HandlePUT_nodes_uid_properties_key(const httplib::Re
   // Parse property query parameters for context and scope
   // Per API spec: PUT /properties/{name} defaults to "node" scope
   auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+
+  // Mutation endpoints do not support scope "all"
+  if (params.scope == PropertyScope::All)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "Scope 'all' is not supported for property mutation operations. Use 'node' or 'data'.", req.path));
+    return;
+  }
 
   // Parse request body
   nlohmann::json value;
@@ -1575,9 +1872,21 @@ void DataStorageController::HandlePUT_nodes_uid_properties_key(const httplib::Re
   // Get previous value if exists
   auto previousProperty = m_Bridge.GetNodeProperty(uid, key, params);
 
-  if (!m_Bridge.SetNodeProperty(uid, key, value, params))
+  const auto setStatus = m_Bridge.SetNodeProperty(uid, key, value, params);
+  if (setStatus == DataStorageBridge::OperationStatus::NodeNotFound)
   {
-    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Failed to set property value", req.path));
+    this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
+    return;
+  }
+  else if (setStatus == DataStorageBridge::OperationStatus::InvalidInput)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "Failed to deserialize property value or no data for requested scope", req.path));
+    return;
+  }
+  else if (setStatus != DataStorageBridge::OperationStatus::Success)
+  {
+    this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to set property value", req.path));
     return;
   }
 
@@ -1603,8 +1912,19 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
-  std::string key = req.path_params.at("key");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
+
+  const std::string key = req.path_params.at("key");
+  if (!ValidatePropertyKey(key))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid property key", req.path));
+    return;
+  }
 
   // Check if node exists
   auto nodeCheck = m_Bridge.GetNode(uid);
@@ -1618,6 +1938,14 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
   // Per API spec: DELETE /properties/{name} defaults to "node" scope
   auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
 
+  // Mutation endpoints do not support scope "all"
+  if (params.scope == PropertyScope::All)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "Scope 'all' is not supported for property mutation operations. Use 'node' or 'data'.", req.path));
+    return;
+  }
+
   // Check for protected properties (like "name") - only protected in node scope
   if (key == "name" && params.scope != PropertyScope::Data)
   {
@@ -1625,7 +1953,18 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
     return;
   }
 
-  if (!m_Bridge.DeleteNodeProperty(uid, key, params))
+  const auto deleteStatus = m_Bridge.DeleteNodeProperty(uid, key, params);
+  if (deleteStatus == DataStorageBridge::OperationStatus::NodeNotFound)
+  {
+    this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
+    return;
+  }
+  else if (deleteStatus == DataStorageBridge::OperationStatus::PropertyNotFound)
+  {
+    this->SendErrorResponse(res, 404, ErrorResponse::PropertyNotFound(key, uid, req.path));
+    return;
+  }
+  else if (deleteStatus != DataStorageBridge::OperationStatus::Success)
   {
     this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to delete property", req.path));
     return;
@@ -1645,7 +1984,12 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if node exists
   auto nodeCheck = m_Bridge.GetNode(uid);
@@ -1658,6 +2002,14 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
   // Parse property query parameters for context and scope
   // Per API spec: PUT /properties defaults to "node" scope
   auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+
+  // Mutation endpoints do not support scope "all"
+  if (params.scope == PropertyScope::All)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "Scope 'all' is not supported for property mutation operations. Use 'node' or 'data'.", req.path));
+    return;
+  }
 
   // Parse request body
   nlohmann::json properties;
@@ -1677,8 +2029,29 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
     return;
   }
 
+  // Validate all property keys before replacing
+  for (const auto& [key, value] : properties.items())
+  {
+    if (!ValidatePropertyKey(key))
+    {
+      this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+        "Invalid property key: " + key, req.path));
+      return;
+    }
+  }
+
   auto replaceResult = m_Bridge.ReplaceNodeProperties(uid, properties, params);
-  if (!replaceResult.has_value())
+  if (replaceResult.status == DataStorageBridge::OperationStatus::NodeNotFound)
+  {
+    this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
+    return;
+  }
+  else if (replaceResult.status == DataStorageBridge::OperationStatus::InvalidInput)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Failed to replace properties", req.path));
+    return;
+  }
+  else if (replaceResult.status != DataStorageBridge::OperationStatus::Success)
   {
     this->SendErrorResponse(res, 500, ErrorResponse::InternalError("Failed to replace properties", req.path));
     return;
@@ -1696,7 +2069,7 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
   }
 
   nlohmann::json response;
-  response["data"] = replaceResult.value();
+  response["data"] = replaceResult.result;
   response["meta"]["node_uid"] = uid;
   response["meta"]["property_scope"] = scopeStr;
   response["meta"]["context"] = params.context.has_value() ? nlohmann::json(params.context.value()) : nlohmann::json(nullptr);
@@ -1712,7 +2085,12 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
     return;
   }
 
-  std::string uid = req.path_params.at("uid");
+  const std::string uid = req.path_params.at("uid");
+  if (!ValidateUid(uid))
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid UID format", req.path));
+    return;
+  }
 
   // Check if node exists
   auto nodeCheck = m_Bridge.GetNode(uid);
@@ -1725,6 +2103,14 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
   // Parse property query parameters for context and scope
   // Per API spec: PATCH /properties defaults to "node" scope
   auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+
+  // Mutation endpoints do not support scope "all"
+  if (params.scope == PropertyScope::All)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(
+      "Scope 'all' is not supported for property mutation operations. Use 'node' or 'data'.", req.path));
+    return;
+  }
 
   // Parse request body
   nlohmann::json properties;
@@ -1747,9 +2133,18 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
   std::vector<std::string> updated;
   std::vector<nlohmann::json> failed;
 
-  for (auto& [key, value] : properties.items())
+  for (const auto& [key, value] : properties.items())
   {
-    if (m_Bridge.SetNodeProperty(uid, key, value, params))
+    if (!ValidatePropertyKey(key))
+    {
+      nlohmann::json failure;
+      failure[JSON_KEY_PROPERTY] = key;
+      failure[JSON_KEY_ERROR] = "Invalid property key";
+      failed.push_back(failure);
+      continue;
+    }
+
+    if (m_Bridge.SetNodeProperty(uid, key, value, params) == DataStorageBridge::OperationStatus::Success)
     {
       updated.push_back(key);
     }

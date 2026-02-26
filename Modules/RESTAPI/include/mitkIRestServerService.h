@@ -133,7 +133,7 @@ namespace mitk
      * @brief Get the currently connected DataStorage.
      * @return The connected DataStorage, or nullptr if none.
      */
-    virtual DataStorage* GetDataStorage() const = 0;
+    virtual DataStorage::Pointer GetDataStorage() const = 0;
 
     // Status
 

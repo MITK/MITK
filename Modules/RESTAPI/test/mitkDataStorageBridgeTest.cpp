@@ -88,7 +88,11 @@ class mitkDataStorageBridgeTestSuite : public mitk::TestFixture
   MITK_TEST(GetNodePropertyWithScopeAndValue);
   MITK_TEST(SetNodeProperty);
   MITK_TEST(DeleteNodeProperty);
+  MITK_TEST(DeleteNodePropertyNotFound);
+  MITK_TEST(DeleteNodePropertyWithScope);
   MITK_TEST(ReplaceNodeProperties);
+  MITK_TEST(ReplaceNodePropertiesWithScope);
+  MITK_TEST(MutationRejectsAllScope);
   MITK_TEST(ComplexPropertySerializationRoundTrip);
   MITK_TEST(NameFilterWithExactMatch);
   MITK_TEST(NameFilterWithWildcard);
@@ -215,15 +219,6 @@ private:
     m_Child3Uid = FindUidByName("Child3");
     m_Grandchild1Uid = FindUidByName("Grandchild1");
     m_Grandchild2Uid = FindUidByName("Grandchild2");
-  }
-
-  void ClearStorage()
-  {
-    auto all = m_DataStorage->GetAll();
-    for (auto it = all->Begin(); it != all->End(); ++it)
-    {
-      m_DataStorage->Remove(it->Value());
-    }
   }
 
 public:
@@ -942,8 +937,8 @@ public:
     auto newImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(8, 8, 8);
 
     // Replace the data
-    bool success = m_Bridge->SetNodeData(nodeUid, newImage);
-    CPPUNIT_ASSERT(success);
+    auto status = m_Bridge->SetNodeData(nodeUid, newImage);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify the data was replaced
     auto* currentData = nodeWithData->GetData();
@@ -961,8 +956,8 @@ public:
     // Root1 has no data - set data on it
     auto newImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(7, 7, 7);
 
-    bool success = m_Bridge->SetNodeData(m_Root1Uid, newImage);
-    CPPUNIT_ASSERT(success);
+    auto status = m_Bridge->SetNodeData(m_Root1Uid, newImage);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify the data was set
     auto* currentData = m_Root1->GetData();
@@ -990,8 +985,8 @@ public:
     CPPUNIT_ASSERT(nodeWithData->GetData() != nullptr);
 
     // Set data to nullptr to clear it
-    bool success = m_Bridge->SetNodeData(nodeUid, nullptr);
-    CPPUNIT_ASSERT(success);
+    auto status = m_Bridge->SetNodeData(nodeUid, nullptr);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify data is now nullptr
     CPPUNIT_ASSERT(nodeWithData->GetData() == nullptr);
@@ -1006,8 +1001,8 @@ public:
   {
     auto newImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(5, 5, 5);
 
-    bool success = m_Bridge->SetNodeData("non-existent-uid", newImage);
-    CPPUNIT_ASSERT(!success);
+    auto status = m_Bridge->SetNodeData("non-existent-uid", newImage);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::NodeNotFound);
   }
 
   void SetNodeDataSetsModificationTracking()
@@ -1024,8 +1019,8 @@ public:
 
     // Set data
     auto newImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(5, 5, 5);
-    bool success = m_Bridge->SetNodeData(nodeUid, newImage);
-    CPPUNIT_ASSERT(success);
+    auto status = m_Bridge->SetNodeData(nodeUid, newImage);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify modification tracking is now set
     CPPUNIT_ASSERT(freshNode->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) != nullptr);
@@ -1087,20 +1082,22 @@ public:
     auto nodeProps = m_Bridge->GetNodeProperties(nodeUid, params);
     CPPUNIT_ASSERT(nodeProps.has_value());
     CPPUNIT_ASSERT(nodeProps.value().contains("node_only_prop"));
-    // Note: data_only_prop should NOT be in node scope results
+    CPPUNIT_ASSERT(!nodeProps.value().contains("data_only_prop"));
 
     // Test PropertyScope::Data - should only return data-level properties
     params.scope = mitk::PropertyScope::Data;
     auto dataProps = m_Bridge->GetNodeProperties(nodeUid, params);
     CPPUNIT_ASSERT(dataProps.has_value());
     CPPUNIT_ASSERT(dataProps.value().contains("data_only_prop"));
+    CPPUNIT_ASSERT(!dataProps.value().contains("node_only_prop"));
 
-    // Test PropertyScope::All - should return both
+    // Test PropertyScope::All - should return both node and data properties
     params.scope = mitk::PropertyScope::All;
     auto allProps = m_Bridge->GetNodeProperties(nodeUid, params);
     CPPUNIT_ASSERT(allProps.has_value());
-    // At least the node properties should be accessible
     CPPUNIT_ASSERT(allProps.value().contains("name"));
+    CPPUNIT_ASSERT(allProps.value().contains("node_only_prop"));
+    CPPUNIT_ASSERT(allProps.value().contains("data_only_prop"));
   }
 
   void GetNodePropertiesWithFiltering()
@@ -1208,11 +1205,19 @@ public:
     CPPUNIT_ASSERT(prop.has_value());
     CPPUNIT_ASSERT_EQUAL(true, prop.value()["node_level"].get<bool>());
 
+    // Node scope should NOT find data_level
+    prop = m_Bridge->GetNodeProperty(nodeUid, "data_level", params);
+    CPPUNIT_ASSERT(!prop.has_value());
+
     // Data scope should find data_level
     params.scope = mitk::PropertyScope::Data;
     prop = m_Bridge->GetNodeProperty(nodeUid, "data_level", params);
     CPPUNIT_ASSERT(prop.has_value());
     CPPUNIT_ASSERT_EQUAL(true, prop.value()["data_level"].get<bool>());
+
+    // Data scope should NOT find node_level
+    prop = m_Bridge->GetNodeProperty(nodeUid, "node_level", params);
+    CPPUNIT_ASSERT(!prop.has_value());
   }
 
   void SetNodeProperty()
@@ -1220,8 +1225,11 @@ public:
     nlohmann::json value;
     value["value"] = 0.5;
 
-    bool set = m_Bridge->SetNodeProperty(m_Root1Uid, "opacity", value);
-    CPPUNIT_ASSERT(set);
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    auto setStatus = m_Bridge->SetNodeProperty(m_Root1Uid, "opacity", value, params);
+    CPPUNIT_ASSERT(setStatus == mitk::DataStorageBridge::OperationStatus::Success);
 
     auto prop = m_Bridge->GetNodeProperty(m_Root1Uid, "opacity");
     CPPUNIT_ASSERT(prop.has_value());
@@ -1229,22 +1237,35 @@ public:
 
   void DeleteNodeProperty()
   {
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
     // First set a custom property
     nlohmann::json value;
     value["value"] = "test_value";
-    m_Bridge->SetNodeProperty(m_Root1Uid, "customProp", value);
+    m_Bridge->SetNodeProperty(m_Root1Uid, "customProp", value, params);
 
     // Verify property exists
     auto prop = m_Bridge->GetNodeProperty(m_Root1Uid, "customProp");
     CPPUNIT_ASSERT(prop.has_value());
 
     // Delete it
-    bool deleted = m_Bridge->DeleteNodeProperty(m_Root1Uid, "customProp");
-    CPPUNIT_ASSERT(deleted);
+    auto deleted = m_Bridge->DeleteNodeProperty(m_Root1Uid, "customProp", params);
+    CPPUNIT_ASSERT(deleted == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify it's gone
     prop = m_Bridge->GetNodeProperty(m_Root1Uid, "customProp");
     CPPUNIT_ASSERT(!prop.has_value());
+  }
+
+  void DeleteNodePropertyNotFound()
+  {
+    // Trying to delete a property that does not exist on the node → PropertyNotFound
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    auto status = m_Bridge->DeleteNodeProperty(m_Root1Uid, "nonExistentProp", params);
+    CPPUNIT_ASSERT(status == mitk::DataStorageBridge::OperationStatus::PropertyNotFound);
   }
 
   void ReplaceNodeProperties()
@@ -1258,8 +1279,11 @@ public:
     newProps["newProp1"] = true;
     newProps["newProp2"] = 42;
 
-    auto result = m_Bridge->ReplaceNodeProperties(m_Root1Uid, newProps);
-    CPPUNIT_ASSERT(result.has_value());
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    auto result = m_Bridge->ReplaceNodeProperties(m_Root1Uid, newProps, params);
+    CPPUNIT_ASSERT(result.status == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify old properties are gone (except protected ones)
     auto props = m_Bridge->GetNodeProperties(m_Root1Uid);
@@ -1268,6 +1292,127 @@ public:
     CPPUNIT_ASSERT(props.value().contains("newProp2"));
     CPPUNIT_ASSERT(!props.value().contains("oldProp1"));
     CPPUNIT_ASSERT(!props.value().contains("oldProp2"));
+  }
+
+  void ReplaceNodePropertiesWithScope()
+  {
+    // Create a node with data, set properties at both levels
+    auto nodeWithData = mitk::DataNode::New();
+    nodeWithData->SetName("ReplaceTest");
+    nodeWithData->SetBoolProperty("node_prop_a", true);
+    nodeWithData->SetStringProperty("node_prop_b", "old");
+
+    auto image = mitk::Image::New();
+    unsigned int dims[3] = {5, 5, 5};
+    image->Initialize(mitk::MakeScalarPixelType<short>(), 3, dims);
+    image->SetProperty("data_prop_a", mitk::BoolProperty::New(true));
+    image->SetProperty("data_prop_b", mitk::StringProperty::New("old"));
+    nodeWithData->SetData(image);
+    m_DataStorage->Add(nodeWithData);
+
+    auto nodeUid = FindUidByName("ReplaceTest");
+
+    // Replace with scope=Node — only node-level properties affected
+    nlohmann::json newNodeProps;
+    newNodeProps["node_prop_new"] = true;
+
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+    auto result = m_Bridge->ReplaceNodeProperties(nodeUid, newNodeProps, params);
+    CPPUNIT_ASSERT(result.status == mitk::DataStorageBridge::OperationStatus::Success);
+
+    // Verify node scope now has only the new property (plus protected "name")
+    auto nodeProps = m_Bridge->GetNodeProperties(nodeUid, params);
+    CPPUNIT_ASSERT(nodeProps.has_value());
+    CPPUNIT_ASSERT(nodeProps.value().contains("node_prop_new"));
+    CPPUNIT_ASSERT(!nodeProps.value().contains("node_prop_a"));
+    CPPUNIT_ASSERT(!nodeProps.value().contains("node_prop_b"));
+
+    // Verify data properties are untouched
+    params.scope = mitk::PropertyScope::Data;
+    auto dataProps = m_Bridge->GetNodeProperties(nodeUid, params);
+    CPPUNIT_ASSERT(dataProps.has_value());
+    CPPUNIT_ASSERT(dataProps.value().contains("data_prop_a"));
+    CPPUNIT_ASSERT(dataProps.value().contains("data_prop_b"));
+
+    // Replace with scope=Data — only data-level properties affected
+    nlohmann::json newDataProps;
+    newDataProps["data_prop_new"] = 42;
+
+    params.scope = mitk::PropertyScope::Data;
+    result = m_Bridge->ReplaceNodeProperties(nodeUid, newDataProps, params);
+    CPPUNIT_ASSERT(result.status == mitk::DataStorageBridge::OperationStatus::Success);
+
+    // Verify data scope now has only the new property
+    dataProps = m_Bridge->GetNodeProperties(nodeUid, params);
+    CPPUNIT_ASSERT(dataProps.has_value());
+    CPPUNIT_ASSERT(dataProps.value().contains("data_prop_new"));
+    CPPUNIT_ASSERT(!dataProps.value().contains("data_prop_a"));
+    CPPUNIT_ASSERT(!dataProps.value().contains("data_prop_b"));
+
+    // Verify node properties are still untouched
+    params.scope = mitk::PropertyScope::Node;
+    nodeProps = m_Bridge->GetNodeProperties(nodeUid, params);
+    CPPUNIT_ASSERT(nodeProps.has_value());
+    CPPUNIT_ASSERT(nodeProps.value().contains("node_prop_new"));
+  }
+
+  void DeleteNodePropertyWithScope()
+  {
+    // Create a node with data, set properties at both levels
+    auto nodeWithData = mitk::DataNode::New();
+    nodeWithData->SetName("DeleteScopeTest");
+    nodeWithData->SetBoolProperty("node_del_prop", true);
+
+    auto image = mitk::Image::New();
+    unsigned int dims[3] = {5, 5, 5};
+    image->Initialize(mitk::MakeScalarPixelType<short>(), 3, dims);
+    image->SetProperty("data_del_prop", mitk::BoolProperty::New(true));
+    nodeWithData->SetData(image);
+    m_DataStorage->Add(nodeWithData);
+
+    auto nodeUid = FindUidByName("DeleteScopeTest");
+
+    mitk::PropertyQueryParams params;
+
+    // Scope=Node on node-only property -> succeeds
+    params.scope = mitk::PropertyScope::Node;
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "node_del_prop", params) == mitk::DataStorageBridge::OperationStatus::Success);
+
+    // Scope=Node on data-only property -> fails (property not in node scope)
+    params.scope = mitk::PropertyScope::Node;
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "data_del_prop", params) == mitk::DataStorageBridge::OperationStatus::PropertyNotFound);
+
+    // Scope=Data on data property -> succeeds
+    params.scope = mitk::PropertyScope::Data;
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "data_del_prop", params) == mitk::DataStorageBridge::OperationStatus::Success);
+
+    // Re-add node property for the next check
+    nodeWithData->SetBoolProperty("node_del_prop2", true);
+
+    // Scope=Data on node-only property -> fails
+    params.scope = mitk::PropertyScope::Data;
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(nodeUid, "node_del_prop2", params) == mitk::DataStorageBridge::OperationStatus::PropertyNotFound);
+  }
+
+  void MutationRejectsAllScope()
+  {
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::All;
+
+    // SetNodeProperty with scope=All -> returns InvalidInput
+    nlohmann::json value;
+    value["value"] = "test";
+    CPPUNIT_ASSERT(m_Bridge->SetNodeProperty(m_Root1Uid, "test_prop", value, params) == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+
+    // DeleteNodeProperty with scope=All -> returns InvalidInput
+    CPPUNIT_ASSERT(m_Bridge->DeleteNodeProperty(m_Root1Uid, "visible", params) == mitk::DataStorageBridge::OperationStatus::InvalidInput);
+
+    // ReplaceNodeProperties with scope=All -> returns InvalidInput
+    nlohmann::json newProps;
+    newProps["prop1"] = true;
+    auto result = m_Bridge->ReplaceNodeProperties(m_Root1Uid, newProps, params);
+    CPPUNIT_ASSERT(result.status == mitk::DataStorageBridge::OperationStatus::InvalidInput);
   }
 
   void ComplexPropertySerializationRoundTrip()
@@ -1306,8 +1451,11 @@ public:
     newColorValue["value"] = nlohmann::json::array({0.1, 0.2, 0.3});
     newColorValue["type"] = "ColorProperty";
 
-    bool set = m_Bridge->SetNodeProperty(m_Root1Uid, "color", newColorValue);
-    CPPUNIT_ASSERT(set);
+    mitk::PropertyQueryParams writeParams;
+    writeParams.scope = mitk::PropertyScope::Node;
+
+    auto setStatus = m_Bridge->SetNodeProperty(m_Root1Uid, "color", newColorValue, writeParams);
+    CPPUNIT_ASSERT(setStatus == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Step 4: Get the property again and verify the new values
     prop = m_Bridge->GetNodeProperty(m_Root1Uid, "color");
@@ -1705,9 +1853,11 @@ public:
     // Trying to set an internal property should fail
     nlohmann::json value;
     value["value"] = "hacked_uid";
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
 
-    bool result = m_Bridge->SetNodeProperty(m_Root1Uid, mitk::NodeUidMapper::UID_PROPERTY_KEY, value);
-    CPPUNIT_ASSERT(!result);
+    auto result = m_Bridge->SetNodeProperty(m_Root1Uid, mitk::NodeUidMapper::UID_PROPERTY_KEY, value, params);
+    CPPUNIT_ASSERT(result == mitk::DataStorageBridge::OperationStatus::InvalidInput);
 
     // Verify the original UID is unchanged
     std::string uidValue;
@@ -1718,9 +1868,12 @@ public:
 
   void InternalPropertyCannotBeDeleted()
   {
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
     // Trying to delete an internal property should fail
-    bool result = m_Bridge->DeleteNodeProperty(m_Root1Uid, mitk::NodeUidMapper::UID_PROPERTY_KEY);
-    CPPUNIT_ASSERT(!result);
+    auto result = m_Bridge->DeleteNodeProperty(m_Root1Uid, mitk::NodeUidMapper::UID_PROPERTY_KEY, params);
+    CPPUNIT_ASSERT(result == mitk::DataStorageBridge::OperationStatus::InvalidInput);
 
     // Verify the property still exists
     std::string uidValue;
@@ -1743,8 +1896,11 @@ public:
     // Even if client tries to set internal property, it should be ignored
     newProps[mitk::NodeUidMapper::UID_PROPERTY_KEY] = "should_be_ignored";
 
-    auto result = m_Bridge->ReplaceNodeProperties(m_Root1Uid, newProps);
-    CPPUNIT_ASSERT(result.has_value());
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    auto result = m_Bridge->ReplaceNodeProperties(m_Root1Uid, newProps, params);
+    CPPUNIT_ASSERT(result.status == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify internal property was NOT removed
     std::string uidAfter;
@@ -1819,8 +1975,11 @@ public:
     nlohmann::json value;
     value["value"] = 0.75;
 
-    bool set = m_Bridge->SetNodeProperty(m_Root1Uid, "test_opacity", value);
-    CPPUNIT_ASSERT(set);
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    auto setStatus = m_Bridge->SetNodeProperty(m_Root1Uid, "test_opacity", value, params);
+    CPPUNIT_ASSERT(setStatus == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify modification tracking properties are set
     CPPUNIT_ASSERT(m_Root1->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) != nullptr);
@@ -1832,14 +1991,17 @@ public:
 
   void DeleteNodePropertySetsModificationTracking()
   {
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
     // First set a custom property
     nlohmann::json value;
     value["value"] = "to_be_deleted";
-    m_Bridge->SetNodeProperty(m_Root2Uid, "deletable_prop", value);
+    m_Bridge->SetNodeProperty(m_Root2Uid, "deletable_prop", value, params);
 
     // Delete the property
-    bool deleted = m_Bridge->DeleteNodeProperty(m_Root2Uid, "deletable_prop");
-    CPPUNIT_ASSERT(deleted);
+    auto deleted = m_Bridge->DeleteNodeProperty(m_Root2Uid, "deletable_prop", params);
+    CPPUNIT_ASSERT(deleted == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify modification tracking properties are set
     CPPUNIT_ASSERT(m_Root2->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) != nullptr);
@@ -1855,8 +2017,11 @@ public:
     newProps["replaced_prop1"] = true;
     newProps["replaced_prop2"] = 42;
 
-    auto result = m_Bridge->ReplaceNodeProperties(m_Root3Uid, newProps);
-    CPPUNIT_ASSERT(result.has_value());
+    mitk::PropertyQueryParams params;
+    params.scope = mitk::PropertyScope::Node;
+
+    auto result = m_Bridge->ReplaceNodeProperties(m_Root3Uid, newProps, params);
+    CPPUNIT_ASSERT(result.status == mitk::DataStorageBridge::OperationStatus::Success);
 
     // Verify modification tracking properties are set
     CPPUNIT_ASSERT(m_Root3->GetProperty(mitk::DataStorageBridge::MODIFIED_PROPERTY_KEY) != nullptr);

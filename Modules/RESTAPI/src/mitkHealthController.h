@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define mitkHealthController_h
 
 #include "mitkDataStorageBridge.h"
+#include <mitkRestServerConfig.h>
 #include <httplib.h>
 
 #include <MitkRESTAPIExports.h>
@@ -21,6 +22,8 @@ found in the LICENSE file.
 #include <functional>
 #include <optional>
 #include <cstdint>
+#include <string>
+#include <vector>
 
 namespace mitk
 {
@@ -77,9 +80,42 @@ namespace mitk
      */
     void HandleGET_info(const httplib::Request& req, httplib::Response& res);
 
+    /**
+     * @brief Handle GET /config/file-access request.
+     *
+     * Returns the current file access configuration, including the mode
+     * and, when restrictions are active, the list of allowed directories.
+     *
+     * @param req The HTTP request.
+     * @param res The HTTP response to populate.
+     */
+    void HandleGET_config_file_access(const httplib::Request& req, httplib::Response& res);
+
+    /**
+     * @brief Set the file access configuration.
+     *
+     * @pre \a mode must be a valid FileAccessMode value.
+     * @pre When \a mode is AllowedDirectories, \a allowedDirs must not be empty.
+     *
+     * @param mode The file access mode to apply.
+     * @param allowedDirs Directories to allow when mode is AllowedDirectories.
+     */
+    void SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs);
+
+    /**
+     * @brief Set the per-IP limit for concurrent file-reference temp directories.
+     *        Reported by GET /config/file-access so clients know the eviction policy.
+     * @pre max >= 1.
+     */
+    void SetMaxActiveTempDirsPerIp(size_t max);
+
   private:
     DataStorageBridge& m_Bridge;
+    mutable std::mutex m_Mutex;
     UptimeCallback m_UptimeCallback;
+    FileAccessMode m_FileAccessMode = FileAccessMode::Unrestricted;
+    std::vector<std::string> m_AllowedFileDirectories;
+    size_t m_MaxActiveTempDirsPerIp = 5;
   };
 }
 

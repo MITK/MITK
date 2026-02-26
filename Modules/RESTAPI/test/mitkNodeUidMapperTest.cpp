@@ -116,19 +116,19 @@ public:
     CPPUNIT_ASSERT(targetUid != uidD);
 
     // Find the target node by UID - this should return exactly the right node
-    auto* foundNode = m_Mapper->FindNodeByUid(targetUid);
+    auto foundNode = m_Mapper->FindNodeByUid(targetUid);
 
-    CPPUNIT_ASSERT(foundNode != nullptr);
+    CPPUNIT_ASSERT(foundNode.IsNotNull());
     CPPUNIT_ASSERT_EQUAL(std::string("TargetNode"), foundNode->GetName());
-    CPPUNIT_ASSERT(foundNode == targetNode.GetPointer());
+    CPPUNIT_ASSERT(foundNode == targetNode);
 
     // Verify we can find other nodes too
-    auto* foundA = m_Mapper->FindNodeByUid(uidA);
-    CPPUNIT_ASSERT(foundA != nullptr);
+    auto foundA = m_Mapper->FindNodeByUid(uidA);
+    CPPUNIT_ASSERT(foundA.IsNotNull());
     CPPUNIT_ASSERT_EQUAL(std::string("NodeA"), foundA->GetName());
 
-    auto* foundD = m_Mapper->FindNodeByUid(uidD);
-    CPPUNIT_ASSERT(foundD != nullptr);
+    auto foundD = m_Mapper->FindNodeByUid(uidD);
+    CPPUNIT_ASSERT(foundD.IsNotNull());
     CPPUNIT_ASSERT_EQUAL(std::string("NodeD"), foundD->GetName());
   }
 
@@ -143,7 +143,7 @@ public:
     m_DataStorage->Remove(node);
 
     CPPUNIT_ASSERT(!m_Mapper->HasUid(uid));
-    CPPUNIT_ASSERT(m_Mapper->FindNodeByUid(uid) == nullptr);
+    CPPUNIT_ASSERT(m_Mapper->FindNodeByUid(uid).IsNull());
   }
 
   void ClearsTransientPropertiesOnConnect()
@@ -243,7 +243,7 @@ public:
 
     // UID should still be in the cache
     CPPUNIT_ASSERT(m_Mapper->HasUid(uid));
-    CPPUNIT_ASSERT(m_Mapper->FindNodeByUid(uid) == node.GetPointer());
+    CPPUNIT_ASSERT(m_Mapper->FindNodeByUid(uid) == node);
 
     // UID property should still be on the node
     std::string value;

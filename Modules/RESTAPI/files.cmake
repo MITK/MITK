@@ -6,8 +6,6 @@ set(H_FILES
   include/mitkNodeUidMapper.h
   include/mitkNodeQueryParams.h
   include/mitkErrorResponse.h
-  include/mitkHealthController.h
-  include/mitkDataStorageController.h
 )
 
 set(CPP_FILES
@@ -18,4 +16,13 @@ set(CPP_FILES
   mitkErrorResponse.cpp
   mitkHealthController.cpp
   mitkDataStorageController.cpp
+  mitkSwaggerController.cpp
+)
+
+set(RESOURCE_FILES
+  openapi.json
+  swagger/index.html
+  swagger/swagger-ui-bundle.js
+  swagger/swagger-ui.css
+  swagger/LICENSE
 )

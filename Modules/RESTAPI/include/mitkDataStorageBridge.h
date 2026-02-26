@@ -85,7 +85,8 @@ namespace mitk
     /// Prefix for internal REST API properties (filtered from responses, protected from modification)
     static constexpr const char* INTERNAL_PROPERTY_PREFIX = "restapi.";
 
-    /// Property key for tracking if a node was modified via REST API (bool property)
+    /** Property key for tracking if a node was modified via REST API (string property).
+     If the property exists the node was modified and the value is the timestamp of the modification.*/
     static constexpr const char* MODIFIED_PROPERTY_KEY = "restapi.modified";
 
     /// Property key for tracking the last modification operation (string property)
@@ -128,6 +129,25 @@ namespace mitk
      * @return The DataStorage, or nullptr if not connected.
      */
     DataStorage::Pointer GetDataStorage() const;
+
+    /**
+     * @brief Status codes for mutation operations.
+     *
+     * Enables controllers to produce precise HTTP responses:
+     * - Success           200/204
+     * - NodeNotFound      404
+     * - PropertyNotFound  404
+     * - InvalidInput      400
+     * - InternalError     500
+     */
+    enum class OperationStatus
+    {
+      Success,
+      NodeNotFound,       ///< Target node does not exist           404
+      PropertyNotFound,   ///< Property absent in target scope      404
+      InvalidInput,       ///< Malformed value or unsupported scope 400
+      InternalError       ///< No DataStorage or unexpected state   500
+    };
 
     /**
      * @brief Check if a DataStorage is connected.
@@ -275,9 +295,9 @@ namespace mitk
      *
      * @param uid The node UID.
      * @param data The data to assign. Can be nullptr to clear the node's data.
-     * @return true if successful, false if node not found.
+     * @return OperationStatus::Success, ::NodeNotFound, or ::InternalError.
      */
-    bool SetNodeData(const std::string& uid, BaseData* data);
+    OperationStatus SetNodeData(const std::string& uid, BaseData* data);
 
     // Property operations
 
@@ -314,13 +334,13 @@ namespace mitk
      * @param key The property key.
      * @param value The property value as JSON.
      * @param params Query parameters for scope and context.
-     * @return true if set successfully.
+     * @return OperationStatus::Success, ::NodeNotFound, ::InvalidInput, or ::InternalError.
      */
-    bool SetNodeProperty(
+    OperationStatus SetNodeProperty(
       const std::string& uid,
       const std::string& key,
       const Json& value,
-      const PropertyQueryParams& params = {});
+      const PropertyQueryParams& params);
 
     /**
      * @brief Delete a property from a node.
@@ -328,12 +348,21 @@ namespace mitk
      * @param uid The node UID.
      * @param key The property key.
      * @param params Query parameters for scope and context.
-     * @return true if deleted successfully.
+     * @return OperationStatus::Success, ::NodeNotFound, ::PropertyNotFound, ::InvalidInput, or ::InternalError.
      */
-    bool DeleteNodeProperty(
+    OperationStatus DeleteNodeProperty(
       const std::string& uid,
       const std::string& key,
-      const PropertyQueryParams& params = {});
+      const PropertyQueryParams& params);
+
+    /**
+     * @brief Result of a ReplaceNodeProperties operation.
+     */
+    struct ReplacePropertiesResult
+    {
+      OperationStatus status = OperationStatus::InternalError;
+      Json result = {};  ///< {"replaced": [...], "removed": [...]} - valid only on Success
+    };
 
     /**
      * @brief Replace all properties on a node (PUT semantics).
@@ -341,12 +370,12 @@ namespace mitk
      * @param uid The node UID.
      * @param properties JSON object with all properties (replaces existing).
      * @param params Query parameters for scope and context.
-     * @return JSON with replaced/removed property names, or nullopt if node not found.
+     * @return ReplacePropertiesResult with status and, on success, the replaced/removed lists.
      */
-    std::optional<Json> ReplaceNodeProperties(
+    ReplacePropertiesResult ReplaceNodeProperties(
       const std::string& uid,
       const Json& properties,
-      const PropertyQueryParams& params = {});
+      const PropertyQueryParams& params);
 
     /**
      * @brief Get available property contexts for a node.
@@ -396,6 +425,8 @@ namespace mitk
     WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
     std::unique_ptr<NodeUidMapper> m_UidMapper;
 
+    /** Remark: Important to ensure that this mutex is always acquired before interacting with m_UidMapper
+     * (and its mutex).*/
     mutable std::mutex m_Mutex;
   };
 }

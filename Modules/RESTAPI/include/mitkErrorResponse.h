@@ -47,6 +47,10 @@ namespace mitk
     static constexpr const char* CODE_FILE_NOT_FOUND = "FILE_NOT_FOUND";
     static constexpr const char* CODE_FILE_READ_ERROR = "FILE_READ_ERROR";
     static constexpr const char* CODE_TRANSFER_MODE_NOT_AVAILABLE = "TRANSFER_MODE_NOT_AVAILABLE";
+    static constexpr const char* CODE_ACCESS_DENIED = "ACCESS_DENIED";
+    static constexpr const char* CODE_UNAUTHORIZED = "UNAUTHORIZED";
+    static constexpr const char* CODE_RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED";
+    static constexpr const char* CODE_FILE_ACCESS_DENIED = "FILE_ACCESS_DENIED";
 
     /**
      * @brief Create an RFC 7807 error response.
@@ -198,6 +202,48 @@ namespace mitk
       const std::string& requestedMode,
       const std::vector<std::string>& availableModes,
       const std::string& instance = "");
+
+    /**
+     * @brief Create an "Access denied" error response.
+     *
+     * Used when client IP is not allowed to access the server.
+     *
+     * @param detail Description of why access was denied
+     * @param instance Request path
+     * @return JSON error response with status 403
+     */
+    static Json AccessDenied(const std::string& detail, const std::string& instance = "");
+
+    /**
+     * @brief Create an "Unauthorized" error response.
+     *
+     * Used when authentication is required but not provided or invalid.
+     *
+     * @param detail Description of the authentication failure
+     * @param instance Request path
+     * @return JSON error response with status 401
+     */
+    static Json Unauthorized(const std::string& detail, const std::string& instance = "");
+
+    /**
+     * @brief Create a "Rate limit exceeded" error response.
+     *
+     * @param retryAfterSeconds Seconds until the client can retry
+     * @param instance Request path
+     * @return JSON error response with status 429
+     */
+    static Json RateLimitExceeded(int retryAfterSeconds, const std::string& instance = "");
+
+    /**
+     * @brief Create a "File access denied" error response.
+     *
+     * Used when a file path is outside the allowed directories.
+     *
+     * @param detail Description of the restriction
+     * @param instance Request path
+     * @return JSON error response with status 403
+     */
+    static Json FileAccessDenied(const std::string& detail, const std::string& instance = "");
   };
 }
 

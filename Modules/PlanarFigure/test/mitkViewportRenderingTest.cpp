@@ -28,6 +28,8 @@ found in the LICENSE file.
 // VTK
 #include <vtkDebugLeaks.h>
 #include <vtkRegressionTestImage.h>
+#include <vtkRenderer.h>
+#include <vtkNew.h>
 
 // stdlib
 #include <cstdlib>
@@ -115,6 +117,18 @@ int mitkViewportRenderingTest(int argc, char *argv[])
 
   mitk::RenderingManager::GetInstance()->InitializeViews(
     renderingHelper.GetDataStorage()->ComputeBoundingGeometry3D(images));
+
+  // Add a background renderer that covers the full window and clears to black.
+  // Without this, the area outside the viewport is never cleared by any renderer
+  // and may contain uninitialized video memory on headless macOS CI clients.
+  vtkNew<vtkRenderer> backgroundRenderer;
+  backgroundRenderer->SetBackground(0.0, 0.0, 0.0);
+  backgroundRenderer->SetLayer(0);
+  backgroundRenderer->InteractiveOff();
+
+  renderingHelper.GetVtkRenderWindow()->SetNumberOfLayers(2);
+  renderingHelper.GetVtkRenderWindow()->AddRenderer(backgroundRenderer);
+  renderingHelper.GetVtkRenderer()->SetLayer(1);
 
   renderingHelper.GetVtkRenderer()->SetViewport(vLeft, vBottom, vRight, vTop);
   renderingHelper.SetAutomaticallyCloseRenderWindow(true); // set to false for testing the test itself

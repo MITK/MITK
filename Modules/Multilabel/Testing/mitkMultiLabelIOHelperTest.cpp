@@ -17,8 +17,7 @@ found in the LICENSE file.
 #include <mitkLabel.h>
 #include <mitkImage.h>
 #include <mitkNodePredicateGeometry.h>
-
-#include <filesystem>
+#include <mitkIOUtil.h>
 
 namespace CppUnit
 {
@@ -81,13 +80,13 @@ public:
     m_Segmentation->AddLabel(mitk::Label::New(8, "TestLabel8"), 0);
 
     // Temporary filename for save/load
-    m_TempPresetFile = std::filesystem::temp_directory_path().string() + "/MITK_TestPreset.mitklabel.json";
+    m_TempPresetFile = mitk::IOUtil::GetTempPath() + mitk::IOUtil::GetDirectorySeparator() + "MITK_TestPreset.mitklabel.json";
   }
 
   void tearDown() override
   {
-    if (std::filesystem::exists(m_TempPresetFile))
-      std::filesystem::remove(m_TempPresetFile);
+    if (fs::exists(m_TempPresetFile))
+      fs::remove(m_TempPresetFile);
     m_Segmentation = nullptr;
   }
 
@@ -97,7 +96,7 @@ public:
     bool saveOK = mitk::MultiLabelIOHelper::SaveMultiLabelSegmentationPreset(m_TempPresetFile, m_Segmentation);
     CPPUNIT_ASSERT_MESSAGE("Saving JSON preset should succeed", saveOK);
 
-    CPPUNIT_ASSERT(std::filesystem::exists(m_TempPresetFile));
+    CPPUNIT_ASSERT(fs::exists(m_TempPresetFile));
 
     // Create a new segmentation to load into
     mitk::MultiLabelSegmentation::Pointer loadedSegmentation = mitk::MultiLabelSegmentation::New();

@@ -613,10 +613,9 @@ std::pair<std::string, std::string> mitk::MonaiLabelTool::CreateTempDirs(const s
   std::string inDir, outDir, inputImagePath, outputImagePath;
   inDir = IOUtil::CreateTemporaryDirectory("monai-in-XXXXXX", this->GetTempDir());
   std::ofstream tmpStream;
-  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, filePattern, inDir + IOUtil::GetDirectorySeparator());
+  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, filePattern, inDir);
   tmpStream.close();
-  std::size_t found = inputImagePath.find_last_of(IOUtil::GetDirectorySeparator());
-  std::string fileName = inputImagePath.substr(found + 1);
+  std::string fileName = fs::path(inputImagePath).filename().string();
   std::string token = fileName.substr(0, fileName.find("_"));
   outDir = IOUtil::CreateTemporaryDirectory("monai-out-XXXXXX", this->GetTempDir());
   outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";

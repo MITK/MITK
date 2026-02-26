@@ -144,10 +144,9 @@ void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image
 
   inDir = IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
-  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, m_TEMPLATE_FILENAME, inDir + IOUtil::GetDirectorySeparator());
+  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, m_TEMPLATE_FILENAME, inDir);
   tmpStream.close();
-  std::size_t found = inputImagePath.find_last_of(IOUtil::GetDirectorySeparator());
-  std::string fileName = inputImagePath.substr(found + 1);
+  std::string fileName = fs::path(inputImagePath).filename().string();
   std::string token = fileName.substr(0, fileName.find("_"));
 
   if (this->GetNoPip())

@@ -56,7 +56,7 @@ public:
 
   void ReadWrite_ExampleData_SavedAndLoadedDataEqualToExample()
   {
-    std::string path = mitk::IOUtil::GetTempPath() + "ExampleDataOutput.txt";
+    std::string path = mitk::IOUtil::GetTempPath() + mitk::IOUtil::GetDirectorySeparator() + "ExampleDataOutput.txt";
     mitk::IOUtil::Save(m_Data, path);
     mitk::ExampleDataStructure::Pointer loadedData =
       mitk::IOUtil::Load<mitk::ExampleDataStructure >(path);

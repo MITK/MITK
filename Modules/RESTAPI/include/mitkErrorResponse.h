@@ -42,6 +42,7 @@ namespace mitk
     static constexpr const char* CODE_NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
     static constexpr const char* CODE_NODE_HAS_CHILDREN = "NODE_HAS_CHILDREN";
     static constexpr const char* CODE_NO_DATA = "NO_DATA";
+    static constexpr const char* CODE_NO_GEOMETRY = "NO_GEOMETRY";
     static constexpr const char* CODE_UNSUPPORTED_FORMAT = "UNSUPPORTED_FORMAT";
     static constexpr const char* CODE_SERIALIZATION_ERROR = "SERIALIZATION_ERROR";
     static constexpr const char* CODE_FILE_NOT_FOUND = "FILE_NOT_FOUND";

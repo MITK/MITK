@@ -425,6 +425,7 @@ private:
       mitk::ErrorResponse::CODE_NOT_IMPLEMENTED,
       mitk::ErrorResponse::CODE_NODE_HAS_CHILDREN,
       mitk::ErrorResponse::CODE_NO_DATA,
+      mitk::ErrorResponse::CODE_NO_GEOMETRY,
       mitk::ErrorResponse::CODE_UNSUPPORTED_FORMAT,
       mitk::ErrorResponse::CODE_SERIALIZATION_ERROR,
       mitk::ErrorResponse::CODE_FILE_NOT_FOUND,

@@ -1594,25 +1594,40 @@ Content-Type: application/json
 
 #### POST /api/v1/rendering/reinit
 
-Fit all render windows to the bounding box of all currently visible data (global reinit), or to the geometry of a specific node when a UID is supplied. Equivalent to clicking the global reinit button in the Workbench toolbar.
+Fit all render windows to the bounding box of all currently visible data (global reinit), or to the bounding geometry of one or more specific nodes when UIDs are supplied. Equivalent to clicking the global reinit button in the Workbench toolbar.
+
+Three operating modes:
+- **No body**: global reinit — fits all render windows to the bounding box of all visible data.
+- **`{"uids": ["node-001"]}`**: single-node reinit — fits render windows to that node's geometry.
+- **`{"uids": ["node-001", "node-002"]}`**: multi-node reinit — fits render windows to the combined bounding geometry of all listed nodes.
+
+Every UID in the `uids` array must identify an existing node with data and a valid time geometry; the first failure returns an error.
 
 **Request body (optional, `application/json`):**
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `uid` | string | (none) | When provided, fit views to this node's geometry instead of all visible data |
+| `uids` | array of string (minItems: 1) | (none) | When provided, fit views to the bounding geometry of the specified nodes |
 
 **Example (global reinit — fit all views to all visible data):**
 ```http
 POST /api/v1/rendering/reinit
 ```
 
-**Example (node-scoped reinit — fit views to a specific node):**
+**Example (single-node reinit — fit views to a specific node):**
 ```http
 POST /api/v1/rendering/reinit
 Content-Type: application/json
 
-{"uid": "node-001"}
+{"uids": ["node-001"]}
+```
+
+**Example (multi-node reinit — fit views to the combined bounding box of several nodes):**
+```http
+POST /api/v1/rendering/reinit
+Content-Type: application/json
+
+{"uids": ["node-001", "node-002"]}
 ```
 
 **Response: 204 No Content**
@@ -1621,10 +1636,10 @@ Content-Type: application/json
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 400 | `INVALID_REQUEST` | Body is present but not valid JSON |
-| 404 | `NODE_NOT_FOUND` | No node exists with the given UID |
-| 422 | `NO_DATA` | Node exists but has no data object attached |
-| 422 | `NO_GEOMETRY` | Node has data but the data has no usable time geometry |
+| 400 | `INVALID_REQUEST` | Body is not valid JSON, or `uids` is present but not a non-empty string array |
+| 404 | `NODE_NOT_FOUND` | No node exists with one of the given UIDs |
+| 422 | `NO_DATA` | A listed node exists but has no data object attached |
+| 422 | `NO_GEOMETRY` | A listed node has data but the data has no usable time geometry |
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | No DataStorage is currently connected |
 
 ---
@@ -1868,10 +1883,10 @@ requests.patch(
 requests.post(f"{BASE_URL}/rendering/update", headers=HEADERS)
 
 # 4. Fit all views to the loaded image's geometry
-requests.post(f"{BASE_URL}/rendering/reinit", headers=HEADERS, json={"uid": uid})
+requests.post(f"{BASE_URL}/rendering/reinit", headers=HEADERS, json={"uids": [uid]})
 ```
 
-> **Note:** Steps 3 and 4 can be combined as needed. `POST /rendering/reinit` with no body fits views to all visible data at once; with `{"uid": "..."}` in the body it focuses on a single node's geometry.
+> **Note:** Steps 3 and 4 can be combined as needed. `POST /rendering/reinit` with no body fits views to all visible data at once; with `{"uids": ["..."]}` in the body it focuses on a single node's geometry; with multiple UIDs it fits the combined bounding box of all listed nodes.
 
 ---
 
@@ -1923,7 +1938,7 @@ The API is designed for extension:
 | `PUT` | `/api/v1/datastorage/nodes/{uid}/properties/{name}` | Set property |
 | `DELETE` | `/api/v1/datastorage/nodes/{uid}/properties/{name}` | Delete property |
 | `POST` | `/api/v1/rendering/update` | Trigger render window update |
-| `POST` | `/api/v1/rendering/reinit` | Fit all views to visible data (or one node when `uid` body field is given) |
+| `POST` | `/api/v1/rendering/reinit` | Fit all views to visible data, or to one/multiple nodes when `uids` body field is given |
 
 ### Query Parameters Summary
 

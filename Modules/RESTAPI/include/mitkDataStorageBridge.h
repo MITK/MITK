@@ -283,6 +283,21 @@ namespace mitk
     GetNodeDataResult GetNodeData(const std::string& uid) const;
 
     /**
+     * @brief Look up a DataNode by UID.
+     *
+     * Returns a const strong reference to the node, keeping it alive for
+     * the duration of the caller's use. Returns null if the UID is not registered.
+     *
+     * Intended for read-only access (e.g. inspecting geometry, properties).
+     * Do not retain the returned pointer beyond the immediate call site without
+     * understanding the threading implications.
+     *
+     * @param uid The node UID.
+     * @return DataNode::ConstPointer to the node, or null if not found.
+     */
+    DataNode::ConstPointer FindDataNode(const std::string& uid) const;
+
+    /**
      * @brief Set or replace the data on a node.
      *
      * Thread-safe assignment of BaseData to a node. The data is assigned

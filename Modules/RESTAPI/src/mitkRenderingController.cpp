@@ -12,8 +12,12 @@ found in the LICENSE file.
 
 #include "mitkRenderingController.h"
 #include "mitkErrorResponse.h"
+#include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkRenderingManager.h>
+
+#include <optional>
+#include <vector>
 
 namespace mitk
 {
@@ -104,16 +108,34 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
   }
 
   // Parse optional body for node-scoped reinit.
-  std::string uid;
+  std::vector<std::string> uids;
 
   if (!req.body.empty())
   {
     try
     {
       const auto body = nlohmann::json::parse(req.body);
-      if (body.contains("uid"))
+      if (body.contains("uids"))
       {
-        uid = body["uid"].get<std::string>();
+        const auto& uidsJson = body["uids"];
+        if (!uidsJson.is_array() || uidsJson.empty())
+        {
+          const auto error = ErrorResponse::InvalidRequest(
+            "'uids' must be a non-empty array of strings.", req.path);
+          this->SendErrorResponse(res, 400, error);
+          return;
+        }
+        for (const auto& item : uidsJson)
+        {
+          if (!item.is_string())
+          {
+            const auto error = ErrorResponse::InvalidRequest(
+              "'uids' must be a non-empty array of strings.", req.path);
+            this->SendErrorResponse(res, 400, error);
+            return;
+          }
+          uids.push_back(item.get<std::string>());
+        }
       }
     }
     catch (const nlohmann::json::exception&)
@@ -124,54 +146,66 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
     }
   }
 
-  if (!uid.empty())
+  if (!uids.empty())
   {
-    // Node-scoped reinit: fit views to the geometry of the specified node.
-    const auto result = m_Bridge.GetNodeData(uid);
-
-    if (!result.nodeFound)
+    // Node-scoped reinit: fit views to the bounding geometry of the specified nodes.
+    // Pre-dispatch: validate all UIDs and capture node pointers (no cloning).
+    std::vector<DataNode::ConstPointer> nodes;
+    nodes.reserve(uids.size());
+    for (const auto& uid : uids)
     {
-      const auto error = ErrorResponse::NodeNotFound(uid, req.path);
-      this->SendErrorResponse(res, 404, error);
-      return;
+      const auto node = m_Bridge.FindDataNode(uid);
+      if (node == nullptr)
+      {
+        this->SendErrorResponse(res, 404, ErrorResponse::NodeNotFound(uid, req.path));
+        return;
+      }
+      nodes.push_back(node);
     }
 
-    const auto& data = result.data;
-
-    if (data == nullptr)
-    {
-      const auto error = ErrorResponse::Create(
-        "NO_DATA",
-        "No Data",
-        "Node '" + uid + "' has no data attached.",
-        422,
-        req.path);
-      this->SendErrorResponse(res, 422, error);
-      return;
-    }
-
-    const auto* geometry = data->GetTimeGeometry();
-
-    if (geometry == nullptr)
-    {
-      const auto error = ErrorResponse::Create(
-        "NO_GEOMETRY",
-        "No Geometry",
-        "Node '" + uid + "' has no usable time geometry.",
-        422,
-        req.path);
-      this->SendErrorResponse(res, 422, error);
-      return;
-    }
+    // Dispatch: validate geometry and compute bounding box on the UI thread.
+    const auto dataStorage = m_Bridge.GetDataStorage();
+    std::optional<std::pair<int, nlohmann::json>> dispatchError;
 
     try
     {
-      // Capture data (smart pointer clone) to keep geometry alive across dispatch.
-      this->Dispatch([data, geometry]() {
+      this->Dispatch([dataStorage, nodes, uids, &req, &dispatchError]()
+      {
+        auto nodeSet = DataStorage::SetOfObjects::New();
+        for (std::size_t i = 0; i < nodes.size(); ++i)
+        {
+          const auto data = nodes[i]->GetData();
+          if (data == nullptr)
+          {
+            dispatchError = {422, ErrorResponse::Create(
+              "NO_DATA", "No Data",
+              "Node '" + uids[i] + "' has no data attached.", 422, req.path)};
+            return;
+          }
+          if (data->GetTimeGeometry() == nullptr)
+          {
+            dispatchError = {422, ErrorResponse::Create(
+              "NO_GEOMETRY", "No Geometry",
+              "Node '" + uids[i] + "' has no usable time geometry.", 422, req.path)};
+            return;
+          }
+          // TODO(#728): remove const_cast once DataStorage::SetOfObjects accepts ConstPointer
+          nodeSet->InsertElement(nodeSet->Size(),
+            const_cast<DataNode*>(nodes[i].GetPointer()));
+        }
+
+        const auto geometry = dataStorage->ComputeBoundingGeometry3D(nodeSet);
+        if (geometry == nullptr)
+        {
+          // Defensive: should not happen after per-node validation above.
+          dispatchError = {422, ErrorResponse::Create(
+            "NO_GEOMETRY", "No Geometry",
+            "Failed to compute bounding geometry for the specified nodes.", 422, req.path)};
+          return;
+        }
         RenderingManager::GetInstance()->InitializeViews(
           geometry, RenderingManager::REQUEST_UPDATE_ALL, true);
       });
-      res.status = 204;
     }
     catch (const mitk::Exception& e)
     {
@@ -180,6 +214,7 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
         std::string("Rendering operation failed: ") + e.what(),
         422, req.path);
       this->SendErrorResponse(res, 422, error);
+      return;
     }
     catch (const std::exception& e)
     {
@@ -188,7 +223,15 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
         std::string("Unexpected error during rendering: ") + e.what(),
         500, req.path);
       this->SendErrorResponse(res, 500, error);
+      return;
     }
+
+    if (dispatchError.has_value())
+    {
+      this->SendErrorResponse(res, dispatchError->first, dispatchError->second);
+      return;
+    }
+    res.status = 204;
   }
   else
   {

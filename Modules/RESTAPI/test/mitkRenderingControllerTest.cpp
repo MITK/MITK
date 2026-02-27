@@ -37,12 +37,16 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(ReinitWithoutDataStorageReturns503);
   MITK_TEST(ReinitWithDataStorageReturns204);
 
-  // POST /rendering/reinit with uid body (node-scoped reinit) tests
+  // POST /rendering/reinit with uids body (node-scoped reinit) tests
   MITK_TEST(NodeReinitWithoutDataStorageReturns503);
   MITK_TEST(NodeReinitUnknownUidReturns404);
   MITK_TEST(NodeReinitNodeWithNoDataReturns422);
   MITK_TEST(NodeReinitValidNodeReturns204);
   MITK_TEST(ReinitWithInvalidJsonBodyReturns400);
+  MITK_TEST(MultiNodeReinitWithTwoUidsReturns204);
+  MITK_TEST(MultiNodeReinitEmptyUidsArrayReturns400);
+  MITK_TEST(MultiNodeReinitSecondUidUnknownReturns404);
+  MITK_TEST(MultiNodeReinitSecondNodeNoDataReturns422);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -171,13 +175,13 @@ public:
     CPPUNIT_ASSERT_EQUAL(204, res.status);
   }
 
-  // ===== POST /rendering/reinit with uid body (node-scoped reinit) =====
+  // ===== POST /rendering/reinit with uids body (node-scoped reinit) =====
 
   void NodeReinitWithoutDataStorageReturns503()
   {
     m_Bridge->SetDataStorage(nullptr);
 
-    const auto req = this->MakeRequest("/api/v1/rendering/reinit", R"({"uid":"some-uid"})");
+    const auto req = this->MakeRequest("/api/v1/rendering/reinit", R"({"uids":["some-uid"]})");
     httplib::Response res;
 
     m_Controller->HandlePOST_reinit(req, res);
@@ -189,7 +193,7 @@ public:
 
   void NodeReinitUnknownUidReturns404()
   {
-    const auto req = this->MakeRequest("/api/v1/rendering/reinit", R"({"uid":"unknown-uid"})");
+    const auto req = this->MakeRequest("/api/v1/rendering/reinit", R"({"uids":["unknown-uid"]})");
     httplib::Response res;
 
     m_Controller->HandlePOST_reinit(req, res);
@@ -208,7 +212,7 @@ public:
 
     const auto uid = m_Bridge->GetNodeUid(node.GetPointer());
 
-    const auto req = this->MakeRequest("/api/v1/rendering/reinit", R"({"uid":")" + uid + R"("})");
+    const auto req = this->MakeRequest("/api/v1/rendering/reinit", R"({"uids":[")" + uid + R"("]})");
     httplib::Response res;
 
     m_Controller->HandlePOST_reinit(req, res);
@@ -228,7 +232,7 @@ public:
 
     const auto uid = m_Bridge->GetNodeUid(node.GetPointer());
 
-    const auto req = this->MakeRequest("/api/v1/rendering/reinit", R"({"uid":")" + uid + R"("})");
+    const auto req = this->MakeRequest("/api/v1/rendering/reinit", R"({"uids":[")" + uid + R"("]})");
     httplib::Response res;
 
     m_Controller->HandlePOST_reinit(req, res);
@@ -246,6 +250,87 @@ public:
     CPPUNIT_ASSERT_EQUAL(400, res.status);
     const auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  void MultiNodeReinitWithTwoUidsReturns204()
+  {
+    auto node1 = mitk::DataNode::New();
+    node1->SetName("Node1");
+    node1->SetData(this->MakeImage());
+    m_DataStorage->Add(node1);
+
+    auto node2 = mitk::DataNode::New();
+    node2->SetName("Node2");
+    node2->SetData(this->MakeImage());
+    m_DataStorage->Add(node2);
+
+    const auto uid1 = m_Bridge->GetNodeUid(node1.GetPointer());
+    const auto uid2 = m_Bridge->GetNodeUid(node2.GetPointer());
+
+    const auto req = this->MakeRequest("/api/v1/rendering/reinit",
+      R"({"uids":[")" + uid1 + R"(",")" + uid2 + R"("]})");
+    httplib::Response res;
+
+    m_Controller->HandlePOST_reinit(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+  }
+
+  void MultiNodeReinitEmptyUidsArrayReturns400()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/reinit", R"({"uids":[]})");
+    httplib::Response res;
+
+    m_Controller->HandlePOST_reinit(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  void MultiNodeReinitSecondUidUnknownReturns404()
+  {
+    auto node = mitk::DataNode::New();
+    node->SetName("ValidNode");
+    node->SetData(this->MakeImage());
+    m_DataStorage->Add(node);
+
+    const auto uid = m_Bridge->GetNodeUid(node.GetPointer());
+
+    const auto req = this->MakeRequest("/api/v1/rendering/reinit",
+      R"({"uids":[")" + uid + R"(","unknown-uid"]})");
+    httplib::Response res;
+
+    m_Controller->HandlePOST_reinit(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("NODE_NOT_FOUND"), json["error"]["code"].get<std::string>());
+  }
+
+  void MultiNodeReinitSecondNodeNoDataReturns422()
+  {
+    auto node1 = mitk::DataNode::New();
+    node1->SetName("ValidNode");
+    node1->SetData(this->MakeImage());
+    m_DataStorage->Add(node1);
+
+    auto node2 = mitk::DataNode::New();
+    node2->SetName("EmptyNode");
+    m_DataStorage->Add(node2);
+
+    const auto uid1 = m_Bridge->GetNodeUid(node1.GetPointer());
+    const auto uid2 = m_Bridge->GetNodeUid(node2.GetPointer());
+
+    const auto req = this->MakeRequest("/api/v1/rendering/reinit",
+      R"({"uids":[")" + uid1 + R"(",")" + uid2 + R"("]})");
+    httplib::Response res;
+
+    m_Controller->HandlePOST_reinit(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(422, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("NO_DATA"), json["error"]["code"].get<std::string>());
   }
 };
 

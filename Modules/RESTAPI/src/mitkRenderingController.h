@@ -68,17 +68,20 @@ namespace mitk
     /**
      * @brief Handle POST /rendering/reinit request.
      *
-     * Without a request body (or with an empty body): fits all render windows to the
-     * bounding box of all currently visible data (global reinit). Calls
-     * RenderingManager::InitializeViewsByBoundingObjects(dataStorage).
-     *
-     * With an optional JSON body containing a "uid" field: fits render windows to the
-     * geometry of that specific node. Calls
-     * RenderingManager::InitializeViews(geometry, REQUEST_UPDATE_ALL, true).
+     * Three operating modes:
+     * - No body (or body without "uids"): global reinit — fits all render windows to the
+     *   bounding box of all currently visible data. Calls
+     *   RenderingManager::InitializeViewsByBoundingObjects(dataStorage).
+     * - Body with "uids" containing one UID: single-node reinit — fits render windows to
+     *   the bounding geometry of that node.
+     * - Body with "uids" containing multiple UIDs: multi-node reinit — fits render windows
+     *   to the combined bounding geometry of all listed nodes.
+     *   Both node cases call RenderingManager::InitializeViews(geometry, REQUEST_UPDATE_ALL, true).
      *
      * @pre DataStorage must be connected (503 otherwise).
-     * @pre When "uid" is given: node must exist (404 otherwise).
-     * @pre When "uid" is given: node must have data with a valid TimeGeometry (422 otherwise).
+     * @pre When "uids" is given: must be a non-empty array of strings (400 otherwise).
+     * @pre When "uids" is given: every UID must identify an existing node (404 on first failure).
+     * @pre When "uids" is given: every node must have data with a valid TimeGeometry (422 on first failure).
      *
      * @param req The HTTP request.
      * @param res The HTTP response to populate.

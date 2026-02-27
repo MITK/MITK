@@ -1863,8 +1863,8 @@
         "tags": [
           "Rendering"
         ],
-        "summary": "Reinit — fit all views to visible data or a specific node",
-        "description": "Without a request body: fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. With a JSON body containing a `uid` field: fits all render windows to the geometry of that specific node via `RenderingManager::InitializeViews()`. Equivalent to clicking the global reinit button in the Workbench.",
+        "summary": "Reinit — fit all views to visible data or specific nodes",
+        "description": "Three operating modes: (1) No body — global reinit, fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. (2) Body with `uids` containing one UID — single-node reinit, fits render windows to the geometry of that node. (3) Body with `uids` containing multiple UIDs — multi-node reinit, fits render windows to the combined bounding geometry of all listed nodes. Both node cases use `RenderingManager::InitializeViews()`. Equivalent to clicking the global reinit button in the Workbench.",
         "operationId": "postRenderingReinit",
         "requestBody": {
           "required": false,
@@ -1873,10 +1873,12 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "uid": {
-                    "type": "string",
-                    "description": "When provided, fit views to this node's geometry instead of all visible data.",
-                    "example": "node_1"
+                  "uids": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1,
+                    "description": "When provided, fit views to the bounding geometry of the specified nodes. Use one UID for single-node reinit, multiple UIDs for multi-node reinit. Every listed node must exist and have a usable geometry.",
+                    "example": ["node_1", "node_2"]
                   }
                 }
               },
@@ -1886,9 +1888,15 @@
                   "value": {}
                 },
                 "node-scoped": {
-                  "summary": "Node-scoped reinit",
+                  "summary": "Single-node reinit",
                   "value": {
-                    "uid": "node_1"
+                    "uids": ["node_1"]
+                  }
+                },
+                "multi-node-scoped": {
+                  "summary": "Multi-node reinit",
+                  "value": {
+                    "uids": ["node_1", "node_2"]
                   }
                 }
               }
@@ -1906,20 +1914,38 @@
             "$ref": "#/components/responses/NodeNotFound"
           },
           "422": {
-            "description": "Node has no data or the data has no usable geometry",
+            "description": "A listed node has no data or the data has no usable geometry",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
-                "example": {
-                  "error": {
-                    "type": "https://docs.mitk.org/api/errors/NO_DATA",
-                    "code": "NO_DATA",
-                    "title": "No Data",
-                    "message": "Node 'node_1' has no data attached",
-                    "status": 422,
-                    "instance": "/api/v1/rendering/reinit"
+                "examples": {
+                  "no-data": {
+                    "summary": "Node has no data attached",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/NO_DATA",
+                        "code": "NO_DATA",
+                        "title": "No Data",
+                        "message": "Node 'node_1' has no data attached.",
+                        "status": 422,
+                        "instance": "/api/v1/rendering/reinit"
+                      }
+                    }
+                  },
+                  "no-geometry": {
+                    "summary": "Node data has no usable geometry",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/NO_GEOMETRY",
+                        "code": "NO_GEOMETRY",
+                        "title": "No Geometry",
+                        "message": "Node 'node_1' has no usable time geometry.",
+                        "status": 422,
+                        "instance": "/api/v1/rendering/reinit"
+                      }
+                    }
                   }
                 }
               }

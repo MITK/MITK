@@ -74,7 +74,6 @@
                 "example": {
                   "data": {
                     "name": "MITK Workbench REST API",
-                    "version": "1.0.0",
                     "api_version": "v1",
                     "mitk_version": "2026.02.0",
                     "documentation_url": "https://docs.mitk.org/api/v1",
@@ -155,7 +154,6 @@
                 "example": {
                   "data": {
                     "name": "MITK Workbench REST API",
-                    "version": "1.0.0",
                     "api_version": "v1",
                     "mitk_version": "2026.02.0",
                     "documentation_url": "https://docs.mitk.org/api/v1",
@@ -1989,7 +1987,6 @@
         "type": "object",
         "required": [
           "name",
-          "version",
           "api_version",
           "mitk_version",
           "documentation_url",
@@ -1999,10 +1996,6 @@
           "name": {
             "type": "string",
             "example": "MITK Workbench REST API"
-          },
-          "version": {
-            "type": "string",
-            "example": "1.0.0"
           },
           "api_version": {
             "type": "string",

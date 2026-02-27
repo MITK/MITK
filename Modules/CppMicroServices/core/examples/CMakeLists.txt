@@ -148,7 +148,7 @@ if(US_BUILD_TESTING)
 
   # The makefile is Linux specific, so only try to build the Makefile example
   # if we are on a proper system
-  if(UNIX AND NOT APPLE AND US_BUILD_SHARED_LIBS)
+  if(LINUX AND US_BUILD_SHARED_LIBS)
     find_program(MAKE_COMMAND NAMES make gmake)
     find_program(CXX_COMMAND NAMES g++)
     mark_as_advanced(MAKE_COMMAND CXX_COMMAND)

@@ -92,6 +92,10 @@ endif()
 
 mitk_use_modules(TARGET ${_APP_NAME} MODULES MitkAppUtil)
 
+if(TARGET MitkCompilerFlags)
+  target_link_libraries(${_APP_NAME} PRIVATE MitkCompilerFlags)
+endif()
+
 set_target_properties(${_APP_NAME} PROPERTIES
                       COMPILE_FLAGS "${_app_compile_flags}"
                       VS_DEBUGGER_COMMAND_ARGUMENTS "-style windowsvista")
@@ -218,7 +222,7 @@ if(NOT _APP_NO_INSTALL)
   endif()
 
   # On Linux, create a shell script to start a relocatable application
-  if(UNIX AND NOT APPLE)
+  if(LINUX)
     install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME "${_APP_NAME}.sh")
   elseif(WIN32)
     install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledWin32App.bat" DESTINATION "." RENAME "${_APP_NAME}.bat")

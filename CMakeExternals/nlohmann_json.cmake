@@ -16,12 +16,6 @@ if(MITK_USE_nlohmann_json)
 
     set(additional_args )
 
-    if(CTEST_USE_LAUNCHERS)
-      list(APPEND additional_args
-        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-      )
-    endif()
-
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/nlohmann/json.git

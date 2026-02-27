@@ -20,12 +20,6 @@ if(MITK_USE_lz4)
       list(APPEND additional_args "-DCMAKE_DEBUG_POSTFIX:STRING=d")
     endif()
 
-    if(CTEST_USE_LAUNCHERS)
-      list(APPEND additional_args
-        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-      )
-    endif()
-
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/lz4/lz4.git

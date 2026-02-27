@@ -70,7 +70,7 @@ function(mitkFunctionInstallAutoLoadModules)
 
             set(_${_autoload_target}_installed 1)
 
-            if(UNIX AND NOT APPLE)
+            if(LINUX)
               if(_target_filename_debug)
                 install(CODE "file(RPATH_REMOVE
                                    FILE \"\${CMAKE_INSTALL_PREFIX}/${_module_install_dir}/${_target_filename_debug}\")")

@@ -19,12 +19,6 @@ if(MITK_USE_CTK)
 
     set(ctk_optional_cache_args )
 
-    if(CTEST_USE_LAUNCHERS)
-      list(APPEND ctk_optional_cache_args
-        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-      )
-    endif()
-
     FOREACH(type RUNTIME ARCHIVE LIBRARY)
       IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
         LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})

@@ -25,11 +25,6 @@ set(GDCM_DEPENDS ${proj})
 if(NOT DEFINED GDCM_DIR)
 
   set(additional_args )
-  if(CTEST_USE_LAUNCHERS)
-    list(APPEND additional_args
-      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-    )
-  endif()
 
   # On Mac some assertions fail that prevent reading certain DICOM files. Bug #19995
   if(APPLE)

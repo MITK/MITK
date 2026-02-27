@@ -29,7 +29,6 @@ include(FindPackageHandleStandardArgs)
 include(GenerateExportHeader)
 
 # Include MITK macros
-include(MacroParseArguments)
 include(mitkFunctionAddManifest)
 include(mitkFunctionAddCustomModuleTest)
 include(mitkFunctionCheckMitkCompatibility)
@@ -54,7 +53,6 @@ include(mitkMacroFindDependency)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetPMDPlatformString)
 include(mitkMacroInstall)
-include(mitkMacroInstallHelperApp)
 include(mitkMacroInstallTargets)
 include(mitkMacroMultiplexPicType)
 

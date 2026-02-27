@@ -19,7 +19,7 @@ endmacro()
 # MITK Prerequisites
 #-----------------------------------------------------------------------------
 
-if(UNIX AND NOT APPLE)
+if(LINUX)
 
   include(mitkFunctionCheckPackageHeader)
 
@@ -49,18 +49,6 @@ endif()
 #-----------------------------------------------------------------------------
 
 get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
-
-if(MITK_CTEST_SCRIPT_MODE)
-  # Write a file containing the list of enabled external project targets.
-  # This file can be read by a ctest script to separately build projects.
-  set(SUPERBUILD_TARGETS )
-  foreach(proj ${external_projects})
-    if(MITK_USE_${proj})
-      list(APPEND SUPERBUILD_TARGETS ${proj})
-    endif()
-  endforeach()
-  file(WRITE "${CMAKE_BINARY_DIR}/SuperBuildTargets.cmake" "set(SUPERBUILD_TARGETS ${SUPERBUILD_TARGETS})")
-endif()
 
 # A list of "nice" external projects, playing well together with CMake
 set(nice_external_projects ${external_projects})
@@ -104,11 +92,7 @@ set(ep_prefix "${CMAKE_BINARY_DIR}/ep")
 set_property(DIRECTORY PROPERTY EP_PREFIX ${ep_prefix})
 
 # Compute -G arg for configuring external projects with the same CMake generator:
-if(CMAKE_EXTRA_GENERATOR)
-  set(gen "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
-else()
-  set(gen "${CMAKE_GENERATOR}")
-endif()
+set(gen "${CMAKE_GENERATOR}")
 
 set(gen_platform ${CMAKE_GENERATOR_PLATFORM})
 
@@ -427,11 +411,9 @@ ExternalProject_Add(${proj}
     -DMITK_PCH:BOOL=${MITK_PCH}
     -DMITK_FAST_TESTING:BOOL=${MITK_FAST_TESTING}
     -DMITK_XVFB_TESTING:BOOL=${MITK_XVFB_TESTING}
-    -DCTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
     # ----------------- Miscellaneous ---------------
     -DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}
     -DCMAKE_INCLUDE_PATH:PATH=${CMAKE_INCLUDE_PATH}
-    -DMITK_CTEST_SCRIPT_MODE:STRING=${MITK_CTEST_SCRIPT_MODE}
     -DMITK_SUPERBUILD_BINARY_DIR:PATH=${MITK_BINARY_DIR}
     -DMITK_MODULES_TO_BUILD:INTERNAL=${MITK_MODULES_TO_BUILD}
     -DMITK_WHITELIST:STRING=${MITK_WHITELIST}

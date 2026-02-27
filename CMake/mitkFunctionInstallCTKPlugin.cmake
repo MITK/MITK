@@ -35,7 +35,7 @@ function(mitkFunctionInstallCTKPlugin)
         install(FILES ${_import_loc_release}
                 DESTINATION ${_INSTALL_DESTINATION}
                 CONFIGURATIONS Release)
-        if(UNIX AND NOT APPLE)
+        if(LINUX)
           if(_target_filename_debug)
             install(CODE "file(RPATH_REMOVE
                                FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_debug}\")")

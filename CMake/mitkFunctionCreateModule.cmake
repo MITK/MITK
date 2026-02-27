@@ -110,7 +110,7 @@ function(mitk_create_module)
      )
 
   set(_macro_multiparams
-      SUBPROJECTS            # list of CDash labels (deprecated)
+      SUBPROJECTS            # deprecated, unused
       INCLUDE_DIRS           # include directories: [PUBLIC|PRIVATE|INTERFACE] <list>
       INTERNAL_INCLUDE_DIRS  # include dirs internal to this module (DEPRECATED)
       PCH                    # list of header files for precompiled header
@@ -321,7 +321,7 @@ function(mitk_create_module)
     set(module_cxx_flags_debug )
     set(module_cxx_flags_release )
 
-    if(MODULE_GCC_DEFAULT_VISIBILITY OR NOT CMAKE_COMPILER_IS_GNUCXX)
+    if(MODULE_GCC_DEFAULT_VISIBILITY OR NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
       # We only support hidden visibility for gcc for now. Clang still has troubles with
       # correctly marking template declarations and explicit template instantiations as exported.
       set(CMAKE_CXX_VISIBILITY_PRESET default)
@@ -463,6 +463,10 @@ function(mitk_create_module)
                     ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
         set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules")
         set(_us_module_name ${MODULE_TARGET})
+      endif()
+
+      if(TARGET MitkCompilerFlags)
+        target_link_libraries(${MODULE_TARGET} PRIVATE MitkCompilerFlags)
       endif()
 
       # Apply properties to the module target.

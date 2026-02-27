@@ -2,7 +2,7 @@
     in CMake/PackageDepends/MITK_Boost_Config.cmake can be removed. See the first
     long comment in CMakeExternals/Boost.cmake for details. ]]
 
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.22)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.28)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
@@ -19,22 +19,10 @@ cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
  ]]
 cmake_policy(SET CMP0091 OLD)
 
-if(POLICY CMP0135)
-  # https://cmake.org/cmake/help/v3.24/policy/CMP0135.html
-  # Set timestamps of extracted ExternalProject_Add() downloads to time of extraction.
-  cmake_policy(SET CMP0135 NEW)
-endif()
-
 if(POLICY CMP0167)
   # https://cmake.org/cmake/help/v3.30/policy/CMP0167.html
   # The FindBoost module is removed.
   cmake_policy(SET CMP0167 OLD)
-endif()
-
-if(POLICY CMP0177)
-  # https://cmake.org/cmake/help/v3.31/policy/CMP0177.html
-  # install() DESTINATION paths are normalized.
-  cmake_policy(SET CMP0177 NEW)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -88,12 +76,10 @@ endforeach()
 
 # Standard CMake macros
 include(FeatureSummary)
-include(CTest)
 include(CMakeParseArguments)
 include(FindPackageHandleStandardArgs)
 
 # MITK macros
-include(mitkFunctionGetGccVersion)
 include(mitkFunctionCheckCompilerFlags)
 include(mitkFunctionSuppressWarnings) # includes several functions
 include(mitkMacroEmptyExternalProject)
@@ -102,7 +88,7 @@ include(mitkFunctionWhitelists)
 include(mitkFunctionAddExternalProject)
 include(mitkFunctionAddLibrarySearchPaths)
 
-SUPPRESS_VC_DEPRECATED_WARNINGS()
+# CRT deprecation warnings are suppressed via the MitkCompilerFlags target below.
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
@@ -117,18 +103,16 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
                STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
-else()
-  set(GCC_VERSION 0)
-endif()
-
 set(MITK_CXX_STANDARD 17)
 
 set(CMAKE_CXX_EXTENSIONS 0)
 set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
 
+# Without /Zc:__cplusplus, MSVC reports __cplusplus as 199711L regardless of
+# the actual standard. This breaks third-party libraries (e.g. DCMTK) that
+# check __cplusplus to detect C++11/14/17 support. Must be global because
+# external projects built by the SuperBuild also need it.
 if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
 endif()
@@ -645,7 +629,6 @@ include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetLinuxDistribution)
 include(mitkMacroGetPMDPlatformString)
 include(mitkMacroInstall)
-include(mitkMacroInstallHelperApp)
 include(mitkMacroInstallTargets)
 include(mitkMacroMultiplexPicType)
 
@@ -797,12 +780,6 @@ mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
 option(MITK_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting MITK GUI Applications" ON)
 mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
 
-if(NOT MITK_FAST_TESTING)
-  if(MITK_CTEST_SCRIPT_MODE STREQUAL "Continuous" OR MITK_CTEST_SCRIPT_MODE STREQUAL "Experimental")
-    set(MITK_FAST_TESTING ON)
-  endif()
-endif()
-
 if(NOT UNIX)
   set(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
 endif()
@@ -884,7 +861,7 @@ endif()
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS}")
 set(MITK_C_FLAGS_DEBUG )
 set(MITK_C_FLAGS_RELEASE )
-set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${MITK_CXX${MITK_CXX_STANDARD}_FLAG}")
+set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS}")
 set(MITK_CXX_FLAGS_DEBUG )
 set(MITK_CXX_FLAGS_RELEASE )
 
@@ -892,17 +869,12 @@ set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
 
 if(WIN32)
-  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
   mitkFunctionCheckCompilerFlags("/wd4005" MITK_CXX_FLAGS) # warning C4005: macro redefinition
   mitkFunctionCheckCompilerFlags("/wd4231" MITK_CXX_FLAGS) # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
   # the following line should be removed after fixing bug 17637
   mitkFunctionCheckCompilerFlags("/wd4316" MITK_CXX_FLAGS) # warning C4316: object alignment on heap
   mitkFunctionCheckCompilerFlags("/wd4180" MITK_CXX_FLAGS) # warning C4180: qualifier applied to function type has no meaning
   mitkFunctionCheckCompilerFlags("/wd4251" MITK_CXX_FLAGS) # warning C4251: 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
-endif()
-
-if(APPLE)
-  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -DGL_SILENCE_DEPRECATION") # Apple deprecated OpenGL in macOS 10.14
 endif()
 
 if(NOT MSVC_VERSION)
@@ -932,12 +904,12 @@ if(NOT MSVC_VERSION)
   endforeach()
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT APPLE)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" MITK_SHARED_LINKER_FLAGS)
   mitkFunctionCheckCompilerFlags("-Wl,--as-needed" MITK_SHARED_LINKER_FLAGS)
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   mitkFunctionCheckCAndCXXCompilerFlags("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
   set(MITK_CXX_FLAGS_RELEASE "-U_FORTIFY_SOURCES -D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
 endif()
@@ -1081,6 +1053,8 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(BUILD_TESTING)
+  enable_testing()
+
   # Configuration for the CMake-generated test driver
   set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "#include <stdexcept>")
   set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
@@ -1121,16 +1095,51 @@ if(NOT DEFINED MITK_SUPERBUILD_BINARY_DIR)
 endif()
 
 #-----------------------------------------------------------------------------
-# Set C/CXX and linker flags for MITK code
+# INTERFACE target carrying all MITK-specific compile flags
 #-----------------------------------------------------------------------------
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MITK_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${MITK_CXX_FLAGS_DEBUG}")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${MITK_CXX_FLAGS_RELEASE}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MITK_C_FLAGS}")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${MITK_C_FLAGS_DEBUG}")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${MITK_C_FLAGS_RELEASE}")
+add_library(MitkCompilerFlags INTERFACE)
 
+# C++ and C flags (populated by mitkFunctionCheckCompilerFlags probes above)
+foreach(_var MITK_CXX_FLAGS MITK_C_FLAGS MITK_CXX_FLAGS_RELEASE)
+  string(STRIP "${${_var}}" ${_var})
+endforeach()
+
+if(MITK_CXX_FLAGS)
+  string(REPLACE " " ";" _mitk_cxx_flags "${MITK_CXX_FLAGS}")
+  target_compile_options(MitkCompilerFlags INTERFACE
+    $<$<COMPILE_LANGUAGE:CXX>:${_mitk_cxx_flags}>)
+endif()
+
+if(MITK_C_FLAGS)
+  string(REPLACE " " ";" _mitk_c_flags "${MITK_C_FLAGS}")
+  target_compile_options(MitkCompilerFlags INTERFACE
+    $<$<COMPILE_LANGUAGE:C>:${_mitk_c_flags}>)
+endif()
+
+if(MITK_CXX_FLAGS_RELEASE)
+  string(REPLACE " " ";" _mitk_cxx_flags_release "${MITK_CXX_FLAGS_RELEASE}")
+  target_compile_options(MitkCompilerFlags INTERFACE
+    $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Release>>:${_mitk_cxx_flags_release}>)
+endif()
+
+# Platform compile definitions
+if(WIN32)
+  target_compile_definitions(MitkCompilerFlags INTERFACE
+    WIN32_LEAN_AND_MEAN NOMINMAX)
+endif()
+
+if(APPLE)
+  target_compile_definitions(MitkCompilerFlags INTERFACE
+    GL_SILENCE_DEPRECATION)
+endif()
+
+if(MSVC)
+  target_compile_definitions(MitkCompilerFlags INTERFACE
+    _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS _SCL_SECURE_NO_WARNINGS)
+endif()
+
+# Linker flags remain global
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MITK_EXE_LINKER_FLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MITK_SHARED_LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER_FLAGS}")
@@ -1310,7 +1319,7 @@ foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})
       list(GET target_info_list 2 executable_name)
       list(APPEND ALL_MITK_APPS "${MITK_EXTENSION_DIR}/Applications/${directory_name}^^${option_name}^^${executable_name}")
       if(${option_name} OR MITK_BUILD_ALL_APPS)
-        MATH(EXPR activated_apps_no "${activated_apps_no} + 1")
+        math(EXPR activated_apps_no "${activated_apps_no} + 1")
       endif()
     endforeach()
   endif()

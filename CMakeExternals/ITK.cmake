@@ -31,12 +31,6 @@ if(NOT DEFINED ITK_DIR)
     -DModule_IsotropicWavelets:BOOL=ON
   )
 
-  if(CTEST_USE_LAUNCHERS)
-    list(APPEND additional_cmake_args
-      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-    )
-  endif()
-
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      UPDATE_COMMAND ""

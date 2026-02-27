@@ -9,7 +9,7 @@ Available sections:
 
 \section RenderingTests_WhatIsARenderingTest What is an automatic rendering test?
 
-An automatic rendering test is a powerful tool to test rendering results automatically via dashboard.
+An automatic rendering test is a powerful tool to test rendering results automatically.
 Regarding rendering lots of different sources influence the output on the screen (e.g. different
 mappers, renderers, camera settings or the algorithm creating the data). Thus, during the rendering
 process of an image many different classes are involved and can have impact on the output. A minor

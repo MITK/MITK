@@ -578,6 +578,26 @@
           "404": {
             "$ref": "#/components/responses/NodeNotFound"
           },
+          "409": {
+            "description": "Reparenting would create a circular hierarchy reference",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/CIRCULAR_HIERARCHY_REFERENCE",
+                    "code": "CIRCULAR_HIERARCHY_REFERENCE",
+                    "title": "Circular Hierarchy Reference",
+                    "message": "Cannot reparent node: the target parent is a descendant of this node",
+                    "status": 409,
+                    "instance": "/api/v1/datastorage/nodes/node-001"
+                  }
+                }
+              }
+            }
+          },
           "500": {
             "$ref": "#/components/responses/InternalError"
           },
@@ -1854,6 +1874,26 @@
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
+          },
+          "422": {
+            "description": "An unexpected error occurred in the rendering framework",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                    "code": "RENDERING_ERROR",
+                    "title": "Rendering Error",
+                    "message": "Rendering operation failed: ...",
+                    "status": 422,
+                    "instance": "/api/v1/rendering/update"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1942,6 +1982,19 @@
                         "code": "NO_GEOMETRY",
                         "title": "No Geometry",
                         "message": "Node 'node_1' has no usable time geometry.",
+                        "status": 422,
+                        "instance": "/api/v1/rendering/reinit"
+                      }
+                    }
+                  },
+                  "rendering-error": {
+                    "summary": "Unexpected rendering framework error",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                        "code": "RENDERING_ERROR",
+                        "title": "Rendering Error",
+                        "message": "Rendering operation failed: ...",
                         "status": 422,
                         "instance": "/api/v1/rendering/reinit"
                       }

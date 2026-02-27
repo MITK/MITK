@@ -893,6 +893,16 @@ Content-Type: application/json
 
 > **Note:** To rename a node, use `PUT /api/v1/datastorage/nodes/{uid}/properties/name`.
 
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Body is not valid JSON, or `parent_uid` has an invalid format |
+| 404 | `NODE_NOT_FOUND` | No node exists with the given UID or parent UID |
+| 409 | `CIRCULAR_HIERARCHY_REFERENCE` | The target parent is a descendant of the node being reparented |
+| 500 | `INTERNAL_ERROR` | Unexpected server error |
+| 503 | `DATASTORAGE_NOT_AVAILABLE` | No DataStorage is currently connected |
+
 ---
 
 ##### DELETE /api/v1/datastorage/nodes/{uid}
@@ -1589,6 +1599,7 @@ Content-Type: application/json
 | Status | Code | Description |
 |--------|------|-------------|
 | 400 | `INVALID_REQUEST` | Body is present but not valid JSON, or `type` is not `"all"`, `"2d"`, or `"3d"` |
+| 422 | `RENDERING_ERROR` | An unexpected error occurred in the rendering framework |
 
 ---
 
@@ -1640,6 +1651,7 @@ Content-Type: application/json
 | 404 | `NODE_NOT_FOUND` | No node exists with one of the given UIDs |
 | 422 | `NO_DATA` | A listed node exists but has no data object attached |
 | 422 | `NO_GEOMETRY` | A listed node has data but the data has no usable time geometry |
+| 422 | `RENDERING_ERROR` | An unexpected error occurred in the rendering framework |
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | No DataStorage is currently connected |
 
 ---

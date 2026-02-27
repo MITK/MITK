@@ -82,18 +82,14 @@ void RenderingController::HandlePOST_update(const httplib::Request& req, httplib
   }
   catch (const mitk::Exception& e)
   {
-    const auto error = ErrorResponse::Create(
-      "RENDERING_ERROR", "Rendering Error",
-      std::string("Rendering operation failed: ") + e.what(),
-      422, req.path);
+    const auto error = ErrorResponse::RenderingError(
+      std::string("Rendering operation failed: ") + e.what(), req.path);
     this->SendErrorResponse(res, 422, error);
   }
   catch (const std::exception& e)
   {
-    const auto error = ErrorResponse::Create(
-      "INTERNAL_ERROR", "Internal Error",
-      std::string("Unexpected error during rendering: ") + e.what(),
-      500, req.path);
+    const auto error = ErrorResponse::InternalError(
+      std::string("Unexpected error during rendering: ") + e.what(), req.path);
     this->SendErrorResponse(res, 500, error);
   }
 }
@@ -177,16 +173,12 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
           const auto data = nodes[i]->GetData();
           if (data == nullptr)
           {
-            dispatchError = {422, ErrorResponse::Create(
-              "NO_DATA", "No Data",
-              "Node '" + uids[i] + "' has no data attached.", 422, req.path)};
+            dispatchError = {422, ErrorResponse::NoData(uids[i], req.path)};
             return;
           }
           if (data->GetTimeGeometry() == nullptr)
           {
-            dispatchError = {422, ErrorResponse::Create(
-              "NO_GEOMETRY", "No Geometry",
-              "Node '" + uids[i] + "' has no usable time geometry.", 422, req.path)};
+            dispatchError = {422, ErrorResponse::NoGeometry(uids[i], req.path)};
             return;
           }
           // TODO(#728): remove const_cast once DataStorage::SetOfObjects accepts ConstPointer
@@ -198,9 +190,8 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
         if (geometry == nullptr)
         {
           // Defensive: should not happen after per-node validation above.
-          dispatchError = {422, ErrorResponse::Create(
-            "NO_GEOMETRY", "No Geometry",
-            "Failed to compute bounding geometry for the specified nodes.", 422, req.path)};
+          dispatchError = {500, ErrorResponse::InternalError(
+            "Failed to compute bounding geometry for the specified nodes.", req.path)};
           return;
         }
         RenderingManager::GetInstance()->InitializeViews(
@@ -209,19 +200,15 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
     }
     catch (const mitk::Exception& e)
     {
-      const auto error = ErrorResponse::Create(
-        "RENDERING_ERROR", "Rendering Error",
-        std::string("Rendering operation failed: ") + e.what(),
-        422, req.path);
+      const auto error = ErrorResponse::RenderingError(
+        std::string("Rendering operation failed: ") + e.what(), req.path);
       this->SendErrorResponse(res, 422, error);
       return;
     }
     catch (const std::exception& e)
     {
-      const auto error = ErrorResponse::Create(
-        "INTERNAL_ERROR", "Internal Error",
-        std::string("Unexpected error during rendering: ") + e.what(),
-        500, req.path);
+      const auto error = ErrorResponse::InternalError(
+        std::string("Unexpected error during rendering: ") + e.what(), req.path);
       this->SendErrorResponse(res, 500, error);
       return;
     }
@@ -247,18 +234,14 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
     }
     catch (const mitk::Exception& e)
     {
-      const auto error = ErrorResponse::Create(
-        "RENDERING_ERROR", "Rendering Error",
-        std::string("Rendering operation failed: ") + e.what(),
-        422, req.path);
+      const auto error = ErrorResponse::RenderingError(
+        std::string("Rendering operation failed: ") + e.what(), req.path);
       this->SendErrorResponse(res, 422, error);
     }
     catch (const std::exception& e)
     {
-      const auto error = ErrorResponse::Create(
-        "INTERNAL_ERROR", "Internal Error",
-        std::string("Unexpected error during rendering: ") + e.what(),
-        500, req.path);
+      const auto error = ErrorResponse::InternalError(
+        std::string("Unexpected error during rendering: ") + e.what(), req.path);
       this->SendErrorResponse(res, 500, error);
     }
   }

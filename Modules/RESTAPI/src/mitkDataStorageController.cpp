@@ -1248,11 +1248,7 @@ void DataStorageController::HandlePATCH_nodes_uid(const httplib::Request& req, h
   {
     // parent_uid is present and the parent node exists; the only remaining
     // failure is a circular hierarchy reference (target is a descendant of this node).
-    this->SendErrorResponse(res, 409, ErrorResponse::Create(
-      "CIRCULAR_HIERARCHY_REFERENCE",
-      "Circular Hierarchy Reference",
-      "Cannot reparent node: the target parent is a descendant of this node.",
-      409, req.path));
+    this->SendErrorResponse(res, 409, ErrorResponse::CircularHierarchyReference(req.path));
     return;
   }
 

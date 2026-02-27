@@ -43,6 +43,8 @@ namespace mitk
     static constexpr const char* CODE_NODE_HAS_CHILDREN = "NODE_HAS_CHILDREN";
     static constexpr const char* CODE_NO_DATA = "NO_DATA";
     static constexpr const char* CODE_NO_GEOMETRY = "NO_GEOMETRY";
+    static constexpr const char* CODE_RENDERING_ERROR = "RENDERING_ERROR";
+    static constexpr const char* CODE_CIRCULAR_HIERARCHY_REFERENCE = "CIRCULAR_HIERARCHY_REFERENCE";
     static constexpr const char* CODE_UNSUPPORTED_FORMAT = "UNSUPPORTED_FORMAT";
     static constexpr const char* CODE_SERIALIZATION_ERROR = "SERIALIZATION_ERROR";
     static constexpr const char* CODE_FILE_NOT_FOUND = "FILE_NOT_FOUND";
@@ -153,6 +155,32 @@ namespace mitk
      * @return JSON error response with status 404
      */
     static Json NoData(const std::string& nodeUid, const std::string& instance = "");
+
+    /**
+     * @brief Create a "No geometry" error response.
+     *
+     * @param nodeUid The node UID whose data has no usable time geometry
+     * @param instance Request path
+     * @return JSON error response with status 422
+     */
+    static Json NoGeometry(const std::string& nodeUid, const std::string& instance = "");
+
+    /**
+     * @brief Create a "Rendering error" error response.
+     *
+     * @param detail Description of the rendering failure
+     * @param instance Request path
+     * @return JSON error response with status 422
+     */
+    static Json RenderingError(const std::string& detail, const std::string& instance = "");
+
+    /**
+     * @brief Create a "Circular hierarchy reference" error response.
+     *
+     * @param instance Request path
+     * @return JSON error response with status 409
+     */
+    static Json CircularHierarchyReference(const std::string& instance = "");
 
     /**
      * @brief Create an "Unsupported format" error response.

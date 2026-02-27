@@ -21,7 +21,6 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
-#include <filesystem>
 #include <algorithm>
 
 class mitkLabelSuggestionHelperTestSuite : public mitk::TestFixture

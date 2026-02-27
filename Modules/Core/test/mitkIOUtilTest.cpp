@@ -63,6 +63,7 @@ public:
   {
     std::string tmpPath = mitk::IOUtil::GetTempPath();
     CPPUNIT_ASSERT(!tmpPath.empty());
+    CPPUNIT_ASSERT(fs::path(tmpPath).has_filename() == true);
 
     std::ofstream tmpFile;
     std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpFile);
@@ -92,7 +93,7 @@ public:
     CPPUNIT_ASSERT(tmpFilePath3.substr(tmpFilePath3.size() - 13, 3) == "my-");
     CPPUNIT_ASSERT(tmpFilePath3.substr(tmpFilePath3.size() - 4) == ".TXT");
     tmpFile3.close();
-    // CPPUNIT_ASSERT(std::remove(tmpFilePath3.c_str()) == 0)
+    CPPUNIT_ASSERT(std::remove(tmpFilePath3.c_str()) == 0);
 
     std::string tmpFilePath4 = mitk::IOUtil::CreateTemporaryFile();
     std::ofstream file;

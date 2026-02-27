@@ -115,10 +115,9 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   inDir = IOUtil::CreateTemporaryDirectory("totalseg-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
-  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, TEMPLATE_FILENAME, inDir + IOUtil::GetDirectorySeparator());
+  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, TEMPLATE_FILENAME, inDir);
   tmpStream.close();
-  std::size_t found = inputImagePath.find_last_of(IOUtil::GetDirectorySeparator());
-  std::string fileName = inputImagePath.substr(found + 1);
+  std::string fileName = fs::path(inputImagePath).filename().string();
   std::string token = fileName.substr(0, fileName.find("_"));
   outDir = IOUtil::CreateTemporaryDirectory("totalseg-out-XXXXXX", this->GetMitkTempDir());
   MultiLabelSegmentation::Pointer outputBuffer;

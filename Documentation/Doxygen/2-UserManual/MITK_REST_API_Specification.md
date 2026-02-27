@@ -580,7 +580,6 @@ API information and capabilities.
 {
   "data": {
     "name": "MITK Workbench REST API",
-    "version": "1.0.0",
     "api_version": "v1",
     "mitk_version": "2024.12",
     "capabilities": {

@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include "mitkDataStorageController.h"
 #include "mitkHealthController.h"
+#include "mitkRenderingController.h"
 #include "mitkDataStorageBridge.h"
 #include "mitkErrorResponse.h"
 #include <mitkStandaloneDataStorage.h>
@@ -123,6 +124,7 @@ private:
   std::unique_ptr<mitk::DataStorageBridge> m_Bridge;
   std::unique_ptr<mitk::DataStorageController> m_Controller;
   std::unique_ptr<mitk::HealthController> m_HealthController;
+  std::unique_ptr<mitk::RenderingController> m_RenderingController;
 
   nlohmann::json m_Spec;
   std::map<EndpointKey, HandlerFunc> m_EndpointRegistry;
@@ -264,6 +266,16 @@ private:
     m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties/{key}", "delete"}] =
       [this](const httplib::Request& req, httplib::Response& res) {
         m_Controller->HandleDELETE_nodes_uid_properties_key(req, res);
+      };
+
+    // Rendering
+    m_EndpointRegistry[{"/rendering/update", "post"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePOST_update(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/reinit", "post"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePOST_reinit(req, res);
       };
   }
 
@@ -458,6 +470,7 @@ public:
     m_Bridge->SetDataStorage(m_DataStorage);
     m_Controller = std::make_unique<mitk::DataStorageController>(*m_Bridge);
     m_HealthController = std::make_unique<mitk::HealthController>(*m_Bridge);
+    m_RenderingController = std::make_unique<mitk::RenderingController>(*m_Bridge);
 
     m_Spec = this->LoadOpenAPISpec();
 
@@ -468,6 +481,7 @@ public:
   {
     m_EndpointRegistry.clear();
     m_Spec = nullptr;
+    m_RenderingController.reset();
     m_HealthController.reset();
     m_Controller.reset();
     m_Bridge->SetDataStorage(nullptr);

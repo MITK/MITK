@@ -52,6 +52,14 @@ namespace mitk
     typedef itk::VectorContainer<unsigned int, DataNode::Pointer> SetOfObjects;
 
     //##Documentation
+    //## @brief A Container of const node pointers, used for input parameters where nodes are only read.
+    //##
+    //## Callers that hold only DataNode::ConstPointer can use this container to pass nodes to DataStorage
+    //## operations without needing a const_cast at the call site. Internally, the DataStorage converts
+    //## to mutable pointers at its ownership boundary, as it owns all nodes as mutable objects.
+    typedef itk::VectorContainer<unsigned int, DataNode::ConstPointer> ConstSetOfObjects;
+
+    //##Documentation
     //## @brief Adds a DataNode containing a data object to its internal storage
     //##
     //## This Method adds a new data object to the DataStorage. The new object is
@@ -69,6 +77,14 @@ namespace mitk
     void Add(DataNode *node, DataNode *parent);
 
     //##Documentation
+    //## @brief Convenience overload for callers that hold only const node pointers for the parents.
+    //##
+    //## Converts the ConstSetOfObjects to a SetOfObjects and delegates to the virtual Add().
+    //## If @a node is nullptr or already in the DataStorage, an exception will be thrown.
+    //## @a parents may be nullptr (equivalent to adding without parents).
+    void Add(DataNode *node, const ConstSetOfObjects *parents);
+
+    //##Documentation
     //## @brief Removes node from the DataStorage
     //##
     virtual void Remove(const DataNode *node) = 0;
@@ -82,6 +98,12 @@ namespace mitk
     //## @brief Removes a set of nodes from the DataStorage
     //##
     void Remove(const DataStorage::SetOfObjects *nodes);
+
+    //##Documentation
+    //## @brief Removes a set of nodes from the DataStorage (const-node-pointer overload).
+    //##
+    //## If @a nodes is nullptr, this method does nothing.
+    void Remove(const ConstSetOfObjects *nodes);
 
     //##Documentation
     //## @brief returns a set of data objects that meet the given condition(s)
@@ -289,6 +311,22 @@ namespace mitk
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
     TimeGeometry::ConstPointer ComputeBoundingGeometry3D(const SetOfObjects *input,
+                                                         const char *boolPropertyKey = nullptr,
+                                                         const BaseRenderer *renderer = nullptr,
+                                                         const char *boolPropertyKey2 = nullptr) const;
+
+    //##Documentation
+    //## @brief Compute the axis-parallel bounding geometry of a given set of const nodes
+    //##
+    //## Overload for callers that hold only DataNode::ConstPointer. Semantically identical to the
+    //## SetOfObjects overload.
+    //## Throws std::invalid_argument exception if input is nullptr
+    //## @param input set of const node pointers to be included in the bounding geometry
+    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
+    //## and is set to @a false, the node is ignored for the bounding-box calculation.
+    //## @param renderer see @a boolPropertyKey
+    //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
+    TimeGeometry::ConstPointer ComputeBoundingGeometry3D(const ConstSetOfObjects *input,
                                                          const char *boolPropertyKey = nullptr,
                                                          const BaseRenderer *renderer = nullptr,
                                                          const char *boolPropertyKey2 = nullptr) const;

@@ -167,7 +167,7 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
     {
       this->Dispatch([dataStorage, nodes, uids, &req, &dispatchError]()
       {
-        auto nodeSet = DataStorage::SetOfObjects::New();
+        auto nodeSet = DataStorage::ConstSetOfObjects::New();
         for (std::size_t i = 0; i < nodes.size(); ++i)
         {
           const auto data = nodes[i]->GetData();
@@ -181,9 +181,7 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
             dispatchError = {422, ErrorResponse::NoGeometry(uids[i], req.path)};
             return;
           }
-          // TODO(#728): remove const_cast once DataStorage::SetOfObjects accepts ConstPointer
-          nodeSet->InsertElement(nodeSet->Size(),
-            const_cast<DataNode*>(nodes[i].GetPointer()));
+          nodeSet->InsertElement(nodeSet->Size(), nodes[i]);
         }
 
         const auto geometry = dataStorage->ComputeBoundingGeometry3D(nodeSet);

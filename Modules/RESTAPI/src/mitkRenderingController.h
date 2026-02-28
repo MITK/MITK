@@ -99,7 +99,7 @@ namespace mitk
     void SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error);
 
     DataStorageBridge& m_Bridge;
-    StorageThreadDispatcherBase* m_Dispatcher = nullptr;
+    WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
   };
 }
 

@@ -218,7 +218,7 @@ bool RestServer::Start()
     m_DataStorageController->SetTempDirectory(m_TempDirectory);
     m_SwaggerController = std::make_unique<SwaggerController>();
     m_RenderingController = std::make_unique<RenderingController>(*m_Bridge);
-    m_RenderingController->SetDispatcher(m_Dispatcher.Lock());
+    this->SyncDispatcherToController();
 
     // Pass file access config to controllers
     m_DataStorageController->SetFileAccessConfig(
@@ -360,10 +360,13 @@ void RestServer::SetDispatcher(StorageThreadDispatcherBase* dispatcher)
   std::lock_guard<std::mutex> lock(m_Mutex);
   m_Dispatcher = dispatcher;
   m_Bridge->SetDispatcher(dispatcher);
+  this->SyncDispatcherToController();
+}
+
+void RestServer::SyncDispatcherToController()
+{
   if (m_RenderingController)
-  {
-    m_RenderingController->SetDispatcher(dispatcher);
-  }
+    m_RenderingController->SetDispatcher(m_Dispatcher.Lock());
 }
 
 DataStorage::Pointer RestServer::GetDataStorage() const

@@ -102,6 +102,10 @@ namespace mitk
     void RegisterRoutes();
     void ServerThreadFunc();
 
+    /** @brief Propagate the current dispatcher to the rendering controller if it exists.
+     *  @pre m_Mutex is held by the caller. */
+    void SyncDispatcherToController();
+
     // --- Security middleware (Phase 4) ---
 
     /**

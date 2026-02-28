@@ -249,13 +249,14 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
 
 void RenderingController::Dispatch(std::function<void()> task) const
 {
-  if (m_Dispatcher == nullptr)
+  auto dispatcher = m_Dispatcher.Lock();
+  if (dispatcher.IsNull())
   {
     task();
   }
   else
   {
-    m_Dispatcher->Execute(std::move(task));
+    dispatcher->Execute(std::move(task));
   }
 }
 

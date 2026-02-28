@@ -90,6 +90,12 @@ else()
   qt_add_executable(${_APP_NAME} MANUAL_FINALIZATION MACOSX_BUNDLE WIN32 ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 endif()
 
+set_target_properties(${_APP_NAME} PROPERTIES MITK_DEPLOY_QT TRUE)
+set_property(GLOBAL APPEND PROPERTY MITK_EXECUTABLE_TARGETS ${_APP_NAME})
+if(_APP_NO_INSTALL)
+  set_target_properties(${_APP_NAME} PROPERTIES NO_INSTALL TRUE)
+endif()
+
 mitk_use_modules(TARGET ${_APP_NAME} MODULES MitkAppUtil)
 
 if(TARGET MitkCompilerFlags)
@@ -213,19 +219,12 @@ if(NOT _APP_NO_INSTALL)
     BlueBerryApplicationInstallHook(APP_NAME ${_APP_NAME} PLUGINS ${_real_app_plugins})
   endif()
 
-  # Install the executable
-  MITK_INSTALL_TARGETS(EXECUTABLES ${_APP_NAME} LIBRARY_DIRS ${_APP_LIBRARY_DIRS} GLOB_PLUGINS )
+  # The executable, wrapper scripts, and Qt deployment are handled centrally
+  # by mitkInstallRules.cmake via MITK_EXECUTABLE_TARGETS.
 
   if(NOT _APP_NO_PROVISIONING)
     # Install the provisioning file
     mitkFunctionInstallProvisioningFiles(${_prov_file})
-  endif()
-
-  # On Linux, create a shell script to start a relocatable application
-  if(LINUX)
-    install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME "${_APP_NAME}.sh")
-  elseif(WIN32)
-    install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledWin32App.bat" DESTINATION "." RENAME "${_APP_NAME}.bat")
   endif()
 
   # Tell cpack the executables that you want in the start menu as links

@@ -151,10 +151,14 @@ function(mitkFunctionCreateProvisioningFile)
       endif()
 
       set(plugin_url "${file_url}${_plugin_location}/lib${_plugin_target}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-      set(plugin_url_install "${file_url}@EXECUTABLE_DIR/plugins/lib${_plugin_target}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
       set(out_var "${out_var}START ${plugin_url}\n")
-      set(out_var_install "${out_var_install}START ${plugin_url_install}\n")
+
+      get_target_property(_no_install ${_plugin_target} NO_INSTALL)
+      if(NOT _no_install)
+        set(plugin_url_install "${file_url}@EXECUTABLE_DIR/plugins/lib${_plugin_target}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+        set(out_var_install "${out_var_install}START ${plugin_url_install}\n")
+      endif()
     else()
       #message(WARNING "Ignoring unknown plug-in target \"${plugin}\" for provisioning.")
     endif()

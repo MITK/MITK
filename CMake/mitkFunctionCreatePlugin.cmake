@@ -277,6 +277,10 @@ function(mitk_create_plugin)
 
   set(PLUGIN_TARGET ${PLUGIN_TARGET} PARENT_SCOPE)
 
+  if(_PLUGIN_NO_INSTALL)
+    set_target_properties(${PLUGIN_TARGET} PROPERTIES NO_INSTALL TRUE)
+  endif()
+
   #------------------------------------------------------------#
   #------------------ Installer support -----------------------#
   if(NOT _PLUGIN_NO_INSTALL)

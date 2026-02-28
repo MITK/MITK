@@ -301,7 +301,7 @@ mitkFunctionFindWhitelists(MITK)
 option(MITK_USE_Qt6 "Use Qt 6 library" ON)
 
 if(MITK_USE_Qt6)
-  set(MITK_QT6_MINIMUM_VERSION 6.6)
+  set(MITK_QT6_MINIMUM_VERSION 6.7)
   set(MITK_QT6_COMPONENTS
     Concurrent
     Core
@@ -387,6 +387,15 @@ if(MITK_USE_Qt6)
 
   get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake LOCATION)
   get_target_property(QT_HELPGENERATOR_EXECUTABLE Qt6::qhelpgenerator LOCATION)
+
+  if(LINUX)
+    execute_process(COMMAND "${QT_QMAKE_EXECUTABLE}" -query QT_INSTALL_LIBEXECS
+      OUTPUT_VARIABLE QT_INSTALL_LIBEXECS OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND "${QT_QMAKE_EXECUTABLE}" -query QT_INSTALL_DATA
+      OUTPUT_VARIABLE QT_INSTALL_DATA OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND "${QT_QMAKE_EXECUTABLE}" -query QT_INSTALL_TRANSLATIONS
+      OUTPUT_VARIABLE QT_INSTALL_TRANSLATIONS OUTPUT_STRIP_TRAILING_WHITESPACE)
+  endif()
 endif()
 
 if(Qt6_DIR)
@@ -1382,9 +1391,6 @@ endif()
 # include CPack model once all variables are set
 include(CPack)
 
-# Additional installation rules
-include(mitkInstallRules)
-
 #-----------------------------------------------------------------------------
 # Last configuration steps
 #-----------------------------------------------------------------------------
@@ -1516,6 +1522,11 @@ foreach(MITK_EXTENSION_DIR ${MITK_ABSOLUTE_EXTENSION_DIRS})
     add_subdirectory("${MITK_APPLICATIONS_EXTENSION_DIR}" "Applications")
   endif()
 endforeach()
+
+# Additional installation rules - included here (after Applications) so that all
+# installable targets are registered in MITK_EXECUTABLE_TARGETS and MITK_MODULE_TARGETS.
+# Must come before Examples to avoid installing example executables.
+include(mitkInstallRules)
 
 #-----------------------------------------------------------------------------
 # MITK Examples

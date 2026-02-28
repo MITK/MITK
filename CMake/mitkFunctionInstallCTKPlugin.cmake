@@ -47,9 +47,9 @@ function(mitkFunctionInstallCTKPlugin)
         endif()
       else()
         install(TARGETS ${_install_target}
+                RUNTIME_DEPENDENCY_SET mitk_deps
                 RUNTIME DESTINATION ${_INSTALL_DESTINATION}
                 LIBRARY DESTINATION ${_INSTALL_DESTINATION}
-                #ARCHIVE DESTINATION ${_INSTALL_DESTINATION}
                 )
       endif()
     else()

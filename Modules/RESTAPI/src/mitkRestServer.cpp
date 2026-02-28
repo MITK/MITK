@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "mitkHealthController.h"
 #include "mitkDataStorageController.h"
 #include "mitkSwaggerController.h"
+#include "mitkRenderingController.h"
 #include "mitkErrorResponse.h"
 
 #ifndef CPPHTTPLIB_OPENSSL_SUPPORT
@@ -216,6 +217,8 @@ bool RestServer::Start()
     m_DataStorageController = std::make_unique<DataStorageController>(*m_Bridge);
     m_DataStorageController->SetTempDirectory(m_TempDirectory);
     m_SwaggerController = std::make_unique<SwaggerController>();
+    m_RenderingController = std::make_unique<RenderingController>(*m_Bridge);
+    this->SyncDispatcherToController();
 
     // Pass file access config to controllers
     m_DataStorageController->SetFileAccessConfig(
@@ -299,6 +302,7 @@ void RestServer::Stop()
     m_HealthController.reset();
     m_DataStorageController.reset();
     m_SwaggerController.reset();
+    m_RenderingController.reset();
 
     // Clear request tracking, log, and rate limit data
     m_ClientIPs.clear();
@@ -354,7 +358,15 @@ void RestServer::SetDataStorage(DataStorage* dataStorage)
 void RestServer::SetDispatcher(StorageThreadDispatcherBase* dispatcher)
 {
   std::lock_guard<std::mutex> lock(m_Mutex);
+  m_Dispatcher = dispatcher;
   m_Bridge->SetDispatcher(dispatcher);
+  this->SyncDispatcherToController();
+}
+
+void RestServer::SyncDispatcherToController()
+{
+  if (m_RenderingController)
+    m_RenderingController->SetDispatcher(m_Dispatcher.Lock());
 }
 
 DataStorage::Pointer RestServer::GetDataStorage() const
@@ -845,6 +857,19 @@ void RestServer::RegisterRoutes()
     [this](const httplib::Request& req, httplib::Response& res) {
       m_DataStorageController->HandlePATCH_nodes_uid_properties(req, res);
       this->RecordRequest(req.path, "PATCH", res.status, req.remote_addr);
+    });
+
+  // Rendering endpoints
+  m_Server->Post(apiBase + "/rendering/update",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePOST_update(req, res);
+      this->RecordRequest(req.path, "POST", res.status, req.remote_addr);
+    });
+
+  m_Server->Post(apiBase + "/rendering/reinit",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePOST_reinit(req, res);
+      this->RecordRequest(req.path, "POST", res.status, req.remote_addr);
     });
 
   // Documentation endpoints (Swagger UI and OpenAPI spec)

@@ -883,6 +883,15 @@ namespace mitk
     });
   }
 
+  DataNode::ConstPointer DataStorageBridge::FindDataNode(const std::string& uid) const
+  {
+    std::lock_guard<std::mutex> lock(m_Mutex);
+    return this->DispatchTask<DataNode::ConstPointer>([this, uid]()
+    {
+      return DataNode::ConstPointer(m_UidMapper->FindNodeByUid(uid));
+    });
+  }
+
   DataStorageBridge::OperationStatus DataStorageBridge::SetNodeData(const std::string& uid, BaseData* data)
   {
     std::lock_guard<std::mutex> lock(m_Mutex);

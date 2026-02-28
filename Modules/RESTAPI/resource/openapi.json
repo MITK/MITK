@@ -43,6 +43,10 @@
     {
       "name": "Configuration",
       "description": "Server configuration discovery"
+    },
+    {
+      "name": "Rendering",
+      "description": "Render window update and reinit operations"
     }
   ],
   "paths": {
@@ -70,7 +74,6 @@
                 "example": {
                   "data": {
                     "name": "MITK Workbench REST API",
-                    "version": "1.0.0",
                     "api_version": "v1",
                     "mitk_version": "2026.02.0",
                     "documentation_url": "https://docs.mitk.org/api/v1",
@@ -151,7 +154,6 @@
                 "example": {
                   "data": {
                     "name": "MITK Workbench REST API",
-                    "version": "1.0.0",
                     "api_version": "v1",
                     "mitk_version": "2026.02.0",
                     "documentation_url": "https://docs.mitk.org/api/v1",
@@ -575,6 +577,26 @@
           },
           "404": {
             "$ref": "#/components/responses/NodeNotFound"
+          },
+          "409": {
+            "description": "Reparenting would create a circular hierarchy reference",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/CIRCULAR_HIERARCHY_REFERENCE",
+                    "code": "CIRCULAR_HIERARCHY_REFERENCE",
+                    "title": "Circular Hierarchy Reference",
+                    "message": "Cannot reparent node: the target parent is a descendant of this node",
+                    "status": 409,
+                    "instance": "/api/v1/datastorage/nodes/node-001"
+                  }
+                }
+              }
+            }
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -1816,6 +1838,177 @@
           }
         }
       }
+    },
+    "/rendering/update": {
+      "post": {
+        "tags": [
+          "Rendering"
+        ],
+        "summary": "Trigger render window update",
+        "description": "Requests all registered render windows to be updated via `RenderingManager::RequestUpdateAll()`. Callers should use this after batching data or property changes to make them visible without triggering per-change flicker.",
+        "operationId": "postRenderingUpdate",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["all", "2d", "3d"],
+                    "default": "all",
+                    "description": "Which render windows to update: all, only 2D windows, or only 3D windows."
+                  }
+                }
+              },
+              "example": {
+                "type": "all"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Update requested successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "422": {
+            "description": "An unexpected error occurred in the rendering framework",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                    "code": "RENDERING_ERROR",
+                    "title": "Rendering Error",
+                    "message": "Rendering operation failed: ...",
+                    "status": 422,
+                    "instance": "/api/v1/rendering/update"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rendering/reinit": {
+      "post": {
+        "tags": [
+          "Rendering"
+        ],
+        "summary": "Reinit — fit all views to visible data or specific nodes",
+        "description": "Three operating modes: (1) No body — global reinit, fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. (2) Body with `uids` containing one UID — single-node reinit, fits render windows to the geometry of that node. (3) Body with `uids` containing multiple UIDs — multi-node reinit, fits render windows to the combined bounding geometry of all listed nodes. Both node cases use `RenderingManager::InitializeViews()`. Equivalent to clicking the global reinit button in the Workbench.",
+        "operationId": "postRenderingReinit",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uids": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1,
+                    "description": "When provided, fit views to the bounding geometry of the specified nodes. Use one UID for single-node reinit, multiple UIDs for multi-node reinit. Every listed node must exist and have a usable geometry.",
+                    "example": ["node_1", "node_2"]
+                  }
+                }
+              },
+              "examples": {
+                "global": {
+                  "summary": "Global reinit (no body)",
+                  "value": {}
+                },
+                "node-scoped": {
+                  "summary": "Single-node reinit",
+                  "value": {
+                    "uids": ["node_1"]
+                  }
+                },
+                "multi-node-scoped": {
+                  "summary": "Multi-node reinit",
+                  "value": {
+                    "uids": ["node_1", "node_2"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Reinit performed successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NodeNotFound"
+          },
+          "422": {
+            "description": "A listed node has no data or the data has no usable geometry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "no-data": {
+                    "summary": "Node has no data attached",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/NO_DATA",
+                        "code": "NO_DATA",
+                        "title": "No Data",
+                        "message": "Node 'node_1' has no data attached.",
+                        "status": 422,
+                        "instance": "/api/v1/rendering/reinit"
+                      }
+                    }
+                  },
+                  "no-geometry": {
+                    "summary": "Node data has no usable geometry",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/NO_GEOMETRY",
+                        "code": "NO_GEOMETRY",
+                        "title": "No Geometry",
+                        "message": "Node 'node_1' has no usable time geometry.",
+                        "status": 422,
+                        "instance": "/api/v1/rendering/reinit"
+                      }
+                    }
+                  },
+                  "rendering-error": {
+                    "summary": "Unexpected rendering framework error",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                        "code": "RENDERING_ERROR",
+                        "title": "Rendering Error",
+                        "message": "Rendering operation failed: ...",
+                        "status": 422,
+                        "instance": "/api/v1/rendering/reinit"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "$ref": "#/components/responses/DataStorageNotAvailable"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1873,7 +2066,6 @@
         "type": "object",
         "required": [
           "name",
-          "version",
           "api_version",
           "mitk_version",
           "documentation_url",
@@ -1883,10 +2075,6 @@
           "name": {
             "type": "string",
             "example": "MITK Workbench REST API"
-          },
-          "version": {
-            "type": "string",
-            "example": "1.0.0"
           },
           "api_version": {
             "type": "string",

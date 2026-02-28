@@ -134,6 +134,36 @@ namespace mitk
       instance);
   }
 
+  ErrorResponse::Json ErrorResponse::NoGeometry(const std::string& nodeUid, const std::string& instance)
+  {
+    return Create(
+      CODE_NO_GEOMETRY,
+      "No Geometry",
+      "Node '" + nodeUid + "' has no usable time geometry",
+      422,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::RenderingError(const std::string& detail, const std::string& instance)
+  {
+    return Create(
+      CODE_RENDERING_ERROR,
+      "Rendering Error",
+      detail,
+      422,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::CircularHierarchyReference(const std::string& instance)
+  {
+    return Create(
+      CODE_CIRCULAR_HIERARCHY_REFERENCE,
+      "Circular Hierarchy Reference",
+      "Cannot reparent node: the target parent is a descendant of this node",
+      409,
+      instance);
+  }
+
   ErrorResponse::Json ErrorResponse::UnsupportedFormat(const std::string& detail, const std::string& instance)
   {
     return Create(

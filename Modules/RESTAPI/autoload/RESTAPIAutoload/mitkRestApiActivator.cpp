@@ -47,13 +47,9 @@ public:
   {
     m_Context = context;
 
-    // Create RestServer instance
     m_RestServer = std::make_unique<RestServer>();
 
-    // Register as IRestServerService
     m_RestServerRegistration = context->RegisterService<IRestServerService>(m_RestServer.get());
-
-    MITK_INFO << "REST API module loaded, service registered";
 
     this->StartServiceTracking();
   }
@@ -62,19 +58,16 @@ public:
   {
     this->StopServiceTracking();
 
-    // Stop server
     if (m_RestServer)
     {
       m_RestServer->Stop();
     }
 
-    // Unregister service
     if (m_RestServerRegistration)
     {
       m_RestServerRegistration.Unregister();
     }
 
-    // Clean up
     m_RestServer.reset();
     m_Context = nullptr;
 

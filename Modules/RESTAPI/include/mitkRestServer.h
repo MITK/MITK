@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <MitkRESTAPIExports.h>
 #include <mitkIRestServerService.h>
 #include <mitkStorageThreadDispatcherBase.h>
+#include <mitkWeakPointer.h>
 
 #include <memory>
 #include <thread>
@@ -40,6 +41,7 @@ namespace mitk
   class HealthController;
   class DataStorageController;
   class SwaggerController;
+  class RenderingController;
 
   /**
    * @brief HTTP REST server implementation.
@@ -100,6 +102,10 @@ namespace mitk
     void RegisterRoutes();
     void ServerThreadFunc();
 
+    /** @brief Propagate the current dispatcher to the rendering controller if it exists.
+     *  @pre m_Mutex is held by the caller. */
+    void SyncDispatcherToController();
+
     // --- Security middleware (Phase 4) ---
 
     /**
@@ -145,6 +151,8 @@ namespace mitk
     std::unique_ptr<HealthController> m_HealthController;
     std::unique_ptr<DataStorageController> m_DataStorageController;
     std::unique_ptr<SwaggerController> m_SwaggerController;
+    std::unique_ptr<RenderingController> m_RenderingController;
+    WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
 
     // State
     mutable std::mutex m_Mutex;

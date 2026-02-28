@@ -20,7 +20,7 @@ function(mitkFunctionOrganizeSources)
   # ${GLOBBED_TXX_FILES} (CURRENTLY COMMENTED OUT)
   # ${GLOBBED_DOX_FILES}
 
-  cmake_parse_arguments(_ORG "" "" "HEADER;SOURCE;TXX;DOC;MOC;GEN_QRC;GEN_UI;META;UI;QRC" ${ARGN})
+  cmake_parse_arguments(_ORG "" "" "HEADER;SOURCE;TXX;DOC;META;UI;QRC" ${ARGN})
 
   set(CORRESPONDING__H_FILES "")
   set(GLOBBED__H_FILES "")
@@ -38,12 +38,6 @@ function(mitkFunctionOrganizeSources)
 
   set(CORRESPONDING__H_FILES ${CORRESPONDING__H_FILES} PARENT_SCOPE)
   set(GLOBBED__H_FILES ${GLOBBED__H_FILES} PARENT_SCOPE)
-
-  if(_ORG_GEN_QRC OR _ORG_GEN_UI OR _ORG_MOC)
-    source_group("Generated\\Qt QRC Source Files" FILES ${_ORG_GEN_QRC})
-    source_group("Generated\\Qt UI Header Files" FILES ${_ORG_GEN_UI})
-    source_group("Generated\\Qt MOC Source Files" FILES ${_ORG_MOC})
-  endif()
 
   #_MACRO_APPEND_TO_LIST(_ORG_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/")
   source_group("== Source Files ==" FILES ${_ORG_SOURCE})

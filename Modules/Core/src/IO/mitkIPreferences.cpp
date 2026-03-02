@@ -13,6 +13,9 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <tinyxml2.h>
 
+#include <algorithm>
+#include <functional>
+
 mitk::IPreferences::ChangeEvent::ChangeEvent(IPreferences* source, const std::string& property, const std::string& oldValue, const std::string& newValue)
   : m_Source(source),
     m_Property(property),
@@ -47,9 +50,17 @@ mitk::IPreferences::~IPreferences()
 
 namespace
 {
-  void ApplyOverridesFromXMLElement(const tinyxml2::XMLElement* xmlPreferencesElement, mitk::IPreferences* targetNode)
+  using PropertyApplier = std::function<void(mitk::IPreferences*, const std::string&, const std::string&)>;
+
+  /** Helper function that traverses the proference tree based on the passed xml and uses the PropertyApplier.*/
+  void ApplyFromXMLElement(
+    const tinyxml2::XMLElement* xmlElement,
+    mitk::IPreferences* targetNode,
+    const PropertyApplier& applyProperty,
+    bool createNodes,
+    const char* operationName)
   {
-    const auto* xmlPropertyElement = xmlPreferencesElement->FirstChildElement("property");
+    const auto* xmlPropertyElement = xmlElement->FirstChildElement("property");
 
     while (xmlPropertyElement != nullptr)
     {
@@ -57,31 +68,34 @@ namespace
       const auto* value = xmlPropertyElement->Attribute("value");
 
       if (name == nullptr)
-        mitkThrow() << "Cannot apply preferences overrides: missing required attribute 'name' on <property> element.";
+        mitkThrow() << "Cannot apply preferences " << operationName << ": missing required attribute 'name' on <property> element.";
 
       if (value == nullptr)
-        mitkThrow() << "Cannot apply preferences overrides: missing required attribute 'value' on <property> element.";
+        mitkThrow() << "Cannot apply preferences " << operationName << ": missing required attribute 'value' on <property> element.";
 
-      targetNode->Override(name, value);
+      applyProperty(targetNode, name, value);
 
       xmlPropertyElement = xmlPropertyElement->NextSiblingElement("property");
     }
 
-    const auto* xmlChildElement = xmlPreferencesElement->FirstChildElement("preferences");
+    const auto* xmlChildElement = xmlElement->FirstChildElement("preferences");
 
     while (xmlChildElement != nullptr)
     {
       const auto* childName = xmlChildElement->Attribute("name");
 
       if (childName == nullptr)
-        mitkThrow() << "Cannot apply preferences overrides: missing required attribute 'name' on <preferences> element.";
+        mitkThrow() << "Cannot apply preferences " << operationName << ": missing required attribute 'name' on <preferences> element.";
 
-      const auto childrenNames = targetNode->ChildrenNames();
+      if (!createNodes)
+      {
+        const auto childrenNames = targetNode->ChildrenNames();
 
-      if (std::find(childrenNames.begin(), childrenNames.end(), childName) == childrenNames.end())
-        mitkThrow() << "Cannot apply preferences overrides: preferences node \"" << childName << "\" does not exist.";
+        if (std::find(childrenNames.begin(), childrenNames.end(), childName) == childrenNames.end())
+          mitkThrow() << "Cannot apply preferences " << operationName << ": preferences node \"" << childName << "\" does not exist.";
+      }
 
-      ApplyOverridesFromXMLElement(xmlChildElement, targetNode->Node(childName));
+      ApplyFromXMLElement(xmlChildElement, targetNode->Node(childName), applyProperty, createNodes, operationName);
 
       xmlChildElement = xmlChildElement->NextSiblingElement("preferences");
     }
@@ -101,5 +115,25 @@ void mitk::ApplyPreferencesOverrides(const std::string& xmlContent, IPreferences
   if (xmlDocument.RootElement() == nullptr)
     mitkThrow() << "Cannot apply preferences overrides: XML document has no root element.";
 
-  ApplyOverridesFromXMLElement(xmlDocument.RootElement(), prefs);
+  ApplyFromXMLElement(xmlDocument.RootElement(), prefs,
+    [](IPreferences* node, const std::string& name, const std::string& value) { node->Override(name, value); },
+    false, "overrides");
+}
+
+void mitk::ApplyPreferencesPatches(const std::string& xmlContent, IPreferences* prefs)
+{
+  if (prefs == nullptr)
+    mitkThrow() << "Cannot apply preferences patches: preferences root node is nullptr.";
+
+  tinyxml2::XMLDocument xmlDocument;
+
+  if (xmlDocument.Parse(xmlContent.c_str()) != tinyxml2::XML_SUCCESS)
+    mitkThrow() << "Cannot apply preferences patches: malformed XML: " << xmlDocument.ErrorStr();
+
+  if (xmlDocument.RootElement() == nullptr)
+    mitkThrow() << "Cannot apply preferences patches: XML document has no root element.";
+
+  ApplyFromXMLElement(xmlDocument.RootElement(), prefs,
+    [](IPreferences* node, const std::string& name, const std::string& value) { node->Put(name, value); },
+    true, "patches");
 }

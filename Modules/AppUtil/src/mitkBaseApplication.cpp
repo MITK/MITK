@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 #include <mitkExceptionMacro.h>
 #include <mitkLog.h>
 #include <mitkProvisioningInfo.h>
@@ -43,6 +44,9 @@ found in the LICENSE file.
 #include <QTime>
 #include <QWebEngineUrlScheme>
 #include <QQuickWindow>
+
+#include <fstream>
+#include <sstream>
 
 #include <QMainWindow>
 #include <QTimer>
@@ -150,6 +154,33 @@ namespace
 
     return remainingOptions;
   }
+
+  void ApplyPreferencesOverridesFromCLI(const QStringList& overrides, mitk::IPreferences* rootPrefs)
+  {
+    for (const auto& override : overrides)
+    {
+      std::string xmlContent;
+
+      if (override.startsWith('@'))
+      {
+        const auto filePath = override.mid(1).toStdString();
+        std::ifstream file(filePath);
+
+        if (!file.is_open())
+          mitkThrow() << "Cannot open preferences override file: \"" << filePath << "\".";
+
+        std::ostringstream buffer;
+        buffer << file.rdbuf();
+        xmlContent = buffer.str();
+      }
+      else
+      {
+        xmlContent = override.toStdString();
+      }
+
+      mitk::ApplyPreferencesOverrides(xmlContent, rootPrefs);
+    }
+  }
 }
 
 namespace mitk
@@ -175,6 +206,7 @@ namespace mitk
   const QString BaseApplication::ARG_LOG_QT_MESSAGES = "Qt.logMessages";
   const QString BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET = "Segmentation.labelSetPreset";
   const QString BaseApplication::ARG_FULL_SCREEN_MODE = "MITK.fullscreen";
+  const QString BaseApplication::ARG_PREFERENCES_OVERRIDE = "MITK.preferences-override";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
   const QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
@@ -229,6 +261,7 @@ namespace mitk
 
     QStringList m_PreloadLibs;
     QString m_ProvFile;
+    QStringList m_PreferencesOverrides;
 
     Impl(int argc, char **argv)
       : m_QApp(nullptr),
@@ -311,6 +344,11 @@ namespace mitk
     void handlePreloadLibraryOption(const std::string &, const std::string &value)
     {
       m_PreloadLibs.push_back(QString::fromStdString(value));
+    }
+
+    void handlePreferencesOverrideOption(const std::string &, const std::string &value)
+    {
+      m_PreferencesOverrides.push_back(QString::fromStdString(value));
     }
 
     void handleClean(const std::string &, const std::string &)
@@ -691,6 +729,14 @@ namespace mitk
       // Initialize core service preferences at the exact same location as their predecessor BlueBerry preferences
       mitk::CoreServicePointer preferencesService(mitk::CoreServices::GetPreferencesService());
       preferencesService->InitializeStorage(storageDir.toStdString() + "data/3/prefs.xml");
+
+      if (!d->m_PreferencesOverrides.isEmpty())
+        ApplyPreferencesOverridesFromCLI(d->m_PreferencesOverrides, preferencesService->GetSystemPreferences());
+    }
+    else
+    {
+      if (!d->m_PreferencesOverrides.isEmpty())
+        MITK_WARN << "Preferences overrides were supplied but could not be applied because the storage directory was not initialized (e.g. another instance is already running).";
     }
 
     // 7. Set the library search paths and the pre-load library property
@@ -933,6 +979,12 @@ namespace mitk
     fullscreenOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
     options.addOption(fullscreenOption);
 
+    Poco::Util::Option preferencesOverrideOption(ARG_PREFERENCES_OVERRIDE.toStdString(), "",
+      "temporarily override preferences for this session; use @<file> to read XML content from a file");
+    preferencesOverrideOption.argument("<xml-or-@file>")
+      .repeatable(true)
+      .callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handlePreferencesOverrideOption));
+    options.addOption(preferencesOverrideOption);
 
     // Make Poco aware of QGuiApplication command-line options, even though they are only parsed by
     // Qt. Otherwise, Poco would throw exceptions for unknown options.
@@ -991,6 +1043,11 @@ namespace mitk
     catch (const Poco::Util::OptionException& e)
     {
       MITK_ERROR << e.name() << ": " << e.message();
+      return EXIT_FAILURE;
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << e.GetDescription();
       return EXIT_FAILURE;
     }
 

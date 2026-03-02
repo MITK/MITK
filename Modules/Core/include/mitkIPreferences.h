@@ -395,6 +395,21 @@ namespace mitk
   */
   MITKCORE_EXPORT void ApplyPreferencesOverrides(const std::string& xmlContent, IPreferences* prefs);
 
+  /**
+  * \brief Permanently patch preferences from an XML string.
+  *
+  * Parses the given XML string (same format as prefs.xml) and writes each
+  * property via IPreferences::Put(). Missing preference nodes are created on demand.
+  * The caller is responsible for calling Flush() after all patches have been applied.
+  *
+  * \pre \p prefs must not be nullptr.
+  * \pre \p xmlContent must be valid XML in the prefs.xml format.
+  * \throws mitk::Exception if \p prefs is nullptr or the XML is malformed.
+  *
+  * \sa IPreferences::Put()
+  */
+  MITKCORE_EXPORT void ApplyPreferencesPatches(const std::string& xmlContent, IPreferences* prefs);
+
 }
 
 #endif

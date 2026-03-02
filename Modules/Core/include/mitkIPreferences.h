@@ -380,6 +380,21 @@ namespace mitk
     Message1<const IPreferences*> OnChanged; /**< \brief Notify on node changes. */
     Message1<const ChangeEvent&> OnPropertyChanged; /**< \brief Notify on property changes. */
   };
+
+  /**
+  * \brief Apply preference overrides from XML content.
+  *
+  * Parses the given XML string (same format as prefs.xml) and applies all
+  * properties as session-only overrides to the corresponding preference nodes.
+  *
+  * \pre \p prefs must not be nullptr.
+  * \pre \p xmlContent must be valid XML in the prefs.xml format.
+  * \throws mitk::Exception if \p prefs is nullptr or the XML is malformed.
+  *
+  * \sa IPreferences::Override()
+  */
+  MITKCORE_EXPORT void ApplyPreferencesOverrides(const std::string& xmlContent, IPreferences* prefs);
+
 }
 
 #endif

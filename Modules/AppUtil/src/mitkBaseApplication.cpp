@@ -155,31 +155,36 @@ namespace
     return remainingOptions;
   }
 
+  std::string ResolvePreferencesXMLFromCLIArg(const QString& arg, const char* kind)
+  {
+    if (arg.startsWith('@'))
+    {
+      const auto filePath = arg.mid(1).toStdString();
+      std::ifstream file(filePath);
+
+      if (!file.is_open())
+        mitkThrow() << "Cannot open preferences " << kind << " file: \"" << filePath << "\".";
+
+      std::ostringstream buffer;
+      buffer << file.rdbuf();
+      return buffer.str();
+    }
+
+    return arg.toStdString();
+  }
+
   void ApplyPreferencesOverridesFromCLI(const QStringList& overrides, mitk::IPreferences* rootPrefs)
   {
     for (const auto& override : overrides)
-    {
-      std::string xmlContent;
+      mitk::ApplyPreferencesOverrides(ResolvePreferencesXMLFromCLIArg(override, "override"), rootPrefs);
+  }
 
-      if (override.startsWith('@'))
-      {
-        const auto filePath = override.mid(1).toStdString();
-        std::ifstream file(filePath);
+  void ApplyPreferencesPatchesFromCLI(const QStringList& patches, mitk::IPreferences* rootPrefs)
+  {
+    for (const auto& patch : patches)
+      mitk::ApplyPreferencesPatches(ResolvePreferencesXMLFromCLIArg(patch, "patch"), rootPrefs);
 
-        if (!file.is_open())
-          mitkThrow() << "Cannot open preferences override file: \"" << filePath << "\".";
-
-        std::ostringstream buffer;
-        buffer << file.rdbuf();
-        xmlContent = buffer.str();
-      }
-      else
-      {
-        xmlContent = override.toStdString();
-      }
-
-      mitk::ApplyPreferencesOverrides(xmlContent, rootPrefs);
-    }
+    rootPrefs->Flush();
   }
 }
 
@@ -207,6 +212,7 @@ namespace mitk
   const QString BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET = "Segmentation.labelSetPreset";
   const QString BaseApplication::ARG_FULL_SCREEN_MODE = "MITK.fullscreen";
   const QString BaseApplication::ARG_PREFERENCES_OVERRIDE = "MITK.preferences-override";
+  const QString BaseApplication::ARG_PREFERENCES_PATCH = "MITK.preferences-patch";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
   const QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
@@ -262,6 +268,7 @@ namespace mitk
     QStringList m_PreloadLibs;
     QString m_ProvFile;
     QStringList m_PreferencesOverrides;
+    QStringList m_PreferencesPatches;
 
     Impl(int argc, char **argv)
       : m_QApp(nullptr),
@@ -349,6 +356,11 @@ namespace mitk
     void handlePreferencesOverrideOption(const std::string &, const std::string &value)
     {
       m_PreferencesOverrides.push_back(QString::fromStdString(value));
+    }
+
+    void handlePreferencesPatchOption(const std::string &, const std::string &value)
+    {
+      m_PreferencesPatches.push_back(QString::fromStdString(value));
     }
 
     void handleClean(const std::string &, const std::string &)
@@ -730,11 +742,17 @@ namespace mitk
       mitk::CoreServicePointer preferencesService(mitk::CoreServices::GetPreferencesService());
       preferencesService->InitializeStorage(storageDir.toStdString() + "data/3/prefs.xml");
 
+      if (!d->m_PreferencesPatches.isEmpty())
+        ApplyPreferencesPatchesFromCLI(d->m_PreferencesPatches, preferencesService->GetSystemPreferences());
+
       if (!d->m_PreferencesOverrides.isEmpty())
         ApplyPreferencesOverridesFromCLI(d->m_PreferencesOverrides, preferencesService->GetSystemPreferences());
     }
     else
     {
+      if (!d->m_PreferencesPatches.isEmpty())
+        MITK_WARN << "Preferences patches were supplied but could not be applied because the storage directory was not initialized (e.g. another instance is already running).";
+
       if (!d->m_PreferencesOverrides.isEmpty())
         MITK_WARN << "Preferences overrides were supplied but could not be applied because the storage directory was not initialized (e.g. another instance is already running).";
     }
@@ -985,6 +1003,13 @@ namespace mitk
       .repeatable(true)
       .callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handlePreferencesOverrideOption));
     options.addOption(preferencesOverrideOption);
+
+    Poco::Util::Option preferencesPatchOption(ARG_PREFERENCES_PATCH.toStdString(), "",
+      "permanently patch preferences before this session starts; use @<file> to read XML content from a file");
+    preferencesPatchOption.argument("<xml-or-@file>")
+      .repeatable(true)
+      .callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handlePreferencesPatchOption));
+    options.addOption(preferencesPatchOption);
 
     // Make Poco aware of QGuiApplication command-line options, even though they are only parsed by
     // Qt. Otherwise, Poco would throw exceptions for unknown options.
